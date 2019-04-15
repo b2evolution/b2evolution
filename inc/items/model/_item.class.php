@@ -5985,10 +5985,7 @@ class Item extends ItemLight
 		$url = false;
 		if( ! is_admin_page() && $this->Blog->get_setting( 'in_skin_editing' ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
-			if( check_item_perm_edit( $this->ID, false ) )
-			{	// Current user can edit this post:
-				$url = url_add_param( $this->Blog->get( 'url' ), 'disp=propose&p='.$this->ID );
-			}
+			$url = url_add_param( $this->Blog->get( 'url' ), 'disp=proposechange&p='.$this->ID );
 		}
 		else if( $current_User->check_perm( 'admin', 'restricted' ) )
 		{	// Edit a post from Back-office:
@@ -12488,9 +12485,13 @@ class Item extends ItemLight
 		{	// Set a redirect URL:
 			$redirect_to = get_returnto_url();
 			$inskin_edit_script = '/item_edit.php';
-			if( strpos( $redirect_to, $inskin_edit_script ) == strlen( $redirect_to ) - strlen( $inskin_edit_script ) )
+			if( strpos( $redirect_to, $inskin_edit_script ) == strlen( $redirect_to ) - strlen( $inskin_edit_script ) ||
+			    strpos( $redirect_to, '?disp=proposechange' ) !== false )
 			{	// Fix a redirect page to correct in-skin editing page
-				$redirect_to = $this->get_edit_url( array( 'force_in_skin_editing' => true ) );
+				if( ! ( $redirect_to = $this->get_edit_url( array( 'force_in_skin_editing' => true ) ) ) )
+				{
+					$redirect_to = $this->get_permanent_url( '', '', '' );
+				}
 			}
 		}
 

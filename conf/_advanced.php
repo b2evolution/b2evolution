@@ -494,7 +494,7 @@ $customizer_url = $baseurl.'customize.php';
 /**
  * Location of the admin interface dispatcher
  */
-$dispatcher = 'admin.php';
+$dispatcher = 'evoadm.php';
 $admin_url = $baseurl.$dispatcher;
 
 /**

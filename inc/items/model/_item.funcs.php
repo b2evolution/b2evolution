@@ -126,7 +126,7 @@ function init_MainList( $items_nb_limit )
  */
 function init_inskin_editing()
 {
-	global $Collection, $Blog, $edited_Item, $action, $form_action;
+	global $Collection, $Blog, $edited_Item, $action, $form_action, $disp;
 	global $item_tags, $item_title, $item_content;
 	global $admin_url, $redirect_to, $advanced_edit_link;
 
@@ -143,7 +143,20 @@ function init_inskin_editing()
 	// Post ID, go from $_GET when we copy post from Front-office
 	$copy_post_ID = param( 'cp', 'integer', 0 );
 
-	if( $post_ID > 0 )
+	if( $disp == 'proposechange' )
+	{	// Propose a change:
+		$ItemCache = & get_ItemCache ();
+		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
+
+		// Check if current User can create a new proposed change:
+		$edited_Item->can_propose_change( true );
+
+		if( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) )
+		{	// Suggest item fields values from last proposed change when user creates new propose change:
+			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
+		}
+	}
+	elseif( $post_ID > 0 )
 	{	// Edit post
 		global $post_extracats;
 		$action = 'edit';
@@ -217,8 +230,10 @@ function init_inskin_editing()
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
 
-	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:Restrict item status to max allowed by item collection:
-	$edited_Item->restrict_status();
+	if( $disp != 'proposechange' )
+	{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:Restrict item status to max allowed by item collection:
+		$edited_Item->restrict_status();
+	}
 
 	// Used in the edit form:
 

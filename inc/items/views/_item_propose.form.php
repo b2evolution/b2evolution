@@ -66,11 +66,9 @@ $Form->begin_form( '', '', $params );
 	<?php
 	// ############################ POST CONTENTS #############################
 
-	if( $edited_Item->ID > 0 )
-	{	// Set form title for editing the item:
-		$form_title_item_ID = T_('Propose change for Item').' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'" class="post_type_link">#'.$edited_Item->ID.'</a>';
-	}
-	$Form->begin_fieldset( $form_title_item_ID.get_manual_link( 'post-contents-panel' ), array( 'id' => 'itemform_content' ) );
+	$Form->begin_fieldset( sprintf( T_('Propose change for Item %s'),
+			' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID.'" class="post_type_link">#'.$edited_Item->ID.'</a>' )
+		.get_manual_link( 'post-contents-panel' ), array( 'id' => 'itemform_content' ) );
 
 	$Form->switch_layout( 'fields_table' );
 

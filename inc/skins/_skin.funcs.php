@@ -1370,6 +1370,7 @@ function skin_init( $disp )
 			break;
 
 		case 'edit':
+		case 'proposechange':
 			global $current_User, $post_ID;
 
 			// Post ID, go from $_GET when we edit a post from Front-office
@@ -1378,7 +1379,7 @@ function skin_init( $disp )
 
 			if( !is_logged_in() )
 			{ // Redirect to the login page if not logged in and allow anonymous user setting is OFF
-				$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit' );
+				$redirect_to = url_add_param( $Blog->gen_blogurl(), ( $disp == 'edit' ? 'disp=edit' : 'disp=proposechange&amp;p='.$post_ID ) );
 				$Messages->add( T_( 'You must log in to create & edit posts.' ) );
 				header_redirect( get_login_url( 'cannot edit posts', $redirect_to ), 302 );
 				// will have exited
@@ -1399,8 +1400,10 @@ function skin_init( $disp )
 				header_redirect( $Blog->gen_blogurl(), 302 );
 			}
 
-			// user logged in and the account was activated
-			check_item_perm_edit( $post_ID );
+			if( $disp == 'edit' )
+			{	// Check permission to create/edit post:
+				check_item_perm_edit( $post_ID );
+			}
 
 			if( ! blog_has_cats( $Blog->ID ) )
 			{ // No categories are in this blog
@@ -1898,6 +1901,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_comments'              => '_comments.disp.php',
 				'disp_download'              => '_download.disp.php',
 				'disp_edit'                  => '_edit.disp.php',
+				'disp_proposechange'         => '_proposechange.disp.php',
 				'disp_edit_comment'          => '_edit_comment.disp.php',
 				'disp_feedback-popup'        => '_feedback_popup.disp.php',
 				'disp_flagged'               => '_flagged.disp.php',

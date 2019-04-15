@@ -930,7 +930,7 @@ function get_user_logout_url( $blog_ID = NULL )
 
 	$redirect_to = url_rel_to_same_host( regenerate_url( 'disp,action','','','&' ), get_htsrv_url( 'login' ) );
 	if( require_login( $redirect_to, true ) )
-	{ // if redirect_to page is a login page, or also require login ( e.g. admin.php )
+	{ // if redirect_to page is a login page, or also require login ( e.g. evoadm.php )
 		if( ! empty( $blog_ID ) )
 		{ // Try to use blog by defined ID
 			$BlogCache = & get_BlogCache();

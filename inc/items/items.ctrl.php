@@ -94,13 +94,14 @@ switch( $action )
 			$edited_Item = & $ItemCache->get_by_ID( $p );
 		}
 
-		if( $action == 'propose' &&
-		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
-		{	// If the Item already has a proposed change:
+		if( $action == 'propose' )
+		{	// Action to propose a change
 			// Check if current User can create a new proposed change:
 			$edited_Item->can_propose_change( true );
-			// Suggest item fields values from last proposed change when user creates new propose change:
-			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
+			if( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) )
+			{	// Suggest item fields values from last proposed change when user creates new propose change:
+				$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
+			}
 		}
 
 		// Load the blog we're in:
