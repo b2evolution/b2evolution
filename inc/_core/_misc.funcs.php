@@ -7495,7 +7495,7 @@ function evo_flush()
 
 /**
  * Name the transaction for the APM.
- * This avoids that every request be called 'index.php' or 'admin.php' or 'cron_exec.php'
+ * This avoids that every request be called 'index.php' or 'evoadm.php' or 'cron_exec.php'
  *
  * @param mixed $request_transaction_name
  */

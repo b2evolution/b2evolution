@@ -663,7 +663,7 @@ class test_plugin extends Plugin
 
 
 	/**
-	 * Event handler: Gets invoked in /admin.php for every backoffice page after
+	 * Event handler: Gets invoked in /evoadm.php for every backoffice page after
 	 *                the menu structure is built. You could use the {@link $AdminUI} object
 	 *                to modify it.
 	 *
