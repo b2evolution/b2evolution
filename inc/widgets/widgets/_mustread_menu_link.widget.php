@@ -155,13 +155,7 @@ class mustread_menu_link_Widget extends generic_menu_link_Widget
 	 */
 	function display( $params )
 	{
-		global $current_User, $disp, $Blog;
-
-		if( ! is_logged_in() )
-		{	// Only logged in user can flag items:
-			$this->display_debug_message( 'Hidden(Not logged in)' );
-			return false;
-		}
+		global $disp, $Blog;
 
 		$this->init_display( $params );
 
