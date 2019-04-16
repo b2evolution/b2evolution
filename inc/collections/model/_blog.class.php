@@ -3167,6 +3167,10 @@ class Blog extends DataObject
 				$disp_param = 'flagged';
 				break;
 
+			case 'mustreadurl':
+				$disp_param = 'mustread';
+				break;
+
 			case 'helpurl':
 				if( $this->get_setting( 'help_link' ) == 'slug' )
 				{
@@ -6599,6 +6603,40 @@ class Blog extends DataObject
 			// ]]>
 			</script>';
 		}
+	}
+
+
+	/**
+	 * Get a count of must read items of this collection
+	 *
+	 * @return integer
+	 */
+	function get_mustread_items_count()
+	{
+		if( ! $this->get_setting( 'track_unread_content' ) )
+		{	// No must read items when tracking of unread content is enabled for this collection:
+			return 0;
+		}
+
+		if( ! isset( $this->mustread_items_count ) )
+		{	// Get it from DB only first time and then cache in var:
+			$mustread_ItemList2 = new ItemList2( $this, $this->get_timestamp_min(), $this->get_timestamp_max() );
+
+			// Set additional debug info prefix for SQL queries in order to know what code executes it:
+			$mustread_ItemList2->query_title_prefix = 'Must Read Items';
+
+			// Filter only the flagged items:
+			$mustread_ItemList2->set_default_filters( array(
+					'mustread' => 1
+				) );
+
+			// Run query initialization to get total rows:
+			$mustread_ItemList2->query_init();
+
+			$this->mustread_items_count = $mustread_ItemList2->total_rows;
+		}
+
+		return $this->mustread_items_count;
 	}
 }
 

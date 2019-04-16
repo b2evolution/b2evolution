@@ -987,6 +987,7 @@ if( !empty( $skin ) )
 					'edit_comment'          => 'edit_comment.main.php',
 					'feedback-popup'        => 'feedback_popup.main.php',
 					'flagged'               => 'flagged.main.php',
+					'mustread'              => 'mustread.main.php',
 					'front'                 => 'front.main.php',
 					'help'                  => 'help.main.php',
 					'login'                 => 'login.main.php',

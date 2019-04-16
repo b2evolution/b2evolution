@@ -73,6 +73,13 @@ function init_MainList( $items_nb_limit )
 							'flagged' => 1
 						) );
 					break;
+
+				case 'mustread':
+					$MainList->set_default_filters( array(
+							'mustread' => 1,
+							'orderby'  => 'mustread',
+						) );
+					break;
 			}
 
 			// pre_dump( $MainList->default_filters );

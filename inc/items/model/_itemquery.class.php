@@ -46,6 +46,15 @@ class ItemQuery extends SQL
 	var $exact;
 	var $featured;
 	var $flagged;
+	var $mustread;
+
+	/**
+	 * A query SELECT string to add other columns.
+	 * It is set in case of the select queries when we need to order by custom fields.
+	 *
+	 * @var string
+	 */
+	var $orderby_select = '';
 
 	/**
 	 * A query FROM string to join other tables.
@@ -1030,6 +1039,29 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restrict to the flagged items
+	 *
+	 * @param boolean TRUE - Restrict to flagged items, FALSE - Don't restrict/Get all items
+	 */
+	function where_mustread( $mustread = false )
+	{
+		global $current_User;
+
+		$this->mustread = $mustread;
+
+		if( ! $this->mustread )
+		{	// Don't restrict if it is not requested:
+			return;
+		}
+
+		// Get items which are flagged by current user:
+		$this->FROM_add( 'INNER JOIN T_items__item_settings AS is_mustread ON '.$this->dbIDname.' = is_mustread.iset_item_ID
+			AND is_mustread.iset_name = "mustread"
+			AND is_mustread.iset_value = 1' );
+	}
+
+
+	/**
 	 * Generate order by clause
 	 *
 	 * @param $order_by
@@ -1038,6 +1070,36 @@ class ItemQuery extends SQL
 	function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname )
 	{
 		global $DB;
+
+		if( $order_by == 'mustread' )
+		{	// Special ordering for "must read" items:
+			$order_by = '';
+			$order_dir = '';
+
+			// 1) Order by item read status of current logged in User:
+			//    1 - new pages
+			//    2 - updated pages
+			//    3 - already read pages
+			if( is_logged_in() )
+			{	// If user is logged in:
+				global $current_User;
+				$this->orderby_select .= 'IF( mustread_order.itud_read_item_ts IS NULL, 1, IF( mustread_order.itud_read_item_ts < post_contents_last_updated_ts, 2, 3 ) ) AS post_mustread';
+				$this->orderby_from .= 'LEFT JOIN T_items__user_data AS mustread_order ON post_ID = mustread_order.itud_item_ID AND mustread_order.itud_user_ID = '.$DB->quote( $current_User->ID );
+				$order_by = 'mustread';
+				$order_dir = 'ASC';
+			}
+
+			// 2) Order by contents last updated DESC:
+			$order_by .= ',contents_last_updated_ts';
+			$order_dir .= ',DESC';
+
+			// 3) Default orders of current collection:
+			$order_by .= ','.get_blog_order( $this->Blog, 'field' );
+			$order_dir .= ','.get_blog_order( $this->Blog, 'dir' );
+
+			$order_by = trim( $order_by, ',' );
+			$order_dir = trim( $order_dir, ',' );
+		}
 
 		$order_by = str_replace( ' ', ',', $order_by );
 		$orderby_array = explode( ',', $order_by );
@@ -1091,6 +1153,7 @@ class ItemQuery extends SQL
 		$available_fields[] = 'status';
 		$available_fields[] = 'T_categories.cat_name';
 		$available_fields[] = 'T_categories.cat_order';
+		$available_fields[] = 'mustread'; // This is a virtual column only for order, real post_mustread doesn't exist in DB
 
 		if( in_array( 'order', $orderby_array ) )
 		{	// If list is ordered by field 'order':
@@ -1139,6 +1202,18 @@ class ItemQuery extends SQL
 		}
 
 		return $order_clause;
+	}
+
+
+	/**
+	 * Get additional SELECT clause if it is required because of custom order_by fields
+	 *
+	 * @param string Before the SELECT clause
+	 * @return string the SELECT clause to select the custom fields
+	 */
+	function get_orderby_select( $prefix = ', ' )
+	{
+		return empty( $this->orderby_select ) ? '' : $prefix.$this->orderby_select;
 	}
 
 

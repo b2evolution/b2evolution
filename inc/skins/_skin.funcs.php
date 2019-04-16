@@ -102,6 +102,7 @@ function skin_init( $disp )
 		case 'download':
 		case 'feedback-popup':
 		case 'flagged':
+		case 'mustread':
 			// We need to load posts for this display:
 
 			if( $disp == 'flagged' && ! is_logged_in() )
@@ -109,6 +110,14 @@ function skin_init( $disp )
 				global $disp;
 				$disp = '403';
 				$Messages->add( T_('You must log in before you can see your flagged content.'), 'error' );
+				break;
+			}
+
+			if( $disp == 'mustread' && ! $Blog->get_setting( 'track_unread_content' ) )
+			{	// Forbid access to flagged content for not logged in users:
+				global $disp;
+				$disp = '404';
+				$Messages->add( T_('This collection has no "Must Read" items.'), 'error' );
 				break;
 			}
 
@@ -1905,6 +1914,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_edit_comment'          => '_edit_comment.disp.php',
 				'disp_feedback-popup'        => '_feedback_popup.disp.php',
 				'disp_flagged'               => '_flagged.disp.php',
+				'disp_mustread'              => '_mustread.disp.php',
 				'disp_front'                 => '_front.disp.php',
 				'disp_help'                  => '_help.disp.php',
 				'disp_login'                 => '_login.disp.php',

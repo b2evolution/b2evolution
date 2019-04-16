@@ -34,9 +34,10 @@ global $ItemList;
 $pp = $ItemList->param_prefix;
 
 global $tab;
-global ${$pp.'flagged'}, ${$pp.'show_past'}, ${$pp.'show_future'}, ${$pp.'show_statuses'}, ${$pp.'s'}, ${$pp.'sentence'}, ${$pp.'exact'}, ${$pp.'author'}, ${$pp.'author_login'}, ${$pp.'assgn'}, ${$pp.'assgn_login'}, ${$pp.'status'};
+global ${$pp.'flagged'}, ${$pp.'mustread'}, ${$pp.'show_past'}, ${$pp.'show_future'}, ${$pp.'show_statuses'}, ${$pp.'s'}, ${$pp.'sentence'}, ${$pp.'exact'}, ${$pp.'author'}, ${$pp.'author_login'}, ${$pp.'assgn'}, ${$pp.'assgn_login'}, ${$pp.'status'};
 
 $flagged = ${$pp.'flagged'};
+$mustread = ${$pp.'mustread'};
 $show_past = ${$pp.'show_past'};
 $show_future = ${$pp.'show_future'};
 $show_statuses = ${$pp.'show_statuses'};
@@ -185,10 +186,13 @@ echo $Widget->replace_vars( $template['block_start'] );
 		echo '<legend>'.T_('Items to show').'</legend>';
 		?>
 		<div style="margin-bottom:5px">
-
 			<input type="checkbox" name="<?php echo $pp ?>flagged" value="1" id="flagged" class="checkbox" <?php if( $flagged ) echo 'checked="checked" '?> />
 			<label for="flagged"><?php echo T_('Flagged') ?></label><br />
+		</div>
 
+		<div style="margin-bottom:5px">
+			<input type="checkbox" name="<?php echo $pp ?>mustread" value="1" id="mustread" class="checkbox" <?php if( $mustread ) echo 'checked="checked" '?> />
+			<label for="mustread"><?php echo T_('Must read') ?></label><br />
 		</div>
 
 		<div style="margin-bottom:5px">

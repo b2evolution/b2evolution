@@ -120,6 +120,7 @@ class ItemListLight extends DataObjectList2
 		$this->set_default_filters( array(
 				'filter_preset' => NULL,
 				'flagged' => false,
+				'mustread' => false,
 				'ts_min' => $timestamp_min,
 				'ts_max' => $timestamp_max,
 				'ts_created_max' => NULL,
@@ -300,6 +301,11 @@ class ItemListLight extends DataObjectList2
 			 * Restrict by flagged items:
 			 */
 			memorize_param( $this->param_prefix.'flagged', 'integer', $this->default_filters['flagged'], $this->filters['flagged'] );
+
+			/*
+			 * Restrict by "must read" items:
+			 */
+			memorize_param( $this->param_prefix.'mustread', 'integer', $this->default_filters['mustread'], $this->filters['mustread'] );
 
 			// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
 			if( is_null($this->default_filters['ts_min'])
@@ -501,6 +507,12 @@ class ItemListLight extends DataObjectList2
 		$this->filters['flagged'] = param( $this->param_prefix.'flagged', 'integer', $this->default_filters['flagged'], true );
 
 
+		/*
+		 * Restrict by "must read" items:
+		 */
+		$this->filters['mustread'] = param( $this->param_prefix.'mustread', 'integer', $this->default_filters['mustread'], true );
+
+
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
 		// So far, these act as SILENT filters. They will not advertise their filtering in titles etc.
 		$this->filters['ts_min'] = $this->default_filters['ts_min'];
@@ -629,6 +641,7 @@ class ItemListLight extends DataObjectList2
 		$this->ItemQuery->where_visibility( $this->filters['visibility_array'], $this->filters['coll_IDs'] );
 		$this->ItemQuery->where_featured( $this->filters['featured'] );
 		$this->ItemQuery->where_flagged( $this->filters['flagged'] );
+		$this->ItemQuery->where_mustread( $this->filters['mustread'] );
 
 
 		/*
@@ -967,6 +980,7 @@ class ItemListLight extends DataObjectList2
 				'display_time'        => true,
 				'display_limit'       => true,
 				'display_flagged'     => true,
+				'display_mustread'    => true,
 
 				'group_mask'          => '$group_title$$filter_items$', // $group_title$, $filter_items$
 				'filter_mask'         => '"$filter_name$"', // $group_title$, $filter_name$, $clear_icon$
@@ -1501,6 +1515,21 @@ class ItemListLight extends DataObjectList2
 				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'flagged' ) ) : '';
 				$title_array['flagged'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
 					array( T_('Flagged'), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
+					$params['filter_mask_nogroup'] );
+				$filter_class_i++;
+			}
+		}
+
+
+		// MUST READ:
+		if( $params['display_mustread'] )
+		{
+			if( ! empty( $this->filters['mustread'] ) )
+			{	// Display when only "must read" items:
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'mustread' ) ) : '';
+				$title_array['mustread'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+					array( T_('Must read'), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
 					$params['filter_mask_nogroup'] );
 				$filter_class_i++;
 			}

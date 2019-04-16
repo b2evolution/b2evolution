@@ -34,6 +34,7 @@ skin_include( '_html_header.inc.php', array(
 	'front_text' => '',
 	'posts_text' => isset( $bootstrap_manual_posts_text ) ? $bootstrap_manual_posts_text : '',
 	'flagged_text' => T_('Flagged pages'),
+	'mustread_text' => T_('Must Read pages'),
 ) );
 // -------------------------------- END OF HEADER --------------------------------
 
@@ -142,6 +143,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'front_text'        => '',
 					'posts_text'        => '',
 					'flagged_text'      => '',
+					'mustread_text'     => '',
 					'register_text'     => '',
 					'login_text'        => '',
 					'lostpassword_text' => '',

@@ -480,6 +480,7 @@ function get_request_title( $params = array() )
 			'edit_links_template' => array(), // More params for the links to advanced editing on disp=edit|edit_comment
 			'tags_text'           => T_('Tags'),
 			'flagged_text'        => T_('Flagged posts'),
+			'mustread_text'       => T_('Must Read Items'),
 			'help_text'           => T_('In case of issues with this site...'),
 			'compare_text'           => /* TRANS: title for disp=compare */ T_('%s compared'),
 			'compare_text_separator' => /* TRANS: title separator for disp=compare */ ' '.T_('vs').' ',
@@ -842,6 +843,11 @@ function get_request_title( $params = array() )
 		case 'flagged':
 			// We are requesting the flagged posts list:
 			$r[] = $params['flagged_text'];
+			break;
+
+		case 'mustread':
+			// We are requesting the must read posts list:
+			$r[] = $params['mustread_text'];
 			break;
 
 		case 'help':

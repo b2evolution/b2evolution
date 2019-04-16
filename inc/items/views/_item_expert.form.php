@@ -710,6 +710,11 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'item_featured', $edited_Item->featured );
 	}
 
+	if( $Blog->get_setting( 'track_unread_content' ) )
+	{	// Display setting to mark Item as "must read" when tracking of unread content is enabled for collection:
+		$Form->checkbox_basic_input( 'item_mustread', $edited_Item->get_setting( 'mustread' ), '<strong>'.T_('Must read').'</strong>' );
+	}
+
 	if( $is_not_content_block && $edited_Item->get_type_setting( 'allow_breaks' ) )
 	{	// Display "hide teaser" checkbox for item with type usage except of content block:
 		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
