@@ -10033,16 +10033,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 						$help_Item->set_tags_from_string( 'demo' );
 						$help_Item->insert( 1, T_('Help content'), '### '.T_('Email preferences')
 							."\n\n"
-							.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'subsurl' ).'"' )
+							.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>.'), 'href="'.$content_block_Blog->get( 'subsurl' ).'"' )
 							."\n\n"
 							.'### '.T_('Managing your personal information')
 							."\n\n"
-							.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'profileurl' ).'"' )
+							.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>.'), 'href="'.$content_block_Blog->get( 'profileurl' ).'"' )
 							."\n\n"
 							.'### '.T_('Closing your account')
 							."\n\n"
-							.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'closeaccounturl' ).'"' ),
-								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'help-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+							.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>.'), 'href="'.$content_block_Blog->get( 'closeaccounturl' ).'"' ),
+								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'help-content', '', 'open', array( 'b2evMark' ), $content_block_ityp_ID );
 						// Create a register content block item for info/shared collection:
 						$register_Item = new Item();
 						$register_Item->set_tags_from_string( 'demo' );
@@ -10058,7 +10058,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							.' '.T_('Your email address and password will not be shared with other users.')
 							.' '.T_('All other information may be shared with other users.')
 							.' '.T_('Do not provide information you are not willing to share.'),
-								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'register-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'register-content', '', 'open', array( 'b2WPAutP' ), $content_block_ityp_ID );
 						task_end();
 					}
 				}

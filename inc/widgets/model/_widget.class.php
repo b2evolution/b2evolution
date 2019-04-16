@@ -1593,6 +1593,43 @@ class ComponentWidget extends DataObject
 
 
 	/**
+	 * Get Item's info from param by ID or slug
+	 *
+	 * @param string Param name
+	 * @return string
+	 */
+	function get_param_item_info( $param_name )
+	{
+		$param_value = $this->get_param( $param_name, '' );
+		if( empty( $param_value ) )
+		{	// Param is not defined:
+			return '';
+		}
+
+		$ItemCache = & get_ItemCache();
+		$param_value_is_ID = is_number( $param_value );
+		if( ! ( $param_value_is_ID && $param_Item = & $ItemCache->get_by_ID( $param_value, false, false ) ) &&
+		    ! ( ! $param_value_is_ID && $param_Item = & $ItemCache->get_by_urltitle( $param_value, false, false ) ) )
+		{	// Item is not detected:
+			return '';
+		}
+
+		$item_info = '';
+		$status_icons = get_visibility_statuses( 'icons' );
+		if( isset( $status_icons[ $param_Item->get( 'status' ) ] ) )
+		{	// Status colored icon:
+			$item_info .= $status_icons[ $param_Item->get( 'status' ) ];
+		}
+		// Title with link to permament url:
+		$item_info .= ' '.$param_Item->get_title( array( 'link_type' => 'admin_view' ) );
+		// Icon to edit:
+		$item_info .= ' '.$param_Item->get_edit_link( array( 'text' => '#icon#' ) );
+
+		return $item_info;
+	}
+
+
+	/**
 	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
 	 *
 	 * @param string Message
