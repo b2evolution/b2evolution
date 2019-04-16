@@ -1122,7 +1122,7 @@ class ItemQuery extends SQL
 		foreach( $custom_sort_fields as $key => $field_name )
 		{
 			$table_alias = $key.'_table';
-			$field_value = $table_alias.'.iset_value';
+			$field_value = $table_alias.'.icfv_value';
 			if( strpos( $key, 'custom_double' ) === 0 )
 			{ // Double values should be compared as numbers and not like strings
 				$field_value .= '+0';
@@ -1134,8 +1134,8 @@ class ItemQuery extends SQL
 					$this->orderby_from .= ' ';
 				}
 				// $nullable_fields[$key] = $field_value;
-				$this->orderby_from .= 'LEFT JOIN T_items__item_settings as '.$table_alias.' ON post_ID = '.$table_alias.'.iset_item_ID AND '
-						.$table_alias.'.iset_name = '.$DB->quote( 'custom:'.$field_name );
+				$this->orderby_from .= 'LEFT JOIN T_items__item_custom_field as '.$table_alias.' ON post_ID = '.$table_alias.'.icfv_item_ID AND '
+						.$table_alias.'.icfv_itcf_name = '.$DB->quote( $field_name );
 				$order_by = str_replace( $key, $field_value, $order_by );
 			}
 			$custom_sort_fields[$key] = $field_value;
