@@ -1316,15 +1316,15 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item->set_tags_from_string( 'demo' );
 				$edited_Item->insert( $owner_ID, T_('Help content'), '### '.T_('Email preferences')
 					."\n\n"
-					.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'subsurl' ).'"' )
+					.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'subsurl' ).'"' )
 					."\n\n"
 					.'### '.T_('Managing your personal information')
 					."\n\n"
-					.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'profileurl' ).'"' )
+					.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'profileurl' ).'"' )
 					."\n\n"
 					.'### '.T_('Closing your account')
 					."\n\n"
-					.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'closeaccounturl' ).'"' ),
+					.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'closeaccounturl' ).'"' ),
 						$now, $cat_home_b2evo, array(), 'published', '#', 'help-content', '', 'open', array( 'default' ), 'Content Block' );
 
 				// Insert a post:
