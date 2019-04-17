@@ -202,7 +202,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				// fp> TODO: ideally we would have a link icon to go click on the destination...
 				'item_ID' => array(
 					'label' => T_('Item ID'),
-					'note' => T_( 'ID of post, page, etc. for "Item" type links.' ),
+					'note' => T_( 'ID of post, page, etc. for "Item" type links.' ).' '.$this->get_param_item_info( 'item_ID' ),
 					'type' => 'integer',
 					'allow_empty' => true,
 					'size' => 5,

@@ -1611,7 +1611,7 @@ class ComponentWidget extends DataObject
 		if( ! ( $param_value_is_ID && $param_Item = & $ItemCache->get_by_ID( $param_value, false, false ) ) &&
 		    ! ( ! $param_value_is_ID && $param_Item = & $ItemCache->get_by_urltitle( $param_value, false, false ) ) )
 		{	// Item is not detected:
-			return '';
+			return '<span class="evo_param_error">'.T_('Item is not found.').'</span>';
 		}
 
 		$item_info = '';
