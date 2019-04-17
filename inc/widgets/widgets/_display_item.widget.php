@@ -95,10 +95,12 @@ class display_item_Widget extends ComponentWidget
 					'type' => 'integer',
 					'allow_empty' => true,
 					'size' => 5,
+					'note' => $this->get_param_item_info( 'item_ID' ),
 				),
 				'item_slug' => array(
 					'label' => T_('Item Slug'),
 					'size' => 60,
+					'note' => $this->get_param_item_info( 'item_slug' ),
 				),
 				'title_display' => array(
 					'label' => T_('Title display' ),
