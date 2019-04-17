@@ -774,7 +774,7 @@ $email_send_simulate_only = false;
  * If true and no SMTP gateway is configured, b2evolution will behave the same as with $email_send_simulate_only = true;
  * This is useful to avoid sending email (especially campaigns) through a bad IP by mistake.
  */
-$email_send_allow_php_mail = false;
+$email_send_allow_php_mail = true;
 
 
 /**
