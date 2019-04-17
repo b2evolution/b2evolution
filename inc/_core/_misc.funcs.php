@@ -3848,7 +3848,7 @@ function check_cron_job_emails_limit()
  */
 function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL, $email_campaign_ID = NULL, $automation_ID = NULL )
 {
-	global $servertimenow, $email_send_simulate_only;
+	global $servertimenow, $email_send_simulate_only, $email_send_allow_php_mail;
 
 	/**
 	 * @var string|NULL This global var stores a last mail log message
@@ -3999,7 +3999,12 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		return false;
 	}
 
-	if( $email_send_simulate_only )
+	// Simulate email sending when:
+	//  - this is forced by config
+	//  - php mail sending is disabled by config and SMTP sending is not enabled
+	$simulate_email_sending = $email_send_simulate_only || ( ! $email_send_allow_php_mail && ! $Settings->get( 'smtp_enabled' ) );
+
+	if( $simulate_email_sending )
 	{	// The email sending is turned on simulation mode, Don't send a real message:
 		$send_mail_result = true;
 	}
@@ -4051,7 +4056,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$mail_log_message = 'Sent mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
 	$Debuglog->add( htmlspecialchars( $mail_log_message ) );
 
-	update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
+	update_mail_log( $mail_log_insert_ID, ( $simulate_email_sending ? 'simulated' : 'ok' ), $message );
 
 	return true;
 }

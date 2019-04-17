@@ -198,15 +198,18 @@ switch( $action )
 			case 'smtp':
 				// SMTP gateway settings:
 
-				// Preferred email service
-				$Settings->set( 'email_service', param( 'email_service', 'string', 'mail' ) );
+				if( $email_send_allow_php_mail )
+				{	// Update the settings only when php mail service is enabled by config:
+					// Preferred email service
+					$Settings->set( 'email_service', param( 'email_service', 'string', 'mail' ) );
 
-				// Force email sending
-				$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
+					// Force email sending
+					$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
 
-				// Sendmail additional params:
-				$Settings->set( 'sendmail_params', param( 'sendmail_params', 'string', 'return' ) );
-				$Settings->set( 'sendmail_params_custom', param( 'sendmail_params_custom', 'string' ) );
+					// Sendmail additional params:
+					$Settings->set( 'sendmail_params', param( 'sendmail_params', 'string', 'return' ) );
+					$Settings->set( 'sendmail_params_custom', param( 'sendmail_params_custom', 'string' ) );
+				}
 
 				$old_smtp_enabled = $Settings->get( 'smtp_enabled' );
 

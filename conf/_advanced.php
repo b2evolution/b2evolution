@@ -770,6 +770,14 @@ $email_send_simulate_only = false;
 
 
 /**
+ * Turn this off to prevent sending emails if no external SMTP gateway is configured.
+ * If true and no SMTP gateway is configured, b2evolution will behave the same as with $email_send_simulate_only = true;
+ * This is useful to avoid sending email (especially campaigns) through a bad IP by mistake.
+ */
+$email_send_allow_php_mail = false;
+
+
+/**
  * Would you like to use CDNs as definied in the array $library_cdn_urls below
  * or do you prefer to load all files from the local source as defined in the array $library_local_urls below?
  *

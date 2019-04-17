@@ -482,6 +482,16 @@ C message size exceeds',
 				}
 				return $value;
 
+			case 'email_service':
+				global $email_send_allow_php_mail;
+				// Force to use SMTP gateway when php mail sending is disabled by config:
+				return $email_send_allow_php_mail ? parent::getx( $parname ) : 'smtp';
+
+			case 'force_email_sending':
+				global $email_send_allow_php_mail;
+				// Don't force to use secondary email service when php mail sending is disabled by config:
+				return $email_send_allow_php_mail ? parent::getx( $parname ) : 0;
+
 			default:
 				$value = parent::getx( $parname );
 				if( $value === NULL && strpos( $parname, 'cjob_timeout_' ) === 0 )
