@@ -931,6 +931,117 @@ class Skin extends DataObject
 
 
 	/**
+	 * Set dynamic style rule and store in array $this->dynamic_styles
+	 * (Use Skin->get_dynamic_styles() to get style as single string)
+	 *
+	 * @param string Setting name
+	 * @param string Style template with mask instead of setting value
+	 * @param array Additional params
+	 */
+	function dynamic_style_rule( $setting_name, $style_template, $params = array() )
+	{
+		$params = array_merge( array(
+				'value'   => NULL, // Custom value, different of what stored in the setting
+				'options' => NULL, // Options per each value, Used for <select> or radio settings
+				'suffix'  => NULL, // Suffix which should de added after value on each update by customzer JS code, e.g. 'px', '%'
+				'type'    => NULL, // Type of the field, e.g. 'image_file'
+			), $params );
+
+		if( $params['value'] === NULL )
+		{	// Try to get current setting value:
+			$setting_value = $this->get_setting( $setting_name );
+		}
+		else
+		{	// Use custom value:
+			$setting_value = $params['value'];
+		}
+
+		if( $setting_value === NULL )
+		{	// No value for the requested setting:
+			return '';
+		}
+
+		global $Session, $blog;
+
+		if( is_array( $params['options'] ) &&
+		    isset( $params['options'][ $setting_value ] ) )
+		{	// Get value from predefined array:
+			$setting_value = $params['options'][ $setting_value ];
+		}
+
+		if( $params['type'] == 'image_file' )
+		{	// Special setting type as ID of image file:
+			if( $this->get_setting( $setting_name ) &&
+					( $FileCache = & get_FileCache() ) && 
+					( $image_File = & $FileCache->get_by_ID( $this->get_setting( $setting_name ), false, false ) ) &&
+					$image_File->exists() )
+			{
+				$setting_value = 'url("'.$image_File->get_url().'")';
+			}
+			else
+			{
+				$setting_value = 'none';
+			}
+		}
+
+		if( $params['suffix'] !== NULL )
+		{	// Suffix for value:
+			$setting_value .= $params['suffix'];
+		}
+
+		if( $Session->get( 'customizer_mode_'.$blog ) )
+		{	// If customizer mode enabled we should append a special css comment code
+			// in order to quick change the value from the customizer panel on change input value:
+			$setting_options = '';
+
+			if( is_array( $params['options'] ) )
+			{	// Append value presets to the comment in order to select them by JavaScript:;
+				$setting_options .= '/options:';
+				$p = 1;
+				foreach( $params['options'] as $preset_val => $preset_style )
+				{
+					$setting_options .= $preset_val.'$'.$preset_style
+						// separator between value options:
+						.( $p < count( $params['options'] ) ? '|' : '' );
+					$p++;
+				}
+			}
+
+			if( $params['suffix'] !== NULL )
+			{	// Suffix for value:
+				$setting_options .= '/suffix:'.$params['suffix'];
+			}
+
+			if( $params['type'] !== NULL )
+			{	// Setting type:
+				$setting_options .= '/type:'.$params['type'];
+			}
+
+			$setting_value = '/*customize:*/'.$setting_value.'/*'.$setting_name.$setting_options.'*/';
+		}
+
+		if( ! isset( $this->dynamic_styles ) )
+		{
+			$this->dynamic_styles = array();
+		}
+
+		// Replace mask with setting value:
+		$this->dynamic_styles[] = str_replace( '$setting_value$', $setting_value, $style_template );
+	}
+
+
+	/**
+	 * Get dynamic style rules
+	 *
+	 * @return string
+	 */
+	function get_dynamic_styles()
+	{
+		return isset( $this->dynamic_styles ) ? implode( "\n", $this->dynamic_styles ) : '';
+	}
+
+
+	/**
 	 * Get current skin post navigation setting.
 	 * Possible values:
 	 *    - NULL - In this case the Blog post navigation setting will be used
