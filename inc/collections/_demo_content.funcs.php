@@ -3117,7 +3117,7 @@ Hello
 
 			$demo_items['register_content'] = array(
 				'title'    => T_('Register content'),
-				'slug'     => 'help-content',
+				'slug'     => 'register-content',
 				'tags'     => 'demo',
 				'category' => 'b2evolution',
 				'type'     => 'Content Block',
