@@ -181,9 +181,11 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
 				widget_container( 'footer', array(
 						// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_display_if_empty' => false, // If no widget, don't display container at all
 						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
 						'container_end'   => '</div>',
+						'block_start'     => '<div class="evo_widget $wi_class$">',
+						'block_end'       => '</div>',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			} ?>
