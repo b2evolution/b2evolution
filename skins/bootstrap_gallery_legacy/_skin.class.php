@@ -342,77 +342,41 @@ class bootstrap_gallery_legacy_Skin extends Skin
 
 		// Skin specific initializations:
 
+		// **** Image Viewing / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$; width: auto; }', array(
+			'suffix' => 'px'
+		) );
+		// **** Image Viewing / END ****
+
+		// **** Page Styles / START ****
+		// Page text size:
+		$this->dynamic_style_rule( 'page_text_size', '#skin_wrapper { font-size: $setting_value$ }' );
+		// Page text color:
+		$this->dynamic_style_rule( 'page_text_color', '#skin_wrapper { color: $setting_value$ }' );
+		// Page link color:
+		$this->dynamic_style_rule( 'page_link_color',
+			'#skin_wrapper .container a:not(.btn .active) { color: $setting_value$ }'.
+			'ul li a:not(.btn) { color: $setting_value$ }'.
+			'ul li a:not(.btn) {background-color: transparent }'.
+			'.ufld_icon_links a:not(.btn) {color: #fff !important}'
+		);
+		// Current tab text color:
+		$this->dynamic_style_rule( 'current_tab_text_color', 'ul.nav.nav-tabs li a.selected { color: $setting_value$ }' );
+		// Page background color:
+		$this->dynamic_style_rule( 'page_bg_color', '#skin_wrapper { background-color: $setting_value$ }' );
+		// **** Page Styles / END ****
+
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
+
 		// Add custom CSS:
 		$custom_css = '';
-
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			$custom_css .= '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }'."\n";
-		}
 
 // fp> TODO: the following code WORKS but produces UGLY CSS with tons of repetitions. It needs a full rewrite.
 
 		// ===== Custom page styles: =====
 		$custom_styles = array();
-
-		// Text size <=== THIS IS A WORK IN PROGRESS
-		if( $text_size = $this->get_setting( 'page_text_size' ) )
-		{
-			$custom_styles[] = 'font-size: '.$text_size;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
-		}
-
-		// Text color
-		$custom_styles = array();
-		if( $text_color = $this->get_setting( 'page_text_color' ) )
-		{
-			$custom_styles[] = 'color: '.$text_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
-		}
-
-		// Link color
-		$custom_styles = array();
-		if( $text_color = $this->get_setting( 'page_link_color' ) )
-		{
-			$custom_styles[] = 'color: '.$text_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	#skin_wrapper .container a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= '	ul li a:not(.btn) { '.implode( ';', $custom_styles )." }\n";
-			$custom_css .= "	ul li a:not(.btn) {background-color: transparent;}\n";
-			$custom_css .= "	.ufld_icon_links a:not(.btn) {color: #fff !important;}\n";
-		}
-
-		// Current tab text color
-		$custom_styles = array();
-		if( $text_color = $this->get_setting( 'current_tab_text_color' ) )
-		{
-			$custom_styles[] = 'color: '.$text_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	ul.nav.nav-tabs li a.selected { '.implode( ';', $custom_styles )." }\n";
-		}
-
-		// Page background color
-		$custom_styles = array();
-		if( $bg_color = $this->get_setting( 'page_bg_color' ) )
-		{
-			$custom_styles[] = 'background-color: '.$bg_color;
-		}
-		if( ! empty( $custom_styles ) )
-		{
-			$custom_css .= '	#skin_wrapper { '.implode( ';', $custom_styles )." }\n";
-		}
 
 		global $thumbnail_sizes;
 		$posts_thumb_size = $this->get_setting( 'posts_thumb_size' );

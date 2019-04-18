@@ -385,131 +385,94 @@ class bootstrap_photoblog_Skin extends Skin
 
 		// Skin specific initializations:
 
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
-		}
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$; width: auto; }', array(
+			'suffix' => 'px'
+		) );
+		// Default font - Size:
+		$this->dynamic_style_rule( 'font_size', '$setting_value$', array(
+			'options' => array(
+				'default' => '',
+				'standard' =>
+					'.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 16px !important }'.
+					'.container input.search_field { height: 100% }'.
+					'.container h1 { font-size: 38px }'.
+					'.container h2 { font-size: 32px }'.
+					'.container h3 { font-size: 26px }'.
+					'.container h4 { font-size: 18px }'.
+					'.container h5 { font-size: 16px }'.
+					'.container h6 { font-size: 14px }'.
+					'.container .small { font-size: 85% !important }',
+				'medium' =>
+					'.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 18px !important }'.
+					'.container input.search_field { height: 100% }'.
+					'.container h1 { font-size: 40px }'.
+					'.container h2 { font-size: 34px }'.
+					'.container h3 { font-size: 28px }'.
+					'.container h4 { font-size: 20px }'.
+					'.container h5 { font-size: 18px }'.
+					'.container h6 { font-size: 16px }'.
+					'.container .small { font-size: 85% !important }',
+				'large' =>
+					'.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 20px !important }'.
+					'.container input.search_field { height: 100% }'.
+					'.container h1 { font-size: 42px }'.
+					'.container h2 { font-size: 36px }'.
+					'.container h3 { font-size: 30px }'.
+					'.container h4 { font-size: 22px }'.
+					'.container h5 { font-size: 20px }'.
+					'.container h6 { font-size: 18px }'.
+					'.container .small { font-size: 85% !important }',
+				'very_large' =>
+					'.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 22px !important }'.
+					'.container input.search_field { height: 100% }'.
+					'.container h1 { font-size: 44px }'.
+					'.container h2 { font-size: 38px }'.
+					'.container h3 { font-size: 32px }'.
+					'.container h4 { font-size: 24px }'.
+					'.container h5 { font-size: 22px }'.
+					'.container h6 { font-size: 20px }'.
+					'.container .small { font-size: 85% !important }',
+			)
+		) );
+		// **** Layout Settings / END ****
 
-		// Add custom CSS:
-		$custom_css = '';
-
-
-		// Font size customization
-		if( $font_size = $this->get_setting( 'font_size' ) )
-		{
-			switch( $font_size )
-			{
-				case 'default': // When default font size, no CSS entry
-				$custom_css = '';
-				break;
-
-				case 'standard':// When standard layout
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 16px !important'." }\n";
-				$custom_css .= '.container input.search_field { height: 100%'." }\n";
-				$custom_css .= '.container h1 { font-size: 38px'." }\n";
-				$custom_css .= '.container h2 { font-size: 32px'." }\n";
-				$custom_css .= '.container h3 { font-size: 26px'." }\n";
-				$custom_css .= '.container h4 { font-size: 18px'." }\n";
-				$custom_css .= '.container h5 { font-size: 16px'." }\n";
-				$custom_css .= '.container h6 { font-size: 14px'." }\n";
-				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-				break;
-
-				case 'medium': // When default font size, no CSS entry
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 18px !important'." }\n";
-				$custom_css .= '.container input.search_field { height: 100%'." }\n";
-				$custom_css .= '.container h1 { font-size: 40px'." }\n";
-				$custom_css .= '.container h2 { font-size: 34px'." }\n";
-				$custom_css .= '.container h3 { font-size: 28px'." }\n";
-				$custom_css .= '.container h4 { font-size: 20px'." }\n";
-				$custom_css .= '.container h5 { font-size: 18px'." }\n";
-				$custom_css .= '.container h6 { font-size: 16px'." }\n";
-				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-				break;
-
-				case 'large': // When default font size, no CSS entry
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 20px !important'." }\n";
-				$custom_css .= '.container input.search_field { height: 100%'." }\n";
-				$custom_css .= '.container h1 { font-size: 42px'." }\n";
-				$custom_css .= '.container h2 { font-size: 36px'." }\n";
-				$custom_css .= '.container h3 { font-size: 30px'." }\n";
-				$custom_css .= '.container h4 { font-size: 22px'." }\n";
-				$custom_css .= '.container h5 { font-size: 20px'." }\n";
-				$custom_css .= '.container h6 { font-size: 18px'." }\n";
-				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-				break;
-
-				case 'very_large': // When default font size, no CSS entry
-				$custom_css = '.container p, .container ul li, .container div, .container label, .container textarea, .container input { font-size: 22px !important'." }\n";
-				$custom_css .= '.container input.search_field { height: 100%'." }\n";
-				$custom_css .= '.container h1 { font-size: 44px'." }\n";
-				$custom_css .= '.container h2 { font-size: 38px'." }\n";
-				$custom_css .= '.container h3 { font-size: 32px'." }\n";
-				$custom_css .= '.container h4 { font-size: 24px'." }\n";
-				$custom_css .= '.container h5 { font-size: 22px'." }\n";
-				$custom_css .= '.container h6 { font-size: 20px'." }\n";
-				$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-				break;
-			}
-		}
-
-
-		// Page background color
-		if ( $background_color = $this->get_setting( 'background_color' ) ) {
-			$custom_css .= '#skin_wrapper, .nav li.active a { background-color: '.$background_color."; }\n";
-		}
-		// Page text color
-		if ( $page_text_color = $this->get_setting( 'page_text_color' ) ) {
-			$custom_css .= '#skin_wrapper { color: '.$page_text_color."; }\n";
-		}
-		// Page link color
-		if ( $page_link_color = $this->get_setting( 'page_link_color' ) ) {
-			$custom_css .= 'a, .evo_comment_title a, .panel-title .evo_comment_type { color: '.$page_link_color."; }\n";
+		// **** Page Color Settings / START ****
+		// Background color:
+		$this->dynamic_style_rule( 'background_color', '#skin_wrapper, .nav li.active a { background-color: $setting_value$ }' );
+		// Text color:
+		$this->dynamic_style_rule( 'page_text_color', '#skin_wrapper { color: $setting_value$ }' );
+		// Link color:
+		$this->dynamic_style_rule( 'page_link_color',
+			'a, .evo_comment_title a, .panel-title .evo_comment_type { color: $setting_value$ }'.
 			// Pagination links:
-			$custom_css .= '.pagination > li > a, .pagination > li > span { color: '.$page_link_color."; }\n";
-			$custom_css .= '.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus { background-color: '.$page_link_color.'; border-color: '.$page_link_color."; }\n";
-		}
-		// Page link hover color
-		if ( $page_link_h_color = $this->get_setting( 'page_link_h_color' ) ) {
-			$custom_css .= 'a:hover, .panel-title .evo_comment_type:hover { color: '.$page_link_h_color."; }\n";
+			'.pagination > li > a, .pagination > li > span { color: $setting_value$ }'.
+			'.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus { background-color: $setting_value$; border-color: $setting_value$ }'
+		);
+		// Link hover color:
+		$this->dynamic_style_rule( 'page_link_h_color',
+			'a:hover, .panel-title .evo_comment_type:hover { color: $setting_value$ }'.
 			// Pagination links:
-			$custom_css .= '.pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus { color: '.$page_link_h_color."; }\n";
-		}
-		// Posts background color
-		if ( $well_color = $this->get_setting( 'well_color' ) ) {
-			$custom_css .= '.well { background-color: '.$well_color."; }\n";
-		}
+			'.pagination > li > a:hover, .pagination > li > span:hover, .pagination > li > a:focus, .pagination > li > span:focus { color:  $setting_value$ }'
+		);
+		// Posts background color:
+		$this->dynamic_style_rule( 'well_color', '.well { background-color: $setting_value$ }' );
+		// **** Page Color Settings / END ****
 
+		// **** Navigation Settings / START ****
+		// Active navigation link color:
+		$this->dynamic_style_rule( 'active_color', 'ul.nav li.active a.selected { color: $setting_value$ }' );
+		// Default navigation links color:
+		$this->dynamic_style_rule( 'default_color', 'ul.nav li a.default { color: $setting_value$ }' );
+		// Default navigation links hover color:
+		$this->dynamic_style_rule( 'default_h_color', 'ul.nav li a.default:hover { color: $setting_value$ }' );
+		// Default navigation links hover background-color:
+		$this->dynamic_style_rule( 'default_bgh_color', 'ul.nav li a.default:hover { background-color: $setting_value$ }' );
+		// **** Navigation Settings / END ****
 
-		// Navigation active link color
-		if ( $active_color = $this->get_setting( 'active_color' ) ) {
-			$custom_css .= 'ul.nav li.active a.selected { color: '.$active_color."; }\n";
-		}
-		// Navigation default link color
-		if ( $default_color = $this->get_setting( 'default_color' ) ) {
-			$custom_css .= 'ul.nav li a.default { color: '.$default_color."; }\n";
-		}
-		// Navigation default link hover color
-		if ( $default_h_color = $this->get_setting( 'default_h_color' ) ) {
-			$custom_css .= 'ul.nav li a.default:hover { color: '.$default_h_color."; }\n";
-		}
-		// Navigation default link hover background-color
-		if ( $default_bgh_color = $this->get_setting( 'default_bgh_color' ) ) {
-			$custom_css .= 'ul.nav li a.default:hover { background-color: '.$default_bgh_color."; }\n";
-		}
-
-
-		if( ! empty( $custom_css ) )
-		{ // Function for custom_css:
-		$custom_css = '<style type="text/css">
-<!--
-'.$custom_css.'
--->
-		</style>';
-		add_headline( $custom_css );
-		}
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
 
 		// Init JS to affix Messages:
 		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
