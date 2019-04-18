@@ -21,7 +21,7 @@ class custom_tags_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc = 'Custom tags';
 	var $long_desc;
-	var $version = '6.10.7';
+	var $version = '6.10.8';
 	var $number_of_installs = 1;
 
 	// Internal
