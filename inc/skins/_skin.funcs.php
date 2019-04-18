@@ -2813,6 +2813,9 @@ function widget_container( $container_code, $params = array() )
 			'container_end'   => '</div>',
 			// Restriction for Page Containers:
 			'container_item_ID' => NULL,
+			// Default params for widget blocks:
+			'block_start' => '<div class="evo_widget $wi_class$">',
+			'block_end'   => '</div>',
 		), $params );
 
 	// Try to find widget container by code for current collection and skin type:
