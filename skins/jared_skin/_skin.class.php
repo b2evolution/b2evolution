@@ -282,7 +282,7 @@ class jared_Skin extends Skin
 						'note' => 'px. ' . T_('Set the ammount of maximum width for the content in this section.' ) . ' <strong>' . T_( 'Maximum value is') . ' 1170px.</strong>',
 						'defaultvalue' => '1170',
 						'type' => 'integer',
-						'size' => '2',
+						'size' => '4',
 						'allow_empty' => false,
 					),
 					'section_1_coll_title_color' => array(
@@ -1234,16 +1234,133 @@ class jared_Skin extends Skin
 				'disp_auto',               // Automatically include additional CSS and/or JS required by certain disps (replace with 'disp_off' to disable this)
 			) );
 
+		$FileCache = & get_FileCache();
+
 		// Skin specific initializations:
 
 		// Limit images by max height:
 
 		add_headline( '<link href="https://fonts.googleapis.com/css?family=Ek+Mukta:300|Josefin+Sans:300,400" rel="stylesheet">' );
 
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$; width: auto; }', array(
+			'suffix' => 'px'
+		) );
+		// **** Layout Settings / END ****
+
+		// **** Top Navigation Bar Settings / START ****
+		if( $this->get_setting( 'nav_bg_transparent' ) )
+		{	// If "Transparent background" is enabled:
+			// Background color:
+			$this->dynamic_style_rule( 'nav_bg_color',
+				// Set background-color for all cases, but (!)
+				'.navbar, .navbar.affix { background-color: $setting_value$ }'.
+				// ... exclude background-color in mentioned media queries and set transparent
+				'@media (min-width: 1025px) { .navbar { background-color: transparent } }' );
+			if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
+			{	// Links color:
+				$this->dynamic_style_rule( 'nav_links_color', '@media (max-width: 1024px) { .affix-top a { color: $setting_value$ !important } }' );
+			}
+		}
+		else
+		{	// If "Transparent background" is disabled:
+			// Background color:
+			$this->dynamic_style_rule( 'nav_bg_color', '.navbar { background-color: $setting_value$ }' );
+		}
+		// Collection title font size:
+		$this->dynamic_style_rule( 'nav_colltitle_size', '.navbar.main-header-navigation .navbar-brand > h3 a { font-size: $setting_value$ }', array(
+			'suffix' => 'px'
+		) );
+		// Links font size:
+		$this->dynamic_style_rule( 'nav_links_size',
+			'.navbar.main-header-navigation.navbar-default .navbar-nav > .active > a, '.
+			'.navbar.main-header-navigation.navbar-default .navbar-nav > .active > a:focus, '.
+			'.navbar.main-header-navigation.navbar-default .navbar-nav > .active > a:hover, '.
+			'.navbar.main-header-navigation.navbar-default .navbar-nav li > a { font-size: $setting_value$ }',
+			array( 'suffix' => 'px' )
+		);
+		// Links color:
+		$this->dynamic_style_rule( 'nav_links_color',
+			'.navbar.navbar-default a, '.
+			'.navbar.navbar-default a:hover, '.
+			'.navbar-default .navbar-nav>.active>a, '.
+			'.navbar-default .navbar-nav>.active>a:focus, '.
+			'.navbar-default .navbar-nav>.active>a:hover, '.
+			'.navbar-default .navbar-nav>.active>a, '.
+			'.navbar-default .navbar-nav>li>a, '.
+			'.navbar-default .navbar-nav>li>a:focus, '.
+			'.navbar-default .navbar-nav>li>a:hover { color: $setting_value$ } }' );
+		// **** Top Navigation Bar Settings / END ****
+
+		// **** Page Top Settings / START ****
+		// Button background color:
+		$this->dynamic_style_rule( 'pagetop_button_bg_color', '.evo_container__page_top .evo_widget > .btn.btn-default { background-color: $setting_value$ }' );
+		// Button text color:
+		$this->dynamic_style_rule( 'pagetop_button_color', '.evo_container__page_top .evo_widget > .btn.btn-default { color: $setting_value$ }' );
+		// **** Page Top Settings / END ****
+
+		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
 		{
-			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
+			// **** Section 1 - Front Page Main Area / START ****
+			if( $this->get_setting( 'section_1_display' ) )
+			{
+				if( $this->get_setting( 'nav_bg_transparent' ) )
+				{	// Top navigation text color:
+					$this->dynamic_style_rule( 'section_1_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
+				}
+				// Background image:
+				$this->dynamic_style_rule( 'section_1_image_file_ID', '.evo_container__front_first_section { background-image: $setting_value$ }', array(
+					'type' => 'image_file',
+				) );
+				// Background color:
+				$this->dynamic_style_rule( 'section_1_bg_color', '.evo_container__front_first_section { background-color: $setting_value$ }' );
+				// Maximum content width:
+				$this->dynamic_style_rule( 'section_1_cont_width', 'body.pictured.disp_front .container.main_page_wrapper { max-width: $setting_value$ }', array( 'suffix' => 'px' ) );
+				// Collection title color:
+				$this->dynamic_style_rule( 'section_1_coll_title_color', 'body.pictured.disp_front .main_page_wrapper .widget_core_coll_title h1 a { color: $setting_value$ }' );
+				// Content title color:
+				$this->dynamic_style_rule( 'section_1_title_color', 'body.pictured.disp_front .main_page_wrapper h2.page-header { color: $setting_value$ }' );
+				// Normal text color:
+				$this->dynamic_style_rule( 'section_1_text_color', 'body.pictured.disp_front .front_main_content, body.pictured .front_main_content h1 small, .evo_container__header, .evo_container__page_top { color: $setting_value$ }' );
+				// Links color:
+				$this->dynamic_style_rule( 'section_1_link_color',
+					'body.pictured .main_page_wrapper .front_main_area a,'.
+					'body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: $setting_value$ }'.
+					'body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,'.
+					'body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a, .evo_container__page_top a { color: $setting_value$ }'.
+					'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__bgcolor"]):not(:hover) { background-color: $setting_value$ }'.
+					'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: $setting_value$ }'
+				);
+				// Muted text color:
+				$this->dynamic_style_rule( 'section_1_muted_color', 'body.pictured.disp_front .main_page_wrapper .text-muted { color: $setting_value$ }' );
+				// Inverse icon color:
+				$this->dynamic_style_rule( 'section_1_icon_color',
+					'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__textcolor"]):not(:hover) { color: $setting_value$ }'.
+					'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hoverbgcolor"]) { background-color: $setting_value$ }'
+				);
+				// Button background color:
+				$this->dynamic_style_rule( 'section_1_button_bg_color',
+					'.evo_container__front_page_main_area .evo_widget > .btn.btn-default { background-color: $setting_value$ }'.
+					'.evo_container__front_page_main_area .evo_widget .item_excerpt > a.btn.btn-default,'.
+					'.evo_container__front_page_main_area .evo_widget .item_content > a.btn.btn-default { background-color: $setting_value$ }'
+				);
+				// Button text color:
+				$this->dynamic_style_rule( 'section_1_button_color',
+					'.evo_container__front_page_main_area .evo_widget > .btn.btn-default { color: $setting_value$ }'.
+					'.evo_container__front_page_main_area .evo_widget .item_excerpt > a.btn.btn-default,'.
+					'.evo_container__front_page_main_area .evo_widget .item_content > a.btn.btn-default { color: $setting_value$ }'
+				);
+				// Align text:
+				$this->dynamic_style_rule( 'section_1_text_align', '.evo_container__front_page_main_area { text-align: $setting_value$ }', array(
+					'options' => array(
+						'section_1_left'   => 'left',
+						'section_1_center' => 'center',
+						'section_1_right'  => 'right;',
+					)
+				) );
+			}
+			// **** Section 1 - Front Page Main Area / END ****
 		}
 
 		// Add custom CSS:
@@ -1251,34 +1368,10 @@ class jared_Skin extends Skin
 
 
 		// ============ Navigation Section ============
-		$nav_links_color = $this->get_setting( 'nav_links_color' );
-		$nav_bg_color    = $this->get_setting( 'nav_bg_color' );
-
-		if( $custom_font_size = $this->get_setting( 'nav_colltitle_size' ) )
-		{
-			$custom_css .= ".navbar.main-header-navigation .navbar-brand > h3 a { font-size:". $custom_font_size. "px }\n";
-		}
-
-		if( $custom_font_size = $this->get_setting( 'nav_links_size' ) )
-		{
-			$custom_css .= ".navbar.main-header-navigation.navbar-default .navbar-nav > .active > a, .navbar.main-header-navigation.navbar-default .navbar-nav > .active > a:focus, .navbar.main-header-navigation.navbar-default .navbar-nav > .active > a:hover, .navbar.main-header-navigation.navbar-default .navbar-nav li > a { font-size:". $custom_font_size. "px }\n";
-		}
 
 		// If "Transparent background" option for navigation is TRUE
 		if( $this->get_setting( 'nav_bg_transparent' ) )
 		{
-			// Set background-color for all cases, but (!)
-			$custom_css .= ".navbar, .navbar.affix { background-color: $nav_bg_color }\n";
-			// ... exclude background-color in mentioned media queries and set transparent
-			$custom_css .= "@media (min-width: 1025px) { .navbar { background-color: transparent } }\n";
-
-			// Section 1 navigation links color
-			if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
-			{
-				$section_nav_color = $this->get_setting( 'section_1_navbar_text_color' );
-				$custom_css .= "@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }\n";
-				$custom_css .= "@media (max-width: 1024px) { .affix-top a { color: $nav_links_color !important } }\n";
-			}
 			// Section 6 navigation links color
 			if( $disp == 'page' )
 			{
@@ -1302,118 +1395,11 @@ class jared_Skin extends Skin
 				$section_nav_color = $this->get_setting( 'section_oth_navbar_text_color' );
 				$custom_css .= "@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }\n";
 			}
-
-			// Default navigation links color, applied to all conditions EXCEPT when '.affix-top'
-			// $custom_css .= ".navbar.navbar-default:not(.affix-top) a, .navbar.navbar-default:not(.affix-top) a:hover, .navbar-default:not(.affix-top) .navbar-nav>.active>a, .navbar-default:not(.affix-top) .navbar-nav>.active>a:focus, .navbar-default:not(.affix-top) .navbar-nav>.active>a:hover, .navbar-default:not(.affix-top) .navbar-nav>.active>a, .navbar-default:not(.affix-top) .navbar-nav>li>a, .navbar-default:not(.affix-top) .navbar-nav>li>a:focus, .navbar-default:not(.affix-top) .navbar-nav>li>a:hover { color: $nav_links_color }\n";
-			$custom_css .= ".navbar.navbar-default a, .navbar.navbar-default a:hover, .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>li>a, .navbar-default .navbar-nav>li>a:focus, .navbar-default .navbar-nav>li>a:hover { color: $nav_links_color }\n";
-
-		}
-
-		// If "Transparent background" option for navigation is FALSE
-		else
-		{
-			// Set background-color for all cases
-			$custom_css .= ".navbar { background-color: $nav_bg_color }\n";
-			// Set all navigation links color to what is set as default
-			$custom_css .= ".navbar.navbar-default a, .navbar.navbar-default a:hover, .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>li>a, .navbar-default .navbar-nav>li>a:focus, .navbar-default .navbar-nav>li>a:hover { color: $nav_links_color }\n";
 		}
 
 
-		// ============ Page Top Section ============
-		if( $color = $this->get_setting( 'pagetop_button_bg_color' ) )
-		{
-			$custom_css .= '.evo_container__page_top .evo_widget > .btn.btn-default { background-color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'pagetop_button_color' ) )
-		{
-			$custom_css .= '.evo_container__page_top .evo_widget > .btn.btn-default { color: '.$color." }\n";
-		}
-
-
-		$FileCache = & get_FileCache();
 		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
 		{
-
-
-			// ============ Section 1 - Front Page Main Area ============
-			if( $this->get_setting( 'section_1_display' ) )
-			{
-			if( $this->get_setting( 'section_1_image_file_ID' ) )
-			{
-				$bg_image_File1 = & $FileCache->get_by_ID( $this->get_setting( 'section_1_image_file_ID' ), false, false );
-			}
-			if( !empty( $bg_image_File1 ) && $bg_image_File1->exists() )
-			{
-				$custom_css .= '.evo_container__front_first_section { background-image: url('.$bg_image_File1->get_url().") }\n";
-			}
-			else
-			{
-				$color = $this->get_setting( 'section_1_bg_color' );
-				$custom_css .= '.evo_container__front_first_section { background: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_1_coll_title_color' ) )
-			{
-				$custom_css .= 'body.pictured.disp_front .main_page_wrapper .widget_core_coll_title h1 a { color: '.$color." }\n";
-			}
-			if( $max_width = $this->get_setting( 'section_1_cont_width' ) )
-			{
-				$custom_css .= 'body.pictured.disp_front .container.main_page_wrapper { max-width: '.$max_width."px }\n";
-			}
-			if( $color = $this->get_setting( 'section_1_title_color' ) )
-			{
-				$custom_css .= 'body.pictured.disp_front .main_page_wrapper h2.page-header { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_1_muted_color' ) )
-			{
-				$custom_css .= 'body.pictured.disp_front .main_page_wrapper .text-muted { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_1_text_color' ) )
-			{
-				$custom_css .= 'body.pictured.disp_front .front_main_content, body.pictured .front_main_content h1 small, .evo_container__header, .evo_container__page_top { color: '.$color." }\n";
-			}
-
-			$link_color 		= $this->get_setting( 'section_1_link_color' );
-			// $link_hover_color   = $this->get_setting( 'section_1_link_h_color' );
-			$icon_color			= $this->get_setting( 'section_1_icon_color' );
-			if( $link_color )
-			{
-				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a,
-				body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: '.$link_color.' }
-				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,
-				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a, .evo_container__page_top a { color: '.$link_color." }\n";
-			}
-			if( $link_color && $icon_color )
-			{
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__textcolor"]):not(:hover) { color: '.$icon_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__bgcolor"]):not(:hover) { background-color: '.$link_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: '.$link_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hoverbgcolor"]) { background-color: '.$icon_color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_1_button_bg_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_main_area .evo_widget > .btn.btn-default { background-color: '.$color." }\n";
-				$custom_css .= '.evo_container__front_page_main_area .evo_widget .item_excerpt > a.btn.btn-default,
-				.evo_container__front_page_main_area .evo_widget .item_content > a.btn.btn-default
-				{ background-color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_1_button_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_main_area .evo_widget > .btn.btn-default { color: '.$color." }\n";
-				$custom_css .= '.evo_container__front_page_main_area .evo_widget .item_excerpt > a.btn.btn-default,
-				.evo_container__front_page_main_area .evo_widget .item_content > a.btn.btn-default
-				{ color: '.$color." }\n";
-			}
-			if( $this->get_setting( 'section_1_text_align' ) == 'section_1_center' )
-			{
-				$custom_css .= ".evo_container__front_page_main_area { text-align: center }\n";
-			}
-			if( $this->get_setting( 'section_1_text_align' ) == 'section_1_right' )
-			{
-				$custom_css .= ".evo_container__front_page_main_area { text-align: right }\n";
-			}
-			}
-
-
 			// ============ Section 2 - Front Page Secondary Area ============
 			if( $this->get_setting( 'section_2_display' ) )
 			{
@@ -1945,6 +1931,9 @@ class jared_Skin extends Skin
 </style>';
 		add_headline( $custom_css );
 		}
+
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
 
 		// Init JS to affix Messages:
 		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
