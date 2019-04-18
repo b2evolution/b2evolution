@@ -532,16 +532,8 @@ class bootstrap_blog_Skin extends Skin
 		$this->dynamic_style_rule( 'panel_heading_bg_color', '.panel .panel-heading, .panel .panel-footer { background-color: $setting_value$ }' );
 		// **** Custom Settings / END ****
 
-		$custom_css = $this->get_dynamic_styles();
-		if( ! empty( $custom_css ) )
-		{	// Function for custom_css:
-			$custom_css = '<style type="text/css" id="evo_skin_styles">
-<!--
-'.$custom_css.'
--->
-		</style>';
-			add_headline( $custom_css );
-		}
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
 
 		// Init JS to affix Messages:
 		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );

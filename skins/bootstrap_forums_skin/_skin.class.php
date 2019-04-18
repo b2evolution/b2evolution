@@ -381,12 +381,15 @@ class bootstrap_forums_Skin extends Skin
 
 		// Skin specific initializations:
 
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
-		}
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$; width: auto; }', array(
+			'suffix' => 'px'
+		) );
+		// **** Layout Settings / END ****
+
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote

@@ -487,22 +487,10 @@ class bootstrap_main_Skin extends Skin
 		$this->dynamic_style_rule( 'bgimg_hover_link_color', '.evo_hasbgimg a:hover { color: $setting_value$ }' );
 		// **** Featured posts Settings / END ****
 
-		$custom_css = $this->get_dynamic_styles();
-		if( ! empty( $custom_css ) )
-		{
-			if( $disp == 'front' )
-			{ // Use standard bootstrap style on width <= 640px only for disp=front
-				$custom_css = '@media only screen and (min-width: 641px)
-					{
-						'.$custom_css.'
-					}';
-			}
-			add_headline( '<style type="text/css" id="evo_skin_styles">
-<!--
-'.$custom_css.'
--->
-</style>' );
-		}
+		// Add dynamic CSS rules headline:
+		// Use standard bootstrap style on width <= 640px only for disp=front:
+		$media_exception = ( $disp == 'front' ? '@media only screen and (min-width: 641px)' : NULL );
+		$this->add_dynamic_css_headline( $media_exception );
 
 		// Init JS to affix Messages:
 		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );

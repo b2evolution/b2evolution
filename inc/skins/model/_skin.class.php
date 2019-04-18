@@ -1042,6 +1042,30 @@ class Skin extends DataObject
 
 
 	/**
+	 * Add dynamic CSS rules headline
+	 *
+	 * @param string CSS rule for media exception of whole dynamic styles
+	 */
+	function add_dynamic_css_headline( $media_exception = NULL )
+	{
+		$dynamic_css = $this->get_dynamic_styles();
+		if( ! empty( $dynamic_css ) )
+		{
+			if( $media_exception !== NULL )
+			{	// Use media exception:
+				$dynamic_css = $media_exception.'{ '.$dynamic_css.' }';
+			}
+			$dynamic_css = '<style type="text/css" id="evo_skin_styles">
+<!--
+'.$dynamic_css.'
+-->
+		</style>';
+			add_headline( $dynamic_css );
+		}
+	}
+
+
+	/**
 	 * Get current skin post navigation setting.
 	 * Possible values:
 	 *    - NULL - In this case the Blog post navigation setting will be used
