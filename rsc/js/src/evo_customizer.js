@@ -39,7 +39,7 @@ function evo_customizer_update_style( setting_input )
 	var skin_setting_name = setting_input.attr( 'name' ).replace( /^edit_skin_\d+_set_/, '' );
 
 	// Replace previous value with new updated:
-	var regexp = new RegExp( '(\\/\\*customize:\\*\\/).*?(\\/\\*(([a-z_\\+]+\\+)?' + skin_setting_name + '(\\+[a-z_\\+]+)?)(\\/([a-z]+):([^\\*]+))?\\*\\/)', 'i' );
+	var regexp = new RegExp( '(\\/\\*customize:\\*\\/).*?(\\/\\*(([a-z_\\+]+\\+)?' + skin_setting_name + '(\\+[a-z_\\+]+)?)(\\/([a-z]+):([^\\*]+))?\\*\\/)', 'ig' );
 	var new_value = setting_input.val();
 	skin_style.text( skin_style.text().replace( regexp, function( m0, m1, m2, m3, m4, m5, m6, m7, m8 )
 	{
