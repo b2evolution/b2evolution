@@ -223,7 +223,7 @@ class DataObjectCache
 	 */
 	function load_list( $req_list, $invert = false )
 	{
-		global $Debuglog;
+		global $Debuglog, $DB;
 
 		if( ! $invert )
 			$req_list = array_diff($req_list, $this->get_ID_array());
@@ -232,7 +232,7 @@ class DataObjectCache
 			return false;
 
 		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()' );
-		$SQL->WHERE_and($this->dbIDname.( $invert ? ' NOT' : '' ).' IN ('.implode(',', $req_list).')');
+		$SQL->WHERE_and($this->dbIDname.( $invert ? ' NOT' : '' ).' IN ('.$DB->quote( $req_list ).')');
 
 		return $this->load_by_sql($SQL);
 	}

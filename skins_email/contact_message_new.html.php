@@ -23,7 +23,7 @@ $params = array_merge( array(
 		'message_footer'   => '',
 		'Blog'             => NULL,
 		'message'          => '',
-		'comment_id'       => NULL,
+		'comment_ID'       => NULL,
 		'post_id'          => NULL,
 		'recipient_User'   => NULL,
 		'Comment'          => NULL,
@@ -36,10 +36,10 @@ $recipient_User = & $params['recipient_User'];
 if( !empty( $Blog ) )
 {
 	echo '<p'.emailskin_style( '.p' ).'>';
-	if( !empty( $params['comment_id'] ) )
+	if( !empty( $params['comment_ID'] ) )
 	{ // From comment
 		$CommentCache = & get_CommentCache();
-		$Comment = & $CommentCache->get_by_ID( $params['comment_id'] );
+		$Comment = & $CommentCache->get_by_ID( $params['comment_ID'] );
 		$Item = & $Comment->get_Item();
 		echo sprintf( T_('Message sent from your <a %s>comment</a> on %s.'),
 			'href="'.$Comment->get_permanent_url( '&', '#comments' ).'"'.emailskin_style( '.a' ).'',

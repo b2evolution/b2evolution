@@ -32,7 +32,7 @@ if( empty( $Blog ) )
 echo '<div id="form_wrapper" style="margin: 2ex auto 1ex">';
 
 $Form = new Form( NULL, 'cat_order_checkchanges', 'post', 'compact' );
-$Form->begin_form( 'fform', T_('Category order').get_manual_link('categories_order') );
+$Form->begin_form( 'fform', T_('Category order').get_manual_link('categories-order') );
 $Form->add_crumb( 'collection' );
 $Form->hidden( 'ctrl', 'coll_settings' );
 $Form->hidden( 'action', 'update' );

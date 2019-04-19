@@ -33,7 +33,7 @@ $Results = new Results( $SQL->get(), 'curr_', '-A');
 
 $Results->Cache = & get_CurrencyCache();
 
-$Results->title = T_('Currencies list').get_manual_link('currencies_list');
+$Results->title = T_('Currencies list').get_manual_link('currencies-list');
 
 /*
  * STATUS TD:
@@ -128,12 +128,12 @@ function curr_td_actions($curr_enabled, $curr_ID )
 
 	if( $curr_enabled == true )
 	{
-		$r .= action_icon( T_('Disable the currency!'), 'deactivate', 
+		$r .= action_icon( T_('Disable the currency!'), 'deactivate',
 										regenerate_url( 'action', 'action=disable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') ) );
 	}
 	else
 	{
-		$r .= action_icon( T_('Enable the currency!'), 'activate', 
+		$r .= action_icon( T_('Enable the currency!'), 'activate',
 										regenerate_url( 'action', 'action=enable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') ) );
 	}
 	$r .= action_icon( T_('Edit this currency...'), 'edit',

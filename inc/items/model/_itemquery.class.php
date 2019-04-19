@@ -1073,9 +1073,7 @@ class ItemQuery extends SQL
 				}
 				// $nullable_fields[$key] = $field_value;
 				$this->orderby_from .= 'LEFT JOIN T_items__item_settings as '.$table_alias.' ON post_ID = '.$table_alias.'.iset_item_ID AND '
-						.$table_alias.'.iset_name = (
-							SELECT CONCAT( "custom_", itcf_type, "_", itcf_ID )
-							FROM T_items__type_custom_field WHERE itcf_name = '.$DB->quote( $field_name ).' AND itcf_ityp_ID = post_ityp_ID )';
+						.$table_alias.'.iset_name = '.$DB->quote( 'custom:'.$field_name );
 				$order_by = str_replace( $key, $field_value, $order_by );
 			}
 			$custom_sort_fields[$key] = $field_value;

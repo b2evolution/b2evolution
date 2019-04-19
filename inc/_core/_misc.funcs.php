@@ -3797,9 +3797,6 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	global $mail_log_message;
 	$mail_log_message = NULL;
 
-	// Stop a request from the blocked IP addresses or Domains
-	antispam_block_request();
-
 	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $mail_log_insert_ID;
 
 	$message_data = $message;
@@ -6932,8 +6929,9 @@ function get_samedomain_htsrv_url( $force_https = false )
 	// Cut htsrv folder from end of the URL:
 	$req_htsrv_url = substr( $req_htsrv_url, 0, strlen( $req_htsrv_url ) - strlen( $htsrv_subdir ) );
 
-	if( $is_cli || strpos( $ReqHost.$ReqPath, $req_htsrv_url ) !== false )
+	if( $is_cli || empty( $ReqHost ) || strpos( $ReqHost.$ReqPath, $req_htsrv_url ) !== false )
 	{	// If current request path contains the required htsrv URL
+		// or $ReqHost is not initialized e-g on install
 		// or this is CLI mode where $ReqHost is not defined:
 		return $req_htsrv_url.$htsrv_subdir;
 	}
@@ -8451,7 +8449,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				'image_size'               => 'fit-400x320',
 				'image_link_to'            => 'original', // Can be 'orginal' (image) or 'single' (this post)
 				'limit'                    => 1000, // Max # of images displayed
-				'get_rendered_attachments' => true,
 			), $params );
 
 	if( !isset( $LinkList ) )
@@ -8620,12 +8617,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						}
 					}
 
-					if( ! $current_image_params['get_rendered_attachments'] )
-					{	// Save $r to temp var in order to don't get the rendered data from plugins
-						$temp_r = $r;
-					}
-
-					$temp_params = $current_image_params;
 					foreach( $current_image_params as $param_key => $param_value )
 					{	// Pass all params by reference, in order to give possibility to modify them by plugin
 						// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
@@ -8636,13 +8627,10 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_image_params );
 
 					// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_image_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_image_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_image_params['data']):
-						if( ! $current_image_params['get_rendered_attachments'] )
-						{	// Restore $r value and mark this item has the rendered attachments:
-							$r = $temp_r;
-							$plugin_render_attachments = true;
-						}
+						$inlines[ $current_inline ] = $current_image_params['data'];
+						break;
 					}
 
 					if( $inline_type == 'image' )
@@ -8890,7 +8878,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_video_params );
 
 					// Render attachments by plugin:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_video_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_video_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_video_params['data']):
 						$inlines[$current_inline] = $current_video_params['data'];
 					}
@@ -8922,9 +8910,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_audio_params );
 
 					// Render attachments by plugin:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_audio_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_audio_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_audio_params['data']):
-						$inlines[$current_inline] =  $current_audio_params['data'];
+						$inlines[$current_inline] = $current_audio_params['data'];
 					}
 					else
 					{ // no plugin available or was able to render the tag

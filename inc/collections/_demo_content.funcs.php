@@ -902,6 +902,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 
 	$timestamp = time();
 	$blog_ID = NULL;
+	$blog_tagline = T_('This is the collection\'s tagline.');
 
 	switch( $collection_type )
 	{
@@ -915,7 +916,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					T_('Homepage Title'),
 					$blog_shortname,
 					'home',
-					T_('Change this as you like'),
+					$blog_tagline,
 					sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
 					2, // Skin ID
 					'main',
@@ -951,7 +952,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					T_('Public Blog'),
 					$blog_shortname,
 					$blog_stub,
-					T_('This blog is completely public...'),
+					$blog_tagline,
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 					1, // Skin ID
 					'std',
@@ -986,7 +987,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					T_('Members-Only Blog'),
 					$blog_shortname,
 					$blog_stub,
-					T_('This blog has restricted access...'),
+					$blog_tagline,
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 					1, // Skin ID
 					'std',
@@ -1019,7 +1020,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					'Photos',
 					$blog_shortname,
 					$blog_stub,
-					T_('This blog shows photos...'),
+					$blog_tagline,
 					sprintf( $default_blog_longdesc, $blog_shortname, $blog_more_longdesc ),
 					3, // Skin ID
 					'photo', '', 0, 'relative', true, 'public',
@@ -1035,7 +1036,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					T_('Forums Title'),
 					$blog_shortname,
 					$blog_stub,
-					T_('Tagline for Forums'),
+					$blog_tagline,
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 					4, // Skin ID
 					'forum', 'any', 1, 'relative', false, 'public',
@@ -1051,7 +1052,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					T_('Manual Title'),
 					$blog_shortname,
 					$blog_stub,
-					T_('Tagline for this online manual'),
+					$blog_tagline,
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 					5, // Skin ID
 					'manual', 'any', 1, $default_blog_access_type, false, 'public',
@@ -1067,7 +1068,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					T_('Tracker Title'),
 					$blog_shortname,
 					$blog_stub,
-					T_('Tagline for Tracker'),
+					$blog_tagline,
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 					4, // Skin ID
 					'group', 'any', 1, $default_blog_access_type, false, 'public',
@@ -1288,15 +1289,15 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$edited_Item->set_tags_from_string( 'demo' );
 				$edited_Item->insert( $owner_ID, T_('Help content'), '### '.T_('Email preferences')
 					."\n\n"
-					.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'subsurl' ).'"' )
+					.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'subsurl' ).'"' )
 					."\n\n"
 					.'### '.T_('Managing your personal information')
 					."\n\n"
-					.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'profileurl' ).'"' )
+					.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'profileurl' ).'"' )
 					."\n\n"
 					.'### '.T_('Closing your account')
 					."\n\n"
-					.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$edited_Blog->get( 'closeaccounturl' ).'"' ),
+					.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>.'), 'href="'.$edited_Blog->get( 'closeaccounturl' ).'"' ),
 						$now, $cat_home_b2evo, array(), 'published', '#', 'help-content', '', 'open', array( 'default' ), 'Content Block' );
 
 				// Insert a post:

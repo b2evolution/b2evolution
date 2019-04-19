@@ -28,7 +28,7 @@ $Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
-$Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'return-path-configuration' ) );
+$Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'test-saved-settings' ) );
 
 	$url = '?ctrl=email&amp;tab=return&amp;tab3=test&amp;'.url_crumb('emailsettings').'&amp;action=';
 	$Form->info_field( T_('Perform tests'),

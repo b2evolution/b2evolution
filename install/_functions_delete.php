@@ -69,6 +69,8 @@ function uninstall_b2evolution()
 			$PageCache = new PageCache( $Blog );
 			$PageCache->cache_delete();
 		}
+		// Clear cache in order to avoid unexpected errors on install new collections right after uninstall:
+		$BlogCache->clear();
 	}
 
 	/* REMOVE DATABASE */

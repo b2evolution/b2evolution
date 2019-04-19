@@ -21,7 +21,7 @@ class bootstrap_main_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.10.7';
+	var $version = '6.10.8';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -451,7 +451,13 @@ class bootstrap_main_Skin extends Skin
 
 			if( $color = $this->get_setting( 'front_text_color' ) )
 			{ // Custom text color:
-				$custom_css .= 'body.pictured .front_main_content, body.pictured .front_main_content h1 small, .evo_container__header, .evo_container__page_top, body.pictured:not(.disp_register) .evo_widget.widget_core_content_block { color: '.$color." }\n";
+				$custom_css .= 'body.pictured .front_main_content, '
+					.'body.pictured .front_main_content h1 small, '
+					.'.evo_container__header, '
+					.'.evo_container__page_top, '
+					.'body.pictured.disp_access_requires_login .evo_widget.widget_core_content_block, '
+					.'body.pictured.disp_access_denied .evo_widget.widget_core_content_block '
+					.'{ color: '.$color." }\n";
 			}
 
 			$link_color = $this->get_setting( 'front_link_color' );

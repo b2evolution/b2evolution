@@ -51,7 +51,7 @@ if( count( $sql_where ) > 0 )
 // Create result set:
 $Results = new Results( $SQL->get(), 'subrg_', '-D' );
 
-$Results->title = T_('Sub-regions/Departments/Counties').get_manual_link('countries_list');
+$Results->title = T_('Sub-regions/Departments/Counties').get_manual_link('subregions-list');
 
 /*
  * STATUS TD:

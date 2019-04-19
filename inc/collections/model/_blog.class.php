@@ -257,10 +257,14 @@ class Blog extends DataObject
 				array( 'table'=>'T_subscriptions', 'fk'=>'sub_coll_ID', 'msg'=>T_('%d subscriptions') ),
 				array( 'table'=>'T_widget', 'fk'=>'wi_coll_ID', 'msg'=>T_('%d widgets') ),
 				array( 'table'=>'T_hitlog', 'fk'=>'hit_coll_ID', 'msg'=>T_('%d hits') ),
+				array( 'table'=>'T_hits__aggregate', 'fk'=>'hagg_coll_ID', 'msg'=>T_('%d hits aggregations') ),
+				array( 'table'=>'T_hits__aggregate_sessions', 'fk'=>'hags_coll_ID', 'msg'=>T_('%d sessions aggregations') ),
+				array( 'table'=>'T_items__type_coll', 'fk'=>'itc_coll_ID', 'msg'=>T_('%d Post type associations with collections') ),
 				array( 'table'=>'T_categories', 'fk'=>'cat_blog_ID', 'msg'=>T_('%d related categories with all of their content recursively'),
 						'class'=>'Chapter', 'class_path'=>'chapters/model/_chapter.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "collection"', 'msg'=>T_('%d files in this blog file root'),
 						'class'=>'File', 'class_path'=>'files/model/_file.class.php' ),
+				array( 'table'=>'T_temporary_ID', 'fk'=>'tmp_coll_ID', 'msg'=>T_('%d temporary uploaded links') ),
 			);
 	}
 
@@ -317,6 +321,9 @@ class Blog extends DataObject
 	 */
 	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
 	{
+		// Set default tagline for collection of any kind:
+		$this->set( 'tagline', T_('This is the collection\'s tagline.') );
+
 		switch( $kind )
 		{
 			case 'main':
@@ -431,7 +438,7 @@ class Blog extends DataObject
 					}
 				}
 				$this->set( 'type', $kind );
-				$this->set( 'name', empty($name) ? T_('Public Blog') : $name );
+				$this->set( 'name', empty($name) ? T_('Blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;
@@ -2524,7 +2531,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path ),
-							'error', T_('Media directory file permission error').get_manual_link('media-directory-file-permission-error').':' );
+							'error', T_('Media directory file permission error').get_manual_link('media-file-permission-errors').':' );
 				}
 				return false;
 			}
@@ -2533,7 +2540,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path ),
-							'error', T_('Media directory creation error').get_manual_link('media-directory-creation-error').':' );
+							'error', T_('Media directory creation error').get_manual_link('media-file-permission-errors').':' );
 				}
 				return false;
 			}
@@ -3148,21 +3155,13 @@ class Blog extends DataObject
 
 	/**
 	 * Make sure collection settings are loaded.
-	 * This keeps a single instance across all blogs.
-	 * fp> why?
 	 */
 	function load_CollectionSettings()
 	{
-		static $instance; // fp> why do we need static? (it actually feels totally wrong: sharing settings between blogs!)
-
-		if( ! isset($this->CollectionSettings) )
+		if( ! isset( $this->CollectionSettings ) )
 		{
-			if( ! isset( $instance ) )
-			{
-				load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
-				$instance = new CollectionSettings(); // COPY (function)
-			}
-			$this->CollectionSettings = $instance;
+			load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+			$this->CollectionSettings = new CollectionSettings(); // COPY (function)
 		}
 	}
 

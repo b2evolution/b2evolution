@@ -104,6 +104,8 @@ class Slug extends DataObject
 		if( empty( $this->ID ) || $slug_title != $this->get( 'title' ) )
 		{	// Check unique slug title only for new creating slug and if title was really changed:
 			$slug_title = urltitle_validate( $slug_title, $slug_title, 0, true, 'slug_title', 'slug_ID', 'T_slug' );
+			// Update the submitted param with validated value in order to correct checking by regexp below:
+			set_param( 'slug_title', $slug_title );
 		}
 		if( $this->dbexists( 'slug_title', $slug_title ) )
 		{
@@ -111,8 +113,8 @@ class Slug extends DataObject
 		}
 		// Added in May 2017; but old slugs are not converted yet.
 		else
-		{	// Display error if slug title doesn't contain at least one letter:
-			param_check_regexp( 'slug_title', '#[a-z]#i', T_('All slugs must contain at least one letter.') );
+		{	// Display error if slug title doesn't contain at least 1 non-numeric character:
+			param_check_regexp( 'slug_title', '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', T_('All slugs must contain at least 1 non-numeric character.'), NULL, false, false );
 		}
 		$this->set( 'title', $slug_title );
 

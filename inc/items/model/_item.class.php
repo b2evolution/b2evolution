@@ -834,11 +834,23 @@ class Item extends ItemLight
 			foreach( $post_urltitle as $u => $slug_urltitle )
 			{
 				$post_urltitle[ $u ] = replace_special_chars( $slug_urltitle, $this->get( 'locale' ) );
+				if( empty( $post_urltitle[ $u ] ) )
+				{	// Unset empty slug in order to create auto slug:
+					unset( $post_urltitle[ $u ] );
+					continue;
+				}
+				// Added in May 2017; but old slugs are not converted yet.
+				if( preg_match( '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', $post_urltitle[ $u ] ) )
+				{	// Display error if one of item slugs doesn't contain at least 1 non-numeric character:
+					param_error( 'post_urltitle', T_('All slugs must contain at least 1 non-numeric character.') );
+				}
 			}
+			// Append old slugs at the end because they are not deleted on updating of the Item,
+			// and update array of the cached slugs from DB in order to display proper slugs after submit the forms with errors:
+			$this->get_slugs();
+			$this->slugs = array_unique( array_merge( $post_urltitle, $this->slugs ) );
+			// Set new post urltitle:
 			$this->set( 'urltitle', implode( ', ', $post_urltitle ) );
-			// Added in May 2017; but old slugs are not converted yet.
-			// Display error if item slugs don't contain at least one letter:
-			param_check_regexp( 'post_urltitle', '#^([^,]*[a-z][^,]*,?)*$#i', T_('All slugs must contain at least one letter.') );
 		}
 
 		if( $is_not_content_block )
@@ -1799,7 +1811,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if the post contains inline file placeholders without corresponding attachemnt file.
+	 * Check if the post contains inline file placeholders without corresponding attachment file.
 	 * Removes the invalid inline file placeholders from the item content.
 	 *
 	 * @param string Content
@@ -1814,34 +1826,34 @@ class Item extends ItemLight
 			return $content;
 		}
 
-		// There are inline image placeholders
-		if( $this->ID > 0 )
-		{ // The post is saved, so it can actually have attachments:
-			global $DB;
-			$links_SQL = new SQL( 'Get item links IDs of the inline images' );
-			$links_SQL->SELECT( 'link_ID' );
-			$links_SQL->FROM( 'T_links' );
-			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
-			$links_SQL->WHERE_and( 'link_position = "inline"' );
-			$inline_links_IDs = $DB->get_col( $links_SQL );
-
-			$unused_inline_images = array();
-			foreach( $inline_images[2] as $i => $inline_link_ID )
-			{
-				if( ! in_array( $inline_link_ID, $inline_links_IDs ) )
-				{ // This inline image must be removed from content
-					$unused_inline_images[] = $inline_images[0][ $i ];
-				}
-			}
+		// There are inline image placeholders in the item's content:
+		global $DB;
+		$links_SQL = new SQL( 'Get item links IDs of the inline files' );
+		$links_SQL->SELECT( 'link_ID' );
+		$links_SQL->FROM( 'T_links' );
+		if( empty( $this->ID ) )
+		{	// Preview mode for new creating item:
+			$links_SQL->WHERE( 'link_tmp_ID = '.$DB->quote( param( 'temp_link_owner_ID', 'integer', 0 ) ) );
 		}
 		else
-		{ // The post is not saved yet, so it can not contains attachments. None of the placeholders are used.
-			$unused_inline_images = $inline_images[0];
+		{	// Normal mode for existing Item in DB:
+			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
+		}
+		$links_SQL->WHERE_and( 'link_position = "inline"' );
+		$inline_links_IDs = $DB->get_col( $links_SQL );
+
+		$unused_inline_images = array();
+		foreach( $inline_images[2] as $i => $inline_link_ID )
+		{
+			if( ! in_array( $inline_link_ID, $inline_links_IDs ) )
+			{ // This inline image must be removed from content
+				$unused_inline_images[] = $inline_images[0][ $i ];
+			}
 		}
 
-		// Clear the unused inline images from content
+		// Clear the unused inline images from content:
 		if( count( $unused_inline_images ) )
-		{ // Remove all unused inline images from the content
+		{	// Remove all unused inline images from the content:
 			global $Messages;
 			$unused_inline_images = array_unique( $unused_inline_images );
 			$content = replace_content_outcode( $unused_inline_images, '', $content, 'replace_content', 'str' );
@@ -2787,6 +2799,7 @@ class Item extends ItemLight
 							// Permalink:
 							global $disp, $Item;
 							if( ( $disp != 'single' && $disp != 'page' ) ||
+							    ! ( $Item instanceof Item ) ||
 							    $Item->ID != $this->ID ||
 							    $fallback_count == $l + 1 )
 							{	// Use permalink if it is not last point and we don't view this current post:
@@ -7030,6 +7043,8 @@ class Item extends ItemLight
 						}
 					}
 				}
+				// Clear cached slugs in order to display new unique updated on the edit form:
+				$this->slugs = NULL;
 			}
 
 			// Create tiny slug:
@@ -7378,6 +7393,27 @@ class Item extends ItemLight
 			}
 		}
 
+		// Let's handle the slugs:
+		// TODO: dh> $result handling here feels wrong: when it's true already, it should not become false (add "|| $result"?)
+		// asimo>dh The result handling is in a transaction. If somehow the new slug creation fails, then the item insertion should rollback as well
+		if( $result && ! empty( $edited_slugs ) )
+		{	// if we have new created $edited_slugs, we have to insert it into the database:
+			foreach( $edited_slugs as $edited_Slug )
+			{
+				if( $edited_Slug->ID == 0 )
+				{	// Insert only new created slugs:
+					$edited_Slug->dbinsert();
+				}
+			}
+			if( isset( $edited_slugs[0] ) && $edited_slugs[0]->ID > 0 )
+			{	// Make first slug from list as main slug for this item:
+				$this->set( 'canonical_slug_ID', $edited_slugs[0]->ID );
+				$this->set( 'urltitle', $edited_slugs[0]->get( 'title' ) );
+			}
+			// Clear cached slugs in order to display new unique updated on the edit form:
+			$this->slugs = NULL;
+		}
+
 		$parent_update = $this->dbupdate_worker( $auto_track_modification );
 		if( $result && ( $parent_update !== false ) )
 		{ // We could update the item object:
@@ -7393,26 +7429,6 @@ class Item extends ItemLight
 			{ // Let's handle the tags:
 				$this->insert_update_tags( 'update' );
 				$db_changed = true;
-			}
-
-			// Let's handle the slugs:
-			// TODO: dh> $result handling here feels wrong: when it's true already, it should not become false (add "|| $result"?)
-			// asimo>dh The result handling is in a transaction. If somehow the new slug creation fails, then the item insertion should rollback as well
-			if( $result && !empty( $edited_slugs ) )
-			{ // if we have new created $edited_slugs, we have to insert it into the database:
-				foreach( $edited_slugs as $edited_Slug )
-				{
-					if( $edited_Slug->ID == 0 )
-					{ // Insert only new created slugs
-						$edited_Slug->dbinsert();
-					}
-				}
-				if( isset( $edited_slugs[0] ) && $edited_slugs[0]->ID > 0 )
-				{ // Make first slug from list as main slug for this item
-					$this->set( 'canonical_slug_ID', $edited_slugs[0]->ID );
-					$this->set( 'urltitle', $edited_slugs[0]->get( 'title' ) );
-					$result = parent::dbupdate();
-				}
 			}
 
 			// Update last touched date of this Item and also all categories of this Item
@@ -7876,7 +7892,7 @@ class Item extends ItemLight
 	 */
 	function handle_notifications( $executed_by_userid = NULL, $is_new_item = false, $force_members = false, $force_community = false, $force_pings = false )
 	{
-		global $Settings, $Messages, $localtimenow, $Debuglog;
+		global $Settings, $Messages, $localtimenow, $Debuglog, $DB;
 
 		// Immediate notifications? Asynchronous? Off?
 		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
@@ -7943,6 +7959,7 @@ class Item extends ItemLight
 		}
 
 		// IMMEDIATE vs ASYNCHRONOUS sending:
+		$DB->begin( 'SERIALIZABLE' );
 
 		if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) <= $localtimenow )
 		{	// We want to send the notifications immediately (can only be done if post does not have an issue_date in the future):
@@ -8014,9 +8031,16 @@ class Item extends ItemLight
 		}
 
 		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
-		$this->dbupdate( false, false, false );
-
-		return true;
+		if( $this->dbupdate( false, false, false ) )
+		{
+			$DB->commit();
+			return true;
+		}
+		else
+		{
+			$DB->rollback();
+			return false;
+		}
 	}
 
 
@@ -9081,24 +9105,30 @@ class Item extends ItemLight
 	 */
 	function get_slugs( $separator = ', ' )
 	{
-		if( empty( $this->ID ) )
-		{ // New creating Item
-			return $this->get('urltitle');
+		if( ! isset( $this->slugs ) )
+		{	// Initialize item slugs:
+			if( empty( $this->ID ) )
+			{	// Get creating Item:
+				//return $this->get( 'urltitle' );
+				$this->slugs = array();
+			}
+			else
+			{	// Load slugs from DB once:
+				global $DB;
+				$SQL = new SQL( 'Get slugs of the Item #'.$this->ID );
+				$SQL->SELECT( 'slug_title, IF( slug_ID = '.intval( $this->canonical_slug_ID ).', 0, slug_ID ) AS slug_order_num' );
+				$SQL->FROM( 'T_slug' );
+				$SQL->WHERE( 'slug_itm_ID = '.$DB->quote( $this->ID ) );
+				if( ! empty( $this->tiny_slug_ID ) )
+				{	// Exclude tiny slug from list:
+					$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
+				}
+				$SQL->ORDER_BY( 'slug_order_num' );
+				$this->slugs = $DB->get_col( $SQL );
+			}
 		}
 
-		global $DB;
-		$SQL = new SQL( 'Get slugs of the Item' );
-		$SQL->SELECT( 'slug_title, IF( slug_ID = '.intval( $this->canonical_slug_ID ).', 0, slug_ID ) AS slug_order_num' );
-		$SQL->FROM( 'T_slug' );
-		$SQL->WHERE( 'slug_itm_ID = '.$DB->quote( $this->ID ) );
-		if( !empty( $this->tiny_slug_ID ) )
-		{ // Exclude tiny slug from list
-			$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
-		}
-		$SQL->ORDER_BY( 'slug_order_num' );
-		$slugs = $DB->get_col( $SQL );
-
-		return implode( $separator, $slugs );
+		return implode( $separator, $this->slugs );
 	}
 
 

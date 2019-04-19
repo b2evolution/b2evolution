@@ -123,10 +123,12 @@ class content_block_Widget extends ComponentWidget
 						'min' => 1,
 						'max' => 4294967295,
 					),
+					'note' => $this->get_param_item_info( 'item_ID' ),
 				),
 				'item_slug' => array(
 					'label' => T_('Item Slug'),
 					'size' => 60,
+					'note' => $this->get_param_item_info( 'item_slug' ),
 				),
 			), parent::get_param_definitions( $params ) );
 
