@@ -2,7 +2,7 @@
 
 # b2evolution CMS
 
-This is b2evolution CMS version **7.0.0-alpha**.
+This is b2evolution CMS version **7.0.1-alpha**.
 
 **This is an ALPHA version.**
 

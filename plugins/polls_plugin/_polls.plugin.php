@@ -23,7 +23,7 @@ class polls_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $version = '7.0.0';
+	var $version = '7.0.1';
 	var $number_of_installs = 1;
 
 
