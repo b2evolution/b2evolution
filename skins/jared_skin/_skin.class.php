@@ -215,12 +215,6 @@ class jared_Skin extends Skin
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
-					'nav_button_color' => array(
-						'label' => T_('Button text color'),
-						'note' => T_('Click to select a color.'),
-						'defaultvalue' => '#FFFFFF',
-						'type' => 'color',
-					),
 				'navigation_section_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -377,7 +371,7 @@ class jared_Skin extends Skin
 						'note' => 'px. ' . T_('Set the ammount of maximum width for the content in this section.' ) . ' <strong>' . T_( 'Maximum value is') . ' 1170px.</strong>',
 						'defaultvalue' => '1170',
 						'type' => 'integer',
-						'size' => '2',
+						'size' => '4',
 						'allow_empty' => false,
 					),
 					'section_2_title_color' => array(
@@ -460,7 +454,7 @@ class jared_Skin extends Skin
 						'note' => 'px. ' . T_('Set the ammount of maximum width for the content in this section.' ) . ' <strong>' . T_( 'Maximum value is') . ' 1170px.</strong>',
 						'defaultvalue' => '1170',
 						'type' => 'integer',
-						'size' => '2',
+						'size' => '4',
 						'allow_empty' => false,
 					),
 					'section_3_title_color' => array(
@@ -544,7 +538,7 @@ class jared_Skin extends Skin
 						'note' => 'px. ' . T_('Set the ammount of maximum width for the content in this section.' ) . ' <strong>' . T_( 'Maximum value is') . ' 1170px.</strong>',
 						'defaultvalue' => '1170',
 						'type' => 'integer',
-						'size' => '2',
+						'size' => '4',
 						'allow_empty' => false,
 					),
 					'section_4_title_color' => array(
@@ -627,7 +621,7 @@ class jared_Skin extends Skin
 						'note' => 'px. ' . T_('Set the ammount of maximum width for the content in this section.' ) . ' <strong>' . T_( 'Maximum value is') . ' 1170px.</strong>',
 						'defaultvalue' => '1170',
 						'type' => 'integer',
-						'size' => '2',
+						'size' => '4',
 						'allow_empty' => false,
 					),
 					'section_5_title_color' => array(
@@ -711,7 +705,7 @@ class jared_Skin extends Skin
 						'note' => 'px. ' . T_('Set the ammount of maximum width for the content in this section.' ) . ' <strong>' . T_( 'Maximum value is') . ' 1170px.</strong>',
 						'defaultvalue' => '1170',
 						'type' => 'integer',
-						'size' => '2',
+						'size' => '4',
 						'allow_empty' => false,
 					),
 					'section_6_title_color' => array(
@@ -794,7 +788,7 @@ class jared_Skin extends Skin
 						'note' => 'px. ' . T_('Set the ammount of maximum width for the content in this section.' ) . ' <strong>' . T_( 'Maximum value is') . ' 1170px.</strong>',
 						'defaultvalue' => '1170',
 						'type' => 'integer',
-						'size' => '2',
+						'size' => '4',
 						'allow_empty' => false,
 					),
 					'section_7_title_color' => array(
@@ -905,7 +899,7 @@ class jared_Skin extends Skin
 						'note' => 'px. ' . T_('Set the ammount of maximum width for the content in this section.' ) . ' <strong>' . T_( 'Maximum value is') . ' 1170px.</strong>',
 						'defaultvalue' => '1170',
 						'type' => 'integer',
-						'size' => '2',
+						'size' => '4',
 						'allow_empty' => false,
 					),
 					'section_oth_title_color' => array(
@@ -1085,19 +1079,6 @@ class jared_Skin extends Skin
 					),
 					'contact_button_bg_color' => array(
 						'label' => T_('Contact and Subscribe button background color'),
-						'note' => T_('Click to select a color.'),
-						'defaultvalue' => '#337ab7',
-						'type' => 'color',
-					),
-					// Save/Submit button
-					'submit_button_color' => array(
-						'label' => T_('Submit and Save button color'),
-						'note' => T_('Click to select a color.'),
-						'defaultvalue' => '#ffffff',
-						'type' => 'color',
-					),
-					'submit_button_bg_color' => array(
-						'label' => T_('Submit and Save button background color'),
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
@@ -1310,9 +1291,7 @@ class jared_Skin extends Skin
 					$this->dynamic_style_rule( 'section_1_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 				}
 				// Background image:
-				$this->dynamic_style_rule( 'section_1_image_file_ID', '.evo_container__front_first_section { background-image: $setting_value$ }', array(
-					'type' => 'image_file',
-				) );
+				$this->dynamic_style_rule( 'section_1_image_file_ID', '.evo_container__front_first_section { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
 				// Background color:
 				$this->dynamic_style_rule( 'section_1_bg_color', '.evo_container__front_first_section { background-color: $setting_value$ }' );
 				// Maximum content width:
@@ -1361,576 +1340,363 @@ class jared_Skin extends Skin
 				) );
 			}
 			// **** Section 1 - Front Page Main Area / END ****
-		}
 
-		// Add custom CSS:
-		$custom_css = '';
-
-
-		// ============ Navigation Section ============
-
-		// If "Transparent background" option for navigation is TRUE
-		if( $this->get_setting( 'nav_bg_transparent' ) )
-		{
-			// Section 6 navigation links color
-			if( $disp == 'page' )
-			{
-				$section_nav_color = $this->get_setting( 'section_6_navbar_text_color' );
-				$custom_css .= "@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }\n";
-			}
-			// Section 7 navigation links color
-			if( $disp == 'msgform' || $disp == 'threads' )
-			{
-				$section_nav_color = $this->get_setting( 'section_7_navbar_text_color' );
-				$custom_css .= "@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }\n";
-			}
-			// Section access navigation links color
-			if( in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
-			{
-				$section_nav_color = $this->get_setting( 'section_access_navbar_text_color' );
-				$custom_css .= "@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }\n";
-			}
-			// Section 8 navigation links color
-			if( ! in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'msgform', 'threads', 'page' ) ) ) {
-				$section_nav_color = $this->get_setting( 'section_oth_navbar_text_color' );
-				$custom_css .= "@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }\n";
-			}
-		}
-
-
-		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
-		{
-			// ============ Section 2 - Front Page Secondary Area ============
+			// **** Section 2 - Front Page Secondary Area / END ****
 			if( $this->get_setting( 'section_2_display' ) )
 			{
-			if( $this->get_setting( 'section_2_image_file_ID' ) )
-			{
-				$bg_image_File2 = & $FileCache->get_by_ID( $this->get_setting( 'section_2_image_file_ID' ), false, false );
+				// Background image:
+				$this->dynamic_style_rule( 'section_2_image_file_ID', '.evo_container__front_page_secondary_area { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
+				// Background color:
+				$this->dynamic_style_rule( 'section_2_bg_color', '.evo_container__front_page_secondary_area { background-color: $setting_value$ }' );
+				// Maximum content width:
+				$this->dynamic_style_rule( 'section_2_cont_width', '.evo_container__front_page_secondary_area > .container { max-width: $setting_value$ }', array( 'suffix' => 'px' ) );
+				// Title color:
+				$this->dynamic_style_rule( 'section_2_title_color', '.evo_container__front_page_secondary_area h2.page-header { color: $setting_value$ }' );
+				// Normal text color:
+				$this->dynamic_style_rule( 'section_2_text_color', '.evo_container__front_page_secondary_area { color: $setting_value$ }' );
+				// Links color:
+				$this->dynamic_style_rule( 'section_2_link_color', '.evo_container__front_page_secondary_area a { color: $setting_value$ }' );
+				// Links hover color:
+				$this->dynamic_style_rule( 'section_2_link_h_color', '.evo_container__front_page_secondary_area a:hover { color: $setting_value$ }' );
+				// Button background color:
+				$this->dynamic_style_rule( 'section_2_button_bg_color',
+					'.evo_container__front_page_secondary_area .evo_widget > .btn.btn-default { background-color: $setting_value$ }'.
+					'.evo_container__front_page_secondary_area .evo_widget .item_excerpt > a.btn.btn-default,'.
+					'.evo_container__front_page_secondary_area .evo_widget .item_content > a.btn.btn-default { background-color: $setting_value$ }'
+				);
+				// Button text color:
+				$this->dynamic_style_rule( 'section_2_button_color',
+					'.evo_container__front_page_secondary_area .evo_widget > .btn.btn-default { color: $setting_value$ }'.
+					'.evo_container__front_page_secondary_area .evo_widget .item_excerpt > a.btn.btn-default,'.
+					'.evo_container__front_page_secondary_area .evo_widget .item_content > a.btn.btn-default { color: $setting_value$ }'
+				);
+				// Align text:
+				$this->dynamic_style_rule( 'section_2_text_align', '.evo_container__front_page_secondary_area { text-align: $setting_value$ }', array(
+					'options' => array(
+						'section_2_left'   => 'left',
+						'section_2_center' => 'center',
+						'section_2_right'  => 'right;',
+					)
+				) );
 			}
-			if( !empty( $bg_image_File2 ) && $bg_image_File2->exists() )
-			{
-				$custom_css .= '.evo_container__front_page_secondary_area { background-image: url('.$bg_image_File2->get_url().") }\n";
-			}
-			else
-			{
-				$color = $this->get_setting( 'section_2_bg_color' );
-				$custom_css .= '.evo_container__front_page_secondary_area { background: '.$color." }\n";
-			}
-			if( $max_width = $this->get_setting( 'section_2_cont_width' ) )
-			{
-				$custom_css .= '.evo_container__front_page_secondary_area > .container { max-width: '.$max_width."px }\n";
-			}
-			if( $color = $this->get_setting( 'section_2_title_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_secondary_area h2.page-header { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_2_text_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_secondary_area { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_2_link_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_secondary_area a { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_2_link_h_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_secondary_area a:hover { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_2_button_bg_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_secondary_area .evo_widget > .btn.btn-default { background-color: '.$color." }\n";
-				$custom_css .= '.evo_container__front_page_secondary_area .evo_widget .item_excerpt > a.btn.btn-default,
-				.evo_container__front_page_secondary_area .evo_widget .item_content > a.btn.btn-default
-				{ background-color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_2_button_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_secondary_area .evo_widget > .btn.btn-default { color: '.$color." }\n";
-				$custom_css .= '.evo_container__front_page_secondary_area .evo_widget .item_excerpt > a.btn.btn-default,
-				.evo_container__front_page_secondary_area .evo_widget .item_content > a.btn.btn-default
-				{ color: '.$color." }\n";
-			}
-			if( $this->get_setting( 'section_2_text_align' ) == 'section_2_center' )
-			{
-				$custom_css .= ".evo_container__front_page_secondary_area { text-align: center }\n";
-			}
-			if( $this->get_setting( 'section_2_text_align' ) == 'section_2_right' )
-			{
-				$custom_css .= ".evo_container__front_page_secondary_area { text-align: right }\n";
-			}
-			}
+			// **** Section 2 - Front Page Secondary Area / END ****
 
-
-			// ============ Section 3 - Front Page Area 3 ============
+			// **** Section 3 - Front Page Area 3 / START ****
 			if( $this->get_setting( 'section_3_display' ) )
 			{
-			if( $this->get_setting( 'section_3_image_file_ID' ) )
-			{
-				$bg_image_File3 = & $FileCache->get_by_ID( $this->get_setting( 'section_3_image_file_ID' ), false, false );
+				// Background image:
+				$this->dynamic_style_rule( 'section_3_image_file_ID', '.evo_container__front_page_area_3 { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
+				// Background color:
+				$this->dynamic_style_rule( 'section_3_bg_color', '.evo_container__front_page_area_3 { background-color: $setting_value$ }' );
+				// Maximum content width:
+				$this->dynamic_style_rule( 'section_3_cont_width', '.evo_container__front_page_area_3 > .container { max-width: $setting_value$ }', array( 'suffix' => 'px' ) );
+				// Title color:
+				$this->dynamic_style_rule( 'section_3_title_color', '.evo_container__front_page_area_3 h2.page-header { color: $setting_value$ }' );
+				// Normal text color:
+				$this->dynamic_style_rule( 'section_3_text_color', '.evo_container__front_page_area_3 { color: $setting_value$ }' );
+				// Links color:
+				$this->dynamic_style_rule( 'section_3_link_color', '.evo_container__front_page_area_3 a { color: $setting_value$ }' );
+				// Links hover color:
+				$this->dynamic_style_rule( 'section_3_link_h_color', '.evo_container__front_page_area_3 a:hover { color: $setting_value$ }' );
+				// Button background color:
+				$this->dynamic_style_rule( 'section_3_button_bg_color',
+					'.evo_container__front_page_area_3 .evo_widget > .btn.btn-default { background-color: $setting_value$ }'.
+					'.evo_container__front_page_area_3 .evo_widget .item_excerpt > a.btn.btn-default,'.
+					'.evo_container__front_page_area_3 .evo_widget .item_content > a.btn.btn-default { background-color: $setting_value$ }'
+				);
+				// Button text color:
+				$this->dynamic_style_rule( 'section_3_button_color',
+					'.evo_container__front_page_area_3 .evo_widget > .btn.btn-default { color: $setting_value$ }'.
+					'.evo_container__front_page_area_3 .evo_widget .item_excerpt > a.btn.btn-default,'.
+					'.evo_container__front_page_area_3 .evo_widget .item_content > a.btn.btn-default { color: $setting_value$ }'
+				);
+				// Align text:
+				$this->dynamic_style_rule( 'section_3_text_align', '.evo_container__front_page_area_3 { text-align: $setting_value$ }', array(
+					'options' => array(
+						'section_3_left'   => 'left',
+						'section_3_center' => 'center',
+						'section_3_right'  => 'right;',
+					)
+				) );
 			}
-			if( !empty( $bg_image_File3 ) && $bg_image_File3->exists() )
-			{
-				$custom_css .= '.evo_container__front_page_area_3 { background-image: url('.$bg_image_File3->get_url().") }\n";
-			}
-			else
-			{
-				$color = $this->get_setting( 'section_3_bg_color' );
-				$custom_css .= '.evo_container__front_page_area_3 { background: '.$color." }\n";
-			}
-			if( $max_width = $this->get_setting( 'section_3_cont_width' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_3 > .container { max-width: '.$max_width."px }\n";
-			}
-			if( $color = $this->get_setting( 'section_3_title_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_3 h2.page-header { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_3_text_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_3 { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_3_link_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_3 a { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_3_link_h_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_3 a:hover { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_3_button_bg_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_3 .evo_widget > .btn.btn-default { background-color: '.$color." }\n";
-				$custom_css .= '.evo_container__front_page_area_3 .evo_widget .item_excerpt > a.btn.btn-default,
-				.evo_container__front_page_area_3 .evo_widget .item_content > a.btn.btn-default
-				{ background-color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_3_button_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_3 .evo_widget > .btn.btn-default { color: '.$color." }\n";
-				$custom_css .= '.evo_container__front_page_area_3 .evo_widget .item_excerpt > a.btn.btn-default,
-				.evo_container__front_page_area_3 .evo_widget .item_content > a.btn.btn-default
-				{ color: '.$color." }\n";
-			}
-			if( $this->get_setting( 'section_3_text_align' ) == 'section_3_center' )
-			{
-				$custom_css .= ".evo_container__front_page_area_3 { text-align: center }\n";
-			}
-			if( $this->get_setting( 'section_3_text_align' ) == 'section_3_right' )
-			{
-				$custom_css .= ".evo_container__front_page_area_3 { text-align: right }\n";
-			}
-			}
+			// **** Section 3 - Front Page Area 3 / END ****
 
-
-			// ============ Section 4 - Front Page Area 4 ============
+			// **** Section 4 - Front Page Area 4 / START ****
 			if( $this->get_setting( 'section_4_display' ) )
 			{
-			if( $this->get_setting( 'section_4_image_file_ID' ) )
-			{
-				$bg_image_File4 = & $FileCache->get_by_ID( $this->get_setting( 'section_4_image_file_ID' ), false, false );
+				// Background image:
+				$this->dynamic_style_rule( 'section_4_image_file_ID', '.evo_container__front_page_area_4 { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
+				// Background color:
+				$this->dynamic_style_rule( 'section_4_bg_color', '.evo_container__front_page_area_4 { background-color: $setting_value$ }' );
+				// Maximum content width:
+				$this->dynamic_style_rule( 'section_4_cont_width', '.evo_container__front_page_area_4 > .container { max-width: $setting_value$ }', array( 'suffix' => 'px' ) );
+				// Title color:
+				$this->dynamic_style_rule( 'section_4_title_color', '.evo_container__front_page_area_4 h2.page-header { color: $setting_value$ }' );
+				// Normal text color:
+				$this->dynamic_style_rule( 'section_4_text_color', '.evo_container__front_page_area_4 { color: $setting_value$ }' );
+				// Links color:
+				$this->dynamic_style_rule( 'section_4_link_color', '.evo_container__front_page_area_4 a { color: $setting_value$ }' );
+				// Links hover color:
+				$this->dynamic_style_rule( 'section_4_link_h_color', '.evo_container__front_page_area_4 a:hover { color: $setting_value$ }' );
+				// Button background color:
+				$this->dynamic_style_rule( 'section_4_button_bg_color',
+					'.evo_container__front_page_area_4 .evo_widget > .btn.btn-default { background-color: $setting_value$ }'.
+					'.evo_container__front_page_area_4 .evo_widget .item_excerpt > a.btn.btn-default,'.
+					'.evo_container__front_page_area_4 .evo_widget .item_content > a.btn.btn-default { background-color: $setting_value$ }'
+				);
+				// Button text color:
+				$this->dynamic_style_rule( 'section_4_button_color',
+					'.evo_container__front_page_area_4 .evo_widget > .btn.btn-default { color: $setting_value$ }'.
+					'.evo_container__front_page_area_4 .evo_widget .item_excerpt > a.btn.btn-default,'.
+					'.evo_container__front_page_area_4 .evo_widget .item_content > a.btn.btn-default { color: $setting_value$ }'
+				);
+				// Align text:
+				$this->dynamic_style_rule( 'section_4_text_align', '.evo_container__front_page_area_4 { text-align: $setting_value$ }', array(
+					'options' => array(
+						'section_4_left'   => 'left',
+						'section_4_center' => 'center',
+						'section_4_right'  => 'right;',
+					)
+				) );
 			}
-			if( !empty( $bg_image_File4 ) && $bg_image_File4->exists() )
-			{
-				$custom_css .= '.evo_container__front_page_area_4 { background-image: url('.$bg_image_File4->get_url().") }\n";
-			}
-			else
-			{
-				$color = $this->get_setting( 'section_4_bg_color' );
-				$custom_css .= '.evo_container__front_page_area_4 { background: '.$color." }\n";
-			}
-			if( $max_width = $this->get_setting( 'section_4_cont_width' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_4 > .container { max-width: '.$max_width."px }\n";
-			}
-			if( $color = $this->get_setting( 'section_4_title_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_4 h2.page-header { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_4_text_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_4 { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_4_link_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_4 a { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_4_link_h_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_4 a:hover { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_4_button_bg_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_4 .evo_widget > .btn.btn-default { background-color: '.$color." }\n";
-				$custom_css .= '.evo_container__front_page_area_4 .evo_widget .item_excerpt > a.btn.btn-default,
-				.evo_container__front_page_area_4 .evo_widget .item_content > a.btn.btn-default
-				{ background-color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_4_button_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_4 .evo_widget > .btn.btn-default { color: '.$color." }\n";
-				$custom_css .= '.evo_container__front_page_area_4 .evo_widget .item_excerpt > a.btn.btn-default,
-				.evo_container__front_page_area_4 .evo_widget .item_content > a.btn.btn-default
-				{ color: '.$color." }\n";
-			}
-			if( $this->get_setting( 'section_4_text_align' ) == 'section_4_center' )
-			{
-				$custom_css .= ".evo_container__front_page_area_4 { text-align: center }\n";
-			}
-			if( $this->get_setting( 'section_4_text_align' ) == 'section_4_right' )
-			{
-				$custom_css .= ".evo_container__front_page_area_4 { text-align: right }\n";
-			}
-			}
+			// **** Section 4 - Front Page Area 4 / END ****
 
-
-			// ============ Section 5 - Front Page Area 5 ============
+			// **** Section 5 - Front Page Area 5 / START ****
 			if( $this->get_setting( 'section_5_display' ) )
 			{
-			if( $this->get_setting( 'section_5_image_file_ID' ) )
-			{
-				$bg_image_File5 = & $FileCache->get_by_ID( $this->get_setting( 'section_5_image_file_ID' ), false, false );
+				// Background image:
+				$this->dynamic_style_rule( 'section_5_image_file_ID', '.evo_container__front_page_area_5 { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
+				// Background color:
+				$this->dynamic_style_rule( 'section_5_bg_color', '.evo_container__front_page_area_5 { background-color: $setting_value$ }' );
+				// Maximum content width:
+				$this->dynamic_style_rule( 'section_5_cont_width', '.evo_container__front_page_area_5 > .container { max-width: $setting_value$ }', array( 'suffix' => 'px' ) );
+				// Title color:
+				$this->dynamic_style_rule( 'section_5_title_color', '.evo_container__front_page_area_5 h2.page-header { color: $setting_value$ }' );
+				// Normal text color:
+				$this->dynamic_style_rule( 'section_5_text_color', '.evo_container__front_page_area_5 { color: $setting_value$ }' );
+				// Links color:
+				$this->dynamic_style_rule( 'section_5_link_color', '.evo_container__front_page_area_5 a { color: $setting_value$ }' );
+				// Links hover color:
+				$this->dynamic_style_rule( 'section_5_link_h_color', '.evo_container__front_page_area_5 a:hover { color: $setting_value$ }' );
+				// Button background color:
+				$this->dynamic_style_rule( 'section_5_button_bg_color',
+					'.evo_container__front_page_area_5 .evo_widget > .btn.btn-default { background-color: $setting_value$ }'.
+					'.evo_container__front_page_area_5 .evo_widget .item_excerpt > a.btn.btn-default,'.
+					'.evo_container__front_page_area_5 .evo_widget .item_content > a.btn.btn-default { background-color: $setting_value$ }'
+				);
+				// Button text color:
+				$this->dynamic_style_rule( 'section_5_button_color',
+					'.evo_container__front_page_area_5 .evo_widget > .btn.btn-default { color: $setting_value$ }'.
+					'.evo_container__front_page_area_5 .evo_widget .item_excerpt > a.btn.btn-default,'.
+					'.evo_container__front_page_area_5 .evo_widget .item_content > a.btn.btn-default { color: $setting_value$ }'
+				);
+				// Align text:
+				$this->dynamic_style_rule( 'section_5_text_align', '.evo_container__front_page_area_5 { text-align: $setting_value$ }', array(
+					'options' => array(
+						'section_5_left'   => 'left',
+						'section_5_center' => 'center',
+						'section_5_right'  => 'right;',
+					)
+				) );
 			}
-			if( !empty( $bg_image_File5 ) && $bg_image_File5->exists() )
-			{
-				$custom_css .= '.evo_container__front_page_area_5 { background-image: url('.$bg_image_File5->get_url().") }\n";
-			}
-			else
-			{
-				$color = $this->get_setting( 'section_5_bg_color' );
-				$custom_css .= '.evo_container__front_page_area_5 { background: '.$color." }\n";
-			}
-			if( $max_width = $this->get_setting( 'section_5_cont_width' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_5 > .container { max-width: '.$max_width."px }\n";
-			}
-			if( $color = $this->get_setting( 'section_5_title_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_5 h2.page-header { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_5_text_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_5 { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_5_link_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_5 a { color: '.$color." }\n";
-			}
-			if( $color =  $this->get_setting( 'section_5_link_h_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_5 a:hover { color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_5_button_bg_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_5 .evo_widget > .btn.btn-default { background-color: '.$color." }\n";
-				$custom_css .= '.evo_container__front_page_area_5 .evo_widget .item_excerpt > a.btn.btn-default,
-				.evo_container__front_page_area_5 .evo_widget .item_content > a.btn.btn-default
-				{ background-color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'section_5_button_color' ) )
-			{
-				$custom_css .= '.evo_container__front_page_area_5 .evo_widget > .btn.btn-default { color: '.$color." }\n";
-				$custom_css .= '.evo_container__front_page_area_5 .evo_widget .item_excerpt > a.btn.btn-default,
-				.evo_container__front_page_area_5 .evo_widget .item_content > a.btn.btn-default
-				{ color: '.$color." }\n";
-			}
-			if( $this->get_setting( 'section_5_text_align' ) == 'section_5_center' )
-			{
-				$custom_css .= ".evo_container__front_page_area_5 { text-align: center }\n";
-			}
-			if( $this->get_setting( 'section_5_text_align' ) == 'section_5_right' )
-			{
-				$custom_css .= ".evo_container__front_page_area_5 { text-align: right }\n";
-			}
-			}
-
-
+			// **** Section 5 - Front Page Area 5 / END ****
 		}
 
-
-		// ============ Section 6 - Header for Standalone Pages ============
+		// **** Section 6 - Header for Standalone Pages / START ****
 		if( $disp == 'page' || $disp == 'single' )
 		{
-		if( $color = $this->get_setting( 'section_6_navbar_text_color' ) )
-		{
-			$custom_css .= '@media only screen and (min-width: 766px) {.navbar.navbar-default a, .navbar.navbar-default a:hover, .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:focus, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>li>a, .navbar-default .navbar-nav>li>a:focus, .navbar-default .navbar-nav>li>a:hover { color: ' . $color . " }}\n";
+			if( $this->get_setting( 'nav_bg_transparent' ) )
+			{
+				// Top navigation text color:
+				$this->dynamic_style_rule( 'section_6_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
+			}
+			// Background image:
+			$this->dynamic_style_rule( 'section_6_image_file_ID', '.evo_container__standalone_page_area_6 { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
+			// Background color:
+			$this->dynamic_style_rule( 'section_6_bg_color', '.evo_container__standalone_page_area_6 { background-color: $setting_value$ }' );
+			// Maximum content width:
+			$this->dynamic_style_rule( 'section_6_cont_width', '.evo_container__standalone_page_area_6 > .container { max-width: $setting_value$ }', array( 'suffix' => 'px' ) );
+			// Title color:
+			$this->dynamic_style_rule( 'section_6_title_color', '.evo_container__standalone_page_area_6 .evo_post_title h1, .evo_container__single_page_cover .evo_post_title h1 { color: $setting_value$ }' );
+			// Normal text color:
+			$this->dynamic_style_rule( 'section_6_text_color', '.evo_container__standalone_page_area_6, .evo_container__single_page_cover { color: $setting_value$ }' );
+			// Links color:
+			$this->dynamic_style_rule( 'section_6_link_color', '.evo_container__standalone_page_area_6 a, .evo_container__single_page_cover a { color: $setting_value$ }' );
+			// Links hover color:
+			$this->dynamic_style_rule( 'section_6_link_h_color', '.evo_container__standalone_page_area_6 a:hover, .evo_container__single_page_cover a:hover { color: $setting_value$ }' );
+			// Button background color:
+			$this->dynamic_style_rule( 'section_6_button_bg_color',
+				'.evo_container__standalone_page_area_6 .evo_widget > .btn.btn-default, .evo_container__single_page_cover .evo_widget > .btn.btn-default { background-color: $setting_value$ }'.
+				'.evo_container__standalone_page_area_6 .evo_widget .item_excerpt > a.btn.btn-default,'.
+				'.evo_container__standalone_page_area_6 .evo_widget .item_content > a.btn.btn-default { background-color: $setting_value$ }'
+			);
+			// Button text color:
+			$this->dynamic_style_rule( 'section_6_button_color',
+				'.evo_container__standalone_page_area_6 .evo_widget > .btn.btn-default, .evo_container__single_page_cover .evo_widget > .btn.btn-default { color: $setting_value$ }'.
+				'.evo_container__standalone_page_area_6 .evo_widget .item_excerpt > a.btn.btn-default,'.
+				'.evo_container__standalone_page_area_6 .evo_widget .item_content > a.btn.btn-default { color: $setting_value$ }'
+			);
+			// Align text:
+			$this->dynamic_style_rule( 'section_6_text_align', '.evo_container__standalone_page_area_6, .evo_container__single_page_cover { text-align: $setting_value$ }', array(
+				'options' => array(
+					'section_6_left'   => 'left',
+					'section_6_center' => 'center',
+					'section_6_right'  => 'right;',
+				)
+			) );
 		}
-		if( $this->get_setting( 'section_6_image_file_ID' ) )
-		{
-			$bg_image_File6 = & $FileCache->get_by_ID( $this->get_setting( 'section_6_image_file_ID' ), false, false );
-		}
-		if( !empty( $bg_image_File6 ) && $bg_image_File6->exists() )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_6 { background-image: url('.$bg_image_File6->get_url().") }\n";
-		}
-		else
-		{
-			$color = $this->get_setting( 'section_6_bg_color' );
-			$custom_css .= '.evo_container__standalone_page_area_6 { background: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_6_title_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_6 .evo_post_title h1, .evo_container__single_page_cover .evo_post_title h1 { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_6_text_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_6, .evo_container__single_page_cover { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_6_link_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_6 a, .evo_container__single_page_cover a { color: '.$color." }\n";
-		}
-		if( $color =  $this->get_setting( 'section_6_link_h_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_6 a:hover, .evo_container__single_page_cover a:hover { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_6_button_bg_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_6 .evo_widget > .btn.btn-default, .evo_container__single_page_cover .evo_widget > .btn.btn-default { background-color: '.$color." }\n";
-			$custom_css .= '.evo_container__standalone_page_area_6 .evo_widget .item_excerpt > a.btn.btn-default,
-			.evo_container__standalone_page_area_6 .evo_widget .item_content > a.btn.btn-default
-			{ background-color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_6_button_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_6 .evo_widget > .btn.btn-default, .evo_container__single_page_cover .evo_widget > .btn.btn-default { color: '.$color." }\n";
-			$custom_css .= '.evo_container__standalone_page_area_6 .evo_widget .item_excerpt > a.btn.btn-default,
-			.evo_container__standalone_page_area_6 .evo_widget .item_content > a.btn.btn-default
-			{ color: '.$color." }\n";
-		}
-		if( $this->get_setting( 'section_6_text_align' ) == 'section_6_center' )
-		{
-			$custom_css .= ".evo_container__standalone_page_area_6, .evo_container__single_page_cover { text-align: center }\n";
-		}
-		if( $this->get_setting( 'section_6_text_align' ) == 'section_6_right' )
-		{
-			$custom_css .= ".evo_container__standalone_page_area_6, .evo_container__single_page_cover { text-align: right }\n";
-		}
-		}
+		// **** Section 6 - Header for Standalone Pages / END ****
 
+		// **** Section 7 - Header for Contact form and Messaging / START ****
+		if( $disp == 'msgform' || $disp == 'threads' || $disp == 'messages' )
+		{
+			if( $this->get_setting( 'nav_bg_transparent' ) )
+			{
+				// Top navigation text color:
+				$this->dynamic_style_rule( 'section_7_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }' );
+			}
+			// Background image:
+			$this->dynamic_style_rule( 'section_7_image_file_ID', '.evo_container__standalone_page_area_7 { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
+			// Background color:
+			$this->dynamic_style_rule( 'section_7_bg_color', '.evo_container__standalone_page_area_7 { background-color: $setting_value$ }' );
+			// Maximum content width:
+			$this->dynamic_style_rule( 'section_7_cont_width', '.evo_container__standalone_page_area_7 > .container { max-width: $setting_value$ }', array( 'suffix' => 'px' ) );
+			// Title color:
+			$this->dynamic_style_rule( 'section_7_title_color', '.evo_container__standalone_page_area_7 .evo_post_title h1 { color: $setting_value$ }' );
+			// Normal text color:
+			$this->dynamic_style_rule( 'section_7_text_color', '.evo_container__standalone_page_area_7 { color: $setting_value$ }' );
+			// Links color:
+			$this->dynamic_style_rule( 'section_7_link_color', '.evo_container__standalone_page_area_7 a { color: $setting_value$ }' );
+			// Links hover color:
+			$this->dynamic_style_rule( 'section_7_link_h_color', '.evo_container__standalone_page_area_7 a:hover { color: $setting_value$ }' );
+			// Button background color:
+			$this->dynamic_style_rule( 'section_7_button_bg_color',
+				'.evo_container__standalone_page_area_7 .evo_widget > .btn.btn-default { background-color: $setting_value$ }'.
+				'.evo_container__standalone_page_area_7 .evo_widget .item_excerpt > a.btn.btn-default,'.
+				'.evo_container__standalone_page_area_7 .evo_widget .item_content > a.btn.btn-default { background-color: $setting_value$ }'
+			);
+			// Button text color:
+			$this->dynamic_style_rule( 'section_7_button_color',
+				'.evo_container__standalone_page_area_7 .evo_widget > .btn.btn-default { color: $setting_value$ }'.
+				'.evo_container__standalone_page_area_7 .evo_widget .item_excerpt > a.btn.btn-default,'.
+				'.evo_container__standalone_page_area_7 .evo_widget .item_content > a.btn.btn-default { color: $setting_value$ }'
+			);
+			// Align text:
+			$this->dynamic_style_rule( 'section_7_text_align', '.evo_container__standalone_page_area_7 { text-align: $setting_value$ }', array(
+				'options' => array(
+					'section_7_left'   => 'left',
+					'section_7_center' => 'center',
+					'section_7_right'  => 'right;',
+				)
+			) );
+		}
+		// **** Section 7 - Header for Contact form and Messaging / END ****
 
-		// ============ Section 7 - Header for Contact form and Messaging ============
-		if( $disp == 'msgform' || $disp == 'threads' )
-		{
-		if( $this->get_setting( 'section_7_image_file_ID' ) )
-		{
-			$bg_image_File7 = & $FileCache->get_by_ID( $this->get_setting( 'section_7_image_file_ID' ), false, false );
-		}
-		if( !empty( $bg_image_File7 ) && $bg_image_File7->exists() )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_7 { background-image: url('.$bg_image_File7->get_url().") }\n";
-		}
-		else
-		{
-			$color = $this->get_setting( 'section_7_bg_color' );
-			$custom_css .= '.evo_container__standalone_page_area_7 { background: '.$color." }\n";
-		}
-		if( $max_width = $this->get_setting( 'section_7_cont_width' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_7 > .container { max-width: '.$max_width."px }\n";
-		}
-		if( $color = $this->get_setting( 'section_7_title_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_7 .msgform_disp_title h1 { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_7_text_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_7 { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_7_link_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_7 a { color: '.$color." }\n";
-		}
-		if( $color =  $this->get_setting( 'section_7_link_h_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_7 a:hover { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_7_button_bg_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_7 .evo_widget > .btn.btn-default { background-color: '.$color." }\n";
-			$custom_css .= '.evo_container__standalone_page_area_7 .evo_widget .item_excerpt > a.btn.btn-default,
-			.evo_container__standalone_page_area_7 .evo_widget .item_content > a.btn.btn-default
-			{ background-ccolor: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_7_button_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_7 .evo_widget > .btn.btn-default { color: '.$color." }\n";
-			$custom_css .= '.evo_container__standalone_page_area_7 .evo_widget .item_excerpt > a.btn.btn-default,
-			.evo_container__standalone_page_area_7 .evo_widget .item_content > a.btn.btn-default
-			{ color: '.$color." }\n";
-		}
-		if( $this->get_setting( 'section_7_text_align' ) == 'section_7_center' )
-		{
-			$custom_css .= ".evo_container__standalone_page_area_7 { text-align: center }\n";
-		}
-		if( $this->get_setting( 'section_7_text_align' ) == 'section_7_right' )
-		{
-			$custom_css .= ".evo_container__standalone_page_area_7 { text-align: right }\n";
-		}
-		}
-
-
-		// ============ Section - Header for restricted access disps ============
+		// **** Section - Restricted access disps / START ****
 		if( in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
 		{
-			if( $this->get_setting( 'section_access_image_file_ID' ) )
+			if( $this->get_setting( 'nav_bg_transparent' ) )
 			{
-				$bg_image_File_access = & $FileCache->get_by_ID( $this->get_setting( 'section_access_image_file_ID' ), false, false );
+				// Top navigation text color:
+				$this->dynamic_style_rule( 'section_access_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }' );
 			}
-			if( !empty( $bg_image_File_access ) && $bg_image_File_access->exists() )
-			{
-				$custom_css .= '.restricted_access_disps { background-image: url('.$bg_image_File_access->get_url().") }\n";
-			}
-			else
-			{
-				$color = $this->get_setting( 'section_access_bg_color' );
-				$custom_css .= '.restricted_access_disps { background: '.$color." }\n";
-			}
+			// Background image:
+			$this->dynamic_style_rule( 'section_access_image_file_ID', '.restricted_access_disps { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
+			// Background color:
+			$this->dynamic_style_rule( 'section_7_bg_color', '.restricted_access_disps { background-color: $setting_value$ }' );
+			
 		}
+		// **** Section - Restricted access disps / END ****
 
+		// **** Section - Header for other disps / START ****
+		if( $this->get_setting( 'nav_bg_transparent' ) &&
+		    ! in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'msgform', 'threads', 'page' ) ) )
+		{
+			// Top navigation text color:
+			$this->dynamic_style_rule( 'section_oth_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }' );
+		}
+		// Background image:
+		$this->dynamic_style_rule( 'section_oth_image_file_ID', '.evo_container__standalone_page_area_oth { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
+		// Background color:
+		$this->dynamic_style_rule( 'section_oth_bg_color', '.evo_container__standalone_page_area_oth { background-color: $setting_value$ }' );
+		// Maximum content width:
+		$this->dynamic_style_rule( 'section_oth_cont_width', '.evo_container__standalone_page_area_oth > .container { max-width: $setting_value$ }', array( 'suffix' => 'px' ) );
+		// Title color:
+		$this->dynamic_style_rule( 'section_oth_title_color', '.evo_container__standalone_page_area_oth h1.page_title { color: $setting_value$ }' );
+		// Normal text color:
+		$this->dynamic_style_rule( 'section_oth_text_color', '.evo_container__standalone_page_area_oth { color: $setting_value$ }' );
+		// Links color:
+		$this->dynamic_style_rule( 'section_oth_link_color', '.evo_container__standalone_page_area_oth a { color: $setting_value$ }' );
+		// Links hover color:
+		$this->dynamic_style_rule( 'section_oth_link_h_color', '.evo_container__standalone_page_area_oth a:hover { color: $setting_value$ }' );
+		// Button background color:
+		$this->dynamic_style_rule( 'section_oth_button_bg_color',
+			'.evo_container__standalone_page_area_oth .evo_widget > .btn.btn-default { background-color: $setting_value$ }'.
+			'.evo_container__standalone_page_area_oth .evo_widget .item_excerpt > a.btn.btn-default,'.
+			'.evo_container__standalone_page_area_oth .evo_widget .item_content > a.btn.btn-default { background-color: $setting_value$ }'
+		);
+		// Button text color:
+		$this->dynamic_style_rule( 'section_oth_button_color',
+			'.evo_container__standalone_page_area_oth .evo_widget > .btn.btn-default { color: $setting_value$ }'.
+			'.evo_container__standalone_page_area_oth .evo_widget .item_excerpt > a.btn.btn-default,'.
+			'.evo_container__standalone_page_area_oth .evo_widget .item_content > a.btn.btn-default { color: $setting_value$ }'
+		);
+		// Align text:
+		$this->dynamic_style_rule( 'section_oth_text_align', '.evo_container__standalone_page_area_oth { text-align: $setting_value$ }', array(
+			'options' => array(
+				'section_oth_left'   => 'left',
+				'section_oth_center' => 'center',
+				'section_oth_right'  => 'right;',
+			)
+		) );
+		// **** Section - Header for other disps / END ****
 
-		// ============ Section - Header for other disps  ============
-		if( $this->get_setting( 'section_oth_image_file_ID' ) )
-		{
-			$bg_image_File_oth = & $FileCache->get_by_ID( $this->get_setting( 'section_oth_image_file_ID' ), false, false );
-		}
-		if( !empty( $bg_image_File_oth ) && $bg_image_File_oth->exists() )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_oth { background-image: url('.$bg_image_File_oth->get_url().") }\n";
-		}
-		else
-		{
-			$color = $this->get_setting( 'section_oth_bg_color' );
-			$custom_css .= '.evo_container__standalone_page_area_oth { background: '.$color." }\n";
-		}
-		if( $max_width = $this->get_setting( 'section_oth_cont_width' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_oth > .container { max-width: '.$max_width."px }\n";
-		}
-		if( $color = $this->get_setting( 'section_oth_text_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_oth { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_oth_title_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_oth h1.page_title { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_oth_link_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_oth a { color: '.$color." }\n";
-		}
-		if( $color =  $this->get_setting( 'section_oth_link_h_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_oth a:hover { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_oth_button_bg_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_oth .evo_widget > .btn.btn-default { background-color: '.$color." }\n";
-			$custom_css .= '.evo_container__standalone_page_area_oth .evo_widget .item_excerpt > a.btn.btn-default,
-			.evo_container__standalone_page_area_oth .evo_widget .item_content > a.btn.btn-default
-			{ background-color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'section_oth_button_color' ) )
-		{
-			$custom_css .= '.evo_container__standalone_page_area_oth .evo_widget > .btn.btn-default { color: '.$color." }\n";
-			$custom_css .= '.evo_container__standalone_page_area_oth .evo_widget .item_excerpt > a.btn.btn-default,
-			.evo_container__standalone_page_area_oth .evo_widget .item_content > a.btn.btn-default
-			{ color: '.$color." }\n";
-		}
-		if( $this->get_setting( 'section_oth_text_align' ) == 'section_oth_center' )
-		{
-			$custom_css .= ".evo_container__standalone_page_area_oth { text-align: center }\n";
-		}
-		if( $this->get_setting( 'section_oth_text_align' ) == 'section_oth_right' )
-		{
-			$custom_css .= ".evo_container__standalone_page_area_oth { text-align: right }\n";
-		}
+		// **** Footer Settings / START ****
+		// Background color:
+		$this->dynamic_style_rule( 'footer_bg_color', '.footer_wrapper { background-color: $setting_value$ }' );
+		// Normal text color:
+		$this->dynamic_style_rule( 'footer_content_color', '.footer_wrapper { color: $setting_value$ }' );
+		// Links color:
+		$this->dynamic_style_rule( 'footer_link_color', '.footer_wrapper a { color: $setting_value$ }' );
+		// Links hover color:
+		$this->dynamic_style_rule( 'footer_link_h_color', '.footer_wrapper a:hover { color: $setting_value$ }' );
+		// Button background color:
+		$this->dynamic_style_rule( 'footer_button_bg_color', '.footer_wrapper .evo_widget > .btn.btn-default { background-color: $setting_value$ }' );
+		// Button text color:
+		$this->dynamic_style_rule( 'footer_button_color', '.footer_wrapper .evo_widget > .btn.btn-default { color: $setting_value$ }' );
+		// Align text:
+		$this->dynamic_style_rule( 'footer_text_align', '.footer_wrapper { text-align: $setting_value$ }', array(
+			'options' => array(
+				'footer_left'   => 'left',
+				'footer_center' => 'center',
+				'footer_right'  => 'right;',
+			)
+		) );
+		// **** Footer Settings / END ****
 
+		// **** Featured posts Settings / START ****
+		// Text color on background image:
+		$this->dynamic_style_rule( 'bgimg_text_color', '.evo_hasbgimg { color: $setting_value$ }' );
+		// Link color on background image:
+		$this->dynamic_style_rule( 'bgimg_link_color', '.evo_hasbgimg a { color { color: $setting_value$ }' );
+		// Hover link color on background image:
+		$this->dynamic_style_rule( 'bgimg_hover_link_color', '.evo_hasbgimg a:hover { color: $setting_value$ }' );
+		// **** Featured posts Settings / END ****
 
-		// ============ Featured Posts Settings ============
-		if( $color = $this->get_setting( 'bgimg_text_color' ) )
-		{	// Custom text color on background image:
-			$custom_css .= '.evo_hasbgimg { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'bgimg_link_color' ) )
-		{	// Custom link color on background image:
-			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
-		{	// Custom link hover color on background image:
-			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
-		}
-
-
-		// ============ Buttons color customization ============
-		if( $color = $this->get_setting( 'login_button_color' ) )
-		{	// Custom text color on login button:
-			$custom_css .= 'input[type="submit"].btn-success, .widget_core_user_login input.submit.btn-default { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'login_button_bg_color' ) )
-		{	// Custom text background-color on login button:
-			$custom_css .= 'input[type="submit"].btn-success, .widget_core_user_login input.submit.btn-default { background-color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'register_button_color' ) )
-		{	// Custom text color on register button:
-			$custom_css .= 'a.btn.btn-primary.btn-lg, input.btn.btn-primary.btn-lg, .widget_register_form input.submit { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'register_button_bg_color' ) )
-		{	// Custom text background-color on register button:
-			$custom_css .= 'a.btn.btn-primary.btn-lg, input.btn.btn-primary.btn-lg, .widget_register_form input.submit { background-color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'contact_button_color' ) )
-		{	// Custom text color on contact button:
-			$custom_css .= 'input[type="submit"].submit.btn-primary { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'contact_button_bg_color' ) )
-		{	// Custom text background-color on contact button:
-			$custom_css .= 'input[type="submit"].submit.btn-primary { background-color: '.$color." }\n";
-		}
-
-
-		// ============ Footer Section ============
-		if( $color = $this->get_setting( 'footer_bg_color' ) )
-		{	// Custom text color on background image:
-			$custom_css .= '.footer_wrapper { background-color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'footer_content_color' ) )
-		{	// Custom link color on background image:
-			$custom_css .= '.footer_wrapper { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'footer_link_color' ) )
-		{	// Custom link color on background image:
-			$custom_css .= '.footer_wrapper a { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'footer_link_h_color' ) )
-		{	// Custom link color on background image:
-			$custom_css .= '.footer_wrapper a:hover { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'footer_button_bg_color' ) )
-		{ // Custom background color:
-			$custom_css .= '.footer_wrapper .evo_widget > .btn.btn-default { background-color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'footer_button_color' ) )
-		{ // Custom background color:
-			$custom_css .= '.footer_wrapper .evo_widget > .btn.btn-default { color: '.$color." }\n";
-		}
-		if( $this->get_setting( 'footer_text_align' ) == 'footer_center' )
-		{
-			$custom_css .= ".footer_wrapper { text-align: center }\n";
-		}
-		if( $this->get_setting( 'footer_text_align' ) == 'footer_right' )
-		{
-			$custom_css .= ".footer_wrapper { text-align: right }\n";
-		}
-
-		if( ! empty( $custom_css ) )
-		{
-			$custom_css = '<style type="text/css">
-<!--
-'.$custom_css.'
--->
-</style>';
-		add_headline( $custom_css );
-		}
+		// **** Button Customization Settings / START ****
+		// Login button color:
+		$this->dynamic_style_rule( 'login_button_color', 'input[type="submit"].btn-success, .widget_core_user_login input.submit.btn-default { color: $setting_value$ }' );
+		// Login button background color:
+		$this->dynamic_style_rule( 'login_button_bg_color', 'input[type="submit"].btn-success, .widget_core_user_login input.submit.btn-default { background-color: $setting_value$ }' );
+		// Register button color:
+		$this->dynamic_style_rule( 'register_button_color', 'a.btn.btn-primary.btn-lg, input.btn.btn-primary.btn-lg, .widget_register_form input.submit { color: $setting_value$ }' );
+		// Register button background color:
+		$this->dynamic_style_rule( 'register_button_bg_color', 'a.btn.btn-primary.btn-lg, input.btn.btn-primary.btn-lg, .widget_register_form input.submit { background-color: $setting_value$ }' );
+		// Contact and Subscribe button color:
+		$this->dynamic_style_rule( 'contact_button_color', 'input[type="submit"].submit.btn-primary { color: $setting_value$ }' );
+		// Contact and Subscribe button background color:
+		$this->dynamic_style_rule( 'contact_button_bg_color', 'input[type="submit"].submit.btn-primary { background-color: $setting_value$ }' );
+		// **** Button Customization Settings / END ****
 
 		// Add dynamic CSS rules headline:
 		$this->add_dynamic_css_headline();
