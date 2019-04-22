@@ -64,35 +64,19 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 
 if( $email_send_allow_php_mail )
 {	// Don't display the settings when only php mail service is disabled by config:
+	$Form->begin_fieldset( T_( 'Email service settings' ).get_manual_link( 'email-service-settings' ) );
 
-$Form->begin_fieldset( T_( 'Email service settings' ).get_manual_link( 'email-service-settings' ) );
+	$Form->radio( 'email_service', $Settings->get( 'email_service' ), array(
+				array( 'mail', T_('Regular PHP <code>mail()</code> function'), T_('Default but not recommended') ),
+				array( 'smtp', T_('External SMTP Server defined below'), T_('Highly recommended if you send email campaigns') ),
+			), T_('Primary email service'), true );
+	$Form->checkbox( 'force_email_sending', $Settings->get( 'force_email_sending' ), T_('Fallback'), T_('If the primary email service is not available, the secondary option will be used.') );
 
-$Form->radio( 'email_service', $Settings->get( 'email_service' ), array(
-			array( 'mail', T_('Regular PHP <code>mail()</code> function'), ),
-			array( 'smtp', T_('External SMTP Server defined below'), ),
-		), T_('Primary email service'), true );
-$Form->checkbox( 'force_email_sending', $Settings->get( 'force_email_sending' ), T_('Force email sending'), T_('If the primary email service is not available, the secondary option will be used.') );
-
-$Form->end_fieldset();
-
-
-$Form->begin_fieldset( T_( 'PHP <code>mail()</code> function settings' ).get_manual_link( 'php-mail-function-settings' ) );
-
-$Form->radio( 'sendmail_params', $Settings->get( 'sendmail_params' ), array(
-			array( 'return', '<code>-r $return-address$</code>', ),
-			array( 'from', '<code>-f $return-address$</code>', ),
-			array( 'custom', T_('Custom').':', '',
-				'<input type="text" class="form_text_input form-control" name="sendmail_params_custom"
-					size="150" value="'.$Settings->dget( 'sendmail_params_custom', 'formvalue' ).'" />
-					<span class="notes">'.sprintf( T_('Allowed placeholders: %s'), '<code>$from-address$</code>, <code>$return-address$</code>' ).'</span>' ),
-		), T_('Sendmail additional params'), true );
-
-$Form->end_fieldset();
-
+	$Form->end_fieldset();
 }
 
 
-$Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('smtp-gateway-settings') );
+$Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('smtp-server-connection-settings') );
 
 	$Form->checkbox_input( 'smtp_enabled', $Settings->get('smtp_enabled'), T_('Enabled') );
 
@@ -131,6 +115,21 @@ $Form->begin_fieldset( T_('SMTP Server connection settings').get_manual_link('sm
 
 $Form->end_fieldset();
 
+if( $email_send_allow_php_mail )
+{	// Don't display the settings when only php mail service is disabled by config:
+	$Form->begin_fieldset( T_( 'PHP <code>mail()</code> function settings' ).get_manual_link( 'php-mail-function-settings' ) );
+
+	$Form->radio( 'sendmail_params', $Settings->get( 'sendmail_params' ), array(
+				array( 'return', '<code>-r $return-address$</code>', ),
+				array( 'from', '<code>-f $return-address$</code>', ),
+				array( 'custom', T_('Custom').':', '',
+					'<input type="text" class="form_text_input form-control" name="sendmail_params_custom"
+						size="150" value="'.$Settings->dget( 'sendmail_params_custom', 'formvalue' ).'" />
+						<span class="notes">'.sprintf( T_('Allowed placeholders: %s'), '<code>$from-address$</code>, <code>$return-address$</code>' ).'</span>' ),
+			), T_('Sendmail additional params'), true );
+
+	$Form->end_fieldset();
+}
 
 
 if( $current_User->check_perm( 'emails', 'edit' ) )
