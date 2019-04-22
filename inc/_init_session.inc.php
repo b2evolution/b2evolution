@@ -26,10 +26,13 @@ $Timer->start( '_init_session' );
 load_funcs( '_core/_url.funcs.php' );
 if( !empty($is_admin_page) )
 {	// Make sure we are calling the right page (on the right domain) to make sure that session cookie goes through:
-	if( ! is_same_url( $ReqHost.$ReqPath, $admin_url, true ) &&
-	    // Support obsolete admin.php url:
-	    ! is_same_url( $ReqHost.$ReqPath, $baseurl.'admin.php', true ) )
+	if( ! is_same_url( $ReqHost.$ReqPath, $admin_url, true ) )
 	{	// The requested URL does not look like it's under the admin URL...
+		if( is_same_url( $ReqHost.$ReqPath, $baseurl.'admin.php', true ) )
+		{	// Permanent redirect from obsolete admin.php url:
+			header_redirect( $admin_url.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] ), 301 );
+			// Exit here.
+		}
 		// NOTE: URLs may have a different protocol, e.g. when "Require SSL" is enabled and URL "/evoadm.php?ctrl=user&user_tab=pwdchange"
 		header('X-Evo-Redirect: Redirect to canonical $admin_url'); // Add debug header to find the cause for infinite redirects better!
 		header_redirect( $admin_url, 302 );
