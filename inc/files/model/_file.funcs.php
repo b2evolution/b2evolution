@@ -3329,4 +3329,28 @@ function check_perm_upload_files( $LinkOwner, $FileRoot, $assert = false )
 		return $LinkOwner->check_perm( 'add', $assert, $FileRoot );
 	}
 }
+
+
+/**
+ * Check if folder contains at least one file with requested extension
+ *
+ * @param string Folder path
+ * @param string File extensions, separated by |
+ * @return boolean
+ */
+function check_folder_with_extensions( $folder_path, $extensions )
+{
+	$folder_files = get_filenames( $folder_path );
+
+	foreach( $folder_files as $folder_file )
+	{
+		if( preg_match( '/\.('.$extensions.')$/i', $folder_file ) )
+		{	// First file with requested extension is found:
+			return true;
+		}
+	}
+
+	// Folder has no file with requested extension
+	return false;
+}
 ?>

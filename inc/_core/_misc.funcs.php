@@ -9551,25 +9551,26 @@ function display_importer_upload_panel( $params = array() )
 	global $admin_url, $current_User, $media_path;
 
 	$params = array_merge( array(
-			'folder'              => '',
-			'allowed_extensions'  => 'csv',
-			'infolder_extensions' => false,
-			'find_attachments'    => false,
-			'help_slug'           => '',
-			'refresh_url'         => '',
+			'folder'                 => '',
+			'allowed_extensions'     => 'csv', // Allowed extensions to import, separated by |
+			'infolder_extensions'    => false, // Allowed extensions inside folders, separated by |, FALSE - to don't find files in subfolders
+			'folder_with_extensions' => false, // Find folders which contain at least one file with extensions(separated by |) in subfolders recursively
+			'find_attachments'       => false,
+			'display_type'           => false,
+			'help_slug'              => '',
+			'refresh_url'            => '',
 		), $params );
 
 	// Get available files to import from the folder /media/import/
-	$import_files = get_import_files( $params['folder'], $params['allowed_extensions'], $params['infolder_extensions'], $params['find_attachments'] );
+	$import_files = get_import_files( $params['folder'], $params['allowed_extensions'], $params['infolder_extensions'], $params['find_attachments'], $params['folder_with_extensions'] );
 
 	$Table = new Table( NULL, 'import' );
 
 	$Table->cols = array();
 	$Table->cols[] = array( 'th' => T_('Import'), 'td_class' => 'shrinkwrap' );
 	$Table->cols[] = array( 'th' => T_('File') );
-	$file_types_count = count( explode( '|', $params['allowed_extensions'] ) );
-	if( $file_types_count > 1 )
-	{	// Display this column only when importer tool allows several file types:
+	if( $params['display_type'] )
+	{	// Display file type:
 		$Table->cols[] = array( 'th' => T_('Type') );
 	}
 	$Table->cols[] = array( 'th' => T_('Date'), 'td_class' => 'shrinkwrap' );
@@ -9652,8 +9653,8 @@ function display_importer_upload_panel( $params = array() )
 			$Table->display_col_end();
 
 			// Type
-			if( $file_types_count > 1 )
-			{	// Display this column only when importer tool allows several file types:
+			if( $params['display_type'] )
+			{	// Display file type:
 				$Table->display_col_start();
 				echo $import_file['type'];
 				$Table->display_col_end();
@@ -9732,16 +9733,18 @@ jQuery( document ).on( 'click', '#modal_window button[data-dismiss=modal]', func
  *
  * @param string Sub folder in the folder /media/import/
  * @param string Allowed extensions to import, separated by |
- * @param string Allowed extensions inside folders, separated by |, FALSE - to don't find files in subfolders
+ * @param string|boolean Allowed extensions inside folders, separated by |, FALSE - to don't find files in subfolders
  * @param boolean TRUE - to find folder of attachments
+ * @param string|boolean Find folders which contain at least one file with extensions(separated by |) recursively in all subfolders
  * @return array Files
  */
-function get_import_files( $folder = '', $allowed_extensions = 'xml|txt|zip', $infolder_extensions = 'xml|txt', $find_attachments = true )
+function get_import_files( $folder = '', $allowed_extensions = 'xml|txt|zip', $infolder_extensions = 'xml|txt', $find_attachments = true, $folder_with_extensions = false )
 {
 	global $media_path;
 
 	// Get all files from the import folder:
-	$files = get_filenames( $media_path.'import/'.( empty( $folder ) ? '' : $folder.'/' ), array(
+	$root_path = $media_path.'import/'.( empty( $folder ) ? '' : $folder.'/' );
+	$files = get_filenames( $root_path, array(
 			'flat' => false
 		) );
 
@@ -9752,56 +9755,60 @@ function get_import_files( $folder = '', $allowed_extensions = 'xml|txt|zip', $i
 		return $import_files;
 	}
 
-	foreach( $files as $file )
+	$file_paths = array();
+	foreach( $files as $folder_name => $file )
 	{
-		$file_paths = array();
-		$file_type = '';
 		if( is_array( $file ) )
 		{	// It is a folder
 			if( $infolder_extensions !== false )
 			{	// Find files inside:
 				foreach( $file as $key => $sub_file )
 				{
-					if( is_string( $sub_file ) && preg_match( '/\.('.$infolder_extensions.')$/i', $sub_file ) )
+					if( is_string( $sub_file ) && preg_match( '/\.('.$infolder_extensions.')$/i', $sub_file, $file_matches ) )
 					{
-						$file_paths[] = $sub_file;
+						$file_paths[] = array( $sub_file, $file_matches[1] );
 					}
 				}
 			}
+			if( $folder_with_extensions !== false && check_folder_with_extensions( $root_path.$folder_name, $folder_with_extensions ) )
+			{	// Use full folder as single import pack when it contains file with requested extensions:
+				$file_paths[] = array( $root_path.$folder_name, '$dir$' );
+			}
 		}
-		elseif( is_string( $file ) )
+		elseif( is_string( $file ) && preg_match( '/\.('.$allowed_extensions.')$/i', $file, $file_matches ) )
 		{	// File in the root:
-			$file_paths[] = $file;
+			$file_paths[] = array( $file, $file_matches[1] );
+		}
+	}
+
+	foreach( $file_paths as $file_data )
+	{
+		switch( $file_data[1] )
+		{
+			case '$dir$':
+				$file_type = T_('Folder');
+				break;
+
+			case 'zip':
+				$file_type = T_('Compressed Archive');
+				break;
+
+			default:
+				if( $find_attachments && ( $file_attachments_folder = get_import_attachments_folder( $file_data[0] ) ) )
+				{	// Probably it is a file with attachments folder:
+					$file_type = sprintf( T_('Complete export (attachments folder: %s)'), '<code>'.basename( $file_attachments_folder ).'</code>' );
+				}
+				else
+				{	// Single XML file without attachments folder:
+					$file_type = T_('Basic export').( $find_attachments ? ' ('.T_('no attachments folder found').')' : '' );
+				}
+				break;
 		}
 
-		foreach( $file_paths as $file_path )
-		{
-			if( ! empty( $file_path ) && preg_match( '/\.('.$allowed_extensions.')$/i', $file_path, $file_matches ) )
-			{	// This file can be a file with import data
-				if( empty( $file_type ) )
-				{	// Set type from file extension
-					if( $file_matches[1] == 'zip' )
-					{
-						$file_type = T_('Compressed Archive');
-					}
-					else
-					{
-						if( $find_attachments && ( $file_attachments_folder = get_import_attachments_folder( $file_path ) ) )
-						{	// Probably it is a file with attachments folder:
-							$file_type = sprintf( T_('Complete export (attachments folder: %s)'), '<code>'.basename( $file_attachments_folder ).'</code>' );
-						}
-						else
-						{	// Single XML file without attachments folder:
-							$file_type = T_('Basic export').( $find_attachments ? ' ('.T_('no attachments folder found').')' : '' );
-						}
-					}
-				}
-				$import_files[] = array(
-						'path' => $file_path,
-						'type' => $file_type,
-					);
-			}
-		}
+		$import_files[] = array(
+				'path' => $file_data[0],
+				'type' => $file_type,
+			);
 	}
 
 	return $import_files;

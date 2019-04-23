@@ -1,6 +1,6 @@
 <?php
 /**
- * This file display the 1st step of WordPress XML importer
+ * This file display the 1st step of Markdown Importer
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -19,20 +19,19 @@ global $admin_url, $media_subdir, $media_path;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
-$Form->begin_form( 'fform', T_('WordPress XML Importer') );
+$Form->begin_form( 'fform', T_('Markdown Importer') );
 
-$Form->add_crumb( 'wpxml' );
+$Form->add_crumb( 'mdimport' );
 $Form->hidden_ctrl();
 $Form->hidden( 'action', 'import' );
 
 // Display a panel to upload files before import:
 $import_files = display_importer_upload_panel( array(
-		'allowed_extensions'  => 'xml|txt|zip',
-		'infolder_extensions' => 'xml|txt',
-		'find_attachments'    => true,
-		'display_type'        => true,
-		'help_slug'           => 'xml-importer',
-		'refresh_url'         => $admin_url.'?ctrl=wpimportxml',
+		'allowed_extensions'     => 'zip',
+		'folder_with_extensions' => 'md',
+		'display_type'           => true,
+		'help_slug'              => 'markdown-importer',
+		'refresh_url'            => $admin_url.'?ctrl=mdimport',
 	) );
 
 if( ! empty( $import_files ) )
@@ -43,7 +42,7 @@ if( ! empty( $import_files ) )
 	$BlogCache->load_all( 'shortname,name', 'ASC' );
 	$BlogCache->none_option_text = T_('Please select...');
 
-	$Form->select_input_object( 'wp_blog_ID', param( 'wp_blog_ID', 'integer', 0 ), $BlogCache, T_('Destination collection'), array(
+	$Form->select_input_object( 'md_blog_ID', param( 'md_blog_ID', 'integer', 0 ), $BlogCache, T_('Destination collection'), array(
 			'note' => T_('This blog will be used for import.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
 			'allow_none' => true,
 			'required' => true,
@@ -71,8 +70,6 @@ if( ! empty( $import_files ) )
 					'id'    => 'import_type_append' ),
 			), '', array( 'lines' => true ) );
 
-	$Form->checkbox_input( 'import_img', 1, '', array( 'input_suffix' => T_('Try to match any remaining <code>&lt;img&gt;</code> tags with imported attachments based on filename') ) );
-
 	$Form->end_fieldset();
 
 	$Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' ) ) );
@@ -82,14 +79,7 @@ $Form->end_form();
 ?>
 <script>
 jQuery( 'input[name=import_type]' ).click( function()
-{ // Show/Hide checkbox to delete files
-	if( jQuery( this ).val() == 'replace' )
-	{
-		jQuery( '#checkbox_delete_files' ).show();
-	}
-	else
-	{
-		jQuery( '#checkbox_delete_files' ).hide();
-	}
+{	// Show/Hide checkbox to delete files:
+	jQuery( '#checkbox_delete_files' ).toggle( jQuery( this ).val() == 'replace' );
 } );
 </script>
