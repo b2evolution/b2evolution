@@ -102,7 +102,7 @@ function tag_td_name( $utag_ID, $utag_name )
 }
 $Results->cols[] = array(
 		'th'       => /* TRANS: noun */ T_('Tag'),
-		'order'    => 'utag_name COLLATE utf8_general_ci',
+		'order'    => 'utag_name COLLATE utf8mb4_unicode_ci',
 		'td'       => '%tag_td_name( #utag_ID#, #utag_name# )%',
 	);
 
