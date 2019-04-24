@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_manual
@@ -17,51 +17,29 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Home page, display full categories list
 
-// Go Grab the featured post:
-$intro_Item = & get_featured_Item( 'front' ); // $intro_Item is used below for comments form
-$Item = $intro_Item;
-if( !empty( $Item ) )
-{ // We have a featured/intro post to display:
-	echo '<div class="evo_content_block">'; // Beginning of posts display
-	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-	skin_include( '_item_block.inc.php', array(
-			'feature_block'     => true,
-			'content_mode'      => 'auto',		// 'auto' will auto select depending on $disp-detail
-			'intro_mode'        => 'normal',	// Intro posts will be displayed in normal mode
-			'item_class'        => 'jumbotron evo_content_block evo_post',
-			'disp_comment_form' => false,
-			'item_link_type'    => 'none',
-		) );
-	// ----------------------------END ITEM BLOCK  ----------------------------
-	echo '</div>'; // End of posts display
-}
-
 // ------------------------- "Front Page Main Area" CONTAINER EMBEDDED HERE --------------------------
 	// Display container and contents:
-	skin_container( NT_('Front Page Main Area'), array(
-	// The following params will be used as defaults for widgets included in this container:
+	skin_container( NT_('Front Page Main Area'), array_merge( array(
+		// The following params will be used as defaults for widgets included in this container:
 		'block_start'       => '<div class="evo_widget $wi_class$">',
 		'block_end'         => '</div>',
 		'block_title_start' => '<h2 class="page-header">',
 		'block_title_end'   => '</h2>',
-	) );
+		'intro_class'       => 'jumbotron',
+		'featured_class'    => 'featurepost',
+
+		// Template params for "Content Hierarchy" widget:
+		'widget_content_hierarchy_params' => array(
+				'class_selected'       => '',
+				'custom_title'         => '<h2 class="table_contents">'.T_('Table of contents').'</h2>',
+				'item_before_opened'   => get_icon( 'collapse' ),
+				'item_before_closed'   => get_icon( 'expand' ),
+				'item_before_post'     => get_icon( 'file_message' ),
+			),
+	), $Skin->get_template( 'disp_params' ) ) );
 // ----------------------------- END OF "Front Page Main Area" CONTAINER -----------------------------
 
-// --------------------------------- START OF CONTENT HIERARCHY --------------------------------
-echo '<h2 class="table_contents">'.T_('Table of contents').'</h2>';
-skin_widget( array(
-		// CODE for the widget:
-		'widget' => 'content_hierarchy',
-		// Optional display params
-		'display_blog_title'   => false,
-		'open_children_levels' => 20,
-		'class_selected'       => '',
-		'item_before_opened'   => get_icon( 'collapse' ),
-		'item_before_closed'   => get_icon( 'expand' ),
-		'item_before_post'     => get_icon( 'file_message' ),
-	) );
-// ---------------------------------- END OF CONTENT HIERARCHY ---------------------------------
-
+$intro_Item = & get_featured_Item( 'front' );
 if( ! empty( $intro_Item ) )
 {
 	global $c, $ReqURI;
@@ -69,6 +47,13 @@ if( ! empty( $intro_Item ) )
 	echo '<div class="evo_content_block">'; // Beginning of posts display
 	// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 	skin_include( '_item_feedback.inc.php', array_merge( array(
+			'disp_comments'        => true,
+			'disp_comment_form'    => true,
+			'disp_trackbacks'      => false,
+			'disp_trackback_url'   => false,
+			'disp_pingbacks'       => false,
+			'disp_webmentions'     => false,
+			'disp_meta_comments'   => false,
 			'before_section_title' => '<h3 class="evo_comment__list_title">',
 			'after_section_title'  => '</h3>',
 			'Item'                 => $intro_Item,

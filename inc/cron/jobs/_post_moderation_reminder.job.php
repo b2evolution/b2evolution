@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $DB, $Settings, $UserSettings;
 
-global $servertimenow, $post_moderation_reminder_threshold;
+global $servertimenow;
 
 // Check if UserSettings exists because it must be initialized before email sending
 if( empty( $UserSettings ) )
@@ -18,7 +18,7 @@ if( empty( $UserSettings ) )
 }
 
 // Only those blogs are selected for moderation where we can find at least one post awaiting moderation which is older then the threshold date defined below
-$threshold_date = date2mysql( $servertimenow - $post_moderation_reminder_threshold );
+$threshold_date = date2mysql( $servertimenow - $Settings->get( 'post_moderation_reminder_threshold' ) );
 
 // Statuses defined in this array should be notified. This should be configurable, but this is the default value.
 $notify_statuses = get_visibility_statuses( 'moderation' );
@@ -35,7 +35,7 @@ $moderation_blogs = $DB->get_col( $SQL->get() );
 
 if( empty( $moderation_blogs ) )
 { // There are no blogs where exists draft posts older then the threshold ( 24 hours by default )
-	$result_message = sprintf( 'No posts have been awaiting moderation for more than %s.', seconds_to_period( $post_moderation_reminder_threshold ) );
+	cron_log_append( sprintf( 'No posts have been awaiting moderation for more than %s.', seconds_to_period( $Settings->get( 'post_moderation_reminder_threshold' ) ) ) );
 	return 1;
 }
 
@@ -63,7 +63,7 @@ $blog_owners = $DB->get_assoc( $SQL->get() );
 
 // Select post moderators based on the blogs advanced user permissions
 $bloguser_SQL = new SQL();
-$bloguser_SQL->SELECT( 'bloguser_user_ID as user_ID, bloguser_blog_ID as blog_ID, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_edit as perm_edit' );
+$bloguser_SQL->SELECT( 'bloguser_user_ID as user_ID, bloguser_blog_ID as blog_ID, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_edit as perm_edit, bloguser_perm_edit + 0 AS perm_edit_num' );
 $bloguser_SQL->FROM( 'T_coll_user_perms' );
 $bloguser_SQL->FROM_add( 'LEFT JOIN T_blogs ON blog_ID = bloguser_blog_ID' );
 $bloguser_SQL->WHERE( sprintf( $not_global_moderator, 'bloguser_user_ID' ) );
@@ -72,9 +72,10 @@ $bloguser_SQL->WHERE_and( sprintf( $moderation_blogs_cond, 'bloguser_blog_ID' ) 
 $bloguser_SQL->WHERE_and( 'bloguser_perm_poststatuses <> "" AND bloguser_perm_edit <> "no" AND bloguser_perm_edit <> "own"' );
 // Select post moderators based on the blogs advanced group permissions
 $bloggroup_SQL = new  SQL();
-$bloggroup_SQL->SELECT( 'user_ID, bloggroup_blog_ID as blog_ID, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_edit as perm_edit' );
+$bloggroup_SQL->SELECT( 'user_ID, bloggroup_blog_ID as blog_ID, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_edit as perm_edit, bloggroup_perm_edit + 0 AS perm_edit_num' );
 $bloggroup_SQL->FROM( 'T_users' );
-$bloggroup_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID' );
+$bloggroup_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( bloggroup_group_ID = user_grp_ID
+	OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID ) )' );
 $bloggroup_SQL->FROM_add( 'LEFT JOIN T_blogs ON blog_ID = bloggroup_blog_ID' );
 $bloggroup_SQL->WHERE( sprintf( $not_global_moderator, 'user_ID' ) );
 $bloggroup_SQL->WHERE_and( 'blog_advanced_perms <> 0' );
@@ -96,21 +97,28 @@ foreach( $specific_blog_moderators as $row )
 		$moderators[$row->user_ID] = array();
 	}
 	if( isset( $moderators[$row->user_ID][$row->blog_ID] ) )
-	{ // Update user permissions on this blog
-		if( $moderators[$row->user_ID][$row->blog_ID]['perm_edit'] < $row->perm_edit )
-		{ // The user and the group advanced post edit perm for this user are not the same, keep the higher perm value
+	{	// Update user permissions on this collection:
+		// perm_edit    : 'no', 'own', 'lt', 'le', 'all' (real value from DB)
+		// perm_edit_num:  1,    2,     3,    4,    5    (index of the value from DB)
+		if( $moderators[$row->user_ID][$row->blog_ID]['perm_edit_num'] < $row->perm_edit_num )
+		{	// The user and the group advanced post edit perm for this user are not the same, keep the higher perm value:
+			$moderators[$row->user_ID][$row->blog_ID]['perm_edit_num'] = intval( $row->perm_edit_num );
 			$moderators[$row->user_ID][$row->blog_ID]['perm_edit'] = $row->perm_edit;
 		}
 		$current_perm_statuses = $moderators[$row->user_ID][$row->blog_ID]['perm_statuses'];
-		$row_perm_status = (int) $row->perm_poststatuses;
+		$row_perm_status = intval( $row->perm_poststatuses );
 		if( $current_perm_statuses != $row_perm_status )
 		{ // The advanced user and the group post statuses perm for this user are not the same, the union of this perms must be accepted
 			$moderators[$row->user_ID][$row->blog_ID]['perm_statuses'] = ( $current_perm_statuses | $row_perm_status );
 		}
 	}
 	else
-	{ // Initialize a new setting for this user / blog
-		$moderators[$row->user_ID][$row->blog_ID] = array( 'perm_edit' => $row->perm_edit, 'perm_statuses' => (int) $row->perm_poststatuses );
+	{	// Initialize a new setting for the moderator per collection:
+		$moderators[$row->user_ID][$row->blog_ID] = array(
+				'perm_edit'     => $row->perm_edit,
+				'perm_edit_num' => intval( $row->perm_edit_num ),
+				'perm_statuses' => intval( $row->perm_poststatuses ),
+			);
 	}
 }
 foreach( $blog_owners as $moderator_ID => $moderator_blogs )
@@ -148,6 +156,7 @@ $SQL->SELECT( 'T_users.*' );
 $SQL->FROM( 'T_users' );
 $SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "send_pst_moderation_reminder"' );
 $SQL->WHERE( 'user_ID IN ('.implode( ',', $all_required_users ).')' );
+$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 $SQL->WHERE_and( $send_moderation_reminder_cond );
 $SQL->WHERE_and( 'LENGTH(TRIM(user_email)) > 0' );
 $SQL->WHERE_and( $blocked_emails_condition );
@@ -160,7 +169,7 @@ $loaded_ids = $UserCache->get_ID_array();
 
 if( empty( $loaded_ids ) )
 { // UserCache result is empty which means nobody wants to receive notifications
-	$result_message = sprintf( 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have posts pending moderation!' );
+	cron_log_append( 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have posts pending moderation!' );
 	return 1;
 }
 
@@ -186,7 +195,7 @@ foreach( $blog_posts as $row )
 {
 	if( $last_blog_ID != $row->blog_ID )
 	{
-		$Blog = & $BlogCache->get_by_ID( $row->blog_ID );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $row->blog_ID );
 		$blog_moderation_statuses = $Blog->get_setting( 'post_moderation_statuses' );
 		$last_blog_ID = $row->blog_ID;
 	}
@@ -213,6 +222,7 @@ foreach( $blog_posts as $row )
 }
 
 $mail_sent = 0;
+$mail_failed = 0;
 $params = array();
 
 // Collect posts data for global moderators
@@ -326,12 +336,20 @@ foreach( $loaded_ids as $moderator_ID )
 	// Change locale here to localize the email subject and content
 	locale_temp_switch( $moderator_User->get( 'locale' ) );
 	if( send_mail_to_User( $moderator_ID, T_( 'Post moderation reminder' ), 'posts_unmoderated_reminder', $params, false ) )
-	{
+	{	// Log success mail sending:
+		cron_log_action_end( 'User '.$moderator_User->get_identity_link().' has been notified' );
 		$mail_sent++;
+	}
+	else
+	{	// Log failed mail sending:
+		global $mail_log_message;
+		cron_log_action_end( 'User '.$moderator_User->get_identity_link().' could not be notified because of error: '
+			.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
+		$mail_failed++;
 	}
 	locale_restore_previous();
 }
 
-$result_message = sprintf( '%d moderators have been notified!', $mail_sent );
+cron_log_append( ( ( $mail_sent + $mail_failed ) ? "\n" : '' ).sprintf( '%d of %d moderators have been notified!', $mail_sent, ( $mail_sent + $mail_failed ) ) );
 return 1; /*OK*/
 ?>

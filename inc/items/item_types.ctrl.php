@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -26,13 +26,13 @@ global $AdminUI;
  */
 global $current_User;
 
-global $dispatcher;
-
 // Check minimum permission:
 $current_User->check_perm( 'options', 'view', true );
 
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
+
+$display_mode = param( 'display_mode', 'string', 'normal' );
 
 $tab = param( 'tab', 'string', 'settings', true );
 
@@ -105,6 +105,9 @@ switch( $action )
 			$edited_Itemtype->dbinsert();
 			$Messages->add( T_('New Post Type created.'), 'success' );
 
+			// Update allowed item statuses
+			$edited_Itemtype->update_item_statuses_from_Request();
+
 			// What next?
 			switch( $action )
 			{
@@ -128,6 +131,7 @@ switch( $action )
 		break;
 
 	case 'update':
+	case 'update_edit':
 		// Edit post type form...:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -146,14 +150,25 @@ switch( $action )
 			// Update in DB:
 			$DB->begin();
 
+			$edited_Itemtype->update_item_statuses_from_Request();
 			$edited_Itemtype->dbupdate();
 			$Messages->add( T_('Post type updated.'), 'success' );
 
 			$DB->commit();
 
-			header_redirect( $admin_url.'?ctrl=itemtypes&blog='.$blog.'&tab='.$tab.'&tab3='.$tab3.'', 303 ); // Will EXIT
+			if( $action == 'update_edit' )
+			{	// Redirect to the edit form back:
+				$redirect_to = $admin_url.'?ctrl=itemtypes&action=edit&ityp_ID='.$edited_Itemtype->ID.'&blog='.$blog;
+			}
+			else
+			{	// Redirect to the item types list:
+				$redirect_to = $admin_url.'?ctrl=itemtypes&blog='.$blog.'&tab='.$tab.'&tab3='.$tab3;
+			}
+
+			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
+		$action = 'update';
 		break;
 
 	case 'delete':
@@ -182,7 +197,7 @@ switch( $action )
 				$blog_names = array();
 				foreach( $default_ids as $blog_ID => $item_type_ID )
 				{
-					if( $edited_Itemtype->ID == $item_type_ID && ( $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
+					if( $edited_Itemtype->ID == $item_type_ID && ( $Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false ) ) )
 					{
 						$blog_names[] = '<a href="'.$admin_url.'?ctrl=coll_settings&tab=features&blog='.$Blog->ID.'#fieldset_wrapper_post_options"><b>'.$Blog->get('name').'</b></a>';
 					}
@@ -301,14 +316,16 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'managing-item-types' );
 		break;
 }
+if( $display_mode != 'js' )
+{
+	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+	$AdminUI->disp_html_head();
 
-// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-$AdminUI->disp_html_head();
+	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+	$AdminUI->disp_body_top();
 
-// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-$AdminUI->disp_body_top();
-
-$AdminUI->disp_payload_begin();
+	$AdminUI->disp_payload_begin();
+}
 
 /**
  * Display payload:
@@ -335,6 +352,34 @@ switch( $action )
 		$AdminUI->disp_view( 'items/views/_itemtype.form.php' );
 		break;
 
+	case 'edit_custom_field':
+		param( 'itcf_ID', 'string', true );
+		param( 'itcf_type', 'string', true );
+		param( 'itcf_order', 'integer' );
+		param( 'itcf_label', 'string' );
+		param( 'itcf_name', 'string' );
+		param( 'itcf_format', 'string' );
+		param( 'itcf_formula', 'string' );
+		param( 'itcf_header_class', 'string' );
+		param( 'itcf_cell_class', 'string' );
+		param( 'itcf_link', 'string' );
+		param( 'itcf_link_nofollow', 'integer', NULL );
+		param( 'itcf_link_class', 'string' );
+		param( 'itcf_note', 'string' );
+		param( 'itcf_public', 'integer' );
+		param( 'itcf_line_highlight', 'string' );
+		param( 'itcf_green_highlight', 'string' );
+		param( 'itcf_red_highlight', 'string' );
+		param( 'itcf_description', 'html' );
+		param( 'itcf_merge', 'integer' );
+		$AdminUI->disp_view( 'items/views/_itemtype_edit_field.form.php' );
+		break;
+
+	case 'select_custom_fields':
+		$custom_fields = rtrim( param( 'custom_fields', 'string' ), ',' );
+		$custom_fields = empty( $custom_fields ) ? array() : explode( ',', $custom_fields );
+		$AdminUI->disp_view( 'items/views/_itemtype_fields.form.php' );
+		break;
 
 	default:
 		// No specific request, list all post types:
@@ -345,10 +390,11 @@ switch( $action )
 		break;
 
 }
+if( $display_mode != 'js' )
+{
+	$AdminUI->disp_payload_end();
 
-$AdminUI->disp_payload_end();
-
-// Display body bottom, debug info and close </html>:
-$AdminUI->disp_global_footer();
-
+	// Display body bottom, debug info and close </html>:
+	$AdminUI->disp_global_footer();
+}
 ?>

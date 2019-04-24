@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -95,6 +95,7 @@ class Group extends DataObject
 			$this->set( 'name', T_('New group') );
 			$this->set( 'perm_blogs', 'user' );
 			$this->set( 'perm_stats', 'none' );
+			$this->set( 'usage', 'primary' );
 		}
 		else
 		{
@@ -221,7 +222,7 @@ class Group extends DataObject
 		foreach( $GroupSettings->permission_values as $name => $value )
 		{
 			// We need to handle checkboxes and radioboxes separately , because when a checkbox isn't checked the checkbox variable is not sent
-			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_templates'
+			if( $name == 'perm_createblog' || $name == 'perm_getblog' || $name == 'perm_centralantispam'
 				|| $name == 'cross_country_allow_profiles' || $name == 'cross_country_allow_contact' )
 			{ // These permissions are represented by checkboxes, all other pluggable group permissions are represented by radiobox.
 				$value = param( 'edited_grp_'.$name, 'string', 'denied' );
@@ -234,10 +235,16 @@ class Group extends DataObject
 			{
 				$value = param( 'edited_grp_'.$name, 'string', '' );
 			}
-			if( ( $value != '') || ( $name == 'max_new_threads'/*allow empty*/ ) )
+			if( ( $value != '') || ( $name == 'max_new_threads'/*allow empty*/ ) || ( $name == 'perm_max_createblog_num' ) )
 			{ // if radio is not set, then doesn't change the settings
 				$GroupSettings->set( $name, $value, $this->ID );
 			}
+		}
+
+		if( $GroupSettings->get( 'perm_admin', $this->ID ) != 'normal' &&
+				$GroupSettings->get( 'perm_users', $this->ID ) != 'none' )
+		{	// Display warning when users permissions are not allowed because of not full access to back-office:
+			$Messages->add( T_('Permission to view other users will not work because users of this group have restricted back-office access.'), 'warning' );
 		}
 
 		return !param_errors_detected();
@@ -256,9 +263,6 @@ class Group extends DataObject
 	{
 		switch( $parname )
 		{
-			case 'perm_templates':
-				return $this->set_param( $parname, 'number', $parvalue, $make_null );
-
 			default:
 				return $this->set_param( $parname, 'string', $parvalue, $make_null );
 		}
@@ -293,6 +297,7 @@ class Group extends DataObject
 	 *                - blogs
 	 *                - admin (levels "visible", "hidden")
 	 *                - messaging
+	 *                - centralantispam
 	 * @param string Requested permission level
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
 	 * @return boolean True on success (permission is granted), false if permission is not granted
@@ -315,7 +320,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs' );
+		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'skins_root', 'plugins_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam', 'maintenance' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;
@@ -364,34 +369,27 @@ class Group extends DataObject
 						break;
 
 					case 'view':
-						// User can ask for view perm...
-						if( $permlevel == 'view' )
+						// User can permissions to view all collections
+						if( $permlevel == 'view' || $permlevel == 'list' )
 						{
 							$perm = true;
 							break;
 						}
-						// ... or for any lower priority perm... (no break)
+						break;
 
 					case 'user':
 						// This is for stats. User perm can grant permissions in the User class
 						// Here it will just allow to list
 					case 'list':
 						// User can only ask for list perm
-						if( $permlevel == 'list' )
+						// But for requested collection we should check perm in user/group perms of the collections
+						if( $permlevel == 'list' && $perm_target === NULL )
 						{
-							$perm = true;
+							$perm = check_coll_first_perm( 'perm_analytics', 'group', $this->ID );
 							break;
 						}
 				}
 				break;
-
-			case 'perm_files':
-				if( ! $this->check_perm( 'admin', 'restricted' ) )
-				{
-					$perm = false;
-					break;
-				}
-				// no break, perm_files is pluggable permission
 
 			default:
 
@@ -399,6 +397,14 @@ class Group extends DataObject
 				$perm = Module::check_perm( $permname, $permlevel, $perm_target, 'group_func', $this );
 				if( $perm === NULL )
 				{	// Even if group permisson check function doesn't exist we should return false value
+					$perm = false;
+				}
+
+				if( $perm && // Permission is allowed
+						in_array( $permname, array( 'perm_spamblacklist', 'perm_slugs', 'perm_emails', 'perm_maintenance' ) ) && // These permissions depend on permission "Settings"
+						! Module::check_perm( 'perm_options', 'view', $perm_target, 'group_func', $this ) ) // permission "Settings" == "No Access"
+				{	// Force permission to FALSE when group perm setting "Settings" == "No Access" for
+					// all depending permissions: "Antispam", "Slug manager", "Email management", "Maintenance"
 					$perm = false;
 				}
 

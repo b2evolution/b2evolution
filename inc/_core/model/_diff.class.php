@@ -332,16 +332,20 @@ class _DiffEngine {
 					continue;
 				}
 				$matches = $ymatches[$line];
+
 				reset( $matches );
-				while ( list( , $y ) = each( $matches ) ) {
+				$y = current( $matches );
+				while( $y !== false ) {
 					if ( empty( $this->in_seq[$y] ) ) {
 						$k = $this->_lcs_pos( $y );
 						assert( $k > 0 );
 						$ymids[$k] = $ymids[$k -1];
+						$y = next( $matches );
 						break;
 					}
+					$y = next( $matches );
 				}
-				while ( list ( , $y ) = each( $matches ) ) {
+				while( $y !== false ) {
 					if ( $y > $this->seq[$k -1] ) {
 						assert( $y < $this->seq[$k] );
 						// Optimization: this is a common case:
@@ -354,6 +358,7 @@ class _DiffEngine {
 						assert( $k > 0 );
 						$ymids[$k] = $ymids[$k -1];
 					}
+					$y = next( $matches );
 				}
 			}
 		}
@@ -471,7 +476,7 @@ class _DiffEngine {
 		$i = 0;
 		$j = 0;
 
-		assert( 'sizeof($lines) == sizeof($changed)' );
+		assert( sizeof($lines) == sizeof($changed) );
 		$len = sizeof( $lines );
 		$other_len = sizeof( $other_changed );
 
@@ -492,7 +497,7 @@ class _DiffEngine {
 			}
 
 			while ( $i < $len && ! $changed[$i] ) {
-				assert( '$j < $other_len && ! $other_changed[$j]' );
+				assert( $j < $other_len && ! $other_changed[$j] );
 				$i++; $j++;
 				while ( $j < $other_len && $other_changed[$j] )
 				$j++;
@@ -527,11 +532,11 @@ class _DiffEngine {
 					while ( $start > 0 && $changed[$start - 1] ) {
 						$start--;
 					}
-					assert( '$j > 0' );
+					assert( $j > 0 );
 					while ( $other_changed[--$j] ) {
 						continue;
 					}
-					assert( '$j >= 0 && !$other_changed[$j]' );
+					assert( $j >= 0 && !$other_changed[$j] );
 				}
 
 				/*
@@ -555,7 +560,7 @@ class _DiffEngine {
 						$i++;
 					}
 
-					assert( '$j < $other_len && ! $other_changed[$j]' );
+					assert( $j < $other_len && ! $other_changed[$j] );
 					$j++;
 					if ( $j < $other_len && $other_changed[$j] ) {
 						$corresponding = $i;
@@ -573,11 +578,11 @@ class _DiffEngine {
 			while ( $corresponding < $i ) {
 				$changed[--$start] = 1;
 				$changed[--$i] = 0;
-				assert( '$j > 0' );
+				assert( $j > 0 );
 				while ( $other_changed[--$j] ) {
 					continue;
 				}
-				assert( '$j >= 0 && !$other_changed[$j]' );
+				assert( $j >= 0 && !$other_changed[$j] );
 			}
 		}
 	}
@@ -1184,8 +1189,15 @@ class TableDiffFormatter extends DiffFormatter {
 	}
 
 	function _block_header( $xbeg, $xlen, $ybeg, $ylen ) {
-		$r = '<tr><td colspan="2" class="diff-lineno">'.sprintf( T_('Line %s'), $xbeg ). ":</td>\n" .
-		  '<td colspan="2" class="diff-lineno">'.sprintf( T_('Line %s'), $ybeg ). ":</td></tr>\n";
+		if( isset( $this->block_header ) )
+		{	// Use custom block header:
+			$r = $this->block_header;
+		}
+		else
+		{	// Use default block header:
+			$r = '<tr><td colspan="2" class="diff-lineno">'.sprintf( T_('Line %s'), $xbeg ). ":</td>\n" .
+			  '<td colspan="2" class="diff-lineno">'.sprintf( T_('Line %s'), $ybeg ). ":</td></tr>\n";
+		}
 		return $r;
 	}
 

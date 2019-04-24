@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -29,10 +29,11 @@ class calendar_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Calr';
 	var $priority = 20;
-	var $version = '5.0.0';
+	var $version = '6.11.1';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
+	var $widget_icon = 'calendar';
 
 
   /**
@@ -115,7 +116,7 @@ class calendar_plugin extends Plugin
 			),
 			'cat_IDs' => array(
 				'label' => T_('Categories'),
-				'note' => T_('List category IDs separated by ,'),
+				'note' => sprintf( T_('List category IDs separated by %s.'), '<code>,</code>' ),
 				'size' => 15,
 				'type' => 'text',
 				'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
@@ -155,6 +156,26 @@ class calendar_plugin extends Plugin
 			),
 		);
 		return $r;
+	}
+
+
+	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		global $Collection, $Blog;
+
+		return array(
+				'wi_ID'        => $widget_ID, // Have the widget settings changed ?
+				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
+			);
 	}
 
 
@@ -202,7 +223,7 @@ class calendar_plugin extends Plugin
 		$itemlist_prefix = isset( $params['itemlist_prefix'] ) ? $params['itemlist_prefix'] : '';
 
 		global $month;
-		global $Blog, $cat_array, $cat_modifier;
+		global $Collection, $Blog, $cat_array, $cat_modifier;
 		global $show_statuses;
 		global $author, $assgn, $status, $types;
 		global ${$itemlist_prefix.'m'}, $w, $dstart;
@@ -287,7 +308,7 @@ class calendar_plugin extends Plugin
 		// Set filter by collection:
 		$blog_ID = empty( $params['blog_ID'] ) ? NULL : $params['blog_ID'];
 
-		
+
 		if( empty( $params['cat_IDs'] ) )
 		{	// Use default categories filter:
 			$filter_cat_array = ( $Calendar->link_type == 'context' ) ? $cat_array : array();
@@ -460,7 +481,7 @@ class Calendar
 	var $context_isolation;
 
 	var $params = array( );
-	
+
 	/**
 	 * Prefix of the ItemList object
 	 * @var string
@@ -537,7 +558,7 @@ class Calendar
 		$this->monthformat = 'F Y';
 		$this->linktomontharchive = true;  // month displayed as link to month' archive
 
-		$this->tablestart = '<table class="bCalendarTable" cellspacing="0" summary="Monthly calendar with links to each day\'s posts">'."\n";
+		$this->tablestart = '<table class="bCalendarTable" title="Monthly calendar with links to each day\'s posts">'."\n";
 		$this->tableend = '</table>';
 
 		$this->monthstart = '<caption>';
@@ -552,7 +573,7 @@ class Calendar
 
 		$this->headerrowstart = '<thead><tr class="bCalendarRow">' . "\n";
 		$this->headerrowend = "</tr></thead>\n";
-		$this->headercellstart = '<th class="bCalendarHeaderCell" abbr="[abbr]" scope="col" title="[abbr]">';	// please leave [abbr] there !
+		$this->headercellstart = '<th class="bCalendarHeaderCell" scope="col" title="[abbr]">';	// please leave [abbr] there !
 		$this->headercellend = "</th>\n";
 
 		$this->cellstart = '<td class="bCalendarCell">';
@@ -783,36 +804,6 @@ class Calendar
 			echo $this->headerrowend;
 		}
 
-		// FOOTER :
-
-		if( $this->navigation == 'tfoot' )
-		{ // We want to display navigation in the table footer:
-			echo "<tfoot>\n";
-			echo "<tr>\n";
-			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->today_is_visible ).'" id="prev">';
-			echo implode( '&nbsp;', $this->getNavLinks( 'prev' ) );
-			echo "</td>\n";
-
-			if( $this->today_is_visible )
-			{
-				if( $this->mode == 'month' )
-				{
-					echo '<td class="pad">&nbsp;</td>'."\n";
-				}
-			}
-			else
-			{
-				echo '<td colspan="'.( $this->mode == 'month' ? '3' : '2' ).'" class="center">'
-							.$this->archive_link( T_('Current'), '', date('Y'), ( $this->mode == 'month' ? date('m') : NULL ) )
-							.'</td>';
-			}
-			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->today_is_visible ).'" id="next">';
-			echo implode( '&nbsp;', $this->getNavLinks( 'next' ) );
-			echo "</td>\n";
-			echo "</tr>\n";
-			echo "</tfoot>\n";
-		}
-
 		// REAL TABLE DATA :
 
 		echo '<tbody>'.$this->rowstart;
@@ -944,6 +935,36 @@ class Calendar
 
 		echo $this->rowend."</tbody>\n";
 
+		// FOOTER :
+
+		if( $this->navigation == 'tfoot' )
+		{ // We want to display navigation in the table footer:
+			echo "<tfoot>\n";
+			echo "<tr>\n";
+			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->today_is_visible ).'" id="prev">';
+			echo implode( '&nbsp;', $this->getNavLinks( 'prev' ) );
+			echo "</td>\n";
+
+			if( $this->today_is_visible )
+			{
+				if( $this->mode == 'month' )
+				{
+					echo '<td class="pad">&nbsp;</td>'."\n";
+				}
+			}
+			else
+			{
+				echo '<td colspan="'.( $this->mode == 'month' ? '3' : '2' ).'" class="center">'
+							.$this->archive_link( T_('Current'), '', date('Y'), ( $this->mode == 'month' ? date('m') : NULL ) )
+							.'</td>';
+			}
+			echo '<td colspan="'.( ( $this->mode == 'month' ? 2 : 1 ) + (int)$this->today_is_visible ).'" id="next">';
+			echo implode( '&nbsp;', $this->getNavLinks( 'next' ) );
+			echo "</td>\n";
+			echo "</tr>\n";
+			echo "</tfoot>\n";
+		}
+
 		echo $this->tableend;
 
 	}  // display(-)
@@ -965,7 +986,7 @@ class Calendar
 		/**
 		 * @var Blog
 		 */
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( $this->link_type == 'context' )
 		{	// We want to preserve context:

@@ -50,6 +50,7 @@ switch ( $action )
 					$User = $current_User;
 				}
 				$Settings->set( 'welcomepm_enabled', param( 'welcomepm_enabled', 'integer', 0 ) );
+				$Settings->set( 'welcomepm_notag', param( 'welcomepm_notag', 'integer', 0 ) );
 				$Settings->set( 'welcomepm_from', $User->login );
 				$Settings->set( 'welcomepm_title', param( 'welcomepm_title', 'string', true ) );
 				$Settings->set( 'welcomepm_message', param( 'welcomepm_message', 'text', true ) );
@@ -138,6 +139,8 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('Renderers'), '?ctrl=msgsettings&amp;tab=renderers' );
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'messaging-plugin-settings' );
+		// Initialize JS for color picker field on the edit plugin settings form:
+		init_colorpicker_js();
 		break;
 
 	default:

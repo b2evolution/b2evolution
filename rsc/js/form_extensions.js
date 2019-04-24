@@ -254,35 +254,28 @@ function focus_on_first_input()
 
 /**
  * Handle Combo Boxes
- * Display the input text when value is 'new'
+ * Display the input text when value is 'new'(first option to enter new value)
  * and hide the input text for all other values
  *
- * @param string ID of the select list
- * @param string value selected
- * @param string class name for the input text
+ * @param string|object jQuery selector or JavaScript object of the combo box <select> element
  */
-function check_combo( el_ID, value, class_name )
+function check_combo( selector )
 {
-	if( value == 'new' )
-	{	// Display the input text and focus on
+	var select_obj = jQuery( selector ),
+	input_obj = select_obj.next();
 
-		// Get the combo the input text
-		input_text = document.getElementById(el_ID+'_combo' );
-
-		// Display the input text
-		input_text.style.display = "inline";
-
- 		// Focus on the new input text
-		input_text.focus();
+	if( select_obj.find( 'option:first' ).is( ':selected' ) )
+	{	// Display the input text and focus on:
+		input_obj.show().focus();
+		if( select_obj.attr( 'required' ) == 'required' )
+		{	// Combo box is required, restore the appropriate attribute for input:
+			input_obj.attr( 'required', 'required' );
+		}
 	}
 	else
-	{ // Hide the input text
-
-		// Get the combo the input text
-		input_text = document.getElementById(el_ID+'_combo' );
-
-		// Hide the input text
-		input_text.style.display = "none";
+	{	// Hide the input text:
+		input_obj.hide();
+		input_obj.removeAttr( 'required' );
 	}
 }
 
@@ -350,4 +343,34 @@ function findTarget( e )
 		return null;
 
 	return target;
+}
+
+
+/**
+ * Add spinner to button
+ */
+function addSpinner( button )
+{
+	button = jQuery( button );
+	button.addClass( 'btn-spinner' );
+	button.css( 'width', '+=24px' );
+}
+
+
+/**
+ * Set custom validity of field based on input value length
+ * @param obj Input field
+ * @param integer mininum input value length
+ * @param string message to display if input value does not meet minimum length
+ */
+function checkInputLength( input, minLength, message )
+{
+	if( input.value.length < minLength )
+	{
+		input.setCustomValidity( message );
+	}
+	else
+	{
+		input.setCustomValidity( '' );
+	}
 }

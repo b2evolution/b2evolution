@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -32,7 +32,7 @@ if( ! $creating )
 {
 	$Form->global_icon( T_('Delete this goal!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb( 'goal' ) ) );
 }
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform', $creating ?  T_('New goal') : T_('Goal') );
 
@@ -77,7 +77,7 @@ else
 }
 
 ?>
-<script type="text/javascript">
+<script>
 function check_goal_redir_url_required()
 {
 	if( jQuery( '#goal_temp_redir_url' ).val() == '' )

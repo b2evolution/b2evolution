@@ -2,6 +2,10 @@
  * Server communication functions - Ajax without the pain
  * b2evolution - http://b2evolution.net/
  * @author yabs {@link http://innervisions.org.uk/ }
+ *
+ * This file is used to work with modal/popup windows for example on widgets
+ * and antispam controllers, to execute some JS code after AJAX request is done.
+ * For more details see using of php function send_javascript_message().
  */
 
 
@@ -310,7 +314,7 @@ var _b2evoCommunications = function()
 				{ // we have some data
 					params.url += '&'+params.data;
 				}
-				var script = jQuery( '<script type="text/javascript"></script>' );
+				var script = jQuery( '<script></script>' );
 				script.attr( 'src', params.url );
 				script.load( params.ok() );
 				script.error( params.error() );

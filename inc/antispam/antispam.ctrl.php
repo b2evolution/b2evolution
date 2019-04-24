@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004 by Vegar BERG GULDAL - {@link http://funky-m.com/}.
  *
  * @package admin
@@ -33,7 +33,14 @@ param( 'confirm', 'string' );
 param( 'keyword', 'string', '', true );
 param( 'domain', 'string' );
 param( 'filteron', 'string', '', true );
-param( 'filter', 'array:string', array() );
+if( $action == 'iprange_edit' )
+{	// Memorize action for users and sessions list below edit form:
+	memorize_param( 'action', 'string', '', $action );
+}
+else
+{	// Don't initialize this param as array because it must be string for UserList:
+	param( 'filter', 'array:string', array() );
+}
 
 $tab = param( 'tab', 'string', '', true );
 $tab3 = param( 'tab3', 'string', '', true );
@@ -46,8 +53,11 @@ if( isset($filter['off']) )
 }
 
 // Check permission:
-$current_User->check_perm( 'options', 'view', true );
-$current_User->check_perm( 'spamblacklist', 'view', true );
+if( ! ( $current_User->check_perm( 'admin', 'normal' ) && $current_User->check_perm( 'spamblacklist', 'view' ) ) &&
+		! ( $current_User->check_perm( 'users', 'moderate' ) && ( ( $tab3 == 'tools' && $tool == 'whois' && empty( $action ) ) || $action == 'whois' ) ) )
+{
+	debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name ) );
+}
 
 
 if( param( 'iprange_ID', 'integer', '', true) )
@@ -105,7 +115,7 @@ switch( $action )
 												WHERE hit_referer LIKE '.$DB->quote( '%'.$keyword.'%' ),
 												'Delete all banned hit-log entries' );
 
-			$Messages->add( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success' );
+			$Messages->add_to_group( sprintf( T_('Deleted %d logged hits matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 		}
 
 		if( $delcomments )
@@ -115,7 +125,7 @@ switch( $action )
 							OR comment_author_email LIKE '.$DB->quote( '%'.utf8_strtolower( $keyword ).'%' ).'
 							OR comment_author_url LIKE '.$DB->quote( '%'.$keyword.'%' ).'
 							OR comment_content LIKE '.$DB->quote( '%'.$keyword.'%' ).')';
-			// asimo> we don't need transaction here 
+			// asimo> we don't need transaction here
 			$query = 'SELECT comment_ID FROM T_comments
 							WHERE '.$keyword_cond.$del_condition;
 			$deleted_ids = $DB->get_col( $query, 0, 'Get comment ids awaiting for delete' );
@@ -123,16 +133,16 @@ switch( $action )
 			$deleted_ids = implode( ',', $deleted_ids );
 
 			// Delete all comments data from DB
-			Comment::db_delete_where( 'Comment', $keyword_cond.$del_condition );
+			Comment::db_delete_where( $keyword_cond.$del_condition );
 
-			$Messages->add( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success' );
+			$Messages->add_to_group( sprintf( T_('Deleted %d comments matching &laquo;%s&raquo;.'), $r, htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 		}
 
 		if( $blacklist_locally )
 		{ // Local blacklist:
 			if( antispam_create( $keyword ) )
 			{ // Success
-				$Messages->add( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars( $keyword ) ), 'success' );
+				$Messages->add_to_group( sprintf( T_('The keyword &laquo;%s&raquo; has been blacklisted locally.'), htmlspecialchars( $keyword ) ), 'success', T_('Banning keyword:') );
 			}
 			else
 			{ // Failed
@@ -157,23 +167,14 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 
-		if( $Messages->has_errors() )
-		{ // Reset js display mode in order to display a correct view after confirmation
-			$display_mode = '';
-			$mode = '';
-		}
-
-		param( 'request', 'string', '' );
-		if( $display_mode == 'js' && $request != 'checkban' )
-		{
+		if( $display_mode == 'js' && ! $Messages->has_errors() )
+		{	// Initialize JS functions to execute after action from modal window:
+			$javascript_messages = array();
 			if( $delcomments && $r ) // $r not null => means the commentlist was deleted successfully
 			{
-				send_javascript_message( array( 'refreshAfterBan' => array( $deleted_ids ), 'closeModalWindow' => array() ), true );
+				$javascript_messages['refreshAfterBan'] = array( $deleted_ids );
 			}
-			else
-			{
-				send_javascript_message( array( 'closeModalWindow' => array() ), true );
-			}
+			$javascript_messages['closeModalAfterBan'] = array();
 		}
 
 		// We'll ask the user later what to do, if no "sub-action" given.
@@ -239,6 +240,9 @@ switch( $action )
 		param_integer_range( 'antispam_threshold_delete', -100, 100, T_('The threshold must be between -100 and 100.') );
 		$Settings->set( 'antispam_threshold_delete', $antispam_threshold_delete );
 
+		param( 'antispam_block_contact_form', 'integer', 0 );
+		$Settings->set( 'antispam_block_contact_form', $antispam_block_contact_form );
+
 		param( 'antispam_block_spam_referers', 'integer', 0 );
 		$Settings->set( 'antispam_block_spam_referers', $antispam_block_spam_referers );
 
@@ -296,7 +300,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
+		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
 		$rows_affected = 0;
 
@@ -331,7 +335,7 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
-		$keywords = $DB->get_col('SELECT aspm_string FROM T_antispam');
+		$keywords = $DB->get_col( 'SELECT askw_string FROM T_antispam__keyword' );
 		$keywords = array_chunk( $keywords, 100 );
 		$rows_affected = 0;
 
@@ -375,7 +379,7 @@ switch( $action )
 			$Messages->add( T_('New IP Range created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges', 303 ); // Will EXIT
+			header_redirect( '?ctrl=antispam&tab3=ipranges&iprange_ID='.$edited_IPRange->ID.'&action=iprange_edit&filter=new', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'iprange_new';
@@ -401,7 +405,7 @@ switch( $action )
 			$Messages->add( T_('IP Range updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges', 303 ); // Will EXIT
+			header_redirect( '?ctrl=antispam&tab='.$tab.'&tab3=ipranges&iprange_ID='.$edited_IPRange->ID.'&action=iprange_edit', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'iprange_edit';
@@ -452,6 +456,21 @@ switch( $action )
 			@ini_set( 'output_buffering', 'off' );
 			// Set this to start deleting in the template file
 			$delete_bankruptcy_blogs = true;
+		}
+		break;
+
+	case 'whois':
+		$tab = '';
+		$tab3 = 'tools';
+		$tool = 'whois';
+		$query = param( 'query', 'string', NULL );
+		if( empty( $query ) )
+		{
+			param_error( 'query', T_('You must specify an IP address or domain to query') );
+		}
+		else
+		{
+			$template_action = 'whois';
 		}
 		break;
 }
@@ -529,6 +548,7 @@ if( $display_mode != 'js' )
 			// Set an url for manual page:
 			if( $action == 'iprange_new' || $action == 'iprange_edit' )
 			{
+				init_tokeninput_js();
 				$AdminUI->set_page_manual_link( 'ip-range-editing' );
 			}
 			else
@@ -545,6 +565,8 @@ if( $display_mode != 'js' )
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'countries-list' );
+
+			$AdminUI->breadcrumbpath_add( T_('Countries'), '?ctrl=antispam&amp;tab3='.$tab3 );
 			break;
 
 		case 'domains':
@@ -569,16 +591,23 @@ if( $display_mode != 'js' )
 	{
 		$AdminUI->append_path_level( $tab3 );
 	}
-
-	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
-	$AdminUI->disp_html_head();
-	
-	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-	$AdminUI->disp_body_top();
-
-	// Begin payload block:
-	$AdminUI->disp_payload_begin();
 }
+
+if( in_array( $action, array( 'iprange_edit' ) ) )
+{ // Initialize date picker
+	init_datepicker_js();
+	// Load jQuery QueryBuilder plugin files for user list filters:
+	init_querybuilder_js( 'rsc_url' );
+}
+
+// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
+$AdminUI->disp_html_head();
+
+// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
+$AdminUI->disp_body_top();
+
+// Begin payload block:
+$AdminUI->disp_payload_begin();
 
 switch( $tab3 )
 {
@@ -588,13 +617,20 @@ switch( $tab3 )
 
 	case 'tools':
 		// Check permission:
-		$current_User->check_perm( 'options', 'edit', true );
+		if( $tool != 'whois' )
+		{
+			$current_User->check_perm( 'options', 'edit', true );
+		}
 
 		switch( $tool )
 		{
 			case 'bankruptcy':
 				$comment_status = param( 'comment_status', 'string', 'draft' );
 				$AdminUI->disp_view( 'antispam/views/_antispam_tools_bankruptcy.view.php' );
+				break;
+
+			case 'whois';
+				$AdminUI->disp_view( 'antispam/views/_antispam_whois.view.php' );
 				break;
 
 			default:
@@ -613,11 +649,24 @@ switch( $tab3 )
 				}
 				// Set IP Start and End from _GET request
 				$ip = param( 'ip', 'string', '' );
+				$ip_start = param( 'ip_start', 'string', '' );
+				$ip_end = param( 'ip_end', 'string', '' );
 				if( ! empty( $ip ) && is_valid_ip_format( $ip ) &&
 				    ( $ip = explode( '.', $ip ) ) && count( $ip ) == 4 )
-				{
+				{	// Prefill from single IP address:
 					$edited_IPRange->set( 'IPv4start', ip2int( implode( '.', array( $ip[0], $ip[1], $ip[2], 0 ) ) ) );
 					$edited_IPRange->set( 'IPv4end', ip2int( implode( '.', array( $ip[0], $ip[1], $ip[2], 255 ) ) ) );
+				}
+				else
+				{	// Prefill from start and end IP addresses:
+					if( ! empty( $ip_start ) && is_valid_ip_format( $ip_start ) )
+					{
+						$edited_IPRange->set( 'IPv4start', ip2int( $ip_start ) );
+					}
+					if( ! empty( $ip_end ) && is_valid_ip_format( $ip_end ) )
+					{
+						$edited_IPRange->set( 'IPv4end', ip2int( $ip_end ) );
+					}
 				}
 				$AdminUI->disp_view( 'antispam/views/_antispam_ipranges.form.php' );
 				break;
@@ -642,6 +691,11 @@ switch( $tab3 )
 
 	case 'blacklist':
 	default:
+		if( ! empty( $javascript_messages ) )
+		{	// Don't display form and list when we should update a content from modal window by JS:
+			break;
+		}
+
 		if( $action == 'ban' && ( ! $Messages->has_errors() || ! empty( $confirm ) ) && !( $delhits || $delcomments ) )
 		{	// Nothing to do, ask user:
 			$AdminUI->disp_view( 'antispam/views/_antispam_ban.form.php' );
@@ -654,12 +708,14 @@ switch( $tab3 )
 }
 
 // End payload block:
-if( $display_mode != 'js')
-{
-	$AdminUI->disp_payload_end();
+$AdminUI->disp_payload_end();
 
-	// Display body bottom, debug info and close </html>:
-	$AdminUI->disp_global_footer();
+// Display body bottom, debug info and close </html>:
+$AdminUI->disp_global_footer();
+
+
+if( ! empty( $javascript_messages ) )
+{	// Execute JS functions after action from modal window:
+	send_javascript_message( $javascript_messages, true, 'window.parent' );
 }
-
 ?>

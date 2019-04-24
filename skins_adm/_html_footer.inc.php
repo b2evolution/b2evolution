@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -40,7 +40,7 @@ if( $this->get_path(0) == 'files'
 	|| $this->get_path_range(0,1) == array( 'blogs', 'permgroup' ) )
 { // init checkall JS functions
 	?>
-	<script type="text/javascript">
+	<script>
 		initcheckall();
 		<?php
 		if( $this->get_path(0) == 'files' )

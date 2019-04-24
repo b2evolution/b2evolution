@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -18,7 +18,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Default params:
 $params = array_merge( array(
 		'comment_template'        => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
-		'author_link_text'        => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'        => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'                 => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'display_comment_avatar'  => true,
 		'comment_avatar_position' => 'before_title', // 'before_title', 'before_text'
@@ -41,11 +41,13 @@ $params = array_merge( array(
 	), $params );
 
 
+global $CommentList;
+
 $CommentList = new CommentList2( $Blog );
 
 // Filter list:
 $CommentList->set_filters( array(
-		'types'    => array( 'comment', 'trackback', 'pingback' ),
+		'types'    => array( 'comment', 'trackback', 'pingback', 'webmention' ),
 		'statuses' => get_inskin_statuses( $Blog->ID, 'comment' ),
 		'order'    => 'DESC',
 		'comments' => $Blog->get_setting( 'latest_comments_num' ),
@@ -53,9 +55,6 @@ $CommentList->set_filters( array(
 		// 'timestamp_min' => $Blog->get_timestamp_min(),
 		// 'timestamp_max' => $Blog->get_timestamp_max(),
 	) );
-
-// Run SQL query to get results depending on current filters:
-$CommentList->query();
 
 // Get ready for display (runs the query):
 $CommentList->display_init();

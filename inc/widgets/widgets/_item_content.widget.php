@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_content_Widget extends ComponentWidget
 {
+	var $icon = 'file-text';
+
 	/**
 	 * Constructor
 	 */
@@ -101,7 +103,32 @@ class item_content_Widget extends ComponentWidget
 				)
 			), parent::get_param_definitions( $params ) );
 
+		if( isset( $r['allow_blockcache'] ) )
+		{	// Disable "allow blockcache" because item content may includes other items by inline tags like [inline:item-slug]:
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
+
 		return $r;
+	}
+
+
+	/**
+	 * Prepare display params
+	 *
+	 * @param array MUST contain at least the basic display params
+	 */
+	function init_display( $params )
+	{
+		global $preview;
+
+		parent::init_display( $params );
+
+		if( $preview )
+		{	// Disable block caching for this widget when item is previewed currently:
+			$this->disp_params['allow_blockcache'] = 0;
+		}
 	}
 
 
@@ -112,6 +139,13 @@ class item_content_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		global $Item;
+
+		if( empty( $Item ) )
+		{	// Don't display this widget when no Item object:
+			return false;
+		}
+
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( array(
@@ -148,23 +182,6 @@ class item_content_Widget extends ComponentWidget
 		echo $this->disp_params['block_end'];
 
 		return true;
-	}
-
-
-	/**
-	 * Maybe be overriden by some widgets, depending on what THEY depend on..
-	 *
-	 * @return array of keys this widget depends on
-	 */
-	function get_cache_keys()
-	{
-		global $Blog;
-
-		return array(
-				'wi_ID'        => $this->ID, // Have the widget settings changed ?
-				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
-				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-			);
 	}
 }
 

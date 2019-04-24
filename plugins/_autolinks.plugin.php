@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -28,7 +28,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 63;
-	var $version = '5.0.0';
+	var $version = '6.11.1';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -64,6 +64,22 @@ class autolinks_plugin extends Plugin
 	var $previous_used = false;
 
 	var $already_linked_usernames;
+
+	/**
+	 * Array of tags used for current collection
+	 *
+	 * @var array
+	 */
+	var $tags_array = NULL;
+
+	var $already_linked_tags = NULL;
+
+	/**
+	 * Current Blog
+	 *
+	 * @var object
+	 */
+	var $current_Blog = NULL;
 
 	/**
 	 * Init
@@ -155,6 +171,7 @@ class autolinks_plugin extends Plugin
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_values = array(
+				'autolink_tag'                       => 0,
 				'autolink_post_nofollow_exist'       => 0,
 				'autolink_post_nofollow_explicit'    => 0,
 				'autolink_post_nofollow_auto'        => 0,
@@ -179,6 +196,12 @@ class autolinks_plugin extends Plugin
 		$default_params = array_merge( $params, array( 'default_comment_rendering' => 'stealth' ) );
 		return array_merge( parent::get_coll_setting_definitions( $default_params ),
 			array(
+				'autolink_tag' => array(
+						'label' => T_( 'Autolink tags' ),
+						'type' => 'checkbox',
+						'note' => $this->T_( 'Find text matching tags of the current collection and autolink them to the tag page in the current collection' ),
+						'defaultvalue' => $default_values['autolink_tag'],
+					),
 				// No follow in posts
 				'autolink_post_nofollow_exist' => array(
 						'label' => T_( 'No follow in posts' ),
@@ -327,11 +350,11 @@ class autolinks_plugin extends Plugin
 		if( !isset($this->link_array[$coll_ID]) )
 		{	// This blog is not loaded yet:
 			$this->link_array[$coll_ID] = array();
-			$text = $this->setting_autolink_defs_coll_db;
-			if( !empty($text) )
-			{	// Load local user defintions:
-				$this->read_textfield( $text, $coll_ID );
-			}
+		}
+		$text = $this->setting_autolink_defs_coll_db;
+		if( ! empty( $text ) )
+		{	// Load local user defintions:
+			$this->read_textfield( $text, $coll_ID );
 		}
 
 		// Prepare working link array:
@@ -422,30 +445,29 @@ class autolinks_plugin extends Plugin
 	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
-		$Item = & $params['Item'];
-		/**
-		 * @var Blog
-		 */
-		$item_Blog = $params['Item']->get_Blog();
+
+		// Get collection from given params (also it is used to build link for tag links):
+		$this->current_Blog = $this->get_Blog_from_params( $params );
 
 		// Define the setting names depending on what is rendering now
 		if( !empty( $params['Comment'] ) )
 		{	// Comment is rendering
-			$this->setting_nofollow_exist = $this->get_coll_setting( 'autolink_comment_nofollow_exist', $item_Blog );
-			$this->setting_nofollow_explicit = $this->get_coll_setting( 'autolink_comment_nofollow_explicit', $item_Blog );
-			$this->setting_nofollow_auto = $this->get_coll_setting( 'autolink_comment_nofollow_auto', $item_Blog );
+			$this->setting_nofollow_exist = $this->get_coll_setting( 'autolink_comment_nofollow_exist', $this->current_Blog );
+			$this->setting_nofollow_explicit = $this->get_coll_setting( 'autolink_comment_nofollow_explicit', $this->current_Blog );
+			$this->setting_nofollow_auto = $this->get_coll_setting( 'autolink_comment_nofollow_auto', $this->current_Blog );
 		}
 		else
 		{	// Item is rendering
-			$this->setting_nofollow_exist = $this->get_coll_setting( 'autolink_post_nofollow_exist', $item_Blog );
-			$this->setting_nofollow_explicit = $this->get_coll_setting( 'autolink_post_nofollow_explicit', $item_Blog );
-			$this->setting_nofollow_auto = $this->get_coll_setting( 'autolink_post_nofollow_auto', $item_Blog );
+			$this->setting_nofollow_exist = $this->get_coll_setting( 'autolink_post_nofollow_exist', $this->current_Blog );
+			$this->setting_nofollow_explicit = $this->get_coll_setting( 'autolink_post_nofollow_explicit', $this->current_Blog );
+			$this->setting_nofollow_auto = $this->get_coll_setting( 'autolink_post_nofollow_auto', $this->current_Blog );
 		}
 
-		$this->setting_autolink_defs_coll_db = $this->get_coll_setting( 'autolink_defs_coll_db', $item_Blog );
-		$this->setting_autolink_username = $this->get_coll_setting( 'autolink_username', $item_Blog );
+		$this->setting_autolink_defs_coll_db = $this->get_coll_setting( 'autolink_defs_coll_db', $this->current_Blog );
+		$this->setting_autolink_username = $this->get_coll_setting( 'autolink_username', $this->current_Blog );
+		$this->setting_autolink_tag = $this->get_coll_setting( 'autolink_tag', $this->current_Blog );
 
-		return $this->render_content( $content, $item_Blog );
+		return $this->render_content( $content, $this->current_Blog );
 	}
 
 
@@ -466,6 +488,7 @@ class autolinks_plugin extends Plugin
 		$this->setting_nofollow_auto = $this->get_msg_setting( 'autolink_nofollow_auto' );
 		$this->setting_autolink_defs_coll_db = $this->get_msg_setting( 'autolink_defs_coll_db' );
 		$this->setting_autolink_username = $this->get_msg_setting( 'autolink_username' );
+		$this->setting_autolink_tag = false;
 
 		return $this->render_content( $content );
 	}
@@ -488,6 +511,7 @@ class autolinks_plugin extends Plugin
 		$this->setting_nofollow_auto = $this->get_email_setting( 'autolink_nofollow_auto' );
 		$this->setting_autolink_defs_coll_db = $this->get_email_setting( 'autolink_defs_coll_db' );
 		$this->setting_autolink_username = $this->get_email_setting( 'autolink_username' );
+		$this->setting_autolink_tag = false;
 
 		return $this->render_content( $content );
 	}
@@ -502,18 +526,19 @@ class autolinks_plugin extends Plugin
 	 */
 	function render_content( & $content, $item_Blog = NULL )
 	{
-		// Prepare existing links
+		// Prepare existing links:
 		$content = $this->prepare_existing_links( $content );
 
-		// reset already linked usernames
+		// Reset already linked usernames:
 		$this->already_linked_usernames = array();
-		if( $this->setting_autolink_username )
-		{	// Replace @usernames with user identity link:
-			$content = replace_content_outcode( '#@([A-Za-z0-9_.]+)#i', '@', $content, array( $this, 'replace_usernames' ) );
-		}
 
-		// load global defs
+		// Load global defs:
 		$this->load_link_array( $item_Blog );
+
+		// Load all tags of current collection:
+		$this->load_tags_array( $item_Blog, $content );
+		// Reset already linked tags:
+		$this->already_linked_tags = array();
 
 		// reset already linked:
 		$this->already_linked_array = array();
@@ -530,12 +555,12 @@ class autolinks_plugin extends Plugin
 
 		if( $this->Settings->get( 'autolink_urls' ) )
 		{	// First, make the URLs clickable:
-			$content = make_clickable( $content, '&amp;', 'make_clickable_callback', $link_attrs );
+			$content = make_clickable( $content, '&amp;', 'make_clickable_callback', $link_attrs, true );
 		}
 
-		if( !empty( $this->replacement_link_array ) )
+		if( ! empty( $this->replacement_link_array ) )
 		{	// Make the desired remaining terms/definitions clickable:
-			$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ), $link_attrs );
+			$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ), $link_attrs, true );
 		}
 
 		return true;
@@ -592,11 +617,17 @@ class autolinks_plugin extends Plugin
 		$text_contains_replacement = ( count( array_intersect( $text_words, array_keys( $this->replacement_link_array ) ) ) > 0 );
 		if( $text_contains_replacement )
 		{ // Find word with 3 characters at least:
-			$text = preg_replace_callback( '#(^|\s|[(),;\[{/])([@\p{L}0-9_\-]{3,})([\.,:;!\?\]\)}/]?)#i'.$regexp_modifier, array( & $this, 'replace_callback' ), $text );
+			$text = preg_replace_callback( '#(^|\s|[(),;\'\"\[{/])([@\p{L}0-9_\-\.]{3,})([\.,:;!\'\"\?\]\)}/]?)#i'.$regexp_modifier, array( & $this, 'replace_callback' ), $text );
 		}
 
 		// Cleanup words to be deleted:
 		$text = preg_replace( '/[@\p{L}0-9_\-]+\s*==!#DEL#!==/i'.$regexp_modifier, '', $text );
+
+		// Replace @usernames with user identity link:
+		$text = replace_content_outcode( '#@([A-Za-z0-9_.]+)#i', '@', $text, array( $this, 'replace_usernames' ) );
+
+		// Make tag names clickable:
+		$text = $this->replace_tags( $text );
 
 		return $text;
 	}
@@ -612,7 +643,7 @@ class autolinks_plugin extends Plugin
 	 */
 	function replace_callback( $matches )
 	{
-		global $Blog;
+		global $disp, $Item;
 
 		$link_attrs = '';
 		if( $this->setting_nofollow_auto )
@@ -660,6 +691,13 @@ class autolinks_plugin extends Plugin
 				$this->previous_word = $word.$after_word;
 				$this->previous_lword = $lword.$after_word;
 				$this->previous_used = false;
+				return $r;
+			}
+
+			if( ( $disp == 'single' || $disp == 'page' ) &&
+			    isset( $Item ) &&
+			    $Item->get_permanent_url() == $url )
+			{	// Do not make a link to same permalink URL of the current Item:
 				return $r;
 			}
 
@@ -730,17 +768,13 @@ class autolinks_plugin extends Plugin
 	 */
 	function replace_usernames( $content, $search_list, $replace_list )
 	{
-		global $Blog;
-
-		if( empty( $Blog ) )
-		{	// No Blog, Exit here
+		if( empty( $this->setting_autolink_username ) )
+		{	// No data to correct username linking, Exit here:
 			return $content;
 		}
 
 		if( preg_match_all( $search_list, $content, $user_matches ) )
 		{
-			$blog_url = $Blog->gen_blogurl();
-
 			// Add this for rel attribute in order to activate bubbletips on usernames
 			$link_attr_rel = 'bubbletip_user_%user_ID%';
 
@@ -764,12 +798,107 @@ class autolinks_plugin extends Plugin
 					if( $User = & $UserCache->get_by_login( $username ) )
 					{	// Replace @usernames
 						$user_link_attrs = str_replace( '%user_ID%', $User->ID, $link_attrs );
-						$user_link = '<a href="'.$Blog->get( 'userurl', array( 'url_suffix' => 'user_ID='.$User->ID ) ).'"'.$user_link_attrs.'>'.$user_matches[0][ $u ].'</a>';
+						$user_link = '<a href="'.$User->get_userpage_url().'"'.$user_link_attrs.'>'.$user_matches[0][ $u ].'</a>';
 						$content = preg_replace( '#'.$user_matches[0][ $u ].'#', $user_link, $content, 1 );
 						$this->already_linked_usernames[] = $user_matches[1][ $u ];
 					}
 				}
 			}
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Load tags array of collection
+	 *
+	 * @param object Blog
+	 */
+	function load_tags_array( $Blog )
+	{
+		if( empty( $this->setting_autolink_tag ) )
+		{	// Don't load tags because it is not required by current settings:
+			return;
+		}
+
+		if( is_array( $this->tags_array ) )
+		{	// The tags array is already initialized, Don't do this twice, Exit here:
+			return;
+		}
+
+		// Get all tags from published posts of the requested collection:
+		$coll_tags = get_tags( $Blog->ID );
+
+		$this->tags_array = array();
+		foreach( $coll_tags as $coll_tag )
+		{
+			$this->tags_array[] = $coll_tag->tag_name;
+		}
+	}
+
+
+	/**
+	 * Replace tag names with link to filter posts by the tag
+	 *
+	 * @param string Content
+	 * @return string Content
+	 */
+	function replace_tags( $content )
+	{
+		if( empty( $this->setting_autolink_tag ) || empty( $this->tags_array ) || empty( $this->current_Blog ) )
+		{	// No data to correct tag linking, Exit here:
+			return $content;
+		}
+
+		$new_linked_tags = array();
+		$tag_search_patterns = array();
+		$tag_replace_strings = array();
+		foreach( $this->tags_array as $tag_name )
+		{
+			if( in_array( $tag_name, $this->already_linked_tags ) )
+			{	// Skip this tag because it has been already linked before:
+				continue;
+			}
+			if( stristr( $content, $tag_name ) !== false )
+			{	// Replace tag name with its link if it is found in text:
+				$tag_search_patterns[] = '#(^|\W)('.preg_quote( $tag_name, '#' ).')(\W|$)#iu';
+				$tag_replace_strings[] = '$1'.$this->current_Blog->get_tag_link( $tag_name, "$2" ).'$3';
+				// Mark this tag as linked and don't link it twice:
+				$new_linked_tags[] = $tag_name;
+			}
+		}
+
+		if( count( $tag_search_patterns ) )
+		{	// Do replacement if at least one tag is found in content:
+			if( stristr( $content, '<a' ) !== false )
+			{	// Don't link tags in body of already existing links:
+				$content = callback_on_non_matching_blocks( $content, '~<a[^>]*>.*?</a>~is',
+					'replace_content', array( $tag_search_patterns, $tag_replace_strings, 'preg', 1 ) );
+			}
+			else
+			{	// Replace in whole content:
+				$content = replace_content( $content, $tag_search_patterns, $tag_replace_strings, 'preg', 1 );
+			}
+		}
+
+		foreach( $new_linked_tags as $n => $new_linked_tag )
+		{
+			if( stristr( $content, $new_linked_tag.'</a>' ) === false )
+			{	// This tag was not linked really in this call, Skip it:
+				// It may happens when one tag is a substring of other tag, Example:
+				//     - First tag is "long tag"
+				//     - Second tag is "test long tag name"
+				//     - $text = "1 test long tag name 2"
+				//     So we should not mark the second as linked because only the first tag is linked only first time,
+				//     and we should keep the second tag for other strings.
+				unset( $new_linked_tags[ $n ] );
+			}
+		}
+
+		if( count( $new_linked_tags ) )
+		{	// Append new linked tags to skip them in next times:
+			$this->already_linked_tags = array_merge( $this->already_linked_tags, $new_linked_tags );
 		}
 
 		return $content;

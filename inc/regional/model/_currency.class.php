@@ -77,6 +77,17 @@ class Currency extends DataObject
 		param_check_regexp( 'curr_code', '#^[A-Za-z]{3}$#', T_('Currency code must be 3 letters.') );
 		$this->set_from_Request( 'code', 'curr_code', true  );
 
+		if( ! param_errors_detected() )
+		{	// Check currency code for duplicating:
+			$existing_curr_ID = $this->dbexists( 'curr_code', $this->get( 'code' ) );
+			if( $existing_curr_ID )
+			{	// We have a duplicate currency:
+				param_error( 'curr_code',
+					sprintf( T_('This currency already exists. Do you want to <a %s>edit the existing currency</a>?'),
+						'href="?ctrl=currencies&amp;action=edit&amp;curr_ID='.$existing_curr_ID.'"' ) );
+			}
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -107,24 +118,6 @@ class Currency extends DataObject
 
 
 	/**
-	 * Check existence of specified currency code in curr_code unique field.
-	 *
-	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
-	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
-	 * @return int ID if currency code exists otherwise NULL/false
-	 */
-	function dbexists( $unique_fields = 'curr_code', $values = NULL )
-	{
-		if( is_null( $values ) )
-		{
-			$values = $this->code;
-		}
-
-		return parent::dbexists( $unique_fields, $values );
-	}
-
-
-	/**
 	 * Get currency unique name (code).
 	 *
 	 * @return string currency code
@@ -140,7 +133,9 @@ class Currency extends DataObject
 	 * Use when try to delete a currencie
 	 *
 	 * @param array restriction array
-	 * @return string link to currency's countries
+	 * @return string|boolean Message with link to objects(currency's countries),
+	 *                        Empty string if no restriction for current table,
+	 *                        FALSE - if no rule for current table
 	 */
 	function get_restriction_link( $restriction )
 	{

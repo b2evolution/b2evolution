@@ -28,17 +28,12 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
  *
  * @todo move to admin interface (T_basedomains list editor), but use for upgrading
  * @todo handle multiple blog roots.
- * @todo If $basehost already begins with "www.", the pure domain will not
- *       be counted as a self referrer. Possible solution: Strip the "www."
- *       from $basehost - for "www.example.com" this would give "://example.com"
- *       and "://www.example.com", which would be correct (currently it
- *       gives "://www.example.com" and "://www.www.example.com").
  *
  * @global array
  */
 $self_referer_list = array(
 	'://'.$basehost,			// This line will match all pages from the host of your $baseurl
-	'://www.'.$basehost,	// This line will also match www.you_base_host in case you have no www. on your basehost
+	'://www.'.$basehost,		// This line will also match www.you_base_host because any "www." will have been stripped away from your basehost
 	'http://localhost',
 	'http://127.0.0.1',
 );
@@ -284,7 +279,8 @@ $referer_type_color = array(
 	'direct'  => '00FFCC',
 	'spam'    => 'FF0000',
 	'self'    => '00FF99',
-	'admin'   => '999999'
+	'admin'   => '999999',
+	'ajax'    => '339966',
 	);
 
 $agent_type_array = array (
@@ -319,7 +315,8 @@ $hit_type_color = array(
 	'admin'            => 'AAE0E0',
 	'standard_robot'   => 'FF9900',
 	'standard_browser' => 'FFCC00',
-	'api'              => '5BC0DE'
+	'api'              => '5BC0DE',
+	'unknown'          => 'CCCCCC',
 );
 
 $hit_method_color = array(
@@ -340,6 +337,12 @@ $user_gender_color = array(
 	'nogender_active'    => '666666',
 	'nogender_notactive' => '999999',
 	'nogender_closed'    => 'cccccc'
+);
+
+$activity_type_color = array(
+	'users'     => 'FF9900',
+	'posts'    => '6699CC',
+	'comments' => '5BC0DE'
 );
 
 ?>

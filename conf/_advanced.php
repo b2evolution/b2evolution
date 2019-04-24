@@ -9,6 +9,7 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+
 /**
  * Display debugging informations?
  *
@@ -34,8 +35,8 @@ $debug_jslog = 'pwd';
  */
 $debug_pwd = '';
 
-// Most of the time you'll want to see all errors, including notices:
-// b2evo should run without any notices! (plugins too!)
+// Most of the time you'll want to see all errors, including notices, to alert you on potential issues:
+// b2evo should run without any notices! (same for plugins!)
 error_reporting( E_ALL | E_STRICT );
 /**
  * Do we want to display errors, even when not in debug mode?
@@ -57,9 +58,9 @@ $dev_menu = 0;
 
 
 // If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
-// The default is 8 MB (in PHP < 5.2) and 128 MB (in PHP > 5.2)
+// The default is 128 MB (in PHP > 5.2)
 // Try uncommmenting the following line:
-// ini_set( 'memory_limit', '128M' );
+// @ini_set( 'memory_limit', '128M' );
 
 
 /**
@@ -77,17 +78,20 @@ $log_app_errors = 1;
 
 
 /**
- * Allows to force a timezone if PHP>=5.1
+ * Allows to force the timezone used by PHP (in case it's not properly configured in php.ini)
  * See: http://b2evolution.net/man/date_default_timezone-forcing-a-timezone
  */
 $date_default_timezone = '';
 
+
 /**
- * Thumbnail size definitions.
+ * Thumbnail/Image sizes
  *
- * NOTE: this gets used for general resizing, too. E.g. in the coll_avatar_Widget.
+ * This is used for resizing images to various sizes
  *
- * type, width, height, quality, percent of blur effect
+ * For each size: name => array( type, width, height, quality, percent of blur effect )
+ *
+ * @global array
  */
 $thumbnail_sizes = array(
 			'fit-1280x720' => array( 'fit', 1280, 720, 85 ),
@@ -130,6 +134,7 @@ $thumbnail_sizes = array(
  *  - Do not allow update of files in the file manager
  *  - Do not allow changes to the 'demouser' and 'admin' account/group
  *  - Blog media directories can only be configured to be inside of {@link $media_path}
+ *
  * @global boolean Default: false
  */
 $demo_mode = false;
@@ -140,7 +145,7 @@ $demo_mode = false;
  *
  * @global boolean
  */
-$test_install_all_features = false;
+$allow_install_test_features = false;
 
 
 /**
@@ -152,52 +157,33 @@ $home_url = $baseurl;
 
 
 /**
- * Comments: Set this to 1 to require e-mail and name, or 0 to allow comments
- * without e-mail/name.
- * @global boolean $require_name_email
- */
-$require_name_email = 1;
-
-/**
- * Minimum interval (in seconds) between consecutive comments from same IP.
- * @global int $minimum_comment_interval
- */
-$minimum_comment_interval = 30;
-
-
-/**
- * Check antispam blacklist for private messages.
- *
- * Do you want to check the antispam blocklist when a message form is submitted?
- *
- * @global boolean $antispam_on_message_form
- */
-$antispam_on_message_form = 1;
-
-
-/**
  * By default images get copied into b2evo cache without resampling if they are smaller
  * than requested thumbnails.
  *
- * Althought, if you want to use the BeforeThumbCreate event (Watermark plugin),
- * this should be set to 'true' in order to process smaller images.
+ * If you want to use the BeforeThumbCreate event (Watermark plugin), this should be set to 'true'
+ * to make sure that smaller images are also processed.
  *
  * @global boolean Default: false
  */
 $resample_all_images = false;
 
 
-// Get hostname out of baseurl
+// Decompose the baseurl
 // YOU SHOULD NOT EDIT THIS unless you know what you're doing
-if( preg_match( '#^(https?://(.+?)(:(.+?))?)(/.*)$#', $baseurl, $matches ) )
+if( preg_match( '#^((https?)://(www\.)?(.+?)(:.+?)?)(/.*)$#', $baseurl, $matches ) )
 {
 	$baseurlroot = $matches[1]; // no ending slash!
 	// echo "baseurlroot=$baseurlroot <br />";
-	$basehost = $matches[2];
+
+	$baseprotocol = $matches[2];
+
+	$basehost = $matches[4]; // Will NEVER include "www." at the beginning.
 	// echo "basehost=$basehost <br />";
-	$baseport =  $matches[4];
+
+	$baseport =  $matches[5]; // Will start with ":" if a port is specified.
 	// echo "baseport=$baseport <br />";
-	$basesubpath =  $matches[5];
+
+	$basesubpath =  $matches[6];
 	// echo "basesubpath=$basesubpath <br />";
 }
 else
@@ -207,27 +193,11 @@ else
 
 
 /**
- * Base domain of b2evolution.
- *
- * By default we try to extract it automagically from $basehost (itself extracted from $baseurl)
- * But you may need to adjust this manually.
- *
- * @todo does anyone have a clean way of handling stuff like .co.uk ?
- *
- * @global string
- */
-$basedomain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '$2', $basehost );
-
-
-/**
  * Short name of this system (will be used for cookies and notification emails).
  *
- * Change this only if you install mutliple b2evolutions on the same website.
+ * Change this only if you install mutliple b2evolution instances on the same server or same domain.
  *
- * WARNING: don't play with this or you'll have tons of cookies sent away and your
- * readers surely will complain about it!
- *
- * You can change the notification email address alone a few lines below.
+ * WARNING: don't play with this or you'll have tons of cookies sent away and your users will have issues!
  *
  * @global string Default: 'b2evo'
  */
@@ -247,7 +217,7 @@ $db_config['show_errors'] = true;
 /**
  * Halt on MySQL errors? (default: true)
  *
- * Setting this to false is not recommended,
+ * Setting this to false is NOT recommended,
  */
 $db_config['halt_on_error'] = true;
 
@@ -263,13 +233,13 @@ $db_config['table_options'] = ''; 	// Low ranking MySQL hosting compatibility De
 /**
  * Use transactions in DB?
  *
- * You need to use InnoDB in order to enable this.
+ * b2evolution REQUIRES transactions to function properly. This also means InnoDB is required.
  */
 $db_config['use_transactions'] = true;
 
 
 /**
- * Display elements that are different on each request (Page processing time, ..)
+ * When debugging obhandler functions, we may need to stop polluting the output with debug info.
  *
  * Set this to true to prevent displaying minor changing elements (like time) in order not to have artificial content changes
  *
@@ -281,9 +251,11 @@ $obhandler_debug = false;
 // ** Cookies **
 
 /**
- * This is the path that will be associated to cookies.
+ * This is the path that will be associated with cookies.
  *
  * That means cookies set by this b2evo install won't be seen outside of this path on the domain below.
+ *
+ * This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_cookie_path()
  *
  * @global string Default: preg_replace( '#https?://[^/]+#', '', $baseurl )
  */
@@ -294,52 +266,53 @@ $cookie_path = preg_replace( '#https?://[^/]+#', '', $baseurl );
  *
  * That means cookies set by this b2evo install won't be seen outside of this domain.
  *
- * We'll take {@link $basehost} by default (the leading dot includes subdomains), but
- * when there's no dot in it, at least Firefox will not set the cookie. The best
- * example for having no dot in the host name is 'localhost', but it's the case for
- * host names in an intranet also.
+ * This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_cookie_domain()
+ *
+ * We'll take {@link $basehost} by default (the leading dot includes subdomains), but if there is no dot in it, at least (old?) Firefox will not set the cookie.
+ * The most common example for having no dot in the host name is 'localhost', but it's the case for host names in an intranet also.
  *
  * Note: ".domain.com" cookies will be sent to sub.domain.com too.
  * But, see http://www.faqs.org/rfcs/rfc2965:
- *	"If multiple cookies satisfy the criteria above, they are ordered in
- *	the Cookie header such that those with more specific Path attributes
- *	precede those with less specific.  Ordering with respect to other
- *	attributes (e.g., Domain) is unspecified."
+ *	"If multiple cookies satisfy the criteria above, they are ordered in the Cookie header such that those with more specific Path attributes
+ *	precede those with less specific. Ordering with respect to other attributes (e.g., Domain) is unspecified."
  *
- * @global string Default: ( strpos($basehost, '.') ) ? '.'. $basehost : '';
+ * @global string
  */
 if( strpos($basehost, '.') === false )
-{	// localhost or windows machine name:
+{	// "localhost" or windows machine name:
 	$cookie_domain = '';
 }
+else
+{
+	$cookie_domain = $basehost;
+}
+
+/* The following is no longer needed because we already strip away "www." from $basehost, so now in all cases the cookie domain should just be the base domain
+
 elseif( preg_match( '~^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$~i', $basehost ) )
 {	// The basehost is an IP address, use the basehost as it is:
 	$cookie_domain = $basehost;
 }
 else
-{	// Keep the part of the basehost after the www. :
-	$cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $basehost );
-
-	// When hosting multiple domains (not just subdomains) on a single instance of b2evo,
-	// you may want to try this:
-	// $cookie_domain = '.'.$_SERVER['HTTP_HOST'];
-	// or this: -- Have a cookie domain of 2 levels only, base on current basehost.
-	// $cookie_domain = preg_replace( '/^( .* \. )? (.+? \. .+? )$/xi', '.$2', $basehost );
-	// fp> pb with domains like .co.uk !?
+{
+	// Keep the part of the basehost after the www. :
+	//	$cookie_domain = preg_replace( '/^(www\. )? (.+)$/xi', '.$2', $basehost );
 }
+*/
 
-// echo $cookie_domain;
-
-/**#@+
- * Names for cookies.
+/**
+ * Name used for session cookies.
  */
-// The following remember the comment meta data for non registered users:
+$cookie_session = 'session_'.$instance_name;
+
+/**
+ * Names used for other cookies.
+ *
+ * The following remember the comment meta data for non registered users:
+ */
 $cookie_name    = 'cookie'.$instance_name.'name';
 $cookie_email   = 'cookie'.$instance_name.'email';
 $cookie_url     = 'cookie'.$instance_name.'url';
-// The following handles the session:
-$cookie_session = str_replace( '.', '_', 'session_'.$instance_name.'_'.$cookie_domain );
-/**#@-*/
 
 /**
  * Expiration for comment meta data cookies.
@@ -372,6 +345,7 @@ $cookie_expired = time() - 86400;
  * @global int $crumb_expires
  */
 $crumb_expires = 7200;
+
 
 /**
  * Page cache expiration time
@@ -430,7 +404,7 @@ $conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
  * @global string Path of the base.
  *                fp> made [i]nsensitive to case because of Windows URL oddities)
  */
-$basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/';
+$basepath = preg_replace( '#/'.preg_quote( $conf_subdir, '#' ).'$#i', '', $conf_path ).'/';
 // echo '<br/>basepath='.$basepath;
 
 /**
@@ -450,21 +424,12 @@ $misc_inc_path = $inc_path.'_misc/';	   	// You should not need to change this
  * Note: This folder NEEDS to by accessible through HTTP.
  *
  * @global string $htsrv_subdir
+ * @global string $htsrv_path
+ * @global string $htsrv_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_htsrv_url( false )
  */
 $htsrv_subdir = 'htsrv/';                // Subdirectory relative to base
 $htsrv_path = $basepath.$htsrv_subdir;   // You should not need to change this
 $htsrv_url = $baseurl.$htsrv_subdir;     // You should not need to change this
-
-/**
- * Sensitive URL to the htsrv folder.
- *
- * Set this separately (based on {@link $htsrv_url}), if you want to use
- * SSL for login, registration and profile updates (where passwords are
- * involved), but not for the whole htsrv scripts.
- *
- * @global string
- */
-$htsrv_url_sensitive = $htsrv_url;
 
 /**
  * Location of the XML SeRVices folder.
@@ -474,11 +439,23 @@ $xmlsrv_subdir = 'xmlsrv/';              // Subdirectory relative to base
 $xmlsrv_url = $baseurl.$xmlsrv_subdir;   // You should not need to change this
 
 /**
+ * URL of the REST API.
+ *
+ * @global string $restapi_script
+ * @global string $restapi_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function get_restapi_url()
+ */
+$restapi_script = 'rest.php?api_version=1&api_request='; // You should not need to change this
+$restapi_url = $htsrv_url.$restapi_script; // You should not need to change this
+
+/**
  * Location of the RSC folder.
  *
  * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $rsc_subdir
+ * @global string $rsc_path
+ * @global string $rsc_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_rsc_url()
+ * @global string $rsc_uri
  */
 $rsc_subdir = 'rsc/';                    // Subdirectory relative to base
 $rsc_path = $basepath.$rsc_subdir;       // You should not need to change this
@@ -491,6 +468,8 @@ $rsc_uri = $basesubpath.$rsc_subdir;
  * Note: This folder NEEDS to by accessible through HTTP. It MAY be replicated on a CDN.
  *
  * @global string $skins_subdir
+ * @global string $skins_path
+ * @global string $skins_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_skins_url()
  */
 $skins_subdir = 'skins/';                // Subdirectory relative to base
 $skins_path = $basepath.$skins_subdir;   // You should not need to change this
@@ -521,7 +500,7 @@ $emailskins_url = $assets_baseurl.$emailskins_subdir;     // You should not need
 /**
  * Location of the admin interface dispatcher
  */
-$dispatcher = 'admin.php'; // DEPRECATED
+$dispatcher = 'evoadm.php';
 $admin_url = $baseurl.$dispatcher;
 
 /**
@@ -553,6 +532,8 @@ $locales_path = $basepath.$locales_subdir;  // You should not need to change thi
  * Exact requirements depend on installed plugins.
  *
  * @global string $plugins_subdir
+ * @global string $plugins_path
+ * @global string $plugins_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_plugins_url()
  */
 $plugins_subdir = 'plugins/';            // Subdirectory relative to base
 $plugins_path = $basepath.$plugins_subdir;  // You should not need to change this
@@ -594,6 +575,8 @@ $cache_path = $basepath.$cache_subdir; // You should not need to change this
  * Exact requirements depend on $public_access_to_media .
  *
  * @global string $media_subdir
+ * @global string $media_path
+ * @global string $media_url This applies only to the backoffice. For the frontoffice, the URL will be dynamically generated by function Blog->get_local_media_url()
  */
 $media_subdir = 'media/';                   // Subdirectory relative to base
 $media_path = $basepath.$media_subdir;      // You should not need to change this
@@ -639,15 +622,6 @@ $public_access_to_media = true;
 
 
 /**
- * Do you want to stay in the current blog when you click on a post title or permalink,
- * even if the post main cat belongs to another blog?
- *
- * @global boolean
- */
-$cross_post_nav_in_same_blog = true;
-
-
-/**
  * File extensions that the admin will not be able to enable in the Settings
  */
 $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'pl', 'vbs' );
@@ -674,6 +648,13 @@ $dirpath_max_length = ( ( ( strtoupper( substr( PHP_OS, 0, 3 ) ) ) === 'WIN' ) ?
 
 
 /**
+ * Allow double dots in file names
+ * Use TRUE if you want to allow ".." in file and directory names like "..filename" or "dir..name"
+ */
+$filemanager_allow_dotdot_in_filenames = false;
+
+
+/**
  * XMLRPC logging. Set this to 1 to log XMLRPC calls received by this server (into /xmlsrv/xmlrpc.log).
  *
  * Default: 0
@@ -684,82 +665,32 @@ $debug_xmlrpc_logging = 0;
 
 
 /**
- * Seconds after which a scheduled task is considered to be timed out.
- */
-$cron_timeout_delay = 1800; // 30 minutes
-
-
-/**
  * Password change request delay in seconds. Only one email can be requested for one login or email address in each x seconds defined below.
  */
 $pwdchange_request_delay = 300; // 5 minutes
 
 
 /**
- * Account activation reminder settings.
- * Each element of the array is given in seconds
- * Assume that the number of element in the array below is n then the following must be followed:
- * n must be greater then 1; n - 1 will be the max number of account activation reminder emails.
- * The first element of the array ( in position 0 ) shows the time in seconds when the firs reminder email must be sent after the new user was registered, or the user status was changed to new, deactivated or emailchanged status
- * Each element between the postion [1 -> (n - 1)) shows the time in seconds when the next reminder email must be sent after the previous one
- * The last element of the array shows when an account status will be set to 'failedactivation' if it was not activated after the last reminder email. This value must be the highest value of the array!
+ * Enabled password drivers.
+ * List what drivers must be enabled on your server.
+ * By default only first driver(which is support by server configuration) will be used to store new updated passwords in DB.
  *
- * E.g. $activate_account_reminder_config = array( 86400, 129600, 388800, 604800 ); = array( 1 day, 1.5 days, 4.5 days, 7 days )
- * At most 3 reminder will be sent, the first 1 day after the registration or deactivation, the seond in 1.5 days after the first one, and the third one after 2.5 days after the second one.
- * 7 days after the last reminder email the account status will be set to 'failedactivation' and no more reminder will be sent.
+ *   possible driver valuse:
+ *     - evo_salted
+ *     - bcrypt_2y
+ *     - bcrypt
+ *     - salted_md5
+ *     - phpass
+ *     - evo_md5 // Use this driver as last choice only.
  */
-$activate_account_reminder_config = array( 86400/* one day */, 129600/* 1.5 days */, 388800/* 4.5 days */, 604800/* 7 days */ );
-
-
-/**
- * Account activation reminder threshold given in seconds.
- * A user may receive Account activation reminder if the account was created at least x ( = threshold value defined below ) seconds ago.
- */
-$activate_account_reminder_threshold = 86400; // 24 hours
-
-
-/**
- * Comment moderation reminder threshold given in seconds.
- * A moderator user may receive Comment moderation reminder if there are comments awaiting moderation which were created at least x ( = threshold value defined below ) seconds ago.
- */
-$comment_moderation_reminder_threshold = 86400; // 24 hours
-
-
-/**
- * Post moderation reminder threshold given in seconds.
- * A moderator user may receive Post moderation reminder if there are posts awaiting moderation which were created at least x ( = threshold value defined below ) seconds ago.
- */
-$post_moderation_reminder_threshold = 86400; // 24 hours
-
-
-/**
- * Unread private messages reminder threshold given in seconds.
- * A user may receive unread message reminder if it has unread private messages at least as old as this threshold value.
- */
-$unread_messsage_reminder_threshold = 86400; // 24 hours
-
-
-/**
- * Unread message reminder is sent in every y days in case when a user last logged in date is below x days.
- * The array below is in x => y format.
- * The values of this array must be ascendant.
- */
-$unread_message_reminder_delay = array(
-	10  => 3,  // less than 10 days -> 3 days spacing
-	30  => 6,  // 10 to 30 days -> 6 days spacing
-	90  => 15, // 30 to 90 days -> 15 days spacing
-	180 => 30, // 90 to 180 days -> 30 days spacing
-	365 => 60, // 180 to 365 days -> 60 days spacing
-	730 => 120 // 365 to 730 days -> 120 days spacing
-	// more => "The user has not logged in for x days, so we will not send him notifications any more".
-);
-
-
-/**
- * Cleanup scheduled jobs threshold given in days.
- * The scheduled jobs older than x ( = threshold value ) days will be removed
- */
-$cleanup_jobs_threshold = 45;
+$enabled_password_drivers = array(
+		'evo_salted',
+		'bcrypt_2y',
+		'bcrypt',
+		'salted_md5',
+		'phpass',
+		'evo_md5', // Use this driver as last choice only.
+	);
 
 
 /**
@@ -797,10 +728,22 @@ $use_hacks = false;
 
 
 /**
- * If user tries to login 10 times during X seconds we refuse login (even if password is correct)
- * If set to 0, then there is never a lockout
+ * If user tries to log in {$failed_logins_before_lockout} times
+ * during the last {$failed_logins_lockout} seconds,
+ * we refuse login (even if password is correct) and display that
+ * the account is locked out until the above condition is no longer true.
+ * If {$failed_logins_lockout} is set to 0, there will never be a lockout.
  */
+$failed_logins_before_lockout = 10; // 10 times, Max is 197
 $failed_logins_lockout = 600; // 10 minutes
+
+
+/**
+ * Deny registering new accounts with these reserved logins;
+ * Also deny changing user logins to one of these;
+ * Only admins with permission to create new users can use these:
+ */
+$reserved_logins = array( 'admin', 'admins', 'administrator', 'administrators', 'moderator', 'moderators', 'webmaster', 'postmaster', 'mailer', 'mail', 'support', 'owner', 'sysop', 'root', 'system', 'web', 'site', 'website', 'server' );
 
 
 /**
@@ -810,21 +753,11 @@ $failed_logins_lockout = 600; // 10 minutes
  *
  * Possible values:
  *  - 'always' : Always allow redirects to a different domain
- *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains, ALL SUB-DOMAINS of $basedomain or redirects of posts with redirected status
+ *  - 'all_collections_and_redirected_posts' ( Default ): Allow redirects to all collection domains, ALL SUB-DOMAINS of $basehost or redirects of posts with redirected status
  *  - 'only_redirected_posts' : Allow redirects to a different domain only in case of posts with redirected status
  *  - 'never' : Force redirects to the same domain in all of the cases, and never allow redirect to a different domain
  */
 $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
-
-
-/**
- * Additional params you may want to pass to sendmail when sending emails
- * For setting the return-path, some Linux servers will require -r, others will require -f.
- * Allowed placeholders: $from-address$ , $return-address$
- *
- * @global string $sendmail_additional_params
- */
-$sendmail_additional_params = '-r $return-address$';
 
 
 /**
@@ -837,7 +770,15 @@ $email_send_simulate_only = false;
 
 
 /**
- * Would you like to use CDNs as definied in the array $library_cdn_urls below 
+ * Turn this off to prevent sending emails if no external SMTP gateway is configured.
+ * If true and no SMTP gateway is configured, b2evolution will behave the same as with $email_send_simulate_only = true;
+ * This is useful to avoid sending email (especially campaigns) through a bad IP by mistake.
+ */
+$email_send_allow_php_mail = true;
+
+
+/**
+ * Would you like to use CDNs as definied in the array $library_cdn_urls below
  * or do you prefer to load all files from the local source as defined in the array $library_local_urls below?
  *
  * @global boolean $use_cdns
@@ -857,9 +798,9 @@ $library_cdn_urls = array(
 		// jqueryUI is commented out because b2evo uses only a subset... ?
 		//'#jqueryUI#' => array( '//code.jquery.com/ui/1.10.4/jquery-ui.min.js', '//code.jquery.com/ui/1.10.4/jquery-ui.js' ),
 		//'#jqueryUI_css#' => array( '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.min.css', '//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css' ),
-		'#bootstrap#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.js' ),
-		'#bootstrap_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.css' ),
-		'#bootstrap_theme_css#' => array( '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css', '//netdna.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.css' ),
+		'#bootstrap#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.js' ),
+		'#bootstrap_css#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css' ),
+		'#bootstrap_theme_css#' => array( '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css', '//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.css' ),
 		// The following are other possible public shared CDNs we are aware of
 		// but it is not clear whether or not they are:
 		// - Future proof (will they continue to serve old versions of the library in the future?)
@@ -868,23 +809,24 @@ $library_cdn_urls = array(
 		//'#easypiechart#' => array( '//cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.1/jquery.easypiechart.min.js', '//cdnjs.cloudflare.com/ajax/libs/easy-pie-chart/2.1.1/jquery.easypiechart.js' ),
 		//'#scrollto#' => array( '//cdnjs.cloudflare.com/ajax/libs/jquery-scrollTo/1.4.2/jquery.scrollTo.min.js' ),
 		//'#touchswipe#' => array( '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.min.js', '//cdn.jsdelivr.net/jquery.touchswipe/1.6.5/jquery.touchSwipe.js' ),
-		/*'#jqplot#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.js' ),
-			'#jqplot_barRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.barRenderer.min.js' ),
-			'#jqplot_canvasAxisTickRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasAxisTickRenderer.min.js' ),
-			'#jqplot_canvasTextRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasTextRenderer.min.js' ),
-			'#jqplot_categoryAxisRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.categoryAxisRenderer.min.js' ),
-			'#jqplot_enhancedLegendRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.enhancedLegendRenderer.min.js' ),
-			'#jqplot_highlighter#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.highlighter.min.js' ),
-			'#jqplot_canvasOverlay#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.canvasOverlay.min.js' ),
-			'#jqplot_donutRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/plugins/jqplot.donutRenderer.min.js' ),
-			'#jqplot_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.8/jquery.jqplot.min.css' ),*/
-		//'#tinymce#' => array( '//tinymce.cachefly.net/4.1/tinymce.min.js' ),
+		/*'#jqplot#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.js' ),
+			'#jqplot_barRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.barRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.barRenderer.js' ),
+			'#jqplot_canvasAxisTickRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasAxisTickRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasAxisTickRenderer.js' ),
+			'#jqplot_canvasTextRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasTextRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasTextRenderer.js' ),
+			'#jqplot_categoryAxisRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.categoryAxisRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.categoryAxisRenderer.js' ),
+			'#jqplot_enhancedLegendRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.enhancedLegendRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.enhancedLegendRenderer.js' ),
+			'#jqplot_highlighter#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.highlighter.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.highlighter.js' ),
+			'#jqplot_canvasOverlay#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasOverlay.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.canvasOverlay.js' ),
+			'#jqplot_donutRenderer#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.donutRenderer.min.js', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/plugins/jqplot.donutRenderer.js' ),
+			'#jqplot_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.min.css', '//cdnjs.cloudflare.com/ajax/libs/jqPlot/1.0.9/jquery.jqplot.css' ),*/
+		//'#tinymce#' => array( '//cdn.tinymce.com/4/tinymce.min.js' ),
+		//'#tinymce_jquery#' => array( '//cdn.tinymce.com/4/jquery.tinymce.min.js' ),
 		//'#flowplayer#' => array( '//releases.flowplayer.org/5.4.4/flowplayer.min.js', '//releases.flowplayer.org/5.4.4/flowplayer.js' ),
 		//'#mediaelement#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.min.js', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/js/mediaelement-and-player.js' ),
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
 		//'#videojs#' => array( 'http://vjs.zencdn.net/4.2.0/video.js' ),
 		//'#videojs_css#' => array( 'http://vjs.zencdn.net/4.2.0/video-js.css' ),
-		'#fontawesome#' => array('//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css', '//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css'),
+		'#fontawesome#' => array( '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' ),
 	);
 
 /**
@@ -899,7 +841,7 @@ $library_local_urls = array(
 		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.b2evo.min.css', 'jquery/smoothness/jquery-ui.b2evo.css' ),
 # Uncomment the following lines if your plugins need more jQueryUI features than the ones loaded by b2evo:
 #		'#jqueryUI#' => array( 'jquery/jquery.ui.all.min.js', 'jquery/jquery.ui.all.js' ),
-#		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.css' ),
+#		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.min.css', 'jquery/smoothness/jquery-ui.css' ),
 		'#bootstrap#' => array( 'bootstrap/bootstrap.min.js', 'bootstrap/bootstrap.js' ),
 		'#bootstrap_css#' => array( 'bootstrap/bootstrap.min.css', 'bootstrap/bootstrap.css' ),
 		'#bootstrap_theme_css#' => array( 'bootstrap/bootstrap-theme.min.css', 'bootstrap/bootstrap-theme.css' ),
@@ -907,18 +849,18 @@ $library_local_urls = array(
 		'#easypiechart#' => array( 'jquery/jquery.easy-pie-chart.min.js', 'jquery/jquery.easy-pie-chart.js' ),
 		'#scrollto#' => array( 'jquery/jquery.scrollto.min.js', 'jquery/jquery.scrollto.js' ),
 		'#touchswipe#' => array( 'jquery/jquery.touchswipe.min.js', 'jquery/jquery.touchswipe.js' ),
-		'#jqplot#' => array( 'jquery/jqplot/jquery.jqplot.min.js' ),
-		'#jqplot_barRenderer#' => array( 'jquery/jqplot/jqplot.barRenderer.min.js' ),
-		'#jqplot_canvasAxisTickRenderer#' => array( 'jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js' ),
-		'#jqplot_canvasTextRenderer#' => array( 'jquery/jqplot/jqplot.canvasTextRenderer.min.js' ),
-		'#jqplot_categoryAxisRenderer#' => array( 'jquery/jqplot/jqplot.categoryAxisRenderer.min.js' ),
-		'#jqplot_enhancedLegendRenderer#' => array( 'jquery/jqplot/jqplot.enhancedLegendRenderer.min.js' ),
-		'#jqplot_highlighter#' => array( 'jquery/jqplot/jqplot.highlighter.min.js' ),
-		'#jqplot_canvasOverlay#' => array( 'jquery/jqplot/jqplot.canvasOverlay.min.js' ),
-		'#jqplot_donutRenderer#' => array( 'jquery/jqplot/jqplot.donutRenderer.min.js' ),
+		'#jqplot#' => array( 'jquery/jqplot/jquery.jqplot.min.js', 'jquery/jqplot/jquery.jqplot.js' ),
+		'#jqplot_barRenderer#' => array( 'jquery/jqplot/jqplot.barRenderer.min.js', 'jquery/jqplot/jqplot.barRenderer.js' ),
+		'#jqplot_canvasAxisTickRenderer#' => array( 'jquery/jqplot/jqplot.canvasAxisTickRenderer.min.js', 'jquery/jqplot/jqplot.canvasAxisTickRenderer.js' ),
+		'#jqplot_canvasTextRenderer#' => array( 'jquery/jqplot/jqplot.canvasTextRenderer.min.js', 'jquery/jqplot/jqplot.canvasTextRenderer.js' ),
+		'#jqplot_categoryAxisRenderer#' => array( 'jquery/jqplot/jqplot.categoryAxisRenderer.min.js', 'jquery/jqplot/jqplot.categoryAxisRenderer.js' ),
+		'#jqplot_enhancedLegendRenderer#' => array( 'jquery/jqplot/jqplot.enhancedLegendRenderer.min.js', 'jquery/jqplot/jqplot.enhancedLegendRenderer.js' ),
+		'#jqplot_highlighter#' => array( 'jquery/jqplot/jqplot.highlighter.min.js', 'jquery/jqplot/jqplot.highlighter.js' ),
+		'#jqplot_canvasOverlay#' => array( 'jquery/jqplot/jqplot.canvasOverlay.min.js', 'jquery/jqplot/jqplot.canvasOverlay.js' ),
+		'#jqplot_donutRenderer#' => array( 'jquery/jqplot/jqplot.donutRenderer.min.js', 'jquery/jqplot/jqplot.donutRenderer.js' ),
 		'#jqplot_css#' => array( 'jquery/jquery.jqplot.min.css', 'jquery/jquery.jqplot.css' ),
 		'#tinymce#' => array( 'tiny_mce/tinymce.min.js' ),
-		'#tinymce_gzip#' => array( 'tiny_mce/tinymce.gzip.js' ),
+		'#tinymce_jquery#' => array( 'tiny_mce/jquery.tinymce.min.js' ),
 		'#flowplayer#' => array( 'flowplayer/flowplayer.min.js', 'flowplayer/flowplayer.js' ),
 		'#mediaelement#' => array( 'mediaelement/mediaelement-and-player.min.js', 'mediaelement/mediaelement-and-player.js' ),
 		'#mediaelement_css#' => array( 'mediaelement/mediaelementplayer.min.css', 'mediaelement/mediaelementplayer.css' ),
@@ -926,8 +868,14 @@ $library_local_urls = array(
 		'#videojs_css#' => array( 'videojs/video-js.min.css', 'videojs/video-js.css' ),
 		'#jcrop#' => array( 'jquery/jquery.jcrop.min.js', 'jquery/jquery.jcrop.js' ),
 		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
-		'#fontawesome#' => array('font-awesome.min.css', 'font-awesome.min.css'),
+		'#fontawesome#' => array( 'font-awesome.min.css', 'font-awesome.css' ),
 	);
+
+
+/**
+ * Allow to send outbound pings on localhost
+ */
+$allow_post_pings_on_localhost = false;
 
 
 /**
@@ -949,14 +897,31 @@ $outgoing_proxy_password = '';
 $check_browser_version = false;
 
 
+/**
+ * Maximum skin API version which is supported by current version of b2evolution.
+ * Skin API version is defined in the method Skin::get_api_version() of each skin.
+ */
+$max_skin_api_version = 6;
+
+
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
+$evonetsrv_protocol = 'http';
 $evonetsrv_host = 'rpc.b2evo.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
 
+$antispamsrv_protocol = 'http';
 $antispamsrv_host = 'antispam.b2evo.net';
 $antispamsrv_port = 80;
 $antispamsrv_uri = '/evonetsrv/xmlrpc.php';
+// For local testing, use something like:
+// $antispamsrv_uri = '/.../xmlsrv/xmlrpc.php';
+$antispamsrv_tos_url = 'http://b2evolution.net/about/terms.html';
+
+/**
+ * Set TRUE if THIS server should be used as central antispam server
+ */
+$enable_blacklist_server_API = false;
 
 // This is for plugins to add CS files to the TinyMCE editor window:
 $tinymce_content_css = array();

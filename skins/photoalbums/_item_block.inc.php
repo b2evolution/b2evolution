@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage photoalbums
@@ -58,9 +58,9 @@ $params = array_merge( array(
 		if( $disp == 'single' )
 		{
 			// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-			// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+				'widget_context' => 'item',	// Signal that we are displaying within an Item
 				// The following (optional) params will be used as defaults for widgets included in this container:
 				// This will enclose each widget in a block:
 				'block_start' => '<div class="$wi_class$">',
@@ -68,9 +68,12 @@ $params = array_merge( array(
 				// This will enclose the title of each widget:
 				'block_title_start' => '<h3>',
 				'block_title_end' => '</h3>',
+				// Template params for "Item Link" widget
+				'widget_item_link_before'    => '<p class="evo_post_link">',
+				'widget_item_link_after'     => '</p>',
 				// Template params for "Item Tags" widget
-				'widget_item_tags_before'    => '<div class="bText"><p>'.T_('Tags').': ',
-				'widget_item_tags_after'     => '</p></div>',
+				'widget_item_tags_before'    => '<nav class="small post_tags">',
+				'widget_item_tags_after'     => '</nav>',
 				// Params for skin file "_item_content.inc.php"
 				'widget_item_content_params' => $params,
 			) );
@@ -87,30 +90,27 @@ $params = array_merge( array(
 		}
 		?>
 
-		<?php
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => '<div class="bSmallPrint">'.T_('Link').': ',
-					'after'         => '</div>',
-					'text_template' => '$url$',
-					'url_template'  => '$url$',
-					'target'        => '',
-					'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-				) );
-		?>
-
 		<div class="item_comments">
 			<?php
+			if( is_single_page() )
+			{	// Display comments only on single Item's page:
 				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 				skin_include( '_item_feedback.inc.php', array(
+						'disp_comments'        => true,
+						'disp_comment_form'    => true,
+						'disp_trackbacks'      => true,
+						'disp_trackback_url'   => true,
+						'disp_pingbacks'       => true,
+						'disp_webmentions'     => true,
 						'before_section_title' => '<h4>',
 						'after_section_title'  => '</h4>',
-						'author_link_text'     => 'preferredname',
+						'author_link_text'     => 'auto',
 						'comment_image_size'   => 'fit-256x256',
 					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.
 				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+			}
 			?>
 		</div>
 
@@ -122,7 +122,7 @@ $params = array_merge( array(
 	?>
 
 </div>
-<script type="text/javascript">
+<script>
 var has_touch_event;
 window.addEventListener( 'touchstart', function set_has_touch_event ()
 {
@@ -143,25 +143,25 @@ function change_position_nav()
 
 	if( nav_size )
 	{ // Navigation bar
-		if( !$nav.hasClass( 'fixed' ) && jQuery( window ).scrollTop() > $nav.offset().top - nav_top )
+		if( !$nav_album.hasClass( 'fixed' ) && jQuery( window ).scrollTop() > $nav_album.offset().top - nav_top )
 		{ // Make nav as fixed if we scroll down
-			$nav.before( $navSpacer );
-			$nav.addClass( 'fixed' ).css( 'top', nav_top + 'px' );
+			$nav_album.before( $navSpacer );
+			$nav_album.addClass( 'fixed' ).css( 'top', nav_top + 'px' );
 		}
-		else if( $nav.hasClass( 'fixed' ) && jQuery( window ).scrollTop() < $navSpacer.offset().top - nav_top )
+		else if( $nav_album.hasClass( 'fixed' ) && jQuery( window ).scrollTop() < $navSpacer.offset().top - nav_top )
 		{ // Remove 'fixed' class from nav if we scroll to the top of page
-			$nav.removeClass( 'fixed' ).css( 'top', '' );
+			$nav_album.removeClass( 'fixed' ).css( 'top', '' );
 			$navSpacer.remove();
 		}
 	}
 }
 
-var $nav = jQuery( '.nav_album' );
-var nav_size = $nav.size();
-var nav_top = <?php echo ( show_toolbar() ? 23 : 0 ) ; ?>;
+var $nav_album = jQuery( '.nav_album' );
+var nav_size = $nav_album.size();
+var nav_top = <?php echo ( show_toolbar() ? 27 : 0 ) ; ?>;
 var $navSpacer = $( '<div />', {
 		'class':  'nav_album_spacer',
-		'height': $nav.outerHeight( true ),
+		'height': $nav_album.outerHeight( true ),
 	} );
 
 jQuery( window ).resize( function()

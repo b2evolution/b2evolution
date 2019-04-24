@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -19,12 +19,13 @@ if( ! defined( 'EVO_MAIN_INIT' ) ) die( 'Please, do not access this page directl
  * Draw the canvas bars chart.
  *
  * @param array Chart bars data
+ * @param string Javascript callback function to execute after rendering
  */
-function CanvasBarsChart( $chart )
+function CanvasBarsChart( $chart, $init_js_callback = NULL, $canvas_id = 'canvasbarschart' )
 {
 ?>
-<div id="canvasbarschart" style="height:<?php echo $chart['canvas_bg']['height']; ?>px;width:<?php echo $chart['canvas_bg']['width']; ?>px;margin:auto auto 35px;"></div>
-<script type="text/javascript">
+<div id="<?php echo $canvas_id; ?>" style="height:<?php echo $chart['canvas_bg']['height']; ?>px;width:<?php echo $chart['canvas_bg']['width']; ?>px;margin:auto auto 35px;"></div>
+<script>
 jQuery( window ).load( function()
 {
 	<?php
@@ -34,7 +35,7 @@ jQuery( window ).load( function()
 	foreach( $chart['chart_data'] as $i => $data )
 	{
 		if( $i > 0 )
-		{ 
+		{
 			// Legend label
 			$jqplot_legend[] = $data[0];
 			// Data
@@ -76,7 +77,7 @@ jQuery( window ).load( function()
 	} );
 
 	var data = [<?php echo implode( ',', $jqplot_data ); ?>];
-	jQuery.jqplot( 'canvasbarschart', data, {
+	var plot = jQuery.jqplot( '<?php echo $canvas_id; ?>', data, {
 		seriesColors: [ '#<?php echo implode( '\', \'#', $chart[ 'series_color' ] ); ?>' ],
 		stackSeries: true,
 		animate: !$.jqplot.use_excanvas,
@@ -152,28 +153,37 @@ jQuery( window ).load( function()
 		<?php } ?>
 	} );
 
-	// Highlight legend
-	jQuery( '#canvasbarschart' ).bind( 'jqplotDataHighlight', function( ev, seriesIndex, pointIndex, data )
+	jQuery( '#<?php echo $canvas_id; ?>' ).data( 'plot', plot );
+
+	<?php
+	if( ! empty( $init_js_callback ) )
 	{
-		jQuery( '#canvasbarschart td.jqplot-table-legend' ).removeClass( 'legend-text-highlighted' );
-		jQuery( '#canvasbarschart td.jqplot-table-legend' ).eq( seriesIndex * 2 + 1 ).addClass( 'legend-text-highlighted' )
+		echo 'window["'.$init_js_callback.'"]();';
+	}
+	?>
+
+	// Highlight legend
+	jQuery( '#<?php echo $canvas_id; ?>' ).bind( 'jqplotDataHighlight', function( ev, seriesIndex, pointIndex, data )
+	{
+		jQuery( '#<?php echo $canvas_id; ?> td.jqplot-table-legend' ).removeClass( 'legend-text-highlighted' );
+		jQuery( '#<?php echo $canvas_id; ?> td.jqplot-table-legend' ).eq( seriesIndex * 2 + 1 ).addClass( 'legend-text-highlighted' )
 			.prev().addClass( 'legend-text-highlighted' );
 		<?php if( isset( $chart['link_data'] ) ) { ?>
-		jQuery( '#canvasbarschart .jqplot-event-canvas' ).css( 'cursor', 'pointer' );
+		jQuery( '#<?php echo $canvas_id; ?> .jqplot-event-canvas' ).css( 'cursor', 'pointer' );
 		<?php } ?>
 	} );
-	jQuery( '#canvasbarschart' ).bind( 'jqplotDataUnhighlight', function( ev, seriesIndex, pointIndex, data )
+	jQuery( '#<?php echo $canvas_id; ?>' ).bind( 'jqplotDataUnhighlight', function( ev, seriesIndex, pointIndex, data )
 	{
-		jQuery( '#canvasbarschart td.jqplot-table-legend' ).removeClass( 'legend-text-highlighted' );
+		jQuery( '#<?php echo $canvas_id; ?> td.jqplot-table-legend' ).removeClass( 'legend-text-highlighted' );
 		<?php if( isset( $chart['link_data'] ) ) { ?>
-		jQuery( '#canvasbarschart .jqplot-event-canvas' ).css( 'cursor', 'auto' );
+		jQuery( '#<?php echo $canvas_id; ?> .jqplot-event-canvas' ).css( 'cursor', 'auto' );
 		<?php } ?>
-		jQuery( '#canvasbarschart .jqplot-highlighter-tooltip' ).hide();
+		jQuery( '#<?php echo $canvas_id; ?> .jqplot-highlighter-tooltip' ).hide();
 	} );
-	var canvas_offset = jQuery( '#canvasbarschart' ).offset();
-	jQuery( '#canvasbarschart' ).mousemove( function( ev )
+	var canvas_offset = jQuery( '#<?php echo $canvas_id; ?>' ).offset();
+	jQuery( '#<?php echo $canvas_id; ?>' ).mousemove( function( ev )
 	{
-		jQuery( '#canvasbarschart .jqplot-highlighter-tooltip' ).css( {
+		jQuery( '#<?php echo $canvas_id; ?> .jqplot-highlighter-tooltip' ).css( {
 			top: ev.pageY - canvas_offset.top - 16,
 			left: ev.pageX - canvas_offset.left - 16
 		} );
@@ -199,7 +209,7 @@ jQuery( window ).load( function()
 		}
 		echo implode( ',', $params );
 		?>];
-	jQuery( '#canvasbarschart' ).bind( 'jqplotDataClick', function ( ev, seriesIndex, pointIndex, data )
+	jQuery( '#<?php echo $canvas_id; ?>' ).bind( 'jqplotDataClick', function ( ev, seriesIndex, pointIndex, data )
 	{
 		if( typeof( jqplot_link_params[ seriesIndex ] ) == 'undefined' )
 		{
@@ -229,7 +239,7 @@ function CanvasDonutChart( $chart )
 {
 ?>
 <div id="canvasdonutchart" style="height:<?php echo $chart['height']; ?>px;width:<?php echo $chart['width']; ?>px;"></div>
-<script type="text/javascript">
+<script>
 jQuery( window ).load( function()
 {
 <?php

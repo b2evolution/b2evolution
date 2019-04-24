@@ -6,10 +6,9 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
- * @subpackage bootstrap_forums_skin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -17,19 +16,23 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $disp;
 
 if( ( $disp == 'single' || $disp == 'page' ) &&
-    ! empty( $Item ) &&
+    isset( $Item ) && $Item->ID > 0 &&
+    ! $Item->can_meta_comment() && // If user can write meta comment then we display the workflow form in the meta comment form instead of here
     is_logged_in() &&
     $Blog->get_setting( 'use_workflow' ) &&
+    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
     $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 { // Display workflow properties if current user can edit this post:
-	$Form = new Form( get_samedomain_htsrv_url().'item_edit.php' );
+	$Form = new Form( get_htsrv_url().'item_edit.php' );
 
 	$Form->add_crumb( 'item' );
 	$Form->hidden( 'blog', $Blog->ID );
 	$Form->hidden( 'post_ID', $Item->ID );
+	$Form->hidden( 'redirect_to', $Item->get_permanent_url() );
 
 	$Form->begin_form( 'evo_item_workflow_form' );
 
+	echo '<a name="workflow_panel"></a>';
 	$Form->begin_fieldset( T_('Workflow properties') );
 
 	echo '<div class="evo_item_workflow_form__fields">';
@@ -44,7 +47,7 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 	if( count( $UserCache->cache ) > 20 )
 	{
 		$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
-		$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees' );
+		$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
 	}
 	else
 	{
@@ -54,9 +57,22 @@ if( ( $disp == 'single' || $disp == 'page' ) &&
 
 	$ItemStatusCache = & get_ItemStatusCache();
 	$ItemStatusCache->load_all();
-	$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true ), T_('Task status') );
+	$ItemTypeCache = & get_ItemTypeCache();
+	$current_ItemType = & $Item->get_ItemType();
+	$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
 
-	$Form->date( 'item_deadline', $Item->get('datedeadline'), T_('Deadline') );
+	if( $Blog->get_setting( 'use_deadline' ) )
+	{	// Display deadline fields only if it is enabled for collection:
+		$Form->begin_line( T_('Deadline'), 'item_deadline' );
+
+			$datedeadline = $Item->get( 'datedeadline' );
+			$Form->date( 'item_deadline', $datedeadline, '' );
+
+			$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+			$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+
+		$Form->end_line();
+	}
 
 	$Form->button( array( 'submit', 'actionArray[update_workflow]', T_('Update'), 'SaveButton' ) );
 

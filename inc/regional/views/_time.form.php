@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -29,7 +29,7 @@ global $rsc_subdir, $pagenow, $servertimenow, $localtimenow, $date_default_timez
 
 // JavaScript function to calculate time difference: {{{
 ?>
-<script type="text/javascript">
+<script>
 
 var server_Date = new Date();
 server_Date.setTime( <?php echo $servertimenow.'000' ?> ); // milliseconds

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -19,6 +19,9 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
+
+// Check and redirect if current URL must be used as https instead of http:
+check_https_url( 'login' );
 
 // Login is not required on the register page:
 $login_required = false;
@@ -48,9 +51,6 @@ $registration_require_lastname = false;
 $registration_require_gender = $Settings->get('registration_require_gender');
 // Check if registration ask for locale
 $registration_ask_locale = $Settings->get('registration_ask_locale');
-// Check what subscriptions should be activated (It can be used for quick registration by widget)
-$auto_subscribe_posts = false;
-$auto_subscribe_comments = false;
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
 $email = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
@@ -64,7 +64,7 @@ param( 'source', 'string', '' );
 param( 'redirect_to', 'url', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
 param( 'inskin', 'boolean', false, true );
 
-global $Blog;
+global $Collection, $Blog;
 if( $inskin && empty( $Blog ) )
 {
 	param( 'blog', 'integer', 0 );
@@ -72,7 +72,7 @@ if( $inskin && empty( $Blog ) )
 	if( isset( $blog) && $blog > 0 )
 	{
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 }
 
@@ -82,16 +82,16 @@ if( $inskin && !empty( $Blog ) )
 }
 
 // Check invitation code if it exists and registration is enabled
-$display_invitation = check_invitation_code();
+$invitation_code_status = check_invitation_code();
 
-if( $display_invitation == 'deny' )
-{ // Registration is disabled
+if( $invitation_code_status == 'deny' )
+{	// Registration is disabled or system is locked:
 	$action = 'disabled';
 }
 
 if( $register_user = $Session->get('core.register_user') )
 {	// Get an user data from predefined session (after adding of a comment)
-	$login = preg_replace( '/[^a-z0-9 ]/i', '', $register_user['name'] );
+	$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $register_user['name'] );
 	$login = str_replace( ' ', '_', $login );
 	$login = utf8_substr( $login, 0, 20 );
 	$email = $register_user['email'];
@@ -103,16 +103,26 @@ switch( $action )
 {
 	case 'register':
 	case 'quick_register':
+		// Use this boolean var to know when quick registration is used
+		$is_quick = ( $action == 'quick_register' );
+		$is_inline = param( 'inline', 'integer', 0 ) == 1;
+
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
+
+		// Check email:
+		param_check_new_user_email( $dummy_fields['email'], $email );
+
+		// We will need the following parameter for the session data that will be set later:
+		param( 'widget', 'integer', 0 );
+
+		// Stop a request from the blocked email address or its domain:
+		antispam_block_by_email( $email );
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'regform' );
 
-		// Use this boolean var to know when quick registration is used
-		$is_quick = ( $action == 'quick_register' );
-
-		if( $is_quick )
+		if( $is_quick || $is_inline )
 		{ // Check if we can use a quick registration now:
 			if( $Settings->get( 'newusers_canregister' ) != 'yes' || ! $Settings->get( 'quick_registration' ) )
 			{ // Display error message when quick registration is disabled
@@ -120,46 +130,64 @@ switch( $action )
 				break;
 			}
 
-			param( 'widget', 'integer', 0 );
-
-			if( empty( $Blog ) || empty( $widget ) )
+			if( empty( $Blog ) || ( empty( $widget ) && ! $is_inline ) )
 			{ // Don't use a quick registration if the request goes from not blog page
 				debug_die( 'Quick registration is currently disabled on this system.' );
 				break;
 			}
 
+			if( empty( $widget ) && $is_inline )
+			{	// Set params for a request from inline tag "[emailcapture:]" :
+				$source = param( 'source', 'string', true );
+				$registration_require_firstname = ( param( 'ask_firstname', 'string', true ) == 'required' );
+				$registration_require_lastname = ( param( 'ask_lastname', 'string', true ) == 'required' );
+				$registration_require_country = ( param( 'ask_country', 'string', true ) == 'required' );
+				$user_tags = param( 'usertags', 'string', NULL );
+				$auto_subscribe_posts = param( 'subscribe_post', 'integer', true );
+				$auto_subscribe_comments = param( 'subscribe_comment', 'integer', true );
+				$newsletters = param( 'newsletters', 'string', true );
+				$newsletters = explode( ',', $newsletters );
+				$widget_newsletters = array();
+				foreach( $newsletters as $loop_newsletter_ID )
+				{
+					$widget_newsletters[$loop_newsletter_ID] = 1;
+				}
+				$widget_redirect_to = param( 'redirect_to', 'string', true );
+				// Use current collection to subscribe:
+				$subscribe_coll_ID = $Blog->ID;
+			}
+
+			// Check what fields should be required by current widget:
+			$registration_require_gender = false;
+		}
+
+		if( ! empty( $widget ) && ! $is_inline )
+		{	// Set params for a request from widget quick registration:
 			$WidgetCache = & get_WidgetCache();
-			if( ! $user_register_Widget = & $WidgetCache->get_by_ID( $widget, false, false ) ||
-			    $user_register_Widget->code != 'user_register' ||
-			    $user_register_Widget->get( 'coll_ID' ) != $Blog->ID )
+			$user_register_quick_Widget = & $WidgetCache->get_by_ID( $widget, false, false );
+			if( ! $user_register_quick_Widget ||
+					$user_register_quick_Widget->code != 'user_register_quick' ||
+					( $is_quick && $user_register_quick_Widget->get( 'coll_ID' ) != $Blog->ID ) )
 			{ // Wrong or hacked request!
 				debug_die( 'Quick registration is currently disabled on this system.' );
 				break;
 			}
 
-			if( $DB->get_var( 'SELECT user_ID FROM T_users WHERE user_email = '.$DB->quote( utf8_strtolower( $email ) ) ) )
-			{ // Don't allow the duplicate emails
-				$Messages->add( sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know or have forgotten it, you can <a %s>set your password here</a>.'),
-					'href="'.$Blog->get( 'loginurl' ).'"',
-					'href="'.$Blog->get( 'lostpasswordurl' ).'"' ), 'warning' );
-				break;
-			}
+			// Initialize the widget settings:
+			$user_register_quick_Widget->init_display( array() );
 
-			// Initialize the widget settings
-			$user_register_Widget->init_display( array() );
-
-			// Get a source from widget setting
-			$source = $user_register_Widget->disp_params['source'];
-
-			// Check what fields should be required by current widget
-			$registration_require_country = false;
-			$registration_require_gender = false;
-			$registration_require_firstname = ( $user_register_Widget->disp_params['ask_firstname'] == 'required' );
-			$registration_require_lastname = ( $user_register_Widget->disp_params['ask_lastname'] == 'required' );
-
-			// Check what subscriptions should be activated by current widget
-			$auto_subscribe_posts = ! empty( $user_register_Widget->disp_params['subscribe_post'] );
-			$auto_subscribe_comments = ! empty( $user_register_Widget->disp_params['subscribe_comment'] );
+			// Get params from widget settings:
+			$source = $user_register_quick_Widget->disp_params['source'];
+			$registration_require_firstname = ( $user_register_quick_Widget->disp_params['ask_firstname'] == 'required' );
+			$registration_require_lastname = ( $user_register_quick_Widget->disp_params['ask_lastname'] == 'required' );
+			$registration_require_country = ( $user_register_quick_Widget->disp_params['ask_country'] == 'required' );
+			$auto_subscribe_posts = $user_register_quick_Widget->disp_params['subscribe_post'];
+			$auto_subscribe_comments = $user_register_quick_Widget->disp_params['subscribe_comment'];
+			$widget_newsletters = $user_register_quick_Widget->disp_params['newsletters'];
+			$user_tags = $user_register_quick_Widget->disp_params['usertags'];
+			$widget_redirect_to = trim( $user_register_quick_Widget->disp_params['redirect_to'] );
+			// Use collection of the widget to subscribe:
+			$subscribe_coll_ID = $user_register_quick_Widget->get( 'coll_ID' );
 		}
 
 		if( ! $is_quick )
@@ -185,11 +213,9 @@ switch( $action )
 					'pass1'     => & $pass1,
 					'pass2'     => & $pass2,
 				) );
-		}
 
-		if( $Messages->has_errors() )
-		{ // a Plugin has added an error
-			break;
+			// Validate first enabled captcha plugin:
+			$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'register' ) );
 		}
 
 		// Set params:
@@ -236,34 +262,43 @@ switch( $action )
 		profile_check_params( $paramsList );
 
 		if( $is_quick && ! $Messages->has_errors() )
-		{ // Generate a login and password for quick registration
-			$pass1 = generate_random_passwd( 10 );
+		{	// Generate a login for quick registration:
 
-			// Get the login from email address:
-			$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
-			$login = preg_replace( '/[\'"><@\s]/', '', $login );
-			if( $Settings->get( 'strict_logins' ) )
-			{ // We allow only the plain ACSII characters, digits, the chars _ and .
-				$login = preg_replace( '/[^A-Za-z0-9_.]/', '', $login );
+			if( ! empty( $firstname ) || ! empty( $lastname ) )
+			{ // Firstname or lastname given, let's use these:
+				$login = array();
+				if( ! empty( $firstname ) )
+				{
+					$login[] = trim( $firstname );
+				}
+				if( ! empty( $lastname ) )
+				{
+					$login[] = trim( $lastname );
+				}
+				$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( implode( '.', $login ) ) );
+				$login = generate_login_from_string( $login );
 			}
 			else
-			{ // We allow any character that is not explicitly forbidden in Step 1
-				// Enforce additional limitations
-				$login = preg_replace( '|%([a-fA-F0-9][a-fA-F0-9])|', '', $login ); // Kill octets
-				$login = preg_replace( '/&.+?;/', '', $login ); // Kill entities
-			}
-			$login = preg_replace( '/^usr_/i', '', $login );
+			{ // Get the login from email address:
+				$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
+				$login = preg_replace( '/[\'"><@\s]/', '', $login );
 
-			// Check and search free login name if current is busy
-			$login_name = $login;
-			$login_number = 1;
-			$UserCache = & get_UserCache();
-			while( empty( $login_name ) || $UserCache->get_by_login( $login_name ) )
-			{
-				$login_name = $login.$login_number;
-				$login_number++;
+				if( strpos( $login, '.' ) )
+				{ // Get only the part before the "." if it has one
+					$temp_login = $login;
+					$login = substr( $login, 0, strpos( $login, '.' ) );
+					$login = generate_login_from_string( $login );
+
+					if( empty( $login ) )
+					{ // Resulting login empty, use full email address
+						$login = generate_login_from_string( $temp_login );
+					}
+				}
+				else
+				{
+					$login = generate_login_from_string( $login );
+				}
 			}
-			$login = $login_name;
 		}
 
 		if( ! $is_quick )
@@ -283,11 +318,95 @@ switch( $action )
 			break;
 		}
 
+		$user_domain = $Hit->get_remote_host( true );
+
+		if( $is_quick )
+		{	// Check quick registration for suspected data:
+			$is_suspected_request = antispam_suspect_check_by_data( array(
+				'IP_address'   => $Hit->IP,
+				'domain'       => $user_domain,
+				'email_domain' => $email,
+				'country_IP'   => $Hit->IP,
+			) );
+			if( $is_suspected_request )
+			{	// Current request is suspected by IP address, domain, domain of email address or country of current IP address,
+				// We should not allow quick registration for such users, Redirect to normal registration form:
+				$prefilled_params = array();
+				if( ! empty( $login ) )
+				{
+					$prefilled_params[ $dummy_fields['login'] ] = $login;
+				}
+				if( ! empty( $email ) )
+				{
+					$prefilled_params[ $dummy_fields['email'] ] = $email;
+				}
+				if( ! empty( $firstname ) )
+				{
+					$prefilled_params['firstname'] = $firstname;
+				}
+				if( ! empty( $lastname ) )
+				{
+					$prefilled_params['lastname'] = $lastname;
+				}
+				if( ! empty( $widget ) )
+				{
+					$prefilled_params['widget'] = $widget;
+				}
+				// Redirect to normal registration form with prefilled data from quick registration form:
+				header_redirect( url_add_param( get_user_register_url( $redirect_to, $source, false, '&' ), $prefilled_params, '&' ) );
+				// Exit here.
+			}
+		}
+
 		$DB->begin();
 
 		$new_User = new User();
 		$new_User->set( 'login', $login );
-		$new_User->set_password( $pass1 );
+
+		if( ! empty( $widget_newsletters ) )
+		{	// Set newsletters subscriptions from current widget "Email capture / Quick registration":
+			foreach( $widget_newsletters as $widget_newsletter_ID => $widget_newsletter_is_enabled )
+			{
+				if( ! $widget_newsletter_is_enabled )
+				{	// Remove disabled newsletter from list:
+					unset( $widget_newsletters[ $widget_newsletter_ID ] );
+				}
+			}
+			if( isset( $widget_newsletters['default'] ) )
+			{	// Set also default newsletters for new users:
+				$new_User->insert_default_newsletters = true;
+				unset( $widget_newsletters['default'] );
+			}
+			else
+			{	// Don't use default newsletters for new users because it is disabled by widget:
+				$new_User->insert_default_newsletters = false;
+			}
+			if( count( $widget_newsletters ) )
+			{	// If at least one newsletter is selected in widget params:
+				$newsletter_subscription_params = array();
+				if( ! empty( $user_tags ) )
+				{
+					$newsletter_subscription_params['usertags'] = $user_tags;
+				}
+				$new_User->set_newsletter_subscriptions( array_keys( $widget_newsletters ), $newsletter_subscription_params );
+			}
+		}
+
+		if( ! empty( $user_tags ) )
+		{	// Set user tags from current widget "Email capture / Quick registration":
+			$new_User->add_usertags( $user_tags );
+		}
+
+		if( $is_quick )
+		{	// Don't save password for quick registration:
+			$new_User->set( 'pass', '' );
+			$new_User->set( 'salt', '' );
+			$new_User->set( 'pass_driver', 'nopass' );
+		}
+		else
+		{	// Save an entered password from normal registration form:
+			$new_User->set_password( $pass1 );
+		}
 		$new_User->set( 'ctry_ID', $country );
 		$new_User->set( 'firstname', $firstname );
 		$new_User->set( 'lastname', $lastname );
@@ -302,17 +421,24 @@ switch( $action )
 
 		if( ! empty( $invitation ) )
 		{ // Invitation code was entered on the form
-			$SQL = new SQL();
-			$SQL->SELECT( 'ivc_source, ivc_grp_ID' );
+			$SQL = new SQL( 'Check if the entered invitation code is not expired' );
+			$SQL->SELECT( 'ivc_source, ivc_grp_ID, ivc_level' );
 			$SQL->FROM( 'T_users__invitation_code' );
 			$SQL->WHERE( 'ivc_code = '.$DB->quote( $invitation ) );
 			$SQL->WHERE_and( 'ivc_expire_ts > '.$DB->quote( date( 'Y-m-d H:i:s', $localtimenow ) ) );
-			if( $invitation_code = $DB->get_row( $SQL->get() ) )
-			{ // Set source and group from invitation code
-				$new_User->set( 'source', $invitation_code->ivc_source );
+			if( $invitation_code = $DB->get_row( $SQL ) )
+			{	// Set source and group from invitation code:
+				if( ! empty( $invitation_code->ivc_source ) )
+				{	// Use invitation source only if it is filled:
+					$new_User->set( 'source', $invitation_code->ivc_source );
+				}
+				if( ! empty( $invitation_code->ivc_level ) )
+				{	// Use invitation level only if it is filled:
+					$new_User->set( 'level', $invitation_code->ivc_level );
+				}
 				$GroupCache = & get_GroupCache();
 				if( $new_user_Group = & $GroupCache->get_by_ID( $invitation_code->ivc_grp_ID, false, false ) )
-				{
+				{	// Use invitation group only if it is filled:
 					$new_User->set_Group( $new_user_Group );
 				}
 			}
@@ -321,6 +447,7 @@ switch( $action )
 		if( $new_User->dbinsert() )
 		{ // Insert system log about user's registration
 			syslog_insert( 'User registration', 'info', 'user', $new_User->ID );
+			report_user_create( $new_User );
 		}
 
 		$new_user_ID = $new_User->ID; // we need this to "rollback" user creation if there's no DB transaction support
@@ -346,9 +473,10 @@ switch( $action )
 		$DB->commit();
 		$UserCache->add( $new_User );
 
-		$initial_hit = $new_User->get_first_session_hit_params( $Session->ID );
+		$initial_hit = $Session->get_first_hit_params();
 		if( ! empty ( $initial_hit ) )
 		{	// Save User Settings
+			$UserSettings->set( 'initial_sess_ID' , $initial_hit->hit_sess_ID, $new_User->ID );
 			$UserSettings->set( 'initial_blog_ID' , $initial_hit->hit_coll_ID, $new_User->ID );
 			$UserSettings->set( 'initial_URI' , $initial_hit->hit_uri, $new_User->ID );
 			$UserSettings->set( 'initial_referer' , $initial_hit->hit_referer , $new_User->ID );
@@ -358,35 +486,55 @@ switch( $action )
 			$UserSettings->set( 'registration_trigger_url' , $session_registration_trigger_url, $new_User->ID );
 		}
 		$UserSettings->set( 'created_fromIPv4', ip2int( $Hit->IP ), $new_User->ID );
-		$UserSettings->set( 'user_domain', $Hit->get_remote_host( true ), $new_User->ID );
+		$UserSettings->set( 'user_registered_from_domain', $user_domain, $new_User->ID );
 		$UserSettings->set( 'user_browser', substr( $Hit->get_user_agent(), 0 , 200 ), $new_User->ID );
 		$UserSettings->dbupdate();
 
 		// Auto subscribe new user to current collection posts/comments:
-		if( $auto_subscribe_posts || $auto_subscribe_comments )
+		if( ! empty( $subscribe_coll_ID ) && ( ! empty( $auto_subscribe_posts ) || ! empty( $auto_subscribe_comments ) ) )
 		{ // If at least one option is enabled
-			$DB->query( 'REPLACE INTO T_subscriptions ( sub_coll_ID, sub_user_ID, sub_items, sub_comments )
-					VALUES ( '.$DB->quote( $Blog->ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
+			$DB->query( 'REPLACE INTO T_subscriptions ( sub_coll_ID, sub_user_ID, sub_items, sub_items_mod, sub_comments )
+					VALUES ( '.$DB->quote( $subscribe_coll_ID ).', '.$DB->quote( $new_User->ID ).', '.$DB->quote( intval( $auto_subscribe_posts ) ).', 0, '.$DB->quote( intval( $auto_subscribe_comments ) ).' )' );
 		}
+
+		// Get user domain status:
+		load_funcs( 'sessions/model/_hitlog.funcs.php' );
+		$DomainCache = & get_DomainCache();
+		$Domain = & get_Domain_by_subdomain( $user_domain );
+		$dom_status_titles = stats_dom_status_titles();
+		$dom_status = $dom_status_titles[ $Domain ? $Domain->get( 'status' ) : 'unknown' ];
 
 		// Send notification email about new user registrations to users with edit users permission
 		$email_template_params = array(
-				'country'     => $country,
+				'country'     => $new_User->get( 'ctry_ID' ),
+				'reg_country' => $new_User->get( 'reg_ctry_ID' ),
+				'reg_domain'  => $user_domain.' ('.$dom_status.')',
+				'user_domain' => $user_domain,
 				'firstname'   => $firstname,
+				'lastname'    => $lastname,
+				'fullname'    => $new_User->get( 'fullname' ),
 				'gender'      => $gender,
 				'locale'      => $locale,
 				'source'      => $new_User->get( 'source' ),
 				'trigger_url' => $session_registration_trigger_url,
 				'initial_hit' => $initial_hit,
+				'level'       => $new_User->get( 'level' ),
+				'group'       => ( ( $user_Group = & $new_User->get_Group() ) ? $user_Group->get_name() : '' ),
 				'login'       => $login,
 				'email'       => $email,
 				'new_user_ID' => $new_User->ID,
 			);
 		send_admin_notification( NT_('New user registration'), 'account_new', $email_template_params );
 
+		// Send notification to owners of lists where new user is automatically subscribed:
+		$new_User->send_list_owner_notifications( 'subscribe' );
+
 		$Plugins->trigger_event( 'AfterUserRegistration', array( 'User' => & $new_User ) );
-		// Move user to suspect group by IP address. Make this move even if during the registration it was added to a trusted group.
+		// Move user to suspect group by IP address and reverse DNS domain and email address domain:
+		// Make this move even if during the registration it was added to a trusted group:
 		antispam_suspect_user_by_IP( '', $new_User->ID, false );
+		antispam_suspect_user_by_reverse_dns_domain( $new_User->ID, false );
+		antispam_suspect_user_by_email_domain( $new_User->ID, false );
 
 		if( $Settings->get('newusers_mustvalidate') )
 		{ // We want that the user validates his email address:
@@ -416,26 +564,42 @@ switch( $action )
 		// extra confusion when account validation is required.
 		$Session->set_User( $new_User );
 
-		// Set redirect_to pending from after_registration setting
-		$after_registration = $Settings->get( 'after_registration' );
-		if( $after_registration == 'return_to_original' )
-		{ // Return to original page ( where user was before the registration process )
-			if( empty( $redirect_to ) )
-			{ // redirect_to param was not set
-				if( $inskin && !empty( $Blog ) )
-				{
-					$redirect_to = $Blog->gen_blogurl();
+		if( $is_quick )
+		{	// Set redirect_to after quick registration from widget or inline tag "[emailcapture:]":
+			if( ! empty( $widget_redirect_to ) )
+			{	// If a redirect param is defined:
+				if( preg_match( '#^(https?://|/)#i', $widget_redirect_to ) )
+				{	// Use absolute or relative url:
+					$widget_redirect_to_url = $widget_redirect_to;
 				}
 				else
-				{
-					$redirect_to = $baseurl;
+				{	// Try to find Item by slug:
+					$ItemCache = & get_ItemCache();
+					if( $widget_redirect_Item = & $ItemCache->get_by_urltitle( $widget_redirect_to, false, false ) )
+					{	// Use permanent url of the detected Item by slug:
+						$widget_redirect_to_url = $widget_redirect_Item->get_permanent_url( '', '', '&' );
+					}
 				}
 			}
+
+			if( $Settings->get( 'registration_after_quick' ) == 'regform' )
+			{	// If we should display additional registration screen after quick registration:
+				$Messages->add( T_('Please double check your email address and choose a password so that you can log in next time you visit us.'), 'warning' );
+				$widget_redirect_to_url = $Blog->get( 'register_finishurl', array(
+						'glue'       => '&',
+						'url_suffix' => 'redirect_to='.rawurlencode( empty( $widget_redirect_to_url ) ? get_returnto_url() : $widget_redirect_to_url ),
+					) );
+			}
+
+			if( isset( $widget_redirect_to_url ) )
+			{	// Redirect to URL from widget config:
+				header_redirect( $widget_redirect_to_url );
+				// Exit here.
+			}
 		}
-		else
-		{ // Return to the specific URL which is set in the registration settings form
-			$redirect_to = $after_registration;
-		}
+
+		// Set redirect_to pending from after_registration setting:
+		$redirect_to = get_redirect_after_registration( $inskin );
 
 		header_redirect( $redirect_to );
 		break;
@@ -472,6 +636,14 @@ if( ! empty( $is_quick ) )
 /*
  * Default: registration form:
  */
+
+// Add core.register_user info again to fill up registration form fields later
+$register_user = array(
+	'name' => $login,
+	'email' => $email
+);
+$Session->set( 'core.register_user', $register_user );
+
 if( $inskin && !empty( $Blog ) )
 { // in-skin display
 	$SkinCache = & get_SkinCache();
@@ -479,14 +651,17 @@ if( $inskin && !empty( $Blog ) )
 	$skin = $Skin->folder;
 	$disp = 'register';
 	$ads_current_skin_path = $skins_path.$skin.'/';
-	require $ads_current_skin_path.'index.main.php';
+	if( file_exists( $ads_current_skin_path.'register.main.php' ) )
+	{	// Call custom file for register disp if it exists:
+		require $ads_current_skin_path.'register.main.php';
+	}
+	else
+	{	// Call index main skin file to display a register disp:
+		require $ads_current_skin_path.'index.main.php';
+	}
 	// already exited here
 	exit(0);
 }
-
-// Load jQuery library and functions to work with ajax response
-require_js( '#jquery#' );
-require_js( 'ajax.js' );
 
 // Display reg form:
 require $adminskins_path.'login/_reg_form.main.php';

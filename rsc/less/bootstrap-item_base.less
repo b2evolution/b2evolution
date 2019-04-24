@@ -1,5 +1,5 @@
 /**
- * item_base.css 
+ * item_base.css
  * These are the default styles that are used INSIDE of a blog post.
  * Override this with an item.css file in your skin folder.
  */
@@ -45,8 +45,8 @@ div.codeblock pre {
 }
 p.codeblock_title,
 .evo_comment p.codeblock_title {
-	font-family: Verdana, sans-serif;
-	letter-spacing: 110%;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	letter-spacing: 0.1em;
 	line-height: 95%;
 	font-weight:bold;
 	font-size: 72%;
@@ -59,8 +59,19 @@ div.codeblock > p {
 
 div.videoblock {
 	text-align: center;
-	margin:auto;
+	margin: 1ex auto;
 	overflow: auto;
+	position: relative;
+	max-width: 100%;
+	height: 0;
+	padding-bottom: 56.25%;
+	iframe {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
 }
 
 div.podplayer {
@@ -78,4 +89,17 @@ div.podplayer {
 
 span.NonExistentWikiWord {
 	border-bottom: 1px dotted #ccc;
+}
+
+/* Styles used by TinyMCE b2evo_shorttags plugin */
+.evo_selected {
+	background-color: #eee;
+}
+
+// Broken links of the plugin "Short Links":
+.evo_shortlink_broken {
+	border-bottom: 1px dotted #F00;
+	&.btn {
+		border: 1px dotted #F00;
+	}
 }

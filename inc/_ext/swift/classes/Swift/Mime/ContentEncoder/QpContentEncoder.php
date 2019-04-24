@@ -11,9 +11,7 @@
 /**
  * Handles Quoted Printable (QP) Transfer Encoding in Swift Mailer.
  *
- * @package    Swift
- * @subpackage Mime
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Mime_ContentEncoder_QpContentEncoder extends Swift_Encoder_QpEncoder implements Swift_Mime_ContentEncoder
 {
@@ -24,7 +22,7 @@ class Swift_Mime_ContentEncoder_QpContentEncoder extends Swift_Encoder_QpEncoder
      *
      * @param Swift_CharacterStream $charStream to use for reading characters
      * @param Swift_StreamFilter    $filter     if canonicalization should occur
-     * @param boolean               $dotEscape  if dot stuffing workaround must be enabled
+     * @param bool                  $dotEscape  if dot stuffing workaround must be enabled
      */
     public function __construct(Swift_CharacterStream $charStream, Swift_StreamFilter $filter = null, $dotEscape = false)
     {
@@ -60,8 +58,8 @@ class Swift_Mime_ContentEncoder_QpContentEncoder extends Swift_Encoder_QpEncoder
      *
      * @param Swift_OutputByteStream $os              output stream
      * @param Swift_InputByteStream  $is              input stream
-     * @param integer                $firstLineOffset
-     * @param integer                $maxLineLength
+     * @param int                    $firstLineOffset
+     * @param int                    $maxLineLength
      */
     public function encodeByteStream(Swift_OutputByteStream $os, Swift_InputByteStream $is, $firstLineOffset = 0, $maxLineLength = 0)
     {
@@ -76,14 +74,14 @@ class Swift_Mime_ContentEncoder_QpContentEncoder extends Swift_Encoder_QpEncoder
 
         $currentLine = '';
         $prepend = '';
-        $size=$lineLen=0;
+        $size = $lineLen = 0;
 
         while (false !== $bytes = $this->_nextSequence()) {
-            //If we're filtering the input
+            // If we're filtering the input
             if (isset($this->_filter)) {
-                //If we can't filter because we need more bytes
+                // If we can't filter because we need more bytes
                 while ($this->_filter->shouldBuffer($bytes)) {
-                    //Then collect bytes into the buffer
+                    // Then collect bytes into the buffer
                     if (false === $moreBytes = $this->_nextSequence(1)) {
                         break;
                     }
@@ -92,23 +90,34 @@ class Swift_Mime_ContentEncoder_QpContentEncoder extends Swift_Encoder_QpEncoder
                         $bytes[] = $b;
                     }
                 }
-                //And filter them
+                // And filter them
                 $bytes = $this->_filter->filter($bytes);
             }
 
             $enc = $this->_encodeByteSequence($bytes, $size);
-            if ($currentLine && $lineLen+$size >= $thisLineLength) {
-                $is->write($prepend . $this->_standardize($currentLine));
+
+            $i = strpos($enc, '=0D=0A');
+            $newLineLength = $lineLen + ($i === false ? $size : $i);
+
+            if ($currentLine && $newLineLength >= $thisLineLength) {
+                $is->write($prepend.$this->_standardize($currentLine));
                 $currentLine = '';
                 $prepend = "=\r\n";
                 $thisLineLength = $maxLineLength;
-                $lineLen=0;
+                $lineLen = 0;
             }
-            $lineLen+=$size;
+
             $currentLine .= $enc;
+
+            if ($i === false) {
+                $lineLen += $size;
+            } else {
+                // 6 is the length of '=0D=0A'.
+                $lineLen = $size - strrpos($enc, '=0D=0A') - 6;
+            }
         }
         if (strlen($currentLine)) {
-            $is->write($prepend . $this->_standardize($currentLine));
+            $is->write($prepend.$this->_standardize($currentLine));
         }
     }
 

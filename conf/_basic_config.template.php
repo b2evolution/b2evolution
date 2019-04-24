@@ -24,7 +24,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 
 // TODO: dh> this file was meant to be used for things where you only need the basic config..
 // fp> also:
-// - At least _admin.php should only be called when in the backoffice.
+// - At least evoadm.php should only be called when in the backoffice.
 // - Also we should probably start by moving as many conf options to the backoffice as possible and see how much stuff is left in conf files
 //    Note: some stuff does not make sense in the back-office (for example stuff that depends on the physical path where the files are installed)
 // - In view of reorganization, please list (all or examples) of situations where only a subset of the conf should be loaded.
@@ -107,7 +107,7 @@ $allow_evodb_reset = 0;	// Set to 1 or 2 to enable. LEAVE this at 0 on productio
 /**
  * $baseurl is where your blogs reside by default. CHECK THIS CAREFULLY or nothing will work.
  * It should be set to the URL where you can find the blog templates and/or the blog stub files,
- * that means index.php, blog1.php, blog2.php, etc. as well as admin.php.
+ * that means index.php, blog1.php, blog2.php, etc. as well as evoadm.php.
  * Note: Blogs can be in subdirectories of the baseurl. However, no blog should be outside
  * of there, or some tricky things may fail (including intempestive logouts)
  *
@@ -123,7 +123,7 @@ $baseurl = 'http://localhost/b2evolution/blogs/';
 // Use the following if you want to use the current domain:
 /*
 if( isset($_SERVER['HTTP_HOST']) )
-{	// This only works if HOSt provided by webserver (i-e DOES NOT WORK IN PHP CLI MODE)
+{	// This only works if HOST is provided by webserver (i-e DOES NOT WORK IN PHP CLI MODE)
 	$baseurl = ( (isset($_SERVER['HTTPS']) && ( $_SERVER['HTTPS'] != 'off' ) ) ?'https://':'http://')
 							.$_SERVER['HTTP_HOST'].'/';
 }

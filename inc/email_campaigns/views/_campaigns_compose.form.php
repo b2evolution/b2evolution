@@ -15,7 +15,9 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 global $admin_url, $tab;
-global $edited_EmailCampaign, $Plugins;
+global $edited_EmailCampaign, $Plugins, $UserSettings;
+
+echo_image_insert_modal();
 
 $Form = new Form( NULL, 'campaign_form' );
 $Form->begin_form( 'fform' );
@@ -25,21 +27,22 @@ $Form->hidden( 'ctrl', 'campaigns' );
 $Form->hidden( 'current_tab', $tab );
 $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 
-$Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'creating-an-email-campaign' ) );
-	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), '', array( 'maxlength' => 255, 'required' => true ) );
+$Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'campaign-compose-panel' ) );
+	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), T_('as it will appear in your subscriber\'s inboxes'), array( 'maxlength' => 255, 'required' => true ) );
+	$Form->text_input( 'ecmp_email_defaultdest', $edited_EmailCampaign->get( 'email_defaultdest' ), 60, T_('Default destination'), '', array( 'maxlength' => 255 ) );
 
 	// Plugin toolbars:
 	ob_start();
 	echo '<div class="email_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'DisplayEmailToolbar' );
+	$Plugins->trigger_event( 'DisplayEmailToolbar', array( 'target_type' => 'EmailCampaign', 'EmailCampaign' => & $edited_EmailCampaign ) );
 	echo '</div>';
 	$email_toolbar = ob_get_clean();
 
 	// Plugin buttons:
 	ob_start();
 	echo '<div class="edit_actions">';
-	echo '<div class="pull-left">';
+	echo '<div class="pull-left" style="display: flex; flex-direction: row; align-items: center;">';
 	// CALL PLUGINS NOW:
 	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
 			'target_type'   => 'EmailCampaign',
@@ -47,6 +50,18 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 			'content_id'    => 'ecmp_email_text',
 			'edit_layout'   => 'expert',
 		) );
+
+	echo '<div style="margin: 7px 0 0 5px; display: flex; align-items: center;">';
+	ob_start();
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+			'target_type'   => 'EmailCampaign',
+			'target_object' => $edited_EmailCampaign,
+			'content_id'    => 'ecmp_email_text',
+			'edit_layout'   => 'expert_quicksettings',
+		) );
+	$quick_setting_switch = ob_get_flush();
+	echo '</div>';
+
 	echo '</div>';
 	echo '</div>';
 	$email_plugin_buttons = ob_get_clean();
@@ -59,8 +74,10 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	$Form->inputstart = $form_inputstart;
 	$Form->inputend = $form_inputend;
 
+
+
 	// set b2evoCanvas for plugins:
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "ecmp_email_text" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "ecmp_email_text" );</script>';
 
 	// Display renderers
 	$current_renderers = !empty( $edited_EmailCampaign ) ? $edited_EmailCampaign->get_renderers_validated() : array( 'default' );
@@ -71,6 +88,11 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	}
 $Form->end_fieldset();
 
+
+// ####################### ATTACHMENTS/LINKS #########################
+$Form->attachments_fieldset( $edited_EmailCampaign );
+
+
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
@@ -79,3 +101,18 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 $Form->end_form( $buttons );
 
 ?>
+<script>
+function toggleWYSIWYGSwitch( val )
+{
+	if( val )
+	{
+		jQuery( 'p#active_wysiwyg_switch' ).show();
+		jQuery( 'p#disable_wysiwyg_switch' ).hide();
+	}
+	else
+	{
+		jQuery( 'p#active_wysiwyg_switch' ).hide();
+		jQuery( 'p#disable_wysiwyg_switch' ).show();
+	}
+}
+</script>

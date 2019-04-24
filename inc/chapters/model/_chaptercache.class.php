@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -97,15 +97,18 @@ class ChapterCache extends DataObjectCache
 
 	/**
 	 * Add a dataobject to the cache
+	 *
+	 * @param object Chapter object to add in cache
+	 * @return boolean TRUE on adding, FALSE on wrong object or if it is already in cache
 	 */
-	function add( & $Obj )
+	function add( $Chapter )
 	{
-		if( parent::add( $Obj ) )
+		if( parent::add( $Chapter ) )
 		{	// Successfully added
 
 			if( !empty( $this->subset_property ) )
 			{	// Also add to subset cache:
-				$this->subset_cache[ $Obj->{$this->subset_property} ][ $Obj->ID ] = & $Obj;
+				$this->subset_cache[ $Chapter->{$this->subset_property} ][ $Chapter->ID ] = $Chapter;
 			}
 			return true;
 		}
@@ -663,7 +666,10 @@ class ChapterCache extends DataObjectCache
 			return strcmp( $Item->title, $Chapter->name );
 		}
 
-		if( $Item->order == NULL )
+		// Get item order depending on category:
+		$item_order = $Item->get_order( $Chapter->get( 'parent_ID' ) );
+
+		if( $item_order == NULL )
 		{
 			return $Chapter->order == NULL ? 0 : 1;
 		}
@@ -672,7 +678,7 @@ class ChapterCache extends DataObjectCache
 			return -1;
 		}
 
-		return ( $Item->order < $Chapter->order ) ? -1 : ( ( $Item->order > $Chapter->order ) ? 1 : 0 );
+		return ( $item_order < $Chapter->order ) ? -1 : ( ( $item_order > $Chapter->order ) ? 1 : 0 );
 	}
 
 
@@ -719,7 +725,7 @@ class ChapterCache extends DataObjectCache
 	/**
 	 * Return recursive display of loaded categories
 	 *
-	 * @param array callback funtions (to format the display)
+	 * @param array callback functions (to format the display)
 	 * @param integer|NULL NULL for all subsets
 	 * @param array categories list to display
 	 * @param integer depth of categories list
@@ -735,6 +741,7 @@ class ChapterCache extends DataObjectCache
 	function recurse( $callbacks, $subset_ID = NULL, $cat_array = NULL, $level = 0, $max_level = 0, $params = array() )
 	{
 		$params = array_merge( array(
+				'highlight_current' => true,
 				'sorted' => false,
 				'chapter_path' => array(),
 				'expand_all' => true,
@@ -777,7 +784,7 @@ class ChapterCache extends DataObjectCache
 		foreach( $cat_array as $cat )
 		{
 			// Check if category is expended
-			$params['is_selected'] = in_array( $cat->ID, $params['chapter_path'] );
+			$params['is_selected'] = $params['highlight_current'] && in_array( $cat->ID, $params['chapter_path'] );
 			$params['is_opened'] = $params['expand_all'] || $params['is_selected'];
 
 			// Display a category:
@@ -790,8 +797,8 @@ class ChapterCache extends DataObjectCache
 				$r .= $callbacks['line']( $cat, $level, $params ); // <li> Category  - or - <tr><td>Category</td></tr> ...
 			}
 
-			if( ( empty( $max_level ) || $max_level > $level + 1 ) && $params['is_opened'] )
-			{ // Iterate through sub categories recursively
+			if( $params['is_opened'] || ( $max_level > $level + 1 ) )
+			{	// Iterate through sub categories recursively:
 				$params['level'] = $level;
 				$r .= $this->iterate_through_category_children( $cat, $callbacks, true, $params );
 			}
@@ -843,7 +850,8 @@ class ChapterCache extends DataObjectCache
 				'sorted'    => false,
 				'level'     => 0,
 				'max_level' => 0,
-				'subset_ID' => $Chapter->blog_ID
+				'subset_ID' => $Chapter->blog_ID,
+				'items_order_alpha_func' => 'compare_items_by_title',
 			), $params );
 
 		if( $params['sorted'] && $has_sub_cats )
@@ -853,7 +861,7 @@ class ChapterCache extends DataObjectCache
 		if( ! empty( $callbacks['posts'] ) )
 		{
 			$ItemCache = & get_ItemCache();
-			$cat_items = $ItemCache->get_by_cat_ID( $Chapter->ID, $params['sorted'] );
+			$cat_items = $ItemCache->get_by_cat_ID( $Chapter->ID, $params['items_order_alpha_func'] );
 		}
 
 		if( $has_sub_cats || !empty( $cat_items ) )
@@ -984,6 +992,9 @@ class ChapterCache extends DataObjectCache
 		{	// Get all parent categorie:
 			$Cat_array = $this->root_cats;
 		}
+
+		// Sort categories alphabetically or manually depending on settings:
+		usort( $Cat_array, array( 'Chapter', 'compare_chapters' ) );
 
 		$r = '';
 

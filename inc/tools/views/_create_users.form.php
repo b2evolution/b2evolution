@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -18,7 +18,7 @@ global $num_users, $user_groups, $advanced_user_perms;
 
 $Form = new Form( NULL, 'create_users', 'user', 'compact' );
 
-$Form->global_icon( T_('Cancel!'), 'close', regenerate_url( 'action' ) );
+$Form->global_icon( T_('Cancel').'!', 'close', regenerate_url( 'action' ) );
 
 $Form->begin_form( 'fform',  T_('Create sample users') );
 
@@ -39,7 +39,7 @@ $Form->begin_form( 'fform',  T_('Create sample users') );
 				T_('Users of this group automatically get a new collection') :
 				T_('Users of this group do NOT automatically get a new collection') );
 	}
-	$Form->checklist( $groups_options, 'user_groups', T_('Create new users in'), true, false,
+	$Form->checklist( $groups_options, 'user_groups', T_('Create new users in'), 'mark_only', false,
 		array( 'note' => T_('Note: For each user it creates, the tool will randomly select between the allowed (checked) options above') ) );
 
 	$advanced_user_perms_array = array(
@@ -62,7 +62,7 @@ $Form->begin_form( 'fform',  T_('Create sample users') );
 	{
 		$advanced_user_perms_options[] = array( 'advanced_user_perms[]', $advanced_perm_key, $advanced_perm_title, is_null( $advanced_user_perms ) || in_array( $advanced_perm_key, $advanced_user_perms ) );
 	}
-	$Form->checklist( $advanced_user_perms_options, 'advanced_user_perms', T_('Advanced user perms to grant on existing collections with advanced perms'), true, false,
+	$Form->checklist( $advanced_user_perms_options, 'advanced_user_perms', T_('Advanced user perms to grant on existing collections with advanced perms'), 'mark_only', false,
 		array( 'note' => T_('Note: For each new user/existing collection combination, the tool will randomly select between the allowed (checked) options above') ) );
 
 $Form->end_form( array( array( 'submit', 'submit', T_('Create'), 'SaveButton' ) ) );

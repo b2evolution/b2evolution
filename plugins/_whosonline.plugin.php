@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -29,10 +29,11 @@ class whosonline_plugin extends Plugin
 	var $name;
 	var $code = 'evo_WhosOnline';
 	var $priority = 96;
-	var $version = '5.0.0';
+	var $version = '6.11.1';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'other';
+	var $widget_icon = 'wifi';
 
 
 	/**
@@ -54,7 +55,7 @@ class whosonline_plugin extends Plugin
 	 */
 	function get_widget_param_definitions( $params )
 	{
-		$r = array(
+		$r = array_merge( array(
 			'contacticons' => array(
 				'label' => T_('Contact icons'),
 				'note' => T_('Display contact icons allowing to send private messages to logged in users.'),
@@ -70,7 +71,15 @@ class whosonline_plugin extends Plugin
 					'min' => 1, // 0 would not make sense.
 				),
 			),
-		);
+		), parent::get_widget_param_definitions( $params ) );
+
+		if( isset( $r['allow_blockcache'] ) )
+		{	// Disable "allow blockcache" because this widget displays the dynamic data:
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
+
 		return $r;
 	}
 
@@ -256,7 +265,7 @@ class OnlineSessions
 	 */
 	function display_online_users( $params )
 	{
-		global $DB, $Blog, $UserSettings;
+		global $DB, $Collection, $Blog, $UserSettings;
 
 		if( !isset($this->_registered_Users) )
 		{

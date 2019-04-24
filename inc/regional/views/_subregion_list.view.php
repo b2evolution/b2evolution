@@ -13,8 +13,6 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
-
 // Get params from request
 $s = param( 's', 'string', '', true ); // Search keyword
 $c = param( 'c', 'integer', 0, true ); // Country
@@ -51,15 +49,13 @@ if( count( $sql_where ) > 0 )
 // Create result set:
 $Results = new Results( $SQL->get(), 'subrg_', '-D' );
 
-$Results->title = T_('Sub-regions/Departments/Counties').get_manual_link('countries_list');
+$Results->title = T_('Sub-regions/Departments/Counties').get_manual_link('subregions-list');
 
 /*
  * STATUS TD:
  */
 function subrg_td_enabled( $subrg_enabled, $subrg_ID )
 {
-
-	global $dispatcher;
 
 	$r = '';
 
@@ -79,8 +75,6 @@ function subrg_td_enabled( $subrg_enabled, $subrg_ID )
 
 function subrg_td_preferred( $subrg_preferred, $subrg_ID )
 {
-
-	global $dispatcher;
 
 	$r = '';
 
@@ -130,7 +124,7 @@ function filter_subregions( & $Form )
 	load_class( 'regional/model/_country.class.php', 'Country' );
 	$CountryCache = & get_CountryCache( NT_('All') );
 	$Form->select_country( 'c', get_param('c'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
-	
+
 	$Form->select_input_options( 'r', get_regions_option_list( get_param('c'), get_param('r') ), T_('Region') );
 
 	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
@@ -205,13 +199,12 @@ else
  */
 function subrg_td_actions($subrg_enabled, $subrg_ID )
 {
-	global $dispatcher;
 
 	$r = '';
 
 	if( $subrg_enabled == true )
 	{
-		$r .= action_icon( T_('Disable the sub-region!'), 'deactivate', 
+		$r .= action_icon( T_('Disable the sub-region!'), 'deactivate',
 										regenerate_url( 'action', 'action=disable_subregion&amp;subrg_ID='.$subrg_ID.'&amp;'.url_crumb('subregion') ) );
 	}
 	else
@@ -238,17 +231,20 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 	$Results->global_icon( T_('Create a new sub-region...'), 'new',
 				regenerate_url( 'action', 'action=new'), T_('New sub-region').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+
+	$Results->global_icon( T_('Import sub-regions from CSV file ...'), 'new',
+				regenerate_url( 'action', 'action=csv'), T_('Import CSV').' &raquo;', 3, 4  );
 }
 
 $Results->display();
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#c' ).change( function ()
 {	// Load option list with regions for seleted country
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_regions_option_list&ctry_id=' + jQuery( this ).val(),
 	success: function( result )
 		{

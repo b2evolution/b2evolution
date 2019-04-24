@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -52,7 +52,7 @@ global $AdminUI;
 // Admin skin dropdown list handler
 // Display settings corresponding only for the current (loaded) admin skin
 ?>
-<script type="text/javascript">
+<script>
 	function admin_skin_changed()
 	{
 		// admin skin dropdown list selected value
@@ -88,7 +88,7 @@ user_prevnext_links( array(
 
 $Form = new Form( NULL, 'user_checkchanges' );
 
-$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+$Form->title_fmt = '$title$';
 
 if( !$user_profile_only )
 {
@@ -96,7 +96,7 @@ if( !$user_profile_only )
 }
 
 $form_text_title = T_( 'Edit advanced preferences' ); // used for js confirmation message on leave the changed form
-$form_title = get_usertab_header( $edited_User, 'advanced', T_( 'Edit advanced preferences' ).get_manual_link( 'user-advanced-tab' ) );
+$form_title = get_usertab_header( $edited_User, 'advanced', '<span class="nowrap">'.T_( 'Edit advanced preferences' ).'</span>'.get_manual_link( 'user-advanced-tab' ) );
 
 $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
@@ -110,7 +110,7 @@ $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_t
 
 	/***************  Preferences  **************/
 
-$Form->begin_fieldset( T_('Preferences').get_manual_link('user_preferences') );
+$Form->begin_fieldset( T_('Preferences').get_manual_link('user-preferences') );
 
 /*
  * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
@@ -164,15 +164,18 @@ if( $action != 'view' )
 }
 else
 { // display only
-	
+
 	/*
 	 * We currently support only one backoffice skin, so we don't need a system for selecting the backoffice skin.
 	$Form->info_field( T_('Admin skin'), $value_admin_skin, array( 'note' => T_('The skin defines how the backoffice appears to you.') ) );
 	 */
 
-	// fp> TODO: a lot of things will not be displayed in view only mode. Do we want that?
-
-	$Form->info_field( T_('Results per page'), $UserSettings->get( 'results_per_page', $edited_User->ID ), array( 'note' => T_('Number of rows displayed in results tables.') ) );
+	$Form->info( T_('Action icon display'), $UserSettings->get( 'action_icon_threshold', $edited_User->ID ), T_('1:more icons ... 5:less icons') );
+	$Form->info( T_('Action word display'), $UserSettings->get( 'action_word_threshold', $edited_User->ID ), T_('1:more action words ... 5:less action words') );
+	$Form->info( T_('Display icon legend'), ( $UserSettings->get( 'display_icon_legend', $edited_User->ID ) ? T_('yes') : T_('no') ), T_('Display a legend at the bottom of every page including all action icons used on that page.') );
+	$Form->info( T_('Control form closing'), ( $UserSettings->get( 'control_form_abortions', $edited_User->ID ) ? T_('yes') : T_('no') ), T_('This will alert you if you fill in data into a form and try to leave the form before submitting the data.') );
+	$Form->info( T_('Focus on first field'), ( $UserSettings->get( 'focus_on_first_input', $edited_User->ID ) ? T_('yes') : T_('no') ), T_('The focus will automatically go to the first input text field.') );
+	$Form->info( T_('Results per page'), $UserSettings->get( 'results_per_page', $edited_User->ID ), T_('Number of rows displayed in results tables.') );
 }
 
 $Form->end_fieldset();
@@ -254,4 +257,6 @@ $Form->end_form();
 // End payload block:
 $this->disp_payload_end();
 
+// Enable JS for fieldset folding:
+echo_fieldset_folding_js();
 ?>

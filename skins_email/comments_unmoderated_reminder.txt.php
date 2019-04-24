@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $baseurl, $htsrv_url, $comment_moderation_reminder_threshold;
+global $admin_url, $baseurl, $Settings;
 
 $BlogCache = & get_BlogCache();
 
@@ -24,7 +24,7 @@ $params = array_merge( array(
 		'comments' => array(),
 	), $params );
 
-echo sprintf( T_('There have been comments awaiting moderation for more than %s in the following blogs:'), seconds_to_period( $comment_moderation_reminder_threshold ) );
+echo sprintf( T_('There have been comments awaiting moderation for more than %s in the following blogs:'), seconds_to_period( $Settings->get( 'comment_moderation_reminder_threshold' ) ) );
 echo "\n\n";
 
 foreach( $params['blogs'] as $blog_ID )
@@ -36,7 +36,7 @@ foreach( $params['blogs'] as $blog_ID )
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'You are a moderator of this blog and you are receiving notifications when a comment may need moderation.' )."\n".
 		T_( 'If you don\'t want to receive any more notifications about comment moderation, click here' ).': '.
-		$htsrv_url.'quick_unsubscribe.php?type=cmt_moderation_reminder&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=cmt_moderation_reminder&user_ID=$user_ID$&key=$unsubscribe_key$';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------
 emailskin_include( '_email_footer.inc.txt.php', $params );

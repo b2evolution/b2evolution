@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -21,11 +21,11 @@ global $Comment;
 /**
  * @var Blog
  */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var CommentList
  */
-global $CommentList, $show_statuses;
+global $CommentList;
 
 global $current_User, $admin_url, $tab3;
 
@@ -50,14 +50,11 @@ if( check_comment_mass_delete( $CommentList ) )
 	$block_item_Widget->global_icon( T_('Delete all comments!'), 'recycle', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
 }
 
-$emptytrash_link = '';
-// Display recycle bin placeholder, because users may have rights to recycle particular comments
-$opentrash_link = '<span id="recycle_bin" class="floatright"></span>';
 if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
 {
 	if( $CommentList->is_trashfilter() )
 	{
-		$block_item_Widget->global_icon( T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;blog='.$CommentList->Blog->ID.'&amp;action=emptytrash', T_('Empty recycle bin...'), 5, 3 );
+		$block_item_Widget->global_icon( /* TRANS: verb */ T_('Empty recycle bin'), 'recycle_empty', $admin_url.'?ctrl=comments&amp;blog='.$CommentList->Blog->ID.'&amp;action=emptytrash', /* TRANS: verb */ T_('Empty recycle bin').'...', 5, 3 );
 	}
 	else
 	{
@@ -70,7 +67,7 @@ if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
 			) );
 	}
 }
-$block_item_Widget->title = $opentrash_link.$emptytrash_link.( $tab3 == 'meta' ? T_('Meta comments') : T_('Feedback (Comments, Trackbacks...)') );
+$block_item_Widget->title = ( $tab3 == 'meta' ? T_('Meta comments') : T_('Feedback (Comments, Trackbacks...)') );
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title
@@ -101,7 +98,7 @@ load_funcs( 'comments/model/_comment_js.funcs.php' );
 // Display list of comments:
 echo '<a id="comments"></a>'; // Used to animate a moving the deleting comment to trash by ajax
 // comments_container value is -1, because in this case we have to show all comments in current blog (Not just one item comments)
-echo '<div id="comments_container" value="-1" class="full_comment_list">';
+echo '<div id="comments_container" value="-1" class="evo_comments_container evo_comments_container__full_list">';
 require dirname(__FILE__).'/_comment_list.inc.php';
 echo '</div>';
 

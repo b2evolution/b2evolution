@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'comments/model/_comment.class.php', 'Comment' );
 
 /**
- * Generic comments/trackbacks/pingbacks counting
+ * Generic comments/trackbacks/pingbacks/webmentions counting
  *
  * @todo check this in a multiblog page...
  * @todo This should support visibility: at least in the default front office (_feedback.php), there should only the number of visible comments/trackbacks get used ({@link Item::feedback_link()}).
@@ -79,7 +79,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 						'trackbacks' => $statuses_array,
 						'pingbacks'  => $statuses_array,
 						'feedbacks'  => $statuses_array,
-						'metas'      => $statuses_array
+						'metas'      => $statuses_array,
+						'webmentions'=> $statuses_array,
 					);
 			}
 
@@ -121,7 +122,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 				'trackbacks' => $statuses_array,
 				'pingbacks'  => $statuses_array,
 				'feedbacks'  => $statuses_array,
-				'metas'      => $statuses_array
+				'metas'      => $statuses_array,
+				'webmentions'=> $statuses_array,
 			);
 
 		$count_SQL->WHERE_and( 'comment_item_ID = '.intval($post_id) );
@@ -145,7 +147,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 		}
 	}
 
-	if( ! in_array( $mode, array( 'comments', 'trackbacks', 'pingbacks', 'metas' ) ) )
+	if( ! in_array( $mode, array( 'comments', 'trackbacks', 'pingbacks', 'metas', 'webmentions' ) ) )
 	{
 		$mode = 'feedbacks';
 	}
@@ -277,7 +279,7 @@ function get_allowed_statuses( $blog )
  */
 function echo_comment_buttons( $Form, $edited_Comment )
 {
-	global $Blog, $AdminUI;
+	global $Collection, $Blog, $AdminUI;
 
 	if( $edited_Comment->is_meta() )
 	{ // Meta comments don't have a status, Display only one button to update
@@ -309,7 +311,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 			{ // Use dropdown for bootstrap skin
 				$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 				$Form->hidden( 'comment_status', $edited_Comment->status );
-				echo '<div class="btn-group dropup comment_status_dropdown">';
+				echo '<div class="btn-group dropup comment_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Comment->status ).'">';
 				echo '<button type="button" class="btn btn-status-'.$edited_Comment->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
 								.'<span>'.$status_options[ $edited_Comment->status ].'</span>'
 							.' <span class="caret"></span></button>';
@@ -352,33 +354,78 @@ function echo_comment_buttons( $Form, $edited_Comment )
  *
  * @param object Form
  * @param object edited Comment
+ * @param string Max allowed status
+ * @param string Action: 'update' - for button titles like 'Save as Public!', 'comments_visibility' - for button titles like 'Set visibility to Public'
  */
-function echo_comment_status_buttons( $Form, $edited_Comment )
+function echo_comment_status_buttons( $Form, $edited_Comment = NULL, $max_allowed_status = '', $action = 'update' )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
-	$comment_Item = & $edited_Comment->get_Item();
+	if( $edited_Comment !== NULL )
+	{	// If the edited comment is defined, e-g on edit form:
+		if( $edited_Comment->is_meta() )
+		{	// Don't suggest to change a status of meta comment:
+			$Form->submit( array( 'actionArray['.$action.']', T_('Save Changes!'), 'SaveButton', '' ) );
+			return;
+		}
+
+		$comment_Item = & $edited_Comment->get_Item();
+		$comment_status = $edited_Comment->status;
+	}
+	else
+	{	// If comment is not defined, e-g on action for several comments from list:
+		$comment_Item = NULL;
+		$comment_status = $max_allowed_status;
+	}
+
 	// Comment status cannot be more than post status, restrict it:
-	$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : '' );
+	$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : $max_allowed_status );
 
 	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $edited_Comment->status, $restrict_max_allowed_status ), array( 'redirected', 'trash' ) );
-	// Get allowed visibility statuses
-	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $comment_status, $restrict_max_allowed_status ), array( 'redirected', 'trash' ) );
+	// Get allowed visibility statuses:
+	if( $action == 'comments_visibility' )
+	{
+		$status_options = get_visibility_statuses( '', $exclude_statuses );
+		foreach( $status_options as $status_key => $status_title )
+		{
+			$status_options[ $status_key ] = sprintf( T_('Set visibility to %s'), $status_title );
+		}
+	}
+	else // 'update'
+	{
+		$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+		$status_options = array_map( 'T_', $status_options );
+	}
+
+	if( empty( $status_options ) )
+	{	// If current User has no permission to edit to any status:
+		return;
+	}
+
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 
-	$Form->hidden( 'comment_status', $edited_Comment->status );
+	if( ! isset( $status_options[ $comment_status ] ) )
+	{	// Check if the status is allowed for current User:
+		foreach( $status_options as $status_key => $status_title )
+		{
+			$comment_status = $status_key;
+			break;
+		}
+	}
+
+	$Form->hidden( 'comment_status', $comment_status );
 	echo '<div class="btn-group dropup comment_status_dropdown">';
-	echo '<button type="submit" class="btn btn-status-'.$edited_Comment->status.'" name="actionArray[update]">'
-				.'<span>'.T_( $status_options[ $edited_Comment->status ] ).'</span>'
+	echo '<button type="submit" class="btn btn-status-'.$comment_status.'" name="actionArray['.$action.']">'
+				.'<span>'.$status_options[ $comment_status ].'</span>'
 			.'</button>'
-			.'<button type="button" class="btn btn-status-'.$edited_Comment->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
+			.'<button type="button" class="btn btn-status-'.$comment_status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
 				.'<span class="caret"></span>'
 			.'</button>';
 	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="comment_status_dropdown">';
 	foreach( $status_options as $status_key => $status_title )
 	{
-		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.T_( $status_title ).'</span></a></li>';
+		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 	}
 	echo '</ul>';
 	echo '</div>';
@@ -537,7 +584,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 	global $admin_url, $current_User, $DB, $blog;
 
 	$params = array_merge( array(
-			'before' => '<div id="recycle_bin" class="floatright">',
+			'before' => '<div id="recycle_bin" class="pull-right">',
 			'after'  => ' </div>',
 			'class'  => 'action_icon btn btn-default btn-sm',
 		), $params );
@@ -545,7 +592,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 	$show_recycle_bin = ( !$check_perm || $current_User->check_perm( 'blogs', 'editall' ) );
 	if( $show_recycle_bin && ( !$force_show ) )
 	{ // get number of trash comments:
-		$SQL = new SQL( 'Get number of trash comments' );
+		$SQL = new SQL( 'Get number of trash comments for open trash link' );
 		$SQL->SELECT( 'COUNT( comment_ID )' );
 		$SQL->FROM( 'T_comments' );
 		$SQL->FROM_add( 'INNER JOIN T_items__item ON comment_item_ID = post_ID' );
@@ -555,7 +602,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 		{
 			$SQL->WHERE_and( 'cat_blog_ID = '.$DB->quote( $blog ) );
 		}
-		$show_recycle_bin = ( $DB->get_var( $SQL->get() ) > 0 );
+		$show_recycle_bin = ( $DB->get_var( $SQL ) > 0 );
 	}
 
 	$result = $params['before'];
@@ -587,7 +634,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 
 	$params = array_merge( array(
 			'comments_disabled_text_member'     => T_( 'You must be a member of this blog to comment.' ),
-			'comments_disabled_text_registered' => T_( 'You must be logged in to leave a comment.' ),
+			'comments_disabled_text_registered' => T_( 'In order to leave a comment' ),
 			'comments_disabled_text_validated'  => T_( 'You must activate your account before you can leave a comment.' ),
 			'form_comment_text'                 => T_('Comment text'),
 			'form_class_comment'                => 'bComment',
@@ -617,10 +664,12 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	{
 		case 'member':
 			$disabled_text = $params['comments_disabled_text_member'];
+			$form_disabled_text = $disabled_text;
 			break;
 
 		case 'registered':
 			$disabled_text = $params['comments_disabled_text_registered'];
+			$form_disabled_text = T_( 'You must be logged in to leave a comment.' );
 			break;
 
 		default:
@@ -638,14 +687,14 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	elseif( $current_User->check_status( 'can_be_validated' ) )
 	{ // logged in but the account is not activated
 		$disabled_text = $params['comments_disabled_text_validated'];
+		$form_disabled_text = $disabled_text;
 		$activateinfo_link = '<a href="'.get_activate_info_url( $item_url, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>';
 	}
 	// else -> user is logged in and account was activated
 
-	$register_link = '';
 	if( ( !$is_logged_in ) && ( $Settings->get( 'newusers_canregister' ) == 'yes' ) && ( $Settings->get( 'registration_is_public' ) ) )
 	{
-		$register_link = '<p>'.sprintf( T_( 'If you have no account yet, you can <a href="%s">register now</a>...<br />(It only takes a few seconds!)' ), get_user_register_url( $item_url, 'reg to post comment' ) ).'</p>';
+		$register_link = '<a class="btn btn-primary btn-sm" href="'.get_user_register_url( $item_url, 'reg to post comment' ).'">'.T_( 'Register now!' ).'</a>';
 	}
 
 	// disabled comment form
@@ -662,8 +711,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	}
 	else
 	{ // not logged in, add login and register links
-		echo $disabled_text.' '.$login_link;
-		echo $register_link;
+		echo $disabled_text.' '.$login_link.( ! empty( $register_link ) ? ' '.T_('or').' '.$register_link : '' );
 	}
 	echo $params['form_params']['comments_disabled_after'];
 
@@ -673,7 +721,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	echo $params['form_params']['fieldstart'];
 	echo $params['form_params']['labelstart'].$params['form_comment_text'].':'.$params['form_params']['labelend'];
 	echo $params['form_params']['inputstart'];
-	echo '<textarea id="p" class="bComment form_textarea_input" rows="5" name="p" cols="40" disabled="disabled">'.$disabled_text.'</textarea>';
+	echo '<textarea id="p" class="bComment form_textarea_input" rows="5" name="p" cols="40" disabled="disabled">'.$form_disabled_text.'</textarea>';
 	echo $params['form_params']['inputend'];
 	echo $params['form_params']['fieldend'];
 	echo $params['form_params']['fieldset_end'];
@@ -689,34 +737,69 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 /**
  * Save Comment object into the current Session
  *
- * @param $Comment
+ * @param object Comment
+ * @param string Kind of session var: 'unsaved' or 'preview'
+ * @param string Comment type: Meta or Normal
  */
-function save_comment_to_session( $Comment )
+function save_comment_to_session( $Comment, $kind = 'unsaved', $type = '' )
 {
 	global $Session;
-	$Session->set( 'core.unsaved_Comment', $Comment );
+
+	if( $type != 'meta' )
+	{	// Use default type if it is not allowed:
+		$type = '';
+	}
+
+	$Session->set( 'core.'.$kind.'_Comment'.$type, $Comment );
 }
 
 
 /**
  * Get Comment object from the current Session
  *
+ * @param string Kind of session var: 'unsaved' or 'preview'
+ * @param string Comment type: Meta or Normal
  * @return Comment|NULL Comment object if Session core.unsaved_Comment param is set, NULL otherwise
  */
-function get_comment_from_session()
+function get_comment_from_session( $kind = 'unsaved', $type = '' )
 {
-	global $Session;
-	if( ( $mass_Comment = $Session->get( 'core.unsaved_Comment' ) ) && is_a( $mass_Comment, 'Comment' ) )
-	{
-		$Session->delete( 'core.unsaved_Comment' );
-		return $mass_Comment;
+	global $Session, $b2evo_session_comments;
+
+	if( $type != 'meta' )
+	{	// Use default type if it is not allowed:
+		$type = '';
 	}
-	return NULL;
+
+	$session_var_name = 'core.'.$kind.'_Comment'.$type;
+
+	if( ! isset( $b2evo_session_comments[ $session_var_name ] ) )
+	{	// Set Comment to cache array:
+		if( ! is_array( $b2evo_session_comments ) )
+		{	// Initialize array for caching:
+			$b2evo_session_comments = array();
+		}
+
+		if( ( $Comment = $Session->get( $session_var_name ) ) && $Comment instanceof Comment )
+		{	// If Comment is detected for current Session:
+
+			// Delete Comment to clear Session data:
+			$Session->delete( $session_var_name );
+		}
+		else
+		{	// Comment is not detected, Return NULL:
+			$Comment = NULL;
+		}
+
+		// Cache Comment in global var:
+		$b2evo_session_comments[ $session_var_name ] = $Comment;
+	}
+
+	return $b2evo_session_comments[ $session_var_name ];
 }
 
 
 /**
- * Dispay the replies of a comment
+ * Dispay the replies of a comment on front-office
  *
  * @param integer Comment ID
  * @param array Template params
@@ -792,13 +875,47 @@ function display_comment_replies( $comment_ID, $params = array(), $level = 1 )
 
 
 /**
+ * Dispay the replies of a comment on back-office
+ *
+ * @param integer Comment ID
+ * @param array Params
+ * @param integer Level
+ */
+function echo_comment_replies( $comment_ID, $params, $level = 1 )
+{
+	global $CommentReplies;
+
+	if( ! isset( $CommentReplies[ $comment_ID ] ) )
+	{	// This comment has no replies, Exit here:
+		return false;
+	}
+
+	$params = array_merge( array(
+			'redirect_to'        => NULL,
+			'save_context'       => false,
+			'display_meta_title' => false,
+		), $params );
+
+	foreach( $CommentReplies[ $comment_ID ] as $Comment )
+	{	// Loop through the replies:
+
+		// Display a comment:
+		echo_comment( $Comment, $params['redirect_to'], $params['save_context'], $Comment->get_inlist_order(), $params['display_meta_title'], $level );
+
+		// Display the rest replies recursively:
+		echo_comment_replies( $Comment->ID, $params, $level + 1 );
+	}
+}
+
+
+/**
  * JS Behaviour: Output JavaScript code to reply the comments
  *
  * @param object Item
  */
 function echo_comment_reply_js( $Item )
 {
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( !isset( $Blog ) )
 	{
@@ -811,7 +928,7 @@ function echo_comment_reply_js( $Item )
 	}
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'a.comment_reply' ).click( function()
 {	// The click action for the links "Reply to this comment"
 	var comment_ID = jQuery( this ).attr( 'rel' );
@@ -862,7 +979,7 @@ function echo_comment_moderate_js()
 		return false;
 	}
 
-	global $Blog;
+	global $Collection, $Blog;
 
 	if( empty( $Blog ) )
 	{
@@ -936,7 +1053,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 		return;
 	}
 
-	global $DB, $cache_comments_has_replies, $user_post_read_statuses, $cache_postcats;
+	global $DB, $cache_comments_has_replies, $cache_items_user_data, $cache_postcats;
 
 	/**
 	 * Disable log queries because it increases the memory and stops the process with error "Allowed memory size of X bytes exhausted..."
@@ -982,7 +1099,7 @@ function comment_mass_delete_process( $mass_type, $deletable_comments_query )
 			$ItemCache->clear();
 			$ChapterCache->clear();
 			$cache_comments_has_replies = array();
-			$user_post_read_statuses = array();
+			$cache_items_user_data = array();
 			$cache_postcats = array();
 
 			// Get new portion of deletable comments
@@ -1048,6 +1165,7 @@ function comments_results_block( $params = array() )
 			'results_param_prefix' => 'actv_comment_',
 			'results_title'        => T_('Comments posted by the user'),
 			'results_no_text'      => T_('User has not posted any comment yet'),
+			'action'               => '',
 		), $params );
 
 	if( !is_logged_in() )
@@ -1093,7 +1211,7 @@ function comments_results_block( $params = array() )
 	$comments_Results->title = $params['results_title'];
 	$comments_Results->no_results_text = $params['results_no_text'];
 
-	if( $comments_Results->get_total_rows() > 0 && $edited_User->has_comment_to_delete() )
+	if( $params['action'] != 'view' && $comments_Results->get_total_rows() > 0 && $edited_User->has_comment_to_delete() )
 	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one comment posted by user
 		$comments_Results->global_icon( sprintf( T_('Delete all comments posted by %s'), $edited_User->login ), 'recycle', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_comments&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}
@@ -1299,7 +1417,7 @@ function get_type( $Comment )
 {
 	global $current_User;
 
-	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( $Comment->can_be_displayed() || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		return $Comment->get( 'type' );
 	}
@@ -1320,7 +1438,7 @@ function get_author( $Comment )
 {
 	global $current_User;
 
-	if( $Comment->get( 'status' ) == 'published' || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
+	if( $Comment->can_be_displayed() || $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) )
 	{
 		$author_User = $Comment->get_author_User();
 		if( $author_User != NULL )
@@ -1500,7 +1618,7 @@ function comment_edit_actions( $Comment )
 			{
 				$edit_url = $admin_url.'?ctrl=comments&amp;comment_ID='.$Comment->ID.'&amp;action=edit&amp;redirect_to='.$redirect_to;
 			}
-			$r .= action_icon( TS_('Edit this comment...'), 'properties', $edit_url );
+			$r .= action_icon( TS_('Edit this comment').'...', 'properties', $edit_url );
 		}
 
 		if( $user_has_delete_perm )
@@ -1508,7 +1626,7 @@ function comment_edit_actions( $Comment )
 			$params = array();
 			if( $Comment->status == 'trash' )
 			{ // Comment is already in the recycle bin, display delete action and add js confirm
-				$title = T_('Delete this comment!');
+				$title = T_('Delete this comment').'!';
 				$params['onclick'] = "return confirm('".TS_('You are about to delete this comment!\\nThis cannot be undone!')."')";
 			}
 			else

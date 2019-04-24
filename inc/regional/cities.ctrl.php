@@ -22,6 +22,7 @@ load_funcs( 'regional/model/_regional.funcs.php' );
 global $current_User;
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 // Memorize this as the last "tab" used in the Global Settings:
@@ -267,19 +268,21 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
 
+		set_max_execution_time( 0 );
+
 		// Country Id
 		param( 'ctry_ID', 'integer', true );
 		param_check_number( 'ctry_ID', T_('Please select a country'), true );
 
 		// CSV File
-		$csv = $_FILES['csv'];
-		if( $csv['size'] == 0 )
-		{	// File is empty
+		$import_file = param( 'import_file', 'string', '' );
+		if( empty( $import_file ) )
+		{	// File is not selected:
 			$Messages->add( T_('Please select a CSV file to import.'), 'error' );
 		}
-		else if( !preg_match( '/\.csv$/i', $csv['name'] ) )
+		else if( !preg_match( '/\.csv$/i', $import_file ) )
 		{	// Extension is incorrect
-			$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $csv['name'] ), 'error' );
+			$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
 		}
 
 		if( param_errors_detected() )
@@ -289,7 +292,7 @@ switch( $action )
 		}
 
 		// Import a new cities from CSV file
-		$count_cities = import_cities( $ctry_ID, $csv['tmp_name'] );
+		$count_cities = import_cities( $ctry_ID, $import_file );
 
 		load_class( 'regional/model/_country.class.php', 'Country' );
 		$CountryCache = & get_CountryCache();
@@ -297,7 +300,7 @@ switch( $action )
 
 		$Messages->add( sprintf( T_('%s cities added and %s cities updated for country %s.'), $count_cities['inserted'], $count_cities['updated'], $Country->get_name() ), 'success' );
 		// Redirect so that a reload doesn't write to the DB twice:
-		header_redirect( '?ctrl=cities', 303 ); // Will EXIT
+		header_redirect( $admin_url.'?ctrl=cities&c='.$ctry_ID, 303 ); // Will EXIT
 		break;
 
 }

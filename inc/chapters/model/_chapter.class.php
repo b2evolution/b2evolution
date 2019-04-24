@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -59,6 +59,13 @@ class Chapter extends DataObject
 	var $order;
 	var $meta;
 	var $lock;
+	var $ityp_ID = NULL;
+
+	/**
+	 * Default Item Type
+	 * @var object|NULL|false
+	 */
+	var $ItemType = NULL;
 
 	/**
 	 * Lazy filled
@@ -86,6 +93,16 @@ class Chapter extends DataObject
 	var $subcat_ordering;
 
 	/**
+	 * Category image
+ 	 */
+	var $image_file_ID;
+
+	/**
+	 * Social media image
+	 */
+	var $social_media_image_file_ID;
+
+	/**
 	 * Constructor
 	 *
 	 * @param table Database row
@@ -101,11 +118,13 @@ class Chapter extends DataObject
 			$this->set( 'blog_ID', $subset_ID );
 		}
 		else
-		{	// Wa are loading an object:
+		{	// We are loading an object:
 			$this->ID = $db_row->cat_ID;
 			$this->name = $db_row->cat_name;
 			$this->parent_ID = $db_row->cat_parent_ID;
 			$this->blog_ID = $db_row->cat_blog_ID;
+			$this->image_file_ID = $db_row->cat_image_file_ID;
+			$this->social_media_image_file_ID = $db_row->cat_social_media_image_file_ID;
 			$this->urlname = $db_row->cat_urlname;
 			$this->description = $db_row->cat_description;
 			$this->order = $db_row->cat_order;
@@ -113,6 +132,7 @@ class Chapter extends DataObject
 			$this->meta = $db_row->cat_meta;
 			$this->lock = $db_row->cat_lock;
 			$this->last_touched_ts = $db_row->cat_last_touched_ts;		// When Chapter received last visible change (edit, item, comment, etc.)
+			$this->ityp_ID = isset( $db_row->cat_ityp_ID ) ? $db_row->cat_ityp_ID : NULL;
 		}
 	}
 
@@ -262,7 +282,7 @@ class Chapter extends DataObject
 		}
 
 		// Sort children list
-		usort( $this->children, array( 'Chapter','compare_chapters' ) );
+		uasort( $this->children, array( 'Chapter','compare_chapters' ) );
 	}
 
 
@@ -298,8 +318,20 @@ class Chapter extends DataObject
 			$this->set_from_Request( 'parent_ID' );
 		}
 
+		// Check image file
+		param( 'cat_image_file_ID', 'integer' );
+		$this->set_from_Request( 'image_file_ID' );
+
+		// Check social media boilerplate image
+		param( 'cat_social_media_image_file_ID', 'integer' );
+		$this->set_from_Request( 'social_media_image_file_ID' );
+
 		// Check url name
 		param( 'cat_urlname', 'string' );
+		// Replace special chars/umlauts:
+		load_funcs( 'locales/_charset.funcs.php' );
+		set_param( 'cat_urlname', replace_special_chars( get_param( 'cat_urlname' ) ) );
+		param_check_regexp( 'cat_urlname', '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', T_('All slugs must contain at least 1 non-numeric character.'), NULL, false, false );
 		$this->set_from_Request( 'urlname' );
 
 		// Check description
@@ -332,6 +364,10 @@ class Chapter extends DataObject
 		// Locked category
 		param( 'cat_lock', 'integer', 0 );
 		$this->set_from_Request( 'lock' );
+
+		// Default Item Type:
+		param( 'cat_ityp_ID', 'integer', NULL );
+		$this->set_from_Request( 'ityp_ID' );
 
 		return ! param_errors_detected();
 	}
@@ -593,6 +629,11 @@ class Chapter extends DataObject
 
 		// The chapter was updated successful
 		$DB->commit();
+
+		// BLOCK CACHE INVALIDATION:
+		$chapter_Blog = $this->get_Blog();
+		BlockCache::invalidate_key( 'cont_coll_ID', $chapter_Blog->ID ); // Content has changed
+
 		return true;
 	}
 
@@ -643,11 +684,11 @@ class Chapter extends DataObject
 
 		if( !isset( $this->count_posts ) )
 		{
-			$SQL = new SQL();
+			$SQL = new SQL( 'Check if category has posts' );
 			$SQL->SELECT( 'COUNT( postcat_post_ID )' );
 			$SQL->FROM( 'T_postcats' );
 			$SQL->WHERE( 'postcat_cat_ID = '.$DB->quote( $this->ID ) );
-			$count_posts = $DB->get_var( $SQL->get() );
+			$count_posts = $DB->get_var( $SQL );
 			$this->count_posts = $count_posts;
 		}
 
@@ -823,6 +864,23 @@ class Chapter extends DataObject
  			case 'parent_ID':
 				return $this->set_param( $parname, 'string', $parvalue, true );
 
+			case 'image_file_ID':
+				return $this->set_param( $parname, 'integer', $parvalue, true );
+
+			case 'ityp_ID':
+				if( $this->get( 'meta' ) )
+				{	// Don't allow default Item Type for meta category because it cannot has items:
+					$parvalue = NULL;
+				}
+				elseif( ( $parvalue === 0 || $parvalue === '0' )&&
+				        $this->ID > 0 &&
+				        ( $cat_Blog = & $this->get_Blog() ) &&
+				        $cat_Blog->get_default_cat_ID() == $this->ID )
+				{	// Force "No default type" of default category to "Same as collection default":
+					$parvalue = NULL;
+				}
+				return $this->set_param( $parname, 'integer', $parvalue, true );
+
 			case 'name':
 			case 'urlname':
 			case 'description':
@@ -843,6 +901,114 @@ class Chapter extends DataObject
 		{	// Add only if it was not added yet:
 			$this->children[ $Chapter->ID ] = & $Chapter;
 		}
+	}
+
+
+	/**
+	 * Get image tag of this chapter
+	 *
+	 * @param array Params
+	 * @return string HTML code of <img /> tag or empty string if this chapter has no correct image file
+	 */
+	function get_image_tag( $params = array() )
+	{
+		$params = array_merge( array(
+				'before'        => '', // HTML code before image tag
+				'before_legend' => '', // HTML code before image legeng(info under image tag image desc is not empty)
+				'after_legend'  => '', // HTML code after image legeng
+				'after'         => '', // HTML code after image tag
+				'size'          => 'crop-48x48', // Image thumbnail size
+				'link_to'       => '', // Url for a link, Use 'original' for full image file url, Empty value to don't make a link
+				'link_title'    => $this->get( 'description' ), // Title of the link, can be text or #title# or #desc#
+				'link_rel'      => '', // Value for attribute "rel", usefull for jQuery libraries selecting on rel='...', e-g: 'lightbox[cat'.$this->ID.']'
+				'class'         => '', // Image class
+				'align'         => '', // Image align
+				'alt'           => $this->get( 'name' ), // Image alt
+				'desc'          => '#', // Image description, used in legeng under image tag, '#' - use current description of the file
+				'size_x'        => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
+				'tag_size'      => NULL, // Override "width" & "height" attributes on img tag. Allows to increase pixel density for retina/HDPI screens.
+				                         // Example: ( $tag_size = '160' ) => width="160" height="160"
+				                         // ( $tag_size = '160x320' ) => width="160" height="320"
+				                         // NULL - use size defined by the thumbnail
+				                         // 'none' - don't use attributes "width" & "height"
+			), $params );
+
+		// Try to get a file by ID:
+		$FileCache = & get_FileCache();
+		$cat_image_File = & $FileCache->get_by_ID( $this->get( 'image_file_ID' ), false, false );
+		if( ! $cat_image_File )
+		{	// This chapter has no image file or it is broken:
+			return '';
+		}
+
+		if( ! $cat_image_File->is_image() )
+		{	// The file must be an image:
+			return '';
+		}
+
+		return $cat_image_File->get_tag( $params['before'],
+				$params['before_legend'],
+				$params['after_legend'],
+				$params['after'],
+				$params['size'],
+				$params['link_to'],
+				$params['link_title'],
+				$params['link_rel'],
+				$params['class'],
+				$params['align'],
+				$params['alt'],
+				$params['desc'],
+				'',
+				$params['size_x'],
+				$params['tag_size'] );
+	}
+
+
+	/**
+	 * Get default Item Type of this Chapter
+	 *
+	 * @param boolean TRUE to return default Item Type object of collection when this category uses same it as collection default
+	 * @return object|false|NULL Default Item Type,
+	 *                           NULL - Same as collection default (only when $use_collection_item_type == false, otherwise real Item Type object what is used as default for collection),
+	 *                           FALSE - No default type or Item Type is not found in DB or Item Type is not enabled for chapter's collection
+	 */
+	function & get_ItemType( $load_coll_default_item_type = false )
+	{
+		if( $this->get( 'ityp_ID' ) === NULL && ! $load_coll_default_item_type )
+		{	// Item Type is same as collection default,
+			// Return NULL because no request to get real Item Type object:
+			$r = NULL;
+			return $r;
+		}
+
+		if( $this->ItemType === NULL )
+		{	// Load Item Type into cache:
+			if( $this->get( 'ityp_ID' ) === NULL && $load_coll_default_item_type )
+			{	// Try to get real Item Type object of this category's collection:
+				if( ( $cat_Blog = & $this->get_Blog() ) && 
+				    ( $coll_ItemType = & $cat_Blog->get_default_ItemType() ) )
+				{	// Use real Item Type object:
+					$this->ItemType = $coll_ItemType;
+				}
+				else
+				{	// Impossible to get default Item Type by some unknown reason:
+					$this->ItemType = false;
+				}
+			}
+			elseif( ( $this->get( 'ityp_ID' ) > 0 ) && 
+			        ( $ItemTypeCache = & get_ItemTypeCache() ) &&
+			        ( $cat_ItemType = & $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ), false, false ) ) &&
+			        ( $cat_ItemType->is_enabled( $this->get( 'blog_ID' ) ) ) )
+			{	// Default Item Type is found in DB and it is enabled for chapter's collection:
+				$this->ItemType = $cat_ItemType;
+			}
+			else
+			{	// No default type or Item Type is not found in DB or Item Type is not enabled for chapter's collection:
+				$this->ItemType = false;
+			}
+		}
+
+		return $this->ItemType;
 	}
 }
 

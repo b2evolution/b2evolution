@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $DB, $Settings, $UserSettings;
 
-global $servertimenow, $comment_moderation_reminder_threshold;
+global $servertimenow;
 
 // Check if UserSettings exists because it must be initialized before email sending
 if( empty( $UserSettings ) )
@@ -18,7 +18,7 @@ if( empty( $UserSettings ) )
 }
 
 // Only those blogs are selected for moderation where we can find at least one comment awaiting moderation which is older then the threshold date defined below
-$threshold_date = date2mysql( $servertimenow - $comment_moderation_reminder_threshold );
+$threshold_date = date2mysql( $servertimenow - $Settings->get( 'comment_moderation_reminder_threshold' ) );
 
 // Statuses defined in this array should be notified. This should be configurable, but this is the default value.
 $notify_statuses = get_visibility_statuses( 'moderation' );
@@ -34,7 +34,7 @@ $moderation_blogs = $DB->get_col( $SQL->get() );
 
 if( empty( $moderation_blogs ) )
 { // There are no blogs where exists draft comments older then the threshold ( 24 hours by default )
-	$result_message = sprintf( T_('No comments have been awaiting moderation for more than %s.'), seconds_to_period( $comment_moderation_reminder_threshold ) );
+	cron_log_append( sprintf( T_('No comments have been awaiting moderation for more than %s.'), seconds_to_period( $Settings->get( 'comment_moderation_reminder_threshold' ) ) ) );
 	return 1;
 }
 
@@ -73,7 +73,8 @@ $bloguser_SQL->WHERE_and( 'bloguser_perm_cmtstatuses <> "" AND bloguser_perm_edi
 $bloggroup_SQL = new  SQL();
 $bloggroup_SQL->SELECT( 'user_ID, bloggroup_blog_ID as blog_ID, bloggroup_perm_cmtstatuses + 0 as perm_cmtstatuses, bloggroup_perm_edit_cmt as perm_edit_cmt' );
 $bloggroup_SQL->FROM( 'T_users' );
-$bloggroup_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON bloggroup_group_ID = user_grp_ID' );
+$bloggroup_SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( bloggroup_group_ID = user_grp_ID
+	OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID ) )' );
 $bloggroup_SQL->FROM_add( 'LEFT JOIN T_blogs ON blog_ID = bloggroup_blog_ID' );
 $bloggroup_SQL->WHERE( sprintf( $not_global_moderator, 'user_ID' ) );
 $bloggroup_SQL->WHERE_and( 'blog_advanced_perms <> 0' );
@@ -147,6 +148,7 @@ $SQL->SELECT( 'T_users.*' );
 $SQL->FROM( 'T_users' );
 $SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "send_cmt_moderation_reminder"' );
 $SQL->WHERE( 'user_ID IN ('.implode( ',', $all_required_users ).')' );
+$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 $SQL->WHERE_and( $send_moderation_reminder_cond );
 $SQL->WHERE_and( 'LENGTH(TRIM(user_email)) > 0' );
 $SQL->WHERE_and( $blocked_emails_condition );
@@ -159,7 +161,7 @@ $loaded_ids = $UserCache->get_ID_array();
 
 if( empty( $loaded_ids ) )
 { // UserCache result is empty which means nobody wants to receive notifications
-	$result_message = sprintf( T_( 'Could not find any moderators wanting to receive comment moderation notifications for the blogs that have comments pending moderation!' ) );
+	cron_log_append( T_( 'Could not find any moderators wanting to receive comment moderation notifications for the blogs that have comments pending moderation!' ) );
 	return 1;
 }
 
@@ -187,7 +189,7 @@ foreach( $blog_comments as $row )
 {
 	if( $last_blog_ID != $row->blog_ID )
 	{
-		$Blog = & $BlogCache->get_by_ID( $row->blog_ID );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $row->blog_ID );
 		$blog_moderation_statuses = $Blog->get_setting( 'moderation_statuses' );
 		$last_blog_ID = $row->blog_ID;
 	}
@@ -214,6 +216,7 @@ foreach( $blog_comments as $row )
 }
 
 $mail_sent = 0;
+$mail_failed = 0;
 $params = array();
 
 // Collect comments data for global moderators
@@ -327,12 +330,20 @@ foreach( $loaded_ids as $moderator_ID )
 	// Change locale here to localize the email subject and content
 	locale_temp_switch( $moderator_User->get( 'locale' ) );
 	if( send_mail_to_User( $moderator_ID, T_( 'Comment moderation reminder' ), 'comments_unmoderated_reminder', $params, false ) )
-	{
+	{	// Log success mail sending:
+		cron_log_action_end( 'User '.$moderator_User->get_identity_link().' has been notified' );
 		$mail_sent++;
+	}
+	else
+	{	// Log failed mail sending:
+		global $mail_log_message;
+		cron_log_action_end( 'User '.$moderator_User->get_identity_link().' could not be notified because of error: '
+			.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
+		$mail_failed++;
 	}
 	locale_restore_previous();
 }
 
-$result_message = sprintf( T_( '%d moderators have been notified!' ), $mail_sent );
+cron_log_append( ( ( $mail_sent + $mail_failed ) ? "\n" : '' ).sprintf( '%d of %d moderators have been notified!', $mail_sent, ( $mail_sent + $mail_failed ) ) );
 return 1; /*OK*/
 ?>

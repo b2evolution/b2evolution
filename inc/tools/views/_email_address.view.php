@@ -7,23 +7,31 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $UserSettings, $email, $statuses;
+global $blog, $admin_url, $UserSettings, $email, $statuses, $all_statuses;
 
 param( 'email', 'string', '', true );
-param( 'statuses', 'array:string', array( 'redemption', 'warning', 'suspicious3' ), true );
+param( 'statuses', 'array:string', NULL, true );
+if( $statuses === NULL && param( 'all_statuses', 'integer', 0, true ) )
+{	// Filter to get email addresses with all statuses:
+	$statuses = array_keys( emadr_get_status_titles() );
+}
+if( $statuses === NULL )
+{	// Default filter:
+	$statuses = array( 'redemption', 'warning', 'suspicious3' );
+}
 
 // Create result set:
 
 $SQL = new SQL();
-$SQL->SELECT( 'SQL_NO_CACHE emadr_ID, emadr_address, emadr_status, emadr_last_sent_ts, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_error_ts, 
+$SQL->SELECT( 'SQL_NO_CACHE emadr_ID, emadr_address, emadr_status, emadr_last_sent_ts, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_error_ts, emadr_last_open_ts,
 ( emadr_prmerror_count + emadr_tmperror_count + emadr_spamerror_count + emadr_othererror_count ) AS emadr_all_count,
-emadr_prmerror_count, emadr_tmperror_count, emadr_spamerror_count, emadr_othererror_count, 
+emadr_prmerror_count, emadr_tmperror_count, emadr_spamerror_count, emadr_othererror_count,
 COUNT( user_ID ) AS users_count' );
 $SQL->FROM( 'T_email__address' );
 $SQL->FROM_add( 'LEFT JOIN T_users ON user_email = emadr_address' );
@@ -36,8 +44,8 @@ $count_SQL->FROM( 'T_email__address' );
 if( !empty( $email ) )
 {	// Filter by email
 	$email = utf8_strtolower( $email );
-	$SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( $email ) );
-	$count_SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( $email ) );
+	$SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( '%'.$email.'%' ) );
+	$count_SQL->WHERE_and( 'emadr_address LIKE '.$DB->quote( '%'.$email.'%' ) );
 }
 if( !empty( $statuses ) )
 {	// Filter by statuses
@@ -49,7 +57,10 @@ $Results = new Results( $SQL->get(), 'emadr_', '---D', $UserSettings->get( 'resu
 
 $Results->title = T_('Email addresses').get_manual_link( 'email-addresses' );
 
-$Results->global_icon( T_('Create a new email address...'), 'new', $admin_url.'?ctrl=email&amp;tab=blocked&amp;action=blocked_new', T_('Add an email address').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+if( $current_User->check_perm( 'emails', 'edit' ) )
+{	// Check permission to edit emails:
+	$Results->global_icon( T_('Create a new email address...'), 'new', $admin_url.'?ctrl=email&amp;action=blocked_new', T_('Add an email address').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+}
 
 /**
  * Callback to add filters on top of the result set
@@ -63,15 +74,15 @@ function filter_email_blocked( & $Form )
 	$statuses = emadr_get_status_titles();
 	foreach( $statuses as $status_value => $status_title )
 	{	// Display the checkboxes to filter by status
-		$Form->checkbox( 'statuses[]', in_array( $status_value, get_param( 'statuses' ) ), $status_title, '', '', $status_value );
+		$Form->checkbox( 'statuses[]', in_array( $status_value, get_param( 'statuses' ) ), '<span class="label" style="background-color:'.emadr_get_status_color( $status_value ).( in_array( $status_value, array( 'redemption', 'warning', 'suspicious1' ) ) ? ';color:#333' : '' ).'">'.$status_title.'</span>', '', '', $status_value );
 	}
 }
 $Results->filter_area = array(
 	'callback' => 'filter_email_blocked',
 	'presets' => array(
-		'all'       => array( T_('All'), $admin_url.'?ctrl=email&amp;tab=blocked&amp;statuses[]=unknown&amp;statuses[]=redemption&amp;statuses[]=warning&amp;statuses[]=suspicious1&amp;statuses[]=suspicious2&amp;statuses[]=suspicious3&amp;statuses[]=prmerror&amp;statuses[]=spammer'),
-		'errors'    => array( T_('Errors'), $admin_url.'?ctrl=email&amp;tab=blocked&amp;statuses[]=warning&amp;statuses[]=suspicious1&amp;statuses[]=suspicious2&amp;statuses[]=suspicious3&amp;statuses[]=prmerror&amp;statuses[]=spammer'),
-		'attention' => array( T_('Need Attention'), $admin_url.'?ctrl=email&amp;tab=blocked&amp;statuses[]=redemption&amp;statuses[]=warning&amp;statuses[]=suspicious3'),
+		'all'       => array( T_('All'), $admin_url.'?ctrl=email&amp;all_statuses=1'),
+		'errors'    => array( T_('Errors'), $admin_url.'?ctrl=email&amp;statuses[]=warning&amp;statuses[]=suspicious1&amp;statuses[]=suspicious2&amp;statuses[]=suspicious3&amp;statuses[]=prmerror&amp;statuses[]=spammer'),
+		'attention' => array( T_('Need Attention'), $admin_url.'?ctrl=email&amp;statuses[]=redemption&amp;statuses[]=warning&amp;statuses[]=suspicious3'),
 		)
 	);
 
@@ -113,21 +124,21 @@ $Results->cols[] = array(
 			/* Current user can edit emails */'<a href="#" rel="$emadr_status$">%emadr_get_status_title( #emadr_status# )%</a>' :
 			/* No edit, only view the status */'%emadr_get_status_title( #emadr_status# )%',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'shrinkwrap emadr_status_edit',
+		'td_class' => 'shrinkwrap jeditable_cell emadr_status_edit',
 		'extra' => array ( 'style' => 'background-color: %emadr_get_status_color( "#emadr_status#" )%;', 'format_to_output' => false )
 	);
 
 $Results->cols[] = array(
-		'th_group' => T_('Send messages'),
+		'th_group' => T_('Sent messages'),
 		'th' => T_('Last sent date'),
 		'order' => 'emadr_last_sent_ts',
 		'default_dir' => 'D',
 		'td_class' => 'timestamp',
-		'td' => '%mysql2localedatetime_spans( #emadr_last_sent_ts#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #emadr_last_sent_ts# )%',
 	);
 
 $Results->cols[] = array(
-		'th_group' => T_('Send messages'),
+		'th_group' => T_('Sent messages'),
 		'th' => T_('Sent count'),
 		'order' => 'emadr_sent_count',
 		'default_dir' => 'D',
@@ -136,7 +147,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th_group' => T_('Send messages'),
+		'th_group' => T_('Sent messages'),
 		'th' => T_('Since last error'),
 		'order' => 'emadr_sent_last_returnerror',
 		'default_dir' => 'D',
@@ -145,12 +156,20 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
+		'th' => T_('Last opened email date'),
+		'order' => 'emadr_last_open_ts',
+		'default_dir' => 'D',
+		'td_class' => 'timestamp',
+		'td' => '%mysql2localedatetime_spans( #emadr_last_open_ts# )%',
+	);
+
+$Results->cols[] = array(
 		'th_group' => T_('Returned error messages'),
 		'th' => T_('Last error date'),
 		'order' => 'emadr_last_error_ts',
 		'default_dir' => 'D',
 		'td_class' => 'timestamp',
-		'td' => '%mysql2localedatetime_spans( #emadr_last_error_ts#, "M-d" )%',
+		'td' => '%mysql2localedatetime_spans( #emadr_last_error_ts# )%',
 	);
 
 $Results->cols[] = array(
@@ -211,8 +230,10 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 		'td' => action_icon( T_('Filter the returned emails by this email address...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;email=$emadr_address$' )
-			.action_icon( T_('Edit this email address...'), 'properties', $admin_url.'?ctrl=email&amp;tab=blocked&amp;emadr_ID=$emadr_ID$' )
+			.( $current_User->check_perm( 'emails', 'edit' )
+			? action_icon( T_('Edit this email address...'), 'properties', $admin_url.'?ctrl=email&amp;emadr_ID=$emadr_ID$' )
 			.action_icon( T_('Delete this email address!'), 'delete', url_decode_special_symbols( regenerate_url( 'emadr_ID,action', 'emadr_ID=$emadr_ID$&amp;action=blocked_delete&amp;'.url_crumb('email_blocked') ) ) )
+			: '' )
 	);
 
 // Display results:
@@ -223,7 +244,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 	// Print JS to edit an email status
 	echo_editable_column_js( array(
 		'column_selector' => '.emadr_status_edit',
-		'ajax_url'        => get_secure_htsrv_url().'async.php?action=emadr_status_edit&'.url_crumb( 'emadrstatus' ),
+		'ajax_url'        => get_htsrv_url().'async.php?action=emadr_status_edit&'.url_crumb( 'emadrstatus' ),
 		'options'         => emadr_get_status_titles(),
 		'new_field_name'  => 'new_status',
 		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',

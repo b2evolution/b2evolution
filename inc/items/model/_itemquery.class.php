@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -45,7 +45,15 @@ class ItemQuery extends SQL
 	var $phrase;
 	var $exact;
 	var $featured;
+	var $flagged;
 
+	/**
+	 * A query FROM string to join other tables.
+	 * It is set in case of the select queries when we need to order by custom fields.
+	 *
+	 * @var string
+	 */
+	var $orderby_from = '';
 
 	/**
 	 * Constructor.
@@ -94,18 +102,17 @@ class ItemQuery extends SQL
 		// if a post urltitle is specified, load that post
 		if( !empty( $title ) )
 		{
+			global $DB;
 			if( substr( $this->title, 0, 1 ) == '-' )
 			{	// Starts with MINUS sign:
-				$eq_title = ' <> ';
-				$this->title = substr( $this->title, 1 );
+				$title = substr( $this->title, 1 );
+				$this->WHERE_and( 'post_ID NOT IN ( SELECT slug_itm_ID FROM T_slug WHERE slug_title = '.$DB->quote( $title ).' )' );
 			}
 			else
 			{
-				$eq_title = ' = ';
+				$this->FROM_add( 'LEFT JOIN T_slug ON slug_itm_ID = post_ID AND slug_type = "item" AND slug_title = '.$DB->quote( $title ) );
+				$this->WHERE_and( 'slug_title IS NOT NULL' );
 			}
-
-			global $DB;
-			$this->WHERE_and( $this->dbprefix.'urltitle'.$eq_title.$DB->quote($this->title) );
 			$r = true;
 		}
 
@@ -210,9 +217,9 @@ class ItemQuery extends SQL
 	/**
 	 * Restrict to specific collection/chapters (blog/categories)
 	 *
-	 * @param Blog
-	 * @param array
-	 * @param string
+	 * @param object Blog
+	 * @param array Categories IDs
+	 * @param string Use '-' to exclude the categories
 	 * @param string 'wide' to search in extra cats too
 	 *               'main' for main cat only
 	 *               'extra' for extra cats only
@@ -227,15 +234,21 @@ class ItemQuery extends SQL
 		$this->cat_modifier = $cat_modifier;
 
 		if( ! empty( $cat_array ) && ( $cat_focus == 'wide' || $cat_focus == 'extra' ) )
-		{
+		{	// Select extra categories if we want filter by several categories:
 			$sql_join_categories = ( $cat_focus == 'extra' ) ? ' AND post_main_cat_ID != cat_ID' : '';
-			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID
-												INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
+			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
+			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID'.$sql_join_categories );
 			// fp> we try to restrict as close as possible to the posts but I don't know if it matters
-			$cat_ID_field = 'postcat_cat_ID';
+			$cat_ID_field = 'T_postcats.postcat_cat_ID';
+		}
+		elseif( get_allow_cross_posting() >= 1 )
+		{	// Select extra categories if cross posting is enabled:
+			$this->FROM_add( 'INNER JOIN T_postcats ON '.$this->dbIDname.' = postcat_post_ID' );
+			$this->FROM_add( 'INNER JOIN T_categories ON postcat_cat_ID = cat_ID' );
+			$cat_ID_field = 'T_postcats.postcat_cat_ID';
 		}
 		else
-		{
+		{	// Select only main categories:
 			$this->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$cat_ID_field = 'post_main_cat_ID';
 		}
@@ -302,7 +315,7 @@ class ItemQuery extends SQL
 		{ // Blog IDs are not defined, Use them depending on current collection setting
 			// NOTE! collection can be 0, for example, on disp=usercomments|useritems where we display data from all collections
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $this->blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $this->blog );
 			$aggregate_coll_IDs = $Blog->get_setting( 'aggregate_coll_IDs' );
 		}
 
@@ -316,11 +329,11 @@ class ItemQuery extends SQL
 		// Check status permission for multiple blogs
 		if( $aggregate_coll_IDs == '*' )
 		{ // Get the status restrictions for all blogs
-			global $DB;
-			$blog_IDs = $DB->get_col( 'SELECT blog_ID FROM T_blogs ORDER BY blog_ID' );
-			// Load all collections in single query, because otherwise we may have very much queries(a query for each collection) by below code:
+			// Load all collections in single query, because otherwise we may have too many queries (1 query for each collection) later:
+			// fp> TODO: PERF: we probably want to remove this later when we restrict the use of '*'
 			$BlogCache = & get_BlogCache();
 			$BlogCache->load_all();
+			$blog_IDs = $BlogCache->get_ID_array();
 		}
 		else
 		{ // Get the status restrictions for several blogs
@@ -376,8 +389,9 @@ class ItemQuery extends SQL
 	 * Restrict to specific tags
 	 *
 	 * @param string List of tags to restrict to
+	 * @param string Condition to search by tags, 'OR' - if item has at least one tag, 'AND' - item must has all tags from the list
 	 */
-	function where_tags( $tags )
+	function where_tags( $tags, $tags_operator = 'OR' )
 	{
 		global $DB;
 
@@ -390,8 +404,20 @@ class ItemQuery extends SQL
 
 		$tags = explode( ',', $tags );
 
-		$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID
-								INNER JOIN T_items__tag ON (itag_tag_ID = tag_ID AND tag_name IN ('.$DB->quote($tags).') )' );
+		if( $tags_operator == 'AND' )
+		{	// Search items with ALL tags from the restriction list:
+			$this->WHERE_and( '( SELECT COUNT( itag_tag_ID )
+				 FROM T_items__tag
+				INNER JOIN T_items__itemtag ON tag_ID = itag_tag_ID
+				WHERE itag_itm_ID = post_ID
+				  AND tag_name IN ( '.$DB->quote( $tags ).' )
+				) = '.count( $tags ) );
+		}
+		else // 'OR'
+		{	// Search items with at least one tag from the restriction list:
+			$this->FROM_add( 'INNER JOIN T_items__itemtag ON post_ID = itag_itm_ID' );
+			$this->FROM_add( 'INNER JOIN T_items__tag ON itag_tag_ID = tag_ID AND tag_name IN ( '.$DB->quote( $tags ).' )' );
+		}
 	}
 
 
@@ -618,7 +644,8 @@ class ItemQuery extends SQL
 	 * Restrict to specific post types usage
 	 *
 	 * @param string List of types usage to restrict to (must have been previously validated):
-	 *               Allowed values: post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special
+	 *               Allowed values: post, page, intro-front, intro-main, intro-cat, intro-tag, intro-sub, intro-all, special,
+	 *                               *featured* - to get also featured posts
 	 */
 	function where_itemtype_usage( $itemtype_usage )
 	{
@@ -631,22 +658,31 @@ class ItemQuery extends SQL
 			return;
 		}
 
+		$featured_sql_where = '';
+		$not_featured_sql_where = '';
+		if( strpos( $itemtype_usage, '*featured*' ) !== false )
+		{	// Get also featured posts:
+			$itemtype_usage = preg_replace( '#,?\*featured\*,?#', '', $itemtype_usage );
+			$featured_sql_where .= ' OR post_featured = 1';
+			$not_featured_sql_where .= ' AND post_featured != 1';
+		}
+
 		$this->FROM_add( 'LEFT JOIN T_items__type ON ityp_ID = '.$this->dbprefix.'ityp_ID' );
 
 		if( $itemtype_usage == '-' )
 		{	// List is ONLY a MINUS sign (we want only those not assigned)
-			$this->WHERE_and( $this->dbprefix.'ityp_ID IS NULL' );
+			$this->WHERE_and( $this->dbprefix.'ityp_ID IS NULL'.$not_featured_sql_where );
 		}
 		elseif( substr( $itemtype_usage, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$itemtype_usage = explode( ',', substr( $itemtype_usage, 1 ) );
 			$this->WHERE_and( '( '.$this->dbprefix.'ityp_ID IS NULL
-			                  OR ityp_usage NOT IN ( '.$DB->quote( $itemtype_usage ).' ) )' );
+			                  OR ( ityp_usage NOT IN ( '.$DB->quote( $itemtype_usage ).' )'.$not_featured_sql_where.' ) )' );
 		}
 		else
 		{
 			$itemtype_usage = explode( ',', $itemtype_usage );
-			$this->WHERE_and( 'ityp_usage IN ( '.$DB->quote( $itemtype_usage ).' )' );
+			$this->WHERE_and( '( ityp_usage IN ( '.$DB->quote( $itemtype_usage ).' )'.$featured_sql_where.' )' );
 		}
 	}
 
@@ -844,7 +880,7 @@ class ItemQuery extends SQL
 	 * @param string Keyword search string
 	 * @param string Search for entire phrase or for individual words: 'OR', 'AND', 'sentence'(or '1')
 	 * @param string Require exact match of title or contents — does NOT apply to tags which are always an EXACT match
-	 * @param string Scope of keyword search string: 'title', 'content'
+	 * @param string Scope of keyword search string: 'title', 'content', 'tags', 'excerpt', 'titletag', 'metadesc', 'metakeywords'
 	 */
 	function where_keywords( $keywords, $phrase, $exact, $keyword_scope = 'title,content' )
 	{
@@ -883,6 +919,24 @@ class ItemQuery extends SQL
 					$this->GROUP_BY( 'post_ID' );
 					// Tags are always an EXACT match:
 					$search_sql[] = 'tag_name = '.$DB->quote( $keywords );
+					break;
+
+				case 'excerpt':
+					$search_fields[] = $this->dbprefix.'excerpt';
+					break;
+
+				case 'titletag':
+					$search_fields[] = $this->dbprefix.'titletag';
+					break;
+
+				case 'metadesc':
+					$this->FROM_add( 'LEFT JOIN T_items__item_settings AS is_md ON post_ID = is_md.iset_item_ID AND is_md.iset_name = "metadesc"' );
+					$search_fields[] = 'is_md.iset_value';
+					break;
+
+				case 'metakeywords':
+					$this->FROM_add( 'LEFT JOIN T_items__item_settings AS is_mk ON post_ID = is_mk.iset_item_ID AND is_mk.iset_name = "metakeywords"' );
+					$search_fields[] = 'is_mk.iset_value';
 					break;
 
 				// TODO: add more.
@@ -952,6 +1006,150 @@ class ItemQuery extends SQL
 	}
 
 
+	/**
+	 * Restrict to the flagged items
+	 *
+	 * @param boolean TRUE - Restrict to flagged items, FALSE - Don't restrict/Get all items
+	 */
+	function where_flagged( $flagged = false )
+	{
+		global $current_User;
+
+		$this->flagged = $flagged;
+
+		if( ! $this->flagged )
+		{	// Don't restrict if it is not requested or if user is not logged in:
+			return;
+		}
+
+		// Get items which are flagged by current user:
+		$this->FROM_add( 'INNER JOIN T_items__user_data ON '.$this->dbIDname.' = itud_item_ID
+			AND itud_flagged_item = 1
+			AND itud_user_ID = '.( is_logged_in() ? $current_User->ID : '-1' ) );
+	}
+
+
+	/**
+	 * Generate order by clause
+	 *
+	 * @param $order_by
+	 * @param $order_dir
+	 */
+	function gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname )
+	{
+		global $DB;
+
+		$order_by = str_replace( ' ', ',', $order_by );
+		$orderby_array = explode( ',', $order_by );
+
+		if( in_array( 'numviews', $orderby_array ) )
+		{	// Special case for numviews:
+			$this->orderby_from .= ' LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS post_numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
+				ON post_ID = numviews.itud_item_ID ';
+		}
+
+		// asimo> $nullable_fields may be used if we would like to order the null values into the end of the result
+		// asimo> It would move the null values into the end no matter what kind of direction are we sorting
+		// Set of sort options which are nullable
+		// $nullable_fields = array( 'order', 'priority' );
+
+		$available_fields = get_available_sort_options( $this->blog, false, true );
+		// Custom sort options
+		$custom_sort_fields = $available_fields['custom'];
+
+		foreach( $custom_sort_fields as $key => $field_name )
+		{
+			$table_alias = $key.'_table';
+			$field_value = $table_alias.'.iset_value';
+			if( strpos( $key, 'custom_double' ) === 0 )
+			{ // Double values should be compared as numbers and not like strings
+				$field_value .= '+0';
+			}
+			if( in_array( $key, $orderby_array ) )
+			{
+				if( empty( $this->orderby_from ) )
+				{
+					$this->orderby_from .= ' ';
+				}
+				// $nullable_fields[$key] = $field_value;
+				$this->orderby_from .= 'LEFT JOIN T_items__item_settings as '.$table_alias.' ON post_ID = '.$table_alias.'.iset_item_ID AND '
+						.$table_alias.'.iset_name = '.$DB->quote( 'custom:'.$field_name );
+				$order_by = str_replace( $key, $field_value, $order_by );
+			}
+			$custom_sort_fields[$key] = $field_value;
+		}
+
+		$available_fields = array_merge( array_keys( $available_fields['general'] ), array_values( $custom_sort_fields ) );
+		// Extend general list to allow order posts by these fields as well for some special cases
+		$available_fields[] = 'creator_user_ID';
+		$available_fields[] = 'assigned_user_ID';
+		$available_fields[] = 'pst_ID';
+		$available_fields[] = 'datedeadline';
+		$available_fields[] = 'ityp_ID';
+		$available_fields[] = 'status';
+		$available_fields[] = 'T_categories.cat_name';
+		$available_fields[] = 'T_categories.cat_order';
+
+		if( in_array( 'order', $orderby_array ) )
+		{	// If list is ordered by field 'order':
+			if( ( $order_i = array_search( 'order', $available_fields ) ) !== false )
+			{	// Use an order per category instead of old field 'post_order':
+				$available_fields[ $order_i ] = 'postcatsorders.postcat_order';
+			}
+			// Join table of categories for field 'postcat_order':
+			$this->FROM_add( 'INNER JOIN T_postcats AS postcatsorders ON postcatsorders.postcat_post_ID = post_ID AND post_main_cat_ID = postcatsorders.postcat_cat_ID' );
+			// Replace field to real name:
+			$order_by = str_replace( 'order', 'postcatsorders.postcat_order', $order_by );
+		}
+
+		$order_clause = gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname, $available_fields );
+
+		// asimo> The following commented code parts handles the nullable fields order, to move them NULL values into the end of the result
+		// asimo> !!!Do NOT remove!!!
+//		$orderby_fields = explode( ',', $order_clause );
+//		foreach( $orderby_array as $index => $orderby_field )
+//		{
+//			$field_name = NULL;
+//			$additional_clause = 0;
+//			if( in_array( $orderby_field, $nullable_fields ) )
+//			{ // This is an item nullable field
+//				$field_name = $dbprefix.$orderby_field;
+//			}
+//			elseif( strpos( $orderby_field, 'custom_' ) === 0 )
+//			{ // This is an item custom field which are always nullable
+//				$field_name = $nullable_fields[$orderby_field];
+//			}
+//
+//			if( empty( $field_name ) || ( strpos( $order_clause, $field_name ) === false ) )
+//			{ // The field is not nullable or it is not present in the final order clause
+//				continue;
+//			}
+//
+//			// Insert 'order null values into the end' order clause
+//			array_splice( $orderby_fields, $index + $additional_clause, 0, array( ' (CASE WHEN '.$field_name.' IS NULL then 1 ELSE 0 END)' ) );
+//			$additional_clause++;
+//		}
+//		$order_clause = implode( ',', $orderby_fields );
+
+		if( strpos( $this->itemtype_usage, '*featured*' ) !== false )
+		{	// If we get featured posts together with other post types(like intro) then we should order featured posts below not featured posts:
+			$order_clause = trim( 'post_featured, '.$order_clause, ', ' );
+		}
+
+		return $order_clause;
+	}
+
+
+	/**
+	 * Get additional FROM clause if it is required because of custom order_by fields
+	 *
+	 * @param return before the FROM clause
+	 * @return string the FROM clause to JOIN the custom fields tables
+	 */
+	function get_orderby_from( $prefix = '' )
+	{
+		return $prefix.$this->orderby_from;
+	}
 }
 
 ?>

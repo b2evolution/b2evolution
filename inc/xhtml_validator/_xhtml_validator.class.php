@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2003 by Nobuo SAKIYAMA - {@link http://www.sakichan.org/}
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
@@ -277,7 +277,7 @@ class XHTML_Validator
 			{
 				$attr = 'data-*';
 			}
-			
+
 			if (!isset($this->tagattrs[$tag]) || !in_array($attr, explode(' ', $this->tagattrs[$tag])) )
 			{
 				$this->html_error( sprintf( T_('Tag &lt;%s&gt; may not have attribute %s="..."'), '<code>'.$tag.'</code>', '<code>'.$attr.'</code>' ) );
@@ -333,7 +333,7 @@ class XHTML_Validator
 	{
 		global $Messages;
 		$this->error = true;
-		$Messages->add( $string, $this->msg_type );
+		$Messages->add_to_group( $string, $this->msg_type, T_('Validation errors:') );
 	}
 
 	/**

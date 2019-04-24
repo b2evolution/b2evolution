@@ -12,7 +12,7 @@
  *
  * @package tests
  */
-require_once dirname(__FILE__).'/../blogs/conf/_config.php';
+require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 

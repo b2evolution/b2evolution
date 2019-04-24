@@ -90,7 +90,7 @@ class FileFuncsTestCase extends EvoUnitTestCase
 		$this->assertTrue( is_dir( TMPDIR.'test//foo/bar///0' ) );
 
 		// does not work (PHP does not allow it):
-		// ini_set('open_basedir', TMPDIR.'test/bar');
+		// @ini_set('open_basedir', TMPDIR.'test/bar');
 	}
 
 

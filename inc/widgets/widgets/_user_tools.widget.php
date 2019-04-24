@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class user_tools_Widget extends ComponentWidget
 {
+	var $icon = 'gears';
+
 	/**
 	 * Constructor
 	 */
@@ -170,7 +172,7 @@ class user_tools_Widget extends ComponentWidget
 				'size' => 30,
 				'note' => T_( 'Link text to display' ),
 				'type' => 'text',
-				'defaultvalue' => T_( 'Notifications &amp; Subscriptions' ),
+				'defaultvalue' => T_( 'Notifications & Subscriptions' ),
 			),
 			// Admin
 			'user_admin_link_show' => array(
@@ -356,7 +358,7 @@ class user_tools_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?

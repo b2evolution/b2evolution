@@ -21,8 +21,6 @@ if( evo_version_compare( $app_version, '2.4.1' ) < 0 )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
-require_js( 'ajax.js', 'blog' );	// Functions to work with AJAX response data
-
 // The following is temporary and should be moved to some SiteSkin class
 siteskin_init();
 
@@ -42,10 +40,14 @@ siteskin_init();
 	<?php skin_base_tag(); /* Base URL for this skin. You need this to fix relative links! */ ?>
 	<meta name="generator" content="b2evolution <?php echo $app_version ?>" /> <!-- Please leave this for stats -->
 	<?php include_headlines() ?>
+	<?php $Plugins->trigger_event( 'SkinEndHtmlHead' ); ?>
 </head>
 <body>
 <?php
 // -------------------------------- END OF HEADER --------------------------------
+$Blog->disp_setting( 'body_includes', 'raw' );
+
+$Plugins->trigger_event( 'SkinBeginHtmlBody' );
 
 
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
@@ -61,7 +63,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'block_start' => '<div>',
 				'block_end' => '</div>',
 				'block_display_title' => false,
-				'list_start' =>  T_('Select blog:').' ',
+				'list_start' =>  T_('Select blog').': ',
 				'list_end' => '',
 				'item_start' => ' [',
 				'item_end' => '] ',
@@ -183,9 +185,9 @@ siteskin_include( '_site_body_header.inc.php' );
 				if( $disp == 'single' )
 				{
 					// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-					// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 					// Display container contents:
 					skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+						'widget_context' => 'item',	// Signal that we are displaying within an Item
 						// The following (optional) params will be used as defaults for widgets included in this container:
 						// This will enclose each widget in a block:
 						'block_start' => '<div class="$wi_class$">',
@@ -195,6 +197,9 @@ siteskin_include( '_site_body_header.inc.php' );
 						'block_title_end' => '</h3>',
 						// Params for skin file "_item_content.inc.php"
 						'widget_item_content_params' => array( 'image_size' => 'fit-400x320' ),
+						// Template params for "Item Link" widget
+						'widget_item_link_before'    => '<p class="evo_post_link">',
+						'widget_item_link_after'     => '</p>',
 					) );
 					// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 				}
@@ -237,14 +242,23 @@ siteskin_include( '_site_body_header.inc.php' );
 			</blockquote>
 
 			<?php
+			if( is_single_page() )
+			{	// Display comments only on single Item's page:
 				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 				skin_include( '_item_feedback.inc.php', array(
+						'disp_comments'        => true,
+						'disp_comment_form'    => true,
+						'disp_trackbacks'      => true,
+						'disp_trackback_url'   => true,
+						'disp_pingbacks'       => true,
+						'disp_webmentions'     => true,
 						'before_section_title' => '<h4>',
 						'after_section_title'  => '</h4>',
 					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.
 				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+			}
 			?>
 
 			<?php
@@ -262,7 +276,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'disp_posts'  => '',		// We already handled this case above
 				'disp_single' => '',		// We already handled this case above
 				'disp_page'   => '',		// We already handled this case above
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.
@@ -329,6 +343,13 @@ siteskin_include( '_site_body_header.inc.php' );
 		// If site footers are enabled, they will be included here:
 		siteskin_include( '_site_body_footer.inc.php' );
 		// ------------------------------- END OF SITE FOOTER --------------------------------
+
+		modules_call_method( 'SkinEndHtmlBody' );
+
+		// SkinEndHtmlBody hook -- could be used e.g. by a google_analytics plugin to add the javascript snippet here:
+		$Plugins->trigger_event( 'SkinEndHtmlBody' );
+
+		$Blog->disp_setting( 'footer_includes', 'raw' );
 
 		$Hit->log();  // log the hit on this page
 		debug_info();	// output debug info if requested

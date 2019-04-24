@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -121,14 +121,23 @@ $Item->load_Blog();
 		<?php $Item->permanent_link(); ?>
 	</div>
 	<?php
+	if( is_single_page() )
+	{	// Display comments only on single Item's page:
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array(
+				'disp_comments'        => true,
+				'disp_comment_form'    => true,
+				'disp_trackbacks'      => true,
+				'disp_trackback_url'   => true,
+				'disp_pingbacks'       => true,
+				'disp_webmentions'     => true,
 				'before_section_title' => '<h4>',
 				'after_section_title'  => '</h4>',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+	}
 	?>
 </div>
 

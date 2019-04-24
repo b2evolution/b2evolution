@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -55,20 +55,22 @@ function uninstall_b2evolution()
 	// Skip if T_blogs table is already deleted. Note that db_delete() will not throw any errors on missing tables.
 	if( $DB->query( 'SHOW TABLES LIKE "T_blogs"' ) )
 	{ // Get all blogs
-		$blogs_SQL = new SQL();
+		$blogs_SQL = new SQL( 'Get all collections' );
 		$blogs_SQL->SELECT( 'blog_ID' );
 		$blogs_SQL->FROM( 'T_blogs' );
-		$blogs = $DB->get_col( $blogs_SQL->get() );
+		$blogs = $DB->get_col( $blogs_SQL );
 
 		$BlogCache = & get_BlogCache( 'blog_ID' );
 		foreach( $blogs as $blog_ID )
 		{
-			$Blog = $BlogCache->get_by_ID( $blog_ID );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
 
 			// Remove page cache of current blog
 			$PageCache = new PageCache( $Blog );
 			$PageCache->cache_delete();
 		}
+		// Clear cache in order to avoid unexpected errors on install new collections right after uninstall:
+		$BlogCache->clear();
 	}
 
 	/* REMOVE DATABASE */

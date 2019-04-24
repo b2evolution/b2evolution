@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -33,7 +33,7 @@ if( ! $creating )
 {
 	$Form->global_icon( T_('Delete this organization!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('organization') ) );
 }
-$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action,org_ID' ) );
+$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,org_ID' ) );
 
 $Form->begin_form( 'fform', ( $creating ? T_('New organization') : T_('Organization') ).get_manual_link( 'organization-form' ) );
 
@@ -67,7 +67,6 @@ $Form->begin_form( 'fform', ( $creating ? T_('New organization') : T_('Organizat
 				array( 'owner', T_('can be edited by organization owner only') )
 			), T_('Role in organization'), true );
 
-
 $buttons = array();
 if( $current_User->check_perm( 'orgs', 'edit', false, $edited_Organization ) )
 {	// Display a button to update the poll question only if current user has a permission:
@@ -95,6 +94,7 @@ if( $edited_Organization->ID > 0 )
 			'page_url'             => get_dispctrl_url( 'organizations', 'action=edit&amp;org_ID='.$edited_Organization->ID ),
 			'display_orgstatus'    => true,
 			'display_role'         => true,
+			'display_priority'     => true,
 			'display_ID'           => false,
 			'display_btn_adduser'  => false,
 			'display_btn_addgroup' => false,

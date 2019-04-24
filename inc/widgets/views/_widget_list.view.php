@@ -7,25 +7,23 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Blog, $admin_url;
+global $Collection, $Blog, $admin_url;
 
 global $container_Widget_array;
 
 global $container_list;
 
-if( $current_User->check_perm( 'options', 'edit', false ) )
-{
-	echo '<div class="pull-right" style="margin-bottom:10px">';
-	echo action_icon( TS_('Reload containers!'), 'reload',
-	                        '?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'), T_('Reload containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
-	echo '</div>';
-}
+echo '<div class="pull-right" style="margin-bottom:10px">';
+echo action_icon( T_('Reload containers').'!', 'reload',
+	$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload&amp;'.url_crumb('widget'),
+	T_('Reload containers'), 3, 4, array( 'class' => 'action_icon hoverlink btn btn-info' ) );
+echo '</div>';
 
 // Load widgets for current collection:
 $WidgetCache = & get_WidgetCache();
@@ -37,12 +35,12 @@ $container_Widget_array = & $WidgetCache->get_by_coll_ID( $Blog->ID );
  */
 function display_container( $container, $legend_suffix = '' )
 {
-	global $Blog, $admin_url;
+	global $Collection, $Blog, $admin_url;
 	global $Session;
 
 	$Table = new Table();
 
-	$Table->title = '<span class="container_name">'.T_($container).'</span>'.$legend_suffix;
+	$Table->title = '<span class="container_name" data-container-name="'.format_to_output( $container, 'htmlattr' ).'">'.T_($container).'</span>'.$legend_suffix;
 
 	// Table ID - fp> needs to be handled cleanly by Table object
 	$table_id = str_replace( array( ' ', ':' ), array( '_', '-' ), $container ); // fp> Using the container name which has special chars is a bad idea. Counter would be better
@@ -122,6 +120,12 @@ function display_container( $container, $legend_suffix = '' )
 			$widget_count++;
 			$enabled = $ComponentWidget->get( 'enabled' );
 
+			$disabled_plugin = false;
+			if( $ComponentWidget->type == 'plugin' && $ComponentWidget->get_Plugin() == false )
+			{
+				$disabled_plugin = true;
+			}
+
 			$fadeout_id = $Session->get( 'fadeout_id' );
 			if( isset($fadeout_id) && $ComponentWidget->ID == $fadeout_id )
 			{
@@ -136,11 +140,17 @@ function display_container( $container, $legend_suffix = '' )
 			$Table->display_line_start( false, $fadeout );
 
 			$Table->display_col_start();
-			echo '<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" />';
+			echo '<input type="checkbox" name="widgets[]" value="'.$ComponentWidget->ID.'" '.( $disabled_plugin ? 'disabled="disabled" ' : '' ).'/>';
 			$Table->display_col_end();
 
 			$Table->display_col_start();
-			if ( $enabled )
+			if( $disabled_plugin )
+			{
+				echo '<span class="plugin_is_disabled">';
+				echo get_icon( 'warning', 'imgtag', array( 'title' => T_('Inactive / Uninstalled plugin') ) );
+				echo '</span>';
+			}
+			elseif( $enabled )
 			{
 				// Indicator for the JS UI:
 				echo '<span class="widget_is_enabled">';
@@ -170,7 +180,7 @@ function display_container( $container, $legend_suffix = '' )
 			//echo $ComponentWidget->order.' ';
 			if( $widget_count > 1 )
 			{
-				echo action_icon( T_('Move up!'), 'move_up', regenerate_url( 'blog', 'action=move_up&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
+				echo action_icon( T_('Move up').'!', 'move_up', regenerate_url( 'blog', 'action=move_up&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
 			else
 			{
@@ -178,7 +188,7 @@ function display_container( $container, $legend_suffix = '' )
 			}
 			if( $widget_count < count($Widget_array))
 			{
-				echo action_icon( T_('Move down!'), 'move_down', regenerate_url( 'blog', 'action=move_down&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
+				echo action_icon( T_('Move down').'!', 'move_down', regenerate_url( 'blog', 'action=move_down&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
 			else
 			{
@@ -211,7 +221,11 @@ function display_container( $container, $legend_suffix = '' )
 
 			// Actions
 			$Table->display_col_start();
-			if ( $enabled )
+			if( $disabled_plugin )
+			{
+				echo action_icon( T_( 'Disable this widget!' ), 'deactivate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ), NULL, NULL, NULL, array( 'style' => 'visibility: hidden' ) );
+			}
+			elseif( $enabled )
 			{
 				echo action_icon( T_( 'Disable this widget!' ), 'deactivate', regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ) );
 			}
@@ -261,13 +275,13 @@ echo '</fieldset>'."\n";
 
 echo '<span class="btn-group">';
 $Form->button( array(
-		'value' => get_icon( 'check_all' ).' '.T_('Check All'),
+		'value' => get_icon( 'check_all' ).' '.T_('Check all'),
 		'id'    => 'widget_button_check_all',
 		'tag'   => 'button',
 		'type'  => 'button'
 	) );
 $Form->button( array(
-		'value' => get_icon( 'uncheck_all' ).' '.T_('Uncheck All'),
+		'value' => get_icon( 'uncheck_all' ).' '.T_('Uncheck all'),
 		'id'    => 'widget_button_uncheck_all',
 		'tag'   => 'button',
 		'type'  => 'button'
@@ -298,7 +312,7 @@ $Form->button( array(
 		'type'  => 'submit'
 	) );
 $Form->button( array(
-		'value' => get_icon( 'bullet_empty_grey' ).' '.T_('De-activate'),
+		'value' => get_icon( 'bullet_empty_grey' ).' '.T_('Deactivate'),
 		'name'  => 'actionArray[deactivate]',
 		'tag'   => 'button',
 		'type'  => 'submit'

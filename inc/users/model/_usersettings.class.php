@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -21,7 +21,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'settings/model/_abstractsettings.class.php', 'AbstractSettings' );
 
 /**
- * Class to handle the settings for users, and any user name-value pair which is not frequently used 
+ * Class to handle the settings for users, and any user name-value pair which is not frequently used
  *
  * @package evocore
  */
@@ -44,13 +44,19 @@ class UserSettings extends AbstractSettings
 		'pref_browse_tab' => 'full',
 
 		// Folding settings, 1 - Hide, 0 - Show
-		'fold_itemform_links' => 1,
+		'fold_itemform_custom_fields' => 1,
 		'fold_itemform_googlemap' => 1,
 		'fold_itemform_meta_cmnt' => 1,
 		'fold_itemform_extra' => 1,
 		'fold_itemform_comments' => 1,
 		'fold_itemform_goals' => 1,
+		'fold_itemform_notifications' => 1,
+		'fold_cmntform_datetime' => 1,
+		'fold_cmntform_html' => 1,
+		'fold_cmntform_info' => 1,
+		'fold_cmntform_notifications' => 1,
 		'fold_upgrade_backup_options' => 1,
+		'fold_upgrade_file_options' => 0,
 		'fold_plugin_vars' => 1,
 		'fold_plugin_events' => 1,
 
@@ -78,17 +84,22 @@ class UserSettings extends AbstractSettings
 		'last_activation_reminder_key' => NULL, // It will be set at the first time when activation reminder email will be sent
 		'activation_reminder_count' => 0, // How many activation reminder was sent since the user is not activated
 		'send_activation_reminder' => 1, // Send reminder to activate my account if it is not activated
+		'send_inactive_reminder' => 1, // Send reminder when my account has been inactive for an extended period of time
 		'welcome_message_sent' => 0, // Used to know if user already received a welcome message after email activation
 
 		// admin user notifications
 		'send_cmt_moderation_reminder' => 1, // Send reminders about comments awaiting moderation
 		'send_pst_moderation_reminder' => 1, // Send reminders about posts awaiting moderation
+		'send_pst_stale_alert' => 1, // Send alert about stale posts
 		'notify_new_user_registration' => 1, // Notify admin user when a new user has registered
 		'notify_activated_account' => 1, // Notify admin user when an account has been activated by email
 		'notify_closed_account' => 1, // Notify admin user when an account has been closed by the account owner
 		'notify_reported_account' => 1, // Notify admin user when an account has been reported by another user
 		'notify_changed_account' => 1, // Notify admin user when an account has been changed
 		'notify_cronjob_error' => 1, // Notify admin user when a scheduled task ends with an error or timeout
+		'notify_list_new_subscriber' => 1, // Notify list owner user when there is a new subscriber
+		'notify_list_lost_subscriber' => 1, // Notify list owner user when list loses a subscriber
+		'notify_automation_owner' => 1, // Notify automation owner user when step is executed
 
 		'account_close_ts' => NULL, // It will be the date when the account was closed. Until the account is not closed this will be NULL.
 		'account_close_reason' => NULL, // It will be the reason why the account was closed. Until the account is not closed this will be NULL.
@@ -97,7 +108,7 @@ class UserSettings extends AbstractSettings
 		'new_thread_count' => 0, // How many new thread was created by this user TODAY!
 
 		'show_online' => 1,     // Show if user is online or not
-		'user_domain' => NULL,  // User domain
+		'user_registered_from_domain' => NULL, // Reverse DNS of IP address on user registration
 		'user_browser' => NULL, // User browser
 
 		'email_format' => 'auto', // Email format: auto | html | text
@@ -105,6 +116,12 @@ class UserSettings extends AbstractSettings
 		'admin_skin' => 'bootstrap',  // User default admin skin
 
 		'suggest_item_tags' => 1, // Suggest to autocomplete item tags on edit form
+
+		'agg_period' => 'last_30_days', // Date period to filter the aggregated hits data
+		'aggcmp_period' => 'prev_30_days', // Date period to compare the aggregated hits data
+
+		'git_upgrade_url' => 'https://github.com/b2evolution/b2evolution.git', // URL of Git repository
+		'git_upgrade_branch' => 'master', // Git branch
 	);
 
 	/**
@@ -120,19 +137,23 @@ class UserSettings extends AbstractSettings
 	var $_configurable_defaults = array(
 		'notify_messages' => 1, 	// Notify user when receives a private message
 		'notify_unread_messages' => 1, // Notify user when he has unread messages more then 24 hour, and he was not notified in the last 3 days
+		'notify_comment_mentioned' => 1, // Notify user when I have been mentioned on a comment
 		'notify_published_comments' => 1, // Notify user when a comment is published in an own post
-		'notify_comment_moderation' => 1, // Notify when a comment is awaiting moderation and the user has right to moderate that comment
-		'notify_post_moderation' => 1, // Notify when a post is awaiting moderation and the user has right to moderate that post
+		'notify_comment_moderation' => 1, // Notify when new comment is awaiting moderation and the user has right to moderate that comment
+		'notify_edit_cmt_moderation' => 1, // Notify when edited comment is awaiting moderation and the user has right to moderate that comment
+		'notify_spam_cmt_moderation' => 1, // Notify when comment is reported as spam and the user has right to moderate that comment
+		'notify_post_mentioned' => 1, // Notify user when I have been mentioned on a post
+		'notify_post_moderation' => 1, // Notify when a new post is awaiting moderation and the user has right to moderate that post
+		'notify_edit_pst_moderation' => 1, // Notify when a edited post is awaiting moderation and the user has right to moderate that post
+		'notify_notify_post_proposed' => 1, // Notify when someone proposed a change on a post and the user has right to moderate that post
+		'notify_post_assignment' => 1, // Notify user when a post is assigned to the user
 		'notify_meta_comments' => 1, // Notify user when a META comment is published in a post where user can sees meta comments
 
 		'enable_PM' => 1,
 		'enable_email' => 1,
 
-		'newsletter_news' => 1, // Send news
-		'newsletter_ads'  => 0, // Send ADs
-
 		'notification_email_limit' => 3, // How many notification email is allowed per day for this user
-		'newsletter_limit' => 1, // How many newsletter email is allowed per day for this user
+		'newsletter_limit' => 3, // How many newsletter email is allowed per day for this user
 	);
 
 
@@ -201,6 +222,9 @@ class UserSettings extends AbstractSettings
 
 			$user_ID = $current_User->ID;
 		}
+
+		// Limit value with max possible length:
+		$value = utf8_substr( $value, 0, 10000 );
 
 		return parent::setx( $user_ID, $setting, $value );
 	}
@@ -286,7 +310,7 @@ class UserSettings extends AbstractSettings
 
 	/**
 	 * Reset a user settings to the default values
-	 * 
+	 *
 	 * @param integer user ID
 	 * @param boolean set to true to save modifications
 	 */
@@ -314,7 +338,7 @@ class UserSettings extends AbstractSettings
 	{
 		if( $coll_ID === NULL )
 		{ // Use current blog ID by default
-			global $Blog;
+			global $Collection, $Blog;
 
 			if( ! empty( $Blog ) )
 			{

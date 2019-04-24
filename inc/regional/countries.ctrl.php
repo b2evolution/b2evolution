@@ -21,6 +21,7 @@ load_class( 'regional/model/_country.class.php', 'Country' );
 global $current_User;
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 // Memorize this as the last "tab" used in the Global Settings:
@@ -123,11 +124,6 @@ switch( $action )
 		{	// Enable country by setting flag to true.
 			$edited_Country->set( 'preferred', 1 );
 			$Messages->add( sprintf( T_('Added to preferred countries (%s, #%d).'), $edited_Country->name, $edited_Country->ID ), 'success' );
-
-			if( ! $edited_Country->get( 'status' ) )
-			{ // If the country status is empty ( which means 'unknown' ) and the coutnry was marked as prefrerred, than the status must be changed to 'trusted'
-				$edited_Country->set( 'status', 'trusted' );
-			}
 		}
 
 		// Update db with new flag value.
@@ -178,43 +174,27 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$DB->begin();
-			$q = $edited_Country->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Country->dbinsert();
+			$Messages->add( T_('New country created.'), 'success' );
 
-				param_error( 'ctry_code',
-					sprintf( T_('This country already exists. Do you want to <a %s>edit the existing country</a>?'),
-						'href="?ctrl=countries&amp;action=edit&amp;ctry_ID='.$q.'"' ) );
-			}
-			else
+			// What next?
+			switch( $action )
 			{
-				$edited_Country->dbinsert();
-				$Messages->add( T_('New country created.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{	// What next?
-
-				switch( $action )
-				{
-					case 'create_copy':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=countries&action=new&ctry_ID='.$edited_Country->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create_new':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=countries&action=new', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=countries', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=countries&action=new&ctry_ID='.$edited_Country->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=countries&action=new', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=countries', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;
@@ -236,26 +216,12 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Update in DB:
-			$DB->begin();
-			$q = $edited_Country->dbexists();
-			if($q)
-			{ 	// We have a duplicate entry:
-				param_error( 'ctry_code',
-					sprintf( T_('This country already exists. Do you want to <a %s>edit the existing country</a>?'),
-						'href="?ctrl=countries&amp;action=edit&amp;ctry_ID='.$q.'"' ) );
-			}
-			else
-			{
-				$edited_Country->dbupdate();
-				$Messages->add( T_('Country updated.'), 'success' );
-			}
-			$DB->commit();
+			$edited_Country->dbupdate();
+			$Messages->add( T_('Country updated.'), 'success' );
 
-			if( empty($q) )
-			{	// If no error, Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=countries', 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
+			// If no error, Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=countries', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 

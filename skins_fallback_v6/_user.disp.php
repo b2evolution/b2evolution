@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
 * @var Blog
 */
-global $Blog;
+global $Collection, $Blog;
 /**
  * @var GeneralSettings
  */
@@ -129,7 +129,7 @@ echo '<div class="profile_column_left">';
 	}
 
 	// Login:
-	echo '<h2 class="text-muted">'.$User->get( 'login' ).'</h2>';
+	echo '<h2 class="'.$User->get_gender_class().'">'.$User->get( 'login' ).'</h2>';
 
 	echo '<hr class="profile_separator" />'."\n";
 
@@ -183,9 +183,9 @@ echo '<div class="profile_column_left">';
 			.'</a>';
 	}
 
-	// Check if current user can edit other users from back-office:
-	$user_perms_edit = ( $is_logged_in &&
-			$current_User->can_moderate_user( $User->ID ) &&
+	// Check if current user can edit other users or own user from back-office:
+	$user_perms_backoffice_edit = ( $is_logged_in &&
+			( $current_User->ID == $User->ID || $current_User->can_moderate_user( $User->ID ) ) &&
 			$current_User->check_status( 'can_access_admin' ) &&
 			$current_User->check_perm( 'admin', 'restricted' )
 		);
@@ -197,7 +197,7 @@ echo '<div class="profile_column_left">';
 		if( ! empty( $msgform_url ) )
 		{
 			$msgform_url = url_add_param( $msgform_url, 'msg_type=PM' );
-			$buttons[] = '<a href="'.$msgform_url.'"><button type="button" class="btn '.( $user_perms_edit ? 'btn-default' : 'btn-primary' ).'">'.T_('Send Message').'</button></a>';
+			$buttons[] = '<a href="'.$msgform_url.'"><button type="button" class="btn '.( $user_perms_backoffice_edit ? 'btn-default' : 'btn-primary' ).'">'.T_('Send Message').'</button></a>';
 		}
 	}
 
@@ -221,7 +221,7 @@ echo '<div class="profile_column_left">';
 		}
 
 		$buttons['group'] = array();
-		$contact_block_url = get_samedomain_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$user_ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
+		$contact_block_url = get_htsrv_url().'action.php?mname=messaging&amp;disp=contacts&amp;user_ID='.$user_ID.'&amp;redirect_to='.rawurlencode( regenerate_url() ).'&amp;'.url_crumb( 'messaging_contacts' );
 		if( $is_contact === NULL || $is_contact === true )
 		{ // Display a button to block user
 			$buttons['group'][] = '<a href="'.$contact_block_url.'&action=block" class="btn btn-warning">'
@@ -238,7 +238,7 @@ echo '<div class="profile_column_left">';
 
 	// - Report:
 	if( $is_logged_in && ( $current_User->ID != $User->ID ) &&
-			$current_User->check_status( 'can_report_user' ) )
+			$current_User->check_status( 'can_report_user', $User->ID ) )
 	{ // Current user must be logged in, cannot report own account, and must has a permission to report
 		if( ! isset( $buttons['group'] ) )
 		{
@@ -256,7 +256,7 @@ echo '<div class="profile_column_left">';
 		}
 	}
 
-	if( $user_perms_edit )
+	if( $user_perms_backoffice_edit )
 	{ // Current user can edit other user's profiles
 		global $admin_url;
 
@@ -354,6 +354,8 @@ echo '<div class="profile_column_right">';
 	$group_ID = 0;
 	foreach( $User->userfields as $userfield )
 	{
+		userfield_prepare( $userfield );
+
 		if( $group_ID != $userfield->ufgp_ID )
 		{ // Start new group
 			if( $group_ID > 0 )
@@ -361,11 +363,6 @@ echo '<div class="profile_column_right">';
 				$profileForm->end_fieldset();
 			}
 			$profileForm->begin_fieldset( $userfield->ufgp_name, array( 'id' => 'fieldset_user_fields' ) );
-		}
-
-		if( $userfield->ufdf_type == 'text' )
-		{ // convert textarea values
-			$userfield->uf_varchar = nl2br( $userfield->uf_varchar );
 		}
 
 		$userfield_icon = '';
@@ -385,17 +382,24 @@ echo '<div class="profile_column_right">';
 
 	$profileForm->begin_fieldset( T_( 'Reputation' ) );
 
-		$profileForm->info( T_('Number of posts'), $User->get_reputation_posts() );
+		$profileForm->info( T_('Registration date'), mysql2localedate( $User->datecreated ) );
 
-		$profileForm->info( T_('Comments'), $User->get_reputation_comments() );
+		if( $Blog->get_setting( 'userdir_lastseen' ) )
+		{	// Display last visit only if it is enabled by current collection:
+			$profileForm->info( T_('Last seen on'), get_lastseen_date( $User->get( 'lastseen_ts' ), $Blog->get_setting( 'userdir_lastseen_view' ), $Blog->get_setting( 'userdir_lastseen_cheat' ) ) );
+		}
 
-		$profileForm->info( T_('Photos'), $User->get_reputation_files( array( 'file_type' => 'image' ) ) );
+		$profileForm->info( T_('Posts'), $User->get_reputation_posts() );
 
-		$profileForm->info( T_('Audio'), $User->get_reputation_files( array( 'file_type' => 'audio' ) ) );
+		$profileForm->info( T_('Comments'), '<span class="reputation_message">'.$User->get_reputation_comments().'</span>' );
 
-		$profileForm->info( T_('Other files'), $User->get_reputation_files( array( 'file_type' => 'other' ) ) );
+		$profileForm->info( T_('Photos'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'image' ) ).'</span>' );
 
-		$profileForm->info( T_('Spam fighter score'), $User->get_reputation_spam() );
+		$profileForm->info( T_('Audio'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'audio' ) ).'</span>' );
+
+		$profileForm->info( T_('Other files'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'other' ) ).'</span>' );
+
+		$profileForm->info( T_('Spam fighter score'), '<span class="reputation_message">'.$User->get_reputation_spam().'</span>' );
 
 	$profileForm->end_fieldset();
 

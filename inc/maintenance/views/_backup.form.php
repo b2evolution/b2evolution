@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var back up configuration
  */
-global $backup_paths, $backup_tables, $backup_path, $backup_exclude_folders;
+global $backup_paths, $backup_tables, $backup_path, $backup_exclude_folders, $admin_url;
 
 /**
  * @var action
@@ -35,12 +35,49 @@ $Form = new Form( NULL, 'backup_settings', 'post' );
 
 $Form->begin_form( 'fform', T_('Backup application files and data') );
 
-echo '<p>Your backups will be saved into the directory: <b>'.$backup_path.'</b> (on your web server).</p>';
-
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
+$Form->begin_fieldset( T_( 'Existing Backups' ).get_manual_link( 'existing-backups' ) );
+
+	$Form->info( T_('Folder'), '<code>'.$backup_path.'</code>' );
+
+	// Get all backup folders:
+	$backup_folders = array();
+	if( $dir_handle = @opendir( $backup_path ) )
+	{
+		while( ( $dir_name = readdir( $dir_handle ) ) !== false )
+		{
+			if( $dir_name != '.' && $dir_name != '..' && is_dir( $backup_path.'/'.$dir_name ) )
+			{
+				$backup_folders[] = $dir_name;
+			}
+		}
+		closedir( $dir_handle );
+	}
+
+	if( count( $backup_folders ) )
+	{
+		// Sort files:
+		natsort( $backup_folders );
+		$backup_folders = array_reverse( $backup_folders );
+
+		// Display backup folders:
+		foreach( $backup_folders as $f => $dir_name )
+		{
+			$backup_folders[ $f ] = '<code>'.$dir_name.'</code> '
+				.'<a href="'.$admin_url.'?ctrl=backup&amp;action=delete&amp;folder='.rawurlencode( $dir_name ).'&amp;'.url_crumb( 'backup' ).'"'
+						.' class="btn btn-danger btn-xs"'
+						.' onclick="return confirm(\''.TS_('Are you sure want to delete this folder?').'\')">'
+					.T_('Delete')
+				.'</a>';
+		}
+		$Form->info( T_('Subfolders'), implode( '<br>', $backup_folders ) );
+	}
+
+$Form->end_fieldset();
+
 // Backup settings for folders and files
-$Form->begin_fieldset( T_( 'Folders & files' ).get_manual_link( 'backup-tab' ), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_( 'Folders & files' ).get_manual_link( 'backup-tab' ) );
 
 // Display checkboxes to include the paths:
 foreach( $backup_paths as $name => $settings )
@@ -71,17 +108,26 @@ foreach( $backup_exclude_folders as $name => $settings )
 		array_pop( $settings['path'] );
 		$exclude_folder_names = '<code>'.implode( '</code>, <code>', $settings['path'] ).'</code>';
 		$exclude_folder_names .= ' '.T_('or').' <code>'.$exclude_folder_name_last.'</code>';
+		$exclude_folder_note = T_('Exclude all %s folders');
+	}
+	elseif( count( $settings['path'] ) == 2 )
+	{
+		$exclude_folder_names = '<code>'.implode( '</code> '.T_('or').' <code>', $settings['path'] ).'</code>';
+		$exclude_folder_note = T_('Exclude all %s folders');
 	}
 	else
 	{
-		$exclude_folder_names = '<code>'.implode( '</code> '.T_('or').' <code>', $settings['path'] ).'</code>';
+		$exclude_folder_names = '<code>'.$settings['path'][0].'</code>';
+		$exclude_folder_note = T_('Exclude the %s folder');
 	}
-	$backup_exclude_checkboxes[] = array( 'exclude_bk_'.$name, $current_Backup->exclude_folders[ $name ], sprintf( T_('Exclude all %s folders'), $exclude_folder_names ), $settings['excluded'] );
+	$backup_exclude_checkboxes[] = array( 'exclude_bk_'.$name, $current_Backup->exclude_folders[ $name ], sprintf( $exclude_folder_note, $exclude_folder_names ), $settings['excluded'] );
 }
 if( count( $backup_exclude_checkboxes ) )
 {
 	$Form->checklist( $backup_exclude_checkboxes, 'exclude_bk', T_('Exclude folders') );
 }
+
+$Form->checkbox( 'ignore_bk_config', $current_Backup->ignore_config, 'backup_ignore.conf', sprintf( T_('Ignore files and folders listed in %s'), '<code>conf/backup_ignore.conf</code>' ) );
 
 $Form->end_fieldset();
 
@@ -103,6 +149,8 @@ foreach( $backup_tables as $name => $settings )
 
 	$Form->checkbox( 'bk_'.$name, $current_Backup->backup_tables[$name], $settings['label'], $note );
 }
+
+$Form->checkbox( 'db_structure', $current_Backup->backup_db_structure, T_('DB Structure'), sprintf( T_('Add %s statements for ALL tables, in order to allow quick restore.'), '<code>CREATE TABLE</code>' ) );
 
 $Form->end_fieldset();
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -129,7 +129,7 @@ class Cronjob extends DataObject
 		}
 
 		// start datetime:
-		param_date( 'cjob_date', T_('Please enter a valid date.'), true );
+		param_date( 'cjob_date', sprintf( T_('Please enter a valid date using the following format: %s'), '<code>'.locale_input_datefmt().'</code>' ), true );
 		param_time( 'cjob_time' );
 		$this->set( 'start_datetime', form_date( get_param( 'cjob_date' ), get_param( 'cjob_time' ) ) );
 
@@ -178,7 +178,7 @@ class Cronjob extends DataObject
 			$SQL->SELECT( 'clog_status' );
 			$SQL->FROM( 'T_cron__log' );
 			$SQL->WHERE( 'clog_ctsk_ID = '.$DB->quote( $this->ID ) );
-			$status = $DB->get_var( $SQL->get() );
+			$status = $DB->get_var( $SQL );
 		}
 
 		if( empty( $status ) )

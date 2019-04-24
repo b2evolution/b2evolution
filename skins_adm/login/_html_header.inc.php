@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package htsrv
  */
@@ -73,6 +73,7 @@ $login_form_params = array(
 	'customstart'    => '<div class="custom_content">',
 	'customend'      => "</div>\n",
 	'note_format'    => ' <span class="help-inline">%s</span>',
+	'bottom_note_format' => ' <div><span class="help-inline">%s</span></div>',
 	// Additional params depending on field type:
 	// - checkbox
 	'inputclass_checkbox'    => '',
@@ -95,6 +96,9 @@ if( empty( $use_form_links ) )
 { // Remove the mask for form links because it is not used by current template
 	$login_form_params['formstart'] = str_replace( '$form_links$', '', $login_form_params['formstart'] );
 }
+
+// Send the predefined cookies:
+evo_sendcookies();
 
 headers_content_mightcache( 'text/html', 0 );		// NEVER cache the login pages!
 

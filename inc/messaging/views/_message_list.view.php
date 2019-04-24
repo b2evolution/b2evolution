@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
+global $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -152,12 +152,6 @@ if( $action == 'preview' )
 { // Init PREVIEW message
 	global $localtimenow;
 
-	foreach( $recipient_status_list as $row )
-	{ // To make the unread status for each recipient
-		$read_status_list[ $row->user_ID ] = -1;
-		$leave_status_list[ $row->user_ID ] = 0;
-	}
-
 	$count_SQL->SELECT( 'COUNT(*) + 1' );
 
 	$select_sql = '(
@@ -166,7 +160,7 @@ if( $action == 'preview' )
 		'.$current_User->ID.' AS msg_user_ID, '.$DB->quote( $current_User->login ).' AS msg_author,
 		'.$DB->quote( $current_User->firstname ).' AS msg_firstname, '.$DB->quote( $current_User->lastname ).' AS msg_lastname,
 		'.$DB->quote( $current_User->avatar_file_ID ).' AS msg_user_avatar_ID,
-		'.$DB->quote( '<b>'.T_('PREVIEW').':</b><br /> '.$edited_Message->get_prerendered_content() ).' AS msg_text, '.$DB->quote( $edited_Message->renderers ).' AS msg_renderers,
+		'.$DB->quote( $edited_Message->text ).' AS msg_text, '.$DB->quote( $edited_Message->renderers ).' AS msg_renderers,
 		'.$DB->quote( $edited_Thread->title ).' AS thread_title
 	)
 	UNION
@@ -183,7 +177,7 @@ $Results->title = $params['messages_list_title'].( is_admin_page() ? get_manual_
 
 if( is_admin_page() )
 {
-	$Results->global_icon( T_('Cancel!'), 'close', '?ctrl=threads' );
+	$Results->global_icon( T_('Cancel').'!', 'close', '?ctrl=threads' );
 }
 
 /**
@@ -219,7 +213,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Message'),
 		'td_class' => 'left top message_text',
-		'td' => '%col_msg_format_text( #msg_ID#, #msg_text# )%',
+		'td' => '@get_content()@@get_images()@@get_files()@',
 	);
 /**
  * Read?:
@@ -313,23 +307,62 @@ if( $is_recipient )
 				$Form->info_field( '', T_( 'The other users involved in this conversation have closed their account.' ) );
 			}
 
+			// Display plugin captcha for message form before textarea:
+			$Plugins->display_captcha( array(
+					'Form'              => & $Form,
+					'form_type'         => 'message',
+					'form_position'     => 'before_textarea',
+					'form_use_fieldset' => false,
+				) );
+
+			if( $current_User->check_perm( 'files', 'view' ) )
+			{	// If current user has a permission to view the files:
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				// Initialize this object as global because this is used in many link functions:
+				global $LinkOwner;
+				$LinkOwner = new LinkMessage( $edited_Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+			}
+
 			ob_start();
 			echo '<div class="message_toolbars">';
 			// CALL PLUGINS NOW:
-			$Plugins->trigger_event( 'DisplayMessageToolbar', array() );
+			$message_toolbar_params = array( 'Message' => & $edited_Message );
+			if( isset( $LinkOwner ) && $LinkOwner->is_temp() )
+			{
+				$message_toolbar_params['temp_ID'] = $LinkOwner->get_ID();
+			}
+			$Plugins->trigger_event( 'DisplayMessageToolbar', $message_toolbar_params );
 			echo '</div>';
 			$message_toolbar = ob_get_clean();
 
+			// CALL PLUGINS NOW:
+			ob_start();
+			$admin_editor_params = array(
+					'target_type'   => 'Message',
+					'target_object' => $edited_Message,
+					'content_id'    => 'msg_text',
+					'edit_layout'   => NULL,
+				);
+			if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+			{
+				$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+			}
+			$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
+			$quick_setting_switch = ob_get_clean();
+
 			$form_inputstart = $Form->inputstart;
+			$form_inputend = $Form->inputend;
 			$Form->inputstart .= $message_toolbar;
+			$Form->inputend = $quick_setting_switch.$Form->inputend;
 			$Form->textarea_input( 'msg_text', !empty( $edited_Message ) ? $edited_Message->original_text : '', 10, T_('Message'), array(
 					'cols' => $params['cols'],
 					'required' => true
 				) );
 			$Form->inputstart = $form_inputstart;
+			$Form->inputend = $form_inputend;
 
 			// set b2evoCanvas for plugins
-			echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "msg_text" );</script>';
+			echo '<script>var b2evoCanvas = document.getElementById( "msg_text" );</script>';
 
 			// Display renderers
 			$current_renderers = !empty( $edited_Message ) ? $edited_Message->get_renderers_validated() : array( 'default' );
@@ -339,8 +372,19 @@ if( $is_recipient )
 				$Form->info( T_('Text Renderers'), $message_renderer_checkboxes );
 			}
 
+			// ####################### ATTACHMENTS/LINKS #########################
+			$Form->attachments_fieldset( $edited_Message );
+
+			// Display plugin captcha for message form before submit button:
+			$Plugins->display_captcha( array(
+					'Form'              => & $Form,
+					'form_type'         => 'message',
+					'form_position'     => 'before_submit_button',
+					'form_use_fieldset' => false,
+				) );
+
 		$Form->end_form( array(
-				array( 'submit', 'actionArray[preview]', T_('Preview'), 'SaveButton btn-info' ),
+				array( 'submit', 'actionArray[preview]', /* TRANS: Verb */ T_('Preview'), 'SaveButton btn-info' ),
 				array( 'submit', 'actionArray[create]', T_('Send message'), 'SaveButton' )
 			) );
 
@@ -402,9 +446,12 @@ if( $action == 'preview' )
 $Results->display_init( $display_params );
 $display_params['list_start'] = str_replace( 'class="grouped', 'class="grouped nohover', $Results->params['list_start'] );
 
+// Disable highlight on hover
+$display_params['list_start'] = str_replace( 'table-hover', '', $Results->params['list_start'] );
+
 // Dispaly message list
 $Results->display( $display_params );
 
 echo $params['messages_list_end'];
-
+echo_image_insert_modal();
 ?>

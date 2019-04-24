@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -61,13 +61,13 @@ class ItemSettings extends AbstractSettings
 	 *
 	 * @access protected
 	 * @param string First column key
-	 * @param string Second column key
+	 * @param string Second column key, NULL - to load all settings of the requested Item
 	 * @param string NOT USED (provided for compatibility with parent class)
 	 * @return boolean
 	 */
 	function _load( $item_ID = NULL, $arg = NULL, $arg3 = NULL )
 	{
-		if( empty( $item_ID ) || empty( $arg ) )
+		if( empty( $item_ID ) || ( empty( $arg ) && $arg !== NULL ) )
 		{
 			return false;
 		}
@@ -100,6 +100,9 @@ class ItemSettings extends AbstractSettings
 	 */
 	function set( $col_key1, $col_key2, $value )
 	{
+		// Limit value with max possible length:
+		$value = utf8_substr( $value, 0, 10000 );
+
 		return parent::setx( $col_key1, $col_key2, $value );
 	}
 }

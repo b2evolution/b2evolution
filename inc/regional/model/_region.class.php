@@ -83,6 +83,17 @@ class Region extends DataObject
 		param_check_regexp( 'rgn_code', '#^[A-Za-z0-9]{1,6}$#', T_('Region code must be from 1 to 6 letters.') );
 		$this->set_from_Request( 'code', 'rgn_code' );
 
+		if( ! param_errors_detected() )
+		{	// Check region code for duplicating:
+			$existing_rgn_ID = $this->dbexists( array( 'rgn_ctry_ID', 'rgn_code' ), array( $this->get( 'ctry_ID' ), $this->get( 'code' ) ) );
+			if( $existing_rgn_ID )
+			{	// We have a duplicate region:
+				param_error( 'rgn_code',
+					sprintf( T_('This region already exists. Do you want to <a %s>edit the existing region</a>?'),
+						'href="?ctrl=regions&amp;action=edit&amp;rgn_ID='.$existing_rgn_ID.'"' ) );
+			}
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -119,24 +130,6 @@ class Region extends DataObject
 	function get_name()
 	{
 		return $this->name;
-	}
-
-
-	/**
-	 * Check existence of specified region code in rgn_code unique field.
-	 *
-	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
-	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
-	 * @return int ID if country + region code exist otherwise NULL/false
-	 */
-	function dbexists( $unique_fields = array( 'rgn_ctry_ID', 'rgn_code' ), $values = NULL )
-	{
-		if( is_null( $values ) )
-		{
-			$values = array( $this->ctry_ID, $this->code );
-		}
-
-		return parent::dbexists( $unique_fields, $values );
 	}
 }
 

@@ -4,12 +4,17 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author fplanque: Francois PLANQUE.
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+// Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
+$current_User->check_perm( 'options', 'edit', true );
 
 load_funcs( 'tools/model/_wp.funcs.php' );
 
@@ -37,17 +42,17 @@ switch( $action )
 		$Session->assert_received_crumb( 'wpxml' );
 
 		$wp_blog_ID = param( 'wp_blog_ID', 'integer', 0 );
-		param_check_not_empty( 'wp_blog_ID', T_('Please select a blog!') );
+		param_check_not_empty( 'wp_blog_ID', T_('Please select a collection!') );
 
 		// XML File
-		$xml_file = param( 'wp_file', 'string', '' );
+		$xml_file = param( 'import_file', 'string', '' );
 		if( empty( $xml_file ) )
 		{ // File is not selected
-			param_error( 'wp_file', T_('Please select file to import.') );
+			param_error( 'import_file', T_('Please select file to import.') );
 		}
 		else if( ! preg_match( '/\.(xml|txt|zip)$/i', $xml_file ) )
 		{ // Extension is incorrect
-			param_error( 'wp_file', sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $xml_file ) );
+			param_error( 'import_file', sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $xml_file ) );
 		}
 
 		if( param_errors_detected() )
@@ -70,7 +75,7 @@ $AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=imp
 $AdminUI->breadcrumbpath_add( T_('WordPress XML Importer'), $admin_url.'?ctrl=wpimportxml' );
 
 // Set an url for manual page:
-$AdminUI->set_page_manual_link( 'wordpress-import' );
+$AdminUI->set_page_manual_link( 'xml-importer' );
 
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

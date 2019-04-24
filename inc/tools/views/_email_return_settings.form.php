@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -102,7 +102,7 @@ $Form->begin_fieldset( T_('Settings to decode the returned emails').get_manual_l
 				T_('Body Terminator'), T_('Starting from any of these strings, everything will be ignored, including these strings.'), 50 );
 
 	$Form->textarea( 'repath_errtype', $Settings->get( 'repath_errtype' ), 15, T_('Error message decoding configuration'),
-				T_('The first letter means one of the following:<br />S: Spam suspicion<br />P: Permament error<br />T: Temporary error<br />C: Configuration error<br />U: Unknown error (default)<br />The string after the space is a case-insensitive error text.'), 50 );
+				T_('The first letter means one of the following:<br />S: Spam suspicion<br />P: Permanent error<br />T: Temporary error<br />C: Configuration error<br />U: Unknown error (default)<br />The string after the space is a case-insensitive error text.'), 50 );
 
 $Form->end_fieldset();
 
@@ -112,7 +112,7 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( 'input[name="repath_method"], input[name="repath_encrypt"]' ).click( function()

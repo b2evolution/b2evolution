@@ -18,7 +18,7 @@ if( empty( $Blog ) )
 	if( isset( $blog) && $blog > 0 )
 	{
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $blog, false, false );
+		$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
 	}
 }
 
@@ -40,10 +40,13 @@ if( ! is_logged_in() )
 { // must be logged in!
 	bad_request_die( T_('You are not logged in.') );
 }
-// check if user can edit this post
-check_item_perm_edit( $post_ID );
 
 $action = param_action();
+
+if( $action != 'save_propose' )
+{	// check if user can edit this post:
+	check_item_perm_edit( $post_ID );
+}
 
 if( !empty( $action ) && $action != 'new' )
 { // Check that this action request is not a CSRF hacked request:
@@ -66,13 +69,14 @@ switch( $action )
 	case 'update':
 	case 'update_workflow': // Update workflow properties from disp=single
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'save_propose':
 		// Load post to edit:
 		$post_ID = param ( 'post_ID', 'integer', true, true );
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = & $ItemCache->get_by_ID ( $post_ID );
 
 		// Load the blog we're in:
-		$Blog = & $edited_Item->get_Blog();
+		$Collection = $Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
@@ -101,10 +105,10 @@ switch( $action )
 		$edited_Item->status = $post_status;		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
-		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
+		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status, $edited_Item );
 
-		// Check if new category was started to create. If yes then set up parameters for next page
-		check_categories_nosave( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes then set up parameters for next page:
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'backoffice' );
 
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
@@ -132,14 +136,14 @@ switch( $action )
 		$edited_Item->status = $post_status;		// 'published' or 'draft' or ...
 		// We know we can use at least one status,
 		// but we need to make sure the requested/default one is ok:
-		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status );
+		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status, $edited_Item );
 
 		// We use the request variables to fill the edit form, because we need to be able to pass those values
 		// from tab to tab via javascript when the editor wants to switch views...
 		$edited_Item->load_from_Request ( true ); // needs Blog set
 
-		// Check if new category was started to create. If yes then set up parameters for next page
-		check_categories_nosave ( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes then set up parameters for next page:
+		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'backoffice' );
 
 		$edited_Item->set ( 'main_cat_ID', $post_category );
 		if( $edited_Item->main_cat_ID && ( get_allow_cross_posting() < 2 ) && $edited_Item->get_blog_ID() != $blog )
@@ -160,8 +164,8 @@ switch( $action )
 	case 'create': // Create a new post
 		$exit_after_save = ( $action != 'create_edit' );
 
-		// Check if new category was started to create. If yes check if it is valid.
-		check_categories( $post_category, $post_extracats );
+		// Check if new category was started to create. If yes check if it is valid:
+		check_categories( $post_category, $post_extracats, NULL, 'frontoffice' );
 
 		// Check permission on statuses:
 		$current_User->check_perm( 'cats_post!'.$post_status, 'create', true, $post_extracats );
@@ -180,13 +184,13 @@ switch( $action )
 		$edited_Item->set( 'main_cat_ID', $post_category );
 		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
-		// Restrict item status to max allowed by item collection:
-		$edited_Item->restrict_status_by_collection( true );
-
 		// Set object params:
 		$edited_Item->load_from_Request( /* editing? */ ($action == 'create_edit'), /* creating? */ true );
 
 		$Plugins->trigger_event ( 'AdminBeforeItemEditCreate', array ('Item' => & $edited_Item ) );
+
+		// Validate first enabled captcha plugin:
+		$Plugins->trigger_event_first_return( 'ValidateCaptcha', array( 'form_type' => 'item' ) );
 
 		if( !empty( $mass_create ) )
 		{	// ------ MASS CREATE ------
@@ -237,7 +241,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( true, $exit_after_save );
+		$edited_Item->handle_notifications( NULL, true );
 
 		$Messages->add( T_('Post has been created.'), 'success' );
 
@@ -259,8 +263,8 @@ switch( $action )
 		// Check edit permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		// Check if new category was started to create.  If yes check if it is valid.
-		$isset_category = check_categories( $post_category, $post_extracats );
+		// Check if new category was started to create.  If yes check if it is valid:
+		$isset_category = check_categories( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
@@ -270,9 +274,6 @@ switch( $action )
 		// UPDATE POST:
 		// Set the params we already got:
 		$edited_Item->set ( 'status', $post_status );
-
-		// Restrict item status to max allowed by item collection:
-		$edited_Item->restrict_status_by_collection( true );
 
 		if( $isset_category )
 		{ // we change the categories only if the check was succesfull
@@ -294,7 +295,19 @@ switch( $action )
 		}
 
 		// UPDATE POST IN DB:
-		$edited_Item->dbupdate();
+		if( $edited_Item->dbupdate() )
+		{
+			if( $edited_Item->assigned_to_new_user && ! empty( $edited_Item->assigned_user_ID ) )
+			{ // Send post assignment notification
+				$edited_Item->send_assignment_notification();
+			}
+
+			// Clear all proposed changes of the updated Item:
+			$edited_Item->clear_proposed_changes();
+
+			// Update attachments folder:
+			$edited_Item->update_attachments_folder();
+		}
 
 		// post post-publishing operations:
 		param( 'trackback_url', 'string' );
@@ -312,7 +325,7 @@ switch( $action )
 		}
 
 		// Execute or schedule notifications & pings:
-		$edited_Item->handle_post_processing( false, $exit_after_save );
+		$edited_Item->handle_notifications();
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -348,34 +361,61 @@ switch( $action )
 		break;
 
 	case 'update_workflow':
-		// Update workflow properties from disp=single
-		if( $Blog->get_setting( 'use_workflow' ) )
-		{ // Only if the workflow is enabled on collection
-			param( 'item_st_ID', 'integer', NULL );
-			$edited_Item->set_from_Request( 'pst_ID', 'item_st_ID', true );
+		// Update workflow properties from disp=single:
 
-			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
-			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
-			$edited_Item->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
 
-			param( 'item_priority', 'integer', NULL );
-			$edited_Item->set_from_Request( 'priority', 'item_priority', true );
+		$item_Blog = & $edited_Item->get_Blog();
 
-			param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL );
-			$edited_Item->set_from_Request( 'datedeadline', 'item_deadline', true );
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		$current_User->check_perm( 'blog_can_be_assignee', 'edit', true, $item_Blog->ID );
 
-			// UPDATE POST IN DB:
+		if( $edited_Item->load_workflow_from_Request() )
+		{	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
 			if( $edited_Item->dbupdate() )
-			{ // Display a message on success result:
+			{	// Display a message on success result:
 				$Messages->add( T_('The workflow properties have been updated.'), 'success' );
+
+				if( $edited_Item->assigned_to_new_user && ! empty( $edited_Item->assigned_user_ID ) )
+				{ // Send post assignment notification
+					$edited_Item->send_assignment_notification();
+				}
 			}
 		}
-
-		$redirect_to = $edited_Item->get_permanent_url();
 
 		// REDIRECT / EXIT
 		header_redirect( $redirect_to );
 		/* EXITED */
+		break;
+
+	case 'save_propose':
+		// Save new proposed change:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check if current User can create a new proposed change:
+		$edited_Item->can_propose_change( true );
+
+		if( $edited_Item->create_proposed_change() )
+		{	// If new proposed changes has been inserted in DB successfully:
+			$Messages->add( T_('New proposed change has been added.'), 'success' );
+			if( $current_User->check_perm( 'admin', 'restricted' ) &&
+			    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+			{	// Redirect to item history page with new poroposed change if current User has a permisson:
+				header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+			}
+			else
+			{	// Redirect to item view page:
+				header_redirect( $edited_Item->get_permanent_url( '', '', '&' ) );
+			}
+		}
+
+		// If some errors on creating new proposed change,
+		// Display the same submitted form of new proposed change:
+		$error_disp = 'proposechange';
 		break;
 }
 
@@ -383,11 +423,11 @@ switch( $action )
 $SkinCache = & get_SkinCache();
 $Skin = & $SkinCache->get_by_ID( $Blog->get_skin_ID() );
 $skin = $Skin->folder;
-$disp = 'edit';
+$disp = isset( $error_disp ) ? $error_disp : 'edit';
 $ads_current_skin_path = $skins_path.$skin.'/';
-if( file_exists( $ads_current_skin_path.'edit.main.php' ) )
+if( file_exists( $ads_current_skin_path.$disp.'.main.php' ) )
 {	// Include template file from current skin folder
-	require $ads_current_skin_path.'edit.main.php';
+	require $ads_current_skin_path.$disp.'.main.php';
 }
 else
 {	// Include default main template

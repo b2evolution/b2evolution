@@ -43,7 +43,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header class="row">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
+	<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8">
 		<div class="evo_container evo_container__page_top">
 		<?php
 			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
@@ -63,7 +63,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		</div>
 	</div><!-- .col -->
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
+	<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<div class="evo_container evo_container__header">
 		<?php
 			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
@@ -122,7 +122,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
-		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
+		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 			messages( array(
@@ -175,9 +175,10 @@ siteskin_include( '_site_body_header.inc.php' );
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
-					'content_mode' => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
-					'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
-					'item_class'   => ($Item->is_intro() ? 'well evo_intro_post' : 'well evo_featured_post'),
+					'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+					'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+					'item_class'    => ($Item->is_intro() ? 'well evo_intro_post' : 'well evo_featured_post'),
+					'Item'          => $Item,
 				) );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
@@ -186,7 +187,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
-					'author_link_text' => 'preferredname',
+					'author_link_text' => 'auto',
 					// Profile tabs to switch between user edit forms
 					'profile_tabs' => array(
 						'block_start'         => '<nav><ul class="nav nav-tabs profile_tabs">',
@@ -209,8 +210,6 @@ siteskin_include( '_site_body_header.inc.php' );
 						'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 					),
 					// Item content:
-					'url_link_position'     => 'top',
-					'parent_link_position'  => 'top',
 					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
 					'skin_form_before'      => '<div class="panel panel-default skin-form">'
 																				.'<div class="panel-heading">'
@@ -230,15 +229,6 @@ siteskin_include( '_site_body_header.inc.php' );
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -249,10 +239,12 @@ siteskin_include( '_site_body_header.inc.php' );
 					'search_submit_before' => '<span class="input-group-btn">',
 					'search_submit_after'  => '</span></div>',
 					// Front page
-					'featured_intro_before' => '<div class="jumbotron"><div class="intro_background_image"></div>',
-					'featured_intro_after'  => '</div>',
+					'featured_intro_before' => '',
+					'featured_intro_after'  => '',
+					'intro_class'           => 'jumbotron',
+					'featured_class'        => 'featurepost',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
@@ -268,12 +260,12 @@ siteskin_include( '_site_body_header.inc.php' );
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="col-md-12">
 
-		<div class="evo_container evo_container__footer">
+		<div class="evo_container evo_container__footer clearfix">
 		<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
@@ -282,7 +274,7 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 		</div>
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
@@ -333,7 +325,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 		?>
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

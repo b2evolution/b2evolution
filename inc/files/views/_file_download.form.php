@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -26,7 +26,7 @@ $Form->begin_form( 'fform', T_('Download files in archive') );
 	$Form->hidden( 'action_invoked', 1 );
 	$Form->hiddens_by_key( get_memorized() );
 
-	$Form->text_input( 'zipname', $zipname, 30, T_('Archive filename'), T_('End in .ZIP'),  array( 'maxlength' => '' ) );
+	$Form->text_input( 'zipname', $zipname, 30, T_('Archive filename'), T_('End with .zip'),  array( 'maxlength' => '' ) );
 
 	if( $selected_Filelist->count_dirs() )
 	{ // Allow to exclude dirs:

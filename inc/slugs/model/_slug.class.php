@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -101,10 +101,20 @@ class Slug extends DataObject
 		global $Messages;
 		// title
 		$slug_title = param( 'slug_title', 'string', true );
-		$slug_title = urltitle_validate( $slug_title, '', 0, true, 'slug_title', 'slug_ID', 'T_slug' );
+		if( empty( $this->ID ) || $slug_title != $this->get( 'title' ) )
+		{	// Check unique slug title only for new creating slug and if title was really changed:
+			$slug_title = urltitle_validate( $slug_title, $slug_title, 0, true, 'slug_title', 'slug_ID', 'T_slug' );
+			// Update the submitted param with validated value in order to correct checking by regexp below:
+			set_param( 'slug_title', $slug_title );
+		}
 		if( $this->dbexists( 'slug_title', $slug_title ) )
 		{
 			$Messages->add( sprintf( T_('The slug &laquo;%s&raquo; already exists.'), $slug_title ), 'error' );
+		}
+		// Added in May 2017; but old slugs are not converted yet.
+		else
+		{	// Display error if slug title doesn't contain at least 1 non-numeric character:
+			param_check_regexp( 'slug_title', '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', T_('All slugs must contain at least 1 non-numeric character.'), NULL, false, false );
 		}
 		$this->set( 'title', $slug_title );
 
@@ -208,7 +218,9 @@ class Slug extends DataObject
 	 * Used when try to delete a slug, which is another object slug
 	 *
 	 * @param array restriction
-	 * @return string message with links to objects
+	 * @return string|boolean Message with link to objects,
+	 *                        Empty string if no restriction for current table,
+	 *                        FALSE - if no rule for current table
 	 */
 	function get_restriction_link( $restriction )
 	{
@@ -246,7 +258,8 @@ class Slug extends DataObject
 				return $ItemCache->get_by_ID( $this->itm_ID, false, false );
 
 			case 'help':
-				return false;
+				$r = false;
+				return $r;
 
 			default:
 				// not defined restriction

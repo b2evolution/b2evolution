@@ -14,48 +14,48 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Blog;
+global $Collection, $Blog;
 
 // Create query
 $SQL = new SQL();
-$SQL->SELECT( 't.*, IF( tb.itc_ityp_ID > 0, 1, 0 ) AS type_enabled' );
+$SQL->SELECT( 't.*, IF( tb.itc_ityp_ID > 0, 1, 0 ) AS type_enabled, IF( ityp_ID = '.$Blog->get_setting( 'default_post_type' ).', 1, 0 ) AS type_default' );
 $SQL->FROM( 'T_items__type AS t' );
 $SQL->FROM_add( 'LEFT JOIN T_items__type_coll AS tb ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$Blog->ID );
 
 // Create result set:
 $Results = new Results( $SQL->get(), 'ityp_' );
 
-$Results->title = T_('Item/Post/Page types').get_manual_link( 'managing-item-types' );
+$Results->title = T_('Item Types').get_manual_link( 'managing-item-types' );
 
 // get reserved and default ids
 global $default_ids;
 $default_ids = ItemType::get_default_ids();
 
 /**
- * Callback to build possible actions depending on post type id
+ * Callback to build possible actions depending on item type id
  *
  */
 function get_actions_for_itemtype( $id )
 {
 	global $default_ids;
-	$action = action_icon( T_('Duplicate this Post Type...'), 'copy',
+	$action = action_icon( T_('Duplicate this Item Type...'), 'copy',
 										regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=new') );
 
-	// Edit all post types except of not reserved post type
-	$action = action_icon( T_('Edit this Post Type...'), 'edit',
+	// Edit all item types except of not reserved item type
+	$action = action_icon( T_('Edit this Item Type...'), 'edit',
 									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=edit') )
 						.$action;
 
 	if( ! in_array( $id, $default_ids ) )
-	{	// Delete only the not default post types:
-		$action .= action_icon( T_('Delete this Post Type!'), 'delete',
+	{	// Delete only the not default item types:
+		$action .= action_icon( T_('Delete this Item Type!'), 'delete',
 									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=delete&amp;'.url_crumb('itemtype').'') );
 	}
 	return $action;
 }
 
 /**
- * Callback to make post type name depending on post type id
+ * Callback to make item type name depending on item type id
  *
  */
 function get_name_for_itemtype( $id, $name )
@@ -85,7 +85,7 @@ $Results->cols[] = array(
 
 function ityp_row_enabled( $enabled, $item_type_ID )
 {
-	global $current_User, $admin_url, $Blog;
+	global $current_User, $admin_url, $Collection, $Blog;
 
 	$perm_edit = $current_User->check_perm( 'options', 'edit', false );
 
@@ -117,7 +117,8 @@ function ityp_row_enabled( $enabled, $item_type_ID )
 }
 $Results->cols[] = array(
 		'th' => sprintf( T_('Enabled in<br />%s'), $Blog->get( 'shortname' ) ),
-		'order' => 'ityp_perm_level',
+		'order' => 'type_enabled',
+		'default_dir' => 'D',
 		'td' => '%ityp_row_enabled( #type_enabled#, #ityp_ID# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
@@ -125,7 +126,7 @@ $Results->cols[] = array(
 
 function ityp_row_default( $item_type_ID )
 {
-	global $current_User, $admin_url, $Blog;
+	global $current_User, $admin_url, $Collection, $Blog;
 
 	if( $Blog->get_setting( 'default_post_type' ) == $item_type_ID )
 	{ // The item type is default for current collection:
@@ -156,7 +157,8 @@ function ityp_row_default( $item_type_ID )
 }
 $Results->cols[] = array(
 		'th' => sprintf( T_('Default for<br />%s'), $Blog->get( 'shortname' ) ),
-		'order' => 'ityp_perm_level',
+		'order' => 'type_default',
+		'default_dir' => 'D',
 		'td' => '%ityp_row_default( #ityp_ID# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center',
@@ -167,7 +169,7 @@ function ityp_row_usage( $item_type_usage )
 	switch( $item_type_usage )
 	{
 		case 'post':
-			return T_('Post');
+			return /* TRANS: noun */ T_('Post');
 		case 'page':
 			return T_('Page');
 		case 'intro-front':
@@ -184,6 +186,8 @@ function ityp_row_usage( $item_type_usage )
 			return T_('Intro-All');
 		case 'special':
 			return T_('Special');
+		case 'content-block':
+			return T_('Content Block');
 		default:
 			return $item_type_usage;
 	}
@@ -238,7 +242,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 						);
 
 	$Results->global_icon( T_('Create a new element...'), 'new',
-				regenerate_url( 'action', 'action=new' ), T_('New Post Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+				regenerate_url( 'action', 'action=new' ), T_('New Item Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
 // Display results:

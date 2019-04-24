@@ -13,8 +13,6 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
-
 // Get params from request
 $s = param( 's', 'string', '', true ); // Search keyword
 $c = param( 'c', 'integer', 0, true ); // Country
@@ -58,15 +56,13 @@ if( count( $sql_where ) > 0 )
 //echo $SQL->get();
 $Results = new Results( $SQL->get(), 'city_', '-----A' );
 
-$Results->title = T_('Cities').get_manual_link('countries_list');
+$Results->title = T_('Cities').get_manual_link('countries-list');
 
 /*
  * STATUS TD:
  */
 function city_td_enabled( $city_enabled, $city_ID )
 {
-
-	global $dispatcher;
 
 	$r = '';
 
@@ -86,8 +82,6 @@ function city_td_enabled( $city_enabled, $city_ID )
 
 function city_td_preferred( $city_preferred, $city_ID )
 {
-
-	global $dispatcher;
 
 	$r = '';
 
@@ -137,7 +131,7 @@ function filter_cities( & $Form )
 	load_class( 'regional/model/_country.class.php', 'Country' );
 	$CountryCache = & get_CountryCache( T_('All') );
 	$Form->select_country( 'c', get_param('c'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
-	
+
 	$Form->select_input_options( 'r', get_regions_option_list( get_param('c'), get_param('r') ), T_('Region') );
 
 	$Form->select_input_options( 'sr', get_subregions_option_list( get_param('r'), get_param('sr') ), T_('Sub-region') );
@@ -224,13 +218,11 @@ else
  */
 function city_td_actions($city_enabled, $city_ID )
 {
-	global $dispatcher;
-
 	$r = '';
 
 	if( $city_enabled == true )
 	{
-		$r .= action_icon( T_('Disable the city!'), 'deactivate', 
+		$r .= action_icon( T_('Disable the city!'), 'deactivate',
 										regenerate_url( 'action', 'action=disable_city&amp;city_ID='.$city_ID.'&amp;'.url_crumb('city') ) );
 	}
 	else
@@ -265,12 +257,12 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 $Results->display();
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#c' ).change( function ()
 {	// Load option list with regions for seleted country
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_regions_option_list&mode=load_subregions&ctry_id=' + jQuery( this ).val(),
 	success: function( result )
 		{
@@ -292,7 +284,7 @@ function load_subregions( region_ID )
 {	// Load option list with sub-regions for seleted region
 	jQuery.ajax( {
 	type: 'POST',
-	url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 	data: 'action=get_subregions_option_list&rgn_id=' + region_ID,
 	success: function( result )
 		{

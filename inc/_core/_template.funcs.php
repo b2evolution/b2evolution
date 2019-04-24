@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -89,22 +89,56 @@ function headers_content_mightcache( $type = 'text/html', $max_age = '#', $chars
 
 
 /**
- * Sends HTTP header to redirect to the previous location (which
- * can be given as function parameter, GET parameter (redirect_to),
+ * Get URL to return
+ *
+ * @return string URL
+ */
+function get_returnto_url()
+{
+	global $Hit, $Blog, $baseurl, $ReqHost;
+
+	// See if there's a redirect_to request param given:
+	$redirect_to = param( 'redirect_to', 'url', '' );
+
+	if( empty( $redirect_to ) )
+	{	// If default redirect_to param is not defined:
+		if( ! empty( $Hit->referer ) )
+		{	// Use referer page:
+			$redirect_to = $Hit->referer;
+		}
+		elseif( isset( $Blog ) && is_object( $Blog ) )
+		{	// Use collection default page URL:
+			$redirect_to = $Blog->get( 'url' );
+		}
+		else
+		{	// Use base URL:
+			$redirect_to = $baseurl;
+		}
+	}
+	elseif( $redirect_to[0] == '/' )
+	{	// relative URL, prepend current host:
+		$redirect_to = $ReqHost.$redirect_to;
+	}
+
+	return $redirect_to;
+}
+
+
+/**
+ * Sends HTTP header to redirect to the previous location (which can be given as function parameter, GET parameter (redirect_to),
  * is taken from {@link Hit::$referer} or {@link $baseurl}).
  *
- * {@link $Debuglog} and {@link $Messages} get stored in {@link $Session}, so they
- * are available after the redirect.
- *
- * NOTE: This function {@link exit() exits} the php script execution.
+ * {@link $Debuglog} and {@link $Messages} get stored in {@link $Session}, so they are available after the redirect.
  *
  * @todo fp> do NOT allow $redirect_to = NULL. This leads to spaghetti code and unpredictable behavior.
  *
+ * @return boolean false IF blocked AND $return_to_caller_if_forbidden BUT most of the time, this function {@link exit() exits} the php script execution.
  * @param string Destination URL to redirect to
  * @param boolean|integer is this a permanent redirect? if true, send a 301; otherwise a 303 OR response code 301,302,303
  * @param boolean is this a redirected post display? This param may be true only if we should redirect to a post url where the post status is 'redirected'!
+ * @param boolean do we want to return to the caller if the redirect is forbidden? (useful when trying to redirect after post edit)
  */
-function header_redirect( $redirect_to = NULL, $status = false, $redirected_post = false )
+function header_redirect( $redirect_to = NULL, $status = false, $redirected_post = false, $return_to_caller_if_forbidden = false )
 {
 	/**
 	 * put your comment there...
@@ -112,36 +146,14 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	 * @var Hit
 	 */
 	global $Hit;
-	global $baseurl, $Blog, $htsrv_url_sensitive, $ReqHost, $ReqURL, $dispatcher;
+	global $baseurl, $Collection, $Blog, $htsrv_url, $ReqHost, $ReqURL, $dispatcher;
 	global $Session, $Debuglog, $Messages;
 	global $http_response_code, $allow_redirects_to_different_domain;
 
-	// TODO: fp> get this out to the caller, make a helper func like get_returnto_url()
-	if( empty($redirect_to) )
-	{ // see if there's a redirect_to request param given:
-		$redirect_to = param( 'redirect_to', 'url', '' );
-
-		if( empty($redirect_to) )
-		{
-			if( ! empty($Hit->referer) )
-			{
-				$redirect_to = $Hit->referer;
-			}
-			elseif( isset($Blog) && is_object($Blog) )
-			{
-				$redirect_to = $Blog->get('url');
-			}
-			else
-			{
-				$redirect_to = $baseurl;
-			}
-		}
-		elseif( $redirect_to[0] == '/' )
-		{ // relative URL, prepend current host:
-			$redirect_to = $ReqHost.$redirect_to;
-		}
+	if( empty( $redirect_to ) )
+	{	// Use automatic return URL if a redirect URL is not defined:
+		$redirect_to = get_returnto_url();
 	}
-	// <fp
 
 	$Debuglog->add('Preparing to redirect to: '.$redirect_to, 'request' );
 
@@ -157,19 +169,24 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	{ // $dispatcher is DEPRECATED and pages should use $admin_url URL instead, but at least we're staying on the same site:
 		$external_redirect = false;
 	}
-	elseif( strpos($redirect_to, $baseurl) === 0 )
+	elseif( strpos( $redirect_to, $baseurl ) === 0 )
 	{
 		$Debuglog->add('Redirecting within $baseurl, all is fine.', 'request' );
 		$external_redirect = false;
 	}
-	elseif( strpos($redirect_to, $htsrv_url_sensitive) === 0 )
-	{
-		$Debuglog->add('Redirecting within $htsrv_url_sensitive, all is fine.', 'request' );
+	elseif( strpos( $redirect_to, force_https_url( $baseurl ) ) === 0 )
+	{	// Protocol https may be forced for all login, registration and etc. pages:
+		$Debuglog->add('Redirecting within https of $baseurl, all is fine.', 'request' );
 		$external_redirect = false;
 	}
-	elseif( !empty($Blog) && strpos($redirect_to, $Blog->gen_baseurl()) === 0 )
+	elseif( ! empty( $Blog ) && strpos( $redirect_to, $Blog->gen_baseurl() ) === 0 )
 	{
 		$Debuglog->add('Redirecting within current collection URL, all is fine.', 'request' );
+		$external_redirect = false;
+	}
+	elseif( ! empty( $Blog ) && strpos( $redirect_to, force_https_url( $Blog->gen_baseurl() ) ) === 0 )
+	{	// Protocol https may be forced for all login, registration and etc. pages:
+		$Debuglog->add('Redirecting within https of current collection URL, all is fine.', 'request' );
 		$external_redirect = false;
 	}
 
@@ -185,30 +202,33 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 
 
 	$allow_collection_redirect = false;
-	if( $external_redirect && $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts' && ! $redirected_post )
+
+	if( $external_redirect
+		&& $allow_redirects_to_different_domain == 'all_collections_and_redirected_posts'
+		&& ! $redirected_post )
 	{ // If a redirect is external and we allow to redirect to all collection domains:
-		global $basedomain;
+		global $basehost;
 
 		$redirect_to_domain = preg_replace( '~https?://([^/]+)/?.*~i', '$1', $redirect_to );
 
-		if( preg_match( '~\.'.str_replace( '.', '\.', $basedomain ).'$~', $redirect_to_domain ) )
-		{ // Current redirect goes to subdomain, Allow this:
+		if( preg_match( '~\.'.preg_quote( $basehost ).'(:\d+)?$~', $redirect_to_domain ) )
+		{ // Current redirect goes to a subdomain of basehost, Allow this:
 			$allow_collection_redirect = true;
 		}
 		else
-		{ // Check if current redirect domain is used as absolute url at least for one collection in system:
+		{ // Check if current redirect domain is used as absolute URL for at least 1 collection on the system:
 			global $DB;
 
-			$abs_url_coll_SQL = new SQL();
+			$abs_url_coll_SQL = new SQL( 'phpBB: get collection by url' );
 			$abs_url_coll_SQL->SELECT( 'blog_ID' );
 			$abs_url_coll_SQL->FROM( 'T_blogs' );
 			$abs_url_coll_SQL->WHERE( 'blog_access_type = "absolute"' );
 			$abs_url_coll_SQL->WHERE_and( 'blog_siteurl LIKE '.$DB->quote( '%://'.str_replace( '_', '\_', $redirect_to_domain.'/%' ) ) );
 			$abs_url_coll_SQL->LIMIT( '1' );
 
-			$abs_url_coll_ID = $DB->get_var( $abs_url_coll_SQL->get() );
+			$abs_url_coll_ID = $DB->get_var( $abs_url_coll_SQL );
 			if( ! empty( $abs_url_coll_ID ) )
-			{ // We found current redirect goes to a collection domain, so it is not external
+			{ // We found current redirect goes to a collection domain, Allow this:
 				$allow_collection_redirect = true;
 			}
 		}
@@ -222,6 +242,10 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	{ // Force header redirects into the same domain. Do not allow external URLs.
 		$Messages->add( T_('A redirection to an external URL was blocked for security reasons.'), 'error' );
 		syslog_insert( 'A redirection to an external URL '.$redirect_to.' was blocked for security reasons.', 'error', NULL );
+		if( $return_to_caller_if_forbidden )
+		{	// Return to caller meaning we did not redirect:
+			return false;
+		}
 		$redirect_to = $baseurl;
 	}
 
@@ -239,19 +263,20 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	if( ! empty($Session) )
 	{	// Session is required here
 
-		// Transfer of Debuglog to next page:
-		if( $Debuglog->count('all') )
-		{	// Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
-			$sess_Debuglogs = $Session->get('Debuglogs');
-			if( empty($sess_Debuglogs) )
+		// Transfer full debug info to next page:
+		ob_start();
+		debug_info( true );
+		$current_debug_info = ob_get_clean();
+		if( ! empty( $current_debug_info ) )
+		{	// Save full debug info into Session, so that it's available after redirect (gets loaded by Session constructor):
+			$sess_debug_infos = $Session->get( 'debug_infos' );
+			if( empty( $sess_debug_infos ) )
 			{
-				$sess_Debuglogs = array();
+				$sess_debug_infos = array();
 			}
-
-			$sess_Debuglogs[] = $Debuglog;
-			$Session->set( 'Debuglogs', $sess_Debuglogs, 60 /* expire in 60 seconds */ );
-			// echo 'Passing Debuglog(s) to next page';
-			// pre_dump( $sess_Debuglogs );
+			// NOTE: We must encode data in order to avoid error "Session data corrupted" because of special chars on unserialize the data:
+			$sess_debug_infos[] = gzencode( $current_debug_info );
+			$Session->set( 'debug_infos', $sess_debug_infos, 60 /* expire in 60 seconds */ );
 		}
 
 		// Transfer of Messages to next page:
@@ -394,7 +419,7 @@ function header_etag( $etag )
  */
 function get_request_title( $params = array() )
 {
-	global $MainList, $preview, $disp, $action, $current_User, $Blog, $admin_url;
+	global $MainList, $preview, $disp, $action, $current_User, $Collection, $Blog, $admin_url;
 
 	$r = array();
 
@@ -416,18 +441,20 @@ function get_request_title( $params = array() )
 			'format'              => 'htmlbody',
 			// Title for each disp:
 			// fp> TODO: Make a global array of $disp => Clear text disp
+			'anonpost_text'       => '#',// # - 'New [Post]' ('Post' is item type name)
 			'arcdir_text'         => T_('Archive Directory'),
 			'catdir_text'         => T_('Category Directory'),
 			'mediaidx_text'       => T_('Photo Index'),
 			'postidx_text'        => T_('Post Index'),
 			'search_text'         => T_('Search'),
 			'sitemap_text'        => T_('Site Map'),
-			'msgform_text'        => T_('Sending a message'),
+			'msgform_text'        => T_('Contact'),
 			'messages_text'       => T_('Messages'),
 			'contacts_text'       => T_('Contacts'),
 			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
 			'register_text'       => T_('Register'),
-			'req_validatemail'    => T_('Account activation'),
+			'register_finish_text'=> T_('Finish Registration'),
+			'req_activate_email'  => T_('Account activation'),
 			'account_activation'  => T_('Account activation'),
 			'lostpassword_text'   => T_('Lost your password?'),
 			'profile_text'        => T_('User Profile'),
@@ -436,13 +463,11 @@ function get_request_title( $params = array() )
 			'userprefs_text'      => T_('User preferences'),
 			'user_text'           => T_('User: %s'),
 			'users_text'          => T_('Users'),
-			'closeaccount_text'   => T_('Close account'),
-			'subs_text'           => T_('Notifications'),
+			'closeaccount_text'   => T_('Account closure'),
+			'subs_text'           => T_('Notifications & Subscriptions'),
+			'visits_text'         => T_('Who visited my profile?'),
 			'comments_text'       => T_('Latest Comments'),
 			'feedback-popup_text' => T_('Feedback'),
-			'edit_text_create'    => T_('New post'),
-			'edit_text_update'    => T_('Editing post'),
-			'edit_text_copy'      => T_('Duplicating post'),
 			'edit_comment_text'   => T_('Editing comment'),
 			'front_text'          => '',		// We don't want to display a special title on the front page
 			'posts_text'          => '#',		// Automatic - display filters
@@ -454,6 +479,11 @@ function get_request_title( $params = array() )
 			'display_edit_links'  => true, // Display the links to advanced editing on disp=edit|edit_comment
 			'edit_links_template' => array(), // More params for the links to advanced editing on disp=edit|edit_comment
 			'tags_text'           => T_('Tags'),
+			'flagged_text'        => T_('Flagged posts'),
+			'help_text'           => T_('In case of issues with this site...'),
+			'compare_text'           => /* TRANS: title for disp=compare */ T_('%s compared'),
+			'compare_text_separator' => /* TRANS: title separator for disp=compare */ ' '.T_('vs').' ',
+			'proposechange_text'     => T_('Propose change for Item %s'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -550,20 +580,29 @@ function get_request_title( $params = array() )
 			$r[] = $params['subs_text'];
 			break;
 
+		case 'register_finish':
+			// We are requesting the register finish form:
+			$r[] = $params['register_finish_text'];
+			break;
+
+		case 'visits':
+			// We are requesting the profile visits screen:
+			$user_ID = param( 'user_ID', 'integer', 0 );
+			$r[] = $params['visits_text'];
+			break;
+
 		case 'msgform':
 			// We are requesting the message form:
-			$r[] = $params['msgform_text'];
+			$msgform_title = utf8_trim( $Blog->get_setting( 'msgform_title' ) );
+			$r[] = empty( $msgform_title ) ? $params['msgform_text'] : $msgform_title;
 			break;
 
 		case 'threads':
 		case 'messages':
 			// We are requesting the messages form
+			global $disp_detail;
 			$thrd_ID = param( 'thrd_ID', 'integer', 0 );
-			if( empty( $thrd_ID ) )
-			{
-				$r[] = $params['messages_text'];
-			}
-			else
+			if( ! empty( $thrd_ID ) )
 			{	// We get a thread title by ID
 				load_class( 'messaging/model/_thread.class.php', 'Thread' );
 				$ThreadCache = & get_ThreadCache();
@@ -572,12 +611,19 @@ function get_request_title( $params = array() )
 					if( $params['auto_pilot'] == 'seo_title' )
 					{	// Display thread title only for tag <title>
 						$r[] = $Thread->title;
+						break;
 					}
 				}
-				else
-				{	// Bad request with not existing thread
-					$r[] = strip_tags( $params['messages_text'] );
-				}
+			}
+
+			if( $disp_detail == 'msgform' )
+			{	// disp=msgform for logged in user:
+				$msgform_title = utf8_trim( $Blog->get_setting( 'msgform_title' ) );
+				$r[] = empty( $msgform_title ) ? $params['msgform_text'] : $msgform_title;
+			}
+			else
+			{
+				$r[] = strip_tags( $params['messages_text'] );
 			}
 			break;
 
@@ -588,9 +634,9 @@ function get_request_title( $params = array() )
 
 		case 'login':
 			// We are requesting the login form:
-			if( $action == 'req_validatemail' )
+			if( $action == 'req_activate_email' )
 			{
-				$r[] = $params['req_validatemail'];
+				$r[] = $params['req_activate_email'];
 			}
 			else
 			{
@@ -619,7 +665,7 @@ function get_request_title( $params = array() )
 			// We are displaying a single message:
 			if( $preview )
 			{	// We are requesting a post preview:
-				$r[] = T_('PREVIEW');
+				$r[] = /* TRANS: Noun */ T_('PREVIEW');
 			}
 			elseif( $params['title_'.$disp.'_disp'] && isset( $MainList ) )
 			{
@@ -634,7 +680,7 @@ function get_request_title( $params = array() )
 				$after = $params['title_'.$disp.'_after'];
 			}
 			break;
-	
+
 		case 'download':
 			// We are displaying a download page:
 			global $download_Link;
@@ -669,22 +715,37 @@ function get_request_title( $params = array() )
 			$r[] = $params['closeaccount_text'];
 			break;
 
+		case 'anonpost':
+			if( $params['anonpost_text'] == '#' )
+			{	// Initialize default auto title:
+				$new_Item = get_session_Item( 0, true );
+				$r[] = sprintf( T_('New [%s]'), $new_Item->get_type_setting( 'name' ) );
+			}
+			else
+			{	// Use custom title from param:
+				$r[] = $params['anonpost_text'];
+			}
+			break;
+
 		case 'edit':
+			global $edited_Item;
+			$type_name = $edited_Item->get_type_setting( 'name' );
+
 			$action = param_action(); // Edit post by switching into 'In skin' mode from Back-office
 			$p = param( 'p', 'integer', 0 ); // Edit post from Front-office
 			$post_ID = param ( 'post_ID', 'integer', 0 ); // Update the edited post( If user is redirected to edit form again with some error messages )
 			$cp = param( 'cp', 'integer', 0 ); // Copy post from Front-office
 			if( $action == 'edit_switchtab' || $p > 0 || $post_ID > 0 )
 			{	// Edit post
-				$title = $params['edit_text_update'];
+				$title = sprintf( T_('Edit [%s]'), $type_name );
 			}
 			else if( $cp > 0 )
 			{	// Copy post
-				$title = $params['edit_text_copy'];
+				$title = sprintf( T_('Duplicate [%s]'), $type_name );
 			}
 			else
 			{	// Create post
-				$title = $params['edit_text_create'];
+				$title = sprintf( T_('New [%s]'), $type_name );
 			}
 			if( $params['display_edit_links'] && $params['auto_pilot'] != 'seo_title' )
 			{ // Add advanced edit and close icon
@@ -720,6 +781,11 @@ function get_request_title( $params = array() )
 				$title .= $params['edit_links_template']['after'];
 			}
 			$r[] = $title;
+			break;
+
+		case 'proposechange':
+			global $edited_Item;
+			$r[] = sprintf( $params['proposechange_text'], '"'.$edited_Item->get_title().'"' );
 			break;
 
 		case 'edit_comment':
@@ -771,6 +837,41 @@ function get_request_title( $params = array() )
 		case 'tags':
 			// We are requesting the tags directory:
 			$r[] = $params['tags_text'];
+			break;
+
+		case 'flagged':
+			// We are requesting the flagged posts list:
+			$r[] = $params['flagged_text'];
+			break;
+
+		case 'help':
+			$r[] = $params['help_text'];
+			break;
+
+		case 'compare':
+			// We are requesting the compare list:
+			$items = trim( param( 'items', '/^[\d,]*$/' ), ',' );
+
+			if( ! empty( $items ) )
+			{	// It at least one item is selected to compare
+				$items = explode( ',', $items );
+
+				// Load all requested posts into the cache:
+				$ItemCache = & get_ItemCache();
+				$ItemCache->load_list( $items );
+
+				$compare_item_titles = array();
+				foreach( $items as $item_ID )
+				{
+					if( $Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
+					{	// Use only existing Item:
+						$compare_item_titles[] = $Item->get( 'title' );
+					}
+				}
+
+				$r[] = sprintf( $params['compare_text'], implode( $params['compare_text_separator'], $compare_item_titles ) );
+			}
+
 			break;
 
 		case 'posts':
@@ -890,7 +991,7 @@ function robots_tag()
  */
 function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_text = 'Home' )
 {
-	global $Blog, $baseurl;
+	global $Collection, $Blog, $baseurl;
 
 	if( !empty( $Blog ) )
 	{
@@ -915,7 +1016,12 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js', $version = '#' )
 {
 	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url;
-	global $Blog, $baseurl, $assets_baseurl, $ReqURL;
+	global $Collection, $Blog, $baseurl, $assets_baseurl, $ReqURL;
+
+	if( $relative_to == 'blog' && ( is_admin_page() || empty( $Blog ) ) )
+	{	// Make sure we never use resource url relative to any blog url in case of an admin page ( important in case of multi-domain installations ):
+		$relative_to = 'rsc_url';
+	}
 
 	// Check if we have a public CDN we want to use for this library file:
 	if( $use_cdns && ! empty( $library_cdn_urls[ $lib_file ] ) )
@@ -970,8 +1076,14 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	{ // Be sure to get a fresh copy of this CSS file after application upgrades:
 		if( $version == '#' )
 		{
-			global $app_version_long;
+			global $app_version_long, $Skin;
+
 			$version = $app_version_long;
+
+			if( ( $relative_to == 'relative' || $relative_to === true ) && ! is_admin_page() && isset( $Skin ) )
+			{	// Prepand skin version to clear file from browser cache after skin switching:
+				$version = $Skin->folder.'+'.$Skin->version.'+'.$version;
+			}
 		}
 		$lib_url = url_add_param( $lib_url, 'v='.$version );
 	}
@@ -996,8 +1108,9 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  * @param boolean|string Is the file's path relative to the base path/url?
  * @param boolean TRUE to add attribute "async" to load javascript asynchronously
  * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param string version number to append at the end of requested url to avoid getting an old version from the cache
  */
-function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false )
+function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false, $version = '#' )
 {
 	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
 	global $dequeued_headlines;
@@ -1007,25 +1120,27 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		return;
 	}
 
-	if( is_admin_page() && ( $relative_to == 'blog' ) )
-	{ // Make sure we never use resource url relative to any blog url in case of an admin page ( important in case of multi-domain installations )
-		$relative_to = 'rsc_url';
+	if( is_admin_page() && in_array( $js_file, array( 'functions.js', 'ajax.js', 'form_extensions.js', 'extracats.js', 'dynamic_select.js', 'backoffice.js' ) ) )
+	{	// Don't require this file on back-office because it is auto loaded by bundled file evo_backoffice.bmin.js:
+		return;
 	}
 
 	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
-	{ // Dependency : ensure jQuery is loaded
-		require_js( '#jquery#', $relative_to, $async, $output );
+	{	// Dependency : ensure jQuery is loaded
+		// Don't use TRUE for $async and $output because it may loads jQuery twice on AJAX request, e.g. on comment AJAX form,
+		// and all jQuery UI libraries(like resizable, sortable and etc.) will not work, e.g. on attachments fieldset
+		require_js( '#jquery#', $relative_to, false, false, $version );
 	}
 
 	// Get library url of JS file by alias name
-	$js_url = get_require_url( $js_file, $relative_to, 'js' );
+	$js_url = get_require_url( $js_file, $relative_to, 'js', $version );
 
 	// Add to headlines, if not done already:
 	if( empty( $required_js ) || ! in_array( strtolower( $js_url ), $required_js ) )
 	{
 		$required_js[] = strtolower( $js_url );
 
-		$script_tag = '<script type="text/javascript"';
+		$script_tag = '<script';
 		$script_tag .= $async ? ' async' : '';
 		$script_tag .= ' src="'.$js_url.'">';
 		$script_tag .= '</script>';
@@ -1062,7 +1177,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
- * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head>
  */
 function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false )
 {
@@ -1190,7 +1305,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				global $b2evo_icons_type, $blog;
 				$blog_param = empty( $blog ) ? '' : '&blog='.$blog;
 				// Colorbox params to translate the strings:
-				$colorbox_strings_params = 'current: "'.TS_('image {current} of {total}').'",
+				$colorbox_strings_params = 'current: "{current} / {total}",
 					previous: "'.TS_('Previous').'",
 					next: "'.TS_('Next').'",
 					close: "'.TS_('Close').'",
@@ -1200,8 +1315,8 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// Colorbox params to display a voting panel:
 				$colorbox_voting_params = '{'.$colorbox_strings_params.'
 					displayVoting: true,
-					votingUrl: "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.$blog_param.'",
-					minWidth: 305}';
+					votingUrl: "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=link&b2evo_icons_type='.$b2evo_icons_type.$blog_param.'",
+					minWidth: 320}';
 				// Colorbox params without voting panel:
 				$colorbox_no_voting_params = '{'.$colorbox_strings_params.'
 					minWidth: 255}';
@@ -1261,7 +1376,23 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				// TODO: translation strings for colorbox buttons
 
 				require_js( 'build/colorbox.bmin.js', $relative_to, true );
-				require_css( 'colorbox/colorbox.css', $relative_to );
+				if( is_admin_page() )
+				{
+					global $AdminUI;
+					if( ! empty( $AdminUI ) )
+					{
+						$colorbox_css_file = $AdminUI->get_template( 'colorbox_css_file' );
+					}
+				}
+				else
+				{
+					global $Skin;
+					if( ! empty( $Skin ) )
+					{
+						$colorbox_css_file = $Skin->get_template( 'colorbox_css_file' );
+					}
+				}
+				require_css( ( empty( $colorbox_css_file ) ? 'colorbox-regular.min.css' : $colorbox_css_file ), $relative_to );
 				break;
 		}
 		// add to list of loaded helpers
@@ -1325,7 +1456,7 @@ function add_headline( $headline, $file_name = NULL )
  */
 function add_js_headline($headline)
 {
-	add_headline("<script type=\"text/javascript\">\n\t/* <![CDATA[ */\n\t\t"
+	add_headline("<script>\n\t/* <![CDATA[ */\n\t\t"
 		.$headline."\n\t/* ]]> */\n\t</script>");
 }
 
@@ -1356,15 +1487,17 @@ function add_js_for_toolbar( $relative_to = 'rsc_url' )
 
 /**
  * Registers headlines required by AJAX forms, but only if javascript forms are enabled in blog settings.
+ *
+ * @deprecated Because we don't need communication.js to work with AJAX forms
  */
 function init_ajax_forms( $relative_to = 'blog' )
 {
-	global $Blog;
+	/*global $Collection, $Blog;
 
 	if( !empty($Blog) && $Blog->get_setting('ajax_form_enabled') )
 	{
 		require_js( 'communication.js', $relative_to );
-	}
+	}*/
 }
 
 
@@ -1450,10 +1583,24 @@ function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 /**
  * Registers headlines required to display a bubbletip to the right of plugin help icon.
  *
+ * @deprecated Use function init_popover_js()
+ *
  * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
  * @param string Library: 'bubbletip', 'popover'
  */
 function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
+{
+	init_popover_js( $relative_to, $library );
+}
+
+
+/**
+ * Registers headlines required to display a bubbletip to the right of plugin, widget, custom fields help icon.
+ *
+ * @param string alias, url or filename (relative to rsc/css, rsc/js) for JS/CSS files
+ * @param string Library: 'bubbletip', 'popover'
+ */
+function init_popover_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
 	require_js( '#jquery#', $relative_to );
 
@@ -1483,25 +1630,11 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 	require_js( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
-	$datefmt = locale_datefmt();
-	$datefmt = str_replace( array( 'd', 'j', 'm', 'Y' ), array( 'dd', 'd', 'mm', 'yy' ), $datefmt );
 	add_js_headline( 'jQuery(document).ready( function(){
-		var monthNames = ["'.T_('January').'","'.T_('February').'", "'.T_('March').'",
-						  "'.T_('April').'", "'.T_('May').'", "'.T_('June').'",
-						  "'.T_('July').'", "'.T_('August').'", "'.T_('September').'",
-						  "'.T_('October').'", "'.T_('November').'", "'.T_('December').'"];
-
-		var dayNamesMin = ["'.T_('Sun').'", "'.T_('Mon').'", "'.T_('Tue').'",
-						  "'.T_('Wed').'", "'.T_('Thu').'", "'.T_('Fri').'", "'.T_('Sat').'"];
-
-		var docHead = document.getElementsByTagName("head")[0];
-		for (i=0;i<dayNamesMin.length;i++)
-			dayNamesMin[i] = dayNamesMin[i].substr(0, 2)
-
 		jQuery(".form_date_input").datepicker({
-			dateFormat: "'.$datefmt.'",
-			monthNames: monthNames,
-			dayNamesMin: dayNamesMin,
+			dateFormat: "'.jquery_datepicker_datefmt().'",
+			monthNames: '.jquery_datepicker_month_names().',
+			dayNamesMin: '.jquery_datepicker_day_names().',
 			firstDay: '.locale_startofweek().'
 		})
 	})' );
@@ -1530,11 +1663,74 @@ function init_results_js( $relative_to = 'rsc_url' )
 
 
 /**
- * Registers headlines for initialization of functions to work with Results tables
+ * Registers headlines for initialization of functions to work with affixed Messages
+ */
+function init_affix_messages_js( $offset = 50 )
+{
+	global $display_mode;
+
+	if( isset( $display_mode ) && $display_mode == 'js' )
+	{	// Don't use affixed Messages in JS mode from modal windows:
+		return;
+	}
+
+	add_js_headline( '
+	jQuery( document ).ready( function()
+	{
+		var msg_obj = jQuery( ".affixed_messages" );
+		var msg_offset = '.format_to_js( $offset == '' ? 50 : $offset ).';
+
+		if( msg_obj.length == 0 )
+		{ // No Messages, exit
+			return;
+		}
+
+		msg_obj.wrap( "<div class=\"msg_wrapper\"></div>" );
+		var wrapper = msg_obj.parent();
+
+		msg_obj.affix( {
+				offset: {
+					top: function() {
+						return wrapper.offset().top - msg_offset - parseInt( msg_obj.css( "margin-top" ) );
+					}
+				}
+			} );
+
+		msg_obj.on( "affix.bs.affix", function()
+			{
+				wrapper.css( { "min-height": msg_obj.outerHeight( true ) } );
+
+				msg_obj.css( { "width": msg_obj.outerWidth(), "top": msg_offset, "z-index": 99999 } );
+
+				jQuery( window ).on( "resize", function()
+					{ // This will resize the Messages based on the wrapper width
+						msg_obj.css( { "width": wrapper.css( "width" ) } );
+					});
+			} );
+
+		msg_obj.on( "affixed-top.bs.affix", function()
+			{
+				wrapper.css( { "min-height": "" } );
+				msg_obj.css( { "width": "", "top": "", "z-index": "" } );
+			} );
+
+		jQuery( "div.alert", msg_obj ).on( "closed.bs.alert", function()
+			{
+				wrapper.css({ "min-height": msg_obj.outerHeight( true ) });
+			} );
+	} );
+	' );
+}
+
+
+/**
+ * Registers headlines for initialization of functions to work a voting panel for comments
+ *
+ * @param boolean|string Is the file's path relative to the base path/url?
  */
 function init_voting_comment_js( $relative_to = 'rsc_url' )
 {
-	global $Blog, $b2evo_icons_type;
+	global $Collection, $Blog, $b2evo_icons_type;
 
 	if( empty( $Blog ) || ! is_logged_in( false ) || ! $Blog->get_setting('allow_rating_comment_helpfulness') )
 	{	// If User is not logged OR Users cannot vote
@@ -1546,10 +1742,39 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{
-		var comment_voting_url = "'.get_secure_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type.'";
+		var comment_voting_url = "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type.'";
 		jQuery( "span[id^=vote_helpful_]" ).each( function()
 		{
 			init_voting_bar( jQuery( this ), comment_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
+		} );
+	} );
+	' );
+}
+
+
+/**
+ * Registers headlines for initialization of functions to work a voting panel for items
+ *
+ * @param boolean|string Is the file's path relative to the base path/url?
+ */
+function init_voting_item_js( $relative_to = 'rsc_url' )
+{
+	global $Collection, $Blog, $b2evo_icons_type;
+
+	if( empty( $Blog ) || ! is_logged_in( false ) || ! $Blog->get_setting( 'voting_positive' ) )
+	{	// If User is not logged OR Users cannot vote:
+		return false;
+	}
+
+	require_js( '#jquery#', $relative_to );
+	require_js( 'voting.js', $relative_to );
+	add_js_headline( '
+	jQuery( document ).ready( function()
+	{
+		var item_voting_url = "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=item&b2evo_icons_type='.$b2evo_icons_type.'";
+		jQuery( "span[id^=vote_item_]" ).each( function()
+		{
+			init_voting_bar( jQuery( this ), item_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
 		} );
 	} );
 	' );
@@ -1561,26 +1786,92 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
  */
 function init_colorpicker_js( $relative_to = 'rsc_url' )
 {
-	// Inititialize bubbletip plugin
-	global $Skin, $AdminUI;
-	if( ! empty( $AdminUI ) )
-	{ // Get library of tooltip for current back-office skin
-		$tooltip_plugin = $AdminUI->get_template( 'tooltip_plugin' );
+	if( ! is_logged_in() )
+	{	// Colorpicker is initialized only for logged in users:
+		return;
 	}
-	elseif( ! empty( $Skin ) )
-	{ // Get library of tooltip for current front-office skin
-		$tooltip_plugin = $Skin->get_template( 'tooltip_plugin' );
+
+	global $current_User, $UserSettings;
+
+	require_js( '#jquery#', $relative_to );
+	require_js( 'bootstrap/colorpicker/bootstrap-colorpicker.min.js', $relative_to );
+	require_css( 'bootstrap-colorpicker.min.css', $relative_to );
+
+	// Get preselected colors from settings of current User:
+	$user_colors = $UserSettings->get( 'colorpicker', $current_User->ID );
+	if( empty( $user_colors ) )
+	{	// Use these default colors if user didn't selected any color yet:
+		$user_colors = array(
+			'black'   => '#000000',
+			'grey'    => '#999999',
+			'white'   => '#ffffff',
+			'red'     => '#FF0000',
+			'default' => '#777777',
+			'primary' => '#337ab7',
+			'success' => '#5cb85c',
+			'info'    => '#5bc0de',
+			'warning' => '#f0ad4e',
+			'danger'  => '#d9534f'
+		);
 	}
 	else
-	{ // Use bubbletip library by default for unknown skins
-		$tooltip_plugin = 'bubbletip';
+	{	// Convert user colors to array:
+		$user_colors = explode( ';', $user_colors );
 	}
-	init_bubbletip_js( $relative_to, $tooltip_plugin );
 
-	// Initialize farbastic colorpicker
-	require_js( '#jquery#', $relative_to );
-	require_js( 'jquery/jquery.farbtastic.min.js', $relative_to );
-	require_css( 'jquery/farbtastic/farbtastic.css', $relative_to );
+	add_js_headline( 'jQuery( document ).ready( function() { evo_initialize_colorpicker_inputs() } );
+function evo_initialize_colorpicker_inputs()
+{
+	jQuery( ".form_color_input" ).each( function()
+	{
+		var predefined_colors = ["'.implode( '","', $user_colors ).'"];
+		var colored_input = jQuery( this ).parent();
+		colored_input.colorpicker( {
+			format: jQuery( this ).hasClass( "form_color_transparent" ) ? false : "hex",
+			colorSelectors: predefined_colors
+		} ).on( "hidePicker", function( e )
+		{	// Update predefined colors with new last selected:
+			var current_colors = e.color.predefinedColors;
+			var new_colors = current_colors.slice();
+			var new_color = e.color.toString();
+			var new_color_index = new_colors.indexOf( new_color );
+			if( new_color_index > -1 )
+			{	// Remove a duplicated color:
+				new_colors.splice( new_color_index, 1 );
+			}
+			new_colors.unshift( new_color );
+			new_colors.splice( 10, 1 );
+
+			if( new_colors.join( "" ) == current_colors.join( "" ) )
+			{	// Dont update if colors is not changed:
+				return;
+			}
+
+			// Reinitialize colorpickers with new preselected colors:
+			jQuery( ".form_color_input" ).each( function()
+			{
+				var colored_input = jQuery( this ).parent();
+				colored_input.colorpicker( "destroy" );
+				colored_input.colorpicker( {
+					format: jQuery( this ).hasClass( "form_color_transparent" ) ? false : "hex",
+					colorSelectors: new_colors
+				} );
+			} );
+
+			// Save new colors in settings for current User:
+			jQuery.ajax(
+			{
+				type: "POST",
+				url: htsrv_url + "anon_async.php",
+				data: {
+					"action": "colorpicker",
+					"colors": new_colors.join( ";" ),
+					"crumb_colorpicker": "'.get_crumb( 'colorpicker' ).'"
+				}
+			} );
+		} );
+	} );
+}' );
 }
 
 
@@ -1592,7 +1883,7 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
  */
 function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintbox' )
 {
-	global $blog;
+	global $Collection, $Blog;
 
 	require_js( '#jquery#', $relative_to ); // dependency
 
@@ -1600,6 +1891,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 	{
 		case 'typeahead':
 			// Use typeahead library of bootstrap
+			require_js( '#bootstrap_typeahead#', $relative_to );
 			add_js_headline( 'jQuery( document ).ready( function()
 			{
 				jQuery( "input.autocomplete_login" ).on( "added",function()
@@ -1610,6 +1902,19 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 						{	// Skip this field because typeahead is initialized before:
 							return;
 						}
+						var ajax_url = "";
+						if( jQuery( this ).hasClass( "only_assignees" ) )
+						{
+							ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
+						}
+						else
+						{
+							ajax_url = restapi_url + "users/logins";
+						}
+						if( jQuery( this ).data( "status" ) )
+						{
+							ajax_url += "&status=" + jQuery( this ).data( "status" );
+						}
 						jQuery( this ).typeahead( null,
 						{
 							displayKey: "login",
@@ -1617,16 +1922,16 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 							{
 								jQuery.ajax(
 								{
-									url: "'.get_secure_htsrv_url().'async.php?action=get_login_list",
-									type: "post",
-									data: { q: query, data_type: "json" },
+									type: "GET",
 									dataType: "JSON",
-									success: function( logins )
+									url: ajax_url,
+									data: { q: query },
+									success: function( data )
 									{
 										var json = new Array();
-										for( var l in logins )
+										for( var l in data.list )
 										{
-											json.push( { login: logins[ l ] } );
+											json.push( { login: data.list[ l ] } );
 										}
 										cb( json );
 									}
@@ -1655,16 +1960,25 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
 			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 			{
-				var ajax_params = "";
+				var ajax_url = "";
 				if( jQuery( this ).hasClass( "only_assignees" ) )
 				{
-					ajax_params = "&user_type=assignees&blog='.$blog.'";
+					ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
+				}
+				else
+				{
+					ajax_url = restapi_url + "users/logins";
+				}
+				if( jQuery( this ).data( "status" ) )
+				{
+					ajax_url += "&status=" + jQuery( this ).data( "status" );
 				}
 				jQuery( this ).hintbox(
 				{
-					url: "'.get_secure_htsrv_url().'async.php?action=get_login_list" + ajax_params,
+					url: ajax_url,
 					matchHint: true,
-					autoDimentions: true
+					autoDimentions: true,
+					json: true,
 				} );
 				'
 				// Don't submit a form by Enter when user is editing the owner fields
@@ -1694,6 +2008,35 @@ function init_jqplot_js( $relative_to = 'rsc_url' )
 	require_js( '#jqplot_donutRenderer#', $relative_to );
 	require_css( '#jqplot_css#', $relative_to );
 	require_css( 'jquery/jquery.jqplot.b2evo.css', $relative_to );
+}
+
+
+/**
+ * Initialize JavaScript variables for jQuery QueryBuilder plugin
+ */
+function init_querybuilder_js( $relative_to = 'rsc_url' )
+{
+	global $current_locale;
+
+	require_js( '#jquery#', $relative_to ); // dependency
+	require_css( '#jqueryUI_css#', $relative_to ); // dependency for date picker
+	require_js( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
+	require_js( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
+	require_js( 'jquery/query-builder/moment.js', $relative_to ); // dependency
+
+	require_js( 'jquery/query-builder/query-builder.min.js', $relative_to );
+	require_css( 'jquery/jquery.query-builder.default.css', $relative_to );
+
+	// Load language file if such file exists:
+	$query_builder_langs = array( 'ar', 'az', 'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fa-IR', 'fr', 'he', 'it', 'nl', 'no', 'pl', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sq', 'tr', 'ua', 'zh-CN' );
+	if( in_array( $current_locale, $query_builder_langs ) )
+	{	// Load lang by full locale name like "en-US":
+		require_js( 'jquery/query-builder/i18n/query-builder.'.$current_locale.'.js', $relative_to );
+	}
+	elseif( in_array( substr( $current_locale, 0, 2 ), $query_builder_langs ) )
+	{	// Load lang by locale code like "en":
+		require_js( 'jquery/query-builder/i18n/query-builder.'.substr( $current_locale, 0, 2 ).'.js', $relative_to );
+	}
 }
 
 
@@ -1770,29 +2113,23 @@ function bullet( $bool )
 }
 
 
-
-
 /**
  * Stub: Links to previous and next post in single post mode
  */
 function item_prevnext_links( $params = array() )
 {
-	global $disp;
+	global $disp, $MainList;
 
-	if( $disp == 'download' )
-	{ // Don't display the links on download page
+	if( ! isset( $MainList ) || ! $MainList->single_post || $disp == 'download' )
+	{	// Don't display the links in NOT single post mode and on download page:
 		return;
 	}
 
-	global $MainList;
-
 	$params = array_merge( array( 'target_blog' => 'auto' ), $params );
 
-	if( isset( $MainList ) )
-	{
-		$MainList->prevnext_item_links( $params );
-	}
+	$MainList->prevnext_item_links( $params );
 }
+
 
 /**
  * Stub: Links to previous and next user in single user mode
@@ -1923,6 +2260,21 @@ function display_if_empty( $params = array() )
 
 
 /**
+ * Check if current page is a single Item's page
+ *
+ * @return boolean
+ */
+function is_single_page()
+{
+	global $disp, $MainList, $Item;
+
+	return ( $disp == 'single' || $disp == 'page' ) &&
+		( isset( $MainList ) && $MainList->single_post ) &&
+		( isset( $Item ) && $Item->ID > 0 );
+}
+
+
+/**
  * Template tag for credits
  *
  * Note: You can limit (and even disable) the number of links being displayed here though the Admin interface:
@@ -1936,7 +2288,7 @@ function credits( $params = array() )
 	 * @var AbstractSettings
 	 */
 	global $global_Cache;
-	global $Blog;
+	global $Collection, $Blog;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -1959,27 +2311,7 @@ function credits( $params = array() )
 
 	display_list( $cred_links, $params['list_start'], $params['list_end'], $params['separator'], $params['item_start'], $params['item_end'], NULL, $max_credits );
 
-	return $max_credits;	
-}
-
-
-/**
- * Get rating as 5 stars
- *
- * @param integer Number of stars
- * @param string Class name
- * @return string Template for star rating
- */
-function get_star_rating( $stars, $class = 'not-used-any-more' )
-{
-	if( is_null( $stars ) )
-	{
-		return;
-	}
-
-	$average = ceil( ( $stars ) / 5 * 100 );
-
-	return '<div class="star_rating"><div style="width:'.$average.'%">'.$stars.' stars</div></div>';
+	return $max_credits;
 }
 
 
@@ -1991,7 +2323,7 @@ function get_star_rating( $stars, $class = 'not-used-any-more' )
  */
 function star_rating( $stars, $class = 'not-used-any-more' )
 {
-	echo get_star_rating( $stars, $class );
+	echo get_star_rating( $stars );
 }
 
 
@@ -2044,7 +2376,7 @@ function powered_by( $params = array() )
  */
 function bloginfo( $what )
 {
-	global $Blog;
+	global $Collection, $Blog;
 	$Blog->disp( $what );
 }
 
@@ -2144,7 +2476,7 @@ function is_recursive( /*array*/ & $array, /*array*/ & $alreadySeen = array() )
  */
 function display_ajax_form( $params )
 {
-	global $rsc_url, $samedomain_htsrv_url, $ajax_form_number, $required_js;
+	global $rsc_url, $ajax_form_number, $required_js, $b2evo_icons_type;
 
 	if( is_recursive( $params ) )
 	{ // The params array contains recursion, don't try to encode, display error message instead
@@ -2153,10 +2485,18 @@ function display_ajax_form( $params )
 		return;
 	}
 
+	// Set icons type to display correct icons on bootstrap skins:
+	$params['b2evo_icons_type'] = $b2evo_icons_type;
+
 	if( ! empty( $required_js ) )
 	{	// Send all loaded JS files to ajax request in order to don't load them twice:
 		// yura: It was done because JS of bootstrap modal doesn't work when jquery JS file is loaded twice.
 		$params['required_js'] = $required_js;
+	}
+
+	if( ! isset( $params['b2evo_icons_type'] ) && isset( $b2evo_icons_type ) )
+	{	// Send current icons type to display proper icons on the loaded AJAX form:
+		$params['b2evo_icons_type'] = $b2evo_icons_type;
 	}
 
 	if( empty( $ajax_form_number ) )
@@ -2167,26 +2507,47 @@ function display_ajax_form( $params )
 
 	echo '<div id="ajax_form_number_'.$ajax_form_number.'" class="section_requires_javascript">';
 
+	if( isset( $params['action'], $params['p'] ) && $params['action'] == 'get_comment_form' )
+	{	// Display anchor here even form is not loaded yet because it is used e.g. for reply links:
+		$comment_form_anchor = empty( $params['params']['comment_form_anchor'] ) ? 'form_p' : $params['params']['comment_form_anchor'];
+		echo '<a id="'.format_to_output( $comment_form_anchor.$params['p'], 'htmlattr' ).'"></a>';
+	}
+
 	// Needs json_encode function to create json type params
 	$json_params = evo_json_encode( $params );
 
 	// Display loader gif until the ajax call returns:
 	echo '<p class="ajax-loader"><span class="loader_img loader_ajax_form" title="'.T_('Loading...').'"></span><br />'.T_( 'Form is loading...' ).'</p>';
 	?>
-	<script type="text/javascript">
+	<script>
 		var ajax_form_offset_<?php echo $ajax_form_number; ?> = jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').offset().top;
 		var request_sent_<?php echo $ajax_form_number; ?> = false;
+		var ajax_form_loading_number_<?php echo $ajax_form_number; ?> = 0;
 
 		function get_form_<?php echo $ajax_form_number; ?>()
 		{
+			var form_id = '#ajax_form_number_<?php echo $ajax_form_number; ?>';
+			ajax_form_loading_number_<?php echo $ajax_form_number; ?>++;
 			jQuery.ajax({
-				url: '<?php echo $samedomain_htsrv_url; ?>anon_async.php',
+				url: '<?php echo get_htsrv_url(); ?>anon_async.php',
 				type: 'POST',
 				data: <?php echo $json_params; ?>,
 				success: function(result)
-					{
-						jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').html( ajax_debug_clear( result ) );
+				{
+					jQuery( form_id ).html( ajax_debug_clear( result ) );
+				},
+				error: function( jqXHR, textStatus, errorThrown )
+				{
+					jQuery( '.loader_ajax_form', form_id ).after( '<div class="red center">' + errorThrown + ': ' + jqXHR.responseText + '</div>' );
+					if( ajax_form_loading_number_<?php echo $ajax_form_number; ?> < 3 )
+					{	// Try to load 3 times this ajax form if error occurs:
+						setTimeout( function()
+						{	// After 1 second delaying:
+							jQuery( '.loader_ajax_form', form_id ).next().remove();
+							get_form_<?php echo $ajax_form_number; ?>();
+						}, 1000 );
 					}
+				}
 			});
 		}
 
@@ -2233,8 +2594,8 @@ function display_ajax_form( $params )
  */
 function display_login_form( $params )
 {
-	global $Settings, $Plugins, $Session, $Blog, $blog, $dummy_fields;
-	global $secure_htsrv_url, $admin_url, $baseurl, $ReqHost, $redirect_to;
+	global $Settings, $Plugins, $Session, $Collection, $Blog, $blog, $dummy_fields;
+	global $admin_url, $baseurl, $ReqHost, $redirect_to;
 
 	$params = array_merge( array(
 			'form_before' => '',
@@ -2256,10 +2617,18 @@ function display_login_form( $params )
 			'reqID' => '',
 			'sessID' => '',
 			'transmit_hashed_password' => false,
+			'get_widget_login_hidden_fields' => false,
 			'display_abort_link'  => true,
 			'abort_link_position' => 'above_form', // 'above_form', 'form_title'
 			'abort_link_text'     => T_('Abort login!'),
-			'display_reg_link'    => false, // Display registration link after login button
+			'login_button_text'     => T_('Log in!'),
+			'login_button_class'    => 'btn btn-success btn-lg',
+			'display_lostpass_link' => true,
+			'lostpass_link_text'    => T_('Lost your password?'),
+			'lostpass_link_class'   => '',
+			'display_reg_link'      => false, // Display registration link after login button
+			'reg_link_text'         => T_('Register').' &raquo;',
+			'reg_link_class'        => 'btn btn-primary btn-lg pull-right',
 		), $params );
 
 	$inskin = $params['inskin'];
@@ -2271,7 +2640,7 @@ function display_login_form( $params )
 
 	if( $params['display_abort_link']
 		&& empty( $params['login_required'] )
-		&& $params['action'] != 'req_validatemail'
+		&& $params['action'] != 'req_activate_email'
 		&& strpos( $return_to, $admin_url ) !== 0
 		&& strpos( $ReqHost.$return_to, $admin_url ) !== 0 )
 	{ // No login required, allow to pass through
@@ -2284,7 +2653,7 @@ function display_login_form( $params )
 				if( empty( $Blog ) )
 				{
 					$BlogCache = & get_BlogCache();
-					$Blog = $BlogCache->get_by_ID( $blog, false );
+					$Collection = $Blog = $BlogCache->get_by_ID( $blog, false );
 				}
 				// set abort url to Blog url
 				$abort_url = $Blog->gen_blogurl();
@@ -2332,6 +2701,10 @@ function display_login_form( $params )
 
 	$Form->add_crumb( 'loginform' );
 	$source = param( 'source', 'string', $params['source'].' login form' );
+	if( ! empty( $blog ) )
+	{
+		$Form->hidden( 'blog', $blog );
+	}
 	$Form->hidden( 'source', $source );
 	$Form->hidden( 'redirect_to', $redirect_to );
 	$Form->hidden( 'return_to', $return_to );
@@ -2341,7 +2714,7 @@ function display_login_form( $params )
 		$separator = '<br />';
 	}
 	else
-	{ // standard login form
+	{ // basic login form
 
 		if( ! empty( $params['form_title'] ) )
 		{
@@ -2349,9 +2722,9 @@ function display_login_form( $params )
 		}
 
 		$Form->hidden( 'validate_required', $params[ 'validate_required' ] );
-		if( isset( $params[ 'action' ],  $params[ 'reqID' ], $params[ 'sessID' ] ) &&  $params[ 'action' ] == 'validatemail' )
+		if( isset( $params[ 'action' ],  $params[ 'reqID' ], $params[ 'sessID' ] ) &&  $params[ 'action' ] == 'activateacc_sec' )
 		{ // the user clicked the link from the "validate your account" email, but has not been logged in; pass on the relevant data:
-			$Form->hidden( 'action', 'validatemail' );
+			$Form->hidden( 'action', 'activateacc_sec' );
 			$Form->hidden( 'reqID', $params[ 'reqID' ] );
 			$Form->hidden( 'sessID', $params[ 'sessID' ] );
 		}
@@ -2361,60 +2734,67 @@ function display_login_form( $params )
 	// check if should transmit hashed password
 	if( $params[ 'transmit_hashed_password' ] )
 	{ // used by JS-password encryption/hashing:
-		$pwd_salt = $Session->get('core.pwd_salt');
-		if( empty($pwd_salt) )
+		$pepper = $Session->get( 'core.pepper' );
+		if( empty( $pepper ) )
 		{ // Do not regenerate if already set because we want to reuse the previous salt on login screen reloads
 			// fp> Question: the comment implies that the salt is reset even on failed login attemps. Why that? I would only have reset it on successful login. Do experts recommend it this way?
 			// but if you kill the session you get a new salt anyway, so it's no big deal.
 			// At that point, why not reset the salt at every reload? (it may be good to keep it, but I think the reason should be documented here)
-			$pwd_salt = generate_random_key(64);
-			$Session->set( 'core.pwd_salt', $pwd_salt, 86400 /* expire in 1 day */ );
+			$pepper = generate_random_key(64);
+			$Session->set( 'core.pepper', $pepper, 86400 /* expire in 1 day */ );
 			$Session->dbsave(); // save now, in case there's an error later, and not saving it would prevent the user from logging in.
 		}
-		$Form->hidden( 'pwd_salt', $pwd_salt );
+		$Form->hidden( 'pepper', $pepper );
 		// Add container for the hashed password hidden inputs
 		echo '<div id="pwd_hashed_container"></div>'; // gets filled by JS
 	}
 
 	if( $inskin )
 	{
-		$Form->begin_field();
-		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, T_('Login'), $separator.T_('Enter your username (or email address).'),
-					array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true ) );
-		$Form->end_field();
+		$Form->login_input( $dummy_fields['login'], $params['login'], 18, /* TRANS: noun */ T_('Login'), $separator.T_('Enter your username (or email address).'),
+					array( 'maxlength' => 255, 'required' => true ) );
 	}
 	else
 	{
-		$Form->text_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, '', '',
-					array( 'maxlength' => 255, 'class' => 'input_text', 'input_required' => 'required', 'placeholder' => T_('Username (or email address)') ) );
+		$Form->login_input( $dummy_fields[ 'login' ], $params[ 'login' ], 18, '', '',
+					array( 'maxlength' => 255, 'required' => true, 'placeholder' => T_('Username (or email address)') ) );
 	}
 
-	$lost_password_url = get_lostpassword_url( $redirect_to, '&amp;', $return_to );
-	if( ! empty( $login ) )
-	{
-		$lost_password_url = url_add_param( $lost_password_url, $dummy_fields['login'].'='.rawurlencode( $login ) );
+	if( $params['display_lostpass_link'] )
+	{	// Display a lost password link:
+		$lost_password_url = get_lostpassword_url( $redirect_to, '&amp;', $return_to );
+		if( ! empty( $login ) )
+		{	// Append login to the lost password form url:
+			$lost_password_url = url_add_param( $lost_password_url, $dummy_fields['login'].'='.rawurlencode( $login ) );
+		}
+		$lost_password_link = '<a href="'.$lost_password_url.'"'
+			.( empty( $params['lostpass_link_text'] ) ? '' : ' class="'.format_to_output( $params['lostpass_link_class'], 'htmlattr' ).'"' ).'>'
+			.$params['lostpass_link_text'].'</a>';
 	}
-	$pwd_note = '<a href="'.$lost_password_url.'">'.T_('Lost your password?').'</a>';
+	else
+	{	// Don't display a lost password link:
+		$lost_password_link = '';
+	}
 
 	if( $inskin )
 	{
 		$Form->begin_field();
-		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, T_('Password'), array( 'note' => $pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'required' => true ) );
+		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, T_('Password'), array( 'note' => $lost_password_link, 'maxlength' => 70, 'class' => 'input_text', 'required' => true ) );
 		$Form->end_field();
 	}
 	else
 	{
-		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, '', array( 'placeholder' => T_('Password'), 'note' => $pwd_note, 'maxlength' => 70, 'class' => 'input_text', 'input_required' => 'required' ) );
+		$Form->password_input( $dummy_fields[ 'pwd' ], '', 18, '', array( 'placeholder' => T_('Password'), 'note' => $lost_password_link, 'maxlength' => 70, 'class' => 'input_text', 'input_required' => 'required' ) );
 	}
 
 	// Allow a plugin to add fields/payload
 	$Plugins->trigger_event( 'DisplayLoginFormFieldset', array( 'Form' => & $Form ) );
 
 	// Display registration link after login button
-	$register_link = $params['display_reg_link'] ? get_user_register_link( '', '', T_('Register').' &raquo;', '#', true /*disp_when_logged_in*/, $redirect_to, $source, 'btn btn-primary btn-lg pull-right' ) : '';
+	$register_link = $params['display_reg_link'] ? get_user_register_link( '', '', $params['reg_link_text'], '#', true /*disp_when_logged_in*/, $redirect_to, $source, $params['reg_link_class'] ) : '';
 
 	// Submit button(s):
-	$submit_buttons = array( array( 'name' => 'login_action[login]', 'value' => T_('Log in!'), 'class' => 'btn-success btn-lg', 'input_suffix' => $register_link ) );
+	$submit_buttons = array( array( 'name' => 'login_action[login]', 'value' => $params['login_button_text'], 'class' => $params['login_button_class'], 'input_suffix' => $register_link ) );
 
 	$Form->buttons_input( $submit_buttons );
 
@@ -2452,7 +2832,7 @@ function display_login_js_handler( $params )
 	$params = array_merge( array( 'get_widget_login_hidden_fields' => false ), $params );
 
 ?>
-	<script type="text/javascript">
+	<script>
 	var requestSent = false;
 	var login = document.getElementById("<?php echo $dummy_fields[ 'login' ]; ?>");
 	if( login.value.length > 0 )
@@ -2477,13 +2857,13 @@ function display_login_js_handler( $params )
 		var get_widget_login_hidden_fields = <?php echo $params['get_widget_login_hidden_fields'] ? 'true' : 'false'; ?>;
 		var sessionid = '<?php echo $Session->ID; ?>';
 
-		if( !form.<?php echo $dummy_fields[ 'pwd' ]; ?> || !form.pwd_salt || typeof hex_sha1 == "undefined" && typeof hex_md5 == "undefined" ) {
+		if( !form.<?php echo $dummy_fields[ 'pwd' ]; ?> || !form.pepper || typeof hex_sha1 == "undefined" && typeof hex_md5 == "undefined" ) {
 			return true;
 		}
 
 		jQuery.ajax({
 			type: 'POST',
-			url: '<?php echo get_samedomain_htsrv_url(); ?>anon_async.php',
+			url: '<?php echo get_htsrv_url( 'login' ); ?>anon_async.php',
 			data: {
 				'<?php echo $dummy_fields[ 'login' ]; ?>': username,
 				'action': 'get_user_salt',
@@ -2503,16 +2883,19 @@ function display_login_js_handler( $params )
 
 				var raw_password = form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value;
 				var salts = parsed_result['salts'];
+				var hash_algo = parsed_result['hash_algo'];
 
 				if( get_widget_login_hidden_fields )
 				{
 					form.crumb_loginform.value = parsed_result['crumb'];
-					form.pwd_salt.value = parsed_result['pwd_salt'];
+					form.pepper.value = parsed_result['pepper'];
 					sessionid = parsed_result['session_id'];
 				}
 
-				for( var index in salts ) {
-					var pwd_hashed = hex_sha1( hex_md5( salts[index] + raw_password ) + form.pwd_salt.value );
+				for( var index in salts )
+				{
+					var pwd_hashed = eval( hash_algo[ index ] );
+					pwd_hashed = hex_sha1( pwd_hashed + form.pepper.value );
 					pwd_container.append( '<input type="hidden" value="' + pwd_hashed + '" name="pwd_hashed[]">' );
 				}
 
@@ -2522,11 +2905,18 @@ function display_login_js_handler( $params )
 				// Append the correct login action as hidden input field
 				pwd_container.append( '<input type="hidden" value="1" name="login_action[login]">' );
 				form.submit();
+			},
+			error: function( jqXHR, textStatus, errorThrown )
+			{	// Display error text on error request:
+				requestSent = false;
+				var wrong_response_code = typeof( jqXHR.status ) != 'undefined' && jqXHR.status != 200 ? '\nHTTP Response code: ' + jqXHR.status : '';
+				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')'
+					+ wrong_response_code );
 			}
 		});
 
-	    // You must return false to prevent the default form behavior
-	    return false;
+		// You must return false to prevent the default form behavior
+		return false;
 	}
 
 	<?php
@@ -2554,12 +2944,12 @@ function display_login_js_handler( $params )
  */
 function display_lostpassword_form( $login, $hidden_params, $params = array() )
 {
-	global $secure_htsrv_url, $dummy_fields, $redirect_to, $Session;
+	global $dummy_fields, $redirect_to, $Session;
 
 	$params = array_merge( array(
 			'form_before'     => '',
 			'form_after'      => '',
-			'form_action'     => $secure_htsrv_url.'login.php',
+			'form_action'     => get_htsrv_url( 'login' ).'login.php',
 			'form_name'       => 'lostpass_form',
 			'form_class'      => 'fform',
 			'form_template'   => NULL,
@@ -2597,7 +2987,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	// Display hidden fields
 	$Form->add_crumb( 'lostpassform' );
-	$Form->hidden( 'action', 'retrievepassword' );
+	$Form->hidden( 'action', 'resetpassword' );
 	foreach( $hidden_params as $key => $value )
 	{
 		$Form->hidden( $key, $value );
@@ -2607,7 +2997,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	if( $params['inskin'] )
 	{
-		$Form->text( $dummy_fields[ 'login' ], $login, 30, T_('Login'), '', 255, 'input_text' );
+		$Form->text( $dummy_fields[ 'login' ], $login, 30, /* TRANS: noun */ T_('Login'), '', 255, 'input_text' );
 	}
 	else
 	{
@@ -2616,12 +3006,12 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 
 	$Form->buttons_input( array( array( /* TRANS: Text for submit button to request an activation link by email */ 'value' => T_('Send me a recovery email!'), 'class' => 'btn-primary btn-lg' ) ) );
 
-	echo '<b>'.T_('How to recover your password:').'</b>';
+	echo '<b>'.T_('How to reset your password:').'</b>';
 	echo '<ol>';
-	echo '<li>'.T_('Please enter you login (or email address) above.').'</li>';
+	echo '<li>'.T_('Please enter your login (or email address) above.').'</li>';
 	echo '<li>'.T_('An email will be sent to your registered email address immediately.').'</li>';
-	echo '<li>'.T_('As soon as you receive the email, click on the link therein to change your password.').'</li>';
-	echo '<li>'.T_('Your browser will open a page where you can chose a new password.').'</li>';
+	echo '<li>'.T_('As soon as you receive the email, click on the link therein to reset your password.').'</li>';
+	echo '<li>'.T_('Your browser will open a page where you can set a new password.').'</li>';
 	echo '</ol>';
 	echo '<p class="red"><strong>'.T_('Important: for security reasons, you must do steps 1 and 4 on the same computer and same web browser. Do not close your browser in between.').'</strong></p>';
 
@@ -2658,7 +3048,7 @@ function display_lostpassword_form( $login, $hidden_params, $params = array() )
 function display_activateinfo( $params )
 {
 	global $current_User, $Settings, $UserSettings, $Plugins;
-	global $secure_htsrv_url, $rsc_path, $rsc_url, $dummy_fields;
+	global $rsc_path, $rsc_url, $dummy_fields;
 
 	if( !is_logged_in() )
 	{ // if this happens, it means the code is not correct somewhere before this
@@ -2669,7 +3059,7 @@ function display_activateinfo( $params )
 			'use_form_wrapper' => true,
 			'form_before'      => '',
 			'form_after'       => '',
-			'form_action'      => $secure_htsrv_url.'login.php',
+			'form_action'      => get_htsrv_url( 'login' ).'login.php',
 			'form_name'        => 'form_validatemail',
 			'form_class'       => 'fform',
 			'form_layout'      => 'fieldset',
@@ -2698,7 +3088,7 @@ function display_activateinfo( $params )
 		$Form->begin_form( $params[ 'form_class' ] );
 
 		$Form->add_crumb( 'validateform' );
-		$Form->hidden( 'action', 'req_validatemail');
+		$Form->hidden( 'action', 'req_activate_email');
 		$Form->hidden( 'redirect_to', $params[ 'redirect_to' ] );
 		if( $params[ 'inskin' ] )
 		{
@@ -2706,10 +3096,10 @@ function display_activateinfo( $params )
 			$Form->hidden( 'blog', $params[ 'blog' ] );
 		}
 		else
-		{ // Form title in standard form
+		{ // Form title in basic form
 			echo '<h4>'.$params['form_title'].'</h4>';
 		}
-		$Form->hidden( 'req_validatemail_submit', 1 ); // to know if the form has been submitted
+		$Form->hidden( 'req_activate_email_submit', 1 ); // to know if the form has been submitted
 
 		$Form->begin_fieldset();
 
@@ -2720,7 +3110,7 @@ function display_activateinfo( $params )
 		// set email text input content only if this is not a forced request. This way the user may have bigger chance to write a correct email address.
 		$user_email = ( $force_request ? '' : $current_User->email );
 		// fp> note: 45 is the max length for evopress skin.
-		$Form->text_input( $dummy_fields[ 'email' ], $user_email, 42, T_('Your email'), '', array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true, 'input_required' => 'required' ) );
+		$Form->email_input( $dummy_fields[ 'email' ], $user_email, 42, T_('Your email'), array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true, 'input_required' => 'required' ) );
 		$Form->end_fieldset();
 
 		// Submit button:
@@ -2761,7 +3151,7 @@ function display_activateinfo( $params )
 	echo '<ol start="1" class="expanded">';
 	$instruction =  sprintf( T_('Open your email account for %s and find a message we sent you on %s at %s with the following title:'), $user_email, $last_email_date, $last_email_time );
 	echo '<li>'.$instruction.'<br /><b>'.sprintf( T_('Activate your account: %s'), $current_User->login ).'</b>';
-	$request_validation_url = 'href="'.regenerate_url( '', 'force_request=1&validate_required=true&redirect_to='.$params[ 'redirect_to' ] ).'"';
+	$request_validation_url = 'href="'.regenerate_url( '', 'force_request=1&validate_required=true&redirect_to='.rawurlencode( $params[ 'redirect_to' ] ) ).'"';
 	echo '<p>'.sprintf( T_('NOTE: If you don\'t find it, check your "Junk", "Spam" or "Unsolicited email" folders. If you really can\'t find it, <a %s>request a new activation email</a>.'), $request_validation_url ).'</p></li>';
 	echo '<li>'.sprintf( T_('Add us (%s) to your contacts to make sure you receive future email notifications, especially when someone sends you a private message.'), '<b><span class="nowrap">'.$notification_email.'</span></b>').'</li>';
 	echo '<li><b class="red">'.T_('Click on the activation link in the email.').'</b>';
@@ -2798,7 +3188,7 @@ function display_activateinfo( $params )
 
 		echo $params['use_form_wrapper'] ? $params['form_before'] : '';
 
-		$Form = new Form( $secure_htsrv_url.'login.php', 'form_validatemail', 'post', 'fieldset' );
+		$Form = new Form( get_htsrv_url( 'login' ).'login.php', 'form_validatemail', 'post', 'fieldset' );
 
 		if( ! empty( $params['form_template'] ) )
 		{ // Switch layout to template from array
@@ -2808,8 +3198,8 @@ function display_activateinfo( $params )
 		$Form->begin_form( 'evo_form__login' );
 
 		$Form->add_crumb( 'validateform' );
-		$Form->hidden( 'action', 'validatemail' );
-		$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, $secure_htsrv_url ) );
+		$Form->hidden( 'action', 'activateacc_sec' );
+		$Form->hidden( 'redirect_to', url_rel_to_same_host( $redirect_to, get_htsrv_url( 'login' ) ) );
 		$Form->hidden( 'reqID', 1 );
 		$Form->hidden( 'sessID', $Session->ID );
 
@@ -2837,7 +3227,7 @@ function display_activateinfo( $params )
  */
 function display_password_indicator( $params = array() )
 {
-	global $Blog, $rsc_url, $disp, $dummy_fields;
+	global $Settings, $Collection, $Blog, $rsc_url, $disp, $dummy_fields;
 
 	$params = array_merge( array(
 			'pass1-id'    => $dummy_fields[ 'pass1' ],
@@ -2850,9 +3240,9 @@ function display_password_indicator( $params = array() )
 			'blacklist'   => "'b2evo','b2evolution'", // Identify the password as "weak" if it includes any of these words
 		), $params );
 
-	echo "<script type='text/javascript'>
+	echo "<script>
 	// Load password strength estimation library
-	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".$rsc_url."js/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
+	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".force_https_url( $rsc_url, 'login' )."js/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
 
 	// Call 'passcheck' function when document is loaded
 	if( document.addEventListener )
@@ -2876,7 +3266,7 @@ function display_password_indicator( $params = array() )
 			pass2input.css( 'width', '".($params['field-width'] - 2)."px' ); // Set fixed length
 		}
 
-		// Prepair password field
+		// Prepare password field
 		pass1input.css( 'width', '".($params['field-width'] - 2)."px' ); // Set fixed length
 		pass1input.attr( 'onkeyup', 'return passinfo(this);' ); // Add onkeyup attribute
 		pass1input.parent().append( \"<div id='p-container'><div id='p-result'></div><div id='p-status'></div><div id='p-time'></div></div>\" );
@@ -2958,16 +3348,159 @@ function display_password_indicator( $params = array() )
 
 	jQuery( 'input#".$params[ 'pass1-id' ].", input#".$params[ 'pass2-id' ]."' ).keyup( function()
 	{	// Validate passwords
-		if( jQuery( 'input#".$params[ 'pass2-id' ]."' ).val() != jQuery( 'input#".$params[ 'pass1-id' ]."' ).val() )
+		var minLength = ".format_to_js( $Settings->get( 'user_minpwdlen' ) ).";
+		var pass1Field = jQuery( 'input#".$params[ 'pass1-id' ]."' );
+		var pass2Field = jQuery( 'input#".$params[ 'pass2-id' ]."' );
+		var passStatus = jQuery( '#pass2_status' );
+		var errorMsg = '';
+		const regex = /^[^\<\&\>]+$/g; // Password cannot contain the following characters: < > &
+
+		if( ( pass1Field.val().length && ( pass1Field.val().match( regex ) == null ) ) ||
+				( pass2Field.val().length && ( pass2Field.val().match( regex ) == null ) ) )
+		{
+			errorMsg = '".sprintf( TS_('Password cannot contain the following characters: %s'), '<code><</code> <code>></code> <code>&</code>' )."';
+			pass1Field[0].setCustomValidity( pass1Field.val().match( regex ) ? '' : errorMsg );
+			pass2Field[0].setCustomValidity( pass2Field.val().match( regex ) ? '' : errorMsg );
+			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
+		}
+		else if( ( pass1Field.val().length > 0 && pass1Field.val().length < minLength ) || ( pass2Field.val().length > 0 && pass2Field.val().length < minLength ) )
+		{ // Password does not meet minimum length
+			errorMsg = '".sprintf( TS_('The minimum password length is %d characters.'), $Settings->get( 'user_minpwdlen' ) )."';
+			pass1Field[0].setCustomValidity( pass1Field.val().length < minLength ? errorMsg : '' );
+			pass2Field[0].setCustomValidity( pass2Field.val().length < minLength ? errorMsg : '' );
+			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
+		}
+		else if( pass2Field.val() != pass1Field.val() )
 		{	// Passwords are different
-			jQuery( '#pass2_status' ).html( '".get_icon( 'xross' )." ".TS_('The second password is different from the first.')."' );
+			errorMsg = '".TS_('The second password is different from the first.')."';
+			pass1Field[0].setCustomValidity( '' );
+			pass2Field[0].setCustomValidity( errorMsg );
+			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
 		}
 		else
 		{
-			jQuery( '#pass2_status' ).html( '' );
+			pass1Field[0].setCustomValidity( errorMsg );
+			pass2Field[0].setCustomValidity( errorMsg );
+			passStatus.html( errorMsg );
 		}
 	} );
 </script>";
+}
+
+
+/*
+ * Display javascript code to edit password
+ *
+ * @param array Params
+ */
+function display_password_js_edit()
+{
+	global $Settings;
+
+	echo '<script>
+jQuery( "#current_user_pass" ).keyup( function()
+{
+	var error_obj = jQuery( this ).parent().find( "span.field_error" );
+	if( error_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			error_obj.show();
+		}
+		else
+		{
+			error_obj.hide();
+		}
+	}
+
+	user_pass_clear_style( "#current_user_pass" );
+} );
+
+jQuery( "#edited_user_pass1, #edited_user_pass2" ).keyup( function()
+{
+	var minpass_obj = jQuery( this ).parent().find( ".pass_check_min" );
+	if( minpass_obj.length )
+	{ // Hide/Show a message about min pass length
+		if( jQuery.trim( jQuery( this ).val() ).length >= '.intval( $Settings->get('user_minpwdlen') ).' )
+		{
+			minpass_obj.hide();
+		}
+		else
+		{
+			minpass_obj.show();
+		}
+	}
+
+	var diff_obj = jQuery( ".pass_check_diff" );
+	if( diff_obj.length && jQuery( "#edited_user_pass1" ).val() == jQuery( " #edited_user_pass2" ).val() )
+	{ // Hide message about different passwords
+		diff_obj.hide();
+	}
+
+	// Hide message about that new password must be entered
+	var new_obj = jQuery( this ).parent().find( ".pass_check_new" );
+	if( new_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			new_obj.show();
+		}
+		else
+		{
+			new_obj.hide();
+		}
+	}
+
+	// Hide message about that new password must be entered twice
+	var twice_obj = jQuery( this ).parent().find( ".pass_check_twice" );
+	if( twice_obj.length )
+	{
+		if( jQuery( this ).val() == "" )
+		{
+			twice_obj.show();
+		}
+		else
+		{
+			twice_obj.hide();
+		}
+	}
+
+	var warning_obj = jQuery( this ).parent().find( ".pass_check_warning" );
+	if( jQuery.trim( jQuery( this ).val() ) != jQuery( this ).val() )
+	{ // Password contains the leading and trailing spaces
+		if( ! warning_obj.length )
+		{
+			jQuery( this ).parent().append( "<span class=\"pass_check_warning notes field_error\">.'.TS_('The leading and trailing spaces will be trimmed.').'</span>" );
+		}
+	}
+	else if( warning_obj.length )
+	{ // No spaces, Remove warning
+		warning_obj.remove();
+	}
+
+	user_pass_clear_style( "#edited_user_pass1, #edited_user_pass2" );
+} );
+
+/**
+ * Hide/Show error style of input depending on visibility of the error messages
+ *
+ * @param string jQuery selector
+ */
+function user_pass_clear_style( obj_selector )
+{
+	jQuery( obj_selector ).each( function()
+	{
+		if( jQuery( this ).parent().find( "span.field_error span:visible" ).length )
+		{
+			jQuery( this ).addClass( "field_error" );
+		}
+		else
+		{
+			jQuery( this ).removeClass( "field_error" );
+		}
+	} );
+}
+</script>';
 }
 
 
@@ -2984,18 +3517,20 @@ function display_login_validator( $params = array() )
 			'login-id' => $dummy_fields[ 'login' ],
 		), $params );
 
-	echo '<script type="text/javascript">
+	echo '<script>
 	var login_icon_load = \'<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.TS_('Loading...').'" title="'.TS_('Loading...').'" style="margin:2px 0 0 5px" align="top" />\';
 	var login_icon_available = \''.get_icon( 'allowback', 'imgtag', array( 'title' => TS_('This username is available.') ) ).'\';
 	var login_icon_exists = \''.get_icon( 'xross', 'imgtag', array( 'title' => TS_('This username is already in use. Please choose another one.') ) ).'\';
+	var login_icon_error = \''.get_icon( 'xross', 'imgtag', array( 'title' => '$error_msg$' ) ).'\';
 
-	var login_text_empty = \''.TS_('Choose an username.').'\';
+	var login_text_empty = \''.TS_('Choose a username').'.\';
 	var login_text_available = \''.TS_('This username is available.').'\';
 	var login_text_exists = \''.TS_('This username is already in use. Please choose another one.').'\';
 
-	jQuery( "#register_form input#'.$params[ 'login-id' ].'" ).change( function()
+	var login_field = jQuery( "#register_form input#'.$params[ 'login-id' ].'" );
+	login_field.change( function()
 	{	// Validate if username is available
-		var note_Obj = jQuery( this ).next().next();
+		var note_Obj = jQuery( "#login_status_msg" );
 		if( jQuery( this ).val() == "" )
 		{	// Login is empty
 			jQuery( "#login_status" ).html( "" );
@@ -3006,25 +3541,29 @@ function display_login_validator( $params = array() )
 			jQuery( "#login_status" ).html( login_icon_load );
 			jQuery.ajax( {
 				type: "POST",
-				url: "'.get_samedomain_htsrv_url().'anon_async.php",
+				url: "'.get_htsrv_url( 'login' ).'anon_async.php",
 				data: "action=validate_login&login=" + jQuery( this ).val(),
 				success: function( result )
 				{
 					result = ajax_debug_clear( result );
 					if( result == "exists" )
 					{	// Login already exists
-						jQuery( "#login_status" ).html( login_icon_exists );
-						note_Obj.html( login_text_exists ).attr( "class", "notes red" );
+						jQuery( "#login_status" ).html( "" );
+						note_Obj.html( login_icon_exists + " " + login_text_exists ).attr( "class", "red" );
+						login_field[0].setCustomValidity( login_text_exists );
 					}
 					else if( result == "available" )
 					{	// Login is available
-						jQuery( "#login_status" ).html( login_icon_available );
-						note_Obj.html( login_text_available ).attr( "class", "notes green" );
+						jQuery( "#login_status" ).html( "" );
+						//note_Obj.html( login_icon_available + " " + login_text_available ).attr( "class", "green" );
+						note_Obj.html( "" );
+						login_field[0].setCustomValidity( "" );
 					}
 					else
 					{	// Errors
-						jQuery( "#login_status" ).html( login_icon_exists );
-						note_Obj.html( result ).attr( "class", "notes red" );
+						jQuery( "#login_status" ).html( "" );
+						note_Obj.html( login_icon_error.replace( "$error_msg$", result.replace( /(<([^>]+)>)/ig, "" ) ) + " " + result ).attr( "class", "red" );
+						login_field[0].setCustomValidity( result.replace( /(<([^>]+)>)/ig, "" ) );
 					}
 				}
 			} );
@@ -3160,9 +3699,10 @@ function init_field_editor_js( $params = array() )
  */
 function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 {
+	global $Collection, $Blog;
+
 	if( is_admin_page() )
 	{ // Check to enable it in back-office
-		global $Blog;
 		if( empty( $Blog ) || ! $Blog->get_setting( 'autocomplete_usernames' ) )
 		{ // Blog setting doesn't allow to autocomplete usernames
 			return;
@@ -3175,15 +3715,18 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 		{ // Skin disables to autocomplete usernames
 			return;
 		}
-		if( $disp != 'edit' && $disp != 'edit_comment' && ( empty( $Item ) || ! $Item->can_comment( NULL ) ) )
-		{ // It is not the edit post/comment form and No form to comment of this post
+		if( $disp != 'search' && $disp != 'edit' && $disp != 'edit_comment' && ( empty( $Item ) || ! $Item->can_comment( NULL ) ) )
+		{ // It is not a search form and not an edit post/comment form and No form to comment of this post
 			return;
 		}
 	}
 
 	require_js( '#jquery#', $relative_to );
+	if( ! empty( $Blog ) )
+	{	// Set global blog ID for textcomplete(Used to sort users by collection members and assignees):
+		add_js_headline( 'var blog = '.$Blog->ID );
+	}
 	require_js( 'build/textcomplete.bmin.js', $relative_to );
-	require_css( 'jquery/jquery.textcomplete.css', $relative_to );
 }
 
 
@@ -3210,8 +3753,9 @@ function get_prevent_key_enter_js( $jquery_selection )
  * @param string Icons type:
  *               - 'fontawesome' - Use only font-awesome icons
  *               - 'fontawesome-glyphicons' - Use font-awesome icons as a priority over the glyphicons
+ * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
  */
-function init_fontawesome_icons( $icons_type = 'fontawesome' )
+function init_fontawesome_icons( $icons_type = 'fontawesome', $relative_to = 'rsc_url' )
 {
 	global $b2evo_icons_type;
 
@@ -3219,7 +3763,112 @@ function init_fontawesome_icons( $icons_type = 'fontawesome' )
 	$b2evo_icons_type = $icons_type;
 
 	// Load main CSS file of font-awesome icons
-	require_css( '#fontawesome#', 'rsc_url' );
+	require_css( '#fontawesome#', $relative_to );
+}
+
+
+/**
+ * Get rating stars template
+ *
+ * @param float Rating value, e-g: 2 - display 2 active stars of default 5, 4.33 - display 4 active stars and 5 star is filled for 33%
+ * @param integer Total number of stars
+ * @param array Additional parameters
+ * @return string HTML of stars
+ */
+function get_star_rating( $value, $stars_num = 5, $params = array() )
+{
+	global $b2evo_icons_type;
+
+	if( isset( $b2evo_icons_type ) && strpos( $b2evo_icons_type, 'fontawesome' ) !== false )
+	{	// Use font-awesome stars if it is allowed for current skin:
+		$icon_type = 'fa';
+		$default_params = array(
+			'stars_before'       => '<span class="evo_stars">',
+			'stars_star_full'    => '<i class="fa fa-star"></i>',
+			'stars_star_percent' => '<i class="fa fa-star evo_star_percent"><i class="fa fa-star" style="width:$percent$"></i></i>', // $percent$ is replaced with values like 10%, 67%
+			'stars_star_empty'   => '<i class="fa fa-star evo_star_empty"></i>',
+			'stars_after'        => '</span>',
+		);
+	}
+	else
+	{	// Use image stars for v5 skins:
+		$icon_type = 'img';
+		$default_params = array(
+			'stars_before'       => '<span class="evo_stars_img" style="width:$stars_width$px">',
+			'stars_star_full'    => '<i>*</i>',
+			'stars_star_percent' => '<i class="evo_stars_img_empty"><i style="width:$percent$">%</i></i>', // $percent$ is replaced with values like 10%, 67%
+			'stars_star_empty'   => '<i class="evo_stars_img_empty">-</i>',
+			'stars_after'        => '</span>',
+		);
+	}
+
+	$params = array_merge( $default_params, $params );
+
+	if( ! is_numeric( $stars_num ) )
+	{	// Fix for old function where second param was a string:
+		$stars_num = 5;
+	}
+
+	$stars_num = intval( $stars_num );
+
+	if( $stars_num < 1 )
+	{	// Nothing to display:
+		return '';
+	}
+
+	if( $icon_type == 'fa' )
+	{
+		$stars_template = $params['stars_before'];
+	}
+	else
+	{	// Image icons must have a specific width depending on number of stars:
+		// (16px is width of one image star icon)
+		$stars_template = str_replace( '$stars_width$', $stars_num * 16, $params['stars_before'] );
+	}
+
+	$full_stars_max = floor( $value );
+	$percents = round( ( $value - $full_stars_max ) * 100 );
+	for( $s = 1; $s <= $stars_num; $s++ )
+	{
+		if( $s == $full_stars_max + 1 && $percents > 0 )
+		{	// Percent star:
+			$stars_template .= str_replace( '$percent$', $percents.'%', $params['stars_star_percent'] );
+		}
+		elseif( $s > $full_stars_max )
+		{	// Empty star:
+			$stars_template .= $params['stars_star_empty'];
+		}
+		else
+		{	// Full star:
+			$stars_template .= $params['stars_star_full'];
+		}
+	}
+
+	$stars_template .= $params['stars_after'];
+
+	return $stars_template;
+}
+
+
+/**
+ * Registers headlines for initialization of file multi uploader
+ *
+ * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean TRUE to make the links table sortable
+ */
+function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = true )
+{
+	// Require Fine Uploader js and css files:
+	require_js( 'multiupload/fine-uploader.js', $relative_to );
+	require_css( 'fine-uploader.css', $relative_to );
+
+	// Used to make uploader area resizable:
+	require_js( '#jqueryUI#', $relative_to );
+
+	if( $load_sortable_js )
+	{	// Load JS files to make the links table sortable:
+		require_js( 'jquery/jquery.sortable.min.js', $relative_to );
+	}
 }
 
 ?>

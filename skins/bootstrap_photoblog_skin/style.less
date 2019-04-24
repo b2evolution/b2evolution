@@ -1,9 +1,21 @@
+// --------- Universal item list widget & Recent posts widget ---------
+@import "../../rsc/less/_universal_item_list_widget.module.less";
+// --------------------------------------------------------------------
+
+// ------------------- Media Index widget --------------------
+@import "../../rsc/less/_coll_media_index_widget.module.less";
+// -----------------------------------------------------------
+
+// ----------- User Avatars (User List) widget ------------
+@import "../../rsc/less/_user_avatars_widget.module.less";
+// --------------------------------------------------------
+
+// -----------------About Author widget -------------------
+@import "../../rsc/less/_about_author_widget.module.less";
+// --------------------------------------------------------
+
 // ------------- Organization Members widget -------------
 @import "../../rsc/less/_org_members_widget.module.less";
-	// Override constants used in the module:
-	@widget_core_org_members-color: #333;
-	@widget_core_org_members-user-link-color: #000;
-	@widget_core_org_members-user-link-hover-color: #23527c;
 // -------------------------------------------------------
 
 // Header
@@ -22,7 +34,7 @@
 
 // Intro post - Featured post background images sample
 //.well {
-//	background: url(images/7T0W8MYRN0.jpg) no-repeat center center; 
+//	background: url(images/7T0W8MYRN0.jpg) no-repeat center center;
 //	-webkit-background-size: cover;
 //	-moz-background-size: cover;
 //	-o-background-size: cover;
@@ -30,90 +42,6 @@
 //	width: 100%;
 //	height: auto;
 //}
-
-// Login widget form
-.widget_core_user_login {
-	#login_form {
-		.form-group {
-			margin: 0;
-		}
-		label {
-			text-align: left;
-			width: 160px;
-			padding-left: 0;
-		}
-		.controls {
-			padding: 0;
-			width: 100%;
-		}
-		.form_text_input.form-control {
-			width: 100%;
-		}
-	}
-	.submit {
-		font-size: 12px;
-	}
-	.field_login_btn {
-		.panel {
-			margin: 0;
-			border: none;
-			border-radius: 0;
-			box-shadow: none;
-			.panel-body {
-				padding-left: 0;
-				padding-right: 0;
-				padding-bottom: 0;
-				#submit_login_form {
-					margin-right: 10px;
-				}
-			}
-		}
-	}
-	.register_link {
-		display: block;
-		padding-top: 10px;
-	}
-}
-
-// Register widget form
-.widget_core_user_register {
-	#register_form {
-		.form-group {
-			margin: 0;
-		}
-		label {
-			text-align: left;
-			width: 160px;
-			padding-left: 0;
-		}
-		.controls {
-			padding: 0;
-			width: 100%;
-		}
-		.form_text_input.form-control {
-			width: 100%;
-		}
-	}
-	.submit {
-		font-size: 12px;
-	}
-	.field_register_btn {
-		.panel {
-			margin: 0;
-			border: none;
-			border-radius: 0;
-			box-shadow: none;
-			.panel-body {
-				padding-left: 0;
-				padding-right: 0;
-				padding-bottom: 0;
-				#submit_login_form {
-					margin-right: 10px;
-				}
-			}
-		}
-	}
-}
 
 // Profile tabs on ?disp=profile
 ul.profile_tabs {
@@ -167,13 +95,6 @@ div.extended_search_form {
 	}
 }
 
-// Table for select categories of item
-table.catselect {
-	input#new_category_name {
-		width: 98% !important;
-	}
-}
-
 // Form elements on item edit page
 label.control-label[for=post_title] {
 	width: auto;
@@ -202,6 +123,12 @@ textarea.message_text {
 //		display: inline-block;
 //		margin-right: 5px;
 //	}
+}
+
+.evo_comment_avatar img {
+	float: left;
+	border-radius: 50%;
+	margin: 0 10px 10px 0;
 }
 
 div.bSideItem {
@@ -251,6 +178,7 @@ div.bSideItem {
 }
 .evo_panel__login {
 	max-width: 400px;
+	min-width: auto;
 }
 .evo_panel__lostpass {
 	max-width: 480px;
@@ -266,16 +194,36 @@ div.bSideItem {
 }
 .evo_panel__register {
 	max-width: 580px;
-	.control-buttons{
-		text-align: left;
-	}
-	&.register-disabled {
-		width: 350px;
-	}
 	.form-control {
 		&#country, &#u {
 			width: 100%;
 		}
+	}
+	#fieldset_wrapper_captcha_qstn .panel {
+		margin: 0;
+		div[id$=_answer] .control-label {
+			padding-right: 14px;
+		}
+	}
+	.panel-body {
+		padding: 15px;
+		p:last-child {
+			margin-bottom: 0;
+		}
+	}
+}
+@media (min-width: 768px) {
+	#fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
+		max-height: 34px;
+	}
+}
+.evo_register_buttons {
+	text-align: center;
+	input.btn {
+		margin: 0 0 15px 0;
+	}
+	a.btn {
+		margin: 0;
 	}
 }
 .evo_form__login_links {
@@ -312,6 +260,11 @@ div.bSideItem {
 }
 .form_footer_notes {
 	margin-top: 0;
+}
+
+// Tags wrapper
+.post_tags {
+	margin: 10px 0;
 }
 
 // Pagination
@@ -370,4 +323,23 @@ div.action_messages, div.log_container {
 // This skin needs this for disp=posts to separate from lower pagination
 footer.row {
 	margin-top: 20px;
+}
+
+// Comment footer
+.evo_content_block .evo_comment {
+	.evo_comment_footer {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
+	}
 }

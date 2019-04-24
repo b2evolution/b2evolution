@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  */
@@ -23,6 +23,8 @@ function emadr_get_status_titles()
 {
 	return array(
 			'unknown'     => TS_('Unknown'),
+			'working'     => TS_('Working'),
+			'unattended'  => TS_('Unattended?'),
 			'redemption'  => TS_('Redemption'),
 			'warning'     => TS_('Warning'),
 			'suspicious1' => TS_('Suspicious 1'),
@@ -44,7 +46,9 @@ function emadr_get_status_colors()
 	return array(
 			''            => '808080',
 			'unknown'     => '808080',
-			'redemption'  => 'FF00FF',
+			'working'     => '00CC00',
+			'unattended'  => 'FF00FF',
+			'redemption'  => 'D9EDF7',
 			'warning'     => 'FFFF00',
 			'suspicious1' => 'FFC800',
 			'suspicious2' => 'FFA500',
@@ -64,7 +68,9 @@ function emadr_get_status_icons()
 {
 	return array(
 			'unknown'     => get_icon( 'bullet_white', 'imgtag', array( 'title' => emadr_get_status_title( 'unknown' ) ) ),
-			'redemption'  => get_icon( 'bullet_magenta', 'imgtag', array( 'title' => emadr_get_status_title( 'redemption' ) ) ),
+			'working'     => get_icon( 'bullet_green', 'imgtag', array( 'title' => emadr_get_status_title( 'working' ) ) ),
+			'unattended'  => get_icon( 'bullet_magenta', 'imgtag', array( 'title' => emadr_get_status_title( 'unattended' ) ) ),
+			'redemption'  => get_icon( 'bullet_light_blue', 'imgtag', array( 'title' => emadr_get_status_title( 'redemption' ) ) ),
 			'warning'     => get_icon( 'bullet_yellow', 'imgtag', array( 'title' => emadr_get_status_title( 'warning' ) ) ),
 			'suspicious1' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emadr_get_status_title( 'suspicious1' ) ) ),
 			'suspicious2' => get_icon( 'bullet_orange', 'imgtag', array( 'title' => emadr_get_status_title( 'suspicious2' ) ) ),
@@ -84,13 +90,15 @@ function emadr_get_status_levels()
 {
 	$levels = array(
 			'unknown'     => 1,
-			'redemption'  => 2,
-			'warning'     => 3,
-			'suspicious1' => 4,
-			'suspicious2' => 5,
-			'suspicious3' => 6,
-			'prmerror'    => 7,
-			'spammer'     => 8,
+			'working'     => 2,
+			'unattended'  => 3,
+			'redemption'  => 4,
+			'warning'     => 5,
+			'suspicious1' => 6,
+			'suspicious2' => 7,
+			'suspicious3' => 8,
+			'prmerror'    => 9,
+			'spammer'     => 10,
 		);
 
 	return $levels;
@@ -185,11 +193,13 @@ function emadr_get_status_icon( $status )
 /**
  * Get result info of email log
  *
- * @param string Result ( 'ok', 'error', 'blocked', 'simulated' )
+ * @param string Result ( 'ok', 'error', 'blocked', 'simulated', 'ready_to_send' )
  * @param boolean Params
+ * @param string Latest timestamp when email was opened
+ * @param string Latest timestamp when a link in the email was clicked
  * @return string Result info
  */
-function emlog_result_info( $result, $params = array() )
+function emlog_result_info( $result, $params = array(), $last_open = NULL, $last_click = NULL )
 {
 	$params = array_merge( array(
 			'display_icon'  => true,	// Display icon
@@ -205,18 +215,32 @@ function emlog_result_info( $result, $params = array() )
 		case 'ok':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_green', 'imgtag', array( 'alt' => T_('Ok') ) );
+				if( empty( $last_open ) && empty( $last_click ) )
+				{
+					$result_info .= get_icon( 'bullet_black', 'imgtag', array( 'alt' => T_('Sent') ) );
+				}
+				else
+				{
+					$result_info .= get_icon( 'bullet_green', 'imgtag', array( 'alt' => T_('Opened') ) );
+				}
 			}
 			if( $params['display_text'] )
 			{
-				$result_info .= ' '.T_('Ok');
+				if( empty( $last_open ) && empty( $last_click ) )
+				{
+					$result_info .= ' '.T_('Sent');
+				}
+				else
+				{
+					$result_info .= ' './* TRANS: Email was already opened */ T_('Opened');
+				}
 			}
 			break;
 
 		case 'error':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_red', 'imgtag', array( 'alt' => T_('Error') ) );
+				$result_info .= get_icon( 'bullet_orange', 'imgtag', array( 'alt' => T_('Error') ) );
 			}
 			if( $params['display_text'] )
 			{
@@ -227,14 +251,14 @@ function emlog_result_info( $result, $params = array() )
 		case 'blocked':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_black', 'imgtag', array( 'alt' => T_('Blocked') ) );
+				$result_info .= get_icon( 'bullet_red', 'imgtag', array( 'alt' => T_('Blocked') ) );
 			}
 			if( $params['display_text'] )
 			{
 				if( $params['link_blocked'] && !empty( $params['email'] ) )
 				{	// Create a link for email address
 					global $admin_url;
-					$result_info .= ' <a href="'.$admin_url.'?ctrl=email&amp;tab=blocked&amp;email='.$params['email'].'">'.T_('Blocked').'</a>';
+					$result_info .= ' <a href="'.$admin_url.'?ctrl=email&amp;email='.$params['email'].'&amp;all_statuses=1">'.T_('Blocked').'</a>';
 				}
 				else
 				{	// Display only text
@@ -246,11 +270,36 @@ function emlog_result_info( $result, $params = array() )
 		case 'simulated':
 			if( $params['display_icon'] )
 			{
-				$result_info .= get_icon( 'bullet_light_blue', 'imgtag', array( 'alt' => T_('Simulated') ) );
+				if( empty( $last_open ) && empty( $last_click ) )
+				{
+					$result_info .= get_icon( 'bullet_gray', 'imgtag', array( 'alt' => T_('Simulated') ) );
+				}
+				else
+				{
+					$result_info .= get_icon( 'bullet_green', 'imgtag', array( 'alt' => T_('Opened') ) );
+				}
 			}
 			if( $params['display_text'] )
 			{
-				$result_info .= ' '.T_('Simulated');
+				if( empty( $last_open ) && empty( $last_click ) )
+				{
+					$result_info .= ' '.T_('Simulated');
+				}
+				else
+				{
+					$result_info .= ' './* TRANS: Email was already opened */ T_('Opened');
+				}
+			}
+			break;
+
+		case 'ready_to_send':
+			if( $params['display_icon'] )
+			{
+				$result_info .= get_icon( 'bullet_empty', 'imgtag', array( 'alt' => T_('Ready to send') ) );
+			}
+			if( $params['display_text'] )
+			{
+				$result_info .= ' '.T_('Ready to send');
 			}
 			break;
 	}
@@ -268,14 +317,19 @@ function emlog_result_info( $result, $params = array() )
  * @param string Message
  * @param string Headers
  * @param string Result type ( 'ok', 'error', 'blocked', 'simulated' )
+ * @param string Key for email tracking
+ * @param integer Email Campaign ID
+ * @param integer Automation ID
  */
-function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
+function mail_log( $user_ID, $to, $subject, $message, $headers, $result, $email_key = NULL, $email_campaign_ID = NULL, $automation_ID = NULL )
 {
-	global $DB, $servertimenow;
+	global $DB, $servertimenow, $localtimenow;
 
 	/**
 	 * @var integer|NULL This global var stores ID of the last inserted mail log
 	 */
+// TODO fp>erwin: why do we need a global below? Why don't we just return $DB->insert_id; ?
+// erwin>fp: this function is called within send_mail() and in EmailCampaign::send_all_emails(), the global is used to update the T_email__campaign_send values after the send_mail() call
 	global $mail_log_insert_ID;
 	$mail_log_insert_ID = NULL;
 
@@ -288,15 +342,18 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
 
 	// Insert mail log
 	$DB->query( 'INSERT INTO T_email__log
-		( emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers )
+		( emlog_key, emlog_timestamp, emlog_user_ID, emlog_to, emlog_result, emlog_subject, emlog_message, emlog_headers, emlog_camp_ID, emlog_autm_ID )
 		VALUES
-		( '.$DB->quote( date2mysql( $servertimenow ) ).',
+		( '.( empty( $email_key ) ? generate_random_key() : $DB->quote( $email_key ) ).',
+			'.$DB->quote( date2mysql( $localtimenow ) ).',
 		  '.$DB->quote( $user_ID ).',
 		  '.$DB->quote( $to ).',
 		  '.$DB->quote( $result ).',
 		  '.$DB->quote( utf8_substr( $subject, 0, 255 ) ).',
 		  '.$DB->quote( $message ).',
-		  '.$DB->quote( $headers ).' )' );
+		  '.$DB->quote( $headers ).',
+		  '.$DB->quote( $email_campaign_ID ).',
+		  '.$DB->quote( $automation_ID ).' )' );
 
 	// Store ID of new inserted mail log
 	$mail_log_insert_ID = $DB->insert_id;
@@ -314,17 +371,149 @@ function mail_log( $user_ID, $to, $subject, $message, $headers, $result )
 }
 
 
+function update_mail_log( $email_ID, $result, $message )
+{
+	global $DB, $servertimenow, $localtimenow;
+	$valid_results = array( 'ok', 'error', 'blocked', 'simulated', 'ready_to_send' );
+	if( ! in_array( $result, $valid_results ) )
+	{
+		debug_die( 'Invalid email log result!' );
+	}
+
+	$DB->query( 'UPDATE T_email__log
+			SET emlog_result = '.$DB->quote( $result )
+			.', emlog_message = '.$DB->quote( $message )
+			.', emlog_timestamp = '.$DB->quote( date2mysql( $localtimenow ) )
+			.' WHERE emlog_ID = '.$DB->quote( $email_ID ) );
+
+	if( $result == 'ok' )
+	{ // Save a report about sending of this message in the table T_email__address
+		// The mail sending was a success. Update last sent date and increase a counter
+		$to = $DB->get_var( 'SELECT emlog_to from T_email__log WHERE emlog_ID = '.$DB->quote( $email_ID ) );
+
+		$DB->query( 'INSERT INTO T_email__address ( emadr_address, emadr_sent_count, emadr_sent_last_returnerror, emadr_last_sent_ts )
+			VALUES( '.$DB->quote( $to ).', 1, 1, '.$DB->quote( date2mysql( $servertimenow ) ).' )
+			ON DUPLICATE KEY UPDATE
+					emadr_sent_count = emadr_sent_count + 1,
+					emadr_sent_last_returnerror = emadr_sent_last_returnerror + 1,
+					emadr_last_sent_ts = '.$DB->quote( date( 'Y-m-d H:i:s', $servertimenow ) ) );
+	}
+}
+
+
+/**
+ * Update time field of mail log row and related tables like email campaign and newsletters
+ *
+ * @param string Type: 'open', 'click'
+ * @param integer Email log ID
+ * @param integer Email log key
+ */
+function update_mail_log_time( $type, $emlog_ID, $emlog_key )
+{
+	global $DB, $localtimenow;
+
+	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+
+	switch( $type )
+	{
+		case 'open':
+			$log_time_field = 'emlog_last_open_ts';
+			$campaign_time_field = 'csnd_last_open_ts';
+			$newsletter_time_field = 'enls_last_open_ts';
+			$campaign_count_field = 'ecmp_img_loads';
+			break;
+
+		case 'click':
+			$log_time_field = 'emlog_last_click_ts';
+			$campaign_time_field = 'csnd_last_click_ts';
+			$newsletter_time_field = 'enls_last_click_ts';
+			$campaign_count_field = 'ecmp_link_clicks';
+			break;
+
+		default:
+			debug_die( 'Invalid mail log time type "'.$type.'"' );
+	}
+
+	// Update last time for email log:
+	$r = $DB->query( 'UPDATE T_email__log
+		  SET '.$log_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
+		WHERE emlog_ID = '.$DB->quote( $emlog_ID ).'
+		  AND emlog_key = '.$DB->quote( $emlog_key ) );
+
+	if( $r )
+	{	// Update last time for email campaign per user:
+
+		// Check if mail is not yet opened
+		$unopened_mail = is_unopened_campaign_mail( $emlog_ID, $send_data );
+		if( empty( $send_data[$campaign_time_field] ) && ! empty( $send_data['csnd_camp_ID'] ) )
+		{ // First image load/click, update appropriate campaign counters
+			$DB->query( 'UPDATE T_email__campaign SET '.$campaign_count_field.' = '.$campaign_count_field.' + 1'.
+					( $unopened_mail ? ', ecmp_open_count = ecmp_open_count + 1' : '' ). // unopened mail, increment open count
+					' WHERE ecmp_ID = '.$DB->quote( $send_data['csnd_camp_ID'] ) );
+		}
+
+		$DB->query( 'UPDATE T_email__campaign_send
+			  SET '.$campaign_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
+			WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ) );
+
+		$SQL = new SQL( 'Get email log data' );
+		$SQL->SELECT( 'emlog_autm_ID, emlog_to, emlog_timestamp' );
+		$SQL->FROM( 'T_email__log' );
+		$SQL->WHERE( 'emlog_ID = '.$DB->quote( $emlog_ID ) );
+		$emlog = $DB->get_row( $SQL );
+
+		if( empty( $emlog->emlog_autm_ID ) )
+		{	// Update last time for user subscriptions of newsletters:
+			$DB->query( 'UPDATE T_email__newsletter_subscription
+				INNER JOIN T_email__campaign ON ecmp_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
+				INNER JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_user_ID = enls_user_ID
+					SET '.$newsletter_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
+				WHERE csnd_emlog_ID = '.$DB->quote( $emlog_ID ).'
+					AND ( enls_last_sent_manual_ts IS NOT NULL OR enls_last_sent_auto_ts IS NOT NULL )' );// When user really received an email from the Newsletter(to avoid subscriptions after email was sent)
+		}
+		else
+		{	// Update last time for user subscriptions of all automation newsletters:
+			$DB->query( 'UPDATE T_email__newsletter_subscription
+				INNER JOIN T_automation__newsletter ON aunl_enlt_ID = enls_enlt_ID AND enls_subscribed = 1
+				INNER JOIN T_email__log ON aunl_autm_ID = emlog_autm_ID AND enls_user_ID = emlog_user_ID
+					SET '.$newsletter_time_field.' = '.$DB->quote( date2mysql( $localtimenow ) ).'
+				WHERE emlog_ID = '.$DB->quote( $emlog_ID ).'
+					AND ( enls_last_sent_manual_ts IS NOT NULL OR enls_last_sent_auto_ts IS NOT NULL )' );// When user really received an email from the Newsletter(to avoid subscriptions after email was sent)
+		}
+
+		$EmailAddressCache = & get_EmailAddressCache();
+		if( ( $EmailAddress = & $EmailAddressCache->get_by_name( $emlog->emlog_to, false, false ) ) &&
+		    ( $emlog->emlog_timestamp > $EmailAddress->get( 'last_open_ts' ) ) )
+		{	// If email address exists in DB and sent date > previous last opened email date:
+			// Update the last opened date of the email address:
+			$EmailAddress->set( 'last_open_ts', $emlog->emlog_timestamp );
+			if( $EmailAddress->get( 'status' ) != 'spammer' &&
+			    ( $EmailAddress->get( 'last_error_ts' ) === NULL ||
+			      $emlog->emlog_timestamp > $EmailAddress->get( 'last_error_ts' )
+			    ) )
+			{	// Switch status to "Working":
+				$EmailAddress->set( 'status', 'working' );
+			}
+			$EmailAddress->dbupdate();
+		}
+	}
+}
+
+
 /**
  * Load the blocked emails from DB in cache
  *
  * @param array User IDs
  * @param array Blocked statuses to know what emails are blocked to send
  *     'unknown'     - Unknown
+ *     'working'     - Working
+ *     'unattended'  - Unattended?
+ *     'redemption'  - Redemption
  *     'warning'     - Warning
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
  *     'suspicious3' - Suspicious 3
- *     'prmerror'    - Permament error
+ *     'prmerror'    - Permanent error
  *     'spammer'     - Spammer
  */
 function load_blocked_emails( $user_IDs, $blocked_statuses = array() )
@@ -369,11 +558,14 @@ function load_blocked_emails( $user_IDs, $blocked_statuses = array() )
  * @param string Email address
  * @param array Blocked statuses to know what emails are blocked to send
  *     'unknown'     - Unknown
+ *     'working'     - Working
+ *     'unattended'  - Unattended?
+ *     'redemption'  - Redemption
  *     'warning'     - Warning
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
  *     'suspicious3' - Suspicious 3
- *     'prmerror'    - Permament error
+ *     'prmerror'    - Permanent error
  *     'spammer'     - Spammer
  * @return boolean TRUE
  */
@@ -395,12 +587,12 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
 	if( !isset( $cache_mail_is_blocked_status[ $status_filter_name ][ $email ] ) )
 	{ // If we check status of this email first time - get it from DB and store in cache
 		global $DB;
-		$SQL = new SQL();
+		$SQL = new SQL( 'Check if email address is blocked' );
 		$SQL->SELECT( 'emadr_ID' );
 		$SQL->FROM( 'T_email__address' );
 		$SQL->WHERE( 'emadr_address = '.$DB->quote( utf8_strtolower( $email ) ) );
 		$SQL->WHERE_and( get_mail_blocked_condition( true, $blocked_statuses ) );
-		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (boolean) $DB->get_var( $SQL->get() );
+		$cache_mail_is_blocked_status[ $status_filter_name ][ $email ] = (boolean) $DB->get_var( $SQL );
 	}
 
 	// Get email block status from cache variable
@@ -409,16 +601,42 @@ function mail_is_blocked( $email, $blocked_statuses = array() )
 
 
 /**
- * Get where conditino to check if a mail is blocked or not
+ * Get email address statuses which are considered as blocked
+ *
+ * @return array
+ */
+function get_blocked_email_statuses()
+{
+	return array( 'prmerror', 'spammer' );
+}
+
+
+/**
+ * Check if the email address status is blocked
+ *
+ * @param string Email address status
+ * @return boolean
+ */
+function is_blocked_email_status( $email_status )
+{
+	return in_array( $email_status, get_blocked_email_statuses() );
+}
+
+
+/**
+ * Get SQL condition to check if a mail is blocked or not
  *
  * @param boolean set true for blocked emails and false for not blocked emails
  * @param array Blocked statuses to know what emails are blocked to send
  *     'unknown'     - Unknown
+ *     'working'     - Working
+ *     'unattended'  - Unattended?
+ *     'redemption'  - Redemption
  *     'warning'     - Warning
  *     'suspicious1' - Suspicious 1
  *     'suspicious2' - Suspicious 2
  *     'suspicious3' - Suspicious 3
- *     'prmerror'    - Permament error
+ *     'prmerror'    - Permanent error
  *     'spammer'     - Spammer
  * @return string the where condition
  */
@@ -428,7 +646,7 @@ function get_mail_blocked_condition( $is_blocked = true, $blocked_statuses = arr
 
 	if( empty( $blocked_statuses ) )
 	{	// Default the blocked statuses
-		$blocked_statuses = array( 'prmerror', 'spammer' );
+		$blocked_statuses = get_blocked_email_statuses();
 	}
 
 	$operator = $is_blocked ? 'IN' : 'NOT IN';
@@ -437,7 +655,7 @@ function get_mail_blocked_condition( $is_blocked = true, $blocked_statuses = arr
 
 
 /**
- * Memorize the blocked emails in cache array in order to display the message 
+ * Memorize the blocked emails in cache array in order to display the message
  * @see blocked_emails_display()
  *
  * @param string Email address
@@ -470,8 +688,10 @@ function blocked_emails_memorize( $email )
 
 /**
  * Display the blocked emails from cache array
+ * 
+ * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
  */
-function blocked_emails_display()
+function blocked_emails_display( $log_messages = false )
 {
 	global $Messages, $cache_blocked_emails;
 
@@ -479,7 +699,15 @@ function blocked_emails_display()
 	{ // Display the messages about the blocked emails (grouped by email)
 		foreach( $cache_blocked_emails as $blocked_email => $blocked_emails_count )
 		{
-			$Messages->add( sprintf( T_('We could not send %d email to %s because this address is blocked.'), $blocked_emails_count, $blocked_email ) );
+			$message = sprintf( T_('We could not send %d email to %s because this address is blocked.'), $blocked_emails_count, $blocked_email );
+			if( $log_messages == 'cron_job' )
+			{
+				cron_log_append( $message."\n", 'error' );
+			}
+			else
+			{
+				$Messages->add( $message );
+			}
 		}
 	}
 }
@@ -610,11 +838,6 @@ function check_smtp_mailer()
 		return T_( 'SMTP gateway is not enabled.' );
 	}
 
-	if( version_compare( phpversion(), '5.2', '<' ) )
-	{ // Swift Mailer works only with PHP 5.2 and higher
-		return T_( 'PHP version must be 5.2 or higher to enable SMTP gateway.' );
-	}
-
 	$smtp_server_host = $Settings->get( 'smtp_server_host' );
 	$smtp_server_port = $Settings->get( 'smtp_server_port' );
 	if( empty( $smtp_server_host ) || empty( $smtp_server_port ) )
@@ -675,9 +898,14 @@ function test_smtp_transport( & $Swift_SmtpTransport )
  */
 function & get_Swift_SmtpTransport()
 {
-	global $Settings;
+	global $Settings, $Swift_SmtpTransport;
 
-	// Load Swift Mailer functions
+	if( isset( $Swift_SmtpTransport ) )
+	{	// Get SMTP Swift Transport from cached global variable:
+		return $Swift_SmtpTransport;
+	}
+
+	// Load Swift Mailer functions:
 	load_funcs( '_ext/swift/swift_required.php' );
 
 	$smtp_server_host = $Settings->get( 'smtp_server_host' );
@@ -686,18 +914,24 @@ function & get_Swift_SmtpTransport()
 	$smtp_server_username = $Settings->get( 'smtp_server_username' );
 	$smtp_server_password = $Settings->get( 'smtp_server_password' );
 
-	// Create the Transport
+	// Create the Transport:
 	$Swift_SmtpTransport = Swift_SmtpTransport::newInstance( $smtp_server_host, $smtp_server_port );
 	if( $smtp_server_security == 'ssl' || $smtp_server_security == 'tls' )
-	{ // Set encryption
+	{	// Set encryption:
 		$Swift_SmtpTransport->setEncryption( $smtp_server_security );
+
+		if( $Settings->get( 'smtp_server_novalidatecert' ) )
+		{	// Do not validate the certificate from the TLS/SSL server:
+			$options = array( 'ssl' => array( 'verify_peer' => false, 'verify_peer_name' => false ) );
+			$Swift_SmtpTransport->setStreamOptions( $options );
+		}
 	}
 	if( ! empty( $smtp_server_username ) )
-	{ // Set username if it is defined
+	{	// Set username if it is defined:
 		$Swift_SmtpTransport->setUsername( $smtp_server_username );
 	}
 	if( ! empty( $smtp_server_password ) )
-	{ // Set password if it is defined
+	{	// Set password if it is defined:
 		$Swift_SmtpTransport->setPassword( $smtp_server_password );
 	}
 
@@ -712,6 +946,13 @@ function & get_Swift_SmtpTransport()
  */
 function & get_Swift_Mailer()
 {
+	global $Swift_Mailer;
+
+	if( isset( $Swift_Mailer ) )
+	{	// Get SMTP Swift Mailer from cached global variable:
+		return $Swift_Mailer;
+	}
+
 	// Create Transport
 	$Swift_SmtpTransport = & get_Swift_SmtpTransport();
 
@@ -742,7 +983,7 @@ function & get_Swift_Mailer()
  */
 function evo_mail( $to, $subject, $message, $headers = array(), $additional_parameters = '' )
 {
-	global $Settings;
+	global $Settings, $mail_log_insert_ID;
 
 	$message_data = $message;
 	if( is_array( $message_data ) && isset( $message_data['full'] ) )
@@ -753,23 +994,69 @@ function evo_mail( $to, $subject, $message, $headers = array(), $additional_para
 	switch( $Settings->get( 'email_service' ) )
 	{
 		case 'smtp':
-			// SMTP sending is preferred
-			$result = evo_mail_smtp( $to, $subject, $message_data, $headers, $additional_parameters );
+			// SMTP sending is preferred:
+			$result = evo_mail_smtp( $to, $subject, $message_data, $headers );
 			if( ! $result && $Settings->get( 'force_email_sending' ) )
-			{ // SMTP sending was failed, Try to send email by php "mail" function
-				$result = @mail( $to, $subject, $message, get_mail_headers( $headers ), $additional_parameters );
+			{	// SMTP sending failed, Fallback to sending email by php "mail" function:
+				syslog_insert( 'Could not send email through SMTP, falling back to PHP function', 'error', 'email_log', empty( $mail_log_insert_ID ) ? NULL : $mail_log_insert_ID );
+				$result = evo_mail_php( $to, $subject, $message, $headers, $additional_parameters );
 			}
 			break;
 
 		case 'mail':
 		default:
-			// PHP "mail" function is preferred
-			$result = @mail( $to, $subject, $message, get_mail_headers( $headers ), $additional_parameters );
+			// PHP "mail" function is preferred:
+			$result = evo_mail_php( $to, $subject, $message, $headers, $additional_parameters );
 			if( ! $result && $Settings->get( 'force_email_sending' ) )
-			{ // "mail" function was failed, Try to send email by SMTP Swift Mailer
-				$result = evo_mail_smtp( $to, $subject, $message_data, $headers, $additional_parameters );
+			{	// "mail" function failed, Fallback to sending email by SMTP Swift Mailer:
+				syslog_insert( 'Could not send email through PHP function, falling back to SMTP', 'error', 'email_log', empty( $mail_log_insert_ID ) ? NULL : $mail_log_insert_ID );
+				$result = evo_mail_smtp( $to, $subject, $message_data, $headers );
 			}
 			break;
+	}
+
+	return $result;
+}
+
+
+/**
+ * Send mail by PHP mail() function
+ *
+ * @param string Receiver, or receivers of the mail
+ * @param string Subject of the email
+ * @param string|array Message OR Array: 'charset', 'full', 'html', 'text'
+ * @param array Email headers
+ * @param string Additional flags as command line options
+ * @return boolean TRUE on success
+ */
+function evo_mail_php( $to, $subject, $message, $headers = array(), $additional_parameters = '' )
+{
+	global $php_mail_sending_log;
+
+	$php_mail_sending_log = '';
+
+	$headers_string = get_mail_headers( $headers );
+
+	if( ! empty( $headers_string ) )
+	{	// Write headers to log:
+		$php_mail_sending_log .= PHP_EOL.'Headers:'.PHP_EOL.$headers_string;
+	}
+
+	if( ! empty( $additional_parameters ) )
+	{	// Write additional params to log:
+		$php_mail_sending_log .= PHP_EOL.'Additional parameters: '.$additional_parameters.PHP_EOL;
+	}
+
+	// Send email by PHP:
+	$result = @mail( $to, $subject, $message, $headers_string, $additional_parameters );
+
+	if( ! $result )
+	{	// Store error log in global var:
+		$php_last_error = error_get_last();
+		if( isset( $php_last_error['message'] ) )
+		{
+			$php_mail_sending_log .= $php_last_error['message'];
+		}
 	}
 
 	return $result;
@@ -783,16 +1070,19 @@ function evo_mail( $to, $subject, $message, $headers = array(), $additional_para
  * @param string Subject of the email
  * @param string|array Message OR Array: 'charset', 'full', 'html', 'text'
  * @param array Email headers
- * @param string Additional flags as command line options
  * @return boolean TRUE on success
  */
-function evo_mail_smtp( $to, $subject, $message, $headers = array(), $additional_parameters = '' )
+function evo_mail_smtp( $to, $subject, $message, $headers = array() )
 {
-	$headers_string = get_mail_headers( $headers );
+	global $smtp_mail_sending_log;
 
 	// Check if we can use SMTP Swift Mailer
 	if( check_smtp_mailer() === true && ( $Swift_Mailer = & get_Swift_Mailer() ) )
 	{ // Use Swift Mailer to send emails using SMTP
+
+		// Register Swift plugin "ArrayLogger":
+		$Swift_Plugins_Loggers_ArrayLogger = new Swift_Plugins_Loggers_ArrayLogger();
+		$Swift_Mailer->registerPlugin( new Swift_Plugins_LoggerPlugin( $Swift_Plugins_Loggers_ArrayLogger ) );
 
 		// Get charset from content type part
 		$charset = ( isset( $headers['Content-Type'] ) && preg_match( '#charset=(.+)$#i', $headers['Content-Type'], $charset ) ) ? $charset[1] : NULL;
@@ -819,8 +1109,7 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array(), $additional
 					// MULTIPLE:
 					if( is_array( $message ) )
 					{ // Body is multiple
-						$Swift_Message->setBody( $message['html'], 'multipart/alternative', $message['charset'] );
-						$Swift_Message->addPart( $message['html'], 'text/html', $message['charset'] );
+						$Swift_Message->setBody( $message['html'], 'text/html', $message['charset'] );
 						$Swift_Message->addPart( $message['text'], 'text/plain', $message['charset'] );
 						break;
 					}
@@ -865,11 +1154,32 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array(), $additional
 		}
 		if( ! empty( $headers['Date'] ) )
 		{ // Date:
-			$Swift_Message->setDate( $headers['Date'] );
+			$Swift_Message->setDate( is_string( $headers['Date'] ) ? strtotime( $headers['Date'] ) : $headers['Date'] );
 		}
 
-		// Send the message
-		return $Swift_Mailer->send( $Swift_Message );
+		// Send the message by SMTP transport:
+		$r = $Swift_Mailer->send( $Swift_Message );
+
+		// Save SMTP log to global cache variable:
+		if( empty( $smtp_mail_sending_log ) )
+		{
+			$smtp_mail_sending_log = '';
+		}
+
+		if( ! empty( $headers ) )
+		{	// Write headers to log:
+			$headers_string = get_mail_headers( $headers );
+			$smtp_mail_sending_log .= PHP_EOL.'Headers:'.PHP_EOL.$headers_string;
+		}
+
+		$recipients = array();
+		foreach( $Swift_Message->getTo() as $recipient_address => $recipient_name )
+		{
+			$recipients[] = '"'.$recipient_name.' <'.$recipient_address.'>"';
+		}
+		$smtp_mail_sending_log .= PHP_EOL.implode( ', ', $recipients ).': '.$Swift_Plugins_Loggers_ArrayLogger->dump();
+
+		return $r;
 	}
 
 	// No email was sent
@@ -905,41 +1215,589 @@ function smtp_connection_test()
 {
 	global $smtp_connection_result;
 
-	$smtp_messages = array();
+	$test_mail_messages = array();
 	$smtp_connection_result = true;
 
 	// Check if Swift Mailer is enabled
 	$check_smtp_result = check_smtp_mailer();
-	$message = T_( 'Check SMTP settings... ' );
+	$message = T_('Check SMTP settings...').' ';
 	if( $check_smtp_result === true )
-	{ // Success
-		$smtp_messages[] = $message.'<span class="green">OK</span>';
-		syslog_insert( $message.'OK', 'info', NULL );
+	{	// Success:
+		$test_mail_messages[] = '<b>'.$message.'</b><b class="green">OK</b>';
+		syslog_insert( $message.' OK', 'info', NULL );
 	}
 	else
-	{ // Error
-		$smtp_messages[] = $message.'<span class="red">'.$check_smtp_result.'</span>';
-		syslog_insert( $message.$check_smtp_result, 'warning', NULL );
+	{	// Error:
+		$test_mail_messages[] = '<b>'.$message.'</b>'.$check_smtp_result.' <b class="red">'.T_('Failed').'</b>';
+		syslog_insert( $message.$check_smtp_result.' '.T_('Failed'), 'warning', NULL );
 		$smtp_connection_result = false;
-		return $smtp_messages;// EXIT
+		return $test_mail_messages;// EXIT
 	}
 
-	// Test a connection
+	// Create SMTP transport:
 	$Swift_SmtpTransport = & get_Swift_SmtpTransport();
+
+	// Register Swift plugin "ArrayLogger":
+	$Swift_Plugins_Loggers_ArrayLogger = new Swift_Plugins_Loggers_ArrayLogger();
+	$Swift_SmtpTransport->registerPlugin( new Swift_Plugins_LoggerPlugin( $Swift_Plugins_Loggers_ArrayLogger ) );
+
+	// Test SMTP connection:
 	$connection_result = test_smtp_transport( $Swift_SmtpTransport );
-	$message = T_( 'Test SMTP connection... ' );
+
+	// Get log of the connection:
+	$smtp_mail_connection_log = PHP_EOL.$Swift_Plugins_Loggers_ArrayLogger->dump();
+
+	$smtp_message = T_('Test SMTP connection...').' ';
+
+	// Set SMTP log text to display on the testing page:
+	$smtp_mail_sending_log_html = '<b>'.$smtp_message.'</b>'
+		.( empty( $smtp_mail_connection_log ) ? ' ' : nl2br( format_to_output( $smtp_mail_connection_log, 'htmlspecialchars' ) ).'<br />' );
+
 	if( $connection_result === true )
 	{ // Success
-		$smtp_messages[] = $message.'<span class="green">OK</span>';
-		syslog_insert( $message.'OK', 'info', NULL );
+		$test_mail_messages[] = $smtp_mail_sending_log_html.'<b class="green">OK</b>';
+		syslog_insert( $smtp_message.$smtp_mail_connection_log.' OK', 'info', NULL );
 	}
 	else
 	{ // Error
-		$smtp_messages[] = $message.'<span class="red">'.$connection_result.'</span>';
-		syslog_insert( $message.$connection_result, 'warning', NULL );
+		$test_mail_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').'</b>';
+		syslog_insert( $smtp_message.$smtp_mail_connection_log.' '.T_('Failed'), 'warning', NULL );
 		$smtp_connection_result = false;
 	}
 
-	return $smtp_messages;
+	return $test_mail_messages;
+}
+
+
+/**
+ * Test email sending by SMTP gateway
+ *
+ * @return array Result messages
+ */
+function smtp_email_sending_test()
+{
+	global $smtp_connection_result, $Settings, $current_User, $smtp_mail_sending_log;
+
+	$smtp_connection_result = true;
+
+	// Firstly try to SMTP connect:
+	$test_mail_messages = smtp_connection_test();
+
+	if( ! $smtp_connection_result )
+	{	// Errors on SMTP connections:
+		return $test_mail_messages;
+		// Exit here.
+	}
+
+	$smtp_message = sprintf( T_( 'Attempting to send a text email to "%s" via external SMTP server...' ), $current_User->get( 'email' ) ).' ';
+
+	// Force temporary to use ONLY SMTP sending:
+	$email_service = $Settings->get( 'email_service' );
+	$Settings->set( 'email_service', 'smtp' );
+	// DON'T force to send email by php "mail":
+	$force_email_sending = $Settings->get( 'force_email_sending' );
+	$Settings->set( 'force_email_sending', false );
+
+	// Send test email:
+	$sending_result = send_mail( $current_User->get( 'email' ), $current_User->get( 'login' ), 'Test SMTP email sending', 'Hello, this is a test.' );
+
+	// Set SMTP log text to display on the testing page:
+	$smtp_mail_sending_log_html = '<b>'.$smtp_message.'</b>'
+		.( empty( $smtp_mail_sending_log ) ? ' ' : nl2br( format_to_output( $smtp_mail_sending_log, 'htmlspecialchars' ) ).'<br />' );
+
+	if( $sending_result === true )
+	{	// Success:
+		$test_mail_messages[] = $smtp_mail_sending_log_html.'<b class="green">OK</b>';
+		syslog_insert( $smtp_message.$smtp_mail_sending_log.' OK', 'info', NULL );
+	}
+	else
+	{	// Error:
+		global $mail_log_message;
+		$test_mail_messages[] = $smtp_mail_sending_log_html.'<b class="red">'.T_('Failed').': '.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'</b>';
+		syslog_insert( $smtp_message.$smtp_mail_sending_log.' '.T_('Failed').': '.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ), 'warning', NULL );
+		$smtp_connection_result = false;
+	}
+
+	// Revert temporary changed settings:
+	$Settings->set( 'email_service', $email_service );
+	$Settings->set( 'force_email_sending', $force_email_sending );
+
+	return $test_mail_messages;
+}
+
+
+/**
+ * Test email sending by PHP
+ *
+ * @return array Result messages
+ */
+function php_email_sending_test()
+{
+	global $Settings, $current_User, $php_mail_sending_log;
+
+	$mail_message = sprintf( T_( 'Attempting to send a text email to "%s" via PHP...' ), $current_User->get( 'email' ) ).' ';
+
+	// Force temporary to use ONLY PHP mail sending:
+	$email_service = $Settings->get( 'email_service' );
+	$Settings->set( 'email_service', 'mail' );
+	// DON'T force to send email by SMTP:
+	$force_email_sending = $Settings->get( 'force_email_sending' );
+	$Settings->set( 'force_email_sending', false );
+
+	// Send test email:
+	$sending_result = send_mail( $current_User->get( 'email' ), $current_User->get( 'login' ), 'Test PHP email sending', 'Hello, this is a test.' );
+
+	// Set SMTP log text to display on the testing page:
+	$php_mail_sending_log_html = '<b>'.$mail_message.'</b>'
+		.( empty( $php_mail_sending_log ) ? ' ' : nl2br( format_to_output( $php_mail_sending_log, 'htmlspecialchars' ) ).'<br />' );
+
+	if( $sending_result === true )
+	{	// Success:
+		$test_mail_messages[] = $php_mail_sending_log_html.'<b class="green">OK</b>';
+		syslog_insert( $mail_message.$php_mail_sending_log.' OK', 'info', NULL );
+	}
+	else
+	{	// Error:
+		global $mail_log_message;
+		$test_mail_messages[] = $php_mail_sending_log_html.'<b class="red">'.T_('Failed').': '.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'</b>';
+		syslog_insert( $mail_message.$php_mail_sending_log.' '.T_('Failed').': '.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ), 'warning', NULL );
+		$smtp_connection_result = false;
+	}
+
+	// Revert temporary changed settings:
+	$Settings->set( 'email_service', $email_service );
+	$Settings->set( 'force_email_sending', $force_email_sending );
+
+	return $test_mail_messages;
+}
+
+
+/**
+ * Adds email tracking to message string
+ *
+ * @param string Message
+ * @param string Email key
+ * @return string Message with email tracking
+ */
+function add_email_tracking( $message, $email_ID, $email_key, $params = array() )
+{
+	global $rsc_url;
+
+	$params = array_merge( array(
+			'content_type' => 'auto',
+			'image_load' => true,
+			'link_click_html' => true,
+			'link_click_text' => true,
+			'template_parts' => array(
+					'header' => 0,
+					'footer' => 0,
+				),
+			'default_template_tag' => NULL
+		), $params );
+
+	load_class( 'tools/model/_emailtrackinghelper.class.php', 'EmailTrackingHelper' );
+
+	if( empty( $email_ID ) )
+	{
+		debug_die( 'No email ID specified.' );
+	}
+
+	if( empty( $email_key ) )
+	{
+		debug_die( 'No email key specified.' );
+	}
+
+	if( $params['content_type'] == 'auto' )
+	{
+		if( is_html( $message ) )
+		{
+			$content_type = 'html';
+		}
+		else
+		{
+			$content_type = 'text';
+		}
+	}
+	else
+	{
+		$content_type = $params['content_type'];
+	}
+
+	$template_message = $message;
+	$template_parts = array();
+	foreach( $params['template_parts'] as $part => $tag )
+	{
+		$re = '~\$template-content-'.$part.'-start\$.*?\$template-content-'.$part.'-end\$~s';
+		preg_match_all( $re, $message, $matches, PREG_SET_ORDER );
+		foreach( $matches as $match )
+		{
+			$key = '#'.rand();
+			$template_parts[$key] = array(
+				'message' => $match[0],
+				'part' => $part,
+				'tag' => $tag );
+
+			$count = 1;
+			$message = str_replace( $match[0], '$template-part-'.$key.'$', $message, $count );
+		}
+	}
+
+	switch( $content_type )
+	{
+		case 'text':
+			// Add link click tracking
+			if( $params['link_click_text'] )
+			{
+				$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#i';
+				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text', $params['default_template_tag'] );
+				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
+			}
+			break;
+
+		case 'html':
+			if( $params['image_load'] )
+			{
+				// Add email open tracking to first image
+				$re = '/(<img\b.+\bsrc=")([^"]*?)(")/iU';
+				$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key, 'html' );
+				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message, 1 );
+
+				/*
+				// Add web beacon
+				$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key );
+				$message .= "\n".'<img src="'.$callback->get_passthrough_url().$rsc_url.'img/blank.gif" />';
+				*/
+			}
+
+			if( $params['link_click_html'] )
+			{
+				// Add link click tracking
+				$re = '/(<a\b.+\bhref=")([^"]*?)(")/iU';
+				$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'html', $params['default_template_tag'] );
+				$message = preg_replace_callback( $re, array( $callback, 'callback' ), $message );
+			}
+			break;
+
+		default:
+			debug_die( 'Invalid content type' );
+	}
+
+	foreach( $template_parts as $key => $row )
+	{
+		switch( $content_type )
+		{
+			case 'text':
+				// Add link click tracking
+				if( $params['link_click_text'] )
+				{
+					$re = '#(\$secret_content_start\$|\b)\s*(https?://[^,\s()<>]+(?:\([\w\d]+\)|(?:[^,[:punct:]\s]?|/)))(\$secret_content_end\$)?#i';
+					$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'plain_text', $row['tag'] );
+					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'] );
+				}
+				break;
+
+			case 'html':
+				if( $params['image_load'] )
+				{
+					// Add email open tracking to first image
+					$re = '/(<img\b.+\bsrc=")([^"]*?)(")/iU';
+					$callback = new EmailTrackingHelper( 'img', $email_ID, $email_key, 'html' );
+					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'], 1 );
+				}
+
+				if( $params['link_click_html'] )
+				{
+					// Add link click tracking
+					$re = '/(<a\b.+\bhref=")([^"]*?)(")/iU';
+					$callback = new EmailTrackingHelper( 'link', $email_ID, $email_key, 'html', $row['tag'] );
+					$template_parts[$key]['message'] = preg_replace_callback( $re, array( $callback, 'callback' ), $template_parts[$key]['message'] );
+				}
+				break;
+
+			default:
+				debug_die( 'Invalid content type' );
+		}
+		$count = 1;
+		$message = str_replace( '$template-part-'.$key.'$', $template_parts[$key]['message'], $message, $count );
+	}
+
+	return $message;
+
+}
+
+
+/**
+ * Helper to display email receiver in cell of sent emails table
+ *
+ * @param integer Email log ID
+ * @param string Email receiver name when no user ID
+ * @param integer Receiver User ID
+ * @return string
+ */
+function emlog_td_receiver( $emlog_ID, $emlog_to, $emlog_user_ID )
+{
+	$deleted_user_note = '';
+	if( !empty( $emlog_user_ID ) )
+	{	// Get user
+		$UserCache = & get_UserCache();
+		if( $User = $UserCache->get_by_ID( $emlog_user_ID, false ) )
+		{
+			$to = $User->get_identity_link();
+		}
+		else
+		{ // could not find user, probably it was deleted
+			$deleted_user_note = '( '.T_( 'Deleted user' ).' )';
+		}
+	}
+
+	if( empty( $to ) )
+	{	// User is not defined
+		global $admin_url;
+		$to = '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID='.$emlog_ID.'">'.htmlspecialchars( $emlog_to ).$deleted_user_note.'</a>';
+	}
+
+	return $to;
+}
+
+
+/**
+ * Initialize Results object for sent emails log list
+ *
+ * @param object Results
+ * @param array Params
+ */
+function emails_sent_log_results( & $emails_Results, $params = array() )
+{
+	global $admin_url;
+
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'display_id'             => true,
+			'display_datetime'       => true,
+			'display_status'         => true,
+			'display_receiver'       => true,
+			'display_subject'        => true,
+			'display_email_campaign' => true,
+			'display_last_opened'    => true,
+			'display_last_clicked'   => true,
+			'display_actions'        => true,
+		), $params );
+
+	if( $params['display_id'] )
+	{	// Display ID column:
+		$emails_Results->cols[] = array(
+				'th' => T_('ID'),
+				'order' => 'emlog_ID',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'right',
+				'td' => '$emlog_ID$',
+			);
+	}
+
+	if( $params['display_datetime'] )
+	{	// Display Date Time column:
+		$emails_Results->cols[] = array(
+				'th' => T_('Date Time'),
+				'order' => 'emlog_timestamp',
+				'default_dir' => 'D',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'timestamp',
+				'td' => '%mysql2localedatetime_spans( #emlog_timestamp# )%',
+			);
+	}
+
+	if( $params['display_status'] )
+	{	// Display Status column:
+		$emails_Results->cols[] = array(
+				'th' => T_('Status'),
+				'order' => 'emlog_result',
+				'td' => '%emlog_result_info( #emlog_result#, array( \'link_blocked\' => true, \'email\' => #emlog_to# ), #emlog_last_open_ts#, #emlog_last_click_ts# )%',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'nowrap'
+			);
+	}
+
+	if( $params['display_receiver'] )
+	{	// Display "To"/receiver column:
+		$emails_Results->cols[] = array(
+				'th' => T_('To'),
+				'order' => 'emlog_to',
+				'td' => '%emlog_td_receiver( #emlog_ID#, #emlog_to#, #emlog_user_ID# )%',
+			);
+	}
+
+	if( $params['display_subject'] )
+	{	// Display Subject column:
+		$emails_Results->cols[] = array(
+				'th' => T_('Subject'),
+				'order' => 'emlog_subject',
+				'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=sent&amp;emlog_ID=$emlog_ID$">%htmlspecialchars(#emlog_subject#)%</a>',
+			);
+	}
+
+	if( $params['display_email_campaign'] )
+	{	// Display Email campaign column:
+		$emails_Results->cols[] = array(
+				'th' => T_('Email campaign'),
+				'order' => 'ecmp_name',
+				'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$emlog_camp_ID$">$ecmp_name$</a>',
+			);
+	}
+
+	if( $params['display_last_opened'] )
+	{	// Display Last opened column:
+		$emails_Results->cols[] = array(
+				'order' => 'emlog_last_open_ts',
+				'default_dir' => 'D',
+				'th' => T_('Last opened'),
+				'th_class' => 'shrinkwrap',
+				'td' => '%mysql2localedatetime_spans( #emlog_last_open_ts# )%',
+				'td_class' => 'timestamp'
+			);
+	}
+
+	if( $params['display_last_clicked'] )
+	{	// Display Last clicked column:
+		$emails_Results->cols[] = array(
+				'order' => 'emlog_last_click_ts',
+				'default_dir' => 'D',
+				'th' => T_('Last clicked'),
+				'th_class' => 'shrinkwrap',
+				'td' => '%mysql2localedatetime_spans( #emlog_last_click_ts# )%',
+				'td_class' => 'timestamp'
+			);
+	}
+
+	if( $params['display_actions'] )
+	{	// Display Actions column:
+		global $current_User;
+		$emails_Results->cols[] = array(
+				'th' => T_('Actions'),
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap',
+				'td' => ( $current_User->check_perm( 'emails', 'edit' ) ? action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=sent&amp;action=delete&amp;emlog_ID=$emlog_ID$&amp;'.url_crumb( 'email' ) ) : '' )
+			);
+	}
+}
+
+
+/**
+ * Helper to display email address in cell of email returns table
+ *
+ * @param string Email address
+ * @return string
+ */
+function emret_td_address( $emret_address )
+{
+	return '<a href="'.regenerate_url( 'email,action,emret_ID', 'email='.$emret_address ).'">'.$emret_address.'</a>';
+}
+
+
+/**
+ * Helper to display action icons in cell of email returns table
+ *
+ * @param string ID of the returned email record
+ * @param string Email address
+ * @return string
+ */
+function emret_td_actions( $emret_ID, $emret_address )
+{
+	global $admin_url, $current_User;
+
+	$r = action_icon( T_('View this email...'), 'magnifier', $admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID='.$emret_ID )
+		.action_icon( T_('Go to users list with this email address'), 'play', $admin_url.'?ctrl=users&amp;filter=new&amp;keywords='.$emret_address );
+
+	if( $current_User->check_perm( 'emails', 'edit' ) )
+	{
+		$r .= action_icon( T_('Delete this record!'), 'delete', $admin_url.'?ctrl=email&amp;tab=return&amp;action=returned_delete&amp;emret_ID='.$emret_ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'blog', '', '', '&' ) ).'&amp;'.url_crumb( 'email' ), '', 1, 0, array( 'onclick' => 'return confirm(\''.TS_('Are you sure want to delete this record?').'\');' ) );
+	}
+
+	return $r;
+}
+
+
+/**
+ * Initialize Results object for email returns list
+ *
+ * @param object Results
+ * @param array Params
+ */
+function email_returns_results( & $email_returns_Results, $params = array() )
+{
+	global $admin_url;
+
+	// Make sure we are not missing any param:
+	$params = array_merge( array(
+			'display_id'         => true,
+			'display_datetime'   => true,
+			'display_address'    => true,
+			'display_error_type' => true,
+			'display_error_msg'  => true,
+			'display_actions'    => true,
+		), $params );
+
+	if( $params['display_id'] )
+	{	// Display ID column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('ID'),
+			'order' => 'emret_ID',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'right',
+			'td' => '$emret_ID$',
+		);
+	}
+
+	if( $params['display_id'] )
+	{	// Display Date Time column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Date Time'),
+			'order' => 'emret_timestamp',
+			'default_dir' => 'D',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'timestamp',
+			'td' => '%mysql2localedatetime_spans( #emret_timestamp# )%',
+		);
+	}
+
+	if( $params['display_address'] )
+	{	// Display Address column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Address'),
+			'order' => 'emret_address',
+			'td' => '%emret_td_address( #emret_address# )%',
+			'th_class' => 'shrinkwrap',
+		);
+	}
+
+	if( $params['display_error_type'] )
+	{	// Display Err Type column:
+		load_funcs( 'cron/model/_decode_returned_emails.funcs.php' );
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Err Type'),
+			'order' => 'emret_errtype',
+			'td' => '%dre_decode_error_type( #emret_errtype# )%',
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+		);
+	}
+
+	if( $params['display_error_msg'] )
+	{	// Display Error column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Error'),
+			'order' => 'emret_errormsg',
+			'td' => '<a href="'.$admin_url.'?ctrl=email&amp;tab=return&amp;emret_ID=$emret_ID$">%htmlspecialchars( #emret_errormsg# )%</a>',
+		);
+	}
+
+	if( $params['display_actions'] )
+	{	// Display Actions column:
+		$email_returns_Results->cols[] = array(
+			'th' => T_('Actions'),
+			'th_class' => 'shrinkwrap small',
+			'td_class' => 'shrinkwrap',
+			'td' => '%emret_td_actions( #emret_ID#, #emret_address# )%'
+		);
+	}
 }
 ?>

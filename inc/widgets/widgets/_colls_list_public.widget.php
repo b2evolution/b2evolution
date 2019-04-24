@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class colls_list_public_Widget extends ComponentWidget
 {
+	var $icon = 'list';
+
 	/**
 	 * Constructor
 	 */
@@ -140,7 +142,7 @@ class colls_list_public_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		return array(
 				'wi_ID'   => $this->ID,					// Have the widget settings changed ?

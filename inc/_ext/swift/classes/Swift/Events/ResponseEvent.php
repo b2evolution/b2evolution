@@ -11,16 +11,14 @@
 /**
  * Generated when a response is received on a SMTP connection.
  *
- * @package    Swift
- * @subpackage Events
- * @author     Chris Corbyn
+ * @author Chris Corbyn
  */
 class Swift_Events_ResponseEvent extends Swift_Events_EventObject
 {
     /**
      * The overall result.
      *
-     * @var boolean
+     * @var bool
      */
     private $_valid;
 
@@ -36,7 +34,7 @@ class Swift_Events_ResponseEvent extends Swift_Events_EventObject
      *
      * @param Swift_Transport $source
      * @param string          $response
-     * @param boolean         $valid
+     * @param bool            $valid
      */
     public function __construct(Swift_Transport $source, $response, $valid = false)
     {
@@ -58,11 +56,10 @@ class Swift_Events_ResponseEvent extends Swift_Events_EventObject
     /**
      * Get the success status of this Event.
      *
-     * @return boolean
+     * @return bool
      */
     public function isValid()
     {
         return $this->_valid;
     }
-
 }

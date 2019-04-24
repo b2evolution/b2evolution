@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  *
@@ -25,7 +25,7 @@ class watermark_plugin extends Plugin
 	var $priority = 10;
 	var $short_desc;
 	var $long_desc;
-	var $version = '5.0.0';
+	var $version = '6.11.1';
 	var $number_of_installs = 1;
 
 	var $fonts_dir = '';
@@ -145,7 +145,7 @@ class watermark_plugin extends Plugin
 
 	function PluginCollSettingsUpdateAction()
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		$font = $this->get_coll_setting( 'coll_font', $Blog );
 
@@ -217,7 +217,7 @@ class watermark_plugin extends Plugin
 		if( $params['root_type'] == 'collection' )
 		{
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $params['root_type_ID'], false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $params['root_type_ID'], false, false );
 		}
 
 		if( ! empty( $Blog ) )

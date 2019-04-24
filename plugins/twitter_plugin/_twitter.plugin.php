@@ -22,12 +22,6 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 // Twitter params initialization
-define( 'TWITTER_CONSUMER_KEY', 'z680vsCAnATc0ZQNgMVwbg' );
-define( 'TWITTER_CONSUMER_SECRET', 'OBo8xI6pvTR1KI0LBHEkjpPPd6nN99tq4SAY8qrBp8' );
-
-//test app
-//define( 'TWITTER_CONSUMER_KEY', 'PTJjBJraSkghuFVXQysPTg' );
-//define( 'TWITTER_CONSUMER_SECRET', 'pcGfALMLaOF6VCaG6FwVO5hI1jtTPEgbLyj6Yo0DN04' );
 
 /**
  * Twitter Plugin
@@ -47,7 +41,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '5.0.0';
+	var $version = '6.11.1';
 	var $author = 'b2evolution Group';
 
 	/*
@@ -64,13 +58,6 @@ class twitter_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		// Check php version
-		if( version_compare( phpversion(), '5.0.0', '<' ) )
-		{ // the plugin is not supported
-			$this->set_status( 'disabled' );
-			return false;
-		}
-
 		if( !extension_loaded( 'curl' ) )
 		{ // the plugin is not supported
 			$this->set_status( 'disabled' );
@@ -112,11 +99,6 @@ class twitter_plugin extends Plugin
 			return T_('The twitter plugin needs a non-empty code.');
 		}
 
-		if( version_compare( phpversion(), '5.0.0', '<' ) )
-		{
-			return T_('The twitter plugin requires PHP 5.');
-		}
-
 		if( !extension_loaded( 'curl' ) )
 		{
 			return T_( 'The twitter plugin requires the PHP curl extension.');
@@ -141,6 +123,35 @@ class twitter_plugin extends Plugin
 			);
 
 		return $this->send_a_tweet( $content, $params['Item'], $params['xmlrpcresp'] );
+	}
+
+
+	/**
+	 * Define the GLOBAL settings of the plugin here. These can then be edited in the backoffice in System > Plugins.
+	 *
+	 * @param array Associative array of parameters (since v1.9).
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating {@link Plugin::$Settings}.
+	 * @return array see {@link Plugin::GetDefaultSettings()}.
+	 * The array to be returned should define the names of the settings as keys (max length is 30 chars)
+	 * and assign an array with the following keys to them (only 'label' is required):
+	 */
+	function GetDefaultSettings( & $params )
+	{
+		return array(
+			'consumer_key' => array(
+				'label' => $this->T_('API key'),
+				'type' => 'text',
+				'size' => 30,
+				'defaultvalue' => 'z680vsCAnATc0ZQNgMVwbg'
+			),
+			'consumer_secret' => array(
+				'label' => $this->T_('API secret'),
+				'type' => 'text',
+				'size' => 50,
+				'defaultvalue' => 'OBo8xI6pvTR1KI0LBHEkjpPPd6nN99tq4SAY8qrBp8'
+			),
+		);
 	}
 
 
@@ -175,6 +186,47 @@ class twitter_plugin extends Plugin
 					'note' => T_('$title$, $excerpt$ and $url$ will be replaced appropriately.'),
 				),
 			);
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlHead( & $params )
+	{
+		global $Collection, $Blog, $Item;
+
+		if( $Blog && $Blog->get_setting( 'tags_twitter_card' ) )
+		{
+			if( $Item )
+			{
+				$Item->get_creator_User();
+			}
+
+			$params = array_merge( array(
+					'blog_ID' => $Blog->ID,
+					'user_ID' => isset( $Item->creator_user_ID ) ? $Item->creator_user_ID : NULL
+				), $params );
+
+			$oauth_info = $this->get_oauth_info( $params );
+
+			if( ! empty( $oauth_info['token'] ) && isset( $oauth_info['contact'] ) )
+			{
+				echo '<meta property="twitter:site" content="@'.$oauth_info['contact'].'" />'."\n";
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
 	}
 
 
@@ -219,7 +271,7 @@ class twitter_plugin extends Plugin
 	 */
 	function get_twitter_link( $target_type, $target_id )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		require_once 'twitteroauth/twitteroauth.php';
 
@@ -252,7 +304,7 @@ class twitter_plugin extends Plugin
 		}
 
 		// create new connection
-		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET);
+		$connection = new TwitterOAuth( $this->Settings->get( 'consumer_key' ), $this->Settings->get( 'consumer_secret' ) );
 
 		// set callback url
 		$callback = $this->get_htsrv_url( 'twitter_callback', array(), '&', true );
@@ -305,7 +357,7 @@ class twitter_plugin extends Plugin
 	 */
 	function get_twitter_contact( $oauth_token, $oauth_token_secret )
 	{
-		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $oauth_token_secret );
+		$connection = new TwitterOAuth( $this->Settings->get( 'consumer_key' ), $this->Settings->get( 'consumer_secret' ), $oauth_token, $oauth_token_secret );
 		// get linked user account
 		$account = $connection->get('account/verify_credentials');
 		if( empty( $account->errors ) )
@@ -352,7 +404,7 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // redirect to blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=renderers&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugins&blog='.$target_id );
 		}
 		else if ($target_type == 'user' )
 		{ // redirect to user advanced preferences form
@@ -394,7 +446,7 @@ class twitter_plugin extends Plugin
 		}
 
 		require_once 'twitteroauth/twitteroauth.php';
-		$connection = new TwitterOAuth( TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth_token, $Session->get( 'oauth_token_secret' ) );
+		$connection = new TwitterOAuth( $this->Settings->get( 'consumer_key' ), $this->Settings->get( 'consumer_secret' ), $oauth_token, $Session->get( 'oauth_token_secret' ) );
 
 		//get access token
 		$access_token = $connection->getAccessToken( $oauth_verifier );
@@ -410,7 +462,7 @@ class twitter_plugin extends Plugin
 			$this->set_coll_setting( 'twitter_contact', $contact, $target_id );
 			// save Collection settings
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $target_id, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $target_id, false, false );
 			$Blog->dbupdate();
 		}
 		else if( $target_type == 'user' )
@@ -451,10 +503,10 @@ class twitter_plugin extends Plugin
 
 		if( $target_type == 'blog' )
 		{ // Blog settings
-			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=renderers&blog='.$target_id );
+			$redirect_to = url_add_param( $admin_url, 'ctrl=coll_settings&tab=plugins&blog='.$target_id );
 
 			$BlogCache = & get_BlogCache();
-			$Blog = $BlogCache->get_by_ID( $target_id );
+			$Collection = $Blog = $BlogCache->get_by_ID( $target_id );
 
 			$this->delete_coll_setting( 'twitter_token', $target_id );
 			$this->delete_coll_setting( 'twitter_secret', $target_id );
@@ -520,7 +572,7 @@ class twitter_plugin extends Plugin
 		if( ! empty($blog_ID) )
 		{	// CollSettings
 			$BlogCache = & get_Cache('BlogCache');
-			$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 			if( !empty( $Blog ) )
 			{
 				$r['token'] = $this->get_coll_setting( 'twitter_token', $Blog );
@@ -552,6 +604,8 @@ class twitter_plugin extends Plugin
 
 	function send_a_tweet( $content, & $Item, & $xmlrpcresp )
 	{
+		global $Messages;
+
 		// Uses either plugin CollSettings or UserSettings
 		$oauth = $this->get_oauth_info( array(
 				'user_ID'	=> $Item->get_creator_User()->ID,
@@ -611,7 +665,7 @@ class twitter_plugin extends Plugin
 		}
 
 		require_once 'twitteroauth/twitteroauth.php';
-		$connection = new TwitterOAuth(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET, $oauth['token'], $oauth['token_secret'] );
+		$connection = new TwitterOAuth( $this->Settings->get( 'consumer_key' ), $this->Settings->get( 'consumer_secret' ), $oauth['token'], $oauth['token_secret'] );
 		$result = $connection->post('statuses/update', array( 'status' => $msg ));
 
 		if( empty($result) )
@@ -619,9 +673,16 @@ class twitter_plugin extends Plugin
 			$xmlrpcresp = 'Unknown error while posting "'.htmlspecialchars( $msg ).'" to account @'.$oauth['contact'];
 			return false;
 		}
-		elseif( !empty($result->error) )
+		elseif( !empty( $result->errors ) )
 		{
-			$xmlrpcresp = $result->error;
+			$xmlrpcresp = array();
+			foreach( $result->errors as $error )
+			{
+				$xmlrpcresp[] = array(
+					'message' => sprintf( T_('Error: %s'), $error->code ).'. '.$error->message,
+					'type' => 'error',
+					'title' => T_('Twitter plugin').':' );
+			}
 			return false;
 		}
 

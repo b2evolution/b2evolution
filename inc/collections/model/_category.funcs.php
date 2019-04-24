@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2004 by The University of North Carolina at Charlotte as
  * contributed by Jason Edgecombe {@link http://tst.uncc.edu/team/members/jason_bio.php}.
@@ -31,8 +31,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param boolean Set to true if the new object needs to be added into the ChapterCache after it was created
  * @param integer Category order
  * @param boolean Is meta category?
+ * @param string Name of default Item Type
+ * @return integer ID of new created Category
  */
-function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_description = NULL, $add_to_cache = false, $cat_order = NULL, $subcat_ordering = NULL, $meta = false )
+function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_description = NULL, $add_to_cache = false, $cat_order = NULL, $subcat_ordering = NULL, $meta = false, $default_item_type_name = NULL )
 {
 	global $DB;
 
@@ -69,6 +71,12 @@ function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_descri
 		$new_Chapter->set( 'meta', 1 );
 	}
 
+	if( $default_item_type_name !== NULL &&
+	    ( $ItemTypeCache = & get_ItemTypeCache() ) &&
+	    ( $ItemType = & $ItemTypeCache->get_by_name( $default_item_type_name, false, false ) ) )
+	{	// Item type exists in DB by requested name, Use it:
+		$new_Chapter->set( 'ityp_ID', $ItemType->ID );
+	}
 
 	if( ! $new_Chapter->dbinsert() )
 	{
@@ -160,7 +168,7 @@ function get_postcount_in_category( $cat_ID, $blog_ID = NULL )
 		$SQL->WHERE_and( 'post_ityp_ID IS NULL OR ityp_usage = "post"' );
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
 		$SQL->GROUP_BY( 'cat_ID' );
-		$number_of_posts_in_cat[ (string) $blog_ID ] = $DB->get_assoc( $SQL->get() );
+		$number_of_posts_in_cat[ (string) $blog_ID ] = $DB->get_assoc( $SQL );
 	}
 
 	return isset( $number_of_posts_in_cat[(string) $blog_ID][$cat_ID] ) ? (int) $number_of_posts_in_cat[(string) $blog_ID][$cat_ID] : 0;
@@ -193,7 +201,7 @@ function get_commentcount_in_category( $cat_ID, $blog_ID = NULL )
 		$SQL->FROM_add( 'LEFT JOIN T_items__item ON comment_item_ID = post_id' );
 		$SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
-		$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback" )' );
+		$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback", "webmention" )' );
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'comment' ), 'comment_', $blog_ID, 'blog_comment!', true ) );
 		// add where condition to show only those posts commetns which are visible for the current User
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );
@@ -209,25 +217,86 @@ function get_commentcount_in_category( $cat_ID, $blog_ID = NULL )
 
 
 /**
+ * Load category associations for requested items
+ *
+ * @param array Item IDs
+ * @return array Item categories IDs
+ */
+function postcats_get_by_IDs( $item_IDs )
+{
+	global $DB, $cache_postcats;
+
+	if( ! is_array( $cache_postcats ) )
+	{	// Initialize cache array first time:
+		$cache_postcats = array();
+	}
+
+	$not_cached_item_IDs = array_diff( $item_IDs, array_keys( $cache_postcats ) );
+
+	if( empty( $not_cached_item_IDs ) )
+	{	// The category associations are loaded for all requested items:
+		return;
+	}
+
+	// Load the category associations from DB and cache into global cache array:
+	$SQL = new SQL( 'Load the category associations for items' );
+	$SQL->SELECT( 'postcat_post_ID AS post_ID, postcat_cat_ID AS cat_ID' );
+	$SQL->FROM( 'T_postcats' );
+	$SQL->WHERE( 'postcat_post_ID IN ( '.$DB->quote( $not_cached_item_IDs ).' )' );
+	$SQL->ORDER_BY( 'postcat_post_ID, postcat_cat_ID' );
+
+	$items_postcats = $DB->get_results( $SQL );
+
+	foreach( $items_postcats as $item_postcats )
+	{
+		if( ! isset( $cache_postcats[ $item_postcats->post_ID ] ) )
+		{
+			$cache_postcats[ $item_postcats->post_ID ] = array();
+		}
+
+		$cache_postcats[ $item_postcats->post_ID ][] = $item_postcats->cat_ID;
+	}
+
+	// Set all unexiting associations for requested items in order to don't repeat SQL queries later:
+	foreach( $not_cached_item_IDs as $not_cached_item_ID )
+	{
+		if( ! isset( $cache_postcats[ $not_cached_item_ID ] ) )
+		{
+			$cache_postcats[ $not_cached_item_ID ] = array();
+		}
+	}
+}
+
+
+/**
  * Get category associations with given item
  *
  * sam2kb> TODO: Cache item cat IDs into Item::categories property instead of global $cache_postcats
+ *
+ * @param integer Item ID
+ * @return array Item categories IDs
  */
 function postcats_get_byID( $post_ID )
 {
 	global $DB, $cache_postcats;
 
-	if( ! isset($cache_postcats[$post_ID]) )
-	{
-		$sql = 'SELECT postcat_cat_ID
-				FROM T_postcats
-				WHERE postcat_post_ID = '.$DB->quote($post_ID).'
-				ORDER BY postcat_cat_ID';
-
-		$cache_postcats[$post_ID] = $DB->get_col( $sql, 0, 'Get category associations with given item' );
+	if( ! is_array( $cache_postcats ) )
+	{	// Initialize cache array first time:
+		$cache_postcats = array();
 	}
 
-	return $cache_postcats[$post_ID];
+	if( ! isset( $cache_postcats[ $post_ID ] ) )
+	{	// Get data from DB if it is not still in cache:
+		$SQL = new SQL( 'Get category associations with given item #'.$post_ID );
+		$SQL->SELECT( 'postcat_cat_ID' );
+		$SQL->FROM( 'T_postcats' );
+		$SQL->WHERE( 'postcat_post_ID = '.$DB->quote( $post_ID ) );
+		$SQL->ORDER_BY( 'postcat_cat_ID' );
+
+		$cache_postcats[ $post_ID ] = $DB->get_col( $SQL );
+	}
+
+	return $cache_postcats[ $post_ID ];
 }
 
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -25,6 +25,8 @@ load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectLis
  */
 class user_avatars_Widget extends ComponentWidget
 {
+	var $icon = 'users';
+
 	/**
 	 * Constructor
 	 */
@@ -63,22 +65,29 @@ class user_avatars_Widget extends ComponentWidget
 				'label' => T_('Layout'),
 				'note' => T_('How to lay out the thumbnails'),
 				'type' => 'select',
-				'options' => array( 
+				'options' => array(
+						'rwd'  => T_( 'RWD Blocks' ),
 						'flow' => T_( 'Flowing Blocks' ),
-						'list' => T_( 'List' ), 
-						'grid' => T_( 'Grid' ),
+						'list' => T_( 'List' ),
+						'grid' => T_( 'Table' ),
 					 ),
 				'defaultvalue' => 'flow',
 			),
-			'grid_nb_cols' => array(
-				'label' => T_( 'Columns' ),
-				'note' => T_( 'Number of columns in grid mode.' ),
-				'size' => 4,
-				'defaultvalue' => 1,
+			'rwd_block_class' => array(
+				'label' => T_('RWD block class'),
+				'note' => T_('Specify the responsive column classes you want to use.'),
+				'size' => 60,
+				'defaultvalue' => 'col-lg-2 col-md-3 col-sm-4 col-xs-6',
 			),
 			'limit' => array(
 				'label' => T_( 'Max pictures' ),
 				'note' => T_( 'Maximum number of pictures to display.' ),
+				'size' => 4,
+				'defaultvalue' => 1,
+			),
+			'grid_nb_cols' => array(
+				'label' => T_( 'Columns' ),
+				'note' => T_( 'Number of columns in Table mode.' ),
 				'size' => 4,
 				'defaultvalue' => 1,
 			),
@@ -93,10 +102,12 @@ class user_avatars_Widget extends ComponentWidget
 				'note' => T_('How to sort the users'),
 				'type' => 'select',
 				'options' => array(
-						'random'  => T_('Random users'),
-						'regdate' => T_('Most recent registrations'),
-						'moddate' => T_('Most recent profile updates'),
-						'numposts' => T_('Number of posts'),
+						'random'     => T_('Random by MySQL (slow)'),
+						'opt_random' => T_('Random by alt algo (experimental)'),
+						'php_random' => T_('Random by PHP (recommended)'),
+						'regdate'    => T_('Most recent registrations'),
+						'moddate'    => T_('Most recent profile updates'),
+						'numposts'   => T_('Number of (Public+Community+Member) posts'),
 					),
 				'defaultvalue' => 'random',
 			),
@@ -187,6 +198,8 @@ class user_avatars_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
+		global $DB;
+
 		$this->init_display( $params );
 
 		$UserCache = & get_UserCache();
@@ -203,6 +216,10 @@ class user_avatars_Widget extends ComponentWidget
 				break;
 			case 'numposts':
 				$sql_order = 'user_numposts DESC';
+				break;
+			case 'opt_random':
+			case 'php_random':
+				$sql_order = 'user_ID';
 				break;
 			case 'random':
 			default:
@@ -231,7 +248,7 @@ class user_avatars_Widget extends ComponentWidget
 		$SQL->WHERE_and( 'user_status <> "closed"' );
 		if( is_logged_in() )
 		{ // Add filters
-			global $current_User, $DB;
+			global $current_User;
 			switch( $this->disp_params[ 'gender' ] )
 			{ // Filter by gender
 				case 'same':
@@ -313,145 +330,176 @@ class user_avatars_Widget extends ComponentWidget
 					break;
 			}
 		}
+
+		$users_limit = intval( $this->disp_params[ 'limit' ] );
 		$SQL->ORDER_BY( $sql_order );
-		$SQL->LIMIT( intval( $this->disp_params[ 'limit' ] ) );
+		$SQL->LIMIT( $users_limit );
 
-		$UserList->sql = $SQL->get();
+		$search_users_by_sql = true;
 
-		$UserList->run_query( false, false, false, 'User avatars widget' );
+		switch( $this->disp_params['order_by'] )
+		{
+			case 'opt_random':
+				// Random by alt algo (experimental):
+				$count_SQL = new SQL( 'Get user numbers for widget #'.$this->ID.' "'.$this->get_name().'"' );
+				$count_SQL->SELECT( 'MIN( user_ID ) AS min_user_ID, MAX( user_ID ) AS max_user_ID, COUNT( user_ID ) AS cnt' );
+				$count_SQL->FROM( 'T_users' );
+				$count_SQL->WHERE( $SQL->get_where( '' ) );
+				$user_nums = $DB->get_row( $count_SQL );
+				if( $user_nums->cnt == 0 )
+				{	// If no users for current filter:
+					$search_users_by_sql = false;
+				}
+				elseif( $user_nums->cnt <= $users_limit )
+				{	// If filtered users number is less or equal than the requested limit:
+					$user_IDs_SQL = $count_SQL;
+					$user_IDs_SQL->title = 'Get filtered user IDs for widget #'.$this->ID.' "'.$this->get_name().'"';
+					$user_IDs_SQL->SELECT( 'user_ID' );
+					$user_IDs = $DB->get_col( $user_IDs_SQL );
+					// Randomizes the order of the user IDs:
+					shuffle( $user_IDs );
+					$SQL->WHERE( 'user_ID IN ( '.implode( ', ', $user_IDs ).' )' );
+					$SQL->ORDER_BY( 'FIND_IN_SET( user_ID, "'.implode( ',', $user_IDs ).'" )' );
+				}
+				else
+				{	// If filtered users number is more than the requested limit:
+					$user_IDs = array();
+					while( count( $user_IDs ) < $users_limit )
+					{
+						$random_user_ID = rand( $user_nums->min_user_ID, $user_nums->max_user_ID );
+						if( ! in_array( $random_user_ID, $user_IDs ) )
+						{	// Use only new random user ID is not array yet:
+							$check_user_SQL = new SQL( 'Check random user ID for widget #'.$this->ID.' "'.$this->get_name().'"' );
+							$check_user_SQL->SELECT( 'user_ID' );
+							$check_user_SQL->FROM( 'T_users' );
+							$check_user_SQL->WHERE( 'user_ID = '.$random_user_ID );
+							$check_user_SQL->WHERE_and( $SQL->get_where( '' ) );
+							if( $DB->get_var( $check_user_SQL ) )
+							{	// Add to array only when user is realted to current filter:
+								$user_IDs[] = $random_user_ID;
+							}
+						}
+					}
+					$SQL->WHERE( 'user_ID IN ( '.implode( ', ', $user_IDs ).' )' );
+					$SQL->ORDER_BY( 'FIND_IN_SET( user_ID, "'.implode( ',', $user_IDs ).'" )' );
+				}
+				// Don't limit because the selection is already limited by fixed array of user IDs:
+				$SQL->LIMIT( '' );
+				break;
 
-		$avatar_link_attrs = '';
-		if( $this->disp_params[ 'style' ] == 'badges' )
-		{ // Remove borders of <td> elements
-			$this->disp_params[ 'grid_cellstart' ] = str_replace( '>', ' style="border:none">', $this->disp_params[ 'grid_cellstart' ] );
-			$avatar_link_attrs = ' class="avatar_rounded"';
+			case 'php_random':
+				// Random by PHP (recommended):
+				$filtered_user_IDs_SQL = new SQL( 'Get all filtered user IDs before PHP random for widget #'.$this->ID.' "'.$this->get_name().'"' );
+				$filtered_user_IDs_SQL->SELECT( 'user_ID' );
+				$filtered_user_IDs_SQL->FROM( 'T_users' );
+				$filtered_user_IDs_SQL->WHERE( $SQL->get_where( '' ) );
+				$filtered_user_IDs = $DB->get_col( $filtered_user_IDs_SQL );
+				$filtered_user_IDs_num = count( $filtered_user_IDs );
+				if( $filtered_user_IDs_num == 0 )
+				{	// If no users for current filter:
+					$search_users_by_sql = false;
+				}
+				else
+				{	// If at least one user is found by widget filter:
+					if( $users_limit > $filtered_user_IDs_num )
+					{	// If filtered users are less than max limit is required by widget setting:
+						$users_limit = $filtered_user_IDs_num;
+					}
+					$user_IDs = array();
+					while( count( $user_IDs ) < $users_limit )
+					{
+						$random_user_ID = $filtered_user_IDs[ rand( 0, $filtered_user_IDs_num - 1 ) ];
+						if( ! in_array( $random_user_ID, $user_IDs ) )
+						{	// Add only new random user ID is not array yet:
+							$user_IDs[] = $random_user_ID;
+						}
+					}
+					$SQL->WHERE( 'user_ID IN ( '.implode( ', ', $user_IDs ).' )' );
+					$SQL->ORDER_BY( 'FIND_IN_SET( user_ID, "'.implode( ',', $user_IDs ).'" )' );
+				}
+				// Don't limit because the selection is already limited by fixed array of user IDs:
+				$SQL->LIMIT( '' );
+				break;
 		}
 
-		$layout = $this->disp_params[ 'thumb_layout' ];
-
-		$nb_cols = intval( $this->disp_params[ 'grid_nb_cols' ] );
 		$count = 0;
 		$r = '';
-		/**
-		 * @var User
-		 */
-		while( $User = & $UserList->get_next() )
-		{
-			if( $layout == 'grid' )
-			{ // Grid layout
-				if( $count % $nb_cols == 0 )
-				{
-					$r .= $this->disp_params[ 'grid_colstart' ];
-				}
-				$r .= $this->disp_params[ 'grid_cellstart' ];
-			}
-			elseif( $layout == 'flow' )
-			{ // Flow block layout
-				$r .= $this->disp_params[ 'flow_block_start' ];
-			}
-			else
-			{ // List layout
-				$r .= $this->disp_params[ 'item_start' ];
+
+		if( $search_users_by_sql )
+		{	// Search users by SQL query:
+			$UserList->sql = $SQL->get();
+			$UserList->run_query( false, false, false, 'Get users by filter of widget #'.$this->ID.' "'.$this->get_name().'"' );
+
+			$avatar_link_attrs = '';
+			if( $this->disp_params[ 'style' ] == 'badges' )
+			{	// Remove borders of <td> elements:
+				$this->disp_params[ 'grid_cellstart' ] = str_replace( '>', ' style="border:none">', $this->disp_params[ 'grid_cellstart' ] );
+				$avatar_link_attrs = ' class="avatar_rounded"';
 			}
 
-			$identity_url = get_user_identity_url( $User->ID );
-			$avatar_tag = $User->get_avatar_imgtag( $this->disp_params['thumb_size'] );
-
-			if( $this->disp_params[ 'bubbletip' ] == '1' )
-			{	// Bubbletip is enabled
-				$bubbletip_param = ' rel="bubbletip_user_'.$User->ID.'"';
-				$avatar_tag = str_replace( '<img ', '<img '.$bubbletip_param.' ', $avatar_tag );
-			}
-
-			if( ! empty( $identity_url ) )
+			while( $User = & $UserList->get_next() )
 			{
-				$r .= '<a href="'.$identity_url.'"'.$avatar_link_attrs.'>';
-				if( $this->disp_params[ 'style' ] != 'username' )
-				{ // Display only username
+				$r .= $this->get_layout_item_start( $count );
+
+				$identity_url = get_user_identity_url( $User->ID );
+				$avatar_tag = $User->get_avatar_imgtag( $this->disp_params['thumb_size'] );
+
+				if( $this->disp_params[ 'bubbletip' ] == '1' )
+				{	// Bubbletip is enabled
+					$bubbletip_param = ' rel="bubbletip_user_'.$User->ID.'"';
+					$avatar_tag = str_replace( '<img ', '<img '.$bubbletip_param.' ', $avatar_tag );
+				}
+
+				if( ! empty( $identity_url ) )
+				{
+					$r .= '<a href="'.$identity_url.'"'.$avatar_link_attrs.'>';
+					if( $this->disp_params[ 'style' ] != 'username' )
+					{	// Display only username:
+						$r .= $avatar_tag;
+					}
+
+					if( $this->disp_params[ 'style' ] == 'badges' )
+					{	// Add user login after picture:
+						$r .= '<br >'.$User->get_colored_login( array( 'login_text' => 'name' ) );
+					}
+					elseif( $this->disp_params[ 'style' ] == 'username' )
+					{	// Display username without <br>:
+						$r .= $User->get_colored_login();
+					}
+					$r .= '</a>';
+				}
+				else
+				{
 					$r .= $avatar_tag;
 				}
 
-				if( $this->disp_params[ 'style' ] == 'badges' )
-				{ // Add user login after picture
-					$r .= '<br >'.$User->get_colored_login();
-				}
-				elseif( $this->disp_params[ 'style' ] == 'username' )
-				{ // username without <br>
-					$r .= $User->get_colored_login();
-				}
-				$r .= '</a>';
-			}
-			else
-			{
-				$r .= $avatar_tag;
-			}
+				++$count;
 
-			++$count;
-
-			if( $layout == 'grid' )
-			{ // Grid layout
-				$r .= $this->disp_params[ 'grid_cellend' ];
-				if( $count % $nb_cols == 0 )
-				{
-					$r .= $this->disp_params[ 'grid_colend' ];
-				}
-			}
-			elseif( $layout == 'flow' )
-			{ // Flow block layout
-				$r .= $this->disp_params[ 'flow_block_end' ];				
-			}
-			else
-			{ // List layout
-				$r .= $this->disp_params[ 'item_end' ];
+				$r .= $this->get_layout_item_end( $count );
 			}
 		}
 
-		// Exit if no files found
-		if( empty($r) ) return;
+		if( $count == 0 )
+		{	// Exit if no users found:
+			return;
+		}
 
-		echo $this->disp_params[ 'block_start'];
+		echo $this->disp_params['block_start'];
 
 		// Display title if requested
 		$this->disp_title();
 
 		echo $this->disp_params['block_body_start'];
 
-		if( $layout == 'grid' )
-		{
-			echo $this->disp_params[ 'grid_start' ];
-		}
-		elseif( $layout == 'flow' )
-		{ // Flow block layout
-			echo $this->disp_params[ 'flow_start' ];
-		}
-		else
-		{
-			echo $this->disp_params[ 'list_start' ];
-		}
-		
+		echo $this->get_layout_start();
+
 		echo $r;
 
-		if( $layout == 'grid' )
-		{
-			if( $count && ( $count % $nb_cols != 0 ) )
-			{
-				echo $this->disp_params[ 'grid_colend' ];
-			}
-
-			echo $this->disp_params[ 'grid_end' ];
-		}
-		elseif ( $layout == 'flow' )
-		{ // Flow block layout
-			echo $this->disp_params[ 'flow_end' ];
-		}
-		else
-		{
-			echo $this->disp_params[ 'list_end' ];
-		}
+		echo $this->get_layout_end( $count );
 
 		echo $this->disp_params['block_body_end'];
 
-		echo $this->disp_params[ 'block_end' ];
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}

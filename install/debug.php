@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -252,6 +252,7 @@ $booststrap_install_form_params = array(
 		'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-4 col-sm-8">',
 		'buttonsend'     => "</div></div>\n\n",
 		'note_format'    => ' <span class="help-inline text-muted small">%s</span>',
+		'bottom_note_format' => ' <div><span class="help-inline text-muted small">%s</span></div>',
 	);
 
 header('Content-Type: text/html; charset='.$evo_charset);
@@ -266,9 +267,9 @@ header('Cache-Control: no-cache'); // no request to this page should get cached!
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title><?php echo format_to_output( T_('b2evo installer').( $title ? ': '.$title : '' ), 'htmlhead' ); ?></title>
-		<script type="text/javascript" src="../rsc/js/jquery.min.js"></script>
+		<script src="../rsc/js/jquery.min.js"></script>
 		<!-- Bootstrap -->
-		<script type="text/javascript" src="../rsc/js/bootstrap/bootstrap.min.js"></script>
+		<script src="../rsc/js/bootstrap/bootstrap.min.js"></script>
 		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
 		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
 	</head>
@@ -334,7 +335,7 @@ switch( $action )
 		 * Form to change the debug config
 		 * -----------------------------------------------------------------------------------
 		 */
-		
+
 		block_open( T_('Debug config') );
 		$Form = new Form( $_SERVER['PHP_SELF'] );
 
@@ -348,11 +349,10 @@ switch( $action )
 		$Form->textarea_input( 'content', $file_overrides_content, 20, T_('Config'), array(
 						'cols' => 50,
 						'note' => 'A few possible settings:<br /><br />
-$minimum_comment_interval = 1;<br />
 $debug = 1;<br />
 $debug_jslog = 1;<br />
 $allow_po_extraction = 1;<br />
-$test_install_all_features = true;<br />
+$allow_install_test_features = true;<br />
 $db_config[\'debug_dump_rows\'] = 20;<br />
 $db_config[\'debug_explain_joins\'] = false;<br />
 $display_errors_on_production = false;'

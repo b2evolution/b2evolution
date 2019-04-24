@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -124,11 +124,24 @@ class AdminUI_general extends Menu
 
 
 	/**
+	 * Page bread crumb path
+	 */
+	var $display_breadcrumbpath = array();
+
+
+	/**
 	 * Titles of bread crumb paths
 	 *
 	 * Used to build a html <title> tag
 	 */
 	var $breadcrumb_titles = array();
+
+	/**
+	 * Titles of bread crumb paths
+	 *
+	 * Used to build a html <title> tag
+	 */
+	var $display_breadcrumb_titles = array();
 
 	/**
 	 * Manual link for entire pages, used to get a big scope describing functionalities.
@@ -142,7 +155,7 @@ class AdminUI_general extends Menu
 	function __construct()
 	{
 		global $mode; // TODO: make it a real property
-		global $htsrv_url, $baseurl;
+		global $baseurl;
 
 		$this->mode = $mode;
 
@@ -186,7 +199,7 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_init( $add_blog = true, $additional_path = array() )
 	{
-		global $Blog, $Settings, $admin_url;
+		global $Collection, $Blog, $Settings, $admin_url;
 
 		// Path to site root
 		$site_style = $Settings->get( 'site_color' ) != '' ? 'style="color:'.$Settings->get( 'site_color' ).'"' : '';
@@ -213,6 +226,11 @@ class AdminUI_general extends Menu
 		$this->page_manual_link = get_manual_link( '', NULL, T_('View manual'), 5 );
 	}
 
+	function display_breadcrumbpath_init()
+	{
+		$this->display_breadcrumbpath = array();
+	}
+
 	/**
 	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
 	*
@@ -223,7 +241,7 @@ class AdminUI_general extends Menu
 	*/
 	function breadcrumbpath_add( $text, $url, $help = NULL, $attrs = '' )
 	{
-		global $Blog, $current_User;
+		global $Collection, $Blog, $current_User;
 
 		$blog_ID = isset($Blog) ? $Blog->ID : 0;
 		$url = str_replace( '$blog$', $blog_ID, $url );
@@ -241,6 +259,43 @@ class AdminUI_general extends Menu
 
 		$this->breadcrumbpath[] = $html;
 		$this->breadcrumb_titles[] = strip_tags( $text );
+	}
+
+	/**
+	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
+	*
+	* @param string Text
+	* @param string Url
+	* @param string Title for help
+	* @param string Additional attributes for link tag
+	*/
+	function display_breadcrumbpath_add( $text, $url = NULL, $help = NULL, $attrs = '' )
+	{
+		global $Collection, $Blog, $current_User;
+
+		$blog_ID = isset($Blog) ? $Blog->ID : 0;
+		if( ! empty( $url ) )
+		{
+			$url = str_replace( '$blog$', $blog_ID, $url );
+
+			$html = $text;
+			if( $current_User->check_perm( 'admin', 'normal' ) )
+			{
+				$html = '<a href="'.$url.'"'.( !empty( $attrs ) ? ' '.$attrs : '' ).'>'.$text.'</a>';
+			}
+		}
+		else
+		{
+			$html = $text;
+		}
+
+		if( ! empty( $help ) )
+		{
+			$html .= ' <abbr title="'.$help.'">?</abbr>';
+		}
+
+		$this->display_breadcrumbpath[] = $html;
+		$this->display_breadcrumb_titles[] = strip_tags( $text );
 	}
 
 	/**
@@ -287,6 +342,47 @@ class AdminUI_general extends Menu
 			}
 
 			$r .= $params['beforeSel'].$this->breadcrumbpath[$i].$params['afterSel'];
+
+			$r .= $params['after'];
+		}
+
+		return $r;
+	}
+
+	/**
+	 * Get breadcrumb path in html format
+	 *
+	 * @param array Params
+	 * @return string Breadcrumb path links
+	 */
+	function display_breadcrumbpath_get_html( $params = array() )
+	{
+		$params = array_merge( array(
+				'before'     => '<div class="col-md-12"><nav aria-label="breadcrumb"><ol class="breadcrumb">',
+				'after'      => '</ol></nav></div>',
+				'beforeText' => '',
+				'beforeEach' => '<li class="breadcrumb-item">',
+				'afterEach'  => '</li>',
+				'beforeSel'  => '<li class="breadcrumb-item active">',
+				'afterSel'   => '</li>',
+				'separator'  => '',
+			), $params );
+
+		$r = '';
+
+		if( $count = count( $this->display_breadcrumbpath ) )
+		{
+			$r = $params['before'].$params['beforeText'];
+
+			for( $i=0; $i<$count-1; $i++ )
+			{
+				$r .= $params['beforeEach']
+						.$this->display_breadcrumbpath[$i]
+						.$params['separator']
+					.$params['afterEach'];
+			}
+
+			$r .= $params['beforeSel'].$this->display_breadcrumbpath[$i].$params['afterSel'];
 
 			$r .= $params['after'];
 		}
@@ -398,7 +494,11 @@ class AdminUI_general extends Menu
 	{
 		global $app_shortname;
 
-		if( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
+		if( ! empty( $this->htmltitle ) )
+		{	// Get html title which is specified for current page:
+			$r = $this->htmltitle;
+		}
+		elseif( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
 		{	// Explicit htmltitle set:
 			$r = $htmltitle;
 		}
@@ -623,6 +723,7 @@ class AdminUI_general extends Menu
 		$params = array_merge( array(
 				'display_menu2' => true,
 				'display_menu3' => true,
+				'display_breadcrumb' => true
 			), $params );
 
 		global $Plugins;
@@ -637,13 +738,19 @@ class AdminUI_general extends Menu
 			$path0 = $this->get_path(0);
 			$r = $this->get_html_menu( $path0, 'sub', 0, ! $params['display_menu2'] );
 
-			echo $this->replace_vars( $r );
 			//echo ' disp_submenu-END ';
+
+			// Show breadcrumbs
+			if( $params['display_breadcrumb'] )
+			{
+				echo $this->display_breadcrumbpath_get_html();
+			}
 
 			// Show 3rd level menu for settings tab
 			$path1 = $this->get_path(1);
-			echo $this->get_html_menu( array($path0, $path1), 'menu3', 0, ! $params['display_menu3'] );
+			$r .= $this->get_html_menu( array($path0, $path1), 'menu3', 0, ! $params['display_menu3'] );
 
+			echo $this->replace_vars( $r );
 
 			$this->displayed_sub_begin = 1;
 		}
@@ -759,7 +866,7 @@ class AdminUI_general extends Menu
 		foreach( $this->coll_list_url_params as $name => $value )
 		{
 			$url_params .= $name.'='.$value.'&amp;';
-			$form_params .= '<input type="hidden" name="'.$name.'" value="'.$value.'" />';
+			$form_params .= '<input type="hidden" name="'.format_to_output( $name, 'htmlattr' ).'" value="'.format_to_output( $value, 'formvalue' ).'" />';
 		}
 
 		$template = $this->get_template( 'CollectionList' );
@@ -777,11 +884,11 @@ class AdminUI_general extends Menu
 
 			$l_Blog = & $BlogCache->get_by_ID( $l_blog_ID );
 
-			if( $l_Blog->get( 'favorite' ) || $l_blog_ID == $blog )
+			if( $l_Blog->favorite() || $l_blog_ID == $blog )
 			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
-				$buttons .= '<a href="'.$url_params.'blog='.$l_blog_ID
+				$buttons .= '<a href="'.format_to_output( $url_params.'blog='.$l_blog_ID, 'htmlattr' )
 							.'" class="'.( $l_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'"';
 
 				if( !is_null($this->coll_list_onclick) )
@@ -801,7 +908,7 @@ class AdminUI_general extends Menu
 				}
 			}
 
-			if( !$l_Blog->get( 'favorite' ) )
+			if( !$l_Blog->favorite() )
 			{ // If blog is not favorute, Add it into the select list:
 				$not_favorite_blogs = true;
 				$select_options .= '<option value="'.$l_blog_ID.'"';
@@ -809,7 +916,7 @@ class AdminUI_general extends Menu
 				{
 					$select_options .= ' selected="selected"';
 				}
-				$select_options .= '>'.$l_Blog->dget( 'shortname', 'formvalue' ).'</option>';
+				$select_options .= '>'.$l_Blog->dget( 'shortname', 'htmlbody' ).'</option>';
 			}
 		}
 
@@ -820,9 +927,9 @@ class AdminUI_general extends Menu
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
 			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
-			$r .= '<a href="'.$this->coll_list_all_url
+			$r .= '<a href="'.format_to_output( $this->coll_list_all_url, 'htmlattr' )
 						.'" class="'.( $blog == 0 ? 'CurrentBlog' : 'OtherBlog' ).'">'
-						.$this->coll_list_all_title.'</a> ';
+						.format_to_output( $this->coll_list_all_title, 'htmlbody' ).'</a> ';
 			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 
@@ -994,9 +1101,9 @@ class AdminUI_general extends Menu
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -1027,8 +1134,8 @@ class AdminUI_general extends Menu
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
@@ -1074,9 +1181,9 @@ class AdminUI_general extends Menu
 							'line_start_odd' => '<tr class="odd">'."\n",
 							'line_start_last' => '<tr class="even lastline">'."\n",
 							'line_start_odd_last' => '<tr class="odd lastline">'."\n",
-								'col_start' => '<td $class_attrib$>',
-								'col_start_first' => '<td class="firstcol $class$">',
-								'col_start_last' => '<td class="lastcol $class$">',
+								'col_start' => '<td $class_attrib$ $colspan_attrib$>',
+								'col_start_first' => '<td class="firstcol $class$" $colspan_attrib$>',
+								'col_start_last' => '<td class="lastcol $class$" $colspan_attrib$>',
 								'col_end' => "</td>\n",
 							'line_end' => "</tr>\n\n",
 							'grp_line_start' => '<tr class="group">'."\n",
@@ -1107,8 +1214,8 @@ class AdminUI_general extends Menu
 						'next_text' => T_('Next'),
 						'no_prev_text' => '',
 						'no_next_text' => '',
-						'list_prev_text' => T_('...'),
-						'list_next_text' => T_('...'),
+						'list_prev_text' => '...',
+						'list_next_text' => '...',
 						'list_span' => 11,
 						'scroll_list_range' => 5,
 					'footer_end' => "</div>\n\n",
@@ -1145,9 +1252,11 @@ class AdminUI_general extends Menu
 					'customstart' => '',
 					'customend' => "\n",
 					'note_format' => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend' => '',
 				);
 
+			case 'accordion_form':
 			case 'compact_form':
 			case 'Form':
 				// Default Form settings:
@@ -1174,6 +1283,7 @@ class AdminUI_general extends Menu
 					'customstart' => '<div class="custom_content">',
 					'customend' => "</div>\n",
 					'note_format' => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend' => '',
 				);
 
@@ -1219,27 +1329,27 @@ class AdminUI_general extends Menu
 			case 'tooltip_plugin':
 				// Plugin name for tooltips: 'bubbletip' or 'popover'
 				return 'bubbletip';
-				break;
 
 			case 'autocomplete_plugin':
 				// Plugin name to autocomplete the fields: 'hintbox', 'typeahead'
 				return 'hintbox';
-				break;
 
 			case 'modal_window_js_func':
 				// JavaScript function to initialize Modal windows, @see echo_user_ajaxwindow_js()
 				return false; // Use standard functions
-				break;
 
 			case 'pagination':
 				// Pagination, @see echo_comment_pages()
 				return array();
-				break;
 
 			case 'blog_base.css':
 				// File name of blog_base.css that are used on several back-office pages
 				return 'blog_base.css';
 				break;
+
+			case 'colorbox_css_file':
+				// CSS file of colorbox, @see require_js_helper( 'colorbox' )
+				return 'colorbox-regular.min.css';
 
 			default:
 				if( $die_on_unknown )
@@ -1497,15 +1607,14 @@ class AdminUI_general extends Menu
 	 */
 	function get_page_head()
 	{
-		global $app_shortname, $app_version, $current_User, $htsrv_url_sensitive, $admin_url, $baseurl, $rsc_url;
+		global $app_shortname, $app_version, $current_User, $admin_url, $baseurl, $rsc_url;
 
-		$secure_htsrv_url = get_secure_htsrv_url();
 		$r = '
 		<div id="header">
 			<div id="headinfo">
 				<span id="headfunctions">'
 					// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
-					.'<a href="'.$secure_htsrv_url.'login.php?action=logout&amp;redirect_to='.rawurlencode(url_rel_to_same_host($admin_url, $secure_htsrv_url)).'">'.T_('Log out').'</a>
+					.'<a href="'.get_htsrv_url( 'login' ).'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $admin_url, get_htsrv_url( 'login' ) ) ).'">'.T_('Log out').'</a>
 					<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
 					.T_('Log out').'" /></a>
 				</span>
@@ -1571,7 +1680,7 @@ class AdminUI_general extends Menu
 
 	/**
 	 * Get show evobar setting. Default true for every admin skin.
-	 * @return boolean 
+	 * @return boolean
 	 */
 	function get_show_evobar()
 	{

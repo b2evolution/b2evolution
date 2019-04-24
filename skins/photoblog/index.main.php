@@ -151,9 +151,10 @@ siteskin_include( '_site_body_header.inc.php' );
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 		skin_include( '_item_block.inc.php', array(
 				'feature_block' => true,
-				'content_mode' => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
-				'intro_mode'   => 'normal',	// Intro posts will be displayed in normal mode
-				'item_class'   => 'featured_post',
+				'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
+				'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+				'item_class'    => 'featured_post',
+				'Item'          => $Item,
 			) );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
@@ -187,7 +188,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				'disp_single' => '',		// We already handled this case above
 				'disp_page'   => '',		// We already handled this case above
 				'mediaidx_thumb_size' => $Skin->get_setting( 'mediaidx_thumb_size' ),
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: you can customize any of the sub templates included here by
 		// copying the matching php file into your skin directory.

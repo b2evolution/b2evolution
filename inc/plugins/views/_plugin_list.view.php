@@ -11,7 +11,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -57,7 +57,7 @@ $Results->grp_cols[] = array(
 	);
 */
 
-$Results->title = T_('Installed plugins').get_manual_link('installed_plugins');
+$Results->title = T_('Installed plugins').get_manual_link('installed-plugins');
 
 if( count( $admin_Plugins->get_plugin_groups() ) )
 {
@@ -198,6 +198,20 @@ $Results->cols[] = array(
 		'th_title' => T_('The code to call the plugin by code (SkinTag) or as Renderer.'),
 		'order' => 'plug_code',
 		'td' => '% {Obj}->code %',
+	);
+
+/*
+ * VERSION TD:
+ */
+function plugin_results_td_version( $Plugin )
+{
+	return '<a href="'.regenerate_url( 'action,plugin_class', 'action=info&amp;plugin_class='.$Plugin->classname )
+		.'">'.$Plugin->version.'</a>';
+
+}
+$Results->cols[] = array(
+		'th' => T_('Version'),
+		'td' => '% plugin_results_td_version( {Obj} ) %'
 	);
 
 /*

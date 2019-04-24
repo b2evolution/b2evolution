@@ -1,0 +1,81 @@
+// Classes to help styling of images
+// May be used in User Generated Content
+
+img {
+	border:none;
+
+	// The following will achieve "fake responsiveness" for images inserted with raw <img src=""> tags.
+	// It will also constrain images added with [inline:]
+	max-width: 100%;
+	height: auto;
+}
+
+
+// Aligning small img with text:
+.top {
+	vertical-align: top !important;
+}
+.middle {
+	vertical-align: middle !important;
+}
+.bottom {
+	vertical-align: bottom !important;
+}
+.baseline {
+	vertical-align: baseline !important;
+}
+.text-bottom {
+	vertical-align: text-bottom !important;
+}
+
+img.icon {
+	vertical-align: bottom;
+}
+
+
+// Classes for adding borders to images, or images added into a wrapper div through [image:] short tag:
+
+// Add a diffuse box box-shadow:
+img.raised,
+.image_block.raised img,
+.evo_image_block.raised img {
+	box-shadow: 0px 0px 11px 0px rgba(0, 0, 0, 0.3);
+}
+// Remove shadow:
+img.noshadow,
+.image_block.noshadow img,
+.evo_image_block.noshadow img {
+	box-shadow: none;
+}
+
+// Add a gray border:
+img.border,
+.image_block.border img,
+.evo_image_block.border img {
+	border: 1px solid #666;
+}
+// Remove border:
+img.noborder,
+.image_block.noborder img,
+.evo_image_block.noborder img {
+	border: none;
+}
+
+// Remove any border-radius:
+img.squared,
+.image_block.squared img,
+.evo_image_block.squared img {
+	border-radius: 0;
+}
+// Add bootstrap-default 4px border-radius:
+img.rounded,
+.image_block.rounded img,
+.evo_image_block.rounded img {
+	border-radius: 4px;
+}
+// Make image round/oval:
+img.round,
+.image_block.round img,
+.evo_image_block.round img {
+	border-radius: 50%;
+}

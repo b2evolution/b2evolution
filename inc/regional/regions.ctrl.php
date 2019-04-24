@@ -14,6 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Load Region class (PHP4):
 load_class( 'regional/model/_region.class.php', 'Region' );
+load_funcs( 'regional/model/_regional.funcs.php' );
 
 /**
  * @var User
@@ -21,6 +22,7 @@ load_class( 'regional/model/_region.class.php', 'Region' );
 global $current_User;
 
 // Check minimum permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'view', true );
 
 // Memorize this as the last "tab" used in the Global Settings:
@@ -137,6 +139,11 @@ switch( $action )
 		}
 		break;
 
+	case 'csv':
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+		break;
+
 	case 'edit':
 		// Check permission:
 		$current_User->check_perm( 'options', 'edit', true );
@@ -162,43 +169,27 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Insert in DB:
-			$DB->begin();
-			$q = $edited_Region->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
+			$edited_Region->dbinsert();
+			$Messages->add( T_('New region created.'), 'success' );
 
-				param_error( 'rgn_code',
-					sprintf( T_('This region already exists. Do you want to <a %s>edit the existing region</a>?'),
-						'href="?ctrl=regions&amp;action=edit&amp;rgn_ID='.$q.'"' ) );
-			}
-			else
+			// What next?
+			switch( $action )
 			{
-				$edited_Region->dbinsert();
-				$Messages->add( T_('New region created.'), 'success' );
-			}
-			$DB->commit();
-
-			if( empty($q) )
-			{	// What next?
-
-				switch( $action )
-				{
-					case 'create_copy':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=regions&action=new&rgn_ID='.$edited_Region->ID, 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create_new':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=regions&action=new', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-					case 'create':
-						// Redirect so that a reload doesn't write to the DB twice:
-						header_redirect( '?ctrl=regions', 303 ); // Will EXIT
-						// We have EXITed already at this point!!
-						break;
-				}
+				case 'create_copy':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=regions&action=new&rgn_ID='.$edited_Region->ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create_new':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=regions&action=new', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
+				case 'create':
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=regions', 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+					break;
 			}
 		}
 		break;
@@ -220,26 +211,12 @@ switch( $action )
 		{	// We could load data from form without errors:
 
 			// Update in DB:
-			$DB->begin();
-			$q = $edited_Region->dbexists();
-			if($q)
-			{	// We have a duplicate entry:
-				param_error( 'rgn_code',
-					sprintf( T_('This region already exists. Do you want to <a %s>edit the existing region</a>?'),
-						'href="?ctrl=regions&amp;action=edit&amp;rgn_ID='.$q.'"' ) );
-			}
-			else
-			{
-				$edited_Region->dbupdate();
-				$Messages->add( T_('Region updated.'), 'success' );
-			}
-			$DB->commit();
+			$edited_Region->dbupdate();
+			$Messages->add( T_('Region updated.'), 'success' );
 
-			if( empty($q) )
-			{	// If no error, Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=regions', 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-			}
+			// If no error, Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=regions', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
 		}
 		break;
 
@@ -275,6 +252,51 @@ switch( $action )
 		}
 		break;
 
+	case 'import':
+		// Import new regions:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'region' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		set_max_execution_time( 0 );
+
+		// Country Id
+		param( 'ctry_ID', 'integer', true );
+		param_check_number( 'ctry_ID', T_('Please select a country'), true );
+
+		// CSV File
+		$import_file = param( 'import_file', 'string', '' );
+		if( empty( $import_file ) )
+		{	// File is not selected:
+			$Messages->add( T_('Please select a CSV file to import.'), 'error' );
+		}
+		else if( ! preg_match( '/\.csv$/i', $import_file ) )
+		{	// Extension is incorrect
+			$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
+		}
+
+		if( param_errors_detected() )
+		{	// Some errors are exist, Stop the importing:
+			$action = 'csv';
+			break;
+		}
+
+		// Import a new regions from CSV file:
+		$count_regions = import_regions( $ctry_ID, $import_file );
+
+		load_class( 'regional/model/_country.class.php', 'Country' );
+		$CountryCache = & get_CountryCache();
+		$Country = $CountryCache->get_by_ID( $ctry_ID );
+
+		$Messages->add( sprintf( T_('%s regions have been added and %s regions have been updated for country %s.'),
+			$count_regions['inserted'], $count_regions['updated'], $Country->get_name() ), 'success' );
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $admin_url.'?ctrl=regions&c='.$ctry_ID, 303 ); // Will EXIT
+		break;
+
 }
 
 
@@ -295,6 +317,9 @@ switch( $action )
 	case 'edit':
 	case 'update':
 		$AdminUI->set_page_manual_link( 'regions-editing' );
+		break;
+	case 'csv':
+		$AdminUI->set_page_manual_link( 'regions-import' );
 		break;
 	default:
 		$AdminUI->set_page_manual_link( 'regions-list' );
@@ -330,6 +355,10 @@ switch( $action )
 	case 'edit':
 	case 'update':
 		$AdminUI->disp_view( 'regional/views/_region.form.php' );
+		break;
+
+	case 'csv':
+		$AdminUI->disp_view( 'regional/views/_region_import.form.php' );
 		break;
 
 	default:

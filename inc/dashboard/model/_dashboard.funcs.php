@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -23,7 +23,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function b2evonet_get_updates( $force_short_delay = false )
 {
 	global $allow_evo_stats; // Possible values: true, false, 'anonymous'
-	global $DB, $debug, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
+	global $DB, $debug, $evonetsrv_protocol, $evonetsrv_host, $evonetsrv_port, $evonetsrv_uri, $servertimenow, $evo_charset;
 	global $Messages, $Settings, $baseurl, $instance_name, $app_name, $app_version, $app_date;
 	global $Debuglog;
 	global $Timer;
@@ -36,6 +36,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 	if( $allow_evo_stats === false )
 	{ // Get outta here:
 		return NULL;
+	}
+
+	if( $Settings->get( 'evonet_last_error' ) > $servertimenow - 5400 )
+	{	// The previous error was less than 90 minutes ago, skip this:
+		return false;
 	}
 
 	if( $debug == 2 )
@@ -90,8 +95,12 @@ function b2evonet_get_updates( $force_short_delay = false )
 	$Settings->dbupdate();
 
 	// Construct XML-RPC client:
-	load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
-	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port );
+	load_funcs( 'xmlrpc/model/_xmlrpc.funcs.php' );
+	if( ! defined( 'CANUSEXMLRPC' ) || CANUSEXMLRPC !== true )
+	{	// Could not use xmlrpc client because server has no the requested extensions:
+		return false;
+	}
+	$client = new xmlrpc_client( $evonetsrv_uri, $evonetsrv_host, $evonetsrv_port, $evonetsrv_protocol );
 	if( $debug > 1 )
 	{
 		$client->debug = 1;
@@ -136,7 +145,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 											'php_uname' => new xmlrpcval( $system_stats['php_uname'], 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
 											'php_gid' => new xmlrpcval( $system_stats['php_gid'], 'int' ),
 											'php_gname' => new xmlrpcval( $system_stats['php_gname'], 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
-											'php_version' => new xmlrpcval( $system_stats['php_version'], 'string' ),			// Target minimum version: PHP 5.2
+											'php_version' => new xmlrpcval( $system_stats['php_version'], 'string' ),			// Target minimum version: PHP 5.4
 											'php_reg_globals' => new xmlrpcval( $system_stats['php_reg_globals'] ? 1 : 0, 'int' ), // if <5% we may actually refuse to run future version on this
 											'php_allow_url_include' => new xmlrpcval( $system_stats['php_allow_url_include'] ? 1 : 0, 'int' ),
 											'php_allow_url_fopen' => new xmlrpcval( $system_stats['php_allow_url_fopen'] ? 1 : 0, 'int' ),
@@ -193,6 +202,11 @@ function b2evonet_get_updates( $force_short_delay = false )
 		}
 	}
 
+	// Response is an error,
+	// Save current server time of this error to don't repeat it during 90 minutes:
+	$Settings->set( 'evonet_last_error', $servertimenow );
+	$Settings->dbupdate();
+
 	$Timer->pause('evonet: check for updates');
 	return false;
 }
@@ -209,7 +223,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
 	global $DB;
 
 	$BlogCache = & get_BlogCache();
-	$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+	$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 	$moderation_statuses = $Blog->get_setting( 'moderation_statuses' );
 	$moderation_statuses_condition = '\''.str_replace( ',', '\',\'', $moderation_statuses ).'\'';
 
@@ -221,7 +235,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
 				INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
 
 	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('othercats.cat_blog_ID');
-	$sql .= ' AND comment_type IN (\'comment\',\'trackback\',\'pingback\') ';
+	$sql .= ' AND comment_type IN (\'comment\',\'trackback\',\'pingback\',\'webmention\') ';
 	$sql .= ' AND comment_status IN ( '.$moderation_statuses_condition.' )';
 	$sql .= ' AND '.statuses_where_clause();
 
@@ -242,12 +256,12 @@ function get_comments_awaiting_moderation_number( $blog_ID )
  */
 function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limit = 5, $comment_IDs = array(), $script = true )
 {
-	global $current_User, $dispatcher;
+	global $current_User;
 
 	if( is_null( $CommentList ) )
 	{ // Inititalize CommentList
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 
 		$CommentList = new CommentList2( $Blog, NULL, 'CommentCache', 'cmnt_fullview_', 'fullview' );
 		$exlude_ID_list = NULL;
@@ -260,7 +274,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		// Filter list:
 		$CommentList->set_filters( array(
-				'types' => array( 'comment', 'trackback', 'pingback' ),
+				'types' => array( 'comment', 'trackback', 'pingback', 'webmention' ),
 				'statuses' => $moderation_statuses,
 				'comment_ID_list' => $exlude_ID_list,
 				'post_statuses' => array( 'published', 'community', 'protected' ),
@@ -268,11 +282,11 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 				'comments' => $limit,
 			) );
 
-		// Run SQL query to get results depending on current filters:
-		$CommentList->query();
-
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
+
+		// Load data of comments from the current page at once to cache variables:
+		$CommentList->load_list_data();
 	}
 
 	$index = 0;
@@ -281,15 +295,17 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 	{ // Loop through comments:
 		$new_comment_IDs[] = $Comment->ID;
 		$index = $index + 1;
+		$is_meta = $Comment->is_meta();
+
 		// Only 5 normal comments should be visible, set hidden status for the rest:
-		$hidden_status = ( $index > 5 && ! $Comment->is_meta() ) ? ' hidden_comment' : '';
+		$hidden_status = ( $index > 5 && ! $is_meta ) ? ' hidden_comment' : '';
 
 		echo '<div id="comment_'.$Comment->ID.'" class="dashboard_post dashboard_post_'.($CommentList->current_idx % 2 ? 'even' : 'odd' ).$hidden_status.'">';
 
-		if( ! $Comment->is_meta() )
+		if( ! $is_meta )
 		{	// Display status banner only for normal comments:
 			$Comment->format_status( array(
-					'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+					'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 				) );
 		}
 
@@ -305,14 +321,14 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 			) );
 
 		echo '<h3 class="dashboard_comment_title">';
-		if( ! $Comment->is_meta() && ( $Comment->status !== 'draft' || $Comment->author_user_ID == $current_User->ID ) )
+		if( ! $is_meta && ( $Comment->status !== 'draft' || $Comment->author_user_ID == $current_User->ID ) )
 		{ // Display Comment permalink icon
 			echo $Comment->get_permanent_link( '#icon#' ).' ';
 		}
 		echo $Comment->get_title( array(
 				'author_format' => '<strong>%s</strong>',
-				'link_text'     => 'login',
-				'linked_type'   => $Comment->is_meta(),
+				'link_text'     => 'auto',
+				'linked_type'   => $is_meta,
 			) );
 		$comment_Item = & $Comment->get_Item();
 		echo ' '.T_('in response to')
@@ -333,12 +349,13 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		$Comment->spam_karma( ' &bull; '.T_('Spam Karma').': %s%', ' &bull; '.T_('No Spam Karma') );
 		echo '</div>';
 
-		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		$user_permission = $current_User->check_perm( 'meta_comment', 'edit', false, $Comment );
+		if( $user_permission )
 		{ // Put the meta comment content into this container to edit by ajax:
 			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';
 		}
 		$Comment->content( 'htmlbody', true );
-		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
+		if( $user_permission )
 		{ // End of the container that is used to edit meta comment by ajax:
 			echo '</div>';
 		}
@@ -369,7 +386,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		echo '</div>';
 
-		if( ! $Comment->is_meta() )
+		if( ! $is_meta )
 		{	// Display Spam Voting system only for normal comment:
 			$Comment->vote_spam( '', '', '&amp;', true, true, array( 'button_group_class' => button_class( 'group' ).' btn-group-sm' ) );
 		}
@@ -377,6 +394,9 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 		echo '<div class="clear"></div>';
 		echo '</div>';
 		echo '</div>';
+
+		// Flush to immediately display the comment
+		evo_flush();
 	}
 
 	if( !$script )
@@ -392,13 +412,19 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
  * @param string Table name
  * @param string SQL WHERE
  * @param string SQL FROM
+ * @param string SQL title for better debug
  * @return integer A count of the records
  */
-function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
+function get_table_count( $table_name, $sql_where = '', $sql_from = '', $sql_title = '' )
 {
 	global $DB;
 
-	$SQL = new SQL();
+	if( empty( $sql_title ) )
+	{	// Set default SQL title:
+		$sql_title = 'Get a count of the records in the DB table '.$table_name;
+	}
+
+	$SQL = new SQL( $sql_title );
 	$SQL->SELECT( 'COUNT( * )' );
 	$SQL->FROM( $table_name );
 	if( !empty( $sql_from ) )
@@ -410,7 +436,7 @@ function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
 		$SQL->WHERE( $sql_where );
 	}
 
-	return intval( $DB->get_var( $SQL->get() ) );
+	return intval( $DB->get_var( $SQL ) );
 }
 
 
@@ -423,7 +449,7 @@ function get_table_count( $table_name, $sql_where = '', $sql_from = '' )
  */
 function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 {
-	global $Blog, $current_User, $admin_url;
+	global $Collection, $Blog, $current_User, $admin_url;
 
 	// Create empty List:
 	$ItemList = new ItemList2( $Blog, NULL, NULL );
@@ -466,7 +492,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 			$block_title = T_('Recent posts awaiting moderation');
 			break;
 	}
-	// erhsatingin> I am not sure if I should hard-code the $param_prefix or set it when $ItemList is instantiated above 
+	// erhsatingin> I am not sure if I should hard-code the $param_prefix or set it when $ItemList is instantiated above
 	$param_prefix = 'items_type_';
 	$block_title = $block_title.' <a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;'.$param_prefix.'show_statuses[]='.$status.'&amp;'.$param_prefix.'sentence=AND&tab=type" style="text-decoration:none">'.
 				'<span id="badge" class="badge badge-important">'.$ItemList->get_total_rows().'</span></a>'.get_manual_link( 'dashboard-posts-awaiting-moderation' );
@@ -481,17 +507,16 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		$Item->get_creator_User();
 
 		$Item->format_status( array(
-				'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+				'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 			) );
 
 		echo '<div class="dashboard_float_actions">';
 		$Item->edit_link( array( // Link to backoffice for editing
 				'before'    => ' ',
 				'after'     => ' ',
-				'class'     => 'ActionButton btn btn-primary',
+				'class'     => 'ActionButton btn btn-primary btn-sm w80px',
 				'text'      => get_icon( 'edit_button' ).' '.T_('Edit')
 			) );
-		$Item->publish_link( '', '', '#', '#', 'PublishButton btn btn-status-published' );
 		echo get_icon( 'pixel' );
 		echo '</div>';
 
@@ -499,6 +524,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		{ // Display Item permalink icon
 			echo '<span style="float: left; padding-right: 5px; margin-top: 4px">'.$Item->get_permanent_link( '#icon#' ).'</span>';
 		}
+		echo '<div class="dashboard_content">';
 		echo '<h3 class="dashboard_post_title">';
 		$item_title = $Item->dget('title');
 		if( ! strlen($item_title) )
@@ -510,7 +536,7 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 		echo '</span>';
 		echo '</h3>';
 
-		echo '</div>';
+		echo '</div></div>';
 	}
 
 	$block_item_Widget->disp_template_raw( 'block_end' );
@@ -520,14 +546,22 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 
 
 /**
- * Get percent by function log10()
+ * Get percent by logarithm functions
  *
  * @param integer Value
+ * @param integer Max value, NULL - 100000
  * @return integer Percent
  */
-function log10_percent( $value )
+function log10_percent( $value, $max = NULL )
 {
-	$percent = log10( intval( $value ) ) * 2 * 10;
+	if( $max === NULL )
+	{	// Use log10 by default where max value is 100000:
+		$percent = log10( $value ) * 2 * 10;
+	}
+	else
+	{	// Use log with custom max value:
+		$percent = log( $value, $max ) * 100;
+	}
 	return intval( $percent > 100 ? 100 : $percent );
 }
 
@@ -541,20 +575,20 @@ function display_charts( $chart_data )
 {
 	// We'll need to know where the chart will be displayed
 	global $ctrl;
-    
+
 	if( empty( $chart_data ) )
 	{ // No data
 		return;
 	}
 
-	echo '<div class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
+	echo '<div style="display:flex;flex-flow:row wrap" class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
 
 	foreach( $chart_data as $chart_item )
 	{
 		if( $chart_item['type'] == 'number' )
-		{ // Calculate a percent with log10 where max value is 100000
-			$chart_percent = empty( $chart_item['value'] ) ? 0 : log10_percent( $chart_item['value'] );
-			// Set a color for value, from green(0%) to red(100%)
+		{ // Calculate a percent with logarithm functions:
+			$chart_percent = empty( $chart_item['value'] ) ? 0 : log10_percent( $chart_item['value'], ( isset( $chart_item['max'] ) ? $chart_item['max'] : NULL ) );
+			// Set a color for value, from green(0%) to orange(100%)
 			$chart_color = get_color_by_percent( '#61bd4f', '#f2d600', '#ffab4a', $chart_percent );
 		}
 		else
@@ -567,11 +601,11 @@ function display_charts( $chart_data )
 		{ // Display a little chart for not null values
 			$chart_percent = 0.01;
 		}
-        
+
 		// Display chart
 		if( $ctrl == 'coll_settings' )
 		{ // in collection dashboard
-			echo '<div class="center col-xs-4 col-sm-4 col-md-12 col-lg-4"><div class="chart">
+			echo '<div class="center"><div class="chart">
 					<div class="'.$chart_item['type'].'" data-percent="'.$chart_percent.'"><b style="color:'.$chart_color.'">'.$chart_item['value'].'</b></div>
 					<div class="label">'.$chart_item['title'].'</div>
 					</div></div>';

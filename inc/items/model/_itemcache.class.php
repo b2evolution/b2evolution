@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -63,7 +63,14 @@ class ItemCache extends DataObjectCache
 	}
 
 
-	function get_by_cat_ID( $cat_ID, $sorted = false )
+	/**
+	 * Get Item by category ID
+	 *
+	 * @param integer Category ID
+	 * @param string Function to order/compare items for case when their category uses alphabetical sorting
+	 * @return object Item
+	 */
+	function get_by_cat_ID( $cat_ID, $order_alpha_func = 'compare_items_by_title' )
 	{
 		$ChapterCache = & get_ChapterCache();
 		$Chapter = $ChapterCache->get_by_ID( $cat_ID );
@@ -75,7 +82,18 @@ class ItemCache extends DataObjectCache
 
 		if( ! ( isset( $this->items_by_cat_map[$cat_ID]['sorted'] ) && $this->items_by_cat_map[$cat_ID]['sorted'] ) )
 		{ // Not sorted yet
-			$compare_method = $Chapter->get_subcat_ordering() == 'alpha' ? 'compare_items_by_title' : 'compare_items_by_order';
+			if( $Chapter->get_subcat_ordering() == 'alpha' )
+			{	// Alphabetical sorting by title or short title:
+				$compare_method =  $order_alpha_func;
+			}
+			else
+			{	// Manual sorting by order field:
+				$compare_method =  'compare_items_by_order';
+				foreach( $this->items_by_cat_map[$cat_ID]['items'] as $i => $sorted_Item )
+				{	// Set temp var in order to know what category order use to compare:
+					$sorted_Item->sort_current_cat_ID = $cat_ID;
+				}
+			}
 			usort( $this->items_by_cat_map[$cat_ID]['items'], array( 'Item', $compare_method ) );
 			$this->items_by_cat_map[$cat_ID]['sorted'] = true;
 		}
@@ -139,7 +157,7 @@ class ItemCache extends DataObjectCache
 
 		// Initialize $Blog from coll_ID
 		$BlogCache = & get_BlogCache();
-		$Blog = $BlogCache->get_by_ID( $coll_ID );
+		$Collection = $Blog = $BlogCache->get_by_ID( $coll_ID );
 
 		$visibility_statuses = is_admin_page() ? get_visibility_statuses( 'keys', array('trash') ) : get_inskin_statuses( $coll_ID, 'post' );
 
@@ -167,6 +185,72 @@ class ItemCache extends DataObjectCache
 			// Add to the map
 			$this->items_by_cat_map[$row['cat_ID']]['items'][] = $this->get_by_ID( $row['post_ID'] );
 		}
+	}
+
+
+	/**
+	 * Load a set of Item objects into the cache by IDs and slugs
+	 *
+	 * @param array List of IDs and names of Item objects to load
+	 * @return array List of Item objects
+	 */
+	function load_by_IDs_or_slugs( $IDs_slugs )
+	{
+		global $DB, $Debuglog;
+
+		if( empty( $IDs_slugs ) || ! is_array( $IDs_slugs ) )
+		{	// Wrong source data:
+			return array();
+		}
+
+		$IDs = array();
+		$slugs = array();
+		foreach( $IDs_slugs as $ID_slug )
+		{
+			if( is_number( $ID_slug ) )
+			{
+				$IDs[] = $ID_slug;
+			}
+			else
+			{
+				$slugs[] = $ID_slug;
+			}
+		}
+
+		$SQL = $this->get_SQL_object( 'Get the '.$this->objtype.' rows to load the objects into the cache by '.get_class().'->'.__FUNCTION__.'()' );
+		$sql_where = array();
+		if( ! empty( $IDs ) )
+		{	// Load Items by IDs:
+			$sql_where[] = $this->dbIDname.' IN ( '.$DB->quote( $IDs ).' )';
+		}
+		if( ! empty( $slugs ) )
+		{	// Load Items by slugs:
+			$SlugCache = & get_SlugCache();
+			$sql_where[] = $SlugCache->name_field.' IN ( '.$DB->quote( $slugs ).' )';
+			$SQL->SELECT_add( ', slug_title' );
+			$SQL->FROM_add( 'INNER JOIN '.$SlugCache->dbtablename.' ON '.$this->dbIDname.' = slug_itm_ID' );
+			$SQL->WHERE_and( 'slug_type = "item"' );
+			$SQL->GROUP_BY( $this->dbIDname );
+		}
+		$SQL->WHERE_and( implode( ' OR ', $sql_where ) );
+
+		$item_rows = $DB->get_results( $SQL );
+
+		$items = array();
+		foreach( $item_rows as $Item )
+		{
+			$item_slug_title = isset( $Item->slug_title ) ? $Item->slug_title : false;
+			$Item = $this->instantiate( $Item );
+			$items[] = $Item;
+			if( $item_slug_title !== false &&
+			    ! isset( $this->urltitle_index[ $item_slug_title ] ) )
+			{	// Cache Item by slug:
+				$Debuglog->add( 'Cached <strong>'.$this->objtype.'('.$item_slug_title.')</strong>' );
+				$this->urltitle_index[ $item_slug_title ] = $Item;
+			}
+		}
+
+		return $items;
 	}
 
 

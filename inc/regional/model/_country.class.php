@@ -28,6 +28,8 @@ class Country extends DataObject
 	var $status = '';
 	var $block_count = 0;
 
+	var $Currency = NULL;
+
 	/**
 	 * Constructor
 	 *
@@ -87,6 +89,17 @@ class Country extends DataObject
 		param_check_number( 'ctry_curr_ID', T_('Please select a currency') );
 		$this->set_from_Request( 'curr_ID', 'ctry_curr_ID', true );
 
+		if( ! param_errors_detected() )
+		{	// Check country code for duplicating:
+			$existing_ctry_ID = $this->dbexists( 'ctry_code', $this->get( 'code' ) );
+			if( $existing_ctry_ID )
+			{	// We have a duplicate country:
+				param_error( 'ctry_code',
+					sprintf( T_('This country already exists. Do you want to <a %s>edit the existing country</a>?'),
+						'href="?ctrl=countries&amp;action=edit&amp;ctry_ID='.$existing_ctry_ID.'"' ) );
+			}
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -128,20 +141,19 @@ class Country extends DataObject
 
 
 	/**
-	 * Check existence of specified country code in ctry_code unique field.
+	 * Get Currency object of this Country
 	 *
-	 * @param string Name of unique field  OR array of Names (for UNIQUE index with MULTIPLE fields)
-	 * @param mixed specified value        OR array of Values (for UNIQUE index with MULTIPLE fields)
-	 * @return int ID if country code exists otherwise NULL/false
+	 * @return object Currency
 	 */
-	function dbexists( $unique_fields = 'ctry_code', $values = NULL )
+	function & get_Currency()
 	{
-		if( is_null( $values ) )
-		{
-			$values = $this->code;
+		if( $this->Currency === NULL )
+		{	// Initialize Currency for this Country:
+			$CurrencyCache = & get_CurrencyCache();
+			$this->Currency = & $CurrencyCache->get_by_ID( $this->get( 'curr_ID' ), false, false );
 		}
 
-		return parent::dbexists( $unique_fields, $values );
+		return $this->Currency;
 	}
 }
 

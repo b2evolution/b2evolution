@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $admin_url, $Blog, $edited_Item;
+global $admin_url, $Collection, $Blog, $edited_Item;
 
 // Create query
 $SQL = new SQL();
@@ -54,7 +54,7 @@ $Results->global_icon( T_('Do NOT change the type'), 'close', $close_url );
  */
 function get_name_for_itemtype( $ityp_ID, $name )
 {
-	global $admin_url, $edited_Item, $from_tab;
+	global $admin_url, $edited_Item, $from_tab, $blog;
 
 	$current = $edited_Item->ityp_ID == $ityp_ID ? ' '.T_('(current)') : '';
 
@@ -62,7 +62,7 @@ function get_name_for_itemtype( $ityp_ID, $name )
 
 	$duplicated_item_param = get_param( 'p' ) > 0 ? '&amp;p='.get_param( 'p' ) : '';
 
-	return '<strong><a href="'.$admin_url.'?ctrl=items&amp;action=update_type&amp;post_ID='.$edited_Item->ID.'&amp;ityp_ID='.$ityp_ID.$from_tab_param.$duplicated_item_param.'&amp;'.url_crumb( 'item' ).'">'
+	return '<strong><a href="'.$admin_url.'?ctrl=items&amp;action=update_type&amp;blog='.$blog.'&amp;post_ID='.$edited_Item->ID.'&amp;ityp_ID='.$ityp_ID.$from_tab_param.$duplicated_item_param.'&amp;'.url_crumb( 'item' ).'">'
 		.$name.'</a></strong>'
 		.$current;
 }
@@ -89,6 +89,16 @@ $Results->cols[] = array(
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center %conditional( "'.$edited_Item->ityp_ID.'" == #ityp_ID#, " info", "" )%'
 	);
+
+if( $current_User->check_perm( 'options', 'edit' ) )
+{	// Add aactions if current user has a permission:
+	$Results->cols[] = array(
+			'th' => T_('Actions'),
+			'td' => action_icon( T_('Edit this Post Type...'), 'edit', $admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID=$ityp_ID$' ),
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'center',
+		);
+}
 
 // Display results:
 $Results->display();

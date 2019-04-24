@@ -36,7 +36,6 @@ font-size: 1.2em;
 text-align: center;
 color: white;
 height: 182px;
-background:-webkit-linear-gradient(top, #6aace6, #4280b6);
 background: -ms-linear-gradient(top, #6aace6, #4280b6);
 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#6aace6', endColorstr='#4280b6');
 }
@@ -277,7 +276,6 @@ width: 740px;
 clear: both;
 color: #999;
 -webkit-text-size-adjust: none; /* iPhone */
-background:-webkit-linear-gradient(top, #FFF, #e3e3e3);
 background: -ms-linear-gradient(top, #FFF, #e3e3e3);
 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#e3e3e3');
 border-radius: 8px;

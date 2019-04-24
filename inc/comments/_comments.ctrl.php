@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -21,6 +21,9 @@ global $AdminUI;
 global $UserSettings;
 
 $action = param_action( 'list' );
+
+// Set the third level tab
+param( 'tab3', 'string', '', true );
 
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
@@ -51,13 +54,13 @@ switch( $action )
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		set_working_blog( $edited_Comment_Item->get_blog_ID() );
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Some users can delete & change a status of comments in their own posts, set corresponding permlevel
 		if( $edited_Comment->is_meta() )
 		{ // Use special permissions for meta comment
 			$check_permname = 'meta_comment';
-			$check_permlevel = 'delete';
+			$check_permlevel = $action == 'delete' ? 'delete' : 'edit';
 		}
 		elseif( $action == 'publish' || $action == 'update_publish' )
 		{ // Load the new comment status from publish request and set perm check values
@@ -79,9 +82,10 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( $check_permname, $check_permlevel, true, $edited_Comment );
 
-		// Restrict comment status by parent item:
-		$update_restricted_status = ( $action != 'edit' && $action != 'switch_view' );
-		$edited_Comment->restrict_status_by_item( $update_restricted_status );
+		if( $action == 'edit' || $action == 'switch_view' )
+		{	// Restrict comment status by parent item:
+			$edited_Comment->restrict_status();
+		}
 
 		$comment_title = '';
 		$comment_content = htmlspecialchars_decode( $edited_Comment->content );
@@ -106,7 +110,7 @@ switch( $action )
 		$edited_Comment = & Comment_get_by_ID( $comment_ID );
 
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission:
 		$current_User->check_perm( 'blog_post!draft', 'edit', true, $blog );
@@ -132,7 +136,14 @@ switch( $action )
 		}
 
 		// Check permission:
-		$selected = autoselect_blog( 'blog_comments', 'edit' );
+		if( $tab3 == 'meta' )
+		{	// For meta comments:
+			$selected = autoselect_blog( 'meta_comment', 'blog' );
+		}
+		else
+		{	// For normal comments:
+			$selected = autoselect_blog( 'blog_comments', 'view' );
+		}
 		if( ! $selected )
 		{ // No blog could be selected
 			$Messages->add( T_('You have no permission to edit comments.' ), 'error' );
@@ -141,7 +152,7 @@ switch( $action )
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
 		{ // Selected a new blog:
 			$BlogCache = & get_BlogCache();
-			$Blog = & $BlogCache->get_by_ID( $blog );
+			$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 		}
 		break;
 
@@ -156,7 +167,7 @@ switch( $action )
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 		set_working_blog( $edited_Comment_Item->get_blog_ID() );
 		$BlogCache = & get_BlogCache();
-		$Blog = & $BlogCache->get_by_ID( $blog );
+		$Collection = $Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check permission for spam voting
 		$current_User->check_perm( 'blog_vote_spam_comments', 'edit', true, $Blog->ID );
@@ -182,9 +193,6 @@ switch( $action )
 		debug_die( 'unhandled action 1' );
 }
 
-// Set the third level tab
-param( 'tab3', 'string', '', true );
-
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 $AdminUI->breadcrumbpath_add( T_('Comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
 switch( $tab3 )
@@ -199,7 +207,7 @@ switch( $tab3 )
 
 	case 'meta':
 		// Check permission for meta comments:
-		$current_User->check_perm( 'meta_comment', 'blog', true, $Blog );
+		$current_User->check_perm( 'meta_comment', 'view', true, $Blog->ID );
 
 		$AdminUI->breadcrumbpath_add( T_('Meta discussion'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;
@@ -221,7 +229,7 @@ switch( $action )
 		$AdminUI->title_titlearea = T_('Editing comment').' #'.$edited_Comment->ID;
 
 		// Generate available blogs list:
-		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore' ) );
+		$AdminUI->set_coll_list_params( 'blog_comments', 'view', array( 'ctrl' => 'comments', 'filter' => 'restore' ) );
 
 		/*
 		 * Add sub menu entries:
@@ -245,6 +253,9 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
 
+		// Update the folding positions for current user per collection:
+		save_fieldset_folding_values( $Blog->ID );
+
 		if( $edited_Comment->get_author_User() )
 		{	// This comment has been created by member
 			if( $current_User->check_perm( 'users', 'edit' ) && param( 'comment_author_login', 'string', NULL ) !== NULL )
@@ -264,6 +275,7 @@ switch( $action )
 			param( 'newcomment_author_email', 'string' );
 			param( 'newcomment_author_url', 'string' );
 			param( 'comment_allow_msgform', 'integer', 0 /* checkbox */ );
+			param( 'comment_anon_notify', 'integer', 0 );
 
 			param_check_not_empty( 'newcomment_author', T_('Please enter an author name.'), '' );
 			$edited_Comment->set( 'author', $newcomment_author );
@@ -272,6 +284,7 @@ switch( $action )
 			param_check_url( 'newcomment_author_url', 'posting', '' ); // Give posting permissions here
 			$edited_Comment->set( 'author_url', $newcomment_author_url );
 			$edited_Comment->set( 'allow_msgform', $comment_allow_msgform );
+			$edited_Comment->set( 'anon_notify', $comment_anon_notify );
 		}
 
 		// Move to different post
@@ -401,10 +414,6 @@ switch( $action )
 			$edited_Comment->set( 'status', $comment_status );
 		}
 
-		// Restrict comment status by parent item:
-		$edited_Comment->restrict_status_by_item( true );
-		$comment_status = $edited_Comment->get( 'status' );
-
 		param( 'comment_nofollow', 'integer', 0 );
 		$edited_Comment->set_from_Request( 'nofollow' );
 
@@ -423,10 +432,12 @@ switch( $action )
 		{ // UPDATE DB:
 			$edited_Comment->dbupdate();	// Commit update to the DB
 
-			if( $edited_Comment->status == 'published' )
-			{ // comment status was set to published or it was already published, needs to handle notifications
-				$edited_Comment->handle_notifications( false, $current_User->ID );
-			}
+			// Get params to skip/force/mark email notifications:
+			param( 'comment_members_notified', 'string', NULL );
+			param( 'comment_community_notified', 'string', NULL );
+
+			// Execute or schedule email notifications:
+			$edited_Comment->handle_notifications( NULL, false, $comment_members_notified, $comment_community_notified );
 
 			$Messages->add( T_('Comment has been updated.'), 'success' );
 
@@ -437,6 +448,10 @@ switch( $action )
 			}
 			else
 			{	// Redirect to previous page(e.g. comments list) after updating:
+
+				// We want to highlight the edited object on next list display:
+				$Session->set( 'fadeout_array', array( 'comment_ID' => array( $edited_Comment->ID ) ) );
+
 				header_redirect( $redirect_to );
 				/* exited */
 			}
@@ -455,8 +470,12 @@ switch( $action )
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		// comment status was set to published, needs to handle notifications
-		$edited_Comment->handle_notifications( false, $current_User->ID );
+		// Get params to skip/force/mark email notifications:
+		param( 'comment_members_notified', 'string', NULL );
+		param( 'comment_community_notified', 'string', NULL );
+
+		// Execute or schedule email notifications:
+		$edited_Comment->handle_notifications( NULL, false, $comment_members_notified, $comment_community_notified );
 
 		// Set the success message corresponding for the new status
 		switch( $edited_Comment->status )
@@ -561,11 +580,11 @@ switch( $action )
 					INNER JOIN T_categories ON cat_ID = post_main_cat_ID
 					WHERE comment_status = "trash" AND cat_blog_ID = '.$DB->quote( $blog_ID );
 			$comment_ids = $DB->get_col( $query, 0, 'get trash comment ids' );
-			$result = Comment::db_delete_where( 'Comment', NULL, $comment_ids );
+			$result = Comment::db_delete_where( NULL, $comment_ids );
 		}
 		else
 		{ // delete by where clause
-			$result = Comment::db_delete_where( 'Comment', 'comment_status = "trash"' );
+			$result = Comment::db_delete_where( 'comment_status = "trash"' );
 		}
 
 		if( $result !== false )
@@ -664,7 +683,7 @@ switch( $action )
 		$AdminUI->title_titlearea = T_('Latest comments');
 
 		// Generate available blogs list:
-		$AdminUI->set_coll_list_params( 'blog_comments', 'edit', array( 'ctrl' => 'comments', 'filter' => 'restore', 'tab3' => $tab3 ) );
+		$AdminUI->set_coll_list_params( 'blog_comments', 'view', array( 'ctrl' => 'comments', 'filter' => 'restore', 'tab3' => $tab3 ) );
 
 		/*
 		 * Add sub menu entries:
@@ -753,15 +772,23 @@ if( $tab3 == 'fullview' || $tab3 == 'meta' )
 	require_js( '#jqueryUI#' );
 }
 
-if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate' ) ) )
+if( $tab3 == 'fullview' || $tab3 == 'listview' )
+{	// Init JS to autcomplete the user logins:
+	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+}
+
+if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate', 'switch_view' ) ) )
 { // Initialize date picker for _comment.form.php
 	init_datepicker_js();
 	// Init JS to autocomplete the user logins:
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+	// Require colorbox js:
+	require_js_helper( 'colorbox' );
+	// Init JS to quick upload several files:
+	init_fileuploader_js();
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
-require_js( 'communication.js' ); // auto requires jQuery
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );
 
@@ -786,7 +813,21 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'comment-mass-deletion' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'comments-tab' );
+		switch( $tab3 )
+		{
+			case 'fullview':
+				$AdminUI->set_page_manual_link( 'comments-full-text-view' );
+				break;
+			case 'listview':
+				$AdminUI->set_page_manual_link( 'comments-list-view' );
+				break;
+			case 'meta':
+				$AdminUI->set_page_manual_link( 'comments-meta-discussion' );
+				break;
+			default:
+				$AdminUI->set_page_manual_link( 'comments-tab' );
+		}
+
 		break;
 }
 

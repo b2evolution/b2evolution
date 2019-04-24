@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -39,8 +39,18 @@ $Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
-$Form->begin_fieldset( T_('Campaign sending').get_manual_link( 'email-other-settings' ) );
+$Form->begin_fieldset( T_('Email campaign throttling').get_manual_link( 'email-other-settings' ) );
+
+	$Form->radio_input( 'email_campaign_send_mode', $Settings->get( 'email_campaign_send_mode' ),
+		array(
+			array( 'value' => 'immediate', 'label' => T_('Immediate'), 'note' => T_('Press "Next" after each chunk') ),
+			array( 'value' => 'cron', 'label' => T_('Asynchronous'), 'note' => T_('A scheduled job will send chunks') )
+		),
+		T_('Sending'),
+		array( 'lines' => true ) );
+
 	$Form->text_input( 'email_campaign_chunk_size', $Settings->get( 'email_campaign_chunk_size' ), 5, T_('Chunk Size'), T_('emails at a time'), array( 'maxlength' => 10 ) );
+
 $Form->end_fieldset();
 
 if( $current_User->check_perm( 'emails', 'edit' ) )

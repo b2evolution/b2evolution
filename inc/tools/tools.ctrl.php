@@ -4,18 +4,24 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  * @author blueyed: Daniel HAHLER
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $deferred_AdminToolActions;
 
-load_funcs('plugins/_plugin.funcs.php');
-load_funcs('tools/model/_maintenance.funcs.php');
-load_funcs('tools/model/_tool.funcs.php');
+// Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
+$current_User->check_perm( 'options', 'view', true );
+
+load_funcs( 'plugins/_plugin.funcs.php' );
+load_funcs( 'tools/model/_maintenance.funcs.php' );
+load_funcs( 'tools/model/_tool.funcs.php' );
 load_funcs( 'tools/model/_system.funcs.php' );
+//load_funcs( '_core/model/db/_upgrade.funcs.php' );
 
 // load item class
 load_class( 'items/model/_item.class.php', 'Item' );
@@ -29,6 +35,11 @@ if( $current_User->check_perm( 'options', 'edit' ) &&
 
 param( 'tab', 'string', '', true );
 param( 'tab3', 'string', 'tools', true );
+
+if( $tab3 == 'import' )
+{	// Check permission for import pages:
+	$current_User->check_perm( 'options', 'edit', true );
+}
 
 $tab_Plugin = NULL;
 $tab_plugin_ID = false;
@@ -48,7 +59,8 @@ if( ! empty($tab) )
 		}
 		else
 		{
-			$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabAction', $params = array() );
+			$plugin_params = array();
+			$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabAction', $plugin_params );
 		}
 	}
 	else
@@ -62,7 +74,7 @@ if( ! empty($tab) )
 $AdminUI->set_path( 'options', 'misc', !empty( $tab ) ? $tab : $tab3 );
 
 
-if( empty($tab) )
+if( empty( $tab ) )
 {	// "Main tab" actions:
 	if( param( 'action', 'string', '' ) )
 	{
@@ -73,7 +85,7 @@ if( empty($tab) )
 		$current_User->check_perm('options', 'edit', true);
 	}
 
-	set_max_execution_time(0);
+	set_max_execution_time( 0 );
 
 	$Plugins->trigger_event( 'AdminToolAction' );
 
@@ -81,37 +93,54 @@ if( empty($tab) )
 	{
 		case 'del_itemprecache':
 			// Clear pre-rendered item cache (DB)
-			dbm_delete_itemprecache();
+			$template_log_title = T_('Clear pre-rendered item cache (DB)');
+			$template_action = $action;
 			break;
 
 		case 'del_commentprecache':
 			// Clear pre-rendered comment cache (DB)
-			dbm_delete_commentprecache();
+			$template_log_title = T_('Clear pre-rendered comment cache (DB)');
+			$template_action = $action;
 			break;
 
 		case 'del_messageprecache':
 			// Clear pre-rendered message cache (DB)
-			dbm_delete_messageprecache();
+			$template_log_title = T_('Clear pre-rendered message cache (DB)');
+			$template_action = $action;
 			break;
 
 		case 'del_pagecache':
 			// Delete the page cache /blogs/cache
-			dbm_delete_pagecache();
+			$template_log_title = T_('Clear full page caches (/cache/* directories)');
+			$template_action = $action;
 			break;
 
 		case 'del_filecache':
 			// delete the thumbnail cahces .evocache
-			dbm_delete_filecache();
+			$template_log_title = T_('Clear thumbnail caches (?evocache directories)');
+			$template_action = $action;
 			break;
 
 		case 'repair_cache':
 			// Repair cache
-			dbm_repair_cache();
+			$template_log_title = T_('Repair /cache/* directory structure');
+			$template_action = $action;
 			break;
 
-		case 'optimize_tables': // Optimize MyISAM & InnoDB tables
-		case 'check_tables':    // Check ALL database tables
+		case 'optimize_tables':
+			// Optimize MyISAM & InnoDB tables
+			$template_log_title = T_('OPTIMIZE database tables');
+			$template_action = $action;
+			break;
+
+		case 'check_tables':
+			// Check ALL database tables
+			$template_log_title = T_('CHECK database tables');
+			$template_action = $action;
+			break;
+
 		case 'analyze_tables':  // Analize ALL database tables
+			$template_log_title = T_('ANALYZE database tables');
 			$template_action = $action;
 			break;
 
@@ -127,25 +156,32 @@ if( empty($tab) )
 
 		case 'delete_orphan_comments':
 			// delete orphan orphan comments with no matching Item
-			dbm_delete_orphan_comments();
+			$template_log_title = T_('Find and delete all orphan Comments (with no matching Item) - Disk &amp; DB.');
+			$template_action = $action;
 			break;
 
 		case 'delete_orphan_comment_uploads':
 			// delete orphan comment upload, older than 24 hours
-			dbm_delete_orphan_comment_uploads();
+			$template_log_title = T_('Find and delete all orphan comment Uploads - Disk &amp; DB.');
+			$template_action = $action;
 			break;
 
 		case 'delete_orphan_files':
 			// delete orphan File objects with no matching file on disk
+			$template_log_title = T_('Find and delete all orphan File objects (with no matching file on disk) - DB only.');
+			$template_action = $action;
+			break;
+
 		case 'delete_orphan_file_roots':
 			// delete orphan file roots with no matching Blog or User entry in the database
+			$template_log_title = T_('Find and delete all orphan file roots (with no matching Collection or User) and all of their content recursively - Disk &amp; DB.');
 			$template_action = $action;
 			break;
 
 		case 'prune_hits_sessions':
 			// Prune old hits & sessions
-			load_class( 'sessions/model/_hitlist.class.php', 'Hitlist' );
-			Hitlist::dbprune(); // will prune once per day, according to Settings
+			$template_log_title = T_('Prune old hits &amp; sessions (includes OPTIMIZE) - DB only.');
+			$template_action = $action;
 			break;
 
 		case 'create_sample_collections':
@@ -226,6 +262,33 @@ if( empty($tab) )
 			$template_action = 'create_sample_posts';
 			break;
 
+		case 'create_sample_revisions':
+			$blog_ID = param( 'blog_ID', 'string', 0 );
+			$min_revisions = param( 'min_revisions', 'string', 0 );
+			$max_revisions = param( 'max_revisions', 'string', 0 );
+
+			if( ! ( param_check_number( 'blog_ID', T_('Blog ID must be a number'), true ) &&
+					param_check_number( 'min_revisions', T_('Minimum number of revisions field must be a number'), true ) &&
+					param_check_number( 'max_revisions', T_('Maximum number of revisions filed must be a number'), true ) ) )
+			{ // param errors
+				$action = 'show_create_revisions';
+				break;
+			}
+
+			// check blog_ID
+			$BlogCache = & get_BlogCache();
+			$selected_Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
+			if( $selected_Blog == NULL )
+			{
+				$Messages->add( T_('Blog ID must be a valid Blog ID!'), 'error' );
+				$action = 'show_create_revisions';
+				break;
+			}
+
+			// Execute a creating of revisions inside template in order to see the process
+			$template_action = 'create_sample_revisions';
+			break;
+
 		case 'create_sample_users':
 			$num_users = param( 'num_users', 'string', 0 );
 			param_check_number( 'num_users', T_('"How many users" field must be a number'), true );
@@ -233,13 +296,13 @@ if( empty($tab) )
 			$user_groups = param( 'user_groups', 'array:integer' );
 			if( empty( $user_groups ) )
 			{	// At least one option must be selected:
-				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Create new users in') ), 'error' );
+				$Messages->add( sprintf( T_('Please select at least one option of the setting "%s".'), T_('Create new users in') ), 'error' );
 			}
 
 			$advanced_user_perms = param( 'advanced_user_perms', 'array:string' );
 			if( empty( $advanced_user_perms ) )
 			{	// At least one option must be selected:
-				$Messages->add( sprintf( T_('Please selected at least one option of the setting "%s".'), T_('Advanced user perms to grant on existing collections with advanced perms') ), 'error' );
+				$Messages->add( sprintf( T_('Please select at least one option of the setting "%s".'), T_('Advanced user perms to grant on existing collections with advanced perms') ), 'error' );
 			}
 
 			if( param_errors_detected() )
@@ -254,15 +317,49 @@ if( empty($tab) )
 
 		case 'recreate_itemslugs':
 			// Recreate all item slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but redirect to the new one.
-			dbm_recreate_itemslugs();
+			$template_log_title = T_('Recreate all item Slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but will redirect to the new ones - DB only.');
+			$template_action = $action;
 			break;
 
 		case 'recreate_autogenerated_excerpts':
 			// Recreating of autogenerated excerpts
+			$template_log_title = T_('Recreate autogenerated excerpts - DB only.');
+			$template_action = $action;
+			break;
+
 		case 'convert_item_content_separators':
 			// Convert item content separators to new format
 			// Execute these actions inside template in order to see the process
+			$template_log_title = T_('Convert item content separators to [teaserbreak] and [pagebreak] - DB only.');
 			$template_action = $action;
+			break;
+
+		case 'delete_item_versions':
+			param( 'confirmed', 'integer', 0 );
+
+			if( $confirmed )
+			{
+				$template_log_title = T_('Remove all Item version - DB only.');
+				$template_action = $action;
+			}
+			else
+			{
+				$action = 'show_delete_item_versions';
+			}
+			break;
+
+		case 'resize_all_images':
+			param( 'confirmed', 'integer', 0 );
+
+			if( $confirmed )
+			{
+				$template_log_title = T_('Resize all images in the media directory');
+				$template_action = $action;
+			}
+			else
+			{
+				$action = 'show_resize_all_images';
+			}
 			break;
 
 		case 'del_obsolete_tags':
@@ -305,6 +402,20 @@ if( empty($tab) )
 			$template_action = 'create_sample_hits';
 			break;
 
+		case 'create_sample_basedomains':
+			// Create sample base domains:
+			$num_basedomains = param( 'num_basedomains', 'string', 0 );
+
+			if( ! param_check_number( 'num_basedomains', T_('"How many base domains" field must be a number'), true ) )
+			{	// Stop action because of param error:
+				$action = 'show_create_basedomains';
+				break;
+			}
+
+			// Execute a creating of base domains inside template in order to see a process:
+			$template_action = 'create_sample_basedomains';
+			break;
+
 		case 'create_sample_messages':
 			$num_loops = param( 'num_loops', 'string', 0 );
 			$num_messages = param( 'num_messages', 'string', 0 );
@@ -324,6 +435,28 @@ if( empty($tab) )
 			$template_action = 'create_sample_messages';
 			break;
 
+		case 'create_sample_campaigns':
+			$num_campaigns = param( 'num_campaigns', 'string', 0 );
+			param_check_number( 'num_campaigns', T_('"How many email campaigns" field must be a number'), true );
+
+			$campaign_lists = param( 'campaign_lists', 'array:integer' );
+			if( empty( $campaign_lists ) )
+			{	// At least one option must be selected:
+				$Messages->add_to_group( sprintf( T_('Please select at least one option of the setting "%s".'), T_('Create new email campaigns in') ), 'error', T_('Validation errors:') );
+			}
+
+			if( param_errors_detected() )
+			{	// If some param errors then stop a creating and display a form to correct:
+				$action = 'show_create_campaigns';
+				break;
+			}
+
+			$send_campaign_emails = param( 'send_campaign_emails', 'integer', 0 );
+
+			// Execute a creating of users inside template in order to see a process
+			$template_action = 'create_sample_campaigns';
+			break;
+
 		case 'test_flush':
 			// Execute a testing of flush inside template in order to see a process
 			$template_action = 'test_flush';
@@ -331,9 +464,16 @@ if( empty($tab) )
 			break;
 
 		case 'utf8check':
+			//$template_log_title = T_('Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)');
+			load_funcs('_core/model/db/_upgrade.funcs.php');
+			$template_log_title = T_('Normalizing DB charsets...');
+			$template_action = $action;
+			break;
+
 		case 'utf8upgrade':
 			// Check/Upgrade DB to UTF-8
 			load_funcs('_core/model/db/_upgrade.funcs.php');
+			$template_log_title = T_('Normalizing DB charsets...');
 			$template_action = $action;
 			break;
 
@@ -405,8 +545,7 @@ $AdminUI->disp_body_top();
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-
-if( empty($tab) )
+if( empty( $tab ) )
 {
 	switch( $action )
 	{
@@ -429,6 +568,9 @@ if( empty($tab) )
 		case 'show_create_posts':
 			$AdminUI->disp_view( 'tools/views/_create_posts.form.php' );
 			break;
+
+		case 'show_create_revisions':
+			$AdminUI->disp_view( 'tools/views/_create_revisions.form.php' );
 			break;
 
 		case 'show_create_users':
@@ -439,15 +581,33 @@ if( empty($tab) )
 			$AdminUI->disp_view( 'tools/views/_create_test_hit.form.php' );
 			break;
 
+		case 'show_create_basedomains':
+			$AdminUI->disp_view( 'tools/views/_create_basedomains.form.php' );
+			break;
+
 		case 'show_create_messages':
 			// Get count users
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get a count of all users' );
 			$SQL->SELECT( 'COUNT( user_ID )' );
 			$SQL->FROM( 'T_users' );
-			$users_count = $DB->get_var( $SQL->get() );
+			$users_count = $DB->get_var( $SQL );
 			$threads_count = $users_count * $users_count - $users_count + 1;
 
 			$AdminUI->disp_view( 'tools/views/_create_messages.form.php' );
+			break;
+
+		case 'show_create_campaigns':
+			$AdminUI->disp_view( 'tools/views/_create_campaigns.form.php' );
+			break;
+
+		case 'show_delete_item_versions':
+			$AdminUI->disp_view( 'tools/views/_delete_item_versions.form.php' );
+			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
+			break;
+
+		case 'show_resize_all_images':
+			$AdminUI->disp_view( 'tools/views/_image_resize.form.php' );
+			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
 			break;
 
 
@@ -486,7 +646,8 @@ elseif( $tab_Plugin )
 	</div>
 
 	<?php
-	$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabPayload', $params = array() );
+	$plugin_params = array();
+	$Plugins->call_method_if_active( $tab_plugin_ID, 'AdminTabPayload', $plugin_params );
 }
 
 

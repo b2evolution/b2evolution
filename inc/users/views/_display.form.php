@@ -22,8 +22,6 @@ global $current_User;
  */
 global $Settings;
 
-global $dispatcher;
-
 global $collections_Module;
 
 $Form = new Form( NULL, 'settings_checkchanges' );
@@ -70,7 +68,7 @@ $Form->end_fieldset();
 $Form->begin_fieldset( T_('Username display options').get_manual_link('user-username-display-options') );
 
 	$Form->radio( 'username_display', $Settings->get( 'username_display' ),
-		array( array( 'login', T_('Usernames/Logins'), T_('Secure options') ),
+		array( array( 'login', T_('Usernames/Logins'), T_('Most secure option') ),
 					array( 'name', T_('Friendly names (Nickname or Firstname if available)'), T_('WARNING: this may allow users to fake their identity') ),
 		), T_('What to display'), true );
 
@@ -161,7 +159,7 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#allow_anonymous_user_list, #allow_anonymous_user_profiles' ).click( function()
 {
 	if( ! jQuery( '#allow_anonymous_user_list' ).is( ':checked' ) && ! jQuery( '#allow_anonymous_user_profiles' ).is( ':checked' ) )

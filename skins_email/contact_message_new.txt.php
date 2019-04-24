@@ -6,15 +6,16 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+global $Session, $admin_url;
 
 // ---------------------------- EMAIL HEADER INCLUDED HERE ----------------------------
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $htsrv_url, $samedomain_htsrv_url;
 
 // Default params:
 $params = array_merge( array(
@@ -23,45 +24,69 @@ $params = array_merge( array(
 		'message_footer'   => '',
 		'Blog'             => NULL,
 		'message'          => '',
-		'comment_id'       => NULL,
+		'comment_ID'       => NULL,
 		'post_id'          => NULL,
 		'recipient_User'   => NULL,
 		'Comment'          => NULL,
 	), $params );
 
-$Blog = & $params['Blog'];
+$Collection = $Blog = & $params['Blog'];
 $recipient_User = & $params['recipient_User'];
 
 // show sender name
-echo sprintf( T_('%s has sent you this message:'), $params['sender_name'] )."\n\n";
+echo sprintf( T_('%s has sent you this message:'), $params['sender_name'] );
 
-echo $params['message'];
+if( ! empty( $params['additional_fields'] ) )
+{	// Display additional fields which have been entered:
+	echo "\n\n-- \n";
+	foreach( $params['additional_fields'] as $additional_field )
+	{
+		echo $additional_field['title'].': '.$additional_field['text_value']."\n\n";
+	}
+}
+
+if( ! empty( $params['contact_method'] ) )
+{	// Display a preferred contact method only if it has been selected:
+	echo "\n\n-- \n".T_('Reply method').': '.$params['contact_method'];
+}
+
+if( ! empty( $params['message'] ) )
+{	// Display a message only if it has been entered:
+	echo "\n\n-- \n".$params['message'];
+}
+
 echo "\n\n-- \n";
 
-// show sender IP address
-echo sprintf( T_( 'This message was typed by a user connecting from this IP address: %s.' ), implode( ', ', get_ip_list( false, true ) ) )."\n\n";
+if( ! empty( $recipient_User ) && $recipient_User->check_perm( 'stats', 'view' ) )
+{
+	$session_ID = $admin_url.'?ctrl=stats&amp;tab=hits&amp;blog=0&amp;sess_ID='.$Session->ID;
+}
+else
+{
+	$session_ID = $Session->ID;
+}
+echo sprintf( T_('Session ID').': %s', $session_ID ) . "\n";
 
 // show sender email address
 echo sprintf( T_( 'By replying, your email will go directly to %s.' ), $params['sender_address'] );
 
 // show additional message info
-if( !empty( $Blog ) )
-{
-	if( !empty( $params['comment_id'] ) )
-	{
-		echo "\n\n".T_('Message sent from your comment:') . "\n"
-			.url_add_param( $Blog->get('url'), 'p='.$params['post_id'].'#'.$params['comment_id'], '&' );
-	}
-	elseif( !empty( $params['post_id'] ) )
-	{
-		echo "\n\n".T_('Message sent from your post:') . "\n"
-			.url_add_param( $Blog->get('url'), 'p='.$params['post_id'], '&' );
-	}
-	else
-	{
-		echo "\n\n".sprintf( T_('Message sent through the contact form on %s.'), $Blog->get('shortname') ). "\n";
+$CommentCache = & get_CommentCache();
+$ItemCache = & get_ItemCache();
 
-	}
+if( !empty( $params['comment_ID'] ) && ( $Comment = & $CommentCache->get_by_ID( $params['comment_ID'], false, false ) ) )
+{
+	echo "\n\n".T_('Message sent from your comment:') . "\n"
+		.$Comment->get_permanent_url();
+}
+elseif( !empty( $params['post_id'] ) && ( $Item = & $ItemCache->get_by_ID( $params['post_id'], false, false ) ) )
+{
+	echo "\n\n".T_('Message sent from your post:') . "\n"
+		.$Item->get_permanent_url();
+}
+elseif( ! empty( $Blog ) )
+{
+	echo "\n\n".sprintf( T_('Message sent through the contact form on %s.'), $Blog->get('shortname') ). "\n";
 }
 
 if( ! empty( $recipient_User ) )
@@ -85,12 +110,12 @@ if( ! empty( $recipient_User ) )
 	}
 	// Add quick unsubcribe link so users can deny receiving emails through b2evo message form in any circumstances
 	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more emails through a message form, click here:' ).' '.
-		$htsrv_url.'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$';
+		get_htsrv_url().'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$';
 }
 elseif( !empty( $params['Comment'] ) )
 { // Visitor:
 	$params['unsubscribe_text'] = T_("Click on the following link to not receive e-mails on your comments\nfor this e-mail address anymore:").' '.
-		$samedomain_htsrv_url.'anon_unsubscribe.php?type=comment&c='.$params['Comment']->ID.'&anon_email='.rawurlencode( $params['Comment']->author_email );
+		get_htsrv_url().'anon_unsubscribe.php?type=comment&c='.$params['Comment']->ID.'&anon_email='.rawurlencode( $params['Comment']->author_email );
 }
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

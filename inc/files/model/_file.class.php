@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -32,6 +32,12 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class File extends DataObject
 {
+	/**
+	 * ID of user that created/uploaded the file
+	 * @var integer
+	 */
+	var $creator_user_ID;
+
 	/**
 	 * File type: 'image', 'audio', 'other', NULL
 	 * @var string
@@ -236,6 +242,7 @@ class File extends DataObject
 		// If there's a valid file root, handle extra stuff. This should not get done when the FileRoot is invalid.
 		if( $this->_FileRoot )
 		{
+			// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 			$this->_rdfp_rel_path = trim( str_replace( '\\', '/', $rdfp_rel_path ), '/' );
 			$this->_adfp_full_path = $this->_FileRoot->ads_path.$this->_rdfp_rel_path;
 			$this->_name = basename( $this->_adfp_full_path );
@@ -324,6 +331,7 @@ class File extends DataObject
 				$Debuglog->add( "Loaded metadata for {$this->_FileRoot->ID}:{$this->_rdfp_rel_path}", 'files' );
 				$this->meta  = 'loaded';
 				$this->ID    = $row->file_ID;
+				$this->creator_user_ID = $row->file_creator_user_ID;
 				$this->type  = $row->file_type;
 				$this->title = $row->file_title;
 				$this->alt   = $row->file_alt;
@@ -412,7 +420,7 @@ class File extends DataObject
 			$this->dbsave();
 		}
 
-		syslog_insert( sprintf( $syslog_message, '<b>'.$this->get_name().'</b>' ), 'info', 'file', $this->ID );
+		syslog_insert( sprintf( $syslog_message, '[['.$this->get_name().']]' ), 'info', 'file', $this->ID );
 
 		return $success;
 	}
@@ -466,6 +474,43 @@ class File extends DataObject
 		return $this->_is_dir;
 	}
 
+	/**
+	 * Is the File a directory or file?
+	 *
+	 * @param string String to return if the File is a directory
+	 * @param string String to return if the File is a file
+	 * @return string specified directory string if the object is a directory, specified file string if not
+	 */
+	function dir_or_file( $dir_string = NULL, $file_string = NULL)
+	{
+		if( is_null( $dir_string ) )
+		{
+			$dir_string = T_('directory');
+		}
+
+		if( is_null( $file_string ) )
+		{
+			$file_string = T_('file');
+		}
+
+		return $this->is_dir() ? $dir_string : $file_string;
+	}
+
+	/**
+	 * Get file type
+	 *
+	 * @return string file type
+	 */
+	function get_file_type()
+	{
+		if( empty( $this->type ) )
+		{ // Detect and set file type
+			$this->set_file_type();
+		}
+
+		return $this->type;
+	}
+
 
 	/**
 	 * Is the File an image?
@@ -499,6 +544,24 @@ class File extends DataObject
 		}
 
 		return ( $this->type == 'audio' );
+	}
+
+
+	/**
+	 * Is the File a video file?
+	 *
+	 * Tries to determine if it is and caches the info.
+	 *
+	 * @return boolean true if the object is a video file, false if not
+	 */
+	function is_video()
+	{
+		if( empty( $this->type ) )
+		{
+			$this->set_file_type();
+		}
+
+		return ( $this->type == 'video' );
 	}
 
 
@@ -593,6 +656,27 @@ class File extends DataObject
 
 
 	/**
+	 * Get file creator
+	 *
+	 * @return object User
+	 */
+	function get_creator()
+	{
+		if( $this->creator_user_ID )
+		{
+			$UserCache = & get_UserCache();
+			$creator = $UserCache->get_by_ID( $this->creator_user_ID );
+
+			return $creator;
+		}
+		else
+		{
+			return NULL;
+		}
+	}
+
+
+	/**
 	 * Get the name prefixed either with "Directory" or "File".
 	 *
 	 * Returned string is localized.
@@ -664,7 +748,7 @@ class File extends DataObject
 	 */
 	function get_url()
 	{
-		global $public_access_to_media, $htsrv_url;
+		global $public_access_to_media;
 
 		if( $this->is_dir() )
 		{ // Directory
@@ -1086,6 +1170,8 @@ class File extends DataObject
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use size defined by the thumbnail
 	 *                        'none' - don't use attributes "width" & "height"
+	 * @param boolean Image style
+	 * @param boolean Add loadimg class
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
@@ -1101,7 +1187,9 @@ class File extends DataObject
 	                  $image_desc = '#',
 	                  $image_link_id = '',
 	                  $image_size_x = 1,
-	                  $tag_size = NULL )
+	                  $tag_size = NULL,
+	                  $image_style = '',
+	                  $add_loadimg = true )
 	{
 		if( $this->is_dir() )
 		{ // We can't reference a directory
@@ -1126,7 +1214,7 @@ class File extends DataObject
 			{
 				$img_attribs = $this->get_img_attribs( $size_name, NULL, NULL, $x_size, $tag_size );
 
-				if( $this->check_image_sizes( $size_name, 64, $img_attribs ) )
+				if( $this->check_image_sizes( $size_name, 64, $img_attribs ) && $add_loadimg )
 				{ // If image larger than 64x64 add class to display animated gif during loading
 					$image_class = trim( $image_class.' loadimg' );
 				}
@@ -1150,6 +1238,11 @@ class File extends DataObject
 				if( $img_attribs['alt'] == '' )
 				{ // Image alt
 					$img_attribs['alt'] = $image_alt;
+				}
+
+				if( $image_style != '' )
+				{ // Image style
+					$img_attribs['style'] = $image_style;
 				}
 
 				// Image tag
@@ -1474,7 +1567,7 @@ class File extends DataObject
 		// but then we have an integrity issue!! :(
 		if( file_exists($this->_dir.$newname) )
 		{
-			syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'File %s could not be renamed to %s', '[['.$old_file_name.']]', '[['.$newname.']]' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
@@ -1504,7 +1597,7 @@ class File extends DataObject
 
 		if( ! @rename( $this->_adfp_full_path, $this->_dir.$newname ) )
 		{ // Rename will fail if $newname already exists (at least on windows)
-			syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'File %s could not be renamed to %s', '[['.$old_file_name.']]', '[['.$newname.']]' ), 'info', 'file', $this->ID );
 			$DB->rollback();
 			return false;
 		}
@@ -1540,11 +1633,11 @@ class File extends DataObject
 				if( ! @rename( $this->_adfp_full_path, $this->_dir.$oldname ) )
 				{ // rename failed
 					$DB->rollback();
-					syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
+					syslog_insert( sprintf( 'File %s could not be renamed to %s', '[['.$old_file_name.']]', '[['.$newname.']]' ), 'info', 'file', $this->ID );
 					return false;
 				}
 				// Maybe needs a specific error message here, the db and the disk is out of sync
-				syslog_insert( sprintf( 'File %s could not be renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
+				syslog_insert( sprintf( 'File %s could not be renamed to %s', '[['.$old_file_name.']]', '[['.$newname.']]' ), 'info', 'file', $this->ID );
 				return false;
 			}
 		}
@@ -1561,7 +1654,7 @@ class File extends DataObject
 
 		$DB->commit();
 
-		syslog_insert( sprintf( 'File %s was renamed to %s', '<b>'.$old_file_name.'</b>', '<b>'.$newname.'</b>' ), 'info', 'file', $this->ID );
+		syslog_insert( sprintf( 'File %s was renamed to %s', '[['.$old_file_name.']]', '[['.$newname.']]' ), 'info', 'file', $this->ID );
 		return true;
 	}
 
@@ -1574,22 +1667,37 @@ class File extends DataObject
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param string Subpath for this file/folder, relative the associated root (no trailing slash)
+	 * @param boolean TRUE to don't rewrite existing file in the destination path, try to create unique file with appending siffix like "-1", "-2" and etc.
 	 * @return boolean true on success, false on failure
 	 */
-	function move_to( $root_type, $root_ID, $rdfp_rel_path )
+	function move_to( $root_type, $root_ID, $rdfp_rel_path, $keep_unique = false )
 	{
 		$old_file_name = $this->get_name();
-		// echo "relpath= $rel_path ";
 
+		// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 		$rdfp_rel_path = str_replace( '\\', '/', $rdfp_rel_path );
 		$FileRootCache = & get_FileRootCache();
 
 		$new_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID, true );
+
+		if( $keep_unique && preg_match( '#(.+\/)?(([^.\/]+)(\.[^.]+)?)$#', $rdfp_rel_path, $new_path_match ) )
+		{	// Try to find free unique file name if same name is already used in the destination folder:
+			$file_unique_name = $new_path_match[2];
+			$file_extension = isset( $new_path_match[4] ) ? $new_path_match[4] : '';
+			$file_unique_num = 1;
+			while( file_exists( $new_FileRoot->ads_path.$new_path_match[1].$file_unique_name ) )
+			{	// Find next free file with unique name in the same folder:
+				$file_unique_name = $new_path_match[3].'-'.$file_unique_num.$file_extension;
+				$file_unique_num++;
+			}
+			$rdfp_rel_path = $new_path_match[1].$file_unique_name;
+		}
+
 		$adfp_posix_path = $new_FileRoot->ads_path.$rdfp_rel_path;
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
 		{
-			syslog_insert( sprintf( 'File %s could not be moved to %s', '<b>'.$old_file_name.'</b>', '<b>'.$rdfp_rel_path.'</b>' ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'File %s could not be moved to %s', '[['.$old_file_name.']]', '[['.$rdfp_rel_path.']]' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
@@ -1628,34 +1736,35 @@ class File extends DataObject
 			$this->load_meta();
 		}
 
-		syslog_insert( sprintf( 'File %s was moved to %s', '<b>'.$old_file_name.'</b>', '<b>'.$rdfp_rel_path.'</b>' ), 'info', 'file', $this->ID );
+		syslog_insert( sprintf( 'File %s was moved to %s', '[['.$old_file_name.']]', '[['.$rdfp_rel_path.']]' ), 'info', 'file', $this->ID );
 		return true;
 	}
 
 
  	/**
-	 * Copy this file to a new location
+	 * Copy this file/folder to a new location
 	 *
 	 * Also copy meta data in Object
 	 *
-	 * @param File the target file (expected to not exist)
+	 * @param object File the target file (expected to not exist)
 	 * @return boolean true on success, false on failure
 	 */
 	function copy_to( & $dest_File )
 	{
 		if( ! $this->exists() || $dest_File->exists() )
 		{
-			syslog_insert( sprintf( 'File %s could not be copied', '<b>'.$this->get_name().'</b>' ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'File %s could not be copied', '[['.$this->get_name().']]' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
 		// TODO: fp> what happens if someone else creates the destination file right at this moment here?
 		//       dh> use a locking mechanism.
 
-		if( ! @copy( $this->get_full_path(), $dest_File->get_full_path() ) )
+		$new_folder_name = $this->is_dir() ? '' : NULL;
+		if( ! copy_r( $this->get_full_path(), $dest_File->get_full_path(), $new_folder_name ) )
 		{	// Note: unlike rename() (at least on Windows), copy() will not fail if destination already exists
 			// this is probably a permission problem
-			syslog_insert( sprintf( 'File %s could not be copied to %s', '<b>'.$this->get_name().'</b>', '<b>'.$dest_File->get_name().'</b>' ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'File %s could not be copied to %s', '[['.$this->get_name().']]', '[['.$dest_File->get_name().']]' ), 'info', 'file', $this->ID );
 			return false;
 		}
 
@@ -1677,7 +1786,7 @@ class File extends DataObject
 			$dest_File->dbsave();
 		}
 
-		syslog_insert( sprintf( 'File %s was copied to %s', '<b>'.$this->get_name().'</b>', '<b>'.$dest_File->get_name().'</b>' ), 'info', 'file', $this->ID );
+		syslog_insert( sprintf( 'File %s was copied to %s', '[['.$this->get_name().']]', '[['.$dest_File->get_name().']]' ), 'info', 'file', $this->ID );
 		return true;
 	}
 
@@ -1733,7 +1842,7 @@ class File extends DataObject
 			$syslog_message .= ' - not exists';
 		}
 
-		syslog_insert( sprintf( $syslog_message, '<b>'.$old_file_name.'</b>' ), 'info', 'file', $old_file_ID );
+		syslog_insert( sprintf( $syslog_message, '[['.$old_file_name.']]' ), 'info', 'file', $old_file_ID );
 
 		if( $file_exists )
 		{
@@ -1780,12 +1889,12 @@ class File extends DataObject
 			// update current entry
 			$this->_perms = fileperms( $this->_adfp_full_path );
 
-			syslog_insert( sprintf( 'The permissions of file %s were changed to %s', '<b>'.$this->get_name().'</b>', $chmod ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'The permissions of file %s were changed to %s', '[['.$this->get_full_path().']]', $chmod ), 'info', 'file', $this->ID );
 			return $this->_perms;
 		}
 		else
 		{
-			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '<b>'.$this->get_name().'</b>', $chmod ), 'info', 'file', $this->ID );
+			syslog_insert( sprintf( 'The permissions of file %s could not be changed to %s', '[['.$this->get_full_path().']]', $chmod ), 'info', 'file', $this->ID );
 			return false;
 		}
 	}
@@ -1796,9 +1905,9 @@ class File extends DataObject
 	 *
 	 * @return boolean true on success, false on failure
 	 */
-	function dbinsert( )
+	function dbinsert()
 	{
-		global $Debuglog;
+		global $Debuglog, $current_User;
 
 		if( $this->meta == 'unknown' )
 		{
@@ -1813,13 +1922,29 @@ class File extends DataObject
 		$Debuglog->add( 'Inserting meta data for new file into db', 'files' );
 
 		// Let's make sure the bare minimum gets saved to DB:
+		if( is_logged_in() )
+		{	// Use ID of current logged in user:
+			$this->set_param( 'creator_user_ID', 'integer', $current_User->ID );
+		}
+		elseif( $this->_FileRoot->type == 'user' )
+		{	// Try to use ID of root user:
+			$this->set_param( 'creator_user_ID', 'integer', $this->_FileRoot->in_type_ID );
+		}
 		$this->set_param( 'root_type', 'string', $this->_FileRoot->type );
 		$this->set_param( 'root_ID', 'number', $this->_FileRoot->in_type_ID );
 		$this->set_param( 'path', 'string', $this->_rdfp_rel_path );
 		$this->set_param( 'path_hash', 'string', md5( $this->_FileRoot->type.$this->_FileRoot->in_type_ID.$this->_rdfp_rel_path, true ) );
 		if( ! $this->is_dir() )
 		{ // create hash value only for files but not for folders
-			$this->set_param( 'hash', 'string', md5_file( $this->get_full_path(), true ) );
+			$file_full_path = $this->get_full_path();
+			if( file_exists( $file_full_path ) )
+			{
+				$this->set_param( 'hash', 'string', md5_file( $file_full_path, true ) );
+			}
+			else
+			{
+				trigger_error( T_('File not found').': <code>'.$file_full_path.'</code>' );
+			}
 		}
 
 		// Let parent do the insert:
@@ -1835,9 +1960,10 @@ class File extends DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
+	 * @param boolean TRUE to update last touched dates of the Link Owners of this File
 	 * @return boolean true on success, false on failure / no changes
 	 */
-	function dbupdate()
+	function dbupdate( $update_link_owner_dates = true )
 	{
 		if( $this->meta == 'unknown' )
 		{
@@ -1856,15 +1982,17 @@ class File extends DataObject
 		// Let parent do the update:
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
-			// Update field 'last_touched_ts' of each item that has a link with this edited file
-			$LinkCache = & get_LinkCache();
-			$links = $LinkCache->get_by_file_ID( $this->ID );
-			foreach( $links as $Link )
-			{
-				$LinkOwner = & $Link->get_LinkOwner();
-				if( $LinkOwner != NULL )
+			if( $update_link_owner_dates )
+			{	// Update field 'last_touched_ts'(and 'contents_last_updated_ts' id exists) of each object(Item, Comment, Message and etc.) that has a link with this File:
+				$LinkCache = & get_LinkCache();
+				$links = $LinkCache->get_by_file_ID( $this->ID );
+				foreach( $links as $Link )
 				{
-					$LinkOwner->update_last_touched_date();
+					if( $LinkOwner = & $Link->get_LinkOwner() )
+					{	// Update last touched date and content last updated date of the Owner:
+						$LinkOwner->update_last_touched_date();
+						$LinkOwner->update_contents_last_updated_ts();
+					}
 				}
 			}
 
@@ -1884,7 +2012,7 @@ class File extends DataObject
 	 */
 	function get_view_url( $always_open_dirs_in_fm = true )
 	{
-		global $htsrv_url, $public_access_to_media;
+		global $public_access_to_media;
 
 		// Get root code
 		$root_ID = $this->_FileRoot->ID;
@@ -1894,7 +2022,7 @@ class File extends DataObject
 			if( $always_open_dirs_in_fm || ! $public_access_to_media )
 			{ // open the dir in the filemanager:
 				// fp>> Note: we MUST NOT clear mode, especially when mode=upload, or else the IMG button disappears when entering a subdir
-				return regenerate_url( 'root,path', 'root='.$root_ID.'&amp;path='.$this->get_rdfs_rel_path() );
+				return regenerate_url( 'root,path', 'root='.$root_ID.'&amp;path='.rawurlencode( $this->get_rdfs_rel_path() ) );
 			}
 			else
 			{ // Public access: direct link to folder:
@@ -1911,10 +2039,10 @@ class File extends DataObject
 			switch( $Filetype->viewtype )
 			{
 				case 'image':
-					return  $htsrv_url.'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=image';
+					return  get_htsrv_url().'viewfile.php?root='.$root_ID.'&amp;path='.rawurlencode( $this->_rdfp_rel_path ).'&amp;viewtype=image';
 
 				case 'text':
-					return $htsrv_url.'viewfile.php?root='.$root_ID.'&amp;path='.$this->_rdfp_rel_path.'&amp;viewtype=text';
+					return get_htsrv_url().'viewfile.php?root='.$root_ID.'&amp;path='.rawurlencode( $this->_rdfp_rel_path ).'&amp;viewtype=text';
 
 				case 'download':	 // will NOT open a popup and will insert a Content-disposition: attachment; header
 					return $this->get_getfile_url();
@@ -1941,11 +2069,11 @@ class File extends DataObject
 	 */
 	function get_view_link( $text = NULL, $title = NULL, $no_access_text = NULL, $format = '$text$', $class = '', $url = NULL )
 	{
-		global $Blog;
+		global $Collection, $Blog;
 
 		if( is_null( $text ) )
 		{ // Use file root+relpath+name by default
-			$text = $this->get_root_and_rel_path();
+			$text = ( $this->is_dir() ? $this->get_root_and_rel_path() : $this->get_root_and_rel_path() );
 		}
 
 		if( is_null( $title ) )
@@ -1961,7 +2089,7 @@ class File extends DataObject
 
 		if( is_null( $url ) )
 		{ // Get the URL for viewing the file/dir:
-			$url = $this->get_view_url( false );
+			$url = ( $this->is_dir() ? $this->get_linkedit_url() : $this->get_view_url( false ) );
 			$ignore_popup = false;
 		}
 		else
@@ -1984,7 +2112,7 @@ class File extends DataObject
 		$rel_attr = ( ! empty( $Blog ) && $Blog->get_setting( 'download_nofollowto' ) ) ? ' rel="nofollow"' : '';
 
 		$Filetype = & $this->get_Filetype();
-		if( $ignore_popup || ( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) ) )
+		if( $this->is_dir() || $ignore_popup || ( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) ) )
 		{ // Link to open in the curent window
 			return '<a href="'.$url.'" title="'.$title.'"'.$class_attr.$rel_attr.'>'.$text.'</a>';
 		}
@@ -2017,11 +2145,11 @@ class File extends DataObject
 	function get_linkedit_link( $link_type = NULL, $link_obj_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
 											$actionurl = '#', $target = '' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( is_null( $text ) )
@@ -2060,11 +2188,11 @@ class File extends DataObject
 	 */
 	function get_linkedit_url( $link_type = NULL, $link_obj_ID = NULL, $actionurl = '#' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( $this->is_dir() )
@@ -2076,7 +2204,7 @@ class File extends DataObject
 			$rdfp_path = dirname( $this->get_rdfp_rel_path() );
 		}
 
-		$url_params = 'root='.$this->get_FileRoot()->ID.'&amp;path='.$rdfp_path.'/';
+		$url_params = 'root='.$this->get_FileRoot()->ID.'&amp;path='.rawurlencode( $rdfp_path .'/' );
 
 		if( ! is_null($link_obj_ID) )
 		{ // We want to open the filemanager in link mode:
@@ -2102,7 +2230,7 @@ class File extends DataObject
 	 */
 	function get_thumb_url( $size_name = 'fit-80x80', $glue = '&amp;', $size_x = 1 )
 	{
-		global $public_access_to_media, $htsrv_url;
+		global $public_access_to_media;
 
 		if( ! $this->is_image() )
 		{ // Not an image
@@ -2141,12 +2269,11 @@ class File extends DataObject
 	 */
 	function get_getfile_url( $glue = '&amp;' )
 	{
-		global $htsrv_url;
-		return $htsrv_url.'getfile.php/'
+		return get_htsrv_url().'getfile.php/'
 			// This is for clean 'save as':
 			.rawurlencode( $this->_name )
 			// This is for locating the file:
-			.'?root='.$this->_FileRoot->ID.$glue.'path='.$this->_rdfp_rel_path
+			.'?root='.$this->_FileRoot->ID.$glue.'path='.rawurlencode( $this->_rdfp_rel_path )
 			.$glue.'mtime='.$this->get_lastmod_ts(); // TODO: dh> use salt here?!
 	}
 
@@ -2279,9 +2406,41 @@ class File extends DataObject
 			$img_attribs['src'] = $this->get_url();
 			if( $tag_size != 'none' )
 			{	// Add attributes "width" & "height" only when they are not disabled:
-				if( ( $size_arr = $this->get_image_size( 'widthheight_assoc' ) ) )
+				if( $tag_size !== NULL )
+				{	// Use size values:
+					$tag_size = explode( 'x', $tag_size );
+					$img_attribs['width'] = $tag_size[0];
+					$img_attribs['height'] = empty( $tag_size[1] ) ? $tag_size[0] : $tag_size[1];
+				}
+				elseif( ( $size_arr = $this->get_image_size( 'widthheight_assoc' ) ) )
 				{
 					$img_attribs += $size_arr;
+				}
+			}
+		}
+		elseif( $size_name == 'fit' )
+		{ // We want src to link to the original file
+			$img_attribs['src'] = $this->get_url();
+
+			if( $tag_size !== NULL)
+			{ // Get target dimension
+				$tag_size = explode( 'x', $tag_size );
+				if( empty( $tag_size[1] ) )
+				{
+					$tag_size[1] = $tag_size[0];
+				}
+				$size_arr = $this->get_image_size( 'widthheight' );
+
+				if( $size_arr[0] > $tag_size[0] || $size_arr[1] > $tag_size[1] )
+				{ // Scale image to fit
+					$scale = min( $tag_size[0]/$size_arr[0], $tag_size[1]/$size_arr[1] );
+					$img_attribs['width'] = $scale * $size_arr[0];
+					$img_attribs['height'] = $scale * $size_arr[1];
+				}
+				else
+				{ // No need to resize
+					$img_attribs['width'] = $size_arr[0];
+					$img_attribs['height'] = $size_arr[1];
 				}
 			}
 		}
@@ -2614,7 +2773,7 @@ class File extends DataObject
 	 * @param string Position
 	 * @return integer Link ID
 	 */
-	function link_to_Object( & $LinkOwner, $set_order = 1, $position = NULL )
+	function link_to_Object( & $LinkOwner, $set_order = 0, $position = NULL )
 	{
 		global $DB;
 
@@ -2622,20 +2781,6 @@ class File extends DataObject
 
 		$order = $set_order;
 		$existing_Links = & $LinkOwner->get_Links();
-
-		// Find highest order
-		foreach( $existing_Links as $loop_Link )
-		{
-			if( $loop_Link->file_ID == $this->ID )
-			{ // The file is already linked to this owner
-				return;
-			}
-			$existing_order = $loop_Link->get('order');
-			if( $set_order == 1 && $existing_order >= $order )
-			{ // Set order if $set_order is default
-				$order = $existing_order + 1;
-			}
-		}
 
 		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 		$this->load_meta( true );
@@ -2662,7 +2807,9 @@ class File extends DataObject
 	 * Used when try to delete a file, which is attached to a post, or to a user
 	 *
 	 * @param array restriction
-	 * @return string message with links to objects
+	 * @return string|boolean Message with link to objects,
+	 *                        Empty string if no restriction for current table,
+	 *                        FALSE - if no rule for current table
 	 */
 	function get_restriction_link( $restriction )
 	{
@@ -2779,11 +2926,30 @@ class File extends DataObject
 			{
 				foreach( $FiletypeCache->cache as $Filetype )
 				{
-					
+
 					if( preg_match( '#^audio/#', $Filetype->mimetype ) &&
 					    in_array( $file_extension, $Filetype->get_extensions() ) )
 					{ // This is audio file
 						$this->update_file_type( 'audio' );
+						return;
+					}
+				}
+			}
+		}
+
+		// VIDEO:
+		// Load all video file types in cache
+		if( ! empty( $file_extension ) )
+		{
+			$FiletypeCache->load_where( 'ftyp_mimetype LIKE "video/%"' );
+			if( count( $FiletypeCache->cache ) )
+			{
+				foreach( $FiletypeCache->cache as $Filetype )
+				{
+					if( preg_match( '#^video/#', $Filetype->mimetype ) &&
+							in_array( $file_extension, $Filetype->get_extensions() ) )
+					{ // This is a video file
+						$this->update_file_type( 'video' );
 						return;
 					}
 				}
@@ -2948,7 +3114,7 @@ class File extends DataObject
 				$UserCache = & get_UserCache();
 				$User = & $UserCache->get_by_ID( $file_root_ID, false, false );
 
-				$link_text = $User ? $User->get_colored_login( array( 'use_style' => $params['use_style'] ) ) : T_('Deleted user');
+				$link_text = $User ? $User->get_colored_login( array( 'use_style' => $params['use_style'], 'login_text' => 'name' ) ) : T_('Deleted user');
 				$link_class = $User ? $User->get_gender_class() : 'user';
 				$link_url = $admin_url.'?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$file_root_ID;
 
@@ -3029,7 +3195,7 @@ class File extends DataObject
 
 		return sprintf( $params['message'], $count, implode( ', ', $users ) );
 	}
-	
+
 	/**
 	 * Increments the number of times the file was downloaded
 	 *
@@ -3040,11 +3206,13 @@ class File extends DataObject
 	{
 		$download_count = $this->download_count + $count;
 		$this->set( 'download_count', $download_count );
- 		$this->dbupdate();
+		// Update only the field 'download_count',
+		// but do NOT update last touched dates of the Link Owners of this File:
+		$this->dbupdate( false );
 
 		return $download_count;
 	}
-	
+
 	/**
 	 * Get total number of times the file was downloaded
 	 *

@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -66,7 +66,7 @@ $params = array_merge( array(
 				if( $Item->status != 'published' )
 				{
 					$Item->format_status( array(
-							'template' => '<div class="floatright"><span class="note status_$status$"><span>$status_title$</span></span></div>',
+							'template' => '<div class="floatright"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 						) );
 				}
 				// Link to comments, trackbacks, etc.:
@@ -106,7 +106,7 @@ $params = array_merge( array(
 				$Item->issue_date( array(
 						'before'      => '<span class="timestamp">',
 						'after'       => '</span>',
-						'date_format' => locale_datefmt().' H:i',
+						'date_format' => locale_datefmt().' '.locale_shorttimefmt(),
 					) );
 			?>
 
@@ -132,9 +132,9 @@ $params = array_merge( array(
 		if( $disp == 'single' )
 		{
 			// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
-			// WARNING: EXPERIMENTAL -- NOT RECOMMENDED FOR PRODUCTION -- MAY CHANGE DRAMATICALLY BEFORE RELEASE.
 			// Display container contents:
 			skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+				'widget_context' => 'item',	// Signal that we are displaying within an Item
 				// The following (optional) params will be used as defaults for widgets included in this container:
 				// This will enclose each widget in a block:
 				'block_start' => '<div class="$wi_class$">',
@@ -144,6 +144,9 @@ $params = array_merge( array(
 				'block_title_end' => '</h3>',
 				// Params for skin file "_item_content.inc.php"
 				'widget_item_content_params' => $params,
+				// Template params for "Item Link" widget
+				'widget_item_link_before'    => '<p class="evo_post_link">',
+				'widget_item_link_after'     => '</p>',
 			) );
 			// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
 		}
@@ -163,7 +166,7 @@ $params = array_merge( array(
 			$Item->author( array(
 					'before'    => T_('By').' ',
 					'after'     => ' &bull; ',
-					'link_text' => 'preferredname',
+					'link_text' => 'auto',
 				) );
 		?>
 
@@ -203,15 +206,24 @@ $params = array_merge( array(
 	</div>
 
 	<?php
+	if( is_single_page() )
+	{	// Display comments only on single Item's page:
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array(
+				'disp_comments'        => true,
+				'disp_comment_form'    => true,
+				'disp_trackbacks'      => true,
+				'disp_trackback_url'   => true,
+				'disp_pingbacks'       => true,
+				'disp_webmentions'     => true,
 				'before_section_title' => '<h4>',
 				'after_section_title'  => '</h4>',
-				'author_link_text' => 'preferredname',
+				'author_link_text' => 'auto',
 			) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+	}
 	?>
 
 	<?php

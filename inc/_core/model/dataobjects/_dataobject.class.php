@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -178,16 +178,16 @@ class DataObject
 	 * Note: the delete cascade arrays are handled!
 	 * Delete cascades are handled recursively only if the cascade arrays from the reffering class contains the class and class_path params ( e.g. see User class )!
 	 *
-	 * @param string the name of the class which objects needs to be deleted;
-	 *   Note: This is required until min phpversion will be 5.3. Since PHP 5.3 we can use static::function_name to achieve late static bindings
 	 * @param string where condition
 	 * @param array object ids
 	 * @param array additional params if required
 	 * @return mixed # of rows affected or false if error
 	 */
-	static function db_delete_where( $class_name, $sql_where, $object_ids = NULL, $params = NULL )
+	static function db_delete_where( $sql_where, $object_ids = NULL, $params = NULL )
 	{
 		global $DB, $db_config;
+
+		$class_name = get_called_class();
 
 		// Init delete cascades
 		if( isset( $params['delete_cascades'] ) )
@@ -197,7 +197,7 @@ class DataObject
 		}
 		else
 		{ // Get delete cascades from the given class
-			$delete_cascades = call_user_func( array( $class_name, 'get_delete_cascades' ) );
+			$delete_cascades = $class_name::get_delete_cascades();
 		}
 
 		// Init dbconfig variables
@@ -208,12 +208,12 @@ class DataObject
 		}
 		else
 		{ // Get class dbconfig from the given class
-			$self_db_config = call_user_func( array( $class_name, 'get_class_db_config' ) );
+			$self_db_config = $class_name::get_class_db_config();
 		}
 
 		if( isset( $params['force_delete'] ) )
 		{ // In case of force deletion, also delete restrictions
-			$delete_restrictions = call_user_func( array( $class_name, 'get_delete_restrictions' ) );
+			$delete_restrictions = $class_name::get_delete_restrictions();
 			$delete_cascades = array_merge( $delete_cascades, $delete_restrictions );
 		}
 
@@ -288,7 +288,7 @@ class DataObject
 				load_class( $cascade['class_path'], $cascade['class'] );
 				// Delete the given class objects together with all of its delete cascades
 				$params['force_delete'] = true;
-				$result = call_user_func( array( $cascade['class'], 'db_delete_where' ), $cascade['class'], $cascade_condition, NULL, $params );
+				$result = $cascade['class']::db_delete_where( $cascade_condition, NULL, $params );
 				if( $result === false )
 				{ // Delete cascade operation failed in a cascade class
 					if( $use_transaction )
@@ -598,7 +598,7 @@ class DataObject
 		else
 		{	// Object already serialized, let's update!
 			// echo 'UPDATE';
-			return $this->dbupdate_worker();
+			return $this->dbupdate();
 		}
 	}
 
@@ -658,7 +658,7 @@ class DataObject
 		);
 
 		// Delete this object with all of its cascade and execute all required updates if there are any
-		$result = $this->db_delete_where( get_class($this), NULL, array( $this->ID ), $params );
+		$result = $this->db_delete_where( NULL, array( $this->ID ), $params );
 
 		$Plugins->trigger_event( 'AfterObjectDelete', $params = array( 'Object' => & $this, 'type' => get_class($this) ) );
 
@@ -734,30 +734,44 @@ class DataObject
 			if( !in_array( $restriction['fk'], $ignore ) )
 			{
 				if( $addlink )
-				{ // get linked objects and add a link
-					$link = '';
-					if( $addlink )
-					{ // get link from derived class
-						$link = $this->get_restriction_link( $restriction );
-					}
-					// without restriction => don't display the message
-					if( $link != '' )
-					{
+				{	// Get a link from derived class method:
+					$link = $this->get_restriction_link( $restriction );
+					if( ! empty( $link ) )
+					{	// Add a restriction message with a link for current table:
 						$restriction_Messages->add( $link );
 					}
-				}
-				else
-				{ // count and show how many object is connected
-					$extra_condition = ( isset( $restriction['and_condition'] ) ) ? ' AND '.$restriction['and_condition'] : '';
-					$count = $DB->get_var(
-					'SELECT COUNT(*)
-					   FROM '.$restriction['table'].'
-					  WHERE '.$restriction['fk'].' = '.$this->ID.$extra_condition,
-					0, 0, 'restriction/cascade check' );
-					if( $count )
-					{
-						$restriction_Messages->add( sprintf( $restriction['msg'], $count ), 'error' );
+					if( $link !== false )
+					{	// If this Object has no restriction in curent table, go to next table checking:
+						continue;
 					}
+					// ELSE $link === false
+					// Use standard checking below if restriciton link is not implemented for current table:
+				}
+
+				// Count and show how many object is connected:
+				$extra_condition = ( isset( $restriction['and_condition'] ) ) ? ' AND '.$restriction['and_condition'] : '';
+				// Replace a mask of $this_ID$ with value of current onject ID, useful to exclude/include current object:
+				$extra_condition = str_replace( '$this_ID$', $this->ID, $extra_condition );
+				$count = $DB->get_var(
+				'SELECT COUNT(*)
+					 FROM '.$restriction['table'].'
+					WHERE '.$restriction['fk'].' = '.$this->ID.$extra_condition,
+				0, 0, 'restriction/cascade check' );
+				if( $count )
+				{
+					if( isset( $restriction['style'] ) )
+					{
+						switch( $restriction['style'] )
+						{
+							case 'bold':
+								$restriction['msg'] = '<b>'.$restriction['msg'].'</b>';
+								break;
+
+							case 'italic':
+								$restriction['msg'] = '<i>'.$restriction['msg'].'</i>';
+						}
+					}
+					$restriction_Messages->add( sprintf( $restriction['msg'], $count ), 'error' );
 				}
 			}
 		}
@@ -818,13 +832,20 @@ class DataObject
 
 		$restriction_Messages = $this->check_relations( 'delete_cascades' );
 
+		$restriction_Messages->params['class_warning'] .= ' text-danger';
+		$restriction_Messages->params['class_note'] .= ' text-warning';
+
 		if( !empty( $additional_messages ) )
-		{ // Initialaize additional messages
+		{ // Initialize additional messages
 			foreach( $additional_messages as $additional_message )
 			{
 				$restriction_Messages->add( $additional_message[0], $additional_message[1] );
 			}
 		}
+
+		$Form = new Form( '', 'form_confirm', 'get', '' );
+
+		$Form->begin_form( 'inline' );
 
 		if( $restriction_Messages->count() )
 		{	// The will be cascading deletes, issue WARNING:
@@ -837,9 +858,6 @@ class DataObject
 
 		$redirect_to = param( 'redirect_to', 'url', '' );
 
-		$Form = new Form( '', 'form_confirm', 'get', '' );
-
-		$Form->begin_form( 'inline' );
 			$Form->add_crumb( $crumb_name );
 			$Form->hiddens_by_key( $hiddens );
 			$Form->hidden( 'action', $delete_action );

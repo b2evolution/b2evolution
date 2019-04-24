@@ -70,7 +70,7 @@ function textarea_replace_selection( myField, snippet, target_document )
  *  - By each plugin that works with textarea content of post or comment, to insert a code inside content by click event of toolbar button
  *  - upload.ctrl.php: ???
  *  - _file_list.inc.php: ???
- *  - links.js: to insert inline tag like this [image:123:caption text]
+ *  - src/evo_links.js: to insert inline tag like this [image:123:caption text]
  *
  * @var element
  * @var text
@@ -193,7 +193,7 @@ function textarea_wrap_selection( myField, before, after, replace, target_docume
  * Replace substring in textarea.
  *
  * Used on FRONT-office (EDITING) and BACK-office in the following files:
- *  - links.js: to remove inline tag like this [image:123:caption text]
+ *  - src/evo_links.js: to remove inline tag like this [image:123:caption text]
  *
  * @var element
  * @var text
@@ -444,6 +444,28 @@ function evoAlert( message )
 evo_alert_events_initialized = false;
 
 
+function debounce( func, wait, immediate )
+{
+	var timeout, result;
+	return function() {
+			var context = this, args = arguments, later, callNow;
+			later = function() {
+					timeout = null;
+					if (!immediate) {
+							result = func.apply(context, args);
+					}
+			};
+			callNow = immediate && !timeout;
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+			if (callNow) {
+					result = func.apply(context, args);
+			}
+			return result;
+	}
+};
+
+
 /**
  * Initialize onclick event for each button with attribute "data-func"
  *
@@ -458,9 +480,9 @@ jQuery( document ).ready( function()
 		func_args.splice( 0, 1 );
 		for( var i = 0; i < func_args.length; i++ )
 		{
-			if( func_args[ i ] == 'b2evoCanvas' )
+			if( func_args[ i ].indexOf( 'b2evoCanvas' ) > -1 )
 			{ // Replace special param with global object
-				func_args[ i ] = b2evoCanvas;
+				func_args[ i ] = window[ func_args[ i ] ];
 			}
 			else if( func_args[ i ] == ' ' )
 			{ // Fix an empty param
@@ -487,7 +509,8 @@ jQuery( document ).ready( function()
 	// Enable/Disable plugin toolbars depending on selected plugins for current edit form:
 	function change_plugin_toolbar_activity( this_obj )
 	{
-		var toolbar_obj = jQuery( '.' + this_obj.val() + '_toolbar' );
+		var prefix = this_obj.data( 'prefix' ) ? this_obj.data( 'prefix' ) : '';
+		var toolbar_obj = jQuery( '.' + prefix + this_obj.val() + '_toolbar' );
 		if( toolbar_obj.length == 0 )
 		{ // Skip this function if plugin has no toolbar
 			return true;
@@ -506,4 +529,31 @@ jQuery( document ).ready( function()
 	}
 	jQuery( 'input[type=checkbox][name="renderers[]"]' ).each( function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
 	jQuery( 'input[type=checkbox][name="renderers[]"]' ).click( function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
+	jQuery( '.plugin-toolbar' ).on( 'click', function() {
+			var toolbar_obj = jQuery( this );
+			if( toolbar_obj.hasClass( 'disabled' ) )
+			{
+				var plugin_id = jQuery( this ).attr( 'data-plugin-toolbar' );
+				if( plugin_id )
+				{
+					plugin_id = plugin_id.replace( '_toolbar', '' );
+					if( plugin_id.indexOf( 'meta_' ) === 0 )
+					{
+						plugin_id = plugin_id.replace( 'meta_', '' );
+						var checkbox_obj = jQuery( 'input[type=checkbox][id="meta_renderer_' + plugin_id + '"]' );
+					}
+					else
+					{
+						var checkbox_obj = jQuery( 'input[type=checkbox][id="renderer_' + plugin_id + '"]' );
+					}
+
+					if(  checkbox_obj.length > 0 )
+					{
+						checkbox_obj.prop( 'checked', true );
+						change_plugin_toolbar_activity( checkbox_obj );
+					}
+				}
+			}
+
+		} );
 } );

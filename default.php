@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage noskin
@@ -51,6 +51,9 @@ init_fontawesome_icons( 'fontawesome-glyphicons' );
 
 add_js_for_toolbar();		// Registers all the javascripts needed by the toolbar menu
 
+// Send the predefined cookies:
+evo_sendcookies();
+
 headers_content_mightcache( 'text/html' );		// In most situations, you do NOT want to cache dynamic content!
 ?>
 <!DOCTYPE html>
@@ -62,9 +65,9 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title>b2evolution - Default Page</title>
-		<script type="text/javascript" src="rsc/js/jquery.min.js"></script>
+		<script src="rsc/js/jquery.min.js"></script>
 		<!-- Bootstrap -->
-		<script type="text/javascript" src="rsc/js/bootstrap/bootstrap.min.js"></script>
+		<script src="rsc/js/bootstrap/bootstrap.min.js"></script>
 		<link href="rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
 		<link href="rsc/build/bootstrap-b2evo_base.bmin.css" rel="stylesheet">
 		<link href="rsc/build/b2evo_helper_screens.css" rel="stylesheet">
@@ -167,7 +170,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 			<footer class="footer">
 				<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('GitHub page'); ?></a></p>
 				<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
-				&bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
+				&bull; <a href="https://b2evolution.net/web-hosting/cheap-plans/" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
 				&bull; <a href="http://b2evolution.net/man/" class="text-nowrap"><?php echo T_('Online manual'); ?></a>
 				&bull; <a href="http://forums.b2evolution.net" class="text-nowrap"><?php echo T_('Help forums'); ?></a>
 				</p>

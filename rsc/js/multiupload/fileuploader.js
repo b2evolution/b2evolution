@@ -592,13 +592,12 @@ qq.FileUploaderBasic.prototype = {
 		return false;
 	},
 	_formatSize: function(bytes){
-		var i = -1;
-		do {
+		for( var i = 0; bytes > 1024; i++ )
+		{
 			bytes = bytes / 1024;
-			i++;
-		} while (bytes > 99);
+		}
 
-		return Math.max(bytes, 0.1).toFixed(1) + ' ' + ['KB', 'MB', 'GB', 'TB', 'PB', 'EB'][i];
+		return bytes.toFixed( Math.max( 0, ( 1 - Math.floor( Math.log( bytes ) / Math.log( 10 ) ) ) ) ) + ' ' + ['B.', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'][i];
 	}
 };
 
@@ -783,18 +782,14 @@ qq.extend(qq.FileUploader.prototype, {
 		else // table
 		{
 			jQuery( fileElement ).attr( 'rel', this._formatFileName(fileName) );
-			var tr_prev = jQuery( '#filelist_tbody tr:last' );
-			var tr_class = 'even';
-			if( tr_prev.hasClass( 'even' ) )
-			{
-				tr_class = 'odd';
-			}
+			var tr_prev = jQuery( this._listElement ).find( 'tr:last' );
+			var tr_class = ( tr_prev.hasClass( 'even' ) ? 'odd' : 'even' );
 			var item_tbody = jQuery( item ).children( 'tbody' ).eq(0);
 			item_tbody.children( 'tr' ).attr( {
 					rel: 'file_upload_' + id,
 					class: tr_class
 				} );
-			jQuery( '#filelist_tbody' ).append( item_tbody.html() );
+			jQuery( this._listElement ).append( item_tbody.html() );
 		}
 	},
 	_getItemByFileId: function(id){
@@ -811,7 +806,7 @@ qq.extend(qq.FileUploader.prototype, {
 		}
 		else // table
 		{
-			return jQuery( 'tr[rel=file_upload_' + id + ']' ).get( 0 );
+			return jQuery( this._listElement ).find( 'tr[rel=file_upload_' + id + ']' ).get( 0 );
 		}
 	},
 	/**
@@ -829,8 +824,17 @@ qq.extend(qq.FileUploader.prototype, {
 				qq.preventDefault(e);
 
 				var item = target.parentNode;
-				self._handler.cancel(item.qqFileId);
-				qq.remove(item);
+				if( typeof( item.qqFileId ) != 'undefined' )
+				{
+					self._handler.cancel(item.qqFileId);
+					qq.remove(item);
+				}
+				else
+				{
+					item = jQuery( target ).closest( 'tr' );
+					self._handler.cancel( item.attr( 'rel' ).replace( 'file_upload_', '' ) );
+					qq.remove( item.get(0) );
+				}
 			}
 		});
 	}

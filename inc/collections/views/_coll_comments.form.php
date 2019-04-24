@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * {@internal Below is a list of authors who have contributed to design/coding of this file: }}
  *
@@ -18,10 +18,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * @var Blog
  */
-global $edited_Blog, $AdminUI;
+global $edited_Blog, $AdminUI, $Settings, $admin_url;
+$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 ?>
-<script type="text/javascript">
+<script>
 	<!--
 	function show_hide_feedback_details(ob)
 	{
@@ -103,7 +104,13 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 
 	echo '<div class="feedback_details_container">';
 
-	$Form->checkbox( 'allow_anon_url', $edited_Blog->get_setting( 'allow_anon_url' ), T_('Anonymous URLs'), T_('Allow anonymous commenters to submit an URL') );
+	$Form->textarea_input( 'comment_form_msg', $edited_Blog->get_setting( 'comment_form_msg' ), 3, T_('Message before comment form') );
+
+	$Form->checklist( array(
+			array( 'require_anon_name', 1, T_('Require a name'), $edited_Blog->get_setting( 'require_anon_name' ) ),
+			array( 'require_anon_email', 1, T_('Require an email'), $edited_Blog->get_setting( 'require_anon_email' ) ),
+			array( 'allow_anon_url', 1, T_('Allow to submit an URL'), $edited_Blog->get_setting( 'allow_anon_url' ) )
+		), 'allow_anon_url', T_('Anonymous comments') );
 
 	$Form->checkbox( 'allow_html_comment', $edited_Blog->get_setting( 'allow_html_comment' ),
 						T_( 'Allow HTML' ), T_( 'Check to allow HTML in comments.' ).' ('.T_('HTML code will pass several sanitization filters.').')' );
@@ -131,6 +138,18 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 		$Form->checkbox( 'blog_allowtrackbacks', $edited_Blog->get( 'allowtrackbacks' ), T_('Trackbacks').$trackbacks_title, $trackbacks_warning.T_('Allow other bloggers to send trackbacks to this blog, letting you know when they refer to it. This will also let you send trackbacks to other blogs.') );
 	}
 
+	if( $perm_blog_admin || $edited_Blog->get_setting( 'webmentions' ) )
+	{	// Only admin can turn ON this setting
+		$Form->checkbox( 'blog_webmentions', $edited_Blog->get_setting( 'webmentions' ),
+			T_('Webmentions').( ! $edited_Blog->get_setting( 'webmentions' ) ? get_admin_badge() : '' ),
+			T_('Allow other bloggers to send webmentions to this collection, letting you know when they refer to it.')
+			// Display additional note for not public collection:
+			.( $edited_Blog->get_setting( 'allow_access' ) != 'public' ? ' <span class="red">'.T_('This collection cannot receive webmentions because it is not public.').'</span>' : '' ),
+			'', 1,
+			// Disable receiving of webmentions for not public collections:
+			$edited_Blog->get_setting( 'allow_access' ) != 'public' );
+	}
+
 	$Form->checkbox( 'autocomplete_usernames', $edited_Blog->get_setting( 'autocomplete_usernames' ),
 		T_( 'Autocomplete usernames in back-office' ), T_( 'Check to enable auto-completion of usernames entered after a "@" sign in the comment forms' ) );
 
@@ -138,7 +157,7 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 
 	if( $edited_Blog->get_setting( 'allow_comments' ) == 'never' )
 	{ ?>
-	<script type="text/javascript">
+	<script>
 		<!--
 		jQuery( '.feedback_details_container' ).hide();
 		//-->
@@ -202,7 +221,7 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 	}
 	// put this on feedback details container, this way it won't be displayed if comment posting is not allowed
 	echo '<div class="feedback_details_container">';
-	
+
 	if( $is_bootstrap_skin )
 	{	// Use dropdown for bootstrap skin:
 		$new_status_field = get_status_dropdown_button( array(
@@ -250,6 +269,10 @@ $Form->begin_fieldset( T_('Comment moderation') . get_manual_link('comment-moder
 				'', // Note
 				'', // Class
 				$status_is_hidden, // Hidden field instead of checkbox?
+				array(
+					'data-toggle' => 'tooltip',
+					'data-placement' => 'top',
+					'title' => get_status_tooltip_title( $status ) )
 			);
 	}
 	$Form->checklist( $checklist_options, 'moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Comments with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );
@@ -271,10 +294,23 @@ $Form->begin_fieldset( T_('RSS/Atom feeds') . get_manual_link('comment-rss-atom-
 	$Form->text( 'comments_per_feed', $edited_Blog->get_setting('comments_per_feed'), 4, T_('Comments in feeds'),  T_('How many of the latest comments do you want to include in RSS & Atom feeds?'), 4 );
 $Form->end_fieldset();
 
-
-$Form->begin_fieldset( T_('Subscriptions') . get_manual_link('comment-subscriptions') );
-	$Form->checkbox( 'allow_item_subscriptions', $edited_Blog->get_setting( 'allow_item_subscriptions' ), T_('Email subscriptions'), T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ) );
-$Form->end_fieldset();
+if( $notifications_mode != 'off' )
+{
+	$Form->begin_fieldset( T_('Subscriptions') . get_manual_link('comment-subscriptions') );
+		$Form->checklist( array(
+					array( 'allow_comment_subscriptions', 1, T_('Allow users to subscribe and receive email notifications for each new comment.'), $edited_Blog->get_setting( 'allow_comment_subscriptions' ) ),
+					array( 'allow_item_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for comments on a specific post.' ), $edited_Blog->get_setting( 'allow_item_subscriptions' ) ),
+				), 'allow_coll_subscriptions', T_('Registered users') );
+		$Form->checklist( array(
+				array( 'allow_anon_subscriptions', 1, T_( 'Allow users to subscribe and receive email notifications for replies to their comments.' ), $edited_Blog->get_setting( 'allow_anon_subscriptions' ) ),
+			), 'allow_anon_subscriptions', T_('Anonymous users') );
+		$Form->radio( 'default_anon_comment_notify', $edited_Blog->get_setting( 'default_anon_comment_notify' ), array(
+				array( 1, T_('Checked') ),
+				array( 0, T_('Unchecked') ),
+			), T_('Default option') );
+		$Form->text( 'anon_notification_email_limit', $edited_Blog->get_setting( 'anon_notification_email_limit' ), 4, T_('Limit'),  T_('Max # of emails an anonymous user may receive per day.'), 4 );
+	$Form->end_fieldset();
+}
 
 
 $Form->begin_fieldset( T_('Registration of commenters') . get_manual_link('comment-registration-of-commenters') );
@@ -284,10 +320,34 @@ $Form->begin_fieldset( T_('Registration of commenters') . get_manual_link('comme
 $Form->end_fieldset();
 
 
+$Form->begin_fieldset( T_('Comment recycle bin').get_manual_link('recycle-bin-settings') );
+
+	$Form->text_input( 'auto_empty_trash', $Settings->get('auto_empty_trash'), 5, T_('Prune recycled comments after'), T_('days').'. '.T_('Warning: This affects ALL collections on the system.') );
+
+$Form->end_fieldset();
+
+
+$Form->begin_fieldset( T_('Meta Comments').get_manual_link( 'meta-comments-settings' ) );
+
+	$Form->checkbox( 'meta_comments_frontoffice', $edited_Blog->get_setting( 'meta_comments_frontoffice' ), T_('Display in Front-Office'), T_('Display meta comments in Front-Office.') );
+
+$Form->end_fieldset();
+
+
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
+echo '<div class="well">';
+echo '<p>'.sprintf( T_('You can find more settings in the <a %s>Post Types</a>, including:'), 'href="'.$admin_url.'?blog='.$edited_Blog->ID.'&amp;ctrl=itemtypes&amp;ityp_ID='.$edited_Blog->get_setting( 'default_post_type' ).'&amp;action=edit"' ).'</p>';
+echo '<ul>';
+echo '<li>'.T_('Message before comment form').'</li>';
+echo '<li>'.T_('Allow closing comments').'</li>';
+echo '<li>'.T_('Allow disabling comments').'</li>';
+echo '<li>'.T_('Use comment expiration').'</li>';
+echo '</ul>';
+echo '</div>';
+
 ?>
-<script type="text/javascript">
+<script>
 	var paged_comments_is_checked = jQuery( '#paged_comments' ).is( ':checked' );
 	jQuery( '#threaded_comments' ).click( function()
 	{ // Disable checkbox "Paged comments" if "Threaded comments" is ON

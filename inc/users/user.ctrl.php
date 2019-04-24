@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 global $AdminUI;
 
 param( 'user_tab', 'string', '', true );
-if( empty($user_tab) )
+if( empty( $user_tab ) )
 {
 	$user_tab = 'profile';
 }
@@ -43,20 +43,25 @@ if( $user_profile_only )
 	}
 }
 
+if( $action == 'new' )
+{	// Check permission, only admins can create new user:
+	$current_User->check_perm( 'users', 'edit', true );
+}
+
 /*
  * Load editable objects and set $action (while checking permissions)
  */
 
 $UserCache = & get_UserCache();
 
-if( ! is_null($user_ID) )
+if( ! is_null( $user_ID ) )
 { // User selected
 	if( $action == 'update' && $user_ID == 0 )
 	{ // we create a new user
 		$edited_User = new User();
 		$edited_User->set_datecreated( $localtimenow );
 	}
-	elseif( ($edited_User = & $UserCache->get_by_ID( $user_ID, false )) === false )
+	elseif( ( $edited_User = & $UserCache->get_by_ID( $user_ID, false ) ) === false )
 	{	// We could not find the User to edit:
 		unset( $edited_User );
 		forget_param( 'user_ID' );
@@ -72,21 +77,32 @@ if( ! is_null($user_ID) )
 		    && $edited_User->ID != $current_User->ID )
 		{ // user is only allowed to _view_ other user's profiles
 			$Messages->add( T_('You have no permission to edit other users!'), 'error' );
+			if( in_array( $user_tab, array( 'pwdchange', 'marketing', 'admin', 'sessions', 'activity' ) ) )
+			{	// Don't allow the restricted pages for view:
+				$user_tab = 'profile';
+			}
 			$action = 'view';
 		}
-		elseif( $demo_mode && ( $edited_User->ID <= 3 ) && ( $edited_User->ID > 0 ) )
+		elseif( $demo_mode && ( $edited_User->ID <= 7 ) )
 		{ // Demo mode restrictions: users created by install process cannot be edited
 			$Messages->add( T_('You cannot edit the admin and demo users profile in demo mode!'), 'error' );
 
 			if( strpos( $action, 'delete_' ) === 0 || $action == 'promote' )
 			{   // Fallback to list/view action
-				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&amp;action=list' ) );
+				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&action=list', '', '&' ) );
 			}
 			else
 			{
 				$action = 'view';
 			}
 		}
+		elseif( $user_tab == 'visits' && $Settings->get( 'enable_visit_tracking' ) != 1 )
+		{
+			$Messages->add( T_('Visit tracking is not enabled.') );
+			header_redirect( '?ctrl=users&user_tab=profile&user_ID='.$current_User->ID, 403 );
+		}
+
+		$user_tags = implode( ', ', $edited_User->get_usertags() );
 	}
 }
 elseif( $action != 'new' )
@@ -367,6 +383,9 @@ if( !$Messages->has_errors() )
 				}
 				 */
 
+				// Update the folding states for current user:
+				save_fieldset_folding_values();
+
 				if( $UserSettings->dbupdate() )
 				{
 					$Messages->add( T_('User feature settings have been changed.'), 'success');
@@ -421,7 +440,7 @@ if( !$Messages->has_errors() )
 				$UserList->refresh_query = true;
 				$UserList->query();
 
-				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&amp;action=list', '', '&' ), 303 );
+				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&action=list', '', '&' ), 303 );
 			}
 			else
 			{ // The user is updated
@@ -438,7 +457,19 @@ if( !$Messages->has_errors() )
 						$user_tab = 'profile';
 					}
 				}
-				header_redirect( regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&user_tab='.$user_tab, '', '&' ), 303 );
+
+				if( isset( $current_User->previous_pass_driver ) &&
+						$current_User->previous_pass_driver == 'nopass' &&
+						$current_User->previous_pass_driver != $current_User->get( 'pass_driver' ) )
+				{	// Redirect to page as we use after email validation if current user set password first time, e-g after email capture/quick registration:
+					$redirect_to = redirect_after_account_activation();
+				}
+				else
+				{
+					$redirect_to = regenerate_url( '', 'user_ID='.$edited_User->ID.'&action=edit&user_tab='.$user_tab, '', '&' );
+				}
+
+				header_redirect( $redirect_to, 303 );
 			}
 			break;
 
@@ -524,6 +555,50 @@ if( !$Messages->has_errors() )
 			$edited_User->ctry_ID = param( 'edited_user_ctry_ID', 'integer', 0 );
 			$edited_User->rgn_ID = param( 'edited_user_rgn_ID', 'integer', 0 );
 			$edited_User->subrg_ID = param( 'edited_user_subrg_ID', 'integer', 0 );
+			break;
+
+		case 'delete_all_sent_emails':
+			// Delete all emails sent to the edited user:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->check_perm( 'emails', 'edit', true );
+
+			if( param( 'confirm', 'integer', 0 ) )
+			{	// confirmed
+				if( $edited_User->delete_sent_emails() )
+				{	// The blogs were deleted successfully
+					$Messages->add( T_('All emails sent to the user were deleted.'), 'success' );
+
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=user&user_tab=activity&user_ID='.$user_ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+			}
+			break;
+
+		case 'delete_all_email_returns':
+			// Delete all email returns from the edited user's email address:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->check_perm( 'emails', 'edit', true );
+
+			if( param( 'confirm', 'integer', 0 ) )
+			{	// confirmed
+				if( $edited_User->delete_email_returns() )
+				{	// The blogs were deleted successfully
+					$Messages->add( T_('All email returns from the user\'s email address were deleted.'), 'success' );
+
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=user&user_tab=activity&user_ID='.$user_ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+			}
 			break;
 
 		case 'delete_all_blogs':
@@ -625,9 +700,53 @@ if( !$Messages->has_errors() )
 
 			if( param( 'confirm', 'integer', 0 ) )
 			{	// confirmed
-				if( $edited_User->delete_messages() )
+				if( $edited_User->delete_messages( 'sent' ) )
 				{	// The messages were deleted successfully
 					$Messages->add( T_('The private messages sent by the user were deleted.'), 'success' );
+
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=user&user_tab=activity&user_ID='.$user_ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+			}
+			break;
+
+		case 'delete_all_received_messages':
+			// Delete all messages received by the user
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $edited_User->ID, true );
+
+			if( param( 'confirm', 'integer', 0 ) )
+			{	// confirmed
+				if( $edited_User->delete_messages( 'received' ) )
+				{	// The messages were deleted successfully
+					$Messages->add( T_('The private messages received by the user were deleted.'), 'success' );
+
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=user&user_tab=activity&user_ID='.$user_ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+			}
+			break;
+
+		case 'delete_all_polls':
+			// Delete all polls posted by the user
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $edited_User->ID, true );
+
+			if( param( 'confirm', 'integer', 0 ) )
+			{	// confirmed
+				if( $edited_User->delete_polls() )
+				{	// The polls were deleted successfully
+					$Messages->add( T_('The polls owned by the user were deleted.'), 'success' );
 
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( '?ctrl=user&user_tab=activity&user_ID='.$user_ID, 303 ); // Will EXIT
@@ -654,11 +773,14 @@ if( !$Messages->has_errors() )
 			{	// confirmed
 				$user_login = $edited_User->dget( 'login' );
 
-				if( $edited_User->delete_messages() &&
-				    $edited_User->delete_comments() &&
-				    $edited_User->delete_posts( 'created|edited' ) &&
-				    $edited_User->delete_blogs() &&
-				    $edited_User->dbdelete( $Messages ) )
+				$edited_User->delete_sent_emails();
+				$edited_User->delete_email_returns();
+				$edited_User->delete_messages();
+				$edited_User->delete_comments();
+				$edited_User->delete_posts( 'created|edited' );
+				$edited_User->delete_blogs();
+				$edited_User->delete_polls();
+				if( $edited_User->dbdelete( $Messages ) )
 				{	// User and all his contributions were deleted successfully
 					$Messages->add( sprintf( T_('The user &laquo;%s&raquo; and all his contributions were deleted.'), $user_login ), 'success' );
 
@@ -732,6 +854,71 @@ if( !$Messages->has_errors() )
 			header_redirect( $admin_url.'?ctrl=user&user_tab='.$user_tab.'&user_ID='.$user_ID ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
+
+		case 'add_automation':
+			// Add user to automation:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $edited_User->ID, true );
+
+			param( 'autm_ID', 'integer', true );
+
+			$AutomationCache = & get_AutomationCache();
+			$user_Automation = & $AutomationCache->get_by_ID( $autm_ID, false, false );
+			$automation_title = ( $user_Automation ? '"'.$user_Automation->get( 'name' ).'"' : '#'.$autm_ID );
+
+			// Add user anyway even it it is not subscribed to Newsletter of the Automation:
+			if( $user_Automation && $user_Automation->add_users( $edited_User->ID, array( 'users_no_subs' => 'add' ) ) )
+			{	// Display message if user has been added to the selected automation really:
+				$Messages->add( sprintf( T_('The user %s has been added to automation %s.'), '"'.$edited_User->dget( 'login' ).'"', $automation_title ), 'success' );
+			}
+			else
+			{
+				// NOTE: Don't translate this message because this case should not be in normal, display only for debug:
+				$Messages->add( sprintf( 'The user %s was already added to automation %s.', '"'.$edited_User->dget( 'login' ).'"', $automation_title ), 'warning' );
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=user&user_tab=marketing&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
+
+		case 'remove_automation':
+			// Remove user from automation:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $edited_User->ID, true );
+
+			param( 'autm_ID', 'integer', true );
+
+			$AutomationCache = & get_AutomationCache();
+			$user_Automation = & $AutomationCache->get_by_ID( $autm_ID, false, false );
+			$automation_title = ( $user_Automation ? '"'.$user_Automation->get( 'name' ).'"' : '#'.$autm_ID );
+
+			$r = $DB->query( 'DELETE FROM T_automation__user_state
+				WHERE aust_user_ID = '.$DB->quote( $edited_User->ID ).'
+				  AND aust_autm_ID = '.$DB->quote( $autm_ID ) );
+
+			if( $r )
+			{	// Display message if user has been removed from selected automation really:
+				$Messages->add( sprintf( T_('The user %s has been removed from automation %s.'), '"'.$edited_User->dget( 'login' ).'"', $automation_title ), 'success' );
+			}
+			else
+			{
+				// NOTE: Don't translate this message because this case should not be in normal, display only for debug:
+				$Messages->add( sprintf( 'The user %s is not detected in automation %s.', '"'.$edited_User->dget( 'login' ).'"', $automation_title ), 'warning' );
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( '?ctrl=user&user_tab=marketing&user_ID='.$edited_User->ID, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
 	}
 }
 
@@ -784,6 +971,9 @@ if( $display_mode != 'js')
 			require_css( '#jcrop_css#', 'rsc_url' );
 			break;
 		case 'pwdchange':
+			// Check and redirect if current URL must be used as https instead of http:
+			check_https_url( 'login' );
+
 			$AdminUI->breadcrumbpath_add( T_('Change password'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
 			// Set an url for manual page:
@@ -796,16 +986,38 @@ if( $display_mode != 'js')
 			$AdminUI->set_page_manual_link( 'user-preferences-tab' );
 			break;
 		case 'subs':
-			$AdminUI->breadcrumbpath_add( T_('Notifications'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+			$AdminUI->breadcrumbpath_add( T_('Emails'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-notifications-tab' );
+			break;
+		case 'marketing':
+			$AdminUI->breadcrumbpath_add( T_('Marketing'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'user-marketing-tab' );
+
+			// Initialize user tag input
+			init_tokeninput_js();
+			break;
+		case 'visits':
+			// Initialize user tag input
+			init_tokeninput_js();
+			// Load jQuery QueryBuilder plugin files for user list filters:
+			init_querybuilder_js( 'rsc_url' );
+			$AdminUI->breadcrumbpath_add( T_('Visits'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
+
+			// Set an url for manual page:
+			$AdminUI->set_page_manual_link( 'profile-visits-tab' );
 			break;
 		case 'advanced':
 			$AdminUI->breadcrumbpath_add( T_('Advanced'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-advanced-tab' );
+
+			// Initialize JS for color picker field on the edit plugin settings form:
+			init_colorpicker_js();
 			break;
 		case 'admin':
 			$AdminUI->breadcrumbpath_add( T_('Admin'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
@@ -837,7 +1049,7 @@ if( $display_mode != 'js')
 	$AdminUI->disp_html_head();
 
 	// Display title, menu, messages, etc. (Note: messages MUST be displayed AFTER the actions)
-	$AdminUI->disp_body_top();
+	$AdminUI->disp_body_top( true, array( 'display_menu3' => false ) );
 }
 
 /*
@@ -900,6 +1112,22 @@ switch( $action )
 				$AdminUI->disp_view( 'users/views/_user_subscriptions.form.php' );
 				$AdminUI->disp_payload_end();
 				break;
+			case 'visits':
+				// Display profile visits view
+				$AdminUI->disp_payload_begin();
+				$AdminUI->disp_view( 'users/views/_user_profile_visits.view.php' );
+				$AdminUI->disp_payload_end();
+				break;
+			case 'marketing':
+				// Display user marketing form:
+				load_funcs( 'automations/model/_automation.funcs.php' );
+				memorize_param( 'user_ID', 'integer', 0 );
+				$AdminUI->disp_view( 'users/views/_user_marketing.form.php' );
+				if( $display_mode != 'js' )
+				{ // Init JS for form to add user to automation:
+					echo_user_automation_js();
+				}
+				break;
 			case 'advanced':
 				// Display user advanced form:
 				$AdminUI->disp_view( 'users/views/_user_advanced.form.php' );
@@ -910,6 +1138,9 @@ switch( $action )
 				if( $display_mode != 'js' )
 				{ // Init JS for form to delete the posts, the comments and the messages of user
 					echo_user_deldata_js();
+
+					// Init JS for WHOIS query window
+					echo_whois_js_bootstrap();
 				}
 				break;
 			case 'sessions':
@@ -918,15 +1149,32 @@ switch( $action )
 				break;
 			case 'activity':
 				// Display user activity lists:
+				load_funcs( 'polls/model/_poll.funcs.php' );
 				$AdminUI->disp_payload_begin();
 
-				if( in_array( $action, array( 'delete_all_blogs', 'delete_all_posts_created', 'delete_all_posts_edited', 'delete_all_comments', 'delete_all_messages', 'delete_all_userdata' ) ) )
+				if( in_array( $action, array( 'delete_all_sent_emails', 'delete_all_email_returns', 'delete_all_blogs', 'delete_all_posts_created', 'delete_all_posts_edited', 'delete_all_comments', 'delete_all_messages', 'delete_all_received_messages', 'delete_all_polls', 'delete_all_userdata' ) ) )
 				{	// We need to ask for confirmation before delete:
 					param( 'user_ID', 'integer', 0 , true ); // Memorize user_ID
 					// Create Data Object to user only one method confirm_delete()
 					$DataObject = new DataObject( '' );
 					switch( $action )
 					{
+						case 'delete_all_sent_emails':
+							$sent_emails_count = $edited_User->get_num_sent_emails();
+							if( $sent_emails_count > 0 )
+							{	// Display a confirm message if curent user can delete at least one email log of the edited user:
+								$confirm_message = sprintf( T_('Delete %d emails sent to the user?'), $sent_emails_count );
+							}
+							break;
+
+						case 'delete_all_email_returns':
+							$email_returns_count = $edited_User->get_num_email_returns();
+							if( $email_returns_count > 0 )
+							{	// Display a confirm message if curent user can delete at least one email returns of the edited user:
+								$confirm_message = sprintf( T_('Delete %d email returns from the user\'s email address?'), $email_returns_count );
+							}
+							break;
+
 						case 'delete_all_blogs':
 							$deleted_blogs_count = count( $edited_User->get_deleted_blogs() );
 							if( $deleted_blogs_count > 0 )
@@ -959,17 +1207,75 @@ switch( $action )
 							break;
 
 						case 'delete_all_messages':
-							$messages_count = $edited_User->get_num_messages();
+							$messages_count = $edited_User->get_num_messages( 'sent' );
 							if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
 							{	// Display a confirm message if curent user can delete the messages sent by the edited user
 								$confirm_message = sprintf( T_('Delete %d private messages sent by the user?'), $messages_count );
 							}
 							break;
 
+						case 'delete_all_received_messages':
+							$messages_count = $edited_User->get_num_messages( 'received' );
+							if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+							{	// Display a confirm message if curent user can delete the messages sent by the edited user
+								$confirm_message = sprintf( T_('Delete %d private messages received by the user?'), $messages_count );
+							}
+							break;
+
+						case 'delete_all_polls':
+							$polls_count = $edited_User->get_num_polls();
+							if( $polls_count > 0 )
+							{	// Display a confirm message if curent user can delete the polls owned by the edited user
+								$confirm_message = sprintf( T_('Delete %d polls owned by the user?'), $polls_count );
+							}
+							break;
+
 						case 'delete_all_userdata':
 							if(  $current_User->ID != $edited_User->ID && $edited_User->ID != 1 )
-							{	// User can NOT delete admin and own account
-								$confirm_message = T_('Delete user and all his contributions?');
+							{	// User can NOT delete admin and own account:
+								$confirm_messages = array();
+								$sent_emails_count = $edited_User->get_num_sent_emails();
+								if( $sent_emails_count > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+								{	// Display a confirm message if curent user can delete at least one email sent log of the edited user:
+									$confirm_messages[] = array( sprintf( T_('%d emails sent to the user'), $sent_emails_count ), 'warning' );
+								}
+								$email_returns_count = $edited_User->get_num_email_returns();
+								if( $email_returns_count > 0 && $current_User->check_perm( 'emails', 'edit' ) )
+								{	// Display a confirm message if curent user can delete at least one email return of the edited user:
+									$confirm_messages[] = array( sprintf( T_('%d email returns from the user\'s email address'), $email_returns_count ), 'warning' );
+								}
+								$deleted_blogs_count = count( $edited_User->get_deleted_blogs() );
+								if( $deleted_blogs_count > 0 )
+								{	// Display a confirm message if curent user can delete at least one blog of the edited user:
+									$confirm_messages[] = array( sprintf( T_('%d collections of the user'), $deleted_blogs_count ), 'warning' );
+								}
+								$deleted_posts_created_count = count( $edited_User->get_deleted_posts( 'created' ) );
+								if( $deleted_posts_created_count > 0 )
+								{	// Display a confirm message if curent user can delete at least one post created by the edited user:
+									$confirm_messages[] = array( sprintf( T_('%d posts created by the user'), $deleted_posts_created_count ), 'warning' );
+								}
+								$deleted_posts_edited_count = count( $edited_User->get_deleted_posts( 'edited' ) );
+								if( $deleted_posts_edited_count > 0 )
+								{	// Display a confirm message if curent user can delete at least one post created by the edited user:
+									$confirm_messages[] = array( sprintf( T_('%d posts edited by the user'), $deleted_posts_edited_count ), 'warning' );
+								}
+								if( $edited_User->has_comment_to_delete() )
+								{	// Display a confirm message if curent user can delete at least one comment posted by the edited user:
+									$confirm_messages[] = array( sprintf( T_('%s comments posted by the user'), $edited_User->get_num_comments( '', true ) ), 'warning' );
+								}
+								$messages_count = $edited_User->get_num_messages();
+								if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+								{	// Display a confirm message if curent user can delete the messages sent by the edited user
+									$confirm_messages[] = array( sprintf( T_('%d private messages sent by the user'), $messages_count ), 'warning' );
+								}
+								// Find other users with the same email address
+								$message_same_email_users = find_users_with_same_email( $edited_User->ID, $edited_User->get( 'email' ), T_('Note: this user has the same email address (%s) as: %s') );
+								if( $message_same_email_users !== false )
+								{
+									$confirm_messages[] = array( $message_same_email_users, 'note' );
+								}
+								// Displays a form to confirm the deletion of all user contributions:
+								$edited_User->confirm_delete( T_('Delete user and all his contributions?'), 'user', $action, get_memorized( 'action' ), $confirm_messages );
 							}
 							break;
 					}
@@ -1024,7 +1330,29 @@ switch( $action )
 				}
 				$image_width = param( 'image_width', 'integer' );
 				$image_height = param( 'image_height', 'integer' );
+				$aspect_ratio = param( 'aspect_ratio', 'double' );
+				$content_width = param( 'content_width', 'integer' );
+				$content_height = param( 'content_height', 'integer' );
 				$AdminUI->disp_view( 'users/views/_user_crop.form.php' );
+				if( $display_mode != 'js')
+				{
+					$AdminUI->disp_payload_end();
+				}
+				break;
+
+			case 'automation':
+				if( $display_mode == 'js')
+				{ // Do not append Debuglog & Debug JSlog to response!
+					$debug = false;
+					$debug_jslog = false;
+				}
+
+				if( $display_mode != 'js')
+				{
+					$AdminUI->disp_payload_begin();
+				}
+				$user_tab = param( 'user_tab_from', 'string', 'marketing' );
+				$AdminUI->disp_view( 'users/views/_user_automation.form.php' );
 				if( $display_mode != 'js')
 				{
 					$AdminUI->disp_payload_end();

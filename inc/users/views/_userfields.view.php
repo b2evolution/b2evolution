@@ -16,8 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'users/model/_userfield.class.php', 'Userfield' );
 
-global $dispatcher;
-
 // query which groups have user field definitions (in order to prevent deletion of groups which have user field definitions)
 global $usedgroups;	// We need this in a callback below
 $usedgroups = $DB->get_col( 'SELECT ufgp_ID
@@ -158,7 +156,7 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 
 			if( !in_array( $row->ufgp_ID, $usedgroups ) )
 			{ // delete
-				$r .= action_icon( T_('Delete this group!'), 'delete', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=delete&amp;ufgp_ID='.$row->ufgp_ID.'&amp;'.url_crumb('userfieldgroup') ) );
+				$r .= action_icon( T_('Delete this group').'!', 'delete', regenerate_url( 'ctrl,action', 'ctrl=userfieldsgroups&amp;action=delete&amp;ufgp_ID='.$row->ufgp_ID.'&amp;'.url_crumb('userfieldgroup') ) );
 			}
 			else
 			{

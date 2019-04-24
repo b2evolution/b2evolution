@@ -15,3 +15,11 @@ npm-debug.log
 /nbproject/
 .idea/*
 media/blogs/a
+skins/business_skin
+conf/_local.php
+plugins/geoip_plugin/GeoLite2-Country.mmdb
+media/blogs/b
+npm-debug.log
+/media/users/admin/private_message
+/media/blogs/forums
+/_db/b2evo_schema.mwb.bak

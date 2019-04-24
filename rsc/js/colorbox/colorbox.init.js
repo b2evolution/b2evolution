@@ -20,7 +20,7 @@ function init_colorbox( this_obj )
 
 	var type = this_obj.attr( 'rel' ).match( /lightbox\[([a-z]+)/i );
 	type = type ? type[1] : '';
-	switch( type[1] )
+	switch( type )
 	{
 		case 'p': // post
 			this_obj.colorbox( b2evo_colorbox_params_post );

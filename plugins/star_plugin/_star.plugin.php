@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  *
@@ -23,18 +23,12 @@ class star_plugin extends Plugin
 	var $code = 'b2evStar';
 	var $name = 'Star renderer';
 	var $priority = 55;
-	var $version = '5.0.0';
+	var $version = '6.11.1';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
 	var $help_topic = 'star-plugin';
 	var $number_of_installs = 1;
-
-	/*
-	 * Internal vars
-	 */
-	var $search_text;
-	var $replace_func;
 
 
 	/**
@@ -44,33 +38,19 @@ class star_plugin extends Plugin
 	{
 		$this->short_desc = T_('Star formatting e-g [stars:2.3/5]');
 		$this->long_desc = T_('This plugin allows to render star ratings inside blog posts and comments by using the syntax [stars:2.3/5] for example');
-
-		// Pattern to search the stars
-		$this->search_text = '#\[stars:([\d\.]+)(/\d+)?\]#';
-		// Function to build template for stars
-		$this->replace_func = array( $this, 'get_stars_template' );
 	}
 
 
 	/**
-	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 * Define here default email settings that are to be made available in the backoffice.
 	 *
-	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
-	 *
-	 * @param array Associative array of parameters
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
 	 */
-	function SkinBeginHtmlHead( & $params )
+	function get_email_setting_definitions( & $params )
 	{
-		global $Blog;
-
-		if( ! isset( $Blog ) || (
-		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' && 
-		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
-		{ // Don't load css/js files when plugin is not enabled
-			return;
-		}
-
-		require_css( $this->get_plugin_url( true ).'star.css', 'blog' );
+		// Set empty array to disable this plugin for Email Campaign:
+		return array();
 	}
 
 
@@ -91,26 +71,9 @@ class star_plugin extends Plugin
 	 *
 	 * @see Plugin::RenderItemAsHtml()
 	 */
-	function RenderItemAsHtml( & $params )
+	function DisplayItemAsHtml( & $params )
 	{
-		$content = & $params['data'];
-		$content = replace_content_outcode( $this->search_text, $this->replace_func, $content, 'replace_content_callback' );
-
-		return true;
-	}
-
-
-	/**
-	 * Perform rendering of Message content
-	 *
-	 * NOTE: Use default coll settings of comments as messages settings
-	 *
-	 * @see Plugin::RenderMessageAsHtml()
-	 */
-	function RenderMessageAsHtml( & $params )
-	{
-		$content = & $params['data'];
-		$content = replace_content_outcode( $this->search_text, $this->replace_func, $content, 'replace_content_callback' );
+		$params['data'] = $this->render_stars( $params['data'] );
 
 		return true;
 	}
@@ -121,28 +84,28 @@ class star_plugin extends Plugin
 	 *
 	 * @see RenderItemAsHtml()
 	 */
-	function RenderItemAsXml( & $params )
+	function DisplayItemAsXml( & $params )
 	{
-		$this->RenderItemAsHtml( $params );
+		return $this->DisplayItemAsHtml( $params );
 	}
 
 
 	/**
+	 * Render stars template from [[stars:3/7]
+	 *  to <span class="evo_stars_img" style="width:112px">
+	 *       <i>*</i>
+	 *       <i>*</i>
+	 *       <i class="evo_stars_img_empty"><i style="width:50%">%</i></i>
+	 *       <i class="evo_stars_img_empty">-</i>
+	 *       <i class="evo_stars_img_empty">-</i>
+	 *     </span>
 	 *
-	 * Render comments if required
-	 *
-	 * @see Plugin::FilterCommentContent()
+	 * @param string Source content
+	 * @return string Rendered content
 	 */
-	function FilterCommentContent( & $params )
+	function render_stars( $content )
 	{
-		$Comment = & $params['Comment'];
-		$comment_Item = & $Comment->get_Item();
-		$item_Blog = & $comment_Item->get_Blog();
-		if( in_array( $this->code, $Comment->get_renderers_validated() ) )
-		{ // apply_comment_rendering is set to render
-			$content = & $params['data'];
-			$content = replace_content_outcode( $this->search_text, $this->replace_func, $content, 'replace_content_callback' );
-		}
+		return replace_content_outcode( '#\[stars:([\d\.]+)(/\d+)?\]#', array( $this, 'get_stars_template' ), $content, 'replace_content_callback' );
 	}
 
 
@@ -154,6 +117,8 @@ class star_plugin extends Plugin
 	 */
 	function get_stars_template( $matches )
 	{
+		global $b2evo_icons_type;
+
 		if( empty( $matches ) )
 		{ // No stars found
 			return;
@@ -170,30 +135,7 @@ class star_plugin extends Plugin
 			$number_stars = 5;
 		}
 
-		$active_stars_max = floor( $active_stars );
-		$percents = round( ( $active_stars - $active_stars_max ) * 100 );
-		$template = '<span class="star_plugin"'.( $number_stars != 5 ? ' style="width:'.( $number_stars * 16 ).'px"' : '' ).'>';
-		for( $s = 1; $s <= $number_stars; $s++ )
-		{
-			$attrs = '';
-			if( $s > $active_stars_max )
-			{ // Class for empty stars
-				$attrs .= ' class="empty"';
-			}
-			$template .= '<span'.$attrs.'>';
-			if( $s == $active_stars_max + 1 && $percents > 0 )
-			{ // Star with a percent fill
-				$template .= '<span style="width:'.$percents.'%">%</span>';
-			}
-			else
-			{
-				$template .= $s <= $active_stars_max ? '*' : '-';
-			}
-			$template .= '</span>';
-		}
-		$template .= '</span>';
-
-		return $template;
+		return get_star_rating( $active_stars, $number_stars );
 	}
 }
 

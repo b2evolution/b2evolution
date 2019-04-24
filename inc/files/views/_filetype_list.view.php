@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -15,7 +15,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $rsc_url, $dispatcher;
+global $rsc_url, $admin_url;
 
 global $Session;
 
@@ -41,7 +41,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	$Results->cols[] = array(
 							'th' => T_('Extensions'),
 							'order' => 'ftyp_extensions',
-							'td' => '<strong><a href="'.$dispatcher.'?ctrl=filetypes&amp;ftyp_ID=$ftyp_ID$&amp;action=edit" title="'.
+							'td' => '<strong><a href="'.$admin_url.'?ctrl=filetypes&amp;ftyp_ID=$ftyp_ID$&amp;action=edit" title="'.
 											T_('Edit this file type...').'">$ftyp_extensions$</a></strong>',
 						);
 }

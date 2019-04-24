@@ -10,7 +10,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  *
@@ -35,6 +35,8 @@ $recipient_id = param( 'recipient_id', 'integer', 0 );
 $post_id = param( 'post_id', 'integer', 0 );
 $comment_id = param( 'comment_id', 'integer', 0 );
 $subject = param( 'subject', 'string', '' );
+$subject_other = param( 'subject_other', 'string', '' );
+$contact_method = param( 'contact_method', 'string', '' );
 
 
 // User's preferred name or the stored value in her cookie (from commenting):
@@ -54,20 +56,28 @@ if( ! strlen( $email_author ) )
 
 $recipient_User = NULL;
 // Get the name and email address of the recipient
-if( empty($recipient_id) )
-{
-	$recipient_name = param( 'recipient_name', 'string', '' );
-	$recipient_address = param( 'recipient_address', 'string', '' );
-}
-else
-{ // If the email is to a registered user get the email address from the users table
+if( ! empty( $recipient_id ) )
+{	// If the email is to a registered user get the email address from the users table
 	$UserCache = & get_UserCache();
 	$recipient_User = & $UserCache->get_by_ID( $recipient_id );
 
 	if( $recipient_User )
 	{ // recipient User found
-		$recipient_name = $recipient_User->get('preferredname');
-		$recipient_address = $recipient_User->get('email');
+		$recipient_name = $recipient_User->get_username();
+		$recipient_address = $recipient_User->get( 'email' );
+	}
+}
+elseif( ! empty( $comment_id ) )
+{	// If the email is to anonymous user of comment
+	$CommentCache = & get_CommentCache();
+	if( $Comment = & $CommentCache->get_by_ID( $comment_id, false ) )
+	{
+		$recipient_User = & $Comment->get_author_User();
+		if( empty( $recipient_User ) && ( $Comment->allow_msgform ) && ( is_email( $Comment->get_author_email() ) ) )
+		{	// Get recipient name and email from comment's author:
+			$recipient_name = $Comment->get_author_name();
+			$recipient_address = $Comment->get_author_email();
+		}
 	}
 }
 
@@ -81,14 +91,12 @@ if( empty($recipient_address) )
 // Form to send email
 if( !empty( $Blog ) && ( $Blog->get_ajax_form_enabled() ) )
 {
-	if( empty( $subject ) )
-	{
-		$subject = '';
-	}
 	// init params
 	$json_params = array(
 		'action' => 'get_msg_form',
 		'subject' => $subject,
+		'subject_other' => $subject_other,
+		'contact_method' => $contact_method,
 		'recipient_id' => $recipient_id,
 		'recipient_name' => $recipient_name,
 		'email_author' => $email_author,
@@ -98,24 +106,11 @@ if( !empty( $Blog ) && ( $Blog->get_ajax_form_enabled() ) )
 		'redirect_to' => $redirect_to,
 		'params' => $params );
 
-	// generate form wtih ajax request
+	// Generate form with ajax request:
 	display_ajax_form( $json_params );
 }
 else
 {
-	if( ! empty( $recipient_User ) )
-	{ // Get identity link for existed users
-		$recipient_link = $recipient_User->get_identity_link( array( 'link_text' => 'nickname' ) );
-	}
-	else
-	{ // Get login name for anonymous user
-		$gender_class = '';
-		if( check_setting( 'gender_colored' ) )
-		{ // Set a gender class if the setting is ON
-			$gender_class = ' nogender';
-		}
-		$recipient_link = '<span class="user anonymous'.$gender_class.'" rel="bubbletip_comment_'.$comment_id.'">'.$recipient_name.'</span>';
-	}
 	require skin_template_path( '_contact_msg.form.php' );
 }
 

@@ -4,7 +4,7 @@
  * or display the default collection. If there is none, it will call default.php.
  *
  * ---------------------------------------------------------------------------------------------------------------
- * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER. 
+ * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER.
  * TO GET STARTED, GO TO THIS PAGE: http://b2evolution.net/man/getting-started
  * ---------------------------------------------------------------------------------------------------------------
  *
@@ -13,7 +13,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package main
  */
@@ -29,15 +29,29 @@ $Timer->resume('index.php');
 
 if( ! isset($collections_Module) )
 {	// The evocore framework is not used as a blog app here / we don't know how to display a public interface...
-	header_redirect( 'admin.php', 302 );
+	header_redirect( $admin_url, 302 );
 	exit(0);
 }
 
 // initialize which blog should be displayed, and display default page if blog could not be initialized
 if( !init_requested_blog( false ) )
-{ // No specific blog to be displayed:
-	// we are going to display the default page:
-	require dirname(__FILE__).'/default.php';
+{	// No specific blog to be displayed:
+	if( $Settings->get( 'default_blog_ID' ) == -1 )
+	{	// we are going to display the admin page:
+		global $dispatcher;
+
+		if( ! is_logged_in() )
+		{	// user must be logged in and his/her account must be validated before access to admin:
+			$login_required = true;
+			$validate_required = true;
+			require $inc_path.'_init_login.inc.php';
+		}
+		require dirname(__FILE__).'/'.$dispatcher;
+	}
+	else
+	{	// we are going to display the default page:
+		require dirname(__FILE__).'/default.php';
+	}
 	exit();
 }
 
@@ -45,11 +59,6 @@ if( !init_requested_blog( false ) )
 
 # You could *force* a specific skin here with this setting:
 # $skin = 'basic';
-
-# This setting retricts posts to those published, thus hiding drafts.
-# You should not have to change this.
-# TODO: Check if we still need this and if it's even working (it's probably overidden anyways)
-$show_statuses = array();
 
 # Additionnaly, you can set other values (see URL params in the manual)...
 # $order = 'ASC'; // This for example would display the blog in chronological order...

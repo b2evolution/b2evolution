@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package plugins
@@ -107,6 +107,9 @@ class Plugins_admin extends Plugins
 
 				'AdminBeginPayload' => 'This gets called before the main payload in the backoffice is displayed.',
 
+				'WidgetBeginSettingsForm' => 'This gets called at the beginning of the "Edit wdiget" form on back-office.',
+				'WidgetEndSettingsForm' => 'This gets called at the end of the "Edit wdiget" form on back-office.',
+
 				'CacheObjects' => 'Cache data objects.',
 				'CachePageContent' => 'Cache page content.',
 				'CacheIsCollectingContent' => 'Gets asked for if we are generating cached content.',
@@ -140,10 +143,18 @@ class Plugins_admin extends Plugins
 				'RenderItemAsHtml' => 'Renders content when generated as HTML.',
 				'RenderItemAsXml' => 'Renders content when generated as XML.',
 				'RenderItemAsText' => 'Renders content when generated as plain text.',
+				'PrepareForRenderItemAttachment' => 'Prepare to render item attachment.',
 				'RenderItemAttachment' => 'Renders item attachment.',
+				'PrepareForRenderCommentAttachment' => 'Prepare to render comment attachment.',
 				'RenderCommentAttachment' => 'Renders comment attachment.',
 				'RenderMessageAsHtml' => 'Renders message content when generated as HTML.',
+				'PrepareForRenderMessageAttachment' => 'Prepare to render message attachment.',
+				'RenderMessageAttachment' => 'Renders message attachment.',
 				'RenderEmailAsHtml' => 'Renders email content when generated as HTML.',
+				'PrepareForRenderEmailAttachment' => 'Prepare to render email campaign attachment.',
+				'RenderEmailAttachment' => 'Renders email campaign attachment.',
+				'RenderInlineTags' => 'Render inline tags.',
+				'RenderURL' => 'Renders file by URL.',
 
 
 				// fp> rename to "DispRender"
@@ -166,6 +177,7 @@ class Plugins_admin extends Plugins
 				'AfterUserDelete' => 'This gets called after an user has been deleted from the database.',
 				'AfterUserInsert' => 'This gets called after an user has been inserted into the database.',
 				'AfterUserUpdate' => 'This gets called after an user has been updated in the database.',
+				'AdminAfterUsersList' => 'This gets called right after displaying the admin users list.',
 
 				// fp> This is actually RENDERing, right?
 				// TODO: Rename to "DispRender"
@@ -214,9 +226,8 @@ class Plugins_admin extends Plugins
 				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
 
 				// Other Plugins can use this:
-				'CaptchaValidated' => 'Validate the test from CaptchaPayload to detect humans.',
-				'CaptchaValidatedCleanup' => 'Cleanup data used for CaptchaValidated.',
-				'CaptchaPayload' => 'Provide a turing test to detect humans.',
+				'RequestCaptcha' => 'Return data to display captcha html code.',
+				'ValidateCaptcha' => 'Validate the test from RequestCaptcha to detect humans.',
 
 				'RegisterFormSent' => 'Called when the "Register" form has been submitted.',
 				'ValidateAccountFormSent' => 'Called when the "Validate account" form has been submitted.',
@@ -236,6 +247,8 @@ class Plugins_admin extends Plugins
 				'BeforeBlogDisplay' => 'Gets called before a (part of the blog) gets displayed.',
 				'InitMainList' => 'Initializes the MainList object. Use this method to create your own MainList, see init_MainList()',
 				'SkinBeginHtmlHead' => 'Gets called at the top of the HTML HEAD section in a skin.',
+				'SkinEndHtmlHead' => 'Gets called at the end of the HTML HEAD section in a skin.',
+				'SkinBeginHtmlBody' => 'Gets called at the top of the skin\'s HTML BODY section.',
 				'SkinEndHtmlBody' => 'Gets called at the end of the skin\'s HTML BODY section.',
 				'DisplayTrackbackAddr' => 'Called to display the trackback URL for an item.',
 				'BeforeSkinWrapper' => 'Gets called before skin wrapper.',
@@ -252,6 +265,10 @@ class Plugins_admin extends Plugins
 				'HandleDispMode' => 'Called when displaying $disp',
 
 				'GetAdditionalColumnsTable' => 'Called to add columns for Results object',
+				'GetImageInlineTags' => 'Called to add tabs on the modal/popup window "Insert image into content"',
+				'InitImageInlineTagForm' => 'Called to initialize params for form of additional tab on the modal/popup window "Insert image into content"',
+				'DisplayImageInlineTagForm' => 'Called to display a form for additional tab on the modal/popup window "Insert image into content"',
+				'GetInsertImageInlineTagJavaScript' => 'Called to get an additional JavaScript before submit/insert inline tag from the modal/popup window "Insert image into content"',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
@@ -417,7 +434,7 @@ class Plugins_admin extends Plugins
 					'always' => 'always',
 					'opt-out' => 'opt-out',
 					'opt-in' => 'opt-in',
-					'lazy' => 'automatic', // The plugin will automatically deside to use rendering or not
+					'lazy' => 'automatic', // The plugin will automatically decide to use rendering or not
 					'never' => 'never',
 				);
 		}
@@ -932,20 +949,9 @@ class Plugins_admin extends Plugins
 	{
 		global $DB;
 
-		if( strlen( $code ) < 8 )
+		if( ! preg_match( '#^[A-Za-z0-9\-_]{8,32}$#', $code ) )
 		{
-			return T_( 'The minimum length of a plugin code is 8 characters.' );
-		}
-
-		if( strlen( $code ) > 32 )
-		{
-			return T_( 'The maximum length of a plugin code is 32 characters.' );
-		}
-
-		// TODO: more strict check?! Just "[\w_-]+" as regexp pattern?
-		if( strpos( $code, '.' ) !== false )
-		{
-			return T_( 'The plugin code cannot include a dot!' );
+			return sprintf( T_('The field "%s" must be from %d to %d letters, digits or signs %s.'), T_('Code'), 8, 32, '<code>_</code>, <code>-</code>' );
 		}
 
 		if( ! empty($code) && isset( $this->index_code_ID[$code] ) )
@@ -1073,9 +1079,9 @@ class Plugins_admin extends Plugins
 	{
 		global $DB;
 
-		if( ! preg_match( '~^1?\d?\d$~', $priority ) ) // using preg_match() to catch floating numbers
+		if( ! preg_match( '~^[12]?\d?\d$~', $priority ) ) // using preg_match() to catch floating numbers
 		{
-			debug_die( 'Plugin priority must be numeric (0-100).' );
+			debug_die( 'Plugin priority must be numeric (0-255).' );
 		}
 
 		$Plugin = & $this->get_by_ID($plugin_ID);
@@ -1451,7 +1457,7 @@ class Plugins_admin extends Plugins
 
 					case 'api_min':
 						// obsolete since 1.9:
-						continue;
+						break;
 
 
 					default:
@@ -1490,7 +1496,7 @@ class Plugins_admin extends Plugins
 		if( !isset( $params['object_Blog'] ) &&
 		    ( !isset( $params['object_type'] ) || ( isset( $params['object_type'] ) && $params['object_type'] != 'Message' ) ) )
 		{
-			global $Blog;
+			global $Collection, $Blog;
 			if( empty( $Blog ) )
 			{
 				return false;

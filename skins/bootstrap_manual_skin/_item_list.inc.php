@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_manual
@@ -46,9 +46,22 @@ if( ! empty( $params['Item'] ) )
 			$item_action_links = '<div class="'.button_class( 'group' ).'">'.$item_action_links.'</div>';
 		}
 
+		// Flag:
+		$item_flag = $Item->get_flag( array(
+				'before'       => ' ',
+				'only_flagged' => true,
+				'allow_toggle' => false,
+			) );
+
+		// Status(only not published):
+		$item_status = $Item->status == 'published' ? '' : $Item->get_format_status( array(
+				'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+			) );
+
+		// Title:
 		$Item->title( array(
 				'before'          => $params['before_title'],
-				'after'           => $params['after_title'].$item_action_links.'<div class="clear"></div>',
+				'after'           => $item_flag.$params['after_title'].$item_status.$item_action_links.'<div class="clear"></div>',
 				'before_title'    => get_icon( 'file_message' ),
 				//'after'      => ' <span class="red">'.( $Item->get('order') > 0 ? $Item->get('order') : 'NULL').'</span>'.$params['after_title'].$item_edit_link.'<div class="clear"></div>',
 				'post_navigation' => $params['post_navigation'],

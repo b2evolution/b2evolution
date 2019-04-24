@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -83,10 +83,10 @@ if( !$user_profile_only )
 $is_admin = is_admin_page();
 if( $is_admin )
 {
-	$form_text_title = T_( 'Change password' ).get_manual_link( 'user-password-tab' ); // used for js confirmation message on leave the changed form
+	$form_text_title = '<span class="nowrap">'.T_( 'Change password' ).'</span>'.get_manual_link( 'user-password-tab' ); // used for js confirmation message on leave the changed form
 	$form_title = get_usertab_header( $edited_User, 'pwdchange', $form_text_title );
 	$form_class = 'fform';
-	$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+	$Form->title_fmt = '$title$';
 }
 else
 {
@@ -114,14 +114,13 @@ $Form->begin_form( $form_class, $form_title, array( 'title' => ( isset( $form_te
 
 	/***************  Password  **************/
 
-if( $action != 'view' )
-{ // We can edit the values:
-
 	$Form->begin_fieldset( $is_admin ? T_('Password').get_manual_link( 'user-password-tab' ) : '', array( 'class'=>'fieldset clear' ) );
 
 		// current password is not required:
 		//   - password change requested by email
-		if( empty( $reqID ) || $reqID != $Session->get( 'core.changepwd.request_id' ) )
+		//   - password has not been set yet(email capture/quick registration)
+		if( ( empty( $reqID ) || $reqID != $Session->get( 'core.changepwd.request_id' ) ) &&
+				( $edited_User->get( 'pass_driver' ) != 'nopass' ) )
 		{
 			if( ! $has_full_access || $edited_User->ID == $current_User->ID )
 			{ // Current user has no full access or editing his own pasword
@@ -133,21 +132,20 @@ if( $action != 'view' )
 			}
 		}
 		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'note' => sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off' ) );
-		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off', 'note' => '<span id="pass2_status" class="red"></span>' ) );
+		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'maxlength' => 50, 'required' => ($edited_User->ID == 0), 'autocomplete'=>'off', 'note' => '<span id="pass2_status" class="field_error"></span>' ) );
 
 	$Form->end_fieldset();
-}
 
 	/***************  Buttons  **************/
 
 if( $action != 'view' )
 { // Edit buttons
-	$Form->buttons( array( array( '', 'actionArray['.$params['form_button_action'].']', T_('Change password!'), 'SaveButton'.$params['button_class'] ) ) );
+	$Form->buttons( array( array( '', 'actionArray['.$params['form_button_action'].']', T_('Change password').'!', 'SaveButton'.$params['button_class'] ) ) );
 }
 
 if( $params['display_abandon_link'] )
-{ // Display a link to go away from this form
-	$Form->info( '', '<div><a href="'.regenerate_url( 'disp', 'disp=profile' ).'">'.T_( 'Abandon password change' ).'</a></div>' );
+{	// Display a link to go away from this form:
+	$Form->info( '', '<div><a href="'.get_user_settings_url( 'profile', $edited_User->ID ).'">'.T_( 'Abandon password change' ).'</a></div>' );
 }
 
 
@@ -161,4 +159,6 @@ display_password_indicator( array(
 			'field-width' => 165,
 	) );
 
+// Display javascript code to edit password:
+display_password_js_edit();
 ?>

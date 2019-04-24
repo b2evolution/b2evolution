@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -23,13 +23,13 @@ global $current_User;
  */
 global $admin_Plugins;
 
-global $dispatcher;
+global $admin_url;
 
 $Table = new Table();
 
-$Table->title = T_('Plugins available for installation').get_manual_link('plugins_available_for_installation');
+$Table->title = T_('Plugins available for installation').get_manual_link('plugins-available-for-installation');
 
-$Table->global_icon( T_('Cancel install!'), 'close', regenerate_url(), T_('Cancel'), 3, 4 );
+$Table->global_icon( T_('Cancel installation!'), 'close', regenerate_url(), T_('Cancel'), 3, 4 );
 
 $Table->cols = array(
 		array( 'th' => T_('Plugin') ),
@@ -51,7 +51,7 @@ $Table->display_head();
 // BODY START:
 $Table->display_body_start();
 
-if( empty($AvailablePlugins) || ! is_a( $AvailablePlugins, 'Plugins_admin_no_DB' ) )
+if( empty($AvailablePlugins) || ! ( $AvailablePlugins instanceof Plugins_admin_no_DB ) )
 { // (may have been instantiated for action 'info')
 	load_class( 'plugins/model/_plugins_admin_no_db.class.php', 'Plugins_admin_no_DB' );
 	$AvailablePlugins = new Plugins_admin_no_DB(); // do not load registered plugins/events from DB
@@ -151,7 +151,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 					     || $registrations < $loop_Plugin->number_of_installs ) )
 			{ // number of installations are not limited or not reached yet and user has "edit options" perms
 				?>
-				[<a href="<?php echo $dispatcher ?>?ctrl=plugins&amp;action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname).'&amp;'.url_crumb('plugin') ?>"><?php
+				[<a href="<?php echo $admin_url; ?>?ctrl=plugins&amp;action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname).'&amp;'.url_crumb('plugin') ?>"><?php
 					echo T_('Install');
 					if( $registrations )
 					{	// This plugin is already installed

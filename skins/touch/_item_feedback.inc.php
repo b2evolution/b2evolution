@@ -1,20 +1,17 @@
 <?php
 /**
  * This is the template that displays the feedback for a post
- * (comments, trackback, pingback...)
- *
- * You may want to call this file multiple time in a row with different $c $tb $pb params.
- * This allow to seprate different kinds of feedbacks instead of displaying them mixed together
+ * (comments, trackback, pingback, webmention...)
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template.
  * To display a feedback, you should call a stub AND pass the right parameters
- * For example: /blogs/index.php?p=1&more=1&c=1&tb=1&pb=1
+ * For example: /blogs/index.php?p=1&more=1
  * Note: don't code this URL by hand, use the template functions to generate it!
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage touch
@@ -27,11 +24,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
-		'disp_comments'        => true,
-		'disp_comment_form'    => true,
-		'disp_trackbacks'      => true,
-		'disp_trackback_url'   => true,
-		'disp_pingbacks'       => true,
+		'disp_comments'        => is_single_page(),
+		'disp_comment_form'    => is_single_page(),
+		'disp_trackbacks'      => is_single_page(),
+		'disp_trackback_url'   => is_single_page(),
+		'disp_pingbacks'       => is_single_page(),
+		'disp_webmentions'     => is_single_page(),
 		'disp_section_title'   => true,
 		'disp_rating_summary'  => true,
 		'before_section_title' => '<h3 id="com-head" onclick="bnc_showhide_coms_toggle();"><img alt="arrow" src="'.$Skin->get_url().'img/com_arrow.png" id="com-arrow">',
@@ -45,14 +43,14 @@ $params = array_merge( array(
 		'comment_error_start'  => '<div class="bComment" id="comment_error">',
 		'comment_error_end'    => '</div>',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
-		'author_link_text'     => 'name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+		'author_link_text'     => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 		'link_to'              => 'userurl>userpage',		    // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'form_title_start'     => '<h3 id="respond">',
 		'form_title_end'       => '</h3>',
 		'notification_text'    => T_( 'This is your post. You are receiving notifications when anyone comments on your posts.' ),
 	), $params );
 
-global $c, $tb, $pb, $redir;
+global $redir;
 
 echo '<div id="comment_wrapper">';
 
@@ -63,24 +61,13 @@ modules_call_method( 'before_comments', $params );
 // Check if user is allowed to see comments, display corresponding message if not allowed
 if( $Item->can_see_comments( true ) )
 { // user is allowed to see comments
-	if( empty($c) )
-	{	// Comments not requested
-		$params['disp_comments'] = false;					// DO NOT Display the comments if not requested
-		$params['disp_comment_form'] = false;			// DO NOT Display the comments form if not requested
+	if( ! $Item->can_receive_pings() )
+	{	// Trackbacks are not allowed
+		$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not allowed
+		$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not allowed
 	}
 
-	if( empty($tb) || !$Item->can_receive_pings() )
-	{	// Trackback not requested or not allowed
-		$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not requested
-		$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not requested
-	}
-
-	if( empty($pb) )
-	{	// Pingback not requested
-		$params['disp_pingbacks'] = false;				// DO NOT Display the pingbacks if not requested
-	}
-
-	if( ! ($params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] ) )
+	if( ! ( $params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] || $params['disp_webmentions'] ) )
 	{	// Nothing more to do....
 		return false;
 	}
@@ -96,7 +83,10 @@ if( $Item->can_see_comments( true ) )
 		if( $Item->can_see_comments() )
 		{	// User can see a comments
 			$type_list[] = 'comment';
-			if( $title = $Item->get_feedback_title( 'comments' ) )
+			$Item->load_Blog();
+			$comment_inskin_statuses = explode( ',', $Item->Blog->get_setting( 'comment_inskin_statuses' ) );
+
+			if( $title = $Item->get_feedback_title( 'comments', '#', '#', '#', $comment_inskin_statuses ) )
 			{
 				$disp_title[] = $title;
 			}
@@ -133,6 +123,16 @@ if( $Item->can_see_comments( true ) )
 		echo '<a id="pingbacks"></a>';
 	}
 
+	if( $params['disp_webmentions'] )
+	{
+		$type_list[] = 'webmention';
+		if( $title = $Item->get_feedback_title( 'webmentions' ) )
+		{
+			$disp_title[] = $title;
+		}
+		echo '<a id="webmentions"></a>';
+	}
+
 	if( $params['disp_trackback_url'] )
 	{ // We want to display the trackback URL:
 
@@ -150,11 +150,11 @@ if( $Item->can_see_comments( true ) )
 	}
 
 
-	if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks']  )
+	if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] || $params['disp_webmentions'] )
 	{
 		if( empty($disp_title) )
 		{	// No title yet
-			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), array( 'review', 'draft' ), false ) )
+			if( $title = $Item->get_feedback_title( 'feedbacks', '', T_('Feedback awaiting moderation'), T_('Feedback awaiting moderation'), '#moderation#', false ) )
 			{ // We have some feedback awaiting moderation: we'll want to show that in the title
 				$disp_title[] = $title;
 			}
@@ -164,6 +164,8 @@ if( $Item->can_see_comments( true ) )
 		{	// Still no title
 			$disp_title[] = T_('No feedback yet');
 		}
+
+		global $CommentList;
 
 		$comments_per_page = !$Blog->get_setting( 'threaded_comments' ) ? $Blog->get_setting( 'comments_per_page' ) : 1000;
 		$CommentList = new CommentList2( $Blog, $comments_per_page, 'CommentCache', 'c_' );
@@ -178,9 +180,6 @@ if( $Item->can_see_comments( true ) )
 			) );
 
 		$CommentList->load_from_Request();
-
-		// Run SQL query to get results depending on current filters:
-		$CommentList->query();
 
 		// Get ready for display (runs the query):
 		$CommentList->display_init();
@@ -201,7 +200,7 @@ if( $Item->can_see_comments( true ) )
 			global $CommentReplies;
 			$CommentReplies = array();
 
-			if( $Comment = $Session->get('core.preview_Comment') )
+			if( $Comment = get_comment_from_session( 'preview' ) )
 			{	// Init PREVIEW comment
 				if( $Comment->item_ID == $Item->ID )
 				{
@@ -282,28 +281,33 @@ if( $Item->can_see_comments( true ) )
 }
 
 // ------------------ COMMENT FORM INCLUDED HERE ------------------
-if( $Blog->get_ajax_form_enabled() && ( $Blog->get_setting( 'allow_comments' ) != 'never' ) )
-{
-	$json_params = array(
-		'action' => 'get_comment_form',
-		'p' => $Item->ID,
-		'blog' => $Blog->ID,
-		'disp' => $disp,
-		'params' => $params );
-	display_ajax_form( $json_params );
+if( $Blog->get_setting( 'allow_comments' ) != 'never' && // if enabled by collection setting
+    $Item->get_type_setting( 'use_comments' ) ) // if enabled by item type setting
+{	// Display a comment form only if it is enabled:
+	if( $Blog->get_ajax_form_enabled() )
+	{
+		$json_params = array(
+			'action' => 'get_comment_form',
+			'p' => $Item->ID,
+			'blog' => $Blog->ID,
+			'reply_ID' => param( 'reply_ID', 'integer', 0 ),
+			'disp' => $disp,
+			'params' => $params );
+		display_ajax_form( $json_params );
+	}
+	else
+	{
+		skin_include( '_item_comment_form.inc.php', $params );
+	}
+	// Note: You can customize the default item comment form by copying the generic
+	// /skins/_item_comment_form.inc.php file into the current skin folder.
 }
-else
-{
-	skin_include( '_item_comment_form.inc.php', $params );
-}
-// Note: You can customize the default item comment form by copying the generic
-// /skins/_item_comment_form.inc.php file into the current skin folder.
 // ---------------------- END OF COMMENT FORM ---------------------
 
 // ----------- Register for item's comment notification -----------
 if( is_logged_in() && $Item->can_comment( NULL ) )
 {
-	global $DB, $htsrv_url;
+	global $DB;
 	global $UserSettings;
 
 	echo '<div class="comment_notification">';
@@ -311,7 +315,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 	$not_subscribed = true;
 	$creator_User = $Item->get_creator_User();
 
-	if( $Blog->get_setting( 'allow_subscriptions' ) )
+	if( $Blog->get_setting( 'allow_comment_subscriptions' ) )
 	{
 		$sql = 'SELECT count( sub_user_ID ) FROM T_subscriptions
 					WHERE sub_user_ID = '.$current_User->ID.' AND sub_coll_ID = '.$Blog->ID.' AND sub_comments <> 0';
@@ -334,11 +338,11 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 		if( get_user_isubscription( $current_User->ID, $Item->ID ) )
 		{
 			echo '<p>'.T_( 'You will be notified by email when someone comments here.' );
-			echo ' <a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></p>';
+			echo ' <a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=0&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Click here to unsubscribe.' ).'</a></p>';
 		}
 		else
 		{
-			echo '<p><a href="'.$samedomain_htsrv_url.'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
+			echo '<p><a href="'.get_htsrv_url().'action.php?mname=collections&action=isubs_update&p='.$Item->ID.'&amp;notify=1&amp;'.url_crumb( 'collections_isubs_update' ).'">'.T_( 'Notify me by email when someone comments here.' ).'</a></p>';
 		}
 	}
 
@@ -346,7 +350,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 }
 
 
-if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] ) )
+if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] || $params['disp_webmentions'] ) )
 {	// user is allowed to see comments
 	// Display link for comments feed:
 	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>' );

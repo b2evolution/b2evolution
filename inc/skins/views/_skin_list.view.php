@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -15,9 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Create result set:
 $SQL = new SQL();
-$SQL->SELECT( 'T_skins__skin.*, COUNT( DISTINCT( cset_coll_ID ) ) AS nb_blogs' );
-$SQL->FROM( 'T_skins__skin LEFT JOIN T_coll_settings ON skin_ID = cset_value AND
-			( cset_name = "normal_skin_ID" OR cset_name = "mobile_skin_ID" OR cset_name = "tablet_skin_ID" )' );
+$SQL->SELECT( 'T_skins__skin.*, SUM( IF( blog_normal_skin_ID = skin_ID, 1, 0 ) + IF( blog_mobile_skin_ID = skin_ID, 1, 0 ) + IF( blog_tablet_skin_ID = skin_ID, 1, 0 ) ) AS nb_blogs' );
+$SQL->FROM( 'T_skins__skin LEFT JOIN T_blogs ON (skin_ID = blog_normal_skin_ID OR skin_ID = blog_mobile_skin_ID OR skin_ID = blog_tablet_skin_ID )' );
 $SQL->GROUP_BY( 'skin_ID' );
 
 $count_SQL = new SQL();
@@ -28,7 +27,7 @@ $Results = new Results( $SQL->get(), 'skin_', '', NULL, $count_SQL->get() );
 
 $Results->Cache = & get_SkinCache();
 
-$Results->title = T_('Installed skins').get_manual_link('installed_skins');
+$Results->title = T_('Installed skins').get_manual_link('installed-skins');
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:
@@ -48,15 +47,22 @@ else
 }
 
 $Results->cols[] = array(
+						'th' => T_('Version'),
+						'td_class' => 'center',
+						'td' => '%get_skin_version( #skin_ID# )%'
+					);
+
+$Results->cols[] = array(
 						'th' => T_('Skin type'),
 						'order' => 'skin_type',
 						'td_class' => 'center',
-						'td' => '$skin_type$',
+						'td' => '%get_skin_type_title( #skin_type# )%',
 					);
 
 $Results->cols[] = array(
 						'th' => T_('Collections'),
 						'order' => 'nb_blogs',
+						'default_dir' => 'D',
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'center',
 						'td' => '~conditional( (#nb_blogs# > 0), #nb_blogs#, \'&nbsp;\' )~',
@@ -76,7 +82,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'td_class' => 'shrinkwrap',
 							'td' => action_icon( TS_('Edit skin properties...'), 'properties',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=edit\')%' )
-	                    .action_icon( TS_('Reload containers!'), 'reload',
+	                    .action_icon( TS_('Reload containers').'!', 'reload',
 	                        '%regenerate_url( \'\', \'skin_ID=$skin_ID$&amp;action=reload&amp;'.url_crumb('skin').'\')%' )
 											.'~conditional( #nb_blogs# < 1, \''
 											.action_icon( TS_('Uninstall this skin!'), 'delete',

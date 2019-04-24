@@ -11,7 +11,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $app_version, $disp, $Blog;
+global $app_version, $disp, $Collection, $Blog;
 
 if( evo_version_compare( $app_version, '6.4' ) < 0 )
 { // Older skins (versions 2.x and above) should work on newer b2evo versions, but newer skins may not work on older b2evo versions.
@@ -40,9 +40,9 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header class="row">
 
-	<div class="coll-xs-12 coll-sm-12 col-md-4 col-md-push-8">
+	<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8">
 		<?php
-		if( $Skin->is_visible_container( 'page_top' ) )
+		if( $Skin->show_container_when_access_denied( 'page_top' ) )
 		{ // Display 'Page Top' widget container
 		?>
 		<div class="evo_container evo_container__page_top">
@@ -65,9 +65,9 @@ siteskin_include( '_site_body_header.inc.php' );
 		<?php } ?>
 	</div><!-- .col -->
 
-	<div class="coll-xs-12 col-sm-12 col-md-8 col-md-pull-4">
+	<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4">
 		<?php
-		if( $Skin->is_visible_container( 'header' ) )
+		if( $Skin->show_container_when_access_denied( 'header' ) )
 		{ // Display 'Header' widget container
 		?>
 		<div class="evo_container evo_container__header">
@@ -91,7 +91,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 
 <?php
-if( $Skin->is_visible_container( 'menu' ) )
+if( $Skin->show_container_when_access_denied( 'menu' ) )
 { // Display 'Menu' widget container
 ?>
 <nav class="row">
@@ -133,27 +133,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
-			skin_include( '$disp$', array(
-					// Form params for the forms below: login, register, lostpassword, activateinfo and msgform
-					'skin_form_before'      => '<div class="panel panel-default skin-form">'
-																				.'<div class="panel-heading">'
-																					.'<h3 class="panel-title">$form_title$</h3>'
-																				.'</div>'
-																				.'<div class="panel-body">',
-					'skin_form_after'       => '</div></div>',
-					// Login
-					'display_form_messages' => true,
-					'form_title_login'      => T_('Log in to your account').'$form_links$',
-					'form_title_lostpass'   => get_request_title().'$form_links$',
-					'lostpass_page_class'   => 'evo_panel__lostpass',
-					'login_form_inskin'     => false,
-					'login_page_class'      => 'evo_panel__login',
-					'login_page_before'     => '<div class="$form_class$">',
-					'login_page_after'      => '</div>',
-					'display_reg_link'      => true,
-					'abort_link_position'   => 'form_title',
-					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-				) );
+			skin_include( '$disp$' );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
 			// ------------------------- END OF MAIN CONTENT TEMPLATE ---------------------------
@@ -168,16 +148,16 @@ if( $Skin->is_visible_container( 'menu' ) )
 <footer class="row">
 
 	<!-- =================================== START OF FOOTER =================================== -->
-	<div class="col-md-12 center">
+	<div class="col-md-12">
 
 		<?php
-		if( $Skin->is_visible_container( 'footer' ) )
+		if( $Skin->show_container_when_access_denied( 'footer' ) )
 		{ // Display 'Footer' widget container
 		?>
-		<div class="evo_container evo_container__footer">
+		<div class="evo_container evo_container__footer clearfix">
 		<?php
 			// Display container and contents:
-			skin_container( NT_("Footer"), array(
+			skin_container( NT_('Footer'), array(
 					// The following params will be used as defaults for widgets included in this container:
 					'block_start'       => '<div class="evo_widget $wi_class$">',
 					'block_end'         => '</div>',
@@ -187,7 +167,7 @@ if( $Skin->is_visible_container( 'menu' ) )
 		</div>
 		<?php } ?>
 
-		<p>
+		<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

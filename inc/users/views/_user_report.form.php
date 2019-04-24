@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -50,7 +50,6 @@ $Form = new Form( $form_action, 'user_checkchanges' );
 
 $form_title = '';
 $form_class = 'fform user_report_form';
-$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
 
 if( $display_mode != 'js' )
 {
@@ -73,7 +72,7 @@ if( is_admin_page() )
 }
 else
 { // Params for frontoffice
-	global $Blog;
+	global $Collection, $Blog;
 	$Form->hidden( 'blog', $Blog->ID );
 }
 
@@ -88,7 +87,7 @@ user_report_form( array(
 		'Form'       => $Form,
 		'user_ID'    => $edited_User->ID,
 		'crumb_name' => 'user',
-		'cancel_url' => get_secure_htsrv_url().'profile_update.php?'
+		'cancel_url' => get_htsrv_url().'profile_update.php?'
 										.( is_admin_page() ? 'is_backoffice=1&amp;' : '' )
 										.'action=remove_report&amp;'
 										.'user_ID='.$edited_User->ID.'&amp;'

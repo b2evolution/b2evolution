@@ -59,13 +59,17 @@ class Thread extends DataObject
 		{	// New Thread
 			global $Session;
 
-			// check if there is unsaved Thread object stored in Session
-			$unsaved_Thread = $Session->get( 'core.unsaved_Thread' );
-			if( !empty( $unsaved_Thread ) )
-			{	// unsaved thread exists, delete it from Session
-				$Session->delete( 'core.unsaved_Thread' );
-				$this->title = $unsaved_Thread['title'];
-				$this->text = $unsaved_Thread['text'];
+			// erwin > Added check for $Session to enable creation of threads in cases where there is
+			// no Session available such as generation of sample private conversation during install
+			if( $Session )
+			{	// check if there is unsaved Thread object stored in Session
+				$unsaved_Thread = $Session->get( 'core.unsaved_Thread' );
+				if( !empty( $unsaved_Thread ) )
+				{	// unsaved thread exists, delete it from Session
+					$Session->delete( 'core.unsaved_Thread' );
+					$this->title = $unsaved_Thread['title'];
+					$this->text = $unsaved_Thread['text'];
+				}
 			}
 
 			$logins = array();
@@ -136,7 +140,7 @@ class Thread extends DataObject
 				{
 					$recipients_selected[] = array(
 						'id'    => $user_ID,
-						'title' => $user_login
+						'login' => $user_login
 					);
 				}
 			}
@@ -191,7 +195,7 @@ class Thread extends DataObject
 	{
 		global $thrd_recipients, $thrd_recipients_array;
 
-		// Resipients
+		// Recipients
 		$this->set_string_from_param( 'recipients', empty( $thrd_recipients_array ) ? true : false );
 
 		// Title
@@ -246,7 +250,7 @@ class Thread extends DataObject
 
 		if( !empty( $recipients_array ) )
 		{	// These data is created by jQuery plugin fbautocomplete
-			$recipients_list = $recipients_array['title'];
+			$recipients_list = $recipients_array['login'];
 		}
 		else
 		{	// For browsers without JavaScript
@@ -425,7 +429,10 @@ class Thread extends DataObject
 				list( $max_new_threads, $new_threads_count ) = get_todays_thread_settings();
 				if( ( !empty( $max_new_threads ) ) && ( ( $max_new_threads - $new_threads_count ) < $recipients_count ) )
 				{ // user has a create thread limit, and recipients number exceed that limit
-					$error_msg .= '<br />';
+					if ( ! empty( $error_msg ) )
+					{
+						$error_msg .= '<br />';
+					}
 					$error_msg .= sprintf( T_( 'You are unable to send %d individual messages, because it exceeds your remaining daily limit of %d.' ), $recipients_count, $max_new_threads - $new_threads_count );
 				}
 			}
@@ -555,7 +562,7 @@ class Thread extends DataObject
 			return true;
 		}
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Count all users whou are involved in the given thread but not the current User and didn\'t block the current User' );
 
 		$SQL->SELECT( 'count( ts.tsta_user_ID )' );
 		$SQL->FROM( 'T_messaging__threadstatus ts
@@ -568,7 +575,7 @@ class Thread extends DataObject
 		// sender is not blocked or is not present in all recipient's contact list
 		$SQL->WHERE_and( '( mc.mct_blocked IS NULL OR mc.mct_blocked = 0 )' );
 
-		if( $DB->get_var( $SQL->get(), 0, NULL, 'Count all users whou are involved in the given thread but not the current User and didn\'t block the current User' ) > 0 )
+		if( $DB->get_var( $SQL ) > 0 )
 		{ // there is at least one recipient who accept the reply
 			return true;
 		}

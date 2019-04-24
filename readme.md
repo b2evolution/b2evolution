@@ -2,7 +2,7 @@
 
 # b2evolution CMS
 
-This is WORK IN PROGRESS on version **6.7.0-alpha**.
+This is b2evolution CMS version **6.11.1-beta**.
 
 ## A complete engine for your website !
 
@@ -14,9 +14,9 @@ More info: http://b2evolution.net
 
 ## Requirements
 
-Basically, all you need is a standard [web hosting plan](http://b2evolution.net/web-hosting/top-quality-best-webhosting.php).
+Basically, all you need is a standard [web hosting plan](https://b2evolution.net/web-hosting/cheap-plans/).
 
-More specifically, your web server should support PHP 5.2+, MySQL 5+ & Apache 2+ (which is very common). More info about these requirements [here](http://b2evolution.net/man/installation-upgrade/system_requirements).
+More specifically, your web server should support PHP 5.4+, MySQL 5.1+ & Apache 2+ (which is very common). More info about these requirements [here](http://b2evolution.net/man/installation-upgrade/system_requirements).
 
 ## Downloading
 
@@ -54,7 +54,5 @@ The installation script will detect that the b2evolution database is already ins
 There are [several other upgrade options](http://b2evolution.net/man/upgrading).
 
 ## GitHub
-
-This version of b2evolution comes from the "i7" (currently "master") branch on GitHub.
 
 All bug fixes and all new code are made available through GitHub before being packaged as releases. If you are interested in cutting-edge versions, we recommend you [follow us on GitHub](https://github.com/b2evolution/b2evolution).

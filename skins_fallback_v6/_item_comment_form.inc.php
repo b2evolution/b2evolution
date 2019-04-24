@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -14,15 +14,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $cookie_name, $cookie_email, $cookie_url;
 global $comment_allowed_tags;
-global $comment_cookies, $comment_allow_msgform;
+global $comment_cookies, $comment_allow_msgform, $comment_anon_notify;
 global $checked_attachments; // Set this var as global to use it in the method $Item->can_attach()
 global $PageCache, $Session;
-global $Blog, $dummy_fields;
+global $Collection, $Blog, $dummy_fields;
 
 // Default params:
 $params = array_merge( array(
 		'disp_comment_form'    => true,
-		'form_title_start'     => '<div class="panel '.( $Session->get('core.preview_Comment') ? 'panel-danger' : 'panel-default' ).'">'
+		'form_title_start'     => '<div class="panel '.( $Session->get( 'core.preview_Comment'.( isset( $params['comment_type'] ) && $params['comment_type'] == 'meta' ? 'meta' : '' ) ) ? 'panel-danger' : 'panel-default' ).'">'
 																.'<div class="panel-heading"><h4 class="panel-title">',
 		'form_title_end'       => '</h4></div><div class="panel-body">',
 		'form_title_text'      => T_('Leave a comment'),
@@ -31,15 +31,15 @@ $params = array_merge( array(
 		'form_params'          => array( // Use to change structure of form, i.e. fieldstart, fieldend and etc.
 			'comments_disabled_before' => '<p class="alert alert-warning">',
 			'comments_disabled_after' => '</p>',
-			), 
+			),
 		'policy_text'          => '',
-		'author_link_text'     => 'name',
+		'author_link_text'     => 'auto',
 		'textarea_lines'       => 10,
 		'default_text'         => '',
 		'preview_block_start'  => '',
-		'preview_start'        => '<div class="evo_comment evo_comment__preview panel panel-warning" id="comment_preview">',
+		'preview_start'        => '<article class="evo_comment evo_comment__preview panel panel-warning" id="comment_preview">',
 		'comment_template'     => '_item_comment.inc.php',	// The template used for displaying individual comments (including preview)
-		'preview_end'          => '</div>',
+		'preview_end'          => '</article>',
 		'preview_block_end'    => '',
 		'before_comment_error' => '<p><em>',
 		'comment_closed_text'  => '#',
@@ -57,6 +57,15 @@ $params = array_merge( array(
 						'block_separator' => '<br /><br />' ) ) )
 			) ),
 		'comment_mode'         => '', // Can be 'quote' from GET request
+		'comment_type'         => 'comment',
+		'comment_title_before'  => '<div class="panel-heading"><h4 class="evo_comment_title panel-title">',
+		'comment_title_after'   => '</h4></div><div class="panel-body">',
+		'comment_rating_before' => '<div class="evo_comment_rating">',
+		'comment_rating_after'  => '</div>',
+		'comment_text_before'   => '<div class="evo_comment_text">',
+		'comment_text_after'    => '</div>',
+		'comment_info_before'   => '<footer class="evo_comment_footer clear text-muted"><small>',
+		'comment_info_after'    => '</small></footer></div>',
 	), $params );
 
 $comment_reply_ID = param( 'reply_ID', 'integer', 0 );
@@ -72,14 +81,19 @@ $comment_renderers = array( 'default' );
 /*
  * Comment form:
  */
+if( $params['comment_type'] == 'meta' )
+{	// Use different form anchor for meta comments:
+	$params['comment_form_anchor'] = 'meta_form_p';
+}
 $section_title = $params['form_title_start'].$params['form_title_text'].$params['form_title_end'];
-if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_error'], $params['after_comment_error'], '#', $params['comment_closed_text'], $section_title, $params ) )
+if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item->can_meta_comment() ||
+		$Item->can_comment( $params['before_comment_error'], $params['after_comment_error'], '#', $params['comment_closed_text'], $section_title, $params ) ) )
 { // We want to display the comments form and the item can be commented on:
 
 	echo $params['before_comment_form'];
 
 	// INIT/PREVIEW:
-	if( $Comment = $Session->get('core.preview_Comment') )
+	if( $Comment = get_comment_from_session( 'preview', $params['comment_type'] ) )
 	{	// We have a comment to preview
 		if( $Comment->item_ID == $Item->ID )
 		{ // display PREVIEW:
@@ -130,6 +144,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			$comment_author = $Comment->author;
 			$comment_author_email = $Comment->author_email;
 			$comment_author_url = $Comment->author_url;
+			$comment_allow_msgform = $Comment->allow_msgform;
+			$comment_anon_notify = $Comment->anon_notify;
+			$comment_user_notify = isset( $Comment->user_notify ) ? $Comment->user_notify : NULL;
 			// Get what renderer checkboxes were selected on form:
 			$comment_renderers = explode( '.', $Comment->get( 'renderers' ) );
 
@@ -137,15 +154,14 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			global $Messages;
 			$Messages->display();
 		}
-
-		// delete any preview comment from session data:
-		$Session->delete( 'core.preview_Comment' );
 	}
 	else
 	{ // New comment:
-		if( ( $Comment = get_comment_from_session() ) == NULL )
+		if( ( $Comment = get_comment_from_session( 'unsaved', $params['comment_type'] ) ) == NULL )
 		{ // there is no saved Comment in Session
 			$Comment = new Comment();
+			$Comment->set( 'type', $params['comment_type'] );
+			$Comment->set( 'item_ID', $Item->ID );
 			if( ( !empty( $PageCache ) ) && ( $PageCache->is_collecting ) )
 			{	// This page is going into the cache, we don't want personal data cached!!!
 				// fp> These fields should be filled out locally with Javascript tapping directly into the cookies. Anyone JS savvy enough to do that?
@@ -172,6 +188,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			$comment_author = $Comment->author;
 			$comment_author_email = $Comment->author_email;
 			$comment_author_url = $Comment->author_url;
+			$comment_allow_msgform = $Comment->allow_msgform;
+			$comment_anon_notify = $Comment->anon_notify;
+			$comment_user_notify = isset( $Comment->user_notify ) ? $Comment->user_notify : NULL;
 			// comment_attachments contains all file IDs that have been attached
 			$comment_attachments = $Comment->preview_attachments;
 			// checked_attachments contains all attachment file IDs which checkbox was checked in
@@ -192,10 +211,11 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			$comment_content = param( $dummy_fields[ 'content' ], 'html' );
 			$quoted_comment_ID = param( 'qc', 'integer', 0 );
 			$quoted_post_ID = param( 'qp', 'integer', 0 );
-			if( !empty( $quoted_comment_ID ) )
-			{
-				$CommentCache = & get_CommentCache();
-				$quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false );
+			if( ! empty( $quoted_comment_ID ) &&
+			    ( $CommentCache = & get_CommentCache() ) &&
+			    ( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&
+			    $params['comment_type'] == $quoted_Comment->get( 'type' ) )
+			{	// Allow comment quoting only for the same comment type form:
 				$quoted_Item = $quoted_Comment->get_Item();
 				if( $quoted_User = $quoted_Comment->get_author_User() )
 				{ // User is registered
@@ -208,8 +228,8 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 				$quoted_content = $quoted_Comment->get( 'content' );
 				$quoted_ID = 'c'.$quoted_Comment->ID;
 			}
-			else if( !empty( $quoted_post_ID ) )
-			{
+			elseif( ! empty( $quoted_post_ID ) && $params['comment_type'] != 'meta' )
+			{	// Allow item quoting only for normal(not meta) comment type form:
 				$ItemCache = & get_ItemCache();
 				$quoted_Item = & $ItemCache->get_by_ID( $quoted_post_ID, false );
 				$quoted_login = $quoted_Item->get_creator_login();
@@ -250,8 +270,13 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['form_title_text'];
 	echo $params['form_title_end'];
 
+	if( $params['comment_type'] != 'meta' )
+	{	// Display a message before comment form:
+		$Item->display_comment_form_msg();
+	}
+
 /*
-	echo '<script type="text/javascript">
+	echo '<script>
 /* <![CDATA[ *
 function validateCommentForm(form)
 {
@@ -264,7 +289,7 @@ function validateCommentForm(form)
 /* ]]> *
 </script>';*/
 
-	$Form = new Form( $samedomain_htsrv_url.'comment_post.php', 'evo_comment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
+	$Form = new Form( get_htsrv_url().'comment_post.php', 'evo_comment_form_id_'.$Item->ID, 'post', NULL, 'multipart/form-data' );
 
 	$Form->switch_template_parts( $params['form_params'] );
 
@@ -275,8 +300,11 @@ function validateCommentForm(form)
 	//           before display!
 
 	$Form->add_crumb( 'comment' );
+	$Form->hidden( 'comment_type', $params['comment_type'] );
 	$Form->hidden( 'comment_item_ID', $Item->ID );
-	if( !empty( $comment_reply_ID ) )
+
+	$comment_type = param( 'comment_type', 'string', 'comment' );
+	if( ! empty( $comment_reply_ID ) && $comment_type == $params['comment_type'] )
 	{
 		$Form->hidden( 'reply_ID', $comment_reply_ID );
 
@@ -287,28 +315,26 @@ function validateCommentForm(form)
 			// Make sure we get back to the right page (on the right domain)
 			// fp> TODO: check if we can use the permalink instead but we must check that application wide,
 			// that is to say: check with the comments in a pop-up etc...
-			// url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl'), '&' ), $htsrv_url)
+			// url_rel_to_same_host(regenerate_url( '', '', $Blog->get('blogurl'), '&' ), get_htsrv_url())
 			// fp> what we need is a regenerate_url that will work in permalinks
 			// fp> below is a simpler approach:
 			$params['form_comment_redirect_to']
 		);
 
-	if( check_user_status( 'is_validated' ) )
-	{ // User is logged in and activated:
-		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array(
-				'link_text' => $params['author_link_text'] ) ).'</strong>' );
-	}
-	else
-	{ // User is not logged in or not activated:
+	if( ! is_logged_in( false ) )
+	{	// User is not logged in or not activated:
 		if( is_logged_in() && empty( $comment_author ) && empty( $comment_author_email ) )
 		{
 			$comment_author = $current_User->login;
 			$comment_author_email = $current_User->email;
 		}
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
-		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '', 100, 'evo_comment_field' );
+		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '<br />'.sprintf( T_('<a %s>Click here to log in</a> if you already have an account on this site.'), 'href="'.get_login_url( 'comment form', $Item->get_permanent_url() ).'" style="font-weight:bold"' ), 100, 'evo_comment_field' );
 
-		$Form->text( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), 255, 'evo_comment_field' );
+		$Form->email_input( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), array(
+			'bottom_note' => T_('Your email address will <strong>not</strong> be revealed on this site.'),
+			'maxlength'   => 255,
+			'class'       => 'evo_comment_field' ) );
 
 		$Item->load_Blog();
 		if( $Item->Blog->get_setting( 'allow_anon_url' ) )
@@ -317,7 +343,7 @@ function validateCommentForm(form)
 		}
 	}
 
-	if( $Item->can_rate() )
+	if( ! $Comment->is_meta() && $Item->can_rate() )
 	{ // Comment rating:
 		ob_start();
 		$Comment->rating_input( array( 'item_ID' => $Item->ID ) );
@@ -330,27 +356,130 @@ function validateCommentForm(form)
 		$Form->info_field( '', $params['policy_text'] );
 	}
 
+	// Workflow properties:
+	if( $Comment->is_meta() &&
+			is_logged_in() &&
+			$Blog->get_setting( 'use_workflow' ) &&
+			$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
+			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	{	// Display workflow properties if current user has a permission:
+		$Form->select_input_array( 'item_priority', $Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+
+		// Load only first 21 users to know when we should display an input box instead of full users list:
+		$UserCache = & get_UserCache();
+		$UserCache->load_blogmembers( $Blog->ID, 21, false );
+		if( count( $UserCache->cache ) > 20 )
+		{	// Display a text input field with autocompletion if members more than 20:
+			$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
+			$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
+		}
+		else
+		{	// Display a select field if members less than 21:
+			$Form->select_object( 'item_assigned_user_ID', NULL, $Item, T_('Assigned to'), '', true, '', 'get_assigned_user_options' );
+		}
+
+		$ItemStatusCache = & get_ItemStatusCache();
+		$ItemStatusCache->load_all();
+		$ItemTypeCache = & get_ItemTypeCache();
+		$current_ItemType = & $Item->get_ItemType();
+		$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
+
+		if( $Blog->get_setting( 'use_deadline' ) )
+		{	// Display deadline fields only if it is enabled for collection:
+			$Form->begin_line( T_('Deadline'), 'item_deadline' );
+
+				$datedeadline = $Item->get( 'datedeadline' );
+				$Form->date( 'item_deadline', $datedeadline, '' );
+
+				$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+				$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+
+			$Form->end_line();
+		}
+
+		// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
+		$params['form_submit_text'] = T_('Update Status').' / '.$params['form_submit_text'];
+	}
+
+	// Set prefix for js code in plugins:
+	$plugin_js_prefix = ( $params['comment_type'] == 'meta' ? 'meta_' : '' );
+
+	// Display plugin captcha for comment form before textarea:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_textarea',
+		) );
+
 	ob_start();
 	echo '<div class="comment_toolbars">';
 	// CALL PLUGINS NOW:
-	$Plugins->trigger_event( 'DisplayCommentToolbar', array( 'Comment' => & $Comment, 'Item' => & $Item ) );
+	$Plugins->trigger_event( 'DisplayCommentToolbar', array(
+			'Comment'     => & $Comment,
+			'Item'        => & $Item,
+			'js_prefix'   => $plugin_js_prefix,
+		) );
 	echo '</div>';
 	$comment_toolbar = ob_get_clean();
 
 	// Message field:
+	$content_id = $dummy_fields['content'].'_'.$params['comment_type'];
 	$form_inputstart = $Form->inputstart;
 	$Form->inputstart .= $comment_toolbar;
 	$note = '';
 	// $note = T_('Allowed XHTML tags').': '.htmlspecialchars(str_replace( '><',', ', $comment_allowed_tags));
-	$Form->textarea_input( $dummy_fields[ 'content' ], $comment_content, $params['textarea_lines'], $params['form_comment_text'], array(
-			'note' => $note,
-			'cols' => 38,
-			'class' => 'autocomplete_usernames'
+	$Form->textarea_input( $dummy_fields['content'], $comment_content, $params['textarea_lines'], $params['form_comment_text'], array(
+			'note'  => $note,
+			'cols'  => 38,
+			'class' => 'autocomplete_usernames',
+			'id'    => $content_id,
 		) );
 	$Form->inputstart = $form_inputstart;
 
-	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+	// Set canvas object for plugins:
+	echo '<script>var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
+
+	// CALL PLUGINS NOW:
+	ob_start();
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
+		'target_type'   => 'Comment',
+		'target_object' => $Comment,
+		'content_id'    => $content_id,
+		'edit_layout'   => 'inskin',
+	) );
+	$quick_setting_switch = ob_get_flush();
+
+	$comment_options = array();
+	if( ! is_logged_in( false ) )
+	{	// For anonymous or not activated user:
+		// TODO: If we got info from cookies, Add a link called "Forget me now!" (without posting a comment).
+		$comment_options[] = array( 'comment_cookies', 1, T_('Remember me'), $comment_cookies, false, '('.T_('Set cookies so I don\'t need to fill out my details next time').')' );
+		// TODO: If we have an email in a cookie, Add links called "Add a contact icon to all my previous comments" and "Remove contact icon from all my previous comments".
+		$comment_options[] = array( 'comment_allow_msgform', 1, T_('Allow message form'), $comment_allow_msgform, false, '('.T_('Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!').')', ( $email_is_detected ? 'comment_recommended_option' : '' ) );
+		if( $Blog->get_setting( 'allow_anon_subscriptions' ) )
+		{	// If item anonymous subscriptions are allowed for current collection:
+			$comment_options[] = array( 'comment_anon_notify', 1, T_('Notify me of replies'), isset( $comment_anon_notify ) ? $comment_anon_notify : $Blog->get_setting( 'default_anon_comment_notify' ) );
+		}
+	}
+	elseif( $params['comment_type'] != 'meta' && $Blog->get_setting( 'allow_item_subscriptions' ) )
+	{	// For registered user and normal(not meta) comment and if item subscriptions are allowed for current collection:
+		$comment_options[] = array( 'comment_user_notify', 1, T_('Notify me of replies'), ( isset( $comment_user_notify ) ? $comment_user_notify : 1 ) );
+	}
+	if( count( $comment_options ) > 0 )
+	{	// Display additional options:
+		$Form->checklist( $comment_options, 'comment_options', T_('Options') );
+	}
+
+	// Display renderers
+	$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array(
+			'Blog'         => & $Blog,
+			'setting_name' => 'coll_apply_comment_rendering',
+			'js_prefix'    => $plugin_js_prefix,
+		) );
+	if( !empty( $comment_renderer_checkboxes ) )
+	{
+		$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
+	}
 
 	// Attach files:
 	if( !empty( $comment_attachments ) )
@@ -378,50 +507,23 @@ function validateCommentForm(form)
 		$Form->hidden( 'preview_attachments', $comment_attachments );
 	}
 	if( $Item->can_attach() )
-	{	// Display attach file input field
+	{	// Display attach file input field when JavaScript is disabled:
+		echo '<noscript>';
 		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => $params['comment_attach_info'], 'name' => 'uploadfile[]', 'type' => 'file' ) );
+		echo '<p>'.T_('Please enable JavaScript to use file uploader.').'</p>';
+		echo '</noscript>';
 	}
-
-	$comment_options = array();
-
-	if( ! is_logged_in( false ) )
-	{ // User is not logged in:
-		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_cookies" tabindex="7"'
-													.( $comment_cookies ? ' checked="checked"' : '' ).' value="1" /> '.T_('Remember me').'</label>'
-													.' <span class="note">('.T_('For my next comment on this site').')</span>';
-		// TODO: If we got info from cookies, Add a link called "Forget me now!" (without posting a comment).
-
-		$msgform_class_start = '';
-		$msgform_class_end = '';
-		if( $email_is_detected )
-		{	// Set a class when comment contains a email
-			$msgform_class_start = '<div class="comment_recommended_option">';
-			$msgform_class_end = '</div>';
-		}
-
-		$comment_options[] = $msgform_class_start.
-													'<label><input type="checkbox" class="checkbox" name="comment_allow_msgform" tabindex="8"'
-													.( $comment_allow_msgform ? ' checked="checked"' : '' ).' value="1" /> '.T_('Allow message form').'</label>'
-													.' <span class="note">('.T_('Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!').')</span>'.
-													$msgform_class_end;
-		// TODO: If we have an email in a cookie, Add links called "Add a contact icon to all my previous comments" and "Remove contact icon from all my previous comments".
-	}
-
-	if( ! empty($comment_options) )
-	{
-		echo $Form->begin_field( NULL, T_('Options'), true );
-		echo implode( '<br />', $comment_options );
-		echo $Form->end_field();
-	}
-
-	// Display renderers
-	$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array( 'Blog' => & $Blog, 'setting_name' => 'coll_apply_comment_rendering' ) );
-	if( !empty( $comment_renderer_checkboxes ) )
-	{
-		$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
-	}
+	// Display attachments fieldset:
+	$Form->attachments_fieldset( $Comment, false, $Comment->is_meta() ? 'meta_' : '' );
 
 	$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
+
+	// Display plugin captcha for comment form before submit button:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_submit_button',
+		) );
 
 	$Form->begin_fieldset();
 		echo $Form->buttonsstart;
@@ -430,12 +532,22 @@ function validateCommentForm(form)
 		$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text, 'tabindex' => 9 ) );
 		$Form->button_input( array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => $params['form_submit_text'], 'tabindex' => 10 ) );
 
+		if( $Item->can_attach() )
+		{	// Don't display "/Add file" on the preview button if JS is enabled:
+			echo '<script type="text/javascript">jQuery( "input[type=submit].preview.btn-info" ).val( "'.TS_('Preview').'" )</script>';
+		}
+
 		$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
 		echo $Form->buttonsend;
 	$Form->end_fieldset();
 	?>
-
+	<script>
+	jQuery( document ).ready( function() {
+		// Align TinyMCE toggle buttons:
+		jQuery( '.evo_tinymce_toggle_buttons' ).addClass( 'col-sm-offset-3' );
+	} );
+	</script>
 	<div class="clear"></div>
 
 	<?php

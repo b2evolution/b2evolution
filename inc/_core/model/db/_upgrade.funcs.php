@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://thequod.de/}.
  *
  * {@link db_delta()} is based on dbDelta() from {@link http://wordpress.com Wordpress}, see
@@ -1692,19 +1692,13 @@ function get_columns_with_charset_definition( $query )
  */
 function convert_table_to_utf8_ascii( $table )
 {
-	global $DB, $schema_queries;
-
-	// Get the table alias
-	$table_index = array_search( $table, $DB->dbreplaces );
-	if( $table_index === NULL || $table_index === false )
-	{ // The table doesn't exists in the configuration
-		return;
-	}
-	$table_alias = $DB->dbaliases[$table_index];
-	$table_alias = substr( $table_alias, 3, strlen( $table_alias ) - 6 );
+	global $DB;
 
 	// Get those columns which contains charset or collation definition
-	$columns_with_charset = get_columns_with_charset_definition( $schema_queries[$table_alias][1] );
+	// Note: Get the DDL statement of the existing table and not the query defined in $schema_queries. This is to avoid modifying fields
+	// included in the $schema_queries but do not exists in the current DB version in case user has not yet upgraded the DB to the latest version.
+	$table_query = $DB->get_var( 'SHOW CREATE TABLE `'.$table.'`', 1 );
+	$columns_with_charset = get_columns_with_charset_definition( $table_query );
 	if( empty( $columns_with_charset ) )
 	{ // There is no explicit charset or collation definition in this table, we update everything utf8
 		$text_columns = $DB->get_results( 'SHOW FULL COLUMNS FROM `'.$table.'` WHERE type LIKE "%TEXT%"' );
@@ -1762,12 +1756,15 @@ function convert_table_to_utf8_ascii( $table )
 /**
  * Upgrade DB to UTF-8 and fix ASCII fields
  */
-function db_check_utf8_ascii()
+function db_check_utf8_ascii( $show_title = true )
 {
 	global $db_config, $tableprefix, $DB, $evo_charset;
 
-	echo '<h2 class="page-title">'.T_('Normalizing DB charsets...').'</h2>';
-	evo_flush();
+	if( $show_title )
+	{
+		echo '<h2 class="page-title">'.T_('Normalizing DB charsets...').'</h2>';
+		evo_flush();
+	}
 
 	// Get the tables that have different charset than what we expect
 	$expected_connection_charset = DB::php_to_mysql_charmap( $evo_charset );
@@ -1799,12 +1796,15 @@ function db_check_utf8_ascii()
 /**
  * Upgrade DB to UTF-8 and fix ASCII fields
  */
-function db_upgrade_to_utf8_ascii()
+function db_upgrade_to_utf8_ascii( $show_title = true )
 {
 	global $db_config, $tableprefix, $DB;
 
-	echo '<h2 class="page-title">'.T_('Normalizing DB charsets...').'</h2>';
-	evo_flush();
+	if( $show_title )
+	{
+		echo '<h2 class="page-title">'.T_('Normalizing DB charsets...').'</h2>';
+		evo_flush();
+	}
 
 	// Load db schema to be able to check the original charset definition
 	load_db_schema( true );

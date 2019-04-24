@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -229,9 +229,15 @@ class PageCache
 			return false;
 		}
 
-		if( $disp == 'login' || $disp == 'access_requires_login' || $disp == 'register' || $disp == 'lostpassword' )
-		{	// We do NOT want caching for in-skin login, register and lostpassord pages
-			$Debuglog->add( 'Never cache the in-skin login and register pages!', 'pagecache' );
+		if( $disp == '403' )
+		{	// We do NOT want caching for 403 pages (illimited possibilities!)
+			$Debuglog->add( 'Never cache 403s!', 'pagecache' );
+			return false;
+		}
+
+		if( in_array( $disp, array( 'login', 'access_requires_login', 'content_requires_login', 'register', 'lostpassword', 'anonpost' ) ) )
+		{	// We do NOT want caching for in-skin login, register, lostpassord pages and new item anonymous form:
+			$Debuglog->add( 'Never cache the in-skin login, register and anonymous new item pages!', 'pagecache' );
 			return false;
 		}
 
@@ -423,7 +429,13 @@ class PageCache
 			unset($lines[$i]);
 
 			// SEND CONTENT!
-			$body = implode('',$lines);
+			$body = implode( '', $lines );
+
+			if( ! $this->is_valid_cached_content( $body ) )
+			{	// The stored content of the cached page is not valid HTML page,
+				// We cannot use this to display, Exit here to generate new one:
+				return false;
+			}
 
 			$Timer->pause( 'Cache file processing' );
 
@@ -457,13 +469,41 @@ class PageCache
 	}
 
 
-  /**
+	/**
 	 * This is called every x bytes to provide real time output
 	 */
 	function output_handler( $buffer )
 	{
 		$this->cached_page_content .= $buffer;
 		return $buffer;
+	}
+
+
+	/**
+	 * Check if the cached page content is valid HTML page
+	 * (in order to avoid storing/displaying of incomplete page without ending html tag)
+	 *
+	 * @param string|NULL The cached page content, NULL - to use current content
+	 * @return boolean TRUE if the content is valid HTML page and can be used
+	 */
+	function is_valid_cached_content( $content = NULL )
+	{
+		if( $content === NULL )
+		{	// Use current cached page content:
+			$content = $this->cached_page_content;
+		}
+
+		// Check if the cached page content is valid HTML page:
+		if( preg_match( '#<html[^>]*>(.+)<\/html>#is', $content ) )
+		{	// Valid HTML page
+			return true;
+		}
+		else
+		{	// Wrong HTML page
+			global $Debuglog;
+			$Debuglog->add( 'The cached page content is not valid HTML page!', 'pagecache' );
+			return false;
+		}
 	}
 
 
@@ -481,16 +521,16 @@ class PageCache
 			return;
 		}
 
- 		$Debuglog->add( 'Aborting cache data collection...', 'pagecache' );
+		$Debuglog->add( 'Aborting cache data collection...', 'pagecache' );
 
- 		if( $flush )
- 		{ // Flush the output buffer and turn off buffering
+		if( $flush )
+		{ // Flush the output buffer and turn off buffering
 			ob_end_flush();
- 		}
- 		else
- 		{ // Erase the output buffer and turn off buffering
+		}
+		else
+		{ // Erase the output buffer and turn off buffering
 			ob_end_clean();
- 		}
+		}
 
 		// We are no longer collecting...
 		$this->is_collecting = false;
@@ -513,6 +553,11 @@ class PageCache
 
 		// echo ' *** cache end *** ';
 		// echo $this->cached_page_content;
+
+		if( ! $this->is_valid_cached_content() )
+		{	// Current cached page content is not valid HTML page, We cannot use this for storing in cache file:
+			return;
+		}
 
 		// What would be the cache file for the current URL?
 		$af_cache_file = $this->get_af_filecache_path();
@@ -586,11 +631,20 @@ class PageCache
 	 *
 	 * @param $file_path
 	 * @return boolean true if the file should be removed, false otherwise
+	 * @param boolean|string 'cron_job' - to log messages for cron job
 	 */
-	static function checkDelete( $file_path )
+	static function checkDelete( $file_path, $display_messages = false )
 	{
+		global $cache_path;
+
+		$folder_file = substr( $file_path, strlen( $cache_path ) );
+
 		if( strpos( $file_path, 'CVS' ) !== false )
 		{ // skip CVS folders - This could be more specific
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_action_end( 'File <code>'.$folder_file.'</code> could not be deleted because of reserved name.', 'warning' );
+			}
 			return false;
 		}
 		// get file name from path
@@ -599,13 +653,21 @@ class PageCache
 		// Note: index.html pages are in the cache to hide the contents from browsers in case the webserver whould should a listing
 		if( ( $file_name == 'index.html' ) || ( substr( $file_name, 0, 1 ) == '.' ) || ( $file_name == 'sample.htaccess' ) )
 		{ // this file is index.html or sample.htaccess or it is hidden, should not delete it.
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_action_end( 'File <code>'.$folder_file.'</code> could not be deleted because of reserved name.', 'warning' );
+			}
 			return false;
 		}
 
 		global $localtimenow;
 		$datediff = $localtimenow - filemtime( $file_path );
-		if( $datediff < 86400 /* 60*60*24 = 24 hour*/)
+		if( $datediff < 86400 /* 60*60*24 = 24 hour*/ )
 		{ // the file is not older then 24 hour, should not delete it.
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_action_end( 'File <code>'.$folder_file.'</code> could not be deleted because it\'s not older then 24 hour.', 'warning' );
+			}
 			return false;
 		}
 
@@ -618,46 +680,63 @@ class PageCache
 	 * Delete those files from the given directory, which results true value on checkDelete function
 	 *
 	 * @param string directory path
-	 * @param string the first error occured deleting the directory content
+	 * @param boolean|string 'cron_job' - to log messages for cron job
 	 */
-	static function deleteDirContent( $path, & $first_error )
+	static function deleteDirContent( $path, $display_messages = false )
 	{
+		global $cache_path;
+
+		$result = true;
+
 		$path = trailing_slash( $path );
 
-		if( $dir = @opendir($path) )
-		{
-			while( ( $file = readdir($dir) ) !== false )
+		if( $dir = @opendir( $path ) )
+		{	// If folder is opened successfully:
+			while( ( $file = readdir( $dir ) ) !== false )
 			{
 				if( $file == '.' || $file == '..' )
-				{
+				{	// Skip reserved file names:
 					continue;
 				}
 				$file_path = $path.$file;
-				if( is_dir($file_path) )
-				{
-					PageCache::deleteDirContent( $file_path, $first_error );
+				$folder_file = substr( $file_path, strlen( $cache_path ) );
+				if( is_dir( $file_path ) )
+				{	// Folder:
+					$result = $result && PageCache::deleteDirContent( $file_path, $display_messages );
 				}
 				else
-				{
-					if( PageCache::checkDelete( $file_path ) )
-					{
-						if( ( ! @unlink( $file_path ) ) && ($first_error == '') )
-						{ // deleting the file failed: return error
-							//$error = error_get_last(); // XXX: requires PHP 5.2
-							//$error['message'];
-							$first_error = sprintf( T_('Some files could not be deleted (including: %s).'), $file);
+				{	// File:
+					if( PageCache::checkDelete( $file_path, $display_messages ) )
+					{	// If file is allowed to be deleted from cache currently:
+						if( @unlink( $file_path ) )
+						{	// Success deleting:
+							if( $display_messages === 'cron_job' )
+							{	// Log a message for cron job:
+								cron_log_action_end( 'File <code>'.$folder_file.'</code> has been deleted.' );
+							}
+						}
+						else
+						{	// If a deleting the file failed: return error
+							if( $display_messages === 'cron_job' )
+							{	// Log a message for cron job:
+								cron_log_action_end( 'File <code>'.$folder_file.'</code> could not be deleted, please check permissions.', 'error' );
+							}
+							$result = false;
 						}
 					}
 				}
 			}
 		}
 		else
-		{
-			if( $first_error == '' )
-			{
-				$first_error = sprintf( T_('Can not access directory: %s.'), $path );;
+		{	// No permission to open the cache folder:
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_action_end( 'Can not access directory: <code>'.$path.'</code>', 'error' );
 			}
+			$result = false;
 		}
+
+		return $result;
 	}
 
 
@@ -665,9 +744,10 @@ class PageCache
 	 * Delete any file that is older than 24 hours from the whole /cache folder (recursively)
 	 * except index.html files and hiddenfiles (starting with .)
 	 *
+	 * @param boolean|string 'cron_job' - to log messages for cron job
 	 * @return string empty string on success, error message otherwise.
 	 */
-	static function prune_page_cache()
+	static function prune_page_cache( $display_messages = false )
 	{
 		global $cache_path;
 
@@ -677,10 +757,7 @@ class PageCache
 
 		$path = trailing_slash( $cache_path );
 
-		$first_error = '';
-		PageCache::deleteDirContent( $path, $first_error );
-
-		return $first_error;
+		return PageCache::deleteDirContent( $path, $display_messages );
 	}
 }
 
