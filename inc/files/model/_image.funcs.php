@@ -212,6 +212,13 @@ function load_image( $path, $mimetype )
 		error_log( 'load_image failed: '.substr($err, 1).' ('.$path.' / '.$mimetype.')' );
 	}
 
+	// By default GD uses alpha blending; this means that any transparent pixels in the PNG files will be blended with whatever color is behind it.
+	// In the case of a transparent PNG it will use the default color (usually black). We need to switch off alpha blending.
+	if( $mimetype == 'image/png' )
+	{
+		imagealphablending($imh, false);
+	}
+
 	return array( $err, $imh );
 }
 
@@ -245,6 +252,8 @@ function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 			break;
 
 		case 'image/png':
+			// By default GD  will not save the alpha channel for transparent PNG, we need to set the alpha flag
+			imagesavealpha($imh, true);
 			$r = @imagepng( $imh, $path );
 			break;
 
@@ -528,6 +537,67 @@ function rotate_image( $File, $degrees )
 
 
 /**
+ * Flip image
+ *
+ * @param object File
+ * @param string mode
+ * @return boolean TRUE if flip operation is successful
+ */
+function flip_image( $File, $mode )
+{
+	$Filetype = & $File->get_Filetype();
+	if( !$Filetype )
+	{	// Error
+		return false;
+	}
+
+	// Load image
+	list( $err, $imh ) = load_image( $File->get_full_path(), $Filetype->mimetype );
+	if( !empty( $err ) )
+	{	// Error
+		return false;
+	}
+
+	switch( $mode )
+	{
+		case 'horizontal':
+			$mode = '1'; // IMG_FLIP_HORIZONTAL
+			break;
+
+		case 'vertical':
+			$mode = '2'; // IMG_FLIP_VERTICAL
+			break;
+
+		case 'both':
+			$mode = '3'; // IMG_FLIP_BOTH
+			break;
+
+		default:
+			debug_die( 'Invalid flip mode' );
+	}
+
+	// Rotate image
+	if( ! imageflip( $imh, $mode ) )
+	{	// If func imageflip is not defined for example:
+		return false;
+	}
+
+	// Save image:
+	$save_image_err = save_image( $imh, $File->get_full_path(), $Filetype->mimetype );
+	if( $save_image_err !== NULL )
+	{	// Some error has been detected on save image:
+		syslog_insert( substr( $save_image_err, 1 ), 'error', 'file', $File->ID );
+		return false;
+	}
+
+	// Remove the old thumbnails
+	$File->rm_cache();
+
+	return true;
+}
+
+
+/**
  * Crop image
  *
  * @param object File
@@ -733,6 +803,64 @@ if( !function_exists( 'imagerotate' ) )
 	}
 }
 
+
+/**
+ * Provide imageflip for undefined cases
+ *
+ * Flip an image depending of mode
+ * @param resource Image: An image resource, returned by one of the image creation functions, such as imagecreatetruecolor().
+ * @param string Modde: 1 - horizontal flip, 2 - vertical flip, 3 - both
+ * @return resource Returns an image resource for the flipped image, or FALSE on failure.
+ */
+if( !function_exists( 'imageflip') )
+{
+	function imageflip( &$imgsrc, $mode )
+	{
+
+		$width = imagesx( $imgsrc );
+		$height = imagesy( $imgsrc );
+
+		$src_x = 0;
+		$src_y = 0;
+		$src_width = $width;
+		$src_height = $height;
+
+		switch ( $mode )
+		{
+			case '1': //horizontal
+				$src_x = $width;
+				$src_width = -$width;
+			break;
+
+			case '2': //vertical
+				$src_y = $height;
+				$src_height = -$height;
+			break;
+
+			case '3': //both
+				$src_x = $width;
+				$src_y = $height;
+				$src_width = -$width;
+				$src_height = -$height;
+			break;
+
+			default:
+				return false;
+		}
+
+		$imgdest = imagecreatetruecolor( $width, $height );
+		imagealphablending($imgdest, false);
+		imagesavealpha( $imgdest, true );
+
+		if( imagecopyresampled( $imgdest, $imgsrc, 0, 0, $src_x, $src_y , $width, $height, $src_width, $src_height ) )
+		{
+			$imgsrc = $imgdest;
+			return true;
+		}
+
+		return false;
+	}
+}
 
 /**
  * Scale image to dimensions specified.

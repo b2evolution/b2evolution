@@ -48,6 +48,8 @@ else
 // Check permission (#2):
 $current_User->check_perm( 'files', 'view', true, $perm_blog );
 
+// Initialize Font Awesome
+init_fontawesome_icons();
 
 // Load the other params:
 param( 'viewtype', 'string', true, true );
@@ -90,6 +92,29 @@ switch( $action )
 		}
 		break;
 
+	case 'flip_horizontal':
+	case 'flip_vertical':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'image' );
+
+		load_funcs( 'files/model/_image.funcs.php' );
+
+		switch( $action )
+		{
+			case 'flip_horizontal':
+				$mode = 'horizontal';
+				break;
+			case 'flip_vertical':
+				$mode = 'vertical';
+				break;
+		}
+
+		if( flip_image( $selected_File, $mode ) )
+		{	// Image was rotated successfully
+			header_redirect( regenerate_url( 'action,crumb_image', 'action=reload_parent', '', '&' ) );
+		}
+		break;
+
 	case 'reload_parent':
 		// Reload parent window to update rotated image
 		$JS_additional = 'window.opener.location.reload(true);';
@@ -100,6 +125,7 @@ switch( $action )
 require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
 require_css( 'basic.css', 'rsc_url' ); // Basic styles
 require_css( 'viewfile.css', 'rsc_url' );
+require_css( '#bootstrap_css#', 'rsc_url' );
 
 // Send the predefined cookies:
 evo_sendcookies();
@@ -145,11 +171,15 @@ switch( $viewtype )
 			$url_rotate_90_left = regenerate_url( '', 'action=rotate_90_left'.'&'.url_crumb('image') );
 			$url_rotate_180 = regenerate_url( '', 'action=rotate_180'.'&'.url_crumb('image') );
 			$url_rotate_90_right = regenerate_url( '', 'action=rotate_90_right'.'&'.url_crumb('image') );
+			$url_flip_horizontal = regenerate_url( '', 'action=flip_horizontal'.'&'.url_crumb('image') );
+			$url_flip_vertical = regenerate_url( '', 'action=flip_vertical'.'&'.url_crumb('image') );
 
 			echo '<div class="center">';
 			echo action_icon( T_('Rotate this picture 90&deg; to the left'), 'rotate_left', $url_rotate_90_left, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
 			echo action_icon( T_('Rotate this picture 180&deg;'), 'rotate_180', $url_rotate_180, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-			echo action_icon( T_('Rotate this picture 90&deg; to the right'), 'rotate_right', $url_rotate_90_right, '', 0, 0 );
+			echo action_icon( T_('Rotate this picture 90&deg; to the right'), 'rotate_right', $url_rotate_90_right, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+			echo action_icon( T_('Flip this picture horizontally'), 'flip_horizontal', $url_flip_horizontal, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+			echo action_icon( T_('Flip this picture vertically'), 'flip_vertical', $url_flip_vertical, '', 0, 0 );
 			echo '</div>';
 
 			echo '<div class="subline">';
