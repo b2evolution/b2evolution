@@ -212,6 +212,13 @@ function load_image( $path, $mimetype )
 		error_log( 'load_image failed: '.substr($err, 1).' ('.$path.' / '.$mimetype.')' );
 	}
 
+	// By default GD uses alpha blending; this means that any transparent pixels in the PNG files will be blended with whatever color is behind it.
+	// In the case of a transparent PNG it will use the default color (usually black). We need to switch off alpha blending.
+	if( $mimetype == 'image/png' )
+	{
+		imagealphablending($imh, false);
+	}
+
 	return array( $err, $imh );
 }
 
@@ -245,6 +252,8 @@ function save_image( $imh, $path, $mimetype, $quality = 90, $chmod = NULL )
 			break;
 
 		case 'image/png':
+			// By default GD  will not save the alpha channel for transparent PNG, we need to set the alpha flag
+			imagesavealpha($imh, true);
 			$r = @imagepng( $imh, $path );
 			break;
 
