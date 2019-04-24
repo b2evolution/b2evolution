@@ -7,11 +7,11 @@ function evo_customizer_reload_frontoffice( additional_url_params )
 	jQuery( '#evo_customizer__frontoffice_loader' ).show();
 	if( typeof( additional_url_params ) == 'undefined' )
 	{	// Reload with current url:
-		jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.reload();
+		jQuery( '#evo_customizer__frontoffice' ).get(0).contentWindow.location.reload();
 	}
 	else
 	{	// Reload with additional params:
-		jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.href += additional_url_params;
+		jQuery( '#evo_customizer__frontoffice' ).get(0).contentWindow.location.href += additional_url_params;
 	}
 }
 
@@ -149,9 +149,9 @@ jQuery( document ).on( 'ready', function()
 			}
 		} );
 
-		backoffice_content.find( 'form' ).on( 'keypress', function( e )
-		{ // Don't submit a form on press "Enter/Return" key:
-			return e.keyCode != 13;
+		backoffice_content.find( 'form#skin_settings_checkchanges' ).on( 'keypress', function( e )
+		{	// Don't submit a form on press "Enter/Return" key:
+			return e.target.nodeName == 'TEXTAREA' || e.keyCode != 13;
 		} );
 
 		// Open links from widget edit form on top window:
