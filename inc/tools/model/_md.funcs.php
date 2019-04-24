@@ -267,6 +267,9 @@ function md_import( $folder_path, $source_type )
 		$category_name = $last_index === false ? $relative_path : substr( $relative_path, $last_index + 1 );//$paths_folders[ $paths_folders_num - 1 ];
 		$parent_path = substr( $relative_path, 0, $last_index );
 
+		echo '<p>'.sprintf( T_('Importing category: %s'), '"<b>'.$relative_path.'</b>"...' );
+		evo_flush();
+
 		$Chapter = new Chapter( NULL, $md_blog_ID );
 		$Chapter->set( 'name', $category_name );
 		$Chapter->set( 'urlname', urltitle_validate( $category_name, $category_name, 0, false, 'cat_urlname', 'cat_ID', 'T_categories' ) );
@@ -279,7 +282,13 @@ function md_import( $folder_path, $source_type )
 			// Save new category in cache:
 			$categories[ $relative_path ] = $Chapter->ID;
 			$categories_count++;
+			echo '<span class="text-success">'.T_('OK').'</span>';
 		}
+		else
+		{
+			echo '<span class="text-warning">'.T_('Failed').'</span>';
+		}
+		echo '.</p>';
 
 		// Unset folder in order to don't check it twice on creating posts below:
 		unset( $files[ $f ] );
@@ -317,7 +326,8 @@ function md_import( $folder_path, $source_type )
 			$item_title = $item_slug;
 		}
 
-		echo '<p>'.sprintf( T_('Importing post: %s'), '"'.$item_title.'" <code>'.$item_slug.'</code>' );
+		echo '<p>'.sprintf( T_('Importing post: %s'), '"<b>'.$item_title.'</b>" <code>'.$item_slug.'</code>' );
+		evo_flush();
 
 		$relative_path = substr( $file_path, $folder_path_length + 1 );
 
@@ -365,17 +375,32 @@ function md_import( $folder_path, $source_type )
 			$posts_count++;
 
 			// Link files:
-			/*if( preg_match_all( '#\!\[img\]\(([^\)]+)\)#', $item_content, $image_matches ) )
+			if( preg_match_all( '#\!\[img\]\(([^\)]+)\)#', $item_content, $image_matches ) )
 			{
+				$updated_item_content = $item_content;
+				$LinkOwner = new LinkItem( $Item );
+				$file_params = array(
+						'file_root_type' => 'collection',
+						'file_root_ID'   => $md_blog_ID,
+						'folder_path'    => 'quick-uploads/'.$Item->get( 'urltitle' ),
+						'link_order'     => 1,
+					);
 				foreach( $image_matches[1] as $i => $image_relative_path )
 				{
-					$image_full_path = $folder_path.'/'.$category_path.'/'.$image_relative_path;
-					if( file_exists( $image_full_path ) )
-					{
-						;
+					if( $link_ID = md_link_file( $LinkOwner, $folder_path, $category_path.'/'.$image_relative_path, $file_params ) )
+					{	// If file has been linked successfully:
+						$file_params['link_order']++;
+						// Replace this img tag from content with b2evolution format:
+						$updated_item_content = str_replace( $image_matches[0][$i], '[image:'.$link_ID.']', $updated_item_content );
 					}
 				}
-			}*/
+
+				if( $updated_item_content != $item_content )
+				{	// Update new content:
+					$Item->set( 'content', $updated_item_content );
+					$Item->dbupdate();
+				}
+			}
 		}
 
 		echo '</p>';
@@ -391,5 +416,75 @@ function md_import( $folder_path, $source_type )
 	echo '<p class="text-success">'.T_('Import complete.').'</p>';
 
 	$DB->commit();
+}
+
+
+/**
+ * Create object File from source path
+ *
+ * @param object LinkOwner
+ * @param string Source folder absolute path
+ * @param string Source file relative path
+ * @param array Params
+ * @return boolean TRUE on success
+ */
+function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_relative_path, $params )
+{
+	$params = array_merge( array(
+			'file_root_type' => 'collection',
+			'file_root_ID'   => '',
+			'folder_path'    => '',
+			'link_order'     => 1,
+		), $params );
+
+	$file_source_path = $source_folder_absolute_path.'/'.$source_file_relative_path;
+
+	if( ! file_exists( $file_source_path ) )
+	{	// File doesn't exist
+		echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</p>';
+		evo_flush();
+		// Skip it:
+		return false;
+	}
+
+	// Get FileRoot by type and ID
+	$FileRootCache = & get_FileRootCache();
+	$FileRoot = & $FileRootCache->get_by_type_and_ID( $params['file_root_type'], $params['file_root_ID'] );
+
+	// Get file name with a fixed name if file with such name already exists in the destination path:
+	list( $File, $old_file_thumb ) = check_file_exists( $FileRoot, $params['folder_path'], basename( $file_source_path ) );
+
+	if( ! $File || ! copy_r( $file_source_path, $File->get_full_path() ) )
+	{	// No permission to copy to the destination folder
+		if( is_dir( $file_source_path ) )
+		{	// Folder
+			echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+		}
+		else
+		{	// File
+			echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+		}
+		evo_flush();
+		// Skip it:
+		return false;
+	}
+
+	// Create new File:
+	$File->dbsave();
+
+	if( $link_ID = $File->link_to_Object( $LinkOwner, $params['link_order'], 'inline' ) )
+	{	// If file has been linked to the post
+		echo '<p class="text-success">'.sprintf( T_('File %s has been imported to %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</p>';
+	}
+	else
+	{	// If file could not be linked to the post:
+		echo '<p class="text-warning">'.sprintf( T_('File of image url %s could not be attached to this post because it is not found in the source attachments folder.'), '<code>'.$file_source_path.'</code>' ).'</p>';
+		evo_flush();
+		return false;
+	}
+
+	evo_flush();
+
+	return $link_ID;
 }
 ?>

@@ -1720,11 +1720,11 @@ function & wpxml_create_File( $file_source_path, $params )
 	{	// No permission to copy to the destination folder
 		if( is_dir( $file_source_path ) )
 		{	// Folder
-			echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
+			echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
 		}
 		else
 		{	// File
-			echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
+			echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
 		}
 		// Skip it:
 		return $File;
