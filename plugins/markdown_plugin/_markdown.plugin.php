@@ -35,6 +35,8 @@ class markdown_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		require_once( dirname( __FILE__ ).'/_parsedown.inc.php' );
+		require_once( dirname( __FILE__ ).'/_parsedown_extra.inc.php' );
+		require_once( dirname( __FILE__ ).'/_parsedown_b2evo.inc.php' );
 
 		$this->short_desc = T_('Markdown');
 		$this->long_desc = T_('Accepted formats:<br />
@@ -164,22 +166,23 @@ class markdown_plugin extends Plugin
 			return;
 		}
 
-		// Init parser class with blog settings
-		$Parsedown = Parsedown::instance();
-		$Parsedown->parse_font_styles = $text_styles_enabled;
-		$Parsedown->parse_links = $links_enabled;
-		$Parsedown->parse_images = $images_enabled;
+		// Initialize object to parse markdown code:
+		$ParsedownB2evo = new ParsedownB2evo();
+		$ParsedownB2evo->setUrlsLinked( false ); // Don't parse urls to links
+		$ParsedownB2evo->set_b2evo_parse_font_styles( $text_styles_enabled );
+		$ParsedownB2evo->set_b2evo_parse_links( $links_enabled );
+		$ParsedownB2evo->set_b2evo_parse_images( $images_enabled );
 
 		// Parse markdown code to HTML
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
 		{ // Call replace_content() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
-				array( $Parsedown, 'parse' ) );
+				array( $ParsedownB2evo, 'text' ) );
 		}
 		else
 		{ // No code/pre blocks, replace on the whole thing
-			$content = $Parsedown->parse( $content );
+			$content = $ParsedownB2evo->text( $content );
 		}
 
 		return true;
