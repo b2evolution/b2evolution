@@ -9341,6 +9341,7 @@ function get_social_media_image( $Item = NULL, $params = array() )
 
 	if( $params['use_coll_fallback'] && $Blog )
 	{	// Try to get collection social media boiler plate and collection image/logo:
+		$FileCache = & get_FileCache();
 		$social_media_image_file_ID = $Blog->get_setting( 'social_media_image_file_ID', false );
 		if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
 		{	// Try social media boiler plate first:
