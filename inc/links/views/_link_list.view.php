@@ -103,6 +103,10 @@ $compact_results_params = is_admin_page() ? $AdminUI->get_template( 'compact_res
 $compact_results_params['body_start'] = str_replace( '<tbody', $tbody_start, $compact_results_params['body_start'] );
 $compact_results_params['no_results_start'] = str_replace( '<tbody', $tbody_start, $compact_results_params['no_results_start'] );
 
+// Disable flush because it breaks layout when comment form is called from widget "Item Comment Form":
+global $disable_evo_flush;
+$disable_evo_flush = true;
+
 $Results->display( $compact_results_params );
 
 // Print out JavaScript to change a link position:
