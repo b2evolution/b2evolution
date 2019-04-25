@@ -375,7 +375,7 @@ function md_import( $folder_path, $source_type )
 			$posts_count++;
 
 			// Link files:
-			if( preg_match_all( '#\!\[img\]\(([^\)]+)\)#', $item_content, $image_matches ) )
+			if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)]+)\)#', $item_content, $image_matches ) )
 			{
 				$updated_item_content = $item_content;
 				$LinkOwner = new LinkItem( $Item );
@@ -385,13 +385,14 @@ function md_import( $folder_path, $source_type )
 						'folder_path'    => 'quick-uploads/'.$Item->get( 'urltitle' ),
 						'link_order'     => 1,
 					);
-				foreach( $image_matches[1] as $i => $image_relative_path )
+				foreach( $image_matches[2] as $i => $image_relative_path )
 				{
 					if( $link_ID = md_link_file( $LinkOwner, $folder_path, $category_path.'/'.$image_relative_path, $file_params ) )
 					{	// If file has been linked successfully:
 						$file_params['link_order']++;
 						// Replace this img tag from content with b2evolution format:
-						$updated_item_content = str_replace( $image_matches[0][$i], '[image:'.$link_ID.']', $updated_item_content );
+						$image_caption = trim( $image_matches[1][$i] );
+						$updated_item_content = str_replace( $image_matches[0][$i], '[image:'.$link_ID.( empty( $image_caption ) ? '' : ':'.$image_caption ).']', $updated_item_content );
 					}
 				}
 
