@@ -82,6 +82,31 @@ class markdown_plugin extends Plugin
 					'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
 					'defaultvalue' => 0,
 				),
+			'table' => array(
+					'label' => T_('Tables'),
+					'type' => 'checkbox',
+					'note' => '<code>|</code> '.( ( $php_less_7 = version_compare( PHP_VERSION, '7', '<' ) ) ? '<span class="text-warning">('.sprintf( T_('Requires PHP %s'), '7.0+' ).')</span>' : '' ),
+					'defaultvalue' => $php_less_7 ? 0 : 1,
+					'disabled' => $php_less_7,
+				),
+			'deflist' => array(
+					'label' => T_('Definition Lists'),
+					'type' => 'checkbox',
+					'note' => '<code>:</code>',
+					'defaultvalue' => 1,
+				),
+			'footnote' => array(
+					'label' => T_('Footnotes'),
+					'type' => 'checkbox',
+					'note' => '<code>[^1]</code>',
+					'defaultvalue' => 1,
+				),
+			'abbr' => array(
+					'label' => T_('Abbreviations'),
+					'type' => 'checkbox',
+					'note' => '<code>*[W3C]: World Wide Web Consortium</code>',
+					'defaultvalue' => 1,
+				),
 		);
 	}
 
@@ -157,23 +182,52 @@ class markdown_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
+		$parsedown_options = array(
+			'table'    => array( 'Table' ),
+			'deflist'  => array( 'DefinitionList' ),
+			'footnote' => array( 'Footnote', 'FootnoteMarker' ),
+			'abbr'     => array( 'Abbreviation' ),
+		);
+		$disabled_options = array();
+
 		if( $setting_Blog = & $this->get_Blog_from_params( $params ) )
 		{	// We are rendering Item, Comment or Widget now, Get the settings depending on Collection:
 			$text_styles_enabled = $this->get_coll_setting( 'text_styles', $setting_Blog );
 			$links_enabled = $this->get_coll_setting( 'links', $setting_Blog );
 			$images_enabled = $this->get_coll_setting( 'images', $setting_Blog );
+			foreach( $parsedown_options as $setting_key => $option_names )
+			{
+				if( ! $this->get_coll_setting( $setting_key, $setting_Blog ) )
+				{	// Disable parsedown option if it is not checked in collection plugin settings:
+					$disabled_options = array_merge( $disabled_options, $option_names );
+				}
+			}
 		}
 		elseif( ! empty( $params['Message'] ) )
 		{	// We are rendering Message now:
 			$text_styles_enabled = $this->get_msg_setting( 'text_styles' );
 			$links_enabled = $this->get_msg_setting( 'links' );
 			$images_enabled = $this->get_msg_setting( 'images' );
+			foreach( $parsedown_options as $setting_key => $option_names )
+			{
+				if( ! $this->get_msg_setting( $setting_key ) )
+				{	// Disable parsedown option if it is not checked in messaging plugin settings:
+					$disabled_options = array_merge( $disabled_options, $option_names );
+				}
+			}
 		}
 		elseif( ! empty( $params['EmailCampaign'] ) )
 		{	// We are rendering EmailCampaign now:
 			$text_styles_enabled = $this->get_email_setting( 'text_styles' );
 			$links_enabled = $this->get_email_setting( 'links' );
 			$images_enabled = $this->get_email_setting( 'images' );
+			foreach( $parsedown_options as $setting_key => $option_names )
+			{
+				if( ! $this->get_email_setting( $setting_key ) )
+				{	// Disable parsedown option if it is not checked in emails plugin settings:
+					$disabled_options = array_merge( $disabled_options, $option_names );
+				}
+			}
 		}
 		else
 		{ // Unknown call, Don't render this case
@@ -186,6 +240,7 @@ class markdown_plugin extends Plugin
 		$ParsedownB2evo->set_b2evo_parse_font_styles( $text_styles_enabled );
 		$ParsedownB2evo->set_b2evo_parse_links( $links_enabled );
 		$ParsedownB2evo->set_b2evo_parse_images( $images_enabled );
+		$ParsedownB2evo->disable_options( $disabled_options );
 
 		// Parse markdown code to HTML
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )

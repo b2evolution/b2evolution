@@ -327,6 +327,58 @@ class ParsedownB2evo extends ParsedownExtra
 				);
 		}
 	}
+
+
+	/**
+	 * Disable blocks/inlines in order to don't render them by parent classes
+	 *
+	 * @param array Names of the disabled blocks/inlines, e.g. 'Tables', 'Header', 'List' and etc.
+	 */
+	function disable_options( $disabled_options )
+	{
+		if( empty( $disabled_options ) )
+		{	// No blocks to disable:
+			return;
+		}
+
+		// Search and disable Block by name:
+		foreach( $this->BlockTypes as $type_char => $types )
+		{
+			if( isset( $this->BlockTypes[ $type_char ] ) )
+			{
+				foreach( $types as $i => $type )
+				{
+					if( in_array( $type, $disabled_options ) )
+					{
+						unset( $this->BlockTypes[ $type_char ][ $i ] );
+					}
+				}
+				if( empty( $this->BlockTypes[ $type_char ] ) )
+				{
+					unset( $this->BlockTypes[ $type_char ] );
+				}
+			}
+		}
+
+		// Search and disable Inline by name:
+		foreach( $this->InlineTypes as $type_char => $types )
+		{
+			if( isset( $this->InlineTypes[ $type_char ] ) )
+			{
+				foreach( $types as $i => $type )
+				{
+					if( in_array( $type, $disabled_options ) )
+					{
+						unset( $this->InlineTypes[ $type_char ][ $i ] );
+					}
+				}
+				if( empty( $this->InlineTypes[ $type_char ] ) )
+				{
+					unset( $this->InlineTypes[ $type_char ] );
+				}
+			}
+		}
+	}
 }
 
 ?>
