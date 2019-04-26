@@ -220,7 +220,7 @@ jQuery( document ).on( 'ready', function()
 			var collection_url = jQuery( '#evo_customizer__frontoffice' ).data( 'coll-url' );
 			if( typeof( link_url ) != 'undefined' && link_url.indexOf( collection_url ) === 0 )
 			{	// Append param to hide evo toolbar and don't redirect for links of the current collection:
-				jQuery( this ).attr( 'href', link_url + ( link_url.indexOf( '?' ) === -1 ? '?' : '&' ) + 'customizer_mode=enable&show_toolbar=hidden&redir=no' );
+				jQuery( this ).attr( 'href', link_url.replace( /^([^#]+)(#.+)?$/, '$1' + ( link_url.indexOf( '?' ) === -1 ? '?' : '&' ) + 'customizer_mode=enable&show_toolbar=hidden&redir=no' + '$2' ) );
 			}
 			else
 			{	// Open all links of other collections and side sites on top window in order to update settings frame or close it:
