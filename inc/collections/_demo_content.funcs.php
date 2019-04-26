@@ -1484,7 +1484,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->set_tags_from_string( 'demo,custom fields' );
 				$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
 				$edited_Item->set_setting( 'custom:second_numeric_field', '456' );
 				$edited_Item->set_setting( 'custom:usd_price', '29.99' );
@@ -1496,21 +1496,14 @@ It can have multiple lines.' );
 				$edited_Item->set_setting( 'custom:url_field', 'http://b2evolution.net/' );
 				$edited_Item->set_setting( 'custom:checkmark_field', '1' );
 				$post_custom_fields_ID = $edited_Item->insert( $owner_ID, T_('Custom Fields Example'),
-'<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
-
-'<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>'.
-
-'<p>[fields]</p>'.
-
-'[teaserbreak]'.
-
-'<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
-
-'<p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>'.
-
-'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>'.
-
-'<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
+'<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>
+<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
+<p>[fields]</p>
+[teaserbreak]
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+<p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>
+<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>
+<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
 				$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -1523,7 +1516,7 @@ It can have multiple lines.' );
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->set_tags_from_string( 'demo,custom fields' );
 				$edited_Item->set_setting( 'custom:first_numeric_field', '123.45' );
 				$edited_Item->set_setting( 'custom:second_numeric_field', '456' );
 				$edited_Item->set_setting( 'custom:usd_price', '17.50' );
@@ -1536,21 +1529,14 @@ This is an extra line.' );
 				$edited_Item->set_setting( 'custom:url_field', 'http://b2evolution.net/' );
 				$edited_Item->set_setting( 'custom:checkmark_field', '0' );
 				$another_custom_fields_example_ID = $edited_Item->insert( $owner_ID, T_('Another Custom Fields Example'),
-'<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
-
-'<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>'.
-
-'<p>[fields]</p>'.
-
-'[teaserbreak]'.
-
-'<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
-
-'<p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>'.
-
-'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>'.
-
-'<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
+'<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>
+<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
+<p>[fields]</p>
+[teaserbreak]
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+<p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>
+<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>
+<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 						$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Post with Custom Fields' );
 				$edit_File = new File( 'shared', 0, 'monument-valley/monument-valley-road.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -1565,7 +1551,7 @@ This is an extra line.' );
 					$post_count--;
 					$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 					$edited_Item = new Item();
-					$edited_Item->set_tags_from_string( 'demo' );
+					$edited_Item->set_tags_from_string( 'demo,custom fields' );
 					$edited_Item->set_setting( 'custom:first_numeric_field', '123' );
 					$edited_Item->set_setting( 'custom:first_string_field', 'abc' );
 					$edited_Item->set_setting( 'custom:image_1', $custom_item_link_ID );
@@ -1573,35 +1559,21 @@ This is an extra line.' );
 					$edited_Item->set( 'parent_ID', $post_custom_fields_ID ); // Set parent post ID
 					/*$edited_Item->insert( $owner_ID, T_('Child Post Example'), T_('<p>This post has a special post type called "Child Post".</p>'),*/
 					$edited_Item->insert( $owner_ID, T_('Child Post Example'),
-'<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>'.
-
-'<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>'.
-
-'<p>[parent:fields]</p>'.
-
-'[teaserbreak]'.
-
-'<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
-
-'<p>[parent:fields:first_numeric_field,first_string_field,second_numeric_field]</p>'.
-
-'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field:first_string_field]' ).'</p>'.
-
-'<p>'.sprintf( T_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:'.$another_custom_fields_example_ID.':field:first_string_field]' ).'</p>'.
-
-'<p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>'.
-
-'<h3>'.T_('Replicated fields').'</h3>'.
-
-'<p>'.T_('By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively).').'</p>'.
-
-'<p>'.T_('This child post has the following fields which automatically replicate from its parent:').'</p>'.
-
-'<p>[fields]</p>'.
-
-'<p>'.sprintf( T_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' ).'</p>'.
-
-'<p>[compare:$this$,$parent$]</p>',
+'<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>
+<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>
+<p>[parent:fields]</p>
+[teaserbreak]
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+<p>[parent:fields:first_numeric_field,first_string_field,second_numeric_field]</p>
+<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field:first_string_field]' ).'</p>
+<p>'.sprintf( T_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:'.$another_custom_fields_example_ID.':field:first_string_field]' ).'</p>
+<p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>
+<h3>'.T_('Replicated fields').'</h3>
+<p>'.T_('By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively).').'</p>
+<p>'.T_('This child post has the following fields which automatically replicate from its parent:').'</p>
+<p>[fields]</p>
+<p>'.sprintf( T_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' ).'</p>
+<p>[compare:$this$,$parent$]</p>',
 							$now, $cat_bg, array(), 'published', '#', '', '', 'open', array('default'), 'Child Post' );
 					$item_IDs[] = array( $edited_Item->ID, $now );
 				}
@@ -1613,7 +1585,7 @@ This is an extra line.' );
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'demo,photo' );
+				$edited_Item->set_tags_from_string( 'demo,photo,recipe,custom fields' );
 				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
 				$edited_Item->set_setting( 'custom:cuisine', TD_('South African') );
 				$edited_Item->set_setting( 'custom:servings', '2' );
@@ -1628,14 +1600,14 @@ This is an extra line.' );
 hearty shot of hot sauce (Franks, Yellowbird)
 hearty crack of pepper') );
 				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, TD_('Stuffed Peppers'),
-'<p>'.TD_('We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).').'</p>'.
-'[teaserbreak]'.
-'<ol>'.
-	'<li>'.TD_('combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper').'</li>'.
-	'<li>'.TD_('if you are feeling spry, beat the mixture to make it fluffy').'</li>'.
-	'<li>'.TD_('put filling in a plastic bag, snip of the tip with scissors to make a piping bag').'</li>'.
-	'<li>'.TD_('fill peppers, place in bowl, top with chives and hot sauce').'</li>'.
-'</ol>',
+'<p>'.TD_('We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).').'</p>
+[teaserbreak]
+<ol>
+	<li>'.TD_('combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper').'</li>
+	<li>'.TD_('if you are feeling spry, beat the mixture to make it fluffy').'</li>
+	<li>'.TD_('put filling in a plastic bag, snip of the tip with scissors to make a piping bag').'</li>
+	<li>'.TD_('fill peppers, place in bowl, top with chives and hot sauce').'</li>
+</ol>',
 						$now, $cat_recipes, array(), 'published', '#', '', '', 'open', array('default'), '$recipe$' );
 				$edit_File = new File( 'shared', 0, 'recipes/stuffed-peppers.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -1646,7 +1618,7 @@ hearty crack of pepper') );
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'demo,photo' );
+				$edited_Item->set_tags_from_string( 'demo,photo,recipe,custom fields' );
 				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
 				$edited_Item->set_setting( 'custom:cuisine', TD_('Mongolian') );
 				$edited_Item->set_setting( 'custom:servings', '4' );
@@ -1663,17 +1635,17 @@ hearty crack of pepper') );
 1 yellow onion
 2 large green onions') );
 				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, TD_('Mongolian Beef'),
-'<p>'.TD_('A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.').'</p>'.
-'<p>'.TD_('Optional: spice this thing up, with a dose of your favorite chili paste/sauce.').'</p>'.
-'[teaserbreak]'.
-'<ol>'.
-	'<li>'.TD_('Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.').'</li>'.
-	'<li>'.TD_('Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.').'</li>'.
-	'<li>'.TD_('Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.').'</li>'.
-	'<li>'.TD_('Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.').'</li>'.
-	'<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>'.
-	'<li>'.TD_('Serve with rice, top with green onions').'</li>'.
-'</ol>',
+'<p>'.TD_('A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.').'</p>
+<p>'.TD_('Optional: spice this thing up, with a dose of your favorite chili paste/sauce.').'</p>
+[teaserbreak]
+<ol>
+	<li>'.TD_('Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.').'</li>
+	<li>'.TD_('Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.').'</li>
+	<li>'.TD_('Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.').'</li>
+	<li>'.TD_('Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.').'</li>
+	<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>
+	<li>'.TD_('Serve with rice, top with green onions').'</li>
+</ol>',
 						$now, $cat_recipes, array(), 'published', '#', '', '', 'open', array('default'), '$recipe$' );
 				$edit_File = new File( 'shared', 0, 'recipes/mongolian-beef.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -2161,7 +2133,7 @@ T_("<p>To get you started, the installer has automatically created several sampl
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->set_tags_from_string( 'demo,rendering' );
 				$edited_Item->insert( $user_1, T_('Markdown examples'), get_filler_text( 'markdown_examples_content'), $now, $cat_forums_news );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
@@ -2266,7 +2238,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->set_tags_from_string( 'demo,rendering' );
 				$edited_Item->insert( $owner_ID, T_('Wiki Tables'), /* DO NOT TRANSLATE - TOO COMPLEX */ '<p>This is the topic with samples of the wiki tables.</p>
 
 {|
@@ -2516,7 +2488,7 @@ Hello
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'demo,photo' );
+				$edited_Item->set_tags_from_string( 'demo,photo,recipe,custom fields' );
 				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
 				$edited_Item->set_setting( 'custom:cuisine', TD_('South African') );
 				$edited_Item->set_setting( 'custom:servings', '2' );
@@ -2531,14 +2503,14 @@ Hello
 hearty shot of hot sauce (Franks, Yellowbird)
 hearty crack of pepper') );
 				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, TD_('Stuffed Peppers'),
-'<p>'.TD_('We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).').'</p>'.
-'[teaserbreak]'.
-'<ol>'.
-	'<li>'.TD_('combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper').'</li>'.
-	'<li>'.TD_('if you are feeling spry, beat the mixture to make it fluffy').'</li>'.
-	'<li>'.TD_('put filling in a plastic bag, snip of the tip with scissors to make a piping bag').'</li>'.
-	'<li>'.TD_('fill peppers, place in bowl, top with chives and hot sauce').'</li>'.
-'</ol>',
+'<p>'.TD_('We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).').'</p>
+[teaserbreak]
+<ol>
+	<li>'.TD_('combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper').'</li>
+	<li>'.TD_('if you are feeling spry, beat the mixture to make it fluffy').'</li>
+	<li>'.TD_('put filling in a plastic bag, snip of the tip with scissors to make a piping bag').'</li>
+	<li>'.TD_('fill peppers, place in bowl, top with chives and hot sauce').'</li>
+</ol>',
 						$now, $cat_manual_recipes, array(), 'published', '#', '', '', 'open', array('default'), '$recipe$' );
 				$edit_File = new File( 'shared', 0, 'recipes/stuffed-peppers.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -2549,7 +2521,7 @@ hearty crack of pepper') );
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'demo,photo' );
+				$edited_Item->set_tags_from_string( 'demo,photo,recipe,custom fields' );
 				$edited_Item->set_setting( 'custom:course', TD_('Main Course') );
 				$edited_Item->set_setting( 'custom:cuisine', TD_('Mongolian') );
 				$edited_Item->set_setting( 'custom:servings', '4' );
@@ -2566,17 +2538,17 @@ hearty crack of pepper') );
 1 yellow onion
 2 large green onions') );
 				$mongolian_beef_ID = $edited_Item->insert( $owner_ID, TD_('Mongolian Beef'),
-'<p>'.TD_('A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.').'</p>'.
-'<p>'.TD_('Optional: spice this thing up, with a dose of your favorite chili paste/sauce.').'</p>'.
-'[teaserbreak]'.
-'<ol>'.
-	'<li>'.TD_('Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.').'</li>'.
-	'<li>'.TD_('Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.').'</li>'.
-	'<li>'.TD_('Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.').'</li>'.
-	'<li>'.TD_('Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.').'</li>'.
-	'<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>'.
-	'<li>'.TD_('Serve with rice, top with green onions').'</li>'.
-'</ol>',
+'<p>'.TD_('A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.').'</p>
+<p>'.TD_('Optional: spice this thing up, with a dose of your favorite chili paste/sauce.').'</p>
+[teaserbreak]
+<ol>
+	<li>'.TD_('Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.').'</li>
+	<li>'.TD_('Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.').'</li>
+	<li>'.TD_('Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.').'</li>
+	<li>'.TD_('Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.').'</li>
+	<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>
+	<li>'.TD_('Serve with rice, top with green onions').'</li>
+</ol>',
 						$now, $cat_manual_recipes, array(), 'published', '#', '', '', 'open', array('default'), '$recipe$' );
 				$edit_File = new File( 'shared', 0, 'recipes/mongolian-beef.jpg' );
 				$LinkOwner = new LinkItem( $edited_Item );
@@ -2703,7 +2675,7 @@ hearty crack of pepper') );
 				$post_count--;
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'demo' );
+				$edited_Item->set_tags_from_string( 'demo,rendering' );
 				$edited_Item->insert( $owner_ID, T_('Markdown examples'), get_filler_text( 'markdown_examples_content'), $now, $cat_manual_userguide );
 				$item_IDs[] = array( $edited_Item->ID, $now );
 			}
