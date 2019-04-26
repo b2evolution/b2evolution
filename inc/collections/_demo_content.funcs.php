@@ -2391,20 +2391,20 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	$demo_items['mongolian_beef'] = array(
 		'title'    => TD_('Mongolian Beef'),
 		'featured' => true,
-		'tags'     => 'photo,demo',
+		'tags'     => 'photo,demo,recipe,custom fields',
 		'category' => 'recipes',
 		'type'     => '$recipe$',
-		'content'  => '<p>'.TD_('A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.').'</p>'.
-'<p>'.TD_('Optional: spice this thing up, with a dose of your favorite chili paste/sauce.').'</p>'.
-'[teaserbreak]'.
-'<ol>'.
-	'<li>'.TD_('Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.').'</li>'.
-	'<li>'.TD_('Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.').'</li>'.
-	'<li>'.TD_('Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.').'</li>'.
-	'<li>'.TD_('Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.').'</li>'.
-	'<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>'.
-	'<li>'.TD_('Serve with rice, top with green onions').'</li>'.
-'</ol>',
+		'content'  => '<p>'.TD_('A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel.').'</p>
+<p>'.TD_('Optional: spice this thing up, with a dose of your favorite chili paste/sauce.').'</p>
+[teaserbreak]
+<ol>
+	<li>'.TD_('Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done.').'</li>
+	<li>'.TD_('Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don’t get the oil too hot.').'</li>
+	<li>'.TD_('Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches.').'</li>
+	<li>'.TD_('Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens.').'</li>
+	<li>'.TD_('Remove from the heat, add beef back in. Toss').'</li>
+	<li>'.TD_('Serve with rice, top with green onions').'</li>
+</ol>',
 		'custom_fields' => array(
 			array( 'course', TD_('Main Course') ),
 			array( 'cuisine', TD_('Mongolian') ),
@@ -2430,17 +2430,17 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 	$demo_items['stuffed_peppers'] = array(
 		'title'    => TD_('Stuffed Peppers'),
 		'featured' => true,
-		'tags'     => 'photo,demo',
+		'tags'     => 'photo,demo,recipe,custom fields',
 		'category' => 'recipes',
 		'type'     => '$recipe$',
-		'content'  => '<p>'.TD_('We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).').'</p>'.
-'[teaserbreak]'.
-'<ol>'.
-	'<li>'.TD_('combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper').'</li>'.
-	'<li>'.TD_('if you are feeling spry, beat the mixture to make it fluffy').'</li>'.
-	'<li>'.TD_('put filling in a plastic bag, snip of the tip with scissors to make a piping bag').'</li>'.
-	'<li>'.TD_('fill peppers, place in bowl, top with chives and hot sauce').'</li>'.
-'</ol>',
+		'content'  => '<p>'.TD_('We found these during Happy Hour at Chiso’s Grill in Bee Cave, Tx. We’ve since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you’re into that).').'</p>
+[teaserbreak]
+<ol>
+	<li>'.TD_('combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper').'</li>
+	<li>'.TD_('if you are feeling spry, beat the mixture to make it fluffy').'</li>
+	<li>'.TD_('put filling in a plastic bag, snip of the tip with scissors to make a piping bag').'</li>
+	<li>'.TD_('fill peppers, place in bowl, top with chives and hot sauce').'</li>
+</ol>',
 		'custom_fields' => array(
 			array( 'course', TD_('Main Course') ),
 			array( 'cuisine', TD_('South African') ),
@@ -2463,24 +2463,17 @@ hearty crack of pepper') ),
 
 	$demo_items['custom_fields_example'] = array(
 		'title'    => T_('Custom Fields Example'),
-		'tags'     => 'demo',
+		'tags'     => 'demo,custom fields',
 		'category' => 'background',
 		'type'     => 'Post with Custom Fields',
-		'content'  => '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
-
-'<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>'.
-
-'<p>[fields]</p>'.
-
-'[teaserbreak]'.
-
-'<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
-
-'<p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>'.
-
-'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>'.
-
-'<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
+		'content'  => '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>
+<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
+<p>[fields]</p>
+[teaserbreak]
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+<p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>
+<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>
+<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 		'custom_fields' => array(
 			array( 'first_numeric_field', '123' ),
 			array( 'second_numeric_field', '456' ),
@@ -2500,24 +2493,17 @@ It can have multiple lines.' ),
 
 	$demo_items['another_custom_fields_example'] = array(
 		'title'    => T_('Another Custom Fields Example'),
-		'tags'     => 'demo',
+		'tags'     => 'demo,custom fields',
 		'category' => 'background',
 		'type'     => 'Post with Custom Fields',
-		'content'  => '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>'.
-
-'<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>'.
-
-'<p>[fields]</p>'.
-
-'[teaserbreak]'.
-
-'<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
-
-'<p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>'.
-
-'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>'.
-
-'<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
+		'content'  => '<p>'.T_('This post has a special post type called "Post with Custom Fields".').'</p>
+<p>'.T_('This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:').'</p>
+<p>[fields]</p>
+[teaserbreak]
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+<p>[fields:first_numeric_field,first_string_field,second_numeric_field]</p>
+<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[field:first_string_field]' ).'</p>
+<p>'.sprintf( T_('It is also possible to create links using a custom field URL: %s'), '[link:url_field:.btn.btn-info]Click me![/link]' ).'</p>',
 		'custom_fields' => array(
 			array( 'first_numeric_field', '123.45' ),
 			array( 'second_numeric_field', '456' ),
@@ -2538,39 +2524,25 @@ This is an extra line.' ),
 
 	$demo_items['child_post_example'] = array(
 		'title'     => T_('Child Post Example'),
-		'tags'      => 'demo',
+		'tags'      => 'demo,custom fields',
 		'category'  => 'background',
 		'type'      => 'Child Post',
 		'parent_ID' => '#get_item#another_custom_fields_example#ID#',
-		'content'   => '<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>'.
-
-'<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>'.
-
-'<p>[parent:fields]</p>'.
-
-'[teaserbreak]'.
-
-'<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>'.
-
-'<p>[parent:fields:first_numeric_field,first_string_field,second_numeric_field]</p>'.
-
-'<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field:first_string_field]' ).'</p>'.
-
-'<p>'.sprintf( T_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:#get_item#another_custom_fields_example#ID#:field:first_string_field]' ).'</p>'.
-
-'<p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>'.
-
-'<h3>'.T_('Replicated fields').'</h3>'.
-
-'<p>'.T_('By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively).').'</p>'.
-
-'<p>'.T_('This child post has the following fields which automatically replicate from its parent:').'</p>'.
-
-'<p>[fields]</p>'.
-
-'<p>'.sprintf( T_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' ).'</p>'.
-
-'<p>[compare:$this$,$parent$]</p>',
+		'content'   => '<p>'.sprintf( T_('This post has a special post type called "Child Post". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s.'), '[parent:titlelink] ([parent:url])' ).'</p>
+<p>'.T_('This also allows us to access the custom fields of the parent post:').'</p>
+<p>[parent:fields]</p>
+[teaserbreak]
+<p>'.T_('It is also possible to selectively display only a couple of these fields:').'</p>
+<p>[parent:fields:first_numeric_field,first_string_field,second_numeric_field]</p>
+<p>'.sprintf( T_('Finally, we can also display just the value of a specific field, like this: %s.'), '[parent:field:first_string_field]' ).'</p>
+<p>'.sprintf( T_('We can also reference fields of any other post like this: %s or like this: %s.'), '[item:another-custom-fields-example:field:first_string_field]', '[item:#get_item#another_custom_fields_example#ID#:field:first_string_field]' ).'</p>
+<p>'.sprintf( T_('It is also possible to create links using a custom field URL from the parent post: %s'), '[parent:link:url_field:.btn.btn-info]Click me![/link]' ).'</p>
+<h3>'.T_('Replicated fields').'</h3>
+<p>'.T_('By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively).').'</p>
+<p>'.T_('This child post has the following fields which automatically replicate from its parent:').'</p>
+<p>[fields]</p>
+<p>'.sprintf( T_('Another way to show this, is to use b2evolution\'s %s short tag:'), '`[compare:...]`' ).'</p>
+<p>[compare:$this$,$parent$]</p>',
 		'custom_fields' => array(
 			array( 'first_numeric_field', '123' ),
 			array( 'first_string_field', 'abc' ),
@@ -2632,14 +2604,14 @@ This is an extra line.' ),
 
 	$demo_items['markdown_examples'] = array(
 		'title'    => T_('Markdown examples'),
-		'tags'     => 'demo',
+		'tags'     => 'demo,rendering',
 		'category' => 'background',
 		'content'  => get_filler_text( 'markdown_examples_content' ),
 	);
 
 	$demo_items['wiki_tables'] = array(
 		'title'      => T_('Wiki Tables'),
-		'tags'       => 'demo',
+		'tags'       => 'demo,rendering',
 		'category'   => 'background',
 		'content'    => /* DO NOT TRANSLATE - TOO COMPLEX */ '<p>This is the topic with samples of the wiki tables.</p>
 
