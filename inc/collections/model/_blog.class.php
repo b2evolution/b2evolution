@@ -415,6 +415,7 @@ class Blog extends DataObject
 				$this->set_setting( 'front_disp', 'front' );
 				$this->set_setting( 'category_ordering', 'manual' );
 				$this->set_setting( 'main_content', 'excerpt' );
+				$this->set_setting( 'chapter_content', 'excerpt' );
 
 				// Try to find post type "Manual Page" in DB
 				global $DB;
