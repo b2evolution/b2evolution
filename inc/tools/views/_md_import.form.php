@@ -46,7 +46,7 @@ $Form->begin_fieldset( T_('Report of the import').get_manual_link( 'markdown-imp
 
 	if( $md_import_data['errors'] === false )
 	{	// Import the data and display a report on the screen:
-		md_import( $md_import_data['folder_path'], $md_import_data['source_type'] );
+		md_import( $md_import_data['folder_path'], $md_import_data['source_type'], basename( $md_file ) );
 	}
 	else
 	{	// Display errors if import cannot be done:

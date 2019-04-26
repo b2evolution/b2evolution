@@ -73,8 +73,9 @@ function md_get_import_data( $source_path )
  *
  * @param string Source folder path
  * @param string Source type: 'dir', 'zip'
+ * @param string Name of source folder or ZIP archive
  */
-function md_import( $folder_path, $source_type )
+function md_import( $folder_path, $source_type, $source_folder_zip_name )
 {
 	global $DB, $tableprefix, $media_path, $current_User, $localtimenow;
 
@@ -255,7 +256,7 @@ function md_import( $folder_path, $source_type )
 		$file_path = str_replace( '\\', '/', $file_path );
 
 		if( ! is_dir( $file_path ) ||
-		    preg_match( '#/(.*\.)?assets$#i', $file_path ) )
+		    preg_match( '#/((.*\.)?assets|__MACOSX)(/|$)#i', $file_path ) )
 		{	// Skip a not folder or reserved folder:
 			continue;
 		}
@@ -289,6 +290,7 @@ function md_import( $folder_path, $source_type )
 			echo '<span class="text-warning">'.T_('Failed').'</span>';
 		}
 		echo '.</p>';
+		evo_flush();
 
 		// Unset folder in order to don't check it twice on creating posts below:
 		unset( $files[ $f ] );
@@ -306,8 +308,11 @@ function md_import( $folder_path, $source_type )
 	{
 		$file_path = str_replace( '\\', '/', $file_path );
 
-		if( ! preg_match( '#([^/]+)\.md$#i', $file_path, $file_match ) )
-		{	// Skip not markdown file:
+		if( ! preg_match( '#([^/]+)\.md$#i', $file_path, $file_match ) ||
+		    preg_match( '#/(\.[^/]*$|((.*\.)?assets|__MACOSX)/)#i', $file_path ) )
+		{	// Skip a not markdown file,
+			// and if file name is started with . (dot),
+			// and files from *.assets and __MACOSX folders:
 			continue;
 		}
 
@@ -326,7 +331,7 @@ function md_import( $folder_path, $source_type )
 			$item_title = $item_slug;
 		}
 
-		echo '<p>'.sprintf( T_('Importing post: %s'), '"<b>'.$item_title.'</b>" <code>'.$item_slug.'</code>' );
+		echo '<p>'.sprintf( T_('Importing post: %s'), '"<b>'.$item_title.'</b>" <code>'.$source_folder_zip_name.substr( $file_path, strlen( $folder_path ) ).'</code>' );
 		evo_flush();
 
 		$relative_path = substr( $file_path, $folder_path_length + 1 );
