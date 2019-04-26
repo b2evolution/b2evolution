@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -193,7 +193,7 @@ switch( $action )
 		debug_die( 'unhandled action 1' );
 }
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
 $AdminUI->breadcrumbpath_add( T_('Comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
 switch( $tab3 )
 {
@@ -275,6 +275,7 @@ switch( $action )
 			param( 'newcomment_author_email', 'string' );
 			param( 'newcomment_author_url', 'string' );
 			param( 'comment_allow_msgform', 'integer', 0 /* checkbox */ );
+			param( 'comment_anon_notify', 'integer', 0 );
 
 			param_check_not_empty( 'newcomment_author', T_('Please enter an author name.'), '' );
 			$edited_Comment->set( 'author', $newcomment_author );
@@ -283,6 +284,7 @@ switch( $action )
 			param_check_url( 'newcomment_author_url', 'posting', '' ); // Give posting permissions here
 			$edited_Comment->set( 'author_url', $newcomment_author_url );
 			$edited_Comment->set( 'allow_msgform', $comment_allow_msgform );
+			$edited_Comment->set( 'anon_notify', $comment_anon_notify );
 		}
 
 		// Move to different post
@@ -446,6 +448,10 @@ switch( $action )
 			}
 			else
 			{	// Redirect to previous page(e.g. comments list) after updating:
+
+				// We want to highlight the edited object on next list display:
+				$Session->set( 'fadeout_array', array( 'comment_ID' => array( $edited_Comment->ID ) ) );
+
 				header_redirect( $redirect_to );
 				/* exited */
 			}
@@ -574,11 +580,11 @@ switch( $action )
 					INNER JOIN T_categories ON cat_ID = post_main_cat_ID
 					WHERE comment_status = "trash" AND cat_blog_ID = '.$DB->quote( $blog_ID );
 			$comment_ids = $DB->get_col( $query, 0, 'get trash comment ids' );
-			$result = Comment::db_delete_where( 'Comment', NULL, $comment_ids );
+			$result = Comment::db_delete_where( NULL, $comment_ids );
 		}
 		else
 		{ // delete by where clause
-			$result = Comment::db_delete_where( 'Comment', 'comment_status = "trash"' );
+			$result = Comment::db_delete_where( 'comment_status = "trash"' );
 		}
 
 		if( $result !== false )
@@ -766,6 +772,11 @@ if( $tab3 == 'fullview' || $tab3 == 'meta' )
 	require_js( '#jqueryUI#' );
 }
 
+if( $tab3 == 'fullview' || $tab3 == 'listview' )
+{	// Init JS to autcomplete the user logins:
+	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+}
+
 if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit', 'elevate', 'switch_view' ) ) )
 { // Initialize date picker for _comment.form.php
 	init_datepicker_js();
@@ -773,13 +784,8 @@ if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit',
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
-	// Require Fine Uploader js and css:
-	init_fineuploader_js_lang_strings();
-	require_js( 'multiupload/fine-uploader.js' );
-	require_css( 'fine-uploader.css' );
-	// Load JS files to make the links table sortable:
-	require_js( '#jquery#' );
-	require_js( 'jquery/jquery.sortable.min.js' );
+	// Init JS to quick upload several files:
+	init_fileuploader_js();
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
@@ -807,7 +813,21 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'comment-mass-deletion' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'comments-tab' );
+		switch( $tab3 )
+		{
+			case 'fullview':
+				$AdminUI->set_page_manual_link( 'comments-full-text-view' );
+				break;
+			case 'listview':
+				$AdminUI->set_page_manual_link( 'comments-list-view' );
+				break;
+			case 'meta':
+				$AdminUI->set_page_manual_link( 'comments-meta-discussion' );
+				break;
+			default:
+				$AdminUI->set_page_manual_link( 'comments-tab' );
+		}
+
 		break;
 }
 

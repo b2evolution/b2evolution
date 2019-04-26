@@ -21,9 +21,6 @@ if( evo_version_compare( $app_version, '2.4.1' ) < 0 )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
-// The following is temporary and should be moved to some SiteSkin class
-siteskin_init();
-
 // ----------------------------- HEADER BEGINS HERE ------------------------------
 ?>
 <html>
@@ -49,6 +46,7 @@ $Blog->disp_setting( 'body_includes', 'raw' );
 
 $Plugins->trigger_event( 'SkinBeginHtmlBody' );
 
+modules_call_method( 'SkinBeginHtmlBody' );
 
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
 // If site headers are enabled, they will be included here:
@@ -242,14 +240,23 @@ siteskin_include( '_site_body_header.inc.php' );
 			</blockquote>
 
 			<?php
+			if( is_single_page() )
+			{	// Display comments only on single Item's page:
 				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 				skin_include( '_item_feedback.inc.php', array(
+						'disp_comments'        => true,
+						'disp_comment_form'    => true,
+						'disp_trackbacks'      => true,
+						'disp_trackback_url'   => true,
+						'disp_pingbacks'       => true,
+						'disp_webmentions'     => true,
 						'before_section_title' => '<h4>',
 						'after_section_title'  => '</h4>',
 					) );
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.
 				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+			}
 			?>
 
 			<?php

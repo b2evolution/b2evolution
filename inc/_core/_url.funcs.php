@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -289,11 +289,18 @@ function _http_wrapper_last_status( & $headers )
  *                       is available)
  * @param integer Timeout (default: 15 seconds)
  * @param integer Maximum size in kB
+ * @param array Additional parameters
  * @return string|false The remote page as a string; false in case of error
  */
-function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL )
+function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL, $params = array() )
 {
 	global $outgoing_proxy_hostname, $outgoing_proxy_port, $outgoing_proxy_username, $outgoing_proxy_password;
+
+	$params = array_merge( array(
+			'method'       => 'GET',
+			'content_type' => '',
+			'fields'       => '', // Array or string of POST/GET fields
+		), $params );
 
 	$info = array(
 		'error' => '',
@@ -314,6 +321,14 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, $timeout );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, $timeout );
+		if( $params['method'] == 'POST' )
+		{	// Use POST method:
+			curl_setopt( $ch, CURLOPT_POST, true );
+		}
+		if( ! empty( $params['fields'] ) )
+		{	// Add fields for the request:
+			curl_setopt( $ch, CURLOPT_POSTFIELDS, $params['fields'] );
+		}
 
 		// Set proxy:
 		if( !empty($outgoing_proxy_hostname) )
@@ -350,23 +365,52 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 			return false;
 		}
 
+		if( isset( $url_parsed['scheme'] ) && $url_parsed['scheme'] == 'https' )
+		{	// Special params for https urls:
+			$host_prefix = 'ssl://';
+			$default_port = 443;
+		}
+		else
+		{	// Default params for normal urls:
+			$host_prefix = '';
+			$default_port = 80;
+		}
+
 		$host = $url_parsed['host'];
-		$port = empty( $url_parsed['port'] ) ? 80 : $url_parsed['port'];
+		$port = empty( $url_parsed['port'] ) ? $default_port : $url_parsed['port'];
 		$path = empty( $url_parsed['path'] ) ? '/' : $url_parsed['path'];
 		if( ! empty( $url_parsed['query'] ) )
 		{
 			$path .= '?'.$url_parsed['query'];
 		}
 
-		$out = 'GET '.$path.' HTTP/1.1'."\r\n";
+		if( ! empty( $params['fields'] ) )
+		{	// Convert fields array to string:
+			$url_fields_string = ( is_array( $params['fields'] ) ? http_build_query( $params['fields'] ) : $params['fields'] );
+		}
+
+		$out = $params['method'].' '.$path.' HTTP/1.1'."\r\n";
 		$out .= 'Host: '.$host;
 		if( ! empty( $url_parsed['port'] ) )
 		{	// we don't want to add :80 if not specified. remote end may not resolve it. (e-g b2evo multiblog does not)
 			$out .= ':'.$port;
 		}
-		$out .= "\r\n".'Connection: Close'."\r\n\r\n";
+		$out .= "\r\n";
+		if( ! empty( $params['content_type'] ) )
+		{
+			$out .= 'Content-type: '.$params['content_type']."\r\n";
+		}
+		if( ! empty( $url_fields_string ) )
+		{
+			$out .= 'Content-length: '.strlen( $url_fields_string )."\r\n";
+		}
+		$out .= 'Connection: close'."\r\n\r\n";
+		if( ! empty( $url_fields_string ) )
+		{	// Append fields to the request:
+			$out .= $url_fields_string;
+		}
 
-		$fp = @fsockopen( $host, $port, $errno, $errstr, $timeout );
+		$fp = @fsockopen( $host_prefix.$host, $port, $errno, $errstr, $timeout );
 		if( ! $fp )
 		{
 			$info['error'] = $errstr.' (#'.$errno.')';
@@ -424,7 +468,30 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 	{	// URL FOPEN:
 		$info['used_method'] = 'fopen';
 
-		$fp = @fopen( $url, 'r' );
+		$url_http_params = array();
+		if( ! empty( $params['content_type'] ) )
+		{	// Header of the request:
+			$url_http_params['header'] = 'Content-type: '.$params['content_type']."\r\n";
+		}
+		if( $params['method'] != 'GET' )
+		{	// Method of the request:
+			$url_http_params['method'] = $params['method'];
+		}
+		if( ! empty( $params['fields'] ) )
+		{	// Additional fields of the request:
+			$url_http_params['content'] = http_build_query( $params['fields'] );
+		}
+
+		if( empty( $url_http_params ) )
+		{	// Open simple URL:
+			$fp = @fopen( $url, 'r' );
+		}
+		else
+		{	// Open URL with additional params:
+			$url_context = stream_context_create( array( 'http' => $url_http_params ) );
+			$fp = @fopen( $url, 'r', false, $url_context );
+		}
+
 		if( ! $fp )
 		{
 			if( isset( $http_response_header )
@@ -478,6 +545,13 @@ function fetch_remote_page( $url, & $info, $timeout = NULL, $max_size_kb = NULL 
 				$info['mimetype'] = trim(substr($header, 13));
 				break; // only looking for mimetype
 			}
+		}
+
+		if( $info['mimetype'] == 'application/json' &&
+		    strpos( $r, '{' ) !== false &&
+		    preg_match( '/^[^\{]*(\{.+\})[^\}]*$/', $r, $match ) )
+		{	// Fix response in JSON format, so it must be started with "{" and ended with "}":
+			$r = $match[1];
 		}
 
 		return $r;
@@ -615,7 +689,7 @@ function url_crumb( $crumb_name )
  * @param string crumb_name
  * @return string
  */
-function get_crumb($crumb_name)
+function get_crumb( $crumb_name )
 {
 	global $Session;
 	return isset( $Session ) ? $Session->create_crumb( $crumb_name ) : '';
@@ -757,8 +831,9 @@ function url_absolute( $url, $base = NULL )
  */
 function make_rel_links_abs( $s, $host = NULL )
 {
-	$s = preg_replace_callback( '~(<[^>]+?)\b((?:src|href)\s*=\s*)(["\'])?([^\\3]+?)(\\3)~i', create_function( '$m', '
-		return $m[1].$m[2].$m[3].url_absolute($m[4], "'.$host.'").$m[5];' ), $s );
+	load_class( '_core/model/_urlhelper.class.php', 'UrlHelper' );
+	$url_helper = new UrlHelper( $host );
+	$s = preg_replace_callback( '~(<[^>]+?)\b((?:src|href)\s*=\s*)(["\'])?([^\\3]+?)(\\3)~i', array( $url_helper, 'callback' ), $s );
 	return $s;
 }
 
@@ -810,12 +885,16 @@ function is_absolute_url( $url )
  * This converts all urlencoded chars (e.g. "%AA") to lowercase.
  * It appears that some webservers use lowercase for the chars (Apache),
  * while others use uppercase (lighttpd).
+ *
+ * @param string First URL
+ * @param string Second URL
+ * @param boolean TRUE to make the compared URLs same even if have a different protocols http or https
  * @return boolean
  */
 function is_same_url( $a, $b, $ignore_http_protocol = FALSE )
 {
-	$a = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $a);
-	$b = preg_replace_callback('~%[0-9A-F]{2}~', create_function('$m', 'return strtolower($m[0]);'), $b);
+	$a = preg_replace_callback('~%[0-9A-F]{2}~', '_is_same_url_callback', $a);
+	$b = preg_replace_callback('~%[0-9A-F]{2}~', '_is_same_url_callback', $b);
 
 	if( $ignore_http_protocol )
 	{
@@ -831,6 +910,15 @@ function is_same_url( $a, $b, $ignore_http_protocol = FALSE )
 
 
 /**
+ * Callback for preg_replace_callback in is_same_url()
+ */
+function _is_same_url_callback( $matches )
+{
+	return strtolower( $matches[0] );
+}
+
+
+/**
  * IDNA-Encode URL to Punycode.
  * @param string URL
  * @return string Encoded URL (ASCII)
@@ -841,16 +929,8 @@ function idna_encode( $url )
 
 	$url_utf8 = convert_charset( $url, 'utf-8', $evo_charset );
 
-	if( version_compare(PHP_VERSION, '5', '>=') )
-	{
-		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
-		$IDNA = new idna_convert();
-	}
-	else
-	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
-		$IDNA = new Net_IDNA_php4();
-	}
+	load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
+	$IDNA = new idna_convert();
 
 	//echo '['.$url_utf8.'] ';
 	$url = $IDNA->encode( $url_utf8 );
@@ -872,16 +952,8 @@ function idna_encode( $url )
  */
 function idna_decode( $url )
 {
-	if( version_compare(PHP_VERSION, '5', '>=') )
-	{
-		load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
-		$IDNA = new idna_convert();
-	}
-	else
-	{
-		load_class('_ext/idna/_idna_convert.class.php4', 'Net_IDNA_php4' );
-		$IDNA = new Net_IDNA_php4();
-	}
+	load_class('_ext/idna/_idna_convert.class.php', 'idna_convert' );
+	$IDNA = new idna_convert();
 	return $IDNA->decode($url);
 }
 
@@ -1008,5 +1080,41 @@ function url_check_same_domain( $main_url, $check_url )
 	$same_domain = ( ( $check_url_host == null ) || ( $check_url_host == $main_url_host ) );
 	// Check subdomain
 	return $same_domain || ( substr( $check_url_host, - ( strlen( $main_url_host ) + 1 ) ) == '.'.$main_url_host );
+}
+
+
+/**
+ * Get current URL
+ *
+ * @param string Exclude params separated by comma
+ * @return string
+ */
+function get_current_url( $exclude_params = NULL )
+{
+	$current_url = ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' ? 'https://' : 'http://' )
+		.$_SERVER['HTTP_HOST']
+		.$_SERVER['REQUEST_URI'];
+
+	if( $exclude_params !== NULL )
+	{	// Exclude params from current url:
+		$current_url = clear_url( $current_url, $exclude_params );
+	}
+
+	return $current_url;
+}
+
+
+/**
+ * Remove parameters from URL
+ *
+ * @param string Original URL
+ * @param string Parameters which should be removed from URL (separated by comma)
+ * @return string Cleared URL
+ */
+function clear_url( $url, $exclude_params )
+{
+	$exclude_params = str_replace( ',', '|', preg_quote( $exclude_params ) );
+	$url = preg_replace( '/((\?)|&(amp;)?)('.$exclude_params.')=[^&]+/i', '$2', $url );
+	return rtrim( preg_replace( '/\?(&(amp;)?)+/', '?', $url ), '?' );
 }
 ?>

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -41,10 +41,9 @@ if( ! is_logged_in() )
 	bad_request_die( T_( 'You are not logged in.' ) );
 }
 
-if( $demo_mode && ( $current_User->ID <= 3 ) )
-{
-	bad_request_die( 'Demo mode: you can\'t edit the admin and demo users profile!<br />[<a href="javascript:history.go(-1)">'
-		. T_('Back to profile') . '</a>]' );
+if( $demo_mode && ( $current_User->ID <= 7 ) )
+{	// Demo mode restrictions: users created by install process cannot be edited:
+	header_redirect( get_user_settings_url( $disp, NULL, $blog, '&' ) );
 }
 
 // Check that this action request is not a CSRF hacked request:
@@ -293,13 +292,24 @@ elseif( ! param_errors_detected() )
 	switch( $action )
 	{
 		case 'update':
-			if( $current_User->has_avatar() )
-			{ // Redirect to display user page
-				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&' ) );
+			if( $user_tab == 'register_finish' )
+			{	// After submitting quick data we should redirect user to page like after registration:
+				$redirect_to = get_redirect_after_registration();
 			}
-			else
-			{ // Redirect to upload avatar
+			elseif( isset( $current_User->previous_pass_driver ) &&
+			    $current_User->previous_pass_driver == 'nopass' &&
+			    $current_User->previous_pass_driver != $current_User->get( 'pass_driver' ) )
+			{	// Redirect to page as we use after email validation if current user set password first time, e-g after email capture/quick registration:
+				$redirect_to = redirect_after_account_activation();
+			}
+			elseif( ! $current_User->has_avatar() )
+			{	// Redirect to upload avatar if it is not uploaded yet:
 				$redirect_to = get_user_avatar_url();
+			}
+
+			if( empty( $redirect_to ) )
+			{	// Redirect to display user page for cases when redirect param cannot be defined above by some reason:
+				$redirect_to = $Blog->get( 'userurl', array( 'glue' => '&' ) );
 			}
 			break;
 		case 'upload_avatar':

@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  * @ignore
@@ -22,7 +22,7 @@ class wikitables_plugin extends Plugin
 	var $code = 'b2evWiTa';
 	var $name = 'Wiki Tables';
 	var $priority = 15;
-	var $version = '6.9.3';
+	var $version = '7.0.1';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -59,13 +59,8 @@ See manual for more.');
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_params = array(
-				'default_post_rendering' => 'opt-in'
+				'default_post_rendering' => 'opt-out'
 			);
-
-		if( isset( $params['blog_type'] ) && $params['blog_type'] == 'manual' )
-		{ // Set the default settings depends on blog type
-			$default_params['default_post_rendering'] = 'opt-out';
-		}
 
 		$tmp_params = array_merge( $params, $default_params );
 		return parent::get_coll_setting_definitions( $tmp_params );

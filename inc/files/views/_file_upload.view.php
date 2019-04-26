@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -27,7 +27,7 @@ global $fm_FileRoot;
 /* TODO: dh> move JS to external file. */
 ?>
 
-<script type="text/javascript">
+<script>
 	<!--
 	/**
 	 * Mighty cool function to append an input or textarea element onto another element.
@@ -140,7 +140,7 @@ global $fm_FileRoot;
 
 	$Widget = new Widget( 'file_browser' );
 	$Widget->global_icon( T_('Quit upload mode!'), 'close', regenerate_url( 'ctrl,fm_mode', 'ctrl=files' ) );
-	$Widget->title = T_('File upload').get_manual_link('upload_multiple');
+	$Widget->title = T_('File upload').get_manual_link('upload-multiple');
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
@@ -301,7 +301,7 @@ global $fm_FileRoot;
 				?>
 			</ul>
 
-			<script type="text/javascript">
+			<script>
 				(function()
 				{
 					var handler = function()

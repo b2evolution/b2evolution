@@ -23,9 +23,6 @@ if( evo_version_compare( $app_version, '2.4.1' ) < 0 )
 // Do inits depending on current $disp:
 skin_init( $disp );
 
-// The following is temporary and should be moved to some SiteSkin class
-siteskin_init();
-
 // ----------------------------- HEADER BEGINS HERE ------------------------------
 ?>
 <html>
@@ -51,6 +48,7 @@ $Blog->disp_setting( 'body_includes', 'raw' );
 
 $Plugins->trigger_event( 'SkinBeginHtmlBody' );
 
+modules_call_method( 'SkinBeginHtmlBody' );
 
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
 // If site headers are enabled, they will be included here:

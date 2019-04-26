@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2007 by Yabba/Scott - {@link http://astonishme.co.uk/contact/}.
  *
  * @package plugins
@@ -66,7 +66,7 @@ class code_highlight_plugin extends Plugin
 	var $name = 'Code highlight';
 	var $code = 'evo_code';
 	var $priority = 27;
-	var $version = '6.9.3';
+	var $version = '7.0.1';
 	var $author = 'Astonish Me';
 	var $group = 'rendering';
 	var $help_topic = 'code-highlight-plugin';
@@ -328,7 +328,7 @@ class code_highlight_plugin extends Plugin
 		// Load js to work with textarea
 		require_js( 'functions.js', 'blog', true, true );
 
-		?><script type="text/javascript">
+		?><script>
 			//<![CDATA[
 			function <?php echo $params['js_prefix']; ?>code_tag( tag_name )
 			{

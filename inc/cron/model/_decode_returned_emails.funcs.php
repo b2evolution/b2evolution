@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -20,10 +20,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @param string Message text
  * @param boolean TRUE if it is called from cron
+ * @param string Message type: 'success', 'warning', 'error', 'note', NULL - to use default text without addition style color
  */
-function dre_msg( $message, $cron = false )
+function dre_msg( $message, $cron = false, $type = NULL )
 {
-	global $is_web, $result_message, $dre_messages;
+	global $is_web, $dre_messages;
 
 	if( ! is_array( $dre_messages ) )
 	{	// Initialize global array first time:
@@ -35,14 +36,13 @@ function dre_msg( $message, $cron = false )
 	$dre_messages[] = $message;
 
 	if( $cron )
-	{	// We are in cron mode
-		if( $is_web )
-		{	// Separate a message with newline when we call a cron from browser:
-			$message .= '<br />';
-		}
+	{	// Append a message to cron log if we are in cron mode:
+		cron_log_append( $message, $type );
+	}
 
-		// Log the message in global variable $result_message:
-		$result_message .= $message."\n";
+	if( $type == 'error' )
+	{	// Store an error message in system log:
+		syslog_insert( 'Get returned emails: '.$message, 'error' );
 	}
 }
 
@@ -122,7 +122,7 @@ function dre_connect( $cron = false, $print_out_folders = false )
 			$error = implode( "<br />\n", $error );
 		}
 
-		dre_msg( sprintf( ('Connection failed: %s'), $error ), $cron );
+		dre_msg( sprintf( ('Connection failed: %s'), $error ), $cron, 'error' );
 		return false;
 	}
 	dre_msg( '<b class="green">'.('Successfully connected!').'</b>', $cron );
@@ -132,7 +132,7 @@ function dre_connect( $cron = false, $print_out_folders = false )
 	if( $print_out_folders )
 	{	// Print out all possible folders of host:
 		$server_folders = imap_list( $mbox, $mailserver, '*' );
-		dre_msg( '<b>'.T_('Mail server has the following folders:').'</b>', $cron );
+		dre_msg( '<b>'.('Mail server has the following folders:').'</b>', $cron );
 		$folders_html = '<ol>';
 		foreach( $server_folders as $server_folder )
 		{
@@ -159,8 +159,11 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 	global $Settings, $debug;
 	global $dre_messages, $dre_emails, $email_cntr, $del_cntr, $is_cron_mode;
 
-	// This may take a very long time if there are many messages; No execution time limit:
-	set_max_execution_time(0);
+	if( empty( $is_cron_mode ) )
+	{	// This may take a very long time if there are many messages; No execution time limit:
+		// (don't apply this for cron job because it uses a setting "Max execution time")
+		set_max_execution_time( 0 );
+	}
 
 	if( $Settings->get( 'repath_ignore_read' ) )
 	{	// Read status info of all messages in order to know which have already been read:
@@ -179,6 +182,10 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			if( isset( $msg_statuses[ $index - 1 ] ) && $msg_statuses[ $index - 1 ]->seen == 1 )
 			{	// Skip this message because it has already been read:
 				dre_msg( ('Ignoring this message because it has aleady been read.'), $cron );
+				if( $cron )
+				{	// Mark the end of action for cron log:
+					cron_log_action_end( '' );
+				}
 				continue;
 			}
 			else
@@ -196,6 +203,10 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		if( ! ($tmpMIME = tempnam( sys_get_temp_dir(), 'b2evoMail' )) )
 		{
 			dre_msg( ('Could not create temporary file.'), $cron );
+			if( $cron )
+			{	// Mark the end of action for cron log:
+				cron_log_action_end( '' );
+			}
 			continue;
 		}
 		// Save the whole body of a specific message from the mailbox:
@@ -210,7 +221,9 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		// Instanciate mime_parser.php library:
 		$mimeParser = new mime_parser_class();
 		$mimeParser->mbox = 0;						// Set to 0 for parsing a *single* RFC 2822 message
-		$mimeParser->decode_headers = 1;			// Set to 1 if it is	necessary to decode message headers that may have non-ASCII	characters and use other character set encodings
+		// NOTE: Use function mb_decode_mimeheader() instead of decoder from mime_parser_class,
+		// because the class cannot properly decode KOI8-R headers:
+		$mimeParser->decode_headers = ! function_exists( 'mb_decode_mimeheader' );			// Set to 1 if it is	necessary to decode message headers that may have non-ASCII	characters and use other character set encodings
 		$mimeParser->ignore_syntax_errors = 1;	// ignore syntax errors in	malformed messages.
 		$mimeParser->extract_addresses = 0;
 
@@ -224,9 +237,13 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		// STEP 1: Parse and decode message data and retrieve its structure:
 		if( !$mimeParser->Decode( $MIMEparameters, /* BY REF */ $decodedMIME ) )
 		{	// error:
-			dre_msg( sprintf( ('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position ), $cron );
+			dre_msg( sprintf( ('MIME message decoding error: %s at position %d.'), $mimeParser->error, $mimeParser->error_position ), $cron, 'error' );
 			rmdir_r( $tmpDirMIME );
 			unlink( $tmpMIME );
+			if( $cron )
+			{	// Mark the end of action for cron log:
+				cron_log_action_end( '' );
+			}
 			continue;
 		}
 		else
@@ -236,9 +253,13 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			// STEP 2: Analyze (the first) parsed message to describe its contents:
 			if( ! $mimeParser->Analyze( $decodedMIME[0], /* BY REF */ $parsedMIME ) )
 			{	// error:
-				dre_msg( sprintf( ('MIME message analyze error: %s'), $mimeParser->error ), $cron );
+				dre_msg( sprintf( ('MIME message analyze error: %s'), $mimeParser->error ), $cron, 'error' );
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
+				if( $cron )
+				{	// Mark the end of action for cron log:
+					cron_log_action_end( '' );
+				}
 				continue;
 			}
 
@@ -247,6 +268,10 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			{	// Couldn't process message headers:
 				rmdir_r( $tmpDirMIME );
 				unlink( $tmpMIME );
+				if( $cron )
+				{	// Mark the end of action for cron log:
+					cron_log_action_end( '' );
+				}
 				continue;
 			}
 
@@ -352,10 +377,14 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		{
 			// Make it easier for user to find and correct the errors
 			dre_msg( "\n".sprintf( ('Processing message: %s'), $post_title ), $cron );
-			dre_msg( $Messages->get_string( ('Cannot post, please correct these errors:'), 'error' ), $cron );
+			dre_msg( $Messages->get_string( ('Cannot process the returned email, please correct these errors:'), 'error' ), $cron, 'error' );
 
 			$Messages->clear();
 			rmdir_r( $tmpDirMIME );
+			if( $cron )
+			{	// Mark the end of action for cron log:
+				cron_log_action_end( '' );
+			}
 			continue;
 		}
 
@@ -367,11 +396,28 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 		$email_headers = dre_get_headers( $decodedMIME );
 
 		// Get data of the returned email:
-		$email_data = dre_get_email_data( $content, $message_text, $email_headers );
+		$email_data = dre_get_email_data( $subject.' '.$content, $message_text, $email_headers, $subject );
 
 		dre_msg( ('Email Address').': '.$email_data['address'], $cron );
 		dre_msg( ('Error Type').': '.dre_decode_error_type( $email_data['errtype'] ), $cron );
-		dre_msg( ('Error Message').': '.$email_data['errormsg'], $cron );
+		dre_msg( ('Error Message').': '.balance_tags( $email_data['errormsg'] ), $cron );
+
+		if( empty( $email_data['address'] ) )
+		{	// Don't process a returned message without email address:
+			$info_error_msg = 'Cannot find email address in the returned email message "'.$subject.'". ';
+			if( $Settings->get('repath_delete_emails') )
+			{
+				$info_error_msg .= 'This email message cannot be deleted automatically from inbox. ';
+			}
+			$info_error_msg .= 'Please analyse this manually.';
+			dre_msg( $info_error_msg, $cron, 'error' );
+			rmdir_r( $tmpDirMIME );
+			if( $cron )
+			{	// Mark the end of action for cron log:
+				cron_log_action_end( '' );
+			}
+			continue;
+		}
 
 		// Insert a returned email's data into DB
 		if( dre_insert_returned_email( $email_data ) )
@@ -388,6 +434,11 @@ function dre_process_messages( & $mbox, $limit, $cron = false )
 			dre_msg( sprintf( ('Marking message for deletion from inbox: %s'), $index ), $cron );
 			imap_delete( $mbox, $index );
 			++$del_cntr;
+		}
+
+		if( $cron )
+		{	// Mark the end of action for cron log:
+			cron_log_action_end( '' );
 		}
 	}
 
@@ -468,9 +519,13 @@ function dre_process_header( $header, & $subject, & $post_date, $cron = false )
 	global $Settings;
 
 	$subject = $header['Subject'];
+	if( function_exists( 'mb_decode_mimeheader' ) )
+	{	// Decode email subject:
+		$subject = mb_decode_mimeheader( $subject );
+	}
 	$ddate = $header['Date'];
 
-	dre_msg( T_('Subject').': '.$subject, $cron );
+	dre_msg( ('Subject').': '.$subject, $cron );
 
 	// Check subject to match in titles to identify return path emails
 	$subject_is_correct = false;
@@ -698,8 +753,13 @@ function dre_get_error_message( $message )
 		$error_text = $message;
 	}
 
-	// Return error text limited by DB field length
-	return utf8_substr( $error_text, 0, 255 );
+	// Set error text limited by DB field length:
+	$error_text = utf8_substr( $error_text, 0, 255 );
+
+	// Cut a not finished html tag at the end in order to don't break a content:
+	$error_text = preg_replace( '/<[^>]+$/', '', $error_text );
+
+	return $error_text;
 }
 
 
@@ -890,7 +950,7 @@ function dre_get_email_data( $content, $message_text, $headers )
 			'address'   => $emails,
 			'errormsg'  => $error_info['text'],
 			'timestamp' => date2mysql( $servertimenow ),
-			'message'   => htmlspecialchars( utf8_clean( $message_text ) ),
+			'message'   => utf8_substr( htmlspecialchars( utf8_clean( $message_text ) ), 0, 65535 ),
 			'headers'   => $headers,
 			'errtype'   => $error_info['type']
 		);

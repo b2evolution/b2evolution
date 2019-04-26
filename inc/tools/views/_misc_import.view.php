@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -16,6 +16,14 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 $block_item_Widget = new Widget( 'block_item' );
+
+$block_item_Widget->title = T_('Markdown Import');
+$block_item_Widget->disp_template_replaced( 'block_start' );
+echo '<ul>';
+printf( '<li>'.T_('Use the <a %s>Markdown Importer</a> to import contents from <code>*.md</code> file.').'</li>', ' href="?ctrl=mdimport"' );
+echo '</ul>';
+$block_item_Widget->disp_template_raw( 'block_end' );
+
 
 // fp> TODO: pluginize MT! :P
 $block_item_Widget->title = T_('Movable Type Import').get_manual_link( 'import-tab' );

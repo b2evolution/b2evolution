@@ -22,8 +22,6 @@ global $current_User;
  */
 global $Settings;
 
-global $dispatcher;
-
 global $collections_Module;
 
 $Form = new Form( NULL, 'settings_checkchanges' );
@@ -161,7 +159,7 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#allow_anonymous_user_list, #allow_anonymous_user_profiles' ).click( function()
 {
 	if( ! jQuery( '#allow_anonymous_user_list' ).is( ':checked' ) && ! jQuery( '#allow_anonymous_user_profiles' ).is( ':checked' ) )

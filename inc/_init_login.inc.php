@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -193,11 +193,11 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 		{ // Check user login attempts
 			$login_attempts = $UserSettings->get( 'login_attempts', $User->ID );
 			$login_attempts = empty( $login_attempts ) ? array() : explode( ';', $login_attempts );
-			if( $failed_logins_lockout > 0 && count( $login_attempts ) == 9 )
+			if( $failed_logins_lockout > 0 && count( $login_attempts ) >= $failed_logins_before_lockout - 1 )
 			{ // User already has a maximum value of the attempts
 				$first_attempt = explode( '|', $login_attempts[0] );
 				if( $localtimenow - $first_attempt[0] < $failed_logins_lockout )
-				{ // User has used 9 attempts during X minutes, Display error and Refuse login
+				{ // User has used N attempts during X minutes, Display error and Refuse login
 					$login_error = sprintf( T_('There have been too many failed login attempts. This account is temporarily locked. Try again in %s minutes.'), ceil( $failed_logins_lockout / 60 ) );
 				}
 			}
@@ -301,8 +301,7 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 
 			if( $Settings->get('system_lock') && $current_User->check_perm( 'users', 'edit' ) )
 			{ // System is locked for maintenance but current user has permission to log in, Display a message about this mode
-				$system_lock_url = ' href="'.$admin_url.'?ctrl=tools"';
-				$Messages->add( sprintf( T_('The site is currently locked for maintenance. Click <a %s>here</a> to access lock settings.'), $system_lock_url ), 'warning' );
+				$Messages->add( T_('The site is currently locked for maintenance.').' '.sprintf( T_('Click <a %s>here</a> to access lock settings.'), 'href="'.$admin_url.'?ctrl=tools"' ), 'warning' );
 			}
 		}
 
@@ -362,7 +361,7 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 
 		if( isset( $login_attempts ) && $current_login_pass != $Session->get( 'wrong_loginpass' ) )
 		{	// Save new login attempt into DB only if previous login data were different:
-			if( count( $login_attempts ) == 9 )
+			if( count( $login_attempts ) >= $failed_logins_before_lockout - 1 )
 			{	// Unset first attempt to clear a space for new attempt:
 				unset( $login_attempts[0] );
 			}
@@ -391,8 +390,7 @@ elseif( $Session->has_User() /* logged in */
 		{ // Current user is a "super admin"
 			if( ! $Messages->count() )
 			{ // If there are no other messages yet, display a warning about the system lock
-				$system_lock_url = ' href="'.$admin_url.'?ctrl=tools"';
-				$Messages->add( sprintf( T_('The site is currently locked for maintenance. Click <a %s>here</a> to access lock settings.'), $system_lock_url ), 'warning' );
+				$Messages->add( T_('The site is currently locked for maintenance.').' '.sprintf( T_('Click <a %s>here</a> to access lock settings.'), 'href="'.$admin_url.'?ctrl=tools"' ), 'warning' );
 			}
 		}
 		else
@@ -459,7 +457,14 @@ if( ! empty( $login_action_value ) && empty( $login_error ) && ( $action != 'log
 				preg_match( '#/register.php([&?].*)?$#', $redirect_to ) ||
 				preg_match( '#disp=(login|register|lostpassword)#', $redirect_to ) )
 			{ // avoid redirect back to login/register screen. This shouldn't occur.
-				$redirect_to = $baseurl;
+				$redirect_to = $Settings->get( 'redirect_to_after_login' );
+				if( empty( $redirect_to ) )
+				{
+					$blog = param( 'blog', 'integer' );
+					$BlogCache = & get_BlogCache();
+					$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+					$redirect_to = $Blog ? $Blog->get( 'url' ) : $baseurl;
+				}
 			}
 
 			if( $email_login )
@@ -511,15 +516,15 @@ if( ! empty( $login_error ) || ( $login_required && ! is_logged_in() ) )
 			$SkinCache = & get_SkinCache();
 			$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
 			$skin = $Skin->folder;
-			$disp = 'login';
+			$disp = param( 'disp', 'string', 'login' );
 			// fp> We ABSOLUTELY want to recover the previous redirect_to so that after a new login attempt that may be successful,
 			// we will finally reach our intended destination. This is paramount with emails telling people to come back to the site
 			// to read a message or sth like that. They must log in first and they may enter the wrong password multiple times.
 			param( 'redirect_to', 'url', $Blog->gen_blogurl() );
 			$ads_current_skin_path = $skins_path.$skin.'/';
-			if( file_exists( $ads_current_skin_path.'login.main.php' ) )
+			if( file_exists( $ads_current_skin_path.$disp.'.main.php' ) )
 			{	// Call custom file for login disp if it exists:
-				require $ads_current_skin_path.'login.main.php';
+				require $ads_current_skin_path.$disp.'.main.php';
 			}
 			else
 			{	// Call index main skin file to display a login disp:

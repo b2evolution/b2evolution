@@ -31,12 +31,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 /**
  * The Captcha Questions Plugin.
  *
- * It displays an captcha question through {@link CaptchaValidated()} and validates
- * it in {@link CaptchaValidated()}.
+ * It displays an captcha question through {@link ValidateCaptcha()} and validates
+ * it in {@link ValidateCaptcha()}.
  */
 class captcha_qstn_plugin extends Plugin
 {
-	var $version = '6.9.3';
+	var $version = '7.0.1';
 	var $group = 'antispam';
 	var $code = 'captcha_qstn';
 
@@ -66,6 +66,12 @@ class captcha_qstn_plugin extends Plugin
 		global $Settings;
 
 		return array(
+				'use_for_anonymous_item' => array(
+					'label' => $this->T_('Use for anonymous item forms'),
+					'defaultvalue' => 1,
+					'note' => $this->T_('Should this plugin be used for anonymous users on item forms?'),
+					'type' => 'checkbox',
+				),
 				'use_for_anonymous_comment' => array(
 					'label' => $this->T_('Use for anonymous comment forms'),
 					'defaultvalue' => 1,
@@ -170,12 +176,12 @@ class captcha_qstn_plugin extends Plugin
 				$answers = trim( $match[2] );
 				if( !empty( $question ) && !empty( $answers ) )
 				{ // Save this question in DB
-					$SQL = new SQL();
+					$SQL = new SQL( 'Get captcha question' );
 					$SQL->SELECT( 'cptq_ID' );
 					$SQL->FROM( $this->get_sql_table( 'questions' ) );
 					$SQL->WHERE( 'cptq_question = '.$DB->quote( $question ) );
 
-					if( $question_ID = $DB->get_var( $SQL->get() ) )
+					if( $question_ID = $DB->get_var( $SQL ) )
 					{ // This question already exists, we should only update the answers
 						$update_data[ $question_ID ] = $answers;
 					}
@@ -233,21 +239,20 @@ class captcha_qstn_plugin extends Plugin
 
 
 	/**
-	 * Validate the given answer against our stored one.
+	 * Event handler: general event to validate a captcha which payload was added
+	 * through {@link RequestCaptcha()}.
 	 *
-	 * This event is provided for other plugins and gets used internally
-	 * for other events we're hooking into.
+	 * NOTE: if the action is verified/completed in total, you HAVE to cleanup its data
+	 *       and is not vulnerable against multiple usage of the same captcha!
 	 *
-	 * @param array Associative array of parameters.
-	 * @return boolean|NULL
+	 * @param array Associative array of parameters
+	 * @return boolean true if the catcha could be validated
 	 */
-	function CaptchaValidated( & $params )
+	function ValidateCaptcha( & $params )
 	{
-		global $DB, $localtimenow, $Session;
-
-		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
+		if( ! empty( $params['is_preview'] ) || ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
 		{	// We should not apply captcha to the requested form:
-			return;
+			return true;
 		}
 
 		$posted_answer = utf8_strtolower( param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ) );
@@ -255,7 +260,7 @@ class captcha_qstn_plugin extends Plugin
 		if( empty( $posted_answer ) )
 		{
 			$this->debug_log( 'captcha_qstn_'.$this->ID.'_answer' );
-			$params['validate_error'] = $this->T_('Please enter the captcha answer.');
+			param_error( 'captcha_qstn_'.$this->ID.'_answer', $this->T_('Please enter the captcha answer.') );
 			if( $params['form_type'] == 'comment' && ( $comment_Item = & $params['Comment']->get_Item() ) )
 			{
 				syslog_insert( 'Comment captcha answer is not entered', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
@@ -280,7 +285,7 @@ class captcha_qstn_plugin extends Plugin
 		if( !$posted_answer_is_correct )
 		{
 			$this->debug_log( 'Posted ('.$posted_answer.') and saved ('.$question->cptq_answers.') answer do not match!' );
-			$params['validate_error'] = $this->T_('The entered answer is incorrect.');
+			param_error( 'captcha_qstn_'.$this->ID.'_answer', $this->T_('The entered answer is incorrect.') );
 			if( $params['form_type'] == 'comment' && ( $comment_Item = & $params['Comment']->get_Item() ) )
 			{
 				syslog_insert( 'Comment captcha answer is incorrect', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
@@ -315,13 +320,13 @@ class captcha_qstn_plugin extends Plugin
 
 		if( empty( $this->question_ID ) )
 		{	// Get question from DB by current IP address
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get captcha question from DB by current IP address' );
 			$SQL->SELECT( 'cq.*' );
 			$SQL->FROM( $this->get_sql_table( 'ip_question' ) );
 			$SQL->FROM_add( 'INNER JOIN '.$this->get_sql_table( 'questions' ).' AS cq ON cptip_cptq_ID = cptq_ID' );
 			$SQL->WHERE( 'cptip_IP = '.$DB->quote( $IP ) );
 
-			if( $question = $DB->get_row( $SQL->get() ) )
+			if( $question = $DB->get_row( $SQL ) )
 			{
 				$this->question_ID = $question->cptq_ID;
 			}
@@ -334,11 +339,11 @@ class captcha_qstn_plugin extends Plugin
 
 		if( empty( $question ) && !empty( $this->question_ID ) )
 		{	// Get question data
-			$SQL = new SQL();
+			$SQL = new SQL( 'Get captcha question data by ID' );
 			$SQL->SELECT( '*' );
 			$SQL->FROM( $this->get_sql_table( 'questions' ) );
 			$SQL->WHERE( 'cptq_ID = '.$DB->quote( $this->question_ID ) );
-			$question = $DB->get_row( $SQL->get() );
+			$question = $DB->get_row( $SQL );
 
 			if( empty( $question ) )
 			{	// Assign random question if previous question doesn't exist in DB
@@ -362,12 +367,12 @@ class captcha_qstn_plugin extends Plugin
 		$IP = ip2int( $_SERVER['REMOTE_ADDR'] );
 
 		// Get new random question from DB
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get new random captcha question from DB' );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( $this->get_sql_table( 'questions' ) );
 		$SQL->ORDER_BY( 'RAND()' );
 		$SQL->LIMIT( 1 );
-		$question = $DB->get_row( $SQL->get() );
+		$question = $DB->get_row( $SQL );
 
 		// Insert a record for current IP address with assigned question ID
 		$DB->query( 'INSERT INTO '.$this->get_sql_table( 'ip_question' ).'
@@ -403,170 +408,72 @@ class captcha_qstn_plugin extends Plugin
 
 
 	/**
-	 * When a comment form gets displayed, we inject our captcha and an input field to
-	 * enter the answer.
+	 * Event handler: Return data to display captcha html code
 	 *
-	 * The question ID is saved into the user's Session and in the DB table "ip_question".
-	 *
-	 * @param array Associative array of parameters
-	 *   - 'Form': the form where payload should get added (by reference, OPTIONALLY!)
-	 *   - 'form_use_fieldset':
-	 *   - 'key': A key that is associated to the caller of the event (string, OPTIONALLY!)
-	 *   - 'form_type': Form type ( comment|register|message )
-	 * @return boolean|NULL true, if displayed; false, if error; NULL if it does not apply
+	 * @param array Associative array of parameters:
+	 *   - 'Form':          Form object
+	 *   - 'form_type':     Form type
+	 *   - 'form_position': Current form position where this event is called
+	 *   - 'captcha_info':  Default captcha info text(can be changed by this plugin)
+	 *   - 'captcha_template_question': Default HTML template for question text = '<span class="evo_captcha_question">$captcha_question$</span><br>'
+	 *   - 'captcha_template_answer':   Default HTML template for answer field = '<span class="evo_captcha_answer">$captcha_answer$</span><br>'
+	 * @return array Associative array of parameters:
+	 *   - 'captcha_position': Captcha position where current plugin must be displayed for the requested form type
+	 *   - 'captcha_html':     Captcha html code
+	 *   - 'captcha_info':     Captcha info text
 	 */
-	function CaptchaPayload( & $params )
+	function RequestCaptcha( & $params )
 	{
-		global $DB, $Session;
-
 		if( ! isset( $params['form_type'] ) || ! $this->does_apply( $params['form_type'] ) )
-		{	// We should not apply captcha to the requested form:
-			return;
+		{	// Exit here if the form type is not defined or this captcha plugin should not be applied for the requested form:
+			return false;
+		}
+
+		switch( $params['form_type'] )
+		{	// Set a position where we should display the captcha depending on form type:
+			case 'register':
+			case 'item':
+			case 'comment':
+			case 'message':
+				$captcha_position = 'before_submit_button';
+				break;
+			default:
+				// The requested form type is not supported by this plugin
+				return false;
 		}
 
 		$question = $this->CaptchaQuestion();
 
 		if( empty( $question ) )
 		{	// No the defined questions
-			return;
+			return false;
 		}
 
 		$this->debug_log( 'Question ID is: ('.$this->question_ID.')' );
 
-		if( ! isset( $params['Form'] ) )
-		{	// there's no Form where we add to, but we create our own form:
-			$Form = new Form( regenerate_url() );
-			$Form->begin_form();
-		}
-		else
-		{
-			$Form = & $params['Form'];
-			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
-			{
-				$Form->begin_fieldset();
-			}
-		}
-
-		$Form->info( $this->T_('Captcha question'), $question->cptq_question );
-		$Form->text_input( 'captcha_qstn_'.$this->ID.'_answer', param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ),
-				10, $this->T_('Captcha answer'), ( empty( $params['use_placeholders'] ) ? $this->T_('Please answer the question above').'.' : '' ),
-				array(
-						'placeholder' => empty( $params['use_placeholders'] ) ? '' : T_('Please answer the question above'),
-					)
+		// Question text:
+		$captcha_html = str_replace( '$captcha_question$', $question->cptq_question, $params['captcha_template_question'] );
+		// Answer input field:
+		$captcha_field_params = array(
+				'type'     => 'text',
+				'name'     => 'captcha_qstn_'.$this->ID.'_answer',
+				'value'    => param( 'captcha_qstn_'.$this->ID.'_answer', 'string', '' ),
+				'size'     => 10,
+				'required' => true,
+				'class'    => 'form_text_input form-control',
 			);
-
-		if( ! isset($params['Form']) )
-		{	// there's no Form where we add to, but our own form:
-			$Form->end_form( array( array( 'submit', 'submit', $this->T_('Validate me'), 'ActionButton' ) ) );
-		}
-		else
+		if( ! empty( $params['use_placeholders'] ) )
 		{
-			if( ! isset($params['form_use_fieldset']) || $params['form_use_fieldset'] )
-			{
-				$Form->end_fieldset();
-			}
+			$captcha_field_params['placeholder'] = T_('Please answer the question above');
 		}
+		$Form = & $params['Form'];
+		$captcha_html .= str_replace( '$captcha_answer$', $Form->get_input_element( $captcha_field_params ), $params['captcha_template_answer'] );
 
-		return true;
-	}
-
-
-	/**
-	 * We display our captcha with comment forms.
-	 */
-	function DisplayCommentFormFieldset( & $params )
-	{
-		$params['form_type'] = 'comment';
-		$this->CaptchaPayload( $params );
-	}
-
-
-	/**
-	 * Validate the answer against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the comment from
-	 * being posted.
-	 *
-	 * @param array Associative array of parameters.
-	 */
-	function BeforeCommentFormInsert( & $params )
-	{
-		$params['form_type'] = 'comment';
-		$this->validate_form_by_captcha( $params );
-	}
-
-
-	/**
-	 * Validate the answer against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the comment from
-	 * being posted.
-	 *
-	 * @param array Associative array of parameters.
-	 */
-	function validate_form_by_captcha( & $params )
-	{
-		if( ! empty( $params['is_preview'] ) )
-		{	// Don't validate on preview action:
-			return;
-		}
-
-		if( empty( $params['form_type'] ) )
-		{	// Form type must be defined:
-			return;
-		}
-
-		if( $this->CaptchaValidated( $params ) === false )
-		{	// Some error on captcha validation:
-			$validate_error = $params['validate_error'];
-			param_error( 'captcha_qstn_'.$this->ID.'_answer', $validate_error );
-		}
-	}
-
-
-	/**
-	 * We display our captcha with the register form.
-	 */
-	function DisplayRegisterFormFieldset( & $params )
-	{
-		$params['form_type'] = 'register';
-		$this->CaptchaPayload( $params );
-	}
-
-
-	/**
-	 * Validate the given private key against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the
-	 * user from being registered.
-	 */
-	function RegisterFormSent( & $params )
-	{
-		$params['form_type'] = 'register';
-		$this->validate_form_by_captcha( $params );
-	}
-
-
-	/**
-	 * We display our captcha with the message form.
-	 */
-	function DisplayMessageFormFieldset( & $params )
-	{
-		$params['form_type'] = 'message';
-		$this->CaptchaPayload( $params );
-	}
-
-
-	/**
-	 * Validate the given private key against our stored one.
-	 *
-	 * In case of error we add a message of category 'error' which prevents the
-	 * user from being registered.
-	 */
-	function MessageFormSent( & $params )
-	{
-		$params['form_type'] = 'message';
-		$this->validate_form_by_captcha( $params );
+		return array(
+				'captcha_position' => $captcha_position,
+				'captcha_html'     => $captcha_html,
+				'captcha_info'     => ( empty( $params['use_placeholders'] ) ? $this->T_('Please answer the question above').'.<br>' : '' ).$params['captcha_info'],
+			);
 	}
 
 
@@ -582,6 +489,13 @@ class captcha_qstn_plugin extends Plugin
 	{
 		switch( $form_type )
 		{
+			case 'item':
+				if( !is_logged_in() )
+				{
+					return $this->Settings->get( 'use_for_anonymous_item' );
+				}
+				break;
+
 			case 'comment':
 				if( !is_logged_in() )
 				{
@@ -613,11 +527,11 @@ class captcha_qstn_plugin extends Plugin
 	{
 		global $DB;
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Check if captcha questions exist in DB' );
 		$SQL->SELECT( 'cptq_ID' );
 		$SQL->FROM( $this->get_sql_table( 'questions' ) );
 
-		if( ! $DB->get_var( $SQL->get() ) )
+		if( ! $DB->get_var( $SQL ) )
 		{
 			return $this->T_( 'Not Enabled: You should create at least one question!' );
 		}

@@ -67,8 +67,10 @@ siteskin_include( '_site_body_header.inc.php' );
 			// CODE for the widget:
 			'widget' => 'coll_member_count',
 			// Optional display params
-			'before' => '(',
-			'after'  => ')',
+			'block_start' => '<span>',
+			'block_end'   => '</span>',
+			'before'      => '(',
+			'after'       => ')',
 		) );
 	?>
 
@@ -236,7 +238,6 @@ if( $disp == 'single' )
 		skin_include( '$disp$', array(
 				'disp_single' => '', // We already handled this case above
 				'disp_page'   => '', // We already handled this case above
-				'mediaidx_thumb_size'  => $Skin->get_setting( 'mediaidx_thumb_size' ),
 				'author_link_text'     => 'auto',
 				'login_page_before'    => '<div class="login_block"><div class="bDetails">',
 				'login_page_after'     => '</div></div>',

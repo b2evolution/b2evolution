@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class mobile_skin_switcher_Widget extends ComponentWidget
 {
+	var $icon = 'toggle-on';
+
 	/**
 	 * Constructor
 	 */
@@ -125,26 +127,22 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 
 		global $ReqURI, $Session, $Collection, $Blog;
 
-		if( empty( $Blog ) )
-		{ // Blog must be defined
-			return;
-		}
+		$this->init_display( $params );
 
 		$is_mobile_session = $Session->is_mobile_session();
 		$is_tablet_session = $Session->is_tablet_session();
 
-		if( ( ! $is_mobile_session && ! $is_tablet_session )
-		 || ( $is_mobile_session && $Blog->get_setting( 'mobile_skin_ID', true ) < 1 )
-		 || ( $is_tablet_session && $Blog->get_setting( 'tablet_skin_ID', true ) < 1 ) )
-		{ // Display the switcher only for mobile/tablet devices and when the mobile/tablet skins are defined
-			return;
+		if( empty( $Blog )
+		 || ( ! $is_mobile_session && ! $is_tablet_session )
+		 || ( $is_mobile_session && $Blog->get( 'mobile_skin_ID', array( 'real_value' => true ) ) < 1 )
+		 || ( $is_tablet_session && $Blog->get( 'tablet_skin_ID', array( 'real_value' => true ) ) < 1 ) )
+		{	// Display the switcher only for mobile/tablet devices and when the mobile/tablet skins are defined:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is disabled because it is only for mobile/tablet devices and when the mobile/tablet skins are defined.' );
+			return false;
 		}
 
 		$force_skin = $Session->get( 'force_skin' );
 
-		$this->init_display( $params );
-
-		// Collection common links:
 		echo $this->disp_params['block_start'];
 
 		if( empty( $force_skin ) || $force_skin == 'mobile' || $force_skin == 'tablet' )
@@ -158,7 +156,7 @@ class mobile_skin_switcher_Widget extends ComponentWidget
 		}
 		else
 		{ // Desktop skin is enabled now, Display a link to switch back on mobile/tablet skin
-			$this->disp_title( $this->disp_params['title'] );
+			$this->disp_title();
 
 			$switch_url = url_add_param( $ReqURI, 'force_skin=auto' );
 			if( $is_mobile_session )

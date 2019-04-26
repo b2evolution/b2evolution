@@ -9,12 +9,10 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Messages;
-
 // Get the ID of the post we are supposed to post-process:
 if( empty( $job_params['item_ID'] ) )
 {
-	$result_message = 'No item_ID parameter received.'; // No trans.
+	cron_log_append( 'No item_ID parameter received.', 'error' ); // No trans.
 	return 3;
 }
 
@@ -30,7 +28,7 @@ $DB->query( 'UPDATE T_items__item
 							  AND post_notifications_ctsk_ID = '.$job_params['ctsk_ID'] );
 if( $DB->rows_affected != 1 )
 {	// We could not "lock" the requested post
-	$result_message = sprintf( T_('Could not lock post #%d. It is probably being processed or has already been processed by another scheduled task.'), $item_ID );
+	cron_log_append( sprintf( T_('Could not lock post #%d. It is probably being processed or has already been processed by another scheduled task.'), $item_ID ) );
 	return 4;
 }
 
@@ -56,10 +54,10 @@ $previous_item_visibility_status = '';
 while( $edited_Item->get( 'status' ) != $previous_item_visibility_status )
 {
 	// Send outbound pings: (will only do something if visibility is 'public')
-	$edited_Item->send_outbound_pings( $job_params['force_pings'] );
+	$edited_Item->send_outbound_pings( $job_params['force_pings'], 'cron_job' );
 
 	// Send email notifications to users who want to receive them for the collection of this item: (will be different recipients depending on visibility)
-	$notified_flags = $edited_Item->send_email_notifications( $job_params['executed_by_userid'], $job_params['is_new_item'], $job_params['already_notified_user_IDs'], $job_params['force_members'], $job_params['force_community'] );
+	$notified_flags = $edited_Item->send_email_notifications( $job_params['executed_by_userid'], $job_params['is_new_item'], $job_params['already_notified_user_IDs'], $job_params['force_members'], $job_params['force_community'], 'cron_job' );
 
 	// Record that we have just notified the members and/or community:
 	$edited_Item->set( 'notifications_flags', $notified_flags );
@@ -77,10 +75,9 @@ while( $edited_Item->get( 'status' ) != $previous_item_visibility_status )
 	$edited_Item = & $ItemCache->get_by_ID( $item_ID );
 }
 
-$result_message = $Messages->get_string( '', '', "\n" );
 if( empty( $result_message ) )
 {
-	$result_message = T_('Done').'.';
+	cron_log_append( T_('Done').'.' );
 }
 
 return 1; /* ok */

@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  *
@@ -52,6 +52,7 @@ class CollectionSettings extends AbstractSettings
 
 		// Single post settings:
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
+			'allow_crosspost_urls' => 1,					// For cross-posted Items, allow non-canonical URL
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'single_links'   => 'short',
 			'single_item_footer_text' => '',
@@ -59,6 +60,7 @@ class CollectionSettings extends AbstractSettings
 			'tags_meta_keywords' => 1,
 			'tags_open_graph' => 1,
 			'tags_twitter_card' => 1,
+			'tags_structured_data' => 1,
 			// 'post_moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 
 		// Item voting settings:
@@ -76,6 +78,7 @@ class CollectionSettings extends AbstractSettings
 			'require_anon_name' => 1,
 			'require_anon_email' => 1,
 			'allow_anon_url' => 0,
+			'comment_maxlen' => 1500,
 			'allow_attachments' => 'registered',
 			'max_attachments' => '',
 			'display_rating_summary' => '1', // Display a summary of star ratings above the comments
@@ -91,6 +94,8 @@ class CollectionSettings extends AbstractSettings
 			'comments_register' => 1,
 			'comment_quick_moderation' => 'expire',		// Comment quick moderation can be 'never', 'expire' - Links expire on first edit action, and 'always'
 			'autocomplete_usernames' => 1,
+			'meta_comments_frontoffice' => 1, // Display meta comments in front-office
+			'webmentions' => 1, // Allow to accept webmentions from other sites
 
 		// Archive settings:
 			'arcdir_noindex' => '1',					// META NOINDEX on Archive directory
@@ -153,7 +158,7 @@ class CollectionSettings extends AbstractSettings
 			'enable_sitemaps' => 1,
 
 		// General settings:
-			'ajax_form_enabled' => 0,					// Comment and contacts forms will be fetched by javascript
+			'ajax_form_enabled' => 1,					// Comment, Contact & Quick registration forms will be fetched by javascript
 			'ajax_form_loggedin_enabled' => 0,			// Also use JS forms for logged in users
 			'cache_enabled' => 0,
 			'cache_enabled_widgets' => 0,
@@ -161,19 +166,26 @@ class CollectionSettings extends AbstractSettings
 			'in_skin_editing' => 0,
 			'in_skin_editing_renderers' => 1,
 			'in_skin_editing_category' => 1,
+			'in_skin_editing_category_order' => 1,
 			'default_cat_ID' => NULL,					// Default Cat for new posts
-			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
+			'ping_plugins' => 'ping_pingomatic,ping_b2evonet,evo_twitter,webmention', // ping plugin codes, separated by comma
 			'allow_subscriptions' => 1,         // Allow email subscriptions for new post by default
 			'allow_comment_subscriptions' => 1, // Allow email subscriptions for new comment by default
 			'allow_item_subscriptions' => 1,    // Allow email subscriptions for a specific post by default
+			'allow_anon_subscriptions' => 1,    // Allow email subscriptions for replies to anonymous users comments
+			'default_anon_comment_notify' => 0, // Default option to subscribe anonymous users for replies notification
+			'anon_notification_email_limit' => 3, // Max # of email notifications an anonymous user may receive per day
 			'use_workflow' => 0,						// Don't use workflow by default
+			'use_deadline' => 1,						// Use deadline for workflow by default
 			'aggregate_coll_IDs' => '',
-			'blog_footer_text' => 'This collection &copy;$year$ by $owner$',
+			'blog_footer_text' => 'This collection &copy;$year$ by $publisher$',
 			'max_footer_credits' => 3,
 			'enable_goto_blog' => 'blog',  // 'no' - No redirect, 'blog' - Go to blog after publishing post, 'post' - Redirect to permanent post url
 			'editing_goto_blog' => 'post', // 'no' - No redirect, 'blog' - Go to blog after editing post, 'post' - Redirect to permanent post url
 			'default_post_type' => '1', // Default type for new posts, value is ID of post type from table T_items__type
-			// 'default_post_status' => 'draft',		// Default status for new posts ("published", "community", "protected", "private", "review", "draft", "deprecated", "redirected"). We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
+			'post_anonymous' => 0, // Allow to create new posts by anonymous users
+			// 'default_post_status' => 'draft',		// Default status for new posts in backoffice ("published", "community", "protected", "private", "review", "draft", "deprecated", "redirected"). We don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
+			'default_post_status_anon' => 'review', // Default status for new posts from anonymous user ("published", "community", "protected", "private", "review", "draft", "deprecated", "redirected").
 			'post_categories' => 'main_extra_cat_post', // Post category setting
 			'post_navigation' => 'same_blog',           // Default post by post navigation should stay in the same blog, category, author or tag
 			'blog_head_includes' => '',
@@ -182,6 +194,7 @@ class CollectionSettings extends AbstractSettings
 			'allow_html_comment' => 1, // Allow HTML in comments
 			'track_unread_content' => 0, // Should we track unread content on the specific blog. It can be modified on the Features/Other settings form.
 			'allow_access' => 'public', // Allow access to blog; Values: 'public' - Everyone (Public Blog), 'users' - Logged in users, 'members' - Members of the blog
+			'http_protocol' => 'allow_both', // SSL; Values: 'always_http' - Always use http, 'always_https' - Always use https, 'allow_both' - Allow both http and https as valid URLs.
 			// Assets URLs:
 			'rsc_assets_url_type' => 'relative', // Load generic /rsc/ assets from: 'basic', 'relative', 'absolute'
 			'rsc_assets_absolute_url' => '', // Absolute URL for setting 'rsc_assets_url_type' with selected option 'absolute'
@@ -200,7 +213,24 @@ class CollectionSettings extends AbstractSettings
 			'cookie_domain_type' => 'auto', // Cookie domain type: 'auto', 'custom'
 			'cookie_path_type' => 'auto', // Cookie path type: 'auto', 'custom'
 
+		// Contact form settings (disp=msgform):
+			'msgform_display_recipient' => 1, // Display a "Message to:" line
+			'msgform_user_name' => 'none', // Name input for logged in users
+			'msgform_display_avatar' => 1, // Display recipient avatar
+			'msgform_avatar_size' => 'crop-top-48x48', // Recipient avatar size
+			'msgform_require_name' => 1, // Require name
+			'msgform_display_subject' => 1, // Display subject
+			'msgform_require_subject' => 1, // Require subject
+			'msgform_contact_method' => 1, // Require a preferred contact method
+			'msgform_display_message' => 1, // Display message
+			'msgform_require_message' => 1, // Require message
+
 		// User directory:
+			'userdir_filter_gender' => 1,
+			'userdir_filter_level' => 1,
+			'userdir_filter_org' => 1,
+			'userdir_filter_criteria' => 1,
+			'userdir_filter_lastseen' => 1,
 			'userdir_picture' => 1,
 			'image_size_user_list' => 'crop-top-48x48',
 			'userdir_login' => 1,
@@ -225,8 +255,35 @@ class CollectionSettings extends AbstractSettings
 			'search_include_posts' => 1, // Include posts to results on disp=search
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
+			'search_include_files' => 1, // Include files to results on disp=search
+			'search_score_post_title'          => 5, // weight multiplier for keywords found in post title
+			'search_score_post_content'        => 1, // weight multiplier for keywords found in post content
+			'search_score_post_tags'           => 4, // weight multiplier for keywords found in post tags
+			'search_score_post_excerpt'        => 1, // weight multiplier for keywords found in post excerpt
+			'search_score_post_titletag'       => 4, // weight multiplier for keywords found in post <title> tag
+			'search_score_post_author'         => 5, // weight multiplier for keywords found in post author login
+			'search_score_post_date_future'    => 0, // weight multiplier for posts from future
+			'search_score_post_date_moremonth' => 0, // weight multiplier for posts older month
+			'search_score_post_date_lastmonth' => 1, // weight multiplier for posts from the last month
+			'search_score_post_date_twoweeks'  => 2, // weight multiplier for posts from the last two weeks
+			'search_score_post_date_lastweek'  => 8, // weight multiplier for posts from the last week
+			'search_score_cmnt_post_title'     => 1, // weight multiplier for keywords found in title of the comment's post
+			'search_score_cmnt_content'        => 1, // weight multiplier for keywords found in comment content
+			'search_score_cmnt_author'         => 5, // weight multiplier for keywords found in comment author name
+			'search_score_cmnt_date_future'    => 0, // weight multiplier for comments from future
+			'search_score_cmnt_date_moremonth' => 0, // weight multiplier for comments older month
+			'search_score_cmnt_date_lastmonth' => 1, // weight multiplier for comments from the last month
+			'search_score_cmnt_date_twoweeks'  => 2, // weight multiplier for comments from the last two weeks
+			'search_score_cmnt_date_lastweek'  => 8, // weight multiplier for comments from the last week
+			'search_score_file_name'           => 3, // weight multiplier for keywords found in file name
+			'search_score_file_path'           => 1, // weight multiplier for keywords found in file path
+			'search_score_file_title'          => 3, // weight multiplier for keywords found in file long title
+			'search_score_file_alt'            => 1, // weight multiplier for keywords found in file alternative text
+			'search_score_file_description'    => 1, // weight multiplier for keywords found in file caption/description
+			'search_score_cat_name'            => 3, // weight multiplier for keywords found in category name
+			'search_score_cat_desc'            => 1, // weight multiplier for keywords found in category description
+			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
-			'msgform_display_recipient' => 1, // Display a "Message to:" line on disp=msgform
 
 		// Time frame settings:
 			'timestamp_min' => 'yes',
@@ -239,6 +296,18 @@ class CollectionSettings extends AbstractSettings
 			'download_delay' => 5,
 			'download_noindex' => 1,
 			'download_nofollowto' => 1,
+
+		// Popups settings:
+			'marketing_popup_using' => 'anonymous',
+			'marketing_popup_animation' => 'random',
+			'marketing_popup_container_front' => 'marketing_popup',
+			'marketing_popup_container_posts' => 'marketing_popup',
+			'marketing_popup_container_single' => 'marketing_popup',
+			'marketing_popup_container_page' => 'marketing_popup',
+			'marketing_popup_container_catdir' => 'marketing_popup',
+			'marketing_popup_container_other_disps' => 'marketing_popup',
+			'marketing_popup_show_repeat' => 0,
+			'marketing_popup_show_frequency' => 'always',
 		);
 
 	/**
@@ -306,6 +375,19 @@ class CollectionSettings extends AbstractSettings
 	 */
 	function set( $col_key1, $col_key2, $value )
 	{
+		if( is_array( $value ) )
+		{	// Don't crop a serialized value if value is an array,
+			// e-g plugin setting with type "checklist":
+			if( strlen( serialize( $value  ) ) > 10000 )
+			{	// Stop here to avoid DB error on inserting of long value:
+				debug_die( 'Impossible to store long data(>10000 chars) of collection setting "'.$col_key2.'"!' );
+			}
+		}
+		else
+		{	// Limit value with max possible length:
+			$value = utf8_substr( $value, 0, 10000 );
+		}
+
 		return parent::setx( $col_key1, $col_key2, $value );
 	}
 }

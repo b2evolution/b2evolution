@@ -11,7 +11,7 @@
 // div.widget_core_coll_tagline {
 	// margin-bottom: 30px;
 // }
-.evo_container__front_page_primary {
+.evo_container__front_page_main_area {
 	padding-bottom: 30px;
 	.evo_widget {
 		margin-top: 30px;
@@ -34,7 +34,7 @@
 		}
 	}
 }
-.evo_container__front_page_secondary {
+.evo_container__front_page_secondary_area {
 	padding-top: 30px;
 }
 
@@ -43,7 +43,7 @@
 	// Important for hiding "Slide down" arrow behind this div
 	position: relative;
 	z-index: 1;
-	
+
 	width: 100%;
 	p {
 		margin-top: 10px;
@@ -104,7 +104,6 @@ body.pictured {
 		height: 100%;
 		min-height: 100%;
 		.panel {
-			color: #333;
 			a:not([class]) {
 				color: #337ab7;
 				text-decoration: none;
@@ -124,15 +123,15 @@ body.pictured {
 		position: absolute;
 		top: 100%;
 	}
+	// To avoid issue on scroll page we must disable 100% height for pictured layout on enabled widgets designer mode:
+	&.dev_designer_mode {
+		height: auto;
+		.secondary_area {
+			position: initial;
+		}
+	}
 }
 .evo_pictured_layout {
-	//position: fixed;
-	// top: 0;
-	// left: 0;
-	// right: 0;
-	// bottom: 0;
-	// width: 100%;
-	// height: 100%;
 	display: table;
 	height: 100%;
 	min-height: 100%;
@@ -147,9 +146,28 @@ body.pictured {
 		width: 100%;
 	}
 }
+
+	// Separate slide-top button from the scrollbar on Mozilla and Chrome
+	// body.disp_front .slide-top {
+		// right: 29px;
+	// }
+	
+@media (min-width: 640px) and (min-device-width: 640px) {
+	// Separate slide-top button from the scrollbar on Mozilla and Chrome
+	body.disp_front .slide-top {
+		right: 29px;
+	}
+}
+	
 @media only screen and (max-width: 640px) {
+	// Important for preventing white gap in .main_page_wrapper on this viewport size
+	// Since we break #bg_picture on this size, height: 100% is not needed anymore
+	html {
+		height: auto;
+	}
+	
 	body.disp_front {
-		.sitewide_header {
+		.sitewide_header, .evo_container__site_header {
 			margin-bottom: 0;
 		}
 		.evo_pictured_layout {
@@ -165,90 +183,25 @@ body.pictured {
 			margin-top: 0;
 			margin-bottom: 0;
 		}
+		
+		.slide-top {
+			right: 8px;
+		}
 	}
 }
 
-// Login widget form
-.widget_core_user_login {
-	#login_form {
-		.form-group {
-			margin: 0;
+@media only screen and (min-device-width: 1024px) {
+body.pictured {
+	#skin_wrapper.skin_wrapper_loggedin {
+		// Use padding instead of margin to avoid a double scrolling on Windows FireFox
+		margin-top: 0;
+		padding-top: 27px;
 		}
-		label {
-			text-align: left;
-			width: 160px;
-			padding-left: 0;
-		}
-		.controls {
-			padding: 0;
-			width: 100%;
-		}
-		.form_text_input.form-control {
-			width: 100%;
-		}
-	}
-	.submit {
-		font-size: 12px;
-	}
-	.field_login_btn {
-		.panel {
-			margin: 0;
-			border: none;
-			border-radius: 0;
-			box-shadow: none;
-			.panel-body {
-				padding-left: 0;
-				padding-right: 0;
-				padding-bottom: 0;
-				#submit_login_form {
-					margin-right: 10px;
-				}
-			}
-		}
-	}
-	.register_link {
-		display: block;
-		padding-top: 10px;
 	}
 }
-
-// Register widget form
-.widget_core_user_register {
-	#register_form {
-		.form-group {
-			margin: 0;
-		}
-		label {
-			text-align: left;
-			width: 160px;
-			padding-left: 0;
-		}
-		.controls {
-			padding: 0;
-			width: 100%;
-		}
-		.form_text_input.form-control {
-			width: 100%;
-		}
-	}
-	.submit {
-		font-size: 12px;
-	}
-	.field_register_btn {
-		.panel {
-			margin: 0;
-			border: none;
-			border-radius: 0;
-			box-shadow: none;
-			.panel-body {
-				padding-left: 0;
-				padding-right: 0;
-				padding-bottom: 0;
-				#submit_login_form {
-					margin-right: 10px;
-				}
-			}
-		}
+@media (min-width: 640px) and (max-device-width: 1024px) {
+	.btn.slide-top.logged_in_margin_top {
+		top: 35px;
 	}
 }
 
@@ -301,13 +254,6 @@ div.extended_search_form {
 			display: inline-block;
 			margin-right: 10px;
 		}
-	}
-}
-
-// Table for select categories of item
-table.catselect {
-	input#new_category_name {
-		width: 98% !important;
 	}
 }
 
@@ -384,6 +330,7 @@ div.bSideItem {
 }
 .evo_panel__login {
 	max-width: 400px;
+	min-width: auto;
 }
 .evo_panel__lostpass {
 	max-width: 480px;
@@ -399,16 +346,36 @@ div.bSideItem {
 }
 .evo_panel__register {
 	max-width: 580px;
-	.control-buttons{
-		text-align: left;
-	}
-	&.register-disabled {
-		width: 350px;
-	}
 	.form-control {
 		&#country, &#u {
 			width: 100%;
 		}
+	}
+	#fieldset_wrapper_captcha_qstn .panel {
+		margin: 0;
+		div[id$=_answer] .control-label {
+			padding-right: 14px;
+		}
+	}
+	.panel-body {
+		padding: 15px;
+		p:last-child {
+			margin-bottom: 0;
+		}
+	}
+}
+@media (min-width: 768px) {
+	#fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
+		max-height: 34px;
+	}
+}
+.evo_register_buttons {
+	text-align: center;
+	input.btn {
+		margin: 0 0 15px 0;
+	}
+	a.btn {
+		margin: 0;
 	}
 }
 .evo_form__login_links {
@@ -544,11 +511,30 @@ body.pictured .secondary_area .widget_core_org_members {
 		text-align: center;
 		opacity: 0.5;
 		transition: 0.1s all;
-		position:relative; 
+		position:relative;
 		left:-50%;
 		&:hover {
 			cursor: pointer;
 			opacity: 0.9;
 		}
+	}
+}
+
+// Comment footer
+.evo_content_block .evo_comment {
+	.evo_comment_footer {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
 	}
 }

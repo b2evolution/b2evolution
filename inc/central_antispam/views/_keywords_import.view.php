@@ -5,7 +5,7 @@
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
@@ -31,7 +31,7 @@ $keywords_SQL->FROM( 'T_antispam__keyword' );
 $keywords_SQL->WHERE( 'askw_string NOT IN ( SELECT cakw_keyword FROM T_centralantispam__keyword )' );
 $keywords_SQL->ORDER_BY( 'source_order' );
 $keywords_SQL->GROUP_BY( 'askw_source' );
-$keywords = $DB->get_assoc( $keywords_SQL->get(), $keywords_SQL->title );
+$keywords = $DB->get_assoc( $keywords_SQL );
 
 // Check if at least one keyword exists in Central Antispam:
 $ca_keywords_count = $DB->get_var( 'SELECT cakw_ID FROM T_centralantispam__keyword LIMIT 1', 0, NULL,

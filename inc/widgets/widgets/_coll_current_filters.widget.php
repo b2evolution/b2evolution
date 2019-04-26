@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2008 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package evocore
@@ -25,6 +25,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_current_filters_Widget extends ComponentWidget
 {
+	var $icon = 'filter';
+
 	/**
 	 * Constructor
 	 */
@@ -103,7 +105,9 @@ class coll_current_filters_Widget extends ComponentWidget
 						array( 'visibility', T_('Visibility'), 1 ),
 						array( 'time', T_('Past/Future'), 0 ),
 						array( 'limit', T_('Limit by days'), 1 ),
-						array( 'flagged', T_('Flagged'), 1 ) ),
+						array( 'flagged', T_('Flagged'), 1 ),
+						array( 'mustread', T_('Must read'), 1 ),
+					),
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -128,6 +132,7 @@ class coll_current_filters_Widget extends ComponentWidget
 
 		if( empty( $params['ItemList'] ) )
 		{ // Empty ItemList object
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is an empty param "ItemList".' );
 			return false;
 		}
 
@@ -177,10 +182,12 @@ class coll_current_filters_Widget extends ComponentWidget
 				'display_time'       => ! empty( $this->disp_params['show_filters']['time'] ),
 				'display_limit'      => ! empty( $this->disp_params['show_filters']['limit'] ),
 				'display_flagged'    => ! empty( $this->disp_params['show_filters']['flagged'] ),
+				'display_mustread'   => ! empty( $this->disp_params['show_filters']['mustread'] ),
 			) ) );
 
-		if( empty( $filters ) && ! $this->disp_params['display_empty_filter'] )
-		{ // No filters
+		if( empty( $filters ) && ! $params['display_empty_filter'] )
+		{	// No filters
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no filters.' );
 			return;
 		}
 
@@ -194,7 +201,7 @@ class coll_current_filters_Widget extends ComponentWidget
 
 		if( empty( $filters ) )
 		{ // No filters
-			if( $this->disp_params['display_empty_filter'] )
+			if( $params['display_empty_filter'] )
 			{
 				if( is_admin_page() && get_param( 'tab' ) == 'type' )
 				{ // Try to get a title for current selected post type on back-office pages:
@@ -237,7 +244,8 @@ class coll_current_filters_Widget extends ComponentWidget
 						.$params['ItemList']->param_prefix.'dstop,'
 						.$params['ItemList']->param_prefix.'show_past,'
 						.$params['ItemList']->param_prefix.'show_future,'
-						.$params['ItemList']->param_prefix.'flagged' ),
+						.$params['ItemList']->param_prefix.'flagged,'
+						.$params['ItemList']->param_prefix.'mustread' ),
 					' '.T_('Reset all filters!'), 3, 4 ).'<p>';
 			}
 		}

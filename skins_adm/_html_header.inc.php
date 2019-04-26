@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package admin
@@ -76,7 +76,7 @@ headers_content_mightcache( 'text/html', 0 );		// Make extra sure we don't cache
 		// gets initialized in _footer.php
 
 		$begin_script = <<<JS
-		<script type="text/javascript">
+		<script>
 		<!--
 		  var allchecked = Array();
 		  var idprefix;

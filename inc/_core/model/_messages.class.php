@@ -11,7 +11,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -117,6 +117,13 @@ class Messages
 	 */
 	var $group_count = 0;
 
+	/**
+	 * Affix the displayed messages. Works in conjunction with template function
+	 * init_affix_messages_js().
+	 *
+	 * @var boolean
+	 */
+	var $affixed = false;
 
 	/**
 	 * Constructor.
@@ -337,6 +344,17 @@ class Messages
 		if( $this->has_open_group() )
 		{
 			$this->close_group();
+		}
+
+		if( $this->affixed )
+		{	// Add "affixed_messages" class to $before param
+			$old_before = $before;
+			$before = add_tag_class( $before, 'affixed_messages' );
+			if( $old_before == $before )
+			{	// No tag to add class to, wrap in DIV with "affixed_messages" class:
+				$before = '<div class="affixed_messages">'.$before;
+				$after = $after.'</div>';
+			}
 		}
 
 		if( $this->count )

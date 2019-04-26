@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -56,6 +56,21 @@ function display_pluggable_permissions( &$Form, $perm_block )
 							$Form->checkbox_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name] == 'allowed', $perm['label'], array( 'input_suffix' => ' '.$perm['note'], 'value' => 'allowed' ) );
 							break;
 
+						case 'checklist':
+							$checklist_values = explode( ',', $GroupSettings->permission_values[$perm_name] );
+							if( ! empty( $checklist_values ) )
+							{	// If at least one option is selected:
+								foreach( $perm['options'] as $o => $checklist_option )
+								{
+									if( in_array( $checklist_option[1], $checklist_values ) )
+									{	// This option is selected for the group:
+										$perm['options'][ $o ][3] = 1;
+									}
+								}
+							}
+							$Form->checklist( $perm['options'], 'edited_grp_'.$perm_name, $perm['label'], false, false, array( 'note' => $perm['note'] ) );
+						break;
+
 						case 'radiobox':
 							if( ! isset( $perm['field_lines'] ) )
 							{
@@ -74,6 +89,10 @@ function display_pluggable_permissions( &$Form, $perm_block )
 
 						case 'text_input':
 							$Form->text_input( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], 5, $perm['label'], $perm['note'], array( 'maxlength' => $perm['maxlength'] ) );
+							break;
+
+						case 'select_object':
+							$Form->select_input_object( 'edited_grp_'.$perm_name, $GroupSettings->permission_values[$perm_name], $perm['object_cache'], $perm['label'] );
 							break;
 
 						case 'hidden':
@@ -113,7 +132,7 @@ $perm_view_option = array( 'view', T_('View details') );
 $perm_edit_option = array( 'edit', T_('Edit/delete all') );
 
 
-$Form->begin_fieldset( T_('General').get_manual_link('group_properties_general') );
+$Form->begin_fieldset( T_('General').get_manual_link('group-properties-general') );
 
 	$Form->text( 'edited_grp_name', $edited_Group->name, 50, T_('Name'), '', 50, 'large' );
 
@@ -137,19 +156,19 @@ $Form->end_fieldset();
 // Show/Hide the panels below depending on group usage:
 $primary_panels_style = $edited_Group->get( 'usage' ) == 'primary' ? '' : 'display:none';
 
-$Form->begin_fieldset( T_('Evobar & Back-office').get_manual_link('group_properties_evobar'), array( 'id' => 'evobar', 'style' => $primary_panels_style ) );
+$Form->begin_fieldset( T_('Evobar & Back-office').get_manual_link('group-properties-evobar'), array( 'id' => 'evobar', 'style' => $primary_panels_style ) );
 
 	display_pluggable_permissions( $Form, 'core_evobar' );
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_properties_blogging'), array( 'id' => 'blogging', 'style' => $primary_panels_style ) );
+$Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group-properties-blogging'), array( 'id' => 'blogging', 'style' => $primary_panels_style ) );
 
 	$Form->radio( 'edited_grp_perm_blogs', $edited_Group->get('perm_blogs'),
-			array(  array( 'user', T_('Depending on each blog\'s permissions') ),
-							array( 'viewall', T_('View all blogs') ),
-							array( 'editall', T_('Full Access').get_admin_badge( 'coll', '#', '#', T_('Select to give Collection Admin permission') ) )
-						), T_('Collections'), false );
+			array(  array( 'user', T_('Users can only see Collections they have access to and the Sections these collections belong to + all Collections in the Sections they own.') ),
+							array( 'viewall', T_('View all: User can see all Sections and call Collections (with no additional edit permissions as above)') ),
+							array( 'editall', sprintf( T_('Full Access %s: Users can edit all Sections and Collections, create and delete Collections in any Section, create new Sections and delete empty Sections.'), get_admin_badge( 'coll', '#', T_('Site Admin'), T_('Select to give Collection Admin permission') ) ) )
+						), T_('Collections & Site Sections'), true );
 
 	$Form->radio( 'perm_xhtmlvalidation', $edited_Group->get('perm_xhtmlvalidation'),
 			array(  array( 'always', T_('Force valid XHTML + strong security'),
@@ -184,7 +203,7 @@ $Form->begin_fieldset( T_('Blogging permissions').get_manual_link('group_propert
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_properties_additional_permissions'), array( 'id' => 'additional', 'style' => $primary_panels_style ) );
+$Form->begin_fieldset( T_('Additional permissions').get_manual_link('group-properties-additional-permissions'), array( 'id' => 'additional', 'style' => $primary_panels_style ) );
 
 	$Form->radio( 'edited_grp_perm_stats', $edited_Group->get('perm_stats'),
 			array(  $perm_none_option,
@@ -198,11 +217,11 @@ $Form->begin_fieldset( T_('Additional permissions').get_manual_link('group_prope
 
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('File permissions').get_manual_link('group_properties_file_permissions'), array( 'id' => 'file', 'style' => $primary_panels_style ) );
+$Form->begin_fieldset( T_('File permissions').get_manual_link('group-properties-file-permissions'), array( 'id' => 'file', 'style' => $primary_panels_style ) );
 	display_pluggable_permissions( $Form, 'file' );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('System admin permissions').get_manual_link('group_properties_system_permissions'), array( 'id' => 'system', 'style' => $primary_panels_style ) );
+$Form->begin_fieldset( T_('System admin permissions').get_manual_link('group-properties-system-permissions'), array( 'id' => 'system', 'style' => $primary_panels_style ) );
 
 	// Display pluggable permissions:
 	display_pluggable_permissions( $Form, 'core' );
@@ -225,7 +244,54 @@ $Form->begin_fieldset( T_( 'Notification options').get_manual_link('notification
 $Form->end_fieldset();
 
 if( $action != 'view' )
-{
+{	// If current User can edit this group:
+
+	// Display plugin settings per group:
+	global $Plugins;
+	load_funcs( 'plugins/_plugin.funcs.php' );
+
+	$Plugins->restart();
+	while( $loop_Plugin = & $Plugins->get_next() )
+	{
+		if( ! $loop_Plugin->GroupSettings )
+		{	// Skip plugin without group settings:
+			continue;
+		}
+
+		// We use output buffers here to display the fieldset only, if there's content in there (either from PluginUserSettings or PluginSettingsEditDisplayAfter).
+		ob_start();
+		$Form->begin_fieldset( $loop_Plugin->name.' '.$loop_Plugin->get_help_link( '$help_url' ) );
+
+		ob_start();
+		$tmp_params = array(
+				'for_editing' => true,
+				'group_ID'    => $edited_Group->ID
+			);
+		$plugin_group_settings = $loop_Plugin->GetDefaultGroupSettings( $tmp_params );
+		if( is_array( $plugin_group_settings ) )
+		{
+			foreach( $plugin_group_settings as $l_name => $l_meta )
+			{	// Display form field for this setting:
+				autoform_display_field( $l_name, $l_meta, $Form, 'GroupSettings', $loop_Plugin, $edited_Group );
+			}
+		}
+
+		$has_contents = strlen( ob_get_contents() );
+		$Form->end_fieldset();
+
+		if( $has_contents )
+		{	// Print out plugin group settings:
+			ob_end_flush();
+			ob_end_flush();
+		}
+		else
+		{	// No content, discard output buffers:
+			ob_end_clean();
+			ob_end_clean();
+		}
+	}
+
+	// Display a button to save changes:
 	$Form->buttons( array( array( '', '', T_('Save Changes!'), 'SaveButton' ) ) );
 }
 
@@ -233,8 +299,9 @@ $Form->end_form();
 
 // set shared root permission availability, when form was loaded and when file perms was changed
 ?>
-<script type="text/javascript">
+<script>
 <?php
+global $Settings;
 if( $Settings->get('fm_enable_roots_shared') )
 {	// asimo> this may belong to the pluggable permissions display
 	// javascript to handle shared root permissions, when file permission was changed:
@@ -303,4 +370,21 @@ jQuery( 'input[name=edited_grp_usage]' ).click( function()
 		jQuery( 'fieldset', primary_field_ids ).hide();
 	}
 } );
+
+function set_activity_default_section( set_default_section )
+{
+	var checked_new_coll = jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).is( ':checked' );
+	// Enable/Disable if at least one checkbox(to create new collection) is checked:
+	jQuery( 'select[name=edited_grp_perm_default_sec_ID], input[type=checkbox][name="edited_grp_perm_allowed_sections[]"]' ).prop( 'disabled', ! checked_new_coll );
+	if( set_default_section && checked_new_coll )
+	{	// Auto select allowed section from current default section:
+		var selected_default_section_ID = jQuery( 'select[name=edited_grp_perm_default_sec_ID] option:selected' ).val();
+		jQuery( 'input[type=checkbox][name="edited_grp_perm_allowed_sections[]"][value=' + selected_default_section_ID + ']' ).prop( 'checked', true );
+	}
+}
+jQuery( 'input[name=edited_grp_perm_createblog], input[name=edited_grp_perm_getblog]' ).click( function()
+{	// Enable/Disable setting "Default Section" depending on checkboxes of "Creating new blogs":
+	set_activity_default_section( true );
+} );
+set_activity_default_section( false );
 </script>

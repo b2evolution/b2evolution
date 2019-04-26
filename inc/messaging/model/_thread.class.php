@@ -429,7 +429,10 @@ class Thread extends DataObject
 				list( $max_new_threads, $new_threads_count ) = get_todays_thread_settings();
 				if( ( !empty( $max_new_threads ) ) && ( ( $max_new_threads - $new_threads_count ) < $recipients_count ) )
 				{ // user has a create thread limit, and recipients number exceed that limit
-					$error_msg .= '<br />';
+					if ( ! empty( $error_msg ) )
+					{
+						$error_msg .= '<br />';
+					}
 					$error_msg .= sprintf( T_( 'You are unable to send %d individual messages, because it exceeds your remaining daily limit of %d.' ), $recipients_count, $max_new_threads - $new_threads_count );
 				}
 			}
@@ -559,7 +562,7 @@ class Thread extends DataObject
 			return true;
 		}
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Count all users whou are involved in the given thread but not the current User and didn\'t block the current User' );
 
 		$SQL->SELECT( 'count( ts.tsta_user_ID )' );
 		$SQL->FROM( 'T_messaging__threadstatus ts
@@ -572,7 +575,7 @@ class Thread extends DataObject
 		// sender is not blocked or is not present in all recipient's contact list
 		$SQL->WHERE_and( '( mc.mct_blocked IS NULL OR mc.mct_blocked = 0 )' );
 
-		if( $DB->get_var( $SQL->get(), 0, NULL, 'Count all users whou are involved in the given thread but not the current User and didn\'t block the current User' ) > 0 )
+		if( $DB->get_var( $SQL ) > 0 )
 		{ // there is at least one recipient who accept the reply
 			return true;
 		}

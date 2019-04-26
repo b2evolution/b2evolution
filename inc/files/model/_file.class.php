@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -1170,6 +1170,8 @@ class File extends DataObject
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use size defined by the thumbnail
 	 *                        'none' - don't use attributes "width" & "height"
+	 * @param boolean Image style
+	 * @param boolean Add loadimg class
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
@@ -1185,7 +1187,9 @@ class File extends DataObject
 	                  $image_desc = '#',
 	                  $image_link_id = '',
 	                  $image_size_x = 1,
-	                  $tag_size = NULL )
+	                  $tag_size = NULL,
+	                  $image_style = '',
+	                  $add_loadimg = true )
 	{
 		if( $this->is_dir() )
 		{ // We can't reference a directory
@@ -1210,7 +1214,7 @@ class File extends DataObject
 			{
 				$img_attribs = $this->get_img_attribs( $size_name, NULL, NULL, $x_size, $tag_size );
 
-				if( $this->check_image_sizes( $size_name, 64, $img_attribs ) )
+				if( $this->check_image_sizes( $size_name, 64, $img_attribs ) && $add_loadimg )
 				{ // If image larger than 64x64 add class to display animated gif during loading
 					$image_class = trim( $image_class.' loadimg' );
 				}
@@ -1234,6 +1238,11 @@ class File extends DataObject
 				if( $img_attribs['alt'] == '' )
 				{ // Image alt
 					$img_attribs['alt'] = $image_alt;
+				}
+
+				if( $image_style != '' )
+				{ // Image style
+					$img_attribs['style'] = $image_style;
 				}
 
 				// Image tag
@@ -1658,9 +1667,10 @@ class File extends DataObject
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param string Subpath for this file/folder, relative the associated root (no trailing slash)
+	 * @param boolean TRUE to don't rewrite existing file in the destination path, try to create unique file with appending siffix like "-1", "-2" and etc.
 	 * @return boolean true on success, false on failure
 	 */
-	function move_to( $root_type, $root_ID, $rdfp_rel_path )
+	function move_to( $root_type, $root_ID, $rdfp_rel_path, $keep_unique = false )
 	{
 		$old_file_name = $this->get_name();
 
@@ -1669,6 +1679,20 @@ class File extends DataObject
 		$FileRootCache = & get_FileRootCache();
 
 		$new_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID, true );
+
+		if( $keep_unique && preg_match( '#(.+\/)?(([^.\/]+)(\.[^.]+)?)$#', $rdfp_rel_path, $new_path_match ) )
+		{	// Try to find free unique file name if same name is already used in the destination folder:
+			$file_unique_name = $new_path_match[2];
+			$file_extension = isset( $new_path_match[4] ) ? $new_path_match[4] : '';
+			$file_unique_num = 1;
+			while( file_exists( $new_FileRoot->ads_path.$new_path_match[1].$file_unique_name ) )
+			{	// Find next free file with unique name in the same folder:
+				$file_unique_name = $new_path_match[3].'-'.$file_unique_num.$file_extension;
+				$file_unique_num++;
+			}
+			$rdfp_rel_path = $new_path_match[1].$file_unique_name;
+		}
+
 		$adfp_posix_path = $new_FileRoot->ads_path.$rdfp_rel_path;
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
@@ -1919,7 +1943,7 @@ class File extends DataObject
 			}
 			else
 			{
-				debug_die( sprintf( 'File not found: %s', $file_full_path ) );
+				trigger_error( T_('File not found').': <code>'.$file_full_path.'</code>' );
 			}
 		}
 
@@ -1936,9 +1960,10 @@ class File extends DataObject
 	/**
 	 * Update the DB based on previously recorded changes
 	 *
+	 * @param boolean TRUE to update last touched dates of the Link Owners of this File
 	 * @return boolean true on success, false on failure / no changes
 	 */
-	function dbupdate()
+	function dbupdate( $update_link_owner_dates = true )
 	{
 		if( $this->meta == 'unknown' )
 		{
@@ -1957,16 +1982,17 @@ class File extends DataObject
 		// Let parent do the update:
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
-			// Update field 'last_touched_ts' of each item that has a link with this edited file
-			$LinkCache = & get_LinkCache();
-			$links = $LinkCache->get_by_file_ID( $this->ID );
-			foreach( $links as $Link )
-			{
-				$LinkOwner = & $Link->get_LinkOwner();
-				if( $LinkOwner != NULL )
-				{	// Update last touched date content last updated date of the Owner:
-					$LinkOwner->update_last_touched_date();
-					$LinkOwner->update_contents_last_updated_ts();
+			if( $update_link_owner_dates )
+			{	// Update field 'last_touched_ts'(and 'contents_last_updated_ts' id exists) of each object(Item, Comment, Message and etc.) that has a link with this File:
+				$LinkCache = & get_LinkCache();
+				$links = $LinkCache->get_by_file_ID( $this->ID );
+				foreach( $links as $Link )
+				{
+					if( $LinkOwner = & $Link->get_LinkOwner() )
+					{	// Update last touched date and content last updated date of the Owner:
+						$LinkOwner->update_last_touched_date();
+						$LinkOwner->update_contents_last_updated_ts();
+					}
 				}
 			}
 
@@ -2119,11 +2145,11 @@ class File extends DataObject
 	function get_linkedit_link( $link_type = NULL, $link_obj_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
 											$actionurl = '#', $target = '' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( is_null( $text ) )
@@ -2162,11 +2188,11 @@ class File extends DataObject
 	 */
 	function get_linkedit_url( $link_type = NULL, $link_obj_ID = NULL, $actionurl = '#' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( $this->is_dir() )
@@ -2380,9 +2406,41 @@ class File extends DataObject
 			$img_attribs['src'] = $this->get_url();
 			if( $tag_size != 'none' )
 			{	// Add attributes "width" & "height" only when they are not disabled:
-				if( ( $size_arr = $this->get_image_size( 'widthheight_assoc' ) ) )
+				if( $tag_size !== NULL )
+				{	// Use size values:
+					$tag_size = explode( 'x', $tag_size );
+					$img_attribs['width'] = $tag_size[0];
+					$img_attribs['height'] = empty( $tag_size[1] ) ? $tag_size[0] : $tag_size[1];
+				}
+				elseif( ( $size_arr = $this->get_image_size( 'widthheight_assoc' ) ) )
 				{
 					$img_attribs += $size_arr;
+				}
+			}
+		}
+		elseif( $size_name == 'fit' )
+		{ // We want src to link to the original file
+			$img_attribs['src'] = $this->get_url();
+
+			if( $tag_size !== NULL)
+			{ // Get target dimension
+				$tag_size = explode( 'x', $tag_size );
+				if( empty( $tag_size[1] ) )
+				{
+					$tag_size[1] = $tag_size[0];
+				}
+				$size_arr = $this->get_image_size( 'widthheight' );
+
+				if( $size_arr[0] > $tag_size[0] || $size_arr[1] > $tag_size[1] )
+				{ // Scale image to fit
+					$scale = min( $tag_size[0]/$size_arr[0], $tag_size[1]/$size_arr[1] );
+					$img_attribs['width'] = $scale * $size_arr[0];
+					$img_attribs['height'] = $scale * $size_arr[1];
+				}
+				else
+				{ // No need to resize
+					$img_attribs['width'] = $size_arr[0];
+					$img_attribs['height'] = $size_arr[1];
 				}
 			}
 		}
@@ -2715,7 +2773,7 @@ class File extends DataObject
 	 * @param string Position
 	 * @return integer Link ID
 	 */
-	function link_to_Object( & $LinkOwner, $set_order = 1, $position = NULL )
+	function link_to_Object( & $LinkOwner, $set_order = 0, $position = NULL )
 	{
 		global $DB;
 
@@ -2723,20 +2781,6 @@ class File extends DataObject
 
 		$order = $set_order;
 		$existing_Links = & $LinkOwner->get_Links();
-
-		// Find highest order
-		foreach( $existing_Links as $loop_Link )
-		{
-			if( $loop_Link->file_ID == $this->ID )
-			{ // The file is already linked to this owner
-				return;
-			}
-			$existing_order = $loop_Link->get('order');
-			if( $set_order == 1 && $existing_order >= $order )
-			{ // Set order if $set_order is default
-				$order = $existing_order + 1;
-			}
-		}
 
 		// Load meta data AND MAKE SURE IT IS CREATED IN DB:
 		$this->load_meta( true );
@@ -2763,7 +2807,9 @@ class File extends DataObject
 	 * Used when try to delete a file, which is attached to a post, or to a user
 	 *
 	 * @param array restriction
-	 * @return string message with links to objects
+	 * @return string|boolean Message with link to objects,
+	 *                        Empty string if no restriction for current table,
+	 *                        FALSE - if no rule for current table
 	 */
 	function get_restriction_link( $restriction )
 	{
@@ -3160,7 +3206,9 @@ class File extends DataObject
 	{
 		$download_count = $this->download_count + $count;
 		$this->set( 'download_count', $download_count );
- 		$this->dbupdate();
+		// Update only the field 'download_count',
+		// but do NOT update last touched dates of the Link Owners of this File:
+		$this->dbupdate( false );
 
 		return $download_count;
 	}

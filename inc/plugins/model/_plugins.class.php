@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -152,12 +152,12 @@ class Plugins
 		// Set plugin path:
 		$this->plugins_path = $basepath.$plugins_subdir;
 
-		$Timer->resume( 'plugin_init' );
+		$Timer->resume( 'plugins_init' );
 
 		// Load events for enabled plugins:
 		$this->load_events();
 
-		$Timer->pause( 'plugin_init' );
+		$Timer->pause( 'plugins_init' );
 	}
 
 
@@ -639,23 +639,15 @@ class Plugins
 	 */
 	function init_settings( & $Plugin )
 	{
-		if( version_compare( PHP_VERSION, '5.1', '>=' ) )
-		{ // we use overloading for PHP5, therefor the member has to be unset:
-			// Note: this is somehow buggy at least in PHP 5.0.5, therefor we use it from 5.1 on.
-			//       see http://forums.b2evolution.net/viewtopic.php?p=49031#49031
-			unset( $Plugin->Settings );
-			unset( $Plugin->UserSettings );
+		// we use overloading for PHP5, therefor the member has to be unset:
+		// Note: this is somehow buggy at least in PHP 5.0.5, therefor we use it from 5.1 on.
+		//       see http://forums.b2evolution.net/viewtopic.php?p=49031#49031
+		unset( $Plugin->Settings );
+		unset( $Plugin->UserSettings );
+		unset( $Plugin->GroupSettings );
 
-			// Nothing to do here, will get called through Plugin::__get() when accessed
-			return;
-		}
-
-		// PHP < 5.1: instantiate now, but only for installed plugins (needs DB).
-		if( $Plugin->ID > 0 )
-		{
-			$this->instantiate_Settings( $Plugin, 'Settings' );
-			$this->instantiate_Settings( $Plugin, 'UserSettings' );
-		}
+		// Nothing to do here, will get called through Plugin::__get() when accessed
+		return;
 	}
 
 
@@ -670,7 +662,7 @@ class Plugins
 	 *           Defaults would need to be handled by Plugin(User)Settings::get_default() then.
 	 *
 	 * @param Plugin
-	 * @param string settings type: "Settings" or "UserSettings"
+	 * @param string settings type: "Settings", "UserSettings" or "GroupSettings"
 	 * @return boolean NULL, if no Settings
 	 */
 	function instantiate_Settings( & $Plugin, $set_type )
@@ -685,28 +677,39 @@ class Plugins
 		// when is_installed=true).
 		$method = 'GetDefault'.$set_type;
 		$params = array('for_editing'=>false);
-		$Timer->resume( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 		$defaults = $Plugin->$method( $params );
-		$Timer->pause( $Plugin->classname.'_(#'.$Plugin->ID.')' );
 
 		if( $set_type == 'Settings' )
-		{	// If general settings are requested we should also append messages and emails settings:
-			if( empty( $defaults ) )
-			{
+		{	// If general settings are requested we should also append custom, collection, widgets, messages, emails and shared settings:
+			if( ! is_array( $defaults ) )
+			{	// Initialize array for default settings:
 				$defaults = array();
 			}
+
+			// Initialize object for Settings temporary because it may be used in the functions below to get default values:
+			load_class( 'plugins/model/_pluginsettings.class.php', 'PluginSettings' );
+			$Plugin->Settings = new PluginSettings( $Plugin->ID );
+
+			$defaults = array_merge( $defaults, $Plugin->get_custom_setting_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_msg_setting_definitions( $params ) );
 			$defaults = array_merge( $defaults, $Plugin->get_email_setting_definitions( $params ) );
+			$defaults = array_merge( $defaults, $Plugin->get_shared_setting_definitions( $params ) );
+
+			// Check what other settings are defined for the Plugin,
+			// We should not merge them with $defaults because they are stored in different DB table,
+			// I.e. they are should be initialized in $Plugin->Settings, but we still need this object for a proper settings work:
+			$other_defaults = $Plugin->get_coll_setting_definitions( $params );
+			$other_defaults = array_merge( $other_defaults, $Plugin->get_widget_param_definitions( $params ) );
 		}
 
-		if( empty( $defaults ) )
-		{ // No settings, no need to instantiate.
+		if( empty( $defaults ) && empty( $other_defaults ) )
+		{	// No settings, no need to instantiate:
 			$Timer->pause( 'plugins_inst_'.$set_type );
 			return NULL;
 		}
 
-		if( ! is_array($defaults) )
-		{ // invalid data
+		if( ! is_array( $defaults ) )
+		{	// Invalid format of default settings:
 			$Debuglog->add( $Plugin->classname.'::GetDefault'.$set_type.'() did not return array!', array('plugins', 'error') );
 			return NULL; // fp> correct me if I'm wrong.
 		}
@@ -718,6 +721,14 @@ class Plugins
 			$Plugin->UserSettings = new PluginUserSettings( $Plugin->ID );
 
 			$set_Obj = & $Plugin->UserSettings;
+		}
+		elseif( $set_type == 'GroupSettings' )
+		{	// Group specific settings:
+			load_class( 'plugins/model/_plugingroupsettings.class.php', 'PluginGroupSettings' );
+
+			$Plugin->GroupSettings = new PluginGroupSettings( $Plugin->ID );
+
+			$set_Obj = & $Plugin->GroupSettings;
 		}
 		else
 		{ // Global settings:
@@ -744,6 +755,10 @@ class Plugins
 			elseif( isset( $l_meta['type'] ) && strpos( $l_meta['type'], 'array' ) === 0 )
 			{
 				$set_Obj->_defaults[$l_name] = array();
+			}
+			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'checklist' )
+			{
+				$set_Obj->_defaults[$l_name] = NULL;
 			}
 			elseif( isset( $l_meta['type'] ) && $l_meta['type'] == 'input_group' && is_array( $l_meta['inputs'] ) )
 			{	// Get default values from input group fields:
@@ -1510,11 +1525,11 @@ class Plugins
 
 		$Debuglog->add( sprintf( 'Loading plugin %s by class name.', $classname ), 'plugins' );
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Load Plugin data by class name' );
 		$SQL->SELECT( 'plug_ID, plug_priority, plug_classname, plug_code, plug_name, plug_shortdesc, plug_status, plug_version, plug_spam_weight' );
 		$SQL->FROM( 'T_plugins' );
 		$SQL->WHERE( 'plug_classname = '.$DB->quote( $classname ) );
-		if( $plugin = $DB->get_row( $SQL->get(), ARRAY_A ) )
+		if( $plugin = $DB->get_row( $SQL, ARRAY_A ) )
 		{
 			if( isset( $this->index_ID_rows[$plugin['plug_ID']] ) )
 			{ // Plugin already was loaded before
@@ -1540,7 +1555,7 @@ class Plugins
 	 *
 	 * @param String setting name ( 'coll_apply_rendering', 'coll_apply_comment_rendering' )
 	 * @param Object the Blog which apply rendering setting should be loaded
-	 * @param string Setting type: 'coll', 'msg', 'email'
+	 * @param string Setting type: 'coll', 'msg', 'email', 'shared'
 	 */
 	function load_index_apply_rendering( $setting_name, & $Blog, $type = 'coll' )
 	{
@@ -1584,6 +1599,11 @@ class Plugins
 				case 'email':
 					// Get plugin email setting value:
 					$rendering_value = $Plugin->get_email_setting( $setting_name );
+					break;
+
+				case 'shared':
+					// Get plugin shared setting value:
+					$rendering_value = 'opt-in';
 					break;
 
 				default:
@@ -1838,7 +1858,7 @@ class Plugins
 	 *
 	 * @param array|string A single event or a list thereof
 	 * @param boolean Make sure there's at least one plugin that provides them all?
-	 *                This is useful for event pairs like "CaptchaPayload" and "CaptchaValidated", which
+	 *                This is useful for event pairs like "RequestCaptcha" and "ValidateCaptcha", which
 	 *                should be served by the same plugin.
 	 * @return boolean
 	 */
@@ -2005,14 +2025,26 @@ class Plugins
 			$setting_name = 'email_apply_rendering';
 			$setting_type = 'email';
 		}
-		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
-		{ // Validate the given rendering option in the give Blog
-			$Collection = $Blog = & $params['Blog'];
+		elseif( isset( $params['setting_name'] ) )
+		{	// Validate the given rendering option:
 			$setting_name = $params['setting_name'];
-			$setting_type = 'coll';
-			if( !in_array( $setting_name, array( 'coll_apply_rendering', 'coll_apply_comment_rendering' ) ) )
-			{
-				debug_die( 'Invalid apply rendering param name received!' );
+			if( isset( $params['Blog'] ) )
+			{	// If Collection is given:
+				$Collection = $Blog = & $params['Blog'];
+				$setting_type = 'coll';
+				if( $setting_name == 'shared_apply_rendering' )
+				{	// Force to posts/items rendering settings:
+					$setting_name = 'coll_apply_rendering';
+				}
+				if( !in_array( $setting_name, array( 'coll_apply_rendering', 'coll_apply_comment_rendering', 'shared_apply_rendering' ) ) )
+				{
+					debug_die( 'Invalid apply rendering param name received!' );
+				}
+			}
+			if( $setting_name == 'shared_apply_rendering' )
+			{	// Set shared type instead of collection for this spec setting name:
+				$Collection = $Blog = NULL;
+				$setting_type = 'shared';
 			}
 		}
 		else
@@ -2020,7 +2052,7 @@ class Plugins
 			return array();
 		}
 
-		$blog_ID = !is_null( $Blog ) ? $Blog->ID : 0;
+		$blog_ID = empty( $Blog ) ? 0 : $Blog->ID;
 
 		// Make sure the requested apply_rendering settings are loaded
 		$this->load_index_apply_rendering( $setting_name, $Blog, $setting_type );
@@ -2132,6 +2164,10 @@ class Plugins
 		{	// get EmailCampaign apply_rendering setting:
 			$setting_name = $params['setting_name'];
 		}
+		elseif( isset( $params['setting_name'] ) && $params['setting_name'] == 'shared_apply_rendering' )
+		{	// get apply_rendering setting for widget from sharaed container:
+			$setting_name = $params['setting_name'];
+		}
 		elseif( isset( $params['Comment'] ) && !empty( $params['Comment'] ) )
 		{ // get Comment apply_rendering setting
 			$Comment = & $params['Comment'];
@@ -2145,10 +2181,17 @@ class Plugins
 			$Item = & $params['Item'];
 			$setting_Blog = & $Item->get_Blog();
 		}
-		elseif( isset( $params['Blog'] ) && isset( $params['setting_name'] ) )
-		{ // get given "apply_rendering" collection setting from the given Blog
-			$setting_Blog = & $params['Blog'];
+		elseif( isset( $params['setting_name'] ) )
+		{	// Get given setting:
 			$setting_name = $params['setting_name'];
+			if( ! empty( $params['Blog'] ) )
+			{	// If Collection is given::
+				$setting_Blog = & $params['Blog'];
+				if( $setting_name == 'shared_apply_rendering' )
+				{	// Force to posts/items rendering settings:
+					$setting_name = 'coll_apply_rendering';
+				}
+			}
 		}
 		else
 		{ // Invalid params
@@ -2163,7 +2206,7 @@ class Plugins
 				break;
 
 			case 'email_apply_rendering':
-				// Get Message renderer plugins
+				// Get Email Campaign renderer plugins
 				$RendererPlugins = $this->get_list_by_events( array('FilterEmailContent') );
 				break;
 
@@ -2172,10 +2215,11 @@ class Plugins
 				$RendererPlugins = $this->get_list_by_events( array('FilterCommentContent') );
 				break;
 
+			case 'shared_apply_rendering':
 			case 'coll_apply_rendering':
 			default:
 				// Get Item renderer plugins
-				$RendererPlugins = $this->get_list_by_events( array('RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText') );
+				$RendererPlugins = $this->get_list_by_events( array( 'RenderItemAsHtml', 'RenderItemAsXml', 'RenderItemAsText', 'DisplayItemAsHtml', 'DisplayItemAsXml', 'DisplayItemAsText' ) );
 				break;
 		}
 
@@ -2186,7 +2230,7 @@ class Plugins
 			{ // No unique code!
 				continue;
 			}
-			if( empty( $setting_Blog ) && $setting_name != 'msg_apply_rendering' && $setting_name != 'email_apply_rendering' )
+			if( empty( $setting_Blog ) && $setting_name != 'msg_apply_rendering' && $setting_name != 'email_apply_rendering' && $setting_name != 'shared_apply_rendering' )
 			{ // If $setting_Blog is not set we can't get collection apply_rendering options
 				continue;
 			}
@@ -2198,6 +2242,10 @@ class Plugins
 			elseif( $setting_name == 'email_apply_rendering' )
 			{	// get rendering setting from plugin email settings:
 				$apply_rendering = $loop_RendererPlugin->get_email_setting( $setting_name );
+			}
+			elseif( $setting_name == 'shared_apply_rendering' )
+			{	// get rendering setting from plugin shared settings:
+				$apply_rendering = $loop_RendererPlugin->get_shared_setting( $setting_name );
 			}
 			else
 			{ // get rendering setting from plugin coll settings
@@ -2334,6 +2382,7 @@ class Plugins
 				global $current_User;
 				if( is_logged_in() && $current_User->check_perm( 'admin', 'normal' ) )
 				{
+					global $admin_url;
 					switch( $setting_name )
 					{
 						case 'msg_apply_rendering':
@@ -2345,8 +2394,15 @@ class Plugins
 
 						case 'email_apply_rendering':
 							if( $current_User->check_perm( 'perm_messaging', 'reply' ) && $current_User->check_perm( 'options', 'edit' ) )
-							{ // Check if current user can edit the messaging settings
+							{ // Check if current user can edit the email settings
 								$settings_url = $admin_url.'?ctrl=email&amp;tab=settings&amp;tab3=renderers';
+							}
+							break;
+
+						case 'shared_apply_rendering':
+							if( $current_User->check_perm( 'options', 'edit' ) )
+							{	// Check if current user can edit the plugin settings for shared container:
+								$settings_url = $admin_url.'?ctrl=plugins&amp;tab=shared';
 							}
 							break;
 
@@ -2378,6 +2434,71 @@ class Plugins
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Display captcha
+	 *
+	 * @param array Associative array of parameters:
+	 *   - 'Form':                   Form object
+	 *   - 'form_type':              Form type
+	 *   - 'form_position':          Current form position where this function is called
+	 *   - 'captcha_info':           Info under the captcha field in note style
+	 *   - 'captcha_info_anonymous': Captcha info for not logged in user when the plugin knows it will NOT ask for captcha in case of logged in users
+	 */
+	function display_captcha( $params = array() )
+	{
+		if( ! isset( $params['Form'] ) ||
+		    ! isset( $params['form_type'] ) ||
+		    ! isset( $params['form_position'] ) )
+		{	// Exit here if the mandatory params are not defined:
+			return;
+		}
+
+		$params = array_merge( array(
+				'captcha_template_question' => '<span class="evo_captcha_question">$captcha_question$</span><br>',
+				'captcha_template_answer'   => '<span class="evo_captcha_answer">$captcha_answer$</span><br>',
+				// Default captcha info text(can be customized by plugin):
+				'captcha_info' => T_('We ask for this in order to slow down spammers.')
+													.'<br>'.T_('Sorry for the inconvenience.')
+													.( is_logged_in() ? '' : '<br>'.T_('Please log in to avoid this antispam check.') ),
+			), $params );
+
+		$form_type = $params['form_type'];
+
+		if( ! isset( $this->captcha_data ) )
+		{	// Initialize array to cache captcha data per current page request:
+			$this->captcha_data = array();
+		}
+
+		if( ! isset( $this->captcha_data[ $form_type ] ) )
+		{	// Load once captcha data per form type and use this for all next calls of this function:
+			$plugin_data = $this->trigger_event_first_return( 'RequestCaptcha', $params );
+			$this->captcha_data[ $form_type ] = isset( $plugin_data['plugin_return'] ) ? $plugin_data['plugin_return'] : false;
+		}
+
+		$captcha_data = $this->captcha_data[ $form_type ];
+
+		if( isset( $captcha_data['captcha_position'], $captcha_data['captcha_html'] ) &&
+		    $captcha_data['captcha_position'] == $params['form_position'] )
+		{	// Display captcha html code only for requested form type and position:
+			$Form = & $params['Form'];
+			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
+			{	// Begin fieldset if it is required from skin file:
+				$Form->begin_fieldset();
+			}
+
+			$Form->info_field( T_('Antispam'), $captcha_data['captcha_html'], array(
+				'note'     => ( isset( $captcha_data['captcha_info'] ) ? $captcha_data['captcha_info'] : $params['captcha_info'] ),
+				'required' => true,
+			) );
+
+			if( ! isset( $params['form_use_fieldset'] ) || $params['form_use_fieldset'] )
+			{	// End fieldset if it is required from skin file:
+				$Form->end_fieldset();
+			}
+		}
 	}
 
 

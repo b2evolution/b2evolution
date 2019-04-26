@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -54,16 +54,6 @@ $Results->cols[] = array(
 /*
  * Sub Type column
  */
-function display_subtype( $link_ID )
-{
-	global $LinkOwner, $current_File;
-
-	$Link = $LinkOwner->get_link_by_link_ID( $link_ID );
-	// Instantiate a File object for this line
-	$current_File = $Link->get_File();
-
-	return $Link->get_preview_thumb();
-}
 $Results->cols[] = array(
 						'th' => T_('Icon/Type'),
 						'td_class' => 'shrinkwrap',
@@ -131,7 +121,7 @@ if( $current_User->check_perm( 'files', 'view' ) )
 
 		$r = '';
 
-		if( isset($current_File) && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
+		if( ! empty( $current_File ) && $current_User->check_perm( 'files', 'view', false, $current_File->get_FileRoot() ) )
 		{
 			if( $current_File->is_dir() )
 				$title = T_('Locate this directory!');

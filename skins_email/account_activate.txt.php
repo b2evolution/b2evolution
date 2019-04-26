@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -80,7 +80,7 @@ if( $Settings->get( 'validation_process' ) == 'easy' )
 }
 else
 { // ---- SECURE activation ---- //
-	$activation_url = get_htsrv_url( true ).'login.php?action=activateacc_sec'
+	$activation_url = get_htsrv_url( 'login' ).'login.php?action=activateacc_sec'
 		.$params['blog_param']
 		.'&reqID='.$params['request_id']
 		.'&sessID='.$Session->ID; // used to detect cookie problems

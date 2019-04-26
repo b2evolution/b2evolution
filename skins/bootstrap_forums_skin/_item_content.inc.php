@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -130,11 +130,6 @@ if( $content_mode == 'auto' )
 			$content_mode = $Blog->get_setting('archive_content');
 			break;
 
-		case 'posts-filtered':
-		case 'search':
-			$content_mode = $Blog->get_setting('filtered_content');
-			break;
-
 		case 'single':
 		case 'page':
 			$content_mode = 'full';
@@ -142,8 +137,11 @@ if( $content_mode == 'auto' )
 
 		case 'posts-default':  // home page 1
 		case 'posts-next':     // next page 2, 3, etc
-		default:
 			$content_mode = $Blog->get_setting('main_content');
+			break;
+
+		default: // posts-filtered, search, flagged and etc.
+			$content_mode = $Blog->get_setting('filtered_content');
 	}
 }
 
@@ -262,6 +260,18 @@ switch( $content_mode )
 					'image_size'          => $params['image_size'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
+					'before_gallery'      => $params['before_gallery'],
+					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
+					'gallery_image_size'  => $params['gallery_image_size'],
+					'gallery_image_limit' => $params['gallery_image_limit'],
+					'gallery_colls'       => $params['gallery_colls'],
+					'gallery_order'       => $params['gallery_order'],
 				) );
 
 			// Display either the "Read more"/"Full story" link OR the #anchor for #direct linking to the "after more" part:

@@ -21,8 +21,6 @@ global $current_User;
  */
 global $Settings;
 
-global $dispatcher;
-
 global $collections_Module, $Plugins;
 
 global $baseurl;
@@ -49,7 +47,7 @@ $Form->begin_fieldset( T_('Default user permissions').get_manual_link('default-u
 
 	$disabled_param_links = array();
 	if( $Settings->get( 'newusers_canregister' ) == 'no' )
-	{ // Disable the field below when registration is not allowed 
+	{ // Disable the field below when registration is not allowed
 		$disabled_param_links['disabled'] = 'disabled';
 	}
 	$Form->checkbox_input( 'registration_is_public', $Settings->get( 'registration_is_public' ), T_('Registration links'), array_merge( array( 'note' => T_('Check to show self-registration links to the public.' ) ), $disabled_param_links ) );
@@ -63,6 +61,9 @@ $Form->begin_fieldset( T_('Default user permissions').get_manual_link('default-u
 	$Form->checkbox_input( 'quick_registration', $Settings->get( 'quick_registration' ), T_('Quick registration'), array_merge( array( 'note' => T_('Check to allow registering with email only (no username, no password) using the quick registration widget.' ) ), $disabled_param_grouplevel ) );
 
 	$GroupCache = & get_GroupCache();
+	$GroupCache->clear();
+	$GroupCache->load_where( 'grp_usage = "primary"' );
+	$GroupCache->all_loaded = true;
 	$Form->select_input_object( 'newusers_grp_ID', $Settings->get( 'newusers_grp_ID' ), $GroupCache, T_('Group for new users'), array_merge( array( 'note' => T_('Groups determine user roles and permissions.') ), $disabled_param_grouplevel ) );
 
 	$Form->text_input( 'newusers_level', $Settings->get( 'newusers_level' ), 1, T_('Level for new users'), T_('Levels determine hierarchy of users in blogs.' ), array_merge( array( 'maxlength' => 1, 'required' => true ), $disabled_param_grouplevel ) );
@@ -80,27 +81,88 @@ $Form->begin_fieldset( T_('Default user settings').get_manual_link('default-user
 	}
 	$Form->checklist( $messaging_options, 'default_user_msgform', T_( 'Other users can send me' ) );
 
-	$notify_options = array(
-		array( 'notify_messages', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I receive a private message.' ),  $Settings->get( 'def_notify_messages' ) ),
-		array( 'notify_unread_messages', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have unread private messages for more than 24 hours.' ),  $Settings->get( 'def_notify_unread_messages' ), false, T_( 'This notification is sent only once every 3 days.' ) ),
-		array( 'notify_published_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is published on one of <strong>my</strong> posts.' ), $Settings->get( 'def_notify_published_comments' ) ),
-		array( 'notify_comment_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is posted and I have permissions to moderate it.' ), $Settings->get( 'def_notify_comment_moderation' ) ),
-		array( 'notify_edit_cmt_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_cmt_moderation' ) ),
-		array( 'notify_spam_cmt_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is reported as spam and I have permissions to moderate it.' ), $Settings->get( 'def_notify_spam_cmt_moderation' ) ),
-		array( 'notify_meta_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a meta comment is posted and I have permission to view it.' ), $Settings->get( 'def_notify_meta_comments' ) ),
-		array( 'notify_post_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is created and I have permissions to moderate it.' ), $Settings->get( 'def_notify_post_moderation' ) ),
-		array( 'notify_edit_pst_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_pst_moderation' ) ),
-	);
-	$Form->checklist( $notify_options, 'default_user_notification', T_( 'Notify me by email whenever' ) );
+	$Form->checklist( array(), 'edited_user_notification', T_('Notify me by email when the following events occur') );
+	$Form->checklist( array(
+			array( 'notify_messages', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I receive a private message.' ),  $Settings->get( 'def_notify_messages' ) ),
+			array( 'notify_unread_messages', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have unread private messages for more than 24 hours.' ),  $Settings->get( 'def_notify_unread_messages' ), false, T_( 'This notification is sent only once every 3 days.' ) ),
+		), 'default_user_notification', T_('Messaging') );
+	$Form->checklist( array(
+			array( 'notify_comment_mentioned', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have been mentioned on a comment.' ), $Settings->get( 'def_notify_comment_mentioned' ) ),
+			array( 'notify_published_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is published on one of <strong>my</strong> posts.' ), $Settings->get( 'def_notify_published_comments' ) ),
+			array( 'notify_comment_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is posted and I have permissions to moderate it.' ), $Settings->get( 'def_notify_comment_moderation' ) ),
+			array( 'notify_edit_cmt_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_cmt_moderation' ) ),
+			array( 'notify_spam_cmt_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is reported as spam and I have permissions to moderate it.' ), $Settings->get( 'def_notify_spam_cmt_moderation' ) ),
+			array( 'notify_meta_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a meta comment is posted and I have permission to view it.' ), $Settings->get( 'def_notify_meta_comments' ) ),
+		), 'default_user_notification', T_('Comments') );
+	$Form->checklist( array(
+			array( 'notify_post_mentioned', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have been mentioned on a post.' ), $Settings->get( 'def_notify_post_mentioned' ) ),
+			array( 'notify_post_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is created and I have permissions to moderate it.' ), $Settings->get( 'def_notify_post_moderation' ) ),
+			array( 'notify_edit_pst_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_pst_moderation' ) ),
+			array( 'notify_post_proposed', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'someone proposed a change on a post and I have permissions to moderate it.' ), $Settings->get( 'def_notify_post_proposed' ) ),
+			array( 'notify_post_assignment', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a post was assigned to me.' ), $Settings->get( 'def_notify_post_assignment' ) ),
+		), 'default_user_notification', T_('Posts') );
 
-	$newsletter_options = array(
-		array( 'newsletter_news', 1, T_( 'Send me news about this site.' ).' <span class="note">'.T_('Each message contains an easy 1 click unsubscribe link.').'</span>', $Settings->get( 'def_newsletter_news' ) ),
-		array( 'newsletter_ads', 1, T_( 'I want to receive ADs that may be relevant to my interests.' ), $Settings->get( 'def_newsletter_ads' ) )
-	);
-	$Form->checklist( $newsletter_options, 'default_user_newsletter', T_( 'Newsletter' ) );
+	$NewsletterCache = & get_NewsletterCache();
+	$NewsletterCache->load_where( 'enlt_active = 1' );
+
+	if( count( $NewsletterCache->cache ) )
+	{	// If at least one newsletter is active:
+		$def_newsletters = ( $Settings->get( 'def_newsletters' ) == '' ? array() : explode( ',', $Settings->get( 'def_newsletters' ) ) );
+		$newsletter_options = array();
+		foreach( $NewsletterCache->cache as $Newsletter )
+		{
+			$newsletter_options[] = array( 'def_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $def_newsletters ) );
+		}
+		$Form->checklist( $newsletter_options, 'def_newsletters', T_( 'Newsletter' ) );
+	}
 
 	$Form->text_input( 'notification_email_limit', $Settings->get( 'def_notification_email_limit' ), 3, T_( 'Limit notification emails to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
-	$Form->text_input( 'newsletter_limit', $Settings->get( 'def_newsletter_limit' ), 3, T_( 'Limit newsletters to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
+	$Form->text_input( 'newsletter_limit', $Settings->get( 'def_newsletter_limit' ), 3, T_( 'Limit lists to' ), T_( 'emails per day' ), array( 'maxlength' => 3, 'required' => true ) );
+
+$Form->end_fieldset();
+
+// --------------------------------------------
+
+$Form->begin_fieldset( T_('Other options').get_manual_link('other-registration-settings') );
+
+	$Form->radio( 'registration_after_quick', $Settings->get( 'registration_after_quick' ), array(
+					array( 'regform', T_('Display additional registration screen as normal registration') ),
+					array( 'continue', T_('Continue directly to next page (note: user will have no password)') ),
+				), T_('After quick registration'), true );
+
+	$Form->checkbox_input( 'registration_require_country', $Settings->get('registration_require_country'), T_('Require country'), array( 'note'=>T_('New users will have to specify their country in order to register.') ) );
+
+	$Form->checkbox_input( 'registration_require_firstname', $Settings->get('registration_require_firstname'), T_('Require first name'), array( 'note'=>T_('New users will have to specify their first name in order to register.') ) );
+
+	$Form->checkbox_input( 'registration_ask_locale', $Settings->get('registration_ask_locale'), T_('Ask for language'), array( 'note'=>T_('New users will be prompted for their preferred language/locale.') ) );
+
+	$Form->radio( 'registration_require_gender',$Settings->get('registration_require_gender'), array(
+					array( 'hidden', T_('Hidden') ),
+					array( 'optional', T_('Optional') ),
+					array( 'required', T_('Required') ),
+				), T_('Gender'), true );
+
+	if( $Settings->get( 'after_registration' ) == 'return_to_original' || $Settings->get( 'after_registration' ) == 'specific_slug' )
+	{ // return to original url
+		$after_registration = $Settings->get( 'after_registration' );
+		$after_registration_url = url_add_param( $baseurl, 'disp=profile' );
+	}
+	else
+	{ // set specific URL
+		$after_registration = 'specific_url';
+		$after_registration_url = $Settings->get( 'after_registration' );
+	}
+	$Form->radio( 'after_registration', $after_registration, array(
+					array( 'return_to_original', T_( 'Return to original page' ) ),
+					array( 'specific_url', T_( 'Go to specific URL' ).':', '',
+						'<input type="text" id="specific_after_registration_url" class="form_text_input form-control" name="specific_after_registration_url" size="50" maxlength="120" value="'
+						.format_to_output( $after_registration_url, 'formvalue' ).'"
+						onfocus="document.getElementsByName(\'after_registration\')[1].checked=true;" />' ),
+					array( 'specific_slug', T_( 'Go to specific slug' ).':', '',
+						'<input type="text" id="specific_after_registration_slug" class="form_text_input form-control" name="specific_after_registration_slug" size="50" maxlength="120" value="'
+						.format_to_output( $Settings->get( 'after_registration_slug' ), 'formvalue' ).'"
+						onfocus="document.getElementsByName(\'after_registration\')[2].checked=true;" />' )
+				), T_( 'After registration' ), true );
 
 $Form->end_fieldset();
 
@@ -139,47 +201,17 @@ $Form->begin_fieldset( T_('Account activation').get_manual_link('account-activat
 						onfocus="document.getElementsByName(\'after_email_validation\')[1].checked=true;" />' )
 				), T_( 'After email activation' ), true );
 
-$Form->end_fieldset();
-
-// --------------------------------------------
-
-$Form->begin_fieldset( T_('Other options').get_manual_link('other-registration-settings') );
-
-	$Form->checkbox_input( 'registration_require_country', $Settings->get('registration_require_country'), T_('Require country'), array( 'note'=>T_('New users will have to specify their country in order to register.') ) );
-
-	$Form->checkbox_input( 'registration_require_firstname', $Settings->get('registration_require_firstname'), T_('Require first name'), array( 'note'=>T_('New users will have to specify their first name in order to register.') ) );
-
-	$Form->checkbox_input( 'registration_ask_locale', $Settings->get('registration_ask_locale'), T_('Ask for language'), array( 'note'=>T_('New users will be prompted for their preferred language/locale.') ) );
-
-	$Form->radio( 'registration_require_gender',$Settings->get('registration_require_gender'), array(
-					array( 'hidden', T_('Hidden') ),
-					array( 'optional', T_('Optional') ),
-					array( 'required', T_('Required') ),
-				), T_('Gender'), true );
-
-	if( $Settings->get( 'after_registration' ) == 'return_to_original' )
-	{ // return to original url
-		$after_registration = 'return_to_original';
-		$after_registration_url = url_add_param( $baseurl, 'disp=profile' );
-	}
-	else
-	{ // set specific URL
-		$after_registration = 'specific_url';
-		$after_registration_url = $Settings->get( 'after_registration' );
-	}
-	$Form->radio( 'after_registration', $after_registration, array(
-					array( 'return_to_original', T_( 'Return to original page' ) ),
-					array( 'specific_url', T_( 'Go to specific URL' ).':', '',
-						'<input type="text" id="specific_after_registration_url" class="form_text_input form-control" name="specific_after_registration_url" size="50" maxlength="120" value="'
-						.format_to_output( $after_registration_url, 'formvalue' ).'"
-						onfocus="document.getElementsByName(\'after_registration\')[1].checked=true;" />' )
-				), T_( 'After registration' ), true );
+	$Form->checklist( array(
+			array( 'pass_after_quick_reg', 1, T_('If no password has been set yet (email capture/quick registration), go to password setting page first.'), $Settings->get( 'pass_after_quick_reg' ) )
+		), '', '' );
 
 $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Security options').get_manual_link('registration-security-settings') );
+$Form->begin_fieldset( T_('Security options').get_manual_link('registration-security-settings'), array( 'id' => 'security_options' ) );
+
+	$Form->checkbox( 'require_ssl', (bool)$Settings->get( 'require_ssl' ), T_('Require SSL'), T_('Force all login, registration, password recovery & password change forms to use <code>https</code>, even if they would normally use <code>http</code>.') );
 
 	$plugins_note = '';
 	$plugin_params = $Plugins->trigger_event_first_true( 'LoginAttemptNeedsRawPassword' );
@@ -190,14 +222,10 @@ $Form->begin_fieldset( T_('Security options').get_manual_link('registration-secu
 	}
 	$Form->checkbox_input( 'js_passwd_hashing', (bool)$Settings->get('js_passwd_hashing'), T_('Password hashing during Login'), array( 'note' => T_('Check to enable the login form to hash the password with Javascript before transmitting it. This provides extra security on non-SSL connections.').$plugins_note ) );
 
-	$Form->checkbox_input( 'http_auth_require', $Settings->get( 'http_auth_require' ), T_('HTTP Authentication'), array( 'note' => T_( 'Check this to require HTTP basic authentication on any login page.' ) ) );
-
-	$http_auth_accept_params = array( 'note' => T_( 'Check this to accept HTTP authentication headers (with any request when user is not already logged in).' ) );
-	if( $Settings->get( 'http_auth_require' ) )
-	{
-		$http_auth_accept_params['disabled'] = 'disabled';
-	}
-	$Form->checkbox_input( 'http_auth_accept', $Settings->get( 'http_auth_accept' ), '', $http_auth_accept_params );
+	$Form->checklist( array(
+			array( 'http_auth_require', 1, T_('Check this to require HTTP basic authentication on any login page.'), $Settings->get( 'http_auth_require' ) ),
+			array( 'http_auth_accept', 1, T_('Check this to accept HTTP authentication headers (with any request when user is not already logged in).'), $Settings->get( 'http_auth_accept' ), $Settings->get( 'http_auth_require' ) ),
+		), 'http_auth', T_('HTTP Authentication') );
 
 	$Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'), T_('characters.'), array( 'maxlength'=>2, 'required'=>true ) );
 
@@ -215,7 +243,7 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=newusers_canregister]' ).click( function()
 {
 	if( jQuery( this ).val() == 'yes' )

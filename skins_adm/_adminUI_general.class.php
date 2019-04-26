@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -113,6 +113,16 @@ class AdminUI_general extends Menu
 	 * @var string
 	 */
 	var $coll_list_onclick = NULL;
+	/**
+	 * Collection List buttons: display a link to add new collection
+	 * @var boolean
+	 */
+	var $coll_list_disp_add = true;
+	/**
+	 * Collection List buttons: display a list of sections
+	 * @var boolean
+	 */
+	var $coll_list_disp_sections = false;
 
 
 	/**
@@ -124,11 +134,24 @@ class AdminUI_general extends Menu
 
 
 	/**
+	 * Page bread crumb path
+	 */
+	var $display_breadcrumbpath = array();
+
+
+	/**
 	 * Titles of bread crumb paths
 	 *
 	 * Used to build a html <title> tag
 	 */
 	var $breadcrumb_titles = array();
+
+	/**
+	 * Titles of bread crumb paths
+	 *
+	 * Used to build a html <title> tag
+	 */
+	var $display_breadcrumb_titles = array();
 
 	/**
 	 * Manual link for entire pages, used to get a big scope describing functionalities.
@@ -213,6 +236,11 @@ class AdminUI_general extends Menu
 		$this->page_manual_link = get_manual_link( '', NULL, T_('View manual'), 5 );
 	}
 
+	function display_breadcrumbpath_init()
+	{
+		$this->display_breadcrumbpath = array();
+	}
+
 	/**
 	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
 	*
@@ -241,6 +269,43 @@ class AdminUI_general extends Menu
 
 		$this->breadcrumbpath[] = $html;
 		$this->breadcrumb_titles[] = strip_tags( $text );
+	}
+
+	/**
+	* Note: These are not real breadcrumbs. It's just "so to speak" for a hierarchical path.
+	*
+	* @param string Text
+	* @param string Url
+	* @param string Title for help
+	* @param string Additional attributes for link tag
+	*/
+	function display_breadcrumbpath_add( $text, $url = NULL, $help = NULL, $attrs = '' )
+	{
+		global $Collection, $Blog, $current_User;
+
+		$blog_ID = isset($Blog) ? $Blog->ID : 0;
+		if( ! empty( $url ) )
+		{
+			$url = str_replace( '$blog$', $blog_ID, $url );
+
+			$html = $text;
+			if( $current_User->check_perm( 'admin', 'normal' ) )
+			{
+				$html = '<a href="'.$url.'"'.( !empty( $attrs ) ? ' '.$attrs : '' ).'>'.$text.'</a>';
+			}
+		}
+		else
+		{
+			$html = $text;
+		}
+
+		if( ! empty( $help ) )
+		{
+			$html .= ' <abbr title="'.$help.'">?</abbr>';
+		}
+
+		$this->display_breadcrumbpath[] = $html;
+		$this->display_breadcrumb_titles[] = strip_tags( $text );
 	}
 
 	/**
@@ -287,6 +352,47 @@ class AdminUI_general extends Menu
 			}
 
 			$r .= $params['beforeSel'].$this->breadcrumbpath[$i].$params['afterSel'];
+
+			$r .= $params['after'];
+		}
+
+		return $r;
+	}
+
+	/**
+	 * Get breadcrumb path in html format
+	 *
+	 * @param array Params
+	 * @return string Breadcrumb path links
+	 */
+	function display_breadcrumbpath_get_html( $params = array() )
+	{
+		$params = array_merge( array(
+				'before'     => '<div class="col-md-12"><nav aria-label="breadcrumb"><ol class="breadcrumb">',
+				'after'      => '</ol></nav></div>',
+				'beforeText' => '',
+				'beforeEach' => '<li class="breadcrumb-item">',
+				'afterEach'  => '</li>',
+				'beforeSel'  => '<li class="breadcrumb-item active">',
+				'afterSel'   => '</li>',
+				'separator'  => '',
+			), $params );
+
+		$r = '';
+
+		if( $count = count( $this->display_breadcrumbpath ) )
+		{
+			$r = $params['before'].$params['beforeText'];
+
+			for( $i=0; $i<$count-1; $i++ )
+			{
+				$r .= $params['beforeEach']
+						.$this->display_breadcrumbpath[$i]
+						.$params['separator']
+					.$params['afterEach'];
+			}
+
+			$r .= $params['beforeSel'].$this->display_breadcrumbpath[$i].$params['afterSel'];
 
 			$r .= $params['after'];
 		}
@@ -398,7 +504,11 @@ class AdminUI_general extends Menu
 	{
 		global $app_shortname;
 
-		if( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
+		if( ! empty( $this->htmltitle ) )
+		{	// Get html title which is specified for current page:
+			$r = $this->htmltitle;
+		}
+		elseif( $htmltitle = $this->get_prop_for_node( $this->path, array( 'htmltitle' ) ) )
 		{	// Explicit htmltitle set:
 			$r = $htmltitle;
 		}
@@ -559,7 +669,7 @@ class AdminUI_general extends Menu
 		}
 
 		$skin_wrapper_class = 'skin_wrapper';
-		if( is_logged_in() )
+		if( show_toolbar() )
 		{ // user is logged in
 			if( $this->get_show_evobar() )
 			{ // show evobar options is enabled for this admin skin
@@ -620,9 +730,16 @@ class AdminUI_general extends Menu
 			return;
 		}
 
+		global $mode;
+		if( $mode == 'customizer' )
+		{	// Don't display this content on skin customizer mode:
+			return;
+		}
+
 		$params = array_merge( array(
 				'display_menu2' => true,
 				'display_menu3' => true,
+				'display_breadcrumb' => true
 			), $params );
 
 		global $Plugins;
@@ -637,13 +754,19 @@ class AdminUI_general extends Menu
 			$path0 = $this->get_path(0);
 			$r = $this->get_html_menu( $path0, 'sub', 0, ! $params['display_menu2'] );
 
-			echo $this->replace_vars( $r );
 			//echo ' disp_submenu-END ';
+
+			// Show breadcrumbs
+			if( $params['display_breadcrumb'] )
+			{
+				echo $this->display_breadcrumbpath_get_html();
+			}
 
 			// Show 3rd level menu for settings tab
 			$path1 = $this->get_path(1);
-			echo $this->get_html_menu( array($path0, $path1), 'menu3', 0, ! $params['display_menu3'] );
+			$r .= $this->get_html_menu( array($path0, $path1), 'menu3', 0, ! $params['display_menu3'] );
 
+			echo $this->replace_vars( $r );
 
 			$this->displayed_sub_begin = 1;
 		}
@@ -724,9 +847,11 @@ class AdminUI_general extends Menu
 	 * @param string Title for "all" button
 	 * @param string URL for "all" button
 	 * @param string onclick attribute format string, with %s for blog number. (NOTE: %s so that we can use this.value when selected through list)
+	 * @param boolean TRUE to display a link to add new collection
+	 * @param boolean TRUE to display a list of sections
 	 */
 	function set_coll_list_params( $permname = 'blog_ismember', $permlevel = 1, $url_params = array(),
-							$all_title = NULL, $all_url = '', $onclick = NULL )
+							$all_title = NULL, $all_url = '', $onclick = NULL, $display_add_link = true, $display_sections = false )
 	{
 		$this->coll_list_all_title = $all_title;
 		$this->coll_list_all_url = $all_url;
@@ -734,6 +859,8 @@ class AdminUI_general extends Menu
 		$this->coll_list_permlevel = $permlevel;
 		$this->coll_list_url_params = $url_params;
 		$this->coll_list_onclick = $onclick;
+		$this->coll_list_disp_add = $display_add_link;
+		$this->coll_list_disp_sections = $display_sections;
 	}
 
 
@@ -759,7 +886,7 @@ class AdminUI_general extends Menu
 		foreach( $this->coll_list_url_params as $name => $value )
 		{
 			$url_params .= $name.'='.$value.'&amp;';
-			$form_params .= '<input type="hidden" name="'.$name.'" value="'.$value.'" />';
+			$form_params .= '<input type="hidden" name="'.format_to_output( $name, 'htmlattr' ).'" value="'.format_to_output( $value, 'formvalue' ).'" />';
 		}
 
 		$template = $this->get_template( 'CollectionList' );
@@ -781,7 +908,7 @@ class AdminUI_general extends Menu
 			{ // If blog is favorute OR current blog, Add blog as a button:
 				$buttons .= $template[ $l_blog_ID == $blog ? 'beforeEachSel' : 'beforeEach' ];
 
-				$buttons .= '<a href="'.$url_params.'blog='.$l_blog_ID
+				$buttons .= '<a href="'.format_to_output( $url_params.'blog='.$l_blog_ID, 'htmlattr' )
 							.'" class="'.( $l_blog_ID == $blog ? 'CurrentBlog' : 'OtherBlog' ).'"';
 
 				if( !is_null($this->coll_list_onclick) )
@@ -809,7 +936,7 @@ class AdminUI_general extends Menu
 				{
 					$select_options .= ' selected="selected"';
 				}
-				$select_options .= '>'.$l_Blog->dget( 'shortname', 'formvalue' ).'</option>';
+				$select_options .= '>'.$l_Blog->dget( 'shortname', 'htmlbody' ).'</option>';
 			}
 		}
 
@@ -820,9 +947,9 @@ class AdminUI_general extends Menu
 		if( !empty( $this->coll_list_all_title ) )
 		{ // We want to add an "all" button
 			$r .= $template[ $blog == 0 ? 'beforeEachSel' : 'beforeEach' ];
-			$r .= '<a href="'.$this->coll_list_all_url
+			$r .= '<a href="'.format_to_output( $this->coll_list_all_url, 'htmlattr' )
 						.'" class="'.( $blog == 0 ? 'CurrentBlog' : 'OtherBlog' ).'">'
-						.$this->coll_list_all_title.'</a> ';
+						.format_to_output( $this->coll_list_all_title, 'htmlbody' ).'</a> ';
 			$r .= $template[ $blog == 0 ? 'afterEachSel' : 'afterEach' ];
 		}
 
@@ -1145,9 +1272,11 @@ class AdminUI_general extends Menu
 					'customstart' => '',
 					'customend' => "\n",
 					'note_format' => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend' => '',
 				);
 
+			case 'accordion_form':
 			case 'compact_form':
 			case 'Form':
 				// Default Form settings:
@@ -1174,6 +1303,7 @@ class AdminUI_general extends Menu
 					'customstart' => '<div class="custom_content">',
 					'customend' => "</div>\n",
 					'note_format' => ' <span class="notes">%s</span>',
+					'bottom_note_format' => ' <div><span class="notes">%s</span></div>',
 					'formend' => '',
 				);
 
@@ -1504,7 +1634,7 @@ class AdminUI_general extends Menu
 			<div id="headinfo">
 				<span id="headfunctions">'
 					// Note: if we log in with another user, we may not have the perms to come back to the same place any more, thus: redirect to admin home.
-					.'<a href="'.get_htsrv_url( true ).'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $admin_url, get_htsrv_url( true ) ) ).'">'.T_('Log out').'</a>
+					.'<a href="'.get_htsrv_url( 'login' ).'login.php?action=logout&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $admin_url, get_htsrv_url( 'login' ) ) ).'">'.T_('Log out').'</a>
 					<img src="'.$rsc_url.'icons/close.gif" width="14" height="14" border="0" class="top" alt="" title="'
 					.T_('Log out').'" /></a>
 				</span>
@@ -1575,6 +1705,16 @@ class AdminUI_general extends Menu
 	function get_show_evobar()
 	{
 		return true;
+	}
+
+
+	/**
+	 * Display tabs for customizer mode in left iframe
+	 *
+	 * @param array Params
+	 */
+	function display_customizer_tabs( $params = array() )
+	{
 	}
 }
 

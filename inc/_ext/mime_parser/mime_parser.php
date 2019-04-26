@@ -32,7 +32,7 @@ define('MIME_ADDRESS_FIRST',            2);
 	<package>net.manuellemos.mimeparser</package>
 
 	<version>@(#) $Id: mime_parser.php 1180 2012-04-05 00:48:28Z sam2kb $</version>
-	<copyright>Copyright © (C) Manuel Lemos 2006 - 2008</copyright>
+	<copyright>Copyright Â© (C) Manuel Lemos 2006 - 2008</copyright>
 	<title>MIME parser</title>
 	<author>Manuel Lemos</author>
 	<authoraddress>mlemos-at-acm.org</authoraddress>
@@ -2143,7 +2143,8 @@ class mime_parser_class
 		$results = array();
 		if(!IsSet($message['Headers']['content-type:']))
 			$content_type = 'text/plain';
-		elseif(count($message['Headers']['content-type:']) == 1)
+		elseif( ( is_array( $message['Headers']['content-type:'] ) && count( $message['Headers']['content-type:'] ) == 1 ) ||
+		        is_string( $message['Headers']['content-type:'] ) )
 			$content_type = $message['Headers']['content-type:'];
 		else
 		{

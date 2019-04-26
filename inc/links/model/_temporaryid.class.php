@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,7 @@ class TemporaryID extends DataObject
 {
 	var $type;
 	var $coll_ID;
+	var $item_ID;
 
 	/**
 	 * Constructor
@@ -40,6 +41,7 @@ class TemporaryID extends DataObject
 			$this->ID = $db_row->tmp_ID;
 			$this->type = $db_row->tmp_type;
 			$this->coll_ID = $db_row->tmp_coll_ID;
+			$this->item_ID = $db_row->tmp_item_ID;
 		}
 	}
 }

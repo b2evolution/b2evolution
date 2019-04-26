@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  *
@@ -82,6 +82,16 @@ $Comment = & $params['Comment'];
 						'after'     => ' ',
 						'text' 			=> T_('Pingback'),
 						'nofollow'	=> true,
+					) );
+				$Comment->author( /* TRANS: author name */ T_('by').' ', '#', '', '#', 'htmlbody', true );
+				break;
+
+			case 'webmention': // Display a webmention:
+				$Comment->permanent_link( array(
+						'before'   => '',
+						'after'    => ' ',
+						'text'     => T_('Webmention'),
+						'nofollow' => true,
 					) );
 				$Comment->author( /* TRANS: author name */ T_('by').' ', '#', '', '#', 'htmlbody', true );
 				break;

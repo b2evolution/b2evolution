@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
@@ -45,6 +45,7 @@ switch( $action )
 					'fm_enable_roots_user',
 					'fm_enable_roots_shared',
 					'fm_enable_roots_skins',
+					'fm_enable_roots_plugins',
 					'fm_enable_create_dir',
 					'fm_default_chmod_dir',
 					'fm_enable_create_file',
@@ -81,17 +82,16 @@ switch( $action )
 			param( 'fm_enable_roots_skins', 'integer', 0 );
 			$Settings->set( 'fm_enable_roots_skins', $fm_enable_roots_skins );
 
+			param( 'fm_enable_roots_plugins', 'integer', 0 );
+			$Settings->set( 'fm_enable_roots_plugins', $fm_enable_roots_plugins );
+
 			param( 'fm_enable_create_dir', 'integer', 0 );
 			$Settings->set( 'fm_enable_create_dir', $fm_enable_create_dir );
 
 			// Default dir CHMOD:
 			if( param( 'fm_default_chmod_dir', 'string', NULL ) !== NULL )
 			{
-				if( ! preg_match('~^[0-7]{3}$~', $fm_default_chmod_dir) )
-				{
-					param_error('fm_default_chmod_dir', T_('Invalid CHMOD value. Use 3 digits.'));
-				}
-
+				param_check_regexp( 'fm_default_chmod_dir', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
 				$Settings->set( 'fm_default_chmod_dir', $fm_default_chmod_dir );
 			}
 
@@ -101,11 +101,7 @@ switch( $action )
 			// Default files CHMOD:
 			if( param( 'fm_default_chmod_file', 'string', NULL ) !== NULL )
 			{
-				if( ! preg_match('~^[0-7]{3}$~', $fm_default_chmod_file) )
-				{
-					param_error('fm_default_chmod_file', T_('Invalid CHMOD value. Use 3 digits.'));
-				}
-
+				param_check_regexp( 'fm_default_chmod_file', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
 				$Settings->set( 'fm_default_chmod_file', $fm_default_chmod_file );
 			}
 

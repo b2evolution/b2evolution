@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -20,6 +20,11 @@
  * Do the MAIN initializations:
  */
 require_once dirname(__FILE__).'/../conf/_config.php';
+
+/**
+ * @global boolean Is this AJAX request? Use {@link is_ajax_request()} to query it, because it may change.
+ */
+$is_ajax_request = true;
 
 /**
  * HEAVY :(
@@ -86,99 +91,8 @@ switch( $action )
 		param( 'query', 'string' );
 		param( 'window_height', 'integer' );
 
-		load_class('_ext/phpwhois/whois.main.php', 'whois' );
-
-		$whois = new Whois();
-
-		// Set to true if you want to allow proxy requests
-		$allowproxy = false;
-
-		// get faster but less acurate results
-		$whois->deep_whois = empty( $_GET['fast'] );
-
-		// To use special whois servers (see README)
-		//$whois->UseServer( 'uk', 'whois.nic.uk:1043?{hname} {ip} {query}' );
-		//$whois->UseServer( 'au', 'whois-check.ausregistry.net.au' );
-
-		// Comment the following line to disable support for non ICANN tld's
-		$whois->non_icann = true;
-
-		$result = $whois->Lookup( $query );
-
-		$winfo = '<pre style="height: '.( $window_height - 200 ).'px; overflow: auto;">';
-		if( ! empty( $result['rawdata'] ) )
-		{
-			for( $i = 0; $i < count( $result['rawdata'] ); $i++ )
-			{
-				// Highlight lines starting with orgname: or org-name: (case insensitive)
-				if( preg_match( '/^(orgname:|org-name:|descr:)/i', $result['rawdata'][$i] ) )
-				{
-					$result['rawdata'][$i] = '<span style="font-weight: bold; background-color: yellow;">'.$result['rawdata'][$i].'</span>';
-				}
-
-				// Make URLs and emails clickable
-				if( preg_match_all( '#[-a-zA-Z0-9@:%_\+.~\#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~\#?&//=;]*)?#si', $result['rawdata'][$i], $matches ) )
-				{
-					foreach( $matches as $match )
-					{
-						if( filter_var( $match[0], FILTER_VALIDATE_EMAIL ) )
-						{ // check if valid email
-							$href_string = 'mailto:'.$match[0];
-							$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'">'.$match[0].'</a>', $result['rawdata'][$i] );
-						}
-						else
-						{ // check if valid URL
-							$href_string = ( ! preg_match( '#^(ht|f)tps?://#', $match[0] ) ) // check if protocol not present
-									? 'http://' . $match[0] // temporarily add one
-									: $match[0]; // use current
-							if( filter_var( $href_string, FILTER_VALIDATE_URL ) )
-							{
-								$result['rawdata'][$i] = str_replace( $match[0], '<a href="'.$href_string.'" target="_blank">'.$match[0].'</a>', $result['rawdata'][$i] );
-							}
-						}
-					}
-				}
-
-				// Make IP ranges clickable
-				if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) &&
-						preg_match_all( '#(?<=\:)(\s*)(\b(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\s?-\s?(?:(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\.){3}(?:25[0-5]|[0-9]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9])\b)#', $result['rawdata'][$i], $matches ) )
-				{
-					if( $current_User->check_perm( 'spamblacklist', 'view' ) )
-					{
-						$aipr_status_titles = aipr_status_titles();
-						$IPRangeCache = & get_IPRangeCache();
-						if( $IPRange = & $IPRangeCache->get_by_ip( $query ) )
-						{ // IP range exists in DB
-							$iprange_status = $IPRange->get( 'status' );
-						}
-						else
-						{ // There is no IP range in DB
-							$iprange_status = '';
-						}
-					}
-
-					if( $IPRange )
-					{
-						if( $current_User->check_perm( 'options', 'view' ) && $current_User->check_perm( 'spamblacklist', 'view' ) )
-						{
-							$result['rawdata'][$i] = str_replace( $matches[2][0],  '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_edit&amp;iprange_ID='.$IPRange->ID.'">'.$matches[2][0].'</a> <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[$iprange_status], $result['rawdata'][$i] );
-						}
-					}
-					else
-					{
-						$result['rawdata'][$i] = str_replace( $matches[2][0],  '<a href="'.$admin_url.'?ctrl=antispam&amp;tab3=ipranges&amp;action=iprange_new&amp;ip='.$query.'">'.$matches[2][0].'</a> <div id="iprange_status_icon" class="status_icon">'.aipr_status_icon( $iprange_status ).'</div>'.$aipr_status_titles[$iprange_status], $result['rawdata'][$i] );
-					}
-				}
-			}
-			$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
-		}
-		else
-		{
-			$winfo = format_to_output( implode( $whois->Query['errstr'], "\n" ) )."<br></br>";
-		}
-		$winfo .= '</pre>';
-
-		echo $winfo;
+		load_funcs( 'antispam/model/_antispam.funcs.php' );
+		echo antispam_get_whois( $query, $window_height );
 		break;
 
 	case 'add_plugin_sett_set':
@@ -242,18 +156,20 @@ switch( $action )
 		{
 			bad_request_die('Invalid Plugin.');
 		}
-		param( 'set_path', '/^\w+(?:\[\w+\])+$/', '' );
+		param( 'param_name', 'string', '' );
+		param( 'param_num', 'integer', '' );
+		$set_path = $param_name.'['.$param_num.']';
 
 		load_funcs('plugins/_plugin.funcs.php');
 
 		// Init the new setting set:
-		_set_setting_by_path( $Plugin, $set_type, $set_path, array() );
+		$set_node = _set_setting_by_path( $Plugin, $set_type, $set_path, array() );
 
 		// Get the new plugin setting set and display it with a fake Form
 		$r = get_plugin_settings_node_by_path( $Plugin, $set_type, $set_path, /* create: */ false );
 
 		$Form = new Form(); // fake Form to display plugin setting
-		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $plugin_Object, $target_Object, $r['set_node'] );
+		autoform_display_field( $set_path, $r['set_meta'], $Form, $set_type, $plugin_Object, $target_Object, $set_node );
 		break;
 
 	case 'edit_comment':
@@ -356,7 +272,7 @@ switch( $action )
 		echo get_opentrash_link( true, true, array(
 				'before' => ' <span id="recycle_bin">',
 				'after' => '</span>',
-				'class' => 'btn btn-default'
+				'class' => 'btn btn-default'.( param( 'request_from', 'string' ) == 'items' ? '' : ' btn-sm' ),
 			) );
 		break;
 
@@ -407,7 +323,7 @@ switch( $action )
 			// In case of comments_fullview we must set a filterset name to be abble to restore filterset.
 			// If $item_ID is not valid, then this requests came from the comments_fullview
 			// TODO: asimo> This should be handled with a better solution
-			$filterset_name = /*'';*/( $item_ID > 0 ) ? '' : 'fullview';
+			$filterset_name = /*'';*/( $item_ID > 0 ) ? '' : ( $comment_type == 'meta' ? 'meta' : 'fullview' );
 
 			echo_item_comments( $blog, $item_ID, $statuses, $currentpage, $limit, array(), $filterset_name, $expiry_status, $comment_type );
 		}
@@ -450,6 +366,10 @@ switch( $action )
 		$currentpage = param( 'currentpage', 'string', 1 );
 		$request_from = param( 'request_from', 'string', 'items' );
 		$comment_type = param( 'comment_type', 'string', 'feedback' );
+
+		// Ininitialize global collection object:
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog );
 
 		// Check minimum permissions ( The comment specific permissions are checked when displaying the comments )
 		$current_User->check_perm( 'blog_ismember', 'view', true, $blog );
@@ -650,6 +570,7 @@ switch( $action )
 				if( $Item->assign_to( $new_assigned_ID, $new_assigned_login ) )
 				{ // An assigned user can be changed
 					$Item->dbupdate();
+					$Item->send_assignment_notification();
 				}
 				else
 				{ // Error on changing of an assigned user
@@ -706,6 +627,7 @@ switch( $action )
 
 		$item_order = param( 'new_item_order', 'string' );
 		$post_ID = param( 'post_ID', 'integer' );
+		$cat_ID = param( 'cat_ID', 'integer', NULL );
 
 		$ItemCache = & get_ItemCache();
 		$Item = & $ItemCache->get_by_ID( $post_ID );
@@ -718,12 +640,11 @@ switch( $action )
 			$item_order = NULL;
 		}
 		else
-		{	// Make an order to integer:
-			$item_order = intval( $item_order );
+		{	// Make an order to double:
+			$item_order = floatval( $item_order );
 		}
 
-		$Item->set( 'order', $item_order, true );
-		$Item->dbupdate();
+		$Item->update_order( $item_order, $cat_ID );
 
 		// Return a link to make the cell editable on next time:
 		echo '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';
@@ -753,6 +674,60 @@ switch( $action )
 			$Chapter->set( 'order', ( $cat_order === '' ? NULL : $cat_order ), true );
 			$Chapter->dbupdate();
 			echo '<a href="#">'.( $cat_order === NULL ? '-' : $cat_order ).'</a>';
+		}
+		break;
+
+	case 'cat_ityp_ID_edit':
+		// Update default Item Type of a chapter from list screen by clicking on the order column:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'catityp' );
+
+		$blog = param( 'blogid', 'integer' );
+		$cat_ityp_ID = param( 'new_ityp_ID', 'string', NULL );
+		$cat_ID = param( 'cat_ID', 'integer' );
+
+		// Check permission:
+		$current_User->check_perm( 'blog_cats', '', true, $blog );
+
+		if( ! empty( $cat_ityp_ID ) )
+		{	// Remove prefix "_" which is used only for correct order in jeditable selector:
+			$cat_ityp_ID = substr( $cat_ityp_ID, 1 );
+		}
+		if( $cat_ityp_ID === false || $cat_ityp_ID === '' )
+		{	// Convert empty value to NULL to update DB:
+			$cat_ityp_ID = NULL;
+		}
+
+		$ChapterCache = & get_ChapterCache();
+		if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) )
+		{	// Update cat Item Type if it exists in DB:
+			$ItemTypeCache = & get_ItemTypeCache();
+			if( ! empty( $cat_ityp_ID ) &&
+			    ( ! ( $ItemType = & $ItemTypeCache->get_by_ID( $cat_ityp_ID, false, false ) ) ||
+			      ! $ItemType->is_enabled( $blog ) ) )
+			{	// Revert back to use previous Item Type if new is wrong for current category:
+				$cat_ityp_ID = $Chapter->get( 'ityp_ID' );
+			}
+			$Chapter->set( 'ityp_ID', $cat_ityp_ID, true );
+			$Chapter->dbupdate();
+			if( $Chapter->get( 'ityp_ID' ) === NULL )
+			{
+				$cat_ityp_title = T_('Same as collection default');
+			}
+			elseif( $Chapter->get( 'ityp_ID' ) == '0' )
+			{
+				$cat_ityp_title = '<b>'.T_('No default type').'</b>';
+			}
+			elseif( $ItemType = & $ItemTypeCache->get_by_ID( $Chapter->get( 'ityp_ID' ), false, false ) )
+			{
+				$cat_ityp_title = $ItemType->get_name();
+			}
+			else
+			{
+				$cat_ityp_title = '<span class="red">'.T_('Not Found').' #'.$Chapter->get( 'ityp_ID' ).'</span>';
+			}
+			echo '<a href="#" rel="_'.$Chapter->get( 'ityp_ID' ).'">'.$cat_ityp_title.'</a>';
 		}
 		break;
 
@@ -910,7 +885,7 @@ switch( $action )
 
 		echo '<div style="background:#FFF;height:80%">'
 				.'<span id="import_files_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
-				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=import&amp;ajax_request=1&amp;root=import_0"'
+				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=import&amp;ajax_request=1&amp;root=import_0&amp;path='.param( 'path', 'string' ).'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
 					.' onload="document.getElementById(\'import_files_loader\').style.display=\'none\'">loading</iframe>'
 			.'</div>';
@@ -921,6 +896,119 @@ switch( $action )
 		// Spec action to test API from ctrl=system:
 		echo 'ok';
 		break;
+
+	case 'get_userlist_automation':
+		// Get automation data for current users list selection:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'users' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'view', true );
+
+		param( 'autm_ID', 'integer', true );
+		param( 'enlt_ID', 'integer', NULL );
+
+		$AutomationCache = & get_AutomationCache();
+		$Automation = & $AutomationCache->get_by_ID( $autm_ID );
+
+		$NewsletterCache = & get_NewsletterCache();
+
+		$autm_data = array();
+
+		if( $enlt_ID === NULL )
+		{	// Get newsletters tied to the automation:
+			$NewsletterCache->load_list( $Automation->get_newsletter_IDs() );
+			$autm_data['newsletters'] = array();
+			foreach( $NewsletterCache->cache as $automation_Newsletter )
+			{
+				$autm_data['newsletters'][ $automation_Newsletter->ID ] = $automation_Newsletter->get( 'name' );
+			}
+		}
+		else
+		{	// Get automation data for selected newsletter:
+			$automation_Newsletter = & $NewsletterCache->get_by_ID( $enlt_ID );
+
+			$autm_data['newsletter_name'] = $automation_Newsletter->get( 'name' );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+			$filterset_user_IDs = get_filterset_user_IDs();
+
+			$no_subs_SQL = new SQL( 'Get a count of not subscribed users' );
+			$no_subs_SQL->SELECT( 'COUNT( user_ID )' );
+			$no_subs_SQL->FROM( 'T_users' );
+			$no_subs_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$automation_Newsletter->ID );
+			$no_subs_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $filterset_user_IDs ).' )' );
+			$no_subs_SQL->WHERE_and( 'enls_subscribed = 0 OR enls_user_ID IS NULL' );
+			$autm_data['users_no_subs_num'] = intval( $DB->get_var( $no_subs_SQL ) );
+
+			$automated_SQL = new SQL( 'Get a count of automated users' );
+			$automated_SQL->SELECT( 'COUNT( user_ID )' );
+			$automated_SQL->FROM( 'T_users' );
+			$automated_SQL->FROM_add( 'INNER JOIN T_automation__user_state ON aust_user_ID = user_ID' );
+			$automated_SQL->WHERE( 'aust_autm_ID = '.$Automation->ID );
+			$automated_SQL->WHERE_and( 'user_ID IN ( '.$DB->quote( $filterset_user_IDs ).' )' );
+			$autm_data['users_automated_num'] = intval( $DB->get_var( $automated_SQL ) );
+
+			$autm_data['users_new_num'] = count( $filterset_user_IDs ) - $autm_data['users_automated_num'];
+		}
+
+		echo evo_json_encode( $autm_data );
+
+		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
+
+	case 'get_campaign_recipients':
+		// Get recipients of Email Campaign depending on requested skip tags:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'view', true );
+
+		param( 'ecmp_ID', 'integer', true );
+		param( 'skip_tags', 'string', '' );
+
+		$EmailCampaignCache = & get_EmailCampaignCache();
+		if( $edited_Campaign = & $EmailCampaignCache->get_by_ID( $ecmp_ID, false, false ) )
+		{	// If Email Campaign is found in DB:
+
+			// Set temporarily the requested skip tags in order to calculate a count of recipients depending on them:
+			$edited_Campaign->set( 'user_tag_sendskip', $skip_tags );
+
+			load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
+			$recipients_data = array(
+				'status'      => 'ok',
+				'skipped_tag' => $edited_Campaign->get_recipients_count( 'skipped_tag' ),
+				'wait'        => $edited_Campaign->get_recipients_count( 'wait' ),
+			);
+		}
+		else
+		{	// Wrong request, unknown Email Campaign:
+			$recipients_data = array(
+				'status' => 'error',
+				'error'  => 'email campaign not found'
+			);
+		}
+
+		echo evo_json_encode( $recipients_data );
+
+		exit(0); // Exit here in order to don't display the AJAX debug info after JSON formatted data
+
+	case 'get_automation_status':
+		// Get automation status:
+
+		// Check permission:
+		$current_User->check_perm( 'options', 'view', true );
+
+		param( 'autm_ID', 'integer', true );
+
+		$AutomationCache = & get_AutomationCache();
+		$Automation = & $AutomationCache->get_by_ID( $autm_ID );
+
+		echo $Automation->get( 'status' );
+
+		exit(0); // Exit here in order to don't display the AJAX debug info.
 
 	default:
 		$incorrect_action = true;

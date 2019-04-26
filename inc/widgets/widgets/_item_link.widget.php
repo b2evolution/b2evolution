@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_link_Widget extends ComponentWidget
 {
+	var $icon = 'external-link';
+
 	/**
 	 * Constructor
 	 */
@@ -151,7 +153,8 @@ class item_link_Widget extends ComponentWidget
 		global $Item;
 
 		if( empty( $Item ) )
-		{ // Don't display this widget when no Item object
+		{	// Don't display this widget when no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
 			return;
 		}
 

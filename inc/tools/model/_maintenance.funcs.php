@@ -7,11 +7,63 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evocore
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+function print_log( $message, $type = NULL, $params = array()  )
+{
+	$params = array_merge( array(
+			'message_before' => '',
+			'message_after' => '<br />',
+			'text_style' => 'normal'
+		), $params );
+
+	switch( $type )
+	{
+		case 'success':
+			$message_before = '<span class="text-success">';
+			$message_after = '</span>';
+			break;
+
+		case 'error':
+			$message_before = '<span class="text-danger">';
+			$message_after = '</span>';
+			break;
+
+		case 'warning':
+			$message_before = '<span class="text-warning">';
+			$message_after = '</span>';
+			break;
+
+		case 'note':
+			$message_before = '<span class="text-info">';
+			$message_after = '</span>';
+			break;
+
+		default:
+			$message_before = '';
+			$message_after = '';
+			break;
+	}
+
+	switch( $params['text_style'] )
+	{
+		case 'bold':
+			$message = '<b>'.$message.'</b>';
+			break;
+
+		case 'italic':
+			$message = '<i>'.$message.'</i>';
+			break;
+	}
+
+	echo $params['message_before'].$message_before.$message.$message_after.$params['message_after'];
+	evo_flush();
+}
 
 
 /**
@@ -23,7 +75,7 @@ function dbm_delete_itemprecache()
 
 	$DB->query('DELETE FROM T_items__prerendering WHERE 1=1');
 
-	$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+	print_log( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
 }
 
 
@@ -36,7 +88,8 @@ function dbm_delete_commentprecache()
 
 	$DB->query('DELETE FROM T_comments__prerendering WHERE 1=1');
 
-	$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+	print_log( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+
 }
 
 
@@ -49,7 +102,7 @@ function dbm_delete_messageprecache()
 
 	$DB->query('DELETE FROM T_messaging__prerendering WHERE 1=1');
 
-	$Messages->add( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
+	print_log( sprintf( T_('Removed %d cached entries.'), $DB->rows_affected ), 'success' );
 }
 
 
@@ -62,17 +115,29 @@ function dbm_delete_pagecache( $display_details = true )
 {
 	global $DB, $Messages, $cache_path;
 
+	if( $display_details )
+	{	// Display message only when it is required:
+		print_log( T_('Clearing page caches:'), 'normal', array( 'text_style' => 'bold' ) );
+		evo_flush();
+
+		echo '<ul>';
+	}
+
 	// Clear general cache directory:
 	$result = cleardir_r( $cache_path.'general' );
 	if( $display_details )
 	{ // Display message only when it is required:
 		if( $result )
 		{
-			$Messages->add_to_group( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ), 'note', T_('Clearing page caches:') );
+			echo '<li>';
+			print_log( sprintf( T_('General cache deleted: %s'), $cache_path.'general' ) );
+			echo '</li>';
 		}
 		else
 		{
-			$Messages->add_to_group( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error', T_('Page cache clearing errors:') );
+			echo '<li>';
+			print_log( sprintf( T_('Could not delete general cache: %s'), $cache_path.'general' ), 'error' );
+			echo '</li>';
 		}
 	}
 
@@ -91,11 +156,15 @@ function dbm_delete_pagecache( $display_details = true )
 			{ // Display message only when it is required:
 				if( $result )
 				{
-					$Messages->add_to_group( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'note', T_('Clearing page caches:') );
+					echo '<li>';
+					print_log( sprintf( T_('Blog %d cache deleted: %s'), $l_blog, $cache_path.'c'.$l_blog ) );
+					echo '</li>';
 				}
 				else
 				{
-					$Messages->add_to_group( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error', T_('Page cache clearing errors:') );
+					echo '<li>';
+					print_log( sprintf( T_('Could not delete blog %d cache: %s'), $l_blog, $cache_path.'c'.$l_blog ), 'error' );
+					echo '</li>';
 				}
 			}
 			// Create .htaccess file with deny rules
@@ -103,7 +172,13 @@ function dbm_delete_pagecache( $display_details = true )
 		}
 	}
 
-	$Messages->add( T_('Page caches deleted.'), 'success' );
+	if( $display_details )
+	{	// Display message only when it is required:
+		echo '</ul>';
+
+		echo '<br />';
+		print_log( T_('Page caches deleted.'), 'success' );
+	}
 }
 
 
@@ -118,7 +193,7 @@ function dbm_delete_filecache()
 	// Delete any ?evocache folders:
 	$deleted_dirs = delete_cachefolders( $Messages );
 
-	$Messages->add( sprintf( T_('Deleted %d directories.'), $deleted_dirs ), 'success' );
+	print_log( sprintf( T_('Deleted %d directories.'), $deleted_dirs ), 'success' );
 }
 
 
@@ -133,12 +208,12 @@ function dbm_repair_cache()
 	$result = system_check_caches();
 	if( empty( $result ) )
 	{
-		$Messages->add( T_( 'All cache folders are working properly.' ), 'success' );
+		print_log( T_( 'All cache folders are working properly.' ), 'success' );
 	}
 	else
 	{
 		$error_message = T_( 'Unable to repair all cache folders becaue of file permissions' ).':<br />';
-		$Messages->add( $error_message.implode( '<br />', $result ) );
+		print_log( $error_message.implode( '<br />', $result ) );
 	}
 }
 
@@ -146,7 +221,7 @@ function dbm_repair_cache()
 /**
  * Optimize DB tables (MyISAM & InnoDB)
  *
- * @param boolean Display messages
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  * @param boolean TRUE - to make optimize query for each table separately
  * @return array Results of the mysql command 'OPTIMIZE'
  */
@@ -191,7 +266,7 @@ function dbm_optimize_tables( $display_messages = true, $separate_tables = true 
 /**
  * Optimize process DB tables (MyISAM & InnoDB)
  *
- * @param boolean Display messages
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  * @param boolean TRUE - to make optimize query for each table separately
  * @param array Tables
  * @param string Table type: 'MyISAM' or 'InnoDB'
@@ -207,10 +282,19 @@ function dbm_optimize_tables_process( $display_messages = true, $separate_tables
 	$results = array();
 
 	if( $display_messages )
-	{ // Display messages
-		echo '<b>'.sprintf( T_('Optimize %s tables...'), $table_type ).'</b><br />';
-		evo_flush();
+	{	// Display or log messages:
+		$log_message = '<b>'.sprintf( T_('Optimize %s tables...'), $table_type ).'</b>';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $log_message );
+		}
+		else
+		{	// Print out a message:
+			echo $log_message.'<br />';
+			evo_flush();
+		}
 	}
+
 	$timer_name = 'optimize_'.strtolower( $table_type );
 
 	$Timer->start( $timer_name );
@@ -225,11 +309,19 @@ function dbm_optimize_tables_process( $display_messages = true, $separate_tables
 				$table_results = $DB->get_results( 'OPTIMIZE NO_WRITE_TO_BINLOG TABLE '.$table );
 				$Timer->stop( $timer_name.'_table' );
 				if( $display_messages )
-				{ // Display messages
-					dbm_display_result_messages( $table_results, 'optimize' );
-					echo '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( $timer_name.'_table' ) ).'</b><br /><br />';
+				{	// Display or log messages:
+					dbm_display_result_messages( $table_results, 'optimize', $display_messages );
+					$log_message = '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( $timer_name.'_table' ) ).'</b>';
+					if( $display_messages === 'cron_job' )
+					{	// Log a message for cron job:
+						cron_log_append( $log_message."\n" );
+					}
+					else
+					{	// Print out a message:
+						echo $log_message.'<br /><br />';
+						evo_flush();
+					}
 				}
-				evo_flush();
 				$results = array_merge( $results, $table_results );
 			}
 		}
@@ -242,13 +334,21 @@ function dbm_optimize_tables_process( $display_messages = true, $separate_tables
 	$Timer->stop( $timer_name );
 
 	if( $display_messages )
-	{ // Display messages
+	{	// Display or log messages:
 		if( !$separate_tables || empty( $tables ) )
 		{ // Display full report log for case when the tables were optimized by one query
-			dbm_display_result_messages( $results, 'optimize' );
+			dbm_display_result_messages( $results, 'optimize', $display_messages );
 		}
-		echo '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( $timer_name ) ).'</b><br /><br />';
-		evo_flush();
+		$log_message = '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( $timer_name ) ).'</b>';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $log_message."\n" );
+		}
+		else
+		{	// Print out a message:
+			echo $log_message.'<br /><br />';
+			evo_flush();
+		}
 	}
 
 	return $results;
@@ -260,8 +360,9 @@ function dbm_optimize_tables_process( $display_messages = true, $separate_tables
  *
  * @param array Results of the mysql commands 'OPTIMIZE', 'CHECK' OR 'ANALYZE'
  * @param string mysql command type: optimize, check, analyze
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  */
-function dbm_display_result_messages( $results, $command_type )
+function dbm_display_result_messages( $results, $command_type, $display_messages = true )
 {
 	switch( $command_type )
 	{
@@ -298,24 +399,50 @@ function dbm_display_result_messages( $results, $command_type )
 	{
 		foreach( $results as $result )
 		{
+			$log_type = NULL;
 			if( $result->Msg_type == 'status' && $result->Msg_text == 'OK' )
 			{ // OK
-				echo sprintf( $params['message_ok'], '<b>'.$result->Table.'</b>' ).'<br />';
+				$log_message = sprintf( $params['message_ok'], '<code>'.$result->Table.'</code>' );
 			}
 			elseif( $result->Msg_type == 'note' && $result->Msg_text == 'Table does not support optimize, doing recreate + analyze instead' )
 			{ // This warning is comming for every innodb table, but that is normal, Display for info
-				echo sprintf( T_('Database table %s does not support optimize, doing recreate + analyze instead'), '<b>'.$result->Table.'</b>' ).'<br />';
+				$log_message = sprintf( T_('Database table %s does not support optimize, doing recreate + analyze instead'), '<code>'.$result->Table.'</code>' );
 			}
 			else
 			{ // Some errors
-				$message_class = $result->Msg_type == 'status' ? 'orange' : 'red';
-				echo '<span class="'.$message_class.'">'.sprintf( $params['message_error'], '<b>'.$result->Table.'</b>', '"'.$result->Msg_text.'"' ).'</span><br />';
+				$log_message = sprintf( $params['message_error'], '<code>'.$result->Table.'</code>', '"'.$result->Msg_text.'"' );
+				if( $display_messages === 'cron_job' )
+				{	// Log a message for cron job:
+					$log_type = ( $result->Msg_type == 'status' ? 'warning' : 'error' );
+				}
+				else
+				{	// Print out a message:
+					$log_message = '<span class="'.( $result->Msg_type == 'status' ? 'orange' : 'red' ).'">'.$log_message.'</span>';
+				}
+			}
+
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_action_end( $log_message, $log_type );
+			}
+			else
+			{	// Print out a message:
+				echo $log_message.'<br />';
+				evo_flush();
 			}
 		}
 	}
 	else
 	{ // No tables found to optimize, probably all tables already were optimized
-		echo $params['message_done'].'<br />';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $params['message_done'] );
+		}
+		else
+		{	// Print out a message:
+			echo $params['message_done'].'<br />';
+			evo_flush();
+		}
 	}
 }
 
@@ -339,12 +466,12 @@ function dbm_delete_broken_posts()
 	if( ! empty( $post_IDs ) )
 	{
 		// select broken items
-		$SQL = new SQL();
+		$SQL = new SQL( 'Find broken posts' );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_items__item' );
 		$SQL->WHERE( 'post_main_cat_ID NOT IN ( SELECT cat_ID FROM T_categories )' );
 		$SQL->WHERE_and( 'post_ID IN ( '.$post_IDs.' )' );
-		$broken_items = $DB->get_results( $SQL->get(), OBJECT, 'Find broken posts' );
+		$broken_items = $DB->get_results( $SQL );
 
 		foreach( $broken_items as $r => $row )
 		{ // delete broken items
@@ -427,7 +554,7 @@ function dbm_delete_orphan_comments()
 		$CommentCache->clear();
 	}
 
-	$Messages->add( sprintf( T_('%d comments have been deleted'), $num_deleted ), 'success' );
+	print_log( sprintf( T_('%d comments have been deleted'), $num_deleted ), 'success' );
 }
 
 
@@ -440,7 +567,7 @@ function dbm_delete_orphan_comment_uploads()
 
 	$count = remove_orphan_files( NULL, 24 );
 
-	$Messages->add( sprintf( T_('%d files have been deleted'), $count ), 'success' );
+	print_log( sprintf( T_('%d files have been deleted'), $count ), 'success' );
 }
 
 
@@ -570,10 +697,10 @@ function dbm_delete_orphan_file_roots()
 	evo_flush();
 
 	// Get logins of all existing users
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get logins of all existing users' );
 	$SQL->SELECT( 'user_login' );
 	$SQL->FROM( 'T_users' );
-	$user_logins = $DB->get_col( $SQL->get() );
+	$user_logins = $DB->get_col( $SQL );
 
 	$media_path_users = $media_path.'users/';
 
@@ -666,7 +793,7 @@ function dbm_recreate_itemslugs()
 			}
 		}
 	}
-	$Messages->add( sprintf( 'Created %d new URL slugs.', $count_slugs ), 'success' );
+	print_log( sprintf( 'Created %d new URL slugs.', $count_slugs ), 'success' );
 }
 
 
@@ -693,7 +820,7 @@ function dbm_recreate_autogenerated_excerpts()
 /**
  * Check DB tables
  *
- * @param boolean Display messages
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  * @param boolean TRUE - to make optimize query for each table separately
  * @return array Results of the mysql command 'CHECK'
  */
@@ -713,8 +840,12 @@ function dbm_check_tables( $display_messages = true, $separate_tables = true )
 	}
 	$dbm_tables_count = count( $tables_names );
 
-	if( $display_messages )
-	{ // Display messages
+	if( $display_messages === 'cron_job' )
+	{	// Log a message for cron job:
+		cron_log_append( '<b>'.T_('Check tables...').'</b>' );
+	}
+	elseif( $display_messages )
+	{	// Print out a message:
 		echo '<b>'.T_('Check tables...').'</b><br />';
 		evo_flush();
 	}
@@ -729,9 +860,17 @@ function dbm_check_tables( $display_messages = true, $separate_tables = true )
 			$table_results = $DB->get_results( 'CHECK TABLE '.$table.' FAST' );
 			$Timer->stop( 'check_one_table' );
 			if( $display_messages )
-			{ // Display messages
-				dbm_display_result_messages( $table_results, 'check' );
-				echo '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( 'check_one_table' ) ).'</b><br /><br />';
+			{	// Display or log messages:
+				dbm_display_result_messages( $table_results, 'check', $display_messages );
+				$log_message = '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( 'check_one_table' ) ).'</b>';
+				if( $display_messages === 'cron_job' )
+				{	// Log a message for cron job:
+					cron_log_append( $log_message."\n" );
+				}
+				else
+				{	// Print out a message:
+					echo $log_message.'<br /><br />';
+				}
 			}
 			evo_flush();
 			$check_results = array_merge( $check_results, $table_results );
@@ -744,12 +883,20 @@ function dbm_check_tables( $display_messages = true, $separate_tables = true )
 	$Timer->stop( 'check_tables' );
 
 	if( $display_messages )
-	{ // Display messages
+	{	// Display or log messages:
 		if( !$separate_tables )
-		{ // Display full report log for case when the tables were checked by one query
-			dbm_display_result_messages( $check_results, 'check' );
+		{	// Display full report log for case when the tables were checked by one query:
+			dbm_display_result_messages( $check_results, 'check', $display_messages );
 		}
-		echo '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( 'check_tables' ) ).'</b><br />';
+		$log_message = '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( 'check_tables' ) ).'</b>';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $log_message."\n" );
+		}
+		else
+		{	// Print out a message:
+			echo $log_message.'<br />';
+		}
 	}
 
 	return $check_results;
@@ -759,7 +906,7 @@ function dbm_check_tables( $display_messages = true, $separate_tables = true )
 /**
  * Analyze DB tables
  *
- * @param boolean Display messages
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  * @param boolean TRUE - to make optimize query for each table separately
  * @return array Results of the mysql command 'ANALYZE'
  */
@@ -779,8 +926,12 @@ function dbm_analyze_tables( $display_messages = true, $separate_tables = true )
 	}
 	$dbm_tables_count = count( $tables_names );
 
-	if( $display_messages )
-	{ // Display messages
+	if( $display_messages === 'cron_job' )
+	{	// Log a message for cron job:
+		cron_log_append( '<b>'.T_('Analyze tables...').'</b>' );
+	}
+	elseif( $display_messages )
+	{	// Print out a message:
 		echo '<b>'.T_('Analyze tables...').'</b><br />';
 		evo_flush();
 	}
@@ -796,10 +947,18 @@ function dbm_analyze_tables( $display_messages = true, $separate_tables = true )
 			$Timer->stop( 'analyze_one_table' );
 			if( $display_messages )
 			{ // Display messages
-				dbm_display_result_messages( $table_results, 'analyze' );
-				echo '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( 'analyze_one_table' ) ).'</b><br /><br />';
+				dbm_display_result_messages( $table_results, 'analyze', $display_messages );
+				$log_message = '<b>'.sprintf( T_('Time: %s seconds'), $Timer->get_duration( 'analyze_one_table' ) ).'</b>';
+				if( $display_messages === 'cron_job' )
+				{	// Log a message for cron job:
+					cron_log_append( $log_message."\n" );
+				}
+				else
+				{	// Print out a message:
+					echo $log_message.'<br /><br />';
+					evo_flush();
+				}
 			}
-			evo_flush();
 			$analyze_results = array_merge( $analyze_results, $table_results );
 		}
 	}
@@ -813,9 +972,18 @@ function dbm_analyze_tables( $display_messages = true, $separate_tables = true )
 	{ // Display messages
 		if( !$separate_tables )
 		{ // Display full report log for case when the tables were analyzed by one query
-			dbm_display_result_messages( $analyze_results, 'analyze' );
+			dbm_display_result_messages( $analyze_results, 'analyze', $display_messages );
 		}
-		echo '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( 'analyze_tables' ) ).'</b>';
+		$log_message = '<b>'.sprintf( T_('Full execution time: %s seconds'), $Timer->get_duration( 'analyze_tables' ) ).'</b>';
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $log_message."\n" );
+		}
+		else
+		{	// Print out a message:
+			echo $log_message;
+			evo_flush();
+		}
 	}
 
 	return $analyze_results;
@@ -833,7 +1001,7 @@ function echo_progress_log_update( $progress_log_id, $done, $all )
 {
 	echo '<span class="function_echo_progress_log_update">';
 	?>
-	<script type="text/javascript">
+	<script>
 		jQuery('.function_echo_progress_log_update').remove();
 		jQuery( '#' + '<?php echo $progress_log_id; ?>' ).html("<?php echo ' '.$done.' / '.$all ?>");
 	</script>
@@ -886,4 +1054,21 @@ function dbm_convert_item_content_separators()
 
 	echo "<br />\n";
 }
+
+function dbm_delete_item_versions()
+{
+	global $DB;
+
+	$count = $DB->get_var( 'SELECT COUNT(*) FROM T_items__version' );
+	$DB->query( 'TRUNCATE TABLE T_items__version' );
+	if( $count > 0 )
+	{
+		print_log( sprintf( T_('Cleared %d records from the item versions table.'), $count ), 'success' );
+	}
+	else
+	{
+		print_log( T_('Item versions table already empty.'), 'note' );
+	}
+}
+
 ?>

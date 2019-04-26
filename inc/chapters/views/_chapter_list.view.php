@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -35,7 +35,7 @@ global $Session, $AdminUI;
 
 $result_fadeout = $Session->get( 'fadeout_array' );
 
-$current_default_cat_ID = $Blog->get_setting('default_cat_ID');
+$current_default_cat_ID = $Blog->get_default_cat_ID();
 
 $line_class = 'odd';
 
@@ -58,22 +58,27 @@ function cat_line( $Chapter, $level )
 
 	$line_class = $line_class == 'even' ? 'odd' : 'even';
 
+	// Check if current item's row should be highlighted:
+	$is_highlighted = ( param( 'highlight_id', 'integer', NULL ) == $Chapter->ID ) ||
+		( isset( $result_fadeout ) && in_array( $Chapter->ID, $result_fadeout ) );
+
 	// ID
 	$r = '<tr id="tr-'.$Chapter->ID.'"class="'.$line_class.
 					' chapter_parent_'.( $Chapter->parent_ID ? $Chapter->parent_ID : '0' ).
-					// Fadeout?
-					( isset($result_fadeout) && in_array( $Chapter->ID, $result_fadeout ) ? ' fadeout-ffff00': '' ).'">
-					<td class="firstcol shrinkwrap">'.
-						$Chapter->ID.'
-				</td>';
+					( $is_highlighted ? ' evo_highlight' : '' ).'">
+					<td class="firstcol shrinkwrap">'.$Chapter->ID.'</td>';
 
 	// Default
-	if( $current_default_cat_ID == $Chapter->ID )
-	{
+	if( $Chapter->get( 'meta' ) )
+	{	// Deny to use meta chapter as default:
+		$makedef_icon = '';
+	}
+	elseif( $current_default_cat_ID == $Chapter->ID )
+	{	// This chapter is default currently:
 		$makedef_icon = get_icon( 'enabled', 'imgtag', array( 'title' => format_to_output( T_( 'This is the default category' ), 'htmlattr' ) ) );
 	}
 	else
-	{
+	{	// Display action icon to make this chapter default:
 		$makedef_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action=make_default&amp;'.url_crumb('element') );
 		$makedef_title = format_to_output( T_('Click to make this the default category'), 'htmlattr' );
 		$makedef_icon = '<a href="'.$makedef_url.'" title="'.$makedef_title.'">'.get_icon( 'disabled', 'imgtag', array( 'title' => $makedef_title ) ).'</a>';
@@ -117,21 +122,72 @@ function cat_line( $Chapter, $level )
 	if( $permission_to_edit )
 	{	// We have permission permission to edit, so display these columns:
 
-		if( $Chapter->meta )
-		{
+		// Meta
+		if( $current_default_cat_ID == $Chapter->ID )
+		{	// Deny to use default chapter as meta:
+			$makemeta_icon = false;
+		}
+		elseif( $Chapter->meta )
+		{	// This chapter is meta:
 			$makemeta_icon = 'enabled';
 			$makemeta_title = format_to_output( T_('Click to revert this from meta category'), 'htmlattr' );
 			$action = 'unset_meta';
 		}
 		else
-		{
+		{	// This chapter is NOT meta:
 			$makemeta_icon = 'disabled';
 			$makemeta_title = format_to_output( T_('Click to make this as meta category'), 'htmlattr' );
 			$action = 'set_meta';
 		}
-		// Meta
-		$makemeta_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action='.$action.'&amp;'.url_crumb('element') );
-		$r .= '<td class="center"><a href="'.$makemeta_url.'" title="'.$makemeta_title.'">'.get_icon( $makemeta_icon, 'imgtag', array( 'title' => $makemeta_title ) ).'</a></td>';
+		if( $makemeta_icon )
+		{	// Display action icon to change meta property of this chapter:
+			$makemeta_url = regenerate_url( 'action,cat_ID', 'cat_ID='.$Chapter->ID.'&amp;action='.$action.'&amp;'.url_crumb('element') );
+			$r .= '<td class="center"><a href="'.$makemeta_url.'" title="'.$makemeta_title.'">'.get_icon( $makemeta_icon, 'imgtag', array( 'title' => $makemeta_title ) ).'</a></td>';
+		}
+		else
+		{
+			$r .= '<td></td>';
+		}
+
+		// Default Item Type:
+		if( $Chapter->get( 'meta' ) )
+		{	// Don't allow default Item Type for meta category because it cannot has items:
+			$r .= '<td>&nbsp;</td>';
+		}
+		else
+		{	// Normal category can has items, Allow to change its default Item Type:
+			if( $Chapter->get( 'ityp_ID' ) === NULL )
+			{	// Same as collection default:
+				$cat_item_type_name = T_('Same as collection default');
+			}
+			elseif( $Chapter->get( 'ityp_ID' ) == '0' )
+			{	// No default type:
+				$cat_item_type_name = '<b>'.T_('No default type').'</b>';
+			}
+			elseif( ( $ItemTypeCache = & get_ItemTypeCache() ) &&
+							( $cat_ItemType = & $ItemTypeCache->get_by_ID( $Chapter->get( 'ityp_ID' ), false, false ) ) )
+			{	// Custom Item Type:
+				$cat_item_type_name = $cat_ItemType->get( 'name' );
+				if( ! $cat_ItemType->is_enabled( $Chapter->get( 'blog_ID' ) ) )
+				{	// Mark not enabled Item Type with red color:
+					$cat_item_type_name = '<span class="red">'.$cat_item_type_name.'</span>';
+				}
+			}
+			else
+			{	// Not found Item Type in DB:
+				$cat_item_type_name = '<span class="red">'.T_('Not Found').' #'.$Chapter->get( 'ityp_ID' ).'</span>';
+			}
+			if( ( $cat_Blog = & $Chapter->get_Blog() ) &&
+			    $cat_Blog->get_default_cat_ID() == $Chapter->ID )
+			{	// For default category use a separate options without "No default type":
+				$cat_cell_edit_class = 'default_cat_ityp_ID_edit';
+			}
+			else
+			{	// For not default categories use full options list:
+				$cat_cell_edit_class = 'cat_ityp_ID_edit';
+			}
+			$r .= '<td class="jeditable_cell '.$cat_cell_edit_class.'"><a href="#" rel="_'.$Chapter->get( 'ityp_ID' ).'">'.$cat_item_type_name.'</a></td>';
+		}
 
 		// Lock
 		if( $Chapter->lock )
@@ -262,6 +318,11 @@ if( $permission_to_edit )
 					);
 
 	$Table->cols[] = array(
+						'th' => T_('Default<br />Item Type'),
+						'th_class' => 'shrinkwrap',
+					);
+
+	$Table->cols[] = array(
 						'th' => T_('Lock'),
 						'th_class' => 'shrinkwrap',
 					);
@@ -318,13 +379,13 @@ echo $results_params['after'];
 echo '<p class="note">'.T_('<strong>Note:</strong> Deleting a category does not delete posts from that category. It will just assign them to the parent category. When deleting a root category, posts will be assigned to the oldest remaining category in the same collection (smallest category number).').'</p>';
 */
 
-global $Settings, $dispatcher;
+global $Settings, $admin_url;
 
 // Use a wrapper div to have margin around the form
 echo '<div id="form_wrapper" style="margin: 2ex auto 1ex">';
 
 $Form = new Form( NULL, 'cat_order_checkchanges', 'post', 'compact' );
-$Form->begin_form( 'fform', T_('Category order').get_manual_link('categories_order') );
+$Form->begin_form( 'fform', T_('Category order').get_manual_link('categories-order') );
 $Form->add_crumb( 'collection' );
 $Form->hidden( 'ctrl', 'coll_settings' );
 $Form->hidden( 'action', 'update' );
@@ -340,7 +401,7 @@ echo '</div>'; // form wrapper end
 
 if( ! $Settings->get('allow_moving_chapters') )
 { // TODO: check perm
-	echo '<p class="alert alert-info">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sblogs settings%s.'), '<a href="'.$dispatcher.'?ctrl=collections&tab=blog_settings#fieldset_wrapper_categories">', '</a>' ).'</p> ';
+	echo '<p class="alert alert-info">'.sprintf( T_('<strong>Note:</strong> Moving categories across blogs is currently disabled in the %sblogs settings%s.'), '<a href="'.$admin_url.'?ctrl=collections&tab=blog_settings#fieldset_wrapper_categories">', '</a>' ).'</p> ';
 }
 
 //Flush fadeout
@@ -355,4 +416,19 @@ echo_editable_column_js( array(
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
 	'ID_name'         => 'cat_ID',
 	'field_type'      => 'text' ) );
+
+if( $permission_to_edit )
+{	// Print JS to edit default Item Type of category:
+	echo_editable_column_js( $cat_ityp_ID_edit_params = array(
+		'column_selector' => '.cat_ityp_ID_edit',
+		'ajax_url'        => get_htsrv_url().'async.php?action=cat_ityp_ID_edit&blogid='.$Blog->ID.'&'.url_crumb( 'catityp' ),
+		'options'         => collection_item_type_titles( $Blog->ID, NULL, '_' ),
+		'new_field_name'  => 'new_ityp_ID',
+		'ID_value'        => 'jQuery( ":first", jQuery( this ).parent() ).text()',
+		'ID_name'         => 'cat_ID' ) );
+	// Separate options without "No default type" for default category of the collection:
+	$cat_ityp_ID_edit_params['column_selector'] = '.default_cat_ityp_ID_edit';
+	$cat_ityp_ID_edit_params['options'] = collection_item_type_titles( $Blog->ID, NULL, '_', false );
+	echo_editable_column_js( $cat_ityp_ID_edit_params );
+}
 ?>

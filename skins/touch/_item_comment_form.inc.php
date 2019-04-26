@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -14,7 +14,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $cookie_name, $cookie_email, $cookie_url;
 global $comment_allowed_tags;
-global $comment_cookies, $comment_allow_msgform;
+global $comment_cookies, $comment_allow_msgform, $comment_anon_notify;
 global $checked_attachments; // Set this var as global to use it in the method $Item->can_attach()
 global $PageCache;
 global $Collection, $Blog, $dummy_fields;
@@ -41,6 +41,7 @@ $params = array_merge( array(
 		'after_comment_error'  => '</em></p>',
 		'before_comment_form'  => '',
 		'after_comment_form'   => '',
+		'comment_type'         => 'comment',
 	), $params );
 
 echo '<div id="textinputwrap">';
@@ -107,6 +108,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			$comment_author = $Comment->author;
 			$comment_author_email = $Comment->author_email;
 			$comment_author_url = $Comment->author_url;
+			$comment_allow_msgform = $Comment->allow_msgform;
+			$comment_anon_notify = $Comment->anon_notify;
+			$comment_user_notify = isset( $Comment->user_notify ) ? $Comment->user_notify : NULL;
 			// Get what renderer checkboxes were selected on form:
 			$comment_renderers = explode( '.', $Comment->get( 'renderers' ) );
 
@@ -146,6 +150,9 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 			$comment_author = $Comment->author;
 			$comment_author_email = $Comment->author_email;
 			$comment_author_url = $Comment->author_url;
+			$comment_allow_msgform = $Comment->allow_msgform;
+			$comment_anon_notify = $Comment->anon_notify;
+			$comment_user_notify = isset( $Comment->user_notify ) ? $Comment->user_notify : NULL;
 			// comment_attachments contains all file IDs that have been attached
 			$comment_attachments = $Comment->preview_attachments;
 			// checked_attachments contains all attachment file IDs which checkbox was checked in
@@ -174,7 +181,7 @@ if( $params['disp_comment_form'] && $Item->can_comment( $params['before_comment_
 	echo $params['form_title_end'];
 
 /*
-	echo '<script type="text/javascript">
+	echo '<script>
 /* <![CDATA[ *
 function validateCommentForm(form)
 {
@@ -192,11 +199,13 @@ function validateCommentForm(form)
 
 	$Form->begin_form( 'bComment', '', array( 'target' => '_self', /*'onsubmit' => 'return validateCommentForm(this);'*/ ) );
 
-	// Display a message before comment form:
-	$Item->display_comment_form_msg( array(
-			'before' => '<br /><div class="warning"><div class="action_messages">',
-			'after'  => '</div></div>',
-		) );
+	if( $params['comment_type'] != 'meta' )
+	{	// Display a message before comment form:
+		$Item->display_comment_form_msg( array(
+				'before' => '<br /><div class="warning"><div class="action_messages">',
+				'after'  => '</div></div>',
+			) );
+	}
 
 	// TODO: dh> a plugin hook would be useful here to add something to the top of the Form.
 	//           Actually, the best would be, if the $Form object could be changed by a plugin
@@ -221,23 +230,26 @@ function validateCommentForm(form)
 			$Item->get_feedback_url( $disp == 'feedback-popup', '&' )
 		);
 
-	if( check_user_status( 'is_validated' ) )
-	{ // User is logged in and activated:
+	if( is_logged_in( false ) )
+	{	// User is logged in and activated:
 		$Form->info_field( T_('User'), '<strong>'.$current_User->get_identity_link( array(
 				'link_text' => $params['author_link_text'] ) ).'</strong> '
 				.get_user_profile_link( ' [', ']', T_('Edit profile') ) );
 	}
 	else
-	{ // User is not logged in or not activated:
+	{	// User is not logged in or not activated:
 		if( is_logged_in() && empty( $comment_author ) && empty( $comment_author_email ) )
 		{
 			$comment_author = $current_User->login;
 			$comment_author_email = $current_User->email;
 		}
 		// Note: we use funky field names to defeat the most basic guestbook spam bots
-		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '', 100, 'bComment' );
+		$Form->text( $dummy_fields[ 'name' ], $comment_author, 40, T_('Name'), '<br />'.sprintf( T_('<a %s>Click here to log in</a> if you already have an account on this site.'), 'href="'.get_login_url( 'comment form', $Item->get_permanent_url() ).'" style="font-weight:bold"' ), 100, 'bComment' );
 
-		$Form->text( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), '<br />'.T_('Your email address will <strong>not</strong> be revealed on this site.'), 255, 'bComment' );
+		$Form->email_input( $dummy_fields[ 'email' ], $comment_author_email, 40, T_('Email'), array(
+			'bottom_note' => T_('Your email address will <strong>not</strong> be revealed on this site.'),
+			'maxlength'   => 255,
+			'class'       => 'bComment' ) );
 
 		$Item->load_Blog();
 		if( $Item->Blog->get_setting( 'allow_anon_url' ) )
@@ -257,6 +269,13 @@ function validateCommentForm(form)
 	{	// We have a policy text to display
 		$Form->info_field( '', $params['policy_text'] );
 	}
+
+	// Display plugin captcha for comment form before textarea:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_textarea',
+		) );
 
 	ob_start();
 	echo '<div class="comment_toolbars">';
@@ -284,7 +303,7 @@ function validateCommentForm(form)
 	$Form->inputstart = $form_inputstart;
 
 	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
 
 	// Attach files:
 	if( !empty( $comment_attachments ) )
@@ -316,29 +335,26 @@ function validateCommentForm(form)
 		$Form->input_field( array( 'label' => T_('Attach files'), 'note' => '<br />'.get_upload_restriction(), 'name' => 'uploadfile[]', 'type' => 'file', 'size' => '30' ) );
 	}
 
+	// Additional options:
 	$comment_options = array();
-
 	if( ! is_logged_in( false ) )
-	{ // User is not logged in:
-		$comment_options[] = '<label><input type="checkbox" class="checkbox" name="comment_cookies" tabindex="7"'
-													.( $comment_cookies ? ' checked="checked"' : '' ).' value="1" /> '.T_('Remember me').'</label>'
-													.' <span class="note">('.T_('For my next comment on this site').')</span>';
+	{	// For anonymous or not activated user:
 		// TODO: If we got info from cookies, Add a link called "Forget me now!" (without posting a comment).
-
-		$msgform_class_start = '';
-		$msgform_class_end = '';
-		if( $email_is_detected )
-		{	// Set a class when comment contains a email
-			$msgform_class_start = '<div class="comment_recommended_option">';
-			$msgform_class_end = '</div>';
-		}
-
-		$comment_options[] = $msgform_class_start.
-													'<label><input type="checkbox" class="checkbox" name="comment_allow_msgform" tabindex="8"'
-													.( $comment_allow_msgform ? ' checked="checked"' : '' ).' value="1" /> '.T_('Allow message form').'</label>'
-													.' <span class="note">('.T_('Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!').')</span>'.
-													$msgform_class_end;
+		$comment_options[] = array( 'comment_cookies', 1, T_('Remember me'), $comment_cookies, false, '('.T_('Set cookies so I don\'t need to fill out my details next time').')' );
 		// TODO: If we have an email in a cookie, Add links called "Add a contact icon to all my previous comments" and "Remove contact icon from all my previous comments".
+		$comment_options[] = array( 'comment_allow_msgform', 1, T_('Allow message form'), $comment_allow_msgform, false, '('.T_('Allow users to contact me through a message form -- Your email will <strong>not</strong> be revealed!').')', ( $email_is_detected ? 'comment_recommended_option' : '' ) );
+		if( $Blog->get_setting( 'allow_anon_subscriptions' ) )
+		{	// If item anonymous subscriptions are allowed for current collection:
+			$comment_options[] = array( 'comment_anon_notify', 1, T_('Notify me of replies'), isset( $comment_anon_notify ) ? $comment_anon_notify : $Blog->get_setting( 'default_anon_comment_notify' ) );
+		}
+	}
+	elseif( $params['comment_type'] != 'meta' && $Blog->get_setting( 'allow_item_subscriptions' ) )
+	{	// For registered user and normal(not meta) comment and if item subscriptions are allowed for current collection:
+		$comment_options[] = array( 'comment_user_notify', 1, T_('Notify me of replies'), ( isset( $comment_user_notify ) ? $comment_user_notify : 1 ) );
+	}
+	if( count( $comment_options ) > 0 )
+	{	// Display additional options:
+		$Form->checklist( $comment_options, 'comment_options', T_('Options') );
 	}
 
 	// Display renderers
@@ -354,6 +370,13 @@ function validateCommentForm(form)
 	}
 
 	$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
+
+	// Display plugin captcha for comment form before submit button:
+	$Plugins->display_captcha( array(
+			'Form'          => & $Form,
+			'form_type'     => 'comment',
+			'form_position' => 'before_submit_button',
+		) );
 
 	$Form->begin_fieldset();
 		echo '<div class="input">';

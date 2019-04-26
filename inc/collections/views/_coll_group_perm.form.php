@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -41,23 +41,8 @@ else
 	set_param( 'keywords2', $keywords );
 }
 
-
-$SQL = new SQL();
-$SQL->SELECT( $edited_Blog->ID.' AS blog_ID, grp_ID, grp_name, grp_usage, grp_level, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_can_be_assignee,'
-	. 'bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses + 0 as perm_cmtstatuses, bloggroup_perm_edit_cmt,'
-	. 'bloggroup_perm_delpost, bloggroup_perm_edit_ts, bloggroup_perm_meta_comment, bloggroup_perm_cats,'
-	. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
-	. 'bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_analytics,'
-	. 'IF( ( grp_perm_blogs = "viewall" OR grp_perm_blogs = "editall" ), 1, bloggroup_ismember ) AS bloggroup_ismember' );
-$SQL->FROM( 'T_groups' );
-$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$edited_Blog->ID.' )' );
-$SQL->ORDER_BY( 'bloggroup_ismember DESC, *, grp_name, grp_ID' );
-
-if( !empty( $keywords ) )
-{
-	$SQL->add_search_field( 'grp_name' );
-	$SQL->WHERE_kw_search( $keywords, 'AND' );
-}
+// Get SQL for collection group permissions:
+$SQL = get_coll_group_perms_SQL( $edited_Blog, $keywords );
 
 // Display wide layout:
 ?>
@@ -66,12 +51,15 @@ if( !empty( $keywords ) )
 
 <?php
 
-$Results = new Results( $SQL->get(), 'collgroup_' );
+$Results = new Results( $SQL->get(), 'section_' );
 
 if( ! empty( $keywords ) )
 { // Display a button to reset the filters
 	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID, T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
 }
+
+// Button to export user permissions into CSV file:
+$Results->global_icon( T_('Export CSV'), '', $admin_url.'?ctrl=coll_settings&amp;action=export_groupperms&amp;blog='.$edited_Blog->ID.( empty( $keywords ) ? '' : '&amp;keywords='.urlencode( $keywords ) ), T_('Export CSV'), 3, 3, array( 'class' => 'action_icon btn-default' ) );
 
 // Tell the Results class that we already have a form for this page:
 $Results->Form = & $Form;
@@ -101,14 +89,20 @@ echo '</div>';
 // fp> TODO: link
 echo '<p class="note center">'.T_('Note: General group permissions may further restrict or extend any media folder permissions defined here.').'</p>';
 
+$form_buttons = array();
+
 // Make a hidden list of all displayed users:
 $grp_IDs = array();
-foreach( $Results->rows as $row )
+if( ! empty( $Results->rows ) )
 {
-	$grp_IDs[] = $row->grp_ID;
+	foreach( $Results->rows as $row )
+	{
+		$grp_IDs[] = $row->grp_ID;
+	}
+	$form_buttons[] = array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' );
 }
 $Form->hidden( 'group_IDs', implode( ',', $grp_IDs) );
 
-$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->end_form( $form_buttons );
 
 ?>

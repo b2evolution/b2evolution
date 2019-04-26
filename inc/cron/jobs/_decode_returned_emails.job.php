@@ -28,7 +28,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Settings, $DB, $result_message;
+global $Settings, $DB;
 global $dre_messages, $dre_emails, $email_cntr, $del_cntr, $is_cron_mode;
 
 // Are we in cron job mode?
@@ -48,7 +48,6 @@ if( ! extension_loaded('imap') )
 	return 2; // error
 }
 
-load_funcs( '_core/_param.funcs.php' );
 load_class( '_ext/mime_parser/rfc822_addresses.php', 'rfc822_addresses_class' );
 load_class( '_ext/mime_parser/mime_parser.php', 'mime_parser_class' );
 
@@ -59,7 +58,7 @@ if( isset($GLOBALS['files_Module']) )
 
 if( ! $mbox = dre_connect( true ) )
 {	// We couldn't connect to the mail server
-	return 2; // error
+	return 20; // IMAP error
 }
 
 // Read messages from server
@@ -77,7 +76,7 @@ if( $imap_obj->Nmsgs == 0 )
 // Create posts
 dre_process_messages( $mbox, $imap_obj->Nmsgs, true );
 
-if( count( $del_cntr ) > 0 )
+if( $del_cntr > 0 )
 {	// We want to delete processed emails from server
 	imap_expunge( $mbox );
 	dre_msg( sprintf( T_('Deleted %d processed message(s) from inbox.'), $del_cntr ), true );

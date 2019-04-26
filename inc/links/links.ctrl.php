@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -69,7 +69,7 @@ if( $action == 'edit_links' || $action == 'sort_links' )
 { // set LinkOwner from params
 	$link_type = param( 'link_type', 'string', 'item', true );
 	$object_ID = param( 'link_object_ID', 'integer', 0, true );
-	$LinkOwner = get_link_owner( $link_type, $object_ID );
+	$LinkOwner = get_LinkOwner( $link_type, $object_ID );
 	if( empty( $Blog ) )
 	{ // Load the blog we're in:
 		$Collection = $Blog = & $LinkOwner->get_Blog();
@@ -113,16 +113,18 @@ switch( $action )
 
 		// Unlink File from Item/Comment:
 		$deleted_link_ID = $edited_Link->ID;
-		$edited_Link->dbdelete();
-		unset( $edited_Link );
+		if( $LinkOwner->remove_link( $edited_Link ) )
+		{	// If Link has been removed successfully:
+			unset( $edited_Link );
 
-		$LinkOwner->after_unlink_action( $deleted_link_ID );
+			$LinkOwner->after_unlink_action( $deleted_link_ID );
 
-		$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
+			$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
 
-		if( $action == 'delete' && ! empty( $linked_File ) )
-		{	// Delete a linked file from disk and DB completely:
-			$linked_File->unlink();
+			if( $action == 'delete' && ! empty( $linked_File ) )
+			{	// Delete a linked file from disk and DB completely:
+				$linked_File->unlink();
+			}
 		}
 
 		header_redirect( $redirect_to );
@@ -281,15 +283,8 @@ switch( $action )
 
 // require colorbox js
 require_js_helper( 'colorbox' );
-// require Fine Uploader js and css:
-init_fineuploader_js_lang_strings();
-require_js( 'multiupload/fine-uploader.js' );
-require_css( 'fine-uploader.css' );
-if( $action == 'edit_links' )
-{ // Load JS files to make the links table sortable:
-	require_js( '#jquery#' );
-	require_js( 'jquery/jquery.sortable.min.js' );
-}
+// Init JS to quick upload several files:
+init_fileuploader_js( 'rsc_url', ( $action == 'edit_links' ) );
 
 $AdminUI->disp_html_head();
 $AdminUI->disp_body_top( false );

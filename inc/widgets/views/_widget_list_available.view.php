@@ -7,16 +7,31 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $container;
+global $AdminUI, $WidgetContainer, $container, $mode;
 
-echo '<h2><span class="right_icons">'.action_icon( T_('Cancel').'!', 'close', regenerate_url( 'container' ) ).'</span>'
-	.sprintf(T_('Widgets available for insertion into &laquo;%s&raquo;'), $container ).'</h2>';
+if( $mode == 'customizer' )
+{	// Display customizer tabs to switch between skin and widgets in special div on customizer mode:
+	$AdminUI->display_customizer_tabs( array(
+			'path' => array( 'coll', 'widgets' ),
+		) );
+
+	// Start of customizer content:
+	echo '<div class="evo_customizer__content evo_customizer__available_widgets">';
+
+	// Display page title:
+	echo '<p><b>'.sprintf( T_('Choose a widget to add to "%s":'), $WidgetContainer->get( 'name' ) ).'</b></p>';
+}
+else
+{	// Display this title for normal view from back-office:
+	echo '<h2><span class="right_icons">'.action_icon( T_('Cancel').'!', 'close', regenerate_url( 'container' ) ).'</span>'
+		.sprintf(T_('Widgets available for insertion into &laquo;%s&raquo;'), $container ).'</h2>';
+}
 
 
 /**
@@ -63,17 +78,24 @@ $core_componentwidget_defs = array(
 			'free_text',
 			'free_html',
 			'spacer',
+			'separator',
 			'image',
 			'social_links',
+			'content_block', // Content Block
+			'display_item',  // Display Item
 		),
 	'about_user' => array(
-			'coll_avatar',		// Avatar of User
+			'user_profile_pics',		// Avatar of User
 			'user_links',		// Social links of coll owner
+			'user_info',
+			'user_action',
+			'user_fields',
 		),
 	'menu_item' => array(
 			'basic_menu_link',
 			'msg_menu_link',
 			'flag_menu_link',
+			'mustread_menu_link',
 			'profile_menu_link',
 		),
 	'navigation' => array(
@@ -84,6 +106,7 @@ $core_componentwidget_defs = array(
 			'breadcrumb_path',
 			'coll_common_links',
 			'coll_current_filters',
+			'coll_item_list_pages',
 		),
 	'content' => array(
 			'coll_featured_posts',    // Simplified UIL: Featured Posts
@@ -92,14 +115,19 @@ $core_componentwidget_defs = array(
 			'coll_related_post_list', // Simple Related Posts list
 			'coll_flagged_list',      // Simplified UIL: Flagged Items
 			'coll_item_list',         // Universal Item list
+			'item_fields_compare',    // Compare Item Fields
 			'coll_featured_intro',    // Featured/Intro Post
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
-			'content_block',          // Content Block
 		),
 	'infoitem' => array(
+			'item_title',
 			'item_info_line',
+			'item_visibility_badge',
 			'item_content',
+			'item_comment_form',
+			'item_comment_feed_link',
+			'item_comment_notification',
 			'item_attachments',
 			'item_link',
 			'item_location',
@@ -108,6 +136,8 @@ $core_componentwidget_defs = array(
 			'item_about_author',
 			'item_seen_by',
 			'item_vote',
+			'item_next_previous',
+			'item_custom_fields',
 		),
 	'collection' => array(
 			'coll_logo',
@@ -118,16 +148,26 @@ $core_componentwidget_defs = array(
 			'coll_xml_feeds',
 			'coll_subscription',
 			'coll_activity_stats',
+			'cat_title',
+			'coll_item_notification',
+			'coll_comment_notification',
 		),
 	'user' => array(
 			'user_avatars',
 			'org_members',
 			'user_login',
-			'user_register',
+			'user_greetings',
+			'user_register_quick',
+			'user_register_standard',
+			'newsletter_subscription',
 			'user_tools',
 			'online_users',
 		),
 	'other' => array(
+			'site_logo',
+			'subcontainer',
+			'subcontainer_row',
+			'inc_file',
 			'poll',
 			'colls_list_public',
 			'colls_list_owner',
@@ -136,6 +176,8 @@ $core_componentwidget_defs = array(
 		),
 );
 
+// Set additional param to add new widget:
+$mode_url_param = $mode == 'customizer' ? '&amp;mode=customizer' : '';
 
 foreach( $widget_groups as $widget_group_code => $widget_group_title )
 {
@@ -160,8 +202,8 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 			$ComponentWidget = new $classname( NULL, 'core', $widget_code );
 
 			echo '<li>';
-			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
-			echo get_icon( 'new' ).' <strong>'.$ComponentWidget->get_name().'</strong>';
+			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=core&amp;code='.$ComponentWidget->code.$mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
+			echo $ComponentWidget->get_icon().' <strong>'.$ComponentWidget->get_name().'</strong>';
 			echo '</a> <span class="notes">'.$ComponentWidget->get_desc().'</span> '.$ComponentWidget->get_help_link( 'manual', false );
 			echo '</li>';
 		}
@@ -173,13 +215,18 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 		foreach( $Plugin_array_grouped[ $widget_group_code ] as $Plugin )
 		{
 			echo '<li>';
-			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
-			echo get_icon( 'puzzle' ).' <strong>'.$Plugin->name.'</strong>';
+			echo '<a href="'.regenerate_url( '', 'action=create&amp;type=plugin&amp;code='.$Plugin->code.$mode_url_param.'&amp;'.url_crumb( 'widget' ) ).'" title="'.T_('Add this widget to the container').'">';
+			echo $Plugin->get_widget_icon().' <strong>'.$Plugin->name.'</strong>';
 			echo '</a> <span class="notes">'.$Plugin->short_desc.'</span> '.$Plugin->get_help_link( '$widget_url', 'manual', false );
 			echo '</li>';
 		}
 	}
 
 	echo '</ul>';
+}
+
+if( $mode == 'customizer' )
+{	// End of customizer content:
+	echo '</div>';
 }
 ?>

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -24,6 +24,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class user_tools_Widget extends ComponentWidget
 {
+	var $icon = 'gears';
+
 	/**
 	 * Constructor
 	 */
@@ -258,6 +260,7 @@ class user_tools_Widget extends ComponentWidget
 	{
 		if( !is_logged_in() )
 		{	// Only logged in users can see this tools panel
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because you are not logged in.' );
 			return false;
 		}
 
@@ -314,6 +317,7 @@ class user_tools_Widget extends ComponentWidget
 
 		if( empty( $tools_links ) )
 		{	// No available links to display
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because no available links to display.' );
 			return false;
 		}
 

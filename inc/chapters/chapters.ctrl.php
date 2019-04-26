@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -366,14 +366,42 @@ switch( $action )
 		break;
 
 	case 'make_default':
-		// Make category as default
+		// Make category as default:
+		if( $edited_Chapter->get( 'meta' ) )
+		{	// If category is meta:
+			$Messages->add( T_('Meta category cannot be used as default!'), 'error' );
+			break;
+		}
+
+		if( $edited_Chapter->get( 'ityp_ID' ) === '0' )
+		{	// Force "No default type" of default category to "Same as collection default":
+			$edited_Chapter->set( 'ityp_ID', NULL, true );
+			if( $edited_Chapter->dbupdate() )
+			{	// Inform user about this modification:
+				$Messages->add( sprintf( T_('The default Item Type of the default category must be defined. Therefore it has been set to "%s".'), T_('Same as collection default') ), 'note' );
+			}
+		}
 
 		$edited_Blog->set_setting( 'default_cat_ID', $edited_Chapter->ID );
 		$edited_Blog->dbsave();
+
+		$Messages->add( sprintf( T_('Default category of this collection has been updated to "%s".'), $edited_Chapter->get( 'name' ) ), 'success' );
+
+		// We want to highlight the edited object on next list display:
+		$Session->set( 'fadeout_array', array( $edited_Chapter->ID ) );
+
+		header_redirect( $admin_url.'?ctrl=chapters&blog='.$blog );
 		break;
 
 	case 'set_meta':
 		// Make category as meta category
+
+		if( $edited_Blog->get_default_cat_ID() == $edited_Chapter->ID )
+		{	// If category is default:
+			$Messages->add( T_('Meta category cannot be used as default!'), 'error' );
+			header_redirect( '?ctrl=chapters&blog='.$blog, 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
 
 		// Start serializable transaction because a category can be meta only if it has no posts
 		$DB->begin( 'SERIALIZABLE' );
@@ -469,7 +497,14 @@ $AdminUI->set_path( 'collections', 'categories' );
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=colls_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 $AdminUI->breadcrumbpath_add( T_('Categories'), $admin_url.'?ctrl=chapters&amp;blog=$blog$' );
 
-$AdminUI->set_page_manual_link( 'categories-tab' );
+if( in_array( $action, array( 'new', 'edit', 'copy', 'create', 'update' ) ) )
+{
+	$AdminUI->set_page_manual_link( 'category-edit-form' );
+}
+else
+{
+	$AdminUI->set_page_manual_link( 'categories-tab' );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

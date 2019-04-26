@@ -8,7 +8,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2006 by Daniel HAHLER - {@link http://daniel.hahler.de/}.
  *
  * @package plugins
@@ -69,6 +69,7 @@ class Plugins_admin extends Plugins
 	 *  - PluginUserSettingsUpdateAction (Called as action before updating the plugin's user settings)
 	 *  - PluginUserSettingsEditDisplayAfter (Called after displaying normal user settings)
 	 *  - PluginUserSettingsValidateSet (Called before setting a plugin's user setting in the backoffice)
+	 *  - PluginGroupSettingsValidateSet (Called before setting a plugin's group setting in the backoffice)
 	 *  - PluginVersionChanged (Called when we detect a version change)
 	 *  - PluginCollSettingsUpdateAction (Called as action before updating the collection/blog's settings)
 	 *
@@ -153,6 +154,7 @@ class Plugins_admin extends Plugins
 				'RenderEmailAsHtml' => 'Renders email content when generated as HTML.',
 				'PrepareForRenderEmailAttachment' => 'Prepare to render email campaign attachment.',
 				'RenderEmailAttachment' => 'Renders email campaign attachment.',
+				'RenderInlineTags' => 'Render inline tags.',
 				'RenderURL' => 'Renders file by URL.',
 
 
@@ -225,9 +227,8 @@ class Plugins_admin extends Plugins
 				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
 
 				// Other Plugins can use this:
-				'CaptchaValidated' => 'Validate the test from CaptchaPayload to detect humans.',
-				'CaptchaValidatedCleanup' => 'Cleanup data used for CaptchaValidated.',
-				'CaptchaPayload' => 'Provide a turing test to detect humans.',
+				'RequestCaptcha' => 'Return data to display captcha html code.',
+				'ValidateCaptcha' => 'Validate the test from RequestCaptcha to detect humans.',
 
 				'RegisterFormSent' => 'Called when the "Register" form has been submitted.',
 				'ValidateAccountFormSent' => 'Called when the "Validate account" form has been submitted.',
@@ -265,6 +266,10 @@ class Plugins_admin extends Plugins
 				'HandleDispMode' => 'Called when displaying $disp',
 
 				'GetAdditionalColumnsTable' => 'Called to add columns for Results object',
+				'GetImageInlineTags' => 'Called to add tabs on the modal/popup window "Insert image into content"',
+				'InitImageInlineTagForm' => 'Called to initialize params for form of additional tab on the modal/popup window "Insert image into content"',
+				'DisplayImageInlineTagForm' => 'Called to display a form for additional tab on the modal/popup window "Insert image into content"',
+				'GetInsertImageInlineTagJavaScript' => 'Called to get an additional JavaScript before submit/insert inline tag from the modal/popup window "Insert image into content"',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
@@ -676,13 +681,17 @@ class Plugins_admin extends Plugins
 
 		$DB->begin();
 
-		// Delete Plugin settings (constraints)
-		$DB->query( "DELETE FROM T_pluginsettings
-		              WHERE pset_plug_ID = $plugin_ID" );
+		// Delete Plugin settings (constraints):
+		$DB->query( 'DELETE FROM T_pluginsettings
+			WHERE pset_plug_ID = '.$plugin_ID );
 
-		// Delete Plugin user settings (constraints)
-		$DB->query( "DELETE FROM T_pluginusersettings
-		              WHERE puset_plug_ID = $plugin_ID" );
+		// Delete Plugin user settings (constraints):
+		$DB->query( 'DELETE FROM T_pluginusersettings
+			WHERE puset_plug_ID = '.$plugin_ID );
+
+		// Delete Plugin group settings (constraints):
+		$DB->query( 'DELETE FROM T_plugingroupsettings
+			WHERE pgset_plug_ID = '.$plugin_ID );
 
 		// Delete Plugin events (constraints)
 		$plugin_events = $DB->get_col( '
@@ -945,20 +954,9 @@ class Plugins_admin extends Plugins
 	{
 		global $DB;
 
-		if( strlen( $code ) < 8 )
+		if( ! preg_match( '#^[A-Za-z0-9\-_]{8,32}$#', $code ) )
 		{
-			return T_( 'The minimum length of a plugin code is 8 characters.' );
-		}
-
-		if( strlen( $code ) > 32 )
-		{
-			return T_( 'The maximum length of a plugin code is 32 characters.' );
-		}
-
-		// TODO: more strict check?! Just "[\w_-]+" as regexp pattern?
-		if( strpos( $code, '.' ) !== false )
-		{
-			return T_( 'The plugin code cannot include a dot!' );
+			return sprintf( T_('The field "%s" must be from %d to %d letters, digits or signs %s.'), T_('Code'), 8, 32, '<code>_</code>, <code>-</code>' );
 		}
 
 		if( ! empty($code) && isset( $this->index_code_ID[$code] ) )
@@ -1008,7 +1006,7 @@ class Plugins_admin extends Plugins
 		if( $result )
 		{ // Update references to code:
 			// Widgets
-			$DB->query( 'UPDATE T_widget
+			$DB->query( 'UPDATE T_widget__widget
 				  SET wi_code = '.$DB->quote( $code ).'
 				WHERE wi_code = '.$DB->quote( $old_code ) );
 			// Update the renderer fields in the tables of Items, Comments and Messages:
@@ -1464,7 +1462,7 @@ class Plugins_admin extends Plugins
 
 					case 'api_min':
 						// obsolete since 1.9:
-						continue;
+						break;
 
 
 					default:

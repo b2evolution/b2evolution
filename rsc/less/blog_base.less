@@ -226,7 +226,7 @@ a.comment_reply_current {
 	text-align: center;
 	font-weight: bold;
 	color: #FF0000;
-	margin-top: 10px;
+	margin: 10px 0;
 }
 a.comment_reply_current:hover {
 	color: #0066CC;
@@ -327,7 +327,7 @@ textarea.form_textarea_input {
 
 
 // Avatar widget
-div.widget_core_coll_avatar {
+div.widget_core_user_profile_pics {
 	margin-top: 1em;
 	margin-bottom: 1em;
 	text-align:center;
@@ -348,42 +348,20 @@ div.container_menu_top input.search_field {
 	width: 160px;	// There is typically more space here
 }
 
-// User login/register widget
-.widget_core_user_login #login_form,
-.widget_core_user_register #register_form {
-	margin-top: 5px;
+// User greeting widget:
+.widget_core_user_greetings {
+	.greeting, .avatar {
+		vertical-align: middle;
+	}
+	.user_group, .user_level {
+		color: #999;
+	}
 }
-.widget_core_user_login fieldset,
-.widget_core_user_register fieldset {
-	border: none;
-	padding: 0;
-	margin: 0;
-}
-.widget_core_user_login .field_login_btn,
-.widget_core_user_register .field_register_btn {
-	margin: 5px 0;
-}
-.widget_core_user_login #ffield_pwd{
-	margin-top: 5px;
-}
-.widget_core_user_login .input_text,
-.widget_core_user_register .input_text {
-	width: 96%;
-}
-.widget_core_user_login .submit,
-.widget_core_user_register .submit {
-	font-size: 10px;
-}
-.widget_core_user_login .register_link {
-	font-weight: bold;
-}
-.widget_core_user_login .greeting,
-.widget_core_user_login .avatar {
-	vertical-align: middle;
-}
-.widget_core_user_login .user_group,
-.widget_core_user_login .user_level {
-	color: #999;
+
+// User Profile Picture widget
+.widget_core_user_profile_pics img {
+	max-width: 100%;
+	height: auto;
 }
 
 // Advertisement widget
@@ -465,6 +443,17 @@ div.results {
 	overflow: auto;
 }
 
+// Styles for edit-screen instructions
+div.action_messages.evo_instruction {
+	margin: 10px 0 0;
+	ul, li {
+		list-style: initial;
+	}
+	ul {
+		padding-left: 20px;
+	}
+}
+
 // Styles for in-skin editing
 form.inskin{
 	padding: 10px;
@@ -487,41 +476,39 @@ table.catselect {
 	border-spacing:0;
 	width:100%;
 	border: 1px solid #bbb;
-}
-table.catselect th {
-	padding: .3ex 1ex;
-	background-color: #ddd;
-	border-bottom: 1px solid #bbb;
-}
-table.catselect td {
-	padding: .2ex 1ex;
-}
-table.catselect tr.group td {
-	border-top: 1px solid #bbb;
-	border-bottom: 1px solid #bbb;
-	background-color: #ccc;
-	font-weight: bold;
-}
-table.catselect tr.odd,
-table.catselect tr.odd input {
-	background-color: #eee;
-}
-table.catselect tr.even,
-table.catselect tr.even input {
-	background-color:#ddd;
-}
-table.catselect tr:hover,
-table.catselect tr:hover input {
-	background-color:#ccc;
-}
-table.catselect th.selector,
-table.catselect td.selector {
-	width: 1%;
-	text-align:center;
-	border-right: 1px solid #bbb;
-}
-table.catselect #new_category_name {
-	background-color:white;
+	th {
+		padding: .3ex 1ex;
+		background-color: #ddd;
+		border-bottom: 1px solid #bbb;
+	}
+	td {
+		padding: .2ex 1ex;
+	}
+	th, td {
+		border-right: 1px solid #bbb;
+		&:last-child {
+			border-right: none;
+		}
+	}
+	tr.group td {
+		border-top: 1px solid #bbb;
+		border-bottom: 1px solid #bbb;
+		background-color: #ccc;
+		font-weight: bold;
+	}
+	tr.odd {
+		background-color: #eee;
+	}
+	tr.even {
+		background-color:#ddd;
+	}
+	tr:hover,
+	tr:hover input {
+		background-color:#ccc;
+	}
+	.catsel_order input {
+		width: 40px;
+	}
 }
 
 // Raty icons (stars)
@@ -752,15 +739,6 @@ div.results span[class*=status_] span {
 	width: 80px;
 }
 
-@fix-IE8-media-screen: ~"\0screen";
-@media @fix-IE8-media-screen {/* IE8 */
-	#styled_content_block span[class*=status_] span,
-	.evo_content_block span[class*=status_] span {
-		top: -15px;
-		left: -2px;
-	}
-}
-
 .search_title {
 	font-size: 125%;
 	color: #666;
@@ -885,7 +863,8 @@ input.btn-lg {
 .main_profile_picture {
 	.border-radius;
 }
-.other_profile_pictures {
+div.other_profile_pictures {
+	text-align: left;
 	margin-bottom: 10px;
 	img {
 		.border-radius;
@@ -930,33 +909,34 @@ input.btn-lg {
 }
 
 // Standard style for all tables of content:
-.evo_content_block table {
-	border-spacing: 0;
-	border-collapse: collapse;
-	margin: 1em 0;
-	th {
-		border: 1px solid #ddd;
-		padding: 8px;
-		background-color: #eee;
-	}
-	td {
-		border: 1px solid #ddd;
-		padding: 8px;
-		vertical-align: top;
-	}
-}
-
-.evo_content_block table.evo_poll__table {
-	border-spacing: 0;
-	border-collapse: collapse;
-	margin: 1em 0;
-	th {
-		padding: 2px 10px 2px 0;
-		background-color: #eee;
-	}
-	td {
-		padding: 2px 10px 2px 0;
-		vertical-align: top;
+.evo_content_block {
+	table {
+		border-spacing: 0;
+		border-collapse: collapse;
+		margin: 1em 0;
+		th {
+			border: 1px solid #ddd;
+			padding: 8px;
+			background-color: #eee;
+		}
+		td {
+			border: 1px solid #ddd;
+			padding: 8px;
+			vertical-align: top;
+		}
+		&.evo_poll__table {
+			td {
+				padding: 2px 10px 2px 0;
+			}
+		}
+		&.item_custom_fields {
+			border: none;
+			margin-bottom: 10px;
+			th, td {
+				vertical-align: middle;
+				padding: 0 10px 0 0;
+			}
+		}
 	}
 }
 
@@ -967,12 +947,18 @@ input.btn-lg {
 }
 
 // Poll table:
+.evo_poll__question {
+	font-weight: bold;
+}
 .evo_poll__table {
 	margin-bottom: 14px;
 	width: 100%;
 	td {
 		padding: 2px 10px 2px 0;
 		vertical-align: top;
+	}
+	td.evo_poll__title label {
+		font-weight: normal;
 	}
 	tr td:last-child {
 		padding-right: 0;
@@ -1007,4 +993,47 @@ input.btn-lg {
 }
 .evo_container__sidebar .evo_poll__title {
 	white-space: normal;
+}
+
+// Widget forms:
+.evo_widget_form__compact, .evo_widget_form__nolabels {
+	fieldset {
+		border: none;
+		padding: 0;
+		margin: 0;
+	}
+	input[type=submit] {
+		margin: 5px 0;
+	}
+	.input_text {
+		width: 96%;
+	}
+}
+.evo_widget_form__nolabels {
+	.label label {
+		display: none;
+	}
+}
+
+// Button to close popup windows:
+.close {
+	float: right;
+	font-size: 21px;
+	font-weight: bold;
+	line-height: 1;
+	color: #000;
+	opacity: .2;
+	&:hover {
+		color: #000;
+		text-decoration: none;
+		cursor: pointer;
+		opacity: .5;
+	}
+	button& {
+		-webkit-appearance: none;
+		padding: 0;
+		cursor: pointer;
+		background: transparent;
+		border: 0;
+	}
 }

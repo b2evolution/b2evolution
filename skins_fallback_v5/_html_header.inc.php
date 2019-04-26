@@ -28,9 +28,6 @@ $params = array_merge( array(
 	'body_class'    => NULL,
 ), $params );
 
-// The following is temporary and should be moved to some SiteSkin class
-siteskin_init();
-
 init_bubbletip_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) ); // Add jQuery bubbletip plugin
 // CSS for IE9. NOTE: Don't use php checking here because of page caching!
 add_headline( '<!--[if IE 9 ]>' );
@@ -105,6 +102,8 @@ echo $params['html_tag'];
 $Blog->disp_setting( 'body_includes', 'raw' );
 
 $Plugins->trigger_event( 'SkinBeginHtmlBody' );
+
+modules_call_method( 'SkinBeginHtmlBody' );
 
 // ---------------------------- TOOLBAR INCLUDED HERE ----------------------------
 require skin_fallback_path( '_toolbar.inc.php' );

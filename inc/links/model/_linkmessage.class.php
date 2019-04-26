@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -47,18 +47,36 @@ class LinkMessage extends LinkOwner
 			'Link files to current xxx' => NT_('Link files to current message'),
 			'Selected files have been linked to xxx.' => NT_('Selected files have been linked to message.'),
 			'Link has been deleted from $xxx$.' => NT_('Link has been deleted from message.'),
+			'Cannot delete Link from $xxx$.' => NT_( 'Cannot delete Link from message.' ),
 		);
 	}
 
 	/**
-	 * Check current User Message permission
+	 * Check current User has an access to work with attachments of the link Message
 	 *
-	 * @param string permission level
-	 * @param boolean true to assert if user dosn't have the required permission
+	 * @param string Permission level
+	 * @param boolean TRUE to assert if user dosn't have the required permission
+	 * @param object File Root to check permission to add/upload new files
+	 * @return boolean
 	 */
-	function check_perm( $permlevel, $assert = false )
+	function check_perm( $permlevel, $assert = false, $FileRoot = NULL )
 	{
 		global $current_User;
+
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			if( $assert )
+			{	// Halt the denied access:
+				debug_die( 'You have no permission for message attachments!' );
+			}
+			return false;
+		}
+
+		if( $permlevel == 'add' )
+		{	// Check permission to add/upload new files:
+			return $current_User->check_perm( 'files', $permlevel, $assert, $FileRoot );
+		}
+
 		return $current_User->check_perm( 'perm_messaging', 'reply', $assert );
 	}
 

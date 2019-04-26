@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -24,7 +24,7 @@ $Form->begin_form( 'fform', T_('WordPress XML Importer') );
 $Form->begin_fieldset( T_('Report of the import') );
 
 	// Get data to import from wordpress XML file:
-	$wp_file = get_param( 'wp_file' );
+	$wp_file = get_param( 'import_file' );
 	$wpxml_import_data = wpxml_get_import_data( $wp_file );
 
 	echo '<p>';
@@ -63,7 +63,7 @@ $Form->begin_fieldset( T_('Report of the import') );
 $Form->end_fieldset();
 
 $Form->buttons( array(
-		array( 'button', 'button', T_('Go to Blog'), 'SaveButton', 'onclick' => 'location.href=\''.$Blog->get( 'url' ).'\'' ),
+		array( 'button', 'button', T_('Go to collection').' >>', 'SaveButton', 'onclick' => 'location.href=\''.$Blog->get( 'url' ).'\'' ),
 	) );
 
 $Form->end_form();

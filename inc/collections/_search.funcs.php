@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -28,7 +28,7 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
 	$score = 0.0;
 	$scores_map = array();
 
-	if( !empty( $search_term ) && strpos( $text, $search_term ) !== false )
+	if( !empty( $search_term ) && utf8_stripos( $text, $search_term ) !== false )
 	{
 		// the max score what it may received in this methods
 		$score = ( ( count( $words ) * 4 ) + ( count( $quoted_terms ) * 6 ) ) * $score_weight;
@@ -38,7 +38,7 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
 
 	$all_found = true;
 	foreach( $quoted_terms as $quoted_term )
-	{ // find quoted keywords
+	{	// find quoted keywords
 		$count = empty( $quoted_term ) ? 0 : substr_count( $text, $quoted_term );
 		if( $count == 0 )
 		{
@@ -72,7 +72,7 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
 		}
 
 		if( $word_match_count = preg_match_all( '/\b'.preg_quote( $word, '/' ).'\b/i', $text, $matches ) )
-		{ // Every word match gives one more score
+		{	// Every word match gives one more score
 			$scores_map['whole_word_match'][$word] = $score_weight;
 			$score += $scores_map['whole_word_match'][$word];
 		}
@@ -82,11 +82,11 @@ function score_text( $text, $search_term, $words = array(), $quoted_terms = arra
 		}
 
 		if( $any_match_count = preg_match_all( '/'.preg_quote( $word, '/' ).'/i', $text, $matches ) )
-		{ // Every word match gives one more score
+		{	// Every word match gives one more score
 			$scores_map['word_case_insensitive_match'][$word] = $score_weight;
 			$score += $scores_map['word_case_insensitive_match'][$word];
 			if( $any_match_count > 1 )
-			{ // there are multiple occurrences
+			{	// there are multiple occurrences
 				$scores_map['word_multiple_occurences'][$word] = score_multiple_occurences( $any_match_count, $score_weight );
 				$score += $scores_map['word_multiple_occurences'][$word];
 			}
@@ -137,29 +137,51 @@ function score_tags( $tag_name, $search_term, $score_weight = 4 )
  * Return a search score for the given date. Recent dates get higher scores.
  *
  * @param string the date to score
+ * @param array Score weights depending on date:
+ *               - 'future'     - Wrong date because it is more than current local time
+ *               - 'more_month' - Date is more month
+ *               - 'last_month' - Last month
+ *               - 'two_weeks'  - Last two weeks
+ *               - 'last_week'  - Last week, We subtract from this score a number of day and result cannot be less than 'two_weeks'
  * @return integer the result score
  */
-function score_date( $date )
+function score_date( $date, $score_weights = array() )
 {
 	global $localtimenow;
 
+	$score_weights = array_merge( array(
+			'future'     => 0,
+			'more_month' => 0,
+			'last_month' => 1,
+			'two_weeks'  => 2,
+			'last_week'  => 8,
+		), $score_weights );
+
 	$day_diff = floor( ($localtimenow - strtotime($date)) / (60 * 60 * 24) );
 	if( $day_diff < 0 )
-	{
-		return 0;
+	{	// If date is more current locale time:
+		return $score_weights['future'];
 	}
 
 	if( $day_diff <= 7 )
-	{
-		return ( ( $day_diff < 5 ) ? ( 8 - $day_diff ) : 3 );
+	{	// Last week:
+		$score = $score_weights['last_week'] - $day_diff;
+		return ( $score > $score_weights['two_weeks'] ) ? $score : $score_weights['two_weeks'] + 1;
 	}
 
 	if( $day_diff < 15 )
-	{
-		return 2;
+	{	// Last two weeks:
+		return $score_weights['two_weeks'];
 	}
 
-	return ( ( $day_diff < 31 ) ? 1 : 0 );
+	if( $day_diff < 31 )
+	{	// Last month:
+		return $score_weights['last_month'];
+	}
+	else
+	{	// More month:
+		return $score_weights['more_month'];
+	}
 }
 
 
@@ -207,6 +229,10 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 			$searched_parts = array( 'name' );
 			break;
 
+		case 'file':
+			$searched_parts = array( 'filename', 'title', 'alt', 'description' );
+			break;
+
 		default:
 			debug_die( 'Invalid search type received!' );
 	}
@@ -215,7 +241,7 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 	foreach( $searched_parts as $searched_part )
 	{
 		if( isset( $scores_map[$searched_part]['map']['whole_term'] ) )
-		{ // The whole search term was found
+		{	// The whole search term was found
 			return 100;
 		}
 	}
@@ -253,15 +279,62 @@ function get_percentage_from_result_map( $type, $scores_map, $quoted_parts, $key
 
 
 /**
+ * Get date by content age value
+ *
+ * @param string Content age:
+ * @return string Date in format YYYYmmddHHiiss
+ */
+function get_search_date_by_content_age( $content_age )
+{
+	global $localtimenow;
+	switch( $content_age )
+	{
+		case 'hour':
+			// Last hour:
+			$date = date( 'YmdHis', $localtimenow - 3600 ); // 60 * 60
+			break;
+		case 'day':
+			// Last day:
+			$date = date( 'YmdHis', $localtimenow - 86400 ); // 3600 * 24
+			break;
+		case 'week':
+			// Last week:
+			$date = date( 'YmdHis', $localtimenow - 604800 ); // 86400 * 7
+			break;
+		case '30d':
+			// Last 30 days:
+			$date = date( 'YmdHis', $localtimenow - 2592000 ); // 86400 * 30
+			break;
+		case '90d':
+			// Last 90 days:
+			$date = date( 'YmdHis', $localtimenow - 7776000 ); // 86400 * 90
+			break;
+		case 'year':
+			// Last year:
+			$date = date( 'YmdHis', $localtimenow - 31190400 ); // 86400 * 361
+			break;
+		case 'anytime':
+		default:
+			// Unknown age value:
+			$date = NULL;
+			break;
+	}
+	return $date;
+}
+
+
+/**
  * Search and score items
  *
  * @param string original search term
  * @param array all separated words from the search term
  * @param array all quoted parts from the search term
  * @param string Post IDs to exclude from result, Separated with ','(comma)
- * @param number max possible score
+ * @param string If logged in, comma separated Author IDs to filter, otherwise author user login
+ * @param string Content age to consider
+ * @return array Results
  */
-function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclude_posts = '' )
+function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclude_posts = '', $authors = '', $content_age = '' )
 {
 	global $DB, $Collection, $Blog;
 
@@ -286,19 +359,31 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 
 	// Prepare filters:
 	$search_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), '', 'ItemCache', 'search_item' );
-	$search_ItemList->set_filters( array(
+	$search_filters = array(
 			'keywords'      => $search_term,
 			'keyword_scope' => 'title,content,tags,excerpt,titletag', // TODO: add more fields
+			'ymdhms_min'    => get_search_date_by_content_age( $content_age ),
 			'phrase'        => 'OR',
 			'itemtype_usage'=> '-sidebar', // Exclude from search: 'sidebar' item types
 			'orderby'       => 'datemodified',
 			'order'         => 'DESC',
 			'posts'         => 1000,
 			'post_ID_list'  => $exclude_posts,
-		) );
+		);
+
+	if( ! empty( $authors ) && is_logged_in() )
+	{
+		$search_filters['authors'] = $authors;
+	}
+	$search_ItemList->set_filters( $search_filters );
 
 	// Generate query from filters above and count results:
 	$search_ItemList->query_init();
+
+	if( ! is_logged_in() && ! empty( $authors ) )
+	{	// This is necessary because the 'authors_login' filter above will not work for non-existent logins and
+		$search_ItemList->ItemQuery->WHERE_and( 'user_login = '.$DB->quote( $authors ) );
+	}
 
 	// Make a custom search query:
 	$search_query = 'SELECT DISTINCT post_ID, post_datestart, post_datemodified, post_title, post_content,'
@@ -319,16 +404,22 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 	{
 		$scores_map = array();
 
-		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ 5 );
-		$scores_map['content'] = score_text( $row->post_content, $search_term, $keywords, $quoted_parts );
-		$scores_map['tags'] = score_tags( $row->tag_name, $search_term, /* multiplier: */ 4 );
-		$scores_map['excerpt'] = score_text( $row->post_excerpt, $search_term, $keywords, $quoted_parts );
-		$scores_map['titletag'] = score_text( $row->post_titletag, $search_term, $keywords, $quoted_parts, 4 );
-		if( !empty( $search_term ) && !empty( $row->creator_login ) && strpos( $row->creator_login, $search_term ) !== false )
+		$scores_map['title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_post_title' ) );
+		$scores_map['content'] = score_text( $row->post_content, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_post_content' ) );
+		$scores_map['tags'] = score_tags( $row->tag_name, $search_term, /* multiplier: */ $Blog->get_setting( 'search_score_post_tags' ) );
+		$scores_map['excerpt'] = score_text( $row->post_excerpt, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_post_excerpt' ) );
+		$scores_map['titletag'] = score_text( $row->post_titletag, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_post_titletag' ) );
+		if( !empty( $search_term ) && !empty( $row->creator_login ) && utf8_stripos( $row->creator_login, $search_term ) !== false )
 		{
-			$scores_map['creator_login'] = 5;
+			$scores_map['creator_login'] = /* multiplier: */ $Blog->get_setting( 'search_score_post_author' );
 		}
-		$scores_map['last_mod_date'] = score_date( $row->post_datemodified );
+		$scores_map['last_mod_date'] = score_date( $row->post_datemodified, /* multipliers: */ array(
+				'future'     => $Blog->get_setting( 'search_score_post_date_future' ),
+				'more_month' => $Blog->get_setting( 'search_score_post_date_moremonth' ),
+				'last_month' => $Blog->get_setting( 'search_score_post_date_lastmonth' ),
+				'two_weeks'  => $Blog->get_setting( 'search_score_post_date_twoweeks' ),
+				'last_week'  => $Blog->get_setting( 'search_score_post_date_lastweek' ),
+			) );
 
 		$final_score = $scores_map['title']['score']
 			+ $scores_map['content']['score']
@@ -357,28 +448,40 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
  * @param string original search term
  * @param array all separated words from the search term
  * @param array all quoted parts from the search term
- * @param number max possible score
+ * @param string If logged in, comma separated Author IDs to filter, otherwise author user login
+ * @param string Content age to consider
+ * @return array Results
  */
-function search_and_score_comments( $search_term, $keywords, $quoted_parts )
+function search_and_score_comments( $search_term, $keywords, $quoted_parts, $authors = '', $content_age = '' )
 {
 	global $DB, $Collection, $Blog;
 
 	// Search between comments
 	$search_CommentList = new CommentList2( $Blog, '', 'CommentCache', 'search_comment' );
-	$search_CommentList->set_filters( array(
-			'keywords' => $search_term,
-			'phrase' => 'OR',
-			'order_by' => 'date',
-			'order' => 'DESC',
-			'comments' => 1000
-		) );
+
+	$search_filters = array(
+			'keywords'      => $search_term,
+			'ymdhms_min'    => get_search_date_by_content_age( $content_age ),
+			'phrase'        => 'OR',
+			'order_by'      => 'date',
+			'order'         => 'DESC',
+			'comments'      => 1000,
+			'author_IDs'    => is_logged_in() ? $authors : NULL
+		);
+
+	if( ! is_logged_in() && ! empty( $authors ) )
+	{
+		$search_filters['authors_login'] = $authors;
+	}
+
+	$search_CommentList->set_filters( $search_filters );
 	$search_CommentList->query_init();
 
 	$search_query = 'SELECT comment_ID, post_title, comment_content, comment_date,
 	 	IFNULL(comment_author, user_login) as author'
 		.$search_CommentList->CommentQuery->get_from()
 		.' LEFT JOIN T_items__item ON comment_item_ID = post_ID'
-		.' LEFT JOIN T_users ON post_creator_user_ID = user_ID'
+		.' LEFT JOIN T_users ON comment_author_user_ID = user_ID'
 		.$search_CommentList->CommentQuery->get_where()
 		.$search_CommentList->CommentQuery->get_group_by()
 		.$search_CommentList->CommentQuery->get_order_by()
@@ -391,13 +494,19 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts )
 	{
 		$scores_map = array();
 
-		$scores_map['item_title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts );
-		$scores_map['content'] = score_text( $row->comment_content, $search_term, $keywords, $quoted_parts );
-		if( !empty( $row->author ) && !empty( $search_term ) && strpos( $row->author, $search_term ) !== false )
+		$scores_map['item_title'] = score_text( $row->post_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_cmnt_post_title' ) );
+		$scores_map['content'] = score_text( $row->comment_content, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_cmnt_content' ) );
+		if( !empty( $row->author ) && !empty( $search_term ) && utf8_stripos( $row->author, $search_term ) !== false )
 		{
-			$scores_map['author_name'] = 5;
+			$scores_map['author_name'] = /* multiplier: */ $Blog->get_setting( 'search_score_cmnt_author' );
 		}
-		$scores_map['creation_date'] = score_date( $row->comment_date );
+		$scores_map['creation_date'] = score_date( $row->comment_date, /* multipliers: */ array(
+				'future'     => $Blog->get_setting( 'search_score_cmnt_date_future' ),
+				'more_month' => $Blog->get_setting( 'search_score_cmnt_date_moremonth' ),
+				'last_month' => $Blog->get_setting( 'search_score_cmnt_date_lastmonth' ),
+				'two_weeks'  => $Blog->get_setting( 'search_score_cmnt_date_twoweeks' ),
+				'last_week'  => $Blog->get_setting( 'search_score_cmnt_date_lastweek' ),
+			) );
 
 		$final_score = $scores_map['item_title']['score']
 			+ $scores_map['content']['score']
@@ -423,7 +532,6 @@ function search_and_score_comments( $search_term, $keywords, $quoted_parts )
  * @param string original search term
  * @param array all separated words from the search term
  * @param array all quoted parts from the search term
- * @param number max possible score
  */
 function search_and_score_chapters( $search_term, $keywords, $quoted_parts )
 {
@@ -450,8 +558,8 @@ function search_and_score_chapters( $search_term, $keywords, $quoted_parts )
 	while( ( $iterator_Chapter = & $ChapterCache->get_next() ) != NULL )
 	{
 		$scores_map = array();
-		$scores_map['name'] = score_text( $iterator_Chapter->get( 'name' ), $search_term, $keywords, $quoted_parts, 3 );
-		$scores_map['description'] = score_text( $iterator_Chapter->get( 'description' ), $search_term, $keywords, $quoted_parts );
+		$scores_map['name'] = score_text( $iterator_Chapter->get( 'name' ), $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_cat_name' ) );
+		$scores_map['description'] = score_text( $iterator_Chapter->get( 'description' ), $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_cat_desc' ) );
 
 		$final_score = $scores_map['name']['score']
 			+ $scores_map['description']['score'];
@@ -474,7 +582,6 @@ function search_and_score_chapters( $search_term, $keywords, $quoted_parts )
  * @param string original search term
  * @param array all separated words from the search term
  * @param array all quoted parts from the search term
- * @param number max possible score
  */
 function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 {
@@ -493,7 +600,7 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 	}
 
 	// Search between tags:
-	$tags_SQL = new SQL();
+	$tags_SQL = new SQL( 'Get tags matching to the search keywords' );
 	$tags_SQL->SELECT( 'tag_ID, tag_name, COUNT( DISTINCT itag_itm_ID ) AS post_count' );
 	$tags_SQL->FROM( 'T_items__tag' );
 	$tags_SQL->FROM_add( 'INNER JOIN T_items__itemtag ON itag_tag_ID = tag_ID' );
@@ -502,7 +609,7 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 	$tags_SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $Blog->ID ) );
 	$tags_SQL->WHERE_and( $tag_where_condition );
 	$tags_SQL->GROUP_BY( 'tag_name' );
-	$tags = $DB->get_results( $tags_SQL->get(), OBJECT, 'Get tags matching to the search keywords' );
+	$tags = $DB->get_results( $tags_SQL );
 
 	foreach( $tags as $tag )
 	{
@@ -512,7 +619,7 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 		}
 
 		$scores_map = array();
-		$scores_map['name'] = score_text( $tag->tag_name, $search_term, $keywords, $quoted_parts, 3 );
+		$scores_map['name'] = score_text( $tag->tag_name, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_tag_name' ) );
 		$final_score = $scores_map['name']['score'];
 
 		$search_result[] = array(
@@ -529,16 +636,127 @@ function search_and_score_tags( $search_term, $keywords, $quoted_parts )
 
 
 /**
+ * Search and score files
+ *
+ * @param string original search term
+ * @param array all separated words from the search term
+ * @param array all quoted parts from the search term
+ * @param string Author IDs to filter, separated with ',' (comma)
+ * @param string Content age to consider
+ * @return array Results
+ */
+function search_and_score_files( $search_term, $keywords, $quoted_parts, $authors = '', $content_age = '' )
+{
+	global $DB, $Collection, $Blog, $time_difference;
+
+	// Init result array:
+	$search_result = array();
+
+	// Set query conditions:
+	$or = '';
+	$file_where_condition = '';
+	foreach( $keywords as $keyword )
+	{
+		$keyword = $DB->escape( $keyword );
+		$file_where_condition .= $or.' ( file_path LIKE \'%'.$keyword.'%\' OR file_title LIKE \'%'.$keyword.'%\' OR file_alt LIKE \'%'.$keyword.'%\' OR file_desc LIKE \'%'.$keyword.'%\' )';
+		$or = ' OR';
+	}
+
+	// Search between files:
+	$files_SQL = new SQL( 'Get files matching to the search keywords' );
+	$files_SQL->SELECT( 'file_ID, file_path, file_title, file_alt, file_desc, GROUP_CONCAT( DISTINCT link_itm_ID SEPARATOR "," ) AS post_IDs, GROUP_CONCAT( DISTINCT link_cmt_ID SEPARATOR "," ) AS comment_IDs' );
+	$files_SQL->FROM( 'T_files' );
+	$files_SQL->FROM_add( 'INNER JOIN T_links ON link_file_ID = file_ID' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_postcats AS ipc ON link_itm_ID = ipc.postcat_post_ID' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_items__item ON post_ID = ipc.postcat_post_ID' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_categories AS icat ON ipc.postcat_cat_ID = icat.cat_ID' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_comments ON link_cmt_ID = comment_ID' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_postcats AS cpc ON comment_item_ID = cpc.postcat_post_ID' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_categories AS ccat ON cpc.postcat_cat_ID = ccat.cat_ID' );
+	if( ! empty( $authors ) && ! is_logged_in() )
+	{
+		$files_SQL->FROM_add( 'LEFT JOIN T_users AS iuser ON comment_author_user_ID = iuser.user_ID' );
+		$files_SQL->FROM_add( 'LEFT JOIN T_users AS cuser ON comment_author_user_ID = cuser.user_ID' );
+	}
+	$files_SQL->WHERE( '( icat.cat_blog_ID = '.$DB->quote( $Blog->ID ).' OR ccat.cat_blog_ID = '.$DB->quote( $Blog->ID ).' )' );
+	$files_SQL->WHERE_and( $file_where_condition );
+	if( ! empty( $authors ) )
+	{
+		if( is_logged_in() )
+		{
+			if( preg_match( '/^[0-9]+(,[0-9]+)*$/', $authors ) === false )
+			{
+				debug_die( 'Invalid comment author filter request' );
+			}
+
+			$files_SQL->WHERE_and( '( comment_author_user_ID IN ('.$authors.') OR post_creator_user_ID IN ('.$authors.') )' );
+		}
+		else
+		{
+			$files_SQL->WHERE_and( '( comment_author = '.$DB->quote( $authors ).' OR cuser.user_login = '.$DB->quote( $authors ).' OR iuser.user_login = '.$DB->quote( $authors ).' )' );
+		}
+	}
+	if( $content_age != '' )
+	{
+		$date_min = remove_seconds( strtotime( get_search_date_by_content_age( $content_age ) ) + $time_difference );
+		//$date_max = remove_seconds( $timestamp_max + $time_difference );
+		$files_SQL->WHERE_and( '( post_datestart >= '.$DB->quote( $date_min ).' OR comment_date >= '.$DB->quote( $date_min ).' )' );
+		//$files_SQL->WHERE_and( '( post_datestart <= '.$DB->quote( $date_min ).' OR comment_date <= '.$DB->quote( $date_min ).' )' );
+	}
+	$files_SQL->GROUP_BY( 'file_path, file_title, file_alt, file_desc' );
+	$files = $DB->get_results( $files_SQL, OBJECT, 'Search files query' );
+
+	foreach( $files as $file )
+	{
+		if( empty( $file->post_IDs ) && empty( $file->comment_IDs ) )
+		{	// Count only those files which have at least one post linked to it, Skip this:
+			continue;
+		}
+
+		$scores_map = array();
+		$scores_map['filename']    = score_text( basename( $file->file_path ), $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_name' ) );
+		$scores_map['filepath']    = score_text( $file->file_path, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_path' ) );
+		$scores_map['title']       = score_text( $file->file_title, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_title' ) );
+		$scores_map['alt']         = score_text( $file->file_alt, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_alt' ) );
+		$scores_map['description'] = score_text( $file->file_desc, $search_term, $keywords, $quoted_parts, /* multiplier: */ $Blog->get_setting( 'search_score_file_description' ) );
+
+		$final_score = $scores_map['filename']['score']
+				+ ( isset( $scores_map['filepath'] ) ? $scores_map['filepath']['score'] : 0 )
+				+ ( isset( $scores_map['title'] ) ? $scores_map['title']['score'] : 0 )
+				+ ( isset( $scores_map['alt'] ) ? $scores_map['alt']['score'] : 0 )
+				+ ( isset( $scores_map['description'] ) ? $scores_map['description']['score'] : 0 );
+
+		$search_result[] = array(
+			'type'       => 'file',
+			'score'      => $final_score,
+			'ID'         => $file->file_ID,
+			'full_path'  => $file->file_path,
+			'post_IDs'   => $file->post_IDs,
+			'comment_IDs'=> $file->comment_IDs,
+			'scores_map' => $scores_map,
+		);
+	}
+
+	return $search_result;
+}
+
+
+/**
  * Perform a scrored search
  * This searches matching objects and gives a match-quality-score to each found object
  *
  * @param string the search keywords
- * @param string What types search: 'all', 'item', 'comment', 'category', 'tag'
- *               Use ','(comma) as separator to use several kinds, e.g: 'item,comment' or 'tag,comment,category'
+ * @param string What types to search: 'all', 'item', 'comment', 'category', 'tag'
+ *               Use ','(comma) as separator to use several kinds, e.g: 'item,comment' or 'tag,comment,category'.
+ *               An empty value is equivalent to 'all'.
  * @param string Post IDs to exclude from result, Separated with ','(comma)
+ * @param string Author IDs to filter, separated with ',' (comma)
+ * @param string Content age to consider: 'anytime', 'hour', 'day', 'week', '30d', '90d', 'year'
+ *               An empty value is equivalent to 'anytime'.
+ *               See @get_search_date_by_content_age().
  * @return array scored search result, each element is an array( type, ID, score )
  */
-function perform_scored_search( $search_keywords, $search_types = 'all', $exclude_posts = '' )
+function perform_scored_search( $search_keywords, $searched_content_types = 'all', $exclude_posts = '', $search_authors = '', $content_age = 'anytime' )
 {
 	$keywords = trim( $search_keywords );
 	if( empty( $keywords ) )
@@ -552,13 +770,13 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 	// Get quoted parts parts of the search query
 	$quoted_parts = array();
 	if( preg_match_all( '/(["\'])(?:(?=(\\\\?))\\2.)*?\\1/', $search_keywords, $matches ) )
-	{ // There are quoted search terms
+	{	// There are quoted search terms
 		$quoted_parts = $matches[0];
 		for( $index = 0; $index < count( $quoted_parts ); $index++ )
-		{ // Remove douple quotes around the parts
+		{	// Remove douple quotes around the parts
 			$quoted_part_length = utf8_strlen( $quoted_parts[$index] );
 			if( $quoted_part_length > 2 )
-			{ // The quoted part is not an empty string
+			{	// The quoted part is not an empty string
 				$quoted_parts[$index] = utf8_substr( $quoted_parts[$index], 1, $quoted_part_length - 2 );
 			}
 		}
@@ -578,36 +796,44 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 	$keywords = array_unique( $keywords );
 
 	if( isset( $keywords[0] ) && empty( $keywords[0] ) )
-	{ // The first item is an empty string when the search keyword contains only irrelevant characters
+	{	// The first item is an empty string when the search keyword contains only irrelevant characters
 		unset( $keywords[0] ); // remove empty word
 	}
 	if( empty( $keywords ) && empty( $quoted_parts ) )
-	{ // There is nothing to search for
+	{	// There is nothing to search for
 		return array();
-// TODO: return NULL and display a specific error message like "Please enter some keywords to search."
+		// TODO: return NULL and display a specific error message like "Please enter some keywords to search."
 	}
 
-	if( $search_types == 'all' )
+	if( $searched_content_types == 'all' || empty( $searched_content_types ) )
 	{	// Search all result types:
-		$search_type_item = true;
-		$search_type_comment = true;
+		$search_type_item     = true;
+		$search_type_comment  = true;
 		$search_type_category = true;
-		$search_type_tag = true;
+		$search_type_tag      = true;
+		$search_type_file     = true;
 	}
 	else
 	{	// Check what types should be searched:
-		$search_types = explode( ',', $search_types );
-		$search_type_item = in_array( 'item', $search_types );
-		$search_type_comment = in_array( 'comment', $search_types );
-		$search_type_category = in_array( 'category', $search_types );
-		$search_type_tag = in_array( 'tag', $search_types );
+		$searched_content_types = explode( ',', $searched_content_types );
+		$search_type_item       = in_array( 'item', $searched_content_types );
+		$search_type_comment    = in_array( 'comment', $searched_content_types );
+		$search_type_category   = in_array( 'category', $searched_content_types );
+		$search_type_tag        = in_array( 'tag', $searched_content_types );
+		$search_type_file       = in_array( 'file', $searched_content_types );
+	}
+
+	if( ! empty( $search_authors ) || ( ! empty( $content_age ) && ( $content_age != 'anytime' ) ) )
+	{	// If search by author or age is enabled then don't search results in categories and tags because they don't have such data:
+		$search_type_category = false;
+		$search_type_tag      = false;
 	}
 
 	$search_result = array();
 
 	if( $search_type_item )
 	{	// Perform search on Items:
-		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts, $exclude_posts );
+		$item_search_result = search_and_score_items( $search_keywords, $keywords, $quoted_parts, $exclude_posts, $search_authors, $content_age );
 		$search_result = $item_search_result;
 		if( $debug )
 		{
@@ -618,7 +844,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 
 	if( $search_type_comment )
 	{	// Perform search on Comments:
-		$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts );
+		$comment_search_result = search_and_score_comments( $search_keywords, $keywords, $quoted_parts, $search_authors, $content_age );
 		$search_result = array_merge( $search_result, $comment_search_result );
 		if( $debug )
 		{
@@ -633,7 +859,7 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 		$search_result = array_merge( $search_result, $cats_search_result );
 		if( $debug )
 		{
-			echo '<p class="text-muted">Just found '.count( $cats_search_result ).' Catageories.</p>';
+			echo '<p class="text-muted">Just found '.count( $cats_search_result ).' Categories.</p>';
 			evo_flush();
 		}
 	}
@@ -645,6 +871,17 @@ function perform_scored_search( $search_keywords, $search_types = 'all', $exclud
 		if( $debug )
 		{
 			echo '<p class="text-muted">Just found '.count( $tags_search_result ).' Tags.</p>';
+			evo_flush();
+		}
+	}
+
+	if( $search_type_file )
+	{
+		$files_search_result = search_and_score_files( $search_keywords, $keywords, $quoted_parts, $search_authors, $content_age );
+		$search_result = array_merge( $search_result, $files_search_result );
+		if( $debug )
+		{
+			echo '<p class="text-muted">Just found '.count( $files_search_result ).' Files.</p>';
 			evo_flush();
 		}
 	}
@@ -716,6 +953,9 @@ function search_result_block( $params = array() )
 	global $Collection, $Blog, $Session, $debug;
 
 	$search_keywords = param( 's', 'string', '', true );
+	$search_authors = param( 'search_author', 'string', '' );
+	$search_content_age = param( 'search_content_age', 'string', '' );
+	$search_content_type = param( 'search_type', 'string', '' );
 	$allow_cache = param( 'allow_cache', 'boolean', false );
 
 	// Try to load existing search results from Session:
@@ -727,7 +967,7 @@ function search_result_block( $params = array() )
 		|| ( $search_params['search_keywords'] != $search_keywords )	// We had saved search results but for a different search string
 		|| ( $search_params['search_blog'] != $Blog->ID ) 		// We had saved search results but for a different collection
 		|| ( $search_result === NULL ) )
-	{ // We need to perform a new search:
+	{	// We need to perform a new search:
 		if( $debug )
 		{
 			echo '<p class="text-muted">Starting a new search...</p>';
@@ -741,27 +981,36 @@ function search_result_block( $params = array() )
 			'search_blog' => $Blog->ID
 		);
 
-		$search_types = array();
+		$searched_content_types = array();
 		if( $Blog->get_setting( 'search_include_posts' ) )
 		{	// Search items:
-			$search_types[] = 'item';
+			$searched_content_types[] = 'item';
 		}
 		if( $Blog->get_setting( 'search_include_cmnts' ) )
 		{	// Search comments:
-			$search_types[] = 'comment';
+			$searched_content_types[] = 'comment';
 		}
 		if( $Blog->get_setting( 'search_include_cats' ) )
 		{	// Search categories:
-			$search_types[] = 'category';
+			$searched_content_types[] = 'category';
 		}
 		if( $Blog->get_setting( 'search_include_tags' ) )
 		{	// Search tags:
-			$search_types[] = 'tag';
+			$searched_content_types[] = 'tag';
 		}
-		$search_types = count( $search_types ) == 4 ? 'all' : implode( ',', $search_types );
+		if( $Blog->get_setting( 'search_include_files' ) )
+		{	// Search files:
+			$searched_content_types[] = 'file';
+		}
+		$searched_content_types = count( $searched_content_types ) == 5 ? '' : implode( ',', $searched_content_types );
+
+		if( ! empty( $search_content_type ) )
+		{
+			$searched_content_types = $search_content_type;
+		}
 
 		// Perform new search:
-		$search_result = perform_scored_search( $search_keywords, $search_types );
+		$search_result = perform_scored_search( $search_keywords, $searched_content_types, '', $search_authors, $search_content_age );
 
 		// Save results into session:
 		$Session->set( 'search_params', $search_params );
@@ -769,7 +1018,7 @@ function search_result_block( $params = array() )
 		$search_result_loaded = true;
 	}
 	else
-	{ // We found the desired saved search results in the Session:
+	{	// We found the desired saved search results in the Session:
 		if( $debug )
 		{	// Display counts
 			echo '<div class="text-muted">';
@@ -791,6 +1040,10 @@ function search_result_block( $params = array() )
 			{
 				echo '<li>'.sprintf( '%d tags', $search_result[0]['nr_of_tags'] ).'</li>';
 			}
+			if( isset( $search_result[0]['nr_of_files'] ) )
+			{
+				echo '<li>'.sprintf( '%d files', $search_result[0]['nr_of_files'] ).'</li>';
+			}
 			echo '</ul>';
 			echo '</div>';
 		}
@@ -807,6 +1060,7 @@ function search_result_block( $params = array() )
 			'title_suffix_comment'  => ' ('./* TRANS: noun */ T_('Comment').')',
 			'title_suffix_category' => ' ('./* TRANS: noun */ T_('Category').')',
 			'title_suffix_tag'      => ' ('./* TRANS: noun */ T_('Tag').')',
+			'title_suffix_file'     => ' ('./* TRANS: noun */ T_('File').')',
 			'block_start'           => '',
 			'block_end'             => '',
 			'pagination'            => array(),
@@ -857,10 +1111,11 @@ function search_result_block( $params = array() )
 	$ItemCache = & get_ItemCache();
 	$CommentCache = & get_CommentCache();
 	$ChapterCache = & get_ChapterCache();
-
+	$FileCache = & get_FileCache();
+	$FiletypeCache = & get_FiletypeCache();
 
 	if( !$search_result_loaded )
-	{ // Search result objects are not loaded into memory yet, load them
+	{	// Search result objects are not loaded into memory yet, load them
 		// Group required object ids by type:
 		$required_ids = array();
 		for( $index = $from; $index < $to; $index++ )
@@ -893,6 +1148,10 @@ function search_result_block( $params = array() )
 					$ChapterCache->load_list( $object_ids );
 					break;
 
+				case 'file':
+					$FileCache->load_list( $object_ids );
+					break;
+
 				// TODO: we'll probably load "tag" objects once we support tag-synonyms.
 
 				default: // Not handled search result type
@@ -908,6 +1167,10 @@ function search_result_block( $params = array() )
 	// Memorize best scores:
 	$max_percentage = isset( $search_result[0]['max_percentage'] ) ? $search_result[0]['max_percentage'] : 100;
 	$max_score = isset( $search_result[0]['max_score'] ) ? $search_result[0]['max_score'] : $search_result[0]['score'];
+	if( $max_score == 0 )
+	{	// This must not happens, however use 1 to avoid error of division by zero:
+		$max_score = 1;
+	}
 
 	// Display results for current page:
 	for( $index = $from; $index < $to; $index++ )
@@ -921,7 +1184,7 @@ function search_result_block( $params = array() )
 				$Item = $ItemCache->get_by_ID( $row['ID'], false );
 
 				if( empty( $Item ) )
-				{ // This Item was deleted, since the search process was executed
+				{	// This Item was deleted, since the search process was executed
 					continue 2; // skip from switch and skip to the next item in loop
 				}
 
@@ -932,10 +1195,10 @@ function search_result_block( $params = array() )
 				);
 
 				if( $params['use_editor'] )
-				{ // Get editor info to display:
+				{	// Get editor info to display:
 					$lastedit_User = & $Item->get_lastedit_User();
 					if( empty( $lastedit_User ) )
-					{ // If editor is not defined yet then use author
+					{	// If editor is not defined yet then use author
 						$lastedit_User = & $Item->get_creator_User();
 					}
 					$display_params = array_merge( array(
@@ -944,7 +1207,7 @@ function search_result_block( $params = array() )
 						), $display_params );
 				}
 				else
-				{ // Get author info to display:
+				{	// Get author info to display:
 					$creator_User = & $Item->get_creator_User();
 					$display_params = array_merge( array(
 							'author'        => $creator_User->get_identity_link( array( 'link_text' => $params['author_format'] ) ),
@@ -960,7 +1223,7 @@ function search_result_block( $params = array() )
 				$Comment = $CommentCache->get_by_ID( $row['ID'], false );
 
 				if( empty( $Comment ) || ( $Comment->status == 'trash' ) )
-				{ // This Comment was deleted, since the search process was executed
+				{	// This Comment was deleted, since the search process was executed
 					continue 2; // skip from switch and skip to the next item in loop
 				}
 
@@ -982,7 +1245,7 @@ function search_result_block( $params = array() )
 				$Chapter = $ChapterCache->get_by_ID( $row['ID'], false );
 
 				if( empty( $Chapter ) )
-				{ // This Chapter was deleted, since the search process was executed
+				{	// This Chapter was deleted, since the search process was executed
 					continue 2; // skip from switch and skip to the next item in loop
 				}
 				$display_params = array(
@@ -998,6 +1261,43 @@ function search_result_block( $params = array() )
 				$display_params = array(
 					'title'   => '<a href="'.url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name ).'">'.$tag_name.'</a>'.$params['title_suffix_tag'],
 					'excerpt' => sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name ),
+				);
+				break;
+
+			case 'file':
+				// Prepare to display a File:
+
+				$File = $FileCache->get_by_id( $row['ID'], false );
+				$FileType = & $File->get_FileType();
+				$link_owners = array();
+				if( ! empty( $row['post_IDs'] ) )
+				{
+					$post_IDs = explode( ',', $row['post_IDs'] );
+					foreach( $post_IDs as $post_ID )
+					{
+						$Item = $ItemCache->get_by_ID( $post_ID, false );
+						$link_owners[] = $Item->get_title( array( 'link_type' => 'permalink' ) );
+					}
+				}
+
+				if( ! empty( $row['comment_IDs'] ) )
+				{
+					$comment_IDs = explode( ',', $row['comment_IDs'] );
+					foreach( $comment_IDs as $comment_ID )
+					{
+						$Comment = $CommentCache->get_by_ID( $comment_ID, false );
+						$link_owners[] = $Comment->get_permanent_link( '#item#' );
+					}
+				}
+
+				$file_description = $File->get( 'desc' );
+
+				$display_params = array(
+					'title' => '<a href="'.$File->get_url().'"'.( $File->get('desc') ? ' title="'.$File->dget('desc', 'htmlattr').'"' : '' ).'>'
+							.( $File->get( 'title' ) ? $File->dget( 'title' ) : $File->dget( 'name' ) ).'</a>'
+							.' ('.T_('File').': '.$File->get_view_link( $File->get_icon() ).' '.$File->get_type().')',
+					'excerpt' => $File->get_url().( ! empty( $file_description ) ? '<div>'.$file_description.'</div>' : '' ),
+					'chapter' => empty( $link_owners ) ? NULL : sprintf( /* TRANS: %s get replaced by list of post and comment links */ T_('In %s'), implode( ', ', $link_owners ) )
 				);
 				break;
 
@@ -1041,7 +1341,7 @@ function search_result_block( $params = array() )
 function search_page_links( $params = array() )
 {
 	if( !isset( $params['total_pages'] ) )
-	{ // this param is required
+	{	// this param is required
 		return;
 	}
 
@@ -1066,21 +1366,21 @@ function search_page_links( $params = array() )
 
 	// Initialize a start of pages list:
 	if( $current_page <= intval( $page_list_span / 2 ) )
-	{ // the current page number is small
+	{	// the current page number is small
 		$page_list_start = 1;
 	}
 	elseif( $current_page > $total_pages - intval( $page_list_span / 2 ) )
-	{ // the current page number is big
+	{	// the current page number is big
 		$page_list_start = max( 1, $total_pages - $page_list_span+1);
 	}
 	else
-	{ // the current page number can be centered
+	{	// the current page number can be centered
 		$page_list_start = $current_page - intval( $page_list_span / 2 );
 	}
 
 	// Initialize an end of pages list:
 	if( $current_page > $total_pages - intval( $page_list_span / 2 ) )
-	{ //the current page number is big
+	{	//the current page number is big
 		$page_list_end = $total_pages;
 	}
 	else
@@ -1091,7 +1391,7 @@ function search_page_links( $params = array() )
 	echo $params['block_start'];
 
 	if( $current_page > 1 )
-	{ // A link to previous page:
+	{	// A link to previous page:
 		echo add_tag_class( $params['page_item_before'], 'listnav_prev' );
 		$prev_attrs = empty( $params['prev_class'] ) ? '' : ' class="'.$params['prev_class'].'"';
 		echo '<a href="'.url_add_param( $page_url, 'page='.( $current_page - 1 ) ).'" rel="prev"'.$prev_attrs.'>'.$params['prev_text'].'</a>';
@@ -1113,7 +1413,7 @@ function search_page_links( $params = array() )
 	}
 
 	if( $page_list_start > 2 )
-	{ // Display a link to previous pages range:
+	{	// Display a link to previous pages range:
 		$page_no = ceil( $page_list_start / 2 );
 		echo add_tag_class( $params['page_item_before'], 'listnav_prev_list' );
 		echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
@@ -1187,7 +1487,7 @@ function search_page_links( $params = array() )
 			echo $params['page_item_after'];
 		}
 		if( $i == $current_page )
-		{ // Current page
+		{	// Current page
 			echo $params['page_item_current_before'];
 			echo str_replace( '$page_num$', $i, $params['page_current_template'] );
 			echo $params['page_item_current_after'];
@@ -1196,11 +1496,11 @@ function search_page_links( $params = array() )
 		{
 			$attr_rel = '';
 			if( $page_prev_i == $i )
-			{ // Add attribute rel="prev" for previous page
+			{	// Add attribute rel="prev" for previous page
 				$attr_rel = ' rel="prev"';
 			}
 			elseif( $page_next_i == $i )
-			{ // Add attribute rel="next" for next page
+			{	// Add attribute rel="next" for next page
 				$attr_rel = ' rel="next"';
 			}
 
@@ -1237,7 +1537,7 @@ function search_page_links( $params = array() )
 	}
 
 	if( ( $page_list_end < $total_pages ) && ( $page_list_end < $total_pages - 1 ) )
-	{ // Display a link to next pages range:
+	{	// Display a link to next pages range:
 		$page_no = $page_list_end + floor( ( $total_pages - $page_list_end ) / 2 );
 		echo add_tag_class( $params['page_item_before'], 'listnav_next_list' );
 		echo '<a href="'.url_add_param( $page_url, 'page='.$page_no ).'">...</a>';
@@ -1261,7 +1561,7 @@ function search_page_links( $params = array() )
 
 
 	if( $current_page < $total_pages )
-	{ // A link to next page:
+	{	// A link to next page:
 		echo add_tag_class( $params['page_item_before'], 'listnav_next' );
 		$next_attrs = empty( $params['next_class'] ) ? '' : ' class="'.$params['next_class'].'"';
 		echo ' <a href="'.url_add_param( $page_url, 'page='.( $current_page + 1 ) ).'" rel="next"'.$next_attrs.'>'.$params['next_text'].'</a>';
@@ -1322,19 +1622,19 @@ function display_search_result( $params = array() )
 	}
 
 	if( ! empty( $params['author'] ) || ! empty( $params['editor'] ) || $params['cell_author_empty'] !== false )
-	{ // Display author or empty string when no author
+	{	// Display author or empty string when no author
 		echo $params['cell_author_start'];
 		if( ! empty( $params['author'] ) )
-		{ // Display author if it is defined
+		{	// Display author if it is defined
 			$lastedit_date = ( isset( $params['lastedit_date'] ) ) ? ', '.T_('last edited on').' '.$params['lastedit_date'] : '';
 			printf( T_('Published by %s on %s'), $params['author'], $params['creation_date'] ).$lastedit_date;
 		}
 		elseif( ! empty( $params['editor'] ) )
-		{ // Display editor if it is defined
+		{	// Display editor if it is defined
 			echo T_('Last edit by ').$params['editor'].T_(' on ').$params['lastedit_date'];
 		}
 		else// $params['cell_author_empty'] !== false
-		{ // Display empty value if author is not defined
+		{	// Display empty value if author is not defined
 			echo $params['cell_author_empty'];
 		}
 		echo $params['cell_author_end'];
@@ -1358,6 +1658,8 @@ function display_search_result( $params = array() )
  */
 function display_score_map( $params )
 {
+	global $Blog;
+
 	echo '<ul class="search_score_map dimmed">';
 
 	echo '<li>Date: '.( empty( $params['score_date'] ) ? 'None' : mysql2localedatetime( $params['score_date'] ) ).'</li>';
@@ -1368,7 +1670,7 @@ function display_score_map( $params )
 		if( ! is_array( $score_map ) )
 		{
 			if( $score_map > 0 )
-			{ // Score received for this field
+			{	// Score received for this field
 				echo '<li>'.sprintf( 'Extra points for [%s]', $result_part ).'</li><ul>';
 				switch ( $result_part )
 				{
@@ -1376,9 +1678,9 @@ function display_score_map( $params )
 					case 'creation_date':
 						echo '<li>'.sprintf( '%d points.', $score_map );
 						echo ' Rule: The number of points are calculated based on the days passed since creation or last modification';
-						echo '<ul><li>days_passed < 5 => ( 8 - days_passed )</li>';
-						echo '<li>5 <= days_passed < 8 => 3</li>';
-						echo '<li>when days_passed >= 8: ( days_passed < 15 ? 2 : ( days_passed < 30 ? 1 : 0 ) )</li>';
+						echo '<ul><li>days_passed < 5 => ( '.$Blog->get_setting( 'search_score_post_date_lastweek' ).' - days_passed )</li>';
+						echo '<li>'.$Blog->get_setting( 'search_score_post_date_lastweek' ).' <= days_passed < 8 => '.( $Blog->get_setting( 'search_score_post_date_twoweeks' ) + 1 ).'</li>';
+						echo '<li>when days_passed >= 8: ( days_passed < 15 ? '.$Blog->get_setting( 'search_score_post_date_twoweeks' ).' : ( days_passed < 31 ? '.$Blog->get_setting( 'search_score_post_date_lastmonth' ).' : '.$Blog->get_setting( 'search_score_post_date_moremonth' ).' ) )</li>';
 						echo '</ul>';
 						break;
 
@@ -1391,11 +1693,11 @@ function display_score_map( $params )
 			continue;
 		}
 		elseif( isset( $score_map['score_weight'] ) && $score_map['score_weight'] > 1 )
-		{ // add note that the score was multiplied because of the importance of the field where it was found
+		{	// add note that the score was multiplied because of the importance of the field where it was found
 			$note =  sprintf( ' - the match scores are multiplied with %d', $score_map['score_weight'] );
 		}
 		else
-		{ // note is not required
+		{	// note is not required
 			$note = '';
 		}
 
@@ -1452,7 +1754,7 @@ function display_score_map( $params )
 			}
 
 			if( $keyword_match != $match_type && $keyword_match !== null )
-			{ // close previously started list
+			{	// close previously started list
 				echo '</ul>';
 			}
 			if( $keyword_match != $match_type )
@@ -1461,17 +1763,17 @@ function display_score_map( $params )
 				{
 					case 'word_case_sensitive_match':
 						// If at least one word from requested phrase is case sensitive matched:
-						echo '<li>Case sensitive mathces</li>';
+						echo '<li>Case sensitive matches</li>';
 						break;
 
 					case 'whole_word_match':
 						// If at least one whole word from requested phrase is case insensitive matched:
-						echo '<li>Whole word mathces</li>';
+						echo '<li>Whole word matches</li>';
 						break;
 
 					case 'word_case_insensitive_match':
 						// If at least one word from requested phrase is case insensitive matched:
-						echo '<li>Case insensitive mathces</li>';
+						echo '<li>Case insensitive matches</li>';
 						break;
 
 					case 'word_multiple_occurences':
@@ -1497,7 +1799,7 @@ function display_score_map( $params )
 			}
 		}
 		if( $keyword_match != null )
-		{ // display the end of the specific match type
+		{	// display the end of the specific match type
 			echo '</ul>';
 		}
 		echo '</ul>';
@@ -1506,8 +1808,8 @@ function display_score_map( $params )
 	echo '<li>'.sprintf( 'Total: '.$total_score_pattern.' points', $params['score'] ).'</li>';
 	if( $params['best_result'] )
 	{
-		echo '<ul><li>This is the best result. Percentage value is calculated based on the number of matching words and mathcing quoted terms.</li>';
-		echo '<li>Note: In case of the number of mathcing words even case insensitive partial matches are counted.</li>';
+		echo '<ul><li>This is the best result. Percentage value is calculated based on the number of matching words and matching quoted terms.</li>';
+		echo '<li>Note: In case of the number of matching words even case insensitive partial matches are counted.</li>';
 		echo '<li>Percentage = ( Number of matching words + Number of matching quoted terms ) * 100 / ( Number of words in search text + Number of quoted terms in search text )</li></ul>';
 	}
 	else

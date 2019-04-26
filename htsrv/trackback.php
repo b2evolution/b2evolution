@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package htsrv
@@ -20,6 +20,9 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
+
+// Stop a request from the blocked IP addresses or Domains:
+antispam_block_request();
 
 if( $Settings->get('system_lock') )
 { // System is locked for maintenance, trackbacks are not allowed

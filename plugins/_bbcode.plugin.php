@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -22,7 +22,7 @@ class bbcode_plugin extends custom_tags_plugin
 	var $code = 'b2evBBco';
 	var $name = 'BB code';
 	var $priority = 50;
-	var $version = '6.9.3';
+	var $version = '7.0.1';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -375,14 +375,13 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 		foreach( $search_list_array as $l => $line )
 		{	// Remove button name from regexp string
 			$line = explode( ' ', $line, 2 );
-			$regexp = $line[1];
-			if( empty( $regexp ) )
+			if( empty( $line[1] ) )
 			{	// Bad format of search string
 				unset( $search_list_array[ $l ] );
 			}
 			else
 			{	// Replace this line with regexp value (to delete a button name)
-				$search_list_array[ $l ] = $regexp;
+				$search_list_array[ $l ] = $line[1];
 			}
 		}
 

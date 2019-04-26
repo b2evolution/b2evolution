@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage basic
@@ -47,6 +47,11 @@ $Comment = & $params['Comment'];
 
 		case 'pingback': // Display a pingback:
 			echo T_('Pingback from:') ?>
+			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true, 'auto' ) ?>
+			<?php break;
+		
+		case 'webmention': // Display a webmention:
+			echo T_('Webmention from:') ?>
 			<?php $Comment->author( '', '#', '', '#', 'htmlbody', true, 'auto' ) ?>
 			<?php break;
 	}

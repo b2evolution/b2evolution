@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
@@ -23,7 +23,7 @@ class flowplayer_plugin extends Plugin
 	var $code = 'b2evFlwP';
 	var $name = 'Flowplayer';
 	var $priority = 80;
-	var $version = '6.9.3';
+	var $version = '7.0.1';
 	var $group = 'files';
 	var $number_of_installs = 1;
 	var $allow_ext = array( 'flv', 'swf', 'mp4', 'ogv', 'webm', 'm3u8' );
@@ -90,17 +90,13 @@ class flowplayer_plugin extends Plugin
 	{
 		return array_merge( parent::get_coll_setting_definitions( $params ),
 			array(
-				'use_for_posts' => array(
-					'label' => T_('Use for'),
-					'note' => T_('videos attached to posts'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
-					),
-				'use_for_comments' => array(
-					'label' => '',
-					'note' => T_('videos attached to comments'),
-					'type' => 'checkbox',
-					'defaultvalue' => 1,
+				'use_for' => array(
+						'label' => T_('Use for'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'posts', T_('videos attached to posts'), 1 ),
+							array( 'comments', T_('videos attached to comments'), 1 ),
+						)
 					),
 				'skin' => array(
 					'label' => T_('Skin'),
@@ -114,7 +110,6 @@ class flowplayer_plugin extends Plugin
 					),
 				'height' => array(
 					'label' => T_('Video height (px)'),
-					'defaultvalue' => 300,
 					'type' => 'integer',
 					'allow_empty' => true,
 					'valid_range' => array( 'min' => 1 ),
@@ -168,8 +163,8 @@ class flowplayer_plugin extends Plugin
 		$Item = & $params['Item'];
 		$item_Blog = $Item->get_Blog();
 
-		if( ( ! $in_comments && ! $this->get_coll_setting( 'use_for_posts', $item_Blog ) ) ||
-		    ( $in_comments && ! $this->get_coll_setting( 'use_for_comments', $item_Blog ) ) )
+		if( ( ! $in_comments && ! $this->get_checklist_setting( 'use_for', 'posts', 'coll', $item_Blog ) ) ||
+		    ( $in_comments && ! $this->get_checklist_setting( 'use_for', 'comments', 'coll', $item_Blog ) ) )
 		{ // Plugin is disabled for post/comment videos on this Blog
 			return false;
 		}

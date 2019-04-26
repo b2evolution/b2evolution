@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -22,7 +22,7 @@ global $edited_Blog;
 
 global $Plugins, $Settings;
 
-global $basepath, $rsc_url, $dispatcher, $admin_url;
+global $basepath, $rsc_url, $admin_url;
 
 $Form = new Form( NULL, 'blogadvanced_checkchanges' );
 
@@ -35,40 +35,39 @@ $Form->hidden( 'tab', 'advanced' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
 
-$Form->begin_fieldset( T_('Workflow').get_manual_link('coll-workflow-settings') );
-	$Form->checkbox( 'blog_use_workflow', $edited_Blog->get_setting( 'use_workflow' ), T_('Use workflow'), T_('This will notably turn on the Tracker tab in the Posts view.') );
-$Form->end_fieldset();
-
-
-$Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_new_post') );
+$Form->begin_fieldset( T_('After each new post...').get_manual_link('after-each-new-post') );
 	if( $edited_Blog->get_setting( 'allow_access' ) == 'users' )
 	{
-		echo '<p class="center orange">'.T_('This collection is for logged in users only.').' '.T_('It is recommended to keep pings disabled.').'</p>';
+		echo '<p class="center orange">'.T_('This collection is for logged in users only.').' '.T_('The ping plugins can be enabled only for public collections.').'</p>';
 	}
 	elseif( $edited_Blog->get_setting( 'allow_access' ) == 'members' )
 	{
-		echo '<p class="center orange">'.T_('This collection is for members only.').' '.T_('It is recommended to keep pings disabled.').'</p>';
+		echo '<p class="center orange">'.T_('This collection is for members only.').' '.T_('The ping plugins can be enabled only for public collections.').'</p>';
 	}
-	$ping_plugins = preg_split( '~\s*,\s*~', $edited_Blog->get_setting('ping_plugins'), -1, PREG_SPLIT_NO_EMPTY);
+	$ping_plugins = preg_split( '~\s*,\s*~', $edited_Blog->get_setting( 'ping_plugins' ), -1, PREG_SPLIT_NO_EMPTY );
 
-	$available_ping_plugins = $Plugins->get_list_by_event('ItemSendPing');
+	$available_ping_plugins = $Plugins->get_list_by_event( 'ItemSendPing' );
 	$displayed_ping_plugin = false;
 	if( $available_ping_plugins )
 	{
 		foreach( $available_ping_plugins as $loop_Plugin )
 		{
-			if( empty($loop_Plugin->code) )
+			if( empty( $loop_Plugin->code ) )
 			{ // Ping plugin needs a code
 				continue;
 			}
 			$displayed_ping_plugin = true;
 
 			$checked = in_array( $loop_Plugin->code, $ping_plugins );
-			$Form->checkbox_input( 'blog_ping_plugins[]', $checked, /* TRANS: %s is a ping service name */ sprintf( T_('Ping %s'), $loop_Plugin->ping_service_name ), array('value'=>$loop_Plugin->code, 'note'=>$loop_Plugin->ping_service_note) );
+			$Form->checkbox( 'blog_ping_plugins[]', $checked,
+				isset( $loop_Plugin->ping_service_setting_title ) ? $loop_Plugin->ping_service_setting_title : sprintf( /* TRANS: %s is a ping service name */ T_('Ping %s'), $loop_Plugin->ping_service_name ),
+				$loop_Plugin->ping_service_note, '', $loop_Plugin->code,
+				// Disable ping plugins for not public collection:
+				$edited_Blog->get_setting( 'allow_access' ) != 'public' );
 
-			while( ($key = array_search($loop_Plugin->code, $ping_plugins)) !== false )
+			while( ( $key = array_search( $loop_Plugin->code, $ping_plugins ) ) !== false )
 			{
-				unset($ping_plugins[$key]);
+				unset( $ping_plugins[$key] );
 			}
 		}
 	}
@@ -85,7 +84,7 @@ $Form->begin_fieldset( T_('After each new post...').get_manual_link('after_each_
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('External Feeds').get_manual_link('external_feeds') );
+$Form->begin_fieldset( T_('External Feeds').get_manual_link('external-feeds') );
 
 	$Form->text_input( 'atom_redirect', $edited_Blog->get_setting( 'atom_redirect' ), 50, T_('Atom Feed URL'),
 	T_('Example: Your Feedburner Atom URL which should replace the original feed URL.').'<br />'
@@ -99,28 +98,25 @@ $Form->begin_fieldset( T_('External Feeds').get_manual_link('external_feeds') );
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Template').get_manual_link('collection-template') );
+	$Form->checkbox_input( 'blog_allow_duplicate', $edited_Blog->get_setting( 'allow_duplicate' ), T_('Allow duplication'), array( 'note' => T_('Check to allow anyone to duplicate this collection.') ) );
+$Form->end_fieldset();
+
 
 if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
 
-	$Form->begin_fieldset( T_('Aggregation').get_admin_badge().get_manual_link('collection_aggregation_settings') );
-		$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Collections to aggregate'), T_('List collection IDs separated by \',\', \'*\' for all collections or leave empty for current collection.').'<br />'.T_('Note: Current collection is always part of the aggregation.'), 255 );
-	$Form->end_fieldset();
+	$Form->begin_fieldset( T_('Caching').get_admin_badge().get_manual_link('collection-cache-settings'), array( 'id' => 'caching' ) );
+		$Form->checklist( array(
+				array( 'ajax_form_enabled', 1, T_('Comment, Contact & Quick registration forms will be fetched by javascript'), $edited_Blog->get_setting( 'ajax_form_enabled' ) ),
+				array( 'ajax_form_loggedin_enabled', 1, T_('Also use JS forms for logged in users'), $edited_Blog->get_setting( 'ajax_form_loggedin_enabled' ), ! $edited_Blog->get_setting( 'ajax_form_enabled' ) ),
+			), 'ajax_form', T_('Enable AJAX forms') );
 
-	$Form->begin_fieldset( T_('Caching').get_admin_badge().get_manual_link('collection_cache_settings'), array( 'id' => 'caching' ) );
-		$ajax_enabled = $edited_Blog->get_setting( 'ajax_form_enabled' );
-		$ajax_loggedin_params = array( 'note' => T_('Also use JS forms for logged in users') );
-		if( !$ajax_enabled )
-		{
-			$ajax_loggedin_params[ 'disabled' ] = 'disabled';
-		}
-		$Form->checkbox_input( 'ajax_form_enabled', $ajax_enabled, T_('Enable AJAX forms'), array( 'note'=>T_('Comment and contacts forms will be fetched by javascript') ) );
-		$Form->checkbox_input( 'ajax_form_loggedin_enabled', $edited_Blog->get_setting('ajax_form_loggedin_enabled'), '', $ajax_loggedin_params );
 		$Form->checkbox_input( 'cache_enabled', $edited_Blog->get_setting('cache_enabled'), get_icon( 'page_cache_on' ).' '.T_('Enable page cache'), array( 'note'=>T_('Cache rendered blog pages') ) );
 		$Form->checkbox_input( 'cache_enabled_widgets', $edited_Blog->get_setting('cache_enabled_widgets'), get_icon( 'block_cache_on' ).' '.T_('Enable widget/block cache'), array( 'note'=>T_('Cache rendered widgets') ) );
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('In-skin Actions').get_admin_badge().get_manual_link('in_skin_action_settings') );
+	$Form->begin_fieldset( T_('In-skin Actions').get_admin_badge().get_manual_link('in-skin-action-settings'), array( 'id' => 'inskin_actions' ) );
 		if( $login_Blog = & get_setting_Blog( 'login_blog_ID', $edited_Blog ) )
 		{ // The login blog is defined in general settings
 			$Form->info( T_( 'In-skin login' ), sprintf( T_('All login/registration functions are delegated to the collection: %s'), '<a href="'.$admin_url.'?ctrl=collections&tab=site_settings">'.$login_Blog->get( 'shortname' ).'</a>' ) );
@@ -132,7 +128,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->checkbox_input( 'in_skin_editing', $edited_Blog->get_setting( 'in_skin_editing' ), T_( 'In-skin editing' ), array( 'note' => sprintf( T_('See more options in Features &gt; <a %s>Posts</a>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$edited_Blog->ID.'#post_options"' ) ) );
 	$Form->end_fieldset();
 
-	$Form->begin_fieldset( T_('Media directory location').get_admin_badge().get_manual_link('media_directory_location'), array( 'id' => 'media_dir_location' ) );
+	$Form->begin_fieldset( T_('Media directory location').get_admin_badge().get_manual_link('media-directory-location'), array( 'id' => 'media_dir_location' ) );
 	global $media_path;
 	$Form->radio( 'blog_media_location', $edited_Blog->get( 'media_location' ),
 			array(
@@ -165,12 +161,15 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 
 }
 
-$Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
+$Form->begin_fieldset( T_('Meta data').get_manual_link('blog-meta-data') );
 	// TODO: move stuff to coll_settings
 	$shortdesc_chars_count = utf8_strlen( html_entity_decode( $edited_Blog->get( 'shortdesc' ) ) );
 	$Form->text( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!')
 		.' ('.sprintf( T_('%s characters'), '<span id="blog_shortdesc_chars_count">'.$shortdesc_chars_count.'</span>' ).')', 250, 'large' );
 	$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
+	$publisher_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select publisher logo'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'blog_publisher_logo_file_ID', $edited_Blog->get_setting( 'publisher_logo_file_ID' ), T_('Publisher logo'), T_('This is used to add Structured Data to your pages.'), $publisher_logo_params );
+	$Form->text( 'blog_publisher_name', $edited_Blog->get_setting( 'publisher_name' ), 60, T_('Publisher name'), T_('This is used to add Structured Data to your pages.'), 250, 'large' );
 	$Form->text( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ), 60, T_('Blog footer'), sprintf(
 		T_('Use &lt;br /&gt; to insert a line break. You might want to put your copyright or <a href="%s" target="_blank">creative commons</a> notice here.'),
 		'http://creativecommons.org/license/' ), 1000, 'large' );
@@ -182,7 +181,7 @@ $Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
 		T_('Additional info. Appears in the backoffice.'), 50 );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Software credits').get_manual_link('software_credits') );
+$Form->begin_fieldset( T_('Software credits').get_manual_link('software-credits') );
 	$max_credits = $edited_Blog->get_setting( 'max_footer_credits' );
 	$note = T_('You get the b2evolution software for <strong>free</strong>. We do appreciate you giving us credit. <strong>Thank you for your support!</strong>');
 	if( $max_credits < 1 )
@@ -214,25 +213,22 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 
 ?>
 
-<script type="text/javascript">
-	jQuery( '#ajax_form_enabled' ).click( function()
+<script>
+	jQuery( 'input[name=ajax_form_enabled]' ).click( function()
 	{
-		if( jQuery( '#ajax_form_enabled' ).attr( "checked" ) )
+		var checked = jQuery( this ).prop( 'checked' );
+		jQuery( 'input[name=ajax_form_loggedin_enabled]' ).prop( 'disabled', ! checked );
+		if( ! checked )
 		{
-			jQuery( '#ajax_form_loggedin_enabled' ).attr( "disabled", false );
-		}
-		else
-		{
-			jQuery( '#cache_enabled' ).attr( "checked", false );
-			jQuery( '#ajax_form_loggedin_enabled' ).attr( "disabled", true );
+			jQuery( 'input[name=cache_enabled]' ).prop( 'checked', false );
 		}
 	} );
 	jQuery( '#cache_enabled' ).click( function()
 	{
-		if( jQuery( '#cache_enabled' ).attr( "checked" ) )
+		if( jQuery( this ).prop( 'checked' ) )
 		{
-			jQuery( '#ajax_form_enabled' ).attr( "checked", true );
-			jQuery( '#ajax_form_loggedin_enabled' ).attr( "disabled", false );
+			jQuery( 'input[name=ajax_form_enabled]' ).prop( 'checked', true );
+			jQuery( 'input[name=ajax_form_loggedin_enabled]' ).prop( 'disabled', false );
 		}
 	} );
 	jQuery( '#advanced_perms' ).click( function()
@@ -263,15 +259,19 @@ $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveBut
 				break;
 			case 'custom':
 				url_preview = jQuery( 'input[name=blog_media_url]' ).val();
+				switch( '<?php echo $edited_Blog->get_setting( 'http_protocol' ) ?>' )
+				{	// Force base URL to http or https for the edited collection:
+					case 'always_http':
+						url_preview = url_preview.replace( /^https:/, 'http:' );
+						break;
+					case 'always_https':
+						url_preview = url_preview.replace( /^http:/, 'https:' );
+						break;
+				}
 				break;
 		}
 		jQuery( '#blog_media_url_preview' ).html( url_preview );
 	}
 	jQuery( 'input[name=blog_media_location]' ).click( function() { update_blog_media_url_preview(); } );
 	jQuery( 'input[name=blog_media_subdir], input[name=blog_media_url]' ).keyup( function() { update_blog_media_url_preview(); } );
-
-	jQuery( '#blog_shortdesc' ).keyup( function()
-	{	// Count characters of meta short description(each html entity is counted as single char):
-		jQuery( '#blog_shortdesc_chars_count' ).html( jQuery( this ).val().replace( /&[^;\s]+;/g, '&' ).length );
-	} );
 </script>

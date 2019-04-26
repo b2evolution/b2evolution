@@ -1,0 +1,221 @@
+/*
+ * Styles for Site skin "default_site_skin"
+ */
+
+/* Override BODY from skin to make sure we touch the edges of the page: */
+body {
+	margin: 0;
+	padding: 0;
+}
+
+.floatright {
+	float: right;
+}
+
+.evo_container__site_header,
+.evo_container__site_footer {
+	font-family:"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial;
+	line-height: normal;
+	color: #ccc;
+	margin: 0;
+	clear: both;
+}
+
+// SITE HEADER:
+.evo_container__site_header {
+	/* autoprefixer: off */
+	font-size: 16px;
+	font-weight: 300;
+	text-align: left;
+	box-shadow: 0px -1px 8px 4px rgba(0,0,0,0.5);
+	padding: 0;
+	background:-webkit-linear-gradient(top, #595C64, #1B1B1C);
+	background:-moz-linear-gradient(top, #595C64, #1B1B1C);
+	background: -ms-linear-gradient(top, #595C64, #1B1B1C);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#595C64', endColorstr='#1B1B1C');
+	border-bottom:1px solid #666;
+	// Hamburger Menu:
+	label[for="nav-trigger"] {
+		position: relative;
+		top: 10px;
+		left: 0;
+		width: 24px;
+		height: 24px;
+		cursor: pointer;
+		background-color: rgb(204, 204, 204);
+		-webkit-mask: url("data:image/svg+xml;utf8,	<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' x='0px' y='0px' width='24px' height='24px' viewBox='0 0 24 24' enable-background='new 0 0 24 24' xml:space='preserve'><rect y='1' width='24' height='4'/><rect y='9' width='24' height='4'/><rect y='17' width='24' height='4'/></svg>");
+		mask: url("data:image/svg+xml;utf8,	<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' x='0px' y='0px' width='24px' height='24px' viewBox='0 0 24 24' enable-background='new 0 0 24 24' xml:space='preserve'><rect y='1' width='24' height='4'/><rect y='9' width='24' height='4'/><rect y='17' width='24' height='4'/></svg>");
+		background-size: contain;
+		margin: 1px 10px 1px 5px;
+	}
+	a {
+		color: #ccc;
+		border: none;
+		display: inline-block;
+		padding: 12px;
+		text-decoration: none;
+		&.selected, &:hover
+		{
+			/* autoprefixer: off */
+			text-decoration: none;
+			text-shadow: 0px 0 3px #FFF;
+			color: #FFF;
+			background:-webkit-linear-gradient(top, #696c72, #333334);
+			background:-moz-linear-gradient(top, #696c72, #333334);
+			background: -ms-linear-gradient(top, #696c72, #333334);
+			filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#696c72', endColorstr='#333334');
+			font-weight: normal;
+		}
+		&.user {
+			color: #ccc; // Don't use a color for user names in the header site menu
+			position: relative;
+			padding-left: 49px;
+			font-weight: normal;
+			img {
+				position: absolute;
+				top: 0;
+				left: 12px;
+				bottom: 0;
+				margin: auto;
+			}
+		}
+		&.evo_widget__site_logo_text {
+			color: #FFF;
+			font-weight: 400;
+		}
+	}
+	.floatright {
+		a.selected, a:hover {
+			text-decoration: underline;
+			background: none;
+			text-shadow: none;
+			filter: none;
+		}
+	}
+	a.bg-white { // Keep this style after .floatright
+		border-radius: 3px;
+		padding: 8px 9px;
+		margin-right: 15px;
+		color: #000;
+		background: #FFF;
+		&:hover {
+			background: #FFF;
+		}
+	}
+	.evo_widget {
+		padding: 0;
+		display: inline-block;
+		&.widget_core_msg_menu_link .badge {
+			margin-top: -3px;
+		}
+		&.widget_core_site_logo a:hover {
+			text-decoration: none;
+			text-shadow: 0px 0 3px #FFF;
+			color: #FFF;
+		}
+	}
+}
+
+input#nav-trigger {
+	position: absolute;
+	clip: rect(0, 0, 0, 0);
+}
+
+.evo_container__navigation_hamburger {
+	background-color: #1b1b1c;
+	height: auto;
+	max-height: 0;
+	overflow-y: auto;
+	.evo_navigation_hamburger_list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		text-align: right;
+		z-index: 1;
+		> li {
+			padding: 0;
+			display: block;
+			&:hover {
+				text-decoration: none;
+				text-shadow: 0px 0 3px #FFF;
+				color: #FFF;
+				background: -ms-linear-gradient(top, #696c72, #333334);
+				filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#696c72', endColorstr='#333334');
+			}
+		}
+		a.default, a.selected {
+			color: #cccccc;
+			font-size: 16px;
+			font-weight: 300;
+			display: block;
+			padding: 5px 12px;
+		}
+		a.selected {
+			/* autoprefixer: off */
+			text-decoration: none;
+			text-shadow: 0px 0 3px #FFF;
+			color: #FFF;
+			background:-webkit-linear-gradient(top, #696c72, #333334);
+			background:-moz-linear-gradient(top, #696c72, #333334);
+			background: -ms-linear-gradient(top, #696c72, #333334);
+			filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#696c72', endColorstr='#333334');
+			width: 100%;
+		}
+		a:hover {
+			text-decoration: none;
+		}
+		a.bg-white {
+			border-radius: 3px;
+			padding: 8px 9px;
+			margin: 4px 10px;
+			display: inline-block;
+			color: #000;
+			background: #FFF;
+			&:hover {
+				background: #FFF;
+			}
+		}
+		hr {
+			margin: 0;
+			border-color: #696c72;
+		}
+		a.evo_widget__site_logo_image {
+			padding: 0;
+			img {
+				max-height: 42px;
+				max-width: 270px;
+			}
+		}
+	}
+}
+
+.nav-trigger:checked ~ .evo_container__navigation_hamburger {
+	max-height: 1000px;
+}
+.nav-trigger + .evo_container__navigation_hamburger {
+	transition: max-height 0.5s ease-in-out;
+}
+
+// Devices with max width <= 1024px (iPhone,iPad):
+// Don't fix a position of the sitewide header
+@media only screen and (max-device-width: 1024px) {
+	div#skin_wrapper .evo_container__site_header {
+		position: inherit;
+		width: 100%;
+	}
+}
+
+// SITE FOOTER:
+.evo_container__site_footer {
+	font-size: 11px;
+	text-align: center;
+	border-top: 1px solid #444;
+	box-shadow: inset 0px 1px 2px rgba(0,0,0,0.3);
+	padding: 4px;
+	background-color: #888;
+	a {
+		text-decoration: underline;
+		color: #ccc;
+		border: none;
+	}
+}

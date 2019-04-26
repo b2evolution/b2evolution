@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -162,17 +162,12 @@ class AbstractSettings
 
 		if( $this->cache_by_col_keys && isset($arg1) )
 		{ // The number of column keys to cache by is > 0
-			$testCache = $this->cache;
-			$args = array( $arg1, $arg2, $arg3 );
-
 			for( $i = 0; $i < $this->cache_by_col_keys; $i++ )
 			{
-				$whereList[] = $this->col_key_names[$i]." = '".$args[$i]."'";
+				$whereList[] = $this->col_key_names[$i].' = '.$DB->quote( ${'arg'.($i+1)} );
 
-				if( ! is_array( $testCache )
-						|| is_null($args[$i])
-						|| ! isset( $testCache[$args[$i]] )
-						|| ! ($testCache = & $testCache[$args[$i]]) )
+				if( ( $this->cache_by_col_keys == 1 && $i == 0 && ! isset( $this->cache[ $arg1 ] ) ) ||
+				    ( $this->cache_by_col_keys == 2 && $i == 1 && ! isset( $this->cache[ $arg1 ][ $arg2 ] ) ) )
 				{
 					break;
 				}

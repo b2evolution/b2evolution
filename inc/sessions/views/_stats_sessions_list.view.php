@@ -7,15 +7,15 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url, $rsc_url, $UserSettings, $edited_User, $user_tab, $Plugins, $current_User;
+global $blog, $admin_url, $rsc_url, $UserSettings, $edited_User, $user_tab, $Plugins, $current_User, $action;
 
-if( !$current_User->can_moderate_user( $edited_User->ID ) )
+if( $edited_User->ID != $current_User->ID && ! $current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
 	debug_die( T_( 'You have no permission to see this tab!' ) );
 }
@@ -57,15 +57,15 @@ user_prevnext_links( array(
 
 $Results = new Results( $SQL->get(), 'sess_', 'D', $UserSettings->get( 'results_per_page' ), $Count_SQL->get() );
 
+$usertab_header = get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.T_( 'Sessions' ).'</span>'.get_manual_link( 'user-sessions-tab' ) );
+
 // echo user edit action icons
-echo_user_actions( $Results, $edited_User, 'edit' );
-echo '<div class="row">';
-echo '<span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">'.$Results->gen_global_icons().'</span>';
+echo_user_actions( $Results, $edited_User, $action );
+$usertab_header = str_replace( '$global_icons$', $Results->gen_global_icons(), $usertab_header );
 $Results->global_icons = array();
 
 // echo user tabs
-echo '<div class="col-xs-12 col-lg-6 col-lg-pull-6">'.get_usertab_header( $edited_User, $user_tab, '<span class="nowrap">'.T_( 'Sessions' ).'</span>'.get_manual_link( 'user-sessions-tab' ) ).'</div>';
-echo '</div>';
+echo $usertab_header;
 $Results->title = T_('Recent sessions').get_manual_link( 'user-sessions-tab' );
 
 /**

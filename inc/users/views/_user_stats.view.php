@@ -7,13 +7,13 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
+global $admin_url;
 
 /*** Email statistics ***/
 
@@ -21,6 +21,7 @@ $SQL = new SQL();
 $SQL->SELECT( 'dom_name,
 	COUNT( IF( user_status = \'new\', 1, NULL ) ) AS cnt_new,
 	COUNT( IF( user_status = \'activated\', 1, NULL ) ) AS cnt_activated,
+	COUNT( IF( user_status = \'manualactivated\', 1, NULL ) ) AS cnt_manualactivated,
 	COUNT( IF( user_status = \'autoactivated\', 1, NULL ) ) AS cnt_autoactivated,
 	COUNT( IF( user_status = \'emailchanged\', 1, NULL ) ) AS cnt_emailchanged,
 	COUNT( IF( user_status = \'deactivated\', 1, NULL ) ) AS cnt_deactivated,
@@ -59,6 +60,13 @@ $Results->cols[] = array(
 		'th' => T_('# Activated'),
 		'td' => '$cnt_activated$',
 		'order' => 'cnt_activated',
+		'default_dir' => 'D',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('# Manually activated'),
+		'td' => '$cnt_manualactivated$',
+		'order' => 'cnt_manualactivated',
 		'default_dir' => 'D',
 	);
 
@@ -115,7 +123,7 @@ $Results->cols[] = array(
 	);
 
 $Results->display( array(
-		'page_url' => $dispatcher.'?ctrl=users&amp;tab=stats'
+		'page_url' => $admin_url.'?ctrl=users&amp;tab=stats'
 	) );
 
 
@@ -192,7 +200,7 @@ $donut_chart['data'][2] = array( 'F' => 11, 'M' => 8, 'G' => 7 );*/
 // Get users data for donut charts from DB
 $donut_SQL = new SQL();
 $donut_SQL->SELECT( 'IF( user_gender IN ( "M", "F" ), user_gender, "G" ) AS gender, '
-	.'IF( user_status IN( "activated", "autoactivated" ), "a", IF( user_status = "closed", "c", "i" ) ) AS active, '
+	.'IF( user_status IN( "activated", "autoactivated", "manualactivated" ), "a", IF( user_status = "closed", "c", "i" ) ) AS active, '
 	.'IF( user_avatar_file_ID IS NOT NULL, "p", "n" ) AS photo, '
 	.'COUNT( user_ID ) AS cnt' );
 $donut_SQL->FROM( 'T_users' );
@@ -252,30 +260,30 @@ echo '</div>';
 /*** Gender statistics ***/
 
 // Get total values
-$SQL = new SQL();
+$SQL = new SQL( 'Get active users' );
 $SQL->SELECT( 'COUNT( * )' );
 $SQL->FROM( 'T_users' );
 // Active users
-$SQL->WHERE( 'user_status IN( \'activated\', \'autoactivated\' )' );
-$total_cnt_active = $DB->get_var( $SQL->get() );
+$SQL->WHERE( 'user_status IN( \'activated\', \'autoactivated\', \'manualactivated\' )' );
+$total_cnt_active = $DB->get_var( $SQL );
 
 // Not active users
 $SQL->WHERE( 'user_status NOT IN( \'activated\', \'autoactivated\', \'closed\' )' );
-$total_cnt_notactive = $DB->get_var( $SQL->get() );
+$total_cnt_notactive = $DB->get_var( $SQL, 0, NULL, 'Get not active users' );
 
 // Closed users
 $SQL->WHERE( 'user_status = \'closed\'' );
-$total_cnt_closed = $DB->get_var( $SQL->get() );
+$total_cnt_closed = $DB->get_var( $SQL, 0, NULL, 'Get closed users' );
 
 // Users with pictures
 $SQL->WHERE( 'user_avatar_file_ID IS NOT NULL' );
-$total_cnt_pictured = $DB->get_var( $SQL->get() );
+$total_cnt_pictured = $DB->get_var( $SQL, 0, NULL, 'Get users with pictures' );
 
 // Get all records
 $SQL = new SQL();
 $SQL->SELECT( 'IF( user_gender IN ( "M", "F" ), user_gender, "A" ) AS gender_sign,
-	COUNT( IF( user_status IN( \'activated\', \'autoactivated\' ), 1, NULL ) ) AS cnt_active,
-	COUNT( IF( user_status IN( \'activated\', \'autoactivated\', \'closed\' ), NULL, 1 ) ) AS cnt_notactive,
+	COUNT( IF( user_status IN( \'activated\', \'autoactivated\', \'manualactivated\' ), 1, NULL ) ) AS cnt_active,
+	COUNT( IF( user_status IN( \'activated\', \'autoactivated\', \'manualactivated\', \'closed\' ), NULL, 1 ) ) AS cnt_notactive,
 	COUNT( IF( user_status = \'closed\', 1, NULL ) ) AS cnt_closed,
 	COUNT( IF( user_avatar_file_ID IS NOT NULL, 1, NULL ) ) AS cnt_pictured' );
 $SQL->FROM( 'T_users' );
@@ -364,7 +372,7 @@ $Results->cols[] = array(
 
 echo '<br />';
 $Results->display( array(
-		'page_url' => $dispatcher.'?ctrl=users&amp;tab=stats'
+		'page_url' => $admin_url.'?ctrl=users&amp;tab=stats'
 	) );
 
 
@@ -374,9 +382,9 @@ echo '<h2>'.T_('# registrations per day').'</h2>';
 
 global $AdminUI, $user_gender_color;
 
-$SQL = new SQL();
+$SQL = new SQL( 'Get user summary' );
 $SQL->SELECT( 'SQL_NO_CACHE COUNT(*) AS users,
-		CONCAT( IF( user_gender IN ( "M", "F" ), user_gender, "G" ), "_", IF( user_status IN ( "activated", "autoactivated" ), "active", ( IF( user_status = "closed", "closed", "notactive" ) ) ) ) AS user_gender_status,
+		CONCAT( IF( user_gender IN ( "M", "F" ), user_gender, "G" ), "_", IF( user_status IN ( "activated", "autoactivated", "manualactivated" ), "active", ( IF( user_status = "closed", "closed", "notactive" ) ) ) ) AS user_gender_status,
 		EXTRACT(YEAR FROM user_created_datetime) AS year,
 		EXTRACT(MONTH FROM user_created_datetime) AS month,
 		EXTRACT(DAY FROM user_created_datetime) AS day' );
@@ -384,7 +392,7 @@ $SQL->FROM( 'T_users' );
 $SQL->WHERE( 'user_created_datetime >= '.$DB->quote( date( 'Y-m-d H:i:s', mktime( date( 'H' ), date( 'i' ), date( 's' ), date( 'm' ) - 1, date( 'd' ), date( 'Y' ) ) ) ) );
 $SQL->GROUP_BY( 'year, month, day, user_gender_status' );
 $SQL->ORDER_BY( 'year DESC, month DESC, day DESC, user_gender_status' );
-$res_users = $DB->get_results( $SQL->get(), ARRAY_A, 'Get user summary' );
+$res_users = $DB->get_results( $SQL, ARRAY_A );
 
 /*
  * Chart
@@ -448,12 +456,12 @@ ONE COLOR for Closed No gender
 	}
 
 /*
-ONE COLOR for user_gender = F AND status IN ( activated, autoactivated )
-ONE COLOR for user_gender = F AND status NOT IN ( activated, autoactivated )
-ONE COLOR for user_gender = M AND status IN ( activated, autoactivated )
-ONE COLOR for user_gender = M AND status NOT IN ( activated, autoactivated )
-ONE COLOR for user_gender = NULL AND status IN ( activated, autoactivated )
-ONE COLOR for user_gender = NULL AND status NOT IN ( activated, autoactivated )
+ONE COLOR for user_gender = F AND status IN ( activated, autoactivated, manualactivated )
+ONE COLOR for user_gender = F AND status NOT IN ( activated, autoactivated, manualactivated )
+ONE COLOR for user_gender = M AND status IN ( activated, autoactivated, manualactivated )
+ONE COLOR for user_gender = M AND status NOT IN ( activated, autoactivated, manualactivated )
+ONE COLOR for user_gender = NULL AND status IN ( activated, autoactivated, manualactivated )
+ONE COLOR for user_gender = NULL AND status NOT IN ( activated, autoactivated, manualactivated )
 */
 	array_unshift( $chart[ 'chart_data' ][ 0 ], '' );
 	array_unshift( $chart[ 'chart_data' ][ 1 ], T_('Women (Active)') );

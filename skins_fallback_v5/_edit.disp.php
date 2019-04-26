@@ -9,7 +9,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package evoskins
  */
@@ -60,13 +60,6 @@ $Form = new Form( $form_action, 'item_checkchanges', 'post' );
 
 $Form->switch_template_parts( $params['edit_form_params'] );
 
-// =================================== INSTRUCTION ====================================
-$ItemType = & $edited_Item->get_ItemType();
-if( $ItemType && ( $ItemType->get( 'front_instruction' ) == 1 ) && $ItemType->get( 'instruction' ) )
-{
-	echo '<div class="alert alert-info fade in">'.$ItemType->get( 'instruction' ).'</div>';
-}
-
 // ================================ START OF EDIT FORM ================================
 
 $form_params = array();
@@ -111,6 +104,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 	{ // DO NOT ADD HIDDEN FIELDS IF THEY ARE NOT SET
 		// These fields will be set only in case when switch tab from admin editing to in-skin editing
 		// Fields used in "advanced" form, but not here:
+		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
+		{
+			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+		}
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 		$Form->hidden( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ) );
@@ -127,14 +124,16 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'item_priority', $edited_Item->priority );
 			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
 			$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-			$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+			if( $Blog->get_setting( 'use_deadline' ) )
+			{	// If deadline is enabled for collection:
+				$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
+			}
 		}
 		$Form->hidden( 'trackback_url', $trackback_url );
 		$Form->hidden( 'item_featured', $edited_Item->featured );
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
 		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
 		$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
-		$Form->hidden( 'item_order', $edited_Item->order );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );
@@ -142,7 +141,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 	elseif( !isset( $edited_Item->status ) )
 	{
-		$highest_publish_status = get_highest_publish_status( 'post', $Blog->ID, false );
+		$highest_publish_status = get_highest_publish_status( 'post', $Blog->ID, false, '', $edited_Item );
 		$edited_Item->set( 'status', $highest_publish_status );
 	}
 
@@ -212,15 +211,26 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->switch_layout( NULL );
 	}
 
+
+	if( $edited_Item->get_type_setting( 'allow_attachments' ) && $edited_Item->ID > 0 )
+	{ // ####################### ATTACHMENTS FIELDSETS #########################
+		$LinkOwner = new LinkItem( $edited_Item );
+	}
+
 	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
 	{ // Display text
 		// --------------------------- TOOLBARS ------------------------------------
 		echo '<div class="edit_toolbars">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'AdminDisplayToolbar', array(
+		$admin_toolbar_params = array(
 				'edit_layout' => 'expert',
 				'Item' => $edited_Item,
-			) );
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$admin_toolbar_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'AdminDisplayToolbar', $admin_toolbar_params );
 		echo '</div>';
 
 		// ---------------------------- TEXTAREA -------------------------------------
@@ -234,7 +244,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 			) );
 		$Form->switch_layout( NULL );
 		?>
-		<script type="text/javascript" language="JavaScript">
+		<script language="JavaScript">
 			<!--
 			// This is for toolbar plugins
 			var b2evoCanvas = document.getElementById('itemform_post_content');
@@ -244,17 +254,28 @@ $Form->begin_form( 'inskin', '', $form_params );
 		<?php
 		echo '<div class="edit_plugin_actions">';
 		// CALL PLUGINS NOW:
-		$Plugins->trigger_event( 'DisplayEditorButton', array(
+		$display_editor_params = array(
 				'target_type'   => 'Item',
 				'target_object' => $edited_Item,
 				'content_id'    => 'itemform_post_content',
-				'edit_layout'   => 'inskin'
-			) );
+				'edit_layout'   => 'inskin',
+			);
+		if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+		{
+			$display_editor_params['temp_ID'] = $LinkOwner->get_ID();
+		}
+		$Plugins->trigger_event( 'DisplayEditorButton', $display_editor_params );
 		echo '</div>';
 	}
 	else
 	{ // Hide text
 		$Form->hidden( 'content', $item_content );
+	}
+
+	// =================================== INSTRUCTION ====================================
+	if( $edited_Item->get_type_setting( 'front_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
+	{
+		echo '<div class="action_messages evo_instruction"><div class="log_note">'.$edited_Item->get_type_setting( 'instruction' ).'</div></div>';
 	}
 
 	global $display_item_settings_is_defined;
@@ -265,7 +286,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	{
 		// ################### VISIBILITY / SHARING ###################
 		// Get those statuses which are not allowed for the current User to create posts in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status ), array( 'trash' ) );
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
 		// Get allowed visibility statuses
 		$sharing_options = get_visibility_statuses( 'radio-options', $exclude_statuses );
 		if( count( $sharing_options ) == 1 )
@@ -288,8 +309,8 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	// ################### TEXT RENDERERS ###################
-	if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
-	{	// If text renderers are allowed to update from front-office:
+	if( $Blog->get_setting( 'in_skin_editing_renderers' ) && $edited_Item->get_type_setting( 'use_text' ) != 'never' )
+	{	// If text renderers are allowed to update from front-office and text content is allowed for the item type:
 		$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
 	}
 	else
@@ -318,51 +339,30 @@ if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
 	$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
 }
 
-// ################### PROPERTIES ###################
-if( ! $edited_Item->get_type_setting( 'use_custom_fields' ) )
-{ // Custom fields are hidden by otem type
-	display_hidden_custom_fields( $Form, $edited_Item );
-}
-else
-{ // Custom fields should be displayed
-	$custom_fields = $edited_Item->get_type_custom_fields();
+// ################### CUSTOM FIELDS ###################
+$custom_fields = $edited_Item->get_type_custom_fields();
+if( count( $custom_fields ) > 0 )
+{
+	$Form->begin_fieldset( T_('Additional fields') );
 
-	if( count( $custom_fields ) > 0 )
-	{
-		$Form->begin_fieldset( T_('Properties') );
+	$Form->switch_layout( 'table' );
+	$Form->labelstart = '<td class="right"><strong>';
+	$Form->labelend = '</strong></td>';
 
-		$Form->switch_layout( 'table' );
-		$Form->labelstart = '<td class="right"><strong>';
-		$Form->labelend = '</strong></td>';
+	echo $Form->formstart;
 
-		echo $Form->formstart;
+	// Display inputs to edit custom fields:
+	display_editable_custom_fields( $Form, $edited_Item );
 
-		foreach( $custom_fields as $field )
-		{ // Display each custom field
-			if( $field['type'] == 'varchar' )
-			{
-				$field_note = '';
-				$field_params = array( 'maxlength' => 255, 'style' => 'width:100%' );
-			}
-			else
-			{	// type == double
-				$field_note = T_('can be decimal');
-				$field_params = array();
-			}
-			$Form->text_input( 'item_'.$field['type'].'_'.$field['ID'], $edited_Item->get_setting( 'custom_'.$field['type'].'_'.$field['ID'] ), 10, $field['label'], $field_note, $field_params );
-		}
+	echo $Form->formend;
 
-		echo $Form->formend;
+	$Form->switch_layout( NULL );
 
-		$Form->switch_layout( NULL );
-
-		$Form->end_fieldset();
-	}
+	$Form->end_fieldset();
 }
 
 if( $edited_Item->get_type_setting( 'allow_attachments' ) && $edited_Item->ID > 0 )
 { // ####################### ATTACHMENTS FIELDSETS #########################
-	$LinkOwner = new LinkItem( $edited_Item );
 	if( $LinkOwner->count_links() )
 	{
 		$Form->begin_fieldset( T_('Attachments') );
@@ -401,6 +401,7 @@ echo_publishnowbutton_js();
 // New category input box:
 echo_onchange_newcat();
 echo_autocomplete_tags();
+echo_fieldset_folding_js();
 
 $edited_Item->load_Blog();
 // Location

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -21,6 +21,7 @@ global $current_User;
 global $DB;
 
 // Check permission:
+$current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'emails', 'view', true );
 
 load_class( 'tools/model/_emailaddress.class.php', 'EmailAddress' );
@@ -36,7 +37,7 @@ param( 'action', 'string' );
 
 if( $tab == 'addresses' )
 {	// Email addresses
-	if( param( 'emadr_ID', 'integer', '', true) )
+	if( param( 'emadr_ID', 'integer', '', true ) )
 	{	// Load Email Address object
 		$EmailAddressCache = & get_EmailAddressCache();
 		if( ( $edited_EmailAddress = & $EmailAddressCache->get_by_ID( $emadr_ID, false ) ) === false )
@@ -44,6 +45,19 @@ if( $tab == 'addresses' )
 			unset( $edited_EmailAddress );
 			forget_param( 'emadr_ID' );
 			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Address') ), 'error' );
+		}
+	}
+}
+elseif( $tab == 'sent' && empty( $tab3 ) )
+{ // Email log
+	if( param( 'emlog_ID', 'integer', 0, true ) )
+	{ // Load Email Log object
+		$EmailLogCache = & get_EmailLogCache();
+		if( ( $edited_EmailLog = & $EmailLogCache->get_by_ID( $emlog_ID, false ) ) === false )
+		{
+			unset( $edited_EmailLog );
+			forget_param( 'emlog_ID' );
+			$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Log') ), 'error' );
 		}
 	}
 }
@@ -184,15 +198,18 @@ switch( $action )
 			case 'smtp':
 				// SMTP gateway settings:
 
-				// Preferred email service
-				$Settings->set( 'email_service', param( 'email_service', 'string', 'mail' ) );
+				if( $email_send_allow_php_mail )
+				{	// Update the settings only when php mail service is enabled by config:
+					// Preferred email service
+					$Settings->set( 'email_service', param( 'email_service', 'string', 'mail' ) );
 
-				// Force email sending
-				$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
+					// Force email sending
+					$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
 
-				// Sendmail additional params:
-				$Settings->set( 'sendmail_params', param( 'sendmail_params', 'string', 'return' ) );
-				$Settings->set( 'sendmail_params_custom', param( 'sendmail_params_custom', 'string' ) );
+					// Sendmail additional params:
+					$Settings->set( 'sendmail_params', param( 'sendmail_params', 'string', 'return' ) );
+					$Settings->set( 'sendmail_params_custom', param( 'sendmail_params_custom', 'string' ) );
+				}
 
 				$old_smtp_enabled = $Settings->get( 'smtp_enabled' );
 
@@ -244,9 +261,6 @@ switch( $action )
 
 				// Chunk Size:
 				$Settings->set( 'email_campaign_chunk_size', param( 'email_campaign_chunk_size', 'integer', 0 ) );
-
-				// Delay between chunks:
-				$Settings->set( 'email_campaign_cron_repeat', param_duration( 'email_campaign_cron_repeat' ) );
 				break;
 
 			default:
@@ -400,6 +414,11 @@ switch( $action )
 		break;
 
 	case 'blocked_new':
+		// Form to create new Email Address:
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
 		// Init Email Address to show on the form
 		$edited_EmailAddress = new EmailAddress();
 		break;
@@ -409,6 +428,9 @@ switch( $action )
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'email_blocked' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
 
 		$action = 'blocked_edit';
 		if( !isset( $edited_EmailAddress ) )
@@ -436,6 +458,9 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'email_blocked' );
 
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
 		// Make sure we got an emadr_ID:
 		param( 'emadr_ID', 'integer', true );
 
@@ -448,6 +473,69 @@ switch( $action )
 			// We have EXITed already at this point!!
 		}
 		break;
+
+	case 'delete':
+		// Delete email log:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'email' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		// Make sure we got an emlog_ID:
+		param( 'emlog_ID', 'integer', 0, true );
+
+		$EmailLogCache = & get_EmailLogCache();
+		$edited_EmailLog = & $EmailLogCache->get_by_ID( $emlog_ID, false );
+
+		if( param( 'confirm', 'integer', 0 ) )
+		{
+			if( $edited_EmailLog === false )
+			{ // We could not find the email log to delete:
+				unset( $edited_EmailLog );
+				forget_param( 'emlog_ID' );
+				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Email Log') ), 'error' );
+			}
+			else
+			{
+				// Delete from DB:
+				if( $edited_EmailLog->dbdelete() )
+				{
+					$Messages->add( sprintf( T_('Email log #%d has been deleted.'), $emlog_ID ), 'success' );
+				}
+			}
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=email&tab=sent', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+		}
+		break;
+
+	case 'returned_delete':
+		// Delete a log of returned email:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'email' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		param( 'emret_ID', 'integer', 0 );
+		param( 'redirect_to', 'url', $admin_url.'?ctrl=email&tab=return' );
+
+		$result = $DB->query( 'DELETE
+			FROM T_email__returns
+			WHERE emret_ID = '.$emret_ID );
+		if( $result )
+		{
+			$Messages->add( sprintf( T_('Returned email log #%d has been deleted.'), $emret_ID ), 'success' );
+		}
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $redirect_to, 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 $AdminUI->breadcrumbpath_init( false );
@@ -458,16 +546,33 @@ switch( $tab )
 	case 'sent':
 		$AdminUI->breadcrumbpath_add( T_('Sent'), '?ctrl=email&amp;tab='.$tab );
 
-		$tab3 = 'log';
+		switch( $tab3 )
+		{
+			case 'stats':
+				$AdminUI->breadcrumbpath_add( T_('Stats'), '?ctrl=email&amp;tab=sent&amp;tab3='.$tab3 );
 
-		$emlog_ID = param( 'emlog_ID', 'integer', 0 );
-		if( empty( $emlog_ID ) )
-		{ // Initialize date picker on list page
-			init_datepicker_js();
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-statistics-summary' );
+
+				// Init jqPlot charts
+				init_jqplot_js();
+				break;
+
+			default:
+				$tab3 = 'log';
+
+				// Init JS to autcomplete the user logins
+				init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+
+				if( empty( $emlog_ID ) )
+				{ // Initialize date picker on list page
+					init_datepicker_js();
+				}
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'sent-emails' );
 		}
 
-		// Set an url for manual page:
-		$AdminUI->set_page_manual_link( 'sent-emails' );
 		break;
 
 	case 'addresses':
@@ -535,7 +640,7 @@ switch( $tab )
 				$AdminUI->breadcrumbpath_add( T_('Test'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'return-path-configuration' );
+				$AdminUI->set_page_manual_link( 'test-saved-settings' );
 				break;
 		}
 		break;
@@ -617,20 +722,31 @@ evo_flush();
 switch( $tab )
 {
 	case 'sent':
-		if( $emlog_ID > 0 )
-		{	// Display a details of selected email log
-			$MailLog = $DB->get_row( '
-				SELECT *
-				  FROM T_email__log
-				 WHERE emlog_ID = '.$DB->quote( $emlog_ID ) );
-			if( $MailLog )
-			{	// The mail log exists with selected ID
-				$AdminUI->disp_view( 'tools/views/_email_sent_details.view.php' );
+		switch( $tab3 )
+		{
+			case 'stats':
+				// Display a list of email logs:
+				$AdminUI->disp_view( 'tools/views/_email_stats.view.php' );
 				break;
-			}
+
+			default:
+				if( ! empty( $edited_EmailLog ) && ( $action != 'delete' ) )
+				{	// Display details of selected email log
+					$AdminUI->disp_view( 'tools/views/_email_sent_details.view.php' );
+					break;
+				}
+
+				// We need to ask for confirmation:
+				if( ! empty( $edited_EmailLog ) && $action == 'delete' )
+				{
+					$edited_EmailLog->confirm_delete(
+						sprintf( T_('Delete email log #%d?'), $edited_EmailLog->ID ),
+						'email', $action, get_memorized( 'action' ) );
+				}
+
+				// Display a list of email logs:
+				$AdminUI->disp_view( 'tools/views/_email_sent.view.php' );
 		}
-		// Display a list of email logs:
-		$AdminUI->disp_view( 'tools/views/_email_sent.view.php' );
 		break;
 
 	case 'addresses':

@@ -7,7 +7,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 require_js( 'functions.js', 'blog', false, true );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).on( 'click', 'a.evo_post_fav_btn', function()
 {
 	var me = jQuery( this );

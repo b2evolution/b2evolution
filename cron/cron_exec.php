@@ -19,6 +19,10 @@ require_once dirname(__FILE__).'/../conf/_config.php';
  */
 require_once $inc_path .'_main.inc.php';
 
+// Start timer for cron job:
+// (time is printed out after each action, @see cron_log_action_end())
+$Timer->start( 'cron_exec' );
+
 if( $Settings->get( 'system_lock' ) )
 { // System is locked down for maintenance, Stop cron execution
 	echo 'The site is locked for maintenance. All scheduled jobs are postponed. No job was executed.';
@@ -30,6 +34,11 @@ if( $Settings->get( 'system_lock' ) )
  */
 load_funcs( 'cron/_cron.funcs.php' );
 
+// Register shutdown function to catch fatal errors:
+register_shutdown_function( 'cron_job_shutdown' );
+// Mark this script as cron job executing in order to catch function debug_die() here and store error log in cron log:
+$is_cron_job_executing = true;
+
 /**
  * @global integer Quietness.
  *         1 suppresses trivial/informative messages,
@@ -39,17 +48,6 @@ load_funcs( 'cron/_cron.funcs.php' );
 $quiet = 0;
 if( $is_cli )
 { // called through Command Line Interface, handle args:
-
-	if( empty( $secure_htsrv_url ) )
-	{ // Initialize this url when it is empty:
-		global $ReqHost;
-		if( empty( $ReqHost ) )
-		{ // In CLI mode the HOST is unknown, so use $baseurl from the config:
-			global $baseurl;
-			$ReqHost = $baseurl;
-		}
-		$secure_htsrv_url = get_htsrv_url( true );
-	}
 
 	// Load required functions ( we need to load here, because in CLI mode it is not loaded )
 	load_funcs( '_core/_url.funcs.php' );
@@ -101,7 +99,7 @@ if( $is_cli )
 	// Init charset handling - this will also set the encoding for MySQL connection
 	init_charsets( $current_charset );
 }
-else
+elseif( ! is_admin_page() )
 { // This is a web request: (for testing purposes only. Not designed for production)
 
 	// Make sure the response is never cached:
@@ -151,6 +149,12 @@ else
 {
 	$ctsk_ID = $task->ctsk_ID;
 	$ctsk_name = cron_job_name( $task->ctsk_key, $task->ctsk_name, $task->ctsk_params );
+
+	// Initialize a var to count a number of cron job actions:
+	$cron_log_actions_num = NULL;
+
+	// Store key of currently executing cron job:
+	$executing_cron_task_key = $task->ctsk_key;
 
 	cron_log( 'Requesting lock on task #'.$ctsk_ID.' ['.$ctsk_name.']', 0 );
 
@@ -207,27 +211,64 @@ else
 		// The job may need to know its ID and name (to set logical locks for example):
 		$cron_params['ctsk_ID'] = $ctsk_ID;
 
-		// EXECUTE
-		$error_message = call_job( $task->ctsk_key, $cron_params );
+		// Set max execution time for each cron job separately:
+		set_max_execution_time( $Settings->get( 'cjob_timeout_'.$task->ctsk_key ) );
 
-		if( !empty( $error_message ) )
-		{
+		// Try to execute cron job:
+		set_error_handler( 'cron_job_error_handler' );
+		try
+		{	// EXECUTE CRON JOB:
+			$error_message = call_job( $task->ctsk_key, $cron_params );
+		}
+		catch( Exception $ex )
+		{	// Unexpected error:
+			$result_status = 'error';
+			$error_message = "\n".'b2evolution caught an UNEXPECTED ERROR: '
+				.'<b>File:</b> '.$ex->getFile().', '
+				.'<b>Line:</b> '.$ex->getLine().', '
+				.'<b>Message:</b> '.$ex->getMessage();
+			$result_message .= $error_message;
+			echo nl2br( $result_message );
+			// We must rollback any started transaction in order to proper update cron job log below:
+			$DB->rollback();
+		}
+		restore_error_handler();
+
+		if( ! empty( $error_message ) )
+		{	// Set error task in order to report by email to admin in the function detect_timeout_cron_jobs():
 			$error_task = array(
 					'ID'      => $ctsk_ID,
 					'name'    => $ctsk_name,
 					'message' => $error_message,
 				);
+
+			if( $result_status == 'imap_error' &&
+			    ( $max_consecutive_imap_errors = $Settings->get( 'cjob_imap_error_'.$task->ctsk_key ) ) > 1 )
+			{	// Check if imap error task can be reported by email to admin:
+				$previous_tasks_SQL = new SQL( 'Check consecutive imap error cron jobs' );
+				$previous_tasks_SQL->SELECT( 'clog_status' );
+				$previous_tasks_SQL->FROM( 'T_cron__log' );
+				$previous_tasks_SQL->FROM_add( 'INNER JOIN T_cron__task ON clog_ctsk_ID = ctsk_ID' );
+				$previous_tasks_SQL->WHERE( 'ctsk_key = '.$DB->quote( $task->ctsk_key ) );
+				$previous_tasks_SQL->ORDER_BY( 'clog_realstart_datetime DESC' );
+				// Skip first task because this is a currently executing task still has a status "started" in DB,
+				// but after update below the status will be "imap_error":
+				$previous_tasks_SQL->LIMIT( '1, '.( $max_consecutive_imap_errors - 1 ) );
+				$previous_tasks = $DB->get_col( $previous_tasks_SQL );
+				$previous_tasks[] = 'imap_error'; // append status of the currently executing task
+				if( count( $previous_tasks ) < $max_consecutive_imap_errors ||
+				    count( array_unique( $previous_tasks ) ) > 1 )
+				{	// If X previous consecutive tasks have no same status "IMAP error",
+					// unset error task in order to don't report by email to admin:
+					$error_task = NULL;
+				}
+			}
 		}
 
 		// Record task as finished:
 		if( empty( $timestop ) )
 		{
 			$timestop = time() + $time_difference;
-		}
-
-		if( $result_status == 'finished' && $timestop - $cron_timestart > 60 )
-		{ // Record a finished task as warning if it has run for more than 60 seconds
-			$result_status = 'warning';
 		}
 
 		if( is_array( $result_message ) )
@@ -238,10 +279,15 @@ else
 		$sql = ' UPDATE T_cron__log
 								SET clog_status = '.$DB->quote( $result_status ).',
 										clog_realstop_datetime = '.$DB->quote( date2mysql( $timestop ) ).',
-										clog_messages = '.$DB->quote( $result_message ) /* May be NULL */.'
+										clog_messages = '.$DB->quote( $result_message ) /* May be NULL */.',
+										clog_actions_num = '.$DB->quote( $cron_log_actions_num ).'
 							WHERE clog_ctsk_ID = '.$ctsk_ID;
 		$DB->query( $sql, 'Record task as finished.' );
 	}
+
+	// Unset data of the executed cron job:
+	unset( $ctsk_ID );
+	unset( $executing_cron_task_key );
 }
 
 
@@ -251,7 +297,7 @@ detect_timeout_cron_jobs( $error_task );
 
 
 
-if( ! $is_cli )
+if( ! $is_cli && ! is_admin_page() )
 { // This is a web request:
 	echo '<p><a href="cron_exec.php">Refresh Now!</a></p>';
 	echo '<p>This page should refresh automatically in 15 seconds...</p>';
@@ -263,4 +309,6 @@ if( ! $is_cli )
 	<?php
 }
 
+// Stop timer of cron job:
+$Timer->stop( 'cron_exec' );
 ?>

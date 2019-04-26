@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -26,8 +26,6 @@ global $admin_Plugins;
 
 global $edited_plugin_name, $edited_plugin_shortdesc, $edited_plugin_priority, $edited_plugin_code;
 global $admin_url;
-
-load_funcs('plugins/_plugin.funcs.php');
 
 
 $Form = new Form( NULL, 'pluginsettings_checkchanges' );
@@ -71,8 +69,6 @@ $Form->end_fieldset();
 // --------------------------- SETTINGS ---------------------------
 if( $edit_Plugin->Settings ) // NOTE: this triggers PHP5 autoloading through Plugin::__get() and therefor the 'isset($this->Settings)' hack in Plugin::GetDefaultSettings() still works, which is good.
 {
-	load_funcs('plugins/_plugin.funcs.php');
-
 	// We use output buffers here to only display the fieldset if there's content in there
 	// (either from PluginSettings or PluginSettingsEditDisplayAfter).
 	ob_start();
@@ -141,7 +137,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	$Form->buttons_input( array(
 		array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save Changes!'), 'class' => 'SaveButton' ),
-		array( 'type' => 'submit', 'name' => 'actionArray[update_edit_settings]', 'value' => T_('Save & edit').'...' ),
+		array( 'type' => 'submit', 'name' => 'actionArray[update_edit_settings]', 'value' => T_('Save and continue editing...') ),
 		) );
 }
 $Form->end_form();

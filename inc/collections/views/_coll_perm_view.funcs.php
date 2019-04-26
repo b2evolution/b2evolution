@@ -4,11 +4,79 @@
  * 
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * 
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * 
  * @package evocore
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
+
+
+/**
+ * Get SQL for collection user permissions
+ *
+ * @param string Keywords
+ * @param object Collection
+ * @param boolean TRUE to use mask in ORDER BY for Results ordering
+ * @return object SQL 
+ */
+function get_coll_user_perms_SQL( $Blog, $keywords = '', $use_order_mask = true )
+{
+	$SQL = new SQL( 'Get user permissions for collection #'.$Blog->ID );
+	$SQL->SELECT( $Blog->ID.' AS blog_ID, user_ID, user_login, user_level, bloguser_perm_item_propose, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_can_be_assignee,'
+		. 'bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses + 0 as perm_cmtstatuses, bloguser_perm_edit_cmt,'
+		. 'bloguser_perm_delpost, bloguser_perm_edit_ts, bloguser_perm_meta_comment, bloguser_perm_cats,'
+		. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
+		. 'bloguser_perm_media_browse, bloguser_perm_media_change, bloguser_perm_analytics,'
+		. 'IF( ( user_ID = "'.$Blog->owner_user_ID.'" OR grp_perm_blogs = "viewall" OR grp_perm_blogs = "editall" ), 1, bloguser_ismember ) AS bloguser_ismember,'
+		. 'IF( user_ID = "'.$Blog->owner_user_ID.'", 1, 0 ) AS bloguser_is_owner' );
+	$SQL->FROM( 'T_users' );
+	$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON ( user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$Blog->ID.' )' );
+	$SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
+	$SQL->ORDER_BY( 'bloguser_is_owner DESC, bloguser_ismember DESC, '.( $use_order_mask ? '*, ' : '' ).'user_login, user_ID' );
+
+	if( ! empty( $keywords ) )
+	{
+		$SQL->add_search_field( 'user_login' );
+		$SQL->add_search_field( 'user_firstname' );
+		$SQL->add_search_field( 'user_lastname' );
+		$SQL->add_search_field( 'user_nickname' );
+		$SQL->add_search_field( 'user_email' );
+		$SQL->WHERE_kw_search( $keywords, 'AND' );
+	}
+
+	return $SQL;
+}
+
+
+/**
+ * Get SQL for collection group permissions
+ *
+ * @param string Keywords
+ * @param object Collection
+ * @param boolean TRUE to use mask in ORDER BY for Results ordering
+ * @return object SQL 
+ */
+function get_coll_group_perms_SQL( $Blog, $keywords = '', $use_order_mask = true )
+{
+	$SQL = new SQL( 'Get group permissions for collection #'.$Blog->ID );
+	$SQL->SELECT( $Blog->ID.' AS blog_ID, grp_ID, grp_name, grp_usage, grp_level, bloggroup_perm_item_propose, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_can_be_assignee,'
+		. 'bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses + 0 as perm_cmtstatuses, bloggroup_perm_edit_cmt,'
+		. 'bloggroup_perm_delpost, bloggroup_perm_edit_ts, bloggroup_perm_meta_comment, bloggroup_perm_cats,'
+		. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
+		. 'bloggroup_perm_media_browse, bloggroup_perm_media_change, bloggroup_perm_analytics,'
+		. 'IF( ( grp_perm_blogs = "viewall" OR grp_perm_blogs = "editall" ), 1, bloggroup_ismember ) AS bloggroup_ismember' );
+	$SQL->FROM( 'T_groups' );
+	$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON ( grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$Blog->ID.' )' );
+	$SQL->ORDER_BY( 'bloggroup_ismember DESC, '.( $use_order_mask ? '*, ' : '' ).'grp_name, grp_ID' );
+
+	if( ! empty( $keywords ) )
+	{
+		$SQL->add_search_field( 'grp_name' );
+		$SQL->WHERE_kw_search( $keywords, 'AND' );
+	}
+
+	return $SQL;
+}
 
 
 /**
@@ -51,6 +119,54 @@ function get_id_coll_from_prefix( $prefix )
 
 
 /**
+ * Check if permission is always enabled
+ *
+ * @param object the db row
+ * @param string the prefix of the db row: 'bloguser_' or 'bloggroup_'
+ * @param string permission name
+ * @param string Collection owner user ID
+ * @return boolean
+ */
+function is_always_coll_perm_enabled( $row, $prefix, $perm, $coll_owner_user_ID )
+{
+	if( $prefix == 'bloguser_' && $perm != 'perm_admin' && $coll_owner_user_ID == $row->user_ID )
+	{	// Collection owner has almost all permissions by default (One exception is "admin" perm to edit advanced/administrative coll properties):
+		return true;
+	}
+
+	// Check if permission is always enabled by group setting:
+	if( ! empty( $row->user_ID ) )
+	{	// User perm:
+		$UserCache = & get_UserCache();
+		if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
+		{	// Get user group:
+			$perm_Group = & $User->get_Group();
+		}
+	}
+	elseif( ! empty( $row->grp_ID ) )
+	{	// Group perm:
+		$GroupCache = & get_GroupCache();
+		$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
+	}
+
+	if( ! empty( $perm_Group ) )
+	{	// Check global group setting permission:
+		$group_perm_blogs = $perm_Group->get( 'perm_blogs' );
+		if( $group_perm_blogs == 'editall' )
+		{	// If the group has a global permission to edit ALL collections:
+			return true;
+		}
+		elseif( $perm == 'ismember' && $group_perm_blogs == 'viewall' )
+		{	// If the group has a global permission to view or edit ALL collections:
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+/**
  * Get collection perm checkbox
  * 
  * @param object the db row
@@ -75,42 +191,6 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
-	$always_enabled = false;
-
-	if( $prefix == 'bloguser_' && $perm != 'perm_admin' && $row_Blog->owner_user_ID == $row->user_ID )
-	{	// Collection owner has almost all permissions by default (One exception is "admin" perm to edit advanced/administrative coll properties):
-		$always_enabled = true;
-	}
-	else
-	{	// Check if permission is always enabled by group setting:
-		if( ! empty( $row->user_ID ) )
-		{	// User perm:
-			$UserCache = & get_UserCache();
-			if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
-			{	// Get user group:
-				$perm_Group = & $User->get_Group();
-			}
-		}
-		elseif( ! empty( $row->grp_ID ) )
-		{	// Group perm:
-			$GroupCache = & get_GroupCache();
-			$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
-		}
-
-		if( ! empty( $perm_Group ) )
-		{	// Check global group setting permission:
-			$group_perm_blogs = $perm_Group->get( 'perm_blogs' );
-			if( $group_perm_blogs == 'editall' )
-			{	// If the group has a global permission to edit ALL collections:
-				$always_enabled = true;
-			}
-			elseif( $perm == 'ismember' && $group_perm_blogs == 'viewall' )
-			{	// If the group has a global permission to view or edit ALL collections:
-				$always_enabled = true;
-			}
-		}
-	}
-
 	$r = '<input type="checkbox"';
 	if( !empty($id) )
 	{
@@ -118,7 +198,7 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 	}
 	$r .= ' name="blog_'.$perm.'_'.$row->{$row_id_coll}.'"';
 
-	if( $always_enabled )
+	if( is_always_coll_perm_enabled( $row, $prefix, $perm, $row_Blog->owner_user_ID ) )
 	{	// This perm option is always enabled:
 		$r .= ' checked="checked" disabled="disabled"';
 	}
@@ -229,33 +309,7 @@ function coll_perm_status_checkbox( $row, $prefix, $perm_status, $title, $type )
 			debug_die('Invalid $type param on advanced perms form!');
 	}
 
-	$always_enabled = false;
-
-	if( $prefix == 'bloguser_' && $row_Blog->owner_user_ID == $row->user_ID )
-	{	// Collection owner has the permissions to edit all item/comment statuses by default:
-		$always_enabled = true;
-	}
-	else
-	{	// Check if permission is always enabled by group setting:
-		if( ! empty( $row->user_ID ) )
-		{	// User perm:
-			$UserCache = & get_UserCache();
-			if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
-			{	// Get user group:
-				$perm_Group = & $User->get_Group();
-			}
-		}
-		elseif( ! empty( $row->grp_ID ) )
-		{	// Group perm:
-			$GroupCache = & get_GroupCache();
-			$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
-		}
-
-		if( ! empty( $perm_Group ) && $perm_Group->get( 'perm_blogs' ) == 'editall' )
-		{	// If the group has a global permission to edit ALL collections:
-			$always_enabled = true;
-		}
-	}
+	$always_enabled = is_always_coll_perm_enabled( $row, $prefix, 'perm_'.$perm_status, $row_Blog->owner_user_ID );
 
 	$r = '<input type="checkbox"';
 	if( !empty($id) )
@@ -336,36 +390,8 @@ function coll_perm_edit( $row, $prefix )
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
-	$always_enabled = false;
-
-	if( $prefix == 'bloguser_' && $row_Blog->owner_user_ID == $row->user_ID )
-	{	// Collection owner has the max permission to edit items:
-		$always_enabled = true;
-	}
-	else
-	{	// Check if permission is always enabled by group setting:
-		if( ! empty( $row->user_ID ) )
-		{	// User perm:
-			$UserCache = & get_UserCache();
-			if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
-			{	// Get user group:
-				$perm_Group = & $User->get_Group();
-			}
-		}
-		elseif( ! empty( $row->grp_ID ) )
-		{	// Group perm:
-			$GroupCache = & get_GroupCache();
-			$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
-		}
-
-		if( ! empty( $perm_Group ) && $perm_Group->get( 'perm_blogs' ) == 'editall' )
-		{	// If the group has a global permission to edit ALL collections:
-			$always_enabled = true;
-		}
-	}
-
 	$r = '<select id="blog_perm_edit_'.$row->{$row_id_coll}.'" name="blog_perm_edit_'.$row->{$row_id_coll}.'"';
-	if( $always_enabled )
+	if( is_always_coll_perm_enabled( $row, $prefix, 'perm_edit', $row_Blog->owner_user_ID ) )
 	{	// This perm option is always enabled:
 		$r .= ' disabled="disabled"';
 		$perm_edit_value = 'all';
@@ -411,36 +437,8 @@ function coll_perm_edit_cmt( $row, $prefix )
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
-	$always_enabled = false;
-
-	if( $prefix == 'bloguser_' && $row_Blog->owner_user_ID == $row->user_ID )
-	{	// Collection owner has the max permission to edit comments:
-		$always_enabled = true;
-	}
-	else
-	{	// Check if permission is always enabled by group setting:
-		if( ! empty( $row->user_ID ) )
-		{	// User perm:
-			$UserCache = & get_UserCache();
-			if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
-			{	// Get user group:
-				$perm_Group = & $User->get_Group();
-			}
-		}
-		elseif( ! empty( $row->grp_ID ) )
-		{	// Group perm:
-			$GroupCache = & get_GroupCache();
-			$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
-		}
-
-		if( ! empty( $perm_Group ) && $perm_Group->get( 'perm_blogs' ) == 'editall' )
-		{	// If the group has a global permission to edit ALL collections:
-			$always_enabled = true;
-		}
-	}
-
 	$r = '<select id="blog_perm_edit_cmt'.$row->{$row_id_coll}.'" name="blog_perm_edit_cmt_'.$row->{$row_id_coll}.'"';
-	if( $always_enabled )
+	if( is_always_coll_perm_enabled( $row, $prefix, 'perm_edit_cmt', $row_Blog->owner_user_ID ) )
 	{	// This perm option is always enabled:
 		$r .= ' disabled="disabled"';
 		$perm_edit_cmt_value = 'all';
@@ -487,36 +485,8 @@ function coll_perm_item_type( $row, $prefix )
 
 	$row_id_coll = get_id_coll_from_prefix( $prefix );
 
-	$always_enabled = false;
-
-	if( $prefix == 'bloguser_' && $row_Blog->owner_user_ID == $row->user_ID )
-	{	// Collection owner has the max permission to edit item types:
-		$always_enabled = true;
-	}
-	else
-	{	// Check if permission is always enabled by group setting:
-		if( ! empty( $row->user_ID ) )
-		{	// User perm:
-			$UserCache = & get_UserCache();
-			if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
-			{	// Get user group:
-				$perm_Group = & $User->get_Group();
-			}
-		}
-		elseif( ! empty( $row->grp_ID ) )
-		{	// Group perm:
-			$GroupCache = & get_GroupCache();
-			$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
-		}
-
-		if( ! empty( $perm_Group ) && $perm_Group->get( 'perm_blogs' ) == 'editall' )
-		{	// If the group has a global permission to edit ALL collections:
-			$always_enabled = true;
-		}
-	}
-
 	$r = '<select id="blog_perm_item_type_'.$row->{$row_id_coll}.'" name="blog_perm_item_type_'.$row->{$row_id_coll}.'"';
-	if( $always_enabled )
+	if( is_always_coll_perm_enabled( $row, $prefix, 'perm_item_type', $row_Blog->owner_user_ID ) )
 	{	// This perm option is always enabled:
 		$r .= ' disabled="disabled"';
 		$perm_edit_value = 'admin';
@@ -663,7 +633,7 @@ function coll_grp_perm_col_member( $row )
 function colls_groups_perms_results( & $Results, $params = array() )
 {
 	$params = array_merge( array(
-			'type'   => 'collection', // 'colleciton' OR 'group'
+			'type'   => 'collection', // 'collection' OR 'group'
 			'object' => NULL,
 		), $params );
 
@@ -745,6 +715,14 @@ function colls_groups_perms_results( & $Results, $params = array() )
 		$col_member['td_colspan'] = '~conditional( #blog_advanced_perms# == 1, 1, -2 )~';
 	}
 	$Results->cols[] = $col_member;
+
+	$Results->cols[] = array(
+			'th_group' => T_('Permissions on Posts'),
+			'th' => T_('Propose changes'),
+			'th_class' => 'center',
+			'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_item_propose\', \''.format_to_output( T_('Permission to propose a change for Item'), 'htmlattr' ).'\' )%',
+			'td_class' => 'shrinkwrap',
+		);
 
 	$Results->cols[] = array(
 			'th_group' => T_('Permissions on Posts'),
@@ -897,6 +875,98 @@ function colls_groups_perms_results( & $Results, $params = array() )
 			'td' => '%perm_check_all( {row}, \'bloggroup_\' )%',
 			'td_class' => 'center',
 		);
+}
+
+
+/**
+ * Get CSV content for collection permissions
+ *
+ * @param string Prefix: 'bloguser_', 'bloggroup_'
+ * @param array Rows
+ * @param object Collection
+ * @return string
+ */
+function get_csv_coll_perms( $prefix, $perm_rows, $perm_Blog )
+{
+	$columns = array( $prefix == 'bloguser_' ? 'login' : 'group', 'level', 'member' );
+	if( $perm_Blog->get_setting( 'use_workflow' ) )
+	{
+		$columns[] = 'assignee';
+	}
+	$columns[] = 'propose changes';
+	$post_statuses = get_visibility_statuses( 'keys' );
+	foreach( $post_statuses as $post_status )
+	{
+		$columns[] = 'post status: '.$post_status;
+	}
+	$columns[] = 'post types';
+	$columns[] = 'edit posts';
+	$columns[] = 'delete posts';
+	$columns[] = 'edit ts';
+	$comment_statuses = get_visibility_statuses( 'keys', array( 'redirected', 'trash' ) );
+	foreach( $comment_statuses as $comment_status )
+	{
+		$columns[] = 'comment status: '.$comment_status;
+	}
+	$columns[] = 'comment status: meta';
+	$columns[] = 'edit cmts';
+	$columns[] = 'delete cmts';
+	$columns[] = 'recycle cmts';
+	$columns[] = 'spam vote cmts';
+	$columns[] = 'cats';
+	$columns[] = 'feat.';
+	$columns[] = 'coll. admin';
+	$columns[] = 'media upload';
+	$columns[] = 'media browse';
+	$columns[] = 'media change';
+	$columns[] = 'analytics';
+
+	$r = get_csv_line( $columns );
+
+	foreach( $perm_rows as $perm )
+	{
+		$perm_row = array(
+				$prefix == 'bloguser_' ? $perm->user_login : $perm->grp_name,
+				$prefix == 'bloguser_' ? $perm->user_level : $perm->grp_level,
+				is_always_coll_perm_enabled( $perm, $prefix, 'ismember', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'ismember'} ),
+			);
+		if( $perm_Blog->get_setting( 'use_workflow' ) )
+		{
+			$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'can_be_assignee', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'can_be_assignee'} );
+		}
+		$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'perm_item_propose', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_item_propose'} );
+		foreach( $post_statuses as $post_status )
+		{
+			$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'perm_'.$post_status, $perm_Blog->owner_user_ID ) ? 1 : ( get_status_permvalue( $post_status ) & $perm->perm_poststatuses ? 1 : 0 );
+		}
+		$perm_row = array_merge( $perm_row, array(
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_item_type', $perm_Blog->owner_user_ID ) ? 'admin' : ( empty( $perm->{$prefix.'perm_item_type'} ) ? 'standard' : $perm->{$prefix.'perm_item_type'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_edit', $perm_Blog->owner_user_ID ) ? 'all' : ( empty( $perm->{$prefix.'perm_edit'} ) ? 'no' : $perm->{$prefix.'perm_edit'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_delpost', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_delpost'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_edit_ts', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_edit_ts'} ),
+			) );
+		foreach( $comment_statuses as $comment_status )
+		{
+			$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'perm_'.$comment_status, $perm_Blog->owner_user_ID ) ? 1 : ( get_status_permvalue( $comment_status ) & $perm->perm_cmtstatuses ? 1 : 0 );
+		}
+		$perm_row = array_merge( $perm_row, array(
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_meta_comment', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_meta_comment'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_edit_cmt', $perm_Blog->owner_user_ID ) ? 'all' : ( empty( $perm->{$prefix.'perm_edit_cmt'} ) ? 'no' : $perm->{$prefix.'perm_edit_cmt'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_delcmts', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_delcmts'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_recycle_owncmts', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_recycle_owncmts'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_vote_spam_cmts', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_vote_spam_cmts'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_cats', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_cats'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_properties', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_properties'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_admin', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_admin'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_media_upload', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_media_upload'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_media_browse', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_media_browse'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_media_change', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_media_change'} ),
+				is_always_coll_perm_enabled( $perm, $prefix, 'perm_analytics', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_analytics'} ),
+			) );
+		$r .= get_csv_line( $perm_row );
+	}
+
+	return $r;
 }
 
 ?>

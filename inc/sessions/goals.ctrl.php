@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -30,6 +30,14 @@ $activate_collection_toolbar = true;
 // Do we have permission to view all stats (aggregated stats) ?
 $perm_view_all = $current_User->check_perm( 'stats', 'view' );
 
+// Section ID:
+param( 'sec_ID', 'integer', 0, true );
+if( ! $perm_view_all && ! $current_User->check_perm( 'section', 'view', false, $sec_ID ) )
+{
+	forget_param( 'sec_ID' );
+	unset( $sec_ID );
+}
+
 $tab3 = param( 'tab3', 'string', 'goals', true );
 $AdminUI->set_path( 'stats', 'goals', $tab3 );
 
@@ -37,12 +45,13 @@ if( isset( $collections_Module ) )
 { // Display list of blogs:
 	if( $perm_view_all )
 	{
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => 'global' ), T_('All'),
-						$admin_url.'?ctrl=stats&amp;tab=summary&amp;tab3=global&amp;blog=0' );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'goals' ), T_('All'),
+						$admin_url.'?ctrl=goals&amp;blog=0', NULL, false, true );
 	}
 	else
 	{ // No permission to view aggregated stats:
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => 'summary', 'tab3' => $tab3 ) );
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'goals' ), NULL,
+						'', NULL, false, true );
 	}
 }
 

@@ -12,15 +12,14 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-?>
-<div id="mobile_footer" class="mobile_footer">
 
-	<ul class="evo_container evo_container__mobile_footer">
-	<?php
 		// ------------------------- "Mobile Footer" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		skin_container( NT_('Mobile: Footer'), array(
+		widget_container( 'mobile_footer', array(
 				// The following (optional) params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
+				'container_start' => '<div id="mobile_footer" class="mobile_footer"><ul class="evo_container $wico_class$">',
+				'container_end'   => '</ul></div>',
 				// This will enclose each widget in a block:
 				'block_start' => '<li class="evo_widget $wi_class$">',
 				'block_end' => '</li>',
@@ -42,6 +41,3 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			) );
 		// ----------------------------- END OF "Mobile Footer" CONTAINER -----------------------------
 	?>
-	</ul>
-
-</div>

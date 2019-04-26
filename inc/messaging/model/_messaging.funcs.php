@@ -153,7 +153,7 @@ function set_contact_blocked( $user_ID, $blocked )
  */
 function create_new_thread()
 {
-	global $Settings, $current_User, $Messages, $edited_Thread, $edited_Message, $action;
+	global $Settings, $current_User, $Messages, $edited_Thread, $edited_Message, $action, $Plugins;
 
 	// Insert new thread:
 	$edited_Thread = new Thread();
@@ -171,6 +171,15 @@ function create_new_thread()
 
 	param( 'thrd_recipients', 'string' );
 	param( 'thrd_recipients_array', 'array' );
+
+	// Trigger event: a Plugin could add a $category="error" message here..
+	$Plugins->trigger_event( 'MessageFormSent', array( 'is_preview' => ( $action == 'preview' ) ) );
+
+	// Validate first enabled captcha plugin:
+	$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+		'form_type'  => 'message',
+		'is_preview' => ( $action == 'preview' ),
+	) );
 
 	// Load data from request
 	if( $edited_Message->load_from_Request() )
@@ -215,7 +224,7 @@ function create_new_thread()
  */
 function create_new_message( $thrd_ID )
 {
-	global $Settings, $current_User, $Messages, $edited_Message, $action;
+	global $Settings, $current_User, $Messages, $edited_Message, $action, $Plugins;
 
 	// Insert new message:
 	$edited_Message = new Message();
@@ -229,6 +238,15 @@ function create_new_message( $thrd_ID )
 		$Messages->add( T_('You cannot send a message at this time because the system is under maintenance. Please try again in a few moments.'), 'error' );
 		return false;
 	}
+
+	// Trigger event: a Plugin could add a $category="error" message here..
+	$Plugins->trigger_event( 'MessageFormSent', array( 'is_preview' => ( $action == 'preview' ) ) );
+
+	// Validate first enabled captcha plugin:
+	$Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
+		'form_type'  => 'message',
+		'is_preview' => ( $action == 'preview' ),
+	) );
 
 	// Load data from request
 	if( $edited_Message->load_from_Request() )
@@ -501,7 +519,7 @@ function get_thread_recipient_status_icons( $thread_ID, $status )
 		// Get messages only of current user:
 		$SQL->WHERE_and( 'ts.tsta_user_ID = '.$current_User->ID );
 	}
-	$user_logins = $DB->get_col( $SQL->get(), 0, $SQL->title );
+	$user_logins = $DB->get_col( $SQL );
 	if( ! empty( $user_logins ) )
 	{	// Display status icons if at least one user is found for the requested status:
 		$result .= get_avatar_imgtags( $user_logins, false, false, 'crop-top-15x15', '', '', $imgtag_status, false );
@@ -640,6 +658,7 @@ function get_threads_results( $params = array() )
 			'results_param_prefix' => 'thrd_', // Param prefix for results list
 			'user_ID' => $current_User->ID,    // To limit messages only by this user's ID
 			'sent_user_ID' => '',              // To limit messages only for sent by given user ID
+			'received_user_ID' => '',          // To limit messages only for received by given user ID
 			'search_word' => '',               // Filter by this keyword
 			'search_user' => '',               // Filter by this user name
 			'show_closed_threads' => NULL,     // Show closed conversations
@@ -648,18 +667,16 @@ function get_threads_results( $params = array() )
 
 
 	$filter_sql = '';
-	if( !empty( $params['search_word'] ) || !empty( $params['search_user'] ) || !empty( $params['sent_user_ID'] ) )
+	if( !empty( $params['search_word'] ) || !empty( $params['search_user'] ) || !empty( $params['sent_user_ID'] ) || !empty( $params['received_user_ID'] ) )
 	{	// We want to filter on search keyword:
 		$filter_sql = array();
 		if( !empty( $params['search_word'] ) )
 		{ // Search by title
 			$filter_sql[] = 'thrd_title LIKE "%'.$DB->escape( $params['search_word'] ).'%"';
 		}
-		if( !empty( $params['search_user'] ) )
-		{ // Search by user names
-
-			// Get all threads IDs with searching user name
-			$threads_SQL = new SQL();
+		if( ! empty( $params['search_user'] ) )
+		{	// Search by user names:
+			$threads_SQL = new SQL( 'Get all threads IDs with searching user name' );
 			$threads_SQL->SELECT( 'tsta_thread_ID' );
 			$threads_SQL->FROM( 'T_users' );
 			$threads_SQL->FROM_add( 'INNER JOIN T_messaging__threadstatus ON tsta_user_ID = user_ID' );
@@ -667,7 +684,7 @@ function get_threads_results( $params = array() )
 			$threads_SQL->WHERE_or( 'user_firstname LIKE "%'.$DB->escape( $params['search_user'] ).'%"' );
 			$threads_SQL->WHERE_or( 'user_lastname LIKE "%'.$DB->escape( $params['search_user'] ).'%"' );
 			$threads_SQL->WHERE_or( 'user_nickname LIKE "%'.$DB->escape( $params['search_user'] ).'%"' );
-			$threads_IDs = $DB->get_col( $threads_SQL->get() );
+			$threads_IDs = $DB->get_col( $threads_SQL );
 
 			if( empty( $threads_IDs ) )
 			{	// No found related threads
@@ -676,14 +693,30 @@ function get_threads_results( $params = array() )
 
 			$filter_sql[] = 'tsta_thread_ID IN ( '.implode( ',', $threads_IDs ).' )';
 		}
-		if( !empty( $params[ 'sent_user_ID' ] ) )
-		{
-			// Get all threads IDs with searching user name
-			$threads_SQL = new SQL();
+		if( ! empty( $params[ 'sent_user_ID' ] ) )
+		{	// Limit messages only for sent by user:
+			$threads_SQL = new SQL( 'Get all threads where user sent messages' );
 			$threads_SQL->SELECT( 'DISTINCT( msg_thread_ID )' );
 			$threads_SQL->FROM( 'T_messaging__message' );
 			$threads_SQL->WHERE( 'msg_author_user_ID = '.$DB->quote( $params[ 'sent_user_ID' ] ) );
-			$threads_IDs = $DB->get_col( $threads_SQL->get() );
+			$threads_IDs = $DB->get_col( $threads_SQL );
+
+			if( empty( $threads_IDs ) )
+			{	// No found related threads
+				$threads_IDs[] = '-1';
+			}
+
+			$filter_sql[] = 'tsta_thread_ID IN ( '.implode( ',', $threads_IDs ).' )';
+		}
+		if( ! empty( $params[ 'received_user_ID' ] ) )
+		{	// Limit messages only for received by user:
+			$threads_SQL = new SQL( 'Get all threads where user received messages' );
+			$threads_SQL->SELECT( 'DISTINCT( msg_thread_ID )' );
+			$threads_SQL->FROM( 'T_messaging__message' );
+			$threads_SQL->FROM_add( 'INNER JOIN T_messaging__threadstatus ON tsta_thread_ID = msg_thread_ID' );
+			$threads_SQL->WHERE( 'tsta_user_ID = '.$DB->quote( $params['received_user_ID'] ) );
+			$threads_SQL->WHERE_and( 'msg_author_user_ID != '.$DB->quote( $params['received_user_ID'] ) );
+			$threads_IDs = $DB->get_col( $threads_SQL );
 
 			if( empty( $threads_IDs ) )
 			{	// No found related threads
@@ -806,13 +839,13 @@ function create_contacts_group( $group_name )
 
 	if( $group_name != '' )
 	{	// Check new group name for duplicates
-		$SQL = new SQL();
+		$SQL = new SQL( 'Check new contact group name for duplicates' );
 		$SQL->SELECT( 'cgr_ID' );
 		$SQL->FROM( 'T_messaging__contact_groups' );
 		$SQL->WHERE( 'cgr_user_ID = '.$current_User->ID );
 		$SQL->WHERE_and( 'cgr_name = '.$DB->quote( $group_name ) );
 
-		$group = $DB->get_var( $SQL->get() );
+		$group = $DB->get_var( $SQL );
 		if( !is_null( $group ) )
 		{	// Duplicate group
 			$Messages->add( T_('You already have a group with this name.'), 'error' );
@@ -854,13 +887,13 @@ function rename_contacts_group( $group_ID, $field_name = 'name' )
 	param_check_not_empty( $field_name, T_('Please enter group name') );
 
 	// Check if user is owner of this group
-	$SQL = new SQL();
+	$SQL = new SQL( 'Check if current user is owner of contact group #'.$group_ID );
 	$SQL->SELECT( 'cgr_ID' );
 	$SQL->FROM( 'T_messaging__contact_groups' );
 	$SQL->WHERE( 'cgr_user_ID = '.$current_User->ID );
 	$SQL->WHERE_and( 'cgr_ID = '.$DB->quote( $group_ID ) );
 
-	if( $DB->get_var( $SQL->get() ) == NULL )
+	if( $DB->get_var( $SQL ) == NULL )
 	{
 		$Messages->add( 'You don\'t have this group', 'error' );
 		return false;
@@ -889,13 +922,13 @@ function delete_contacts_group( $group_ID )
 	global $DB, $current_User, $Messages;
 
 	// Check if user is owner of this group
-	$SQL = new SQL();
+	$SQL = new SQL( 'Check if current user is owner of group #'.$group_ID );
 	$SQL->SELECT( 'cgr_ID' );
 	$SQL->FROM( 'T_messaging__contact_groups' );
 	$SQL->WHERE( 'cgr_user_ID = '.$current_User->ID );
 	$SQL->WHERE_and( 'cgr_ID = '.$DB->quote( $group_ID ) );
 
-	if( $DB->get_var( $SQL->get() ) == NULL )
+	if( $DB->get_var( $SQL ) == NULL )
 	{
 		$Messages->add( 'You don\'t have this group', 'error' );
 		return false;
@@ -974,13 +1007,13 @@ function create_contacts_group_users( $group, $users, $new_group_field_name = 'g
 			return false;
 		}
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Check if current User has a contact group #'.$group_ID );
 		$SQL->SELECT( 'cgr_name AS name' );
 		$SQL->FROM( 'T_messaging__contact_groups' );
 		$SQL->WHERE( 'cgr_user_ID = '.$current_User->ID );
 		$SQL->WHERE_and( 'cgr_ID = '.$DB->quote( $group_ID ) );
 
-		$group = $DB->get_row( $SQL->get() );
+		$group = $DB->get_row( $SQL );
 		if( is_null( $group ) )
 		{	// User try use a group of another user
 			return false;
@@ -1046,7 +1079,7 @@ function remove_contacts_group_user( $group_ID, $user_ID )
 {
 	global $DB, $current_User, $Messages;
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Check if user #'.$user_ID.' has a contact group #'.$group_ID );
 	$SQL->SELECT( 'cgr_name AS name' );
 	$SQL->FROM( 'T_messaging__contact_groups' );
 	$SQL->FROM_add( 'LEFT JOIN T_messaging__contact_groupusers ON cgr_ID = cgu_cgr_ID' );
@@ -1054,7 +1087,7 @@ function remove_contacts_group_user( $group_ID, $user_ID )
 	$SQL->WHERE_and( 'cgu_user_ID = '.$DB->quote( $user_ID ) );
 	$SQL->WHERE_and( 'cgu_cgr_ID = '.$DB->quote( $group_ID ) );
 
-	$group = $DB->get_row( $SQL->get() );
+	$group = $DB->get_row( $SQL );
 	if( is_null( $group ) )
 	{	// User try use a group of another user
 		return false;
@@ -1235,13 +1268,13 @@ function get_contacts_groups_by_user_ID( $user_ID )
 	global $DB, $current_User;
 
 	// Get user groups
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get what contact groups are selected for the user by current User' );
 	$SQL->SELECT( 'cgu_cgr_ID' );
 	$SQL->FROM( 'T_messaging__contact_groups' );
 	$SQL->FROM_add( 'INNER JOIN T_messaging__contact_groupusers ON cgu_cgr_ID=cgr_ID' );
 	$SQL->WHERE( 'cgr_user_ID = '.$DB->quote( $current_User->ID ) );
 	$SQL->WHERE_and( 'cgu_user_ID = '.$DB->quote( $user_ID ) );
-	return $DB->get_col( $SQL->get() );
+	return $DB->get_col( $SQL );
 }
 
 
@@ -1576,7 +1609,7 @@ function get_unread_messages_count( $user_ID = 0 )
 		$SQL->WHERE_and( 'ts.tsta_thread_leave_msg_ID IS NULL OR mm.msg_ID <= tsta_thread_leave_msg_ID' );
 		$SQL->WHERE_and( 'ts.tsta_user_ID = '.$DB->quote( $user_ID ) );
 
-		$cache_unread_messages_count[ $user_ID ] = intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
+		$cache_unread_messages_count[ $user_ID ] = intval( $DB->get_var( $SQL ) );
 	}
 
 	return $cache_unread_messages_count[ $user_ID ];
@@ -1603,7 +1636,7 @@ function get_first_unread_message_date( $user_ID )
 
 	global $DB;
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get the first ( oldest ) unread message of user #'.$user_ID );
 	$SQL->SELECT( 'min( msg_datetime )' );
 	$SQL->FROM( 'T_messaging__threadstatus ts' );
 	$SQL->FROM_add( 'INNER JOIN T_messaging__message mu
@@ -1612,7 +1645,7 @@ function get_first_unread_message_date( $user_ID )
 	$SQL->WHERE_and( 'ts.tsta_thread_leave_msg_ID IS NULL OR ts.tsta_first_unread_msg_ID <= ts.tsta_thread_leave_msg_ID' );
 	$SQL->WHERE_and( 'ts.tsta_user_ID = '.$DB->quote( $user_ID ) );
 
-	return $DB->get_var( $SQL->get() );
+	return $DB->get_var( $SQL );
 }
 
 
@@ -1624,7 +1657,7 @@ function get_first_unread_message_date( $user_ID )
  */
 function get_next_reminder_info( $user_ID )
 {
-	global $UserSettings, $DB, $servertimenow, $unread_message_reminder_delay, $unread_messsage_reminder_threshold;
+	global $Settings, $UserSettings, $DB, $servertimenow;
 
 	if( ! $UserSettings->get( 'notify_unread_messages', $user_ID ) )
 	{ // The user doesn't want to recive unread messages reminders
@@ -1636,6 +1669,9 @@ function get_next_reminder_info( $user_ID )
 	{ // The user doesn't have unread messages
 		return T_('This user doesn\'t have unread messages.');
 	}
+
+	// Get array of the unread private messages reminder delay settings:
+	$unread_message_reminder_delay = $Settings->get( 'unread_message_reminder_delay' );
 
 	// We assume that reminder is not delayed because of the user was not logged in since too many days
 	$reminder_is_delayed = false;
@@ -1690,7 +1726,7 @@ function get_next_reminder_info( $user_ID )
 	}
 	elseif( empty( $last_unread_messages_reminder ) )
 	{ // The user didn't get unread messages reminder emails before
-		$note = sprintf( T_('The user has never received a notification yet, so the first notification is sent with %s delay'), seconds_to_period( $unread_messsage_reminder_threshold ) );
+		$note = sprintf( T_('The user has never received a notification yet, so the first notification is sent with %s delay'), seconds_to_period( $Settings->get( 'unread_message_reminder_threshold' ) ) );
 	}
 	else
 	{ // Reminder is not delayed
@@ -1783,7 +1819,7 @@ function delete_orphan_threads( $user_ids = NULL )
 	{ // There are orphan threads ( or orphan thread targets )
 		load_class( 'messaging/model/_thread.class.php', 'Thread' );
 		// Delete all orphan threads with all cascade relations
-		if( Thread::db_delete_where( 'Thread', NULL, $orphan_thread_ids, array( 'use_transaction' => false ) ) === false )
+		if( Thread::db_delete_where( NULL, $orphan_thread_ids, array( 'use_transaction' => false ) ) === false )
 		{ // Deleting orphan threads failed
 			$DB->rollback();
 			return false;
@@ -1894,6 +1930,41 @@ function get_thread_prevnext_links( $current_thread_ID, $params = array() )
 
 
 /**
+ * Get preferred contact methods on disp=msgform
+ *
+ * @param object Recipient User
+ * @return array
+ */
+function get_msgform_contact_methods( $recipient_User = NULL )
+{
+	global $Blog;
+
+	$contact_methods = array();
+
+	if( $recipient_User !== NULL )
+	{	// Check what contact methods are allowed between recipient and current users:
+		if( $recipient_User->get_msgform_possibility( NULL, 'PM' ) == 'PM' )
+		{	// PM method is allowed:
+			$contact_methods['pm'] = T_('Private Message on this Site');
+		}
+		if( $recipient_User->get_msgform_possibility( NULL, 'email' ) == 'email' )
+		{	// Email method is allowed:
+			$contact_methods['email'] = T_('Email');
+		}
+	}
+
+	// Get additional user fields which are defined for current collection:
+	$msgform_additional_fields = $Blog->get_msgform_additional_fields();
+	foreach( $msgform_additional_fields as $additional_Userfield )
+	{
+		$contact_methods[ $additional_Userfield->ID ] = $additional_Userfield->get_name();
+	}
+
+	return $contact_methods;
+}
+
+
+/**
  * Display threads results table
  *
  * @param array Params
@@ -1903,9 +1974,14 @@ function threads_results_block( $params = array() )
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'edited_User'          => NULL,
+			'messages_type'        => 'sent',
 			'results_param_prefix' => 'actv_thrd_',
 			'results_title'        => T_('Threads with private messages sent by the user'),
 			'results_no_text'      => T_('User has not sent any private messages'),
+			'delete_title'         => T_('Delete all private messages sent by %s'),
+			'delete_action'        => 'delete_all_messages',
+			'action'               => '',
+			'ajax_function'        => __FUNCTION__,
 		), $params );
 
 	if( !is_logged_in() )
@@ -1949,18 +2025,19 @@ function threads_results_block( $params = array() )
 	if( $current_User->check_perm( 'perm_messaging', 'abuse' ) )
 	{
 		// Create result set:
+		$threads_user_filter = ( $params['messages_type'] == 'received' ? 'received_user_ID' : 'sent_user_ID' );
 		$threads_Results = get_threads_results( array(
 				'results_param_prefix' => $params['results_param_prefix'],
 				'user_ID' => $edited_User->ID,
-				'sent_user_ID' => $edited_User->ID
+				$threads_user_filter => $edited_User->ID,
 			) );
 		$threads_Results->Cache = & get_ThreadCache();
 		$threads_Results->title = $params['results_title'];
 		$threads_Results->no_results_text = $params['results_no_text'];
 
-		if( $threads_Results->get_total_rows() > 0 )
+		if( $params['action'] != 'view' && $threads_Results->get_total_rows() > 0 )
 		{	// Display action icon to delete all records if at least one record exists
-			$threads_Results->global_icon( sprintf( T_('Delete all private messages sent by %s'), $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_messages&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
+			$threads_Results->global_icon( sprintf( $params['delete_title'], $edited_User->login ), 'delete', '?ctrl=user&amp;user_tab=activity&amp;action='.$params['delete_action'].'&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 		}
 
 		// Load classes
@@ -1985,33 +2062,40 @@ function threads_results_block( $params = array() )
 
 		if( !is_ajax_content() )
 		{	// Create this hidden div to get a function name for AJAX request
-			echo '<div id="'.$params['results_param_prefix'].'ajax_callback" style="display:none">'.__FUNCTION__.'</div>';
+			echo '<div id="'.$params['results_param_prefix'].'ajax_callback" style="display:none">'.$params['ajax_function'].'</div>';
 		}
 	}
 	else
 	{ // No permission for abuse management
-		$Table = new Table();
-
-		$Table->title = T_('Messaging');
-		$Table->no_results_text = sprintf( T_('User has sent %s private messages'), $edited_User->get_num_messages( 'sent' ) );
-
-		$Table->display_init();
-		$Table->total_pages = 0;
-
-		echo $display_params['before'];
-
-		$Table->display_head();
-
-		echo $Table->params['content_start'];
-
-		$Table->display_list_start();
-
-		$Table->display_list_end();
-
-		echo $Table->params['content_end'];
-
-		echo $display_params['after'];
+		if( $params['messages_type'] == 'sent' )
+		{
+			echo '<p>'.sprintf( T_('User has sent %s private messages'), $edited_User->get_num_messages( 'sent' ) ).'</p>';
+		}
+		elseif( $params['messages_type'] == 'received' )
+		{
+			echo '<p>'.sprintf( T_('User has received %s private messages'), $edited_User->get_num_messages( 'received' ) ).'</p>';
+			echo '<p class="note" style="margin-bottom:20px">'.T_('You need Abuse management permission to see details.').'</p>';
+		}
 	}
+}
+
+
+/**
+ * Display received threads results table
+ *
+ * @param array Params
+ */
+function received_threads_results_block( $params = array() )
+{
+	threads_results_block( array_merge( $params, array(
+			'messages_type'        => 'received',
+			'results_param_prefix' => 'rcvd_thrd_',
+			'results_title'        => T_('Threads with private messages received by the user'),
+			'results_no_text'      => T_('User has not received any private messages'),
+			'delete_title'         => T_('Delete all private messages received by %s'),
+			'delete_action'        => 'delete_all_received_messages',
+			'ajax_function'        => __FUNCTION__,
+		) ) );
 }
 
 
@@ -2108,7 +2192,7 @@ function col_thread_recipients( $thread_ID, $abuse_management )
 {
 	global $DB, $Collection, $Blog;
 
-	$SQL = new SQL();
+	$SQL = new SQL( 'Get recipients of thread #'.$thread_ID );
 	$SQL->SELECT( 'user_login' );
 	$SQL->FROM( 'T_messaging__threadstatus mts' );
 	$SQL->FROM_add( 'LEFT JOIN T_users u ON user_ID = tsta_user_ID' );
@@ -2118,7 +2202,7 @@ function col_thread_recipients( $thread_ID, $abuse_management )
 		global $current_User;
 		$SQL->WHERE_and( 'tsta_user_ID != '.$current_User->ID );
 	}
-	$recipients = $DB->get_col( $SQL->get() );
+	$recipients = $DB->get_col( $SQL );
 
 	$image_size = isset( $Blog ) ? $Blog->get_setting( 'image_size_messaging' ) : 'crop-top-32x32';
 

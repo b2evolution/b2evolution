@@ -21,9 +21,9 @@ class photoblog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.3';
+	var $version = '7.0.1';
 
- 	/**
+	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -33,7 +33,7 @@ class photoblog_Skin extends Skin
 	}
 
 
-  /**
+	/**
 	 * Get default type for the skin.
 	 */
 	function get_default_type()
@@ -83,6 +83,35 @@ class photoblog_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array(
+				'header'                    => NULL,
+				'front_page_secondary_area' => NULL,
+				'item_list'                 => NULL,
+				'item_in_list'              => NULL,
+				'item_single_header'        => NULL,
+				'item_page'                 => NULL,
+				'sidebar_2'                 => NULL,
+				'footer'                    => NULL,
+				'user_profile_left'         => NULL,
+				'user_profile_right'        => NULL,
+			);
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -90,9 +119,6 @@ class photoblog_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
-		// Load to use function get_available_thumb_sizes()
-		load_funcs( 'files/model/_image.funcs.php' );
-
 		$r = array_merge( array(
 				'menu_bg_color' => array(
 					'label' => T_('Menu background color'),
@@ -189,13 +215,6 @@ class photoblog_Skin extends Skin
 					'note' => T_('Check to enable auto-completion of usernames entered after a "@" sign in the comment forms'),
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
-				),
-				'mediaidx_thumb_size' => array(
-					'label' => T_('Thumbnail size for media index'),
-					'note' => '',
-					'defaultvalue' => 'fit-80x80',
-					'options' => get_available_thumb_sizes(),
-					'type' => 'select',
 				),
 			), parent::get_param_definitions( $params ) );
 

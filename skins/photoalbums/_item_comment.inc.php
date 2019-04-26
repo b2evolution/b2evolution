@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage photoalbums
@@ -74,6 +74,7 @@ $Comment = & $params['Comment'];
 
 			case 'trackback': // Display a trackback:
 			case 'pingback': // Display a pingback:
+			case 'webmention': // Display a webmention:
 				$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
 				break;
 		}

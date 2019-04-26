@@ -27,7 +27,7 @@ elseif( file_exists(dirname(__FILE__).'/umaintenance.html') )
 	$get_ctrl = isset( $_GET['ctrl'] ) ? $_GET['ctrl'] : ( isset( $_POST['ctrl'] ) ? $_POST['ctrl'] : '' );
 	// Check if the request is to the upgrade controller or it is an upgrade action request from the upgrade ctrl
 	$is_upgrade = ( ( $get_ctrl == 'upgrade' ) || ( ( substr( $_SERVER['PHP_SELF'], -17 ) == 'install/index.php' )
-				&& isset( $_GET['action'] ) && ( $_GET['action'] == 'svn_upgrade' || $_GET['action'] == 'auto_upgrade' ) ) ); // The request action is 'svn_upgrade' or 'auto_upgrade'
+				&& isset( $_GET['action'] ) && ( $_GET['action'] == 'auto_upgrade' ) ) ); // The request action is 'auto_upgrade'
 	if( ! $is_upgrade )
 	{ // NOT an upgrade
 		header('HTTP/1.0 503 Service Unavailable');

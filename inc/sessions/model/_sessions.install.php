@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -28,7 +28,7 @@ global $db_storage_charset;
 $schema_queries['T_sessions'] = array(
 		'Creating table for active sessions',
 		"CREATE TABLE T_sessions (
-			sess_ID          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			sess_ID          INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			sess_key         CHAR(32) COLLATE ascii_general_ci NULL,
 			sess_start_ts    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			sess_lastseen_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'User last logged activation time. Value may be off by up to 60 seconds',
@@ -45,11 +45,11 @@ $schema_queries['T_sessions'] = array(
 $schema_queries['T_basedomains'] = array(
 		'Creating table for base domains',
 		"CREATE TABLE T_basedomains (
-			dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			dom_ID     INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			dom_name   VARCHAR(250)  COLLATE utf8_bin NOT NULL DEFAULT '',
 			dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
-			dom_comment VARCHAR(255) DEFAULT NULL,
+			dom_comment VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 			PRIMARY KEY     (dom_ID),
 			UNIQUE dom_name ( dom_name)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
@@ -73,15 +73,15 @@ $schema_queries['T_hitlog'] = array(
 			hit_sess_ID           INT UNSIGNED,
 			hit_datetime          TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			hit_uri               VARCHAR(250) DEFAULT NULL,
-			hit_disp              VARCHAR(30) DEFAULT NULL,
+			hit_disp              VARCHAR(30) COLLATE ascii_general_ci DEFAULT NULL,
 			hit_ctrl              VARCHAR(30) COLLATE ascii_general_ci DEFAULT NULL,
-			hit_action            VARCHAR(30) DEFAULT NULL,
+			hit_action            VARCHAR(30) COLLATE ascii_general_ci DEFAULT NULL,
 			hit_type              ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
 			hit_referer_type      ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
 			hit_referer           VARCHAR(250) DEFAULT NULL,
 			hit_referer_dom_ID    INT UNSIGNED DEFAULT NULL,
 			hit_keyphrase_keyp_ID INT UNSIGNED DEFAULT NULL,
-			hit_keyphrase         VARCHAR(255) DEFAULT NULL,
+			hit_keyphrase         VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 			hit_serprank          SMALLINT UNSIGNED DEFAULT NULL,
 			hit_coll_ID           INT(10) UNSIGNED NULL DEFAULT NULL,
 			hit_remote_addr       VARCHAR(45) COLLATE ascii_general_ci DEFAULT NULL,"/* IPv4 mapped IPv6 addresses maximum length is 45 chars: ex. ABCD:ABCD:ABCD:ABCD:ABCD:ABCD:192.168.158.190 */."
@@ -114,9 +114,9 @@ $schema_queries['T_hitlog'] = array(
 $schema_queries['T_hits__aggregate'] = array(
 		'Creating table for Hits aggregations',
 		"CREATE TABLE T_hits__aggregate (
-			hagg_ID           INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hagg_ID           INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			hagg_date         DATE NOT NULL DEFAULT '2000-01-01',
-			hagg_coll_ID      INT(11) UNSIGNED NULL DEFAULT NULL,
+			hagg_coll_ID      INT(10) UNSIGNED NULL DEFAULT NULL,
 			hagg_type         ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
 			hagg_referer_type ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
 			hagg_agent_type   ENUM('robot','browser','unknown') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
@@ -128,9 +128,9 @@ $schema_queries['T_hits__aggregate'] = array(
 $schema_queries['T_hits__aggregate_sessions'] = array(
 		'Creating table for aggregations of hit sessions',
 		"CREATE TABLE T_hits__aggregate_sessions (
-			hags_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hags_ID            INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			hags_date          DATE NOT NULL DEFAULT '2000-01-01',
-			hags_coll_ID       INT(11) UNSIGNED NULL DEFAULT NULL,
+			hags_coll_ID       INT(10) UNSIGNED NULL DEFAULT NULL,
 			hags_count_browser INT(11) UNSIGNED NOT NULL DEFAULT 0,
 			hags_count_api     INT(11) UNSIGNED NOT NULL DEFAULT 0,
 			PRIMARY KEY        (hags_ID),
@@ -142,14 +142,14 @@ $schema_queries['T_track__goal'] = array(
 		"CREATE TABLE T_track__goal(
 		  goal_ID             int(10) unsigned NOT NULL auto_increment,
 		  goal_gcat_ID        int(10) unsigned NOT NULL,
-		  goal_name           varchar(50) default NULL,
+		  goal_name           varchar(50) COLLATE utf8mb4_unicode_ci default NULL,
 		  goal_key            varchar(32) default NULL,
 		  goal_redir_url      varchar(255) default NULL,
 		  goal_temp_redir_url varchar(255) default NULL,
 		  goal_temp_start_ts  TIMESTAMP NULL,
 		  goal_temp_end_ts    TIMESTAMP NULL,
 		  goal_default_value  double default NULL,
-		  goal_notes          TEXT DEFAULT NULL,
+		  goal_notes          TEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL,
 		  PRIMARY KEY (goal_ID),
 		  UNIQUE KEY goal_key (goal_key)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
@@ -160,7 +160,7 @@ $schema_queries['T_track__goalhit'] = array(
 		  ghit_ID         int(10) unsigned NOT NULL auto_increment,
 		  ghit_goal_ID    int(10) unsigned NOT NULL,
 		  ghit_hit_ID     int(10) unsigned NOT NULL,
-		  ghit_params     TEXT default NULL,
+		  ghit_params     TEXT COLLATE utf8mb4_unicode_ci default NULL,
 		  PRIMARY KEY  (ghit_ID),
 		  KEY ghit_goal_ID (ghit_goal_ID),
 		  KEY ghit_hit_ID (ghit_hit_ID)
@@ -170,7 +170,7 @@ $schema_queries['T_track__goalcat'] = array(
 	'Creating goal categories table',
 	"CREATE TABLE T_track__goalcat (
 		  gcat_ID     int(10) unsigned NOT NULL auto_increment,
-		  gcat_name   varchar(50) default NULL,
+		  gcat_name   varchar(50) COLLATE utf8mb4_unicode_ci default NULL,
 		  gcat_color  char(7) COLLATE ascii_general_ci default NULL,
 		  PRIMARY KEY (gcat_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );

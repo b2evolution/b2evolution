@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'comments/model/_comment.class.php', 'Comment' );
 
 /**
- * Generic comments/trackbacks/pingbacks counting
+ * Generic comments/trackbacks/pingbacks/webmentions counting
  *
  * @todo check this in a multiblog page...
  * @todo This should support visibility: at least in the default front office (_feedback.php), there should only the number of visible comments/trackbacks get used ({@link Item::feedback_link()}).
@@ -79,7 +79,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 						'trackbacks' => $statuses_array,
 						'pingbacks'  => $statuses_array,
 						'feedbacks'  => $statuses_array,
-						'metas'      => $statuses_array
+						'metas'      => $statuses_array,
+						'webmentions'=> $statuses_array,
 					);
 			}
 
@@ -121,7 +122,8 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 				'trackbacks' => $statuses_array,
 				'pingbacks'  => $statuses_array,
 				'feedbacks'  => $statuses_array,
-				'metas'      => $statuses_array
+				'metas'      => $statuses_array,
+				'webmentions'=> $statuses_array,
 			);
 
 		$count_SQL->WHERE_and( 'comment_item_ID = '.intval($post_id) );
@@ -145,7 +147,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 		}
 	}
 
-	if( ! in_array( $mode, array( 'comments', 'trackbacks', 'pingbacks', 'metas' ) ) )
+	if( ! in_array( $mode, array( 'comments', 'trackbacks', 'pingbacks', 'metas', 'webmentions' ) ) )
 	{
 		$mode = 'feedbacks';
 	}
@@ -309,7 +311,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 			{ // Use dropdown for bootstrap skin
 				$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 				$Form->hidden( 'comment_status', $edited_Comment->status );
-				echo '<div class="btn-group dropup comment_status_dropdown" data-toggle="tooltip" data-placement="top" data-container="body" title="'.get_status_tooltip_title( $edited_Comment->status ).'">';
+				echo '<div class="btn-group dropup comment_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Comment->status ).'">';
 				echo '<button type="button" class="btn btn-status-'.$edited_Comment->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
 								.'<span>'.$status_options[ $edited_Comment->status ].'</span>'
 							.' <span class="caret"></span></button>';
@@ -352,39 +354,78 @@ function echo_comment_buttons( $Form, $edited_Comment )
  *
  * @param object Form
  * @param object edited Comment
+ * @param string Max allowed status
+ * @param string Action: 'update' - for button titles like 'Save as Public!', 'comments_visibility' - for button titles like 'Set visibility to Public'
  */
-function echo_comment_status_buttons( $Form, $edited_Comment )
+function echo_comment_status_buttons( $Form, $edited_Comment = NULL, $max_allowed_status = '', $action = 'update' )
 {
 	global $Collection, $Blog;
 
-	if( $edited_Comment->is_meta() )
-	{	// Don't suggest to change a status of meta comment:
-		$Form->submit( array( 'actionArray[update]', T_('Save Changes!'), 'SaveButton', '' ) );
+	if( $edited_Comment !== NULL )
+	{	// If the edited comment is defined, e-g on edit form:
+		if( $edited_Comment->is_meta() )
+		{	// Don't suggest to change a status of meta comment:
+			$Form->submit( array( 'actionArray['.$action.']', T_('Save Changes!'), 'SaveButton', '' ) );
+			return;
+		}
+
+		$comment_Item = & $edited_Comment->get_Item();
+		$comment_status = $edited_Comment->status;
+	}
+	else
+	{	// If comment is not defined, e-g on action for several comments from list:
+		$comment_Item = NULL;
+		$comment_status = $max_allowed_status;
+	}
+
+	// Comment status cannot be more than post status, restrict it:
+	$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : $max_allowed_status );
+
+	// Get those statuses which are not allowed for the current User to create posts in this blog
+	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $comment_status, $restrict_max_allowed_status ), array( 'redirected', 'trash' ) );
+	// Get allowed visibility statuses:
+	if( $action == 'comments_visibility' )
+	{
+		$status_options = get_visibility_statuses( '', $exclude_statuses );
+		foreach( $status_options as $status_key => $status_title )
+		{
+			$status_options[ $status_key ] = sprintf( T_('Set visibility to %s'), $status_title );
+		}
+	}
+	else // 'update'
+	{
+		$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
+		$status_options = array_map( 'T_', $status_options );
+	}
+
+	if( empty( $status_options ) )
+	{	// If current User has no permission to edit to any status:
 		return;
 	}
 
-	$comment_Item = & $edited_Comment->get_Item();
-	// Comment status cannot be more than post status, restrict it:
-	$restrict_max_allowed_status = ( $comment_Item ? $comment_Item->status : '' );
-
-	// Get those statuses which are not allowed for the current User to create posts in this blog
-	$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_comment!', 'edit', $edited_Comment->status, $restrict_max_allowed_status ), array( 'redirected', 'trash' ) );
-	// Get allowed visibility statuses
-	$status_options = get_visibility_statuses( 'button-titles', $exclude_statuses );
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 
-	$Form->hidden( 'comment_status', $edited_Comment->status );
+	if( ! isset( $status_options[ $comment_status ] ) )
+	{	// Check if the status is allowed for current User:
+		foreach( $status_options as $status_key => $status_title )
+		{
+			$comment_status = $status_key;
+			break;
+		}
+	}
+
+	$Form->hidden( 'comment_status', $comment_status );
 	echo '<div class="btn-group dropup comment_status_dropdown">';
-	echo '<button type="submit" class="btn btn-status-'.$edited_Comment->status.'" name="actionArray[update]">'
-				.'<span>'.T_( $status_options[ $edited_Comment->status ] ).'</span>'
+	echo '<button type="submit" class="btn btn-status-'.$comment_status.'" name="actionArray['.$action.']">'
+				.'<span>'.$status_options[ $comment_status ].'</span>'
 			.'</button>'
-			.'<button type="button" class="btn btn-status-'.$edited_Comment->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
+			.'<button type="button" class="btn btn-status-'.$comment_status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="comment_status_dropdown">'
 				.'<span class="caret"></span>'
 			.'</button>';
 	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="comment_status_dropdown">';
 	foreach( $status_options as $status_key => $status_title )
 	{
-		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.T_( $status_title ).'</span></a></li>';
+		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 	}
 	echo '</ul>';
 	echo '</div>';
@@ -561,7 +602,7 @@ function get_opentrash_link( $check_perm = true, $force_show = false, $params = 
 		{
 			$SQL->WHERE_and( 'cat_blog_ID = '.$DB->quote( $blog ) );
 		}
-		$show_recycle_bin = ( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) > 0 );
+		$show_recycle_bin = ( $DB->get_var( $SQL ) > 0 );
 	}
 
 	$result = $params['before'];
@@ -593,7 +634,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 
 	$params = array_merge( array(
 			'comments_disabled_text_member'     => T_( 'You must be a member of this blog to comment.' ),
-			'comments_disabled_text_registered' => T_( 'You must be logged in to leave a comment.' ),
+			'comments_disabled_text_registered' => T_( 'In order to leave a comment' ),
 			'comments_disabled_text_validated'  => T_( 'You must activate your account before you can leave a comment.' ),
 			'form_comment_text'                 => T_('Comment text'),
 			'form_class_comment'                => 'bComment',
@@ -623,10 +664,12 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	{
 		case 'member':
 			$disabled_text = $params['comments_disabled_text_member'];
+			$form_disabled_text = $disabled_text;
 			break;
 
 		case 'registered':
 			$disabled_text = $params['comments_disabled_text_registered'];
+			$form_disabled_text = T_( 'You must be logged in to leave a comment.' );
 			break;
 
 		default:
@@ -644,14 +687,14 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	elseif( $current_User->check_status( 'can_be_validated' ) )
 	{ // logged in but the account is not activated
 		$disabled_text = $params['comments_disabled_text_validated'];
+		$form_disabled_text = $disabled_text;
 		$activateinfo_link = '<a href="'.get_activate_info_url( $item_url, '&amp;' ).'">'.T_( 'More info &raquo;' ).'</a>';
 	}
 	// else -> user is logged in and account was activated
 
-	$register_link = '';
 	if( ( !$is_logged_in ) && ( $Settings->get( 'newusers_canregister' ) == 'yes' ) && ( $Settings->get( 'registration_is_public' ) ) )
 	{
-		$register_link = '<p>'.sprintf( T_( 'If you have no account yet, you can <a href="%s">register now</a>...<br />(It only takes a few seconds!)' ), get_user_register_url( $item_url, 'reg to post comment' ) ).'</p>';
+		$register_link = '<a class="btn btn-primary btn-sm" href="'.get_user_register_url( $item_url, 'reg to post comment' ).'">'.T_( 'Register now!' ).'</a>';
 	}
 
 	// disabled comment form
@@ -668,8 +711,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	}
 	else
 	{ // not logged in, add login and register links
-		echo $disabled_text.' '.$login_link;
-		echo $register_link;
+		echo $disabled_text.' '.$login_link.( ! empty( $register_link ) ? ' '.T_('or').' '.$register_link : '' );
 	}
 	echo $params['form_params']['comments_disabled_after'];
 
@@ -679,7 +721,7 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 	echo $params['form_params']['fieldstart'];
 	echo $params['form_params']['labelstart'].$params['form_comment_text'].':'.$params['form_params']['labelend'];
 	echo $params['form_params']['inputstart'];
-	echo '<textarea id="p" class="bComment form_textarea_input" rows="5" name="p" cols="40" disabled="disabled">'.$disabled_text.'</textarea>';
+	echo '<textarea id="p" class="bComment form_textarea_input" rows="5" name="p" cols="40" disabled="disabled">'.$form_disabled_text.'</textarea>';
 	echo $params['form_params']['inputend'];
 	echo $params['form_params']['fieldend'];
 	echo $params['form_params']['fieldset_end'];
@@ -886,7 +928,7 @@ function echo_comment_reply_js( $Item )
 	}
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'a.comment_reply' ).click( function()
 {	// The click action for the links "Reply to this comment"
 	var comment_ID = jQuery( this ).attr( 'rel' );
@@ -1123,6 +1165,7 @@ function comments_results_block( $params = array() )
 			'results_param_prefix' => 'actv_comment_',
 			'results_title'        => T_('Comments posted by the user'),
 			'results_no_text'      => T_('User has not posted any comment yet'),
+			'action'               => '',
 		), $params );
 
 	if( !is_logged_in() )
@@ -1168,7 +1211,7 @@ function comments_results_block( $params = array() )
 	$comments_Results->title = $params['results_title'];
 	$comments_Results->no_results_text = $params['results_no_text'];
 
-	if( $comments_Results->get_total_rows() > 0 && $edited_User->has_comment_to_delete() )
+	if( $params['action'] != 'view' && $comments_Results->get_total_rows() > 0 && $edited_User->has_comment_to_delete() )
 	{	// Display action icon to delete all records if at least one record exists & current user can delete at least one comment posted by user
 		$comments_Results->global_icon( sprintf( T_('Delete all comments posted by %s'), $edited_User->login ), 'recycle', '?ctrl=user&amp;user_tab=activity&amp;action=delete_all_comments&amp;user_ID='.$edited_User->ID.'&amp;'.url_crumb('user'), ' '.T_('Delete all'), 3, 4 );
 	}

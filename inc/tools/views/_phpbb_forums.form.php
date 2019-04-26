@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $flush_action, $phpbb_tool_title, $phpbb_version;
+global $admin_url, $flush_action, $phpbb_tool_title, $phpbb_version;
 
 phpbb_display_steps( 4 );
 
@@ -56,7 +56,7 @@ $Form->begin_fieldset( T_('Report of the forums import') );
 $Form->end_fieldset();
 
 $Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' )/*,
-											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$dispatcher.'?ctrl=phpbbimport&step=users\'' )*/ ) );
+											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$admin_url.'?ctrl=phpbbimport&step=users\'' )*/ ) );
 
 $Form->end_form();
 

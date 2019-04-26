@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -39,8 +39,10 @@ $Form->begin_form( 'fform', T_('Display settings').get_manual_link('file-manager
 				array( 'value'=>'no', 'label'=>T_('No') ),
 				array( 'value'=>'compact', 'label'=>T_('Smart date format') ),
 				array( 'value'=>'long', 'label'=>T_('Long format') ) ), T_('Last change') );
-		$Form->checkbox( 'option_showfsperms', $UserSettings->get('fm_showfsperms'), T_('File permissions'), T_('Unix file permissions') );
-		$Form->checkbox( 'option_permlikelsl', $UserSettings->get('fm_permlikelsl'), '', T_('Check to display file permissions like "rwxr-xr-x" rather than short form') );
+		$Form->checklist( array(
+				array( 'option_showfsperms', 1, T_('Unix file permissions'), $UserSettings->get( 'fm_showfsperms' ) ),
+				array( 'option_permlikelsl', 1, T_('Check to display file permissions like "rwxr-xr-x" rather than short form'), $UserSettings->get( 'fm_permlikelsl' ) ),
+			), 'unix_options', T_('File permissions') );
 		$Form->checkbox( 'option_showfsowner', $UserSettings->get('fm_showfsowner'), T_('File Owner'), T_('Unix file owner') );
 		$Form->checkbox( 'option_showfsgroup', $UserSettings->get('fm_showfsgroup'), T_('File Group'), T_('Unix file group') );
 		$Form->checkbox( 'option_showcreator', $UserSettings->get('fm_showcreator'), T_('Added by'), T_('File creator') );
@@ -48,8 +50,10 @@ $Form->begin_form( 'fform', T_('Display settings').get_manual_link('file-manager
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Options') );
-		$Form->checkbox( 'option_showhidden', $UserSettings->get('fm_showhidden'), T_('Hidden files'), T_('Check this to show system hidden files. System hidden files start with a dot (.)') );
-		$Form->checkbox( 'option_showevocache', $UserSettings->get('fm_showevocache'), '', T_('Check this to show _evocache folders (not recommended)') );
+		$Form->checklist( array(
+				array( 'option_showhidden', 1, T_('Check this to show system hidden files. System hidden files start with a dot (.)'), $UserSettings->get( 'fm_showhidden' ) ),
+				array( 'option_showevocache', 1, T_('Check this to show _evocache folders (not recommended)'), $UserSettings->get( 'fm_showevocache' ) ),
+			), 'hidden_options', T_('Hidden files') );
 		$Form->checkbox( 'option_dirsattop', !$UserSettings->get('fm_dirsnotattop'), T_('Folders first'), T_('Check to always display folders before files') );
 		$Form->checkbox( 'option_recursivedirsize', $UserSettings->get('fm_recursivedirsize'), T_('Folder sizes'), T_('Check to compute recursive size of folders') );
 		$Form->radio_input( 'option_allowfiltering', $UserSettings->get('fm_allowfiltering'), array(

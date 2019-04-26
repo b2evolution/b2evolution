@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.3';
+	var $version = '7.0.1';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -55,7 +55,7 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_api_version()
 	{
-		return 6;
+		return 7;
 	}
 
 
@@ -99,6 +99,31 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined (which will be the case for older v6- skins)
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array(
+				'front_page_main_area'       => NULL,
+				'front_page_secondary_area'  => NULL,
+				'forum_front_secondary_area' => array( NT_('Forum Front Secondary Area'), 47 ),
+				'item_list'                  => NULL,
+				'item_in_list'               => NULL,
+				'sidebar_single'             => array( NT_('Sidebar Single'), 95 ),
+			);
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -135,10 +160,18 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -205,6 +238,7 @@ class bootstrap_forums_Skin extends Skin
 						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'section_page_end' => array(
 					'layout' => 'end_fieldset',
@@ -347,12 +381,15 @@ class bootstrap_forums_Skin extends Skin
 
 		// Skin specific initializations:
 
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
-		}
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$; width: auto; }', array(
+			'suffix' => 'px'
+		) );
+		// **** Layout Settings / END ****
+
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
@@ -360,46 +397,15 @@ class bootstrap_forums_Skin extends Skin
 		}
 
 		if( in_array( $disp, array( 'single', 'page' ) ) )
-		{	// Init JS to autcomplete the user logins
+		{	// Init JS to autcomplete the user logins:
 			require_js( '#bootstrap_typeahead#', 'blog' );
 			init_autocomplete_login_js( 'blog', 'typeahead' );
-			// Initialize date picker for _item_expert.form.php
+			// Initialize date picker for _item_expert.form.php:
 			init_datepicker_js( 'blog' );
 		}
 
-		// Add custom CSS:
-		$custom_css = '';
-
-
-		// If sidebar == true + col-lg
-		if( $layout = $this->get_setting( 'layout_general' ) != 'no_sidebar' )
-		{
-			$custom_css = "@media screen and (min-width: 1200px) {
-				.forums_list .ft_date {
-					white-space: normal;
-					margin-top: 3px;
-				}
-				.disp_single .single_topic .evo_content_block .panel-body .evo_post__full,
-				.disp_single .evo_comment .panel-body .evo_comment_text p,
-				.disp_single .post_tags,
-				.disp_single .evo_voting_panel,
-				.disp_single .evo_seen_by
-				{
-					padding-left: 15px;
-				}
-				\n
-			}";
-		}
-
-		if( ! empty( $custom_css ) )
-		{ // Function for custom_css:
-		$custom_css = '<style type="text/css">
-<!--
-'.$custom_css.'
--->
-		</style>';
-		add_headline( $custom_css );
-		}
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 
@@ -435,11 +441,26 @@ class bootstrap_forums_Skin extends Skin
 		$post_button = '';
 
 		$chapter_is_locked = false;
+		$default_new_ItemType = $Blog->get_default_new_ItemType();
+
+		if( $default_new_ItemType === false )
+		{ // Do not show button on disabled default item type for new items:
+			return '';
+		}
 
 		$write_new_post_url = $Blog->get_write_item_url( $chapter_ID );
 		if( $write_new_post_url != '' )
 		{ // Display button to write a new post
-			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.T_('New topic').'</a>';
+			if( empty( $default_new_ItemType ) )
+			{	// Use default button text:
+				$button_text = T_('New topic');
+			}
+			else
+			{	// Use button text from Item Type:
+				$button_text = $default_new_ItemType->get_item_denomination( 'inskin_new_btn' );
+			}
+
+			$post_button = '<a href="'.$write_new_post_url.'" class="btn btn-primary '.$params['button_class'].'" title="'.T_('Post a new topic').'"><i class="fa fa-pencil"></i> '.$button_text.'</a>';
 		}
 		else
 		{ // If a creating of new post is unavailable
@@ -497,28 +518,6 @@ class bootstrap_forums_Skin extends Skin
 
 		// Don't display status banner
 		return false;
-	}
-
-
-	/**
-	 * Check if we can display a widget container when access is denied to collection by current user
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function show_container_when_access_denied( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
 
 
@@ -610,49 +609,18 @@ class bootstrap_forums_Skin extends Skin
 	{
 		global $Collection, $Blog;
 
-		if( ! is_logged_in() || ! $Blog->get_setting( 'track_unread_content' ) )
-		{	// For not logged in users AND if the tracking of unread content is turned off for the collection
-			$btn_class = 'btn-info';
-			$btn_title = T_('Recent Topics');
+		// Get a number of unread posts by current User:
+		$unread_posts_count = $Blog->get_unread_posts_count();
+
+		if( $unread_posts_count > 0 )
+		{	// If at least one new unread topic exists
+			$btn_class = 'btn-warning';
+			$btn_title = T_('New Topics').' <span class="badge">'.$unread_posts_count.'</span>';
 		}
 		else
-		{	// For logged in users:
-			global $current_User, $DB, $localtimenow;
-
-			// Initialize SQL query to get only the posts which are displayed by global $MainList on disp=posts:
-			$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL, 'ItemCache', 'recent_topics' );
-			$ItemList2->set_default_filters( array(
-					'unit' => 'all', // set this to don't calculate total rows
-				) );
-			$ItemList2->query_init();
-
-			// Get a count of the unread topics for current user:
-			$unread_posts_SQL = new SQL();
-			$unread_posts_SQL->SELECT( 'COUNT( post_ID )' );
-			$unread_posts_SQL->FROM( 'T_items__item' );
-			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__user_data ON post_ID = itud_item_ID AND itud_user_ID = '.$DB->quote( $current_User->ID ) );
-			$unread_posts_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
-			$unread_posts_SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
-			$unread_posts_SQL->WHERE( $ItemList2->ItemQuery->get_where( '' ) );
-			$unread_posts_SQL->WHERE_and( 'post_last_touched_ts > '.$DB->quote( date2mysql( $localtimenow - 30 * 86400 ) ) );
-			// In theory, it would be more safe to use this comparison:
-			// $unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts <= post_last_touched_ts' );
-			// But until we have milli- or micro-second precision on timestamps, we decided it was a better trade-off to never see our own edits as unread. So we use:
-			$unread_posts_SQL->WHERE_and( 'itud_item_ID IS NULL OR itud_read_item_ts < post_last_touched_ts' );
-
-			// Execute a query with to know if current user has new data to view:
-			$unread_posts_count = $DB->get_var( $unread_posts_SQL->get(), 0, NULL, 'Get a count of the unread topics for current user' );
-
-			if( $unread_posts_count > 0 )
-			{	// If at least one new unread topic exists
-				$btn_class = 'btn-warning';
-				$btn_title = T_('New Topics').' <span class="badge">'.$unread_posts_count.'</span>';
-			}
-			else
-			{	// Current user already have read all topics
-				$btn_class = 'btn-info';
-				$btn_title = T_('Recent Topics');
-			}
+		{	// Current user already have read all topics
+			$btn_class = 'btn-info';
+			$btn_title = T_('Recent Topics');
 		}
 
 		// Print out the button:

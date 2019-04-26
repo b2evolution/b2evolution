@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -50,7 +50,7 @@ $Form = new Form( $form_action, 'user_checkchanges' );
 
 $form_title = '';
 $form_class = 'fform';
-$Form->title_fmt = '<span style="float:right">$global_icons$</span><div>$title$</div>'."\n";
+$Form->title_fmt = '$title$';
 
 if( $display_mode != 'js' )
 {

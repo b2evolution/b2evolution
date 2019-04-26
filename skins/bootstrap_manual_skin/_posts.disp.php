@@ -29,7 +29,13 @@ if( isset( $tag ) )
 	if( isset( $MainList ) && !empty( $MainList ) )
 	{
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-		mainlist_page_links( $params['pagination'] );
+		widget_container( 'item_list', array_merge( $params['pagination'], array(
+				// The following params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => false, // If no widget, don't display container at all
+				// This will enclose each widget in a block:
+				'block_start' => '<div class="evo_widget $wi_class$">',
+				'block_end'   => '</div>',
+			) ) );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 
 		// --------------------------------- START OF POSTS -------------------------------------
@@ -56,54 +62,29 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 	$ChapterCache->reveal_children( $Blog->ID );
 	$curr_Chapter = & $ChapterCache->get_by_ID( $cat, false );
 
-	// Go Grab the featured post:
-	$intro_Item = & get_featured_Item(); // $intro_Item is used below for comments form
+	// This will initialize $FeaturedList that will be used by widgets below and without moving the cursor:
+	$intro_Item = & get_featured_Item( 'posts', NULL, true ); // $intro_Item is used below for comments form
 
-	if( empty( $intro_Item ) || $intro_Item->get( 'title' ) == '' )
-	{ // Display chapter title only if intro post has no title
-		echo '<div class="cat_title">';
+	// ------------------------- "Chapter Main Area" CONTAINER EMBEDDED HERE --------------------------
+	// Display container and contents:
+	widget_container( 'chapter_main_area', array(
+		// The following params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
+			'block_start'       => '<div class="evo_widget $wi_class$">',
+			'block_end'         => '</div>',
+			'block_title_start' => '<h2 class="page-header">',
+			'block_title_end'   => '</h2>',
+			'intro_class'       => 'well evo_post evo_content_block',
+			'featured_class'    => 'featurepost',
+			'item_mask'         => '<li><a href="$url$">$title$</a></li>',
+			'item_active_mask'  => '<li class="active">$title$</li>',
 
-		echo '<h1>'.$curr_Chapter->get( 'name' ).'</h1>';
-		echo '<div class="'.button_class( 'group' ).'">';
-		echo $curr_Chapter->get_edit_link( array(
-				'text'          => get_icon( 'edit' ).' '.T_('Edit Cat'),
-				'class'         => button_class( 'text' ),
-				'redirect_page' => 'front',
-			) );
+			// Template params for "Breadcrumb Path" widget:
+			'widget_breadcrumb_path_before' => '<nav><ol class="breadcrumb">',
+			'widget_breadcrumb_path_after' => '</ol></nav>',
 
-		// Button to create a new page
-		$write_new_intro_url = $Blog->get_write_item_url( $cat, '', '', 'intro-cat' );
-		if( !empty( $write_new_intro_url ) )
-		{ // Display button to write a new intro
-			echo '<a href="'.$write_new_intro_url.'" class="'.button_class( 'text' ).'">'
-					.get_icon( 'add' ).' '
-					.T_('Add Intro')
-				.'</a>';
-		}
-		echo '</div>';
-
-			echo '</div>';
-	}
-
-	if( ! empty( $intro_Item ) )
-	{ // We have a featured/intro post to display:
-		$Item = $intro_Item;
-		echo '<div class="evo_content_block">'; // Beginning of posts display
-		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-		skin_include( '_item_block.inc.php', array_merge( array(
-				'feature_block'     => true,
-				'content_mode'      => 'auto',		// 'auto' will auto select depending on $disp-detail
-				'intro_mode'        => 'normal',	// Intro posts will be displayed in normal mode
-				'item_class'        => 'well evo_post evo_content_block',
-				'disp_comments'     => false,
-				'disp_comment_form' => false,
-				'disp_notification' => false,
-				'item_link_type'    => 'none',
-				'Item'              => $Item,
-			), $Skin->get_template( 'disp_params' ) ) );
-		// ----------------------------END ITEM BLOCK  ----------------------------
-		echo '</div>'; // End of posts display
-	}
+		) );
+	// ----------------------------- END OF "Chapter Main Area" CONTAINER -----------------------------
 
 	$callbacks = array(
 		'line'  => 'cat_inskin_display',
@@ -143,6 +124,13 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 		echo '<div class="evo_content_block">'; // Beginning of posts display
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( array(
+				'disp_comments'        => true,
+				'disp_comment_form'    => true,
+				'disp_trackbacks'      => false,
+				'disp_trackback_url'   => false,
+				'disp_pingbacks'       => false,
+				'disp_webmentions'     => false,
+				'disp_meta_comments'   => false,
 				'before_section_title' => '<h3 class="evo_comment__list_title">',
 				'after_section_title'  => '</h3>',
 				'Item'                 => $intro_Item,
@@ -160,7 +148,13 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 else
 { // Display the latest posts:
 	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-	mainlist_page_links( $params['pagination'] );
+	widget_container( 'item_list', array_merge( $params['pagination'], array(
+			// The following params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
+			// This will enclose each widget in a block:
+			'block_start' => '<div class="evo_widget $wi_class$">',
+			'block_end'   => '</div>',
+		) ) );
 	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
 ?>
 <ul class="posts_list">

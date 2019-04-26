@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -94,7 +94,7 @@ if( isset( $edited_User ) )
 		}
 	}
 
-	$Widget->title = T_('File browser').get_manual_link('file_browser');
+	$Widget->title = T_('File browser').get_manual_link('file-browser');
 	$Widget->disp_template_replaced( 'block_start' );
 ?>
 
@@ -305,7 +305,7 @@ else
 }
 ?>
 	</div>
-<script type="text/javascript">
+<script>
 if( typeof file_uploader_note_text != 'undefined' )
 {
 	document.write( '<div class="note pull-right">' + file_uploader_note_text + '</div>' );
@@ -331,7 +331,7 @@ if( typeof file_uploader_note_text != 'undefined' )
 	$new_root_selector_html = preg_replace( '/<script.*?<\/script>/is', '', $new_root_selector_html );
 	$new_root_selector_html = format_to_js( $new_root_selector_html );
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#new_root_selector a[data-type]' ).click( function()
@@ -340,7 +340,12 @@ jQuery( document ).ready( function()
 		var field_title = ( type == 'collection' ) ? '<?php echo TS_('Collection ID or short name') ?>' : '<?php echo TS_('Username'); ?>';
 		var window_title = ( type == 'collection' ) ? '<?php echo TS_('Select collection') ?>' : '<?php echo TS_('Select user'); ?>';
 
-		openModalWindow( '<?php echo $new_root_selector_html; ?>'.replace( '$field_title$', field_title ).replace( '$selector_type$', type ), 'auto', '', true, window_title, '', true );
+		var modalInputFocus = function()
+			{
+				jQuery( 'input#new_root_selector_field' ).focus();
+			};
+
+		openModalWindow( '<?php echo $new_root_selector_html; ?>'.replace( '$field_title$', field_title ).replace( '$selector_type$', type ), 'auto', '', true, window_title, '', true, undefined, undefined, modalInputFocus );
 
 		return false;
 	} );
@@ -354,8 +359,8 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'collections',
 			{
 				'per_page': 20,
-				'filter'  : 'all',
-				'restrict': 'available_fileroots',
+				'list_in_frontoffice' : 'all',
+				'restrict_to_available_fileroots': 1,
 				'fields'  : 'id,shortname',
 				'q'       : jQuery( '#new_root_selector_field' ).val()
 			},
@@ -384,8 +389,9 @@ jQuery( document ).ready( function()
 			evo_rest_api_request( 'users',
 			{
 				'per_page': 20,
-				'restrict': 'available_fileroots',
+				'restrict_to_available_fileroots': 1,
 				'filter'  : 'new',
+				'list_params': { 'keywords_fields': 'user_login', 'order_by_login_length': 'D' },
 				'keywords': jQuery( '#new_root_selector_field' ).val()
 			},
 			function( data )

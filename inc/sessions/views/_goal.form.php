@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -77,7 +77,7 @@ else
 }
 
 ?>
-<script type="text/javascript">
+<script>
 function check_goal_redir_url_required()
 {
 	if( jQuery( '#goal_temp_redir_url' ).val() == '' )

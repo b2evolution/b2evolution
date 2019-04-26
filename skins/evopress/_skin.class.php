@@ -21,9 +21,9 @@ class evopress_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.3';
+	var $version = '7.0.1';
 
-  /**
+	/**
 	 * Get default name for the skin.
 	 * Note: the admin can customize it.
 	 */
@@ -33,7 +33,7 @@ class evopress_Skin extends Skin
 	}
 
 
-  /**
+	/**
 	 * Get default type for the skin.
 	 */
 	function get_default_type()
@@ -67,6 +67,34 @@ class evopress_Skin extends Skin
 			);
 
 		return $supported_kinds;
+	}
+
+
+	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array(
+				'front_page_secondary_area' => NULL,
+				'item_list'                 => NULL,
+				'item_in_list'              => NULL,
+				'item_single_header'        => NULL,
+				'item_page'                 => NULL,
+				'sidebar_2'                 => NULL,
+				'footer'                    => NULL,
+				'user_profile_left'         => NULL,
+				'user_profile_right'        => NULL,
+			);
 	}
 
 

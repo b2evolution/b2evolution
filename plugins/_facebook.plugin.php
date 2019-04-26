@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  *
@@ -32,10 +32,11 @@ class facebook_plugin extends Plugin
 	var $name;
 	var $code = 'evo_facebook';
 	var $priority = 20;
-	var $version = '6.9.3';
+	var $version = '7.0.1';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'other';
+	var $widget_icon = 'facebook-official';
 
 	/**
 	 * Init
@@ -43,8 +44,8 @@ class facebook_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		$this->name = T_( 'Facebook Widget' );
-		$this->short_desc = T_('This skin tag displays a Facebook Like and Share button.');
-		$this->long_desc = T_('Shows how many users like and shared the current page.');
+		$this->short_desc = T_('This widget displays Facebook Like and Share buttons.');
+		$this->long_desc = $this->short_desc.' '.T_('Also shows how many users liked and shared the current page.');
 	}
 
 
@@ -124,7 +125,7 @@ class facebook_plugin extends Plugin
 	function WidgetBeginSettingsForm( & $params )
 	{
 		?>
-		<script type="text/javascript">
+		<script>
 		jQuery( document ).ready( function() {
 			var showButtons = jQuery( 'input[name$=show_buttons]' ),
 					layoutSelect = jQuery( 'select[name$=layout]' ),

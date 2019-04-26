@@ -10,7 +10,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage basic
@@ -28,9 +28,6 @@ if( evo_version_compare( $app_version, '2.4.1' ) < 0 )
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
 skin_init( $disp );
-
-// The following is temporary and should be moved to some SiteSkin class
-siteskin_init();
 
 // ----------------------------- HEADER BEGINS HERE ------------------------------
 ?>
@@ -57,6 +54,7 @@ $Blog->disp_setting( 'body_includes', 'raw' );
 
 $Plugins->trigger_event( 'SkinBeginHtmlBody' );
 
+modules_call_method( 'SkinBeginHtmlBody' );
 
 // ---------------------------- SITE HEADER INCLUDED HERE ----------------------------
 // If site headers are enabled, they will be included here:

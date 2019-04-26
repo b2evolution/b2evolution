@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -78,6 +78,7 @@ user_prevnext_links( array(
 // ------------- END OF PREV/NEXT USER LINKS -------------------
 
 $has_full_access = $current_User->check_perm( 'users', 'edit' );
+$has_moderate_access = $current_User->can_moderate_user( $edited_User->ID );
 $edited_user_perms = array( 'edited-user', 'edited-user-required' );
 $new_user_creating = ( $edited_User->ID == 0 );
 
@@ -95,13 +96,13 @@ if( $is_admin )
 {
 	if( $new_user_creating )
 	{
-		$form_title = '<span class="nowrap">'.T_('Edit user profile').'</span>';
+		$form_title = '<span class="nowrap">'.T_('New user profile').'</span>';
 	}
 	else
 	{
 		$form_text_title = '<span class="nowrap">'.T_( 'Edit profile' ).'</span>'.get_manual_link( 'user-profile-tab' ); // used for js confirmation message on leave the changed form
 		$form_title = get_usertab_header( $edited_User, 'profile', $form_text_title );
-		$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
+		$Form->title_fmt = '$title$';
 	}
 	$form_class = 'fform';
 }
@@ -132,20 +133,15 @@ else
 
 if( $new_user_creating )
 {
-	$current_User->check_perm( 'users', 'edit', true );
-	$edited_User->get_Group();
-
 	$Form->begin_fieldset( T_( 'New user' ).get_manual_link( 'user-edit' ), array( 'class' => 'fieldset clear' ) );
 
-	$chosengroup = ( $edited_User->Group === NULL ) ? $Settings->get( 'newusers_grp_ID' ) : $edited_User->grp_ID;
-	$GroupCache = & get_GroupCache();
-	$Form->select_object( 'edited_user_grp_ID', $chosengroup, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
+	// Primary and secondary groups:
+	display_user_groups_selectors( $edited_User, $Form );
 
-	$field_note = '[0 - 10]';
-	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), $field_note, array( 'required' => true ) );
+	$Form->text_input( 'edited_user_level', $edited_User->get('level'), 2, T_('User level'), '[0 - 10]', array( 'required' => true ) );
 
 	$email_fieldnote = '<a href="mailto:'.$edited_User->get('email').'">'.get_icon( 'email', 'imgtag', array('title'=>T_('Send an email')) ).'</a>';
-	$Form->text_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), $email_fieldnote, array( 'maxlength' => 255, 'required' => true ) );
+	$Form->email_input( 'edited_user_email', $edited_User->email, 30, T_('Email'), array( 'maxlength' => 255, 'required' => true, 'note' => $email_fieldnote ) );
 	$Form->select_input_array( 'edited_user_status', $edited_User->get( 'status' ), get_user_statuses(), T_( 'Account status' ) );
 
 	$Form->end_fieldset();
@@ -153,7 +149,7 @@ if( $new_user_creating )
 
 	/***************  Identity  **************/
 
-$Form->begin_fieldset( T_('Identity').( is_admin_page() ? get_manual_link( 'user-profile-tab' ) : '' ) );
+$Form->begin_fieldset( T_('Identity').( is_admin_page() ? get_manual_link( 'user-profile-tab-identity' ) : '' ) );
 
 if( ($url = $edited_User->get('url')) != '' )
 {
@@ -251,28 +247,32 @@ if( $action != 'view' )
 	$Form->text_input( 'edited_user_login', $edited_User->login, 20, /* TRANS: noun */ T_('Login'), '', array( 'maxlength' => 60, 'required' => true ) );
 
 	$firstname_editing = $Settings->get( 'firstname_editing' );
-	if( ( in_array( $firstname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $has_full_access ) )
+	if( ( in_array( $firstname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $has_moderate_access ) )
 	{
 		$Form->text_input( 'edited_user_firstname', $edited_User->firstname, 20, T_('First name'), '', array( 'maxlength' => 50, 'required' => ( $firstname_editing == 'edited-user-required' ) ) );
 	}
 
 	$lastname_editing = $Settings->get( 'lastname_editing' );
-	if( ( in_array( $lastname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $has_full_access ) )
+	if( ( in_array( $lastname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $lastname_editing != 'hidden' && $has_moderate_access ) )
 	{
 		$Form->text_input( 'edited_user_lastname', $edited_User->lastname, 20, T_('Last name'), '', array( 'maxlength' => 50, 'required' => ( $lastname_editing == 'edited-user-required' ) ) );
 	}
 
 	$nickname_editing = $Settings->get( 'nickname_editing' );
-	if( ( in_array( $nickname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $has_full_access ) )
+	if( ( in_array( $nickname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $nickname_editing != 'hidden' && $has_moderate_access ) )
 	{
 		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => ( $nickname_editing == 'edited-user-required' ) ) );
 	}
 
-	$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
-			array( 'M', T_('A man') ),
-			array( 'F', T_('A woman') ),
-			array( 'O', T_('Other') ),
-		), T_('I am'), false, '', $Settings->get( 'registration_require_gender' ) == 'required' );
+	$gender_editing = $Settings->get( 'registration_require_gender' );
+	if( $gender_editing != 'hidden' && ( $edited_User->ID == $current_User->ID || $has_moderate_access ) )
+	{
+		$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
+				array( 'M', T_('A man') ),
+				array( 'F', T_('A woman') ),
+				array( 'O', T_('Other') ),
+			), T_('I am'), false, '', $Settings->get( 'registration_require_gender' ) == 'required' );
+	}
 
 	$button_refresh_regional = '<button id="%s" type="submit" name="actionArray[refresh_regional]" class="action_icon refresh_button">'.get_icon( 'refresh' ).'</button>';
 	$button_refresh_regional .= '<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.T_('Loading...').'" title="'.T_('Loading...').'" style="display:none;margin:2px 0 0 5px" align="top" />';
@@ -285,9 +285,9 @@ if( $action != 'view' )
 				$CountryCache,
 				T_('Country'),
 				array(	// field params
-						'required' => $Settings->get( 'location_country' ) == 'required', // true if Country is required
+						'required' => ( $Settings->get( 'location_country' ) == 'required' ? 'mark_only' : false ), // true if Country is required
 						'allow_none' => // Allow none value:
-						                $has_full_access || // Current user has permission to edit users
+						                $has_moderate_access || // Current user has permission to moderate users
 						                empty( $edited_User->ctry_ID ) || // Country is not defined yet
 						                ( !empty( $edited_User->ctry_ID ) && $Settings->get( 'location_country' ) != 'required' ) // Country is defined but this field is not required
 					)
@@ -302,7 +302,7 @@ if( $action != 'view' )
 				T_( 'Region' ),
 				sprintf( $button_refresh_regional, 'button_refresh_region' ), // Button to refresh regions list
 				array(	// field params
-						'required' => $Settings->get( 'location_region' ) == 'required' // true if Region is required
+						'required' => ( $Settings->get( 'location_region' ) == 'required' ? 'mark_only' : false ) // true if Region is required
 					)
 			);
 	}
@@ -315,7 +315,7 @@ if( $action != 'view' )
 				T_( 'Sub-region' ),
 				sprintf( $button_refresh_regional, 'button_refresh_subregion' ), // Button to refresh subregions list
 				array(	// field params
-						'required' => $Settings->get( 'location_subregion' ) == 'required' // true if Subregion is required
+						'required' => ( $Settings->get( 'location_subregion' ) == 'required' ? 'mark_only' : false ) // true if Subregion is required
 					)
 			);
 	}
@@ -328,7 +328,7 @@ if( $action != 'view' )
 				T_( 'City' ),
 				sprintf( $button_refresh_regional, 'button_refresh_city' ), // Button to refresh cities list
 				array(	// field params
-						'required' => $Settings->get( 'location_city' ) == 'required' // true if City is required
+						'required' => ( $Settings->get( 'location_city' ) == 'required' ? 'mark_only' : false ) // true if City is required
 					)
 			);
 	}
@@ -401,19 +401,24 @@ if( $action != 'view' )
 			if( $org_ID > 0 && ! $perm_edit_orgs && $org_data['accepted'] )
 			{ // Display only info of the assigned organization
 				$Form->infostart = $Form->infostart.$inputstart_icon;
-				$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; ';
+				$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; '
+					.'<input type="hidden" name="org_roles[]" value="" />';
+				$org_priority_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Order').':</strong> '.$org_data['priority'] ).' &nbsp; '
+						.'<input type="hidden" name="org_priorities[]" value="" />';
 				$org_hidden_fields = '<input type="hidden" name="organizations[]" value="'.$org_ID.'" />';
 				$Form->info_field( T_('Organization'), $org_data['name'], array(
-						'field_suffix' => $org_role_input.$org_add_icon.$org_remove_icon.$org_hidden_fields,
+						'field_suffix' => $org_role_input.$org_priority_input.$org_add_icon.$org_remove_icon.$org_hidden_fields,
 						'name'         => 'organizations[]'
 					) );
 			}
 			else
 			{ // Allow to update the organization fields
 				$perm_edit_org_role = false;
+				$perm_edit_org_priority = false;
 				if( ! empty( $org_ID ) )
 				{
 					$perm_edit_org_role = ( $user_Organization->owner_user_ID == $current_User->ID ) || ( $user_Organization->perm_role == 'owner and member' && $org_data['accepted'] );
+					$perm_edit_org_priority = ( $user_Organization->owner_user_ID == $current_User->ID || $perm_edit_orgs );
 				}
 
 				$Form->output = false;
@@ -425,7 +430,18 @@ if( $action != 'view' )
 				}
 				else
 				{
-					$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; ';
+					$org_role_input = ( empty( $org_data['role'] ) ? '' : ' &nbsp; <strong>'.T_('Role').':</strong> '.$org_data['role'] ).' &nbsp; '
+						.'<input type="hidden" name="org_roles[]" value="" />';
+				}
+				if( $perm_edit_org_priority )
+				{
+					$org_priority_input = ' &nbsp; <strong>'.T_('Order').':</strong> '.
+							$Form->text_input( 'org_priorities[]', $org_data['priority'], 10, '', '', array( 'type' => 'number', 'min' => -2147483648, 'max' => 2147483647 ) ).' &nbsp; ';
+				}
+				else
+				{
+					$org_priority_input = ( empty( $org_data['priority'] ) ? '' : ' &nbsp; <strong>'.T_('Order').':</strong> '.$org_data['priority'] ).' &nbsp; '
+						.'<input type="hidden" name="org_priorities[]" value="" />';
 				}
 				$Form->switch_layout( NULL );
 				$Form->output = true;
@@ -433,7 +449,7 @@ if( $action != 'view' )
 				$Form->inputstart = $Form->inputstart.$inputstart_icon;
 				$Form->select_input_object( 'organizations[]', $org_ID, $OrganizationCache, T_('Organization'), array(
 						'allow_none'   => $org_allow_none,
-						'field_suffix' => $org_role_input.$org_add_icon.$org_remove_icon
+						'field_suffix' => $org_role_input.$org_priority_input.$org_add_icon.$org_remove_icon
 					) );
 			}
 			$Form->infostart = $form_infostart;
@@ -456,7 +472,26 @@ else
 
 	if( $Settings->get('allow_avatars') )
 	{
-		$Form->info( T_('Profile picture'), $edited_User->get_avatar_imgtag( 'crop-top-64x64', 'avatar', '', true ) );
+		// Main profile picture:
+		$user_pictures = '<div class="avatartag main image_rounded">'
+				.$edited_User->get_avatar_imgtag( 'crop-top-320x320', 'avatar', 'top', true, '', 'user', '160x160' )
+			.'<div class="clear"></div></div>';
+		// Append the other pictures to main avatar:
+		$user_avatars = $edited_User->get_avatar_Links();
+		foreach( $user_avatars as $user_Link )
+		{
+			$user_pictures .= $user_Link->get_tag( array(
+					'before_image'        => '<div class="avatartag image_rounded">',
+					'before_image_legend' => '',
+					'after_image_legend'  => '',
+					'after_image'         => '</div>',
+					'image_size'          => 'crop-top-160x160',
+					'image_link_title'    => $edited_User->login,
+					'image_link_rel'      => 'lightbox[user]',
+					'tag_size'            => '80x80'
+				) );
+		}
+		$Form->info( T_('Profile picture'), $user_pictures );
 	}
 
 	$Form->info( /* TRANS: noun */ T_('Login'), $edited_User->get('login') );
@@ -495,11 +530,16 @@ else
 		$Form->info( T_( 'City' ), $edited_User->get_city_name() );
 	}
 
-	//$Form->info( T_('My ZIP/Postcode'), $edited_User->get('postcode') );
-	$Form->info( T_('My age group'), $edited_User->get('age_min') );
-	$Form->info( T_('to'), $edited_User->get('age_max') );
+	$Form->info( T_('My age group'), ( $edited_User->get( 'age_min' ) > 0 || $edited_User->get( 'age_max' ) > 0 ? $edited_User->get( 'age_min' ).' '.T_('to').' '.$edited_User->get( 'age_max' ) : '' ) );
 
-	$Form->info( T_('URL'), $edited_User->get('url'), $url_fieldnote );
+	// Organizations:
+	$user_organizations = $edited_User->get_organizations();
+	$org_names = array();
+	foreach( $user_organizations as $org )
+	{
+		$org_names[] = empty( $org->url ) ? $org->name : '<a href="'.$org->url.'" rel="nofollow" target="_blank">'.$org->name.'</a>';
+	}
+	$Form->info( T_('Organizations'), implode( ' &middot; ', $org_names ) );
 }
 
 $Form->end_fieldset();
@@ -507,11 +547,25 @@ $Form->end_fieldset();
 	/***************  Password  **************/
 
 if( empty( $edited_User->ID ) && $action != 'view' )
-{ // We can edit the values:
-
+{	// Display password fields for new creating user:
 	$Form->begin_fieldset( T_('Password') );
-		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'maxlength' => 50, 'required' => true, 'autocomplete'=>'off' ) );
-		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => true, 'autocomplete'=>'off' ) );
+		$Form->radio( 'init_pass', param( 'init_pass', 'string', 'user' ), array(
+					array( 'user', T_('User must initialize') ),
+					array( 'admin', T_('Initialize as below:') ),
+			 ), T_('Initial password'), true );
+		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'maxlength' => 50, 'autocomplete'=>'off' ) );
+		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'autocomplete'=>'off' ) );
+		$Form->checkbox( 'send_pass_email', param( 'send_pass_email', 'integer', 1 ), T_('Send email'), T_('Inform user by email') );
+?>
+<script>
+function new_user_pass_visibility()
+{
+	jQuery( '#ffield_edited_user_pass1, #ffield_edited_user_pass2' ).toggle( jQuery( 'input[name=init_pass]:checked' ).val() == 'admin' );
+}
+jQuery( 'input[name=init_pass]' ).click( new_user_pass_visibility );
+new_user_pass_visibility();
+</script>
+<?php
 	$Form->end_fieldset();
 }
 
@@ -632,7 +686,7 @@ if( $action != 'view' )
 $Form->end_form();
 
 ?>
-<script type="text/javascript">
+<script>
 	function replace_form_params( result, field_id )
 	{
 		field_id = ( typeof( field_id ) == 'undefined' ? '' : ' id="' + field_id + '"' );
@@ -884,7 +938,7 @@ $Form->end_form();
 	} );
 </script>
 
-<script type="text/javascript">
+<script>
 function bind_autocomplete( field_objs )
 {	// Bind autocomplete plugin event
 	if( field_objs.length > 0 )

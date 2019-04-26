@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -102,7 +102,7 @@ function tag_td_name( $tag_ID, $tag_name )
 }
 $Results->cols[] = array(
 		'th'       => /* TRANS: noun */ T_('Tag'),
-		'order'    => 'tag_name COLLATE utf8_general_ci',
+		'order'    => 'tag_name COLLATE utf8_bin',
 		'td'       => '%tag_td_name( #tag_ID#, #tag_name# )%',
 	);
 

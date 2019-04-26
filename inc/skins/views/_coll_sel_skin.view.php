@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @package admin
  */
@@ -20,20 +20,25 @@ $kind_title = get_collection_kinds( $kind );
 echo '<h2 class="page-title">'.sprintf( T_('New [%s]'), $kind_title ).':</h2>';
 
 if( $action == 'new-selskin' )
-{ // Select an existing skin
+{	// Select an existing skin:
+
+	$coll_url_suffix = get_param( 'sec_ID' ) ? '&amp;sec_ID='.get_param( 'sec_ID' ) : '';
+
+	echo '<h3>'.sprintf( T_('Pick an existing skin below: (or <a %s>install a new one now</a>)'), 'href="'.$admin_url.'?ctrl=collections&amp;action=new-installskin&amp;kind='.$kind.$coll_url_suffix.'&amp;skin_type=normal"' ).'</h3>';
+
 	$SkinCache = & get_SkinCache();
 	$SkinCache->load_all();
 	$SkinCache->rewind();
 
 	// Group together skins based on how well they support the selected collection type
 	$skins = array();
-	while( ( $skin = & $SkinCache->get_next() ) != NULL )
+	while( ( $iterator_Skin = & $SkinCache->get_next() ) != NULL )
 	{
-		if( $skin->type != 'normal' && $skin->type != 'rwd' )
+		if( $iterator_Skin->type != 'normal' && $iterator_Skin->type != 'rwd' )
 		{	// This skin cannot be used here...
 			continue;
 		}
-		$skins[$skin->supports_coll_kind( $kind )][] = $skin;
+		$skins[ $iterator_Skin->supports_coll_kind( $kind ) ][] = $iterator_Skin;
 	}
 
 
@@ -54,15 +59,15 @@ if( $action == 'new-selskin' )
 
 		if( isset( $skins['yes'] ) )
 		{
-			foreach( $skins['yes'] as $skin )
+			foreach( $skins['yes'] as $iterator_Skin )
 			{
-				$select_url = '?ctrl=collections&amp;action=new-name&amp;kind='.$kind.'&amp;skin_ID='.$skin->ID;
+				$select_url = '?ctrl=collections&amp;action=new-name&amp;kind='.$kind.'&amp;skin_ID='.$iterator_Skin->ID.$coll_url_suffix;
 				$disp_params = array(
-					'function'     => 'select',
-					'select_url'   => $select_url
+					'function'   => 'select',
+					'select_url' => $select_url
 				);
 				// Display skinshot:
-				Skin::disp_skinshot( $skin->folder, $skin->name, $disp_params );
+				Skin::disp_skinshot( $iterator_Skin->folder, $iterator_Skin->name, $disp_params );
 			}
 		}
 
@@ -80,15 +85,15 @@ if( $action == 'new-selskin' )
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 			echo '<div class="skin_selector_block">';
 
-			foreach( $skins['partial'] as $skin )
+			foreach( $skins['partial'] as $iterator_Skin )
 			{
-				$select_url = '?ctrl=collections&amp;action=new-name&amp;kind='.$kind.'&amp;skin_ID='.$skin->ID;
+				$select_url = '?ctrl=collections&amp;action=new-name&amp;kind='.$kind.'&amp;skin_ID='.$iterator_Skin->ID.$coll_url_suffix;
 				$disp_params = array(
-					'function'     => 'select',
-					'select_url'   => $select_url
+					'function'   => 'select',
+					'select_url' => $select_url
 				);
 				// Display skinshot:
-				Skin::disp_skinshot( $skin->folder, $skin->name, $disp_params );
+				Skin::disp_skinshot( $iterator_Skin->folder, $iterator_Skin->name, $disp_params );
 			}
 
 			echo '<div class="clear"></div>';
@@ -107,15 +112,15 @@ if( $action == 'new-selskin' )
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 			echo '<div class="skin_selector_block">';
 
-			foreach( $skins['maybe'] as $skin )
+			foreach( $skins['maybe'] as $iterator_Skin )
 			{
-				$select_url = '?ctrl=collections&amp;action=new-name&amp;kind='.$kind.'&amp;skin_ID='.$skin->ID;
+				$select_url = '?ctrl=collections&amp;action=new-name&amp;kind='.$kind.'&amp;skin_ID='.$iterator_Skin->ID.$coll_url_suffix;
 				$disp_params = array(
-					'function'     => 'select',
-					'select_url'   => $select_url
+					'function'   => 'select',
+					'select_url' => $select_url
 				);
 				// Display skinshot:
-				Skin::disp_skinshot( $skin->folder, $skin->name, $disp_params );
+				Skin::disp_skinshot( $iterator_Skin->folder, $iterator_Skin->name, $disp_params );
 			}
 
 			echo '<div class="clear"></div>';

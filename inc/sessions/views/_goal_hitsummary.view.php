@@ -7,25 +7,25 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $blog, $admin_url;
+global $blog, $sec_ID, $admin_url;
 
 $final = param( 'final', 'integer', 0, true );
 $goal_name = param( 'goal_name', 'string', NULL, true );
 $goal_cat = param( 'goal_cat', 'integer', 0, true );
 
 // Get all goal hits:
-$SQL = new SQL();
+$SQL = new SQL( 'Get hits by day and goal' );
 $SQL->SELECT( 'DATE_FORMAT( hit_datetime, "%Y-%m-%d" ) as day, ghit_goal_ID, COUNT(ghit_ID) as count' );
 $SQL->FROM( 'T_track__goalhit' );
 $SQL->FROM_add( 'INNER JOIN T_hitlog ON ghit_hit_ID = hit_ID' );
 $SQL->GROUP_BY( 'day DESC, ghit_goal_ID' );
-$hitgroup_rows = $DB->get_results( $SQL->get(), OBJECT, 'Get hits by day and goal' );
+$hitgroup_rows = $DB->get_results( $SQL );
 
 $hitgroup_array = array();
 foreach( $hitgroup_rows as $hitgroup_row )
@@ -34,7 +34,7 @@ foreach( $hitgroup_rows as $hitgroup_row )
 }
 
 // Get list of all goals
-$SQL = new SQL();
+$SQL = new SQL( 'Get list of all goals' );
 $SQL->SELECT( 'goal_ID, goal_name, gcat_color' );
 $SQL->FROM( 'T_track__goal' );
 $SQL->FROM_add( 'LEFT JOIN T_track__goalcat ON gcat_ID = goal_gcat_ID' );
@@ -51,8 +51,11 @@ if( ! empty( $goal_cat ) )
 	$SQL->WHERE_and( 'goal_gcat_ID = '.$DB->quote( $goal_cat ) );
 }
 $SQL->ORDER_BY( 'goal_name' );
-$goal_rows = $DB->get_results( $SQL->get(), OBJECT, 'Get list of all goals' );
+$goal_rows = $DB->get_results( $SQL );
 
+// Initialize params to filter by selected collection and/or group:
+$section_params = empty( $blog ) ? '' : '&blog='.$blog;
+$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
 
 /*
  * Chart
@@ -66,7 +69,7 @@ if( count( $goal_rows ) && count( $hitgroup_array ) )
 
 	// Initialize the data to open an url by click on bar item
 	$chart['link_data'] = array();
-	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=goals&tab3=hits&blog='.$blog.'&datestartinput=$date$&datestopinput=$date$&goal_name=$param1$';
+	$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=goals&tab3=hits'.$section_params.'&datestartinput=$date$&datestopinput=$date$&goal_name=$param1$';
 	$chart['link_data']['params'] = array();
 
 	// Column mapping and colors
@@ -157,8 +160,8 @@ $Table->filter_area = array(
 	'callback' => 'filter_goal_hitsummary',
 	'url_ignore' => 'final,goal_name',
 	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=goals&amp;tab3=stats&amp;blog='.$blog ),
-		'final' => array( T_('Final'), '?ctrl=goals&amp;tab3=stats&amp;final=1&amp;blog='.$blog ),
+		'all' => array( T_('All'), '?ctrl=goals&amp;tab3=stats'.$section_params ),
+		'final' => array( T_('Final'), '?ctrl=goals&amp;tab3=stats&amp;final=1'.$section_params ),
 		)
 	);
 
@@ -211,7 +214,7 @@ if( $Table->total_pages > 0 )
 			$Table->display_col_start();
 			if( isset( $hitday_array[ $goal_row->goal_ID ] ) )
 			{
-				echo '<a href="'.$admin_url.'?blog='.$blog.'&amp;ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;datestartinput='.$date_param.'&amp;datestopinput='.$date_param.'&amp;goal_name='.rawurlencode( $goal_row->goal_name ).'">'.$hitday_array[ $goal_row->goal_ID ].'</a>';
+				echo '<a href="'.$admin_url.'?ctrl=stats&amp;tab=goals&amp;tab3=hits&amp;datestartinput='.$date_param.'&amp;datestopinput='.$date_param.$section_params.'&amp;goal_name='.rawurlencode( $goal_row->goal_name ).'">'.$hitday_array[ $goal_row->goal_ID ].'</a>';
 				$line_total += $hitday_array[ $goal_row->goal_ID ];
 				$goal_total[ $goal_row->goal_ID ] += $hitday_array[ $goal_row->goal_ID ];
 			}

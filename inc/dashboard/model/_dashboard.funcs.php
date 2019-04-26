@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -145,7 +145,7 @@ function b2evonet_get_updates( $force_short_delay = false )
 											'php_uname' => new xmlrpcval( $system_stats['php_uname'], 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
 											'php_gid' => new xmlrpcval( $system_stats['php_gid'], 'int' ),
 											'php_gname' => new xmlrpcval( $system_stats['php_gname'], 'string' ),	// Potential unsecure hosts will use names like 'nobody', 'www-data'
-											'php_version' => new xmlrpcval( $system_stats['php_version'], 'string' ),			// Target minimum version: PHP 5.2
+											'php_version' => new xmlrpcval( $system_stats['php_version'], 'string' ),			// Target minimum version: PHP 5.4
 											'php_reg_globals' => new xmlrpcval( $system_stats['php_reg_globals'] ? 1 : 0, 'int' ), // if <5% we may actually refuse to run future version on this
 											'php_allow_url_include' => new xmlrpcval( $system_stats['php_allow_url_include'] ? 1 : 0, 'int' ),
 											'php_allow_url_fopen' => new xmlrpcval( $system_stats['php_allow_url_fopen'] ? 1 : 0, 'int' ),
@@ -235,7 +235,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
 				INNER JOIN T_categories othercats ON postcat_cat_ID = othercats.cat_ID ';
 
 	$sql .= 'WHERE '.$Blog->get_sql_where_aggregate_coll_IDs('othercats.cat_blog_ID');
-	$sql .= ' AND comment_type IN (\'comment\',\'trackback\',\'pingback\') ';
+	$sql .= ' AND comment_type IN (\'comment\',\'trackback\',\'pingback\',\'webmention\') ';
 	$sql .= ' AND comment_status IN ( '.$moderation_statuses_condition.' )';
 	$sql .= ' AND '.statuses_where_clause();
 
@@ -256,7 +256,7 @@ function get_comments_awaiting_moderation_number( $blog_ID )
  */
 function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limit = 5, $comment_IDs = array(), $script = true )
 {
-	global $current_User, $dispatcher;
+	global $current_User;
 
 	if( is_null( $CommentList ) )
 	{ // Inititalize CommentList
@@ -274,7 +274,7 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		// Filter list:
 		$CommentList->set_filters( array(
-				'types' => array( 'comment', 'trackback', 'pingback' ),
+				'types' => array( 'comment', 'trackback', 'pingback', 'webmention' ),
 				'statuses' => $moderation_statuses,
 				'comment_ID_list' => $exlude_ID_list,
 				'post_statuses' => array( 'published', 'community', 'protected' ),
@@ -436,7 +436,7 @@ function get_table_count( $table_name, $sql_where = '', $sql_from = '', $sql_tit
 		$SQL->WHERE( $sql_where );
 	}
 
-	return intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
+	return intval( $DB->get_var( $SQL ) );
 }
 
 
@@ -546,14 +546,22 @@ function display_posts_awaiting_moderation( $status, & $block_item_Widget )
 
 
 /**
- * Get percent by function log10()
+ * Get percent by logarithm functions
  *
  * @param integer Value
+ * @param integer Max value, NULL - 100000
  * @return integer Percent
  */
-function log10_percent( $value )
+function log10_percent( $value, $max = NULL )
 {
-	$percent = log10( intval( $value ) ) * 2 * 10;
+	if( $max === NULL )
+	{	// Use log10 by default where max value is 100000:
+		$percent = log10( $value ) * 2 * 10;
+	}
+	else
+	{	// Use log with custom max value:
+		$percent = log( $value, $max ) * 100;
+	}
 	return intval( $percent > 100 ? 100 : $percent );
 }
 
@@ -573,14 +581,14 @@ function display_charts( $chart_data )
 		return;
 	}
 
-	echo '<div style="display: flex; flex-flow: row nowrap;" class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
+	echo '<div style="display:flex;flex-flow:row wrap" class="charts'.( $ctrl == 'col_settings' ? ' row' : '' ).'">';
 
 	foreach( $chart_data as $chart_item )
 	{
 		if( $chart_item['type'] == 'number' )
-		{ // Calculate a percent with log10 where max value is 100000
-			$chart_percent = empty( $chart_item['value'] ) ? 0 : log10_percent( $chart_item['value'] );
-			// Set a color for value, from green(0%) to red(100%)
+		{ // Calculate a percent with logarithm functions:
+			$chart_percent = empty( $chart_item['value'] ) ? 0 : log10_percent( $chart_item['value'], ( isset( $chart_item['max'] ) ? $chart_item['max'] : NULL ) );
+			// Set a color for value, from green(0%) to orange(100%)
 			$chart_color = get_color_by_percent( '#61bd4f', '#f2d600', '#ffab4a', $chart_percent );
 		}
 		else

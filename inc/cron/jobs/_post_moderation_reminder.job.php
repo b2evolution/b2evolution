@@ -8,7 +8,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $DB, $Settings, $UserSettings;
 
-global $servertimenow, $post_moderation_reminder_threshold;
+global $servertimenow;
 
 // Check if UserSettings exists because it must be initialized before email sending
 if( empty( $UserSettings ) )
@@ -18,7 +18,7 @@ if( empty( $UserSettings ) )
 }
 
 // Only those blogs are selected for moderation where we can find at least one post awaiting moderation which is older then the threshold date defined below
-$threshold_date = date2mysql( $servertimenow - $post_moderation_reminder_threshold );
+$threshold_date = date2mysql( $servertimenow - $Settings->get( 'post_moderation_reminder_threshold' ) );
 
 // Statuses defined in this array should be notified. This should be configurable, but this is the default value.
 $notify_statuses = get_visibility_statuses( 'moderation' );
@@ -35,7 +35,7 @@ $moderation_blogs = $DB->get_col( $SQL->get() );
 
 if( empty( $moderation_blogs ) )
 { // There are no blogs where exists draft posts older then the threshold ( 24 hours by default )
-	$result_message = sprintf( 'No posts have been awaiting moderation for more than %s.', seconds_to_period( $post_moderation_reminder_threshold ) );
+	cron_log_append( sprintf( 'No posts have been awaiting moderation for more than %s.', seconds_to_period( $Settings->get( 'post_moderation_reminder_threshold' ) ) ) );
 	return 1;
 }
 
@@ -156,7 +156,7 @@ $SQL->SELECT( 'T_users.*' );
 $SQL->FROM( 'T_users' );
 $SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "send_pst_moderation_reminder"' );
 $SQL->WHERE( 'user_ID IN ('.implode( ',', $all_required_users ).')' );
-$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated" )' );
+$SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 $SQL->WHERE_and( $send_moderation_reminder_cond );
 $SQL->WHERE_and( 'LENGTH(TRIM(user_email)) > 0' );
 $SQL->WHERE_and( $blocked_emails_condition );
@@ -169,7 +169,7 @@ $loaded_ids = $UserCache->get_ID_array();
 
 if( empty( $loaded_ids ) )
 { // UserCache result is empty which means nobody wants to receive notifications
-	$result_message = sprintf( 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have posts pending moderation!' );
+	cron_log_append( 'Could not find any moderators wanting to receive post moderation notifications for the blogs that have posts pending moderation!' );
 	return 1;
 }
 
@@ -222,6 +222,7 @@ foreach( $blog_posts as $row )
 }
 
 $mail_sent = 0;
+$mail_failed = 0;
 $params = array();
 
 // Collect posts data for global moderators
@@ -335,12 +336,20 @@ foreach( $loaded_ids as $moderator_ID )
 	// Change locale here to localize the email subject and content
 	locale_temp_switch( $moderator_User->get( 'locale' ) );
 	if( send_mail_to_User( $moderator_ID, T_( 'Post moderation reminder' ), 'posts_unmoderated_reminder', $params, false ) )
-	{
+	{	// Log success mail sending:
+		cron_log_action_end( 'User '.$moderator_User->get_identity_link().' has been notified' );
 		$mail_sent++;
+	}
+	else
+	{	// Log failed mail sending:
+		global $mail_log_message;
+		cron_log_action_end( 'User '.$moderator_User->get_identity_link().' could not be notified because of error: '
+			.'"'.( empty( $mail_log_message ) ? 'Unknown Error' : $mail_log_message ).'"', 'warning' );
+		$mail_failed++;
 	}
 	locale_restore_previous();
 }
 
-$result_message = sprintf( '%d moderators have been notified!', $mail_sent );
+cron_log_append( ( ( $mail_sent + $mail_failed ) ? "\n" : '' ).sprintf( '%d of %d moderators have been notified!', $mail_sent, ( $mail_sent + $mail_failed ) ) );
 return 1; /*OK*/
 ?>

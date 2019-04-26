@@ -21,7 +21,7 @@ class bootstrap_main_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.9.3';
+	var $version = '7.0.1';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -55,7 +55,7 @@ class bootstrap_main_Skin extends Skin
 	 */
 	function get_api_version()
 	{
-		return 6;
+		return 7;
 	}
 
 
@@ -74,6 +74,7 @@ class bootstrap_main_Skin extends Skin
 	public function get_supported_coll_kinds()
 	{
 		$supported_kinds = array(
+				'minisite' => 'maybe',  // Not necessarily a good choice because there is no menu container on the homepage, minisites typically need a menu to switch pages
 				'main' => 'yes',
 				'std' => 'no',		// Blog
 				'photo' => 'no',
@@ -99,6 +100,24 @@ class bootstrap_main_Skin extends Skin
 
 
 	/**
+	 * Get the container codes of the skin main containers
+	 *
+	 * This should NOT be protected. It should be used INSTEAD of file parsing.
+	 * File parsing should only be used if this function is not defined
+	 *
+	 * @return array Array which overrides default containers; Empty array means to use all default containers.
+	 */
+	function get_declared_containers()
+	{
+		// Array to override default containers from function get_skin_default_containers():
+		// - Key is widget container code;
+		// - Value: array( 0 - container name, 1 - container order ),
+		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
+		return array();
+	}
+
+
+	/**
 	 * Get definitions for editable params
 	 *
 	 * @see Plugin::GetDefaultSettings()
@@ -113,10 +132,18 @@ class bootstrap_main_Skin extends Skin
 				),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
-						'note' => 'px. ' . T_('Set maximum height for post images.'),
+						'input_suffix' => ' px ',
+						'note' => T_('Set maximum height for post images.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
 						'allow_empty' => true,
 					),
 				'section_layout_end' => array(
@@ -138,6 +165,7 @@ class bootstrap_main_Skin extends Skin
 						'note' => T_('This color will be used if Background image is not set or does not exist.'),
 						'defaultvalue' => '#333333',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'1_end' => array(
 					'layout' => 'end_fieldset',
@@ -166,20 +194,9 @@ class bootstrap_main_Skin extends Skin
 					'front_bg_cont_color' => array(
 						'label' => T_('Background color'),
 						'note' => T_('Click to select a color.'),
-						'defaultvalue' => '#000000',
+						'defaultvalue' => 'rgba(0,0,0,0.1)',
 						'type' => 'color',
-					),
-					'front_bg_opacity' => array(
-						'label' => T_('Background opacity'),
-						'note' => '%. ' . T_('Adjust the background transparency level.'),
-						'size' => '7',
-						'maxlength' => '3',
-						'defaultvalue' => '10',
-						'type' => 'integer',
-						'valid_range' => array(
-							'min' => 0, // from 0%
-							'max' => 100, // to 100%
-						),
+						'transparency' => true,
 					),
 					'pict_title_color' => array(
 						'label' => T_('Title color'),
@@ -223,6 +240,7 @@ class bootstrap_main_Skin extends Skin
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'secondary_text_color' => array(
 						'label' => T_('Text color'),
@@ -367,7 +385,7 @@ class bootstrap_main_Skin extends Skin
 	 */
 	function display_init()
 	{
-		global $Messages, $disp, $debug;
+		global $Messages, $disp, $debug, $Session, $blog;
 
 		// Request some common features that the parent function (Skin::display_init()) knows how to provide:
 		parent::display_init( array(
@@ -384,167 +402,110 @@ class bootstrap_main_Skin extends Skin
 
 		// Skin specific initializations:
 
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$; width: auto; }', array(
+			'suffix' => 'px'
+		) );
+		// **** Layout Settings / END ****
+
+		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'content_requires_login' ) ) )
 		{
-			add_css_headline( '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }' );
+			// **** Image section / START ****
+			// Background image:
+			$this->dynamic_style_rule( 'front_bg_image_file_ID', '.evo_pictured_layout { background-image: $setting_value$ }', array(
+				'type' => 'image_file',
+			) );
+			// Background color:
+			$this->dynamic_style_rule( 'front_bg_color', '.evo_pictured_layout { background-color: $setting_value$ }' );
+			// **** Image section / END ****
+
+			// **** Front Page Main Area Settings / START ****
+			// Width:
+			$this->dynamic_style_rule( 'front_width', 'div.front_main_area { width: $setting_value$ }' );
+
+			// Title color:
+			$this->dynamic_style_rule( 'pict_title_color', 'body.pictured .main_page_wrapper .front_main_area .widget_core_coll_title h2 a { color: $setting_value$ }' );
+
+			// Muted text color:
+			$this->dynamic_style_rule( 'pict_muted_color', 'body.pictured .main_page_wrapper .text-muted { color: $setting_value$ }' );
+
+			// Background color:
+			$this->dynamic_style_rule( 'front_bg_cont_color', '.front_main_content { background-color: $setting_value$ }' );
+
+			// Text color:
+			$this->dynamic_style_rule( 'front_text_color',
+				'body.pictured .front_main_content, '.
+				'body.pictured .front_main_content h1 small, '.
+				'.evo_container__header, '.
+				'.evo_container__page_top, '.
+				'body.pictured.disp_access_requires_login .evo_widget.widget_core_content_block, '.
+				'body.pictured.disp_access_denied .evo_widget.widget_core_content_block '.
+				'{ color: $setting_value$ }'
+			);
+
+			// Link color:
+			$this->dynamic_style_rule( 'front_link_color',
+				'body.pictured .main_page_wrapper .front_main_area a:not(.btn),'.
+				'body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: $setting_value$ }'.
+				'body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,'.
+				'body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a { color: $setting_value$'." }\n".
+				'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__bgcolor"]):not(:hover) { background-color: $setting_value$'." }\n".
+				'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: $setting_value$ }'
+			);
+
+			// Inverse icon color:
+			$this->dynamic_style_rule( 'front_icon_color',
+				'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__textcolor"]):not(:hover) { color: $setting_value$'." }\n".
+				'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hoverbgcolor"]) { background-color: $setting_value$ }'
+			);
+
+			// Position:
+			$this->dynamic_style_rule( 'front_position', 'div.front_main_area { $setting_value$ }', array(
+				'options' => array(
+					'left'   => '',// default value
+					'middle' => 'float: none; margin-left: auto; margin-right: auto;',
+					'right'  => 'float: right;',
+				)
+			) );
+			// **** Front Page Main Area Settings / END ****
+
+			// **** Front Page Secondary Area Settings / START ****
+			// Background color:
+			$this->dynamic_style_rule( 'secondary_bg_color', 'section.secondary_area { background-color: $setting_value$ }' );
+			// Text color:
+			$this->dynamic_style_rule( 'secondary_text_color', 'section.secondary_area, .widget_core_org_members { color: $setting_value$ !important }' );
+			// **** Front Page Secondary Area Settings / END ****
 		}
 
-		// Add custom CSS:
-		$custom_css = '';
+		// **** Featured posts Settings / START ****
+		// Text color on background image:
+		$this->dynamic_style_rule( 'bgimg_text_color', '.evo_hasbgimg { color: $setting_value$ }' );
+		// Link color on background image:
+		$this->dynamic_style_rule( 'bgimg_link_color', '.evo_hasbgimg a { color: $setting_value$ }' );
+		// Hover link color on background image:
+		$this->dynamic_style_rule( 'bgimg_hover_link_color', '.evo_hasbgimg a:hover { color: $setting_value$ }' );
+		// **** Featured posts Settings / END ****
 
-		if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
-		{
-			$FileCache = & get_FileCache();
+		// Add dynamic CSS rules headline:
+		// Use standard bootstrap style on width <= 640px only for disp=front:
+		$media_exception = ( $disp == 'front' ? '@media only screen and (min-width: 641px)' : NULL );
+		$this->add_dynamic_css_headline( $media_exception );
 
-			if( $this->get_setting( 'front_bg_image_file_ID' ) )
-			{
-				$bg_image_File = & $FileCache->get_by_ID( $this->get_setting( 'front_bg_image_file_ID' ), false, false );
-			}
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 
-			if( !empty( $bg_image_File ) && $bg_image_File->exists() )
-			{ // Custom body background image:
-				$custom_css .= '.evo_pictured_layout { background-image: url('.$bg_image_File->get_url().") }\n";
-			}
-			else
-			{
-				$color = $this->get_setting( 'front_bg_color' );
-				$custom_css .= '.evo_pictured_layout { background: '.$color." }\n";
-			}
-
-			if( $color = $this->get_setting( 'pict_title_color' ) )
-			{ // Custom title color:
-				$custom_css .= 'body.pictured .main_page_wrapper .widget_core_coll_title h1 a { color: '.$color." }\n";
-			}
-
-			if( $color = $this->get_setting( 'pict_muted_color' ) )
-			{ // Custom muted text color:
-				$custom_css .= 'body.pictured .main_page_wrapper .text-muted { color: '.$color." }\n";
-			}
-
-			if( $color = $this->get_setting( 'front_bg_cont_color' ) )
-			{ // Custom body background color:
-				$color_transparency = floatval( $this->get_setting( 'front_bg_opacity' ) / 100 );
-				$color = substr( $color, 1 );
-				if( strlen( $color ) == '6' )
-				{ // Color value in format #FFFFFF
-					$color = str_split( $color, 2 );
-				}
-				else
-				{ // Color value in format #FFF
-					$color = str_split( $color, 1 );
-					foreach( $color as $c => $v )
-					{
-						$color[ $c ] = $v.$v;
-					}
-				}
-				$custom_css .= '.front_main_content { background-color: rgba('.implode( ',', array_map( 'hexdec', $color ) ).','.$color_transparency.')'." }\n";
-			}
-
-			if( $color = $this->get_setting( 'front_text_color' ) )
-			{ // Custom text color:
-				$custom_css .= 'body.pictured .front_main_content, body.pictured .front_main_content h1 small, .evo_container__header, .evo_container__page_top { color: '.$color." }\n";
-			}
-
-			$link_color = $this->get_setting( 'front_link_color' );
-			$icon_color = $this->get_setting( 'front_icon_color' );
-			if( $link_color )
-			{ // Custom link color:
-				$custom_css .= 'body.pictured .main_page_wrapper .front_main_area a:not(.btn),
-				body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: '.$link_color.' }
-				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,
-				body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a { color: '.$link_color." }\n";
-			}
-			if( $link_color && $icon_color )
-			{ // Custom icon color:
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__textcolor"]):not(:hover) { color: '.$icon_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__bgcolor"]):not(:hover) { background-color: '.$link_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: '.$link_color." }\n";
-				$custom_css .= 'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hoverbgcolor"]) { background-color: '.$icon_color." }\n";
-			}
-
-			if( $width = $this->get_setting( 'front_width' ) )
-			{ // Custom width for front main area:
-				$custom_css .= 'div.front_main_area { width: '.$width." }\n";
-			}
-
-			if( $position = $this->get_setting( 'front_position' ) )
-			{ // Custom width for front main area:
-				if( $position == 'middle' )
-				{
-					$custom_css .= 'div.front_main_area { float: none; margin-left: auto; margin-right: auto;'." }\n";
-				}
-				elseif( $position == 'right' )
-				{
-					$custom_css .= 'div.front_main_area { float: right;'." }\n";
-				}
-			}
-
-			if( $color = $this->get_setting( 'secondary_bg_color' ) )
-			{ // Custom text color on secondary area:
-				$custom_css .= 'section.secondary_area { background-color: '.$color." }\n";
-			}
-			if( $color = $this->get_setting( 'secondary_text_color' ) )
-			{ // Custom text color on secondary area:
-				$custom_css .= 'section.secondary_area, .widget_core_org_members { color: '.$color." !important }\n";
-			}
-		}
-
-
-		if( $color = $this->get_setting( 'bgimg_text_color' ) )
-		{	// Custom text color on background image:
-			$custom_css .= '.evo_hasbgimg { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'bgimg_link_color' ) )
-		{	// Custom link color on background image:
-			$custom_css .= '.evo_hasbgimg a { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
-		{	// Custom link hover color on background image:
-			$custom_css .= '.evo_hasbgimg a:hover { color: '.$color." }\n";
-		}
-
-		if( ! empty( $custom_css ) )
-		{
-			if( $disp == 'front' )
-			{ // Use standard bootstrap style on width <= 640px only for disp=front
-				$custom_css = '@media only screen and (min-width: 641px)
-					{
-						'.$custom_css.'
-					}';
-			}
-			$custom_css = '<style type="text/css">
-<!--
-'.$custom_css.'
--->
-</style>';
-		add_headline( $custom_css );
+		if( $Session->get( 'designer_mode_'.$blog ) )
+		{	// On enabled designer mode we should set full window height for pictured layout in pixel instead of 100% percents to avoid issues on scroll page:
+			add_js_headline( 'jQuery( document ).ready( function()
+			{	// On enabled designer mode we should set full window height for pictured layout in pixel instead of 100% percents to avoid issues on scroll page:
+				jQuery( ".evo_pictured_layout" ).height( jQuery( window ).height() );
+				jQuery( window ).resize( function()
+				{	// Update height on window resizing:
+					jQuery( ".evo_pictured_layout" ).height( jQuery( window ).height() );
+				} );
+			} );' );
 		}
 	}
-
-
-	/**
-	 * Check if we can display a widget container when access is denied to collection by current user
-	 *
-	 * @param string Widget container key: 'header', 'page_top', 'menu', 'sidebar', 'sidebar2', 'footer'
-	 * @return boolean TRUE to display
-	 */
-	function show_container_when_access_denied( $container_key )
-	{
-		global $Collection, $Blog;
-
-		if( $Blog->has_access() )
-		{	// If current user has an access to this collection then don't restrict containers:
-			return true;
-		}
-
-		// Get what containers are available for this skin when access is denied or requires login:
-		$access = $this->get_setting( 'access_login_containers' );
-
-		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
-	}
-
 }
-
 ?>

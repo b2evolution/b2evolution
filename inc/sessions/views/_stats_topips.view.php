@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 require_once dirname(__FILE__).'/_stats_view.funcs.php';
 
-global $UserSettings, $Plugins;
+global $UserSettings, $Plugins, $blog, $sec_ID;
 
 $SQL = new SQL();
 $SQL->SELECT( 'SQL_NO_CACHE hit_remote_addr, COUNT( hit_ID ) AS hit_count_by_IP' );
@@ -31,6 +31,20 @@ $count_SQL = new SQL();
 $count_SQL->SELECT( 'SQL_NO_CACHE hit_ID' );
 $count_SQL->FROM( 'T_hitlog' );
 $count_SQL->GROUP_BY( 'hit_remote_addr' );
+
+if( ! empty( $sec_ID ) )
+{	// Filter by section:
+	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+	$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
+	$count_SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+	$count_SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
+}
+if( $blog > 0 )
+{	// Filter by collection:
+	$SQL->WHERE_and( 'hit_coll_ID = '.$blog );
+	$count_SQL->WHERE_and( 'hit_coll_ID = '.$blog );
+}
+
 $count_top_IPs = count( $DB->get_col( $count_SQL->get() ) );
 
 $Results = new Results( $SQL->get(), 'topips_', ''/*an order is static in SQL query*/, $UserSettings->get( 'results_per_page' ), $count_top_IPs );
@@ -42,7 +56,7 @@ $Results->cols[] = array(
 		'th' => T_('IP'),
 		'td' => '$hit_remote_addr$',
 		'th_class' => 'shrinkwrap',
-		'td_class' => 'compact_data'
+		'td_class' => 'nowrap'
 	);
 
 // A count of the hits
@@ -55,7 +69,7 @@ $Results->cols[] = array(
 // Reverse DNS
 $Results->cols[] = array(
 		'th' => T_('Reverse DNS'),
-		'td_class' => 'nowrap compact_data',
+		'td_class' => 'nowrap',
 		'td' => '%gethostbyaddr( #hit_remote_addr# )%%evo_flush()%'
 	);
 

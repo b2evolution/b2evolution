@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
@@ -14,24 +14,33 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 emailskin_include( '_email_header.inc.txt.php', $params );
 // ------------------------------- END OF EMAIL HEADER --------------------------------
 
-global $admin_url, $baseurl;
+global $admin_url;
 
 // Default params:
 $params = array_merge( array(
-		'tasks' => array(),
+		'timeout_tasks' => array(),
+		'error_task'    => NULL,
 	), $params );
 
-echo T_('The following scheduled tasks have ended with error:')."\n";
-if( is_array( $params['tasks'] ) && count( $params['tasks'] ) )
-{
-	foreach( $params['tasks'] as $task_ID => $task )
+if( $params['error_task'] !== NULL )
+{	// Display an error task:
+	echo T_('The following scheduled task has ended with an error:')."\n";
+	echo $params['error_task']['name'].' (#'.$params['error_task']['ID'].' - '.$admin_url.'?ctrl=crontab&action=view&cjob_ID='.$params['error_task']['ID'].'):'."\n";
+	echo ltrim( $params['error_task']['message'], "\n" );
+	echo "\n\n";
+}
+
+if( is_array( $params['timeout_tasks'] ) && count( $params['timeout_tasks'] ) )
+{	// Display timeout tasks:
+	echo T_('The following scheduled tasks have timed out:')."\n";
+	foreach( $params['timeout_tasks'] as $task_ID => $task_name )
 	{
-		echo '- '.$task['name'].' (#'.$task_ID.'): '.T_( $task['message'] )."\n";
+		echo '- '.$task_name.' (#'.$task_ID.' - '.$admin_url.'?ctrl=crontab&action=view&cjob_ID='.$task_ID.')'."\n";
 	}
 }
 echo "\n";
 
-$tasks_url = $admin_url.'?ctrl=crontab&ctst_timeout=1&ctst_error=1';
+$tasks_url = $admin_url.'?ctrl=crontab&ctst_status[]=warning&ctst_status[]=timeout&ctst_status[]=error&ctst_status[]=imap_error';
 echo sprintf( T_('To see more information about these tasks click here: %s'), $tasks_url );
 
 // Footer vars:

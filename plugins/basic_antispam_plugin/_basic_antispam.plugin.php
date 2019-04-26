@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package plugins
@@ -32,7 +32,7 @@ class basic_antispam_plugin extends Plugin
 	var $name = 'Basic Antispam';
 	var $code = 'b2evBAspm';
 	var $priority = 60;
-	var $version = '6.9.3';
+	var $version = '7.0.1';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $number_of_installs = 1;
@@ -115,6 +115,30 @@ class basic_antispam_plugin extends Plugin
 					'defaultvalue' => '0',
 				),
 
+			);
+	}
+
+
+	/**
+	 * Define the PER-GROUP settings of the plugin here. These can then be edited by each user.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 * @param array Associative array of parameters.
+	 *    'for_editing': true, if the settings get queried for editing;
+	 *                   false, if they get queried for instantiating
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function GetDefaultGroupSettings( & $params )
+	{
+		return array(
+				'comment_throttling' => array(
+					'label'        => T_('Minimum comment interval'),
+					'note'         => T_('Users from this group will only be able to post a comment every x seconds.').' '.T_('0 to disable it.'),
+					'type'         => 'integer',
+					'defaultvalue' => 2,
+					'size'         => 3,
+					'valid_range'  => array( 'min' => 0 ),
+				),
 			);
 	}
 
@@ -216,8 +240,19 @@ class basic_antispam_plugin extends Plugin
 	{
 		$comment_Item = & $params['Comment']->get_Item();
 
-		$min_comment_interval = $this->Settings->get( 'min_comment_interval' );
-		if( $params['action'] != 'preview' && ! empty( $min_comment_interval ) )
+		if( is_logged_in() )
+		{	// If user is logged in then we can get minimum comment interval per group:
+			global $current_User;
+			$min_comment_interval = $this->GroupSettings->get( 'comment_throttling', $current_User->grp_ID );
+		}
+		else
+		{	// Use plugin setting of minimum comment interval for all anonymous users:
+			$min_comment_interval = $this->Settings->get( 'min_comment_interval' );
+		}
+
+		if( $params['action'] != 'preview' &&
+		    ! empty( $min_comment_interval ) &&
+		    ! $params['Comment']->is_meta() )
 		{	// If a comment posting should be blocked by minumum interval:
 			global $Hit, $DB, $localtimenow;
 
@@ -227,7 +262,7 @@ class basic_antispam_plugin extends Plugin
 			$SQL->WHERE( 'comment_author_IP = '.$DB->quote( $Hit->IP ) );
 			$SQL->WHERE_or( 'comment_author_email = '.$DB->quote( $params['Comment']->get_author_email() ) );
 
-			if( $last_comment_time = $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) )
+			if( $last_comment_time = $DB->get_var( $SQL ) )
 			{	// If last comment is found from current IP or email address:
 				$last_comment_time = mysql2date( 'U', $last_comment_time );
 				$new_comment_time = mysql2date( 'U', date( 'Y-m-d H:i:s', $localtimenow ) );
@@ -306,6 +341,34 @@ class basic_antispam_plugin extends Plugin
 
 
 	/**
+	 * Callback for preg_replace_callback ini apply_nofollow()
+	 */
+	private static function _apply_nofollow_callback( $matches )
+	{
+		if( preg_match( '~\brel=([\'"])(.*?)\1~', $matches[2], $match ) )
+		{ // there is already a rel attrib:
+			$rel_values = explode( " ", $match[2] );
+
+			if( ! in_array( 'nofollow', $rel_values ) )
+			{
+				$rel_values[] = 'nofollow';
+			}
+
+			return $matches[1]
+				.preg_replace(
+					'~\brel=([\'"]).*?\1~',
+					'rel=$1'.implode( " ", $rel_values ).'$1',
+					$matches[2] )
+				.">";
+		}
+		else
+		{
+			return $matches[1].$matches[2].' rel="nofollow">';
+		}
+	}
+
+
+	/**
 	 * Do we want to apply rel="nofollow" tag?
 	 *
 	 * @return boolean
@@ -327,27 +390,7 @@ class basic_antispam_plugin extends Plugin
 			return;
 		}
 
-		$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', create_function( '$m', '
-				if( preg_match( \'~\brel=([\\\'"])(.*?)\1~\', $m[2], $match ) )
-				{ // there is already a rel attrib:
-					$rel_values = explode( " ", $match[2] );
-
-					if( ! in_array( \'nofollow\', $rel_values ) )
-					{
-						$rel_values[] = \'nofollow\';
-					}
-
-					return $m[1]
-						.preg_replace(
-							\'~\brel=([\\\'"]).*?\1~\',
-							\'rel=$1\'.implode( " ", $rel_values ).\'$1\',
-							$m[2] )
-						.">";
-				}
-				else
-				{
-					return $m[1].$m[2].\' rel="nofollow">\';
-				}' ), $data );
+		$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', array( 'basic_antispam_plugin', '_apply_nofollow_callback' ), $data );
 	}
 
 

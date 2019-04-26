@@ -5,7 +5,7 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * {@internal License choice
  * - If you have received this file as part of a package, please find the license.txt file in
@@ -34,6 +34,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_info_line_Widget extends ComponentWidget
 {
+	var $icon = 'info';
+
 	/**
 	 * Constructor
 	 */
@@ -103,13 +105,13 @@ class item_info_line_Widget extends ComponentWidget
 					'label' => T_( 'Flag icon' ),
 					'note' => T_( 'Display flag icon' ),
 					'type' => 'checkbox',
-					'defaultvalue' => true
+					'defaultvalue' => true,
 				),
 				'permalink_icon' => array(
 					'label' => T_( 'Permalink icon' ),
 					'note' => T_( 'Display permalink icon' ),
 					'type' => 'checkbox',
-					'defaultvalue' => false
+					'defaultvalue' => false,
 				),
 				'before_author' => array(
 					'label' => T_( 'Before author' ),
@@ -121,7 +123,7 @@ class item_info_line_Widget extends ComponentWidget
 						array( 'none', T_( 'None' ) )
 					),
 					'defaultvalue' => 'posted_by',
-					'field_lines' => true
+					'field_lines' => true,
 				),
 				'date_format' => array(
 					'label' => T_( 'Date format' ),
@@ -134,7 +136,7 @@ class item_info_line_Widget extends ComponentWidget
 						array( 'none', T_('None') )
 					),
 					'defaultvalue' => 'extended',
-					'field_lines' => true
+					'field_lines' => true,
 				),
 				'time_format' => array(
 					'label' => T_( 'Time format' ),
@@ -146,7 +148,7 @@ class item_info_line_Widget extends ComponentWidget
 						array( 'none', T_('None') )
 					),
 					'defaultvalue' => 'none',
-					'field_lines' => true
+					'field_lines' => true,
 				),
 				'display_date' => array(
 					'label' => T_('Date and time to use'),
@@ -157,26 +159,32 @@ class item_info_line_Widget extends ComponentWidget
 						array( 'date_created', T_('Date created') )
 					),
 					'defaultvalue' => in_array( $Blog->type, array( 'forum', 'group' ) ) ? 'date_created' : 'issue_date',
-					'field_lines' => true
+					'field_lines' => true,
 				),
 				'last_touched' => array(
 					'label' => T_( 'Last touched' ),
 					'note' => T_( 'Display date and time when item/post was last touched' ),
 					'type' => 'checkbox',
-					'defaultvalue' => false
+					'defaultvalue' => false,
+				),
+				'contents_updated' => array(
+					'label' => T_( 'Contents last updated' ),
+					'note' => T_( 'Display date and time when item/post contents (title, content, URL or attachments) were last updated' ),
+					'type' => 'checkbox',
+					'defaultvalue' => false,
 				),
 				'category' => array(
 					'label' => T_( 'Category' ),
 					'note' => T_( 'Display item/post category' ),
 					'type' => 'checkbox',
-					'defaultvalue' => true
+					'defaultvalue' => true,
 				),
 				'edit_link' => array(
 					'label' => T_( 'Edit link' ),
 					'note' => T_( 'Display link to edit the item/post' ),
 					'type' => 'checkbox',
-					'defaultvalue' => false
-				)
+					'defaultvalue' => false,
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -200,54 +208,38 @@ class item_info_line_Widget extends ComponentWidget
 		global $Item;
 
 		$params = array_merge( array(
-			'author_link_text' => 'preferredname'
+			'author_link_text' => 'preferredname',
+			'block_body_start' => '<div class="small text-muted">',
+			'block_body_end'   => '</div>',
+			'widget_item_info_line_before'  => '<span class="small text-muted">',
+			'widget_item_info_line_after'   => '</span>',
+			'widget_item_info_line_params'  => array(),
 		), $params );
 
 		$this->init_display( $params );
 
-		echo $this->disp_params['block_start'];
-		$this->disp_title();
-		echo $this->disp_params['block_body_start'];
-
-		// Flag:
-		if( $this->disp_params['flag_icon'] )
-		{
-			$Item->flag();
+		if( empty( $Item ) )
+		{ // Don't display this widget when there is no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
+			return false;
 		}
 
-		// Permalink:
-		if( $this->disp_params['permalink_icon'] )
+		// Get default before author:
+		switch( $this->disp_params['before_author'] )
 		{
-			$Item->permanent_link( array(
-					'text' => '#icon#',
-					'after' => ' ',
-				) );
+			case 'posted_by':
+				$before_author = T_('Posted by').' ';
+				break;
+
+			case 'started_by':
+				$before_author = T_('Started by').' ';
+				break;
+
+			default:
+				$before_author = '';
 		}
 
-		// Author
-		if( $this->disp_params['before_author'] != 'none' )
-		{
-			switch( $this->disp_params['before_author'] )
-			{
-				case 'posted_by':
-					$before_author = T_('Posted by').' ';
-					break;
-
-				case 'started_by':
-					$before_author = T_('Started by').' ';
-					break;
-
-				default:
-					$before_author = '';
-			}
-			$Item->author( array(
-				'before'    => /* TRANS: author name */ $before_author,
-				'after'     => ' ',
-				'link_text' => $params['author_link_text'],
-			) );
-		}
-
-		// We want to display the post time:
+		// Get datetime format:
 		$date_format = '';
 		if( $this->disp_params['date_format'] != 'none' )
 		{
@@ -266,7 +258,6 @@ class item_info_line_Widget extends ComponentWidget
 					break;
 			}
 		}
-
 		$time_format = '';
 		if( $this->disp_params['time_format'] != 'none' )
 		{
@@ -281,63 +272,194 @@ class item_info_line_Widget extends ComponentWidget
 					break;
 			}
 		}
+		$before_post_time = $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ';
 
+		$widget_params = array_merge( array(
+			'before_flag'         => '',
+			'after_flag'          => '',
+			'before_permalink'    => '',
+			'after_permalink'     => ' ',
+			'permalink_text'      => '#icon#',
+			'before_author'       => $before_author,
+			'after_author'        => ' ',
+			'before_post_time'    => $before_post_time,
+			'after_post_time'     => ' ',
+			'before_categories'   => T_('in').' ',
+			'after_categories'    => ' ',
+			'before_last_touched' => '<span class="text-muted"> &ndash; '.T_('Last touched').': ',
+			'after_last_touched'  => '</span>',
+			'before_last_updated' => '<span class="text-muted"> &ndash; '.T_('Contents updated').': ',
+			'after_last_updated'  => '</span>',
+			'before_edit_link'    => ' &bull; ',
+			'after_edit_link'     => '',
+			'edit_link_text'      => '#',
+			'format'              => '',
+		), $params['widget_item_info_line_params'] );
+
+		ob_start();
+
+		// Flag:
+		$flag = '';
+		if( $this->disp_params['flag_icon'] )
+		{
+			$Item->flag( array(
+					'before' => $widget_params['before_flag'],
+					'after'  => $widget_params['after_flag'],
+				)	);
+			$flag = ob_get_contents();
+			ob_clean();
+		}
+
+		// Permalink:
+		$permalink = '';
+		if( $this->disp_params['permalink_icon'] )
+		{
+			$Item->permanent_link( array(
+					'text'   => $widget_params['permalink_text'],
+					'before' => $widget_params['before_permalink'],
+					'after'  => $widget_params['after_permalink'],
+				) );
+			$permalink = ob_get_contents();
+			ob_clean();
+		}
+
+		// Author:
+		$author = '';
+		if( $this->disp_params['before_author'] != 'none' )
+		{
+			$Item->author( array(
+					'before'    => $widget_params['before_author'],
+					'after'     => $widget_params['after_author'],
+					'link_text' => $params['author_link_text'],
+				) );
+			$author = ob_get_contents();
+			ob_clean();
+		}
+
+		// We want to display the post time:
+		$post_time = '';
 		if( $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' )
 		{
 			switch( $this->disp_params['display_date'] )
 			{
 				case 'issue_date':
 					$Item->issue_time( array(
-							'before'      => $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ',
-							'after'       => ' ',
-							'time_format' => $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format
+							'before'      => $widget_params['before_post_time'],
+							'after'       => $widget_params['after_post_time'],
+							'time_format' => $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format
 						) );
 					break;
 
 				case 'date_created':
-					echo $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ';
-					echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->datecreated ).' ';
+					echo $widget_params['before_post_time'];
+					echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
+					echo $widget_params['after_post_time'];
 					break;
 			}
+			$post_time = ob_get_contents();
+			ob_clean();
 		}
 
-
-		// Categories
+		// Categories:
+		$categories = '';
 		if( $this->disp_params['category'] )
 		{
 			$Item->categories( array(
-				'before'          => /* TRANS: category name(s) */ T_('in').' ',
-				'after'           => ' ',
+				'before'          => $widget_params['before_categories'],
+				'after'           => $widget_params['after_categories'],
 				'include_main'    => true,
 				'include_other'   => true,
 				'include_external'=> true,
 				'link_categories' => true,
 			) );
+			$categories = ob_get_contents();
+			ob_clean();
 		}
 
-		// Last touched
+		// Last touched:
+		$last_touched = '';
 		if( $this->disp_params['last_touched'] )
 		{
-			echo '<span class="text-muted"> &ndash; '
-				.T_('Last touched').': '
-				.mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) )
-				.$Item->get_refresh_last_touched_link()
-				.'</span>';
+			echo $widget_params['before_last_touched'];
+			echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) );
+			echo $widget_params['after_last_touched'];
+			$last_touched = ob_get_contents();
+			ob_clean();
 		}
 
-		// Link for editing
+		// Contents last updated:
+		$last_updated = '';
+		if( $this->disp_params['contents_updated'] )
+		{
+			echo $widget_params['before_last_updated'];
+			echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
+			echo $widget_params['after_last_updated'];
+			$last_updated = ob_get_contents();
+			ob_clean();
+		}
+
+		// Link for editing:
+		$edit_link = '';
 		if( $this->disp_params['edit_link'] )
 		{
 			$Item->edit_link( array(
-				'before'    => ' &bull; ',
-				'after'     => '',
-			) );
+					'before' => $widget_params['before_edit_link'],
+					'after'  => $widget_params['after_edit_link'],
+					'text'   => $widget_params['edit_link_text'],
+				) );
+			$edit_link = ob_get_contents();
+			ob_clean();
 		}
 
-		echo $this->disp_params['block_body_end'];
-		echo $this->disp_params['block_end'];
+		ob_end_clean();
 
-		return true;
+		// Item info line format:
+		$format = empty( $widget_params['format'] ) ? '$flag$$permalink$$author$$post_time$$categories$$last_touched$$last_updated$$edit_link$' : $widget_params['format'];
+
+		$info_line = str_replace(
+				array( '$flag$', '$permalink$', '$author$', '$post_time$', '$last_touched$', '$last_updated$', '$categories$', '$edit_link$' ),
+				array( $flag, $permalink, $author, $post_time, $last_touched, $last_updated, $categories, $edit_link ), $format
+			);
+
+		$display_widget = $this->disp_params['flag_icon'] || $this->disp_params['permalink_icon'] || $this->disp_params['before_author'] != 'none'
+				|| $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' || $this->disp_params['category']
+				|| $this->disp_params['last_touched'] || $this->disp_params['contents_updated'] || $this->disp_params['edit_link'];
+
+		if( ! $display_widget && empty( $info_line ) )
+		{	// Display error message when nothing to display because of widget settings:
+			global $admin_url;
+
+			echo $this->disp_params['block_start'];
+			$this->disp_title();
+			echo $this->disp_params['block_body_start'];
+			echo '<span class="evo_param_error">'.sprintf( T_('Nothing to display! Check "%s" <a %s>widget settings</a>.'),
+					$this->get_name(), 'href="'.url_add_param( $admin_url, array( 'ctrl' => 'widgets', 'action' => 'edit', 'wi_ID' => $this->ID ) ).'"' ).'</span>';
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+
+			return true;
+		}
+
+		if( ! empty( $info_line ) )
+		{
+			echo $this->disp_params['block_start'];
+
+			$this->disp_title();
+
+			echo $this->disp_params['block_body_start'];
+
+			echo $params['widget_item_info_line_before'];
+			echo $info_line;
+			echo $params['widget_item_info_line_after'];
+
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+
+			return true;
+		}
+
+		$this->display_debug_message();
+		return false;
 	}
 }
 

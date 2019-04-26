@@ -550,6 +550,20 @@ function get_icon_info( $name )
 			'fa' => 'circle',
 			'color' => '#5bc0de'
 		);
+		case 'bullet_dark_blue': return array(
+			'alt' => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 32, 192 ),
+			'fa' => 'circle',
+			'color' => '#337ab7'
+		);
+		case 'bullet_cyan': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 32, 192 ),
+			'fa' => 'circle',
+			'color' => '#00FFFF'
+		);
 		case 'bullet_red': return array(
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
@@ -563,6 +577,13 @@ function get_icon_info( $name )
 			'xy' => array( 64, 192 ),
 			'fa' => 'circle',
 			'color' => '#F60'
+		);
+		case 'bullet_redorange': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 64, 192 ),
+			'fa' => 'circle',
+			'color' => '#FF8000'
 		);
 		case 'bullet_green': return array(
 			'alt'  => '&bull;',
@@ -592,6 +613,13 @@ function get_icon_info( $name )
 			'fa' => 'circle-thin',
 			'color' => '#CCC'
 		);
+		case 'bullet_gray': return array(
+			'alt'  => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 0, 192 ),
+			'fa' => 'circle',
+			'color' => '#BBB'
+		);
 		case 'bullet_magenta': return array(
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),
@@ -605,14 +633,14 @@ function get_icon_info( $name )
 			'legend' => T_('Activate'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 64, 96 ),
-			'fa' => 'toggle-on'
+			'fa' => 'toggle-off'
 		);
 		case 'deactivate': return array(
 			'alt'  => /* TRANS: Short for "Deactivate(d)" */ T_('Deact.'),
 			'legend' => T_('Deactivate'),
 			'size' => array( 16, 16 ),
 			'xy' => array( 80, 96 ),
-			'fa' => 'toggle-off'
+			'fa' => 'toggle-on'
 		);
 		case 'enabled': return array(
 			'alt'  => /* TRANS: Short for "Activate(d)" */ T_('Act.'),
@@ -664,7 +692,7 @@ function get_icon_info( $name )
 		case 'manual': return array(
 			'rollover' => true,
 			'alt'  => T_('Help'),
-			'legend' => T_('Online Manual'),
+			'legend' => T_('Online manual'),
 			'size' => array( 16, 15 ),
 			'xy' => array( 128, 96 ),
 			'glyph' => 'book',
@@ -912,6 +940,27 @@ function get_icon_info( $name )
 			'glyph' => 'play',
 			'fa' => 'play'
 		);
+		case 'pause': return array( // used to pause automation
+			'alt'  => '||',
+			'size' => array( 14, 14 ),
+			'xy' => array( 64, 128 ),
+			'glyph' => 'pause',
+			'fa' => 'pause'
+		);
+		case 'rewind': return array( // Used to resend email campaign ( rewind user back to previous state )
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'rewind',
+			'fa' => 'backward',
+		);
+		case 'forward': return array( // Used to skip email campaign for user
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'forward',
+			'fa' => 'forward',
+		);
 
 		case 'feed': return array(
 			'alt'	 => T_('XML Feed'),
@@ -1067,6 +1116,14 @@ function get_icon_info( $name )
 			'fa' => 'plus-circle',
 			'color' => '#337ab7'
 		);
+		case 'add__cyan': return array(
+			'alt'  => T_('Add'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 32, 224 ),
+			'glyph' => 'plus-sign',
+			'fa' => 'plus-circle',
+			'color' => '#60b9e1'
+		);
 
 		case 'add__yellow': return array(
 			'alt'  => T_('Add'),
@@ -1109,7 +1166,19 @@ function get_icon_info( $name )
 			'alt'  => T_('Rotate this picture 180&deg;'),
 			'size' => array( 14, 16 ),
 			'xy' => array( 96, 224 ),
-			'fa' => 'rotate-right'
+			'fa' => 'undo fa-flip-horizontal'
+		);
+		case 'flip_horizontal': return array(
+			'alt'  => T_('Flip this picture horizontally'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 125, 254 ),
+			'fa' => 'sort fa-rotate-90',
+		);
+		case 'flip_vertical': return array(
+			'alt'  => T_('Flip this picture vertically'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 144, 255 ),
+			'fa' => 'sort',
 		);
 		case 'crop': return array(
 			'alt'  => T_('Crop this picture'),
@@ -1139,6 +1208,15 @@ function get_icon_info( $name )
 			'size' => array( 16, 16 ),
 			'xy' => array( 64, 128 ),
 			'fa' => 'hand-paper-o',
+			'color' => '#C00'
+		);
+
+		case 'stop_square': return array(
+			'alt'  => T_('Stop'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 64, 128 ),
+			'glyph' => 'stop',
+			'fa' => 'stop',
 			'color' => '#C00'
 		);
 
@@ -1251,6 +1329,36 @@ function get_icon_info( $name )
 			'xy' => array( 96, 96 ),
 			'glyph' => 'link',
 			'fa' => 'link'
+		);
+
+		case 'designer_widget_up': return array(
+			'alt'  => T_('Up'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 96, 80 ),
+			'glyph' => 'circle-arrow-up',
+			'fa' => 'arrow-circle-up',
+		);
+		case 'designer_widget_down': return array(
+			'alt'  => T_('Down'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 64, 80 ),
+			'glyph' => 'circle-arrow-down',
+			'fa' => 'arrow-circle-down',
+		);
+		case 'designer_widget_list': return array(
+			'alt'  => T_('List'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 144, 16 ),
+			'glyph' => 'list',
+			'fa' => 'list',
+		);
+
+		case 'asterisk': return array(
+			'alt' => '',
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0 ),
+			'glyph' => 'asterisk',
+			'fa' => 'asterisk'
 		);
 	}
 }

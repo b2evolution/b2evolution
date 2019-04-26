@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  *
@@ -32,6 +32,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 	$Form->hidden_ctrl();
 	$Form->hidden( 'action', 'update' );
 	$Form->hidden( 'skin_ID', $edited_Skin->ID );
+	$Form->hidden( 'tab', get_param( 'tab' ) );
 
 	$Form->begin_fieldset( T_('Skin properties').get_manual_link( 'skin-system-settings' ) );
 
@@ -52,16 +53,33 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				echo '<span>'.( isset( $edited_Skin->version ) ? $edited_Skin->version : 'unknown' ).'</span>';
 			echo '</div>';
 
-			// Skin type
+			// Site Skin:
 			echo '<div class="skin_setting_row">';
-				echo '<label>'.T_('Skin type').':</label>';
-				echo '<span>'.$edited_Skin->type.'</span>';
+				echo '<label>'.T_('Site Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_site_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
+
+			// Collection Skin:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Collection Skin').':</label>';
+				echo '<span>'.( $edited_Skin->provides_collection_skin() ? T_('Yes') : T_('No') ).'</span>';
+			echo '</div>';
+
+			// Skin format:
+			echo '<div class="skin_setting_row">';
+				echo '<label>'.T_('Skin format').':</label>';
+				echo '<span>'.get_skin_type_title( $edited_Skin->type ).'</span>';
 			echo '</div>';
 
 			// Containers
 			if( $skin_containers = $edited_Skin->get_containers() )
 			{
-				$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers ).'</li></ul>';
+				$skin_containers_names = array();
+				foreach( $skin_containers as $skin_container_data )
+				{
+					$skin_containers_names[] = $skin_container_data[0];
+				}
+				$container_ul = '<ul><li>'.implode( '</li><li>', $skin_containers_names ).'</li></ul>';
 			}
 			else
 			{
@@ -78,20 +96,71 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 
 			$Form->text_input( 'skin_name', $edited_Skin->name, 32, T_('Skin name'), T_('As seen by blog owners'), array( 'required'=>true ) );
 
-			$Form->radio( 'skin_type',
-										$edited_Skin->type,
-										 array(
-														array( 'normal', T_( 'Normal' ), T_( 'Normal skin for general browsing' ) ),
-														array( 'mobile', T_( 'Mobile' ), T_( 'Mobile skin for mobile phones browsers' ) ),
-														array( 'tablet', T_( 'Tablet' ), T_( 'Tablet skin for tablet browsers' ) ),
-														array( 'rwd', T_( 'RWD' ), T_( 'Skin can be used for general, mobile phones and tablet browsers' ) ),
-														array( 'feed', T_( 'XML Feed' ), T_( 'Special system skin for XML feeds like RSS and Atom' ) ),
-														array( 'sitemap', T_( 'XML Sitemap' ), T_( 'Special system skin for XML sitemaps' ) ),
-													),
-											T_( 'Skin type' ),
-											true // separate lines
-									 );
+			$skin_types = get_skin_types();
+			$skin_types_options = array();
+			foreach( $skin_types as $skin_type_key => $skin_type_data )
+			{
+				$skin_types_options[] = array( $skin_type_key, $skin_type_data[0], $skin_type_data[1] );
+			}
+			$Form->radio( 'skin_type', $edited_Skin->type, $skin_types_options, T_( 'Skin type' ), true );
 			$Form->end_fieldset();
+
+			$SQL = 'SELECT a.* FROM(
+					SELECT blog_ID, blog_name, "normal" AS skin_type, "1" AS skin_type_order
+					FROM T_blogs
+					WHERE blog_normal_skin_ID = '.$edited_Skin->ID.'
+					UNION ALL
+					SELECT blog_ID, blog_name, "mobile" AS skin_type, "2" AS skin_type_order
+					FROM T_blogs
+					WHERE blog_mobile_skin_ID = '.$edited_Skin->ID.'
+					UNION ALL
+					SELECT blog_ID, blog_name, "tablet" AS skin_type, "3" AS skin_type_order
+					FROM T_blogs
+					WHERE blog_tablet_skin_ID = '.$edited_Skin->ID.' ) AS a
+					ORDER BY blog_ID ASC, skin_type_order ASC';
+
+			$count_SQL = 'SELECT SUM( IF( blog_normal_skin_ID = '.$edited_Skin->ID.', 1, 0 )
+					+ IF( blog_mobile_skin_ID = '.$edited_Skin->ID.', 1, 0 )
+					+ IF( blog_tablet_skin_ID = '.$edited_Skin->ID.', 1, 0 ) )
+					FROM T_blogs
+					WHERE blog_normal_skin_ID = '.$edited_Skin->ID.' OR blog_mobile_skin_ID = '.$edited_Skin->ID.' OR blog_tablet_skin_ID = '.$edited_Skin->ID;
+
+			$Results = new Results( $SQL, '', '', 1000, $count_SQL );
+			$Results->title = T_('Used by').'...';
+			$Results->cols[] = array(
+				'th' => T_('Collection ID'),
+				'td_class' => 'shrinkwrap',
+				'td' => '$blog_ID$',
+			);
+
+			function display_skin_setting_link( $row )
+			{
+				if( empty( $row->blog_name ) )
+				{
+					return;
+				}
+				$url_params = 'tab=skin&amp;blog='.$row->blog_ID;
+
+				if( in_array( $row->skin_type, array( 'mobile', 'tablet' ) ) )
+				{
+					$url_params .= '&amp;skin_type='.str_replace( '_skin_ID', '', $row->skin_type );
+				}
+
+				return '<a href="'.get_dispctrl_url( 'coll_settings', $url_params ).'">'.$row->blog_name.'</a>';
+			}
+
+			$Results->cols[] = array(
+				'th' => T_('Collection name'),
+				'td' => '%display_skin_setting_link( {row} )%',
+			);
+
+			$Results->cols[] = array(
+				'th' => T_('Skin type'),
+				'td' => '%get_skin_type_title( #skin_type# )%',
+				'td_class' => 'text-center'
+			);
+
+			$Results->display();
 
 		echo '</div>';
 

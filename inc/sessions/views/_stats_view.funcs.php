@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -26,7 +26,7 @@ function hits_results( & $Results, $params = array() )
 			'default_order' => '--D'
 		), $params );
 
-	global $blog, $Session, $sess_ID;
+	global $blog, $sec_ID, $Session, $sess_ID;
 	global $preset_results_title, $preset_referer_type, $preset_filter_all_url;
 	global $hide_columns, $admin_url;
 
@@ -37,13 +37,17 @@ function hits_results( & $Results, $params = array() )
 	$param_prefix = 'results_'.$Results->param_prefix;
 	$tab = get_param( 'tab' );
 
+	// Initialize params to filter by selected collection and/or group:
+	$section_params = empty( $blog ) ? '' : '&amp;blog='.$blog;
+	$section_params .= empty( $sec_ID ) ? '' : '&amp;sec_ID='.$sec_ID;
+
 	$filter_presets = array();
-	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;'.$param_prefix.'order='.$params['default_order'] );
+	$filter_presets['all'] = array( T_('All'), isset( $preset_filter_all_url ) ? $preset_filter_all_url : $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;'.$param_prefix.'order='.$params['default_order'] );
 	if( !isset( $preset_referer_type ) )
 	{	// Show these presets only when referer type is not set
-		$filter_presets['all_but_curr'] = array( T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['direct_hits'] = array( T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
-		$filter_presets['refered_hits'] = array( T_('Refered hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.'&amp;blog='.$blog.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['all_but_curr'] = array( T_('All but current session'), $admin_url.'?ctrl=stats&amp;tab='.$tab.$section_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['direct_hits'] = array( T_('Direct hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=direct&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
+		$filter_presets['refered_hits'] = array( T_('Refered hits'), $admin_url.'?ctrl=stats&amp;agent_type=browser&amp;tab='.$tab.$section_params.'&amp;referer_type=referer&amp;exclude=0&amp;'.$param_prefix.'order='.$params['default_order'] );
 	}
 
 	$Results->filter_area = array(
@@ -52,26 +56,17 @@ function hits_results( & $Results, $params = array() )
 		'presets' => $filter_presets
 		);
 
-	if( $sess_ID == NULL )
-	{
-		$session_link = '%stat_session_hits( #sess_ID#, #sess_ID# )%';
-	}
-	else
-	{
-		$session_link = '<a href="?ctrl=stats&amp;tab='.$tab.'&amp;blog='.$blog.'" title="'.T_( 'Show all sessions' ).'">$sess_ID$</a>';
-	}
-
 	$Results->cols[] = array(
 			'th' => T_('Session'),
 			'order' => 'hit_sess_ID',
-			'td_class' => 'right compact_data',
-			'td' => $session_link,
+			'td_class' => 'right nowrap',
+			'td' => '%stat_session_hits( #sess_ID#, #sess_ID# )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('User'),
 			'order' => 'user_login',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '%stat_session_login( #user_login# )%',
 		);
 
@@ -79,14 +74,14 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Date Time'),
 			'order' => 'hit_ID',
 			'default_dir' => 'D',
-			'td_class' => 'timestamp compact_data',
+			'td_class' => 'timestamp',
 			'td' => '%mysql2localedatetime_spans( #hit_datetime# )%',
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Agent'),
 			'order' => 'hit_agent_type',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '$hit_agent_type$',
 			'extra' => array ( 'style' => 'background-color: %hit_agent_type_color( "#hit_agent_type#" )%;',
 			'format_to_output'	=> false)
@@ -95,7 +90,7 @@ function hits_results( & $Results, $params = array() )
 	$Results->cols[] = array(
 			'th' => T_('Device'),
 			'order' => 'sess_device',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '$sess_device$',
 			'extra' => array ( 'style' => 'background-color: %hit_device_color( "#sess_device#" )%;', 'format_to_output' => false )
 		);
@@ -106,7 +101,7 @@ function hits_results( & $Results, $params = array() )
 				'th_group' => T_('Referer'),
 				'th' => T_('Type'),
 				'order' => 'hit_referer_type',
-				'td_class' => 'shrinkwrap compact_data',
+				'td_class' => 'shrinkwrap',
 				'td' => '$hit_referer_type$',
 				'extra' => array ( 'style' => 'background-color: %hit_referer_type_color( "#hit_referer_type#" )%;',
 					'format_to_output' => false )
@@ -116,7 +111,7 @@ function hits_results( & $Results, $params = array() )
 				'th_group' => T_('Referer'),
 				'th' => T_('Domain'),
 				'order' => 'dom_name',
-				'td_class' => 'nowrap compact_data',
+				'td_class' => 'nowrap',
 				'td' => '<a href="$hit_referer$">$dom_name$</a>',
 			);
 	}
@@ -126,7 +121,7 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Search keywords'),
 			'order' => 'hit_keyphrase',
 			'td' => '%stats_search_keywords( #hit_keyphrase#, 45 )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 
 	// Serp Rank:
@@ -134,7 +129,7 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('SR'),
 			'th_title' => T_('Serp rank'),
 			'order' => 'hit_serprank',
-			'td_class' => 'center compact_data',
+			'td_class' => 'center nowrap',
 			'td' => '$hit_serprank$',
 		);
 
@@ -143,19 +138,19 @@ function hits_results( & $Results, $params = array() )
 			'order' => 'goal_name',
 			'default_dir' => 'D',
 			'td' => '$goal_name$',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Collection'),
 			'order' => 'hit_coll_ID',
 			'td' => '$blog_shortname$',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 	$Results->cols[] = array(
 			'th' => T_('Hit type'),
 			'order' => 'hit_type',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'td' => '$hit_type$',
 			'extra' => array (	'style'				=> 'background-color: %hit_type_color( "#hit_type#" )%',
 								'format_to_output'	=> false)
@@ -165,19 +160,19 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Requested URI'),
 			'order' => 'hit_uri',
 			'td' => '%stats_format_req_URI( #hit_coll_ID#, #hit_uri#, 40, #hit_disp#, #hit_ctrl#, #hit_action# )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 	$Results->cols[] = array(
 			'th' => T_('HTTP resp'),
 			'order' => 'hit_response_code',
 			'td' => '$hit_response_code$',
-			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap compact_data'
+			'td_class' => '%hit_response_code_class( #hit_response_code# )% shrinkwrap'
 		);
 	$Results->cols[] = array(
 			'th' => T_('HTTP meth'),
 			'order' => 'hit_method',
 			'td' => '$hit_method$',
-			'td_class' => 'shrinkwrap compact_data',
+			'td_class' => 'shrinkwrap',
 			'extra' => array(
 					'style' => '%hit_method_style( "#hit_method#" )%',
 					'format_to_output'=> false
@@ -188,14 +183,14 @@ function hits_results( & $Results, $params = array() )
 			'th' => T_('Remote IP'),
 			'order' => 'hit_remote_addr',
 			'td' => '%disp_clickable_log_IP( #hit_remote_addr# )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 
 	$Results->cols[] = array(
 			'th' => T_('Agent Name'),
 			'order' => 'hit_agent_ID',
 			'td' => '%get_hit_agent_name_by_ID( #hit_agent_ID# )%',
-			'td_class' => 'compact_data'
+			'td_class' => 'nowrap'
 		);
 }
 
@@ -273,14 +268,13 @@ function filter_hits( & $Form )
  */
 function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp = NULL, $hit_ctrl = NULL, $hit_action = NULL)
 {
-	if( ! empty( $hit_coll_ID ) )
-	{
-		$BlogCache = & get_BlogCache();
-		$tmp_Blog = & $BlogCache->get_by_ID( $hit_coll_ID );
+	$BlogCache = & get_BlogCache();
+	if( $tmp_Blog = & $BlogCache->get_by_ID( $hit_coll_ID, false, false ) )
+	{	// Use root url of the requested collection if it still exists in DB:
 		$full_url = $tmp_Blog->get_baseurl_root().$hit_uri;
 	}
 	else
-	{
+	{	// Don't use root url if a request was without collection or it doesn't exist in DB anymore:
 		$full_url = $hit_uri;
 	}
 
@@ -290,6 +284,14 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 	{ // This is an internal search:
 		preg_match( '~[?&]s=([^&#]*)~', $int_search_uri, $res );
 		$hit_uri = sprintf( T_( 'Internal search: %s' ), $res[1] );
+	}
+	elseif( $hit_disp == 'redirect' )
+	{	// This is a redirect:
+		return '['.get_link_tag( $full_url, 'redirect' ).']';
+	}
+	elseif( strpos( $hit_uri, 'email_passthrough.php' ) !== false )
+	{	// This is a click from email message:
+		return '['.get_link_tag( $full_url, 'email_passthrough' ).']';
 	}
 	elseif( utf8_strlen( $hit_uri ) > $max_len )
 	{
@@ -302,6 +304,10 @@ function stats_format_req_URI( $hit_coll_ID, $hit_uri, $max_len = 40, $hit_disp 
 		if( $hit_disp != NULL )
 		{
 			$hit_uri .= '[disp=<a href="'.$full_url.'">'.$hit_disp.'</a>]';
+			if( $hit_disp == 'single' || $hit_disp == 'page' )
+			{	// Display item slug:
+				$hit_uri .= ' <a href="'.$full_url.'">'.preg_replace( '#^.+/([^/]+)$#', '$1', $full_url ).'</a>';
+			}
 		}
 		if( $hit_ctrl != NULL )
 		{
@@ -343,7 +349,7 @@ function stat_session_login( $login )
  */
 function stat_session_hits( $sess_ID, $link_text )
 {
-	global $blog, $admin_url;
+	global $admin_url;
 
 	$tab = get_param( 'tab' );
 	if( empty( $tab ) )
@@ -351,7 +357,7 @@ function stat_session_hits( $sess_ID, $link_text )
 		$tab = 'hits';
 	}
 
-	return '<strong><a href="'.$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;sess_ID='.$sess_ID.'&amp;blog='.$blog.'">'.$link_text.'</a></strong>';
+	return '<strong><a href="'.$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;sess_ID='.$sess_ID.'&amp;blog=0">'.$link_text.'</a></strong>';
 }
 
 
@@ -362,7 +368,7 @@ function stat_session_hits( $sess_ID, $link_text )
  */
 function disp_clickable_log_IP( $hit_remote_addr )
 {
-	global $current_User, $blog;
+	global $current_User, $admin_url;
 	static $perm = NULL;
 
 	if( empty( $perm ) )
@@ -372,7 +378,9 @@ function disp_clickable_log_IP( $hit_remote_addr )
 
 	if( $perm == true )
 	{
-		return '<a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog='.$blog.'">'.$hit_remote_addr.'</a>';
+		return '<a href="?ctrl=stats&tab='.get_param( 'tab' ).'&colselect_submit=Filter+list&sess_ID=&remote_IP='.$hit_remote_addr.'&blog=0">'.$hit_remote_addr.'</a>'
+				.' <a href="'.$admin_url.'?ctrl=antispam&amp;action=whois&amp;query='.$hit_remote_addr.'" onclick="return get_whois_info(\''.$hit_remote_addr.'\');">'
+				.get_icon( 'magnifier', 'imgtag', array( 'title' => T_('Check domain registration (WHOIS)...') ) ).'</a>';
 	}
 	else
 	{
@@ -427,28 +435,28 @@ function disp_color_agent( $hit_agent_type )
  */
 function hit_response_code_class( $hit_response_code )
 {
-	$class = '';
-
-	if( $hit_response_code >= 200 && $hit_response_code < 300 )
-	{
-		$class =  "code_2xx";
+	if( $hit_response_code >= 500 )
+	{	// Server errors:
+		return 'text-danger';
 	}
-	if( $hit_response_code >= 300 && $hit_response_code < 400 )
-	{
-		$class =  "code_3xx";
+	elseif( $hit_response_code >= 400 )
+	{	// Code errors:
+		return 'text-warning';
+	}
+	elseif( $hit_response_code == 304 )
+	{	// 304 means "Not Modified"; Display this as success 2xx codes:
+		return 'text-success';
+	}
+	elseif( $hit_response_code >= 300 )
+	{	// Redirects:
+		return 'text-info';
+	}
+	elseif( $hit_response_code >= 200 )
+	{	// Success pages:
+		return 'text-success';
 	}
 
-	if( $hit_response_code == 304 )
-	{
-		$class =  "code_304";
-	}
-
-	if( $hit_response_code >= 400 )
-	{
-		$class =  "code_4xx";
-	}
-
-	return $class;
+	return '';
 }
 
 
@@ -649,5 +657,645 @@ function hit_method_style( $hit_method )
 	$style = 'color: #'.$color;
 
 	return $style;
+}
+
+
+/**
+ * Get hits data for chart and table for Analytics: Global hits - Summary
+ *
+ * @param string Mode: 'live', 'aggregate', 'compare'
+ * @return array Hits data
+ */
+function get_hits_results_global( $mode = 'live' )
+{
+	global $DB, $blog, $sec_ID;
+
+	// fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
+	// Bug report: http://lists.mysql.com/bugs/36
+	// Solution : CAST to string
+	// TODO: I've also limited this to hit_agent_type "browser" here, according to the change for "referers" (Rev 1.6)
+	//       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
+	$SQL = new SQL( 'Get global hits summary (mode: '.$mode.')' );
+	if( $mode == 'live' )
+	{	// Get the live data:
+		$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits, hit_agent_type, hit_type,
+			EXTRACT( YEAR FROM hit_datetime ) AS year,
+			EXTRACT( MONTH FROM hit_datetime ) AS month,
+			EXTRACT( DAY FROM hit_datetime ) AS day' );
+		$SQL->FROM( 'T_hitlog' );
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE( 'hit_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
+
+		$hits_start_date = NULL;
+		$hits_end_date = date( 'Y-m-d' );
+	}
+	else
+	{	// Get the aggregated/compared data:
+		$SQL->SELECT( 'SUM( hagg_count ) AS hits, hagg_agent_type AS hit_agent_type, hagg_type AS hit_type,
+			EXTRACT( YEAR FROM hagg_date ) AS year,
+			EXTRACT( MONTH FROM hagg_date ) AS month,
+			EXTRACT( DAY FROM hagg_date ) AS day' );
+		$SQL->FROM( 'T_hits__aggregate' );
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
+		// Filter by date:
+		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
+		$SQL->WHERE_and( 'hagg_date >= '.$DB->quote( $hits_start_date ) );
+		$SQL->WHERE_and( 'hagg_date <= '.$DB->quote( $hits_end_date ) );
+	}
+	$SQL->GROUP_BY( 'year, month, day, hit_agent_type, hit_type' );
+	$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, hit_agent_type, hit_type' );
+
+	$hits = $DB->get_results( $SQL, ARRAY_A );
+
+	// Find the dates without hits and fill them with 0 to display on graph and table:
+	$hits = fill_empty_hit_days( $hits, $hits_start_date, $hits_end_date );
+
+	return $hits;
+}
+
+
+/**
+ * Get hits data for chart and table for Analytics: Hits from web browsers - Summary
+ *
+ * @param string Mode: 'live', 'aggregate', 'compare'
+ * @return array 0 - hits data, 1 - sessions data
+ */
+function get_hits_results_browser( $mode = 'live' )
+{
+	global $DB, $blog, $sec_ID;
+
+	// fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
+	// Bug report: http://lists.mysql.com/bugs/36
+	// Solution : CAST to string
+	// waltercruz >> MySQL sorts ENUM columns according to the order in which the enumeration
+	// members were listed in the column specification, not the lexical order. Solution: CAST to string using using CONCAT
+	// or CAST (but CAST only works from MySQL 4.0.2)
+	// References:
+	// http://dev.mysql.com/doc/refman/5.0/en/enum.html
+	// http://dev.mysql.com/doc/refman/4.1/en/cast-functions.html
+	// TODO: I've also limited this to agent_type "browser" here, according to the change for "referers" (Rev 1.6)
+	//       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
+	$SQL = new SQL( 'Get hits summary from web browsers (mode: '.$mode.')' );
+	$sessions_SQL = new SQL( 'Get sessions summary from web browsers (mode: '.$mode.')' );
+	if( $mode == 'live' )
+	{	// Get the live data:
+		$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits, hit_referer_type AS referer_type, hit_type,
+			GROUP_CONCAT( DISTINCT hit_sess_ID SEPARATOR "," ) AS sessions,
+			EXTRACT( YEAR FROM hit_datetime ) AS year,
+			EXTRACT( MONTH FROM hit_datetime ) AS month,
+			EXTRACT( DAY FROM hit_datetime ) AS day' );
+		$SQL->FROM( 'T_hitlog' );
+		$SQL->WHERE( 'hit_agent_type = "browser"' );
+
+		$sessions_SQL->SELECT( 'SQL_NO_CACHE DATE( hit_datetime ) AS hit_date, COUNT( DISTINCT hit_sess_ID )' );
+		$sessions_SQL->FROM( 'T_hitlog' );
+		$sessions_SQL->WHERE( 'hit_agent_type = "browser"' );
+
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+			$sessions_SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+			$sessions_SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$sessions_SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
+
+		$hits_start_date = NULL;
+		$hits_end_date = date( 'Y-m-d' );
+	}
+	else
+	{	// Get the aggregated data:
+		$SQL->SELECT( 'SUM( hagg_count ) AS hits, hagg_referer_type AS referer_type, hagg_type AS hit_type,
+			"" AS sessions,
+			EXTRACT( YEAR FROM hagg_date ) AS year,
+			EXTRACT( MONTH FROM hagg_date ) AS month,
+			EXTRACT( DAY FROM hagg_date ) AS day' );
+		$SQL->FROM( 'T_hits__aggregate' );
+		$SQL->WHERE( 'hagg_agent_type = "browser"' );
+		// Filter by date:
+		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
+		$SQL->WHERE_and( 'hagg_date >= '.$DB->quote( $hits_start_date ) );
+		$SQL->WHERE_and( 'hagg_date <= '.$DB->quote( $hits_end_date ) );
+
+		$sessions_SQL->SELECT( 'hags_date AS hit_date, hags_count_browser' );
+		$sessions_SQL->FROM( 'T_hits__aggregate_sessions' );
+
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+			$sessions_SQL->WHERE( 'hags_coll_ID = '.$DB->quote( $blog ) );
+		}
+		else
+		{	// Get ALL aggregated sessions:
+			$sessions_SQL->WHERE( 'hags_coll_ID = 0' );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+			$sessions_SQL->FROM_add( 'LEFT JOIN T_blogs ON hags_coll_ID = blog_ID' );
+			$sessions_SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
+		// Filter by date:
+		$sessions_SQL->WHERE_and( 'hags_date >= '.$DB->quote( $hits_start_date ) );
+		$sessions_SQL->WHERE_and( 'hags_date <= '.$DB->quote( $hits_end_date ) );
+	}
+	$SQL->GROUP_BY( 'year, month, day, referer_type, hit_type' );
+	$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type, hit_type' );
+	$sessions_SQL->GROUP_BY( 'hit_date' );
+	$sessions_SQL->ORDER_BY( 'hit_date DESC' );
+
+	$res_hits = $DB->get_results( $SQL, ARRAY_A );
+	$sessions = $DB->get_assoc( $sessions_SQL );
+
+	// Find the dates without hits and fill them with 0 to display on graph and table:
+	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
+
+	return array( $res_hits, $sessions );
+}
+
+
+/**
+ * Get hits data for chart and table for Analytics: Hits from search and referers - Summary
+ *
+ * @param string Mode: 'live', 'aggregate', 'compare'
+ * @return array
+ */
+function get_hits_results_search_referers( $mode = 'live' )
+{
+	global $DB, $blog, $sec_ID;
+
+	// fplanque>> I don't get it, it seems that GROUP BY on the referer type ENUM fails pathetically!!
+	// Bug report: http://lists.mysql.com/bugs/36
+	// Solution : CAST to string
+	// waltercruz >> MySQL sorts ENUM columns according to the order in which the enumeration
+	// members were listed in the column specification, not the lexical order. Solution: CAST to string using using CONCAT
+	// or CAST (but CAST only works from MySQL 4.0.2)
+	// References:
+	// http://dev.mysql.com/doc/refman/5.0/en/enum.html
+	// http://dev.mysql.com/doc/refman/4.1/en/cast-functions.html
+	// TODO: I've also limited this to agent_type "browser" here, according to the change for "referers" (Rev 1.6)
+	//       -> an RSS service that sends a referer is not a real referer (though it should be listed in the robots list)! (blueyed)
+	$SQL = new SQL( 'Get hits summary from web browsers (mode: '.$mode.')' );
+	if( $mode == 'live' )
+	{	// Get the live data:
+		$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits, hit_referer_type AS referer_type, hit_type,
+			EXTRACT( YEAR FROM hit_datetime ) AS year,
+			EXTRACT( MONTH FROM hit_datetime ) AS month,
+			EXTRACT( DAY FROM hit_datetime ) AS day' );
+		$SQL->FROM( 'T_hitlog' );
+		$SQL->WHERE( 'hit_agent_type = "browser"' );
+
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
+
+		$hits_start_date = NULL;
+		$hits_end_date = date( 'Y-m-d' );
+	}
+	else
+	{	// Get the aggregated data:
+		$SQL->SELECT( 'SUM( hagg_count ) AS hits, hagg_referer_type AS referer_type, hagg_type AS hit_type,
+			EXTRACT( YEAR FROM hagg_date ) AS year,
+			EXTRACT( MONTH FROM hagg_date ) AS month,
+			EXTRACT( DAY FROM hagg_date ) AS day' );
+		$SQL->FROM( 'T_hits__aggregate' );
+		$SQL->WHERE( 'hagg_agent_type = "browser"' );
+		// Filter by date:
+		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
+		$SQL->WHERE_and( 'hagg_date >= '.$DB->quote( $hits_start_date ) );
+		$SQL->WHERE_and( 'hagg_date <= '.$DB->quote( $hits_end_date ) );
+
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
+	}
+	$SQL->GROUP_BY( 'year, month, day, referer_type, hit_type' );
+	$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type, hit_type' );
+
+	$res_hits = $DB->get_results( $SQL, ARRAY_A );
+
+	// Find the dates without hits and fill them with 0 to display on graph and table:
+	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
+
+	return $res_hits;
+}
+
+
+/**
+ * Get hits data for chart and table for Analytics: Hits from API - Summary
+ *
+ * @param string Mode: 'live', 'aggregate', 'compare'
+ * @return array 0 - hits data, 1 - sessions data
+ */
+function get_hits_results_api( $mode = 'live' )
+{
+	global $DB, $blog, $sec_ID;
+
+	$SQL = new SQL( 'Get API hits summary (mode: '.$mode.')' );
+	$sessions_SQL = new SQL( 'Get API sessions summary (mode: '.$mode.')' );
+	if( $mode == 'live' )
+	{	// Get the live data:
+		$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits, hit_referer_type AS referer_type,
+			GROUP_CONCAT( DISTINCT hit_sess_ID SEPARATOR "," ) AS sessions,
+			EXTRACT( YEAR FROM hit_datetime ) AS year,
+			EXTRACT( MONTH FROM hit_datetime ) AS month,
+			EXTRACT( DAY FROM hit_datetime ) AS day' );
+		$SQL->FROM( 'T_hitlog' );
+		$SQL->WHERE( 'hit_type = "api"' );
+
+		$sessions_SQL->SELECT( 'SQL_NO_CACHE DATE( hit_datetime ) AS hit_date, COUNT( DISTINCT hit_sess_ID )' );
+		$sessions_SQL->FROM( 'T_hitlog' );
+		$sessions_SQL->WHERE( 'hit_type = "api"' );
+
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+			$sessions_SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+			$sessions_SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$sessions_SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
+
+		$hits_start_date = NULL;
+		$hits_end_date = date( 'Y-m-d' );
+	}
+	else
+	{	// Get the aggregated data:
+		$SQL->SELECT( 'SUM( hagg_count ) AS hits, hagg_referer_type AS referer_type,
+			"" AS sessions,
+			EXTRACT( YEAR FROM hagg_date ) AS year,
+			EXTRACT( MONTH FROM hagg_date ) AS month,
+			EXTRACT( DAY FROM hagg_date ) AS day' );
+		$SQL->FROM( 'T_hits__aggregate' );
+		$SQL->WHERE( 'hagg_type = "api"' );
+		// Filter by date:
+		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
+		$SQL->WHERE_and( 'hagg_date >= '.$DB->quote( $hits_start_date ) );
+		$SQL->WHERE_and( 'hagg_date <= '.$DB->quote( $hits_end_date ) );
+
+		$sessions_SQL->SELECT( 'hags_date AS hit_date, hags_count_api' );
+		$sessions_SQL->FROM( 'T_hits__aggregate_sessions' );
+
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+			$sessions_SQL->WHERE( 'hags_coll_ID = '.$DB->quote( $blog ) );
+		}
+		else
+		{	// Get ALL aggregated sessions:
+			$sessions_SQL->WHERE( 'hags_coll_ID = 0' );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+			$sessions_SQL->FROM_add( 'LEFT JOIN T_blogs ON hags_coll_ID = blog_ID' );
+			$sessions_SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+		}
+		// Filter by date:
+		$sessions_SQL->WHERE_and( 'hags_date >= '.$DB->quote( $hits_start_date ) );
+		$sessions_SQL->WHERE_and( 'hags_date <= '.$DB->quote( $hits_end_date ) );
+	}
+	$SQL->GROUP_BY( 'year, month, day, referer_type' );
+	$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, referer_type' );
+	$sessions_SQL->GROUP_BY( 'hit_date' );
+	$sessions_SQL->ORDER_BY( 'hit_date DESC' );
+
+	$res_hits = $DB->get_results( $SQL, ARRAY_A );
+	$sessions = $DB->get_assoc( $sessions_SQL );
+
+	// Find the dates without hits and fill them with 0 to display on graph and table:
+	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
+
+	return array( $res_hits, $sessions );
+}
+
+
+/**
+ * Get hits data for chart and table for Analytics: Hits from indexing robots / spiders / crawlers - Summary
+ *
+ * @param string Mode: 'live', 'aggregate', 'compare'
+ * @return array Hits data
+ */
+function get_hits_results_robot( $mode = 'live' )
+{
+	global $DB, $blog, $sec_ID;
+
+	$SQL = new SQL( 'Get robot hits summary (mode: '.$mode.')' );
+	if( $mode == 'live' )
+	{	// Get the live data:
+		$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits,
+			EXTRACT( YEAR FROM hit_datetime ) AS year,
+			EXTRACT( MONTH FROM hit_datetime ) AS month,
+			EXTRACT( DAY FROM hit_datetime ) AS day' );
+		$SQL->FROM( 'T_hitlog' );
+		$SQL->WHERE( 'hit_agent_type = "robot"' );
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
+		}
+
+		$hits_start_date = NULL;
+		$hits_end_date = date( 'Y-m-d' );
+	}
+	else
+	{	// Get the aggregated data:
+		$SQL->SELECT( 'SUM( hagg_count ) AS hits,
+			EXTRACT( YEAR FROM hagg_date ) AS year,
+			EXTRACT( MONTH FROM hagg_date ) AS month,
+			EXTRACT( DAY FROM hagg_date ) AS day' );
+		$SQL->FROM( 'T_hits__aggregate' );
+		$SQL->WHERE( 'hagg_agent_type = "robot"' );
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
+		}
+		// Filter by date:
+		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
+		$SQL->WHERE_and( 'hagg_date >= '.$DB->quote( $hits_start_date ) );
+		$SQL->WHERE_and( 'hagg_date <= '.$DB->quote( $hits_end_date ) );
+	}
+	$SQL->GROUP_BY( 'year, month, day' );
+	$SQL->ORDER_BY( 'year DESC, month DESC, day DESC' );
+
+	$res_hits = $DB->get_results( $SQL, ARRAY_A );
+
+	// Find the dates without hits and fill them with 0 to display on graph and table:
+	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
+
+	return $res_hits;
+}
+
+
+/**
+ * Get hits data for chart and table for Analytics: Hits from RSS/Atom feed readers - Summary
+ *
+ * @param string Mode: 'live', 'aggregate', 'compare'
+ * @return array Hits data
+ */
+function get_hits_results_rss( $mode = 'live' )
+{
+	global $DB, $blog, $sec_ID;
+
+	$SQL = new SQL( 'Get RSS/Atom feed readers hits summary (mode: '.$mode.')' );
+	if( $mode == 'live' )
+	{	// Get the live data:
+		$SQL->SELECT( 'SQL_NO_CACHE COUNT( * ) AS hits,
+			EXTRACT( YEAR FROM hit_datetime ) AS year,
+			EXTRACT( MONTH FROM hit_datetime ) AS month,
+			EXTRACT( DAY FROM hit_datetime ) AS day' );
+		$SQL->FROM( 'T_hitlog' );
+		$SQL->WHERE( 'hit_type = "rss"' );
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
+		}
+
+		$hits_start_date = NULL;
+		$hits_end_date = date( 'Y-m-d' );
+	}
+	else
+	{	// Get the aggregated data:
+		$SQL->SELECT( 'SUM( hagg_count ) AS hits,
+			EXTRACT( YEAR FROM hagg_date ) AS year,
+			EXTRACT( MONTH FROM hagg_date ) AS month,
+			EXTRACT( DAY FROM hagg_date ) AS day' );
+		$SQL->FROM( 'T_hits__aggregate' );
+		$SQL->WHERE( 'hagg_type = "rss"' );
+		if( $blog > 0 )
+		{	// Filter by collection:
+			$SQL->WHERE_and( 'hagg_coll_ID = '.$DB->quote( $blog ) );
+		}
+		if( ! empty( $sec_ID ) )
+		{	// Filter by section:
+			$SQL->FROM_add( 'LEFT JOIN T_blogs ON hagg_coll_ID = blog_ID' );
+			$SQL->WHERE_and( 'blog_sec_ID = '.$sec_ID );
+		}
+		// Filter by date:
+		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
+		$SQL->WHERE_and( 'hagg_date >= '.$DB->quote( $hits_start_date ) );
+		$SQL->WHERE_and( 'hagg_date <= '.$DB->quote( $hits_end_date ) );
+	}
+	$SQL->GROUP_BY( 'year, month, day' );
+	$SQL->ORDER_BY( 'year DESC, month DESC, day DESC' );
+
+	$res_hits = $DB->get_results( $SQL, ARRAY_A );
+
+	// Find the dates without hits and fill them with 0 to display on graph and table:
+	$res_hits = fill_empty_hit_days( $res_hits, $hits_start_date, $hits_end_date );
+
+	return $res_hits;
+}
+
+
+/**
+ * Display diagram for hits data
+ *
+ * @param string Diagram type: 'global', 'browser', 'search_referers', 'api', 'robot', 'rss'
+ * @param array Diagram columns
+ * @param array Hits data
+ * @param string Canvas ID for JavaScript initialization
+ */
+function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 'canvasbarschart' )
+{
+	global $blog, $sec_ID, $admin_url;
+
+	// Initialize params to filter by selected collection and/or group:
+	$section_params = empty( $blog ) ? '' : '&blog='.$blog;
+	$section_params .= empty( $sec_ID ) ? '' : '&sec_ID='.$sec_ID;
+
+	$last_date = 0;
+
+	// Initialize the data to open an url by click on bar item:
+	$chart = array( 'link_data' => array( 'params' => array() ) );
+	switch( $type )
+	{
+		case 'global':
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&hit_type=$param1$&agent_type=$param2$';
+			break;
+
+		case 'browser':
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&agent_type=browser&referer_type=$param1$&hit_type=$param2$';
+			$sessions = $res_hits[1];
+			$res_hits = $res_hits[0];
+			break;
+
+		case 'search_referers':
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&agent_type=browser&referer_type=$param1$';
+			break;
+
+		case 'api':
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&referer_type=$param1$&hit_type=api';
+			$sessions = $res_hits[1];
+			$res_hits = $res_hits[0];
+			break;
+
+		case 'robot':
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&agent_type=$param1$';
+			break;
+
+		case 'rss':
+			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$'.$section_params.'&hit_type=$param1$';
+			break;
+	}
+
+	// This defines what hits will go where
+	// This maps a 'hit_type' (from any agent type that is 'browser' or 'robot') to a column
+	// OR it can also map 'hit_type'_'hit_agent_type' (concatenated with _ ) to a column
+	// OR the 'unknown' column will get ANY hits from an unknown user agent (this will go to the "other" column)
+	$col_mapping = array();
+	$col_num = 1;
+	$chart['chart_data'][ 0 ] = array();
+	foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
+	{
+		$chart['chart_data'][ $col_num ] = array();
+		if( $diagram_column_data['link_data'] !== false )
+		{
+			$chart['link_data']['params'][] = $diagram_column_data['link_data'];
+		}
+		$col_mapping[ $diagram_column_key ] = $col_num++;
+	}
+
+	$chart['dates'] = array();
+
+	if( isset( $diagram_columns['session'] ) )
+	{	// Draw last data as line only for Sessions:
+		$chart['draw_last_line'] = true;
+	}
+
+	$count = 0;
+	foreach( $res_hits as $row_stats )
+	{
+		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
+		if( $last_date != $this_date )
+		{	// We just hit a new day, let's display the previous one:
+			$last_date = $this_date; // that'll be the next one
+			$count ++;
+			array_unshift( $chart['chart_data'][ 0 ], date( 'D '.locale_datefmt(), $last_date ) );
+			$col_num = 1;
+			foreach( $diagram_columns as $diagram_column_data )
+			{
+				array_unshift( $chart['chart_data'][ $col_num++ ], 0 );
+			}
+			array_unshift( $chart['dates'], $last_date );
+		}
+
+		switch( $type )
+		{
+			case 'global':
+				if( $row_stats['hit_agent_type'] == 'unknown' )
+				{	// only those hits are calculated which hit_agent_type = unknown
+					$hit_key = $row_stats['hit_agent_type'];
+				}
+				elseif( ! empty ( $col_mapping[$row_stats['hit_type'].'_'.$row_stats['hit_agent_type']] ) )
+				{	// those hits are calculated here if hit_type = standard and hit_agent_type = browser, robot
+					$hit_key = $row_stats['hit_type'].'_'.$row_stats['hit_agent_type'];
+				}
+				elseif( ! empty ( $col_mapping[$row_stats['hit_type']] ) )
+				{	// those hits are calculated here which did not match either of the above rules
+					$hit_key = $row_stats['hit_type'];
+				}
+				else
+				{
+					$hit_key = NULL;
+				}
+				break;
+
+			case 'browser':
+				$hit_key = in_array( $row_stats['hit_type'], array( 'ajax', 'admin' ) ) ? $row_stats['hit_type'] : $row_stats['referer_type'];
+				break;
+
+			case 'search_referers':
+			case 'api':
+				$hit_key = $row_stats['referer_type'];
+				break;
+
+			case 'robot':
+				$hit_key = 'robot';
+				break;
+
+			case 'rss':
+				$hit_key = 'rss';
+				break;
+		}
+
+		if( isset( $col_mapping[ $hit_key ] ) )
+		{
+			$chart['chart_data'][ $col_mapping[ $hit_key ] ][0] += $row_stats['hits'];
+		}
+
+		if( isset( $col_mapping['session'] ) )
+		{	// Store a count of sessions:
+			$chart['chart_data'][ $col_mapping['session'] ][0] = ( isset( $sessions[ date( 'Y-m-d', $this_date ) ] ) ? $sessions[ date( 'Y-m-d', $this_date ) ] : 0 );
+		}
+	}
+
+	// Initialize titles and colors for diagram columns:
+	array_unshift( $chart['chart_data'][ 0 ], '' );
+	$col_num = 1;
+	$chart['series_color'] = array();
+	foreach( $diagram_columns as $diagram_column_key => $diagram_column_data )
+	{
+		$chart['series_color'][ $col_num ] = $diagram_column_data['color'];
+		array_unshift( $chart['chart_data'][ $col_num++ ], $diagram_column_data['title'] );
+	}
+
+	$chart['canvas_bg'] = array( 'width' => '100%', 'height' => 355 );
+
+	echo '<div class="center">';
+	load_funcs('_ext/_canvascharts.php');
+	CanvasBarsChart( $chart, NULL, $canvas_id );
+	echo '</div>';
 }
 ?>

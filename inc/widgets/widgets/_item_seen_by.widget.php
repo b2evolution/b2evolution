@@ -34,6 +34,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_seen_by_Widget extends ComponentWidget
 {
+	var $icon = 'eye';
+
 	/**
 	 * Constructor
 	 */
@@ -119,19 +121,24 @@ class item_seen_by_Widget extends ComponentWidget
 	{
 		global $Collection, $Blog, $Item, $current_User, $DB;
 
+		$this->init_display( $params );
+
 		if( empty( $Blog ) || ! $Blog->get_setting( 'track_unread_content' ) )
 		{	// Don't display this widget if current collection doesn't track the unread content:
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is a collection restriction.' );
+			return false;
 		}
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
-			return;
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item object.' );
+			return false;
 		}
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{	// Don't display this widget if user is NOT logged in OR user has no permission to edit this Item:
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no user permission.' );
+			return false;
 		}
 
 		// Get all memebers of the current collection:
@@ -140,27 +147,26 @@ class item_seen_by_Widget extends ComponentWidget
 
 		if( empty( $UserCache->cache ) )
 		{	// Don't display this widget if the collection has no members:
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no collection members.' );
+			return false;
 		}
 
 		// Get IDs of all collection members:
 		$member_user_IDs = array_keys( $UserCache->cache );
-
-		$this->init_display( $params );
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
 		// Get post read statuses for all collection members of the current Item:
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get post read statuses for all collection members of the Item#'.$Item->ID );
 		$SQL->SELECT( 'itud_user_ID, IF( itud_read_item_ts >= '.$DB->quote( $Item->last_touched_ts ).', "read", "updated" ) AS read_post_status' );
 		$SQL->FROM( 'T_items__user_data' );
 		$SQL->FROM_add( 'INNER JOIN T_users ON itud_user_ID = user_ID' );
 		$SQL->WHERE( 'itud_user_ID IN ( '.$DB->quote( $member_user_IDs ).' )' );
 		$SQL->WHERE_and( 'itud_item_ID = '.$DB->quote( $Item->ID ) );
 		$SQL->ORDER_BY( 'read_post_status, user_login' );
-		$read_statuses = $DB->get_assoc( $SQL->get(), 'Get post read statuses for all collection members of the Item#'.$Item->ID );
+		$read_statuses = $DB->get_assoc( $SQL );
 
 		foreach( $member_user_IDs as $member_user_ID )
 		{

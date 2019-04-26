@@ -6,7 +6,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  *
  * @author fplanque: Francois PLANQUE.
  */
@@ -50,8 +50,10 @@ if( ! (
 	) )
 { // Bad request, Display "404 not found" page
 	load_funcs( 'skins/_skin.funcs.php' );
-	require $siteskins_path.'_404_not_found.main.php'; // error & exit
+	siteskin_init();
+	siteskin_include( '_404_not_found.main.php' ); // error
 	exit(0);
+	// EXIT.
 }
 
 apm_log_custom_param( 'FilePath', $download_File->get_full_path() );

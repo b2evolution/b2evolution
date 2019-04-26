@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -33,6 +33,10 @@ class ItemTypeCache extends DataObjectCache
 	 */
 	var $col_default = array();
 
+	/**
+	 * Object array by template name
+	 */
+	var $cache_template = array();
 
 	/**
 	 * Constructor
@@ -93,8 +97,9 @@ class ItemTypeCache extends DataObjectCache
 						'post' => /* TRANS: noun */ T_('Post')
 					),
 				T_('Out of content flow') => array(
-						'page'    => T_('Page'),
-						'special' => T_('Special'),
+						'page'          => T_('Content Page'),
+						'widget-page'   => T_('Widget Page'),
+						'special'       => T_('Special'),
 						'content-block' => T_('Content Block'),
 					),
 				T_('Intros') => array(
@@ -106,6 +111,74 @@ class ItemTypeCache extends DataObjectCache
 						'intro-all'   => T_('Intro-All'),
 					),
 			);
+	}
+
+
+	/**
+	 * Get an Item Type from cache by template name
+	 *
+	 * Load the cache if necessary (all at once if allowed).
+	 *
+	 * @param string Template name
+	 * @param boolean true if function should die on error
+	 * @param boolean true if function should die on empty/null
+	 * @return object|NULL|boolean Reference on cached object, NULL - if request with empty template name, FALSE - if requested object does not exist
+	 */
+	function & get_by_template( $template_name, $halt_on_error = true, $halt_on_empty = true )
+	{
+		global $DB, $Debuglog;
+
+		if( empty( $template_name ) )
+		{	// Don't allow request with empty template name:
+			if( $template_name )
+			{
+				debug_die( 'Requested '.$this->objtype.' from '.$this->dbtablename.' without template name!' );
+			}
+			$r = NULL;
+			return $r;
+		}
+
+		if( isset( $this->cache_template[ $template_name ] ) )
+		{	// Get object from cache by template name:
+			$Debuglog->add( 'Accessing <strong>'.$this->objtype.'('.$template_name.')</strong> from cache by template name', 'dataobjects' );
+			return $this->cache_template[ $template_name ];
+		}
+
+		// Load just the requested object:
+		$Debuglog->add( 'Loading <strong>'.$this->objtype.'('.$template_name.')</strong>', 'dataobjects' );
+		$SQL = $this->get_SQL_object();
+		$SQL->WHERE_and( $this->dbprefix.'template_name = '.$DB->quote( $template_name ) );
+
+		if( $db_row = $DB->get_row( $SQL->get(), OBJECT, 0, __CLASS__.'::'.__FUNCTION__.'()' ) )
+		{
+			$resolved_ID = $db_row->{$this->dbIDname};
+			$Debuglog->add( 'success; ID = '.$resolved_ID, 'dataobjects' );
+			if( ! isset( $this->cache[$resolved_ID] ) )
+			{	// Object is not already in cache:
+				$Debuglog->add( 'Adding to cache...', 'dataobjects' );
+				//$Obj = new $this->objtype( $row ); // COPY !!
+				if( ! $this->add( $this->new_obj( $db_row ) ) )
+				{	// could not add
+					$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
+				}
+			}
+			if( ! isset( $this->cache_template[ $template_name ] ) )
+			{	// Add object in cache by template name:
+				$this->cache_template[ $template_name ] = $this->new_obj( $db_row );
+			}
+		}
+
+		if( empty( $this->cache_template[ $template_name ] ) )
+		{	// Object does not exist by requested template name:
+			$Debuglog->add( 'Could not get ItemType by template name.', 'dataobjects' );
+			if( $halt_on_error )
+			{
+				debug_die( 'Requested '.$this->objtype.' does not exist!' );
+			}
+			$this->cache_template[ $template_name ] = false;
+		}
+
+		return $this->cache_template[ $template_name ];
 	}
 }
 

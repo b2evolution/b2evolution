@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2005-2006 by PROGIDISTRI - {@link http://progidistri.com/}.
  *
  * @package evocore
@@ -59,6 +59,13 @@ class Chapter extends DataObject
 	var $order;
 	var $meta;
 	var $lock;
+	var $ityp_ID = NULL;
+
+	/**
+	 * Default Item Type
+	 * @var object|NULL|false
+	 */
+	var $ItemType = NULL;
 
 	/**
 	 * Lazy filled
@@ -91,6 +98,11 @@ class Chapter extends DataObject
 	var $image_file_ID;
 
 	/**
+	 * Social media image
+	 */
+	var $social_media_image_file_ID;
+
+	/**
 	 * Constructor
 	 *
 	 * @param table Database row
@@ -112,6 +124,7 @@ class Chapter extends DataObject
 			$this->parent_ID = $db_row->cat_parent_ID;
 			$this->blog_ID = $db_row->cat_blog_ID;
 			$this->image_file_ID = $db_row->cat_image_file_ID;
+			$this->social_media_image_file_ID = $db_row->cat_social_media_image_file_ID;
 			$this->urlname = $db_row->cat_urlname;
 			$this->description = $db_row->cat_description;
 			$this->order = $db_row->cat_order;
@@ -119,6 +132,7 @@ class Chapter extends DataObject
 			$this->meta = $db_row->cat_meta;
 			$this->lock = $db_row->cat_lock;
 			$this->last_touched_ts = $db_row->cat_last_touched_ts;		// When Chapter received last visible change (edit, item, comment, etc.)
+			$this->ityp_ID = isset( $db_row->cat_ityp_ID ) ? $db_row->cat_ityp_ID : NULL;
 		}
 	}
 
@@ -308,8 +322,16 @@ class Chapter extends DataObject
 		param( 'cat_image_file_ID', 'integer' );
 		$this->set_from_Request( 'image_file_ID' );
 
+		// Check social media boilerplate image
+		param( 'cat_social_media_image_file_ID', 'integer' );
+		$this->set_from_Request( 'social_media_image_file_ID' );
+
 		// Check url name
 		param( 'cat_urlname', 'string' );
+		// Replace special chars/umlauts:
+		load_funcs( 'locales/_charset.funcs.php' );
+		set_param( 'cat_urlname', replace_special_chars( get_param( 'cat_urlname' ) ) );
+		param_check_regexp( 'cat_urlname', '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', T_('All slugs must contain at least 1 non-numeric character.'), NULL, false, false );
 		$this->set_from_Request( 'urlname' );
 
 		// Check description
@@ -342,6 +364,10 @@ class Chapter extends DataObject
 		// Locked category
 		param( 'cat_lock', 'integer', 0 );
 		$this->set_from_Request( 'lock' );
+
+		// Default Item Type:
+		param( 'cat_ityp_ID', 'integer', NULL );
+		$this->set_from_Request( 'ityp_ID' );
 
 		return ! param_errors_detected();
 	}
@@ -603,6 +629,11 @@ class Chapter extends DataObject
 
 		// The chapter was updated successful
 		$DB->commit();
+
+		// BLOCK CACHE INVALIDATION:
+		$chapter_Blog = $this->get_Blog();
+		BlockCache::invalidate_key( 'cont_coll_ID', $chapter_Blog->ID ); // Content has changed
+
 		return true;
 	}
 
@@ -653,11 +684,11 @@ class Chapter extends DataObject
 
 		if( !isset( $this->count_posts ) )
 		{
-			$SQL = new SQL();
+			$SQL = new SQL( 'Check if category has posts' );
 			$SQL->SELECT( 'COUNT( postcat_post_ID )' );
 			$SQL->FROM( 'T_postcats' );
 			$SQL->WHERE( 'postcat_cat_ID = '.$DB->quote( $this->ID ) );
-			$count_posts = $DB->get_var( $SQL->get() );
+			$count_posts = $DB->get_var( $SQL );
 			$this->count_posts = $count_posts;
 		}
 
@@ -836,6 +867,20 @@ class Chapter extends DataObject
 			case 'image_file_ID':
 				return $this->set_param( $parname, 'integer', $parvalue, true );
 
+			case 'ityp_ID':
+				if( $this->get( 'meta' ) )
+				{	// Don't allow default Item Type for meta category because it cannot has items:
+					$parvalue = NULL;
+				}
+				elseif( ( $parvalue === 0 || $parvalue === '0' )&&
+				        $this->ID > 0 &&
+				        ( $cat_Blog = & $this->get_Blog() ) &&
+				        $cat_Blog->get_default_cat_ID() == $this->ID )
+				{	// Force "No default type" of default category to "Same as collection default":
+					$parvalue = NULL;
+				}
+				return $this->set_param( $parname, 'integer', $parvalue, true );
+
 			case 'name':
 			case 'urlname':
 			case 'description':
@@ -916,6 +961,54 @@ class Chapter extends DataObject
 				'',
 				$params['size_x'],
 				$params['tag_size'] );
+	}
+
+
+	/**
+	 * Get default Item Type of this Chapter
+	 *
+	 * @param boolean TRUE to return default Item Type object of collection when this category uses same it as collection default
+	 * @return object|false|NULL Default Item Type,
+	 *                           NULL - Same as collection default (only when $use_collection_item_type == false, otherwise real Item Type object what is used as default for collection),
+	 *                           FALSE - No default type or Item Type is not found in DB or Item Type is not enabled for chapter's collection
+	 */
+	function & get_ItemType( $load_coll_default_item_type = false )
+	{
+		if( $this->get( 'ityp_ID' ) === NULL && ! $load_coll_default_item_type )
+		{	// Item Type is same as collection default,
+			// Return NULL because no request to get real Item Type object:
+			$r = NULL;
+			return $r;
+		}
+
+		if( $this->ItemType === NULL )
+		{	// Load Item Type into cache:
+			if( $this->get( 'ityp_ID' ) === NULL && $load_coll_default_item_type )
+			{	// Try to get real Item Type object of this category's collection:
+				if( ( $cat_Blog = & $this->get_Blog() ) && 
+				    ( $coll_ItemType = & $cat_Blog->get_default_ItemType() ) )
+				{	// Use real Item Type object:
+					$this->ItemType = $coll_ItemType;
+				}
+				else
+				{	// Impossible to get default Item Type by some unknown reason:
+					$this->ItemType = false;
+				}
+			}
+			elseif( ( $this->get( 'ityp_ID' ) > 0 ) && 
+			        ( $ItemTypeCache = & get_ItemTypeCache() ) &&
+			        ( $cat_ItemType = & $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ), false, false ) ) &&
+			        ( $cat_ItemType->is_enabled( $this->get( 'blog_ID' ) ) ) )
+			{	// Default Item Type is found in DB and it is enabled for chapter's collection:
+				$this->ItemType = $cat_ItemType;
+			}
+			else
+			{	// No default type or Item Type is not found in DB or Item Type is not enabled for chapter's collection:
+				$this->ItemType = false;
+			}
+		}
+
+		return $this->ItemType;
 	}
 }
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -132,6 +132,19 @@ class Group extends DataObject
 
 
 	/**
+	 * Get delete cascade settings
+	 *
+	 * @return array
+	 */
+	static function get_delete_cascades()
+	{
+		return array(
+				array( 'table' => 'T_plugingroupsettings', 'fk' => 'pgset_grp_ID', 'msg' => T_('%d group settings on plugins') ),
+			);
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -231,6 +244,11 @@ class Group extends DataObject
 			{ // Admin group has always admin perm, it can not be set or changed.
 				continue;
 			}
+			elseif( $name == 'perm_allowed_sections' )
+			{	// This permission is represented by checklist:
+				$value = param( 'edited_grp_'.$name, 'array:integer', '' );
+				$value = implode( ',', $value );
+			}
 			else
 			{
 				$value = param( 'edited_grp_'.$name, 'string', '' );
@@ -239,6 +257,19 @@ class Group extends DataObject
 			{ // if radio is not set, then doesn't change the settings
 				$GroupSettings->set( $name, $value, $this->ID );
 			}
+		}
+
+		// Check if default section is in allowed list:
+		$perm_allowed_sections = explode( ',', $GroupSettings->get( 'perm_allowed_sections', $this->ID ) );
+		if( ! in_array( $GroupSettings->get( 'perm_default_sec_ID', $this->ID ), $perm_allowed_sections ) )
+		{
+			param_error( 'edited_grp_perm_default_sec_ID', T_('Default section must be in allowed section for new collections.') );
+		}
+
+		if( $GroupSettings->get( 'perm_admin', $this->ID ) != 'normal' &&
+				$GroupSettings->get( 'perm_users', $this->ID ) != 'none' )
+		{	// Display warning when users permissions are not allowed because of not full access to back-office:
+			$Messages->add( T_('Permission to view other users will not work because users of this group have restricted back-office access.'), 'warning' );
 		}
 
 		return !param_errors_detected();
@@ -294,9 +325,10 @@ class Group extends DataObject
 	 *                - centralantispam
 	 * @param string Requested permission level
 	 * @param mixed Permission target (blog ID, array of cat IDs...)
+	 * @param object|NULL User
 	 * @return boolean True on success (permission is granted), false if permission is not granted
 	 */
-	function check_perm( $permname, $permlevel = 'any', $perm_target = NULL )
+	function check_perm( $permname, $permlevel = 'any', $perm_target = NULL, $User = NULL )
 	{
 		global $Debuglog;
 
@@ -314,7 +346,7 @@ class Group extends DataObject
 			$permvalue = false; // This will result in $perm == false always. We go on for the $Debuglog..
 		}
 
-		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'skins_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam' );
+		$pluggable_perms = array( 'admin', 'shared_root', 'import_root', 'skins_root', 'plugins_root', 'spamblacklist', 'slugs', 'templates', 'options', 'emails', 'files', 'users', 'orgs', 'centralantispam', 'maintenance' );
 		if( in_array( $permname, $pluggable_perms ) )
 		{
 			$permname = 'perm_'.$permname;
@@ -324,6 +356,28 @@ class Group extends DataObject
 		// Check group permission:
 		switch( $permname )
 		{
+			case 'section':
+				// Check permissions for this group to the requested section:
+				$perm = $this->check_perm( 'blogs', 'editall' );
+
+				if( ! $perm && ! empty( $perm_target ) )
+				{	// User has an access to any Section he owns, or at a minimum, in the Default Section of this group:
+					$SectionCache = & get_SectionCache();
+					if( $Section = & $SectionCache->get_by_ID( $perm_target, false, false ) )
+					{
+						$allowed_section_IDs = explode( ',', $this->get_setting( 'perm_allowed_sections' ) );
+						if( $permlevel != 'edit' && in_array( $Section->ID, $allowed_section_IDs ) )
+						{	// Allow to view or create a collection if the requested section is default of this group:
+							$perm = true;
+						}
+						if( ! $perm && $User && $Section->owner_user_ID == $User->ID )
+						{	// If user is owner of the requested section:
+							$perm = true;
+						}
+					}
+				}
+				break;
+
 			case 'blogs':
 				switch( $permvalue )
 				{ // Depending on current group permission:
@@ -343,8 +397,16 @@ class Group extends DataObject
 				}
 
 				if( ! $perm && ( $permlevel == 'create' ) && $this->check_perm( 'perm_createblog', 'allowed' ) )
-				{ // User is allowed to create a blog (for himself)
-					$perm = true;
+				{	// User can create a collection for himself (in any Section he owns, or at a minimum, in the Default Section of this group):
+					$perm = $this->check_perm( 'section', 'view', $perm_target, $User );
+					if( ! $perm && empty( $perm_target ) )
+					{	// If request to create a collection without specified Section, then try to create it in default Section of this group:
+						$SectionCache = & get_SectionCache();
+						if( $Section = & $SectionCache->get_by_ID( $this->get_setting( 'perm_default_sec_ID' ), false, false ) )
+						{	// If default section really exists in DB:
+							$perm = true;
+						}
+					}
 				}
 				break;
 
@@ -391,6 +453,14 @@ class Group extends DataObject
 				$perm = Module::check_perm( $permname, $permlevel, $perm_target, 'group_func', $this );
 				if( $perm === NULL )
 				{	// Even if group permisson check function doesn't exist we should return false value
+					$perm = false;
+				}
+
+				if( $perm && // Permission is allowed
+						in_array( $permname, array( 'perm_spamblacklist', 'perm_slugs', 'perm_emails', 'perm_maintenance' ) ) && // These permissions depend on permission "Settings"
+						! Module::check_perm( 'perm_options', 'view', $perm_target, 'group_func', $this ) ) // permission "Settings" == "No Access"
+				{	// Force permission to FALSE when group perm setting "Settings" == "No Access" for
+					// all depending permissions: "Antispam", "Slug manager", "Email management", "Maintenance"
 					$perm = false;
 				}
 
@@ -585,6 +655,19 @@ class Group extends DataObject
 
 		// Current user can assign this group if his group level is more than level of this group
 		return ( $this->get( 'level' ) < $user_Group->get( 'level' ) );
+	}
+
+
+	/**
+	 * Get group setting value
+	 * 
+	 * @param string Setting value
+	 */
+	function get_setting( $name )
+	{
+		$GroupSettings = & $this->get_GroupSettings();
+
+		return $GroupSettings->get( $name, $this->ID );
 	}
 }
 

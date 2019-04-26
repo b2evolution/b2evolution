@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link https://thequod.de/}.
  *
  * {@link db_delta()} is based on dbDelta() from {@link http://wordpress.com Wordpress}, see
@@ -1756,12 +1756,15 @@ function convert_table_to_utf8_ascii( $table )
 /**
  * Upgrade DB to UTF-8 and fix ASCII fields
  */
-function db_check_utf8_ascii()
+function db_check_utf8_ascii( $show_title = true )
 {
 	global $db_config, $tableprefix, $DB, $evo_charset;
 
-	echo '<h2 class="page-title">'.T_('Normalizing DB charsets...').'</h2>';
-	evo_flush();
+	if( $show_title )
+	{
+		echo '<h2 class="page-title">'.T_('Normalizing DB charsets...').'</h2>';
+		evo_flush();
+	}
 
 	// Get the tables that have different charset than what we expect
 	$expected_connection_charset = DB::php_to_mysql_charmap( $evo_charset );
@@ -1793,12 +1796,15 @@ function db_check_utf8_ascii()
 /**
  * Upgrade DB to UTF-8 and fix ASCII fields
  */
-function db_upgrade_to_utf8_ascii()
+function db_upgrade_to_utf8_ascii( $show_title = true )
 {
 	global $db_config, $tableprefix, $DB;
 
-	echo '<h2 class="page-title">'.T_('Normalizing DB charsets...').'</h2>';
-	evo_flush();
+	if( $show_title )
+	{
+		echo '<h2 class="page-title">'.T_('Normalizing DB charsets...').'</h2>';
+		evo_flush();
+	}
 
 	// Load db schema to be able to check the original charset definition
 	load_db_schema( true );

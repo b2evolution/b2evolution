@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -26,6 +26,7 @@ load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_
 class msg_menu_link_Widget extends generic_menu_link_Widget
 {
 	var $link_types;
+	var $icon = 'comments';
 
 	/**
 	 * Constructor
@@ -36,8 +37,8 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 		parent::__construct( $db_row, 'core', 'msg_menu_link' );
 
 		$this->link_types = array(
-			'messages' => T_('Messages'),
-			'contacts' => T_('Contacts'),
+			'messages' => T_('Private messages'),
+			'contacts' => T_('Messaging contacts'),
 		);
 	}
 
@@ -71,7 +72,7 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 
 		if( !empty($this->param_array['link_type']) )
 		{	// Messaging or Contacts
-			return sprintf( T_( '%s link' ), $this->link_types[ $this->param_array['link_type'] ] );
+			return sprintf( T_('Link to: %s'), $this->link_types[ $this->param_array['link_type'] ] );
 		}
 
 		return $this->get_name();
@@ -100,13 +101,15 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 		// Try to get collection that is used for messages on this site:
 		$msg_Blog = & get_setting_Blog( 'msg_blog_ID' );
 
+		$default_link_type = 'messages';
+
 		$r = array_merge( array(
 				'link_type' => array(
 					'label' => T_( 'Link Type' ),
 					'note' => T_('What do you want to link to?'),
 					'type' => 'select',
 					'options' => $this->link_types,
-					'defaultvalue' => 'messages',
+					'defaultvalue' => $default_link_type,
 					'onchange' => '
 						var curr_link_type = this.value;
 						var show_badge = jQuery("[id$=\'_set_show_badge\']");
@@ -172,8 +175,7 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 		{ // Not called from the update process
 			// Turn off allow blockcache by default, because it is forbidden in case of messages
 			// Note: we may call $this->get_param() only if this function was not called from there. This way we prevent infinite recursion/loop.
-			$link_type = ( empty( $this->params ) || isset( $params['infinite_loop'] ) ) ? 'messages' : $this->get_param( 'link_type', true );
-			if( $link_type == 'contacts' )
+			if( $this->get_param( 'link_type', $default_link_type ) == 'contacts' )
 			{
 				$r['show_badge']['defaultvalue'] = false;
 				$r['show_badge']['disabled'] = 'disabled';
@@ -231,12 +233,14 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 		}
 
 		if( empty( $current_Blog ) )
-		{ // Don't use this widget without current collection:
+		{	// Don't use this widget without current collection:
+			$this->display_debug_message( 'Hidden(No collection)' );
 			return false;
 		}
 
 		if( $this->disp_params['visibility'] == 'access' && ! $current_Blog->has_access() )
 		{	// Don't use this widget because current user has no access to the collection:
+			$this->display_debug_message( 'Hidden(No access)' );
 			return false;
 		}
 
@@ -247,12 +251,14 @@ class msg_menu_link_Widget extends generic_menu_link_Widget
 			case 'loggedin':
 				if( !is_logged_in() )
 				{
+					$this->display_debug_message( 'Hidden(Not logged in)' );
 					return false;
 				}
 				break;
 			case 'perms':
 				if( !is_logged_in() || !$current_User->check_perm( 'perm_messaging', 'reply', false ) )
 				{
+					$this->display_debug_message( 'Hidden(No access)' );
 					return false;
 				}
 				break; // display

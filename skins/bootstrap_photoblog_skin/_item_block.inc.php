@@ -7,7 +7,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -36,10 +36,9 @@ $params = array_merge( array(
 		'image_size'                 => 'fit-1280x720',
 		'author_link_text'           => 'auto',
 	), $params );
-
-
-echo '<div class="evo_content_block">'; // Beginning of post display
 ?>
+
+<div class="evo_content_block">
 
 <article id="<?php $Item->anchor_id() ?>" class="<?php $Item->div_classes( $params ) ?>" lang="<?php $Item->lang() ?>">
 
@@ -173,14 +172,12 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	<?php
 	if( $disp == 'single' )
 	{
-		?>
-		<div class="evo_container evo_container__item_single">
-		<?php
 		// ------------------------- "Item Single" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		skin_container( /* TRANS: Widget container name */ NT_('Item Single'), array(
+		widget_container( 'item_single', array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
@@ -208,20 +205,15 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				),
 		) );
 		// ----------------------------- END OF "Item Single" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php
 	}
 	elseif( $disp == 'page' )
 	{
-		?>
-		<div class="evo_container evo_container__item_page">
-		<?php
 		// ------------------------- "Item Page" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
-		skin_container( /* TRANS: Widget container name */ NT_('Item Page'), array(
+		widget_container( 'item_page', array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',
@@ -242,9 +234,6 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				),
 		) );
 		// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
-		?>
-		</div>
-		<?php
 	}
 	else
 	{
@@ -263,9 +252,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		<?php
 			if( ! $Item->is_intro() && $disp == 'posts' ) // Do NOT apply tags, comments and feedback on intro posts
 			{ // List all tags attached to this post:
-				echo '<footer>';
 		?>
-
+	<footer>
 		<nav>
 		<?php
 			// Link to comments, trackbacks, etc.:
@@ -293,22 +281,29 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 						) );
 		?>
 		</nav>
-			<?php
-				echo '</footer>';
+	</footer>
+		<?php
 			} ?>
 
-	</div><!-- ../evo_post_wrapper -->
-	</section>  <!-- ../content_end_full -->
-
 	<?php
+	if( is_single_page() )
+	{	// Display comments only on single Item's page:
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( array(
+				'disp_comments'        => true,
+				'disp_comment_form'    => true,
+				'disp_trackbacks'      => true,
+				'disp_trackback_url'   => true,
+				'disp_pingbacks'       => true,
+				'disp_webmentions'     => true,
+				'disp_meta_comments'   => false,
 				'before_section_title' => '<div class="clearfix"></div><h3 class="evo_comment__list_title">',
 				'after_section_title'  => '</h3>',
 			), $params ) );
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+	}
 	?>
 
 	<?php
@@ -337,4 +332,4 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 	?>
 </article>
 
-<?php echo '</div>'; // End of post display ?>
+</div><!-- ../evo_content_block -->

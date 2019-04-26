@@ -1,19 +1,16 @@
 <?php
 /**
- * This is the template that displays the feedback for a post (comments, trackback, pingback...)
- *
- * You may want to call this file multiple time in a row with different $c $tb $pb params.
- * This allow to seprate different kinds of feedbacks instead of displaying them mixed together
+ * This is the template that displays the feedback for a post (comments, trackback, pingback, webmention...)
  *
  * This file is not meant to be called directly.
  * It is meant to be called by an include in the main.page.php template.
  * To display a feedback, you should call a stub AND pass the right parameters
- * For example: /blogs/index.php?p=1&more=1&c=1&tb=1&pb=1
+ * For example: /blogs/index.php?p=1&more=1
  * Note: don't code this URL by hand, use the template functions to generate it!
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -26,11 +23,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Default params:
 $params = array_merge( array(
 		'Item'                 => NULL,
-		'disp_comments'        => true,
-		'disp_comment_form'    => true,
-		'disp_trackbacks'      => true,
-		'disp_trackback_url'   => true,
-		'disp_pingbacks'       => true,
+		'disp_comments'        => is_single_page(),
+		'disp_comment_form'    => is_single_page(),
+		'disp_trackbacks'      => is_single_page(),
+		'disp_trackback_url'   => is_single_page(),
+		'disp_pingbacks'       => is_single_page(),
+		'disp_webmentions'     => is_single_page(),
 		'disp_section_title'   => true,
 		'disp_rating_summary'  => true,
 		'before_section_title' => '<h3>',
@@ -80,7 +78,7 @@ $params = array_merge( array(
 	), $params );
 
 
-global $c, $tb, $pb, $redir;
+global $redir;
 
 if( !empty( $params['Item'] ) && is_object( $params['Item'] ) )
 {	// Set Item object from params
@@ -96,24 +94,13 @@ modules_call_method( 'before_comments', $params );
 // Check if user is allowed to see comments, display corresponding message if not allowed
 if( $Item->can_see_comments( true ) )
 { // user is allowed to see comments
-	if( empty($c) )
-	{	// Comments not requested
-		$params['disp_comments'] = false;					// DO NOT Display the comments if not requested
-		$params['disp_comment_form'] = false;			// DO NOT Display the comments form if not requested
+	if( ! $Item->can_receive_pings() )
+	{	// Trackbacks are not allowed
+		$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not allowed
+		$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not allowed
 	}
 
-	if( empty($tb) || !$Item->can_receive_pings() )
-	{	// Trackback not requested or not allowed
-		$params['disp_trackbacks'] = false;				// DO NOT Display the trackbacks if not requested
-		$params['disp_trackback_url'] = false;		// DO NOT Display the trackback URL if not requested
-	}
-
-	if( empty($pb) )
-	{	// Pingback not requested
-		$params['disp_pingbacks'] = false;				// DO NOT Display the pingbacks if not requested
-	}
-
-	if( ! ($params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] ) )
+	if( ! ( $params['disp_comments'] || $params['disp_comment_form'] || $params['disp_trackbacks'] || $params['disp_trackback_url'] || $params['disp_pingbacks'] || $params['disp_webmentions'] ) )
 	{	// Nothing more to do....
 		return false;
 	}
@@ -173,6 +160,16 @@ if( $Item->can_see_comments( true ) )
 		echo '<a id="pingbacks"></a>';
 	}
 
+	if( $params['disp_webmentions'] )
+	{
+		$type_list[] = 'webmention';
+		if( $title = $Item->get_feedback_title( 'webmentions' ) )
+		{
+			$disp_title[] = $title;
+		}
+		echo '<a id="webmentions"></a>';
+	}
+
 	if( $params['disp_trackback_url'] )
 	{ // We want to display the trackback URL:
 
@@ -190,7 +187,7 @@ if( $Item->can_see_comments( true ) )
 	}
 
 
-	if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks']  )
+	if( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] || $params['disp_webmentions'] )
 	{
 		if( empty($disp_title) )
 		{	// No title yet
@@ -366,6 +363,7 @@ if( $params['disp_comment_form'] && // if enabled by skin param
 			'action' => 'get_comment_form',
 			'p' => $Item->ID,
 			'blog' => $Blog->ID,
+			'reply_ID' => param( 'reply_ID', 'integer', 0 ),
 			'disp' => $disp,
 			'params' => $params );
 		display_ajax_form( $json_params );
@@ -479,7 +477,7 @@ if( is_logged_in() && $Item->can_comment( NULL ) )
 }
 
 
-if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] ) )
+if( $Item->can_see_comments( false ) && ( $params['disp_comments'] || $params['disp_trackbacks'] || $params['disp_pingbacks'] || $params['disp_webmentions'] ) )
 {	// user is allowed to see comments
 	// Display link for comments feed:
 	$Item->feedback_feed_link( '_rss2', '<div class="feedback_feed_msg"><p>', '</p></div>', $params['feed_title'] );

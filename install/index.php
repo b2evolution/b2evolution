@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -160,7 +160,8 @@ $current_charset = $evo_charset;
 init_charsets( $current_charset );
 
 // Check minimum memory limit for successful using:
-if( system_check_memory_limit() < get_php_bytes_size( '48M' ) )
+$memory_limit = system_check_memory_limit();
+if( $memory_limit != -1 && $memory_limit < get_php_bytes_size( '48M' ) )
 { // Deny to use on server with small memory limit size:
 	$install_memory_limit_allow = false;
 	if( $action != 'localeinfo' )
@@ -194,7 +195,6 @@ switch( $action )
 {
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 	case 'newdb':
 	case 'cafelogupgrade':
 	case 'deletedb':
@@ -321,7 +321,6 @@ switch( $action )
 {
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 		$title = T_('Upgrade from a previous version');
 		break;
 
@@ -372,6 +371,7 @@ $booststrap_install_form_params = array(
 		'buttonsstart'   => '<div class="form-group"><div class="control-buttons col-sm-offset-4 col-sm-8">',
 		'buttonsend'     => "</div></div>\n\n",
 		'note_format'    => ' <span class="help-inline text-muted small">%s</span>',
+		'bottom_note_format' => ' <div><span class="help-inline text-muted small">%s</span></div>',
 		// - checkbox
 		'fieldstart_checkbox'    => '<div class="form-group" $ID$>'."\n",
 		'fieldend_checkbox'      => "</div>\n\n",
@@ -381,6 +381,9 @@ $booststrap_install_form_params = array(
 		'checkbox_newline_start' => '<div class="checkbox">',
 		'checkbox_newline_end'   => "</div>\n",
 	);
+
+// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
+init_fontawesome_icons( 'fontawesome-glyphicons' );
 
 header('Content-Type: text/html; charset='.$evo_charset);
 header('Cache-Control: no-cache'); // no request to this page should get cached!
@@ -397,11 +400,12 @@ if( $display != 'cli' )
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title><?php echo format_to_output( T_('b2evo installer').( $title ? ': '.$title : '' ), 'htmlhead' ); ?></title>
-		<script type="text/javascript" src="../rsc/js/jquery.min.js"></script>
+		<script src="../rsc/js/jquery.min.js"></script>
 		<!-- Bootstrap -->
-		<script type="text/javascript" src="../rsc/js/bootstrap/bootstrap.min.js"></script>
+		<script src="../rsc/js/bootstrap/bootstrap.min.js"></script>
 		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
 		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
+		<link href="../rsc/css/font-awesome.min.css" rel="stylesheet">
 	</head>
 	<body>
 		<div class="container" id="content_wrapper">
@@ -518,8 +522,9 @@ switch( $action )
 				'baseurl'        => $conf_baseurl,
 				'admin_email'    => $conf_admin_email,
 			);
-		if( ! update_basic_config_file( $basic_config_params ) )
+		if( ! update_basic_config_file( $basic_config_params ) && $action == 'conf' )
 		{ // Break here if some error on creating/updating basic config file
+			// and action has not been switched to display another page from case below:
 			break;
 		}
 		// ATTENTION: we continue here...
@@ -605,10 +610,10 @@ switch( $action )
 					<p class="text-muted small"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
 					<?php
 					$Form->checkbox( 'conf_create_db', param( 'conf_create_db', 'integer' ), '', T_('Try to create this DB if it doesn\'t exist yet (useful for developers)') );
-					$Form->text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
-					$Form->text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
-					$Form->text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
-					$Form->text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
+					$Form->text( 'conf_db_host', $conf_db_host, NULL, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ) );
+					$Form->text( 'conf_db_name', $conf_db_name, NULL, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ) );
+					$Form->text( 'conf_db_user', $conf_db_user, NULL, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ) );
+					$Form->text( 'conf_db_password', $conf_db_password, NULL, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ) ); // no need to hyde this. nobody installs b2evolution from a public place
 					// Too confusing for (most) newbies.	form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
 				block_close();
 
@@ -802,85 +807,21 @@ switch( $action )
 		 * -----------------------------------------------------------------------------------
 		 */
 		track_step( 'installer-options' );
+		load_funcs( 'collections/_demo_content.funcs.php' );
 		?>
 
 		<form action="index.php" method="get" class="evo_form__install">
-			<input type="hidden" name="locale" value="<?php echo $default_locale ?>" />
+			<h2><?php echo T_('b2evolution installation options') ?></h2>
+			<p><?php echo T_('You can start adding your own content whenever you\'re ready. Until then, it may be handy to have some demo contents to play around with. You can easily delete these demo contents once you\'re done testing.'); ?></p>
+
+			<input type="hidden" name="locale" value="'.$default_locale.'" />
 			<input type="hidden" name="confirmed" value="0" />
 			<input type="hidden" name="installer_version" value="10" />
 			<input type="hidden" name="action" value="newdb" />
 
-			<h2><?php echo T_('b2evolution installation options') ?></h2>
-
-			<p><?php echo T_('You can start adding your own content whenever you\'re ready. Until then, it may be handy to have some demo contents to play around with. You can easily delete these demo contents once you\'re done testing.'); ?></p>
-
-			<div class="checkbox">
-				<label>
-					<input type="checkbox" name="create_sample_contents" id="create_sample_contents" value="1" checked="checked" />
-					<?php echo T_('Install sample collections &amp; sample contents. The sample posts explain several features of b2evolution. This is highly recommended for new users.') ?>
-				</label>
-				<div id="create_sample_contents_options" style="margin:10px 0 0 20px">
-					<?php
-					echo T_('Which demo collections would you like to install?');
-
-					// Display the collections to select which install
-					$collections = array(
-							'home'   => T_('Home'),
-							'a'      => T_('Blog A'),
-							'b'      => T_('Blog B'),
-							'photos' => T_('Photos'),
-							'forums' => T_('Forums'),
-							'manual' => T_('Manual'),
-							'group'  => T_('Tracker'),
-						);
-
-					// Allow all modules to set what collections should be installed
-					$module_collections = modules_call_method( 'get_demo_collections' );
-					if( ! empty( $module_collections ) )
-					{
-						foreach( $module_collections as $module_key => $module_colls )
-						{
-							foreach( $module_colls as $module_coll_key => $module_coll_title )
-							{
-								$collections[ $module_key.'_'.$module_coll_key ] = $module_coll_title;
-							}
-						}
-					}
-
-					foreach( $collections as $coll_index => $coll_title )
-					{ // Display the checkboxes to select what demo collection to install
-					?>
-					<div class="checkbox" style="margin-left:1em">
-						<label>
-							<input type="checkbox" name="collections[]" id="collection_<?php echo $coll_index; ?>" value="<?php echo $coll_index; ?>" checked="checked" />
-							<?php echo $coll_title; ?>
-						</label>
-					</div>
-					<?php } ?>
-				</div>
-			</div>
-
-			<div class="checkbox" style="margin-top: 15px">
-				<label>
-					<input type="checkbox" name="create_sample_organization" id="create_sample_organization" value="1" checked="checked" />
-					<?php echo T_('Create a sample organization');?>
-				</label>
-			</div>
-
-			<div class="checkbox" style="margin-top: 15px">
-				<label>
-					<input type="checkbox" name="create_demo_users" id="create_demo_users" value="1" checked="checked" />
-					<?php echo T_('Create demo users (in addition to the admin account)');?>
-				</label>
-				<div id="create_demo_users_options" style="margin:10px 0 0 20px">
-					<div class="checkbox" style="margin-left: 1em">
-						<label>
-							<input type="checkbox" name="create_sample_private_messages" id="create_sameple_private_messages" value="1" checked="checked" />
-							<?php echo T_('Create sample private messages between users');?>
-						</label>
-					</div>
-				</div>
-			</div>
+			<?php
+			echo echo_installation_options();
+			?>
 
 			<?php
 			if( $allow_install_test_features )
@@ -889,15 +830,17 @@ switch( $action )
 				<div class="checkbox" style="margin-top:15px">
 					<label>
 						<input accept="" type="checkbox" name="install_test_features" id="install_test_features" value="1" />
-						<?php echo T_('Also install all test features.')?>
+						<?php echo T_('Also install all test features.').get_manual_link( 'install-test-features' ); ?>
 					</label>
 				</div>
-			<?php } ?>
+			<?php
+			}
+			?>
 
 			<div class="checkbox" style="margin:15px 0 15px">
 				<label>
 					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo check_local_installation() ? ' checked="checked"' : ''; ?> />
-					<?php echo T_('This is a local / test / intranet installation.')?>
+					<?php echo T_('This is a local / test / intranet installation.').get_manual_link( 'local-test-intranet-install-checkbox' ); ?>
 				</label>
 			</div>
 
@@ -924,17 +867,6 @@ switch( $action )
 			</p>
 		</form>
 
-		<script type="text/javascript">
-			jQuery( '#create_sample_contents' ).click( function()
-			{
-				jQuery( '#create_sample_contents_options' ).toggle();
-			} );
-
-			jQuery( '#create_demo_users' ).click( function()
-			{
-				jQuery( '#create_demo_users_options' ).toggle();
-			} );
-		</script>
 		<?php
 		break;
 
@@ -982,14 +914,14 @@ switch( $action )
 		 */
 		track_step( 'install-start' );
 
-		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
-		$create_sample_organization = param( 'create_sample_organization', 'boolean', false, true );
+		$create_sample_contents = param( 'create_sample_contents', 'string', false, true ); // during auto install this param can be 'full', 'minisite', 'blog-a', 'blog-b', 'photos, 'forums', 'manual', 'tracker'
+		$create_demo_organization = param( 'create_demo_organization', 'boolean', false, true );
 		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
 		$create_demo_messages = param( 'create_sample_private_messages', 'boolean', false, true );
 
-		if( $create_sample_contents == 'all' )
-		{ // Override create sample organization and demo user setting
-			$create_sample_organization = true;
+		if( $create_sample_contents == 'full' )
+		{	// Override create sample organization and demo user setting:
+			$create_demo_organization = true;
 			$create_demo_users = true;
 			$create_demo_messages = true;
 		}
@@ -1083,7 +1015,6 @@ switch( $action )
 
 	case 'evoupgrade':
 	case 'auto_upgrade':
-	case 'svn_upgrade':
 		/*
 		 * -----------------------------------------------------------------------------------
 		 * EVO UPGRADE: Upgrade data from existing b2evolution database
@@ -1097,6 +1028,12 @@ switch( $action )
 		start_install_progress_bar( T_('Upgrade in progress'), get_upgrade_steps_count() );
 
 		echo get_install_format_text( '<h2>'.T_('Upgrading b2evolution...').'</h2>', 'h2' );
+
+		display_install_messages( sprintf( '<p>%s<ol><li>%s</li><li>%s</li><li>%s</li></ol></p>',
+				T_('IMPORTANT: if this upgrade procedure fails, do this:'),
+				T_('Make a screenshot showing as much context as possible, and save it in case you need support.'),
+				T_('Reload the page. The upgrade script is designed to recover from unexpected stops and may be able to pick up where it left off.'),
+				sprintf( T_('If needed, see <a %s>this man page &raquo;</a>' ), 'href="http://b2evolution.net/man/auto-upgrade-procedure"' ) ), 'info' );
 
 		if( $htaccess != 'skip' )
 		{
@@ -1130,7 +1067,7 @@ switch( $action )
 		if( $is_automated_upgrade && $upgrade_result !== 'need-fix' )
 		{
 			if( $upgrade_result === true )
-			{	// After successful auto_upgrade or svn_upgrade we must remove files/folder based on the upgrade_policy.conf
+			{	// After successful auto_upgrade we must remove files/folder based on the upgrade_policy.conf
 				remove_after_upgrade();
 			}
 			// Disable maintenance mode at the end of the upgrade script:
@@ -1319,10 +1256,7 @@ switch( $action )
 
 	default:
 		// This should not happen!
-		pre_dump($action);
 }
-
-// pre_dump($action);
 
 block_close();
 
@@ -1339,7 +1273,7 @@ if( $display != 'cli' )
 			<footer class="footer" id="sticky_footer">
 				<p class="pull-right"><a href="https://github.com/b2evolution/b2evolution" class="text-nowrap"><?php echo T_('GitHub page'); ?></a></p>
 				<p><a href="http://b2evolution.net/" class="text-nowrap">b2evolution.net</a>
-				&bull; <a href="http://b2evolution.net/about/recommended-hosting-lamp-best-choices.php" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
+				&bull; <a href="https://b2evolution.net/web-hosting/cheap-plans/" class="text-nowrap"><?php echo T_('Find a host'); ?></a>
 				&bull; <a href="http://b2evolution.net/man/" class="text-nowrap"><?php echo T_('Online manual'); ?></a>
 				&bull; <a href="http://forums.b2evolution.net" class="text-nowrap"><?php echo T_('Help forums'); ?></a>
 				</p>

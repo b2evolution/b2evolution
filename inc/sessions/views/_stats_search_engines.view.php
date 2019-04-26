@@ -7,14 +7,14 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $blog, $DB;
+global $blog, $sec_ID, $DB;
 
 $max_top_engines = 20;
 
@@ -25,6 +25,11 @@ $SQL->FROM( 'T_hitlog' );
 $SQL->FROM_add( 'LEFT JOIN T_basedomains ON dom_ID = hit_referer_dom_ID' );
 $SQL->WHERE( 'hit_referer_type = "search"' );
 $SQL->WHERE_and( 'hit_agent_type = "browser"' );
+if( ! empty( $sec_ID ) )
+{	// Filter by section:
+	$SQL->FROM_add( 'LEFT JOIN T_blogs ON hit_coll_ID = blog_ID' );
+	$SQL->WHERE_and( 'blog_sec_ID = '.$DB->quote( $sec_ID ) );
+}
 if( ! empty( $blog ) )
 {	// Filter by current collection:
 	$SQL->WHERE_and( 'hit_coll_ID = '.$DB->quote( $blog ) );

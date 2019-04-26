@@ -36,6 +36,8 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_content_Widget extends ComponentWidget
 {
+	var $icon = 'file-text';
+
 	/**
 	 * Constructor
 	 */
@@ -101,6 +103,13 @@ class item_content_Widget extends ComponentWidget
 				)
 			), parent::get_param_definitions( $params ) );
 
+		if( isset( $r['allow_blockcache'] ) )
+		{	// Disable "allow blockcache" because item content may includes other items by inline tags like [inline:item-slug]:
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
+
 		return $r;
 	}
 
@@ -134,6 +143,7 @@ class item_content_Widget extends ComponentWidget
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
 			return false;
 		}
 
@@ -157,7 +167,7 @@ class item_content_Widget extends ComponentWidget
 		if( isset($this->disp_params['widget_coll_item_content_params']) )
 		{	// The new correct stuff gets precedence over the old stuff:
 			$widget_item_content_params = array_merge( $widget_item_content_params, $this->disp_params['widget_coll_item_content_params'] );
-		}		
+		}
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
@@ -173,25 +183,6 @@ class item_content_Widget extends ComponentWidget
 		echo $this->disp_params['block_end'];
 
 		return true;
-	}
-
-
-	/**
-	 * Maybe be overriden by some widgets, depending on what THEY depend on..
-	 *
-	 * @return array of keys this widget depends on
-	 */
-	function get_cache_keys()
-	{
-		global $Collection, $Blog, $Item;
-
-		return array(
-				'wi_ID'        => $this->ID, // Cache each widget separately + Have the widget settings changed ?
-				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
-				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => $Item->ID, // Cache each item separately + Has the Item changed?
-				'item_page'    => isset( $GLOBALS['page'] ) ? $GLOBALS['page'] : 1, // Cache each Item page separately
-			);
 	}
 }
 

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -48,6 +48,8 @@ else
 // Check permission (#2):
 $current_User->check_perm( 'files', 'view', true, $perm_blog );
 
+// Initialize Font Awesome
+init_fontawesome_icons();
 
 // Load the other params:
 param( 'viewtype', 'string', true, true );
@@ -90,6 +92,29 @@ switch( $action )
 		}
 		break;
 
+	case 'flip_horizontal':
+	case 'flip_vertical':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'image' );
+
+		load_funcs( 'files/model/_image.funcs.php' );
+
+		switch( $action )
+		{
+			case 'flip_horizontal':
+				$mode = 'horizontal';
+				break;
+			case 'flip_vertical':
+				$mode = 'vertical';
+				break;
+		}
+
+		if( flip_image( $selected_File, $mode ) )
+		{	// Image was rotated successfully
+			header_redirect( regenerate_url( 'action,crumb_image', 'action=reload_parent', '', '&' ) );
+		}
+		break;
+
 	case 'reload_parent':
 		// Reload parent window to update rotated image
 		$JS_additional = 'window.opener.location.reload(true);';
@@ -100,6 +125,7 @@ switch( $action )
 require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
 require_css( 'basic.css', 'rsc_url' ); // Basic styles
 require_css( 'viewfile.css', 'rsc_url' );
+require_css( '#bootstrap_css#', 'rsc_url' );
 
 // Send the predefined cookies:
 evo_sendcookies();
@@ -110,10 +136,10 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 <html xml:lang="<?php locale_lang() ?>" lang="<?php locale_lang() ?>">
 <head>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-	<title><?php echo $selected_File->dget('name').' ('.T_('Preview').')'; ?></title>
+	<title><?php echo $selected_File->dget('name').' ('./* TRANS: Noun */ T_('Preview').')'; ?></title>
 	<?php include_headlines() /* Add javascript and css files included by plugins and skin */ ?>
 <?php if( isset( $JS_additional ) ) { ?>
-	<script type="text/javascript"><?php echo $JS_additional; ?></script>
+	<script><?php echo $JS_additional; ?></script>
 <?php } ?>
 </head>
 
@@ -145,11 +171,15 @@ switch( $viewtype )
 			$url_rotate_90_left = regenerate_url( '', 'action=rotate_90_left'.'&'.url_crumb('image') );
 			$url_rotate_180 = regenerate_url( '', 'action=rotate_180'.'&'.url_crumb('image') );
 			$url_rotate_90_right = regenerate_url( '', 'action=rotate_90_right'.'&'.url_crumb('image') );
+			$url_flip_horizontal = regenerate_url( '', 'action=flip_horizontal'.'&'.url_crumb('image') );
+			$url_flip_vertical = regenerate_url( '', 'action=flip_vertical'.'&'.url_crumb('image') );
 
 			echo '<div class="center">';
 			echo action_icon( T_('Rotate this picture 90&deg; to the left'), 'rotate_left', $url_rotate_90_left, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
 			echo action_icon( T_('Rotate this picture 180&deg;'), 'rotate_180', $url_rotate_180, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-			echo action_icon( T_('Rotate this picture 90&deg; to the right'), 'rotate_right', $url_rotate_90_right, '', 0, 0 );
+			echo action_icon( T_('Rotate this picture 90&deg; to the right'), 'rotate_right', $url_rotate_90_right, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+			echo action_icon( T_('Flip this picture horizontally'), 'flip_horizontal', $url_flip_horizontal, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+			echo action_icon( T_('Flip this picture vertically'), 'flip_vertical', $url_flip_vertical, '', 0, 0 );
 			echo '</div>';
 
 			echo '<div class="subline">';
@@ -205,13 +235,13 @@ switch( $viewtype )
 
 				echo ' [';
 				?>
-				<noscript type="text/javascript">
+				<noscript>
 					<a href="<?php echo $selected_File->get_url().'&amp;showlinenrs='.(1-$showlinenrs); ?>">
 
 					<?php echo $showlinenrs ? T_('Hide line numbers') : T_('Show line numbers');
 					?></a>
 				</noscript>
-				<script type="text/javascript">
+				<script>
 					<!--
 					document.write('<a id="togglelinenrs" href="javascript:toggle_linenrs()">toggle</a>');
 

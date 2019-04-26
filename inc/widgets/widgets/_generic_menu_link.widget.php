@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -25,6 +25,9 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class generic_menu_link_Widget extends ComponentWidget
 {
+	// Enable additional params for classes of Link/Button:
+	var $allow_link_css_params = true;
+
 	/**
 	 * Get a layout for menu link
 	 *
@@ -64,12 +67,12 @@ class generic_menu_link_Widget extends ComponentWidget
 			if( $is_active_link )
 			{	// Use template and class to highlight current menu item:
 				$r .= $this->disp_params['item_selected_start'];
-				$link_class = $this->disp_params['link_selected_class'];
+				$link_class = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['link_selected_class'] : $this->disp_params['widget_active_link_class'];
 			}
 			else
 			{	// Use normal template:
 				$r .= $this->disp_params['item_start'];
-				$link_class = $this->disp_params['link_default_class'];
+				$link_class = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['link_default_class'] : $this->disp_params['widget_link_class'];
 			}
 
 			// Get a link from template:
@@ -94,11 +97,11 @@ class generic_menu_link_Widget extends ComponentWidget
 
 			if( $is_active_link )
 			{	// Use template and class to highlight current menu item:
-				$button_class = $this->disp_params['button_selected_class'];
+				$button_class = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'];
 			}
 			else
 			{	// Use normal template:
-				$button_class = $this->disp_params['button_default_class'];
+				$button_class = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'];
 			}
 
 			// Get a button from template:
@@ -112,5 +115,28 @@ class generic_menu_link_Widget extends ComponentWidget
 		$r .= $this->disp_params['block_end'];
 
 		return $r;
+	}
+
+
+	/**
+	 * Display debug message e-g on designer mode when we need to show widget when nothing to display currently
+	 *
+	 * @param string Message
+	 */
+	function display_debug_message( $message = NULL )
+	{
+		if( $this->mode == 'designer' )
+		{	// Display message on designer mode:
+			if( $message === NULL )
+			{	// Set default message:
+				$message = 'Hidden';
+				if( ! empty( $this->disp_params['link_type'] ) )
+				{
+					$message .= '('.$this->disp_params['link_type'].')';
+				}
+			}
+
+			echo $this->get_layout_menu_link( '#', $message, false );
+		}
 	}
 }
