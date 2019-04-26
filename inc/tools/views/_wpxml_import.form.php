@@ -63,7 +63,7 @@ $Form->begin_fieldset( T_('Report of the import') );
 $Form->end_fieldset();
 
 $Form->buttons( array(
-		array( 'button', 'button', T_('Go to Blog'), 'SaveButton', 'onclick' => 'location.href=\''.$Blog->get( 'url' ).'\'' ),
+		array( 'button', 'button', T_('Go to collection').' >>', 'SaveButton', 'onclick' => 'location.href=\''.$Blog->get( 'url' ).'\'' ),
 	) );
 
 $Form->end_form();

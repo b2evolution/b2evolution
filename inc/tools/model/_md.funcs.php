@@ -368,7 +368,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		$Item->set( 'datemodified', date2mysql( $localtimenow ) );
 		$Item->set( 'urltitle', urltitle_validate( $item_slug, $item_slug, 0, false, 'post_urltitle', 'post_ID', 'T_items__item' ) );
 		$Item->set( 'status', 'published' );
-		$Item->set( 'ityp_ID', '1' );
+		$Item->set( 'ityp_ID', $md_Blog->get_setting( 'default_post_type' ) );
 		if( ! empty( $item_content ) )
 		{	// Generate excerpt from content:
 			$Item->set_param( 'excerpt', 'string', excerpt( $item_content ), true );
@@ -380,7 +380,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			$posts_count++;
 
 			// Link files:
-			if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)]+)\)#', $item_content, $image_matches ) )
+			if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)"]+)\s*("[^"]*")?\)#', $item_content, $image_matches ) )
 			{
 				$updated_item_content = $item_content;
 				$LinkOwner = new LinkItem( $Item );
@@ -392,12 +392,17 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 					);
 				foreach( $image_matches[2] as $i => $image_relative_path )
 				{
-					if( $link_ID = md_link_file( $LinkOwner, $folder_path, $category_path.'/'.$image_relative_path, $file_params ) )
+					$file_params['file_alt'] = trim( $image_matches[1][$i] );
+					if( $file_params['file_alt'] == 'img' )
+					{	// Don't use this default text for alt image text:
+						$file_params['file_alt'] = '';
+					}
+					$file_params['file_title'] = trim( $image_matches[3][$i], ' "' );
+					if( $link_ID = md_link_file( $LinkOwner, $folder_path, $category_path.'/'.rtrim( $image_relative_path ), $file_params ) )
 					{	// If file has been linked successfully:
 						$file_params['link_order']++;
 						// Replace this img tag from content with b2evolution format:
-						$image_caption = trim( $image_matches[1][$i] );
-						$updated_item_content = str_replace( $image_matches[0][$i], '[image:'.$link_ID.( empty( $image_caption ) ? '' : ':'.$image_caption ).']', $updated_item_content );
+						$updated_item_content = str_replace( $image_matches[0][$i], '[image:'.$link_ID.']', $updated_item_content );
 					}
 				}
 
@@ -439,6 +444,8 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 	$params = array_merge( array(
 			'file_root_type' => 'collection',
 			'file_root_ID'   => '',
+			'file_title'     => '',
+			'file_alt'       => '',
 			'folder_path'    => '',
 			'link_order'     => 1,
 		), $params );
@@ -475,7 +482,9 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 		return false;
 	}
 
-	// Create new File:
+	// Set additional params and create new File:
+	$File->set( 'title', $params['file_title'] );
+	$File->set( 'alt', $params['file_alt'] );
 	$File->dbsave();
 
 	if( $link_ID = $File->link_to_Object( $LinkOwner, $params['link_order'], 'inline' ) )
