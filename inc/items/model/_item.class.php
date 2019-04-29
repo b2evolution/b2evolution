@@ -13027,7 +13027,7 @@ class Item extends ItemLight
 		foreach( $available_locales as $locale_key )
 		{
 			if( ( isset( $locales[ $locale_key ] ) && $locales[ $locale_key ]['enabled'] ) ||
-			    $this_localekey == $default )
+			    $locale_key == $this->get( 'locale' ) )
 			{	// Allow enabled locales or if it is already selected for this Item:
 				$r .= '<option value="'.$locale_key.'"';
 				if( $locale_key == $this->get( 'locale' ) )
