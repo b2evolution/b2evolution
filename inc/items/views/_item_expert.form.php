@@ -88,6 +88,10 @@ $Form->begin_form( '', '', $params );
 	if( ! empty( $original_item_ID ) )
 	{
 		$Form->hidden( 'p', $original_item_ID );
+		if( $action == 'new_version' )
+		{	// Set a flag to know this is a new version of this Item:
+			$Form->hidden( 'source_version_item_ID', $original_item_ID );
+		}
 	}
 
 	$Form->hidden( 'redirect_to', $redirect_to );
@@ -132,7 +136,8 @@ $Form->begin_form( '', '', $params );
 	{
 		if( ! empty( $original_item_ID ) )
 		{	// Set form title for duplicating the item:
-			$form_title_item_ID = sprintf( T_('Duplicating Item %s'), '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$original_item_ID.'" class="post_type_link">#'.$original_item_ID.'</a>' );
+			$form_title_item_ID = sprintf( ( $action == 'new_version' ? T_('Add version for Item %s') : T_('Duplicating Item %s') ),
+				'<a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$original_item_ID.'" class="post_type_link">#'.$original_item_ID.'</a>' );
 		}
 		else
 		{	// Set form title for creating new item:
@@ -184,7 +189,7 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'post_title', $item_title );
 	}
 
-	$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
+	/*$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
 	if( ( $Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
 	      $edited_Item->get( 'locale' ) == $Blog->get( 'locale' ) &&
 	      isset( $locales[ $edited_Item->get( 'locale' ) ] )
@@ -196,7 +201,7 @@ $Form->begin_form( '', '', $params );
 	else
 	{	// Allow to select a locale:
 		$Form->select_input_options( 'post_locale', $locale_options, T_('Language'), '', array( 'style' => 'width:180px' ) );
-	}
+	}*/
 	$Form->end_fieldset();
 	$Form->switch_layout( NULL );
 
@@ -720,13 +725,13 @@ $Form->begin_form( '', '', $params );
 		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
 	}
 
-	if( ! is_array( $locale_options ) )
+	/*if( ! is_array( $locale_options ) )
 	{	// Display this setting if we have more than 1 enabled locale:
 		$Form->radio( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ), array(
 				array( 'always', T_('Show for any navigation locale') ),
 				array( 'follow-nav-locale', T_('Show only if matching navigation locale') )
 			), '', true );
-	}
+	}*/
 
 	// Single/page view:
 	if( ! in_array( $edited_Item->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all', 'content-block', 'special' ) ) )
@@ -773,6 +778,44 @@ $Form->begin_form( '', '', $params );
 
 		$Form->end_fieldset();
 	}
+
+
+	// ################### Language / Versions ###################
+	$Form->begin_fieldset( T_('Language / Versions').get_manual_link( 'post-language-versions' ), array( 'id' => 'itemform_language', 'fold' => true ) );
+	$Form->switch_layout( 'fields_table' );
+
+		$Form->select_input_options( 'post_locale', $edited_Item->get_locale_options(), T_('Language'), '', array( 'style' => 'width:auto' ) );
+
+		if( count( $edited_Item->get_available_locales() ) )
+		{	// Display this setting if we have more than 1 enabled locale:
+			$Form->radio( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ), array(
+					array( 'always', T_('Show for any navigation locale') ),
+					array( 'follow-nav-locale', T_('Show only if matching navigation locale') )
+				), '', true );
+		}
+
+		$other_version_items = $edited_Item->get_other_version_items();
+		$item_add_version_link = $edited_Item->get_add_version_link();
+		if( $item_add_version_link || count( $other_version_items ) > 0 )
+		{
+			echo '<b>'.T_('Other versions').':</b>';
+			echo '<ul style="list-style:disc;margin-left:20px">';
+			foreach( $other_version_items as $other_version_Item )
+			{
+				echo '<li>'.$other_version_Item->get_title( array( 'link_type' => 'edit_view_url' ) ).' '
+						.locale_flag( $other_version_Item->get( 'locale' ), 'w16px', 'flag', '', false )
+						.'<span class="note">('.$other_version_Item->get( 'locale' ).')</span>'
+					.'</li>';
+			}
+			if( $item_add_version_link )
+			{	// Display link to add new version if it is allowed:
+				echo '<li>'.$item_add_version_link.'</li>';
+			}
+			echo '</ul>';
+		}
+
+	$Form->switch_layout( NULL );
+	$Form->end_fieldset();
 
 
 	// ################### COMMENT STATUS ###################
@@ -1100,6 +1143,8 @@ echo_fieldset_folding_js();
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
 // JS code for merge button:
 echo_item_merge_js();
+// JS code for link to add new version:
+echo_item_add_version_js();
 
 // JS to post excerpt mode switching:
 ?>

@@ -181,6 +181,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_single_view            ENUM('normal','404','redirected') COLLATE ascii_general_ci NOT NULL DEFAULT 'normal',
 			post_pst_ID                 int(10) unsigned NULL,
 			post_ityp_ID                int(10) unsigned NOT NULL DEFAULT 1,
+			post_igrp_ID                INT(10) UNSIGNED NULL,
 			post_locale                 VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'en-EU',
 			post_locale_visibility      ENUM( 'always', 'follow-nav-locale' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'always',
 			post_content                MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
@@ -343,6 +344,13 @@ $schema_queries = array_merge( $schema_queries, array(
 			ivl_position    VARCHAR(10) COLLATE ascii_general_ci NOT NULL,
 			ivl_order       INT(11) UNSIGNED NOT NULL,
 			PRIMARY KEY     ( ivl_iver_ID, ivl_iver_type, ivl_iver_itm_ID, ivl_link_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__itemgroup' => array(
+		'Creating table for Post Groups',
+		"CREATE TABLE T_items__itemgroup (
+			igrp_ID INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			PRIMARY KEY (igrp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__status' => array(

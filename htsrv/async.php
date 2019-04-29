@@ -1010,6 +1010,25 @@ switch( $action )
 
 		exit(0); // Exit here in order to don't display the AJAX debug info.
 
+	case 'get_item_add_version_form':
+		// Form to add version for the Item:
+
+		$item_ID = param( 'item_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+		// Initialize back-office skin:
+		global $UserSettings, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		
+
+		require $inc_path.'items/views/_item_add_version.form.php';
+		break;
+
 	default:
 		$incorrect_action = true;
 		break;

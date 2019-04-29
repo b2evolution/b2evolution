@@ -3591,6 +3591,10 @@ class Blog extends DataObject
 			}
 
 			// Update locales:
+			if( empty( $this->locales ) )
+			{	// Don't forget to store main locale in extra locales table:
+				$this->locales = array( $this->get( 'locale' ) );
+			}
 			$this->update_locales();
 
 			$default_post_type_ID = $this->get_setting( 'default_post_type' );
@@ -6211,6 +6215,11 @@ class Blog extends DataObject
 			{	// Unset a disabled locale:
 				unset( $new_locales[ $l ] );
 			}
+		}
+
+		if( ! in_array( $this->get( 'locale' ), $new_locales ) )
+		{	// Make sure main locale will be stored in the table of collection locales:
+			$new_locales[] = $this->get( 'locale' );
 		}
 
 		// Remove duplicates and sort locales:

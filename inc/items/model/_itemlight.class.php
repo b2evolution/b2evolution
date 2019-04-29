@@ -1447,6 +1447,13 @@ class ItemLight extends DataObject
 				$url = '?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
 				break;
 
+			case 'edit_view_url':
+				if( ! $url = $this->get_edit_url() )
+				{	// If edit URL is not available use URL ot view Item:
+					$url = is_admin_page() ? $this->get_url( 'admin_view' ) : $this->get_permanent_url( '', $blogurl );
+				}
+				break;
+
 			case 'custom_url':
 				$url = $params['custom_url'];
 				break;

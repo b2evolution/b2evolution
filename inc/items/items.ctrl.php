@@ -195,6 +195,7 @@ switch( $action )
 	case 'new_mass':
 	case 'new_type':
 	case 'copy':
+	case 'new_version':
 	case 'create_edit':
 	case 'create_link':
 	case 'create':
@@ -917,6 +918,7 @@ switch( $action )
 
 
 	case 'copy': // Duplicate post
+	case 'new_version': // Add version
 		$item_ID = param( 'p', 'integer', true );
 		$ItemCache = &get_ItemCache();
 		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
@@ -941,6 +943,18 @@ switch( $action )
 		$edited_Item->set( 'status', $item_status );
 		$edited_Item->set( 'dateset', 0 );	// Date not explicitly set yet
 		$edited_Item->set( 'issue_date', date( 'Y-m-d H:i:s', $localtimenow ) );
+
+		if( $action == 'new_version' )
+		{	// Creating new version
+			if( param( 'post_locale', 'string', NULL ) !== NULL )
+			{	// Set locale:
+				$edited_Item->set_from_Request( 'locale' );
+			}
+			if( param( 'post_create_child', 'integer', NULL ) === 1 )
+			{	// Set parent Item:
+				$edited_Item->set( 'parent_ID', $item_ID );
+			}
+		}
 
 		// Set post comment status and extracats
 		$post_comment_status = $edited_Item->get( 'comment_status' );
@@ -2385,6 +2399,7 @@ switch( $action )
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'new_type': // this gets set as action by JS, when we switch tabs
 	case 'copy':
+	case 'new_version':
 	case 'create_edit':
 	case 'create_link':
 	case 'create':
@@ -2681,7 +2696,7 @@ if( $action == 'view' || $action == 'history_compare' || strpos( $action, 'edit'
 	init_fileuploader_js();
 }
 
-if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )
+if( in_array( $action, array( 'new', 'new_version', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )
 { // Set manual link for edit expert mode
 	$AdminUI->set_page_manual_link( 'expert-edit-screen' );
 }
@@ -2698,6 +2713,7 @@ switch( $action )
 	case 'edit':
 	case 'edit_switchtab':
 	case 'copy':
+	case 'new_version':
 	case 'create':
 	case 'create_edit':
 	case 'create_link':
@@ -2758,6 +2774,7 @@ switch( $action )
 		$bozo_start_modified = true;	// We want to start with a form being already modified
 	case 'new':
 	case 'copy':
+	case 'new_version':
 	case 'create_edit':
 	case 'create_link':
 	case 'create':

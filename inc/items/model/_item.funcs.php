@@ -2869,6 +2869,61 @@ jQuery( document ).on( 'click', '#evo_merge_btn_back_to_list', function()
 
 
 /**
+ * JS Behaviour: Output JavaScript code to add version of Item
+ */
+function echo_item_add_version_js()
+{
+	global $Blog, $admin_url, $evo_item_add_version_js_initialized;
+
+	if( ! empty( $evo_item_add_version_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
+
+	// Set flag to know this is initialized:
+	$evo_item_add_version_js_initialized = true;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+?>
+<script>
+function evo_add_version_load_window( item_ID )
+{
+	if( item_ID < 1 || ( typeof( bozo ) && bozo.nb_changes > 0 ) )
+	{	// Don't allow to merge if item edit form is changed and not saved yet:
+		alert( '<?php echo TS_('You must save the Item before you can add version.'); ?>' );
+		return false;
+	}
+
+	var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
+	var evo_js_lang_add_version = '<?php echo TS_('Add version');?>';
+	evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+
+	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '"></span>',
+		'600px', 'auto', true, evo_js_lang_add_version, evo_js_lang_add_version, true );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
+		data:
+		{
+			'action': 'get_item_add_version_form',
+			'item_ID': item_ID,
+		},
+		success: function(result)
+		{
+			result = ajax_debug_clear( result );
+			openModalWindow( result, '600px', 'auto', true, evo_js_lang_add_version, evo_js_lang_add_version );
+		}
+	} );
+	return false;
+}
+</script>
+<?php
+}
+
+
+/**
  * Output Javascript for tags autocompletion.
  * @todo dh> a more facebook like widget would be: http://plugins.jquery.com/project/facelist
  *           "ListBuilder" is being planned for jQuery UI: http://wiki.jqueryui.com/ListBuilder

@@ -11677,6 +11677,20 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15410, 'Creating table for Post Groups...' ) )
+	{	// part of 7.0.1-alpha
+		db_create_table( 'T_items__itemgroup', '
+			igrp_ID INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			PRIMARY KEY (igrp_ID)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15420, 'Upgrading posts table...' ) )
+	{	// part of 7.0.1-alpha
+		db_add_col( 'T_items__item', 'post_igrp_ID', 'INT(10) UNSIGNED NULL AFTER post_ityp_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

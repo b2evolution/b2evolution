@@ -272,7 +272,7 @@ foreach( $locales as $locale_data )
 
 if( ! $is_creating )
 {
-	$Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-settings' ) );
+	$Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-settings' ), array( 'id' => 'language' ) );
 		if( $number_enabled_locales > 1 )
 		{ // More than 1 locale
 			$blog_locale_note = ( $current_User->check_perm( 'options', 'view' ) ) ?
