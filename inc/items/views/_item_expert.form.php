@@ -759,12 +759,17 @@ $Form->begin_form( '', '', $params );
 
 
 	// ################### LANGUAGE / VERSIONS ###################
-	$Form->begin_fieldset( T_('Language / Versions').get_manual_link( 'post-language-versions' ), array( 'id' => 'itemform_language', 'fold' => true, 'deny_fold' => true ) );
+	$multiple_available_locales = count( $edited_Item->get_available_locales() ) > 1;
+	$Form->begin_fieldset( T_('Language / Versions').get_manual_link( 'post-language-versions' ), array(
+			'id'           => 'itemform_language',
+			'fold'         => true,
+			'default_fold' => ! $multiple_available_locales
+		) );
 	$Form->switch_layout( 'fields_table' );
 
 		$Form->select_input_options( 'post_locale', $edited_Item->get_locale_options(), T_('Language'), '', array( 'style' => 'width:auto' ) );
 
-		if( count( $edited_Item->get_available_locales() ) > 1 )
+		if( $multiple_available_locales )
 		{	// Display this setting if we have more than 1 enabled locale:
 			$Form->radio( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ), array(
 					array( 'always', T_('Show for any navigation locale') ),

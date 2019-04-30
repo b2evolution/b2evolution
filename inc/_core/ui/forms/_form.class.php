@@ -929,6 +929,7 @@ class Form extends Widget
 				'class'     => 'fieldset',
 				'fold'      => false, // TRUE to enable folding for this fieldset
 				'deny_fold' => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+				'default_fold' => NULL, // Set default "fold" value for current fieldset
 			), $field_params );
 
 		if( $field_params['fold'] )
@@ -939,12 +940,17 @@ class Form extends Widget
 				global $UserSettings, $Collection, $Blog, $ctrl;
 				if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
 				{ // Get user setting value
-					$value = intval( $UserSettings->get( 'fold_'.$field_params['id'] ) );
+					$value = $UserSettings->get( 'fold_'.$field_params['id'] );
 				}
 				else
 				{ // Get user-collection setting
-					$value = intval( $UserSettings->get_collection_setting( 'fold_'.$field_params['id'], $Blog->ID ) );
+					$value = $UserSettings->get_collection_setting( 'fold_'.$field_params['id'], $Blog->ID );
 				}
+				if( $value === NULL && $field_params['default_fold'] !== NULL )
+				{	// Use custom default value for this fieldset:
+					$value = $field_params['default_fold'];
+				}
+				$value = intval( $value );
 				if( $value === 1 )
 				{
 					$field_params['class'] = trim( $field_params['class'].' folded' );
@@ -960,6 +966,7 @@ class Form extends Widget
 		}
 		unset( $field_params['fold'] );
 		unset( $field_params['deny_fold'] );
+		unset( $field_params['default_fold'] );
 
 		if( ! empty( $this->fieldset_title ) )
 		{	// Replace text part of fieldset title with provided html code:
