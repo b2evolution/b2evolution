@@ -127,6 +127,8 @@ class LinkOwner
 					$tmp_link_Object->set( 'item_ID', $this->link_Object->item_ID );
 				}
 				$tmp_link_Object->dbinsert();
+				// Update global param in order to don't create temp object twice:
+				set_param( 'temp_link_owner_ID', $tmp_link_Object->ID );
 			}
 
 			if( ! is_object( $this->link_Object ) || empty( $this->link_Object ) )

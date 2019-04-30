@@ -192,6 +192,9 @@ function init_inskin_editing()
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $copy_post_ID );
 
+		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
+		$edited_Item->ID = 0;
+
 		$edited_Item_Blog = $edited_Item->get_Blog();
 		$item_status = $edited_Item_Blog->get_allowed_item_status();
 
@@ -202,6 +205,9 @@ function init_inskin_editing()
 		modules_call_method( 'constructor_item', array( 'Item' => & $edited_Item ) );
 
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
+
+		// Duplicate attachments from source Item:
+		$edited_Item->duplicate_attachments( $copy_post_ID );
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
