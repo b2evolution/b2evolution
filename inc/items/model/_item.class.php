@@ -1428,8 +1428,9 @@ class Item extends ItemLight
 		foreach( $LinkOwner->Links as $item_Link )
 		{
 			if( $item_File = & $item_Link->get_File() &&
-			    $item_FileRoot = & $item_File->get_FileRoot() )
-			{
+			    $item_FileRoot = & $item_File->get_FileRoot() &&
+			    $item_Link->is_single_linked_file() )
+			{	// If file is not linked to any other object:
 				if( ! file_exists( $item_FileRoot->ads_path.$item_slug_folder_name ) )
 				{	// Create if folder doesn't exist for files of new created message:
 					mkdir_r( $item_FileRoot->ads_path.$item_slug_folder_name );
@@ -1438,7 +1439,7 @@ class Item extends ItemLight
 			}
 		}
 
-		if( file_exists( $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/' ) )
+		if( $item_FileRoot && file_exists( $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/' ) )
 		{	// Remove temp folder from disk completely:
 			rmdir_r( $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/' );
 		}
@@ -2008,6 +2009,28 @@ class Item extends ItemLight
 		}
 
 		return 'unlimit';
+	}
+
+
+	/**
+	 * Duplicate attachments from another Item
+	 *
+	 * @param integer Item ID
+	 */
+	function duplicate_attachments( $item_ID )
+	{
+		global $DB;
+
+		// Initiliaze Link Owner where we create a temporary object for new creating Item:
+		$LinkOwner = new LinkItem( $this, param( 'temp_link_owner_ID', 'integer', 0 ) );
+
+		if( ! empty( $LinkOwner->link_Object->tmp_ID ) )
+		{	// If temporaty object has been created for new Item:
+			$DB->query( 'INSERT INTO T_links ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_tmp_ID, link_file_ID, link_position, link_order )
+				SELECT link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, '.$DB->quote( $LinkOwner->link_Object->tmp_ID ).', link_file_ID, link_position, link_order
+				  FROM T_links
+				WHERE link_itm_ID = '.$DB->quote( $item_ID ) );
+		}
 	}
 
 

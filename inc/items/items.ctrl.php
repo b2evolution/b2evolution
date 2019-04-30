@@ -963,6 +963,9 @@ switch( $action )
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item );
 
+		// Duplicate attachments from source Item:
+		$edited_Item->duplicate_attachments( $item_ID );
+
 		// Initialize a page title depending on item type:
 		$ItemTypeCache = & get_ItemTypeCache();
 		$ItemType = & $ItemTypeCache->get_by_ID( $edited_Item->ityp_ID );

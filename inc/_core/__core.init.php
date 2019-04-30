@@ -1366,13 +1366,14 @@ class _core_Module extends Module
 						'text' => T_('Page'),
 						'entries' => array(
 							// PLACE HOLDER FOR ENTRIES "Edit in Front-Office", "Edit in Back-Office", "View in Back-Office":
-							'edit_front' => NULL,
-							'edit_back'  => NULL,
-							'propose'    => NULL,
-							'view_back'  => NULL,
+							'edit_front'   => NULL,
+							'edit_back'    => NULL,
+							'propose'      => NULL,
+							'view_back'    => NULL,
+							'view_history' => NULL,
 							// PLACE HOLDERS FOR SESSIONS MODULE:
-							'stats_sep'  => NULL,
-							'stats_page' => NULL,
+							'stats_sep'    => NULL,
+							'stats_page'   => NULL,
 						)
 					);
 			}
@@ -1435,9 +1436,16 @@ class _core_Module extends Module
 						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 						{	// Menu item to view post in back-office:
 							$entries['page']['entries']['view_back'] = array(
-									'text' => sprintf( T_('View "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
+									'text' => T_('View in Back-Office').'&hellip;',
 									'href' => $admin_url.'?ctrl=items&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
 								);
+						}
+						if( $perm_admin_restricted && ( $item_history_url = $menu_Item->get_history_url() ) )
+						{
+							$entries['page']['entries']['view_history'] = array(
+								'text' => T_('View History').'&hellip;',
+								'href' => $item_history_url,
+							);
 						}
 						if( $disp != 'proposechange' && ( $propose_change_item_url = $menu_Item->get_propose_change_url() ) )
 						{	// If current User has a permission to propose a change for the Item:
