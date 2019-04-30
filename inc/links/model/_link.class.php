@@ -336,7 +336,7 @@ class Link extends DataObject
 	 */
 	function can_be_file_deleted()
 	{
-		global $current_User, $DB;
+		global $current_User;
 
 		if( ! is_logged_in() )
 		{	// Not logged in user
@@ -356,20 +356,36 @@ class Link extends DataObject
 			return false;
 		}
 
-		// Try to find at least one another link by same file ID:
-		$SQL = new SQL( 'Try to find at least one another link by same file ID #'.$File->ID );
-		$SQL->SELECT( 'link_ID' );
-		$SQL->FROM( 'T_links' );
-		$SQL->WHERE( 'link_file_ID = '.$DB->quote( $File->ID ) );
-		$SQL->WHERE_and( 'link_ID != '.$DB->quote( $this->ID ) );
-		$SQL->LIMIT( '1' );
-		if( $DB->get_var( $SQL ) )
+		if( ! $this->is_single_linked_file() )
 		{	// We cannot delete the file of this link because it is also linked to another object
 			return false;
 		}
 
 		// No any restriction, Current User can delete the file of this link from disk and DB completely:
 		return true;
+	}
+
+
+	/**
+	 * Check if the File is linked only to this Link
+	 *
+	 * @return boolean
+	 */
+	function is_single_linked_file()
+	{
+		if( ! isset( $this->is_single_linked_file ) )
+		{	// Try to find at least one another link by same file ID:
+			global $DB;
+			$SQL = new SQL( 'Try to find at least one another link by same file ID #'.$this->file_ID );
+			$SQL->SELECT( 'link_ID' );
+			$SQL->FROM( 'T_links' );
+			$SQL->WHERE( 'link_file_ID = '.$DB->quote( $this->file_ID ) );
+			$SQL->WHERE_and( 'link_ID != '.$DB->quote( $this->ID ) );
+			$SQL->LIMIT( '1' );
+			$this->is_single_linked_file = ( $DB->get_var( $SQL ) === NULL );
+		}
+
+		return $this->is_single_linked_file;
 	}
 
 
