@@ -13068,15 +13068,25 @@ class Item extends ItemLight
 	/**
 	 * Get other version Items from the same group
 	 *
+	 * @param integer Include additional Item by ID, e.g. ID of source Item on adding new version
 	 * @return array
 	 */
-	function get_other_version_items()
+	function get_other_version_items( $source_item_ID = NULL )
 	{
 		if( ! isset( $this->other_version_items ) )
 		{	// Try to load other version Items from DB:
 			if( ! $this->get( 'igrp_ID' ) )
 			{	// No group for this Item yet:
 				$this->other_version_items = array();
+				if( ! empty( $source_item_ID ) )
+				{	// Include source Item:
+					$ItemCache = & get_ItemCache();
+					$ItemCache->clear();
+					if( $Item = & $ItemCache->get_by_ID( $source_item_ID, false, false ) )
+					{
+						$this->other_version_items[ $Item->ID ] = & $Item;
+					}
+				}
 			}
 			else
 			{	// Load from DB:
@@ -13084,7 +13094,7 @@ class Item extends ItemLight
 				$SQL = new SQL();
 				$SQL->SELECT( 'post_ID' );
 				$SQL->FROM( 'T_items__item' );
-				$SQL->WHERE( 'post_igrp_ID = '.$this->get( 'igrp_ID' ) );
+				$SQL->WHERE( '(post_igrp_ID = '.$this->get( 'igrp_ID' ).( empty( $source_item_ID ) ? '' : ' OR post_ID = '.$source_item_ID ).')' );
 				if( $this->ID > 0 )
 				{	// Exclude this Item:
 					$SQL->WHERE_and( 'post_ID != '.$this->ID );

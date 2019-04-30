@@ -794,7 +794,7 @@ $Form->begin_form( '', '', $params );
 				), '', true );
 		}
 
-		$other_version_items = $edited_Item->get_other_version_items();
+		$other_version_items = $edited_Item->get_other_version_items( $original_item_ID );
 		$item_add_version_link = $edited_Item->get_add_version_link();
 		if( $item_add_version_link || count( $other_version_items ) > 0 )
 		{

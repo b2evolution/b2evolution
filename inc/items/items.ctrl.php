@@ -954,6 +954,12 @@ switch( $action )
 			{	// Set parent Item:
 				$edited_Item->set( 'parent_ID', $item_ID );
 			}
+			// Duplicate same images depending on setting from modal window:
+			$duplicate_same_images = param( 'post_same_images', 'integer', NULL );
+		}
+		else
+		{	// Always duplicate images on action=copy:
+			$duplicate_same_images = true;
 		}
 
 		// Set post comment status and extracats
@@ -963,8 +969,10 @@ switch( $action )
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item );
 
-		// Duplicate attachments from source Item:
-		$edited_Item->duplicate_attachments( $item_ID );
+		if( $duplicate_same_images )
+		{	// Duplicate attachments from source Item:
+			$edited_Item->duplicate_attachments( $item_ID );
+		}
 
 		// Initialize a page title depending on item type:
 		$ItemTypeCache = & get_ItemTypeCache();
