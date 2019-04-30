@@ -293,7 +293,6 @@ if( ! $is_creating )
 
 			$Form->radio( 'blog_new_item_locale_source', $edited_Blog->get_setting( 'new_item_locale_source' ),
 					array(
-						array( 'use_coll', T_('Always use collection locale') ),
 						array( 'select_coll', T_('Allow select - use collection locale by default') ),
 						array( 'select_user', T_('Allow select - use user locale by default') ),
 				), T_('New Posts'), true );

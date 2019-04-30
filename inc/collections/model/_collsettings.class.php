@@ -208,7 +208,7 @@ class CollectionSettings extends AbstractSettings
 			'htsrv_assets_absolute_url' => '', // Absolute URL for setting 'htsrv_assets_url_type' with selected option 'absolute'
 			'locale_source' => 'blog', // Source of the locale for navigation/widget: 'blog', 'user'
 			'post_locale_source' => 'post', // Source of the locale for post content: 'post', 'blog'
-			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'use_coll', 'select_coll', 'select_user'
+			'new_item_locale_source' => 'select_coll', // Source of the locale for new items: 'select_coll', 'select_user'
 			// Cookie settings:
 			'cookie_domain_type' => 'auto', // Cookie domain type: 'auto', 'custom'
 			'cookie_path_type' => 'auto', // Cookie path type: 'auto', 'custom'

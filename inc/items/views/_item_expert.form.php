@@ -188,20 +188,6 @@ $Form->begin_form( '', '', $params );
 	{	// Hide a post title field:
 		$Form->hidden( 'post_title', $item_title );
 	}
-
-	/*$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
-	if( ( $Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
-	      $edited_Item->get( 'locale' ) == $Blog->get( 'locale' ) &&
-	      isset( $locales[ $edited_Item->get( 'locale' ) ] )
-	    ) || is_array( $locale_options ) )
-	{	// Force to use collection locale because it is restricted by collection setting and the edited item has the same locale as collection
-		// OR only single locale is allowed to select:
-		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
-	}
-	else
-	{	// Allow to select a locale:
-		$Form->select_input_options( 'post_locale', $locale_options, T_('Language'), '', array( 'style' => 'width:180px' ) );
-	}*/
 	$Form->end_fieldset();
 	$Form->switch_layout( NULL );
 
@@ -725,14 +711,6 @@ $Form->begin_form( '', '', $params );
 		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
 	}
 
-	/*if( ! is_array( $locale_options ) )
-	{	// Display this setting if we have more than 1 enabled locale:
-		$Form->radio( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ), array(
-				array( 'always', T_('Show for any navigation locale') ),
-				array( 'follow-nav-locale', T_('Show only if matching navigation locale') )
-			), '', true );
-	}*/
-
 	// Single/page view:
 	if( ! in_array( $edited_Item->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all', 'content-block', 'special' ) ) )
 	{	// We don't need this setting for intro, content block and special items:
@@ -780,13 +758,13 @@ $Form->begin_form( '', '', $params );
 	}
 
 
-	// ################### Language / Versions ###################
-	$Form->begin_fieldset( T_('Language / Versions').get_manual_link( 'post-language-versions' ), array( 'id' => 'itemform_language', 'fold' => true ) );
+	// ################### LANGUAGE / VERSIONS ###################
+	$Form->begin_fieldset( T_('Language / Versions').get_manual_link( 'post-language-versions' ), array( 'id' => 'itemform_language', 'fold' => true, 'deny_fold' => true ) );
 	$Form->switch_layout( 'fields_table' );
 
 		$Form->select_input_options( 'post_locale', $edited_Item->get_locale_options(), T_('Language'), '', array( 'style' => 'width:auto' ) );
 
-		if( count( $edited_Item->get_available_locales() ) )
+		if( count( $edited_Item->get_available_locales() ) > 1 )
 		{	// Display this setting if we have more than 1 enabled locale:
 			$Form->radio( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ), array(
 					array( 'always', T_('Show for any navigation locale') ),
@@ -797,11 +775,11 @@ $Form->begin_form( '', '', $params );
 		$other_version_items = $edited_Item->get_other_version_items( $original_item_ID );
 		$item_add_version_link = $edited_Item->get_add_version_link();
 		if( $item_add_version_link || count( $other_version_items ) > 0 )
-		{
+		{	// Display other versions and link to add version:
 			echo '<b>'.T_('Other versions').':</b>';
 			echo '<ul style="list-style:disc;margin-left:20px">';
 			foreach( $other_version_items as $other_version_Item )
-			{
+			{	// Display a link to another version of the Item:
 				echo '<li>'.$other_version_Item->get_title( array( 'link_type' => 'edit_view_url' ) ).' '
 						.locale_flag( $other_version_Item->get( 'locale' ), 'w16px', 'flag', '', false )
 						.'<span class="note">('.$other_version_Item->get( 'locale' ).')</span>'

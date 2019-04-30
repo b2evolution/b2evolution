@@ -396,7 +396,6 @@ class Item extends ItemLight
 			{	// Set locale depending on collection setting:
 				switch( $Blog->get_setting( 'new_item_locale_source' ) )
 				{
-					case 'use_coll':
 					case 'select_coll':
 						// Use locale of current collection by default:
 						$new_item_locale = $Blog->get( 'locale' );
@@ -7525,14 +7524,6 @@ class Item extends ItemLight
 
 		$this->set_last_touched_ts();
 		$this->set_contents_last_updated_ts();
-
-		// Check which locale we can use for this item:
-		$item_Blog = & $this->get_Blog();
-		if( $item_Blog && $item_Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
-		    $this->get( 'locale' ) != $item_Blog->get( 'locale' ) )
-		{	// Force to use collection locale because it is restricted by collection setting:
-			$this->set( 'locale', $item_Blog->get( 'locale' ) );
-		}
 
 		// Check if item is assigned to a user
 		if( isset( $this->dbchanges['post_assigned_user_ID'] ) )

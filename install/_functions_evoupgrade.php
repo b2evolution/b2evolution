@@ -11691,6 +11691,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15430, 'Updating collection locale setting for new posts...' ) )
+	{	// part of 7.0.1-alpha
+		$DB->query( 'UPDATE T_coll_settings
+			  SET cset_value = "select_coll"
+			WHERE cset_name = "new_item_locale_source"
+			  AND cset_value = "use_coll"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
