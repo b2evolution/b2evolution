@@ -466,7 +466,7 @@ class ArchiveList extends Results
 		}
 
 		// Restrict with locale visibility by current navigation locale:
-		$ItemQuery->where_locale_visibility();
+		$this->ItemQuery->where_locale_visibility();
 
 		$this->from = $this->ItemQuery->get_from();
 		$this->where = $this->ItemQuery->get_where();

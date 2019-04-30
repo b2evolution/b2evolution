@@ -13066,6 +13066,10 @@ class Item extends ItemLight
 	{
 		if( ! isset( $this->other_version_items ) )
 		{	// Try to load other version Items from DB:
+			if( $source_item_ID == $this->ID )
+			{	// Don't include the same Item:
+				$source_item_ID = NULL;
+			}
 			if( ! $this->get( 'igrp_ID' ) )
 			{	// No group for this Item yet:
 				$this->other_version_items = array();
