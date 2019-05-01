@@ -936,4 +936,52 @@ function resize_image( $File, $new_width, $new_height, $mimetype = NULL, $image_
 	}
 }
 
+
+/**
+ * Output a black error thumbnail
+ *
+ * @param string Error message to display in the thumbnail
+ * @param integer Thumbnail width
+ * @param integer Thumbnail height
+ */
+function output_error_thumb( $err = '!error', $thumb_width = 80, $thumb_height = 80 )
+{
+	// Note: we write small and close to the upper left in order to have as much text as possible on small thumbs
+	$line_height = 11;
+	$err = substr( $err, 1 ); // crop 1st car
+	$car_width = ceil( ($thumb_width-4)/6 );
+	// $err = 'w='.$car_width.' '.$err;
+
+	// Wrap error message and split it into lines:
+	$err_lines = preg_split( '~\n~', wordwrap( $err, $car_width, "\n", true ) );
+	$im_handle = imagecreatetruecolor( $thumb_width, $thumb_height ); // Create a black image
+	if( count($err_lines)*$line_height > $thumb_height )
+	{ // Message does not fit into picture:
+		// Rewrite error messages, so they fit better into the generated images.
+		$rewritten = true;
+		if( preg_match('~Unable to open \'.*?\' for writing: Permission denied~', $err) )
+			$err = 'Cannot write: permission denied';
+		else
+			$rewritten = false;
+		// Recreate error lines, if it has been rewritten/shortened.
+		if( $rewritten )
+		{
+			$err_lines = preg_split( '~\n~', wordwrap( $err, $car_width, "\n", true ) );
+		}
+	}
+
+	$text_color = imagecolorallocate( $im_handle, 255, 0, 0 );
+	$y = 0;
+	foreach( $err_lines as $err_string )
+	{
+		imagestring( $im_handle, 2, 2, $y, $err_string, $text_color);
+		$y += $line_height;
+	}
+
+	header('Content-type: image/png' );
+	header_nocache();	// Do NOT cache errors! People won't see they have fixed them!!
+
+	imagepng( $im_handle );
+	imagedestroy( $im_handle );
+}
 ?>

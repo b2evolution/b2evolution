@@ -4447,6 +4447,12 @@ class Item extends ItemLight
 				{	// Display the log message only for revision preview mode:
 					$r .= '<div class="red">'.$log_message.'</div>';
 				}
+
+				// Still generate the IMG tag but this should display a black thumbnail with the appropriate error message:
+				$r .= $this->get_attached_image_tag( $Link, $params );
+
+				$image_counter++;
+
 				$Debuglog->add( $log_message, array( 'error', 'files' ) );
 				continue;
 			}
@@ -9523,7 +9529,7 @@ class Item extends ItemLight
 	 *
 	 * @param double New order value
 	 * @param integer Category ID, NULL - for main category
-	 * @return boolean 
+	 * @return boolean
 	 */
 	function update_order( $order, $cat_ID = NULL )
 	{
@@ -10597,7 +10603,7 @@ class Item extends ItemLight
 			{	// This Item has no proposed changes:
 				return;
 			}
-			
+
 		}
 
 		if( strpos( $action, 'accept' ) !== false )
@@ -12512,7 +12518,7 @@ class Item extends ItemLight
 
 		// Get next version ID:
 		$iver_ID = $this->get_next_version_ID( 'proposed' );
-	
+
 		$result = $DB->query( 'INSERT INTO T_items__version ( iver_ID, iver_type, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
 			VALUES ( '.$iver_ID.', '
 				.'"proposed", '
