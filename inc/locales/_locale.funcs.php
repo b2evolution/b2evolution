@@ -908,7 +908,7 @@ function locale_overwritefromDB()
  */
 function locale_updateDB()
 {
-	global $locales, $DB, $Settings, $Messages, $action;
+	global $locales, $DB, $Settings, $Messages, $action, $current_User, $admin_url;
 	global $saved_params;
 
 	$templocales = $locales;
@@ -994,46 +994,95 @@ function locale_updateDB()
 	$disabled_locales = ( count( $disabled_locales ) > 0 ) ? $DB->quote( $disabled_locales ) : false;
 	if( $disabled_locales && ( $action != 'confirm_update' ) )
 	{ // Some locales were disabled, create warning message if required
-		$user_disabled_locales = $DB->get_assoc( '
-			SELECT user_locale, count( user_ID ) as number_of_users
-			FROM T_users
-			WHERE user_locale IN ( '.$disabled_locales.' )
-			GROUP BY user_locale
-			HAVING number_of_users > 0
-			ORDER BY user_locale'
-		);
-		$coll_disabled_locales = $DB->get_assoc( '
-			SELECT blog_locale, count( blog_ID ) as number_of_blogs
-			FROM T_blogs
-			WHERE blog_locale IN ( '.$disabled_locales.' )
-			GROUP BY blog_locale
-			HAVING number_of_blogs > 0
-			ORDER BY blog_locale'
-		);
-
 		global $warning_message;
-		$warning_message = array();
-		$users_message = T_('%d users with invalid locale %s');
-		$colls_message = T_('%d collections with invalid locale %s');
-		foreach( $user_disabled_locales as $disabled_locale => $numbe_of_users )
-		{ // Disabled locale is used by users, add warning
-			$warning_message[] = sprintf( $users_message, $numbe_of_users, $disabled_locale );
-			if( isset( $coll_disabled_locales[$disabled_locale] ) )
-			{ // Disabled locale is used by blogs, add warning
-				$warning_message[] = sprintf( $colls_message, $coll_disabled_locales[$disabled_locale], $disabled_locale );
-				unset( $coll_disabled_locales[$disabled_locale] );
+		$warning_message = '';
+
+		// Display what MAIN collection locales will be disabled:
+		$SQL = new SQL( 'Get collections with disabled main locales' );
+		$SQL->SELECT( 'blog_locale, GROUP_CONCAT( blog_ID SEPARATOR "," ) ' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->WHERE( 'blog_locale IN ( '.$disabled_locales.' )' );
+		$SQL->ORDER_BY( 'blog_locale' );
+		$SQL->GROUP_BY( 'blog_locale' );
+		$SQL->HAVING( 'COUNT( blog_ID ) > 0' );
+		$main_locale_colls = $DB->get_assoc( $SQL );
+		if( count( $main_locale_colls ) > 0 )
+		{
+			$BlogCache = & get_BlogCache();
+			$BlogCache->load_list( explode( ',', implode( ',', $main_locale_colls ) ) );
+			foreach( $main_locale_colls as $main_locale => $main_locale_coll_IDs )
+			{
+				$warning_message .= sprintf( T_('The locale %s is used as main locale by the following collections:'), '<code>'.$main_locale.'</code>' ).'<ul style="list-style:disc;margin-left:20px">';
+				$main_locale_coll_IDs = explode( ',', $main_locale_coll_IDs );
+				foreach( $main_locale_coll_IDs as $main_locale_coll_ID )
+				{
+					$locale_Blog = & $BlogCache->get_by_ID( $main_locale_coll_ID );
+					$coll_url = $current_User->check_perm( 'blog_properties', 'edit', false, $main_locale_coll_ID )
+						? $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$locale_Blog->ID.'#fieldset_wrapper_language'
+						: $locale_Blog->get( 'url' );
+					$warning_message .= '<li><a href="'.$coll_url.'">'.$locale_Blog->get( 'name' ).'</a></li>';
+				}
+				$warning_message .= '</ul>'.sprintf( T_('These will be switched to the default locale %s.'), '<code>'.$main_locale.'</code>' ).'<br><br>';
 			}
 		}
-		foreach( $coll_disabled_locales as $disabled_locale => $numbe_of_colls )
-		{ // Disabled locale is used by blogs, add warning
-			$warning_message[] = sprintf( $colls_message, $numbe_of_colls, $disabled_locale );
+
+		// Display what EXTRA collection locales will be disabled:
+		$SQL = new SQL( 'Get collections with disabled extra locales' );
+		$SQL->SELECT( 'cl_locale, GROUP_CONCAT( cl_coll_ID SEPARATOR "," ) ' );
+		$SQL->FROM( 'T_coll_locales' );
+		$SQL->WHERE( 'cl_locale IN ( '.$disabled_locales.' )' );
+		$SQL->ORDER_BY( 'cl_locale' );
+		$SQL->GROUP_BY( 'cl_locale' );
+		$SQL->HAVING( 'COUNT( cl_coll_ID ) > 0' );
+		$extra_locale_colls = $DB->get_assoc( $SQL );
+		if( count( $extra_locale_colls ) > 0 )
+		{
+			$BlogCache = & get_BlogCache();
+			$BlogCache->load_list( explode( ',', implode( ',', $extra_locale_colls ) ) );
+			foreach( $extra_locale_colls as $extra_locale => $extra_locale_coll_IDs )
+			{
+				$warning_message .= sprintf( T_('The locale %s is also used as extra locale by the following collections:'), '<code>'.$extra_locale.'</code>' ).'<ul style="list-style:disc;margin-left:20px">';
+				$extra_locale_coll_IDs = explode( ',', $extra_locale_coll_IDs );
+				foreach( $extra_locale_coll_IDs as $extra_locale_coll_ID )
+				{
+					$locale_Blog = & $BlogCache->get_by_ID( $extra_locale_coll_ID );
+					$coll_url = $current_User->check_perm( 'blog_properties', 'edit', false, $extra_locale_coll_ID )
+						? $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$locale_Blog->ID.'#fieldset_wrapper_language'
+						: $locale_Blog->get( 'url' );
+					$warning_message .= '<li><a href="'.$coll_url.'">'.$locale_Blog->get( 'name' ).'</a></li>';
+				}
+				$warning_message .= '</ul>'.sprintf( T_('These collections will no longer use the %s extra locale.'), '<code>'.$extra_locale.'</code>' ).'<br><br>';
+			}
 		}
 
-		if( !empty( $warning_message ) )
-		{ // There are disabled locales which are used, create the final warning message
-			$warning_message = T_('You have disabled some locales. This results in:')."\n"
-				.'<ul><li>'.implode( '</li><li>', $warning_message ).'</li></ul>'
-				.sprintf( T_('These will be assigned the default locale %s'), $current_default_locale );
+		// Display what USER locales will be disabled:
+		$SQL = new SQL( 'Get users with disabled locales' );
+		$SQL->SELECT( 'user_locale, GROUP_CONCAT( user_ID SEPARATOR "," ) ' );
+		$SQL->FROM( 'T_users' );
+		$SQL->WHERE( 'user_locale IN ( '.$disabled_locales.' )' );
+		$SQL->ORDER_BY( 'user_locale' );
+		$SQL->GROUP_BY( 'user_locale' );
+		$SQL->HAVING( 'COUNT( user_ID ) > 0' );
+		$locale_users = $DB->get_assoc( $SQL );
+		if( count( $locale_users ) > 0 )
+		{
+			$UserCache = & get_UserCache();
+			$UserCache->load_list( explode( ',', implode( ',', $locale_users ) ) );
+			foreach( $locale_users as $user_locale => $locale_user_IDs )
+			{
+				$warning_message .= sprintf( T_('The locale %s is also used as locale by the following users:'), '<code>'.$user_locale.'</code>' ).'<ul style="list-style:disc;margin-left:20px">';
+				$locale_user_IDs = explode( ',', $locale_user_IDs );
+				foreach( $locale_user_IDs as $locale_user_ID )
+				{
+					$locale_User = & $UserCache->get_by_ID( $locale_user_ID );
+					$warning_message .= '<li>'.$locale_User->get_identity_link( array( 'user_tab' => 'userprefs' ) ).'</li>';
+				}
+				$warning_message .= '</ul>'.sprintf( T_('These users will no longer use the %s locale.'), '<code>'.$user_locale.'</code>' ).'<br><br>';
+			}
+		}
+
+		if( ! empty( $warning_message ) )
+		{
 			return false;
 		}
 	}
@@ -1086,14 +1135,14 @@ function locale_updateDB()
 	if( $action == 'confirm_update' )
 	{ // Update users and blogs locale to the default if the prevously used locale was disabled
 		$users_update = $DB->query( 'UPDATE T_users
-			SET user_locale = '.$DB->quote( $current_default_locale ).'
-			WHERE  user_locale IN ( '.$disabled_locales.' )'
-		);
-		$blogs_update = $DB->query( 'UPDATE T_blogs
-			SET blog_locale = '.$DB->quote( $current_default_locale ).'
-			WHERE  blog_locale IN ( '.$disabled_locales.' )'
-		);
-		$result = ( $users_update !== false ) && ( $blogs_update !== false );
+			  SET user_locale = '.$DB->quote( $current_default_locale ).'
+			WHERE  user_locale IN ( '.$disabled_locales.' )' );
+		$colls_main_locales_update = $DB->query( 'UPDATE T_blogs
+			  SET blog_locale = '.$DB->quote( $current_default_locale ).'
+			WHERE blog_locale IN ( '.$disabled_locales.' )' );
+		$colls_extra_locales_update = $DB->query( 'DELETE FROM T_coll_locales
+			WHERE cl_locale IN ( '.$disabled_locales.' )' );
+		$result = ( $users_update !== false ) && ( $colls_main_locales_update !== false ) && ( $colls_extra_locales_update !== false );
 	}
 
 	if( $result && ( $DB->query($query) !== false ) )
