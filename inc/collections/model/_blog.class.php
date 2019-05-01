@@ -204,6 +204,12 @@ class Blog extends DataObject
 
 
 	/**
+	 * @var array Linked collections with locales
+	 */
+	var $linked_colls = NULL;
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -575,6 +581,12 @@ class Blog extends DataObject
 				if( $extra_locales !== NULL )
 				{	// Set new extra locales:
 					$this->set_locales( $extra_locales );
+				}
+
+				$linked_colls = param( 'blog_locale_link_coll', 'array:integer', NULL );
+				if( $linked_colls !== NULL )
+				{	// Set new linked colle:
+					$this->set_linked_colls( $linked_colls );
 				}
 			}
 
@@ -6178,8 +6190,9 @@ class Blog extends DataObject
 			$SQL->SELECT( 'cl_locale' );
 			$SQL->FROM( 'T_coll_locales' );
 			$SQL->WHERE( 'cl_coll_ID = '.$this->ID );
+			$SQL->WHERE_and( 'cl_linked_coll_ID IS NULL' );
 			$SQL->ORDER_BY( 'cl_locale' );
-			$this->locales = $DB->get_col( $SQL->get(), 0, $SQL->title );
+			$this->locales = $DB->get_col( $SQL );
 			if( ! in_array( $this->get( 'locale' ), $this->locales ) )
 			{	// Add main locale it is not stored in extra locales by some reason:
 				$this->locales[] = $this->get( 'locale' );
@@ -6236,7 +6249,70 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get linked collections with this collection by locale
+	 *
+	 * @return array Key is locale, Value is collection ID
+	 */
+	function get_linked_colls()
+	{
+		if( $this->linked_colls === NULL && ! empty( $this->ID ) )
+		{	// Load linked collections from DB once and store in cache variable:
+			global $DB;
+			$SQL = new SQL( 'Get linked collections with collection #'.$this->ID.' by locales' );
+			$SQL->SELECT( 'cl_locale, cl_linked_coll_ID' );
+			$SQL->FROM( 'T_coll_locales' );
+			$SQL->WHERE( 'cl_coll_ID = '.$this->ID );
+			$SQL->WHERE_and( 'cl_linked_coll_ID IS NOT NULL' );
+			$SQL->ORDER_BY( 'cl_locale' );
+			$this->linked_colls = $DB->get_assoc( $SQL );
+		}
+
+		if( ! is_array( $this->linked_colls ) )
+		{	// Set default empty array:
+			$this->linked_colls = array();
+		}
+
+		return $this->linked_colls;
+	}
+
+
+	/**
+	 * Set linked collections with this collection by locale
+	 *
+	 * @param array Linked collections
+	 */
+	function set_linked_colls( $new_linked_colls = array() )
+	{
+		global $locales;
+
+		$enabled_locales = array();
+		foreach( $locales as $locale_key => $locale_data )
+		{
+			if( $locale_data['enabled'] )
+			{	// If locale is enabled:
+				$enabled_locales[] = $locale_key;
+			}
+		}
+
+		foreach( $new_linked_colls as $locale_key => $linked_coll_ID )
+		{
+			if( empty( $linked_coll_ID ) || ! in_array( $locale_key, $enabled_locales ) )
+			{	// Unset a disabled locale:
+				unset( $new_linked_colls[ $locale_key ] );
+			}
+		}
+
+		// Sort collections by locale:
+		ksort( $new_linked_colls );
+
+		// Set new linked collections:
+		$this->linked_colls = $new_linked_colls;
+	}
+
+
+	/**
 	 * Update locales of this collection
+	 * and also update a linking with other collection by locales
 	 *
 	 * @return boolean TRUE on success
 	 */
@@ -6253,16 +6329,27 @@ class Blog extends DataObject
 		$DB->query( 'DELETE FROM T_coll_locales
 			WHERE cl_coll_ID = '.$this->ID );
 
+		$sql_coll_locales = array();
+
 		if( ! empty( $this->locales ) )
 		{	// If at least one new locale:
-			$sql_coll_locales = array();
 			foreach( $this->locales as $coll_locale )
 			{
-				$sql_coll_locales[] = '( '.$this->ID.', '.$DB->quote( $coll_locale ).' )';
+				$sql_coll_locales[ $coll_locale ] = '( '.$this->ID.', '.$DB->quote( $coll_locale ).', NULL )';
 			}
+		}
 
-			// Insert new locales:
-			$DB->query( 'INSERT INTO T_coll_locales ( cl_coll_ID, cl_locale )
+		if( ! empty( $this->linked_colls ) )
+		{	// If at least one new locale:
+			foreach( $this->linked_colls as $linked_locale => $linked_coll_ID )
+			{
+				$sql_coll_locales[ $linked_locale ] = '( '.$this->ID.', '.$DB->quote( $linked_locale ).', '.$DB->quote( $linked_coll_ID ).' )';
+			}
+		}
+
+		if( ! empty( $sql_coll_locales ) )
+		{	// Insert new locales:
+			$DB->query( 'INSERT INTO T_coll_locales ( cl_coll_ID, cl_locale, cl_linked_coll_ID )
 				VALUES '.implode( ', ', $sql_coll_locales ) );
 		}
 
@@ -6790,6 +6877,8 @@ class Blog extends DataObject
 			return T_('N/A');
 		}
 
+		$linked_colls = $this->get_linked_colls();
+
 		if( ! is_logged_in() || ! $current_User->check_perm( 'blogs', 'editall' ) )
 		{	// Display only the stored value because current User has no permission to edit all collections:
 			return T_('None');
@@ -6808,6 +6897,7 @@ class Blog extends DataObject
 		$extra_locale_SQL->SELECT( 'cl_coll_ID' );
 		$extra_locale_SQL->FROM( 'T_coll_locales' );
 		$extra_locale_SQL->WHERE( 'cl_locale = '.$DB->quote( $locale ) );
+		$extra_locale_SQL->WHERE_and( 'cl_linked_coll_ID IS NULL' );
 		if( $this->ID > 0 )
 		{
 			$extra_locale_SQL->WHERE_and( 'cl_coll_ID != '.$this->ID );
@@ -6831,7 +6921,9 @@ class Blog extends DataObject
 		{
 			if( $locale_Blog = & $BlogCache->get_by_ID( $coll_ID, false, false ) )
 			{
-				$r .= '<option value="'.$coll_ID.'">'.$locale_Blog->get( 'name' ).'</option>';
+				$r .= '<option value="'.$coll_ID.'"'
+					.( isset( $linked_colls[ $locale ] ) && $linked_colls[ $locale ] == $coll_ID ? ' selected="selected"' : '' ).'>'
+					.$locale_Blog->get( 'name' ).'</option>';
 			}
 		}
 		$r .= '</select>';

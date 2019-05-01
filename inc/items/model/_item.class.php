@@ -13000,6 +13000,7 @@ class Item extends ItemLight
 			$SQL->SELECT( 'cl_locale' );
 			$SQL->FROM( 'T_coll_locales' );
 			$SQL->WHERE( 'cl_coll_ID = '.$this->get_blog_ID() );
+			$SQL->WHERE_and( 'cl_linked_coll_ID IS NULL' );
 			$SQL->ORDER_BY( 'cl_locale' );
 			$this->available_locales = $DB->get_col( $SQL );
 		}

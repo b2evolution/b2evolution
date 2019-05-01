@@ -102,10 +102,11 @@ $schema_queries = array_merge( $schema_queries, array(
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_coll_locales' => array(
-		'Creating table for collection extra locales',
+		'Creating table for collection extra locales and linking with other collections',
 		"CREATE TABLE T_coll_locales (
-			cl_coll_ID INT(10) UNSIGNED NOT NULL,
-			cl_locale  VARCHAR(20) COLLATE ascii_general_ci NOT NULL,
+			cl_coll_ID        INT(10) UNSIGNED NOT NULL,
+			cl_locale         VARCHAR(20) COLLATE ascii_general_ci NOT NULL,
+			cl_linked_coll_ID INT(10) UNSIGNED NULL,
 			PRIMARY KEY cl_coll_loc_pk (cl_coll_ID, cl_locale)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
