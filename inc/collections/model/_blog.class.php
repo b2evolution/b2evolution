@@ -6881,7 +6881,12 @@ class Blog extends DataObject
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'blogs', 'editall' ) )
 		{	// Display only the stored value because current User has no permission to edit all collections:
-			return T_('None');
+			if( isset( $linked_colls[ $locale ] ) )
+			{	// Get the linked collection:
+				$BlogCache = & get_BlogCache();
+				$linked_Blog = & $BlogCache->get_by_ID( $linked_colls[ $locale ], false, false );
+			}
+			return empty( $linked_Blog ) ? T_('None') : $linked_Blog->get( 'name' );
 		}
 
 		$main_locale_SQL = new SQL( 'Get collections with locale '.$locale.' to link with coolection #'.$this->ID );
