@@ -24,34 +24,16 @@ $Form->begin_form();
 	$Form->hidden( 'blog', $edited_Item->get_blog_ID() );
 	$Form->hidden( 'p', $edited_Item->ID );
 
-	$locale_options = $edited_Item->get_locale_options( true );
-	if( empty( $locale_options ) )
-	{
-		echo T_('You already created a version for each locale in this collection.').' ';
+	$Form->select_input_options( 'post_locale', $edited_Item->get_locale_options(), T_('Language'), '', array( 'style' => 'width:auto' ) );
 
-		if( $current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
-		{	// Display a button to edit collection locales if current User has a permission:
-			$Form->button_input( array(
-					'tag'   => 'link',
-					'value' => T_('Configure locales'),
-					'class' => 'btn-primary',
-					'href'  => $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$edited_Item->get_blog_ID().'#fieldset_wrapper_language',
-				) );
-		}
+	$Form->checkbox( 'post_same_images', 1, T_('Same images'), T_('Link all attachments of current Item to new version.') );
+
+	if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
+	{	// If parent is allowed for the Item Type:
+		$Form->checkbox( 'post_create_child', 1, T_('Create as child'), T_('Version will be a child and current Item will be parent.') );
 	}
-	else
-	{
-		$Form->select_input_options( 'post_locale', $locale_options, T_('Language'), '', array( 'style' => 'width:auto' ) );
 
-		$Form->checkbox( 'post_same_images', 1, T_('Same images'), T_('Link all attachments of current Item to new version.') );
-
-		if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
-		{	// If parent is allowed for the Item Type:
-			$Form->checkbox( 'post_create_child', 1, T_('Create as child'), T_('Version will be a child and current Item will be parent.') );
-		}
-
-		$Form->buttons( array( array( 'submit', 'actionArray[new_version]', T_('Add version'), 'SaveButton' ) ) );
-	}
+	$Form->buttons( array( array( 'submit', 'actionArray[new_version]', T_('Add version'), 'SaveButton' ) ) );
 
 $Form->end_form();
 ?>
