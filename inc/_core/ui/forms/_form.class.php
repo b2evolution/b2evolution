@@ -5022,6 +5022,10 @@ class Form extends Widget
 	{
 		global $locales;
 
+		$BlogCache = & get_BlogCache();
+		$link_Blog = & $BlogCache->get_by_ID( $field_params['link_coll_ID'], false, false );
+		unset( $field_params['link_coll_ID'] );
+
 		$this->handle_common_params( $field_params, $field_name, $field_label, $field_note );
 
 		$r = $this->begin_field();
@@ -5030,9 +5034,10 @@ class Form extends Widget
 
 		// Table header:
 		$r .= '<thead><tr>'
+				.'<th>'.T_('Locale').'</th>'
 				.'<th>'.T_('Main').'</th>'
 				.'<th>'.T_('Extra').'</th>'
-				.'<th>'.T_('Locale').'</th>'
+				.( $link_Blog ? '<th>'.T_('Link with').'</th>' : '' )
 			.'</tr></thead>';
 
 		foreach( $locales as $locale_key => $locale_data )
@@ -5043,7 +5048,8 @@ class Form extends Widget
 			}
 
 			// Locale row with radio, checkbox and name:
-			$r .= '<tr>'
+			$r .= '<tr data-locale="'.$locale_key.'">'
+					.'<td>'.T_( $locale_data['name'] ).'</td>'
 					.'<td class="center"><input type="radio" '
 							.'name="'.format_to_output( $field_name, 'htmlattr' ).'" '
 							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
@@ -5052,7 +5058,7 @@ class Form extends Widget
 							.'name="'.format_to_output( $field_name, 'htmlattr' ).'_extra[]" '
 							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
 							.( in_array( $locale_key, $extra_locales ) ? ' checked="checked"' : '' ).' /></td>'
-					.'<td>'.T_( $locale_data['name'] ).'</td>'
+					.( $link_Blog ? '<td class="evo_coll_link_locale_selector">'.$link_Blog->get_link_locale_selector( $field_name, $locale_key ).'</td>' : '' )
 				.'</tr>';
 		}
 
@@ -5073,7 +5079,58 @@ class Form extends Widget
 				{
 					return false;
 				}
-			} );
+			} );';
+		if( $link_Blog )
+		{	// JavaScript to link with collections:
+			$r .= 'jQuery( "input[type=radio][name='.$field_name.'], input[type=checkbox][name=\''.$field_name.'_extra[]\']" ).click( function()
+			{
+				var locale_row = jQuery( this ).closest( "tr" );
+				var current_locale = locale_row.data( "locale" );
+				var coll_locale_selector = jQuery( "select[name=\''.$field_name.'_link_coll[" + current_locale + "]\']" );
+				if( jQuery( this ).is( ":checked" ) || jQuery( "input[type=radio][name='.$field_name.'][value=\'" + jQuery( this ).val() + "\']" ).is( ":checked" ) )
+				{
+					if( coll_locale_selector.length )
+					{
+						coll_locale_selector.hide();
+						if( coll_locale_selector.next( "span" ).length )
+						{
+							coll_locale_selector.next( "span" ).show();
+						}
+						else
+						{
+							coll_locale_selector.after( "<span>'.TS_('N/A').'</span>" );
+						}
+					}
+				}
+				else
+				{
+					if( coll_locale_selector.length )
+					{	// Show selector from cache:
+						coll_locale_selector.show();
+						coll_locale_selector.next( "span" ).hide();
+					}
+					else
+					{	// Load selector by AJAX:
+						jQuery.ajax(
+						{
+							url: "'.get_htsrv_url().'async.php",
+							type: "POST",
+							data: {
+								action: "get_link_locale_selector",
+								coll_ID: '.$link_Blog->ID.',
+								coll_locale: current_locale,
+								field_name: "'.$field_name.'",
+							},
+							success: function( result )
+							{
+								locale_row.find( "td.evo_coll_link_locale_selector" ).html( ajax_debug_clear( result ) );
+							},
+						} );
+					}
+				}
+			} );';
+		}
+		$r .= '
 		</script>';
 
 		$r .= $this->end_field();

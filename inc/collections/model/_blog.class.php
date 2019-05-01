@@ -6180,6 +6180,10 @@ class Blog extends DataObject
 			$SQL->WHERE( 'cl_coll_ID = '.$this->ID );
 			$SQL->ORDER_BY( 'cl_locale' );
 			$this->locales = $DB->get_col( $SQL->get(), 0, $SQL->title );
+			if( ! in_array( $this->get( 'locale' ), $this->locales ) )
+			{	// Add main locale it is not stored in extra locales by some reason:
+				$this->locales[] = $this->get( 'locale' );
+			}
 		}
 
 		if( ! is_array( $this->locales ) )
@@ -6764,6 +6768,75 @@ class Blog extends DataObject
 		}
 
 		return $this->mustread_items_count;
+	}
+
+
+	/**
+	 * Get a selector to link this collection with other collections
+	 * which have same main or extra locale as requested
+	 *
+	 * @param string Field name
+	 * @param string Locale to search other collections
+	 * @return string
+	 */
+	function get_link_locale_selector( $field_name, $locale, $restrict_used_locales = true )
+	{
+		global $DB, $current_User;
+
+		if( $restrict_used_locales &&
+		    ( $this->get( 'locale' ) == $locale ||
+		      in_array( $locale, $this->get_locales() ) ) )
+		{	// Don't allow selector if this collection already uses the requested locale:
+			return T_('N/A');
+		}
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'blogs', 'editall' ) )
+		{	// Display only the stored value because current User has no permission to edit all collections:
+			return T_('None');
+		}
+
+		$main_locale_SQL = new SQL( 'Get collections with locale '.$locale.' to link with coolection #'.$this->ID );
+		$main_locale_SQL->SELECT( 'blog_ID' );
+		$main_locale_SQL->FROM( 'T_blogs' );
+		$main_locale_SQL->WHERE( 'blog_locale = '.$DB->quote( $locale ) );
+		if( $this->ID > 0 )
+		{
+			$main_locale_SQL->WHERE_and( 'blog_ID != '.$this->ID );
+		}
+
+		$extra_locale_SQL = new SQL( 'Get collections with locale '.$locale.' to link with coolection #'.$this->ID );
+		$extra_locale_SQL->SELECT( 'cl_coll_ID' );
+		$extra_locale_SQL->FROM( 'T_coll_locales' );
+		$extra_locale_SQL->WHERE( 'cl_locale = '.$DB->quote( $locale ) );
+		if( $this->ID > 0 )
+		{
+			$extra_locale_SQL->WHERE_and( 'cl_coll_ID != '.$this->ID );
+		}
+
+		$colls = $DB->get_col( 'SELECT blog_ID
+			FROM ( '.$main_locale_SQL->get().' UNION ' .$extra_locale_SQL->get().' ) AS locale_colls
+			ORDER BY blog_ID' );
+
+		if( empty( $colls ) )
+		{	// No collection with requested locale:
+			return T_('None');
+		}
+
+		$BlogCache = get_BlogCache();
+		$BlogCache->load_list( $colls );
+
+		$r = '<select name="'.$field_name.'_link_coll['.$locale.']" class="form-control" style="width:100%">';
+		$r .= '<option value="">'.T_('None').'</option>';
+		foreach( $colls as $coll_ID )
+		{
+			if( $locale_Blog = & $BlogCache->get_by_ID( $coll_ID, false, false ) )
+			{
+				$r .= '<option value="'.$coll_ID.'">'.$locale_Blog->get( 'name' ).'</option>';
+			}
+		}
+		$r .= '</select>';
+
+		return $r;
 	}
 }
 
