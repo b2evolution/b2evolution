@@ -8917,7 +8917,7 @@ class Item extends ItemLight
 	 *
 	 * @param double New order value
 	 * @param integer Category ID, NULL - for main category
-	 * @return boolean 
+	 * @return boolean
 	 */
 	function update_order( $order, $cat_ID = NULL )
 	{
