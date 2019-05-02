@@ -1668,6 +1668,27 @@ function skin_init( $disp )
 			break;
 	}
 
+	// Add hreflang tags for Items with several versions:
+	if( in_array( $disp, array( 'single', 'page' ) ) &&
+	    isset( $Item ) && $Item instanceof Item )
+	{	// Use current Item:
+		$version_Item = $Item;
+	}
+	if( in_array( $disp_detail, array( 'posts-topcat', 'posts-subcat' ) ) )
+	{	// Try to get intro Item:
+		$version_Item = & get_featured_Item( 'posts', NULL, true );
+	}
+	if( ! empty( $version_Item ) )
+	{	// If current Item is detected
+		$other_version_items = $version_Item->get_other_version_items();
+		foreach( $other_version_items as $other_version_Item )
+		{
+			add_headline( '<link rel="alternate" '
+				.'hreflang="'.format_to_output( $other_version_Item->get( 'locale' ), 'htmlattr' ).'" '
+				.'href="'.format_to_output( $other_version_Item->get_permanent_url( '', '', '&' ), 'htmlattr' ).'">' );
+		}
+	}
+
 	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );
 
 	// Make this switch block special only for 403 and 404 pages:

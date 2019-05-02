@@ -13142,9 +13142,9 @@ class Item extends ItemLight
 			{	// Don't include the same Item:
 				$source_item_ID = NULL;
 			}
+			$this->other_version_items = array();
 			if( ! $this->get( 'igrp_ID' ) )
 			{	// No group for this Item yet:
-				$this->other_version_items = array();
 				if( ! empty( $source_item_ID ) )
 				{	// Include source Item:
 					$ItemCache = & get_ItemCache();
