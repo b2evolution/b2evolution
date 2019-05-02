@@ -6296,8 +6296,10 @@ class Blog extends DataObject
 
 		foreach( $new_linked_colls as $locale_key => $linked_coll_ID )
 		{
-			if( empty( $linked_coll_ID ) || ! in_array( $locale_key, $enabled_locales ) )
-			{	// Unset a disabled locale:
+			if( empty( $linked_coll_ID ) ||
+			    ! in_array( $locale_key, $enabled_locales ) ||
+			    in_array( $locale_key, $this->locales ) )
+			{	// Unset a disabled locale or when it is used as extra locale for this collection:
 				unset( $new_linked_colls[ $locale_key ] );
 			}
 		}
