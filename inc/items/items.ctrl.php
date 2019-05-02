@@ -141,6 +141,7 @@ switch( $action )
 	case 'save_propose':
 	case 'accept_propose':
 	case 'reject_propose':
+	case 'link_version':
 		if( $action != 'edit_switchtab' && $action != 'edit_type' )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
@@ -1483,6 +1484,33 @@ switch( $action )
 
 		// REDIRECT / EXIT:
 		header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+		/* EXITED */
+		break;
+
+	case 'link_version':
+		// Link the edited Post with the selected Post:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		param( 'dest_post_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		if( $dest_Item = & $ItemCache->get_by_ID( $dest_post_ID, false, false ) )
+		{	// Do the linking:
+			$dest_Item->set_group_ID( $edited_Item->ID );
+			$dest_Item->dbupdate();
+
+			// Remember what last collection was used for linking in order to display it by default on next linking:
+			$UserSettings->set( 'last_linked_coll_ID', $dest_Item->get_blog_ID() );
+			$UserSettings->dbupdate();
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $edited_Item->get_edit_url( array( 'glue' => '&' ) ) );
 		/* EXITED */
 		break;
 

@@ -5922,6 +5922,67 @@ class Item extends ItemLight
 
 
 	/**
+	 * Provide link to link a new version of this post if user has rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 * @return string
+	 */
+	function get_link_version_link( $params = array() )
+	{
+		if( ! $this->can_add_version() )
+		{	// New version cannot be added by some restriction:
+			return false;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'       => '',
+				'after'        => '',
+				'text'         => '#text#', // '#' - icon + text, '#icon#' - only icon, '#text#' - only text
+				'title'        => '#', // '#' - Add version...
+				'class'        => '',
+			), $params );
+
+		switch( $params['text'] )
+		{
+			case '#text#':
+				$params['text'] = T_('Link version').'...';
+				break;
+
+			case '#':
+				$params['text'] = get_icon( 'link', 'imgtag', array( 'title' => T_('Link version').'...' ) ).' '.T_('Link version').'...';
+				break;
+
+			case '#icon#':
+				$params['text'] = get_icon( 'link', 'imgtag', array( 'title' => T_('Link version').'...' ) );
+				break;
+		}
+
+		if( $params['title'] == '#' )
+		{
+			$params['title'] = T_('Link version').'...';
+		}
+
+		$r = $params['before'];
+
+		$item_Blog = & $this->get_Blog();
+		$r .= '<a href="#" onclick="return evo_link_version_load_window( '.$this->ID.', \''.$item_Blog->get( 'urlname' ).'\' )"'
+				.'title="'.format_to_output( $params['title'], 'htmlattr' ).'"'
+				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
+			.'>'.format_to_output( $params['text'], 'htmlbody' ).'</a>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
 	 * Get URL to add a new version of this post if user has rights
 	 *
 	 * @return boolean
@@ -5951,18 +6012,6 @@ class Item extends ItemLight
 		}
 
 		return true;
-	}
-
-
-	/**
-	 * Template tag to add a new version of this post
-	 * @see Item::get_add_version_link()
-	 *
-	 * @param array Params
-	 */
-	function add_version_link( $params = array() )
-	{
-		echo $this->get_add_version_link( $params );
 	}
 
 
@@ -6036,7 +6085,10 @@ class Item extends ItemLight
 		}
 
 		// default params
-		$params += array( 'save_context' => true );
+		$params += array(
+				'save_context' => true,
+				'glue'         => '&amp;',
+			);
 
 		$this->load_Blog();
 		$url = false;
@@ -6049,10 +6101,10 @@ class Item extends ItemLight
 		}
 		else if( $current_User->check_perm( 'admin', 'restricted' ) )
 		{	// Edit a post from Back-office
-			$url = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID.'&amp;blog='.$this->Blog->ID;
+			$url = $admin_url.'?ctrl=items'.$params['glue'].'action=edit'.$params['glue'].'p='.$this->ID.$params['glue'].'blog='.$this->Blog->ID;
 			if( $params['save_context'] )
 			{
-				$url .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
+				$url .= $params['glue'].'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
 			}
 		}
 		return $url;
@@ -7537,17 +7589,8 @@ class Item extends ItemLight
 		{ // We could insert the item object..
 
 			if( ! empty( $this->source_version_item_ID ) )
-			{	// This Item is creating as version of another Item:
-				$ItemCache = & get_ItemCache();
-				$source_Item = & $ItemCache->get_by_ID( $this->source_version_item_ID );
-				if( ! $source_Item->get( 'igrp_ID' ) )
-				{	// Create new Item Group if it wasn't created before:
-					$DB->query( 'INSERT INTO T_items__itemgroup () VALUES ()' );
-					$source_Item->set( 'igrp_ID', $DB->insert_id );
-					$source_Item->dbupdate();
-				}
-				// Use the same Item Group as source Item has:
-				$this->set( 'igrp_ID', $source_Item->get( 'igrp_ID' ) );
+			{	// Set group ID if this Item is creating as version of another Item:
+				$this->set_group_ID( $this->source_version_item_ID );
 			}
 
 			// Link attachments from temporary object to new created Item:
@@ -13054,6 +13097,34 @@ class Item extends ItemLight
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Set group ID from another Item
+	 *
+	 * @param integer ID of parent/source Item
+	 */
+	function set_group_ID( $parent_item_ID )
+	{
+		$ItemCache = & get_ItemCache();
+		if( ! ( $parent_Item = & $ItemCache->get_by_ID( $parent_item_ID, false, false ) ) )
+		{	// Wrong source Item ID:
+			return;
+		}
+
+		if( ! $parent_Item->get( 'igrp_ID' ) )
+		{	// Create new Item Group if it wasn't created yet:
+			global $DB;
+			if( $DB->query( 'INSERT INTO T_items__itemgroup () VALUES ()' ) )
+			{
+				$parent_Item->set( 'igrp_ID', $DB->insert_id );
+				$parent_Item->dbupdate();
+			}
+		}
+
+		// Use the same Item Group as source Item has:
+		$this->set( 'igrp_ID', $parent_Item->get( 'igrp_ID' ) );
 	}
 
 

@@ -331,7 +331,7 @@ class RestApi
 		{
 			case 'GET':
 				// List of valid resources
-				$valid_resources = array( '', 'view', 'items', 'posts', 'search', 'assignees' );
+				$valid_resources = array( '', 'view', 'items', 'posts', 'search', 'assignees', 'linked' );
 				break;
 
 			case 'PUT':
@@ -571,6 +571,41 @@ class RestApi
 					'name'      => $Blog->get( 'name' ),
 					'tagline'   => $Blog->get( 'tagline' ),
 					'desc'      => $Blog->get( 'longdesc' ),
+				), 'array' );
+		}
+	}
+
+
+	/**
+	 * Call collection controller to prepare request for linked collections
+	 */
+	private function controller_coll_linked()
+	{
+		global $Collection, $Blog;
+
+		// Get linked collections:
+		$linked_colls = $Blog->get_linked_colls();
+		// Add current collection on top:
+		array_unshift( $linked_colls, $Blog->ID );
+
+		// Load all collections in cache by single SQL query:
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_list( $linked_colls );
+
+		foreach( $linked_colls as $linked_locale => $linked_coll_ID )
+		{	// Add each collection row in the response array:
+			if( ! ( $linked_Blog = & $BlogCache->get_by_ID( $linked_coll_ID, false, false ) ) )
+			{	// Skip wrong linked collection:
+				continue;
+			}
+			$this->add_response( 'colls', array(
+					'id'        => intval( $linked_Blog->ID ),
+					'urlname'   => $linked_Blog->get( 'urlname' ),
+					'kind'      => $linked_Blog->get( 'type' ),
+					'shortname' => $linked_Blog->get( 'shortname' ),
+					'name'      => $linked_Blog->get( 'name' ).' ('.( $linked_locale === 0 ? $linked_Blog->get( 'locale' ) : $linked_locale ).')',
+					'tagline'   => $linked_Blog->get( 'tagline' ),
+					'desc'      => $linked_Blog->get( 'longdesc' ),
 				), 'array' );
 		}
 	}

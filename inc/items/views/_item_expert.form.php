@@ -779,7 +779,8 @@ $Form->begin_form( '', '', $params );
 
 		$other_version_items = $edited_Item->get_other_version_items( $original_item_ID );
 		$item_add_version_link = $edited_Item->get_add_version_link();
-		if( $item_add_version_link || count( $other_version_items ) > 0 )
+		$item_link_version_link = $edited_Item->get_link_version_link();
+		if( $item_add_version_link || $item_link_version_link || count( $other_version_items ) > 0 )
 		{	// Display other versions and link to add version:
 			echo '<b>'.T_('Other versions').':</b>';
 			echo '<ul style="list-style:disc;margin-left:20px">';
@@ -793,6 +794,10 @@ $Form->begin_form( '', '', $params );
 			if( $item_add_version_link )
 			{	// Display link to add new version if it is allowed:
 				echo '<li>'.$item_add_version_link.'</li>';
+			}
+			if( $item_link_version_link )
+			{	// Display link to add new version if it is allowed:
+				echo '<li>'.$item_link_version_link.'</li>';
 			}
 			echo '</ul>';
 		}
@@ -1128,6 +1133,8 @@ echo_item_content_position_js( get_param( 'content_height' ), get_param( 'conten
 echo_item_merge_js();
 // JS code for link to add new version:
 echo_item_add_version_js();
+// JS code for link to link new version:
+echo_item_link_version_js();
 
 // JS to post excerpt mode switching:
 ?>
