@@ -69,6 +69,7 @@ $Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(di
 	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
 	$Form->checklist( array(
 		array( 'canonical_homepage', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_homepage' ) ),
+		array( 'self_canonical_homepage', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_homepage' ) ),
 		array( 'relcanonical_homepage', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_homepage' ) ),
 		), 'canonical_homepage_options', T_('Make canonical') );
 
@@ -126,6 +127,7 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 
 	$Form->checklist( array(
 		array( 'canonical_item_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_item_urls' ) ),
+		array( 'self_canonical_item_urls', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_item_urls' ) ),
 		array( 'allow_crosspost_urls', 1, T_('For cross-posted Items, allow non-canonical URL'), $edited_Blog->get_setting( 'allow_crosspost_urls' ), ! $edited_Blog->get_setting( 'canonical_item_urls' ) ),
 		array( 'relcanonical_item_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_item_urls' ) ),
 		), 'canonical_item_urls_options', T_('Make canonical') );
@@ -149,6 +151,7 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive-pages-s
 
 	$Form->checklist( array(
 		array( 'canonical_archive_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_archive_urls' ) ),
+		array( 'self_canonical_archive_urls', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_archive_urls' ) ),
 		array( 'relcanonical_archive_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_archive_urls' ) ),
 		), 'canonical_archive_urls_options', T_('Make canonical') );
 
@@ -199,6 +202,7 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category-pages-seo'
 
 	$Form->checklist( array(
 		array( 'canonical_cat_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_cat_urls' ) ),
+		array( 'self_canonical_cat_urls', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_cat_urls' ) ),
 		array( 'relcanonical_cat_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_cat_urls' ) ),
 		), 'canonical_cat_urls_options', T_('Make canonical') );
 
@@ -247,6 +251,7 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag-pages-seo'), array('
 
 	$Form->checklist( array(
 		array( 'canonical_tag_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_tag_urls' ) ),
+		array( 'self_canonical_tag_urls', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_tag_urls' ) ),
 		array( 'relcanonical_tag_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_tag_urls' ) ),
 		), 'canonical_tag_urls_options', T_('Make canonical') );
 
