@@ -2915,7 +2915,7 @@ function echo_item_merge_js()
 function evo_merge_load_window( item_ID )
 {
 	return evo_item_selector_load_window( item_ID,
-		[ '<?php echo TS_('Select destination Post...'); ?>', '<?php echo T_('Destination Post:'); ?>' ],
+		[ '<?php echo TS_('Select destination Post...'); ?>', '<?php echo TS_('Destination Post:'); ?>' ],
 		'<?php echo TS_('You must save the Item before you can merge it.'); ?>',
 		[
 			'<?php echo TS_('Move source post & comments'); ?>: ',
@@ -3029,7 +3029,7 @@ function echo_item_link_version_js()
 function evo_link_version_load_window( item_ID, coll_url )
 {
 	return evo_item_selector_load_window( item_ID,
-		[ '<?php echo TS_('Select Post to link...'); ?>', '<?php echo T_('Link with this Post:'); ?>' ],
+		[ '<?php echo TS_('Select Post to link...'); ?>', '<?php echo TS_('Link with this Post:'); ?>' ],
 		'<?php echo TS_('You must save the Item before you can link version.'); ?>',
 		[ { 'text': '<?php echo TS_('Link'); ?>', 'id': 'evo_link_version_btn', 'class': 'btn btn-primary' } ],
 		<?php echo $default_coll_ID; ?>,
