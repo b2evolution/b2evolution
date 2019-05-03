@@ -142,6 +142,7 @@ switch( $action )
 	case 'accept_propose':
 	case 'reject_propose':
 	case 'link_version':
+	case 'unlink_version':
 		if( $action != 'edit_switchtab' && $action != 'edit_type' )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
@@ -1507,17 +1508,46 @@ switch( $action )
 			// Remember what last collection was used for linking in order to display it by default on next linking:
 			$UserSettings->set( 'last_linked_coll_ID', $dest_Item->get_blog_ID() );
 			$UserSettings->dbupdate();
+
+			// Inform user about duplicated locale in the same group:
+			$other_version_items = $dest_Item->get_other_version_items();
+			foreach( $other_version_items as $other_version_Item )
+			{
+				if( $dest_Item->get( 'locale' ) == $other_version_Item->get( 'locale' ) )
+				{	// This is a duplicate locale
+					$Messages->add( sprintf( T_('Please note the locale %s is used for several versions of this Item.'), '<code>'.$dest_Item->get( 'locale' ).'</code>' ), 'warning' );
+					break;
+				}
+			}
+
+			// Display result message after redirect:
+			$Messages->add( sprintf( T_('Item %s has been linked to the current Item.'), '"'.$dest_Item->get( 'title' ).'" <code>'.$dest_Item->get( 'locale' ).'</code>' ), 'success' );
 		}
 
-		// Inform user about duplicated locale in the same group:
-		$other_version_items = $dest_Item->get_other_version_items();
-		foreach( $other_version_items as $other_version_Item )
-		{
-			if( $dest_Item->get( 'locale' ) == $other_version_Item->get( 'locale' ) )
-			{	// This is a duplicate locale
-				$Messages->add( sprintf( T_('Please note the locale %s is used for several versions of this Item.'), '<code>'.$dest_Item->get( 'locale' ).'</code>' ), 'warning' );
-				break;
-			}
+		// REDIRECT / EXIT:
+		header_redirect( $edited_Item->get_edit_url( array( 'glue' => '&' ) ) );
+		/* EXITED */
+		break;
+
+	case 'unlink_version':
+		// Unlink the selected Post from the edited Post:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		param( 'unlink_item_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		if( $unlink_Item = & $ItemCache->get_by_ID( $unlink_item_ID, false, false ) )
+		{	// Do the unlinking:
+			$unlink_Item->set( 'igrp_ID', NULL, true );
+			$unlink_Item->dbupdate();
+
+			// Display result message after redirect:
+			$Messages->add( sprintf( T_('Item %s has been unlinked.'), '"'.$unlink_Item->get( 'title' ).'" <code>'.$unlink_Item->get( 'locale' ).'</code>' ), 'success' );
 		}
 
 		// REDIRECT / EXIT:

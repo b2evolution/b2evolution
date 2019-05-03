@@ -794,6 +794,7 @@ $Form->begin_form( '', '', $params );
 				echo '<li>'.$other_version_Item->get_title( array( 'link_type' => 'edit_view_url' ) ).' '
 						.locale_flag( $other_version_Item->get( 'locale' ), 'w16px', 'flag', '', false )
 						.'<span class="note'.( $other_version_locales[ $other_version_Item->get( 'locale' ) ] == 2 ? ' red' : '' ).'">('.$other_version_Item->get( 'locale' ).')</span>'
+						.$edited_Item->get_unlink_version_link( array( 'unlink_item_ID' => $other_version_Item->ID ) )
 					.'</li>';
 			}
 			if( $item_add_version_link )

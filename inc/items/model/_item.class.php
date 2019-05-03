@@ -5862,7 +5862,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Provide link to add a new version of this post if user has rights
+	 * Provide a link to add a new version of this post if user has rights
 	 *
 	 * @param array Params:
 	 *  - 'before': to display before link
@@ -5874,7 +5874,7 @@ class Item extends ItemLight
 	 */
 	function get_add_version_link( $params = array() )
 	{
-		if( ! $this->can_add_version() )
+		if( ! $this->can_link_version() )
 		{	// New version cannot be added by some restriction:
 			return false;
 		}
@@ -5922,7 +5922,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Provide link to link a new version of this post if user has rights
+	 * Provide a link to link a new version of this post if user has rights
 	 *
 	 * @param array Params:
 	 *  - 'before': to display before link
@@ -5934,7 +5934,7 @@ class Item extends ItemLight
 	 */
 	function get_link_version_link( $params = array() )
 	{
-		if( ! $this->can_add_version() )
+		if( ! $this->can_link_version() )
 		{	// New version cannot be added by some restriction:
 			return false;
 		}
@@ -5944,7 +5944,7 @@ class Item extends ItemLight
 				'before'       => '',
 				'after'        => '',
 				'text'         => '#text#', // '#' - icon + text, '#icon#' - only icon, '#text#' - only text
-				'title'        => '#', // '#' - Add version...
+				'title'        => '#', // '#' - Link version...
 				'class'        => '',
 			), $params );
 
@@ -5983,11 +5983,119 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get URL to add a new version of this post if user has rights
+	 * Get URL to unlink a post if user has a permission
+	 *
+	 * @param array Params:
+	 *  - 'unlink_item_ID': What item to unlink, NULL - to unlink this Item
+	 */
+	function get_unlink_version_url( $params = array() )
+	{
+		global $admin_url;
+
+		if( ! $this->can_link_version() )
+		{	// New version cannot be added by some restriction:
+			return false;
+		}
+
+		// Default params:
+		$params = array_merge( array(
+				'unlink_item_ID' => NULL,
+			), $params );
+
+		if( $params['unlink_item_ID'] !== NULL )
+		{
+			$ItemCache = & get_ItemCache();
+			if( ! ( $unlink_item = & $ItemCache->get_by_ID( $params['unlink_item_ID'], false, false ) ) ||
+			    $unlink_item->get( 'igrp_ID' ) != $this->get( 'igrp_ID' ) )
+			{	// If the requested Item to unlink is from different group:
+				return false;
+			}
+		}
+
+		return $admin_url.'?ctrl=items&amp;action=unlink_version&amp;blog='.$this->Blog->ID
+			.'&amp;post_ID='.$this->ID
+			.( empty( $unlink_item ) ? '' : '&amp;unlink_item_ID='.$unlink_item->ID )
+			.'&amp;'.url_crumb( 'item' );
+	}
+
+
+	/**
+	 * Provide a link to unlink a new version of this post if user has rights
+	 *
+	 * @param array Params:
+	 *  - 'unlink_item_ID': What item to unlink, NULL - to unlink this Item
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 * @return string
+	 */
+	function get_unlink_version_link( $params = array() )
+	{
+		if( ! ( $unlink_version_url = $this->get_unlink_version_url( $params ) ) )
+		{	// Unlink action is not allowed for current User and this Item
+			return false;
+		}
+
+		// Default params:
+		$params = array_merge( array(
+				'unlink_item_ID' => NULL,
+				'before'         => ' ',
+				'after'          => ' ',
+				'text'           => '#icon#', // '#' - icon + text, '#icon#' - only icon, '#text#' - only text
+				'title'          => '#', // '#' - Unlink version...
+				'class'          => '',
+			), $params );
+
+		switch( $params['text'] )
+		{
+			case '#text#':
+				$params['text'] = T_('Unlink version').'...';
+				break;
+
+			case '#':
+				$params['text'] = get_icon( 'unlink', 'imgtag', array( 'title' => T_('Unlink version').'...' ) ).' '.T_('Link version').'...';
+				break;
+
+			case '#icon#':
+				$params['text'] = get_icon( 'unlink', 'imgtag', array( 'title' => T_('Unlink version').'...' ) );
+				break;
+		}
+
+		if( $params['title'] == '#' )
+		{
+			$params['title'] = T_('Unlink version').'...';
+		}
+
+		$ItemCache = & get_ItemCache();
+		if( ! ( $unlink_item = & $ItemCache->get_by_ID( $params['unlink_item_ID'], false, false ) ) ||
+		    $unlink_item->get( 'igrp_ID' ) != $this->get( 'igrp_ID' ) )
+		{	// Use current Item if the requested Item doesn't exist or it is from another group:
+			$unlink_item = $this;
+		}
+
+		$r = $params['before'];
+
+		$item_Blog = & $this->get_Blog();
+		$r .= '<a href="'.$unlink_version_url.'" '
+				.'onclick="return confirm( \''.format_to_output( sprintf( TS_('Are you sure want to unlink the Item %s?'), '"'.$unlink_item->get( 'title' ).'" ('.$unlink_item->get( 'locale' ).')' ), 'htmlattr' ).'\' )"'
+				.'title="'.format_to_output( $params['title'], 'htmlattr' ).'"'
+				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
+			.'>'.format_to_output( $params['text'], 'htmlbody' ).'</a>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Check to add/link a new version of this post if user has rights
 	 *
 	 * @return boolean
 	 */
-	function can_add_version()
+	function can_link_version()
 	{
 		global $current_User;
 
