@@ -7964,6 +7964,7 @@ function get_fieldset_folding_icon( $id, $params = array() )
 			'before'     => '',
 			'after'      => ' ',
 			'deny_fold'  => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+			'default_fold' => NULL, // Set default "fold" value for current icon
 			'fold_value' => NULL,
 		), $params );
 
@@ -7980,12 +7981,17 @@ function get_fieldset_folding_icon( $id, $params = array() )
 		global $UserSettings, $Collection, $Blog, $ctrl;
 		if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
 		{	// Get user setting value
-			$value = intval( $UserSettings->get( 'fold_'.$id ) );
+			$value = $UserSettings->get( 'fold_'.$id );
 		}
 		else
 		{	// Get user-collection setting
-			$value = intval( $UserSettings->get_collection_setting( 'fold_'.$id, $Blog->ID ) );
+			$value = $UserSettings->get_collection_setting( 'fold_'.$id, $Blog->ID );
 		}
+		if( $value === NULL && $params['default_fold'] !== NULL )
+		{	// Use custom default value for this icon:
+			$value = $params['default_fold'];
+		}
+		$value = intval( $value );
 	}
 
 	// Icon

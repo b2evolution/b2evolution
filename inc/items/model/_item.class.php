@@ -153,6 +153,16 @@ class Item extends ItemLight
 	 */
 	var $locale;
 
+	/**
+	 * Display the Item in list depending on navigation locale
+	 *
+	 * 0 - Always show
+	 * 1 - Show only if matching navigation locale
+	 *
+	 * @var integer|boolean
+	 */
+	var $locale_visibility = 'always';
+
 	var $content;
 	/**
 	 * Flag to know if content was updated during current request
@@ -268,6 +278,18 @@ class Item extends ItemLight
 	var $parent_Item = NULL;
 
 	/**
+	 * Item Group ID
+	 * @var integer
+	 */
+	var $igrp_ID = NULL;
+
+	/**
+	 * Other versions of this Item, linked by igrp_ID
+	 * @var array
+	 */
+	var $other_version_items;
+
+	/**
 	 * Additional settings for the items.  lazy filled.
  	 *
 	 * @see Item::get_setting()
@@ -374,7 +396,6 @@ class Item extends ItemLight
 			{	// Set locale depending on collection setting:
 				switch( $Blog->get_setting( 'new_item_locale_source' ) )
 				{
-					case 'use_coll':
 					case 'select_coll':
 						// Use locale of current collection by default:
 						$new_item_locale = $Blog->get( 'locale' );
@@ -427,6 +448,7 @@ class Item extends ItemLight
 			$this->datedeadline = $db_row->post_datedeadline;
 			$this->priority = $db_row->post_priority;
 			$this->locale = $db_row->post_locale;
+			$this->locale_visibility = $db_row->post_locale_visibility;
 			$this->wordcount = $db_row->post_wordcount;
 			$this->notifications_status = $db_row->post_notifications_status;
 			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
@@ -434,6 +456,7 @@ class Item extends ItemLight
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
 			$this->featured = $db_row->post_featured;
 			$this->parent_ID = $db_row->post_parent_ID === NULL ? NULL : intval( $db_row->post_parent_ID );
+			$this->igrp_ID = $db_row->post_igrp_ID;
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = $db_row->post_renderers;
@@ -731,6 +754,17 @@ class Item extends ItemLight
 		if( param( 'post_locale', 'string', NULL ) !== NULL )
 		{
 			$this->set_from_Request( 'locale' );
+		}
+
+		// LOCALE VISIBILITY:
+		if( param( 'post_locale_visibility', 'string', NULL ) !== NULL )
+		{
+			$this->set_from_Request( 'locale_visibility' );
+		}
+
+		if( param( 'source_version_item_ID', 'integer', NULL ) !== NULL )
+		{	// Temp flag to know this is a new version of this Item:
+			$this->source_version_item_ID = get_param( 'source_version_item_ID' );
 		}
 
 		// POST TYPE:
@@ -5834,6 +5868,268 @@ class Item extends ItemLight
 
 
 	/**
+	 * Provide a link to add a new version of this post if user has rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 * @return string
+	 */
+	function get_add_version_link( $params = array() )
+	{
+		if( ! $this->can_link_version() )
+		{	// New version cannot be added by some restriction:
+			return false;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'       => '',
+				'after'        => '',
+				'text'         => '#text#', // '#' - icon + text, '#icon#' - only icon, '#text#' - only text
+				'title'        => '#', // '#' - Add version...
+				'class'        => '',
+			), $params );
+
+		switch( $params['text'] )
+		{
+			case '#text#':
+				$params['text'] = T_('Add version').'...';
+				break;
+
+			case '#':
+				$params['text'] = get_icon( 'add', 'imgtag', array( 'title' => T_('Add version').'...' ) ).' '.T_('Add version').'...';
+				break;
+
+			case '#icon#':
+				$params['text'] = get_icon( 'add', 'imgtag', array( 'title' => T_('Add version').'...' ) );
+				break;
+		}
+
+		if( $params['title'] == '#' )
+		{
+			$params['title'] = T_('Add version').'...';
+		}
+
+		$r = $params['before'];
+
+		$r .= '<a href="#" onclick="return evo_add_version_load_window( '.$this->ID.' )"'
+				.'title="'.format_to_output( $params['title'], 'htmlattr' ).'"'
+				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
+			.'>'.format_to_output( $params['text'], 'htmlbody' ).'</a>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Provide a link to link a new version of this post if user has rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 * @return string
+	 */
+	function get_link_version_link( $params = array() )
+	{
+		if( ! $this->can_link_version() )
+		{	// New version cannot be added by some restriction:
+			return false;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'       => '',
+				'after'        => '',
+				'text'         => '#text#', // '#' - icon + text, '#icon#' - only icon, '#text#' - only text
+				'title'        => '#', // '#' - Link version...
+				'class'        => '',
+			), $params );
+
+		switch( $params['text'] )
+		{
+			case '#text#':
+				$params['text'] = T_('Link version').'...';
+				break;
+
+			case '#':
+				$params['text'] = get_icon( 'link', 'imgtag', array( 'title' => T_('Link version').'...' ) ).' '.T_('Link version').'...';
+				break;
+
+			case '#icon#':
+				$params['text'] = get_icon( 'link', 'imgtag', array( 'title' => T_('Link version').'...' ) );
+				break;
+		}
+
+		if( $params['title'] == '#' )
+		{
+			$params['title'] = T_('Link version').'...';
+		}
+
+		$r = $params['before'];
+
+		$item_Blog = & $this->get_Blog();
+		$r .= '<a href="#" onclick="return evo_link_version_load_window( '.$this->ID.', \''.$item_Blog->get( 'urlname' ).'\' )"'
+				.'title="'.format_to_output( $params['title'], 'htmlattr' ).'"'
+				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
+			.'>'.format_to_output( $params['text'], 'htmlbody' ).'</a>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Get URL to unlink a post if user has a permission
+	 *
+	 * @param array Params:
+	 *  - 'unlink_item_ID': What item to unlink, NULL - to unlink this Item
+	 */
+	function get_unlink_version_url( $params = array() )
+	{
+		global $admin_url;
+
+		if( ! $this->can_link_version() )
+		{	// New version cannot be added by some restriction:
+			return false;
+		}
+
+		// Default params:
+		$params = array_merge( array(
+				'unlink_item_ID' => NULL,
+			), $params );
+
+		if( $params['unlink_item_ID'] !== NULL )
+		{
+			$ItemCache = & get_ItemCache();
+			if( ! ( $unlink_item = & $ItemCache->get_by_ID( $params['unlink_item_ID'], false, false ) ) ||
+			    $unlink_item->get( 'igrp_ID' ) != $this->get( 'igrp_ID' ) )
+			{	// If the requested Item to unlink is from different group:
+				return false;
+			}
+		}
+
+		return $admin_url.'?ctrl=items&amp;action=unlink_version&amp;blog='.$this->Blog->ID
+			.'&amp;post_ID='.$this->ID
+			.( empty( $unlink_item ) ? '' : '&amp;unlink_item_ID='.$unlink_item->ID )
+			.'&amp;'.url_crumb( 'item' );
+	}
+
+
+	/**
+	 * Provide a link to unlink a new version of this post if user has rights
+	 *
+	 * @param array Params:
+	 *  - 'unlink_item_ID': What item to unlink, NULL - to unlink this Item
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 * @return string
+	 */
+	function get_unlink_version_link( $params = array() )
+	{
+		if( ! ( $unlink_version_url = $this->get_unlink_version_url( $params ) ) )
+		{	// Unlink action is not allowed for current User and this Item
+			return false;
+		}
+
+		// Default params:
+		$params = array_merge( array(
+				'unlink_item_ID' => NULL,
+				'before'         => ' ',
+				'after'          => ' ',
+				'text'           => '#icon#', // '#' - icon + text, '#icon#' - only icon, '#text#' - only text
+				'title'          => '#', // '#' - Unlink version...
+				'class'          => '',
+			), $params );
+
+		switch( $params['text'] )
+		{
+			case '#text#':
+				$params['text'] = T_('Unlink version').'...';
+				break;
+
+			case '#':
+				$params['text'] = get_icon( 'unlink', 'imgtag', array( 'title' => T_('Unlink version').'...' ) ).' '.T_('Link version').'...';
+				break;
+
+			case '#icon#':
+				$params['text'] = get_icon( 'unlink', 'imgtag', array( 'title' => T_('Unlink version').'...' ) );
+				break;
+		}
+
+		if( $params['title'] == '#' )
+		{
+			$params['title'] = T_('Unlink version').'...';
+		}
+
+		$ItemCache = & get_ItemCache();
+		if( ! ( $unlink_item = & $ItemCache->get_by_ID( $params['unlink_item_ID'], false, false ) ) ||
+		    $unlink_item->get( 'igrp_ID' ) != $this->get( 'igrp_ID' ) )
+		{	// Use current Item if the requested Item doesn't exist or it is from another group:
+			$unlink_item = $this;
+		}
+
+		$r = $params['before'];
+
+		$item_Blog = & $this->get_Blog();
+		$r .= '<a href="'.$unlink_version_url.'" '
+				.'onclick="return confirm( \''.format_to_output( sprintf( TS_('Are you sure want to unlink the Item %s?'), '"'.$unlink_item->get( 'title' ).'" ('.$unlink_item->get( 'locale' ).')' ), 'htmlattr' ).'\' )"'
+				.'title="'.format_to_output( $params['title'], 'htmlattr' ).'"'
+				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
+			.'>'.format_to_output( $params['text'], 'htmlbody' ).'</a>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Check to add/link a new version of this post if user has rights
+	 *
+	 * @return boolean
+	 */
+	function can_link_version()
+	{
+		global $current_User;
+
+		if( ! $this->ID )
+		{	// Item must be saved in DB:
+			return false;
+		}
+
+		if( ! is_logged_in( false ) )
+		{	// User must be logged in
+			return false;
+		}
+
+		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// User has no rights to edit this Item
+			return false;
+		}
+
+		if( ! is_admin_page() || ! $current_User->check_perm( 'admin', 'restricted' ) )
+		{	// This feature is allowed only for back-office yet
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Provide link to edit a post if user has edit rights
 	 *
 	 * @param array Params:
@@ -5903,7 +6199,10 @@ class Item extends ItemLight
 		}
 
 		// default params
-		$params += array( 'save_context' => true );
+		$params += array(
+				'save_context' => true,
+				'glue'         => '&amp;',
+			);
 
 		$this->load_Blog();
 		$url = false;
@@ -5916,10 +6215,10 @@ class Item extends ItemLight
 		}
 		else if( $current_User->check_perm( 'admin', 'restricted' ) )
 		{	// Edit a post from Back-office
-			$url = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID.'&amp;blog='.$this->Blog->ID;
+			$url = $admin_url.'?ctrl=items'.$params['glue'].'action=edit'.$params['glue'].'p='.$this->ID.$params['glue'].'blog='.$this->Blog->ID;
 			if( $params['save_context'] )
 			{
-				$url .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
+				$url .= $params['glue'].'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
 			}
 		}
 		return $url;
@@ -7392,14 +7691,6 @@ class Item extends ItemLight
 		$this->set_last_touched_ts();
 		$this->set_contents_last_updated_ts();
 
-		// Check which locale we can use for this item:
-		$item_Blog = & $this->get_Blog();
-		if( $item_Blog && $item_Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
-		    $this->get( 'locale' ) != $item_Blog->get( 'locale' ) )
-		{	// Force to use collection locale because it is restricted by collection setting:
-			$this->set( 'locale', $item_Blog->get( 'locale' ) );
-		}
-
 		// Check if item is assigned to a user
 		if( isset( $this->dbchanges['post_assigned_user_ID'] ) )
 		{
@@ -7410,6 +7701,11 @@ class Item extends ItemLight
 
 		if( $result = parent::dbinsert() )
 		{ // We could insert the item object..
+
+			if( ! empty( $this->source_version_item_ID ) )
+			{	// Set group ID if this Item is creating as version of another Item:
+				$this->set_group_ID( $this->source_version_item_ID );
+			}
 
 			// Link attachments from temporary object to new created Item:
 			$this->link_from_Request();
@@ -12844,6 +13140,158 @@ class Item extends ItemLight
 		}
 
 		return $result;
+	}
+
+
+	/**
+	 * Get available locales
+	 *
+	 * @return array
+	 */
+	function get_available_locales()
+	{
+		if( ! isset( $this->available_locales ) )
+		{	// Load locales from DB:
+			global $DB;
+			$SQL = new SQL( 'Get available locales for '.( empty( $this->ID ) ? 'new Item' : 'Item #'.$this->ID ) );
+			$SQL->SELECT( 'cl_locale' );
+			$SQL->FROM( 'T_coll_locales' );
+			$SQL->WHERE( 'cl_coll_ID = '.$this->get_blog_ID() );
+			$SQL->WHERE_and( 'cl_linked_coll_ID IS NULL' );
+			$SQL->ORDER_BY( 'cl_locale' );
+			$this->available_locales = $DB->get_col( $SQL );
+		}
+
+		return $this->available_locales;
+	}
+
+
+	/**
+	 * Get locale options for selector on edit page
+	 *
+	 * @param boolean Exclude locales that are already used in the group of this Item
+	 * @return string
+	 */
+	function get_locale_options( $exclude_used = false )
+	{
+		global $locales;
+
+		$r = '';
+
+		$available_locales = $this->get_available_locales();
+
+		if( $exclude_used )
+		{	// Exclude locales that are already used in the group of this Item
+			$exclude_locales = array( $this->get( 'locale' ) );
+			$other_version_items = $this->get_other_version_items();
+			foreach( $other_version_items as $other_version_Item )
+			{
+				$exclude_locales[] = $other_version_Item->get( 'locale' );
+			}
+			$available_locales = array_diff( $available_locales, $exclude_locales );
+		}
+
+		if( empty( $available_locales ) )
+		{	// No available locales:
+			return $r;
+		}
+
+		foreach( $available_locales as $locale_key )
+		{
+			if( ( isset( $locales[ $locale_key ] ) && $locales[ $locale_key ]['enabled'] ) ||
+			    $locale_key == $this->get( 'locale' ) )
+			{	// Allow enabled locales or if it is already selected for this Item:
+				$r .= '<option value="'.$locale_key.'"';
+				if( $locale_key == $this->get( 'locale' ) )
+				{	// This is a selected locale
+					$r .= ' selected="selected"';
+				}
+				$r .= '>'.( isset( $locales[ $locale_key ] ) ? T_( $locales[ $locale_key ]['name'] ) : $locale_key ).'</option>'."\n";
+			}
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Set group ID from another Item
+	 *
+	 * @param integer ID of parent/source Item
+	 */
+	function set_group_ID( $parent_item_ID )
+	{
+		$ItemCache = & get_ItemCache();
+		if( ! ( $parent_Item = & $ItemCache->get_by_ID( $parent_item_ID, false, false ) ) )
+		{	// Wrong source Item ID:
+			return;
+		}
+
+		if( ! $parent_Item->get( 'igrp_ID' ) )
+		{	// Create new Item Group if it wasn't created yet:
+			global $DB;
+			if( $DB->query( 'INSERT INTO T_items__itemgroup () VALUES ()' ) )
+			{
+				$parent_Item->set( 'igrp_ID', $DB->insert_id );
+				$parent_Item->dbupdate();
+			}
+		}
+
+		// Use the same Item Group as source Item has:
+		$this->set( 'igrp_ID', $parent_Item->get( 'igrp_ID' ) );
+	}
+
+
+	/**
+	 * Get other version Items from the same group
+	 *
+	 * @param integer Include additional Item by ID, e.g. ID of source Item on adding new version
+	 * @return array
+	 */
+	function get_other_version_items( $source_item_ID = NULL )
+	{
+		if( ! isset( $this->other_version_items ) )
+		{	// Try to load other version Items from DB:
+			if( $source_item_ID == $this->ID )
+			{	// Don't include the same Item:
+				$source_item_ID = NULL;
+			}
+			$this->other_version_items = array();
+			if( ! $this->get( 'igrp_ID' ) )
+			{	// No group for this Item yet:
+				if( ! empty( $source_item_ID ) )
+				{	// Include source Item:
+					$ItemCache = & get_ItemCache();
+					$ItemCache->clear();
+					if( $Item = & $ItemCache->get_by_ID( $source_item_ID, false, false ) )
+					{
+						$this->other_version_items[ $Item->ID ] = & $Item;
+					}
+				}
+			}
+			else
+			{	// Load from DB:
+				global $DB;
+				$SQL = new SQL();
+				$SQL->SELECT( 'post_ID' );
+				$SQL->FROM( 'T_items__item' );
+				$SQL->WHERE( '(post_igrp_ID = '.$this->get( 'igrp_ID' ).( empty( $source_item_ID ) ? '' : ' OR post_ID = '.$source_item_ID ).')' );
+				if( $this->ID > 0 )
+				{	// Exclude this Item:
+					$SQL->WHERE_and( 'post_ID != '.$this->ID );
+				}
+				$group_item_IDs = $DB->get_col( $SQL );
+				$ItemCache = & get_ItemCache();
+				$ItemCache->clear();
+				$ItemCache->load_where( 'post_ID IN ( '.$DB->quote( $group_item_IDs ).' ) ' );
+				foreach( $group_item_IDs as $group_item_ID )
+				{
+					$this->other_version_items[ $group_item_ID ] = & $ItemCache->get_by_ID( $group_item_ID );
+				}
+			}
+		}
+
+		return $this->other_version_items;
 	}
 }
 ?>

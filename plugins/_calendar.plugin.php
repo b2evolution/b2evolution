@@ -358,6 +358,9 @@ class calendar_plugin extends Plugin
 		// * Restrict to the statuses we want to show:
 		$Calendar->ItemQuery->where_visibility( $visibility_array );
 
+		// Restrict with locale visibility by current navigation locale:
+		$Calendar->ItemQuery->where_locale_visibility();
+
 		$item_types = $types;
 		if( isset( $params['item_type'] ) )
 		{
@@ -1040,6 +1043,8 @@ class Calendar
 			$nav_ItemQuery->where_keywords( $this->ItemQuery->keywords, $this->ItemQuery->phrase, $this->ItemQuery->exact );
 			// Exclude pages and intros:
 			$nav_ItemQuery->where_types( $this->ItemQuery->types );
+			// Restrict with locale visibility by current navigation locale:
+			$nav_ItemQuery->where_locale_visibility();
 		}
 
 		switch( $direction )

@@ -929,6 +929,7 @@ class Form extends Widget
 				'class'     => 'fieldset',
 				'fold'      => false, // TRUE to enable folding for this fieldset
 				'deny_fold' => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+				'default_fold' => NULL, // Set default "fold" value for current fieldset
 			), $field_params );
 
 		if( $field_params['fold'] )
@@ -939,12 +940,17 @@ class Form extends Widget
 				global $UserSettings, $Collection, $Blog, $ctrl;
 				if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
 				{ // Get user setting value
-					$value = intval( $UserSettings->get( 'fold_'.$field_params['id'] ) );
+					$value = $UserSettings->get( 'fold_'.$field_params['id'] );
 				}
 				else
 				{ // Get user-collection setting
-					$value = intval( $UserSettings->get_collection_setting( 'fold_'.$field_params['id'], $Blog->ID ) );
+					$value = $UserSettings->get_collection_setting( 'fold_'.$field_params['id'], $Blog->ID );
 				}
+				if( $value === NULL && $field_params['default_fold'] !== NULL )
+				{	// Use custom default value for this fieldset:
+					$value = $field_params['default_fold'];
+				}
+				$value = intval( $value );
 				if( $value === 1 )
 				{
 					$field_params['class'] = trim( $field_params['class'].' folded' );
@@ -960,6 +966,7 @@ class Form extends Widget
 		}
 		unset( $field_params['fold'] );
 		unset( $field_params['deny_fold'] );
+		unset( $field_params['default_fold'] );
 
 		if( ! empty( $this->fieldset_title ) )
 		{	// Replace text part of fieldset title with provided html code:
@@ -4997,6 +5004,138 @@ class Form extends Widget
 
 		// Insert image modal window:
 		echo_image_insert_modal();
+	}
+
+
+	/**
+	 * Locale selector
+	 *
+	 * @param string Field name
+	 * @param string Main locale value
+	 * @param array Extra locale values
+	 * @param string Field label
+	 * @param string Field note
+	 * @param array Params
+	 * @return 
+	 */
+	function locale_selector( $field_name, $main_locale, $extra_locales, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $locales;
+
+		$BlogCache = & get_BlogCache();
+		$link_Blog = & $BlogCache->get_by_ID( $field_params['link_coll_ID'], false, false );
+		unset( $field_params['link_coll_ID'] );
+
+		$this->handle_common_params( $field_params, $field_name, $field_label, $field_note );
+
+		$r = $this->begin_field();
+
+		$r .= '<table class="evo_locale_selector table table-striped table-hover table-condensed table-bordered">';
+
+		// Table header:
+		$r .= '<thead><tr>'
+				.'<th>'.T_('Locale').'</th>'
+				.'<th>'.T_('Main').'</th>'
+				.'<th>'.T_('Extra').'</th>'
+				.( $link_Blog ? '<th>'.T_('Link with').'</th>' : '' )
+			.'</tr></thead>';
+
+		foreach( $locales as $locale_key => $locale_data )
+		{
+			if( ! $locale_data['enabled'] )
+			{	// Skip disabled locale:
+				continue;
+			}
+
+			// Locale row with radio, checkbox and name:
+			$r .= '<tr data-locale="'.$locale_key.'">'
+					.'<td>'.T_( $locale_data['name'] ).'</td>'
+					.'<td class="center"><input type="radio" '
+							.'name="'.format_to_output( $field_name, 'htmlattr' ).'" '
+							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
+							.( $main_locale == $locale_key ? ' checked="checked"' : '' ).' /></td>'
+					.'<td class="center"><input type="checkbox" '
+							.'name="'.format_to_output( $field_name, 'htmlattr' ).'_extra[]" '
+							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
+							.( in_array( $locale_key, $extra_locales ) ? ' checked="checked"' : '' ).' /></td>'
+					.( $link_Blog ? '<td class="evo_coll_link_locale_selector">'.$link_Blog->get_link_locale_selector( $field_name, $locale_key ).'</td>' : '' )
+				.'</tr>';
+		}
+
+		$r .= '</table>';
+
+		// JavaScript for autoselecting extra locale:
+		$r .= '<script type="text/javascript">
+			jQuery( "input[type=radio][name='.$field_name.']" ).click( function()
+			{
+				if( jQuery( this ).is( ":checked" ) )
+				{
+					jQuery( "input[type=checkbox][name=\''.$field_name.'_extra[]\'][value=\'" + jQuery( this ).val() + "\']" ).prop( "checked", true );
+				}
+			} );
+			jQuery( "input[type=checkbox][name=\''.$field_name.'_extra[]\']" ).click( function()
+			{
+				if( ! jQuery( this ).is( ":checked" ) && jQuery( "input[type=radio][name='.$field_name.'][value=\'" + jQuery( this ).val() + "\']" ).is( ":checked" ) )
+				{
+					return false;
+				}
+			} );';
+		if( $link_Blog )
+		{	// JavaScript to link with collections:
+			$r .= 'jQuery( "input[type=radio][name='.$field_name.'], input[type=checkbox][name=\''.$field_name.'_extra[]\']" ).click( function()
+			{
+				var locale_row = jQuery( this ).closest( "tr" );
+				var current_locale = locale_row.data( "locale" );
+				var coll_locale_selector = jQuery( "select[name=\''.$field_name.'_link_coll[" + current_locale + "]\']" );
+				if( jQuery( this ).is( ":checked" ) || jQuery( "input[type=radio][name='.$field_name.'][value=\'" + jQuery( this ).val() + "\']" ).is( ":checked" ) )
+				{
+					if( coll_locale_selector.length )
+					{
+						coll_locale_selector.hide();
+						if( coll_locale_selector.next( "span" ).length )
+						{
+							coll_locale_selector.next( "span" ).show();
+						}
+						else
+						{
+							coll_locale_selector.after( "<span>'.TS_('N/A').'</span>" );
+						}
+					}
+				}
+				else
+				{
+					if( coll_locale_selector.length )
+					{	// Show selector from cache:
+						coll_locale_selector.show();
+						coll_locale_selector.next( "span" ).hide();
+					}
+					else
+					{	// Load selector by AJAX:
+						jQuery.ajax(
+						{
+							url: "'.get_htsrv_url().'async.php",
+							type: "POST",
+							data: {
+								action: "get_link_locale_selector",
+								coll_ID: '.$link_Blog->ID.',
+								coll_locale: current_locale,
+								field_name: "'.$field_name.'",
+							},
+							success: function( result )
+							{
+								locale_row.find( "td.evo_coll_link_locale_selector" ).html( ajax_debug_clear( result ) );
+							},
+						} );
+					}
+				}
+			} );';
+		}
+		$r .= '
+		</script>';
+
+		$r .= $this->end_field();
+
+		return $this->display_or_return( $r );
 	}
 }
 

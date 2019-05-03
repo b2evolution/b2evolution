@@ -141,6 +141,8 @@ switch( $action )
 	case 'save_propose':
 	case 'accept_propose':
 	case 'reject_propose':
+	case 'link_version':
+	case 'unlink_version':
 		if( $action != 'edit_switchtab' && $action != 'edit_type' )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
@@ -195,6 +197,7 @@ switch( $action )
 	case 'new_mass':
 	case 'new_type':
 	case 'copy':
+	case 'new_version':
 	case 'create_edit':
 	case 'create_link':
 	case 'create':
@@ -917,6 +920,7 @@ switch( $action )
 
 
 	case 'copy': // Duplicate post
+	case 'new_version': // Add version
 		$item_ID = param( 'p', 'integer', true );
 		$ItemCache = &get_ItemCache();
 		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
@@ -942,6 +946,24 @@ switch( $action )
 		$edited_Item->set( 'dateset', 0 );	// Date not explicitly set yet
 		$edited_Item->set( 'issue_date', date( 'Y-m-d H:i:s', $localtimenow ) );
 
+		if( $action == 'new_version' )
+		{	// Creating new version
+			if( param( 'post_locale', 'string', NULL ) !== NULL )
+			{	// Set locale:
+				$edited_Item->set_from_Request( 'locale' );
+			}
+			if( param( 'post_create_child', 'integer', NULL ) === 1 )
+			{	// Set parent Item:
+				$edited_Item->set( 'parent_ID', $item_ID );
+			}
+			// Duplicate same images depending on setting from modal window:
+			$duplicate_same_images = param( 'post_same_images', 'integer', NULL );
+		}
+		else
+		{	// Always duplicate images on action=copy:
+			$duplicate_same_images = true;
+		}
+
 		// Set post comment status and extracats
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
@@ -949,8 +971,10 @@ switch( $action )
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item );
 
-		// Duplicate attachments from source Item:
-		$edited_Item->duplicate_attachments( $item_ID );
+		if( $duplicate_same_images )
+		{	// Duplicate attachments from source Item:
+			$edited_Item->duplicate_attachments( $item_ID );
+		}
 
 		// Initialize a page title depending on item type:
 		$ItemTypeCache = & get_ItemTypeCache();
@@ -1461,6 +1485,73 @@ switch( $action )
 
 		// REDIRECT / EXIT:
 		header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+		/* EXITED */
+		break;
+
+	case 'link_version':
+		// Link the edited Post with the selected Post:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		param( 'dest_post_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		if( $dest_Item = & $ItemCache->get_by_ID( $dest_post_ID, false, false ) )
+		{	// Do the linking:
+			$dest_Item->set_group_ID( $edited_Item->ID );
+			$dest_Item->dbupdate();
+
+			// Remember what last collection was used for linking in order to display it by default on next linking:
+			$UserSettings->set( 'last_linked_coll_ID', $dest_Item->get_blog_ID() );
+			$UserSettings->dbupdate();
+
+			// Inform user about duplicated locale in the same group:
+			$other_version_items = $dest_Item->get_other_version_items();
+			foreach( $other_version_items as $other_version_Item )
+			{
+				if( $dest_Item->get( 'locale' ) == $other_version_Item->get( 'locale' ) )
+				{	// This is a duplicate locale
+					$Messages->add( sprintf( T_('Please note the locale %s is used for several versions of this Item.'), '<code>'.$dest_Item->get( 'locale' ).'</code>' ), 'warning' );
+					break;
+				}
+			}
+
+			// Display result message after redirect:
+			$Messages->add( sprintf( T_('Item %s has been linked to the current Item.'), '"'.$dest_Item->get( 'title' ).'" <code>'.$dest_Item->get( 'locale' ).'</code>' ), 'success' );
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $edited_Item->get_edit_url( array( 'glue' => '&' ) ) );
+		/* EXITED */
+		break;
+
+	case 'unlink_version':
+		// Unlink the selected Post from the edited Post:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		param( 'unlink_item_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		if( $unlink_Item = & $ItemCache->get_by_ID( $unlink_item_ID, false, false ) )
+		{	// Do the unlinking:
+			$unlink_Item->set( 'igrp_ID', NULL, true );
+			$unlink_Item->dbupdate();
+
+			// Display result message after redirect:
+			$Messages->add( sprintf( T_('Item %s has been unlinked.'), '"'.$unlink_Item->get( 'title' ).'" <code>'.$unlink_Item->get( 'locale' ).'</code>' ), 'success' );
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $edited_Item->get_edit_url( array( 'glue' => '&' ) ) );
 		/* EXITED */
 		break;
 
@@ -2388,6 +2479,7 @@ switch( $action )
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'new_type': // this gets set as action by JS, when we switch tabs
 	case 'copy':
+	case 'new_version':
 	case 'create_edit':
 	case 'create_link':
 	case 'create':
@@ -2684,7 +2776,7 @@ if( $action == 'view' || $action == 'history_compare' || strpos( $action, 'edit'
 	init_fileuploader_js();
 }
 
-if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )
+if( in_array( $action, array( 'new', 'new_version', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )
 { // Set manual link for edit expert mode
 	$AdminUI->set_page_manual_link( 'expert-edit-screen' );
 }
@@ -2701,6 +2793,7 @@ switch( $action )
 	case 'edit':
 	case 'edit_switchtab':
 	case 'copy':
+	case 'new_version':
 	case 'create':
 	case 'create_edit':
 	case 'create_link':
@@ -2761,6 +2854,7 @@ switch( $action )
 		$bozo_start_modified = true;	// We want to start with a form being already modified
 	case 'new':
 	case 'copy':
+	case 'new_version':
 	case 'create_edit':
 	case 'create_link':
 	case 'create':

@@ -1039,6 +1039,22 @@ class ItemQuery extends SQL
 
 
 	/**
+	 * Restrict with locale visibility by current navigation locale
+	 */
+	function where_locale_visibility()
+	{
+		if( is_admin_page() )
+		{	// Don't restrict this in back-office:
+			return;
+		}
+
+		global $DB, $current_locale;
+
+		$this->WHERE_and( 'post_locale_visibility = "always" OR post_locale = '.$DB->quote( $current_locale ) );
+	}
+
+
+	/**
 	 * Restrict to the flagged items
 	 *
 	 * @param boolean TRUE - Restrict to flagged items, FALSE - Don't restrict/Get all items

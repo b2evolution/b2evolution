@@ -1668,6 +1668,46 @@ function skin_init( $disp )
 			break;
 	}
 
+	// Add hreflang tags for Items with several versions:
+	if( in_array( $disp, array( 'single', 'page' ) ) &&
+	    isset( $Item ) && $Item instanceof Item )
+	{	// Use current Item:
+		$version_Item = $Item;
+	}
+	if( in_array( $disp_detail, array( 'posts-topcat', 'posts-subcat' ) ) )
+	{	// Try to get intro Item:
+		$version_Item = & get_featured_Item( 'posts', NULL, true );
+	}
+	if( ! empty( $version_Item ) )
+	{	// If current Item is detected
+		$other_version_items = $version_Item->get_other_version_items();
+		if( ! empty( $other_version_items ) )
+		{	// If at least one other version exists for current Item:
+			// Add also current Item as first:
+			array_unshift( $other_version_items, $version_Item );
+			$other_version_locales = array();
+			foreach( $other_version_items as $o => $other_version_Item )
+			{	// Check to exclude what items cannot be displayed for hreflang tag:
+				if( in_array( $other_version_Item->get( 'locale' ), $other_version_locales ) ||
+				    ! $other_version_Item->can_be_displayed() )
+				{	// Don't add hreflang tag with same locale
+					// or if the Item cannot be displayed for current user on front-office
+					unset( $other_version_items[ $o ] );
+				}
+				$other_version_locales[] = $other_version_Item->get( 'locale' );
+			}
+			if( count( $other_version_items ) > 1 )
+			{	// Add hreflang tag only when at least two Items can be displayed:
+				foreach( $other_version_items as $other_version_Item )
+				{
+					add_headline( '<link rel="alternate" '
+						.'hreflang="'.format_to_output( $other_version_Item->get( 'locale' ), 'htmlattr' ).'" '
+						.'href="'.format_to_output( $other_version_Item->get_permanent_url( '', '', '&' ), 'htmlattr' ).'">' );
+				}
+			}
+		}
+	}
+
 	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );
 
 	// Make this switch block special only for 403 and 404 pages:

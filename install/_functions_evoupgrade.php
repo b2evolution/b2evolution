@@ -11654,6 +11654,58 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15380, 'Upgrading posts table...' ) )
+	{	// part of 7.0.1-alpha
+		db_add_col( 'T_items__item', 'post_locale_visibility', 'ENUM( "always", "follow-nav-locale" ) COLLATE ascii_general_ci NOT NULL DEFAULT "always" AFTER post_locale' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15390, 'Creating table for collection extra locales...' ) )
+	{	// part of 7.0.1-alpha
+		db_create_table( 'T_coll_locales', '
+			cl_coll_ID INT(10) UNSIGNED NOT NULL,
+			cl_locale  VARCHAR(20) COLLATE ascii_general_ci NOT NULL,
+			PRIMARY KEY cl_coll_loc_pk (cl_coll_ID, cl_locale)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15400, 'Inserting collection extra locales...' ) )
+	{	// part of 7.0.1-alpha
+		$DB->query( 'INSERT INTO T_coll_locales ( cl_coll_ID, cl_locale )
+			SELECT blog_ID, blog_locale
+			  FROM T_blogs' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15410, 'Creating table for Post Groups...' ) )
+	{	// part of 7.0.1-alpha
+		db_create_table( 'T_items__itemgroup', '
+			igrp_ID INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			PRIMARY KEY (igrp_ID)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15420, 'Upgrading posts table...' ) )
+	{	// part of 7.0.1-alpha
+		db_add_col( 'T_items__item', 'post_igrp_ID', 'INT(10) UNSIGNED NULL AFTER post_ityp_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15430, 'Updating collection locale setting for new posts...' ) )
+	{	// part of 7.0.1-alpha
+		$DB->query( 'UPDATE T_coll_settings
+			  SET cset_value = "select_coll"
+			WHERE cset_name = "new_item_locale_source"
+			  AND cset_value = "use_coll"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15440, 'Upgrading table of collection extra locales and linking with other collections...' ) )
+	{	// part of 7.0.1-alpha
+		db_add_col( 'T_coll_locales', 'cl_linked_coll_ID', 'INT(10) UNSIGNED NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

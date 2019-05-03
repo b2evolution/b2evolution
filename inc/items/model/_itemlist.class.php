@@ -642,6 +642,7 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_featured( $featured );
 		$next_Query->where_tags( $this->filters['tags'] );
 		$next_Query->where_flagged( $this->filters['flagged'] );
+		$next_Query->where_locale_visibility();
 		$next_Query->where_mustread( $this->filters['mustread'] );
 
 		/*

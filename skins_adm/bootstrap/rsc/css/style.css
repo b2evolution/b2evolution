@@ -1935,3 +1935,7 @@ div.query-builder .rule-container .rule-value-container {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+table.evo_locale_selector {
+  width: auto;
+  margin-bottom: 0;
+}

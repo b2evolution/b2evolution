@@ -1010,6 +1010,35 @@ switch( $action )
 
 		exit(0); // Exit here in order to don't display the AJAX debug info.
 
+	case 'get_item_add_version_form':
+		// Form to add version for the Item:
+
+		$item_ID = param( 'item_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+		// Initialize back-office skin:
+		global $UserSettings, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		require $inc_path.'items/views/_item_add_version.form.php';
+		break;
+
+	case 'get_link_locale_selector':
+		// Get a selector to link a collection with other collectios which have same main or extra locale as requested
+		param( 'coll_ID', 'integer', true );
+		param( 'coll_locale', 'string' );
+		param( 'field_name', 'string' );
+
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $coll_ID );
+
+		echo $Blog->get_link_locale_selector( $field_name, $coll_locale, false );
+		break;
+
 	default:
 		$incorrect_action = true;
 		break;
