@@ -1070,14 +1070,14 @@ function locale_updateDB()
 			$UserCache->load_list( explode( ',', implode( ',', $locale_users ) ) );
 			foreach( $locale_users as $user_locale => $locale_user_IDs )
 			{
-				$warning_message .= sprintf( T_('The locale %s is also used as locale by the following users:'), '<code>'.$user_locale.'</code>' ).'<ul style="list-style:disc;margin-left:20px">';
+				$warning_message .= sprintf( T_('The locale %s is also used as preferred locale by the following users:'), '<code>'.$user_locale.'</code>' ).'<ul style="list-style:disc;margin-left:20px">';
 				$locale_user_IDs = explode( ',', $locale_user_IDs );
 				foreach( $locale_user_IDs as $locale_user_ID )
 				{
 					$locale_User = & $UserCache->get_by_ID( $locale_user_ID );
 					$warning_message .= '<li>'.$locale_User->get_identity_link( array( 'user_tab' => 'userprefs' ) ).'</li>';
 				}
-				$warning_message .= '</ul>'.sprintf( T_('These users will no longer use the %s locale.'), '<code>'.$user_locale.'</code>' ).'<br><br>';
+				$warning_message .= '</ul>'.sprintf( T_('These users\' preferred locale will fall back to %s.'), '<code>'.$user_locale.'</code>' ).'<br><br>';
 			}
 		}
 

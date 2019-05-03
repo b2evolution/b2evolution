@@ -2993,7 +2993,7 @@ function evo_add_version_load_window( item_ID )
 {
 	if( item_ID < 1 || ( typeof( bozo ) && bozo.nb_changes > 0 ) )
 	{	// Don't allow to add version if item edit form is changed and not saved yet:
-		alert( '<?php echo TS_('You must save the Item before you can add version.'); ?>' );
+		alert( '<?php echo TS_('You must save this Item before you can add a version to it.'); ?>' );
 		return false;
 	}
 
