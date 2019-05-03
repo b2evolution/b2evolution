@@ -608,7 +608,8 @@ elseif( $disp == '-' )
 
 	// Do we need to handle the canoncial url?
 	if( ( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
-			|| $Blog->get_setting( 'relcanonical_homepage' ) )
+	    || $Blog->get_setting( 'relcanonical_homepage' )
+	    || $Blog->get_setting( 'self_canonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
 		if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
@@ -617,10 +618,14 @@ elseif( $disp == '-' )
 			{	// REDIRECT TO THE CANONICAL URL:
 				header_redirect( $canonical_url, (empty( $display_containers ) && empty( $display_includes )) ? 301 : 303 );
 			}
-			else
+			elseif( $Blog->get_setting( 'relcanonical_homepage' ) )
 			{	// Use link rel="canoncial":
 				add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 			}
+		}
+		elseif( $Blog->get_setting( 'self_canonical_homepage' ) )
+		{	// Use self-referencing rel="canonical" tag:
+			add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 		}
 	}
 

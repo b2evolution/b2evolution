@@ -179,9 +179,11 @@ function skin_init( $disp )
 
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
-			if( ! $preview
-					&& (( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
-								|| $Blog->get_setting( 'relcanonical_item_urls' ) ) )
+			if( ! $preview &&
+			    ( ( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
+			      || $Blog->get_setting( 'relcanonical_item_urls' ) 
+			      || $Blog->get_setting( 'self_canonical_item_urls' )
+			    ) )
 			{	// We want to redirect to the Item's canonical URL:
 				$canonical_is_same_url = true;
 				$item_Blog = & $Item->get_Blog();
@@ -279,10 +281,14 @@ function skin_init( $disp )
 						header_redirect( $canonical_url, true );
 						// EXITED.
 					}
-					else
+					elseif( $Blog->get_setting( 'relcanonical_item_urls' ) )
 					{	// Use rel="canoncial":
 						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 					}
+				}
+				elseif( $Blog->get_setting( 'self_canonical_item_urls' ) )
+				{	// Use self-referencing rel="canonical" tag:
+					add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 				}
 			}
 
@@ -385,7 +391,8 @@ function skin_init( $disp )
 						$disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
 
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
-							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
+						    || $Blog->get_setting( 'relcanonical_cat_urls' )
+						    || $Blog->get_setting( 'self_canonical_cat_urls' ) )
 						{ // Check if the URL was canonical:
 							if( empty( $Chapter ) && isset( $MainList->filters['cat_array'][0] ) )
 							{	// Try to get Chapter from filters:
@@ -407,10 +414,14 @@ function skin_init( $disp )
 									{	// REDIRECT TO THE CANONICAL URL:
 										header_redirect( $canonical_url, true );
 									}
-									else
+									elseif( $Blog->get_setting( 'relcanonical_cat_urls' ) )
 									{	// Use rel="canonical":
 										add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 									}
+								}
+								elseif( $Blog->get_setting( 'self_canonical_cat_urls' ) )
+								{	// Use self-referencing rel="canonical" tag:
+									add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 								}
 							}
 						}
@@ -439,7 +450,8 @@ function skin_init( $disp )
 					}
 
 					if( ( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
-							|| $Blog->get_setting( 'relcanonical_tag_urls' ) )
+					    || $Blog->get_setting( 'relcanonical_tag_urls' )
+					    || $Blog->get_setting( 'self_canonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
 						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
@@ -448,10 +460,14 @@ function skin_init( $disp )
 							{	// REDIRECT TO THE CANONICAL URL:
 								header_redirect( $canonical_url, true );
 							}
-							else
+							elseif( $Blog->get_setting( 'relcanonical_tag_urls' ) )
 							{	// Use rel="canoncial":
 								add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 							}
+						}
+						elseif( $Blog->get_setting( 'self_canonical_tag_urls' ) )
+						{	// Use self-referencing rel="canonical" tag:
+							add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 						}
 					}
 
@@ -467,8 +483,9 @@ function skin_init( $disp )
 					$disp_detail = 'posts-date';
 					$seo_page_type = 'Date archive page';
 
-					if( ($Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
-							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
+					if( ( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
+					    || $Blog->get_setting( 'relcanonical_archive_urls' )
+					    || $Blog->get_setting( 'self_canonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
 						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
@@ -477,10 +494,14 @@ function skin_init( $disp )
 							{	// REDIRECT TO THE CANONICAL URL:
 								header_redirect( $canonical_url, true );
 							}
-							else
+							elseif( $Blog->get_setting( 'relcanonical_archive_urls' ) )
 							{	// Use rel="canoncial":
 								add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 							}
+						}
+						elseif( $Blog->get_setting( 'self_canonical_archive_urls' ) )
+						{	// Use self-referencing rel="canonical" tag:
+							add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 						}
 					}
 

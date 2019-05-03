@@ -39,6 +39,7 @@ class CollectionSettings extends AbstractSettings
 			'posts_per_page'         => '5',
 			'disp_featured_above_list' => 0,				// Don't display a featured post above the list by default
 			'canonical_homepage'     => 1,				// Redirect homepage to its canonical Url?
+			'self_canonical_homepage' => 1,				// Use self-referencing rel="canonical" tag
 			'relcanonical_homepage'  => 1,				// If no 301, fall back to rel="canoncial" ?
 			'default_noindex'        => '0',				// META NOINDEX on Default blog page
 			'orderby'         => 'datestart',
@@ -52,6 +53,7 @@ class CollectionSettings extends AbstractSettings
 
 		// Single post settings:
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
+			'self_canonical_item_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'allow_crosspost_urls' => 1,					// For cross-posted Items, allow non-canonical URL
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'single_links'   => 'short',
@@ -100,6 +102,7 @@ class CollectionSettings extends AbstractSettings
 			'archive_mode'   => 'monthly',				// monthly, weekly, daily, postbypost
 			'archive_links'  => 'extrapath',			// param, extrapath
 			'canonical_archive_urls' => 1,				// Redirect archives to their canonical URL?
+			'self_canonical_archive_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'relcanonical_archive_urls' => 1,			// If no 301, fall back to rel="canoncial" ?
 			'archive_content'   => 'excerpt',
 			'archive_posts_per_page' => '100',
@@ -111,6 +114,7 @@ class CollectionSettings extends AbstractSettings
 			'catdir_noindex' => '1',					// META NOINDEX on Category directory
 			'chapter_links'  => 'chapters',				// 'param_num', 'subchap', 'chapters'
 			'canonical_cat_urls' => 1,					// Redirect categories to their canonical URL?
+			'self_canonical_cat_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'relcanonical_cat_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'chapter_content'   => 'normal',
 			'chapter_posts_per_page' => 100,
@@ -122,6 +126,7 @@ class CollectionSettings extends AbstractSettings
 		// Tag page settings:
 			'tag_links'  => 'colon',					// 'param', 'semicolon' -- fp> we want this changed to prefix only for new blogs only
 			'canonical_tag_urls' => 1,					// Redirect tag pages to their canonical Url?
+			'self_canonical_tag_urls' => 1,			// Use self-referencing rel="canonical" tag
 			'relcanonical_tag_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'tag_content'       => 'excerpt',
 			'tag_posts_per_page' => 100,

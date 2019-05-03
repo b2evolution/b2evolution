@@ -1181,15 +1181,20 @@ class Blog extends DataObject
 		if( in_array( 'seo', $groups ) )
 		{ // we want to load the workflow checkboxes:
 			$this->set_setting( 'canonical_homepage', param( 'canonical_homepage', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_homepage', param( 'self_canonical_homepage', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_homepage', param( 'relcanonical_homepage', 'integer', 0 ) );
 			$this->set_setting( 'canonical_item_urls', param( 'canonical_item_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_item_urls', param( 'self_canonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'allow_crosspost_urls', param( 'allow_crosspost_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_item_urls', param( 'relcanonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_archive_urls', param( 'canonical_archive_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_archive_urls', param( 'self_canonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_archive_urls', param( 'relcanonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_cat_urls', param( 'canonical_cat_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_cat_urls', param( 'self_canonical_cat_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_cat_urls', param( 'relcanonical_cat_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_tag_urls', param( 'canonical_tag_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_tag_urls', param( 'self_canonical_tag_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_tag_urls', param( 'relcanonical_tag_urls', 'integer', 0 ) );
 			$this->set_setting( 'default_noindex', param( 'default_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_noindex', param( 'paged_noindex', 'integer', 0 ) );
