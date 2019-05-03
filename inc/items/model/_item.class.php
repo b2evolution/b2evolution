@@ -13150,19 +13150,7 @@ class Item extends ItemLight
 	 */
 	function get_available_locales()
 	{
-		if( ! isset( $this->available_locales ) )
-		{	// Load locales from DB:
-			global $DB;
-			$SQL = new SQL( 'Get available locales for '.( empty( $this->ID ) ? 'new Item' : 'Item #'.$this->ID ) );
-			$SQL->SELECT( 'cl_locale' );
-			$SQL->FROM( 'T_coll_locales' );
-			$SQL->WHERE( 'cl_coll_ID = '.$this->get_blog_ID() );
-			$SQL->WHERE_and( 'cl_linked_coll_ID IS NULL' );
-			$SQL->ORDER_BY( 'cl_locale' );
-			$this->available_locales = $DB->get_col( $SQL );
-		}
-
-		return $this->available_locales;
+		return ( $item_blog = & $this->get_Blog() ? $item_blog->get_locales() : array() );
 	}
 
 
@@ -13295,6 +13283,31 @@ class Item extends ItemLight
 		}
 
 		return $this->other_version_items;
+	}
+
+
+	/**
+	 * Get version Item by locale
+	 *
+	 * @param string Locale
+	 * @return object|NULL Item object
+	 */
+	function & get_version_Item( $locale )
+	{
+		$version_items = $this->get_other_version_items();
+		array_unshift( $version_items, $this );
+
+		foreach( $version_items as $version_Item )
+		{
+			if( $version_Item->get( 'locale' ) == $locale &&
+			    $version_Item->can_be_displayed() )
+			{	// Use first detected Item with requested locale and visible for current User:
+				return $version_Item;
+			}
+		}
+
+		$r = NULL;
+		return $r;
 	}
 }
 ?>

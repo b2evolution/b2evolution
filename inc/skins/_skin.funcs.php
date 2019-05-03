@@ -1690,16 +1690,7 @@ function skin_init( $disp )
 	}
 
 	// Add hreflang tags for Items with several versions:
-	if( in_array( $disp, array( 'single', 'page' ) ) &&
-	    isset( $Item ) && $Item instanceof Item )
-	{	// Use current Item:
-		$version_Item = $Item;
-	}
-	if( in_array( $disp_detail, array( 'posts-topcat', 'posts-subcat' ) ) )
-	{	// Try to get intro Item:
-		$version_Item = & get_featured_Item( 'posts', NULL, true );
-	}
-	if( ! empty( $version_Item ) )
+	if( $version_Item = & get_current_Item() )
 	{	// If current Item is detected
 		$other_version_items = $version_Item->get_other_version_items();
 		if( ! empty( $other_version_items ) )

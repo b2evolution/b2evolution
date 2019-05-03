@@ -151,6 +151,7 @@ $core_componentwidget_defs = array(
 			'cat_title',
 			'coll_item_notification',
 			'coll_comment_notification',
+			'coll_locale_switch',
 		),
 	'user' => array(
 			'user_avatars',

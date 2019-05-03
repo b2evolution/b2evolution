@@ -11706,6 +11706,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15450, 'Installing new default widgets...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'page_top', 'coll_locale_switch' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

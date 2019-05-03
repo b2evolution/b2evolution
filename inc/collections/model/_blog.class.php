@@ -6194,9 +6194,10 @@ class Blog extends DataObject
 			$SQL = new SQL( 'Get extra locales of collection #'.$this->ID );
 			$SQL->SELECT( 'cl_locale' );
 			$SQL->FROM( 'T_coll_locales' );
+			$SQL->FROM_add( 'INNER JOIN T_locales ON loc_locale = cl_locale AND loc_enabled = 1' );
 			$SQL->WHERE( 'cl_coll_ID = '.$this->ID );
 			$SQL->WHERE_and( 'cl_linked_coll_ID IS NULL' );
-			$SQL->ORDER_BY( 'cl_locale' );
+			$SQL->ORDER_BY( 'loc_priority' );
 			$this->locales = $DB->get_col( $SQL );
 			if( ! in_array( $this->get( 'locale' ), $this->locales ) )
 			{	// Add main locale it is not stored in extra locales by some reason:
@@ -6266,9 +6267,10 @@ class Blog extends DataObject
 			$SQL = new SQL( 'Get linked collections with collection #'.$this->ID.' by locales' );
 			$SQL->SELECT( 'cl_locale, cl_linked_coll_ID' );
 			$SQL->FROM( 'T_coll_locales' );
+			$SQL->FROM_add( 'INNER JOIN T_locales ON loc_locale = cl_locale AND loc_enabled = 1' );
 			$SQL->WHERE( 'cl_coll_ID = '.$this->ID );
 			$SQL->WHERE_and( 'cl_linked_coll_ID IS NOT NULL' );
-			$SQL->ORDER_BY( 'cl_locale' );
+			$SQL->ORDER_BY( 'loc_priority' );
 			$this->linked_colls = $DB->get_assoc( $SQL );
 		}
 

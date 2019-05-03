@@ -669,7 +669,7 @@ elseif( $disp == '-' )
 	    || $Blog->get_setting( 'self_canonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
-		if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+		if( ! is_same_url( preg_replace( '#[\?&]coll_locale=([^&]+|$)#', '', $ReqURL ), $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 		{	// We are not on the canonicial blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:

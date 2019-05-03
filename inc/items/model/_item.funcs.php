@@ -427,6 +427,32 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 
 /**
+ * Get currently viewing Item or Intro Item of the current Chapter
+ *
+ * @return object Item
+ */
+function & get_current_Item()
+{
+	global $disp, $disp_detail, $Item;
+
+	$current_Item = NULL;
+
+	if( in_array( $disp, array( 'single', 'page', 'widget_page' ) ) &&
+	    isset( $Item ) && $Item instanceof Item )
+	{	// Use current global Item:
+		$current_Item = $Item;
+	}
+
+	if( in_array( $disp_detail, array( 'posts-topcat', 'posts-subcat' ) ) )
+	{	// Try to get intro Item:
+		$current_Item = & get_featured_Item( 'posts', NULL, true );
+	}
+
+	return $current_Item;
+}
+
+
+/**
  * Validate URL title (slug) / Also used for category slugs
  *
  * Using title as a source if url title is empty.

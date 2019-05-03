@@ -159,6 +159,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'link5'      => 20,
 				'link5_href' => 'https://github.com/b2evolution/b2evolution',
 			) ),
+		array( 20, 'coll_locale_switch' ),
 	);
 
 	/* Sidebar */
