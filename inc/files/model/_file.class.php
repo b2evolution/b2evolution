@@ -1249,33 +1249,37 @@ class File extends DataObject
 				$img .= '<img'.get_field_attribs_as_string( $img_attribs ).' />';
 			}
 
-			if( $image_link_to == 'original' )
-			{ // special case
-				$image_link_to = $this->get_url();
-			}
-			if( !empty( $image_link_to ) )
-			{
-				$a = '<a href="'.$image_link_to.'"';
-
-				if( $image_link_title == '#title#' )
-					$image_link_title = $this->title;
-				elseif( $image_link_title == '#desc#' )
-					$image_link_title = $this->desc;
-
-				if( !empty($image_link_title) )
+			if( $this->exists() )
+			{	// file exists, we can safely link to this file:
+				if( $image_link_to == 'original' )
+				{ // special case
+					$image_link_to = $this->get_url();
+				}
+				if( !empty( $image_link_to ) )
 				{
-					$a .= ' title="'.htmlspecialchars($image_link_title).'"';
+					$a = '<a href="'.$image_link_to.'"';
+
+					if( $image_link_title == '#title#' )
+						$image_link_title = $this->title;
+					elseif( $image_link_title == '#desc#' )
+						$image_link_title = $this->desc;
+
+					if( !empty($image_link_title) )
+					{
+						$a .= ' title="'.htmlspecialchars($image_link_title).'"';
+					}
+					if( !empty($image_link_rel) )
+					{
+						$a .= ' rel="'.htmlspecialchars($image_link_rel).'"';
+					}
+					if( !empty( $image_link_id ) )
+					{ // Set attribute "id" for link
+						$a .= ' id="'.$image_link_id.'"';
+					}
+					$img = $a.'>'.$img.'</a>';
 				}
-				if( !empty($image_link_rel) )
-				{
-					$a .= ' rel="'.htmlspecialchars($image_link_rel).'"';
-				}
-				if( !empty( $image_link_id ) )
-				{ // Set attribute "id" for link
-					$a .= ' id="'.$image_link_id.'"';
-				}
-				$img = $a.'>'.$img.'</a>';
 			}
+
 			$r .= $img;
 
 			if( $image_desc == '#' )
@@ -2467,6 +2471,11 @@ class File extends DataObject
 					$img_attribs['height'] = $thumb_sizes[1];
 				}
 			}
+		}
+
+		if( ! $this->exists() )
+		{	// We cannot find the file, force use of getfile.php to handle missing display of missing file:
+			$img_attribs['src'] = url_add_param( $this->get_getfile_url( '&' ), array( 'size' => $size_name ), '&' );
 		}
 
 		return $img_attribs;

@@ -1271,6 +1271,8 @@ function file_controller_build_tabs()
  */
 function rename_cachefolders( $oldname, $newname )
 {
+	load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
+
 	$available_Roots = FileRootCache::get_available_FileRoots();
 
 	$slash_oldname = '/'.$oldname;
