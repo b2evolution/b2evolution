@@ -6085,7 +6085,7 @@ class Item extends ItemLight
 
 		$item_Blog = & $this->get_Blog();
 		$r .= '<a href="'.$unlink_version_url.'" '
-				.'onclick="return confirm( \''.format_to_output( sprintf( TS_('Are you sure want to unlink the Item %s?'), '"'.$unlink_item->get( 'title' ).'" ('.$unlink_item->get( 'locale' ).')' ), 'htmlattr' ).'\' )"'
+				.'onclick="return confirm( \''.format_to_output( sprintf( TS_('Are you sure want to unlink the Item "%s" (%s)?'), $unlink_item->get( 'title' ), $unlink_item->get( 'locale' ) ), 'htmlattr' ).'\' )"'
 				.'title="'.format_to_output( $params['title'], 'htmlattr' ).'"'
 				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
 			.'>'.format_to_output( $params['text'], 'htmlbody' ).'</a>';
@@ -13281,12 +13281,15 @@ class Item extends ItemLight
 					$SQL->WHERE_and( 'post_ID != '.$this->ID );
 				}
 				$group_item_IDs = $DB->get_col( $SQL );
-				$ItemCache = & get_ItemCache();
-				$ItemCache->clear();
-				$ItemCache->load_where( 'post_ID IN ( '.$DB->quote( $group_item_IDs ).' ) ' );
-				foreach( $group_item_IDs as $group_item_ID )
+				if( count( $group_item_IDs ) )
 				{
-					$this->other_version_items[ $group_item_ID ] = & $ItemCache->get_by_ID( $group_item_ID );
+					$ItemCache = & get_ItemCache();
+					$ItemCache->clear();
+					$ItemCache->load_where( 'post_ID IN ( '.$DB->quote( $group_item_IDs ).' ) ' );
+					foreach( $group_item_IDs as $group_item_ID )
+					{
+						$this->other_version_items[ $group_item_ID ] = & $ItemCache->get_by_ID( $group_item_ID );
+					}
 				}
 			}
 		}

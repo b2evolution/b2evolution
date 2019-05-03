@@ -3030,7 +3030,7 @@ function evo_link_version_load_window( item_ID, coll_url )
 {
 	return evo_item_selector_load_window( item_ID,
 		[ '<?php echo TS_('Select Post to link...'); ?>', '<?php echo TS_('Link with this Post:'); ?>' ],
-		'<?php echo TS_('You must save the Item before you can link version.'); ?>',
+		'<?php echo TS_('You must save this Item before you can link it with another.'); ?>',
 		[ { 'text': '<?php echo TS_('Link'); ?>', 'id': 'evo_link_version_btn', 'class': 'btn btn-primary' } ],
 		<?php echo $default_coll_ID; ?>,
 		'collections/' + coll_url + '/linked'

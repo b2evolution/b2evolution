@@ -1515,13 +1515,13 @@ switch( $action )
 			{
 				if( $dest_Item->get( 'locale' ) == $other_version_Item->get( 'locale' ) )
 				{	// This is a duplicate locale
-					$Messages->add( sprintf( T_('Please note the locale %s is used for several versions of this Item.'), '<code>'.$dest_Item->get( 'locale' ).'</code>' ), 'warning' );
+					$Messages->add( sprintf( T_('WARNING: several versions of this Item use the same locale %s.'), '<code>'.$dest_Item->get( 'locale' ).'</code>' ), 'warning' );
 					break;
 				}
 			}
 
 			// Display result message after redirect:
-			$Messages->add( sprintf( T_('Item %s has been linked to the current Item.'), '"'.$dest_Item->get( 'title' ).'" <code>'.$dest_Item->get( 'locale' ).'</code>' ), 'success' );
+			$Messages->add( sprintf( T_('The Item "%s" (%s) has been linked to the current Item.'), $dest_Item->get( 'title' ), $dest_Item->get( 'locale' ) ), 'success' );
 		}
 
 		// REDIRECT / EXIT:
@@ -1547,7 +1547,7 @@ switch( $action )
 			$unlink_Item->dbupdate();
 
 			// Display result message after redirect:
-			$Messages->add( sprintf( T_('Item %s has been unlinked.'), '"'.$unlink_Item->get( 'title' ).'" <code>'.$unlink_Item->get( 'locale' ).'</code>' ), 'success' );
+			$Messages->add( sprintf( T_('The Item %s (%s) has been unlinked from the current Item.'), $unlink_Item->get( 'title' ), $unlink_Item->get( 'locale' ) ), 'success' );
 		}
 
 		// REDIRECT / EXIT:
