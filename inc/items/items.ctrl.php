@@ -1509,6 +1509,17 @@ switch( $action )
 			$UserSettings->dbupdate();
 		}
 
+		// Inform user about duplicated locale in the same group:
+		$other_version_items = $dest_Item->get_other_version_items();
+		foreach( $other_version_items as $other_version_Item )
+		{
+			if( $dest_Item->get( 'locale' ) == $other_version_Item->get( 'locale' ) )
+			{	// This is a duplicate locale
+				$Messages->add( sprintf( T_('Please note the locale %s is used for several versions of this Item.'), '<code>'.$dest_Item->get( 'locale' ).'</code>' ), 'warning' );
+				break;
+			}
+		}
+
 		// REDIRECT / EXIT:
 		header_redirect( $edited_Item->get_edit_url( array( 'glue' => '&' ) ) );
 		/* EXITED */

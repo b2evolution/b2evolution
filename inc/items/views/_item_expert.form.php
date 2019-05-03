@@ -784,11 +784,16 @@ $Form->begin_form( '', '', $params );
 		{	// Display other versions and link to add version:
 			echo '<b>'.T_('Other versions').':</b>';
 			echo '<ul style="list-style:disc;margin-left:20px">';
+			$other_version_locales = array( $edited_Item->get( 'locale' ) => 1 );
+			foreach( $other_version_items as $other_version_Item )
+			{	// Find duplicated locales:
+				$other_version_locales[ $other_version_Item->get( 'locale' ) ] = isset( $other_version_locales[ $other_version_Item->get( 'locale' ) ] ) ? 2 : 1;
+			}
 			foreach( $other_version_items as $other_version_Item )
 			{	// Display a link to another version of the Item:
 				echo '<li>'.$other_version_Item->get_title( array( 'link_type' => 'edit_view_url' ) ).' '
 						.locale_flag( $other_version_Item->get( 'locale' ), 'w16px', 'flag', '', false )
-						.'<span class="note">('.$other_version_Item->get( 'locale' ).')</span>'
+						.'<span class="note'.( $other_version_locales[ $other_version_Item->get( 'locale' ) ] == 2 ? ' red' : '' ).'">('.$other_version_Item->get( 'locale' ).')</span>'
 					.'</li>';
 			}
 			if( $item_add_version_link )
