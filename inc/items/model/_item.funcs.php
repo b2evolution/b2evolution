@@ -2473,7 +2473,7 @@ function echo_item_selector_js()
 <script>
 function evo_item_selector_load_window( item_ID, window_titles, restriction_message, submit_buttons, default_coll_ID, api_coll_path, api_coll_params )
 {
-	if( typeof( bozo ) && bozo.nb_changes > 0 )
+	if( item_ID < 1 || ( typeof( bozo ) && bozo.nb_changes > 0 ) )
 	{	// Don't allow to select another item if item edit form is changed and not saved yet:
 		alert( restriction_message );
 		return false;

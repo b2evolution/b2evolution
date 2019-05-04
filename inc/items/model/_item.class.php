@@ -5880,8 +5880,8 @@ class Item extends ItemLight
 	 */
 	function get_add_version_link( $params = array() )
 	{
-		if( ! $this->can_link_version() )
-		{	// New version cannot be added by some restriction:
+		if( ! $this->can_link_version( true ) )
+		{	// New item version cannot be added by some restriction:
 			return false;
 		}
 
@@ -5940,8 +5940,8 @@ class Item extends ItemLight
 	 */
 	function get_link_version_link( $params = array() )
 	{
-		if( ! $this->can_link_version() )
-		{	// New version cannot be added by some restriction:
+		if( ! $this->can_link_version(  true  ) )
+		{	// New item version cannot be linked by some restriction:
 			return false;
 		}
 
@@ -5999,7 +5999,7 @@ class Item extends ItemLight
 		global $admin_url;
 
 		if( ! $this->can_link_version() )
-		{	// New version cannot be added by some restriction:
+		{	// Item version cannot be unlinked by some restriction:
 			return false;
 		}
 
@@ -6101,11 +6101,11 @@ class Item extends ItemLight
 	 *
 	 * @return boolean
 	 */
-	function can_link_version()
+	function can_link_version( $allow_new_item = false )
 	{
 		global $current_User;
 
-		if( ! $this->ID )
+		if( ! $allow_new_item && ! $this->ID )
 		{	// Item must be saved in DB:
 			return false;
 		}
