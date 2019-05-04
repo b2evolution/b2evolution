@@ -85,9 +85,15 @@ class coll_locale_switch_Widget extends ComponentWidget
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
-					'note' => T_( 'Title to display in your skin.' ),
+					'note' => T_('Title to display in your skin.'),
 					'size' => 40,
 					'defaultvalue' => '',
+				),
+				'show_current' => array(
+					'label' => T_('Show current'),
+					'note' => T_('Check to show the current version in the list.'),
+					'type' => 'checkbox',
+					'defaultvalue' => 0,
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -103,7 +109,7 @@ class coll_locale_switch_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog, $locales;
+		global $Collection, $Blog, $locales, $current_locale;
 
 		$this->init_display( $params );
 
@@ -122,6 +128,11 @@ class coll_locale_switch_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
+		// Get currently viewing Item:
+		$current_Item = & get_current_Item();
+		// Get currently viewing locale:
+		$view_locale = ( $current_Item ? $current_Item->get( 'locale' ) : $current_locale );
+
 		foreach( $coll_locales as $coll_locale => $linked_coll_ID )
 		{
 			if( ! isset( $locales[ $coll_locale ] ) || ! $locales[ $coll_locale ]['enabled'] )
@@ -129,10 +140,15 @@ class coll_locale_switch_Widget extends ComponentWidget
 				continue;
 			}
 
-			if( ( $version_Item = & get_current_Item() ) &&
-			    ( $locale_Item = & $version_Item->get_version_Item( $coll_locale ) ) )
+			if( ! $this->disp_params['show_current'] && $view_locale == $coll_locale )
+			{	// Don't show current locale:
+				continue;
+			}
+
+			if( $current_Item &&
+			    ( $version_Item = & $current_Item->get_version_Item( $coll_locale ) ) )
 			{	// Use permanent URL of the version Item with requested locale:
-				$locale_switch_url = $locale_Item->get_permanent_url();
+				$locale_switch_url = $version_Item->get_permanent_url();
 			}
 			else
 			{	// Use URL to front page of the current collection:
@@ -181,7 +197,7 @@ class coll_locale_switch_Widget extends ComponentWidget
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => $Blog->ID, // Has the content of the displayed blog changed ?
-				'item_ID'      => ( $version_Item = & get_current_Item() ? $version_Item->ID : 0 ), // Cache each item separately + Has the Item changed?
+				'item_ID'      => ( $current_Item = & get_current_Item() ? $current_Item->ID : 0 ), // Cache each item separately + Has the Item changed?
 			);
 	}
 }
