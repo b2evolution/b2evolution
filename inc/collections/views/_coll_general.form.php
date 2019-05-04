@@ -277,7 +277,7 @@ if( ! $is_creating )
 		{ // More than 1 locale
 			$blog_locale_note = ( $current_User->check_perm( 'options', 'view' ) ) ?
 				'<a href="'.$admin_url.'?ctrl=regional">'.T_('Regional settings').' &raquo;</a>' : '';
-		$Form->locale_selector( 'blog_locale', $edited_Blog->get( 'locale' ), $edited_Blog->get_locales(), T_('Collection Locale'), $blog_locale_note, array( 'link_coll_ID' => $edited_Blog->ID ) );
+		$Form->locale_selector( 'blog_locale', $edited_Blog->get( 'locale' ), $edited_Blog->get_locales(), T_('Collection Locales'), $blog_locale_note, array( 'link_coll_ID' => $edited_Blog->ID ) );
 
 			$Form->radio( 'blog_locale_source', $edited_Blog->get_setting( 'locale_source' ),
 					array(
@@ -287,14 +287,14 @@ if( ! $is_creating )
 
 			$Form->radio( 'blog_post_locale_source', $edited_Blog->get_setting( 'post_locale_source' ),
 					array(
-						array( 'post', T_('Always force to post locale') ),
+						array( 'post', T_('Always force to Post locale') ),
 					array( 'blog', T_('Follow navigation locale'), '('.T_('Navigation/Widget Display').')' ),
-				), T_('Content Display'), true );
+				), T_('Post Details Display'), true );
 
 			$Form->radio( 'blog_new_item_locale_source', $edited_Blog->get_setting( 'new_item_locale_source' ),
 					array(
-						array( 'select_coll', T_('Use collection locale by default') ),
-						array( 'select_user', T_('Use user locale by default') ),
+						array( 'select_coll', T_('Default to collection\'s main locale') ),
+						array( 'select_user', T_('Default to user\'s locale') ),
 				), T_('New Posts'), true );
 		}
 		else
