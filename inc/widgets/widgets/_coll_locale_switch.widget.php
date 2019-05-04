@@ -108,7 +108,7 @@ class coll_locale_switch_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		// Get collection locales:
-		$coll_locales = $Blog->get_locales();
+		$coll_locales = $Blog->get_locales( 'all' );
 
 		if( count( $coll_locales ) < 2 )
 		{	// Don't display this widget when less 2 locales:
@@ -122,7 +122,7 @@ class coll_locale_switch_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		foreach( $coll_locales as $coll_locale )
+		foreach( $coll_locales as $coll_locale => $linked_coll_ID )
 		{
 			if( ! isset( $locales[ $coll_locale ] ) || ! $locales[ $coll_locale ]['enabled'] )
 			{	// Skip wrong or disabled locale:
@@ -136,7 +136,18 @@ class coll_locale_switch_Widget extends ComponentWidget
 			}
 			else
 			{	// Use URL to front page of the current collection:
-				$locale_switch_url = url_add_param( $Blog->get( 'url' ), 'coll_locale='.urlencode( $coll_locale ) );
+				if( ! empty( $linked_coll_ID ) )
+				{	// Use linked collection:
+					$BlogCache = & get_BlogCache();
+					if( $locale_Blog = & $BlogCache->get_by_ID( $linked_coll_ID, false, false ) )
+					{
+						$locale_switch_url = url_add_param( $locale_Blog->get( 'url' ), 'coll_locale='.urlencode( $coll_locale ) );
+					}
+				}
+				else
+				{	// Use current collection:
+					$locale_switch_url = url_add_param( $Blog->get( 'url' ), 'coll_locale='.urlencode( $coll_locale ) );
+				}
 			}
 
 			echo '<div class="evo_locale_switcher">';

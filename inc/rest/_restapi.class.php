@@ -584,7 +584,7 @@ class RestApi
 		global $Collection, $Blog;
 
 		// Get linked collections:
-		$linked_colls = $Blog->get_linked_colls();
+		$linked_colls = $Blog->get_locales( 'coll' );
 		// Add current collection on top:
 		array_unshift( $linked_colls, $Blog->ID );
 
