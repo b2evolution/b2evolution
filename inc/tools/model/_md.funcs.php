@@ -239,6 +239,34 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		echo '<br />';
 	}
 
+	// Check if we should skip a single folder in ZIP archive root which is the same as ZIP file name:
+	$root_folder_path = $folder_path;
+	if( ! empty( $source_folder_zip_name ) )
+	{	// This is an import from ZIP archive
+		$zip_file_name = preg_replace( '#\.zip$#i', '', $source_folder_zip_name );
+		if( file_exists( $folder_path.'/'.$zip_file_name ) )
+		{	// If folder exists in the root with same name as ZIP file name:
+			$skip_single_zip_root_folder = true;
+			if( $folder_path_handler = @opendir( $folder_path ) )
+			{
+				while( ( $file = readdir( $folder_path_handler ) ) !== false )
+				{
+					if( ! preg_match( '#^([\.]{1,2}|__MACOSX|'.preg_quote( $zip_file_name ).')$#i', $file ) )
+					{	// This is a different file or folder than ZIP file name:
+						$skip_single_zip_root_folder = false;
+						break;
+					}
+				}
+				closedir( $folder_path_handler );
+			}
+			if( $skip_single_zip_root_folder )
+			{	// Skip root folder with same name as ZIP file name:
+				$folder_path .= '/'.$zip_file_name;
+				$source_folder_zip_name .= '/'.$zip_file_name;
+			}
+		}
+	}
+
 	// Get all subfolders and files from the source folder:
 	$files = get_filenames( $folder_path );
 	$folder_path_length = strlen( $folder_path );
@@ -420,9 +448,9 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 	}
 	echo '<b>'.sprintf( T_('%d records'), $posts_count ).'</b></p>';
 
-	if( $source_type == 'zip' && file_exists( $folder_path ) )
+	if( $source_type == 'zip' && file_exists( $root_folder_path ) )
 	{	// This folder was created only to extract files from ZIP package, Remove it now:
-		rmdir_r( $folder_path );
+		rmdir_r( $root_folder_path );
 	}
 
 	echo '<p class="text-success">'.T_('Import complete.').'</p>';
