@@ -369,6 +369,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		$Item->set( 'urltitle', urltitle_validate( $item_slug, $item_slug, 0, false, 'post_urltitle', 'post_ID', 'T_items__item' ) );
 		$Item->set( 'status', 'published' );
 		$Item->set( 'ityp_ID', $md_Blog->get_setting( 'default_post_type' ) );
+		$Item->set( 'locale', $md_Blog->get( 'locale' ) );
 		if( ! empty( $item_content ) )
 		{	// Generate excerpt from content:
 			$Item->set_param( 'excerpt', 'string', excerpt( $item_content ), true );
