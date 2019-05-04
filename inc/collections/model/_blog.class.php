@@ -3601,7 +3601,7 @@ class Blog extends DataObject
 			// Update locales:
 			if( empty( $this->locales ) )
 			{	// Don't forget to store main locale in extra locales table:
-				$this->locales = array( $this->get( 'locale' ) );
+				$this->locales = array( $this->get( 'locale' ) => NULL );
 			}
 			$this->update_locales();
 
@@ -3769,6 +3769,9 @@ class Blog extends DataObject
 			), $params );
 
 		$DB->begin();
+
+		// Load all locales and linked collections:
+		$this->load_locales();
 
 		// Remember ID of the duplicated collection and Reset it to allow create new one:
 		$duplicated_coll_ID = $this->ID;
@@ -6173,17 +6176,9 @@ class Blog extends DataObject
 
 
 	/**
-	 * Get locales of this collection
-	 *
-	 * @param string Type of locales:
-	 *        - 'locale' - locales of this collection,
-	 *        - 'coll' - locales as links to other collections,
-	 *        - 'all' - all locales of this and links with other collections,
-	 * @return array Array with structure depending on param $type:
-	 *        - 'locale' - Numbered array with locale keys in values
-	 *        - 'coll'/'all' - Key is locale key, Value is ID of another collection or NULL
+	 * Load locales of this collection into cache array
 	 */
-	function get_locales( $type = 'locale' )
+	function load_locales()
 	{
 		if( $this->locales === NULL && ! empty( $this->ID ) )
 		{	// Load locales from DB once and store in cache variable:
@@ -6205,6 +6200,24 @@ class Blog extends DataObject
 		{	// Set default array with main locale:
 			$this->locales = array( $this->get( 'locale' ) => NULL );
 		}
+	}
+
+
+	/**
+	 * Get locales of this collection
+	 *
+	 * @param string Type of locales:
+	 *        - 'locale' - locales of this collection,
+	 *        - 'coll' - locales as links to other collections,
+	 *        - 'all' - all locales of this and links with other collections,
+	 * @return array Array with structure depending on param $type:
+	 *        - 'locale' - Numbered array with locale keys in values
+	 *        - 'coll'/'all' - Key is locale key, Value is ID of another collection or NULL
+	 */
+	function get_locales( $type = 'locale' )
+	{
+		// Load all locales:
+		$this->load_locales();
 
 		if( $type == 'locale' || $type == 'coll' )
 		{	// Get only locales or linked collections:

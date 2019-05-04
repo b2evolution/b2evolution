@@ -53,7 +53,7 @@ if( $next_action == 'create' )
 }
 else
 {
-	$Form->hidden( 'blog', $blog );
+	$Form->hidden( 'blog', $edited_Blog->ID );
 }
 
 if( ! empty( $edited_Blog->confirmation ) )
