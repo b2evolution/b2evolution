@@ -11615,10 +11615,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			}
 			if( ! empty( $modify_columns ) )
 			{	// Upgrade wrong integer unsigned ID columns:
-				$DB->query( 'ALTER TABLE '.$table_name.' '.implode( ', ', $modify_columns ) );
-				echo '<br />- table <code>'.$table_name.'</code>, columns: <code>'.implode( '</code>, <code>', array_keys( $modify_columns ) ).'</code>';
-				$tables_num++;
+				echo '<br />- table <code>'.$table_name.'</code>, columns: <code>'.implode( '</code>, <code>', array_keys( $modify_columns ) ).'</code>...';
 				evo_flush();
+				$DB->query( 'ALTER TABLE '.$table_name.' '.implode( ', ', $modify_columns ) );
+				$tables_num++;
 			}
 		}
 		echo '<br />'.$columns_num.' columns have been modified in '.$tables_num.' tables - ';
