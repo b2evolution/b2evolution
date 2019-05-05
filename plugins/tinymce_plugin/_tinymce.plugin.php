@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.11.1';
+	var $version = '6.11.2';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
