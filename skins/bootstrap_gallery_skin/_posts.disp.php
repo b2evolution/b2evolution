@@ -47,7 +47,10 @@ if( $Item = & get_featured_Item() )
 		) );
 
 	// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-	skin_include( '_item_content.inc.php', array_merge( $params, array( 'Item' => $Item ) ) );
+	skin_include( '_item_content.inc.php', array_merge( $params, array(
+			'Item'       => $Item,
+			'intro_mode' => 'normal', // Intro posts will be displayed in normal mode
+		) ) );
 	// Note: You can customize the default item content by copying the generic
 	// /skins/_item_content.inc.php file into the current skin folder.
 	// -------------------------- END OF POST CONTENT -------------------------

@@ -228,7 +228,8 @@ if( $single_cat_ID )
 	{	// We have the intro or featured posts to display:
 		// ---------------------- ITEM LIST INCLUDED HERE ------------------------
 		skin_include( '_item_list.inc.php', array(
-				'Item' => $Item
+				'Item'       => $Item,
+				'intro_mode' => 'normal', // Intro posts will be displayed in normal mode
 			) );
 		// ----------------------------END ITEM LIST  ----------------------------
 	}
