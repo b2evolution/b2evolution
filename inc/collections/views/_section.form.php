@@ -32,7 +32,7 @@ if( ! $creating && $perm_section_edit && $edited_Section->ID != 1 )
 {	// Display a link to delete the section only if Current user has no permission to edit it:
 	$Form->global_icon( T_('Delete this section!'), 'delete', regenerate_url( 'action', 'action=delete_section&amp;'.url_crumb( 'section' ) ) );
 }
-$Form->global_icon( T_('Cancel editing!'), 'close', '?ctrl=dashboard' );
+$Form->global_icon( T_('Cancel editing!'), 'close', '?ctrl=collections' );
 
 $Form->begin_form( 'fform', $creating ?  T_('New section') : T_('Section') );
 

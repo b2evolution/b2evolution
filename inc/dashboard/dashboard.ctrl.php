@@ -57,16 +57,6 @@ require_js_helper( 'colorbox' );
 require_js( '#easypiechart#' );
 require_css( 'jquery/jquery.easy-pie-chart.css' );
 
-// Init JS to quick edit an order of the collections and their groups in the table cell by AJAX:
-init_field_editor_js( array(
-		'field_prefix' => 'order-blog-',
-		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update&order_data=',
-	) );
-init_field_editor_js( array(
-		'field_prefix' => 'order-section-',
-		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update_section&order_data=',
-	) );
-
 // Init JS to autcomplete the user logins
 init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 

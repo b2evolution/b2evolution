@@ -53,7 +53,7 @@ else
 	// Note: we may still have permission to edit categories!!
 	$Messages->add( T_('Sorry, you have no permission to edit collection properties.'), 'error' );
 	// Redirect to collections list:
-	header_redirect( $admin_url.'?ctrl=dashboard' );
+	header_redirect( $admin_url.'?ctrl=collections' );
 	// EXITED.
 }
 

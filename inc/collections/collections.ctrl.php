@@ -181,7 +181,7 @@ switch( $action )
 		if( $kind == 'main' && ! $current_User->check_perm( 'blog_admin', 'editAll', false ) )
 		{ // Non-collection admins should not be able to create home/main collections
 			$Messages->add( sprintf( T_('You don\'t have permission to create a collection of kind %s.'), '<b>&laquo;'.$kind.'&raquo;</b>' ), 'error' );
-			header_redirect( $admin_url.'?ctrl=dashboard' ); // will EXIT
+			header_redirect( $admin_url.'?ctrl=collections' ); // will EXIT
 			// We have EXITed already at this point!!
 		}
 
@@ -329,7 +329,7 @@ switch( $action )
 
 			$action = 'list';
 			// Redirect so that a reload doesn't write to the DB twice:
-			$redirect_to = param( 'redirect_to', 'url', $admin_url.'?ctrl=dashboard' );
+			$redirect_to = param( 'redirect_to', 'url', $admin_url.'?ctrl=collections' );
 			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
@@ -543,7 +543,7 @@ switch( $action )
 			}
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=dashboard' ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=collections' ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -572,7 +572,7 @@ switch( $action )
 			forget_param( 'sec_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=dashboard' ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=collections' ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -835,6 +835,16 @@ switch( $tab )
 
 		// Reset previous working collection:
 		$blog = 0;
+
+		// Init JS to quick edit an order of the collections and their groups in the table cell by AJAX:
+		init_field_editor_js( array(
+				'field_prefix' => 'order-blog-',
+				'action_url' => $admin_url.'?ctrl=collections&order_action=update&order_data=',
+			) );
+		init_field_editor_js( array(
+				'field_prefix' => 'order-section-',
+				'action_url' => $admin_url.'?ctrl=collections&order_action=update_section&order_data=',
+			) );
 		break;
 }
 
@@ -943,7 +953,7 @@ switch( $action )
 
 		if( $action == 'delete_section' )
 		{	// We need to ask for confirmation:
-			set_param( 'redirect_to', $admin_url.'?ctrl=dashboard' );
+			set_param( 'redirect_to', $admin_url.'?ctrl=collections' );
 			$edited_Section->confirm_delete(
 				sprintf( T_('Delete section "%s"?'), $edited_Section->dget( 'name' ) ),
 				'section', $action, get_memorized( 'action' ) );

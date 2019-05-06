@@ -67,7 +67,7 @@ else
 		// Note: we may still have permission to edit categories!!
 		$Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
 		// redirect to blog list:
-		header_redirect( $admin_url.'?ctrl=dashboard' );
+		header_redirect( $admin_url.'?ctrl=collections' );
 		// EXITED:
 	}
 
@@ -377,7 +377,7 @@ switch( $action )
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
-		$update_redirect_url = $admin_url.'?ctrl=dashboard';
+		$update_redirect_url = $admin_url.'?ctrl=collections';
 
 		$setting = param( 'setting', 'string', '' );
 		$setting_value = ( $action == 'enable_setting' ? '1' : '0' );
@@ -500,14 +500,6 @@ if( $action == 'dashboard' )
 	// Include files to work with charts
 	require_js( '#easypiechart#' );
 	require_css( 'jquery/jquery.easy-pie-chart.css' );
-
-	if( empty( $blog ) )
-	{ // Init JS to quick edit an order of the blogs in the table cell by AJAX
-		init_field_editor_js( array(
-				'field_prefix' => 'order-blog-',
-				'action_url' => $admin_url.'?ctrl=dashboard&order_action=update&order_data=',
-			) );
-	}
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
