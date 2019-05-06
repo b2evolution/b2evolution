@@ -228,6 +228,10 @@ div.delete_messages ul label {
 .evo_comment .panel-footer {
   padding: 1ex;
 }
+.evo_post .panel-heading,
+.evo_comment .panel-heading {
+  line-height: 1.42857143;
+}
 .evo_comments_container {
   border: none;
 }
@@ -1240,6 +1244,10 @@ div.coll-selector + div.level2 {
 }
 .navbar-right {
   margin-right: -15px;
+}
+.navbar-right .action_icon {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 nav.level1 {
   z-index: 1;

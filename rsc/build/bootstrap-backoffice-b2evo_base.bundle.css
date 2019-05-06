@@ -2987,8 +2987,7 @@ select:focus:invalid:focus {
   margin: 0;
 }
 .panel-heading .close {
-  position: relative;
-  top: -4px;
+  float: none;
 }
 .panel-heading .btn-group {
   margin-left: 6px;
