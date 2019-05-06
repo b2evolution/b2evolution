@@ -129,18 +129,13 @@ class cat_title_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $cat, $disp, $Blog, $Item;
+		global $cat, $disp, $Blog;
 
 		$this->init_display( $params );
 
 		if( empty( $cat ) )
-		{	// Don't display this widget when not cat object
-			echo $this->disp_params['block_start'];
-			$this->disp_title();
-			echo $this->disp_params['block_body_start'];
-			echo '<span class="evo_param_error">'.sprintf( 'No %s ID found. Cannot display widget "%s".', '<code>cat</code>', $this->get_name() ).'</span>';
-			echo $this->disp_params['block_body_end'];
-			echo $this->disp_params['block_end'];
+		{	// Display error when no cat is found:
+			$this->display_error_message( sprintf( 'No %s ID found. Cannot display widget "%s".', '<code>cat</code>', $this->get_name() ) );
 			return false;
 		}
 		else
@@ -216,13 +211,14 @@ class cat_title_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Collection, $Blog, $current_User, $Item;
+		global $Collection, $Blog, $current_User, $cat;
 
 		return array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
-				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
-				'item_ID'      => $Item->ID, // Has the Item page changed?
+				'user_ID'      => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
+				'cont_coll_ID' => $Blog->ID, // Has the content of the displayed blog changed ?
+				'cat_ID'       => empty( $cat ) ? 0 : $cat, // Has the chapter changed ?
 			);
 	}
 }

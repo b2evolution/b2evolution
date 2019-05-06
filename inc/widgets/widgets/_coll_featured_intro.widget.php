@@ -194,12 +194,12 @@ class coll_featured_intro_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item, $disp;
+		global $disp;
 
 		$this->init_display( $params );
 
 		// Go Grab the featured post:
-		if( $Item = & get_featured_Item( $disp, $this->disp_params['blog_ID'] ) )
+		if( $Item = & get_featured_Item( $disp, $this->disp_params['blog_ID'], true ) )
 		{	// We have a featured/intro post to display:
 			$item_style = '';
 			$LinkOwner = new LinkItem( $Item );
@@ -274,14 +274,10 @@ class coll_featured_intro_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Collection, $Blog, $FeaturedList, $current_User;
+		global $Collection, $Blog, $FeaturedList, $current_User, $disp;
 
 		// Get intro Item which is displayed for this widget:
-		$Item = get_featured_Item( 'front', $this->disp_params['blog_ID'] );
-		if( ! empty( $FeaturedList ) )
-		{	// Restart results of the featured list in order to keep the same Item on display this widget:
-			$FeaturedList->restart();
-		}
+		$Item = & get_featured_Item( $disp, $this->disp_params['blog_ID'], true );
 
 		return array(
 				'wi_ID' => $this->ID, // Have the widget settings changed ?

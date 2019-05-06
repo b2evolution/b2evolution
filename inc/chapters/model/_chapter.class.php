@@ -633,6 +633,7 @@ class Chapter extends DataObject
 		// BLOCK CACHE INVALIDATION:
 		$chapter_Blog = $this->get_Blog();
 		BlockCache::invalidate_key( 'cont_coll_ID', $chapter_Blog->ID ); // Content has changed
+		BlockCache::invalidate_key( 'cat_ID', $this->ID ); // Chaper has changed
 
 		return true;
 	}
