@@ -20,6 +20,7 @@ global $number_of_posts_in_cat, $cat, $legend_icons, $Item;
 
 $params = array(
 		'item_class' => 'jumbotron evo_content_block evo_post',
+		'intro_mode' => 'normal', // Intro posts will be displayed in normal mode
 	);
 
 // Breadcrumbs
