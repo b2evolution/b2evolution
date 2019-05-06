@@ -11596,8 +11596,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	{	// part of 7.0.0-alpha
 		$tables_num = 0;
 		$columns_num = 0;
-		foreach( $db_config['aliases'] as $table_alias => $table_name )
+		$tables = $DB->get_col( 'SHOW TABLES' );
+		foreach( $tables as $table_name )
 		{
+			if( ! in_array( $table_name, $db_config['aliases'] ) )
+			{	// Skip not core table, e.g. custom plugin tables:
+				continue;
+			}
 			$modify_columns = array();
 			// ID field must be unsigned 10 digit size instead of wrong 11:
 			$columns = $DB->get_results( 'SHOW FULL COLUMNS FROM '.$table_name

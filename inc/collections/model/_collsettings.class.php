@@ -303,7 +303,7 @@ class CollectionSettings extends AbstractSettings
 			'download_nofollowto' => 1,
 
 		// Popups settings:
-			'marketing_popup_using' => 'anonymous',
+			'marketing_popup_using' => 'never',
 			'marketing_popup_animation' => 'random',
 			'marketing_popup_container_front' => 'marketing_popup',
 			'marketing_popup_container_posts' => 'marketing_popup',

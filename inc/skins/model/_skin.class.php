@@ -119,8 +119,14 @@ class Skin extends DataObject
 	 */
 	function install()
 	{
-		// INSERT NEW SKIN INTO DB:
-		$this->dbinsert();
+		if( $skin_ID = $this->dbexists( 'skin_folder', $this->get( 'folder' ) ) )
+		{	// Use already stored skin in DB:
+			$this->ID = $skin_ID;
+		}
+		else
+		{	// Insert new skin into DB:
+			$this->dbinsert();
+		}
 	}
 
 
