@@ -2103,7 +2103,7 @@ function blogs_all_results_block( $params = array() )
 		'is_filtered' => ! empty( $collection_filters ),
 		'url_ignore' => 'results_blog_page',
 		'presets'  => array(
-			'all' => array( T_('All'), '?cf_type=&cf_name=&cf_owner=' )
+			'all' => array( T_('All'), '?ctrl=collections&amp;cf_type=&amp;cf_name=&amp;cf_owner=' )
 		)
 	);
 
