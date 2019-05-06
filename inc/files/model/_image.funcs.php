@@ -460,6 +460,40 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height, $th
 
 
 /**
+ * Regenerate existing thumbnails
+ *
+ * @param object File object
+ * @param resource Image resource
+ * @param
+ */
+function regenerate_thumbnails( $File, $src_imh = NULL )
+{
+	global $thumbnail_sizes;
+
+	$Filetype = & $File->get_Filetype();
+
+	if( is_null( $src_imh ) )
+	{
+		$src_imh = loadimage( $File->get_full_path(), $Filetype->mimetype );
+	}
+
+	foreach( $thumbnail_sizes as $size_name => $value )
+	{
+		list( $thumb_type, $thumb_width, $thumb_height, $thumb_percent_blur ) = $value;
+		$filepath = $File->get_af_thumb_path( $size_name );
+		if( file_exists( $filepath ) )
+		{
+			list( $err, $dest_imh ) = generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height );
+			if( empty( $err ) )
+			{
+				$err = $File->save_thumb_to_cache( $dest_imh, $size_name, $Filetype->mimetype );
+			}
+		}
+	}
+}
+
+
+/**
  * Apply blur effect
  *
  * @param resource Image resource

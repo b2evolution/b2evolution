@@ -53,6 +53,7 @@ switch( $action )
 					'upload_enabled',
 					'upload_maxkb',
 					'regexp_filename',
+					'use_tui_image_editor',
 					'exif_orientation',
 					'fm_resize_enable',
 					'fm_resize_width',
@@ -139,6 +140,8 @@ switch( $action )
 			}
 
 			// Save Image options
+			param( 'use_tui_image_editor', 'integer', 0 );
+			$Settings->set( 'use_tui_image_editor', $use_tui_image_editor );
 			param( 'exif_orientation', 'integer', 0 );
 			$Settings->set( 'exif_orientation', $exif_orientation );
 			param( 'fm_resize_enable', 'integer', 0 );

@@ -127,6 +127,23 @@ require_css( 'basic.css', 'rsc_url' ); // Basic styles
 require_css( 'viewfile.css', 'rsc_url' );
 require_css( '#bootstrap_css#', 'rsc_url' );
 
+if( $Settings->get( 'use_tui_image_editor' ) )
+{
+	// Add JS:
+	global $rsc_url;
+	add_js_headline('var rsc_url = \''.format_to_js( $rsc_url ).'\';' );
+	require_js( '#jquery#', 'rsc_url' );
+	require_js( '#fabricjs#', 'rsc_url' );
+	require_js( '#tui_code_snippet#', 'rsc_url' );
+	require_js( '#tui_color_picker#', 'rsc_url' );
+	require_js( '#tui_image_editor#', 'rsc_url' );
+	require_js( 'toastui/white-theme.js', 'rsc_url' );
+
+	// Additional CSS:
+	require_css( '#tui_color_picker_css#', 'rsc_url' );
+	require_css( '#tui_image_editor_css#', 'rsc_url' );
+}
+
 // Send the predefined cookies:
 evo_sendcookies();
 
@@ -152,50 +169,125 @@ switch( $viewtype )
 		/*
 		 * Image file view:
 		 */
-		echo '<div class="img_preview content-type-image">';
-
-		if( $imgSize = $selected_File->get_image_size( 'widthheight' ) )
+		if( $Settings->get( 'use_tui_image_editor' ) )
 		{
-			echo '<img ';
-			if( $alt = $selected_File->dget( 'alt', 'htmlattr' ) )
+			$imgSize = $selected_File->get_image_size( 'widthheight' );
+			$FileRoot = & $selected_File->get_FileRoot();
+			?>
+			<div id="image-editor"></div>
+			<script>
+			var ImageEditor = tui.ImageEditor;
+			var instance = new ImageEditor('#image-editor', {
+					includeUI: {
+						loadImage: {
+							path: '<?php echo $selected_File->get_url();?>',
+							name: 'SampleImage'
+						},
+						theme: whiteTheme,
+						menuBarPosition: 'bottom',
+						menu: ['crop', 'flip', 'rotate', 'draw', 'shape', 'text', 'mask', 'filter'],
+					},
+					cssMaxWidth: window.innerWidth - 100,
+					cssMaxHeight: window.innerHeight - 200,
+					selectionStyle: {
+						cornerSize: 20,
+						rotatingPointOffset: 70
+					}
+				});
+
+			// This is a simple way to extend the interface and add a save button
+			document.querySelector('.tui-image-editor-header-buttons .tui-image-editor-save-btn').addEventListener('click', this.saveImage);
+
+			function saveImage()
 			{
-				echo 'alt="'.$alt.'" ';
+				// Generate the image data
+				var imgData = instance.toDataURL("image/png");
+				imgData = imgData.replace(/^data:image\/(png|jpg);base64,/, "")
+
+				// Sending the image data to Server
+				$.ajax({
+						type: 'POST',
+						url: '<?php echo format_to_js( get_htsrv_url().'async.php' );?>',
+						dataType: 'json',
+						data: {
+							action: 'save_image',
+							image_data: imgData,
+							crumb_image: '<?php echo format_to_js( get_crumb( 'image' ) );?>',
+							root: '<?php echo format_to_js( $FileRoot->type.'_'.$FileRoot->in_type_ID );?>',
+							path: '<?php echo format_to_js( $selected_File->get_rdfp_rel_path() );?>',
+						},
+						success: function( data )
+						{
+							if( data.status == 'ok' )
+							{	// What to do on save success?
+								var success_message = '<?php echo T_('Upload OK');?>';
+								alert( success_message );
+							}
+							else if( data.status == 'error' )
+							{
+								if( data.error_msg )
+								{
+									alert( data.error_msg );
+								}
+								else
+								{
+									alert( 'An unknown error has occurred while trying to upload the image.' );
+								}
+							}
+						}
+				});
 			}
-			if( $title = $selected_File->dget( 'title', 'htmlattr' ) )
-			{
-				echo 'title="'.$title.'" ';
-			}
-			echo 'src="'.$selected_File->get_url().'"'
-						.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
 
-			$url_rotate_90_left = regenerate_url( '', 'action=rotate_90_left'.'&'.url_crumb('image') );
-			$url_rotate_180 = regenerate_url( '', 'action=rotate_180'.'&'.url_crumb('image') );
-			$url_rotate_90_right = regenerate_url( '', 'action=rotate_90_right'.'&'.url_crumb('image') );
-			$url_flip_horizontal = regenerate_url( '', 'action=flip_horizontal'.'&'.url_crumb('image') );
-			$url_flip_vertical = regenerate_url( '', 'action=flip_vertical'.'&'.url_crumb('image') );
-
-			echo '<div class="center">';
-			echo action_icon( T_('Rotate this picture 90&deg; to the left'), 'rotate_left', $url_rotate_90_left, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-			echo action_icon( T_('Rotate this picture 180&deg;'), 'rotate_180', $url_rotate_180, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-			echo action_icon( T_('Rotate this picture 90&deg; to the right'), 'rotate_right', $url_rotate_90_right, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-			echo action_icon( T_('Flip this picture horizontally'), 'flip_horizontal', $url_flip_horizontal, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-			echo action_icon( T_('Flip this picture vertically'), 'flip_vertical', $url_flip_vertical, '', 0, 0 );
-			echo '</div>';
-
-			echo '<div class="subline">';
-			echo '<p><strong>'.$selected_File->dget( 'title' ).'</strong></p>';
-			echo '<p>'.$selected_File->dget( 'desc' ).'</p>';
-			echo '<p>'.$selected_File->dget('name').' &middot; ';
-			echo $selected_File->get_image_size().' &middot; ';
-			echo $selected_File->get_size_formatted().'</p>';
-			echo '</div>';
-
+			</script>
+			<?php
 		}
 		else
 		{
-			echo 'error';
+			echo '<div class="img_preview content-type-image">';
+
+			if( $imgSize = $selected_File->get_image_size( 'widthheight' ) )
+			{
+				echo '<img ';
+				if( $alt = $selected_File->dget( 'alt', 'htmlattr' ) )
+				{
+					echo 'alt="'.$alt.'" ';
+				}
+				if( $title = $selected_File->dget( 'title', 'htmlattr' ) )
+				{
+					echo 'title="'.$title.'" ';
+				}
+				echo 'src="'.$selected_File->get_url().'"'
+							.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
+
+				$url_rotate_90_left = regenerate_url( '', 'action=rotate_90_left'.'&'.url_crumb('image') );
+				$url_rotate_180 = regenerate_url( '', 'action=rotate_180'.'&'.url_crumb('image') );
+				$url_rotate_90_right = regenerate_url( '', 'action=rotate_90_right'.'&'.url_crumb('image') );
+				$url_flip_horizontal = regenerate_url( '', 'action=flip_horizontal'.'&'.url_crumb('image') );
+				$url_flip_vertical = regenerate_url( '', 'action=flip_vertical'.'&'.url_crumb('image') );
+
+				echo '<div class="center">';
+				echo action_icon( T_('Rotate this picture 90&deg; to the left'), 'rotate_left', $url_rotate_90_left, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+				echo action_icon( T_('Rotate this picture 180&deg;'), 'rotate_180', $url_rotate_180, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+				echo action_icon( T_('Rotate this picture 90&deg; to the right'), 'rotate_right', $url_rotate_90_right, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+				echo action_icon( T_('Flip this picture horizontally'), 'flip_horizontal', $url_flip_horizontal, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
+				echo action_icon( T_('Flip this picture vertically'), 'flip_vertical', $url_flip_vertical, '', 0, 0 );
+				echo '</div>';
+
+				echo '<div class="subline">';
+				echo '<p><strong>'.$selected_File->dget( 'title' ).'</strong></p>';
+				echo '<p>'.$selected_File->dget( 'desc' ).'</p>';
+				echo '<p>'.$selected_File->dget('name').' &middot; ';
+				echo $selected_File->get_image_size().' &middot; ';
+				echo $selected_File->get_size_formatted().'</p>';
+				echo '</div>';
+
+			}
+			else
+			{
+				echo 'error';
+			}
+			echo '&nbsp;</div>';
 		}
-		echo '&nbsp;</div>';
 		break;
 
 	case 'text':

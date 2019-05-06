@@ -1010,6 +1010,65 @@ switch( $action )
 
 		exit(0); // Exit here in order to don't display the AJAX debug info.
 
+	case 'save_image':
+		// Save image edited by TUI image editor:
+
+		$Session->assert_received_crumb( 'image' );
+
+		$root = param( 'root', 'string', true );
+		$file_path = param( 'path', 'string', true );
+		$image_data = param( 'image_data', 'string', true );
+
+		$FileCache = & get_FileCache();
+		list( $root_type, $root_in_type_ID ) = explode( '_', $root, 2 );
+		$current_File = & $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, $file_path );
+
+		if( $current_File )
+		{
+			$FileRoot = & $current_File->get_FileRoot();
+
+			if( ! check_perm_upload_files( NULL, $FileRoot ) )
+			{
+				debug_die('You don\'t have permission to upload on this file root.' );
+			}
+			elseif( ! $current_File->is_image() )
+			{
+				debug_die('Not an image file.');
+			}
+			else
+			{
+				load_funcs('files/model/_image.funcs.php');
+
+				$filepath = $current_File->get_full_path();
+				$filetype = $current_File->get_Filetype();
+
+				$image_data = base64_decode( $image_data );
+				$imh = imagecreatefromstring( $image_data );
+				$err = save_image( $imh, $filepath, $filetype->mimetype );
+
+				// Update thumbnails:
+				regenerate_thumbnails( $current_File, $imh );
+			}
+		}
+		else
+		{
+			debug_die('File object not found.');
+		}
+
+		if( empty( $err ) )
+		{
+			$data['status'] = 'ok';
+		}
+		else
+		{
+			$data['status'] = 'error';
+			$data['error_msg'] = $err;
+		}
+
+		echo evo_json_encode( $data );
+
+		exit(0); // Exit here in order to don't display the AJAX debug info.
+
 	default:
 		$incorrect_action = true;
 		break;

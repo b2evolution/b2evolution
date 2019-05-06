@@ -2117,15 +2117,19 @@ class File extends DataObject
 			return '<a href="'.$url.'" title="'.$title.'"'.$class_attr.$rel_attr.'>'.$text.'</a>';
 		}
 		else
-		{ // Link to open in a new window
+		{ // Link to open image in a new window
 			$target = 'evo_fm_'.$this->get_md5_ID();
 
+			$height = $this->get_image_size( 'height' );
+			$width = $this->get_image_size( 'width' );
+
+			$height = empty( $height ) ? 'window.screen.availHeight' : '( '.$height.' <= ( window.screen.availHeight - 200 ) ) ? ( '.$height.' + 200 ) : window.screen.availHeight';
+			$width = empty( $width ) ? 'window.screen.availWidth' : '( '.$width.' <= ( window.screen.availWidth - 100 ) ) ? ( ( '.$width.' + 100 ) < 1000 ? 1000 : '.$width.' + 100 ) : window.screen.availWidth';
 			// onclick: we unset target attrib and return the return value of pop_up_window() to make the browser not follow the regular href link (at least FF 1.5 needs the target reset)
 			return '<a href="'.$url.'" target="'.$target.'"
 				title="'.T_('Open in a new window').'" onclick="'
-				."this.target = ''; return pop_up_window( '$url', '$target', "
-				.(( $width = $this->get_image_size( 'width' ) ) ? ( $width + 100 ) : 750 ).', '
-				.(( $height = $this->get_image_size( 'height' ) ) ? ( $height + 150 ) : 550 ).' )"'
+				."this.target = '_blank'; return pop_up_window( '$url', '$target', "
+				.$width.', '.$height.' )"'
 				.$class_attr.$rel_attr.'>'
 				.$text.'</a>';
 		}
