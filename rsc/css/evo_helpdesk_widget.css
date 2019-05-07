@@ -5,11 +5,15 @@
  */
 
 #evo_helpdesk_widget {
-	font-family: Verdana, Arial, Sans-Serif;
+	font: 16px Verdana, Arial, Sans-Serif;
+	line-height: 1.4;
 	position: fixed;
 	bottom: 10px;
 	right: 10px;
 	z-index: 1000000;
+}
+#evo_helpdesk_widget * {
+	box-sizing: border-box;
 }
 
 #evo_helpdesk_widget__sticker {
@@ -51,24 +55,58 @@
 }
 
 /* Search form */
-.form-inline .input-group, #evo_helpdesk_widget__search_clear {
+#evo_helpdesk_widget__search_form {
 	margin-bottom: 10px;
 }
-#evo_helpdesk_widget__search_input {
-	box-shadow: none;
+#evo_helpdesk_widget__search_form input {
+	height: 34px;
+	padding: 6px 12px;
+	font-size: 14px;
+	line-height: 1.42857143;
+	color: #555;
+	background-color: #fff;
+	border: 1px solid #ccc;
 	border-right: 0;
+	border-top-left-radius: 4px;
+	border-bottom-left-radius: 4px;
+	transition: border-color ease-in-out .15s;
+	outline: none;
+	vertical-align: middle;
 }
-#evo_helpdesk_widget__search_input:focus {
+#evo_helpdesk_widget__search_form input:focus {
 	border: 1px solid #faa72d;
 	border-right: 0;
 }
-#evo_helpdesk_widget__search_submit {
+.evo_helpdesk_widget__button {
+	display: inline-block;
+	padding: 6px 12px;
+	margin-bottom: 0;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.42857143;
+	vertical-align: middle;
+	touch-action: manipulation;
+	cursor: pointer;
+	user-select: none;
+	border-radius: 4px;
+	color: #333;
+	background-color: #fff;
+	border-color: #ccc;
+	outline: none;
+}
+.evo_helpdesk_widget__button:hover {
+	background-color: #e6e6e6;
+	border-color: #adadad;
+}
+#evo_helpdesk_widget__search_form button[type=submit] {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	color: #FFF;
 	background: #faa72d;
 	border: 1px solid #faa72d;
-	margin-left: 0;	
 }
-#evo_helpdesk_widget__search_submit:hover {
-	background: #f69d1b
+#evo_helpdesk_widget__search_form button[type=submit]:hover {
+	background: #f69d1b;
 }
 
 /* Animation for AJAX loader */

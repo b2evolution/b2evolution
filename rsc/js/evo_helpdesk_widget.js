@@ -19,7 +19,7 @@ var evo_helpdesk_widget = {
 	},
 
 	/**
-	 * Initialize 
+	 * Initialize widget
 	 *
 	 * @param Array Options
 	 */
@@ -73,7 +73,7 @@ var evo_helpdesk_widget = {
 			// Submit a search form:
 			jQuery( document ).on( 'submit', '#evo_helpdesk_widget__search_form', function()
 			{
-				var search_keyword = jQuery( '#evo_helpdesk_widget__search_input' ).val();
+				var search_keyword = jQuery( '#evo_helpdesk_widget__search_form input' ).val();
 
 				evo_helpdesk_widget.rest_api_request( 'collections/' + evo_helpdesk_widget.options.collection + '/search/' + search_keyword,
 				'#evo_helpdesk_widget__posts_list',
@@ -81,7 +81,7 @@ var evo_helpdesk_widget = {
 				{	// Display the post data on success request:
 					if( data.found === 0 || data.results.length === 0 )
 					{	// empty search result
-						var r = '<h4 class="text-message">Sorry, we could not find anything matching your request, please try to broaden your search.</h4>';
+						var r = '<div>Sorry, we could not find anything matching your request, please try to broaden your search.</div>';
 					}
 					else
 					{
@@ -98,7 +98,7 @@ var evo_helpdesk_widget = {
 							{	// category, comment, tag:
 								r += search_item.title;
 							}
-							r += ' <a href="' + search_item.permalink + '" target="_blank"><span class="fa fa-external-link"></span></a> ';
+							r += ' <a href="' + search_item.permalink + '" target="_blank" title="Open post in new window">&gt;&gt;</a> ';
 							r += '</li>';
 						}
 						r += '</ul>';
@@ -111,13 +111,13 @@ var evo_helpdesk_widget = {
 			} );
 
 			// Clear the searched results:
-			jQuery( document ).on( 'click', '#evo_helpdesk_widget__search_clear', function()
+			jQuery( document ).on( 'click', '#evo_helpdesk_widget__search_form button[type=button]', function()
 			{
 				evo_helpdesk_widget.rest_api_request( 'collections/' + evo_helpdesk_widget.options.collection + '/posts',
 				'#evo_helpdesk_widget__posts_list',
 				function( data )
 				{	// Display the posts on success request:
-					jQuery( '#evo_helpdesk_widget__search_input' ).val( '' )
+					jQuery( '#evo_helpdesk_widget__search_form input' ).val( '' )
 					var r = '<ul>';
 					for( var p in data.items )
 					{
@@ -149,12 +149,9 @@ var evo_helpdesk_widget = {
 			'#evo_helpdesk_widget__body',
 			function( data )
 			{	// Display the posts on success request:
-				var r = '<form class="form-inline" id="evo_helpdesk_widget__search_form" style="margin-bottom:10px">' +
-						'<div class="input-group">' +
-							'<input type="text" id="evo_helpdesk_widget__search_input" class="form-control">' +
-							'<span class="input-group-btn"><button id="evo_helpdesk_widget__search_submit" class="btn btn-primary">Search</button></span>' +
-						'</div> ' +
-						'<button id="evo_helpdesk_widget__search_clear" class="btn btn-default">Clear</button>' +
+				var r = '<form class="form-inline" id="evo_helpdesk_widget__search_form">' +
+						'<input type="text"><button type="submit" class="evo_helpdesk_widget__button">Search</button> ' +
+						'<button type="button" class="evo_helpdesk_widget__button">Clear</button>' +
 					'</form>' +
 					'<div id="evo_helpdesk_widget__posts_list">' +
 						'<ul>';
@@ -189,7 +186,7 @@ var evo_helpdesk_widget = {
 	 * @param function Function on success request
 	 * @param string Type method: 'GET', 'POST', 'DELETE', etc.
 	 */
-	rest_api_request: function ( url, content_selector, params_func, func_method, method )
+	rest_api_request: function ( request, content_selector, params_func, func_method, method )
 	{
 		var params = params_func;
 		var func = func_method;
@@ -217,7 +214,7 @@ var evo_helpdesk_widget = {
 		{
 			contentType: 'application/json; charset=utf-8',
 			type: method,
-			url: rest_api_url + url,
+			url: rest_api_url + request,
 			data: params
 		} )
 		.then( function( data, textStatus, jqXHR )
