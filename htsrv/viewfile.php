@@ -138,6 +138,7 @@ if( $Settings->get( 'use_tui_image_editor' ) )
 	require_js( '#tui_color_picker#', 'rsc_url' );
 	require_js( '#tui_image_editor#', 'rsc_url' );
 	require_js( 'toastui/white-theme.js', 'rsc_url' );
+	require_js( 'backoffice.js', 'rsc_url' );
 
 	// Additional CSS:
 	require_css( '#tui_color_picker_css#', 'rsc_url' );
@@ -172,10 +173,24 @@ switch( $viewtype )
 		if( $Settings->get( 'use_tui_image_editor' ) )
 		{
 			$imgSize = $selected_File->get_image_size( 'widthheight' );
+			$Filetype = & $selected_File->get_Filetype();
 			$FileRoot = & $selected_File->get_FileRoot();
+
+			switch( $Filetype->mimetype )
+			{
+				case 'image/jpeg':
+					$mimetype = 'jpeg';
+					break;
+
+				default:
+				case 'image/png':
+					$mimetype = 'png';
+					break;
+			}
 			?>
 			<div id="image-editor"></div>
 			<script>
+			var saveInProgress = false;
 			var ImageEditor = tui.ImageEditor;
 			var instance = new ImageEditor('#image-editor', {
 					includeUI: {
@@ -200,24 +215,38 @@ switch( $viewtype )
 
 			function saveImage()
 			{
-				// Generate the image data
-				var imgData = instance.toDataURL("image/png");
-				imgData = imgData.replace(/^data:image\/(png|jpg);base64,/, "")
+				if( !saveInProgress )
+				{
+					saveInProgress = true;
 
-				// Sending the image data to Server
-				$.ajax({
-						type: 'POST',
-						url: '<?php echo format_to_js( get_htsrv_url().'async.php' );?>',
-						dataType: 'json',
-						data: {
-							action: 'save_image',
-							image_data: imgData,
-							crumb_image: '<?php echo format_to_js( get_crumb( 'image' ) );?>',
-							root: '<?php echo format_to_js( $FileRoot->type.'_'.$FileRoot->in_type_ID );?>',
-							path: '<?php echo format_to_js( $selected_File->get_rdfp_rel_path() );?>',
-						},
-						success: function( data )
-						{
+					// Generate the image data
+					var imgData = instance.toDataURL( { format: '<?php echo format_to_js( $mimetype );?>' } );
+					imgData = dataURItoBlob( imgData );
+
+					var fd = new FormData();
+					fd.append( 'action', 'save_image' );
+					fd.append( 'crumb_image', '<?php echo format_to_js( get_crumb( 'image' ) );?>' );
+					fd.append( 'root', '<?php echo format_to_js( $FileRoot->type.'_'.$FileRoot->in_type_ID );?>' );
+					fd.append( 'path', '<?php echo format_to_js( $selected_File->get_rdfp_rel_path() );?>' );
+					fd.append( 'qquuid', '<?php echo format_to_js( bin2hex( random_bytes( 16 ) ) );?>' ); // Just random stuff but we need this for the UploadHandler to work
+					fd.append( 'image_data', imgData );
+
+					// Sending the image data to Server
+					$request = $.ajax( {
+								type: 'POST',
+								url: '<?php echo format_to_js( get_htsrv_url().'async.php' );?>',
+								data: fd,
+								processData: false,
+								contentType: false,
+								success: function( data )
+								{
+
+								}
+						} );
+
+					$request.done( function( data ) {
+							saveInProgress = false;
+							data = JSON.parse( data );
 							if( data.status == 'ok' )
 							{	// What to do on save success?
 								var success_message = '<?php echo T_('Upload OK');?>';
@@ -234,10 +263,9 @@ switch( $viewtype )
 									alert( 'An unknown error has occurred while trying to upload the image.' );
 								}
 							}
-						}
-				});
+						} );
+				}
 			}
-
 			</script>
 			<?php
 		}

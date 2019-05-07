@@ -1017,42 +1017,89 @@ switch( $action )
 
 		$root = param( 'root', 'string', true );
 		$file_path = param( 'path', 'string', true );
-		$image_data = param( 'image_data', 'string', true );
 
 		$FileCache = & get_FileCache();
 		list( $root_type, $root_in_type_ID ) = explode( '_', $root, 2 );
-		$current_File = & $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, $file_path );
 
-		if( $current_File )
+		if( $current_File = & $FileCache->get_by_root_and_path( $root_type, $root_in_type_ID, $file_path ) )
 		{
-			$FileRoot = & $current_File->get_FileRoot();
-
-			if( ! check_perm_upload_files( NULL, $FileRoot ) )
+			$fm_FileRoot = & $current_File->get_FileRoot();
+			if( ! check_perm_upload_files( NULL, $fm_FileRoot ) )
 			{
-				debug_die('You don\'t have permission to upload on this file root.' );
+				$err = 'You don\'t have permission to upload on this file root.';
 			}
 			elseif( ! $current_File->is_image() )
 			{
-				debug_die('Not an image file.');
+				$err = 'Not an image file.';
+			}
+			elseif( empty( $fm_FileRoot ) )
+			{ // Stop when this object is NULL, it can happens when media path has no rights to write
+				$err = sprintf( T_( 'We cannot open the folder %s. PHP needs execute permissions on this folder.' ), '<b>'.$media_path.'</b>' );
 			}
 			else
 			{
+				require_once dirname(__FILE__).'/upload_handler.php';
 				load_funcs('files/model/_image.funcs.php');
 
-				$filepath = $current_File->get_full_path();
-				$filetype = $current_File->get_Filetype();
+				$size_limits = array( return_bytes( ini_get( 'post_max_size' ) ), return_bytes( ini_get( 'upload_max_filesize') ) );
+				if( $Settings->get( 'upload_maxkb' ) )
+				{
+					$size_limits[] = $Settings->get( 'upload_maxkb' ) * 1024;
+				}
 
-				$image_data = base64_decode( $image_data );
-				$imh = imagecreatefromstring( $image_data );
-				$err = save_image( $imh, $filepath, $filetype->mimetype );
+				$file = new UploadHandler();
+				// Specify the list of valid extensions, ex. array("jpeg", "xml", "bmp")
+				$file->allowedExtensions = array(); // all files types allowed by default
+				// Specify max file size in bytes.
+				$file->sizeLimit = min( $size_limits );
+				// Specify the input name set in the javascript.
+				$file->inputName = "image_data";
+				// If you want to use the chunking/resume feature, specify the folder to temporarily save parts.
+				$file->chunksFolder = 'chunks';
 
-				// Update thumbnails:
-				regenerate_thumbnails( $current_File, $imh );
+				$method = $_SERVER['REQUEST_METHOD'];
+				if ( $method == 'POST' )
+				{
+					header( 'Content-Type: text/plain' );
+					// Assumes you have a chunking.success.endpoint set to point here with a query parameter of "done".
+					// For example: /myserver/handlers/endpoint.php?done
+					if ( isset( $_GET['done'] ) )
+					{
+						$result = $file->combineChunks();
+					}
+					else
+					{ // Handles upload requests
+						// Call handleUpload() with the name of the folder, relative to PHP's getcwd()
+						$result = $file->handleUpload();
+						// To return a name used for uploaded file you can use the following line.
+						$result["uploadName"] = $file->getUploadName();
+					}
+				}
+				else
+				{	// We only allow POST requests:
+					header( 'HTTP/1.0 405 Method Not Allowed' );
+				}
+
+				// If everything is ok, save the file somewhere
+				if( ! isset( $result['success'] ) || ! $result['success'] )
+				{ // Error on upload
+					$err = $result['error'];
+				}
+				else
+				{
+					$file_content = $result['contents'];
+					$imh = imagecreatefromstring( $file_content );
+					$Filetype = & $current_File->get_Filetype();
+					$err = save_image( $imh, $current_File->get_full_path(), $Filetype->mimetype );
+
+					// Update thumbnails:
+					regenerate_thumbnails( $current_File );
+				}
 			}
 		}
 		else
 		{
-			debug_die('File object not found.');
+			$err = 'File object not found.';
 		}
 
 		if( empty( $err ) )

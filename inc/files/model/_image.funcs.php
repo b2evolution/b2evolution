@@ -466,16 +466,12 @@ function generate_thumb( $src_imh, $thumb_type, $thumb_width, $thumb_height, $th
  * @param resource Image resource
  * @param
  */
-function regenerate_thumbnails( $File, $src_imh = NULL )
+function regenerate_thumbnails( $File )
 {
 	global $thumbnail_sizes;
 
 	$Filetype = & $File->get_Filetype();
-
-	if( is_null( $src_imh ) )
-	{
-		$src_imh = loadimage( $File->get_full_path(), $Filetype->mimetype );
-	}
+	list( $err, $src_imh ) = load_image( $File->get_full_path(), $Filetype->mimetype );
 
 	foreach( $thumbnail_sizes as $size_name => $value )
 	{
