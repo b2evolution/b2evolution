@@ -13,9 +13,8 @@ var evo_helpdesk_widget = {
 		collection: null, // Collection urlname
 		sticker: '?',
 		title: 'b2evolution widget',
-		close_text: 'x',
-		width: '355px',
-		height: '400px',
+		width: '370px',
+		height: '450px',
 	},
 
 	/**
@@ -54,9 +53,13 @@ var evo_helpdesk_widget = {
 					'<div id="evo_helpdesk_widget__window">' +
 						'<div id="evo_helpdesk_widget__header">' +
 							evo_helpdesk_widget.options.title +
-							'<div id="evo_helpdesk_widget__close">' + evo_helpdesk_widget.options.close_text + '</div>' +
+							'<svg id="evo_helpdesk_widget__close" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="15" x2="15" y2="1"></line><line x1="1" y1="1" x2="15" y2="15"></line></svg>' +
 						'</div>' +
-						'<div id="evo_helpdesk_widget__body"></div>' +
+						'<div id="evo_helpdesk_widget__body">' +
+							'<div id="evo_helpdesk_widget__results_list"></div>' +
+							'<div id="evo_helpdesk_widget__result_details"></div>' +
+							'<button id="evo_helpdesk_widget__results_back" class="evo_helpdesk_widget__button">&lt;&lt; Back</button>' +
+						'</div>' +
 					'</div>' +
 				'</div>' );
 
@@ -66,78 +69,26 @@ var evo_helpdesk_widget = {
 				height: evo_helpdesk_widget.options.height,
 			} );
 
-			// Initialize events:
+			/* Initialize events: */
+			// Show helpdesk window:
 			jQuery( '#evo_helpdesk_widget__sticker' ).click( evo_helpdesk_widget.show );
+			// Hide helpdesk window:
 			jQuery( '#evo_helpdesk_widget__close' ).click( evo_helpdesk_widget.hide );
-
 			// Submit a search form:
-			jQuery( document ).on( 'submit', '#evo_helpdesk_widget__search_form', function()
-			{
-				var search_keyword = jQuery( '#evo_helpdesk_widget__search_form input' ).val();
-
-				evo_helpdesk_widget.rest_api_request( 'collections/' + evo_helpdesk_widget.options.collection + '/search/' + search_keyword,
-				'#evo_helpdesk_widget__posts_list',
-				function( data )
-				{	// Display the post data on success request:
-					if( data.found === 0 || data.results.length === 0 )
-					{	// empty search result
-						var r = '<div>Sorry, we could not find anything matching your request, please try to broaden your search.</div>';
-					}
-					else
-					{
-						var r = '<ul>';
-						for( var s in data.results )
-						{
-							var search_item = data.results[s];
-							r += '<li>' + search_item.kind + ': ';
-							if( search_item.kind == 'item' )
-							{ // item: (Display this as link to load data)
-								r += '<a href="#" data-id="' + search_item.id + '" data-urlname="' + evo_helpdesk_widget.options.collection + '">' + search_item.title + '</a>';
-							}
-							else
-							{	// category, comment, tag:
-								r += search_item.title;
-							}
-							r += ' <a href="' + search_item.permalink + '" target="_blank" title="Open post in new window">&gt;&gt;</a> ';
-							r += '</li>';
-						}
-						r += '</ul>';
-					}
-					return r;
-				} );
-
-				// To prevent form default event:
-				return false;
-			} );
-
+			jQuery( document ).on( 'submit', '#evo_helpdesk_widget__search_form', evo_helpdesk_widget.search );
 			// Clear the searched results:
-			jQuery( document ).on( 'click', '#evo_helpdesk_widget__search_form button[type=button]', function()
-			{
-				evo_helpdesk_widget.rest_api_request( 'collections/' + evo_helpdesk_widget.options.collection + '/posts',
-				'#evo_helpdesk_widget__posts_list',
-				function( data )
-				{	// Display the posts on success request:
-					jQuery( '#evo_helpdesk_widget__search_form input' ).val( '' )
-					var r = '<ul>';
-					for( var p in data.items )
-					{
-						var post = data.items[p];
-						r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + evo_helpdesk_widget.options.collection + '">' + post.title + '</a></li>';
-					}
-					r += '</ul>';
-					return r;
-				} );
-
-				// To prevent form default event:
-				return false;
-			} );
+			jQuery( document ).on( 'click', '#evo_helpdesk_widget__search_form button[type=button]', evo_helpdesk_widget.reset );
+			// Load the data of the selected post:
+			jQuery( document ).on( 'click', '#evo_helpdesk_widget__posts_list a:not([target])', evo_helpdesk_widget.load_item );
+			// Load the data of the selected post:
+			jQuery( document ).on( 'click', '#evo_helpdesk_widget__results_back', evo_helpdesk_widget.switch_layout );
 		} );
 	},
 
 	/**
 	 * Show window and load content
 	 */
-	show: function()
+	show: function( event )
 	{
 		jQuery( '#evo_helpdesk_widget__window' ).show();
 		jQuery( '#evo_helpdesk_widget__sticker' ).hide();
@@ -146,12 +97,15 @@ var evo_helpdesk_widget = {
 		if( this.loaded !== true )
 		{
 			evo_helpdesk_widget.rest_api_request( 'collections/' + evo_helpdesk_widget.options.collection + '/posts',
-			'#evo_helpdesk_widget__body',
+			'#evo_helpdesk_widget__results_list',
 			function( data )
 			{	// Display the posts on success request:
-				var r = '<form class="form-inline" id="evo_helpdesk_widget__search_form">' +
-						'<input type="text"><button type="submit" class="evo_helpdesk_widget__button">Search</button> ' +
-						'<button type="button" class="evo_helpdesk_widget__button">Clear</button>' +
+				var r = '<form id="evo_helpdesk_widget__search_form">' +
+						'<div>' +
+							'<div><input type="text"></div>' +
+							'<div><button type="submit" class="evo_helpdesk_widget__button">Search</button></div>' +
+							'<div><button type="button" class="evo_helpdesk_widget__button">Clear</button></div>' +
+						'</div>' +
 					'</form>' +
 					'<div id="evo_helpdesk_widget__posts_list">' +
 						'<ul>';
@@ -171,10 +125,171 @@ var evo_helpdesk_widget = {
 	/**
 	 * Hide window with loaded content
 	 */
-	hide: function()
+	hide: function( event )
 	{
 		jQuery( '#evo_helpdesk_widget__window' ).hide();
 		jQuery( '#evo_helpdesk_widget__sticker' ).show();
+	},
+
+	/**
+	 * Search categories/posts/comments/tags by keyword
+	 */
+	search: function( event, keyword )
+	{
+		var is_event_call = ( typeof( event ) == 'object' );
+		if( ! is_event_call || typeof( keyword ) == 'undefined' )
+		{	// Set params when they are not defined depending on call mode:
+			keyword = ( is_event_call ? jQuery( '#evo_helpdesk_widget__search_form input' ).val() : event );
+		}
+
+		evo_helpdesk_widget.switch_layout( 'results' );
+
+		evo_helpdesk_widget.rest_api_request( 'collections/' + evo_helpdesk_widget.options.collection + '/search/' + keyword,
+		'#evo_helpdesk_widget__posts_list',
+		function( data )
+		{	// Display the post data on success request:
+			if( data.found === 0 || data.results.length === 0 )
+			{	// empty search result
+				var r = '<div>Sorry, we could not find anything matching your request, please try to broaden your search.</div>';
+			}
+			else
+			{
+				var r = '<ul>';
+				for( var s in data.results )
+				{
+					var search_item = data.results[s];
+					r += '<li>' + search_item.kind + ': ';
+					if( search_item.kind == 'item' )
+					{ // item: (Display this as link to load data)
+						r += '<a href="#" data-id="' + search_item.id + '" data-urlname="' + evo_helpdesk_widget.options.collection + '">' + search_item.title + '</a>';
+					}
+					else
+					{	// category, comment, tag:
+						r += search_item.title;
+					}
+					r += ' <a href="' + search_item.permalink + '" target="_blank" title="Open in new window">&gt;&gt;</a> ';
+					r += '</li>';
+				}
+				r += '</ul>';
+			}
+			return r;
+		} );
+
+		// Prevent default event of the submitted form:
+		if( is_event_call )
+		{
+			event.preventDefault();
+		}
+		return false;
+	},
+
+	/**
+	 * Reset the searched results
+	 */
+	reset: function( event )
+	{
+		evo_helpdesk_widget.switch_layout( 'results' );
+
+		evo_helpdesk_widget.rest_api_request( 'collections/' + evo_helpdesk_widget.options.collection + '/posts',
+		'#evo_helpdesk_widget__posts_list',
+		function( data )
+		{	// Display the posts on success request:
+			jQuery( '#evo_helpdesk_widget__search_form input' ).val( '' )
+			var r = '<ul>';
+			for( var p in data.items )
+			{
+				var post = data.items[p];
+				r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + evo_helpdesk_widget.options.collection + '">' + post.title + '</a></li>';
+			}
+			r += '</ul>';
+			return r;
+		} );
+
+		// Prevent default event of the pressed button:
+		if( typeof( event ) == 'object' )
+		{
+			event.preventDefault();
+		}
+		return false;
+	},
+
+	/**
+	 * Load Item/Post
+	 */
+	load_item: function( event, collection, item_id )
+	{
+		var is_event_call = ( typeof( event ) == 'object' );
+		if( ! is_event_call || typeof( item_id ) == 'undefined' )
+		{	// Set params when they are not defined depending on call mode:
+			item_id = ( is_event_call ? jQuery( event.target ).data( 'id' ) : collection );
+			collection = ( is_event_call ? jQuery( event.target ).data( 'urlname' ) : event );
+		}
+
+		evo_helpdesk_widget.switch_layout( 'item' );
+
+		evo_helpdesk_widget.rest_api_request( 'collections/' + collection + '/items/' + item_id,
+		'#evo_helpdesk_widget__result_details',
+		function( item )
+		{	// Display the post data in third column on success request:
+
+			// Item title:
+			var item_content = '<h2><a href="' + item.URL + '" target="_blank">' + item.title + '</a></h2>';
+			// Item attachments, Only images and on teaser positions:
+			if( typeof( item.attachments ) == 'object' && item.attachments.length > 0 )
+			{
+				item_content += '<div id="evo_helpdesk_widget__attachments">';
+				for( var a in item.attachments )
+				{
+					var attachment = item.attachments[a];
+					if( attachment.type == 'image' &&
+							( attachment.position == 'teaser' ||
+								attachment.position == 'teaserperm' ||
+								attachment.position == 'teaserlink' )
+						)
+					{
+						item_content += '<img src="' + attachment.url + '" />';
+					}
+				}
+				item_content += '</div>';
+			}
+			// Item content:
+			item_content += item.content;
+
+			return item_content;
+		} );
+
+		// Prevent default event of the clicked link:
+		if( is_event_call )
+		{
+			event.preventDefault();
+		}
+		return false;
+	},
+
+	/**
+	 * Switch layout between search results and result details
+	 */
+	switch_layout: function( event, layout )
+	{
+		var is_event_call = ( typeof( event ) == 'object' );
+		if( ! is_event_call || typeof( layout ) == 'undefined' )
+		{	// Set params when they are not defined depending on call mode:
+			layout = ( is_event_call ? ( typeof( layout ) == 'undefined' ? 'results' : 'layout' ) : event );
+		}
+
+		jQuery( '#evo_helpdesk_widget__results_list' ).toggle( layout == 'results' );
+		jQuery( '#evo_helpdesk_widget__result_details, #evo_helpdesk_widget__results_back' ).toggle( layout == 'item' );
+		if( layout == 'item' )
+		{
+			jQuery( '#evo_helpdesk_widget__result_details' ).html( '' );
+		}
+
+		// Prevent default event of the clicked link:
+		if( is_event_call )
+		{
+			event.preventDefault();
+		}
+		return false;
 	},
 
 	/**
@@ -209,7 +324,11 @@ var evo_helpdesk_widget = {
 		}
 		rest_api_url += 'api/v1/';
 
-		evo_helpdesk_widget.rest_api_start_loading( content_selector )
+		// Set style during loading new REST API content:
+		jQuery( content_selector ).addClass( 'evo_helpdesk_widget_loading' )
+			.append( '<div class="evo_helpdesk_widget_loader">loading...</div>' );
+
+		// Request data by REST API:
 		jQuery.ajax(
 		{
 			contentType: 'application/json; charset=utf-8',
@@ -224,18 +343,6 @@ var evo_helpdesk_widget = {
 				evo_helpdesk_widget.rest_api_end_loading( content_selector, eval( func )( data, textStatus, jqXHR ) );
 			}
 		} );
-	},
-
-
-	/**
-	 * Set style during loading new REST API content
-	 *
-	 * @param string Object selector
-	 */
-	rest_api_start_loading: function( obj_selector )
-	{
-		jQuery( obj_selector ).addClass( 'evo_helpdesk_widget_loading' )
-			.append( '<div class="evo_helpdesk_widget_loader">loading...</div>' );
 	},
 
 	/**

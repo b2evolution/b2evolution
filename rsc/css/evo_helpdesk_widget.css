@@ -5,11 +5,11 @@
  */
 
 #evo_helpdesk_widget {
-	font: 16px Verdana, Arial, Sans-Serif;
+	font: 16px 'Raleway', 'Helvetica Neue', sans-serif;
 	line-height: 1.4;
 	position: fixed;
-	bottom: 10px;
-	right: 10px;
+	bottom: 20px;
+	right: 20px;
 	z-index: 1000000;
 }
 #evo_helpdesk_widget * {
@@ -17,13 +17,14 @@
 }
 
 #evo_helpdesk_widget__sticker {
+	width: 60px;
+	height: 60px;
 	background: #faa72d;
 	color: #FFF;
-	border-radius: 10px;
-	padding: 10px;
+	border-radius: 50%;
 	text-align: center;
 	font-size: 50px;
-	line-height: 30px;
+	line-height: 60px;
 	cursor: pointer;
 }
 
@@ -31,19 +32,30 @@
 	display: none;
 	overflow: hidden;
 	background: #fafafa;
-	border-radius: 10px;
-	padding-bottom: 40px;
+	border-radius: 5px;
+	padding-bottom: 50px;
+	box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 20px;
 }
 #evo_helpdesk_widget__header {
 	background: #faa72d;
-	padding: 5px 10px;
+	padding: 10px 20px;
 	color: #FFF;
+	height: 30px;
+	line-height: 30px;
+	box-sizing: content-box;
 }
 #evo_helpdesk_widget__close {
 	float: right;
 	cursor: pointer;
 	margin-left: 10px;
-	font-weight: bold;
+	vertical-align: middle;
+	width: 15px;
+	height: 15px;
+	margin-top: 7px;
+}
+#evo_helpdesk_widget__close line {
+	stroke: #FFF;
+	stroke-width: 1px;
 }
 #evo_helpdesk_widget__body {
 	padding: 10px;
@@ -52,14 +64,31 @@
 }
 #evo_helpdesk_widget__body a {
 	color: #faa72d !important;
+	text-decoration: none;
+}
+#evo_helpdesk_widget__body a:hover {
+	text-decoration: underline;
 }
 
 /* Search form */
 #evo_helpdesk_widget__search_form {
 	margin-bottom: 10px;
+	display: table;
+	width: 100%;
+}
+#evo_helpdesk_widget__search_form > div {
+	display: table-row;
+}
+#evo_helpdesk_widget__search_form > div > div {
+	display: table-cell;
+}
+#evo_helpdesk_widget__search_form > div > div:first-child {
+	width: 100%;
 }
 #evo_helpdesk_widget__search_form input {
+	width: 100%;
 	height: 34px;
+	margin: 0;
 	padding: 6px 12px;
 	font-size: 14px;
 	line-height: 1.42857143;
@@ -80,7 +109,7 @@
 .evo_helpdesk_widget__button {
 	display: inline-block;
 	padding: 6px 12px;
-	margin-bottom: 0;
+	margin: 0;
 	font-size: 14px;
 	font-weight: 400;
 	line-height: 1.42857143;
@@ -91,7 +120,7 @@
 	border-radius: 4px;
 	color: #333;
 	background-color: #fff;
-	border-color: #ccc;
+	border: 1px solid #ccc;
 	outline: none;
 }
 .evo_helpdesk_widget__button:hover {
@@ -104,9 +133,24 @@
 	color: #FFF;
 	background: #faa72d;
 	border: 1px solid #faa72d;
+	margin-right: 5px;
 }
 #evo_helpdesk_widget__search_form button[type=submit]:hover {
 	background: #f69d1b;
+}
+
+/* Result details */
+#evo_helpdesk_widget__result_details,
+#evo_helpdesk_widget__results_back {
+	display: none;
+}
+#evo_helpdesk_widget__result_details h2 {
+	margin-top: 0;
+}
+#evo_helpdesk_widget__attachments img {
+	display: block;
+	max-width: 100%;
+	margin: 20px auto;
 }
 
 /* Animation for AJAX loader */
