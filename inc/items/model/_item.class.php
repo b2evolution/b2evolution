@@ -6346,18 +6346,13 @@ class Item extends ItemLight
 
 
 	/**
-	 * Provide link to merge a post if user has edit rights
+	 * Get JavaScript code for onclick event of merge link
 	 *
-	 * @param array Params:
-	 *  - 'before': to display before link
-	 *  - 'after':    to display after link
-	 *  - 'text': link text
-	 *  - 'title': link title
-	 *  - 'class': CSS class name
+	 * @return boolean|string
 	 */
-	function get_merge_link( $params = array() )
+	function get_merge_click_js()
 	{
-		global $admin_url, $current_User;
+		global $current_User;
 
 		if( ! is_logged_in( false ) )
 		{	// Current User must be logged in and activated:
@@ -6371,6 +6366,28 @@ class Item extends ItemLight
 
 		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
 		{	// User has no right to edit this Item:
+			return false;
+		}
+
+		return 'return evo_merge_load_window( '.$this->ID.' )';
+	}
+
+
+	/**
+	 * Provide link to merge a post if user has edit rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 */
+	function get_merge_link( $params = array() )
+	{
+		$merge_click_js = $this->get_merge_click_js( $params );
+		if( ! $merge_click_js )
+		{	// Don't display the propose change button if current user has no rights:
 			return false;
 		}
 
@@ -6396,7 +6413,7 @@ class Item extends ItemLight
 		}
 
 		$r = $params['before'];
-		$r .= '<a href="#" onclick="return evo_merge_load_window( '.$this->ID.' )"'
+		$r .= '<a href="#" onclick="'.$merge_click_js.'"'
 					.' title="'.$params['title'].'"'
 					.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' ).'>'
 				.$params['text']

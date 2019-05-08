@@ -217,8 +217,15 @@ div.delete_messages ul label {
 .evo_post .evo_post__tags {
   border-top: 1px solid #ddd;
 }
-.evo_post .panel-body h3 {
-  margin: 8px 0;
+.evo_post .panel-heading h3 {
+  margin: 0 0 5px 0;
+}
+.evo_post .panel-heading .btn-group {
+  margin-left: 0;
+  margin-right: 6px;
+}
+.evo_post .panel-heading .btn-group:last-child {
+  margin-right: 0;
 }
 .evo_post .panel-heading,
 .evo_comment .panel-heading,
