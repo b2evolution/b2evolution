@@ -50,3 +50,12 @@ div.filecode {
 	color:black;
 	font-weight:normal;font-style:normal; /* to be sure */
 }
+
+button.tui-processing {
+	background-color: #aaa !important;
+	border-color: #666 !important;
+}
+button.tui-error {
+	background-color: #f66 !important;
+	border-color: #a00 !important;
+}

@@ -219,6 +219,11 @@ switch( $viewtype )
 				{
 					saveInProgress = true;
 
+					// Set save button style to indicate we are processing the request:
+					var saveButton = jQuery( '.tui-image-editor-save-btn' );
+					saveButton.removeClass( 'tui-error' );
+					saveButton.html( 'Saving...' ).addClass( 'tui-processing' );
+
 					// Generate the image data
 					var imgData = instance.toDataURL( { format: '<?php echo format_to_js( $mimetype );?>' } );
 					imgData = dataURItoBlob( imgData );
@@ -231,29 +236,35 @@ switch( $viewtype )
 					fd.append( 'qquuid', '<?php echo format_to_js( bin2hex( random_bytes( 16 ) ) );?>' ); // Just random stuff but we need this for the UploadHandler to work
 					fd.append( 'image_data', imgData );
 
-					// Sending the image data to Server
+					// Send image data to Server
 					$request = $.ajax( {
 								type: 'POST',
 								url: '<?php echo format_to_js( get_htsrv_url().'async.php' );?>',
 								data: fd,
 								processData: false,
 								contentType: false,
-								success: function( data )
-								{
-
-								}
 						} );
 
+					// Response received
 					$request.done( function( data ) {
 							saveInProgress = false;
 							data = JSON.parse( data );
 							if( data.status == 'ok' )
-							{	// What to do on save success?
-								var success_message = '<?php echo T_('Upload OK');?>';
-								alert( success_message );
+							{
+								saveButton.html( 'Save OK' );
+								setTimeout( function() {
+									saveButton.html( 'Save' );
+									saveButton.removeClass( 'tui-processing' );
+								}, 3000 );
 							}
 							else if( data.status == 'error' )
 							{
+								saveButton.removeClass( 'tui-processing' );
+								saveButton.addClass( 'tui-error' );
+								saveButton.html( 'Save Error' );
+								setTimeout( function() {
+									saveButton.html( 'Save' );
+								}, 3000 );
 								if( data.error_msg )
 								{
 									alert( data.error_msg );
