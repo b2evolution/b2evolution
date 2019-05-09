@@ -9,16 +9,6 @@
 <link type="text/css" rel="stylesheet" href="style.css">
 <link href='https://fonts.googleapis.com/css?family=Raleway:400,700,900' rel='stylesheet' type='text/css'>
 <script src="../rsc/js/jquery.min.js"></script>
-<!-- Change this to an absolute URL when installing this on a production server -->
-<script src="../rsc/js/evo_helpdesk_widget.js"></script>
-<!-- On a production installation, copy and customize this CSS -->
-<link type="text/css" rel="stylesheet" href="../rsc/css/evo_helpdesk_widget.css">
-<script>
-evo_helpdesk_widget.init( {
-	site_url: '../',
-	collection: 'a',
-} );
-</script>
 <script>
 /**
  * Print out a message of request
@@ -289,5 +279,16 @@ jQuery( document ).on( 'click', '#api_search__clear', function()
 			<div class="col-lg-5 col-sm-12 col-xs-12" id="api_column_3"></div>
 
 	</div>
+
+<!-- Change this to an absolute URL when installing this on a production server -->
+<script src="../rsc/js/evo_helpdesk_widget.js"></script>
+<!-- On a production installation, copy and customize this CSS -->
+<link type="text/css" rel="stylesheet" href="../rsc/css/evo_helpdesk_widget.css">
+<script>
+evo_helpdesk_widget.init( {
+	site_url: '../',
+	collection: 'a',
+} );
+</script>
 </body>
 </html>

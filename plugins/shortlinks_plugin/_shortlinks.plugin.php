@@ -1258,18 +1258,11 @@ class shortlinks_plugin extends Plugin
 					// Item attachments, Only images:
 					if( typeof( post.attachments ) == 'object' && post.attachments.length > 0 )
 					{
-						item_content += '<div id="shortlinks_post_attachments">';
 						for( var a in post.attachments )
 						{
 							var attachment = post.attachments[a];
 							if( attachment.type == 'image' )
 							{	// Use only images:
-								if( attachment.position == 'teaser' ||
-								    attachment.position == 'teaserperm' ||
-								    attachment.position == 'teaserlink' )
-								{	// Add teaser image to post content:
-									item_content += '<img src="' + attachment.url + '" />';
-								}
 								if( attachment.position == 'cover' )
 								{	// Store link ID of cover image in hidden field to use on insert complex link:
 									jQuery( '#shortlinks_hidden_cover_link' ).val( attachment.link_ID );
@@ -1280,7 +1273,6 @@ class shortlinks_plugin extends Plugin
 								}
 							}
 						}
-						item_content += '</div>';
 					}
 					// Item content:
 					item_content += '<div id="shortlinks_post_content">' + post.content + '</div>';

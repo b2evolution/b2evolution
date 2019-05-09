@@ -16,9 +16,14 @@
 	box-sizing: border-box;
 }
 
+.evo_helpdesk_widget__text_error {
+	color: #a94442;
+}
+
 #evo_helpdesk_widget__sticker {
 	width: 60px;
 	height: 60px;
+	padding: 5px;
 	background: #faa72d;
 	color: #FFF;
 	border-radius: 50%;
@@ -37,37 +42,72 @@
 	box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 20px;
 }
 #evo_helpdesk_widget__header {
+	display: table;
+	width: 100%;
 	background: #faa72d;
-	padding: 10px 20px;
 	color: #FFF;
-	height: 30px;
+	height: 50px;
 	line-height: 30px;
 	box-sizing: content-box;
 }
-#evo_helpdesk_widget__close {
-	float: right;
-	cursor: pointer;
-	margin-left: 10px;
+#evo_helpdesk_widget__header div {
+	display: table-cell;
+	width: 100%;
+	text-align: center;
 	vertical-align: middle;
-	width: 15px;
-	height: 15px;
-	margin-top: 7px;
 }
-#evo_helpdesk_widget__close line {
-	stroke: #FFF;
-	stroke-width: 1px;
+#evo_helpdesk_widget__header div:first-child,
+#evo_helpdesk_widget__header div:last-child {
+	width: auto;
+	cursor: pointer;
+	padding: 10px 20px;
 }
 #evo_helpdesk_widget__body {
 	padding: 10px;
 	height: 100%;
 	overflow: auto;
 }
-#evo_helpdesk_widget__body a {
-	color: #faa72d !important;
+#evo_helpdesk_widget__body h2 {
+	font-weight: normal;
+}
+#evo_helpdesk_widget__body a:not(.btn) {
+	color: #faa72d;
 	text-decoration: none;
 }
 #evo_helpdesk_widget__body a:hover {
 	text-decoration: underline;
+}
+
+/* Icons */
+svg {
+	vertical-align: middle;
+}
+#evo_helpdesk_widget__sticker svg {
+	fill: #FFF;
+	vertical-align: initial;
+}
+#evo_helpdesk_widget__icon_close svg {
+	width: 15px;
+	height: 15px;
+	line-height: 15px;
+}
+#evo_helpdesk_widget__icon_close svg line {
+	stroke: #FFF;
+	stroke-width: 1px;
+}
+.evo_helpdesk_widget__icon_permalink svg {
+	width: 15px;
+	height: 15px;
+	fill: #faa72d;
+}
+h2 .evo_helpdesk_widget__icon_permalink svg {
+	width: 30px;
+	height: 30px;
+}
+#evo_helpdesk_widget__icon_search svg {
+	width: 18px;
+	height: 18px;
+	fill: #FFF;
 }
 
 /* Search form */
@@ -151,10 +191,42 @@
 #evo_helpdesk_widget__result_details h2 {
 	margin-top: 0;
 }
-#evo_helpdesk_widget__attachments img {
+#evo_helpdesk_widget__result_details img {
+	border-radius: 4px;
+}
+.evo_helpdesk_widget__image {
+	margin: 20px auto;
+}
+.evo_helpdesk_widget__image img {
 	display: block;
 	max-width: 100%;
-	margin: 20px auto;
+	height: auto;
+}
+.evo_helpdesk_widget__image_caption {
+	font-size: 80%;
+	color: #999;
+	text-align: center;
+	margin-top: 3px;
+}
+.evo_helpdesk_widget__gallery_image {
+	display: inline-block;
+	margin: 0 10px 10px 0;
+}
+
+/* Custom fields table */
+#evo_helpdesk_widget__result_details table {
+	margin: 1em 0;
+	border-spacing: 0;
+	border-collapse: collapse;
+}
+#evo_helpdesk_widget__result_details table th {
+	background-color: #eee;
+}
+#evo_helpdesk_widget__result_details table th,
+#evo_helpdesk_widget__result_details table td {
+	border: 1px solid #ddd;
+	padding: 8px;
+	vertical-align: middle;
 }
 
 /* Animation for AJAX loader */
