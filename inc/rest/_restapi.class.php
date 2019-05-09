@@ -743,6 +743,7 @@ class RestApi
 					'urltitle',
 					'type',
 					'title',
+					'raw_content',
 					'content',
 					'excerpt',
 					'teaser',
@@ -785,6 +786,9 @@ class RestApi
 						break;
 					case 'title':
 						$item_data['title'] = $Item->get( 'title' );
+						break;
+					case 'raw_content':
+						$item_data['raw_content'] = $Item->get( 'content' );
 						break;
 					case 'content':
 						$item_data['content'] =

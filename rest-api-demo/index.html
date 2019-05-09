@@ -185,7 +185,7 @@ jQuery( document ).on( 'click', '#api_posts_list a:not([target])', function()
 			item_content += '</div>';
 		}
 		// Item content:
-		item_content += item.content;
+		item_content += item.raw_content;
 
 		rest_api_end_loading( '#api_column_3', item_content );
 	} );
