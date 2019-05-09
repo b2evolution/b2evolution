@@ -1698,6 +1698,7 @@ function skin_init( $disp )
 			// Add also current Item as first:
 			array_unshift( $other_version_items, $version_Item );
 			$other_version_locales = array();
+			$version_lang_keys = array();
 			foreach( $other_version_items as $o => $other_version_Item )
 			{	// Check to exclude what items cannot be displayed for hreflang tag:
 				if( in_array( $other_version_Item->get( 'locale' ), $other_version_locales ) ||
@@ -1707,13 +1708,18 @@ function skin_init( $disp )
 					unset( $other_version_items[ $o ] );
 				}
 				$other_version_locales[] = $other_version_Item->get( 'locale' );
+				// Count different country locales with same language:
+				$version_lang_key = substr( $other_version_Item->get( 'locale' ), 0, 2 );
+				$version_lang_keys[ $version_lang_key ] = isset( $version_lang_keys[ $version_lang_key ] ) ? true : false;
 			}
 			if( count( $other_version_items ) > 1 )
 			{	// Add hreflang tag only when at least two Items can be displayed:
 				foreach( $other_version_items as $other_version_Item )
 				{
+					$version_lang_key = substr( $other_version_Item->get( 'locale' ), 0, 2 );
 					add_headline( '<link rel="alternate" '
-						.'hreflang="'.format_to_output( $other_version_Item->get( 'locale' ), 'htmlattr' ).'" '
+						// Use only language code like 'en' when it is a single, otherwise use full locale code with country code like 'en-US':
+						.'hreflang="'.format_to_output( ( $version_lang_keys[ $version_lang_key ] ? $other_version_Item->get( 'locale' ) : $version_lang_key ), 'htmlattr' ).'" '
 						.'href="'.format_to_output( $other_version_Item->get_permanent_url( '', '', '&' ), 'htmlattr' ).'">' );
 				}
 			}
