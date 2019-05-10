@@ -119,6 +119,7 @@ $thumbnail_sizes = array(
 			'crop-480x320'			=> array( 'crop', 480, 320, 90 ),
 		// 1:1 square ratio 1
 			'crop-512x512'			=> array( 'crop', 512, 512, 85 ),		// EXPERIMENTAL For Retina 
+			'crop-320x320'			=> array( 'crop', 320, 320, 85 ),
 			'crop-256x256'			=> array( 'crop', 256, 256, 85 ),
 			'crop-192x192'			=> array( 'crop', 192, 192, 85 ),
 			'crop-128x128'			=> array( 'crop', 128, 128, 85 ),
