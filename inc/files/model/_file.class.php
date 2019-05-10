@@ -1146,20 +1146,23 @@ class File extends DataObject
 
 
 	/**
-	 * Get a complete tag (IMG or A HREF) pointing to this file.
+	 * Get a complete HTML snippet (<div><a href><IMG> Caption...), including caption and link on img, loader animation, etc.
+	 * This is he main thing to use for content images.
 	 *
-	 * @param string
-	 * @param string NULL for no legend
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string rel attribute of link, usefull for jQuery libraries selecting on rel='...', e-g: lighbox
-	 * @param string image class
-	 * @param string image align
-	 * @param string image rel
-	 * @param string image caption/description
+	 * Used by: Link::get_tag(), Item::get_custom_field_formatted(), Item:get_attached_image_tag(), item_list_summary.view.php, file manager file list, quick_upload.php, upload.ctrl.php, render_inline_tags(), Chapter::get_image_tag(), coll_settings.ctrl.php for collection image, Comment preview, File::get_gallery(), File::get_duplicated_files_message(()
+	 *
+	 * @param string html code to wrap the whole image block
+	 * @param string html code to wrap the legend under the image, in the image block --- NULL for no legend
+	 * @param string close of previous
+	 * @param string close of previous
+	 * @param string Thumbnail size name , 'original' or 'fit' -- See: $thumbnail_sizes
+	 * @param string href= attribute of Link : URL or 'original'  or NULL
+	 * @param string title= attribute of link
+	 * @param string rel= attribute of link, usefull for jQuery libraries selecting on rel='...', e-g: lightbox
+	 * @param string image class=
+	 * @param string image align=
+	 * @param string image alt=
+	 * @param string image caption/description to be displayed under the image
 	 * @param integer Link ID
 	 * @param integer Size multiplier, can be 1, 2 and etc. (Used for b2evonet slider for example)
 	 *                Example: $image_size_x = 2 returns 2 img tags:
@@ -1170,14 +1173,14 @@ class File extends DataObject
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use size defined by the thumbnail
 	 *                        'none' - don't use attributes "width" & "height"
-	 * @param boolean Image style
+	 * @param boolean Image style= attribute
 	 * @param boolean Add loadimg class
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
 	                  $after_image_legend = '</div>',
 	                  $after_image = '</div>',
-	                  $size_name = 'original',
+	                  $size_name = 'original', 
 	                  $image_link_to = 'original',
 	                  $image_link_title = '',	// can be text or #title# or #desc#
 	                  $image_link_rel = '',
@@ -1186,7 +1189,7 @@ class File extends DataObject
 	                  $image_alt = '',
 	                  $image_desc = '#',
 	                  $image_link_id = '',
-	                  $image_size_x = 1,
+	                  $image_size_x = 1,		// TODO: Make another function for this and get this out of here
 	                  $tag_size = NULL,
 	                  $image_style = '',
 	                  $add_loadimg = true )
@@ -2284,19 +2287,27 @@ class File extends DataObject
 
 
 	/**
-	 * Generate the IMG THUMBNAIL tag with all the alt & title if available.
+	 * Get a simple <img> tag with attributes but nothing wrapped around it.
 	 *
-	 * @param string Size
-	 * @param string Class
-	 * @param string Alignment
-	 * @param string Title
+	 * Used by file_select_item(), User::get_avatar_imgtag(), Media Index widget, Email notifications showing files
+	 * 
+	 *
+	 * @param string Thumbnail size name , 'original' or 'fit' -- See: $thumbnail_sizes
+	 * @param string class= attribut
+	 * @param string align= attribute
+	 * @param string title= attbute
 	 * @param string Change size of the attributes "width" & "height".
 	 *               Example: ( $tag_size = '160' ) => width="160" height="160"
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use real size
 	 * @return string
 	 */
-	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '', $title = '', $tag_size = NULL )
+	function get_thumb_imgtag( 
+		$size_name = 'fit-80x80', 
+		$class = '', 
+		$align = '', 
+		$title = '', 
+		$tag_size = NULL )
 	{
 		global $use_strict;
 
@@ -2379,7 +2390,7 @@ class File extends DataObject
 	 * - width
 	 * - height
 	 *
-	 * @param string what size do we want src to link to, can be "original" or a thumnbail size
+	 * @param string what size do we want src to link to, can be "original", "fit" or a thumnbail size defined in $thumbnail_sizes
 	 * @param string Title img attribute
 	 * @param string Alt img attribute
 	 * @param integer Ratio size, can be 1, 2 and etc.
@@ -2450,7 +2461,7 @@ class File extends DataObject
 			}
 		}
 		else
-		{ // We want src to link to a thumbnail
+		{ // We want src to link to a generated thumbnail:
 			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&', $size_x );
 			$img_attrib_srcset = $this->get_img_srcset( $size_name, '&', $size_x );
 			if( ! empty( $img_attrib_srcset ) )
@@ -2587,6 +2598,8 @@ class File extends DataObject
 
 	/**
 	 * Displays a preview thumbnail which is clickable and opens a view popup
+	 *
+	 * Used by Backoffice image manipulation functions
 	 *
 	 * @param string what do do with files that are not images? 'fulltype'
 	 * @param array colorbox plugin params:
