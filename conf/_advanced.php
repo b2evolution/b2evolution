@@ -143,6 +143,12 @@ $thumbnail_sizes = array(
 
 
 /**
+ * Generate additional attribute "srcset" for images
+ */
+$generate_srcset_params = true;
+
+
+/**
  * Demo mode
  *  - Do not allow update of files in the file manager
  *  - Do not allow changes to the 'demouser' and 'admin' account/group

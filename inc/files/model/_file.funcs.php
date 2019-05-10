@@ -3355,4 +3355,18 @@ function check_folder_with_extensions( $folder_path, $extensions )
 	// Folder has no file with requested extension
 	return false;
 }
+
+
+/**
+ * Callback function to sort thumbnail sizes array by width and height
+ */
+function sort_thumbnail_sizes_callback( $a, $b )
+{
+	if( $a[1] == $b[1] )
+	{
+		return $a[2] > $b[2] ? -1 : 1;
+	}
+
+	return ( $a[1] > $b[1] ? -1 : 1 );
+}
 ?>

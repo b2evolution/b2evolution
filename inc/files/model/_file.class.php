@@ -2452,6 +2452,11 @@ class File extends DataObject
 		else
 		{ // We want src to link to a thumbnail
 			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&', $size_x );
+			$img_attrib_srcset = $this->get_img_srcset( $size_name, '&', $size_x );
+			if( ! empty( $img_attrib_srcset ) )
+			{
+				$img_attribs['srcset'] = $img_attrib_srcset;
+			}
 			if( $tag_size != 'none' )
 			{	// Add attributes "width" & "height" only when they are not disabled:
 				$thumb_path = $this->get_af_thumb_path( $size_name, NULL, true );
@@ -2480,6 +2485,103 @@ class File extends DataObject
 		}
 
 		return $img_attribs;
+	}
+
+
+	/**
+	 * Get value for attribute "srcset" for images
+	 *
+	 * @param string Thumbnail size name
+	 * @param string Glue between url params
+	 * @param integer Ratio size, can be 1, 2 and etc.
+	 * @return string Example: 'fit-640x480.jpg 640w, fit-720x500.jpg 720w, fit-1280x720.jpg 1280w, fit-2560x1440.jpg 2560w'
+	 */
+	function get_img_srcset( $size_name = 'fit-80x80', $glue = '&amp;', $size_x = 1 )
+	{
+		global $generate_srcset_params, $thumbnail_sizes, $grouped_srcset_thumbnail_sizes;
+
+		if( ! $generate_srcset_params )
+		{	// Disabled in config
+			return '';
+		}
+
+		if( ! isset( $thumbnail_sizes[ $size_name ] ) )
+		{	// Wrong thumbnail size:
+			return '';
+		}
+
+		if( $grouped_srcset_thumbnail_sizes === NULL )
+		{	// Group and sort thumbnail sizes ONCE and put into cache array:
+			$grouped_srcset_thumbnail_sizes = array();
+			foreach( $thumbnail_sizes as $thumb_size_name => $thumb_size_data )
+			{
+				// Type like 'fit', 'crop', 'crop-top':
+				$thumb_size_type = $thumb_size_data[0];
+				// Is it blurred size?
+				$thumb_size_blur = empty( $thumb_size_data[4] ) ? 0 : 1;
+				// Aspect ratio, Do NOT check it for fit sizes:
+				$thumb_size_aspect_ratio = ( $thumb_size_type == 'fit' ? 0 : (string)( $thumb_size_data[1] / $thumb_size_data[2] ) );
+
+				if( ! isset( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ] ) )
+				{	// Init array to group by type:
+					$grouped_srcset_thumbnail_sizes[ $thumb_size_type ] = array();
+				}
+				if( ! isset( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ] ) )
+				{	// Init array to group by blur effect:
+					$grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ] = array();
+				}
+				if( ! isset( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ] ) )
+				{	// Init array to group by aspect ratio:
+					$grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ] = array();
+				}
+
+				$grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ][ $thumb_size_name ] = $thumb_size_data;
+			}
+			// Sort sizes by width and height:
+			foreach( $grouped_srcset_thumbnail_sizes as $thumb_size_type => $thumb_size_type_data )
+			{
+				foreach( $thumb_size_type_data as $thumb_size_blur => $thumb_size_blur_data )
+				{
+					foreach( $thumb_size_blur_data as $thumb_size_aspect_ratio => $thumb_size_aspect_ratio_data )
+					{
+						uasort( $thumb_size_aspect_ratio_data, 'sort_thumbnail_sizes_callback' );
+						$grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ] = $thumb_size_aspect_ratio_data;
+					}
+				}
+			}
+		}
+
+		// Get thumbnail size and group params:
+		$thumbnail_size = $thumbnail_sizes[ $size_name ];
+		// Type like 'fit', 'crop', 'crop-top':
+		$thumb_size_type = $thumbnail_size[0];
+		// Is it blurred size?
+		$thumb_size_blur = empty( $thumbnail_size[4] ) ? 0 : 1;
+		// Aspect ratio, Do NOT check it for fit sizes:
+		$thumb_size_aspect_ratio = ( $thumb_size_type == 'fit' ? 0 : (string)( $thumbnail_size[1] / $thumbnail_size[2] ) );
+
+		if( ! isset( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ][ $size_name ] ) )
+		{	// Wrong thumbnail size, cannot be detected in group,
+			// This case is impossible but log this error in system:
+			syslog_insert( 'Wrong thumbnail size "'.$size_name.'" cannot be grouped to generate "srcset"', 'error' );
+			return;
+		}
+
+		// Search +2 and -2 near thumbnail sizes:
+		$srcset_thumbnail_sizes = array();
+		$grouped_srcset_thumbnail_size_names = array_keys( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ] );
+		$grouped_srcset_thumbnail_size_names_count = count( $grouped_srcset_thumbnail_size_names );
+		$size_step = 2;
+		$size_name_i =  array_search( $size_name, $grouped_srcset_thumbnail_size_names );
+		$size_name_i_start = ( $size_name_i - $size_step >= 0 ? $size_name_i - $size_step : 0 );
+		$size_name_i_end = ( $size_name_i + $size_step < $grouped_srcset_thumbnail_size_names_count ? $size_name_i + $size_step : $grouped_srcset_thumbnail_size_names_count - 1 );
+		for( $i = $size_name_i_start; $i <= $size_name_i_end; $i++ )
+		{
+			$srcset_thumbnail_sizes[] = $this->get_thumb_url( $grouped_srcset_thumbnail_size_names[ $i ], $glue, $size_x ).' '.$thumbnail_sizes[ $grouped_srcset_thumbnail_size_names[ $i ] ][1].'w';
+		}
+
+		// Reverse srcset urls:
+		return implode( ', ', array_reverse( $srcset_thumbnail_sizes ) );
 	}
 
 
