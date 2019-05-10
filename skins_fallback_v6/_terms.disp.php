@@ -27,7 +27,7 @@ $params = array_merge( array(
 		// Controlling the content:
 		'content_mode'        => 'full', // Use only 'full' on disp=terms
 		'image_class'         => 'img-responsive',
-		'image_size'          => 'fit-1280x720',
+		'image_size'          => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 		// Part with accept button:
 		'terms_button_before' => '<p class="text-center">',
 		'terms_button_after'  => '</p>',

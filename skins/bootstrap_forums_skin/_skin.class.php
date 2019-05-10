@@ -131,6 +131,9 @@ class bootstrap_forums_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array_merge( array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -158,10 +161,16 @@ class bootstrap_forums_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
 						'input_suffix' => ' px ',
-						'note' => T_('Set maximum height for post images.'),
+						'note' => T_('Constrain height of content images by CSS.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
