@@ -3477,4 +3477,29 @@ function get_skin_type_title( $skin_type )
 	$skin_types = get_skin_types();
 	return ( isset( $skin_types[ $skin_type ] ) ? $skin_types[ $skin_type ][0] : $skin_type );
 }
+
+
+/**
+ * Get setting value of the current Skin
+ *
+ * @param string Setting name
+ * @param mixed Fallback value when no current Skin or the requested setting is not defined in the current Skin
+ * @return mixed Setting value
+ */
+function get_skin_setting( $setting_name, $fallback_value = NULL )
+{
+	global $Skin;
+
+	if( isset( $Skin ) && $Skin instanceof Skin )
+	{	// Try to get setting value of the current Skin:
+		$setting_value = $Skin->get_setting( $setting_name );
+	}
+
+	if( ! isset( $setting_value ) )
+	{	// Fallback to default value when no current Skin or settings is not defined:
+		$setting_value = $fallback_value;
+	}
+
+	return $setting_value;
+}
 ?>

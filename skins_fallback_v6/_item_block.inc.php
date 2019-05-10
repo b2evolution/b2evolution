@@ -34,7 +34,7 @@ $params = array_merge( array(
 		// Controlling the content:
 		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
 		'image_class'                => 'img-responsive',
-		'image_size'                 => 'fit-1280x720',
+		'image_size'                 => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 		'author_link_text'           => 'auto',
 	), $params );
 
