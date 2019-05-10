@@ -55,7 +55,10 @@ $params = array_merge( array(
 		'after_image'              => '</figure>',
 		'after_images'             => '</div>',
 		'image_class'              => 'img-responsive',
-		'image_size'               => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
+		'image_size'               => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ), // Standard size (for old browsers)
+		// 'image_sizes'					=> 'btf400px, btf640px, sm: 720px, md: 698px, 848px', // simplified sizes= attribute for browser to select correct size from srcset=
+		'image_sizes'					=> '(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px', // It's also allowed to have a real size= value here
+													// Note: first we handle margins 15+640+15 = 670 in the fluid domain, then we work with bootstrap breakpoints
 		'image_limit'              =>  1000,
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
 		'excerpt_image_class'      => '',
@@ -224,6 +227,7 @@ switch( $content_mode )
 					'after'               => $params['after_images'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
@@ -258,6 +262,7 @@ switch( $content_mode )
 					'after_image'         => $params['after_image'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
@@ -295,6 +300,7 @@ switch( $content_mode )
 						'after'               => $params['after_images'],
 						'image_class'         => $params['image_class'],
 						'image_size'          => $params['image_size'],
+						'image_sizes'         => $params['image_sizes'],
 						'limit'               => $params['image_limit'],
 						'image_link_to'       => $params['image_link_to'],
 						'before_gallery'      => $params['before_gallery'],
@@ -324,6 +330,7 @@ switch( $content_mode )
 					'after_image'         => $params['after_image'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
 					'force_more'          => $params['force_more'],

@@ -1147,7 +1147,9 @@ class File extends DataObject
 
 	/**
 	 * Get a complete HTML snippet (<div><a href><IMG> Caption...), including caption and link on img, loader animation, etc.
-	 * This is he main thing to use for content images.
+	 * This is the main thing to use for content images.
+	 *
+// TODO: we should replace this with a cleaner File->get_html_image_block( $params array )  
 	 *
 	 * Used by: Link::get_tag(), Item::get_custom_field_formatted(), Item:get_attached_image_tag(), item_list_summary.view.php, file manager file list, quick_upload.php, upload.ctrl.php, render_inline_tags(), Chapter::get_image_tag(), coll_settings.ctrl.php for collection image, Comment preview, File::get_gallery(), File::get_duplicated_files_message(()
 	 *
@@ -1175,6 +1177,7 @@ class File extends DataObject
 	 *                        'none' - don't use attributes "width" & "height"
 	 * @param boolean Image style= attribute
 	 * @param boolean Add loadimg class
+	 * @param string simplified sizes= attribute for browser to select correct size from srcset=
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
@@ -1192,7 +1195,8 @@ class File extends DataObject
 	                  $image_size_x = 1,		// TODO: Make another function for this and get this out of here
 	                  $tag_size = NULL,
 	                  $image_style = '',
-	                  $add_loadimg = true )
+	                  $add_loadimg = true,
+	                  $image_sizes = NULL )
 	{
 		if( $this->is_dir() )
 		{ // We can't reference a directory
@@ -1215,7 +1219,7 @@ class File extends DataObject
 			$img = '';
 			foreach( $x_sizes as $x_size )
 			{
-				$img_attribs = $this->get_img_attribs( $size_name, NULL, NULL, $x_size, $tag_size );
+				$img_attribs = $this->get_img_attribs( $size_name, NULL, NULL, $x_size, $tag_size, $image_sizes );
 
 				if( $this->check_image_sizes( $size_name, 64, $img_attribs ) && $add_loadimg )
 				{ // If image larger than 64x64 add class to display animated gif during loading
@@ -2399,9 +2403,10 @@ class File extends DataObject
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use real size
 	 *                        'none' - don't use attributes "width" & "height"
+	 * @param string sizes= attribute for browser to select correct size from srcset=
 	 * @return array List of HTML attributes for the image.
 	 */
-	function get_img_attribs( $size_name = 'fit-80x80', $title = NULL, $alt = NULL, $size_x = 1, $tag_size = NULL )
+	function get_img_attribs( $size_name = 'fit-80x80', $title = NULL, $alt = NULL, $size_x = 1, $tag_size = NULL, $image_sizes = NULL )
 	{
 		$img_attribs = array(
 				'title' => isset($title) ? $title : $this->get('title'),
@@ -2463,10 +2468,15 @@ class File extends DataObject
 		else
 		{ // We want src to link to a generated thumbnail:
 			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&', $size_x );
-			$img_attrib_srcset = $this->get_img_srcset( $size_name, '&', $size_x );
-			if( ! empty( $img_attrib_srcset ) )
-			{
-				$img_attribs['srcset'] = $img_attrib_srcset;
+
+			if( !empty($image_sizes) )
+			{	// We want a responsive image with a srcset= and sizes=
+				$img_attribs['sizes'] = $image_sizes;
+				$img_attrib_srcset = $this->get_img_srcset( $size_name, '&', $size_x );
+				if( ! empty( $img_attrib_srcset ) )
+				{
+					$img_attribs['srcset'] = $img_attrib_srcset;
+				}
 			}
 			if( $tag_size != 'none' )
 			{	// Add attributes "width" & "height" only when they are not disabled:

@@ -226,6 +226,7 @@ class Link extends DataObject
 				'after_image_legend'  => '</div>',
 				'after_image'         => '</div>',
 				'image_size'          => 'original',
+				'image_sizes'         => NULL, // simplified sizes= attribute for browser to select correct size from srcset= -- NULL = no srcset
 				'image_link_to'       => 'original',
 				'image_link_title'    => '',	// can be text or #title# or #desc#
 				'image_link_rel'      => '',
@@ -239,6 +240,7 @@ class Link extends DataObject
 				'add_loadimg'         => true,
 			), $params );
 
+// TODO: we should replace this with a cleaner File->get_html_image_block()
 		return $File->get_tag( $params['before_image'],
 				$params['before_image_legend'],
 				$params['after_image_legend'],
@@ -255,7 +257,8 @@ class Link extends DataObject
 				$params['image_size_x'],
 				$params['tag_size'],
 				$params['image_style'],
-				$params['add_loadimg'] );
+				$params['add_loadimg'],
+				$params['image_sizes'] );
 	}
 
 
