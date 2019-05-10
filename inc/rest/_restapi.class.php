@@ -676,7 +676,7 @@ class RestApi
 			'image_class'              => '',
 			'image_size'               => 'original',
 			'image_limit'              =>  1000,
-			'image_link_to'            => '', // Can be 'original', 'single' or empty
+			'image_link_to'            => 'original', // Can be 'original', 'single' or empty
 			'before_gallery'           => '<div class="evo_post_gallery">',
 			'after_gallery'            => '</div>',
 			'gallery_table_start'      => '',
@@ -687,6 +687,7 @@ class RestApi
 			'gallery_cell_end'         => '</div>',
 			'gallery_image_size'       => 'crop-80x80',
 			'gallery_image_limit'      => 1000,
+			'gallery_image_link_to' => 'original', // Can be 'original', 'single' or empty
 			'gallery_colls'            => 5,
 			'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 		), $content_params );
@@ -743,7 +744,6 @@ class RestApi
 					'urltitle',
 					'type',
 					'title',
-					'raw_content',
 					'content',
 					'excerpt',
 					'teaser',
@@ -786,9 +786,6 @@ class RestApi
 						break;
 					case 'title':
 						$item_data['title'] = $Item->get( 'title' );
-						break;
-					case 'raw_content':
-						$item_data['raw_content'] = $Item->get( 'content' );
 						break;
 					case 'content':
 						$item_data['content'] =

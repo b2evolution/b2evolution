@@ -11,12 +11,14 @@ var evo_helpdesk_widget = {
 	defaults: {
 		site_url: null, // Absolute site URL
 		collection: null, // Collection urlname
-		title: 'Help',
-		width: '370px',
-		height: '450px',
+		title: 'Help', // Window title
+		width: '370px', // Window width
+		height: '450px', // Window height
 		default_tag: null, // If set, default page will be filtered by this tag
 		default_slug: null, // If set, default page will show specific page
-		results_per_page: 25,
+		results_per_page: 25, // Number of items/posts or searched results per page
+		image_link: true, // true/false - to enable/disable links to original images
+		image_size: 'fit-640x480', // 'original', 'fit-1280x720', 'crop-256x256', 'crop-top-80x80' end etc. see config var $thumbnail_sizes in "/conf/_advanced.php"
 		icon_sticker: '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M50,5C25.2,5,5,25.2,5,50s20.2,45,45,45s45-20.2,45-45S74.8,5,50,5z M50,7c11.5,0,21.9,4.5,29.7,11.9L67.3,31.3  c-4.5-4.2-10.6-6.8-17.3-6.8s-12.7,2.6-17.3,6.8L20.3,18.9C28.1,11.5,38.5,7,50,7z M73.4,50c0,12.9-10.5,23.4-23.4,23.4  S26.6,62.9,26.6,50S37.1,26.6,50,26.6S73.4,37.1,73.4,50z M7,50c0-11.5,4.5-21.9,11.9-29.7l12.4,12.4c-4.2,4.5-6.8,10.6-6.8,17.3  s2.6,12.7,6.8,17.3L18.9,79.7C11.5,71.9,7,61.5,7,50z M50,93c-11.5,0-21.9-4.5-29.7-11.9l12.4-12.4c4.5,4.2,10.6,6.8,17.3,6.8  s12.7-2.6,17.3-6.8l12.4,12.4C71.9,88.5,61.5,93,50,93z M81.1,79.7L68.7,67.3c4.2-4.5,6.8-10.6,6.8-17.3s-2.6-12.7-6.8-17.3  l12.4-12.4C88.5,28.1,93,38.5,93,50S88.5,71.9,81.1,79.7z"/></svg>',
 		icon_search: '<svg viewBox="0 0 90 100" xmlns="http://www.w3.org/2000/svg"><path d="M93.667,93.66711a4.54882,4.54882,0,0,0,0-6.43475L70.94507,64.51221A36.9358,36.9358,0,1,0,64.51,70.94672L87.23218,93.66711a4.54887,4.54887,0,0,0,6.43481,0ZM41.87268,69.64435A27.77146,27.77146,0,1,1,69.64417,41.87286,27.80231,27.80231,0,0,1,41.87268,69.64435Z"/></svg>',
 		icon_close: '<svg viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg"><line x1="1" y1="15" x2="15" y2="1"></line><line x1="1" y1="1" x2="15" y2="15"></line></svg>',
@@ -84,6 +86,8 @@ var evo_helpdesk_widget = {
 				width: evo_helpdesk_widget.options.width,
 				height: evo_helpdesk_widget.options.height,
 			} );
+			jQuery( window ).resize( evo_helpdesk_widget.update_widget_size );
+			evo_helpdesk_widget.update_widget_size();
 
 			/* Initialize events: */
 			// Show helpdesk window:
@@ -104,6 +108,18 @@ var evo_helpdesk_widget = {
 	},
 
 	/**
+	 * Fit widget window height to small screen height
+	 */
+	update_widget_size: function()
+	{
+		jQuery( '#evo_helpdesk_widget' ).css( 'height',
+			jQuery( '#evo_helpdesk_widget__window' ).is( ':visible' ) &&
+			parseInt( evo_helpdesk_widget.options.height ) > jQuery( '#evo_helpdesk_widget' ).height()
+			? '100%' : 'initial'
+		);
+	},
+
+	/**
 	 * Show window and load content
 	 */
 	show: function( event )
@@ -111,6 +127,7 @@ var evo_helpdesk_widget = {
 		jQuery( '#evo_helpdesk_widget__window' ).show();
 		jQuery( '#evo_helpdesk_widget__sticker' ).hide();
 		jQuery( '#evo_helpdesk_widget__search_form input' ).focus();
+		evo_helpdesk_widget.update_widget_size();
 
 		if( evo_helpdesk_widget.shown === true )
 		{	// Don't load content twice:
@@ -135,6 +152,7 @@ var evo_helpdesk_widget = {
 	{
 		jQuery( '#evo_helpdesk_widget__window' ).hide();
 		jQuery( '#evo_helpdesk_widget__sticker' ).show();
+		evo_helpdesk_widget.update_widget_size();
 	},
 
 	/**
@@ -167,18 +185,15 @@ var evo_helpdesk_widget = {
 				for( var s in data.results )
 				{
 					var search_item = data.results[s];
-					r += '<li>' + search_item.kind + ': ';
+					r += '<li>';
 					if( search_item.kind == 'item' )
 					{ // item: (Display this as link to load data)
-						r += '<a href="#" data-id="' + search_item.id + '" data-urlname="' + evo_helpdesk_widget.options.collection + '">' + search_item.title + '</a>';
+						r += '<a href="#" data-id="' + search_item.id + '" data-urlname="' + evo_helpdesk_widget.options.collection + '" class="evo_helpdesk_widget__link">' + search_item.title + '</a>';
 					}
 					else
 					{	// category, comment, tag:
-						r += search_item.title;
+						r += search_item.kind + ': <a href="' + search_item.permalink + '" target="_blank" title="Open in new tab" class="evo_helpdesk_widget__link">' + search_item.title + '</a>';
 					}
-					r += ' <a href="' + search_item.permalink + '" target="_blank" title="Open in new tab">' +
-							'<span class="evo_helpdesk_widget__icon_permalink">' + evo_helpdesk_widget.options.icon_permalink + '</span>' +
-						'</a> ';
 					r += '</li>';
 				}
 				r += '</ul>';
@@ -244,7 +259,7 @@ var evo_helpdesk_widget = {
 			for( var p in data.items )
 			{
 				var post = data.items[p];
-				r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + collection + '">' + post.title + '</a></li>';
+				r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + collection + '" class="evo_helpdesk_widget__link">' + post.title + '</a></li>';
 			}
 			r += '</ul>';
 			return r;
@@ -280,20 +295,20 @@ var evo_helpdesk_widget = {
 				after_gallery:       '</div>',
 				gallery_cell_start:  '<div class="evo_helpdesk_widget__gallery_image">',
 				gallery_cell_end:    '</div>',
+				image_link_to:         evo_helpdesk_widget.options.image_link ? 'original' : '',
+				gallery_image_link_to: evo_helpdesk_widget.options.image_link ? 'original' : '',
+				image_size:            evo_helpdesk_widget.options.image_size,
 			}
 		},
 		function( item )
 		{	// Display the post data in third column on success request:
-
-			// Item title:
-			var item_content = '<h2><a href="' + item.URL + '" target="_blank" title="Open in new tab">' +
-					item.title +
-					' <span class="evo_helpdesk_widget__icon_permalink">' + evo_helpdesk_widget.options.icon_permalink + '</span>' +
-				'</a></h2>';
-			// Item content:
-			item_content += item.content;
-
-			return item_content;
+			return '<h2>' +
+					'<a href="' + item.URL + '" target="_blank" class="evo_helpdesk_widget__link" title="Open in new tab">' +
+						'<span class="evo_helpdesk_widget__icon_permalink">' + evo_helpdesk_widget.options.icon_permalink + '</span>' +
+						item.title +
+					'</a>' +
+				'</h2>' +
+				item.content;
 		} );
 
 		// Prevent default event of the clicked link:

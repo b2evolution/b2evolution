@@ -1326,6 +1326,7 @@ class File extends DataObject
 				'gallery_cell_end'      => '</div>',//'</div></td>',
 				'gallery_image_size'    => 'crop-80x80',
 				'gallery_image_limit'   => 1000,
+				'gallery_image_link_to' => 'original', // Can be 'original', 'single' or empty
 				'gallery_colls'         => 5,
 				'gallery_order'         => '', // 'ASC', 'DESC', 'RAND'
 				'gallery_link_rel'      => '#', // '#' - Use default 'lightbox[g'.$this->ID.']' to make one "gallery" per directory
@@ -1353,7 +1354,7 @@ class File extends DataObject
 				$params['gallery_link_rel'] = 'lightbox[g'.$this->ID.']';
 			}
 
-			$img_tag = $l_File->get_tag( '', NULL, '', '', $params['gallery_image_size'], 'original', $link_title, $params['gallery_link_rel'] );
+			$img_tag = $l_File->get_tag( '', NULL, '', '', $params['gallery_image_size'], $params['gallery_image_link_to'], $link_title, $params['gallery_link_rel'] );
 
 			if( $count % $params['gallery_colls'] == 0 ) $r .= $params['gallery_row_start'];
 			$count++;

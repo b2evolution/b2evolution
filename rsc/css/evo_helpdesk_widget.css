@@ -8,9 +8,17 @@
 	font: 16px 'Raleway', 'Helvetica Neue', sans-serif;
 	line-height: 1.4;
 	position: fixed;
-	bottom: 20px;
-	right: 20px;
+	bottom: 0;
+	right: 0;
 	z-index: 1000000;
+	padding: 20px;
+	max-width: 100%;
+	max-height: 100%;
+}
+@media (max-width: 400px), (max-height: 500px) {
+	#evo_helpdesk_widget {
+		padding: 10px;
+	}
 }
 #evo_helpdesk_widget * {
 	box-sizing: border-box;
@@ -39,6 +47,8 @@
 	border-radius: 5px;
 	padding-bottom: 50px;
 	box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 20px;
+	max-width: 100%;
+	max-height: 100%;
 }
 #evo_helpdesk_widget__header {
 	display: table;
@@ -69,11 +79,11 @@
 #evo_helpdesk_widget__body h2 {
 	font-weight: normal;
 }
-#evo_helpdesk_widget__body a:not(.btn) {
+a.evo_helpdesk_widget__link {
 	color: #faa72d;
 	text-decoration: none;
 }
-#evo_helpdesk_widget__body a:hover {
+a.evo_helpdesk_widget__link:hover {
 	text-decoration: underline;
 }
 
@@ -97,7 +107,10 @@ svg {
 .evo_helpdesk_widget__icon_permalink svg {
 	width: 15px;
 	height: 15px;
-	fill: #faa72d;
+	fill: #aaa;
+}
+h2 .evo_helpdesk_widget__icon_permalink {
+	float: right;
 }
 h2 .evo_helpdesk_widget__icon_permalink svg {
 	width: 30px;
