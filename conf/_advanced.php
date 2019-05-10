@@ -94,22 +94,32 @@ $date_default_timezone = '';
  * @global array
  */
 $thumbnail_sizes = array(
+	// FIT: Typical images that will be shrunk to max width and/or max height but keep original aspect ratio (the ratios below are only for reference)
+		// 16:9 ratio 1.77
 			'fit-2560x1440' => array( 'fit', 2560, 1440, 80 ),  // For Retina displays
 			'fit-1280x720' => array( 'fit', 1280, 720, 85 ),
+		// ratio 1.44
 			'fit-720x500' => array( 'fit', 720, 500, 90 ),
+		// 4:3 ratio 1.33
 			'fit-640x480' => array( 'fit', 640, 480, 90 ),
 			'fit-520x390' => array( 'fit', 520, 390, 90 ),
+		// 5:4 ratio 1.25
 			'fit-400x320' => array( 'fit', 400, 320, 85 ),
+		// 1:1 square ratio 1
 			'fit-320x320' => array( 'fit', 320, 320, 85 ),
 			'fit-256x256' => array( 'fit', 256, 256, 85 ),
 			'fit-192x192' => array( 'fit', 192, 192, 85 ),
 			'fit-160x160' => array( 'fit', 160, 160, 80 ),
-			'fit-160x160-blur-13' => array( 'fit', 160, 160, 80, 13 ),
-			'fit-160x160-blur-18' => array( 'fit', 160, 160, 80, 18 ),
 			'fit-160x120' => array( 'fit', 160, 120, 80 ),
 			'fit-128x128' => array( 'fit', 128, 128, 80 ),
 			'fit-80x80' => array( 'fit', 80, 80, 80 ),
+	// FIT+BLUR: Blurred images (probably no need for Retina support, because the intended effect is to be blurred)
+			'fit-160x160-blur-13' => array( 'fit', 160, 160, 80, 13 ),
+			'fit-160x160-blur-18' => array( 'fit', 160, 160, 80, 18 ),
+	// CROPPED: Images that will be shrunk AND cropped to completely FILL the request aspect ratio
+		// 3:2 ratio 1.5
 			'crop-480x320' => array( 'crop', 480, 320, 90 ),
+		// 1:1 square ratio 1
 			'crop-256x256' => array( 'crop', 256, 256, 85 ),
 			'crop-192x192' => array( 'crop', 192, 192, 85 ),
 			'crop-128x128' => array( 'crop', 128, 128, 85 ),
@@ -118,7 +128,7 @@ $thumbnail_sizes = array(
 			'crop-48x48' => array( 'crop', 48, 48, 85 ),
 			'crop-32x32' => array( 'crop', 32, 32, 85 ),
 			'crop-15x15' => array( 'crop', 15, 15, 85 ),
-			'crop-top-320x320-blur-8' => array( 'crop-top', 320, 320, 80, 8 ),
+	// CROPPED near TOP: Images that will be shrunk with preference towards the top AND cropped to completely FILL the request aspect ratio (typically used for profile pictures)
 			'crop-top-320x320' => array( 'crop-top', 320, 320, 85 ),
 			'crop-top-200x200' => array( 'crop-top', 200, 200, 85 ),
 			'crop-top-160x160' => array( 'crop-top', 160, 160, 85 ),
@@ -127,6 +137,8 @@ $thumbnail_sizes = array(
 			'crop-top-48x48' => array( 'crop-top', 48, 48, 85 ),
 			'crop-top-32x32' => array( 'crop-top', 32, 32, 85 ),
 			'crop-top-15x15' => array( 'crop-top', 15, 15, 85 ),
+	// CROPPED near TOP + BLUR  (typically used to obfuscate profile pictures) (probably no need for Retina support, because the intended effect is to be blurred)
+			'crop-top-320x320-blur-8' => array( 'crop-top', 320, 320, 80, 8 ),
 	);
 
 
