@@ -96,9 +96,10 @@ $date_default_timezone = '';
 $thumbnail_sizes = array(
 	// FIT: Typical images that will be shrunk to max width and/or max height but keep original aspect ratio (the ratios below are only for reference)
 		// 16:9 ratio 1.77
-			'fit-2880x2880'		=> array( 'fit', 2880, 2880, 80 ),		// 1:1 square ratio 1	For Retina displays 
-			'fit-2560x1440'		=> array( 'fit', 2560, 1440, 80 ),		// 16:9 ratio 1.77		For Retina displays 
+			'fit-2880x1620'		=> array( 'fit', 2880, 1620, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays 
+			'fit-2560x1440'		=> array( 'fit', 2560, 1440, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays 
 			'fit-1280x720'			=> array( 'fit', 1280, 720, 85 ),		// 16:9 ratio 1.77
+			'fit-960x540'			=> array( 'fit', 960, 540, 85 ),			// 16:9 ratio 1.77	EXPERIMENTAL
 			'fit-720x500'			=> array( 'fit', 720, 500, 90 ),			// ratio 1.44
 			'fit-640x480'			=> array( 'fit', 640, 480, 90 ),			// 4:3 ratio 1.33
 			'fit-520x390'			=> array( 'fit', 520, 390, 90 ),			// 4:3 ratio 1.33
@@ -117,7 +118,7 @@ $thumbnail_sizes = array(
 		// 3:2 ratio 1.5
 			'crop-480x320'			=> array( 'crop', 480, 320, 90 ),
 		// 1:1 square ratio 1
-			'crop-512x512'			=> array( 'crop', 512, 512, 85 ),		// For Retina 
+			'crop-512x512'			=> array( 'crop', 512, 512, 85 ),		// EXPERIMENTAL For Retina 
 			'crop-256x256'			=> array( 'crop', 256, 256, 85 ),
 			'crop-192x192'			=> array( 'crop', 192, 192, 85 ),
 			'crop-128x128'			=> array( 'crop', 128, 128, 85 ),
@@ -127,7 +128,7 @@ $thumbnail_sizes = array(
 			'crop-32x32'			=> array( 'crop', 32, 32, 85 ),
 			'crop-15x15'			=> array( 'crop', 15, 15, 85 ),
 	// CROPPED near TOP: Images that will be shrunk with preference towards the top AND cropped to completely FILL the request aspect ratio (typically used for profile pictures)
-			'crop-top-640x640'	=> array( 'crop-top', 640, 640, 85 ),		// For Retina 
+			'crop-top-640x640'	=> array( 'crop-top', 640, 640, 85 ),		// EXPERIMENTAL For Retina 
 			'crop-top-320x320'	=> array( 'crop-top', 320, 320, 85 ),
 			'crop-top-200x200'	=> array( 'crop-top', 200, 200, 85 ),
 			'crop-top-160x160'	=> array( 'crop-top', 160, 160, 85 ),
