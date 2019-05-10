@@ -116,6 +116,7 @@ class green_bootstrap_theme_Skin extends Skin
 				),
 					'main_content_image_size' => array(
 						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
 						'defaultvalue' => 'fit-1280x720',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
@@ -368,6 +369,7 @@ class green_bootstrap_theme_Skin extends Skin
 					),
 					'main_content_image_size' => array(
 						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
 						'defaultvalue' => 'fit-1280x720',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
@@ -578,6 +580,7 @@ class green_bootstrap_theme_Skin extends Skin
 				),
 					'main_content_image_size' => array(
 						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
 						'defaultvalue' => 'fit-1280x720',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
@@ -798,6 +801,7 @@ class green_bootstrap_theme_Skin extends Skin
 					),
 					'main_content_image_size' => array(
 						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
 						'defaultvalue' => 'fit-1280x720',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
@@ -1002,6 +1006,7 @@ class green_bootstrap_theme_Skin extends Skin
 				),
 					'main_content_image_size' => array(
 						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
 						'defaultvalue' => 'fit-1280x720',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
