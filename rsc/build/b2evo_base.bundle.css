@@ -1894,6 +1894,9 @@ div.debug_session div.debug {
   background: #aaa;
   border: none;
 }
+pre.xdebug-var-dump {
+  overflow: auto;
+}
 a.jslog_switcher {
   cursor: pointer;
 }
