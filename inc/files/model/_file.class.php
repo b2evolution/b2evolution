@@ -2469,10 +2469,10 @@ class File extends DataObject
 		{ // We want src to link to a generated thumbnail:
 			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&', $size_x );
 
-			if( !empty($image_sizes) )
+			if( ! empty( $image_sizes ) )
 			{	// We want a responsive image with a srcset= and sizes=
 				$img_attribs['sizes'] = $image_sizes;
-				$img_attrib_srcset = $this->get_img_srcset( $size_name, '&', $size_x );
+				$img_attrib_srcset = $this->get_img_srcset( $image_sizes, $size_name, '&', $size_x );
 				if( ! empty( $img_attrib_srcset ) )
 				{
 					$img_attribs['srcset'] = $img_attrib_srcset;
@@ -2512,12 +2512,13 @@ class File extends DataObject
 	/**
 	 * Get value for attribute "srcset" for images
 	 *
+	 * @param string sizes= attribute for browser to select correct size from srcset=
 	 * @param string Thumbnail size name
 	 * @param string Glue between url params
 	 * @param integer Ratio size, can be 1, 2 and etc.
 	 * @return string Example: 'fit-640x480.jpg 640w, fit-720x500.jpg 720w, fit-1280x720.jpg 1280w, fit-2560x1440.jpg 2560w'
 	 */
-	function get_img_srcset( $size_name = 'fit-80x80', $glue = '&amp;', $size_x = 1 )
+	function get_img_srcset( $image_sizes, $size_name = 'fit-80x80', $glue = '&amp;', $size_x = 1 )
 	{
 		global $generate_srcset_params, $thumbnail_sizes, $grouped_srcset_thumbnail_sizes;
 
@@ -2528,6 +2529,13 @@ class File extends DataObject
 
 		if( ! isset( $thumbnail_sizes[ $size_name ] ) )
 		{	// Wrong thumbnail size:
+			return '';
+		}
+
+		// Extract sizes(width values) from provided param $image_sizes:
+		if( ! preg_match_all( '/(\(max-width:\s*\d+px\)\s*)?(\d+)px(,\s*|$)/', $image_sizes, $image_sizes_match ) ||
+		    empty( $image_sizes_match[2] ) )
+		{	// Wrong value for attribute "sizes":
 			return '';
 		}
 
@@ -2588,21 +2596,59 @@ class File extends DataObject
 			return;
 		}
 
-		// Search +2 and -2 near thumbnail sizes:
-		$srcset_thumbnail_sizes = array();
-		$grouped_srcset_thumbnail_size_names = array_keys( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ] );
-		$grouped_srcset_thumbnail_size_names_count = count( $grouped_srcset_thumbnail_size_names );
-		$size_step = 2;
-		$size_name_i =  array_search( $size_name, $grouped_srcset_thumbnail_size_names );
-		$size_name_i_start = ( $size_name_i - $size_step >= 0 ? $size_name_i - $size_step : 0 );
-		$size_name_i_end = ( $size_name_i + $size_step < $grouped_srcset_thumbnail_size_names_count ? $size_name_i + $size_step : $grouped_srcset_thumbnail_size_names_count - 1 );
-		for( $i = $size_name_i_start; $i <= $size_name_i_end; $i++ )
+		// Sort sizes and add 2x sizes for retina screen:
+		$original_image_width = $this->get_image_size( 'width' );
+		$requested_image_sizes = array();
+		foreach( $image_sizes_match[2] as $image_sizes_m )
+		{	// Don't use thumbnail size with width more than original:
+			if( $image_sizes_m < $original_image_width )
+			{	// 1x size:
+				$requested_image_sizes[] = $image_sizes_m;
+			}
+			if( $image_sizes_m * 2 < $original_image_width )
+			{	// 2x size for retina screen:
+				$requested_image_sizes[] = $image_sizes_m * 2;
+			}
+		}
+		$requested_image_sizes = array_flip( $requested_image_sizes );
+		ksort( $requested_image_sizes );
+
+		// Find thumbnail size for each requested image size:
+		foreach( $requested_image_sizes as $requested_image_size => $r )
 		{
-			$srcset_thumbnail_sizes[] = $this->get_thumb_url( $grouped_srcset_thumbnail_size_names[ $i ], $glue, $size_x ).' '.$thumbnail_sizes[ $grouped_srcset_thumbnail_size_names[ $i ] ][1].'w';
+			foreach( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ] as $grouped_thumb_size_name => $grouped_thumb_size_data )
+			{
+				if( $grouped_thumb_size_data[1] >= $requested_image_size )
+				{
+					if( $grouped_thumb_size_data[1] >= $original_image_width )
+					{	// Don't try to generate thumbnail size with same width as original image:
+						unset( $requested_image_sizes[ $requested_image_size ] );
+					}
+					else
+					{
+						$requested_image_sizes[ $requested_image_size ] = $grouped_thumb_size_name;
+					}
+					// Don't search next wider sizes:
+					break;
+				}
+			}
+		}
+		// Clear duplicated thumbnail sizes:
+		$requested_image_sizes = array_unique( $requested_image_sizes );
+
+		// Set thumbnail size and width size for attribute "srcset":
+		$srcset_thumbnail_sizes = array();
+		foreach( $requested_image_sizes as $requested_image_size )
+		{
+			$srcset_thumbnail_sizes[] = $this->get_thumb_url( $requested_image_size, $glue, $size_x ).' '.$thumbnail_sizes[ $requested_image_size ][1].'w';
+		}
+		if( ! empty( $srcset_thumbnail_sizes ) )
+		{	// Add original size as max possible instead of thumbnail:
+			$srcset_thumbnail_sizes[] = $this->get_url().' '.$original_image_width.'w';
 		}
 
-		// Reverse srcset urls:
-		return implode( ', ', array_reverse( $srcset_thumbnail_sizes ) );
+		// Return searched srcset urls:
+		return implode( ', ', $srcset_thumbnail_sizes );
 	}
 
 

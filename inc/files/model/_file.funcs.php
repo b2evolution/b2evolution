@@ -3364,9 +3364,9 @@ function sort_thumbnail_sizes_callback( $a, $b )
 {
 	if( $a[1] == $b[1] )
 	{
-		return $a[2] > $b[2] ? -1 : 1;
+		return $a[2] < $b[2] ? -1 : 1;
 	}
 
-	return ( $a[1] > $b[1] ? -1 : 1 );
+	return ( $a[1] < $b[1] ? -1 : 1 );
 }
 ?>
