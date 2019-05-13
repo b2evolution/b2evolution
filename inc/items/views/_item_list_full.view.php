@@ -299,8 +299,8 @@ while( $Item = & $ItemList->get_item() )
 				if( $edit_buttons_num > 1 )
 				{	// Display buttons in dropdown style:
 					echo '<div class="'.button_class( 'group' ).'">';
-					echo '<a href="'.$edit_buttons[0]['url'].'" class="btn btn-primary">'.$edit_buttons[0]['text'].'</a>';
-					echo '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>';
+					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'">'.$edit_buttons[0]['text'].'</a>';
+					echo '<button type="button" class="'.button_class( 'text' ).' dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>';
 					echo '<ul class="dropdown-menu">';
 					for( $b = 1; $b < $edit_buttons_num; $b++ )
 					{
@@ -314,16 +314,19 @@ while( $Item = & $ItemList->get_item() )
 				elseif( $edit_buttons_num == 1 )
 				{	// Display single button:
 					echo '<span class="'.button_class( 'group' ).'">';
-					echo '<a href="'.$edit_buttons[0]['url'].'" class="btn btn-primary">'.$edit_buttons[0]['text'].'</a>';
+					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'">'.$edit_buttons[0]['text'].'</a>';
 					echo '</span>';
 				}
 
 				// Details | History | Comments
 				echo '<span class="'.button_class( 'group' ).'">';
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('Details').'</a>';
+				if( $action != 'view' )
+				{
+					echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('Details').'</a>';
+				}
 
 				echo $Item->get_history_link( array(
-						'class'     => button_class( 'text' ).( $Item->has_proposed_change() ? ' btn-warning' : '' ),
+						'class'     => button_class( $Item->has_proposed_change() ? 'text_warning' : 'text' ),
 						'link_text' => '$icon$ '.T_('History'),
 					) );
 
@@ -441,7 +444,9 @@ while( $Item = & $ItemList->get_item() )
 				) );
 
 		// _____________________________________ Displayed in SINGLE VIEW mode only _____________________________________
-
+	?>
+	</div>
+	<?php
 		if( $action == 'view' )
 		{ // We are looking at a single post, include files and comments:
 
@@ -863,9 +868,6 @@ while( $Item = & $ItemList->get_item() )
 		</div>
 		<?php
 	} // / comments requested
-?>
-</div>
-<?php
 }
 
 if( $action == 'view' )

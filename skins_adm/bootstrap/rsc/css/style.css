@@ -257,7 +257,7 @@ div.delete_messages ul label {
   margin-right: 0;
 }
 .evo_post__comments {
-  margin: 1ex;
+  margin: 1ex 0;
 }
 .evo_post__comments .evo_comments_container {
   border: none;
@@ -373,13 +373,16 @@ div.delete_messages ul label {
   border: none;
 }
 .evo_post__attachments {
-  margin: 1ex;
+  margin: 1ex 0;
+}
+.evo_post__attachments table {
+  margin: 0;
 }
 .feedback-tabs {
-  margin: 0 1ex !important;
+  margin: 0 1ex 0 0 !important;
 }
 .feedback-actions {
-  margin: 0 1ex !important;
+  margin: 0 0 0 1ex !important;
   float: right;
 }
 .vote_spam {
@@ -408,6 +411,9 @@ div.delete_messages ul label {
 .evo_content_block span[class*="status_"] {
   left: 8px;
   top: -8px;
+}
+.evo_content_block .global_actions {
+  top: -12px;
 }
 .evo_post__status_community {
   border: 1px solid #2E8BB9;

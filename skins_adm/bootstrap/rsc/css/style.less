@@ -293,7 +293,7 @@ div.delete_messages ul {
 	}
 }
 .evo_post__comments {
-	margin: 1ex;
+	margin: 1ex 0;
 	.evo_comments_container {
 		border: none;
 		.evo_comment {
@@ -419,13 +419,16 @@ div.delete_messages ul {
 	}
 }
 .evo_post__attachments {
-	margin: 1ex;
+	margin: 1ex 0;
+	table {
+		margin: 0;
+	}
 }
 .feedback-tabs {
-	margin: 0 1ex !important;
+	margin: 0 1ex 0 0 !important;
 }
 .feedback-actions {
-	margin: 0 1ex !important;
+	margin: 0 0 0 1ex !important;
 	float: right;
 }
 .vote_spam {
@@ -451,10 +454,16 @@ div.delete_messages ul {
 	margin-left: 10px;
 	line-height: 34px;
 }
-// Status banner
-.evo_content_block span[class*="status_"] {
-	left: 8px;
-	top: -8px;
+.evo_content_block {
+	// Status banner
+	span[class*="status_"] {
+		left: 8px;
+		top: -8px;
+	}
+	// Top-right action icons:
+	.global_actions {
+		top: -12px;
+	}
 }
 // The colored blocks for special post statuses
 .evo_post__status_community {
