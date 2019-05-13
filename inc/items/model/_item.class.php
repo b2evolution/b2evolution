@@ -3345,12 +3345,12 @@ class Item extends ItemLight
 						// Widget "Item Custom Fields":
 						if( $tag_prefix == 'parent:' )
 						{	// Use parent item:
-							$widget_item_ID = '$parent$';
 							if( ! ( $widget_Item = & $this->get_parent_Item() ) )
 							{	// Display error message if parent doesn't exist:
 								$widget_html = '<span class="text-danger">'.T_('This Item has no parent.').'</span>';
 								break;
 							}
+							$widget_item_ID = $widget_Item->ID;
 						}
 						elseif( strpos( $tag_prefix, 'item:' ) === 0 )
 						{	// Use other item by ID or slug:
