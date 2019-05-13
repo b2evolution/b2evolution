@@ -1010,6 +1010,110 @@ switch( $action )
 
 		exit(0); // Exit here in order to don't display the AJAX debug info.
 
+	case 'rotate_90_left':
+	case 'rotate_180':
+	case 'rotate_90_right':
+	case 'flip_horizontal':
+	case 'flip_vertical':
+	case 'reload_image':
+		// Perform quick image manipulation:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'image' );
+
+		// We need this param early to check blog perms, if possible
+		param( 'root', 'string', true, true ); // the root directory from the dropdown box (user_X or blog_X; X is ID - 'user' for current user (default))
+		if( preg_match( '/^collection_(\d+)$/', $root, $perm_blog ) )
+		{	// OK, we got a blog ID:
+			$perm_blog = $perm_blog[1];
+		}
+		else
+		{	// No blog ID, we will check the global group perm
+			$perm_blog = NULL;
+		}
+
+		// Check permission (#2):
+		$current_User->check_perm( 'files', 'view', true, $perm_blog );
+
+		// Load fileroot infos
+		$FileRootCache = & get_FileRootCache();
+		$FileRoot = & $FileRootCache->get_by_ID( $root );
+
+		// Create file object
+		param( 'path', 'filepath', true, true );
+		$selected_File = new File( $FileRoot->type , $FileRoot->in_type_ID, $path, true );
+
+		switch( $action )
+		{
+			case 'rotate_90_left':
+				$degrees = 90;
+				break;
+			case 'rotate_180':
+				$degrees = 180;
+				break;
+			case 'rotate_90_right':
+				$degrees = 270;
+				break;
+			case 'flip_horizontal':
+				$mode = 'horizontal';
+				break;
+			case 'flip_vertical':
+				$mode = 'vertical';
+				break;
+		}
+
+		load_funcs( 'files/model/_image.funcs.php' );
+		$err = NULL;
+
+		switch( $action )
+		{
+			case 'rotate_90_left':
+			case 'rotate_180':
+			case 'rotate_90_right':
+				if( ! rotate_image( $selected_File, $degrees ) )
+				{
+					$err = T_('Unable to perform image rotation operation.');
+				}
+				break;
+
+			case 'flip_horizontal':
+			case 'flip_vertical':
+				if( ! flip_image( $selected_File, $mode ) )
+				{
+					$err = T_('Unable to perform image flipping operation.');
+				}
+				break;
+		}
+
+		if( $err )
+		{
+			$data = array(
+				'status' => 'error',
+				'error_msg' => $err	);
+		}
+		else
+		{
+			$r = '<img ';
+			if( $alt = $selected_File->dget( 'alt', 'htmlattr' ) )
+			{
+				$r .= 'alt="'.$alt.'" ';
+			}
+			if( $title = $selected_File->dget( 'title', 'htmlattr' ) )
+			{
+				$r .= 'title="'.$title.'" ';
+			}
+			$imgSize = $selected_File->get_image_size( 'widthheight' );
+			$r .= 'src="'.$selected_File->get_url().'"'.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
+
+			$data = array(
+				'status' => 'ok',
+				'content' => $r );
+		}
+
+		echo json_encode( $data );
+
+		exit(0); // Exit here in order to don't display the AJAX debug info.
+
 	case 'save_image':
 		// Save image edited by TUI image editor:
 

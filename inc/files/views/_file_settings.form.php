@@ -221,7 +221,6 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Image options').get_manual_link( 'image-options' ) );
 
-	$Form->checkbox( 'use_tui_image_editor', $Settings->get( 'use_tui_image_editor' ), T_('Use Toast UI Image Editor'), T_('Use Toast UI Image Editor for editing images.') );
 	$Form->checkbox( 'exif_orientation', $Settings->get( 'exif_orientation' ), T_('Use EXIF info in photos'), T_('Use orientation tag to automatically rotate thumbnails to upright position.') );
 
 	$Form->begin_line( T_('Resize large images after upload'), 'fm_resize_enable' );

@@ -107,7 +107,6 @@ class GeneralSettings extends AbstractSettings
 		'fm_default_chmod_dir' => '775',
 
 		// Image options
-		'use_tui_image_editor' => '1',
 		'exif_orientation' => '1',
 		'fm_resize_enable' => '0',
 		'fm_resize_width' => '2880',

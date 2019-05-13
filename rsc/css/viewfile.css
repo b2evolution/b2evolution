@@ -59,3 +59,26 @@ button.tui-error {
 	background-color: #f66 !important;
 	border-color: #a00 !important;
 }
+
+div#advanced_editor {
+	display: block;
+	height: 100%;
+	width: 100%;
+}
+
+div#quick_editor {
+	display: none;
+}
+
+div.img_preview {
+	padding-top: 56px;
+	height: 100%;
+	width: 100%;
+}
+
+div.editor_toggle {
+	position: absolute;
+	top: 1em;
+	left: 1em;
+	z-index: 10000;
+}

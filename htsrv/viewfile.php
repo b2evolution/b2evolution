@@ -126,24 +126,21 @@ require_css( 'basic_styles.css', 'rsc_url' ); // the REAL basic styles
 require_css( 'basic.css', 'rsc_url' ); // Basic styles
 require_css( 'viewfile.css', 'rsc_url' );
 require_css( '#bootstrap_css#', 'rsc_url' );
+require_css( '#tui_color_picker_css#', 'rsc_url' );
+require_css( '#tui_image_editor_css#', 'rsc_url' );
 
-if( $Settings->get( 'use_tui_image_editor' ) )
-{
-	// Add JS:
-	global $rsc_url;
-	add_js_headline('var rsc_url = \''.format_to_js( $rsc_url ).'\';' );
-	require_js( '#jquery#', 'rsc_url' );
-	require_js( '#fabricjs#', 'rsc_url' );
-	require_js( '#tui_code_snippet#', 'rsc_url' );
-	require_js( '#tui_color_picker#', 'rsc_url' );
-	require_js( '#tui_image_editor#', 'rsc_url' );
-	require_js( 'toastui/white-theme.js', 'rsc_url' );
-	require_js( 'backoffice.js', 'rsc_url' );
 
-	// Additional CSS:
-	require_css( '#tui_color_picker_css#', 'rsc_url' );
-	require_css( '#tui_image_editor_css#', 'rsc_url' );
-}
+// Add JS:
+global $rsc_url;
+add_js_headline('var rsc_url = \''.format_to_js( $rsc_url ).'\';' );
+require_js( '#jquery#', 'rsc_url' );
+require_js( '#fabricjs#', 'rsc_url' );
+require_js( '#tui_code_snippet#', 'rsc_url' );
+require_js( '#tui_color_picker#', 'rsc_url' );
+require_js( '#tui_image_editor#', 'rsc_url' );
+require_js( 'toastui/white-theme.js', 'rsc_url' );
+require_js( 'backoffice.js', 'rsc_url' );
+
 
 // Send the predefined cookies:
 evo_sendcookies();
@@ -170,24 +167,58 @@ switch( $viewtype )
 		/*
 		 * Image file view:
 		 */
-		if( $Settings->get( 'use_tui_image_editor' ) )
+
+		$imgSize = $selected_File->get_image_size( 'widthheight' );
+		$Filetype = & $selected_File->get_Filetype();
+		$FileRoot = & $selected_File->get_FileRoot();
+
+		switch( $Filetype->mimetype )
 		{
-			$imgSize = $selected_File->get_image_size( 'widthheight' );
-			$Filetype = & $selected_File->get_Filetype();
-			$FileRoot = & $selected_File->get_FileRoot();
+			case 'image/jpeg':
+				$mimetype = 'jpeg';
+				break;
 
-			switch( $Filetype->mimetype )
-			{
-				case 'image/jpeg':
-					$mimetype = 'jpeg';
-					break;
+			default:
+			case 'image/png':
+				$mimetype = 'png';
+				break;
+		}
+		?>
+		<div class="editor_toggle">
+			<div class="btn-group">
+				<button id="advanced_button" class="btn btn-default active" onclick="toggle_editor('advanced');"><?php echo T_('Advanced edit');?></button>
+				<button id="quick_button" class="btn btn-default" onclick="toggle_editor('quick');"><?php echo T_('Quick edit');?></button>
+				<script>
+					function toggle_editor( mode )
+					{
+						var advanced_editor = jQuery( '#advanced_editor' ),
+								advanced_button = jQuery( '#advanced_button' ),
+								quick_editor = jQuery( '#quick_editor' ),
+								quick_button = jQuery( '#quick_button' );
 
-				default:
-				case 'image/png':
-					$mimetype = 'png';
-					break;
-			}
-			?>
+						switch( mode )
+						{
+							case 'advanced':
+								advanced_editor.show();
+								advanced_button.addClass( 'active' );
+								quick_editor.hide();
+								quick_button.removeClass( 'active' );
+								reloadImage( 'advanced' );
+								break;
+
+							case 'quick':
+								advanced_editor.hide();
+								advanced_button.removeClass( 'active' );
+								quick_editor.show();
+								quick_button.addClass( 'active' );
+								reloadImage( 'quick' );
+								break;
+						}
+					}
+				</script>
+			</div>
+		</div>
+		<div id="advanced_editor">
 			<div id="image-editor"></div>
 			<script>
 			var saveInProgress = false;
@@ -195,8 +226,8 @@ switch( $viewtype )
 			var instance = new ImageEditor('#image-editor', {
 					includeUI: {
 						loadImage: {
-							path: '<?php echo $selected_File->get_url();?>',
-							name: 'SampleImage'
+							path: '<?php echo format_to_js( $selected_File->get_url() );?>',
+							name: '<?php echo format_to_js( $selected_File->get_name() );?>',
 						},
 						theme: whiteTheme,
 						menuBarPosition: 'bottom',
@@ -212,6 +243,41 @@ switch( $viewtype )
 
 			// This is a simple way to extend the interface and add a save button
 			document.querySelector('.tui-image-editor-header-buttons .tui-image-editor-save-btn').addEventListener('click', this.saveImage);
+
+			function reloadImage( mode )
+			{
+				switch( mode )
+				{
+					case 'advanced':
+						instance.loadImageFromURL( '<?php echo format_to_js( $selected_File->get_url() );?>', '<?php echo format_to_js( $selected_File->get_name() );?>' );
+						break;
+
+					case 'quick':
+						$request = jQuery.ajax( {
+									type: 'GET',
+									url: '<?php echo format_to_js( get_htsrv_url().'async.php' );?>',
+									data: {
+										action: 'reload_image',
+										root: '<?php echo format_to_js( $root );?>',
+										path: '<?php echo format_to_js( $path );?>',
+										crumb_image: '<?php echo format_to_js( get_crumb('image') );?>',
+									}
+							} );
+
+						$request.done( function( data ) {
+							data = JSON.parse( data );
+							if( data.status == 'ok' )
+							{
+								jQuery( '.img_wrapper' ).html( data.content );
+							}
+							else if( data.status == 'error' )
+							{
+								alert( data.error_msg );
+							}
+						} );
+						break;
+				}
+			}
 
 			function saveImage()
 			{
@@ -237,7 +303,7 @@ switch( $viewtype )
 					fd.append( 'image_data', imgData );
 
 					// Send image data to Server
-					$request = $.ajax( {
+					$request = jQuery.ajax( {
 								type: 'POST',
 								url: '<?php echo format_to_js( get_htsrv_url().'async.php' );?>',
 								data: fd,
@@ -278,14 +344,15 @@ switch( $viewtype )
 				}
 			}
 			</script>
-			<?php
-		}
-		else
-		{
-			echo '<div class="img_preview content-type-image">';
+		</div>
 
+		<div id="quick_editor">
+			<div class="img_preview content-type-image">
+
+			<?php
 			if( $imgSize = $selected_File->get_image_size( 'widthheight' ) )
 			{
+				echo '<div class="img_wrapper">';
 				echo '<img ';
 				if( $alt = $selected_File->dget( 'alt', 'htmlattr' ) )
 				{
@@ -297,6 +364,7 @@ switch( $viewtype )
 				}
 				echo 'src="'.$selected_File->get_url().'"'
 							.' width="'.$imgSize[0].'" height="'.$imgSize[1].'" />';
+				echo '</div>';
 
 				$url_rotate_90_left = regenerate_url( '', 'action=rotate_90_left'.'&'.url_crumb('image') );
 				$url_rotate_180 = regenerate_url( '', 'action=rotate_180'.'&'.url_crumb('image') );
@@ -305,11 +373,11 @@ switch( $viewtype )
 				$url_flip_vertical = regenerate_url( '', 'action=flip_vertical'.'&'.url_crumb('image') );
 
 				echo '<div class="center">';
-				echo action_icon( T_('Rotate this picture 90&deg; to the left'), 'rotate_left', $url_rotate_90_left, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-				echo action_icon( T_('Rotate this picture 180&deg;'), 'rotate_180', $url_rotate_180, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-				echo action_icon( T_('Rotate this picture 90&deg; to the right'), 'rotate_right', $url_rotate_90_right, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-				echo action_icon( T_('Flip this picture horizontally'), 'flip_horizontal', $url_flip_horizontal, '', 0, 0, array( 'style' => 'margin-right:4px' ) );
-				echo action_icon( T_('Flip this picture vertically'), 'flip_vertical', $url_flip_vertical, '', 0, 0 );
+				echo action_icon( T_('Rotate this picture 90&deg; to the left'), 'rotate_left', $url_rotate_90_left, '', 0, 0, array( 'style' => 'margin-right:4px', 'onclick' => 'return quick_edit(\'rotate_90_left\');' ) );
+				echo action_icon( T_('Rotate this picture 180&deg;'), 'rotate_180', $url_rotate_180, '', 0, 0, array( 'style' => 'margin-right:4px', 'onclick' => 'return quick_edit(\'rotate_180\');' ) );
+				echo action_icon( T_('Rotate this picture 90&deg; to the right'), 'rotate_right', $url_rotate_90_right, '', 0, 0, array( 'style' => 'margin-right:4px', 'onclick' => 'return quick_edit(\'rotate_90_right\');' ) );
+				echo action_icon( T_('Flip this picture horizontally'), 'flip_horizontal', $url_flip_horizontal, '', 0, 0, array( 'style' => 'margin-right:4px', 'onclick' => 'return quick_edit(\'flip_horizontal\');' ) );
+				echo action_icon( T_('Flip this picture vertically'), 'flip_vertical', $url_flip_vertical, '', 0, 0, array( 'onclick' => 'return quick_edit(\'flip_vertical\');') );
 				echo '</div>';
 
 				echo '<div class="subline">';
@@ -320,13 +388,52 @@ switch( $viewtype )
 				echo $selected_File->get_size_formatted().'</p>';
 				echo '</div>';
 
+				?>
+				<script>
+				var editInProgress = false;
+				function quick_edit(action)
+				{
+					if( ! editInProgress )
+					{
+						editInProgress = true;
+						$request = jQuery.ajax( {
+									type: 'POST',
+									url: '<?php echo format_to_js( get_htsrv_url().'async.php' );?>',
+									data: {
+										action: action,
+										root: '<?php echo format_to_js( $root );?>',
+										path: '<?php echo format_to_js( $path );?>',
+										crumb_image: '<?php echo format_to_js( get_crumb('image') );?>',
+									}
+							} );
+
+							$request.done( function( data ) {
+								editInProgress = false;
+								data = JSON.parse( data );
+								if( data.status == 'ok' )
+								{
+									jQuery( '.img_wrapper' ).html( data.content );
+								}
+								else if( data.status == 'error' )
+								{
+									alert( data.error_msg );
+								}
+							} );
+					}
+
+					return false;
+				}
+				</script>
+				<?php
 			}
 			else
 			{
 				echo 'error';
 			}
-			echo '&nbsp;</div>';
-		}
+			?>
+			</div>
+		</div>
+		<?php
 		break;
 
 	case 'text':
@@ -334,7 +441,7 @@ switch( $viewtype )
  		/*
 		 * Text file view:
 		 */
-		if( ($buffer = @file( $selected_File->get_full_path() )) !== false )
+		if( ( $buffer = @file( $selected_File->get_full_path() ) ) !== false )
 		{ // Display raw file
 			param( 'showlinenrs', 'integer', 0 );
 
