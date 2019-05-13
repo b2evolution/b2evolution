@@ -760,11 +760,8 @@ class RestApi
 			$api_details = explode( ',', $api_details );
 		}
 
-		// Set global $Item because it may be used by some rendering inline tags like custom fields
-		global $Item;
-
 		// Add each post row in the response array:
-		while( $Item = $ItemList2->get_next() )
+		while( $Item = & $ItemList2->get_next() )
 		{
 			// Initialize data for each item:
 			$item_data = array();
