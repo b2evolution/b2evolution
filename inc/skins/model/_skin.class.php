@@ -950,7 +950,8 @@ class Skin extends DataObject
 				'value'   => NULL, // Custom value, different of what stored in the setting
 				'options' => NULL, // Options per each value, Used for <select> or radio settings
 				'suffix'  => NULL, // Suffix which should de added after value on each update by customzer JS code, e.g. 'px', '%'
-				'type'    => NULL, // Type of the field, e.g. 'image_file'
+				'type'    => NULL, // Type of the field, e.g. 'image_file', 'not_empty'
+				'check'   => NULL, // 'not_empty' - don't apply style rule completely if value is empty
 			), $params );
 
 		if( $params['value'] === NULL )
@@ -996,7 +997,7 @@ class Skin extends DataObject
 		}
 
 		if( $Session->get( 'customizer_mode_'.$blog ) )
-		{	// If customizer mode enabled we should append a special css comment code
+		{	// If customizer mode is enabled we should append a special css comment code
 			// in order to quick change the value from the customizer panel on change input value:
 			$setting_options = '';
 
@@ -1023,7 +1024,28 @@ class Skin extends DataObject
 				$setting_options .= '/type:'.$params['type'];
 			}
 
-			$setting_value = '/*customize:*/'.$setting_value.'/*'.$setting_name.$setting_options.'*/';
+			if( $params['check'] == 'not_empty' )
+			{	// If we should apply rule only when setting value is not empty:
+				// Store full template, to get it from here on customizer mode by JS:
+				$setting_options .= '/template:'.str_replace( '$setting_value$', '#setting_value#', $style_template );
+				if( empty( $setting_value ) )
+				{	// Don't apply rule completely when value is empty:
+					$style_template = '';
+				}
+				// Wrap full template instead of value as for normal rule in order to clear it in case of empty value:
+				$style_template = '/*customize:*/'.$style_template.'/*'.$setting_name.$setting_options.'*/';
+			}
+			else
+			{	// Normal rule:
+				$setting_value = '/*customize:*/'.$setting_value.'/*'.$setting_name.$setting_options.'*/';
+			}
+		}
+		else
+		{	// If customizer mode is disabled
+			if( $params['check'] == 'not_empty' && empty( $setting_value ) )
+			{	// Don't apply rule completely when value is empty:
+				return '';
+			}
 		}
 
 		if( ! isset( $this->dynamic_styles ) )

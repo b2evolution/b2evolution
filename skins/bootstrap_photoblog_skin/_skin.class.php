@@ -395,8 +395,8 @@ class bootstrap_photoblog_Skin extends Skin
 
 		// **** Layout Settings / START ****
 		// Max image height:
-		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$; width: auto; }', array(
-			'suffix' => 'px'
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
+			'check' => 'not_empty'
 		) );
 		// Default font - Size:
 		$this->dynamic_style_rule( 'font_size', '$setting_value$', array(

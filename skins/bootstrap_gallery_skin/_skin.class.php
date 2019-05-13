@@ -344,8 +344,8 @@ class bootstrap_gallery_Skin extends Skin
 
 		// **** Image Viewing / START ****
 		// Max image height:
-		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$; width: auto; }', array(
-			'suffix' => 'px'
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
+			'check' => 'not_empty'
 		) );
 		// **** Image Viewing / END ****
 

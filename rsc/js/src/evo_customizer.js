@@ -78,6 +78,10 @@ function evo_customizer_update_style( setting_input )
 					}
 				}
 				break;
+			case 'template':
+				// Template, e.g. when style rule should not be applied when value  empty:
+				new_value = ( new_value == '' || new_value == 0 ? '' : m8.replace( '#setting_value#', new_value ) );
+				break;
 		}
 
 		return m1 + new_value + m2;
