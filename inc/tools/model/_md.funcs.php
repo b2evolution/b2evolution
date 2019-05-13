@@ -422,7 +422,8 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 				foreach( $image_matches[2] as $i => $image_relative_path )
 				{
 					$file_params['file_alt'] = trim( $image_matches[1][$i] );
-					if( $file_params['file_alt'] == 'img' )
+					if( strtolower( $file_params['file_alt'] ) == 'img' ||
+					    strtolower( $file_params['file_alt'] ) == 'image' )
 					{	// Don't use this default text for alt image text:
 						$file_params['file_alt'] = '';
 					}
