@@ -48,7 +48,7 @@ $required_php_version = array( 'application' => '5.6' );
  * Minimum MYSQL version required for b2evolution to function properly. It will contain each module own minimum MYSQL version as well.
  * @global array
  */
-$required_mysql_version = array( 'application' => '5.1' );
+$required_mysql_version = array( 'application' => '5.5.3' );
 
 /**
  * Is displayed on the login screen:
