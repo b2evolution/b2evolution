@@ -3367,7 +3367,7 @@ class Item extends ItemLight
 						}
 						else
 						{	// Use current Item:
-							$widget_item_ID = '$this$';
+							$widget_item_ID = $this->ID;
 							$widget_Item = $this;
 						}
 
