@@ -148,7 +148,7 @@ $thumbnail_sizes = array(
 /**
  * Generate additional attribute "srcset" for images
  */
-$generate_srcset_params = true;
+$generate_srcset_sizes = true;
 
 
 /**

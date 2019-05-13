@@ -2469,7 +2469,8 @@ class File extends DataObject
 		{ // We want src to link to a generated thumbnail:
 			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&', $size_x );
 
-			if( ! empty( $image_sizes ) )
+			global $generate_srcset_sizes;
+			if( $generate_srcset_sizes && ! empty( $image_sizes ) )
 			{	// We want a responsive image with a srcset= and sizes=
 				$img_attribs['sizes'] = $image_sizes;
 				$img_attrib_srcset = $this->get_img_srcset( $image_sizes, $size_name, '&', $size_x );
@@ -2520,9 +2521,9 @@ class File extends DataObject
 	 */
 	function get_img_srcset( $image_sizes, $size_name = 'fit-80x80', $glue = '&amp;', $size_x = 1 )
 	{
-		global $generate_srcset_params, $thumbnail_sizes, $grouped_srcset_thumbnail_sizes;
+		global $generate_srcset_sizes, $thumbnail_sizes, $grouped_srcset_thumbnail_sizes;
 
-		if( ! $generate_srcset_params )
+		if( ! $generate_srcset_sizes )
 		{	// Disabled in config
 			return '';
 		}
@@ -2642,10 +2643,8 @@ class File extends DataObject
 		{
 			$srcset_thumbnail_sizes[] = $this->get_thumb_url( $requested_image_size, $glue, $size_x ).' '.$thumbnail_sizes[ $requested_image_size ][1].'w';
 		}
-		if( ! empty( $srcset_thumbnail_sizes ) )
-		{	// Add original size as max possible instead of thumbnail:
-			$srcset_thumbnail_sizes[] = $this->get_url().' '.$original_image_width.'w';
-		}
+		// Add original size as max possible instead of thumbnail:
+		$srcset_thumbnail_sizes[] = $this->get_url().' '.$original_image_width.'w';
 
 		// Return searched srcset urls:
 		return implode( ', ', $srcset_thumbnail_sizes );
