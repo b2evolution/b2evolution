@@ -11717,6 +11717,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15460, 'Upgrading files table...' ) )
+	{	// part of 7.0.1-alpha
+		db_upgrade_cols( 'T_files', array(
+			'ADD' => array(
+				'file_ts'  => 'TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00" AFTER file_path',
+				'file_width'  => 'INT(10) UNSIGNED NULL AFTER file_ts',
+				'file_height'  => 'INT(10) UNSIGNED NULL AFTER file_width',
+			),
+		) );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

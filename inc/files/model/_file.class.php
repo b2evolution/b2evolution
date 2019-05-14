@@ -51,6 +51,24 @@ class File extends DataObject
 	var $meta = 'unknown';
 
 	/**
+	 * Meta data: Timestamp of last modification
+	 * @var string
+	 */
+	var $ts;
+
+	/**
+	 * Meta data: Image width
+	 * @var string
+	 */
+	var $width;
+
+	/**
+	 * Meta data: Image height
+	 * @var string
+	 */
+	var $height;
+
+	/**
 	 * Meta data: Long title
 	 * @var string
 	 */
@@ -333,6 +351,9 @@ class File extends DataObject
 				$this->ID    = $row->file_ID;
 				$this->creator_user_ID = $row->file_creator_user_ID;
 				$this->type  = $row->file_type;
+				$this->ts = isset( $row->file_ts ) ? $row->file_ts : NULL;
+				$this->width = isset( $row->file_width ) ? $row->file_width : NULL;
+				$this->height = isset( $row->file_height ) ? $row->file_height : NULL;
 				$this->title = $row->file_title;
 				$this->alt   = $row->file_alt;
 				$this->desc  = $row->file_desc;
@@ -871,10 +892,25 @@ class File extends DataObject
 	 */
 	function get_lastmod_ts()
 	{
-		if( ! isset($this->_lastmod_ts) )
-		{
+		if( ! isset( $this->_lastmod_ts ) )
+		{	// Get timestamp from disk file:
 			$this->_lastmod_ts = @filemtime( $this->_adfp_full_path );
 		}
+
+		if( $this->ID && // File is stored in DB before
+		    $this->load_meta() && // Meta data was loaded successfully
+		    $this->_lastmod_ts != strtotime( $this->ts ) )
+		{	// We must update timestamp in DB if it is defferent than last modification date of this File on disk:
+			$this->set( 'ts', date2mysql( $this->_lastmod_ts ) );
+			if( $this->is_image() &&
+			    ( $image_dimensions = imgsize( $this->_adfp_full_path, 'widthheight' ) ) )
+			{	// Also update dimensions for image file if they can be extracted from disk file successfully:
+				$this->set( 'width', $image_dimensions[0] );
+				$this->set( 'height', $image_dimensions[1] );
+			}
+			$this->dbupdate( false );
+		}
+
 		return $this->_lastmod_ts;
 	}
 
@@ -1122,6 +1158,36 @@ class File extends DataObject
 	 */
 	function get_image_size( $param = 'widthxheight' )
 	{
+		if( ( $this->get( 'width' ) === NULL || $this->get( 'height' ) === NULL ) &&
+		    $this->ID && // File is stored in DB before
+		    $this->load_meta() && // Meta data was loaded successfully
+		    ( $image_dimensions = imgsize( $this->_adfp_full_path ) ) )
+		{	// Set dimensions for image file if it was not stored before:
+			$this->set( 'width', $image_dimensions[0] );
+			$this->set( 'height', $image_dimensions[1] );
+			$this->dbupdate( false );
+		}
+
+		if( $this->get( 'width' ) !== NULL && $this->get( 'height' ) !== NULL )
+		{	// Get image dimensions from DB(cached):
+			switch( $param )
+			{
+				case 'width':
+					return $this->get( 'width' );
+				case 'height':
+					return $this->get( 'height' );
+				case 'widthxheight':
+					return $this->get( 'width' ).'x'.$this->get( 'height' );
+				case 'widthheight_assoc':
+					return array( 'width' => $this->get( 'width' ), 'height' => $this->get( 'height' ) );
+				case 'widthheight':
+					return array( $this->get( 'width' ), $this->get( 'height' ) );
+				// default: Fallback to imgsize() for other(not dimension) values of $param like 'type', 'string'
+			}
+		}
+
+		// Get image dimensions from disk file:
+		// (result is cached per file path after first call of the function imgsize())
 		return imgsize( $this->_adfp_full_path, $param );
 	}
 
