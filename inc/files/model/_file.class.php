@@ -2617,21 +2617,23 @@ class File extends DataObject
 		// Find thumbnail size for each requested image size:
 		foreach( $requested_image_sizes as $requested_image_size => $r )
 		{
+			$is_detected_proper_size = false;
 			foreach( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ] as $grouped_thumb_size_name => $grouped_thumb_size_data )
 			{
 				if( $grouped_thumb_size_data[1] >= $requested_image_size )
-				{
-					if( $grouped_thumb_size_data[1] >= $original_image_width )
-					{	// Don't try to generate thumbnail size with same width as original image:
-						unset( $requested_image_sizes[ $requested_image_size ] );
-					}
-					else
-					{
+				{	// If thumbnail size more than requested size:
+					if( $grouped_thumb_size_data[1] < $original_image_width )
+					{	// Allow thumbnail size only with less width than original image:
 						$requested_image_sizes[ $requested_image_size ] = $grouped_thumb_size_name;
+						$is_detected_proper_size = true;
 					}
 					// Don't search next wider sizes:
 					break;
 				}
+			}
+			if( ! $is_detected_proper_size )
+			{	// Don't use requested size if it is not proper:
+				unset( $requested_image_sizes[ $requested_image_size ] );
 			}
 		}
 		// Clear duplicated thumbnail sizes:
@@ -2641,7 +2643,10 @@ class File extends DataObject
 		$srcset_thumbnail_sizes = array();
 		foreach( $requested_image_sizes as $requested_image_size )
 		{
-			$srcset_thumbnail_sizes[] = $this->get_thumb_url( $requested_image_size, $glue, $size_x ).' '.$thumbnail_sizes[ $requested_image_size ][1].'w';
+			if( isset( $thumbnail_sizes[ $requested_image_size ] ) )
+			{
+				$srcset_thumbnail_sizes[] = $this->get_thumb_url( $requested_image_size, $glue, $size_x ).' '.$thumbnail_sizes[ $requested_image_size ][1].'w';
+			}
 		}
 		// Add original size as max possible instead of thumbnail:
 		$srcset_thumbnail_sizes[] = $this->get_url().' '.$original_image_width.'w';
