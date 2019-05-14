@@ -64,6 +64,7 @@ class UserSettings extends AbstractSettings
 		'show_quick_publish' => 1, // Show the quick "Publish!" button on item form edit screen in back-office
 
 		'fm_imglistpreview' => 1,
+		'fm_getimagesizes' => 1,
 		'fm_showdate'       => 'compact',
 		'fm_allowfiltering' => 'simple',
 
