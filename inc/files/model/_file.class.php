@@ -51,7 +51,7 @@ class File extends DataObject
 	var $meta = 'unknown';
 
 	/**
-	 * Meta data: Timestamp of last modification
+	 * Meta data: Timestamp of last modification from DB
 	 * @var string
 	 */
 	var $ts;
@@ -192,7 +192,7 @@ class File extends DataObject
 	var $_recursive_size;
 
 	/**
-	 * UNIX timestamp of last modification on disk.
+	 * UNIX timestamp of last modification on DISK.
 	 * @var integer
 	 * @see get_lastmod_ts()
 	 * @see get_lastmod_formatted()
@@ -886,11 +886,9 @@ class File extends DataObject
 
 
 	/**
-	 * Get timestamp of last modification.
-	 *
-	 * @return integer Timestamp
+	 * Load timestamp of last modification on DISK
 	 */
-	function get_lastmod_ts()
+	function load_lastmod_ts()
 	{
 		if( ! isset( $this->_lastmod_ts ) )
 		{	// Get timestamp from disk file:
@@ -900,7 +898,7 @@ class File extends DataObject
 		if( $this->ID && // File is stored in DB before
 		    $this->load_meta() && // Meta data was loaded successfully
 		    $this->_lastmod_ts != strtotime( $this->ts ) )
-		{	// We must update timestamp in DB if it is defferent than last modification date of this File on disk:
+		{	// We must update timestamp in DB if it is defferent than last modification date of this File on DISK:
 			$this->set( 'ts', date2mysql( $this->_lastmod_ts ) );
 			if( $this->is_image() &&
 			    ( $image_dimensions = imgsize( $this->_adfp_full_path, 'widthheight' ) ) )
@@ -910,6 +908,18 @@ class File extends DataObject
 			}
 			$this->dbupdate( false );
 		}
+	}
+
+
+	/**
+	 * Get timestamp of last modification on DISK
+	 *
+	 * @return integer Timestamp
+	 */
+	function get_lastmod_ts()
+	{
+		// Load timestamp of last modification on DISK:
+		$this->load_lastmod_ts();
 
 		return $this->_lastmod_ts;
 	}
@@ -1154,10 +1164,16 @@ class File extends DataObject
 	 *
 	 * @uses imgsize()
 	 * @param string {@link imgsize()}
+	 * @param boolean TRUE to check if file was modified on disk then force to update width and height to new values even when they were already defined before
 	 * @return false|mixed false if the File is not an image, the requested data otherwise
 	 */
-	function get_image_size( $param = 'widthxheight' )
+	function get_image_size( $param = 'widthxheight', $check_ts = false )
 	{
+		if( $check_ts )
+		{	// If DISK timestamp is defferent than DB timestamp then width and height will be updated to new values:
+			$this->load_lastmod_ts();
+		}
+
 		if( ( $this->get( 'width' ) === NULL || $this->get( 'height' ) === NULL ) &&
 		    $this->ID && // File is stored in DB before
 		    $this->load_meta() && // Meta data was loaded successfully
@@ -2664,7 +2680,7 @@ class File extends DataObject
 		}
 
 		// Sort sizes and add 2x sizes for retina screen:
-		$original_image_width = $this->get_image_size( 'width' );
+		$original_image_width = $this->get_image_size( 'width', true );
 		$requested_image_sizes = array();
 		foreach( $image_sizes_match[2] as $image_sizes_m )
 		{	// Don't use thumbnail size with width more than original:
