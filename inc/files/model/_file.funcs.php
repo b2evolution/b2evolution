@@ -400,7 +400,7 @@ function imgsize( $path, $param = 'widthheight' )
 	}
 	elseif( $param == 'type' )
 	{
-		switch( $size[1] )
+		switch( $size[2] )
 		{
 			case 1: return 'gif';
 			case 2: return 'jpg';
