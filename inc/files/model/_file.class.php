@@ -2714,8 +2714,11 @@ class File extends DataObject
 				$srcset_thumbnail_sizes[] = $this->get_thumb_url( $requested_image_size, $glue, $size_x ).' '.$thumbnail_sizes[ $requested_image_size ][1].'w';
 			}
 		}
-		// Add original size as max possible instead of thumbnail:
-		$srcset_thumbnail_sizes[] = $this->get_url().' '.$original_image_width.'w';
+		if( $thumb_size_type == 'fit' && ! $thumb_size_blur )
+		{	// Add original size as max possible instead of thumbnail:
+			// NOTE: don't allow original image for cropped or blurred thumbnails!
+			$srcset_thumbnail_sizes[] = $this->get_url().' '.$original_image_width.'w';
+		}
 
 		// Return searched srcset urls:
 		return implode( ', ', $srcset_thumbnail_sizes );
