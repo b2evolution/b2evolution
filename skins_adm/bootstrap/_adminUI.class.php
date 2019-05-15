@@ -40,7 +40,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Messages, $debug, $Hit, $check_browser_version, $adminskins_url;
+		global $Messages, $debug, $Hit, $check_browser_version, $adminskins_url, $rsc_url;
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
@@ -99,6 +99,30 @@ class AdminUI extends AdminUI_general
 				$Messages->add( 'User Agent: '.$Hit->get_user_agent(), 'note' );
 			}
 		}
+
+		// evo helpdesk widget:
+		//require_css( $rsc_url.'css/evo_helpdesk_widget.min.css' );
+		//require_js( $rsc_url.'js/evo_helpdesk_widget.min.js' );
+	}
+
+
+	/**
+	 * Get the end of the HTML <body>. Close open divs, etc...
+	 *
+	 * This is not called if {@link $mode} is set.
+	 *
+	 * @return string
+	 */
+	function get_body_bottom()
+	{
+		/*return '<script>
+			// Initialize the b2evolution helpdesk widget:
+			evo_helpdesk_widget.init( {
+				site_url: "https://b2evolution.net/",
+				collection: "man",
+				'.( empty( $this->page_manual_slug ) ? '' : 'default_slug: "'.$this->page_manual_slug.'",' ).'
+			} );
+			</script>';*/
 	}
 
 
