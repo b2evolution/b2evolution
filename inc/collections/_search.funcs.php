@@ -891,7 +891,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		// Sort results by score or date:
 		$score_result = array();
 		$max_score_result = $search_result[0];
-		foreach( $search_result as $result_item )
+		foreach( $search_result as $r => $result_item )
 		{
 			if( $Blog->get_setting( 'search_sort_by' ) == 'date' )
 			{	// Sort by date:
@@ -913,6 +913,10 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 			if( $max_score_result['score'] < $result_item['score'] )
 			{	// Find item with max score:
 				$max_score_result = $result_item;
+			}
+			if( ! $debug )
+			{	// Don't store scores map in Sessions when debug is OFF:
+				unset( $search_result[ $r ]['scores_map'] );
 			}
 		}
 		array_multisort( $score_result, SORT_DESC, $search_result );
@@ -1313,7 +1317,10 @@ function search_result_block( $params = array() )
 		$display_params['score_date'] = isset( $row['date'] ) ? $row['date'] : 0;
 		$display_params['score'] = $row['score'];
 		$display_params['percentage'] = round( $row['score'] * $max_percentage / $max_score );
-		$display_params['scores_map'] = $row['scores_map'];
+		if( isset( $row['scores_map'] ) )
+		{	// Scores map is defiend only with enabled debug mode:
+			$display_params['scores_map'] = $row['scores_map'];
+		}
 		$display_params['type'] = $row['type'];
 		$display_params['best_result'] = $index == 0;
 		$display_params['max_score'] = sprintf( ( floor( $max_score ) != $max_score ) ? '%.2f' : '%d', $max_score );
@@ -1664,146 +1671,149 @@ function display_score_map( $params )
 
 	echo '<li>Date: '.( empty( $params['score_date'] ) ? 'None' : mysql2localedatetime( $params['score_date'] ) ).'</li>';
 
-	foreach( $params['scores_map'] as $result_part => $score_map )
-	{
-
-		if( ! is_array( $score_map ) )
+	if( ! empty( $params['scores_map'] ) )
+	{	// If score map is provided:
+		foreach( $params['scores_map'] as $result_part => $score_map )
 		{
-			if( $score_map > 0 )
-			{	// Score received for this field
-				echo '<li>'.sprintf( 'Extra points for [%s]', $result_part ).'</li><ul>';
-				switch ( $result_part )
-				{
-					case 'last_mod_date':
-					case 'creation_date':
-						echo '<li>'.sprintf( '%d points.', $score_map );
-						echo ' Rule: The number of points are calculated based on the days passed since creation or last modification';
-						echo '<ul><li>days_passed < 5 => ( '.$Blog->get_setting( 'search_score_post_date_lastweek' ).' - days_passed )</li>';
-						echo '<li>'.$Blog->get_setting( 'search_score_post_date_lastweek' ).' <= days_passed < 8 => '.( $Blog->get_setting( 'search_score_post_date_twoweeks' ) + 1 ).'</li>';
-						echo '<li>when days_passed >= 8: ( days_passed < 15 ? '.$Blog->get_setting( 'search_score_post_date_twoweeks' ).' : ( days_passed < 31 ? '.$Blog->get_setting( 'search_score_post_date_lastmonth' ).' : '.$Blog->get_setting( 'search_score_post_date_moremonth' ).' ) )</li>';
-						echo '</ul>';
-						break;
+			if( ! is_array( $score_map ) )
+			{
+				if( $score_map > 0 )
+				{	// Score received for this field
+					echo '<li>'.sprintf( 'Extra points for [%s]', $result_part ).'</li><ul>';
+					switch ( $result_part )
+					{
+						case 'last_mod_date':
+						case 'creation_date':
+							echo '<li>'.sprintf( '%d points.', $score_map );
+							echo ' Rule: The number of points are calculated based on the days passed since creation or last modification';
+							echo '<ul><li>days_passed < 5 => ( '.$Blog->get_setting( 'search_score_post_date_lastweek' ).' - days_passed )</li>';
+							echo '<li>'.$Blog->get_setting( 'search_score_post_date_lastweek' ).' <= days_passed < 8 => '.( $Blog->get_setting( 'search_score_post_date_twoweeks' ) + 1 ).'</li>';
+							echo '<li>when days_passed >= 8: ( days_passed < 15 ? '.$Blog->get_setting( 'search_score_post_date_twoweeks' ).' : ( days_passed < 31 ? '.$Blog->get_setting( 'search_score_post_date_lastmonth' ).' : '.$Blog->get_setting( 'search_score_post_date_moremonth' ).' ) )</li>';
+							echo '</ul>';
+							break;
 
-					default:
-						echo '<li>'.sprintf( '%d points for [%s]', $score_map, $result_part ).'</li>';
-						break;
+						default:
+							echo '<li>'.sprintf( '%d points for [%s]', $score_map, $result_part ).'</li>';
+							break;
+					}
+					echo '</ul>';
 				}
+				continue;
+			}
+			elseif( isset( $score_map['score_weight'] ) && $score_map['score_weight'] > 1 )
+			{	// add note that the score was multiplied because of the importance of the field where it was found
+				$note =  sprintf( ' - the match scores are multiplied with %d', $score_map['score_weight'] );
+			}
+			else
+			{	// note is not required
+				$note = '';
+			}
+
+			echo '<li>'.sprintf( 'Searching in [%s]', $result_part ).$note.'</li><ul>';
+			if( $score_map['score'] == 0 )
+			{
 				echo '</ul>';
-			}
-			continue;
-		}
-		elseif( isset( $score_map['score_weight'] ) && $score_map['score_weight'] > 1 )
-		{	// add note that the score was multiplied because of the importance of the field where it was found
-			$note =  sprintf( ' - the match scores are multiplied with %d', $score_map['score_weight'] );
-		}
-		else
-		{	// note is not required
-			$note = '';
-		}
-
-		echo '<li>'.sprintf( 'Searching in [%s]', $result_part ).$note.'</li><ul>';
-		if( $score_map['score'] == 0 )
-		{
-			echo '</ul>';
-			continue;
-		}
-
-		$keyword_match = null;
-		foreach( $score_map['map'] as $match_type => $scores )
-		{
-			switch( $match_type )
-			{
-				case 'whole_term':
-					// Example: We searched [several images attached] and we matched it in:
-					//  - [This post has several images attached to it]
-					// OR we searched [wild] and we matched it in:
-					//  - [I was bewildered!]
-					//  - [A wild cat!]
-					echo '<li>'.sprintf( '%d points for whole term match', $scores ).'</li>';
-					continue;
-
-				case 'quoted_term_all':
-					// Example: We searched ["images attached" "has several" word] and we matched it in:
-					//  - [This post has several images attached to it]
-					//  - [The comment has several private images attached]
-					echo '<li>'.sprintf( '%d extra points for all quoted term match', $scores ).'</li>';
-					continue;
-
-				case 'all_case_sensitive':
-					// Example: We searched [several Thi ost mage Each] and we matched it in:
-					//  - [This post has several images attached to it. Each one uses a different Attachment Position.]
-					echo '<li>'.sprintf( '%d extra points for all word case sensitive match', $scores ).'</li>';
-					continue;
-
-				case 'all_whole_words':
-					// Example: We searched [several this post images each] and we matched it in:
-					//  - [This post has several images attached to it. Each one uses a different Attachment Position.]
-					echo '<li>'.sprintf( '%d extra points for all word complete match', $scores ).'</li>';
-					continue;
-
-				case 'tags':
-					// Example: We searched [photo album] and we matched it if the post has a tag with name:
-					//  - [photo album]
-					echo '<li>'.sprintf( '%d points for tag term match', $scores ).'</li>';
-					continue;
-			}
-
-			if( !is_array( $scores ) )
-			{
 				continue;
 			}
 
-			if( $keyword_match != $match_type && $keyword_match !== null )
-			{	// close previously started list
-				echo '</ul>';
-			}
-			if( $keyword_match != $match_type )
+			$keyword_match = null;
+			foreach( $score_map['map'] as $match_type => $scores )
 			{
 				switch( $match_type )
 				{
-					case 'word_case_sensitive_match':
-						// If at least one word from requested phrase is case sensitive matched:
-						echo '<li>Case sensitive matches</li>';
-						break;
+					case 'whole_term':
+						// Example: We searched [several images attached] and we matched it in:
+						//  - [This post has several images attached to it]
+						// OR we searched [wild] and we matched it in:
+						//  - [I was bewildered!]
+						//  - [A wild cat!]
+						echo '<li>'.sprintf( '%d points for whole term match', $scores ).'</li>';
+						continue;
 
-					case 'whole_word_match':
-						// If at least one whole word from requested phrase is case insensitive matched:
-						echo '<li>Whole word matches</li>';
-						break;
+					case 'quoted_term_all':
+						// Example: We searched ["images attached" "has several" word] and we matched it in:
+						//  - [This post has several images attached to it]
+						//  - [The comment has several private images attached]
+						echo '<li>'.sprintf( '%d extra points for all quoted term match', $scores ).'</li>';
+						continue;
 
-					case 'word_case_insensitive_match':
-						// If at least one word from requested phrase is case insensitive matched:
-						echo '<li>Case insensitive matches</li>';
-						break;
+					case 'all_case_sensitive':
+						// Example: We searched [several Thi ost mage Each] and we matched it in:
+						//  - [This post has several images attached to it. Each one uses a different Attachment Position.]
+						echo '<li>'.sprintf( '%d extra points for all word case sensitive match', $scores ).'</li>';
+						continue;
 
-					case 'word_multiple_occurences':
-						// If at least one word from requested phrase is case insensitive matched at least two times in the content:
-						echo '<li>Extra points for multiple occurrences - Rule: sum( score weight / x ) where x goes from 2 to number of occurrences</li>';
-						break;
+					case 'all_whole_words':
+						// Example: We searched [several this post images each] and we matched it in:
+						//  - [This post has several images attached to it. Each one uses a different Attachment Position.]
+						echo '<li>'.sprintf( '%d extra points for all word complete match', $scores ).'</li>';
+						continue;
+
+					case 'tags':
+						// Example: We searched [photo album] and we matched it if the post has a tag with name:
+						//  - [photo album]
+						echo '<li>'.sprintf( '%d points for tag term match', $scores ).'</li>';
+						continue;
 				}
-				$keyword_match = $match_type;
-				echo '<ul>';
-			}
 
-			foreach( $scores as $word => $score )
-			{
-				if( is_float( $score ) )
+				if( !is_array( $scores ) )
 				{
-					$points_label = '%.2F points - match on [%s]';
+					continue;
 				}
-				else
+
+				if( $keyword_match != $match_type && $keyword_match !== null )
+				{	// close previously started list
+					echo '</ul>';
+				}
+				if( $keyword_match != $match_type )
 				{
-					$points_label = ( $score > 1 ) ? '%d points - match on [%s]' : '%d point - match on [%s]';
+					switch( $match_type )
+					{
+						case 'word_case_sensitive_match':
+							// If at least one word from requested phrase is case sensitive matched:
+							echo '<li>Case sensitive matches</li>';
+							break;
+
+						case 'whole_word_match':
+							// If at least one whole word from requested phrase is case insensitive matched:
+							echo '<li>Whole word matches</li>';
+							break;
+
+						case 'word_case_insensitive_match':
+							// If at least one word from requested phrase is case insensitive matched:
+							echo '<li>Case insensitive matches</li>';
+							break;
+
+						case 'word_multiple_occurences':
+							// If at least one word from requested phrase is case insensitive matched at least two times in the content:
+							echo '<li>Extra points for multiple occurrences - Rule: sum( score weight / x ) where x goes from 2 to number of occurrences</li>';
+							break;
+					}
+					$keyword_match = $match_type;
+					echo '<ul>';
 				}
-				echo '<li>'.sprintf( $points_label, $score, $word ).'</li>';
+
+				foreach( $scores as $word => $score )
+				{
+					if( is_float( $score ) )
+					{
+						$points_label = '%.2F points - match on [%s]';
+					}
+					else
+					{
+						$points_label = ( $score > 1 ) ? '%d points - match on [%s]' : '%d point - match on [%s]';
+					}
+					echo '<li>'.sprintf( $points_label, $score, $word ).'</li>';
+				}
 			}
-		}
-		if( $keyword_match != null )
-		{	// display the end of the specific match type
+			if( $keyword_match != null )
+			{	// display the end of the specific match type
+				echo '</ul>';
+			}
 			echo '</ul>';
 		}
-		echo '</ul>';
 	}
+
 	$total_score_pattern = ( floor( $params['score'] ) != $params['score'] ) ? '%.2f' : '%d';
 	echo '<li>'.sprintf( 'Total: '.$total_score_pattern.' points', $params['score'] ).'</li>';
 	if( $params['best_result'] )
