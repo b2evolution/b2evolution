@@ -263,20 +263,23 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	if( ! empty($Session) )
 	{	// Session is required here
 
-		// Transfer full debug info to next page:
-		ob_start();
-		debug_info( true );
-		$current_debug_info = ob_get_clean();
-		if( ! empty( $current_debug_info ) )
-		{	// Save full debug info into Session, so that it's available after redirect (gets loaded by Session constructor):
-			$sess_debug_infos = $Session->get( 'debug_infos' );
-			if( empty( $sess_debug_infos ) )
-			{
-				$sess_debug_infos = array();
+		global $debug;
+		if( ! empty( $debug ) )
+		{	// Transfer full debug info to next page only when debug is enabled:
+			ob_start();
+			debug_info( true );
+			$current_debug_info = ob_get_clean();
+			if( ! empty( $current_debug_info ) )
+			{	// Save full debug info into Session, so that it's available after redirect (gets loaded by Session constructor):
+				$sess_debug_infos = $Session->get( 'debug_infos' );
+				if( empty( $sess_debug_infos ) )
+				{
+					$sess_debug_infos = array();
+				}
+				// NOTE: We must encode data in order to avoid error "Session data corrupted" because of special chars on unserialize the data:
+				$sess_debug_infos[] = gzencode( $current_debug_info );
+				$Session->set( 'debug_infos', $sess_debug_infos, 60 /* expire in 60 seconds */ );
 			}
-			// NOTE: We must encode data in order to avoid error "Session data corrupted" because of special chars on unserialize the data:
-			$sess_debug_infos[] = gzencode( $current_debug_info );
-			$Session->set( 'debug_infos', $sess_debug_infos, 60 /* expire in 60 seconds */ );
 		}
 
 		// Transfer of Messages to next page:
