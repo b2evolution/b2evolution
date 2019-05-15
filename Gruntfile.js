@@ -78,6 +78,9 @@ module.exports = function(grunt) {
 					// Colorbox
 					'rsc/css/colorbox/colorbox-regular.css':   'rsc/css/colorbox/colorbox-regular.less',
 					'rsc/css/colorbox/colorbox-bootstrap.css': 'rsc/css/colorbox/colorbox-bootstrap.less',
+
+					// evo helpdesk widget
+					'rsc/css/evo_helpdesk_widget.css': 'rsc/less/evo_helpdesk_widget.less',
 				}
 			},
 
@@ -195,6 +198,10 @@ module.exports = function(grunt) {
 			ddexitpop: {
 				src: [ 'rsc/css/ddexitpop/ddexitpop.css', 'rsc/css/ddexitpop/animate.min.css' ],
 				dest: 'rsc/build/ddexitpop.bmin.css',
+			},
+			evo_helpdesk_widget: {
+				src: 'rsc/css/evo_helpdesk_widget.css',
+				dest: 'rsc/css/evo_helpdesk_widget.min.css',
 			},
 		},
 
@@ -379,6 +386,10 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_links.js',
 							'rsc/js/src/evo_input_counter.js'],
 				dest: 'rsc/js/build/bootstrap-evo_backoffice.bmin.js'
+			},
+			evo_helpdesk_widget: {
+				src: 'rsc/js/evo_helpdesk_widget.js',
+				dest: 'rsc/js/evo_helpdesk_widget.min.js',
 			},
 		},
 

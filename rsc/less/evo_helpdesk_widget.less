@@ -1,0 +1,288 @@
+/**
+ * These are the default styles for evo helpdesk widget.
+
+ * On a production installation, copy and customize this CSS.
+ */
+
+#evo_helpdesk_widget {
+	font: 16px 'Raleway', 'Helvetica Neue', sans-serif;
+	line-height: 1.4;
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	z-index: 1000000;
+	padding: 20px;
+	max-width: 100%;
+	max-height: 100%;
+	* {
+		box-sizing: border-box;
+	}
+}
+@media (max-width: 400px), (max-height: 500px) {
+	#evo_helpdesk_widget {
+		padding: 10px;
+	}
+}
+
+.evo_helpdesk_widget__text_error {
+	color: #a94442;
+}
+
+#evo_helpdesk_widget__sticker {
+	width: 60px;
+	height: 60px;
+	padding: 10px;
+	background: #faa72d;
+	color: #FFF;
+	border-radius: 50%;
+	text-align: center;
+	line-height: 60px;
+	cursor: pointer;
+}
+
+#evo_helpdesk_widget__window {
+	display: none;
+	overflow: hidden;
+	background: #fafafa;
+	border-radius: 5px;
+	padding-bottom: 50px;
+	box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 20px;
+	max-width: 100%;
+	max-height: 100%;
+}
+#evo_helpdesk_widget__header {
+	display: table;
+	width: 100%;
+	background: #faa72d;
+	color: #FFF;
+	height: 50px;
+	line-height: 30px;
+	box-sizing: content-box;
+	div {
+		display: table-cell;
+		width: 100%;
+		text-align: center;
+		vertical-align: middle;
+		&:first-child, &:last-child {
+			width: auto;
+			cursor: pointer;
+			padding: 10px 20px;
+		}
+	}
+}
+#evo_helpdesk_widget__body {
+	padding: 10px;
+	height: 100%;
+	overflow: auto;
+	h2 {
+		font-weight: normal;
+	}
+}
+a.evo_helpdesk_widget__link {
+	color: #faa72d;
+	text-decoration: none;
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+// Icons:
+svg {
+	vertical-align: middle;
+}
+#evo_helpdesk_widget__sticker svg {
+	fill: #FFF;
+	vertical-align: initial;
+}
+#evo_helpdesk_widget__icon_close {
+	svg {
+		width: 15px;
+		height: 15px;
+		line-height: 15px;
+		line {
+			stroke: #FFF;
+			stroke-width: 1px;
+		}
+	}
+}
+.evo_helpdesk_widget__icon_permalink {
+	float: right;
+	svg {
+		width: 30px;
+		height: 30px;
+		fill: #aaa;
+	}
+}
+#evo_helpdesk_widget__icon_search svg {
+	width: 18px;
+	height: 18px;
+	fill: #FFF;
+}
+
+// Search form:
+#evo_helpdesk_widget__search_form {
+	margin-bottom: 10px;
+	display: table;
+	width: 100%;
+	> div {
+		display: table-row;
+		> div {
+			display: table-cell;
+			&:first-child {
+				width: 100%;
+			}
+		}
+	}
+	input {
+		width: 100%;
+		height: 34px;
+		margin: 0;
+		padding: 6px 12px;
+		font-size: 14px;
+		line-height: 1.42857143;
+		color: #555;
+		background-color: #fff;
+		border: 1px solid #ccc;
+		border-right: 0;
+		border-top-left-radius: 4px;
+		border-bottom-left-radius: 4px;
+		transition: border-color ease-in-out .15s;
+		outline: none;
+		vertical-align: middle;
+		&:focus {
+			border: 1px solid #faa72d;
+			border-right: 0;
+		}
+	}
+	button[type=submit] {
+		border-top-left-radius: 0;
+		border-bottom-left-radius: 0;
+		color: #FFF;
+		background: #faa72d;
+		border: 1px solid #faa72d;
+		margin-right: 5px;
+		&:hover {
+			background: #f69d1b;
+		}
+	}
+}
+
+.evo_helpdesk_widget__button {
+	display: inline-block;
+	padding: 6px 12px;
+	margin: 0;
+	font-size: 14px;
+	font-weight: 400;
+	line-height: 1.42857143;
+	vertical-align: middle;
+	touch-action: manipulation;
+	cursor: pointer;
+	user-select: none;
+	border-radius: 4px;
+	color: #333;
+	background-color: #fff;
+	border: 1px solid #ccc;
+	outline: none;
+	&:hover {
+		background-color: #e6e6e6;
+		border-color: #adadad;
+	}
+}
+
+// Result details:
+#evo_helpdesk_widget__results_back {
+	display: none;
+}
+#evo_helpdesk_widget__result_details {
+	display: none;
+	h2 {
+		margin-top: 0;
+	}
+	img {
+		border-radius: 4px;
+	}
+}
+.evo_helpdesk_widget__image {
+	margin: 20px auto;
+	img {
+		display: block;
+		max-width: 100%;
+		height: auto;
+	}
+}
+.evo_helpdesk_widget__image_caption {
+	font-size: 80%;
+	color: #999;
+	text-align: center;
+	margin-top: 3px;
+}
+.evo_helpdesk_widget__gallery_image {
+	display: inline-block;
+	margin: 0 10px 10px 0;
+}
+
+// Custom fields table:
+#evo_helpdesk_widget__result_details {
+	table {
+		margin: 1em 0;
+		border-spacing: 0;
+		border-collapse: collapse;
+		th {
+			background-color: #eee;
+		}
+		th, td {
+			border: 1px solid #ddd;
+			padding: 8px;
+			vertical-align: middle;
+		}
+	}
+}
+
+// Animation for AJAX loader:
+.evo_helpdesk_widget_loading {
+	position: relative;
+	min-height: 64px;
+	&:before {
+		content: "";
+		position: absolute;
+		background: #fafafa;
+		width: 100%;
+		height: 100%;
+		opacity: 0.5;
+	}
+	// :not(:required) hides this rule from IE9 and below
+	.evo_helpdesk_widget_loader:not(:required) {
+		position: absolute;
+		margin: auto;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		overflow: hidden;
+		text-indent: -9999px;
+		display: inline-block;
+		width: 7px;
+		height: 7px;
+		background: transparent;
+		border-radius: 100%;
+		box-shadow: #f86 -14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
+		animation: evo_helpdesk_widget_loader 5s infinite ease-in-out;
+		-ms-transform-origin: 50% 50%;
+		transform-origin: 50% 50%;
+	}
+}
+@keyframes evo_helpdesk_widget_loader {
+	0%     { box-shadow: #f86 -14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px; }
+	8.33%  { box-shadow: #f86 14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px; }
+	16.67% { box-shadow: #f86 14px 14px 0 7px, #fc6 14px 14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px; }
+	25%    { box-shadow: #f86 -14px 14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px 14px 0 7px, #4ae -14px 14px 0 7px; }
+	33.33% { box-shadow: #f86 -14px -14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae -14px -14px 0 7px; }
+	41.67% { box-shadow: #f86 14px -14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px; }
+	50%    { box-shadow: #f86 14px 14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px; }
+	58.33% { box-shadow: #f86 -14px 14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px; }
+	66.67% { box-shadow: #f86 -14px -14px 0 7px, #fc6 -14px -14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px; }
+	75%    { box-shadow: #f86 14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px -14px 0 7px, #4ae 14px -14px 0 7px; }
+	83.33% { box-shadow: #f86 14px 14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae 14px 14px 0 7px;}
+	91.67% { box-shadow: #f86 -14px 14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px; }
+	100%   { box-shadow: #f86 -14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px; }
+}
