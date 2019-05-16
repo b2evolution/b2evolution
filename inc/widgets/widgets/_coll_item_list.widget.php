@@ -136,9 +136,14 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_('Follow Main List'),
 					'note' => T_('Do you want to restrict to contents related to what is displayed in the main area?'),
 					'type' => 'radio',
-					'options' => array( array ('no', T_('No') ),
-										array ('tags', T_('By tags') ) ), // may be extended
+					'options' => array(
+							array( 'no', T_('No') ),
+							array( 'tags', T_('By any tag included in Main List (OR match)') ),
+							array( 'tags_and', T_('By all tags included in Main List (AND match)') ),
+							array( 'tags_order', T_('By priority to best match (OR match + ORDER BY highest number of matches)') ),
+						),
 					'defaultvalue' => 'no',
+					'field_lines' => true,
 				),
 				'blog_ID' => array(
 					'label' => T_('Collections'),
@@ -528,8 +533,8 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 
-		if( $this->disp_params['follow_mainlist'] == 'tags' )
-		{	// Restrict to Item tagged with some tag used in the Mainlist:
+		if( strpos( $this->disp_params['follow_mainlist'], 'tags' ) === 0 )
+		{	// Restrict to Item tagged with some or all tags used in the Mainlist:
 
 			if( ! isset($MainList) )
 			{	// Nothing to follow, don't display anything
@@ -543,6 +548,17 @@ class coll_item_list_Widget extends ComponentWidget
 			}
 
 			$filters['tags'] = implode( ',', $all_tags );
+			if( $this->disp_params['follow_mainlist'] == 'tags_and' )
+			{	// Filter posts which have all tags:
+				$filters['tags_operator'] = 'AND';
+			}
+			// else 'OR' operator by default
+
+			if( $this->disp_params['follow_mainlist'] == 'tags_order' )
+			{	// Order by highest number of matched tags:
+				$filters['orderby'] = 'matched_tags_num'.( empty( $filters['orderby'] ) ? '' : ','.$filters['orderby'] );
+				$filters['order'] = 'DESC'.( empty( $filters['order'] ) ? '' : ','.$filters['order'] );
+			}
 
 			if( !empty($Item) )
 			{	// Exclude current Item
