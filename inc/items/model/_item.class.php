@@ -8410,7 +8410,7 @@ class Item extends ItemLight
 			) );
 
 		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
-		$first_content_part = preg_replace( '/\[[a-z]+\]:[^\]]*\]/i', '', $first_content_part );
+		$first_content_part = preg_replace( '/\[[a-z]+:[^\]]*\]/i', '', $first_content_part );
 
 		return excerpt( $first_content_part, $maxlen, $tail );
 	}

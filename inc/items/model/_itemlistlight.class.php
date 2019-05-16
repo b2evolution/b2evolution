@@ -840,6 +840,7 @@ class ItemListLight extends DataObjectList2
 		{	// If categories table is not joined yet we should use it for column postcat_cat_ID
 			$this->ItemQuery->FROM_add( 'INNER JOIN T_postcats ON '.$this->Cache->dbIDname.' = postcat_post_ID' );
 		}
+		$this->ItemQuery->FROM_add( $this->ItemQuery->get_orderby_from() );
 		// Use the custom alias(probably "postcatsorders") of the table T_postcats if it is used in the FROM clause,
 		// and use default alias T_postcats if there is no defined alias:
 		$table_postcats_alias = empty( $match_postcats_alias[2] ) ? 'T_postcats' : $match_postcats_alias[2];
