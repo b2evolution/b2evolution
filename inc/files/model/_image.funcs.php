@@ -352,8 +352,8 @@ function check_thumbnail_sizes( $thumb_type, & $thumb_width, & $thumb_height, $s
 		return true;
 	}
 
-	if( $src_width <= $thumb_width && $src_height <= $thumb_height )
-	{ // If original image sizes are less than thumbnail sizes
+	if( $src_width <= $thumb_width || $src_height <= $thumb_height )
+	{ // If at least one of original image sizes(width or height) is less than thumbnail size
 		if( $thumb_type == 'fit' )
 		{ // There is no need to resample, use original!
 			return true;
