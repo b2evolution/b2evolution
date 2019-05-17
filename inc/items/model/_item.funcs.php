@@ -5704,6 +5704,12 @@ function item_row_order( $Item )
 		$order_cat_ID = $ItemList->filters['cat_single'];
 		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
 	}
+	elseif( isset( $ItemList, $ItemList->filters['cat_array'] ) &&
+	        count( $ItemList->filters['cat_array'] ) == 1 )
+	{	// Use order of single filtered category form multiple categories selection:
+		$order_cat_ID = $ItemList->filters['cat_array'][0];
+		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
+	}
 	else
 	{	// Use order of main category:
 		$order_cat_ID = NULL;
