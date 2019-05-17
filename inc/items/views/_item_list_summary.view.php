@@ -292,7 +292,7 @@ while( $Item = & $ItemList->get_item() )
 
 					echo $Item->get_history_link( array(
 							'class'     => button_class( $Item->has_proposed_change() ? 'small_text_warning' : 'small_text' ),
-							'link_text' => '$icon$ '.T_('History'),
+							'link_text' => '$icon$ '.T_('Changes'),
 						) );
 
 					if( $Blog->get_setting( 'allow_comments' ) != 'never' )

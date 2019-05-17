@@ -26,12 +26,6 @@ $Form = new Form( NULL, 'history', 'post', 'compact' );
 $Form->global_icon( T_('Cancel comparing!'), 'close', regenerate_url( 'action', 'action=history' ) );
 
 $Form->begin_form( 'fform', sprintf( T_('Difference between revisions for: %s'), $edited_Item->get_title() ) );
-
-$version_titles = array(
-		'proposed' => T_('Proposed change #%s as of %s by %s'),
-		'current'  => T_('Current version as of %s by %s'),
-		'archived' => T_('Archived version #%s as of %s by %s'),
-	);
 ?>
 <table border="0" width="100%" cellpadding="0" cellspacing="4" class="diff">
 	<col class="diff-marker" />

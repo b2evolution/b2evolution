@@ -2592,8 +2592,8 @@ switch( $action )
 		{
 			if( $edited_Item->ID > 0 )
 			{ // Display a link to history if Item exists in DB
-				$AdminUI->global_icon( T_('History'), '', $edited_Item->get_history_url(),
-					$edited_Item->history_info_icon().' '.T_('History'), 4, 3, array(
+				$AdminUI->global_icon( T_('Changes'), '', $edited_Item->get_history_url(),
+					$edited_Item->history_info_icon().' '.T_('Changes'), 4, 3, array(
 							'style' => 'margin-right: 3ex'
 					) );
 

@@ -5444,11 +5444,21 @@ function get_item_version_title( $Version )
 			break;
 	}
 
-	// A link to view the revision details:
-	$r .= ' (<a href="'.$admin_url.'?ctrl=items&amp;action=history_details&amp;p='.$Version->iver_itm_ID.'&amp;r='.$Version->iver_ID.'"'
+	if( $Version->iver_ID == 0 )
+	{	// A link to permanent URL of the Item:
+		$ItemCache = & get_ItemCache();
+		if( $version_Item = & $ItemCache->get_by_ID( $Version->iver_itm_ID, false, false ) )
+		{
+			$r .= ' ('.$version_Item->get_permanent_link( T_('View') ).')';
+		}
+	}
+	else
+	{	// A link to view the revision details:
+		$r .= ' (<a href="'.$admin_url.'?ctrl=items&amp;action=history_details&amp;p='.$Version->iver_itm_ID.'&amp;r='.$Version->iver_ID.'"'
 		.' title="'.format_to_output( T_('View this revision'), 'htmlattr' ).'">'
 			.T_('View')
 		.'</a>)';
+	}
 
 	return $r;
 }

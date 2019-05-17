@@ -1443,7 +1443,7 @@ class _core_Module extends Module
 						if( $perm_admin_restricted && ( $item_history_url = $menu_Item->get_history_url() ) )
 						{
 							$entries['page']['entries']['view_history'] = array(
-								'text' => T_('View History').'&hellip;',
+								'text' => T_('View Change History').'&hellip;',
 								'href' => $item_history_url,
 							);
 						}

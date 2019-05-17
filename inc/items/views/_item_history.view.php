@@ -78,7 +78,7 @@ $history_sql = $proposed_changes_SQL->get()
 	.' ORDER BY iver_type DESC, version_order ASC';
 $Results = new Results( $history_sql, 'iver_', $default_order, NULL, $revisions_count );
 
-$Results->title = T_('Item history for:').' '.$edited_Item->get_title();
+$Results->title = T_('Item Change history for:').' '.$edited_Item->get_title();
 
 if( $revisions_count > 1 )
 {	// Dispay the selectors to compare the revisions
