@@ -1177,7 +1177,8 @@ class ItemQuery extends SQL
 				$available_fields[ $order_i ] = 'postcatsorders.postcat_order';
 			}
 			// Join table of categories for field 'postcat_order':
-			$this->FROM_add( 'INNER JOIN T_postcats AS postcatsorders ON postcatsorders.postcat_post_ID = post_ID AND post_main_cat_ID = postcatsorders.postcat_cat_ID' );
+			$current_cat_ID = ( isset( $this->cat_array ) && count( $this->cat_array ) == 1 ? $DB->quote( $this->cat_array[0] ) : 'post_main_cat_ID' );
+			$this->FROM_add( 'INNER JOIN T_postcats AS postcatsorders ON postcatsorders.postcat_post_ID = post_ID AND '.$current_cat_ID.' = postcatsorders.postcat_cat_ID' );
 			// Replace field to real name:
 			$order_by = str_replace( 'order', 'postcatsorders.postcat_order', $order_by );
 		}
