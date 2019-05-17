@@ -2554,8 +2554,8 @@ class File extends DataObject
 			global $generate_srcset_sizes;
 			if( $generate_srcset_sizes && ! empty( $image_sizes ) )
 			{	// We want a responsive image with a srcset= and sizes=
-				$img_attribs['sizes'] = $image_sizes;
-				$img_attrib_srcset = $this->get_img_srcset( $image_sizes, $size_name, '&', $size_x );
+				$img_attribs['sizes'] = preg_replace_callback( '#(^|[\s,]+)(\d+px|xs|sm|md):\s*#', array( $this, 'callback_img_attrib_sizes' ), $image_sizes );
+				$img_attrib_srcset = $this->get_img_srcset( $img_attribs['sizes'], $size_name, '&', $size_x );
 				if( ! empty( $img_attrib_srcset ) )
 				{
 					$img_attribs['srcset'] = $img_attrib_srcset;
@@ -2589,6 +2589,32 @@ class File extends DataObject
 		}
 
 		return $img_attribs;
+	}
+
+
+	/**
+	 * Callback function to replace simplified sizes= attribute
+	 *
+	 * @param array Matches of regexp
+	 * @return string
+	 */
+	function callback_img_attrib_sizes( $m )
+	{
+		switch( $m[2] )
+		{
+			case 'xs':
+				$max_width_size = '767px';
+				break;
+			case 'sm':
+				$max_width_size = '991px';
+				break;
+			case 'md':
+				$max_width_size = '1199px';
+				break;
+			default:
+				$max_width_size = $m[2];
+		}
+		return $m[1].'(max-width: '.$max_width_size.') ';
 	}
 
 
