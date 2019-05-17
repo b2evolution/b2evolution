@@ -1089,7 +1089,7 @@ class ItemQuery extends SQL
 		$available_fields[] = 'status';
 		$available_fields[] = 'T_categories.cat_name';
 		$available_fields[] = 'T_categories.cat_order';
-		$available_fields[] = 'matched_tags_num';
+		$available_fields[] = 'matched_tags_num'; // This is a virtual column only for order, real post_matched_tags_num doesn't exist in DB
 
 		if( in_array( 'order', $orderby_array ) )
 		{	// If list is ordered by field 'order':
