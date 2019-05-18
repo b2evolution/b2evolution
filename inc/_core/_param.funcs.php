@@ -379,11 +379,12 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 							if( $type == 'array:filepath' || $type == 'array:array:filepath' )
 							{	// Special verifying for file path params:
 								// Format param to valid file path value:
-								$globals_var[$i][$j] = param_format( $var_value, 'filepath' );
-								if( ! is_safe_filepath( $globals_var[$i][$j] ) )
+								$var_value = param_format( $var_value, 'filepath' );
+								if( ( ! is_safe_filepath( $var_value ) ) || $var_value == '.' )
 								{	// We cannot accept this unsecure file path:
 									bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
 								}
+								$globals_var[$i][$j] = $var_value;
 							}
 							else
 							{	// Format param to valid string value:
@@ -2868,7 +2869,7 @@ function is_safe_filepath( $filepath )
 	}
 
 	do
-	{	// Decode file path while it is possible:
+	{	// Recursively decode file path as long as it is possible:
 		$orig_filepath = $filepath;
 		$filepath = urldecode( $filepath );
 
