@@ -30,8 +30,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 {
 	global $DB, $install_test_features, $installed_collection_info_pages;
 	// Handle all blog IDs which can go from function create_demo_contents()
-	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+	global $blog_minisite_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
 	global $demo_poll_ID;
+	$blog_minisite_ID = intval( $blog_minisite_ID );
 	$blog_home_ID = intval( $blog_home_ID );
 	$blog_a_ID = intval( $blog_a_ID );
 	$blog_b_ID = intval( $blog_b_ID );
@@ -89,8 +90,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Item in List */
 	$default_widgets['item_in_list'] = array(
 		array( 10, 'item_title' ),
-		array( 20, 'item_visibility_badge' ),
-		array( 30, 'item_info_line' ),
+		array( 20, 'coll_type' => '-manual', 'item_visibility_badge' ),
+		array( 30, 'coll_type' => '-manual', 'item_info_line' ),
+		array( 40, 'coll_type' => 'manual', 'item_content' ),
 	);
 
 	/* Item Single Header */
@@ -165,7 +167,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['comment_area'] = array(
 		array( 10, 'item_comment_form' ),
 		array( 20, 'item_comment_notification' ),
-		array( 30, 'item_comment_feed_link' ),
+		array( 30, 'coll_item_notification' ),
+		array( 40, 'coll_comment_notification' ),
+		array( 50, 'item_comment_feed_link' ),
 	);
 
 	/* Sidebar Single */
@@ -755,7 +759,8 @@ function insert_basic_widgets( $blog_id, $skin_type, $initial_install = false, $
 	global $DB, $install_test_features;
 
 	// Handle all blog IDs which can go from function create_demo_contents()
-	global $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+	global $blog_minisite_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
+	$blog_minisite_ID = intval( $blog_minisite_ID );
 	$blog_home_ID = intval( $blog_home_ID );
 	$blog_a_ID = intval( $blog_a_ID );
 	$blog_b_ID = intval( $blog_b_ID );

@@ -399,7 +399,7 @@ function echo_regional_js( $prefix, $region_visible )
 		return;
 	}
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	check_regional_required_fields();
@@ -538,7 +538,7 @@ function load_cities( country_ID, region_ID, subregion_ID )
 function echo_regional_required_js( $prefix )
 {
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=<?php echo $prefix; ?>city][value=required]' ).click( function ()
 {	// when city is required make subregion is required
 	set_subregion_required();

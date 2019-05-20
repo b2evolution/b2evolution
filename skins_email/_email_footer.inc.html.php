@@ -24,6 +24,22 @@ if( ! in_array( $params['template_name'], array( 'account_activate', 'account_ac
 {
 	// Add custom messages here
 }
+
+if( ! empty( $params['is_welcome_email'] ) )
+{	// If this is a welcome email campaign on newsletter subsribing:
+	// Add custom messages here
+}
+
+if( isset( $params['ecmp_ID'] ) && $params['ecmp_ID'] == 1 )
+{	// Email Campaign #1 is sending now:
+	// Add custom messages here
+}
+
+if( isset( $params['enlt_ID'] ) && $params['enlt_ID'] == 1 )
+{	// Newsletter/List #1 is sending now:
+	// Add custom messages here
+}
+
 ?>
 </div>
 </div>

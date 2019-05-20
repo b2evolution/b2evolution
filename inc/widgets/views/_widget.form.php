@@ -198,14 +198,14 @@ echo_fieldset_folding_js();
 // Print out JavaScript code which helps to edit widget form:
 if( $widget_javascript = $edited_ComponentWidget->get_edit_form_javascript() )
 {
-	echo "\n".'<script type="text/javascript">'.$widget_javascript.'</script>'."\n";
+	echo "\n".'<script>'.$widget_javascript.'</script>'."\n";
 }
 
 if( $display_mode == 'js' )
 {	// Reset previous and Initialize new bozo validator for each new opened widget edit form in popup window,
 	// because it is not applied for new created forms dynamically:
 ?>
-<script type="text/javascript">
+<script>
 if( typeof( bozo ) != 'undefined' )
 {
 	bozo.reset_changes();

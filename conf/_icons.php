@@ -550,6 +550,13 @@ function get_icon_info( $name )
 			'fa' => 'circle',
 			'color' => '#5bc0de'
 		);
+		case 'bullet_dark_blue': return array(
+			'alt' => '&bull;',
+			'size' => array( 9, 9 ),
+			'xy' => array( 32, 192 ),
+			'fa' => 'circle',
+			'color' => '#337ab7'
+		);
 		case 'bullet_cyan': return array(
 			'alt'  => '&bull;',
 			'size' => array( 9, 9 ),

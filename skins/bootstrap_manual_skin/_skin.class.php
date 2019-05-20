@@ -115,7 +115,6 @@ class bootstrap_manual_Skin extends Skin
 		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
 		return array(
 				'front_page_secondary_area' => NULL,
-				'item_in_list'              => NULL,
 				'item_single_header'        => NULL,
 				'chapter_main_area'         => array( NT_('Chapter Main Area'), 46 ),
 			);

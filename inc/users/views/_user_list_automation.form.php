@@ -71,7 +71,7 @@ $Form->button( array( '', 'actionArray[add_automation]', T_('Add selected users 
 
 $Form->end_form();
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '.modal-footer .btn-primary, #userlist_automation_details, #ffield_enlt_ID' ).addClass( 'hidden' );

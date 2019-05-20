@@ -54,7 +54,7 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New email address') : T_('Email a
 $Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 
 ?>
-<script type="text/javascript">
+<script>
 var email_status_icons = new Array;
 <?php
 $email_status_icons = emadr_get_status_icons();

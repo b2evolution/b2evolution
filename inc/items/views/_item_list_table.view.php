@@ -91,7 +91,7 @@ $postIDarray = $ItemList->get_page_ID_array();
 $ItemList->display( NULL, $result_fadeout );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery(document).ready( function()
 {
 	jQuery( '.item_order_edit' ).each( function()

@@ -30,12 +30,10 @@ $SQL->WHERE( $status_condition );
 $SQL->WHERE_and( 'LENGTH(TRIM(user_email)) > 0' );
 // check that user email is not blocked
 $SQL->WHERE_and( 'user_email NOT IN ( SELECT emadr_address FROM T_email__address WHERE '.get_mail_blocked_condition().' )' );
-// check that user has not yet received an inactive email notification
-$SQL->WHERE_and( 'last_sent.uset_value IS NULL' );
 // check if user wants to receive inactive reminder or not
 $SQL->WHERE_and( 'notif_setting.uset_value IS NULL OR notif_setting.uset_value <> '.$DB->quote( '0' ) );
 // check if user last seen timestamp exceeds threshold for inactive users
-$SQL->WHERE_and( 'TIMESTAMPDIFF( SECOND, IF( user_lastseen_ts IS NULL, user_created_datetime, user_lastseen_ts ), '.$DB->quote( date2mysql( $servertimenow ) ).' ) > '.$inactive_account_threshold );
+$SQL->WHERE_and( 'TIMESTAMPDIFF( SECOND, GREATEST( user_created_datetime, IFNULL( user_lastseen_ts, 0 ), IFNULL( last_sent.uset_value, 0 ) ), '.$DB->quote( date2mysql( $servertimenow ) ).' ) > '.$inactive_account_threshold );
 
 $UserCache = & get_UserCache();
 $UserCache->clear();
@@ -45,6 +43,6 @@ $UserCache->load_by_sql( $SQL );
 // Send inactive reminder to every user loaded into the UserCache ( there are only not activated users )
 $reminder_sent = send_inactive_user_emails( $UserCache->get_ID_array(), NULL, 'cron_job' );
 
-cron_log_append( ( empty( $result_message ) ? '' : "\n" ).sprintf( T_( '%d account inactive reminder emails were sent!' ), $reminder_sent ) );
+cron_log_append( ( empty( $result_message ) ? '' : "\n" ).sprintf( T_( '%d of %d account inactive reminder emails were sent!' ), $reminder_sent, count( $UserCache->get_ID_array() ) ) );
 return 1; /* ok */
 ?>

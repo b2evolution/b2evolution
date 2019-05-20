@@ -65,9 +65,9 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title>b2evolution - Default Page</title>
-		<script type="text/javascript" src="rsc/js/jquery.min.js"></script>
+		<script src="rsc/js/jquery.min.js"></script>
 		<!-- Bootstrap -->
-		<script type="text/javascript" src="rsc/js/bootstrap/bootstrap.min.js"></script>
+		<script src="rsc/js/bootstrap/bootstrap.min.js"></script>
 		<link href="rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
 		<link href="rsc/build/bootstrap-b2evo_base.bmin.css" rel="stylesheet">
 		<link href="rsc/build/b2evo_helper_screens.css" rel="stylesheet">

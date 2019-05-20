@@ -339,7 +339,16 @@ function skin_init( $disp )
 			if( !empty($active_filters) )
 			{	// The current page is being filtered...
 
-				if( array_diff( $active_filters, array( 'page' ) ) == array() )
+				if( array_diff( $active_filters, array( 'posts' ) ) == array() )
+				{	// This is the default blog page only if the 'front_disp' is set to 'posts'
+					$disp_detail = 'posts-default';
+					$seo_page_type = 'Default page';
+					if( $Blog->get_setting( 'default_noindex' ) )
+					{	// We prefer robots not to index archive pages:
+						$robots_index = false;
+					}
+				}
+				elseif( array_diff( $active_filters, array( 'posts', 'page' ) ) == array() )
 				{ // This is just a follow "paged" page
 					$disp_detail = 'posts-next';
 					$seo_page_type = 'Next page';
@@ -359,14 +368,14 @@ function skin_init( $disp )
 
 					global $cat, $catsel;
 
-					$ChapterCache = & get_ChapterCache();
-					$Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
-
 					if( empty( $catsel ) && preg_match( '~^[0-9]+$~', $cat ) )
 					{	// We are on a single cat page:
 						// NOTE: we must have selected EXACTLY ONE CATEGORY through the cat parameter
 						// BUT: - this can resolve to including children
 						//      - selecting exactly one cat through catsel[] is NOT OK since not equivalent (will exclude children)
+
+						$ChapterCache = & get_ChapterCache();
+						$Chapter = & $ChapterCache->get_by_ID( $cat, false, false );
 
 						// echo 'SINGLE CAT PAGE';
 						$disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
@@ -406,14 +415,14 @@ function skin_init( $disp )
 						{ // Category is set and post navigation should go through the same category, set navigation target param
 							$MainList->nav_target = $cat;
 						}
-					}
 
-					if( empty( $Chapter ) )
-					{	// If the requested chapter was not found display 404 page:
-						$Messages->add( T_('The requested chapter was not found') );
-						global $disp;
-						$disp = '404';
-						break;
+						if( empty( $Chapter ) )
+						{	// If the requested chapter was not found display 404 page:
+							$Messages->add( T_('The requested chapter was not found') );
+							global $disp;
+							$disp = '404';
+							break;
+						}
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )

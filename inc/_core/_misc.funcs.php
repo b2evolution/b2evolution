@@ -3382,7 +3382,7 @@ function debug_info( $force = false, $force_clean = false )
 			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
 			require_js( 'jquery/jquery.tablesorter.min.js', $relative_to, true, true );
 			echo '
-			<script type="text/javascript">
+			<script>
 			(function($){
 				var clicked_once;
 				jQuery("table.debug_timer th").click( function(event) {
@@ -3764,6 +3764,53 @@ function user_get_notification_sender( $user_ID, $setting )
 
 
 /**
+ * Check if current executing cron job should be stopped because of email sending limit
+ *
+ * 1. THIS MUST BE CALLED ONLY FROM INSIDE THE MAIN LOOP of the cronjob (*.job.php), not from within a generic function.
+ * 2. THE GOAL is to NOT overload the sending  mail server by creating a PAUSE afer (approximately) the pax number of email to send in a chunk
+ * 2B. The goal is that the next execution of the cron job will continue sending emails where the current job has left off.
+ * 2C. The goal is NOT to miss sending notifications by generating send errors!
+ * 3. Counter increase must be done SEPARATELY when an email is sent.
+ *
+ * @return boolean TRUE if cron job execution can continue, FALSE - when max emails was reached
+ */
+function check_cron_job_emails_limit()
+{
+	global $Settings, $executing_cron_task_key;
+
+	if( ! isset( $executing_cron_task_key ) )
+	{	// Don't stop because it is a not cron job execution:
+		return true;
+	}
+
+	// Get max number of emails for current cron job:
+	$current_cron_job_emails_limit = intval( $Settings->get( 'cjob_maxemail_'.$executing_cron_task_key ) );
+
+	if( $current_cron_job_emails_limit > 0 )
+	{	// If current cron job has a limit for sending of emails:
+		global $executing_cron_task_emails_count;
+		if( $executing_cron_task_emails_count >= $current_cron_job_emails_limit )
+		{	// The limit was reached:
+			global $executing_cron_task_emails_reached, $mail_log_message;
+			$mail_log_message = 'Stopping execution because max number of emails ('.$current_cron_job_emails_limit.') has been sent.';
+			if( empty( $executing_cron_task_emails_reached ) )
+			{	// Append warning to cron log only if max emails is not reached yet:
+				cron_log_append( $mail_log_message."\n", 'warning' );
+				// Set flag to don't show the above warning twice:
+				$executing_cron_task_emails_reached = true;
+			}
+			// Stop current job execution:
+			return false;
+		}
+
+	}
+
+	// Allow to continue current cron job execution:
+	return true;
+}
+
+
+/**
  * Sends an email, wrapping PHP's mail() function.
  * ALL emails sent by b2evolution must be sent through this function (for consistency and for logging)
  *
@@ -3792,7 +3839,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	global $servertimenow, $email_send_simulate_only;
 
 	/**
-	 * @var string|NULL This global var stores ID of the last mail log message
+	 * @var string|NULL This global var stores a last mail log message
 	 */
 	global $mail_log_message;
 	$mail_log_message = NULL;
@@ -3948,9 +3995,13 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		$send_mail_result = true;
 	}
 	else
-	{	// Send email message on real mode:
+	{	// If real mode
+		// Send email message:
 		$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
 	}
+
+// HERE: increase_mail_send_counter();  THIS MUST NOT STOP execution here!
+
 
 	if( ! $send_mail_result )
 	{	// The message has not been sent successfully
@@ -3994,7 +4045,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 	global $UserSettings, $Settings, $current_charset;
 
 	/**
-	 * @var string|NULL This global var stores ID of the last mail log message
+	 * @var string|NULL This global var stores a last mail log message
 	 */
 	global $mail_log_message;
 	$mail_log_message = NULL;
@@ -4018,6 +4069,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 		switch( $template_name )
 		{
 			case 'account_activate':
+			case 'account_delete_warning':
 				if( $Settings->get( 'validation_process' ) == 'easy' && !$template_params['is_reminder'] )
 				{ // this is not a notification email
 					break;
@@ -4048,6 +4100,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'posts_stale_alert':
 				// 'send_pst_stale_alert' - "there are stale posts and I have permission to moderate them."
 			case 'account_activate':
+			case 'account_delete_warning':
 				// 'send_activation_reminder' - "my account was deactivated or is not activated for more than X seconds."(X - $Settings->get( 'activate_account_reminder_threshold' ))
 			case 'account_inactive':
 				// 'send_inactive_reminder' - "my account has been inactive for more than X months."(X - $Settings->get( 'inactive_account_reminder_threshold' ))
@@ -4161,7 +4214,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $template_name, $template_params = array(), $force_on_non_activated = false, $headers = array(), $force_email_address = '' )
 {
 	/**
-	 * @var string|NULL This global var stores ID of the last mail log message
+	 * @var string|NULL This global var stores a last mail log message
 	 */
 	global $mail_log_message;
 	$mail_log_message = NULL;
@@ -4275,7 +4328,7 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 				$UserSettings->dbupdate();
 			}
 		}
-		$newsletter_ID = isset( $params['newsletter'] ) ? $params['newsletter'] : '';
+		$newsletter_ID = isset( $params['enlt_ID'] ) ? $params['enlt_ID'] : '';
 	}
 	else
 	{	// Get data of anonymous user:
@@ -6247,7 +6300,7 @@ function send_javascript_message( $methods = array(), $send_as_html = false, $ta
 		{	// Send headers only when they are not send yet to avoid an error:
 			headers_content_mightcache( 'text/html', 0 );		// Do NOT cache interactive communications.
 		}
-		echo '<html><head></head><body><script type="text/javascript">'."\n";
+		echo '<html><head></head><body><script>'."\n";
 		echo $output;
 		echo '</script></body></html>';
 	}
@@ -7588,7 +7641,7 @@ function echo_editable_column_js( $params = array() )
 	if( $params['print_init_tags'] )
 	{
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 <?php
@@ -7786,7 +7839,7 @@ function echo_modalwindow_js()
 function echo_modalwindow_js_bootstrap()
 {
 	// Initialize variables for the file "bootstrap-evo_modal_window.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_close = \''.TS_('Close').'\'
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_edit_image = \''.TS_('Insert or edit inline image').'\';
@@ -7803,7 +7856,7 @@ function echo_modalwindow_js_bootstrap()
  */
 function echo_whois_js_bootstrap()
 {
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_close = \''.TS_('Close').'\';
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_whois_title = \''.TS_('Querying WHOIS server...').'\';
@@ -7912,7 +7965,7 @@ function echo_fieldset_folding_js()
 	}
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).on( 'click', 'span[id^=icon_folding_], span[id^=title_folding_]', function()
 {
 	var is_icon = jQuery( this ).attr( 'id' ).match( /^icon_folding_/ );
@@ -8081,7 +8134,7 @@ function echo_form_dropdown_js()
 	}
 	$tooltip_titles_js_array = implode( ', ', $tooltip_titles_js_array );
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
 {
 	var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};

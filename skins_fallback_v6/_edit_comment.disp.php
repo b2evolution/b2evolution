@@ -123,7 +123,7 @@ $Form->begin_form( 'evo_comment' );
 	$Form->inputend = $form_inputend;
 
 	// set b2evoCanvas for plugins
-	echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
+	echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields[ 'content' ].'" );</script>';
 
 
 	// Display renderers checkboxes ( Note: This contains inputs )
@@ -153,7 +153,7 @@ $Form->begin_form( 'evo_comment' );
 $Form->end_form();
 
 ?>
-<script type="text/javascript">
+<script>
 	function switch_edit_view()
 	{
 		var form = document.getElementById('comment_edit');

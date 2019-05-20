@@ -1637,7 +1637,7 @@ if( $mode != 'modal' )
 // Display reload-icon in the opener window if we're a popup in the same CWD and the
 // Filemanager content differs.
 ?>
-<script type="text/javascript">
+<script>
 	<!--
 	if( opener
 			&& opener.document.FilesForm

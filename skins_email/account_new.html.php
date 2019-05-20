@@ -79,7 +79,7 @@ if( ! empty( $params['initial_hit'] ) )
 { // Hit info
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Session ID').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $admin_url.'?ctrl=stats&tab=hits&blog=0&sess_ID='.$params['initial_hit']->hit_sess_ID, $params['initial_hit']->hit_sess_ID, '.a' ).'</td></tr>'."\n";
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $params['initial_hit']->hit_referer, '', '.a' ).'</td></tr>'."\n";
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".$params['initial_hit']->hit_uri.'</td></tr>'."\n";
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$params['initial_hit']->hit_coll_ID." - ".get_link_tag( get_hit_full_url( $params['initial_hit']->hit_uri, $params['initial_hit']->hit_coll_ID ), $params['initial_hit']->hit_uri, '.a', 60 ).'</td></tr>'."\n";
 }
 
 if( $params['gender'] == 'M' )

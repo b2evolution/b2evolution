@@ -1376,15 +1376,6 @@ class ItemLight extends DataObject
 				'title_override'  => $this->get( 'title' ),
 			), $params );
 
-		// Set post navigation target
-		$nav_target = ( ( $params['nav_target'] === NULL ) && isset($MainList) && !empty( $MainList->nav_target ) ) ? $MainList->nav_target : $params['nav_target'];
-
-		$blogurl = '';
-		if( !empty($Blog) && $this->check_cross_post_nav( $params['target_blog'], $Blog->ID ) )
-		{
-			$blogurl = $Blog->gen_blogurl();
-		}
-
 		$title_fields = explode( ',', $params['title_field'] );
 		foreach( $title_fields as $title_field )
 		{
@@ -1408,6 +1399,14 @@ class ItemLight extends DataObject
 		if( empty( $title ) )
 		{
 			return;
+		}
+
+		$blogurl = '';
+		if( ! empty( $Blog ) &&
+		    in_array( $params['link_type'], array( '#', 'permalink' ) ) &&
+		    $this->check_cross_post_nav( $params['target_blog'], $Blog->ID ) )
+		{	// Get collection URL only when it is required:
+			$blogurl = $Blog->gen_blogurl();
 		}
 
 		if( $params['link_type'] == '#' )
@@ -1457,8 +1456,9 @@ class ItemLight extends DataObject
 			default:
 		}
 
-		if( !empty( $url ) )
+		if( ! empty( $url ) )
 		{ // url is set, also add navigation param if it is necessary
+			$nav_target = ( $params['nav_target'] === NULL && isset( $MainList ) && ! empty( $MainList->nav_target ) ) ? $MainList->nav_target : $params['nav_target'];
 			$url = $this->add_navigation_param( $url, $params['post_navigation'], $nav_target );
 		}
 

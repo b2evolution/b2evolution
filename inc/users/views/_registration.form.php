@@ -223,14 +223,10 @@ $Form->begin_fieldset( T_('Security options').get_manual_link('registration-secu
 	}
 	$Form->checkbox_input( 'js_passwd_hashing', (bool)$Settings->get('js_passwd_hashing'), T_('Password hashing during Login'), array( 'note' => T_('Check to enable the login form to hash the password with Javascript before transmitting it. This provides extra security on non-SSL connections.').$plugins_note ) );
 
-	$Form->checkbox_input( 'http_auth_require', $Settings->get( 'http_auth_require' ), T_('HTTP Authentication'), array( 'note' => T_( 'Check this to require HTTP basic authentication on any login page.' ) ) );
-
-	$http_auth_accept_params = array( 'note' => T_( 'Check this to accept HTTP authentication headers (with any request when user is not already logged in).' ) );
-	if( $Settings->get( 'http_auth_require' ) )
-	{
-		$http_auth_accept_params['disabled'] = 'disabled';
-	}
-	$Form->checkbox_input( 'http_auth_accept', $Settings->get( 'http_auth_accept' ), '', $http_auth_accept_params );
+	$Form->checklist( array(
+			array( 'http_auth_require', 1, T_('Check this to require HTTP basic authentication on any login page.'), $Settings->get( 'http_auth_require' ) ),
+			array( 'http_auth_accept', 1, T_('Check this to accept HTTP authentication headers (with any request when user is not already logged in).'), $Settings->get( 'http_auth_accept' ), $Settings->get( 'http_auth_require' ) ),
+		), 'http_auth', T_('HTTP Authentication') );
 
 	$Form->text_input( 'user_minpwdlen', (int)$Settings->get('user_minpwdlen'), 2, T_('Minimum password length'), T_('characters.'), array( 'maxlength'=>2, 'required'=>true ) );
 
@@ -248,7 +244,7 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=newusers_canregister]' ).click( function()
 {
 	if( jQuery( this ).val() == 'yes' )

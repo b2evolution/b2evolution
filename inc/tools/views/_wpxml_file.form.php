@@ -184,7 +184,7 @@ if( $import_perm_view )
 	echo_modalwindow_js();
 }
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '.table_scroll td' ).click( function()
 {
 	jQuery( this ).parent().find( 'input[type=radio]' ).attr( 'checked', 'checked' );

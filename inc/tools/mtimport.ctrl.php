@@ -88,7 +88,7 @@ if( is_file( $adminskins_path.'legacy/rsc/css/custom.css' ) )
 	$head .= '<link href="'.$adminskins_url.'legacy/rsc/css/custom.css" rel="alternate stylesheet" type="text/css" title="Custom" />';
 }
 $head .= <<<EOB
-<script type="text/javascript" src="{$rsc_url}js/styleswitcher.js?v=2"></script>
+<script src="{$rsc_url}js/styleswitcher.js?v=2"></script>
 </head>
 <body>
 <div id="header">

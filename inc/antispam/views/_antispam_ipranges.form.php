@@ -175,7 +175,7 @@ if( $edited_IPRange->ID > 0 )
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#delete_iprange_conflicts' ).click( function()

@@ -4500,6 +4500,42 @@ class Plugin
 		global $app_version_long;
 		require_js( $this->get_plugin_url().$js_file, 'relative', false, false, $this->version.'+'.$app_version_long );
 	}
+
+
+	/**
+	 * Get value of setting with format "checklist" which values are stored as array
+	 *
+	 * @param string Group name
+	 * @param string Setting name
+	 * @param string Setting type: 'default', 'coll', 'msg', 'email', 'shared'
+	 * @return boolean
+	 */
+	function get_checklist_setting( $group_name, $setting_name, $setting_type = 'default', $object = NULL )
+	{
+		switch( $setting_type )
+		{
+			case 'coll':
+				$group_array = $this->get_coll_setting( $group_name, $object );
+				break;
+
+			case 'msg':
+				$group_array = $this->get_msg_setting( $group_name );
+				break;
+
+			case 'email':
+				$group_array = $this->get_email_setting( $group_name );
+				break;
+
+			case 'shared':
+				$group_array = $this->get_shared_setting( $group_name );
+				break;
+
+			default:
+				$group_array = $this->Settings->get( $group_name );
+		}
+
+		return isset( $group_array[ $setting_name ] ) ? $group_array[ $setting_name ] : NULL;
+	}
 }
 
 ?>

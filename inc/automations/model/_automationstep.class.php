@@ -93,11 +93,12 @@ class AutomationStep extends DataObject
 	/**
 	 * Insert object into DB based on previously recorded changes.
 	 *
+	 * @param boolean TRUE to check if step can be inserted e.g. when automation is not paused
 	 * @return boolean true on success
 	 */
-	function dbinsert()
+	function dbinsert( $check_restriction = true )
 	{
-		if( ! $this->can_be_modified() )
+		if( $check_restriction && ! $this->can_be_modified() )
 		{	// If this step cannnot be modified
 			return false;
 		}
@@ -177,7 +178,9 @@ class AutomationStep extends DataObject
 		if( ! $this->can_be_modified() && ! param( 'confirm_pause', 'integer' ) )
 		{	// Don't allow to edit step of active automation without confirmation:
 			global $Messages;
-			$Messages->add( T_('You must pause the automation before creating it.'), 'error' );
+			$Messages->add( empty( $this->ID )
+				? T_('You must pause the automation before creating new step.')
+				: T_('You must pause the automation before changing step.'), 'error' );
 		}
 
 		// Order:
@@ -267,6 +270,13 @@ class AutomationStep extends DataObject
 				param( 'step_automation', 'integer', true );
 				param_check_not_empty( 'step_automation', T_('Please select an automation.') );
 				$this->set( 'info', get_param( 'step_automation' ) );
+				break;
+
+			case 'user_status':
+				// Change user account status:
+				param( 'user_status', 'string', true );
+				param_check_not_empty( 'user_status', /* Do NOT translate because this error is impossible for normal form */'Please select an account status.' );
+				$this->set( 'info', get_param( 'user_status' ) );
 				break;
 
 			default:
@@ -595,8 +605,8 @@ class AutomationStep extends DataObject
 						) );
 
 					$email_template_params = array(
-						'message_html' => str_replace( '$login$', $step_user_login_html, $notification_message ),
-						'message_text' => nl2br( str_replace( '$login$', $step_User->get( 'login' ), $notification_message ) ),
+						'message_html' => nl2br( str_replace( '$login$', $step_user_login_html, $notification_message ) ),
+						'message_text' => str_replace( '$login$', $step_User->get( 'login' ), $notification_message ),
 					);
 
 					if( send_mail_to_User( $owner_User->ID, sprintf( T_('Notification of automation %s'), '"'.$Automation->get( 'name' ).'"' ), 'automation_owner_notification', $email_template_params ) )
@@ -658,10 +668,16 @@ class AutomationStep extends DataObject
 						if( $this->get( 'type' ) == 'subscribe' )
 						{	// Subscribe:
 							$affected_subscriprions_num = $step_User->subscribe( $Newsletter->ID );
+
+							// Send notification to owners of lists where user was subscribed:
+							$step_User->send_list_owner_notifications( 'subscribe' );
 						}
 						else
 						{	// Unsubscribe:
 							$affected_subscriprions_num = $step_User->unsubscribe( $Newsletter->ID );
+
+							// Send notification to owners of lists where user was unsubscribed:
+							$step_User->send_list_owner_notifications( 'unsubscribe' );
 						}
 						$step_result = ( $affected_subscriprions_num ? 'YES' : 'NO' );
 						// Display newsletter name in log:
@@ -692,6 +708,44 @@ class AutomationStep extends DataObject
 					{	// If List/Newsletter does not exist:
 						$step_result = 'ERROR';
 						$additional_result_message = 'Automation #'.$this->get( 'info' ).' is not found in DB.';
+					}
+					break;
+
+				case 'user_status':
+					// Change user account status:
+					$current_status = $step_User->get( 'status' );
+					$new_status = $this->get( 'info' );
+					if( $step_User->ID == 1 )
+					{	// Don't allow to change status of the Admin user:
+						$step_result = 'ERROR';
+						$additional_result_message = 'Status of admin user account cannot be changed';
+					}
+					elseif( $current_status == $new_status )
+					{	// If step User's account is already in the desired status:
+						$step_result = 'NO';
+						// Display status title in log:
+						$user_statuses = get_user_statuses();
+						$additional_result_message = ( isset( $user_statuses[ $new_status ] ) ? $user_statuses[ $new_status ] : $new_status );
+					}
+					elseif( $current_status == 'closed' )
+					{	// Don't allow to change a closed status:
+						$step_result = 'ERROR';
+						$additional_result_message = 'The closed user account cannot be changed to any other status';
+					}
+					else
+					{	// Change user account to another status:
+						$step_User->set( 'status', $new_status );
+						if( $step_User->dbupdate() )
+						{	// Successful user updating:
+							$step_result = 'YES';
+							// Display status title in log:
+							$user_statuses = get_user_statuses();
+							$additional_result_message = ( isset( $user_statuses[ $new_status ] ) ? $user_statuses[ $new_status ] : $new_status );
+						}
+						else
+						{	// Unknown error on user updating:
+							$step_result = 'ERROR';
+						}
 					}
 					break;
 
@@ -1264,6 +1318,14 @@ class AutomationStep extends DataObject
 				if( $Automation = & $AutomationCache->get_by_ID( $this->get( 'info' ), false, false ) )
 				{	// Use name of Automation:
 					$label = $Automation->get( 'name' );
+				}
+				break;
+
+			case 'user_status':
+				$user_statuses = get_user_statuses();
+				if( isset( $user_statuses[ $this->get( 'info' ) ] ) )
+				{	// Get status title from status key:
+					$label = $user_statuses[ $this->get( 'info' ) ];
 				}
 				break;
 

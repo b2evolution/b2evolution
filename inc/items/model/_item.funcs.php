@@ -1257,7 +1257,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	if( isset( $blog ) && get_allow_cross_posting() )
 	{
 		?>
-		<script type="text/javascript">
+		<script>
 		jQuery.getScript( '<?php echo get_require_url( '#scrollto#' );?>', function() {
 				jQuery( "[id=itemform_categories]" ).scrollTo( "#catselect_blog<?php echo $blog;?>" );
 			} );
@@ -1407,8 +1407,6 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 
 	$ChapterCache = & get_ChapterCache();
 	$thisChapter = $ChapterCache->get_by_ID($cat_ID);
-
-	$Blog = $thisChapter->get_blog();
 
 	if( $thisChapter->lock && !$current_User->check_perm( 'blog_cats', '', false, $current_blog_ID ) )
 	{	// This chapter is locked and current user has no permission to edit the categories of this blog
@@ -2208,7 +2206,7 @@ function echo_item_status_buttons( $Form, $edited_Item, $button_action = NULL )
 function echo_link_files_js()
 {
 	?>
-	<script type="text/javascript">
+	<script>
 		jQuery( '#title_file_add' ).click( function()
 		{
 			jQuery( '#itemform_createlinks input[name="actionArray[create_edit]"]' ).click();
@@ -2238,7 +2236,7 @@ function echo_publishnowbutton_js()
 	$button_titles_js_array = implode( ', ', $button_titles_js_array );
 
 	?>
-	<script type="text/javascript">
+	<script>
 		function update_post_status_buttons( status, update_title )
 		{
 			var item_save_btn_titles = {<?php echo $button_titles_js_array ?>};
@@ -2290,7 +2288,7 @@ function echo_status_dropdown_button_js( $type = 'post' )
 	$tooltip_titles_js_array = implode( ', ', $tooltip_titles_js_array );
 
 	?>
-	<script type="text/javascript">
+	<script>
 		jQuery( '.<?php echo $type; ?>_status_dropdown li a' ).click( function()
 		{
 			var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};
@@ -2343,7 +2341,7 @@ function echo_status_dropdown_button_js( $type = 'post' )
 function echo_item_content_position_js( $height, $scroll_position )
 {
 ?>
-	<script type="text/javascript">
+	<script>
 	// Send current height and scroll position of the item content field to the submitting form:
 	jQuery( '[name="actionArray[update_edit]"]' ).click( function()
 	{
@@ -2417,7 +2415,7 @@ function echo_item_merge_js()
 	// Initialize JavaScript to build and open window:
 	echo_modalwindow_js();
 ?>
-<script type="text/javascript">
+<script>
 function evo_merge_load_window( item_ID )
 {
 	if( typeof( bozo ) && bozo.nb_changes > 0 )
@@ -2858,7 +2856,7 @@ function echo_autocomplete_tags( $params = array() )
 			'update_by_ajax' => false,
 		), $params );
 ?>
-	<script type="text/javascript">
+	<script>
 	function init_autocomplete_tags( selector )
 	{
 		var tags = jQuery( selector ).val();
@@ -3326,7 +3324,7 @@ function check_categories_nosave( & $post_category, & $post_extracats, $Item = N
 function echo_onchange_newcat()
 {
 ?>
-	<script type="text/javascript">
+	<script>
 		jQuery( '#new_category_name' ).keypress( function()
 		{
 			var newcategory_radio = jQuery( '#sel_maincat_new' );
@@ -3347,7 +3345,7 @@ function echo_onchange_goal_cat()
 {
 	global $blog;
 ?>
-	<script type="text/javascript">
+	<script>
 		jQuery( '#goal_cat_ID' ).change( function()
 		{
 			jQuery( '#goal_ID' ).next().find( 'img' ).show();
@@ -3376,7 +3374,7 @@ function echo_onchange_goal_cat()
 function echo_slug_filler()
 {
 ?>
-	<script type="text/javascript">
+	<script>
 		var slug_changed = false;
 		jQuery( '#post_title' ).keyup( function()
 		{
@@ -3402,7 +3400,7 @@ function echo_slug_filler()
 function echo_set_slug_changed()
 {
 ?>
-	<script type="text/javascript">
+	<script>
 		jQuery( '[name=slug_changed]' ).val( 1 );
 	</script>
 <?php
@@ -3417,7 +3415,7 @@ function echo_set_slug_changed()
 function echo_show_comments_changed( $comment_type )
 {
 ?>
-	<script type="text/javascript">
+	<script>
 		jQuery( '[name ^= show_comments]' ).change( function()
 		{
 			var item_id = jQuery('#comments_container').attr('value');
@@ -4314,7 +4312,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 	if( $parent_Item )
 	{	// JS to refresh custom field values from parent post custom fields:
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'a[data-child-input-id]' ).click( function()
 {	// Update custom field value with value from parent post:
 	var child_field_obj = jQuery( '[name=' + jQuery( this ).data( 'child-input-id' ) + '][type!=hidden]' );
@@ -4613,7 +4611,7 @@ function echo_image_insert_modal()
 	// Initialize JavaScript to build and open window:
 	echo_modalwindow_js();
 ?>
-<script type="text/javascript">
+<script>
 	function evo_item_image_insert( blog, tagType, linkID )
 	{
 		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
@@ -4779,7 +4777,7 @@ function items_manual_results_block( $params = array() )
 	$Table->global_icon( T_('Add new chapter...'), 'add', $admin_url.'?ctrl=chapters&amp;action=new&amp;blog='.$blog.$redirect_page, ' '.T_('Add top level chapter').' &raquo;', 3, 4 );
 
 	$Table->cols[] = array(
-							'th' => T_('Name'),
+							'th' => T_('Title'),
 						);
 	$Table->cols[] = array(
 							'th' => T_('Image'),
@@ -5762,10 +5760,10 @@ function item_row_order( $Item )
 {
 	global $current_User, $ItemList;
 
-	if( isset( $ItemList, $ItemList->filters['cat_array'] ) &&
-	    count ( $ItemList->filters['cat_array'] ) == 1 )
+	if( isset( $ItemList, $ItemList->filters['cat_single'] ) &&
+	    ! empty( $ItemList->filters['cat_single'] ) )
 	{	// Use order of single filtered category:
-		$order_cat_ID = $ItemList->filters['cat_array'][0];
+		$order_cat_ID = $ItemList->filters['cat_single'];
 		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
 	}
 	else
@@ -6030,7 +6028,7 @@ function manual_display_post_row( $Item, $level, $params = array() )
 	}
 	$r .= $params['title_before']
 			.$item_icon.' '
-			.$Item->dget('title')
+			.$Item->get_title( array( 'title_field' => 'short_title,title', 'link_type' => 'none' ) )
 			.$params['title_after'];
 	$r .= !empty( $item_edit_url ) ? '</a>' : '';
 	$r .= '</strong></td>';

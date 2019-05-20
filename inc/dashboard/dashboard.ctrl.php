@@ -33,6 +33,17 @@ if( empty( $_GET['blog'] ) )
 	unset( $Blog, $Collection );
 }
 
+param_action();
+
+if( $action == 'new_demo_content' )
+{	// Update site skins setting ahead of rendering so that the menu will display correctly:
+	global $Settings;
+
+	$demo_content_type = param( 'demo_content_type', 'string', NULL );
+	$Settings->set( 'site_skins_enabled', $demo_content_type != 'minisite' );
+	$Settings->dbupdate();
+}
+
 // Site dashboard
 $AdminUI->set_path( 'site', 'dashboard' );
 
@@ -78,11 +89,26 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 $collection_count = get_table_count( 'T_blogs' );
-if( $current_User->check_perm( 'blogs', 'create' ) && $collection_count  === 0 )
+if( $action == 'new_demo_content' )
+{	// Execute action inside template to display a process in real time
+
+	// Check that this action request is not a CSRF hacked request:
+	$Session->assert_received_crumb( 'demo_content' );
+
+	$block_item_Widget = new Widget( 'block_item' );
+
+	$block_item_Widget->title = T_('Demo content').':';
+	$block_item_Widget->disp_template_replaced( 'block_start' );
+
+	load_funcs( 'collections/_demo_content.funcs.php' );
+	$collection_count = install_demo_content();
+
+	$block_item_Widget->disp_template_raw( 'block_end' );
+}
+if( $current_User->check_perm( 'blogs', 'create' ) && $collection_count === 0 )
 {
 	// Display welcome panel:
 	$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
-	$AdminUI->disp_payload_end();
 }
 
 // Display blog list VIEW:
@@ -129,7 +155,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	// Blogs
 	$chart_data[] = array(
-			'title' => T_('Blogs'),
+			'title' => T_('Collections'),
 			'value' => $collection_count,
 			'type'  => 'number',
 		);
@@ -174,6 +200,30 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 			'title' => T_('Messages'),
 			'value' => get_table_count( 'T_messaging__message' ),
 			'type'  => 'number',
+		);
+
+	// Email Lists
+	$chart_data[] = array(
+			'title' => T_('Email Lists'),
+			'value' => get_table_count( 'T_email__newsletter' ),
+			'type'  => 'number',
+			'max'   => 20,
+		);
+
+	// Campaigns
+	$chart_data[] = array(
+			'title' => T_('Campaigns'),
+			'value' => get_table_count( 'T_email__campaign' ),
+			'type'  => 'number',
+			'max'   => 10000,
+		);
+
+	// Automations
+	$chart_data[] = array(
+			'title' => T_('Automations'),
+			'value' => get_table_count( 'T_automation__automation' ),
+			'type'  => 'number',
+			'max'   => 20,
 		);
 
 	$stat_item_Widget = new Widget( 'block_item' );
@@ -253,7 +303,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 if( ! empty( $chart_data ) )
 { // JavaScript to initialize charts
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'document' ).ready( function()
 {
 	var chart_params = {

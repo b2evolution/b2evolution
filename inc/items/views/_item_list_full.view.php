@@ -163,12 +163,6 @@ while( $Item = & $ItemList->get_item() )
 					echo '&nbsp;'.action_icon( T_('Edit slugs').'...', 'edit', $admin_url.'?ctrl=slugs&amp;slug_item_ID='.$Item->ID,
 						NULL, NULL, NULL, array( 'class' => 'small' ) );
 				}
-				$order_cat_ID = ( isset( $ItemList->filters['cat_array'] ) && count ( $ItemList->filters['cat_array'] ) == 1 ) ? $ItemList->filters['cat_array'][0] : NULL;
-				$item_order = $Item->get_order( $order_cat_ID );
-				if( $item_order !== NULL )
-				{
-					echo T_('Order').': '.$item_order;
-				}
 				echo '<br>';
 				echo T_('Item ID').': '.$Item->ID;
 				if( $parent_Item = $Item->get_parent_Item() )
@@ -255,7 +249,16 @@ while( $Item = & $ItemList->get_item() )
 					'include_external'=> true,
 					'link_categories' => false,
 					'show_locked'     => true,
+					'before_main'     => '<b>',
+					'after_main'      => '</b>',
 				) );
+
+				$order_cat_ID = ( isset( $ItemList->filters['cat_array'] ) && count ( $ItemList->filters['cat_array'] ) == 1 ) ? $ItemList->filters['cat_array'][0] : NULL;
+				$item_order = $Item->get_order( $order_cat_ID );
+				if( $item_order !== NULL )
+				{
+					echo ' &middot; '.T_('Order').': '.$item_order;
+				}
 			?>
 		</div>
 
@@ -686,7 +689,7 @@ while( $Item = & $ItemList->get_item() )
 			$Form->inputstart = $form_inputstart;
 
 			// Set b2evoCanvas for plugins:
-			echo '<script type="text/javascript">var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
+			echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
 
 			// Attach files:
 			if( !empty( $comment_attachments ) )

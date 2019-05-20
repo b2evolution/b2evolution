@@ -1524,26 +1524,30 @@ function create_default_jobs( $is_upgrade = false )
 
 	// init insert values
 	$insert_values = array(
-			// run unread messages reminder in every 29 minutes
-			$messages_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:00:00' ) ).", 1740,  ".$DB->quote( $messages_reminder_key ).", ".$ctsk_params." )",
-			// run activate account reminder in every 31 minutes
-			$activate_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:30:00' ) ).", 1860,  ".$DB->quote( $activate_reminder_key ).", ".$ctsk_params." )",
-			$prune_pagecache_key      => "( ".$DB->quote( form_date( $tomorrow, '02:00:00' ) ).", 86400, ".$DB->quote( $prune_pagecache_key ).", ".$ctsk_params." )",
-			$process_hitlog_key       => "( ".$DB->quote( form_date( $tomorrow, '02:30:00' ) ).", 86400, ".$DB->quote( $process_hitlog_key ).", ".$ctsk_params." )",
-			$prune_sessions_key       => "( ".$DB->quote( form_date( $tomorrow, '03:00:00' ) ).", 86400, ".$DB->quote( $prune_sessions_key ).", ".$ctsk_params." )",
-			$poll_antispam_key        => "( ".$DB->quote( form_date( $tomorrow, '04:00:00' ) ).", 86400, ".$DB->quote( $poll_antispam_key ).", ".$ctsk_params." )",
-			$comment_reminder_key     => "( ".$DB->quote( form_date( $tomorrow, '04:30:00' ) ).", 86400, ".$DB->quote( $comment_reminder_key ).", ".$ctsk_params." )",
-			$cleanup_jobs_key         => "( ".$DB->quote( form_date( $tomorrow, '05:00:00' ) ).", 86400, ".$DB->quote( $cleanup_jobs_key ).", ".$ctsk_params." )",
-			$prune_comments_key       => "( ".$DB->quote( form_date( $tomorrow, '05:30:00' ) ).", 86400, ".$DB->quote( $prune_comments_key ).", ".$ctsk_params." )",
-			$light_db_maintenance_key => "( ".$DB->quote( form_date( $tomorrow, '06:00:00' ) ).", 86400, ".$DB->quote( $light_db_maintenance_key ).", ".$ctsk_params." )",
-			$heavy_db_maintenance_key => "( ".$DB->quote( form_date( $next_sunday, '06:30:00' ) ).", 604800, ".$DB->quote( $heavy_db_maintenance_key ).", ".$ctsk_params." )",
-			$post_reminder_key        => "( ".$DB->quote( form_date( $tomorrow, '07:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
-			$alert_old_contents_key   => "( ".$DB->quote( form_date( $next_sunday, '07:30:00' ) ).", 604800, ".$DB->quote( $alert_old_contents_key ).", ".$ctsk_params." )",
 			$execute_automations_key  => "( ".$DB->quote( form_date( $today, '00:00:00' ) ).", 300, ".$DB->quote( $execute_automations_key ).", ".$ctsk_params." )",
-			$inactive_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '08:00:00' ) ).", 86400, ".$DB->quote( $inactive_reminder_key ).", ".$ctsk_params." )",
-			$cleanup_email_logs_key   => "( ".$DB->quote( form_date( $tomorrow, '08:30:00' ) ).", 86400, ".$DB->quote( $cleanup_email_logs_key ).", ".$ctsk_params." )",
-			$manage_email_status_key  => "( ".$DB->quote( form_date( $tomorrow, '09:00:00' ) ).", 86400, ".$DB->quote( $manage_email_status_key ).", ".$ctsk_params." )",
-			$process_return_path_key  => "( ".$DB->quote( form_date( $tomorrow, '09:30:00' ) ).", 86400, ".$DB->quote( $process_return_path_key ).", ".$ctsk_params." )",
+
+			// run check return path inbox every 11 minutes:
+			$process_return_path_key  => "( ".$DB->quote( form_date( $tomorrow, '00:03:00' ) ).", 660, ".$DB->quote( $process_return_path_key ).", ".$ctsk_params." )",
+			// run unread messages reminder in every 29 minutes:
+			$messages_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:06:00' ) ).", 1740,  ".$DB->quote( $messages_reminder_key ).", ".$ctsk_params." )",
+			// run activate account reminder in every 31 minutes:
+			$activate_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '01:09:00' ) ).", 1860,  ".$DB->quote( $activate_reminder_key ).", ".$ctsk_params." )",
+
+			$prune_pagecache_key      => "( ".$DB->quote( form_date( $tomorrow, '02:00:00' ) ).", 86400, ".$DB->quote( $prune_pagecache_key ).", ".$ctsk_params." )",
+			$process_hitlog_key       => "( ".$DB->quote( form_date( $tomorrow, '02:15:00' ) ).", 86400, ".$DB->quote( $process_hitlog_key ).", ".$ctsk_params." )",
+			$prune_sessions_key       => "( ".$DB->quote( form_date( $tomorrow, '02:30:00' ) ).", 86400, ".$DB->quote( $prune_sessions_key ).", ".$ctsk_params." )",
+			$poll_antispam_key        => "( ".$DB->quote( form_date( $tomorrow, '02:45:00' ) ).", 86400, ".$DB->quote( $poll_antispam_key ).", ".$ctsk_params." )",
+			$post_reminder_key        => "( ".$DB->quote( form_date( $tomorrow, '03:00:00' ) ).", 86400, ".$DB->quote( $post_reminder_key ).", ".$ctsk_params." )",
+			$inactive_reminder_key    => "( ".$DB->quote( form_date( $tomorrow, '03:15:00' ) ).", 86400, ".$DB->quote( $inactive_reminder_key ).", ".$ctsk_params." )",
+			$comment_reminder_key     => "( ".$DB->quote( form_date( $tomorrow, '03:30:00' ) ).", 86400, ".$DB->quote( $comment_reminder_key ).", ".$ctsk_params." )",
+			$prune_comments_key       => "( ".$DB->quote( form_date( $tomorrow, '03:45:00' ) ).", 86400, ".$DB->quote( $prune_comments_key ).", ".$ctsk_params." )",
+			$cleanup_email_logs_key   => "( ".$DB->quote( form_date( $tomorrow, '04:00:00' ) ).", 86400, ".$DB->quote( $cleanup_email_logs_key ).", ".$ctsk_params." )",
+			$manage_email_status_key  => "( ".$DB->quote( form_date( $tomorrow, '04:15:00' ) ).", 86400, ".$DB->quote( $manage_email_status_key ).", ".$ctsk_params." )",
+			$cleanup_jobs_key         => "( ".$DB->quote( form_date( $tomorrow, '04:30:00' ) ).", 86400, ".$DB->quote( $cleanup_jobs_key ).", ".$ctsk_params." )",
+			$light_db_maintenance_key => "( ".$DB->quote( form_date( $tomorrow, '04:45:00' ) ).", 86400, ".$DB->quote( $light_db_maintenance_key ).", ".$ctsk_params." )",
+
+			$alert_old_contents_key   => "( ".$DB->quote( form_date( $next_sunday, '05:00:00' ) ).", 604800, ".$DB->quote( $alert_old_contents_key ).", ".$ctsk_params." )",
+			$heavy_db_maintenance_key => "( ".$DB->quote( form_date( $next_sunday, '05:15:00' ) ).", 604800, ".$DB->quote( $heavy_db_maintenance_key ).", ".$ctsk_params." )",
 		);
 	if( $is_upgrade )
 	{	// Check if these jobs already exist, and don't create another
@@ -1979,7 +1983,7 @@ function create_default_newsletters()
  */
 function create_default_email_campaigns()
 {
-	global $DB, $create_sample_contents, $baseurl;
+	global $DB, $Settings, $create_sample_contents, $baseurl;
 
 	task_begin( 'Creating default email campaigns... ' );
 
@@ -2038,6 +2042,16 @@ T_('Button examples:
 				'name' => T_('Another example'),
 				'text' => sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...'),
 			),
+			array(
+				'name'  => T_('Welcome & Activate'),
+				'title' => sprintf( T_( 'Activate your account: %s' ), '$login$' ),
+				'text'  => sprintf( T_('Hello %s!'), '$username$' )."\r\n\r\n"
+					.sprintf( T_('You have recently registered a new account on %s .'), '<a href="'.$baseurl.'">'.$Settings->get( 'notification_short_name' ).'</a>' )."\r\n\r\n"
+					.'<b style="color:#d00">'.T_('You must activate this account by clicking below in order to be able to use all the site features.').'</b>'."\r\n\r\n"
+					.T_('Your login is: $login$')."\r\n\r\n"
+					.T_('Your email is: $email$')."\r\n\r\n"
+					.'[activate:primary]'.T_( 'Activate NOW' ).'[/activate]'
+			),
 		);
 
 		$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
@@ -2046,7 +2060,7 @@ T_('Button examples:
 			$EmailCampaign = new EmailCampaign();
 			$EmailCampaign->set( 'enlt_ID', 1 );
 			$EmailCampaign->set( 'name', $email_campaign['name'] );
-			$EmailCampaign->set( 'email_title', $email_campaign['name'] );
+			$EmailCampaign->set( 'email_title', isset( $email_campaign['title'] ) ? $email_campaign['title'] : $email_campaign['name'] );
 			$EmailCampaign->set( 'email_defaultdest', $baseurl );
 			$EmailCampaign->set( 'email_text', $email_campaign['text'] );
 
@@ -2092,19 +2106,18 @@ function create_default_automations()
 			$AutomationStep = new AutomationStep();
 			$AutomationStep->set( 'autm_ID', $Automation->ID );
 			$AutomationStep->set( 'order', 1 );
-			$AutomationStep->set( 'label', 'admin' );
 			$AutomationStep->set( 'type', 'notify_owner' );
-			$AutomationStep->set( 'info', 'The User $login$ has reached step $step_number$ (ID: $step_ID$) in automation $automation_name$ (ID: $automation_ID$)' );
+			$AutomationStep->set( 'info', '$login$ has reached step $step_number$ (ID: $step_ID$)'."\n".'in automation $automation_name$ (ID: $automation_ID$)' );
 			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
 			$AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
 			$AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
 			$AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
+			$AutomationStep->set_label();
 			$AutomationStep->dbinsert();
 
 			$AutomationStep = new AutomationStep();
 			$AutomationStep->set( 'autm_ID', $Automation->ID );
 			$AutomationStep->set( 'order', 2 );
-			$AutomationStep->set( 'label', 'Markdown Example' );
 			$AutomationStep->set( 'type', 'send_campaign' );
 			$AutomationStep->set( 'info', '1' ); // Email Campaign ID
 			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
@@ -2113,12 +2126,12 @@ function create_default_automations()
 			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
 			$AutomationStep->set( 'error_next_step_ID', 2 ); // Loop
 			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->set_label();
 			$AutomationStep->dbinsert();
 
 			$AutomationStep = new AutomationStep();
 			$AutomationStep->set( 'autm_ID', $Automation->ID );
 			$AutomationStep->set( 'order', 3 );
-			$AutomationStep->set( 'label', 'Another example' );
 			$AutomationStep->set( 'type', 'send_campaign' );
 			$AutomationStep->set( 'info', '2' ); // Email Campaign ID
 			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
@@ -2127,6 +2140,7 @@ function create_default_automations()
 			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
 			$AutomationStep->set( 'error_next_step_ID', 3 ); // Loop
 			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
+			$AutomationStep->set_label();
 			$AutomationStep->dbinsert();
 
 			// Add users to this automation:

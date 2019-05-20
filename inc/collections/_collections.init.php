@@ -20,7 +20,7 @@ $default_ctrl = 'dashboard';
 /**
  * Minimum PHP version required for collections module to function properly
  */
-$required_php_version[ 'collections' ] = '5.4';
+$required_php_version[ 'collections' ] = '5.6';
 
 /**
  * Minimum MYSQL version required for collections module to function properly
@@ -1387,6 +1387,9 @@ class collections_Module extends Module
 					if( $current_User->unsubscribe( $Newsletter->ID ) )
 					{
 						$Messages->add( sprintf( T_('You have unsubscribed and you will no longer receive emails from %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+
+						// Send notification to owners of lists where user subscribed:
+						$current_User->send_list_owner_notifications( 'unsubscribe' );
 					}
 				}
 				else
@@ -1399,6 +1402,9 @@ class collections_Module extends Module
 							$current_User->dbupdate();
 						}
 						$Messages->add( sprintf( T_('You have successfully subscribed to: %s.'), '"'.$Newsletter->get( 'name' ).'"' ), 'success' );
+
+						// Send notification to owners of lists where user subscribed:
+						$current_User->send_list_owner_notifications( 'subscribe' );
 					}
 				}
 

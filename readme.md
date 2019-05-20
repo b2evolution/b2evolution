@@ -4,6 +4,12 @@
 
 This is b2evolution CMS version **7.0.0-alpha**.
 
+**This is an ALPHA version.**
+
+**We recommend you use it for evaluation purposes only.**
+
+**We recommend you wait at least for the BETA version before running it on production.**
+
 ## A complete engine for your website !
 
 Multiblog/CMS + user community + email marketing + social network + more...
@@ -16,7 +22,7 @@ More info: http://b2evolution.net
 
 Basically, all you need is a standard [web hosting plan](https://b2evolution.net/web-hosting/cheap-plans/).
 
-More specifically, your web server should support PHP 5.4+, MySQL 5.1+ & Apache 2+ (which is very common). More info about these requirements [here](http://b2evolution.net/man/installation-upgrade/system_requirements).
+More specifically, your web server should support PHP 5.6+, MySQL 5.1+ & Apache 2+ (which is very common). More info about these requirements [here](http://b2evolution.net/man/installation-upgrade/system_requirements).
 
 ## Downloading
 

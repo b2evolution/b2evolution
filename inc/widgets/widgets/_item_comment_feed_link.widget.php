@@ -145,6 +145,7 @@ class item_comment_feed_link_Widget extends ComponentWidget
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is disabled because there is no Item object.' );
 			return false;
 		}
 
@@ -180,6 +181,7 @@ class item_comment_feed_link_Widget extends ComponentWidget
 		}
 		else
 		{
+			$this->display_debug_message();
 			return false;
 		}
 	}

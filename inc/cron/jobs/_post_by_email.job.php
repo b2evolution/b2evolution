@@ -98,6 +98,11 @@ if( $post_cntr > 0 )
 	$UserCache = & get_UserCache();
 	foreach( $pbm_items as $Items )
 	{	// Send report to post author
+		if( ! check_cron_job_emails_limit() )
+		{	// Stop execution for cron job because max number of emails has been already sent:
+			break;
+		}
+
 		$to_user_ID = 0;
 		foreach( $Items as $Item )
 		{

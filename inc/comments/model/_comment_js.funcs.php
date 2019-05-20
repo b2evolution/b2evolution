@@ -11,7 +11,7 @@ require_js( 'functions.js', 'blog', false, true );
 echo_modalwindow_js();
 
 ?>
-<script type="text/javascript">
+<script>
 
 // General variables
 var modifieds = new Array();

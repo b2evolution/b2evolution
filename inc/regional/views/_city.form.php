@@ -57,7 +57,7 @@ else
 }
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#city_ctry_ID' ).change( function ()
 {	// Load option list with regions for seleted country
 	jQuery.ajax( {

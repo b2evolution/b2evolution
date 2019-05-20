@@ -155,7 +155,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';
 	?>
-	<script type="text/javascript">
+	<script>
 		<!--
 		// This is for toolbar plugins
 		var b2evoCanvas = document.getElementById('commentform_post_content');

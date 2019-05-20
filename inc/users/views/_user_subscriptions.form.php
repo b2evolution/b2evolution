@@ -210,7 +210,7 @@ $Form->begin_fieldset( T_('List subscriptions').( is_admin_page() ? get_manual_l
 		if( isset( $allowed_newsletters[ $Newsletter->ID ] ) ||
 		    in_array( $Newsletter->ID, $user_newsletter_subscriptions ) )
 		{	// Display only allowed newsletter and what user is subscribed to:
-			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, $Newsletter->get( 'name' ).': '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ), $disabled );
+			$newsletter_options[] = array( 'edited_user_newsletters[]', $Newsletter->ID, '<b>'.$Newsletter->get( 'name' ).':</b> '.$Newsletter->get( 'label' ), in_array( $Newsletter->ID, $user_newsletter_subscriptions ), $disabled );
 		}
 	}
 	if( count( $newsletter_options ) )
@@ -417,7 +417,7 @@ if( $notifications_mode != 'off' )
 			$Form->checklist( $post_subs, 'item_subscriptions', $blog_name );
 		}
 		$Form->hidden( 'subs_item_IDs', implode( ',', $subs_item_IDs ) );
-		$Form->info_field( '', T_( 'To subscribe to notifications on a specifc post, go to that post and click "Notify me when someone comments" at the end of the comment list.' ), array( 'class' => 'info_full' ) );
+		$Form->info_field( '', T_( 'To subscribe to notifications on a specifc post, go to that post and click "Notify me by email when someone comments here." at the end of the comment list.' ), array( 'class' => 'info_full' ) );
 
 	$Form->end_fieldset();
 }

@@ -59,7 +59,7 @@ class User extends DataObject
 	/**
 	 * User account status
 	 *
-	 * 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'closed'
+	 * 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'pendingdelete', 'closed'
 	 *
 	 * @var string
 	 */
@@ -180,6 +180,15 @@ class User extends DataObject
 	 * @var boolean
 	 */
 	var $newsletter_subscriptions_updated = false;
+
+	/**
+	 * Array of newsletter subscription changes with the following elements:
+	 *   - string, 'subscribe' | 'unsubscribe'
+	 *   - array of newsletter IDs
+	 *   - array of email template params
+	 * @var array
+	 */
+	var $newsletter_subscription_changed_values = array();
 
 	/**
 	 * Constructor
@@ -1385,7 +1394,13 @@ class User extends DataObject
 				//   - password change requested by email
 				//   - password has not been set yet(email capture/quick registration)
 
-				if( $request_password_confirmation )
+				if( $is_new_user && empty( $edited_user_pass1 ) && empty( $edited_user_pass2 ) )
+				{	// Allow to create new user without password from back-office by admin:
+					$this->set( 'pass_driver', 'nopass' );
+					$this->set( 'pass', '' );
+					$this->set( 'salt', '' );
+				}
+				elseif( $request_password_confirmation )
 				{	// Request a password confirmation:
 					if( param_check_passwords( 'edited_user_pass1', 'edited_user_pass2', true, $Settings->get('user_minpwdlen') ) )
 					{ // We can set password
@@ -2147,7 +2162,8 @@ class User extends DataObject
 	{
 		if( $this->check_status( 'is_closed' ) && ( !is_admin_page() ) )
 		{ // don't return closed accounts regional information to front office
-			return false;
+			$r = false;
+			return $r;
 		}
 
 		if( is_null($this->$Object) && !empty($this->$ID ) )
@@ -3847,7 +3863,7 @@ class User extends DataObject
 				}
 				return false;
 			case 'can_be_validated':
-				return ( ( $this->status == 'new' ) || ( $this->status == 'emailchanged' ) || ( $this->status == 'deactivated' ) || ( $this->status == 'failedactivation' ) );
+				return in_array( $this->status, array( 'new', 'emailchanged', 'deactivated', 'failedactivation', 'pendingdelete' ) );
 			case 'can_view_msgform':
 			case 'can_receive_any_message': // can this user receive emails or private messages
 			case 'can_receive_pm':
@@ -4496,6 +4512,15 @@ class User extends DataObject
 		global $app_name, $Session, $baseurl, $servertimenow;
 		global $Settings, $UserSettings;
 
+		if( ! empty( $this->welcome_activate_email_campaign_sent ) )
+		{	// This flag means we don't need to send a separate activation email
+			// because at least one special(Welcome-Activate) email campaign was sent
+			// on auto newsletter subscribing before calling this function.
+			// Return TRUE in order to display the same info messages what user sees on normal activation,
+			// because Welcome-Activate email campaign may contains button/link to activate user account:
+			return true;
+		}
+
 		// Display messages depending on user email status
 		display_user_email_status_message( $this->ID );
 
@@ -4538,7 +4563,7 @@ class User extends DataObject
 				'blog_param' => $blog_param,
 				'request_id' => $request_id,
 			);
-		$r = send_mail_to_User( $this->ID, T_('Activate your account: $login$'), 'account_activate', $email_template_params, true );
+		$r = send_mail_to_User( $this->ID, sprintf( T_( 'Activate your account: %s' ), '$login$' ), 'account_activate', $email_template_params, true );
 		locale_restore_previous();
 
 		if( $r )
@@ -5620,6 +5645,9 @@ class User extends DataObject
 			{ // Send notification email about the changes of user account
 				$this->send_account_changed_notification();
 			}
+
+			// Send notification to owners of lists where user is subscribed/unsubscribed:
+			$this->send_list_owner_notifications();
 		}
 		elseif( $is_new_user )
 		{	// Some error on inserting new user in DB:
@@ -5760,6 +5788,10 @@ class User extends DataObject
 							);
 						send_admin_notification( NT_('User account closed'), 'account_closed', $email_template_params );
 					}
+
+					// Send notification to owners of list where user was automatically unsubscribed:
+					$this->send_list_owner_notifications( 'unsubscribe' );
+
 					return true;
 				}
 			}
@@ -7915,8 +7947,11 @@ class User extends DataObject
 	 * Set newsletter subscriptions for this user
 	 *
 	 * @param array
+	 * @param array Optional subscription params. This will be applied to the next call to User::subscribe() and cleared thereafter.
+	 *              This will also be overridden by params passed to User::subscribe().
+	 *              - 'usertags': Comma-delimited user tags applied as part of subscription
 	 */
-	function set_newsletter_subscriptions( $new_subscriptions )
+	function set_newsletter_subscriptions( $new_subscriptions, $params = array() )
 	{
 		$prev_subscriptions = $this->get_newsletter_subscriptions();
 
@@ -7963,6 +7998,9 @@ class User extends DataObject
 
 		// Set new subscriptions:
 		$this->new_newsletter_subscriptions = $new_subscriptions;
+
+		// Set newsletter subscription params:
+		$this->newsletter_subscription_params = $params;
 	}
 
 
@@ -7971,7 +8009,6 @@ class User extends DataObject
 	 *
 	 * @param array|integer Newsletter IDs
 	 * @param array Optional subscription params
-	 *              - 'subscribed_User': User that subscribed
 	 *              - 'usertags': Comma-delimited user tags applied as part of subscription
 	 * @return integer|boolean # of rows affected or false if error
 	 */
@@ -8035,11 +8072,12 @@ class User extends DataObject
 		if( count( $insert_newsletter_IDs ) || count( $resubscribe_newsletter_IDs ) )
 		{	// Notify list owner of new subscriber:
 			$email_template_params = array_merge( array(
-				'subscribed_User' => $this,
+				'subscribed_User'     => $this,
 				'subscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
-			), $params );
+			), empty( $this->newsletter_subscription_params ) ? array() : $this->newsletter_subscription_params, $params );
 
-			send_list_owner_notification( array_unique( array_merge( $insert_newsletter_IDs, $resubscribe_newsletter_IDs ) ), 'list_new_subscriber', $email_template_params );
+			// Add to changes in subscription values:
+			$this->newsletter_subscription_changed_values[] = array( 'subscribe', array_unique( array_merge( $insert_newsletter_IDs, $resubscribe_newsletter_IDs ) ), $email_template_params );
 		}
 
 		// Insert user states for newsletters with automations:
@@ -8065,6 +8103,9 @@ class User extends DataObject
 		// Unset flag in order not to run this twice:
 		$this->newsletter_subscriptions_updated = false;
 
+		// Unset newsletter subscription params for subsequent calls to this function:
+		unset( $this->newsletter_subscription_params );
+
 		// Update the CACHE array where we store who are subscribed already in order to avoid a duplicate entry error on second calling of this function:
 		$this->newsletter_subscriptions['subscribed'] = array_merge( $this->newsletter_subscriptions['subscribed'], $newsletter_IDs );
 		$this->newsletter_subscriptions['unsubscribed'] = array_diff( $this->newsletter_subscriptions['unsubscribed'], $newsletter_IDs );
@@ -8078,7 +8119,6 @@ class User extends DataObject
 	 *
 	 * @param array|integer Newsletter IDs
 	 * @param array Optional subscription params
-	 *              - 'subscribed_User': User that unsubscribed
 	 *              - 'usertags': Comma-delimited user tags applied as part of unsubscription
 	 * @return integer|boolean # of rows affected or false if error
 	 */
@@ -8127,12 +8167,16 @@ class User extends DataObject
 		if( count( $update_newsletter_IDs ) )
 		{	// Notify list owner of lost subscriber:
 			$email_template_params = array_merge( array(
-				'subscribed_User' => $this,
+				'subscribed_User'       => $this,
 				'unsubscribed_by_admin' => ( is_logged_in() && $current_User->login != $this->login ? $current_User->login : '' ),
-			), $params );
+			), empty( $this->newsletter_unsubscription_params ) ? array() : $this->newsletter_unsubscription_params, $params );
 
-			send_list_owner_notification( $update_newsletter_IDs, 'list_lost_subscriber', $email_template_params );
+			// Add to changes in subscription values:
+			$this->newsletter_subscription_changed_values[] = array( 'unsubscribe', $update_newsletter_IDs, $email_template_params );
 		}
+
+		// Unset newsletter unsubscription params for subsequent calls to this function:
+		unset( $this->newsletter_unsubscription_params );
 
 		// Update the CACHE array where we store who are subscribed already in order to avoid a duplicate entry error on second calling of this function:
 		$this->newsletter_subscriptions['subscribed'] = array_diff( $this->newsletter_subscriptions['subscribed'], $update_newsletter_IDs );
@@ -8162,8 +8206,51 @@ class User extends DataObject
 			$EmailCampaignCache->load_where( 'ecmp_enlt_ID IN ( '.$DB->quote( $new_subscriptions ).' ) AND ecmp_welcome = 1' );
 
 			foreach( $EmailCampaignCache->cache as $EmailCampaign )
-			{	// Send an email of the campaign at subscription:
-				$EmailCampaign->send_all_emails( false, array( $this->ID ), 'auto' );
+			{	// Send a "Welcome" email of the campaign at subscription:
+				$r = $EmailCampaign->send_all_emails( false, array( $this->ID ), 'welcome' );
+				if( $r && $EmailCampaign->get( 'activate' ) )
+				{	// Set a flag to know email campaign which is used as "Activate" message has been sent now for this User:
+					$this->welcome_activate_email_campaign_sent = true;
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Send email notification to owners of lists where user subscribed/unsubscribed
+	 *
+	 * @param string subscribed | unsubscribed | all
+	 */
+	function send_list_owner_notifications( $filter = 'all' )
+	{
+		if( ! empty( $this->newsletter_subscription_changed_values ) )
+		{
+			foreach( $this->newsletter_subscription_changed_values as $key => $value )
+			{
+				list( $action, $newsletter_IDs, $email_template_params ) = $value;
+				if( $filter == 'all' || $filter == $action )
+				{
+					switch( $action )
+					{
+						case 'subscribe':
+							$template_name = 'list_new_subscriber';
+							break;
+
+						case 'unsubscribe':
+							$template_name = 'list_lost_subscriber';
+							break;
+
+						default:
+							debug_die( 'Invalid type of subscription action' );
+					}
+
+					// Send an email to the list owner:
+					send_list_owner_notification( $newsletter_IDs, $template_name, $email_template_params );
+
+					// Unset subscription change:
+					unset( $this->newsletter_subscription_changed_values[$key] );
+				}
 			}
 		}
 	}

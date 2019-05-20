@@ -54,7 +54,7 @@ class GeneralSettings extends AbstractSettings
 		'cleanup_jobs_threshold' => 45, // days (Cleanup scheduled jobs threshold)
 		'cleanup_email_logs_threshold' => 59616000, // seconds (Cleanup email logs threshold)
 		'activate_account_reminder_threshold' => 86400, // seconds (Account activation reminder threshold)
-		'activate_account_reminder_config' => '86400,129600,345600,604800', // seconds (Account activation reminder settings), Defaults: one day, 1.5 days, 4 days, 7 days
+		'activate_account_reminder_config' => '86400,129600,345600,604800,0,0', // seconds (Account activation reminder settings), Defaults: one day, 1.5 days, 4 days, 7 days, "Don't send", "Don't delete"
 		'inactive_account_reminder_threshold' => 31536000, // seconds (Inactive account reminder threshold)
 		'comment_moderation_reminder_threshold' => 86400, // seconds (Comment moderation reminder threshold)
 		'post_moderation_reminder_threshold' => 86400, // seconds (Post moderation reminder threshold)
@@ -345,6 +345,18 @@ C message size exceeds',
 
 	// Back-end settings, these can't be modified by the users:
 		'last_invalidation_timestamp' => 0,
+
+	// Cron job settings:
+		'cjob_maxemail_send-non-activated-account-reminders' => 50,
+		'cjob_maxemail_send-unmoderated-comments-reminders' => 50,
+		'cjob_maxemail_send-comment-notifications' => 50,
+		'cjob_maxemail_execute-automations' => 50,
+		'cjob_maxemail_send-inactive-account-reminders' => 50,
+		'cjob_maxemail_monthly-alert-old-contents' => 50,
+		'cjob_maxemail_create-post-by-email' => 50,
+		'cjob_maxemail_send-unmoderated-posts-reminders' => 50,
+		'cjob_maxemail_send-post-notifications' => 50,
+		'cjob_maxemail_send-unread-messages-reminders' => 50,
 	);
 
 

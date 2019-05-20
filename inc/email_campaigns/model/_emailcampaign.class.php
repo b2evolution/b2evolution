@@ -47,6 +47,16 @@ class EmailCampaign extends DataObject
 
 	var $auto_sent_ts;
 
+	var $renderers;
+
+	var $use_wysiwyg = 0;
+
+	var $send_ctsk_ID;
+
+	var $welcome = 0;
+
+	var $activate = 0;
+
 	var $user_tag_sendskip;
 
 	var $user_tag_sendsuccess;
@@ -62,6 +72,8 @@ class EmailCampaign extends DataObject
 	var $user_tag_like;
 
 	var $user_tag_dislike;
+
+	var $user_tag_activate;
 
 	var $user_tag_unsubscribe;
 
@@ -85,11 +97,23 @@ class EmailCampaign extends DataObject
 
 	var $unsub_clicks;
 
-	var $use_wysiwyg = 0;
+	var $cta1_autm_ID;
+	var $cta1_autm_execute = 1;
 
-	var $send_ctsk_ID;
+	var $cta2_autm_ID;
+	var $cta2_autm_execute = 1;
 
-	var $welcome = 0;
+	var $cta3_autm_ID;
+	var $cta3_autm_execute = 1;
+
+	var $like_autm_ID;
+	var $like_autm_execute = 1;
+
+	var $dislike_autm_ID;
+	var $dislike_autm_execute = 1;
+
+	var $activate_autm_ID;
+	var $activate_autm_execute = 1;
 
 	var $sequence;
 
@@ -103,11 +127,6 @@ class EmailCampaign extends DataObject
 	 *   'wait'    - Users which still didn't receive email by some reason (Probably their newsletter limit was full)
 	 */
 	var $users = NULL;
-
-	/**
-	 * @var string
-	 */
-	var $renderers;
 
 	/**
 	 * Constructor
@@ -141,6 +160,7 @@ class EmailCampaign extends DataObject
 			$this->use_wysiwyg = $db_row->ecmp_use_wysiwyg;
 			$this->send_ctsk_ID = $db_row->ecmp_send_ctsk_ID;
 			$this->welcome = $db_row->ecmp_welcome;
+			$this->activate = $db_row->ecmp_activate;
 			$this->user_tag_sendskip = $db_row->ecmp_user_tag_sendskip;
 			$this->user_tag_sendsuccess = $db_row->ecmp_user_tag_sendsuccess;
 			$this->user_tag = $db_row->ecmp_user_tag;
@@ -149,6 +169,7 @@ class EmailCampaign extends DataObject
 			$this->user_tag_cta3 = $db_row->ecmp_user_tag_cta3;
 			$this->user_tag_like = $db_row->ecmp_user_tag_like;
 			$this->user_tag_dislike = $db_row->ecmp_user_tag_dislike;
+			$this->user_tag_activate = $db_row->ecmp_user_tag_activate;
 			$this->user_tag_unsubscribe = $db_row->ecmp_user_tag_unsubscribe;
 			$this->send_count = $db_row->ecmp_send_count;
 			$this->open_count = $db_row->ecmp_open_count;
@@ -160,6 +181,18 @@ class EmailCampaign extends DataObject
 			$this->like_count = $db_row->ecmp_like_count;
 			$this->dislike_count = $db_row->ecmp_dislike_count;
 			$this->unsub_clicks = $db_row->ecmp_unsub_clicks;
+			$this->cta1_autm_ID = $db_row->ecmp_cta1_autm_ID;
+			$this->cta1_autm_execute = $db_row->ecmp_cta1_autm_execute;
+			$this->cta2_autm_ID = $db_row->ecmp_cta2_autm_ID;
+			$this->cta2_autm_execute = $db_row->ecmp_cta2_autm_execute;
+			$this->cta3_autm_ID = $db_row->ecmp_cta3_autm_ID;
+			$this->cta3_autm_execute = $db_row->ecmp_cta3_autm_execute;
+			$this->like_autm_ID = $db_row->ecmp_like_autm_ID;
+			$this->like_autm_execute = $db_row->ecmp_like_autm_execute;
+			$this->dislike_autm_ID = $db_row->ecmp_dislike_autm_ID;
+			$this->dislike_autm_execute = $db_row->ecmp_dislike_autm_execute;
+			$this->activate_autm_ID = $db_row->ecmp_activate_autm_ID;
+			$this->activate_autm_execute = $db_row->ecmp_activate_autm_execute;
 		}
 	}
 
@@ -228,13 +261,13 @@ class EmailCampaign extends DataObject
 			$new_users_SQL->WHERE( 'user_ID IN ( '.$DB->quote( $filtered_users_IDs ).' )' );
 			$new_users_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
 			$new_users_SQL->WHERE_and( 'enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
-			$new_users = $DB->get_col( $new_users_SQL->get(), 0, $new_users_SQL->title );
+			$new_users = $DB->get_col( $new_users_SQL );
 
 			// Remove the filtered recipients which didn't receive email newsletter yet:
 			$this->remove_recipients();
 
-			// Get users which already received email newsletter:
-			$old_users = $this->get_recipients( 'receive' );
+			// Get all send statuses per users of this email campaign in order to don't insert the data twice:
+			$old_users = $this->get_recipients( 'full_all' );
 
 			// Exclude old users from new users (To store value of csnd_emlog_ID):
 			$new_users = array_diff( $new_users, $old_users );
@@ -246,7 +279,7 @@ class EmailCampaign extends DataObject
 				{
 					$insert_SQL .= "\n".'( '.$DB->quote( $this->ID ).', '.$DB->quote( $user_ID ).', "ready_to_send" ),';
 				}
-				$DB->query( substr( $insert_SQL, 0, -1 ) );
+				$DB->query( substr( $insert_SQL, 0, -1 ).' ON DUPLICATE KEY UPDATE csnd_camp_ID = csnd_camp_ID, csnd_user_ID = csnd_user_ID' );
 			}
 		}
 	}
@@ -364,11 +397,12 @@ class EmailCampaign extends DataObject
 
 		// Get users from DB:
 		$users_SQL = new SQL( 'Get recipients of campaign #'.$this->ID );
-		$users_SQL->SELECT( 'user_ID, csnd_emlog_ID, csnd_user_ID, csnd_status, enls_user_ID' );
+		$users_SQL->SELECT( 'user_ID, csnd_emlog_ID, csnd_user_ID, csnd_status, enls_subscribed' );
 		$users_SQL->FROM( 'T_users' );
-		$users_SQL->FROM_add( 'INNER JOIN T_email__campaign_send ON ( csnd_camp_ID = '.$DB->quote( $this->ID ).' AND ( csnd_user_ID = user_ID OR csnd_user_ID IS NULL ) )' );
-		$users_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_subscribed = 1 AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
+		$users_SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = '.$DB->quote( $this->ID ).' AND csnd_user_ID = user_ID' );
+		$users_SQL->FROM_add( 'LEFT JOIN T_email__newsletter_subscription ON enls_user_ID = user_ID AND enls_enlt_ID = '.$DB->quote( $this->get( 'enlt_ID' ) ) );
 		$users_SQL->WHERE( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
+		$users_SQL->WHERE_and( 'csnd_user_ID IS NOT NULL OR enls_user_ID IS NOT NULL' );
 		$users = $DB->get_results( $users_SQL->get(), OBJECT, $users_SQL->title );
 
 		$this->users = array(
@@ -394,7 +428,7 @@ class EmailCampaign extends DataObject
 
 		foreach( $users as $user_data )
 		{
-			if( $user_data->enls_user_ID === NULL )
+			if( ! $user_data->enls_subscribed )
 			{	// This user is unsubscribed from newsletter of this email campaign:
 				$this->users['unsub_all'][] = $user_data->user_ID;
 			}
@@ -405,7 +439,7 @@ class EmailCampaign extends DataObject
 
 			if( $user_data->csnd_status == 'sent' )
 			{	// This user already received newsletter email:
-				if( $user_data->enls_user_ID === NULL )
+				if( ! $user_data->enls_subscribed )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_receive'][] = $user_data->user_ID;
 					$this->users['unsub_filter'][] = $user_data->user_ID;
@@ -418,7 +452,7 @@ class EmailCampaign extends DataObject
 			}
 			elseif( $user_data->csnd_status == 'skipped' )
 			{ // This user will be skipped from receiving newsletter email:
-				if( $user_data->enls_user_ID === NULL )
+				if( ! $user_data->enls_subscribed )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_skipped'][] = $user_data->user_ID;
 					$this->users['unsub_filter'][] = $user_data->user_ID;
@@ -431,7 +465,7 @@ class EmailCampaign extends DataObject
 			}
 			elseif( check_usertags( $user_data->user_ID, explode( ',', $this->get( 'user_tag_sendskip' ) ), 'has_any' ) )
 			{	// This user will be skipped from receiving newsletter email because of skip tags:
-				if( $user_data->enls_user_ID === NULL )
+				if( ! $user_data->enls_subscribed )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_skipped_tag'][] = $user_data->user_ID;
 					$this->users['unsub_filter'][] = $user_data->user_ID;
@@ -444,7 +478,7 @@ class EmailCampaign extends DataObject
 			}
 			elseif( $user_data->csnd_status == 'send_error' )
 			{ // We encountered a send error the last time we attempted to send email,:
-				if( $user_data->enls_user_ID === NULL )
+				if( ! $user_data->enls_subscribed )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_error'][] = $user_data->user_ID;
 					$this->users['unsub_filter'][] = $user_data->user_ID;
@@ -457,7 +491,7 @@ class EmailCampaign extends DataObject
 			}
 			elseif( $user_data->csnd_user_ID > 0 ) // Includes failed email attempts
 			{	// This user didn't receive email yet:
-				if( $user_data->enls_user_ID === NULL )
+				if( ! $user_data->enls_subscribed )
 				{	// This user is unsubscribed from newsletter of this email campaign:
 					$this->users['unsub_wait'][] = $user_data->user_ID;
 					$this->users['unsub_filter'][] = $user_data->user_ID;
@@ -489,22 +523,34 @@ class EmailCampaign extends DataObject
 
 		if( $link )
 		{	// Initialize URL to page with reciepients of this Email Campaign:
-			$campaign_edit_modes = get_campaign_edit_modes( $this->ID );
-			switch( $type )
-			{
-				case 'receive':
-					$recipient_type = 'sent';
-					break;
-				case 'skipped':
-					$recipient_type = 'skipped';
-					break;
-				case 'wait':
-					$recipient_type = 'ready_to_send';
-					break;
-				case 'filter':
-				default:
-					$recipient_type = 'filtered';
-					break;
+			if( $type == 'all' )
+			{	// Get URL to display ALL subscribers:
+				global $admin_url;
+				$url = $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=subscribers&amp;enlt_ID='.$this->get( 'enlt_ID' );
+			}
+			else
+			{	// Get URL to display filtered and other users which are linked to this email campaign:
+				switch( $type )
+				{
+					case 'receive':
+						$recipient_type = 'sent';
+						break;
+					case 'skipped':
+						$recipient_type = 'skipped';
+						break;
+					case 'wait':
+						$recipient_type = 'ready_to_send';
+						break;
+					case 'error':
+						$recipient_type = 'send_error';
+						break;
+					case 'filter':
+					default:
+						$recipient_type = 'filtered';
+						break;
+				}
+				$campaign_edit_modes = get_campaign_edit_modes( $this->ID );
+				$url = $campaign_edit_modes['recipient']['href'].( empty( $type ) ? '' : '&amp;recipient_type='.$recipient_type );
 			}
 
 			$unsub_recipients_count = count( $this->get_recipients( 'unsub_'.$type ) );
@@ -512,7 +558,7 @@ class EmailCampaign extends DataObject
 			{	// If unsubscribed users exist:
 				$recipients_count = $recipients_count.' ('.T_('still subscribed').') + '.$unsub_recipients_count.' ('.T_('unsubscribed').')';
 			}
-			$recipients_count = '<a href="'.$campaign_edit_modes['recipient']['href'].( empty( $type ) ? '' : '&amp;recipient_type='.$recipient_type ).'">'.$recipients_count.'</a>';
+			$recipients_count = '<a href="'.$url.'">'.$recipients_count.'</a>';
 		}
 
 		return $recipients_count;
@@ -616,15 +662,51 @@ class EmailCampaign extends DataObject
 	{
 		if( $force_update || $this->get( 'sync_plaintext' ) )
 		{	// Update plain-text message only when it is enabled for this email campaign:
-			$email_plaintext = preg_replace( '#<a[^>]+href="([^"]+)"[^>]*>[^<]*</a>#i', ' [ $1 ] ', $this->get( 'email_html' ) );
+			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>([^<]*)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
 			$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 			$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
-			$email_plaintext = preg_replace( '#<(p|/h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
-			$email_plaintext = preg_replace( '#<(br|h[1-6]|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
-			$email_plaintext = preg_replace( '#<li[^>]*>#i', "- ", $email_plaintext );
+			$email_plaintext = preg_replace( '#</li>[\s\t]*</ul>#i', '</li>', $email_plaintext );
+			$email_plaintext = preg_replace_callback( '#<h([1-4])[^>]*>([^<]*)</h\1>#i', array( $this, 'update_plaintext_callback_h' ), $email_plaintext );
+			$email_plaintext = preg_replace( '#<(p|/?h[1-6]|ul|ol)[^>]*>#i', "\n\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#<(br|/li|code|pre|div|/?blockquote)[^>]*>#i', "\n", $email_plaintext );
+			$email_plaintext = preg_replace( '#<li[^>]*>#i', '- ', $email_plaintext );
 			$email_plaintext = preg_replace( '#<hr ?/?>#i', "\n\n----------------\n\n", $email_plaintext );
-			$this->set( 'email_plaintext', strip_tags( $email_plaintext ) );
+			$email_plaintext = preg_replace( '#[\n\s]{3,}#i', "\n\n", $email_plaintext );
+			$email_plaintext = str_replace( array( '&ndash;', '&mdash;', '&#8211;', '&#8212;' ), '--', $email_plaintext );
+			$this->set( 'email_plaintext', trim( strip_tags( $email_plaintext ), " \r\n" ) );
 		}
+	}
+
+
+	/**
+	 * Callback for <h1-4> of the function update_plaintext()
+	 *
+	 * @param array Matches
+	 * @return string
+	 */
+	function update_plaintext_callback_h( $m )
+	{
+		return "\n\n"
+			// Header text:
+			.$m[2]."\n"
+			// Put ======= under H1 and H2, ------- under H3 and H4:
+			.str_repeat( ( $m[1] > 2 ? '-' : '=' ), utf8_strlen( $m[2] ) )."\n\n";
+	}
+
+
+	/**
+	 * Callback for <a> of the function update_plaintext()
+	 *
+	 * @param array Matches
+	 * @return string
+	 */
+	function update_plaintext_callback_a( $m )
+	{
+		return ' [ '
+			// Display a text of the link if it is not same as url:
+			.( $m[1] == $m[2] ? '' : $m[2].' --> ' )
+			// Url of the link:
+			.$m[1].' ] ';
 	}
 
 
@@ -776,9 +858,62 @@ class EmailCampaign extends DataObject
 			$this->set_from_Request( 'user_tag_dislike' );
 		}
 
+		if( param( 'ecmp_user_tag_activate', 'string', NULL ) !== NULL )
+		{	// User tag:
+			$this->set_from_Request( 'user_tag_activate' );
+		}
+
 		if( param( 'ecmp_user_tag_unsubscribe', 'string', NULL ) !== NULL )
 		{	// User tag:
 			$this->set_from_Request( 'user_tag_unsubscribe' );
+		}
+
+		$cta1_autm_ID = param( 'ecmp_cta1_autm_ID', 'integer', NULL );
+		if( $cta1_autm_ID !== NULL )
+		{	// Automation CTA 1:
+			$this->set( 'cta1_autm_ID', ( $cta1_autm_ID === 0 ? NULL : $cta1_autm_ID ), true );
+			param( 'ecmp_cta1_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'cta1_autm_execute' );
+		}
+
+		$cta2_autm_ID = param( 'ecmp_cta2_autm_ID', 'integer', NULL );
+		if( $cta2_autm_ID !== NULL )
+		{	// Automation CTA 2:
+			$this->set( 'cta2_autm_ID', ( $cta2_autm_ID === 0 ? NULL : $cta2_autm_ID ), true );
+			param( 'ecmp_cta2_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'cta2_autm_execute' );
+		}
+
+		$cta3_autm_ID = param( 'ecmp_cta3_autm_ID', 'integer', NULL );
+		if( $cta3_autm_ID !== NULL )
+		{	// Automation CTA 3:
+			$this->set( 'cta3_autm_ID', ( $cta3_autm_ID === 0 ? NULL : $cta3_autm_ID ), true );
+			param( 'ecmp_cta3_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'cta3_autm_execute' );
+		}
+
+		$like_autm_ID = param( 'ecmp_like_autm_ID', 'integer', NULL );
+		if( $like_autm_ID !== NULL )
+		{	// Automation LIKE:
+			$this->set( 'like_autm_ID', ( $like_autm_ID === 0 ? NULL : $like_autm_ID ), true );
+			param( 'ecmp_like_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'like_autm_execute' );
+		}
+
+		$dislike_autm_ID = param( 'ecmp_dislike_autm_ID', 'integer', NULL );
+		if( $dislike_autm_ID !== NULL )
+		{	// Automation DISLIKE:
+			$this->set( 'dislike_autm_ID', ( $dislike_autm_ID === 0 ? NULL : $dislike_autm_ID ), true );
+			param( 'ecmp_dislike_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'dislike_autm_execute' );
+		}
+
+		$activate_autm_ID = param( 'ecmp_activate_autm_ID', 'integer', NULL );
+		if( $activate_autm_ID !== NULL )
+		{	// Automation ACTIVATE:
+			$this->set( 'activate_autm_ID', ( $activate_autm_ID === 0 ? NULL : $activate_autm_ID ), true );
+			param( 'ecmp_activate_autm_execute', 'integer', 0 );
+			$this->set_from_Request( 'activate_autm_execute' );
 		}
 
 		return ! param_errors_detected();
@@ -838,7 +973,7 @@ class EmailCampaign extends DataObject
 	 * @param integer User ID
 	 * @param string Email address
 	 * @param string Mode: 'test' - to send test email newsletter
-	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
+	 * @param string|boolean Update time of last sending: 'auto', 'manual'. FALSE and 'welcome' - to don't update
 	 * @param integer Newsletter ID, used for unsubscribe link in email footer, NULL - to use Newsletter ID of this Email Campaign
 	 * @param integer Automation ID, used to store in mail log
 	 * @return boolean TRUE on success
@@ -851,14 +986,15 @@ class EmailCampaign extends DataObject
 				'include_greeting' => false,
 				'message_html'     => $this->get( 'email_html' ),
 				'message_text'     => $this->get( 'email_plaintext' ),
-				'newsletter'       => ( $newsletter_ID === NULL ? $this->get( 'enlt_ID' ) : $newsletter_ID ),
+				'enlt_ID'          => ( $newsletter_ID === NULL ? $this->get( 'enlt_ID' ) : $newsletter_ID ),
 				'ecmp_ID'          => $this->ID,
 				'autm_ID'          => $automation_ID,
 				'template_parts'   => array(
 						'header' => 0,
 						'footer' => 0
 					),
-				'default_template_tag' => 1
+				'default_template_tag' => 1,
+				'is_welcome_email'     => ( $update_sent_ts == 'welcome' ),
 			);
 
 		$UserCache = & get_UserCache();
@@ -967,7 +1103,8 @@ class EmailCampaign extends DataObject
 	 *
 	 * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
 	 * @param array Force users instead of users which are ready to receive this email campaign
-	 * @param string|boolean Update time of last sending: 'auto', 'manual', FALSE - to don't update
+	 * @param string|boolean Update time of last sending: 'auto', 'manual', 'welcome'. FALSE - to don't update
+	 * @return boolean TRUE if at least one email is sent
 	 */
 	function send_all_emails( $display_messages = true, $user_IDs = NULL, $update_sent_ts = 'manual' )
 	{
@@ -986,7 +1123,7 @@ class EmailCampaign extends DataObject
 
 		if( empty( $user_IDs ) )
 		{	// No users, Exit here:
-			return;
+			return false;
 		}
 
 		// It it important to randomize order so that it is not always the same users who get the news first and the same users who the get news last:
@@ -1002,6 +1139,7 @@ class EmailCampaign extends DataObject
 		$email_success_count = 0;
 		$email_skip_count = 0;
 		$email_error_count = 0;
+		$return = false;
 		foreach( $user_IDs as $user_ID )
 		{
 			if( $email_campaign_chunk_size > 0 && $email_success_count >= $email_campaign_chunk_size )
@@ -1015,7 +1153,8 @@ class EmailCampaign extends DataObject
 			}
 
 			// Send email to user:
-			$result = $this->send_email( $user_ID );
+			$result = $this->send_email( $user_ID, '', '', ( $update_sent_ts == 'welcome' ? $update_sent_ts : false ) );
+			$return = $return || $result;
 
 			if( $result )
 			{	// Email newsletter was sent for user successfully:
@@ -1088,7 +1227,7 @@ class EmailCampaign extends DataObject
 			}
 		}
 
-		if( $update_sent_ts == 'auto' )
+		if( $update_sent_ts == 'auto' || $update_sent_ts == 'welcome' )
 		{	// Update auto date of sending:
 			$this->set( 'auto_sent_ts', date( 'Y-m-d H:i:s', $localtimenow ) );
 			$this->dbupdate();
@@ -1129,6 +1268,8 @@ class EmailCampaign extends DataObject
 				$Messages->display();
 			}
 		}
+
+		return $return;
 	}
 
 
@@ -1477,6 +1618,42 @@ class EmailCampaign extends DataObject
 		$EmailCampaignCache->add( $this );
 
 		return true;
+	}
+
+
+	/**
+	 * Add user to automation if it is defined in this email campaign for requested click type
+	 *
+	 * @param string Click type: 'cta1', 'cta2', 'cta3', 'like', 'dislike', 'activate'
+	 * @param integer User ID
+	 * @return boolean|integer FALSE on fail, Number of added users on success
+	 */
+	function add_user_to_automation( $click_type, $user_ID )
+	{
+		$autm_ID = $this->get( $click_type.'_autm_ID' );
+
+		if( empty( $autm_ID ) )
+		{	// Automation is not defined for this email campaign:
+			return false;
+		}
+
+		$AutomationCache = & get_AutomationCache();
+		if( ! $click_Automation = & $AutomationCache->get_by_ID( $autm_ID, false, false ) )
+		{	// Wrong automation:
+			return false;
+		}
+
+		// Add user to automation:
+		$added_users_num = $click_Automation->add_users( $user_ID, array(
+				'users_no_subs' => 'add', // Add anyway users who are not subscribed to Newsletter of the Automation
+			) );
+
+		if( $added_users_num && $this->get( $click_type.'_autm_execute' ) )
+		{	// Execute first step(s) immediately:
+			$click_Automation->execute_first_step( $user_ID );
+		}
+
+		return empty( $added_users_num ) ? false : $added_users_num;
 	}
 }
 

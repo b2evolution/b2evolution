@@ -301,7 +301,7 @@ class geoip_plugin extends Plugin
 
 		// JavaScript to load country by IP address
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#geoip_load_country' ).click( function ()

@@ -22,7 +22,7 @@ global $edited_Blog, $AdminUI, $Settings, $admin_url;
 $notifications_mode = $Settings->get( 'outbound_notifications_mode' );
 
 ?>
-<script type="text/javascript">
+<script>
 	<!--
 	function show_hide_feedback_details(ob)
 	{
@@ -146,7 +146,7 @@ $Form->begin_fieldset( T_('Feedback options') . get_manual_link('comment-feedbac
 
 	if( $edited_Blog->get_setting( 'allow_comments' ) == 'never' )
 	{ ?>
-	<script type="text/javascript">
+	<script>
 		<!--
 		jQuery( '.feedback_details_container' ).hide();
 		//-->
@@ -336,7 +336,7 @@ echo '</ul>';
 echo '</div>';
 
 ?>
-<script type="text/javascript">
+<script>
 	var paged_comments_is_checked = jQuery( '#paged_comments' ).is( ':checked' );
 	jQuery( '#threaded_comments' ).click( function()
 	{ // Disable checkbox "Paged comments" if "Threaded comments" is ON

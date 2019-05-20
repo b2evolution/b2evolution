@@ -30,7 +30,7 @@ global $Debuglog;
 global $admin_url;
 
 ?>
-<script type="text/javascript">
+<script>
 	function show_hide_chapter_prefix(ob)
 	{
 		var fldset = document.getElementById( 'category_prefix_container' );
@@ -201,7 +201,7 @@ $Form->begin_fieldset( T_('Collection base URL').get_admin_badge().get_manual_li
 		$Form->radio( 'blog_access_type', $edited_Blog->get( 'access_type' ), $access_type_options, T_('Collection base URL'), true );
 
 ?>
-<script type="text/javascript">
+<script>
 // Script to update the Blog URL preview:
 function update_urlpreview( baseurl, url_path )
 {
@@ -507,7 +507,7 @@ $Form->begin_fieldset( T_('Category URLs') . get_manual_link('category-url-setti
 
 		if( $edited_Blog->get_setting( 'chapter_links' ) == 'param_num' )
 		{ ?>
-		<script type="text/javascript">
+		<script>
 			<!--
 			var fldset = document.getElementById( 'category_prefix_container' );
 			fldset.style.display = 'none';
@@ -547,7 +547,7 @@ $Form->end_fieldset();
 
 // Javascript juice for the tag fields.
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#tag_links_fieldset input[type=radio]' ).click( function()
 {
 	if( jQuery( this ).val() == 'param' )

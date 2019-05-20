@@ -160,7 +160,7 @@ if( $can_crop )
 	}
 </style>
 
-<script type="text/javascript">
+<script>
 	var jcrop_api;
 	var image_url = '<?php echo format_to_js( $cropped_File->get_url() ); ?>';
 	var gutter = 10;

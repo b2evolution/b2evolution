@@ -100,7 +100,22 @@ if( ! empty( $user_domain ) )
 if( $subscribed_User->ctry_ID > 0 )
 { // Country field is defined
 	load_class( 'regional/model/_country.class.php', 'Country' );
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Profile Country').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$subscribed_User->get_country_name().'</td></tr>'."\n";
+
+	if( $params['user_account_closed'] )
+	{	// Set TRUE to use country settings from back office.
+		global $is_admin_page;
+		$old_is_admin_page = $is_admin_page;
+		$is_admin_page = true;
+
+		echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Profile Country').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$subscribed_User->get_country_name().'</td></tr>'."\n";
+
+		// Restore $is_admin_page:
+		$is_admin_page = $old_is_admin_page;
+	}
+	else
+	{
+		echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Profile Country').': </th><td'.emailskin_style( 'table.email_table td' ).'>'.$subscribed_User->get_country_name().'</td></tr>'."\n";
+	}
 }
 
 echo '<tr><td'.emailskin_style( 'table.email_table td' ).' colspan=2>&nbsp;</td></tr>'."\n";
@@ -114,7 +129,7 @@ $initial_blog_ID = $UserSettings->get( 'initial_blog_ID', $subscribed_User->ID )
 if( !empty( $initial_blog_ID ) )
 { // Hit info
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial referer').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.get_link_tag( $UserSettings->get( 'initial_referer', $subscribed_User->ID ), '', '.a' ).'</td></tr>'."\n";
-	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$UserSettings->get( 'initial_blog_ID', $subscribed_User->ID )." - ".$UserSettings->get( 'initial_URI', $subscribed_User->ID ).'</td></tr>'."\n";
+	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Initial page').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('Collection')." ".$UserSettings->get( 'initial_blog_ID', $subscribed_User->ID )." - ".get_link_tag( $UserSettings->get( 'initial_URI', $subscribed_User->ID ), '', '.a', 60 ).'</td></tr>'."\n";
 }
 
 if( $subscribed_User->gender == 'M' )

@@ -289,7 +289,9 @@ body.evo_toolbar_visible div#skin_wrapper .evo_container__site_header {
   margin-right: 5px;
 }
 .posts_list li > .btn-group,
-.posts_list li > .evo_status {
+.posts_list .evo_container__item_in_list .widget_core_item_title > .btn-group,
+.posts_list li > .evo_status,
+.posts_list .evo_container__item_in_list .widget_core_item_title > .evo_status {
   margin: 0 0 6px 30px;
 }
 ol.breadcrumb {

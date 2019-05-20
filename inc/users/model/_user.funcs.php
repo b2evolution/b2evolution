@@ -207,7 +207,7 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 	$return_url = param( 'return_to', 'url', '' );
 	if( empty( $return_url ) )
 	{
-		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( 'login' ) );
+		$return_url = regenerate_url( '', '', '', '&' );
 	}
 
 	if( ! $force_normal_login && use_in_skin_login() )
@@ -219,28 +219,20 @@ function get_login_url( $source, $redirect_to = NULL, $force_normal_login = fals
 		}
 		$BlogCache = & get_BlogCache();
 		$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID );
-		if( ! empty( $redirect_url ) )
-		{
-			$redirect_url = url_rel_to_same_host( $redirect_url, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
-		}
-		if( ! empty( $redirect_url ) )
-		{
-			$return_url = url_rel_to_same_host( $return_url, $Blog->get( $blog_page, array( 'glue' => '&' ) ) );
-		}
 		$url = $Blog->get( $blog_page, array( 'glue' => '&' ) );
-		//$url = force_https_url( $url, 'login' );
 	}
 	else
 	{ // Use normal/basic login form (without blog skin)
-		if( ! empty( $redirect_url ) )
-		{
-			$redirect_url = url_rel_to_same_host( $redirect_url, get_htsrv_url( 'login' ) );
-		}
-		if( ! empty( $redirect_url ) )
-		{
-			$return_url = url_rel_to_same_host( $return_url, get_htsrv_url( 'login' ) );
-		}
 		$url = get_htsrv_url( 'login' ).'login.php';
+	}
+
+	if( ! empty( $redirect_url ) )
+	{
+		$redirect_url = url_rel_to_same_host( $redirect_url, $url );
+	}
+	if( ! empty( $redirect_url ) )
+	{
+		$return_url = url_rel_to_same_host( $return_url, $url );
 	}
 
 	return url_add_param( $url, 'redirect_to='.rawurlencode( $redirect_url )
@@ -263,13 +255,13 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
 
 	if( empty( $redirect_to ) && $redirect_to !== false )
 	{ // Redirect back to current URL
-		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
+		$redirect_to = regenerate_url( '', '', '', $glue );
 	}
 
 	// This URL is used to redirect after ABORT login action:
 	if( empty( $return_to ) && $return_to !== false  )
 	{
-		$return_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
+		$return_to = regenerate_url( '', '', '', $glue );
 	}
 
 	if( use_in_skin_login() )
@@ -283,12 +275,12 @@ function get_lostpassword_url( $redirect_to = NULL, $glue = '&amp;', $return_to 
 
 	if( $redirect_to !== false )
 	{ // Append redirect URL only when it is not restricted:
-		$lostpassword_url = url_add_param( $lostpassword_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue );
+		$lostpassword_url = url_add_param( $lostpassword_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $lostpassword_url ) ), $glue );
 	}
 
 	if( $return_to !== false )
 	{ // Append return URL only when it is not restricted:
-		$lostpassword_url = url_add_param( $lostpassword_url, 'return_to='.rawurlencode( $return_to ), $glue );
+		$lostpassword_url = url_add_param( $lostpassword_url, 'return_to='.rawurlencode( url_rel_to_same_host( $return_to, $lostpassword_url ) ), $glue );
 	}
 
 	return $lostpassword_url;
@@ -308,7 +300,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 
 	if( empty( $redirect_to ) )
 	{ // Redirect back to current URL
-		$redirect_to = url_rel_to_same_host( regenerate_url( '', '', '', $glue ), get_htsrv_url( 'login' ) );
+		$redirect_to = regenerate_url( '', '', '', $glue );
 	}
 
 	if( use_in_skin_login() )
@@ -320,7 +312,7 @@ function get_activate_info_url( $redirect_to = NULL, $glue = '&' )
 		$activateinfo_url = get_htsrv_url( 'login' ).'login.php?action=req_activate_email';
 	}
 
-	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( $redirect_to ), $glue ) ;
+	return url_add_param( $activateinfo_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $activateinfo_url ) ), $glue );
 }
 
 
@@ -629,10 +621,10 @@ function send_list_owner_notification( $newsletter_IDs, $template_name, $templat
 			return;
 		}
 		if( $UserSettings->get( $check_setting, $owner_ID ) )
-		{	// this owner must be notifed
+		{	// this owner must be notified
 			$template_params['newsletters'] = $newsletters;
 			locale_temp_switch( $owner_User->get( 'locale' ) );
-			// send mail to user (using his local)
+			// send mail to owner User (using his local)
 			$localized_subject = T_( $subject ).$subject_suffix;
 			send_mail_to_User( $owner_User->ID, $localized_subject, $template_name, $template_params ); // ok, if this may fail
 			locale_restore_previous();
@@ -857,14 +849,14 @@ function get_user_register_url( $redirect_to = NULL, $default_source_string = ''
 
 	if( ! empty( $redirect_to ) )
 	{
-		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, get_htsrv_url( 'login' ) ) ), $glue );
+		$register_url = url_add_param( $register_url, 'redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $register_url ) ), $glue );
 	}
 
 	// This URL is used to redirect after ABORT login action
 	$return_url = param( 'return_to', 'url', '' );
 	if( empty( $return_url ) )
 	{
-		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), get_htsrv_url( 'login' ) );
+		$return_url = url_rel_to_same_host( regenerate_url( '', '', '', '&' ), $register_url );
 	}
 
 	$register_url = url_add_param( $register_url, 'return_to='.rawurlencode( $return_url ), $glue );
@@ -3074,15 +3066,21 @@ function update_anon_user_email_counter( $comment_ID )
  * @param boolean TRUE if user email is changed
  * @param string URL, where to redirect the user after he clicked the validation link (gets saved in Session).
  * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
+ * @param string Email template name: 'account_activate', 'account_delete_warning'
  * @return integer the number of successfully sent emails
  */
-function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false, $redirect_to_after = NULL, $log_messages = false )
+function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_changed = false, $redirect_to_after = NULL, $log_messages = false, $email_template_name = 'account_activate' )
 {
 	global $UserSettings, $Session, $servertimenow;
 
+	if( empty( $user_ids ) )
+	{	// No users to send:
+		return 0;
+	}
+
 	$UserCache = & get_UserCache();
 
-	if( isset( $GLOBALS['messaging_Module'] ) )
+	if( isset( $GLOBALS['messaging_Module'] ) && $email_template_name == 'account_activate' )
 	{ // Get already received messages for each recepient user:
 		$already_received_messages = get_users_unread_threads( $user_ids, NULL, 'string', 'text', 'http:' );
 	}
@@ -3091,6 +3089,12 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 	$email_sent = 0;
 	foreach( $user_ids as $user_ID )
 	{ // Iterate through user ids and send account activation reminder to all user
+
+		if( $log_messages == 'cron_job' && ! check_cron_job_emails_limit() )
+		{	// Stop execution for cron job because max number of emails has been already sent:
+			break;
+		}
+
 		$User = $UserCache->get_by_ID( $user_ID, false );
 		if( !$User )
 		{ // user not exists
@@ -3123,7 +3127,9 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 		{ // No subject for this locale generated yet:
 			locale_temp_switch( $notify_locale );
 
-			$cache_by_locale[$notify_locale]['subject'] = T_( 'Activate your account: $login$' );
+			$cache_by_locale[$notify_locale]['subject'] = ( $email_template_name == 'account_delete_warning'
+				? T_('Last chance -- Your account is about to be deleted!')
+				: sprintf( T_('Activate your account: %s'), '$login$' ) );
 
 			locale_restore_previous();
 		}
@@ -3143,7 +3149,7 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 		// Update notification sender's info from General settings
 		$User->update_sender( true );
 
-		if( send_mail_to_User( $User->ID, $cache_by_locale[$notify_locale]['subject'], 'account_activate', $email_template_params, true ) )
+		if( send_mail_to_User( $User->ID, $cache_by_locale[$notify_locale]['subject'], $email_template_name, $email_template_params, true ) )
 		{ // save corresponding user settings right after the email was sent, to prevent not saving if an eroor occurs
 			$email_sent++;
 			// Set last remind activation email date and increase sent reminder emails number in UserSettings
@@ -3195,6 +3201,12 @@ function send_inactive_user_emails( $user_ids, $redirect_to_after = NULL, $log_m
 	$email_sent = 0;
 	foreach( $user_ids as $user_ID )
 	{ // Iterate through user ids and send account activation reminder to all user
+
+		if( $log_messages == 'cron_job' && ! check_cron_job_emails_limit() )
+		{	// Stop execution for cron job because max number of emails has been already sent:
+			break;
+		}
+
 		$User = $UserCache->get_by_ID( $user_ID, false );
 		if( !$User )
 		{ // user not exists
@@ -3839,7 +3851,7 @@ function callback_filter_userlist( & $Form )
 	if( user_region_visible() )
 	{	// JS functions for AJAX loading of regions, subregions & cities
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#country' ).change( function()
 {
 	var this_obj = jQuery( this );
@@ -4028,7 +4040,7 @@ function load_cities( country_ID, region_ID, subregion_ID )
 					'operators'   => 'user_tagged,user_not_tagged',
 				);
 ?>
-<script type="text/javascript">
+<script>
 function evo_get_filter_user_tags( rule )
 {
 	var input_name = rule.$el.find( ".rule-value-container input" ).attr( "name" );
@@ -4212,6 +4224,7 @@ function get_user_statuses( $null_option_name = '' )
 			'emailchanged'     => T_( 'Email changed' ),
 			'deactivated'      => T_( 'Deactivated email' ),
 			'failedactivation' => T_( 'Failed activation' ),
+			'pendingdelete'    => T_( 'Pending delete' ),
 			'closed'           => T_( 'Closed account' )
 		);
 
@@ -4243,7 +4256,8 @@ function get_user_status_icons( $display_text = false )
 			'deactivated'      => get_icon( 'bullet_blue', 'imgtag', array( 'title' => T_( 'Deactivated account' ) ) ),
 			'emailchanged'     => get_icon( 'bullet_yellow', 'imgtag', array( 'title' => T_( 'Email address was changed' ) ) ),
 			'closed'           => get_icon( 'bullet_black', 'imgtag', array( 'title' => T_( 'Closed account' ) ) ),
-			'failedactivation' => get_icon( 'bullet_red', 'imgtag', array( 'title' => T_( 'Account was not activated or the activation failed' ) ) )
+			'failedactivation' => get_icon( 'bullet_red', 'imgtag', array( 'title' => T_( 'Account was not activated or the activation failed' ) ) ),
+			'pendingdelete'    => get_icon( 'bullet_red', 'imgtag', array( 'title' => T_( 'Account is pending delete' ) ) ),
 		);
 
 	if( $display_text )
@@ -4256,6 +4270,7 @@ function get_user_status_icons( $display_text = false )
 		$user_status_icons['emailchanged']     .= ' '.T_( 'Email changed' );
 		$user_status_icons['closed']           .= ' '.T_( 'Closed' );
 		$user_status_icons['failedactivation'] .= ' '.T_( 'Failed activation' );
+		$user_status_icons['pendingdelete']    .= ' '.T_( 'Pending delete' );
 	}
 
 	return $user_status_icons;
@@ -4998,7 +5013,7 @@ function echo_user_report_window()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_report.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_report_user = \''.TS_('Report User').'\';
 		var evo_js_lang_report_this_user_now = \''.TS_('Report this user now!').'\';
@@ -5021,7 +5036,7 @@ function echo_user_contact_groups_window()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_contact_groups.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_contact_groups = \''.TS_('Contact Groups').'\';
 		var evo_js_lang_save = \''.TS_('Save').'\';
@@ -5043,7 +5058,7 @@ function echo_user_crop_avatar_window()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_crop.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_crop_profile_pic = \''.TS_('Crop profile picture').'\';
 		var evo_js_lang_crop = \''.TS_('Apply').'\';
@@ -5069,7 +5084,7 @@ function echo_user_deldata_js( $params = array() )
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_delete_user_data = \''.TS_('Delete user data').get_manual_link( 'delete-user-data' ).'\';
 		var evo_js_lang_delete_selected_data = \''.TS_('Delete selected data').'\';
@@ -5091,7 +5106,7 @@ function echo_user_automation_js()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_add_user_to_automation = \''.TS_('Add user to an automation...').get_manual_link( 'add-user-to-automation' ).'\';
 		var evo_js_lang_add = \''.TS_('Add').'\';
@@ -5113,7 +5128,7 @@ function echo_userlist_automation_js()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_add_current_selection_to_automation = \''.TS_('Add users to Automation...').get_manual_link( 'add-users-list-to-automation' ).'\';
 		var evo_js_lang_add_selected_users_to_automation = \''.TS_('Add selected users to "%s"').'\';
@@ -5135,7 +5150,7 @@ function echo_userlist_tags_js()
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_add_remove_tags_to_users = \''.TS_('Add/Remove tags...').get_manual_link( 'add-remove-user-tags' ).'\';
 		var evo_js_lang_make_changes_now = \''.TS_('Make changes now!').'\';
@@ -5195,7 +5210,7 @@ function user_report_form( $params = array() )
 		if( $use_js )
 		{
 			$report_content = str_replace( '$report_info_content$', '', $report_content );
-			$report_content .= '<script type="text/javascript">
+			$report_content .= '<script>
 				var info_content = \''.$info_content.'\';
 				jQuery("#report_user_status").change( function() {
 					var report_info = jQuery("#report_info");
@@ -5242,7 +5257,7 @@ function echo_user_organization_js()
 		return;
 	}
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).on( 'click', 'span[rel^=org_status_]', function()
 { // Change an accept status of organization
 	var this_obj = jQuery( this );
@@ -5285,7 +5300,7 @@ function echo_user_add_organization_js( $edited_Organization )
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_add_user_to_organization = \''.TS_('Add user to organization').get_manual_link( 'add-user-organization' ).'\';
 		var evo_js_lang_add = \''.TS_('Add').'\';
@@ -5312,7 +5327,7 @@ function echo_user_edit_membership_js( $edited_Organization )
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_edit_membership = \''.TS_('Edit membership').get_manual_link( 'edit-user-membership' ).'\';
 		var evo_js_lang_edit = \''.TS_('Edit').'\';
@@ -5340,7 +5355,7 @@ function echo_user_remove_membership_js( $edited_Organization )
 	echo_modalwindow_js();
 
 	// Initialize variables for the file "evo_user_deldata.js":
-	echo '<script type="text/javascript">
+	echo '<script>
 		var evo_js_lang_loading = \''.TS_('Loading...').'\';
 		var evo_js_lang_remove_user_membership = \''.TS_('WARNING').'\';
 		var evo_js_lang_remove = \''.TS_('Continue').'\';
@@ -8188,7 +8203,7 @@ function display_user_groups_selectors( & $User, & $Form )
 		) );
 	echo '</div>';
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).on( 'click', '.add_secondary_group', function()
 {	// Add new select element for new secondary group:
 	var current_fieldset = jQuery( this ).closest( '[id^=ffield_]' );

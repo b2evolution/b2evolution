@@ -301,18 +301,66 @@ switch( $action )
 		param( 'ecmp_ID', 'integer', true );
 
 		$edited_EmailCampaign->set( 'welcome', ( $action == 'enable_welcome' ? 1 : 0 ) );
-		if( $edited_EmailCampaign->dbupdate() && $action == 'enable_welcome' )
-		{	// If email campaign has been set as "Welcome" we should other campaign of its list set to not "Welcome":
+		if( $edited_EmailCampaign->dbupdate() )
+		{
+			if( $action == 'enable_welcome' )
+			{	// If email campaign has been set as "Welcome" we should other campaign of its list set to not "Welcome":
+				$DB->query( 'UPDATE T_email__campaign
+					  SET ecmp_welcome = 0
+					WHERE ecmp_enlt_ID = '.$DB->quote( $edited_EmailCampaign->get( 'enlt_ID' ) ).'
+					  AND ecmp_welcome = 1
+					  AND ecmp_ID != '.$DB->quote( $edited_EmailCampaign->ID ) );
+			}
+			// Reset "Activate" flag when "Welcome" flag is disabled:
 			$DB->query( 'UPDATE T_email__campaign
-				  SET ecmp_welcome = 0
+				  SET ecmp_activate = 0
 				WHERE ecmp_enlt_ID = '.$DB->quote( $edited_EmailCampaign->get( 'enlt_ID' ) ).'
-				  AND ecmp_welcome = 1
-				  AND ecmp_ID != '.$DB->quote( $edited_EmailCampaign->ID ) );
+				  AND ecmp_welcome = 0
+				  AND ecmp_activate = 1' );
 		}
 
 		$Messages->add( ( $action == 'enable_welcome' ?
 			T_('The email campaign has been set as "Welcome" to its list.') :
 			T_('The email campaign has been unset as "Welcome" from its list.') ), 'success' );
+
+		// We want to highlight the reduced Step on list display:
+		$Session->set( 'fadeout_array', array( 'ecmp_ID' => array( $ecmp_ID ) ) );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( $from == 'newsletters'
+			? $admin_url.'?ctrl=newsletters&action=edit&tab=campaigns&enlt_ID='.$edited_EmailCampaign->get( 'enlt_ID' )
+			: $admin_url.'?ctrl=campaigns', 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
+
+	case 'enable_activate':
+	case 'disable_activate':
+		// Set/Unset activate email campaign:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaign' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		param( 'from', 'string', '' );
+
+		// Make sure we got an ecmp_ID:
+		param( 'ecmp_ID', 'integer', true );
+
+		$edited_EmailCampaign->set( 'activate', ( $action == 'enable_activate' ? 1 : 0 ) );
+		if( $edited_EmailCampaign->dbupdate() && $action == 'enable_activate' )
+		{	// If email campaign has been set as "Activate" we should other campaign of its list set to not "Activate":
+			$DB->query( 'UPDATE T_email__campaign
+				  SET ecmp_activate = 0
+				WHERE ecmp_enlt_ID = '.$DB->quote( $edited_EmailCampaign->get( 'enlt_ID' ) ).'
+				  AND ecmp_activate = 1
+				  AND ecmp_ID != '.$DB->quote( $edited_EmailCampaign->ID ) );
+		}
+
+		$Messages->add( ( $action == 'enable_activate' ?
+			T_('The email campaign will double as an Activation email and no separate activation email will be sent.') :
+			T_('The email campaign does not act as an activation email. If necessary, a separate activation email will be sent.') ), 'success' );
 
 		// We want to highlight the reduced Step on list display:
 		$Session->set( 'fadeout_array', array( 'ecmp_ID' => array( $ecmp_ID ) ) );
@@ -582,7 +630,7 @@ switch( $action )
 		break;
 	default:
 	$AdminUI->display_breadcrumbpath_add( T_('Campaigns') );
-		$AdminUI->set_page_manual_link( 'email-campaigns' );
+		$AdminUI->set_page_manual_link( 'email-campaign-list' );
 		break;
 }
 

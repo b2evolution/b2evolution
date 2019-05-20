@@ -93,7 +93,7 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#cat_meta' ).click( function()
 {	// Show/Hide selector of default Item Type depending on meta setting:
 	if( jQuery( this ).prop( 'checked' ) )

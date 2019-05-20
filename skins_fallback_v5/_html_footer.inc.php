@@ -37,6 +37,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			'container_end'   => '</div>',
 			// Force loading of all ajax forms from widgets of this container right after page loading in order to don't wait scroll down event:
 			'load_ajax_form_on_page_load' => true,
+			'form_display' => 'nolabels',
 		) );
 		// Initialize JS & CSS for marketing popup container:
 		$Blog->init_marketing_popup_container();

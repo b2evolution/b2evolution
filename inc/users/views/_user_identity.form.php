@@ -96,7 +96,7 @@ if( $is_admin )
 {
 	if( $new_user_creating )
 	{
-		$form_title = '<span class="nowrap">'.T_('Edit user profile').'</span>';
+		$form_title = '<span class="nowrap">'.T_('New user profile').'</span>';
 	}
 	else
 	{
@@ -547,11 +547,10 @@ $Form->end_fieldset();
 	/***************  Password  **************/
 
 if( empty( $edited_User->ID ) && $action != 'view' )
-{ // We can edit the values:
-
+{	// Display password fields for new creating user:
 	$Form->begin_fieldset( T_('Password') );
-		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'maxlength' => 50, 'required' => true, 'autocomplete'=>'off' ) );
-		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'required' => true, 'autocomplete'=>'off' ) );
+		$Form->password_input( 'edited_user_pass1', '', 20, T_('New password'), array( 'maxlength' => 50, 'autocomplete'=>'off' ) );
+		$Form->password_input( 'edited_user_pass2', '', 20, T_('Confirm new password'), array( 'note'=>sprintf( T_('Minimum length: %d characters.'), $Settings->get('user_minpwdlen') ), 'maxlength' => 50, 'autocomplete'=>'off' ) );
 	$Form->end_fieldset();
 }
 
@@ -672,7 +671,7 @@ if( $action != 'view' )
 $Form->end_form();
 
 ?>
-<script type="text/javascript">
+<script>
 	function replace_form_params( result, field_id )
 	{
 		field_id = ( typeof( field_id ) == 'undefined' ? '' : ' id="' + field_id + '"' );
@@ -924,7 +923,7 @@ $Form->end_form();
 	} );
 </script>
 
-<script type="text/javascript">
+<script>
 function bind_autocomplete( field_objs )
 {	// Bind autocomplete plugin event
 	if( field_objs.length > 0 )

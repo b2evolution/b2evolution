@@ -198,6 +198,13 @@ switch( $action )
 			// Max execution time:
 			$Settings->set( 'cjob_timeout_'.$cron_job_key, param_duration( 'cjob_timeout_'.$cron_job_key ) );
 
+			$cjob_maxemail = param( 'cjob_maxemail_'.$cron_job_key, 'string', NULL );
+			if( $cjob_maxemail !== NULL )
+			{	// Setting only for cron jobs that use email sending:
+				$cjob_maxemail = intval( $cjob_maxemail );
+				$Settings->set( 'cjob_maxemail_'.$cron_job_key, ( $cjob_maxemail > 0 ? $cjob_maxemail : '' ) );
+			}
+
 			// Additional settings per cron job:
 			switch( $cron_job_key )
 			{
@@ -246,18 +253,18 @@ switch( $action )
 					for( $c = 0; $c <= $reminder_config_num; $c++ )
 					{
 						$reminder_config_value = param_duration( 'activate_account_reminder_config_'.$c );
-						if( $reminder_config_value > 0 )
-						{	// Store only a selected reminder:
+						if( $reminder_config_value > 0 || $c >= $reminder_config_num - 2 )
+						{	// Store only a selected reminder and 3 last options("Mark as Failed / Pending delete", "Delete warning", "Delete account"):
 							$reminder_config[ $c ] = $reminder_config_value;
 						}
 					}
-					if( count( $reminder_config ) < 2 )
+					if( count( $reminder_config ) < 4 )
 					{	// If no reminder has been selected:
 						param_error( 'activate_account_reminder_config_0', T_('Please select at least one reminder for account activation reminder after subscription.') );
 					}
-					if( ! isset( $reminder_config[ $reminder_config_num ] ) )
-					{	// If "Mark as failed" is not selected:
-						param_error( 'activate_account_reminder_config_'.$reminder_config_num, T_('Please select account activation reminder threshold to mark as failed after subscription.') );
+					if( empty( $reminder_config[ $reminder_config_num - 2 ] ) )
+					{	// If "Mark as Failed / Pending delete" is not selected:
+						param_error( 'activate_account_reminder_config_'.( $reminder_config_num - 2 ), /* Do NOT translate because it is impossible for normal form */'Please select account activation reminder threshold to "Marked as Failed / Pending delete" after subscription.' );
 					}
 					$Settings->set( 'activate_account_reminder_config', implode( ',', $reminder_config ) );
 					break;

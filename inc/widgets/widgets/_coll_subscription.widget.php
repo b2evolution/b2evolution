@@ -189,7 +189,7 @@ class coll_subscription_Widget extends ComponentWidget
 					$Form->checklist( $options, 'subscriptions', NULL );
 					$Form->end_form( array( array( 'submit', 'submit', $button_label, 'btn btn-primary' ) ) );
 					?>
-					<script type="text/javascript">
+					<script>
 					var subItems = <?php echo $items_subscribed; ?>;
 					var subComments = <?php echo $comments_subscribed; ?>;
 					var cbItems = jQuery('input[name=cb_sub_items]');

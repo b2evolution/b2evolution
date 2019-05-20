@@ -2094,7 +2094,7 @@ function phpbb_forums_list( & $Form )
 
 	$phpbb_DB->commit();
 
-	echo '<script type="text/javascript">
+	echo '<script>
 	/* <![CDATA[ */
 	jQuery( document ).ready( function()
 	{

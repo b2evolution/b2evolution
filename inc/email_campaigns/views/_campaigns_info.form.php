@@ -42,7 +42,7 @@ $Form->begin_fieldset( T_('List recipients').get_manual_link( 'campaign-recipien
 	$Form->select_input_object( 'ecmp_enlt_ID', $edited_EmailCampaign->get( 'enlt_ID' ), $NewsletterCache, T_('Send to subscribers of'), array(
 			'required'     => true,
 			'field_suffix' => '<input type="submit" name="actionArray[update_newsletter]" class="btn btn-default" value="'.format_to_output( T_('Update'), 'htmlattr' ).'" />' ) );
-	$Form->info( T_('Currently selected recipients'), $edited_EmailCampaign->get_recipients_count(), '('.T_('Accounts which currently accept this list').')' );
+	$Form->info( T_('Subscribers'), $edited_EmailCampaign->get_recipients_count( 'all', true ), '('.T_('Accounts which currently accept this list').')' );
 	$Form->info_field( T_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter', true ), array(
 			'class' => 'info_full_height',
 			'note'  => '('.T_('Accounts that match your additional filter').') '
@@ -56,6 +56,7 @@ $Form->begin_fieldset( T_('List recipients').get_manual_link( 'campaign-recipien
 			'input_prefix' => '<div class="evo_input__tags">',
 			'input_suffix' => '</div><span id="skipped_tag_count">'.$edited_EmailCampaign->get_recipients_count( 'skipped_tag' ).'</span>',
 		) );
+	$Form->info( T_('Send error'), $edited_EmailCampaign->get_recipients_count( 'error', true ), '('.T_('Accounts which had errors on receiving this campaign').')' );
 	$Form->info( T_('Ready to send'), '<span id="ready_to_send_count">'.$edited_EmailCampaign->get_recipients_count( 'wait', true ).'</span>', '('.T_('Accounts which meet all criteria to receive this campaign').')' );
 	$Form->usertag_input( 'ecmp_user_tag_sendsuccess', param( 'ecmp_user_tag_sendsuccess', 'string', $edited_EmailCampaign->get( 'user_tag_sendsuccess' ) ), 60, T_('On successful send, tag users with'), '', array(
 		'maxlength' => 255,
@@ -63,30 +64,23 @@ $Form->begin_fieldset( T_('List recipients').get_manual_link( 'campaign-recipien
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Click tagging').get_manual_link( 'campaign-tagging-panel' ) );
-	$Form->usertag_input( 'ecmp_user_tag', param( 'ecmp_user_tag', 'string', $edited_EmailCampaign->get( 'user_tag' ) ), 60, T_('Tag users who click on content links with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_cta1', param( 'ecmp_user_tag_cta1', 'string', $edited_EmailCampaign->get( 'user_tag_cta1' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 1 with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_cta2', param( 'ecmp_user_tag_cta2', 'string', $edited_EmailCampaign->get( 'user_tag_cta2' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 2 with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_cta3', param( 'ecmp_user_tag_cta3', 'string', $edited_EmailCampaign->get( 'user_tag_cta3' ) ), 60, /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 3 with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_like', param( 'ecmp_user_tag_like', 'string', $edited_EmailCampaign->get( 'user_tag_like' ) ), 60, T_('Tag users who liked the email with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_dislike', param( 'ecmp_user_tag_dislike', 'string', $edited_EmailCampaign->get( 'user_tag_dislike' ) ), 60, T_('Tag users who disliked the email with'), '', array(
-		'maxlength' => 255,
-	) );
-	$Form->usertag_input( 'ecmp_user_tag_unsubscribe', param( 'ecmp_user_tag_unsubscribe', 'string', $edited_EmailCampaign->get( 'user_tag_unsubscribe' ) ), 60, T_('Tag users who (really) unsubscribe with'), '', array(
-		'maxlength' => 255,
-	) );
+	$tag_options = array(
+			array( T_('Tag users who click on content links with'), 'user_tag' ),
+			array( /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 1 with'), 'user_tag_cta1' ),
+			array( /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 2 with'), 'user_tag_cta2' ),
+			array( /* TRANS: CTA means Call To Action */ T_('Tag users who click CTA 3 with'), 'user_tag_cta3' ),
+			array( T_('Tag users who liked the email with'), 'user_tag_like' ),
+			array( T_('Tag users who disliked the email with'), 'user_tag_dislike' ),
+			array( T_('Tag users who click Activate with'), 'user_tag_activate' ),
+			array( T_('Tag users who (really) unsubscribe with'), 'user_tag_unsubscribe' ),
+		);
+	foreach( $tag_options as $tag_option )
+	{
+		$Form->usertag_input( 'ecmp_'.$tag_option[1], $edited_EmailCampaign->get( $tag_option[1] ), 60, $tag_option[0], '', array( 'maxlength' => 255 ) );
+	}
 
 	?>
-	<script type="text/javascript">
+	<script>
 	function update_campaign_recipients_count( ecmp_ID )
 	{
 		jQuery.ajax(
@@ -120,6 +114,29 @@ $Form->begin_fieldset( T_('Click tagging').get_manual_link( 'campaign-tagging-pa
 	<?php
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Automations').get_manual_link( 'campaign-automations-panel' ) );
+	$AutomationCache = & get_AutomationCache();
+	$AutomationCache->load_all();
+	$AutomationCache->none_option_value = 0;
+	$automation_options = array(
+			array( T_('Add users who click CTA 1 to'),       'cta1_autm_ID',    'cta1_autm_execute' ),
+			array( T_('Add users who click CTA 2 to'),       'cta2_autm_ID',    'cta2_autm_execute' ),
+			array( T_('Add users who click CTA 3 to'),       'cta3_autm_ID',    'cta3_autm_execute' ),
+			array( T_('Add users who like the email to'),    'like_autm_ID',    'like_autm_execute' ),
+			array( T_('Add users who dislike the email to'), 'dislike_autm_ID', 'dislike_autm_execute' ),
+			array( T_('Add users who click Activate to'),    'activate_autm_ID','activate_autm_execute' ),
+		);
+	foreach( $automation_options as $automation_option )
+	{
+		$Form->begin_line( $automation_option[0] );
+			$action_autm_ID = $edited_EmailCampaign->get( $automation_option[1] );
+			$Form->select_input_object( 'ecmp_'.$automation_option[1], $action_autm_ID, $AutomationCache, '', array( 'allow_none' => true ) );
+			echo action_icon( T_('Steps'), 'edit', $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=steps&amp;autm_ID='.$action_autm_ID, NULL, NULL, NULL, empty( $action_autm_ID ) ? array( 'style' => 'display:none' ) : array() );
+			$Form->checkbox_input( 'ecmp_'.$automation_option[2], $edited_EmailCampaign->get( $automation_option[2] ), '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('Execute first step(s) immediately').'</label> &nbsp; ' ) );
+		$Form->end_line();
+	}
+$Form->end_fieldset();
+
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
@@ -128,3 +145,17 @@ if( $current_User->check_perm( 'emails', 'edit' ) )
 $Form->end_form( $buttons );
 
 ?>
+<script>
+jQuery( 'select[name$=_autm_ID]' ).change( function()
+{	// Show/Hide icon to view automation steps:
+	var edit_icon = jQuery( this ).next( 'a' );
+	if( jQuery( this ).val() > 0 )
+	{
+		edit_icon.show().attr( 'href', '<?php echo $admin_url; ?>?ctrl=automations&action=edit&tab=steps&autm_ID=' + jQuery( this ).val() );
+	}
+	else
+	{
+		edit_icon.hide();
+	}
+} );
+</script>

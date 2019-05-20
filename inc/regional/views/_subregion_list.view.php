@@ -130,7 +130,7 @@ function filter_subregions( & $Form )
 	load_class( 'regional/model/_country.class.php', 'Country' );
 	$CountryCache = & get_CountryCache( NT_('All') );
 	$Form->select_country( 'c', get_param('c'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
-	
+
 	$Form->select_input_options( 'r', get_regions_option_list( get_param('c'), get_param('r') ), T_('Region') );
 
 	$Form->text( 's', get_param('s'), 30, T_('Search'), '', 255 );
@@ -211,7 +211,7 @@ function subrg_td_actions($subrg_enabled, $subrg_ID )
 
 	if( $subrg_enabled == true )
 	{
-		$r .= action_icon( T_('Disable the sub-region!'), 'deactivate', 
+		$r .= action_icon( T_('Disable the sub-region!'), 'deactivate',
 										regenerate_url( 'action', 'action=disable_subregion&amp;subrg_ID='.$subrg_ID.'&amp;'.url_crumb('subregion') ) );
 	}
 	else
@@ -243,7 +243,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 $Results->display();
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( '#c' ).change( function ()
 {	// Load option list with regions for seleted country
 	jQuery.ajax( {

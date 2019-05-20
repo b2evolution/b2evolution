@@ -25,7 +25,7 @@ global $preset;
 global $rsc_url;
 
 ?>
-<script type="text/javascript">
+<script>
 	function show_hide_chapter_prefix(ob)
 	{
 		var fldset = document.getElementById( 'category_prefix_container' );
@@ -72,8 +72,10 @@ $Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(di
 		array( 'relcanonical_homepage', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_homepage' ) ),
 		), 'canonical_homepage_options', T_('Make canonical') );
 
-	$Form->checkbox( 'paged_noindex', $edited_Blog->get_setting( 'paged_noindex' ), T_('"Next" blog pages'), T_('META NOINDEX').' - '.T_('Page 2,3,4...') );
-	$Form->checkbox( 'paged_nofollowto', $edited_Blog->get_setting( 'paged_nofollowto' ), '', T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...') );
+	$Form->checklist( array(
+			array( 'paged_noindex', 1, T_('META NOINDEX').' - '.T_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_noindex' ) ),
+			array( 'paged_nofollowto', 1, T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_nofollowto' ) ),
+		), 'paged', T_('"Next" blog pages') );
 
 	$Form->radio( 'title_link_type', $edited_Blog->get_setting( 'title_link_type' ), array(
 			  array( 'permalink', T_('Link to the permanent url of the post') ),
@@ -186,7 +188,7 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category_pages_seo'
 		echo '</div>';
 		if( $edited_Blog->get_setting( 'chapter_links' ) == 'param_num' )
 		{ ?>
-		<script type="text/javascript">
+		<script>
 			<!--
 			var fldset = document.getElementById( 'category_prefix_container' );
 			fldset.style.display = 'none';
@@ -264,7 +266,7 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag_pages_seo'), array('
 
 // Javascript juice for the tag fields.
 ?>
-<script type="text/javascript">
+<script>
 jQuery("#tag_links_fieldset input[name=tag_links][type=radio]").click( function()
 {
 	// Disable tag_prefix, if "param" is used. fp> TODO: visual feedback that this is disabled
@@ -345,7 +347,7 @@ $Form->end_fieldset();
 $Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>
-<script type="text/javascript">
+<script>
 jQuery( 'input[name=canonical_item_urls]' ).click( function()
 {
 	var canonical_item_urls_is_unchecked = ! jQuery( this ).prop( 'checked' );

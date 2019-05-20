@@ -275,7 +275,7 @@ class coll_activity_stats_Widget extends ComponentWidget
 		echo $this->disp_params['block_end'];
 
 		?>
-		<script type="text/javascript">
+		<script>
 		var plot, originalData = [], weekData = [], xLabels = [],
 				displayed = '<?php echo format_to_js( $this->disp_params['time_period'] );?>',
 				resizeTimer;

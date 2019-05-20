@@ -10,6 +10,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_funcs( 'collections/_demo_content.funcs.php' );
+
 /**
  * Open a block
  *
@@ -278,7 +280,8 @@ function install_newdb()
 		// (Assigning by reference does not work with "global" keyword (PHP 5.2.8))
 		$GLOBALS['current_User'] = & $UserCache->get_by_ID( 1 );
 
-		create_demo_contents( $demo_users );
+		// Create the demo/sample contents:
+		create_demo_contents( $demo_users, $create_demo_users, true );
 	}
 
 	// Call the following function even if no demo content will be installed.
@@ -322,25 +325,7 @@ function install_newdb()
 }
 
 
-/**
- * Begin install task.
- * This will offer other display methods in the future
- */
-function task_begin( $title )
-{
-	echo get_install_format_text( $title."\n" );
-	evo_flush();
-}
 
-
-/**
- * End install task.
- * This will offer other display methods in the future
- */
-function task_end( $message = 'OK.' )
-{
-	echo get_install_format_text( $message."<br />\n", 'br' );
-}
 
 
 function get_db_version()
@@ -1333,7 +1318,7 @@ function start_install_progress_bar( $title, $steps = NULL )
 				.'<style type="text/css">.progress-bar{width:100% !important}</style>'
 			.'</noscript>';
 		// Don't use the striped animation when we have a real progress indication
-		echo '<script type="text/javascript">'
+		echo '<script>'
 			.'jQuery( ".progress-bar.active.progress-bar-striped" ).removeClass( "active progress-bar-striped" );'
 		.'</script>';
 	}
@@ -1352,7 +1337,7 @@ function stop_install_progress_bar()
 		return;
 	}
 
-	echo '<script type="text/javascript">'
+	echo '<script>'
 		.'jQuery( ".progress-bar" ).css( "width", "100%" ).removeClass( "active progress-bar-striped" );'
 		.'setTimeout( function() { jQuery( ".progress-bar" ).addClass( "progress-bar-'.$install_progress_bar_status.'" ); }, 600 );'
 	.'</script>';
@@ -1385,7 +1370,7 @@ function update_install_progress_bar()
 		$bar_width = 100;
 	}
 
-	echo '<script type="text/javascript">'
+	echo '<script>'
 		.'jQuery( ".progress-bar" ).css( "width", "'.$bar_width.'%" );'
 	.'</script>';
 }
@@ -1623,7 +1608,7 @@ function echo_install_button_js()
 {
 	global $app_name;
 ?>
-<script type="text/javascript">
+<script>
 jQuery( document ).ready( function()
 {
 	jQuery( '#install_button' ).click( function()
@@ -1747,7 +1732,7 @@ function display_install_result_window( $title, $body )
 	</div>';
 
 	// JavaScript to open modal window with info:
-	echo '<script type="text/javascript">'
+	echo '<script>'
 		.'setTimeout( function() { jQuery( "#evo_modal__install" ).modal(); }, 1000 );'
 	.'</script>';
 }

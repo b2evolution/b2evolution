@@ -104,6 +104,16 @@ class SkinCache extends DataObjectCache
 		return $Skin;
 	}
 
+
+	/**
+	 * Get an object from cache by its skin class.
+	 *
+	 * This is used to get a skin for an RSS/Aom type; also to check if a skin is installed.
+	 *
+	 * @param string skin class name of object to load
+	 * @param boolean false if you want to return false on error
+	 * @return Skin A Skin object on success, false on failure (may also halt!)
+	 */
 	function & get_by_class( $req_class, $halt_on_error = true )
 	{
 		global $DB, $Debuglog;

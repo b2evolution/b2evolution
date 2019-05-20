@@ -10513,10 +10513,70 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_end();
 
 		task_begin( 'Upgrading email campaigns table...' );
-		db_add_col( 'T_email__campaign', 'ecmp_user_tag_unsubscribe', 'VARCHAR(255) NULL AFTER ecmp_user_tag_like' );
+		db_add_col( 'T_email__campaign', 'ecmp_user_tag_unsubscribe', 'VARCHAR(255) NULL AFTER ecmp_user_tag_dislike' );
 		task_end();
 
 		upg_task_end( false );
+	}
+
+	if( upg_task_start( 13030, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.10.4-stable
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_cta1_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_cta1_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_cta2_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_cta2_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_cta3_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_cta3_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_like_autm_ID'         => 'INT UNSIGNED NULL',
+				'ecmp_like_autm_execute'    => 'TINYINT(1) NOT NULL DEFAULT 1',
+				'ecmp_dislike_autm_ID'      => 'INT UNSIGNED NULL',
+				'ecmp_dislike_autm_execute' => 'TINYINT(1) NOT NULL DEFAULT 1',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13040, 'Upgrading items table...' ) )
+	{	// part of 6.10.5-stable
+		db_modify_col( 'T_items__item', 'post_title', 'VARCHAR(255) NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13050, 'Upgrading email campaigns table...' ) )
+	{	// part of 6.10.5-stable
+		db_upgrade_cols( 'T_email__campaign', array(
+			'ADD' => array(
+				'ecmp_activate'              => 'TINYINT(1) NOT NULL DEFAULT 0 AFTER ecmp_welcome',
+				'ecmp_user_tag_activate'     => 'VARCHAR(255) NULL AFTER ecmp_user_tag_dislike',
+				'ecmp_activate_autm_ID'      => 'INT UNSIGNED NULL',
+				'ecmp_activate_autm_execute' => 'TINYINT(1) NOT NULL DEFAULT 1',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13060, 'Updating settings for scheduled job "Send reminders about non-activated accounts"...' ) )
+	{	// part of 6.10.5-stable
+		// Add default value "Don't send" for new setting "Delete warning"
+		// and default value "Don't delete" for new setting "Delete account":
+		$DB->query( 'UPDATE T_settings
+			  SET set_value = CONCAT( set_value, ",0,0" )
+			WHERE set_name = "activate_account_reminder_config"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13070, 'Upgrading automation step table...' ) )
+	{	// part of 6.10.6-stable
+		db_modify_col( 'T_automation__step', 'step_type', 'ENUM("if_condition", "send_campaign", "notify_owner", "add_usertag", "remove_usertag", "subscribe", "unsubscribe", "start_automation", "user_status") COLLATE ascii_general_ci NOT NULL DEFAULT "if_condition"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13080, 'Upgrading users table...' ) )
+	{	// part of 6.10.6-stable
+		db_modify_col( 'T_users', 'user_status', "enum( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'pendingdelete', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new'" );
+		upg_task_end();
 	}
 
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
@@ -10812,7 +10872,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			'T_comments__prerendering'     => array( 'cmpr_content_prerendered' ),
 			'T_cron__log'                  => array( 'clog_messages' ),
 			'T_cron__task'                 => array( 'ctsk_name', 'ctsk_params' ),
-			'T_email__campaign'            => array( 'ecmp_email_title', 'ecmp_email_html', 'ecmp_email_text', 'ecmp_email_plaintext', 'ecmp_user_tag', 'ecmp_user_tag_cta1', 'ecmp_user_tag_cta2', 'ecmp_user_tag_cta3', 'ecmp_user_tag_like', 'ecmp_user_tag_dislike, ecmp_user_tag_unsubscribe' ),
+			'T_email__campaign'            => array( 'ecmp_email_title', 'ecmp_email_html', 'ecmp_email_text', 'ecmp_email_plaintext', 'ecmp_user_tag', 'ecmp_user_tag_cta1', 'ecmp_user_tag_cta2', 'ecmp_user_tag_cta3', 'ecmp_user_tag_like', 'ecmp_user_tag_dislike', 'ecmp_user_tag_activate', 'ecmp_user_tag_unsubscribe' ),
 			'T_email__log'                 => array( 'emlog_subject', 'emlog_headers', 'emlog_message' ),
 			'T_email__newsletter'          => array( 'enlt_name', 'enlt_label' ),
 			'T_email__returns'             => array( 'emret_errormsg', 'emret_headers', 'emret_message' ),
@@ -11105,7 +11165,196 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15340 ) )
+	if( upg_task_start( 15340, 'Updating checkbox plugins settings...' ) )
+	{	// part of 7.0.0-alpha
+
+		/**
+		 * Convert general plugin checkbox settings to checklist format
+		 *
+		 * @param string Plugin class name
+		 * @param array Setting replacements
+		 */
+		function upg_convert_plugin_checkbox_settings( $plugin_classname, $setting_replacements )
+		{
+			global $DB;
+
+			$new_plugin_setting_sql = array();
+			$set_names = array();
+
+			foreach( $setting_replacements as $settings_group => $setting_replacement )
+			{
+				foreach( $setting_replacement as $setting_replacement_new )
+				{
+					$set_name = $settings_group.'_'.$setting_replacement_new;
+					$setting_replacement[ $set_name ] = $setting_replacement_new;
+					$set_names[] = $set_name;
+				}
+				$SQL = new SQL( 'Get plugins to update params from checkbox to checklist' );
+				$SQL->SELECT( 'plug_ID, pset_name, pset_value' );
+				$SQL->FROM( 'T_plugins' );
+				$SQL->FROM_add( 'INNER JOIN T_pluginsettings ON plug_ID = pset_plug_ID' );
+				$SQL->WHERE( 'plug_classname = '.$DB->quote( $plugin_classname ) );
+				$SQL->WHERE_and( 'pset_plug_ID IS NOT NULL' );
+				$SQL->WHERE_and( 'pset_name IN ( '.$DB->quote( array_keys( $setting_replacement ) ).' )' );
+				$plugin_settings = $DB->get_results( $SQL );
+
+				if( empty( $plugin_settings ) )
+				{	// Nothing to update because either plugin has default settings or it doesn't exist:
+					continue;
+				}
+
+				$new_plugin_settings = array();
+				foreach( $plugin_settings as $plugin_setting )
+				{
+					if( ! isset( $new_plugin_settings[ $plugin_setting->plug_ID ] ) )
+					{
+						$new_plugin_settings[ $plugin_setting->plug_ID ] = array();
+					}
+					if( ! isset( $new_plugin_settings[ $plugin_setting->plug_ID ][ $settings_group ] ) )
+					{
+						$new_plugin_settings[ $plugin_setting->plug_ID ][ $settings_group ] = array();
+					}
+					if( empty( $plugin_setting->pset_value ) )
+					{
+						continue;
+					}
+					$new_plugin_settings[ $plugin_setting->plug_ID ][ $settings_group ][ $setting_replacement[ $plugin_setting->pset_name ] ] = $plugin_setting->pset_value;
+				}
+				foreach( $new_plugin_settings as $new_set_plugin_ID => $new_set_value )
+				{
+					$new_plugin_setting_sql[] = '( '.$new_set_plugin_ID.', '.$DB->quote( $settings_group ).', '.$DB->quote( serialize( $new_set_value[ $settings_group ] ) ).' )';
+				}
+			}
+
+			if( ! empty( $new_plugin_setting_sql ) )
+			{	// Insert new setting in new format:
+				$DB->query( 'INSERT INTO T_pluginsettings ( pset_plug_ID, pset_name, pset_value )
+					VALUES '.implode( ', '."\n", $new_plugin_setting_sql ) );
+				// Delete old settings:
+				$DB->query( 'DELETE ps FROM T_pluginsettings AS ps
+					INNER JOIN T_plugins AS p ON plug_ID = pset_plug_ID
+					WHERE plug_classname = '.$DB->quote( $plugin_classname ).'
+						AND pset_name IN ( '.$DB->quote( $set_names ).' )' );
+			}
+		}
+
+		/**
+		 * Convert collection plugin checkbox settings to checklist format
+		 *
+		 * @param string Plugin class name
+		 * @param array Setting replacements
+		 */
+		function upg_convert_plugin_coll_checkbox_settings( $plugin_classname, $setting_replacements )
+		{
+			global $DB;
+
+			$new_plugin_setting_sql = array();
+			$sql_join_cond = array();
+
+			foreach( $setting_replacements as $settings_group => $setting_replacement )
+			{
+				$curr_sql_join_cond = array();
+				foreach( $setting_replacement as $setting_replacement_new )
+				{
+					$setting_replacement[ $settings_group.'_'.$setting_replacement_new ] = $setting_replacement_new;
+					$join_cond = 'cset_name = CONCAT( "plugin", plug_ID, "_'.$settings_group.'_'.$setting_replacement_new.'" )';;
+					$sql_join_cond[] = $join_cond;
+					$curr_sql_join_cond[] = $join_cond;
+				}
+
+				$SQL = new SQL( 'Get plugins to update params from checkbox to checklist' );
+				$SQL->SELECT( 'plug_ID, cset_coll_ID, cset_name, cset_value' );
+				$SQL->FROM( 'T_plugins' );
+				$SQL->FROM_add( 'INNER JOIN T_coll_settings ON '.implode( ' OR ', $curr_sql_join_cond ) );
+				$SQL->WHERE( 'plug_classname = '.$DB->quote( $plugin_classname ) );
+				$plugin_settings = $DB->get_results( $SQL );
+
+				if( empty( $plugin_settings ) )
+				{	// Nothing to update because either plugin has default settings or it doesn't exist:
+					continue;
+				}
+
+				$new_plugin_settings = array();
+				foreach( $plugin_settings as $plugin_setting )
+				{
+					if( ! isset( $new_plugin_settings[ $plugin_setting->cset_coll_ID ][ $plugin_setting->plug_ID ] ) )
+					{
+						$new_plugin_settings[ $plugin_setting->cset_coll_ID ][ $plugin_setting->plug_ID ] = array();
+					}
+					if( ! isset( $new_plugin_settings[ $plugin_setting->cset_coll_ID ][ $plugin_setting->plug_ID ][ $settings_group ] ) )
+					{
+						$new_plugin_settings[ $plugin_setting->cset_coll_ID ][ $plugin_setting->plug_ID ][ $settings_group ] = array();
+					}
+					if( empty( $plugin_setting->cset_value ) )
+					{
+						continue;
+					}
+					$cset_name = substr( $plugin_setting->cset_name, strlen( 'plugin'.$plugin_setting->plug_ID.'_' ) );
+					$new_plugin_settings[ $plugin_setting->cset_coll_ID ][ $plugin_setting->plug_ID ][ $settings_group ][ $setting_replacement[ $cset_name ] ] = $plugin_setting->cset_value;
+				}
+				foreach( $new_plugin_settings as $new_set_coll_ID => $new_set_plugins )
+				{
+					foreach( $new_set_plugins as $new_set_plugin_ID => $new_set_value )
+					{
+						$new_plugin_setting_sql[] = '( '.$new_set_coll_ID.', '.$DB->quote( 'plugin'.$new_set_plugin_ID.'_'.$settings_group ).', '.$DB->quote( serialize( $new_set_value[ $settings_group ] ) ).' )';
+					}
+				}
+			}
+
+			if( ! empty( $new_plugin_setting_sql ) )
+			{	// Insert new setting in new format:
+				$DB->query( 'INSERT INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+					VALUES '.implode( ', ', $new_plugin_setting_sql ) );
+				// Delete old settings:
+				$DB->query( 'DELETE cs FROM T_coll_settings AS cs
+					INNER JOIN T_plugins AS p ON '.implode( ' OR ', $sql_join_cond ).'
+					WHERE plug_classname = '.$DB->quote( $plugin_classname ) );
+			}
+		}
+
+		// Update plugin "Autolinks":
+		upg_convert_plugin_checkbox_settings( 'autolinks_plugin', array(
+				// - general settings:
+				'autolink' => array( 'urls', 'defs_default', 'defs_local' ),
+				// - message settings:
+				'msg_autolink_nofollow' => array( 'exist', 'explicit', 'auto' ),
+				// - email campaign settings:
+				'email_autolink_nofollow' => array( 'exist', 'explicit', 'auto' ),
+				// - shared widget container settings:
+				'shared_autolink_nofollow' => array( 'exist', 'explicit', 'auto' ),
+			) );
+		// - collection settings:
+		upg_convert_plugin_coll_checkbox_settings( 'autolinks_plugin', array(
+				'autolink_post_nofollow'    => array( 'exist', 'explicit', 'auto' ),
+				'autolink_comment_nofollow' => array( 'exist', 'explicit', 'auto' ),
+			) );
+
+		// Update collection settings of the plugin "Flowplayer":
+		upg_convert_plugin_coll_checkbox_settings( 'flowplayer_plugin', array(
+				'use_for' => array( 'posts', 'comments' ),
+			) );
+
+		// Update collection settings of the plugin "HTML 5 MediaElement.js Video and Audio Player":
+		upg_convert_plugin_coll_checkbox_settings( 'html5_mediaelementjs_plugin', array(
+				'use_for' => array( 'posts', 'comments' ),
+			) );
+
+		// Update collection settings of the plugin "HTML 5 VideoJS Player":
+		upg_convert_plugin_coll_checkbox_settings( 'html5_videojs_plugin', array(
+				'use_for' => array( 'posts', 'comments' ),
+			) );
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15350, 'Installing minisite collection default skin...' ) )
+	{	// part of 7.0.0-alpha
+		load_funcs( 'skins/_skin.funcs.php' );
+		skin_install( 'jared_skin', true );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15360 ) )
 	{	// part of 7.0.0-alpha
 
 		/* ---- Install basic widgets for containers "Shopping Cart": ---- START */
@@ -11181,7 +11430,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end( false );
 	}
 
-	if( upg_task_start( 15350, 'Creating table for item pricing...' ) )
+	if( upg_task_start( 15370, 'Creating table for item pricing...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_items__pricing', "
 			iprc_ID         INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -11197,7 +11446,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15360, 'Upgrade table currencies...' ) )
+	if( upg_task_start( 15380, 'Upgrade table currencies...' ) )
 	{	// part of 7.0.0-alpha
 		db_add_col( 'T_regional__currency', 'curr_default', 'tinyint(1) NOT NULL DEFAULT 0' );
 		$DB->query( 'UPDATE T_regional__currency
@@ -11206,7 +11455,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15370 ) )
+	if( upg_task_start( 15390 ) )
 	{	// part of 7.0.0-alpha
 		global $basic_widgets_insert_sql_rows;
 		$basic_widgets_insert_sql_rows = array();
@@ -11283,7 +11532,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15380 ) )
+	if( upg_task_start( 15400 ) )
 	{	// part of 7.0.0-alpha
 
 		task_begin( 'Updating table items... ' );
