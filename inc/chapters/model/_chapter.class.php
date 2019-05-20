@@ -328,6 +328,10 @@ class Chapter extends DataObject
 
 		// Check url name
 		param( 'cat_urlname', 'string' );
+		// Replace special chars/umlauts:
+		load_funcs( 'locales/_charset.funcs.php' );
+		set_param( 'cat_urlname', replace_special_chars( get_param( 'cat_urlname' ) ) );
+		param_check_regexp( 'cat_urlname', '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', T_('All slugs must contain at least 1 non-numeric character.'), NULL, false, false );
 		$this->set_from_Request( 'urlname' );
 
 		// Check description
@@ -629,6 +633,7 @@ class Chapter extends DataObject
 		// BLOCK CACHE INVALIDATION:
 		$chapter_Blog = $this->get_Blog();
 		BlockCache::invalidate_key( 'cont_coll_ID', $chapter_Blog->ID ); // Content has changed
+		BlockCache::invalidate_key( 'cat_ID', $this->ID ); // Chaper has changed
 
 		return true;
 	}

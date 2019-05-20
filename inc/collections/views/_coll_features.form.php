@@ -117,7 +117,7 @@ $Form->begin_fieldset( T_('Post list').get_manual_link('item-list-features') );
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Single Item view').get_manual_link('blog_features_settings'), array( 'id' => 'post_options' ) );
+$Form->begin_fieldset( T_('Single Item view').get_manual_link('item-single-item-view-features'), array( 'id' => 'post_options' ) );
 
 	$Form->radio( 'post_navigation', $edited_Blog->get_setting('post_navigation'),
 		array( array( 'same_blog', T_('same blog') ),
@@ -129,7 +129,7 @@ $Form->begin_fieldset( T_('Single Item view').get_manual_link('blog_features_set
 $Form->end_fieldset();
 
 
-$Form->begin_fieldset( T_('Create/Edit options').get_manual_link('blog_features_settings'), array( 'id' => 'post_options' ) );
+$Form->begin_fieldset( T_('Create/Edit options').get_manual_link('blog-features-settings'), array( 'id' => 'post_options' ) );
 
 	$Form->radio( 'enable_goto_blog', $edited_Blog->get_setting( 'enable_goto_blog' ),
 		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
@@ -304,7 +304,7 @@ if( $notifications_mode != 'off' )
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( T_('Aggregation').get_admin_badge().get_manual_link('collection_aggregation_settings') );
+$Form->begin_fieldset( T_('Aggregation').get_admin_badge().get_manual_link('collection-aggregation-settings') );
 	$Form->text( 'aggregate_coll_IDs', $edited_Blog->get_setting( 'aggregate_coll_IDs' ), 30, T_('Collections to aggregate'), T_('List collection IDs separated by \',\', \'*\' for all collections or leave empty for current collection.').'<br />'.T_('Note: Current collection is always part of the aggregation.'), 255 );
 $Form->end_fieldset();
 
@@ -354,47 +354,7 @@ jQuery( '#voting_positive' ).click( function()
 } );
 
 // JS for order fields:
-jQuery( document ).ready( function()
-{
-	disable_selected_orderby_options();
-} );
-
-jQuery( 'select[id^=orderby]' ).change( function()
-{
-	if( jQuery( this ).attr( 'id' ) == 'orderby_1' )
-	{ // First additional order field was changed
-		if( jQuery( this ).val() == '' )
-		{ // If 'None' is selected - Disable second additional order field
-			jQuery( '#orderby_2, #orderdir_2' ).attr( 'disabled', 'disabled' ).val( '' );
-		}
-		else
-		{ // Enable second if first is selected
-			jQuery( '#orderby_2, #orderdir_2' ).removeAttr( 'disabled' );
-		}
-	}
-
-	// Redisable options after some order field was changed
-	jQuery( 'select[id^=orderby] option' ).removeAttr( 'disabled' );
-	disable_selected_orderby_options();
-} );
-
-/**
- * Disable the selected option in two other 'orderby' <select>s
- */
-function disable_selected_orderby_options()
-{
-	jQuery( 'select[id^=orderby]' ).each( function()
-	{
-		var selected = jQuery( this ).val();
-		if( selected != '' )
-		{
-			jQuery( 'select[id^=orderby][id!="' + jQuery( this ).attr( 'id' ) + '"]' ).each( function()
-			{
-				jQuery( this ).find( 'option[value="' + selected + '"]' ).attr( 'disabled', 'disabled' );
-			} );
-		}
-	} );
-}
+<?php echo get_post_orderby_js( 'orderby', 'orderdir' ); ?>
 
 jQuery( 'input[name=blog_use_workflow]' ).click( function()
 {	// Disable setting "Use deadline" when setting "Use workflow" is unchecked:

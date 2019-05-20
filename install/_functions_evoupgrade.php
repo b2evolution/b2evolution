@@ -10033,16 +10033,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 						$help_Item->set_tags_from_string( 'demo' );
 						$help_Item->insert( 1, T_('Help content'), '### '.T_('Email preferences')
 							."\n\n"
-							.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'subsurl' ).'"' )
+							.sprintf( T_('You can see and change all your email subscriptions and notifications coming from this site by clicking <a %s>here</a>.'), 'href="'.$content_block_Blog->get( 'subsurl' ).'"' )
 							."\n\n"
 							.'### '.T_('Managing your personal information')
 							."\n\n"
-							.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'profileurl' ).'"' )
+							.sprintf( T_('You can see and correct the personal details we know about you by clicking <a %s>here</a>.'), 'href="'.$content_block_Blog->get( 'profileurl' ).'"' )
 							."\n\n"
 							.'### '.T_('Closing your account')
 							."\n\n"
-							.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>'), 'href="'.$content_block_Blog->get( 'closeaccounturl' ).'"' ),
-								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'help-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+							.sprintf( T_('You can close your account yourself by clicking <a %s>here</a>.'), 'href="'.$content_block_Blog->get( 'closeaccounturl' ).'"' ),
+								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'help-content', '', 'open', array( 'b2evMark' ), $content_block_ityp_ID );
 						// Create a register content block item for info/shared collection:
 						$register_Item = new Item();
 						$register_Item->set_tags_from_string( 'demo' );
@@ -10058,7 +10058,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 							.' '.T_('Your email address and password will not be shared with other users.')
 							.' '.T_('All other information may be shared with other users.')
 							.' '.T_('Do not provide information you are not willing to share.'),
-								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'register-content', '', 'open', array( 'default' ), $content_block_ityp_ID );
+								date( 'Y-m-d H:i:s' ), $cat_ID, array(), '!published', '#', 'register-content', '', 'open', array( 'b2WPAutP' ), $content_block_ityp_ID );
 						task_end();
 					}
 				}
@@ -10573,9 +10573,247 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13075, 'Upgrading GeoIP plugin data file...' ) )
+	{	// part of 6.10.6-stable
+		if( $Plugins_admin = & get_Plugins_admin() &&
+		    $geoip_Plugin = & $Plugins_admin->get_by_code( 'evo_GeoIP' ) &&
+		    $geoip_Plugin->status == 'enabled' )
+		{	// Try to download only when plugin is installed and enabled:
+			try
+			{	// Download GeoIP data file:
+				$geoip_Plugin->download_geoip_data();
+				task_end( 'OK.' );
+			}
+			catch( Exception $ex )
+			{	// Unexpected error:
+				if( ! is_object( $Plugins ) )
+				{	// Initiliaze Plugins object because it is required in the function Plugin->set_status():
+					load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+					$Plugins = new Plugins();
+				}
+				// Disable plugin if new data file cannot be downloaded as expected:
+				$status_result = $geoip_Plugin->set_status( 'needs_config' );
+				// Display error message:
+				echo get_install_format_text( '<span class="text-danger"><evo:error>'
+						.'<b>UNEXPECTED ERROR</b>: '.nl2br( $ex->getMessage() )
+						.( $status_result ? ' <b>WARNING:</b> The plugin #'.$geoip_Plugin->ID.'('.$geoip_Plugin->name.') has been disabled!' : '' )
+						.'<br />Please check the GeoIP plugin settings right after this upgrade has finished.'
+					.'</evo:error></span> ' );
+				task_end( '' );
+			}
+		}
+		else
+		{
+			task_end( 'Not needed - Plugin is not active.' );
+		}
+		upg_task_end( false );
+	}
+
 	if( upg_task_start( 13080, 'Upgrading users table...' ) )
 	{	// part of 6.10.6-stable
 		db_modify_col( 'T_users', 'user_status', "enum( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'pendingdelete', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new'" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13090, 'Upgrading messages table...' ) )
+	{	// part of 6.10.6-stable
+		db_add_index( 'T_messaging__message', 'msg_author_user_ID', 'msg_author_user_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13100, 'Upgrading comments table...' ) )
+	{	// part of 6.10.6-stable
+		db_modify_col( 'T_comments', 'comment_type', "enum('comment','linkback','trackback','pingback','meta','webmention') COLLATE ascii_general_ci NOT NULL default 'comment'" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13110, 'Updating collection ping plugin settings...' ) )
+	{	// part of 6.10.6-stable
+		load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+		$CollectionSettings = new CollectionSettings();
+		// Remove webmention from default setting in order to don't enable webmentions plugin for collections on upgrade:
+		$default_ping_plugins = trim( preg_replace( '/(^|,)webmention(,|$)/', '$2', $CollectionSettings->get_default( 'ping_plugins' ) ), ',' );
+		$DB->query( 'INSERT INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+			SELECT blog_ID, "ping_plugins", '.$DB->quote( $default_ping_plugins ).'
+			  FROM T_blogs
+			 WHERE blog_ID NOT IN ( SELECT cset_coll_ID FROM T_coll_settings WHERE cset_name = "ping_plugins" )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13120, 'Upgrade Temporary IDs table...' ) )
+	{	// part of 6.11.0-beta
+		db_add_col( 'T_temporary_ID', 'tmp_item_ID', 'INT(11) UNSIGNED NULL COMMENT \'Link to parent Item of Comment in order to enable permission checks\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13130, 'Upgrade links table...' ) )
+	{	// part of 6.11.0-beta
+		db_drop_col( 'T_links', 'link_ltype_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13140, 'Creating custom fields and link versions tables for item versions...' ) )
+	{	// part of 6.11.0-beta
+		db_create_table( 'T_items__version_custom_field', '
+			ivcf_iver_ID     INT UNSIGNED NOT NULL,
+			ivcf_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivcf_itcf_ID     INT UNSIGNED NOT NULL,
+			ivcf_itcf_label  VARCHAR(255) NOT NULL,
+			ivcf_value       VARCHAR( 10000 ) NULL,
+			PRIMARY KEY      ( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID )' );
+
+		db_create_table( 'T_items__version_link', '
+			ivl_iver_ID     INT UNSIGNED NOT NULL,
+			ivl_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivl_link_ID     INT(11) UNSIGNED NOT NULL,
+			ivl_file_ID     INT(11) UNSIGNED NULL,
+			ivl_position    VARCHAR(10) COLLATE ascii_general_ci NOT NULL,
+			ivl_order       INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY     ( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID )' );
+
+		$DB->query( 'ALTER TABLE T_items__version
+				CHANGE iver_edit_datetime iver_edit_last_touched_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13150, 'Upgrading item versions tables...' ) )
+	{	// part of 6.11.0-beta
+
+		// Make column iver_ID unique per Item in order to avoid error on adding PRIMARY(unique) KEY below:
+		$DB->query( 'SET @iver_ID = 0' );
+		$DB->query( 'SET @iver_itm_ID = 0' );
+		$DB->query( 'UPDATE T_items__version
+			  SET iver_ID = IF( @iver_itm_ID != iver_itm_ID, @iver_ID := 1 AND @iver_itm_ID := iver_itm_ID, @iver_ID := @iver_ID + 1 )
+			ORDER BY iver_itm_ID, iver_edit_last_touched_ts' );
+
+		$DB->query( 'ALTER TABLE T_items__version
+			ADD COLUMN iver_type ENUM("archived","proposed") COLLATE ascii_general_ci NOT NULL DEFAULT "archived" AFTER iver_ID,
+			DROP INDEX iver_ID_itm_ID,
+			ADD PRIMARY KEY ( iver_ID , iver_type, iver_itm_ID )' );
+
+		$DB->query( 'ALTER TABLE T_items__version_custom_field
+			ADD COLUMN ivcf_iver_type ENUM("archived","proposed") COLLATE ascii_general_ci NOT NULL DEFAULT "archived" AFTER ivcf_iver_ID,
+			DROP PRIMARY KEY,
+			ADD PRIMARY KEY ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID )' );
+
+		$DB->query( 'ALTER TABLE T_items__version_link
+			ADD COLUMN ivl_iver_type ENUM("archived","proposed") COLLATE ascii_general_ci NOT NULL DEFAULT "archived" AFTER ivl_iver_ID,
+			DROP PRIMARY KEY,
+			ADD PRIMARY KEY ( ivl_iver_ID, ivl_iver_type, ivl_iver_itm_ID, ivl_link_ID )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13160, 'Updating collection user/group permissions...' ) )
+	{	// part of 6.11.0-beta
+		db_add_col( 'T_coll_user_perms', 'bloguser_perm_item_propose', 'tinyint NOT NULL default 0 AFTER bloguser_can_be_assignee' );
+		db_add_col( 'T_coll_group_perms', 'bloggroup_perm_item_propose', 'tinyint NOT NULL default 0 AFTER bloggroup_can_be_assignee' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13170, 'Creating Markdown text file type...' ) )
+	{	// part of 6.11.0-beta
+		$SQL = new SQL( 'Check for file type .md' );
+		$SQL->SELECT( 'ftyp_ID' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_extensions REGEXP "(^| )md( |$)"' );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Insert new file type for Markdown Documentation only if it doesn't exist:
+			$DB->query( 'INSERT INTO T_filetypes
+				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
+				VALUES ( "md", "Markdown text file", "text/plain", "file_document", "text", "registered" )' );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13180, 'Upgrading cron logs table...' ) )
+	{	// part of 6.11.0-beta
+		db_modify_col( 'T_cron__log', 'clog_status', 'enum("started","finished","error","imap_error","timeout","warning") COLLATE ascii_general_ci not null default "started"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13190, 'Update skin color settings with transparency to new format...' ) )
+	{	// part of 6.11.0-beta
+		$SQL = new SQL( 'Get skins with transparent colors' );
+		$SQL->SELECT( 'skin_ID, skin_folder' );
+		$SQL->FROM( 'T_skins__skin' );
+		$SQL->WHERE( 'skin_folder IN ( "bootstrap_main_skin", "horizon_main_skin" )' );
+		$skins = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$color_transparency_settings = array();
+		foreach( $skins as $skin_ID => $skin_folder )
+		{
+			$color_set_name = ( $skin_folder == 'bootstrap_main_skin' ? 'front_bg_cont_color' : 'front_bg_color' );
+			$color_transparency_settings[ $color_set_name ] = array( $skin_ID, 'front_bg_opacity' );
+		}
+
+		$SQL = new SQL( 'Get all skin color settings with transparency which must be updated from hex to rgba format' );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_coll_settings' );
+		foreach( $color_transparency_settings as $color_set_name => $color_data )
+		{
+			$skin_ID = $color_data[0];
+			$transparency_set_name = $color_data[1];
+			$SQL->WHERE_or( 'cset_name LIKE "skin'.$skin_ID.'\_'.str_replace( '_', '\_', $color_set_name ).'"' );
+			$SQL->WHERE_or( 'cset_name LIKE "skin'.$skin_ID.'\_'.str_replace( '_', '\_', $transparency_set_name ).'"' );
+		}
+		$SQL->ORDER_BY( 'cset_coll_ID, cset_name' );
+		$color_settings = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		foreach( $color_settings as $color_setting )
+		{
+			$color_set_name = preg_replace( '/^skin\d+_/', '', $color_setting->cset_name );
+			if( ! isset( $color_transparency_settings[ $color_set_name ] ) )
+			{	// Skip not color setting:
+				continue;
+			}
+			$transparency_set_name = $color_transparency_settings[ $color_set_name ][1];
+			foreach( $color_settings as $transparency_setting )
+			{
+				if( $color_setting->cset_coll_ID == $transparency_setting->cset_coll_ID &&
+				    $transparency_setting->cset_name == str_replace( $color_set_name, '', $color_setting->cset_name ).$transparency_set_name )
+				{	// We found transparency value for the same color setting,
+					// Convert color from format #FFFFFF to rgba(255,255,255,1):
+					$transparency = floatval( $transparency_setting->cset_value / 100 );
+					$color = substr( $color_setting->cset_value, 1 );
+					if( strlen( $color ) == '6' )
+					{	// Color value in format #FFFFFF
+						$color = str_split( $color, 2 );
+					}
+					else
+					{	// Color value in format #FFF
+						$color = str_split( $color, 1 );
+						foreach( $color as $c => $v )
+						{
+							$color[ $c ] = $v.$v;
+						}
+					}
+					// Update color setting to new format:
+					$rgba_color = 'rgba('.implode( ',', array_map( 'hexdec', $color ) ).','.$transparency.')';
+					$DB->query( 'UPDATE T_coll_settings
+						  SET cset_value = '.$DB->quote( $rgba_color ).'
+						WHERE cset_coll_ID = '.$color_setting->cset_coll_ID.'
+						  AND cset_name = "'.$color_setting->cset_name.'"' );
+					// Remove old setting with transparency value:
+					$DB->query( 'DELETE FROM T_coll_settings
+						WHERE cset_coll_ID = '.$transparency_setting->cset_coll_ID.'
+						  AND cset_name = "'.$transparency_setting->cset_name.'"' );
+					break;
+				}
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13200, 'Creating CSV file type...' ) )
+	{	// part of 6.11.0-beta
+		$SQL = new SQL( 'Check for file type .csv' );
+		$SQL->SELECT( 'ftyp_ID' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_extensions REGEXP "(^| )csv( |$)"' );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Insert new file type for Markdown Documentation only if it doesn't exist:
+			$DB->query( 'INSERT INTO T_filetypes
+				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
+				VALUES ( "csv", "CSV file", "text/plain", "file_document", "text", "registered" )' );
+		}
 		upg_task_end();
 	}
 
@@ -10791,7 +11029,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					}
 					$DB->query( 'INSERT INTO T_widget__container ( wico_code, wico_name, wico_coll_ID, wico_order, wico_main )
 						VALUES '.implode( ', ', $new_main_cnontainers_sql ),
-						'Insert new main widget containers which are declared in skin file for colleciton #'.$Blog->ID );
+						'Insert new main widget containers which are declared in skin file for collection #'.$Blog->ID );
 				}
 			}
 		}
@@ -11354,8 +11592,145 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15360 ) )
+	if( upg_task_start( 15360, 'Fix integer unsigned ID columns...' ) )
 	{	// part of 7.0.0-alpha
+		$tables_num = 0;
+		$columns_num = 0;
+		$tables = $DB->get_col( 'SHOW TABLES' );
+		foreach( $tables as $table_name )
+		{
+			if( ! in_array( $table_name, $db_config['aliases'] ) )
+			{	// Skip not core table, e.g. custom plugin tables:
+				continue;
+			}
+			$modify_columns = array();
+			// ID field must be unsigned 10 digit size instead of wrong 11:
+			$columns = $DB->get_results( 'SHOW FULL COLUMNS FROM '.$table_name
+				.' WHERE Field LIKE "%_ID"'
+				.' AND Type LIKE "int(11)%"' );
+			foreach( $columns as $column )
+			{
+				$modify_columns[ $column->Field ] = 'MODIFY COLUMN `'.$column->Field.'` '
+					.'INT(10) UNSIGNED ' // Change from INT(11) to INT(10)
+					.( $column->Null == 'YES' ? 'NULL' : 'NOT NULL' )
+					.( $column->Default === NULL ? '' : ' DEFAULT '.$DB->quote( $column->Default ) )
+					.( empty( $column->Extra ) ? '' : ' '.$column->Extra )
+					.( empty( $column->Comment ) ? '' : ' COMMENT '.$DB->quote( $column->Comment ) );
+				$columns_num++;
+			}
+			if( ! empty( $modify_columns ) )
+			{	// Upgrade wrong integer unsigned ID columns:
+				echo '<br />- table <code>'.$table_name.'</code>, columns: <code>'.implode( '</code>, <code>', array_keys( $modify_columns ) ).'</code>...';
+				evo_flush();
+				$DB->query( 'ALTER TABLE '.$table_name.' '.implode( ', ', $modify_columns ) );
+				$tables_num++;
+			}
+		}
+		echo '<br />'.$columns_num.' columns have been modified in '.$tables_num.' tables - ';
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15370, 'Installing new widget container "Photo Index"...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'photo_index' );
+		// Move skin setting "Thumbnail size in Media index" to widget "Photo Index" of new created container "Photo Index":
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params, cset_value' );
+		$SQL->FROM( 'T_widget__container' );
+		$SQL->FROM_add( 'INNER JOIN T_coll_settings ON cset_coll_ID = wico_coll_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_widget__widget ON wi_wico_ID = wico_ID' );
+		$SQL->WHERE( 'wico_code = "photo_index"' );
+		$SQL->WHERE_and( 'wi_code = "coll_media_index"' );
+		$SQL->WHERE_and( 'cset_name LIKE "skin%mediaidx\_thumb\_size"' );
+		$skin_settings = $DB->get_results( $SQL );
+		foreach( $skin_settings as $skin_setting )
+		{
+			$wi_params = empty( $skin_setting->wi_params ) ? array() : @unserialize( $skin_setting->wi_params );
+			if( ! is_array( $wi_params ) )
+			{
+				$wi_params = array();
+			}
+			// Update widget thumb size setting with value what was stored in skin settings:
+			$wi_params['thumb_size'] = $skin_setting->cset_value;
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_params = '.$DB->quote( serialize( $wi_params ) ).'
+				WHERE wi_ID = '.$DB->quote( $skin_setting->wi_ID ) );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15380, 'Upgrading posts table...' ) )
+	{	// part of 7.0.1-alpha
+		db_add_col( 'T_items__item', 'post_locale_visibility', 'ENUM( "always", "follow-nav-locale" ) COLLATE ascii_general_ci NOT NULL DEFAULT "always" AFTER post_locale' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15390, 'Creating table for collection extra locales...' ) )
+	{	// part of 7.0.1-alpha
+		db_create_table( 'T_coll_locales', '
+			cl_coll_ID INT(10) UNSIGNED NOT NULL,
+			cl_locale  VARCHAR(20) COLLATE ascii_general_ci NOT NULL,
+			PRIMARY KEY cl_coll_loc_pk (cl_coll_ID, cl_locale)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15400, 'Inserting collection extra locales...' ) )
+	{	// part of 7.0.1-alpha
+		$DB->query( 'INSERT INTO T_coll_locales ( cl_coll_ID, cl_locale )
+			SELECT blog_ID, blog_locale
+			  FROM T_blogs' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15410, 'Creating table for Post Groups...' ) )
+	{	// part of 7.0.1-alpha
+		db_create_table( 'T_items__itemgroup', '
+			igrp_ID INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			PRIMARY KEY (igrp_ID)' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15420, 'Upgrading posts table...' ) )
+	{	// part of 7.0.1-alpha
+		db_add_col( 'T_items__item', 'post_igrp_ID', 'INT(10) UNSIGNED NULL AFTER post_ityp_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15430, 'Updating collection locale setting for new posts...' ) )
+	{	// part of 7.0.1-alpha
+		$DB->query( 'UPDATE T_coll_settings
+			  SET cset_value = "select_coll"
+			WHERE cset_name = "new_item_locale_source"
+			  AND cset_value = "use_coll"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15440, 'Upgrading table of collection extra locales and linking with other collections...' ) )
+	{	// part of 7.0.1-alpha
+		db_add_col( 'T_coll_locales', 'cl_linked_coll_ID', 'INT(10) UNSIGNED NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15450, 'Installing new default widgets...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'page_top', 'coll_locale_switch' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15460, 'Upgrading files table...' ) )
+	{	// part of 7.0.1-alpha
+		db_upgrade_cols( 'T_files', array(
+			'ADD' => array(
+				'file_ts'  => 'TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00" AFTER file_path',
+				'file_width'  => 'INT(10) UNSIGNED NULL AFTER file_ts',
+				'file_height'  => 'INT(10) UNSIGNED NULL AFTER file_width',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15470 ) )
+	{	// part of 7.0.1-alpha
 
 		/* ---- Install basic widgets for containers "Shopping Cart": ---- START */
 		global $basic_widgets_insert_sql_rows;
@@ -11430,8 +11805,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end( false );
 	}
 
-	if( upg_task_start( 15370, 'Creating table for item pricing...' ) )
-	{	// part of 7.0.0-alpha
+	if( upg_task_start( 15480, 'Creating table for item pricing...' ) )
+	{	// part of 7.0.1-alpha
 		db_create_table( 'T_items__pricing', "
 			iprc_ID         INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			iprc_itm_ID     INT UNSIGNED NOT NULL,
@@ -11446,8 +11821,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15380, 'Upgrade table currencies...' ) )
-	{	// part of 7.0.0-alpha
+	if( upg_task_start( 15490, 'Upgrade table currencies...' ) )
+	{	// part of 7.0.1-alpha
 		db_add_col( 'T_regional__currency', 'curr_default', 'tinyint(1) NOT NULL DEFAULT 0' );
 		$DB->query( 'UPDATE T_regional__currency
 			  SET curr_default = 1
@@ -11455,8 +11830,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15390 ) )
-	{	// part of 7.0.0-alpha
+	if( upg_task_start( 15500 ) )
+	{	// part of 7.0.1-alpha
 		global $basic_widgets_insert_sql_rows;
 		$basic_widgets_insert_sql_rows = array();
 
@@ -11532,8 +11907,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15400 ) )
-	{	// part of 7.0.0-alpha
+	if( upg_task_start( 15510 ) )
+	{	// part of 7.0.1-alpha
 
 		task_begin( 'Updating table items... ' );
 		db_upgrade_cols( 'T_items__item', array(

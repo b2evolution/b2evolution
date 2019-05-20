@@ -20,7 +20,7 @@ global $more;
 // Default params:
 $params = array_merge( array(
 		'content_mode'             => 'auto', // Can be 'excerpt', 'normal' or 'full'. 'auto' will auto select depending on backoffice SEO settings for $disp-detail
-		'intro_mode'               => 'auto', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
+		'intro_mode'               => 'normal', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
 		'force_more'               => false, // This will be set to true id 'content_mode' resolves to 'full'.
 
 		'content_display_full'     => true, // Do we want to display all post content? false to display only images/attachments
@@ -56,7 +56,7 @@ $params = array_merge( array(
 		'after_image'              => '</figure>',
 		'after_images'             => '</div>',
 		'image_class'              => 'img-responsive',
-		'image_size'               => 'fit-1280x720',
+		'image_size'               => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 		'image_limit'              =>  1000,
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
 		'excerpt_image_class'      => '',
@@ -131,11 +131,6 @@ if( $content_mode == 'auto' )
 			$content_mode = $Blog->get_setting('archive_content');
 			break;
 
-		case 'posts-filtered':
-		case 'search':
-			$content_mode = $Blog->get_setting('filtered_content');
-			break;
-
 		case 'single':
 		case 'page':
 			$content_mode = 'full';
@@ -143,8 +138,11 @@ if( $content_mode == 'auto' )
 
 		case 'posts-default':  // home page 1
 		case 'posts-next':     // next page 2, 3, etc
-		default:
 			$content_mode = $Blog->get_setting('main_content');
+			break;
+
+		default: // posts-filtered, search, flagged and etc.
+			$content_mode = $Blog->get_setting('filtered_content');
 	}
 }
 

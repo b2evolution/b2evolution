@@ -18,7 +18,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-param( 'tab', 'string', '', true );
+param( 'tab', 'string', 'list', true );
 param( 'skin_type', 'string', 'normal' );
 
 param_action( 'list' );
@@ -27,7 +27,7 @@ if( strpos( $action, 'new' ) !== false || $action == 'copy' )
 { // Simulate tab to value 'new' for actions to create new blog
 	$tab = 'new';
 }
-if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_section', 'edit_section', 'delete_section', 'update_site_skin', 'new_demo_content' ) ) &&
+if( ! in_array( $action, array( 'list', 'new', 'new-selskin', 'new-installskin', 'new-name', 'create', 'update_settings_blog', 'update_settings_site', 'new_section', 'edit_section', 'delete_section', 'update_site_skin', 'create_demo_content' ) ) &&
     ! in_array( $tab, array( 'site_settings', 'site_skin' ) ) )
 {
 	if( valid_blog_requested() )
@@ -146,10 +146,12 @@ switch( $action )
 
 		$edited_Blog->set( 'owner_user_ID', $current_User->ID );
 
+		param( 'skin_ID', 'integer', true );
+		$edited_Blog->set( 'normal_skin_ID', $skin_ID );
+
 		param( 'kind', 'string', true );
 		$edited_Blog->init_by_kind( $kind );
 
-		param( 'skin_ID', 'integer', true );
 		if( $sec_ID > 0 )
 		{
 			$edited_Blog->set( 'sec_ID', $sec_ID );
@@ -179,9 +181,12 @@ switch( $action )
 		if( $kind == 'main' && ! $current_User->check_perm( 'blog_admin', 'editAll', false ) )
 		{ // Non-collection admins should not be able to create home/main collections
 			$Messages->add( sprintf( T_('You don\'t have permission to create a collection of kind %s.'), '<b>&laquo;'.$kind.'&raquo;</b>' ), 'error' );
-			header_redirect( $admin_url.'?ctrl=dashboard' ); // will EXIT
+			header_redirect( $admin_url.'?ctrl=collections' ); // will EXIT
 			// We have EXITed already at this point!!
 		}
+
+		param( 'skin_ID', 'integer', true );
+		$edited_Blog->set( 'normal_skin_ID', $skin_ID );
 
 		$edited_Blog->init_by_kind( $kind );
 		if( ! $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
@@ -190,9 +195,6 @@ switch( $action )
 		 	// When user has edit permission to blog admin part, the urlname will be validated in load_from_request() function.
 			$edited_Blog->set( 'urlname', urltitle_validate( empty( $blog_urlname ) ? $edited_Blog->get( 'urlname' ) : $blog_urlname, '', 0, false, 'blog_urlname', 'blog_ID', 'T_blogs' ) );
 		}
-
-		param( 'skin_ID', 'integer', true );
-		$edited_Blog->set( 'normal_skin_ID', $skin_ID );
 
 		// Check how new content should be created for new collection:
 		param( 'create_demo_contents', 'boolean', NULL );
@@ -321,7 +323,7 @@ switch( $action )
 
 			$action = 'list';
 			// Redirect so that a reload doesn't write to the DB twice:
-			$redirect_to = param( 'redirect_to', 'url', $admin_url.'?ctrl=dashboard' );
+			$redirect_to = param( 'redirect_to', 'url', $admin_url.'?ctrl=collections' );
 			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
@@ -426,7 +428,7 @@ switch( $action )
 
 		// Site color
 		$site_color = param( 'site_color', 'string', '' );
-		param_check_regexp( 'site_color', '~^(#([a-f0-9]{3}){1,2})?$~i', T_('Invalid color code.'), NULL, false );
+		param_check_color( 'site_color', T_('Invalid color code.') );
 		$Settings->set( 'site_color', $site_color );
 
 		// Site short name
@@ -535,7 +537,7 @@ switch( $action )
 			}
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=dashboard' ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=collections' ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		break;
@@ -564,7 +566,7 @@ switch( $action )
 			forget_param( 'sec_ID' );
 			$Messages->add( $msg, 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=dashboard' ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=collections' ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
@@ -720,6 +722,18 @@ switch( $action )
 
 		header_redirect( $admin_url.'?ctrl=dashboard' ); // will save $Messages into Session
 		break;
+
+	case 'create_demo_content':
+		// Install demo collections:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'demo_content' );
+
+		// Check permission:
+		$current_User->check_perm( 'blogs', 'create', true );
+
+		// Install process is executed below in template in order to display it in real time.
+		break;
 }
 
 switch( $tab )
@@ -772,7 +786,7 @@ switch( $tab )
 
 		$AdminUI->set_path( 'collections', 'settings', 'blog_settings' );
 
-		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
 		$AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog=$blog$' );
 		$AdminUI->breadcrumbpath_add( T_('Common Settings'), $admin_url.'?ctrl=collections&amp;tab=blog_settings&amp;blog=$blog$' );
 
@@ -790,8 +804,14 @@ switch( $tab )
 		$AdminUI->set_path( 'collections' );
 		$AdminUI->clear_menu_entries( 'collections' );
 
-		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
 		$AdminUI->breadcrumbpath_add( T_('New Collection'), $admin_url.'?ctrl=collections&amp;action=new' );
+
+		// Init params to display a panel with blog selectors
+		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'coll_settings', 'tab' => 'dashboard' ) );
+
+		// Reset previous working collection:
+		$blog = 0;
 
 		// Set an url for manual page:
 		switch( $action )
@@ -813,7 +833,10 @@ switch( $tab )
 		$AdminUI->set_path( 'collections' );
 		$AdminUI->clear_menu_entries( 'collections' );
 
-		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
+		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
+
+		// Init params to display a panel with blog selectors
+		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'coll_settings', 'tab' => 'dashboard' ) );
 
 		// We should activate toolbar menu items for this controller and tab
 		$activate_collection_toolbar = true;
@@ -821,16 +844,46 @@ switch( $tab )
 
 	case 'section':
 		// Pages to create/edit/delete sections:
-		$AdminUI->set_path( 'site', 'dashboard' );
+		$AdminUI->set_path( 'collections' );
+		$AdminUI->clear_menu_entries( 'collections' );
 
 		$AdminUI->breadcrumbpath_init( false );
-		$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
-		$AdminUI->breadcrumbpath_add( T_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
+		$AdminUI->breadcrumbpath_add( T_('List'), $admin_url.'?ctrl=collections' );
+		$AdminUI->breadcrumbpath_add( T_('Collections'), $admin_url.'?ctrl=collections' );
 
-		$AdminUI->set_page_manual_link( 'section' );
+		// Init params to display a panel with blog selectors
+		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'coll_settings', 'tab' => 'dashboard' ) );
+
+		// Reset previous working collection:
+		$blog = 0;
 
 		// Init JS to autcomplete the user logins:
 		init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
+		break;
+
+	case 'list':
+		$AdminUI->set_path( 'collections' );
+		$AdminUI->clear_menu_entries( 'collections' );
+
+		$AdminUI->breadcrumbpath_init( false );
+		$AdminUI->breadcrumbpath_add( T_('List'), $admin_url.'?ctrl=collections' );
+		$AdminUI->breadcrumbpath_add( T_('Collections'), $admin_url.'?ctrl=collections' );
+
+		// Init params to display a panel with blog selectors
+		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'coll_settings', 'tab' => 'dashboard' ) );
+
+		// Reset previous working collection:
+		$blog = 0;
+
+		// Init JS to quick edit an order of the collections and their groups in the table cell by AJAX:
+		init_field_editor_js( array(
+				'field_prefix' => 'order-blog-',
+				'action_url' => $admin_url.'?ctrl=collections&order_action=update&order_data=',
+			) );
+		init_field_editor_js( array(
+				'field_prefix' => 'order-section-',
+				'action_url' => $admin_url.'?ctrl=collections&order_action=update_section&order_data=',
+			) );
 		break;
 }
 
@@ -939,7 +992,7 @@ switch( $action )
 
 		if( $action == 'delete_section' )
 		{	// We need to ask for confirmation:
-			set_param( 'redirect_to', $admin_url.'?ctrl=dashboard' );
+			set_param( 'redirect_to', $admin_url.'?ctrl=collections' );
 			$edited_Section->confirm_delete(
 				sprintf( T_('Delete section "%s"?'), $edited_Section->dget( 'name' ) ),
 				'section', $action, get_memorized( 'action' ) );
@@ -977,6 +1030,36 @@ switch( $action )
 			case 'blog_settings':
 				$AdminUI->disp_view( 'collections/views/_coll_settings_blog.form.php' );
 				break;
+
+			default:
+				load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+				$collection_count = get_table_count( 'T_blogs' );
+				if( $action == 'create_demo_content' && $collection_count == 0 )
+				{	// Create new demo content inside template to display a process in real time:
+					$block_item_Widget = new Widget( 'block_item' );
+
+					$block_item_Widget->title = T_('Demo content').':';
+					$block_item_Widget->disp_template_replaced( 'block_start' );
+
+					load_funcs( 'collections/_demo_content.funcs.php' );
+					$collection_count = install_demo_content();
+
+					$block_item_Widget->disp_template_raw( 'block_end' );
+				}
+
+				// Welcome panel to create demo content:
+				if( $current_User->check_perm( 'blogs', 'create' ) && $collection_count == 0 )
+				{
+					$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
+				}
+
+				if( $collection_count > 0 )
+				{	// Collections list:
+					$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
+				}
+
+				// Models to start new collections
+				$AdminUI->disp_view( 'collections/views/_coll_model_list.view.php' );
 		}
 		$AdminUI->disp_payload_end();
 

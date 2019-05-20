@@ -21,7 +21,7 @@ if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page direct
 /**
  * Get config array of default widgets for install, upgrade and new collections
  *
- * @param string Collection kind
+ * @param string Collection kind: 'minisite', 'main', 'std', 'photo', 'forum', 'manual', 'group'
  * @param integer Collection ID
  * @param boolean Should be true only when it's called after initial install
  * @return array
@@ -64,7 +64,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 10, 'basic_menu_link', 'coll_ID' => $blog_b_ID, 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) ),
 		array( 13, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) ),
 		array( 15, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) ),
-		array( 17, 'flag_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged topics') ) ),
+		array( 17, 'flag_menu_link', 'coll_type' => 'forum,group', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged topics') ) ),
 		array( 13, 'basic_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) ),
 		array( 15, 'basic_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) ),
 		array( 17, 'flag_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged pages') ) ),
@@ -165,6 +165,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Comment Area */
 	$default_widgets['comment_area'] = array(
+		array(  5, 'fin_contrib', 'type' => 'plugin' ),
 		array( 10, 'item_comment_form' ),
 		array( 20, 'item_comment_notification' ),
 		array( 30, 'coll_item_notification' ),
@@ -191,6 +192,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'link5'      => 20,
 				'link5_href' => 'https://github.com/b2evolution/b2evolution',
 			) ),
+		array( 20, 'coll_locale_switch' ),
 	);
 
 	/* Sidebar */
@@ -267,31 +269,52 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			) ),
 		array( 10, 'coll_comment_list' ),
 		array( 15, 'coll_media_index', 'params' => 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
-		array( 20, 'free_html', 'params' => 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:162:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Customize", then "Blog Widgets".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
+		array( 20, 'free_html', 'params' => 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:166:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Collection", then "Widgets&hellip;".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
 	);
 
 	/* Front Page Main Area */
 	$default_widgets['front_page_main_area'] = array(
 		array(  1, 'coll_title', 'coll_type' => 'main,minisite' ),
-		array(  2, 'coll_tagline', 'coll_type' => 'main,minisite' ),
-		array( 10, 'coll_featured_intro', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
+		array(  2, 'coll_tagline', 'coll_type' => 'minisite' ),
+		array(  5, 'free_text', 'coll_type' => 'main', 'params' => array(
+				'content' => T_('This is the Home page of your site.')."\n\n"
+					.T_('More specifically it is the "Front page" of the first collection of your site. This first collection is called "Home". Several other sample collections may have been created during the setup process. You can access these collections by clicking "Blog A", "Blog B", "Photos", etc. in the menu bar at the top of this page.')."\n\n"
+					.T_('You can think of collections as "sections" of your site. Different collections/sections may have different purposes: blog, photo gallery, forums, manual, etc. You can add or remove collections at will through the back-office. You can even remove this "Home" collection if you don\'t need it.')."\n\n"
+					.T_('Feel free to experiment! If you delete all collections, the Quick start wizard will come back and you will be able to start with a completely new arrangement of collections.'),
+			) ),
+		array( 10, 'coll_featured_intro', 'coll_type' => '-main,minisite', 'params' => ( $kind == 'main' ? array(
 			// Hide a title of the front intro post:
 				'disp_title' => 0,
 			) : NULL ) ),
-		array( 15, 'user_links', 'coll_type' => 'main' ),
+		array( 15, 'social_links', 'coll_type' => 'main', 'params' => array(
+				'link1'      => 16,
+				'link1_href' => 'https://twitter.com/b2evolution/',
+				'link2'      => 17,
+				'link2_href' => 'https://www.facebook.com/b2evolution',
+				'link3'      => 18,
+				'link3_href' => 'https://plus.google.com/+b2evolution/posts',
+				'link4'      => 19,
+				'link4_href' => 'https://www.linkedin.com/company/b2evolution-net',
+				'link5'      => 20,
+				'link5_href' => 'https://github.com/b2evolution/b2evolution',
+			) ),
 		array( 20, 'coll_featured_posts', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
-			// Display the posts from all other blogs if it is allowed by blogs setting "Collections to aggregate":
-				'blog_ID'    => '',
+				'blog_ID'    => '*', // Display Items from all Collections
 				'limit'      => 5,
 				'layout'     => 'list',
 				'thumb_size' => 'crop-80x80',
 			) : NULL ) ),
+		array( 30, 'coll_post_list', 'coll_type' => 'main', 'params' => array(
+				'blog_ID'  => '*', // Display Items from all Collections
+				'title'    => T_('More Posts'),
+				'featured' => 'other',
+			) ),
 		// Install widget "Poll" only for Blog B on install:
 		array( 40, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => $demo_poll_ID ) ),
 		array( 45, 'content_hierarchy', 'coll_type' => 'manual' ),
-		array( 50, 'subcontainer_row', 'params' => array(
+		array( 50, 'subcontainer_row', 'coll_type' => '-main', 'params' => array(
 				'column1_container' => 'front_page_column_a',
-				'column1_class'     => ( $kind == 'main' ? 'col-xs-12' : 'col-sm-6 col-xs-12' ),
+				'column1_class'     => 'col-sm-6 col-xs-12',
 				'column2_container' => 'front_page_column_b',
 				'column2_class'     => 'col-sm-6 col-xs-12',
 			) ),
@@ -316,8 +339,11 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Front Page Secondary Area */
 	$default_widgets['front_page_secondary_area'] = array(
 		array( 10, 'org_members', 'coll_type' => 'main,minisite' ),
-		array( 20, 'coll_flagged_list', 'coll_type' => '-minisite' ),
-		array( 30, 'content_block', 'coll_type' => 'main', 'params' => array( 'item_slug' => 'this-is-a-content-block' ) ),
+		array( 20, 'coll_flagged_list', 'coll_type' => '-main,minisite' ),
+		array( 30, 'content_block', 'coll_type' => 'main', 'params' => array(
+			'title'     => T_('Content Block Example'),
+			'item_slug' => 'this-is-a-content-block',
+		) ),
 	);
 
 	/* Front Page Area 3 */
@@ -388,6 +414,17 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 20, 'display_shopping_cart' ),
 		array( 30, 'country_selector' ),
 		array( 40, 'display_shipping_method' ),
+	);
+
+	/* Photo Index */
+	$default_widgets['photo_index'] = array(
+		array( 10, 'coll_media_index', 'params' => array(
+				'title'        => '',
+				'thumb_size'   => 'fit-256x256',
+				'thumb_layout' => 'grid',
+				'grid_nb_cols' => 8,
+				'limit'        => 1000,
+			) ),
 	);
 
 	/* Mobile Footer */
@@ -696,7 +733,13 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'name'    => NT_('Widget Page Section 1'),
 		'order'   => 10,
 		'item_ID' => $installed_collection_info_pages['widget_page'],
-		array( 10, 'coll_featured_posts' ),
+		array(  5, 'free_text', 'params' => array(
+				'title'   => T_('This is a sample widget page'),
+				'content' => T_('A widget page is a page that is constructed entirely with widgets, rather than being constructed around a classic structure of title, content and comments.'),
+			) ),
+		array( 10, 'coll_featured_posts', 'params' => array(
+				'blog_ID' => '*', // Display Items from all Collections
+			) ),
 	);
 
 	/* Widget Page Section 2 */
@@ -751,7 +794,7 @@ function get_default_widgets_by_container( $container_code, $kind = '', $blog_id
  * @param boolean should be true only when it's called after initial install
  * fp> TODO: $initial_install is used to know if we want to trust globals like $blog_photoblog_ID and $blog_forums_ID. We don't want that.
  *           We should pass a $context array with values like 'photo_source_coll_ID' => 4.
- *           Also, checking $blog_forums_ID is unnecessary complexity. We can check the colleciton kind == forum
+ *           Also, checking $blog_forums_ID is unnecessary complexity. We can check the collection kind == forum
  * @param string Kind of blog ( 'std', 'photo', 'group', 'forum' )
  */
 function insert_basic_widgets( $blog_id, $skin_type, $initial_install = false, $kind = '' )
@@ -942,7 +985,29 @@ function insert_shared_widgets( $skin_type )
 
 	$shared_widgets_insert_sql_rows = array();
 	$shared_containers = array();
+	$shared_widgets = array();
 	$shared_container_order = 1;
+
+	// Get all shared containers and widgets in order to don't install them twice when it is requested:
+	$existing_widgets_SQL = new SQL( 'Get existings shared widget containers' );
+	$existing_widgets_SQL->SELECT( 'wico_code, wico_ID, wi_code, wi_order' );
+	$existing_widgets_SQL->FROM( 'T_widget__container' );
+	$existing_widgets_SQL->FROM_add( 'LEFT JOIN T_widget__widget ON wico_ID = wi_wico_ID' );
+	$existing_widgets_SQL->WHERE( 'wico_coll_ID IS NULL' );
+	$existing_widgets = $DB->get_results( $existing_widgets_SQL );
+	foreach( $existing_widgets as $existing_widget )
+	{
+		$shared_containers[ $existing_widget->wico_code ] = $existing_widget->wico_ID;
+		if( ! isset( $shared_widgets[ $existing_widget->wico_ID ] ) )
+		{
+			$shared_widgets[ $existing_widget->wico_ID ] = array();
+		}
+		// Table T_widget__widget has the unique index ( wi_wico_ID, wi_order ),
+		// so we should check widgets per container ID and widget order
+		// in order to avoid error of duplicate records:
+		$shared_widgets[ $existing_widget->wico_ID ][ $existing_widget->wi_order ] = $existing_widget->wi_code;
+	}
+
 	foreach( $default_widgets as $wico_code => $container_widgets )
 	{
 		if( ! isset( $container_widgets['type'] ) ||
@@ -981,6 +1046,11 @@ function insert_shared_widgets( $skin_type )
 
 			if( isset( $widget['install'] ) && ! $widget['install'] )
 			{	// Skip widget because it should not be installed by condition from config:
+				continue;
+			}
+
+			if( isset( $shared_widgets[ $wico_id ][ $widget[0] ] ) )
+			{	// Skip the widget because a widget was already installed for the container with same order:
 				continue;
 			}
 

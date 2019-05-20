@@ -22,8 +22,6 @@ global $current_User;
  */
 global $Settings;
 
-global $dispatcher;
-
 global $collections_Module;
 
 $Form = new Form( NULL, 'closing_checkchanges' );

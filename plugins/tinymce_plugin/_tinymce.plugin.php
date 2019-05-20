@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '7.0.0';
+	var $version = '7.0.1';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -710,8 +710,7 @@ class tinymce_plugin extends Plugin
 					// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
 					require_js( '#tinymce#', 'blog', false, true );
 					require_js( '#tinymce_jquery#', 'blog', false, true );
-					require_js( '#shortcodes#', 'blog', false, true );
-					require_js( '#evo_view#', 'blog', false, true );
+					$this->require_js( 'js/evo_view_shortcodes.bmin.js', true );
 					?>
 
 					<script>
@@ -1093,6 +1092,10 @@ class tinymce_plugin extends Plugin
 		$init_options[] = 'object_resizing : false';
 
 		$init_options[] = 'extended_valid_elements : "figure[class],figcaption[class]"';
+
+		// Options below should prevent insertion of <p> for every newline:
+		//$init_options[] = 'force_p_newlines : false';
+		//$init_options[] = 'forced_root_block : ""';
 
 		// Content CSS:
 		$content_css = array();

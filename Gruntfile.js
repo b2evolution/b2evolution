@@ -79,6 +79,9 @@ module.exports = function(grunt) {
 					// Colorbox
 					'rsc/css/colorbox/colorbox-regular.css':   'rsc/css/colorbox/colorbox-regular.less',
 					'rsc/css/colorbox/colorbox-bootstrap.css': 'rsc/css/colorbox/colorbox-bootstrap.less',
+
+					// evo helpdesk widget
+					'rsc/css/evo_helpdesk_widget.css': 'rsc/less/evo_helpdesk_widget.less',
 				}
 			},
 
@@ -198,6 +201,10 @@ module.exports = function(grunt) {
 				src: [ 'rsc/css/ddexitpop/ddexitpop.css', 'rsc/css/ddexitpop/animate.min.css' ],
 				dest: 'rsc/build/ddexitpop.bmin.css',
 			},
+			evo_helpdesk_widget: {
+				src: 'rsc/css/evo_helpdesk_widget.css',
+				dest: 'rsc/css/evo_helpdesk_widget.min.css',
+			},
 		},
 
 		// Configuration for the uglify minifying tasks:
@@ -224,6 +231,7 @@ module.exports = function(grunt) {
 					'rsc/js/tiny_mce/plugins/b2evo_attachments/plugin.min.js': 'rsc/js/tiny_mce/plugins/b2evo_attachments/plugin.js',
 					'rsc/js/tiny_mce/plugins/b2evo_shorttags/plugin.min.js': 'rsc/js/tiny_mce/plugins/b2evo_shorttags/plugin.js',
 					'rsc/js/tiny_mce/plugins/evo_view/plugin.min.js': 'rsc/js/tiny_mce/plugins/evo_view/plugin.js',
+					'plugins/tinymce_plugin/js/evo_view_shortcodes.bmin.js': ['plugins/tinymce_plugin/js/shortcodes.js', 'plugins/tinymce_plugin/js/evo_view.js'],
 				}
 			},
 
@@ -239,21 +247,21 @@ module.exports = function(grunt) {
 			// Bubbletip
 			bubbletip: {
 				options: {
-					banner: '/* This includes 4 files: bubbletip.js, popover.js, userfields.js, colorpicker.js */\n'
+					banner: '/* This includes 3 files: bubbletip.js, popover.js, userfields.js */\n'
 				},
 				nonull: true, // Display missing files
 				// fp>yura: why isn't jquery.bubbletip.js bundled into this?
 				// if popover.js is used only for editing we should probably move it to a textedit.bundle
-				src: ['rsc/js/bubbletip.js', 'rsc/js/popover.js', 'rsc/js/userfields.js', 'rsc/js/colorpicker.js'],
+				src: ['rsc/js/bubbletip.js', 'rsc/js/popover.js', 'rsc/js/userfields.js'],
 				dest: 'rsc/js/build/bubbletip.bmin.js'
 			},
 			// Popover (Analog of bubbletip on bootstrap skins)
 			popover: {
 				options: {
-					banner: '/* This includes 5 files: bootstrap/usernames.js, bootstrap/popover.js, bootstrap/userfields.js, bootstrap/colorpicker.js, bootstrap/formfields.js */\n'
+					banner: '/* This includes 4 files: bootstrap/usernames.js, bootstrap/popover.js, bootstrap/userfields.js, bootstrap/formfields.js */\n'
 				},
 				nonull: true, // Display missing files
-				src: ['rsc/js/bootstrap/usernames.js', 'rsc/js/bootstrap/popover.js', 'rsc/js/bootstrap/userfields.js', 'rsc/js/bootstrap/colorpicker.js', 'rsc/js/bootstrap/formfields.js'],
+				src: ['rsc/js/bootstrap/usernames.js', 'rsc/js/bootstrap/popover.js', 'rsc/js/bootstrap/userfields.js', 'rsc/js/bootstrap/formfields.js'],
 				dest: 'rsc/js/build/popover.bmin.js'
 			},
 			// Textcomplete plugin to suggest user names in textareas with '@username'
@@ -343,6 +351,8 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_org.js',
 							'rsc/js/src/evo_automation.js',
 							'rsc/js/src/evo_user_tags.js',
+							'rsc/js/src/evo_user_status.js',
+							'rsc/js/src/evo_user_groups.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_links.js',
 							'rsc/js/src/evo_input_counter.js'],
@@ -372,10 +382,16 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_org.js',
 							'rsc/js/src/evo_automation.js',
 							'rsc/js/src/evo_user_tags.js',
+							'rsc/js/src/evo_user_status.js',
+							'rsc/js/src/evo_user_groups.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_links.js',
 							'rsc/js/src/evo_input_counter.js'],
 				dest: 'rsc/js/build/bootstrap-evo_backoffice.bmin.js'
+			},
+			evo_helpdesk_widget: {
+				src: 'rsc/js/evo_helpdesk_widget.js',
+				dest: 'rsc/js/evo_helpdesk_widget.min.js',
 			},
 		},
 

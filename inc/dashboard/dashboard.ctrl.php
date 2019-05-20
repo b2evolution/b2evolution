@@ -24,7 +24,7 @@ load_funcs( 'dashboard/model/_dashboard.funcs.php' );
  */
 global $current_User;
 
-global $dispatcher, $blog;
+global $blog;
 
 
 if( empty( $_GET['blog'] ) )
@@ -34,15 +34,6 @@ if( empty( $_GET['blog'] ) )
 }
 
 param_action();
-
-if( $action == 'new_demo_content' )
-{	// Update site skins setting ahead of rendering so that the menu will display correctly:
-	global $Settings;
-
-	$demo_content_type = param( 'demo_content_type', 'string', NULL );
-	$Settings->set( 'site_skins_enabled', $demo_content_type != 'minisite' );
-	$Settings->dbupdate();
-}
 
 // Site dashboard
 $AdminUI->set_path( 'site', 'dashboard' );
@@ -66,16 +57,6 @@ require_js_helper( 'colorbox' );
 require_js( '#easypiechart#' );
 require_css( 'jquery/jquery.easy-pie-chart.css' );
 
-// Init JS to quick edit an order of the collections and their groups in the table cell by AJAX:
-init_field_editor_js( array(
-		'field_prefix' => 'order-blog-',
-		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update&order_data=',
-	) );
-init_field_editor_js( array(
-		'field_prefix' => 'order-section-',
-		'action_url' => $admin_url.'?ctrl=dashboard&order_action=update_section&order_data=',
-	) );
-
 // Init JS to autcomplete the user logins
 init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 
@@ -89,43 +70,13 @@ $AdminUI->disp_body_top();
 $AdminUI->disp_payload_begin();
 
 $collection_count = get_table_count( 'T_blogs' );
-if( $action == 'new_demo_content' )
-{	// Execute action inside template to display a process in real time
-
-	// Check that this action request is not a CSRF hacked request:
-	$Session->assert_received_crumb( 'demo_content' );
-
-	$block_item_Widget = new Widget( 'block_item' );
-
-	$block_item_Widget->title = T_('Demo content').':';
-	$block_item_Widget->disp_template_replaced( 'block_start' );
-
-	load_funcs( 'collections/_demo_content.funcs.php' );
-	$collection_count = install_demo_content();
-
-	$block_item_Widget->disp_template_raw( 'block_end' );
-}
 if( $current_User->check_perm( 'blogs', 'create' ) && $collection_count === 0 )
 {
 	// Display welcome panel:
 	$AdminUI->disp_view( 'collections/views/_welcome_demo_content.view.php' );
 }
 
-// Display blog list VIEW:
-$AdminUI->disp_view( 'collections/views/_coll_list.view.php' );
-load_funcs( 'collections/model/_blog_js.funcs.php' );
 $AdminUI->disp_payload_end();
-
-
-/*
- * DashboardGlobalMain to be added here (anyone?)
- */
-if( $current_User->check_perm( 'blogs', 'create' ) )
-{
-	$AdminUI->disp_payload_begin();
-	$AdminUI->disp_view( 'collections/views/_coll_model_list.view.php' );
-	$AdminUI->disp_payload_end();
-}
 
 /*
  * Administrative tasks

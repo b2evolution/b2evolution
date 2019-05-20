@@ -39,7 +39,7 @@ load_funcs( 'cron/model/_decode_returned_emails.funcs.php' );
 if( ! $Settings->get( 'repath_enabled' ) )
 {
 	dre_msg( T_('Return path processing feature is not enabled.'), true );
-	return 2; // error
+	return 1; // success
 }
 
 if( ! extension_loaded('imap') )
@@ -58,7 +58,7 @@ if( isset($GLOBALS['files_Module']) )
 
 if( ! $mbox = dre_connect( true ) )
 {	// We couldn't connect to the mail server
-	return 2; // error
+	return 20; // IMAP error
 }
 
 // Read messages from server

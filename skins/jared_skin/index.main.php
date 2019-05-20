@@ -28,7 +28,7 @@ skin_init( $disp );
 
 // Check if current page has a big picture as background
 $is_pictured_page = in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) );
-$is_other_disp = !in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'page', 'msgform', 'help', 'front' ) );
+$is_other_disp = !in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'page', 'msgform', 'threads', 'messages', 'help', 'front' ) );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(

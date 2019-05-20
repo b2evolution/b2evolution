@@ -193,11 +193,11 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 		{ // Check user login attempts
 			$login_attempts = $UserSettings->get( 'login_attempts', $User->ID );
 			$login_attempts = empty( $login_attempts ) ? array() : explode( ';', $login_attempts );
-			if( $failed_logins_lockout > 0 && count( $login_attempts ) == 9 )
+			if( $failed_logins_lockout > 0 && count( $login_attempts ) >= $failed_logins_before_lockout - 1 )
 			{ // User already has a maximum value of the attempts
 				$first_attempt = explode( '|', $login_attempts[0] );
 				if( $localtimenow - $first_attempt[0] < $failed_logins_lockout )
-				{ // User has used 9 attempts during X minutes, Display error and Refuse login
+				{ // User has used N attempts during X minutes, Display error and Refuse login
 					$login_error = sprintf( T_('There have been too many failed login attempts. This account is temporarily locked. Try again in %s minutes.'), ceil( $failed_logins_lockout / 60 ) );
 				}
 			}
@@ -361,7 +361,7 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 
 		if( isset( $login_attempts ) && $current_login_pass != $Session->get( 'wrong_loginpass' ) )
 		{	// Save new login attempt into DB only if previous login data were different:
-			if( count( $login_attempts ) == 9 )
+			if( count( $login_attempts ) >= $failed_logins_before_lockout - 1 )
 			{	// Unset first attempt to clear a space for new attempt:
 				unset( $login_attempts[0] );
 			}
@@ -457,7 +457,14 @@ if( ! empty( $login_action_value ) && empty( $login_error ) && ( $action != 'log
 				preg_match( '#/register.php([&?].*)?$#', $redirect_to ) ||
 				preg_match( '#disp=(login|register|lostpassword)#', $redirect_to ) )
 			{ // avoid redirect back to login/register screen. This shouldn't occur.
-				$redirect_to = $baseurl;
+				$redirect_to = $Settings->get( 'redirect_to_after_login' );
+				if( empty( $redirect_to ) )
+				{
+					$blog = param( 'blog', 'integer' );
+					$BlogCache = & get_BlogCache();
+					$Blog = & $BlogCache->get_by_ID( $blog, false, false );
+					$redirect_to = $Blog ? $Blog->get( 'url' ) : $baseurl;
+				}
 			}
 
 			if( $email_login )

@@ -193,7 +193,7 @@ switch( $action )
 		debug_die( 'unhandled action 1' );
 }
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
 $AdminUI->breadcrumbpath_add( T_('Comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
 switch( $tab3 )
 {
@@ -784,12 +784,8 @@ if( in_array( $action, array( 'edit', 'update_publish', 'update', 'update_edit',
 	init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
-	// Require Fine Uploader js and css:
-	require_js( 'multiupload/fine-uploader.js' );
-	require_css( 'fine-uploader.css' );
-	// Load JS files to make the links table sortable:
-	require_js( '#jquery#' );
-	require_js( 'jquery/jquery.sortable.min.js' );
+	// Init JS to quick upload several files:
+	init_fileuploader_js();
 }
 
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
@@ -817,7 +813,21 @@ switch( $action )
 		$AdminUI->set_page_manual_link( 'comment-mass-deletion' );
 		break;
 	default:
-		$AdminUI->set_page_manual_link( 'comments-tab' );
+		switch( $tab3 )
+		{
+			case 'fullview':
+				$AdminUI->set_page_manual_link( 'comments-full-text-view' );
+				break;
+			case 'listview':
+				$AdminUI->set_page_manual_link( 'comments-list-view' );
+				break;
+			case 'meta':
+				$AdminUI->set_page_manual_link( 'comments-meta-discussion' );
+				break;
+			default:
+				$AdminUI->set_page_manual_link( 'comments-tab' );
+		}
+
 		break;
 }
 

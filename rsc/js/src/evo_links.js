@@ -13,45 +13,68 @@
  */
 
 
-// Initialize attachments block:
-jQuery( document ).ready( function()
+/**
+ * Initialize attachments fieldset to set proper height and handler to resize it
+ *
+ * @param string Fieldset prefix, e-g 'meta_' when two forms are used on the same page
+ */
+function evo_link_initialize_fieldset( fieldset_prefix )
 {
-	if( jQuery( '#attachments_fieldset_table' ).length > 0 )
+	if( jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).length > 0 )
 	{	// Only if the attachments block exists on the loading page:
-		var height = jQuery( '#attachments_fieldset_table' ).height();
+		var height = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).height();
 		height = ( height > 320 ) ? 320 : ( height < 97 ? 97 : height );
-		jQuery( '#attachments_fieldset_wrapper' ).height( height );
+		jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).height( height );
 
-		jQuery( '#attachments_fieldset_wrapper' ).resizable(
+		jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).resizable(
 		{	// Make the attachments fieldset wrapper resizable:
 			minHeight: 80,
 			handles: 's',
 			resize: function( e, ui )
 			{	// Limit max height by table of attachments:
-				jQuery( '#attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#attachments_fieldset_table' ).height() );
+				jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).resizable( 'option', 'maxHeight', jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).height() );
+				evo_link_update_overlay( fieldset_prefix );
 			}
 		} );
-		jQuery( document ).on( 'click', '#attachments_fieldset_wrapper .ui-resizable-handle', function()
+		jQuery( document ).on( 'click', '#' + fieldset_prefix + 'attachments_fieldset_wrapper .ui-resizable-handle', function()
 		{	// Increase attachments fieldset height on click to resizable handler:
-			var max_height = jQuery( '#attachments_fieldset_table' ).height();
-			var height = jQuery( '#attachments_fieldset_wrapper' ).height() + 80;
-			jQuery( '#attachments_fieldset_wrapper' ).css( 'height', height > max_height ? max_height : height );
+			var max_height = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).height();
+			var height = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).height() + 80;
+			jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).css( 'height', height > max_height ? max_height : height );
+			evo_link_update_overlay( fieldset_prefix );
 		} );
 	}
-} );
+}
+
+
+/**
+ * Update position and size of overlay which restrict edit of attachments
+ *
+ * @param string Fieldset prefix, e-g 'meta_' when two forms are used on the same page
+ */
+function evo_link_update_overlay( fieldset_prefix )
+{
+	if( jQuery( '#' + fieldset_prefix + 'attachments_fieldset_overlay' ).length )
+	{	// Update height of restriction overlay if it exists:
+		jQuery( '#' + fieldset_prefix + 'attachments_fieldset_overlay' ).css( 'height', jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).closest( '.panel' ).height() );
+	}
+}
 
 
 /**
  * Fix height of attachments wrapper
  * Used after content changing by AJAX loading
+ *
+ * @param string Fieldset prefix, e-g 'meta_' when two forms are used on the same page
  */
-function evo_link_fix_wrapper_height()
+function evo_link_fix_wrapper_height( fieldset_prefix )
 {
-	var table_height = jQuery( '#attachments_fieldset_table' ).height();
-	var wrapper_height = jQuery( '#attachments_fieldset_wrapper' ).height();
+	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
+	var table_height = jQuery( '#' + prefix + 'attachments_fieldset_table' ).height();
+	var wrapper_height = jQuery( '#' + prefix + 'attachments_fieldset_wrapper' ).height();
 	if( wrapper_height != table_height )
 	{
-		jQuery( '#attachments_fieldset_wrapper' ).height( jQuery( '#attachments_fieldset_table' ).height() );
+		jQuery( '#' + prefix + 'attachments_fieldset_wrapper' ).height( jQuery( '#' + prefix + 'attachments_fieldset_table' ).height() );
 	}
 }
 
@@ -99,8 +122,10 @@ function evo_link_change_position( selectInput, url, crumb )
  * @param string Type: 'image', 'file', 'video'
  * @param integer File ID
  * @param string Caption text
+ * @param boolean Replace a selected text
+ * @param string Caption, when this param is filled then tag is inserted in format like [image:123]Caption[/image]
  */
-function evo_link_insert_inline( type, link_ID, option, replace )
+function evo_link_insert_inline( type, link_ID, option, replace, caption )
 {
 	if( replace == undefined )
 	{
@@ -117,6 +142,11 @@ function evo_link_insert_inline( type, link_ID, option, replace )
 		}
 
 		insert_tag += ']';
+
+		if( typeof( caption ) != 'undefined' && caption !== false )
+		{	// Tag with caption:
+			insert_tag += caption + '[/' + type + ']';
+		}
 
 		var $position_selector = jQuery( '#display_position_' + link_ID );
 		if( $position_selector.length != 0 )
@@ -337,10 +367,13 @@ function evo_link_refresh_list( type, object_ID, action )
 
 /**
  * Sort list of Item/Comment attachments based on link_order
+ *
+ * @param string Fieldset prefix, e-g 'meta_' when two forms are used on the same page
  */
-function evo_link_sort_list()
+function evo_link_sort_list( fieldset_prefix )
 {
-	var rows = jQuery( 'tr', 'tbody#filelist_tbody' );
+	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
+	var rows = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table tbody.filelist_tbody tr' );
 	rows.sort( function( a, b )	{
 		var A = parseInt( jQuery( 'span[data-order]', a ).attr( 'data-order' ) );
 		var B = parseInt( jQuery( 'span[data-order]', b ).attr( 'data-order' ) );
@@ -365,7 +398,7 @@ function evo_link_sort_list()
 	$.each( rows, function( index, row ) {
 		if( index === 0 )
 		{
-			jQuery( row ).prependTo( 'tbody#filelist_tbody' );
+			jQuery( row ).prependTo( '#' + fieldset_prefix + 'attachments_fieldset_table tbody.filelist_tbody' );
 			previousRow = row;
 		}
 		else

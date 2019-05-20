@@ -379,11 +379,12 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 							if( $type == 'array:filepath' || $type == 'array:array:filepath' )
 							{	// Special verifying for file path params:
 								// Format param to valid file path value:
-								$globals_var[$i][$j] = param_format( $var_value, 'filepath' );
-								if( ! is_safe_filepath( $globals_var[$i][$j] ) )
+								$var_value = param_format( $var_value, 'filepath' );
+								if( ( ! is_safe_filepath( $var_value ) ) || $var_value == '.' )
 								{	// We cannot accept this unsecure file path:
 									bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
 								}
+								$globals_var[$i][$j] = $var_value;
 							}
 							else
 							{	// Format param to valid string value:
@@ -884,9 +885,12 @@ function param_check_new_user_email( $var, $value = NULL, $link_Blog = NULL )
 			global $Blog;
 			$link_Blog = $Blog;
 		}
+		global $dummy_fields;
+		$lostpassword_url = ( $link_Blog === NULL ? get_lostpassword_url() : $link_Blog->get( 'lostpasswordurl' ) );
+		$lostpassword_url = url_add_param( $lostpassword_url, $dummy_fields['login'].'='.urlencode( $value ) );
 		param_error( $var, sprintf( T_('You already registered on this site. You can <a %s>log in here</a>. If you don\'t know it or have forgotten it, you can <a %s>reset your password here</a>.'),
 			'href="'.( $link_Blog === NULL ? get_login_url( '' ) : $link_Blog->get( 'loginurl' ) ).'"',
-			'href="'.( $link_Blog === NULL ? get_lostpassword_url() : $link_Blog->get( 'lostpasswordurl' ) ).'"' ) );
+			'href="'.$lostpassword_url.'"' ) );
 		return false;
 	}
 
@@ -1073,16 +1077,20 @@ function param_check_isregexp( $var, $err_msg, $field_err_msg = NULL )
  * @param string regexp
  * @param string error message
  * @param string|NULL error message for form field ($err_msg gets used if === NULL).
+ * @param boolean TRUE if the param value cannot be empty
+ * @param boolean FALSE to check the param value DOES NOT MATCH a regexp
  * @return boolean true if OK
  */
-function param_check_regexp( $var, $regexp, $err_msg, $field_err_msg = NULL, $required = true )
+function param_check_regexp( $var, $regexp, $err_msg, $field_err_msg = NULL, $required = true, $match = true )
 {
 	if( empty( $GLOBALS[$var] ) && ! $required )
 	{ // empty variable is OK
 		return true;
 	}
 
-	if( ! preg_match( $regexp, $GLOBALS[$var] ) )
+	$result = preg_match( $regexp, $GLOBALS[$var] );
+	if( ( $match && ! $result ) || // Match
+	    ( ! $match && $result ) )  // Does NOT match
 	{
 		param_error( $var, $err_msg, $field_err_msg );
 		return false;
@@ -2493,6 +2501,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			$allow_iframes    = false;
 			$allow_objects    = false;
 			$bypass_antispam  = false;
+			$trim_content     = false;
 			// Do not add error messages in this context
 			$verbose = false;
 			break;
@@ -2572,7 +2581,10 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		$Messages->add_to_group(	$errmsg, 'error', T_('Validation errors:') );
 	}
 
-	$content = trim( $content );
+	if( ! isset( $trim_content ) || $trim_content )
+	{	// Trim content if it is allowed for the requested context:
+		$content = trim( $content );
+	}
 
 	if( $use_balanceTags && ( $context != 'general_array_params' ) )
 	{ // Auto close open tags:
@@ -2861,7 +2873,7 @@ function is_safe_filepath( $filepath )
 	}
 
 	do
-	{	// Decode file path while it is possible:
+	{	// Recursively decode file path as long as it is possible:
 		$orig_filepath = $filepath;
 		$filepath = urldecode( $filepath );
 

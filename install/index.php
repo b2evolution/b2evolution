@@ -382,6 +382,9 @@ $booststrap_install_form_params = array(
 		'checkbox_newline_end'   => "</div>\n",
 	);
 
+// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
+init_fontawesome_icons( 'fontawesome-glyphicons' );
+
 header('Content-Type: text/html; charset='.$evo_charset);
 header('Cache-Control: no-cache'); // no request to this page should get cached!
 
@@ -402,6 +405,7 @@ if( $display != 'cli' )
 		<script src="../rsc/js/bootstrap/bootstrap.min.js"></script>
 		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
 		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
+		<link href="../rsc/css/font-awesome.min.css" rel="stylesheet">
 	</head>
 	<body>
 		<div class="container" id="content_wrapper">
@@ -606,10 +610,10 @@ switch( $action )
 					<p class="text-muted small"><?php echo T_('b2evolution stores blog posts, comments, user permissions, etc. in a MySQL database. You must create this database prior to installing b2evolution and provide the access parameters to this database below. If you are not familiar with this, you can ask your hosting provider to create the database for you.') ?></p>
 					<?php
 					$Form->checkbox( 'conf_create_db', param( 'conf_create_db', 'integer' ), '', T_('Try to create this DB if it doesn\'t exist yet (useful for developers)') );
-					$Form->text( 'conf_db_host', $conf_db_host, 16, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ), 120 );
-					$Form->text( 'conf_db_name', $conf_db_name, 16, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ), 100);
-					$Form->text( 'conf_db_user', $conf_db_user, 16, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 );
-					$Form->text( 'conf_db_password', $conf_db_password, 16, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ), 100 ); // no need to hyde this. nobody installs b2evolution from a public place
+					$Form->text( 'conf_db_host', $conf_db_host, NULL, T_('MySQL Host/Server'), sprintf( T_('Typically looks like "localhost" or "sql-6" or "sql-8.yourhost.net"...' ) ) );
+					$Form->text( 'conf_db_name', $conf_db_name, NULL, T_('MySQL Database'), sprintf( T_('Name of the MySQL database you have created on the server' ) ) );
+					$Form->text( 'conf_db_user', $conf_db_user, NULL, T_('MySQL Username'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ) );
+					$Form->text( 'conf_db_password', $conf_db_password, NULL, T_('MySQL Password'), sprintf( T_('Used by b2evolution to access the MySQL database' ) ) ); // no need to hyde this. nobody installs b2evolution from a public place
 					// Too confusing for (most) newbies.	form_text( 'conf_db_tableprefix', $conf_db_tableprefix, 16, T_('MySQL tables prefix'), sprintf( T_('All DB tables will be prefixed with this. You need to change this only if you want to have multiple b2evo installations in the same DB.' ) ), 30 );
 				block_close();
 
@@ -826,7 +830,7 @@ switch( $action )
 				<div class="checkbox" style="margin-top:15px">
 					<label>
 						<input accept="" type="checkbox" name="install_test_features" id="install_test_features" value="1" />
-						<?php echo T_('Also install all test features.')?>
+						<?php echo T_('Also install all test features.').get_manual_link( 'install-test-features' ); ?>
 					</label>
 				</div>
 			<?php
@@ -836,7 +840,7 @@ switch( $action )
 			<div class="checkbox" style="margin:15px 0 15px">
 				<label>
 					<input type="checkbox" name="local_installation" id="local_installation" value="1"<?php echo check_local_installation() ? ' checked="checked"' : ''; ?> />
-					<?php echo T_('This is a local / test / intranet installation.')?>
+					<?php echo T_('This is a local / test / intranet installation.').get_manual_link( 'local-test-intranet-install-checkbox' ); ?>
 				</label>
 			</div>
 
@@ -910,13 +914,13 @@ switch( $action )
 		 */
 		track_step( 'install-start' );
 
-		$create_sample_contents = param( 'create_sample_contents', 'string', false, true );   // during auto install this param can be 'all'
+		$create_sample_contents = param( 'create_sample_contents', 'string', false, true ); // during auto install this param can be 'full', 'minisite', 'blog-a', 'blog-b', 'photos, 'forums', 'manual', 'tracker'
 		$create_demo_organization = param( 'create_demo_organization', 'boolean', false, true );
 		$create_demo_users = param( 'create_demo_users', 'boolean', false, true );
 		$create_demo_messages = param( 'create_sample_private_messages', 'boolean', false, true );
 
-		if( $create_sample_contents == 'all' )
-		{ // Override create sample organization and demo user setting
+		if( $create_sample_contents == 'full' )
+		{	// Override create sample organization and demo user setting:
 			$create_demo_organization = true;
 			$create_demo_users = true;
 			$create_demo_messages = true;

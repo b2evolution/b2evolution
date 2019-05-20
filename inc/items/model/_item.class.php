@@ -153,6 +153,16 @@ class Item extends ItemLight
 	 */
 	var $locale;
 
+	/**
+	 * Display the Item in list depending on navigation locale
+	 *
+	 * 0 - Always show
+	 * 1 - Show only if matching navigation locale
+	 *
+	 * @var integer|boolean
+	 */
+	var $locale_visibility = 'always';
+
 	var $content;
 	/**
 	 * Flag to know if content was updated during current request
@@ -268,6 +278,18 @@ class Item extends ItemLight
 	var $parent_Item = NULL;
 
 	/**
+	 * Item Group ID
+	 * @var integer
+	 */
+	var $igrp_ID = NULL;
+
+	/**
+	 * Other versions of this Item, linked by igrp_ID
+	 * @var array
+	 */
+	var $other_version_items;
+
+	/**
 	 * Additional settings for the items.  lazy filled.
  	 *
 	 * @see Item::get_setting()
@@ -300,6 +322,7 @@ class Item extends ItemLight
 	 * @var integer
 	 */
 	var $addvotes;
+
 	/**
 	 * A count of all votes
 	 *
@@ -331,6 +354,20 @@ class Item extends ItemLight
 	var $low_stock = 5;
 	var $can_be_ordered_if_no_stock = 0;
 
+
+	/**
+	 * Current revision
+	 *
+	 * @var integer
+	 */
+	var $revision;
+
+	/**
+	 * Cached revisions in order to don't load them twice
+	 *
+	 * @var array
+	 */
+	var $revisions;
 
 	/**
 	 * Constructor
@@ -380,7 +417,6 @@ class Item extends ItemLight
 			{	// Set locale depending on collection setting:
 				switch( $Blog->get_setting( 'new_item_locale_source' ) )
 				{
-					case 'use_coll':
 					case 'select_coll':
 						// Use locale of current collection by default:
 						$new_item_locale = $Blog->get( 'locale' );
@@ -433,6 +469,7 @@ class Item extends ItemLight
 			$this->datedeadline = $db_row->post_datedeadline;
 			$this->priority = $db_row->post_priority;
 			$this->locale = $db_row->post_locale;
+			$this->locale_visibility = $db_row->post_locale_visibility;
 			$this->wordcount = $db_row->post_wordcount;
 			$this->notifications_status = $db_row->post_notifications_status;
 			$this->notifications_ctsk_ID = $db_row->post_notifications_ctsk_ID;
@@ -440,6 +477,7 @@ class Item extends ItemLight
 			$this->comment_status = $db_row->post_comment_status;			// Comments status
 			$this->featured = $db_row->post_featured;
 			$this->parent_ID = $db_row->post_parent_ID === NULL ? NULL : intval( $db_row->post_parent_ID );
+			$this->igrp_ID = $db_row->post_igrp_ID;
 
 			// echo 'renderers=', $db_row->post_renderers;
 			$this->renderers = $db_row->post_renderers;
@@ -744,6 +782,17 @@ class Item extends ItemLight
 			$this->set_from_Request( 'locale' );
 		}
 
+		// LOCALE VISIBILITY:
+		if( param( 'post_locale_visibility', 'string', NULL ) !== NULL )
+		{
+			$this->set_from_Request( 'locale_visibility' );
+		}
+
+		if( param( 'source_version_item_ID', 'integer', NULL ) !== NULL )
+		{	// Temp flag to know this is a new version of this Item:
+			$this->source_version_item_ID = get_param( 'source_version_item_ID' );
+		}
+
 		// POST TYPE:
 		$item_typ_ID = get_param( 'item_typ_ID' );
 		if( empty( $item_typ_ID ) )
@@ -860,13 +909,23 @@ class Item extends ItemLight
 			foreach( $post_urltitle as $u => $slug_urltitle )
 			{
 				$post_urltitle[ $u ] = replace_special_chars( $slug_urltitle, $this->get( 'locale' ) );
+				if( empty( $post_urltitle[ $u ] ) )
+				{	// Unset empty slug in order to create auto slug:
+					unset( $post_urltitle[ $u ] );
+					continue;
+				}
+				// Added in May 2017; but old slugs are not converted yet.
+				if( preg_match( '#^[^a-z0-9]*[0-9]*[^a-z0-9]*$#i', $post_urltitle[ $u ] ) )
+				{	// Display error if one of item slugs doesn't contain at least 1 non-numeric character:
+					param_error( 'post_urltitle', T_('All slugs must contain at least 1 non-numeric character.') );
+				}
 			}
+			// Append old slugs at the end because they are not deleted on updating of the Item,
+			// and update array of the cached slugs from DB in order to display proper slugs after submit the forms with errors:
+			$this->get_slugs();
+			$this->slugs = array_unique( array_merge( $post_urltitle, $this->slugs ) );
+			// Set new post urltitle:
 			$this->set( 'urltitle', implode( ', ', $post_urltitle ) );
-			// Added in May 2017; but old slugs are not converted yet.
-			if( preg_match( '#(^|,+)[^a-z\d_]*\d+[^a-z\d_]*($|,+)#i', get_param( 'post_urltitle' ) ) )
-			{	// Display error if item slugs contain only digits:
-				param_error( 'post_urltitle', T_('All slugs must contain at least one letter.') );
-			}
 		}
 
 		if( $is_not_content_block )
@@ -947,10 +1006,23 @@ class Item extends ItemLight
 		// FEATURED checkbox:
 		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
 
+		// MUST READ checkbox:
+		$item_Blog = & $this->get_Blog();
+		if( $item_Blog->get_setting( 'track_unread_content' ) )
+		{	// Update only when tracking of unread content is enabled for collection:
+			$this->set_setting( 'mustread', param( 'item_mustread', 'integer', 0 ) );
+		}
+
 		if( $is_not_content_block )
 		{	// Save "hide teaser" and goal for item with type usage except of content block:
 			// HIDE TEASER checkbox:
 			$this->set_setting( 'hide_teaser', param( 'item_hideteaser', 'integer', 0 ) );
+
+			// User Tagging:
+			if( param( 'user_tags', 'string', NULL ) !== NULL )
+			{
+				$this->set_setting( 'user_tags', trim( get_param( 'user_tags' ), ' ,' ) );
+			}
 
 			// Goal ID:
 			$goal_ID = param( 'goal_ID', 'integer', NULL );
@@ -1026,69 +1098,7 @@ class Item extends ItemLight
 		$item_pricing = $this->get_item_pricing();
 
 		// CUSTOM FIELDS:
-		$custom_fields = $this->get_type_custom_fields();
-		foreach( $custom_fields as $custom_field )
-		{ // update each custom field
-			$param_name = 'item_cf_'.$custom_field['name'];
-			$param_error = false;
-			if( isset_param( $param_name ) )
-			{ // param is set
-				switch( $custom_field['type'] )
-				{
-					case 'double':
-						$param_type = 'double';
-						$field_value = param( $param_name, 'string', NULL );
-						if( ! empty( $field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
-						{
-							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
-							$param_error = true;
-						}
-						break;
-					case 'html':
-					case 'text': // Keep html tags for text fields, they will be escaped at display
-						$param_type = 'html';
-						break;
-					case 'url':
-						$param_type = 'url';
-						$field_value = param( $param_name, 'string', NULL );
-						$url_error = validate_url( $field_value, 'http-https' );
-						if( $url_error !== false )
-						{
-							param_error( $param_name, $url_error );
-							$param_error = true;
-						}
-						break;
-					case 'image':
-						$param_type = 'integer';
-						$field_value = param( $param_name, 'string', NULL );
-						if( ! empty( $field_value ) && ! is_number( $field_value ) )
-						{
-							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
-							$param_error = true;
-						}
-						break;
-					case 'varchar':
-					default:
-						$param_type = 'string';
-						break;
-				}
-				if( ! $param_error )
-				{
-					param( $param_name, $param_type, NULL ); // get par value
-				}
-				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
-				$this->set_custom_field( $custom_field['name'], get_param( $param_name ), 'value', $custom_field_make_null );
-			}
-			// Update checkbox "Auto-sync from Parent":
-			$this->set_custom_field( $custom_field['name'], param( 'item_pscf_'.$custom_field['name'], 'integer', 0 ), 'parent_sync' );
-		}
-		foreach( $custom_fields as $custom_field )
-		{	// Update computed custom fields after when all fields we updated above:
-			if( $custom_field['type'] == 'computed' )
-			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
-				$this->set_custom_field( $custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ) );
-			}
-		}
+		$this->load_custom_fields_from_Request();
 
 		// COMMENTS:
 		if( $this->allow_comment_statuses() )
@@ -1450,6 +1460,83 @@ class Item extends ItemLight
 		return false;
 	}
 
+	/**
+	 * Load custom fields values from Request form fields
+	 */
+	function load_custom_fields_from_Request()
+	{
+		$custom_fields = $this->get_type_custom_fields();
+		$this->dbchanges_custom_fields = array();
+		foreach( $custom_fields as $custom_field )
+		{ // update each custom field
+			$param_name = 'item_cf_'.$custom_field['name'];
+			$param_error = false;
+			if( isset_param( $param_name ) )
+			{ // param is set
+				switch( $custom_field['type'] )
+				{
+					case 'double':
+						$param_type = 'double';
+						$field_value = param( $param_name, 'string', NULL );
+						if( ! empty( $field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $field_value ) ) // we could have used is_numeric here but this is how "double" type is checked in the param.funcs.php
+						{
+							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
+							$param_error = true;
+						}
+						break;
+					case 'html':
+					case 'text': // Keep html tags for text fields, they will be escaped at display
+						$param_type = 'html';
+						break;
+					case 'url':
+						$param_type = 'url';
+						$field_value = param( $param_name, 'string', NULL );
+						$url_error = validate_url( $field_value, 'http-https' );
+						if( $url_error !== false )
+						{
+							param_error( $param_name, $url_error );
+							$param_error = true;
+						}
+						break;
+					case 'image':
+						$param_type = 'integer';
+						$field_value = param( $param_name, 'string', NULL );
+						if( ! empty( $field_value ) && ! is_number( $field_value ) )
+						{
+							param_error( $param_name, sprintf( T_('Custom "%s" field must be a number'), $custom_field['label'] ) );
+							$param_error = true;
+						}
+						break;
+					case 'varchar':
+					default:
+						$param_type = 'string';
+						break;
+				}
+				if( ! $param_error )
+				{
+					param( $param_name, $param_type, NULL ); // get par value
+				}
+				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
+
+				$custom_field_value = $this->get_custom_field_value( $custom_field['name'] );
+				if( $custom_field_value !== NULL && $custom_field_value !== false )
+				{	// Store previous value in order to save this in archived version:
+					$this->dbchanges_custom_fields[ $custom_field['name'] ] = $custom_field_value;
+					// Flag to know custom fields were changed:
+					$this->dbchanges_flags['custom_fields'] = true;
+				}
+				$this->set_custom_field( $custom_field['name'], get_param( $param_name ), 'value', $custom_field_make_null );
+			}
+		}
+		foreach( $custom_fields as $custom_field )
+		{	// Update computed custom fields after when all fields we updated above:
+			if( $custom_field['type'] == 'computed' )
+			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
+				$this->set_custom_field( $custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ) );
+			}
+		}
+	}
+
 
 	/**
 	 * Link attachments from temporary object to new created Item
@@ -1491,26 +1578,26 @@ class Item extends ItemLight
 			      link_tmp_ID = NULL
 			WHERE link_tmp_ID = '.$TemporaryID->ID );
 
+		$item_slug_folder_name = 'quick-uploads/'.$this->get( 'urltitle' ).'/';
+
 		// Move all temporary files to folder of new created message:
 		foreach( $LinkOwner->Links as $item_Link )
 		{
 			if( $item_File = & $item_Link->get_File() &&
-			    $item_FileRoot = & $item_File->get_FileRoot() )
-			{
-				if( ! file_exists( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
+			    $item_FileRoot = & $item_File->get_FileRoot() &&
+			    $item_Link->is_single_linked_file() )
+			{	// If file is not linked to any other object:
+				if( ! file_exists( $item_FileRoot->ads_path.$item_slug_folder_name ) )
 				{	// Create if folder doesn't exist for files of new created message:
-					if( mkdir_r( $item_FileRoot->ads_path.'quick-uploads/p'.$this->ID.'/' ) )
-					{
-						$tmp_folder_path = $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/';
-					}
+					mkdir_r( $item_FileRoot->ads_path.$item_slug_folder_name );
 				}
-				$item_File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, 'quick-uploads/p'.$this->ID.'/'.$item_File->get_name() );
+				$item_File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, $item_slug_folder_name.$item_File->get_name(), true );
 			}
 		}
 
-		if( isset( $tmp_folder_path ) && file_exists( $tmp_folder_path ) )
+		if( $item_FileRoot && file_exists( $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/' ) )
 		{	// Remove temp folder from disk completely:
-			rmdir_r( $tmp_folder_path );
+			rmdir_r( $item_FileRoot->ads_path.'quick-uploads/tmp'.$TemporaryID->ID.'/' );
 		}
 
 		// Delete temporary object from DB:
@@ -1921,9 +2008,11 @@ class Item extends ItemLight
 	/**
 	 * Template function: Check if user can attach files to this post comments
 	 *
+	 * @param boolean|integer ID of Temporary object to count also temporary attached files to new creating comment,
+	 *                        FALSE to count ONLY attachments of the created comments
 	 * @return boolean true if user can attach files to this post comments, false if s/he cannot
 	 */
-	function can_attach()
+	function can_attach( $link_tmp_ID = false )
 	{
 		global $Settings;
 
@@ -1937,7 +2026,7 @@ class Item extends ItemLight
 				global $DB, $current_User, $Session;
 
 				// Get a number of attachments for current user on this post
-				$attachments_count = $this->get_attachments_number();
+				$attachments_count = $this->get_attachments_number( NULL, $link_tmp_ID );
 
 				// Get the attachments from preview comment
 				global $checked_attachments;
@@ -1958,7 +2047,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if the post contains inline file placeholders without corresponding attachemnt file.
+	 * Check if the post contains inline file placeholders without corresponding attachment file.
 	 * Removes the invalid inline file placeholders from the item content.
 	 *
 	 * @param string Content
@@ -1973,34 +2062,34 @@ class Item extends ItemLight
 			return $content;
 		}
 
-		// There are inline image placeholders
-		if( $this->ID > 0 )
-		{ // The post is saved, so it can actually have attachments:
-			global $DB;
-			$links_SQL = new SQL( 'Get item links IDs of the inline images' );
-			$links_SQL->SELECT( 'link_ID' );
-			$links_SQL->FROM( 'T_links' );
-			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
-			$links_SQL->WHERE_and( 'link_position = "inline"' );
-			$inline_links_IDs = $DB->get_col( $links_SQL );
-
-			$unused_inline_images = array();
-			foreach( $inline_images[2] as $i => $inline_link_ID )
-			{
-				if( ! in_array( $inline_link_ID, $inline_links_IDs ) )
-				{ // This inline image must be removed from content
-					$unused_inline_images[] = $inline_images[0][ $i ];
-				}
-			}
+		// There are inline image placeholders in the item's content:
+		global $DB;
+		$links_SQL = new SQL( 'Get item links IDs of the inline files' );
+		$links_SQL->SELECT( 'link_ID' );
+		$links_SQL->FROM( 'T_links' );
+		if( empty( $this->ID ) )
+		{	// Preview mode for new creating item:
+			$links_SQL->WHERE( 'link_tmp_ID = '.$DB->quote( param( 'temp_link_owner_ID', 'integer', 0 ) ) );
 		}
 		else
-		{ // The post is not saved yet, so it can not contains attachments. None of the placeholders are used.
-			$unused_inline_images = $inline_images[0];
+		{	// Normal mode for existing Item in DB:
+			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
+		}
+		$links_SQL->WHERE_and( 'link_position = "inline"' );
+		$inline_links_IDs = $DB->get_col( $links_SQL );
+
+		$unused_inline_images = array();
+		foreach( $inline_images[2] as $i => $inline_link_ID )
+		{
+			if( ! in_array( $inline_link_ID, $inline_links_IDs ) )
+			{ // This inline image must be removed from content
+				$unused_inline_images[] = $inline_images[0][ $i ];
+			}
 		}
 
-		// Clear the unused inline images from content
+		// Clear the unused inline images from content:
 		if( count( $unused_inline_images ) )
-		{ // Remove all unused inline images from the content
+		{	// Remove all unused inline images from the content:
 			global $Messages;
 			$unused_inline_images = array_unique( $unused_inline_images );
 			$content = replace_content_outcode( $unused_inline_images, '', $content, 'replace_content', 'str' );
@@ -2015,9 +2104,11 @@ class Item extends ItemLight
 	 * Get a number of attachments on this post
 	 *
 	 * @param object User
+	 * @param boolean|integer ID of Temporary object to count also temporary attached files to new creating comment,
+	 *                        FALSE to count ONLY attachments of the created comments
 	 * @return integer Number of attachments
 	 */
-	function get_attachments_number( $User = NULL )
+	function get_attachments_number( $User = NULL, $link_tmp_ID = false )
 	{
 		global $DB, $cache_item_attachments_number;
 
@@ -2032,21 +2123,26 @@ class Item extends ItemLight
 			$cache_item_attachments_number = array();
 		}
 
-		if( isset( $cache_item_attachments_number[$User->ID] ) )
-		{	// Get a number of attachments from cache variable
-			return $cache_item_attachments_number[$User->ID];
+		if( isset( $cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ] ) )
+		{	// Get a number of attachments from cache variable:
+			return $cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ];
 		}
 
-		// Get a number of attachments from DB
-		$SQL = new SQL( 'Get a number of attachments for user #'.$User->ID.' and post #'.$this->ID );
+		// Get a number of attachments from DB:
+		$SQL = new SQL( 'Get a number of comment attachments per item #'.$this->ID.' by user #'.$User->ID );
 		$SQL->SELECT( 'COUNT( link_ID )' );
 		$SQL->FROM( 'T_links' );
-		$SQL->FROM_add( 'INNER JOIN T_comments ON comment_ID = link_cmt_ID' );
+		$SQL->FROM_add( 'LEFT JOIN T_comments ON comment_ID = link_cmt_ID' );
 		$SQL->WHERE( 'link_creator_user_ID = '.$DB->quote( $User->ID ) );
-		$SQL->WHERE_and( 'comment_item_ID = '.$DB->quote( $this->ID ) );
-		$cache_item_attachments_number[$User->ID] = (int)$DB->get_var( $SQL );
+		$sql_where = 'comment_item_ID = '.$DB->quote( $this->ID );
+		if( $link_tmp_ID )
+		{	// Count also the attached files to new creating comment:
+			$sql_where .= ' OR ( comment_item_ID IS NULL AND link_tmp_ID = '.$DB->quote( $link_tmp_ID ).' )';
+		}
+		$SQL->WHERE_and( $sql_where );
+		$cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ] = intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
 
-		return $cache_item_attachments_number[$User->ID];
+		return $cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ];
 	}
 
 
@@ -2069,6 +2165,28 @@ class Item extends ItemLight
 		}
 
 		return 'unlimit';
+	}
+
+
+	/**
+	 * Duplicate attachments from another Item
+	 *
+	 * @param integer Item ID
+	 */
+	function duplicate_attachments( $item_ID )
+	{
+		global $DB;
+
+		// Initiliaze Link Owner where we create a temporary object for new creating Item:
+		$LinkOwner = new LinkItem( $this, param( 'temp_link_owner_ID', 'integer', 0 ) );
+
+		if( ! empty( $LinkOwner->link_Object->tmp_ID ) )
+		{	// If temporaty object has been created for new Item:
+			$DB->query( 'INSERT INTO T_links ( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_tmp_ID, link_file_ID, link_position, link_order )
+				SELECT link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, '.$DB->quote( $LinkOwner->link_Object->tmp_ID ).', link_file_ID, link_position, link_order
+				  FROM T_links
+				WHERE link_itm_ID = '.$DB->quote( $item_ID ) );
+		}
 	}
 
 
@@ -2124,7 +2242,8 @@ class Item extends ItemLight
 		$post_renderers = $this->get_renderers_validated();
 		$cache_key = $format.'/'.implode('.', $post_renderers); // logic gets used below, for setting cache, too.
 
-		$use_cache = $this->ID && in_array( $format, array('htmlbody', 'entityencoded', 'xml', 'text') );
+		$use_cache = $this->ID && in_array( $format, array('htmlbody', 'entityencoded', 'xml', 'text') )
+				&& ! $this->is_revision(); // do not use cache when viewing historical revision
 
 		// $use_cache = false;
 
@@ -2212,7 +2331,7 @@ class Item extends ItemLight
 			}
 
 			// Call RENDERER plugins:
-			$r = $this->content;
+			$r = $this->get( 'content' );
 			$Plugins->render( $r /* by ref */, $post_renderers, $format, array( 'Item' => $this ), 'Render' );
 
 			// Check and clear inline files, to avoid to have placeholders without corresponding attachment
@@ -2472,7 +2591,7 @@ class Item extends ItemLight
 			) );
 
 		$view_type = 'full';
-		if( $this->has_content_parts($params) )
+		if( $this->has_content_parts( $params ) )
 		{ // This is an extended post (has a more section):
 			if( $stripteaser === '#' )
 			{
@@ -2791,11 +2910,31 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get item custom field value by field index
+	 * Get item custom field title by field index
 	 *
 	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
-	 * @param string Restrict field by type(double, varchar, html, text, url, image, computed, separator), FALSE - to don't restrict
-	 * @return string|boolean FALSE if the field doesn't exist; NULL if the field exists but no value has been entered yet, '' (empty string) if field has been left blank
+	 * @return string|boolean FALSE if the field doesn't exist
+	 */
+	function get_custom_field_title( $field_index )
+	{
+		// Get all custom fields by item ID:
+		$custom_fields = $this->get_custom_fields_defs();
+
+		if( ! isset( $custom_fields[ $field_index ] ) )
+		{	// The requested field is not detected:
+			return false;
+		}
+
+		return $custom_fields[ $field_index ]['label'];
+	}
+
+
+	/**
+	 * Get item custom field value by field index
+	 *
+	 * @param string Field index which by default is the field name, see {@link load_custom_field_value()}
+	 * @param string Restring field by type, FALSE - to don't restrict
+	 * @return mixed false if the field doesn't exist Double/String otherwise depending from the custom field type
 	 */
 	function get_custom_field_value( $field_index, $restrict_type = false )
 	{
@@ -2812,8 +2951,15 @@ class Item extends ItemLight
 			return false;
 		}
 
-		// Use a value from DB:
-		return $custom_fields[ $field_index ]['value'];
+		// Get custom item field value:
+		if( $this->is_revision() )
+		{	// from current revision if it is active for this Item:
+			return $this->get_revision_custom_field_value( $field_index );
+		}
+		else
+		{	// from the item setting:
+			return $custom_fields[ $field_index ]['value'];
+		}
 	}
 
 
@@ -3059,6 +3205,7 @@ class Item extends ItemLight
 							// Permalink:
 							global $disp, $Item;
 							if( ( $disp != 'single' && $disp != 'page' ) ||
+							    ! ( $Item instanceof Item ) ||
 							    $Item->ID != $this->ID ||
 							    $fallback_count == $l + 1 )
 							{	// Use permalink if it is not last point and we don't view this current post:
@@ -3115,7 +3262,8 @@ class Item extends ItemLight
 
 		if( $custom_fields[ $field_index ]['type'] == 'double' )
 		{	// This case may be called by computing of the formula:
-			return $this->get_custom_field_value( $field_index );
+			// Use floatval() in order to consider empty value as 0
+			return floatval( $this->get_custom_field_value( $field_index ) );
 		}
 
 		if( $custom_fields[ $field_index ]['type'] != 'computed' )
@@ -3504,12 +3652,12 @@ class Item extends ItemLight
 						// Widget "Item Custom Fields":
 						if( $tag_prefix == 'parent:' )
 						{	// Use parent item:
-							$widget_item_ID = '$parent$';
 							if( ! ( $widget_Item = & $this->get_parent_Item() ) )
 							{	// Display error message if parent doesn't exist:
 								$widget_html = '<span class="text-danger">'.T_('This Item has no parent.').'</span>';
 								break;
 							}
+							$widget_item_ID = $widget_Item->ID;
 						}
 						elseif( strpos( $tag_prefix, 'item:' ) === 0 )
 						{	// Use other item by ID or slug:
@@ -3526,7 +3674,7 @@ class Item extends ItemLight
 						}
 						else
 						{	// Use current Item:
-							$widget_item_ID = '$this$';
+							$widget_item_ID = $this->ID;
 							$widget_Item = $this;
 						}
 
@@ -4589,14 +4737,30 @@ class Item extends ItemLight
 			if( ! ( $File = & $Link->get_File() ) )
 			{ // No File object
 				global $Debuglog;
-				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				$log_message = sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID );
+				if( $this->is_revision() )
+				{	// Display the log message only for revision preview mode:
+					$r .= '<div class="red">'.$log_message.'</div>';
+				}
+				$Debuglog->add( $log_message, array( 'error', 'files' ) );
 				continue;
 			}
 
 			if( ! $File->exists() )
 			{ // File doesn't exist
 				global $Debuglog;
-				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				$log_message = sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() );
+				if( $this->is_revision() )
+				{	// Display the log message only for revision preview mode:
+					$r .= '<div class="red">'.$log_message.'</div>';
+				}
+
+				// Still generate the IMG tag but this should display a black thumbnail with the appropriate error message:
+				$r .= $this->get_attached_image_tag( $Link, $params );
+
+				$image_counter++;
+
+				$Debuglog->add( $log_message, array( 'error', 'files' ) );
 				continue;
 			}
 
@@ -4639,9 +4803,7 @@ class Item extends ItemLight
 			}
 
 			if( ! $File->is_image() )
-			{ // Skip anything that is not an image
-				// fp> TODO: maybe this property should be stored in link_ltype_ID
-
+			{	// Skip anything that is not an image:
 				//$r .= $this->attachment_files($params);
 				continue;
 			}
@@ -4817,17 +4979,32 @@ class Item extends ItemLight
 		$File = NULL;
 		while( ( $Link = & $LinkList->get_next() ) && $params['limit_attach'] > $i )
 		{
+			if( $Link->get( 'position' ) != 'attachment' )
+			{	// Skip not "attachment" links:
+				continue;
+			}
+
 			if( ! ( $File = & $Link->get_File() ) )
 			{ // No File object
 				global $Debuglog;
-				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				$log_message = sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID );
+				if( $this->is_revision() )
+				{	// Display the log message only for revision preview mode:
+					$r_file[$i] = $params['before_attach'].'<div class="red">'.$log_message.'</div>'.$params['after_attach'];
+				}
+				$Debuglog->add( $log_message, array( 'error', 'files' ) );
 				continue;
 			}
 
 			if( ! $File->exists() )
 			{ // File doesn't exist
 				global $Debuglog;
-				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				$log_message = sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() );
+				if( $this->is_revision() )
+				{	// Display the log message only for revision preview mode:
+					$r_file[$i] = $params['before_attach'].'<div class="red">'.$log_message.'</div>'.$params['after_attach'];
+				}
+				$Debuglog->add( $log_message, array( 'error', 'files' ) );
 				continue;
 			}
 
@@ -4841,11 +5018,6 @@ class Item extends ItemLight
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
 
-			if( $Link->get( 'position' ) != 'attachment' )
-			{	// Skip not "attachment" links:
-				continue;
-			}
-
 			// Prepare params before rendering item attachment:
 			$Plugins->trigger_event_first_true_with_params( 'PrepareForRenderItemAttachment', $params );
 
@@ -4854,7 +5026,7 @@ class Item extends ItemLight
 				continue;
 			}
 
-			if( $File->is_image() && $Link->get( 'position' ) != 'attachment' )
+			if( $File->is_image() )
 			{ // Skip images (except those in the attachment position) because these are displayed inline already
 				// fp> TODO: have a setting for each linked file to decide whether it should be displayed inline or as an attachment
 				continue;
@@ -5240,6 +5412,18 @@ class Item extends ItemLight
 				if( $params['link_text_more'] == '#' ) $params['link_text_more'] = T_('%d pingbacks').' &raquo;';
 				break;
 
+			case 'webmentions':
+				if( ! $this->can_receive_webmentions() )
+				{ // Webmentions not allowed on this collection:
+					// We'll consider webmentions to follow the same restriction
+					return;
+				}
+				if( $params['link_title'] == '#' ) $params['link_title'] = T_('Display webmentions');
+				if( $params['link_text_zero'] == '#' ) $params['link_text_zero'] = T_('No webmention yet').' &raquo;';
+				if( $params['link_text_one'] == '#' ) $params['link_text_one'] = T_('1 webmention').' &raquo;';
+				if( $params['link_text_more'] == '#' ) $params['link_text_more'] = T_('%d webmentions').' &raquo;';
+				break;
+
 			default:
 				debug_die( "Unknown feedback type [{$params['type']}]" );
 		}
@@ -5311,6 +5495,7 @@ class Item extends ItemLight
 			case 'comments':
 			case 'trackbacks':
 			case 'pingbacks':
+			case 'webmentions':
 				break;
 			default:
 				debug_die( "Unknown feedback type [{$params['type']}]" );
@@ -5335,9 +5520,21 @@ class Item extends ItemLight
 
 
 	/**
+	 * Return true if webmentions are allowed
+	 *
+	 * @return boolean
+	 */
+	function can_receive_webmentions()
+	{
+		$this->load_Blog();
+		return $this->Blog->get_setting( 'webmentions' ) && $this->can_comment( NULL );
+	}
+
+
+	/**
 	 * Get text depending on number of comments
 	 *
-	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
+	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks/webmentions)
 	 * @param string Link text to display when there are 0 comments
 	 * @param string Link text to display when there is 1 comment
 	 * @param string Link text to display when there are >1 comments (include %d for # of comments)
@@ -5384,6 +5581,12 @@ class Item extends ItemLight
 				if( $zero == '#' ) $zero = '';
 				if( $one == '#' ) $one = T_('1 meta comment');
 				if( $more == '#' ) $more = T_('%d meta comments');
+				break;
+
+			case 'webmentions':
+				if( $zero == '#' ) $zero = '';
+				if( $one == '#' ) $one = T_('1 webmention');
+				if( $more == '#' ) $more = T_('%d webmentions');
 				break;
 
 			default:
@@ -5525,7 +5728,7 @@ class Item extends ItemLight
 	/**
 	 * Template function: Displays feeback moderation info
 	 *
-	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks)
+	 * @param string Type of feedback to link to (feedbacks (all)/comments/trackbacks/pingbacks/webmentions)
 	 * @param string String to display before the link (if comments are to be displayed)
 	 * @param string String to display after the link (if comments are to be displayed)
 	 * @param string Link text to display when there are 0 comments
@@ -5853,6 +6056,268 @@ class Item extends ItemLight
 
 
 	/**
+	 * Provide a link to add a new version of this post if user has rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 * @return string
+	 */
+	function get_add_version_link( $params = array() )
+	{
+		if( ! $this->can_link_version( true ) )
+		{	// New item version cannot be added by some restriction:
+			return false;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'       => '',
+				'after'        => '',
+				'text'         => '#text#', // '#' - icon + text, '#icon#' - only icon, '#text#' - only text
+				'title'        => '#', // '#' - Add version...
+				'class'        => '',
+			), $params );
+
+		switch( $params['text'] )
+		{
+			case '#text#':
+				$params['text'] = T_('Add version').'...';
+				break;
+
+			case '#':
+				$params['text'] = get_icon( 'add', 'imgtag', array( 'title' => T_('Add version').'...' ) ).' '.T_('Add version').'...';
+				break;
+
+			case '#icon#':
+				$params['text'] = get_icon( 'add', 'imgtag', array( 'title' => T_('Add version').'...' ) );
+				break;
+		}
+
+		if( $params['title'] == '#' )
+		{
+			$params['title'] = T_('Add version').'...';
+		}
+
+		$r = $params['before'];
+
+		$r .= '<a href="#" onclick="return evo_add_version_load_window( '.$this->ID.' )"'
+				.'title="'.format_to_output( $params['title'], 'htmlattr' ).'"'
+				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
+			.'>'.format_to_output( $params['text'], 'htmlbody' ).'</a>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Provide a link to link a new version of this post if user has rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 * @return string
+	 */
+	function get_link_version_link( $params = array() )
+	{
+		if( ! $this->can_link_version(  true  ) )
+		{	// New item version cannot be linked by some restriction:
+			return false;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'       => '',
+				'after'        => '',
+				'text'         => '#text#', // '#' - icon + text, '#icon#' - only icon, '#text#' - only text
+				'title'        => '#', // '#' - Link version...
+				'class'        => '',
+			), $params );
+
+		switch( $params['text'] )
+		{
+			case '#text#':
+				$params['text'] = T_('Link version').'...';
+				break;
+
+			case '#':
+				$params['text'] = get_icon( 'link', 'imgtag', array( 'title' => T_('Link version').'...' ) ).' '.T_('Link version').'...';
+				break;
+
+			case '#icon#':
+				$params['text'] = get_icon( 'link', 'imgtag', array( 'title' => T_('Link version').'...' ) );
+				break;
+		}
+
+		if( $params['title'] == '#' )
+		{
+			$params['title'] = T_('Link version').'...';
+		}
+
+		$r = $params['before'];
+
+		$item_Blog = & $this->get_Blog();
+		$r .= '<a href="#" onclick="return evo_link_version_load_window( '.$this->ID.', \''.$item_Blog->get( 'urlname' ).'\' )"'
+				.'title="'.format_to_output( $params['title'], 'htmlattr' ).'"'
+				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
+			.'>'.format_to_output( $params['text'], 'htmlbody' ).'</a>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Get URL to unlink a post if user has a permission
+	 *
+	 * @param array Params:
+	 *  - 'unlink_item_ID': What item to unlink, NULL - to unlink this Item
+	 */
+	function get_unlink_version_url( $params = array() )
+	{
+		global $admin_url;
+
+		if( ! $this->can_link_version() )
+		{	// Item version cannot be unlinked by some restriction:
+			return false;
+		}
+
+		// Default params:
+		$params = array_merge( array(
+				'unlink_item_ID' => NULL,
+			), $params );
+
+		if( $params['unlink_item_ID'] !== NULL )
+		{
+			$ItemCache = & get_ItemCache();
+			if( ! ( $unlink_item = & $ItemCache->get_by_ID( $params['unlink_item_ID'], false, false ) ) ||
+			    $unlink_item->get( 'igrp_ID' ) != $this->get( 'igrp_ID' ) )
+			{	// If the requested Item to unlink is from different group:
+				return false;
+			}
+		}
+
+		return $admin_url.'?ctrl=items&amp;action=unlink_version&amp;blog='.$this->Blog->ID
+			.'&amp;post_ID='.$this->ID
+			.( empty( $unlink_item ) ? '' : '&amp;unlink_item_ID='.$unlink_item->ID )
+			.'&amp;'.url_crumb( 'item' );
+	}
+
+
+	/**
+	 * Provide a link to unlink a new version of this post if user has rights
+	 *
+	 * @param array Params:
+	 *  - 'unlink_item_ID': What item to unlink, NULL - to unlink this Item
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 * @return string
+	 */
+	function get_unlink_version_link( $params = array() )
+	{
+		if( ! ( $unlink_version_url = $this->get_unlink_version_url( $params ) ) )
+		{	// Unlink action is not allowed for current User and this Item
+			return false;
+		}
+
+		// Default params:
+		$params = array_merge( array(
+				'unlink_item_ID' => NULL,
+				'before'         => ' ',
+				'after'          => ' ',
+				'text'           => '#icon#', // '#' - icon + text, '#icon#' - only icon, '#text#' - only text
+				'title'          => '#', // '#' - Unlink version...
+				'class'          => '',
+			), $params );
+
+		switch( $params['text'] )
+		{
+			case '#text#':
+				$params['text'] = T_('Unlink version').'...';
+				break;
+
+			case '#':
+				$params['text'] = get_icon( 'unlink', 'imgtag', array( 'title' => T_('Unlink version').'...' ) ).' '.T_('Link version').'...';
+				break;
+
+			case '#icon#':
+				$params['text'] = get_icon( 'unlink', 'imgtag', array( 'title' => T_('Unlink version').'...' ) );
+				break;
+		}
+
+		if( $params['title'] == '#' )
+		{
+			$params['title'] = T_('Unlink version').'...';
+		}
+
+		$ItemCache = & get_ItemCache();
+		if( ! ( $unlink_item = & $ItemCache->get_by_ID( $params['unlink_item_ID'], false, false ) ) ||
+		    $unlink_item->get( 'igrp_ID' ) != $this->get( 'igrp_ID' ) )
+		{	// Use current Item if the requested Item doesn't exist or it is from another group:
+			$unlink_item = $this;
+		}
+
+		$r = $params['before'];
+
+		$item_Blog = & $this->get_Blog();
+		$r .= '<a href="'.$unlink_version_url.'" '
+				.'onclick="return confirm( \''.format_to_output( sprintf( TS_('Are you sure want to unlink the Item "%s" (%s)?'), $unlink_item->get( 'title' ), $unlink_item->get( 'locale' ) ), 'htmlattr' ).'\' )"'
+				.'title="'.format_to_output( $params['title'], 'htmlattr' ).'"'
+				.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' )
+			.'>'.format_to_output( $params['text'], 'htmlbody' ).'</a>';
+
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
+	 * Check to add/link a new version of this post if user has rights
+	 *
+	 * @return boolean
+	 */
+	function can_link_version( $allow_new_item = false )
+	{
+		global $current_User;
+
+		if( ! $allow_new_item && ! $this->ID )
+		{	// Item must be saved in DB:
+			return false;
+		}
+
+		if( ! is_logged_in( false ) )
+		{	// User must be logged in
+			return false;
+		}
+
+		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// User has no rights to edit this Item
+			return false;
+		}
+
+		if( ! is_admin_page() || ! $current_User->check_perm( 'admin', 'restricted' ) )
+		{	// This feature is allowed only for back-office yet
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
 	 * Provide link to edit a post if user has edit rights
 	 *
 	 * @param array Params:
@@ -5922,11 +6387,14 @@ class Item extends ItemLight
 		}
 
 		// default params
-		$params += array( 'save_context' => true );
+		$params += array(
+				'save_context' => true,
+				'glue'         => '&amp;',
+			);
 
 		$this->load_Blog();
 		$url = false;
-		if( $this->Blog->get_setting( 'in_skin_editing' ) && ! is_admin_page() )
+		if( $this->Blog->get_setting( 'in_skin_editing' ) && ( ! is_admin_page() || ! empty( $params['force_in_skin_editing'] ) ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
 			if( check_item_perm_edit( $this->ID, false ) )
 			{	// Current user can edit this post
@@ -5935,10 +6403,10 @@ class Item extends ItemLight
 		}
 		else if( $current_User->check_perm( 'admin', 'restricted' ) )
 		{	// Edit a post from Back-office
-			$url = $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$this->ID.'&amp;blog='.$this->Blog->ID;
+			$url = $admin_url.'?ctrl=items'.$params['glue'].'action=edit'.$params['glue'].'p='.$this->ID.$params['glue'].'blog='.$this->Blog->ID;
 			if( $params['save_context'] )
 			{
-				$url .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
+				$url .= $params['glue'].'redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
 			}
 		}
 		return $url;
@@ -5956,7 +6424,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Provide link to merge a post if user has edit rights
+	 * Provide link to propose change a post if user has edit rights
 	 *
 	 * @param array Params:
 	 *  - 'before': to display before link
@@ -5964,10 +6432,115 @@ class Item extends ItemLight
 	 *  - 'text': link text
 	 *  - 'title': link title
 	 *  - 'class': CSS class name
+	 *  - 'save_context': redirect to current URL?
 	 */
-	function get_merge_link( $params = array() )
+	function get_propose_change_link( $params = array() )
+	{
+		$actionurl = $this->get_propose_change_url( $params );
+		if( ! $actionurl )
+		{	// Don't display the propose change button if current user has no rights:
+			return false;
+		}
+
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'before'       => ' ',
+				'after'        => ' ',
+				'text'         => '#',
+				'title'        => '#',
+				'class'        => '',
+				'save_context' => true,
+			), $params );
+
+
+		if( $params['text'] == '#' )
+		{	// Default text:
+			$params['text'] = get_icon( 'edit_button' ).' '.T_('Propose change');
+		}
+		elseif( $params['text'] == '#icon#' )
+		{	// Default text as single icon:
+			$params['text'] = get_icon( 'edit_button' );
+		}
+		if( $params['title'] == '#' )
+		{	// Default title:
+			$params['title'] = T_('Propose change');
+		}
+
+		return $params['before'].
+			'<a href="'.$actionurl.'"'.
+					' title="'.format_to_output( $params['title'], 'htmlattr' ).'"'.
+					( empty( $params['class'] ) ? '' : ' class="'.format_to_output( $params['class'], 'htmlattr' ).'"' ).'>'.
+				$params['text'].
+			'</a>';
+			$params['after'];
+	}
+
+
+	/**
+	 * Get URL to propose a change for a post if user has edit rights.
+	 *
+	 * @param array Params:
+	 *  - 'save_context': redirect to current URL?
+	 */
+	function get_propose_change_url( $params = array() )
 	{
 		global $admin_url, $current_User;
+
+		if( ! is_logged_in( false ) )
+		{	// User must be logged in and activated for this action:
+			return false;
+		}
+
+		if( ! $this->ID )
+		{	// Don't display this button in preview mode:
+			return false;
+		}
+
+		if( ! $current_User->check_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
+		{	// User has no right to propose a change for this Item:
+			return false;
+		}
+
+		// default params:
+		$params += array( 'save_context' => true );
+
+		$this->load_Blog();
+		$url = false;
+		if( ! is_admin_page() && $this->Blog->get_setting( 'in_skin_editing' ) )
+		{	// We have a mode 'In-skin editing' for the current Blog
+			$url = url_add_param( $this->Blog->get( 'url' ), 'disp=proposechange&p='.$this->ID );
+		}
+		else if( $current_User->check_perm( 'admin', 'restricted' ) )
+		{	// Edit a post from Back-office:
+			$url = $admin_url.'?ctrl=items&amp;action=propose&amp;p='.$this->ID.'&amp;blog='.$this->Blog->ID;
+			if( $params['save_context'] )
+			{
+				$url .= '&amp;redirect_to='.rawurlencode( regenerate_url( '', '', '', '&' ).'#'.$this->get_anchor_id() );
+			}
+		}
+
+		return $url;
+	}
+
+
+	/**
+	 * Template tag
+	 * @see Item::get_edit_link()
+	 */
+	function propose_change_link( $params = array() )
+	{
+		echo $this->get_propose_change_link( $params );
+	}
+
+
+	/**
+	 * Get JavaScript code for onclick event of merge link
+	 *
+	 * @return boolean|string
+	 */
+	function get_merge_click_js()
+	{
+		global $current_User;
 
 		if( ! is_logged_in( false ) )
 		{	// Current User must be logged in and activated:
@@ -5981,6 +6554,28 @@ class Item extends ItemLight
 
 		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
 		{	// User has no right to edit this Item:
+			return false;
+		}
+
+		return 'return evo_merge_load_window( '.$this->ID.' )';
+	}
+
+
+	/**
+	 * Provide link to merge a post if user has edit rights
+	 *
+	 * @param array Params:
+	 *  - 'before': to display before link
+	 *  - 'after':    to display after link
+	 *  - 'text': link text
+	 *  - 'title': link title
+	 *  - 'class': CSS class name
+	 */
+	function get_merge_link( $params = array() )
+	{
+		$merge_click_js = $this->get_merge_click_js( $params );
+		if( ! $merge_click_js )
+		{	// Don't display the propose change button if current user has no rights:
 			return false;
 		}
 
@@ -6006,7 +6601,7 @@ class Item extends ItemLight
 		}
 
 		$r = $params['before'];
-		$r .= '<a href="#" onclick="return evo_merge_load_window( '.$this->ID.' )"'
+		$r .= '<a href="#" onclick="'.$merge_click_js.'"'
 					.' title="'.$params['title'].'"'
 					.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' ).'>'
 				.$params['text']
@@ -6023,9 +6618,13 @@ class Item extends ItemLight
 	 */
 	function merge_link( $params = array() )
 	{
-		echo $this->get_merge_link( $params );
+		$merge_link = $this->get_merge_link( $params );
 
-		echo_item_merge_js();
+		if( ! empty( $merge_link ) )
+		{
+			echo_item_merge_js();
+			echo $merge_link;
+		}
 	}
 
 
@@ -6515,9 +7114,9 @@ class Item extends ItemLight
 				'format'   => 'htmlbody', // Output format, see {@link format_to_output()}
 			), $params );
 
-		$r = str_replace( '$status$', $this->status, $params['template'] );
+		$r = str_replace( '$status$', $this->get( 'status' ), $params['template'] );
 		$r = str_replace( '$status_title$', $this->get('t_status'), $r );
-		$r = str_replace( '$tooltip_title$', get_status_tooltip_title( $this->status ), $r );
+		$r = str_replace( '$tooltip_title$', get_status_tooltip_title( $this->get( 'status' ) ), $r );
 
 		return format_to_output( $r, $params['format'] );
 	}
@@ -6999,6 +7598,36 @@ class Item extends ItemLight
 				$this->previous_status = $this->get( 'status' );
 				return parent::set( 'status', $parvalue, $make_null );
 
+			case 'revision':
+				if( ! isset( $this->revision ) || $this->revision != $parvalue )
+				{	// When revision is changed:
+					if( isset( $this->custom_fields ) )
+					{	// Reset custom fields:
+						unset( $this->custom_fields );
+					}
+					// Clear Links/Attachments to load them with data from other revision:
+					$LinkCache = & get_LinkCache();
+					$LinkCache->clear();
+				}
+				if( $parvalue == 'c' )
+				{	// Don't set revision if required to current version:
+					if( $this->is_revision() )
+					{	// Unset previous active revision:
+						unset( $this->revision );
+					}
+					return false;
+				}
+				// Don't use parent::set() because post has no column "revision" in DB:
+				$this->revision = $parvalue;
+				return true;
+
+			case 'urltitle':
+				if( ! isset( $this->previous_urltitle ) )
+				{	// Save previous urltitle, may be used to rename folder of attachments:
+					$this->previous_urltitle = $this->get( 'urltitle' );
+				}
+				return parent::set( $parname, $parvalue, $make_null );
+
 			default:
 				return parent::set( $parname, $parvalue, $make_null );
 		}
@@ -7085,7 +7714,7 @@ class Item extends ItemLight
 		$post_url = '',
 		$post_comment_status = 'open',
 		$post_renderers = array('default'),
-		$item_type_name_or_ID = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type OR integer to use post type by ID
+		$item_type_name_or_ID_or_template = '#', // Use 'Page', 'Post' and etc. OR '#' to use default post type OR integer to use post type by ID OR $template_name$
 		$item_st_ID = NULL,
 		$postcat_order = NULL,
 		$display_restrict_status_messages = true )
@@ -7093,7 +7722,7 @@ class Item extends ItemLight
 		global $DB, $query, $UserCache;
 		global $default_locale;
 
-		if( $item_type_name_or_ID == '#' )
+		if( $item_type_name_or_ID_or_template == '#' )
 		{	// Try to set default post type ID from blog setting:
 			$ChapterCache = & get_ChapterCache();
 			if( $Chapter = & $ChapterCache->get_by_ID( $main_cat_ID, false, false ) &&
@@ -7105,11 +7734,17 @@ class Item extends ItemLight
 		else
 		{	// Try to get item type by requested name:
 			$ItemTypeCache = & get_ItemTypeCache();
-			if( is_int( $item_type_name_or_ID ) && $ItemType = & $ItemTypeCache->get_by_ID( $item_type_name_or_ID, false, false ) )
+			if( is_int( $item_type_name_or_ID_or_template ) &&
+			    ( $ItemType = & $ItemTypeCache->get_by_ID( $item_type_name_or_ID_or_template, false, false ) ) )
 			{	// Item type exists in DB by requested ID, Use it:
 				$item_typ_ID = $ItemType->ID;
 			}
-			elseif( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name_or_ID, false, false ) )
+			elseif( preg_match( '/^\$(.+)\$$/', $item_type_name_or_ID_or_template, $ityp_match ) &&
+			        ( $ItemType = & $ItemTypeCache->get_by_template( $ityp_match[1], false, false ) ) )
+			{	// Item type exists in DB by requested template, Use it:
+				$item_typ_ID = $ItemType->ID;
+			}
+			elseif( $ItemType = & $ItemTypeCache->get_by_name( $item_type_name_or_ID_or_template, false, false ) )
 			{	// Item type exists in DB by requested name, Use it:
 				$item_typ_ID = $ItemType->ID;
 			}
@@ -7171,6 +7806,31 @@ class Item extends ItemLight
 		$this->set( 'ityp_ID', $item_typ_ID );
 		$this->set( 'pst_ID', $item_st_ID );
 		$this->set( 'order', $postcat_order );
+
+		if( $this->get( 'ityp_ID' ) > 0 && isset( $this->custom_fields ) )
+		{	// Reinitialize custom fields definitions if they were created to set new values before set item type for this Item, e-g on install default Items:
+			$old_custom_fields = $this->custom_fields;
+			$this->custom_fields = $this->get_custom_fields_defs();
+			foreach( $this->custom_fields as $custom_field_name => $custom_field )
+			{
+				if( isset( $old_custom_fields[ $custom_field_name ]['value'] ) )
+				{
+					$custom_field['value'] = $old_custom_fields[ $custom_field_name ]['value'];
+				}
+				$this->custom_fields[ $custom_field_name ] = $custom_field;
+			}
+			unset( $old_custom_fields );
+		}
+
+		// Update the computed custom fields if this Item has them:
+		$custom_fields = $this->get_custom_fields_defs();
+		foreach( $custom_fields as $custom_field )
+		{
+			if( $custom_field['type'] == 'computed' )
+			{	// Set a value by special function because we don't submit value for such fields and compute a value by formula automatically:
+				$this->set_custom_field( $custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ), 'value', true );
+			}
+		}
 
 		// INSERT INTO DB:
 		$this->dbinsert( $display_restrict_status_messages );
@@ -7236,14 +7896,6 @@ class Item extends ItemLight
 		$this->set_last_touched_ts();
 		$this->set_contents_last_updated_ts();
 
-		// Check which locale we can use for this item:
-		$item_Blog = & $this->get_Blog();
-		if( $item_Blog && $item_Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
-		    $this->get( 'locale' ) != $item_Blog->get( 'locale' ) )
-		{	// Force to use collection locale because it is restricted by collection setting:
-			$this->set( 'locale', $item_Blog->get( 'locale' ) );
-		}
-
 		// Check if item is assigned to a user
 		if( isset( $this->dbchanges['post_assigned_user_ID'] ) )
 		{
@@ -7254,6 +7906,11 @@ class Item extends ItemLight
 
 		if( $result = parent::dbinsert() )
 		{ // We could insert the item object..
+
+			if( ! empty( $this->source_version_item_ID ) )
+			{	// Set group ID if this Item is creating as version of another Item:
+				$this->set_group_ID( $this->source_version_item_ID );
+			}
 
 			// Link attachments from temporary object to new created Item:
 			$this->link_from_Request();
@@ -7303,6 +7960,8 @@ class Item extends ItemLight
 						}
 					}
 				}
+				// Clear cached slugs in order to display new unique updated on the edit form:
+				$this->slugs = NULL;
 			}
 
 			// Create tiny slug:
@@ -7425,9 +8084,10 @@ class Item extends ItemLight
 	 * 	because of the item canonical url title was changed on the slugs edit form, so slug update is already done.
 	 *  If slug update wasn't done already, then this param has to be true.
 	 * @param boolean Update custom fields of child posts?
+	 * @param boolean TRUE to force to create revision
 	 * @return boolean true on success
 	 */
-	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true )
+	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true, $force_create_revision = false )
 	{
 		global $DB, $Plugins, $Messages;
 
@@ -7609,29 +8269,24 @@ class Item extends ItemLight
 
 		$result = true;
 		// fp> note that dbchanges isn't actually 100% accurate. At this time it does include variables that actually haven't changed.
-		if( isset($this->dbchanges['post_status'])
-			|| isset($this->dbchanges['post_title'])
-			|| isset($this->dbchanges['post_content']) )
+		if( isset( $this->dbchanges['post_status'] )
+			|| isset( $this->dbchanges['post_title'] )
+			|| isset( $this->dbchanges['post_content'] )
+			|| isset( $this->dbchanges_flags['custom_fields'] ) )
 		{ // One of the fields we track in the revision history has changed:
 			// Save the "current" (soon to be "old") data as a version before overwriting it in parent::dbupdate:
 			// fp> TODO: actually, only the fields that have been changed should be copied to the version, the other should be left as NULL
 
-			// Get next version ID
-			$iver_SQL = new SQL();
-			$iver_SQL->SELECT( 'MAX( iver_ID )' );
-			$iver_SQL->FROM( 'T_items__version' );
-			$iver_SQL->WHERE( 'iver_itm_ID = '.$this->ID );
-			$iver_ID = (int)$DB->get_var( $iver_SQL->get() ) + 1;
+			global $localtimenow;
+			if( $force_create_revision || $localtimenow - strtotime( $this->last_touched_ts ) > 10 )
+			{ // Create new revision
+				$result = $this->create_revision();
+			}
 
-			$sql = 'INSERT INTO T_items__version( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_datetime, iver_status, iver_title, iver_content )
-				SELECT "'.$iver_ID.'" AS iver_ID, post_ID, post_lastedit_user_ID, post_datemodified, post_status, post_title, post_content
-					FROM T_items__item
-				 WHERE post_ID = '.$this->ID;
-			$result = $DB->query( $sql, 'Save a version of the Item' ) !== false;
 			$db_changed = true;
 		}
 
-		if( $auto_track_modification && ( count( $dbchanges ) > 0 ) )
+		if( $auto_track_modification && ( count( $dbchanges ) > 0 || ! empty( $this->dbchanges_custom_fields ) ) )
 		{
 			if( ! isset( $dbchanges['last_touched_ts'] ) )
 			{	// Update last_touched_ts field only if it wasn't updated yet and the datemodified will be updated for sure:
@@ -7644,6 +8299,31 @@ class Item extends ItemLight
 			{	// If at least one of those fields has been updated then it means a content of this item has been updated:
 				$this->set_contents_last_updated_ts();
 			}
+		}
+
+		// Unset the following otherwise a new revision will be created if another dbupdate is called
+		$this->dbchanges_custom_fields = array();
+		unset( $this->dbchanges_flags['custom_fields'] );
+
+		// Let's handle the slugs:
+		// TODO: dh> $result handling here feels wrong: when it's true already, it should not become false (add "|| $result"?)
+		// asimo>dh The result handling is in a transaction. If somehow the new slug creation fails, then the item insertion should rollback as well
+		if( $result && ! empty( $edited_slugs ) )
+		{	// if we have new created $edited_slugs, we have to insert it into the database:
+			foreach( $edited_slugs as $edited_Slug )
+			{
+				if( $edited_Slug->ID == 0 )
+				{	// Insert only new created slugs:
+					$edited_Slug->dbinsert();
+				}
+			}
+			if( isset( $edited_slugs[0] ) && $edited_slugs[0]->ID > 0 )
+			{	// Make first slug from list as main slug for this item:
+				$this->set( 'canonical_slug_ID', $edited_slugs[0]->ID );
+				$this->set( 'urltitle', $edited_slugs[0]->get( 'title' ) );
+			}
+			// Clear cached slugs in order to display new unique updated on the edit form:
+			$this->slugs = NULL;
 		}
 
 		$parent_update = $this->dbupdate_worker( $auto_track_modification );
@@ -7661,26 +8341,6 @@ class Item extends ItemLight
 			{ // Let's handle the tags:
 				$this->insert_update_tags( 'update' );
 				$db_changed = true;
-			}
-
-			// Let's handle the slugs:
-			// TODO: dh> $result handling here feels wrong: when it's true already, it should not become false (add "|| $result"?)
-			// asimo>dh The result handling is in a transaction. If somehow the new slug creation fails, then the item insertion should rollback as well
-			if( $result && !empty( $edited_slugs ) )
-			{ // if we have new created $edited_slugs, we have to insert it into the database:
-				foreach( $edited_slugs as $edited_Slug )
-				{
-					if( $edited_Slug->ID == 0 )
-					{ // Insert only new created slugs
-						$edited_Slug->dbinsert();
-					}
-				}
-				if( isset( $edited_slugs[0] ) && $edited_slugs[0]->ID > 0 )
-				{ // Make first slug from list as main slug for this item
-					$this->set( 'canonical_slug_ID', $edited_slugs[0]->ID );
-					$this->set( 'urltitle', $edited_slugs[0]->get( 'title' ) );
-					$result = parent::dbupdate();
-				}
 			}
 
 			// Update/Insert/Delete custom fields:
@@ -8008,7 +8668,7 @@ class Item extends ItemLight
 			) );
 
 		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
-		$first_content_part = preg_replace( '/\[[a-z]+\]:[^\]]*\]/i', '', $first_content_part );
+		$first_content_part = preg_replace( '/\[[a-z]+:[^\]]*\]/i', '', $first_content_part );
 
 		return excerpt( $first_content_part, $maxlen, $tail );
 	}
@@ -8211,7 +8871,13 @@ class Item extends ItemLight
 	 */
 	function handle_notifications( $executed_by_userid = NULL, $is_new_item = false, $force_members = false, $force_community = false, $force_pings = false )
 	{
-		global $Settings, $Messages, $localtimenow, $Debuglog;
+		global $Settings, $Messages, $localtimenow, $Debuglog, $DB;
+
+		if( empty( $this->ID ) )
+		{	// Don't send notifications for not created Item:
+			$Debuglog->add( 'Item->handle_notifications() : Item is NOT saved in DB', 'notifications' );
+			return false;
+		}
 
 		// Immediate notifications? Asynchronous? Off?
 		$notifications_mode = $Settings->get( 'outbound_notifications_mode' );
@@ -8238,7 +8904,7 @@ class Item extends ItemLight
 		$Blog = & $this->get_Blog();
 		if( $Blog->get_setting( 'use_workflow' ) && $this->assigned_to_new_user && ! empty( $this->assigned_user_ID ) )
 		{
-			$already_notified_user_IDs = array_merge( $already_notified_user_IDs, $this->send_assignment_notification( $executed_by_userid, $is_new_item ) );
+			$already_notified_user_IDs = array_merge( $already_notified_user_IDs, $this->send_assignment_notification( $executed_by_userid ) );
 		}
 
 		// THIRD: Subscribers may be notified asynchornously... and that is a even a requirement if the post has an issue_date in the future.
@@ -8278,6 +8944,7 @@ class Item extends ItemLight
 		}
 
 		// IMMEDIATE vs ASYNCHRONOUS sending:
+		$DB->begin( 'SERIALIZABLE' );
 
 		if( $notifications_mode == 'immediate' && strtotime( $this->issue_date ) <= $localtimenow )
 		{	// We want to send the notifications immediately (can only be done if post does not have an issue_date in the future):
@@ -8349,22 +9016,30 @@ class Item extends ItemLight
 		}
 
 		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
-		$this->dbupdate( false, false, false );
-
-		return true;
+		if( $this->dbupdate( false, false, false ) )
+		{
+			$DB->commit();
+			return true;
+		}
+		else
+		{
+			$DB->rollback();
+			return false;
+		}
 	}
 
 
 	/**
-	 * Send "post may need moderation" notifications for those users who have permission to moderate this post and would like to receive these notifications.
+	 * Get item moderators
 	 *
+	 * @param string Setting name of notification: 'notify_post_moderation', 'notify_edit_pst_moderation', 'notify_post_proposed'
 	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
-	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
-	 * @return array the notified user ids
+	 * @param string|false Additional check with collection subscription: 'sub_items', 'sub_items_mod', 'sub_comments'
+	 * @return array Key - User ID, Value - perm level
 	 */
-	function send_moderation_emails( $executed_by_userid = NULL, $is_new_item = false )
+	function get_moderators( $notify_setting_name, $executed_by_userid = NULL, $check_coll_subscription = false )
 	{
-		global $Settings, $UserSettings, $DB, $Messages;
+		global $Settings, $DB;
 
 		if( $executed_by_userid === NULL && is_logged_in() )
 		{	// Use current user by default:
@@ -8372,29 +9047,24 @@ class Item extends ItemLight
 			$executed_by_userid = $current_User->ID;
 		}
 
-		// Select all users who are post moderators in this Item's blog
-		$blog_ID = $this->load_Blog();
-
-		$notify_moderation_setting_name = ( $is_new_item ? 'notify_post_moderation' : 'notify_edit_pst_moderation' );
-
 		$notify_condition = 'uset_value IS NOT NULL AND uset_value <> "0"';
-		if( $Settings->get( 'def_'.$notify_moderation_setting_name ) )
+		if( $Settings->get( 'def_'.$notify_setting_name ) )
 		{
 			$notify_condition = '( uset_value IS NULL OR ( '.$notify_condition.' ) )';
 		}
-		if( ! $is_new_item && $this->Blog->get_setting( 'allow_item_mod_subscriptions' ) )
+		if( $check_coll_subscription !== false )
 		{	// Notify moderators which selected to be notified per collection (if it is enabled by collection setting):
-			$notify_condition = '( sub_items_mod = 1 OR ( '.$notify_condition.' ) )';
+			$notify_condition = '( '.$check_coll_subscription.' = 1 OR ( '.$notify_condition.' ) )';
 		}
 
 		// Select user_ids with the corresponding item edit permission on this item's blog
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get moderators "'.$notify_setting_name.'" for Item #'.$this->ID );
 		$SQL->SELECT( 'user_ID, IF( grp_perm_blogs = "editall" OR user_ID = blog_owner_user_ID, "all", IF( IFNULL( bloguser_perm_edit + 0, 0 ) > IFNULL( bloggroup_perm_edit + 0, 0 ), bloguser_perm_edit, bloggroup_perm_edit ) ) as perm' );
 		$SQL->FROM( 'T_users' );
-		$SQL->FROM_add( 'LEFT JOIN T_blogs ON ( blog_ID = '.$this->blog_ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$this->blog_ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND user_grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$this->blog_ID.' )' );
-		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_moderation_setting_name.'"' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON ( blog_ID = '.$this->get_blog_ID().' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_user_perms ON (blog_advanced_perms <> 0 AND user_ID = bloguser_user_ID AND bloguser_blog_ID = '.$this->get_blog_ID().' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_group_perms ON (blog_advanced_perms <> 0 AND user_grp_ID = bloggroup_group_ID AND bloggroup_blog_ID = '.$this->get_blog_ID().' )' );
+		$SQL->FROM_add( 'LEFT JOIN T_users__usersettings ON uset_user_ID = user_ID AND uset_name = "'.$notify_setting_name.'"' );
 		$SQL->FROM_add( 'LEFT JOIN T_groups ON grp_ID = user_grp_ID' );
 		$SQL->FROM_add( 'LEFT JOIN T_subscriptions ON sub_coll_ID = blog_ID AND sub_user_ID = user_ID' );
 		$SQL->WHERE( $notify_condition );
@@ -8407,11 +9077,31 @@ class Item extends ItemLight
 			$SQL->WHERE_and( 'user_ID != '.$DB->quote( $executed_by_userid ) );
 		}
 
-		$post_moderators = $DB->get_assoc( $SQL->get() );
+		return $DB->get_assoc( $SQL );
+	}
+
+
+	/**
+	 * Send "post may need moderation" notifications for those users who have permission to moderate this post and would like to receive these notifications.
+	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
+	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
+	 * @return array the notified user ids
+	 */
+	function send_moderation_emails( $executed_by_userid = NULL, $is_new_item = false )
+	{
+		global $Messages;
+
+		$notify_moderation_setting_name = ( $is_new_item ? 'notify_post_moderation' : 'notify_edit_pst_moderation' );
+		// Notify moderators which selected to be notified per collection (if it is enabled by collection setting):
+		$check_coll_subscription = ( ! $is_new_item && $this->get_Blog()->get_setting( 'allow_item_mod_subscriptions' ) ? 'sub_items_mod' : false );
+
+		// Get all users who are post moderators in this Item's blog:
+		$post_moderators = $this->get_moderators( $notify_moderation_setting_name, $executed_by_userid, $check_coll_subscription );
 
 		$post_creator_User = & $this->get_creator_User();
 		if( isset( $post_moderators[$post_creator_User->ID] ) )
-		{ // Don't notify the user who just created this Item
+		{	// Don't notify the user who just created this Item:
 			unset( $post_moderators[$post_creator_User->ID] );
 		}
 
@@ -8486,13 +9176,84 @@ class Item extends ItemLight
 
 
 	/**
+	 * Send "post proposed change" notifications for those users who have permission to moderate this post and would like to receive these notifications.
+	 *
+	 * @param integer Version ID of new proposed change
+	 */
+	function send_proposed_change_notification( $iver_ID )
+	{
+		global $Messages, $current_User;
+
+		if( ! is_logged_in() )
+		{	// Only logged in user can propose a change
+			return;
+		}
+
+		// Get all users who are post moderators in this Item's blog:
+		$post_moderators = $this->get_moderators( 'notify_post_proposed' );
+
+		if( empty( $post_moderators ) )
+		{ // There are no moderator users who would like to receive notificaitons
+			return;
+		}
+
+		// Clear revision in order to use current data in the email message:
+		$this->clear_revision();
+
+		// Collect all notified User IDs in this array:
+		$notified_users_num = 0;
+
+		$post_creator_User = & $this->get_creator_User();
+		$post_creator_level = $post_creator_User->level;
+		$UserCache = & get_UserCache();
+		$UserCache->load_list( array_keys( $post_moderators ) );
+
+		foreach( $post_moderators as $moderator_ID => $perm )
+		{
+			$moderator_User = $UserCache->get_by_ID( $moderator_ID );
+			if( ( $perm == 'lt' ) && ( $moderator_User->level <= $post_creator_level ) )
+			{ // User has no permission moderate this post
+				continue;
+			}
+			if( ( $perm == 'le' ) && ( $moderator_User->level < $post_creator_level ) )
+			{ // User has no permission moderate this post
+				continue;
+			}
+
+			$moderator_user_Group = $moderator_User->get_Group();
+
+			$email_template_params = array(
+				'iver_ID'        => $iver_ID,
+				'Item'           => $this,
+				'recipient_User' => $moderator_User,
+				'proposer_User'  => $current_User,
+			);
+
+			locale_temp_switch( $moderator_User->locale );
+
+			// TRANS: Subject of the mail to send on a post proposed change to moderators. First %s is blog name, the second %s is the item's title.
+			$subject = sprintf( T_('[%s] New change was proposed on: "%s"'), $this->get_Blog()->get( 'shortname' ), $this->get( 'title' ) );
+
+			// Send the email:
+			if( send_mail_to_User( $moderator_ID, $subject, 'post_proposed_change', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) ) )
+			{	// A send notification email request to the user with $moderator_ID ID was processed:
+				$notified_users_num++;
+			}
+
+			locale_restore_previous();
+		}
+
+		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), $notified_users_num ), 'note', T_('Sending notifications:')  );
+	}
+
+
+	/**
 	 * Send "post assignment" notifications for user who have been assigned to this post and would like to receive these notifications.
 	 *
 	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
-	 * @param boolean TRUE if it is notification about new item, FALSE - for edited item
 	 * @return array the notified user ids
 	 */
-	function send_assignment_notification( $executed_by_userid = NULL, $is_new_item = false )
+	function send_assignment_notification( $executed_by_userid = NULL )
 	{
 		global $current_User, $Messages, $UserSettings;
 
@@ -8975,11 +9736,6 @@ class Item extends ItemLight
 		$cache_by_locale = array();
 		foreach( $notify_users as $user_ID => $notify_type )
 		{
-			if( ! check_cron_job_emails_limit() )
-			{	// Stop execution for cron job because max number of emails has been already sent:
-				break;
-			}
-
 			$notify_User = & $UserCache->get_by_ID( $user_ID, false, false );
 			if( empty( $notify_User ) )
 			{	// skip invalid users:
@@ -9191,13 +9947,13 @@ class Item extends ItemLight
 
 			foreach( $ping_plugins as $plugin_code )
 			{
-				$Plugin = & $Plugins->get_by_code($plugin_code);
+				$Plugin = & $Plugins->get_by_code( $plugin_code );
 
 				if( $Plugin )
 				{
 					$ping_messages = array();
 					$ping_messages[] = array(
-						'message' => sprintf( T_('Pinging %s...'), $Plugin->ping_service_name ),
+						'message' => isset( $Plugin->ping_service_process_message ) ? $Plugin->ping_service_process_message : sprintf( /* TRANS: %s is a ping service name */ T_('Pinging %s...'), $Plugin->ping_service_name ),
 						'type' => 'note' );
 					$params = array( 'Item' => & $this, 'xmlrpcresp' => NULL, 'display' => false );
 
@@ -9351,7 +10107,7 @@ class Item extends ItemLight
 			case 't_status':
 				// Text status:
 				$post_statuses = get_visibility_statuses();
-				return $post_statuses[$this->status];
+				return $post_statuses[ $this->get_from_revision( 'status' ) ];
 
 			case 't_extra_status':
 				$ItemStatusCache = & get_ItemStatusCache();
@@ -9389,6 +10145,11 @@ class Item extends ItemLight
 			case 'order':
 				// Get item order in main category:
 				return $this->get_order();
+
+			case 'title':
+			case 'content':
+			case 'status':
+				return $this->get_from_revision( $parname );
 		}
 
 		return parent::get( $parname );
@@ -9465,6 +10226,26 @@ class Item extends ItemLight
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Get param value from current revision
+	 *
+	 * @param mixed Name of parameter
+	 * @return mixed Value of parameter
+	 */
+	function get_from_revision( $parname )
+	{
+		if( $this->is_revision() && // If revision is active currently for this Item
+		    ( $Revision = $this->get_revision() ) && // If current revision is detected for this Item
+				isset( $Revision->{'iver_'.$parname} ) ) // If revision really has the requested field
+		{	// Get value from current revision of this Item:
+			return $Revision->{'iver_'.$parname};
+		}
+
+		// Get value from this Item:
+		return parent::get( $parname );
 	}
 
 
@@ -9624,24 +10405,30 @@ class Item extends ItemLight
 	 */
 	function get_slugs( $separator = ', ' )
 	{
-		if( empty( $this->ID ) )
-		{ // New creating Item
-			return $this->get('urltitle');
+		if( ! isset( $this->slugs ) )
+		{	// Initialize item slugs:
+			if( empty( $this->ID ) )
+			{	// Get creating Item:
+				//return $this->get( 'urltitle' );
+				$this->slugs = array();
+			}
+			else
+			{	// Load slugs from DB once:
+				global $DB;
+				$SQL = new SQL( 'Get slugs of the Item #'.$this->ID );
+				$SQL->SELECT( 'slug_title, IF( slug_ID = '.intval( $this->canonical_slug_ID ).', 0, slug_ID ) AS slug_order_num' );
+				$SQL->FROM( 'T_slug' );
+				$SQL->WHERE( 'slug_itm_ID = '.$DB->quote( $this->ID ) );
+				if( ! empty( $this->tiny_slug_ID ) )
+				{	// Exclude tiny slug from list:
+					$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
+				}
+				$SQL->ORDER_BY( 'slug_order_num' );
+				$this->slugs = $DB->get_col( $SQL );
+			}
 		}
 
-		global $DB;
-		$SQL = new SQL( 'Get slugs of the Item' );
-		$SQL->SELECT( 'slug_title, IF( slug_ID = '.intval( $this->canonical_slug_ID ).', 0, slug_ID ) AS slug_order_num' );
-		$SQL->FROM( 'T_slug' );
-		$SQL->WHERE( 'slug_itm_ID = '.$DB->quote( $this->ID ) );
-		if( !empty( $this->tiny_slug_ID ) )
-		{ // Exclude tiny slug from list
-			$SQL->WHERE_and( 'slug_ID != '.$DB->quote( $this->tiny_slug_ID ) );
-		}
-		$SQL->ORDER_BY( 'slug_order_num' );
-		$slugs = $DB->get_col( $SQL );
-
-		return implode( $separator, $slugs );
+		return implode( $separator, $this->slugs );
 	}
 
 
@@ -10139,35 +10926,382 @@ class Item extends ItemLight
 	/**
 	 * Get item revision
 	 *
-	 * @param integer Revision ID
+	 * @param string Revision ID with prefix as first char: 'a'(or digit) - archived version, 'c' - current version, 'p' - proposed change, NULL - to use current revision
 	 * @return object Revision
 	 */
-	function get_revision( $iver_ID = 0 )
+	function & get_revision( $iver_ID = NULL )
 	{
-		if( $iver_ID > 0 )
-		{	// Get revision from archive
-			global $DB;
+		global $DB;
 
+		if( $iver_ID === NULL && $this->is_revision() )
+		{	// Use current revision
+			$iver_ID = $this->revision;
+		}
+
+		if( empty( $this->ID ) || empty( $iver_ID ) )
+		{	// Item must be stored in DB to get revisions and Revision ID must be defined:
+			$r = false;
+			return $r;
+		}
+
+		if( isset( $this->revisions[ $iver_ID ] ) )
+		{	// Get revision data from cached array:
+			return $this->revisions[ $iver_ID ];
+		}
+
+		// Save original ID to use this for storing in cache:
+		$orig_iver_ID = $iver_ID;
+
+		if( $iver_ID == 'last_archived' || $iver_ID == 'last_proposed' )
+		{	// Get last revision:
+			list( , $iver_type ) = explode( '_', $iver_ID );
 			$revision_SQL = new SQL();
-			$revision_SQL->SELECT( '*' );
-			$revision_SQL->FROM( 'T_items__version' );
-			$revision_SQL->WHERE( 'iver_ID = '.$DB->quote( $iver_ID ) );
-			$revision_SQL->WHERE_and( 'iver_itm_ID = '.$DB->quote( $this->ID ) );
-			$Revision = $DB->get_row( $revision_SQL->get() );
+			$revision_SQL->SELECT( 'a.*, CONCAT( "'.$iver_type.'", a.iver_ID ) AS param_ID' );
+			$revision_SQL->FROM( 'T_items__version a' );
+			$revision_SQL->FROM_add( 'LEFT OUTER JOIN T_items__version b ON a.iver_itm_ID = b.iver_itm_ID AND a.iver_ID < b.iver_ID AND b.iver_type = '.$DB->quote( $iver_type ) );
+			$revision_SQL->WHERE( 'b.iver_itm_ID IS NULL' );
+			$revision_SQL->WHERE_and( 'a.iver_itm_ID = '.$DB->quote( $this->ID ) );
+			$revision_SQL->WHERE_and( 'a.iver_type = '.$DB->quote( $iver_type ) );
+			$this->revisions[ $orig_iver_ID ] = $DB->get_row( $revision_SQL->get(), OBJECT, NULL, $revision_SQL->title );
+
+			return $this->revisions[ $orig_iver_ID ];
+		}
+
+		// Get version type from first char:
+		$iver_ID_len = strlen( $iver_ID );
+		$iver_type = $iver_ID_len > 0 ? substr( $iver_ID, 0, 1 ) : 'c';
+
+		if( intval( $iver_type ) == 0 )
+		{	// Extract version ID:
+			$iver_ID = intval( substr( $iver_ID, 1 ) );
 		}
 		else
-		{	// Get current version
-			$Revision = (object) array(
-				'iver_ID'            => 0,
-				'iver_edit_datetime' => $this->datemodified,
-				'iver_edit_user_ID'  => $this->lastedit_user_ID,
-				'iver_status'        => $this->status,
-				'iver_title'         => $this->title,
-				'iver_content'       => $this->content
-			);
+		{	// Use the provided integer ID and decide this as archived version:
+			$iver_type = 'a';
+		}
+		$iver_ID = intval( $iver_ID );
+		if( $iver_ID == 0 )
+		{	// Force to get current version for request without ID:
+			$iver_type = 'c';
 		}
 
-		return $Revision;
+		switch( $iver_type )
+		{
+			case 'a':
+			case 'p':
+				// Archived version or Proposed change:
+				$revision_SQL = new SQL( 'Get '.( $iver_type == 'a' ? 'an archived version' : 'a proposed change' ).' #'.$this->ID.' for Item #'.$this->ID );
+				$revision_SQL->SELECT( '*, CONCAT( "'.$iver_type.'", iver_ID ) AS param_ID' );
+				$revision_SQL->FROM( 'T_items__version' );
+				$revision_SQL->WHERE( 'iver_ID = '.$DB->quote( $iver_ID ) );
+				$revision_SQL->WHERE_and( 'iver_itm_ID = '.$DB->quote( $this->ID ) );
+				$revision_SQL->WHERE_and( 'iver_type = "'.( $iver_type == 'a' ? 'archived' : 'proposed' ).'"' );
+				$this->revisions[ $orig_iver_ID ] = $DB->get_row( $revision_SQL->get(), OBJECT, NULL, $revision_SQL->title );
+				break;
+
+			case 'c':
+			default:
+				// Current version:
+				$this->revisions[ $orig_iver_ID ] = (object) array(
+					'param_ID'           => 'c',
+					'iver_ID'            => 0,
+					'iver_type'          => 'current',
+					'iver_itm_ID'        => $this->ID,
+					'iver_edit_last_touched_ts' => $this->contents_last_updated_ts,
+					'iver_edit_user_ID'  => $this->lastedit_user_ID,
+					'iver_status'        => $this->status,
+					'iver_title'         => $this->title,
+					'iver_content'       => $this->content
+				);
+				break;
+		}
+
+		return $this->revisions[ $orig_iver_ID ];
+	}
+
+
+	/**
+	 * Clear revision and item's data to current version
+	 */
+	function clear_revision()
+	{
+		// Reset this Item in order to use current title, content and other data:
+		$ItemCache = get_ItemCache();
+		unset( $ItemCache->cache[ $this->ID ] );
+		if( $current_Item = $ItemCache->get_by_ID( $this->ID, false, false ) )
+		{	// Revert fields to current values:
+			$revision_fields = array( 'title', 'content', 'status' );
+			foreach( $revision_fields as $revision_field )
+			{
+				$this->set( $revision_field, $current_Item->get( $revision_field ) );
+			}
+		}
+
+		if( isset( $this->revision ) )
+		{	// Reset to use data from current Item:
+			unset( $this->revision );
+		}
+	}
+
+
+	/**
+	 * Get item custom field value by index from current revision
+	 *
+	 * @param string Field index which by default is the field name, see {@link load_custom_field_value()}
+	 * @return mixed false if the field doesn't exist Double/String otherwise depending from the custom field type
+	 */
+	function get_revision_custom_field_value( $field_index )
+	{
+		if( ! $this->is_revision() )
+		{	// Revision is not active:
+			return NULL;
+		}
+
+		if( ! ( $Revision = & $this->get_revision() ) )
+		{	// Revision cannot be detected:
+			return NULL;
+		}
+
+		if( ! isset( $Revision->custom_fields ) )
+		{	// Load custom fields from DB and store in cache:
+			global $DB;
+			$SQL = new SQL( 'Get custom fields values of Item #'.$this->ID.' for revision #'.$Revision->iver_ID.'('.$Revision->iver_type.')' );
+			$SQL->SELECT( 'IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ), ivcf_value' );
+			$SQL->FROM( 'T_items__version_custom_field' );
+			$SQL->FROM_add( 'LEFT JOIN T_items__type_custom_field ON ivcf_itcf_ID = itcf_ID' );
+			$SQL->WHERE_and( 'ivcf_iver_ID = '.$DB->quote( $Revision->iver_ID ) );
+			$SQL->WHERE_and( 'ivcf_iver_type = '.$DB->quote( $Revision->iver_type ) );
+			$SQL->WHERE_and( 'ivcf_iver_itm_ID = '.$DB->quote( $Revision->iver_itm_ID ) );
+			$Revision->custom_fields = $DB->get_assoc( $SQL );
+		}
+
+		if( isset( $Revision->custom_fields[ $field_index ] ) )
+		{	// If the revision has a requested custom field:
+			return $Revision->custom_fields[ $field_index ];
+		}
+		else
+		{	// If the revision has no requested custom field:
+			return NULL;
+		}
+	}
+
+
+	/**
+	 * Update this item from revision
+	 *
+	 * @param string Revision ID with prefix as first char: 'a'(or digit) - archived version, 'c' - current version, 'p' - proposed change, NULL - to use current revision
+	 * @return boolean TRUE on success, FALSE on failed
+	 */
+	function update_from_revision( $iver_ID = NULL )
+	{
+		if( ! ( $Revision = & $this->get_revision( $iver_ID ) ) )
+		{	// If revision is not found:
+			return false;
+		}
+
+		global $DB;
+
+		$DB->begin( 'SERIALIZABLE' );
+
+		// Update main fields:
+		$this->set( 'status', $Revision->iver_status );
+		$this->set( 'title', $Revision->iver_title );
+		$this->set( 'content', $Revision->iver_content );
+
+		$custom_fields = $this->get_type_custom_fields();
+		if( count( $custom_fields ) )
+		{	// Update custom fields if item type has them:
+			// Switch to the requested revision:
+			$this->set( 'revision', $Revision->param_ID );
+			foreach( $custom_fields as $custom_field )
+			{
+				$this->set_custom_field( $custom_field['name'], $this->get_custom_field_value( $custom_field['name'] ) );
+			}
+		}
+
+		if( $Revision->iver_type == 'proposed' )
+		{	// Update last updated data from proposed change:
+			$this->set( 'lastedit_user_ID', $Revision->iver_edit_user_ID );
+			$this->set( 'datemodified', $Revision->iver_edit_last_touched_ts );
+			$this->set( 'contents_last_updated_ts', $Revision->iver_edit_last_touched_ts );
+			$this->set_last_touched_ts();
+			// Don't auto track date fields on accepting of proposed change:
+			$auto_track_modification = false;
+			// Force to create new revision even if no 90 seconds after last changing:
+			$force_create_revision = true;
+		}
+		else
+		{	// Auto track date fields on restoring from history:
+			$auto_track_modification = true;
+			// Don't force creating of new revision:
+			$force_create_revision = false;
+		}
+
+		$r = $this->dbupdate( $auto_track_modification, true, true, $force_create_revision );
+
+		// Update attachments:
+		$current_links_SQL = new SQL( 'Get current links of Item #'.$this->ID.' before updating from revision' );
+		$current_links_SQL->SELECT( '*' );
+		$current_links_SQL->FROM( 'T_links' );
+		$current_links_SQL->WHERE( 'link_itm_ID = '.$this->ID );
+		$current_links = $DB->get_results( $current_links_SQL, OBJECT, '', 'link_ID' );
+
+		$revision_links_SQL = new SQL( 'Get attachments of Item #'.$this->ID.' for revision #'.$Revision->iver_ID.'('.$Revision->iver_type.') before updating from revision' );
+		$revision_links_SQL->SELECT( 'T_items__version_link.*' );
+		$revision_links_SQL->FROM( 'T_items__version_link' );
+		$revision_links_SQL->FROM_add( 'INNER JOIN T_files ON ivl_file_ID = file_ID' );
+		$revision_links_SQL->WHERE( 'ivl_iver_ID = '.$Revision->iver_ID );
+		$revision_links_SQL->WHERE_and( 'ivl_iver_itm_ID = '.$this->ID );
+		$revision_links_SQL->WHERE_and( 'ivl_iver_type = '.$DB->quote( $Revision->iver_type ) );
+		$revision_links = $DB->get_results( $revision_links_SQL, OBJECT, '', 'ivl_link_ID' );
+
+		// Use this array to check for uniqueness links by order:
+		$link_orders = array();
+
+		$LinkOwner = new LinkItem( $this );
+		$LinkCache = & get_LinkCache();
+		foreach( $current_links as $current_link_ID => $current_link )
+		{
+			if( ! isset( $revision_links[ $current_link_ID ] ) )
+			{	// This link doesn't exist in revision, Delete it:
+				if( $deleted_Link = & $LinkCache->get_by_ID( $current_link_ID, false, false ) &&
+				    $LinkOwner->remove_link( $deleted_Link, true ) )
+				{
+					$LinkOwner->after_unlink_action( $current_link_ID );
+				}
+			}
+			else
+			{	// This link exists in revision, we should keep it:
+				// Also store an order in the array to check for uniqueness them by order:
+				$link_orders[ $current_link_ID ] = $current_link->link_order;
+			}
+		}
+
+		if( count( $revision_links ) )
+		{	// It revision has at least one link/attachment:
+			$updated_links = array();
+			$delete_updated_links = array();
+			foreach( $revision_links as $revision_link_ID => $revision_link )
+			{	// Add links of revision to array to check for uniqueness them by order:
+				$link_orders[ $revision_link_ID ] = $revision_link->ivl_order;
+				if( isset( $current_links[ $revision_link_ID ] ) )
+				{	// Store here what links of current version must be updated from revision:
+					$updated_links[ $revision_link_ID ] = $current_links[ $revision_link_ID ];
+					$delete_updated_links[] = $revision_link_ID;
+				}
+			}
+
+			if( count( $delete_updated_links ) )
+			{	// Delete the links(which must be updated) rows temporary from DB in order insert them later with new data to avoid duplicate entry error:
+				$DB->query( 'DELETE FROM T_links
+					WHERE link_ID IN ( '.$DB->quote( $delete_updated_links ).' )
+						AND link_itm_ID = '.$DB->quote( $this->ID ),
+					'Temporary deleting of links rows which must be updated from revision' );
+			}
+
+			// Sort links by order and check for duplicate orders:
+			asort( $link_orders );
+			$prev_order = -1;
+			foreach( $link_orders as $link_ID => $link_order )
+			{
+				if( $prev_order >= $link_order )
+				{	// If previous link has same order then increase it to avoid a duplicate error on insert links in DB:
+					$link_orders[ $link_ID ]++;
+				}
+				$prev_order = $link_order;
+			}
+
+			$insert_links_sql = array();
+			foreach( $revision_links as $revision_link_ID => $revision_link )
+			{
+				if( isset( $updated_links[ $revision_link_ID ] ) )
+				{	// This link exists in current version, Update it:
+					$updated_link = $updated_links[ $revision_link_ID ];
+				}
+				{	// This link doesn't exist in current version, Insert it:
+					$updated_link = false;
+				}
+				$insert_links_sql[] = '( '.$DB->quote( array(
+						$revision_link_ID,
+						$updated_link ? $updated_link->link_datecreated      : $Revision->iver_edit_last_touched_ts,
+						$updated_link ? $updated_link->link_datemodified     : $Revision->iver_edit_last_touched_ts,
+						$updated_link ? $updated_link->link_creator_user_ID  : $Revision->iver_edit_user_ID,
+						$updated_link ? $updated_link->link_lastedit_user_ID : $Revision->iver_edit_user_ID,
+						$this->ID,
+						$revision_link->ivl_file_ID,
+						$revision_link->ivl_position,
+						$link_orders[ $revision_link_ID ]
+					) ).' )';
+			}
+
+			// Insert/Update links with data from revision:
+			$DB->query( 'INSERT INTO T_links ( link_ID, link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID, link_itm_ID, link_file_ID, link_position, link_order )
+				VALUES '.implode( ', ', $insert_links_sql ),
+				'Insert/Update item links with data from revision #'.$Revision->iver_ID.'('.$Revision->iver_type.')' );
+		}
+
+		$DB->commit();
+
+		return $r;
+	}
+
+
+	/**
+	 * Delete proposed changes of this Item from DB
+	 *
+	 * @param string Action 'accept', 'reject'
+	 * @param integer|string ID of the proposed change, 'last' to get last proposed change
+	 */
+	function clear_proposed_changes( $action = 'accept', $iver_ID = 'last' )
+	{
+		global $DB;
+
+		if( empty( $this->ID ) )
+		{	// Item must be stored in nDB:
+			return;
+		}
+
+		if( $iver_ID === 'last' )
+		{	// Try to get ID of the last proposed change:
+			if( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) )
+			{	// If this Item has at least one proposed change:
+				$iver_ID = $last_proposed_Revision->iver_ID;
+			}
+			else
+			{	// This Item has no proposed changes:
+				return;
+			}
+
+		}
+
+		if( strpos( $action, 'accept' ) !== false )
+		{	// Accept(delete) all previous proposed changes:
+			$delete_direction = '<=';
+		}
+		elseif( strpos( $action, 'reject' ) !== false )
+		{	// Reject(delete) all newer proposed changes:
+			$delete_direction = '>=';
+		}
+		else
+		{
+			debug_die( 'Unhandled action "'.$action.'" to clear proposed changes!' );
+		}
+
+		// Clear proposed changes:
+		$DB->query( 'DELETE FROM T_items__version
+			WHERE iver_itm_ID = '.$DB->quote( $this->ID ).'
+			  AND iver_type = "proposed"
+			  AND iver_ID '.$delete_direction.' '.$DB->quote( $iver_ID ) );
+		// Clear custom fields of the proposed changes:
+		$DB->query( 'DELETE FROM T_items__version_custom_field
+			WHERE ivcf_iver_itm_ID = '.$DB->quote( $this->ID ).'
+			  AND ivcf_iver_type = "proposed"
+			  AND ivcf_iver_ID '.$delete_direction.' '.$DB->quote( $iver_ID ) );
+		// Clear links/attachments of the proposed changes:
+		$DB->query( 'DELETE FROM T_items__version_link
+			WHERE ivl_iver_itm_ID = '.$DB->quote( $this->ID ).'
+			  AND ivl_iver_type = "proposed"
+			  AND ivl_iver_ID '.$delete_direction.' '.$DB->quote( $iver_ID ) );
 	}
 
 
@@ -10658,16 +11792,50 @@ class Item extends ItemLight
 	 * Get custom fields of post type
 	 *
 	 * @param string Type(s) of custom field: 'all', 'varchar', 'double', 'text', 'html', 'url', 'image', 'computed', 'separator'. Use comma separator to get several types
+	 * @param boolean TRUE to force use custom fields of current version instead of revision
 	 * @return array
 	 */
-	function get_type_custom_fields( $type = 'all' )
+	function get_type_custom_fields( $type = 'all', $force_current_fields = false )
 	{
-		if( ! $this->get_ItemType() )
-		{ // Unknown post type
-			return array();
-		}
+		if( ! $force_current_fields && $this->is_revision() )
+		{	// Get custom fields of current active revision:
+			if( ! isset( $this->custom_fields ) )
+			{	// Initialize an array only first time:
+				$this->custom_fields = array();
+				if( ! empty( $this->ID ) &&
+				    ( $Revision = & $this->get_revision() ) )
+				{	// Get the custom fields from DB:
+					global $DB;
+					$SQL = new SQL( 'Get custom fields of revision #'.$Revision->iver_ID.'('.$Revision->iver_type.') for Item #'.$this->ID );
+					$SQL->SELECT( 'ivcf_itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, ivcf_itcf_label AS label, IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ) AS name, itcf_type AS type, IFNULL( itcf_order, 999999999 ) AS `order`, itcf_note AS note, ' );
+					$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+					$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
+					$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
+					$SQL->FROM( 'T_items__version_custom_field' );
+					$SQL->FROM_add( 'LEFT JOIN T_items__type_custom_field ON ivcf_itcf_ID = itcf_ID' );
+					$SQL->WHERE_and( 'ivcf_iver_ID = '.$DB->quote( $Revision->iver_ID ) );
+					$SQL->WHERE_and( 'ivcf_iver_type = '.$DB->quote( $Revision->iver_type ) );
+					$SQL->WHERE_and( 'ivcf_iver_itm_ID = '.$DB->quote( $Revision->iver_itm_ID ) );
+					$SQL->ORDER_BY( '`order`, ivcf_itcf_ID' );
+					$custom_fields = $DB->get_results( $SQL, ARRAY_A );
+					foreach( $custom_fields as $custom_field )
+					{
+						$this->custom_fields[ $custom_field['name'] ] = $custom_field;
+					}
+				}
+			}
 
-		return $this->ItemType->get_custom_fields( $type );
+			return $this->custom_fields;
+		}
+		else
+		{	// Get custom fields of current item type:
+			if( ! $this->get_ItemType() )
+			{ // Unknown post type
+				return array();
+			}
+
+			return $this->ItemType->get_custom_fields( $type );
+		}
 	}
 
 
@@ -10994,7 +12162,7 @@ class Item extends ItemLight
 	 */
 	function get_flag( $params = array() )
 	{
-		global $current_User, $cache_items_flag_displayed;
+		global $current_User;
 
 		$params = array_merge( array(
 				'before'       => '',
@@ -11002,20 +12170,11 @@ class Item extends ItemLight
 				'title_flag'   => T_('Click to flag this.'),
 				'title_unflag' => T_('You have flagged this. Click to remove flag.'),
 				'only_flagged' => false, // Display the flag button only when this item is already flagged by current User
+				'allow_toggle' => true, // Allow to toggle flag state by AJAX
 			), $params );
 
 		if( ! $this->can_flag() )
 		{	// Don't display the flag button if it is not allowed by some reason:
-			return '';
-		}
-
-		if( ! isset( $cache_items_flag_displayed ) || ! is_array( $cache_items_flag_displayed ) )
-		{	// Initialize array to cache what items flags have been displayed for:
-			$cache_items_flag_displayed = array();
-		}
-
-		if( in_array( $this->ID, $cache_items_flag_displayed ) )
-		{	// Don't display the flag button because it has been already displayed before of the current page:
 			return '';
 		}
 
@@ -11031,7 +12190,9 @@ class Item extends ItemLight
 
 		$r = $params['before'];
 
-		$r .= '<a href="#" data-id="'.$this->ID.'" data-coll="'.$item_Blog->get( 'urlname' ).'" class="action_icon evo_post_flag_btn">'
+		if( $params['allow_toggle'] )
+		{	// Allow to toggle:
+			$r .= '<a href="#" data-id="'.$this->ID.'" data-coll="'.$item_Blog->get( 'urlname' ).'" class="action_icon evo_post_flag_btn">'
 				.get_icon( 'flag_on', 'imgtag', array(
 					'title' => $params['title_flag'],
 					'style' => $is_flagged ? '' : 'display:none',
@@ -11041,11 +12202,17 @@ class Item extends ItemLight
 					'style' => $is_flagged ? 'display:none' : '',
 				) )
 			.'</a>';
+		}
+		else
+		{	// Display only current flag state as icon:
+			$r .= '<span class="action_icon evo_post_flag_btn">'
+				.get_icon( ( $is_flagged ? 'flag_on' : 'flag_off' ), 'imgtag', array(
+						'title' => ( $is_flagged ? $params['title_flag'] : $params['title_unflag'] ),
+					) )
+				.'</span>';
+		}
 
 		$r .= $params['after'];
-
-		// Cache this to don't display flag twice for the same item on the same page:
-		$cache_items_flag_displayed[] = $this->ID;
 
 		return $r;
 	}
@@ -11090,6 +12257,9 @@ class Item extends ItemLight
 		}
 
 		$this->set_user_data( 'item_flag', $new_flag_value );
+
+		// Invalidate key for the Item data per current User:
+		BlockCache::invalidate_key( 'item_user_flag_'.$this->ID, $current_User->ID );
 
 		$DB->commit();
 	}
@@ -11516,7 +12686,7 @@ class Item extends ItemLight
 	}
 
 
-	/**
+	/*
 	 * Get URL to refresh a contents last updated date of this Item if user has refresh rights
 	 *
 	 * @param array Params
@@ -11789,6 +12959,161 @@ class Item extends ItemLight
 
 
 	/**
+	 * Add tags to current User
+	 */
+	function tag_user()
+	{
+		if( empty( $this->ID ) )
+		{	// Item is not saved in DB
+			return;
+		}
+
+		if( ! is_logged_in() )
+		{	// User is not logged in
+			return;
+		}
+
+		$item_user_tags = trim( $this->get_setting( 'user_tags' ), ' ,' );
+		if( empty( $item_user_tags ) )
+		{	// This Item has no tags for users:
+			return;
+		}
+
+		global $current_User;
+
+		// Add tags to current User:
+		$current_User->add_usertags( $item_user_tags );
+		$current_User->dbupdate();
+	}
+
+
+	/**
+	 * Get ID of next version
+	 *
+	 * @param string Version type: 'archived', 'proposed'
+	 * @param integer
+	 */
+	function get_next_version_ID( $type = 'archived' )
+	{
+		global $DB;
+
+		// Get next version ID:
+		$iver_SQL = new SQL();
+		$iver_SQL->SELECT( 'MAX( iver_ID )' );
+		$iver_SQL->FROM( 'T_items__version' );
+		$iver_SQL->WHERE( 'iver_itm_ID = '.$this->ID );
+		$iver_SQL->WHERE_and( 'iver_type = '.$DB->quote( $type ) );
+
+		return intval( $DB->get_var( $iver_SQL->get() ) ) + 1;
+	}
+
+
+	/**
+	 * Create a new item revision
+	 *
+	 * @return integer/boolean ID of created item revision if successful, otherwise False
+	 */
+	function create_revision()
+	{
+		global $DB;
+
+		// Get next version ID:
+		$iver_ID = $this->get_next_version_ID( 'archived' );
+
+		$DB->begin( 'SERIALIZABLE' );
+
+		$result = $DB->query( 'INSERT INTO T_items__version
+				( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
+				SELECT '.$iver_ID.' AS iver_ID, post_ID, post_lastedit_user_ID, post_last_touched_ts, post_status, post_title, post_content
+				  FROM T_items__item
+				  WHERE post_ID = '.$this->ID,
+			'Save a version of the Item' ) !== false;
+
+		if( $result )
+		{	// Create a revision for custom fields:
+			$custom_fields = $this->get_type_custom_fields();
+			if( count( $custom_fields ) )
+			{	// If at least one custom field has been updated:
+				$custom_field_values = array();
+				foreach( $custom_fields as $custom_field_name => $custom_field )
+				{
+					if( isset( $this->dbchanges_custom_fields[ $custom_field_name ] ) )
+					{
+						$custom_field_values[] = '('.$iver_ID.','.$DB->quote( $this->ID ).','.$custom_field['ID'].','.$DB->quote( $custom_field['label'] ).','.$DB->quote( $this->dbchanges_custom_fields[ $custom_field_name ] ).')';
+					}
+				}
+				if( count( $custom_field_values ) )
+				{
+					$result = $DB->query( 'INSERT INTO T_items__version_custom_field
+							( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_itcf_label, ivcf_value )
+							VALUES '.implode( ',', $custom_field_values ),
+						'Save a version of the custom fields' ) !== false;
+				}
+			}
+		}
+
+		if( $result )
+		{	// Create a revision for links/attachments:
+			$LinkOwner = new LinkItem( $this );
+			$existing_Links = & $LinkOwner->get_Links();
+
+			if( ! empty( $existing_Links ) )
+			{
+				$link_values = array();
+				foreach( $existing_Links as $loop_Link )
+				{
+					$link_values[] = '('.$iver_ID.','.$this->ID.','.$loop_Link->ID.','.$loop_Link->file_ID.','.$DB->quote( $loop_Link->position ).','.$loop_Link->order.')';
+				}
+				$result = $DB->query( 'INSERT INTO T_items__version_link
+						( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order )
+						VALUES '.implode( ',', $link_values ),
+					'Save a version of attachments' ) !== false;
+			}
+		}
+
+		if( $result )
+		{
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $result ? $iver_ID : false;
+	}
+
+
+	/**
+	 * Check if this Item has at least one proposed change
+	 *
+	 * @param boolean
+	 */
+	function has_proposed_change()
+	{
+		if( ! isset( $this->has_proposed_change ) )
+		{	// Check if this Item has a proposed change and save the result in cache var:
+			if( empty( $this->ID ) )
+			{	// Item must be created to have the proposed changes:
+				return false;
+			}
+
+			global $DB;
+
+			$SQL = new SQL( 'Check if Item #'.$this->ID.' has at least one proposed change' );
+			$SQL->SELECT( 'iver_ID' );
+			$SQL->FROM( 'T_items__version' );
+			$SQL->WHERE( 'iver_itm_ID = '.$this->ID );
+			$SQL->WHERE_and( 'iver_type = "proposed"' );
+
+			$this->has_proposed_change = (boolean) $DB->get_var( $SQL->get(), 0, NULL, $SQL->title );
+		}
+
+		return $this->has_proposed_change;
+	}
+
+
+	/**
 	 * Get current best price available to user
 	 *
 	 * @param integer Currency ID
@@ -11852,6 +13177,357 @@ class Item extends ItemLight
 
 
 	/**
+	 * Check if current user can create new proposed change
+	 *
+	 * @param boolean TRUE to redirect back if current user cannot create a proposed change
+	 * @return boolean
+	 */
+	function can_propose_change( $redirect = false )
+	{
+		global $current_User, $Messages;
+
+		if( $redirect )
+		{	// Set a redirect URL:
+			$redirect_to = get_returnto_url();
+			$inskin_edit_script = '/item_edit.php';
+			if( strpos( $redirect_to, $inskin_edit_script ) == strlen( $redirect_to ) - strlen( $inskin_edit_script ) ||
+			    strpos( $redirect_to, '?disp=proposechange' ) !== false )
+			{	// Fix a redirect page to correct in-skin editing page
+				if( ! ( $redirect_to = $this->get_edit_url( array( 'force_in_skin_editing' => true ) ) ) )
+				{
+					$redirect_to = $this->get_permanent_url( '', '', '' );
+				}
+			}
+		}
+
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			if( $redirect )
+			{	// Redirect back to previous page
+				header_redirect( $redirect_to );
+			}
+			return false;
+		}
+
+		if( ! $current_User->check_perm( 'blog_item_propose', 'edit', false, $this->get_blog_ID() ) )
+		{	// User has no right to propose a change for this Item:
+
+			// Display a message:
+			// NOTE: Do NOT translate this because it should not be displayed from normal UI:
+			$Messages->add( 'You don\'t have a permission to propose a change for the Item.', 'error' );
+
+			if( $redirect )
+			{	// Redirect back to previous page
+				header_redirect( $redirect_to );
+			}
+			return false;
+		}
+
+		if( ( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) ) &&
+		    $last_proposed_Revision->iver_edit_user_ID != $current_User->ID )
+		{	// Don't allow to propose when previous proposition was created by another user:
+			$UserCache = & get_UserCache();
+			$User = & $UserCache->get_by_ID( $last_proposed_Revision->iver_edit_user_ID, false, false );
+
+			// Display a message:
+			$Messages->add( sprintf( T_('You cannot currently propose a change because previous changes by %s are pending review.'),
+				( $User ? $User->get_identity_link() : '<span class="user deleted">'.T_('Deleted user').'</span>' ) ), 'error' );
+
+			if( $redirect )
+			{	// Redirect back to previous page
+				header_redirect( $redirect_to );
+			}
+			return false;
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Create a new proposed change
+	 *
+	 * @return integer/boolean ID of created item revision if successful, otherwise False
+	 */
+	function create_proposed_change()
+	{
+		global $DB, $current_User, $Plugins_admin, $localtimenow;
+
+		if( empty( $this->ID ) || ! is_logged_in() )
+		{	// Item must be created and current user must be logged in:
+			return false;
+		}
+
+		if( $this->get_type_setting( 'allow_html' ) )
+		{	// HTML is allowed for this post, we'll accept HTML tags:
+			$text_format = 'html';
+		}
+		else
+		{	// HTML is disallowed for this post, we'll encode all special chars:
+			$text_format = 'htmlspecialchars';
+		}
+
+		// Never allow html content on post titles:  (fp> probably so as to not mess up backoffice and all sorts of tools)
+		param( 'post_title', 'htmlspecialchars', NULL );
+
+		param( 'content', $text_format, NULL );
+
+		// Do some optional filtering on the content
+		// Typically stuff that will help the content to validate
+		// Useful for code display.
+		// Will probably be used for validation also.
+		$Plugins_admin = & get_Plugins_admin();
+		$params = array(
+				'object_type' => 'Item',
+				'object'      => & $this,
+				'object_Blog' => & $this->Blog
+			);
+		$Plugins_admin->filter_contents( $GLOBALS['post_title'] /* by ref */, $GLOBALS['content'] /* by ref */, $this->get_renderers(), $params /* by ref */ );
+
+		// Title checking:
+		if( $this->get_type_setting( 'use_title' ) == 'required' )
+		{
+			param_check_not_empty( 'post_title', T_('Please provide a title.'), '' );
+		}
+
+		// Format raw HTML input to cleaned up and validated HTML:
+		param_check_html( 'content', T_('Invalid content.') );
+		$this->set( 'content', prepare_item_content( get_param( 'content' ) ) );
+
+		$this->set( 'title', get_param( 'post_title' ) );
+
+		if( empty( $iver_content ) && $this->get_type_setting( 'use_text' ) == 'required' )
+		{	// Content must be entered:
+			param_check_not_empty( 'content', T_('Please enter some text.'), '' );
+		}
+
+		// Load values of custom fields:
+		$this->load_custom_fields_from_Request();
+
+		if( param_errors_detected() )
+		{	// Exit here if some errors on the submitted form:
+			return false;
+		}
+		// END of loading the proposed change this this Item from request.
+
+		$DB->begin( 'SERIALIZABLE' );
+
+		// Get next version ID:
+		$iver_ID = $this->get_next_version_ID( 'proposed' );
+
+		$result = $DB->query( 'INSERT INTO T_items__version ( iver_ID, iver_type, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
+			VALUES ( '.$iver_ID.', '
+				.'"proposed", '
+				.$this->ID.', '
+				.$current_User->ID.', '
+				.$DB->quote( date2mysql( $localtimenow ) ).','
+				.$DB->quote( $this->get( 'status' ) ).','
+				.$DB->quote( $this->get( 'title' ) ).','
+				.$DB->quote( $this->get( 'content' ) ).' )',
+			'Save a proposed change of the Item #'.$this->ID ) !== false;
+
+		if( $result && ( $custom_fields = $this->get_type_custom_fields() ) )
+		{	// Save custom fields of the proposition:
+			$custom_fields_insert_sql = array();
+			foreach( $custom_fields as $custom_field )
+			{
+				$custom_fields_insert_sql[] = '( '.$iver_ID.', '
+					.'"proposed", '
+					.$this->ID.', '
+					.$DB->quote( $custom_field['ID'] ).','
+					.$DB->quote( $custom_field['label'] ).','
+					.$DB->quote( $this->get_custom_field_value( $custom_field['name'] ) ).' )';
+			}
+			$result = $DB->query( 'INSERT INTO T_items__version_custom_field ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID, ivcf_itcf_label, ivcf_value )
+				VALUES '.implode( ', ', $custom_fields_insert_sql ),
+				'Save custom fields for a proposed change of the Item #'.$this->ID ) !== false;
+		}
+
+		if( $result )
+		{	// Save links/attachments of current version to new created proposed change:
+			// TODO: This is a temporary solution. We must allow to edit links/attachements for a proposed change and store them here!
+			$result = $DB->query( 'INSERT INTO T_items__version_link
+					( ivl_iver_ID, ivl_iver_type, ivl_iver_itm_ID, ivl_link_ID, ivl_file_ID, ivl_position, ivl_order )
+					SELECT '.$iver_ID.', "proposed", link_itm_ID, link_ID, link_file_ID, link_position, link_order
+					  FROM T_links
+					 WHERE link_itm_ID = '.$this->ID,
+				'Save custom fields for a proposed change of the Item #'.$this->ID ) !== false;
+		}
+
+		if( $result )
+		{
+			$DB->commit();
+			// Send email notification to moderators about new proposed change:
+			$this->send_proposed_change_notification( $iver_ID );
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Check if this item can be updated depending on proposed changes
+	 *
+	 * @param boolean|string FALSE to don't display message of restriction, Message type: 'error', 'warning', 'note', 'success'
+	 * @return boolean
+	 */
+	function check_proposed_change_restriction( $restriction_message_type = false )
+	{
+		if( ! isset( $this->check_proposed_change_restriction ) )
+		{	// Check and save result in cache var:
+			if( empty( $this->ID ) )
+			{	// Item is not created yet, so it can be updated, i.e. insert new record without restriction:
+				$this->check_proposed_change_restriction = true;
+			}
+			elseif( $last_proposed_Revision = $this->get_revision( 'last_proposed' ) )
+			{	// Don't allow to edit this Item if it has at least one proposed change:
+				if( $restriction_message_type !== false )
+				{	// Display a message to inform user about this restriction:
+					global $Messages, $admin_url;
+
+					$UserCache = & get_UserCache();
+					$User = & $UserCache->get_by_ID( $last_proposed_Revision->iver_edit_user_ID, false, false );
+
+					$Messages->add( sprintf( T_('The content below includes <a %s>proposed changes</a> submitted by %s. If you edit the post, the changes will be considered accepted and you will save a new version with your own changes.'),
+							'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$this->ID.'"',
+							( $User ? $User->get_identity_link() : '<span class="user deleted">'.T_('Deleted user').'</span>' )
+						), $restriction_message_type );
+				}
+				$this->check_proposed_change_restriction = false;
+			}
+			else
+			{	// Item can be updated:
+				$this->check_proposed_change_restriction = true;
+			}
+		}
+
+		return $this->check_proposed_change_restriction;
+	}
+
+
+	/**
+	 * Update folder of Item's attachments
+	 *
+	 * @return boolean TRUE if at least one attachment was moved to current slug folder
+	 */
+	function update_attachments_folder()
+	{
+		global $DB, $Debuglog;
+
+		if( empty( $this->ID ) )
+		{	// Item must be saved in DB:
+			return false;
+		}
+
+		$FileRootCache = & get_FileRootCache();
+		if( ! ( $item_FileRoot = & $FileRootCache->get_by_type_and_ID( 'collection', $this->get_blog_ID(), true ) ) )
+		{	// Unknown file root:
+			return false;
+		}
+
+		$LinkOwner = new LinkItem( $this );
+
+		if( ! $LinkList = $LinkOwner->get_attachment_LinkList() )
+		{	// Item has no attachments:
+			return false;
+		}
+
+		// Folder with current/new slug:
+		$item_new_slug_folder_name = 'quick-uploads/'.$this->get( 'urltitle' ).'/';
+		$item_new_slug_folder_path = $item_FileRoot->ads_path.$item_new_slug_folder_name;
+
+		$result = false;
+		$folders_of_moved_files = array();
+		while( $Link = & $LinkList->get_next() )
+		{
+			if( ! ( $File = & $Link->get_File() ) )
+			{	// No File object
+				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			if( ! $File->exists() )
+			{	// File doesn't exist
+				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			if( strpos( $File->get_rdfp_rel_path(), 'quick-uploads/' ) !== 0 ||
+			    ( strpos( $File->get_rdfp_rel_path(), $item_new_slug_folder_name ) === 0 &&
+			      ( $file_FileRoot = & $File->get_FileRoot() ) &&
+			      $item_FileRoot->ID == $file_FileRoot->ID ) )
+			{	// Skip if File is not located in the folder "quick-uploads/"
+				//      or File is already located in the current slug folder of this Item:
+				continue;
+			}
+
+			$SQL = new SQL( 'Check File #'.$File->ID.' for muplitle Links before moving to slug folder of Item #'.$this->ID );
+			$SQL->SELECT( 'COUNT( link_ID )' );
+			$SQL->FROM( 'T_links' );
+			$SQL->WHERE( 'link_file_ID = '.$DB->quote( $File->ID ) );
+			if( $DB->get_var( $SQL ) > 1 )
+			{	// Don't move if File is linked with several Items:
+				continue;
+			}
+
+			if( ! file_exists( $item_new_slug_folder_path ) )
+			{	// Try to create a folder for new item slug:
+				if( ! mkdir_r( $item_new_slug_folder_path ) )
+				{	// Stop trying to move other files when no file rights to create new folder on the disc:
+					$log_message = 'No file rights to create a folder %s before moving Item\'s files to slug folder!';
+					$Debuglog->add( sprintf( $log_message, '"'.$item_new_slug_folder_path.'"' ), array( 'error', 'files' ) );
+					syslog_insert( sprintf( $log_message, '[['.$item_new_slug_folder_path.']]'), 'error', 'item', $this->ID );
+					return false;
+				}
+			}
+
+			// Save file folder before moving:
+			$old_file_dir = isset( $File->_dir ) ? $File->_dir : false;
+
+			// Move File to the folder with name as current Item's slug:
+			if( $File->move_to( $item_FileRoot->type, $item_FileRoot->in_type_ID, $item_new_slug_folder_name.$File->get_name(), true ) )
+			{	// If File was moved successfully
+				$result = true;
+				if( $old_file_dir && ! in_array( $old_file_dir, $folders_of_moved_files ) )
+				{	// Collect a folder in order to check and remove if it is empty after moving all files from the folder:
+					$folders_of_moved_files[] = $old_file_dir;
+				}
+			}
+		}
+
+		// Delete folders which are empty after moving all files:
+		foreach( $folders_of_moved_files as $folder_of_moved_files )
+		{
+			if( file_exists( $folder_of_moved_files ) &&
+			    is_empty_directory( $folder_of_moved_files ) &&
+			    ! rmdir_r( $folder_of_moved_files ) )
+			{	// Log error:
+				$log_message = 'No file rights to delete an empty folder %s after moving Item\'s files to slug folder!';
+				$Debuglog->add( sprintf( $log_message, '"'.$folder_of_moved_files.'"' ), array( 'error', 'files' ) );
+				syslog_insert( sprintf( $log_message, '[['.$folder_of_moved_files.']]' ), 'warning', 'item', $this->ID );
+			}
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Get available locales
+	 *
+	 * @return array
+	 */
+	function get_available_locales()
+	{
+		return ( $item_blog = & $this->get_Blog() ? $item_blog->get_locales() : array() );
+	}
+
+
+	/**
 	 * Get item availability
 	 *
 	 * @return string Item availability
@@ -11895,6 +13571,163 @@ class Item extends ItemLight
 				return $this->can_be_ordered_if_no_stock ? 'out_of_stock' : 'sold_out';
 			}
 		}
+	}
+
+
+	/**
+	 * Get locale options for selector on edit page
+	 *
+	 * @param boolean Exclude locales that are already used in the group of this Item
+	 * @return string
+	 */
+	function get_locale_options( $exclude_used = false )
+	{
+		global $locales;
+
+		$r = '';
+
+		$available_locales = $this->get_available_locales();
+
+		if( $exclude_used )
+		{	// Exclude locales that are already used in the group of this Item
+			$exclude_locales = array( $this->get( 'locale' ) );
+			$other_version_items = $this->get_other_version_items();
+			foreach( $other_version_items as $other_version_Item )
+			{
+				$exclude_locales[] = $other_version_Item->get( 'locale' );
+			}
+			$available_locales = array_diff( $available_locales, $exclude_locales );
+		}
+
+		if( empty( $available_locales ) )
+		{	// No available locales:
+			return $r;
+		}
+
+		foreach( $available_locales as $locale_key )
+		{
+			if( ( isset( $locales[ $locale_key ] ) && $locales[ $locale_key ]['enabled'] ) ||
+			    $locale_key == $this->get( 'locale' ) )
+			{	// Allow enabled locales or if it is already selected for this Item:
+				$r .= '<option value="'.$locale_key.'"';
+				if( $locale_key == $this->get( 'locale' ) )
+				{	// This is a selected locale
+					$r .= ' selected="selected"';
+				}
+				$r .= '>'.( isset( $locales[ $locale_key ] ) ? T_( $locales[ $locale_key ]['name'] ) : $locale_key ).'</option>'."\n";
+			}
+		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Set group ID from another Item
+	 *
+	 * @param integer ID of parent/source Item
+	 */
+	function set_group_ID( $parent_item_ID )
+	{
+		$ItemCache = & get_ItemCache();
+		if( ! ( $parent_Item = & $ItemCache->get_by_ID( $parent_item_ID, false, false ) ) )
+		{	// Wrong source Item ID:
+			return;
+		}
+
+		if( ! $parent_Item->get( 'igrp_ID' ) )
+		{	// Create new Item Group if it wasn't created yet:
+			global $DB;
+			if( $DB->query( 'INSERT INTO T_items__itemgroup () VALUES ()' ) )
+			{
+				$parent_Item->set( 'igrp_ID', $DB->insert_id );
+				$parent_Item->dbupdate();
+			}
+		}
+
+		// Use the same Item Group as source Item has:
+		$this->set( 'igrp_ID', $parent_Item->get( 'igrp_ID' ) );
+	}
+
+
+	/**
+	 * Get other version Items from the same group
+	 *
+	 * @param integer Include additional Item by ID, e.g. ID of source Item on adding new version
+	 * @return array
+	 */
+	function get_other_version_items( $source_item_ID = NULL )
+	{
+		if( ! isset( $this->other_version_items ) )
+		{	// Try to load other version Items from DB:
+			if( $source_item_ID == $this->ID )
+			{	// Don't include the same Item:
+				$source_item_ID = NULL;
+			}
+			$this->other_version_items = array();
+			if( ! $this->get( 'igrp_ID' ) )
+			{	// No group for this Item yet:
+				if( ! empty( $source_item_ID ) )
+				{	// Include source Item:
+					$ItemCache = & get_ItemCache();
+					$ItemCache->clear();
+					if( $Item = & $ItemCache->get_by_ID( $source_item_ID, false, false ) )
+					{
+						$this->other_version_items[ $Item->ID ] = & $Item;
+					}
+				}
+			}
+			else
+			{	// Load from DB:
+				global $DB;
+				$SQL = new SQL();
+				$SQL->SELECT( 'post_ID' );
+				$SQL->FROM( 'T_items__item' );
+				$SQL->WHERE( '(post_igrp_ID = '.$this->get( 'igrp_ID' ).( empty( $source_item_ID ) ? '' : ' OR post_ID = '.$source_item_ID ).')' );
+				if( $this->ID > 0 )
+				{	// Exclude this Item:
+					$SQL->WHERE_and( 'post_ID != '.$this->ID );
+				}
+				$group_item_IDs = $DB->get_col( $SQL );
+				if( count( $group_item_IDs ) )
+				{
+					$ItemCache = & get_ItemCache();
+					$ItemCache->clear();
+					$ItemCache->load_where( 'post_ID IN ( '.$DB->quote( $group_item_IDs ).' ) ' );
+					foreach( $group_item_IDs as $group_item_ID )
+					{
+						$this->other_version_items[ $group_item_ID ] = & $ItemCache->get_by_ID( $group_item_ID );
+					}
+				}
+			}
+		}
+
+		return $this->other_version_items;
+	}
+
+
+	/**
+	 * Get version Item by locale
+	 *
+	 * @param string Locale
+	 * @return object|NULL Item object
+	 */
+	function & get_version_Item( $locale )
+	{
+		$version_items = $this->get_other_version_items();
+		array_unshift( $version_items, $this );
+
+		foreach( $version_items as $version_Item )
+		{
+			if( $version_Item->get( 'locale' ) == $locale &&
+			    $version_Item->can_be_displayed() )
+			{	// Use first detected Item with requested locale and visible for current User:
+				return $version_Item;
+			}
+		}
+
+		$r = NULL;
+		return $r;
 	}
 }
 ?>

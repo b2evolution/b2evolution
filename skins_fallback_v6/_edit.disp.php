@@ -109,6 +109,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		}
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
+		$Form->hidden( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ) );
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 		$Form->hidden( 'post_parent_ID', $edited_Item->get( 'parent_ID' ) );
 		$Form->hidden( 'post_excerpt', $edited_Item->get( 'excerpt' ) );
@@ -317,15 +318,11 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	// ####################### ATTACHMENTS/LINKS #########################
-	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
-			$current_User->check_perm( 'files', 'view', false ) )
-	{	// Display attachments fieldset:
-		display_attachments_fieldset( $Form, $LinkOwner );
-	}
+	$Form->attachments_fieldset( $edited_Item );
 
 	// ################### TEXT RENDERERS & CATEGORIES ###################
-	if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
-	{	// If text renderers are allowed to update from front-office:
+	if( $Blog->get_setting( 'in_skin_editing_renderers' ) && $edited_Item->get_type_setting( 'use_text' ) != 'never' )
+	{	// If text renderers are allowed to update from front-office and text content is allowed for the item type:
 		$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
 	}
 	else

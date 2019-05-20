@@ -900,8 +900,8 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 		// Create an unique string in order to replace all matching blocks temporarily
 		$unique_replacement = md5( time() + rand() );
 
-		$matches_search = array();
-		$matches_replace = array();
+		$matches_source = array();
+		$matches_temp = array();
 		foreach( $matches[0] as $l => $l_matching )
 		{	// Build arrays with a source code of the matching blocks and with temporary replacement
 			$matches_source[] = $l_matching[0];
@@ -2220,13 +2220,14 @@ function is_valid_login( $login, $force_strict_logins = false )
 
 /**
  * Checks if the color is valid
+ * Allowed formats: #09ABEF, rgba(100,200,255,0.99)
  *
  * @param string color to check
  * @return boolean true if OK
  */
 function is_color( $color )
 {
-	return preg_match( '~^(#([a-f0-9]{3}){1,2})?$~i', $color );
+	return preg_match( '~^(#([a-f0-9]{3}){1,2}|rgba\(\d{1,3},\d{1,3},\d{1,3},(1|0(\.\d{1,2})?)\))$~i', $color );
 }
 
 
@@ -3019,9 +3020,10 @@ function debug_die( $additional_info = '', $params = array() )
  *
  * This should be used when a bad user input is detected.
  *
- * @param string Message to output (HTML)
+ * @param string Message to output (HTML/TEXT)
+ * @param string Output format: 'html', 'text'
  */
-function bad_request_die( $additional_info = '' )
+function bad_request_die( $additional_info = '', $error_code = '400 Bad Request', $format = 'html' )
 {
 	global $debug, $baseurl, $is_api_request;
 
@@ -3033,10 +3035,10 @@ function bad_request_die( $additional_info = '' )
 
 		// Set JSON content type:
 		headers_content_mightcache( 'application/json', 0, '#', false ); // Do NOT cache error messages! (Users would not see they fixed them)
-		header_http_response( '400 Bad Request' );
+		header_http_response( $error_code );
 
 		echo json_encode( array(
-				'error_status' => '400 Bad Request',
+				'error_status' => $error_code,
 				'error_info'   => $additional_info,
 			) );
 
@@ -3049,8 +3051,15 @@ function bad_request_die( $additional_info = '' )
 	{
 		load_funcs('_core/_template.funcs.php');
 		headers_content_mightcache( 'text/html', 0, '#', false );		// Do NOT cache error messages! (Users would not see they fixed them)
-		header_http_response('400 Bad Request');
+		header_http_response( $error_code );
 	}
+
+	if( $format == 'text' )
+	{	// Display error message in TEXT format:
+		echo $additional_info;
+		die(2); // Error code 2. Note: this will still call the shutdown function.
+	}
+	// else display error message in HTML format:
 
 	if( ! function_exists( 'T_' ) )
 	{	// Load locale funcs to initialize function "T_" because it is used below:
@@ -3247,7 +3256,84 @@ function debug_info( $force = false, $force_clean = false )
 	$ReqHostPathQuery = $ReqHost.$ReqPath.( empty( $_SERVER['QUERY_STRING'] ) ? '' : '?'.$_SERVER['QUERY_STRING'] );
 
 	echo "\n\n\n";
-	echo ( $clean ? '*** Debug info ***'."\n\n" : '<div class="debug" id="debug_info"><h2>Debug info</h2>' );
+	if( ! $clean )
+	{
+		echo '<div class="debug" id="debug_info">';
+	}
+
+	// FULL DEBUG INFO(s) FROM PREVIOUS SESSION(s), after REDIRECT(s):
+	if( isset( $Session ) && ( $sess_debug_infos = $Session->get( 'debug_infos' ) ) && ! empty( $sess_debug_infos ) )
+	{
+		$count_sess_debug_infos = count( $sess_debug_infos );
+		if( $count_sess_debug_infos > 1 )
+		{	// Links to those Debuglogs:
+			if( $clean )
+			{	// kind of useless, but anyway...
+				echo "\n".'There are '.$count_sess_debug_infos.' debug infos from redirected pages.'."\n";
+			}
+			else
+			{
+				echo '<p>There are '.$count_sess_debug_infos.' debug infos from redirected pages: ';
+				for( $i = 1; $i <= $count_sess_debug_infos; $i++ )
+				{
+					echo '<a href="'.$ReqHostPathQuery.'#debug_sess_debug_info_'.$i.'">#'.$i.'</a> ';
+				}
+				echo '</p>';
+			}
+		}
+
+		foreach( $sess_debug_infos as $k => $sess_debug_info )
+		{
+			if( $clean )
+			{
+				echo "\n".'== Debug messages from redirected page (#'.( $k + 1 ).') =='."\n"
+					.'See below for the Debuglog from the current request.'."\n";
+				echo gzdecode( $sess_debug_info );
+			}
+			else
+			{
+				echo '<div class="debug_session">';
+				echo '<h3 id="debug_sess_debug_info_'.( $k + 1 ).'" style="color:#f00">Debug messages from redirected page (#'.( $k + 1 ).')</h3>'
+					// link to real Debuglog:
+					.'<p><a href="'.$ReqHostPathQuery.'#debug_current">See below for the debug from the current request.</a></p>';
+				$sess_debug_info = gzdecode( $sess_debug_info );
+				// Fix all anchors to proper work with SESSION debug info and do NOT mix with current debug info where same achors are used but without number suffix ($k + 1):
+				$anchors_regexp = '(evo_debug_queries|debug_info_cat_[^"]+)';
+				$sess_debug_info = preg_replace( '/id="'.$anchors_regexp.'"/', 'id="$1_'.( $k + 1 ).'"', $sess_debug_info );
+				echo preg_replace( '/href="([^#"]*)#'.$anchors_regexp.'"/', 'href="'.$ReqHostPathQuery.'#$2_'.( $k + 1 ).'"', $sess_debug_info );
+				echo '</div>';
+			}
+		}
+
+		if( ! $clean )
+		{	// Anchor to scrolldown to current debug:
+			echo '<a id="debug_current"></a>';
+		}
+
+		// link to first sess_debug_infos:
+		if( $clean )
+		{
+			echo 'See above for the debug info(s) from before the redirect.'."\n";
+		}
+		else
+		{
+			echo '<p><a href="'.$ReqHostPathQuery.'#debug_sess_debug_info_1">See above for the debug info(s) from before the redirect.</a></p>';
+		}
+
+		// Delete logs since they have been displayed...
+		// EXCEPT if we are redirecting, because in this case we won't see these logs in a browser (only in request debug tools)
+		// So in that case we want them to move over to the next page...
+		if( $http_response_code < 300 || $http_response_code >= 400 )
+		{	// This is NOT a 3xx redirect, assume debuglogs have been seen & delete them:
+			$Session->delete( 'debug_infos' );
+		}
+
+		echo "\n\n\n";
+	}
+	// END OF DEBUG FROM PREVIOUS SESSIONS, after REDIRECT(s).
+
+	$debug_info_title = empty( $count_sess_debug_infos ) ? 'Debug info' : 'Debug info from Current page';
+	echo ( $clean ? '*** '.$debug_info_title.' ***'."\n\n" : '<h2>'.$debug_info_title.'</h2>' );
 
 	if( !$obhandler_debug )
 	{ // don't display changing items when we want to test obhandler
@@ -3272,6 +3358,10 @@ function debug_info( $force = false, $force_clean = false )
 		echo $clean ? "\n" : '<br />';
 
 		echo '</div></div>';
+	}
+
+	if( !$obhandler_debug )
+	{ // don't display changing items when we want to test obhandler
 
 		// ================================== DB Summary ================================
 		if( isset($DB) )
@@ -3362,10 +3452,10 @@ function debug_info( $force = false, $force_clean = false )
 		// Collapse ignored rows, allowing to expand them with Javascript:
 		if( $count_collapse > 5 )
 		{
-			echo '<tr><td colspan="4" class="center" id="evo-debuglog-timer-long-header">';
-			echo '<a href="" onclick="var e = document.getElementById(\'evo-debuglog-timer-long\'); e.style.display = (e.style.display == \'none\' ? \'\' : \'none\'); return false;">+ '.$count_collapse.' queries &lt; 1%</a> </td></tr>';
+			echo '<tr><td colspan="4" class="center">';
+			echo '<a href="" onclick="jQuery(this).closest(\'tbody\').next().toggle(); return false;">+ '.$count_collapse.' queries &lt; 1%</a> </td></tr>';
 			echo '</tbody>';
-			echo '<tbody id="evo-debuglog-timer-long" style="display:none;">';
+			echo '<tbody style="display:none">';
 		}
 		echo implode( "\n", $table_rows_collapse )."\n";
 
@@ -3384,13 +3474,13 @@ function debug_info( $force = false, $force_clean = false )
 			echo '
 			<script>
 			(function($){
-				var clicked_once;
-				jQuery("table.debug_timer th").click( function(event) {
-					if( clicked_once ) return; else clicked_once = true;
-					jQuery("#evo-debuglog-timer-long tr").appendTo(jQuery("table.debug_timer tbody")[0]);
-					jQuery("#evo-debuglog-timer-long-header").remove();
+				jQuery( "table.debug_timer th" ).click( function(event) {
+					var table = jQuery(this).closest( "table.debug_timer" );
+					if( table.data( "clicked_once" ) ) return; else table.data( "clicked_once", true );
+					jQuery( "tbody:eq(0) tr:last", table ).remove();
+					jQuery( "tbody:eq(1) tr", table ).appendTo( jQuery( "tbody:eq(0)", table ) );
 					// click for tablesorter:
-					jQuery("table.debug_timer").tablesorter();
+					table.tablesorter();
 					jQuery(event.currentTarget).click();
 				});
 			})(jQuery);
@@ -3444,91 +3534,9 @@ function debug_info( $force = false, $force_clean = false )
 	}
 
 
-	// DEBUGLOG(s) FROM PREVIOUS SESSIONS, after REDIRECT(s) (with list of categories at top):
-	if( isset($Session) && ($sess_Debuglogs = $Session->get('Debuglogs')) && ! empty($sess_Debuglogs) )
-	{
-		$count_sess_Debuglogs = count($sess_Debuglogs);
-		if( $count_sess_Debuglogs > 1 )
-		{ // Links to those Debuglogs:
-			if ( $clean )
-			{	// kind of useless, but anyway...
-				echo "\n".'There are '.$count_sess_Debuglogs.' Debuglogs from redirected pages.'."\n";
-			}
-			else
-			{
-				echo '<p>There are '.$count_sess_Debuglogs.' Debuglogs from redirected pages: ';
-				for( $i = 1; $i <= $count_sess_Debuglogs; $i++ )
-				{
-					echo '<a href="'.$ReqHostPathQuery.'#debug_sess_debuglog_'.$i.'">#'.$i.'</a> ';
-				}
-				echo '</p>';
-			}
-		}
-
-		foreach( $sess_Debuglogs as $k => $sess_Debuglog )
-		{
-			$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
-
-			if( $clean )
-			{
-				$log_container_head = "\n".'== Debug messages from redirected page (#'.($k+1).') =='."\n"
-									 .'See below for the Debuglog from the current request.'."\n";
-				echo format_to_output(
-					$sess_Debuglog->display( array(
-							'container' => array( 'string' => $log_container_head, 'template' => false ),
-							'all' => array( 'string' => '= %s ='."\n\n", 'template' => false ) ),
-						'', false, $log_categories, '', 'raw', false ),
-					'raw' );
-			}
-			else
-			{
-				$log_container_head = '<h3 id="debug_sess_debuglog_'.($k+1).'" style="color:#f00;">Debug messages from redirected page (#'.($k+1).')</h3>'
-					// link to real Debuglog:
-					.'<p><a href="'.$ReqHostPathQuery.'#debug_debuglog">See below for the Debuglog from the current request.</a></p>';
-				$log_cats = array_keys($sess_Debuglog->get_messages( $log_categories )); // the real list (with all replaced and only existing ones)
-				$log_head_links = array();
-
-				foreach( $log_cats as $l_cat )
-				{
-					$log_head_links[] .= '<a href="'.$ReqHostPathQuery.'#debug_redir_'.($k+1).'_info_cat_'.str_replace( ' ', '_', $l_cat ).'">'.$l_cat.'</a>';
-				}
-				$log_container_head .= implode( ' | ', $log_head_links );
-
-				echo '<div style="border:1px solid #F00;background:#aaa">'.
-					format_to_output(
-						$sess_Debuglog->display( array(
-								'container' => array( 'string' => $log_container_head, 'template' => false ),
-								'all' => array( 'string' => '<h4 id="debug_redir_'.($k+1).'_info_cat_%s">%s:</h4>', 'template' => false ) ),
-							'', false, $log_categories ),
-						'htmlbody' ).
-					'</div>';
-			}
-		}
-
-		// Delete logs since they have been displayed...
-		// EXCEPT if we are redirecting, because in this case we won't see these logs in a browser (only in request debug tools)
-		// So in that case we want them to move over to the next page...
-		if( $http_response_code < 300 || $http_response_code >= 400 )
-		{	// This is NOT a 3xx redirect, assume debuglogs have been seen & delete them:
-			$Session->delete( 'Debuglogs' );
-		}
-	}
-
-
 	// CURRENT DEBUGLOG (with list of categories at top):
 	$log_categories = array( 'error', 'note', 'all' ); // Categories to output (in that order)
 	$log_container_head = $clean ? ( "\n".'== Debug messages =='."\n" ) : '<h3 id="debug_debuglog">Debug messages</h3>';
-	if( ! empty($sess_Debuglogs) )
-	{ // link to first sess_Debuglog:
-		if ( $clean )
-		{
-			$log_container_head .= 'See above for the Debuglog(s) from before the redirect.'."\n";
-		}
-		else
-		{
-			$log_container_head .= '<p><a href="'.$ReqHostPathQuery.'#debug_sess_debuglog_1">See above for the Debuglog(s) from before the redirect.</a></p>';
-		}
-	}
 
 	if ( ! $clean )
 	{
@@ -3764,6 +3772,26 @@ function user_get_notification_sender( $user_ID, $setting )
 
 
 /**
+ * Get limit for email sending for currently executing cron job
+ *
+ * @return integer 0 means either unlimited email sending or no cron job is executing at the moment
+ */
+function get_cron_job_emails_limit()
+{
+	global $executing_cron_task_key;
+
+	if( isset( $executing_cron_task_key ) )
+	{	// If any cron job is really executing now:
+		global $Settings;
+		return intval( $Settings->get( 'cjob_maxemail_'.$executing_cron_task_key ) );
+	}
+
+	// No currently executing cron job:
+	return 0;
+}
+
+
+/**
  * Check if current executing cron job should be stopped because of email sending limit
  *
  * 1. THIS MUST BE CALLED ONLY FROM INSIDE THE MAIN LOOP of the cronjob (*.job.php), not from within a generic function.
@@ -3776,15 +3804,8 @@ function user_get_notification_sender( $user_ID, $setting )
  */
 function check_cron_job_emails_limit()
 {
-	global $Settings, $executing_cron_task_key;
-
-	if( ! isset( $executing_cron_task_key ) )
-	{	// Don't stop because it is a not cron job execution:
-		return true;
-	}
-
 	// Get max number of emails for current cron job:
-	$current_cron_job_emails_limit = intval( $Settings->get( 'cjob_maxemail_'.$executing_cron_task_key ) );
+	$current_cron_job_emails_limit = get_cron_job_emails_limit();
 
 	if( $current_cron_job_emails_limit > 0 )
 	{	// If current cron job has a limit for sending of emails:
@@ -3802,7 +3823,6 @@ function check_cron_job_emails_limit()
 			// Stop current job execution:
 			return false;
 		}
-
 	}
 
 	// Allow to continue current cron job execution:
@@ -3836,16 +3856,13 @@ function check_cron_job_emails_limit()
  */
 function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name = NULL, $headers = array(), $user_ID = NULL, $email_campaign_ID = NULL, $automation_ID = NULL )
 {
-	global $servertimenow, $email_send_simulate_only;
+	global $servertimenow, $email_send_simulate_only, $email_send_allow_php_mail;
 
 	/**
 	 * @var string|NULL This global var stores a last mail log message
 	 */
 	global $mail_log_message;
 	$mail_log_message = NULL;
-
-	// Stop a request from the blocked IP addresses or Domains
-	antispam_block_request();
 
 	global $debug, $app_name, $app_version, $current_locale, $current_charset, $evo_charset, $locales, $Debuglog, $Settings, $demo_mode, $mail_log_insert_ID;
 
@@ -3990,22 +4007,48 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 		return false;
 	}
 
-	if( $email_send_simulate_only )
+	// Simulate email sending when:
+	//  - this is forced by config
+	//  - php mail sending is disabled by config and SMTP sending is not enabled
+	$simulate_email_sending = $email_send_simulate_only || ( ! $email_send_allow_php_mail && ! $Settings->get( 'smtp_enabled' ) );
+
+	if( $simulate_email_sending )
 	{	// The email sending is turned on simulation mode, Don't send a real message:
 		$send_mail_result = true;
 	}
 	else
-	{	// If real mode
-		// Send email message:
-		$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
+	{	// Send email message on real mode:
+		try
+		{	// Try to send:
+			$send_mail_result = evo_mail( $to, $subject, $message_data, $headers, $additional_parameters );
+		}
+		catch( Exception $ex )
+		{	// Unexpected error:
+			$send_mail_result = false;
+			// Log the caught error:
+			$mail_log_message = $ex->getMessage();
+			// Insert a returned email's data into DB:
+			load_funcs( 'cron/model/_decode_returned_emails.funcs.php' );
+			$content = dre_limit_by_terminators( $mail_log_message );
+			$email_data = dre_get_email_data( $content, $mail_log_message, 'Empty headers' );
+			if( empty( $email_data['address'] ) )
+			{	// Use current email address if no email address is detected in the error message:
+				$email_data['address'] = $to_email_address;
+			}
+			dre_insert_returned_email( $email_data );
+		}
 	}
 
-// HERE: increase_mail_send_counter();  THIS MUST NOT STOP execution here!
+	if( get_cron_job_emails_limit() > 0 )
+	{	// Increase global counter if currently executing cron jobs has a limit for mail sending:
+		global $executing_cron_task_emails_count;
+		$executing_cron_task_emails_count++;
+	}
 
 
 	if( ! $send_mail_result )
 	{	// The message has not been sent successfully
-		$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED.';
+		$mail_log_message = 'Sending mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'" FAILED'.( $mail_log_message === NULL ? '' : ', Error: '.$mail_log_message ).'.';
 		update_mail_log( $mail_log_insert_ID, 'error', $message );
 		if( $debug > 1 )
 		{ // We agree to die for debugging...
@@ -4021,7 +4064,7 @@ function send_mail( $to, $to_name, $subject, $message, $from = NULL, $from_name 
 	$mail_log_message = 'Sent mail from "'.$from.'" to "'.$to.'", Subject "'.$subject.'".';
 	$Debuglog->add( htmlspecialchars( $mail_log_message ) );
 
-	update_mail_log( $mail_log_insert_ID, ( $email_send_simulate_only ? 'simulated' : 'ok' ), $message );
+	update_mail_log( $mail_log_insert_ID, ( $simulate_email_sending ? 'simulated' : 'ok' ), $message );
 
 	return true;
 }
@@ -4092,7 +4135,9 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			case 'post_new':
 				// 'notify_post_mentioned' - "I have been mentioned on a post.",
 				// 'notify_post_moderation' - "a post is created and I have permissions to moderate it."
-				// 'notify_edit_pst_moderation' - "a post is modified and I have permissions to moderate it."
+				// 'notify_edit_pst_moderation' - "someone proposed a change on a post and I have permissions to moderate it."
+			case 'post_proposed_change':
+				// 'notify_post_proposed' - "someone proposed a change on a post and I have permissions to moderate it."
 			case 'post_assignment':
 				// 'notify_post_assignment' - "a post was assigned to me."
 			case 'posts_unmoderated_reminder':
@@ -4172,7 +4217,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 		$message = mail_template( $template_name, $UserSettings->get( 'email_format', $User->ID ), $template_params, $User );
 
 		// Autoinsert user's data
-		$subject = mail_autoinsert_user_data( $subject, $User );
+		$subject = mail_autoinsert_user_data( $subject, $User, 'text', NULL, NULL, $template_params );
 
 		// erhsatingin > moved to mail_template()
 		//$message = mail_autoinsert_user_data( $message, $User );
@@ -4244,7 +4289,7 @@ function send_mail_to_anonymous_user( $user_email, $user_name, $subject, $templa
 	$message = mail_template( $template_name, 'auto', $template_params );
 
 	// Autoinsert user's data:
-	$subject = mail_autoinsert_user_data( $subject, NULL, 'text', $user_email, $user_name );
+	$subject = mail_autoinsert_user_data( $subject, NULL, 'text', $user_email, $user_name, $template_params );
 
 	// Params for email log:
 	$email_campaign_ID = empty( $template_params['ecmp_ID'] ) ? NULL : $template_params['ecmp_ID'];
@@ -5600,6 +5645,7 @@ function is_create_action( $action )
 
 		case 'edit':
 		case 'edit_switchtab':
+		case 'propose':
 		case 'update':	// we return in this state after a validation error
 		case 'delete':
 		// The following one's a bit far fetched, but can happen if we have no sheet display:
@@ -5915,8 +5961,8 @@ function is_front_page()
  */
 function require_login( $url, $check_login_screen )
 {
-	global $Settings;
-	if( preg_match( '#/admin.php([&?].*)?$#', $url ) )
+	global $Settings, $dispatcher;
+	if( preg_match( '#/'.preg_quote( $dispatcher, '#' ).'([&?].*)?$#', $url ) )
 	{ // admin always require logged in user
 		return true;
 	}
@@ -6970,8 +7016,9 @@ function get_samedomain_htsrv_url( $force_https = false )
 	// Cut htsrv folder from end of the URL:
 	$req_htsrv_url = substr( $req_htsrv_url, 0, strlen( $req_htsrv_url ) - strlen( $htsrv_subdir ) );
 
-	if( $is_cli || strpos( $ReqHost.$ReqPath, $req_htsrv_url ) !== false )
+	if( $is_cli || empty( $ReqHost ) || strpos( $ReqHost.$ReqPath, $req_htsrv_url ) !== false )
 	{	// If current request path contains the required htsrv URL
+		// or $ReqHost is not initialized e-g on install
 		// or this is CLI mode where $ReqHost is not defined:
 		return $req_htsrv_url.$htsrv_subdir;
 	}
@@ -7330,6 +7377,19 @@ function save_to_file( $data, $filename, $mode = 'a' )
 
 /**
  * Check if current request is AJAX
+ *
+ * @return boolean TRUE/FALSE
+ */
+function is_ajax_request()
+{
+	global $is_ajax_request;
+
+	return isset( $is_ajax_request ) && $is_ajax_request === true;
+}
+
+
+/**
+ * Check if current request is AJAX content
  * Used in order to get only content of the requested page
  *
  * @param string Template name
@@ -7453,7 +7513,7 @@ function evo_flush()
 
 /**
  * Name the transaction for the APM.
- * This avoids that every request be called 'index.php' or 'admin.php' or 'cron_exec.php'
+ * This avoids that every request be called 'index.php' or 'evoadm.php' or 'cron_exec.php'
  *
  * @param mixed $request_transaction_name
  */
@@ -7904,6 +7964,7 @@ function get_fieldset_folding_icon( $id, $params = array() )
 			'before'     => '',
 			'after'      => ' ',
 			'deny_fold'  => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+			'default_fold' => NULL, // Set default "fold" value for current icon
 			'fold_value' => NULL,
 		), $params );
 
@@ -7920,12 +7981,17 @@ function get_fieldset_folding_icon( $id, $params = array() )
 		global $UserSettings, $Collection, $Blog, $ctrl;
 		if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
 		{	// Get user setting value
-			$value = intval( $UserSettings->get( 'fold_'.$id ) );
+			$value = $UserSettings->get( 'fold_'.$id );
 		}
 		else
 		{	// Get user-collection setting
-			$value = intval( $UserSettings->get_collection_setting( 'fold_'.$id, $Blog->ID ) );
+			$value = $UserSettings->get_collection_setting( 'fold_'.$id, $Blog->ID );
 		}
+		if( $value === NULL && $params['default_fold'] !== NULL )
+		{	// Use custom default value for this icon:
+			$value = $params['default_fold'];
+		}
+		$value = intval( $value );
 	}
 
 	// Icon
@@ -8424,7 +8490,7 @@ function can_use_hashed_password()
  * Convert inline file tags like [image|file:123:link title:.css_class_name] or [inline:123:.css_class_name] into HTML tags
  *
  * @param string Source content
- * @param object Source object
+ * @param object Source object: Item, Comment, EmailCampaign, Message
  * @param array Params
  * @return string Content
  */
@@ -8467,7 +8533,7 @@ function render_inline_files( $content, $Object, $params = array() )
 /**
  * Convert inline tags like [image:|file:|inline:|video:|audio:|thumbnail:|folder:] into HTML tags
  *
- * @param object Source object: Item, EmailCampaign, Comment, Message
+ * @param object Source object: Item, Comment, EmailCampaign, Message
  * @param array Inline tags
  * @param array Params
  * @return array Associative array of rendered HTML tags with inline tags as key
@@ -8489,7 +8555,6 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				'image_size'               => 'fit-400x320',
 				'image_link_to'            => 'original', // Can be 'orginal' (image) or 'single' (this post)
 				'limit'                    => 1000, // Max # of images displayed
-				'get_rendered_attachments' => true,
 			), $params );
 
 	if( !isset( $LinkList ) )
@@ -8512,9 +8577,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				break;
 
 			case 'Comment':
-				$LinkOwner = new LinkComment( $Object );
-				$prepare_plugin_event_name = 'PrepareForRenderItemAttachment';
-				$render_plugin_event_name = 'RenderItemAttachment';
+				$LinkOwner = new LinkComment( $Object, empty( $Object->temp_link_owner_ID ) ? $temp_link_owner_ID : $Object->temp_link_owner_ID );
+				$prepare_plugin_event_name = 'PrepareForRenderCommentAttachment';
+				$render_plugin_event_name = 'RenderCommentAttachment';
 				break;
 
 			case 'EmailCampaign':
@@ -8537,16 +8602,29 @@ function render_inline_tags( $Object, $tags, $params = array() )
 	}
 
 	if( empty( $LinkList ) )
-	{	// This Item has no attached files for 'inline' position, Exit here
+	{	// This Object has no attached files for 'inline' position, Exit here:
 		return false;
+	}
+
+	// Render inline tags by active plugins:
+	$plugins_inlines = $Plugins->trigger_collect( 'RenderInlineTags', array_merge( $params, array(
+			'Object'      => $Object,
+			'inline_tags' => $tags,
+		) ) );
+	foreach( $plugins_inlines as $plugin_ID => $plugin_inlines )
+	{
+		$inlines = array_merge( $inlines, $plugin_inlines );
 	}
 
 	foreach( $tags as $current_inline )
 	{
-		preg_match("/\[(image|file|inline|video|audio|thumbnail|folder):(\d+)(:?)([^\]]*)\]/i", $current_inline, $inline);
+		if( isset( $inlines[$current_inline] ) )
+		{	// Skip inline tag if it has been already rendered before, e-g by some plugin in the event "RenderInlineTags" above:
+			continue;
+		}
 
-		if( empty( $inline ) )
-		{
+		if( ! preg_match( '/\[(image|file|inline|video|audio|thumbnail|folder):(\d+)(:?)([^\]]*)\]/i', $current_inline, $inline ) )
+		{	// Don't render a not supported inline tag:
 			$inlines[$current_inline] = $current_inline;
 			continue;
 		}
@@ -8624,46 +8702,19 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
 							{
-								// Overwrite 'before_image' setting to add an extra class name:
 								if( $object_class == 'EmailCampaign' )
-								{
-									$el_style = '';
-									$custom_classes = array();
-									if( isset( $image_extraclass ) )
-									{
-										$classes = explode( ' ', $image_extraclass );
-										foreach( $classes as $class )
-										{
-											$class_style = emailskin_style( '.'.trim( $class ), false );
-											$el_style .= $class_style;
-											if( empty( $class_style ) )
-											{	// Doesn't have appropriate email skin style:
-												$custom_classes[] = $class;
-											}
-										}
-									}
-									$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array(
-											'class' => implode( ' ', $custom_classes ),
-											'style' => $el_style
-										) );
+								{	// Append extra class to image/file inline img tags:
+									$current_image_params['image_class'] = $image_extraclass;
 								}
 								else
-								{
+								{	// Overwrite 'before_image' setting to add an extra class name:
 									$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
 								}
-
-								// Append extra class to file inline img tags:
 								$current_file_params['class'] = $image_extraclass;
 							}
 						}
 					}
 
-					if( ! $current_image_params['get_rendered_attachments'] )
-					{	// Save $r to temp var in order to don't get the rendered data from plugins
-						$temp_r = $r;
-					}
-
-					$temp_params = $current_image_params;
 					foreach( $current_image_params as $param_key => $param_value )
 					{	// Pass all params by reference, in order to give possibility to modify them by plugin
 						// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
@@ -8674,13 +8725,10 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_image_params );
 
 					// Render attachments by plugin, Append the html content to $current_image_params['data'] and to $r:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_image_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_image_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_image_params['data']):
-						if( ! $current_image_params['get_rendered_attachments'] )
-						{	// Restore $r value and mark this item has the rendered attachments:
-							$r = $temp_r;
-							$plugin_render_attachments = true;
-						}
+						$inlines[ $current_inline ] = $current_image_params['data'];
+						break;
 					}
 
 					if( $inline_type == 'image' )
@@ -8695,28 +8743,18 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							case 'EmailCampaign':
 								// Get the IMG tag without link for email content:
 								$image_style = '';
-								if( isset( $current_image_params['image_class'] ) )
-								{
-									$classes = explode( ' ', $current_image_params['image_class'] );
-									$custom_classes = array();
-									foreach( $classes as $class )
-									{
-										$class_style = emailskin_style( '.'.trim( $class ), false );
-										$image_style .= $class_style;
-										if( empty( $class_style ) )
-										{	// Doesn't have appropriate email skin style:
-											$custom_classes[] = $class;
-										}
-									}
-									$current_image_params['image_class'] = implode( ' ', $custom_classes );
-									$current_image_params['image_style'] = $image_style;
+								if( ! empty( $current_image_params['image_class'] ) )
+								{	// Convert classes to style format:
+									$image_style = emailskin_style( '.'.str_replace( ' ', '+.', $current_image_params['image_class'] ), false );
+									// We cannot use class attribute on email campaign content:
+									unset( $current_image_params['image_class'] );
 								}
 
-								$inlines[ $current_inline ] = $Link->get_tag( array_merge( array(
+								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
 										'image_link_to' => false,
-										'image_style'   => 'border: none; max-width: 100%; height: auto;',
+										'image_style'   => 'border: none; max-width: 100%; height: auto;'.$image_style,
 										'add_loadimg'   => false,
-								), $current_image_params ) );
+								) ) );
 								break;
 
 							default:
@@ -8731,22 +8769,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						{
 							case 'EmailCampaign':
 								$image_style = '';
-								$custom_classes = array();
 								if( ! empty( $current_file_params['class'] ) )
-								{
-									$classes = explode( ' ', $current_file_params['class'] );
-									foreach( $classes as $class )
-									{
-										$class_style = emailskin_style( '.'.trim( $class ), false );
-										$image_style .= $class_style;
-										if( empty( $class_style ) )
-										{	// Doesn't have appropriate email skin style:
-											$custom_classes[] = $class;
-										}
-									}
+								{	// Convert classes to style format:
+									$image_style = emailskin_style( '.'.str_replace( ' ', '+.', $current_file_params['class'] ), false );
+									// We cannot use class attribute on email campaign content:
+									unset( $current_file_params['class'] );
 								}
 								$inlines[ $current_inline ] = $File->get_tag( '', '', '', '', $current_image_params['image_size'], '', '', '',
-										implode( ' ', $custom_classes ), '', '', '', '', 1, NULL, 'border: none; max-width: 100%; height: auto;'.$image_style, false );
+										'', '', '', '', '', 1, NULL, 'border: none; max-width: 100%; height: auto;'.$image_style, false );
 								break;
 
 							default:
@@ -8839,19 +8869,10 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							// Get the IMG tag without link for email content:
 							$image_style = '';
 							if( ! empty( $current_image_params['image_class'] ) )
-							{
-								$classes = explode( ' ', $current_image_params['image_class'] );
-								$custom_classes = array();
-								foreach( $classes as $class )
-								{
-									$class_style = emailskin_style( '.'.trim( $class ), false );
-									$image_style .= $class_style;
-									if( empty( $class_style ) )
-									{	// Doesn't have appropriate email skin style:
-										$custom_classes[] = $class;
-									}
-								}
-								$current_image_params['image_class'] = implode( ' ', $custom_classes );
+							{	// Convert classes to style format:
+								$image_style = emailskin_style( '.'.str_replace( ' ', '+.', $current_image_params['image_class'] ), false );
+								// We cannot use class attribute on email campaign content:
+								unset( $current_image_params['image_class'] );
 							}
 							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
 									'image_link_to' => false,
@@ -8867,8 +8888,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					}
 				}
 				else
-				{
-					continue;
+				{	// not an image file, do not process
+					$inlines[$current_inline] = $current_inline;
 				}
 				break;
 
@@ -8928,7 +8949,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_video_params );
 
 					// Render attachments by plugin:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_video_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_video_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_video_params['data']):
 						$inlines[$current_inline] = $current_video_params['data'];
 					}
@@ -8960,9 +8981,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$Plugins->trigger_event_first_true_with_params( $prepare_plugin_event_name, $current_audio_params );
 
 					// Render attachments by plugin:
-					if( count( $Plugins->trigger_event_first_true( $render_plugin_event_name, $current_audio_params ) ) != 0 )
+					if( count( $Plugins->trigger_event_first_true_with_params( $render_plugin_event_name, $current_audio_params ) ) != 0 )
 					{	// This attachment has been rendered by a plugin (to $current_audio_params['data']):
-						$inlines[$current_inline] =  $current_audio_params['data'];
+						$inlines[$current_inline] = $current_audio_params['data'];
 					}
 					else
 					{ // no plugin available or was able to render the tag
@@ -9326,6 +9347,7 @@ function get_social_media_image( $Item = NULL, $params = array() )
 
 	if( $params['use_coll_fallback'] && $Blog )
 	{	// Try to get collection social media boiler plate and collection image/logo:
+		$FileCache = & get_FileCache();
 		$social_media_image_file_ID = $Blog->get_setting( 'social_media_image_file_ID', false );
 		if( $social_media_image_file_ID > 0 && ( $File = & $FileCache->get_by_ID( $social_media_image_file_ID  ) ) && $File->is_image() )
 		{	// Try social media boiler plate first:
@@ -9473,11 +9495,10 @@ function insert_image_links_block( $params )
 			return;
 	}
 
-	// Set a different dragand drop button ID
-	global $dragdropbutton_ID, $fm_mode, $link_list_tbody_ID;
+	global $fm_mode;
 	$fm_mode = 'file_select';
-	$dragdropbutton_ID = 'file-uploader-modal';
-	$link_list_tbody_ID = 'linklist_tbody_modal';
+	// Set a different drag and drop fieldset prefix:
+	$fieldset_prefix = 'modal_';
 
 	if( is_admin_page() )
 	{
@@ -9486,8 +9507,6 @@ function insert_image_links_block( $params )
 		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
 		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
 		$AdminUI = new AdminUI();
-
-		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
 	}
 	else
 	{
@@ -9498,9 +9517,9 @@ function insert_image_links_block( $params )
 		$blog_skin_ID = $Blog->get_skin_ID();
 		$SkinCache = & get_SkinCache();
 		$Skin = & $SkinCache->get_by_ID( $blog_skin_ID );
-
-		require $inc_path.'links/views/_link_list.view.php';
 	}
+
+	require $inc_path.'links/views/_link_list.view.php';
 }
 
 
@@ -9525,6 +9544,350 @@ function get_csv_line( $row, $delimiter = ';', $enclosure = '"', $eol = "\n" )
 	}
 
 	return implode( $delimiter, $row ).$eol;
+}
+
+
+/**
+ * Display a panel to upload files before import
+ *
+ * @param array Params
+ * @return array Already uploaded files in the requested folder
+ */
+function display_importer_upload_panel( $params = array() )
+{
+	global $admin_url, $current_User, $media_path;
+
+	$params = array_merge( array(
+			'folder'                 => '',
+			'allowed_extensions'     => 'csv', // Allowed extensions to import, separated by |
+			'infolder_extensions'    => false, // Allowed extensions inside folders, separated by |, FALSE - to don't find files in subfolders
+			'folder_with_extensions' => false, // Find folders which contain at least one file with extensions(separated by |) in subfolders recursively
+			'find_attachments'       => false,
+			'display_type'           => false,
+			'help_slug'              => '',
+			'refresh_url'            => '',
+		), $params );
+
+	// Get available files to import from the folder /media/import/
+	$import_files = get_import_files( $params['folder'], $params['allowed_extensions'], $params['infolder_extensions'], $params['find_attachments'], $params['folder_with_extensions'] );
+
+	$Table = new Table( NULL, 'import' );
+
+	$Table->cols = array();
+	$Table->cols[] = array( 'th' => T_('Import'), 'td_class' => 'shrinkwrap' );
+	$Table->cols[] = array( 'th' => T_('File') );
+	if( $params['display_type'] )
+	{	// Display file type:
+		$Table->cols[] = array( 'th' => T_('Type') );
+	}
+	$Table->cols[] = array( 'th' => T_('Date'), 'td_class' => 'shrinkwrap' );
+
+	// Get link to manual page:
+	$manual_link = ( empty( $params['help_slug'] ) ? '' : get_manual_link( $params['help_slug'] ) );
+
+	$Table->title = T_('Potential files to be imported').$manual_link;
+	if( ! empty( $params['refresh_url'] ) )
+	{	// Display a link to refresh the uploaded files:
+		$Table->title .= ' - '.action_icon( T_('Refresh'), 'refresh', $params['refresh_url'], T_('Refresh'), 3, 4 );
+	}
+
+	$FileRootCache = & get_FileRootCache();
+	$FileRoot = & $FileRootCache->get_by_type_and_ID( 'import', '0', true );
+	$import_perm_view = $current_User->check_perm( 'files', 'view', false, $FileRoot );
+	if( $import_perm_view )
+	{ // Current user must has access to the import dir
+		if( $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
+		{ // User has full access
+			$import_title = T_('Upload/Manage import files');
+		}
+		else if( $current_User->check_perm( 'files', 'add', false, $FileRoot ) )
+		{ // User can only upload the files to import root
+			$import_title = T_('Upload import files');
+		}
+		else
+		{ // Only view
+			$import_title = T_('View import files');
+		}
+		$Table->title .= ' - '
+			.action_icon( $import_title, 'folder', $admin_url.'?ctrl=files&amp;root=import_0&amp;path='.$params['folder'], $import_title, 3, 4,
+				array( 'onclick' => 'return import_files_window()' )
+			).' <span class="note">(popup)</span>';
+	}
+	$Table->display_init();
+
+	echo $Table->params['before'];
+
+	// TITLE:
+	$Table->display_head();
+
+	if( empty( $import_files ) )
+	{	// No files to import:
+		$Table->total_pages = 0;
+		$Table->no_results_text = '<div class="center">'.T_('We have not found any suitable file to perform the import. Please read the details at the manual page.').$manual_link.'</div>';
+
+		// BODY START:
+		$Table->display_body_start();
+		$Table->display_list_start();
+		$Table->display_list_end();
+		// BODY END:
+		$Table->display_body_end();
+	}
+	else
+	{	// Display the files to import in table:
+
+		// TABLE START:
+		$Table->display_list_start();
+
+		// COLUMN HEADERS:
+		$Table->display_col_headers();
+		// BODY START:
+		$Table->display_body_start();
+
+		$media_path_length = strlen( $media_path.'import/'.( empty( $params['folder'] ) ? '' : $params['folder'].'/' ) );
+
+		foreach( $import_files as $import_file )
+		{
+			$Table->display_line_start();
+
+			// Checkbox to import
+			$Table->display_col_start();
+			echo '<input type="radio" name="import_file" value="'.$import_file['path'].'"'.( get_param( 'import_file' ) == $import_file['path'] ? ' checked="checked"' : '' ).' />';
+			$Table->display_col_end();
+
+			// File
+			$Table->display_col_start();
+			echo substr( $import_file['path'], $media_path_length );
+			$Table->display_col_end();
+
+			// Type
+			if( $params['display_type'] )
+			{	// Display file type:
+				$Table->display_col_start();
+				echo $import_file['type'];
+				$Table->display_col_end();
+			}
+
+			// File date
+			$Table->display_col_start();
+			echo date( locale_datefmt().' '.locale_timefmt(), filemtime( $import_file['path'] ) );
+			$Table->display_col_end();
+
+			$Table->display_line_end();
+
+			evo_flush();
+		}
+
+		// BODY END:
+		$Table->display_body_end();
+
+		// TABLE END:
+		$Table->display_list_end();
+	}
+
+	echo $Table->params['after'];
+
+?>
+<script>
+jQuery( '.table_scroll td' ).click( function()
+{
+	jQuery( this ).parent().find( 'input[type=radio]' ).prop( 'checked', true );
+} );
+</script>
+<?php
+	if( $import_perm_view )
+	{	// Current user must has access to the import dir:
+
+		// Initialize JavaScript to build and open window:
+		echo_modalwindow_js();
+?>
+<script>
+function import_files_window()
+{
+	openModalWindow( '<span class="loader_img absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+		'90%', '80%', true, '<?php echo TS_('Add/Link files'); ?>', '', true );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
+		data:
+		{
+			'action': 'import_files',
+			'path': '<?php echo $params['folder']; ?>',
+			'crumb_import': '<?php echo get_crumb( 'import' ); ?>',
+		},
+		success: function( result )
+		{
+			openModalWindow( result, '90%', '80%', true, '<?php echo TS_('Upload/Manage import files'); ?>', '' );
+		}
+	} );
+	return false;
+}
+
+jQuery( document ).on( 'click', '#modal_window button[data-dismiss=modal]', function()
+{	// Reload page on closing modal window to display new uploaded files:
+	location.reload();
+} );
+</script>
+<?php
+	}
+
+	return $import_files;
+}
+
+
+/**
+ * Get available files to import from the requested folder
+ *
+ * @param string Sub folder in the folder /media/import/
+ * @param string Allowed extensions to import, separated by |
+ * @param string|boolean Allowed extensions inside folders, separated by |, FALSE - to don't find files in subfolders
+ * @param boolean TRUE - to find folder of attachments
+ * @param string|boolean Find folders which contain at least one file with extensions(separated by |) recursively in all subfolders
+ * @return array Files
+ */
+function get_import_files( $folder = '', $allowed_extensions = 'xml|txt|zip', $infolder_extensions = 'xml|txt', $find_attachments = true, $folder_with_extensions = false )
+{
+	global $media_path;
+
+	// Get all files from the import folder:
+	$root_path = $media_path.'import/'.( empty( $folder ) ? '' : $folder.'/' );
+	$files = get_filenames( $root_path, array(
+			'flat' => false
+		) );
+
+	$import_files = array();
+
+	if( empty( $files ) )
+	{ // No access to the import folder OR it is empty
+		return $import_files;
+	}
+
+	$file_paths = array();
+	foreach( $files as $folder_name => $file )
+	{
+		if( is_array( $file ) )
+		{	// It is a folder
+			if( $infolder_extensions !== false )
+			{	// Find files inside:
+				foreach( $file as $key => $sub_file )
+				{
+					if( is_string( $sub_file ) && preg_match( '/\.('.$infolder_extensions.')$/i', $sub_file, $file_matches ) )
+					{
+						$file_paths[] = array( $sub_file, $file_matches[1] );
+					}
+				}
+			}
+			if( $folder_with_extensions !== false && check_folder_with_extensions( $root_path.$folder_name, $folder_with_extensions ) )
+			{	// Use full folder as single import pack when it contains file with requested extensions:
+				$file_paths[] = array( $root_path.$folder_name, '$dir$' );
+			}
+		}
+		elseif( is_string( $file ) && preg_match( '/\.('.$allowed_extensions.')$/i', $file, $file_matches ) )
+		{	// File in the root:
+			$file_paths[] = array( $file, $file_matches[1] );
+		}
+	}
+
+	foreach( $file_paths as $file_data )
+	{
+		switch( $file_data[1] )
+		{
+			case '$dir$':
+				$file_type = T_('Folder');
+				break;
+
+			case 'zip':
+				$file_type = T_('Compressed Archive');
+				break;
+
+			default:
+				if( $find_attachments && ( $file_attachments_folder = get_import_attachments_folder( $file_data[0] ) ) )
+				{	// Probably it is a file with attachments folder:
+					$file_type = sprintf( T_('Complete export (attachments folder: %s)'), '<code>'.basename( $file_attachments_folder ).'</code>' );
+				}
+				else
+				{	// Single XML file without attachments folder:
+					$file_type = T_('Basic export').( $find_attachments ? ' ('.T_('no attachments folder found').')' : '' );
+				}
+				break;
+		}
+
+		$import_files[] = array(
+				'path' => $file_data[0],
+				'type' => $file_type,
+			);
+	}
+
+	return $import_files;
+}
+
+
+/**
+ * Find attachments folder path for given import file path
+ *
+ * @param string File path
+ * @param boolean TRUE to use first found folder if no reserved folders not found before
+ * @return string Folder path
+ */
+function get_import_attachments_folder( $file_path, $first_folder = false )
+{
+	$file_name = basename( $file_path );
+	$file_folder_path = dirname( $file_path ).'/';
+	$folder_full_name = preg_replace( '#\.[^\.]+$#', '', $file_name );
+	$folder_part_name = preg_replace( '#_[^_]+$#', '', $folder_full_name );
+
+	// Find and get first existing folder with attachments:
+	if( is_dir( $file_folder_path.$folder_full_name ) )
+	{	// 1st priority folder:
+		return $file_folder_path.$folder_full_name.'/';
+	}
+	if( is_dir( $file_folder_path.$folder_part_name.'_files' ) )
+	{	// 2nd priority folder:
+		return $file_folder_path.$folder_part_name.'_files/';
+	}
+	if( is_dir( $file_folder_path.$folder_part_name.'_attachments' ) )
+	{	// 3rd priority folder:
+		return $file_folder_path.$folder_part_name.'_attachments/';
+	}
+	if( is_dir( $file_folder_path.'b2evolution_export_files' ) )
+	{	// 4th priority folder:
+		return $file_folder_path.'b2evolution_export_files/';
+	}
+	if( is_dir( $file_folder_path.'export_files' ) )
+	{	// 5th priority folder:
+		return $file_folder_path.'export_files/';
+	}
+	if( is_dir( $file_folder_path.'import_files' ) )
+	{	// 6th priority folder:
+		return $file_folder_path.'import_files/';
+	}
+	if( is_dir( $file_folder_path.'files' ) )
+	{	// 7th priority folder:
+		return $file_folder_path.'files/';
+	}
+	if( is_dir( $file_folder_path.'attachments' ) )
+	{	// 8th priority folder:
+		return $file_folder_path.'attachments/';
+	}
+
+	if( $first_folder )
+	{	// Try to use first found folder:
+		$files = scandir( $file_folder_path );
+		foreach( $files as $file )
+		{
+			if( $file == '.' || $file == '..' )
+			{	// Skip reserved dir names of the current path:
+				continue;
+			}
+			if( is_dir( $file_folder_path.$file ) )
+			{	// 9th priority folder:
+				return $file_folder_path.$file.'/';
+			}
+		}
+	}
+
+	// File has no attachments folder
+	return false;
 }
 
 

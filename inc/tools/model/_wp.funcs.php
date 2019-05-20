@@ -109,7 +109,7 @@ function wpxml_get_import_data( $XML_file_path )
 
 	if( $XML_file_path )
 	{	// Get a path with attached files for the XML file:
-		$attached_files_path = wpxml_get_attachments_folder( $XML_file_path, $use_first_folder_for_attachments );
+		$attached_files_path = get_import_attachments_folder( $XML_file_path, $use_first_folder_for_attachments );
 	}
 	else
 	{	// Wrong source file:
@@ -1452,7 +1452,6 @@ function wpxml_parser( $file )
 				'link_cmt_ID'           => (int) $link->link_cmt_ID,
 				'link_usr_ID'           => (int) $link->link_usr_ID,
 				'link_file_ID'          => (int) $link->link_file_ID,
-				'link_ltype_ID'         => (int) $link->link_ltype_ID,
 				'link_position'         => (string) $link->link_position,
 				'link_order'            => (int) $link->link_order,
 			);
@@ -1649,80 +1648,6 @@ function wp_get_regional_data( $country_code, $region, $subregion, $city )
 
 
 /**
- * Get available files to import from the folder /media/import/
- *
- * @return array Files
- */
-function wpxml_get_import_files()
-{
-	global $media_path;
-
-	// Get all files from the import folder
-	$files = get_filenames( $media_path.'import/', array(
-			'flat' => false
-		) );
-
-	$import_files = array();
-
-	if( empty( $files ) )
-	{ // No access to the import folder OR it is empty
-		return $import_files;
-	}
-
-	foreach( $files as $file )
-	{
-		$file_paths = array();
-		$file_type = '';
-		if( is_array( $file ) )
-		{	// It is a folder, Find xml files inside:
-			foreach( $file as $key => $sub_file )
-			{
-				if( is_string( $sub_file ) && preg_match( '/\.(xml|txt)$/i', $sub_file ) )
-				{
-					$file_paths[] = $sub_file;
-				}
-			}
-		}
-		elseif( is_string( $file ) )
-		{	// File in the root:
-			$file_paths[] = $file;
-		}
-
-		foreach( $file_paths as $file_path )
-		{
-			if( ! empty( $file_path ) && preg_match( '/\.(xml|txt|zip)$/i', $file_path, $file_matches ) )
-			{	// This file can be a file with import data
-				if( empty( $file_type ) )
-				{	// Set type from file extension
-					if( $file_matches[1] == 'zip' )
-					{
-						$file_type = T_('Compressed Archive');
-					}
-					else
-					{
-						if( $file_attachments_folder = wpxml_get_attachments_folder( $file_path ) )
-						{	// Probably it is a file with attachments folder:
-							$file_type = sprintf( T_('Complete export (attachments folder: %s)'), '<code>'.basename( $file_attachments_folder ).'</code>' );
-						}
-						else
-						{	// Single XML file without attachments folder:
-							$file_type = T_('Basic export (no attachments folder found)');
-						}
-					}
-				}
-				$import_files[] = array(
-						'path' => $file_path,
-						'type' => $file_type,
-					);
-			}
-		}
-	}
-
-	return $import_files;
-}
-
-
-/**
  * Convert string value to normal encoding
  *
  * @param string Value
@@ -1795,11 +1720,11 @@ function & wpxml_create_File( $file_source_path, $params )
 	{	// No permission to copy to the destination folder
 		if( is_dir( $file_source_path ) )
 		{	// Folder
-			echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
+			echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
 		}
 		else
 		{	// File
-			echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$file_destination_path.'</code>' ).'</p>';
+			echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
 		}
 		// Skip it:
 		return $File;
@@ -1816,75 +1741,6 @@ function & wpxml_create_File( $file_source_path, $params )
 	evo_flush();
 
 	return $File;
-}
-
-
-/**
- * Find attachments folder path for given XML file path
- *
- * @param string File path
- * @param boolean TRUE to use first found folder if no reserved folders not found before
- * @return string Folder path
- */
-function wpxml_get_attachments_folder( $file_path, $first_folder = false )
-{
-	$file_name = basename( $file_path );
-	$file_folder_path = dirname( $file_path ).'/';
-	$folder_full_name = preg_replace( '#\.[^\.]+$#', '', $file_name );
-	$folder_part_name = preg_replace( '#_[^_]+$#', '', $folder_full_name );
-
-	// Find and get first existing folder with attachments:
-	if( is_dir( $file_folder_path.$folder_full_name ) )
-	{	// 1st priority folder:
-		return $file_folder_path.$folder_full_name.'/';
-	}
-	if( is_dir( $file_folder_path.$folder_part_name.'_files' ) )
-	{	// 2nd priority folder:
-		return $file_folder_path.$folder_part_name.'_files/';
-	}
-	if( is_dir( $file_folder_path.$folder_part_name.'_attachments' ) )
-	{	// 3rd priority folder:
-		return $file_folder_path.$folder_part_name.'_attachments/';
-	}
-	if( is_dir( $file_folder_path.'b2evolution_export_files' ) )
-	{	// 4th priority folder:
-		return $file_folder_path.'b2evolution_export_files/';
-	}
-	if( is_dir( $file_folder_path.'export_files' ) )
-	{	// 5th priority folder:
-		return $file_folder_path.'export_files/';
-	}
-	if( is_dir( $file_folder_path.'import_files' ) )
-	{	// 6th priority folder:
-		return $file_folder_path.'import_files/';
-	}
-	if( is_dir( $file_folder_path.'files' ) )
-	{	// 7th priority folder:
-		return $file_folder_path.'files/';
-	}
-	if( is_dir( $file_folder_path.'attachments' ) )
-	{	// 8th priority folder:
-		return $file_folder_path.'attachments/';
-	}
-
-	if( $first_folder )
-	{	// Try to use first found folder:
-		$files = scandir( $file_folder_path );
-		foreach( $files as $file )
-		{
-			if( $file == '.' || $file == '..' )
-			{	// Skip reserved dir names of the current path:
-				continue;
-			}
-			if( is_dir( $file_folder_path.$file ) )
-			{	// 9th priority folder:
-				return $file_folder_path.$file.'/';
-			}
-		}
-	}
-
-	// File has no attachments folder
-	return false;
 }
 
 

@@ -154,6 +154,7 @@ class Plugins_admin extends Plugins
 				'RenderEmailAsHtml' => 'Renders email content when generated as HTML.',
 				'PrepareForRenderEmailAttachment' => 'Prepare to render email campaign attachment.',
 				'RenderEmailAttachment' => 'Renders email campaign attachment.',
+				'RenderInlineTags' => 'Render inline tags.',
 				'RenderURL' => 'Renders file by URL.',
 
 
@@ -268,6 +269,10 @@ class Plugins_admin extends Plugins
 				'HandleDispMode' => 'Called when displaying $disp',
 
 				'GetAdditionalColumnsTable' => 'Called to add columns for Results object',
+				'GetImageInlineTags' => 'Called to add tabs on the modal/popup window "Insert image into content"',
+				'InitImageInlineTagForm' => 'Called to initialize params for form of additional tab on the modal/popup window "Insert image into content"',
+				'DisplayImageInlineTagForm' => 'Called to display a form for additional tab on the modal/popup window "Insert image into content"',
+				'GetInsertImageInlineTagJavaScript' => 'Called to get an additional JavaScript before submit/insert inline tag from the modal/popup window "Insert image into content"',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )
@@ -1460,7 +1465,7 @@ class Plugins_admin extends Plugins
 
 					case 'api_min':
 						// obsolete since 1.9:
-						continue;
+						break;
 
 
 					default:

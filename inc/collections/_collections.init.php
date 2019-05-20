@@ -42,6 +42,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_coll_user_perms'          => $tableprefix.'blogusers',
 		'T_coll_user_favs'           => $tableprefix.'coll_favs',
 		'T_coll_settings'            => $tableprefix.'coll_settings',
+		'T_coll_locales'             => $tableprefix.'coll_locales',
 		'T_section'                  => $tableprefix.'section',
 		'T_comments'                 => $tableprefix.'comments',
 		'T_comments__votes'          => $tableprefix.'comments__votes',
@@ -50,6 +51,7 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__item_settings'     => $tableprefix.'items__item_settings',
 		'T_items__item_custom_field' => $tableprefix.'items__item_custom_field',
 		'T_items__itemtag'           => $tableprefix.'items__itemtag',
+		'T_items__itemgroup'         => $tableprefix.'items__itemgroup',
 		'T_items__prerendering'      => $tableprefix.'items__prerendering',
 		'T_items__status'            => $tableprefix.'items__status',
 		'T_items__subscriptions'     => $tableprefix.'items__subscriptions',
@@ -59,6 +61,8 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__type_coll'         => $tableprefix.'items__type_coll',
 		'T_items__user_data'         => $tableprefix.'items__user_data',
 		'T_items__version'           => $tableprefix.'items__version',
+		'T_items__version_custom_field' => $tableprefix.'items__version_custom_field',
+		'T_items__version_link'      => $tableprefix.'items__version_link',
 		'T_items__votes'             => $tableprefix.'items__votes',
 		'T_items__status_type'       => $tableprefix.'items__status_type',
 		'T_items__pricing'           => $tableprefix.'items__pricing',
@@ -103,6 +107,7 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
 		'widgets'      => 'widgets/widgets.ctrl.php',
 		'wpimportxml'  => 'tools/wpimportxml.ctrl.php',
 		'phpbbimport'  => 'tools/phpbbimport.ctrl.php',
+		'mdimport'     => 'tools/mdimport.ctrl.php',
 	) );
 
 
@@ -780,40 +785,16 @@ class collections_Module extends Module
 			}
 		}
 
-		$working_blog = get_working_blog();
-		$new_actions = array( 'new', 'new-selskin', 'new-name' );
-		if( $working_blog )
-		{ // User is member of some blog or has at least view perms, so Dashboard and Collections menus should be visible
-			$AdminUI->add_menu_entries(
-				NULL, // root
-				array(
-					'site' => $site_menu,
-					'collections' => array(
-						'text' => T_('Collections'),
-						'href' => $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$working_blog
-					)
+		$AdminUI->add_menu_entries(
+			NULL, // root
+			array(
+				'site' => $site_menu,
+				'collections' => array(
+					'text' => T_('Collections'),
+					'href' => $admin_url.'?ctrl=collections',
 				)
-			);
-		}
-		elseif( $perm_admin_normal && param( 'ctrl', 'string' ) == 'collections' && in_array( param( 'action', 'string' ), $new_actions ) )
-		{ // User is not member of any blogs, but has admin normal permission.
-			$AdminUI->add_menu_entries(
-				NULL, // root
-				array(
-					'site' => $site_menu,
-					'collections' => array(
-						'text' => T_('Collections')
-					)
-				)
-			);
-		}
-		elseif( $perm_admin_normal )
-		{ // User is not member of any blogs, but has admin normal permission. Only the dashboard menu ( no Collections ) should be visible.
-			$AdminUI->add_menu_entries(
-				NULL, // root
-				array( 'site' => $site_menu )
-			);
-		}
+			)
+		);
 	}
 
 
@@ -1111,7 +1092,7 @@ class collections_Module extends Module
 				'params' => NULL, // 'comment_ID', 'executed_by_userid', 'is_new_comment', 'already_notified_user_IDs', 'force_members', 'force_community'
 			),
 			'send-post-notifications' => array( // not user schedulable
-				'name'   => T_('Send notifications for &laquo;%s&raquo;'),
+				'name'   => T_('Send notifications for #%d &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_notifications.job.php',
 				'params' => NULL, // 'item_ID', 'executed_by_userid', 'is_new_item', 'already_notified_user_IDs', 'force_members', 'force_community', 'force_pings'
@@ -1202,30 +1183,32 @@ class collections_Module extends Module
 				if( $confirmed )
 				{ // Unlink File from Item:
 					$deleted_link_ID = $edited_Link->ID;
-					$edited_Link->dbdelete();
-					unset($edited_Link);
+					if( $LinkOwner->remove_link( $edited_Link ) )
+					{	// If Link has been removed successfully:
+						unset($edited_Link);
 
-					$LinkOwner->after_unlink_action( $deleted_link_ID );
+						$LinkOwner->after_unlink_action( $deleted_link_ID );
 
-					$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
+						$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
 
-					if( $current_User->check_perm( 'files', 'edit' ) )
-					{ // current User has permission to edit/delete files
-						$file_name = $linked_File->get_name();
-						$links_count--;
-						if( $links_count > 0 )
-						{ // File is linked to other objects
-							$Messages->add( sprintf( T_('File %s is still linked to %d other objects'), $file_name, $links_count ), 'note' );
-						}
-						else
-						{ // File is not linked to other objects
-							if( $linked_File->unlink() )
-							{ // File removed successful ( removed from db and from storage device also )
-								$Messages->add( sprintf( T_('File %s has been deleted.'), $file_name ), 'success' );
+						if( $current_User->check_perm( 'files', 'edit' ) )
+						{ // current User has permission to edit/delete files
+							$file_name = $linked_File->get_name();
+							$links_count--;
+							if( $links_count > 0 )
+							{ // File is linked to other objects
+								$Messages->add( sprintf( T_('File %s is still linked to %d other objects'), $file_name, $links_count ), 'note' );
 							}
 							else
-							{ // Could not completly remove the file
-								$Messages->add( sprintf( T_('File %s could not be deleted.'), $file_name ), 'error' );
+							{ // File is not linked to other objects
+								if( $linked_File->unlink() )
+								{ // File removed successful ( removed from db and from storage device also )
+									$Messages->add( sprintf( T_('File %s has been deleted.'), $file_name ), 'success' );
+								}
+								else
+								{ // Could not completly remove the file
+									$Messages->add( sprintf( T_('File %s could not be deleted.'), $file_name ), 'error' );
+								}
 							}
 						}
 					}

@@ -28,7 +28,7 @@ global $ItemList;
  */
 global $Item;
 
-global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
+global $action, $blog, $posts, $poststart, $postend, $ReqURI;
 global $edit_item_url, $delete_item_url, $p, $dummy_fields;
 global $comment_allowed_tags, $comment_type;
 global $Plugins, $DB, $UserSettings, $Session, $Messages;
@@ -140,12 +140,13 @@ while( $Item = & $ItemList->get_item() )
 		// Load item's creator user:
 		$Item->get_creator_User();
 		?>
-		<div class="panel-heading small <?php
-		if( $Item->ID == $highlight )
-		{
-			echo ' evo_highlight';
-		}
-		?>">
+		<div class="panel-heading small<?php echo ( $Item->ID == $highlight ? ' evo_highlight' : '' ); ?>">
+			<h3 class="bTitle"><?php
+				$Item->title( array(
+						'target_blog' => '',
+						'link_type'   => $Item->can_be_displayed() ? 'auto' : 'none',
+					) );
+			?></h3>
 			<?php
 				echo '<div class="pull-right text-right">';
 				$Item->permanent_link( array(
@@ -259,6 +260,108 @@ while( $Item = & $ItemList->get_item() )
 				{
 					echo ' &middot; '.T_('Order').': '.$item_order;
 				}
+
+				// Action buttons:
+				echo '<div class="clearfix"></div>';
+
+				// Edit : Propose change | Duplicate... | Merge with...
+				$edit_buttons = array();
+				if( $item_edit_url = $Item->get_edit_url() )
+				{	// Edit
+					$edit_buttons[] = array(
+						'url'  => $item_edit_url,
+						'text' => get_icon( 'edit_button' ).' '.T_('Edit'),
+					);
+				}
+				if( $item_propose_change_url = $Item->get_propose_change_url() )
+				{	// Propose change
+					$edit_buttons[] = array(
+						'url'  => $item_propose_change_url,
+						'text' => get_icon( 'edit_button' ).' '.T_('Propose change'),
+					);
+				}
+				if( $item_copy_url = $Item->get_copy_url() )
+				{	// Duplicate...
+					$edit_buttons[] = array(
+						'url'  => $item_copy_url,
+						'text' => get_icon( 'copy' ).' '.T_('Duplicate...'),
+					);
+				}
+				if( $item_merge_click_js = $Item->get_merge_click_js( $params ) )
+				{	// Merge with...
+					$edit_buttons[] = array(
+						'onclick' => $item_merge_click_js,
+						'text'    => get_icon( 'merge' ).' '.T_('Merge with...'),
+					);
+					echo_item_merge_js();
+				}
+				$edit_buttons_num = count( $edit_buttons );
+				if( $edit_buttons_num > 1 )
+				{	// Display buttons in dropdown style:
+					echo '<div class="'.button_class( 'group' ).'">';
+					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'">'.$edit_buttons[0]['text'].'</a>';
+					echo '<button type="button" class="'.button_class( 'text' ).' dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>';
+					echo '<ul class="dropdown-menu">';
+					for( $b = 1; $b < $edit_buttons_num; $b++ )
+					{
+						echo '<li><a href="'.( empty( $edit_buttons[ $b ]['url'] ) ? '#' : $edit_buttons[ $b ]['url'] ).'"'
+								.( empty( $edit_buttons[ $b ]['onclick'] ) ? '' : ' onclick="'.$edit_buttons[ $b ]['onclick'].'"' ).'>'
+								.$edit_buttons[ $b ]['text']
+							.'</a></li>';
+					}
+					echo '</ul></div>';
+				}
+				elseif( $edit_buttons_num == 1 )
+				{	// Display single button:
+					echo '<span class="'.button_class( 'group' ).'">';
+					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'">'.$edit_buttons[0]['text'].'</a>';
+					echo '</span>';
+				}
+
+				// Details | History | Comments
+				echo '<span class="'.button_class( 'group' ).'">';
+				if( $action != 'view' )
+				{
+					echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('Details').'</a>';
+				}
+
+				echo $Item->get_history_link( array(
+						'class'     => button_class( $Item->has_proposed_change() ? 'text_warning' : 'text' ),
+						'link_text' => '$icon$ '.T_('Changes'),
+					) );
+
+				if( $Blog->get_setting( 'allow_comments' ) != 'never' )
+				{
+					echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="'.button_class( 'text' ).'">';
+					$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total', true );
+					echo get_icon( $comments_number > 0 ? 'comments' : 'nocomment' ).' ';
+					// TRANS: Link to comments for current post
+					comments_number( T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
+					load_funcs('comments/_trackback.funcs.php'); // TODO: use newer call below
+					trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);
+					echo '</a>';
+				}
+				echo '</span>';
+
+				// Status | Delete
+				echo '<span class="'.button_class( 'group' ).'"> ';
+				// Display the moderate buttons if current user has the rights:
+				$status_link_params = array(
+						'class'       => button_class( 'text' ),
+						'redirect_to' => regenerate_url( '', '&highlight='.$Item->ID.'#item_'.$Item->ID, '', '&' ),
+					);
+				$Item->next_status_link( $status_link_params, true );
+				$Item->next_status_link( $status_link_params, false );
+
+				$next_status_in_row = $Item->get_next_status( false );
+				if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
+				{ // Display deprecate button if current user has the rights:
+					$Item->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', button_class() );
+				}
+
+				// Display delete button if current user has the rights:
+				$Item->delete_link( '', ' ', '#', '#', button_class( 'text' ), false );
+				echo '</span>';
 			?>
 		</div>
 
@@ -268,8 +371,6 @@ while( $Item = & $ItemList->get_item() )
 						'template' => '<div class="pull-right"><span class="note status_$status$" data-toggle="tooltip" data-placement="top" title="$tooltip_title$"><span>$status_title$</span></span></div>',
 					) );
 			?>
-			<!-- TODO: Tblue> Do not display link if item does not get displayed in the frontend (e. g. not published). -->
-			<h3 class="bTitle"><?php $Item->title( array( 'target_blog' => '' )) ?></h3>
 
 			<?php
 				// Display images that are linked to this post:
@@ -341,96 +442,11 @@ while( $Item = & $ItemList->get_item() )
 					'after' =>          '</div>',
 					'separator' =>      ', ',
 				) );
-		?>
-
-		<div class="panel-footer">
-			<?php
-
-			echo '<span class="'.button_class( 'group' ).'">';
-			if( $action != 'view' )
-			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'" class="'.button_class( 'text' ).'">'.get_icon( 'magnifier' ).' '.T_('Details').'</a>';
-			}
-
-			echo $Item->get_history_link( array(
-					'class'     => button_class( 'text' ),
-					'link_text' => '$icon$ '.T_('History'),
-				) );
-
-			if( isset( $GLOBALS['files_Module'] )
-			    && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
-			    && $current_User->check_perm( 'files', 'view' ) )
-			{	// Display a button to view the files of the post only if current user has a permissions:
-				echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID )
-							.'" class="'.button_class( 'text' ).'">'.get_icon( 'folder' ).' '.T_('Attachments').'</a>';
-			}
-
-			if( $Blog->get_setting( 'allow_comments' ) != 'never' )
-			{
-				echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$Item->ID.'#comments" class="'.button_class( 'text' ).'">';
-				$comments_number = generic_ctp_number( $Item->ID, 'comments', 'total', true );
-				echo get_icon( $comments_number > 0 ? 'comments' : 'nocomment' ).' ';
-				// TRANS: Link to comments for current post
-				comments_number( T_('no comment'), T_('1 comment'), T_('%d comments'), $Item->ID );
-				load_funcs('comments/_trackback.funcs.php'); // TODO: use newer call below
-				trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);
-				echo '</a>';
-			}
-			echo '</span>';
-
-			echo '<span class="'.button_class( 'group' ).'"> ';
-			// Display edit button if current user has the rights:
-			$Item->edit_link( array( // Link to backoffice for editing
-					'before' => '',
-					'after'  => '',
-					'class'  => button_class( 'text_primary' ),
-					'text'   => get_icon( 'edit_button' ).' '.T_('Edit')
-				) );
-
-			// Display copy button if current user has the rights:
-			$Item->copy_link( array( // Link to backoffice for coping
-					'before' => '',
-					'after'  => '',
-					'text'   => '#icon#',
-					'class'  => button_class()
-				) );
-
-			// Display merge button if current user has the rights:
-			$Item->merge_link( array( // Link to backoffice for merging
-					'before' => '',
-					'after'  => '',
-					'class'  => button_class()
-				) );
-			echo '</span>';
-
-			echo '<span class="'.button_class( 'group' ).'"> ';
-			// Display the moderate buttons if current user has the rights:
-			$status_link_params = array(
-					'class'       => button_class( 'text' ),
-					'redirect_to' => regenerate_url( '', '&highlight='.$Item->ID.'#item_'.$Item->ID, '', '&' ),
-				);
-			$Item->next_status_link( $status_link_params, true );
-			$Item->next_status_link( $status_link_params, false );
-
-			$next_status_in_row = $Item->get_next_status( false );
-			if( $next_status_in_row && $next_status_in_row[0] != 'deprecated' )
-			{ // Display deprecate button if current user has the rights:
-				$Item->deprecate_link( '', '', get_icon( 'move_down_grey', 'imgtag', array( 'title' => '' ) ), '#', button_class() );
-			}
-
-			// Display delete button if current user has the rights:
-			$Item->delete_link( '', ' ', '#', '#', button_class( 'text' ), false );
-			echo '</span>';
-
-			?>
-
-			<div class="clearfix"></div>
-		</div>
-
-		<?php
 
 		// _____________________________________ Displayed in SINGLE VIEW mode only _____________________________________
-
+	?>
+	</div>
+	<?php
 		if( $action == 'view' )
 		{ // We are looking at a single post, include files and comments:
 
@@ -629,6 +645,8 @@ while( $Item = & $ItemList->get_item() )
 				if( ( $Comment = get_comment_from_session( 'unsaved', $comment_type ) ) === NULL )
 				{	// There is no saved Comment in Session
 					$Comment = new Comment();
+					$Comment->set( 'type', $comment_type );
+					$Comment->set( 'item_ID', $Item->ID );
 					$comment_attachments = '';
 					$checked_attachments = '';
 				}
@@ -691,6 +709,11 @@ while( $Item = & $ItemList->get_item() )
 			// Set b2evoCanvas for plugins:
 			echo '<script>var b2evoCanvas = document.getElementById( "'.$dummy_fields['content'].'" );</script>';
 
+			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $comment_renderers, array(
+					'Blog'         => & $Blog,
+					'setting_name' => 'coll_apply_comment_rendering'
+				) ) );
+
 			// Attach files:
 			if( !empty( $comment_attachments ) )
 			{	// display already attached files checkboxes
@@ -716,31 +739,12 @@ while( $Item = & $ItemList->get_item() )
 				// memorize all attachments ids
 				$Form->hidden( 'preview_attachments', $comment_attachments );
 			}
-			if( $Item->can_attach() )
-			{	// Display attach file input field:
-				$Form->input_field( array(
-						'label' => T_('Attach files'),
-						'note'  => get_icon( 'help', 'imgtag', array(
-								'data-toggle'    => 'tooltip',
-								'data-placement' => 'top',
-								'data-html'      => 'true',
-								'title'          => htmlspecialchars( get_upload_restriction( array(
-										'block_after'     => '',
-										'block_separator' => '<br /><br />' ) ) )
-							) ),
-						'name'  => 'uploadfile[]',
-						'type'  => 'file'
-					) );
-			}
 
-			$Form->info( T_('Text Renderers'), $Plugins->get_renderer_checkboxes( $comment_renderers, array(
-					'Blog'         => & $Blog,
-					'setting_name' => 'coll_apply_comment_rendering'
-				) ) );
+			// Display attachments fieldset:
+			$Form->attachments_fieldset( $Comment );
 
-			$preview_text = ( $Item->can_attach() ) ? T_('Preview/Add file') : /* TRANS: Verb */ T_('Preview');
 			$Form->buttons_input( array(
-					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => $preview_text ),
+					array( 'name' => 'submit_comment_post_'.$Item->ID.'[preview]', 'class' => 'preview btn-info', 'value' => /* TRANS: Verb */ T_('Preview') ),
 					array( 'name' => 'submit_comment_post_'.$Item->ID.'[save]', 'class' => 'submit SaveButton', 'value' => T_('Send comment') )
 				) );
 
@@ -864,9 +868,6 @@ while( $Item = & $ItemList->get_item() )
 		</div>
 		<?php
 	} // / comments requested
-?>
-</div>
-<?php
 }
 
 if( $action == 'view' )

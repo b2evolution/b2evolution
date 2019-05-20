@@ -251,8 +251,8 @@ function create_default_data()
 			'schema'         => 'Article',
 		);
 	$post_types[] = array(
-			'name'           => 'Podcast Episode',
-			'podcast'        => 1,
+			'name'          => 'Recipe',
+			'template_name' => 'recipe',
 		);
 	$post_types[] = array(
 			'name'           => 'Post with Custom Fields',
@@ -260,6 +260,13 @@ function create_default_data()
 	$post_types[] = array(
 			'name'           => 'Child Post',
 			'use_parent'     => 'required',
+		);
+	$post_types[] = array(
+			'name'           => 'Podcast Episode',
+			'podcast'        => 1,
+		);
+	$post_types[] = array(
+			'name'           => 'Photo Album',
 		);
 	$post_types[] = array(
 			'name'           => 'Manual Page',
@@ -271,7 +278,8 @@ function create_default_data()
 			'allow_html'     => 0,
 		);
 	$post_types[] = array(
-			'name'           => 'Photo Album',
+			'name'       => 'Bug Report',
+			'allow_html' => 0,
 		);
 	$post_types[] = array(
 			'name'           => 'Standalone Page',
@@ -286,6 +294,10 @@ function create_default_data()
 			'template_name'  => 'widget_page',
 			'perm_level'     => 'admin',
 			'use_text'       => 'never',
+			'allow_html'        => 0,
+			'allow_breaks'      => 0,
+			'allow_attachments' => 0,
+			'allow_featured'    => 0,
 			'use_comments'   => 0,
 			'use_coordinates'=> 'optional',
 		);
@@ -385,10 +397,6 @@ function create_default_data()
 			'use_comment_expiration' => 'never',
 		);
 	$post_types[] = array(
-			'name'       => 'Bug Report',
-			'allow_html' => 0,
-		);
-	$post_types[] = array(
 			'name'   => 'Product',
 			'schema' => 'Product',
 			'can_be_purchased_instore' => 1,
@@ -415,6 +423,7 @@ function create_default_data()
 			'title_maxlen'             => 100,
 			'allow_html'               => 1,
 			'allow_breaks'             => 1,
+			'allow_attachments'        => 1,
 			'allow_featured'           => 1,
 			'use_text'                 => 'optional',
 			'use_tags'                 => 'optional',
@@ -448,11 +457,12 @@ function create_default_data()
 	$DB->query( $post_types_sql );
 
 	// Item type custom fields:
-	$parent_ityp_ID          = 3;
-	$child_ityp_ID           = 4;
-	$product_ityp_ID         = 21;
-	$digital_product_ityp_ID = 22;
-	$review_ityp_ID          = 23;
+	$recipe_ityp_ID = 2;	
+	$parent_ityp_ID = 3;
+	$child_ityp_ID = 4;
+	$product_ityp_ID = 22;
+	$digital_product_ityp_ID = 23;
+	$review_ityp_ID = 24;
 	$custom_fields = array(
 		// for Item Type "Post with Custom Fields":
 		array(
@@ -580,6 +590,87 @@ function create_default_data()
 			'format'          => '#yes#;;#no#;n/a',
 			'cell_class'      => 'right',
 		),
+		// for Item Type "Recipe":
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Course'),
+			'name'            => 'course',
+			'type'            => 'varchar',
+			'order'           => 1,
+			'note'            => T_('E-g: ').'"'.TD_('Dessert').'"',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Cuisine'),
+			'name'            => 'cuisine',
+			'type'            => 'varchar',
+			'order'           => 2,
+			'note'            => T_('E-g: ').'"'.TD_('Italian').'"',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Servings'),
+			'name'            => 'servings',
+			'order'           => 3,
+			'note'            => TD_('people'),
+			'format'          => sprintf( TD_('%d people'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Prep Time'),
+			'name'            => 'prep_time',
+			'order'           => 4,
+			'note'            => TD_('minutes'),
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Cook Time'),
+			'name'            => 'cook_time',
+			'order'           => 5,
+			'note'            => TD_('minutes'),
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Passive Time'),
+			'name'            => 'passive_time',
+			'order'           => 6,
+			'note'            => TD_('minutes'),
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Total time'),
+			'name'            => 'total_time',
+			'type'            => 'computed',
+			'order'           => 7,
+			'format'          => sprintf( TD_('%s minutes'), 0 ),
+			'formula'         => '$prep_time$ + $cook_time$ + $passive_time$',
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
+		array(
+			'ityp_ID'         => $recipe_ityp_ID,
+			'label'           => TD_('Ingredients'),
+			'name'            => 'ingredients',
+			'type'            => 'text',
+			'order'           => 8,
+			'header_class'    => '',
+			'cell_class'      => '',
+		),
 		// for Item Type "Product":
 		array(
 			'ityp_ID'         => $product_ityp_ID,
@@ -703,6 +794,7 @@ function create_default_data()
 			'order'           => '',
 			'note'            => NULL,
 			'format'          => NULL,
+			'formula'         => NULL,
 			'header_class'    => 'right nowrap',
 			'cell_class'      => 'center',
 			'link'            => 'nolink',
@@ -772,7 +864,9 @@ function create_default_data()
 			(21, 'webm', 'WebM video file', 'video/webm', 'file_video', 'browser', 'registered'),
 			(22, 'ogv', 'Ogg video file', 'video/ogg', 'file_video', 'browser', 'registered'),
 			(23, 'm3u8', 'M3U8 video file', 'application/x-mpegurl', 'file_video', 'browser', 'registered'),
-			(24, 'xml', 'XML file', 'application/xml', 'file_www', 'browser', 'admin')
+			(24, 'xml', 'XML file', 'application/xml', 'file_www', 'browser', 'admin'),
+			(25, 'md', 'Markdown text file', 'text/plain', 'file_document', 'text', 'registered'),
+			(26, 'csv', 'CSV file', 'text/plain', 'file_document', 'text', 'registered')
 		" );
 	task_end();
 
@@ -1355,7 +1449,8 @@ function create_default_regions()
 			(76, 74, '04', 'La R\xE9union'),
 			(77, 74, '05', 'Mayotte'),
 			(78, 74, '09', 'Outre-Mer'),
-			(79, 74, '99', 'Monaco')", $current_charset, 'iso-8859-1' ) );
+			(79, 74, '99', 'Monaco')",
+		$current_charset, 'iso-8859-1' ) );
 
 	task_end();
 }
@@ -1479,7 +1574,8 @@ function create_default_subregions()
 			(103, 78, '986', 'Wallis-et-Futuna'),
 			(104, 78, '987', 'Polyn\xE9sie fran\xE7aise'),
 			(105, 78, '988', 'Nouvelle-Cal\xE9donie'),
-			(106, 79, '99', 'Monaco')", $current_charset, 'iso-8859-1') );
+			(106, 79, '99', 'Monaco')",
+		$current_charset, 'iso-8859-1') );
 
 	task_end();
 }
@@ -1950,205 +2046,5 @@ function create_default_posts_location()
 
 		echo_install_log( 'TEST FEATURE: Defining default location "France, Île-de-France, Paris" for all posts' );
 	}
-}
-
-
-/**
- * Create default newsletters
- */
-function create_default_newsletters()
-{
-	global $DB, $create_sample_contents;
-
-	task_begin( 'Creating default lists... ' );
-
-	if( $create_sample_contents )
-	{
-		// Insert default newsletters:
-		$DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order, enlt_owner_user_ID )
-			VALUES ( "News", "Send me news about this site.", 1, 1 ),
-			       ( "Promotions", "I want to receive ADs that may be relevant to my interests.", 2, 1 )' );
-
-		// Insert default subscriptions for each user on first newsletter:
-		$DB->query( 'REPLACE INTO T_email__newsletter_subscription ( enls_user_ID, enls_enlt_ID )
-			SELECT user_ID, 1 FROM T_users' );
-	}
-
-	task_end();
-}
-
-
-/**
- * Create default email campaigns
- */
-function create_default_email_campaigns()
-{
-	global $DB, $Settings, $create_sample_contents, $baseurl;
-
-	task_begin( 'Creating default email campaigns... ' );
-
-	if( $create_sample_contents )
-	{
-		load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
-		load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
-
-		$email_campaigns = array(
-			array(
-				'name' => T_('Markdown Example'),
-				'text' => T_('Heading
-=======
-
-Sub-heading
------------
-
-### H3 header
-
-#### H4 header ####
-
-> Email-style angle brackets
-> are used for blockquotes.
-
-> > And, they can be nested.
-
-> ##### Headers in blockquotes
->
-> * You can quote a list.
-> * Etc.
-
-[This is a link](http://b2evolution.net/) if Links are turned on in the markdown plugin settings
-
-Paragraphs are separated by a blank line.
-
-    This is a preformatted
-    code block.
-
-Text attributes *Italic*, **bold**, `monospace`.
-
-Shopping list:
-
-* apples
-* oranges
-* pears
-
-The rain---not the reign---in Spain.').
-"\n".
-T_('Button examples:
-[button]This is a button[/button]
-[like]I like this[/like] [dislike]I don\'t like this[/dislike]
-[cta:1:info]Call to action 1 info button[/cta] [cta:2:warning]Call to action 2 warning button[/cta] [cta:3:default]Call to action 3 default button[/cta]
-[cta:1:link]Call to action 1 link only[/cta]'),
-			),
-			array(
-				'name' => T_('Another example'),
-				'text' => sprintf( T_('Hello %s!'), '$firstname_and_login$' )."\r\n\r\n".T_('Here are some news...'),
-			),
-			array(
-				'name'  => T_('Welcome & Activate'),
-				'title' => sprintf( T_( 'Activate your account: %s' ), '$login$' ),
-				'text'  => sprintf( T_('Hello %s!'), '$username$' )."\r\n\r\n"
-					.sprintf( T_('You have recently registered a new account on %s .'), '<a href="'.$baseurl.'">'.$Settings->get( 'notification_short_name' ).'</a>' )."\r\n\r\n"
-					.'<b style="color:#d00">'.T_('You must activate this account by clicking below in order to be able to use all the site features.').'</b>'."\r\n\r\n"
-					.T_('Your login is: $login$')."\r\n\r\n"
-					.T_('Your email is: $email$')."\r\n\r\n"
-					.'[activate:primary]'.T_( 'Activate NOW' ).'[/activate]'
-			),
-		);
-
-		$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
-		foreach( $email_campaigns as $email_campaign )
-		{
-			$EmailCampaign = new EmailCampaign();
-			$EmailCampaign->set( 'enlt_ID', 1 );
-			$EmailCampaign->set( 'name', $email_campaign['name'] );
-			$EmailCampaign->set( 'email_title', isset( $email_campaign['title'] ) ? $email_campaign['title'] : $email_campaign['name'] );
-			$EmailCampaign->set( 'email_defaultdest', $baseurl );
-			$EmailCampaign->set( 'email_text', $email_campaign['text'] );
-
-			if( $EmailCampaign->dbinsert() && ! empty( $user_IDs ) )
-			{	// Add recipients after successfull email campaign creating,
-				// only if we have found the users in DB:
-				$EmailCampaign->add_recipients( $user_IDs );
-			}
-		}
-	}
-
-	task_end();
-}
-
-
-/**
- * Create default automations
- */
-function create_default_automations()
-{
-	global $DB, $create_sample_contents, $baseurl;
-
-	task_begin( 'Creating default automations... ' );
-
-	if( $create_sample_contents )
-	{
-		//load_funcs( 'automations/model/_automation.funcs.php' );
-		load_class( 'automations/model/_automation.class.php', 'Automation' );
-		load_class( 'automations/model/_automationstep.class.php', 'AutomationStep' );
-
-		$Automation = new Automation();
-		$Automation->set( 'name', T_('Sample Automation') );
-		$Automation->set( 'owner_user_ID', 1 );
-		$Automation->update_newsletters = true;
-		$Automation->newsletters = array( array(
-				'ID'        => 1,
-				'autostart' => 1,
-				'autoexit'  => 1,
-			) );
-
-		if( $Automation->dbinsert() )
-		{	// Add steps after successfull creating of the automation:
-			$AutomationStep = new AutomationStep();
-			$AutomationStep->set( 'autm_ID', $Automation->ID );
-			$AutomationStep->set( 'order', 1 );
-			$AutomationStep->set( 'type', 'notify_owner' );
-			$AutomationStep->set( 'info', '$login$ has reached step $step_number$ (ID: $step_ID$)'."\n".'in automation $automation_name$ (ID: $automation_ID$)' );
-			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
-			$AutomationStep->set( 'yes_next_step_delay', 86400 ); // 1 day
-			$AutomationStep->set( 'error_next_step_ID', 1 ); // Loop
-			$AutomationStep->set( 'error_next_step_delay', 14400 ); // 4 hours
-			$AutomationStep->set_label();
-			$AutomationStep->dbinsert();
-
-			$AutomationStep = new AutomationStep();
-			$AutomationStep->set( 'autm_ID', $Automation->ID );
-			$AutomationStep->set( 'order', 2 );
-			$AutomationStep->set( 'type', 'send_campaign' );
-			$AutomationStep->set( 'info', '1' ); // Email Campaign ID
-			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
-			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
-			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
-			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
-			$AutomationStep->set( 'error_next_step_ID', 2 ); // Loop
-			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
-			$AutomationStep->set_label();
-			$AutomationStep->dbinsert();
-
-			$AutomationStep = new AutomationStep();
-			$AutomationStep->set( 'autm_ID', $Automation->ID );
-			$AutomationStep->set( 'order', 3 );
-			$AutomationStep->set( 'type', 'send_campaign' );
-			$AutomationStep->set( 'info', '2' ); // Email Campaign ID
-			$AutomationStep->set( 'yes_next_step_ID', 0 ); // Continue
-			$AutomationStep->set( 'yes_next_step_delay', 259200 ); // 3 days
-			$AutomationStep->set( 'no_next_step_ID', 0 ); // Continue
-			$AutomationStep->set( 'no_next_step_delay', 0 ); // 0 seconds
-			$AutomationStep->set( 'error_next_step_ID', 3 ); // Loop
-			$AutomationStep->set( 'error_next_step_delay', 604800 ); // 7 days
-			$AutomationStep->set_label();
-			$AutomationStep->dbinsert();
-
-			// Add users to this automation:
-			$user_IDs = $DB->get_col( 'SELECT user_ID FROM T_users' );
-			$Automation->add_users( $user_IDs );
-		}
-	}
-
-	task_end();
 }
 ?>

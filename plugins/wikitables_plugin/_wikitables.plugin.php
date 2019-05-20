@@ -22,7 +22,7 @@ class wikitables_plugin extends Plugin
 	var $code = 'b2evWiTa';
 	var $name = 'Wiki Tables';
 	var $priority = 15;
-	var $version = '7.0.0';
+	var $version = '7.0.1';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -59,13 +59,8 @@ See manual for more.');
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_params = array(
-				'default_post_rendering' => 'opt-in'
+				'default_post_rendering' => 'opt-out'
 			);
-
-		if( isset( $params['blog_type'] ) && $params['blog_type'] == 'manual' )
-		{ // Set the default settings depends on blog type
-			$default_params['default_post_rendering'] = 'opt-out';
-		}
 
 		$tmp_params = array_merge( $params, $default_params );
 		return parent::get_coll_setting_definitions( $tmp_params );

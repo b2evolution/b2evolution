@@ -1189,8 +1189,15 @@ class TableDiffFormatter extends DiffFormatter {
 	}
 
 	function _block_header( $xbeg, $xlen, $ybeg, $ylen ) {
-		$r = '<tr><td colspan="2" class="diff-lineno">'.sprintf( T_('Line %s'), $xbeg ). ":</td>\n" .
-		  '<td colspan="2" class="diff-lineno">'.sprintf( T_('Line %s'), $ybeg ). ":</td></tr>\n";
+		if( isset( $this->block_header ) )
+		{	// Use custom block header:
+			$r = $this->block_header;
+		}
+		else
+		{	// Use default block header:
+			$r = '<tr><td colspan="2" class="diff-lineno">'.sprintf( T_('Line %s'), $xbeg ). ":</td>\n" .
+			  '<td colspan="2" class="diff-lineno">'.sprintf( T_('Line %s'), $ybeg ). ":</td></tr>\n";
+		}
 		return $r;
 	}
 

@@ -497,7 +497,14 @@ $AdminUI->set_path( 'collections', 'categories' );
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=colls_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
 $AdminUI->breadcrumbpath_add( T_('Categories'), $admin_url.'?ctrl=chapters&amp;blog=$blog$' );
 
-$AdminUI->set_page_manual_link( 'categories-tab' );
+if( in_array( $action, array( 'new', 'edit', 'copy', 'create', 'update' ) ) )
+{
+	$AdminUI->set_page_manual_link( 'category-edit-form' );
+}
+else
+{
+	$AdminUI->set_page_manual_link( 'categories-tab' );
+}
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 $AdminUI->disp_html_head();

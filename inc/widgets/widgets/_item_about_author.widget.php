@@ -175,7 +175,7 @@ class item_about_author_Widget extends ComponentWidget
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
-			$this->display_error_message( 'Widget "'.$this->get_name().'" is disabled because there is no Item object.' );
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item object.' );
 			return false;
 		}
 
@@ -183,7 +183,7 @@ class item_about_author_Widget extends ComponentWidget
 
 		if( empty( $this->disp_params['user_field'] ) )
 		{	// Not defined user field in the widget settings:
-			$this->display_error_message( 'Widget "'.$this->get_name().'" is disabled because there is no defined widget param "user_field".' );
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no defined widget param "user_field".' );
 			return false;
 		}
 
@@ -192,7 +192,7 @@ class item_about_author_Widget extends ComponentWidget
 		$creator_User->userfields_load();
 		if( empty( $creator_User->userfields_by_type[ $this->disp_params['user_field'] ] ) )
 		{	// No user field by ID for current author:
-			$this->display_debug_message( 'Widget "'.$this->get_name().'" is disabled because there is no defined widget param "user_field".' );
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no defined widget param "user_field".' );
 			return false;
 		}
 

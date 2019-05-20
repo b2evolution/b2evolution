@@ -31,7 +31,7 @@ $schema_queries = array(
 	'T_groups' => array(
 		'Creating table for Groups',
 		"CREATE TABLE T_groups (
-			grp_ID                           int(11) NOT NULL auto_increment,
+			grp_ID                           int(10) UNSIGNED NOT NULL auto_increment,
 			grp_name                         varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL default '',
 			grp_usage                        ENUM('primary','secondary') COLLATE ascii_general_ci NOT NULL DEFAULT 'primary',
 			grp_level                        int unsigned DEFAULT 0 NOT NULL,
@@ -50,7 +50,7 @@ $schema_queries = array(
 	'T_groups__groupsettings' => array(
 		'Creating table for Group Settings',
 		"CREATE TABLE T_groups__groupsettings (
-			gset_grp_ID INT(11) UNSIGNED NOT NULL,
+			gset_grp_ID INT(10) UNSIGNED NOT NULL,
 			gset_name VARCHAR(30) COLLATE ascii_general_ci NOT NULL,
 			gset_value VARCHAR(10000) COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY (gset_grp_ID, gset_name)
@@ -75,7 +75,7 @@ $schema_queries = array(
 	'T_users' => array(
 		'Creating table for Users',
 		"CREATE TABLE T_users (
-			user_ID int(11) unsigned NOT NULL auto_increment,
+			user_ID int(10) unsigned NOT NULL auto_increment,
 			user_login varchar(20) NOT NULL,
 			user_pass VARCHAR(64) NOT NULL,
 			user_salt VARCHAR(32) NOT NULL default '',
@@ -153,8 +153,8 @@ $schema_queries = array(
 	'T_users__reports' => array(
 		'Creating table for User reports',
 		"CREATE TABLE T_users__reports (
-			urep_target_user_ID int(11) unsigned NOT NULL,
-			urep_reporter_ID    int(11) unsigned NOT NULL,
+			urep_target_user_ID int(10) unsigned NOT NULL,
+			urep_reporter_ID    int(10) unsigned NOT NULL,
 			urep_status         enum( 'fake', 'guidelines', 'harass', 'spam', 'other' ) COLLATE ascii_general_ci,
 			urep_info           varchar(240) COLLATE utf8mb4_unicode_ci,
 			urep_datetime       TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
@@ -164,7 +164,7 @@ $schema_queries = array(
 	'T_users__invitation_code' => array(
 		'Creating table for User invitation codes',
 		"CREATE TABLE T_users__invitation_code (
-			ivc_ID        int(11) unsigned NOT NULL auto_increment,
+			ivc_ID        int(10) unsigned NOT NULL auto_increment,
 			ivc_code      varchar(32) COLLATE ascii_general_ci NOT NULL,
 			ivc_expire_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			ivc_source    varchar(30) NULL,
@@ -177,8 +177,8 @@ $schema_queries = array(
 	'T_users__organization' => array(
 		'Creating table for User organizations',
 		"CREATE TABLE T_users__organization (
-			org_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-			org_owner_user_ID INT(11) UNSIGNED NOT NULL,
+			org_ID            INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			org_owner_user_ID INT(10) UNSIGNED NOT NULL,
 			org_name          VARCHAR(255) COLLATE utf8mb4_unicode_ci NOT NULL,
 			org_url           VARCHAR(2000) NULL,
 			org_accept        ENUM( 'yes', 'owner', 'no' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'owner',
@@ -190,8 +190,8 @@ $schema_queries = array(
 	'T_users__user_org' => array(
 		'Creating table for relations users with organizations',
 		"CREATE TABLE T_users__user_org (
-			uorg_user_ID  INT(11) UNSIGNED NOT NULL,
-			uorg_org_ID   INT(11) UNSIGNED NOT NULL,
+			uorg_user_ID  INT(10) UNSIGNED NOT NULL,
+			uorg_org_ID   INT(10) UNSIGNED NOT NULL,
 			uorg_accepted TINYINT(1) DEFAULT 0,
 			uorg_role     VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL,
 			uorg_priority INT(11) NULL,
@@ -201,16 +201,16 @@ $schema_queries = array(
 	'T_users__secondary_user_groups' => array(
 		'Creating table for secondary user groups',
 		"CREATE TABLE T_users__secondary_user_groups (
-			sug_user_ID INT(11) UNSIGNED NOT NULL,
-			sug_grp_ID  INT(11) UNSIGNED NOT NULL,
+			sug_user_ID INT(10) UNSIGNED NOT NULL,
+			sug_grp_ID  INT(10) UNSIGNED NOT NULL,
 			PRIMARY KEY ( sug_user_ID, sug_grp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_users__profile_visits' => array(
 		'Creating table for profile visits',
 		"CREATE TABLE T_users__profile_visits (
-			upv_visited_user_ID INT(11) UNSIGNED NOT NULL,
-			upv_visitor_user_ID INT(11) UNSIGNED NOT NULL,
+			upv_visited_user_ID INT(10) UNSIGNED NOT NULL,
+			upv_visitor_user_ID INT(10) UNSIGNED NOT NULL,
 			upv_last_visit_ts   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY ( upv_visited_user_ID, upv_visitor_user_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -218,7 +218,7 @@ $schema_queries = array(
 	'T_users__profile_visit_counters' => array(
 		'Creating table for profile visit counters',
 		"CREATE TABLE T_users__profile_visit_counters (
-			upvc_user_ID  INT(11) UNSIGNED NOT NULL,
+			upvc_user_ID  INT(10) UNSIGNED NOT NULL,
 			upvc_total_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
 			upvc_last_view_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			upvc_new_unique_visitors INT(10) UNSIGNED NOT NULL DEFAULT 0,
@@ -228,7 +228,7 @@ $schema_queries = array(
 	'T_users__tag' => array(
 		'Creating table for user tags',
 		"CREATE TABLE T_users__tag (
-			utag_ID   INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			utag_ID   INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			utag_name VARCHAR(200) COLLATE utf8mb4_unicode_ci NOT NULL,
 			PRIMARY KEY (utag_ID),
 			UNIQUE  utag_name(utag_name(191))
@@ -237,8 +237,8 @@ $schema_queries = array(
 	'T_users__usertag' => array(
 		'Creating table for User-to-Tag relationships',
 		"CREATE TABLE T_users__usertag (
-			uutg_user_ID INT(11) UNSIGNED NOT NULL,
-			uutg_emtag_ID INT(11)  UNSIGNED NOT NULL,
+			uutg_user_ID INT(10) UNSIGNED NOT NULL,
+			uutg_emtag_ID INT(10)  UNSIGNED NOT NULL,
 			PRIMARY KEY (uutg_user_ID, uutg_emtag_ID),
 			UNIQUE taguser(uutg_emtag_ID, uutg_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -312,7 +312,7 @@ $schema_queries = array(
 	'T_users__usersettings' => array(
 		'Creating user settings table',
 		"CREATE TABLE T_users__usersettings (
-			uset_user_ID INT(11) UNSIGNED NOT NULL,
+			uset_user_ID INT(10) UNSIGNED NOT NULL,
 			uset_name    VARCHAR(50) COLLATE ascii_general_ci NOT NULL,
 			uset_value   VARCHAR(10000) COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY ( uset_user_ID, uset_name )
@@ -321,7 +321,7 @@ $schema_queries = array(
 	'T_plugins' => array(
 		'Creating plugins table',
 		"CREATE TABLE T_plugins (
-			plug_ID              INT(11) UNSIGNED NOT NULL auto_increment,
+			plug_ID              INT(10) UNSIGNED NOT NULL auto_increment,
 			plug_priority        TINYINT UNSIGNED NOT NULL default 50,
 			plug_classname       VARCHAR(40) COLLATE ascii_general_ci NOT NULL default '',
 			plug_code            VARCHAR(32) COLLATE ascii_general_ci NULL,
@@ -338,7 +338,7 @@ $schema_queries = array(
 	'T_pluginsettings' => array(
 		'Creating plugin settings table',
 		"CREATE TABLE T_pluginsettings (
-			pset_plug_ID INT(11) UNSIGNED NOT NULL,
+			pset_plug_ID INT(10) UNSIGNED NOT NULL,
 			pset_name VARCHAR( 60 ) COLLATE ascii_general_ci NOT NULL,
 			pset_value TEXT COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY ( pset_plug_ID, pset_name )
@@ -347,8 +347,8 @@ $schema_queries = array(
 	'T_pluginusersettings' => array(
 		'Creating plugin user settings table',
 		"CREATE TABLE T_pluginusersettings (
-			puset_plug_ID INT(11) UNSIGNED NOT NULL,
-			puset_user_ID INT(11) UNSIGNED NOT NULL,
+			puset_plug_ID INT(10) UNSIGNED NOT NULL,
+			puset_user_ID INT(10) UNSIGNED NOT NULL,
 			puset_name VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
 			puset_value TEXT COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY ( puset_plug_ID, puset_user_ID, puset_name )
@@ -357,8 +357,8 @@ $schema_queries = array(
 	'T_plugingroupsettings' => array(
 		'Creating plugin group settings table',
 		"CREATE TABLE T_plugingroupsettings (
-			pgset_plug_ID INT(11) UNSIGNED NOT NULL,
-			pgset_grp_ID  INT(11) UNSIGNED NOT NULL,
+			pgset_plug_ID INT(10) UNSIGNED NOT NULL,
+			pgset_grp_ID  INT(10) UNSIGNED NOT NULL,
 			pgset_name    VARCHAR( 50 ) COLLATE ascii_general_ci NOT NULL,
 			pgset_value   TEXT COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY   ( pgset_plug_ID, pgset_grp_ID, pgset_name )
@@ -367,7 +367,7 @@ $schema_queries = array(
 	'T_pluginevents' => array(
 		'Creating plugin events table',
 		"CREATE TABLE T_pluginevents(
-			pevt_plug_ID INT(11) UNSIGNED NOT NULL,
+			pevt_plug_ID INT(10) UNSIGNED NOT NULL,
 			pevt_event VARCHAR(40) COLLATE ascii_general_ci NOT NULL,
 			pevt_enabled TINYINT NOT NULL DEFAULT 1,
 			PRIMARY KEY( pevt_plug_ID, pevt_event )
@@ -392,7 +392,7 @@ $schema_queries = array(
 			clog_ctsk_ID              int(10) unsigned   not null,
 			clog_realstart_datetime   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			clog_realstop_datetime    TIMESTAMP NULL,
-			clog_status               enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started',
+			clog_status               enum('started','finished','error','imap_error','timeout','warning') COLLATE ascii_general_ci not null default 'started',
 			clog_messages             MEDIUMTEXT COLLATE utf8mb4_unicode_ci,
 			clog_actions_num          INT UNSIGNED NULL,
 			PRIMARY KEY (clog_ctsk_ID)
@@ -475,7 +475,7 @@ $schema_queries = array(
 			slug_ID int(10) unsigned NOT NULL auto_increment,
 			slug_title varchar(255) COLLATE ascii_bin NOT NULL,
 			slug_type	char(6) COLLATE ascii_bin NOT NULL DEFAULT 'item',
-			slug_itm_ID	int(11) unsigned,
+			slug_itm_ID	int(10) unsigned,
 			PRIMARY KEY slug_ID (slug_ID),
 			UNIQUE	slug_title (slug_title)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -620,10 +620,10 @@ $schema_queries = array(
 	'T_email__campaign_send' => array(
 		'Creating email campaign send data table',
 		"CREATE TABLE T_email__campaign_send (
-			csnd_camp_ID             INT(11) UNSIGNED NOT NULL,
-			csnd_user_ID             INT(11) UNSIGNED NOT NULL,
+			csnd_camp_ID             INT(10) UNSIGNED NOT NULL,
+			csnd_user_ID             INT(10) UNSIGNED NOT NULL,
 			csnd_status              ENUM('ready_to_send', 'ready_to_resend', 'sent', 'send_error', 'skipped' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'ready_to_send',
-			csnd_emlog_ID            INT(11) UNSIGNED NULL,
+			csnd_emlog_ID            INT(10) UNSIGNED NULL,
 			csnd_clicked_unsubscribe TINYINT(1) UNSIGNED DEFAULT 0,
 			csnd_last_sent_ts        TIMESTAMP NULL,
 			csnd_last_open_ts        TIMESTAMP NULL,
@@ -659,17 +659,17 @@ $schema_queries = array(
 	'T_automation__step' => array(
 		'Creating automation step table',
 		"CREATE TABLE T_automation__step (
-			step_ID                    INT UNSIGNED NOT NULL AUTO_INCREMENT,
-			step_autm_ID               INT UNSIGNED NOT NULL,
+			step_ID                    INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			step_autm_ID               INT(10) UNSIGNED NOT NULL,
 			step_order                 INT NOT NULL DEFAULT 1,
 			step_label                 VARCHAR(500) COLLATE utf8mb4_unicode_ci NULL,
 			step_type                  ENUM('if_condition', 'send_campaign', 'notify_owner', 'add_usertag', 'remove_usertag', 'subscribe', 'unsubscribe', 'start_automation', 'user_status') COLLATE ascii_general_ci NOT NULL DEFAULT 'if_condition',
 			step_info                  TEXT COLLATE utf8mb4_unicode_ci NULL,
-			step_yes_next_step_ID      INT NULL,
+			step_yes_next_step_ID      INT(10) UNSIGNED NULL,
 			step_yes_next_step_delay   INT UNSIGNED NULL,
-			step_no_next_step_ID       INT NULL,
+			step_no_next_step_ID       INT(10) UNSIGNED NULL,
 			step_no_next_step_delay    INT UNSIGNED NULL,
-			step_error_next_step_ID    INT NULL,
+			step_error_next_step_ID    INT(10) UNSIGNED NULL,
 			step_error_next_step_delay INT UNSIGNED NULL,
 			step_diagram               VARCHAR(64) NULL,
 			PRIMARY KEY                (step_ID),
@@ -689,7 +689,7 @@ $schema_queries = array(
 	'T_syslog' => array(
 		'Creating system log table',
 		"CREATE TABLE T_syslog (
-			slg_ID        INT NOT NULL AUTO_INCREMENT,
+			slg_ID        INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			slg_timestamp TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			slg_user_ID   INT UNSIGNED NULL,
 			slg_type      ENUM('info', 'warning', 'error', 'critical_error') COLLATE ascii_general_ci NOT NULL DEFAULT 'info',

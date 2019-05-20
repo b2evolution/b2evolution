@@ -21,7 +21,7 @@ class photoalbums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.0.0';
+	var $version = '7.0.1';
 
 	/**
 	 * Get default name for the skin.
@@ -225,13 +225,6 @@ class photoalbums_Skin extends Skin
 					'note' => T_('Display banner for "Public" posts (posts & comments)'),
 					'defaultvalue' => 1,
 					'type' => 'checkbox',
-				),
-				'mediaidx_thumb_size' => array(
-					'label' => T_('Thumbnail size for media index'),
-					'note' => '',
-					'defaultvalue' => 'fit-128x128',
-					'options' => get_available_thumb_sizes(),
-					'type' => 'select',
 				),
 				'posts_thumb_size' => array(
 					'label' => T_('Thumbnail size in post list'),

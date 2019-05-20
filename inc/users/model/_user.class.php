@@ -1394,7 +1394,7 @@ class User extends DataObject
 				//   - password change requested by email
 				//   - password has not been set yet(email capture/quick registration)
 
-				if( $is_new_user && empty( $edited_user_pass1 ) && empty( $edited_user_pass2 ) )
+				if( $is_new_user && param( 'init_pass', 'string' ) == 'user' )
 				{	// Allow to create new user without password from back-office by admin:
 					$this->set( 'pass_driver', 'nopass' );
 					$this->set( 'pass', '' );
@@ -1616,6 +1616,7 @@ class User extends DataObject
 				{	// update 'notify_post_moderation', 'notify_edit_pst_moderation' and 'send_cmt_moderation_reminder' only if user is post moderator at least in one collection:
 					$UserSettings->set( 'notify_post_moderation', param( 'edited_user_notify_post_moderation', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_edit_pst_moderation', param( 'edited_user_notify_edit_pst_moderation', 'integer', 0 ), $this->ID );
+					$UserSettings->set( 'notify_post_proposed', param( 'edited_user_notify_post_proposed', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_moderation_reminder', param( 'edited_user_send_pst_moderation_reminder', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'send_pst_stale_alert', param( 'edited_user_send_pst_stale_alert', 'integer', 0 ), $this->ID );
 				}
@@ -2334,7 +2335,7 @@ class User extends DataObject
 			$SQL->SELECT( 'comment_status, COUNT(*)' );
 			$SQL->FROM( 'T_comments' );
 			$SQL->WHERE( 'comment_author_user_ID = '.$this->ID );
-			$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback" )' );
+			$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback", "webmentions" )' );
 			$SQL->GROUP_BY( 'comment_status' );
 			$this->_num_comments = $DB->get_assoc( $SQL );
 
@@ -2610,7 +2611,7 @@ class User extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), rel_path_to_base($userdir) )
-							.get_manual_link('directory_creation_error'), 'error' );
+							.get_manual_link('directory-creation-error'), 'error' );
 				}
 				return false;
 			}
@@ -2619,7 +2620,7 @@ class User extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add( sprintf( T_("The user's media directory &laquo;%s&raquo; could not be created."), rel_path_to_base($userdir) )
-							.get_manual_link('directory_creation_error'), 'error' );
+							.get_manual_link('directory-creation-error'), 'error' );
 				}
 				return false;
 			}
@@ -3167,6 +3168,7 @@ class User extends DataObject
 			// NOTE: these are currently the only collections that will check multiple user groups:
 			case 'blog_ismember':
 			case 'blog_can_be_assignee':
+			case 'blog_item_propose':
 			case 'blog_post_statuses':
 			case 'blog_post!published':
 			case 'blog_post!community':
@@ -3242,7 +3244,7 @@ class User extends DataObject
 						if( $perm_Blog = & $BlogCache->get_by_ID( $perm_target_ID, false, false ) )
 						{
 							if( $this->check_perm( 'blogs', 'create', $assert, $perm_Blog->get( 'sec_ID' ) ) )
-							{	// If user can create new colleciton in section of the duplicating collection:
+							{	// If user can create new collection in section of the duplicating collection:
 								if( $perm_Blog->get_setting( 'allow_duplicate' ) ||
 								    $this->check_perm( 'blog_properties', 'edit', false, $perm_Blog->ID ) )
 								{	// If the collection is allowed to duplicate by anyone OR user can edit the duplicating collection:
@@ -6775,9 +6777,10 @@ class User extends DataObject
 	/**
 	 * Delete private messaged of the user
 	 *
+	 * @param string Type ( sent | received )
 	 * @return boolean True on success
 	 */
-	function delete_messages()
+	function delete_messages( $type = 'sent' )
 	{
 		global $DB, $Plugins, $current_User;
 
@@ -6792,21 +6795,35 @@ class User extends DataObject
 
 		$MessageCache = & get_MessageCache();
 		$MessageCache->clear();
-		$MessageCache->load_where( 'msg_author_user_ID = '.$this->ID );
-		$message_was_deleted = false;
+		if( $type == 'received' )
+		{	// Received messages:
+			$SQL = $MessageCache->get_SQL_object();
+			$SQL->FROM_add( 'INNER JOIN T_messaging__threadstatus ON tsta_thread_ID = msg_thread_ID' );
+			$SQL->WHERE( 'tsta_user_ID = '.$DB->quote( $this->ID ) );
+			$SQL->WHERE_and( 'msg_author_user_ID != '.$DB->quote( $this->ID ) );
+			$MessageCache->load_by_sql( $SQL );
+		}
+		else
+		{	// Sent messages:
+			$MessageCache->load_where( 'msg_author_user_ID = '.$this->ID );
+		}
 
+		$thread_IDs = array();
 		while( ( $iterator_Message = & $MessageCache->get_next() ) != NULL )
 		{ // Iterate through MessageCache
 			// Delete a message from DB:
-			$iterator_Message->dbdelete();
-			$message_was_deleted = true;
+			$msg_thread_ID = $iterator_Message->get( 'thread_ID' );
+			if( $iterator_Message->dbdelete() )
+			{
+				$thread_IDs[ $msg_thread_ID ] = NULL;
+			}
 		}
 
-		if( $message_was_deleted )
-		{ // at least one message was deleted
-			// Delete statuses
+		if( ! empty( $thread_IDs ) )
+		{	// Delete read statuses of the threads where message was deleted:
 			$DB->query( 'DELETE FROM T_messaging__threadstatus
-							WHERE tsta_user_ID = '.$DB->quote( $this->ID ) );
+				WHERE tsta_user_ID = '.$DB->quote( $this->ID ).'
+				  AND tsta_thread_ID IN ( '.$DB->quote( array_keys( $thread_IDs ) ).' )' );
 		}
 
 		$DB->commit();

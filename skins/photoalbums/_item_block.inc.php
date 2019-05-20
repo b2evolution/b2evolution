@@ -92,8 +92,16 @@ $params = array_merge( array(
 
 		<div class="item_comments">
 			<?php
+			if( is_single_page() )
+			{	// Display comments only on single Item's page:
 				// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 				skin_include( '_item_feedback.inc.php', array(
+						'disp_comments'        => true,
+						'disp_comment_form'    => true,
+						'disp_trackbacks'      => true,
+						'disp_trackback_url'   => true,
+						'disp_pingbacks'       => true,
+						'disp_webmentions'     => true,
 						'before_section_title' => '<h4>',
 						'after_section_title'  => '</h4>',
 						'author_link_text'     => 'auto',
@@ -102,6 +110,7 @@ $params = array_merge( array(
 				// Note: You can customize the default item feedback by copying the generic
 				// /skins/_item_feedback.inc.php file into the current skin folder.
 				// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+			}
 			?>
 		</div>
 

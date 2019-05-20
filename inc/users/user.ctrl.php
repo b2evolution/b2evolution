@@ -129,6 +129,7 @@ if( !$Messages->has_errors() )
 			else
 			{ // We use an empty user:
 				$edited_User = new User();
+				$edited_User->set( 'status', 'manualactivated' );
 			}
 			break;
 
@@ -440,6 +441,16 @@ if( !$Messages->has_errors() )
 				$UserList->refresh_query = true;
 				$UserList->query();
 
+				if( param( 'send_pass_email', 'integer', 0 ) )
+				{	// Inform new created user by email:
+					locale_temp_switch( $edited_User->get( 'locale' ) );
+					send_mail_to_User( $edited_User->ID, sprintf( T_('Your new account on %s'), $Settings->get( 'notification_short_name' ) ), 'new_account_password_info', array(
+							'login'    => $edited_User->get( 'login' ),
+							'password' => get_param( 'edited_user_pass1' ),
+						), true );
+					locale_restore_previous();
+				}
+
 				header_redirect( regenerate_url( 'ctrl,action', 'ctrl=users&action=list', '', '&' ), 303 );
 			}
 			else
@@ -700,9 +711,31 @@ if( !$Messages->has_errors() )
 
 			if( param( 'confirm', 'integer', 0 ) )
 			{	// confirmed
-				if( $edited_User->delete_messages() )
+				if( $edited_User->delete_messages( 'sent' ) )
 				{	// The messages were deleted successfully
 					$Messages->add( T_('The private messages sent by the user were deleted.'), 'success' );
+
+					// Redirect so that a reload doesn't write to the DB twice:
+					header_redirect( '?ctrl=user&user_tab=activity&user_ID='.$user_ID, 303 ); // Will EXIT
+					// We have EXITed already at this point!!
+				}
+			}
+			break;
+
+		case 'delete_all_received_messages':
+			// Delete all messages received by the user
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'user' );
+
+			// Check edit permissions:
+			$current_User->can_moderate_user( $edited_User->ID, true );
+
+			if( param( 'confirm', 'integer', 0 ) )
+			{	// confirmed
+				if( $edited_User->delete_messages( 'received' ) )
+				{	// The messages were deleted successfully
+					$Messages->add( T_('The private messages received by the user were deleted.'), 'success' );
 
 					// Redirect so that a reload doesn't write to the DB twice:
 					header_redirect( '?ctrl=user&user_tab=activity&user_ID='.$user_ID, 303 ); // Will EXIT
@@ -1165,7 +1198,7 @@ switch( $action )
 				load_funcs( 'polls/model/_poll.funcs.php' );
 				$AdminUI->disp_payload_begin();
 
-				if( in_array( $action, array( 'delete_all_sent_emails', 'delete_all_email_returns', 'delete_all_blogs', 'delete_all_posts_created', 'delete_all_posts_edited', 'delete_all_comments', 'delete_all_messages', 'delete_all_polls', 'delete_all_userdata' ) ) )
+				if( in_array( $action, array( 'delete_all_sent_emails', 'delete_all_email_returns', 'delete_all_blogs', 'delete_all_posts_created', 'delete_all_posts_edited', 'delete_all_comments', 'delete_all_messages', 'delete_all_received_messages', 'delete_all_polls', 'delete_all_userdata' ) ) )
 				{	// We need to ask for confirmation before delete:
 					param( 'user_ID', 'integer', 0 , true ); // Memorize user_ID
 					// Create Data Object to user only one method confirm_delete()
@@ -1220,10 +1253,18 @@ switch( $action )
 							break;
 
 						case 'delete_all_messages':
-							$messages_count = $edited_User->get_num_messages();
+							$messages_count = $edited_User->get_num_messages( 'sent' );
 							if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
 							{	// Display a confirm message if curent user can delete the messages sent by the edited user
 								$confirm_message = sprintf( T_('Delete %d private messages sent by the user?'), $messages_count );
+							}
+							break;
+
+						case 'delete_all_received_messages':
+							$messages_count = $edited_User->get_num_messages( 'received' );
+							if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
+							{	// Display a confirm message if curent user can delete the messages sent by the edited user
+								$confirm_message = sprintf( T_('Delete %d private messages received by the user?'), $messages_count );
 							}
 							break;
 

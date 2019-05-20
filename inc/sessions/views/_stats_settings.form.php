@@ -38,7 +38,7 @@ $Form->hidden( 'action', 'update_settings' );
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit_logging') );
+$Form->begin_fieldset( T_('Hit & session logging').get_manual_link('hit-logging') );
 
 	$Form->checklist( array(
 			array( 'log_public_hits', 1, T_('on every public page'), $Settings->get('log_public_hits') ),

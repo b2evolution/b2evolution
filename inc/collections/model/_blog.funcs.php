@@ -107,6 +107,8 @@ function blog_update_perms( $object_ID, $context = 'user' )
 		$ismember = param( 'blog_ismember_'.$loop_ID, 'integer', 0 );
 		$can_be_assignee = param( 'blog_can_be_assignee_'.$loop_ID, 'integer', 0 );
 
+		$perm_item_propose = param( 'blog_perm_item_propose_'.$loop_ID, 'integer', 0 );
+
 		$perm_published = param( 'blog_perm_published_'.$loop_ID, 'string', '' );
 		if( !empty($perm_published) ) $perm_post[] = 'published';
 
@@ -171,13 +173,13 @@ function blog_update_perms( $object_ID, $context = 'user' )
 
 		// Update those permissions in DB:
 
-		if( $ismember || $can_be_assignee || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
+		if( $ismember || $can_be_assignee || $perm_item_propose || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
 			$perm_meta_comments || $perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change || $perm_analytics )
 		{ // There are some permissions for this user:
 			$ismember = 1;	// Must have this permission
 
 			// insert new perms:
-			$inserted_values[] = " ( $main_object_ID, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote( implode( ',',$perm_post ) ).",
+			$inserted_values[] = " ( $main_object_ID, $loop_ID, $ismember, $can_be_assignee, $perm_item_propose, ".$DB->quote( implode( ',',$perm_post ) ).",
 																".$DB->quote( $perm_item_type ).", ".$DB->quote( $perm_edit ).",
 																$perm_delpost, $perm_edit_ts, $perm_delcmts, $perm_recycle_owncmts, $perm_vote_spam_comments, $perm_cmtstatuses,
 																".$DB->quote( $perm_edit_cmt ).",
@@ -190,7 +192,7 @@ function blog_update_perms( $object_ID, $context = 'user' )
 	if( count( $inserted_values ) )
 	{
 		$DB->query( "INSERT INTO $table( {$ID_field_main}, {$ID_field_edit}, {$prefix}ismember, {$prefix}can_be_assignee,
-											{$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
+											{$prefix}perm_item_propose, {$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
 											{$prefix}perm_delcmts, {$prefix}perm_recycle_owncmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_cmtstatuses, {$prefix}perm_edit_cmt,
 											{$prefix}perm_meta_comment, {$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
 											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change, {$prefix}perm_analytics )
@@ -313,7 +315,7 @@ function valid_blog_requested()
 		if( $blog_ID )
 		{
 			$BlogCache = & get_BlogCache();
-			$Collection = $Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			$Collection = $Blog = $BlogCache->get_by_ID( $blog_ID, false, false );
 		}
 	}
 
@@ -1582,9 +1584,10 @@ function can_be_displayed_with_status( $status, $type, $blog_ID, $creator_user_I
  * @param object|NULL Current collection, Used for additional checking
  * @param boolean true if function $BlogCache->get_by_ID() should die on error
  * @param boolean true if function $BlogCache->get_by_ID() should die on empty/null
+ * @param boolean true to get first detected collection from DB when requested collection is not defined
  * @return object|NULL|false
  */
-function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error = false, $halt_on_empty = false )
+function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error = false, $halt_on_empty = false, $get_first = false )
 {
 	global $Settings;
 
@@ -1600,6 +1603,12 @@ function & get_setting_Blog( $setting_name, $current_Blog = NULL, $halt_on_error
 	{ // Check if blog really exists in DB
 		$BlogCache = & get_BlogCache();
 		$setting_Blog = & $BlogCache->get_by_ID( $blog_ID, $halt_on_error, $halt_on_empty );
+	}
+
+	if( $get_first && empty( $setting_Blog ) )
+	{	// Try to get first collection from DB:
+		$BlogCache = & get_BlogCache();
+		$setting_Blog = & $BlogCache->get_first();
 	}
 
 	if( $setting_name == 'login_blog_ID' &&
@@ -1742,6 +1751,40 @@ function get_post_orderby_options( $coll_ID = NULL, $selected_value, $allow_none
 	}
 
 	return $option_list;
+}
+
+
+/**
+ * Get JavaScript to enable/disable fields to order post fields
+ * (used on ?ctrl=coll_settings&tab=features and for "Universal Item list" widget settings form)
+ *
+ * @param string "Order by" field name
+ * @param string "Order direction" field name
+ * @return string JavaScript
+ */
+function get_post_orderby_js( $field_order_by, $field_order_dir )
+{
+	return 'jQuery( document ).ready( function() { disable_selected_orderby_options(); } );
+jQuery( "select[id^='.$field_order_by.']" ).change( function() { disable_selected_orderby_options(); } );
+function disable_selected_orderby_options()
+{
+	// Disable/Enable second additional order field if the first was changed:
+	jQuery( "#'.$field_order_by.'_2, #'.$field_order_dir.'_2" ).prop( "disabled", jQuery( "#'.$field_order_by.'_1" ).val() == "" );
+
+	// Redisable options after some order field was changed:
+	jQuery( "select[id^='.$field_order_by.'] option" ).prop( "disabled", false );
+	jQuery( "select[id^='.$field_order_by.']" ).each( function()
+	{
+		var selected = jQuery( this ).val();
+		if( selected != "" )
+		{
+			jQuery( "select[id^='.$field_order_by.'][id!=" + jQuery( this ).attr( "id" ) + "]" ).each( function()
+			{
+				jQuery( this ).find( "option[value=" + selected + "]" ).prop( "disabled", true );
+			} );
+		}
+	} );
+}';
 }
 
 
@@ -1952,7 +1995,7 @@ function blogs_all_results_block( $params = array() )
 		$order_data = param( 'order_data', 'string' );
 
 		if( $order_action == 'update' )
-		{	// Update colleciton order to new value:
+		{	// Update collection order to new value:
 			$order_obj_ID = intval( str_replace( 'order-blog-', '', $order_data ) );
 			if( $order_obj_ID > 0 )
 			{	// Update collection order if ID is valid integer:
@@ -2013,7 +2056,7 @@ function blogs_all_results_block( $params = array() )
 			. ' AND ( bloggroup_group_ID = ' . $current_User->grp_ID
 			. '       OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) ) )' );
 		$section_where_sql = '';
-		$colleciton_where_sql = 'blog_owner_user_ID = '.$current_User->ID
+		$collection_where_sql = 'blog_owner_user_ID = '.$current_User->ID
 			.' OR bloguser_ismember <> 0'
 			.' OR bloggroup_ismember <> 0';
 		if( $params['grouped'] )
@@ -2027,10 +2070,10 @@ function blogs_all_results_block( $params = array() )
 			if( ! empty( $perm_allowed_sections ) )
 			{	// If at least one section is specified to be allowed for new collections:
 				$section_where_sql .= '( sec_ID IN ( '.$DB->quote( explode( ',', $perm_allowed_sections ) ).' ) '
-					.'AND ( '.$colleciton_where_sql.' ) ) OR ';
+					.'AND ( '.$collection_where_sql.' ) ) OR ';
 			}
 		}
-		$SQL->WHERE( $section_where_sql.$colleciton_where_sql );
+		$SQL->WHERE( $section_where_sql.$collection_where_sql );
 
 		$no_results = $params['results_no_perm_text'];
 	}
@@ -2065,7 +2108,7 @@ function blogs_all_results_block( $params = array() )
 		'is_filtered' => ! empty( $collection_filters ),
 		'url_ignore' => 'results_blog_page',
 		'presets'  => array(
-			'all' => array( T_('All'), '?cf_type=&cf_name=&cf_owner=' )
+			'all' => array( T_('All'), '?ctrl=collections&amp;cf_type=&amp;cf_name=&amp;cf_owner=' )
 		)
 	);
 
@@ -2101,15 +2144,13 @@ function blogs_all_results_block( $params = array() )
 
 
 /**
- * Display all blogs results table
+ * Display models to start new collections results table
  *
  * @param array Params
  */
 function blogs_model_results_block( $params = array() )
 {
-	global $admin_url, $current_User;
-
-	$is_coll_admin = $current_User->check_perm( 'blog_admin', 'editAll', false );
+	global $admin_url, $current_User, $DB;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -2118,10 +2159,19 @@ function blogs_model_results_block( $params = array() )
 			'results_no_text'      => T_('No model available'),
 		), $params );
 
-	if( !is_logged_in() )
-	{ // Only logged in users can access this function
+	if( ! is_logged_in() || ! $current_User->check_perm( 'blogs', 'create' ) )
+	{	// Only logged in users which can create new collections can access this function
 		return;
 	}
+
+	// Check if at least one collection exists in DB:
+	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+	if( get_table_count( 'T_blogs' ) == 0 )
+	{	// Don't display this panel if no collections:
+		return;
+	}
+
+	$is_coll_admin = $current_User->check_perm( 'blog_admin', 'editAll' );
 
 	global $current_User;
 

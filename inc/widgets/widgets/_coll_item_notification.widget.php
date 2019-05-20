@@ -137,13 +137,11 @@ class coll_item_notification_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item;
-		global $current_User;
-		global $Collection, $Blog;
+		global $Collection, $Blog, $Item, $current_User;
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
-			$this->display_error_message( 'Widget "'.$this->get_name().'" is disabled because there is no Item object.' );
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item object.' );
 			return false;
 		}
 
@@ -158,7 +156,6 @@ class coll_item_notification_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		$params = array_merge( array(
-			'widget_coll_item_notification_display' => true,
 			'widget_coll_item_notification_params'  => array(),
 		), $params );
 
@@ -169,7 +166,7 @@ class coll_item_notification_Widget extends ComponentWidget
 				'notification_after'  => '</nav>',
 			), $params['widget_coll_item_notification_params'] );
 
-		if( $params['widget_coll_item_notification_display'] && is_logged_in() && $Item->can_comment( NULL ) )
+		if( is_logged_in() && $Item->can_comment( NULL ) )
 		{
 			global $DB;
 			global $UserSettings;

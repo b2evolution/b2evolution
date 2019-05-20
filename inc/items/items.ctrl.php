@@ -40,7 +40,7 @@ global $current_User;
  */
 global $Collection, $Blog;
 
-global $dispatcher;
+global $admin_url;
 
 global $basehost;
 
@@ -75,6 +75,7 @@ if( $action == 'group_action' )
 switch( $action )
 {
 	case 'edit':
+	case 'propose':
 	case 'history':
 	case 'history_details':
 	case 'history_compare':
@@ -93,12 +94,30 @@ switch( $action )
 			$edited_Item = & $ItemCache->get_by_ID( $p );
 		}
 
+		if( $action == 'propose' )
+		{	// Action to propose a change
+			// Check if current User can create a new proposed change:
+			$edited_Item->can_propose_change( true );
+			if( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) )
+			{	// Suggest item fields values from last proposed change when user creates new propose change:
+				$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
+			}
+		}
+
 		// Load the blog we're in:
 		$Collection = $Blog = & $edited_Item->get_Blog();
 		set_working_blog( $Blog->ID );
 
 		// Where are we going to redirect to?
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=items&filter=restore&blog='.$Blog->ID.'&highlight='.$edited_Item->ID, '&' ) );
+
+		// Check if the editing Item has at least one proposed change:
+		if( $action == 'edit' &&
+		    ! $edited_Item->check_proposed_change_restriction( 'warning' ) &&
+		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
+		{	// Use item fields values from last proposed change:
+			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
+		}
 		break;
 
 	case 'mass_edit':
@@ -119,6 +138,11 @@ switch( $action )
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'edit_type': // this gets set as action by JS, when we switch tabs
 	case 'extract_tags':
+	case 'save_propose':
+	case 'accept_propose':
+	case 'reject_propose':
+	case 'link_version':
+	case 'unlink_version':
 		if( $action != 'edit_switchtab' && $action != 'edit_type' )
 		{ // Stop a request from the blocked IP addresses or Domains
 			antispam_block_request();
@@ -173,6 +197,7 @@ switch( $action )
 	case 'new_mass':
 	case 'new_type':
 	case 'copy':
+	case 'new_version':
 	case 'create_edit':
 	case 'create_link':
 	case 'create':
@@ -373,7 +398,7 @@ switch( $action )
 
 		// Note: we redirect without restoring filter. This should allow to see the new files.
 		// &filter=restore
-		header_redirect( $dispatcher.'?ctrl=items&blog='.$blog );	// Will save $Messages
+		header_redirect( $admin_url.'?ctrl=items&blog='.$blog );	// Will save $Messages
 
 		// Note: we should have EXITED here. In case we don't (error, or sth...)
 
@@ -778,7 +803,7 @@ switch( $action )
 		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
 }
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
 $AdminUI->breadcrumbpath_add( T_('Posts'), $admin_url.'?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
 
 /**
@@ -895,6 +920,7 @@ switch( $action )
 
 
 	case 'copy': // Duplicate post
+	case 'new_version': // Add version
 		$item_ID = param( 'p', 'integer', true );
 		$ItemCache = &get_ItemCache();
 		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
@@ -920,12 +946,35 @@ switch( $action )
 		$edited_Item->set( 'dateset', 0 );	// Date not explicitly set yet
 		$edited_Item->set( 'issue_date', date( 'Y-m-d H:i:s', $localtimenow ) );
 
+		if( $action == 'new_version' )
+		{	// Creating new version
+			if( param( 'post_locale', 'string', NULL ) !== NULL )
+			{	// Set locale:
+				$edited_Item->set_from_Request( 'locale' );
+			}
+			if( param( 'post_create_child', 'integer', NULL ) === 1 )
+			{	// Set parent Item:
+				$edited_Item->set( 'parent_ID', $item_ID );
+			}
+			// Duplicate same images depending on setting from modal window:
+			$duplicate_same_images = param( 'post_same_images', 'integer', NULL );
+		}
+		else
+		{	// Always duplicate images on action=copy:
+			$duplicate_same_images = true;
+		}
+
 		// Set post comment status and extracats
 		$post_comment_status = $edited_Item->get( 'comment_status' );
 		$post_extracats = postcats_get_byID( $p );
 
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item );
+
+		if( $duplicate_same_images )
+		{	// Duplicate attachments from source Item:
+			$edited_Item->duplicate_attachments( $item_ID );
+		}
 
 		// Initialize a page title depending on item type:
 		$ItemTypeCache = & get_ItemTypeCache();
@@ -953,9 +1002,13 @@ switch( $action )
 		// but we need to make sure the requested/default one is ok:
 		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status, $edited_Item );
 
-		// We use the request variables to fill the edit form, because we need to be able to pass those values
-		// from tab to tab via javascript when the editor wants to switch views...
-		$edited_Item->load_from_Request( true ); // needs Blog set
+		param( 'load_from_request', 'integer', 1 );
+		if( $load_from_request )
+		{
+			// We use the request variables to fill the edit form, because we need to be able to pass those values
+			// from tab to tab via javascript when the editor wants to switch views...
+			$edited_Item->load_from_Request( true ); // needs Blog set
+		}
 
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats,$edited_Item, ( $action == 'edit_switchtab' ? 'frontoffice' : 'backoffice' ) );
@@ -996,10 +1049,21 @@ switch( $action )
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
 
-		// get revision param, but it is possible that it is not a number because current version sign is 'C'
-		param( 'r', 'integer', 0, false, false, true, false );
+		$Revision = $edited_Item->get_revision( param( 'r', 'string' ) );
 
-		$Revision = $edited_Item->get_revision( $r );
+		if( ! $Revision )
+		{	// Redirect to history list on wrong requested revision:
+			if( substr( get_param( 'r' ), 0, 1 ) == 'p' )
+			{	// When view old(not existing) proposed change:
+				$Messages->add( T_('The changes have already been accepted or rejected.'), 'error' );
+			}
+			else
+			{	// When view archived version:
+				// Don't translate because it should not happens on normal work:
+				$Messages->add( 'The requested version does not exist.', 'error' );
+			}
+			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+		}
 		break;
 
 	case 'history_compare':
@@ -1010,24 +1074,167 @@ switch( $action )
 			header_redirect( $admin_url );
 		}
 
-		param( 'r1', 'integer', 0 );
-		$r2 = (int)param( 'r2', 'string', 0 );
+		$Revision_1 = $edited_Item->get_revision( param( 'r1', 'string' ) );
+		$Revision_2 = $edited_Item->get_revision( param( 'r2', 'string' ) );
 
-		$Revision_1 = $edited_Item->get_revision( $r1 );
-		$Revision_2 = $edited_Item->get_revision( $r2 );
+		if( ! $Revision_1 || ! $Revision_2 )
+		{	// Redirect to history list on wrong requested revision:
+			if( substr( get_param( 'r1' ), 0, 1 ) == 'c' && substr( get_param( 'r2' ), 0, 1 ) == 'p' )
+			{	// When compare current version with old(not existing) proposed change(e.g. on opening url from old email message):
+				$Messages->add( T_('The changes have already been accepted or rejected.'), 'error' );
+			}
+			else
+			{	// When compare all other cases:
+				// Don't translate because it should not happens on normal work:
+				$Messages->add( 'The requested version does not exist.', 'error' );
+			}
+			header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+		}
 
 		load_class( '_core/model/_diff.class.php', 'Diff' );
 
-		// Compare the titles of two revisions
+		// Compare the titles of two revisions:
 		$revisions_difference_title = new Diff( explode( "\n", $Revision_1->iver_title ), explode( "\n", $Revision_2->iver_title ) );
-		$format = new TitleDiffFormatter();
-		$revisions_difference_title = $format->format( $revisions_difference_title );
+		$TitleDiffFormatter = new TitleDiffFormatter();
+		$revisions_difference_title = $TitleDiffFormatter->format( $revisions_difference_title );
 
-		// Compare the contents of two revisions
+		// Compare the contents of two revisions:
 		$revisions_difference_content = new Diff( explode( "\n", $Revision_1->iver_content ), explode( "\n", $Revision_2->iver_content ) );
-		$format = new TableDiffFormatter();
-		$revisions_difference_content = $format->format( $revisions_difference_content );
+		$TableDiffFormatter = new TableDiffFormatter();
+		$revisions_difference_content = $TableDiffFormatter->format( $revisions_difference_content );
 
+		// Compare the custom fields of two revisions:
+		$oneline_TableDiffFormatter = new TableDiffFormatter();
+		$oneline_TableDiffFormatter->block_header = '';
+		$revisions_difference_custom_fields = array();
+		// Switch to 1st revision:
+		$edited_Item->set( 'revision', get_param( 'r1' ) );
+		$custom_fields = $edited_Item->get_type_custom_fields();
+		$r1_custom_fields = array();
+		foreach( $custom_fields as $custom_field )
+		{
+			$r1_custom_fields[ $custom_field['name'] ] = $edited_Item->get_custom_field_value( $custom_field['name'] );
+		}
+		// Switch to 2nd revision:
+		$edited_Item->set( 'revision', get_param( 'r2' ) );
+		$r2_custom_fields = $edited_Item->get_type_custom_fields();
+		foreach( $r2_custom_fields as $r2_custom_field )
+		{
+			if( ! isset( $custom_fields[ $r2_custom_field['name'] ] ) )
+			{	// Append custom fields which don't exist in 1st revision but exist in 2nd revision:
+				$custom_fields[ $r2_custom_field['name'] ] = $r2_custom_field;
+			}
+		}
+		foreach( $custom_fields as $custom_field )
+		{
+			// Get custom field values of both revisions:
+			$r1_custom_field_value = isset( $r1_custom_fields[ $custom_field['name'] ] ) ? $r1_custom_fields[ $custom_field['name'] ] : false;
+			$r2_custom_field_value = $edited_Item->get_custom_field_value( $custom_field['name'], false, false );
+			$revisions_difference_custom_field = '';
+			if( $r1_custom_field_value != $r2_custom_field_value )
+			{	// If values are different:
+				if( $r1_custom_field_value !== false &&
+				    $r2_custom_field_value !== false )
+				{	// Compare custom field values of 1st and 2nd revisions if they are used for both revisions:
+					$revisions_difference_custom_field = new Diff(
+							explode( "\n", $r1_custom_field_value ),
+							explode( "\n", $r2_custom_field_value )
+						);
+					if( $custom_field['type'] == 'html' || $custom_field['type'] == 'text' )
+					{	// Display a line number for custom fields with multiple lines:
+						$revisions_difference_custom_field = $TableDiffFormatter->format( $revisions_difference_custom_field );
+					}
+					else
+					{	// Don't display a line number for custom fields with single line:
+						$revisions_difference_custom_field = $oneline_TableDiffFormatter->format( $revisions_difference_custom_field );
+					}
+				}
+				elseif( $r1_custom_field_value !== false ||
+				        $r2_custom_field_value !== false)
+				{	// Don't compare custom field values if at least one is not used in revision but however they are different:
+					$revisions_difference_custom_field = NULL;
+				}
+			}
+
+			if( $revisions_difference_custom_field !== '' )
+			{	// Display custom fields only with differences:
+				$revision_custom_fields = array(
+						'r1_label' => $custom_field['label'],
+						'r2_label' => isset( $r2_custom_fields[ $custom_field['name'] ] ) ? $r2_custom_fields[ $custom_field['name'] ]['label'] : $custom_field['label'],
+					);
+				if( $revisions_difference_custom_field === NULL )
+				{	// Store field value instead of difference if one field is not used in some revision:
+					if( $r1_custom_field_value !== false )
+					{	// If only old revision has the field:
+						$revision_custom_fields['r1_value'] = $r1_custom_field_value;
+					}
+					else
+					{	// If only new revision has the field:
+						$revision_custom_fields['r2_value'] = $r2_custom_field_value;
+					}
+				}
+				else
+				{	// Store a difference if field is used in both revisions:
+					$revision_custom_fields['diff_value'] = $revisions_difference_custom_field;
+				}
+				if( $revision_custom_fields['r1_label'] != $revision_custom_fields['r2_label'] )
+				{	// Compare the labels of custom fields:
+					$revisions_difference_label = new Diff( explode( "\n", $revision_custom_fields['r1_label'].':' ), explode( "\n", $revision_custom_fields['r2_label'].':' ) );
+					$TitleDiffFormatter = new TitleDiffFormatter();
+					$revisions_difference_label = $TitleDiffFormatter->format( $revisions_difference_label );
+					if( ! empty( $revisions_difference_label ) )
+					{
+						$revision_custom_fields['diff_label'] = preg_replace( '/^<tr/', '<tr class="diff-custom-field"', $revisions_difference_label );
+					}
+				}
+				$revisions_difference_custom_fields[] = $revision_custom_fields;
+			}
+		}
+
+		// Compare the links of two revisions:
+		$LinkOwner = new LinkItem( $edited_Item );
+		// Switch to 1st revision:
+		$edited_Item->set( 'revision', get_param( 'r1' ) );
+		$revisions_difference_links = array();
+		if( $r1_LinkList = $LinkOwner->get_attachment_LinkList() )
+		{
+			while( $r1_Link = & $r1_LinkList->get_next() )
+			{
+				$revisions_difference_links[ $r1_Link->ID ]['r1'] = array(
+						'icon'     => $r1_Link->get_preview_thumb(),
+						'path'     => ( $r1_link_File = & $r1_Link->get_File() ? $r1_link_File->get_view_link() : false ),
+						'order'    => $r1_Link->get( 'order' ),
+						'position' => $r1_Link->get( 'position' ),
+						'file_ID'  => $r1_Link->get( 'file_ID' ),
+					);
+			}
+		}
+		// Switch to 2nd revision:
+		$edited_Item->set( 'revision', get_param( 'r2' ) );
+		if( $r2_LinkList = $LinkOwner->get_attachment_LinkList() )
+		{
+			while( $r2_Link = & $r2_LinkList->get_next() )
+			{
+				$r_link_data = array(
+						'icon'     => $r2_Link->get_preview_thumb(),
+						'path'     => ( $r2_link_File = & $r2_Link->get_File() ? $r2_link_File->get_view_link() : false ),
+						'order'    => $r2_Link->get( 'order' ),
+						'position' => $r2_Link->get( 'position' ),
+						'file_ID'  => $r2_Link->get( 'file_ID' ),
+					);
+				if( isset( $revisions_difference_links[ $r2_Link->ID ]['r1'] ) && $revisions_difference_links[ $r2_Link->ID ]['r1'] == $r_link_data )
+				{	// The links/attachments of both revisions are equal:
+					unset( $revisions_difference_links[ $r2_Link->ID ] );
+				}
+				else
+				{	// The links/attachments of both revisions have at least one difference:
+					$revisions_difference_links[ $r2_Link->ID ]['r2'] = $r_link_data;
+				}
+			}
+		}
+
+		// Clear revision in order to display current data on the form:
+		$edited_Item->clear_revision();
 		break;
 
 	case 'history_restore':
@@ -1039,18 +1246,9 @@ switch( $action )
 
 		param( 'r', 'integer', 0 );
 
-		if( $r > 0 )
-		{	// Update item only from revisions ($r == 0 for current version)
-			$Revision = $edited_Item->get_revision( $r );
-
-			$edited_Item->set( 'status', $Revision->iver_status );
-			$edited_Item->set( 'title', $Revision->iver_title );
-			$edited_Item->set( 'content', $Revision->iver_content );
-
-			if( $edited_Item->dbupdate() )
-			{	// Item updated
-				$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
-			}
+		if( $r > 0 && $edited_Item->update_from_revision( $r ) )
+		{	// Update item only from revisions ($r == 0 for current version):
+			$Messages->add( sprintf( T_('Item has been restored from revision #%s'), $r ), 'success' );
 		}
 
 		header_redirect( regenerate_url( 'action', 'action=history', '', '&' ) );
@@ -1077,6 +1275,14 @@ switch( $action )
 
 		// Params we need for tab switching:
 		$tab_switch_params = 'p='.$edited_Item->ID;
+		break;
+
+	case 'propose':
+		// Check permission:
+		$current_User->check_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
+
+		$AdminUI->breadcrumbpath_add( sprintf( /* TRANS: noun */ T_('Post').' #%s', $edited_Item->ID ), '?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
+		$AdminUI->breadcrumbpath_add( T_('Propose change'), '?ctrl=items&amp;action=propose&amp;blog='.$Blog->ID.'&amp;p='.$edited_Item->ID );
 		break;
 
 
@@ -1112,7 +1318,7 @@ switch( $action )
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
-		check_perm_posttype( $item_typ_ID, $post_extracats );
+		$valid_item_type = check_perm_posttype( $item_typ_ID, $post_extracats, false );
 
 		// Update the folding positions for current user
 		save_fieldset_folding_values( $Blog->ID );
@@ -1176,9 +1382,9 @@ switch( $action )
 					if( $current_User->check_perm( 'item_post!CURSTATUS', 'view', false, $original_Item ) )
 					{	// Current user must has a permission to view an original item
 						$DB->query( 'INSERT INTO T_links ( link_datecreated, link_datemodified, link_creator_user_ID,
-								link_lastedit_user_ID, link_itm_ID, link_file_ID, link_ltype_ID, link_position, link_order )
+								link_lastedit_user_ID, link_itm_ID, link_file_ID, link_position, link_order )
 							SELECT '.$DB->quote( date2mysql( $localtimenow ) ).', '.$DB->quote( date2mysql( $localtimenow ) ).', '.$current_User->ID.',
-								'.$current_User->ID.', '.$edited_Item->ID.', link_file_ID, link_ltype_ID, link_position, link_order
+								'.$current_User->ID.', '.$edited_Item->ID.', link_file_ID, link_position, link_order
 									FROM T_links
 									WHERE link_itm_ID = '.$original_Item->ID );
 					}
@@ -1235,7 +1441,14 @@ switch( $action )
 		// We want to highlight the edited object on next list display:
 		$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 
-		if( $edited_Item->status != 'redirected' &&
+		if( ! $valid_item_type )
+		{	// Item Type is not enabled for this collection, we will redirect to item type selection to allow user to change it t a valid one:
+			$Messages->add( sprintf( T_('You just edited an Item of Type "%s" which is not valid for this collection. Please select a new Item type below...'), $edited_Item->get( 't_type' ) ), 'warning' );
+
+			// load_from_request param set to 0 will prevent loading of Item data from request because we are not passing any item data from request!
+			$redirect_to = url_add_param( $admin_url, 'ctrl=items&action=edit_type&post_ID='.$edited_Item->ID.'&load_from_request=0' );
+		}
+		elseif( $edited_Item->status != 'redirected' &&
 		    ! strpos( $redirect_to, 'tab=tracker' ) &&
 		    ! strpos( $redirect_to, 'tab=manual' ) )
 		{	// Where to go after creating the post?
@@ -1272,6 +1485,73 @@ switch( $action )
 
 		// REDIRECT / EXIT:
 		header_redirect( regenerate_url( '', '&highlight='.$edited_Item->ID, '', '&' ) );
+		/* EXITED */
+		break;
+
+	case 'link_version':
+		// Link the edited Post with the selected Post:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		param( 'dest_post_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		if( $dest_Item = & $ItemCache->get_by_ID( $dest_post_ID, false, false ) )
+		{	// Do the linking:
+			$dest_Item->set_group_ID( $edited_Item->ID );
+			$dest_Item->dbupdate();
+
+			// Remember what last collection was used for linking in order to display it by default on next linking:
+			$UserSettings->set( 'last_linked_coll_ID', $dest_Item->get_blog_ID() );
+			$UserSettings->dbupdate();
+
+			// Inform user about duplicated locale in the same group:
+			$other_version_items = $dest_Item->get_other_version_items();
+			foreach( $other_version_items as $other_version_Item )
+			{
+				if( $dest_Item->get( 'locale' ) == $other_version_Item->get( 'locale' ) )
+				{	// This is a duplicate locale
+					$Messages->add( sprintf( T_('WARNING: several versions of this Item use the same locale %s.'), '<code>'.$dest_Item->get( 'locale' ).'</code>' ), 'warning' );
+					break;
+				}
+			}
+
+			// Display result message after redirect:
+			$Messages->add( sprintf( T_('The Item "%s" (%s) has been linked to the current Item.'), $dest_Item->get( 'title' ), $dest_Item->get( 'locale' ) ), 'success' );
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $edited_Item->get_edit_url( array( 'glue' => '&' ) ) );
+		/* EXITED */
+		break;
+
+	case 'unlink_version':
+		// Unlink the selected Post from the edited Post:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		param( 'unlink_item_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		if( $unlink_Item = & $ItemCache->get_by_ID( $unlink_item_ID, false, false ) )
+		{	// Do the unlinking:
+			$unlink_Item->set( 'igrp_ID', NULL, true );
+			$unlink_Item->dbupdate();
+
+			// Display result message after redirect:
+			$Messages->add( sprintf( T_('The Item %s (%s) has been unlinked from the current Item.'), $unlink_Item->get( 'title' ), $unlink_Item->get( 'locale' ) ), 'success' );
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $edited_Item->get_edit_url( array( 'glue' => '&' ) ) );
 		/* EXITED */
 		break;
 
@@ -1313,7 +1593,7 @@ switch( $action )
 		// Get requested Post Type:
 		$item_typ_ID = param( 'item_typ_ID', 'integer', true /* require input */ );
 		// Check permission on post type: (also verifies that post type is enabled and NOT reserved)
-		check_perm_posttype( $item_typ_ID, $post_extracats );
+		$valid_item_type = check_perm_posttype( $item_typ_ID, $post_extracats, false );
 
 		// UPDATE POST:
 		// Set the params we already got:
@@ -1372,6 +1652,11 @@ switch( $action )
 			break;
 		}
 
+		if( strpos( $action, 'update' ) === 0 )
+		{	// Update attachments folder:
+			$edited_Item->update_attachments_folder();
+		}
+
 		// post post-publishing operations:
 		param( 'trackback_url', 'string' );
 		if( !empty( $trackback_url ) )
@@ -1389,6 +1674,11 @@ switch( $action )
 
 		// Execute or schedule notifications & pings:
 		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
+
+		if( in_array( $action, array( 'update_edit', 'update', 'update_publish' ) ) )
+		{	// Clear all proposed changes of the updated Item:
+			$edited_Item->clear_proposed_changes();
+		}
 
 		$Messages->add( T_('Post has been updated.'), 'success' );
 
@@ -1410,7 +1700,12 @@ switch( $action )
 		}
 
 		// Where to go after editing the post?
-		if( $edited_Item->status == 'redirected' ||
+		if( ! $valid_item_type )
+		{	// Item Type is not enabled for this collection, we will redirect to item type selection to allow user to change it t a valid one:
+			$Messages->add( sprintf( T_('You just edited an Item of Type "%s" which is not valid for this collection. Please select a new Item type below...'), $edited_Item->get( 't_type' ) ), 'warning' );
+			$blog_redirect_setting = 'post_type';
+		}
+		elseif( $edited_Item->status == 'redirected' ||
 		    strpos( $redirect_to, 'tab=tracker' ) )
 		{ // We should show the posts list if:
 			//    a post is in "Redirected" status
@@ -1441,6 +1736,10 @@ switch( $action )
 			$Session->set( 'highlight_id', $edited_Item->ID );
 			$Session->set( 'fadeout_array', array( 'item-'.$edited_Item->ID ) );
 			$redirect_to = url_add_param( $redirect_to, 'highlight_id='.$edited_Item->ID, '&' );
+		}
+		elseif( $blog_redirect_setting == 'post_type' )
+		{	// load_from_request param set to 0 will prevent loading of Item data from request because we are not passing any item data from request!
+			$redirect_to = url_add_param( $admin_url, 'ctrl=items&action=edit_type&post_ID='.$edited_Item->ID.'&load_from_request=0' );
 		}
 		else
 		{ // $blog_redirect_setting == 'no', set redirect_to = NULL which will redirect to posts list
@@ -1673,7 +1972,14 @@ switch( $action )
 		}
 
 		// UPDATE POST IN DB:
-		$edited_Item->dbupdate();
+		if( $edited_Item->dbupdate() )
+		{
+			// Update attachments folder:
+			$edited_Item->update_attachments_folder();
+
+			// Clear all proposed changes of the updated Item:
+			$edited_Item->clear_proposed_changes();
+		}
 
 		// Get params to skip/force/mark notifications and pings:
 		param( 'item_members_notified', 'string', NULL );
@@ -1947,6 +2253,76 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=items&blog='.$blog.'&p='.$dest_Item->ID );
 		break;
 
+	case 'save_propose':
+		// Save new proposed change:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check edit permission:
+		$current_User->check_perm( 'blog_item_propose', 'edit', true, $Blog->ID );
+
+		// Check if current User can create a new proposed change:
+		$edited_Item->can_propose_change( true );
+
+		if( $edited_Item->create_proposed_change() )
+		{	// If new proposed changes has been inserted in DB successfully:
+			$Messages->add( T_('New proposed change has been added.'), 'success' );
+			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+			{	// Redirect to item history page with new poroposed change if current User has a permisson:
+				header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+			}
+			else
+			{	// Redirect to item view page:
+				header_redirect( $admin_url.'?ctrl=items&blog='.$edited_Item->get_blog_ID().'&p='.$edited_Item->ID );
+			}
+		}
+
+		// If some errors on creating new proposed change,
+		// Display the same submitted form of new proposed change:
+		$action = 'propose';
+		break;
+
+	case 'accept_propose':
+	case 'reject_propose':
+		// Accept/Reject the proposed change:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check edit permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		// Try to get a proposed change by requested ID:
+		$Revision = $edited_Item->get_revision( param( 'r', 'string' ) );
+
+		if( ! $Revision || $Revision->iver_type != 'proposed' )
+		{	// Stop on wrong requested proposed change:
+			debug_die( 'The proposed change #'.$r.' could not be found for Item #'.$edited_Item->ID.' in DB!' );
+		}
+
+		if( $action == 'accept_propose' )
+		{	// Accept the proposed change:
+			// Update current Item with values from the requested proposed change:
+			$result = $edited_Item->update_from_revision( get_param( 'r' ) );
+			$success_message = sprintf( T_('The proposed change #%d has been accepted.'), $Revision->iver_ID );
+		}
+		else
+		{	// Reject the proposed change:
+			$result = true;
+			$success_message = sprintf( T_('The proposed change #%d has been rejected.'), $Revision->iver_ID );
+		}
+		if( $result )
+		{	// Delete also the proposed changes with custom fields and links to complete accept/reject action:
+			$edited_Item->clear_proposed_changes( $action, $Revision->iver_ID );
+			// Display success message:
+			$Messages->add( $success_message, 'success' );
+		}
+
+		// Redirect to item history page with new poroposed change:
+		header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+		break;
+
 	default:
 		debug_die( 'unhandled action 2: '.htmlspecialchars($action) );
 }
@@ -2103,6 +2479,7 @@ switch( $action )
 	case 'new_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'new_type': // this gets set as action by JS, when we switch tabs
 	case 'copy':
+	case 'new_version':
 	case 'create_edit':
 	case 'create_link':
 	case 'create':
@@ -2129,6 +2506,7 @@ switch( $action )
 	case 'edit':
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
 	case 'edit_type': // this gets set as action by JS, when we switch tabs
+	case 'propose':
 	case 'update_edit':
 	case 'update': // on error
 	case 'update_publish': // on error
@@ -2139,6 +2517,8 @@ switch( $action )
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'filter' => 'restore' ) );
+
+		$display_permalink = false;
 
 		// Display item's title and ID in <title> tag instead of default breadcrumb path:
 		$AdminUI->htmltitle = $edited_Item->get_title( array(
@@ -2159,15 +2539,6 @@ switch( $action )
 			case 'update': // on error
 			case 'update_publish': // on error
 			case 'extract_tags':
-				if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
-				{	// User has permissions to delete this post
-					$AdminUI->global_icon( T_('Delete this post'), 'delete', $admin_url.'?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
-						' '.T_('Delete'), 4, 3, array(
-								'onclick' => 'return confirm(\''.TS_('You are about to delete this post!\\nThis cannot be undone!').'\')',
-								'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
-						) );
-				}
-
 				$item_permanent_url = $edited_Item->get_permanent_url( '', '', '&amp;', array( 'none' ) );
 				if( $item_permanent_url !== false )
 				{	// Display item permanent URL only if permanent type is not 'none':
@@ -2175,6 +2546,7 @@ switch( $action )
 							' '.T_('Permalink'), 4, 3, array(
 									'style' => 'margin-right: 3ex',
 							) );
+					$display_permalink = true;
 				}
 
 				if( $Blog->get_setting( 'allow_comments' ) != 'never' )
@@ -2204,6 +2576,15 @@ switch( $action )
 								'onclick' => 'return evo_merge_load_window( '.$edited_Item->ID.' )',
 						) );
 				}
+
+				if( $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $edited_Item ) )
+				{	// User has permissions to delete this post
+					$AdminUI->global_icon( T_('Delete this post'), 'delete', $admin_url.'?ctrl=items&amp;action=delete&amp;post_ID='.$edited_Item->ID.'&amp;'.url_crumb('item'),
+						' '.T_('Delete'), 4, 3, array(
+								'onclick' => 'return confirm(\''.TS_('You are about to delete this post!\\nThis cannot be undone!').'\')',
+								'style' => 'margin-right: 3ex;',	// Avoid misclicks by all means!
+						) );
+				}
 				break;
 		}
 
@@ -2211,8 +2592,8 @@ switch( $action )
 		{
 			if( $edited_Item->ID > 0 )
 			{ // Display a link to history if Item exists in DB
-				$AdminUI->global_icon( T_('History'), '', $edited_Item->get_history_url(),
-					$edited_Item->history_info_icon().' '.T_('History'), 4, 3, array(
+				$AdminUI->global_icon( T_('Changes'), '', $edited_Item->get_history_url(),
+					$edited_Item->history_info_icon().' '.T_('Changes'), 4, 3, array(
 							'style' => 'margin-right: 3ex'
 					) );
 
@@ -2224,7 +2605,22 @@ switch( $action )
 				$tab_switch_params = '';
 			}
 
-			if( $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
+			// Rearrange global icons to show: Permalink - History - Duplicate - Delete - Close
+			if( count( $AdminUI->global_icons ) > 1 && $edited_Item->ID > 0 )
+			{
+				$history_icon = array_pop( $AdminUI->global_icons );
+
+				if( $display_permalink )
+				{ // Insert the history icon right after the permalink icon
+					array_splice( $AdminUI->global_icons, 1, 0, array( $history_icon ) );
+				}
+				else
+				{ // Move the history icon in front
+					array_unshift( $AdminUI->global_icons, $history_icon );
+				}
+			}
+
+			if( $action != 'propose' && $Blog->get_setting( 'in_skin_editing' ) && ( $current_User->check_perm( 'blog_post!published', 'edit', false, $Blog->ID ) || get_param( 'p' ) > 0 ) )
 			{ // Show 'In skin' link if Blog setting 'In-skin editing' is ON and User has a permission to publish item in this blog
 				$mode_inskin_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;'.$tab_switch_params );
 				$mode_inskin_action = get_htsrv_url().'item_edit.php';
@@ -2246,7 +2642,17 @@ switch( $action )
 			{	// User has permissions to edit this Item:
 				$AdminUI->global_icon( T_('Edit current version'), 'edit',  $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$edited_Item->ID, T_('Edit current version'), 4, 3, array( 'style' => 'margin-right:3ex' ) );
 			}
-			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
+
+			$item_permanent_url = $edited_Item->get_permanent_url( '', '', '&amp;', array( 'none' ) );
+			if( $item_permanent_url !== false )
+			{	// Display item permanent URL only if permanent type is not 'none':
+				$AdminUI->global_icon( T_('Permanent link to full entry'), 'permalink', $item_permanent_url,
+						' '.T_('Permalink'), 4, 3, array(
+								'style' => 'margin-right: 3ex',
+						) );
+			}
+
+			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action', 'action=history' ), T_('Cancel'), 4, 2 );
 		}
 
 		break;
@@ -2361,20 +2767,16 @@ if( !empty( $Blog ) )
 }
 */
 
-if( $action == 'view' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false || $action == 'copy' )
+if( $action == 'view' || $action == 'history_compare' || strpos( $action, 'edit' ) !== false || strpos( $action, 'new' ) !== false || $action == 'copy' )
 {	// Initialize js to autocomplete usernames in post/comment form
 	init_autocomplete_usernames_js();
 	// Require colorbox js:
 	require_js_helper( 'colorbox' );
-	// Require Fine Uploader js and css:
-	require_js( 'multiupload/fine-uploader.js' );
-	require_css( 'fine-uploader.css' );
-	// Load JS files to make the links table sortable:
-	require_js( '#jquery#' );
-	require_js( 'jquery/jquery.sortable.min.js' );
+	// Init JS to quick upload several files:
+	init_fileuploader_js();
 }
 
-if( in_array( $action, array( 'new', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )
+if( in_array( $action, array( 'new', 'new_version', 'copy', 'create_edit', 'create_link', 'create', 'create_publish', 'edit', 'update_edit', 'update', 'update_publish', 'extract_tags' ) ) )
 { // Set manual link for edit expert mode
 	$AdminUI->set_page_manual_link( 'expert-edit-screen' );
 }
@@ -2391,6 +2793,7 @@ switch( $action )
 	case 'edit':
 	case 'edit_switchtab':
 	case 'copy':
+	case 'new_version':
 	case 'create':
 	case 'create_edit':
 	case 'create_link':
@@ -2451,11 +2854,13 @@ switch( $action )
 		$bozo_start_modified = true;	// We want to start with a form being already modified
 	case 'new':
 	case 'copy':
+	case 'new_version':
 	case 'create_edit':
 	case 'create_link':
 	case 'create':
 	case 'create_publish':
 	case 'edit':
+	case 'propose':
 	case 'update_edit':
 	case 'update':	// on error
 	case 'update_publish':	// on error
@@ -2464,9 +2869,9 @@ switch( $action )
 		$AdminUI->disp_payload_begin();
 
 		// We never allow HTML in titles, so we always encode and decode special chars.
-		$item_title = htmlspecialchars_decode( $edited_Item->title );
+		$item_title = htmlspecialchars_decode( $edited_Item->get( 'title' ) );
 
-		$item_content = prepare_item_content( $edited_Item->content );
+		$item_content = prepare_item_content( $edited_Item->get( 'content' ) );
 
 		if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 		{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
@@ -2480,13 +2885,22 @@ switch( $action )
 		$Plugins_admin->unfilter_contents( $item_title /* by ref */, $item_content /* by ref */, $edited_Item->get_renderers_validated(), $params );
 
 		// Display VIEW:
-		if( in_array( $action, array( 'new_type', 'edit_type' ) ) )
-		{ // Form to change post type
-			$AdminUI->disp_view( 'items/views/_item_edit_type.form.php' );
-		}
-		else
-		{ // Form to edit item
-			$AdminUI->disp_view( 'items/views/_item_expert.form.php' );
+		switch( $action )
+		{
+			case 'new_type':
+			case 'edit_type':
+				// Form to change post type:
+				$AdminUI->disp_view( 'items/views/_item_edit_type.form.php' );
+				break;
+
+			case 'propose':
+				// Form to change post type:
+				$AdminUI->disp_view( 'items/views/_item_propose.form.php' );
+				break;
+
+			default:
+				// Form to edit item
+				$AdminUI->disp_view( 'items/views/_item_expert.form.php' );
 		}
 
 		// End payload block:

@@ -184,7 +184,7 @@ function install_newdb()
 	 *
 	 * @var integer
 	 */
-	$local_installation = param( 'local_installation', 'integer', ( $create_sample_contents == 'all' ? intval( check_local_installation() ) : 0 ) );
+	$local_installation = param( 'local_installation', 'integer', ( $create_sample_contents == 'full' ? intval( check_local_installation() ) : 0 ) );
 
 	echo get_install_format_text( '<h2>'.T_('Creating b2evolution tables...').'</h2>', 'h2' );
 	evo_flush();
@@ -203,7 +203,7 @@ function install_newdb()
 
 	if( $create_demo_organization || $create_demo_users )
 	{
-		echo get_install_format_text( '<h2>'.T_('Creating sample organization and users...').'</h2>', 'h2' );
+		echo get_install_format_text( '<h2>'.T_('Creating demo organization and users...').'</h2>', 'h2' );
 		evo_flush();
 
 		// Create demo organization if selected:
@@ -261,7 +261,7 @@ function install_newdb()
 	{
 		global $Settings, $install_test_features;
 
-		echo get_install_format_text( '<h2>'.T_('Installing sample contents...').'</h2>', 'h2' );
+		echo get_install_format_text( '<h2>'.T_('Creating demo website...').'</h2>', 'h2' );
 		evo_flush();
 
 		// We're gonna need some environment in order to create the demo contents...
@@ -288,14 +288,8 @@ function install_newdb()
 	// We still need to install the shared widgets
 	install_basic_widgets( $new_db_version );
 
-	evo_flush();
-	create_default_newsletters();
-
-	evo_flush();
-	create_default_email_campaigns();
-
-	evo_flush();
-	create_default_automations();
+	// Create demo emails data like lists, campaigns, automations:
+	create_demo_emails();
 
 	// Update the progress bar status
 	update_install_progress_bar();
@@ -812,10 +806,20 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'email_elements_plugin' );
 	}
 
+	if( $old_db_version < 13090 )
+	{
+		install_plugin( 'webmention_plugin' );
+	}
+
 	if( $old_db_version < 15330 )
 	{
 		install_plugin( 'instore_pickup_plugin' );
 		install_plugin( 'courier_example_plugin' );
+	}
+
+	if( $old_db_version < 15380 )
+	{
+		install_plugin( 'financial_contribution_plugin' );
 	}
 }
 
@@ -885,16 +889,17 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
  */
 function install_basic_widgets( $old_db_version = 0 )
 {
-	/**
-	* @var DB
-	*/
-	global $DB;
+	global $DB, $installed_default_shared_widgets;
 
 	load_funcs( 'widgets/_widgets.funcs.php' );
 
-	task_begin( 'Installing default shared widgets... ' );
-	insert_shared_widgets( 'normal' );
-	task_end();
+	if( empty( $installed_default_shared_widgets ) )
+	{	// Install default widgets only when they were not installed before,
+		// (e-g after demo collections creating):
+		task_begin( 'Installing default shared widgets... ' );
+		insert_shared_widgets( 'normal' );
+		task_end();
+	}
 
 	$blog_type = ( $old_db_version < 11010 ) ? '"std"' : 'blog_type';
 	$SQL = new SQL( 'Get all collections with their skins before install basic widgets' );
@@ -1425,7 +1430,7 @@ function get_install_steps_count()
 		// After Creating default sample contents(users, and probably blogs and categories):
 		$steps++;
 
-		if( $create_sample_contents == 'all' )
+		if( $create_sample_contents == 'full' )
 		{ // Array contains which collections should be installed
 			$install_collection_home =   1;
 			$install_collection_bloga =  1;
@@ -2083,17 +2088,5 @@ function update_basic_config_file( $params = array() )
 	}
 
 	return true;
-}
-
-
-/**
- * Print out log text on screen
- *
- * @param string Log text
- * @param string Log type: 'warning', 'note', 'success', 'danger'
- */
-function echo_install_log( $text, $type = 'warning' )
-{
-	echo '<p class="alert alert-'.$type.'">'.$text.'</p>';
 }
 ?>

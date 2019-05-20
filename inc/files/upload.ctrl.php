@@ -28,7 +28,7 @@ load_class( 'files/model/_filelist.class.php', 'FileList' );
 
 global $current_User, $Plugins;
 
-global $dispatcher;
+global $admin_url;
 
 global $blog;
 
@@ -334,7 +334,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 			// Allow to insert/link new upload into currently edited link object:
 			if( $mode == 'upload' && !empty( $link_object_ID ) && !empty( $link_type ) )
 			{	// The filemanager has been opened from a link owner object, offer to insert an img tag into original object.
-				$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+				$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 				// TODO: Add plugin hook to allow generating JS insert code(s)
 				$img_tag = format_to_output( $uploadedFile->get_tag(), 'formvalue' );
 				if( $uploadedFile->is_image() )
@@ -367,7 +367,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 
 	if( empty($failedFiles) && empty($renamedFiles) )
 	{ // quick mode or no failed files, Go back to Browsing
-		// header_redirect( $dispatcher.'?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
+		// header_redirect( $admin_url.'?ctrl=files&root='.$fm_FileRoot->ID.'&path='.rawurlencode($path) );
 		header_redirect( regenerate_url( 'ctrl', 'ctrl=files', '', '&' ) );
 	}
 }

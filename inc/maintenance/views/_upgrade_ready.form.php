@@ -116,6 +116,8 @@ foreach( $backup_tables as $name => $settings )
 	$Form->checkbox( 'bk_'.$name, $current_Backup->backup_tables[$name], $settings['label'], $note );
 }
 
+$Form->checkbox( 'db_structure',$current_Backup->backup_db_structure, T_('DB Structure'), sprintf( T_('Add %s statements for ALL tables, in order to allow quick restore.'), '<code>CREATE TABLE</code>' ) );
+
 if( function_exists( 'gzopen' ) )
 {
 	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, 'ZIP', T_('Compress backup files into ZIP archive.') );

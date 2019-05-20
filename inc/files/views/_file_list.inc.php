@@ -154,7 +154,7 @@ $Form->begin_form();
 	?>
 	</thead>
 
-	<tbody id="filelist_tbody">
+	<tbody class="filelist_tbody">
 	<?php
 	$checkall = param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
 	$fm_highlight = param( 'fm_highlight', 'string', NULL );
@@ -551,7 +551,7 @@ $Form->begin_form();
 	if( $Settings->get( 'upload_enabled' ) && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{	// Upload is enabled and we have permission to use it...
 	?>
-		<tr id="fileuploader_form" class="listfooter firstcol lastcol">
+		<tr class="evo_fileuploader_form listfooter firstcol lastcol">
 			<td colspan="<?php echo $filetable_cols ?>">
 			<?php
 			if( isset( $LinkOwner ) && $LinkOwner->check_perm( 'edit' ) )
@@ -662,11 +662,11 @@ $Form->begin_form();
 			display_dragdrop_upload_button( array(
 					'fileroot_ID'          => $fm_FileRoot->ID,
 					'path'                 => $path,
-					'listElement'          => 'jQuery( "#filelist_tbody" ).get(0)',
+					'listElement'          => 'jQuery( ".filelist_tbody" ).get(0)',
 					'list_style'           => 'table',
 					'template'             => $template,
 					'display_support_msg'  => false,
-					'additional_dropzone'  => '[ document.getElementById( "filelist_tbody" ) ]',
+					'additional_dropzone'  => '[ jQuery( ".filelist_tbody" ).get(0) ]',
 					'filename_before'      => $icon_to_link_files,
 					'noresults'            => $noresults,
 				) );

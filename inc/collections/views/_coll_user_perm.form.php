@@ -116,6 +116,14 @@ $Results->cols[] = array(
 					);
 
 $Results->cols[] = array(
+		'th_group' => T_('Permissions on Posts'),
+		'th' => T_('Propose changes'),
+		'th_class' => 'center',
+		'td' => '%coll_perm_checkbox( {row}, \'bloguser_\', \'perm_item_propose\', \''.format_to_output( T_('Permission to propose a change for Item'), 'htmlattr' ).'\' )%',
+		'td_class' => 'shrinkwrap',
+	);
+
+$Results->cols[] = array(
 						'th_group' => T_('Permissions on Posts'),
 						'th' => T_('Post Statuses'),
 						'th_class' => 'checkright',

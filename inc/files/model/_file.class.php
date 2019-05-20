@@ -51,6 +51,24 @@ class File extends DataObject
 	var $meta = 'unknown';
 
 	/**
+	 * Meta data: Timestamp of last modification from DB
+	 * @var string
+	 */
+	var $ts;
+
+	/**
+	 * Meta data: Image width
+	 * @var string
+	 */
+	var $width;
+
+	/**
+	 * Meta data: Image height
+	 * @var string
+	 */
+	var $height;
+
+	/**
 	 * Meta data: Long title
 	 * @var string
 	 */
@@ -174,7 +192,7 @@ class File extends DataObject
 	var $_recursive_size;
 
 	/**
-	 * UNIX timestamp of last modification on disk.
+	 * UNIX timestamp of last modification on DISK.
 	 * @var integer
 	 * @see get_lastmod_ts()
 	 * @see get_lastmod_formatted()
@@ -333,6 +351,9 @@ class File extends DataObject
 				$this->ID    = $row->file_ID;
 				$this->creator_user_ID = $row->file_creator_user_ID;
 				$this->type  = $row->file_type;
+				$this->ts = isset( $row->file_ts ) ? $row->file_ts : NULL;
+				$this->width = isset( $row->file_width ) ? $row->file_width : NULL;
+				$this->height = isset( $row->file_height ) ? $row->file_height : NULL;
 				$this->title = $row->file_title;
 				$this->alt   = $row->file_alt;
 				$this->desc  = $row->file_desc;
@@ -865,16 +886,41 @@ class File extends DataObject
 
 
 	/**
-	 * Get timestamp of last modification.
+	 * Load timestamp of last modification on DISK
+	 */
+	function load_lastmod_ts()
+	{
+		if( ! isset( $this->_lastmod_ts ) )
+		{	// Get timestamp from disk file:
+			$this->_lastmod_ts = @filemtime( $this->_adfp_full_path );
+		}
+
+		if( $this->ID && // File is stored in DB before
+		    $this->load_meta() && // Meta data was loaded successfully
+		    $this->_lastmod_ts != strtotime( $this->ts ) )
+		{	// We must update timestamp in DB if it is defferent than last modification date of this File on DISK:
+			$this->set( 'ts', date2mysql( $this->_lastmod_ts ) );
+			if( $this->is_image() &&
+			    ( $image_dimensions = imgsize( $this->_adfp_full_path, 'widthheight' ) ) )
+			{	// Also update dimensions for image file if they can be extracted from disk file successfully:
+				$this->set( 'width', $image_dimensions[0] );
+				$this->set( 'height', $image_dimensions[1] );
+			}
+			$this->dbupdate( false );
+		}
+	}
+
+
+	/**
+	 * Get timestamp of last modification on DISK
 	 *
 	 * @return integer Timestamp
 	 */
 	function get_lastmod_ts()
 	{
-		if( ! isset($this->_lastmod_ts) )
-		{
-			$this->_lastmod_ts = @filemtime( $this->_adfp_full_path );
-		}
+		// Load timestamp of last modification on DISK:
+		$this->load_lastmod_ts();
+
 		return $this->_lastmod_ts;
 	}
 
@@ -1118,10 +1164,46 @@ class File extends DataObject
 	 *
 	 * @uses imgsize()
 	 * @param string {@link imgsize()}
+	 * @param boolean TRUE to check if file was modified on disk then force to update width and height to new values even when they were already defined before
 	 * @return false|mixed false if the File is not an image, the requested data otherwise
 	 */
-	function get_image_size( $param = 'widthxheight' )
+	function get_image_size( $param = 'widthxheight', $check_ts = false )
 	{
+		if( $check_ts )
+		{	// If DISK timestamp is defferent than DB timestamp then width and height will be updated to new values:
+			$this->load_lastmod_ts();
+		}
+
+		if( ( $this->get( 'width' ) === NULL || $this->get( 'height' ) === NULL ) &&
+		    $this->ID && // File is stored in DB before
+		    $this->load_meta() && // Meta data was loaded successfully
+		    ( $image_dimensions = imgsize( $this->_adfp_full_path ) ) )
+		{	// Set dimensions for image file if it was not stored before:
+			$this->set( 'width', $image_dimensions[0] );
+			$this->set( 'height', $image_dimensions[1] );
+			$this->dbupdate( false );
+		}
+
+		if( $this->get( 'width' ) !== NULL && $this->get( 'height' ) !== NULL )
+		{	// Get image dimensions from DB(cached):
+			switch( $param )
+			{
+				case 'width':
+					return $this->get( 'width' );
+				case 'height':
+					return $this->get( 'height' );
+				case 'widthxheight':
+					return $this->get( 'width' ).'x'.$this->get( 'height' );
+				case 'widthheight_assoc':
+					return array( 'width' => $this->get( 'width' ), 'height' => $this->get( 'height' ) );
+				case 'widthheight':
+					return array( $this->get( 'width' ), $this->get( 'height' ) );
+				// default: Fallback to imgsize() for other(not dimension) values of $param like 'type', 'string'
+			}
+		}
+
+		// Get image dimensions from disk file:
+		// (result is cached per file path after first call of the function imgsize())
 		return imgsize( $this->_adfp_full_path, $param );
 	}
 
@@ -1146,20 +1228,25 @@ class File extends DataObject
 
 
 	/**
-	 * Get a complete tag (IMG or A HREF) pointing to this file.
+	 * Get a complete HTML snippet (<div><a href><IMG> Caption...), including caption and link on img, loader animation, etc.
+	 * This is the main thing to use for content images.
 	 *
-	 * @param string
-	 * @param string NULL for no legend
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string
-	 * @param string rel attribute of link, usefull for jQuery libraries selecting on rel='...', e-g: lighbox
-	 * @param string image class
-	 * @param string image align
-	 * @param string image rel
-	 * @param string image caption/description
+// TODO: we should replace this with a cleaner File->get_html_image_block( $params array )  
+	 *
+	 * Used by: Link::get_tag(), Item::get_custom_field_formatted(), Item:get_attached_image_tag(), item_list_summary.view.php, file manager file list, quick_upload.php, upload.ctrl.php, render_inline_tags(), Chapter::get_image_tag(), coll_settings.ctrl.php for collection image, Comment preview, File::get_gallery(), File::get_duplicated_files_message(()
+	 *
+	 * @param string html code to wrap the whole image block
+	 * @param string html code to wrap the legend under the image, in the image block --- NULL for no legend
+	 * @param string close of previous
+	 * @param string close of previous
+	 * @param string Thumbnail size name , 'original' or 'fit' -- See: $thumbnail_sizes
+	 * @param string href= attribute of Link : URL or 'original'  or NULL
+	 * @param string title= attribute of link
+	 * @param string rel= attribute of link, usefull for jQuery libraries selecting on rel='...', e-g: lightbox
+	 * @param string image class=
+	 * @param string image align=
+	 * @param string image alt=
+	 * @param string image caption/description to be displayed under the image
 	 * @param integer Link ID
 	 * @param integer Size multiplier, can be 1, 2 and etc. (Used for b2evonet slider for example)
 	 *                Example: $image_size_x = 2 returns 2 img tags:
@@ -1170,14 +1257,15 @@ class File extends DataObject
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use size defined by the thumbnail
 	 *                        'none' - don't use attributes "width" & "height"
-	 * @param boolean Image style
+	 * @param boolean Image style= attribute
 	 * @param boolean Add loadimg class
+	 * @param string simplified sizes= attribute for browser to select correct size from srcset=
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
 	                  $after_image_legend = '</div>',
 	                  $after_image = '</div>',
-	                  $size_name = 'original',
+	                  $size_name = 'original', 
 	                  $image_link_to = 'original',
 	                  $image_link_title = '',	// can be text or #title# or #desc#
 	                  $image_link_rel = '',
@@ -1186,10 +1274,11 @@ class File extends DataObject
 	                  $image_alt = '',
 	                  $image_desc = '#',
 	                  $image_link_id = '',
-	                  $image_size_x = 1,
+	                  $image_size_x = 1,		// TODO: Make another function for this and get this out of here
 	                  $tag_size = NULL,
 	                  $image_style = '',
-	                  $add_loadimg = true )
+	                  $add_loadimg = true,
+	                  $image_sizes = NULL )
 	{
 		if( $this->is_dir() )
 		{ // We can't reference a directory
@@ -1212,7 +1301,7 @@ class File extends DataObject
 			$img = '';
 			foreach( $x_sizes as $x_size )
 			{
-				$img_attribs = $this->get_img_attribs( $size_name, NULL, NULL, $x_size, $tag_size );
+				$img_attribs = $this->get_img_attribs( $size_name, NULL, NULL, $x_size, $tag_size, $image_sizes );
 
 				if( $this->check_image_sizes( $size_name, 64, $img_attribs ) && $add_loadimg )
 				{ // If image larger than 64x64 add class to display animated gif during loading
@@ -1249,33 +1338,37 @@ class File extends DataObject
 				$img .= '<img'.get_field_attribs_as_string( $img_attribs ).' />';
 			}
 
-			if( $image_link_to == 'original' )
-			{ // special case
-				$image_link_to = $this->get_url();
-			}
-			if( !empty( $image_link_to ) )
-			{
-				$a = '<a href="'.$image_link_to.'"';
-
-				if( $image_link_title == '#title#' )
-					$image_link_title = $this->title;
-				elseif( $image_link_title == '#desc#' )
-					$image_link_title = $this->desc;
-
-				if( !empty($image_link_title) )
+			if( $this->exists() )
+			{	// file exists, we can safely link to this file:
+				if( $image_link_to == 'original' )
+				{ // special case
+					$image_link_to = $this->get_url();
+				}
+				if( !empty( $image_link_to ) )
 				{
-					$a .= ' title="'.htmlspecialchars($image_link_title).'"';
+					$a = '<a href="'.$image_link_to.'"';
+
+					if( $image_link_title == '#title#' )
+						$image_link_title = $this->title;
+					elseif( $image_link_title == '#desc#' )
+						$image_link_title = $this->desc;
+
+					if( !empty($image_link_title) )
+					{
+						$a .= ' title="'.htmlspecialchars($image_link_title).'"';
+					}
+					if( !empty($image_link_rel) )
+					{
+						$a .= ' rel="'.htmlspecialchars($image_link_rel).'"';
+					}
+					if( !empty( $image_link_id ) )
+					{ // Set attribute "id" for link
+						$a .= ' id="'.$image_link_id.'"';
+					}
+					$img = $a.'>'.$img.'</a>';
 				}
-				if( !empty($image_link_rel) )
-				{
-					$a .= ' rel="'.htmlspecialchars($image_link_rel).'"';
-				}
-				if( !empty( $image_link_id ) )
-				{ // Set attribute "id" for link
-					$a .= ' id="'.$image_link_id.'"';
-				}
-				$img = $a.'>'.$img.'</a>';
 			}
+
 			$r .= $img;
 
 			if( $image_desc == '#' )
@@ -1322,6 +1415,7 @@ class File extends DataObject
 				'gallery_cell_end'      => '</div>',//'</div></td>',
 				'gallery_image_size'    => 'crop-80x80',
 				'gallery_image_limit'   => 1000,
+				'gallery_image_link_to' => 'original', // Can be 'original', 'single' or empty
 				'gallery_colls'         => 5,
 				'gallery_order'         => '', // 'ASC', 'DESC', 'RAND'
 				'gallery_link_rel'      => '#', // '#' - Use default 'lightbox[g'.$this->ID.']' to make one "gallery" per directory
@@ -1349,7 +1443,7 @@ class File extends DataObject
 				$params['gallery_link_rel'] = 'lightbox[g'.$this->ID.']';
 			}
 
-			$img_tag = $l_File->get_tag( '', NULL, '', '', $params['gallery_image_size'], 'original', $link_title, $params['gallery_link_rel'] );
+			$img_tag = $l_File->get_tag( '', NULL, '', '', $params['gallery_image_size'], $params['gallery_image_link_to'], $link_title, $params['gallery_link_rel'] );
 
 			if( $count % $params['gallery_colls'] == 0 ) $r .= $params['gallery_row_start'];
 			$count++;
@@ -1667,9 +1761,10 @@ class File extends DataObject
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param string Subpath for this file/folder, relative the associated root (no trailing slash)
+	 * @param boolean TRUE to don't rewrite existing file in the destination path, try to create unique file with appending siffix like "-1", "-2" and etc.
 	 * @return boolean true on success, false on failure
 	 */
-	function move_to( $root_type, $root_ID, $rdfp_rel_path )
+	function move_to( $root_type, $root_ID, $rdfp_rel_path, $keep_unique = false )
 	{
 		$old_file_name = $this->get_name();
 
@@ -1678,6 +1773,20 @@ class File extends DataObject
 		$FileRootCache = & get_FileRootCache();
 
 		$new_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID, true );
+
+		if( $keep_unique && preg_match( '#(.+\/)?(([^.\/]+)(\.[^.]+)?)$#', $rdfp_rel_path, $new_path_match ) )
+		{	// Try to find free unique file name if same name is already used in the destination folder:
+			$file_unique_name = $new_path_match[2];
+			$file_extension = isset( $new_path_match[4] ) ? $new_path_match[4] : '';
+			$file_unique_num = 1;
+			while( file_exists( $new_FileRoot->ads_path.$new_path_match[1].$file_unique_name ) )
+			{	// Find next free file with unique name in the same folder:
+				$file_unique_name = $new_path_match[3].'-'.$file_unique_num.$file_extension;
+				$file_unique_num++;
+			}
+			$rdfp_rel_path = $new_path_match[1].$file_unique_name;
+		}
+
 		$adfp_posix_path = $new_FileRoot->ads_path.$rdfp_rel_path;
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
@@ -2130,11 +2239,11 @@ class File extends DataObject
 	function get_linkedit_link( $link_type = NULL, $link_obj_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
 											$actionurl = '#', $target = '' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( is_null( $text ) )
@@ -2173,11 +2282,11 @@ class File extends DataObject
 	 */
 	function get_linkedit_url( $link_type = NULL, $link_obj_ID = NULL, $actionurl = '#' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( $this->is_dir() )
@@ -2264,19 +2373,27 @@ class File extends DataObject
 
 
 	/**
-	 * Generate the IMG THUMBNAIL tag with all the alt & title if available.
+	 * Get a simple <img> tag with attributes but nothing wrapped around it.
 	 *
-	 * @param string Size
-	 * @param string Class
-	 * @param string Alignment
-	 * @param string Title
+	 * Used by file_select_item(), User::get_avatar_imgtag(), Media Index widget, Email notifications showing files
+	 * 
+	 *
+	 * @param string Thumbnail size name , 'original' or 'fit' -- See: $thumbnail_sizes
+	 * @param string class= attribut
+	 * @param string align= attribute
+	 * @param string title= attbute
 	 * @param string Change size of the attributes "width" & "height".
 	 *               Example: ( $tag_size = '160' ) => width="160" height="160"
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use real size
 	 * @return string
 	 */
-	function get_thumb_imgtag( $size_name = 'fit-80x80', $class = '', $align = '', $title = '', $tag_size = NULL )
+	function get_thumb_imgtag( 
+		$size_name = 'fit-80x80', 
+		$class = '', 
+		$align = '', 
+		$title = '', 
+		$tag_size = NULL )
 	{
 		global $use_strict;
 
@@ -2359,7 +2476,7 @@ class File extends DataObject
 	 * - width
 	 * - height
 	 *
-	 * @param string what size do we want src to link to, can be "original" or a thumnbail size
+	 * @param string what size do we want src to link to, can be "original", "fit" or a thumnbail size defined in $thumbnail_sizes
 	 * @param string Title img attribute
 	 * @param string Alt img attribute
 	 * @param integer Ratio size, can be 1, 2 and etc.
@@ -2368,9 +2485,10 @@ class File extends DataObject
 	 *                        ( $tag_size = '160x320' ) => width="160" height="320"
 	 *                        NULL - use real size
 	 *                        'none' - don't use attributes "width" & "height"
+	 * @param string sizes= attribute for browser to select correct size from srcset=
 	 * @return array List of HTML attributes for the image.
 	 */
-	function get_img_attribs( $size_name = 'fit-80x80', $title = NULL, $alt = NULL, $size_x = 1, $tag_size = NULL )
+	function get_img_attribs( $size_name = 'fit-80x80', $title = NULL, $alt = NULL, $size_x = 1, $tag_size = NULL, $image_sizes = NULL )
 	{
 		$img_attribs = array(
 				'title' => isset($title) ? $title : $this->get('title'),
@@ -2430,8 +2548,19 @@ class File extends DataObject
 			}
 		}
 		else
-		{ // We want src to link to a thumbnail
+		{ // We want src to link to a generated thumbnail:
 			$img_attribs['src'] = $this->get_thumb_url( $size_name, '&', $size_x );
+
+			global $generate_srcset_sizes;
+			if( $generate_srcset_sizes && ! empty( $image_sizes ) )
+			{	// We want a responsive image with a srcset= and sizes=
+				$img_attribs['sizes'] = preg_replace_callback( '#(^|[\s,]+)(\d+px|xs|sm|md):\s*#', array( $this, 'callback_img_attrib_sizes' ), $image_sizes );
+				$img_attrib_srcset = $this->get_img_srcset( $img_attribs['sizes'], $size_name, '&', $size_x );
+				if( ! empty( $img_attrib_srcset ) )
+				{
+					$img_attribs['srcset'] = $img_attrib_srcset;
+				}
+			}
 			if( $tag_size != 'none' )
 			{	// Add attributes "width" & "height" only when they are not disabled:
 				$thumb_path = $this->get_af_thumb_path( $size_name, NULL, true );
@@ -2454,12 +2583,194 @@ class File extends DataObject
 			}
 		}
 
+		if( ! $this->exists() )
+		{	// We cannot find the file, force use of getfile.php to handle missing display of missing file:
+			$img_attribs['src'] = url_add_param( $this->get_getfile_url( '&' ), array( 'size' => $size_name ), '&' );
+		}
+
 		return $img_attribs;
 	}
 
 
 	/**
+	 * Callback function to replace simplified sizes= attribute
+	 *
+	 * @param array Matches of regexp
+	 * @return string
+	 */
+	function callback_img_attrib_sizes( $m )
+	{
+		switch( $m[2] )
+		{
+			case 'xs':
+				$max_width_size = '767px';
+				break;
+			case 'sm':
+				$max_width_size = '991px';
+				break;
+			case 'md':
+				$max_width_size = '1199px';
+				break;
+			default:
+				$max_width_size = $m[2];
+		}
+		return $m[1].'(max-width: '.$max_width_size.') ';
+	}
+
+
+	/**
+	 * Get value for attribute "srcset" for images
+	 *
+	 * @param string sizes= attribute for browser to select correct size from srcset=
+	 * @param string Thumbnail size name
+	 * @param string Glue between url params
+	 * @param integer Ratio size, can be 1, 2 and etc.
+	 * @return string Example: 'fit-640x480.jpg 640w, fit-720x500.jpg 720w, fit-1280x720.jpg 1280w, fit-2560x1440.jpg 2560w'
+	 */
+	function get_img_srcset( $image_sizes, $size_name = 'fit-80x80', $glue = '&amp;', $size_x = 1 )
+	{
+		global $generate_srcset_sizes, $thumbnail_sizes, $grouped_srcset_thumbnail_sizes;
+
+		if( ! $generate_srcset_sizes )
+		{	// Disabled in config
+			return '';
+		}
+
+		if( ! isset( $thumbnail_sizes[ $size_name ] ) )
+		{	// Wrong thumbnail size:
+			return '';
+		}
+
+		// Extract sizes(width values) from provided param $image_sizes:
+		if( ! preg_match_all( '/(\(max-width:\s*\d+px\)\s*)?(\d+)px(,\s*|$)/', $image_sizes, $image_sizes_match ) ||
+		    empty( $image_sizes_match[2] ) )
+		{	// Wrong value for attribute "sizes":
+			return '';
+		}
+
+		if( $grouped_srcset_thumbnail_sizes === NULL )
+		{	// Group and sort thumbnail sizes ONCE and put into cache array:
+			$grouped_srcset_thumbnail_sizes = array();
+			foreach( $thumbnail_sizes as $thumb_size_name => $thumb_size_data )
+			{
+				// Type like 'fit', 'crop', 'crop-top':
+				$thumb_size_type = $thumb_size_data[0];
+				// Is it blurred size?
+				$thumb_size_blur = empty( $thumb_size_data[4] ) ? 0 : 1;
+				// Aspect ratio, Do NOT check it for fit sizes:
+				$thumb_size_aspect_ratio = ( $thumb_size_type == 'fit' ? 0 : (string)( $thumb_size_data[1] / $thumb_size_data[2] ) );
+
+				if( ! isset( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ] ) )
+				{	// Init array to group by type:
+					$grouped_srcset_thumbnail_sizes[ $thumb_size_type ] = array();
+				}
+				if( ! isset( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ] ) )
+				{	// Init array to group by blur effect:
+					$grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ] = array();
+				}
+				if( ! isset( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ] ) )
+				{	// Init array to group by aspect ratio:
+					$grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ] = array();
+				}
+
+				$grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ][ $thumb_size_name ] = $thumb_size_data;
+			}
+			// Sort sizes by width and height:
+			foreach( $grouped_srcset_thumbnail_sizes as $thumb_size_type => $thumb_size_type_data )
+			{
+				foreach( $thumb_size_type_data as $thumb_size_blur => $thumb_size_blur_data )
+				{
+					foreach( $thumb_size_blur_data as $thumb_size_aspect_ratio => $thumb_size_aspect_ratio_data )
+					{
+						uasort( $thumb_size_aspect_ratio_data, 'sort_thumbnail_sizes_callback' );
+						$grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ] = $thumb_size_aspect_ratio_data;
+					}
+				}
+			}
+		}
+
+		// Get thumbnail size and group params:
+		$thumbnail_size = $thumbnail_sizes[ $size_name ];
+		// Type like 'fit', 'crop', 'crop-top':
+		$thumb_size_type = $thumbnail_size[0];
+		// Is it blurred size?
+		$thumb_size_blur = empty( $thumbnail_size[4] ) ? 0 : 1;
+		// Aspect ratio, Do NOT check it for fit sizes:
+		$thumb_size_aspect_ratio = ( $thumb_size_type == 'fit' ? 0 : (string)( $thumbnail_size[1] / $thumbnail_size[2] ) );
+
+		if( ! isset( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ][ $size_name ] ) )
+		{	// Wrong thumbnail size, cannot be detected in group,
+			// This case is impossible but log this error in system:
+			syslog_insert( 'Wrong thumbnail size "'.$size_name.'" cannot be grouped to generate "srcset"', 'error' );
+			return;
+		}
+
+		// Sort sizes and add 2x sizes for retina screen:
+		$original_image_width = $this->get_image_size( 'width', true );
+		$requested_image_sizes = array();
+		foreach( $image_sizes_match[2] as $image_sizes_m )
+		{	// Don't use thumbnail size with width more than original:
+			if( $image_sizes_m < $original_image_width )
+			{	// 1x size:
+				$requested_image_sizes[] = $image_sizes_m;
+			}
+			if( $image_sizes_m * 2 < $original_image_width )
+			{	// 2x size for retina screen:
+				$requested_image_sizes[] = $image_sizes_m * 2;
+			}
+		}
+		$requested_image_sizes = array_flip( $requested_image_sizes );
+		ksort( $requested_image_sizes );
+
+		// Find thumbnail size for each requested image size:
+		foreach( $requested_image_sizes as $requested_image_size => $r )
+		{
+			$is_detected_proper_size = false;
+			foreach( $grouped_srcset_thumbnail_sizes[ $thumb_size_type ][ $thumb_size_blur ][ $thumb_size_aspect_ratio ] as $grouped_thumb_size_name => $grouped_thumb_size_data )
+			{
+				if( $grouped_thumb_size_data[1] >= $requested_image_size )
+				{	// If thumbnail size more than requested size:
+					if( $grouped_thumb_size_data[1] < $original_image_width )
+					{	// Allow thumbnail size only with less width than original image:
+						$requested_image_sizes[ $requested_image_size ] = $grouped_thumb_size_name;
+						$is_detected_proper_size = true;
+					}
+					// Don't search next wider sizes:
+					break;
+				}
+			}
+			if( ! $is_detected_proper_size )
+			{	// Don't use requested size if it is not proper:
+				unset( $requested_image_sizes[ $requested_image_size ] );
+			}
+		}
+		// Clear duplicated thumbnail sizes:
+		$requested_image_sizes = array_unique( $requested_image_sizes );
+
+		// Set thumbnail size and width size for attribute "srcset":
+		$srcset_thumbnail_sizes = array();
+		foreach( $requested_image_sizes as $requested_image_size )
+		{
+			if( isset( $thumbnail_sizes[ $requested_image_size ] ) )
+			{
+				$srcset_thumbnail_sizes[] = $this->get_thumb_url( $requested_image_size, $glue, $size_x ).' '.$thumbnail_sizes[ $requested_image_size ][1].'w';
+			}
+		}
+		if( $thumb_size_type == 'fit' && ! $thumb_size_blur )
+		{	// Add original size as max possible instead of thumbnail:
+			// NOTE: don't allow original image for cropped or blurred thumbnails!
+			$srcset_thumbnail_sizes[] = $this->get_url().' '.$original_image_width.'w';
+		}
+
+		// Return searched srcset urls:
+		return implode( ', ', $srcset_thumbnail_sizes );
+	}
+
+
+	/**
 	 * Displays a preview thumbnail which is clickable and opens a view popup
+	 *
+	 * Used by Backoffice image manipulation functions
 	 *
 	 * @param string what do do with files that are not images? 'fulltype'
 	 * @param array colorbox plugin params:

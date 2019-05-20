@@ -287,6 +287,25 @@ function & get_Plugins_admin()
 
 
 /**
+ * Get the Plugins
+ *
+ * @return object Plugins
+ */
+function & get_Plugins()
+{
+	global $Plugins;
+
+	if( ! is_object( $Plugins ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+		$Plugins = new Plugins();
+	}
+
+	return $Plugins;
+}
+
+
+/**
  * Get the UserCache
  *
  * @return UserCache
@@ -1347,12 +1366,14 @@ class _core_Module extends Module
 						'text' => T_('Page'),
 						'entries' => array(
 							// PLACE HOLDER FOR ENTRIES "Edit in Front-Office", "Edit in Back-Office", "View in Back-Office":
-							'edit_front' => NULL,
-							'edit_back'  => NULL,
-							'view_back'  => NULL,
+							'edit_front'   => NULL,
+							'edit_back'    => NULL,
+							'propose'      => NULL,
+							'view_back'    => NULL,
+							'view_history' => NULL,
 							// PLACE HOLDERS FOR SESSIONS MODULE:
-							'stats_sep'  => NULL,
-							'stats_page' => NULL,
+							'stats_sep'    => NULL,
+							'stats_page'   => NULL,
 						)
 					);
 			}
@@ -1372,10 +1393,11 @@ class _core_Module extends Module
 		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) )
 		{ // A collection is currently selected AND we can activate toolbar items for selected collection:
 
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ||
+			    $current_User->check_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
 				global $disp, $ctrl, $action, $Item, $edited_Item;
-				if( ( $disp == 'edit' || $ctrl == 'items' ) &&
+				if( ( $disp == 'edit' || $disp == 'proposechange' || $ctrl == 'items' ) &&
 				    isset( $edited_Item ) &&
 				    $edited_Item->ID > 0 &&
 				    $view_item_url = $edited_Item->get_permanent_url() )
@@ -1388,9 +1410,9 @@ class _core_Module extends Module
 						);
 				}
 				if( ! is_admin_page() &&
-				    in_array( $disp, array( 'single', 'page', 'edit', 'widget_page' ) ) &&
+				    in_array( $disp, array( 'single', 'page', 'edit', 'proposechange', 'widget_page' ) ) &&
 				    $perm_admin_restricted )
-				{	// If curent user has a permission to edit a current editing/viewing post:
+				{	// If curent user has a permission to edit a current editing/viewing/proposing post:
 					if( $disp != 'edit' &&
 					    $Blog->get_setting( 'in_skin_editing' ) &&
 					    ! empty( $Item ) &&
@@ -1404,14 +1426,39 @@ class _core_Module extends Module
 					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
 					{	// Display menu entries to edit and view the post in back-office:
 						$menu_Item = empty( $Item ) ? $edited_Item : $Item;
-						$entries['page']['entries']['edit_back'] = array(
-								'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+						if( $perm_admin_restricted && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $menu_Item ) )
+						{	// Menu item to edit post in back-office:
+							$entries['page']['entries']['edit_back'] = array(
+									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+								);
+						}
+						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+						{	// Menu item to view post in back-office:
+							$entries['page']['entries']['view_back'] = array(
+									'text' => T_('View in Back-Office').'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+								);
+						}
+						if( $perm_admin_restricted && ( $item_history_url = $menu_Item->get_history_url() ) )
+						{
+							$entries['page']['entries']['view_history'] = array(
+								'text' => T_('View Change History').'&hellip;',
+								'href' => $item_history_url,
 							);
-						$entries['page']['entries']['view_back'] = array(
-								'text' => sprintf( T_('View "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
-							);
+						}
+						if( $disp != 'proposechange' && ( $propose_change_item_url = $menu_Item->get_propose_change_url() ) )
+						{	// If current User has a permission to propose a change for the Item:
+							$entries['page']['entries']['propose'] = array(
+									'text' => T_('Propose change').'&hellip;',
+									'href' => $propose_change_item_url,
+								);
+						}
+					}
+
+					if( isset( $entries['page'] ) )
+					{	// Set a title when at least one menu item is allowed for current User:
+						$entries['page']['text'] = T_('Page');
 					}
 				}
 				if( isset( $entries['post'] ) && $write_item_url = $Blog->get_write_item_url() )
@@ -1865,6 +1912,35 @@ class _core_Module extends Module
 				'title' => T_('JS log'),
 				'class' => 'jslog_switcher'
 			);
+		}
+
+		// Collection locales:
+		if( isset( $Blog ) && count( $coll_locales = $Blog->get_locales() ) )
+		{
+			global $locales, $current_locale;
+
+			$dev_entries[] = array(
+					'separator' => true,
+				);
+
+			$current_coll_locale = get_param( 'coll_locale' ) != '' ? get_param( 'coll_locale' ) : $current_locale;
+			foreach( $coll_locales as $coll_locale_key )
+			{
+				if( ! isset( $locales[ $coll_locale_key ] ) || ! $locales[ $coll_locale_key ]['enabled'] )
+				{	// Skip wrong or disabled locale:
+					continue;
+				}
+
+				$is_selected = ( $current_coll_locale == $coll_locale_key );
+				$dev_entries[] = array(
+					'text' => ( $is_selected ? '&#10003; ' : '' ).$locales[ $coll_locale_key ]['name'],
+					'href' => $is_selected ?
+						// Url to edit collection locales list:
+						$admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog='.$Blog->ID :
+						// Url to change locale of the current collection:
+						url_add_param( regenerate_url( 'coll_locale' ), 'coll_locale='.urlencode( $coll_locale_key ) ),
+				);
+			}
 		}
 
 		if( ! empty( $dev_entries ) )

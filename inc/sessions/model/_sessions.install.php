@@ -28,7 +28,7 @@ global $db_storage_charset;
 $schema_queries['T_sessions'] = array(
 		'Creating table for active sessions',
 		"CREATE TABLE T_sessions (
-			sess_ID          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			sess_ID          INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			sess_key         CHAR(32) COLLATE ascii_general_ci NULL,
 			sess_start_ts    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			sess_lastseen_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00' COMMENT 'User last logged activation time. Value may be off by up to 60 seconds',
@@ -45,7 +45,7 @@ $schema_queries['T_sessions'] = array(
 $schema_queries['T_basedomains'] = array(
 		'Creating table for base domains',
 		"CREATE TABLE T_basedomains (
-			dom_ID     INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			dom_ID     INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			dom_name   VARCHAR(250)  COLLATE utf8_bin NOT NULL DEFAULT '',
 			dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
@@ -114,9 +114,9 @@ $schema_queries['T_hitlog'] = array(
 $schema_queries['T_hits__aggregate'] = array(
 		'Creating table for Hits aggregations',
 		"CREATE TABLE T_hits__aggregate (
-			hagg_ID           INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hagg_ID           INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			hagg_date         DATE NOT NULL DEFAULT '2000-01-01',
-			hagg_coll_ID      INT(11) UNSIGNED NULL DEFAULT NULL,
+			hagg_coll_ID      INT(10) UNSIGNED NULL DEFAULT NULL,
 			hagg_type         ENUM('standard','rss','admin','ajax', 'service', 'api') COLLATE ascii_general_ci DEFAULT 'standard' NOT NULL,
 			hagg_referer_type ENUM('search','special','spam','referer','direct','self') COLLATE ascii_general_ci NOT NULL,
 			hagg_agent_type   ENUM('robot','browser','unknown') COLLATE ascii_general_ci DEFAULT 'unknown' NOT NULL,
@@ -128,9 +128,9 @@ $schema_queries['T_hits__aggregate'] = array(
 $schema_queries['T_hits__aggregate_sessions'] = array(
 		'Creating table for aggregations of hit sessions',
 		"CREATE TABLE T_hits__aggregate_sessions (
-			hags_ID            INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			hags_ID            INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			hags_date          DATE NOT NULL DEFAULT '2000-01-01',
-			hags_coll_ID       INT(11) UNSIGNED NULL DEFAULT NULL,
+			hags_coll_ID       INT(10) UNSIGNED NULL DEFAULT NULL,
 			hags_count_browser INT(11) UNSIGNED NOT NULL DEFAULT 0,
 			hags_count_api     INT(11) UNSIGNED NOT NULL DEFAULT 0,
 			PRIMARY KEY        (hags_ID),

@@ -52,6 +52,7 @@ $Form->begin_fieldset( T_('Front page').get_manual_link('collection-front-page-s
 			array( 'terms',    T_('Terms & Conditions') ),
 			array( 'flagged',  T_('Flagged Items') ),
 			array( 'cart',     T_('Shopping cart') ),
+			array( 'mustread', T_('Must Read Items') ),
 			array( 'single',   T_('First post') ),
 			array( 'page',     T_('A specific page') ),
 		);

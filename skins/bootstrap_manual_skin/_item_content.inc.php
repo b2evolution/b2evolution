@@ -20,7 +20,7 @@ global $more;
 // Default params:
 $params = array_merge( array(
 		'content_mode'             => 'auto', // Can be 'excerpt', 'normal' or 'full'. 'auto' will auto select depending on backoffice SEO settings for $disp-detail
-		'intro_mode'               => 'auto', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
+		'intro_mode'               => 'normal', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
 		'force_more'               => false, // This will be set to true id 'content_mode' resolves to 'full'.
 
 		'content_display_full'     => true, // Do we want to display all post content? false to display only images/attachments
@@ -55,7 +55,10 @@ $params = array_merge( array(
 		'after_image'              => '</figure>',
 		'after_images'             => '</div>',
 		'image_class'              => 'img-responsive',
-		'image_size'               => 'fit-1280x720',
+		'image_size'               => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ), // Standard size (for old browsers)
+		// 'image_sizes'					=> '430px: 400px, 670px: 640px, sm: 720px, md: 698px, 848px', // simplified sizes= attribute for browser to select correct size from srcset=
+		'image_sizes'					=> '(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px',
+													// Note: first we handle margins 15+640+15 = 670 in the fluid domain, then we work with bootstrap breakpoints
 		'image_limit'              =>  1000,
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
 		'excerpt_image_class'      => '',
@@ -130,11 +133,6 @@ if( $content_mode == 'auto' )
 			$content_mode = $Blog->get_setting('archive_content');
 			break;
 
-		case 'posts-filtered':
-		case 'search':
-			$content_mode = $Blog->get_setting('filtered_content');
-			break;
-
 		case 'single':
 		case 'page':
 			$content_mode = 'full';
@@ -142,8 +140,11 @@ if( $content_mode == 'auto' )
 
 		case 'posts-default':  // home page 1
 		case 'posts-next':     // next page 2, 3, etc
-		default:
 			$content_mode = $Blog->get_setting('main_content');
+			break;
+
+		default: // posts-filtered, search, flagged and etc.
+			$content_mode = $Blog->get_setting('filtered_content');
 	}
 }
 
@@ -226,6 +227,7 @@ switch( $content_mode )
 					'after'               => $params['after_images'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
@@ -260,6 +262,7 @@ switch( $content_mode )
 					'after_image'         => $params['after_image'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
@@ -297,6 +300,7 @@ switch( $content_mode )
 						'after'               => $params['after_images'],
 						'image_class'         => $params['image_class'],
 						'image_size'          => $params['image_size'],
+						'image_sizes'         => $params['image_sizes'],
 						'limit'               => $params['image_limit'],
 						'image_link_to'       => $params['image_link_to'],
 						'before_gallery'      => $params['before_gallery'],
@@ -326,6 +330,7 @@ switch( $content_mode )
 					'after_image'         => $params['after_image'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
 					'force_more'          => $params['force_more'],

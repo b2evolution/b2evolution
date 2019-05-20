@@ -33,7 +33,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 		widget_container( $marketing_popup_container_code, array(
 			// The following params will be used as defaults for widgets included in this container:
 			'container_display_if_empty' => false, // If no widget, don't display container at all
-			'container_start' => '<div id="evo_container__'.$marketing_popup_container_code.'" class="evo_container $wico_class$ ddexitpop">',
+			'container_start' => '<div id="evo_container__'.$marketing_popup_container_code.'" class="evo_container $wico_class$ ddexitpop">'
+					// Additional button to close popup:
+					.'<button type="button" class="close"><span>&times;</span></button>',
 			'container_end'   => '</div>',
 			// Force loading of all ajax forms from widgets of this container right after page loading in order to don't wait scroll down event:
 			'load_ajax_form_on_page_load' => true,

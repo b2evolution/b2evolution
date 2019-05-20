@@ -50,7 +50,7 @@ $schema_queries['T_messaging__message'] = array(
 $schema_queries['T_messaging__prerendering'] = array(
 		'Creating message prerendering cache table',
 		"CREATE TABLE T_messaging__prerendering(
-			mspr_msg_ID              INT(11) UNSIGNED NOT NULL,
+			mspr_msg_ID              INT(10) UNSIGNED NOT NULL,
 			mspr_format              ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
 			mspr_renderers           VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			mspr_content_prerendered MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,

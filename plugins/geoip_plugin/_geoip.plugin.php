@@ -1,4 +1,8 @@
 <?php
+require_once( dirname( __FILE__ ).'/autoload.php' );
+
+use GeoIp2\Database\Reader;
+
 /**
  * This file implements the Geo IP plugin.
  *
@@ -34,7 +38,7 @@ class geoip_plugin extends Plugin
 	var $name = 'GeoIP';
 	var $code = 'evo_GeoIP';
 	var $priority = 45;
-	var $version = '7.0.0';
+	var $version = '7.0.1';
 	var $author = 'The b2evo Group';
 	var $group = 'antispam';
 	var $plugin_actions = array( 'geoip_download', 'geoip_find_country', 'geoip_fix_country' );
@@ -46,13 +50,14 @@ class geoip_plugin extends Plugin
 
 
 	/*
-	 * Path to GeoIP Database (file GeoIP.dat)
+	 * Path to GeoIP Database (file GeoLite2-Country.mmdb)
 	 */
 	var $geoip_file_path = '';
-	var $geoip_file_name = 'GeoIP.dat';
+	var $geoip_file_name = 'GeoLite2-Country.mmdb';
+
 
 	/**
-	 * URL to download the GeoIP.dat
+	 * URL to download the GeoIP data file
 	 * @var string
 	 */
 	var $geoip_download_url = '';
@@ -62,6 +67,11 @@ class geoip_plugin extends Plugin
 	 * @var string
 	 */
 	var $geoip_manual_download_url = '';
+
+	/**
+	 * GeoIP Database Reader
+	 */
+	var $reader = NULL;
 
 	/**
 	 * Init
@@ -74,8 +84,8 @@ class geoip_plugin extends Plugin
 		$this->long_desc = T_('This plugin detects user\'s country at the moment the account is created');
 
 		$this->geoip_file_path = dirname( __FILE__ ).'/'.$this->geoip_file_name;
-		$this->geoip_download_url = 'http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz';
-		$this->geoip_manual_download_url = 'http://dev.maxmind.com/geoip/legacy/geolite/';
+		$this->geoip_download_url = 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-Country.tar.gz';
+		$this->geoip_manual_download_url = 'https://dev.maxmind.com/geoip/geoip2/geolite2/';
 	}
 
 
@@ -105,7 +115,7 @@ class geoip_plugin extends Plugin
 
 		return array(
 			'datfile' => array(
-				'label' => 'GeoIP.dat',
+				'label' => 'GeoLite2-Country.mmdb',
 				'type' => 'info',
 				'note' => '',
 				'info' => $datfile_info,
@@ -133,21 +143,21 @@ class geoip_plugin extends Plugin
 
 
 	/**
-	 * Check the existence of the file "GeoIP.dat" (GeoIP Country database)
+	 * Check the existence of the file "GeoLite2-Country.mmdb" (GeoIP Country database)
 	 */
 	function BeforeEnable()
 	{
 		if( !file_exists( $this->geoip_file_path ) )
-		{ // GeoIP DB doesn't exist in the right folder
+		{	// GeoIP DB doesn't exist in the right folder
 			global $admin_url;
 
 
 			if( is_install_page() )
-			{ // Display simple warning on install pages
+			{	// Display simple warning on install pages
 				return T_('WARNING: this plugin can only work once you download the GeoLite Country DB database. Go to the plugin settings to download it.');
 			}
 			else
-			{ // Display full detailed warning on backoffice pages
+			{	// Display full detailed warning on backoffice pages
 				return sprintf( T_('GeoIP Country database not found. Download the <b>GeoLite Country DB in binary format</b> from here: <a %s>%s</a> and then upload the %s file to the folder: %s. Click <a href="%s">here</a> for automatic download.'),
 						'href="'.$this->geoip_manual_download_url.'" target="_blank"',
 						$this->geoip_manual_download_url,
@@ -231,29 +241,29 @@ class geoip_plugin extends Plugin
 	 */
 	function get_country_by_IP( $IP )
 	{
+		if( ! is_valid_ip_format( $IP ) )
+		{	// Don't try to search country by invalid IP address:
+			return false;
+		}
+
 		if( $this->status != 'enabled' || ! file_exists( $this->geoip_file_path ) )
 		{
 			return false;
 		}
 
-		if( function_exists('geoip_country_code_by_name') )
-		{	// GeoIP extension
-
-			// Get country code by user IP address
-			$country_code = @geoip_country_code_by_name($IP);
+		if( empty( $this->reader ) )
+		{
+			$this->reader = new Reader( __DIR__.'/'.$this->geoip_file_name );
 		}
-		else
-		{	// Include GeoIP API
-			require_once( dirname( __FILE__ ).'/geoip.inc' );
 
-			// Open GeoIP database
-			$GeoIP = geoip_open( $this->geoip_file_path, GEOIP_STANDARD );
-
-			// Get country code by user IP address
-			$country_code = geoip_country_code_by_addr( $GeoIP, $IP );
-
-			// Close GeoIP DB
-			geoip_close( $GeoIP );
+		try
+		{
+			$record = $this->reader->country( $IP );
+			$country_code = $record->country->isoCode;
+		}
+		catch( Exception $e )
+		{
+			$country_code = NULL;
 		}
 
 		if( ! $country_code )
@@ -271,7 +281,7 @@ class geoip_plugin extends Plugin
 		$country_ID = $DB->get_var( $SQL );
 
 		if( !$country_ID )
-		{ // No found country in the b2evo DB
+		{	// No found country in the b2evo DB
 			return false;
 		}
 
@@ -524,12 +534,12 @@ jQuery( document ).ready( function()
 			), $params );
 
 		if( is_null( $params['Results'] ) || !is_object( $params['Results'] ) )
-		{ // Results must be object
+		{	// Results must be object
 			return;
 		}
 
 		if( in_array( $params['table'], array( 'sessions', 'activity', 'ipranges', 'top_ips' ) ) )
-		{ // Display column only for required tables by GeoIP plugin
+		{	// Display column only for required tables by GeoIP plugin
 			$column = array(
 				'th' => T_('Country'),
 				'td' => '%geoip_get_country_by_IP( #'.$params['column'].'# )%',
@@ -556,7 +566,6 @@ jQuery( document ).ready( function()
 		if( $action == 'geoip_download' && ! ( isset( $template_action ) && $template_action == 'deferred_admin_tool_action' ) )
 		{
 			$this->download_geoip_data();
-			$this->print_tool_log( '<br /><br />' );
 		}
 		else
 		{
@@ -573,7 +582,7 @@ jQuery( document ).ready( function()
 	function display_tool_form( $params = array() )
 	{
 		if( $this->status != 'enabled' )
-		{ // Don't allow use this tool when GeoIP plugin is not enabled
+		{	// Don't allow use this tool when GeoIP plugin is not enabled
 			echo '<p class="error">'.T_('You must enable the GeoIP plugin before to use this tool.').'</p>';
 			return;
 		}
@@ -648,7 +657,7 @@ jQuery( document ).ready( function()
 			{
 				$datfile_info .= ' - download!!!!!!</a>';
 			}
-			echo '<p><b>GeoIP.dat:</b> '.$datfile_info.'</p>';
+			echo '<p><b>GeoLite2-Country.mmdb:</b> '.$datfile_info.'</p>';
 		}
 
 		$Form->end_form();
@@ -709,12 +718,12 @@ jQuery( document ).ready( function()
 			$Country = $this->get_country_by_IP( $IP_address );
 
 			if( ! $Country )
-			{ // Country not found
+			{	// Country not found
 				continue;
 			}
 
 			if( antispam_block_by_country( $Country->ID, false ) )
-			{ // Block the action if the country is blocked
+			{	// Block the action if the country is blocked
 				$log_message = sprintf( 'A request with [ %s ] ip addresses was blocked because of \'%s\' is blocked.', implode( ', ', $request_ip_list ), $Country->get_name() );
 				exit_blocked_request( 'Country', $log_message, 'plugin', $this->ID ); // WILL exit();
 			}
@@ -798,26 +807,27 @@ jQuery( document ).ready( function()
 
 
 	/**
-	 * Download GeoIP.dat
+	 * Download GeoLite2-Country.mmdb
 	 */
 	function download_geoip_data()
 	{
-		// Display a process of downloading of GeoIP.dat
+		// Display a process of downloading of GeoLite2-Country.mmdb
 		global $admin_url;
 
-		$this->print_tool_log( sprintf( T_('Downloading GeoIP.dat file from the url: %s ...'),
+		$this->print_tool_log( sprintf( T_('Downloading %s file from the url: %s ...'),
+			'<code>'.$this->geoip_file_name.'</code>',
 			'<a href="'.$this->geoip_download_url.'" target="_blank">'.$this->geoip_download_url.'</a>' ) );
 
 		// DOWNLOAD:
 		$gzip_contents = fetch_remote_page( $this->geoip_download_url, $info, 1800 );
 		if( $gzip_contents === false || $info['status'] != 200 )
-		{ // Downloading is Failed
+		{	// Download failed
 			if( empty( $info['error'] ) )
-			{ // Some unknown error
-				$this->print_tool_log( T_( 'The URL is not available. It may correspond to an old version of the GeoIP.dat file.' ), 'error' );
+			{	// Some unknown error
+				$this->print_tool_log( sprintf( T_('The URL is not available. It may correspond to an old version of the %s file.'), '<code>'.$this->geoip_file_name.'</code>' ), 'error' );
 			}
 			else
-			{ // Display an error of request
+			{	// Display an error of request
 				$this->print_tool_log( T_( $info['error'] ), 'error' );
 			}
 			return;
@@ -826,107 +836,121 @@ jQuery( document ).ready( function()
 
 		$plugin_dir = dirname( __FILE__ );
 		$geoip_dat_file = $plugin_dir.'/'.$this->geoip_file_name;
-		// Check if GeoIP.dat file already exists
+		// Check if GeoLite2-Country.mmdb file already exists
 		if( file_exists( $geoip_dat_file ) )
 		{
 			if( ! is_writable( $geoip_dat_file ) )
 			{
-				$this->print_tool_log( sprintf( T_('File %s must be writable to update it. Please fix the write permissions and try again.'), '<b>'.$geoip_dat_file.'</b>' ), 'error' );
+				$this->print_tool_log( sprintf( T_('File %s must be writable to update it. Please fix the write permissions and try again.'), '<code>'.$geoip_dat_file.'</code>' ), 'error' );
 				return;
 			}
 		}
 		elseif( ! is_writable( $plugin_dir ) )
-		{ // Check the write rights
-			$this->print_tool_log( sprintf( T_('Plugin folder %s must be writable to receive GeoIP.dat. Please fix the write permissions and try again.'), '<b>'.$plugin_dir.'</b>' ), 'error' );
+		{	// Check the write rights
+			$this->print_tool_log( sprintf( T_('Plugin folder %s must be writable to receive %s. Please fix the write permissions and try again.'), '<code>'.$plugin_dir.'</code>', '<code>'.$this->geoip_file_name.'</code>' ), 'error' );
 			return;
 		}
 
-		$gzip_file_name = explode( '/', $this->geoip_download_url );
-		$gzip_file_name = $gzip_file_name[ count( $gzip_file_name ) - 1 ];
-		$gzip_file_path = sys_get_temp_dir().'/'.$gzip_file_name;
+		$gzip_tar_file_name = explode( '/', $this->geoip_download_url );
+		$gzip_tar_file_name = $gzip_tar_file_name[ count( $gzip_tar_file_name ) - 1 ];
+		$gzip_tar_file_path = rtrim( sys_get_temp_dir(), '/' ).'/'.$gzip_tar_file_name;
 
-		if( ! save_to_file( $gzip_contents, $gzip_file_path, 'w' ) )
-		{ // Impossible to save file...
-			$this->print_tool_log( sprintf( T_( 'Unable to create file: %s' ), '<b>'.$gzip_file_path.'</b>' ), 'error' );
+		if( ! save_to_file( $gzip_contents, $gzip_tar_file_path, 'w' ) )
+		{	// Impossible to save file...
+			$this->print_tool_log( sprintf( T_( 'Unable to create file: %s' ), '<code>'.$gzip_tar_file_path.'</code>' ), 'error' );
 
-			if( file_exists( $gzip_file_path ) )
-			{ // Remove file from disk
-				if( ! @unlink( $gzip_file_path ) )
-				{ // File exists without the write rights
-					$this->print_tool_log( sprintf( T_( 'Unable to remove file: %s' ), '<b>'.$gzip_file_path.'</b>' ), 'error' );
+			if( file_exists( $gzip_tar_file_path ) )
+			{	// Remove file from disk
+				if( ! @unlink( $gzip_tar_file_path ) )
+				{	// File exists without the write rights
+					$this->print_tool_log( sprintf( T_('Unable to remove file: %s'), '<code>'.$gzip_tar_file_path.'</code>' ), 'error' );
 				}
 			}
 			return;
 		}
 
 		// UNPACK:
-		$this->print_tool_log( sprintf( T_('Extracting of the file %s...'), '<b>'.$gzip_file_path.'</b>' ) );
+		$this->print_tool_log( sprintf( T_('Extracting of the file %s...'), '<code>'.$gzip_tar_file_path.'</code>' ) );
 
-		if( ! function_exists( 'gzopen' ) )
-		{ // No extension
-			$this->print_tool_log( T_( 'There is no \'zip\' or \'zlib\' extension installed!' ), 'error' );
+		if( ! defined( 'Phar::TAR' ) )
+		{	// No extension
+			$this->print_tool_log( sprintf( T_('There is no %s extension installed!'), '<code>phar</code>' ), 'error' );
 			return;
 		}
 
-		if( ! ( $gzip_handle = @gzopen( $gzip_file_path, 'rb' ) ) )
-		{ // Try to open gzip file
-			$this->print_tool_log( T_('Could not open the source file!'), 'error' );
-			return;
-		}
+		$archive = new PharData( $gzip_tar_file_path );
+		$archive->decompress();
 
-		if( ! ( $out_handle = @fopen( $plugin_dir.'/'.str_replace( '.gz', '', $gzip_file_name ), 'w' ) ) )
+		$tar_file_path = str_replace( '.gz', '', $gzip_tar_file_path );
+		$phar = new PharData( $tar_file_path );
+
+		$re = '|'.preg_quote( $tar_file_path.'/', '|' ).'(.*\/'.preg_quote( $this->geoip_file_name, '|' ).')$|';
+		foreach( new RecursiveIteratorIterator( $phar ) as $file )
 		{
-			$this->print_tool_log( sprintf( T_('The file %s cannot be written to disk. Please check the filesystem permissions.'), '<b>'.$plugin_dir.'/'.str_replace( '.gz', '', $gzip_file_name ).'</b>' ), 'error' );
-			return;
-		}
-
-		$i = 0;
-		while( ! gzeof( $gzip_handle ) )
-		{ // Extract file by 4Kb
-			fwrite( $out_handle, gzread( $gzip_handle, 4096 ) );
-			if( $i == 100 )
-			{ // Display the process dots after each 400Kb
-				$this->print_tool_log( ' .' );
-				$i = 0;
+			if( preg_match( $re, $file, $matches ) )
+			{
+				$phar->extractTo( sys_get_temp_dir(), $matches[1], true );
+				@copy( sys_get_temp_dir().'/'.$matches[1], $plugin_dir.'/'.$this->geoip_file_name );
+				if( @unlink( sys_get_temp_dir().'/'.$matches[1] ) )
+				{
+					$this->print_tool_log( ' OK.<br />' );
+				}
+				else
+				{	// Failed removing
+					$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), '<code>'.$gzip_file_path.'</code>' ), 'warning' );
+				}
+				break;
 			}
-			$i++;
 		}
-		$this->print_tool_log( ' OK.<br />' );
 
-		fclose( $out_handle );
-		gzclose( $gzip_handle );
-
-		$this->print_tool_log( sprintf( T_('Remove gzip file %s...'), '<b>'.$gzip_file_path.'</b>' ) );
-		if( @unlink( $gzip_file_path ) )
+		$this->print_tool_log( sprintf( T_('Removing of the file %s...'), '<code>'.$gzip_tar_file_path.'</code>' ) );
+		if( ! @unlink( $tar_file_path ) )
+		{	// Failed to remove tar file:
+			$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), '<code>'.$tar_file_path.'</code>' ), 'warning' );
+		}
+		if( @unlink( $gzip_tar_file_path ) )
 		{
-			$this->print_tool_log( ' OK.<br />' );
+			$this->print_tool_log( ' OK.' );
 		}
 		else
-		{ // Failed on removing
-			$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), $gzip_file_path ), 'warning' );
+		{	// Failed to remove gzip file:
+			$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), '<code>'.$gzip_tar_file_path.'</code>' ), 'warning' );
 		}
 
-		// Success message
-		$this->print_tool_log( sprintf( T_('%s file was downloaded successfully.'), 'GeoIP.dat' ), 'success' );
+		// Success message:
+		$this->print_tool_log( sprintf( T_('%s file was downloaded successfully.'), '<code>'.$this->geoip_file_name.'</code>' ), 'success' );
+
+		$old_geoip_file_path = dirname( __FILE__ ).'/GeoIP.dat';
+		if( file_exists( $old_geoip_file_path ) )
+		{	// Try to remove old data file if it exists on the disk:
+			$this->print_tool_log( '<br />'.sprintf( T_('Removing of the file %s...'), '<code>'.$old_geoip_file_path.'</code>' ) );
+			if( @unlink( $old_geoip_file_path ) )
+			{
+				$this->print_tool_log( ' OK.' );
+			}
+			else
+			{
+				$this->print_tool_log( sprintf( T_('Impossible to remove the file %s. You can do it manually.'), '<code>'.$old_geoip_file_path.'</code>' ), 'warning' );
+			}
+		}
 
 		// Try to enable plugin automatically:
 		global $Plugins;
 		$enable_return = $this->BeforeEnable();
 		if( $enable_return === true )
-		{ // Success enabling
-			$this->print_tool_log( T_('The plugin has been enabled.'), 'success' );
-
+		{	// Successfully enabled the plugin:
 			if( $this->status != 'enabled' )
-			{ // Enable this plugin automatically:
+			{	// Enable this plugin automatically:
 				$Plugins->set_Plugin_status( $this, 'enabled' );
+				$this->print_tool_log( T_('The plugin has been enabled.'), 'success' );
 			}
 		}
 		else
-		{ // Some restriction for enabling
+		{	// Some restriction for enabling:
 			$this->print_tool_log( T_('The plugin could not be automatically enabled.'), 'warning' );
 
 			if( $this->status != 'needs_config' )
-			{ // Make this plugin incomplete because it cannot be enabled:
+			{	// Make this plugin incomplete because it cannot be enabled:
 				$Plugins->set_Plugin_status( $this, 'needs_config' );
 			}
 		}
@@ -1124,12 +1148,12 @@ function geoip_get_country_by_IP( $IP )
 	if( $Plugins && $geoip_Plugin = & $Plugins->get_by_code( 'evo_GeoIP' ) )
 	{
 		if( strlen( intval( $IP ) ) == strlen( $IP ) )
-		{ // IP is in integer format, We should convert it to normal IP
+		{	// IP is in integer format, We should convert it to normal IP
 			$IP = int2ip( $IP );
 		}
 
 		if( $Country = $geoip_Plugin->get_country_by_IP( $IP ) )
-		{ // Get country flag + name
+		{	// Get country flag + name
 			load_funcs( 'regional/model/_regional.funcs.php' );
 			$country = country_flag( $Country->get( 'code' ), $Country->get_name(), 'w16px', 'flag', '', false ).
 				' '.$Country->get_name();

@@ -241,6 +241,12 @@ elseif( $confirmed )
 					}
 					break;
 
+				case 'post_proposed_change':
+					// unsubscribe from post proposed change notifications:
+					$UserSettings->set( 'notify_post_proposed', '0', $edited_User->ID );
+					$UserSettings->dbupdate();
+					break;
+
 				case 'unread_msg':
 					// unsubscribe from unread messages reminder
 					$UserSettings->set( 'notify_unread_messages', '0', $edited_User->ID );
@@ -550,7 +556,7 @@ elseif( $confirmed )
 					// resubscribe to updated post moderation notifications:
 					$subs_edit_pst_type = param( 'subs_edit_pst_type', 'string', 'all' );
 					if( $subs_edit_pst_type == 'all' )
-					{	// If user was unsubscribed from ALL collections we should subsribe to ALL collecitons as well:
+					{	// If user was unsubscribed from ALL collections we should subsribe to ALL collections as well:
 						$UserSettings->set( 'notify_edit_pst_moderation', '1', $edited_User->ID );
 						$UserSettings->dbupdate();
 					}
@@ -569,6 +575,12 @@ elseif( $confirmed )
 								  AND sub_coll_ID = '.$DB->quote( $coll_ID ) );
 						}
 					}
+					break;
+
+				case 'post_proposed_change':
+					// resubscribe to post proposed change notifications:
+					$UserSettings->set( 'notify_post_proposed', '1', $edited_User->ID );
+					$UserSettings->dbupdate();
 					break;
 
 				case 'unread_msg':
@@ -795,6 +807,11 @@ switch( $type )
 	case 'post_moderator_edit':
 		// unsubscribe from updated post moderation notifications:
 		$type_str = $notification_prefix.': '.T_('a post is modified and I have permissions to moderate it.');
+		break;
+
+	case 'post_proposed_change':
+		// unsubscribe from post proposed change notifications:
+		$type_str = $notification_prefix.': '.T_('someone proposed a change on a post and I have permissions to moderate it.');
 		break;
 
 	case 'unread_msg':

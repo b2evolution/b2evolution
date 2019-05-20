@@ -211,7 +211,6 @@ class item_info_line_Widget extends ComponentWidget
 			'author_link_text' => 'preferredname',
 			'block_body_start' => '<div class="small text-muted">',
 			'block_body_end'   => '</div>',
-			'widget_item_info_line_display' => true,
 			'widget_item_info_line_before'  => '<span class="small text-muted">',
 			'widget_item_info_line_after'   => '</span>',
 			'widget_item_info_line_params'  => array(),
@@ -441,7 +440,7 @@ class item_info_line_Widget extends ComponentWidget
 			return true;
 		}
 
-		if( $params['widget_item_info_line_display'] && ! empty( $info_line ) )
+		if( ! empty( $info_line ) )
 		{
 			echo $this->disp_params['block_start'];
 

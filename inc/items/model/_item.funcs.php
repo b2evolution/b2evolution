@@ -73,6 +73,13 @@ function init_MainList( $items_nb_limit )
 							'flagged' => 1
 						) );
 					break;
+
+				case 'mustread':
+					$MainList->set_default_filters( array(
+							'mustread' => 1,
+							'orderby'  => 'mustread',
+						) );
+					break;
 			}
 
 			// pre_dump( $MainList->default_filters );
@@ -117,9 +124,6 @@ function init_MainList( $items_nb_limit )
 
 	param( 'more', 'integer', 0, true );
 	param( 'page', 'integer', 1, true ); // Post page to show
-	param( 'c',    'integer', 0, true ); // Display comments?
-	param( 'tb',   'integer', 0, true ); // Display trackbacks?
-	param( 'pb',   'integer', 0, true ); // Display pingbacks?
 }
 
 
@@ -129,7 +133,7 @@ function init_MainList( $items_nb_limit )
  */
 function init_inskin_editing()
 {
-	global $Collection, $Blog, $edited_Item, $action, $form_action;
+	global $Collection, $Blog, $edited_Item, $action, $form_action, $disp;
 	global $item_tags, $item_title, $item_content;
 	global $admin_url, $redirect_to, $advanced_edit_link;
 
@@ -146,13 +150,33 @@ function init_inskin_editing()
 	// Post ID, go from $_GET when we copy post from Front-office
 	$copy_post_ID = param( 'cp', 'integer', 0 );
 
-	if( $post_ID > 0 )
+	if( $disp == 'proposechange' )
+	{	// Propose a change:
+		$ItemCache = & get_ItemCache ();
+		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
+
+		// Check if current User can create a new proposed change:
+		$edited_Item->can_propose_change( true );
+
+		if( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) )
+		{	// Suggest item fields values from last proposed change when user creates new propose change:
+			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
+		}
+	}
+	elseif( $post_ID > 0 )
 	{	// Edit post
 		global $post_extracats;
 		$action = 'edit';
 
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
+
+		// Check if the editing Item has at least one proposed change:
+		if( ! $edited_Item->check_proposed_change_restriction( 'warning' ) &&
+		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
+		{	// Use item fields values from last proposed change:
+			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
+		}
 
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 		$post_extracats = postcats_get_byID( $post_ID );
@@ -168,6 +192,9 @@ function init_inskin_editing()
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $copy_post_ID );
 
+		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
+		$edited_Item->ID = 0;
+
 		$edited_Item_Blog = $edited_Item->get_Blog();
 		$item_status = $edited_Item_Blog->get_allowed_item_status();
 
@@ -178,6 +205,9 @@ function init_inskin_editing()
 		modules_call_method( 'constructor_item', array( 'Item' => & $edited_Item ) );
 
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
+
+		// Duplicate attachments from source Item:
+		$edited_Item->duplicate_attachments( $copy_post_ID );
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
@@ -213,15 +243,17 @@ function init_inskin_editing()
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
 
-	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:Restrict item status to max allowed by item collection:
-	$edited_Item->restrict_status();
+	if( $disp != 'proposechange' )
+	{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:Restrict item status to max allowed by item collection:
+		$edited_Item->restrict_status();
+	}
 
 	// Used in the edit form:
 
 	// We never allow HTML in titles, so we always encode and decode special chars.
-	$item_title = htmlspecialchars_decode( $edited_Item->title );
+	$item_title = htmlspecialchars_decode( $edited_Item->get( 'title' ) );
 
-	$item_content = prepare_item_content( $edited_Item->content );
+	$item_content = prepare_item_content( $edited_Item->get( 'content' ) );
 
 	if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 	{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
@@ -391,6 +423,32 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 	}
 
 	return $Item;
+}
+
+
+/**
+ * Get currently viewing Item or Intro Item of the current Chapter
+ *
+ * @return object Item
+ */
+function & get_current_Item()
+{
+	global $disp, $disp_detail, $Item;
+
+	$current_Item = NULL;
+
+	if( in_array( $disp, array( 'single', 'page', 'widget_page' ) ) &&
+	    isset( $Item ) && $Item instanceof Item )
+	{	// Use current global Item:
+		$current_Item = $Item;
+	}
+
+	if( in_array( $disp_detail, array( 'posts-topcat', 'posts-subcat' ) ) )
+	{	// Try to get intro Item:
+		$current_Item = & get_featured_Item( 'posts', NULL, true );
+	}
+
+	return $current_Item;
 }
 
 
@@ -1673,7 +1731,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 					array(
 						'custom' => array(
 							'text' => T_('Custom Types'),
-							'href' => $dispatcher.'?ctrl=items&amp;tab=custom&amp;filter=restore&amp;blog='.$Blog->ID,
+							'href' => $admin_url.'?ctrl=items&amp;tab=custom&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					)
 			);
@@ -2055,17 +2113,17 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		echo '<span class="edit_actions_text">'.T_('Visibility').get_manual_link( 'visibility-status' ).': </span>';
 
 		// Get those statuses which are not allowed for the current User to create posts in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->get( 'status' ), '', $edited_Item ), array( 'trash' ) );
 		// Get allowed visibility statuses
 		$status_options = get_visibility_statuses( '', $exclude_statuses );
 
 		if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
 		{ // Use dropdown for bootstrap skin
 			$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
-			$Form->hidden( 'post_status', $edited_Item->status );
-			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
-			echo '<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
-							.'<span>'.$status_options[ $edited_Item->status ].'</span>'
+			$Form->hidden( 'post_status', $edited_Item->get( 'status' ) );
+			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->get( 'status' ) ).'">';
+			echo '<button type="button" class="btn btn-status-'.$edited_Item->get( 'status' ).' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
+							.'<span>'.$status_options[ $edited_Item->get( 'status' ) ].'</span>'
 						.' <span class="caret"></span></button>';
 			echo '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
 			foreach( $status_options as $status_key => $status_title )
@@ -2081,7 +2139,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 			foreach( $status_options as $status_key => $status_title )
 			{
 				echo '<option value="'.$status_key.'"'
-							.( $edited_Item->status == $status_key ? ' selected="selected"' : '' )
+							.( $edited_Item->get( 'status' ) == $status_key ? ' selected="selected"' : '' )
 							.' class="btn-status-'.$status_key.'">'
 						.$status_title
 					.'</option>';
@@ -2097,19 +2155,19 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	$next_action = ($creating ? 'create' : 'update');
 	if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{ // Show Save & Edit only on admin mode
-		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->status ) );
+		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->get( 'status' ) ) );
 	}
 
 	if( $inskin )
 	{ // Front-office: display a save button with title depending on post status
 		$button_titles = get_visibility_statuses( 'button-titles' );
-		$button_title = isset( $button_titles[ $edited_Item->status ] ) ? T_( $button_titles[ $edited_Item->status ] ) : T_('Save Changes!');
+		$button_title = isset( $button_titles[ $edited_Item->get( 'status' ) ] ) ? T_( $button_titles[ $edited_Item->get( 'status' ) ] ) : T_('Save Changes!');
 	}
 	else
 	{ // Use static button title on back-office
 		$button_title = T_('Save');
 	}
-	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->status ) );
+	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->get( 'status' ) ) );
 
 	echo '</span>';
 
@@ -2119,7 +2177,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	{ // Display this button to make a post published
 
 		// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
-		$publish_style = ( $edited_Item->status == $highest_publish_status ) ? 'display: none' : 'display: inline';
+		$publish_style = ( $edited_Item->get( 'status' ) == $highest_publish_status ) ? 'display: none' : 'display: inline';
 
 		$Form->submit( array(
 			'actionArray['.$next_action.'_publish]',
@@ -2398,56 +2456,57 @@ function echo_item_content_position_js( $height, $scroll_position )
 
 
 /**
- * JS Behaviour: Output JavaScript code to merge an item with another item
+ * JS Behaviour: Output JavaScript code to display selector an item from another item to do some actions like merging or linking
  */
-function echo_item_merge_js()
+function echo_item_selector_js()
 {
-	global $Blog, $admin_url, $evo_item_merge_js_initialized;
+	global $evo_item_selector_js_initialized;
 
-	if( ! empty( $evo_item_merge_js_initialized ) )
+	if( ! empty( $evo_item_selector_js_initialized ) )
 	{	// Don't initialize this JS code twice on same page:
 		return;
 	}
 
 	// Set flag to know this is initialized:
-	$evo_item_merge_js_initialized = true;
-
-	// Initialize JavaScript to build and open window:
-	echo_modalwindow_js();
+	$evo_item_selector_js_initialized = true;
 ?>
 <script>
-function evo_merge_load_window( item_ID )
+function evo_item_selector_load_window( item_ID, window_titles, restriction_message, submit_buttons, default_coll_ID, api_coll_path, api_coll_params )
 {
-	if( typeof( bozo ) && bozo.nb_changes > 0 )
-	{	// Don't allow to merge if item edit form is changed and not saved yet:
-		alert( '<?php echo TS_('You must save the Item before you can merge it.'); ?>' );
+	if( item_ID < 1 || ( typeof( bozo ) && bozo.nb_changes > 0 ) )
+	{	// Don't allow to select another item if item edit form is changed and not saved yet:
+		alert( restriction_message );
 		return false;
 	}
 
-	openModalWindow( '<div id="evo_merge_wrapper"></div>', 'auto', '', true,
-		'<?php echo TS_('Select destination Post...'); ?>', // Window title
-		[ '-', 'evo_merge_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back", "Merge with original dates",  "Append to this post with new dates"
+	openModalWindow( '<div id="evo_item_selector_wrapper"></div>', 'auto', '', true,
+		window_titles[0],
+		[ '-', 'evo_item_selector_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back", and other additional submit buttons
 		true );
+	jQuery( '.modal-title' ).data( 'titles', window_titles );
 
 	// Load collections:
-	var current_coll_urlname = '<?php echo empty( $Blog ) ? '' : format_to_js( $Blog->get( 'urlname' ) ); ?>';
-	evo_rest_api_start_loading( '#evo_merge_wrapper' );
-	evo_rest_api_request( 'collections', { per_page: 0, list_in_frontoffice: 'all' }, function( data )
+	evo_rest_api_start_loading( '#evo_item_selector_wrapper' );
+	if( typeof( api_coll_params ) == 'undefined' )
+	{	// Default params:
+		api_coll_params = {};
+	}
+	evo_rest_api_request( api_coll_path, api_coll_params, function( data )
 	{	// Display the colllections on success request:
 		var coll_urlname = '';
 		var coll_name = '';
 
 		// Initialize html code to view the loaded collections:
-		var r = '<div id="evo_merge_colls_list">'
+		var r = '<div id="evo_item_selector_colls_list">'
 			+ '<h2><?php echo TS_('Collections'); ?></h2>'
 			+ '<select class="form-control">';
 		for( var c in data.colls )
 		{
 			var coll = data.colls[c];
 			r += '<option value="' + coll.urlname + '"'
-				+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
+				+ ( default_coll_ID == coll.id ? ' selected="selected"' : '' )+ '>'
 				+ coll.name + '</option>';
-			if( coll_urlname == '' || coll.urlname == current_coll_urlname )
+			if( coll_urlname == '' || coll.id == default_coll_ID )
 			{	// Set these vars to load posts of the selected or first collection:
 				coll_urlname = coll.urlname;
 				coll_name = coll.name;
@@ -2455,21 +2514,58 @@ function evo_merge_load_window( item_ID )
 		}
 		r += '</select>'
 			+ '</div>'
-			+ '<div id="evo_merge_posts_block"></div>'
-			+ '<div id="evo_merge_post_block"></div>'
-			+ '<input type="hidden" id="evo_merge_post_ID" value="' + item_ID + '" />'
-			+ '<input type="hidden" id="evo_merge_dest_post_ID" />';
+			+ '<div id="evo_item_selector_posts_block"></div>'
+			+ '<div id="evo_item_selector_post_block"></div>'
+			+ '<input type="hidden" id="evo_item_selector_post_ID" value="' + item_ID + '" />'
+			+ '<input type="hidden" id="evo_item_selector_dest_post_ID" />';
 
-		evo_rest_api_end_loading( '#evo_merge_wrapper', r );
+		evo_rest_api_end_loading( '#evo_item_selector_wrapper', r );
 
 		if( coll_urlname != '' )
 		{	// Load posts list of the current or first collection:
-			evo_merge_load_coll_posts( coll_urlname, coll_name );
+			evo_item_selector_load_coll_posts( coll_urlname, coll_name );
 		}
+
+		// Initialize the buttons to back and additional buttons:
+		var buttons_side_obj = jQuery( '.evo_item_selector_post_buttons' ).length ?
+			jQuery( '.evo_item_selector_post_buttons' ) :
+			jQuery( '#evo_item_selector_post_content' );
+		var buttons_html = '<button id="evo_item_selector_btn_back_to_list" class="btn btn-default" style="display:none">&laquo; <?php echo TS_('Back'); ?></button>';
+		if( typeof( submit_buttons ) == 'object' )
+		{
+			buttons_html += '<span id="evo_item_selector_btns_group" style="margin:0 5px;display:none">';
+			for( var b in submit_buttons )
+			{
+				switch( typeof( submit_buttons[b] ) )
+				{
+					case 'string':
+						// Plain text:
+						buttons_html += submit_buttons[b];
+						break;
+					case 'object':
+						if( typeof( submit_buttons[b][0] ) == 'undefined' )
+						{	// Single button:
+							buttons_html += '<button id="' + submit_buttons[b]['id'] + '" class="' + submit_buttons[b]['class'] + '">' + submit_buttons[b]['text'] + '</button>';
+						}
+						else
+						{	// Grouped buttons:
+							buttons_html += ' <div class="btn-group">';
+							for( var bb in submit_buttons[b] )
+							{
+								buttons_html += '<button id="' + submit_buttons[b][bb]['id'] + '" class="' + submit_buttons[b][bb]['class'] + '">' + submit_buttons[b][bb]['text'] + '</button>';
+							}
+							buttons_html += '</div>';
+						}
+						break;
+				}
+			}
+			buttons_html += '</span>';
+		}
+		buttons_side_obj.after( buttons_html );
 	} );
 
 	// Set max-height to keep the action buttons on screen:
-	var modal_window = jQuery( '#evo_item_merge_wrapper' ).parent();
+	var modal_window = jQuery( '#evo_item_item_selector_wrapper' ).parent();
 	var modal_height = jQuery( window ).height() - 20;
 	if( modal_window.hasClass( 'modal-body' ) )
 	{	// Extract heights of header and footer:
@@ -2494,19 +2590,19 @@ function evo_merge_load_window( item_ID )
  * @param string Collection name
  * @param string Predefined Search keyword
  */
-function evo_merge_display_search_form( coll_urlname, coll_name, search_keyword )
+function evo_item_selector_display_search_form( coll_urlname, coll_name, search_keyword )
 {
 	var r = '<h2>' + coll_name + '</h2>' +
-		'<form class="form-inline" id="evo_merge_search__form" data-urlname="' + coll_urlname + '">' +
+		'<form class="form-inline" id="evo_item_selector_search__form" data-urlname="' + coll_urlname + '">' +
 			'<div class="input-group">' +
-				'<input type="text" id="evo_merge_search__input" class="form-control" value="' + ( typeof( search_keyword ) == 'undefined' ? '' : search_keyword ) + '">' +
-				'<span class="input-group-btn"><button id="evo_merge_search__submit" class="btn btn-primary"><?php echo TS_('Search'); ?></button></span>' +
+				'<input type="text" id="evo_item_selector_search__input" class="form-control" value="' + ( typeof( search_keyword ) == 'undefined' ? '' : search_keyword ) + '">' +
+				'<span class="input-group-btn"><button id="evo_item_selector_search__submit" class="btn btn-primary"><?php echo TS_('Search'); ?></button></span>' +
 			'</div> ' +
-			'<button id="evo_merge_search__clear" class="btn btn-default"><?php echo TS_('Clear'); ?></button>' +
+			'<button id="evo_item_selector_search__clear" class="btn btn-default"><?php echo TS_('Clear'); ?></button>' +
 		'</form>' +
-		'<div id="evo_merge_posts_list"></div>';
+		'<div id="evo_item_selector_posts_list"></div>';
 
-	jQuery( '#evo_merge_posts_block' ).html( r );
+	jQuery( '#evo_item_selector_posts_block' ).html( r );
 }
 
 
@@ -2517,18 +2613,18 @@ function evo_merge_display_search_form( coll_urlname, coll_name, search_keyword 
  * @param string Collection name
  * @param integer Page
  */
-function evo_merge_load_coll_posts( coll_urlname, coll_name, page )
+function evo_item_selector_load_coll_posts( coll_urlname, coll_name, page )
 {
 	if( typeof( coll_name ) != 'undefined' && coll_name !== false )
 	{
-		evo_merge_display_search_form( coll_urlname, coll_name );
+		evo_item_selector_display_search_form( coll_urlname, coll_name );
 	}
 
-	var current_post_exclude_param = '&pl=-' + jQuery( '#evo_merge_post_ID' ).val();
+	var current_post_exclude_param = '&pl=-' + jQuery( '#evo_item_selector_post_ID' ).val();
 
 	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
-	evo_rest_api_start_loading( '#evo_merge_posts_list' );
+	evo_rest_api_start_loading( '#evo_item_selector_posts_list' );
 	evo_rest_api_request( 'collections/' + coll_urlname + '/items&orderby=datemodified&order=DESC' + current_post_exclude_param +page_param, function( data )
 	{	// Display the posts on success request:
 		var r = '<ul>';
@@ -2538,8 +2634,8 @@ function evo_merge_load_coll_posts( coll_urlname, coll_name, page )
 			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
 		}
 		r += '</ul>';
-		r += evo_merge_get_pagination( data );
-		evo_rest_api_end_loading( '#evo_merge_posts_list', r );
+		r += evo_item_selector_get_pagination( data );
+		evo_rest_api_end_loading( '#evo_item_selector_posts_list', r );
 	} );
 }
 
@@ -2551,7 +2647,7 @@ function evo_merge_load_coll_posts( coll_urlname, coll_name, page )
  * @param string Search keyword
  * @return string Pagination
  */
-function evo_merge_get_pagination( data, search_keyword )
+function evo_item_selector_get_pagination( data, search_keyword )
 {
 	var r = '';
 
@@ -2592,7 +2688,7 @@ function evo_merge_get_pagination( data, search_keyword )
 		page_list_end = Math.min( total_pages, page_list_start + page_list_span - 1 );
 	}
 
-	r += '<ul class="evo_merge_pagination pagination"' + search_keyword_attr + '>';
+	r += '<ul class="evo_item_selector_pagination pagination"' + search_keyword_attr + '>';
 
 	if( current_page > 1 )
 	{	// A link to previous page:
@@ -2651,18 +2747,18 @@ function evo_merge_get_pagination( data, search_keyword )
  * @param string Search keyword
  * @param integer Page
  */
-function evo_merge_load_coll_search( coll_urlname, search_keyword, page )
+function evo_item_selector_load_coll_search( coll_urlname, search_keyword, page )
 {
-	var current_post_exclude_param = '&exclude_posts=' + jQuery( '#evo_merge_post_ID' ).val();
+	var current_post_exclude_param = '&exclude_posts=' + jQuery( '#evo_item_selector_post_ID' ).val();
 
 	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
-	evo_rest_api_start_loading( '#evo_merge_posts_list' );
+	evo_rest_api_start_loading( '#evo_item_selector_posts_list' );
 	evo_rest_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + '&kind=item' + current_post_exclude_param + page_param, function( data )
 	{	// Display the post data in third column on success request:
 		if( typeof( data.code ) != 'undefined' )
 		{	// Error code was responsed:
-			evo_rest_api_print_error( '#evo_merge_posts_list', data );
+			evo_rest_api_print_error( '#evo_item_selector_posts_list', data );
 			return;
 		}
 
@@ -2679,57 +2775,57 @@ function evo_merge_load_coll_search( coll_urlname, search_keyword, page )
 			r += '</li>';
 		}
 		r += '</ul>';
-		r += evo_merge_get_pagination( data, search_keyword );
-		evo_rest_api_end_loading( '#evo_merge_posts_list', r );
+		r += evo_item_selector_get_pagination( data, search_keyword );
+		evo_rest_api_end_loading( '#evo_item_selector_posts_list', r );
 	} );
 }
 
 // Load the posts of the selected collection:
-jQuery( document ).on( 'change', '#evo_merge_colls_list select', function()
+jQuery( document ).on( 'change', '#evo_item_selector_colls_list select', function()
 {
-	evo_merge_load_coll_posts( jQuery( this ).val(), jQuery( 'option:selected', this ).text() );
+	evo_item_selector_load_coll_posts( jQuery( this ).val(), jQuery( 'option:selected', this ).text() );
 
 	// To prevent link default event:
 	return false;
 } );
 
 // Submit a search form:
-jQuery( document ).on( 'submit', '#evo_merge_search__form', function()
+jQuery( document ).on( 'submit', '#evo_item_selector_search__form', function()
 {
 	var coll_urlname = jQuery( this ).data( 'urlname' );
-	var search_keyword = jQuery( '#evo_merge_search__input' ).val();
+	var search_keyword = jQuery( '#evo_item_selector_search__input' ).val();
 
-	evo_merge_load_coll_search( coll_urlname, search_keyword );
+	evo_item_selector_load_coll_search( coll_urlname, search_keyword );
 
 	// To prevent link default event:
 	return false;
 } );
 
 // Clear the search results:
-jQuery( document ).on( 'click', '#evo_merge_search__clear', function()
+jQuery( document ).on( 'click', '#evo_item_selector_search__clear', function()
 {
-	evo_merge_load_coll_posts( jQuery( this ).closest( 'form' ).data( 'urlname' ) );
+	evo_item_selector_load_coll_posts( jQuery( this ).closest( 'form' ).data( 'urlname' ) );
 
 	// Clear search input field:
-	jQuery( '#evo_merge_search__input' ).val( '' );
+	jQuery( '#evo_item_selector_search__input' ).val( '' );
 
 	// To prevent link default event:
 	return false;
 } );
 
 // Switch page:
-jQuery( document ).on( 'click', '.evo_merge_pagination a', function()
+jQuery( document ).on( 'click', '.evo_item_selector_pagination a', function()
 {
-	var coll_selector = jQuery( '#evo_merge_colls_list select' );
-	var pages_list = jQuery( this ).closest( '.evo_merge_pagination' );
+	var coll_selector = jQuery( '#evo_item_selector_colls_list select' );
+	var pages_list = jQuery( this ).closest( '.evo_item_selector_pagination' );
 
 	if( pages_list.data( 'search' ) == undefined )
 	{	// Load posts/items for selected page:
-		evo_merge_load_coll_posts( coll_selector.val(), false, jQuery( this ).data( 'page' ) );
+		evo_item_selector_load_coll_posts( coll_selector.val(), false, jQuery( this ).data( 'page' ) );
 	}
 	else
 	{	// Load search list for selected page:
-		evo_merge_load_coll_search( coll_selector.val(), pages_list.data( 'search' ), jQuery( this ).data( 'page' ) );
+		evo_item_selector_load_coll_search( coll_selector.val(), pages_list.data( 'search' ), jQuery( this ).data( 'page' ) );
 	}
 
 	// To prevent link default event:
@@ -2738,73 +2834,44 @@ jQuery( document ).on( 'click', '.evo_merge_pagination a', function()
 
 
 // Load the data of the selected post:
-jQuery( document ).on( 'click', '#evo_merge_posts_list a[data-id]', function()
+jQuery( document ).on( 'click', '#evo_item_selector_posts_list a[data-id]', function()
 {
 	var coll_urlname = jQuery( this ).data( 'urlname' );
 	var post_id = jQuery( this ).data( 'id' );
 
 	// Hide the lists of collectionss and posts:
-	jQuery( '#evo_merge_colls_list, #evo_merge_posts_block' ).hide();
+	jQuery( '#evo_item_selector_colls_list, #evo_item_selector_posts_block' ).hide();
 
 	// Show the post preview block, because it can be hidded after prevous preview:
-	jQuery( '#evo_merge_post_block' ).show();
+	jQuery( '#evo_item_selector_post_block' ).show();
 
-	if( jQuery( '#evo_merge_post_block' ).data( 'post' ) == post_id )
+	if( jQuery( '#evo_item_selector_post_block' ).data( 'post' ) == post_id )
 	{	// If user loads the same post, just display the cached content to save ajax calls:
 		// Show the action buttons:
-		jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btns_group' ).show();
+		jQuery( '#evo_item_selector_btn_back_to_list, #evo_item_selector_btns_group' ).show();
 	}
 	else
 	{	// Load new post:
-		jQuery( '#evo_merge_post_block' ).html( '' ); // Clear previous cached content
-		evo_rest_api_start_loading( '#evo_merge_post_block' );
+		jQuery( '#evo_item_selector_post_block' ).html( '' ); // Clear previous cached content
+		evo_rest_api_start_loading( '#evo_item_selector_post_block' );
 		evo_rest_api_request( 'collections/' + coll_urlname + '/items/' + post_id, function( post )
 		{	// Display the post data on success request:
-			jQuery( '#evo_merge_post_block' ).data( 'post', post.id );
+			jQuery( '#evo_item_selector_post_block' ).data( 'post', post.id );
 
 			// Store item field values in hidden inputs to use on insert complex link:
-			jQuery( '#evo_merge_dest_post_ID' ).val( post.id );
+			jQuery( '#evo_item_selector_dest_post_ID' ).val( post.id );
 
 			// Item title:
 			var item_content = '<h2>' + post.title + '</h2>';
-			// Item attachments, Only images and on teaser positions:
-			if( typeof( post.attachments ) == 'object' && post.attachments.length > 0 )
-			{
-				item_content += '<div id="evo_merge_post_attachments">';
-				for( var a in post.attachments )
-				{
-					var attachment = post.attachments[a];
-					if( attachment.type == 'image' &&
-							( attachment.position == 'teaser' ||
-								attachment.position == 'teaserperm' ||
-								attachment.position == 'teaserlink' )
-						)
-					{
-						item_content += '<img src="' + attachment.url + '" />';
-					}
-				}
-				item_content += '</div>';
-			}
 			// Item content:
-			item_content += '<div id="evo_merge_post_content">' + post.content + '</div>';
+			item_content += '<div id="evo_item_selector_post_content">' + post.content + '</div>';
 
-			evo_rest_api_end_loading( '#evo_merge_post_block', item_content );
+			evo_rest_api_end_loading( '#evo_item_selector_post_block', item_content );
 
-			jQuery( '.modal-title' ).html( '<?php echo T_('Destination Post:'); ?>' );
+			jQuery( '.modal-title' ).html( jQuery( '.modal-title' ).data( 'titles' )[1] );
 
-			// Display the buttons to back and merge/append a post:
-			var buttons_side_obj = jQuery( '.evo_merge_post_buttons' ).length ?
-				jQuery( '.evo_merge_post_buttons' ) :
-				jQuery( '#evo_merge_post_content' );
-			jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btns_group, #evo_merge_btn_form' ).remove();
-			buttons_side_obj.after( '<button id="evo_merge_btn_back_to_list" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
-				+ '<span id="evo_merge_btns_group" style="margin:0 5px">'
-				+ '<?php echo TS_('Move source post & comments'); ?>: '
-				+ '<div class="btn-group">'
-				+ '<button id="evo_merge_btn_merge" class="btn btn-primary"><?php echo TS_('by keeping original dates (merge)'); ?></button>'
-				+ '<button id="evo_merge_btn_append" class="btn btn-default"><?php echo TS_('by assigning new dates (append)'); ?></button>'
-				+ '</div>'
-				+ '</span>' );
+			// Show the action buttons:
+			jQuery( '#evo_item_selector_btn_back_to_list, #evo_item_selector_btns_group' ).show();
 		} );
 	}
 
@@ -2812,30 +2879,179 @@ jQuery( document ).on( 'click', '#evo_merge_posts_list a[data-id]', function()
 	return false;
 } );
 
+// Back to previous list:
+jQuery( document ).on( 'click', '#evo_item_selector_btn_back_to_list', function()
+{
+	jQuery( '.modal-title' ).html( jQuery( '.modal-title' ).data( 'titles' )[0] );
+
+	// Show the lists of collections and posts:
+	jQuery( '#evo_item_selector_colls_list, #evo_item_selector_posts_block' ).show();
+
+	// Hide the post preview block and action buttons:
+	jQuery( '#evo_item_selector_post_block, #evo_item_selector_btn_back_to_list, #evo_item_selector_btns_group' ).hide();
+
+	// To prevent link default event:
+	return false;
+} );
+</script>
+<?php
+}
+
+
+/**
+ * JS Behaviour: Output JavaScript code to merge an item with another item
+ */
+function echo_item_merge_js()
+{
+	global $Blog, $admin_url, $evo_item_merge_js_initialized;
+
+	if( ! empty( $evo_item_merge_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
+
+	// Set flag to know this is initialized:
+	$evo_item_merge_js_initialized = true;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize JavaScript for item selector window:
+	echo_item_selector_js();
+?>
+<script>
+function evo_merge_load_window( item_ID )
+{
+	return evo_item_selector_load_window( item_ID,
+		[ '<?php echo TS_('Select destination Post...'); ?>', '<?php echo TS_('Destination Post:'); ?>' ],
+		'<?php echo TS_('You must save the Item before you can merge it.'); ?>',
+		[
+			'<?php echo TS_('Move source post & comments'); ?>: ',
+			[
+				{ 'text': '<?php echo TS_('by keeping original dates (merge)'); ?>', 'id': 'evo_merge_btn_merge', 'class': 'btn btn-primary' },
+				{ 'text': '<?php echo TS_('by assigning new dates (append)'); ?>', 'id': 'evo_merge_btn_append', 'class': 'btn btn-default' },
+			]
+		],
+		<?php echo empty( $Blog ) ? 0 : $Blog->ID; // Default collection ?>,
+		'collections', { per_page: 0, list_in_frontoffice: 'all' }
+	);
+}
+
 // Submit form to merge/append a post:
 jQuery( document ).on( 'click', '#evo_merge_btn_merge, #evo_merge_btn_append', function()
 {
 	var action = jQuery( this ).attr( 'id' ) == 'evo_merge_btn_merge' ? 'merge' : 'append';
 
 	location.href = '<?php echo $admin_url; ?>?ctrl=items&action=' + action
-		+ '&post_ID=' + jQuery( '#evo_merge_post_ID' ).val()
-		+ '&dest_post_ID=' + jQuery( '#evo_merge_dest_post_ID' ).val()
+		+ '&post_ID=' + jQuery( '#evo_item_selector_post_ID' ).val()
+		+ '&dest_post_ID=' + jQuery( '#evo_item_selector_dest_post_ID' ).val()
 		+ '&<?php echo url_crumb( 'item' ); ?>';
 } );
+</script>
+<?php
+}
 
-// Back to previous list:
-jQuery( document ).on( 'click', '#evo_merge_btn_back_to_list', function()
+
+/**
+ * JS Behaviour: Output JavaScript code to add version of Item
+ */
+function echo_item_add_version_js()
 {
-	jQuery( '.modal-title' ).html( '<?php echo T_('Select destination Post...'); ?>' );
+	global $evo_item_add_version_js_initialized;
 
-	// Show the lists of collections and posts:
-	jQuery( '#evo_merge_colls_list, #evo_merge_posts_block' ).show();
+	if( ! empty( $evo_item_add_version_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
 
-	// Hide the post preview block and action buttons:
-	jQuery( '#evo_merge_post_block, #evo_merge_btn_back_to_list, #evo_merge_btns_group' ).hide();
+	// Set flag to know this is initialized:
+	$evo_item_add_version_js_initialized = true;
 
-	// To prevent link default event:
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+?>
+<script>
+function evo_add_version_load_window( item_ID )
+{
+	if( item_ID < 1 || ( typeof( bozo ) && bozo.nb_changes > 0 ) )
+	{	// Don't allow to add version if item edit form is changed and not saved yet:
+		alert( '<?php echo TS_('You must save this Item before you can add a version to it.'); ?>' );
+		return false;
+	}
+
+	var evo_js_lang_add_version = '<?php echo TS_('Add version');?>';
+	evo_js_lang_close = '<?php echo TS_('Cancel');?>';
+
+	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo format_to_output( TS_('Loading'), 'htmlattr' );?>"></span>',
+		'600px', 'auto', true, evo_js_lang_add_version, evo_js_lang_add_version, true );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
+		data:
+		{
+			'action': 'get_item_add_version_form',
+			'item_ID': item_ID,
+		},
+		success: function(result)
+		{
+			result = ajax_debug_clear( result );
+			openModalWindow( result, '600px', 'auto', true, evo_js_lang_add_version, evo_js_lang_add_version );
+		}
+	} );
 	return false;
+}
+</script>
+<?php
+}
+
+
+/**
+ * JS Behaviour: Output JavaScript code to link version to Item
+ */
+function echo_item_link_version_js()
+{
+	global $Blog, $UserSettings, $admin_url, $evo_item_link_version_js_initialized;
+
+	if( ! empty( $evo_item_link_version_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
+
+	// Set flag to know this is initialized:
+	$evo_item_link_version_js_initialized = true;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize JavaScript for item selector window:
+	echo_item_selector_js();
+
+	// Get default collection:
+	if( ! ( $default_coll_ID = $UserSettings->get( 'last_linked_coll_ID' ) ) )
+	{
+		$default_coll_ID = empty( $Blog ) ? 0 : $Blog->ID;
+	}
+?>
+<script>
+function evo_link_version_load_window( item_ID, coll_url )
+{
+	return evo_item_selector_load_window( item_ID,
+		[ '<?php echo TS_('Select Post to link...'); ?>', '<?php echo TS_('Link with this Post:'); ?>' ],
+		'<?php echo TS_('You must save this Item before you can link it with another.'); ?>',
+		[ { 'text': '<?php echo TS_('Link'); ?>', 'id': 'evo_link_version_btn', 'class': 'btn btn-primary' } ],
+		<?php echo $default_coll_ID; ?>,
+		'collections/' + coll_url + '/linked'
+	);
+}
+
+// Submit form to merge/append a post:
+jQuery( document ).on( 'click', '#evo_link_version_btn', function()
+{
+	location.href = '<?php echo $admin_url; ?>?ctrl=items&action=link_version'
+		+ '&post_ID=' + jQuery( '#evo_item_selector_post_ID' ).val()
+		+ '&dest_post_ID=' + jQuery( '#evo_item_selector_dest_post_ID' ).val()
+		+ '&<?php echo url_crumb( 'item' ); ?>';
 } );
 </script>
 <?php
@@ -2955,8 +3171,11 @@ function echo_autocomplete_tags( $params = array() )
  *
  * @param integer Item type ID
  * @param array The extra cats of the post.
+ * @param boolean Assert valid post type
+ * @param boolean Assert valid permission
+ * @return boolean
  */
-function check_perm_posttype( $item_typ_ID, $post_extracats )
+function check_perm_posttype( $item_typ_ID, $post_extracats, $assert_post_type = true, $assert_permission = true )
 {
 	global $Collection, $Blog, $current_User;
 
@@ -2965,11 +3184,15 @@ function check_perm_posttype( $item_typ_ID, $post_extracats )
 
 	if( ! $Blog->is_item_type_enabled( $ItemType->ID ) )
 	{ // Don't allow to use a not enabled post type:
-		debug_die( 'This post type is not enabled. Please choose another one.' );
+		if( $assert_post_type )
+		{
+			debug_die( 'This post type is not enabled. Please choose another one.' );
+		}
+		return false;
 	}
 
 	// Check permission:
-	$current_User->check_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', true /* assert */, $post_extracats );
+	return $current_User->check_perm( 'cats_item_type_'.$ItemType->perm_level, 'edit', $assert_permission, $post_extracats );
 }
 
 
@@ -3521,7 +3744,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 
 		// Filter comments list:
 		$CommentList->set_filters( array(
-			'types'             => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
+			'types'             => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback', 'webmentions' ),
 			'statuses'          => $statuses,
 			'expiry_statuses'   => ( $expiry_status == 'all' ? array( 'active', 'expired' ) : array( $expiry_status ) ),
 			'comment_ID_list'   => ( empty( $exclude_comment_IDs ) ? NULL : '-'.implode( ",", $exclude_comment_IDs ) ),
@@ -3539,7 +3762,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=comments&blog='.$blog_ID.'&filter=restore', '&' ) );
 		// this is an ajax call we always have to restore the filterst (we can set filters only without ajax call)
 		$CommentList->set_filters( array(
-			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
+			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback', 'webmentions' ),
 			'order' => 'DESC',
 		) );
 		$CommentList->restore_filterset();
@@ -4173,7 +4396,7 @@ function display_hidden_custom_fields( & $Form, & $edited_Item )
 	$custom_fields = $edited_Item->get_type_custom_fields();
 	foreach( $custom_fields as $custom_field )
 	{ // For each custom field with type $type:
-		$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_custom_field_value( $custom_field['name'] ) );
+		$Form->hidden( 'item_cf_'.$custom_field['name'], $edited_Item->get_custom_field_value( $custom_field['name'] ) );
 	}
 }
 
@@ -4183,8 +4406,9 @@ function display_hidden_custom_fields( & $Form, & $edited_Item )
  *
  * @param object Form
  * @param object edited Item
+ * @param boolean TRUE to force use custom fields of current version instead of revision
  */
-function display_editable_custom_fields( & $Form, & $edited_Item )
+function display_editable_custom_fields( & $Form, & $edited_Item, $force_current_fields = false )
 {
 	$custom_fields = $edited_Item->get_custom_fields_defs();
 
@@ -4615,7 +4839,7 @@ function echo_image_insert_modal()
 	function evo_item_image_insert( blog, tagType, linkID )
 	{
 		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
-		var evo_js_lang_insert_image = '<?php echo T_('Insert image into post');?>';
+		var evo_js_lang_insert_image = '<?php echo TS_('Insert image into content');?>';
 		var evo_js_lang_modal_action = '<?php echo TS_('Insert');?>';
 		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
 
@@ -4631,7 +4855,7 @@ function echo_image_insert_modal()
 				'tag_type': tagType,
 				'link_ID': linkID,
 				'blog': blog,
-				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+				'request_from': '<?php echo is_admin_page() ? 'back' : 'front';?>',
 			},
 			success: function(result)
 			{
@@ -4645,7 +4869,7 @@ function echo_image_insert_modal()
 	function evo_item_image_edit( blog, shortTag )
 	{
 		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
-		var evo_js_lang_edit_image = '<?php echo T_('Edit image');?>';
+		var evo_js_lang_edit_image = '<?php echo TS_('Edit image');?>';
 		var evo_js_lang_modal_action = '<?php echo TS_('Update');?>';
 		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
 
@@ -4660,7 +4884,7 @@ function echo_image_insert_modal()
 				'action': 'get_edit_image_form',
 				'short_tag': shortTag,
 				'blog': blog,
-				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+				'request_from': '<?php echo is_admin_page() ? 'back' : 'front';?>',
 			},
 			success: function(result)
 			{
@@ -5184,6 +5408,59 @@ function get_item_numviews( $Item )
 	$SQL->WHERE( 'itud_item_ID = '.$Item->ID );
 
 	return $DB->get_var( $SQL );
+}
+
+
+/**
+ * Get title for item revision
+ *
+ * @param object Revision/Version
+ */
+function get_item_version_title( $Version )
+{
+	global $admin_url;
+
+	$iver_date = mysql2localedatetime( $Version->iver_edit_last_touched_ts, 'Y-m-d', 'H:i:s' );
+
+	$iver_editor_user_link = get_user_identity_link( NULL, $Version->iver_edit_user_ID );
+	$iver_editor_user_link = ( empty( $iver_editor_user_link ) ? T_( 'Deleted user' ) : $iver_editor_user_link );
+
+	switch( $Version->iver_type )
+	{
+		case 'proposed':
+			// Title for proposed change:
+			$r = sprintf( T_('Proposed change #%s as of %s by %s'), $Version->iver_ID, $iver_date, $iver_editor_user_link );
+			break;
+
+		case 'archived':
+			// Title for archived version:
+			$r = sprintf( T_('Archived version #%s as of %s by %s'), $Version->iver_ID, $iver_date, $iver_editor_user_link );
+			break;
+
+		default:
+		case 'current':
+			// Title for current version:
+			$r = sprintf( T_('Current version as of %s by %s'), $iver_date, $iver_editor_user_link );
+			break;
+	}
+
+	if( $Version->iver_ID == 0 )
+	{	// A link to permanent URL of the Item:
+		$ItemCache = & get_ItemCache();
+		if( $version_Item = & $ItemCache->get_by_ID( $Version->iver_itm_ID, false, false ) )
+		{
+			$r .= ' ('.$version_Item->get_permanent_link( T_('View') ).')';
+		}
+	}
+	else
+	{	// A link to view the revision details:
+		$r .= ' (<a href="'.$admin_url.'?ctrl=items&amp;action=history_details&amp;p='.$Version->iver_itm_ID.'&amp;r='.$Version->iver_ID.'"'
+		.' title="'.format_to_output( T_('View this revision'), 'htmlattr' ).'">'
+			.T_('View')
+		.'</a>)';
+	}
+
+	return $r;
 }
 
 
@@ -5764,6 +6041,12 @@ function item_row_order( $Item )
 	    ! empty( $ItemList->filters['cat_single'] ) )
 	{	// Use order of single filtered category:
 		$order_cat_ID = $ItemList->filters['cat_single'];
+		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
+	}
+	elseif( isset( $ItemList, $ItemList->filters['cat_array'] ) &&
+	        count( $ItemList->filters['cat_array'] ) == 1 )
+	{	// Use order of single filtered category form multiple categories selection:
+		$order_cat_ID = $ItemList->filters['cat_array'][0];
 		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
 	}
 	else

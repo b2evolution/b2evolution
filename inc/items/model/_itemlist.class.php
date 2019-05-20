@@ -227,6 +227,7 @@ class ItemList2 extends ItemListLight
 		// fp> That can dramatically fatten the returned data. You must handle this in the postgres class (check that order fields are in select)
 		$step1_sql = 'SELECT DISTINCT '.$this->Cache->dbIDname // .', '.implode( ', ', $order_cols_to_select )
 									.$select_temp_order
+									.$this->ItemQuery->get_orderby_select()
 									.$this->ItemQuery->get_from()
 									.$this->ItemQuery->get_orderby_from( ' ' )
 									.$this->ItemQuery->get_where()
@@ -641,6 +642,8 @@ class ItemList2 extends ItemListLight
 		$next_Query->where_featured( $featured );
 		$next_Query->where_tags( $this->filters['tags'] );
 		$next_Query->where_flagged( $this->filters['flagged'] );
+		$next_Query->where_locale_visibility();
+		$next_Query->where_mustread( $this->filters['mustread'] );
 
 		/*
 		 * ORDER BY stuff:
@@ -699,7 +702,7 @@ class ItemList2 extends ItemListLight
 				$compare_field = substr( $orderby, 0, -4 );
 			}
 			$compare_field = trim( $compare_field );
-			if( strpos( $compare_field, 'T_postcats.postcat_order' ) !== false )
+			if( strpos( $compare_field, 'postcatsorders.postcat_order' ) !== false )
 			{	// This is an order field per category:
 				$post_field_name = 'postcat_order';
 			}

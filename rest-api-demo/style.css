@@ -2,18 +2,18 @@ body {
 	font-family: 'Raleway', sans-serif;
 	font-size: 16px;
 }
-h1 {
+#api_demo_container h1 {
 	font-weight: 900;
 	color: #7c7c7c;
 	text-align: center;
 	letter-spacing: 0.8px;
 	margin-top: 30px;
 }
-a {
+#api_demo_container a:not(.btn) {
 	color: #faa72d !important;
 }
 
-.container {
+#api_demo_container {
 	margin-top: 50px;
 }
 
@@ -54,10 +54,27 @@ h4.api_documentation:before, h4.api_documentation:after {
 .container > div:empty {
 	display: none;
 }
-#api_post_attachments img {
+.evo_image_block img {
 	display: block;
 	max-width: 100%;
+	height: auto;
 	margin: 20px auto;
+}
+
+/* Custom fields table */
+.evo_content_block table {
+	margin: 1em 0;
+	border-spacing: 0;
+	border-collapse: collapse;
+}
+.evo_content_block table th {
+	background-color: #eee;
+}
+.evo_content_block table th,
+.evo_content_block table td {
+	border: 1px solid #ddd;
+	padding: 8px;
+	vertical-align: middle;
 }
 
 .api_loading {

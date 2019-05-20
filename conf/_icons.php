@@ -1166,7 +1166,19 @@ function get_icon_info( $name )
 			'alt'  => T_('Rotate this picture 180&deg;'),
 			'size' => array( 14, 16 ),
 			'xy' => array( 96, 224 ),
-			'fa' => 'rotate-right'
+			'fa' => 'undo fa-flip-horizontal'
+		);
+		case 'flip_horizontal': return array(
+			'alt'  => T_('Flip this picture horizontally'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 125, 254 ),
+			'fa' => 'sort fa-rotate-90',
+		);
+		case 'flip_vertical': return array(
+			'alt'  => T_('Flip this picture vertically'),
+			'size' => array( 15, 15 ),
+			'xy' => array( 144, 255 ),
+			'fa' => 'sort',
 		);
 		case 'crop': return array(
 			'alt'  => T_('Crop this picture'),

@@ -60,13 +60,14 @@ echo $Widget->replace_vars( $template['block_start'] );
 
 $Form = new Form( NULL, 'comment_filter_form', 'get', 'none' );
 
-$Form->begin_form( '' );
+$Form->begin_form( 'evo_sidebar_filters' );
 
 	$Form->hidden_ctrl();
 	$Form->hidden( 'tab3', $tab3 );
 	$Form->hidden( 'blog', $Blog->ID );
-	$Form->submit( array( 'submit', T_('Search'), 'search btn-info', '', 'float:right' ) );
+	$Form->submit( array( 'submit', T_('Search'), 'btn-info pull-right' ) );
 
+	// COMMENTS TO SHOW:
 	if( $tab3 != 'meta' )
 	{ // These filters only for normal comments:
 		echo '<fieldset class="clearfix">';
@@ -83,25 +84,24 @@ $Form->begin_form( '' );
 		}
 		?>
 
-		<br />
+		<div style="margin-top:5px">
 		<input type="checkbox" name="<?php echo $pp ?>expiry_statuses[]" value="active" id="show_active" class="checkbox" <?php if( in_array( "active", $expiry_statuses ) ) echo 'checked="checked" '?> />
 		<label for="show_active"><?php echo T_('Show active') ?> </label><br />
 		<input type="checkbox" name="<?php echo $pp ?>expiry_statuses[]" value="expired" id="show_expired" class="checkbox" <?php if( in_array( "expired", $expiry_statuses ) ) echo 'checked="checked" '?> />
-		<label for="show_expired"><?php echo T_('Show expired') ?> </label><br />
+		<label for="show_expired"><?php echo T_('Show expired') ?> </label>
+		</div>
 
 		<?php
 		echo '</fieldset>';
 	}
 
+
+	// TITLE / TEXT CONTAINS:
 	echo '<fieldset class="clearfix">';
 	echo '<legend>'.T_('Title / Text contains').'</legend>';
 
-	echo $Form->inputstart;
 	?>
-	<div><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField form-control" /></div>
-	<?php
-	echo $Form->inputend;
-	?>
+	<div class="tile"><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField form-control" /></div>
 	<div class="tile">
 		<input type="radio" name="<?php echo $pp ?>sentence" value="AND" id="sentAND" class="radio" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
 		<label for="sentAND"><?php echo T_('AND') ?></label>
@@ -122,6 +122,8 @@ $Form->begin_form( '' );
 	<?php
 	echo '</fieldset>';
 
+
+	// RATING:
 	if( $tab3 != 'meta' )
 	{ // These filters only for normal comments:
 		echo '<fieldset>';
@@ -166,6 +168,8 @@ $Form->begin_form( '' );
 		<?php
 		echo '</fieldset>';
 
+
+		// AUTHOR:
 		// Load only first 21 users to know when we should display an input box instead of full users list:
 		$first_users_SQL = new SQL( 'Get users count for filter comments list' );
 		$first_users_SQL->SELECT( 'user_ID' );
@@ -179,7 +183,7 @@ $Form->begin_form( '' );
 		 * TODO: allow multiple selection
 		 */
 		echo '<fieldset>';
-		echo '<legend>'.T_('Authors').'</legend>';
+		echo '<legend>'.T_('Author').'</legend>';
 		if( $user_count )
 		{
 			if( $user_count > 20 )
@@ -210,23 +214,21 @@ $Form->begin_form( '' );
 		}
 		echo '</fieldset>';
 
+
+		// AUTHOR URL:
 		echo '<fieldset>';
 		echo '<legend>'.T_('Author URL').'</legend>';
 
-		echo $Form->inputstart;
 		?>
-		<div><input type="text" name="<?php echo $pp ?>author_url" size="20" value="<?php echo htmlspecialchars($author_url) ?>" class="SearchField form-control" /></div>
-		<?php
-		echo $Form->inputend;
-		?>
-		<div>
+		<div class="tile"><input type="text" name="<?php echo $pp ?>author_url" size="20" value="<?php echo htmlspecialchars($author_url) ?>" class="SearchField form-control" /></div>
+		<div class="tile">
 			<input type="radio" name="<?php echo $pp ?>url_match" value="=" id="with_url" class="radio" <?php if( $url_match=='=' ) echo 'checked="checked" '?> />
 			<label for="with_url"><?php echo T_('With this') ?></label>
 
 			<input type="radio" name="<?php echo $pp ?>url_match" value="!=" id="without_url" class="radio" <?php if( $url_match=='!=' ) echo 'checked="checked" '?> />
 			<label for="without_url"><?php echo T_('Without this') ?></label>
 		</div>
-		<div>
+		<div class="tile">
 			<input type="checkbox" name="<?php echo $pp ?>include_emptyurl" value="true" id="without_any_url" class="checkbox" <?php if( $include_emptyurl ) echo 'checked="checked" '?> />
 			<label for="without_any_url"><?php echo T_('Include comments with no url') ?> <span class="notes">(<?php echo T_('Works only when url filter is set') ?>)</span></label><br />
 		</div>
@@ -234,17 +236,17 @@ $Form->begin_form( '' );
 		<?php
 		echo '</fieldset>';
 
+
+		// IP:
 		echo '<fieldset>';
 		echo '<legend>'.T_('IP').'</legend>';
-		echo $Form->inputstart;
 		?>
-		<div><?php echo T_('IP') ?> <input type="text" name="<?php echo $pp ?>author_IP" size="20" value="<?php echo htmlspecialchars($author_IP) ?>" class="SearchField form-control" style="width:85%" /></div>
-		<div class="note"><?php
+		<?php echo T_('IP') ?> <input type="text" name="<?php echo $pp ?>author_IP" size="50" value="<?php echo htmlspecialchars($author_IP) ?>" class="SearchField form-control" />
+		<span class="note"><?php
 			// We use sprintf to avoid problems with a single % sign in transifex
 			echo sprintf( T_('use \'%%\' for partial matches') );
-		?></div>
+		?></span>
 		<?php
-		echo $Form->inputend;
 
 		echo '</fieldset>';
 	}

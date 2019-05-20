@@ -170,6 +170,20 @@ if( $Blog->get_setting( 'locale_source' ) == 'blog' )
 	locale_activate( $Blog->get( 'locale' ) );
 }
 
+$coll_locale = param( 'coll_locale', 'string', NULL, true );
+if( $coll_locale !== NULL )
+{	// Overriding locale from REQUEST with extra collection locale:
+	$Debuglog->add( 'Overriding collection locale from REQUEST: '.$coll_locale, 'locale' );
+	if( in_array( $coll_locale, $Blog->get_locales() ) )
+	{	// If locale is selected for current collection:
+		locale_activate( $coll_locale );
+	}
+	else
+	{	// Wrong colleciton locale is requested:
+		$Messages->add( sprintf( T_('The requested language/locale %s is not allowed for this collection.'), '<code>'.$coll_locale.'</code>' ), 'error' );
+	}
+}
+
 
 // Re-Init charset handling, in case current_charset has changed:
 if( init_charsets( $current_charset ) )
@@ -298,9 +312,6 @@ if( $resolve_extra_path )
 					// Set a lot of defaults as if we had received a complex URL:
 					$m = '';
 					$more = 1; // Display the extended entries' text
-					$c = 1;    // Display comments
-					$tb = 1;   // Display trackbacks
-					$pb = 1;   // Display pingbacks
 
 					if( preg_match( '#^p([0-9]+)$#', $last_part, $req_post ) )
 					{ // The last param is of the form p000
@@ -324,7 +335,7 @@ if( $resolve_extra_path )
 						// echo $path_elements[$i];
 						if( isset( $path_elements[$i] ) )
 						{
-							if( is_numeric( $path_elements[$i] ) )
+							if( preg_match( '#^\d{4}$#', $path_elements[$i] ) )
 							{ // We'll consider this to be the year
 								$m = $path_elements[$i++];
 								$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
@@ -335,18 +346,18 @@ if( $resolve_extra_path )
 									$posts = $Blog->get_setting( 'posts_per_page' );
 								}
 
-								if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
+								if( isset( $path_elements[$i] ) && preg_match( '#^(0[1-9]|1[0-2])$#', $path_elements[$i] ) )
 								{ // We'll consider this to be the month
 									$m .= $path_elements[$i++];
 									$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
 
-									if( isset( $path_elements[$i] ) && is_numeric( $path_elements[$i] ) )
+									if( isset( $path_elements[$i] ) && preg_match( '#^(0[1-9]|[12][0-9]|3[01])$#', $path_elements[$i] ) )
 									{ // We'll consider this to be the day
 										$m .= $path_elements[$i++];
 										$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
 									}
 								}
-								elseif( isset( $path_elements[$i] ) && substr( $path_elements[$i], 0, 1 ) == 'w' )
+								elseif( isset( $path_elements[$i] ) && preg_match( '#^w(0?[0-9]|[1-4][0-9]|5[0-3])$#', $path_elements[$i] ) )
 								{ // We consider this a week number
 									$w = substr( $path_elements[$i], 1, 2 );
 								}
@@ -654,19 +665,24 @@ elseif( $disp == '-' )
 
 	// Do we need to handle the canoncial url?
 	if( ( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
-			|| $Blog->get_setting( 'relcanonical_homepage' ) )
+	    || $Blog->get_setting( 'relcanonical_homepage' )
+	    || $Blog->get_setting( 'self_canonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
-		if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+		if( ! is_same_url( preg_replace( '#[\?&]coll_locale=([^&]+|$)#', '', $ReqURL ), $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 		{	// We are not on the canonicial blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
 				header_redirect( $canonical_url, (empty( $display_containers ) && empty( $display_includes )) ? 301 : 303 );
 			}
-			else
+			elseif( $Blog->get_setting( 'relcanonical_homepage' ) )
 			{	// Use link rel="canoncial":
 				add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 			}
+		}
+		elseif( $Blog->get_setting( 'self_canonical_homepage' ) )
+		{	// Use self-referencing rel="canonical" tag:
+			add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 		}
 	}
 
@@ -986,9 +1002,11 @@ if( !empty( $skin ) )
 					'contacts'              => 'contacts.main.php',
 					'download'              => 'download.main.php',
 					'edit'                  => 'edit.main.php',
+					'proposechange'         => 'proposechange.main.php',
 					'edit_comment'          => 'edit_comment.main.php',
 					'feedback-popup'        => 'feedback_popup.main.php',
 					'flagged'               => 'flagged.main.php',
+					'mustread'              => 'mustread.main.php',
 					'front'                 => 'front.main.php',
 					'help'                  => 'help.main.php',
 					'login'                 => 'login.main.php',
@@ -1091,7 +1109,10 @@ if( !empty( $skin ) )
 		// Save collected cached data if needed:
 		$PageCache->end_collect();
 	}
-	$Timer->pause( 'PageCache' );
+	if( $Timer->get_state( 'PageCache' ) == 'running' )
+	{	// Pause only when the page cache timer was not stoped above:
+		$Timer->pause( 'PageCache' );
+	}
 
 	$Timer->pause( 'SKIN DISPLAY' );
 	// LOG with APM:

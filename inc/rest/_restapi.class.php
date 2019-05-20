@@ -67,7 +67,7 @@ class RestApi
 	 */
 	private function user_log_in( $entered_login, $entered_password )
 	{
-		global $current_User, $failed_logins_lockout, $UserSettings, $Settings, $Session, $localtimenow;
+		global $current_User, $failed_logins_lockout, $failed_logins_before_lockout, $UserSettings, $Settings, $Session, $localtimenow;
 
 		$UserCache = & get_UserCache();
 
@@ -111,11 +111,11 @@ class RestApi
 		// Check user login attempts:
 		$login_attempts = $UserSettings->get( 'login_attempts', $User->ID );
 		$login_attempts = empty( $login_attempts ) ? array() : explode( ';', $login_attempts );
-		if( $failed_logins_lockout > 0 && count( $login_attempts ) == 9 )
+		if( $failed_logins_lockout > 0 && count( $login_attempts ) >= $failed_logins_before_lockout - 1 )
 		{	// User already has a maximum value of the attempts:
 			$first_attempt = explode( '|', $login_attempts[0] );
 			if( $localtimenow - $first_attempt[0] < $failed_logins_lockout )
-			{	// User has used 9 attempts during X minutes, Display error and Refuse login
+			{	// User has used N attempts during X minutes, Display error and Refuse login
 				$this->halt( sprintf( T_('There have been too many failed login attempts. This account is temporarily locked. Try again in %s minutes.'), ceil( $failed_logins_lockout / 60 ) ), 'login_attempt_failed', 403 );
 				// Exit here.
 			}
@@ -124,7 +124,7 @@ class RestApi
 		if( ! $User->check_password( $entered_password ) )
 		{	// The entered password is not right for requested user
 			// Save new login attempt into DB:
-			if( count( $login_attempts ) == 9 )
+			if( count( $login_attempts ) >= $failed_logins_before_lockout - 1 )
 			{ // Unset first attempt to clear a space for new attempt
 				unset( $login_attempts[0] );
 			}
@@ -331,7 +331,7 @@ class RestApi
 		{
 			case 'GET':
 				// List of valid resources
-				$valid_resources = array( '', 'view', 'items', 'posts', 'search', 'assignees' );
+				$valid_resources = array( '', 'view', 'items', 'posts', 'search', 'assignees', 'linked' );
 				break;
 
 			case 'PUT':
@@ -577,6 +577,41 @@ class RestApi
 
 
 	/**
+	 * Call collection controller to prepare request for linked collections
+	 */
+	private function controller_coll_linked()
+	{
+		global $Collection, $Blog;
+
+		// Get linked collections:
+		$linked_colls = $Blog->get_locales( 'coll' );
+		// Add current collection on top:
+		array_unshift( $linked_colls, $Blog->ID );
+
+		// Load all collections in cache by single SQL query:
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_list( $linked_colls );
+
+		foreach( $linked_colls as $linked_locale => $linked_coll_ID )
+		{	// Add each collection row in the response array:
+			if( ! ( $linked_Blog = & $BlogCache->get_by_ID( $linked_coll_ID, false, false ) ) )
+			{	// Skip wrong linked collection:
+				continue;
+			}
+			$this->add_response( 'colls', array(
+					'id'        => intval( $linked_Blog->ID ),
+					'urlname'   => $linked_Blog->get( 'urlname' ),
+					'kind'      => $linked_Blog->get( 'type' ),
+					'shortname' => $linked_Blog->get( 'shortname' ),
+					'name'      => $linked_Blog->get( 'name' ).' ('.( $linked_locale === 0 ? $linked_Blog->get( 'locale' ) : $linked_locale ).')',
+					'tagline'   => $linked_Blog->get( 'tagline' ),
+					'desc'      => $linked_Blog->get( 'longdesc' ),
+				), 'array' );
+		}
+	}
+
+
+	/**
 	 * Call collection controller to view collection information
 	 */
 	private function controller_coll_view()
@@ -622,6 +657,40 @@ class RestApi
 
 		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/items/<id>":
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
+
+		// Get params for full content:
+		$content_params = param( 'content_params', 'array', array() );
+		$content_params =  array_merge( array(
+			'before_content_teaser'    => '',
+			'after_content_teaser'     => '',
+			'before_content_extension' => '',
+			'after_content_extension'  => '',
+			'image_position_teaser'    => 'teaser,teaserperm,teaserlink',
+			'image_position_aftermore' => 'aftermore',
+			'before_images'            => '',
+			'after_images'             => '',
+			'before_image'             => '<figure class="evo_image_block">',
+			'before_image_legend'      => '<figcaption class="evo_image_legend">',
+			'after_image_legend'       => '</figcaption>',
+			'after_image'              => '</figure>',
+			'image_class'              => '',
+			'image_size'               => 'original',
+			'image_limit'              =>  1000,
+			'image_link_to'            => 'original', // Can be 'original', 'single' or empty
+			'before_gallery'           => '<div class="evo_post_gallery">',
+			'after_gallery'            => '</div>',
+			'gallery_table_start'      => '',
+			'gallery_table_end'        => '',
+			'gallery_row_start'        => '',
+			'gallery_row_end'          => '',
+			'gallery_cell_start'       => '<div class="evo_post_gallery__image">',
+			'gallery_cell_end'         => '</div>',
+			'gallery_image_size'       => 'crop-80x80',
+			'gallery_image_limit'      => 1000,
+			'gallery_image_link_to' => 'original', // Can be 'original', 'single' or empty
+			'gallery_colls'            => 5,
+			'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
+		), $content_params );
 
 		$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $api_per_page, 'ItemCache', '' );
 
@@ -716,7 +785,27 @@ class RestApi
 						$item_data['title'] = $Item->get( 'title' );
 						break;
 					case 'content':
-						$item_data['content'] = $Item->get_prerendered_content( 'htmlbody' );
+						$item_data['content'] =
+							$Item->get_images( array_merge( $content_params, array(
+									'before' => $content_params['before_images'],
+									'after'  => $content_params['after_images'],
+									'limit'  => $content_params['image_limit'],
+									'restrict_to_image_position' => $content_params['image_position_teaser'],
+								) ) ).
+							$Item->get_content_teaser( '#', '#', 'htmlbody', array_merge( $content_params, array(
+									'before' => $content_params['before_content_teaser'],
+									'after'  => $content_params['after_content_teaser'],
+								) ) ).
+							$Item->get_images( array_merge( $content_params, array(
+									'before' => $content_params['before_images'],
+									'after'  => $content_params['after_images'],
+									'limit'  => $content_params['image_limit'],
+									'restrict_to_image_position' => $content_params['image_position_aftermore'],
+								) ) ).
+							$Item->get_content_extension( '#', true, 'htmlbody', array_merge( $content_params, array(
+									'before' => $content_params['before_content_extension'],
+									'after'  => $content_params['after_content_extension'],
+								) ) );
 						break;
 					case 'excerpt':
 						$item_data['excerpt'] = $Item->get( 'excerpt' );
@@ -2171,7 +2260,7 @@ class RestApi
 
 		$LinkOwner = & $Link->get_LinkOwner();
 
-		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		if( ! $LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to unlink the requested link:
 			$this->halt( 'You have no permission to edit the requested link!', 'no_access', 403 );
 			// Exit here.
@@ -2208,18 +2297,25 @@ class RestApi
 
 		// Unlink File from Item/Comment:
 		$deleted_link_ID = $deleted_Link->ID;
-		$deleted_Link->dbdelete();
+		if( $LinkOwner->remove_link( $deleted_Link ) )
+		{	// If Link has been removed successfully:
 
-		$LinkOwner->after_unlink_action( $deleted_link_ID );
+			$LinkOwner->after_unlink_action( $deleted_link_ID );
 
-		if( $action == 'delete' && ! empty( $linked_File ) )
-		{	// Delete a linked file from disk and DB completely:
-			$linked_File->unlink();
+			if( $action == 'delete' && ! empty( $linked_File ) )
+			{	// Delete a linked file from disk and DB completely:
+				$linked_File->unlink();
+			}
+
+			// The requested link has been deleted successfully:
+			$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
+			// Exit here.
 		}
-
-		// The requested link has been deleted successfully:
-		$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
-		// Exit here.
+		else
+		{	// The requested link cannot be deleted:
+			$this->halt( $LinkOwner->translate( 'Cannot delete Link from $xxx$.' ), 'delete_failed', 403 );
+			// Exit here.
+		}
 	}
 
 
@@ -2280,6 +2376,8 @@ class RestApi
 	 */
 	private function controller_link_change_order()
 	{
+		global $localtimenow;
+
 		// Check permission if current user can update the requested link:
 		$this->link_check_perm();
 
@@ -2320,6 +2418,15 @@ class RestApi
 		}
 		if( $i > -1 && $i < PHP_INT_MAX )
 		{	// Switch the links:
+			if( $LinkOwner->type == 'item' && ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) > 90 )
+			{
+				$LinkOwner->Item->create_revision();
+			}
+
+			// Update last touched date of Owners
+			// Update to last touched date made earlier to prevent subsequent link dbupdate from creating a new revision
+			$LinkOwner->update_last_touched_date();
+
 			$switch_Link->set( 'order', $edited_Link->get( 'order' ) );
 
 			// HACK: go through order=0 to avoid duplicate key conflict:
@@ -2329,9 +2436,6 @@ class RestApi
 
 			$edited_Link->set( 'order', $i );
 			$edited_Link->dbupdate();
-
-			// Update last touched date of Owners
-			$LinkOwner->update_last_touched_date();
 
 			// The requested link order has been changed successfully:
 			$this->halt( ( $link_action == 'move_up' )
@@ -2360,9 +2464,9 @@ class RestApi
 		$root = param( 'root', 'string' );
 		$file_path = param( 'path', 'string' );
 
-		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
-		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		if( ! $LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to unlink the requested link:
 			$this->halt( 'You have no permission to attach a file!', 'no_access', 403 );
 			// Exit here.
@@ -2386,12 +2490,9 @@ class RestApi
 			// Use the glyph or font-awesome icons if requested by skin
 			param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
 
-			global $LinkOwner, $current_File, $disable_evo_flush;
+			global $disable_evo_flush;
 
-			$link_type = param( 'type', 'string' );
-			$link_object_ID = param( 'object_ID', 'string' );
-
-			$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+			$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
 			// Initialize admin skin:
 			global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
@@ -2440,9 +2541,9 @@ class RestApi
 		$link_type = param( 'type', 'string' );
 		$link_object_ID = param( 'object_ID', 'string' );
 
-		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
-		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		if( ! $LinkOwner->check_perm( 'view', false ) )
 		{	// Current user has no permission to unlink the requested link:
 			$this->halt( 'You have no permission to list of the links!', 'no_access', 403 );
 			// Exit here.
@@ -2483,7 +2584,7 @@ class RestApi
 
 		// Initialize admin skin:
 		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
-		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		$admin_skin = is_logged_in() ? $UserSettings->get( 'admin_skin', $current_User->ID ) : 'bootstrap';
 		$is_admin_page = true;
 		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
 		$AdminUI = new AdminUI();
@@ -2519,9 +2620,9 @@ class RestApi
 		$dest_type = param( 'dest_type', 'string' );
 		$dest_object_ID = param( 'dest_object_ID', 'string' );
 
-		$dest_LinkOwner = get_link_owner( $dest_type, $dest_object_ID );
+		$dest_LinkOwner = get_LinkOwner( $dest_type, $dest_object_ID );
 
-		if( ! is_logged_in() || ! $dest_LinkOwner->check_perm( 'edit', false ) )
+		if( ! $dest_LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to copy the requested link:
 			$this->halt( 'You have no permission to list of the links!', 'no_access', 403 );
 			// Exit here.
@@ -2532,7 +2633,7 @@ class RestApi
 		$source_position = trim( param( 'source_position', 'string' ), ',' );
 		$source_file_type = param( 'source_file_type', 'string', NULL );
 
-		$source_LinkOwner = get_link_owner( $source_type, $source_object_ID );
+		$source_LinkOwner = get_LinkOwner( $source_type, $source_object_ID );
 
 		$link_list_params = array(
 				// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order

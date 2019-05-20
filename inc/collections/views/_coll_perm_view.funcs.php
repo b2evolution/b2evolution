@@ -22,7 +22,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function get_coll_user_perms_SQL( $Blog, $keywords = '', $use_order_mask = true )
 {
 	$SQL = new SQL( 'Get user permissions for collection #'.$Blog->ID );
-	$SQL->SELECT( $Blog->ID.' AS blog_ID, user_ID, user_login, user_level, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_can_be_assignee,'
+	$SQL->SELECT( $Blog->ID.' AS blog_ID, user_ID, user_login, user_level, bloguser_perm_item_propose, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_can_be_assignee,'
 		. 'bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses + 0 as perm_cmtstatuses, bloguser_perm_edit_cmt,'
 		. 'bloguser_perm_delpost, bloguser_perm_edit_ts, bloguser_perm_meta_comment, bloguser_perm_cats,'
 		. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
@@ -59,7 +59,7 @@ function get_coll_user_perms_SQL( $Blog, $keywords = '', $use_order_mask = true 
 function get_coll_group_perms_SQL( $Blog, $keywords = '', $use_order_mask = true )
 {
 	$SQL = new SQL( 'Get group permissions for collection #'.$Blog->ID );
-	$SQL->SELECT( $Blog->ID.' AS blog_ID, grp_ID, grp_name, grp_usage, grp_level, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_can_be_assignee,'
+	$SQL->SELECT( $Blog->ID.' AS blog_ID, grp_ID, grp_name, grp_usage, grp_level, bloggroup_perm_item_propose, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_can_be_assignee,'
 		. 'bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses + 0 as perm_cmtstatuses, bloggroup_perm_edit_cmt,'
 		. 'bloggroup_perm_delpost, bloggroup_perm_edit_ts, bloggroup_perm_meta_comment, bloggroup_perm_cats,'
 		. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
@@ -633,7 +633,7 @@ function coll_grp_perm_col_member( $row )
 function colls_groups_perms_results( & $Results, $params = array() )
 {
 	$params = array_merge( array(
-			'type'   => 'collection', // 'colleciton' OR 'group'
+			'type'   => 'collection', // 'collection' OR 'group'
 			'object' => NULL,
 		), $params );
 
@@ -715,6 +715,14 @@ function colls_groups_perms_results( & $Results, $params = array() )
 		$col_member['td_colspan'] = '~conditional( #blog_advanced_perms# == 1, 1, -2 )~';
 	}
 	$Results->cols[] = $col_member;
+
+	$Results->cols[] = array(
+			'th_group' => T_('Permissions on Posts'),
+			'th' => T_('Propose changes'),
+			'th_class' => 'center',
+			'td' => '%coll_perm_checkbox( {row}, \'bloggroup_\', \'perm_item_propose\', \''.format_to_output( T_('Permission to propose a change for Item'), 'htmlattr' ).'\' )%',
+			'td_class' => 'shrinkwrap',
+		);
 
 	$Results->cols[] = array(
 			'th_group' => T_('Permissions on Posts'),
@@ -885,6 +893,7 @@ function get_csv_coll_perms( $prefix, $perm_rows, $perm_Blog )
 	{
 		$columns[] = 'assignee';
 	}
+	$columns[] = 'propose changes';
 	$post_statuses = get_visibility_statuses( 'keys' );
 	foreach( $post_statuses as $post_status )
 	{
@@ -925,6 +934,7 @@ function get_csv_coll_perms( $prefix, $perm_rows, $perm_Blog )
 		{
 			$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'can_be_assignee', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'can_be_assignee'} );
 		}
+		$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'perm_item_propose', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_item_propose'} );
 		foreach( $post_statuses as $post_status )
 		{
 			$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'perm_'.$post_status, $perm_Blog->owner_user_ID ) ? 1 : ( get_status_permvalue( $post_status ) & $perm->perm_poststatuses ? 1 : 0 );

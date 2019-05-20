@@ -12,7 +12,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
+global $admin_url;
 
 // Get params from request
 $s = param( 's', 'string', '', true );
@@ -33,7 +33,7 @@ $Results = new Results( $SQL->get(), 'curr_', '-A');
 
 $Results->Cache = & get_CurrencyCache();
 
-$Results->title = T_('Currencies list').get_manual_link('currencies_list');
+$Results->title = T_('Currencies list').get_manual_link('currencies-list');
 
 /**
  * Display icon to set default currency
@@ -68,8 +68,6 @@ $Results->cols[] = array(
  */
 function curr_td_enabled( $curr_enabled, $curr_ID )
 {
-	global $dispatcher;
-
 	$r = '';
 
 	if( $curr_enabled == true )
@@ -118,7 +116,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 	$Results->cols[] = array(
 							'th' => T_('Code'),
 							'order' => 'curr_code',
-							'td' => '<strong><a href="'.$dispatcher.'?ctrl=currencies&amp;curr_ID=$curr_ID$&amp;action=edit" title="'.
+							'td' => '<strong><a href="'.$admin_url.'?ctrl=currencies&amp;curr_ID=$curr_ID$&amp;action=edit" title="'.
 											T_('Edit this currency...').'">$curr_code$</a></strong>',
 							'td_class' => 'center',
 						);
@@ -152,18 +150,16 @@ $Results->cols[] = array(
  */
 function curr_td_actions($curr_enabled, $curr_ID )
 {
-	global $dispatcher;
-
 	$r = '';
 
 	if( $curr_enabled == true )
 	{
-		$r .= action_icon( T_('Disable the currency!'), 'deactivate', 
+		$r .= action_icon( T_('Disable the currency!'), 'deactivate',
 										regenerate_url( 'action', 'action=disable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') ) );
 	}
 	else
 	{
-		$r .= action_icon( T_('Enable the currency!'), 'activate', 
+		$r .= action_icon( T_('Enable the currency!'), 'activate',
 										regenerate_url( 'action', 'action=enable_currency&amp;curr_ID='.$curr_ID.'&amp;'.url_crumb('currency') ) );
 	}
 	$r .= action_icon( T_('Edit this currency...'), 'edit',

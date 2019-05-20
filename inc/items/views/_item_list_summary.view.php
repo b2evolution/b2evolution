@@ -28,7 +28,7 @@ global $ItemList;
  */
 global $Item;
 
-global $action, $dispatcher, $blog, $posts, $poststart, $postend, $ReqURI;
+global $action, $blog, $posts, $poststart, $postend, $ReqURI;
 global $edit_item_url, $delete_item_url, $p, $dummy_fields;
 global $comment_allowed_tags, $comment_type;
 global $Plugins, $DB, $UserSettings, $Session, $Messages;
@@ -230,6 +230,60 @@ while( $Item = & $ItemList->get_item() )
 				<div>
 					<?php
 
+					// Edit : Propose change | Duplicate... | Merge with...
+					$edit_buttons = array();
+					if( $item_edit_url = $Item->get_edit_url() )
+					{	// Edit
+						$edit_buttons[] = array(
+							'url'  => $item_edit_url,
+							'text' => get_icon( 'edit_button' ).' '.T_('Edit'),
+						);
+					}
+					if( $item_propose_change_url = $Item->get_propose_change_url() )
+					{	// Propose change
+						$edit_buttons[] = array(
+							'url'  => $item_propose_change_url,
+							'text' => get_icon( 'edit_button' ).' '.T_('Propose change'),
+						);
+					}
+					if( $item_copy_url = $Item->get_copy_url() )
+					{	// Duplicate...
+						$edit_buttons[] = array(
+							'url'  => $item_copy_url,
+							'text' => get_icon( 'copy' ).' '.T_('Duplicate...'),
+						);
+					}
+					if( $item_merge_click_js = $Item->get_merge_click_js( $params ) )
+					{	// Merge with...
+						$edit_buttons[] = array(
+							'onclick' => $item_merge_click_js,
+							'text'    => get_icon( 'merge' ).' '.T_('Merge with...'),
+						);
+						echo_item_merge_js();
+					}
+					$edit_buttons_num = count( $edit_buttons );
+					if( $edit_buttons_num > 1 )
+					{	// Display buttons in dropdown style:
+						echo '<div class="'.button_class( 'group' ).'">';
+						echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'small_text_primary' ).'">'.$edit_buttons[0]['text'].'</a>';
+						echo '<button type="button" class="'.button_class( 'small_text' ).' dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>';
+						echo '<ul class="dropdown-menu">';
+						for( $b = 1; $b < $edit_buttons_num; $b++ )
+						{
+							echo '<li><a href="'.( empty( $edit_buttons[ $b ]['url'] ) ? '#' : $edit_buttons[ $b ]['url'] ).'"'
+									.( empty( $edit_buttons[ $b ]['onclick'] ) ? '' : ' onclick="'.$edit_buttons[ $b ]['onclick'].'"' ).'>'
+									.$edit_buttons[ $b ]['text']
+								.'</a></li>';
+						}
+						echo '</ul></div>';
+					}
+					elseif( $edit_buttons_num == 1 )
+					{	// Display single button:
+						echo '<span class="'.button_class( 'group' ).'">';
+						echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'small_text_primary' ).'">'.$edit_buttons[0]['text'].'</a>';
+						echo '</span>';
+					}
+
 					echo '<span class="'.button_class( 'group' ).'">';
 					if( $action != 'view' )
 					{
@@ -237,17 +291,9 @@ while( $Item = & $ItemList->get_item() )
 					}
 
 					echo $Item->get_history_link( array(
-							'class'     => button_class( 'small_text' ),
-							'link_text' => '$icon$ '.T_('History'),
+							'class'     => button_class( $Item->has_proposed_change() ? 'small_text_warning' : 'small_text' ),
+							'link_text' => '$icon$ '.T_('Changes'),
 						) );
-
-					if( isset( $GLOBALS['files_Module'] )
-							&& $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
-							&& $current_User->check_perm( 'files', 'view' ) )
-					{	// Display a button to view the files of the post only if current user has a permissions:
-						echo '<a href="'.url_add_param( $Blog->get_filemanager_link(), 'fm_mode=link_object&amp;link_type=item&amp;link_object_ID='.$Item->ID )
-									.'" class="'.button_class( 'small_text' ).'">'.get_icon( 'folder' ).' '.T_('Attachments').'</a>';
-					}
 
 					if( $Blog->get_setting( 'allow_comments' ) != 'never' )
 					{
@@ -260,31 +306,6 @@ while( $Item = & $ItemList->get_item() )
 						trackback_number('', ' &middot; '.T_('1 Trackback'), ' &middot; '.T_('%d Trackbacks'), $Item->ID);
 						echo '</a>';
 					}
-					echo '</span>';
-
-					echo '<span class="'.button_class( 'group' ).'"> ';
-					// Display edit button if current user has the rights:
-					$Item->edit_link( array( // Link to backoffice for editing
-							'before' => '',
-							'after'  => '',
-							'class'  => button_class( 'small_text_primary' ),
-							'text'   => get_icon( 'edit_button' ).' '.T_('Edit')
-						) );
-
-					// Display copy button if current user has the rights:
-					$Item->copy_link( array( // Link to backoffice for coping
-							'before' => '',
-							'after'  => '',
-							'text'   => '#icon#',
-							'class'  => button_class( 'small_text')
-						) );
-
-					// Display merge button if current user has the rights:
-					$Item->merge_link( array( // Link to backoffice for merging
-							'before' => '',
-							'after'  => '',
-							'class'  => button_class( 'small_text' )
-						) );
 					echo '</span>';
 
 					echo '<span class="'.button_class( 'group' ).'"> ';

@@ -45,7 +45,7 @@ if( $action == 'new-selskin' )
 	// Skins that fully support the selected collection type
 	$block_item_Widget = new Widget( 'block_item' );
 	$block_item_Widget->title = sprintf( T_('Recommended skins for a "%s" collection'), $kind_title );
-	$block_item_Widget->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=dashboard',
+	$block_item_Widget->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=collections',
 			' '.sprintf( T_('Abort new "%s" collection'), $kind_title ), 3 , 4, array( 'class' => 'action_icon btn-default' ) );
 
 	$block_item_Widget->disp_template_replaced( 'block_start' );

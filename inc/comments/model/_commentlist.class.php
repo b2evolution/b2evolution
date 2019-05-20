@@ -111,7 +111,7 @@ class CommentList2 extends DataObjectList2
 				'exact' => 0,
 				'statuses' => NULL,
 				'expiry_statuses' => array( 'active' ), // Show active/expired comments
-				'types' => array( 'comment','trackback','pingback' ),
+				'types' => array( 'comment','trackback','pingback','webmention' ),
 				'orderby' => 'date',
 				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('comments_orderdir') : 'DESC',
 				//'order' => 'DESC',
@@ -471,6 +471,7 @@ class CommentList2 extends DataObjectList2
 		}
 		// Restrict post filters to available statuses. When blog = 0 we will check visibility statuses for each blog separately ( on the same query ).
 		$this->ItemQuery->where_visibility( $post_show_statuses );
+		$this->ItemQuery->where_locale_visibility();
 		$sql_item_IDs = 'SELECT DISTINCT post_ID'
 						.$this->ItemQuery->get_from();
 		if( strpos( $this->ItemQuery->get_from(), 'T_categories' ) === false &&
@@ -803,7 +804,8 @@ class CommentList2 extends DataObjectList2
 	 *
 	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
 	 *
-	 * @return string Empty, if ok.
+	 * @return string Error message
+	 *         integer Number of the pruned comments
 	 */
 	static function dbprune()
 	{
@@ -832,7 +834,7 @@ class CommentList2 extends DataObjectList2
 		$Settings->set( 'auto_empty_trash_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact datetime
 		$Settings->dbupdate();
 
-		return ''; /* ok */
+		return $rows_affected; /* ok */
 	}
 
 

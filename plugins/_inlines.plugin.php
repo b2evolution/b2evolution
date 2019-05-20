@@ -56,6 +56,7 @@ class inlines_plugin extends Plugin
 			return false;
 		}
 
+		$params['target_type'] = 'Item';
 		return $this->DisplayCodeToolbar( $params );
 	}
 
@@ -86,6 +87,7 @@ class inlines_plugin extends Plugin
 			return false;
 		}
 
+		$params['target_type'] = 'Comment';
 		return $this->DisplayCodeToolbar( $params );
 	}
 
@@ -98,6 +100,7 @@ class inlines_plugin extends Plugin
 	 */
 	function DisplayEmailToolbar( & $params )
 	{
+		$params['target_type'] = 'EmailCampaign';
 		return $this->DisplayCodeToolbar( $params );
 	}
 
@@ -110,6 +113,7 @@ class inlines_plugin extends Plugin
 	 */
 	function DisplayMessageToolbar( & $params )
 	{
+		$params['target_type'] = 'Message';
 		return $this->DisplayCodeToolbar( $params );
 	}
 

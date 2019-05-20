@@ -194,12 +194,12 @@ class coll_featured_intro_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item, $disp;
+		global $disp;
 
 		$this->init_display( $params );
 
 		// Go Grab the featured post:
-		if( $Item = & get_featured_Item( $disp, $this->disp_params['blog_ID'] ) )
+		if( $Item = & get_featured_Item( $disp, $this->disp_params['blog_ID'], true ) )
 		{	// We have a featured/intro post to display:
 			$item_style = '';
 			$LinkOwner = new LinkItem( $Item );
@@ -274,13 +274,17 @@ class coll_featured_intro_Widget extends ComponentWidget
 	 */
 	function get_cache_keys()
 	{
-		global $Collection, $Blog, $current_User;
+		global $Collection, $Blog, $FeaturedList, $current_User, $disp;
+
+		// Get intro Item which is displayed for this widget:
+		$Item = & get_featured_Item( $disp, $this->disp_params['blog_ID'], true );
 
 		return array(
 				'wi_ID' => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'user_ID' => (is_logged_in() ? $current_User->ID : 0), // Has the current User changed?
 				'intro_feat_coll_ID' => empty($this->disp_params['blog_ID']) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the intro/featured post changed ?
+				'item_ID' => empty( $Item ) ? 0 : $Item->ID, // Cache each item separately + Has the Item changed?
 			);
 	}
 

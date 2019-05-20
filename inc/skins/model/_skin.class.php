@@ -119,8 +119,14 @@ class Skin extends DataObject
 	 */
 	function install()
 	{
-		// INSERT NEW SKIN INTO DB:
-		$this->dbinsert();
+		if( $skin_ID = $this->dbexists( 'skin_folder', $this->get( 'folder' ) ) )
+		{	// Use already stored skin in DB:
+			$this->ID = $skin_ID;
+		}
+		else
+		{	// Insert new skin into DB:
+			$this->dbinsert();
+		}
 	}
 
 
@@ -271,14 +277,21 @@ class Skin extends DataObject
 		// Loop through all widget params:
 		foreach( $this->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
 		{
-			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'color' && empty( $parmeta['valid_pattern'] ) )
-			{ // Set default validation for color fields
-				$parmeta['valid_pattern'] = array(
-						'pattern' => '~^(#([a-f0-9]{3}){1,2})?$~i',
-						'error'   => T_('Invalid color code.')
-					);
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'input_group' )
+			{
+				if( ! empty( $parmeta['inputs'] ) )
+				{
+					foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
+					{
+						$l_parmeta['group'] = $parname; // inject group into meta
+						autoform_set_param_from_request( $l_parname, $l_parmeta, $this, 'Skin' );
+					}
+				}
 			}
-			autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+			else
+			{
+				autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+			}
 		}
 	}
 
@@ -815,7 +828,10 @@ class Skin extends DataObject
 		$r = array();
 
 		// Skin v7 definitions for kind of current collection:
-		if( $this->get_api_version() == 7 && method_exists( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ) )
+		if( $this->get_api_version() == 7 &&
+		    $this->provides_collection_skin() &&
+		    ! empty( $Blog ) &&
+		    method_exists( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ) )
 		{	// If skin has declared the method for collection kind:
 			$coll_kind_param_definitions = call_user_func( array( $this, 'get_param_definitions_'.$Blog->get( 'type' ) ), $params );
 
@@ -922,6 +938,163 @@ class Skin extends DataObject
 
 
 	/**
+	 * Set dynamic style rule and store in array $this->dynamic_styles
+	 * (Use Skin->get_dynamic_styles() to get style as single string)
+	 *
+	 * @param string Setting name
+	 * @param string Style template with mask instead of setting value
+	 * @param array Additional params
+	 */
+	function dynamic_style_rule( $setting_name, $style_template, $params = array() )
+	{
+		$params = array_merge( array(
+				'value'   => NULL, // Custom value, different of what stored in the setting
+				'options' => NULL, // Options per each value, Used for <select> or radio settings
+				'suffix'  => NULL, // Suffix which should de added after value on each update by customzer JS code, e.g. 'px', '%'
+				'type'    => NULL, // Type of the field, e.g. 'image_file', 'not_empty'
+				'check'   => NULL, // 'not_empty' - don't apply style rule completely if value is empty
+			), $params );
+
+		if( $params['value'] === NULL )
+		{	// Try to get current setting value:
+			$setting_value = $this->get_setting( $setting_name );
+		}
+		else
+		{	// Use custom value:
+			$setting_value = $params['value'];
+		}
+
+		if( $setting_value === NULL )
+		{	// No value for the requested setting:
+			return '';
+		}
+
+		global $Session, $blog;
+
+		if( is_array( $params['options'] ) &&
+		    isset( $params['options'][ $setting_value ] ) )
+		{	// Get value from predefined array:
+			$setting_value = $params['options'][ $setting_value ];
+		}
+
+		if( $params['type'] == 'image_file' )
+		{	// Special setting type as ID of image file:
+			if( $this->get_setting( $setting_name ) &&
+					( $FileCache = & get_FileCache() ) && 
+					( $image_File = & $FileCache->get_by_ID( $this->get_setting( $setting_name ), false, false ) ) &&
+					$image_File->exists() )
+			{
+				$setting_value = 'url("'.$image_File->get_url().'")';
+			}
+			else
+			{
+				$setting_value = 'none';
+			}
+		}
+
+		if( $params['suffix'] !== NULL )
+		{	// Suffix for value:
+			$setting_value .= $params['suffix'];
+		}
+
+		if( $Session->get( 'customizer_mode_'.$blog ) )
+		{	// If customizer mode is enabled we should append a special css comment code
+			// in order to quick change the value from the customizer panel on change input value:
+			$setting_options = '';
+
+			if( is_array( $params['options'] ) )
+			{	// Append value presets to the comment in order to select them by JavaScript:;
+				$setting_options .= '/options:';
+				$p = 1;
+				foreach( $params['options'] as $preset_val => $preset_style )
+				{
+					$setting_options .= $preset_val.'$'.$preset_style
+						// separator between value options:
+						.( $p < count( $params['options'] ) ? '|' : '' );
+					$p++;
+				}
+			}
+
+			if( $params['suffix'] !== NULL )
+			{	// Suffix for value:
+				$setting_options .= '/suffix:'.$params['suffix'];
+			}
+
+			if( $params['type'] !== NULL )
+			{	// Setting type:
+				$setting_options .= '/type:'.$params['type'];
+			}
+
+			if( $params['check'] == 'not_empty' )
+			{	// If we should apply rule only when setting value is not empty:
+				// Store full template, to get it from here on customizer mode by JS:
+				$setting_options .= '/template:'.str_replace( '$setting_value$', '#setting_value#', $style_template );
+				if( empty( $setting_value ) )
+				{	// Don't apply rule completely when value is empty:
+					$style_template = '';
+				}
+				// Wrap full template instead of value as for normal rule in order to clear it in case of empty value:
+				$style_template = '/*customize:*/'.$style_template.'/*'.$setting_name.$setting_options.'*/';
+			}
+			else
+			{	// Normal rule:
+				$setting_value = '/*customize:*/'.$setting_value.'/*'.$setting_name.$setting_options.'*/';
+			}
+		}
+		else
+		{	// If customizer mode is disabled
+			if( $params['check'] == 'not_empty' && empty( $setting_value ) )
+			{	// Don't apply rule completely when value is empty:
+				return '';
+			}
+		}
+
+		if( ! isset( $this->dynamic_styles ) )
+		{
+			$this->dynamic_styles = array();
+		}
+
+		// Replace mask with setting value:
+		$this->dynamic_styles[] = str_replace( '$setting_value$', $setting_value, $style_template );
+	}
+
+
+	/**
+	 * Get dynamic style rules
+	 *
+	 * @return string
+	 */
+	function get_dynamic_styles()
+	{
+		return isset( $this->dynamic_styles ) ? implode( "\n", $this->dynamic_styles ) : '';
+	}
+
+
+	/**
+	 * Add dynamic CSS rules headline
+	 *
+	 * @param string CSS rule for media exception of whole dynamic styles
+	 */
+	function add_dynamic_css_headline( $media_exception = NULL )
+	{
+		$dynamic_css = $this->get_dynamic_styles();
+		if( ! empty( $dynamic_css ) )
+		{
+			if( $media_exception !== NULL )
+			{	// Use media exception:
+				$dynamic_css = $media_exception.'{ '.$dynamic_css.' }';
+			}
+			$dynamic_css = '<style type="text/css" id="evo_skin_styles">
+<!--
+'.$dynamic_css.'
+-->
+		</style>';
+			add_headline( $dynamic_css );
+		}
+	}
+
+
+	/**
 	 * Get current skin post navigation setting.
 	 * Possible values:
 	 *    - NULL - In this case the Blog post navigation setting will be used
@@ -1023,7 +1196,7 @@ class Skin extends DataObject
 	 */
 	function display_init( /*optional: $features = array() */ )
 	{
-		global $debug, $Messages, $disp, $UserSettings, $Blog, $Session;
+		global $debug, $Messages, $disp, $UserSettings, $Collection, $Blog, $Session;
 
 		// We get the optional arg this way for PHP7 comaptibility:
 		@list( $features ) = func_get_args();
@@ -1167,7 +1340,15 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Collection, $Blog, $current_User;
+					global $Collection, $Blog, $Item, $current_User;
+
+					if( isset( $Item ) && $Item->can_receive_webmentions() )
+					{	// Send header and initialize <link> tags in order to mark current Item can receive webmentions by current User(usually anonymous user):
+						$webmention_url = $Blog->get_htsrv_url().'webmention.php';
+						header( 'Link: <'.$webmention_url.'>; rel="webmention"' );
+						add_headline( '<link rel="webmention" href="'.$webmention_url.'" />' );
+						add_headline( '<link rel="http://webmention.org/" href="'.$webmention_url.'" />' );// used for older version of the protocol specification
+					}
 
 					// Used to set rating for a new comment:
 					init_ratings_js( 'blog' );
@@ -1194,6 +1375,12 @@ class Skin extends DataObject
 						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );
 					}
+
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
+
+					// Used to change link position:
+					require_js( 'backoffice.js', 'blog' );
 					break;
 
 				case 'disp_users':
@@ -1378,7 +1565,7 @@ class Skin extends DataObject
 					// Used to display a tooltip to the right of plugin help icon:
 					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
-					// Used to switch to advanced editing:
+					// Used to switch to advanced editing and for link position changing:
 					require_js( 'backoffice.js', 'blog' );
 
 					// Used to automatically checks the matching extracat when we select a new main cat:
@@ -1393,12 +1580,8 @@ class Skin extends DataObject
 						require_js( 'bozo_validator.js', 'blog' );
 					}
 
-					// Require Fine Uploader js and css:
-					require_js( 'multiupload/fine-uploader.js', 'blog' );
-					require_css( 'fine-uploader.css', 'blog' );
-					// Load JS files to make the links table sortable:
-					require_js( '#jquery#', 'blog' );
-					require_js( 'jquery/jquery.sortable.min.js', 'blog' );
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_edit_comment':
@@ -1424,6 +1607,9 @@ class Skin extends DataObject
 
 					// Used to switch to advanced editing:
 					require_js( 'backoffice.js', 'blog' );
+
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_useritems':
@@ -1511,7 +1697,8 @@ var downloadInterval = setInterval( function()
 					.'var evo_js_lang_loading = \''.TS_('Loading...').'\';'
 					.'var evo_js_lang_title_available_widgets = \''.sprintf( TS_('Widgets available for insertion into &laquo;%s&raquo;'), '$container_name$' ).'\';'
 					.'var evo_js_lang_title_edit_widget = \''.sprintf( TS_('Edit widget "%s" in container "%s"'), '$widget_name$', '$container_name$' ).'\';'
-					.'var evo_js_lang_error_communicating = \''.TS_('There was an error communicating with the server. Please reload the page to be in sync with the server.').'\';' );
+					.'var evo_js_lang_server_error = \''.TS_('There was a server side error.').'\';'
+					.'var evo_js_lang_sync_error = \''.TS_('Please reload the page to be in sync with the server.').'\';' );
 			}
 			require_js( 'src/evo_widget_designer.js', 'blog' );
 			require_js( 'communication.js', 'blog' );

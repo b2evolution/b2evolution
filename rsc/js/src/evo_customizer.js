@@ -7,11 +7,11 @@ function evo_customizer_reload_frontoffice( additional_url_params )
 	jQuery( '#evo_customizer__frontoffice_loader' ).show();
 	if( typeof( additional_url_params ) == 'undefined' )
 	{	// Reload with current url:
-		jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.reload();
+		jQuery( '#evo_customizer__frontoffice' ).get(0).contentWindow.location.reload();
 	}
 	else
 	{	// Reload with additional params:
-		jQuery( '#evo_customizer__frontoffice' ).get(0).contentDocument.location.href += additional_url_params;
+		jQuery( '#evo_customizer__frontoffice' ).get(0).contentWindow.location.href += additional_url_params;
 	}
 }
 
@@ -27,6 +27,65 @@ function evo_customizer_hide_backoffice()
 	jQuery( '.evo_customizer__wrapper' ).addClass( 'evo_customizer__collapsed' );
 	// Fix for Safari browser in order to make back-office panel scrollable again after collapse/expand action:
 	jQuery( '#evo_customizer__backoffice' ).css( 'height', '99.9%' );
+}
+
+function evo_customizer_update_style( setting_input )
+{
+	var skin_style = jQuery( '#evo_customizer__frontoffice' ).contents().find( 'style#evo_skin_styles' );
+	if( skin_style.length == 0 )
+	{	// Skip skin without customizable style sheet:
+		return;
+	}
+	var skin_setting_name = setting_input.attr( 'name' ).replace( /^edit_skin_\d+_set_/, '' );
+
+	// Replace previous value with new updated:
+	var regexp = new RegExp( '(\\/\\*customize:\\*\\/).*?(\\/\\*(([a-z_\\+]+\\+)?' + skin_setting_name + '(\\+[a-z_\\+]+)?)(\\/([a-z]+):([^\\*]+))?\\*\\/)', 'ig' );
+	var new_value = setting_input.val();
+	skin_style.text( skin_style.text().replace( regexp, function( m0, m1, m2, m3, m4, m5, m6, m7, m8 )
+	{
+		switch( m7 )
+		{
+			case 'options':
+				// Get preset value:
+				m8.split( '|' ).forEach( function( value_preset, i, arr )
+				{	// Find preset by selected value:
+					var value_preset = value_preset.split( '$' );
+					if( value_preset[0] == new_value )
+					{	// Use style code what is predefined for the value:
+						new_value = value_preset[1];
+					}
+				} );
+				break;
+			case 'suffix':
+				// Append suffix:
+				new_value += m8;
+				break;
+			case 'type':
+				// Special type:
+				if( m8 == 'image_file' )
+				{	// Special setting with image URL:
+					var file_image_obj = setting_input.next().find( '.file_select_item' )
+					if( setting_input.attr( 'type' ) == 'hidden' &&
+					    setting_input.next().data( 'file-type' ) == 'image' &&
+					    file_image_obj.length &&
+					    file_image_obj.data( 'file-url' ) )
+					{	// If image URL is defined:
+						new_value = 'url("' + file_image_obj.data( 'file-url' ) + '")';
+					}
+					else
+					{	// No image:
+						new_value = 'none';
+					}
+				}
+				break;
+			case 'template':
+				// Template, e.g. when style rule should not be applied when value  empty:
+				new_value = ( new_value == '' || new_value == 0 ? '' : m8.replace( '#setting_value#', new_value ) );
+				break;
+		}
+
+		return m1 + new_value + m2;
+	} ) );
 }
 
 jQuery( document ).on( 'ready', function()
@@ -94,8 +153,23 @@ jQuery( document ).on( 'ready', function()
 			}
 		} );
 
+		backoffice_content.find( 'form#skin_settings_checkchanges' ).on( 'keypress', function( e )
+		{	// Don't submit a form on press "Enter/Return" key:
+			return e.target.nodeName == 'TEXTAREA' || e.keyCode != 13;
+		} );
+
 		// Open links from widget edit form on top window:
 		backoffice_content.find( 'form#widget_checkchanges a:not([target])' ).attr( 'target', '_top' );
+
+		// Update custom styles of the skin:
+		backoffice_content.find( '.evo_customizer__content input' ).on( 'input', function()
+		{	// Update style with new changed value:
+			evo_customizer_update_style( jQuery( this ) );
+		} );
+		backoffice_content.find( '.evo_customizer__content select' ).on( 'change', function()
+		{	// Update style with new changed value:
+			evo_customizer_update_style( jQuery( this ) );
+		} );
 	} );
 
 	jQuery( '#evo_customizer__updater' ).on( 'load', function()
@@ -150,7 +224,7 @@ jQuery( document ).on( 'ready', function()
 			var collection_url = jQuery( '#evo_customizer__frontoffice' ).data( 'coll-url' );
 			if( typeof( link_url ) != 'undefined' && link_url.indexOf( collection_url ) === 0 )
 			{	// Append param to hide evo toolbar and don't redirect for links of the current collection:
-				jQuery( this ).attr( 'href', link_url + ( link_url.indexOf( '?' ) === -1 ? '?' : '&' ) + 'customizer_mode=enable&show_toolbar=hidden&redir=no' );
+				jQuery( this ).attr( 'href', link_url.replace( /^([^#]+)(#.+)?$/, '$1' + ( link_url.indexOf( '?' ) === -1 ? '?' : '&' ) + 'customizer_mode=enable&show_toolbar=hidden&redir=no' + '$2' ) );
 			}
 			else
 			{	// Open all links of other collections and side sites on top window in order to update settings frame or close it:

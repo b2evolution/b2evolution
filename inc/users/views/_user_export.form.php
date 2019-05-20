@@ -78,9 +78,11 @@ if( ! $user_profile_only )
 	echo_user_actions( $Form, $edited_User, $action );
 }
 
-$Form->title_fmt = '<div class="row"><span class="col-xs-12 col-lg-6 col-lg-push-6 text-right">$global_icons$</span><div class="col-xs-12 col-lg-6 col-lg-pull-6">$title$</div></div>'."\n";
+$form_text_title = T_('Export');
+$form_title = get_usertab_header( $edited_User, 'export', '<span class="nowrap">'.$form_text_title.'</span>'.get_manual_link( 'user-export-xml-zip' ) );
+$Form->title_fmt = '$title$';
 
-$Form->begin_form( 'fform', get_usertab_header( $edited_User, 'export', '<span class="nowrap">'.T_('Export').'</span>'.get_manual_link( 'user-export-xml-zip' ) ) );
+$Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
 	$Form->add_crumb( 'user' );
 	$Form->hidden_ctrl();

@@ -95,6 +95,7 @@ $core_componentwidget_defs = array(
 			'basic_menu_link',
 			'msg_menu_link',
 			'flag_menu_link',
+			'mustread_menu_link',
 			'profile_menu_link',
 		),
 	'navigation' => array(
@@ -157,6 +158,7 @@ $core_componentwidget_defs = array(
 			'cat_title',
 			'coll_item_notification',
 			'coll_comment_notification',
+			'coll_locale_switch',
 		),
 	'user' => array(
 			'user_avatars',

@@ -266,7 +266,7 @@ class ComponentWidget extends DataObject
 			{
 				return $this->Plugin->name;
 			}
-			return T_('Inactive / Uninstalled plugin');
+			return T_('Inactive / Uninstalled plugin').': "'.$this->code.'"';
 		}
 
 		return T_('Unknown');
@@ -291,6 +291,18 @@ class ComponentWidget extends DataObject
 	 */
 	function get_icon()
 	{
+		if( $this->type == 'plugin' )
+		{	// Use widget icon from plugin:
+			if( $this->get_Plugin() )
+			{	// Get widget icon from plugin:
+				return $this->Plugin->get_widget_icon();
+			}
+			else
+			{	// Set icon for inactive / uninstalled plugin:
+				$this->icon = 'warning';
+			}
+		}
+
 		if( empty( $this->icon ) )
 		{
 			return '';
@@ -355,7 +367,7 @@ class ComponentWidget extends DataObject
 			{
 				return $this->Plugin->short_desc;
 			}
-			return T_('Inactive / Uninstalled plugin');
+			return T_('Inactive / Uninstalled plugin').': "'.$this->code.'"';
 		}
 
 		return T_('Unknown');
@@ -813,7 +825,7 @@ class ComponentWidget extends DataObject
 				{	// Plugin failed (happens when a plugin has been disabled for example):
 					if( $this->mode == 'designer' )
 					{	// Display red text in customizer widget designer mode in order to make this plugin visible for editing:
-						echo $this->disp_params['block_start'].'<span class="evo_param_error">'.T_('Inactive / Uninstalled plugin').'</span>'.$this->disp_params['block_end'];
+						echo $this->disp_params['block_start'].'<span class="evo_param_error">'.T_('Inactive / Uninstalled plugin').': "'.$this->code.'"</span>'.$this->disp_params['block_end'];
 					}
 					return false;
 				}
@@ -923,7 +935,14 @@ class ComponentWidget extends DataObject
 				}
 			}
 
-			$this->display( $params );
+			if( ! isset( $params['widget_'.$this->code.'_display'] ) || ! empty( $params['widget_'.$this->code.'_display'] ) )
+			{	// Display widget content:
+				$this->display( $params );
+			}
+			else
+			{	// Hide the widget by code if it is requsted from skin:
+				$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden by code <code>'.$this->code.'</code> from skin template.' );
+			}
 
 			if( $display_containers )
 			{ // DEBUG:
@@ -978,7 +997,14 @@ class ComponentWidget extends DataObject
 
 				$this->BlockCache->start_collect();
 
-				$this->display( $params );
+				if( ! isset( $params['widget_'.$this->code.'_display'] ) || ! empty( $params['widget_'.$this->code.'_display'] ) )
+				{	// Display widget content:
+					$this->display( $params );
+				}
+				else
+				{	// Hide the widget by code if it is requsted from skin:
+					$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden by code <code>'.$this->code.'</code> from skin template.' );
+				}
 
 				// Save collected cached data if needed:
 				$this->BlockCache->end_collect();
@@ -1563,6 +1589,43 @@ class ComponentWidget extends DataObject
 	{
 		$form_display = isset( $this->disp_params['form_display'] ) ? $this->disp_params['form_display'] : $default_form_display;
 		return in_array( $form_display, array( 'standard', 'compact', 'nolabels', 'inline', 'grouped' ) ) ? $form_display : $default_form_display;
+	}
+
+
+	/**
+	 * Get Item's info from param by ID or slug
+	 *
+	 * @param string Param name
+	 * @return string
+	 */
+	function get_param_item_info( $param_name )
+	{
+		$param_value = $this->get_param( $param_name, '' );
+		if( empty( $param_value ) )
+		{	// Param is not defined:
+			return '';
+		}
+
+		$ItemCache = & get_ItemCache();
+		$param_value_is_ID = is_number( $param_value );
+		if( ! ( $param_value_is_ID && $param_Item = & $ItemCache->get_by_ID( $param_value, false, false ) ) &&
+		    ! ( ! $param_value_is_ID && $param_Item = & $ItemCache->get_by_urltitle( $param_value, false, false ) ) )
+		{	// Item is not detected:
+			return '<span class="evo_param_error">'.T_('Item is not found.').'</span>';
+		}
+
+		$item_info = '';
+		$status_icons = get_visibility_statuses( 'icons' );
+		if( isset( $status_icons[ $param_Item->get( 'status' ) ] ) )
+		{	// Status colored icon:
+			$item_info .= $status_icons[ $param_Item->get( 'status' ) ];
+		}
+		// Title with link to permament url:
+		$item_info .= ' '.$param_Item->get_title( array( 'link_type' => 'admin_view' ) );
+		// Icon to edit:
+		$item_info .= ' '.$param_Item->get_edit_link( array( 'text' => '#icon#' ) );
+
+		return $item_info;
 	}
 
 

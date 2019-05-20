@@ -243,6 +243,8 @@ if( ! empty( $bg_File ) && $bg_File->exists() )
 						'container_display_if_empty' => false, // If no widget, don't display container at all
 						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
 						'container_end'   => '</div>',
+						'block_start'     => '<div class="evo_widget $wi_class$">',
+						'block_end'       => '</div>',
 					) );
 				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>

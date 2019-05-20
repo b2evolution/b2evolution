@@ -31,13 +31,13 @@ if( $edited_Blog->ID == 0 )
 	$kind_title = get_collection_kinds( $kind );
 	$form_title = sprintf( T_('New "%s" collection'), $kind_title ).':';
 
-	$Form->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.sprintf( T_('Abort new "%s" collection'), $kind_title ), 3, 3 );
+	$Form->global_icon( T_('Abort creating new collection'), 'close', $admin_url.'?ctrl=collections', ' '.sprintf( T_('Abort new "%s" collection'), $kind_title ), 3, 3 );
 }
 elseif( $action == 'copy' )
 {	// Copy collection form:
 	$form_title = sprintf( T_('Duplicate "%s" collection'), $duplicating_collection_name ).':';
 
-	$Form->global_icon( T_('Abort duplicating collection'), 'close', $admin_url.'?ctrl=dashboard', ' '.T_('Abort duplicating collection'), 3, 3 );
+	$Form->global_icon( T_('Abort duplicating collection'), 'close', $admin_url.'?ctrl=collections', ' '.T_('Abort duplicating collection'), 3, 3 );
 }
 
 $Form->begin_form( 'fform', $form_title );
@@ -53,7 +53,7 @@ if( $next_action == 'create' )
 }
 else
 {
-	$Form->hidden( 'blog', $blog );
+	$Form->hidden( 'blog', $edited_Blog->ID );
 }
 
 if( ! empty( $edited_Blog->confirmation ) )
@@ -176,7 +176,7 @@ if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' 
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs_general_parameters' ), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs-general-parameters' ), array( 'class'=>'fieldset clear' ) );
 
 	$collection_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select collection logo/image'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
 	$Form->fileselect( 'collection_logo_file_ID', $edited_Blog->get_setting( 'collection_logo_file_ID' ), T_('Collection logo/image'), NULL, $collection_logo_params );
@@ -272,12 +272,12 @@ foreach( $locales as $locale_data )
 
 if( ! $is_creating )
 {
-	$Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-settings' ) );
+	$Form->begin_fieldset( T_('Language / locale').get_manual_link( 'coll-locale-settings' ), array( 'id' => 'language' ) );
 		if( $number_enabled_locales > 1 )
 		{ // More than 1 locale
 			$blog_locale_note = ( $current_User->check_perm( 'options', 'view' ) ) ?
 				'<a href="'.$admin_url.'?ctrl=regional">'.T_('Regional settings').' &raquo;</a>' : '';
-			$Form->select( 'blog_locale', $edited_Blog->get( 'locale' ), 'locale_options_return', T_('Collection Locale'), $blog_locale_note );
+		$Form->locale_selector( 'blog_locale', $edited_Blog->get( 'locale' ), $edited_Blog->get_locales(), T_('Collection Locales'), $blog_locale_note, array( 'link_coll_ID' => $edited_Blog->ID ) );
 
 			$Form->radio( 'blog_locale_source', $edited_Blog->get_setting( 'locale_source' ),
 					array(
@@ -287,15 +287,14 @@ if( ! $is_creating )
 
 			$Form->radio( 'blog_post_locale_source', $edited_Blog->get_setting( 'post_locale_source' ),
 					array(
-						array( 'post', T_('Always force to post locale') ),
-						array( 'blog', T_('Follow navigation locale') ),
-				), T_('Content Display'), true );
+						array( 'post', T_('Always force to Post locale') ),
+					array( 'blog', T_('Follow navigation locale'), '('.T_('Navigation/Widget Display').')' ),
+				), T_('Post Details Display'), true );
 
 			$Form->radio( 'blog_new_item_locale_source', $edited_Blog->get_setting( 'new_item_locale_source' ),
 					array(
-						array( 'use_coll', T_('Always use collection locale') ),
-						array( 'select_coll', T_('Allow select - use collection locale by default') ),
-						array( 'select_user', T_('Allow select - use user locale by default') ),
+						array( 'select_coll', T_('Default to collection\'s main locale') ),
+						array( 'select_user', T_('Default to user\'s locale') ),
 				), T_('New Posts'), true );
 		}
 		else
@@ -432,7 +431,7 @@ else
 
 if( ! $is_creating )
 {
-	$Form->begin_fieldset( T_('Meta data').get_manual_link('blog_meta_data') );
+	$Form->begin_fieldset( T_('Meta data').get_manual_link('blog-meta-data') );
 		$social_media_boilerplate_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select logo for social media boilerplate'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
 		$Form->fileselect( 'social_media_image_file_ID', $edited_Blog->get_setting( 'social_media_image_file_ID' ), T_('Social media boilerplate'), NULL, $social_media_boilerplate_params );
 		$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );

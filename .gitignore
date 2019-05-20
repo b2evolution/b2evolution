@@ -14,13 +14,12 @@ npm-debug.log
 # IDE Files
 /nbproject/
 .idea/*
-media/blogs/a
+
 skins/business_skin
 conf/_local.php
-plugins/geoip_plugin/GeoIP.dat
-media/blogs/b
+plugins/geoip_plugin/GeoLite2-Country.mmdb
 npm-debug.log
 /media/users/admin/private_message
-/media/import
-/media/blogs/forums
 /_db/b2evo_schema.mwb.bak
+media/import/LRT-*
+media/blogs/*

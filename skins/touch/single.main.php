@@ -190,6 +190,12 @@ while( $Item = & mainlist_get_item() )
 	<?php
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array(
+				'disp_comments'      => true,
+				'disp_comment_form'  => true,
+				'disp_trackbacks'    => true,
+				'disp_trackback_url' => true,
+				'disp_pingbacks'     => true,
+				'disp_webmentions'   => true,
 				'author_link_text' => 'auto',
 			) );
 		// Note: You can customize the default item feedback by copying the generic

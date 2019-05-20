@@ -134,7 +134,7 @@ if( ! empty( $ityp_usage ) )
 }
 
 $Results = new Results( $SQL->get(), 'ityp_' );
-$Results->title = T_('Item Types allowed for this Item Status').get_manual_link( 'item-statuses-allowed-per-item-type' );
+$Results->title = T_('Item Types allowed for this Item Status').get_manual_link( 'item-types-allowed-per-item-status' );
 $Results->Form = $Form;
 
 $Results->filter_area = array(
@@ -196,7 +196,7 @@ $Results->cols[] = array(
 $Results->display_init();
 
 $display_params = array(
-		'page_url' => 'admin.php?ctrl=itemstatuses&pst_ID='.$edited_ItemStatus->ID.'&action=edit',
+		'page_url' => $admin_url.'?ctrl=itemstatuses&pst_ID='.$edited_ItemStatus->ID.'&action=edit',
 	);
 
 $Results->checkbox_toggle_selectors = 'input[name^=type_]:checkbox';

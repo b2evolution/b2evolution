@@ -318,7 +318,7 @@ function file_select_item( $file_ID, $params = array() )
 	$File = & $FileCache->get_by_ID( $file_ID, false );
 
 	$params = array_merge( array(
-			'field_item_start' => '<div class="file_select_item" data-item-value="%value%">',
+			'field_item_start' => '<div class="file_select_item" data-item-value="%value%" data-file-url="%url%">',
 			'field_item_end' => '</div>',
 			'item_before' => '<div>',
 			'item_after' => '</div>',
@@ -329,7 +329,10 @@ function file_select_item( $file_ID, $params = array() )
 			'max_file_num' => 1
 		), $params );
 
-	$r = str_replace( '%value%', $file_ID, $params['field_item_start'] );
+	// Set full file URL (used by JS e.g. on designer customizer mode):
+	$file_url = ( $File && $File->exists() ? $File->get_url() : '' );
+
+	$r = str_replace( array( '%value%', '%url%' ), array( $file_ID, $file_url ), $params['field_item_start'] );
 	$r .= $params['max_file_num'] > 1 ? '<div>' : '';
 	if( $File )
 	{

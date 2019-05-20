@@ -85,6 +85,16 @@ $Comment = & $params['Comment'];
 					) );
 				$Comment->author( /* TRANS: author name */ T_('by').' ', '#', '', '#', 'htmlbody', true );
 				break;
+
+			case 'webmention': // Display a webmention:
+				$Comment->permanent_link( array(
+						'before'   => '',
+						'after'    => ' ',
+						'text'     => T_('Webmention'),
+						'nofollow' => true,
+					) );
+				$Comment->author( /* TRANS: author name */ T_('by').' ', '#', '', '#', 'htmlbody', true );
+				break;
 		}
 	?>
 	&#8212;

@@ -28,19 +28,19 @@
 #evo_container__sidebar.fixed {
 	position: fixed;
 }
-@media (max-width:1200px) {
+@media (max-width:1199px) { // Bootstrap MD ends at 1199, LG starts at 1200
 	#evo_container__sidebar {
 		width: 212px;
 	}
 }
-@media (max-width:992px) {
+@media (max-width:991px) { // Bootstrap SM ends at 991, LG starts at 992
 	#evo_container__sidebar {
 		width: 100%;
 	}
 }
-// Windows with height <= 800px OR width <= 992px:
-// Don't fix a position of the left side bar
-@media (max-height:800px),(max-width:992px) {
+// Windows with height <= 800px OR width < 992px:
+// Don't fix position of the left side bar, because there is not enough vertical space or because we are on a single column
+@media (max-height:800px),(max-width:991px) {
 	#evo_container__sidebar.fixed {
 		position: static;
 	}
@@ -209,7 +209,7 @@ div.bSideItem {
 		}
 	}
 }
-@media (min-width: 768px) {
+@media (min-width: 768px) { // Bootstrap SM starts at 768px
 	#fieldset_wrapper_captcha_qstn .panel div[id$=_answer] {
 		max-height: 34px;
 	}
@@ -360,7 +360,7 @@ ol.breadcrumb {
 		}
 	}
 }
-@media (max-width: 767px) {
+@media (max-width: 767px) { // Bootstrap XS ends at 767, SM starts at 768
 	.evo_post_title, .cat_title {
 		display: block;
 		h1 {

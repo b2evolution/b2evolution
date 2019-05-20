@@ -420,7 +420,7 @@ class item_fields_compare_Widget extends ComponentWidget
 			$items_can_be_edited = false;
 			foreach( $items as $item_ID )
 			{
-				if( isset( $Item ) && $Item->ID == $item_ID && count( $items ) == 1 )
+				if( isset( $Item ) && ( $Item instanceof Item ) && $Item->ID == $item_ID && count( $items ) == 1 )
 				{	// Don't display an edit link when this is a page of currently displayed Item:
 					$items_edit_links[] = '';
 				}
@@ -474,6 +474,8 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function get_custom_fields( & $items )
 	{
+		global $Item;
+
 		if( empty( $items ) )
 		{	// No items to compare:
 			return false;
@@ -500,6 +502,11 @@ class item_fields_compare_Widget extends ComponentWidget
 			{	// Skin wrong post:
 				unset( $items[ $i ] );
 				continue;
+			}
+
+			if( isset( $Item ) && $Item->ID == $widget_Item->ID && $Item->is_revision() )
+			{	// Display data from requested revision of the Item:
+				$widget_Item->set( 'revision', $Item->revision );
 			}
 
 			// Load all custom fields of the Item in cache:
@@ -1189,7 +1196,7 @@ class item_fields_compare_Widget extends ComponentWidget
 		$cache_keys = array(
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
-				'item_ID'      => isset( $Item ) ? $Item->ID : NULL, // Has the Item page changed? (this is important for disp=single|page because $this$ and $parent$ resolve differently depending on item ID)
+				'item_ID'      => isset( $Item ) && ( $Item instanceof Item ) ? $Item->ID : NULL, // Has the Item page changed? (this is important for disp=single|page because $this$ and $parent$ resolve differently depending on item ID)
 				'items'        => implode( ',', $items ), // Have the compared items changed? (Check firstly widget setting and then param from request) (this is important in case the same items are compared in different order)
 			);
 

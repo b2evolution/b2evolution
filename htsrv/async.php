@@ -22,6 +22,11 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 
 /**
+ * @global boolean Is this AJAX request? Use {@link is_ajax_request()} to query it, because it may change.
+ */
+$is_ajax_request = true;
+
+/**
  * HEAVY :(
  *
  * @todo dh> refactor _main.inc.php to be able to include small parts
@@ -151,7 +156,9 @@ switch( $action )
 		{
 			bad_request_die('Invalid Plugin.');
 		}
-		param( 'set_path', '/^\w+(?:\[\w+\])+$/', '' );
+		param( 'param_name', 'string', '' );
+		param( 'param_num', 'integer', '' );
+		$set_path = $param_name.'['.$param_num.']';
 
 		load_funcs('plugins/_plugin.funcs.php');
 
@@ -563,7 +570,7 @@ switch( $action )
 				if( $Item->assign_to( $new_assigned_ID, $new_assigned_login ) )
 				{ // An assigned user can be changed
 					$Item->dbupdate();
-					$Item->send_assignment_notification( NULL, false );
+					$Item->send_assignment_notification();
 				}
 				else
 				{ // Error on changing of an assigned user
@@ -878,7 +885,7 @@ switch( $action )
 
 		echo '<div style="background:#FFF;height:80%">'
 				.'<span id="import_files_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
-				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=import&amp;ajax_request=1&amp;root=import_0"'
+				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=import&amp;ajax_request=1&amp;root=import_0&amp;path='.param( 'path', 'string' ).'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
 					.' onload="document.getElementById(\'import_files_loader\').style.display=\'none\'">loading</iframe>'
 			.'</div>';
@@ -1002,6 +1009,35 @@ switch( $action )
 		echo $Automation->get( 'status' );
 
 		exit(0); // Exit here in order to don't display the AJAX debug info.
+
+	case 'get_item_add_version_form':
+		// Form to add version for the Item:
+
+		$item_ID = param( 'item_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		$edited_Item = & $ItemCache->get_by_ID( $item_ID );
+
+		// Initialize back-office skin:
+		global $UserSettings, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		require $inc_path.'items/views/_item_add_version.form.php';
+		break;
+
+	case 'get_link_locale_selector':
+		// Get a selector to link a collection with other collectios which have same main or extra locale as requested
+		param( 'coll_ID', 'integer', true );
+		param( 'coll_locale', 'string' );
+		param( 'field_name', 'string' );
+
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $coll_ID );
+
+		echo $Blog->get_link_locale_selector( $field_name, $coll_locale, false );
+		break;
 
 	default:
 		$incorrect_action = true;

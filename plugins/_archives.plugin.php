@@ -35,7 +35,7 @@ class archives_plugin extends Plugin
 	var $name;
 	var $code = 'evo_Arch';
 	var $priority = 50;
-	var $version = '7.0.0';
+	var $version = '7.0.1';
 	var $author = 'The b2evo Group';
 	var $group = 'widget';
 	var $subgroup = 'navigation';
@@ -465,6 +465,8 @@ class ArchiveList extends Results
 			$this->ItemQuery->where_itemtype_usage( 'post' );
 		}
 
+		// Restrict with locale visibility by current navigation locale:
+		$this->ItemQuery->where_locale_visibility();
 
 		$this->from = $this->ItemQuery->get_from();
 		$this->where = $this->ItemQuery->get_where();

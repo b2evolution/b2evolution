@@ -198,6 +198,14 @@ class Blog extends DataObject
 
 
 	/**
+	 * @var array Locales:
+	 *        Key - Locale key
+	 *        Value - Collection ID or NULL for locale of this collection
+	 */
+	var $locales = NULL;
+
+
+	/**
 	 * Constructor
 	 *
 	 * @param object DB row
@@ -217,6 +225,7 @@ class Blog extends DataObject
 			// echo 'Creating blank blog';
 			$this->owner_user_ID = 1; // DB default
 			$this->set( 'locale', $default_locale );
+			$this->set_locales( array( $default_locale ) );
 			// Use access type(Collection base URL) from general settings:
 			$this->set( 'access_type', $Settings->get( 'coll_access_type' ) );
 			if( is_logged_in() )
@@ -277,6 +286,7 @@ class Blog extends DataObject
 		return array(
 				array( 'table'=>'T_coll_user_favs', 'fk'=>'cufv_blog_ID', 'msg'=>T_('%d user favorites') ),
 				array( 'table'=>'T_coll_settings', 'fk'=>'cset_coll_ID', 'msg'=>T_('%d blog settings') ),
+				array( 'table'=>'T_coll_locales', 'fk'=>'cl_coll_ID', 'msg'=>T_('%d extra locales associations') ),
 				array( 'table'=>'T_coll_url_aliases', 'fk'=>'cua_coll_ID', 'msg'=>T_('%d URL aliases') ),
 				array( 'table'=>'T_coll_user_perms', 'fk'=>'bloguser_blog_ID', 'msg'=>T_('%d user permission definitions') ),
 				array( 'table'=>'T_coll_group_perms', 'fk'=>'bloggroup_blog_ID', 'msg'=>T_('%d group permission definitions') ),
@@ -284,10 +294,14 @@ class Blog extends DataObject
 				array( 'table'=>'T_widget__container', 'fk'=>'wico_coll_ID', 'msg'=>T_('%d widget container'),
 						'class'=>'WidgetContainer', 'class_path'=>'widgets/model/_widgetcontainer.class.php' ),
 				array( 'table'=>'T_hitlog', 'fk'=>'hit_coll_ID', 'msg'=>T_('%d hits') ),
+				array( 'table'=>'T_hits__aggregate', 'fk'=>'hagg_coll_ID', 'msg'=>T_('%d hits aggregations') ),
+				array( 'table'=>'T_hits__aggregate_sessions', 'fk'=>'hags_coll_ID', 'msg'=>T_('%d sessions aggregations') ),
+				array( 'table'=>'T_items__type_coll', 'fk'=>'itc_coll_ID', 'msg'=>T_('%d Post type associations with collections') ),
 				array( 'table'=>'T_categories', 'fk'=>'cat_blog_ID', 'msg'=>T_('%d related categories with all of their content recursively'),
 						'class'=>'Chapter', 'class_path'=>'chapters/model/_chapter.class.php' ),
 				array( 'table'=>'T_files', 'fk'=>'file_root_ID', 'and_condition'=>'file_root_type = "collection"', 'msg'=>T_('%d files in this blog file root'),
 						'class'=>'File', 'class_path'=>'files/model/_file.class.php' ),
+				array( 'table'=>'T_temporary_ID', 'fk'=>'tmp_coll_ID', 'msg'=>T_('%d temporary uploaded links') ),
 			);
 	}
 
@@ -344,14 +358,27 @@ class Blog extends DataObject
 	 */
 	function init_by_kind( $kind, $name = NULL, $shortname = NULL, $urlname = NULL )
 	{
+		// Set default tagline for collection of any kind:
+		$this->set( 'tagline', T_('This is the collection\'s tagline.') );
+
 		switch( $kind )
 		{
 			case 'minisite':
 				$this->set( 'type', 'minisite' );
-				$this->set( 'name', empty( $name ) ? T_('Minisite Title') : $name );
+				$this->set( 'name', empty( $name ) ? T_('Mini-Site Title') : $name );
 				$this->set( 'shortname', empty( $shortname ) ? T_('Mini-Site') : $shortname );
 				$this->set( 'urlname', empty( $urlname ) ? 'minisite' : $urlname );
 				$this->set_setting( 'front_disp', 'front' );
+				if( $blog_skin_ID = $this->get_skin_ID( 'normal' ) )
+				{
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_2_image_file_ID', NULL );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_3_display', 1 );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_3_title_color', '#FFFFFF' );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_3_text_color', '#FFFFFF' );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_3_link_color', '#FFFFFF' );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_3_link_h_color', '#FFFFFF' );
+					$this->set_setting( 'skin'.$blog_skin_ID.'_section_4_image_file_ID', NULL );
+				}
 				break;
 
 			case 'main':
@@ -360,7 +387,6 @@ class Blog extends DataObject
 				$this->set( 'shortname', empty( $shortname ) ? T_('Home') : $shortname );
 				$this->set( 'urlname', empty( $urlname ) ? 'home' : $urlname );
 				$this->set_setting( 'front_disp', 'front' );
-				$this->set_setting( 'aggregate_coll_IDs', '*' );
 				$this->set_setting( 'in_skin_login', '1' );
 				break;
 
@@ -444,6 +470,7 @@ class Blog extends DataObject
 				$this->set_setting( 'front_disp', 'front' );
 				$this->set_setting( 'category_ordering', 'manual' );
 				$this->set_setting( 'main_content', 'excerpt' );
+				$this->set_setting( 'chapter_content', 'excerpt' );
 
 				// Try to find post type "Manual Page" in DB
 				global $DB;
@@ -485,7 +512,7 @@ class Blog extends DataObject
 					}
 				}
 				$this->set( 'type', $kind );
-				$this->set( 'name', empty($name) ? T_('Public Blog') : $name );
+				$this->set( 'name', empty($name) ? T_('Blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
 				break;
@@ -563,6 +590,13 @@ class Blog extends DataObject
 				$this->set_setting( 'locale_source', param( 'blog_locale_source', 'string', 'blog' ) );
 				$this->set_setting( 'post_locale_source', param( 'blog_post_locale_source', 'string', 'post' ) );
 				$this->set_setting( 'new_item_locale_source', param( 'blog_new_item_locale_source', 'string', 'select_coll' ) );
+
+				$extra_locales = param( 'blog_locale_extra', 'array:string', NULL );
+				$linked_colls = param( 'blog_locale_link_coll', 'array:integer', NULL );
+				if( $extra_locales !== NULL || $linked_colls !== NULL )
+				{	// Set new extra locales and linked collections:
+					$this->set_locales( $extra_locales, $linked_colls );
+				}
 			}
 
 			// Collection permissions:
@@ -657,8 +691,8 @@ class Blog extends DataObject
 				// Force enabled statuses regardless of previous settings
 				$this->set_setting( 'moderation_statuses', implode( ',', $enable_comment_moderation_statuses ) );
 			}
-			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
-			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
+			if( $this->get_setting( 'allow_access' ) != 'public' )
+			{	// Disable site maps, feeds and ping plugins for not public collection:
 				$this->set_setting( 'enable_sitemaps', 0 );
 				$this->set_setting( 'feed_content', 'none' );
 				$this->set_setting( 'ping_plugins', '' );
@@ -932,8 +966,7 @@ class Blog extends DataObject
 		if( in_array( 'pings', $groups ) )
 		{ // we want to load the ping checkboxes:
 			$blog_ping_plugins = param( 'blog_ping_plugins', 'array:string', array() );
-			$blog_ping_plugins = array_unique($blog_ping_plugins);
-			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
+			$this->set_setting( 'ping_plugins', implode( ',', array_unique( $blog_ping_plugins ) ) );
 		}
 
 		if( in_array( 'home', $groups ) )
@@ -1161,6 +1194,38 @@ class Blog extends DataObject
 			$this->set_setting( 'search_include_cmnts', param( 'search_include_cmnts', 'integer', 0 ) );
 			$this->set_setting( 'search_include_tags', param( 'search_include_tags', 'integer', 0 ) );
 			$this->set_setting( 'search_include_files', param( 'search_include_files', 'integer', 0 ) );
+			// Scoring for posts:
+			$this->set_setting( 'search_score_post_title', param( 'search_score_post_title', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_content', param( 'search_score_post_content', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_tags', param( 'search_score_post_tags', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_excerpt', param( 'search_score_post_excerpt', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_titletag', param( 'search_score_post_titletag', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_author', param( 'search_score_post_author', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_future', param( 'search_score_post_date_future', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_moremonth', param( 'search_score_post_date_moremonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_lastmonth', param( 'search_score_post_date_lastmonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_twoweeks', param( 'search_score_post_date_twoweeks', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_lastweek', param( 'search_score_post_date_lastweek', 'integer', 0 ) );
+			// Scoring for comments:
+			$this->set_setting( 'search_score_cmnt_post_title', param( 'search_score_cmnt_post_title', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_content', param( 'search_score_cmnt_content', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_author', param( 'search_score_cmnt_author', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_future', param( 'search_score_cmnt_date_future', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_moremonth', param( 'search_score_cmnt_date_moremonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_lastmonth', param( 'search_score_cmnt_date_lastmonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_twoweeks', param( 'search_score_cmnt_date_twoweeks', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_lastweek', param( 'search_score_cmnt_date_lastweek', 'integer', 0 ) );
+			// Scoring for files:
+			$this->set_setting( 'search_score_file_name', param( 'search_score_file_name', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_path', param( 'search_score_file_path', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_title', param( 'search_score_file_title', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_alt', param( 'search_score_file_alt', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_description', param( 'search_score_file_description', 'integer', 0 ) );
+			// Scoring for categories:
+			$this->set_setting( 'search_score_cat_name', param( 'search_score_cat_name', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cat_desc', param( 'search_score_cat_desc', 'integer', 0 ) );
+			// Scoring for tags:
+			$this->set_setting( 'search_score_tag_name', param( 'search_score_tag_name', 'integer', 0 ) );
 
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
@@ -1243,6 +1308,11 @@ class Blog extends DataObject
 			{ // Only admin can turn ON this setting
 				$this->set( 'allowtrackbacks', $blog_allowtrackbacks );
 			}
+			$blog_webmentions = param( 'blog_webmentions', 'integer', 0 );
+			if( $blog_webmentions != $this->get_setting( 'webmentions' ) && ( $blog_webmentions == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			{	// Only admin can turn ON this setting
+				$this->set_setting( 'webmentions', $blog_webmentions );
+			}
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
 
 			// call modules update_collection_comments on this blog
@@ -1264,15 +1334,20 @@ class Blog extends DataObject
 		if( in_array( 'seo', $groups ) )
 		{ // we want to load the workflow checkboxes:
 			$this->set_setting( 'canonical_homepage', param( 'canonical_homepage', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_homepage', param( 'self_canonical_homepage', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_homepage', param( 'relcanonical_homepage', 'integer', 0 ) );
 			$this->set_setting( 'canonical_item_urls', param( 'canonical_item_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_item_urls', param( 'self_canonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'allow_crosspost_urls', param( 'allow_crosspost_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_item_urls', param( 'relcanonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_archive_urls', param( 'canonical_archive_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_archive_urls', param( 'self_canonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_archive_urls', param( 'relcanonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_cat_urls', param( 'canonical_cat_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_cat_urls', param( 'self_canonical_cat_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_cat_urls', param( 'relcanonical_cat_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_tag_urls', param( 'canonical_tag_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_tag_urls', param( 'self_canonical_tag_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_tag_urls', param( 'relcanonical_tag_urls', 'integer', 0 ) );
 			$this->set_setting( 'default_noindex', param( 'default_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_noindex', param( 'paged_noindex', 'integer', 0 ) );
@@ -2659,6 +2734,11 @@ class Blog extends DataObject
 			}
 		}
 
+		if( $allowed_status === NULL )
+		{	// Use max allowed status if it could not be found above:
+			$allowed_status = $max_allowed_status;
+		}
+
 		return $allowed_status;
 	}
 
@@ -2765,7 +2845,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created, because the parent directory is not writable or does not exist."), $msg_mediadir_path ),
-							'error', T_('Media directory file permission error').get_manual_link('media-directory-file-permission-error').':' );
+							'error', T_('Media directory file permission error').get_manual_link('media-file-permission-errors').':' );
 				}
 				return false;
 			}
@@ -2774,7 +2854,7 @@ class Blog extends DataObject
 				if( is_admin_page() )
 				{
 					$Messages->add_to_group( sprintf( T_("Media directory &laquo;%s&raquo; could not be created."), $msg_mediadir_path ),
-							'error', T_('Media directory creation error').get_manual_link('media-directory-creation-error').':' );
+							'error', T_('Media directory creation error').get_manual_link('media-file-permission-errors').':' );
 				}
 				return false;
 			}
@@ -3132,6 +3212,10 @@ class Blog extends DataObject
 				$disp_param = 'cart';
 				break;
 
+			case 'mustreadurl':
+				$disp_param = 'mustread';
+				break;
+
 			case 'helpurl':
 				if( $this->get_setting( 'help_link' ) == 'slug' )
 				{
@@ -3365,6 +3449,20 @@ class Blog extends DataObject
 				}
 				break;
 
+			case 'webmentions':
+				if( $this->get_setting( 'allow_access' ) != 'public' )
+				{	// Disable receiving of webmentions for not public collections:
+					$result = 0;
+				}
+				break;
+
+			case 'ping_plugins':
+				if( $this->get_setting( 'allow_access' ) != 'public' )
+				{	// Disable ping plugins for not public collections:
+					$result = '';
+				}
+				break;
+
 			case 'social_media_image':
 				if( $result === NULL )
 				{
@@ -3447,21 +3545,13 @@ class Blog extends DataObject
 
 	/**
 	 * Make sure collection settings are loaded.
-	 * This keeps a single instance across all blogs.
-	 * fp> why?
 	 */
 	function load_CollectionSettings()
 	{
-		static $instance; // fp> why do we need static? (it actually feels totally wrong: sharing settings between blogs!)
-
-		if( ! isset($this->CollectionSettings) )
+		if( ! isset( $this->CollectionSettings ) )
 		{
-			if( ! isset( $instance ) )
-			{
-				load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
-				$instance = new CollectionSettings(); // COPY (function)
-			}
-			$this->CollectionSettings = $instance;
+			load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+			$this->CollectionSettings = new CollectionSettings(); // COPY (function)
 		}
 	}
 
@@ -3529,6 +3619,13 @@ class Blog extends DataObject
 
 				$this->CollectionSettings->dbupdate();
 			}
+
+			// Update locales:
+			if( empty( $this->locales ) )
+			{	// Don't forget to store main locale in extra locales table:
+				$this->locales = array( $this->get( 'locale' ) => NULL );
+			}
+			$this->update_locales();
 
 			$default_post_type_ID = $this->get_setting( 'default_post_type' );
 			if( ! empty( $default_post_type_ID ) )
@@ -3606,7 +3703,7 @@ class Blog extends DataObject
 		{ // Proceed insertion:
 			$DB->query( 'INSERT INTO T_coll_user_perms
 					( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, bloguser_can_be_assignee,
-						bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit,
+						bloguser_perm_item_propose, bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit,
 						bloguser_perm_delpost, bloguser_perm_edit_ts,
 						bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts,
 						bloguser_perm_cmtstatuses, bloguser_perm_edit_cmt,
@@ -3614,7 +3711,7 @@ class Blog extends DataObject
 						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change,
 						bloguser_perm_analytics )
 					VALUES ( '.$this->ID.', '.$this->owner_user_ID.', 1, 1,
-						"published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
+						1, "published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
 						1, 1,
 						1, 1, 1,
 						"published,community,deprecated,protected,private,review,draft", "all",
@@ -3695,6 +3792,9 @@ class Blog extends DataObject
 
 		$DB->begin();
 
+		// Load all locales and linked collections:
+		$this->load_locales();
+
 		// Remember ID of the duplicated collection and Reset it to allow create new one:
 		$duplicated_coll_ID = $this->ID;
 		$this->ID = 0;
@@ -3772,7 +3872,7 @@ class Blog extends DataObject
 		}
 
 		// Initialize fields of collection permission tables which must be duplicated:
-		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}perm_poststatuses, {prefix}perm_item_type,
+		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}perm_item_propose, {prefix}perm_poststatuses, {prefix}perm_item_type,
 				{prefix}perm_edit, {prefix}perm_delpost, {prefix}perm_edit_ts, {prefix}perm_delcmts,
 				{prefix}perm_recycle_owncmts, {prefix}perm_vote_spam_cmts, {prefix}perm_cmtstatuses,
 				{prefix}perm_edit_cmt, {prefix}perm_meta_comment, {prefix}perm_cats, {prefix}perm_properties,
@@ -4134,6 +4234,7 @@ class Blog extends DataObject
 			'admins' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 1,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft,redirected',
 				'perm_item_type'       => 'admin',
 				'perm_edit'            => 'all',
@@ -4156,6 +4257,7 @@ class Blog extends DataObject
 			'moderators' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 1,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft',
 				'perm_item_type'       => 'restricted',
 				'perm_edit'            => 'le',
@@ -4178,6 +4280,7 @@ class Blog extends DataObject
 			'editors' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => '',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -4203,6 +4306,7 @@ class Blog extends DataObject
 			$group_permissions['editors'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'community,protected,draft,deprecated',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'own',
@@ -4225,6 +4329,7 @@ class Blog extends DataObject
 			$group_permissions['users'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'community,draft',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -4247,6 +4352,7 @@ class Blog extends DataObject
 			$group_permissions['suspect'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'review,draft',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -4273,6 +4379,7 @@ class Blog extends DataObject
 			$group_permissions['blogb'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => '',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -4386,6 +4493,9 @@ class Blog extends DataObject
 		{
 			$this->CollectionSettings->dbupdate();
 		}
+
+		// Update locales:
+		$this->update_locales();
 
 		$Plugins->trigger_event( 'AfterCollectionUpdate', $params = array( 'Blog' => & $this ) );
 
@@ -5730,30 +5840,33 @@ class Blog extends DataObject
 
 		if( ! isset( $cache_all_item_type_data ) )
 		{	// Get all item type data only first time to save execution time:
-			$cache_all_item_type_data = $DB->get_results( 'SELECT ityp_ID, ityp_usage, ityp_name FROM T_items__type' );
+			$cache_all_item_type_data = $DB->get_results( 'SELECT ityp_ID, ityp_usage, ityp_name, ityp_template_name FROM T_items__type' );
 		}
 
 		// Decide what "post" item type we can enable depending on collection kind:
+		$default_post_types_by_template = array( 'recipe' );
+		$default_post_types = array( 'Post with Custom Fields', 'Child Post', 'Recipe' );
 		switch( $this->type )
 		{
 			case 'main':
-				$default_post_types = array( 'Post' );
+				$default_post_types[] = 'Post';
 				break;
 
 			case 'photo':
-				$default_post_types = array( 'Photo Album' );
+				$default_post_types[] = 'Photo Album';
 				break;
 
 			case 'forum':
-				$default_post_types = array( 'Forum Topic' );
+				$default_post_types[] = 'Forum Topic';
 				break;
 
 			case 'manual':
-				$default_post_types = array( 'Manual Page' );
+				$default_post_types[] = 'Manual Page';
 				break;
 
 			case 'group':
-				$default_post_types = array( 'Forum Topic', 'Bug Report' );
+				$default_post_types[] = 'Forum Topic';
+				$default_post_types[] = 'Bug Report';
 				break;
 
 			case 'catalog':
@@ -5761,7 +5874,8 @@ class Blog extends DataObject
 				break;
 
 			default: // 'std'
-				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post' );
+				$default_post_types[] = 'Post';
+				$default_post_types[] = 'Podcast Episode';
 				break;
 		}
 
@@ -5769,7 +5883,8 @@ class Blog extends DataObject
 		foreach( $cache_all_item_type_data as $item_type )
 		{
 			if( $item_type->ityp_usage == 'post' &&
-			    in_array( $item_type->ityp_name, $default_post_types ) )
+			    ( in_array( $item_type->ityp_name, $default_post_types ) || in_array( $item_type->ityp_template_name, $default_post_types_by_template ) ) &&
+			    ! in_array( $item_type->ityp_ID, $enable_post_types ) )
 			{	// This "post" item type can be enabled:
 				$enable_post_types[] = $item_type->ityp_ID;
 			}
@@ -6083,6 +6198,164 @@ class Blog extends DataObject
 			WHERE cat_blog_ID = '.$this->ID.'
 				AND comment_status IN ( '.$DB->quote( $reduced_statuses ).' )',
 			'Reduce comments statuses by max allowed status of the collection #'.$this->ID );
+	}
+
+
+	/**
+	 * Load locales of this collection into cache array
+	 */
+	function load_locales()
+	{
+		if( $this->locales === NULL && ! empty( $this->ID ) )
+		{	// Load locales from DB once and store in cache variable:
+			global $DB;
+			$SQL = new SQL( 'Get extra locales and linked collections of collection #'.$this->ID );
+			$SQL->SELECT( 'cl_locale, cl_linked_coll_ID' );
+			$SQL->FROM( 'T_coll_locales' );
+			$SQL->FROM_add( 'INNER JOIN T_locales ON loc_locale = cl_locale AND loc_enabled = 1' );
+			$SQL->WHERE( 'cl_coll_ID = '.$this->ID );
+			$SQL->ORDER_BY( 'loc_priority' );
+			$this->locales = $DB->get_assoc( $SQL );
+			if( ! array_key_exists( $this->get( 'locale' ), $this->locales ) )
+			{	// Add main locale if it is not stored in extra locales by some unknown reason:
+				$this->locales[ $this->get( 'locale' ) ] = NULL;
+			}
+		}
+
+		if( ! is_array( $this->locales ) )
+		{	// Set default array with main locale:
+			$this->locales = array( $this->get( 'locale' ) => NULL );
+		}
+	}
+
+
+	/**
+	 * Get locales of this collection
+	 *
+	 * @param string Type of locales:
+	 *        - 'locale' - locales of this collection,
+	 *        - 'coll' - locales as links to other collections,
+	 *        - 'all' - all locales of this and links with other collections,
+	 * @return array Array with structure depending on param $type:
+	 *        - 'locale' - Numbered array with locale keys in values
+	 *        - 'coll'/'all' - Key is locale key, Value is ID of another collection or NULL
+	 */
+	function get_locales( $type = 'locale' )
+	{
+		// Load all locales:
+		$this->load_locales();
+
+		if( $type == 'locale' || $type == 'coll' )
+		{	// Get only locales or linked collections:
+			$locales = array();
+			foreach( $this->locales as $locale => $linked_coll_ID )
+			{	
+				if( ( $type == 'locale' && empty( $linked_coll_ID ) ) )
+				{
+					$locales[] = $locale;
+				}
+				elseif( $type == 'coll' && ! empty( $linked_coll_ID ) )
+				{
+					$locales[ $locale ] = $linked_coll_ID;
+				}
+			}
+			return $locales;
+		}
+
+		// Return all locales and linked collections:
+		return $this->locales;
+	}
+
+
+	/**
+	 * Set locales for this collection
+	 *
+	 * @param array Locales
+	 * @param array Linked collections
+	 */
+	function set_locales( $new_locales = array(), $new_linked_colls = array() )
+	{
+		global $locales;
+
+		// Reset previous values:
+		$this->locales = array();
+
+		$enabled_locales = array();
+		foreach( $locales as $locale_key => $locale_data )
+		{
+			if( $locale_data['enabled'] )
+			{	// If locale is enabled:
+				$enabled_locales[] = $locale_key;
+			}
+		}
+
+		if( is_array( $new_locales ) )
+		{	// Set locales:
+			foreach( $new_locales as $new_locale )
+			{
+				if( in_array( $new_locale, $enabled_locales ) )
+				{	// Set only enabled locale:
+					$this->locales[ $new_locale ] = NULL;
+				}
+			}
+		}
+
+		if( ! array_key_exists( $this->get( 'locale' ), $this->locales ) )
+		{	// Make sure main locale will be stored in the table of collection locales:
+			$this->locales[ $this->get( 'locale' ) ] = NULL;
+		}
+
+		if( is_array( $new_linked_colls ) )
+		{	// Set linked collections:
+			foreach( $new_linked_colls as $locale_key => $linked_coll_ID )
+			{
+				if( ! empty( $linked_coll_ID ) &&
+				    in_array( $locale_key, $enabled_locales ) &&
+				    ! array_key_exists( $locale_key, $this->locales ) )
+				{	// Set collection only with enalbed locale link:
+					$this->locales[ $locale_key ] = $linked_coll_ID;
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Update locales of this collection
+	 * and also update a linking with other collection by locales
+	 *
+	 * @return boolean TRUE on success
+	 */
+	function update_locales()
+	{
+		global $DB;
+
+		if( empty( $this->ID ) || ! is_array( $this->locales ) )
+		{	// Collection must be stored in DB and new locales must be defined:
+			return false;
+		}
+
+		// Delete all previous locales before inserting new:
+		$DB->query( 'DELETE FROM T_coll_locales
+			WHERE cl_coll_ID = '.$this->ID );
+
+		$sql_coll_locales = array();
+
+		if( ! empty( $this->locales ) )
+		{	// If at least one new locale:
+			foreach( $this->locales as $coll_locale => $linked_coll_ID )
+			{
+				$sql_coll_locales[ $coll_locale ] = '( '.$this->ID.', '.$DB->quote( $coll_locale ).', '.$DB->quote( $linked_coll_ID ).' )';
+			}
+		}
+
+		if( ! empty( $sql_coll_locales ) )
+		{	// Insert new locales:
+			$DB->query( 'INSERT INTO T_coll_locales ( cl_coll_ID, cl_locale, cl_linked_coll_ID )
+				VALUES '.implode( ', ', $sql_coll_locales ) );
+		}
+
+		return true;
 	}
 
 
@@ -6542,10 +6815,127 @@ class Blog extends DataObject
 					hideaftershow: '.( $this->get_setting( 'marketing_popup_show_repeat' ) ? 'false' : 'true' ).',
 					displayfreq: "'.$marketing_popup_show_frequency.'",
 				} )
+				jQuery( ".ddexitpop button.close" ).click( function()
+				{	// Hide popup on click top-right close icon button:
+					ddexitpop.hidepopup();
+				} )
 			} )
 			// ]]>
 			</script>';
 		}
+	}
+
+
+	/**
+	 * Get a count of must read items of this collection
+	 *
+	 * @return integer
+	 */
+	function get_mustread_items_count()
+	{
+		if( ! $this->get_setting( 'track_unread_content' ) )
+		{	// No must read items when tracking of unread content is enabled for this collection:
+			return 0;
+		}
+
+		if( ! isset( $this->mustread_items_count ) )
+		{	// Get it from DB only first time and then cache in var:
+			$mustread_ItemList2 = new ItemList2( $this, $this->get_timestamp_min(), $this->get_timestamp_max() );
+
+			// Set additional debug info prefix for SQL queries in order to know what code executes it:
+			$mustread_ItemList2->query_title_prefix = 'Must Read Items';
+
+			// Filter only the flagged items:
+			$mustread_ItemList2->set_default_filters( array(
+					'mustread' => 1
+				) );
+
+			// Run query initialization to get total rows:
+			$mustread_ItemList2->query_init();
+
+			$this->mustread_items_count = $mustread_ItemList2->total_rows;
+		}
+
+		return $this->mustread_items_count;
+	}
+
+
+	/**
+	 * Get a selector to link this collection with other collections
+	 * which have same main or extra locale as requested
+	 *
+	 * @param string Field name
+	 * @param string Locale to search other collections
+	 * @return string
+	 */
+	function get_link_locale_selector( $field_name, $locale, $restrict_used_locales = true )
+	{
+		global $DB, $current_User;
+
+		if( $restrict_used_locales &&
+		    ( $this->get( 'locale' ) == $locale ||
+		      in_array( $locale, $this->get_locales() ) ) )
+		{	// Don't allow selector if this collection already uses the requested locale:
+			return T_('N/A');
+		}
+
+		$linked_colls = $this->get_locales( 'coll' );
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'blogs', 'editall' ) )
+		{	// Display only the stored value because current User has no permission to edit all collections:
+			if( isset( $linked_colls[ $locale ] ) )
+			{	// Get the linked collection:
+				$BlogCache = & get_BlogCache();
+				$linked_Blog = & $BlogCache->get_by_ID( $linked_colls[ $locale ], false, false );
+			}
+			return empty( $linked_Blog ) ? T_('None') : $linked_Blog->get( 'name' );
+		}
+
+		$main_locale_SQL = new SQL( 'Get collections with locale '.$locale.' to link with coolection #'.$this->ID );
+		$main_locale_SQL->SELECT( 'blog_ID' );
+		$main_locale_SQL->FROM( 'T_blogs' );
+		$main_locale_SQL->WHERE( 'blog_locale = '.$DB->quote( $locale ) );
+		if( $this->ID > 0 )
+		{
+			$main_locale_SQL->WHERE_and( 'blog_ID != '.$this->ID );
+		}
+
+		$extra_locale_SQL = new SQL( 'Get collections with locale '.$locale.' to link with coolection #'.$this->ID );
+		$extra_locale_SQL->SELECT( 'cl_coll_ID' );
+		$extra_locale_SQL->FROM( 'T_coll_locales' );
+		$extra_locale_SQL->WHERE( 'cl_locale = '.$DB->quote( $locale ) );
+		$extra_locale_SQL->WHERE_and( 'cl_linked_coll_ID IS NULL' );
+		if( $this->ID > 0 )
+		{
+			$extra_locale_SQL->WHERE_and( 'cl_coll_ID != '.$this->ID );
+		}
+
+		$colls = $DB->get_col( 'SELECT blog_ID
+			FROM ( '.$main_locale_SQL->get().' UNION ' .$extra_locale_SQL->get().' ) AS locale_colls
+			ORDER BY blog_ID' );
+
+		if( empty( $colls ) )
+		{	// No collection with requested locale:
+			return T_('None');
+		}
+
+		$BlogCache = get_BlogCache();
+		$BlogCache->load_list( $colls );
+
+		$r = '<select name="'.$field_name.'_link_coll['.$locale.']" class="form-control" style="width:100%">';
+		$r .= '<option value="">'.T_('None').'</option>';
+		foreach( $colls as $coll_ID )
+		{
+			if( $locale_Blog = & $BlogCache->get_by_ID( $coll_ID, false, false ) )
+			{
+				$r .= '<option value="'.$coll_ID.'"'
+					.( isset( $linked_colls[ $locale ] ) && $linked_colls[ $locale ] == $coll_ID ? ' selected="selected"' : '' ).'>'
+					.$locale_Blog->get( 'name' ).'</option>';
+			}
+		}
+		$r .= '</select>';
+
+		return $r;
 	}
 }
 

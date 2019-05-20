@@ -628,16 +628,24 @@ class Session
 	 *
 	 * @param string crumb name
 	 * @param boolean true if the script should die on error
+	 * @param array Additional parameters
 	 */
-	function assert_received_crumb( $crumb_name, $die = true )
+	function assert_received_crumb( $crumb_name, $die = true, $params = array() )
 	{
 		global $servertimenow, $crumb_expires, $debug;
+
+		$params = array_merge( array(
+				'msg_format'        => 'html',
+				'msg_no_crumb'      => 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.',
+				'msg_expired_crumb' => sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor( $crumb_expires / 60 ) ),
+				'error_code'        => '400 Bad Request',
+			), $params );
 
 		if( ! $crumb_received = param( 'crumb_'.$crumb_name, 'string', NULL ) )
 		{ // We did not receive a crumb!
 			if( $die )
 			{
-				bad_request_die( 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.' );
+				bad_request_die( $params['msg_no_crumb'], $params['error_code'], $params['msg_format'] );
 			}
 			return false;
 		}
@@ -667,6 +675,22 @@ class Session
 			return false;
 		}
 
+		// Attempt to output an error header (will not work if the output buffer has already flushed once):
+		// This should help preventing indexing robots from indexing the error :P
+		if( ! headers_sent() )
+		{
+			load_funcs( '_core/_template.funcs.php' );
+			headers_content_mightcache( 'text/html', 0, '#', false ); // Do NOT cache error messages! (Users would not see they fixed them)
+			header_http_response( $params['error_code'] );
+		}
+
+		if( $params['msg_format'] == 'text' )
+		{	// Display error message in TEXT format:
+			echo $params['msg_expired_crumb'];
+			die();
+		}
+		// else display error message in HTML format:
+
 		// ERROR MESSAGE, with form/button to bypass and enough warning hopefully.
 		// TODO: dh> please review carefully!
 		global $io_charset;
@@ -678,7 +702,7 @@ class Session
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').' ['.$crumb_name.']</h3>';
 		echo '<p>'.T_('Your request was stopped for security reasons.').'</p>';
-		echo '<p>'.sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor( $crumb_expires / 60 ) ).'</p>';
+		echo '<p>'.$params['msg_expired_crumb'].'</p>';
 		echo '<p>'.T_('Please go back to the previous page and refresh it before submitting the form again.').'</p>';
 		echo '</div>';
 

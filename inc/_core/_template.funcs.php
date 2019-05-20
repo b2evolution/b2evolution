@@ -263,19 +263,23 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	if( ! empty($Session) )
 	{	// Session is required here
 
-		// Transfer of Debuglog to next page:
-		if( $Debuglog->count('all') )
-		{	// Save Debuglog into Session, so that it's available after redirect (gets loaded by Session constructor):
-			$sess_Debuglogs = $Session->get('Debuglogs');
-			if( empty($sess_Debuglogs) )
-			{
-				$sess_Debuglogs = array();
+		global $debug;
+		if( ! empty( $debug ) )
+		{	// Transfer full debug info to next page only when debug is enabled:
+			ob_start();
+			debug_info( true );
+			$current_debug_info = ob_get_clean();
+			if( ! empty( $current_debug_info ) )
+			{	// Save full debug info into Session, so that it's available after redirect (gets loaded by Session constructor):
+				$sess_debug_infos = $Session->get( 'debug_infos' );
+				if( empty( $sess_debug_infos ) )
+				{
+					$sess_debug_infos = array();
+				}
+				// NOTE: We must encode data in order to avoid error "Session data corrupted" because of special chars on unserialize the data:
+				$sess_debug_infos[] = gzencode( $current_debug_info );
+				$Session->set( 'debug_infos', $sess_debug_infos, 60 /* expire in 60 seconds */ );
 			}
-
-			$sess_Debuglogs[] = $Debuglog;
-			$Session->set( 'Debuglogs', $sess_Debuglogs, 60 /* expire in 60 seconds */ );
-			// echo 'Passing Debuglog(s) to next page';
-			// pre_dump( $sess_Debuglogs );
 		}
 
 		// Transfer of Messages to next page:
@@ -479,10 +483,12 @@ function get_request_title( $params = array() )
 			'edit_links_template' => array(), // More params for the links to advanced editing on disp=edit|edit_comment
 			'tags_text'           => T_('Tags'),
 			'flagged_text'        => T_('Flagged posts'),
+			'mustread_text'       => T_('Must Read Items'),
 			'help_text'           => T_('In case of issues with this site...'),
 			'compare_text'           => /* TRANS: title for disp=compare */ T_('%s compared'),
 			'compare_text_separator' => /* TRANS: title separator for disp=compare */ ' '.T_('vs').' ',
 			'cart_text'           => T_('Shopping cart'),
+			'proposechange_text'     => T_('Propose change for Item %s'),
 		), $params );
 
 	if( $params['auto_pilot'] == 'seo_title' )
@@ -782,6 +788,11 @@ function get_request_title( $params = array() )
 			$r[] = $title;
 			break;
 
+		case 'proposechange':
+			global $edited_Item;
+			$r[] = sprintf( $params['proposechange_text'], '"'.$edited_Item->get_title().'"' );
+			break;
+
 		case 'edit_comment':
 			global $comment_Item, $edited_Comment;
 			$title = $params['edit_comment_text'];
@@ -836,6 +847,11 @@ function get_request_title( $params = array() )
 		case 'flagged':
 			// We are requesting the flagged posts list:
 			$r[] = $params['flagged_text'];
+			break;
+
+		case 'mustread':
+			// We are requesting the must read posts list:
+			$r[] = $params['mustread_text'];
 			break;
 
 		case 'help':
@@ -1187,7 +1203,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
- * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head>
  */
 function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media = NULL, $version = '#', $output = false )
 {
@@ -1820,26 +1836,100 @@ function init_voting_item_js( $relative_to = 'rsc_url' )
  */
 function init_colorpicker_js( $relative_to = 'rsc_url' )
 {
-	// Inititialize bubbletip plugin
-	global $Skin, $AdminUI;
-	if( ! empty( $AdminUI ) )
-	{ // Get library of tooltip for current back-office skin
-		$tooltip_plugin = $AdminUI->get_template( 'tooltip_plugin' );
+	if( ! is_logged_in() )
+	{	// Colorpicker is initialized only for logged in users:
+		return;
 	}
-	elseif( ! empty( $Skin ) )
-	{ // Get library of tooltip for current front-office skin
-		$tooltip_plugin = $Skin->get_template( 'tooltip_plugin' );
+
+	global $current_User, $UserSettings;
+
+	require_js( '#jquery#', $relative_to );
+	require_js( 'bootstrap/colorpicker/bootstrap-colorpicker.min.js', $relative_to );
+	require_css( 'bootstrap-colorpicker.min.css', $relative_to );
+
+	// Get preselected colors from settings of current User:
+	$user_colors = $UserSettings->get( 'colorpicker', $current_User->ID );
+	if( empty( $user_colors ) )
+	{	// Use these default colors if user didn't selected any color yet:
+		$user_colors = array(
+			'black'   => '#000000',
+			'grey'    => '#999999',
+			'white'   => '#ffffff',
+			'red'     => '#FF0000',
+			'default' => '#777777',
+			'primary' => '#337ab7',
+			'success' => '#5cb85c',
+			'info'    => '#5bc0de',
+			'warning' => '#f0ad4e',
+			'danger'  => '#d9534f'
+		);
 	}
 	else
-	{ // Use bubbletip library by default for unknown skins
-		$tooltip_plugin = 'bubbletip';
+	{	// Convert user colors to array:
+		$user_colors = explode( ';', $user_colors );
 	}
-	init_bubbletip_js( $relative_to, $tooltip_plugin );
 
-	// Initialize farbastic colorpicker
-	require_js( '#jquery#', $relative_to );
-	require_js( 'jquery/jquery.farbtastic.min.js', $relative_to );
-	require_css( 'jquery/farbtastic/farbtastic.css', $relative_to );
+	add_js_headline( 'jQuery( document ).ready( function() { evo_initialize_colorpicker_inputs() } );
+function evo_initialize_colorpicker_inputs()
+{
+	jQuery( ".form_color_input" ).each( function()
+	{
+		var predefined_colors = ["'.implode( '","', $user_colors ).'"];
+		var colored_input = jQuery( this );
+		colored_input.parent().colorpicker( {
+			format: jQuery( this ).hasClass( "form_color_transparent" ) ? false : "hex",
+			colorSelectors: predefined_colors
+		} )
+		.on( "changeColor", function()
+		{
+			if( typeof( parent.evo_customizer_update_style ) == "function" )
+			{	// Update style in designer customizer mode if it is enabled currently:
+				parent.evo_customizer_update_style( colored_input );
+			}
+		} )
+		.on( "hidePicker", function( e )
+		{	// Update predefined colors with new last selected:
+			var current_colors = e.color.predefinedColors;
+			var new_colors = current_colors.slice();
+			var new_color = e.color.toString();
+			var new_color_index = new_colors.indexOf( new_color );
+			if( new_color_index > -1 )
+			{	// Remove a duplicated color:
+				new_colors.splice( new_color_index, 1 );
+			}
+			new_colors.unshift( new_color );
+			new_colors.splice( 10, 1 );
+
+			if( new_colors.join( "" ) == current_colors.join( "" ) )
+			{	// Dont update if colors is not changed:
+				return;
+			}
+
+			// Reinitialize colorpickers with new preselected colors:
+			jQuery( ".form_color_input" ).each( function()
+			{
+				var colored_input = jQuery( this ).parent();
+				colored_input.colorpicker( "destroy" );
+				colored_input.colorpicker( {
+					format: jQuery( this ).hasClass( "form_color_transparent" ) ? false : "hex",
+					colorSelectors: new_colors
+				} );
+			} );
+
+			// Save new colors in settings for current User:
+			jQuery.ajax(
+			{
+				type: "POST",
+				url: htsrv_url + "anon_async.php",
+				data: {
+					"action": "colorpicker",
+					"colors": new_colors.join( ";" ),
+					"crumb_colorpicker": "'.get_crumb( 'colorpicker' ).'"
+				}
+			} );
+		} );
+	} );
+}' );
 }
 
 
@@ -2247,6 +2337,21 @@ function display_if_empty( $params = array() )
 
 
 /**
+ * Check if current page is a single Item's page
+ *
+ * @return boolean
+ */
+function is_single_page()
+{
+	global $disp, $MainList, $Item;
+
+	return ( $disp == 'single' || $disp == 'page' ) &&
+		( isset( $MainList ) && $MainList->single_post ) &&
+		( isset( $Item ) && $Item->ID > 0 );
+}
+
+
+/**
  * Template tag for credits
  *
  * Note: You can limit (and even disable) the number of links being displayed here though the Admin interface:
@@ -2456,6 +2561,9 @@ function display_ajax_form( $params )
 		echo '<p style="color:red;font-weight:bold">'.T_( 'This section can\'t be displayed because wrong params were created by the skin.' ).'</p>';
 		return;
 	}
+
+	// Set icons type to display correct icons on bootstrap skins:
+	$params['b2evo_icons_type'] = $b2evo_icons_type;
 
 	if( ! empty( $required_js ) )
 	{	// Send all loaded JS files to ajax request in order to don't load them twice:
@@ -2672,6 +2780,10 @@ function display_login_form( $params )
 
 	$Form->add_crumb( 'loginform' );
 	$source = param( 'source', 'string', $params['source'].' login form' );
+	if( ! empty( $blog ) )
+	{
+		$Form->hidden( 'blog', $blog );
+	}
 	$Form->hidden( 'source', $source );
 	$Form->hidden( 'redirect_to', $redirect_to );
 	$Form->hidden( 'return_to', $return_to );
@@ -3815,4 +3927,27 @@ function get_star_rating( $value, $stars_num = 5, $params = array() )
 
 	return $stars_template;
 }
+
+
+/**
+ * Registers headlines for initialization of file multi uploader
+ *
+ * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean TRUE to make the links table sortable
+ */
+function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = true )
+{
+	// Require Fine Uploader js and css files:
+	require_js( 'multiupload/fine-uploader.js', $relative_to );
+	require_css( 'fine-uploader.css', $relative_to );
+
+	// Used to make uploader area resizable:
+	require_js( '#jqueryUI#', $relative_to );
+
+	if( $load_sortable_js )
+	{	// Load JS files to make the links table sortable:
+		require_js( 'jquery/jquery.sortable.min.js', $relative_to );
+	}
+}
+
 ?>

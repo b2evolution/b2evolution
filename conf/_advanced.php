@@ -94,40 +94,62 @@ $date_default_timezone = '';
  * @global array
  */
 $thumbnail_sizes = array(
-			'fit-1280x720' => array( 'fit', 1280, 720, 85 ),
-			'fit-720x500' => array( 'fit', 720, 500, 90 ),
-			'fit-640x480' => array( 'fit', 640, 480, 90 ),
-			'fit-480x600' => array( 'fit', 480, 600, 90 ),
-			'fit-520x390' => array( 'fit', 520, 390, 90 ),
-			'fit-400x320' => array( 'fit', 400, 320, 85 ),
-			'fit-320x320' => array( 'fit', 320, 320, 85 ),
-			'fit-256x256' => array( 'fit', 256, 256, 85 ),
-			'fit-192x192' => array( 'fit', 192, 192, 85 ),
-			'fit-160x160' => array( 'fit', 160, 160, 80 ),
-			'fit-160x160-blur-13' => array( 'fit', 160, 160, 80, 13 ),
-			'fit-160x160-blur-18' => array( 'fit', 160, 160, 80, 18 ),
-			'fit-160x120' => array( 'fit', 160, 120, 80 ),
-			'fit-128x128' => array( 'fit', 128, 128, 80 ),
-			'fit-80x80' => array( 'fit', 80, 80, 80 ),
-			'crop-480x320' => array( 'crop', 480, 320, 90 ),
-			'crop-256x256' => array( 'crop', 256, 256, 85 ),
-			'crop-192x192' => array( 'crop', 192, 192, 85 ),
-			'crop-128x128' => array( 'crop', 128, 128, 85 ),
-			'crop-80x80' => array( 'crop', 80, 80, 85 ),
-			'crop-64x64' => array( 'crop', 64, 64, 85 ),
-			'crop-48x48' => array( 'crop', 48, 48, 85 ),
-			'crop-32x32' => array( 'crop', 32, 32, 85 ),
-			'crop-15x15' => array( 'crop', 15, 15, 85 ),
+	// FIT: Typical images that will be shrunk to max width and/or max height but keep original aspect ratio (the ratios below are only for reference)
+		// 16:9 ratio 1.77
+			'fit-2880x1620'		=> array( 'fit', 2880, 1620, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays 
+			'fit-2560x1440'		=> array( 'fit', 2560, 1440, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays 
+			'fit-1920x1080'		=> array( 'fit', 1920, 1080, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays 
+			'fit-1600x900'			=> array( 'fit', 1600, 900, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays 
+			'fit-1280x720'			=> array( 'fit', 1280, 720, 85 ),		// 16:9 ratio 1.77
+			'fit-960x540'			=> array( 'fit', 960, 540, 85 ),			// 16:9 ratio 1.77	EXPERIMENTAL
+			'fit-720x500'			=> array( 'fit', 720, 500, 90 ),			// ratio 1.44
+			'fit-640x480'			=> array( 'fit', 640, 480, 90 ),			// 4:3 ratio 1.33
+			'fit-520x390'			=> array( 'fit', 520, 390, 90 ),			// 4:3 ratio 1.33
+			'fit-480x600' 			=> array( 'fit', 480, 600, 90 ),			// 4:5 ratio 0.80
+			'fit-400x320'			=> array( 'fit', 400, 320, 85 ),			// 5:4 ratio 1.25
+			'fit-320x320'			=> array( 'fit', 320, 320, 85 ),			// 1:1 square ratio 1
+			'fit-256x256'			=> array( 'fit', 256, 256, 85 ),			// 1:1 square ratio 1
+			'fit-192x192'			=> array( 'fit', 192, 192, 85 ),			// 1:1 square ratio 1
+			'fit-160x160'			=> array( 'fit', 160, 160, 85 ),			// 1:1 square ratio 1
+			'fit-160x120'			=> array( 'fit', 160, 120, 85 ),			// 1:1 square ratio 1
+			'fit-128x128'			=> array( 'fit', 128, 128, 85 ),			// 1:1 square ratio 1
+			'fit-80x80'				=> array( 'fit', 80, 80, 85 ),				// 1:1 square ratio 1
+	// FIT+BLUR: Blurred images (probably no need for Retina support, because the intended effect is to be blurred)
+			'fit-160x160-blur-13'=> array( 'fit', 160, 160, 80, 13 ),
+			'fit-160x160-blur-18'=> array( 'fit', 160, 160, 80, 18 ),
+	// CROPPED: Images that will be shrunk AND cropped to completely FILL the request aspect ratio
+		// 3:2 ratio 1.5
+			'crop-480x320'			=> array( 'crop', 480, 320, 90 ),
+		// 1:1 square ratio 1
+			'crop-512x512'			=> array( 'crop', 512, 512, 85 ),		// EXPERIMENTAL For Retina 
+			'crop-320x320'			=> array( 'crop', 320, 320, 85 ),
+			'crop-256x256'			=> array( 'crop', 256, 256, 85 ),
+			'crop-192x192'			=> array( 'crop', 192, 192, 85 ),
+			'crop-128x128'			=> array( 'crop', 128, 128, 85 ),
+			'crop-80x80'			=> array( 'crop', 80, 80, 85 ),
+			'crop-64x64'			=> array( 'crop', 64, 64, 85 ),
+			'crop-48x48'			=> array( 'crop', 48, 48, 85 ),
+			'crop-32x32'			=> array( 'crop', 32, 32, 85 ),
+			'crop-15x15'			=> array( 'crop', 15, 15, 85 ),
+	// CROPPED near TOP: Images that will be shrunk with preference towards the top AND cropped to completely FILL the request aspect ratio (typically used for profile pictures)
+			'crop-top-640x640'	=> array( 'crop-top', 640, 640, 85 ),		// EXPERIMENTAL For Retina 
+			'crop-top-320x320'	=> array( 'crop-top', 320, 320, 85 ),
+			'crop-top-200x200'	=> array( 'crop-top', 200, 200, 85 ),
+			'crop-top-160x160'	=> array( 'crop-top', 160, 160, 85 ),
+			'crop-top-80x80'		=> array( 'crop-top', 80, 80, 85 ),
+			'crop-top-64x64'		=> array( 'crop-top', 64, 64, 85 ),
+			'crop-top-48x48'		=> array( 'crop-top', 48, 48, 85 ),
+			'crop-top-32x32'		=> array( 'crop-top', 32, 32, 85 ),
+			'crop-top-15x15'		=> array( 'crop-top', 15, 15, 85 ),
+	// CROPPED near TOP + BLUR  (typically used to obfuscate profile pictures) (probably no need for Retina support, because the intended effect is to be blurred)
 			'crop-top-320x320-blur-8' => array( 'crop-top', 320, 320, 80, 8 ),
-			'crop-top-320x320' => array( 'crop-top', 320, 320, 85 ),
-			'crop-top-200x200' => array( 'crop-top', 200, 200, 85 ),
-			'crop-top-160x160' => array( 'crop-top', 160, 160, 85 ),
-			'crop-top-80x80' => array( 'crop-top', 80, 80, 85 ),
-			'crop-top-64x64' => array( 'crop-top', 64, 64, 85 ),
-			'crop-top-48x48' => array( 'crop-top', 48, 48, 85 ),
-			'crop-top-32x32' => array( 'crop-top', 32, 32, 85 ),
-			'crop-top-15x15' => array( 'crop-top', 15, 15, 85 ),
 	);
+
+
+/**
+ * Generate additional attribute "srcset" for images
+ */
+$generate_srcset_sizes = true;
 
 
 /**
@@ -405,7 +427,7 @@ $conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
  * @global string Path of the base.
  *                fp> made [i]nsensitive to case because of Windows URL oddities)
  */
-$basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/';
+$basepath = preg_replace( '#/'.preg_quote( $conf_subdir, '#' ).'$#i', '', $conf_path ).'/';
 // echo '<br/>basepath='.$basepath;
 
 /**
@@ -495,7 +517,7 @@ $customizer_url = $baseurl.'customize.php';
 /**
  * Location of the admin interface dispatcher
  */
-$dispatcher = 'admin.php'; // DEPRECATED
+$dispatcher = 'evoadm.php';
 $admin_url = $baseurl.$dispatcher;
 
 /**
@@ -723,9 +745,13 @@ $use_hacks = false;
 
 
 /**
- * If user tries to login 10 times during X seconds we refuse login (even if password is correct)
- * If set to 0, then there is never a lockout
+ * If user tries to log in {$failed_logins_before_lockout} times
+ * during the last {$failed_logins_lockout} seconds,
+ * we refuse login (even if password is correct) and display that
+ * the account is locked out until the above condition is no longer true.
+ * If {$failed_logins_lockout} is set to 0, there will never be a lockout.
  */
+$failed_logins_before_lockout = 10; // 10 times, Max is 197
 $failed_logins_lockout = 600; // 10 minutes
 
 
@@ -758,6 +784,14 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
  * You will still be able to see the emails that would have been sent through the Emails > Sent tab in the back-office.
  */
 $email_send_simulate_only = false;
+
+
+/**
+ * Turn this off to prevent sending emails if no external SMTP gateway is configured.
+ * If true and no SMTP gateway is configured, b2evolution will behave the same as with $email_send_simulate_only = true;
+ * This is useful to avoid sending email (especially campaigns) through a bad IP by mistake.
+ */
+$email_send_allow_php_mail = true;
 
 
 /**
@@ -852,8 +886,6 @@ $library_local_urls = array(
 		'#jcrop#' => array( 'jquery/jquery.jcrop.min.js', 'jquery/jquery.jcrop.js' ),
 		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
 		'#fontawesome#' => array( 'font-awesome.min.css', 'font-awesome.css' ),
-		'#shortcodes#' => array( 'shortcodes.js' ),
-		'#evo_view#' => array( 'evo_view.js' ),
 	);
 
 
@@ -880,6 +912,13 @@ $outgoing_proxy_password = '';
  *       On our end though we'll send an 'IE-Edge' header and it will make the IE on the other end behva ethe best it can...
  */
 $check_browser_version = false;
+
+
+/**
+ * Maximum skin API version which is supported by current version of b2evolution.
+ * Skin API version is defined in the method Skin::get_api_version() of each skin.
+ */
+$max_skin_api_version = 7;
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

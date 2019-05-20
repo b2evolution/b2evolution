@@ -147,6 +147,21 @@ function cron_log_action_end( $message, $type = NULL, $nl = "\n" )
 
 
 /**
+ * Set a number of cron job actions.
+ *
+ * Used for manual updating the actions number when cron job has no separate
+ * actions, but it does many actions by single code like mysql query.
+ *
+ * @param integer Number of actions
+ */
+function cron_log_report_action_count( $num )
+{
+	global $cron_log_actions_num;
+	$cron_log_actions_num = $num;
+}
+
+
+/**
  * Get a time of cron log
  *
  * @param integer A number of cron log action
@@ -235,7 +250,7 @@ function call_job( $job_key, $job_params = array() )
 
 	if( $error_code != 1 )
 	{	// We got an error
-		$result_status = 'error';
+		$result_status = ( $error_code == 20 ? 'imap_error' : 'error' );
 		$result_message_text = '[Error code: '.$error_code.']'."\n".$result_message_text;
 		if( is_array( $result_message ) )
 		{ // If result is array
@@ -272,6 +287,39 @@ function call_job( $job_key, $job_params = array() )
 
 
 /**
+ * Get status titles
+ *
+ * @return array
+ */
+function cron_statuses()
+{
+	return array(
+			'pending'    => T_('Pending'),
+			'started'    => T_('Started'),
+			'warning'    => T_('Warning'),
+			'timeout'    => T_('Timed out'),
+			'error'      => T_('Error'),
+			'imap_error' => T_('IMAP error'),
+			'finished'   => T_('Finished'),
+		);
+}
+
+
+/**
+ * Get status title of sheduled job by status value
+ *
+ * @param string Status
+ * @return string Title
+ */
+function cron_status_title( $status )
+{
+	$titles = cron_statuses();
+
+	return isset( $titles[ $status ] ) ? $titles[ $status ] : $status;
+}
+
+
+/**
  * Get status color of sheduled job by status value
  *
  * @param string Status value
@@ -285,6 +333,7 @@ function cron_status_color( $status )
 			'warning'  => 'dbdb57',
 			'timeout'  => 'e09952',
 			'error'    => 'cb4d4d',
+			'imap_error' => 'cb4d4d',
 			'finished' => '34b27d',
 		);
 
@@ -348,7 +397,7 @@ function cron_job_name( $job_key, $job_name = '', $job_params = '' )
 					$ItemCache = & get_ItemCache();
 					if( $Item = $ItemCache->get_by_ID( $job_params['item_ID'], false, false ) )
 					{
-						$job_name = sprintf( $job_name, $Item->get( 'title' ) );
+						$job_name = sprintf( $job_name, $Item->ID, $Item->get( 'title' ) );
 					}
 				}
 				break;
@@ -432,10 +481,7 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 			{ // Try to get default task name by key:
 				$task_name = ( isset( $cron_jobs_names[ $timeout_task->ctsk_key ] ) ? $cron_jobs_names[ $timeout_task->ctsk_key ] : $timeout_task->ctsk_key );
 			}
-			$tasks[ $timeout_task->ctsk_ID ] = array(
-					'name'    => $task_name,
-					'message' => NT_('Cron job has timed out.'),	// Here is not a good place to translate! We don't know the language of the recipient here.
-				);
+			$tasks[ $timeout_task->ctsk_ID ] = $task_name;
 		}
 
 		// Update timed out cron jobs:
@@ -444,13 +490,30 @@ function detect_timeout_cron_jobs( $error_task = NULL )
 			WHERE clog_ctsk_ID IN ( '.$DB->quote( array_keys( $tasks ) ).' )', 'Mark timeouts in cron jobs.' );
 	}
 
-	if( count( $tasks ) > 0 || $error_task !== NULL )
+	$timeout_tasks_num = count( $tasks );
+	if( $timeout_tasks_num > 0 || $error_task !== NULL )
 	{	// Send notification email about timed out and error cron jobs to users with edit options permission:
 		$email_template_params = array(
 				'timeout_tasks' => $tasks,
 				'error_task'    => $error_task,
 			);
-		send_admin_notification( NT_('Scheduled task error'), 'scheduled_task_error_report', $email_template_params );
+		if( $timeout_tasks_num > 1 || ( $error_task !== NULL && $timeout_tasks_num > 0 ) )
+		{	// Set email subject for multiple cron jobs:
+			$email_subject = NT_('Errors in multiple scheduled tasks');
+		}
+		elseif( $error_task !== NULL )
+		{	// Use name of error task in email subject:
+			$email_subject = array( NT_('Error in task: %s'), $error_task['name'] );
+		}
+		else
+		{	// Use name of first timed out task in email subject:
+			foreach( $tasks as $timeout_task_name )
+			{
+				$email_subject = array( NT_('Error in task: %s'), $timeout_task_name );
+				break;
+			}
+		}
+		send_admin_notification( $email_subject, 'scheduled_task_error_report', $email_template_params );
 	}
 }
 

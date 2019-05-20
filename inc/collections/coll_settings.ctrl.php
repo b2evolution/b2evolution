@@ -67,7 +67,7 @@ else
 		// Note: we may still have permission to edit categories!!
 		$Messages->add( T_('Sorry, you have no permission to edit blog properties.'), 'error' );
 		// redirect to blog list:
-		header_redirect( $admin_url.'?ctrl=dashboard' );
+		header_redirect( $admin_url.'?ctrl=collections' );
 		// EXITED:
 	}
 
@@ -377,7 +377,7 @@ switch( $action )
 		// Check permissions:
 		$current_User->check_perm( 'blog_properties', 'edit', true, $blog );
 
-		$update_redirect_url = $admin_url.'?ctrl=dashboard';
+		$update_redirect_url = $admin_url.'?ctrl=collections';
 
 		$setting = param( 'setting', 'string', '' );
 		$setting_value = ( $action == 'enable_setting' ? '1' : '0' );
@@ -501,14 +501,6 @@ if( $action == 'dashboard' )
 	require_js( '#easypiechart#' );
 	require_css( 'jquery/jquery.easy-pie-chart.css' );
 
-	if( empty( $blog ) )
-	{ // Init JS to quick edit an order of the blogs in the table cell by AJAX
-		init_field_editor_js( array(
-				'field_prefix' => 'order-blog-',
-				'action_url' => $admin_url.'?ctrl=dashboard&order_action=update&order_data=',
-			) );
-	}
-
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();
 
@@ -545,7 +537,7 @@ if( $action == 'dashboard' )
 
 			// Filter list:
 			$CommentList->set_filters( array(
-					'types' => array( 'comment','trackback','pingback' ),
+					'types' => array( 'comment','trackback','pingback','webmention' ),
 					'statuses' => $user_modeartion_statuses,
 					'user_perm' => 'moderate',
 					'post_statuses' => array( 'published', 'community', 'protected' ),
@@ -1041,7 +1033,7 @@ else
 							array( 'ctrl' => 'coll_settings', 'tab' => $tab, 'action' => 'edit' ) );
 
 
-	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=coll_settings&amp;tab=dashboard&amp;blog=$blog$' ) );
+	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=' ) );
 	switch( $AdminUI->get_path(1) )
 	{
 		case 'general':
@@ -1082,7 +1074,7 @@ else
 			$AdminUI->set_path( 'collections', 'features', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
 			$AdminUI->breadcrumbpath_add( T_('Contact form'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
-			$AdminUI->set_page_manual_link( 'contact-form' );
+			$AdminUI->set_page_manual_link( 'contact-form-features' );
 			break;
 
 		case 'userdir':
@@ -1110,7 +1102,7 @@ else
 			$AdminUI->set_path( 'collections', 'features', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
 			$AdminUI->breadcrumbpath_add( T_('More'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
-			$AdminUI->set_page_manual_link( 'features-more' );
+			$AdminUI->set_page_manual_link( 'more-features' );
 			break;
 
 		case 'skin':

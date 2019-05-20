@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.0.0';
+	var $version = '7.0.1';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -57,7 +57,7 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function get_api_version()
 	{
-		return 6;
+		return 7;
 	}
 
 
@@ -129,6 +129,9 @@ class bootstrap_blog_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array_merge( array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -148,10 +151,17 @@ class bootstrap_blog_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
 						'input_suffix' => ' px ',
-						'note' => T_('Set maximum height for post images.'),
+						'note' => T_('Constrain height of content images by CSS.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
@@ -218,6 +228,7 @@ class bootstrap_blog_Skin extends Skin
 						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'page_text_color' => array(
 						'label' => T_('Text color'),
@@ -266,18 +277,21 @@ class bootstrap_blog_Skin extends Skin
 						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'hover_tab_bg_color' => array(
 						'label' => T_('Hovered tab background color'),
 						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#eee',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'panel_bg_color' => array(
 						'label' => T_('Panel background color'),
 						'note' => T_('Choose background color for function panels and widgets.'),
 						'defaultvalue' => '#ffffff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'panel_border_color' => array(
 						'label' => T_('Panel border color'),
@@ -290,6 +304,7 @@ class bootstrap_blog_Skin extends Skin
 						'note' => T_('Choose background color for function panels and widgets.'),
 						'defaultvalue' => '#f5f5f5',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'section_color_end' => array(
 					'layout' => 'end_fieldset',
@@ -423,158 +438,116 @@ class bootstrap_blog_Skin extends Skin
 			) );
 
 		// Skin specific initializations:
-		global $media_url, $media_path;
 
-		// Add custom CSS:
-		$custom_css = '';
+		// **** Layout Settings / START ****
+		// Max image height:
+		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
+			'check' => 'not_empty'
+		) );
+		// Default font - Family:
+		$this->dynamic_style_rule( 'font_family', '#skin_wrapper { font-family: $setting_value$ }', array(
+			'options' => $this->get_font_definitions()
+		) );
+		// Default font - Size:
+		$this->dynamic_style_rule( 'font_size', '$setting_value$', array(
+			'options' => array(
+				'default' => '',
+				'standard' =>
+					'.container { font-size: 16px !important}'.
+					'.container input.search_field { height: 100%}'.
+					'.container h1 { font-size: 38px }'.
+					'.container h2 { font-size: 32px }'.
+					'.container h3 { font-size: 26px }'.
+					'.container h4 { font-size: 18px }'.
+					'.container h5 { font-size: 16px }'.
+					'.container h6 { font-size: 14px }'.
+					'.container .small { font-size: 85% !important }',
+				'medium' =>
+					'.container { font-size: 18px !important }'.
+					'.container input.search_field { height: 100% }'.
+					'.container h1 { font-size: 40px }'.
+					'.container h2 { font-size: 34px }'.
+					'.container h3 { font-size: 28px }'.
+					'.container h4 { font-size: 20px }'.
+					'.container h5 { font-size: 18px }'.
+					'.container h6 { font-size: 16px }'.
+					'.container .small { font-size: 85% !important }',
+				'large' =>
+					'.container { font-size: 20px !important }'.
+					'.container input.search_field { height: 100% }'.
+					'.container h1 { font-size: 42px }'.
+					'.container h2 { font-size: 36px }'.
+					'.container h3 { font-size: 30px }'.
+					'.container h4 { font-size: 22px }'.
+					'.container h5 { font-size: 20px }'.
+					'.container h6 { font-size: 18px }'.
+					'.container .small { font-size: 85% !important }',
+				'very_large' =>
+					'.container { font-size: 22px !important }'.
+					'.container input.search_field { height: 100% }'.
+					'.container h1 { font-size: 44px }'.
+					'.container h2 { font-size: 38px }'.
+					'.container h3 { font-size: 32px }'.
+					'.container h4 { font-size: 24px }'.
+					'.container h5 { font-size: 22px }'.
+					'.container h6 { font-size: 20px }'.
+					'.container .small { font-size: 85% !important }',
+			)
+		) );
+		// Default font - Weight:
+		$this->dynamic_style_rule( 'font_weight', '#skin_wrapper { font-weight: $setting_value$ }' );
+		// **** Layout Settings / END ****
 
-		if( $color = $this->get_setting( 'page_bg_color' ) )
-		{ // Custom page background color:
-			$custom_css .= '#skin_wrapper { background-color: '.$color." }\n";
+		// **** Custom Settings / START ****
+		// Background color:
+		$this->dynamic_style_rule( 'page_bg_color', '#skin_wrapper { background-color: $setting_value$ }' );
+		// Text color:
+		$this->dynamic_style_rule( 'page_text_color', '#skin_wrapper { color: $setting_value$ }' );
+		// Link color:
+		$this->dynamic_style_rule( 'page_link_color',
+			'a { color: $setting_value$ }'.
+			'h4.evo_comment_title a, h4.panel-title a.evo_comment_type, .pagination li:not(.active) a, .pagination li:not(.active) span { color: $setting_value$ !important }'.
+			'.pagination li.active a, .pagination li.active span { color: #fff; background-color: $setting_value$ !important; border-color: $setting_value$ }'
+		);
+		if( $this->get_setting( 'gender_colored' ) !== 1 )
+		{	// If gender option is not enabled, choose custom link color. Otherwise, chose gender link colors:
+			$this->dynamic_style_rule( 'page_link_color', 'h4.panel-title a { color: $setting_value$ }' );
 		}
-		if( $color = $this->get_setting( 'page_text_color' ) )
-		{ // Custom page text color:
-			$custom_css .= '#skin_wrapper { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'page_link_color' ) )
-		{ // Custom page link color:
-			$custom_css .= 'a { color: '.$color." }\n";
-			$custom_css .= 'h4.evo_comment_title a, h4.panel-title a.evo_comment_type, .pagination li:not(.active) a, .pagination li:not(.active) span { color: '.$color." !important }\n";
-			$custom_css .= '.pagination li.active a, .pagination li.active span { color: #fff; background-color: '.$color.' !important; border-color: '.$color." }\n";
-			if( $this->get_setting( 'gender_colored' ) !== 1 )
-			{ // If gender option is not enabled, choose custom link color. Otherwise, chose gender link colors:
-				$custom_css .= 'h4.panel-title a { color: '.$color." }\n";
-			}
-		}
-		if( $color = $this->get_setting( 'page_hover_link_color' ) )
-		{ // Custom page link color on hover:
-			$custom_css .= 'a:hover { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'bgimg_text_color' ) )
-		{	// Custom text color on background image:
-			$custom_css .= '.evo_hasbgimg { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'bgimg_link_color' ) )
-		{	// Custom link color on background image:
-			$custom_css .= '.evo_hasbgimg a:not(.btn) { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'bgimg_hover_link_color' ) )
-		{	// Custom link hover color on background image:
-			$custom_css .= '.evo_hasbgimg a:not(.btn):hover { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'current_tab_text_color' ) )
-		{ // Custom current tab text color:
-			$custom_css .= 'ul.nav.nav-tabs li a.selected { color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'current_tab_bg_color' ) )
-		{ // Custom current tab background color:
-			$custom_css .= 'ul.nav.nav-tabs li a.selected { background-color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'hover_tab_bg_color' ) )
-		{ // Custom hovered tab background text color:
-			$custom_css .= 'ul.nav.nav-tabs li a.default:hover { background-color: '.$color."; border-top-color: $color; border-left-color: $color; border-right-color: $color }\n";
-		}
-		if( $color = $this->get_setting( 'panel_bg_color' ) )
-		{ // Panel background text color:
-			$custom_css .= '.panel, .pagination>li>a { background-color: '.$color." }\n";
-		}
-		if( $color = $this->get_setting( 'panel_border_color' ) )
-		{ // Panel border color:
-			$custom_css .= '
-			.pagination li a, .pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover,
-			.nav-tabs,
-			.panel-default, .panel .panel-footer,
-			.panel .table, .panel .table th, .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th
-			{ border-color: '.$color." }\n";
-			$custom_css .= '.panel .panel-heading { border-color: '.$color."; background-color: $color }\n";
-			$custom_css .= '.nav-tabs>li>a:hover { border-bottom: 1px solid '.$color." }\n";
-			$custom_css .= '.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover { border-top-color: '.$color."; border-left-color: $color; border-right-color: $color }\n";
-		}
-		if( $color = $this->get_setting( 'panel_heading_bg_color' ) )
-		{ // Panel border color:
-			$custom_css .= '.panel .panel-heading, .panel .panel-footer { background-color: '.$color." }\n";
-		}
+		// Hover link color:
+		$this->dynamic_style_rule( 'page_hover_link_color', 'a:hover { color: $setting_value$ }' );
+		// Text color on background image:
+		$this->dynamic_style_rule( 'bgimg_text_color', '.evo_hasbgimg { color: $setting_value$ }' );
+		// Link color on background image:
+		$this->dynamic_style_rule( 'bgimg_link_color', '.evo_hasbgimg a:not(.btn) { color: $setting_value$ }' );
+		// Hover link color on background image:
+		$this->dynamic_style_rule( 'bgimg_hover_link_color', '.evo_hasbgimg a:not(.btn):hover { color: $setting_value$ }' );
+		// Current tab text color:
+		$this->dynamic_style_rule( 'current_tab_text_color', 'ul.nav.nav-tabs li a.selected { color: $setting_value$ }' );
+		// Current tab background color:
+		$this->dynamic_style_rule( 'current_tab_bg_color', 'ul.nav.nav-tabs li a.selected { background-color: $setting_value$ }' );
+		// Hovered tab background color:
+		$this->dynamic_style_rule( 'hover_tab_bg_color', 'ul.nav.nav-tabs li a.default:hover { background-color: $setting_value$; border-top-color: $setting_value$; border-left-color: $color; border-right-color: $setting_value$ }' );
+		// Panel background color:
+		$this->dynamic_style_rule( 'panel_bg_color', '.panel, .pagination>li>a { background-color: $setting_value$ }' );
+		// Panel border color:
+		$this->dynamic_style_rule( 'panel_border_color',
+			'.pagination li a, .pagination>li>a:focus, .pagination>li>a:hover, .pagination>li>span:focus, .pagination>li>span:hover,'.
+			'.nav-tabs, .panel-default, .panel .panel-footer,'.
+			'.panel .table, .panel .table th, .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th'.
+			'{ border-color: $setting_value$ }'.
+			'.panel .panel-heading { border-color: $setting_value$; background-color: $setting_value$ }'.
+			'.nav-tabs>li>a:hover { border-bottom: 1px solid $setting_value$ }'.
+			'.nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover { border-top-color: $setting_value$; border-left-color: $setting_value$; border-right-color: $setting_value$ }'
+		);
+		// Panel heading background color:
+		$this->dynamic_style_rule( 'panel_heading_bg_color', '.panel .panel-heading, .panel .panel-footer { background-color: $setting_value$ }' );
+		// **** Custom Settings / END ****
 
-		// Limit images by max height:
-		$max_image_height = intval( $this->get_setting( 'max_image_height' ) );
-		if( $max_image_height > 0 )
-		{
-			$custom_css .= '.evo_image_block img { max-height: '.$max_image_height.'px; width: auto; }'." }\n";
-		}
+		// Add dynamic CSS rules headline:
+		$this->add_dynamic_css_headline();
 
-		// Font size customization
-		if( $font_size = $this->get_setting( 'font_size' ) )
-		{
-			switch( $font_size )
-			{
-				case 'default': // When default font size, no CSS entry
-					//$custom_css .= '';
-					break;
-
-				case 'standard':// When standard layout
-					$custom_css .= '.container { font-size: 16px !important'." }\n";
-					$custom_css .= '.container input.search_field { height: 100%'." }\n";
-					$custom_css .= '.container h1 { font-size: 38px'." }\n";
-					$custom_css .= '.container h2 { font-size: 32px'." }\n";
-					$custom_css .= '.container h3 { font-size: 26px'." }\n";
-					$custom_css .= '.container h4 { font-size: 18px'." }\n";
-					$custom_css .= '.container h5 { font-size: 16px'." }\n";
-					$custom_css .= '.container h6 { font-size: 14px'." }\n";
-					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-					break;
-
-				case 'medium': // When default font size, no CSS entry
-					$custom_css .= '.container { font-size: 18px !important'." }\n";
-					$custom_css .= '.container input.search_field { height: 100%'." }\n";
-					$custom_css .= '.container h1 { font-size: 40px'." }\n";
-					$custom_css .= '.container h2 { font-size: 34px'." }\n";
-					$custom_css .= '.container h3 { font-size: 28px'." }\n";
-					$custom_css .= '.container h4 { font-size: 20px'." }\n";
-					$custom_css .= '.container h5 { font-size: 18px'." }\n";
-					$custom_css .= '.container h6 { font-size: 16px'." }\n";
-					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-					break;
-
-				case 'large': // When default font size, no CSS entry
-					$custom_css .= '.container { font-size: 20px !important'." }\n";
-					$custom_css .= '.container input.search_field { height: 100%'." }\n";
-					$custom_css .= '.container h1 { font-size: 42px'." }\n";
-					$custom_css .= '.container h2 { font-size: 36px'." }\n";
-					$custom_css .= '.container h3 { font-size: 30px'." }\n";
-					$custom_css .= '.container h4 { font-size: 22px'." }\n";
-					$custom_css .= '.container h5 { font-size: 20px'." }\n";
-					$custom_css .= '.container h6 { font-size: 18px'." }\n";
-					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-					break;
-
-				case 'very_large': // When default font size, no CSS entry
-					$custom_css .= '.container { font-size: 22px !important'." }\n";
-					$custom_css .= '.container input.search_field { height: 100%'." }\n";
-					$custom_css .= '.container h1 { font-size: 44px'." }\n";
-					$custom_css .= '.container h2 { font-size: 38px'." }\n";
-					$custom_css .= '.container h3 { font-size: 32px'." }\n";
-					$custom_css .= '.container h4 { font-size: 24px'." }\n";
-					$custom_css .= '.container h5 { font-size: 22px'." }\n";
-					$custom_css .= '.container h6 { font-size: 20px'." }\n";
-					$custom_css .= '.container .small { font-size: 85% !important'." }\n";
-					break;
-			}
-		}
-
-		// Font family customization
-		$custom_css .= $this->apply_selected_font( '#skin_wrapper', 'font_family', NULL, 'font_weight', 'font' );
-
-		if( ! empty( $custom_css ) )
-		{	// Function for custom_css:
-			$custom_css = '<style type="text/css">
-<!--
-'.$custom_css.'
--->
-		</style>';
-			add_headline( $custom_css );
-			// Init JS to affix Messages:
-			init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
-		}
+		// Init JS to affix Messages:
+		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
 
 

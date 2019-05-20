@@ -42,16 +42,7 @@ $params = array_merge( array(
 				'after_image_legend' =>  '</div>',
 				'after_image' =>         '</div>',
 				'after' =>               '</div>',
-				'image_size' =>          'fit-720x500',
-				/* Comment the above line to use the default image size
-				 * (fit-720x500). Possible values for the image_size
-				 * parameter are:
-				 * fit-720x500, fit-640x480, fit-520x390, fit-400x320,
-				 * fit-320x320, fit-160x160, fit-160x120, fit-80x80,
-				 * crop-80x80, crop-64x64, crop-48x48, crop-32x32,
-				 * crop-15x15
-				 * See also the $thumbnail_sizes array in conf/_advanced.php.
-				 */
+				'image_size' =>          'fit-720x500', // See the $thumbnail_sizes array in conf/_advanced.php.
 				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
 				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink',
 			) );
@@ -206,8 +197,16 @@ $params = array_merge( array(
 	</div>
 
 	<?php
+	if( is_single_page() )
+	{	// Display comments only on single Item's page:
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array(
+				'disp_comments'        => true,
+				'disp_comment_form'    => true,
+				'disp_trackbacks'      => true,
+				'disp_trackback_url'   => true,
+				'disp_pingbacks'       => true,
+				'disp_webmentions'     => true,
 				'before_section_title' => '<h4>',
 				'after_section_title'  => '</h4>',
 				'author_link_text' => 'auto',
@@ -215,6 +214,7 @@ $params = array_merge( array(
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+	}
 	?>
 
 	<?php

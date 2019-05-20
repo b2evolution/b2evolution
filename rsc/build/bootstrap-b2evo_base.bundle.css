@@ -5,6 +5,9 @@
 .red {
   color: #f00 !important;
 }
+.violet {
+  color: #9400D3;
+}
 .orange {
   color: #f60 !important;
 }
@@ -1015,6 +1018,9 @@ div#publish_buttons .quick-publish {
 tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
   display: none;
 }
+.input-group.colorpicker-component {
+  width: 100px;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
@@ -1027,7 +1033,7 @@ div#evo_toolbar {
   margin: 0;
   font: 14px "Helvetica Neue", Helvetica, sans-serif, Arial;
   position: fixed;
-  z-index: 11000;
+  z-index: 110000;
   left: 0px;
   top: 0px;
   width: 100%;
@@ -1316,6 +1322,17 @@ div.debug td {
 }
 div.debug td.odd {
   background-color: #eee;
+}
+div.debug_session {
+  border: 1px solid #F00;
+  background: #aaa;
+}
+div.debug_session div.debug {
+  background: #aaa;
+  border: none;
+}
+pre.xdebug-var-dump {
+  overflow: auto;
 }
 a.jslog_switcher {
   cursor: pointer;
@@ -3820,6 +3837,20 @@ form#comment_edit {
 .evo_form__comment .bg-warning {
   margin: 0px !important;
 }
+#cmntform_links .panel,
+#meta_cmntform_links .panel {
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+#cmntform_links .panel .panel-body,
+#meta_cmntform_links .panel .panel-body {
+  padding: 0;
+}
+#cmntform_links table,
+#meta_cmntform_links table {
+  margin: 0;
+}
 .form-horizontal .form-group,
 .form-horizontal .custom_content {
   margin-left: 0;
@@ -3941,6 +3972,10 @@ form#comment_edit {
 .evo_container__sidebar .evo_poll__title {
   white-space: normal;
 }
+#itemform_links .panel,
+#cmntform_links .panel {
+  overflow: hidden;
+}
 #itemform_links .panel-body,
 #cmntform_links .panel-body {
   padding: 0;
@@ -3964,28 +3999,28 @@ div.qq-upload-drop-area-active {
 ul.qq-upload-list {
   margin: 0;
 }
-div#fileuploader_form {
+div.evo_fileuploader_form {
   padding: 5px;
   height: 65px;
   background: #f5f5f5;
 }
-#attachments_fieldset_wrapper {
+.evo_attachments_fieldset__wrapper {
   width: 100%;
   height: 160px;
   position: relative;
   padding-bottom: 6px;
   box-sizing: content-box;
 }
-#attachments_fieldset_wrapper #attachments_fieldset_block {
+.evo_attachments_fieldset__wrapper .evo_attachments_fieldset__block {
   overflow: auto;
   height: 100%;
 }
-#attachments_fieldset_wrapper .ui-resizable-s {
+.evo_attachments_fieldset__wrapper .ui-resizable-s {
   background: #c0c0c0;
   height: 6px;
   bottom: 0;
 }
-#attachments_fieldset_wrapper .ui-resizable-s:after {
+.evo_attachments_fieldset__wrapper .ui-resizable-s:after {
   content: "...";
   font-size: 10px;
   top: -7px;
@@ -3993,23 +4028,54 @@ div#fileuploader_form {
   text-align: center;
   display: block;
 }
-#attachments_fieldset_wrapper .table_scroll {
+.evo_attachments_fieldset__wrapper .table_scroll {
   position: relative;
 }
-#attachments_fieldset_wrapper div.results,
-#attachments_fieldset_wrapper div.table_scroll {
+.evo_attachments_fieldset__wrapper div.results,
+.evo_attachments_fieldset__wrapper div.table_scroll {
   overflow: initial;
 }
-#attachments_fieldset_wrapper table tbody .dragged {
+.evo_attachments_fieldset__wrapper table tbody .dragged {
   opacity: 0.8;
   position: absolute;
   z-index: 1000;
 }
-#attachments_fieldset_wrapper table tbody td {
+.evo_attachments_fieldset__wrapper table tbody td {
   cursor: move;
 }
-#filelist_tbody tr:first-child .action_icon_link_move_up,
-#filelist_tbody tr:last-child .action_icon_link_move_down {
+.evo_attachments_fieldset__wrapper .evo_attachments_fieldset__overlay {
+  position: absolute;
+  top: -43px;
+  z-index: 1;
+  width: 100%;
+  height: 140px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #FFF;
+  text-align: center;
+  font-size: 200%;
+}
+.evo_attachments_fieldset__wrapper .evo_attachments_fieldset__overlay b {
+  width: 100%;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+@media (max-width: 768px) {
+  .evo_attachments_fieldset__wrapper .evo_attachments_fieldset__overlay {
+    font-size: 170%;
+  }
+}
+@media (max-width: 431px) {
+  .evo_attachments_fieldset__wrapper .evo_attachments_fieldset__overlay {
+    top: -65px;
+    height: 162px;
+    font-size: 140%;
+  }
+}
+.filelist_tbody tr:first-child .action_icon_link_move_up,
+.filelist_tbody tr:last-child .action_icon_link_move_down {
   visibility: hidden;
 }
 .widget_core_display_shopping_cart .evo_shopping_cart {
@@ -4804,8 +4870,7 @@ select:focus:invalid:focus {
   margin: 0;
 }
 .panel-heading .close {
-  position: relative;
-  top: -4px;
+  float: none;
 }
 .panel-heading .btn-group {
   margin-left: 6px;

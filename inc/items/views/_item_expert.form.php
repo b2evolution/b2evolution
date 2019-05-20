@@ -88,6 +88,10 @@ $Form->begin_form( '', '', $params );
 	if( ! empty( $original_item_ID ) )
 	{
 		$Form->hidden( 'p', $original_item_ID );
+		if( $action == 'new_version' )
+		{	// Set a flag to know this is a new version of this Item:
+			$Form->hidden( 'source_version_item_ID', $original_item_ID );
+		}
 	}
 
 	$Form->hidden( 'redirect_to', $redirect_to );
@@ -132,7 +136,8 @@ $Form->begin_form( '', '', $params );
 	{
 		if( ! empty( $original_item_ID ) )
 		{	// Set form title for duplicating the item:
-			$form_title_item_ID = sprintf( T_('Duplicating Item %s'), '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$original_item_ID.'" class="post_type_link">#'.$original_item_ID.'</a>' );
+			$form_title_item_ID = sprintf( ( $action == 'new_version' ? T_('Add version for Item %s') : T_('Duplicating Item %s') ),
+				'<a href="'.$admin_url.'?ctrl=items&amp;blog='.$Blog->ID.'&amp;p='.$original_item_ID.'" class="post_type_link">#'.$original_item_ID.'</a>' );
 		}
 		else
 		{	// Set form title for creating new item:
@@ -182,20 +187,6 @@ $Form->begin_form( '', '', $params );
 	else
 	{	// Hide a post title field:
 		$Form->hidden( 'post_title', $item_title );
-	}
-
-	$locale_options = locale_options( $edited_Item->get( 'locale' ), false, true );
-	if( ( $Blog->get_setting( 'new_item_locale_source' ) == 'use_coll' &&
-	      $edited_Item->get( 'locale' ) == $Blog->get( 'locale' ) &&
-	      isset( $locales[ $edited_Item->get( 'locale' ) ] )
-	    ) || is_array( $locale_options ) )
-	{	// Force to use collection locale because it is restricted by collection setting and the edited item has the same locale as collection
-		// OR only single locale is allowed to select:
-		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
-	}
-	else
-	{	// Allow to select a locale:
-		$Form->select_input_options( 'post_locale', $locale_options, T_('Language'), '', array( 'style' => 'width:180px' ) );
 	}
 	$Form->end_fieldset();
 	$Form->switch_layout( NULL );
@@ -299,12 +290,8 @@ $Form->begin_form( '', '', $params );
 
 
 	// ####################### ATTACHMENTS/LINKS #########################
-	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
-	    $current_User->check_perm( 'files', 'view', false ) )
-	{	// Display attachments fieldset:
-		$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
-		display_attachments_fieldset( $Form, $LinkOwner, false, $fold_images_attachments_block );
-	}
+	$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
+	$Form->attachments_fieldset( $edited_Item, $fold_images_attachments_block );
 
 	// ############################ ITEM PRICING #############################
 	global $thumbnail_sizes;
@@ -896,7 +883,12 @@ $Form->begin_form( '', '', $params );
 		$Form->hidden( 'item_featured', $edited_Item->featured );
 	}
 
-	if( $is_not_content_block )
+	if( $Blog->get_setting( 'track_unread_content' ) )
+	{	// Display setting to mark Item as "must read" when tracking of unread content is enabled for collection:
+		$Form->checkbox_basic_input( 'item_mustread', $edited_Item->get_setting( 'mustread' ), '<strong>'.T_('Must read').'</strong>' );
+	}
+
+	if( $is_not_content_block && $edited_Item->get_type_setting( 'allow_breaks' ) )
 	{	// Display "hide teaser" checkbox for item with type usage except of content block:
 		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
 	}
@@ -934,14 +926,71 @@ $Form->begin_form( '', '', $params );
 
 
 	// ################### TEXT RENDERERS ###################
+	if( $edited_Item->get_type_setting( 'use_text' ) != 'never' )
+	{	// Display text renderers only when text content is allowed for the item type:
 
-	$Form->begin_fieldset( T_('Text Renderers').get_manual_link( 'post-renderers-panel' )
+		$Form->begin_fieldset( T_('Text Renderers').get_manual_link( 'post-renderers-panel' )
 					.action_icon( T_('Plugins'), 'edit', $admin_url.'?ctrl=coll_settings&amp;tab=plugins&plugin_group=rendering&amp;blog='.$Blog->ID, T_('Plugins'), 3, 4, array( 'class' => 'action_icon pull-right' ) ),
 				array( 'id' => 'itemform_renderers', 'fold' => true ) );
 
-	// fp> TODO: there should be no param call here (shld be in controller)
-	$edited_Item->renderer_checkboxes( param('renderers', 'array:string', NULL) );
+		// fp> TODO: there should be no param call here (shld be in controller)
+		$edited_Item->renderer_checkboxes( param('renderers', 'array:string', NULL) );
 
+		$Form->end_fieldset();
+	}
+
+
+	// ################### LANGUAGE / VERSIONS ###################
+	$multiple_available_locales = count( $edited_Item->get_available_locales() ) > 1;
+	$Form->begin_fieldset( T_('Language / Versions').get_manual_link( 'post-language-versions' ), array(
+			'id'           => 'itemform_language',
+			'fold'         => true,
+			'default_fold' => ! $multiple_available_locales
+		) );
+	$Form->switch_layout( 'fields_table' );
+
+		$Form->select_input_options( 'post_locale', $edited_Item->get_locale_options(), T_('Language'), '', array( 'style' => 'width:auto' ) );
+
+		if( $multiple_available_locales )
+		{	// Display this setting if we have more than 1 enabled locale:
+			$Form->radio( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ), array(
+					array( 'always', T_('Show for any navigation locale') ),
+					array( 'follow-nav-locale', T_('Show only if matching navigation locale') )
+				), '', true );
+		}
+
+		$other_version_items = $edited_Item->get_other_version_items( $original_item_ID );
+		$item_add_version_link = $edited_Item->get_add_version_link();
+		$item_link_version_link = $edited_Item->get_link_version_link();
+		if( $item_add_version_link || $item_link_version_link || count( $other_version_items ) > 0 )
+		{	// Display other versions and link to add version:
+			echo '<b>'.T_('Other versions').':</b>';
+			echo '<ul style="list-style:disc;margin-left:20px">';
+			$other_version_locales = array( $edited_Item->get( 'locale' ) => 1 );
+			foreach( $other_version_items as $other_version_Item )
+			{	// Find duplicated locales:
+				$other_version_locales[ $other_version_Item->get( 'locale' ) ] = isset( $other_version_locales[ $other_version_Item->get( 'locale' ) ] ) ? 2 : 1;
+			}
+			foreach( $other_version_items as $other_version_Item )
+			{	// Display a link to another version of the Item:
+				echo '<li>'.$other_version_Item->get_title( array( 'link_type' => 'edit_view_url' ) ).' '
+						.locale_flag( $other_version_Item->get( 'locale' ), 'w16px', 'flag', '', false )
+						.'<span class="note'.( $other_version_locales[ $other_version_Item->get( 'locale' ) ] == 2 ? ' red' : '' ).'">('.$other_version_Item->get( 'locale' ).')</span>'
+						.$edited_Item->get_unlink_version_link( array( 'unlink_item_ID' => $other_version_Item->ID ) )
+					.'</li>';
+			}
+			if( $item_add_version_link )
+			{	// Display link to add new version if it is allowed:
+				echo '<li>'.$item_add_version_link.'</li>';
+			}
+			if( $item_link_version_link )
+			{	// Display link to add new version if it is allowed:
+				echo '<li>'.$item_link_version_link.'</li>';
+			}
+			echo '</ul>';
+		}
+
+	$Form->switch_layout( NULL );
 	$Form->end_fieldset();
 
 
@@ -997,8 +1046,40 @@ $Form->begin_form( '', '', $params );
 	}
 
 
+	if( in_array( $edited_Item->get_type_setting( 'usage' ), array( 'post', 'page', 'widget-page' ) ) )
+	{	// Display user tagging for items which can be displayed only on disp=single, disp=page or disp=widget_page:
+
+		// ################### USER TAGGING ###################
+		$Form->begin_fieldset( T_('User Tagging').get_manual_link( 'post-user-tagging-panel' )
+						.( $current_User->check_perm( 'options', 'view' ) ? action_icon( T_('User Tags'), 'edit', $admin_url.'?ctrl=usertags', T_('User Tags'), 3, 4, array( 'class' => 'action_icon pull-right' ) ) : '' ),
+					array( 'id' => 'itemform_usertags', 'fold' => true ) );
+
+		$Form->switch_layout( 'table' );
+		$Form->formstart = '<table id="item_locations" cellspacing="0" class="fform">'."\n";
+		$Form->labelstart = '<td class="right"><strong>';
+		$Form->labelend = '</strong></td>';
+
+		echo '<p class="note">'.T_('You can tag the (registered) Users who view this page.').'</p>';
+
+		echo $Form->formstart;
+
+		$Form->usertag_input( 'user_tags', $edited_Item->get_setting( 'user_tags' ), 40, T_('Tags'), '', array(
+				'maxlength'    => 255,
+				'style'        => 'width:100%',
+				'input_prefix' => '<span class="evo_input__tags">',
+				'input_suffix' => '</span>',
+			) );
+
+		echo $Form->formend;
+
+		$Form->switch_layout( NULL );
+
+		$Form->end_fieldset();
+	}
+
 	if( $is_not_content_block )
 	{	// Display goal tracking and notifications for item with type usage except of content block:
+
 		// ################### GOAL TRACKING ###################
 
 		$Form->begin_fieldset( T_('Goal tracking').get_manual_link( 'post-goal-tracking-panel' )
@@ -1238,6 +1319,10 @@ echo_fieldset_folding_js();
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
 // JS code for merge button:
 echo_item_merge_js();
+// JS code for link to add new version:
+echo_item_add_version_js();
+// JS code for link to link new version:
+echo_item_link_version_js();
 
 // JS to post excerpt mode switching:
 ?>

@@ -107,15 +107,25 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function get_param_definitions_main( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
 				),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
 						'input_suffix' => ' px ',
-						'note' => T_('Set maximum height for post images.'),
+						'note' => T_('Constrain height of content images by CSS.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -336,6 +346,9 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function get_param_definitions_std( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -355,10 +368,17 @@ class green_bootstrap_theme_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
 						'input_suffix' => ' px ',
-						'note' => T_('Set maximum height for post images.'),
+						'note' => T_('Constrain height of content images by CSS.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'allow_empty' => true,
@@ -559,6 +579,13 @@ class green_bootstrap_theme_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Image Viewing')
 				),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
 					'max_image_height' => array(
 						'label' => T_('Max comment image height'),
 						'input_suffix' => ' px ',
@@ -579,13 +606,6 @@ class green_bootstrap_theme_Skin extends Skin
 						'label' => T_('Thumbnail size inside Album'),
 						'note' => T_('Select thumbnail size for images inside Albums') . ' (disp=single).',
 						'defaultvalue' => 'fit-640x480',
-						'options' => get_available_thumb_sizes(),
-						'type' => 'select',
-					),
-					'mediaidx_thumb_size' => array(
-						'label' => T_('Thumbnail size in Media index'),
-						'note' => T_('Select thumbnail size for Media index images') . ' (disp=mediaidx).',
-						'defaultvalue' => 'fit-256x256',
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
 					),
@@ -750,6 +770,9 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function get_param_definitions_forum( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -777,10 +800,17 @@ class green_bootstrap_theme_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
 						'input_suffix' => ' px ',
-						'note' => T_('Set maximum height for post images.'),
+						'note' => T_('Constrain height of content images by CSS.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -967,15 +997,25 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function get_param_definitions_manual( $params )
 	{
+		// Load for function get_available_thumb_sizes():
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
 				),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
 						'input_suffix' => ' px ',
-						'note' => T_('Set maximum height for post images.'),
+						'note' => T_('Constrain height of content images by CSS.'),
 						'defaultvalue' => '',
 						'type' => 'integer',
 						'size' => '7',
@@ -2061,7 +2101,7 @@ jQuery( document ).ready( function()
 		}
 
 		// Display left navigation column only on these pages:
-		return in_array( $disp, array( 'front', 'posts', 'flagged', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
+		return in_array( $disp, array( 'front', 'posts', 'flagged', 'mustread', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
 	}
 }
 

@@ -40,7 +40,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Messages, $debug, $Hit, $check_browser_version;
+		global $Messages, $debug, $Hit, $check_browser_version, $adminskins_url, $rsc_url;
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
@@ -68,11 +68,11 @@ class AdminUI extends AdminUI_general
 		// Make sure standard CSS is called ahead of custom CSS generated below:
 		if( $debug )
 		{	// Use readable CSS:
-			require_css( 'skins_adm/bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( $adminskins_url.'bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
 		else
 		{	// Use minified CSS:
-			require_css( 'skins_adm/bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( $adminskins_url.'bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
 
 		// Load general JS file:
@@ -99,6 +99,30 @@ class AdminUI extends AdminUI_general
 				$Messages->add( 'User Agent: '.$Hit->get_user_agent(), 'note' );
 			}
 		}
+
+		// evo helpdesk widget:
+		//require_css( $rsc_url.'css/evo_helpdesk_widget.min.css' );
+		//require_js( $rsc_url.'js/evo_helpdesk_widget.min.js' );
+	}
+
+
+	/**
+	 * Get the end of the HTML <body>. Close open divs, etc...
+	 *
+	 * This is not called if {@link $mode} is set.
+	 *
+	 * @return string
+	 */
+	function get_body_bottom()
+	{
+		/*return '<script>
+			// Initialize the b2evolution helpdesk widget:
+			evo_helpdesk_widget.init( {
+				site_url: "https://b2evolution.net/",
+				collection: "man",
+				'.( empty( $this->page_manual_slug ) ? '' : 'default_slug: "'.$this->page_manual_slug.'",' ).'
+			} );
+			</script>';*/
 	}
 
 
@@ -307,7 +331,7 @@ class AdminUI extends AdminUI_general
 			case 'CollectionList':
 				// Template for a list of Collections (Blogs)
 				return array(
-						'before' => '<div class="container-fluid coll-selector"><nav><div class="btn-group">',
+						'before' => '<div class="container-fluid coll-selector"><nav>$button_list_all$<div class="btn-group">',
 						'after' => '</div>$button_add_blog$$collection_groups$</nav></div>',
 						'select_start' => '<div class="btn-group" role="group">',
 						'select_end' => '</div>',
@@ -895,6 +919,12 @@ class AdminUI extends AdminUI_general
 						.'" class="btn btn-default'.( empty( $sec_ID ) && $blog == 0 ? ' active' : '' ).'">'
 						.format_to_output( $this->coll_list_all_title, 'htmlbody' ).'</a> ';
 			$r .= $template[ empty( $sec_ID ) && $blog == 0 ? 'afterEachSel' : 'afterEach' ];
+			// Don't display default button if custom is defined:
+			$button_list_all = '';
+		}
+		else
+		{	// Default button to list all collections:
+			$button_list_all = '<a href="'.$admin_url.'?ctrl=collections" class="btn btn-default'.( $blog == 0 ? ' active' : '' ).'">'.T_('List').'</a> ';
 		}
 
 		$r .= $template['buttons_start'];
@@ -916,7 +946,7 @@ class AdminUI extends AdminUI_general
 		// Button to add new collection:
 		if( $this->coll_list_disp_add && is_logged_in() && $current_User->check_perm( 'blogs', 'create' ) )
 		{	// Display a button to add new collection if it is requested and current user has a permission
-			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.T_('New Collection').'"><span class="fa fa-plus"></span></a>';
+			$button_add_blog = '<a href="'.$admin_url.'?ctrl=collections&amp;action=new" class="btn btn-default" title="'.format_to_output( T_('New Collection'), 'htmlattr' ).'"><span class="fa fa-plus"></span></a>';
 		}
 		else
 		{	// No request or permission to add new collection:
@@ -950,9 +980,10 @@ class AdminUI extends AdminUI_general
 			$collection_groups = '';
 		}
 
-		$r .= str_replace( array( '$button_add_blog$', '$collection_groups$' ), array( $button_add_blog, $collection_groups ), $template['after'] );
+		$r .= $template['after'];
 
-		return $r;
+		return str_replace( array( '$button_list_all$', '$button_add_blog$', '$collection_groups$' ),
+			array( $button_list_all, $button_add_blog, $collection_groups ), $r );
 	}
 
 
@@ -993,7 +1024,7 @@ class AdminUI extends AdminUI_general
 				'href' => $admin_url.'?ctrl=customize&amp;view=site_skin',
 			);
 		}
-		// Colleciton:
+		// Collection:
 		if( $current_User->check_perm( 'blog_properties', 'edit', false, $tab_Blog->ID ) )
 		{	// If current User can edit current collection settings:
 			$tabs['coll'] = array(

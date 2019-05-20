@@ -34,7 +34,7 @@ $params = array_merge( array(
 		'item_type_class'    => 'evo_post__ptyp_',
 		'item_status_class'  => 'evo_post__',
 		'item_disp_class'    => NULL,
-		'image_size'         => 'fit-1280x720',
+		'image_size'         => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 	), $params );
 
 // In this skin, it makes no sense to navigate in any different mode than "same category"
@@ -342,8 +342,18 @@ skin_widget( array(
 	?>
 
 	<?php
+	if( is_single_page() )
+	{	// Display comments only on single Item's page:
 		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 		skin_include( '_item_feedback.inc.php', array_merge( $params, array(
+			'disp_comments'         => true,
+			'disp_comment_form'     => true,
+			'disp_trackbacks'       => true,
+			'disp_trackback_url'    => true,
+			'disp_pingbacks'        => true,
+			'disp_webmentions'      => true,
+			'disp_meta_comments'    => false,
+
 			'disp_section_title'    => false,
 			'disp_meta_comment_info' => false,
 
@@ -365,6 +375,7 @@ skin_widget( array(
 		echo_comment_moderate_js();
 
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+	}
 	?>
 
 	<?php

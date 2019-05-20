@@ -315,6 +315,7 @@ class AdminUI_general extends Menu
 	 */
 	function set_page_manual_link( $topic )
 	{
+		$this->page_manual_slug = $topic;
 		$this->page_manual_link = get_manual_link( $topic, NULL, T_('Manual page'), 5 );
 	}
 

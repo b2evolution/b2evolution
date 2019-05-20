@@ -56,6 +56,7 @@ skin_include( '_html_header.inc.php', array(
 	'useritems_text'    => T_('User\'s topics'),
 	'usercomments_text' => T_('User\'s replies'),
 	'flagged_text'      => T_('Flagged topics'),
+	'mustread_text'     => T_('Must Read topics'),
 ) );
 // -------------------------------- END OF HEADER --------------------------------
 
@@ -175,6 +176,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'front_text'        => '',
 					'posts_text'        => '',
 					'flagged_text'      => '',
+					'mustread_text'     => '',
 					'useritems_text'    => T_('User\'s topics'),
 					'usercomments_text' => T_('User\'s replies'),
 					'register_text'     => '',

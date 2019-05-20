@@ -152,12 +152,11 @@ users_results_block( array(
 		'page_url'             => get_dispctrl_url( 'campaigns', 'action=edit&amp;tab=recipient&amp;ecmp_ID='.$edited_EmailCampaign->ID.
 				( empty( $recipient_type ) ? '' : '&amp;recipient_type='.$recipient_type ).
 				( empty( $recipient_action ) ? '' : '&amp;recipient_action='.$recipient_action ) ),
-		'display_ID'           => false,
+		'display_ID'           => true,
 		'display_btn_adduser'  => false,
 		'display_btn_addgroup' => false,
 		'display_avatar'       => false,
-		'display_firstname'    => true,
-		'display_lastname'     => true,
+		'display_nickname'     => false,
 		'display_name'         => false,
 		'display_gender'       => false,
 		'display_country'      => false,
@@ -176,12 +175,14 @@ users_results_block( array(
 		'display_campaign_actions' => true,
 		'display_newsletter'   => false,
 		'display_enlt_status'  => true,
+		'display_camp_user_status' => true,
+		'display_email_status' => true,
 		'display_camp_status'  => true,
 		'display_emlog_date'   => true,
 		'display_email_tracking' => true,
-		'th_class_login'       => 'shrinkwrap',
+		'th_class_id'          => 'shrinkwrap',
+		'td_class_id'          => 'shrinkwrap',
+		'th_class_login'       => '',
 		'td_class_login'       => '',
-		'th_class_nickname'    => 'shrinkwrap',
-		'td_class_nickname'    => '',
 	) );
 ?>

@@ -387,6 +387,10 @@ class Form extends Widget
 
 			if( is_array( $template ) && ! empty( $template ) )
 			{ // Template is detected on current skin, Use it
+				if( ! isset( $template['fieldset_title'] ) )
+				{	// Set default fieldset title if old template doesn't define it:
+					$template['fieldset_title'] = '';
+				}
 				foreach( $template as $t_param_name => $t_param_value )
 				{
 					$this->$t_param_name = $t_param_value;
@@ -407,6 +411,7 @@ class Form extends Widget
 																	.'$title$</div></th></tr>'."\n";
 					$this->no_title_fmt   = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -456,6 +461,7 @@ class Form extends Widget
 					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																		.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -504,6 +510,7 @@ class Form extends Widget
 					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -553,6 +560,7 @@ class Form extends Widget
 					$this->title_fmt      = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt   = '';          //           "
 					$this->no_title_no_icons_fmt = '';
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -603,6 +611,7 @@ class Form extends Widget
 					$this->title_fmt      = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt   = '';          //           "
 					$this->no_title_fmt   = '';          //           "
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -920,6 +929,7 @@ class Form extends Widget
 				'class'     => 'fieldset',
 				'fold'      => false, // TRUE to enable folding for this fieldset
 				'deny_fold' => false, // TRUE to don't allow fold the block and keep it opened always on page loading
+				'default_fold' => NULL, // Set default "fold" value for current fieldset
 			), $field_params );
 
 		if( $field_params['fold'] )
@@ -930,12 +940,17 @@ class Form extends Widget
 				global $UserSettings, $Collection, $Blog, $ctrl;
 				if( empty( $Blog ) || ( isset( $ctrl ) && in_array( $ctrl, array( 'plugins', 'user' ) ) ) )
 				{ // Get user setting value
-					$value = intval( $UserSettings->get( 'fold_'.$field_params['id'] ) );
+					$value = $UserSettings->get( 'fold_'.$field_params['id'] );
 				}
 				else
 				{ // Get user-collection setting
-					$value = intval( $UserSettings->get_collection_setting( 'fold_'.$field_params['id'], $Blog->ID ) );
+					$value = $UserSettings->get_collection_setting( 'fold_'.$field_params['id'], $Blog->ID );
 				}
+				if( $value === NULL && $field_params['default_fold'] !== NULL )
+				{	// Use custom default value for this fieldset:
+					$value = $field_params['default_fold'];
+				}
+				$value = intval( $value );
 				if( $value === 1 )
 				{
 					$field_params['class'] = trim( $field_params['class'].' folded' );
@@ -951,6 +966,7 @@ class Form extends Widget
 		}
 		unset( $field_params['fold'] );
 		unset( $field_params['deny_fold'] );
+		unset( $field_params['default_fold'] );
 
 		if( ! empty( $this->fieldset_title ) )
 		{	// Replace text part of fieldset title with provided html code:
@@ -1161,11 +1177,14 @@ class Form extends Widget
 				'type'      => 'text',
 				'value'     => $field_value,
 				'note'      => $field_note,
-				'size'      => 7,
-				'maxlength' => 7,
+				'size'      => 18,
+				'maxlength' => 22,
 				'name'      => $field_name,
 				'label'     => $field_label,
 				'class'     => '', // default class 'form_text_input form-control form_color_input'
+				'transparency' => false, // TRUE to allow select transparent color
+				'input_prefix' => '',
+				'input_suffix' => '',
 			), $field_params );
 
 		if( isset( $field_params['force_to'] ) )
@@ -1180,6 +1199,16 @@ class Form extends Widget
 
 		// Give it a class, so it can be selected for CSS in IE6
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_text_input form-control form_color_input';
+
+		if( $field_params['transparency'] )
+		{	// Set class to initialize colorpicker with transparency option:
+			$field_params['class'] .= ' form_color_transparent';
+			unset( $field_params['transparency'] );
+		}
+
+		// Initialize colorpicker wrappers to display a color selector box after color input field:
+		$field_params['input_prefix'] = $field_params['input_prefix'].'<span class="input-group colorpicker-component">';
+		$field_params['input_suffix'] = '<span class="input-group-addon"><i></i></span></span>'.$field_params['input_suffix'];
 
 		return $this->input_field( $field_params );
 	}
@@ -3954,7 +3983,7 @@ class Form extends Widget
 		$this->handle_common_params( $field_params, $field_name, $field_label );
 
 		$field_params = array_merge( array(
-				'field_item_start' => '<div class="file_select_item" data-item-value="%value%">',
+				'field_item_start' => '<div class="file_select_item" data-item-value="%value%" data-file-url="%url%">',
 				'field_item_end' => '</div>',
 				'size_name' => 'crop-64x64',
 				'class' => '',
@@ -4166,6 +4195,11 @@ class Form extends Widget
 										// Trigger change so bozo validator will pickup the change
 										inputField.trigger( "change" );
 
+										if( typeof( parent.evo_customizer_update_style ) == "function" )
+										{	// Update style in designer customizer mode if it is enabled currently:
+											parent.evo_customizer_update_style( inputField );
+										}
+
 										// close modal if single item select
 										if( maxLength == 1 )
 										{
@@ -4215,6 +4249,11 @@ class Form extends Widget
 							}
 							inputField.val( values.join( "'.$field_params['value_separator'].'" ) );
 							inputField.trigger( "change" );
+
+							if( typeof( parent.evo_customizer_update_style ) == "function" )
+							{	// Update style in designer customizer mode if it is enabled currently:
+								parent.evo_customizer_update_style( inputField );
+							}
 
 							return false;
 						}
@@ -4888,6 +4927,213 @@ class Form extends Widget
 
 		// End field:
 		$r .= $this->end_field( $field_type );
+
+		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Display attachments fieldset
+	 *
+	 * @param object Object of the links owner
+	 * @param boolean TRUE to allow folding for this fieldset, FALSE - otherwise
+	 * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+	 */
+	function attachments_fieldset( $object, $fold = false, $fieldset_prefix = '' )
+	{
+		global $current_User;
+
+		// Get object type to initialize link owner
+		$object_type = get_class( $object );
+
+		if( $object_type != 'Comment' && ! is_logged_in() )
+		{	// User must logged in for all other objects like Item, Message and EmailCampaign:
+			// (for Comment we can allow to attach files by anonymous user depending on collection setting)
+			return;
+		}
+
+		// Declare this object as global because it is used in many link functions:
+		global $LinkOwner;
+
+		// Initialize link owner depending on object type:
+		switch( $object_type )
+		{
+			case 'Comment':
+				$Comment = $object;
+				$comment_Item = & $Comment->get_Item();
+				if( ! $comment_Item->check_blog_settings( 'allow_attachments' ) )
+				{	// Item attachments must be allowed by collection setting depending on user type(anounymous, registered, member and etc.):
+					return;
+				}
+				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+				$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
+				break;
+
+			case 'Item':
+				$Item = $object;
+				if( ! $Item->get_type_setting( 'allow_attachments' ) )
+				{	// Item attachments must be allowed for the item type
+					return;
+				}
+				load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+				$LinkOwner = new LinkItem( $Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'Message':
+				if( ! is_admin_page() )
+				{	// Message attachments are allowed only on back-office
+					return;
+				}
+				$Message = $object;
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				$LinkOwner = new LinkMessage( $Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'EmailCampaign':
+				$EmailCampaign = $object;
+				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+				$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
+				break;
+
+			default:
+				debug_die( 'Wrong object type "'.$object_type.'" to display attachments fieldset!' );
+		}
+
+		// Display attachments fieldset:
+		display_attachments_fieldset( $this, $LinkOwner, $fold, $fieldset_prefix );
+
+		// Insert image modal window:
+		echo_image_insert_modal();
+	}
+
+
+	/**
+	 * Locale selector
+	 *
+	 * @param string Field name
+	 * @param string Main locale value
+	 * @param array Extra locale values
+	 * @param string Field label
+	 * @param string Field note
+	 * @param array Params
+	 * @return 
+	 */
+	function locale_selector( $field_name, $main_locale, $extra_locales, $field_label, $field_note = '', $field_params = array() )
+	{
+		global $locales;
+
+		$BlogCache = & get_BlogCache();
+		$link_Blog = & $BlogCache->get_by_ID( $field_params['link_coll_ID'], false, false );
+		unset( $field_params['link_coll_ID'] );
+
+		$this->handle_common_params( $field_params, $field_name, $field_label, $field_note );
+
+		$r = $this->begin_field();
+
+		$r .= '<table class="evo_locale_selector table table-striped table-hover table-condensed table-bordered">';
+
+		// Table header:
+		$r .= '<thead><tr>'
+				.'<th>'.T_('Locale').'</th>'
+				.'<th>'.T_('Main').'</th>'
+				.'<th>'.T_('Extra').'</th>'
+				.( $link_Blog ? '<th>'.T_('Link with').'</th>' : '' )
+			.'</tr></thead>';
+
+		foreach( $locales as $locale_key => $locale_data )
+		{
+			if( ! $locale_data['enabled'] )
+			{	// Skip disabled locale:
+				continue;
+			}
+
+			// Locale row with radio, checkbox and name:
+			$r .= '<tr data-locale="'.$locale_key.'">'
+					.'<td>'.T_( $locale_data['name'] ).'</td>'
+					.'<td class="center"><input type="radio" '
+							.'name="'.format_to_output( $field_name, 'htmlattr' ).'" '
+							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
+							.( $main_locale == $locale_key ? ' checked="checked"' : '' ).' /></td>'
+					.'<td class="center"><input type="checkbox" '
+							.'name="'.format_to_output( $field_name, 'htmlattr' ).'_extra[]" '
+							.'value="'.format_to_output( $locale_key, 'htmlattr' ).'"'
+							.( in_array( $locale_key, $extra_locales ) ? ' checked="checked"' : '' ).' /></td>'
+					.( $link_Blog ? '<td class="evo_coll_link_locale_selector">'.$link_Blog->get_link_locale_selector( $field_name, $locale_key ).'</td>' : '' )
+				.'</tr>';
+		}
+
+		$r .= '</table>';
+
+		// JavaScript for autoselecting extra locale:
+		$r .= '<script type="text/javascript">
+			jQuery( "input[type=radio][name='.$field_name.']" ).click( function()
+			{
+				if( jQuery( this ).is( ":checked" ) )
+				{
+					jQuery( "input[type=checkbox][name=\''.$field_name.'_extra[]\'][value=\'" + jQuery( this ).val() + "\']" ).prop( "checked", true );
+				}
+			} );
+			jQuery( "input[type=checkbox][name=\''.$field_name.'_extra[]\']" ).click( function()
+			{
+				if( ! jQuery( this ).is( ":checked" ) && jQuery( "input[type=radio][name='.$field_name.'][value=\'" + jQuery( this ).val() + "\']" ).is( ":checked" ) )
+				{
+					return false;
+				}
+			} );';
+		if( $link_Blog )
+		{	// JavaScript to link with collections:
+			$r .= 'jQuery( "input[type=radio][name='.$field_name.'], input[type=checkbox][name=\''.$field_name.'_extra[]\']" ).click( function()
+			{
+				var locale_row = jQuery( this ).closest( "tr" );
+				var current_locale = locale_row.data( "locale" );
+				var coll_locale_selector = jQuery( "select[name=\''.$field_name.'_link_coll[" + current_locale + "]\']" );
+				if( jQuery( this ).is( ":checked" ) || jQuery( "input[type=radio][name='.$field_name.'][value=\'" + jQuery( this ).val() + "\']" ).is( ":checked" ) )
+				{
+					if( coll_locale_selector.length )
+					{
+						coll_locale_selector.hide();
+						if( coll_locale_selector.next( "span" ).length )
+						{
+							coll_locale_selector.next( "span" ).show();
+						}
+						else
+						{
+							coll_locale_selector.after( "<span>'.TS_('N/A').'</span>" );
+						}
+					}
+				}
+				else
+				{
+					if( coll_locale_selector.length )
+					{	// Show selector from cache:
+						coll_locale_selector.show();
+						coll_locale_selector.next( "span" ).hide();
+					}
+					else
+					{	// Load selector by AJAX:
+						jQuery.ajax(
+						{
+							url: "'.get_htsrv_url().'async.php",
+							type: "POST",
+							data: {
+								action: "get_link_locale_selector",
+								coll_ID: '.$link_Blog->ID.',
+								coll_locale: current_locale,
+								field_name: "'.$field_name.'",
+							},
+							success: function( result )
+							{
+								locale_row.find( "td.evo_coll_link_locale_selector" ).html( ajax_debug_clear( result ) );
+							},
+						} );
+					}
+				}
+			} );';
+		}
+		$r .= '
+		</script>';
+
+		$r .= $this->end_field();
 
 		return $this->display_or_return( $r );
 	}

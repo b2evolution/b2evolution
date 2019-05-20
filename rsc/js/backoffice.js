@@ -20,8 +20,6 @@ jQuery( document ).on( 'change', '.btn-file :file', function()
  *
  * Used to expand/collapse in BACK-office:
  *  - _file.funcs.php: to toggle the subfolders in directory list
- *  - _backup_options.form.php: to toggle the backup options on upgrade action
- *  - _plugin_settings.form.php: to toggle the plugin event settings on edit plugin page
  *
  * @param string html id of the element to toggle
  * @param string CSS display property to use when visible ('inline', 'block')
@@ -212,8 +210,9 @@ function b2edit_reload( form_selector, new_action_url, blog, params, reset )
 {
 	var form = jQuery( form_selector );
 
-	if( form.length == 0 )
-	{	// Form is not detected on the current page by requested selector:
+	if( form.length == 0 || form.find( 'input[type=hidden][name^=crumb_]' ).length == 0 )
+	{	// Form is not detected on the current page by requested selector
+		// or form is not loaded completely because of slow code:
 		// Redirect to new URL without form submitting:
 		location.href = new_action_url;
 		return false;

@@ -35,6 +35,11 @@ else
 		{
 			if( $AutomationStep = & $AutomationStepCache->get_by_ID( $automation_step_ID, false, false ) )
 			{
+				if( ! check_cron_job_emails_limit() )
+				{	// Stop execution for cron job because max number of emails has been already sent:
+					break;
+				}
+
 				// Execute Step action for given User:
 				$step_log_message = $AutomationStep->execute_action( $automation_user_ID );
 				// Append a step log message to cron job log and count this as action:
