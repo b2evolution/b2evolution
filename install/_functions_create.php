@@ -457,7 +457,7 @@ function create_default_data()
 	$DB->query( $post_types_sql );
 
 	// Item type custom fields:
-	$recipe_ityp_ID = 2;	
+	$recipe_ityp_ID = 2;
 	$parent_ityp_ID = 3;
 	$child_ityp_ID = 4;
 	$product_ityp_ID = 22;
@@ -1756,7 +1756,7 @@ function create_demo_users()
 			$group_ID = $normal_Group->ID;
 		}
 
-		$demo_User = get_demo_user( $demo_user['login'], true, $group_ID, '#' );
+		$demo_User = get_demo_user( $demo_user['login'], true, false );
 		if( $demo_User )
 		{
 			$demo_Users[ $demo_user['login'] ] = $demo_User;

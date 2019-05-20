@@ -1316,6 +1316,7 @@ function create_demo_collections( $demo_users = array(), $use_demo_users = true,
 	$install_collection_forums   = 0;
 	$install_collection_manual   = 0;
 	$install_collection_tracker  = 0;
+	$install_collection_catalog  = 0;
 	$site_skins_setting          = 0;
 	switch( $create_sample_contents )
 	{
@@ -1329,6 +1330,7 @@ function create_demo_collections( $demo_users = array(), $use_demo_users = true,
 			$install_collection_forums  = 1;
 			$install_collection_manual  = 1;
 			$install_collection_tracker = 1;
+			$install_collection_catalog = 1;
 			$site_skins_setting         = 1;
 			break;
 
@@ -1367,6 +1369,11 @@ function create_demo_collections( $demo_users = array(), $use_demo_users = true,
 			$install_collection_tracker = 1;
 			break;
 
+		case 'catalog':
+			// Install "Catalog" from auto install script:
+			$install_collection_catalog = 1;
+			break;
+
 		default:
 			// Install collections depending on the selected options "Create a demo website" on the submitted form:
 			$demo_content_type = param( 'demo_content_type', 'string', NULL );
@@ -1384,6 +1391,7 @@ function create_demo_collections( $demo_users = array(), $use_demo_users = true,
 					$install_collection_forums  = ( $standard_collection == 'forums' );
 					$install_collection_manual  = ( $standard_collection == 'manual' );
 					$install_collection_tracker = ( $standard_collection == 'group' );
+					$install_collection_catalog = ( $standard_collection == 'catalog' );
 					break;
 
 				default: // complex_site
@@ -1395,6 +1403,7 @@ function create_demo_collections( $demo_users = array(), $use_demo_users = true,
 					$install_collection_forums  = in_array( 'forums', $collections );
 					$install_collection_manual  = in_array( 'manual', $collections );
 					$install_collection_tracker = in_array( 'group', $collections );
+					$install_collection_catalog = in_array( 'catalog', $collections );
 					$site_skins_setting         = 1;
 			}
 	}
@@ -1406,7 +1415,8 @@ function create_demo_collections( $demo_users = array(), $use_demo_users = true,
 	    ! $install_collection_photos &&
 	    ! $install_collection_forums &&
 	    ! $install_collection_manual &&
-	    ! $install_collection_tracker )
+	    ! $install_collection_tracker &&
+	    ! $install_collection_catalog )
 	{	// Don't try to install demo content if no collection is selected:
 		return 0;
 	}
@@ -1437,6 +1447,10 @@ function create_demo_collections( $demo_users = array(), $use_demo_users = true,
 		if( $install_collection_manual )
 		{
 			$sections['Manual'] = array( 'owner_ID' => $dave_blogger_ID, 'order' => 6 );
+		}
+		if( $install_collection_catalog )
+		{
+			$sections['Catalog'] = array( 'owner_ID' => $mary_moderator_ID, 'order' => 7 );
 		}
 
 		foreach( $sections as $section_name => $section_data )
@@ -1675,6 +1689,35 @@ function create_demo_collections( $demo_users = array(), $use_demo_users = true,
 		}
 	}
 
+	if( $install_collection_catalog )
+	{	// Install Catalog blog
+		$timeshift += 86400;
+		task_begin( sprintf( T_('Creating %s collection...'), T_('Catalog') ) );
+		$section_ID = isset( $sections['Catalog']['ID'] ) ? $sections['Catalog']['ID'] : 1;
+		if( $blog_ID = create_demo_collection( 'catalog', $mary_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
+		{
+			if( $initial_install )
+			{
+				if( is_callable( 'update_install_progress_bar' ) )
+				{
+					update_install_progress_bar();
+				}
+			}
+			else
+			{	// Insert basic widgets:
+				insert_basic_widgets( $blog_ID, 'normal', false, 'catalog' );
+				insert_basic_widgets( $blog_ID, 'mobile', false, 'catalog' );
+				insert_basic_widgets( $blog_ID, 'tablet', false, 'catalog' );
+			}
+			$collection_created++;
+			task_end();
+		}
+		else
+		{
+			task_end( '<span class="text-danger">Failed.</span>' );
+		}
+	}
+
 	if( $install_collection_minisite )
 	{	// Install Mini-site collection
 		$timeshift += 86400;
@@ -1794,7 +1837,7 @@ function create_demo_collections( $demo_users = array(), $use_demo_users = true,
 
 /**
  * Create default email lists
- * 
+ *
  * @return integer Number of new created email lists
  */
 function create_default_newsletters()
@@ -1989,7 +2032,7 @@ function create_default_automations()
 
 /**
  * Create demo emails data like lists, campaigns, automations
- * 
+ *
  * @return integer Number of new created email lists
  */
 function create_demo_emails()
@@ -2364,7 +2407,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$blog_stub,
 					T_('Tagline for Catalog'),
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
-					7, // Skin ID
+					'Bootstrap Catalog',
 					'catalog', 'any',	1, '#', true, 'public',
 					$owner_ID,
 					'public',
@@ -3607,368 +3650,346 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 		// =======================================================================================================
 		case 'catalog':
-			$post_count = 13;
-			$post_timestamp_array = get_post_timestamp_data( $post_count ) ;
+			// Sample Catalog (Public)
 
-			// Sample categories
-			$cat_catalog_book = cat_create( T_('Books'), 'NULL', $blog_ID, NULL, true );
-			$cat_catalog_stationery = cat_create( T_('Stationery'), 'NULL', $blog_ID, NULL, true );
-				$cat_catalog_paper = cat_create( T_('Paper Supplies'), $cat_catalog_stationery, $blog_ID, NULL, true );
-					$cat_catalog_envelope = cat_create( T_('Envelopes'), $cat_catalog_paper, $blog_ID, NULL, true );
-					$cat_catalog_journal = cat_create( T_('Journals'), $cat_catalog_paper, $blog_ID, NULL, true );
-					$cat_catalog_notebook = cat_create( T_('Notebooks & Pads'), $cat_catalog_paper, $blog_ID, NULL, true );
-					$cat_catalog_office_paper = cat_create( T_('Office Paper'), $cat_catalog_paper, $blog_ID, NULL, true );
-					$cat_catalog_specialty = cat_create( T_('Specialty Paper'), $cat_catalog_paper, $blog_ID, NULL, true );
-					$cat_catalog_writing_stationery = cat_create( T_('Writing Stationery'), $cat_catalog_paper, $blog_ID, NULL, true );
-
-				$cat_catalog_writing = cat_create( T_('Writing Supplies'), $cat_catalog_stationery, $blog_ID, NULL, true );
-					$cat_catalog_pencil = cat_create( T_('Pencils'), $cat_catalog_writing, $blog_ID, NULL, true );
-					$cat_catalog_pen = cat_create( T_('Pens'), $cat_catalog_writing, $blog_ID, NULL, true );
-					$cat_catalog_marker = cat_create( T_('Markers & Highlighters'), $cat_catalog_writing, $blog_ID, NULL, true );
-			$cat_catalog_equipment = cat_create( T_('Office Equipment'), 'NULL', $blog_ID, NULL, true );
-			$cat_catalog_new = cat_create( T_('New Arrivals'), 'NULL', $blog_ID, NULL, true );
-			$cat_catalog_bestseller = cat_create( T_('Bestsellers'), 'NULL', $blog_ID, NULL, true );
-
-			if( $edited_Blog = $BlogCache->get_by_ID( $blog_ID, false, false ) )
-			{
-				$edited_Blog->set_setting( 'default_cat_ID', $cat_catalog_new );
-				$edited_Blog->dbupdate();
-			}
+			// Sample categories:
+			$categories = array(
+				'book' => T_('Books'),
+				'stationery' => array( T_('Stationery'), 'subs' => array(
+					'paper-supplies' => array( T_('Paper Supplies'), 'subs' => array(
+						'envelopes'          => T_('Envelopes'),
+						'journals'           => T_('Journals'),
+						'notebooks-pads'     => T_('Notebooks & Pads'),
+						'office-paper'       => T_('Office Paper'),
+						'specialty-paper'    => T_('Specialty Paper'),
+						'writing-stationery' => T_('Writing Stationery'),
+					) ),
+					'writing-supplies' => array( T_('Writing Supplies'), 'subs' => array(
+						'pencils' => T_('Pencils'),
+						'pens'    => T_('Pens'),
+						'markers' => T_('Markers & Highlighters'),
+					) )
+				) ),
+				'equipment'    => T_('Office Equipment'),
+				'new-arrivals' => T_('New Arrivals'),
+				'bestsellers'  => T_('Bestsellers'),
+			);
 
 			$pen_desc = array(
-					T_('Visible, long-lasting ink supply.'),
-					T_('Grip designed for comfort and control.'),
-					T_('Vivid colors.'),
-				);
+				T_('Visible, long-lasting ink supply.'),
+				T_('Grip designed for comfort and control.'),
+				T_('Vivid colors.'),
+			);
 
 			$envelope_desc = array(
-					T_('Withstands extra handling and wear and tear.'),
-					T_('Ideal for business or personal correspondence.'),
-					T_('Made from recycled paper.'),
-				);
+				T_('Withstands extra handling and wear and tear.'),
+				T_('Ideal for business or personal correspondence.'),
+				T_('Made from recycled paper.'),
+			);
 
-			// Sample posts
-			$currency_ID = locale_currency( '#', 'ID' );
-			if( is_available_item_type( $blog_ID, '#' ) )
-			{
-				// Temporarily set availability of all items to 'InStock':
-				//$availability = array( 'Discontinued', 'InStock', 'InStoreOnly', 'LimitedAvailability', 'OnlineOnly', 'OutOfStock', 'PreOrder', 'PreSale', 'SoldOut' );
-				$availability = array( 'InStock' );
+			$availability = array( 'InStock', /*'Discontinued', 'InStock', 'InStoreOnly', 'LimitedAvailability', 'OnlineOnly', 'OutOfStock', 'PreOrder', 'PreSale', 'SoldOut'*/ );
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$pen_desc[0]."</li>\n<li>".$pen_desc[1]."</li>\n<li>".$pen_desc[2].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'pen, marker' );
-				$edited_Item->set_setting( 'custom:brand', 'Pilot' );
-				$edited_Item->set_setting( 'custom:item_color', 'assorted' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.1' );
-				$edited_Item->set_setting( 'custom:package_length', '14.22' );
-				$edited_Item->set_setting( 'custom:package_width', '9.40' );
-				$edited_Item->set_setting( 'custom:package_height', '1.8' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('Pilot V Razor Point Liquid Ink Marker Pens, extra fine point, 8/pack'), $desc,
-						$now, $cat_catalog_marker, array( $cat_catalog_bestseller ), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 12.99 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/pilot-v-razor-point-pen-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				// Image 2
-				$edit_File = new File( 'shared', 0, 'products/pilot-v-razor-point-pen-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			// Don't install generic items for this collection type:
+			$demo_items = array();
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$pen_desc[1]."</li>\n<li>".$pen_desc[2]."</li>\n<li>".$pen_desc[0].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'pen' );
-				$edited_Item->set_setting( 'custom:brand', 'Pilot' );
-				$edited_Item->set_setting( 'custom:item_color', 'assorted' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.15' );
-				$edited_Item->set_setting( 'custom:package_length', '13.97' );
-				$edited_Item->set_setting( 'custom:package_width', '9.65' );
-				$edited_Item->set_setting( 'custom:package_height', '0.76' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('Pilot Varsity Fountain Pens, 0.1mm medium nib, 7/pack'), $desc,
-						$now, $cat_catalog_pen, array( $cat_catalog_new ), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 16.99 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/pilot-varsity-fountain-pen-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				// Image 2
-				$edit_File = new File( 'shared', 0, 'products/pilot-varsity-fountain-pen-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			// Additional sample Items:
+			$demo_items['pilot_v_razor'] = array(
+				'title'    => T_('Pilot V Razor Point Liquid Ink Marker Pens, extra fine point, 8/pack'),
+				'category' => 'pens',
+				'extra_cats' => array( 'bestsellers' ),
+				'tags'     => 'pen,marker',
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$pen_desc[0]."</li>\n<li>".$pen_desc[1]."</li>\n<li>".$pen_desc[2].'</li></ul>',
+				'files'    => array(
+					array( 'products/pilot-v-razor-point-pen-1.jpg', 'cover' ),
+					array( 'products/pilot-v-razor-point-pen-2.jpg', 'aftermore' )
+				),
+				'custom_fields' => array(
+					array( 'brand', 'Pilot' ),
+					array( 'item_color', T_('assorted') ),
+					array( 'package_total_weight', '0.1' ),
+					array( 'package_length', '14.22' ),
+					array( 'package_width', '9.40' ),
+					array( 'package_height', '1.8' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 12.99,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$pen_desc[2]."</li>\n<li>".$pen_desc[0]."</li>\n<li>".$pen_desc[1].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'pen' );
-				$edited_Item->set_setting( 'custom:brand', 'BIC' );
-				$edited_Item->set_setting( 'custom:item_color', 'black' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.16' );
-				$edited_Item->set_setting( 'custom:package_length', '14.22' );
-				$edited_Item->set_setting( 'custom:package_width', '9.40' );
-				$edited_Item->set_setting( 'custom:package_height', '1.8' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('BIC&reg; Xtra Comfort Round Stic&reg; Grip Ballpoint Pens, medium point, 12/pack'), $desc,
-						$now, $cat_catalog_pen, array( $cat_catalog_bestseller ), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 12.99 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/bic-xtra-comfort-round-stic-pen-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				// Image 2
-				$edit_File = new File( 'shared', 0, 'products/bic-xtra-comfort-round-stic-pen-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2 );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			$demo_items['pilot_varsity_pen'] = array(
+				'title' => T_('Pilot Varsity Fountain Pens, 0.1mm medium nib, 7/pack'),
+				'category' => 'pens',
+				'extra_cats' => array( 'new-arrivals' ),
+				'tags'     => array( 'pen' ),
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$pen_desc[1]."</li>\n<li>".$pen_desc[2]."</li>\n<li>".$pen_desc[0].'</li></ul>',
+				'files'    => array(
+					array( 'products/pilot-varsity-fountain-pen-1.jpg', 'cover' ),
+					array( 'products/pilot-varsity-fountain-pen-2.jpg', 'aftermore' ),
+				),
+				'custom_fields' => array(
+					array( 'brand', 'Pilot' ),
+					array( 'item_color', T_('assorted') ),
+					array( 'package_total_weight', '0.15' ),
+					array( 'package_length', '13.97' ),
+					array( 'package_width', '9.65' ),
+					array( 'package_height', '0.76' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 16.99,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$pen_desc[2]."</li>\n<li>".$pen_desc[1]."</li>\n<li>".$pen_desc[0].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'pen, marker' );
-				$edited_Item->set_setting( 'custom:brand', 'Sharpie' );
-				$edited_Item->set_setting( 'custom:item_color', 'black' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.25' );
-				$edited_Item->set_setting( 'custom:package_length', '15.24' );
-				$edited_Item->set_setting( 'custom:package_width', '7.12' );
-				$edited_Item->set_setting( 'custom:package_height', '2.79' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('Sharpie&reg; Fine Point Permanent Markers, 12/pack'), $desc,
-						$now, $cat_catalog_marker, array( $cat_catalog_bestseller ), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 11.79 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/sharpie-fine-point-permanent-marker-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				// Image 2
-				$edit_File = new File( 'shared', 0, 'products/sharpie-fine-point-permanent-marker-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
-				// Image 3
-				$edit_File = new File( 'shared', 0, 'products/sharpie-fine-point-permanent-marker-3.jpg' );
-				$photo_link_3_ID = $edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			$demo_items['bic_xtra_comfort'] = array(
+				'title' => T_('BIC&reg; Xtra Comfort Round Stic&reg; Grip Ballpoint Pens, medium point, 12/pack'),
+				'category' => 'pens',
+				'extra_cats' => array( 'bestsellers' ),
+				'tags'     => 'pen',
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$pen_desc[2]."</li>\n<li>".$pen_desc[0]."</li>\n<li>".$pen_desc[1].'</li></ul>',
+				'files'    => array(
+					array( 'products/bic-xtra-comfort-round-stic-pen-1.jpg', 'cover' ),
+					array( 'products/bic-xtra-comfort-round-stic-pen-2.jpg', 'aftermore' ),
+				),
+				'custom_fields' => array(
+					array( 'brand', 'BIC' ),
+					array( 'item_color', T_('black') ),
+					array( 'package_total_weight', '0.16' ),
+					array( 'package_length', '14.22' ),
+					array( 'package_width', '9.40' ),
+					array( 'package_height', '1.80' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 12.99,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$pen_desc[1]."</li>\n<li>".$pen_desc[0]."</li>\n<li>".$pen_desc[2].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'pen, retractable' );
-				$edited_Item->set_setting( 'custom:brand', 'BIC' );
-				$edited_Item->set_setting( 'custom:item_color', 'black/blue' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.23' );
-				$edited_Item->set_setting( 'custom:package_length', '15.24' );
-				$edited_Item->set_setting( 'custom:package_width', '6.99' );
-				$edited_Item->set_setting( 'custom:package_height', '6.05' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('BIC&reg; Atlantis&reg; Retractable Ballpoint Pens, medium point 1.0mm, 24/pack'), $desc,
-						$now, $cat_catalog_pen, array( $cat_catalog_bestseller ), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 23.99 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/bic-atlantis-retractable-pen-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			$demo_items['sharpie_fine_point'] = array(
+				'title' => T_('Sharpie&reg; Fine Point Permanent Markers, 12/pack'),
+				'category' => 'markers',
+				'extra_cats' => array( 'bestsellers' ),
+				'tags'     => 'pen,marker',
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$pen_desc[2]."</li>\n<li>".$pen_desc[1]."</li>\n<li>".$pen_desc[0].'</li></ul>',
+				'files'    => array(
+					array( 'products/sharpie-fine-point-permanent-marker-1.jpg', 'cover' ),
+					array( 'products/sharpie-fine-point-permanent-marker-2.jpg', 'aftermore' ),
+					array( 'products/sharpie-fine-point-permanent-marker-3.jpg', 'aftermore' ),
+				),
+				'custom_fields' => array(
+					array( 'brand', 'Sharpie' ),
+					array( 'item_color', T_('black') ),
+					array( 'package_total_weight', '0.25' ),
+					array( 'package_length', '15.24' ),
+					array( 'package_width', '7.12' ),
+					array( 'package_height', '2.79' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 11.79,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$pen_desc[0]."</li>\n<li>".$pen_desc[2]."</li>\n<li>".$pen_desc[1].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'pen, highlighter' );
-				$edited_Item->set_setting( 'custom:brand', 'Sharpie' );
-				$edited_Item->set_setting( 'custom:item_color', 'assorted' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.19' );
-				$edited_Item->set_setting( 'custom:package_length', '13.21' );
-				$edited_Item->set_setting( 'custom:package_width', '11.94' );
-				$edited_Item->set_setting( 'custom:package_height', '1.78' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('Sharpie&reg; Accent&reg; Tank Highlighters, chisel tip, 6/pack'), $desc,
-						$now, $cat_catalog_marker, array( $cat_catalog_pen ), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 5.79 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/sharpie-accent-tank-highlighter-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				// Image 2
-				$edit_File = new File( 'shared', 0, 'products/sharpie-accent-tank-highlighter-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
-				// Image 3
-				$edit_File = new File( 'shared', 0, 'products/sharpie-accent-tank-highlighter-3.jpg' );
-				$photo_link_3_ID = $edit_File->link_to_Object( $LinkOwner, 3, 'aftermore' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			$demo_items['bic_atlantis_pen'] = array(
+				'title' => T_('BIC&reg; Atlantis&reg; Retractable Ballpoint Pens, medium point 1.0mm, 24/pack'),
+				'category' => 'pens',
+				'extra_cats' => array( 'bestsellers' ),
+				'tags'     => 'pen,retractable',
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$pen_desc[1]."</li>\n<li>".$pen_desc[0]."</li>\n<li>".$pen_desc[2].'</li></ul>',
+				'files'    => array(
+					array( 'products/bic-atlantis-retractable-pen-1.jpg', 'cover' ),
+				),
+				'custom_fields' => array(
+					array( 'brand', 'BIC' ),
+					array( 'item_color', T_('black').'/'.T_('blue') ),
+					array( 'package_total_weight', '0.23' ),
+					array( 'package_length', '15.24' ),
+					array( 'package_width', '6.99' ),
+					array( 'package_height', '6.05' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 23.99,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$envelope_desc[0]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[2].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:brand', 'Quality Park' );
-				$edited_Item->set_setting( 'custom:item_color', 'white' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.15' );
-				$edited_Item->set_setting( 'custom:package_length', '21.91' );
-				$edited_Item->set_setting( 'custom:package_width', '0.40' );
-				$edited_Item->set_setting( 'custom:package_height', '9.21' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('Quality Park&reg; Redi-Seal&trade; Double Window Security Business Envelopes, #8-5/8, 500/box'), $desc,
-						$now, $cat_catalog_envelope, array( $cat_catalog_bestseller ), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 76.79 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/quality-park-redi-seal-business-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			$demo_items['sharpie_accent_tank'] = array(
+				'title' => T_('Sharpie&reg; Accent&reg; Tank Highlighters, chisel tip, 6/pack'),
+				'category' => 'markers',
+				'extra_cats' => array( 'pens' ),
+				'tags'     => 'pen,highlighter',
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$pen_desc[0]."</li>\n<li>".$pen_desc[2]."</li>\n<li>".$pen_desc[1].'</li></ul>',
+				'files'    => array(
+					array( 'products/sharpie-accent-tank-highlighter-1.jpg', 'cover' ),
+					array( 'products/sharpie-accent-tank-highlighter-2.jpg', 'aftermore' ),
+					array( 'products/sharpie-accent-tank-highlighter-3.jpg', 'aftermore' ),
+				),
+				'custom_fields' => array(
+					array( 'brand', 'Sharpie' ),
+					array( 'item_color', T_('assorted') ),
+					array( 'package_total_weight', '0.19' ),
+					array( 'package_length', '13.21' ),
+					array( 'package_width', '11.94' ),
+					array( 'package_height', '1.78' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 5.79,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$envelope_desc[1]."</li>\n<li>".$envelope_desc[2]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:brand', 'JAM Paper' );
-				$edited_Item->set_setting( 'custom:item_color', 'yellow' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.08' );
-				$edited_Item->set_setting( 'custom:package_length', '24.13' );
-				$edited_Item->set_setting( 'custom:package_width', '0.04' );
-				$edited_Item->set_setting( 'custom:package_height', '10.48' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; #10 Window Envelopes, 4 1/8 x 9 1/2, Bright Hue yellow recyled, 25/pack'), $desc,
-						$now, $cat_catalog_envelope, array(), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 5.49 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/jam-paper-window-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			$demo_items['quality_park_redi_seal'] = array(
+				'title' => T_('Quality Park&reg; Redi-Seal&trade; Double Window Security Business Envelopes, #8-5/8, 500/box'),
+				'category' => 'envelope',
+				'tags'     => 'envelope',
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$envelope_desc[0]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[2].'</li></ul>',
+				'files'    => array(
+					array( 'products/quality-park-redi-seal-business-envelope-1.jpg', 'cover' ),
+				),
+				'custom_fields' => array(
+					array( 'brand', 'Quality Park' ),
+					array( 'item_color', T_('white') ),
+					array( 'package_total_weight', '0.15' ),
+					array( 'package_length', '21.91' ),
+					array( 'package_width', '0.40' ),
+					array( 'package_height', '9.21' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 76.79,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[0]."</li>\n<li>".$envelope_desc[1].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:brand', 'JAM Paper' );
-				$edited_Item->set_setting( 'custom:item_color', 'white' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.20' );
-				$edited_Item->set_setting( 'custom:package_length', '16.51' );
-				$edited_Item->set_setting( 'custom:package_width', '1.20' );
-				$edited_Item->set_setting( 'custom:package_height', '9.21' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; #6 3/4 Commercial Envelopes, 250/box'), $desc,
-						$now, $cat_catalog_envelope, array(), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 29.99 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/jam-paper-commercial-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				// Image 2
-				$edit_File = new File( 'shared', 0, 'products/jam-paper-commercial-envelope-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			$demo_items['jam_paper_window'] = array(
+				'title' =>  T_('JAM Paper&reg; #10 Window Envelopes, 4 1/8 x 9 1/2, Bright Hue yellow recyled, 25/pack'),
+				'category' => 'envelope',
+				'tags'     => 'envelope',
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$envelope_desc[1]."</li>\n<li>".$envelope_desc[2]."</li>\n<li>".$envelope_desc[0].'</li></ul>',
+				'files'    => array(
+					array( 'products/jam-paper-window-envelope-1.jpg', 'cover' ),
+				),
+				'custom_fields' => array(
+					array( 'brand', 'JAM Paper' ),
+					array( 'item_color', T_('yellow') ),
+					array( 'package_total_weight', '0.08' ),
+					array( 'package_length', '24.13' ),
+					array( 'package_width', '0.04' ),
+					array( 'package_height', '10.48' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 5.49,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:brand', 'Simply Quickstrip' );
-				$edited_Item->set_setting( 'custom:item_color', 'white' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.20' );
-				$edited_Item->set_setting( 'custom:package_length', '16.51' );
-				$edited_Item->set_setting( 'custom:package_width', '0.50' );
-				$edited_Item->set_setting( 'custom:package_height', '9.21' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('Simply QuickStrip Security Tint #6 3/4 Envelope, 50/box'), $desc,
-						$now, $cat_catalog_envelope, array(), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 29.99 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/simply-quickstrip-security-tint-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			$demo_items['jam_paper_commercial'] = array(
+				'title' => T_('JAM Paper&reg; #6 3/4 Commercial Envelopes, 250/box'),
+				'category' => 'envelope',
+				'tags'     => 'envelope',
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[0]."</li>\n<li>".$envelope_desc[1].'</li></ul>',
+				'files'    => array(
+					array( 'products/jam-paper-commercial-envelope-1.jpg', 'cover' ),
+					array( 'products/jam-paper-commercial-envelope-2.jpg', 'aftermore' ),
+				),
+				'custom_fields' => array(
+					array( 'brand', 'JAM Paper' ),
+					array( 'item_color', T_('white') ),
+					array( 'package_total_weight', '0.20' ),
+					array( 'package_length', '16.51' ),
+					array( 'package_width', '1.20' ),
+					array( 'package_height', '9.21' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 29.99,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$envelope_desc[1]."</li>\n<li>".$envelope_desc[2]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:brand', 'JAM Paper' );
-				$edited_Item->set_setting( 'custom:item_color', 'dark red' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.10' );
-				$edited_Item->set_setting( 'custom:package_length', '18.42' );
-				$edited_Item->set_setting( 'custom:package_width', '0.13' );
-				$edited_Item->set_setting( 'custom:package_height', '13.34' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('JAM Paper&reg; A7 Invitation Envelopes, 25/pack'), $desc,
-						$now, $cat_catalog_envelope, array(), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 5.99 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/jam-paper-a7-invitation-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				// Image 2
-				$edit_File = new File( 'shared', 0, 'products/jam-paper-a7-invitation-envelope-2.jpg' );
-				$photo_link_2_ID = $edit_File->link_to_Object( $LinkOwner, 2, 'aftermore' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			$demo_items['simply_quickstrip'] = array(
+				'title' => T_('Simply QuickStrip Security Tint #6 3/4 Envelope, 50/box'),
+				'category' => 'envelope',
+				'tags'     => 'envelope',
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[0].'</li></ul>',
+				'files'    => array(
+					array( 'products/simply-quickstrip-security-tint-envelope-1.jpg', 'cover' ),
+				),
+				'custom_fields' => array(
+					array( 'brand', 'Simply Quickstrip' ),
+					array( 'item_color', T_('white') ),
+					array( 'package_total_weight', '0.20' ),
+					array( 'package_length', '16.51' ),
+					array( 'package_width', '0.50' ),
+					array( 'package_height', '9.21' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 29.99,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$desc = '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[0].'</li></ul>';
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'envelope' );
-				$edited_Item->set_setting( 'custom:brand', 'Quality Park' );
-				$edited_Item->set_setting( 'custom:item_color', 'white' );
-				$edited_Item->set_setting( 'custom:package_total_weight', '0.10' );
-				$edited_Item->set_setting( 'custom:package_length', '15.24' );
-				$edited_Item->set_setting( 'custom:package_width', '0.18' );
-				$edited_Item->set_setting( 'custom:package_height', '21.29' );
-				$edited_Item->set_setting( 'custom:sku', substr( uniqid(), 0, 9 ) );
-				$edited_Item->set_setting( 'custom:availability', $availability[array_rand( $availability )] );
-				$edited_Item->insert( $owner_ID, T_('Quality Park Redi-Strip&trade; Anti-Static Disk Mailers Envelopes, 25/box'), $desc,
-						$now, $cat_catalog_envelope, array(), 'published','en-US' );
-				// Item pricing
-				add_item_pricing( $edited_Item->ID, $currency_ID, 12.29 );
-				$LinkOwner = new LinkItem( $edited_Item );
-				// Image 1
-				$edit_File = new File( 'shared', 0, 'products/quality-park-redi-strip-disk-envelope-1.jpg' );
-				$photo_link_1_ID = $edit_File->link_to_Object( $LinkOwner, 1, 'cover' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
+			$demo_items['jam_paper_invitation'] = array(
+				'title' => T_('JAM Paper&reg; A7 Invitation Envelopes, 25/pack'),
+				'category' => 'envelope',
+				'tags'     => 'envelope',
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$envelope_desc[1]."</li>\n<li>".$envelope_desc[2]."</li>\n<li>".$envelope_desc[0].'</li></ul>',
+				'files'    => array(
+					array( 'products/jam-paper-a7-invitation-envelope-1.jpg', 'cover' ),
+					array( 'products/jam-paper-a7-invitation-envelope-2.jpg', 'aftermore' ),
+				),
+				'custom_fields' => array(
+					array( 'brand', 'JAM Paper' ),
+					array( 'item_color', T_('dark red') ),
+					array( 'package_total_weight', '0.10' ),
+					array( 'package_length', '18.42' ),
+					array( 'package_width', '0.13' ),
+					array( 'package_height', '13.34' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 5.99,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-				// Insert a post:
-				$post_count--;
-				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
-				$edited_Item = new Item();
-				$edited_Item->set_tags_from_string( 'intro' );
-				$edited_Item->insert( $owner_ID, T_('New Arrivals'), T_('This is the main intro post. It appears on the homepage only.'),
-					$now, $cat_catalog_pen, array(), 'published', '#', '', '', 'open', array('default'), 'Intro-Main' );
-				$item_IDs[] = array( $edited_Item->ID, $now );
-			}
+			$demo_items['quality_park_anti_static'] = array(
+				'title' => T_('Quality Park Redi-Strip&trade; Anti-Static Disk Mailers Envelopes, 25/box'),
+				'category' => 'envelope',
+				'tags'     => 'envelope',
+				'type'     => 'Product',
+				'content'  => '<ul><li>'.$envelope_desc[2]."</li>\n<li>".$envelope_desc[1]."</li>\n<li>".$envelope_desc[0].'</li></ul>',
+				'files'    => array(
+					array( 'products/quality-park-redi-strip-disk-envelope-1.jpg', 'cover' ),
+				),
+				'custom_fields' => array(
+					array( 'brand', 'Quality Park' ),
+					array( 'item_color', T_('white') ),
+					array( 'package_total_weight', '0.10' ),
+					array( 'package_length', '15.24' ),
+					array( 'package_width', '0.18' ),
+					array( 'package_height', '21.29' ),
+					array( 'sku', substr( uniqid(), 0, 9) ),
+					array( 'availability', $availability[array_rand( $availability )] ),
+				),
+				'item_price' => 12.29,
+				'qty_in_stock' => rand(1, 100),
+			);
 
-
+			$demo_items['quality_park_anti_static'] = array(
+				'title' => T_('New Arrivals'),
+				'category' => 'new-arrivals',
+				'type'     => 'Intro-Main',
+				'content'  => T_('This is the main intro post. It appears on the homepage only.'),
+			);
 			break;
 	}
 
@@ -4059,6 +4080,10 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			{	// Set task assigned user ID:
 				$new_Item->set( 'assigned_user_ID', $demo_item['assigned_user_ID'] );
 			}
+			if( isset( $demo_item['qty_in_stock'] ) )
+			{	// Set item quantity in stock:
+				$new_Item->set( 'qty_in_stock', $demo_item['qty_in_stock'] );
+			}
 
 			$item_date = date( 'Y-m-d H:i:s', $item_timestamp_array[ $item_i++ ] );
 
@@ -4109,8 +4134,13 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 				}
 			}
 
+			if( ! empty( $demo_item['item_price'] ) )
+			{	// Add item price records:
+				add_item_pricing( $new_Item->ID, locale_currency( '#', 'ID' ), $demo_item['item_price'] );
+			}
+
 			if( ! empty( $demo_item['update_content'] ) )
-			{	// Update content after insert with new var liek Link IDs:
+			{	// Update content after insert with new var like Link IDs:
 				$new_Item->set( 'content', replace_demo_content_vars( $demo_item['update_content'], $demo_items, $demo_vars ) );
 				$new_Item->dbupdate();
 				if( $demo_item_key == 'bus_stop_ahead' )
@@ -4146,8 +4176,6 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 					$comment_item_IDs[] = array( $new_Item->ID, $item_date );
 					break;
 			}
-
-			
 		}
 	}
 
@@ -4304,7 +4332,7 @@ function get_demo_category_ID( $category_key, $categories, $use_first = true )
 				return $first_cat_ID;
 			}
 		}
-		
+
 
 		if( $category_key == $cat_key && ! empty( $cat_data['ID'] ) )
 		{	// Return ID of the detected category:
@@ -4444,7 +4472,7 @@ function install_demo_content()
 	if( $create_sample_contents )
 	{
 		evo_flush();
-		$collections_installed = create_demo_contents( $demo_users, true, false );
+		$collections_installed = create_demo_collections( $demo_users, true, false );
 	}
 
 	if( $create_demo_email_lists )
