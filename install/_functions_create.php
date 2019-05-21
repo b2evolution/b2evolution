@@ -463,6 +463,7 @@ function create_default_data()
 	$product_ityp_ID = 22;
 	$digital_product_ityp_ID = 23;
 	$review_ityp_ID = 24;
+	$forum_topic_ityp_ID = 8;
 	$custom_fields = array(
 		// for Item Type "Post with Custom Fields":
 		array(
@@ -782,6 +783,15 @@ function create_default_data()
 			'type'            => 'double',
 			'order'           => 2,
 			'note'            => T_('Rating must be a value between 1 and 5 with 5 being the highest.'),
+		),
+		// for Item Type "Forum Topic":
+		array(
+			'ityp_ID'         => $forum_topic_ityp_ID,
+			'label'           => T_('Project Cost'),
+			'name'            => 'project_cost',
+			'type'            => 'double',
+			'order'           => 1,
+			'format'          => '$ 0 0.00',
 		),
 	);
 	// Default settings for custom fields:

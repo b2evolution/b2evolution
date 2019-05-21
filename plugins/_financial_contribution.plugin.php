@@ -126,10 +126,20 @@ class financial_contribution_plugin extends Plugin
 	function get_widget_param_definitions( $params )
 	{
 		return array(
+			'check_custom_field' => array(
+				'label' => T_('Custom field to check'),
+				'size' => 60,
+				'defaultvalue' => 'project_cost',
+			),
 			'title' => array(
 				'label' => T_('Title'),
 				'size' => 60,
 				'defaultvalue' => T_('Contribute to this project'),
+			),
+			'estimate_text' => array(
+				'label' => T_('Estimate text'),
+				'size' => 60,
+				'defaultvalue' => T_('Estimated Cost'),
 			),
 			'total_text' => array(
 				'label' => T_('Total text'),
@@ -197,6 +207,7 @@ class financial_contribution_plugin extends Plugin
 				'text_title_end'    => ': </b>',
 				'text_value_start'  => '',
 				'text_value_end'    => '',
+				'text_separator'    => ' &middot; ',
 				'text_row_end'      => '</p>',
 			) );
 
@@ -222,6 +233,12 @@ class financial_contribution_plugin extends Plugin
 		if( ! ( $Currency = $CurrencyCache->get_by_name( $this->get_coll_setting( 'currency', $Blog ), false, false ) ) )
 		{	// Don't display this widget with unknown currency:
 			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because currency is not found, please check collection settings of this plugin.' );
+			return false;
+		}
+
+		if( $Item->get_custom_field_value( $this->get_widget_setting( 'check_custom_field' ) ) <= 0 )
+		{	// Don't display this widget when custom field value is less 0 for the current Item:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because custom field value is less 0.' );
 			return false;
 		}
 
@@ -277,8 +294,11 @@ class financial_contribution_plugin extends Plugin
 		$Form->hidden( 'item_ID', $Item->ID );
 		$Form->add_crumb( 'contribute' );
 
-		// Total text:
-		$this->display_widget_text( 'total_text', $Currency->get( 'shortcut' ).number_format( $total_amount, 0, '', '\'' ) );
+		// Estimate text + Total text:
+		$this->display_widget_text( array(
+				'estimate_text' => $Item->get_custom_field_formatted( $this->get_widget_setting( 'check_custom_field' ) ),
+				'total_text'    => $Currency->get( 'shortcut' ).number_format( $total_amount, 0, '', '\'' ),
+			) );
 
 		if( ! empty( $current_contributors_text ) )
 		{	// Current contributors list:
@@ -310,19 +330,33 @@ class financial_contribution_plugin extends Plugin
 	/**
 	 * Display text field for the widget form
 	 *
-	 * @param string Widget setting name
+	 * @param string|array Widget setting name or set of settings
 	 * @param string Content
 	 */
-	function display_widget_text( $setting_name, $content )
+	function display_widget_text( $setting_name, $content = NULL )
 	{
-		echo $this->widget_params['text_row_start']
-			.$this->widget_params['text_title_start']
+		$settings = is_array( $setting_name ) ? $setting_name : array( $setting_name => $content );
+		$settings_num = count( $settings );
+
+		echo $this->widget_params['text_row_start'];
+
+		$s = 0;
+		foreach( $settings as $setting_name => $content )
+		{
+			echo $this->widget_params['text_title_start']
 				.$this->get_widget_setting( $setting_name )
 			.$this->widget_params['text_title_end']
 			.$this->widget_params['text_value_start']
 				.$content
-			.$this->widget_params['text_value_end']
-		.$this->widget_params['text_row_end'];
+			.$this->widget_params['text_value_end'];
+			if( $s < $settings_num - 1 )
+			{	// Display a separator between several settings:
+				echo $this->widget_params['text_separator'];
+			}
+			$s++;
+		}
+
+		echo $this->widget_params['text_row_end'];
 	}
 
 
