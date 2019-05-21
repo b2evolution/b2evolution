@@ -229,9 +229,11 @@ class display_shopping_cart_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$this->disp_params = array_merge( $this->disp_params, array(
+		$this->disp_params = array_merge( array(
 				'shopping_cart_empty'           => '<p>'.T_('Your shopping cart is empty.').'</p>',
 				'shopping_cart_table_start'     => '<div class="evo_shopping_cart">',
+				'shopping_cart_header_row_start'=> '<div class="row header_row">',
+				'shopping_cart_header_row_end'  => '</div>',
 				'shopping_cart_row_start'       => '<div class="row">',
 				'shopping_cart_cell_header'     => '<div class="$class$"><b>$header$</b></div>',
 				'shopping_cart_cell_value'      => '<div class="$class$">$value$</div>',
@@ -239,7 +241,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 				'shopping_cart_total_row_start' => '<div class="row total_row">',
 				'shopping_cart_total_row_end'   => '</div>',
 				'shopping_cart_table_end'       => '</div>',
-			), $params );
+			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
 
@@ -256,7 +258,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 			echo $this->disp_params['shopping_cart_table_start'];
 
 			// Table header columns:
-			echo $this->disp_params['shopping_cart_row_start'];
+			echo $this->disp_params['shopping_cart_header_row_start'];
 			$cols = array(
 				array( T_('Image'), $this->disp_params['class_image_header'] ),
 				array( T_('Product'), $this->disp_params['class_product_header'] ),
@@ -269,7 +271,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 			{
 				echo str_replace( array( '$header$', '$class$' ), $col_data, $this->disp_params['shopping_cart_cell_header'] );
 			}
-			echo $this->disp_params['shopping_cart_row_end'];
+			echo $this->disp_params['shopping_cart_header_row_end'];
 
 			// Display products:
 			$total = 0.00;
