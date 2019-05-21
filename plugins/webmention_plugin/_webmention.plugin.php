@@ -44,11 +44,11 @@ class webmention_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->name = T_('Webmention plugin');
-		$this->short_desc = T_('Send webmentions to all URLs detected in a posted Item.');
+		$this->name = T_('Webmentions plugin');
+		$this->short_desc = T_('Send webmentions to all URLs mentioned in a Post.');
 
 		$this->ping_service_name = 'Webmention';
-		$this->ping_service_note = T_('Send webmentions to all URLs detected in a posted Item.');
+		$this->ping_service_note = T_('Send webmentions to all URLs mentioned in a Post.');
 		$this->ping_service_process_message = T_('Sending webmention pings to URLs mentioned in the post').'...';
 		$this->ping_service_setting_title = T_('Send webmentions');
 	}
@@ -112,7 +112,7 @@ class webmention_plugin extends Plugin
 
 		if( count( $success_urls ) )
 		{	// Success URLs:
-			$messages[] = sprintf( T_('Webmentions have been accepted in the URLs: %s.'), implode( ', ', $success_urls ) );
+			$messages[] = sprintf( T_('Webmentions have been accepted for the URLs: %s.'), implode( ', ', $success_urls ) );
 		}
 
 		if( count( $nosupport_urls ) )

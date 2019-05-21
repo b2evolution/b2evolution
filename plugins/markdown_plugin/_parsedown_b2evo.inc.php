@@ -379,6 +379,14 @@ class ParsedownB2evo extends ParsedownExtra
 			}
 		}
 	}
+
+	protected function li( $lines )
+	{
+		$markup = parent::li( $lines );
+		// Remove newlines before embedded list,
+		// in order to don't add unnecessary <p> e.g. by plugin "Auto P":
+		return preg_replace( '#[\n\r]+<ul>#i', '<ul>', $markup );
+	}
 }
 
 ?>
