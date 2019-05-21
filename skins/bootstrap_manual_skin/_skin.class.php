@@ -136,29 +136,6 @@ class bootstrap_manual_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
 				),
-					'main_content_image_size' => array(
-						'label' => T_('Image size for main content'),
-						'note' => T_('Controls Aspect, Ratio and Standard Size'),
-						'defaultvalue' => 'fit-1280x720',
-						'options' => get_available_thumb_sizes(),
-						'type' => 'select',
-					),
-					'max_image_height' => array(
-						'label' => T_('Max image height'),
-						'input_suffix' => ' px ',
-						'note' => T_('Constrain height of content images by CSS.'),
-						'defaultvalue' => '',
-						'type' => 'integer',
-						'size' => '7',
-						'allow_empty' => true,
-					),
-					'message_affix_offset' => array(
-						'label' => T_('Messages affix offset'),
-						'note' => 'px. ' . T_('Set message top offset value.'),
-						'defaultvalue' => '100',
-						'type' => 'integer',
-						'allow_empty' => true,
-					),
 					'page_navigation' => array(
 						'label' => T_('Page navigation'),
 						'note' => T_('(EXPERIMENTAL)').' '.T_('Check this to show previous/next page links to navigate inside the <b>current</b> chapter.'),
@@ -264,6 +241,37 @@ class bootstrap_manual_Skin extends Skin
 							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
 						),
 				'section_access_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+				'section_advanced_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Advanced')
+				),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
+					'max_image_height' => array(
+						'label' => T_('Max image height'),
+						'input_suffix' => ' px ',
+						'note' => T_('Constrain height of content images by CSS.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '100',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
+				'section_advanced_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
