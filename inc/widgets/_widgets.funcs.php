@@ -132,7 +132,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Comment Area */
 	$default_widgets['comment_area'] = array(
-		array(  5, 'fin_contrib', 'type' => 'plugin' ),
+		array(  5, 'fin_contrib', 'coll_type' => 'forum', 'type' => 'plugin' ),
 		array( 10, 'item_comment_form' ),
 		array( 20, 'item_comment_notification' ),
 		array( 30, 'coll_item_notification' ),
