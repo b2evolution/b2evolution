@@ -3639,7 +3639,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 				array( 'default' ),
 				$item_type,
 				NULL,
-				$demo_item['order'],
+				isset( $demo_item['order'] ) ? $demo_item['order'] : NULL,
 				false );
 
 			if( ! $insert_new_item_result )
