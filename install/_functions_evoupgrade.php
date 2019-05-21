@@ -11930,6 +11930,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15520 ) )
+	{	// part of 7.0.1-alpha
+		db_create_table( 'T_order__payment', '
+			payt_ID              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			payt_user_ID         INT(10) UNSIGNED NULL,
+			payt_sess_ID         INT(10) UNSIGNED NOT NULL,
+			payt_status          ENUM ( "new", "success", "cancelled" ) COLLATE ascii_general_ci DEFAULT "new" NOT NULL,
+			payt_processor       VARCHAR( 32 ) COLLATE ascii_general_ci NOT NULL,
+			payt_proc_session_ID VARCHAR( 64 ) COLLATE ascii_general_ci NULL,
+			payt_return_info     TEXT NULL,
+			PRIMARY KEY payt_ID  (payt_ID),
+			INDEX payt_sess_ID   (payt_sess_ID)' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

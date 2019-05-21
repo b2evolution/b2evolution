@@ -668,6 +668,20 @@ $schema_queries = array_merge( $schema_queries, array(
 			lvot_spam          tinyint(1),
 			primary key (lvot_link_ID, lvot_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_order__payment' => array(
+		'Creating table for payment orders',
+		"CREATE TABLE T_order__payment (
+			payt_ID              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			payt_user_ID         INT(10) UNSIGNED NULL,
+			payt_sess_ID         INT(10) UNSIGNED NOT NULL,
+			payt_status          ENUM ( 'new', 'success', 'cancelled' ) COLLATE ascii_general_ci DEFAULT 'new' NOT NULL,
+			payt_processor       VARCHAR( 32 ) COLLATE ascii_general_ci NOT NULL,
+			payt_proc_session_ID VARCHAR( 64 ) COLLATE ascii_general_ci NULL,
+			payt_return_info     TEXT NULL,
+			PRIMARY KEY payt_ID  (payt_ID),
+			INDEX payt_sess_ID   (payt_sess_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 ) );
 
 ?>

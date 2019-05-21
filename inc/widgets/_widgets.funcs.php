@@ -411,10 +411,12 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Shopping Cart */
 	$default_widgets['shopping_cart'] = array(
+		'coll_type' => 'catalog',
 		array( 10, 'currency_selector' ),
 		array( 20, 'display_shopping_cart' ),
 		array( 30, 'country_selector' ),
 		array( 40, 'display_shipping_method' ),
+		array( 50, 'payment_stripe', 'type' => 'plugin' ),
 	);
 
 	/* Photo Index */

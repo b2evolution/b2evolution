@@ -821,6 +821,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'financial_contribution_plugin' );
 	}
+
+	if( $old_db_version < 15510 )
+	{
+		install_plugin( 'payment_stripe_plugin' );
+	}
 }
 
 
