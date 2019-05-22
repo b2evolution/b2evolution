@@ -2207,7 +2207,7 @@ class File extends DataObject
 
 		$Filetype = & $this->get_Filetype();
 		if( $this->is_dir() || $ignore_popup || ( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) ) )
-		{ // Link to open in the curent window
+		{ // Link to open in the current window
 			return '<a href="'.$url.'" title="'.$title.'"'.$class_attr.$rel_attr.'>'.$text.'</a>';
 		}
 		else

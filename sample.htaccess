@@ -8,7 +8,7 @@
 	# AddHandler application/x-httpd-php5 .php
 
 	# The following will try to configure PHP in the way b2evolution would like it to be:
-	# However, these falgs will only work if the server configuration allows them...
+	# However, these flags will only work if the server configuration allows them...
 
 	# Increase memory limit
 	php_value memory_limit 384M
@@ -23,7 +23,7 @@
 	php_value post_max_size 40M
 
 	# You may increase the following if PHP is not able to increase it by itself when needed
-	# Otherwiwse it's better to keep the number low enough for general use
+	# Otherwise it's better to keep the number low enough for general use
 	php_value max_execution_time 30
 	
 	# You may want to turn the following to Off on production servers
@@ -35,13 +35,13 @@
 	# To avoid warning about the automatically populating $HTTP_RAW_POST_DATA is deprecated and will be removed in a future version
 	php_value always_populate_raw_post_data -1
 </IfModule>
-# Duplicate all of th eabove for PHP7
+# Duplicate all of the above for PHP7
 <IfModule mod_php7.c>
 	# On some overly "secured" systems, the following may need to be added in each folder:
 	# AddHandler application/x-httpd-php5 .php
 
 	# The following will try to configure PHP in the way b2evolution would like it to be:
-	# However, these falgs will only work if the server configuration allows them...
+	# However, these flags will only work if the server configuration allows them...
 
 	# Increase memory limit
 	php_value memory_limit 384M
@@ -56,7 +56,7 @@
 	php_value post_max_size 40M
 
 	# You may increase the following if PHP is not able to increase it by itself when needed
-	# Otherwiwse it's better to keep the number low enough for general use
+	# Otherwise it's better to keep the number low enough for general use
 	php_value max_execution_time 30
 	
 	# You may want to turn the following to Off on production servers

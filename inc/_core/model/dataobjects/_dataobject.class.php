@@ -741,7 +741,7 @@ class DataObject
 						$restriction_Messages->add( $link );
 					}
 					if( $link !== false )
-					{	// If this Object has no restriction in curent table, go to next table checking:
+					{	// If this Object has no restriction in current table, go to next table checking:
 						continue;
 					}
 					// ELSE $link === false

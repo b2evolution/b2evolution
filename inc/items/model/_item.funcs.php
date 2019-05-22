@@ -3681,7 +3681,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	}
 
 	if( empty( $limit ) )
-	{	// Get default limit from curent user's setting:
+	{	// Get default limit from current user's setting:
 		global $UserSettings;
 		$limit = $UserSettings->get( 'results_per_page' );
 	}

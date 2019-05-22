@@ -1460,7 +1460,7 @@ function param_extend_list( $var, $var_ext_array, $save_prefix = true )
  * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
  * and keeps those values available for future reference (category widget)
  *
- * @param integer Colection ID to restrict chapters only from this collection
+ * @param integer Collection ID to restrict chapters only from this collection
  * @param integer Default category ID
  * @param array Default categories IDs
  */

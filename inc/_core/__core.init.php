@@ -1401,7 +1401,7 @@ class _core_Module extends Module
 				    isset( $edited_Item ) &&
 				    $edited_Item->ID > 0 &&
 				    $view_item_url = $edited_Item->get_permanent_url() )
-				{	// If curent user has a permission to edit a current viewing post:
+				{	// If current user has a permission to edit a current viewing post:
 					$entries['permalink'] = array(
 							'text'        => get_icon( 'permalink' ).' '.T_('Permalink'),
 							'href'        => $view_item_url,
@@ -1412,7 +1412,7 @@ class _core_Module extends Module
 				if( ! is_admin_page() &&
 				    in_array( $disp, array( 'single', 'page', 'edit', 'proposechange', 'widget_page' ) ) &&
 				    $perm_admin_restricted )
-				{	// If curent user has a permission to edit a current editing/viewing/proposing post:
+				{	// If current user has a permission to edit a current editing/viewing/proposing post:
 					if( $disp != 'edit' &&
 					    $Blog->get_setting( 'in_skin_editing' ) &&
 					    ! empty( $Item ) &&
