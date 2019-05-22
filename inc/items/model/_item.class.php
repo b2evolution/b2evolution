@@ -11498,8 +11498,8 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'before'       => '',
 				'after'        => '',
-				'title_flag'   => T_('Click to flag this.'),
-				'title_unflag' => T_('You have flagged this. Click to remove flag.'),
+				'title_flag'   => T_('You have flagged this. Click to remove flag.'),
+				'title_unflag' => T_('Click to flag this.'),
 				'only_flagged' => false, // Display the flag button only when this item is already flagged by current User
 				'allow_toggle' => true, // Allow to toggle flag state by AJAX
 			), $params );
