@@ -3447,7 +3447,7 @@ class User extends DataObject
 				// Blog permission to edit its properties...
 				$this->get_Group();
 
-				// Group may grant VIEW acces, FULL access:
+				// Group may grant VIEW access, FULL access:
 				if( $this->Group->check_perm( $permname, $permlevel, $perm_target ) )
 				{ // If group grants a global permission:
 					$perm = true;

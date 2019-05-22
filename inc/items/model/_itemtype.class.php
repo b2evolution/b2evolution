@@ -839,7 +839,7 @@ class ItemType extends DataObject
 		if( ! isset( $this->enabled_colls ) )
 		{	// Load into cache where this Item Type is enabled for all collections:
 			global $DB;
-			$SQL = new SQL( 'Load all colections IDs where Item Type #'.$this->ID.' is enabled' );
+			$SQL = new SQL( 'Load all collections IDs where Item Type #'.$this->ID.' is enabled' );
 			$SQL->SELECT( 'itc_coll_ID' );
 			$SQL->FROM( 'T_items__type_coll' );
 			$SQL->WHERE( 'itc_ityp_ID = '.$this->ID );

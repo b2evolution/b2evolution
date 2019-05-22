@@ -1162,7 +1162,7 @@ switch( $action )
 						case 'delete_all_sent_emails':
 							$sent_emails_count = $edited_User->get_num_sent_emails();
 							if( $sent_emails_count > 0 )
-							{	// Display a confirm message if curent user can delete at least one email log of the edited user:
+							{	// Display a confirm message if current user can delete at least one email log of the edited user:
 								$confirm_message = sprintf( T_('Delete %d emails sent to the user?'), $sent_emails_count );
 							}
 							break;
@@ -1170,7 +1170,7 @@ switch( $action )
 						case 'delete_all_email_returns':
 							$email_returns_count = $edited_User->get_num_email_returns();
 							if( $email_returns_count > 0 )
-							{	// Display a confirm message if curent user can delete at least one email returns of the edited user:
+							{	// Display a confirm message if current user can delete at least one email returns of the edited user:
 								$confirm_message = sprintf( T_('Delete %d email returns from the user\'s email address?'), $email_returns_count );
 							}
 							break;
@@ -1178,7 +1178,7 @@ switch( $action )
 						case 'delete_all_blogs':
 							$deleted_blogs_count = count( $edited_User->get_deleted_blogs() );
 							if( $deleted_blogs_count > 0 )
-							{	// Display a confirm message if curent user can delete at least one blog of the edited user
+							{	// Display a confirm message if current user can delete at least one blog of the edited user
 								$confirm_message = sprintf( T_('Delete %d blogs of the user?'), $deleted_blogs_count );
 							}
 							break;
@@ -1186,7 +1186,7 @@ switch( $action )
 						case 'delete_all_posts_created':
 							$deleted_posts_created_count = count( $edited_User->get_deleted_posts( 'created' ) );
 							if( $deleted_posts_created_count > 0 )
-							{	// Display a confirm message if curent user can delete at least one post created by the edited user
+							{	// Display a confirm message if current user can delete at least one post created by the edited user
 								$confirm_message = sprintf( T_('Delete %d posts created by the user?'), $deleted_posts_created_count );
 							}
 							break;
@@ -1194,14 +1194,14 @@ switch( $action )
 						case 'delete_all_posts_edited':
 							$deleted_posts_edited_count = count( $edited_User->get_deleted_posts( 'edited' ) );
 							if( $deleted_posts_edited_count > 0 )
-							{	// Display a confirm message if curent user can delete at least one post created by the edited user
+							{	// Display a confirm message if current user can delete at least one post created by the edited user
 								$confirm_message = sprintf( T_('Delete %d posts edited by the user?'), $deleted_posts_edited_count );
 							}
 							break;
 
 						case 'delete_all_comments':
 							if( $edited_User->has_comment_to_delete() )
-							{ // Display a confirm message if curent user can delete at least one comment posted by the edited user
+							{ // Display a confirm message if current user can delete at least one comment posted by the edited user
 								$confirm_message = sprintf( T_('Delete %s comments posted by the user?'), $edited_User->get_num_comments( '', true ) );
 							}
 							break;
@@ -1209,7 +1209,7 @@ switch( $action )
 						case 'delete_all_messages':
 							$messages_count = $edited_User->get_num_messages( 'sent' );
 							if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
-							{	// Display a confirm message if curent user can delete the messages sent by the edited user
+							{	// Display a confirm message if current user can delete the messages sent by the edited user
 								$confirm_message = sprintf( T_('Delete %d private messages sent by the user?'), $messages_count );
 							}
 							break;
@@ -1225,7 +1225,7 @@ switch( $action )
 						case 'delete_all_polls':
 							$polls_count = $edited_User->get_num_polls();
 							if( $polls_count > 0 )
-							{	// Display a confirm message if curent user can delete the polls owned by the edited user
+							{	// Display a confirm message if current user can delete the polls owned by the edited user
 								$confirm_message = sprintf( T_('Delete %d polls owned by the user?'), $polls_count );
 							}
 							break;
@@ -1236,36 +1236,36 @@ switch( $action )
 								$confirm_messages = array();
 								$sent_emails_count = $edited_User->get_num_sent_emails();
 								if( $sent_emails_count > 0 && $current_User->check_perm( 'emails', 'edit' ) )
-								{	// Display a confirm message if curent user can delete at least one email sent log of the edited user:
+								{	// Display a confirm message if current user can delete at least one email sent log of the edited user:
 									$confirm_messages[] = array( sprintf( T_('%d emails sent to the user'), $sent_emails_count ), 'warning' );
 								}
 								$email_returns_count = $edited_User->get_num_email_returns();
 								if( $email_returns_count > 0 && $current_User->check_perm( 'emails', 'edit' ) )
-								{	// Display a confirm message if curent user can delete at least one email return of the edited user:
+								{	// Display a confirm message if current user can delete at least one email return of the edited user:
 									$confirm_messages[] = array( sprintf( T_('%d email returns from the user\'s email address'), $email_returns_count ), 'warning' );
 								}
 								$deleted_blogs_count = count( $edited_User->get_deleted_blogs() );
 								if( $deleted_blogs_count > 0 )
-								{	// Display a confirm message if curent user can delete at least one blog of the edited user:
+								{	// Display a confirm message if current user can delete at least one blog of the edited user:
 									$confirm_messages[] = array( sprintf( T_('%d collections of the user'), $deleted_blogs_count ), 'warning' );
 								}
 								$deleted_posts_created_count = count( $edited_User->get_deleted_posts( 'created' ) );
 								if( $deleted_posts_created_count > 0 )
-								{	// Display a confirm message if curent user can delete at least one post created by the edited user:
+								{	// Display a confirm message if current user can delete at least one post created by the edited user:
 									$confirm_messages[] = array( sprintf( T_('%d posts created by the user'), $deleted_posts_created_count ), 'warning' );
 								}
 								$deleted_posts_edited_count = count( $edited_User->get_deleted_posts( 'edited' ) );
 								if( $deleted_posts_edited_count > 0 )
-								{	// Display a confirm message if curent user can delete at least one post created by the edited user:
+								{	// Display a confirm message if current user can delete at least one post created by the edited user:
 									$confirm_messages[] = array( sprintf( T_('%d posts edited by the user'), $deleted_posts_edited_count ), 'warning' );
 								}
 								if( $edited_User->has_comment_to_delete() )
-								{	// Display a confirm message if curent user can delete at least one comment posted by the edited user:
+								{	// Display a confirm message if current user can delete at least one comment posted by the edited user:
 									$confirm_messages[] = array( sprintf( T_('%s comments posted by the user'), $edited_User->get_num_comments( '', true ) ), 'warning' );
 								}
 								$messages_count = $edited_User->get_num_messages();
 								if( $messages_count > 0 && $current_User->check_perm( 'perm_messaging', 'abuse' ) )
-								{	// Display a confirm message if curent user can delete the messages sent by the edited user
+								{	// Display a confirm message if current user can delete the messages sent by the edited user
 									$confirm_messages[] = array( sprintf( T_('%d private messages sent by the user'), $messages_count ), 'warning' );
 								}
 								// Find other users with the same email address

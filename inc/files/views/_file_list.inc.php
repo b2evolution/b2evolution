@@ -350,7 +350,7 @@ $Form->begin_form();
 
 			if( $lFile->is_dir() )
 			{ // Directory
-				// Link to open the directory in the curent window
+				// Link to open the directory in the current window
 				echo '<a href="'.$browse_dir_url.'">'.$lFile->dget('name').'</a>';
 			}
 			else
