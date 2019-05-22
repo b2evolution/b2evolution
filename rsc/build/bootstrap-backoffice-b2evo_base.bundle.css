@@ -3365,3 +3365,6 @@ div.message_toolbars {
     border-radius: 3px;
   }
 }
+.evo_container__shopping_cart .evo_widget {
+  margin: 20px 0;
+}

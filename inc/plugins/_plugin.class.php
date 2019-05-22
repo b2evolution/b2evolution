@@ -3932,10 +3932,28 @@ class Plugin
 	 * @param array Custom params
 	 * @param array Default params
 	 */
-	function init_widget_params( $params, $default_params = array() )
+	function init_widget_params( $params, $default_params = NULL )
 	{
 		if( ! isset( $this->widget_params ) )
 		{	// Don't initialize params twice:
+			if( $default_params === NULL )
+			{	// Set default params if they are not passed:
+				$default_params = array(
+						// This is what will enclose the block in the skin:
+						'block_start'         => '<div class="evo_widget widget $wi_class$">',
+						'block_end'           => '</div>'."\n",
+						// Title:
+						'block_display_title' => true,
+						'block_title_start'   => '<h4>',
+						'title'               => '',
+						'block_title_end'     => '</h4>'."\n",
+						// This is what will enclose the body:
+						'block_body_start'    => '',
+						'block_body_end'      => '',
+						// Widget debug mode: 'normal', 'designer'
+						'debug_mode'          => 'normal',
+					);
+			}
 			$this->widget_params = array_merge( $default_params, $params );
 		}
 	}
@@ -3982,41 +4000,71 @@ class Plugin
 
 
 	/**
+	 * Display widget title
+	 *
+	 * @param string Title
+	 */
+	function display_widget_title( $title = NULL, $params = array() )
+	{
+		$this->init_widget_params( $params );
+
+		if( $title === NULL )
+		{
+			$title = $this->widget_params['title'];
+		}
+
+		if( $this->widget_params['block_display_title'] && ! empty( $title ) )
+		{	// Display title:
+			echo $this->widget_params['block_title_start'];
+			echo format_to_output( $title );
+			echo $this->widget_params['block_title_end'];
+		}
+	}
+
+
+	/**
 	 * Display widget debug message e-g on designer mode when we need to show widget when nothing to display currently
 	 *
 	 * @param string Message
+	 * @param array Template parameters
 	 */
 	function display_widget_debug_message( $message = NULL, $params = array() )
 	{
-		$this->init_widget_params( $params, array(
-				// This is what will enclose the block in the skin:
-				'block_start'       => '<div class="evo_widget widget $wi_class$">',
-				'block_end'         => "</div>\n",
-				// Title:
-				'block_title_start' => '<h4>',
-				'title'             => '',
-				'block_title_end'   => '</h4>',
-				// This is what will enclose the body:
-				'block_body_start'  => '',
-				'block_body_end'    => '',
-				// Widget debug mode: 'normal', 'designer'
-				'debug_mode'        => 'normal',
-			) );
+		$this->init_widget_params( $params );
 
 		if( isset( $this->widget_params['debug_mode'] ) && $this->widget_params['debug_mode'] == 'designer' )
 		{	// Display message on designer mode:
 			echo $this->widget_params['block_start'];
-			if( ! empty( $this->widget_params['title'] ) )
-			{	// Display title:
-				echo $this->widget_params['block_title_start'];
-				echo $this->widget_params['title'];
-				echo $this->widget_params['block_title_end'];
-			}
+			$this->display_widget_title( NULL, $params );
 			echo $this->widget_params['block_body_start'];
 			echo $message;
 			echo $this->widget_params['block_body_end'];
 			echo $this->widget_params['block_end'];
 		}
+	}
+
+
+	/**
+	 * Display widget error message
+	 *
+	 * @param string Message
+	 * @param array Template parameters
+	 */
+	function display_widget_error_message( $message = NULL, $params = array() )
+	{
+		$this->init_widget_params( $params );
+
+		if( $message === NULL )
+		{
+			$message = 'Unable to display plugin widget "'.$this->name.'"';
+		}
+
+		echo $this->widget_params['block_start'];
+		$this->display_widget_title( NULL, $params );
+		echo $this->widget_params['block_body_start'];
+		echo '<span class="evo_param_error">'.$message.'</span>';
+		echo $this->widget_params['block_body_end'];
+		echo $this->widget_params['block_end'];
 	}
 
 

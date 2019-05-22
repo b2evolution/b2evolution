@@ -107,13 +107,13 @@ class display_shipping_method_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$this->disp_params = array_merge( $this->disp_params, array(
+		$this->disp_params = array_merge( array(
 				'shipping_method_empty'            => '<p>'.T_('No shipment plugins found.').'</p>',
 				'shipping_method_list_start'       => '<div class="evo_shipping_options">',
 				'shipping_method_list_end'         => '</div>',
 				'shipping_method_total_cost_start' => '',
 				'shipping_method_total_cost_end'   => '',
-			), $params );
+			), $this->disp_params );
 
 		// Get shipment plugins:
 		$shipment_Plugin = get_shipment_plugin();

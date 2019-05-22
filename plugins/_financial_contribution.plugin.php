@@ -277,13 +277,7 @@ class financial_contribution_plugin extends Plugin
 
 		echo $this->widget_params['block_start'];
 
-		$widget_title = $this->get_widget_setting( 'title' );
-		if( ! empty( $widget_title ) )
-		{	// We want to display a title for the widget block:
-			echo $this->widget_params['block_title_start'];
-			echo $widget_title;
-			echo $this->widget_params['block_title_end'];
-		}
+		$this->display_widget_title();
 
 		echo $this->widget_params['block_body_start'];
 

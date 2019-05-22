@@ -52,14 +52,14 @@ class payment_stripe_plugin extends Plugin
 		return array(
 			'publish_api_key' => array(
 				'label' => T_('Publishable API key'),
-				'size' => 50,
+				'size' => 80,
 				'defaultvalue' => '',
 				'note' => sprintf( T_('Visit the <a %s>Stripe dashboard</a> to get your API keys'),
 						'href="https://dashboard.stripe.com/account/apikeys" target="_blank"' ),
 				),
 			'secret_api_key' => array(
 				'label' => T_('Secret API key'),
-				'size' => 50,
+				'size' => 80,
 				'type' => 'password',
 				'defaultvalue' => '',
 				'note' => sprintf( T_('Visit the <a %s>Stripe dashboard</a> to get your API keys'),
@@ -86,7 +86,7 @@ class payment_stripe_plugin extends Plugin
 			'button_class' => array(
 				'label' => T_('Button class'),
 				'size' => 60,
-				'defaultvalue' => 'btn btn-success',
+				'defaultvalue' => 'btn btn-lg btn-success',
 			),
 			'button_text' => array(
 				'label' => T_('Button text'),
@@ -122,24 +122,46 @@ class payment_stripe_plugin extends Plugin
 			return false;
 		}
 
-		require_once( __DIR__.'/stripe-php/init.php' );
+		if( substr( $this->Settings->get( 'publish_api_key' ), 0, 3 ) != 'pk_' )
+		{	// Don't display this widget with wrong publishable API key:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because Publishable API key must start with <code>pk_</code>.' );
+			return false;
+		}
 
-		\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
+		if( substr( $this->Settings->get( 'secret_api_key' ), 0, 3 ) != 'sk_' )
+		{	// Don't display this widget with wrong publishable API key:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because Secret API key must start with <code>sk_</code>.' );
+			return false;
+		}
 
-		// TODO: set items from shopping cart and proper urls:
-		$session = \Stripe\Checkout\Session::create([
-			'payment_method_types' => ['card'],
-			'line_items' => [[
-				'name' => 'T-shirt',
-				'description' => 'Comfortable cotton t-shirt',
-				'images' => ['https://example.com/t-shirt.png'],
-				'amount' => 500,
-				'currency' => 'gbp',
-				'quantity' => 1,
-			]],
-			'success_url' => $Blog->get( 'carturl' ),
-			'cancel_url' => $Blog->get( 'carturl' ),
-		]);
+		try
+		{	// Try to get a session for Stripe payment:
+			require_once( __DIR__.'/stripe-php/init.php' );
+
+			\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
+
+			// TODO: set items from shopping cart and proper urls:
+			$session = \Stripe\Checkout\Session::create([
+				'payment_method_types' => ['card'],
+				'line_items' => [[
+					'name' => 'T-shirt',
+					'description' => 'Comfortable cotton t-shirt',
+					'images' => ['https://example.com/t-shirt.png'],
+					'amount' => 500,
+					'currency' => 'gbp',
+					'quantity' => 1,
+				]],
+				'success_url' => $Blog->get( 'carturl' ),
+				'cancel_url' => $Blog->get( 'carturl' ),
+			]);
+		}
+		catch( Exception $ex )
+		{	// Display unexpected error:
+			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" cannot be displayed because of error "'.$ex->getMessage().'".' );
+			return false;
+		}
+
+		echo $this->widget_params['block_start'];
 
 		echo '<script src="https://js.stripe.com/v3/"></script>';
 		echo '<script>
@@ -159,15 +181,7 @@ class payment_stripe_plugin extends Plugin
 			} );
 		</script>';
 
-		echo $this->widget_params['block_start'];
-
-		$widget_title = $this->get_widget_setting( 'title' );
-		if( ! empty( $widget_title ) )
-		{	// We want to display a title for the widget block:
-			echo $this->widget_params['block_title_start'];
-			echo $widget_title;
-			echo $this->widget_params['block_title_end'];
-		}
+		$this->display_widget_title();
 
 		echo $this->widget_params['block_body_start'];
 
@@ -178,7 +192,6 @@ class payment_stripe_plugin extends Plugin
 		echo $this->widget_params['block_end'];
 
 		return true;
-		
 	}
 
 }
