@@ -261,7 +261,7 @@ if( $disp == 'single' )
 			<?php
 			$CurrencyCache = & get_currencyCache();
 			//echo '$'.$Item->get_setting( 'custom:price' ).' ';
-			$current_Currency = get_currency();
+			$current_Currency = & get_Currency();
 			$default_pricing = $Item->get_default_pricing( $current_Currency->ID );
 			$current_best_pricing = $Item->get_current_best_pricing();
 			if( $default_pricing && $current_best_pricing && ( $default_pricing['iprc_price'] != $current_best_pricing['iprc_price'] ) )

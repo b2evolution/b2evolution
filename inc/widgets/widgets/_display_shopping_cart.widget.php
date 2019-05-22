@@ -292,11 +292,11 @@ class display_shopping_cart_Widget extends ComponentWidget
 				echo str_replace( $product_cell_masks, array( $Cart->get_title( $cart_item_ID ), $this->disp_params['class_product_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Currency:
-				$currency = $Cart->get_currency( $cart_item_ID );
+				$Currency = & $Cart->get_Currency( $cart_item_ID );
 
 				// Unit Price:
-				$currency_shortcut = empty( $currency ) ? '' : $currency->get( 'shortcut' ).'&nbsp';
-				$unit_price = $Cart->get_unit_price( $cart_item_ID );
+				$currency_shortcut = empty( $Currency ) ? '' : $Currency->get( 'shortcut' ).'&nbsp';
+				$unit_price = $Cart->get_unit_price( $cart_item_ID, true );
 				echo str_replace( $product_cell_masks, array( $unit_price, $this->disp_params['class_unit_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Quantity:
@@ -313,7 +313,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 				echo str_replace( $product_cell_masks, array( $qty_cell, $this->disp_params['class_quantity_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Total Price:
-				$total_price = $Cart->get_total_price( $cart_item_ID );
+				$total_price = $Cart->get_total_price( $cart_item_ID, true );
 				echo str_replace( $product_cell_masks, array( $total_price, $this->disp_params['class_total_price_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Remove:

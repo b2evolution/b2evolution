@@ -126,8 +126,6 @@ class currency_selector_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
-		$currency = get_currency();
-
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
@@ -138,7 +136,7 @@ class currency_selector_Widget extends ComponentWidget
 
 		$Form = new Form( get_htsrv_url().'anon_async.php?action=set_currency', 'currency_selector', 'post', 'blockspan' );
 		$Form->begin_form();
-		$Form->select_input_object( 'currency', $currency->ID, $CurrencyCache, T_('Currency'), array( 'field_suffix' => $update_button ) );
+		$Form->select_input_object( 'currency', get_Currency()->ID, $CurrencyCache, T_('Currency'), array( 'field_suffix' => $update_button ) );
 		$Form->hidden( 'redirect_to', regenerate_url() );
 		$Form->end_form();
 

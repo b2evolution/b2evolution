@@ -9952,10 +9952,9 @@ function convert_path_to_array( $property, $value, $separator = '.' )
  *
  * @return object Currency object
  */
-function get_currency()
+function & get_Currency()
 {
 	global $Session;
-	$CurrencyCache = & get_CurrencyCache();
 
 	$curr_ID = $Session->get( 'currency_ID' );
 	if( empty( $curr_ID ) )
@@ -9970,7 +9969,10 @@ function get_currency()
 		$curr_ID = locale_currency( '#', 'ID' );
 	}
 
-	return $CurrencyCache->get_by_ID( $curr_ID, false, false );
+	$CurrencyCache = & get_CurrencyCache();
+	$Currency = & $CurrencyCache->get_by_ID( $curr_ID, false, false );
+
+	return $Currency;
 }
 
 
@@ -9991,7 +9993,7 @@ function set_currency( $curr_ID )
  *
  * @return object Country object
  */
-function get_country()
+function & get_Country()
 {
 	global $Session;
 	$CountryCache = & get_CountryCache();
@@ -10004,7 +10006,9 @@ function get_country()
 		$Session->set( 'country_ID', $country_ID );
 	}
 
-	return $CountryCache->get_by_ID( $country_ID, false, false );
+	$Country = & $CountryCache->get_by_ID( $country_ID, false, false );
+
+	return $Country;
 }
 
 
@@ -10013,7 +10017,7 @@ function get_country()
  *
  * @return object Shipment plugin object
  */
-function get_shipment_plugin()
+function & get_shipment_Plugin()
 {
 	global $Session, $Plugins;
 
@@ -10029,8 +10033,8 @@ function get_shipment_plugin()
 		}
 	}
 
-	return $Plugins->get_by_ID( $shipment_plugin_ID, false, false );
+	$Plugin = & $Plugins->get_by_ID( $shipment_plugin_ID, false, false );
+
+	return $Plugin;
 }
-
-
 ?>

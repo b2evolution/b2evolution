@@ -4850,6 +4850,76 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get URLs of images linked to the current Item
+	 *
+	 * @param array of params
+	 * @return array
+	 */
+	function get_image_urls( $params = array() )
+	{
+		$params = array_merge( array(
+				'image_size'                 => 'fit-720x500',
+				'image_size_x'               => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
+				'image_link_to'              => 'original', // Can be 'original' (image) or 'single' (this post)
+				'limit'                      => 1000, // Max # of images displayed
+				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				'links_sql_select'           => '',
+				'links_sql_orderby'          => 'link_order',
+			), $params );
+
+		// Get list of ALL attached files
+		$links_params = array(
+				'sql_select_add' => $params['links_sql_select'],
+				'sql_order_by'   => $params['links_sql_orderby']
+			);
+
+		$image_urls = array();
+
+		$LinkOwner = new LinkItem( $this );
+		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000, $params['restrict_to_image_position'], NULL, $links_params ) )
+		{	// No attachments:
+			return $image_urls;
+		}
+
+		$image_counter = 0;
+		while( $image_counter < $params['limit'] && $Link = & $LinkList->get_next() )
+		{
+			if( ! ( $File = & $Link->get_File() ) )
+			{	// No File object:
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			if( ! $File->exists() )
+			{	// File doesn't exist:
+				global $Debuglog;
+				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+				continue;
+			}
+
+			if( ! $File->is_image() )
+			{	// Skip anything that is not an image:
+				continue;
+			}
+
+			if( $params['image_size'] == 'original' )
+			{	// Original size:
+				$image_urls[] = $File->get_url();
+			}
+			else
+			{	// Thumbnail size:
+				$image_urls[] = $File->get_thumb_url( $params['image_size'], '&', $params['image_size_x'] );
+			}
+
+			$image_counter++;
+		}
+
+		return $image_urls;
+	}
+
+
+	/**
 	 * Get URL of a first cover image
 	 *
 	 * @return string|NULL cover URL or NULL if it doesn't exist
@@ -12941,15 +13011,7 @@ class Item extends ItemLight
 		$SQL->WHERE_and( 'iprc_grp_ID IS NULL' );
 		$SQL->WHERE_and( 'iprc_date_start IS NULL' );
 		$SQL->WHERE_and( 'iprc_date_end IS NULL' );
-		if( empty( $curr_ID ) )
-		{
-			$currency = get_currency();
-			$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( $currency->ID ) );
-		}
-		else
-		{
-			$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( $curr_ID ) );
-		}
+		$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( empty( $curr_ID ) ? get_Currency()->ID : $curr_ID ) );
 
 		$SQL->ORDER_BY( 'iprc_price ASC' );
 		$SQL->LIMIT( 1 );
@@ -13133,15 +13195,7 @@ class Item extends ItemLight
 		$SQL->WHERE_and( 'iprc_date_end IS NULL OR ( iprc_date_end > '.$DB->quote( date2mysql( $servertimenow ) ).' )' );
 
 		// Currency:
-		if( empty( $curr_ID ) )
-		{
-			$currency = get_currency();
-			$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( $currency->ID ) );
-		}
-		else
-		{
-			$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( $curr_ID ) );
-		}
+		$SQL->WHERE_and( 'iprc_curr_ID = '.$DB->quote( empty( $curr_ID ) ? get_Currency()->ID : $curr_ID ) );
 
 		// Group:
 		if( empty( $grp_ID ) )

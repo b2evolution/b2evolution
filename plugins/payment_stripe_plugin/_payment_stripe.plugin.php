@@ -129,8 +129,17 @@ class payment_stripe_plugin extends Plugin
 		}
 
 		if( substr( $this->Settings->get( 'secret_api_key' ), 0, 3 ) != 'sk_' )
-		{	// Don't display this widget with wrong publishable API key:
+		{	// Don't display this widget with wrong secret API key:
 			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because Secret API key must start with <code>sk_</code>.' );
+			return false;
+		}
+
+		$Cart = & get_Cart();
+		$cart_items = $Cart->get_items();
+
+		if( empty( $cart_items ) )
+		{	// Don't display this widget without items in shopping cart:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because no items in shopping cart.' );
 			return false;
 		}
 
@@ -140,20 +149,23 @@ class payment_stripe_plugin extends Plugin
 
 			\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
 
-			// TODO: set items from shopping cart and proper urls:
-			$session = \Stripe\Checkout\Session::create([
+			$session_data = [
 				'payment_method_types' => ['card'],
-				'line_items' => [[
-					'name' => 'T-shirt',
-					'description' => 'Comfortable cotton t-shirt',
-					'images' => ['https://example.com/t-shirt.png'],
-					'amount' => 500,
-					'currency' => 'gbp',
-					'quantity' => 1,
-				]],
+				'line_items' => [],
 				'success_url' => $Blog->get( 'carturl' ),
 				'cancel_url' => $Blog->get( 'carturl' ),
-			]);
+			];
+			foreach( $cart_items as $cart_item_ID => $cart_Item )
+			{
+				$session_data['line_items'][] = [
+					'name' => $Cart->get_title( $cart_item_ID, array( 'link_type' => 'none' ) ),
+					'images' => $Cart->get_image_urls( $cart_item_ID ),
+					'amount' => intval( $Cart->get_unit_price( $cart_item_ID ) * 100 ),
+					'currency' => $Cart->get_currency_code( $cart_item_ID ),
+					'quantity' => $Cart->get_quantity( $cart_item_ID ),
+				];
+			}
+			$session = \Stripe\Checkout\Session::create( $session_data );
 		}
 		catch( Exception $ex )
 		{	// Display unexpected error:
@@ -169,9 +181,6 @@ class payment_stripe_plugin extends Plugin
 			jQuery( document ).on( "click", ".evo_widget.widget_plugin_payment_stripe", function()
 			{
 				stripe.redirectToCheckout({
-					// Make the id field from the Checkout Session creation API response
-					// available to this file, so you can provide it as parameter here
-					// instead of the {{CHECKOUT_SESSION_ID}} placeholder.
 					sessionId: "'.$session['id'].'"
 				}).then(function (result) {
 					// If `redirectToCheckout` fails due to a browser or network
@@ -194,5 +203,42 @@ class payment_stripe_plugin extends Plugin
 		return true;
 	}
 
+
+	/**
+	 * Get keys for block/widget caching
+	 *
+	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 *
+	 * @param integer Widget ID
+	 * @return array of keys this widget depends on
+	 */
+	function get_widget_cache_keys( $widget_ID = 0 )
+	{
+		global $Collection, $Blog, $current_User, $Session;
+
+		$cache_keys = array(
+				'wi_ID'       => $widget_ID, // Have the widget settings changed ?
+				'set_coll_ID' => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
+				// NOTE: The key 'user_ID' is used to invalidate cache when current User was updated,
+				//       for example, user was in group "VIP client" and then he was moved to "Problem client"
+				//       which cannot see/buy items/products with status "Members", so in such case at the user updating moment
+				//       we should invalidate widget cache in order to hide some items/products for the updated user.
+				'user_ID'     => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
+				'cart'        => $Session->ID, // Has the cart updated for current session?
+			);
+
+		// Get items form the current cart:
+		$Cart = & get_Cart();
+		$cart_items = $Cart->get_items();
+
+		// Add 1 cache key for each item that is in shopping card, in order to detect changes on each one:
+		foreach( $cart_items as $cart_item_ID => $cart_Item )
+		{
+			// 1 is a dummy value, only the key name is really important
+			$cache_keys['item_'.$cart_item_ID] = 1;
+		}
+
+		return $cache_keys;
+	}
 }
 ?>

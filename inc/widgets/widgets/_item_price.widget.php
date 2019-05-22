@@ -160,28 +160,28 @@ class item_price_Widget extends ComponentWidget
 		$curr_ID = $this->disp_params['currency_ID'];
 		if( empty( $curr_ID ) )
 		{
-			$currency = get_currency();
-			$curr_ID = $currency->ID;
+			$Currency = & get_Currency();
+			$curr_ID = $Currency->ID;
 		}
 
 		$default_pricing = $Item->get_default_pricing( $curr_ID );
 		$best_pricing = $Item->get_current_best_pricing( $curr_ID );
 		$CurrencyCache = & get_currencyCache();
-		$currency = $CurrencyCache->get_by_ID( $curr_ID, false, false );
+		$Currency = & $CurrencyCache->get_by_ID( $curr_ID, false, false );
 
 		if( $default_pricing
 				&& !( $best_pricing && ( $best_pricing['iprc_price'] == $default_pricing['iprc_price'] ) )
 				&& $this->disp_params['display_original_price'] )
 		{
 			echo $this->disp_params['widget_item_price_before_default'];
-			echo $currency->get( 'code' ).'&nbsp;'.number_format( $default_pricing['iprc_price'], 2 );
+			echo $Currency->get( 'code' ).'&nbsp;'.number_format( $default_pricing['iprc_price'], 2 );
 			echo $this->disp_params['widget_item_price_after_default'];
 		}
 
 		if( $best_pricing )
 		{
 			echo $this->disp_params['widget_item_price_before_best'];
-			echo $currency->get( 'code' ).'&nbsp;'.number_format( $best_pricing['iprc_price'], 2 );
+			echo $Currency->get( 'code' ).'&nbsp;'.number_format( $best_pricing['iprc_price'], 2 );
 			echo $this->disp_params['widget_item_price_after_best'];
 		}
 

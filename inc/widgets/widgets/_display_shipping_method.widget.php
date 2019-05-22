@@ -116,7 +116,7 @@ class display_shipping_method_Widget extends ComponentWidget
 			), $this->disp_params );
 
 		// Get shipment plugins:
-		$shipment_Plugin = get_shipment_plugin();
+		$shipment_Plugin = & get_shipment_Plugin();
 		$shipment_plugin_ID = $shipment_Plugin->ID;
 		$shipment_options = $Plugins->trigger_collect( 'GetShipmentOption' );
 
@@ -151,17 +151,17 @@ class display_shipping_method_Widget extends ComponentWidget
 			$Form->switch_layout( NULL );
 
 			// Determine current shipping cost:
-			$currency = get_currency();
-			$country = get_country();
+			$Currency = & get_Currency();
+			$Country = & get_Country();
 			$Cart = & get_Cart();
 			$cart_items = $Cart->get_items();
 			$shipping_cost = 0;
 
-			if( $shipment_Plugin && $currency && $country )
+			if( $shipment_Plugin && $Currency && $Country )
 			{
 				$params = array(
-					'currency_ID' => $currency->ID,
-					'country_ID'  => $country->ID,
+					'currency_ID' => $Currency->ID,
+					'country_ID'  => $Country->ID,
 					'items'       => array(),
 				);
 
@@ -175,7 +175,7 @@ class display_shipping_method_Widget extends ComponentWidget
 				$shipping_cost = $shipment_Plugin->GetShippingCost( $params );
 				if( $shipping_cost !== false )
 				{
-					$shipping_cost = '<span class="evo_total_shipping_cost">'.$currency->shortcut.'&nbsp;'.number_format( $shipping_cost, 2 ).'</span>';
+					$shipping_cost = '<span class="evo_total_shipping_cost">'.$Currency->shortcut.'&nbsp;'.number_format( $shipping_cost, 2 ).'</span>';
 				}
 				else
 				{
