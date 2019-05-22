@@ -8457,7 +8457,7 @@ class Item extends ItemLight
 			$sql .= ' AND user_ID != '.$DB->quote( $executed_by_userid );
 		}
 
-		$notify_list = $DB->get_col( $sql, 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
+		$notify_list = $DB->get_col( $sql, 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on collection #'.$this->get_blog_ID() );
 
 		// Preprocess list:
 		foreach( $notify_list as $notify_user_ID )
@@ -8470,7 +8470,7 @@ class Item extends ItemLight
 
 		$notify_user_IDs = array_keys( $notify_users );
 
-		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on collection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
 		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		// Load all users who will be notified:
@@ -8529,7 +8529,7 @@ class Item extends ItemLight
 			}
 		}
 
-		$Debuglog->add( 'Number of users who are allowed to be notified about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'Number of users who are allowed to be notified about new items on collection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
 		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		if( $notify_members )
