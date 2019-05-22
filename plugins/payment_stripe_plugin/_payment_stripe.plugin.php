@@ -93,6 +93,16 @@ class payment_stripe_plugin extends Plugin
 				'size' => 60,
 				'defaultvalue' => T_('Checkout'),
 			),
+			'page_success' => array(
+				'label' => T_('Page for success'),
+				'size' => 120,
+				'note' => T_('Enter slug of the page to display in case of successful checkout.').' '.T_('Leave empty to return to cart.'),
+			),
+			'page_cancel' => array(
+				'label' => T_('Page for cancelation'),
+				'size' => 120,
+				'note' => T_('Enter slug of the page to display in case checkout is cancelled.').' '.T_('Leave empty to return to cart.'),
+			),
 		);
 	}
 
@@ -105,7 +115,7 @@ class payment_stripe_plugin extends Plugin
 	 */
 	function SkinTag( & $params )
 	{
-		global $Blog;
+		global $Blog, $current_User;
 
 		$this->init_widget_params( $params );
 
@@ -152,11 +162,17 @@ class payment_stripe_plugin extends Plugin
 			$session_data = [
 				'payment_method_types' => ['card'],
 				'line_items' => [],
-				'success_url' => $Blog->get( 'carturl' ),
-				'cancel_url' => $Blog->get( 'carturl' ),
+				'success_url' => $this->get_result_page_url( 'page_success' ),
+				'cancel_url' => $this->get_result_page_url( 'page_cancel' ),
 			];
+
+			if( is_logged_in() )
+			{	// Use email address of current logged-in User:
+				$session_data['customer_email'] = $current_User->get( 'email' );
+			}
+
 			foreach( $cart_items as $cart_item_ID => $cart_Item )
-			{
+			{	// Set all items from shopping cart:
 				$session_data['line_items'][] = [
 					'name' => $Cart->get_title( $cart_item_ID, array( 'link_type' => 'none' ) ),
 					'images' => $Cart->get_image_urls( $cart_item_ID ),
@@ -165,6 +181,8 @@ class payment_stripe_plugin extends Plugin
 					'quantity' => $Cart->get_quantity( $cart_item_ID ),
 				];
 			}
+
+			// Request session:
 			$session = \Stripe\Checkout\Session::create( $session_data );
 		}
 		catch( Exception $ex )
@@ -201,6 +219,40 @@ class payment_stripe_plugin extends Plugin
 		echo $this->widget_params['block_end'];
 
 		return true;
+	}
+
+
+	/**
+	 * Get URL to redirect after success or failed checkout
+	 *
+	 * @param string Setting name: 'page_succes', 'page_cancel'
+	 * @return string
+	 */
+	function get_result_page_url( $setting_name )
+	{
+		global $Blog;
+
+		$setting_value = $this->get_widget_setting( $setting_name );
+		if( ! empty( $setting_value ) )
+		{
+			if( $ItemCache = & get_ItemCache() &&
+			    $page_Item = & $ItemCache->get_by_urltitle( $setting_value, false, false ) )
+			{	// Use Item permanent URL:
+				$result_page_url = $page_Item->get_permanent_url( '', '', '&' );
+			}
+			elseif( $ChapterCache = & get_ChapterCache() &&
+			        $page_Chapter = & $ChapterCache->get_by_urlname( $setting_value, false, false ) )
+			{	// Use Cahpter permanent URL:
+				$result_page_url = $page_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' );
+			}
+		}
+
+		if( empty( $result_page_url ) )
+		{	// Use shopping cart page URL by default:
+			$result_page_url = $Blog->get( 'carturl' );
+		}
+
+		return $result_page_url;
 	}
 
 
