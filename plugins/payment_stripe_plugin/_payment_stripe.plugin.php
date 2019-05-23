@@ -53,7 +53,6 @@ class payment_stripe_plugin extends Plugin
 			'publish_api_key' => array(
 				'label' => T_('Publishable API key'),
 				'size' => 80,
-				'defaultvalue' => '',
 				'note' => sprintf( T_('Visit the <a %s>Stripe dashboard</a> to get your API keys'),
 						'href="https://dashboard.stripe.com/account/apikeys" target="_blank"' ),
 				),
@@ -61,9 +60,20 @@ class payment_stripe_plugin extends Plugin
 				'label' => T_('Secret API key'),
 				'size' => 80,
 				'type' => 'password',
-				'defaultvalue' => '',
 				'note' => sprintf( T_('Visit the <a %s>Stripe dashboard</a> to get your API keys'),
 						'href="https://dashboard.stripe.com/account/apikeys" target="_blank"' ),
+				),
+			'webhook_url' => array(
+				'label' => T_('Webhook url'),
+				'type' => 'info',
+				'info' => '<code>'.$this->get_htsrv_url( 'webhook', array(), '&amp;', true ).'</code>',
+				),
+			'webhook_key' => array(
+				'label' => T_('Webhook signing secret key'),
+				'size' => 80,
+				'type' => 'password',
+				'note' => sprintf( T_('Visit the <a %s>Stripe webhooks endpoints</a> to get your signing secret key'),
+						'href="https://dashboard.stripe.com/test/webhooks" target="_blank"' ),
 				),
 			);
 	}
@@ -285,12 +295,11 @@ class payment_stripe_plugin extends Plugin
 			// Exit here.
 		}
 
+		require_once( __DIR__.'/stripe-php/init.php' );
+		\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
+
 		try
 		{	// Try to get a session for Stripe payment:
-			require_once( __DIR__.'/stripe-php/init.php' );
-
-			\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
-
 			$session_data = [
 				'payment_method_types' => ['card'],
 				'line_items'           => [],
@@ -370,6 +379,50 @@ class payment_stripe_plugin extends Plugin
 		$Messages->add( T_('Payment has been done successfully.'), 'success' );
 
 		header_redirect( $this->get_result_page_url( 'page_success', $params ) );
+	}
+
+
+	/**
+	 * Plugin action to listen webhook from Stripe server
+	 *
+	 * @param array Params
+	 */
+	function htsrv_webhook( $params )
+	{
+		$Cart = & get_Cart();
+		// Check to be sure this webhook was called:
+		$Cart->update_order_payment( array(
+			'payt_return_info' => 'webhook',
+		) );
+
+		require_once( __DIR__.'/stripe-php/init.php' );
+		\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
+
+		$payload = @file_get_contents('php://input');
+		$sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
+		$event = null;
+
+		try {
+			$event = \Stripe\Webhook::constructEvent( $payload, $sig_header, $this->Settings->get( 'webhook_key' ) );
+		} catch(\UnexpectedValueException $e) {
+			// Invalid payload
+			http_response_code(400); // PHP 5.4 or greater
+			exit();
+		} catch(\Stripe\Error\SignatureVerification $e) {
+			// Invalid signature
+			http_response_code(400); // PHP 5.4 or greater
+			exit();
+		}
+
+		// Handle the checkout.session.completed event
+		if( $event->type == 'checkout.session.completed' )
+		{
+			$session = $event->data->object;
+			// Fulfill the purchase...
+			//handle_checkout_session($session);
+		}
+
+		http_response_code(200); // PHP 5.4 or greater
 	}
 
 
