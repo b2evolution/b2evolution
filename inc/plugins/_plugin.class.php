@@ -3934,8 +3934,9 @@ class Plugin
 	 */
 	function init_widget_params( $params, $default_params = NULL )
 	{
-		if( ! isset( $this->widget_params ) )
-		{	// Don't initialize params twice:
+		if( ! isset( $this->widget_params ) ||
+		    ( isset( $params['wi_ID'], $this->widget_params['wi_ID'] ) && $params['wi_ID'] != $this->widget_params['wi_ID'] ) )
+		{	// Don't initialize params twice or when they were initialized for previous widget of the same plugin:
 			if( $default_params === NULL )
 			{	// Set default params if they are not passed:
 				$default_params = array(
@@ -3972,14 +3973,18 @@ class Plugin
 			$params = $this->widget_params;
 		}
 
-		if ( empty( $name ) || ! isset ( $params[$name] ) )
-		{
-			return NULL;
+		$param_value = isset( $params[ $name ] ) ? $params[ $name ] : NULL;
+
+		if( $param_value === NULL && isset( $params['wi_ID'] ) )
+		{	// Try to get a value from passed widget:
+			$WidgetCache = & get_WidgetCache();
+			if( $Widget = & $WidgetCache->get_by_ID( $params['wi_ID'], false, false ) )
+			{
+				$param_value = $Widget->get_param( $name );
+			}
 		}
-		else
-		{
-			return $params[$name];
-		}
+
+		return $param_value;
 	}
 
 

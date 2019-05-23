@@ -159,7 +159,12 @@ class payment_stripe_plugin extends Plugin
 
 		echo $this->widget_params['block_body_start'];
 
-		echo '<a href="'.$this->get_htsrv_url( 'checkout', array( 'blog' => $Blog->ID ) ).'" class="'.$this->get_widget_setting( 'button_class' ).'">'.$this->get_widget_setting( 'button_text' ).'</a>';
+		$checkout_url = $this->get_htsrv_url( 'checkout', array(
+				'blog'  => $Blog->ID,
+				// Set widget ID in order to know what settings to use after redirect to success or cancel URLs:
+				'wi_ID' => $this->widget_params['wi_ID'],
+			) );
+		echo '<a href="'.$checkout_url.'" class="'.$this->get_widget_setting( 'button_class' ).'">'.$this->get_widget_setting( 'button_text' ).'</a>';
 
 		echo $this->widget_params['block_body_end'];
 
@@ -178,7 +183,7 @@ class payment_stripe_plugin extends Plugin
 	 */
 	function get_result_page_url( $setting_name, $params = array() )
 	{
-		$setting_value = $this->get_widget_setting( $setting_name );
+		$setting_value = $this->get_widget_setting( $setting_name, $params );
 		if( ! empty( $setting_value ) )
 		{
 			if( $ItemCache = & get_ItemCache() &&
@@ -188,7 +193,7 @@ class payment_stripe_plugin extends Plugin
 			}
 			elseif( $ChapterCache = & get_ChapterCache() &&
 			        $page_Chapter = & $ChapterCache->get_by_urlname( $setting_value, false, false ) )
-			{	// Use Cahpter permanent URL:
+			{	// Use Chapter permanent URL:
 				$result_page_url = $page_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' );
 			}
 		}
@@ -289,8 +294,8 @@ class payment_stripe_plugin extends Plugin
 			$session_data = [
 				'payment_method_types' => ['card'],
 				'line_items'           => [],
-				'success_url'          => $this->get_htsrv_url( 'success', array( 'blog' => $params['blog'] ), '&', true ),
-				'cancel_url'           => $this->get_htsrv_url( 'cancel', array( 'blog' => $params['blog'] ), '&', true ),
+				'success_url'          => $this->get_htsrv_url( 'success', $params, '&', true ),
+				'cancel_url'           => $this->get_htsrv_url( 'cancel', $params, '&', true ),
 				'client_reference_id'  => $Session->ID,
 			];
 
