@@ -217,7 +217,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 
 		if( empty( $cart_last_updated ) || ( $servertimenow > ( $cart_last_updated + 600 ) ) )
 		{	// Update availability and pricing of cart items
-			$update_Messages = $Cart->update_cart();
+			$update_Messages = $Cart->refresh();
 		}
 
 		// Get items from the current cart:

@@ -44,6 +44,11 @@ class Cart
 	var $items = NULL;
 
 	/**
+	 * @var array Order payment
+	 */
+	var $order_payment = NULL;
+
+	/**
 	 * Constructor
 	 */
 	function __construct()
@@ -82,7 +87,7 @@ class Cart
 
 
 	/**
-	 * Update shopping cart
+	 * Update Item in shopping cart
 	 *
 	 * @param integer|NULL Quantity of products,
 	 *                     0 - means to delete the item/product from the cart completely,
@@ -94,7 +99,7 @@ class Cart
 	 * @return boolean TRUE on successful updating,
 	 *                 FALSE on failed e.g. if a requested item doesn't exist
 	 */
-	function update( $qty = NULL, $item_ID = NULL, $curr_ID = NULL )
+	function update_item( $qty = NULL, $item_ID = NULL, $curr_ID = NULL )
 	{
 		global $Session, $Messages;
 
@@ -184,9 +189,13 @@ class Cart
 		if( $cart_is_updated )
 		{	// Update shopping cart with items data:
 			$cart_data = array(
-					'items' => $this->data, );
+					'items' => $this->data,
+				);
 			$Session->set( 'cart', $cart_data );
 			$Session->dbsave();
+
+			// Initialize payment order data in DB:
+			$this->init_order_payment();
 
 			// BLOCK CACHE INVALIDATION:
 			BlockCache::invalidate_key( 'cart', $Session->ID ); // Cart has updated for current session
@@ -202,7 +211,7 @@ class Cart
 	 *
 	 * @return string $Messages HTML output
 	 */
-	function update_cart()
+	function refresh()
 	{
 		global $Session, $Messages, $servertimenow, $cart_last_updated;
 
@@ -257,9 +266,13 @@ class Cart
 		if( $cart_is_updated )
 		{	// Update shopping cart with items data:
 			$cart_data = array(
-					'items' => $this->data, );
+					'items' => $this->data,
+				);
 			$Session->set( 'cart', $cart_data );
 			$Session->dbsave();
+
+			// Initialize payment order data in DB:
+			$this->init_order_payment();
 
 			// BLOCK CACHE INVALIDATION:
 			BlockCache::invalidate_key( 'cart', $Session->ID ); // Cart has updated for current session
@@ -269,6 +282,122 @@ class Cart
 		$Session->dbsave();
 
 		return $Messages->display( NULL, NULL, false, NULL );
+	}
+
+
+	/**
+	 * Clear shopping cart
+	 * Used after successful checkout
+	 */
+	function clear()
+	{
+		global $Session, $servertimenow;
+
+		$Session->delete( 'cart' );
+		$Session->set( 'cart_last_updated', $servertimenow );
+		$Session->dbsave();
+
+		// BLOCK CACHE INVALIDATION:
+		BlockCache::invalidate_key( 'cart', $Session->ID ); // Cart has updated for current session
+	}
+
+
+	/**
+	 * Initialize order payment for the current Session
+	 * Create one if it is not detected in DB by current Session ID
+	 */
+	function init_order_payment()
+	{
+		global $DB, $Session, $current_User;
+
+		if( $this->order_payment === NULL ||
+		    $this->order_payment['payt_sess_ID'] != $Session->ID )
+		{	// Try to get a stored order payment from DB:
+			$SQL = new SQL( 'Get order payment for session #'.$Session->ID );
+			$SQL->SELECT( '*' );
+			$SQL->FROM( 'T_order__payment' );
+			$SQL->WHERE( 'payt_sess_ID = '.$Session->ID );
+			$SQL->WHERE( 'payt_status != "success"' );
+			$this->order_payment = $DB->get_row( $SQL, ARRAY_A );
+		}
+
+		if( empty( $this->order_payment ) )
+		{	// If payment is not created for current Session yet:
+			$this->order_payment = array(
+				'payt_ID'              => NULL,
+				'payt_user_ID'         => is_logged_in() ? $current_User->ID : NULL,
+				'payt_sess_ID'         => $Session->ID,
+				'payt_status'          => 'new',
+				'payt_processor'       => NULL,
+				'payt_proc_session_ID' => NULL,
+				'payt_return_info'     => NULL,
+			);
+			// Insert new order payment:
+			$DB->query( 'INSERT INTO T_order__payment ( '.implode( ',', array_keys( $this->order_payment ) ).' )
+				VALUES ( '.$DB->quote( $this->order_payment ).' )' );
+			// Set ID of new inserted order payment:
+			$this->order_payment['payt_ID'] = $DB->insert_id;
+		}
+	}
+
+
+	/**
+	 * Get order payment of the current Session
+	 *
+	 * @return array Order payment data
+	 */
+	function get_order_payment()
+	{
+		// Load order payment from DB of create one:
+		$this->init_order_payment();
+
+		return $this->order_payment;
+	}
+
+
+	/**
+	 * Get order payment field value
+	 *
+	 * @param string Order payment field name withour prefix 'payt_'
+	 * @return string Field value
+	 */
+	function get_order_payment_field( $field_name )
+	{
+		$order_payment = $this->get_order_payment();
+
+		return isset( $order_payment[ 'payt_'.$field_name ] ) ? $order_payment[ 'payt_'.$field_name ] : NULL;
+	}
+
+
+	/**
+	 * Update order payment of the current Session
+	 *
+	 * @param array Order payment data
+	 */
+	function update_order_payment( $data )
+	{
+		global $DB;
+
+		// Load order payment from DB of create one:
+		$this->init_order_payment();
+
+		$update_fields = array();
+		foreach( $data as $field_key => $field_value )
+		{	// Check what fields can be updated:
+			if( in_array( $field_key, array( 'user_ID', 'status', 'processor', 'proc_session_ID', 'return_info' ) ) )
+			{
+				$update_fields[] = 'payt_'.$field_key.' = '.$DB->quote( $field_value );
+			}
+		}
+
+		if( empty( $update_fields ) )
+		{	// Nothing to update:
+			return false;
+		}
+
+		$DB->query( 'UPDATE T_order__payment
+			  SET '.implode( ', ', $update_fields ).'
+			WHERE payt_ID = '.$this->order_payment['payt_ID'] );
 	}
 
 

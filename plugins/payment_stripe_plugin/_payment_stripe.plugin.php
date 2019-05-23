@@ -23,7 +23,7 @@ class payment_stripe_plugin extends Plugin
 	var $code = 'payment_stripe';
 	var $priority = 100;
 	var $version = '7.0.1';
-	var $group = 'widget';
+	var $group = 'payment';
 	var $subgroup = 'content';
 	var $widget_icon = 'money';
 	var $number_of_installs = 1;
@@ -128,19 +128,19 @@ class payment_stripe_plugin extends Plugin
 		if( empty( $this->Settings->get( 'publish_api_key' ) ) ||
 		    empty( $this->Settings->get( 'secret_api_key' ) ) )
 		{	// Don't display this widget when no current Collection:
-			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because API keys are not provided.' );
+			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" is hidden because API keys are not provided.' );
 			return false;
 		}
 
 		if( substr( $this->Settings->get( 'publish_api_key' ), 0, 3 ) != 'pk_' )
 		{	// Don't display this widget with wrong publishable API key:
-			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because Publishable API key must start with <code>pk_</code>.' );
+			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" is hidden because Publishable API key must start with <code>pk_</code>.' );
 			return false;
 		}
 
 		if( substr( $this->Settings->get( 'secret_api_key' ), 0, 3 ) != 'sk_' )
 		{	// Don't display this widget with wrong secret API key:
-			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because Secret API key must start with <code>sk_</code>.' );
+			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" is hidden because Secret API key must start with <code>sk_</code>.' );
 			return false;
 		}
 
@@ -153,66 +153,13 @@ class payment_stripe_plugin extends Plugin
 			return false;
 		}
 
-		try
-		{	// Try to get a session for Stripe payment:
-			require_once( __DIR__.'/stripe-php/init.php' );
-
-			\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
-
-			$session_data = [
-				'payment_method_types' => ['card'],
-				'line_items' => [],
-				'success_url' => $this->get_result_page_url( 'page_success' ),
-				'cancel_url' => $this->get_result_page_url( 'page_cancel' ),
-			];
-
-			if( is_logged_in() )
-			{	// Use email address of current logged-in User:
-				$session_data['customer_email'] = $current_User->get( 'email' );
-			}
-
-			foreach( $cart_items as $cart_item_ID => $cart_Item )
-			{	// Set all items from shopping cart:
-				$session_data['line_items'][] = [
-					'name' => $Cart->get_title( $cart_item_ID, array( 'link_type' => 'none' ) ),
-					'images' => $Cart->get_image_urls( $cart_item_ID ),
-					'amount' => intval( $Cart->get_unit_price( $cart_item_ID ) * 100 ),
-					'currency' => $Cart->get_currency_code( $cart_item_ID ),
-					'quantity' => $Cart->get_quantity( $cart_item_ID ),
-				];
-			}
-
-			// Request session:
-			$session = \Stripe\Checkout\Session::create( $session_data );
-		}
-		catch( Exception $ex )
-		{	// Display unexpected error:
-			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" cannot be displayed because of error "'.$ex->getMessage().'".' );
-			return false;
-		}
-
 		echo $this->widget_params['block_start'];
-
-		echo '<script src="https://js.stripe.com/v3/"></script>';
-		echo '<script>
-			var stripe = Stripe( "'.$this->Settings->get( 'publish_api_key' ).'" );
-			jQuery( document ).on( "click", ".evo_widget.widget_plugin_payment_stripe", function()
-			{
-				stripe.redirectToCheckout({
-					sessionId: "'.$session['id'].'"
-				}).then(function (result) {
-					// If `redirectToCheckout` fails due to a browser or network
-					// error, display the localized error message to your customer
-					// using `result.error.message`.
-				});
-			} );
-		</script>';
 
 		$this->display_widget_title();
 
 		echo $this->widget_params['block_body_start'];
 
-		echo '<button class="'.$this->get_widget_setting( 'button_class' ).'">'.$this->get_widget_setting( 'button_text' ).'</button>';
+		echo '<a href="'.$this->get_htsrv_url( 'checkout', array( 'blog' => $Blog->ID ) ).'" class="'.$this->get_widget_setting( 'button_class' ).'">'.$this->get_widget_setting( 'button_text' ).'</a>';
 
 		echo $this->widget_params['block_body_end'];
 
@@ -226,12 +173,11 @@ class payment_stripe_plugin extends Plugin
 	 * Get URL to redirect after success or failed checkout
 	 *
 	 * @param string Setting name: 'page_succes', 'page_cancel'
+	 * @param array Additional parameters: 'blog' - to use when global collection is not defined yet
 	 * @return string
 	 */
-	function get_result_page_url( $setting_name )
+	function get_result_page_url( $setting_name, $params = array() )
 	{
-		global $Blog;
-
 		$setting_value = $this->get_widget_setting( $setting_name );
 		if( ! empty( $setting_value ) )
 		{
@@ -249,7 +195,13 @@ class payment_stripe_plugin extends Plugin
 
 		if( empty( $result_page_url ) )
 		{	// Use shopping cart page URL by default:
-			$result_page_url = $Blog->get( 'carturl' );
+			global $Blog, $baseurl;
+			if( ! isset( $Blog ) && isset( $params['blog'] ) )
+			{	// Try to set collection from params:
+				$BlogCache = & get_BlogCache();
+				$Blog = $BlogCache->get_by_ID( $params['blog'], false, false );
+			}
+			$result_page_url = empty( $Blog ) ? $baseurl : $Blog->get( 'carturl' );
 		}
 
 		return $result_page_url;
@@ -291,6 +243,150 @@ class payment_stripe_plugin extends Plugin
 		}
 
 		return $cache_keys;
+	}
+
+
+	/**
+	 * Return the list of Htsrv (HTTP-Services) provided by the plugin.
+	 *
+	 * This implements the plugin interface for the list of methods that are valid to
+	 * get called through htsrv/call_plugin.php.
+	 *
+	 * @return array
+	 */
+	function GetHtsrvMethods()
+	{
+		return array( 'checkout', 'success', 'cancel' );
+	}
+
+
+	/**
+	 * Plugin action after success payment
+	 *
+	 * @param array Params
+	 */
+	function htsrv_checkout( $params )
+	{
+		global $Messages, $current_User, $Session;
+
+		$Cart = & get_Cart();
+
+		// Check order status:
+		if( $Cart->get_order_payment_field( 'status' ) == 'success' )
+		{	// Display error message if order was already paid before:
+			$Messages->add( T_('This order has already been paid for.'), 'error' );
+			// Redirect back:
+			header_redirect();
+			// Exit here.
+		}
+
+		try
+		{	// Try to get a session for Stripe payment:
+			require_once( __DIR__.'/stripe-php/init.php' );
+
+			\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
+
+			$session_data = [
+				'payment_method_types' => ['card'],
+				'line_items'           => [],
+				'success_url'          => $this->get_htsrv_url( 'success', array( 'blog' => $params['blog'] ), '&', true ),
+				'cancel_url'           => $this->get_htsrv_url( 'cancel', array( 'blog' => $params['blog'] ), '&', true ),
+				'client_reference_id'  => $Session->ID,
+			];
+
+			if( is_logged_in() )
+			{	// Use email address of current logged-in User:
+				$session_data['customer_email'] = $current_User->get( 'email' );
+			}
+
+			$cart_items = $Cart->get_items();
+			foreach( $cart_items as $cart_item_ID => $cart_Item )
+			{	// Set all items from shopping cart:
+				$session_data['line_items'][] = [
+					'name'     => $Cart->get_title( $cart_item_ID, array( 'link_type' => 'none' ) ),
+					'images'   => $Cart->get_image_urls( $cart_item_ID ),
+					'amount'   => intval( $Cart->get_unit_price( $cart_item_ID ) * 100 ),
+					'currency' => $Cart->get_currency_code( $cart_item_ID ),
+					'quantity' => $Cart->get_quantity( $cart_item_ID ),
+				];
+			}
+
+			// Request session:
+			$session = \Stripe\Checkout\Session::create( $session_data );
+		}
+		catch( Exception $ex )
+		{	// Display unexpected error:
+			$Messages->add( 'Plugin widget "'.$this->name.'" cannot be used because of error "'.$ex->getMessage().'".', 'error' );
+			// Redirect back:
+			header_redirect();
+			// Exit here.
+		}
+
+		// Mark the payment is executing by Stripe processor:
+		$Cart->update_order_payment( array(
+			'processor'       => 'Stripe',
+			'proc_session_ID' => $session['id'],
+		) );
+
+		// Redirect to pay order:
+		echo '<script src="https://js.stripe.com/v3/"></script>';
+		echo '<script>
+			var stripe = Stripe( "'.$this->Settings->get( 'publish_api_key' ).'" );
+			stripe.redirectToCheckout({
+				sessionId: "'.$session['id'].'",
+			}).then(function (result) {
+				alert( result.error.message );
+			});
+		</script>';
+	}
+
+
+	/**
+	 * Plugin action after success payment
+	 *
+	 * @param array Params
+	 */
+	function htsrv_success( $params )
+	{
+		global $Messages;
+
+		$Cart = & get_Cart();
+
+		// TODO: Implement checking from Stripe server by Webhooks...
+
+		// Update status of the order payment:
+		$Cart->update_order_payment( array(
+			'status' => 'success',
+		) );
+
+		// Clear cart after successful payment
+		$Cart->clear();
+
+		$Messages->add( T_('Payment has been done successfully.'), 'success' );
+
+		header_redirect( $this->get_result_page_url( 'page_success', $params ) );
+	}
+
+
+	/**
+	 * Plugin action after success payment
+	 *
+	 * @param array Params
+	 */
+	function htsrv_cancel( $params )
+	{
+		global $Messages;
+
+		$Cart = & get_Cart();
+
+		// Update status of the order payment:
+		$Cart->update_order_payment( array(
+			'status' => 'cancelled',
+		) );
+
+		$Messages->add( T_('Payment has not been finished, please try it again.'), 'error' );
+
+		header_redirect( $this->get_result_page_url( 'page_cancel', $params ) );
 	}
 }
 ?>

@@ -1700,7 +1700,7 @@ function skin_init( $disp )
 					if( $Cart = & get_Cart() )
 					{
 						$qty = ( $action == 'remove' ? 0 : NULL );
-						$Cart->update( $qty );
+						$Cart->update_item( $qty );
 					}
 					header_redirect( $Blog->get( 'carturl', array( 'glue' => '&' ) ) );
 					break;
