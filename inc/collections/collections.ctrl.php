@@ -715,7 +715,7 @@ switch( $action )
 
 		if( $create_sample_contents )
 		{
-			create_demo_collections( $demo_users, $create_demo_users );
+			create_demo_contents( $demo_users, $create_demo_users );
 			$Messages->add_to_group( T_('Created sample contents.'), 'success', T_('Demo contents').':' );
 		}
 		$DB->commit();

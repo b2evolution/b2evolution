@@ -1278,7 +1278,7 @@ function create_demo_messages()
  * @param boolean True to create users for the demo content
  * @return integer Number of collections created
  */
-function create_demo_collections( $demo_users = array(), $use_demo_users = true, $initial_install = true )
+function create_demo_contents( $demo_users = array(), $use_demo_users = true, $initial_install = true )
 {
 	global $current_User, $DB, $Settings;
 
@@ -3722,7 +3722,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 				'title' => T_('Pilot Varsity Fountain Pens, 0.1mm medium nib, 7/pack'),
 				'category' => 'pens',
 				'extra_cats' => array( 'new-arrivals' ),
-				'tags'     => array( 'pen' ),
+				'tags'     => 'pen',
 				'type'     => 'Product',
 				'content'  => '<ul><li>'.$pen_desc[1]."</li>\n<li>".$pen_desc[2]."</li>\n<li>".$pen_desc[0].'</li></ul>',
 				'files'    => array(
@@ -4472,7 +4472,7 @@ function install_demo_content()
 	if( $create_sample_contents )
 	{
 		evo_flush();
-		$collections_installed = create_demo_collections( $demo_users, true, false );
+		$collections_installed = create_demo_contents( $demo_users, true, false );
 	}
 
 	if( $create_demo_email_lists )

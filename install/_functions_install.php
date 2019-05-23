@@ -811,19 +811,15 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'webmention_plugin' );
 	}
 
-	if( $old_db_version < 15330 )
-	{
-		install_plugin( 'instore_pickup_plugin' );
-		install_plugin( 'courier_example_plugin' );
-	}
-
 	if( $old_db_version < 15380 )
 	{
 		install_plugin( 'financial_contribution_plugin' );
 	}
 
-	if( $old_db_version < 15510 )
+	if( $old_db_version < 15480 )
 	{
+		install_plugin( 'instore_pickup_plugin' );
+		install_plugin( 'courier_example_plugin' );
 		install_plugin( 'payment_stripe_plugin' );
 	}
 }
