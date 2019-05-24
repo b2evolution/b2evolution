@@ -34,6 +34,8 @@ class payment_stripe_plugin extends Plugin
 		$this->name = T_('Stripe payment processor');
 		$this->short_desc = T_('Stripe payment processor');
 		$this->long_desc = T_('Stripe payment processor');
+
+		$this->payment_processor = 'Stripe';
 	}
 
 
@@ -135,22 +137,21 @@ class payment_stripe_plugin extends Plugin
 			return false;
 		}
 
-		if( empty( $this->Settings->get( 'publish_api_key' ) ) ||
-		    empty( $this->Settings->get( 'secret_api_key' ) ) )
-		{	// Don't display this widget when no current Collection:
-			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" is hidden because API keys are not provided.' );
-			return false;
-		}
-
 		if( substr( $this->Settings->get( 'publish_api_key' ), 0, 3 ) != 'pk_' )
 		{	// Don't display this widget with wrong publishable API key:
-			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" is hidden because Publishable API key must start with <code>pk_</code>.' );
+			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" cannot be used because "Publishable API key" must start with <code>pk_</code>.' );
 			return false;
 		}
 
 		if( substr( $this->Settings->get( 'secret_api_key' ), 0, 3 ) != 'sk_' )
 		{	// Don't display this widget with wrong secret API key:
-			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" is hidden because Secret API key must start with <code>sk_</code>.' );
+			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" cannot be used because "Secret API key" must start with <code>sk_</code>.' );
+			return false;
+		}
+
+		if( substr( $this->Settings->get( 'webhook_key' ), 0, 6 ) != 'whsec_' )
+		{	// Don't display this widget with wrong secret API key:
+			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" cannot be used because "Webhook signing secret key" must start with <code>whsec_</code>.' );
 			return false;
 		}
 
@@ -287,7 +288,7 @@ class payment_stripe_plugin extends Plugin
 		$Cart = & get_Cart();
 
 		// Check order status:
-		if( $Cart->get_order_payment_field( 'status' ) == 'success' )
+		if( $Cart->get_payment_field( 'status', $this->payment_processor ) == 'success' )
 		{	// Display error message if order was already paid before:
 			$Messages->add( T_('This order has already been paid for.'), 'error' );
 			// Redirect back:
@@ -336,9 +337,9 @@ class payment_stripe_plugin extends Plugin
 			// Exit here.
 		}
 
-		// Mark the payment is executing by Stripe processor:
-		$Cart->update_order_payment( array(
-			'processor'       => 'Stripe',
+		// Save the payment is executing by Stripe processor:
+		$Cart->save_payment( $this->payment_processor, array(
+			'status'          => 'new',
 			'proc_session_ID' => $session['id'],
 		) );
 
@@ -366,15 +367,17 @@ class payment_stripe_plugin extends Plugin
 
 		$Cart = & get_Cart();
 
-		// TODO: Implement checking from Stripe server by Webhooks...
+		if( $Cart->get_payment_field( 'status', $this->payment_processor ) == 'new' )
+		{	// Update payment status to "pending" only when it is a "new":
+			$Cart->save_payment( $this->payment_processor, array(
+				'status' => 'pending',
+			) );
+		}
 
-		// Update status of the order payment:
-		$Cart->update_order_payment( array(
-			'status' => 'success',
-		) );
-
-		// Clear cart after successful payment
-		$Cart->clear();
+		// Clear cart after successful payment:
+		// TODO: The clearing of shopping cart is temporary disabled for testing,
+		//       probably it will be moved to $this->htsrv_webhook().
+		//$Cart->clear();
 
 		$Messages->add( T_('Payment has been done successfully.'), 'success' );
 
@@ -390,10 +393,13 @@ class payment_stripe_plugin extends Plugin
 	function htsrv_webhook( $params )
 	{
 		$Cart = & get_Cart();
-		// Check to be sure this webhook was called:
-		$Cart->update_order_payment( array(
+
+		// THIS IS A TEST CODE TO Check to be sure this webhook was called:
+		$Cart->save_payment( $this->payment_processor, array(
+			'status'           => 'success',
 			'payt_return_info' => 'webhook',
 		) );
+		return;
 
 		require_once( __DIR__.'/stripe-php/init.php' );
 		\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
@@ -418,8 +424,13 @@ class payment_stripe_plugin extends Plugin
 		if( $event->type == 'checkout.session.completed' )
 		{
 			$session = $event->data->object;
-			// Fulfill the purchase...
-			//handle_checkout_session($session);
+
+			// TODO: We should update payment by passed payt_ID in $session somehow,
+			//       because the webhook is called by different $Session than user has on browser.
+			$Cart->save_payment( $this->payment_processor, array(
+				'status'           => 'success',
+				'payt_return_info' => serialize( $session ),
+			) );
 		}
 
 		http_response_code(200); // PHP 5.4 or greater
@@ -438,7 +449,7 @@ class payment_stripe_plugin extends Plugin
 		$Cart = & get_Cart();
 
 		// Update status of the order payment:
-		$Cart->update_order_payment( array(
+		$Cart->save_payment( $this->payment_processor, array(
 			'status' => 'cancelled',
 		) );
 

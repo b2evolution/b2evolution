@@ -44,9 +44,9 @@ class Cart
 	var $items = NULL;
 
 	/**
-	 * @var array Order payment
+	 * @var array Payments per processor
 	 */
-	var $order_payment = NULL;
+	var $payments = NULL;
 
 	/**
 	 * Constructor
@@ -194,9 +194,6 @@ class Cart
 			$Session->set( 'cart', $cart_data );
 			$Session->dbsave();
 
-			// Initialize payment order data in DB:
-			$this->init_order_payment();
-
 			// BLOCK CACHE INVALIDATION:
 			BlockCache::invalidate_key( 'cart', $Session->ID ); // Cart has updated for current session
 		}
@@ -271,9 +268,6 @@ class Cart
 			$Session->set( 'cart', $cart_data );
 			$Session->dbsave();
 
-			// Initialize payment order data in DB:
-			$this->init_order_payment();
-
 			// BLOCK CACHE INVALIDATION:
 			BlockCache::invalidate_key( 'cart', $Session->ID ); // Cart has updated for current session
 		}
@@ -303,101 +297,124 @@ class Cart
 
 
 	/**
-	 * Initialize order payment for the current Session
-	 * Create one if it is not detected in DB by current Session ID
+	 * Load payments for the current Session
 	 */
-	function init_order_payment()
+	function load_payments()
 	{
-		global $DB, $Session, $current_User;
+		global $DB, $Session;
 
-		if( $this->order_payment === NULL ||
-		    $this->order_payment['payt_sess_ID'] != $Session->ID )
-		{	// Try to get a stored order payment from DB:
-			$SQL = new SQL( 'Get order payment for session #'.$Session->ID );
-			$SQL->SELECT( '*' );
-			$SQL->FROM( 'T_order__payment' );
-			$SQL->WHERE( 'payt_sess_ID = '.$Session->ID );
-			$SQL->WHERE( 'payt_status != "success"' );
-			$this->order_payment = $DB->get_row( $SQL, ARRAY_A );
+		if( $this->payments !== NULL )
+		{	// Don't load twice:
+			return;
 		}
 
-		if( empty( $this->order_payment ) )
-		{	// If payment is not created for current Session yet:
-			$this->order_payment = array(
-				'payt_ID'              => NULL,
-				'payt_user_ID'         => is_logged_in() ? $current_User->ID : NULL,
-				'payt_sess_ID'         => $Session->ID,
-				'payt_status'          => 'new',
-				'payt_processor'       => NULL,
-				'payt_proc_session_ID' => NULL,
-				'payt_return_info'     => NULL,
-			);
-			// Insert new order payment:
-			$DB->query( 'INSERT INTO T_order__payment ( '.implode( ',', array_keys( $this->order_payment ) ).' )
-				VALUES ( '.$DB->quote( $this->order_payment ).' )' );
-			// Set ID of new inserted order payment:
-			$this->order_payment['payt_ID'] = $DB->insert_id;
+		$this->payments = array();
+
+		// Load payments for current session and for all processors:
+		$SQL = new SQL( 'Get payment for session #'.$Session->ID );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_order__payment' );
+		$SQL->WHERE( 'payt_sess_ID = '.$Session->ID );
+		$SQL->WHERE( 'payt_status != "success"' );
+		$payments = $DB->get_results( $SQL, ARRAY_A );
+
+		foreach( $payments as $payment )
+		{
+			$this->payments[ $payment['payt_processor'] ] = array();
+			foreach( $payment as $field_name => $field_value )
+			{	// Store field name without DB table prefix "payt_":
+				$this->payments[ $payment['payt_processor'] ][ substr( $field_name, 5 ) ] = $field_value;
+			}
 		}
 	}
 
 
 	/**
-	 * Get order payment of the current Session
+	 * Get payment of the current Session by processor
 	 *
-	 * @return array Order payment data
+	 * @param string Payment processor name, e.g. 'Stripe', 'PayPal'
+	 * @return array|NULL Payment data
 	 */
-	function get_order_payment()
+	function get_payment( $processor )
 	{
-		// Load order payment from DB of create one:
-		$this->init_order_payment();
+		if( empty( $processor ) )
+		{	// Don't allow empty payment processor name:
+			return NULL;
+		}
 
-		return $this->order_payment;
+		// Load payments from DB:
+		$this->load_payments();
+
+		return isset( $this->payments[ $processor ] ) ? $this->payments[ $processor ] : NULL;
 	}
 
 
 	/**
-	 * Get order payment field value
+	 * Get payment field value
 	 *
-	 * @param string Order payment field name withour prefix 'payt_'
+	 * @param string Payment field name withour prefix 'payt_'
+	 * @param string Payment processor name, e.g. 'Stripe', 'PayPal'
 	 * @return string Field value
 	 */
-	function get_order_payment_field( $field_name )
+	function get_payment_field( $field_name, $processor )
 	{
-		$order_payment = $this->get_order_payment();
+		$payment = $this->get_payment( $processor );
 
-		return isset( $order_payment[ 'payt_'.$field_name ] ) ? $order_payment[ 'payt_'.$field_name ] : NULL;
+		return isset( $payment[ $field_name ] ) ? $payment[ $field_name ] : NULL;
 	}
 
 
 	/**
-	 * Update order payment of the current Session
+	 * Save(Insert/Update) payment of the current Session for requested processor
 	 *
-	 * @param array Order payment data
+	 * @param string Payment processor name, e.g. 'Stripe', 'PayPal'
+	 * @param array payment data
 	 */
-	function update_order_payment( $data )
+	function save_payment( $processor, $data )
 	{
-		global $DB;
+		global $DB, $current_User, $Session;
 
-		// Load order payment from DB of create one:
-		$this->init_order_payment();
-
-		$update_fields = array();
 		foreach( $data as $field_key => $field_value )
 		{	// Check what fields can be updated:
-			if( in_array( $field_key, array( 'user_ID', 'status', 'processor', 'proc_session_ID', 'return_info' ) ) )
-			{
-				$update_fields[] = 'payt_'.$field_key.' = '.$DB->quote( $field_value );
+			if( ! in_array( $field_key, array( 'user_ID', 'status', 'processor', 'proc_session_ID', 'return_info' ) ) )
+			{	// Unset wrong payment field:
+				unset( $data[ $field_key ] );
 			}
 		}
 
-		if( empty( $update_fields ) )
-		{	// Nothing to update:
-			return false;
-		}
+		// Try to get payment from DB or cache:
+		$payment = $this->get_payment( $processor );
 
-		$DB->query( 'UPDATE T_order__payment
-			  SET '.implode( ', ', $update_fields ).'
-			WHERE payt_ID = '.$this->order_payment['payt_ID'] );
+		if( empty( $payment ) )
+		{	// Insert new payment:
+			$this->payments[ $processor ] = array_merge( array(
+				'user_ID'         => is_logged_in() ? $current_User->ID : NULL,
+				'sess_ID'         => $Session->ID,
+				'status'          => 'new',
+				'processor'       => $processor,
+				//'proc_session_ID' => NULL,
+				//'return_info'     => NULL,
+			), $data );
+			$DB->query( 'INSERT INTO T_order__payment ( payt_'.implode( ', payt_', array_keys( $this->payments[ $processor ] ) ).' )
+				VALUES ( '.$DB->quote( $this->payments[ $processor ] ).' )' );
+			// Set ID of new inserted payment:
+			$this->payments[ $processor ]['ID'] = $DB->insert_id;
+		}
+		else
+		{	// Update payment:
+			if( empty( $data ) )
+			{	// Nothing to update:
+				return;
+			}
+			$update_fields = array();
+			foreach( $data as $field_key => $field_value )
+			{
+				$update_fields[] = 'payt_'.$field_key.' = '.$DB->quote( $field_value );
+			}
+			$DB->query( 'UPDATE T_order__payment
+				  SET '.implode( ', ', $update_fields ).'
+				WHERE payt_ID = '.$DB->quote( $payment['ID'] ) );
+		}
 	}
 
 
