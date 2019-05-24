@@ -157,7 +157,7 @@ class payment_stripe_plugin extends Plugin
 
 		$Cart = & get_Cart();
 
-		if( $Cart->get_payment_field( 'status', $this->payment_processor ) == 'success' )
+		if( in_array( $Cart->get_payment_field( 'status', $this->payment_processor ), array( 'pending', 'success' ) ) )
 		{	// Display error message if order was already paid before:
 			$this->display_widget_error_message( T_('This order has already been paid for.') );
 			return false;
@@ -279,12 +279,12 @@ class payment_stripe_plugin extends Plugin
 	 */
 	function GetHtsrvMethods()
 	{
-		return array( 'checkout', 'success', 'cancel' );
+		return array( 'checkout', 'success', 'cancel', 'webhook' );
 	}
 
 
 	/**
-	 * Plugin action after success payment
+	 * Plugin action on click "Checkout" button before redirect to Stripe payment page
 	 *
 	 * @param array Params
 	 */
@@ -295,11 +295,9 @@ class payment_stripe_plugin extends Plugin
 		$Cart = & get_Cart();
 
 		// Check order status:
-		if( $Cart->get_payment_field( 'status', $this->payment_processor ) == 'success' )
+		if( in_array( $Cart->get_payment_field( 'status', $this->payment_processor ), array( 'pending', 'success' ) ) )
 		{	// Display error message if order was already paid before:
-			$Messages->add( T_('This order has already been paid for.'), 'error' );
-			// Redirect back:
-			header_redirect();
+			debug_die( T_('This order has already been paid for.') );
 			// Exit here.
 		}
 
@@ -309,11 +307,12 @@ class payment_stripe_plugin extends Plugin
 		try
 		{	// Try to get a session for Stripe payment:
 			$session_data = [
-				'payment_method_types' => ['card'],
-				'line_items'           => [],
-				'success_url'          => $this->get_htsrv_url( 'success', $params, '&', true ),
-				'cancel_url'           => $this->get_htsrv_url( 'cancel', $params, '&', true ),
-				'client_reference_id'  => $Session->ID,
+				'billing_address_collection' => 'required',
+				'payment_method_types'       => ['card'],
+				'line_items'                 => [],
+				'success_url'                => $this->get_htsrv_url( 'success', $params, '&', true ),
+				'cancel_url'                 => $this->get_htsrv_url( 'cancel', $params, '&', true ),
+				'client_reference_id'        => $Session->ID,
 			];
 
 			if( is_logged_in() )
@@ -326,7 +325,7 @@ class payment_stripe_plugin extends Plugin
 			{	// Set all items from shopping cart:
 				$session_data['line_items'][] = [
 					'name'     => $Cart->get_title( $cart_item_ID, array( 'link_type' => 'none' ) ),
-					'images'   => $Cart->get_image_urls( $cart_item_ID ),
+					'images'   => $Cart->get_image_urls( $cart_item_ID, array( 'image_size' => 'original' ) ),
 					'amount'   => intval( $Cart->get_unit_price( $cart_item_ID ) * 100 ),
 					'currency' => $Cart->get_currency_code( $cart_item_ID ),
 					'quantity' => $Cart->get_quantity( $cart_item_ID ),
@@ -399,48 +398,49 @@ class payment_stripe_plugin extends Plugin
 	 */
 	function htsrv_webhook( $params )
 	{
-		$Cart = & get_Cart();
-
-		// THIS IS A TEST CODE TO Check to be sure this webhook was called:
-		$Cart->save_payment( $this->payment_processor, array(
-			'status'           => 'success',
-			'payt_return_info' => 'webhook',
-		) );
-		return;
-
 		require_once( __DIR__.'/stripe-php/init.php' );
 		\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
 
-		$payload = @file_get_contents('php://input');
-		$sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
-		$event = null;
+		$payload = @file_get_contents( 'php://input' );
 
-		try {
-			$event = \Stripe\Webhook::constructEvent( $payload, $sig_header, $this->Settings->get( 'webhook_key' ) );
-		} catch(\UnexpectedValueException $e) {
-			// Invalid payload
-			http_response_code(400); // PHP 5.4 or greater
+		try
+		{
+			$event = \Stripe\Webhook::constructEvent( $payload, $_SERVER['HTTP_STRIPE_SIGNATURE'], $this->Settings->get( 'webhook_key' ) );
+		}
+		catch( \UnexpectedValueException $e )
+		{	// Invalid payload
+			http_response_code( 400 );
 			exit();
-		} catch(\Stripe\Error\SignatureVerification $e) {
-			// Invalid signature
-			http_response_code(400); // PHP 5.4 or greater
+		}
+		catch( \Stripe\Error\SignatureVerification $e )
+		{	// Invalid signature
+			http_response_code( 400 );
 			exit();
 		}
 
 		// Handle the checkout.session.completed event
-		if( $event->type == 'checkout.session.completed' )
+		if( ! empty( $event ) && $event->type == 'checkout.session.completed' )
 		{
 			$session = $event->data->object;
 
-			// TODO: We should update payment by passed payt_ID in $session somehow,
-			//       because the webhook is called by different $Session than user has on browser.
+			$Cart = & get_Cart();
+
+			// Check if payment exists with requested Session ID(client_reference_id) and status is proper to complete payment:
+			$payment_status = $Cart->get_payment_field( 'status', $this->payment_processor, $session->client_reference_id );
+			if( ! in_array( $payment_status, array( 'new', 'pending' ) ) )
+			{	// Could not find payment in the requested session or payment was already completed or canceled:
+				http_response_code( 400 );
+				exit();
+			}
+
+			// Update payment status to "success" and store payload data into DB:
 			$Cart->save_payment( $this->payment_processor, array(
-				'status'           => 'success',
-				'payt_return_info' => serialize( $session ),
+				'status'      => 'success',
+				'return_info' => $payload,
 			) );
 		}
 
-		http_response_code(200); // PHP 5.4 or greater
+		http_response_code( 200 );
 	}
 
 

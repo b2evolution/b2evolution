@@ -298,8 +298,10 @@ class Cart
 
 	/**
 	 * Load payments for the current Session
+	 *
+	 * @param integer|NULL Session ID or NULL to use current Session
 	 */
-	function load_payments()
+	function load_payments( $session_ID = NULL )
 	{
 		global $DB, $Session;
 
@@ -308,13 +310,19 @@ class Cart
 			return;
 		}
 
+		if( $session_ID === NULL )
+		{	// Use current Session:
+			$session_ID = $Session->ID;
+		}
+
 		$this->payments = array();
 
 		// Load payments for current session and for all processors:
-		$SQL = new SQL( 'Get payment for session #'.$Session->ID );
+		$SQL = new SQL( 'Get payment for session #'.$session_ID );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_order__payment' );
-		$SQL->WHERE( 'payt_sess_ID = '.$Session->ID );
+		$SQL->WHERE( 'payt_sess_ID = '.$DB->quote( $session_ID ) );
+		// TODO: Temprorary commented in order to test
 		//$SQL->WHERE( 'payt_status != "success"' );
 		$payments = $DB->get_results( $SQL, ARRAY_A );
 
@@ -333,9 +341,10 @@ class Cart
 	 * Get payment of the current Session by processor
 	 *
 	 * @param string Payment processor name, e.g. 'Stripe', 'PayPal'
+	 * @param integer|NULL Session ID or NULL to use current Session
 	 * @return array|NULL Payment data
 	 */
-	function get_payment( $processor )
+	function get_payment( $processor, $session_ID = NULL )
 	{
 		if( empty( $processor ) )
 		{	// Don't allow empty payment processor name:
@@ -343,7 +352,7 @@ class Cart
 		}
 
 		// Load payments from DB:
-		$this->load_payments();
+		$this->load_payments( $session_ID );
 
 		return isset( $this->payments[ $processor ] ) ? $this->payments[ $processor ] : NULL;
 	}
@@ -354,11 +363,12 @@ class Cart
 	 *
 	 * @param string Payment field name withour prefix 'payt_'
 	 * @param string Payment processor name, e.g. 'Stripe', 'PayPal'
+	 * @param integer|NULL Session ID or NULL to use current Session
 	 * @return string Field value
 	 */
-	function get_payment_field( $field_name, $processor )
+	function get_payment_field( $field_name, $processor, $session_ID = NULL )
 	{
-		$payment = $this->get_payment( $processor );
+		$payment = $this->get_payment( $processor, $session_ID );
 
 		return isset( $payment[ $field_name ] ) ? $payment[ $field_name ] : NULL;
 	}
