@@ -156,6 +156,13 @@ class payment_stripe_plugin extends Plugin
 		}
 
 		$Cart = & get_Cart();
+
+		if( $Cart->get_payment_field( 'status', $this->payment_processor ) == 'success' )
+		{	// Display error message if order was already paid before:
+			$this->display_widget_error_message( T_('This order has already been paid for.') );
+			return false;
+		}
+
 		$cart_items = $Cart->get_items();
 
 		if( empty( $cart_items ) )

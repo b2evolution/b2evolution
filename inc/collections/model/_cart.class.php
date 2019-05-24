@@ -315,7 +315,7 @@ class Cart
 		$SQL->SELECT( '*' );
 		$SQL->FROM( 'T_order__payment' );
 		$SQL->WHERE( 'payt_sess_ID = '.$Session->ID );
-		$SQL->WHERE( 'payt_status != "success"' );
+		//$SQL->WHERE( 'payt_status != "success"' );
 		$payments = $DB->get_results( $SQL, ARRAY_A );
 
 		foreach( $payments as $payment )
