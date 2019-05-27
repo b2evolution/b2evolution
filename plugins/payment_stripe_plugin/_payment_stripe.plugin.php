@@ -36,6 +36,7 @@ class payment_stripe_plugin extends Plugin
 		$this->long_desc = T_('Stripe payment processor');
 
 		$this->payment_processor = 'Stripe';
+		$this->api_version = '2019-05-16';
 	}
 
 
@@ -303,6 +304,7 @@ class payment_stripe_plugin extends Plugin
 
 		require_once( __DIR__.'/stripe-php/init.php' );
 		\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
+		\Stripe\Stripe::setApiVersion( $this->api_version );
 
 		try
 		{	// Try to get a session for Stripe payment:
