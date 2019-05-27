@@ -783,6 +783,10 @@ class collections_Module extends Module
 					'text' => T_('Tags'),
 					'href' => $admin_url.'?ctrl=itemtags'
 				);
+				$site_menu['entries']['payments'] = array(
+					'text' => T_('Payments'),
+					'href' => $admin_url.'?ctrl=payments'
+				);
 			}
 		}
 

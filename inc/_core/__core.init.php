@@ -139,6 +139,7 @@ $ctrl_mappings = array(
 		'automations'      => 'automations/automations.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
 		'customize'        => 'customize/customize.ctrl.php',
+		'payments'         => 'orders/payments.ctrl.php',
 	);
 
 
@@ -624,6 +625,25 @@ function & get_CronjobCache()
 	}
 
 	return $CronjobCache;
+}
+
+
+/**
+ * Get the PaymentCache
+ *
+ * @return PaymentCache
+ */
+function & get_PaymentCache()
+{
+	global $PaymentCache;
+
+	if( ! isset( $PaymentCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'orders/model/_payment.class.php', 'Payment' );
+		$PaymentCache = new DataObjectCache( 'Payment', false, 'T_order__payment', 'payt_', 'payt_ID', 'payt_ID', 'payt_ID' );
+	}
+
+	return $PaymentCache;
 }
 
 
