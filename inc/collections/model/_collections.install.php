@@ -677,6 +677,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			payt_sess_ID         INT(10) UNSIGNED NOT NULL,
 			payt_status          ENUM ( 'new', 'pending', 'success', 'cancelled' ) COLLATE ascii_general_ci DEFAULT 'new' NOT NULL,
 			payt_processor       VARCHAR( 32 ) COLLATE ascii_general_ci NOT NULL,
+			payt_secret          VARCHAR( 32 ) COLLATE ascii_general_ci NOT NULL,
 			payt_proc_session_ID VARCHAR( 64 ) COLLATE ascii_general_ci NULL,
 			payt_return_info     TEXT NULL,
 			PRIMARY KEY payt_ID  (payt_ID),

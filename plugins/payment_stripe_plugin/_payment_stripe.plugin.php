@@ -306,13 +306,17 @@ class payment_stripe_plugin extends Plugin
 
 		try
 		{	// Try to get a session for Stripe payment:
+
+			// Insert new payment for Stripe processor:
+			$payment = $Cart->save_payment( $this->payment_processor );
+
 			$session_data = [
 				'billing_address_collection' => 'required',
 				'payment_method_types'       => ['card'],
 				'line_items'                 => [],
 				'success_url'                => $this->get_htsrv_url( 'success', $params, '&', true ),
 				'cancel_url'                 => $this->get_htsrv_url( 'cancel', $params, '&', true ),
-				'client_reference_id'        => $Session->ID,
+				'client_reference_id'        => $payment['ID'].'-'.$payment['secret'],
 			];
 
 			if( is_logged_in() )
@@ -343,9 +347,8 @@ class payment_stripe_plugin extends Plugin
 			// Exit here.
 		}
 
-		// Save the payment is executing by Stripe processor:
+		// Save ID of Stripe session for the new created payment:
 		$Cart->save_payment( $this->payment_processor, array(
-			'status'          => 'new',
 			'proc_session_ID' => $session['id'],
 		) );
 
@@ -407,13 +410,15 @@ class payment_stripe_plugin extends Plugin
 		{
 			$event = \Stripe\Webhook::constructEvent( $payload, $_SERVER['HTTP_STRIPE_SIGNATURE'], $this->Settings->get( 'webhook_key' ) );
 		}
-		catch( \UnexpectedValueException $e )
+		catch( \UnexpectedValueException $ex )
 		{	// Invalid payload
+			echo 'Error: '.$ex->getMessage();
 			http_response_code( 400 );
 			exit();
 		}
-		catch( \Stripe\Error\SignatureVerification $e )
+		catch( \Stripe\Error\SignatureVerification $ex )
 		{	// Invalid signature
+			echo 'Error: '.$ex->getMessage();
 			http_response_code( 400 );
 			exit();
 		}
@@ -423,12 +428,27 @@ class payment_stripe_plugin extends Plugin
 		{
 			$session = $event->data->object;
 
+			// Extract payment ID and secret key:
+			$payment_data = explode( '-', $session->client_reference_id );
+			$payment_ID = $payment_data[0];
+			$payment_secret = isset( $payment_data[1] ) ? $payment_data[1] : false;
+
 			$Cart = & get_Cart();
 
-			// Check if payment exists with requested Session ID(client_reference_id) and status is proper to complete payment:
-			$payment_status = $Cart->get_payment_field( 'status', $this->payment_processor, $session->client_reference_id );
+			// Try to get payment by ID
+			$payment = $Cart->get_payment_by_ID( $payment_ID, $this->payment_processor );
+
+			if( ! $payment || $payment['secret'] != $payment_secret )
+			{	// Could not find payment by ID and sercret key:
+				echo 'Could not find payment "'.$session->client_reference_id.'"';
+				http_response_code( 400 );
+				exit();
+			}
+
+			$payment_status = $Cart->get_payment_field( 'status', $this->payment_processor );
 			if( ! in_array( $payment_status, array( 'new', 'pending' ) ) )
-			{	// Could not find payment in the requested session or payment was already completed or canceled:
+			{	// Payment was already completed or canceled:
+				echo 'Payment "'.$session->client_reference_id.'" was already processed with status "'.$payment_status.'"';
 				http_response_code( 400 );
 				exit();
 			}
