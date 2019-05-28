@@ -33,7 +33,7 @@ echo "\n\n";
 
 // Buttons:
 echo T_('View all changes').': '.$admin_url.'?ctrl=items&action=history_compare&p='.$Item->ID.'&r1=c&r2=p'.$params['iver_ID']."\n";
-echo T_('View history').': '.$admin_url.'?ctrl=items&action=history&p='.$Item->ID."\n";
+echo T_('View change history').': '.$admin_url.'?ctrl=items&action=history&p='.$Item->ID."\n";
 echo T_('View post').': '.$Item->get_permanent_url( '', '', '&' )."\n";
 
 // Footer vars:

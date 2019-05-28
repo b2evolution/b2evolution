@@ -170,7 +170,7 @@ $params = array_merge( array(
 			'</p>';
 			echo $Item->get_history_link( array(
 					'before'    => ' &bull; ',
-					'link_text' => T_('View history')
+					'link_text' => T_('View change history')
 				) );
 		}
 	}
