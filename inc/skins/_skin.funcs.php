@@ -362,7 +362,7 @@ function skin_init( $disp )
 						$canonical_url = url_add_param( $canonical_url, $MainList->page_param.'='.$MainList->filters['page'], '&' );
 					}
 					if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
-					{	// We are not on the canonicial blog url:
+					{	// We are not on the canonical blog url:
 						if( $Blog->get_setting( 'canonical_posts' ) && $redir == 'yes' )
 						{	// REDIRECT TO THE CANONICAL URL:
 							header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) ) ? 301 : 303 );
