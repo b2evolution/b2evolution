@@ -2,13 +2,7 @@
 
 # b2evolution CMS
 
-This is b2evolution CMS version **7.0.1-alpha**.
-
-**This is an ALPHA version.**
-
-**We recommend you use it for evaluation purposes only.**
-
-**We recommend you wait at least for the BETA version before running it on production.**
+This is b2evolution CMS version **7.0.1-beta**.
 
 ## A complete engine for your website !
 

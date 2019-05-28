@@ -11660,13 +11660,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15380, 'Upgrading posts table...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_add_col( 'T_items__item', 'post_locale_visibility', 'ENUM( "always", "follow-nav-locale" ) COLLATE ascii_general_ci NOT NULL DEFAULT "always" AFTER post_locale' );
 		upg_task_end();
 	}
 
 	if( upg_task_start( 15390, 'Creating table for collection extra locales...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_create_table( 'T_coll_locales', '
 			cl_coll_ID INT(10) UNSIGNED NOT NULL,
 			cl_locale  VARCHAR(20) COLLATE ascii_general_ci NOT NULL,
@@ -11675,7 +11675,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15400, 'Inserting collection extra locales...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		$DB->query( 'INSERT INTO T_coll_locales ( cl_coll_ID, cl_locale )
 			SELECT blog_ID, blog_locale
 			  FROM T_blogs' );
@@ -11683,7 +11683,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15410, 'Creating table for Post Groups...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_create_table( 'T_items__itemgroup', '
 			igrp_ID INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			PRIMARY KEY (igrp_ID)' );
@@ -11691,13 +11691,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15420, 'Upgrading posts table...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_add_col( 'T_items__item', 'post_igrp_ID', 'INT(10) UNSIGNED NULL AFTER post_ityp_ID' );
 		upg_task_end();
 	}
 
 	if( upg_task_start( 15430, 'Updating collection locale setting for new posts...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		$DB->query( 'UPDATE T_coll_settings
 			  SET cset_value = "select_coll"
 			WHERE cset_name = "new_item_locale_source"
@@ -11706,7 +11706,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15440, 'Upgrading table of collection extra locales and linking with other collections...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_add_col( 'T_coll_locales', 'cl_linked_coll_ID', 'INT(10) UNSIGNED NULL' );
 		upg_task_end();
 	}
@@ -11718,7 +11718,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15460, 'Upgrading files table...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_upgrade_cols( 'T_files', array(
 			'ADD' => array(
 				'file_ts'  => 'TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00" AFTER file_path',
