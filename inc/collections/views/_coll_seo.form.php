@@ -54,16 +54,29 @@ $Form->hidden( 'action', 'update' );
 $Form->hidden( 'tab', 'seo' );
 $Form->hidden( 'blog', $edited_Blog->ID );
 
-$Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main-page-seo') );
-	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
+$Form->begin_fieldset( T_('Special Front Page').' <span class="text-muted">(disp=front)</span>'.get_manual_link( 'special-front-page-seo' ) );
+	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+
 	$Form->checklist( array(
 		array( 'canonical_homepage', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_homepage' ) ),
 		array( 'self_canonical_homepage', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_homepage' ) ),
 		array( 'relcanonical_homepage', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_homepage' ) ),
 		), 'canonical_homepage_options', T_('Make canonical') );
+$Form->end_fieldset();
 
-	$Form->checkbox( 'paged_noindex', $edited_Blog->get_setting( 'paged_noindex' ), T_('"Next" blog pages'), T_('META NOINDEX').' - '.T_('Page 2,3,4...') );
-	$Form->checkbox( 'paged_nofollowto', $edited_Blog->get_setting( 'paged_nofollowto' ), '', T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...') );
+$Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main-page-seo') );
+	$Form->checkbox( 'first_noindex', $edited_Blog->get_setting( 'first_noindex' ), T_('First posts page'), T_('META NOINDEX') );
+
+	$Form->checklist( array(
+			array( 'paged_noindex', 1, T_('META NOINDEX').' - '.T_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_noindex' ) ),
+			array( 'paged_nofollowto', 1, T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_nofollowto' ) ),
+		), 'paged', T_('Next posts pages') );
+
+	$Form->checklist( array(
+		array( 'canonical_posts', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_posts' ) ),
+		array( 'self_canonical_posts', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_posts' ) ),
+		array( 'relcanonical_posts', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_posts' ) ),
+		), 'canonical_posts_options', T_('Make canonical') );
 
 	$Form->radio( 'title_link_type', $edited_Blog->get_setting( 'title_link_type' ), array(
 			  array( 'permalink', T_('Link to the permanent url of the post') ),
