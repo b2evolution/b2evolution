@@ -361,19 +361,51 @@ function skin_init( $disp )
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
 
-			if( !empty($active_filters) )
-			{	// The current page is being filtered...
+			$is_first_page = ( empty( $active_filters ) || array_diff( $active_filters, array( 'posts' ) ) == array() );
+			$is_next_pages = ( ! $is_first_page && array_diff( $active_filters, array( 'posts', 'page' ) ) == array() );
 
-				if( array_diff( $active_filters, array( 'posts' ) ) == array() )
-				{	// This is the default blog page only if the 'front_disp' is set to 'posts'
-					$disp_detail = 'posts-default';
-					$seo_page_type = 'Default page';
-					if( $Blog->get_setting( 'default_noindex' ) )
-					{	// We prefer robots not to index archive pages:
-						$robots_index = false;
+			if( ( $is_first_page && $Blog->get_setting( 'front_disp' ) != 'posts' ) || $is_next_pages )
+			{	// This is first(but not front disp) or next pages of disp=posts:
+				// Do we need to handle the canoncial url?
+				if( ( $Blog->get_setting( 'canonical_posts' ) && $redir == 'yes' )
+				    || $Blog->get_setting( 'relcanonical_posts' )
+				    || $Blog->get_setting( 'self_canonical_posts' ) )
+				{	// Check if the URL was canonical:
+					$canonical_url = url_add_param( $Blog->get( 'url' ), 'disp=posts', '&' );
+					if( $is_next_pages )
+					{	// Set param for paged url:
+						$canonical_url = url_add_param( $canonical_url, $MainList->page_param.'='.$MainList->filters['page'], '&' );
+					}
+					if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+					{	// We are not on the canonical blog url:
+						if( $Blog->get_setting( 'canonical_posts' ) && $redir == 'yes' )
+						{	// REDIRECT TO THE CANONICAL URL:
+							header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) ) ? 301 : 303 );
+						}
+						elseif( $Blog->get_setting( 'relcanonical_posts' ) )
+						{	// Use link rel="canoncial":
+							add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+						}
+					}
+					elseif( $Blog->get_setting( 'self_canonical_posts' ) )
+					{	// Use self-referencing rel="canonical" tag:
+						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'posts', 'page' ) ) == array() )
+			}
+
+			if( $is_first_page )
+			{	// This is first page of disp=posts:
+				$disp_detail = 'posts-default';
+				$seo_page_type = 'First posts page';
+				if( $Blog->get_setting( 'first_noindex' ) )
+				{	// We prefer robots not to index archive pages:
+					$robots_index = false;
+				}
+			}
+			elseif( ! empty( $active_filters ) )
+			{	// The current page is being filtered...
+				if( $is_next_pages )
 				{ // This is just a follow "paged" page
 					$disp_detail = 'posts-next';
 					$seo_page_type = 'Next page';
@@ -534,15 +566,6 @@ function skin_init( $disp )
 					{	// We prefer robots not to index other filtered pages:
 						$robots_index = false;
 					}
-				}
-			}
-			elseif( $Blog->get_setting('front_disp') == 'posts' )
-			{	// This is the default blog page only if the 'front_disp' is set to 'posts'
-				$disp_detail = 'posts-default';
-				$seo_page_type = 'Default page';
-				if( $Blog->get_setting( 'default_noindex' ) )
-				{	// We prefer robots not to index archive pages:
-					$robots_index = false;
 				}
 			}
 			break;
@@ -1723,6 +1746,15 @@ function skin_init( $disp )
 						.'href="'.format_to_output( $other_version_Item->get_permanent_url( '', '', '&' ), 'htmlattr' ).'">' );
 				}
 			}
+		}
+	}
+
+	if( $Blog->get_setting( 'front_disp' ) == $disp )
+	{	// This is the default/front collection page:
+		$seo_page_type = 'Default page';
+		if( $Blog->get_setting( 'default_noindex' ) )
+		{	// We prefer robots not to index archive pages:
+			$robots_index = false;
 		}
 	}
 

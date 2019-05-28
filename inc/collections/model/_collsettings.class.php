@@ -32,16 +32,20 @@ class CollectionSettings extends AbstractSettings
 	var $_defaults = array(
 		// Home page settings:
 			'front_disp'             => 'posts',
+			'default_noindex'         => 0, // META NOINDEX on Default/Front collection page
+			'canonical_homepage'      => 1, // Redirect front page to its canonical Url?
+			'self_canonical_homepage' => 1, // Use self-referencing rel="canonical" tag
+			'relcanonical_homepage'   => 1, // If no 301, fall back to rel="canoncial" ?
 
 		// Posts list settings:
 			'what_to_show'           => 'posts',      // posts, days
 			'main_content'           => 'normal',
 			'posts_per_page'         => '5',
 			'disp_featured_above_list' => 0,				// Don't display a featured post above the list by default
-			'canonical_homepage'     => 1,				// Redirect homepage to its canonical Url?
-			'self_canonical_homepage' => 1,				// Use self-referencing rel="canonical" tag
-			'relcanonical_homepage'  => 1,				// If no 301, fall back to rel="canoncial" ?
-			'default_noindex'        => '0',				// META NOINDEX on Default blog page
+			'canonical_posts'        => 1,				// Redirect disp=posts to its canonical Url?
+			'self_canonical_posts'   => 1,				// Use self-referencing rel="canonical" tag
+			'relcanonical_posts'     => 1,				// If no 301, fall back to rel="canoncial" ?
+			'first_noindex'          => 0,				// META NOINDEX on First page on disp=posts
 			'orderby'         => 'datestart',
 			'orderdir'        => 'DESC',
 			'title_link_type' => 'permalink',
