@@ -1573,7 +1573,7 @@ class jared_Skin extends Skin
 			// Maximum content width:
 			$this->dynamic_style_rule( 'section_7_cont_width', '.evo_container__standalone_page_area_7 > .container { max-width: $setting_value$ }', array( 'suffix' => 'px' ) );
 			// Title color:
-			$this->dynamic_style_rule( 'section_7_title_color', '.evo_container__standalone_page_area_7 .evo_post_title h1 { color: $setting_value$ }' );
+			$this->dynamic_style_rule( 'section_7_title_color', '.evo_container__standalone_page_area_7 .msgform_disp_title h1 { color: $setting_value$ }' );
 			// Normal text color:
 			$this->dynamic_style_rule( 'section_7_text_color', '.evo_container__standalone_page_area_7 { color: $setting_value$ }' );
 			// Links color:
