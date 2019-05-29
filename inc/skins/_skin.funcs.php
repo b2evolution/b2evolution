@@ -383,7 +383,7 @@ function skin_init( $disp )
 			{	// This is first page of disp=posts:
 				$disp_detail = 'posts-default';
 				$seo_page_type = 'First posts page';
-				if( $Blog->get_setting( 'first_noindex' ) )
+				if( $Blog->get_setting( 'posts_firstpage_noindex' ) )
 				{	// We prefer robots not to index archive pages:
 					$robots_index = false;
 				}

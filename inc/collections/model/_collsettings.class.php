@@ -45,7 +45,7 @@ class CollectionSettings extends AbstractSettings
 			'canonical_posts'        => 1,				// Redirect disp=posts to its canonical Url?
 			'self_canonical_posts'   => 1,				// Use self-referencing rel="canonical" tag
 			'relcanonical_posts'     => 1,				// If no 301, fall back to rel="canoncial" ?
-			'first_noindex'          => 0,				// META NOINDEX on First page on disp=posts
+			'posts_firstpage_noindex'=> 0,				// META NOINDEX on First page on disp=posts
 			'orderby'         => 'datestart',
 			'orderdir'        => 'DESC',
 			'title_link_type' => 'permalink',

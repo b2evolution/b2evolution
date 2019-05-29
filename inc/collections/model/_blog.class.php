@@ -1200,7 +1200,7 @@ class Blog extends DataObject
 			$this->set_setting( 'self_canonical_tag_urls', param( 'self_canonical_tag_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_tag_urls', param( 'relcanonical_tag_urls', 'integer', 0 ) );
 			$this->set_setting( 'default_noindex', param( 'default_noindex', 'integer', 0 ) );
-			$this->set_setting( 'first_noindex', param( 'first_noindex', 'integer', 0 ) );
+			$this->set_setting( 'posts_firstpage_noindex', param( 'posts_firstpage_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_noindex', param( 'paged_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_nofollowto', param( 'paged_nofollowto', 'integer', 0 ) );
 			$this->set_setting( 'archive_noindex', param( 'archive_noindex', 'integer', 0 ) );
