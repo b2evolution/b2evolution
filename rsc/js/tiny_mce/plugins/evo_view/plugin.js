@@ -206,13 +206,6 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 
 			if( viewNode !== selected )
 			{
-				// Make sure that the editor is focused.
-				// It is possible that the editor is not focused when the mouse event fires
-				// without focus, the selection will not work properly.
-				// yb: I commented this code because it scrolls top the edit area after click on inline image,
-				//     and I could not reproduce "the selection will not work properly".
-				//editor.getBody().focus();
-
 				deselect();
 				selected = viewNode;
 				selectedView = getView( viewNode );

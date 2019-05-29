@@ -76,7 +76,7 @@ $Form->begin_fieldset( T_('Special Front Page').' <span class="text-muted">(disp
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main-page-seo') );
-	$Form->checkbox( 'first_noindex', $edited_Blog->get_setting( 'first_noindex' ), T_('First posts page'), T_('META NOINDEX') );
+	$Form->checkbox( 'posts_firstpage_noindex', $edited_Blog->get_setting( 'posts_firstpage_noindex' ), T_('First posts page'), T_('META NOINDEX') );
 
 	$Form->checklist( array(
 			array( 'paged_noindex', 1, T_('META NOINDEX').' - '.T_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_noindex' ) ),

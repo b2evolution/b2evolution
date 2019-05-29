@@ -1486,6 +1486,24 @@ class Comment extends DataObject
 
 
 	/**
+	 * Check if current User can edit this Comment
+	 *
+	 * @return boolean
+	 */
+	function can_be_edited()
+	{
+		global $current_User;
+
+		// Comment must be stored in DB:
+		return ! empty( $this->ID ) &&
+			// User must be logged in and activated:
+			is_logged_in( false ) &&
+			// User must has a permission to edit this Comment:
+			$current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this );
+	}
+
+
+	/**
 	 * Provide link to edit a comment if user has edit rights
 	 *
 	 * @param string to display before link
@@ -1500,17 +1518,10 @@ class Comment extends DataObject
 	 */
 	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $redirect_to = NULL )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! is_logged_in( false ) ) return false;
-
-		if( empty($this->ID) )
-		{	// Happens in Preview
-			return false;
-		}
-
-		if( ! $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
-		{ // If User has no permission to edit this comment:
+		if( ! $this->can_be_edited() )
+		{	// Don't allow to edit this Comment if it cannot be edited by curren User:
 			return false;
 		}
 
@@ -3601,13 +3612,19 @@ class Comment extends DataObject
 		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
 			$force_members = false;
 			$notified_flags[] = 'members_notified';
-			$Messages->add_to_group( T_('Marking email notifications for members as sent.'), 'note', T_('Sending notifications:') );
+			if( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
+				$Messages->add_to_group( T_('Marking email notifications for members as sent.'), 'note', T_('Sending notifications:') );
+			}
 		}
 		if( $force_community == 'mark' )
 		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
 			$force_community = false;
 			$notified_flags[] = 'community_notified';
-			$Messages->add_to_group( T_('Marking email notifications for community as sent.'), 'note', T_('Sending notifications:') );
+			if( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
+				$Messages->add_to_group( T_('Marking email notifications for community as sent.'), 'note', T_('Sending notifications:') );
+			}
 		}
 		if( ! empty( $notified_flags ) )
 		{	// Save the marked processing status to DB:
@@ -3619,7 +3636,10 @@ class Comment extends DataObject
 		if( ( $force_members != 'force' && $force_community != 'force' ) &&
 		    $this->check_notifications_flags( array( 'members_notified', 'community_notified' ) ) )
 		{	// All possible notifications have already been sent:
-			$Messages->add_to_group( T_('All possible notifications have already been sent: skipping notifications...'), 'note', T_('Sending notifications:') );
+			if( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
+				$Messages->add_to_group( T_('All possible notifications have already been sent: skipping notifications...'), 'note', T_('Sending notifications:') );
+			}
 			return false;
 		}
 
@@ -3664,7 +3684,10 @@ class Comment extends DataObject
 			// Save cronjob to DB:
 			if( $comment_Cronjob->dbinsert() )
 			{
-				$Messages->add_to_group( T_('Scheduling email notifications for subscribers.'), 'note', T_('Sending notifications:') );
+				if( $this->can_be_edited() )
+				{	// Display notification note only for user with edit permission:
+					$Messages->add_to_group( T_('Scheduling email notifications for subscribers.'), 'note', T_('Sending notifications:') );
+				}
 
 				// Memorize the cron job ID which is going to handle this post:
 				$this->set( 'notif_ctsk_ID', $comment_Cronjob->ID );
@@ -3763,7 +3786,10 @@ class Comment extends DataObject
 		// Update comment notification params:
 		$this->dbupdate();
 
-		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notify_users ) ), 'note', T_('Sending notifications:') );
+		if( $this->can_be_edited() )
+		{	// Display notification note only for user with edit permission:
+			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notify_users ) ), 'note', T_('Sending notifications:') );
+		}
 
 		return $notified_user_IDs;
 	}
@@ -3803,8 +3829,8 @@ class Comment extends DataObject
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return array();
@@ -3819,8 +3845,8 @@ class Comment extends DataObject
 			{
 				cron_log_append( $message."\n"  );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return array();
@@ -3833,8 +3859,8 @@ class Comment extends DataObject
 			{
 				cron_log_append( $message."\n"  );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return array();
@@ -3847,8 +3873,8 @@ class Comment extends DataObject
 			{
 				cron_log_append( $message."\n"  );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 		}
@@ -3859,8 +3885,8 @@ class Comment extends DataObject
 			{
 				cron_log_append( $message."\n"  );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 		}
@@ -3871,8 +3897,8 @@ class Comment extends DataObject
 			{
 				cron_log_append( $message."\n"  );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 		}
@@ -3906,8 +3932,8 @@ class Comment extends DataObject
 			{
 				cron_log_append( $message."\n"  );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return array();
@@ -3920,8 +3946,8 @@ class Comment extends DataObject
 			{
 				cron_log_append( $message."\n"  );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			$notify_members = false;
@@ -3933,8 +3959,8 @@ class Comment extends DataObject
 			{
 				cron_log_append( $message."\n"  );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			$notify_community = false;
@@ -4257,8 +4283,8 @@ class Comment extends DataObject
 			{
 				cron_log_append( $message."\n"  );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 		}
@@ -4269,8 +4295,8 @@ class Comment extends DataObject
 			{
 				cron_log_append( $message."\n"  );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 		}

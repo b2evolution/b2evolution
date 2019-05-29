@@ -10817,6 +10817,22 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13210, 'Inserting new collection settings...' ) )
+	{	// part of 6.11.2-stable
+		// This upgrade block is NOT critical/NOT required for users already on 7.0dev
+		$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_value, cset_name )
+			SELECT cset_coll_ID, cset_value,
+			  CASE cset_name
+			    WHEN "default_noindex"         THEN "posts_firstpage_noindex"
+			    WHEN "canonical_homepage"      THEN "canonical_posts"
+			    WHEN "self_canonical_homepage" THEN "self_canonical_posts"
+			    WHEN "relcanonical_homepage"   THEN "relcanonical_posts"
+			  END AS new_cset_name
+			  FROM T_coll_settings
+			 WHERE cset_name IN ( "default_noindex", "canonical_homepage", "self_canonical_homepage", "relcanonical_homepage" )' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
