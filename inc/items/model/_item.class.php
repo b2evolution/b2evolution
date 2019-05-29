@@ -8257,28 +8257,19 @@ class Item extends ItemLight
 		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
 			$force_members = false;
 			$notified_flags[] = 'members_notified';
-			if( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( T_('Marking email notifications for members as sent.'), 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Marking email notifications for members as sent.') );
 		}
 		if( $force_community == 'mark' )
 		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
 			$force_community = false;
 			$notified_flags[] = 'community_notified';
-			if( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( T_('Marking email notifications for community as sent.'), 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Marking email notifications for community as sent.') );
 		}
 		if( $force_pings == 'mark' )
 		{	// Only change DB flag to "pings_sent" but do NOT actually send pings:
 			$force_pings = false;
 			$notified_flags[] = 'pings_sent';
-			if( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( T_('Marking pings as sent.'), 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Marking pings as sent.') );
 		}
 		if( ! empty( $notified_flags ) )
 		{	// Save the marked processing status to DB:
@@ -8290,10 +8281,7 @@ class Item extends ItemLight
 		if( ( $force_members != 'force' && $force_community != 'force' && $force_pings != 'force' ) &&
 		    $this->check_notifications_flags( array( 'members_notified', 'community_notified', 'pings_sent' ) ) )
 		{	// All possible notifications have already been sent and no forcing for any notification:
-			if( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( T_('All possible notifications have already been sent: skipping notifications...'), 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('All possible notifications have already been sent: skipping notifications...') );
 			$Debuglog->add( 'Item->handle_notifications() : All possible notifications have already been sent: skipping notifications...', 'notifications' );
 			return false;
 		}
@@ -8360,10 +8348,7 @@ class Item extends ItemLight
 			// Save cronjob to DB:
 			if( $item_Cronjob->dbinsert() )
 			{
-				if( $this->can_be_edited() )
-				{	// Display notification note only for user with edit permission:
-					$Messages->add_to_group( T_('Scheduling Pings & Subscriber email notifications.'), 'note', T_('Sending notifications:') );
-				}
+				$this->display_notification_message( T_('Scheduling Pings & Subscriber email notifications.') );
 
 				// Memorize the cron job ID which is going to handle this post:
 				$this->set( 'notifications_ctsk_ID', $item_Cronjob->ID );
@@ -8527,10 +8512,7 @@ class Item extends ItemLight
 		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
 		$this->dbupdate( false, false, false );
 
-		if( $this->can_be_edited() )
-		{	// Display notification note only for user with edit permission:
-			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note', T_('Sending notifications:')  );
-		}
+		$this->display_notification_message( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ) );
 
 		return $notified_user_IDs;
 	}
@@ -8604,10 +8586,7 @@ class Item extends ItemLight
 			locale_restore_previous();
 		}
 
-		if( $this->can_be_edited() )
-		{	// Display notification note only for user with edit permission:
-			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), $notified_users_num ), 'note', T_('Sending notifications:')  );
-		}
+		$this->display_notification_message( sprintf( T_('Sending %d email notifications to moderators.'), $notified_users_num ) );
 	}
 
 
@@ -8660,10 +8639,7 @@ class Item extends ItemLight
 				if( send_mail_to_User( $assigned_User->ID, $subject, 'post_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
 				{	// A send notification email request to the assigned user was processed:
 					$notified_user_IDs[] = $assigned_User->ID;
-					if( $this->can_be_edited() )
-					{	// Display notification note only for user with edit permission:
-						$Messages->add_to_group( T_('Sending email notification to assigned user.'), 'note', T_('Sending notifications:')  );
-					}
+					$this->display_notification_message( T_('Sending email notification to assigned user.') );
 				}
 
 				locale_restore_previous();
@@ -8710,30 +8686,14 @@ class Item extends ItemLight
 
 		if( ! $edited_Blog->get_setting( 'allow_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			$message = T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), $log_messages );
 			return array();
 		}
 
 		if( ! $this->notifications_allowed() )
 		{	// Don't send notifications about some post/usages like "special":
 			// Note: this is a safety but this case should never happen, so don't make translators work on this:
-			$message = 'This post type/usage cannot support notifications: skipping notifications...';
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( 'This post type/usage cannot support notifications: skipping notifications...', $log_messages );
 			return array();
 		}
 
@@ -8741,67 +8701,27 @@ class Item extends ItemLight
 		{	// Don't send notifications about items with not allowed status:
 			$status_titles = get_visibility_statuses( '', array() );
 			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
-			$message = sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title );
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), $log_messages );
 			return array();
 		}
 
 		if( $force_members == 'skip' && $force_community == 'skip' )
 		{	// Skip subscriber notifications because of it is forced by param:
-			$message = T_('Skipping email notifications to subscribers.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribers.'), $log_messages );
 			return array();
 		}
 
 		if( $force_members == 'force' && $force_community == 'force' )
 		{	// Force to members and community:
-			$message = T_('Force sending email notifications to subscribers...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Force sending email notifications to subscribers...'), $log_messages );
 		}
 		elseif( $force_members == 'force' )
 		{	// Force to members only:
-			$message = T_('Force sending email notifications to subscribed members...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Force sending email notifications to subscribed members...'), $log_messages );
 		}
 		elseif( $force_community == 'force' )
 		{	// Force to community only:
-			$message = T_('Force sending email notifications to other subscribers...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Force sending email notifications to other subscribers...'), $log_messages );
 		}
 		else
 		{	// Check if email notifications can be sent for this item currently:
@@ -8810,15 +8730,7 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$message = T_('This post type/usage doesn\'t need notifications by default: skipping notifications...');
-				if( $log_messages == 'cron_job' )
-				{
-					cron_log_append( $message."\n" );
-				}
-				elseif( $this->can_be_edited() )
-				{	// Display notification note only for user with edit permission:
-					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-				}
+				$this->display_notification_message( T_('This post type/usage doesn\'t need notifications by default: skipping notifications...'), $log_messages );
 				return array();
 			}
 		}
@@ -8847,42 +8759,18 @@ class Item extends ItemLight
 
 		if( ! $notify_members && ! $notify_community )
 		{	// Everyone has already been notified, nothing to do:
-			$message = T_('Skipping email notifications to subscribers because they were already notified.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribers because they were already notified.'), $log_messages );
 			return array();
 		}
 
 		if( $notify_members && $force_members == 'skip' )
 		{	// Skip email notifications to members because it is forced by param:
-			$message = T_('Skipping email notifications to subscribed members.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribed members.'), $log_messages );
 			$notify_members = false;
 		}
 		if( $notify_community && $force_community == 'skip' )
 		{	// Skip email notifications to community because it is forced by param:
-			$message = T_('Skipping email notifications to other subscribers.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to other subscribers.'), $log_messages );
 			$notify_community = false;
 		}
 
@@ -9062,27 +8950,11 @@ class Item extends ItemLight
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
-			$message = sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count );
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), $log_messages );
 		}
 		if( $notify_community )
 		{	// Display a message to know how many community users are notified:
-			$message = sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count );
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), $log_messages );
 		}
 
 		if( empty( $notify_users ) )
@@ -9189,72 +9061,32 @@ class Item extends ItemLight
 		if( ! $this->notifications_allowed() )
 		{	// Don't send pings about some post/usages like "special":
 			// Note: this is a safety but this case should never happen, so don't make translators work on this:
-			$message = 'This post type/usage cannot support pings: skipping pings...';
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( 'This post type/usage cannot support pings: skipping pings...', $log_messages );
 			return false;
 		}
 
 		if( $this->get( 'status' ) != 'published' )
 		{	// Don't send pings if item is not 'public':
-			$message = T_('Skipping outbound pings because item is not published yet.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping outbound pings because item is not published yet.'), $log_messages );
 			return false;
 		}
 
 		if( $force_pings == 'skip' )
 		{	// Skip pings because it is forced by param:
-			$message = T_('Skipping outbound pings.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping outbound pings.'), $log_messages );
 			return false;
 		}
 
 		if( $force_pings == 'force' )
 		{	// Force pings:
-			$message = T_('Force sending outbound pings...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Force sending outbound pings...'), $log_messages );
 		}
 		else
 		{	// Check if pings can be sent for this item currently:
 
 			if( $this->check_notifications_flags( 'pings_sent' ) )
 			{	// Don't send pings if they have already been sent:
-				$message = T_('Skipping outbound pings because they were already sent.');
-				if( $log_messages == 'cron_job' )
-				{
-					cron_log_append( $message."\n" );
-				}
-				elseif( $this->can_be_edited() )
-				{	// Display notification note only for user with edit permission:
-					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-				}
+				$this->display_notification_message( T_('Skipping outbound pings because they were already sent.'), $log_messages );
 				return false;
 			}
 
@@ -9262,15 +9094,7 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$message = T_('This post type/usage doesn\'t need pings by default: skipping pings...');
-				if( $log_messages == 'cron_job' )
-				{
-					cron_log_append( $message."\n" );
-				}
-				elseif( $this->can_be_edited() )
-				{	// Display notification note only for user with edit permission:
-					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-				}
+				$this->display_notification_message( T_('This post type/usage doesn\'t need pings by default: skipping pings...'), $log_messages );
 				return false;
 			}
 		}
@@ -9283,28 +9107,12 @@ class Item extends ItemLight
 		    ( preg_match( '#^http://localhost[/:]#', $baseurl ) ||
 		      preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) ) /* domain ending in ".local" */
 		{	// Don't send pings from localhost:
-			$message = T_('Skipping pings (Running on localhost).');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping pings (Running on localhost).'), $log_messages );
 			return false;
 		}
 		else
 		{	// Send pings:
-			$message = T_('Trying to find plugins for sending outbound pings...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			elseif( $this->can_be_edited() )
-			{	// Display notification note only for user with edit permission:
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Trying to find plugins for sending outbound pings...'), $log_messages );
 
 			load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
@@ -9397,16 +9205,9 @@ class Item extends ItemLight
 						}
 					}
 
-					if( !empty( $current_message ) )
-					{ // Display last message
-						if( $log_messages == 'cron_job' )
-						{
-							cron_log_append( $current_message."\n", $current_type );
-						}
-						elseif( $this->can_be_edited() )
-						{	// Display notification note only for user with edit permission:
-							$Messages->add_to_group( $current_message, $current_type, $current_title );
-						}
+					if( ! empty( $current_message ) )
+					{	// Display last message:
+						$this->display_notification_message( $current_message, $log_messages, $current_type, $current_title );
 					}
 				}
 			}
@@ -12752,6 +12553,36 @@ class Item extends ItemLight
 		}
 
 		return $result;
+	}
+
+
+	/**
+	 * Display or log notification message
+	 *
+	 * @param string Message
+	 * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
+	 * @param string Message type
+	 * @param string Message group title
+	 */
+	function display_notification_message( $message, $log_messages = false, $message_type = 'note', $message_group = NULL )
+	{
+		global $current_User, $Messages;
+
+		if( $log_messages == 'cron_job' )
+		{	// Log message for cron job:
+			cron_log_append( $message."\n", $message_type );
+		}
+		elseif( ! empty( $this->ID ) && // Item must be stored in DB
+			is_logged_in( false ) && // User must be logged in and activated
+			// User must be a collection admin
+			$current_User->check_perm( 'blog_admin', 'edit', false, $this->get_blog_ID() ) )
+		{	// Display notification message only for collection admin:
+			if( $message_group === NULL )
+			{	// Set default group title:
+				$message_group = T_('Sending notifications:');
+			}
+			$Messages->add_to_group( $message, $message_type, $message_group );
+		}
 	}
 }
 ?>
