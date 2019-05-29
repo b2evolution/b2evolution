@@ -28,13 +28,6 @@ tinymce.PluginManager.add( 'b2evo_shorttags', function( editor ) {
 		var dom = editor.dom;
 
 		if ( node !== selected ) {
-			// Make sure that the editor is focused.
-			// It is possible that the editor is not focused when the mouse event fires
-			// without focus, the selection will not work properly.
-			// yb: I commented this code because it scrolls top the edit area after click on inline image,
-			//     and I could not reproduce "the selection will not work properly".
-			//editor.getBody().focus();
-
 			deselect();
 			selected = node;
 			selectedType = node.getAttribute( 'data-evo-type' );
