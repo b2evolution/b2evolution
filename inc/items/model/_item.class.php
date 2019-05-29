@@ -5796,6 +5796,24 @@ class Item extends ItemLight
 
 
 	/**
+	 * Check if current User can edit this Item
+	 *
+	 * @return boolean
+	 */
+	function can_be_edited()
+	{
+		global $current_User;
+
+		// Item must be stored in DB:
+		return ! empty( $this->ID ) &&
+			// User must be logged in and activated:
+			is_logged_in( false ) &&
+			// User must has a permission to edit this Item:
+			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this );
+	}
+
+
+	/**
 	 * Get URL to edit a post if user has edit rights.
 	 *
 	 * @param array Params:
@@ -5805,15 +5823,8 @@ class Item extends ItemLight
 	{
 		global $admin_url, $current_User;
 
-		if( ! is_logged_in( false ) ) return false;
-
-		if( ! $this->ID )
-		{ // preview..
-			return false;
-		}
-
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
-		{ // User has no right to edit this post
+		if( ! $this->can_be_edited() )
+		{	// Don't allow to edit this Item if it cannot be edited by curren User:
 			return false;
 		}
 
@@ -8246,19 +8257,28 @@ class Item extends ItemLight
 		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
 			$force_members = false;
 			$notified_flags[] = 'members_notified';
-			$Messages->add_to_group( T_('Marking email notifications for members as sent.'), 'note', T_('Sending notifications:') );
+			if( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
+				$Messages->add_to_group( T_('Marking email notifications for members as sent.'), 'note', T_('Sending notifications:') );
+			}
 		}
 		if( $force_community == 'mark' )
 		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
 			$force_community = false;
 			$notified_flags[] = 'community_notified';
-			$Messages->add_to_group( T_('Marking email notifications for community as sent.'), 'note', T_('Sending notifications:') );
+			if( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
+				$Messages->add_to_group( T_('Marking email notifications for community as sent.'), 'note', T_('Sending notifications:') );
+			}
 		}
 		if( $force_pings == 'mark' )
 		{	// Only change DB flag to "pings_sent" but do NOT actually send pings:
 			$force_pings = false;
 			$notified_flags[] = 'pings_sent';
-			$Messages->add_to_group( T_('Marking pings as sent.'), 'note', T_('Sending notifications:') );
+			if( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
+				$Messages->add_to_group( T_('Marking pings as sent.'), 'note', T_('Sending notifications:') );
+			}
 		}
 		if( ! empty( $notified_flags ) )
 		{	// Save the marked processing status to DB:
@@ -8270,7 +8290,10 @@ class Item extends ItemLight
 		if( ( $force_members != 'force' && $force_community != 'force' && $force_pings != 'force' ) &&
 		    $this->check_notifications_flags( array( 'members_notified', 'community_notified', 'pings_sent' ) ) )
 		{	// All possible notifications have already been sent and no forcing for any notification:
-			$Messages->add_to_group( T_('All possible notifications have already been sent: skipping notifications...'), 'note', T_('Sending notifications:') );
+			if( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
+				$Messages->add_to_group( T_('All possible notifications have already been sent: skipping notifications...'), 'note', T_('Sending notifications:') );
+			}
 			$Debuglog->add( 'Item->handle_notifications() : All possible notifications have already been sent: skipping notifications...', 'notifications' );
 			return false;
 		}
@@ -8337,7 +8360,10 @@ class Item extends ItemLight
 			// Save cronjob to DB:
 			if( $item_Cronjob->dbinsert() )
 			{
-				$Messages->add_to_group( T_('Scheduling Pings & Subscriber email notifications.'), 'note', T_('Sending notifications:') );
+				if( $this->can_be_edited() )
+				{	// Display notification note only for user with edit permission:
+					$Messages->add_to_group( T_('Scheduling Pings & Subscriber email notifications.'), 'note', T_('Sending notifications:') );
+				}
 
 				// Memorize the cron job ID which is going to handle this post:
 				$this->set( 'notifications_ctsk_ID', $item_Cronjob->ID );
@@ -8501,7 +8527,10 @@ class Item extends ItemLight
 		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
 		$this->dbupdate( false, false, false );
 
-		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note', T_('Sending notifications:')  );
+		if( $this->can_be_edited() )
+		{	// Display notification note only for user with edit permission:
+			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note', T_('Sending notifications:')  );
+		}
 
 		return $notified_user_IDs;
 	}
@@ -8575,7 +8604,10 @@ class Item extends ItemLight
 			locale_restore_previous();
 		}
 
-		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), $notified_users_num ), 'note', T_('Sending notifications:')  );
+		if( $this->can_be_edited() )
+		{	// Display notification note only for user with edit permission:
+			$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), $notified_users_num ), 'note', T_('Sending notifications:')  );
+		}
 	}
 
 
@@ -8628,7 +8660,10 @@ class Item extends ItemLight
 				if( send_mail_to_User( $assigned_User->ID, $subject, 'post_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
 				{	// A send notification email request to the assigned user was processed:
 					$notified_user_IDs[] = $assigned_User->ID;
-					$Messages->add_to_group( T_('Sending email notification to assigned user.'), 'note', T_('Sending notifications:')  );
+					if( $this->can_be_edited() )
+					{	// Display notification note only for user with edit permission:
+						$Messages->add_to_group( T_('Sending email notification to assigned user.'), 'note', T_('Sending notifications:')  );
+					}
 				}
 
 				locale_restore_previous();
@@ -8680,8 +8715,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return array();
@@ -8695,8 +8730,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return array();
@@ -8711,8 +8746,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return array();
@@ -8725,8 +8760,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return array();
@@ -8739,8 +8774,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 		}
@@ -8751,8 +8786,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 		}
@@ -8763,8 +8798,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 		}
@@ -8780,8 +8815,8 @@ class Item extends ItemLight
 				{
 					cron_log_append( $message."\n" );
 				}
-				else
-				{
+				elseif( $this->can_be_edited() )
+				{	// Display notification note only for user with edit permission:
 					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 				}
 				return array();
@@ -8817,8 +8852,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return array();
@@ -8831,8 +8866,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			$notify_members = false;
@@ -8844,8 +8879,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			$notify_community = false;
@@ -9032,8 +9067,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 		}
@@ -9044,8 +9079,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 		}
@@ -9159,8 +9194,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return false;
@@ -9173,8 +9208,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return false;
@@ -9187,8 +9222,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return false;
@@ -9201,8 +9236,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 		}
@@ -9216,8 +9251,8 @@ class Item extends ItemLight
 				{
 					cron_log_append( $message."\n" );
 				}
-				else
-				{
+				elseif( $this->can_be_edited() )
+				{	// Display notification note only for user with edit permission:
 					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 				}
 				return false;
@@ -9232,8 +9267,8 @@ class Item extends ItemLight
 				{
 					cron_log_append( $message."\n" );
 				}
-				else
-				{
+				elseif( $this->can_be_edited() )
+				{	// Display notification note only for user with edit permission:
 					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 				}
 				return false;
@@ -9253,8 +9288,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 			return false;
@@ -9266,8 +9301,8 @@ class Item extends ItemLight
 			{
 				cron_log_append( $message."\n" );
 			}
-			else
-			{
+			elseif( $this->can_be_edited() )
+			{	// Display notification note only for user with edit permission:
 				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
 			}
 
@@ -9368,8 +9403,8 @@ class Item extends ItemLight
 						{
 							cron_log_append( $current_message."\n", $current_type );
 						}
-						else
-						{
+						elseif( $this->can_be_edited() )
+						{	// Display notification note only for user with edit permission:
 							$Messages->add_to_group( $current_message, $current_type, $current_title );
 						}
 					}

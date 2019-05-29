@@ -1498,6 +1498,10 @@ class collections_Module extends Module
 
 				if( $new_Item->dbinsert() )
 				{	// Successful new item creating:
+
+					// Execute or schedule notifications & pings:
+					$new_Item->handle_notifications( NULL, true );
+
 					$Messages->add( T_('Post has been created.'), 'success' );
 					$Messages->add( T_('Please double check your email address and choose a password so that you can log in next time you visit us.'), 'warning' );
 					$redirect_to = $item_Blog->get( 'register_finishurl', array( 'glue' => '&' ) );
