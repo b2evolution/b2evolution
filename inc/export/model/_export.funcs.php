@@ -426,7 +426,7 @@ function export_xml( $params )
 						'evo:post_renderers'     => $Item->renderers,
 						'evo:post_priority'      => $Item->priority,
 						'evo:post_featured'      => $Item->featured,
-						'evo:post_order'         => $Item->order,
+						'evo:post_order'         => $Item->get_order(),
 						'evo:post_country'       => $item_country_code,
 						'evo:post_region'        => xml_cdata( $Item->get_region() ),
 						'evo:post_subregion'     => xml_cdata( $Item->get_subregion() ),
@@ -618,7 +618,6 @@ function export_xml_files( $type, & $row_xml_data, & $files_xml_data )
 						'evo:link_cmt_ID'           => $link->link_cmt_ID,
 						'evo:link_usr_ID'           => $link->link_usr_ID,
 						'evo:link_file_ID'          => $link->link_file_ID,
-						'evo:link_ltype_ID'         => $link->link_ltype_ID,
 						'evo:link_position'         => $link->link_position,
 						'evo:link_order'            => $link->link_order
 					)
