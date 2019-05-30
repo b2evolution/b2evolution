@@ -107,7 +107,6 @@ class dating_mood_Skin extends Skin
 		$r = array_merge( array(
 				'body_bg_color' => array(
 					'label' => T_('Background Color'),
-					'note' => T_('E-g: #000000 for black'),
 					'defaultvalue' => '#000',
 					'type' => 'color',
 				),

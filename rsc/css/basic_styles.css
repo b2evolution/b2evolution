@@ -177,6 +177,9 @@ img.round,
 .indented {
   padding-left: 3em;
 }
+.pointer {
+  cursor: pointer;
+}
 /* The sprite image file is located: "/rsc/icons/flags_sprite.png"
  * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"
  * **** You should save the changed file as PNG-8 with 256 colors to the "flags_sprite.png"

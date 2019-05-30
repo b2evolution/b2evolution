@@ -200,6 +200,29 @@ jQuery( 'input[type=button][name=cancel]' ).on( 'click', function()
 <?php
 }
 ?>
+jQuery( document ).ready( function()
+{	// Restore skin setting to default value:
+	jQuery( '[data-default-value]' ).click( function()
+	{
+		var setting_input = jQuery( this ).closest( '[id^=ffield_edit_skin_]' ).find( 'input,select' );
+		if( setting_input.length &&
+		    setting_input.val() != jQuery( this ).data( 'default-value' ) )
+		{	// Restore only not default value:
+			setting_input.val( jQuery( this ).data( 'default-value' ) );
+			if( typeof( parent.evo_customizer_update_style ) == "function" )
+			{	// Update style in designer customizer mode if it is enabled currently:
+				if( setting_input.hasClass( 'form_color_input' ) )
+				{	// For color input enough to fire event "change":
+					setting_input.trigger( 'change' );
+				}
+				else
+				{	// For other fields we should update style by function:
+					parent.evo_customizer_update_style( setting_input );
+				}
+			}
+		}
+	} );
+} );
 </script>
 <?php
 }

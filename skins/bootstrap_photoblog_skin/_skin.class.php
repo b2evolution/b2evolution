@@ -199,31 +199,26 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 					'background_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
 					'page_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Link color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'page_link_h_color' => array(
 						'label' => T_('Link hover color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
 					'well_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#f5f5f5',
 						'type' => 'color',
 					),
@@ -239,25 +234,21 @@ class bootstrap_photoblog_Skin extends Skin
 				),
 					'active_color' => array(
 						'label' => T_('Active navigation link color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#555',
 						'type' => 'color',
 					),
 					'default_color' => array(
 						'label' => T_('Default navigation links color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'default_h_color' => array(
 						'label' => T_('Default navigation links hover color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
 					'default_bgh_color' => array(
 						'label' => T_('Default navigation links hover background-color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#eee',
 						'type' => 'color',
 					),

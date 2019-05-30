@@ -965,7 +965,7 @@ class Skin extends DataObject
 
 		if( $setting_value === NULL )
 		{	// No value for the requested setting:
-			return '';
+			return;
 		}
 
 		global $Session, $blog;
@@ -1044,7 +1044,7 @@ class Skin extends DataObject
 		{	// If customizer mode is disabled
 			if( $params['check'] == 'not_empty' && empty( $setting_value ) )
 			{	// Don't apply rule completely when value is empty:
-				return '';
+				return;
 			}
 		}
 

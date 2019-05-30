@@ -109,13 +109,11 @@ class evopress_Skin extends Skin
 		$r = array_merge( array(
 				'head_bg_color_top' => array(
 					'label' => T_('Header gradient top color'),
-					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#6aace6',
 					'type' => 'color',
 				),
 				'head_bg_color_bottom' => array(
 					'label' => T_('Header gradient bottom color'),
-					'note' => T_('E-g: #00ff00 for green'),
 					'defaultvalue' => '#4280b6',
 					'type' => 'color',
 				),

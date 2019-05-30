@@ -125,37 +125,31 @@ class photoalbums_Skin extends Skin
 		$r = array_merge( array(
 				'menu_bg_color' => array(
 					'label' => T_('Menu background color'),
-					'note' => T_('E-g: #0000ff for blue'),
 					'defaultvalue' => '#333333',
 					'type' => 'color',
 				),
 				'menu_text_color' => array(
 					'label' => T_('Menu text color'),
-					'note' => T_('E-g: #ff6600 for orange'),
 					'defaultvalue' => '#AAAAAA',
 					'type' => 'color',
 				),
 				'page_bg_color' => array(
 					'label' => T_('Page background color'),
-					'note' => T_('E-g: #ff0000 for red'),
 					'defaultvalue' => '#666666',
 					'type' => 'color',
 				),
 				'page_text_color' => array(
 					'label' => T_('Page text color'),
-					'note' => T_('E-g: #00ff00 for green'),
 					'defaultvalue' => '#AAAAAA',
 					'type' => 'color',
 				),
 				'post_bg_color' => array(
 					'label' => T_('Post info background color'),
-					'note' => T_('E-g: #0000ff for blue'),
 					'defaultvalue' => '#555555',
 					'type' => 'color',
 				),
 				'post_text_color' => array(
 					'label' => T_('Post info text color'),
-					'note' => T_('E-g: #ff6600 for orange'),
 					'defaultvalue' => '#AAAAAA',
 					'type' => 'color',
 				),
