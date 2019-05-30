@@ -296,7 +296,7 @@ function prepare_maintenance_dir( $dir_name, $deny_access = true )
  */
 function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_name = '' )
 {
-	global $Settings, $current_User;
+	global $Settings, $current_User, $basepath;
 
 	if( ! is_logged_in() || ! $current_User->check_perm( 'files', 'all' ) )
 	{	// No permission to unzip files:
@@ -307,6 +307,15 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 			$error = '<a href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->get( 'grp_ID' ).'#fieldset_wrapper_file">'.$error.'</a>';
 		}
 		echo '<p>'.$error.'</p>';
+		evo_flush();
+		return false;
+	}
+
+	if( strpos( $src_file, $basepath ) !== 0 || // ZIP file path must be started with $basepath
+	    strpos( $src_file, '/../' ) !== false || // Deny ZIP file path with hack to up dir level
+	    strpos( $src_file, '://' ) !== false ) // Deny ZIP file from urls
+	{	// Don't allow wrong ZIP file path:
+		echo '<p class="text-danger">Invalid ZIP file path <code>'.$src_file.'</code>!</p>';
 		evo_flush();
 		return false;
 	}
