@@ -1159,6 +1159,62 @@ function move_files_r( $source_dir_path, $dest_dir_path )
 
 
 /**
+ * Change file and folder permissions recursively
+ *
+ * @param string Directory path
+ * @param integer Permissions for directories, NULL - to use general setting "Permissions for new folders"
+ * @param integer Permissions for files, NULL - to use general setting "Permissions for new files"
+ * @return boolean TRUE on success
+ */
+function chmod_r( $dir_path, $chmod_dir = NULL, $chmod_file = NULL )
+{
+	global $Settings;
+
+	$result = false;
+
+	if( ! is_dir( $dir_path ) )
+	{	// Skip not directory path:
+		return $result;
+	}
+
+	if( ! ( $dir_handle = @opendir( $dir_path ) ) )
+	{	// Unable to open dir:
+		return $result;
+	}
+
+	// Get default permissions:
+	$chmod_dir = ( $chmod_dir === NULL ? $Settings->get( 'fm_default_chmod_dir' ) : $chmod_dir );
+	$chmod_file = ( $chmod_file === NULL ? $Settings->get( 'fm_default_chmod_file' ) : $chmod_file );
+
+	if( ! empty( $chmod_dir ) )
+	{	// Change permissions for directory:
+		$result = @chmod( $dir_path, is_string( $chmod_dir ) ? octdec( $chmod_dir ) : $chmod_dir ) && $result;
+	}
+
+	while( $file = readdir( $dir_handle ) )
+	{
+		if( $file == '.' || $file == '..' )
+		{	// Skip reserved folders:
+			continue;
+		}
+		if( is_dir( $dir_path.'/'.$file ) )
+		{	// Change permissions for directory and all files inside:
+			$result = chmod_r( $dir_path.'/'.$file, $chmod_dir, $chmod_file ) && $result;
+		}
+		elseif( ! empty( $chmod_file ) )
+		{	// Change permissions for file:
+			$result = @chmod( $dir_path.'/'.$file, is_string( $chmod_file ) ? octdec( $chmod_file ) : $chmod_file ) && $result;
+		}
+	}
+
+	// Close the folder handler:
+	$result = closedir( $dir_handle ) && $result;
+
+	return $result;
+}
+
+
+/**
  * Is the given path absolute (non-relative)?
  *
  * @return boolean

@@ -318,22 +318,20 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 		return false;
 	}
 
-	if( function_exists( 'gzopen' ) )
-	{ // Unpack using 'zlib' extension and PclZip wrapper
-
-		// Load PclZip class (PHP4):
-		load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
-
-		$PclZip = new PclZip( $src_file );
-		if( $PclZip->extract( PCLZIP_OPT_PATH, $dest_dir, PCLZIP_OPT_SET_CHMOD, octdec( $Settings->get( 'fm_default_chmod_file' ) ) ) == 0 )
+	if( class_exists( 'ZipArchive' ) )
+	{	// Unpack using 'ZipArchive' extension:
+		$ZipArchive = new ZipArchive();
+		if( $ZipArchive->open( $src_file ) &&
+		    $ZipArchive->extractTo( $dest_dir ) )
+		{	// Change rights for unpacked folders and files after successful unpacking:
+			chmod_r( $dest_dir );
+			$ZipArchive->close();
+		}
+		else
 		{
-			if( empty( $src_file_name ) )
-			{ // Set zip file name
-				$src_file_name = $src_file;
-			}
 			echo '<p class="text-danger">'
-					.sprintf( T_( 'Error: %s' ), $PclZip->errorInfo( true ) ).'<br />'
-					.sprintf( T_( 'Unable to decompress &laquo;%s&raquo; ZIP archive.' ), $src_file_name )
+					.sprintf( T_( 'Error: %s' ), $ZipArchive->getStatusString() ).'<br />'
+					.sprintf( T_( 'Unable to decompress &laquo;%s&raquo; ZIP archive.' ), ( empty( $src_file_name ) ? $src_file : $src_file_name ) )
 				.'</p>';
 			evo_flush();
 
@@ -342,7 +340,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 	}
 	else
 	{
-		debug_die( 'Unable to decompress the file because there is no \'zip\' or \'zlib\' extension installed in your PHP!' );
+		debug_die( 'Unable to decompress the file because there is no \'ZipArchive\' extension installed in your PHP!' );
 	}
 
 	return true;
