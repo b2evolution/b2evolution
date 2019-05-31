@@ -9643,8 +9643,6 @@ function display_importer_upload_panel( $params = array() )
 		// BODY START:
 		$Table->display_body_start();
 
-		$media_path_length = strlen( $media_path.'import/'.( empty( $params['folder'] ) ? '' : $params['folder'].'/' ) );
-
 		foreach( $import_files as $import_file )
 		{
 			$Table->display_line_start();
@@ -9656,7 +9654,7 @@ function display_importer_upload_panel( $params = array() )
 
 			// File
 			$Table->display_col_start();
-			echo substr( $import_file['path'], $media_path_length );
+			echo $import_file['name'];
 			$Table->display_col_end();
 
 			// Type
@@ -9669,7 +9667,7 @@ function display_importer_upload_panel( $params = array() )
 
 			// File date
 			$Table->display_col_start();
-			echo date( locale_datefmt().' '.locale_timefmt(), filemtime( $import_file['path'] ) );
+			echo date( locale_datefmt().' '.locale_timefmt(), $import_file['date'] );
 			$Table->display_col_end();
 
 			$Table->display_line_end();
@@ -9788,6 +9786,8 @@ function get_import_files( $folder = '', $allowed_extensions = 'xml|txt|zip', $i
 		}
 	}
 
+	$media_path_length = strlen( $media_path.'import/'.( empty( $folder ) ? '' : $folder.'/' ) );
+
 	foreach( $file_paths as $file_data )
 	{
 		switch( $file_data[1] )
@@ -9814,11 +9814,34 @@ function get_import_files( $folder = '', $allowed_extensions = 'xml|txt|zip', $i
 
 		$import_files[] = array(
 				'path' => $file_data[0],
+				'name' => substr( $file_data[0], $media_path_length ),
 				'type' => $file_type,
+				'date' => filemtime( $file_data[0] ),
 			);
 	}
 
+	// Sort import files by date DESC:
+	usort( $import_files, 'sort_import_files_callback' );
+
 	return $import_files;
+}
+
+
+/**
+ * Callback function to sort import files by date DESC
+ *
+ * @param array Import file data
+ * @param array Import file data
+ * @return boolean
+ */
+function sort_import_files_callback( $a, $b )
+{
+	if( $a['date'] == $b['date'] )
+	{	// Sort by file name with same dates:
+		return $a['name'] < $b['name'] ? -1 : 1;
+	}
+
+	return ( $a['date'] > $b['date'] ? -1 : 1 );
 }
 
 
