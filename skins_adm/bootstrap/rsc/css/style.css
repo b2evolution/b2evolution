@@ -1334,6 +1334,13 @@ ol.breadcrumb {
 .skin_settings_form .col-sm-10 {
   width: 80%;
 }
+.fa[data-default-value] {
+  font-size: 80%;
+  color: #999;
+}
+.fa[data-default-value]:hover {
+  color: #666;
+}
 @media (max-width: 992px) {
   .skin_settings_form {
     margin-left: 0;
