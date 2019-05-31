@@ -139,8 +139,8 @@ $Form->begin_form( 'fform' );
 $buttons = array();
 if( $can_edit_skin_settings )
 {	// Display a button to update skin params only when if current User can edit this:
-	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
-	$buttons[] = array( 'button', 'cancel', T_('Cancel'), 'ResetButton', 'location.reload()' );
+	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), ( $mode == 'customizer' ? '' : 'SaveButton' ) );
+	$buttons[] = array( 'button', 'cancel', T_('Cancel'), ( $mode == 'customizer' ? '' : 'ResetButton' ), 'location.reload()' );
 }
 
 if( $mode == 'customizer' )
