@@ -11745,6 +11745,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15470, 'Creating SVG file type...' ) )
+	{	// part of 7.0.1-beta
+		$SQL = new SQL( 'Check for file type .svg' );
+		$SQL->SELECT( 'ftyp_ID' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_extensions REGEXP "(^| )svg( |$)"' );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Insert new SVG file type only if it doesn't exist:
+			$DB->query( 'INSERT INTO T_filetypes
+				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
+				VALUES ( "svg", "SVG file", "image/svg+xml", "file_document", "text", "admin" )' );
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
