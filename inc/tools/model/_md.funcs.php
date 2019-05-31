@@ -276,6 +276,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 	evo_flush();
 
 	load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
+	$ChapterCache = & get_ChapterCache();
 
 	$categories = array();
 	$categories_count = 0;
@@ -312,6 +313,8 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			$categories[ $relative_path ] = $Chapter->ID;
 			$categories_count++;
 			echo '<span class="text-success">'.T_('OK').'</span>';
+			// Add new created Chapter into cache to avoid wrong main category ID in ItemLight::get_main_Chapter():
+			$ChapterCache->add( $Chapter );
 		}
 		else
 		{
@@ -380,6 +383,8 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 				$new_Chapter->set( 'urlname', urltitle_validate( $default_category_name, $default_category_name, 0, false, 'cat_urlname', 'cat_ID', 'T_categories' ) );
 				$new_Chapter->dbinsert();
 				$default_category_ID = $new_Chapter->ID;
+				// Add new created Chapter into cache to avoid wrong main category ID in ItemLight::get_main_Chapter():
+				$ChapterCache->add( $new_Chapter );
 			}
 			$category_ID = $default_category_ID;
 		}
