@@ -65,6 +65,14 @@ if( ! empty( $import_files ) )
 
 	$Form->radio_input( 'import_type', $import_type, array(
 				array(
+					'value' => 'upgrade',
+					'label' => T_('Upgrade existing contents'),
+					'note'  => T_('Existing Categories & Posts will be re-used (based on slug).'),
+					'id'    => 'import_type_upgrade' ),
+			), '', array( 'lines' => true ) );
+
+	$Form->radio_input( 'import_type', $import_type, array(
+				array(
 					'value' => 'append',
 					'label' => T_('Append to existing contents'),
 					'id'    => 'import_type_append' ),

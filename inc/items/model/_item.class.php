@@ -7904,10 +7904,10 @@ class Item extends ItemLight
 	 * 	because of the item canonical url title was changed on the slugs edit form, so slug update is already done.
 	 *  If slug update wasn't done already, then this param has to be true.
 	 * @param boolean Update custom fields of child posts?
-	 * @param boolean TRUE to force to create revision
+	 * @param boolean|string TRUE - Force to create revision, FALSE - Auto create revision depending on last edit time, 'no' - Force to do NOT create revision
 	 * @return boolean true on success
 	 */
-	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true, $force_create_revision = false )
+	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true, $create_revision = false )
 	{
 		global $DB, $Plugins, $Messages;
 
@@ -8098,8 +8098,8 @@ class Item extends ItemLight
 			// fp> TODO: actually, only the fields that have been changed should be copied to the version, the other should be left as NULL
 
 			global $localtimenow;
-			if( $force_create_revision || $localtimenow - strtotime( $this->last_touched_ts ) > 10 )
-			{ // Create new revision
+			if( $create_revision !== 'no' && ( $create_revision || $localtimenow - strtotime( $this->last_touched_ts ) > 10 ) )
+			{	// Create new revision:
 				$result = $this->create_revision();
 			}
 
