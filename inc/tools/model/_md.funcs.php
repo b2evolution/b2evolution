@@ -77,12 +77,14 @@ function md_get_import_data( $source_path )
  */
 function md_import( $folder_path, $source_type, $source_folder_zip_name )
 {
-	global $DB, $tableprefix, $media_path, $current_User, $localtimenow;
+	global $Blog, $DB, $tableprefix, $media_path, $current_User, $localtimenow;
 
 	// Set Collection by requested ID:
 	$md_blog_ID = param( 'md_blog_ID', 'integer', 0 );
 	$BlogCache = & get_BlogCache();
 	$md_Blog = & $BlogCache->get_by_ID( $md_blog_ID );
+	// Set current collection because it is used inside several functions like urltitle_validate():
+	$Blog = $md_Blog;
 
 	// The import type ( replace | append )
 	$import_type = param( 'import_type', 'string', 'replace' );
@@ -292,33 +294,44 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 
 		$relative_path = substr( $file_path, $folder_path_length + 1 );
 
-		// Get names of current category and parent path:
-		$last_index = strrpos( $relative_path, '/' );
-		$category_name = $last_index === false ? $relative_path : substr( $relative_path, $last_index + 1 );//$paths_folders[ $paths_folders_num - 1 ];
-		$parent_path = substr( $relative_path, 0, $last_index );
-
 		echo '<p>'.sprintf( T_('Importing category: %s'), '"<b>'.$relative_path.'</b>"...' );
 		evo_flush();
 
-		$Chapter = new Chapter( NULL, $md_blog_ID );
-		$Chapter->set( 'name', $category_name );
-		$Chapter->set( 'urlname', urltitle_validate( $category_name, $category_name, 0, false, 'cat_urlname', 'cat_ID', 'T_categories' ) );
-		if( ! empty( $parent_path ) && isset( $categories[ $parent_path ] ) )
-		{	// Set category parent ID:
-			$Chapter->set( 'parent_ID', $categories[ $parent_path ] );
-		}
-		if( $Chapter->dbinsert() )
-		{	// If category is inserted successfully:
-			// Save new category in cache:
+		if( $import_type != 'replace' &&
+		    $Chapter = & md_get_Chapter( $relative_path, $md_blog_ID ) )
+		{	// Use existing category with same full url path:
 			$categories[ $relative_path ] = $Chapter->ID;
 			$categories_count++;
 			echo '<span class="text-success">'.T_('OK').'</span>';
-			// Add new created Chapter into cache to avoid wrong main category ID in ItemLight::get_main_Chapter():
-			$ChapterCache->add( $Chapter );
 		}
 		else
-		{
-			echo '<span class="text-warning">'.T_('Failed').'</span>';
+		{	// Create new category:
+			$Chapter = new Chapter( NULL, $md_blog_ID );
+
+			// Get names of current category and parent path:
+			$last_index = strrpos( $relative_path, '/' );
+			$category_name = $last_index === false ? $relative_path : substr( $relative_path, $last_index + 1 );//$paths_folders[ $paths_folders_num - 1 ];
+			$parent_path = substr( $relative_path, 0, $last_index );
+
+			$Chapter->set( 'name', $category_name );
+			$Chapter->set( 'urlname', urltitle_validate( $category_name, $category_name, 0, false, 'cat_urlname', 'cat_ID', 'T_categories' ) );
+			if( ! empty( $parent_path ) && isset( $categories[ $parent_path ] ) )
+			{	// Set category parent ID:
+				$Chapter->set( 'parent_ID', $categories[ $parent_path ] );
+			}
+			if( $Chapter->dbinsert() )
+			{	// If category is inserted successfully:
+				// Save new category in cache:
+				$categories[ $relative_path ] = $Chapter->ID;
+				$categories_count++;
+				echo '<span class="text-success">'.T_('OK').'</span>';
+				// Add new created Chapter into cache to avoid wrong main category ID in ItemLight::get_main_Chapter():
+				$ChapterCache->add( $Chapter );
+			}
+			else
+			{
+				echo '<span class="text-warning">'.T_('Failed').'</span>';
+			}
 		}
 		echo '.</p>';
 		evo_flush();
@@ -536,5 +549,59 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 	evo_flush();
 
 	return $link_ID;
+}
+
+
+/**
+ * Get category by provided folder path
+ *
+ * @param string Category folder path
+ * @param string Collection ID
+ * @return object|NULL Chapter object
+ */
+function & md_get_Chapter( $cat_folder_path, $blog_ID )
+{
+	global $DB;
+
+	$cat_full_url_path = explode( '/', $cat_folder_path );
+	foreach( $cat_full_url_path as $c => $cat_slug )
+	{	// Convert title text to slug format:
+		$cat_full_url_path[ $c ] = get_urltitle( $cat_slug );
+	}
+	// Get base of url name without numbers at the end:
+	$cat_urlname_base = preg_replace( '/-\d+$/', '', $cat_full_url_path[ count( $cat_full_url_path ) - 1 ] );
+
+	$SQL = new SQL( 'Find categories by path "'.implode( '/', $cat_full_url_path ).'/"' );
+	$SQL->SELECT( 'cat_ID' );
+	$SQL->FROM( 'T_categories' );
+	$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
+	$SQL->WHERE_and( 'cat_urlname REGEXP '.$DB->quote( '^('.$cat_urlname_base.')(-[0-9]+)?$' ) );
+	$cat_IDs = $DB->get_col( $SQL );
+
+	$ChapterCache = & get_ChapterCache();
+	foreach( $cat_IDs as $cat_ID )
+	{
+		if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false, false ) )
+		{
+			$cat_curr_url_path = explode( '/', substr( $Chapter->get_url_path(), 0 , -1 ) );
+			$full_match = true;
+			foreach( $cat_full_url_path as $c => $cat_full_url_folder )
+			{
+				// Decide slug is same without number at the end:
+				if( ! preg_match( '/^'.preg_quote( $cat_full_url_folder, '/' ).'(-\d+)?$/', $cat_curr_url_path[ $c ] ) )
+				{
+					$full_match = false;
+					break;
+				}
+			}
+			if( $full_match )
+			{	// We found category with same full url path:
+				return $Chapter;
+			}
+		}
+	}
+
+	$r = NULL;
+	return $r;
 }
 ?>

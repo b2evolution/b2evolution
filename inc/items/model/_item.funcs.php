@@ -453,45 +453,17 @@ function & get_current_Item()
 
 
 /**
- * Validate URL title (slug) / Also used for category slugs
+ * Get url title / slug from provided title text
  *
- * Using title as a source if url title is empty.
- * We allow up to 200 chars (which is ridiculously long) for WP import compatibility.
- * New slugs will be cropped to 5 words so the URLs are not too long.
- *
- * @param string url title to validate
- * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
- * @param integer ID of post
- * @param boolean Query the DB, but don't modify the URL title if the title already exists (Useful if you only want to alert the pro user without making changes for him)
- * @param string The prefix of the database column names (e. g. "post_" for post_urltitle)
- * @param string The name of the post ID column
- * @param string The name of the DB table to use
- * @param NULL|string The post locale or NULL if there is no specific locale.
- * @param NULL|string The name of the DB table to use in the message
- * @return string validated url title
+ * @param string Title
+ * @param string Locale
+ * @return string
  */
-function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
-									$dbSlugFieldName = 'post_urltitle', $dbIDname = 'post_ID',
-									$dbtable = 'T_items__item', $post_locale = NULL, $msg_dbtable = NULL )
+function get_urltitle( $title, $locale = NULL )
 {
-	global $DB, $Messages;
-
-	$urltitle = trim( $urltitle );
-	$orig_title = $urltitle;
-
-	if( empty( $urltitle ) )
-	{
-		if( ! empty($title) )
-			$urltitle = $title;
-		else
-			$urltitle = 'title';
-	}
-
-	// echo 'starting with: '.$urltitle.'<br />';
-
 	// Replace special chars/umlauts, if we can convert charsets:
 	load_funcs('locales/_charset.funcs.php');
-	$urltitle = replace_special_chars($urltitle, $post_locale);
+	$urltitle = replace_special_chars( $title, $locale );
 
 	// Make everything lowercase and use trim again after replace_special_chars
 	$urltitle = strtolower( trim ( $urltitle ) );
@@ -541,6 +513,47 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	{	// Append only NOT empty string after last dash:
 		$urltitle .= '-'.$matches[4];
 	}
+
+	return $urltitle;
+}
+
+
+/**
+ * Validate URL title (slug) / Also used for category slugs
+ *
+ * Using title as a source if url title is empty.
+ * We allow up to 200 chars (which is ridiculously long) for WP import compatibility.
+ * New slugs will be cropped to 5 words so the URLs are not too long.
+ *
+ * @param string url title to validate
+ * @param string real title to use as a source if $urltitle is empty (encoded in $evo_charset)
+ * @param integer ID of post
+ * @param boolean Query the DB, but don't modify the URL title if the title already exists (Useful if you only want to alert the pro user without making changes for him)
+ * @param string The prefix of the database column names (e. g. "post_" for post_urltitle)
+ * @param string The name of the post ID column
+ * @param string The name of the DB table to use
+ * @param NULL|string The post locale or NULL if there is no specific locale.
+ * @param NULL|string The name of the DB table to use in the message
+ * @return string validated url title
+ */
+function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false,
+									$dbSlugFieldName = 'post_urltitle', $dbIDname = 'post_ID',
+									$dbtable = 'T_items__item', $post_locale = NULL, $msg_dbtable = NULL )
+{
+	global $DB, $Messages;
+
+	$urltitle = trim( $urltitle );
+	$orig_title = $urltitle;
+
+	if( empty( $urltitle ) )
+	{
+		$urltitle = empty( $title ) ? 'title' : $title;
+	}
+
+	// Convert title text to url title/slug:
+	$urltitle = get_urltitle( $urltitle );
+
+	$urlbase = str_replace( '/-\d+$/', '', $urltitle );
 
 	if( !$query_only )
 	{
