@@ -48,7 +48,16 @@ if( ! empty( $import_files ) )
 			'required' => true,
 			'loop_object_method' => 'get_extended_name' ) );
 
-	$import_type = param( 'import_type', 'string', 'replace' );
+	$import_type = param( 'import_type', 'string', NULL );
+	$delete_files = param( 'delete_files', 'integer', NULL );
+	$reuse_cats = param( 'reuse_cats', 'integer', NULL );
+	if( $import_type === NULL )
+	{	// Set default form params:
+		$import_type = 'replace';
+		$delete_files = 0;
+		$reuse_cats = 1;
+	}
+
 	$Form->radio_input( 'import_type', $import_type, array(
 				array(
 					'value' => 'replace',
@@ -58,8 +67,8 @@ if( ! empty( $import_files ) )
 			), '', array( 'lines' => true ) );
 
 	echo '<div id="checkbox_delete_files"'.( $import_type == 'replace' ? '' : ' style="display:none"' ).'>';
-	$Form->checkbox_input( 'delete_files', param( 'delete_files', 'integer', 0 ), '', array(
-		'input_suffix' => '<label for="delete_files">'.T_(' Also delete files that will no longer be referenced in the destination collection after replacing its contents').'</label>',
+	$Form->checkbox_input( 'delete_files', $delete_files, '', array(
+		'input_suffix' => T_('Also delete files that will no longer be referenced in the destination collection after replacing its contents'),
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
@@ -78,6 +87,14 @@ if( ! empty( $import_files ) )
 					'id'    => 'import_type_append' ),
 			), '', array( 'lines' => true ) );
 
+	echo '<div id="checkbox_reuse_cats"'.( $import_type == 'append' ? '' : ' style="display:none"' ).'>';
+
+	$Form->checkbox_input( 'reuse_cats', $reuse_cats, '', array(
+		'input_suffix' => T_('Reuse existing categories'),
+		'note'         => '('.T_('based on folder name = slug name').')',
+		'input_prefix' => '<span style="margin-left:25px"></span>') );
+	echo '</div>';
+
 	$Form->end_fieldset();
 
 	$Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' ) ) );
@@ -89,5 +106,6 @@ $Form->end_form();
 jQuery( 'input[name=import_type]' ).click( function()
 {	// Show/Hide checkbox to delete files:
 	jQuery( '#checkbox_delete_files' ).toggle( jQuery( this ).val() == 'replace' );
+	jQuery( '#checkbox_reuse_cats' ).toggle( jQuery( this ).val() == 'append' );
 } );
 </script>

@@ -88,13 +88,14 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 
 	// The import type ( replace | append )
 	$import_type = param( 'import_type', 'string', 'replace' );
-	// Should we delete files on 'replace' mode?
-	$delete_files = param( 'delete_files', 'integer', 0 );
 
 	$DB->begin();
 
 	if( $import_type == 'replace' )
-	{ // Remove data from selected blog
+	{	// Remove data from selected collection:
+
+		// Should we delete files on 'replace' mode?
+		$delete_files = param( 'delete_files', 'integer', 0 );
 
 		// Get existing categories
 		$SQL = new SQL( 'Get existing categories of collection #'.$md_blog_ID );
@@ -297,8 +298,13 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		echo '<p>'.sprintf( T_('Importing category: %s'), '"<b>'.$relative_path.'</b>"...' );
 		evo_flush();
 
-		if( $import_type != 'replace' &&
-		    $Chapter = & md_get_Chapter( $relative_path, $md_blog_ID ) )
+		// Always reuse existing categories on "upgrade" mode:
+		$reuse_cats = ( $import_type == 'upgrade' ||
+			// Should we reuse existing categories on "append" mode?
+			( $import_type == 'append' && param( 'reuse_cats', 'integer', 0 ) ) );
+			// Don't try to use find existing categories on replace mode.
+
+		if( $reuse_cats && $Chapter = & md_get_Chapter( $relative_path, $md_blog_ID ) )
 		{	// Use existing category with same full url path:
 			$categories[ $relative_path ] = $Chapter->ID;
 			$categories_count++;
