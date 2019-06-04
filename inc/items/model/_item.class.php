@@ -5945,7 +5945,7 @@ class Item extends ItemLight
 
 		$this->load_Blog();
 		$url = false;
-		if( ! is_admin_page() && $this->Blog->get_setting( 'in_skin_editing' ) )
+		if( ! is_admin_page() && $this->Blog->get_setting( 'in_skin_change_proposal' ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
 			$url = url_add_param( $this->Blog->get( 'url' ), 'disp=proposechange&p='.$this->ID );
 		}

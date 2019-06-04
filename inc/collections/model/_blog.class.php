@@ -1258,6 +1258,7 @@ class Blog extends DataObject
 					$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
 				}
 				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
+				$this->set_setting( 'in_skin_change_proposal', param( 'in_skin_change_proposal', 'integer', 0 ) );
 			}
 
 			if( param( 'blog_head_includes', 'html', NULL ) !== NULL )

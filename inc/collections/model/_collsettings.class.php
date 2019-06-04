@@ -171,6 +171,7 @@ class CollectionSettings extends AbstractSettings
 			'cache_enabled_widgets' => 0,
 			'in_skin_login' => 0,						// Use in skin login form every time it's possible
 			'in_skin_editing' => 0,
+			'in_skin_change_proposal' => 1,
 			'in_skin_editing_renderers' => 1,
 			'in_skin_editing_category' => 1,
 			'in_skin_editing_category_order' => 1,
