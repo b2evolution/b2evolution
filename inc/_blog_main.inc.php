@@ -175,12 +175,12 @@ if( $resolve_extra_path )
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
 	// Check if we have one of these:
-	// - Either the ReqPath starts with collection base URI (always including trailing slash)
+	// - Either the ReqPath starts with collection base URI (always including trailing slash) (ignoring prefix "/index.php")
 	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
 	// ... followed by some extra path info.
-	if( preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
+	if( preg_match( '~(^(/index.php)?'.preg_quote( preg_replace( '~^/index.php~', '', $blog_baseuri ), '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
 	{ // We have extra path info
-		$path_string = $matches[2];
+		$path_string = $matches[3];
 
 		$Debuglog->add( 'Extra path info found! path_string=' . $path_string , 'params' );
 		// echo "path=[$path_string]<br />";
