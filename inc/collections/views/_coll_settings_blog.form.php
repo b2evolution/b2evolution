@@ -84,7 +84,14 @@ $Form->begin_fieldset( T_('Cross posting').get_manual_link('collections-cross-po
 		array( 'cross_posting_blogs', 1, T_('Allow admins to move posts between collections'), $Settings->get('cross_posting_blogs'), false, T_('(Main cat can move to different blog)').get_admin_badge() ) ),
 		'allow_cross_posting', T_('Cross posting') );
 
-	$Form->checkbox_input( 'redirect_moved_posts', $Settings->get('redirect_moved_posts'), T_('Redirect if post has moved'), array( 'note'=>T_('check to allow redirects to the correct Collection if the requested Item Slug was found in a different collection.') ) );
+	$redirect_moved_posts_params = array( 'note' => T_('check to allow redirects to the correct Collection if the requested Item Slug was found in a different collection.') );
+	if( $Settings->get( 'always_match_slug' ) )
+	{
+		$redirect_moved_posts_params['disabled'] = 'disabled';
+	}
+	$Form->checkbox_input( 'redirect_moved_posts', $Settings->get( 'redirect_moved_posts' ), T_('Redirect if post has moved'), $redirect_moved_posts_params );
+
+	$Form->checkbox_input( 'always_match_slug', $Settings->get( 'always_match_slug' ), T_('Always try to match slug'), array( 'note' => T_('check to redirect to correct Collection if an Item Slug was found in <b>any</b> URL.') ) );
 $Form->end_fieldset();
 
 // --------------------------------------------
@@ -146,3 +153,13 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 }
 
 ?>
+<script>
+jQuery( '#always_match_slug' ).click( function()
+{
+	if( jQuery( this ).prop( 'checked' ) )
+	{
+		jQuery( '#redirect_moved_posts' ).prop( 'checked', true );
+	}
+	jQuery( '#redirect_moved_posts' ).prop( 'disabled', jQuery( this ).prop( 'checked' ) );
+} );
+</script>
