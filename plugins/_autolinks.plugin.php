@@ -175,7 +175,6 @@ class autolinks_plugin extends Plugin
 			switch( $params['blog_type'] )
 			{
 				case 'forum':
-				case 'manual':
 					$default_values['autolink_post_nofollow_exist'] = 1;
 					$default_values['autolink_post_nofollow_explicit'] = 1;
 					break;
