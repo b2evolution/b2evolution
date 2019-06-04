@@ -541,22 +541,29 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 			if( ( $File = & $item_Link->get_File() ) &&
 			    $file_name == $File->get( 'name' ) )
 			{	// We found File with same name:
-				if( copy_r( $file_source_path, $File->get_full_path() ) )
-				{	// If file has been updated successfully:
-					echo '<p class="text-success">'.sprintf( T_('File %s has been imported to %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</p>';
-					// Clear evocache:
-					$File->rm_cache();
-				}
-				else
-				{	// No permission to update file:
-					if( is_dir( $file_source_path ) )
-					{	// Folder
-						echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+				if( $File->get( 'hash' ) != md5_file( $file_source_path, true ) )
+				{	// Update only really changed file:
+					if( copy_r( $file_source_path, $File->get_full_path() ) )
+					{	// If file has been updated successfully:
+						echo '<p class="text-success">'.sprintf( T_('File %s has been imported to %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</p>';
+						// Clear evocache:
+						$File->rm_cache();
+						// Update file hash:
+						$File->set_param( 'hash', 'string', md5_file( $File->get_full_path(), true ) );
+						$File->dbupdate();
 					}
 					else
-					{	// File
-						echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+					{	// No permission to update file:
+						if( is_dir( $file_source_path ) )
+						{	// Folder
+							echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+						}
+						else
+						{	// File
+							echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+						}
 					}
+					evo_flush();
 				}
 				return $item_Link->ID;
 			}
