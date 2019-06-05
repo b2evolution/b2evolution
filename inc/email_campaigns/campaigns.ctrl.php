@@ -549,6 +549,55 @@ switch( $action )
 		$action = 'edit';
 		$tab = 'recipient';
 		break;
+
+	case 'plugins':
+		// Update email campaigns plugins settings:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'campaigns_plugins' );
+
+		// Check permission:
+		$current_User->check_perm( 'emails', 'edit', true );
+
+		load_funcs( 'plugins/_plugin.funcs.php' );
+
+		$Plugins->restart();
+		while( $loop_Plugin = & $Plugins->get_next() )
+		{
+			$tmp_params = array( 'for_editing' => true );
+			$pluginsettings = $loop_Plugin->get_email_setting_definitions( $tmp_params );
+			if( empty( $pluginsettings ) )
+			{
+				continue;
+			}
+
+			// Loop through settings for this plugin:
+			foreach( $pluginsettings as $set_name => $set_meta )
+			{
+				autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'EmailSettings' );
+			}
+
+			// Let the plugin handle custom fields:
+			// We use call_method to keep track of this call, although calling the plugins PluginSettingsUpdateAction method directly _might_ work, too.
+			$tmp_params = array();
+			$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params );
+
+			if( $ok_to_update === false )
+			{	// The plugin has said they should not get updated, Rollback settings:
+				$loop_Plugin->Settings->reset();
+			}
+			else
+			{	// Update message settings of the Plugin:
+				$loop_Plugin->Settings->dbupdate();
+			}
+		}
+
+		$Messages->add( T_('Settings updated.'), 'success' );
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		header_redirect( '?ctrl=campaigns&tab=plugins'.( empty( $edited_EmailCampaign->ID ) ? '' : '&action=edit&ecmp_ID='.$edited_EmailCampaign->ID ), 303 ); // Will EXIT
+		// We have EXITed already at this point!!
+		break;
 }
 
 
@@ -598,13 +647,20 @@ switch( $action )
 {
 	case 'new':
 	case 'edit':
+	case 'delete':
 		switch( $tab )
 		{
 			case 'info':
 				$AdminUI->set_page_manual_link( ( ! isset( $edited_EmailCampaign ) || $edited_EmailCampaign->ID == 0 ) ? 'creating-an-email-campaign' : 'campaign-info-panel' );
+				// Initialize user tag input:
+				init_tokeninput_js();
 				break;
 			case 'compose':
 				$AdminUI->set_page_manual_link( 'campaign-compose-panel' );
+				// Require colorbox js:
+				require_js_helper( 'colorbox' );
+				// Init JS to quick upload several files:
+				init_fileuploader_js();
 				break;
 			case 'plaintext':
 				$AdminUI->set_page_manual_link( 'campaign-plaintext-panel' );
@@ -614,64 +670,60 @@ switch( $action )
 				break;
 			case 'recipient':
 				$AdminUI->set_page_manual_link( 'email-campaign-recipients' );
+				// Initialize date picker:
+				init_datepicker_js();
+				// Initialize user tag input:
+				init_tokeninput_js();
+				break;
+			case 'plugins':
+				$Messages->add( T_('The settings below apply to <b>all</b> campaigns.'), 'note' );
+				$AdminUI->set_page_manual_link( 'email-plugins-settings' );
+				// Initialize JS for color picker field on the edit plugin settings form:
+				init_colorpicker_js();
 				break;
 			default:
 				$AdminUI->set_page_manual_link( 'creating-an-email-campaign' );
 				break;
 		}
-
+		$AdminUI->set_path( 'email', 'campaigns', $tab );
 		$AdminUI->display_breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
 		$AdminUI->display_breadcrumbpath_add( isset( $edited_EmailCampaign ) ? $edited_EmailCampaign->get( 'name' ) : T_('New campaign') );
+		if( $ecmp_ID > 0 )
+		{	// Build special tabs in edit mode of the campaign:
+			$campaign_edit_modes = get_campaign_edit_modes( $ecmp_ID );
+			$AdminUI->clear_menu_entries( array( 'email', 'campaigns' ) );
+			$AdminUI->add_menu_entries( array( 'email', 'campaigns' ), $campaign_edit_modes );
+			$AdminUI->breadcrumbpath_add( T_('Edit campaign'), $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID='.$ecmp_ID );
+			if( ! empty( $campaign_edit_modes[ $tab ] ) )
+			{
+				$AdminUI->breadcrumbpath_add( $campaign_edit_modes[ $tab ]['text'], $campaign_edit_modes[ $tab ]['href'] );
+			}
+		}
 		break;
 	case 'copy':
+		$AdminUI->set_path( 'email', 'campaigns' );
 		$AdminUI->set_page_manual_link( 'duplicating-an-email-campaign' );
 		$AdminUI->display_breadcrumbpath_add( T_('Campaigns'), $admin_url.'?ctrl=campaigns' );
 		$AdminUI->display_breadcrumbpath_add( sprintf( T_('Duplicate [%s]'), $edited_EmailCampaign->get( 'name' ) ) );
 		break;
 	default:
-	$AdminUI->display_breadcrumbpath_add( T_('Campaigns') );
-		$AdminUI->set_page_manual_link( 'email-campaign-list' );
+		$AdminUI->display_breadcrumbpath_add( T_('Campaigns') );
+		switch( $tab )
+		{
+			case 'plugins':
+				$Messages->add( T_('The settings below apply to <b>all</b> campaigns.'), 'note' );
+				$AdminUI->set_path( 'email', 'campaigns', 'plugins' );
+				$AdminUI->breadcrumbpath_add( T_('Plugins'), $admin_url.'?ctrl=campaigns&amp;tab=plugins' );
+				$AdminUI->set_page_manual_link( 'email-plugins-settings' );
+				// Initialize JS for color picker field on the edit plugin settings form:
+				init_colorpicker_js();
+				break;
+			default:
+				$AdminUI->set_path( 'email', 'campaigns' );
+				$AdminUI->set_page_manual_link( 'email-campaign-list' );
+				break;
+		}
 		break;
-}
-
-if( $action == 'edit' || $action == 'delete' )
-{ // Build special tabs in edit mode of the campaign
-	$AdminUI->set_path( 'email', 'campaigns', $tab );
-	$campaign_edit_modes = get_campaign_edit_modes( $ecmp_ID );
-	$AdminUI->add_menu_entries( array( 'email', 'campaigns' ), $campaign_edit_modes );
-	$AdminUI->breadcrumbpath_add( T_('Edit campaign'), $admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID='.$ecmp_ID );
-
-	if( !empty( $campaign_edit_modes[ $tab ] ) )
-	{
-		$AdminUI->breadcrumbpath_add( $campaign_edit_modes[ $tab ]['text'], $campaign_edit_modes[ $tab ]['href'] );
-	}
-
-	if( $tab == 'compose' )
-	{	// Require colorbox js:
-		require_js_helper( 'colorbox' );
-		// Init JS to quick upload several files:
-		init_fileuploader_js();
-	}
-	elseif( $tab == 'recipient' )
-	{
-		// Initialize date picker
-		init_datepicker_js();
-
-		// Initialize user tag input
-		init_tokeninput_js();
-	}
-	elseif( $tab == 'info' )
-	{
-		init_tokeninput_js();
-	}
-}
-else
-{ // List of campaigns
-	if( $action == 'copy' )
-	{
-		init_tokeninput_js();
-	}
-	$AdminUI->set_path( 'email', 'campaigns' );
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -730,12 +782,25 @@ switch( $action )
 				memorize_param( 'tab', 'string', '' );
 				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_recipient.view.php' );
 				break;
+
+			case 'plugins':
+				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_plugins.form.php' );
+				break;
 		}
 		break;
 
 	default:
-		// Display a list of email campaigns:
-		$AdminUI->disp_view( 'email_campaigns/views/_campaigns.view.php' );
+		switch( $tab )
+		{
+			case 'plugins':
+				// Display plugin settings for email campaigns:
+				$AdminUI->disp_view( 'email_campaigns/views/_campaigns_plugins.form.php' );
+				break;
+
+			default:
+				// Display a list of email campaigns:
+				$AdminUI->disp_view( 'email_campaigns/views/_campaigns.view.php' );
+		}
 		break;
 }
 
