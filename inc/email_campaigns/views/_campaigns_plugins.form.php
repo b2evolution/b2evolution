@@ -17,20 +17,17 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-/**
- * @var Plugins
- */
-global $Plugins;
+global $Plugins, $edited_EmailCampaign;
 
 $Form = new Form( NULL, 'email_settings_renderers' );
 
 $Form->begin_form( 'fform', '' );
 
-	$Form->add_crumb( 'emailsettings' );
-	$Form->hidden( 'ctrl', 'email' );
-	$Form->hidden( 'action', 'settings' );
-	$Form->hidden( 'tab', 'settings' );
-	$Form->hidden( 'tab3', get_param( 'tab3' ) );
+	$Form->add_crumb( 'campaigns_plugins' );
+	$Form->hidden( 'ctrl', 'campaigns' );
+	$Form->hidden( 'action', 'plugins' );
+	$Form->hidden( 'tab', get_param( 'tab' ) );
+	$Form->hidden( 'ecmp_ID', isset( $edited_EmailCampaign ) ? $edited_EmailCampaign->ID : '' );
 
 load_funcs('plugins/_plugin.funcs.php');
 

@@ -740,7 +740,7 @@ switch( $action )
 						continue;
 					}
 
-					if( $l_File->unlink() )
+					if( $l_File->unlink( true, true ) )
 					{
 						$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
 										: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', T_('Creating ZIP file...') );
@@ -1005,6 +1005,7 @@ switch( $action )
 			break;
 		}
 
+		param( 'delete_nonempty', 'integer', 0 );
 		param( 'confirmed', 'integer', 0 );
 		// fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB
 
@@ -1025,7 +1026,7 @@ switch( $action )
 					continue;
 				}
 
-				if( $l_File->unlink() )
+				if( $l_File->unlink( true, $delete_nonempty ) )
 				{
 					$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
 									: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', T_('Deleting files...') );

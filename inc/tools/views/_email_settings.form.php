@@ -36,7 +36,6 @@ $Form->begin_form( 'fform' );
 $Form->add_crumb( 'emailsettings' );
 $Form->hidden( 'ctrl', 'email' );
 $Form->hidden( 'tab', get_param( 'tab' ) );
-$Form->hidden( 'tab2', get_param( 'tab2' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 

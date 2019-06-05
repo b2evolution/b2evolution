@@ -39,7 +39,7 @@ $Form->hidden( 'tab', get_param( 'tab' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
 
-$Form->begin_fieldset( T_('Email campaign throttling').get_manual_link( 'email-other-settings' ) );
+$Form->begin_fieldset( T_('Email campaign throttling').get_manual_link( 'email-throttling-settings' ) );
 
 	$Form->radio_input( 'email_campaign_send_mode', $Settings->get( 'email_campaign_send_mode' ),
 		array(
