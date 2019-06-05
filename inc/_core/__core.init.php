@@ -2120,6 +2120,9 @@ class _core_Module extends Module
 							'text' => T_('Campaigns'),
 							'href' => '?ctrl=campaigns',
 							'entries' => array(
+								'list' => array(
+									'text' => T_('List'),
+									'href' => '?ctrl=campaigns' ),
 								'plugins' => array(
 									'text' => T_('Plugins'),
 									'href' => '?ctrl=campaigns&amp;tab=plugins' ),

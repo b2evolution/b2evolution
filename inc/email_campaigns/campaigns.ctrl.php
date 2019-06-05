@@ -719,7 +719,7 @@ switch( $action )
 				init_colorpicker_js();
 				break;
 			default:
-				$AdminUI->set_path( 'email', 'campaigns' );
+				$AdminUI->set_path( 'email', 'campaigns', 'list' );
 				$AdminUI->set_page_manual_link( 'email-campaign-list' );
 				break;
 		}
