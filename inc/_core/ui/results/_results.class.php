@@ -987,8 +987,10 @@ class Results extends Table
 			$this->display_filters();
 		}
 
-		// Flush in order to show the filters before slow SQL query will be executed below
-		evo_flush();
+		if( ! isset( $this->params['disable_evo_flush'] ) || ! $this->params['disable_evo_flush'] )
+		{	// Flush in order to show the filters before slow SQL query will be executed below
+			evo_flush();
+		}
 
 		// Initialize the order param
 		$this->init_order_param();

@@ -104,8 +104,7 @@ $compact_results_params['body_start'] = str_replace( '<tbody', $tbody_start, $co
 $compact_results_params['no_results_start'] = str_replace( '<tbody', $tbody_start, $compact_results_params['no_results_start'] );
 
 // Disable flush because it breaks layout when comment form is called from widget "Item Comment Form":
-global $disable_evo_flush;
-$disable_evo_flush = true;
+$compact_results_params['disable_evo_flush'] = true;
 
 $Results->display( $compact_results_params );
 
