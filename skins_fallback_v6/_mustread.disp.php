@@ -35,12 +35,14 @@ display_if_empty( array(
 		'msg_empty' => T_('This collection has no "Must Read" items.')
 	) );
 
-while( mainlist_get_item() )
+while( $Item = mainlist_get_item() )
 {	// For each collection post, do everything below up to the closing curly brace "}"
 
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 	skin_include( '_item_block.inc.php', array(
 			'content_mode' => 'auto', // 'auto' will auto select depending on $disp-detail
+			'item_title_before' => '<h2>'.$Item->get_unread_status(),
+			'item_title_after'  => '</h2>',
 		) );
 	// ----------------------------END ITEM BLOCK  ----------------------------
 

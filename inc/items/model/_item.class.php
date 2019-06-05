@@ -11215,16 +11215,19 @@ class Item extends ItemLight
 
 
 	/**
-	 * Display the icon if this post is unread by current User
+	 * Get a color read status icon if this post is unread by current User
 	 *
 	 * @param array Params
+	 * @return string
 	 */
-	function display_unread_status( $params = array() )
+	function get_unread_status( $params = array() )
 	{
+		$r = '';
+
 		$this->load_Blog();
 		if( ! $this->Blog->get_setting( 'track_unread_content' ) )
 		{	// The tracking of unread content is turned off for the collection
-			return;
+			return $r;
 		}
 
 		// Set titles by Blog type:
@@ -11245,16 +11248,16 @@ class Item extends ItemLight
 		{
 			case 'new':
 				// This post is new for the current User, it was never opened
-				echo $params['before'];
-				echo get_icon( 'bullet_orange', 'imgtag', array( 'title' => $params['title_new'], 'class' => $params['class'] ) );
-				echo $params['after'];
+				$r .= $params['before']
+					.get_icon( 'bullet_orange', 'imgtag', array( 'title' => $params['title_new'], 'class' => $params['class'] ) )
+					.$params['after'];
 				break;
 
 			case 'updated':
 				// The last updates of this post was not read by the current User
-				echo $params['before'];
-				echo get_icon( 'bullet_brown', 'imgtag', array( 'title' => $params['title_updated'], 'class' => $params['class'] ) );
-				echo $params['after'];
+				$r .= $params['before']
+					.get_icon( 'bullet_brown', 'imgtag', array( 'title' => $params['title_updated'], 'class' => $params['class'] ) )
+					.$params['after'];
 				break;
 
 			case 'read':
@@ -11262,6 +11265,19 @@ class Item extends ItemLight
 				// Don't display status icons if user already have read this post
 				break;
 		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Display a color read status icon if this post is unread by current User
+	 *
+	 * @param array Params
+	 */
+	function display_unread_status( $params = array() )
+	{
+		echo $this->get_unread_status( $params );
 	}
 
 

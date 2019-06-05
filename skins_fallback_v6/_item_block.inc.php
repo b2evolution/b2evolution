@@ -56,21 +56,10 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			{
 				echo $params['item_title_line_before'];
 
-				if( $disp == 'single' || $disp == 'page' )
-				{
-					$title_before = $params['item_title_single_before'];
-					$title_after = $params['item_title_single_after'];
-				}
-				else
-				{
-					$title_before = $params['item_title_before'];
-					$title_after = $params['item_title_after'];
-				}
-
 				// POST TITLE:
 				$Item->title( array(
-						'before'    => $title_before,
-						'after'     => $title_after,
+						'before'    => $params['item_title_before'],
+						'after'     => $params['item_title_after'],
 						'link_type' => '#'
 					) );
 
@@ -112,8 +101,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 				// Controlling the title:
 				'widget_item_title_params'  => array(
-					'before' => '<div class="evo_post_title">'.( in_array( $disp, array( 'single', 'page' ) ) ? '<h1>' : '<h2>' ),
-					'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
+						'before' => $params['item_title_line_before'].$params['item_title_before'],
+						'after' => $params['item_title_after'].$params['item_title_line_after'],
 				),
 				// Item Visibility Badge widge template
 				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
@@ -142,8 +131,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 				// Controlling the title:
 				'widget_item_title_params'  => array(
-						'before' => '<div class="evo_post_title">'.( in_array( $disp, array( 'single', 'page' ) ) ? '<h1>' : '<h2>' ),
-						'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
+						'before' => $params['item_title_line_before'].( $disp == 'single' ? $params['item_title_single_before'] : $params['item_title_before'] ),
+						'after' => ( $disp == 'single' ? $params['item_title_single_after'] : $params['item_title_after'] ).$params['item_title_line_after'],
 					),
 				// Item Previous Next widget
 				'widget_item_next_previous_params' => array(
@@ -238,11 +227,6 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 					'before_attach_size' => ' <span class="evo_file_size">(',
 					'after_attach_size'  => ')</span>',
 				),
-			// Controlling the title:
-			'widget_item_title_params'  => array(
-				'before' => '<div class="evo_post_title">'.( in_array( $disp, array( 'single', 'page' ) ) ? '<h1>' : '<h2>' ),
-				'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
-			),
 		) );
 		// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
 	}
