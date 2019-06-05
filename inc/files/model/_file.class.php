@@ -1801,9 +1801,11 @@ class File extends DataObject
 	 * Also removes meta data from DB.
 	 *
 	 * @access public
+	 * @param boolean TRUE to use DB transaction
+	 * @param boolean TRUE to delete non-empty directory recursively
 	 * @return boolean true on success, false on failure
 	 */
-	function unlink( $use_transactions = true )
+	function unlink( $use_transactions = true, $recursively = false )
 	{
 		global $DB;
 
@@ -1827,7 +1829,9 @@ class File extends DataObject
 		// Physically remove file from disk:
 		if( $this->is_dir() )
 		{
-			$unlinked = @rmdir( $this->_adfp_full_path );
+			$unlinked = ( $recursively
+				? rmdir_r( $this->_adfp_full_path )
+				: @rmdir( $this->_adfp_full_path ) );
 			$syslog_message = $unlinked ?
 					'Folder %s was deleted' :
 					'Folder %s could not be deleted';
