@@ -696,36 +696,68 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 				return $item_Link->ID;
 			}
 		}
+	}
 
-		if( file_exists( $FileRoot->ads_path.$params['folder_path'].'/'.$file_name ) )
-		{	// If file exists with same name in the post folder but is not linked to post:
-			$FileCache = & get_FileCache();
-			$File = & $FileCache->get_by_root_and_path( $FileRoot->type, $FileRoot->in_type_ID, trailing_slash( $params['folder_path'] ).$file_name, true );
-			if( empty( $File->ID ) )
-			{	// Create new File in DB with additional params:
-				$File->set( 'title', $params['file_title'] );
-				$File->set( 'alt', $params['file_alt'] );
-				if( ! $File->dbinsert() )
-				{	// Don't translate
-					echo '<li class="text-danger">'.sprintf( 'Cannot to create file %s in DB.', '<code>'.$File->get_full_path().'</code>' ).'</li>';
-					evo_flush();
-					return false;
+	// Try to find already existing file:
+	$folder_full_path = $FileRoot->ads_path.$params['folder_path'];
+	$file_exists = ( file_exists( $folder_full_path.'/'.$file_name )
+	                 && md5_file( $folder_full_path.'/'.$file_name, true ) == md5_file( $file_source_path, true ) );
+	global $b2evo_md_scandirs;
+	if( ! is_array( $b2evo_md_scandirs ) )
+	{
+		$b2evo_md_scandirs = array();
+	}
+	if( ! $file_exists )
+	{
+		if( ! isset( $b2evo_md_scandirs[ $folder_full_path ] ) )
+		{	// Cache results of scanned folder:
+			$b2evo_md_scandirs[ $folder_full_path ] = file_exists( $folder_full_path ) ? scandir( $folder_full_path ) : array();
+		}
+		if( is_array( $b2evo_md_scandirs[ $folder_full_path ] ) )
+		{
+			foreach( $b2evo_md_scandirs[ $folder_full_path ] as $md_scanned_file )
+			{
+				if( is_file( $folder_full_path.'/'.$md_scanned_file ) &&
+				    ( $file_name_info = pathinfo( $file_name ) ) &&
+				    preg_match( '/^'.preg_quote( $file_name_info['filename'] ).'(-\d+)?'.( empty( $file_name_info['extension'] ) ? '' : '\.'.preg_quote( $file_name_info['extension'] ) ).'$/', $md_scanned_file ) &&
+				    md5_file( $folder_full_path.'/'.$md_scanned_file, true ) == md5_file( $file_source_path, true ) )
+				{	// We found a file with same name and same hash:
+					$file_name = $md_scanned_file;
+					$file_exists = true;
+					break;
 				}
 			}
-			// Try to link new created File object to the Item:
-			if( $link_ID = $File->link_to_Object( $LinkOwner, 0, 'inline' ) )
-			{	// If file has been linked to the post
-				echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been linked to this post.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
-				evo_flush();
-			}
-			else
-			{	// If file could not be linked to the post:
-				echo '<li class="text-warning">'.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+		}
+	}
+
+	if( $file_exists )
+	{	// If file exists with same name in the post folder but is not linked to post:
+		$FileCache = & get_FileCache();
+		$File = & $FileCache->get_by_root_and_path( $FileRoot->type, $FileRoot->in_type_ID, trailing_slash( $params['folder_path'] ).$file_name, true );
+		if( empty( $File->ID ) )
+		{	// Create new File in DB with additional params:
+			$File->set( 'title', $params['file_title'] );
+			$File->set( 'alt', $params['file_alt'] );
+			if( ! $File->dbinsert() )
+			{	// Don't translate
+				echo '<li class="text-danger">'.sprintf( 'Cannot to create file %s in DB.', '<code>'.$File->get_full_path().'</code>' ).'</li>';
 				evo_flush();
 				return false;
 			}
-			return $link_ID;
 		}
+		// Try to link new created File object to the Item:
+		if( $link_ID = $File->link_to_Object( $LinkOwner, 0, 'inline' ) )
+		{	// If file has been linked to the post
+			echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been linked to this post.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+			evo_flush();
+		}
+		else
+		{	// If file could not be linked to the post:
+			echo '<li class="text-warning">'.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+			evo_flush();
+			return false;
+		}
+		return $link_ID;
 	}
 
 	// Get file name with a fixed name if file with such name already exists in the destination path:
@@ -743,6 +775,11 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 		}
 		evo_flush();
 		return false;
+	}
+
+	if( isset( $b2evo_md_scandirs[ $folder_full_path ] ) )
+	{	// Update cache with scanned files:
+		$b2evo_md_scandirs[ $folder_full_path ][] = $File->get( 'name' );
 	}
 
 	// Set additional params and create new File:
