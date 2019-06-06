@@ -186,61 +186,56 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 	 * - Split text into blocks, using $block_tags pattern.
 	 *
 	 * @param string Text
-	 * @param string The HTML tag where $text is in
 	 * @return string
 	 */
-	function handle_blocks( $text, $in_tag = '' )
+	function handle_blocks( $text )
 	{
-		#echo '<h1>HANDLE_BLOCKS</h1>'; pre_dump( $text, $in_tag );
+		$blocks = preg_split( '~(</?('.$this->block_tags.')(\b[^>]*)?>)~is', $text, -1, PREG_SPLIT_DELIM_CAPTURE );
 
 		$new_text = '';
-
-		if( preg_match( '~^(.*?)(<\s*('.$this->block_tags.')(\b[^>]*)?>)~is', $text, $match ) )
-		{ // there's a block tag:
-			$tag = $match[3];
-			$before_tag = $match[1];
-
-			if( ! empty($before_tag) )
-			{ // Recurse (one pattern/callback deeper):
-				$new_text .= $this->handle_pre_blocks( $before_tag, $in_tag );
+		$tag_position = false;
+		$opened_tags = array();
+		foreach( $blocks as $b => $block )
+		{
+			if( $block === '' )
+			{	// Skip empty string:
+				continue;
 			}
 
-			$text_after_tag = substr( $text, strlen($match[0]) );
-
-			if( empty($match[4]) || substr(rtrim($match[4]), -1) != '/' )
-			{ // Opening tag (and not self-closing): handle text in tag:
-				$new_text .= $match[2];
-
-				// Find closing tag:
-				list( $text_in_tag, $closing_tag, $NL_before, $NL_after ) = $this->split_text_for_tag($tag, $text_after_tag);
-
-				if( ! empty($text_in_tag) )
-				{ // Recurse (same level):
-					$text_in_tag = $this->handle_blocks( $text_in_tag, $tag );
+			if( $tag_position !== false && $b <= $tag_position + 2 )
+			{	// Skip tag name and attributes:
+				if( $b == $tag_position + 2 )
+				{	// Tag position is ended here, next is text:
+					$tag_position = false;
 				}
-
-				$new_text .= $NL_before.$text_in_tag.$NL_after;
-
-				$new_text .= $closing_tag;
-			}
-			else
-			{ // self-closing tag:
-				$new_text .= $match[2];
+				continue;
 			}
 
-			if( ! empty($text_after_tag) )
-			{
-				#echo '<h1>RECURSE: text_after_tag (block)</h1>';
-				// Recurse (same level):
-				$new_text .= $this->handle_blocks( $text_after_tag, $in_tag );
+			if( strpos( $block, '<' ) === 0 &&
+			    isset( $blocks[ $b + 1 ] ) &&
+			    preg_match( '~^('.$this->block_tags.')$~i', $blocks[ $b + 1 ] ) )
+			{	// Block tag is opening or closing here:
+				$tag_position = $b;
+				if( substr( $block, 1, 1 ) == '/' )
+				{	// This is a closing of opened tag,
+					// Remove last opened tag from the array:
+					array_pop( $opened_tags );
+				}
+				else
+				{	// This is a start of new tag,
+					// Put tag name in array to know what tags are opened and not closed yet:
+					$opened_tags[] = $blocks[ $b + 1 ];
+				}
+				// Append start or end of block tag with all attributes:
+				$new_text .= $block;
+				continue;
 			}
+
+			// Handle text which may contain inline tags:
+			$current_tag = isset( $opened_tags[ count( $opened_tags ) - 1 ] ) ? $opened_tags[ count( $opened_tags ) - 1 ] : '';
+			$new_text .= $this->handle_pre_blocks( $block, $current_tag );
 		}
-		else
-		{ // No BLOCKS in this $text:
-			$new_text = $this->handle_pre_blocks($text, $in_tag);
-		}
 
-		#pre_dump( 'HANDLE_BLOCKS return: ', $new_text, $in_tag );
 		return $new_text;
 	}
 
