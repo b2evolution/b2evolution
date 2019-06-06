@@ -275,14 +275,20 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 	$folder_path_length = strlen( $folder_path );
 
 	/* Import categories: */
-	echo '<p><b>'.T_('Importing the categories...').' </b>';
+	echo '<h3>'.T_('Importing the categories...').' </h3>';
 	evo_flush();
 
 	load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
 	$ChapterCache = & get_ChapterCache();
 
 	$categories = array();
-	$categories_count = 0;
+	$cat_results_num = array(
+		'added_success'   => 0,
+		'added_failed'    => 0,
+		'updated_success' => 0,
+		'updated_failed'  => 0,
+		'no_changed'      => 0,
+	);
 	foreach( $files as $f => $file_path )
 	{
 		$file_path = str_replace( '\\', '/', $file_path );
@@ -298,6 +304,10 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		echo '<p>'.sprintf( T_('Importing category: %s'), '"<b>'.$relative_path.'</b>"...' );
 		evo_flush();
 
+		// Get name of current category:
+		$last_index = strrpos( $relative_path, '/' );
+		$category_name = $last_index === false ? $relative_path : substr( $relative_path, $last_index + 1 );
+
 		// Always reuse existing categories on "upgrade" mode:
 		$reuse_cats = ( $import_type == 'upgrade' ||
 			// Should we reuse existing categories on "append" mode?
@@ -307,16 +317,31 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		if( $reuse_cats && $Chapter = & md_get_Chapter( $relative_path, $md_blog_ID ) )
 		{	// Use existing category with same full url path:
 			$categories[ $relative_path ] = $Chapter->ID;
-			$categories_count++;
-			echo '<span class="text-success">'.T_('OK').'</span>';
+			if( $category_name == $Chapter->get( 'name' ) )
+			{	// Don't update category with same name:
+				$cat_results_num['no_changed']++;
+				echo T_('No change');
+			}
+			else
+			{	// Try to update category with different name but same slug:
+				$Chapter->set( 'name', $category_name );
+				if( $Chapter->dbupdate() )
+				{	// If category is updated successfully:
+					echo '<span class="text-warning">'.T_('Updated').'</span>';
+					$cat_results_num['updated_success']++;
+				}
+				else
+				{	// Don't translate because it should not happens:
+					echo '<span class="text-danger">Cannot be updated</span>';
+					$cat_results_num['updated_failed']++;
+				}
+			}
 		}
 		else
 		{	// Create new category:
 			$Chapter = new Chapter( NULL, $md_blog_ID );
 
-			// Get names of current category and parent path:
-			$last_index = strrpos( $relative_path, '/' );
-			$category_name = $last_index === false ? $relative_path : substr( $relative_path, $last_index + 1 );//$paths_folders[ $paths_folders_num - 1 ];
+			// Get parent path:
 			$parent_path = substr( $relative_path, 0, $last_index );
 
 			$Chapter->set( 'name', $category_name );
@@ -329,14 +354,15 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			{	// If category is inserted successfully:
 				// Save new category in cache:
 				$categories[ $relative_path ] = $Chapter->ID;
-				$categories_count++;
-				echo '<span class="text-success">'.T_('OK').'</span>';
+				echo '<span class="text-success">'.T_('Added').'</span>';
+				$cat_results_num['added_success']++;
 				// Add new created Chapter into cache to avoid wrong main category ID in ItemLight::get_main_Chapter():
 				$ChapterCache->add( $Chapter );
 			}
 			else
-			{
-				echo '<span class="text-warning">'.T_('Failed').'</span>';
+			{	// Don't translate because it should not happens:
+				echo '<span class="text-danger">Cannot be inserted</span>';
+				$cat_results_num['added_failed']++;
 			}
 		}
 		echo '.</p>';
@@ -345,16 +371,54 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		// Unset folder in order to don't check it twice on creating posts below:
 		unset( $files[ $f ] );
 	}
-	echo '<b>'.sprintf( T_('%d records'), $categories_count ).'</b></p>';
+
+	foreach( $cat_results_num as $cat_result_type => $cat_result_num )
+	{
+		if( $cat_result_num > 0 )
+		{
+			switch( $cat_result_type )
+			{
+				case 'added_success':
+					$cat_msg_text = T_('%d categories imported');
+					$cat_msg_class = 'text-success';
+					break;
+				case 'added_failed':
+					// Don't translate because it should not happens:
+					$cat_msg_text = '%d categories could not be imported';
+					$cat_msg_class = 'text-danger';
+					break;
+				case 'updated_success':
+					$cat_msg_text = T_('%d categories updated');
+					$cat_msg_class = 'text-warning';
+					break;
+				case 'updated_failed':
+					// Don't translate because it should not happens:
+					$cat_msg_text = '%d categories could not be updated';
+					$cat_msg_class = 'text-danger';
+					break;
+				case 'no_changed':
+					$cat_msg_text = T_('%d categories no changed');
+					$cat_msg_class = '';
+					break;
+			}
+			echo '<b'.( empty( $cat_msg_class ) ? '' : ' class="'.$cat_msg_class.'"').'>'.sprintf( $cat_msg_text, $cat_result_num ).'</b><br>';
+		}
+	}
 
 	/* Import posts: */
-	echo '<p><b>'.T_('Importing the posts...').' </b>';
+	echo '<h3>'.T_('Importing the posts...').'</h3>';
 	evo_flush();
 
 	load_class( 'items/model/_item.class.php', 'Item' );
 	$ItemCache = get_ItemCache();
 
 	$posts_count = 0;
+	$post_results_num = array(
+		'added_success'   => 0,
+		'added_failed'    => 0,
+		'updated_success' => 0,
+		'no_changed'      => 0,
+	);
 	foreach( $files as $file_path )
 	{
 		$file_path = str_replace( '\\', '/', $file_path );
@@ -383,7 +447,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			$item_title = $item_slug;
 		}
 
-		echo '<p>'.sprintf( T_('Importing post: %s'), '"<b>'.$item_title.'</b>" <code>'.$source_folder_zip_name.substr( $file_path, strlen( $folder_path ) ).'</code>' );
+		echo sprintf( T_('Importing post: %s'), '"<b>'.$item_title.'</b>" <code>'.$source_folder_zip_name.substr( $file_path, strlen( $folder_path ) ).'</code>... ' );
 		evo_flush();
 
 		$relative_path = substr( $file_path, $folder_path_length + 1 );
@@ -438,19 +502,36 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		$Item->set_setting( 'last_import_hash', $item_content_hash );
 		if( empty( $Item->ID ) )
 		{	// Insert new Item:
-			$Item->dbinsert();
+			if( $Item->dbinsert() )
+			{	// If post is inserted successfully:
+				echo '<span class="text-success">'.T_('Added').'</span>';
+				$post_results_num['added_success']++;
+			}
+			else
+			{	// Don't translate because it should not happens:
+				echo '<span class="text-danger">Cannot be inserted</span>';
+				$post_results_num['added_failed']++;
+			}
 		}
 		else
 		{	// Update Item:
 			// Create new revision only when file hash was changed after last import:
 			$create_revision = ( $prev_last_import_hash == $Item->get_setting( 'last_import_hash' ) ? 'no': false );
-			$Item->dbupdate( true, true, true, $create_revision );
+			if( $Item->dbupdate( true, true, true, $create_revision ) )
+			{	// If post is updated successfully:
+				echo '<span class="text-warning">'.T_('Updated').'</span>';
+				$post_results_num['updated_success']++;
+			}
+			else
+			{	// No changes
+				$post_results_num['no_changed']++;
+				echo T_('No change');
+			}
 		}
 
+		$files_imported = false;
 		if( ! empty( $Item->ID ) )
 		{
-			$posts_count++;
-
 			// Link files:
 			if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)"]+)\s*("[^"]*")?\)#', $item_content, $image_matches ) )
 			{
@@ -462,6 +543,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 						'folder_path'    => 'quick-uploads/'.$Item->get( 'urltitle' ),
 						'import_type'    => $import_type,
 					);
+				echo ',<ul class="list-default">';
 				foreach( $image_matches[2] as $i => $image_relative_path )
 				{
 					$file_params['file_alt'] = trim( $image_matches[1][$i] );
@@ -477,6 +559,8 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 						$updated_item_content = str_replace( $image_matches[0][$i], '[image:'.$link_ID.']', $updated_item_content );
 					}
 				}
+				echo '</ul>';
+				$files_imported = true;
 
 				if( $updated_item_content != $item_content )
 				{	// Update new content:
@@ -486,17 +570,52 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			}
 		}
 
-		echo '</p>';
+		if( ! $files_imported )
+		{
+			echo '.<br><br>';
+		}
 		evo_flush();
 	}
-	echo '<b>'.sprintf( T_('%d records'), $posts_count ).'</b></p>';
+
+	foreach( $post_results_num as $post_result_type => $post_result_num )
+	{
+		if( $post_result_num > 0 )
+		{
+			switch( $post_result_type )
+			{
+				case 'added_success':
+					$post_msg_text = T_('%d posts imported');
+					$post_msg_class = 'text-success';
+					break;
+				case 'added_failed':
+					// Don't translate because it should not happens:
+					$post_msg_text = '%d posts could not be imported';
+					$post_msg_class = 'text-danger';
+					break;
+				case 'updated_success':
+					$post_msg_text = T_('%d posts updated');
+					$post_msg_class = 'text-warning';
+					break;
+				case 'updated_failed':
+					// Don't translate because it should not happens:
+					$post_msg_text = '%d posts could not be updated';
+					$post_msg_class = 'text-danger';
+					break;
+				case 'no_changed':
+					$post_msg_text = T_('%d posts no changed');
+					$post_msg_class = '';
+					break;
+			}
+			echo '<b'.( empty( $post_msg_class ) ? '' : ' class="'.$post_msg_class.'"').'>'.sprintf( $post_msg_text, $post_result_num ).'</b><br>';
+		}
+	}
 
 	if( $source_type == 'zip' && file_exists( $root_folder_path ) )
 	{	// This folder was created only to extract files from ZIP package, Remove it now:
 		rmdir_r( $root_folder_path );
 	}
 
-	echo '<p class="text-success">'.T_('Import complete.').'</p>';
+	echo '<h4 class="text-success">'.T_('Import completed.').'</h4>';
 
 	$DB->commit();
 }
@@ -526,15 +645,20 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 
 	if( ! file_exists( $file_source_path ) )
 	{	// File doesn't exist
-		echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</p>';
+		echo '<li class="text-warning">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</li>';
 		evo_flush();
 		// Skip it:
 		return false;
 	}
 
+	$file_name = basename( $file_source_path );
+
+	// Get FileRoot by type and ID:
+	$FileRootCache = & get_FileRootCache();
+	$FileRoot = & $FileRootCache->get_by_type_and_ID( $params['file_root_type'], $params['file_root_ID'] );
+
 	if( $params['import_type'] == 'upgrade' )
 	{	// Try to find existing and linked image File:
-		$file_name = basename( $file_source_path );
 		$item_Links = $LinkOwner->get_Links();
 		foreach( $item_Links as $item_Link )
 		{
@@ -545,7 +669,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 				{	// Update only really changed file:
 					if( copy_r( $file_source_path, $File->get_full_path() ) )
 					{	// If file has been updated successfully:
-						echo '<p class="text-success">'.sprintf( T_('File %s has been imported to %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</p>';
+						echo '<li class="text-warning">'.sprintf( T_('File %s has been updated in %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
 						// Clear evocache:
 						$File->rm_cache();
 						// Update file hash:
@@ -556,39 +680,68 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 					{	// No permission to update file:
 						if( is_dir( $file_source_path ) )
 						{	// Folder
-							echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+							echo '<li class="text-danger">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
 						}
 						else
 						{	// File
-							echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+							echo '<li class="text-danger">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
 						}
 					}
-					evo_flush();
 				}
+				else
+				{	// No change for same file:
+					echo '<li>'.sprintf( T_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+				}
+				evo_flush();
 				return $item_Link->ID;
 			}
 		}
+
+		if( file_exists( $FileRoot->ads_path.$params['folder_path'].'/'.$file_name ) )
+		{	// If file exists with same name in the post folder but is not linked to post:
+			$FileCache = & get_FileCache();
+			$File = & $FileCache->get_by_root_and_path( $FileRoot->type, $FileRoot->in_type_ID, trailing_slash( $params['folder_path'] ).$file_name, true );
+			if( empty( $File->ID ) )
+			{	// Create new File in DB with additional params:
+				$File->set( 'title', $params['file_title'] );
+				$File->set( 'alt', $params['file_alt'] );
+				if( ! $File->dbinsert() )
+				{	// Don't translate
+					echo '<li class="text-danger">'.sprintf( 'Cannot to create file %s in DB.', '<code>'.$File->get_full_path().'</code>' ).'</li>';
+					evo_flush();
+					return false;
+				}
+			}
+			// Try to link new created File object to the Item:
+			if( $link_ID = $File->link_to_Object( $LinkOwner, 0, 'inline' ) )
+			{	// If file has been linked to the post
+				echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been linked to this post.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+				evo_flush();
+			}
+			else
+			{	// If file could not be linked to the post:
+				echo '<li class="text-warning">'.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+				evo_flush();
+				return false;
+			}
+			return $link_ID;
+		}
 	}
 
-	// Get FileRoot by type and ID
-	$FileRootCache = & get_FileRootCache();
-	$FileRoot = & $FileRootCache->get_by_type_and_ID( $params['file_root_type'], $params['file_root_ID'] );
-
 	// Get file name with a fixed name if file with such name already exists in the destination path:
-	list( $File, $old_file_thumb ) = check_file_exists( $FileRoot, $params['folder_path'], basename( $file_source_path ) );
+	list( $File, $old_file_thumb ) = check_file_exists( $FileRoot, $params['folder_path'], $file_name );
 
 	if( ! $File || ! copy_r( $file_source_path, $File->get_full_path() ) )
 	{	// No permission to copy to the destination folder
 		if( is_dir( $file_source_path ) )
 		{	// Folder
-			echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+			echo '<li class="text-danger">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
 		}
 		else
 		{	// File
-			echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+			echo '<li class="text-danger">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
 		}
 		evo_flush();
-		// Skip it:
 		return false;
 	}
 
@@ -599,16 +752,19 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 
 	if( $link_ID = $File->link_to_Object( $LinkOwner, 0, 'inline' ) )
 	{	// If file has been linked to the post
-		echo '<p class="text-success">'.sprintf( T_('File %s has been imported to %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</p>';
+		echo '<li class="text-success">'.sprintf( T_('New file %s has been imported to %s successfully.'),
+			'<code>'.$source_file_relative_path.'</code>',
+			'<code>'.$File->get_rdfs_rel_path().'</code>'.
+			( $file_name == $File->get( 'name' ) ? '' : '<span class="note">('.T_('Renamed').'!)</span>')
+		).'</li>';
+		evo_flush();
 	}
 	else
 	{	// If file could not be linked to the post:
-		echo '<p class="text-warning">'.sprintf( T_('File of image url %s could not be attached to this post because it is not found in the source attachments folder.'), '<code>'.$file_source_path.'</code>' ).'</p>';
+		echo '<li class="text-warning">'.sprintf( 'New file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
 		evo_flush();
 		return false;
 	}
-
-	evo_flush();
 
 	return $link_ID;
 }

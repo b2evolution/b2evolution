@@ -58,6 +58,11 @@
   margin-top: 1ex;
   margin-bottom: 1ex;
 }
+ul.list-default {
+  list-style: initial;
+  margin: 0 0 10px 25px;
+  padding: 0;
+}
 a.discreet {
   text-decoration: none;
 }

@@ -21,7 +21,7 @@ $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
 $Form->begin_form( 'fform', T_('Markdown Importer') );
 
-$Form->begin_fieldset( T_('Report of the import').get_manual_link( 'markdown-importer' ) );
+$Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) );
 
 	// Get data to import from the file/folder:
 	$md_file = get_param( 'import_file' );
@@ -40,7 +40,21 @@ $Form->begin_fieldset( T_('Report of the import').get_manual_link( 'markdown-imp
 
 	$BlogCache = & get_BlogCache();
 	$Collection = $Blog = & $BlogCache->get_by_ID( $md_blog_ID );
-	echo '<b>'.T_('Destination collection').':</b> '.$Blog->dget( 'shortname' ).' &ndash; '.$Blog->dget( 'name' );
+	echo '<b>'.T_('Destination collection').':</b> '.$Blog->dget( 'shortname' ).' &ndash; '.$Blog->dget( 'name' ).'<br />';
+
+	echo '<b>'.T_('Mode').':</b> ';
+	switch( param( 'import_type', 'string', NULL ) )
+	{
+		case 'replace':
+			echo T_('Replace existing contents');
+			break;
+		case 'upgrade':
+			echo T_('Upgrade existing contents');
+			break;
+		case 'append':
+			echo T_('Append to existing contents');
+			break;
+	}
 
 	echo '</p>';
 
