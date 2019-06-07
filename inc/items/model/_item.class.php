@@ -7938,6 +7938,12 @@ class Item extends ItemLight
 		// save Item settings
 		if( isset( $this->ItemSettings ) )
 		{
+			if( $this->get_setting( 'last_import_hash' ) !== NULL &&
+			    ! isset( $this->ItemSettings->changes['last_import_hash'] ) )
+			{	// Clear the setting if it is a manual updating and not import updating:
+				$this->delete_setting( 'last_import_hash' );
+			}
+
 			$item_settings_changed = $this->ItemSettings->dbupdate();
 			$db_changed = $item_settings_changed || $db_changed;
 
