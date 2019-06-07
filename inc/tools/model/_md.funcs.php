@@ -526,7 +526,13 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			}
 			elseif( $Item->dbupdate( true, true, true, true/* Force to create new revision because file hash(title+content) was changed after last import */ ) )
 			{	// Item has been updated successfully:
-				echo '<span class="text-warning">'.T_('Has changed -> New revision added to DB').'</span>';
+				echo '<span class="text-warning">'.T_('Has changed -> New revision added to DB');
+				if( $prev_last_import_hash === NULL )
+				{	// Display additional warning when Item was edited manually:
+					global $admin_url;
+					echo '. <b>'.sprintf( T_('WARNING: this item has been manually edited. Check <a %s>changes history</a>'), 'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$Item->ID.'" target="_blank"' ).'</b>';
+				}
+				echo '</span>';
 				$post_results_num['updated_success']++;
 			}
 			else
