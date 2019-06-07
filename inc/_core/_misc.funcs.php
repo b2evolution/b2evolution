@@ -182,10 +182,7 @@ function shutdown()
 	 */
 	global $Session;
 
-	global $Settings;
-	global $Debuglog;
-
-	global $Timer;
+	global $Settings, $Debuglog, $DB, $Timer;
 
 	// Try forking a background process and let the parent return as fast as possbile.
 	if( is_callable('pcntl_fork') && function_exists('posix_kill') && defined('STDIN') )
@@ -254,6 +251,12 @@ function shutdown()
 	// Update the SESSION again, at the very end:
 	// (e.g. "Debuglogs" may have been removed in debug_info())
 	$Session->dbsave();
+
+	while( $DB->transaction_nesting_level )
+	{	// Rollback all transactions which could not finished correctly by some unknown error,
+		// Used to avoid errors like "Lock wait timeout exceeded; try restarting transaction":
+		$DB->rollback();
+	}
 
 	$Timer->pause('shutdown');
 }
