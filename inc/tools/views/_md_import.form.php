@@ -55,6 +55,10 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 			echo T_('Append to existing contents');
 			break;
 	}
+	if( param( 'convert_md_links', 'integer', 0 ) )
+	{
+		echo '<br /><b>'.T_('Options').':</b> '.T_('Convert Markdown relative links to b2evolution ShortLinks');
+	}
 
 	echo '</p>';
 

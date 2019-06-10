@@ -89,6 +89,9 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 	// The import type ( replace | append )
 	$import_type = param( 'import_type', 'string', 'replace' );
 
+	// Options:
+	$convert_md_links = param( 'convert_md_links', 'integer', 0 );
+
 	$DB->begin();
 
 	if( $import_type == 'replace' )
@@ -498,6 +501,10 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		$Item->set_setting( 'last_import_hash', $item_content_hash );
 		if( $prev_last_import_hash != $item_content_hash )
 		{	// Set new fields only when import hash(title + content) was really changed:
+			if( $convert_md_links )
+			{	// Convert Markdown relative links to b2evolution ShortLinks:
+				$item_content = preg_replace_callback( '#\[([^\]]*)\]\((.+/)?(.+?)\.md\)#', 'md_callback_convert_links', $item_content );
+			}
 			$Item->set( 'lastedit_user_ID', $current_User->ID );
 			$Item->set( 'title', $item_title );
 			$Item->set( 'content', $item_content );
@@ -921,5 +928,20 @@ function & md_get_Item( $item_slug, $coll_ID )
 
 	$r = NULL;
 	return $r;
+}
+
+
+/**
+ * Callback function to Convert Markdown relative links to b2evolution ShortLinks
+ *
+ * @param array Match data
+ * @return string Link in b2evolution ShortLinks format
+ */
+function md_callback_convert_links( $m )
+{
+	$item_slug = get_urltitle( $m[3] );
+	$link_title = trim( $m[1] );
+
+	return '(('.$item_slug.( empty( $link_title ) ? '' : ' '.$link_title ).'))';
 }
 ?>

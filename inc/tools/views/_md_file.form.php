@@ -95,6 +95,8 @@ if( ! empty( $import_files ) )
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
+	$Form->checkbox_input( 'convert_md_links', $reuse_cats, T_('Options'), array( 'input_suffix' => T_('Convert Markdown relative links to b2evolution ShortLinks') ) );
+
 	$Form->end_fieldset();
 
 	$Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' ) ) );
