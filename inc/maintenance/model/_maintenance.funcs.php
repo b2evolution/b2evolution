@@ -304,7 +304,7 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 		if( $current_User->check_perm( 'users', 'edit' ) )
 		{	// Link to edit permissions:
 			global $admin_url;
-			$error = '<a href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->get( 'grp_ID' ).'#fieldset_wrapper_file">'.$error.'</a>';
+			$error .= ' ('.sprintf( T_('You can change this <a %s>here</a>'), 'href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->get( 'grp_ID' ).'#fieldset_wrapper_file"' ).')';
 		}
 		echo '<p>'.$error.'</p>';
 		evo_flush();
