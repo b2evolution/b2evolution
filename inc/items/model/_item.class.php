@@ -11246,29 +11246,70 @@ class Item extends ItemLight
 				'before'        => ' ',
 				'after'         => '',
 				'class'         => 'track_content',
+				'style'         => 'icon', // 'text'
 				'title_new'     => $title_new,
 				'title_updated' => $title_updated,
+				'title_read'    => T_('Read'),
+				'text_new'      => T_('New'),
+				'text_updated'  => T_('Updated'),
+				'text_read'     => T_('Read'),
+				'class_new'     => 'label label-warning',
+				'class_updated' => 'label label-danger',
+				'class_read'    => 'label label-success',
 			), $params );
 
 		switch( $this->get_read_status() )
 		{
 			case 'new':
 				// This post is new for the current User, it was never opened
-				$r .= $params['before']
-					.get_icon( 'bullet_orange', 'imgtag', array( 'title' => $params['title_new'], 'class' => $params['class'] ) )
-					.$params['after'];
+				$r .= $params['before'];
+				if( $params['style'] == 'text' )
+				{	// Text style:
+					$r .= '<span'
+						.( empty( $params['class_new'] ) ? '' : ' class="'.$params['class_new'].'"')
+						.( empty( $params['title_new'] ) ? '' : ' class="'.$params['title_new'].'"').'>'
+							.$params['text_new']
+						.'</span>';
+				}
+				else
+				{	// Icon style:
+					$r .= get_icon( 'bullet_orange', 'imgtag', array( 'title' => $params['title_new'], 'class' => $params['class'] ) );
+				}
+				$r .= $params['after'];
 				break;
 
 			case 'updated':
 				// The last updates of this post was not read by the current User
-				$r .= $params['before']
-					.get_icon( 'bullet_brown', 'imgtag', array( 'title' => $params['title_updated'], 'class' => $params['class'] ) )
-					.$params['after'];
+				$r .= $params['before'];
+				if( $params['style'] == 'text' )
+				{	// Text style:
+					$r .= '<span'
+						.( empty( $params['class_updated'] ) ? '' : ' class="'.$params['class_updated'].'"')
+						.( empty( $params['title_updated'] ) ? '' : ' class="'.$params['title_updated'].'"').'>'
+							.$params['text_updated']
+						.'</span>';
+				}
+				else
+				{	// Icon style:
+					$r .= get_icon( 'bullet_brown', 'imgtag', array( 'title' => $params['title_updated'], 'class' => $params['class'] ) );
+				}
+				$r .= $params['after'];
 				break;
 
 			case 'read':
 			default:
 				// Don't display status icons if user already have read this post
+				if( $params['style'] == 'text' )
+				{	// Text style:
+					$r .= $params['before'];
+					$r .= '<span'
+						.( empty( $params['class_read'] ) ? '' : ' class="'.$params['class_read'].'"')
+						.( empty( $params['title_read'] ) ? '' : ' class="'.$params['title_read'].'"').'>'
+							.$params['text_read']
+						.'</span>';
+					$r .= $params['after'];
+				}
+				// No icon for read status.
 				break;
 		}
 

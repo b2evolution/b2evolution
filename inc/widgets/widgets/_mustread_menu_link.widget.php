@@ -198,7 +198,7 @@ class mustread_menu_link_Widget extends generic_menu_link_Widget
 		}
 
 		$url = $current_Blog->get( 'mustreadurl' );
-		$text = empty( $this->disp_params['link_text'] ) ? T_('Must Read Items') : $this->disp_params['link_text'];
+		$text = empty( $this->disp_params['link_text'] ) ? T_('Must Read') : $this->disp_params['link_text'];
 
 		// Higlight current menu item only when it is linked to current collection and must read items page is displaying currently:
 		$highlight_current = ( $current_Blog->ID == $Blog->ID && $disp == 'mustread' );
@@ -206,7 +206,7 @@ class mustread_menu_link_Widget extends generic_menu_link_Widget
 		$badge = '';
 		if( $this->disp_params['show_badge'] )
 		{	// Show badge with count of must read items:
-			$mustread_items_count = $current_Blog->get_mustread_items_count();
+			$mustread_items_count = $current_Blog->get_mustread_items_count( 'unread' );
 			if( $mustread_items_count > 0 )
 			{	// If at least one must read item:
 				$badge = ' <span class="badge badge-warning">'.$mustread_items_count.'</span>';

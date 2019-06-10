@@ -320,6 +320,10 @@ ol.breadcrumb {
 .cat_title .btn-group .btn {
   float: none;
 }
+.evo_post_title .evo_post_read_status {
+  vertical-align: middle;
+  margin: 10px 2px 0 0;
+}
 @media (max-width: 767px) {
   .evo_post_title,
   .cat_title {
@@ -334,6 +338,9 @@ ol.breadcrumb {
     display: block;
     text-align: right;
     padding: 0 0 10px 0;
+  }
+  .evo_post_title .evo_post_read_status {
+    margin: 0;
   }
 }
 .evo_content_block .evo_comment .evo_comment_footer .action_btn_group {

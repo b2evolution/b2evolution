@@ -41,7 +41,11 @@ while( $Item = mainlist_get_item() )
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
 	skin_include( '_item_block.inc.php', array(
 			'content_mode' => 'auto', // 'auto' will auto select depending on $disp-detail
-			'item_title_before' => '<h2>'.$Item->get_unread_status(),
+			'item_title_before' => $Item->get_unread_status( array(
+					'style'  => 'text',
+					'before' => '<div class="evo_post_read_status">',
+					'after'  => '</div>'
+				) ).'<h2>',
 			'item_title_after'  => '</h2>',
 		) );
 	// ----------------------------END ITEM BLOCK  ----------------------------

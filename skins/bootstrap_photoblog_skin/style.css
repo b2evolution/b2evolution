@@ -839,6 +839,11 @@ div.log_container {
   padding: 20px 0 10px 30px;
   vertical-align: middle;
 }
+.evo_post .well .evo_post_title .evo_post_read_status {
+  display: table-cell;
+  vertical-align: middle;
+  padding: 0 2px 10px 0;
+}
 .well .evo_post_title h2,
 .featurepost .evo_post_title h2 {
   display: table-cell;

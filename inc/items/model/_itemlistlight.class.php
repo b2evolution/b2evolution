@@ -120,7 +120,7 @@ class ItemListLight extends DataObjectList2
 		$this->set_default_filters( array(
 				'filter_preset' => NULL,
 				'flagged' => false,
-				'mustread' => false,
+				'mustread' => false, // true/1/'all' - All(Read and Unread) items with "must read" flag, 'unread' - Items which are not read by current User yet, 'read' - Items which are already read by current User, false - Don't match items with "must read" flag
 				'ts_min' => $timestamp_min,
 				'ts_max' => $timestamp_max,
 				'ts_created_max' => NULL,
@@ -305,7 +305,7 @@ class ItemListLight extends DataObjectList2
 			/*
 			 * Restrict by "must read" items:
 			 */
-			memorize_param( $this->param_prefix.'mustread', 'integer', $this->default_filters['mustread'], $this->filters['mustread'] );
+			memorize_param( $this->param_prefix.'mustread', 'string', $this->default_filters['mustread'], $this->filters['mustread'] );
 
 			// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter
 			if( is_null($this->default_filters['ts_min'])
@@ -510,7 +510,7 @@ class ItemListLight extends DataObjectList2
 		/*
 		 * Restrict by "must read" items:
 		 */
-		$this->filters['mustread'] = param( $this->param_prefix.'mustread', 'integer', $this->default_filters['mustread'], true );
+		$this->filters['mustread'] = param( $this->param_prefix.'mustread', 'string', $this->default_filters['mustread'], true );
 
 
 		// TODO: show_past/future should probably be wired on dstart/dstop instead on timestamps -> get timestamps out of filter perimeter

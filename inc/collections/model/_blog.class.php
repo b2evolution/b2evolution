@@ -6808,34 +6808,47 @@ class Blog extends DataObject
 	/**
 	 * Get a count of must read items of this collection
 	 *
+	 * @param string 'unread' - Items which are not read by current User yet,
+	 *               'read' - Items which are already read by current User,
+	 *               'all' - All(Read and Unread) items with "must read" flag.
 	 * @return integer
 	 */
-	function get_mustread_items_count()
+	function get_mustread_items_count( $read_status = 'all' )
 	{
 		if( ! $this->get_setting( 'track_unread_content' ) )
 		{	// No must read items when tracking of unread content is enabled for this collection:
 			return 0;
 		}
 
+		if( ! in_array( $read_status, array( 'all', 'unread', 'read' ) ) )
+		{	// Ignore wrong param value:
+			return 0;
+		}
+
 		if( ! isset( $this->mustread_items_count ) )
+		{	// Initialize array for cache:
+			$this->mustread_items_count = array();
+		}
+
+		if( ! isset( $this->mustread_items_count[ $read_status ] ) )
 		{	// Get it from DB only first time and then cache in var:
 			$mustread_ItemList2 = new ItemList2( $this, $this->get_timestamp_min(), $this->get_timestamp_max() );
 
 			// Set additional debug info prefix for SQL queries in order to know what code executes it:
-			$mustread_ItemList2->query_title_prefix = 'Must Read Items';
+			$mustread_ItemList2->query_title_prefix = 'Must Read Items (status = '.$read_status.')';
 
 			// Filter only the flagged items:
 			$mustread_ItemList2->set_default_filters( array(
-					'mustread' => 1
+					'mustread' => $read_status
 				) );
 
 			// Run query initialization to get total rows:
 			$mustread_ItemList2->query_init();
 
-			$this->mustread_items_count = $mustread_ItemList2->total_rows;
+			$this->mustread_items_count[ $read_status ] = $mustread_ItemList2->total_rows;
 		}
 
-		return $this->mustread_items_count;
+		return $this->mustread_items_count[ $read_status ];
 	}
 
 

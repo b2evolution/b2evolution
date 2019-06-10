@@ -297,3 +297,7 @@ ol.breadcrumb {
 .cat_title .btn-group .btn {
   float: none;
 }
+.evo_post_title .evo_post_read_status {
+  vertical-align: middle;
+  margin: 10px 2px 0 0;
+}
