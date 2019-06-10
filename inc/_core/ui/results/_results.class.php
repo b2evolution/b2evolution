@@ -559,8 +559,8 @@ class Results extends Table
 		if( $append_order_by && ($orders = $this->get_order_field_list()) )
 		{	// We have orders to append
 
-			if( strpos( $sql, 'ORDER BY') === false )
-			{ // there is no ORDER BY clause in the original SQL query
+			if( ! preg_match( '# \s ORDER \s+ BY \s+ [^\)]+$#xi', $sql ) )
+			{ // there is no ORDER BY clause in the original SQL query at the end(excluding order clause in sub queries)
 				$sql .= ' ORDER BY '.$orders.' ';
 			}
 			else
