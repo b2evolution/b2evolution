@@ -441,9 +441,9 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		// Extract title from content:
 		$item_content = trim( file_get_contents( $file_path ) );
 		$item_content_hash = md5( $item_content );
-		if( preg_match( '~^#(.+?)\n(.+)$~s', $item_content, $content_match ) )
+		if( preg_match( '~^#+\s*(.+?)\s*#*\s*[\r\n]+(.+)$~s', $item_content, $content_match ) )
 		{
-			$item_title = trim( $content_match[1] );
+			$item_title = $content_match[1];
 			$item_content = $content_match[2];
 		}
 		else

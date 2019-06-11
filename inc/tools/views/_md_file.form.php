@@ -64,7 +64,7 @@ if( ! empty( $import_files ) )
 					'label' => T_('Replace existing contents'),
 					'note'  => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.'),
 					'id'    => 'import_type_replace' ),
-			), '', array( 'lines' => true ) );
+			), T_('Import mode'), array( 'lines' => true ) );
 
 	echo '<div id="checkbox_delete_files"'.( $import_type == 'replace' ? '' : ' style="display:none"' ).'>';
 	$Form->checkbox_input( 'delete_files', $delete_files, '', array(
