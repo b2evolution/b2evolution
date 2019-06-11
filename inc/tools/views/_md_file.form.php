@@ -68,7 +68,7 @@ if( ! empty( $import_files ) )
 
 	echo '<div id="checkbox_delete_files"'.( $import_type == 'replace' ? '' : ' style="display:none"' ).'>';
 	$Form->checkbox_input( 'delete_files', $delete_files, '', array(
-		'input_suffix' => T_('Also delete files that will no longer be referenced in the destination collection after replacing its contents'),
+		'input_suffix' => T_('Also delete media files that will no longer be referenced in the destination collection after replacing its contents'),
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
