@@ -713,11 +713,54 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 		return false;
 	}
 
-	$file_name = basename( $file_source_path );
+	global $DB;
+
+	$FileCache = & get_FileCache();
+
+	$file_source_name = basename( $file_source_path );
+	$file_source_hash = md5_file( $file_source_path, true );
+
+	// Try to find already existing File by hash in DB:
+	$SQL = new SQL( 'Find file by hash' );
+	$SQL->SELECT( 'file_ID, link_ID' );
+	$SQL->FROM( 'T_files' );
+	$SQL->FROM_add( 'LEFT JOIN T_links ON link_file_ID = file_ID AND link_itm_ID = '.$DB->quote( $LinkOwner->get_ID() ) );
+	$SQL->WHERE( 'file_hash = '.$DB->quote( $file_source_hash ) );
+	$SQL->ORDER_BY( 'link_itm_ID DESC, file_ID' );
+	$SQL->LIMIT( '1' );
+	$file_data = $DB->get_row( $SQL, ARRAY_A );
+	if( ! empty( $file_data ) &&
+	    ( $File = & $FileCache->get_by_ID( $file_data['file_ID'], false, false ) ) )
+	{
+		if( ! empty( $file_data['link_ID'] ) )
+		{	// The found File is already linked to the Item:
+			echo '<li>'.sprintf( T_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+			evo_flush();
+			return $file_data['link_ID'];
+		}
+		else
+		{	// Try to link the found File object to the Item:
+			if( $link_ID = $File->link_to_Object( $LinkOwner, 0, 'inline' ) )
+			{	// If file has been linked to the post
+				echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been linked to this post.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+				evo_flush();
+			}
+			else
+			{	// If file could not be linked to the post:
+				echo '<li class="text-warning">'.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+				evo_flush();
+				return false;
+			}
+			return $link_ID;
+		}
+	}
 
 	// Get FileRoot by type and ID:
 	$FileRootCache = & get_FileRootCache();
 	$FileRoot = & $FileRootCache->get_by_type_and_ID( $params['file_root_type'], $params['file_root_ID'] );
+
+	$replaced_File = NULL;
+	$replaced_link_ID = NULL;
 
 	if( $params['import_type'] == 'upgrade' )
 	{	// Try to find existing and linked image File:
@@ -725,123 +768,92 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 		foreach( $item_Links as $item_Link )
 		{
 			if( ( $File = & $item_Link->get_File() ) &&
-			    $file_name == $File->get( 'name' ) )
+			    $file_source_name == $File->get( 'name' ) )
 			{	// We found File with same name:
-				if( $File->get( 'hash' ) != md5_file( $file_source_path, true ) )
+				if( $File->get( 'hash' ) != $file_source_hash )
 				{	// Update only really changed file:
-					if( copy_r( $file_source_path, $File->get_full_path() ) )
-					{	// If file has been updated successfully:
-						echo '<li class="text-warning">'.sprintf( T_('File %s has been updated in %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
-						// Clear evocache:
-						$File->rm_cache();
-						// Update file hash:
-						$File->set_param( 'hash', 'string', md5_file( $File->get_full_path(), true ) );
-						$File->dbupdate();
-					}
-					else
-					{	// No permission to update file:
-						if( is_dir( $file_source_path ) )
-						{	// Folder
-							echo '<li class="text-danger">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
-						}
-						else
-						{	// File
-							echo '<li class="text-danger">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
-						}
-					}
+					$replaced_File = $File;
+					$replaced_link_ID = $item_Link->ID;
 				}
 				else
 				{	// No change for same file:
 					echo '<li>'.sprintf( T_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
-				}
-				evo_flush();
-				return $item_Link->ID;
-			}
-		}
-	}
-
-	// Try to find already existing file:
-	$folder_full_path = $FileRoot->ads_path.$params['folder_path'];
-	$file_exists = ( file_exists( $folder_full_path.'/'.$file_name )
-	                 && md5_file( $folder_full_path.'/'.$file_name, true ) == md5_file( $file_source_path, true ) );
-	global $b2evo_md_scandirs;
-	if( ! is_array( $b2evo_md_scandirs ) )
-	{
-		$b2evo_md_scandirs = array();
-	}
-	if( ! $file_exists )
-	{
-		if( ! isset( $b2evo_md_scandirs[ $folder_full_path ] ) )
-		{	// Cache results of scanned folder:
-			$b2evo_md_scandirs[ $folder_full_path ] = file_exists( $folder_full_path ) ? scandir( $folder_full_path ) : array();
-		}
-		if( is_array( $b2evo_md_scandirs[ $folder_full_path ] ) )
-		{
-			foreach( $b2evo_md_scandirs[ $folder_full_path ] as $md_scanned_file )
-			{
-				if( is_file( $folder_full_path.'/'.$md_scanned_file ) &&
-				    ( $file_name_info = pathinfo( $file_name ) ) &&
-				    preg_match( '/^'.preg_quote( $file_name_info['filename'] ).'(-\d+)?'.( empty( $file_name_info['extension'] ) ? '' : '\.'.preg_quote( $file_name_info['extension'] ) ).'$/', $md_scanned_file ) &&
-				    md5_file( $folder_full_path.'/'.$md_scanned_file, true ) == md5_file( $file_source_path, true ) )
-				{	// We found a file with same name and same hash:
-					$file_name = $md_scanned_file;
-					$file_exists = true;
-					break;
+					evo_flush();
+					return $item_Link->ID;
 				}
 			}
 		}
 	}
 
-	if( $file_exists )
-	{	// If file exists with same name in the post folder but is not linked to post:
-		$FileCache = & get_FileCache();
-		$File = & $FileCache->get_by_root_and_path( $FileRoot->type, $FileRoot->in_type_ID, trailing_slash( $params['folder_path'] ).$file_name, true );
-		if( empty( $File->ID ) )
+	if( $params['import_type'] != 'append' &&
+	    $replaced_File === NULL )
+	{	// Find an existing File on disk to replace with new:
+		$File = & $FileCache->get_by_root_and_path( $FileRoot->type, $FileRoot->in_type_ID, trailing_slash( $params['folder_path'] ).$file_source_name, true );
+		if( $File && $File->exists() )
+		{	// If file already exists:
+			$replaced_File = $File;
+		}
+	}
+
+	if( $replaced_File !== NULL )
+	{	// The found File must be replaced:
+		if( empty( $replaced_File->ID ) )
 		{	// Create new File in DB with additional params:
-			$File->set( 'title', $params['file_title'] );
-			$File->set( 'alt', $params['file_alt'] );
-			if( ! $File->dbinsert() )
+			$replaced_File->set( 'title', $params['file_title'] );
+			$replaced_File->set( 'alt', $params['file_alt'] );
+			if( ! $replaced_File->dbinsert() )
 			{	// Don't translate
-				echo '<li class="text-danger">'.sprintf( 'Cannot to create file %s in DB.', '<code>'.$File->get_full_path().'</code>' ).'</li>';
+				echo '<li class="text-danger">'.sprintf( 'Cannot to create file %s in DB.', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>';
 				evo_flush();
 				return false;
 			}
 		}
-		// Try to link new created File object to the Item:
-		if( $link_ID = $File->link_to_Object( $LinkOwner, 0, 'inline' ) )
-		{	// If file has been linked to the post
-			echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been linked to this post.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
-			evo_flush();
+
+		if( copy_r( $file_source_path, $replaced_File->get_full_path() ) )
+		{	// If file has been updated successfully:
+			// Clear evocache:
+			$replaced_File->rm_cache();
+			// Update file hash:
+			$replaced_File->set_param( 'hash', 'string', md5_file( $replaced_File->get_full_path(), true ) );
+			$replaced_File->dbupdate();
 		}
 		else
-		{	// If file could not be linked to the post:
-			echo '<li class="text-warning">'.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+		{	// No permission to update file:
+			echo '<li class="text-danger">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>';
 			evo_flush();
 			return false;
 		}
-		return $link_ID;
+
+		if( $replaced_link_ID === NULL )
+		{	// Try to link new created File object to the Item:
+			if( $replaced_link_ID = $replaced_File->link_to_Object( $LinkOwner, 0, 'inline' ) )
+			{	// If file has been linked to the post
+				echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been updated and linked to this post successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>';
+			}
+			else
+			{	// If file could not be linked to the post:
+				echo '<li class="text-danger">'.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>';
+				evo_flush();
+				return false;
+			}
+		}
+
+		evo_flush();
+		return $replaced_link_ID;
 	}
 
+	// Create new File:
+	// - always for "append" mode,
+	// - when File is not found above.
+
 	// Get file name with a fixed name if file with such name already exists in the destination path:
-	list( $File, $old_file_thumb ) = check_file_exists( $FileRoot, $params['folder_path'], $file_name );
+	list( $File, $old_file_thumb ) = check_file_exists( $FileRoot, $params['folder_path'], $file_source_name );
 
 	if( ! $File || ! copy_r( $file_source_path, $File->get_full_path() ) )
 	{	// No permission to copy to the destination folder
-		if( is_dir( $file_source_path ) )
-		{	// Folder
-			echo '<li class="text-danger">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
-		}
-		else
-		{	// File
-			echo '<li class="text-danger">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
-		}
+		echo '<li class="text-danger">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
 		evo_flush();
 		return false;
-	}
-
-	if( isset( $b2evo_md_scandirs[ $folder_full_path ] ) )
-	{	// Update cache with scanned files:
-		$b2evo_md_scandirs[ $folder_full_path ][] = $File->get( 'name' );
 	}
 
 	// Set additional params and create new File:
@@ -854,7 +866,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 		echo '<li class="text-success">'.sprintf( T_('New file %s has been imported to %s successfully.'),
 			'<code>'.$source_file_relative_path.'</code>',
 			'<code>'.$File->get_rdfs_rel_path().'</code>'.
-			( $file_name == $File->get( 'name' ) ? '' : '<span class="note">('.T_('Renamed').'!)</span>')
+			( $file_source_name == $File->get( 'name' ) ? '' : '<span class="note">('.T_('Renamed').'!)</span>')
 		).'</li>';
 		evo_flush();
 	}
