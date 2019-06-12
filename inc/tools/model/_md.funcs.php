@@ -514,7 +514,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		{	// Set new fields only when import hash(title + content) was really changed:
 			if( $convert_md_links )
 			{	// Convert Markdown relative links to b2evolution ShortLinks:
-				$item_content = preg_replace_callback( '#\[([^\]]*)\]\((.+/)?(.+?)\.md\)#', 'md_callback_convert_links', $item_content );
+				$item_content = preg_replace_callback( '#\[([^\]]*)\]\((.+/)?(.+?)\.md(\#[^\)]+)?\)#', 'md_callback_convert_links', $item_content );
 			}
 			$Item->set( 'lastedit_user_ID', $current_User->ID );
 			$Item->set( 'title', $item_title );
@@ -988,7 +988,10 @@ function md_callback_convert_links( $m )
 {
 	$item_slug = get_urltitle( $m[3] );
 	$link_title = trim( $m[1] );
+	$link_anchor = isset( $m[4] ) ? trim( $m[4], '# ' ) : '';
 
-	return '(('.$item_slug.( empty( $link_title ) ? '' : ' '.$link_title ).'))';
+	return '(('.$item_slug
+		.( empty( $link_anchor ) ? '' : '#'.$link_anchor )
+		.( empty( $link_title ) ? '' : ' '.$link_title ).'))';
 }
 ?>
