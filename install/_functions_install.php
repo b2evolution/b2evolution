@@ -791,6 +791,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'webmention_plugin' );
 	}
+
+	if( $old_db_version < 13210 )
+	{
+		install_plugin( 'auto_anchors_plugin' );
+	}
 }
 
 
