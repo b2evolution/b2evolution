@@ -86,8 +86,8 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 	// Set current collection because it is used inside several functions like urltitle_validate():
 	$Blog = $md_Blog;
 
-	// The import type ( replace | append )
-	$import_type = param( 'import_type', 'string', 'replace' );
+	// The import type ( update | append | replace )
+	$import_type = param( 'import_type', 'string', 'update' );
 
 	// Options:
 	$convert_md_links = param( 'convert_md_links', 'integer', 0 );
@@ -311,8 +311,8 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		$last_index = strrpos( $relative_path, '/' );
 		$category_name = $last_index === false ? $relative_path : substr( $relative_path, $last_index + 1 );
 
-		// Always reuse existing categories on "upgrade" mode:
-		$reuse_cats = ( $import_type == 'upgrade' ||
+		// Always reuse existing categories on "update" mode:
+		$reuse_cats = ( $import_type == 'update' ||
 			// Should we reuse existing categories on "append" mode?
 			( $import_type == 'append' && param( 'reuse_cats', 'integer', 0 ) ) );
 			// Don't try to use find existing categories on replace mode.
@@ -451,7 +451,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			{	// Parse YAML data:
 				$item_data = spyc_load( $item_data );
 			}
-			$item_title = isset( $item_data['title'] ) ? $item_data['title'] : $content_match[4];
+			$item_title = empty( $content_match[4] ) ? $item_slug : $content_match[4];
 			$item_content = $content_match[5];
 		}
 		else
@@ -490,9 +490,9 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		}
 
 		$item_slug = get_urltitle( $item_slug );
-		if( $import_type != 'upgrade' ||
+		if( $import_type != 'update' ||
 		    ! ( $Item = & md_get_Item( $item_slug, $md_blog_ID ) ) )
-		{	// Create new Item for not upgrade mode or if it is not found by slug in the requested Collection:
+		{	// Create new Item for not update mode or if it is not found by slug in the requested Collection:
 			$Item = new Item();
 			$Item->set( 'creator_user_ID', $current_User->ID );
 			$Item->set( 'datestart', date2mysql( $localtimenow ) );
@@ -533,6 +533,10 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			if( isset( $item_data['short-title'] ) )
 			{	// Set short title from yaml data:
 				$Item->set( 'short_title', utf8_substr( $item_data['short-title'], 0, 50 ) );
+			}
+			if( isset( $item_data['title'] ) )
+			{	// Set title tag from yaml data:
+				$Item->set( 'titletag', utf8_substr( $item_data['title'], 0, 255 ) );
 			}
 			if( isset( $item_data['description'] ) )
 			{	// Set meta description from yaml data:
@@ -577,7 +581,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 					if( $prev_last_import_hash === NULL )
 					{	// Display additional warning when Item was edited manually:
 						global $admin_url;
-						echo '. <b>'.sprintf( T_('WARNING: this item has been manually edited. Check <a %s>changes history</a>'), 'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$Item->ID.'" target="_blank"' ).'</b>';
+						echo '. <br /><span class="label label-danger">'.T_('CONFLICT').'</span> <b>'.sprintf( T_('WARNING: this item has been manually edited. Check <a %s>changes history</a>'), 'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$Item->ID.'" target="_blank"' ).'</b>';
 					}
 				}
 				echo '</span>';
@@ -707,7 +711,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 
 	if( ! file_exists( $file_source_path ) )
 	{	// File doesn't exist
-		echo '<li class="text-warning">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</li>';
+		echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</li>';
 		evo_flush();
 		// Skip it:
 		return false;
@@ -744,6 +748,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 			{	// If file has been linked to the post
 				echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been linked to this post.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
 				evo_flush();
+				return $link_ID;
 			}
 			else
 			{	// If file could not be linked to the post:
@@ -751,7 +756,6 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 				evo_flush();
 				return false;
 			}
-			return $link_ID;
 		}
 	}
 
@@ -762,7 +766,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 	$replaced_File = NULL;
 	$replaced_link_ID = NULL;
 
-	if( $params['import_type'] == 'upgrade' )
+	if( $params['import_type'] == 'update' )
 	{	// Try to find existing and linked image File:
 		$item_Links = $LinkOwner->get_Links();
 		foreach( $item_Links as $item_Link )
@@ -774,6 +778,8 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 				{	// Update only really changed file:
 					$replaced_File = $File;
 					$replaced_link_ID = $item_Link->ID;
+					// Don't find next files:
+					break;
 				}
 				else
 				{	// No change for same file:
@@ -803,39 +809,40 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 			$replaced_File->set( 'alt', $params['file_alt'] );
 			if( ! $replaced_File->dbinsert() )
 			{	// Don't translate
-				echo '<li class="text-danger">'.sprintf( 'Cannot to create file %s in DB.', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>';
+				echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Cannot to create file %s in DB.', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>';
 				evo_flush();
 				return false;
 			}
 		}
 
-		if( copy_r( $file_source_path, $replaced_File->get_full_path() ) )
-		{	// If file has been updated successfully:
-			// Clear evocache:
-			$replaced_File->rm_cache();
-			// Update file hash:
-			$replaced_File->set_param( 'hash', 'string', md5_file( $replaced_File->get_full_path(), true ) );
-			$replaced_File->dbupdate();
-		}
-		else
-		{	// No permission to update file:
-			echo '<li class="text-danger">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>';
+		// Try to replace old file with new:
+		if( ! copy_r( $file_source_path, $replaced_File->get_full_path() ) )
+		{	// No permission to replace file:
+			echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>';
 			evo_flush();
 			return false;
 		}
 
-		if( $replaced_link_ID === NULL )
-		{	// Try to link new created File object to the Item:
-			if( $replaced_link_ID = $replaced_File->link_to_Object( $LinkOwner, 0, 'inline' ) )
-			{	// If file has been linked to the post
-				echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been updated and linked to this post successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>';
-			}
-			else
-			{	// If file could not be linked to the post:
-				echo '<li class="text-danger">'.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>';
-				evo_flush();
-				return false;
-			}
+		// If file has been updated successfully:
+		// Clear evocache:
+		$replaced_File->rm_cache();
+		// Update file hash:
+		$replaced_File->set_param( 'hash', 'string', md5_file( $replaced_File->get_full_path(), true ) );
+		$replaced_File->dbupdate();
+
+		if( $replaced_link_ID !== NULL )
+		{	// Inform about replaced file:
+			echo '<li class="text-warning">'.sprintf( T_('File %s has been replaced in %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+		}
+		elseif( $replaced_link_ID = $replaced_File->link_to_Object( $LinkOwner, 0, 'inline' ) )
+		{	// If file has been linked to the post
+			echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been updated and linked to this post successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>';
+		}
+		else
+		{	// If file could not be linked to the post:
+			echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>';
+			evo_flush();
+			return false;
 		}
 
 		evo_flush();
@@ -851,7 +858,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 
 	if( ! $File || ! copy_r( $file_source_path, $File->get_full_path() ) )
 	{	// No permission to copy to the destination folder
-		echo '<li class="text-danger">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
+		echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
 		evo_flush();
 		return false;
 	}

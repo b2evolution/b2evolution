@@ -44,6 +44,9 @@ switch( $action )
 		$md_blog_ID = param( 'md_blog_ID', 'integer', 0 );
 		param_check_not_empty( 'md_blog_ID', T_('Please select a collection!') );
 
+		// Save last import collection in Session:
+		$Session->set( 'last_import_coll_ID', $md_blog_ID );
+
 		// Import File/Folder:
 		$import_file = param( 'import_file', 'string', '' );
 		if( empty( $import_file ) )

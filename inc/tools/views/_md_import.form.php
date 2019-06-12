@@ -48,8 +48,8 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 		case 'replace':
 			echo T_('Replace existing contents');
 			break;
-		case 'upgrade':
-			echo T_('Upgrade existing contents');
+		case 'update':
+			echo T_('Update existing contents');
 			break;
 		case 'append':
 			echo T_('Append to existing contents');

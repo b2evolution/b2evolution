@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url, $media_subdir, $media_path;
+global $admin_url, $media_subdir, $media_path, $Session;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
@@ -42,7 +42,7 @@ if( ! empty( $import_files ) )
 	$BlogCache->load_all( 'shortname,name', 'ASC' );
 	$BlogCache->none_option_text = T_('Please select...');
 
-	$Form->select_input_object( 'md_blog_ID', param( 'md_blog_ID', 'integer', 0 ), $BlogCache, T_('Destination collection'), array(
+	$Form->select_input_object( 'md_blog_ID', $Session->get( 'last_import_coll_ID' ), $BlogCache, T_('Destination collection'), array(
 			'note' => T_('This blog will be used for import.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
 			'allow_none' => true,
 			'required' => true,
@@ -53,32 +53,18 @@ if( ! empty( $import_files ) )
 	$reuse_cats = param( 'reuse_cats', 'integer', NULL );
 	if( $import_type === NULL )
 	{	// Set default form params:
-		$import_type = 'replace';
+		$import_type = 'update';
 		$delete_files = 0;
 		$reuse_cats = 1;
 	}
 
 	$Form->radio_input( 'import_type', $import_type, array(
 				array(
-					'value' => 'replace',
-					'label' => T_('Replace existing contents'),
-					'note'  => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.'),
-					'id'    => 'import_type_replace' ),
-			), T_('Import mode'), array( 'lines' => true ) );
-
-	echo '<div id="checkbox_delete_files"'.( $import_type == 'replace' ? '' : ' style="display:none"' ).'>';
-	$Form->checkbox_input( 'delete_files', $delete_files, '', array(
-		'input_suffix' => T_('Also delete media files that will no longer be referenced in the destination collection after replacing its contents'),
-		'input_prefix' => '<span style="margin-left:25px"></span>') );
-	echo '</div>';
-
-	$Form->radio_input( 'import_type', $import_type, array(
-				array(
-					'value' => 'upgrade',
-					'label' => T_('Upgrade existing contents'),
+					'value' => 'update',
+					'label' => T_('Update existing contents'),
 					'note'  => T_('Existing Categories & Posts will be re-used (based on slug).'),
-					'id'    => 'import_type_upgrade' ),
-			), '', array( 'lines' => true ) );
+					'id'    => 'import_type_update' ),
+			), T_('Import mode'), array( 'lines' => true ) );
 
 	$Form->radio_input( 'import_type', $import_type, array(
 				array(
@@ -88,10 +74,22 @@ if( ! empty( $import_files ) )
 			), '', array( 'lines' => true ) );
 
 	echo '<div id="checkbox_reuse_cats"'.( $import_type == 'append' ? '' : ' style="display:none"' ).'>';
-
 	$Form->checkbox_input( 'reuse_cats', $reuse_cats, '', array(
 		'input_suffix' => T_('Reuse existing categories'),
 		'note'         => '('.T_('based on folder name = slug name').')',
+		'input_prefix' => '<span style="margin-left:25px"></span>') );
+	echo '</div>';
+
+	$Form->radio_input( 'import_type', $import_type, array(
+				array(
+					'value' => 'replace',
+					'label' => T_('Replace existing contents'),
+					'note'  => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.'),
+					'id'    => 'import_type_replace' ),
+			), '', array( 'lines' => true ) );
+	echo '<div id="checkbox_delete_files"'.( $import_type == 'replace' ? '' : ' style="display:none"' ).'>';
+	$Form->checkbox_input( 'delete_files', $delete_files, '', array(
+		'input_suffix' => T_('Also delete media files that will no longer be referenced in the destination collection after replacing its contents'),
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
