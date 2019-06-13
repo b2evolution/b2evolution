@@ -395,7 +395,9 @@ var evo_helpdesk_widget = {
 		// Request data by REST API:
 		jQuery.ajax(
 		{
-			contentType: 'application/json; charset=utf-8',
+			// Don't use "contentType" to avoid CORS restriction "OPTIONS 405 (Method Not Allowed)",
+			// NOTE: Headers on server side like "Access-Control-Allow-Methods: GET, OPTIONS" and "Access-Control-Allow-Headers: Content-Type" don't solve the problem.
+			//contentType: 'application/json; charset=utf-8',
 			type: method,
 			url: rest_api_url + request,
 			data: params
