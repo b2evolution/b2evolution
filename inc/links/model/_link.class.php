@@ -22,7 +22,6 @@ load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
  */
 class Link extends DataObject
 {
-	var $ltype_ID = 0;
 	var $file_ID = 0;
 	var $position;
 	var $order;
@@ -35,6 +34,9 @@ class Link extends DataObject
 	 * @see get_File()
 	 */
 	var $File;
+
+	var $previous_position;
+	var $previous_order;
 
 
 	/**
@@ -50,33 +52,32 @@ class Link extends DataObject
 
 		if( $db_row != NULL )
 		{
-			$this->ID       = $db_row->link_ID;
-			$this->ltype_ID = $db_row->link_ltype_ID;
+			$this->ID = $db_row->link_ID;
 
 			// source of link:
 			if( $db_row->link_itm_ID != NULL )
 			{	// Item:
-				$this->LinkOwner = & get_link_owner( 'item', $db_row->link_itm_ID );
+				$this->LinkOwner = & get_LinkOwner( 'item', $db_row->link_itm_ID );
 			}
 			elseif( $db_row->link_cmt_ID != NULL )
 			{	// Comment:
-				$this->LinkOwner = & get_link_owner( 'comment', $db_row->link_cmt_ID );
+				$this->LinkOwner = & get_LinkOwner( 'comment', $db_row->link_cmt_ID );
 			}
 			elseif( $db_row->link_usr_ID != NULL )
 			{	// User:
-				$this->LinkOwner = & get_link_owner( 'user', $db_row->link_usr_ID );
+				$this->LinkOwner = & get_LinkOwner( 'user', $db_row->link_usr_ID );
 			}
 			elseif( $db_row->link_ecmp_ID != NULL )
 			{	// Email Campaign:
-				$this->LinkOwner = & get_link_owner( 'emailcampaign', $db_row->link_ecmp_ID );
+				$this->LinkOwner = & get_LinkOwner( 'emailcampaign', $db_row->link_ecmp_ID );
 			}
 			elseif( $db_row->link_msg_ID != NULL )
 			{	// Message:
-				$this->LinkOwner = & get_link_owner( 'message', $db_row->link_msg_ID );
+				$this->LinkOwner = & get_LinkOwner( 'message', $db_row->link_msg_ID );
 			}
 			elseif( $db_row->link_tmp_ID != NULL )
 			{	// Temporary ID:
-				$this->LinkOwner = & get_link_owner( 'temporary', $db_row->link_tmp_ID );
+				$this->LinkOwner = & get_LinkOwner( 'temporary', $db_row->link_tmp_ID );
 			}
 			else
 			{
@@ -95,6 +96,23 @@ class Link extends DataObject
 		{	// New object:
 
 		}
+	}
+
+
+	function set( $parname, $parvalue, $make_null = false )
+	{
+		switch( $parname )
+		{
+			case 'position':
+				$this->previous_position = $this->position;
+				break;
+
+			case 'order':
+				$this->previous_order = $this->order;
+				break;
+		}
+
+		return $this->set_param( $parname, 'string', $parvalue, $make_null );
 	}
 
 
@@ -183,7 +201,7 @@ class Link extends DataObject
 			return 'file';
 		}
 
-		return 'unkown';
+		return 'unknown';
 	}
 
 
@@ -318,7 +336,7 @@ class Link extends DataObject
 	 */
 	function can_be_file_deleted()
 	{
-		global $current_User, $DB;
+		global $current_User;
 
 		if( ! is_logged_in() )
 		{	// Not logged in user
@@ -338,20 +356,36 @@ class Link extends DataObject
 			return false;
 		}
 
-		// Try to find at least one another link by same file ID:
-		$SQL = new SQL( 'Try to find at least one another link by same file ID #'.$File->ID );
-		$SQL->SELECT( 'link_ID' );
-		$SQL->FROM( 'T_links' );
-		$SQL->WHERE( 'link_file_ID = '.$DB->quote( $File->ID ) );
-		$SQL->WHERE_and( 'link_ID != '.$DB->quote( $this->ID ) );
-		$SQL->LIMIT( '1' );
-		if( $DB->get_var( $SQL ) )
+		if( ! $this->is_single_linked_file() )
 		{	// We cannot delete the file of this link because it is also linked to another object
 			return false;
 		}
 
 		// No any restriction, Current User can delete the file of this link from disk and DB completely:
 		return true;
+	}
+
+
+	/**
+	 * Check if the File is linked only to this Link
+	 *
+	 * @return boolean
+	 */
+	function is_single_linked_file()
+	{
+		if( ! isset( $this->is_single_linked_file ) )
+		{	// Try to find at least one another link by same file ID:
+			global $DB;
+			$SQL = new SQL( 'Try to find at least one another link by same file ID #'.$this->file_ID );
+			$SQL->SELECT( 'link_ID' );
+			$SQL->FROM( 'T_links' );
+			$SQL->WHERE( 'link_file_ID = '.$DB->quote( $this->file_ID ) );
+			$SQL->WHERE_and( 'link_ID != '.$DB->quote( $this->ID ) );
+			$SQL->LIMIT( '1' );
+			$this->is_single_linked_file = ( $DB->get_var( $SQL ) === NULL );
+		}
+
+		return $this->is_single_linked_file;
 	}
 
 
@@ -472,6 +506,82 @@ class Link extends DataObject
 		{
 			$Plugins->trigger_event( 'AfterObjectInsert', $params = array( 'Object' => & $this, 'type' => get_class($this) ) );
 		}
+
+		return true;
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 */
+	function dbupdate()
+	{
+		global $DB, $Plugins, $localtimenow;
+		$position_updated = false;
+		$order_updated = false;
+
+		$DB->begin();
+
+		$LinkOwner = & $this->get_LinkOwner();
+		if( $LinkOwner && $LinkOwner->type == 'item' && isset( $this->dbchanges['link_position'] ) || isset( $this->dbchanges['link_order'] ) )
+		{
+			if( ! $LinkOwner->Item->check_proposed_change_restriction( 'error' ) )
+			{	// If the Link's Item cannot be updated because of proposed change:
+				$DB->rollback();
+				return false;
+			}
+
+			$update_values = array();
+
+			if( isset( $this->dbchanges['link_position'] ) )
+			{
+				$position_updated = true;
+				$update_values[] = 'ivl_position = '.$DB->quote( $this->previous_position );
+				$this->previous_position = NULL;
+			}
+
+			if( isset( $this->dbchanges['link_order'] ) )
+			{
+				$order_updated = true;
+				$update_values[] = 'ivl_order = '.$this->previous_order;
+				$this->previous_order = NULL;
+			}
+
+			if( ! empty( $update_values ) )
+			{
+				if( ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) > 90 )
+				{ // Create a new revision...
+					$revision_ID = $LinkOwner->Item->create_revision();
+					if( is_int( $revision_ID ) )
+					{
+						$new_Revision = $LinkOwner->Item->get_revision( $revision_ID );
+					}
+
+					if( ! empty( $new_Revision ) )
+					{ // ...but newly created link history has current position and order values, restore it to previous values
+						$sql = 'UPDATE T_items__version_link SET '.implode( ',', $update_values )
+								.' WHERE ivl_iver_ID = '.$new_Revision->iver_ID
+								.' AND ivl_iver_itm_ID = '.$new_Revision->iver_itm_ID
+								.' AND ivl_link_ID = '.$this->ID;
+						$DB->query( $sql, 'Restore revision link position/order' );
+					}
+				}
+			}
+		}
+
+		if( parent::dbupdate() )
+		{	// Update last touched date and content last updated date of the Item:
+			if( $position_updated || $order_updated )
+			{
+				$LinkOwner->update_last_touched_date();
+			}
+
+			if( $position_updated )
+			{
+				$LinkOwner->update_contents_last_updated_ts();
+			}
+		}
+		$DB->commit();
 
 		return true;
 	}

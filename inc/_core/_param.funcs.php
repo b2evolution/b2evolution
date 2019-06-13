@@ -379,11 +379,12 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 							if( $type == 'array:filepath' || $type == 'array:array:filepath' )
 							{	// Special verifying for file path params:
 								// Format param to valid file path value:
-								$globals_var[$i][$j] = param_format( $var_value, 'filepath' );
-								if( ! is_safe_filepath( $globals_var[$i][$j] ) )
+								$var_value = param_format( $var_value, 'filepath' );
+								if( ( ! is_safe_filepath( $var_value ) ) || $var_value == '.' )
 								{	// We cannot accept this unsecure file path:
 									bad_request_die( sprintf( T_('Illegal value received for parameter &laquo;%s&raquo;!'), $var ) );
 								}
+								$globals_var[$i][$j] = $var_value;
 							}
 							else
 							{	// Format param to valid string value:
@@ -1459,7 +1460,7 @@ function param_extend_list( $var, $var_ext_array, $save_prefix = true )
  * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
  * and keeps those values available for future reference (category widget)
  *
- * @param integer Colection ID to restrict chapters only from this collection
+ * @param integer Collection ID to restrict chapters only from this collection
  * @param integer Default category ID
  * @param array Default categories IDs
  */
@@ -2500,6 +2501,7 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			$allow_iframes    = false;
 			$allow_objects    = false;
 			$bypass_antispam  = false;
+			$trim_content     = false;
 			// Do not add error messages in this context
 			$verbose = false;
 			break;
@@ -2579,7 +2581,10 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 		$Messages->add_to_group(	$errmsg, 'error', T_('Validation errors:') );
 	}
 
-	$content = trim( $content );
+	if( ! isset( $trim_content ) || $trim_content )
+	{	// Trim content if it is allowed for the requested context:
+		$content = trim( $content );
+	}
 
 	if( $use_balanceTags && ( $context != 'general_array_params' ) )
 	{ // Auto close open tags:
@@ -2868,7 +2873,7 @@ function is_safe_filepath( $filepath )
 	}
 
 	do
-	{	// Decode file path while it is possible:
+	{	// Recursively decode file path as long as it is possible:
 		$orig_filepath = $filepath;
 		$filepath = urldecode( $filepath );
 

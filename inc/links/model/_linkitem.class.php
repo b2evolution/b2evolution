@@ -47,22 +47,39 @@ class LinkItem extends LinkOwner
 			'Link files to current xxx' => NT_( 'Link files to current item' ),
 			'Selected files have been linked to xxx.' => NT_( 'Selected files have been linked to item.' ),
 			'Link has been deleted from $xxx$.' => NT_( 'Link has been deleted from &laquo;item&raquo;.' ),
+			'Cannot delete Link from $xxx$.' => NT_( 'Cannot delete Link from &laquo;item&raquo;.' ),
 		);
 	}
 
 	/**
-	 * Check current User Item permission
+	 * Check current User has an access to work with attachments of the link Item
 	 *
-	 * @param string permission level
-	 * @param boolean true to assert if user dosn't have the required permission
+	 * @param string Permission level
+	 * @param boolean TRUE to assert if user dosn't have the required permission
+	 * @param object File Root to check permission to add/upload new files
+	 * @return boolean
 	 */
-	function check_perm( $permlevel, $assert = false )
+	function check_perm( $permlevel, $assert = false, $FileRoot = NULL )
 	{
 		global $current_User;
 
+		if( ! is_logged_in() )
+		{	// User must be logged in:
+			if( $assert )
+			{	// Halt the denied access:
+				debug_die( 'You have no permission for item attachments!' );
+			}
+			return false;
+		}
+
+		if( $permlevel == 'add' )
+		{	// Check permission to add/upload new files:
+			return $current_User->check_perm( 'files', $permlevel, $assert, $FileRoot );
+		}
+
 		if( $this->is_temp() )
 		{	// Check permission for new creating item:
-			return $current_User->check_perm( 'blog_post_statuses', 'edit', false, $this->link_Object->tmp_coll_ID );
+			return $current_User->check_perm( 'blog_post_statuses', $permlevel, $assert, $this->get_blog_ID() );
 		}
 		else
 		{	// Check permission for existing item in DB:
@@ -164,7 +181,7 @@ class LinkItem extends LinkOwner
 			}
 			else
 			{
-				$this->Links = $LinkCache->get_by_item_ID( $this->Item->ID );
+				$this->Links = $LinkCache->get_by_item_ID( $this->get_ID() );
 			}
 		}
 	}
@@ -180,6 +197,13 @@ class LinkItem extends LinkOwner
 	 */
 	function add_link( $file_ID, $position = NULL, $order = 1, $update_owner = true )
 	{
+		global $DB, $localtimenow;
+
+		if( ! $this->Item->check_proposed_change_restriction( 'error' ) )
+		{	// If the Link's Item cannot be updated because of proposed change:
+			return false;
+		}
+
 		if( is_null( $position ) )
 		{ // Use default link position
 			$position = $this->get_default_position( $file_ID );
@@ -190,6 +214,12 @@ class LinkItem extends LinkOwner
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
 		$edited_Link->set( 'order', $order );
+
+		if( ( $localtimenow - strtotime( $this->Item->last_touched_ts ) ) > 90 )
+		{
+			$this->Item->create_revision();
+		}
+
 		if( $edited_Link->dbinsert() )
 		{
 			if( ! $this->is_temp() )
@@ -219,22 +249,92 @@ class LinkItem extends LinkOwner
 		return false;
 	}
 
+
 	/**
-	 * Set Blog
+	 * Remove link from the owner
+	 *
+	 * @param object Link
+	 * @param boolean TRUE to force a removing
+	 * @return boolean true on success
+	 */
+	function remove_link( & $Link, $force = false )
+	{
+		global $DB, $localtimenow;
+
+		if( ! $force && ! $this->Item->check_proposed_change_restriction( 'error' ) )
+		{	// If the Link's Item cannot be updated because of proposed change:
+			return false;
+		}
+
+		$this->load_Links();
+
+		$previous_Revision = $this->Item->get_revision( 'last_archived' );
+
+		if( ! empty( $previous_Revision ) &&  ( $localtimenow - strtotime( $this->Item->last_touched_ts ) ) < 90 )
+		{ // Check if we can remove the link from the previous revision
+			$last_revision_ID = ( int ) $previous_Revision->iver_ID;
+			if( $last_revision_ID > 1 )
+			{ // Check if the file attachment exists in the previous revision
+				$sql = new SQL();
+				$sql->SELECT( '*' );
+				$sql->FROM( 'T_items__version_link' );
+				$sql->WHERE( 'ivl_iver_ID = '.$previous_Revision->iver_ID );
+				$sql->WHERE_and( 'ivl_iver_itm_ID = '.$previous_Revision->iver_itm_ID );
+				$sql->WHERE_and( 'ivl_link_ID = '.$Link->ID );
+				$revision_links = $DB->get_results( $sql->get() );
+
+				if( empty( $revision_links ) )
+				{ // Link is not in previous history, we need to create a new revision
+					$this->Item->create_revision();
+				}
+			}
+			else
+			{ // Link has no attachment history so we'll have to create a new one
+				$this->Item->create_revision();
+			}
+		}
+		else
+		{
+			$this->Item->create_revision();
+		}
+
+		$index = array_search( $Link, $this->Links );
+		if( $index !== false )
+		{
+			unset( $this->Links[ $index ] );
+		}
+		$LinkCache = & get_LinkCache();
+		$LinkCache->remove( $Link );
+
+		if( $Link->dbdelete() )
+		{
+			if( ! $this->is_temp() )
+			{	// Update last touched date and content last updated date of the Item:
+				$this->update_last_touched_date();
+				$this->update_contents_last_updated_ts();
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * Load collection of the onwer Item
 	 */
 	function load_Blog()
 	{
-		if( is_null( $this->Blog ) )
-		{
-			$Item = $this->Item;
-			if( $Item->ID == 0 )
-			{	// This is a request of new creating Item (for example, preview mode),
-				// We should use current collection, because new Item has no category ID yet here to load Collection:
-				global $Blog;
-				$this->Blog = $Blog;
+		if( $this->Blog === NULL )
+		{	// Try to get Item from DB and store in cache to next requests:
+			if( $this->is_temp() )
+			{	// If new Comment is creating
+				$BlogCache = & get_BlogCache();
+				$this->Blog = & $BlogCache->get_by_ID( $this->link_Object->tmp_coll_ID, false, false );
 			}
 			else
-			{	// Use Collection of the existing Item:
+			{	// If existing Item is editing
 				$this->Blog = & $this->Item->get_Blog();
 			}
 		}
@@ -268,24 +368,23 @@ class LinkItem extends LinkOwner
 			global $admin_url;
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->link_Object->tmp_coll_ID.'&amp;action=new';
+				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=new';
 			}
 			else
 			{	// The edited Item:
-				$this->load_Blog();
-				return $admin_url.'?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;action=edit&amp;p='.$this->Item->ID;
+				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=edit&amp;p='.$this->get_ID();
 			}
 		}
 		else
 		{	// Front-office:
-			global $Blog;
+			$item_Blog = & $this->get_Blog();
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit' );
 			}
 			else
-			{	// The edited Item:
-				return url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;p='.$this->Item->ID );
+			{	// The editing Item:
+				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit&amp;p='.$this->get_ID() );
 			}
 		}
 	}
@@ -300,24 +399,23 @@ class LinkItem extends LinkOwner
 			global $admin_url;
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->link_Object->tmp_coll_ID.'&amp;action=new';
+				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=new';
 			}
 			else
-			{	// The edited Item:
-				$this->load_Blog();
-				return $admin_url.'?ctrl=items&amp;blog='.$this->Blog->ID.'&amp;p='.$this->Item->ID;
+			{	// The editing Item:
+				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->get_ID();
 			}
 		}
 		else
 		{	// Front-office:
-			global $Blog;
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return url_add_param( $Blog->get( 'url' ), 'disp=edit' );
+				$item_Blog = & $this->get_Blog();
+				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit' );
 			}
 			else
-			{	// The edited Item:
-				return url_add_param( $Blog->get( 'url' ), 'disp=edit&amp;p='.$this->Item->ID );
+			{	// The editing Item:
+				return $this->Item->get_permanent_url();
 			}
 		}
 	}
@@ -374,6 +472,92 @@ class LinkItem extends LinkOwner
 		{	// Update last touched date and content last updated date of the Item:
 			$this->update_last_touched_date();
 			$this->update_contents_last_updated_ts();
+		}
+	}
+
+
+	/**
+	 * Get list of attached Links
+	 *
+	 * @param integer Limit max result
+	 * @param string Restrict to files/images linked to a specific position.
+	 *               Position can be 'teaser'|'aftermore'|'inline'
+	 *               Use comma as separator
+	 * @param string File type: 'image', 'audio', 'other'; NULL - to select all
+	 * @param array Params
+	 * @return DataObjectList2 on success or NULL if no linked files found
+	 */
+	function get_attachment_LinkList( $limit = 1000, $position = NULL, $file_type = NULL, $params = array() )
+	{
+		if( $this->Item->is_revision() )
+		{	// Get Links of current active revision:
+			if( ! isset( $GLOBALS['files_Module'] ) )
+			{
+				return NULL;
+			}
+
+			$params = array_merge( array(
+					'sql_select_add' => '', // Additional fields for SELECT clause
+					'sql_order_by'   => 'link_order', // ORDER BY clause
+				), $params );
+
+			foreach( $params as $param_key => $param_value )
+			{
+				if( strpos( $param_key, 'sql_' ) !== false )
+				{	// Replace column names to revision table name in external SQL:
+					$params[ $param_key ] = str_replace(
+						array( 'link_ID', 'link_file_ID', 'link_position', 'link_prder', 'link_itm_ID' ),
+						array( 'ivl_link_ID', 'ivl_file_ID', 'ivl_position', 'ivl_order', 'ivl_iver_itm_ID' ),
+						$param_value );
+				}
+			}
+
+			$Revision = $this->Item->get_revision();
+
+			global $DB;
+
+			load_class( '_core/model/dataobjects/_dataobjectlist2.class.php', 'DataObjectList2' );
+
+			$LinkCache = & get_LinkCache();
+
+			$LinkList = new DataObjectList2( $LinkCache ); // IN FUNC
+
+			$SQL = new SQL();
+			$SQL->SELECT( 'ivl_link_ID AS link_ID, ivl_iver_itm_ID AS link_itm_ID, ivl_file_ID AS link_file_ID, ivl_position AS link_position, ivl_order AS link_order' );
+			$SQL->SELECT_add( ', NULL AS link_datecreated, NULL AS link_datemodified, NULL AS link_creator_user_ID, NULL AS link_lastedit_user_ID, NULL AS link_cmt_ID, NULL AS link_usr_ID, NULL AS link_ecmp_ID, NULL AS link_msg_ID, NULL AS link_tmp_ID' );
+			$SQL->SELECT_add( $params['sql_select_add'] );
+			$SQL->FROM( 'T_items__version_link' );
+			$SQL->WHERE( 'ivl_iver_itm_ID = '.$this->get_ID() );
+			$SQL->WHERE_and( 'ivl_iver_ID = '.$Revision->iver_ID );
+			$SQL->WHERE_and( 'ivl_iver_type = '.$DB->quote( $Revision->iver_type ) );
+			if( ! empty( $position ) )
+			{
+				$position = explode( ',', $position );
+				$SQL->WHERE_and( 'ivl_position IN ( '.$DB->quote( $position ).' )' );
+			}
+			$SQL->ORDER_BY( $params['sql_order_by'] );
+			$SQL->LIMIT( $limit );
+
+			if( ! is_null( $file_type ) )
+			{	// Restrict the Links by File type:
+				$SQL->FROM_add( 'LEFT JOIN T_files ON ivl_file_ID = file_ID' );
+				$SQL->WHERE_and( 'file_type = '.$DB->quote( $file_type ).' OR file_type IS NULL' );
+			}
+
+			$LinkList->sql = $SQL->get();
+
+			$LinkList->run_query( false, false, false, 'get_attachment_LinkList' );
+
+			if( $LinkList->result_num_rows == 0 )
+			{	// Nothing found
+				$LinkList = NULL;
+			}
+
+			return $LinkList;
+		}
+		else
+		{	// Get Links of current Item:
+			return parent::get_attachment_LinkList( $limit, $position, $file_type, $params );
 		}
 	}
 }

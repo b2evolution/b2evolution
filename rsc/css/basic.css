@@ -386,6 +386,17 @@ div.debug td {
 div.debug td.odd {
   background-color: #eee;
 }
+div.debug_session {
+  border: 1px solid #F00;
+  background: #aaa;
+}
+div.debug_session div.debug {
+  background: #aaa;
+  border: none;
+}
+pre.xdebug-var-dump {
+  overflow: auto;
+}
 a.jslog_switcher {
   cursor: pointer;
 }

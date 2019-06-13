@@ -481,8 +481,8 @@ function redirect_after_account_activation()
 /**
  * Send notification to users with edit users permission
  *
- * @param string notification email suject
- * @param string notificaiton email template name
+ * @param string|array notification email subject, Array if subject string contains a replaceable vars like %s, %d
+ * @param string notification email template name
  * @param array notification email template params
  */
 function send_admin_notification( $subject, $template_name, $template_params )
@@ -555,7 +555,15 @@ function send_admin_notification( $subject, $template_name, $template_params )
 		{ // this user must be notifed
 			locale_temp_switch( $User->get( 'locale' ) );
 			// send mail to user (using his local)
-			$localized_subject = T_( $subject ).$subject_suffix;
+			if( is_array( $subject ) )
+			{	// If subject string has at least one replaceable var:
+				$user_subject = call_user_func_array( 'sprintf', array_map( 'T_', $subject ) );
+			}
+			else
+			{	// Subject string has no replaceable vars:
+				$user_subject = T_( $subject );
+			}
+			$localized_subject = $user_subject.$subject_suffix;
 			send_mail_to_User( $User->ID, $localized_subject, $template_name, $template_params ); // ok, if this may fail
 			locale_restore_previous();
 		}
@@ -917,7 +925,7 @@ function get_user_logout_url( $blog_ID = NULL )
 
 	$redirect_to = url_rel_to_same_host( regenerate_url( 'disp,action','','','&' ), get_htsrv_url( 'login' ) );
 	if( require_login( $redirect_to, true ) )
-	{ // if redirect_to page is a login page, or also require login ( e.g. admin.php )
+	{ // if redirect_to page is a login page, or also require login ( e.g. evoadm.php )
 		if( ! empty( $blog_ID ) )
 		{ // Try to use blog by defined ID
 			$BlogCache = & get_BlogCache();
@@ -2193,6 +2201,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 		$blog_perms[ $row[ $perm_target_key ] ] = array(
 				'blog_ismember'           => $row[$prefix.'_ismember'],
 				'blog_can_be_assignee'    => $row[$prefix.'_can_be_assignee'],
+				'blog_item_propose'       => $row[$prefix.'_perm_item_propose'],
 				'blog_post_statuses'      => $row['perm_poststatuses_bin'],
 				'blog_cmt_statuses'       => $row['perm_cmtstatuses_bin'],
 				'blog_item_type'          => $row[$prefix.'_perm_item_type'],
@@ -2223,6 +2232,7 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				$blog_perms[ $perm_target_ID ] = array(
 						'blog_ismember'           => 0,
 						'blog_can_be_assignee'    => 0,
+						'blog_item_propose'       => 0,
 						'blog_post_statuses'      => 0,
 						'blog_item_type'          => 'standard',
 						'blog_edit'               => 'no',
@@ -3077,6 +3087,12 @@ function send_easy_validate_emails( $user_ids, $is_reminder = true, $email_chang
 	$email_sent = 0;
 	foreach( $user_ids as $user_ID )
 	{ // Iterate through user ids and send account activation reminder to all user
+
+		if( $log_messages == 'cron_job' && ! check_cron_job_emails_limit() )
+		{	// Stop execution for cron job because max number of emails has been already sent:
+			break;
+		}
+
 		$User = $UserCache->get_by_ID( $user_ID, false );
 		if( !$User )
 		{ // user not exists
@@ -3183,6 +3199,12 @@ function send_inactive_user_emails( $user_ids, $redirect_to_after = NULL, $log_m
 	$email_sent = 0;
 	foreach( $user_ids as $user_ID )
 	{ // Iterate through user ids and send account activation reminder to all user
+
+		if( $log_messages == 'cron_job' && ! check_cron_job_emails_limit() )
+		{	// Stop execution for cron job because max number of emails has been already sent:
+			break;
+		}
+
 		$User = $UserCache->get_by_ID( $user_ID, false );
 		if( !$User )
 		{ // user not exists
@@ -4230,6 +4252,7 @@ function get_user_statuses( $null_option_name = '' )
 			'emailchanged'     => T_( 'Email changed' ),
 			'deactivated'      => T_( 'Deactivated email' ),
 			'failedactivation' => T_( 'Failed activation' ),
+			'pendingdelete'    => T_( 'Pending delete' ),
 			'closed'           => T_( 'Closed account' )
 		);
 
@@ -4261,7 +4284,8 @@ function get_user_status_icons( $display_text = false )
 			'deactivated'      => get_icon( 'bullet_blue', 'imgtag', array( 'title' => T_( 'Deactivated account' ) ) ),
 			'emailchanged'     => get_icon( 'bullet_yellow', 'imgtag', array( 'title' => T_( 'Email address was changed' ) ) ),
 			'closed'           => get_icon( 'bullet_black', 'imgtag', array( 'title' => T_( 'Closed account' ) ) ),
-			'failedactivation' => get_icon( 'bullet_red', 'imgtag', array( 'title' => T_( 'Account was not activated or the activation failed' ) ) )
+			'failedactivation' => get_icon( 'bullet_red', 'imgtag', array( 'title' => T_( 'Account was not activated or the activation failed' ) ) ),
+			'pendingdelete'    => get_icon( 'bullet_red', 'imgtag', array( 'title' => T_( 'Account is pending delete' ) ) ),
 		);
 
 	if( $display_text )
@@ -4274,6 +4298,7 @@ function get_user_status_icons( $display_text = false )
 		$user_status_icons['emailchanged']     .= ' '.T_( 'Email changed' );
 		$user_status_icons['closed']           .= ' '.T_( 'Closed' );
 		$user_status_icons['failedactivation'] .= ' '.T_( 'Failed activation' );
+		$user_status_icons['pendingdelete']    .= ' '.T_( 'Pending delete' );
 	}
 
 	return $user_status_icons;
@@ -6555,7 +6580,7 @@ function users_results_block( $params = array() )
  */
 function users_results( & $UserList, $params = array() )
 {
-	global $Settings, $current_User, $collections_Module;
+	global $Settings, $current_User, $collections_Module, $admin_url;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
@@ -6881,7 +6906,7 @@ function users_results( & $UserList, $params = array() )
 				'default_dir' => 'D',
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'center small',
-				'td' => '~conditional( (#nb_blogs# > 0), \'<a href="admin.php?ctrl=user&amp;user_tab=activity&amp;user_ID=$user_ID$" title="'.format_to_output( T_('View personal blogs'), 'htmlattr' ).'">$nb_blogs$</a>\', \'&nbsp;\' )~',
+				'td' => '~conditional( (#nb_blogs# > 0), \'<a href="'.$admin_url.'?ctrl=user&amp;user_tab=activity&amp;user_ID=$user_ID$" title="'.format_to_output( T_('View personal blogs'), 'htmlattr' ).'">$nb_blogs$</a>\', \'&nbsp;\' )~',
 			);
 	}
 

@@ -21,7 +21,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.10.8';
+	var $version = '6.11.2';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -195,6 +195,7 @@ class bootstrap_gallery_legacy_Skin extends Skin
 						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'section_page_end' => array(
 					'layout' => 'end_fieldset',

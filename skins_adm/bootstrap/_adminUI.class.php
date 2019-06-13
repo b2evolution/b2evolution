@@ -40,7 +40,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function init_templates()
 	{
-		global $Messages, $debug, $Hit, $check_browser_version;
+		global $Messages, $debug, $Hit, $check_browser_version, $adminskins_url;
 
 		require_js( '#jquery#', 'rsc_url' );
 		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
@@ -68,11 +68,11 @@ class AdminUI extends AdminUI_general
 		// Make sure standard CSS is called ahead of custom CSS generated below:
 		if( $debug )
 		{	// Use readable CSS:
-			require_css( 'skins_adm/bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( $adminskins_url.'bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
 		else
 		{	// Use minified CSS:
-			require_css( 'skins_adm/bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( $adminskins_url.'bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
 
 		// Load general JS file:

@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
+global $admin_url;
 
 /*** Email statistics ***/
 
@@ -123,7 +123,7 @@ $Results->cols[] = array(
 	);
 
 $Results->display( array(
-		'page_url' => $dispatcher.'?ctrl=users&amp;tab=stats'
+		'page_url' => $admin_url.'?ctrl=users&amp;tab=stats'
 	) );
 
 
@@ -372,7 +372,7 @@ $Results->cols[] = array(
 
 echo '<br />';
 $Results->display( array(
-		'page_url' => $dispatcher.'?ctrl=users&amp;tab=stats'
+		'page_url' => $admin_url.'?ctrl=users&amp;tab=stats'
 	) );
 
 

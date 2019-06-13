@@ -415,6 +415,7 @@ class Blog extends DataObject
 				$this->set_setting( 'front_disp', 'front' );
 				$this->set_setting( 'category_ordering', 'manual' );
 				$this->set_setting( 'main_content', 'excerpt' );
+				$this->set_setting( 'chapter_content', 'excerpt' );
 
 				// Try to find post type "Manual Page" in DB
 				global $DB;
@@ -585,8 +586,8 @@ class Blog extends DataObject
 				// Force enabled statuses regardless of previous settings
 				$this->set_setting( 'moderation_statuses', implode( ',', $enable_comment_moderation_statuses ) );
 			}
-			if( $this->get_setting( 'allow_access' ) == 'users' || $this->get_setting( 'allow_access' ) == 'members' )
-			{ // Disable site maps, feeds and ping plugins when access is restricted on this blog
+			if( $this->get_setting( 'allow_access' ) != 'public' )
+			{	// Disable site maps, feeds and ping plugins for not public collection:
 				$this->set_setting( 'enable_sitemaps', 0 );
 				$this->set_setting( 'feed_content', 'none' );
 				$this->set_setting( 'ping_plugins', '' );
@@ -831,8 +832,7 @@ class Blog extends DataObject
 		if( in_array( 'pings', $groups ) )
 		{ // we want to load the ping checkboxes:
 			$blog_ping_plugins = param( 'blog_ping_plugins', 'array:string', array() );
-			$blog_ping_plugins = array_unique($blog_ping_plugins);
-			$this->set_setting('ping_plugins', implode(',', $blog_ping_plugins));
+			$this->set_setting( 'ping_plugins', implode( ',', array_unique( $blog_ping_plugins ) ) );
 		}
 
 		if( in_array( 'home', $groups ) )
@@ -1060,6 +1060,38 @@ class Blog extends DataObject
 			$this->set_setting( 'search_include_cmnts', param( 'search_include_cmnts', 'integer', 0 ) );
 			$this->set_setting( 'search_include_tags', param( 'search_include_tags', 'integer', 0 ) );
 			$this->set_setting( 'search_include_files', param( 'search_include_files', 'integer', 0 ) );
+			// Scoring for posts:
+			$this->set_setting( 'search_score_post_title', param( 'search_score_post_title', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_content', param( 'search_score_post_content', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_tags', param( 'search_score_post_tags', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_excerpt', param( 'search_score_post_excerpt', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_titletag', param( 'search_score_post_titletag', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_author', param( 'search_score_post_author', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_future', param( 'search_score_post_date_future', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_moremonth', param( 'search_score_post_date_moremonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_lastmonth', param( 'search_score_post_date_lastmonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_twoweeks', param( 'search_score_post_date_twoweeks', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_date_lastweek', param( 'search_score_post_date_lastweek', 'integer', 0 ) );
+			// Scoring for comments:
+			$this->set_setting( 'search_score_cmnt_post_title', param( 'search_score_cmnt_post_title', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_content', param( 'search_score_cmnt_content', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_author', param( 'search_score_cmnt_author', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_future', param( 'search_score_cmnt_date_future', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_moremonth', param( 'search_score_cmnt_date_moremonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_lastmonth', param( 'search_score_cmnt_date_lastmonth', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_twoweeks', param( 'search_score_cmnt_date_twoweeks', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cmnt_date_lastweek', param( 'search_score_cmnt_date_lastweek', 'integer', 0 ) );
+			// Scoring for files:
+			$this->set_setting( 'search_score_file_name', param( 'search_score_file_name', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_path', param( 'search_score_file_path', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_title', param( 'search_score_file_title', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_alt', param( 'search_score_file_alt', 'integer', 0 ) );
+			$this->set_setting( 'search_score_file_description', param( 'search_score_file_description', 'integer', 0 ) );
+			// Scoring for categories:
+			$this->set_setting( 'search_score_cat_name', param( 'search_score_cat_name', 'integer', 0 ) );
+			$this->set_setting( 'search_score_cat_desc', param( 'search_score_cat_desc', 'integer', 0 ) );
+			// Scoring for tags:
+			$this->set_setting( 'search_score_tag_name', param( 'search_score_tag_name', 'integer', 0 ) );
 
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
@@ -1123,6 +1155,11 @@ class Blog extends DataObject
 			{ // Only admin can turn ON this setting
 				$this->set( 'allowtrackbacks', $blog_allowtrackbacks );
 			}
+			$blog_webmentions = param( 'blog_webmentions', 'integer', 0 );
+			if( $blog_webmentions != $this->get_setting( 'webmentions' ) && ( $blog_webmentions == 0 || $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) ) )
+			{	// Only admin can turn ON this setting
+				$this->set_setting( 'webmentions', $blog_webmentions );
+			}
 			$this->set_setting( 'comments_orderdir', param( 'comments_orderdir', '/^(?:ASC|DESC)$/', 'ASC' ) );
 
 			// call modules update_collection_comments on this blog
@@ -1144,17 +1181,26 @@ class Blog extends DataObject
 		if( in_array( 'seo', $groups ) )
 		{ // we want to load the workflow checkboxes:
 			$this->set_setting( 'canonical_homepage', param( 'canonical_homepage', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_homepage', param( 'self_canonical_homepage', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_homepage', param( 'relcanonical_homepage', 'integer', 0 ) );
+			$this->set_setting( 'canonical_posts', param( 'canonical_posts', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_posts', param( 'self_canonical_posts', 'integer', 0 ) );
+			$this->set_setting( 'relcanonical_posts', param( 'relcanonical_posts', 'integer', 0 ) );
 			$this->set_setting( 'canonical_item_urls', param( 'canonical_item_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_item_urls', param( 'self_canonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'allow_crosspost_urls', param( 'allow_crosspost_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_item_urls', param( 'relcanonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_archive_urls', param( 'canonical_archive_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_archive_urls', param( 'self_canonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_archive_urls', param( 'relcanonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_cat_urls', param( 'canonical_cat_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_cat_urls', param( 'self_canonical_cat_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_cat_urls', param( 'relcanonical_cat_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_tag_urls', param( 'canonical_tag_urls', 'integer', 0 ) );
+			$this->set_setting( 'self_canonical_tag_urls', param( 'self_canonical_tag_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_tag_urls', param( 'relcanonical_tag_urls', 'integer', 0 ) );
 			$this->set_setting( 'default_noindex', param( 'default_noindex', 'integer', 0 ) );
+			$this->set_setting( 'posts_firstpage_noindex', param( 'posts_firstpage_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_noindex', param( 'paged_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_nofollowto', param( 'paged_nofollowto', 'integer', 0 ) );
 			$this->set_setting( 'archive_noindex', param( 'archive_noindex', 'integer', 0 ) );
@@ -1212,6 +1258,7 @@ class Blog extends DataObject
 					$this->set_setting( 'in_skin_login', param( 'in_skin_login', 'integer', 0 ) );
 				}
 				$this->set_setting( 'in_skin_editing', param( 'in_skin_editing', 'integer', 0 ) );
+				$this->set_setting( 'in_skin_change_proposal', param( 'in_skin_change_proposal', 'integer', 0 ) );
 			}
 
 			if( param( 'blog_head_includes', 'html', NULL ) !== NULL )
@@ -3084,6 +3131,20 @@ class Blog extends DataObject
 					}
 				}
 				break;
+
+			case 'webmentions':
+				if( $this->get_setting( 'allow_access' ) != 'public' )
+				{	// Disable receiving of webmentions for not public collections:
+					$result = 0;
+				}
+				break;
+
+			case 'ping_plugins':
+				if( $this->get_setting( 'allow_access' ) != 'public' )
+				{	// Disable ping plugins for not public collections:
+					$result = '';
+				}
+				break;
 		}
 
 		return $result;
@@ -3316,7 +3377,7 @@ class Blog extends DataObject
 		{ // Proceed insertion:
 			$DB->query( 'INSERT INTO T_coll_user_perms
 					( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, bloguser_can_be_assignee,
-						bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit,
+						bloguser_perm_item_propose, bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit,
 						bloguser_perm_delpost, bloguser_perm_edit_ts,
 						bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts,
 						bloguser_perm_cmtstatuses, bloguser_perm_edit_cmt,
@@ -3324,7 +3385,7 @@ class Blog extends DataObject
 						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change,
 						bloguser_perm_analytics )
 					VALUES ( '.$this->ID.', '.$this->owner_user_ID.', 1, 1,
-						"published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
+						1, "published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
 						1, 1,
 						1, 1, 1,
 						"published,community,deprecated,protected,private,review,draft", "all",
@@ -3481,7 +3542,7 @@ class Blog extends DataObject
 		}
 
 		// Initialize fields of collection permission tables which must be duplicated:
-		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}perm_poststatuses, {prefix}perm_item_type,
+		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}perm_item_propose, {prefix}perm_poststatuses, {prefix}perm_item_type,
 				{prefix}perm_edit, {prefix}perm_delpost, {prefix}perm_edit_ts, {prefix}perm_delcmts,
 				{prefix}perm_recycle_owncmts, {prefix}perm_vote_spam_cmts, {prefix}perm_cmtstatuses,
 				{prefix}perm_edit_cmt, {prefix}perm_meta_comment, {prefix}perm_cats, {prefix}perm_properties,
@@ -3825,6 +3886,7 @@ class Blog extends DataObject
 			'admins' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 1,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft,redirected',
 				'perm_item_type'       => 'admin',
 				'perm_edit'            => 'all',
@@ -3847,6 +3909,7 @@ class Blog extends DataObject
 			'moderators' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 1,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft',
 				'perm_item_type'       => 'restricted',
 				'perm_edit'            => 'le',
@@ -3869,6 +3932,7 @@ class Blog extends DataObject
 			'editors' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => '',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -3894,6 +3958,7 @@ class Blog extends DataObject
 			$group_permissions['editors'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'community,protected,draft,deprecated',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'own',
@@ -3916,6 +3981,7 @@ class Blog extends DataObject
 			$group_permissions['users'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'community,draft',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -3938,6 +4004,7 @@ class Blog extends DataObject
 			$group_permissions['suspect'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'review,draft',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -3964,6 +4031,7 @@ class Blog extends DataObject
 			$group_permissions['blogb'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => '',
 				'perm_item_type'       => 'standard',
 				'perm_edit'            => 'no',
@@ -5115,10 +5183,11 @@ class Blog extends DataObject
 
 		if( ! isset( $cache_all_item_type_data ) )
 		{	// Get all item type data only first time to save execution time:
-			$cache_all_item_type_data = $DB->get_results( 'SELECT ityp_ID, ityp_usage, ityp_name FROM T_items__type' );
+			$cache_all_item_type_data = $DB->get_results( 'SELECT ityp_ID, ityp_usage, ityp_name, ityp_template_name FROM T_items__type' );
 		}
 
 		// Decide what "post" item type we can enable depending on collection kind:
+		$default_post_types_by_template = array();
 		switch( $this->type )
 		{
 			case 'main':
@@ -5134,7 +5203,8 @@ class Blog extends DataObject
 				break;
 
 			case 'manual':
-				$default_post_types = array( 'Manual Page' );
+				$default_post_types = array( 'Manual Page', 'Recipe' );
+				$default_post_types_by_template = array( 'recipe' );
 				break;
 
 			case 'group':
@@ -5142,7 +5212,8 @@ class Blog extends DataObject
 				break;
 
 			default: // 'std'
-				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post' );
+				$default_post_types = array( 'Post', 'Podcast Episode', 'Post with Custom Fields', 'Child Post', 'Recipe' );
+				$default_post_types_by_template = array( 'recipe' );
 				break;
 		}
 
@@ -5150,7 +5221,8 @@ class Blog extends DataObject
 		foreach( $cache_all_item_type_data as $item_type )
 		{
 			if( $item_type->ityp_usage == 'post' &&
-			    in_array( $item_type->ityp_name, $default_post_types ) )
+			    ( in_array( $item_type->ityp_name, $default_post_types ) || in_array( $item_type->ityp_template_name, $default_post_types_by_template ) ) &&
+			    ! in_array( $item_type->ityp_ID, $enable_post_types ) )
 			{	// This "post" item type can be enabled:
 				$enable_post_types[] = $item_type->ityp_ID;
 			}

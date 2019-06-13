@@ -1089,6 +1089,7 @@ class ItemQuery extends SQL
 		$available_fields[] = 'status';
 		$available_fields[] = 'T_categories.cat_name';
 		$available_fields[] = 'T_categories.cat_order';
+		$available_fields[] = 'matched_tags_num'; // This is a virtual column only for order, real post_matched_tags_num doesn't exist in DB
 
 		if( in_array( 'order', $orderby_array ) )
 		{	// If list is ordered by field 'order':
@@ -1097,9 +1098,16 @@ class ItemQuery extends SQL
 				$available_fields[ $order_i ] = 'postcatsorders.postcat_order';
 			}
 			// Join table of categories for field 'postcat_order':
-			$this->FROM_add( 'INNER JOIN T_postcats AS postcatsorders ON postcatsorders.postcat_post_ID = post_ID AND post_main_cat_ID = postcatsorders.postcat_cat_ID' );
+			$current_cat_ID = ( isset( $this->cat_array ) && count( $this->cat_array ) == 1 ? $DB->quote( $this->cat_array[0] ) : 'post_main_cat_ID' );
+			$this->FROM_add( 'INNER JOIN T_postcats AS postcatsorders ON postcatsorders.postcat_post_ID = post_ID AND '.$current_cat_ID.' = postcatsorders.postcat_cat_ID' );
 			// Replace field to real name:
 			$order_by = str_replace( 'order', 'postcatsorders.postcat_order', $order_by );
+		}
+
+		if( in_array( 'matched_tags_num', $orderby_array ) )
+		{	// Special selection to order by highest number of matched tags:
+			$this->orderby_from .= ' LEFT JOIN ( SELECT itag_itm_ID, COUNT(*) AS post_matched_tags_num FROM T_items__itemtag GROUP BY itag_itm_ID ) AS matched_tags_num
+				ON post_ID = matched_tags_num.itag_itm_ID ';
 		}
 
 		$order_clause = gen_order_clause( $order_by, $order_dir, $dbprefix, $dbIDname, $available_fields );

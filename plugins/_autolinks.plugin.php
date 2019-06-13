@@ -28,7 +28,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 63;
-	var $version = '6.10.8';
+	var $version = '6.11.2';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -185,7 +185,6 @@ class autolinks_plugin extends Plugin
 			switch( $params['blog_type'] )
 			{
 				case 'forum':
-				case 'manual':
 					$default_values['autolink_post_nofollow_exist'] = 1;
 					$default_values['autolink_post_nofollow_explicit'] = 1;
 					break;

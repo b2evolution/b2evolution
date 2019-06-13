@@ -200,7 +200,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_comments (
 			comment_ID                 int(11) unsigned NOT NULL auto_increment,
 			comment_item_ID            int(11) unsigned NOT NULL default 0,
-			comment_type               enum('comment','linkback','trackback','pingback','meta') COLLATE ascii_general_ci NOT NULL default 'comment',
+			comment_type               enum('comment','linkback','trackback','pingback','meta','webmention') COLLATE ascii_general_ci NOT NULL default 'comment',
 			comment_status             ENUM('published','community','deprecated','protected','private','review','draft','trash') COLLATE ascii_general_ci DEFAULT 'draft' NOT NULL,
 			comment_in_reply_to_cmt_ID INT(10) unsigned NULL,
 			comment_author_user_ID     int unsigned NULL default NULL,
@@ -274,15 +274,41 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating item versions table',
 		"CREATE TABLE T_items__version (
 			iver_ID            INT UNSIGNED NOT NULL,
+			iver_type          ENUM('archived','proposed') COLLATE ascii_general_ci NOT NULL DEFAULT 'archived',
 			iver_itm_ID        INT UNSIGNED NOT NULL,
 			iver_edit_user_ID  INT UNSIGNED NULL,
-			iver_edit_datetime TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			iver_edit_last_touched_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			iver_status        ENUM('published','community','deprecated','protected','private','review','draft','redirected') COLLATE ascii_general_ci NULL,
 			iver_title         VARCHAR(255) NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			iver_content       MEDIUMTEXT NULL,
-			INDEX iver_ID_itm_ID ( iver_ID , iver_itm_ID ),
+			PRIMARY KEY        ( iver_ID , iver_type, iver_itm_ID ),
 			INDEX iver_edit_user_ID ( iver_edit_user_ID )
-		) ENGINE = innodb ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__version_custom_field' => array(
+		'Creating item version custom fields table',
+		"CREATE TABLE T_items__version_custom_field (
+			ivcf_iver_ID     INT UNSIGNED NOT NULL,
+			ivcf_iver_type   ENUM('archived','proposed') COLLATE ascii_general_ci NOT NULL DEFAULT 'archived',
+			ivcf_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivcf_itcf_ID     INT UNSIGNED NOT NULL,
+			ivcf_itcf_label  VARCHAR(255) NOT NULL,
+			ivcf_value       VARCHAR( 10000 ) NULL,
+			PRIMARY KEY      ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_items__version_link' => array(
+		'Creating item version links table',
+		"CREATE TABLE T_items__version_link (
+			ivl_iver_ID     INT UNSIGNED NOT NULL,
+			ivl_iver_type   ENUM('archived','proposed') COLLATE ascii_general_ci NOT NULL DEFAULT 'archived',
+			ivl_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivl_link_ID     INT(11) UNSIGNED NOT NULL,
+			ivl_file_ID     INT(11) UNSIGNED NULL,
+			ivl_position    VARCHAR(10) COLLATE ascii_general_ci NOT NULL,
+			ivl_order       INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY     ( ivl_iver_ID, ivl_iver_type, ivl_iver_itm_ID, ivl_link_ID )
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_items__status' => array(
 		'Creating table for Post Statuses',
@@ -458,6 +484,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloguser_user_ID              int(11) unsigned NOT NULL default 0,
 			bloguser_ismember             tinyint NOT NULL default 0,
 			bloguser_can_be_assignee      tinyint NOT NULL default 0,
+			bloguser_perm_item_propose    tinyint NOT NULL default 0,
 			bloguser_perm_poststatuses    set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
 			bloguser_perm_item_type       ENUM('standard','restricted','admin') COLLATE ascii_general_ci NOT NULL default 'standard',
 			bloguser_perm_edit            ENUM('no','own','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no',
@@ -487,6 +514,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			bloggroup_group_ID             int(11) unsigned NOT NULL default 0,
 			bloggroup_ismember             tinyint NOT NULL default 0,
 			bloggroup_can_be_assignee      tinyint NOT NULL default 0,
+			bloggroup_perm_item_propose    tinyint NOT NULL default 0,
 			bloggroup_perm_poststatuses    set('review','draft','private','protected','deprecated','community','published','redirected') COLLATE ascii_general_ci NOT NULL default '',
 			bloggroup_perm_item_type       ENUM('standard','restricted','admin') COLLATE ascii_general_ci NOT NULL default 'standard',
 			bloggroup_perm_edit            ENUM('no','own','lt','le','all') COLLATE ascii_general_ci NOT NULL default 'no',
@@ -531,7 +559,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			link_msg_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to private message',
 			link_tmp_ID           int(11) unsigned  NULL COMMENT 'Used for linking files to new creating object',
 			link_file_ID          int(11) unsigned  NULL,
-			link_ltype_ID         int(11) unsigned  NOT NULL default 1,
 			link_position         varchar(10) COLLATE ascii_general_ci NOT NULL,
 			link_order            int(11) unsigned  NOT NULL,
 			PRIMARY KEY (link_ID),
@@ -548,6 +575,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			tmp_ID      INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			tmp_type    VARCHAR(32) COLLATE ascii_general_ci NOT NULL,
 			tmp_coll_ID INT(11) UNSIGNED NULL,
+			tmp_item_ID INT(11) UNSIGNED NULL COMMENT 'Link to parent Item of Comment in order to enable permission checks',
 			PRIMARY KEY (tmp_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

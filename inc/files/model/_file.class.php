@@ -1249,33 +1249,37 @@ class File extends DataObject
 				$img .= '<img'.get_field_attribs_as_string( $img_attribs ).' />';
 			}
 
-			if( $image_link_to == 'original' )
-			{ // special case
-				$image_link_to = $this->get_url();
-			}
-			if( !empty( $image_link_to ) )
-			{
-				$a = '<a href="'.$image_link_to.'"';
-
-				if( $image_link_title == '#title#' )
-					$image_link_title = $this->title;
-				elseif( $image_link_title == '#desc#' )
-					$image_link_title = $this->desc;
-
-				if( !empty($image_link_title) )
+			if( $this->exists() )
+			{	// file exists, we can safely link to this file:
+				if( $image_link_to == 'original' )
+				{ // special case
+					$image_link_to = $this->get_url();
+				}
+				if( !empty( $image_link_to ) )
 				{
-					$a .= ' title="'.htmlspecialchars($image_link_title).'"';
+					$a = '<a href="'.$image_link_to.'"';
+
+					if( $image_link_title == '#title#' )
+						$image_link_title = $this->title;
+					elseif( $image_link_title == '#desc#' )
+						$image_link_title = $this->desc;
+
+					if( !empty($image_link_title) )
+					{
+						$a .= ' title="'.htmlspecialchars($image_link_title).'"';
+					}
+					if( !empty($image_link_rel) )
+					{
+						$a .= ' rel="'.htmlspecialchars($image_link_rel).'"';
+					}
+					if( !empty( $image_link_id ) )
+					{ // Set attribute "id" for link
+						$a .= ' id="'.$image_link_id.'"';
+					}
+					$img = $a.'>'.$img.'</a>';
 				}
-				if( !empty($image_link_rel) )
-				{
-					$a .= ' rel="'.htmlspecialchars($image_link_rel).'"';
-				}
-				if( !empty( $image_link_id ) )
-				{ // Set attribute "id" for link
-					$a .= ' id="'.$image_link_id.'"';
-				}
-				$img = $a.'>'.$img.'</a>';
 			}
+
 			$r .= $img;
 
 			if( $image_desc == '#' )
@@ -1667,9 +1671,10 @@ class File extends DataObject
 	 * @param string Root type: 'user', 'group', 'collection' or 'absolute'
 	 * @param integer ID of the user, the group or the collection the file belongs to...
 	 * @param string Subpath for this file/folder, relative the associated root (no trailing slash)
+	 * @param boolean TRUE to don't rewrite existing file in the destination path, try to create unique file with appending siffix like "-1", "-2" and etc.
 	 * @return boolean true on success, false on failure
 	 */
-	function move_to( $root_type, $root_ID, $rdfp_rel_path )
+	function move_to( $root_type, $root_ID, $rdfp_rel_path, $keep_unique = false )
 	{
 		$old_file_name = $this->get_name();
 
@@ -1678,6 +1683,20 @@ class File extends DataObject
 		$FileRootCache = & get_FileRootCache();
 
 		$new_FileRoot = & $FileRootCache->get_by_type_and_ID( $root_type, $root_ID, true );
+
+		if( $keep_unique && preg_match( '#(.+\/)?(([^.\/]+)(\.[^.]+)?)$#', $rdfp_rel_path, $new_path_match ) )
+		{	// Try to find free unique file name if same name is already used in the destination folder:
+			$file_unique_name = $new_path_match[2];
+			$file_extension = isset( $new_path_match[4] ) ? $new_path_match[4] : '';
+			$file_unique_num = 1;
+			while( file_exists( $new_FileRoot->ads_path.$new_path_match[1].$file_unique_name ) )
+			{	// Find next free file with unique name in the same folder:
+				$file_unique_name = $new_path_match[3].'-'.$file_unique_num.$file_extension;
+				$file_unique_num++;
+			}
+			$rdfp_rel_path = $new_path_match[1].$file_unique_name;
+		}
+
 		$adfp_posix_path = $new_FileRoot->ads_path.$rdfp_rel_path;
 
 		if( ! @rename( $this->_adfp_full_path, $adfp_posix_path ) )
@@ -1782,9 +1801,11 @@ class File extends DataObject
 	 * Also removes meta data from DB.
 	 *
 	 * @access public
+	 * @param boolean TRUE to use DB transaction
+	 * @param boolean TRUE to delete non-empty directory recursively
 	 * @return boolean true on success, false on failure
 	 */
-	function unlink( $use_transactions = true )
+	function unlink( $use_transactions = true, $recursively = false )
 	{
 		global $DB;
 
@@ -1808,7 +1829,9 @@ class File extends DataObject
 		// Physically remove file from disk:
 		if( $this->is_dir() )
 		{
-			$unlinked = @rmdir( $this->_adfp_full_path );
+			$unlinked = ( $recursively
+				? rmdir_r( $this->_adfp_full_path )
+				: @rmdir( $this->_adfp_full_path ) );
 			$syslog_message = $unlinked ?
 					'Folder %s was deleted' :
 					'Folder %s could not be deleted';
@@ -2098,7 +2121,7 @@ class File extends DataObject
 
 		$Filetype = & $this->get_Filetype();
 		if( $this->is_dir() || $ignore_popup || ( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) ) )
-		{ // Link to open in the curent window
+		{ // Link to open in the current window
 			return '<a href="'.$url.'" title="'.$title.'"'.$class_attr.$rel_attr.'>'.$text.'</a>';
 		}
 		else
@@ -2130,11 +2153,11 @@ class File extends DataObject
 	function get_linkedit_link( $link_type = NULL, $link_obj_ID = NULL, $text = NULL, $title = NULL, $no_access_text = NULL,
 											$actionurl = '#', $target = '' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( is_null( $text ) )
@@ -2173,11 +2196,11 @@ class File extends DataObject
 	 */
 	function get_linkedit_url( $link_type = NULL, $link_obj_ID = NULL, $actionurl = '#' )
 	{
-		global $dispatcher;
+		global $admin_url;
 
 		if( $actionurl == '#' )
 		{
-			$actionurl = $dispatcher.'?ctrl=files';
+			$actionurl = $admin_url.'?ctrl=files';
 		}
 
 		if( $this->is_dir() )
@@ -2452,6 +2475,11 @@ class File extends DataObject
 					$img_attribs['height'] = $thumb_sizes[1];
 				}
 			}
+		}
+
+		if( ! $this->exists() )
+		{	// We cannot find the file, force use of getfile.php to handle missing display of missing file:
+			$img_attribs['src'] = url_add_param( $this->get_getfile_url( '&' ), array( 'size' => $size_name ), '&' );
 		}
 
 		return $img_attribs;

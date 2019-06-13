@@ -56,6 +56,8 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_items__type_coll'         => $tableprefix.'items__type_coll',
 		'T_items__user_data'         => $tableprefix.'items__user_data',
 		'T_items__version'           => $tableprefix.'items__version',
+		'T_items__version_custom_field' => $tableprefix.'items__version_custom_field',
+		'T_items__version_link'      => $tableprefix.'items__version_link',
 		'T_items__votes'             => $tableprefix.'items__votes',
 		'T_items__status_type'       => $tableprefix.'items__status_type',
 		'T_links'                    => $tableprefix.'links',
@@ -969,7 +971,7 @@ class collections_Module extends Module
 				'params' => NULL, // 'comment_ID', 'executed_by_userid', 'is_new_comment', 'already_notified_user_IDs', 'force_members', 'force_community'
 			),
 			'send-post-notifications' => array( // not user schedulable
-				'name'   => T_('Send notifications for &laquo;%s&raquo;'),
+				'name'   => T_('Send notifications for #%d &laquo;%s&raquo;'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_post_notifications.job.php',
 				'params' => NULL, // 'item_ID', 'executed_by_userid', 'is_new_item', 'already_notified_user_IDs', 'force_members', 'force_community', 'force_pings'
@@ -1060,30 +1062,32 @@ class collections_Module extends Module
 				if( $confirmed )
 				{ // Unlink File from Item:
 					$deleted_link_ID = $edited_Link->ID;
-					$edited_Link->dbdelete();
-					unset($edited_Link);
+					if( $LinkOwner->remove_link( $edited_Link ) )
+					{	// If Link has been removed successfully:
+						unset($edited_Link);
 
-					$LinkOwner->after_unlink_action( $deleted_link_ID );
+						$LinkOwner->after_unlink_action( $deleted_link_ID );
 
-					$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
+						$Messages->add( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'success' );
 
-					if( $current_User->check_perm( 'files', 'edit' ) )
-					{ // current User has permission to edit/delete files
-						$file_name = $linked_File->get_name();
-						$links_count--;
-						if( $links_count > 0 )
-						{ // File is linked to other objects
-							$Messages->add( sprintf( T_('File %s is still linked to %d other objects'), $file_name, $links_count ), 'note' );
-						}
-						else
-						{ // File is not linked to other objects
-							if( $linked_File->unlink() )
-							{ // File removed successful ( removed from db and from storage device also )
-								$Messages->add( sprintf( T_('File %s has been deleted.'), $file_name ), 'success' );
+						if( $current_User->check_perm( 'files', 'edit' ) )
+						{ // current User has permission to edit/delete files
+							$file_name = $linked_File->get_name();
+							$links_count--;
+							if( $links_count > 0 )
+							{ // File is linked to other objects
+								$Messages->add( sprintf( T_('File %s is still linked to %d other objects'), $file_name, $links_count ), 'note' );
 							}
 							else
-							{ // Could not completly remove the file
-								$Messages->add( sprintf( T_('File %s could not be deleted.'), $file_name ), 'error' );
+							{ // File is not linked to other objects
+								if( $linked_File->unlink() )
+								{ // File removed successful ( removed from db and from storage device also )
+									$Messages->add( sprintf( T_('File %s has been deleted.'), $file_name ), 'success' );
+								}
+								else
+								{ // Could not completly remove the file
+									$Messages->add( sprintf( T_('File %s could not be deleted.'), $file_name ), 'error' );
+								}
 							}
 						}
 					}
@@ -1494,6 +1498,10 @@ class collections_Module extends Module
 
 				if( $new_Item->dbinsert() )
 				{	// Successful new item creating:
+
+					// Execute or schedule notifications & pings:
+					$new_Item->handle_notifications( NULL, true );
+
 					$Messages->add( T_('Post has been created.'), 'success' );
 					$Messages->add( T_('Please double check your email address and choose a password so that you can log in next time you visit us.'), 'warning' );
 					$redirect_to = $item_Blog->get( 'register_finishurl', array( 'glue' => '&' ) );

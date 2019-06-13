@@ -33,14 +33,14 @@ if( $params['error_task'] !== NULL )
 if( is_array( $params['timeout_tasks'] ) && count( $params['timeout_tasks'] ) )
 {	// Display timeout tasks:
 	echo T_('The following scheduled tasks have timed out:')."\n";
-	foreach( $params['timeout_tasks'] as $task_ID => $task )
+	foreach( $params['timeout_tasks'] as $task_ID => $task_name )
 	{
-		echo '- '.$task['name'].' (#'.$task_ID.' - '.$admin_url.'?ctrl=crontab&action=view&cjob_ID='.$task_ID.'):'."\n".T_( $task['message'] )."\n";
+		echo '- '.$task_name.' (#'.$task_ID.' - '.$admin_url.'?ctrl=crontab&action=view&cjob_ID='.$task_ID.')'."\n";
 	}
 }
 echo "\n";
 
-$tasks_url = $admin_url.'?ctrl=crontab&ctst_status[]=warning&ctst_status[]=timeout&ctst_status[]=error';
+$tasks_url = $admin_url.'?ctrl=crontab&ctst_status[]=warning&ctst_status[]=timeout&ctst_status[]=error&ctst_status[]=imap_error';
 echo sprintf( T_('To see more information about these tasks click here: %s'), $tasks_url );
 
 // Footer vars:

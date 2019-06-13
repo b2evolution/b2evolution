@@ -179,9 +179,11 @@ function skin_init( $disp )
 
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
-			if( ! $preview
-					&& (( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
-								|| $Blog->get_setting( 'relcanonical_item_urls' ) ) )
+			if( ! $preview &&
+			    ( ( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
+			      || $Blog->get_setting( 'relcanonical_item_urls' ) 
+			      || $Blog->get_setting( 'self_canonical_item_urls' )
+			    ) )
 			{	// We want to redirect to the Item's canonical URL:
 				$canonical_is_same_url = true;
 				$item_Blog = & $Item->get_Blog();
@@ -199,6 +201,14 @@ function skin_init( $disp )
 				if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
 				{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
 					$canonical_url = url_add_param( $canonical_url, implode( '&', $page_param[1] ), '&' );
+				}
+				if( preg_match( '|[&?](revision=(p?\d+))|', $ReqURI, $revision_param )
+						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item ) )
+						&& $item_revision = $Item->get_revision( $revision_param[2] ) )
+				{ // A revision of the post, keep only this param and discard all others:
+					$canonical_url = url_add_param( $canonical_url, $revision_param[1], '&' );
+					$Item->set( 'revision', $revision_param[2] );
+					$Messages->add( sprintf( T_('You are viewing Revision #%s dated %s' ), $revision_param[2], date( locale_datetimefmt(), strtotime( $item_revision->iver_edit_last_touched_ts ) ) ), 'note' );
 				}
 				$canonical_is_same_url = is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 
@@ -271,10 +281,14 @@ function skin_init( $disp )
 						header_redirect( $canonical_url, true );
 						// EXITED.
 					}
-					else
+					elseif( $Blog->get_setting( 'relcanonical_item_urls' ) )
 					{	// Use rel="canoncial":
 						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 					}
+				}
+				elseif( $Blog->get_setting( 'self_canonical_item_urls' ) )
+				{	// Use self-referencing rel="canonical" tag:
+					add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 				}
 			}
 
@@ -332,19 +346,51 @@ function skin_init( $disp )
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
 
-			if( !empty($active_filters) )
-			{	// The current page is being filtered...
+			$is_first_page = ( empty( $active_filters ) || array_diff( $active_filters, array( 'posts' ) ) == array() );
+			$is_next_pages = ( ! $is_first_page && array_diff( $active_filters, array( 'posts', 'page' ) ) == array() );
 
-				if( array_diff( $active_filters, array( 'posts' ) ) == array() )
-				{	// This is the default blog page only if the 'front_disp' is set to 'posts'
-					$disp_detail = 'posts-default';
-					$seo_page_type = 'Default page';
-					if( $Blog->get_setting( 'default_noindex' ) )
-					{	// We prefer robots not to index archive pages:
-						$robots_index = false;
+			if( ( $is_first_page && $Blog->get_setting( 'front_disp' ) != 'posts' ) || $is_next_pages )
+			{	// This is first(but not front disp) or next pages of disp=posts:
+				// Do we need to handle the canoncial url?
+				if( ( $Blog->get_setting( 'canonical_posts' ) && $redir == 'yes' )
+				    || $Blog->get_setting( 'relcanonical_posts' )
+				    || $Blog->get_setting( 'self_canonical_posts' ) )
+				{	// Check if the URL was canonical:
+					$canonical_url = url_add_param( $Blog->get( 'url' ), 'disp=posts', '&' );
+					if( $is_next_pages )
+					{	// Set param for paged url:
+						$canonical_url = url_add_param( $canonical_url, $MainList->page_param.'='.$MainList->filters['page'], '&' );
+					}
+					if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+					{	// We are not on the canonical blog url:
+						if( $Blog->get_setting( 'canonical_posts' ) && $redir == 'yes' )
+						{	// REDIRECT TO THE CANONICAL URL:
+							header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) ) ? 301 : 303 );
+						}
+						elseif( $Blog->get_setting( 'relcanonical_posts' ) )
+						{	// Use link rel="canoncial":
+							add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+						}
+					}
+					elseif( $Blog->get_setting( 'self_canonical_posts' ) )
+					{	// Use self-referencing rel="canonical" tag:
+						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'posts', 'page' ) ) == array() )
+			}
+
+			if( $is_first_page )
+			{	// This is first page of disp=posts:
+				$disp_detail = 'posts-default';
+				$seo_page_type = 'First posts page';
+				if( $Blog->get_setting( 'posts_firstpage_noindex' ) )
+				{	// We prefer robots not to index archive pages:
+					$robots_index = false;
+				}
+			}
+			elseif( ! empty( $active_filters ) )
+			{	// The current page is being filtered...
+				if( $is_next_pages )
 				{ // This is just a follow "paged" page
 					$disp_detail = 'posts-next';
 					$seo_page_type = 'Next page';
@@ -377,7 +423,8 @@ function skin_init( $disp )
 						$disp_detail = 'posts-topcat';  // may become 'posts-subcat' below.
 
 						if( ( $Blog->get_setting( 'canonical_cat_urls' ) && $redir == 'yes' )
-							|| $Blog->get_setting( 'relcanonical_cat_urls' ) )
+						    || $Blog->get_setting( 'relcanonical_cat_urls' )
+						    || $Blog->get_setting( 'self_canonical_cat_urls' ) )
 						{ // Check if the URL was canonical:
 							if( empty( $Chapter ) && isset( $MainList->filters['cat_array'][0] ) )
 							{	// Try to get Chapter from filters:
@@ -399,10 +446,14 @@ function skin_init( $disp )
 									{	// REDIRECT TO THE CANONICAL URL:
 										header_redirect( $canonical_url, true );
 									}
-									else
+									elseif( $Blog->get_setting( 'relcanonical_cat_urls' ) )
 									{	// Use rel="canonical":
 										add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 									}
+								}
+								elseif( $Blog->get_setting( 'self_canonical_cat_urls' ) )
+								{	// Use self-referencing rel="canonical" tag:
+									add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 								}
 							}
 						}
@@ -431,7 +482,8 @@ function skin_init( $disp )
 					}
 
 					if( ( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
-							|| $Blog->get_setting( 'relcanonical_tag_urls' ) )
+					    || $Blog->get_setting( 'relcanonical_tag_urls' )
+					    || $Blog->get_setting( 'self_canonical_tag_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url = $Blog->gen_tag_url( $MainList->get_active_filter('tags'), $MainList->get_active_filter('page'), '&' );
 						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
@@ -440,10 +492,14 @@ function skin_init( $disp )
 							{	// REDIRECT TO THE CANONICAL URL:
 								header_redirect( $canonical_url, true );
 							}
-							else
+							elseif( $Blog->get_setting( 'relcanonical_tag_urls' ) )
 							{	// Use rel="canoncial":
 								add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 							}
+						}
+						elseif( $Blog->get_setting( 'self_canonical_tag_urls' ) )
+						{	// Use self-referencing rel="canonical" tag:
+							add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 						}
 					}
 
@@ -459,8 +515,9 @@ function skin_init( $disp )
 					$disp_detail = 'posts-date';
 					$seo_page_type = 'Date archive page';
 
-					if( ($Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
-							|| $Blog->get_setting( 'relcanonical_archive_urls' ) )
+					if( ( $Blog->get_setting( 'canonical_archive_urls' ) && $redir == 'yes' )
+					    || $Blog->get_setting( 'relcanonical_archive_urls' )
+					    || $Blog->get_setting( 'self_canonical_archive_urls' ) )
 					{ // Check if the URL was canonical:
 						$canonical_url =  $Blog->gen_archive_url( substr( $m, 0, 4 ), substr( $m, 4, 2 ), substr( $m, 6, 2 ), $w, '&', $MainList->get_active_filter('page') );
 						if( ! is_same_url($ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
@@ -469,10 +526,14 @@ function skin_init( $disp )
 							{	// REDIRECT TO THE CANONICAL URL:
 								header_redirect( $canonical_url, true );
 							}
-							else
+							elseif( $Blog->get_setting( 'relcanonical_archive_urls' ) )
 							{	// Use rel="canoncial":
 								add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 							}
+						}
+						elseif( $Blog->get_setting( 'self_canonical_archive_urls' ) )
+						{	// Use self-referencing rel="canonical" tag:
+							add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 						}
 					}
 
@@ -490,15 +551,6 @@ function skin_init( $disp )
 					{	// We prefer robots not to index other filtered pages:
 						$robots_index = false;
 					}
-				}
-			}
-			elseif( $Blog->get_setting('front_disp') == 'posts' )
-			{	// This is the default blog page only if the 'front_disp' is set to 'posts'
-				$disp_detail = 'posts-default';
-				$seo_page_type = 'Default page';
-				if( $Blog->get_setting( 'default_noindex' ) )
-				{	// We prefer robots not to index archive pages:
-					$robots_index = false;
 				}
 			}
 			break;
@@ -1357,6 +1409,7 @@ function skin_init( $disp )
 			break;
 
 		case 'edit':
+		case 'proposechange':
 			global $current_User, $post_ID;
 
 			// Post ID, go from $_GET when we edit a post from Front-office
@@ -1365,7 +1418,7 @@ function skin_init( $disp )
 
 			if( !is_logged_in() )
 			{ // Redirect to the login page if not logged in and allow anonymous user setting is OFF
-				$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit' );
+				$redirect_to = url_add_param( $Blog->gen_blogurl(), ( $disp == 'edit' ? 'disp=edit' : 'disp=proposechange&amp;p='.$post_ID ) );
 				$Messages->add( T_( 'You must log in to create & edit posts.' ) );
 				header_redirect( get_login_url( 'cannot edit posts', $redirect_to ), 302 );
 				// will have exited
@@ -1386,8 +1439,10 @@ function skin_init( $disp )
 				header_redirect( $Blog->gen_blogurl(), 302 );
 			}
 
-			// user logged in and the account was activated
-			check_item_perm_edit( $post_ID );
+			if( $disp == 'edit' )
+			{	// Check permission to create/edit post:
+				check_item_perm_edit( $post_ID );
+			}
 
 			if( ! blog_has_cats( $Blog->ID ) )
 			{ // No categories are in this blog
@@ -1643,6 +1698,15 @@ function skin_init( $disp )
 			break;
 	}
 
+	if( $Blog->get_setting( 'front_disp' ) == $disp )
+	{	// This is the default/front collection page:
+		$seo_page_type = 'Default page';
+		if( $Blog->get_setting( 'default_noindex' ) )
+		{	// We prefer robots not to index archive pages:
+			$robots_index = false;
+		}
+	}
+
 	$Debuglog->add('skin_init: $disp='.$disp. ' / $disp_detail='.$disp_detail.' / $seo_page_type='.$seo_page_type, 'skins' );
 
 	// Make this switch block special only for 403 and 404 pages:
@@ -1840,6 +1904,7 @@ function skin_include( $template_name, $params = array() )
 				'disp_comments'              => '_comments.disp.php',
 				'disp_download'              => '_download.disp.php',
 				'disp_edit'                  => '_edit.disp.php',
+				'disp_proposechange'         => '_proposechange.disp.php',
 				'disp_edit_comment'          => '_edit_comment.disp.php',
 				'disp_feedback-popup'        => '_feedback_popup.disp.php',
 				'disp_flagged'               => '_flagged.disp.php',

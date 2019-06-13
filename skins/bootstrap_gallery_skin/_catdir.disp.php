@@ -24,6 +24,7 @@ $params = array_merge( array(
 		'item_class'        => 'evo_post evo_content_block',
 		'item_type_class'   => 'evo_post__ptyp_',
 		'item_status_class' => 'evo_post__',
+		'intro_mode'        => 'normal', // Intro posts will be displayed in normal mode
 	), $params );
 
 // ------------------------------- START OF INTRO POST -------------------------------

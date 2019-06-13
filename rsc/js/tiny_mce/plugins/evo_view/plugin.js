@@ -21,7 +21,7 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 				execCommandView,
 				execCommandBefore,
 				toolbar,
-				shortTags = [ 'image', 'thumbnail', 'inline' ];
+				shortTags = [ 'image', 'thumbnail', 'inline', 'button', 'cta', 'like', 'dislike', 'activate', 'unsubscribe' ];
 
 
 		/**
@@ -206,11 +206,6 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 
 			if( viewNode !== selected )
 			{
-				// Make sure that the editor is focused.
-				// It is possible that the editor is not focused when the mouse event fires
-				// without focus, the selection will not work properly.
-				editor.getBody().focus();
-
 				deselect();
 				selected = viewNode;
 				selectedView = getView( viewNode );

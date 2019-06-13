@@ -22,6 +22,11 @@
 require_once dirname(__FILE__).'/../conf/_config.php';
 
 /**
+ * @global boolean Is this AJAX request? Use {@link is_ajax_request()} to query it, because it may change.
+ */
+$is_ajax_request = true;
+
+/**
  * HEAVY :(
  *
  * @todo dh> refactor _main.inc.php to be able to include small parts
@@ -151,7 +156,9 @@ switch( $action )
 		{
 			bad_request_die('Invalid Plugin.');
 		}
-		param( 'set_path', '/^\w+(?:\[\w+\])+$/', '' );
+		param( 'param_name', 'string', '' );
+		param( 'param_num', 'integer', '' );
+		$set_path = $param_name.'['.$param_num.']';
 
 		load_funcs('plugins/_plugin.funcs.php');
 
@@ -563,7 +570,7 @@ switch( $action )
 				if( $Item->assign_to( $new_assigned_ID, $new_assigned_login ) )
 				{ // An assigned user can be changed
 					$Item->dbupdate();
-					$Item->send_assignment_notification( NULL, false );
+					$Item->send_assignment_notification();
 				}
 				else
 				{ // Error on changing of an assigned user
@@ -878,7 +885,7 @@ switch( $action )
 
 		echo '<div style="background:#FFF;height:80%">'
 				.'<span id="import_files_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
-				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=import&amp;ajax_request=1&amp;root=import_0"'
+				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=import&amp;ajax_request=1&amp;root=import_0&amp;path='.param( 'path', 'string' ).'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
 					.' onload="document.getElementById(\'import_files_loader\').style.display=\'none\'">loading</iframe>'
 			.'</div>';

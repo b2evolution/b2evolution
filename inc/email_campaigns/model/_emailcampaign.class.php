@@ -662,7 +662,7 @@ class EmailCampaign extends DataObject
 	{
 		if( $force_update || $this->get( 'sync_plaintext' ) )
 		{	// Update plain-text message only when it is enabled for this email campaign:
-			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>([^<]*)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
+			$email_plaintext = preg_replace_callback( '#<a[^>]+href="([^"]+)"[^>]*>(.*?)</a>#i', array( $this, 'update_plaintext_callback_a' ), $this->get( 'email_html' ) );
 			$email_plaintext = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', ' [ $1 ] ', $email_plaintext );
 			$email_plaintext = preg_replace( '#[\n\r]#i', ' ', $email_plaintext );
 			$email_plaintext = preg_replace( '#</li>[\s\t]*</ul>#i', '</li>', $email_plaintext );
@@ -702,9 +702,11 @@ class EmailCampaign extends DataObject
 	 */
 	function update_plaintext_callback_a( $m )
 	{
+		$link_text = preg_replace( '#<img[^>]+src="([^"]+)"[^>]*>#i', '$1', $m[2] );
+
 		return ' [ '
 			// Display a text of the link if it is not same as url:
-			.( $m[1] == $m[2] ? '' : $m[2].' --> ' )
+			.( $m[1] == $link_text ? '' : $link_text.' --> ' )
 			// Url of the link:
 			.$m[1].' ] ';
 	}
@@ -1605,10 +1607,10 @@ class EmailCampaign extends DataObject
 		$DB->query( 'INSERT INTO T_links
 				( link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID,
 				link_itm_ID, link_cmt_ID, link_usr_ID, link_ecmp_ID, link_msg_ID, link_tmp_ID, link_file_ID,
-				link_ltype_ID, link_position, link_order )
+				link_position, link_order )
 			SELECT link_datecreated, link_datemodified, link_creator_user_ID, link_lastedit_user_ID,
 				link_itm_ID, link_cmt_ID, link_usr_ID, '.$DB->quote( $this->ID ).' AS link_ecmp_ID, link_msg_ID, link_tmp_ID, link_file_ID,
-				link_ltype_ID, link_position, link_order
+				link_position, link_order
 			FROM T_links
 			WHERE link_ecmp_ID = '.$DB->quote( $duplicated_campaign_ID ),
 			'Duplicate linked files from email campaign #'.$duplicated_campaign_ID.' to #'.$this->ID );

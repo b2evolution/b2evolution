@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $flush_action, $phpbb_tool_title, $phpbb_version;
+global $flush_action, $phpbb_tool_title, $phpbb_version;
 
 phpbb_display_steps( 7 );
 

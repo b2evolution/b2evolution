@@ -45,14 +45,14 @@ switch( $action )
 		param_check_not_empty( 'wp_blog_ID', T_('Please select a collection!') );
 
 		// XML File
-		$xml_file = param( 'wp_file', 'string', '' );
+		$xml_file = param( 'import_file', 'string', '' );
 		if( empty( $xml_file ) )
 		{ // File is not selected
-			param_error( 'wp_file', T_('Please select file to import.') );
+			param_error( 'import_file', T_('Please select file to import.') );
 		}
 		else if( ! preg_match( '/\.(xml|txt|zip)$/i', $xml_file ) )
 		{ // Extension is incorrect
-			param_error( 'wp_file', sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $xml_file ) );
+			param_error( 'import_file', sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $xml_file ) );
 		}
 
 		if( param_errors_detected() )

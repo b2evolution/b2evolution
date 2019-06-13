@@ -458,9 +458,14 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 								5, 3, /* icon/text prio */
 								// attach onclick event to remove the whole fieldset:
 								array(
-									'onclick' => "
-										jQuery('#".$fieldset_params['id']."').remove();
-										return false;",
+									'onclick' => '
+										jQuery( \'#fieldset_wrapper_'.$parname.'_'.$k_nb.'\' ).remove();
+										'.( isset( $parmeta['max_number'] ) ? '
+										if( jQuery( \'[id^=fieldset_wrapper_'.$parname.'_\' ).length < '.intval( $parmeta['max_number'] ).' )
+										{
+											jQuery( \'#button_add_new_setting_'.$parname.'\' ).show();
+										}' : '' ).'
+										return false;',
 									)
 								).'</span>';
 					}
@@ -508,38 +513,52 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				}
 			}
 
+			// This div is used to insert new set of setting:
+			echo '<div id="block_add_new_setting_'.$parname.'" data-param-num="'.$k_nb.'"></div>';
+
 			// TODO: fix this for AJAX callbacks, when removing and re-adding items (dh):
-			if( ! isset( $parmeta['max_number'] ) || $parmeta['max_number'] > ($k_nb) )
-			{ // no max_number defined or not reached: display link to add a new set
+			if( ! is_ajax_request() )
+			{	// Don't display "Add" button twice after AJAX request:
 				global $Blog;
 				$set_path = $parname.'['.$k_nb.']';
 
-				echo '<div id="'.$parname.'_add_new">';
 				echo action_icon(
-					sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label),
+					sprintf( T_('Add a new set of &laquo;%s&raquo;'), $set_label ),
 					'add',
 					regenerate_url( 'action', array('action=add_settings_set', 'set_path='.$set_path.( $set_type == 'UserSettings' ? '&amp;user_ID='.get_param('user_ID') : '' ), 'plugin_ID='.$Obj->ID) ),
 					T_('Add'),
 					5, 3, /* icon/text prio */
-					// Replace the 'add new' action icon div with a new set of setting and a new 'add new' action icon div
-					array('onclick'=>"
-						var oThis = this;
-						jQuery.get('".get_htsrv_url()."async.php', {
-								action: 'add_plugin_sett_set',
-								plugin_ID: '{$Obj->ID}',
-								set_type: '$set_type',
-								set_path: '$set_path'
-								".( isset( $Blog ) ? ',blog: '.$Blog->ID : '' )."
-								".( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' )."
+					array(
+						// Set button id to hide/show it depending on current number of settings:
+						'id' => 'button_add_new_setting_'.$parname,
+						// Hide button to add new set of setting when max number is reached:
+						'style' => ( isset( $parmeta['max_number'] ) && $k_nb >= $parmeta['max_number'] ? 'display:none' : '' ),
+						// Replace the 'add new' div with a new set of setting:
+						'onclick' => 'jQuery.get( \''.get_htsrv_url().'async.php\',
+							{
+								action: \'add_plugin_sett_set\',
+								plugin_ID: '.$Obj->ID.',
+								set_type: \''.$set_type.'\',
+								param_name: \''.$parname.'\',
+								//param_num: jQuery( \'[id^=fieldset_wrapper_'.$parname.'_\' ).length
+								param_num: jQuery( \'#block_add_new_setting_'.$parname.'\' ).data( \'param-num\' )
+								'.( isset( $Blog ) ? ',blog: '.$Blog->ID : '' ).'
+								'.( $set_type == 'UserSettings' ? ',user_ID: '.get_param( 'user_ID' ) : '' ).'
 							},
-							function(r, status) {
-								jQuery('#".$parname."_add_new').replaceWith(r);
-								".( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' )."
+							function( r, status )
+							{
+								jQuery( \'#block_add_new_setting_'.$parname.'\' ).replaceWith( ajax_debug_clear( r ) );
+								'.( $has_color_field ? 'evo_initialize_colorpicker_inputs();' : '' ).'
+								'.( isset( $parmeta['max_number'] ) ? '
+								if( jQuery( \'[id^=fieldset_wrapper_'.$parname.'_\' ).length >= '.intval( $parmeta['max_number'] ).' )
+								{
+									jQuery( \'#button_add_new_setting_'.$parname.'\' ).hide();
+								}' : '' ).'
 							}
 						);
-						return false;")
-					);
-				echo '</div>';
+						return false;'
+					)
+				);
 			}
 
 			if( ! empty($disp_whole_set) )
@@ -612,6 +631,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 			break;
 
 		case 'color':
+			if( isset( $parmeta['transparency'] ) )
+			{
+				$params['transparency'] = $parmeta['transparency'];
+			}
 			$Form->color_input( $input_name, $set_value, $set_label, '', $params );
 			break;
 
@@ -1316,6 +1339,10 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 				// Check if the selected values can be used for the select element:
 				foreach( $check_options as $v )
 				{
+					if( empty( $v ) && ! empty( $meta['allow_none'] ) )
+					{ // empty is ok:
+						continue;
+					}
 					if( ! in_array( $v, $meta_options ) )
 					{
 						param_error( $param_name, sprintf( T_('Invalid option &laquo;%s&raquo;.'), $v ) );
@@ -1371,6 +1398,14 @@ function autoform_validate_param_value( $param_name, $value, $meta )
 							return false;
 						}
 					}
+				}
+				break;
+
+			case 'color':
+				if( ! is_color( $value ) )
+				{
+					param_error( $param_name, sprintf(  T_('Invalid color code for &laquo;%s&raquo;.'), $meta['label'] ) );
+					return false;
 				}
 				break;
 		}

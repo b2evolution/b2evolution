@@ -34,7 +34,7 @@ load_class( 'files/model/_filelist.class.php', 'FileList' );
  */
 global $current_User;
 
-global $dispatcher;
+global $admin_url;
 
 global $blog;
 
@@ -82,7 +82,7 @@ if( param( 'link_type', 'string', NULL, true, false, false ) && param( 'link_obj
 	{	// Deny to link skin files to objects:
 		debug_die( 'Skin files are not allowed to link to objects!' );
 	}
-	$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+	$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 	if( empty( $LinkOwner ) )
 	{ // We could not find the owner object to link:
 		$Messages->add( T_('Requested object does not exist any longer.'), 'error' );
@@ -740,7 +740,7 @@ switch( $action )
 						continue;
 					}
 
-					if( $l_File->unlink() )
+					if( $l_File->unlink( true, true ) )
 					{
 						$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
 										: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', T_('Creating ZIP file...') );
@@ -1005,6 +1005,7 @@ switch( $action )
 			break;
 		}
 
+		param( 'delete_nonempty', 'integer', 0 );
 		param( 'confirmed', 'integer', 0 );
 		// fplanque>> We cannot actually offer to delete subdirs since we cannot pre-check DB
 
@@ -1025,7 +1026,7 @@ switch( $action )
 					continue;
 				}
 
-				if( $l_File->unlink() )
+				if( $l_File->unlink( true, $delete_nonempty ) )
 				{
 					$Messages->add_to_group( sprintf( ( $l_File->is_dir() ? T_('The directory &laquo;%s&raquo; has been deleted.')
 									: T_('The file &laquo;%s&raquo; has been deleted.') ), $l_File->dget('name') ), 'success', T_('Deleting files...') );
@@ -1176,7 +1177,7 @@ switch( $action )
 					$DB->rollback();
 				}
 
-				header_redirect( $dispatcher.'?ctrl=items&action=edit&p='.$edited_Item->ID );	// Will save $Messages
+				header_redirect( $admin_url.'?ctrl=items&action=edit&p='.$edited_Item->ID );	// Will save $Messages
 				break;
 		}
 
@@ -1391,7 +1392,7 @@ switch( $action )
 		}
 
 		// Link file to user
-		$LinkOwner = get_link_owner( 'user', $edited_User->ID );
+		$LinkOwner = get_LinkOwner( 'user', $edited_User->ID );
 		$edited_File->link_to_Object( $LinkOwner );
 		// Assign avatar:
 		$edited_User->set( 'avatar_file_ID', $edited_File->ID );
@@ -1614,9 +1615,8 @@ if( $mode != 'modal' )
 {
 	// require colorbox js
 	require_js_helper( 'colorbox' );
-	// require Fine Uploader js and css:
-	require_js( 'multiupload/fine-uploader.js' );
-	require_css( 'fine-uploader.css' );
+	// Init JS to quick upload several files:
+	init_fileuploader_js( 'rsc_url', false );
 
 	if( $mode == 'upload' || $mode == 'import' )
 	{ // Add css to remove spaces around window

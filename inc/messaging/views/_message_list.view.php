@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
+global $action, $current_User, $Collection, $Blog, $perm_abuse_management, $Plugins, $edited_Message;
 
 // in front office there is no function call, $edited_Thread is available
 if( !isset( $edited_Thread ) )
@@ -373,11 +373,7 @@ if( $is_recipient )
 			}
 
 			// ####################### ATTACHMENTS/LINKS #########################
-			if( is_admin_page() && $current_User->check_perm( 'files', 'view' ) )
-			{	// If current user has a permission to view the files AND it is back-office:
-				// Display attachments fieldset:
-				display_attachments_fieldset( $Form, $LinkOwner );
-			}
+			$Form->attachments_fieldset( $edited_Message );
 
 			// Display plugin captcha for message form before submit button:
 			$Plugins->display_captcha( array(

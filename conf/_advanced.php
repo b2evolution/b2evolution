@@ -404,7 +404,7 @@ $conf_path = str_replace( '\\', '/', dirname(__FILE__) ).'/';
  * @global string Path of the base.
  *                fp> made [i]nsensitive to case because of Windows URL oddities)
  */
-$basepath = preg_replace( '#/'.$conf_subdir.'$#i', '', $conf_path ).'/';
+$basepath = preg_replace( '#/'.preg_quote( $conf_subdir, '#' ).'$#i', '', $conf_path ).'/';
 // echo '<br/>basepath='.$basepath;
 
 /**
@@ -500,7 +500,7 @@ $emailskins_url = $assets_baseurl.$emailskins_subdir;     // You should not need
 /**
  * Location of the admin interface dispatcher
  */
-$dispatcher = 'admin.php'; // DEPRECATED
+$dispatcher = 'evoadm.php';
 $admin_url = $baseurl.$dispatcher;
 
 /**
@@ -770,6 +770,14 @@ $email_send_simulate_only = false;
 
 
 /**
+ * Turn this off to prevent sending emails if no external SMTP gateway is configured.
+ * If true and no SMTP gateway is configured, b2evolution will behave the same as with $email_send_simulate_only = true;
+ * This is useful to avoid sending email (especially campaigns) through a bad IP by mistake.
+ */
+$email_send_allow_php_mail = true;
+
+
+/**
  * Would you like to use CDNs as definied in the array $library_cdn_urls below
  * or do you prefer to load all files from the local source as defined in the array $library_local_urls below?
  *
@@ -861,8 +869,6 @@ $library_local_urls = array(
 		'#jcrop#' => array( 'jquery/jquery.jcrop.min.js', 'jquery/jquery.jcrop.js' ),
 		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
 		'#fontawesome#' => array( 'font-awesome.min.css', 'font-awesome.css' ),
-		'#shortcodes#' => array( 'shortcodes.js' ),
-		'#evo_view#' => array( 'evo_view.js' ),
 	);
 
 
@@ -889,6 +895,13 @@ $outgoing_proxy_password = '';
  *       On our end though we'll send an 'IE-Edge' header and it will make the IE on the other end behva ethe best it can...
  */
 $check_browser_version = false;
+
+
+/**
+ * Maximum skin API version which is supported by current version of b2evolution.
+ * Skin API version is defined in the method Skin::get_api_version() of each skin.
+ */
+$max_skin_api_version = 6;
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

@@ -111,9 +111,6 @@ function init_MainList( $items_nb_limit )
 
 	param( 'more', 'integer', 0, true );
 	param( 'page', 'integer', 1, true ); // Post page to show
-	param( 'c',    'integer', 0, true ); // Display comments?
-	param( 'tb',   'integer', 0, true ); // Display trackbacks?
-	param( 'pb',   'integer', 0, true ); // Display pingbacks?
 }
 
 
@@ -123,7 +120,7 @@ function init_MainList( $items_nb_limit )
  */
 function init_inskin_editing()
 {
-	global $Collection, $Blog, $edited_Item, $action, $form_action;
+	global $Collection, $Blog, $edited_Item, $action, $form_action, $disp;
 	global $item_tags, $item_title, $item_content;
 	global $admin_url, $redirect_to, $advanced_edit_link;
 
@@ -140,13 +137,33 @@ function init_inskin_editing()
 	// Post ID, go from $_GET when we copy post from Front-office
 	$copy_post_ID = param( 'cp', 'integer', 0 );
 
-	if( $post_ID > 0 )
+	if( $disp == 'proposechange' )
+	{	// Propose a change:
+		$ItemCache = & get_ItemCache ();
+		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
+
+		// Check if current User can create a new proposed change:
+		$edited_Item->can_propose_change( true );
+
+		if( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) )
+		{	// Suggest item fields values from last proposed change when user creates new propose change:
+			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
+		}
+	}
+	elseif( $post_ID > 0 )
 	{	// Edit post
 		global $post_extracats;
 		$action = 'edit';
 
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
+
+		// Check if the editing Item has at least one proposed change:
+		if( ! $edited_Item->check_proposed_change_restriction( 'warning' ) &&
+		    ( $last_proposed_Revision = $edited_Item->get_revision( 'last_proposed' ) ) )
+		{	// Use item fields values from last proposed change:
+			$edited_Item->set( 'revision', 'p'.$last_proposed_Revision->iver_ID );
+		}
 
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
 		$post_extracats = postcats_get_byID( $post_ID );
@@ -162,6 +179,9 @@ function init_inskin_editing()
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $copy_post_ID );
 
+		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
+		$edited_Item->ID = 0;
+
 		$edited_Item_Blog = $edited_Item->get_Blog();
 		$item_status = $edited_Item_Blog->get_allowed_item_status();
 
@@ -172,6 +192,9 @@ function init_inskin_editing()
 		modules_call_method( 'constructor_item', array( 'Item' => & $edited_Item ) );
 
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item, 'frontoffice' );
+
+		// Duplicate attachments from source Item:
+		$edited_Item->duplicate_attachments( $copy_post_ID );
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
@@ -207,15 +230,17 @@ function init_inskin_editing()
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
 
-	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:Restrict item status to max allowed by item collection:
-	$edited_Item->restrict_status();
+	if( $disp != 'proposechange' )
+	{	// Restrict Item status by Collection access restriction AND by CURRENT USER write perm:Restrict item status to max allowed by item collection:
+		$edited_Item->restrict_status();
+	}
 
 	// Used in the edit form:
 
 	// We never allow HTML in titles, so we always encode and decode special chars.
-	$item_title = htmlspecialchars_decode( $edited_Item->title );
+	$item_title = htmlspecialchars_decode( $edited_Item->get( 'title' ) );
 
-	$item_content = prepare_item_content( $edited_Item->content );
+	$item_content = prepare_item_content( $edited_Item->get( 'content' ) );
 
 	if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 	{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
@@ -1672,7 +1697,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 					array(
 						'custom' => array(
 							'text' => T_('Custom Types'),
-							'href' => $dispatcher.'?ctrl=items&amp;tab=custom&amp;filter=restore&amp;blog='.$Blog->ID,
+							'href' => $admin_url.'?ctrl=items&amp;tab=custom&amp;filter=restore&amp;blog='.$Blog->ID,
 						),
 					)
 			);
@@ -2053,17 +2078,17 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 		echo '<span class="edit_actions_text">'.T_('Visibility').get_manual_link( 'visibility-status' ).': </span>';
 
 		// Get those statuses which are not allowed for the current User to create posts in this blog
-		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->status, '', $edited_Item ), array( 'trash' ) );
+		$exclude_statuses = array_merge( get_restricted_statuses( $Blog->ID, 'blog_post!', 'create', $edited_Item->get( 'status' ), '', $edited_Item ), array( 'trash' ) );
 		// Get allowed visibility statuses
 		$status_options = get_visibility_statuses( '', $exclude_statuses );
 
 		if( isset( $AdminUI, $AdminUI->skin_name ) && $AdminUI->skin_name == 'bootstrap' )
 		{ // Use dropdown for bootstrap skin
 			$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
-			$Form->hidden( 'post_status', $edited_Item->status );
-			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->status ).'">';
-			echo '<button type="button" class="btn btn-status-'.$edited_Item->status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
-							.'<span>'.$status_options[ $edited_Item->status ].'</span>'
+			$Form->hidden( 'post_status', $edited_Item->get( 'status' ) );
+			echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="left" data-container="body" title="'.get_status_tooltip_title( $edited_Item->get( 'status' ) ).'">';
+			echo '<button type="button" class="btn btn-status-'.$edited_Item->get( 'status' ).' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
+							.'<span>'.$status_options[ $edited_Item->get( 'status' ) ].'</span>'
 						.' <span class="caret"></span></button>';
 			echo '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
 			foreach( $status_options as $status_key => $status_title )
@@ -2079,7 +2104,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 			foreach( $status_options as $status_key => $status_title )
 			{
 				echo '<option value="'.$status_key.'"'
-							.( $edited_Item->status == $status_key ? ' selected="selected"' : '' )
+							.( $edited_Item->get( 'status' ) == $status_key ? ' selected="selected"' : '' )
 							.' class="btn-status-'.$status_key.'">'
 						.$status_title
 					.'</option>';
@@ -2095,19 +2120,19 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	$next_action = ($creating ? 'create' : 'update');
 	if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{ // Show Save & Edit only on admin mode
-		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->status ) );
+		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->get( 'status' ) ) );
 	}
 
 	if( $inskin )
 	{ // Front-office: display a save button with title depending on post status
 		$button_titles = get_visibility_statuses( 'button-titles' );
-		$button_title = isset( $button_titles[ $edited_Item->status ] ) ? T_( $button_titles[ $edited_Item->status ] ) : T_('Save Changes!');
+		$button_title = isset( $button_titles[ $edited_Item->get( 'status' ) ] ) ? T_( $button_titles[ $edited_Item->get( 'status' ) ] ) : T_('Save Changes!');
 	}
 	else
 	{ // Use static button title on back-office
 		$button_title = T_('Save');
 	}
-	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->status ) );
+	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->get( 'status' ) ) );
 
 	echo '</span>';
 
@@ -2117,7 +2142,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	{ // Display this button to make a post published
 
 		// Only allow publishing if in draft mode. Other modes are too special to run the risk of 1 click publication.
-		$publish_style = ( $edited_Item->status == $highest_publish_status ) ? 'display: none' : 'display: inline';
+		$publish_style = ( $edited_Item->get( 'status' ) == $highest_publish_status ) ? 'display: none' : 'display: inline';
 
 		$Form->submit( array(
 			'actionArray['.$next_action.'_publish]',
@@ -3463,7 +3488,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	}
 
 	if( empty( $limit ) )
-	{	// Get default limit from curent user's setting:
+	{	// Get default limit from current user's setting:
 		global $UserSettings;
 		$limit = $UserSettings->get( 'results_per_page' );
 	}
@@ -3526,7 +3551,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 
 		// Filter comments list:
 		$CommentList->set_filters( array(
-			'types'             => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
+			'types'             => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback', 'webmentions' ),
 			'statuses'          => $statuses,
 			'expiry_statuses'   => ( $expiry_status == 'all' ? array( 'active', 'expired' ) : array( $expiry_status ) ),
 			'comment_ID_list'   => ( empty( $exclude_comment_IDs ) ? NULL : '-'.implode( ",", $exclude_comment_IDs ) ),
@@ -3544,7 +3569,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=comments&blog='.$blog_ID.'&filter=restore', '&' ) );
 		// this is an ajax call we always have to restore the filterst (we can set filters only without ajax call)
 		$CommentList->set_filters( array(
-			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback' ),
+			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback', 'webmentions' ),
 			'order' => 'DESC',
 		) );
 		$CommentList->restore_filterset();
@@ -4178,7 +4203,7 @@ function display_hidden_custom_fields( & $Form, & $edited_Item )
 	$custom_fields = $edited_Item->get_type_custom_fields();
 	foreach( $custom_fields as $custom_field )
 	{ // For each custom field with type $type:
-		$Form->hidden( 'item_'.$custom_field['type'].'_'.$custom_field['ID'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
+		$Form->hidden( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ) );
 	}
 }
 
@@ -4188,10 +4213,11 @@ function display_hidden_custom_fields( & $Form, & $edited_Item )
  *
  * @param object Form
  * @param object edited Item
+ * @param boolean TRUE to force use custom fields of current version instead of revision
  */
-function display_editable_custom_fields( & $Form, & $edited_Item )
+function display_editable_custom_fields( & $Form, & $edited_Item, $force_current_fields = false )
 {
-	$custom_fields = $edited_Item->get_type_custom_fields();
+	$custom_fields = $edited_Item->get_type_custom_fields( 'all', $force_current_fields );
 
 	if( empty( $custom_fields ) )
 	{	// No custom fields
@@ -4257,25 +4283,25 @@ function display_editable_custom_fields( & $Form, & $edited_Item )
 		switch( $custom_field['type'] )
 		{
 			case 'double':
-				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_custom_field_value( $custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'computed':
 				$Form->info( $custom_field_label, $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
 				break;
 			case 'varchar':
-				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_custom_field_value( $custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'text':
-				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_custom_field_value( $custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'html':
-				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_custom_field_value( $custom_field['name'] ), 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
 				break;
 			case 'url':
-				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_custom_field_value( $custom_field['name'] ), 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
 				break;
 			case 'image':
-				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_setting( 'custom:'.$custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $edited_Item->get_custom_field_value( $custom_field['name'] ), 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
 				break;
 			case 'separator':
 				if( is_admin_page() && $c > 0 )
@@ -4611,7 +4637,7 @@ function echo_image_insert_modal()
 	function evo_item_image_insert( blog, tagType, linkID )
 	{
 		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
-		var evo_js_lang_insert_image = '<?php echo T_('Insert image into post');?>';
+		var evo_js_lang_insert_image = '<?php echo TS_('Insert image into content');?>';
 		var evo_js_lang_modal_action = '<?php echo TS_('Insert');?>';
 		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
 
@@ -4627,7 +4653,7 @@ function echo_image_insert_modal()
 				'tag_type': tagType,
 				'link_ID': linkID,
 				'blog': blog,
-				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+				'request_from': '<?php echo is_admin_page() ? 'back' : 'front';?>',
 			},
 			success: function(result)
 			{
@@ -4641,7 +4667,7 @@ function echo_image_insert_modal()
 	function evo_item_image_edit( blog, shortTag )
 	{
 		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
-		var evo_js_lang_edit_image = '<?php echo T_('Edit image');?>';
+		var evo_js_lang_edit_image = '<?php echo TS_('Edit image');?>';
 		var evo_js_lang_modal_action = '<?php echo TS_('Update');?>';
 		evo_js_lang_close = '<?php echo TS_('Cancel');?>';
 
@@ -4656,7 +4682,7 @@ function echo_image_insert_modal()
 				'action': 'get_edit_image_form',
 				'short_tag': shortTag,
 				'blog': blog,
-				'request_from': '<?php echo format_to_js( is_admin_page() ? 'back' : 'front' );?>',
+				'request_from': '<?php echo is_admin_page() ? 'back' : 'front';?>',
 			},
 			success: function(result)
 			{
@@ -5184,6 +5210,49 @@ function get_item_numviews( $Item )
 
 
 /**
+ * Get title for item revision
+ *
+ * @param object Revision/Version
+ */
+function get_item_version_title( $Version )
+{
+	global $admin_url;
+
+	$iver_date = mysql2localedatetime( $Version->iver_edit_last_touched_ts, 'Y-m-d', 'H:i:s' );
+
+	$iver_editor_user_link = get_user_identity_link( NULL, $Version->iver_edit_user_ID );
+	$iver_editor_user_link = ( empty( $iver_editor_user_link ) ? T_( 'Deleted user' ) : $iver_editor_user_link );
+
+	switch( $Version->iver_type )
+	{
+		case 'proposed':
+			// Title for proposed change:
+			$r = sprintf( T_('Proposed change #%s as of %s by %s'), $Version->iver_ID, $iver_date, $iver_editor_user_link );
+			break;
+
+		case 'archived':
+			// Title for archived version:
+			$r = sprintf( T_('Archived version #%s as of %s by %s'), $Version->iver_ID, $iver_date, $iver_editor_user_link );
+			break;
+
+		default:
+		case 'current':
+			// Title for current version:
+			$r = sprintf( T_('Current version as of %s by %s'), $iver_date, $iver_editor_user_link );
+			break;
+	}
+
+	// A link to view the revision details:
+	$r .= ' (<a href="'.$admin_url.'?ctrl=items&amp;action=history_details&amp;p='.$Version->iver_itm_ID.'&amp;r='.$Version->iver_ID.'"'
+		.' title="'.format_to_output( T_('View this revision'), 'htmlattr' ).'">'
+			.T_('View')
+		.'</a>)';
+
+	return $r;
+}
+
+
+/**
  * Initialize Results object for items list
  *
  * @param object Results
@@ -5633,6 +5702,12 @@ function item_row_order( $Item )
 	    ! empty( $ItemList->filters['cat_single'] ) )
 	{	// Use order of single filtered category:
 		$order_cat_ID = $ItemList->filters['cat_single'];
+		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
+	}
+	elseif( isset( $ItemList, $ItemList->filters['cat_array'] ) &&
+	        count( $ItemList->filters['cat_array'] ) == 1 )
+	{	// Use order of single filtered category form multiple categories selection:
+		$order_cat_ID = $ItemList->filters['cat_array'][0];
 		$order_cat_attr = ' data-cat-id="'.$order_cat_ID.'"';
 	}
 	else

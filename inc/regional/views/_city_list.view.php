@@ -13,8 +13,6 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
-
 // Get params from request
 $s = param( 's', 'string', '', true ); // Search keyword
 $c = param( 'c', 'integer', 0, true ); // Country
@@ -66,8 +64,6 @@ $Results->title = T_('Cities').get_manual_link('countries-list');
 function city_td_enabled( $city_enabled, $city_ID )
 {
 
-	global $dispatcher;
-
 	$r = '';
 
 	if( $city_enabled == true )
@@ -86,8 +82,6 @@ function city_td_enabled( $city_enabled, $city_ID )
 
 function city_td_preferred( $city_preferred, $city_ID )
 {
-
-	global $dispatcher;
 
 	$r = '';
 
@@ -224,8 +218,6 @@ else
  */
 function city_td_actions($city_enabled, $city_ID )
 {
-	global $dispatcher;
-
 	$r = '';
 
 	if( $city_enabled == true )

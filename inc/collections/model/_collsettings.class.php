@@ -32,15 +32,20 @@ class CollectionSettings extends AbstractSettings
 	var $_defaults = array(
 		// Home page settings:
 			'front_disp'             => 'posts',
+			'default_noindex'         => 0, // META NOINDEX on Default/Front collection page
+			'canonical_homepage'      => 1, // Redirect front page to its canonical Url?
+			'self_canonical_homepage' => 1, // Use self-referencing rel="canonical" tag
+			'relcanonical_homepage'   => 1, // If no 301, fall back to rel="canoncial" ?
 
 		// Posts list settings:
 			'what_to_show'           => 'posts',      // posts, days
 			'main_content'           => 'normal',
 			'posts_per_page'         => '5',
 			'disp_featured_above_list' => 0,				// Don't display a featured post above the list by default
-			'canonical_homepage'     => 1,				// Redirect homepage to its canonical Url?
-			'relcanonical_homepage'  => 1,				// If no 301, fall back to rel="canoncial" ?
-			'default_noindex'        => '0',				// META NOINDEX on Default blog page
+			'canonical_posts'        => 1,				// Redirect disp=posts to its canonical Url?
+			'self_canonical_posts'   => 1,				// Use self-referencing rel="canonical" tag
+			'relcanonical_posts'     => 1,				// If no 301, fall back to rel="canoncial" ?
+			'posts_firstpage_noindex'=> 0,				// META NOINDEX on First page on disp=posts
 			'orderby'         => 'datestart',
 			'orderdir'        => 'DESC',
 			'title_link_type' => 'permalink',
@@ -52,6 +57,7 @@ class CollectionSettings extends AbstractSettings
 
 		// Single post settings:
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
+			'self_canonical_item_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'allow_crosspost_urls' => 1,					// For cross-posted Items, allow non-canonical URL
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'single_links'   => 'short',
@@ -93,12 +99,14 @@ class CollectionSettings extends AbstractSettings
 			'comment_quick_moderation' => 'expire',		// Comment quick moderation can be 'never', 'expire' - Links expire on first edit action, and 'always'
 			'autocomplete_usernames' => 1,
 			'meta_comments_frontoffice' => 1, // Display meta comments in front-office
+			'webmentions' => 1, // Allow to accept webmentions from other sites
 
 		// Archive settings:
 			'arcdir_noindex' => '1',					// META NOINDEX on Archive directory
 			'archive_mode'   => 'monthly',				// monthly, weekly, daily, postbypost
 			'archive_links'  => 'extrapath',			// param, extrapath
 			'canonical_archive_urls' => 1,				// Redirect archives to their canonical URL?
+			'self_canonical_archive_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'relcanonical_archive_urls' => 1,			// If no 301, fall back to rel="canoncial" ?
 			'archive_content'   => 'excerpt',
 			'archive_posts_per_page' => '100',
@@ -110,6 +118,7 @@ class CollectionSettings extends AbstractSettings
 			'catdir_noindex' => '1',					// META NOINDEX on Category directory
 			'chapter_links'  => 'chapters',				// 'param_num', 'subchap', 'chapters'
 			'canonical_cat_urls' => 1,					// Redirect categories to their canonical URL?
+			'self_canonical_cat_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'relcanonical_cat_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'chapter_content'   => 'normal',
 			'chapter_posts_per_page' => 100,
@@ -121,6 +130,7 @@ class CollectionSettings extends AbstractSettings
 		// Tag page settings:
 			'tag_links'  => 'colon',					// 'param', 'semicolon' -- fp> we want this changed to prefix only for new blogs only
 			'canonical_tag_urls' => 1,					// Redirect tag pages to their canonical Url?
+			'self_canonical_tag_urls' => 1,			// Use self-referencing rel="canonical" tag
 			'relcanonical_tag_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'tag_content'       => 'excerpt',
 			'tag_posts_per_page' => 100,
@@ -161,11 +171,12 @@ class CollectionSettings extends AbstractSettings
 			'cache_enabled_widgets' => 0,
 			'in_skin_login' => 0,						// Use in skin login form every time it's possible
 			'in_skin_editing' => 0,
+			'in_skin_change_proposal' => 1,
 			'in_skin_editing_renderers' => 1,
 			'in_skin_editing_category' => 1,
 			'in_skin_editing_category_order' => 1,
 			'default_cat_ID' => NULL,					// Default Cat for new posts
-			'ping_plugins'   => 'ping_pingomatic,ping_b2evonet,evo_twitter', // ping plugin codes, separated by comma
+			'ping_plugins' => 'ping_pingomatic,ping_b2evonet,evo_twitter,webmention', // ping plugin codes, separated by comma
 			'allow_subscriptions' => 1,         // Allow email subscriptions for new post by default
 			'allow_comment_subscriptions' => 1, // Allow email subscriptions for new comment by default
 			'allow_item_subscriptions' => 1,    // Allow email subscriptions for a specific post by default
@@ -253,6 +264,33 @@ class CollectionSettings extends AbstractSettings
 			'search_include_cmnts' => 1, // Include comments to results on disp=search
 			'search_include_tags'  => 1, // Include tags to results on disp=search
 			'search_include_files' => 1, // Include files to results on disp=search
+			'search_score_post_title'          => 5, // weight multiplier for keywords found in post title
+			'search_score_post_content'        => 1, // weight multiplier for keywords found in post content
+			'search_score_post_tags'           => 4, // weight multiplier for keywords found in post tags
+			'search_score_post_excerpt'        => 1, // weight multiplier for keywords found in post excerpt
+			'search_score_post_titletag'       => 4, // weight multiplier for keywords found in post <title> tag
+			'search_score_post_author'         => 5, // weight multiplier for keywords found in post author login
+			'search_score_post_date_future'    => 0, // weight multiplier for posts from future
+			'search_score_post_date_moremonth' => 0, // weight multiplier for posts older month
+			'search_score_post_date_lastmonth' => 1, // weight multiplier for posts from the last month
+			'search_score_post_date_twoweeks'  => 2, // weight multiplier for posts from the last two weeks
+			'search_score_post_date_lastweek'  => 8, // weight multiplier for posts from the last week
+			'search_score_cmnt_post_title'     => 1, // weight multiplier for keywords found in title of the comment's post
+			'search_score_cmnt_content'        => 1, // weight multiplier for keywords found in comment content
+			'search_score_cmnt_author'         => 5, // weight multiplier for keywords found in comment author name
+			'search_score_cmnt_date_future'    => 0, // weight multiplier for comments from future
+			'search_score_cmnt_date_moremonth' => 0, // weight multiplier for comments older month
+			'search_score_cmnt_date_lastmonth' => 1, // weight multiplier for comments from the last month
+			'search_score_cmnt_date_twoweeks'  => 2, // weight multiplier for comments from the last two weeks
+			'search_score_cmnt_date_lastweek'  => 8, // weight multiplier for comments from the last week
+			'search_score_file_name'           => 3, // weight multiplier for keywords found in file name
+			'search_score_file_path'           => 1, // weight multiplier for keywords found in file path
+			'search_score_file_title'          => 3, // weight multiplier for keywords found in file long title
+			'search_score_file_alt'            => 1, // weight multiplier for keywords found in file alternative text
+			'search_score_file_description'    => 1, // weight multiplier for keywords found in file caption/description
+			'search_score_cat_name'            => 3, // weight multiplier for keywords found in category name
+			'search_score_cat_desc'            => 1, // weight multiplier for keywords found in category description
+			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:

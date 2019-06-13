@@ -74,6 +74,7 @@ $Comment = & $params['Comment'];
 
 			case 'trackback': // Display a trackback:
 			case 'pingback': // Display a pingback:
+			case 'webmention': // Display a webmention:
 				$Comment->author( '', '#', '', '#', 'htmlbody', true, $params['author_link_text'] );
 				break;
 		}

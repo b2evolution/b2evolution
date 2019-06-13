@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.10.8';
+	var $version = '6.11.2';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -197,6 +197,7 @@ class bootstrap_blog_Skin extends Skin
 						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'page_text_color' => array(
 						'label' => T_('Text color'),
@@ -245,18 +246,21 @@ class bootstrap_blog_Skin extends Skin
 						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'hover_tab_bg_color' => array(
 						'label' => T_('Hovered tab background color'),
 						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#eee',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'panel_bg_color' => array(
 						'label' => T_('Panel background color'),
 						'note' => T_('Choose background color for function panels and widgets.'),
 						'defaultvalue' => '#ffffff',
 						'type' => 'color',
+						'transparency' => true,
 					),
 					'panel_border_color' => array(
 						'label' => T_('Panel border color'),
@@ -269,6 +273,7 @@ class bootstrap_blog_Skin extends Skin
 						'note' => T_('Choose background color for function panels and widgets.'),
 						'defaultvalue' => '#f5f5f5',
 						'type' => 'color',
+						'transparency' => true,
 					),
 				'section_color_end' => array(
 					'layout' => 'end_fieldset',

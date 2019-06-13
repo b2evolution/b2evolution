@@ -269,6 +269,13 @@ siteskin_include( '_site_body_header.inc.php' );
 				<?php
 					// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 					skin_include( '_item_feedback.inc.php', array(
+							'disp_comments'        => true,
+							'disp_comment_form'    => true,
+							'disp_trackbacks'      => true,
+							'disp_trackback_url'   => true,
+							'disp_pingbacks'       => true,
+							'disp_webmentions'     => true,
+							'disp_meta_comments'   => false,
 							'before_section_title' => '<h4>',
 							'after_section_title'  => '</h4>',
 							'author_link_text'     => 'auto',

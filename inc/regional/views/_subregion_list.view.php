@@ -13,8 +13,6 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher;
-
 // Get params from request
 $s = param( 's', 'string', '', true ); // Search keyword
 $c = param( 'c', 'integer', 0, true ); // Country
@@ -59,8 +57,6 @@ $Results->title = T_('Sub-regions/Departments/Counties').get_manual_link('subreg
 function subrg_td_enabled( $subrg_enabled, $subrg_ID )
 {
 
-	global $dispatcher;
-
 	$r = '';
 
 	if( $subrg_enabled == true )
@@ -79,8 +75,6 @@ function subrg_td_enabled( $subrg_enabled, $subrg_ID )
 
 function subrg_td_preferred( $subrg_preferred, $subrg_ID )
 {
-
-	global $dispatcher;
 
 	$r = '';
 
@@ -205,7 +199,6 @@ else
  */
 function subrg_td_actions($subrg_enabled, $subrg_ID )
 {
-	global $dispatcher;
 
 	$r = '';
 
@@ -238,6 +231,9 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 
 	$Results->global_icon( T_('Create a new sub-region...'), 'new',
 				regenerate_url( 'action', 'action=new'), T_('New sub-region').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+
+	$Results->global_icon( T_('Import sub-regions from CSV file ...'), 'new',
+				regenerate_url( 'action', 'action=csv'), T_('Import CSV').' &raquo;', 3, 4  );
 }
 
 $Results->display();

@@ -642,7 +642,7 @@ class files_Module extends Module
 	 */
 	function build_menu_1()
 	{
-		global $blog, $dispatcher;
+		global $blog, $admin_url;
 		/**
 		 * @var User
 		 */
@@ -665,7 +665,7 @@ class files_Module extends Module
 						'files' => array(
 							'text' => T_('Files'),
 							'title' => T_('File management'),
-							'href' => $dispatcher.'?ctrl=files',
+							'href' => $admin_url.'?ctrl=files',
 							// Controller may add subtabs
 						),
 					) );

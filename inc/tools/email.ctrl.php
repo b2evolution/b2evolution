@@ -30,7 +30,6 @@ load_funcs('tools/model/_email.funcs.php');
 param_action();
 
 $tab = param( 'tab', 'string', 'addresses', true );
-$tab2 = param( 'tab2', 'string', '', true );
 $tab3 = param( 'tab3', 'string', '', true );
 
 param( 'action', 'string' );
@@ -103,48 +102,6 @@ switch( $action )
 				$Settings->set( 'notification_logo_file_ID',  param( 'notification_logo_file_ID', 'integer', NULL ) );
 				break;
 
-			case 'plugins':
-				// Update email renderers settings:
-				load_funcs('plugins/_plugin.funcs.php');
-
-				$Plugins->restart();
-				while( $loop_Plugin = & $Plugins->get_next() )
-				{
-					$tmp_params = array( 'for_editing' => true );
-					$pluginsettings = $loop_Plugin->get_email_setting_definitions( $tmp_params );
-					if( empty( $pluginsettings ) )
-					{
-						continue;
-					}
-
-					// Loop through settings for this plugin:
-					foreach( $pluginsettings as $set_name => $set_meta )
-					{
-						autoform_set_param_from_request( $set_name, $set_meta, $loop_Plugin, 'EmailSettings' );
-					}
-
-					// Let the plugin handle custom fields:
-					// We use call_method to keep track of this call, although calling the plugins PluginSettingsUpdateAction method directly _might_ work, too.
-					$tmp_params = array();
-					$ok_to_update = $Plugins->call_method( $loop_Plugin->ID, 'PluginSettingsUpdateAction', $tmp_params );
-
-					if( $ok_to_update === false )
-					{	// The plugin has said they should not get updated, Rollback settings:
-						$loop_Plugin->Settings->reset();
-					}
-					else
-					{	// Update message settings of the Plugin:
-						$loop_Plugin->Settings->dbupdate();
-					}
-				}
-
-				$Messages->add( T_('Settings updated.'), 'success' );
-
-				// Redirect so that a reload doesn't write to the DB twice:
-				header_redirect( '?ctrl=email&tab=settings&tab3='.$tab3, 303 ); // Will EXIT
-				// We have EXITed already at this point!!
-				break;
-
 			case 'settings':
 				// Settings to decode the returned emails:
 				param( 'repath_enabled', 'boolean', 0 );
@@ -198,15 +155,18 @@ switch( $action )
 			case 'smtp':
 				// SMTP gateway settings:
 
-				// Preferred email service
-				$Settings->set( 'email_service', param( 'email_service', 'string', 'mail' ) );
+				if( $email_send_allow_php_mail )
+				{	// Update the settings only when php mail service is enabled by config:
+					// Preferred email service
+					$Settings->set( 'email_service', param( 'email_service', 'string', 'mail' ) );
 
-				// Force email sending
-				$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
+					// Force email sending
+					$Settings->set( 'force_email_sending', param( 'force_email_sending', 'integer', 0 ) );
 
-				// Sendmail additional params:
-				$Settings->set( 'sendmail_params', param( 'sendmail_params', 'string', 'return' ) );
-				$Settings->set( 'sendmail_params_custom', param( 'sendmail_params_custom', 'string' ) );
+					// Sendmail additional params:
+					$Settings->set( 'sendmail_params', param( 'sendmail_params', 'string', 'return' ) );
+					$Settings->set( 'sendmail_params_custom', param( 'sendmail_params_custom', 'string' ) );
+				}
 
 				$old_smtp_enabled = $Settings->get( 'smtp_enabled' );
 
@@ -250,7 +210,7 @@ switch( $action )
 				}
 				break;
 
-			case 'other':
+			case 'throttling':
 				/* Campaign/Newsletter throttling: */
 
 				// Sending:
@@ -555,6 +515,42 @@ switch( $tab )
 				init_jqplot_js();
 				break;
 
+			case 'envelope':
+				$AdminUI->breadcrumbpath_add( T_('Envelope'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-notification-settings' );
+				break;
+
+			case 'smtp':
+				$AdminUI->breadcrumbpath_add( T_('SMTP gateway'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'smtp-gateway-settings' );
+
+				if( $Settings->get( 'email_service' ) == 'smtp' && ! $Settings->get( 'smtp_enabled' ) )
+				{	// Display this error when primary email service is SMTP but it is not enabled:
+					$Messages->add( T_('Your external SMTP Server is not enabled.'), 'error' );
+				}
+				break;
+
+			case 'throttling':
+				$AdminUI->breadcrumbpath_add( T_('Throttling'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-throttling-settings' );
+				break;
+
+			case 'test':
+				// Check permission:
+				$current_User->check_perm( 'emails', 'edit', true );
+
+				$AdminUI->breadcrumbpath_add( T_('Test'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
+
+				// Set an url for manual page:
+				$AdminUI->set_page_manual_link( 'email-test-smtp-settings' );
+				break;
+
 			default:
 				$tab3 = 'log';
 
@@ -641,62 +637,6 @@ switch( $tab )
 				break;
 		}
 		break;
-
-	case 'settings':
-		$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=email&amp;tab='.$tab );
-
-		if( $tab2 == 'sent' )
-		{	// The settings are opened from from tab "Sent"
-			$orig_tab = $tab;
-			$tab = $tab2;
-		}
-
-		if( empty( $tab3 ) )
-		{	// Default tab3 for this case:
-			$tab3 = 'plugins';
-		}
-
-		switch( $tab3 )
-		{
-			case 'envelope':
-				$AdminUI->breadcrumbpath_add( T_('Envelope'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
-
-				// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'email-notification-settings' );
-				break;
-
-			case 'smtp':
-				$AdminUI->breadcrumbpath_add( T_('SMTP gateway'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
-
-				// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'smtp-gateway-settings' );
-
-				if( $Settings->get( 'email_service' ) == 'smtp' && ! $Settings->get( 'smtp_enabled' ) )
-				{	// Display this error when primary email service is SMTP but it is not enabled:
-					$Messages->add( T_('Your external SMTP Server is not enabled.'), 'error' );
-				}
-				break;
-
-			case 'other':
-				$AdminUI->breadcrumbpath_add( T_('Other'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
-
-				// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'email-other-settings' );
-				break;
-
-			case 'plugins':
-			default:
-				$AdminUI->breadcrumbpath_add( T_('Plugins'), '?ctrl=email&amp;tab=settings&amp;tab3='.$tab3 );
-
-				// Set an url for manual page:
-				$AdminUI->set_page_manual_link( 'email-plugins-settings' );
-
-				// Initialize JS for color picker field on the edit plugin settings form:
-				init_colorpicker_js();
-				break;
-		}
-
-		break;
 }
 
 $AdminUI->set_path( 'email', $tab, $tab3 );
@@ -724,6 +664,22 @@ switch( $tab )
 			case 'stats':
 				// Display a list of email logs:
 				$AdminUI->disp_view( 'tools/views/_email_stats.view.php' );
+				break;
+
+			case 'envelope':
+				$AdminUI->disp_view( 'tools/views/_email_settings.form.php' );
+				break;
+
+			case 'smtp':
+				$AdminUI->disp_view( 'tools/views/_email_smtp.form.php' );
+				break;
+
+			case 'throttling':
+				$AdminUI->disp_view( 'tools/views/_email_throttling.form.php' );
+				break;
+
+			case 'test':
+				$AdminUI->disp_view( 'tools/views/_email_test.form.php' );
 				break;
 
 			default:
@@ -792,28 +748,6 @@ switch( $tab )
 				break;
 		}
 		break;
-
-	case 'settings':
-		switch( $tab3 )
-		{
-			case 'envelope':
-				$AdminUI->disp_view( 'tools/views/_email_settings.form.php' );
-				break;
-
-			case 'smtp':
-				$AdminUI->disp_view( 'tools/views/_email_smtp.form.php' );
-				break;
-
-			case 'other':
-				$AdminUI->disp_view( 'tools/views/_email_other.form.php' );
-				break;
-
-			case 'plugins':
-			default:
-				$AdminUI->disp_view( 'tools/views/_email_renderers.form.php' );
-		}
-		break;
-
 }
 
 // End payload block:

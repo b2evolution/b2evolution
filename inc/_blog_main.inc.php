@@ -175,12 +175,14 @@ if( $resolve_extra_path )
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
 	// Check if we have one of these:
+	// - Always try to match slug
 	// - Either the ReqPath starts with collection base URI (always including trailing slash)
 	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
 	// ... followed by some extra path info.
-	if( preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
+	if( $Settings->get( 'always_match_slug' ) ||
+	    preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
 	{ // We have extra path info
-		$path_string = $matches[2];
+		$path_string = $Settings->get( 'always_match_slug' ) ? $ReqPath : $matches[2];
 
 		$Debuglog->add( 'Extra path info found! path_string=' . $path_string , 'params' );
 		// echo "path=[$path_string]<br />";
@@ -260,9 +262,6 @@ if( $resolve_extra_path )
 					// Set a lot of defaults as if we had received a complex URL:
 					$m = '';
 					$more = 1; // Display the extended entries' text
-					$c = 1;    // Display comments
-					$tb = 1;   // Display trackbacks
-					$pb = 1;   // Display pingbacks
 
 					if( preg_match( '#^p([0-9]+)$#', $last_part, $req_post ) )
 					{ // The last param is of the form p000
@@ -611,19 +610,24 @@ elseif( $disp == '-' )
 
 	// Do we need to handle the canoncial url?
 	if( ( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
-			|| $Blog->get_setting( 'relcanonical_homepage' ) )
+	    || $Blog->get_setting( 'relcanonical_homepage' )
+	    || $Blog->get_setting( 'self_canonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
 		if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
-		{	// We are not on the canonicial blog url:
+		{	// We are not on the canonical blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
 				header_redirect( $canonical_url, (empty( $display_containers ) && empty( $display_includes )) ? 301 : 303 );
 			}
-			else
+			elseif( $Blog->get_setting( 'relcanonical_homepage' ) )
 			{	// Use link rel="canoncial":
 				add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 			}
+		}
+		elseif( $Blog->get_setting( 'self_canonical_homepage' ) )
+		{	// Use self-referencing rel="canonical" tag:
+			add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 		}
 	}
 
@@ -886,7 +890,7 @@ $Timer->log_duration( '_BLOG_MAIN.inc' );
 skin_init_global_vars();
 
 
-// Check if current user has acces to this blog
+// Check if current user has access to this blog
 $Blog->check_access();
 
 
@@ -944,6 +948,7 @@ if( !empty( $skin ) )
 					'contacts'              => 'contacts.main.php',
 					'download'              => 'download.main.php',
 					'edit'                  => 'edit.main.php',
+					'proposechange'         => 'proposechange.main.php',
 					'edit_comment'          => 'edit_comment.main.php',
 					'feedback-popup'        => 'feedback_popup.main.php',
 					'flagged'               => 'flagged.main.php',
@@ -1026,7 +1031,10 @@ if( !empty( $skin ) )
 		// Save collected cached data if needed:
 		$PageCache->end_collect();
 	}
-	$Timer->pause( 'PageCache' );
+	if( $Timer->get_state( 'PageCache' ) == 'running' )
+	{	// Pause only when the page cache timer was not stoped above:
+		$Timer->pause( 'PageCache' );
+	}
 
 	$Timer->pause( 'SKIN DISPLAY' );
 	// LOG with APM:

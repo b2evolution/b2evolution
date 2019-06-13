@@ -285,6 +285,25 @@ function & get_Plugins_admin()
 
 
 /**
+ * Get the Plugins
+ *
+ * @return object Plugins
+ */
+function & get_Plugins()
+{
+	global $Plugins;
+
+	if( ! is_object( $Plugins ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
+		$Plugins = new Plugins();
+	}
+
+	return $Plugins;
+}
+
+
+/**
  * Get the UserCache
  *
  * @return UserCache
@@ -1329,12 +1348,14 @@ class _core_Module extends Module
 						'text' => T_('Page'),
 						'entries' => array(
 							// PLACE HOLDER FOR ENTRIES "Edit in Front-Office", "Edit in Back-Office", "View in Back-Office":
-							'edit_front' => NULL,
-							'edit_back'  => NULL,
-							'view_back'  => NULL,
+							'edit_front'   => NULL,
+							'edit_back'    => NULL,
+							'propose'      => NULL,
+							'view_back'    => NULL,
+							'view_history' => NULL,
 							// PLACE HOLDERS FOR SESSIONS MODULE:
-							'stats_sep'  => NULL,
-							'stats_page' => NULL,
+							'stats_sep'    => NULL,
+							'stats_page'   => NULL,
 						)
 					);
 			}
@@ -1354,14 +1375,15 @@ class _core_Module extends Module
 		if( ( ! is_admin_page() || ! empty( $activate_collection_toolbar ) ) && ! empty( $Blog ) )
 		{ // A collection is currently selected AND we can activate toolbar items for selected collection:
 
-			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+			if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) ||
+			    $current_User->check_perm( 'blog_item_propose', 'edit', false, $Blog->ID ) )
 			{ // We have permission to add a post with at least one status:
 				global $disp, $ctrl, $action, $Item, $edited_Item;
-				if( ( $disp == 'edit' || $ctrl == 'items' ) &&
+				if( ( $disp == 'edit' || $disp == 'proposechange' || $ctrl == 'items' ) &&
 				    isset( $edited_Item ) &&
 				    $edited_Item->ID > 0 &&
 				    $view_item_url = $edited_Item->get_permanent_url() )
-				{	// If curent user has a permission to edit a current viewing post:
+				{	// If current user has a permission to edit a current viewing post:
 					$entries['permalink'] = array(
 							'text'        => get_icon( 'permalink' ).' '.T_('Permalink'),
 							'href'        => $view_item_url,
@@ -1370,9 +1392,8 @@ class _core_Module extends Module
 						);
 				}
 				if( ! is_admin_page() &&
-				    in_array( $disp, array( 'single', 'page', 'edit' ) ) &&
-				    $perm_admin_restricted )
-				{	// If curent user has a permission to edit a current editing/viewing post:
+				    in_array( $disp, array( 'single', 'page', 'edit', 'proposechange' ) ) )
+				{	// If current user has a permission to edit a current editing/viewing/proposing post:
 					if( $disp != 'edit' &&
 					    $Blog->get_setting( 'in_skin_editing' ) &&
 					    ! empty( $Item ) &&
@@ -1386,14 +1407,39 @@ class _core_Module extends Module
 					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
 					{	// Display menu entries to edit and view the post in back-office:
 						$menu_Item = empty( $Item ) ? $edited_Item : $Item;
-						$entries['page']['entries']['edit_back'] = array(
-								'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+						if( $perm_admin_restricted && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $menu_Item ) )
+						{	// Menu item to edit post in back-office:
+							$entries['page']['entries']['edit_back'] = array(
+									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+								);
+						}
+						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+						{	// Menu item to view post in back-office:
+							$entries['page']['entries']['view_back'] = array(
+									'text' => T_('View in Back-Office').'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+								);
+						}
+						if( $perm_admin_restricted && ( $item_history_url = $menu_Item->get_history_url() ) )
+						{
+							$entries['page']['entries']['view_history'] = array(
+								'text' => T_('View History').'&hellip;',
+								'href' => $item_history_url,
 							);
-						$entries['page']['entries']['view_back'] = array(
-								'text' => sprintf( T_('View "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
-								'href' => $admin_url.'?ctrl=items&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
-							);
+						}
+						if( $disp != 'proposechange' && ( $propose_change_item_url = $menu_Item->get_propose_change_url() ) )
+						{	// If current User has a permission to propose a change for the Item:
+							$entries['page']['entries']['propose'] = array(
+									'text' => T_('Propose change').'&hellip;',
+									'href' => $propose_change_item_url,
+								);
+						}
+					}
+
+					if( isset( $entries['page'] ) )
+					{	// Set a title when at least one menu item is allowed for current User:
+						$entries['page']['text'] = T_('Page');
 					}
 				}
 				if( isset( $entries['post'] ) && $write_item_url = $Blog->get_write_item_url() )
@@ -2072,23 +2118,14 @@ class _core_Module extends Module
 							'href' => '?ctrl=newsletters' ),
 						'campaigns' => array(
 							'text' => T_('Campaigns'),
-							'href' => '?ctrl=campaigns' ),
-						'settings' => array(
-							'text' => T_('Settings'),
-							'href' => '?ctrl=email&amp;tab=settings',
+							'href' => '?ctrl=campaigns',
 							'entries' => array(
+								'list' => array(
+									'text' => T_('List'),
+									'href' => '?ctrl=campaigns' ),
 								'plugins' => array(
 									'text' => T_('Plugins'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=plugins' ),
-								'envelope' => array(
-									'text' => T_('Envelope'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=envelope' ),
-								'smtp' => array(
-									'text' => T_('SMTP gateway'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=smtp' ),
-								'other' => array(
-									'text' => T_('Other'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=other' ),
+									'href' => '?ctrl=campaigns&amp;tab=plugins' ),
 							) ),
 						'sent' => array(
 							'text' => T_('Sent'),
@@ -2102,10 +2139,13 @@ class _core_Module extends Module
 									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=stats' ),
 								'envelope' => array(
 									'text' => T_('Envelope'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab2=sent&amp;tab3=envelope' ),
+									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=envelope' ),
 								'smtp' => array(
 									'text' => T_('SMTP gateway'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab2=sent&amp;tab3=smtp' ),
+									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=smtp' ),
+								'throttling' => array(
+									'text' => T_('Throttling'),
+									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=throttling' ),
 							) ),
 						'return' => array(
 							'text' => T_('Returned'),
@@ -2133,12 +2173,17 @@ class _core_Module extends Module
 			}
 
 			if( $current_User->check_perm( 'emails', 'edit' ) )
-			{	// Allow to test a returned email only if user has a permission to edit email settings:
+			{	// Allow to test a returned email and smtp sending only if user has a permission to edit email settings:
 				$AdminUI->add_menu_entries( array( 'email', 'return' ), array(
 						'test' => array(
 							'text' => T_('Test'),
 							'href' => '?ctrl=email&amp;tab=return&amp;tab3=test' ,
 					) ) );
+				$AdminUI->add_menu_entries( array( 'email', 'sent' ), array(
+					'test' => array(
+						'text' => T_('Test'),
+						'href' => '?ctrl=email&amp;tab=sent&amp;tab3=test' ),
+					) );
 			}
 		}
 

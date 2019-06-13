@@ -81,12 +81,12 @@ class Timer
 	 */
 	function stop( $category )
 	{
-		global $Debuglog;
+		//global $Debuglog;
 
 		if( ! $this->pause( $category ) )
 			return false;
 
-		$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' stopped at '.$this->get_duration( $category, 3 ), 'timer' );
+		//$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' stopped at '.$this->get_duration( $category, 3 ), 'timer' );
 
 		return true;
 	}
@@ -107,7 +107,7 @@ class Timer
 		{
 			$this->indent--;
 			if( $this->indent < 0 ) $this->indent = 0;
-			$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' paused at '.$this->get_duration( $category, 3 ).' (<strong>+'.number_format($since_resume, 4).'</strong>)', 'timer' );
+			//$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' paused at '.$this->get_duration( $category, 3 ).' (<strong>+'.number_format($since_resume, 4).'</strong>)', 'timer' );
 		}
 		if( $this->get_state($category) != 'running' )
 		{ // Timer is not running!
@@ -127,7 +127,7 @@ class Timer
 	 */
 	function resume( $category, $log = true )
 	{
-		global $Debuglog;
+		//global $Debuglog;
 
 		if( !isset($this->_times[$category]['total']) )
 		{
@@ -142,7 +142,7 @@ class Timer
 
 		if( $log )
 		{
-			$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' resumed at '.$this->get_duration( $category, 3 ), 'timer' );
+			//$Debuglog->add( str_repeat('&nbsp;', $this->indent*4).$category.' resumed at '.$this->get_duration( $category, 3 ), 'timer' );
 			$this->indent++;
 		}
 	}

@@ -82,7 +82,7 @@ $schema_queries = array(
 			user_pass_driver VARCHAR(16) NOT NULL default 'evo\$md5',
 			user_grp_ID int(4) NOT NULL default 1,
 			user_email varchar(255) COLLATE ascii_general_ci NOT NULL,
-			user_status enum( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
+			user_status enum( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'pendingdelete', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new',
 			user_avatar_file_ID int(10) unsigned default NULL,
 			user_firstname varchar(50) NULL,
 			user_lastname varchar(50) NULL,
@@ -382,7 +382,7 @@ $schema_queries = array(
 			clog_ctsk_ID              int(10) unsigned   not null,
 			clog_realstart_datetime   TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			clog_realstop_datetime    TIMESTAMP NULL,
-			clog_status               enum('started','finished','error','timeout','warning') COLLATE ascii_general_ci not null default 'started',
+			clog_status               enum('started','finished','error','imap_error','timeout','warning') COLLATE ascii_general_ci not null default 'started',
 			clog_messages             MEDIUMTEXT,
 			clog_actions_num          INT UNSIGNED NULL,
 			PRIMARY KEY (clog_ctsk_ID)

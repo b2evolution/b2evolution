@@ -51,7 +51,8 @@ class GeneralSettings extends AbstractSettings
 		'auto_prune_stats' => '15',         // days (T_hitlog and T_sessions)
 		'auto_empty_trash' => '15',         // days (How many days to keep recycled comments)
 
-		'cleanup_jobs_threshold' => 45, // days (Cleanup scheduled jobs threshold)
+		'cleanup_jobs_threshold' => 30, // days (Cleanup successfully finished scheduled jobs threshold)
+		'cleanup_jobs_threshold_failed' => 90, // days (Cleanup failed scheduled jobs threshold)
 		'cleanup_email_logs_threshold' => 59616000, // seconds (Cleanup email logs threshold)
 		'activate_account_reminder_threshold' => 86400, // seconds (Account activation reminder threshold)
 		'activate_account_reminder_config' => '86400,129600,345600,604800,0,0', // seconds (Account activation reminder settings), Defaults: one day, 1.5 days, 4 days, 7 days, "Don't send", "Don't delete"
@@ -143,6 +144,7 @@ class GeneralSettings extends AbstractSettings
 		'def_notify_post_mentioned' => '1',
 		'def_notify_post_moderation' => '1',
 		'def_notify_edit_pst_moderation' => '1',
+		'def_notify_post_proposed' => '1',
 		'def_notify_post_assignment' => '1',
 		'def_newsletters' => '1',
 		'def_notification_email_limit' => '3',
@@ -343,6 +345,16 @@ C message size exceeds',
 
 	// Back-end settings, these can't be modified by the users:
 		'last_invalidation_timestamp' => 0,
+
+	// Cron job settings:
+		// Max emails to send:
+		'cjob_maxemail_send-non-activated-account-reminders' => 50,
+		'cjob_maxemail_execute-automations' => 50,
+		'cjob_maxemail_send-inactive-account-reminders' => 50,
+		'cjob_maxemail_send-unread-messages-reminders' => 50,
+		// Do not notify IMAP errors before X consecutive errors:
+		'cjob_imap_error_process-return-path-inbox' => 3,
+		'cjob_imap_error_create-post-by-email' => 3,
 	);
 
 
@@ -469,6 +481,16 @@ C message size exceeds',
 					$value = $values;
 				}
 				return $value;
+
+			case 'email_service':
+				global $email_send_allow_php_mail;
+				// Force to use SMTP gateway when php mail sending is disabled by config:
+				return $email_send_allow_php_mail ? parent::getx( $parname ) : 'smtp';
+
+			case 'force_email_sending':
+				global $email_send_allow_php_mail;
+				// Don't force to use secondary email service when php mail sending is disabled by config:
+				return $email_send_allow_php_mail ? parent::getx( $parname ) : 0;
 
 			default:
 				$value = parent::getx( $parname );

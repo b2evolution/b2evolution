@@ -400,7 +400,7 @@ function imgsize( $path, $param = 'widthheight' )
 	}
 	elseif( $param == 'type' )
 	{
-		switch( $size[1] )
+		switch( $size[2] )
 		{
 			case 1: return 'gif';
 			case 2: return 'jpg';
@@ -1271,6 +1271,8 @@ function file_controller_build_tabs()
  */
 function rename_cachefolders( $oldname, $newname )
 {
+	load_class( 'files/model/_filerootcache.class.php', 'FileRootCache' );
+
 	$available_Roots = FileRootCache::get_available_FileRoots();
 
 	$slash_oldname = '/'.$oldname;
@@ -2281,7 +2283,6 @@ function display_dragdrop_upload_button( $params = array() )
 	global $blog, $Settings, $current_User, $b2evo_icons_type, $DB;
 
 	$params = array_merge( array(
-			'button_ID'        => 'file-uploader',
 			'before'           => '',
 			'after'            => '',
 			'fileroot_ID'      => 0, // Root type and ID, e.g. collection_1
@@ -2357,12 +2358,15 @@ function display_dragdrop_upload_button( $params = array() )
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
 			'noresults'              => '',
+			'fieldset_prefix'        => '', // Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
 		), $params );
+
+	$LinkOwner = & $params['LinkOwner'];
 
 	$FileRootCache = & get_FileRootCache();
 	$fm_FileRoot = $FileRootCache->get_by_ID( $params['fileroot_ID'] );
 
-	if( ! is_logged_in() || ! $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
+	if( ! check_perm_upload_files( $LinkOwner, $fm_FileRoot ) )
 	{	// Don't display the button if current user has no permission to upload to the selected file root:
 		return;
 	}
@@ -2374,9 +2378,11 @@ function display_dragdrop_upload_button( $params = array() )
 
 	echo $params['before'];
 
-	if( $params['LinkOwner'] !== NULL && $params['LinkOwner']->is_temp() )
+	if( $LinkOwner !== NULL && $LinkOwner->is_temp() )
 	{	// Use this field to know a form is submitted with temporary link owner(when object is creating and still doesn't exist in DB):
-		echo '<input type="hidden" name="temp_link_owner_ID" value="'.$params['LinkOwner']->get_ID().'" />';
+		echo '<input type="hidden" name="temp_link_owner_ID_nojs" value="'.$LinkOwner->get_ID().'" />';
+		// Set correct name only when JS is enabled:
+		echo '<script type="text/javascript">jQuery( "input[name=temp_link_owner_ID_nojs]" ).attr( "name", "temp_link_owner_ID" )</script>';
 	}
 
 	// Get list of allowed filetype extensions
@@ -2399,7 +2405,7 @@ function display_dragdrop_upload_button( $params = array() )
 	sort( $allowed_extensions );
 
 	?>
-	<div id="<?php echo $params['button_ID'];?>" style="width:100%">
+	<div id="<?php echo $params['fieldset_prefix']; ?>file-uploader" style="width:100%">
 		<noscript>
 			<p><?php echo T_('Please enable JavaScript to use file uploader.'); ?></p>
 		</noscript>
@@ -2417,44 +2423,43 @@ function display_dragdrop_upload_button( $params = array() )
 			var file_uploader_note_text = '<?php echo TS_('Your browser does not support full upload functionality: You can only upload files one by one and you cannot use Drag & Drop.') ?>';
 		}
 
-		var url = <?php echo '"'.$quick_upload_url.'&'.url_crumb( 'file' ).'"'; ?>;
-		var root_and_path = '<?php echo $root_and_path ?>';
+		var <?php echo $params['fieldset_prefix']; ?>url = <?php echo '"'.$quick_upload_url.'&'.url_crumb( 'file' ).'"'; ?>;
+		var <?php echo $params['fieldset_prefix']; ?>root_and_path = '<?php echo $root_and_path ?>';
 
 		jQuery( '#fm_dirtree input[type=radio]' ).click( function()
 		{
-			url = "<?php echo $quick_upload_url; ?>"+"&root_and_path="+this.value+"&"+"<?php echo url_crumb( 'file' ); ?>";
-			root_and_path = this.value;
-			uploader.setParams({root_and_path: root_and_path});
+			<?php echo $params['fieldset_prefix']; ?>url = "<?php echo $quick_upload_url; ?>"+"&root_and_path="+this.value+"&"+"<?php echo url_crumb( 'file' ); ?>";
+			<?php echo $params['fieldset_prefix']; ?>root_and_path = this.value;
+			<?php echo $params['fieldset_prefix']; ?>uploader.setParams({root_and_path: <?php echo $params['fieldset_prefix']; ?>root_and_path});
 		} );
 
 		<?php
-		if( $params['LinkOwner'] !== NULL )
+		if( $LinkOwner !== NULL )
 		{	// Add params to link a file right after uploading:
-			echo 'url += "&link_owner='.$params['LinkOwner']->type.'_'.$params['LinkOwner']->get_ID().'_'.intval( $params['LinkOwner']->is_temp() ).'";';
+			echo $params['fieldset_prefix'].'url += "&link_owner='.$LinkOwner->type.'_'.$LinkOwner->get_ID().'_'.intval( $LinkOwner->is_temp() ).'";';
 		}
 		if( ! empty( $params['fm_mode'] ) && $params['fm_mode'] == 'file_select' )
 		{
-			echo 'url += "&fm_mode='.$params['fm_mode'].'";';
+			echo $params['fieldset_prefix'].'url += "&fm_mode='.$params['fm_mode'].'";';
 		}
 		?>
 
 		jQuery( document ).ready( function()
 		{
-			uploader = new qq.FineUploader(
+			<?php echo $params['fieldset_prefix']; ?>uploader = new qq.FineUploader(
 			{
 				request: {
-					endpoint: url,
-					params: { root_and_path: root_and_path }
+					endpoint: <?php echo $params['fieldset_prefix']; ?>url,
+					params: { root_and_path: <?php echo $params['fieldset_prefix']; ?>root_and_path }
 				},
-				template: document.getElementById( 'qq-template'),
-				element: document.getElementById( '<?php echo $params['button_ID'];?>' ),
+				template: document.getElementById( '<?php echo $params['fieldset_prefix']; ?>qq-template' ),
+				element: document.getElementById( '<?php echo $params['fieldset_prefix']; ?>file-uploader' ),
 				listElement: <?php echo $params['listElement']; ?>,
 				dragAndDrop: {
-					extraDropzones: <?php echo $params['additional_dropzone'];?>
+					extraDropzones: <?php echo empty( $params['additional_dropzone'] ) ? '""' : $params['additional_dropzone']; ?>
 				},
 				list_style: '<?php echo $params['list_style']; ?>',
-				additional_dropzone: '<?php echo $params['additional_dropzone']; ?>',
-				action: url,
+				action: <?php echo $params['fieldset_prefix']; ?>url,
 				sizeLimit: <?php echo ( $Settings->get( 'upload_maxkb' ) * 1024 ); ?>,
 				debug: false,
 				messages: {
@@ -2479,50 +2484,36 @@ function display_dragdrop_upload_button( $params = array() )
 					sizeLimit: <?php echo min( array( return_bytes( ini_get('post_max_size') ), return_bytes( ini_get('upload_max_filesize') ), $Settings->get( 'upload_maxkb') * 1024 ) );?>,
 					allowedExtensions: <?php echo json_encode( $allowed_extensions );?>
 				},
-				onSubmit: function( id, fileName )
-				{
-					var noresults_row = jQuery( 'tr.noresults' );
-					if( noresults_row.length )
-					{ // Add table headers and remove "No results" row
-						<?php
-						if( $params['table_headers'] != '' )
-						{ // Append table headers if they are defined
-						?>
-						noresults_row.parent().parent().prepend( '<?php echo format_to_js( $params['table_headers'] ); ?>' );
-						<?php } ?>
-						noresults_row.remove();
-					}
-				},
 				callbacks: {
 					onSubmit: function( id, fileName )
 					{
-						var noresults_row = jQuery( 'tr.noresults' );
+						var noresults_row = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table tr.noresults' );
 						if( noresults_row.length )
 						{ // Add table headers and remove "No results" row
 							<?php
 							if( $params['table_headers'] != '' )
 							{ // Append table headers if they are defined
 							?>
-							noresults_row.parent().parent().prepend( '<?php echo str_replace( array( "'", "\n" ), array( "\'", '' ), $params['table_headers'] ); ?>' );
+							noresults_row.parent().parent().prepend( '<?php echo format_to_js( $params['table_headers'] ); ?>' );
 							<?php } ?>
 							noresults_row.remove();
 						}
 
 						setTimeout( function()
 							{
-								evo_link_fix_wrapper_height();
+								evo_link_fix_wrapper_height( '<?php echo $params['fieldset_prefix']; ?>' );
 								<?php
 								if( $params['resize_frame'] )
-								{ // Resize frame after upload new image
+								{	// Resize attachments fieldset after upload new image:
 								?>
-								update_iframe_height();
-								jQuery( 'img' ).on( 'load', function() { update_iframe_height(); } );
+								update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' );
+								jQuery( document ).on( 'load', '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table img', function() { update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' ); } );
 								<?php } ?>
 							}, 10 );
 					},
 					onProgress: function( id, fileName, uploadedBytes, totalBytes )
 					{
-						var progressbar = jQuery( 'tr[qq-file-id=' + id + '] .progress-bar' );
+						var progressbar = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table tr[qq-file-id=' + id + '] .progress-bar' );
 						var percentCompleted = Math.round( uploadedBytes / totalBytes * 100 ) + '%';
 
 						//progressbar.style.width = percentCompleted;
@@ -2532,7 +2523,7 @@ function display_dragdrop_upload_button( $params = array() )
 						<?php
 						if( $params['resize_frame'] )
 						{
-							echo 'update_iframe_height();';
+							echo 'update_iframe_height( \''.$params['fieldset_prefix'].'\' );';
 						}
 						?>
 					},
@@ -2560,7 +2551,7 @@ function display_dragdrop_upload_button( $params = array() )
 							?>
 							if( responseJSON.data.status != undefined && responseJSON.data.status == 'rename' )
 							{
-								jQuery( '#saveBtn' ).show();
+								jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table #saveBtn' ).show();
 							}
 							<?php } ?>
 						}
@@ -2568,7 +2559,7 @@ function display_dragdrop_upload_button( $params = array() )
 						if( $params['list_style'] == 'table' )
 						{ // Table view
 						?>
-						var this_row = jQuery( 'tr[qq-file-id=' + id + ']' );
+						var this_row = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table tr[qq-file-id=' + id + ']' );
 
 						if( responseJSON == undefined || responseJSON.data == undefined || responseJSON.data.status == 'error' || responseJSON.data.status == 'fatal' )
 						{ // Failed
@@ -2677,7 +2668,7 @@ function display_dragdrop_upload_button( $params = array() )
 									+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
 									+ '</a>'
 									+ warning );
-								var old_file_obj = jQuery( 'input[type=hidden][value="' + responseJSON.data.oldpath + '"]' );
+								var old_file_obj = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table input[type=hidden][value="' + responseJSON.data.oldpath + '"]' );
 								if( old_file_obj.length > 0 )
 								{
 									old_file_obj.parent().append( ' <span class="orange"><?php echo TS_('(Old File)'); ?></span>' );
@@ -2695,26 +2686,26 @@ function display_dragdrop_upload_button( $params = array() )
 								}
 								init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 							}
-							evo_link_sort_list();
+							evo_link_sort_list( '<?php echo $params['fieldset_prefix']; ?>' );
 						}
 						<?php
 						}
 						else
 						{ // Simple list
 						?>
-							jQuery( uploader.getItemByFileId( id ) ).append( text );
+							jQuery( <?php echo $params['fieldset_prefix']; ?>uploader.getItemByFileId( id ) ).append( text );
 							if( responseJSON.data == undefined && responseJSON != '' )
 							{ // Display the fatal errors
-								jQuery( uploader.getItemByFileId( id ) ).append( responseJSON );
+								jQuery( <?php echo $params['fieldset_prefix']; ?>uploader.getItemByFileId( id ) ).append( responseJSON );
 							}
 						<?php
 						}
 
 						if( $params['resize_frame'] )
-						{ // Resize frame after upload new image
+						{	// Resize attachments fieldset after upload new image:
 						?>
-						update_iframe_height();
-						jQuery( 'img' ).on( 'load', function() { update_iframe_height(); } );
+						update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' );
+						jQuery( document ).on( 'load', '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table img', function() { update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' ); } );
 						<?php } ?>
 					},
 					onCancel: function( id, fileName )
@@ -2725,7 +2716,7 @@ function display_dragdrop_upload_button( $params = array() )
 						?>
 							setTimeout( function()
 							{ // allow some time to remove cancelled row first before determining the number of rows
-								var container = jQuery( '#filelist_tbody' );
+								var container = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table .filelist_tbody' );
 								var rows = container.find( 'tr' );
 								if( !rows.length )
 								{
@@ -2746,12 +2737,12 @@ function display_dragdrop_upload_button( $params = array() )
 
 		<?php
 		if( $params['resize_frame'] )
-		{ // Resize frame after upload new image
+		{	// Resize attachments fieldset after upload new image:
 		?>
-		function update_iframe_height()
+		function update_iframe_height( fieldset_prefix )
 		{
-			var table_height = jQuery( '#attachments_fieldset_table' ).height();
-			jQuery( '#attachments_fieldset_wrapper' ).css( { 'height': table_height, 'max-height': table_height } );
+			var table_height = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).height();
+			jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).css( { 'height': table_height, 'max-height': table_height } );
 		}
 		<?php } ?>
 
@@ -2760,14 +2751,14 @@ function display_dragdrop_upload_button( $params = array() )
 		{
 		// A click event for button to replace old file with name
 		?>
-		jQuery( document ).on( 'click', '.qq-conflict-replace', function()
+		jQuery( document ).on( 'click', '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table .qq-conflict-replace', function()
 		{
 			var this_obj = jQuery( this );
 
 			var is_replace = this_obj.children( 'div:first' ).is( ':visible' );
 
 			var old_file_name = this_obj.attr( 'old' );
-			var old_file_obj = jQuery( 'input[type=hidden][value="' + old_file_name + '"]' );
+			var old_file_obj = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table input[type=hidden][value="' + old_file_name + '"]' );
 			// Element found with old file name on the page
 			var old_file_exists = ( old_file_obj.length > 0 );
 			this_obj.hide();
@@ -2848,8 +2839,7 @@ function display_dragdrop_upload_button( $params = array() )
 			} );
 
 			return false;
-		} );
-		<?php } ?>
+		} );<?php } ?>
 
 		<?php
 		if( $params['display_support_msg'] )
@@ -2859,7 +2849,7 @@ function display_dragdrop_upload_button( $params = array() )
 		<?php } ?>
 	</script>
 
-	<script type="text/template" id="qq-template">
+	<script type="text/template" id="<?php echo $params['fieldset_prefix']; ?>qq-template">
 	<?php echo $params['template'];?>
 	</script>
 
@@ -3314,5 +3304,31 @@ function get_social_tag_image_file( $disp )
 	}
 
 	return $social_tag_image_File;
+}
+
+
+/**
+ * Check if current user has an access to upload new files
+ *
+ * @param object Link Owner
+ * @param object File Root
+ * @param boolean TRUE to assert if user dosn't have the required permission
+ * @return boolean
+ */
+function check_perm_upload_files( $LinkOwner, $FileRoot, $assert = false )
+{
+	if( empty( $LinkOwner ) )
+	{	// Check perm when we upload new files by file manager without linking to any object:
+		if( ! is_logged_in() && $assert )
+		{	// Halt the denied access:
+			debug_die( 'You have no permission to upload new files!' );
+		}
+		global $current_User;
+		return $current_User->check_perm( 'files', 'add', $assert, $FileRoot );
+	}
+	else
+	{	// Check perm when we upload new files for the object like Item, Comment, Message or EmailCampaign:
+		return $LinkOwner->check_perm( 'add', $assert, $FileRoot );
+	}
 }
 ?>

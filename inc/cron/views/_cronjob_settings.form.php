@@ -60,7 +60,8 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 
 			case 'cleanup-scheduled-jobs':
 				// Clean up scheduled jobs older than a threshold:
-				$Form->text_input( 'cleanup_jobs_threshold', $Settings->get( 'cleanup_jobs_threshold' ), 5, T_('Trigger after'), T_('days').'. '.T_('The scheduled jobs older than the selected number of days will be removed.') );
+				$Form->text_input( 'cleanup_jobs_threshold', $Settings->get( 'cleanup_jobs_threshold' ), 5, T_('Keep normally finished tasks for'), T_('days').'. '.T_('The successfully finished scheduled jobs older than the selected number of days will be removed.') );
+				$Form->text_input( 'cleanup_jobs_threshold_failed', $Settings->get( 'cleanup_jobs_threshold_failed' ), 5, T_('Keep other tasks for'), T_('days').'. '.T_('The failed scheduled jobs older than the selected number of days will be removed.') );
 				break;
 
 			case 'cleanup-email-logs':
@@ -84,7 +85,7 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 					if( $c == $config_count - 3 )
 					{	// This option is used for failed activation threshold:
 						$Form->duration_input( 'activate_account_reminder_config_'.$c, 0, sprintf( $reminder_config_label, $c + 1 ), '', '', $reminder_config_params );
-						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $config_value, T_('Mark as failed'), '', '', array_merge( $reminder_config_params, array(
+						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $config_value, T_('Mark as Failed / Pending delete'), '', '', array_merge( $reminder_config_params, array(
 								'allow_none_value' => false,
 								'allow_none_title' => false,
 							) ) );
@@ -92,7 +93,7 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 					elseif( $c == $config_count - 2 )
 					{	// This option is used for delete warning threshold:
 						$Form->duration_input( 'activate_account_reminder_config_'.( $c + 1 ), $config_value, T_('Delete warning'), '', '', array_merge( $reminder_config_params, array(
-								'note' => T_('After marking as failed'),
+								'note' => T_('After marking as "Pending Delete"'),
 							) ) );
 					}
 					elseif( $c == $config_count - 1 )
@@ -162,6 +163,16 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 		}
 
 		$Form->duration_input( 'cjob_timeout_'.$cron_job_key, $Settings->get( 'cjob_timeout_'.$cron_job_key ), T_('Max execution time'), 'days', 'minutes', array( 'note' => T_( 'Leave empty for no limit' ) ) );
+
+		if( $Settings->get( 'cjob_maxemail_'.$cron_job_key ) !== NULL )
+		{	// Setting only for cron jobs that use email sending:
+			$Form->text_input( 'cjob_maxemail_'.$cron_job_key, $Settings->get( 'cjob_maxemail_'.$cron_job_key ), 10, T_('Max emails to send'), T_('Leave empty for no limit'), array( 'type' => 'number', 'min' => 0 ) );
+		}
+
+		if( $Settings->get( 'cjob_imap_error_'.$cron_job_key ) !== NULL )
+		{	// Setting only for cron jobs that use IMAP email sending:
+			$Form->text_input( 'cjob_imap_error_'.$cron_job_key, $Settings->get( 'cjob_imap_error_'.$cron_job_key ), 5, T_('Do not notify IMAP errors before'), '', array( 'input_suffix' => ' '.T_('consecutive errors'), 'type' => 'number', 'min' => 1 ) );
+		}
 
 	$Form->end_fieldset();
 }

@@ -198,6 +198,20 @@ switch( $action )
 			// Max execution time:
 			$Settings->set( 'cjob_timeout_'.$cron_job_key, param_duration( 'cjob_timeout_'.$cron_job_key ) );
 
+			$cjob_maxemail = param( 'cjob_maxemail_'.$cron_job_key, 'string', NULL );
+			if( $cjob_maxemail !== NULL )
+			{	// Setting only for cron jobs that use email sending:
+				$cjob_maxemail = intval( $cjob_maxemail );
+				$Settings->set( 'cjob_maxemail_'.$cron_job_key, ( $cjob_maxemail > 0 ? $cjob_maxemail : '' ) );
+			}
+
+			$cjob_imap_error = param( 'cjob_imap_error_'.$cron_job_key, 'string', NULL );
+			if( $cjob_imap_error !== NULL )
+			{	// Setting only for cron jobs that use IMAP email sending:
+				$cjob_imap_error = intval( $cjob_imap_error );
+				$Settings->set( 'cjob_imap_error_'.$cron_job_key, ( $cjob_imap_error > 1 ? $cjob_imap_error : 1 ) );
+			}
+
 			// Additional settings per cron job:
 			switch( $cron_job_key )
 			{
@@ -230,6 +244,7 @@ switch( $action )
 				case 'cleanup-scheduled-jobs':
 					// Clean up scheduled jobs older than a threshold:
 					$Settings->set( 'cleanup_jobs_threshold', param( 'cleanup_jobs_threshold', 'integer', 0 ) );
+					$Settings->set( 'cleanup_jobs_threshold_failed', param( 'cleanup_jobs_threshold_failed', 'integer', 0 ) );
 					break;
 
 				case 'cleanup-email-logs':
@@ -247,7 +262,7 @@ switch( $action )
 					{
 						$reminder_config_value = param_duration( 'activate_account_reminder_config_'.$c );
 						if( $reminder_config_value > 0 || $c >= $reminder_config_num - 2 )
-						{	// Store only a selected reminder and 3 last options("Mark as failed", "Delete warning", "Delete account"):
+						{	// Store only a selected reminder and 3 last options("Mark as Failed / Pending delete", "Delete warning", "Delete account"):
 							$reminder_config[ $c ] = $reminder_config_value;
 						}
 					}
@@ -256,8 +271,8 @@ switch( $action )
 						param_error( 'activate_account_reminder_config_0', T_('Please select at least one reminder for account activation reminder after subscription.') );
 					}
 					if( empty( $reminder_config[ $reminder_config_num - 2 ] ) )
-					{	// If "Mark as failed" is not selected:
-						param_error( 'activate_account_reminder_config_'.( $reminder_config_num - 2 ), /* Do NOT translate because it is impossible for normal form */'Please select account activation reminder threshold to mark as failed after subscription.' );
+					{	// If "Mark as Failed / Pending delete" is not selected:
+						param_error( 'activate_account_reminder_config_'.( $reminder_config_num - 2 ), /* Do NOT translate because it is impossible for normal form */'Please select account activation reminder threshold to "Marked as Failed / Pending delete" after subscription.' );
 					}
 					$Settings->set( 'activate_account_reminder_config', implode( ',', $reminder_config ) );
 					break;

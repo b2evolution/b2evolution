@@ -241,15 +241,243 @@ function get_cities_option_list( $country_ID, $region_ID = 0, $subregion_ID = 0,
 
 
 /**
+ * Import regions from CSV file
+ *
+ * @param integer Country ID
+ * @param string File path
+ * @return array (
+ *   'inserted' => Count of inserted regions,
+ *   'updated'  => Count of updated regions );
+ */
+function import_regions( $country_ID, $file_path )
+{
+	global $DB;
+
+	$DB->begin();
+
+	// Get regions of the requested country from DB:
+	$SQL = new SQL( 'Get regions of the country #'.$country_ID.' before import' );
+	$SQL->SELECT( 'rgn_code, rgn_name' );
+	$SQL->FROM( 'T_regional__region' );
+	$SQL->WHERE( 'rgn_ctry_ID = '.$DB->quote( $country_ID ) );
+	$existing_regions = $DB->get_assoc( $SQL );
+
+	// Open file:
+	$file_handle = fopen( $file_path, 'r' );
+
+	$r = 0;
+	$regions_insert_values = array();
+	$regions_update_values = array();
+	while( $data = fgetcsv( $file_handle, 1024, ";" ) )
+	{
+		$r++;
+		if( $r == 1 )
+		{	// Skip first row with titles:
+			continue;
+		}
+
+		$code = trim( $data[0], " \xA0" ); // \xA0 - ASCII Non-breaking space
+		$name = trim( $data[1], " \xA0" );
+
+		if( empty( $code ) || empty( $name ) )
+		{	// Skip empty row:
+			continue;
+		}
+
+		if( isset( $existing_regions[ $code ] ) )
+		{	// Set new name for existing region if it already exists in the requested country:
+			$regions_update_values[ $code ] = $name;
+		}
+		else
+		{	// Insert a new region:
+			$regions_insert_values[] = '( '.$DB->quote( $country_ID ).', '.$DB->quote( $code ).', '.$DB->quote( $name ).' )';
+			$existing_regions[ $code ] = $name;
+		}
+	}
+
+	// Close file pointer:
+	fclose( $file_handle );
+
+	$count_insert_regions = count( $regions_insert_values );
+	$count_update_regions = count( $regions_update_values );
+
+	if( $count_insert_regions > 0 )
+	{	// New regions are found to import:
+		$DB->query( 'INSERT INTO T_regional__region ( rgn_ctry_ID, rgn_code, rgn_name )
+			VALUES '.implode( ', ', $regions_insert_values ) );
+	}
+
+	if( $count_update_regions > 0 )
+	{	// Some regions should be updated:
+		foreach( $regions_update_values as $region_code => $region_name )
+		{	// Update an existing region:
+			$DB->query( 'UPDATE T_regional__region
+				  SET rgn_name = '.$DB->quote( $region_name ).'
+				WHERE rgn_ctry_ID = '.$DB->quote( $country_ID ).'
+				  AND rgn_code = '.$DB->quote( $region_code ) );
+		}
+	}
+
+	$DB->commit();
+
+	return array(
+		'inserted' => $count_insert_regions,
+		'updated'  => $count_update_regions );
+}
+
+
+/**
+ * Import sub-regions from CSV file
+ *
+ * @param integer Country ID
+ * @param string File path
+ * @param boolean TRUE - auto create regions from provided codes
+ * @return array (
+ *   'inserted' => Count of inserted sub-regions,
+ *   'updated'  => Count of updated sub-regions );
+ */
+function import_subregions( $country_ID, $file_path, $auto_create_regions = false )
+{
+	global $DB;
+
+	$DB->begin();
+
+	// Get sub-regions of the requested country from DB:
+	$SQL = new SQL( 'Get sub-regions of the country #'.$country_ID.' before import' );
+	$SQL->SELECT( 'rgn_ID, rgn_code, subrg_code, subrg_name' );
+	$SQL->FROM( 'T_regional__region' );
+	$SQL->FROM_add( 'LEFT JOIN T_regional__subregion ON subrg_rgn_ID = rgn_ID' );
+	$SQL->WHERE( 'rgn_ctry_ID = '.$DB->quote( $country_ID ) );
+	$subregions_rows = $DB->get_results( $SQL );
+
+	$existing_regions = array();
+	$existing_subregions = array();
+	foreach( $subregions_rows as $data )
+	{
+		$existing_regions[ $data->rgn_code ] = $data->rgn_ID;
+		if( ! isset( $existing_subregions[ $data->rgn_code ] ) )
+		{
+			$existing_subregions[ $data->rgn_code ] = array();
+		}
+		if( $data->subrg_code === NULL )
+		{
+			continue;
+		}
+		$existing_subregions[ $data->rgn_code ][ $data->subrg_code ] = $data->subrg_name;
+	}
+
+	// Open file:
+	$file_handle = fopen( $file_path, 'r' );
+
+	$s = 0;
+	$subregions_insert_values = array();
+	$subregions_update_values = array();
+	$count_insert_regions = 0;
+	while( $data = fgetcsv( $file_handle, 1024, ";" ) )
+	{
+		$s++;
+		if( $s == 1 )
+		{	// Skip first row with titles:
+			continue;
+		}
+
+		$region_code = trim( $data[0], " \xA0" ); // \xA0 - ASCII Non-breaking space
+		$code = trim( $data[1], " \xA0" );
+		$name = trim( $data[2], " \xA0" );
+
+		if( empty( $region_code ) || empty( $code ) || empty( $name ) )
+		{	// Skip empty row:
+			continue;
+		}
+
+		if( ! isset( $existing_regions[ $region_code ] ) )
+		{	// Region is not found:
+			if( $auto_create_regions )
+			{	// Try to create new region:
+				$insert_region_result = $DB->query( 'INSERT INTO T_regional__region ( rgn_ctry_ID, rgn_code, rgn_name )
+					VALUES ( '.$DB->quote( $country_ID ).', '.$DB->quote( $region_code ).', '.$DB->quote( $region_code ).' )' );
+				if( $insert_region_result && $DB->insert_id )
+				{	// Use new inserted region:
+					$existing_regions[ $region_code ] = $DB->insert_id;
+					$count_insert_regions++;
+				}
+				else
+				{	// Skip when region could not be inserted:
+					continue;
+				}
+			}
+			else
+			{	// Skip sub-region without stored region in DB:
+				continue;
+			}
+		}
+
+		if( isset( $existing_subregions[ $region_code ][ $code ] ) )
+		{	// Set new name for existing sub-region if it already exists in the requested country:
+			if( ! isset( $subregions_update_values[ $region_code ] ) )
+			{
+				$subregions_update_values[ $region_code ] = array();
+			}
+			$subregions_update_values[ $region_code ][ $code ] = $name;
+		}
+		else
+		{	// Insert a new sub-region:
+			$subregions_insert_values[] = '( '.$DB->quote( $existing_regions[ $region_code ] ).', '.$DB->quote( $code ).', '.$DB->quote( $name ).' )';
+			$existing_subregions[ $region_code ][ $code ] = $name;
+		}
+	}
+
+	// Close file pointer:
+	fclose( $file_handle );
+
+	$count_insert_subregions = count( $subregions_insert_values );
+
+	if( $count_insert_subregions > 0 )
+	{	// New sub-regions are found to import:
+		$DB->query( 'INSERT INTO T_regional__subregion ( subrg_rgn_ID, subrg_code, subrg_name )
+			VALUES '.implode( ', ', $subregions_insert_values ) );
+	}
+
+	$count_update_subregions = 0;
+	if( count( $subregions_update_values ) > 0 )
+	{	// Some sub-regions should be updated:
+		foreach( $subregions_update_values as $region_code => $subregions )
+		{
+			if( ! isset( $existing_regions[ $region_code ] ) )
+			{	// Skip sub-region without stored region in DB:
+				continue;
+			}
+
+			foreach( $subregions as $subregion_code => $subregion_name )
+			{
+				$DB->query( 'UPDATE T_regional__subregion
+					  SET subrg_name = '.$DB->quote( $subregion_name ).'
+					WHERE subrg_rgn_ID = '.$DB->quote( $existing_regions[ $region_code ] ).'
+					  AND subrg_code = '.$DB->quote( $subregion_code ) );
+				$count_update_subregions++;
+			}
+		}
+	}
+
+	$DB->commit();
+
+	return array(
+		'inserted' => $count_insert_subregions,
+		'updated'  => $count_update_subregions,
+		'regions'  => $count_insert_regions );
+}
+
+
+/**
  * Import cities from CSV file
  *
- * @param integer country ID
- * @param string
+ * @param integer Country ID
+ * @param string File path
  * @return array (
  *   'inserted' => Count of inserted cities,
  *   'updated'  => Count of updated cities );
  */
-function import_cities( $country_ID, $file_name )
+function import_cities( $country_ID, $file_path )
 {
 	global $DB;
 
@@ -272,7 +500,7 @@ function import_cities( $country_ID, $file_name )
 
 
 	// Open file
-	$file_handle = fopen( $file_name, 'r' );
+	$file_handle = fopen( $file_path, 'r' );
 
 	$c = 0;
 	$cities_insert_values = array();

@@ -1835,7 +1835,7 @@ function xmlrpc_get_comments( $params, & $Blog )
 			'comment_ID'	=> 0,
 			'item_ID'		=> 0,
 			'statuses'		=> '',
-			'types'			=> array('comment', 'trackback', 'pingback'),
+			'types'			=> array('comment', 'trackback', 'pingback', 'webmentions'),
 		), $params );
 
 	$params['comment_ID'] = abs( intval($params['comment_ID']) );

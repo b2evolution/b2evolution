@@ -43,6 +43,6 @@ $UserCache->load_by_sql( $SQL );
 // Send inactive reminder to every user loaded into the UserCache ( there are only not activated users )
 $reminder_sent = send_inactive_user_emails( $UserCache->get_ID_array(), NULL, 'cron_job' );
 
-cron_log_append( ( empty( $result_message ) ? '' : "\n" ).sprintf( T_( '%d account inactive reminder emails were sent!' ), $reminder_sent ) );
+cron_log_append( ( empty( $result_message ) ? '' : "\n" ).sprintf( T_( '%d of %d account inactive reminder emails were sent!' ), $reminder_sent, count( $UserCache->get_ID_array() ) ) );
 return 1; /* ok */
 ?>

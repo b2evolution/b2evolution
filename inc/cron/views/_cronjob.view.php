@@ -44,13 +44,13 @@ $Form->begin_form( 'fform', T_('Scheduled job') );
 
 		if( empty( $cjob_row->clog_status ) )
 		{
-			$Form->info( T_('Status'), 'pending' );
+			$Form->info( T_('Status'), '<span style="background-color:'.cron_status_color( 'pending' ).';padding:5px">'.cron_status_title( 'pending' ).'</span>' );
 		}
 		else
 		{
 			$duration_seconds = strtotime( $cjob_row->clog_realstop_datetime ) - strtotime( $cjob_row->clog_realstart_datetime );
 
-			$Form->info( T_('Status'), '<span style="background-color:'.cron_status_color ( $cjob_row->clog_status ).';padding:0 5px;">'.$cjob_row->clog_status.'</span>' );
+			$Form->info( T_('Status'), '<span style="background-color:'.cron_status_color( $cjob_row->clog_status ).';padding:5px">'.cron_status_title( $cjob_row->clog_status ).'</span>' );
 			$Form->info( T_('Real start time'), mysql2localedatetime( $cjob_row->clog_realstart_datetime ) );
 			$Form->info( T_('Real stop time'), mysql2localedatetime( $cjob_row->clog_realstop_datetime ) );
 			$Form->info( T_('Duration'), seconds_to_period( $duration_seconds ) );

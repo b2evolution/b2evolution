@@ -257,14 +257,21 @@ class Skin extends DataObject
 		// Loop through all widget params:
 		foreach( $this->get_param_definitions( array('for_editing'=>true) ) as $parname => $parmeta )
 		{
-			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'color' && empty( $parmeta['valid_pattern'] ) )
-			{ // Set default validation for color fields
-				$parmeta['valid_pattern'] = array(
-						'pattern' => '~^(#([a-f0-9]{3}){1,2})?$~i',
-						'error'   => T_('Invalid color code.')
-					);
+			if( isset( $parmeta['type'] ) && $parmeta['type'] == 'input_group' )
+			{
+				if( ! empty( $parmeta['inputs'] ) )
+				{
+					foreach( $parmeta['inputs'] as $l_parname => $l_parmeta )
+					{
+						$l_parmeta['group'] = $parname; // inject group into meta
+						autoform_set_param_from_request( $l_parname, $l_parmeta, $this, 'Skin' );
+					}
+				}
 			}
-			autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+			else
+			{
+				autoform_set_param_from_request( $parname, $parmeta, $this, 'Skin' );
+			}
 		}
 	}
 
@@ -956,7 +963,7 @@ class Skin extends DataObject
 	 */
 	function display_init( /*optional: $features = array() */ )
 	{
-		global $debug, $Messages, $disp, $UserSettings;
+		global $debug, $Messages, $disp, $UserSettings, $Collection, $Blog;
 
 		// We get the optional arg this way for PHP7 comaptibility:
 		@list( $features ) = func_get_args();
@@ -1084,7 +1091,15 @@ class Skin extends DataObject
 				case 'disp_page':
 					// Specific features for disp=page:
 
-					global $Collection, $Blog, $current_User;
+					global $Collection, $Blog, $Item, $current_User;
+
+					if( isset( $Item ) && $Item->can_receive_webmentions() )
+					{	// Send header and initialize <link> tags in order to mark current Item can receive webmentions by current User(usually anonymous user):
+						$webmention_url = $Blog->get_htsrv_url().'webmention.php';
+						header( 'Link: <'.$webmention_url.'>; rel="webmention"' );
+						add_headline( '<link rel="webmention" href="'.$webmention_url.'" />' );
+						add_headline( '<link rel="http://webmention.org/" href="'.$webmention_url.'" />' );// used for older version of the protocol specification
+					}
 
 					// Used to set rating for a new comment:
 					init_ratings_js( 'blog' );
@@ -1111,6 +1126,12 @@ class Skin extends DataObject
 						init_autocomplete_login_js( 'blog', $this->get_template( 'autocomplete_plugin' ) );
 						init_datepicker_js( 'blog' );
 					}
+
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
+
+					// Used to change link position:
+					require_js( 'backoffice.js', 'blog' );
 					break;
 
 				case 'disp_users':
@@ -1295,7 +1316,7 @@ class Skin extends DataObject
 					// Used to display a tooltip to the right of plugin help icon:
 					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
-					// Used to switch to advanced editing:
+					// Used to switch to advanced editing and for link position changing:
 					require_js( 'backoffice.js', 'blog' );
 
 					// Used to automatically checks the matching extracat when we select a new main cat:
@@ -1310,12 +1331,8 @@ class Skin extends DataObject
 						require_js( 'bozo_validator.js', 'blog' );
 					}
 
-					// Require Fine Uploader js and css:
-					require_js( 'multiupload/fine-uploader.js', 'blog' );
-					require_css( 'fine-uploader.css', 'blog' );
-					// Load JS files to make the links table sortable:
-					require_js( '#jquery#', 'blog' );
-					require_js( 'jquery/jquery.sortable.min.js', 'blog' );
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_edit_comment':
@@ -1341,6 +1358,9 @@ class Skin extends DataObject
 
 					// Used to switch to advanced editing:
 					require_js( 'backoffice.js', 'blog' );
+
+					// Used to quick upload several files:
+					init_fileuploader_js( 'blog' );
 					break;
 
 				case 'disp_useritems':

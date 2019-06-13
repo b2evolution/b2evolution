@@ -23,7 +23,7 @@ global $current_User;
  */
 global $admin_Plugins;
 
-global $dispatcher;
+global $admin_url;
 
 $Table = new Table();
 
@@ -151,7 +151,7 @@ while( $loop_Plugin = & $AvailablePlugins->get_next() )
 					     || $registrations < $loop_Plugin->number_of_installs ) )
 			{ // number of installations are not limited or not reached yet and user has "edit options" perms
 				?>
-				[<a href="<?php echo $dispatcher ?>?ctrl=plugins&amp;action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname).'&amp;'.url_crumb('plugin') ?>"><?php
+				[<a href="<?php echo $admin_url; ?>?ctrl=plugins&amp;action=install&amp;plugin=<?php echo rawurlencode($loop_Plugin->classname).'&amp;'.url_crumb('plugin') ?>"><?php
 					echo T_('Install');
 					if( $registrations )
 					{	// This plugin is already installed

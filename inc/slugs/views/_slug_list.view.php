@@ -88,10 +88,10 @@ $Results->filter_area = array(
 
 function get_slug_link( $Slug )
 {
-	global $current_User;
+	global $current_User, $admin_url;
 	if( $current_User->check_perm( 'slugs', 'edit') )
 	{
-		return '<strong><a href="admin.php?ctrl=slugs&amp;slug_ID='.$Slug->ID.'&amp;action=edit">'.$Slug->get('title').'</a></strong>';
+		return '<strong><a href="'.$admin_url.'?ctrl=slugs&amp;slug_ID='.$Slug->ID.'&amp;action=edit">'.$Slug->get('title').'</a></strong>';
 	}
 	else
 	{
@@ -218,7 +218,7 @@ if( $current_User->check_perm( 'slugs', 'edit' ) )
 				'th_class' => 'shrinkwrap small',
 				'td_class' => 'shrinkwrap',
 				'td' => action_icon( TS_('Edit this slug...'), 'properties',
-		        		'admin.php?ctrl=slugs&amp;slug_ID=$slug_ID$&amp;action=edit' )
+		        		$admin_url.'?ctrl=slugs&amp;slug_ID=$slug_ID$&amp;action=edit' )
 		                 .action_icon( T_('Delete this slug!'), 'delete',
 		                  regenerate_url( 'slug_ID,action,slug_filter', 'slug_ID=$slug_ID$&amp;action=delete&amp;'.url_crumb('slug') ) ),
 						);

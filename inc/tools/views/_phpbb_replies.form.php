@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $dispatcher, $flush_action, $phpbb_tool_title, $phpbb_version;
+global $admin_url, $flush_action, $phpbb_tool_title, $phpbb_version;
 
 phpbb_display_steps( 6 );
 
@@ -65,7 +65,7 @@ $Form->begin_fieldset( T_('Report of the replies import') );
 $Form->end_fieldset();
 
 $Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' )/*,
-											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$dispatcher.'?ctrl=phpbbimport&step=topics\'' )*/ ) );
+											 array( 'button', 'button', T_('Back'), 'SaveButton', 'location.href=\''.$admin_url.'?ctrl=phpbbimport&step=topics\'' )*/ ) );
 
 $Form->end_form();
 

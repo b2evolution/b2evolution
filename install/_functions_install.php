@@ -786,6 +786,16 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'email_elements_plugin' );
 	}
+
+	if( $old_db_version < 13090 )
+	{
+		install_plugin( 'webmention_plugin' );
+	}
+
+	if( $old_db_version < 13210 )
+	{
+		install_plugin( 'auto_anchors_plugin' );
+	}
 }
 
 

@@ -61,7 +61,7 @@ class coll_item_list_Widget extends ComponentWidget
 				'' => T_('All'),
 			) + $ItemTypeCache->get_usage_option_array();
 
-		$r = array_merge( array(
+		$r = array(
 				'title' => array(
 					'label' => T_('Block title'),
 					'note' => T_('Title to display in your skin.'),
@@ -136,9 +136,14 @@ class coll_item_list_Widget extends ComponentWidget
 					'label' => T_('Follow Main List'),
 					'note' => T_('Do you want to restrict to contents related to what is displayed in the main area?'),
 					'type' => 'radio',
-					'options' => array( array ('no', T_('No') ),
-										array ('tags', T_('By tags') ) ), // may be extended
+					'options' => array(
+							array( 'no', T_('No') ),
+							array( 'tags', T_('By any tag included in Main List (OR match)') ),
+							array( 'tags_and', T_('By all tags included in Main List (AND match)') ),
+							array( 'tags_order', T_('By priority to best match (OR match + ORDER BY highest number of matches)') ),
+						),
 					'defaultvalue' => 'no',
+					'field_lines' => true,
 				),
 				'blog_ID' => array(
 					'label' => T_('Collections'),
@@ -165,21 +170,36 @@ class coll_item_list_Widget extends ComponentWidget
 										array( 'chapter', T_('By category/chapter') ) ),
 					'defaultvalue' => 'none',
 				),
-				'order_by' => array(
-					'label' => T_('Order by'),
+			);
+
+		// Display the 3 orderby fields with order direction
+		for( $order_index = 0; $order_index <= 2 /* The number of orderby fields - 1 */; $order_index++ )
+		{
+			$field_suffix = ( $order_index == 0 ? '' : '_'.$order_index );
+			$r = array_merge( $r, array(
+				'orderby'.$field_suffix.'_begin_line' => array(
+					'type' => 'begin_line',
+					'label' => ( $order_index == 0 ? T_('Order by') : '' ),
+				),
+				'order_by'.$field_suffix.'' => array(
+					'type' => 'select',
+					'options' => get_available_sort_options( NULL, $order_index > 0 ),
+					'defaultvalue' => ( $order_index == 0 ? 'datestart' : '' ),
+				),
+				'order_dir'.$field_suffix.'' => array(
 					'note' => T_('How to sort the items'),
 					'type' => 'select',
-					'options' => get_available_sort_options(),
-					'defaultvalue' => 'datestart',
+					'options' => array( 'ASC' => T_('Ascending'), 'DESC' => T_('Descending') ),
+					'defaultvalue' => ( $order_index == 0 ? 'DESC' : 'ASC' ),
+					'allow_none' => true,
 				),
-				'order_dir' => array(
-					'label' => T_('Direction'),
-					'note' => T_('How to sort the items'),
-					'type' => 'radio',
-					'options' => array( array( 'ASC', T_('Ascending') ),
-										array( 'DESC', T_('Descending') ) ),
-					'defaultvalue' => 'DESC',
+				'orderby'.$field_suffix.'_end_line' => array(
+					'type' => 'end_line',
 				),
+			) );
+		}
+
+		$r = array_merge( $r, array(
 				'limit' => array(
 					'label' => T_( 'Max items' ),
 					'note' => T_( 'Maximum number of items to display.' ),
@@ -289,6 +309,60 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		return get_post_orderby_js( $this->get_param_prefix().'order_by', $this->get_param_prefix().'order_dir' );
+	}
+
+
+	/**
+	 * Get order field
+	 *
+	 * @param string What return: 'field' - Field/column to order, 'dir' - Order direction
+	 * @return string
+	 */
+	function get_order( $return = 'field' )
+	{
+		$result = '';
+
+		switch( $return )
+		{
+			case 'field':
+				// Get field for ORDERBY sql clause:
+				$result = $this->get_param( 'order_by' );
+				if( $this->get_param( 'order_by_1' ) != '' )
+				{	// Append second order field:
+					$result .= ','.$this->get_param( 'order_by_1' );
+					if( $this->get_param( 'order_by_2' ) != '' )
+					{	// Append third order field:
+						$result .= ','.$this->get_param( 'order_by_2' );
+					}
+				}
+				break;
+
+			case 'dir':
+				// Get direction(ASC|DESC) for ORDERBY sql clause:
+				$result = $this->get_param( 'order_dir' );
+				if( $this->get_param( 'order_by_1' ) != '' && $this->get_param( 'order_dir_1' ) != '' )
+				{	// Append second order direction
+					$result .= ','.$this->get_param( 'order_dir_1' );
+					if( $this->get_param( 'order_by_2' ) != '' && $this->get_param( 'order_dir_2' ) != '' )
+					{	// Append third order direction:
+						$result .= ','.$this->get_param( 'order_dir_2' );
+					}
+				}
+				break;
+		}
+
+		return $result;
 	}
 
 
@@ -418,8 +492,8 @@ class coll_item_list_Widget extends ComponentWidget
 		// Filter list:
 		$filters = array(
 				'cat_array' => $cat_array, // Restrict to selected categories
-				'orderby'   => $this->disp_params['order_by'],
-				'order'     => $this->disp_params['order_dir'],
+				'orderby'   => $this->get_order( 'field' ),
+				'order'     => $this->get_order( 'dir' ),
 				'unit'      => 'posts', // We want to advertise all items (not just a page or a day)
 				'coll_IDs'  => $this->disp_params['blog_ID'],
 			);
@@ -459,8 +533,8 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 
 
-		if( $this->disp_params['follow_mainlist'] == 'tags' )
-		{	// Restrict to Item tagged with some tag used in the Mainlist:
+		if( strpos( $this->disp_params['follow_mainlist'], 'tags' ) === 0 )
+		{	// Restrict to Item tagged with some or all tags used in the Mainlist:
 
 			if( ! isset($MainList) )
 			{	// Nothing to follow, don't display anything
@@ -474,6 +548,17 @@ class coll_item_list_Widget extends ComponentWidget
 			}
 
 			$filters['tags'] = implode( ',', $all_tags );
+			if( $this->disp_params['follow_mainlist'] == 'tags_and' )
+			{	// Filter posts which have all tags:
+				$filters['tags_operator'] = 'AND';
+			}
+			// else 'OR' operator by default
+
+			if( $this->disp_params['follow_mainlist'] == 'tags_order' )
+			{	// Order by highest number of matched tags:
+				$filters['orderby'] = 'matched_tags_num'.( empty( $filters['orderby'] ) ? '' : ','.$filters['orderby'] );
+				$filters['order'] = 'DESC'.( empty( $filters['order'] ) ? '' : ','.$filters['order'] );
+			}
 
 			if( !empty($Item) )
 			{	// Exclude current Item

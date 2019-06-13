@@ -111,7 +111,7 @@ class CommentList2 extends DataObjectList2
 				'exact' => 0,
 				'statuses' => NULL,
 				'expiry_statuses' => array( 'active' ), // Show active/expired comments
-				'types' => array( 'comment','trackback','pingback' ),
+				'types' => array( 'comment','trackback','pingback','webmention' ),
 				'orderby' => 'date',
 				'order' => !is_null( $this->Blog ) ? $this->Blog->get_setting('comments_orderdir') : 'DESC',
 				//'order' => 'DESC',
@@ -803,7 +803,8 @@ class CommentList2 extends DataObjectList2
 	 *
 	 * NOTE: do not call this directly, but only in conjuction with auto_prune_stats_mode.
 	 *
-	 * @return string Empty, if ok.
+	 * @return string Error message
+	 *         integer Number of the pruned comments
 	 */
 	static function dbprune()
 	{
@@ -832,7 +833,7 @@ class CommentList2 extends DataObjectList2
 		$Settings->set( 'auto_empty_trash_done', date('Y-m-d H:i:s', $localtimenow) ); // save exact datetime
 		$Settings->dbupdate();
 
-		return ''; /* ok */
+		return $rows_affected; /* ok */
 	}
 
 

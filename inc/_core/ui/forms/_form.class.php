@@ -387,6 +387,10 @@ class Form extends Widget
 
 			if( is_array( $template ) && ! empty( $template ) )
 			{ // Template is detected on current skin, Use it
+				if( ! isset( $template['fieldset_title'] ) )
+				{	// Set default fieldset title if old template doesn't define it:
+					$template['fieldset_title'] = '';
+				}
 				foreach( $template as $t_param_name => $t_param_value )
 				{
 					$this->$t_param_name = $t_param_value;
@@ -407,6 +411,7 @@ class Form extends Widget
 																	.'$title$</div></th></tr>'."\n";
 					$this->no_title_fmt   = '<tr><th colspan="2"><span class="right_icons">$global_icons$</span></th></tr>'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -456,6 +461,7 @@ class Form extends Widget
 					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																		.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -504,6 +510,7 @@ class Form extends Widget
 					$this->title_fmt      = '<span style="float:right">$global_icons$</span><h2>$title$</h2>'."\n";
 					$this->no_title_fmt   = '<span style="float:right">$global_icons$</span>&nbsp;'."\n";
 					$this->no_title_no_icons_fmt = "\n";
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -553,6 +560,7 @@ class Form extends Widget
 					$this->title_fmt      = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt   = '';          //           "
 					$this->no_title_no_icons_fmt = '';
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -603,6 +611,7 @@ class Form extends Widget
 					$this->title_fmt      = '$title$'."\n"; // TODO: icons
 					$this->no_title_fmt   = '';          //           "
 					$this->no_title_fmt   = '';          //           "
+					$this->fieldset_title = '';
 					$this->fieldset_begin = '<fieldset $fieldset_attribs$>'."\n"
 																	.'<legend $title_attribs$>$fieldset_title$</legend>'."\n";
 					$this->fieldset_end   = '</fieldset>'."\n";
@@ -1161,11 +1170,14 @@ class Form extends Widget
 				'type'      => 'text',
 				'value'     => $field_value,
 				'note'      => $field_note,
-				'size'      => 7,
-				'maxlength' => 7,
+				'size'      => 18,
+				'maxlength' => 22,
 				'name'      => $field_name,
 				'label'     => $field_label,
 				'class'     => '', // default class 'form_text_input form-control form_color_input'
+				'transparency' => false, // TRUE to allow select transparent color
+				'input_prefix' => '',
+				'input_suffix' => '',
 			), $field_params );
 
 		if( isset( $field_params['force_to'] ) )
@@ -1180,6 +1192,16 @@ class Form extends Widget
 
 		// Give it a class, so it can be selected for CSS in IE6
 		$field_params['class'] = ( empty( $field_params['class'] ) ? '' : $field_params['class'].' ' ).'form_text_input form-control form_color_input';
+
+		if( $field_params['transparency'] )
+		{	// Set class to initialize colorpicker with transparency option:
+			$field_params['class'] .= ' form_color_transparent';
+			unset( $field_params['transparency'] );
+		}
+
+		// Initialize colorpicker wrappers to display a color selector box after color input field:
+		$field_params['input_prefix'] = $field_params['input_prefix'].'<span class="input-group colorpicker-component">';
+		$field_params['input_suffix'] = '<span class="input-group-addon"><i></i></span></span>'.$field_params['input_suffix'];
 
 		return $this->input_field( $field_params );
 	}
@@ -4908,6 +4930,81 @@ class Form extends Widget
 		$r .= $this->end_field( $field_type );
 
 		return $this->display_or_return( $r );
+	}
+
+
+	/**
+	 * Display attachments fieldset
+	 *
+	 * @param object Object of the links owner
+	 * @param boolean TRUE to allow folding for this fieldset, FALSE - otherwise
+	 * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+	 */
+	function attachments_fieldset( $object, $fold = false, $fieldset_prefix = '' )
+	{
+		global $current_User;
+
+		// Get object type to initialize link owner
+		$object_type = get_class( $object );
+
+		if( $object_type != 'Comment' && ! is_logged_in() )
+		{	// User must logged in for all other objects like Item, Message and EmailCampaign:
+			// (for Comment we can allow to attach files by anonymous user depending on collection setting)
+			return;
+		}
+
+		// Declare this object as global because it is used in many link functions:
+		global $LinkOwner;
+
+		// Initialize link owner depending on object type:
+		switch( $object_type )
+		{
+			case 'Comment':
+				$Comment = $object;
+				$comment_Item = & $Comment->get_Item();
+				if( ! $comment_Item->check_blog_settings( 'allow_attachments' ) )
+				{	// Item attachments must be allowed by collection setting depending on user type(anounymous, registered, member and etc.):
+					return;
+				}
+				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+				$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
+				break;
+
+			case 'Item':
+				$Item = $object;
+				if( ! $Item->get_type_setting( 'allow_attachments' ) )
+				{	// Item attachments must be allowed for the item type
+					return;
+				}
+				load_class( 'links/model/_linkitem.class.php', 'LinkItem' );
+				$LinkOwner = new LinkItem( $Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'Message':
+				if( ! is_admin_page() )
+				{	// Message attachments are allowed only on back-office
+					return;
+				}
+				$Message = $object;
+				load_class( 'links/model/_linkmessage.class.php', 'LinkMessage' );
+				$LinkOwner = new LinkMessage( $Message, param( 'temp_link_owner_ID', 'integer', 0 ) );
+				break;
+
+			case 'EmailCampaign':
+				$EmailCampaign = $object;
+				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );
+				$LinkOwner = new LinkEmailCampaign( $EmailCampaign );
+				break;
+
+			default:
+				debug_die( 'Wrong object type "'.$object_type.'" to display attachments fieldset!' );
+		}
+
+		// Display attachments fieldset:
+		display_attachments_fieldset( $this, $LinkOwner, $fold, $fieldset_prefix );
+
+		// Insert image modal window:
+		echo_image_insert_modal();
 	}
 }
 

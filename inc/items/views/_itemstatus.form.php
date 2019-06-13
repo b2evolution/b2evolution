@@ -196,7 +196,7 @@ $Results->cols[] = array(
 $Results->display_init();
 
 $display_params = array(
-		'page_url' => 'admin.php?ctrl=itemstatuses&pst_ID='.$edited_ItemStatus->ID.'&action=edit',
+		'page_url' => $admin_url.'?ctrl=itemstatuses&pst_ID='.$edited_ItemStatus->ID.'&action=edit',
 	);
 
 $Results->checkbox_toggle_selectors = 'input[name^=type_]:checkbox';

@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.10.8';
+	var $version = '6.11.2';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -700,8 +700,7 @@ class tinymce_plugin extends Plugin
 					// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
 					require_js( '#tinymce#', 'blog', false, true );
 					require_js( '#tinymce_jquery#', 'blog', false, true );
-					require_js( '#shortcodes#', 'blog', false, true );
-					require_js( '#evo_view#', 'blog', false, true );
+					$this->require_js( 'js/evo_view_shortcodes.bmin.js', true );
 					?>
 
 					<script>

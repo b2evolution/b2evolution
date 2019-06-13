@@ -107,6 +107,8 @@ function blog_update_perms( $object_ID, $context = 'user' )
 		$ismember = param( 'blog_ismember_'.$loop_ID, 'integer', 0 );
 		$can_be_assignee = param( 'blog_can_be_assignee_'.$loop_ID, 'integer', 0 );
 
+		$perm_item_propose = param( 'blog_perm_item_propose_'.$loop_ID, 'integer', 0 );
+
 		$perm_published = param( 'blog_perm_published_'.$loop_ID, 'string', '' );
 		if( !empty($perm_published) ) $perm_post[] = 'published';
 
@@ -171,13 +173,13 @@ function blog_update_perms( $object_ID, $context = 'user' )
 
 		// Update those permissions in DB:
 
-		if( $ismember || $can_be_assignee || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
+		if( $ismember || $can_be_assignee || $perm_item_propose || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
 			$perm_meta_comments || $perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change || $perm_analytics )
 		{ // There are some permissions for this user:
 			$ismember = 1;	// Must have this permission
 
 			// insert new perms:
-			$inserted_values[] = " ( $main_object_ID, $loop_ID, $ismember, $can_be_assignee, ".$DB->quote( implode( ',',$perm_post ) ).",
+			$inserted_values[] = " ( $main_object_ID, $loop_ID, $ismember, $can_be_assignee, $perm_item_propose, ".$DB->quote( implode( ',',$perm_post ) ).",
 																".$DB->quote( $perm_item_type ).", ".$DB->quote( $perm_edit ).",
 																$perm_delpost, $perm_edit_ts, $perm_delcmts, $perm_recycle_owncmts, $perm_vote_spam_comments, $perm_cmtstatuses,
 																".$DB->quote( $perm_edit_cmt ).",
@@ -190,7 +192,7 @@ function blog_update_perms( $object_ID, $context = 'user' )
 	if( count( $inserted_values ) )
 	{
 		$DB->query( "INSERT INTO $table( {$ID_field_main}, {$ID_field_edit}, {$prefix}ismember, {$prefix}can_be_assignee,
-											{$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
+											{$prefix}perm_item_propose, {$prefix}perm_poststatuses, {$prefix}perm_item_type, {$prefix}perm_edit, {$prefix}perm_delpost, {$prefix}perm_edit_ts,
 											{$prefix}perm_delcmts, {$prefix}perm_recycle_owncmts, {$prefix}perm_vote_spam_cmts, {$prefix}perm_cmtstatuses, {$prefix}perm_edit_cmt,
 											{$prefix}perm_meta_comment, {$prefix}perm_cats, {$prefix}perm_properties, {$prefix}perm_admin,
 											{$prefix}perm_media_upload, {$prefix}perm_media_browse, {$prefix}perm_media_change, {$prefix}perm_analytics )
@@ -1697,6 +1699,40 @@ function get_post_orderby_options( $coll_ID = NULL, $selected_value, $allow_none
 	}
 
 	return $option_list;
+}
+
+
+/**
+ * Get JavaScript to enable/disable fields to order post fields
+ * (used on ?ctrl=coll_settings&tab=features and for "Universal Item list" widget settings form)
+ *
+ * @param string "Order by" field name
+ * @param string "Order direction" field name
+ * @return string JavaScript
+ */
+function get_post_orderby_js( $field_order_by, $field_order_dir )
+{
+	return 'jQuery( document ).ready( function() { disable_selected_orderby_options(); } );
+jQuery( "select[id^='.$field_order_by.']" ).change( function() { disable_selected_orderby_options(); } );
+function disable_selected_orderby_options()
+{
+	// Disable/Enable second additional order field if the first was changed:
+	jQuery( "#'.$field_order_by.'_2, #'.$field_order_dir.'_2" ).prop( "disabled", jQuery( "#'.$field_order_by.'_1" ).val() == "" );
+
+	// Redisable options after some order field was changed:
+	jQuery( "select[id^='.$field_order_by.'] option" ).prop( "disabled", false );
+	jQuery( "select[id^='.$field_order_by.']" ).each( function()
+	{
+		var selected = jQuery( this ).val();
+		if( selected != "" )
+		{
+			jQuery( "select[id^='.$field_order_by.'][id!=" + jQuery( this ).attr( "id" ) + "]" ).each( function()
+			{
+				jQuery( this ).find( "option[value=" + selected + "]" ).prop( "disabled", true );
+			} );
+		}
+	} );
+}';
 }
 
 

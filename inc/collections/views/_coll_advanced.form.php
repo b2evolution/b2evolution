@@ -22,7 +22,7 @@ global $edited_Blog;
 
 global $Plugins, $Settings;
 
-global $basepath, $rsc_url, $dispatcher, $admin_url;
+global $basepath, $rsc_url, $admin_url;
 
 $Form = new Form( NULL, 'blogadvanced_checkchanges' );
 
@@ -38,32 +38,36 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 $Form->begin_fieldset( T_('After each new post...').get_manual_link('after-each-new-post') );
 	if( $edited_Blog->get_setting( 'allow_access' ) == 'users' )
 	{
-		echo '<p class="center orange">'.T_('This collection is for logged in users only.').' '.T_('It is recommended to keep pings disabled.').'</p>';
+		echo '<p class="center orange">'.T_('This collection is for logged in users only.').' '.T_('The ping plugins can be enabled only for public collections.').'</p>';
 	}
 	elseif( $edited_Blog->get_setting( 'allow_access' ) == 'members' )
 	{
-		echo '<p class="center orange">'.T_('This collection is for members only.').' '.T_('It is recommended to keep pings disabled.').'</p>';
+		echo '<p class="center orange">'.T_('This collection is for members only.').' '.T_('The ping plugins can be enabled only for public collections.').'</p>';
 	}
-	$ping_plugins = preg_split( '~\s*,\s*~', $edited_Blog->get_setting('ping_plugins'), -1, PREG_SPLIT_NO_EMPTY);
+	$ping_plugins = preg_split( '~\s*,\s*~', $edited_Blog->get_setting( 'ping_plugins' ), -1, PREG_SPLIT_NO_EMPTY );
 
-	$available_ping_plugins = $Plugins->get_list_by_event('ItemSendPing');
+	$available_ping_plugins = $Plugins->get_list_by_event( 'ItemSendPing' );
 	$displayed_ping_plugin = false;
 	if( $available_ping_plugins )
 	{
 		foreach( $available_ping_plugins as $loop_Plugin )
 		{
-			if( empty($loop_Plugin->code) )
+			if( empty( $loop_Plugin->code ) )
 			{ // Ping plugin needs a code
 				continue;
 			}
 			$displayed_ping_plugin = true;
 
 			$checked = in_array( $loop_Plugin->code, $ping_plugins );
-			$Form->checkbox_input( 'blog_ping_plugins[]', $checked, /* TRANS: %s is a ping service name */ sprintf( T_('Ping %s'), $loop_Plugin->ping_service_name ), array('value'=>$loop_Plugin->code, 'note'=>$loop_Plugin->ping_service_note) );
+			$Form->checkbox( 'blog_ping_plugins[]', $checked,
+				isset( $loop_Plugin->ping_service_setting_title ) ? $loop_Plugin->ping_service_setting_title : sprintf( /* TRANS: %s is a ping service name */ T_('Ping %s'), $loop_Plugin->ping_service_name ),
+				$loop_Plugin->ping_service_note, '', $loop_Plugin->code,
+				// Disable ping plugins for not public collection:
+				$edited_Blog->get_setting( 'allow_access' ) != 'public' );
 
-			while( ($key = array_search($loop_Plugin->code, $ping_plugins)) !== false )
+			while( ( $key = array_search( $loop_Plugin->code, $ping_plugins ) ) !== false )
 			{
-				unset($ping_plugins[$key]);
+				unset( $ping_plugins[$key] );
 			}
 		}
 	}
@@ -125,6 +129,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 			$Form->checkbox_input( 'in_skin_login', $edited_Blog->get_setting( 'in_skin_login' ), T_( 'In-skin login' ), array( 'note' => T_( 'Use in-skin login form every time it\'s possible' ) ) );
 		}
 		$Form->checkbox_input( 'in_skin_editing', $edited_Blog->get_setting( 'in_skin_editing' ), T_( 'In-skin editing' ), array( 'note' => sprintf( T_('See more options in Features &gt; <a %s>Posts</a>'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=features&amp;blog='.$edited_Blog->ID.'#post_options"' ) ) );
+		$Form->checkbox_input( 'in_skin_change_proposal', $edited_Blog->get_setting( 'in_skin_change_proposal' ), T_( 'In-skin change proposal' ) );
 	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Media directory location').get_admin_badge().get_manual_link('media-directory-location'), array( 'id' => 'media_dir_location' ) );

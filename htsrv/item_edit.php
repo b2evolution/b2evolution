@@ -40,10 +40,13 @@ if( ! is_logged_in() )
 { // must be logged in!
 	bad_request_die( T_('You are not logged in.') );
 }
-// check if user can edit this post
-check_item_perm_edit( $post_ID );
 
 $action = param_action();
+
+if( $action != 'save_propose' )
+{	// check if user can edit this post:
+	check_item_perm_edit( $post_ID );
+}
 
 if( !empty( $action ) && $action != 'new' )
 { // Check that this action request is not a CSRF hacked request:
@@ -66,6 +69,7 @@ switch( $action )
 	case 'update':
 	case 'update_workflow': // Update workflow properties from disp=single
 	case 'edit_switchtab': // this gets set as action by JS, when we switch tabs
+	case 'save_propose':
 		// Load post to edit:
 		$post_ID = param ( 'post_ID', 'integer', true, true );
 		$ItemCache = & get_ItemCache ();
@@ -297,6 +301,12 @@ switch( $action )
 			{ // Send post assignment notification
 				$edited_Item->send_assignment_notification();
 			}
+
+			// Clear all proposed changes of the updated Item:
+			$edited_Item->clear_proposed_changes();
+
+			// Update attachments folder:
+			$edited_Item->update_attachments_folder();
 		}
 
 		// post post-publishing operations:
@@ -379,17 +389,45 @@ switch( $action )
 		header_redirect( $redirect_to );
 		/* EXITED */
 		break;
+
+	case 'save_propose':
+		// Save new proposed change:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Check if current User can create a new proposed change:
+		$edited_Item->can_propose_change( true );
+
+		if( $edited_Item->create_proposed_change() )
+		{	// If new proposed changes has been inserted in DB successfully:
+			$Messages->add( T_('New proposed change has been recorded.'), 'success' );
+			if( $current_User->check_perm( 'admin', 'restricted' ) &&
+			    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
+			{	// Redirect to item history page with new poroposed change if current User has a permisson:
+				header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
+			}
+			else
+			{	// Redirect to item view page:
+				header_redirect( $edited_Item->get_permanent_url( '', '', '&' ) );
+			}
+		}
+
+		// If some errors on creating new proposed change,
+		// Display the same submitted form of new proposed change:
+		$error_disp = 'proposechange';
+		break;
 }
 
 // Display a 'In-skin editing' form
 $SkinCache = & get_SkinCache();
 $Skin = & $SkinCache->get_by_ID( $Blog->get_skin_ID() );
 $skin = $Skin->folder;
-$disp = 'edit';
+$disp = isset( $error_disp ) ? $error_disp : 'edit';
 $ads_current_skin_path = $skins_path.$skin.'/';
-if( file_exists( $ads_current_skin_path.'edit.main.php' ) )
+if( file_exists( $ads_current_skin_path.$disp.'.main.php' ) )
 {	// Include template file from current skin folder
-	require $ads_current_skin_path.'edit.main.php';
+	require $ads_current_skin_path.$disp.'.main.php';
 }
 else
 {	// Include default main template

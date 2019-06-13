@@ -971,7 +971,7 @@ class Plugin
 
 
 	/**
-	 * Event handler: Gets invoked in /admin.php for every backoffice page after
+	 * Event handler: Gets invoked in /evoadm.php for every backoffice page after
 	 *                the menu structure is built. You could use the {@link $AdminUI} object
 	 *                to modify it.
 	 *
@@ -4205,12 +4205,89 @@ class Plugin
 
 
 	/**
+	 * Event handler: Called when rendering inline tags in contents of Item, Comment, Message or Email Campaign.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'inline_tags' - Array of inline tags
+	 *   - 'Object' - Item, Comment, Message, EmailCampaign
+	 * @return array Rendered tags: Key - Original inline tag, Value - The rendered tag html
+	 */
+	function RenderInlineTags( & $params )
+	{
+	}
+
+
+	/**
+	 * This method initializes an array that used as additional tabs/forms
+	 *   for the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 *   - 'active_tag' - Index of current tag: 'image', 'thumbnail', 'inline' or custom from a plugin
+	 * @return array Array:
+	 *   key - Index of additional tab/form, NOTE: indexes 'image', 'thumbnail', 'inline' are used by core
+	 *   value - Tab title
+	 */
+	function GetImageInlineTags( & $params )
+	{
+		return array();
+	}
+
+
+	/**
+	 * This method initializes params for form of additional tab
+	 *   on the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'tag_type' - Active tag type
+	 *   - 'link_ID' - Link ID
+	 *   - 'short_tag' - Full code of short tag
+	 * @return array Array of parameters:
+	 *   - 'tag_type' - Overridden tag type
+	 *   - 'link_ID' - Overridden link ID
+	 */
+	function InitImageInlineTagForm( & $params )
+	{
+	}
+
+
+	/**
+	 * This method displays a form for additional tab
+	 *   on the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 *   - 'active_tag' - Index of currently active tag: 'image', 'thumbnail', 'inline' or custom from a plugin
+	 *   - 'display_tag' - Index of the plugin tag which should be displayed
+	 *   - 'Form' - Form object
+	 * @return boolean Did we display a form?
+	 */
+	function DisplayImageInlineTagForm( & $params )
+	{
+		return false;
+	}
+
+
+	/**
+	 * This method initializes JavaScript before submit/insert inline tag
+	 *   from the modal/popup window "Insert image into content"
+	 *
+	 * @param array Array of parameters:
+	 *   - 'link_ID' - Link ID
+	 * @return string JavaScript code
+	 */
+	function GetInsertImageInlineTagJavaScript( & $params )
+	{
+	}
+
+
+	/**
 	 * Memorize that a specific css that file will be required by the current page.
 	 * @see require_css() for full documentation,
 	 * this function is used to add unique version number for each plugin
 	 *
 	 * @param string Name of CSS file relative to current plugin folder
-	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+	 * @param boolean TRUE to print style tag on the page, FALSE to store in array to print then inside <head>
 	 */
 	function require_css( $css_file, $output = false )
 	{
@@ -4225,11 +4302,12 @@ class Plugin
 	 * this function is used to add unique version number for each plugin
 	 *
 	 * @param string Name of JavaScript file relative to plugin folder
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
 	 */
-	function require_js( $js_file )
+	function require_js( $js_file, $output = false )
 	{
 		global $app_version_long;
-		require_js( $this->get_plugin_url().$js_file, 'relative', false, false, $this->version.'+'.$app_version_long );
+		require_js( $this->get_plugin_url().$js_file, 'relative', false, $output, $this->version.'+'.$app_version_long );
 	}
 }
 

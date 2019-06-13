@@ -279,7 +279,7 @@ foreach( $BlogCache->cache as $alert_Blog )
 
 if( count( $mail_moderator_sent ) )
 {
-	cron_log_append( ( $mail_moderator_num ? "\n" : '' ).sprintf( '%s moderators have been alerted on old contents of %s collections!', count( $mail_moderator_sent ), $mail_coll_sent ) );
+	cron_log_append( ( $mail_moderator_num ? "\n" : '' ).sprintf( '%d of %d moderators have been alerted on old contents of %s collections!', count( $mail_moderator_sent ), count( $UserCache->cache ), $mail_coll_sent ) );
 }
 else
 {

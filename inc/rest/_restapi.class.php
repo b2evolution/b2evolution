@@ -2171,7 +2171,7 @@ class RestApi
 
 		$LinkOwner = & $Link->get_LinkOwner();
 
-		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		if( ! $LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to unlink the requested link:
 			$this->halt( 'You have no permission to edit the requested link!', 'no_access', 403 );
 			// Exit here.
@@ -2208,18 +2208,25 @@ class RestApi
 
 		// Unlink File from Item/Comment:
 		$deleted_link_ID = $deleted_Link->ID;
-		$deleted_Link->dbdelete();
+		if( $LinkOwner->remove_link( $deleted_Link ) )
+		{	// If Link has been removed successfully:
 
-		$LinkOwner->after_unlink_action( $deleted_link_ID );
+			$LinkOwner->after_unlink_action( $deleted_link_ID );
 
-		if( $action == 'delete' && ! empty( $linked_File ) )
-		{	// Delete a linked file from disk and DB completely:
-			$linked_File->unlink();
+			if( $action == 'delete' && ! empty( $linked_File ) )
+			{	// Delete a linked file from disk and DB completely:
+				$linked_File->unlink();
+			}
+
+			// The requested link has been deleted successfully:
+			$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
+			// Exit here.
 		}
-
-		// The requested link has been deleted successfully:
-		$this->halt( $LinkOwner->translate( 'Link has been deleted from $xxx$.' ), 'delete_success', 200 );
-		// Exit here.
+		else
+		{	// The requested link cannot be deleted:
+			$this->halt( $LinkOwner->translate( 'Cannot delete Link from $xxx$.' ), 'delete_failed', 403 );
+			// Exit here.
+		}
 	}
 
 
@@ -2280,6 +2287,8 @@ class RestApi
 	 */
 	private function controller_link_change_order()
 	{
+		global $localtimenow;
+
 		// Check permission if current user can update the requested link:
 		$this->link_check_perm();
 
@@ -2320,6 +2329,15 @@ class RestApi
 		}
 		if( $i > -1 && $i < PHP_INT_MAX )
 		{	// Switch the links:
+			if( $LinkOwner->type == 'item' && ( $localtimenow - strtotime( $LinkOwner->Item->last_touched_ts ) ) > 90 )
+			{
+				$LinkOwner->Item->create_revision();
+			}
+
+			// Update last touched date of Owners
+			// Update to last touched date made earlier to prevent subsequent link dbupdate from creating a new revision
+			$LinkOwner->update_last_touched_date();
+
 			$switch_Link->set( 'order', $edited_Link->get( 'order' ) );
 
 			// HACK: go through order=0 to avoid duplicate key conflict:
@@ -2329,9 +2347,6 @@ class RestApi
 
 			$edited_Link->set( 'order', $i );
 			$edited_Link->dbupdate();
-
-			// Update last touched date of Owners
-			$LinkOwner->update_last_touched_date();
 
 			// The requested link order has been changed successfully:
 			$this->halt( ( $link_action == 'move_up' )
@@ -2360,9 +2375,9 @@ class RestApi
 		$root = param( 'root', 'string' );
 		$file_path = param( 'path', 'string' );
 
-		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
-		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		if( ! $LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to unlink the requested link:
 			$this->halt( 'You have no permission to attach a file!', 'no_access', 403 );
 			// Exit here.
@@ -2386,12 +2401,9 @@ class RestApi
 			// Use the glyph or font-awesome icons if requested by skin
 			param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
 
-			global $LinkOwner, $current_File, $disable_evo_flush;
+			global $disable_evo_flush;
 
-			$link_type = param( 'type', 'string' );
-			$link_object_ID = param( 'object_ID', 'string' );
-
-			$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+			$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
 			// Initialize admin skin:
 			global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
@@ -2440,9 +2452,9 @@ class RestApi
 		$link_type = param( 'type', 'string' );
 		$link_object_ID = param( 'object_ID', 'string' );
 
-		$LinkOwner = get_link_owner( $link_type, $link_object_ID );
+		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
-		if( ! is_logged_in() || ! $LinkOwner->check_perm( 'edit', false ) )
+		if( ! $LinkOwner->check_perm( 'view', false ) )
 		{	// Current user has no permission to unlink the requested link:
 			$this->halt( 'You have no permission to list of the links!', 'no_access', 403 );
 			// Exit here.
@@ -2483,7 +2495,7 @@ class RestApi
 
 		// Initialize admin skin:
 		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
-		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		$admin_skin = is_logged_in() ? $UserSettings->get( 'admin_skin', $current_User->ID ) : 'bootstrap';
 		$is_admin_page = true;
 		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
 		$AdminUI = new AdminUI();
@@ -2519,9 +2531,9 @@ class RestApi
 		$dest_type = param( 'dest_type', 'string' );
 		$dest_object_ID = param( 'dest_object_ID', 'string' );
 
-		$dest_LinkOwner = get_link_owner( $dest_type, $dest_object_ID );
+		$dest_LinkOwner = get_LinkOwner( $dest_type, $dest_object_ID );
 
-		if( ! is_logged_in() || ! $dest_LinkOwner->check_perm( 'edit', false ) )
+		if( ! $dest_LinkOwner->check_perm( 'edit', false ) )
 		{	// Current user has no permission to copy the requested link:
 			$this->halt( 'You have no permission to list of the links!', 'no_access', 403 );
 			// Exit here.
@@ -2532,7 +2544,7 @@ class RestApi
 		$source_position = trim( param( 'source_position', 'string' ), ',' );
 		$source_file_type = param( 'source_file_type', 'string', NULL );
 
-		$source_LinkOwner = get_link_owner( $source_type, $source_object_ID );
+		$source_LinkOwner = get_LinkOwner( $source_type, $source_object_ID );
 
 		$link_list_params = array(
 				// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order

@@ -30,7 +30,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 		// Template params for "Content Hierarchy" widget:
 		'widget_content_hierarchy_params' => array(
-				'open_children_levels' => 20,
 				'class_selected'       => '',
 				'custom_title'         => '<h2 class="table_contents">'.T_('Table of contents').'</h2>',
 				'item_before_opened'   => get_icon( 'collapse' ),
@@ -48,6 +47,13 @@ if( ! empty( $intro_Item ) )
 	echo '<div class="evo_content_block">'; // Beginning of posts display
 	// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 	skin_include( '_item_feedback.inc.php', array_merge( array(
+			'disp_comments'        => true,
+			'disp_comment_form'    => true,
+			'disp_trackbacks'      => false,
+			'disp_trackback_url'   => false,
+			'disp_pingbacks'       => false,
+			'disp_webmentions'     => false,
+			'disp_meta_comments'   => false,
 			'before_section_title' => '<h3 class="evo_comment__list_title">',
 			'after_section_title'  => '</h3>',
 			'Item'                 => $intro_Item,

@@ -31,8 +31,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param boolean Set to true if the new object needs to be added into the ChapterCache after it was created
  * @param integer Category order
  * @param boolean Is meta category?
+ * @param string Name of default Item Type
+ * @return integer ID of new created Category
  */
-function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_description = NULL, $add_to_cache = false, $cat_order = NULL, $subcat_ordering = NULL, $meta = false )
+function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_description = NULL, $add_to_cache = false, $cat_order = NULL, $subcat_ordering = NULL, $meta = false, $default_item_type_name = NULL )
 {
 	global $DB;
 
@@ -69,6 +71,12 @@ function cat_create( $cat_name, $cat_parent_ID, $cat_blog_ID = NULL, $cat_descri
 		$new_Chapter->set( 'meta', 1 );
 	}
 
+	if( $default_item_type_name !== NULL &&
+	    ( $ItemTypeCache = & get_ItemTypeCache() ) &&
+	    ( $ItemType = & $ItemTypeCache->get_by_name( $default_item_type_name, false, false ) ) )
+	{	// Item type exists in DB by requested name, Use it:
+		$new_Chapter->set( 'ityp_ID', $ItemType->ID );
+	}
 
 	if( ! $new_Chapter->dbinsert() )
 	{
@@ -193,7 +201,7 @@ function get_commentcount_in_category( $cat_ID, $blog_ID = NULL )
 		$SQL->FROM_add( 'LEFT JOIN T_items__item ON comment_item_ID = post_id' );
 		$SQL->FROM_add( 'LEFT JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $blog_ID ) );
-		$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback" )' );
+		$SQL->WHERE_and( 'comment_type IN ( "comment", "trackback", "pingback", "webmention" )' );
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'comment' ), 'comment_', $blog_ID, 'blog_comment!', true ) );
 		// add where condition to show only those posts commetns which are visible for the current User
 		$SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $blog_ID, 'post' ), 'post_', $blog_ID, 'blog_post!', true ) );

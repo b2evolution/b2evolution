@@ -346,7 +346,7 @@ class ItemLight extends DataObject
 		{
 			case 'param_num':
 			case 'param_title':
-				$permalink = url_add_param( $blogurl, $urlparam.$glue.'more=1'.$glue.'c=1'.$glue.'tb=1'.$glue.'pb=1', $glue );
+				$permalink = url_add_param( $blogurl, $urlparam.$glue.'more=1', $glue );
 				break;
 
 			case 'y':
@@ -1803,6 +1803,17 @@ class ItemLight extends DataObject
 		}
 
 		return $chapter_links;
+	}
+
+
+	/**
+	 * Check if currently this Item is viewed as revision(archived version or proposed change)
+	 *
+	 * @return boolean
+	 */
+	function is_revision()
+	{
+		return ! empty( $this->revision );
 	}
 }
 

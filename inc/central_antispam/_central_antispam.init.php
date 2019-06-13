@@ -108,7 +108,7 @@ class central_antispam_Module extends Module
 		global $AdminUI, $admin_url, $current_User;
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'centralantispam', 'view' ) )
-		{	// Don't display menu if current user has no acces to central antispam:
+		{	// Don't display menu if current user has no access to central antispam:
 			return;
 		}
 

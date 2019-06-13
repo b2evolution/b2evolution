@@ -100,6 +100,16 @@ function get_campaign_edit_modes( $campaign_ID, $glue = '&amp;' )
 		$modes['recipient']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'recipient'} );";
 	}
 
+	$url = $edit_url.$glue.'tab=plugins';
+	$modes['plugins'] = array(
+		'text' => T_('Plugins'),
+		'href' => $url
+	);
+	if( $current_User->check_perm( 'emails', 'edit' ) )
+	{ // User must has a permission to edit emails
+		$modes['plugins']['onclick'] = "return b2edit_reload( '#campaign_form', '$url', 'undefined', {tab:'plugins'} );";
+	}
+
 	return $modes;
 }
 

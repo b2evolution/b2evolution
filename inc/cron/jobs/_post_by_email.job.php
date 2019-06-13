@@ -64,7 +64,7 @@ if( $Settings->get('eblog_test_mode') )
 
 if( ! $mbox = pbm_connect() )
 {	// We couldn't connect to the mail server
-	return 2; // error
+	return 20; // IMAP error
 }
 
 // Read messages from server

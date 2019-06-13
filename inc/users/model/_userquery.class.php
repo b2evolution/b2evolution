@@ -283,7 +283,7 @@ class UserQuery extends FilterSQL
 	/**
 	 * Restrict to user status, currently activated also means auto and manually activated users
 	 *
-	 * @param string user status ( 'activated', 'deactivated', 'new', 'emailchanged', 'failedactivation', 'closed' )
+	 * @param string user status ( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'pendingdelete', 'new' )
 	 * @param boolean set true to include users only with the given status, or set false to exclude users with the given status
 	 * @param boolean set true to make exact comparing with selected status
 	 */

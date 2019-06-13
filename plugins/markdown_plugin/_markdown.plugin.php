@@ -22,7 +22,7 @@ class markdown_plugin extends Plugin
 	var $code = 'b2evMark';
 	var $name = 'Markdown';
 	var $priority = 20;
-	var $version = '6.10.8';
+	var $version = '6.11.2';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -35,6 +35,8 @@ class markdown_plugin extends Plugin
 	function PluginInit( & $params )
 	{
 		require_once( dirname( __FILE__ ).'/_parsedown.inc.php' );
+		require_once( dirname( __FILE__ ).'/_parsedown_extra.inc.php' );
+		require_once( dirname( __FILE__ ).'/_parsedown_b2evo.inc.php' );
 
 		$this->short_desc = T_('Markdown');
 		$this->long_desc = T_('Accepted formats:<br />
@@ -79,6 +81,31 @@ class markdown_plugin extends Plugin
 					'type' => 'checkbox',
 					'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
 					'defaultvalue' => 0,
+				),
+			'table' => array(
+					'label' => T_('Tables'),
+					'type' => 'checkbox',
+					'note' => '<code>|</code> '.( ( $php_less_7 = version_compare( PHP_VERSION, '7', '<' ) ) ? '<span class="text-warning">('.sprintf( T_('Requires PHP %s'), '7.0+' ).')</span>' : '' ),
+					'defaultvalue' => $php_less_7 ? 0 : 1,
+					'disabled' => $php_less_7,
+				),
+			'deflist' => array(
+					'label' => T_('Definition Lists'),
+					'type' => 'checkbox',
+					'note' => '<code>:</code>',
+					'defaultvalue' => 1,
+				),
+			'footnote' => array(
+					'label' => T_('Footnotes'),
+					'type' => 'checkbox',
+					'note' => '<code>[^1]</code>',
+					'defaultvalue' => 1,
+				),
+			'abbr' => array(
+					'label' => T_('Abbreviations'),
+					'type' => 'checkbox',
+					'note' => '<code>*[W3C]: World Wide Web Consortium</code>',
+					'defaultvalue' => 1,
 				),
 		);
 	}
@@ -141,45 +168,76 @@ class markdown_plugin extends Plugin
 	{
 		$content = & $params['data'];
 
+		$parsedown_options = array(
+			'table'    => array( 'Table' ),
+			'deflist'  => array( 'DefinitionList' ),
+			'footnote' => array( 'Footnote', 'FootnoteMarker' ),
+			'abbr'     => array( 'Abbreviation' ),
+		);
+		$disabled_options = array();
+
 		if( $setting_Blog = & $this->get_Blog_from_params( $params ) )
 		{	// We are rendering Item, Comment or Widget now, Get the settings depending on Collection:
 			$text_styles_enabled = $this->get_coll_setting( 'text_styles', $setting_Blog );
 			$links_enabled = $this->get_coll_setting( 'links', $setting_Blog );
 			$images_enabled = $this->get_coll_setting( 'images', $setting_Blog );
+			foreach( $parsedown_options as $setting_key => $option_names )
+			{
+				if( ! $this->get_coll_setting( $setting_key, $setting_Blog ) )
+				{	// Disable parsedown option if it is not checked in collection plugin settings:
+					$disabled_options = array_merge( $disabled_options, $option_names );
+				}
+			}
 		}
 		elseif( ! empty( $params['Message'] ) )
 		{	// We are rendering Message now:
 			$text_styles_enabled = $this->get_msg_setting( 'text_styles' );
 			$links_enabled = $this->get_msg_setting( 'links' );
 			$images_enabled = $this->get_msg_setting( 'images' );
+			foreach( $parsedown_options as $setting_key => $option_names )
+			{
+				if( ! $this->get_msg_setting( $setting_key ) )
+				{	// Disable parsedown option if it is not checked in messaging plugin settings:
+					$disabled_options = array_merge( $disabled_options, $option_names );
+				}
+			}
 		}
 		elseif( ! empty( $params['EmailCampaign'] ) )
 		{	// We are rendering EmailCampaign now:
 			$text_styles_enabled = $this->get_email_setting( 'text_styles' );
 			$links_enabled = $this->get_email_setting( 'links' );
 			$images_enabled = $this->get_email_setting( 'images' );
+			foreach( $parsedown_options as $setting_key => $option_names )
+			{
+				if( ! $this->get_email_setting( $setting_key ) )
+				{	// Disable parsedown option if it is not checked in emails plugin settings:
+					$disabled_options = array_merge( $disabled_options, $option_names );
+				}
+			}
 		}
 		else
 		{ // Unknown call, Don't render this case
 			return;
 		}
 
-		// Init parser class with blog settings
-		$Parsedown = Parsedown::instance();
-		$Parsedown->parse_font_styles = $text_styles_enabled;
-		$Parsedown->parse_links = $links_enabled;
-		$Parsedown->parse_images = $images_enabled;
+		// Initialize object to parse markdown code:
+		$ParsedownB2evo = new ParsedownB2evo();
+		$ParsedownB2evo->setUrlsLinked( false ); // Don't parse urls to links
+		$ParsedownB2evo->set_b2evo_parse_font_styles( $text_styles_enabled );
+		$ParsedownB2evo->set_b2evo_parse_links( $links_enabled );
+		$ParsedownB2evo->set_b2evo_parse_images( $images_enabled );
+		$ParsedownB2evo->disable_options( $disabled_options );
 
 		// Parse markdown code to HTML
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
 		{ // Call replace_content() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
 				'~<(code|pre)[^>]*>.*?</\1>~is',
-				array( $Parsedown, 'parse' ) );
+				array( $ParsedownB2evo, 'text' ) );
 		}
 		else
 		{ // No code/pre blocks, replace on the whole thing
-			$content = $Parsedown->parse( $content );
+			$content = $ParsedownB2evo->text( $content );
 		}
 
 		return true;

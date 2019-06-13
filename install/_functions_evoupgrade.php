@@ -10314,6 +10314,230 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end( false );
 	}
 
+	if( upg_task_start( 13080, 'Upgrading users table...' ) )
+	{	// part of 6.10.6-stable
+		db_modify_col( 'T_users', 'user_status', "enum( 'activated', 'manualactivated', 'autoactivated', 'closed', 'deactivated', 'emailchanged', 'failedactivation', 'pendingdelete', 'new' ) COLLATE ascii_general_ci NOT NULL default 'new'" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13090, 'Upgrading messages table...' ) )
+	{	// part of 6.10.6-stable
+		db_add_index( 'T_messaging__message', 'msg_author_user_ID', 'msg_author_user_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13100, 'Upgrading comments table...' ) )
+	{	// part of 6.10.6-stable
+		db_modify_col( 'T_comments', 'comment_type', "enum('comment','linkback','trackback','pingback','meta','webmention') COLLATE ascii_general_ci NOT NULL default 'comment'" );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13110, 'Updating collection ping plugin settings...' ) )
+	{	// part of 6.10.6-stable
+		load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+		$CollectionSettings = new CollectionSettings();
+		// Remove webmention from default setting in order to don't enable webmentions plugin for collections on upgrade:
+		$default_ping_plugins = trim( preg_replace( '/(^|,)webmention(,|$)/', '$2', $CollectionSettings->get_default( 'ping_plugins' ) ), ',' );
+		$DB->query( 'INSERT INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+			SELECT blog_ID, "ping_plugins", '.$DB->quote( $default_ping_plugins ).'
+			  FROM T_blogs
+			 WHERE blog_ID NOT IN ( SELECT cset_coll_ID FROM T_coll_settings WHERE cset_name = "ping_plugins" )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13120, 'Upgrade Temporary IDs table...' ) )
+	{	// part of 6.11.0-beta
+		db_add_col( 'T_temporary_ID', 'tmp_item_ID', 'INT(11) UNSIGNED NULL COMMENT \'Link to parent Item of Comment in order to enable permission checks\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13130, 'Upgrade links table...' ) )
+	{	// part of 6.11.0-beta
+		db_drop_col( 'T_links', 'link_ltype_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13140, 'Creating custom fields and link versions tables for item versions...' ) )
+	{	// part of 6.11.0-beta
+		db_create_table( 'T_items__version_custom_field', '
+			ivcf_iver_ID     INT UNSIGNED NOT NULL,
+			ivcf_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivcf_itcf_ID     INT UNSIGNED NOT NULL,
+			ivcf_itcf_label  VARCHAR(255) NOT NULL,
+			ivcf_value       VARCHAR( 10000 ) NULL,
+			PRIMARY KEY      ( ivcf_iver_ID, ivcf_iver_itm_ID, ivcf_itcf_ID )' );
+
+		db_create_table( 'T_items__version_link', '
+			ivl_iver_ID     INT UNSIGNED NOT NULL,
+			ivl_iver_itm_ID INT UNSIGNED NOT NULL,
+			ivl_link_ID     INT(11) UNSIGNED NOT NULL,
+			ivl_file_ID     INT(11) UNSIGNED NULL,
+			ivl_position    VARCHAR(10) COLLATE ascii_general_ci NOT NULL,
+			ivl_order       INT(11) UNSIGNED NOT NULL,
+			PRIMARY KEY     ( ivl_iver_ID, ivl_iver_itm_ID, ivl_link_ID )' );
+
+		$DB->query( 'ALTER TABLE T_items__version
+				CHANGE iver_edit_datetime iver_edit_last_touched_ts TIMESTAMP NOT NULL DEFAULT \'2000-01-01 00:00:00\'' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13150, 'Upgrading item versions tables...' ) )
+	{	// part of 6.11.0-beta
+
+		// Make column iver_ID unique per Item in order to avoid error on adding PRIMARY(unique) KEY below:
+		$DB->query( 'SET @iver_ID = 0' );
+		$DB->query( 'SET @iver_itm_ID = 0' );
+		$DB->query( 'UPDATE T_items__version
+			  SET iver_ID = IF( @iver_itm_ID != iver_itm_ID, @iver_ID := 1 AND @iver_itm_ID := iver_itm_ID, @iver_ID := @iver_ID + 1 )
+			ORDER BY iver_itm_ID, iver_edit_last_touched_ts' );
+
+		$DB->query( 'ALTER TABLE T_items__version
+			ADD COLUMN iver_type ENUM("archived","proposed") COLLATE ascii_general_ci NOT NULL DEFAULT "archived" AFTER iver_ID,
+			DROP INDEX iver_ID_itm_ID,
+			ADD PRIMARY KEY ( iver_ID , iver_type, iver_itm_ID )' );
+
+		$DB->query( 'ALTER TABLE T_items__version_custom_field
+			ADD COLUMN ivcf_iver_type ENUM("archived","proposed") COLLATE ascii_general_ci NOT NULL DEFAULT "archived" AFTER ivcf_iver_ID,
+			DROP PRIMARY KEY,
+			ADD PRIMARY KEY ( ivcf_iver_ID, ivcf_iver_type, ivcf_iver_itm_ID, ivcf_itcf_ID )' );
+
+		$DB->query( 'ALTER TABLE T_items__version_link
+			ADD COLUMN ivl_iver_type ENUM("archived","proposed") COLLATE ascii_general_ci NOT NULL DEFAULT "archived" AFTER ivl_iver_ID,
+			DROP PRIMARY KEY,
+			ADD PRIMARY KEY ( ivl_iver_ID, ivl_iver_type, ivl_iver_itm_ID, ivl_link_ID )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13160, 'Updating collection user/group permissions...' ) )
+	{	// part of 6.11.0-beta
+		db_add_col( 'T_coll_user_perms', 'bloguser_perm_item_propose', 'tinyint NOT NULL default 0 AFTER bloguser_can_be_assignee' );
+		db_add_col( 'T_coll_group_perms', 'bloggroup_perm_item_propose', 'tinyint NOT NULL default 0 AFTER bloggroup_can_be_assignee' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13170, 'Creating Markdown text file type...' ) )
+	{	// part of 6.11.0-beta
+		$SQL = new SQL( 'Check for file type .md' );
+		$SQL->SELECT( 'ftyp_ID' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_extensions REGEXP "(^| )md( |$)"' );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Insert new file type for Markdown Documentation only if it doesn't exist:
+			$DB->query( 'INSERT INTO T_filetypes
+				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
+				VALUES ( "md", "Markdown text file", "text/plain", "file_document", "text", "registered" )' );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13180, 'Upgrading cron logs table...' ) )
+	{	// part of 6.11.0-beta
+		db_modify_col( 'T_cron__log', 'clog_status', 'enum("started","finished","error","imap_error","timeout","warning") COLLATE ascii_general_ci not null default "started"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13190, 'Update skin color settings with transparency to new format...' ) )
+	{	// part of 6.11.0-beta
+		$SQL = new SQL( 'Get skins with transparent colors' );
+		$SQL->SELECT( 'skin_ID, skin_folder' );
+		$SQL->FROM( 'T_skins__skin' );
+		$SQL->WHERE( 'skin_folder IN ( "bootstrap_main_skin", "horizon_main_skin" )' );
+		$skins = $DB->get_assoc( $SQL->get(), $SQL->title );
+		$color_transparency_settings = array();
+		foreach( $skins as $skin_ID => $skin_folder )
+		{
+			$color_set_name = ( $skin_folder == 'bootstrap_main_skin' ? 'front_bg_cont_color' : 'front_bg_color' );
+			$color_transparency_settings[ $color_set_name ] = array( $skin_ID, 'front_bg_opacity' );
+		}
+
+		$SQL = new SQL( 'Get all skin color settings with transparency which must be updated from hex to rgba format' );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_coll_settings' );
+		foreach( $color_transparency_settings as $color_set_name => $color_data )
+		{
+			$skin_ID = $color_data[0];
+			$transparency_set_name = $color_data[1];
+			$SQL->WHERE_or( 'cset_name LIKE "skin'.$skin_ID.'\_'.str_replace( '_', '\_', $color_set_name ).'"' );
+			$SQL->WHERE_or( 'cset_name LIKE "skin'.$skin_ID.'\_'.str_replace( '_', '\_', $transparency_set_name ).'"' );
+		}
+		$SQL->ORDER_BY( 'cset_coll_ID, cset_name' );
+		$color_settings = $DB->get_results( $SQL->get(), OBJECT, $SQL->title );
+		foreach( $color_settings as $color_setting )
+		{
+			$color_set_name = preg_replace( '/^skin\d+_/', '', $color_setting->cset_name );
+			if( ! isset( $color_transparency_settings[ $color_set_name ] ) )
+			{	// Skip not color setting:
+				continue;
+			}
+			$transparency_set_name = $color_transparency_settings[ $color_set_name ][1];
+			foreach( $color_settings as $transparency_setting )
+			{
+				if( $color_setting->cset_coll_ID == $transparency_setting->cset_coll_ID &&
+				    $transparency_setting->cset_name == str_replace( $color_set_name, '', $color_setting->cset_name ).$transparency_set_name )
+				{	// We found transparency value for the same color setting,
+					// Convert color from format #FFFFFF to rgba(255,255,255,1):
+					$transparency = floatval( $transparency_setting->cset_value / 100 );
+					$color = substr( $color_setting->cset_value, 1 );
+					if( strlen( $color ) == '6' )
+					{	// Color value in format #FFFFFF
+						$color = str_split( $color, 2 );
+					}
+					else
+					{	// Color value in format #FFF
+						$color = str_split( $color, 1 );
+						foreach( $color as $c => $v )
+						{
+							$color[ $c ] = $v.$v;
+						}
+					}
+					// Update color setting to new format:
+					$rgba_color = 'rgba('.implode( ',', array_map( 'hexdec', $color ) ).','.$transparency.')';
+					$DB->query( 'UPDATE T_coll_settings
+						  SET cset_value = '.$DB->quote( $rgba_color ).'
+						WHERE cset_coll_ID = '.$color_setting->cset_coll_ID.'
+						  AND cset_name = "'.$color_setting->cset_name.'"' );
+					// Remove old setting with transparency value:
+					$DB->query( 'DELETE FROM T_coll_settings
+						WHERE cset_coll_ID = '.$transparency_setting->cset_coll_ID.'
+						  AND cset_name = "'.$transparency_setting->cset_name.'"' );
+					break;
+				}
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13200, 'Creating CSV file type...' ) )
+	{	// part of 6.11.0-beta
+		$SQL = new SQL( 'Check for file type .csv' );
+		$SQL->SELECT( 'ftyp_ID' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_extensions REGEXP "(^| )csv( |$)"' );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Insert new file type for Markdown Documentation only if it doesn't exist:
+			$DB->query( 'INSERT INTO T_filetypes
+				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
+				VALUES ( "csv", "CSV file", "text/plain", "file_document", "text", "registered" )' );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13210, 'Inserting new collection settings...' ) )
+	{	// part of 6.11.2-stable
+		// This upgrade block is NOT critical/NOT required for users already on 7.0dev
+		$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_value, cset_name )
+			SELECT cset_coll_ID, cset_value,
+			  CASE cset_name
+			    WHEN "default_noindex"         THEN "posts_firstpage_noindex"
+			    WHEN "canonical_homepage"      THEN "canonical_posts"
+			    WHEN "self_canonical_homepage" THEN "self_canonical_posts"
+			    WHEN "relcanonical_homepage"   THEN "relcanonical_posts"
+			  END AS new_cset_name
+			  FROM T_coll_settings
+			 WHERE cset_name IN ( "default_noindex", "canonical_homepage", "self_canonical_homepage", "relcanonical_homepage" )' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
