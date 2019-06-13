@@ -2176,7 +2176,7 @@ switch( $action )
 
 		if( $edited_Item->create_proposed_change() )
 		{	// If new proposed changes has been inserted in DB successfully:
-			$Messages->add( T_('New proposed change has been added.'), 'success' );
+			$Messages->add( T_('New proposed change has been recorded.'), 'success' );
 			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 			{	// Redirect to item history page with new poroposed change if current User has a permisson:
 				header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
