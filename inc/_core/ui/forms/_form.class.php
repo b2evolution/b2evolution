@@ -4312,7 +4312,10 @@ class Form extends Widget
 		switch( $field_params['tag_type'] )
 		{
 			case 'user':
-				$tags_url = get_restapi_url().'usertags';
+				$tags_url = get_restapi_url().'tags/user';
+				break;
+			case 'metakeyword':
+				$tags_url = get_restapi_url().'tags/metakeyword';
 				break;
 			case 'item':
 			default:
