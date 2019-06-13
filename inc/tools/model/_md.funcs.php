@@ -599,7 +599,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		if( ! empty( $Item->ID ) )
 		{
 			// Link files:
-			if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)"]+)\s*("[^"]*")?\)#', $item_content, $image_matches ) )
+			if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)"]+\.(jpe?g|gif|png))\s*("[^"]*")?\)#i', $item_content, $image_matches ) )
 			{
 				$updated_item_content = $item_content;
 				$LinkOwner = new LinkItem( $Item );
@@ -618,7 +618,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 					{	// Don't use this default text for alt image text:
 						$file_params['file_alt'] = '';
 					}
-					$file_params['file_title'] = trim( $image_matches[3][$i], ' "' );
+					$file_params['file_title'] = trim( $image_matches[4][$i], ' "' );
 					// Try to find existing and linked image File or create, copy and link image File:
 					if( $link_ID = md_link_file( $LinkOwner, $folder_path, $category_path.'/'.rtrim( $image_relative_path ), $file_params ) )
 					{	// Replace this img tag from content with b2evolution format:
@@ -706,6 +706,14 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 			'folder_path'    => '',
 			'import_type'    => 'replace',
 		), $params );
+
+	if( preg_match( '#(^|[/\\\\])..[/\\\\]#', $source_file_relative_path ) )
+	{	// Don't allow a traversal directory:
+		echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Skip file %s, because path is invalid.', '<code>'.$source_file_relative_path.'</code>' ).'</li>';
+		evo_flush();
+		// Skip it:
+		return false;
+	}
 
 	$file_source_path = $source_folder_absolute_path.'/'.$source_file_relative_path;
 
