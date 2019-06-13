@@ -1921,23 +1921,76 @@ class RestApi
 	 */
 	private function module_tags()
 	{
-		global $DB;
+
+		switch( $_SERVER['REQUEST_METHOD'] )
+		{
+			case 'GET':
+				// List of valid resources
+				$valid_resources = array( 'item', 'user', 'metakeyword' );
+				break;
+
+			default:
+				$this->halt( 'Request method not supported for the requested resource', 'wrong_request', 405 );
+				// Exit here
+		}
+
+		// Set default controller or get from request path:
+		$tag_controller = ( empty( $this->args[1] ) ? 'item' : $this->args[1] );
+
+		if( ! method_exists( $this, 'controller_tag_'.$tag_controller ) )
+		{	// Unknown controller:
+			$this->halt( 'Unknown tag controller "'.$tag_controller.'"', 'unknown_controller' );
+			// Exit here.
+		}
+
+		if( ! in_array( $tag_controller, $valid_resources, true ) )
+		{ // Invalid request method:
+			$this->halt( 'Request method not supported for the requested resource', 'wrong_request', 405 );
+			// Exit here.
+		}
 
 		$term = param( 's', 'string' );
 
-		if( substr( $term, 0, 1 ) == '-' )
-		{	// Prevent chars '-' in first position:
-			$term = preg_replace( '/^-+/', '', $term );
-		}
+		// Prevent chars '-' in first position:
+		$term = ltrim( $term, '-' );
 
 		// Deny to use a comma in tag names:
 		$term = str_replace( ',', ' ', $term );
 
+		// Call tag controller to prepare current request:
+		$tags = $this->{'controller_tag_'.$tag_controller}( $term );
+
+		// Check if current term is not an existing tag:
 		$term_is_new_tag = true;
+		foreach( $tags as $tag )
+		{
+			/* Yura: I have added "utf8_strtolower()" below in condition in order to:
+			 * When we enter new tag 'testA' and the tag 'testa' already exists
+			 * then we suggest only 'testa' instead of 'testA'.
+			 */
+			if( utf8_strtolower( $tag['name'] ) == utf8_strtolower( $term ) )
+			{ // Current term is an existing tag
+				$term_is_new_tag = false;
+			}
+		}
 
-		$tags = array();
+		if( $term_is_new_tag && ! empty( $term ) )
+		{	// Add current term in the beginning of the tags list:
+			array_unshift( $tags, array( 'id' => $term, 'name' => $term ) );
+		}
 
-		$tags_SQL = new SQL();
+		$this->add_response( 'tags', $tags );
+	}
+
+
+	/**
+	 * Call tags controller to search for item tags
+	 */
+	private function controller_tag_item( $term )
+	{
+		global $DB;
+
+		$tags_SQL = new SQL( 'Search item tags' );
 		$tags_SQL->SELECT( 'tag_name AS id, tag_name AS name' );
 		$tags_SQL->FROM( 'T_items__tag' );
 		/* Yura: Here I added "COLLATE utf8_general_ci" because:
@@ -1946,57 +1999,19 @@ class RestApi
 		 */
 		$tags_SQL->WHERE( 'tag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
 		$tags_SQL->ORDER_BY( 'tag_name' );
-		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
 
-		// Check if current term is not an existing tag:
-		foreach( $tags as $tag )
-		{
-			/* Yura: I have added "utf8_strtolower()" below in condition in order to:
-			 * When we enter new tag 'testA' and the tag 'testa' already exists
-			 * then we suggest only 'testa' instead of 'testA'.
-			 */
-			if( utf8_strtolower( $tag['name'] ) == utf8_strtolower( $term ) )
-			{ // Current term is an existing tag
-				$term_is_new_tag = false;
-			}
-		}
-
-		if( $term_is_new_tag && ! empty( $term ) )
-		{	// Add current term in the beginning of the tags list:
-			array_unshift( $tags, array( 'id' => $term, 'name' => $term ) );
-		}
-
-		$this->add_response( 'tags', $tags );
+		return $DB->get_results( $tags_SQL, ARRAY_A );
 	}
 
 
-	/**** MODULE TAGS ---- END ****/
-
-	/**** MODULE USER TAGS ---- START ****/
-
-
 	/**
-	 * Call module to prepare request for user tags
+	 * Call tags controller to search for user tags
 	 */
-	private function module_usertags()
+	private function controller_tag_user( $term )
 	{
 		global $DB;
 
-		$term = param( 's', 'string' );
-
-		if( substr( $term, 0, 1 ) == '-' )
-		{	// Prevent chars '-' in first position:
-			$term = preg_replace( '/^-+/', '', $term );
-		}
-
-		// Deny to use a comma in tag names:
-		$term = str_replace( ',', ' ', $term );
-
-		$term_is_new_tag = true;
-
-		$tags = array();
-
-		$tags_SQL = new SQL();
+		$tags_SQL = new SQL( 'Search user tags' );
 		$tags_SQL->SELECT( 'utag_name AS id, utag_name AS name' );
 		$tags_SQL->FROM( 'T_users__tag' );
 		/* Yura: Here I added "COLLATE utf8_general_ci" because:
@@ -2005,31 +2020,50 @@ class RestApi
 		 */
 		$tags_SQL->WHERE( 'utag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
 		$tags_SQL->ORDER_BY( 'utag_name' );
-		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
 
-		// Check if current term is not an existing tag:
-		foreach( $tags as $tag )
-		{
-			/* Yura: I have added "utf8_strtolower()" below in condition in order to:
-			 * When we enter new tag 'testA' and the tag 'testa' already exists
-			 * then we suggest only 'testa' instead of 'testA'.
-			 */
-			if( utf8_strtolower( $tag['name'] ) == utf8_strtolower( $term ) )
-			{ // Current term is an existing tag
-				$term_is_new_tag = false;
-			}
-		}
-
-		if( $term_is_new_tag && ! empty( $term ) )
-		{	// Add current term in the beginning of the tags list:
-			array_unshift( $tags, array( 'id' => $term, 'name' => $term ) );
-		}
-
-		$this->add_response( 'tags', $tags );
+		return $DB->get_results( $tags_SQL, ARRAY_A );
 	}
 
 
-	/**** MODULE USER TAGS ---- END ****/
+	/**
+	 * Call tags controller to search for item meta keywords
+	 */
+	private function controller_tag_metakeyword( $term )
+	{
+		global $DB;
+
+		$keywords = array();
+
+		$keywords_SQL = new SQL( 'Search item meta keywords' );
+		$keywords_SQL->SELECT( 'DISTINCT iset_value' );
+		$keywords_SQL->FROM( 'T_items__item_settings' );
+		/* Yura: Here I added "COLLATE utf8_general_ci" because:
+		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
+		 * It also allows to find "ee" when we type in "éè" and otherwise.
+		 */
+		$keywords_SQL->WHERE( 'iset_name = "metakeywords"' );
+		$keywords_SQL->WHERE_and( 'iset_value LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$searched_keywords = $DB->get_col( $keywords_SQL );
+
+		// Extract keywords from item settings where they are stored in single string separated by comma:
+		if( ! empty( $searched_keywords ) &&
+	      preg_match_all( '#(^|\s*)([^,]*'.preg_quote( $term ).'[^,]*)(,|$)#', implode( ', ', $searched_keywords ), $match_keywords ) &&
+		    ! empty( $match_keywords[2] ) )
+		{	// Generate proper array for JS plugin "tokenInput":
+			$match_keywords = array_unique( $match_keywords[2] );
+			sort( $match_keywords );
+			foreach( $match_keywords as $match_keyword )
+			{
+				$keywords[] = array( 'id' => $match_keyword, 'name' => $match_keyword );
+			}
+		}
+
+		return $keywords;
+	}
+
+
+	/**** MODULE TAGS ---- END ****/
+
 
 	/**** MODULE POLLS ---- START ****/
 
