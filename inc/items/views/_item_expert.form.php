@@ -449,8 +449,7 @@ $Form->begin_form( '', '', $params );
 
 		if( $edited_Item->get_type_setting( 'use_meta_keywds' ) != 'never' )
 		{	// Display <meta> keywords:
-			$Form->tag_input( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ), 40, T_('&lt;meta&gt; keywds'), '', array(
-					'tag_type'  => 'metakeyword',
+			$Form->text_input( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ), 40, T_('&lt;meta&gt; keywds'), '', array(
 					'maxlength' => 500,
 					'data-recommended-length' => '200;250',
 					'required'  => ( $edited_Item->get_type_setting( 'use_meta_keywds' ) == 'required' )
