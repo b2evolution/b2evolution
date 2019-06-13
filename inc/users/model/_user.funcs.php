@@ -4074,7 +4074,7 @@ function evo_get_filter_user_tags( rule )
 		return jQuery( selector ).val();
 	}
 
-	jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'tags/user'; ?>',
+	jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'usertags'; ?>',
 	{
 		theme: 'facebook',
 		queryParam: 's',
