@@ -384,7 +384,7 @@ function link_destination()
 
 	if( empty( $current_File ) )
 	{
-		return '?';
+		return '<span class="text-danger">Broken File!</span>';
 	}
 
 	$r = '';
@@ -532,7 +532,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		// Delete icon:
 		$LinkCache = & get_LinkCache();
 		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
-		if( ! $current_File->is_dir() && $Link && $Link->can_be_file_deleted() )
+		if( $current_File && ! $current_File->is_dir() && $Link && $Link->can_be_file_deleted() )
 		{	// If current user has a permission to delete a file(not folder) completely
 			$File = & $Link->get_File();
 			$r .= action_icon( T_('Delete this file!'), 'delete',
@@ -1025,7 +1025,7 @@ function link_add_iframe( $link_destination )
 	global $LinkOwner, $current_File, $iframe_name, $link_type;
 	$link_owner_ID = $LinkOwner->get_ID();
 
-	if( $current_File->is_dir() && isset( $iframe_name ) )
+	if( $current_File && $current_File->is_dir() && isset( $iframe_name ) )
 	{
 		$root = $current_File->get_FileRoot()->ID;
 		$path = $current_File->get_rdfp_rel_path();
