@@ -188,14 +188,15 @@ function skin_init( $disp )
 				$canonical_is_same_url = true;
 				$item_Blog = & $Item->get_Blog();
 				// Use item URL from first detected category of the current collection:
+				$main_canonical_url = $Item->get_permanent_url( '', '', '&' );
 				if( $item_Blog->get_setting( 'allow_crosspost_urls' ) )
 				{	// If non-canonical URL is allowed for cross-posted items,
-					// try to get a canonical URL in thecurrent collection even it is not main/canonical collection of the Item:
+					// try to get a canonical URL in the current collection even it is not main/canonical collection of the Item:
 					$canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID );
 				}
 				else
 				{	// If non-canonical URL is allowed for cross-posted items, then only get canonical URL in the main collection:
-					$canonical_url = $Item->get_permanent_url( '', '', '&' );
+					$canonical_url = $main_canonical_url;
 				}
 				$canonical_url_params_regexp = '#[&?](page=\d+|mode=quote&[qcp]+=\d+)+#';
 				if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
@@ -269,7 +270,6 @@ function skin_init( $disp )
 						}
 						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
-
 					if( ! $url_resolved &&
 					    $Blog->get_setting( 'canonical_item_urls' ) &&
 					    $redir == 'yes' &&
@@ -282,13 +282,13 @@ function skin_init( $disp )
 						// EXITED.
 					}
 					elseif( $Blog->get_setting( 'relcanonical_item_urls' ) )
-					{	// Use rel="canoncial":
-						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+					{	// Use rel="canoncial" with MAIN canoncial URL:
+						add_headline( '<link rel="canonical" href="'.$main_canonical_url.'" />' );
 					}
 				}
 				elseif( $Blog->get_setting( 'self_canonical_item_urls' ) )
-				{	// Use self-referencing rel="canonical" tag:
-					add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+				{	// Use self-referencing rel="canonical" tag with MAIN canoncial URL:
+					add_headline( '<link rel="canonical" href="'.$main_canonical_url.'" />' );
 				}
 			}
 
