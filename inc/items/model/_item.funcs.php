@@ -128,7 +128,7 @@ function init_MainList( $items_nb_limit )
 
 
 /**
- * Prepare the 'In-skin editing'.
+ * Prepare the 'In-skin editing' / 'In-skin change proposal'.
  *
  */
 function init_inskin_editing()
@@ -137,18 +137,22 @@ function init_inskin_editing()
 	global $item_tags, $item_title, $item_content;
 	global $admin_url, $redirect_to, $advanced_edit_link;
 
-	if( ! $Blog->get_setting( 'in_skin_editing' ) )
-	{	// Redirect to the Back-office editing (setting is OFF)
-		header_redirect( $admin_url.'?ctrl=items&action=new&blog='.$Blog->ID );
-	}
-
-	$tab_switch_params = 'blog='.$Blog->ID;
-
 	// Post ID, go from $_GET when we edit post from Front-office
 	$post_ID = param( 'p', 'integer', 0 );
 
 	// Post ID, go from $_GET when we copy post from Front-office
 	$copy_post_ID = param( 'cp', 'integer', 0 );
+
+	if( $disp == 'edit' && ! $Blog->get_setting( 'in_skin_editing' ) )
+	{	// Redirect to the Back-office editing (setting is OFF)
+		header_redirect( $admin_url.'?ctrl=items&action='.( $post_ID == 0 ? ( $copy_post_ID == 0 ? 'new' : 'copy&p='.$copy_post_ID ) : 'edit&p='.$post_ID ).'&blog='.$Blog->ID );
+	}
+	elseif( $disp == 'proposechange' && ! $Blog->get_setting( 'in_skin_change_proposal' ) )
+	{	// Redirect to the Back-office editing (setting is OFF)
+		header_redirect( $admin_url.'?ctrl=items&action=propose&blog='.$Blog->ID.'&p='.$post_ID );
+	}
+
+	$tab_switch_params = 'blog='.$Blog->ID;
 
 	if( $disp == 'proposechange' )
 	{	// Propose a change:

@@ -371,7 +371,7 @@ class ItemLight extends DataObject
 						$blog_ID = $blog;
 					}
 				}
-				if( $blog_ID !== NULL && $blog_ID != $this->get_blog_ID() )
+				if( $blog_ID !== NULL && $blogurl != $this->Blog->gen_blogurl() )
 				{	// If requested collection is not collection of main category:
 					if( ! empty( $this->current_extra_cat_ID ) )
 					{	// Use first detected extra category:
