@@ -2140,12 +2140,12 @@ class _core_Module extends Module
 								'envelope' => array(
 									'text' => T_('Envelope'),
 									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=envelope' ),
-								'smtp' => array(
-									'text' => T_('SMTP gateway'),
-									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=smtp' ),
 								'throttling' => array(
 									'text' => T_('Throttling'),
 									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=throttling' ),
+								'smtp' => array(
+									'text' => T_('SMTP gateway'),
+									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=smtp' ),
 							) ),
 						'return' => array(
 							'text' => T_('Returned'),
