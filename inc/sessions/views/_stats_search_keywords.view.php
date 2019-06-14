@@ -66,9 +66,12 @@ else
 {
 	// Extract keyphrases from the hitlog:
 	$extract_keyphrase_result = extract_keyphrase_from_hitlogs();
-	if( $extract_keyphrase_result !== true )
-	{ // Could not execute the extract_keyphrase process, display a warning
-		echo '<div class="action_messages"><div class="warning">'.$extract_keyphrase_result.'</div></div>';
+	if( is_string( $extract_keyphrase_result ) )
+	{	// Could not execute the extract_keyphrase process, display a warning
+		global $Messages;
+		$Messages->clear();
+		$Messages->add( $extract_keyphrase_result, 'warning' );
+		$Messages->display();
 	}
 
 	$SQL = new SQL();
