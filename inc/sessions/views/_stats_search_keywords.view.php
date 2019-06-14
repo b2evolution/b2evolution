@@ -263,6 +263,7 @@ else
 $Results->cols[] = array(
 		'th' => T_('Refered searches'),
 		'order' => 'keyp_count_refered_searches',
+		'default_dir' => 'D',
 		'td' => '$keyp_count_refered_searches$',
 		'td_class' => 'nowrap right',
 );
@@ -270,6 +271,7 @@ $Results->cols[] = array(
 $Results->cols[] = array(
 		'th' => T_('Internal searches'),
 		'order' => 'keyp_count_internal_searches',
+		'default_dir' => 'D',
 		'td' => '$keyp_count_internal_searches$',
 		'td_class' => 'nowrap right',
 );
