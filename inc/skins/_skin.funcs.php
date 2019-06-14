@@ -1466,7 +1466,7 @@ function skin_init( $disp )
 				header_redirect( $selected_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
 			}
 
-			// Prepare the 'In-skin editing':
+			// Prepare the 'In-skin editing' / 'In-skin change proposal':
 			init_inskin_editing();
 			break;
 
