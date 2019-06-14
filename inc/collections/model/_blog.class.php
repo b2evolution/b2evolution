@@ -1182,6 +1182,7 @@ class Blog extends DataObject
 			$this->set_setting( 'search_score_post_tags', param( 'search_score_post_tags', 'integer', 0 ) );
 			$this->set_setting( 'search_score_post_excerpt', param( 'search_score_post_excerpt', 'integer', 0 ) );
 			$this->set_setting( 'search_score_post_titletag', param( 'search_score_post_titletag', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_metakeywords', param( 'search_score_post_metakeywords', 'integer', 0 ) );
 			$this->set_setting( 'search_score_post_author', param( 'search_score_post_author', 'integer', 0 ) );
 			$this->set_setting( 'search_score_post_date_future', param( 'search_score_post_date_future', 'integer', 0 ) );
 			$this->set_setting( 'search_score_post_date_moremonth', param( 'search_score_post_date_moremonth', 'integer', 0 ) );
