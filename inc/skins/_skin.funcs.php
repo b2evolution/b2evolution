@@ -225,11 +225,7 @@ function skin_init( $disp )
 					}
 				}
 
-				if( $canonical_is_same_url )
-				{	// Decide current URL is resolved when it is same as canonical:
-					$url_resolved = true;
-				}
-				else
+				if( ! $canonical_is_same_url )
 				{	// The requested URL does not look like the canonical URL for this post...
 					// url difference was resolved
 					$url_resolved = false;
@@ -264,22 +260,21 @@ function skin_init( $disp )
 						}
 						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
-				}
-
-				if( ! $url_resolved &&
-				    $Blog->get_setting( 'canonical_item_urls' ) &&
-				    $redir == 'yes' &&
-				    ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) || // If Item has main category in the current collection
-				      $Item->is_part_of_blog( $Blog->ID ) // If Item has extra category from not main collection
-				    ) )
-				{	// REDIRECT TO THE CANONICAL URL:
-					$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
-					header_redirect( $canonical_url, true );
-					// EXITED.
-				}
-				else
-				{	// Use rel="canoncial" with MAIN canoncial URL:
-					add_headline( '<link rel="canonical" href="'.$main_canonical_url.'" />' );
+					if( ! $url_resolved &&
+					    $Blog->get_setting( 'canonical_item_urls' ) &&
+					    $redir == 'yes' &&
+					    ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) || // If Item has main category in the current collection
+					      $Item->is_part_of_blog( $Blog->ID ) // If Item has extra category from not main collection
+					    ) )
+					{	// REDIRECT TO THE CANONICAL URL:
+						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
+						header_redirect( $canonical_url, true );
+						// EXITED.
+					}
+					else
+					{	// Use rel="canoncial" with MAIN canoncial URL:
+						add_headline( '<link rel="canonical" href="'.$main_canonical_url.'" />' );
+					}
 				}
 			}
 
