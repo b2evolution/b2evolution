@@ -60,7 +60,7 @@ function link_add_iframe( $link_destination )
 	global $LinkOwner, $current_File, $iframe_name, $link_type;
 	$link_owner_ID = $LinkOwner->get_ID();
 
-	if( $current_File->is_dir() && isset( $iframe_name ) )
+	if( $current_File && $current_File->is_dir() && isset( $iframe_name ) )
 	{
 		$root = $current_File->get_FileRoot()->ID;
 		$path = $current_File->get_rdfp_rel_path();
