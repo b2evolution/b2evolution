@@ -73,7 +73,7 @@ function display_link()
 
 	if( empty( $current_File ) )
 	{
-		return '?';
+		return '<span class="text-danger">Broken File!</span>';
 	}
 
 	$r = '';

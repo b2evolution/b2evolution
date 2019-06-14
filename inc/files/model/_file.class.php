@@ -344,8 +344,16 @@ class File extends DataObject
 			}
 
 			// We check that we got something AND that the CASE matches (because of case insensitive collations on MySQL)
-			if( $row && $row->file_path == $this->_rdfp_rel_path )
+			if( $row &&
+			    ( $row->file_path == $this->_rdfp_rel_path ||
+			      $row->file_path == '/'.$this->_rdfp_rel_path ) )
 			{ // We found meta data
+				if( $row->file_path == '/'.$this->_rdfp_rel_path )
+				{	// Fix wrong path started with "/":
+					$DB->query( 'UPDATE T_files
+						  SET file_path = '.$DB->quote( $this->_rdfp_rel_path ).'
+						WHERE file_ID = '.$DB->quote( $row->file_ID ) );
+				}
 				$Debuglog->add( "Loaded metadata for {$this->_FileRoot->ID}:{$this->_rdfp_rel_path}", 'files' );
 				$this->meta  = 'loaded';
 				$this->ID    = $row->file_ID;
