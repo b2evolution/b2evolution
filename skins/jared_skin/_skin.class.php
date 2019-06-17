@@ -262,7 +262,7 @@ class jared_Skin extends Skin
 						'type' => 'checkbox',
 					),
 					'section_1_navbar_text_color' => array(
-						'label' => T_('Top navigation text color'),
+						'label' => T_('Top nav text color for transparent bg'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -657,7 +657,7 @@ class jared_Skin extends Skin
 					'label'  => T_('Section 6 - Header for Standalone Pages')
 				),
 					'section_6_navbar_text_color' => array(
-						'label' => T_('Top navigation text color'),
+						'label' => T_('Top nav text color for transparent bg'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -734,7 +734,7 @@ class jared_Skin extends Skin
 					'label'  => T_('Section 7 - Header for Contact form and Messaging')
 				),
 					'section_7_navbar_text_color' => array(
-						'label' => T_('Top navigation text color'),
+						'label' => T_('Top nav text color for transparent bg'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -810,7 +810,7 @@ class jared_Skin extends Skin
 					'label'  => T_('Section - Restricted access disps') . ' ( disp=login || disp=register || disp=lostpassword || disp=activateinfo || disp=access_denied || disp=access_requires_login )'
 				),
 					'section_access_navbar_text_color' => array(
-						'label' => T_('Top navigation text color'),
+						'label' => T_('Top nav text color for transparent bg'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -837,7 +837,7 @@ class jared_Skin extends Skin
 					'label'  => T_('Section - Header for other disps')
 				),
 					'section_oth_navbar_text_color' => array(
-						'label' => T_('Top navigation text color'),
+						'label' => T_('Top nav text color for transparent bg'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -1225,7 +1225,7 @@ class jared_Skin extends Skin
 			if( $this->get_setting( 'section_1_display' ) )
 			{
 				if( $this->get_setting( 'nav_bg_transparent' ) )
-				{	// Top navigation text color:
+				{	// Top nav text color for transparent bg:
 					$this->dynamic_style_rule( 'section_1_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 				}
 				// Background image:
@@ -1445,7 +1445,7 @@ class jared_Skin extends Skin
 		{
 			if( $this->get_setting( 'nav_bg_transparent' ) )
 			{
-				// Top navigation text color:
+				// Top nav text color for transparent bg:
 				$this->dynamic_style_rule( 'section_6_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 			}
 			// Background image:
@@ -1490,7 +1490,7 @@ class jared_Skin extends Skin
 		{
 			if( $this->get_setting( 'nav_bg_transparent' ) )
 			{
-				// Top navigation text color:
+				// Top nav text color for transparent bg:
 				$this->dynamic_style_rule( 'section_7_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 			}
 			// Background image:
@@ -1535,7 +1535,7 @@ class jared_Skin extends Skin
 		{
 			if( $this->get_setting( 'nav_bg_transparent' ) )
 			{
-				// Top navigation text color:
+				// Top nav text color for transparent bg:
 				$this->dynamic_style_rule( 'section_access_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 			}
 			// Background image:
@@ -1550,7 +1550,7 @@ class jared_Skin extends Skin
 		if( $this->get_setting( 'nav_bg_transparent' ) &&
 		    ! in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'msgform', 'threads', 'page' ) ) )
 		{
-			// Top navigation text color:
+			// Top nav text color for transparent bg:
 			$this->dynamic_style_rule( 'section_oth_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 		}
 		// Background image:
