@@ -24,6 +24,13 @@ $app_version = '7.0.1-beta';
 $app_date = '2019-06-17';
 
 /**
+ * Is this b2evolution PRO?
+ * If the PRO modules are available some UI elements will be set up differently.
+ * @global boolean
+ */
+$app_pro = false;
+
+/**
  * Long version string for checking differences
  */
 $app_version_long = $app_version.'-'.$app_date;
