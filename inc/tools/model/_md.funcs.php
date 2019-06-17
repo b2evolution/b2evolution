@@ -456,6 +456,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		}
 		else
 		{
+			$item_data = NULL;
 			$item_title = $item_slug;
 		}
 
@@ -477,14 +478,17 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		{	// Use default category:
 			if( ! isset( $default_category_ID ) )
 			{	// If category is still not defined then we should create default, because blog must has at least one category
-				$new_Chapter = new Chapter( NULL, $md_blog_ID );
-				$new_Chapter->set( 'name', T_('Uncategorized') );
-				$default_category_name = $md_Blog->get( 'urlname' ).'-main';
-				$new_Chapter->set( 'urlname', urltitle_validate( $default_category_name, $default_category_name, 0, false, 'cat_urlname', 'cat_ID', 'T_categories' ) );
-				$new_Chapter->dbinsert();
-				$default_category_ID = $new_Chapter->ID;
-				// Add new created Chapter into cache to avoid wrong main category ID in ItemLight::get_main_Chapter():
-				$ChapterCache->add( $new_Chapter );
+				$default_category_urlname = $md_Blog->get( 'urlname' ).'-main';
+				if( ! ( $default_Chapter = & $ChapterCache->get_by_urlname( $default_category_urlname, false, false ) ) )
+				{	// Create default category if it doesn't exist yet:
+					$default_Chapter = new Chapter( NULL, $md_blog_ID );
+					$default_Chapter->set( 'name', T_('Uncategorized') );
+					$default_Chapter->set( 'urlname', urltitle_validate( $default_category_urlname, $default_category_urlname, 0, false, 'cat_urlname', 'cat_ID', 'T_categories' ) );
+					$default_Chapter->dbinsert();
+					// Add new created Chapter into cache to avoid wrong main category ID in ItemLight::get_main_Chapter():
+					$ChapterCache->add( $default_Chapter );
+				}
+				$default_category_ID = $default_Chapter->ID;
 			}
 			$category_ID = $default_category_ID;
 		}
@@ -506,12 +510,13 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		$prev_category_ID = $Item->get( 'main_cat_ID' );
 		// Set new category for new Item or when post was moved to different category:
 		$Item->set( 'main_cat_ID', $category_ID );
-		$Item->set( 'extra_cat_IDs', array( $category_ID ) );
+		$extra_cats = array( $category_ID => NULL );
+		$extra_cats_errors = '';
 
 		$prev_last_import_hash = $Item->get_setting( 'last_import_hash' );
 		$Item->set_setting( 'last_import_hash', $item_content_hash );
 		if( $prev_last_import_hash != $item_content_hash )
-		{	// Set new fields only when import hash(title + content) was really changed:
+		{	// Set new fields only when import hash(title + content + YAML data) was really changed:
 			if( $convert_md_links )
 			{	// Convert Markdown relative links to b2evolution ShortLinks:
 				$item_content = preg_replace_callback( '#\[([^\]]*)\]\((.+/)?(.+?)\.md(\#[^\)]+)?\)#', 'md_callback_convert_links', $item_content );
@@ -542,11 +547,31 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			{	// Set meta description from yaml data:
 				$Item->set_setting( 'metadesc', $item_data['description'] );
 			}
-			if( isset( $item_data['description'] ) )
+			if( isset( $item_data['keywords'] ) )
 			{	// Set meta keywords from yaml data:
 				$Item->set_setting( 'metakeywords', $item_data['keywords'] );
 			}
+			// Set/Clear tags from yaml data:
+			$Item->set_tags_from_string( isset( $item_data['tags'] ) && is_array( $item_data['tags'] ) ? implode( ',', $item_data['tags'] ) : '' );
+			// Set extra categories from yaml data:
+			if( ! empty( $item_data['extra-cats'] ) )
+			{
+				foreach( $item_data['extra-cats'] as $extra_cat_slug )
+				{
+					if( $extra_Chapter = & md_get_Chapter( $extra_cat_slug, $md_blog_ID, strpos( $extra_cat_slug, '/' ) !== false ) )
+					{	// Use only existing category:
+						$extra_cats[ $extra_Chapter->ID ] = NULL;
+					}
+					else
+					{	// Display error on not existing category:
+						$extra_cats_errors .= '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Skip extra category %s, because it doesn\'t exist.', '<code>'.$extra_cat_slug.'</code>' ).'</li>';
+					}
+				}
+			}
 		}
+
+		// Set extra categories:
+		$Item->set( 'extra_cat_IDs', array_keys( $extra_cats ) );
 
 		if( empty( $Item->ID ) )
 		{	// Insert new Item:
@@ -595,11 +620,16 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			}
 		}
 
+		if( ! empty( $extra_cats_errors ) )
+		{	// Display errors of linking to extra categories:
+			echo ',<ul class="list-default" style="margin-bottom:0">'.$extra_cats_errors.'</ul>';
+		}
+
 		$files_imported = false;
 		if( ! empty( $Item->ID ) )
 		{
 			// Link files:
-			if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)"]+\.(jpe?g|gif|png))\s*("[^"]*")?\)#i', $item_content, $image_matches ) )
+			if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)"]+\.('.md_get_image_extensions().'))\s*("[^"]*")?\)#i', $item_content, $image_matches ) )
 			{
 				$updated_item_content = $item_content;
 				$LinkOwner = new LinkItem( $Item );
@@ -609,7 +639,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 						'folder_path'    => 'quick-uploads/'.$Item->get( 'urltitle' ),
 						'import_type'    => $import_type,
 					);
-				echo ',<ul class="list-default">';
+				echo ( empty( $extra_cats_errors ) ? ',' : '' ).'<ul class="list-default">';
 				foreach( $image_matches[2] as $i => $image_relative_path )
 				{
 					$file_params['file_alt'] = trim( $image_matches[1][$i] );
@@ -901,10 +931,18 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
  *
  * @param string Category folder path
  * @param string Collection ID
+ * @param boolean Check by full path, FALSE - useful to find only by slug
  * @return object|NULL Chapter object
  */
-function & md_get_Chapter( $cat_folder_path, $blog_ID )
+function & md_get_Chapter( $cat_folder_path, $blog_ID, $check_full_path = true )
 {
+	global $evo_md_chapters_by_path;
+
+	if( isset( $evo_md_chapters_by_path[ $cat_folder_path ] ) )
+	{	// Get Chapter from cache:
+		return $evo_md_chapters_by_path[ $cat_folder_path ];
+	}
+
 	global $DB;
 
 	$cat_full_url_path = explode( '/', $cat_folder_path );
@@ -922,30 +960,36 @@ function & md_get_Chapter( $cat_folder_path, $blog_ID )
 	$SQL->WHERE_and( 'cat_urlname REGEXP '.$DB->quote( '^('.$cat_urlname_base.')(-[0-9]+)?$' ) );
 	$cat_IDs = $DB->get_col( $SQL );
 
+	$r = NULL;
 	$ChapterCache = & get_ChapterCache();
 	foreach( $cat_IDs as $cat_ID )
 	{
 		if( $Chapter = & $ChapterCache->get_by_ID( $cat_ID, false, false ) )
 		{
-			$cat_curr_url_path = explode( '/', substr( $Chapter->get_url_path(), 0 , -1 ) );
 			$full_match = true;
-			foreach( $cat_full_url_path as $c => $cat_full_url_folder )
-			{
-				// Decide slug is same without number at the end:
-				if( ! preg_match( '/^'.preg_quote( $cat_full_url_folder, '/' ).'(-\d+)?$/', $cat_curr_url_path[ $c ] ) )
+			if( $check_full_path )
+			{	// Check full path:
+				$cat_curr_url_path = explode( '/', substr( $Chapter->get_url_path(), 0 , -1 ) );
+				foreach( $cat_full_url_path as $c => $cat_full_url_folder )
 				{
-					$full_match = false;
-					break;
+					// Decide slug is same without number at the end:
+					if( ! isset( $cat_curr_url_path[ $c ] ) ||
+					    ! preg_match( '/^'.preg_quote( $cat_full_url_folder, '/' ).'(-\d+)?$/', $cat_curr_url_path[ $c ] ) )
+					{
+						$full_match = false;
+						break;
+					}
 				}
 			}
 			if( $full_match )
 			{	// We found category with same full url path:
-				return $Chapter;
+				$r = $Chapter;
+				break;
 			}
 		}
 	}
 
-	$r = NULL;
+	$evo_md_chapters_by_path[ $cat_folder_path ] = $r;
 	return $r;
 }
 
@@ -1001,5 +1045,28 @@ function md_callback_convert_links( $m )
 	return '(('.$item_slug
 		.( empty( $link_anchor ) ? '' : '#'.$link_anchor )
 		.( empty( $link_title ) ? '' : ' '.$link_title ).'))';
+}
+
+
+/**
+ * Get available image extensions
+ *
+ * @return string Image extensions separated by |
+ */
+function md_get_image_extensions()
+{
+	global $evo_md_image_extensions;
+
+	if( ! is_string( $evo_md_image_extensions ) )
+	{	// Load image extensions from DB into cache string:
+		global $DB;
+		$SQL = new SQL( 'Get available image extensions' );
+		$SQL->SELECT( 'ftyp_extensions' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_viewtype = "image"' );
+		$evo_md_image_extensions = str_replace( ' ', '|', implode( ' ', $DB->get_col( $SQL ) ) );
+	}
+
+	return $evo_md_image_extensions;
 }
 ?>

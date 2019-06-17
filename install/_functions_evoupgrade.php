@@ -11755,7 +11755,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		{	// Insert new SVG file type only if it doesn't exist:
 			$DB->query( 'INSERT INTO T_filetypes
 				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
-				VALUES ( "svg", "SVG file", "image/svg+xml", "file_document", "text", "admin" )' );
+				VALUES ( "svg", "SVG file", "image/svg+xml", "file_document", "image", "admin" )' );
 		}
 		upg_task_end();
 	}
