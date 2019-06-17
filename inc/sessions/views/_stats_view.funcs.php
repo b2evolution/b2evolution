@@ -541,6 +541,20 @@ function hit_referer_type_color( $hit_referer_type )
 
 
 /**
+ * Display IP address with WHOIS lookup icon
+ *
+ * @param string IP address in format xxx.xxx.xxx.xxx
+ * @return string IP address with whois lookup icon
+ */
+function hit_ip_address_lookup( $IP_address )
+{
+	global  $admin_url;
+
+	return $IP_address.'&nbsp;'.action_icon( '', 'magnifier', $admin_url.'?ctrl=antispam&amp;action=whois&amp;query='.$IP_address);
+}
+
+
+/**
  * Get status code of IP range by IP address
  *
  * @param string IP address in format xxx.xxx.xxx.xxx
