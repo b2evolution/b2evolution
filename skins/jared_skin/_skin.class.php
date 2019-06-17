@@ -192,20 +192,25 @@ class jared_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Top Navigation Bar Settings')
 				),
-					'nav_bg_transparent' => array(
-						'label' => T_('Transparent background'),
-						'note' => T_('Check this to enable transparent background until navigation breaks into hamburger layout.'),
-						'defaultvalue' => 1,
-						'type' => 'checkbox',
-					),
 					'nav_bg_color' => array(
 						'label' => T_('Background color'),
 						'note' => T_('This color will be used if Background image is not set or does not exist.'),
 						'defaultvalue' => '#333333',
 						'type' => 'color',
 					),
+					'nav_links_color' => array(
+						'label' => T_('Text/Links color'),
+						'defaultvalue' => '#FFFFFF',
+						'type' => 'color',
+					),
+					'nav_bg_transparent' => array(
+						'label' => T_('Transparent background'),
+						'note' => T_('Check this to enable transparent background until navigation breaks into hamburger layout.'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
 					'nav_colltitle_size' => array(
-						'label' => T_('Collection title font size'),
+						'label' => T_('Title font size'),
 						'note' => 'px. ' . T_('Set font size for collection title in navigation.'),
 						'defaultvalue' => '18',
 						'type' => 'integer',
@@ -219,11 +224,6 @@ class jared_Skin extends Skin
 						'type' => 'integer',
 						'size' => '2',
 						'allow_empty' => false,
-					),
-					'nav_links_color' => array(
-						'label' => T_('Links color'),
-						'defaultvalue' => '#FFFFFF',
-						'type' => 'color',
 					),
 				'navigation_section_end' => array(
 					'layout' => 'end_fieldset',
@@ -1178,7 +1178,7 @@ class jared_Skin extends Skin
 				// ... exclude background-color in mentioned media queries and set transparent
 				'@media (min-width: 1025px) { .navbar { background-color: transparent } }' );
 			if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
-			{	// Links color:
+			{	// Text/Links color:
 				$this->dynamic_style_rule( 'nav_links_color', '@media (max-width: 1024px) { .affix-top a { color: $setting_value$ !important } }' );
 			}
 		}
@@ -1187,7 +1187,7 @@ class jared_Skin extends Skin
 			// Background color:
 			$this->dynamic_style_rule( 'nav_bg_color', '.navbar { background-color: $setting_value$ }' );
 		}
-		// Collection title font size:
+		// Title font size:
 		$this->dynamic_style_rule( 'nav_colltitle_size', '.navbar.main-header-navigation .navbar-brand > h3 a { font-size: $setting_value$ }', array(
 			'suffix' => 'px'
 		) );
@@ -1199,7 +1199,7 @@ class jared_Skin extends Skin
 			'.navbar.main-header-navigation.navbar-default .navbar-nav li > a { font-size: $setting_value$ }',
 			array( 'suffix' => 'px' )
 		);
-		// Links color:
+		// Text/Links color:
 		$this->dynamic_style_rule( 'nav_links_color',
 			'.navbar.navbar-default a, '.
 			'.navbar.navbar-default a:hover, '.
@@ -1491,7 +1491,7 @@ class jared_Skin extends Skin
 			if( $this->get_setting( 'nav_bg_transparent' ) )
 			{
 				// Top navigation text color:
-				$this->dynamic_style_rule( 'section_7_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }' );
+				$this->dynamic_style_rule( 'section_7_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 			}
 			// Background image:
 			$this->dynamic_style_rule( 'section_7_image_file_ID', '.evo_container__standalone_page_area_7 { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
@@ -1536,7 +1536,7 @@ class jared_Skin extends Skin
 			if( $this->get_setting( 'nav_bg_transparent' ) )
 			{
 				// Top navigation text color:
-				$this->dynamic_style_rule( 'section_access_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }' );
+				$this->dynamic_style_rule( 'section_access_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 			}
 			// Background image:
 			$this->dynamic_style_rule( 'section_access_image_file_ID', '.restricted_access_disps { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
@@ -1551,7 +1551,7 @@ class jared_Skin extends Skin
 		    ! in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'msgform', 'threads', 'page' ) ) )
 		{
 			// Top navigation text color:
-			$this->dynamic_style_rule( 'section_oth_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }' );
+			$this->dynamic_style_rule( 'section_oth_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 		}
 		// Background image:
 		$this->dynamic_style_rule( 'section_oth_image_file_ID', '.evo_container__standalone_page_area_oth { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );

@@ -873,6 +873,13 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
 .evo_widget.widget_core_coll_related_post_list.evo_layout_rwd .widget_rwd_content {
   background: transparent;
 }
+.evo_widget.widget_core_item_content ul {
+  display: block;
+  margin-left: 25px;
+}
+.evo_widget.widget_core_item_content ul:last-child {
+  margin-left: 25px;
+}
 .widget_register_form .panel,
 .widget_core_user_login .panel {
   background: transparent;
