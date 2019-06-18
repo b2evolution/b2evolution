@@ -564,7 +564,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 					}
 					else
 					{	// Display error on not existing category:
-						$extra_cats_errors .= '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Skip extra category %s, because it doesn\'t exist.', '<code>'.$extra_cat_slug.'</code>' ).'</li>';
+						$extra_cats_errors .= '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Skip extra category %s, because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>' ).'</li>';
 					}
 				}
 			}
@@ -577,7 +577,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		{	// Insert new Item:
 			if( $Item->dbinsert() )
 			{	// If post is inserted successfully:
-				echo '<span class="text-success">'.T_('Is new -> Added to DB').'</span>';
+				echo '<span class="text-success">'.sprintf( T_('Is new -> <a %s>Added to DB</a>'), 'href="'.$Item->get_permanent_url().'"' ).'</span>';
 				$post_results_num['added_success']++;
 			}
 			else
@@ -591,11 +591,11 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			if( $prev_last_import_hash == $item_content_hash && $prev_category_ID == $category_ID )
 			{	// Don't try to update item in DB because import hash(title + content) was not changed after last import:
 				$post_results_num['no_changed']++;
-				echo T_('No change');
+				echo '<a href="'.$Item->get_permanent_url().'">'.T_('No change').'</a>';
 			}
 			elseif( $Item->dbupdate( true, true, true, $prev_last_import_hash != $item_content_hash/* Force to create new revision only when file hash(title+content) was changed after last import */ ) )
 			{	// Item has been updated successfully:
-				echo '<span class="text-warning">'.T_('Has changed');
+				echo '<span class="text-warning"><a href="'.$Item->get_permanent_url().'">'.T_('Has changed').'</a>';
 				if( $prev_category_ID != $category_ID )
 				{	// If moved to different category:
 					echo ' -> '.T_('Moved to different category');
