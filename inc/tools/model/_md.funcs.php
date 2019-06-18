@@ -586,16 +586,22 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		// Set extra categories:
 		$Item->set( 'extra_cat_IDs', array_keys( $extra_cats ) );
 
+		$item_result_messages = array();
+		$item_result_class = '';
+		$item_result_suffix = '';
 		if( empty( $Item->ID ) )
 		{	// Insert new Item:
 			if( $Item->dbinsert() )
 			{	// If post is inserted successfully:
-				echo '<span class="text-success">'.sprintf( T_('Is new -> <a %s>Added to DB</a>'), 'href="'.$Item->get_permanent_url().'" target="_blank"' ).'</span>';
+				$item_result_class = 'text-success';
+				$item_result_messages[] = /* TRANS: Result of imported Item */ T_('Is new');
+				$item_result_messages[] = /* TRANS: Result of imported Item */ T_('Added to DB');
 				$post_results_num['added_success']++;
 			}
 			else
 			{	// Don't translate because it should not happens:
-				echo '<span class="text-danger">Cannot be inserted</span>';
+				$item_result_messages[] = 'Cannot be inserted';
+				$item_result_class = 'text-danger';
 				$post_results_num['added_failed']++;
 			}
 		}
@@ -604,34 +610,48 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			if( $prev_last_import_hash == $item_content_hash && $prev_category_ID == $category_ID )
 			{	// Don't try to update item in DB because import hash(title + content) was not changed after last import:
 				$post_results_num['no_changed']++;
-				echo '<a href="'.$Item->get_permanent_url().'" target="_blank">'.T_('No change').'</a>';
+				$item_result_messages[] = /* TRANS: Result of imported Item */ T_('No change');
 			}
 			elseif( $Item->dbupdate( true, true, true, $prev_last_import_hash != $item_content_hash/* Force to create new revision only when file hash(title+content) was changed after last import */ ) )
 			{	// Item has been updated successfully:
-				echo '<span class="text-warning"><a href="'.$Item->get_permanent_url().'" target="_blank">'.T_('Has changed').'</a>';
+				$item_result_class = 'text-warning';
+				$item_result_messages[] = /* TRANS: Result of imported Item */ T_('Has changed');
 				if( $prev_category_ID != $category_ID )
 				{	// If moved to different category:
-					echo ' -> '.T_('Moved to different category');
+					$item_result_messages[] =/* TRANS: Result of imported Item */  T_('Moved to different category');
 				}
 				if( $prev_last_import_hash != $item_content_hash )
 				{	// If content was changed:
-					echo ' -> '.T_('New revision added to DB');
+					$item_result_messages[] = /* TRANS: Result of imported Item */ T_('New revision added to DB');
 					if( $prev_last_import_hash === NULL )
 					{	// Display additional warning when Item was edited manually:
 						global $admin_url;
-						echo '. <br /><span class="label label-danger">'.T_('CONFLICT').'</span> <b>'.sprintf( T_('WARNING: this item has been manually edited. Check <a %s>changes history</a>'), 'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$Item->ID.'" target="_blank"' ).'</b>';
+						$item_result_suffix = '. <br /><span class="label label-danger">'.T_('CONFLICT').'</span> <b>'
+							.sprintf( T_('WARNING: this item has been manually edited. Check <a %s>changes history</a>'),
+								'href="'.$admin_url.'?ctrl=items&amp;action=history&amp;p='.$Item->ID.'" target="_blank"' ).'</b>';
 					}
 				}
-				echo '</span>';
 				$post_results_num['updated_success']++;
 			}
 			else
 			{	// Failed update:
 				// Don't translate because it should not happens:
-				echo '<span class="text-danger"><a href="'.$Item->get_permanent_url().'" target="_blank">Cannot be updated</a></span>';
+				$item_result_messages[] = 'Cannot be updated';
+				$item_result_class = 'text-danger';
 				$post_results_num['updated_failed']++;
 			}
 		}
+
+		// Display result messages of Item inserting or updating:
+		echo empty( $item_result_class ) ? '' : '<span class="'.$item_result_class.'">';
+		if( $Item->ID > 0 )
+		{	// Set last message text as link to permanent URL of the inserted/updated Item:
+			$last_msg_i = count( $item_result_messages ) - 1;
+			$item_result_messages[ $last_msg_i ] = '<a href="'.$Item->get_permanent_url().'" target="_blank">'.$item_result_messages[ $last_msg_i ].'</a>';
+		}
+		echo implode( ' -> ', $item_result_messages );
+		echo $item_result_suffix;
+		echo empty( $item_result_class ) ? '' : '</span>';
 
 		if( ! empty( $extra_cats_errors ) )
 		{	// Display errors of linking to extra categories:
