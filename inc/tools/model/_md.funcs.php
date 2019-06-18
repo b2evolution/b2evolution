@@ -551,8 +551,21 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			{	// Set meta keywords from yaml data:
 				$Item->set_setting( 'metakeywords', $item_data['keywords'] );
 			}
-			// Set/Clear tags from yaml data:
-			$Item->set_tags_from_string( isset( $item_data['tags'] ) && is_array( $item_data['tags'] ) ? implode( ',', $item_data['tags'] ) : '' );
+			if( isset( $item_data['tags'] ) )
+			{	// Update tags only when they are defined:
+				if( empty( $item_data['tags'] ) )
+				{	// Clear tags:
+					$Item->set_tags_from_string( '' );
+				}
+				else
+				{	// Set new tags:
+					$Item->set_tags_from_string( is_array( $item_data['tags'] )
+						// Set tags from array:
+						? implode( ',', $item_data['tags'] )
+						// Set tags from string separated by comma:
+						: preg_replace( '#,\s+#', ',', $item_data['tags'] ) );
+				}
+			}
 			// Set extra categories from yaml data:
 			if( ! empty( $item_data['extra-cats'] ) )
 			{
