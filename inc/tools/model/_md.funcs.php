@@ -771,6 +771,8 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_categor
 			'import_type'    => 'replace',
 		), $params );
 
+	$requested_file_relative_path = str_replace( '\\', '/', $requested_file_relative_path );
+
 	$source_file_relative_path = $source_category_folder.'/'.$requested_file_relative_path;
 	$file_source_path = $source_folder_absolute_path.'/'.$source_file_relative_path;
 
