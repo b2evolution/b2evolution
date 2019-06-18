@@ -650,7 +650,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 					}
 					$file_params['file_title'] = trim( $image_matches[4][$i], ' "' );
 					// Try to find existing and linked image File or create, copy and link image File:
-					if( $link_ID = md_link_file( $LinkOwner, $folder_path, $category_path.'/'.rtrim( $image_relative_path ), $file_params ) )
+					if( $link_ID = md_link_file( $LinkOwner, $folder_path, $category_path, rtrim( $image_relative_path ), $file_params ) )
 					{	// Replace this img tag from content with b2evolution format:
 						$updated_item_content = str_replace( $image_matches[0][$i], '[image:'.$link_ID.']', $updated_item_content );
 					}
@@ -722,11 +722,12 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
  *
  * @param object LinkOwner
  * @param string Source folder absolute path
- * @param string Source file relative path
+ * @param string Source Category folder name
+ * @param string Requested file relative path
  * @param array Params
  * @return boolean|integer FALSE or Link ID on success
  */
-function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_relative_path, $params )
+function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_category_folder, $requested_file_relative_path, $params )
 {
 	$params = array_merge( array(
 			'file_root_type' => 'collection',
@@ -737,15 +738,17 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_file_re
 			'import_type'    => 'replace',
 		), $params );
 
-	if( preg_match( '#(^|[/\\\\])..[/\\\\]#', $source_file_relative_path ) )
+	$source_file_relative_path = $source_category_folder.'/'.$requested_file_relative_path;
+	$file_source_path = $source_folder_absolute_path.'/'.$source_file_relative_path;
+
+	if( strpos( $requested_file_relative_path, '/' ) === 0 ||
+	    strpos( get_canonical_path( $file_source_path ), $source_folder_absolute_path ) !== 0 )
 	{	// Don't allow a traversal directory:
-		echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Skip file %s, because path is invalid.', '<code>'.$source_file_relative_path.'</code>' ).'</li>';
+		echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Skip file %s, because path is invalid.', '<code>'.$requested_file_relative_path.'</code>' ).'</li>';
 		evo_flush();
 		// Skip it:
 		return false;
 	}
-
-	$file_source_path = $source_folder_absolute_path.'/'.$source_file_relative_path;
 
 	if( ! file_exists( $file_source_path ) )
 	{	// File doesn't exist
