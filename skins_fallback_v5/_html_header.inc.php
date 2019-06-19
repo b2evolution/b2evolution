@@ -57,6 +57,7 @@ echo $params['html_tag'];
 		request_title( $params );
 		// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?></title>
+	<?php skin_favicon_tag(); ?>
 	<?php skin_description_tag(); ?>
 	<?php skin_keywords_tag(); ?>
 	<?php skin_opengraph_tags(); ?>

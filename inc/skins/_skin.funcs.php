@@ -196,7 +196,7 @@ function skin_init( $disp )
 			// Please document encountered problems.
 			if( ! $preview &&
 			    ( ( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
-			      || $Blog->get_setting( 'relcanonical_item_urls' ) 
+			      || $Blog->get_setting( 'relcanonical_item_urls' )
 			      || $Blog->get_setting( 'self_canonical_item_urls' )
 			    ) )
 			{	// We want to redirect to the Item's canonical URL:
@@ -2469,6 +2469,29 @@ function skin_keywords_tag()
 	if( !empty($r) )
 	{
 		echo '<meta name="keywords" content="'.format_to_output( $r, 'htmlattr' )."\" />\n";
+	}
+}
+
+
+/**
+ * Template tag
+ *
+ * Note for future mods: we do NOT want to repeat identical content on multiple pages.
+ */
+function skin_favicon_tag()
+{
+	global $Collection, $Blog;
+
+	if( ! empty( $Blog ) )
+	{
+		if( $favicon_File = $Blog->get( 'collection_favicon') )
+		{
+			if( $favicon_File->exists() && $favicon_File->is_image() )
+			{
+				$favicon_Filetype = $favicon_File->get_Filetype();
+				echo sprintf( '<link rel="icon" type="%s" href="%s">', $favicon_Filetype->mimetype, $favicon_File->get_url() );
+			}
+		}
 	}
 }
 
