@@ -861,7 +861,8 @@ function create_default_data()
 			(24, 'xml', 'XML file', 'application/xml', 'file_www', 'browser', 'admin'),
 			(25, 'md', 'Markdown text file', 'text/plain', 'file_document', 'text', 'registered'),
 			(26, 'csv', 'CSV file', 'text/plain', 'file_document', 'text', 'registered'),
-			(27, 'svg', 'SVG file', 'image/svg+xml', 'file_document', 'image', 'admin')
+			(27, 'svg', 'SVG file', 'image/svg+xml', 'file_document', 'image', 'admin'),
+			(28, 'ico', 'ICO image', 'image/x-icon', 'file_image', 'image', 'admin')
 		" );
 	task_end();
 

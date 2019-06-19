@@ -11760,6 +11760,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15480, 'Creating ICO file type...') )
+	{	// part of 7.0.1-beta
+		$SQL = new SQL( 'Check for file type .ico' );
+		$SQL->SELECT( 'ftyp_ID' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_extensions REGEXP "(^| )ico( |$)"' );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Insert new ICO file type only if it doesn't exist:
+			$DB->query( 'INSERT INTO T_filetypes
+				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
+				VALUES ( "ico", "ICO image", "image/x-icon", "file_image", "image", "admin" )' );
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
