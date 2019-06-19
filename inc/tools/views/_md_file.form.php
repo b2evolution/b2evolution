@@ -51,11 +51,15 @@ if( ! empty( $import_files ) )
 	$import_type = param( 'import_type', 'string', NULL );
 	$delete_files = param( 'delete_files', 'integer', NULL );
 	$reuse_cats = param( 'reuse_cats', 'integer', NULL );
+	$convert_md_links = param( 'convert_md_links', 'integer', NULL );
+	$force_item_update = param( 'force_item_update', 'integer', NULL );
 	if( $import_type === NULL )
 	{	// Set default form params:
 		$import_type = 'update';
 		$delete_files = 0;
 		$reuse_cats = 1;
+		$convert_md_links = 1;
+		$force_item_update = 0;
 	}
 
 	$Form->radio_input( 'import_type', $import_type, array(
@@ -93,7 +97,10 @@ if( ! empty( $import_files ) )
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
-	$Form->checkbox_input( 'convert_md_links', $reuse_cats, T_('Options'), array( 'input_suffix' => T_('Convert Markdown relative links to b2evolution ShortLinks') ) );
+	$Form->checklist( array(
+			array( 'convert_md_links', '1', T_('Convert Markdown relative links to b2evolution ShortLinks'), $convert_md_links ),
+			array( 'force_item_update', '1', T_('Force Item update, even if file hash has not changed'), $force_item_update ),
+		), 'md_options', T_('Options') );
 
 	$Form->end_fieldset();
 

@@ -27,7 +27,7 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 	$md_file = get_param( 'import_file' );
 	$md_import_data = md_get_import_data( $md_file );
 
-	echo '<p>';
+	echo '<p style="margin-bottom:0">';
 
 	if( $md_import_data['source_type'] == 'zip' )
 	{	// ZIP archive:
@@ -55,12 +55,20 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 			echo T_('Append to existing contents');
 			break;
 	}
+	echo '</p>';
+	$selected_options = array();
 	if( param( 'convert_md_links', 'integer', 0 ) )
 	{
-		echo '<br /><b>'.T_('Options').':</b> '.T_('Convert Markdown relative links to b2evolution ShortLinks');
+		$selected_options[] = T_('Convert Markdown relative links to b2evolution ShortLinks');
 	}
-
-	echo '</p>';
+	if( param( 'force_item_update', 'integer', 0 ) )
+	{
+		$selected_options[] = T_('Force Item update, even if file hash has not changed');
+	}
+	if( $selected_options_count = count( $selected_options ) )
+	{
+		echo '<b>'.T_('Options').':</b> '.( $selected_options_count == 1 ? $selected_options[0] : '<ul class="list-default"><li>'.implode( '</li><li>', $selected_options ).'</li></ul>' );
+	}
 
 	if( $md_import_data['errors'] === false )
 	{	// Import the data and display a report on the screen:

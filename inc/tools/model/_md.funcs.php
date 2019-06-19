@@ -91,6 +91,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 
 	// Options:
 	$convert_md_links = param( 'convert_md_links', 'integer', 0 );
+	$force_item_update = param( 'force_item_update', 'integer', 0 );
 
 	$DB->begin();
 
@@ -521,7 +522,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 
 		$prev_last_import_hash = $Item->get_setting( 'last_import_hash' );
 		$Item->set_setting( 'last_import_hash', $item_content_hash );
-		if( $prev_last_import_hash != $item_content_hash )
+		if( $force_item_update || $prev_last_import_hash != $item_content_hash )
 		{	// Set new fields only when import hash(title + content + YAML data) was really changed:
 			$Item->set( 'lastedit_user_ID', $current_User->ID );
 			$Item->set( 'title', $item_title );
@@ -609,7 +610,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		}
 		else
 		{	// Update existing Item:
-			if( $prev_last_import_hash == $item_content_hash && $prev_category_ID == $category_ID )
+			if( ! $force_item_update && $prev_last_import_hash == $item_content_hash && $prev_category_ID == $category_ID )
 			{	// Don't try to update item in DB because import hash(title + content) was not changed after last import:
 				$post_results_num['no_changed']++;
 				$item_result_messages[] = /* TRANS: Result of imported Item */ T_('No change');
@@ -617,7 +618,14 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			elseif( $Item->dbupdate( true, true, true, $prev_last_import_hash != $item_content_hash/* Force to create new revision only when file hash(title+content) was changed after last import */ ) )
 			{	// Item has been updated successfully:
 				$item_result_class = 'text-warning';
-				$item_result_messages[] = /* TRANS: Result of imported Item */ T_('Has changed');
+				if( $force_item_update )
+				{	// If item update was forced:
+					$item_result_messages[] = /* TRANS: Result of imported Item */ T_('Forced update');
+				}
+				else
+				{	// Normal update because content or category was changed:
+					$item_result_messages[] = /* TRANS: Result of imported Item */ T_('Has changed');
+				}
 				if( $prev_category_ID != $category_ID )
 				{	// If moved to different category:
 					$item_result_messages[] =/* TRANS: Result of imported Item */  T_('Moved to different category');
@@ -667,6 +675,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)"]+\.('.md_get_image_extensions().'))\s*("[^"]*")?\)#i', $item_content, $image_matches ) )
 			{
 				$updated_item_content = $item_content;
+				$all_links_count = 0;
 				$new_links_count = 0;
 				$LinkOwner = new LinkItem( $Item );
 				$file_params = array(
@@ -693,15 +702,24 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 						{	// Count new linked files:
 							$new_links_count++;
 						}
+						$all_links_count++;
 					}
 				}
 
-				if( $new_links_count > 0 )
+				if( ( $force_item_update && $all_links_count > 0 ) || $new_links_count > 0 )
 				{	// Update content for new markdown image links which were replaced with b2evo inline tags format:
-					echo '<li class="text-warning"><span class="label label-warning">'.T_('NOTE').'</span> '
-							.sprintf( '%d new image files were linked to the Item', $new_links_count )
-							.' -> <a href="'.$Item->get_permanent_url().'" target="_blank">'.T_('Saving to DB').'</a>.'
-						.'</li>';
+					echo '<li class="text-warning"><span class="label label-warning">'.T_('NOTE').'</span> ';
+					if( $force_item_update )
+					{	// Force to update content with inline image tags:
+						echo sprintf( '%d image inline tags were updated in the Item', $all_links_count )
+							.' -> <a href="'.$Item->get_permanent_url().'" target="_blank">'./* TRANS: Result of imported Item */ T_('Force saving to DB').'</a>.';
+					}
+					else
+					{	// Update content with new inline image tags:
+						echo sprintf( '%d new image files were linked to the Item', $new_links_count )
+							.' -> <a href="'.$Item->get_permanent_url().'" target="_blank">'./* TRANS: Result of imported Item */ T_('Saving to DB').'</a>.';
+					}
+					echo '</li>';
 					$Item->set( 'content', $updated_item_content );
 					$Item->dbupdate( true, true, true, 'no'/* Force to do NOT create new revision because we do this above when store new content */ );
 				}
