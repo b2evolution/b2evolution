@@ -4427,24 +4427,28 @@ class Blog extends DataObject
 	 */
 	function contact_link( $params = array() )
 	{
-		$owner_User = & $this->get_owner_User();
-		if( ! $owner_User->get_msgform_possibility() )
-		{
-			return false;
-		}
-
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'      => ' ',
 				'after'       => ' ',
 				'text'        => 'Contact', // Note: left untranslated, should be translated in skin anyway
 				'title'       => 'Send a message to the owner of this blog...',
+				'class'       => 'contact_link',
+				'with_redirect'=> true,
 			), $params );
 
+		$contact_url = $this->get_contact_url( $params['with_redirect'] );
+		if( empty( $contact_url ) )
+		{	// If contact URL is not available:
+			return false;
+		}
 
 		echo $params['before'];
-		echo '<a href="'.$this->get_contact_url(true).'" title="'.$params['title'].'" class="contact_link">'
-					.$params['text'].'</a>';
+		echo '<a href="'.$contact_url.'" '
+					.'title="'.format_to_output( $params['title'], 'htmlattr' ).'" '
+					.'class="'.format_to_output( $params['class'], 'htmlattr' ).'">'
+				.format_to_output( $params['text'] )
+			.'</a>';
 		echo $params['after'];
 
 		return true;
@@ -4525,16 +4529,19 @@ class Blog extends DataObject
 
 		if( $with_redirect )
 		{
-			if( $owner_User->get_msgform_possibility() != 'login' )
-			{
-				$blog_contact_url = url_add_param( $blog_contact_url, 'redirect_to='
-					// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
-					.rawurlencode( regenerate_url('','','','&') ) );
+			if( param( 'redirect_to', 'url', NULL ) !== NULL )
+			{	// Use current redirect URL:
+				$redirect_to = get_param( 'redirect_to' );
+			}
+			elseif( $owner_User->get_msgform_possibility() != 'login' )
+			{	// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
+				$redirect_to = regenerate_url( '', '', '', '&' );
 			}
 			else
-			{ // no email option - try to log in and send private message (only registered users can send PM)
-				$blog_contact_url = url_add_param( $blog_contact_url, 'redirect_to='.rawurlencode( url_add_param( $this->gen_blogurl(), 'disp=msgform', '&' ) ) );
+			{	// no email option - try to log in and send private message (only registered users can send PM):
+				$redirect_to = url_add_param( $this->gen_blogurl(), 'disp=msgform', '&' );
 			}
+			$blog_contact_url = url_add_param( $blog_contact_url, 'redirect_to='.rawurlencode( $redirect_to ) );
 		}
 
 		return $blog_contact_url;
