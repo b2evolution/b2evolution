@@ -667,6 +667,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)"]+\.('.md_get_image_extensions().'))\s*("[^"]*")?\)#i', $item_content, $image_matches ) )
 			{
 				$updated_item_content = $item_content;
+				$new_links_count = 0;
 				$LinkOwner = new LinkItem( $Item );
 				$file_params = array(
 						'file_root_type' => 'collection',
@@ -685,19 +686,28 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 					}
 					$file_params['file_title'] = trim( $image_matches[4][$i], ' "' );
 					// Try to find existing and linked image File or create, copy and link image File:
-					if( $link_ID = md_link_file( $LinkOwner, $folder_path, $category_path, rtrim( $image_relative_path ), $file_params ) )
+					if( $link_data = md_link_file( $LinkOwner, $folder_path, $category_path, rtrim( $image_relative_path ), $file_params ) )
 					{	// Replace this img tag from content with b2evolution format:
-						$updated_item_content = str_replace( $image_matches[0][$i], '[image:'.$link_ID.']', $updated_item_content );
+						$updated_item_content = str_replace( $image_matches[0][$i], '[image:'.$link_data['ID'].']', $updated_item_content );
+						if( $link_data['type'] == 'new' )
+						{	// Count new linked files:
+							$new_links_count++;
+						}
 					}
 				}
-				echo '</ul>';
-				$files_imported = true;
 
-				if( $updated_item_content != $item_content )
+				if( $new_links_count > 0 )
 				{	// Update content for new markdown image links which were replaced with b2evo inline tags format:
+					echo '<li class="text-warning"><span class="label label-warning">'.T_('NOTE').'</span> '
+							.sprintf( '%d new image files were linked to the Item', $new_links_count )
+							.' -> <a href="'.$Item->get_permanent_url().'" target="_blank">'.T_('Saving to DB').'</a>.'
+						.'</li>';
 					$Item->set( 'content', $updated_item_content );
 					$Item->dbupdate( true, true, true, 'no'/* Force to do NOT create new revision because we do this above when store new content */ );
 				}
+
+				echo '</ul>';
+				$files_imported = true;
 			}
 		}
 
@@ -760,7 +770,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
  * @param string Source Category folder name
  * @param string Requested file relative path
  * @param array Params
- * @return boolean|integer FALSE or Link ID on success
+ * @return boolean|array FALSE or Array on success ( 'ID' - Link ID, 'type' - 'new'/'old' )
  */
 function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_category_folder, $requested_file_relative_path, $params )
 {
@@ -773,13 +783,12 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_categor
 			'import_type'    => 'replace',
 		), $params );
 
-	$requested_file_relative_path = str_replace( '\\', '/', $requested_file_relative_path );
+	$requested_file_relative_path = ltrim( str_replace( '\\', '/', $requested_file_relative_path ), '/' );
 
 	$source_file_relative_path = $source_category_folder.'/'.$requested_file_relative_path;
 	$file_source_path = $source_folder_absolute_path.'/'.$source_file_relative_path;
 
-	if( strpos( $requested_file_relative_path, '/' ) === 0 ||
-	    strpos( get_canonical_path( $file_source_path ), $source_folder_absolute_path ) !== 0 )
+	if( strpos( get_canonical_path( $file_source_path ), $source_folder_absolute_path ) !== 0 )
 	{	// Don't allow a traversal directory:
 		echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Skip file %s, because path is invalid.', '<code>'.$requested_file_relative_path.'</code>' ).'</li>';
 		evo_flush();
@@ -818,7 +827,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_categor
 		{	// The found File is already linked to the Item:
 			echo '<li>'.sprintf( T_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
 			evo_flush();
-			return $file_data['link_ID'];
+			return array( 'ID' => $file_data['link_ID'], 'type' => 'old' );
 		}
 		else
 		{	// Try to link the found File object to the Item:
@@ -826,7 +835,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_categor
 			{	// If file has been linked to the post
 				echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been linked to this post.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
 				evo_flush();
-				return $link_ID;
+				return array( 'ID' => $link_ID, 'type' => 'new' );
 			}
 			else
 			{	// If file could not be linked to the post:
@@ -856,6 +865,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_categor
 				{	// Update only really changed file:
 					$replaced_File = $File;
 					$replaced_link_ID = $item_Link->ID;
+					$replaced_link_type = 'old';
 					// Don't find next files:
 					break;
 				}
@@ -863,7 +873,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_categor
 				{	// No change for same file:
 					echo '<li>'.sprintf( T_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
 					evo_flush();
-					return $item_Link->ID;
+					return array( 'ID' => $item_Link->ID, 'type' => 'old' );
 				}
 			}
 		}
@@ -914,6 +924,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_categor
 		}
 		elseif( $replaced_link_ID = $replaced_File->link_to_Object( $LinkOwner, 0, 'inline' ) )
 		{	// If file has been linked to the post
+			$replaced_link_type = 'new';
 			echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been updated and linked to this post successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>';
 		}
 		else
@@ -924,7 +935,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_categor
 		}
 
 		evo_flush();
-		return $replaced_link_ID;
+		return array( 'ID' => $replaced_link_ID, 'type' => $replaced_link_type );
 	}
 
 	// Create new File:
@@ -962,7 +973,7 @@ function md_link_file( $LinkOwner, $source_folder_absolute_path, $source_categor
 		return false;
 	}
 
-	return $link_ID;
+	return array( 'ID' => $link_ID, 'type' => 'new' );
 }
 
 
