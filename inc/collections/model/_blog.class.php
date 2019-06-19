@@ -536,6 +536,7 @@ class Blog extends DataObject
 		{ // General params:
 
 			$this->set_setting( 'collection_logo_file_ID', param( 'collection_logo_file_ID', 'integer', NULL ) );
+			$this->set_setting( 'collection_favicon_file_ID', param( 'collection_favicon_file_ID', 'integer', NULL ) );
 
 			$this->set_from_Request( 'name' );
 			$this->set( 'shortname', param( 'blog_shortname', 'string', true ) );
@@ -3299,6 +3300,17 @@ class Blog extends DataObject
 					if( $collection_image_File = & $FileCache->get_by_ID( $collection_image_ID, false, false ) )
 					{
 						return $collection_image_File;
+					}
+				}
+				return NULL;
+
+			case 'collection_favicon':
+				$FileCache = & get_FileCache();
+				if( $collection_favicon_ID = $this->get_setting( 'collection_favicon_file_ID' ) )
+				{
+					if( $collection_favicon_File = & $FileCache->get_by_ID( $collection_favicon_ID, false, false ) )
+					{
+						return $collection_favicon_File;
 					}
 				}
 				return NULL;
@@ -6229,7 +6241,7 @@ class Blog extends DataObject
 		{	// Get only locales or linked collections:
 			$locales = array();
 			foreach( $this->locales as $locale => $linked_coll_ID )
-			{	
+			{
 				if( ( $type == 'locale' && empty( $linked_coll_ID ) ) )
 				{
 					$locales[] = $locale;
