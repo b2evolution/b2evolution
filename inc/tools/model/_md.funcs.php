@@ -513,14 +513,16 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		$extra_cats = array( $category_ID => NULL );
 		$extra_cats_errors = '';
 
+		if( $convert_md_links )
+		{	// Convert Markdown relative links to b2evolution ShortLinks:
+			// NOTE: Do this even when last import hash is different because below we may update content on import images:
+			$item_content = preg_replace_callback( '#\[([^\]]*)\]\((.+/)?(.+?)\.md(\#[^\)]+)?\)#', 'md_callback_convert_links', $item_content );
+		}
+
 		$prev_last_import_hash = $Item->get_setting( 'last_import_hash' );
 		$Item->set_setting( 'last_import_hash', $item_content_hash );
 		if( $prev_last_import_hash != $item_content_hash )
 		{	// Set new fields only when import hash(title + content + YAML data) was really changed:
-			if( $convert_md_links )
-			{	// Convert Markdown relative links to b2evolution ShortLinks:
-				$item_content = preg_replace_callback( '#\[([^\]]*)\]\((.+/)?(.+?)\.md(\#[^\)]+)?\)#', 'md_callback_convert_links', $item_content );
-			}
 			$Item->set( 'lastedit_user_ID', $current_User->ID );
 			$Item->set( 'title', $item_title );
 			$Item->set( 'content', $item_content );
@@ -692,9 +694,9 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 				$files_imported = true;
 
 				if( $updated_item_content != $item_content )
-				{	// Update new content:
+				{	// Update content for new markdown image links which were replaced with b2evo inline tags format:
 					$Item->set( 'content', $updated_item_content );
-					$Item->dbupdate();
+					$Item->dbupdate( true, true, true, 'no'/* Force to do NOT create new revision because we do this above when store new content */ );
 				}
 			}
 		}
