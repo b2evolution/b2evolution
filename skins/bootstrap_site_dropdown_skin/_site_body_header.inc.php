@@ -59,17 +59,17 @@ else
 
 						// If collections grouped in a section exist and have at least one collection:
 						if( isset( $header_tab['items'] ) &&
-						    count( $header_tab['items'] > 0 ) )
+						    count( $header_tab['items'] ) > 0 )
 						{	// Create a dropdown list trigger:
 							echo '<a href="#" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">'.$header_tab['name'].' <span class="caret"></span></a>';
 						}
 						else
 						{	// Create a simple collection link:
-							echo '<a href="'.$header_tab['url'].'" >'.$header_tab['name'].'</a>';
-						} 
+							echo '<a href="'.$header_tab['url'].'"'.( empty( $header_tab['rel'] ) ? '' : ' rel="'.$header_tab['rel'].'"' ).'>'.$header_tab['name'].'</a>';
+						}
 
 						if( isset( $header_tab['items'] ) &&
-						    count( $header_tab['items'] > 0 ) )
+						    count( $header_tab['items'] ) > 0 )
 						{	// Display sub menus of the selected level 0 tab only when at least one exists:
 
 							echo '<ul class="dropdown-menu">';
@@ -78,9 +78,8 @@ else
 								if( is_array( $menu_item ) )
 								{	// Display sub menus:
 								?>
-								
 									<li<?php echo ( $menu_item['active'] ? ' class="active"' : '' ); ?>>
-										<a href="<?php echo $menu_item['url']; ?>"><?php echo $menu_item['name']; ?></a>
+										<a href="<?php echo $menu_item['url']; ?>"<?php echo empty( $menu_item['rel'] ) ? '' : ' rel="'.$menu_item['rel'].'"'; ?>><?php echo $menu_item['name']; ?></a>
 									</li>
 								<?php
 								}

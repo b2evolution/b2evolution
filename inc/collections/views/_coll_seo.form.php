@@ -328,11 +328,21 @@ $Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other-filtere
 			), T_('Post contents'), true );
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Download pages').get_manual_link( 'download-display-seo' ) );
+	$Form->checkbox( 'download_noindex', $edited_Blog->get_setting( 'download_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+	$Form->checkbox( 'download_nofollowto', $edited_Blog->get_setting( 'download_nofollowto' ), T_('No Follow TO'), T_('NOFOLLOW on links leading to download pages') );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Contact/Message Form pages').get_manual_link( 'contact-message-form-pages-seo' ) );
+	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Indexing'),
+										T_('META NOINDEX').' - '.T_('WARNING: Letting search engines index contact forms will attract spam.') );
+	$Form->checkbox( 'msgform_nofollowto', $edited_Blog->get_setting( 'msgform_nofollowto' ), T_('No Follow TO'), T_('NOFOLLOW on links leading to contact/message form pages') );
+	$Form->text_input( 'msgform_redirect_slug', $edited_Blog->get_setting( 'msgform_redirect_slug' ), 100, T_('Default redirect after message send'), T_('Enter slug or leave empty to redirect to front page of current collection.') );
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('Other pages').get_manual_link('other-pages-seo') );
 	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'),
 										T_('META NOINDEX').' - '.T_('For skins with comment popups only.') );
-	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Contact forms'),
-										T_('META NOINDEX').' - '.T_('WARNING: Letting search engines index contact forms will attract spam.') );
 	$Form->checkbox( 'special_noindex', $edited_Blog->get_setting( 'special_noindex' ), T_('Other special pages'),
 										T_('META NOINDEX').' - '.T_('Pages with no index setting of their own... yet.') );
 	$Form->radio( '404_response', $edited_Blog->get_setting('404_response'),
@@ -352,11 +362,6 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other-pages-seo') );
 			array( 'slug', T_('Use extra-path').': '.'/help', T_('E-g: ')
 				.url_add_tail( $blogurl, '<strong>/help</strong>' ) ),
 			), T_('Help page'), true );
-$Form->end_fieldset();
-
-$Form->begin_fieldset( T_('Download pages').get_manual_link( 'download-display-seo' ) );
-	$Form->checkbox( 'download_noindex', $edited_Blog->get_setting( 'download_noindex' ), T_('Indexing'), T_('META NOINDEX') );
-	$Form->checkbox( 'download_nofollowto', $edited_Blog->get_setting( 'download_nofollowto' ), T_('No Follow TO'), T_('NOFOLLOW on links leading to download pages') );
 $Form->end_fieldset();
 
 

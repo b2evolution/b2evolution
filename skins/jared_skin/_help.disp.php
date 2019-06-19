@@ -27,12 +27,12 @@ if( isset( $Blog ) && $Blog->get_setting( 'allow_access' ) != 'public' )
 
 	echo '<p>'.T_('You need special permissions to access the contents of this website/section.').'</p>';
 
-	echo '<p>'.sprintf( T_('If you need assistance, please <a %s>contact the owner of this website/section</a>.'), 'href="'.$Blog->get_contact_url().'"' ).'</p>';
+	echo '<p>'.sprintf( T_('If you need assistance, please <a %s>contact the owner of this website/section</a>.'), 'href="'.$Blog->get_contact_url().'"'.( $Blog->get_setting( 'msgform_nofollowto' ) ? ' rel="nofollow"' : '' ) ).'</p>';
 }
 
 echo '<p>'.T_('This is an independent website published solely under the reponsibility of its owner.').'</p>';
 
-echo '<p>'.sprintf( T_('In case of concerns with the contents of this website/section, please <a %s>contact the owner of this website/section</a>.'), 'href="'.$Blog->get_contact_url().'"' ).'</p>';
+echo '<p>'.sprintf( T_('In case of concerns with the contents of this website/section, please <a %s>contact the owner of this website/section</a>.'), 'href="'.$Blog->get_contact_url().'"'.( $Blog->get_setting( 'msgform_nofollowto' ) ? ' rel="nofollow"' : '' ) ).'</p>';
 
 echo '<p><a href="'.get_manual_url( 'content-issues' ).'">'.T_('What to do if the owner doesn\'t respond').' &raquo;</a></p>';
 

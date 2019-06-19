@@ -1349,6 +1349,8 @@ class Blog extends DataObject
 			$this->set_setting( 'catdir_noindex', param( 'catdir_noindex', 'integer', 0 ) );
 			$this->set_setting( 'feedback-popup_noindex', param( 'feedback-popup_noindex', 'integer', 0 ) );
 			$this->set_setting( 'msgform_noindex', param( 'msgform_noindex', 'integer', 0 ) );
+			$this->set_setting( 'msgform_nofollowto', param( 'msgform_nofollowto', 'integer', 0 ) );
+			$this->set_setting( 'msgform_redirect_slug', param( 'msgform_redirect_slug', 'string' ) );
 			$this->set_setting( 'special_noindex', param( 'special_noindex', 'integer', 0 ) );
 			$this->set_setting( 'title_link_type', param( 'title_link_type', 'string', '' ) );
 			$this->set_setting( 'permalinks', param( 'permalinks', 'string', '' ) );
@@ -5086,7 +5088,7 @@ class Blog extends DataObject
 				'text'        => 'Contact', // Note: left untranslated, should be translated in skin anyway
 				'title'       => 'Send a message to the owner of this blog...',
 				'class'       => 'contact_link',
-				'with_redirect'=> true,
+				'with_redirect'=> false,
 			), $params );
 
 		$contact_url = $this->get_contact_url( $params['with_redirect'] );
@@ -5097,6 +5099,7 @@ class Blog extends DataObject
 
 		echo $params['before'];
 		echo '<a href="'.$contact_url.'" '
+					.( $this->get_setting( 'msgform_nofollowto' ) ? 'rel="nofollow" ' : '' )
 					.'title="'.format_to_output( $params['title'], 'htmlattr' ).'" '
 					.'class="'.format_to_output( $params['class'], 'htmlattr' ).'">'
 				.format_to_output( $params['text'] )
@@ -5167,7 +5170,7 @@ class Blog extends DataObject
 	 *
 	 * @param boolean do we want to redirect back to where we came from after message?
 	 */
-	function get_contact_url( $with_redirect = true )
+	function get_contact_url( $with_redirect = false )
 	{
 		$owner_User = & $this->get_owner_User();
 		if( ! $owner_User->get_msgform_possibility() )

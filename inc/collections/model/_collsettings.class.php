@@ -147,6 +147,7 @@ class CollectionSettings extends AbstractSettings
 		// Other pages:
 			'feedback-popup_noindex' => '1',			// META NOINDEX on Feedback popups
 			'msgform_noindex' => '1',					// META NOINDEX on Message forms
+			'msgform_nofollowto' => '1',
 			'special_noindex' => '1',					// META NOINDEX on other special pages
 			'404_response' => '404',
 			'help_link' => 'slug',

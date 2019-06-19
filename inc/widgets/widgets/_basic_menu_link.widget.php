@@ -320,6 +320,9 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		// Allow to higlight current menu item only when it is enabled by widget setting and it is linked to current collection:
 		$highlight_current = ( $this->disp_params['highlight_current'] == 'yes' && $current_Blog->ID == $Blog->ID );
 
+		// Default link template:
+		$link_template = NULL;
+
 		switch( $this->disp_params['link_type'] )
 		{
 			case 'recentposts':
@@ -424,7 +427,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				break;
 
 			case 'ownercontact':
-				if( ! $url = $current_Blog->get_contact_url( true ) )
+				if( ! $url = $current_Blog->get_contact_url() )
 				{	// Current user does not allow contact form:
 					$this->display_debug_message();
 					return false;
@@ -434,6 +437,10 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 				// fp> I think it's interesting to select this link , even if the recipient ID is different from the owner
 				// odds are there is no other link to highlight in this case
 				$highlight_current = ( $highlight_current && ( $disp == 'msgform' || ( isset( $_GET['disp'] ) && $_GET['disp'] == 'msgform' ) ) );
+				if( $current_Blog->get_setting( 'msgform_nofollowto' ) )
+				{	// Use nofollow attribute:
+					$link_template = '<a href="$link_url$" class="$link_class$" rel="nofollow">$link_text$</a>';
+				}
 				break;
 
 			case 'login':
@@ -669,7 +676,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		}
 
 		// Display a layout with menu link:
-		echo $this->get_layout_menu_link( $url, $text, $highlight_current );
+		echo $this->get_layout_menu_link( $url, $text, $highlight_current, $link_template );
 
 		return true;
 	}

@@ -254,10 +254,10 @@ class coll_common_links_Widget extends ComponentWidget
 			echo $this->disp_params['item_end'];
 		}
 
-		if( $this->disp_params['show_ownercontact'] && $url = $Blog->get_contact_url( true ) )
+		if( $this->disp_params['show_ownercontact'] && $url = $Blog->get_contact_url() )
 		{	// owner allows contact:
 			echo $this->disp_params['item_start'];
-			echo '<strong><a href="'.$url.'">'.T_('Contact').'</a></strong>';
+			echo '<strong><a href="'.$url.'"'.( $Blog->get_setting( 'msgform_nofollowto' ) ? ' rel="nofollow"' : '' ).'>'.T_('Contact').'</a></strong>';
 			echo $this->disp_params['item_end'];
 		}
 

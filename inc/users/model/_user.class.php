@@ -4702,7 +4702,16 @@ class User extends DataObject
 			$form_url = isset($Blog) ? $Blog->get('msgformurl') : '';
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $form_url)) );
+		if( param( 'redirect_to', 'url', NULL ) !== NULL )
+		{	// Use current redirect URL:
+			$redirect_to = get_param( 'redirect_to' );
+		}
+		else
+		{	// Generate new redirect URL:
+			$redirect_to = regenerate_url( '', '', '', '&' );
+		}
+
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $form_url ) ) );
 
 		if( $title == '#' )
 		{

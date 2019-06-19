@@ -588,7 +588,21 @@ if( $success_message )
 		$Messages->add( sprintf( T_('You have successfully sent an email to %s.'),
 			( empty( $recipient_User ) ? $recipient_name : $recipient_User->get_username() ) ), 'success' );
 	}
-	if( empty( $redirect_to ) )
+	if( isset( $recipient_User, $Blog ) &&
+	    $Blog->get_owner_User() &&
+	    $recipient_User->ID == $Blog->get_owner_User()->ID )
+	{	// Message was sent to collection owner:
+		$ItemCache = & get_ItemCache();
+		if( $redirect_Item = & $ItemCache->get_by_urltitle( $Blog->get_setting( 'msgform_redirect_slug' ), false, false ) )
+		{	// Use item permanent URL from collection setting:
+			$redirect_to = $redirect_Item->get_permanent_url( '', '', '&' );
+		}
+		else
+		{	// Use collection home page URL:
+			$redirect_to = $Blog->gen_blogurl();
+		}
+	}
+	elseif( empty( $redirect_to ) )
 	{
 		$redirect_to = $Blog->gen_blogurl();
 		if( !empty( $recipient_User ) )

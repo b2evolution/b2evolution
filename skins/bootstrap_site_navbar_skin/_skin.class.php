@@ -501,19 +501,24 @@ footer.bootstrap_site_navbar_footer .container a {
 				$this->header_tab_active = $level0_index;
 			}
 
-			if( $contact_url = $Blog->get_contact_url( true ) )
+			if( $contact_url = $Blog->get_contact_url() )
 			{	// If contact page is allowed for current collection:
-				$tab_items[] = array(
+				$tab_item = array(
 						'name'   => T_('Contact'),
 						'url'    => $contact_url,
 						'active' => ( $current_disp == 'msgform' )
 					);
+				if( $Blog->get_setting( 'msgform_nofollowto' ) )
+				{	// Use nofollow attribute:
+					$tab_item['rel'] = 'nofollow';
+				}
+				$tab_items[] = $tab_item;
 			}
 
 			if( ! empty( $contact_url ) )
 			{	// Display additional tabs with static pages only user has an access to contact page:
 				$header_tabs[] = array(
-						'name'   => 'About',
+						'name'   => T_('About'),
 						'url'    => $contact_url,
 						'items'  => $tab_items
 					);

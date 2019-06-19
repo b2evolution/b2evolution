@@ -57,7 +57,7 @@ else
 				{	// Display level 0 tabs:
 ?>
 					<li<?php echo ( $site_Skin->header_tab_active === $s ? ' class="active"' : '' ); ?>>
-						<a href="<?php echo $header_tab['url']; ?>"><?php echo $header_tab['name']; ?></a>
+						<a href="<?php echo $header_tab['url']; ?>"<?php echo empty( $header_tab['rel'] ) ? '' : ' rel="'.$header_tab['rel'].'"'; ?>><?php echo $header_tab['name']; ?></a>
 					</li>
 <?php
 				}
@@ -227,7 +227,7 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 		{	// Display menu item for collection:
 ?>
 			<li<?php echo ( $menu_item['active'] ? ' class="active"' : '' ); ?>>
-				<a href="<?php echo $menu_item['url']; ?>"><?php echo $menu_item['name']; ?></a>
+				<a href="<?php echo $menu_item['url']; ?>"<?php echo empty( $menu_item['rel'] ) ? '' : ' rel="'.$menu_item['rel'].'"'; ?>><?php echo $menu_item['name']; ?></a>
 			</li>
 <?php
 		}
