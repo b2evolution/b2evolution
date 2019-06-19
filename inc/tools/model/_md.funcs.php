@@ -706,18 +706,18 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 					}
 				}
 
-				if( ( $force_item_update && $all_links_count > 0 ) || $new_links_count > 0 )
+				if( $new_links_count > 0 || ( $force_item_update && $all_links_count > 0 ) )
 				{	// Update content for new markdown image links which were replaced with b2evo inline tags format:
-					echo '<li class="text-warning"><span class="label label-warning">'.T_('NOTE').'</span> ';
-					if( $force_item_update )
-					{	// Force to update content with inline image tags:
-						echo sprintf( '%d image inline tags were updated in the Item', $all_links_count )
-							.' -> <a href="'.$Item->get_permanent_url().'" target="_blank">'./* TRANS: Result of imported Item */ T_('Force saving to DB').'</a>.';
+					echo '<li class="text-warning">';
+					if( $new_links_count > 0 )
+					{	// Update content with new inline image tags:
+						echo sprintf( T_('%d new image files were linked to the Item'), $new_links_count )
+							.' -> './* TRANS: Result of imported Item */ T_('Saving to DB').'.';
 					}
 					else
-					{	// Update content with new inline image tags:
-						echo sprintf( '%d new image files were linked to the Item', $new_links_count )
-							.' -> <a href="'.$Item->get_permanent_url().'" target="_blank">'./* TRANS: Result of imported Item */ T_('Saving to DB').'</a>.';
+					{	// Force to update content with inline image tags:
+						echo T_('No image file changes BUT Force Item Update requested')
+							.' -> './* TRANS: Result of imported Item */ T_('Force saving <code>[image:]</code> tags to DB').'.';
 					}
 					echo '</li>';
 					$Item->set( 'content', $updated_item_content );
