@@ -408,6 +408,10 @@ class Blog extends DataObject
 				{	// Set default post type as "Photo Album":
 					$this->set_setting( 'default_post_type', $photo_album_type_ID );
 				}
+				if( is_pro() )
+				{	// Enable tracking of unread content only in PRO version:
+					$this->set_setting( 'track_unread_content', 1 );
+				}
 				break;
 
 			case 'group':
@@ -424,6 +428,10 @@ class Blog extends DataObject
 				if( $forum_topic_type_ID )
 				{ // Set default post type as "Forum Topic"
 					$this->set_setting( 'default_post_type', $forum_topic_type_ID );
+				}
+				if( is_pro() )
+				{	// Enable tracking of unread content only in PRO version:
+					$this->set_setting( 'track_unread_content', 1 );
 				}
 				break;
 
@@ -471,6 +479,10 @@ class Blog extends DataObject
 				$this->set_setting( 'category_ordering', 'manual' );
 				$this->set_setting( 'main_content', 'excerpt' );
 				$this->set_setting( 'chapter_content', 'excerpt' );
+				if( is_pro() )
+				{	// Enable tracking of unread content only in PRO version:
+					$this->set_setting( 'track_unread_content', 1 );
+				}
 
 				// Try to find post type "Manual Page" in DB
 				global $DB;
@@ -497,6 +509,10 @@ class Blog extends DataObject
 				$this->set( 'name', empty($name) ? T_('Blog') : $name );
 				$this->set( 'shortname', empty($shortname) ? T_('Blog') : $shortname );
 				$this->set( 'urlname', empty($urlname) ? 'blog' : $urlname );
+				if( is_pro() )
+				{	// Enable tracking of unread content only in PRO version:
+					$this->set_setting( 'track_unread_content', 1 );
+				}
 				break;
 		}
 

@@ -5956,6 +5956,19 @@ function is_front_page()
 
 
 /**
+ * Is pro version?
+ *
+ * @return boolean
+ */
+function is_pro()
+{
+	global $app_pro;
+
+	return isset( $app_pro ) && $app_pro === true;
+}
+
+
+/**
  * Does the given url require logged in user
  *
  * @param string url

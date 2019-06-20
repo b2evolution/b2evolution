@@ -1155,7 +1155,8 @@ div.available_widgets #available_widgets_inner {
   text-indent: -25px;
   padding-left: 25px;
 }
-.widget_list li a {
+.widget_list li a,
+.widget_list li .label {
   text-indent: initial;
 }
 .evo_widget_icon {
