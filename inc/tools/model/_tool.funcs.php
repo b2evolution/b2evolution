@@ -801,10 +801,12 @@ function tool_create_sample_campaigns( $num_campaigns, $campaign_lists, $send_ca
 
 	for( $i = 1; $i <= $num_campaigns; $i++ )
 	{
+		$rand_list_ID = $campaign_lists[rand( 0, $campaign_lists_max_index )];
 		$EmailCampaign = new EmailCampaign();
-		$EmailCampaign->set( 'enlt_ID', $campaign_lists[rand( 0, $campaign_lists_max_index )] );
+		$EmailCampaign->set( 'enlt_ID', $rand_list_ID );
 		$EmailCampaign->set( 'name', T_('Markdown Example').' '.$i );
 		$EmailCampaign->set( 'email_defaultdest', $baseurl );
+		$EmailCampaign->set( 'email_title', T_('Markdown Example').' '.$i );
 		$EmailCampaign->set( 'email_text', T_('Heading
 =======
 
@@ -861,16 +863,22 @@ T_('Button examples:
 				if( $send_campaign_emails )
 				{
 					$EmailCampaign->send_all_emails( false, $loop_user_IDs );
-					// Randomly set values
+					// Randomly set clicked values
 					$DB->query( 'UPDATE T_email__campaign_send
 							SET
 								csnd_clicked_unsubscribe = IF( RAND() > 0.95, 1, 0 ),
-								csnd_last_open_ts = IF( RAND() > 0.7, NOW(), NULL ),
-								csnd_last_click_ts = IF( RAND() > 0.7, NOW(), NULL ),
 								csnd_like = IF( RAND() > 0.75, 1, IF( RAND() > 0.8, -1, 0 ) ),
 								csnd_cta1 = IF( RAND() > 0.85, 1, 0 ),
 								csnd_cta2 = IF( RAND() > 0.85, 1, 0 ),
 								csnd_cta3 = IF( RAND() > 0.85, 1, 0 )
+							WHERE
+								csnd_camp_ID = '.$EmailCampaign->ID );
+
+					// Update timestamps based on randomly generated click values above:
+					$DB->query( 'UPDATE T_email__campaign_send
+							SET
+								csnd_last_open_ts = IF( ABS(csnd_like) + csnd_cta1 + csnd_cta2 + csnd_cta3 + csnd_clicked_unsubscribe > 0, NOW(), IF( RAND() > 0.7, NOW(), NULL ) ),
+								csnd_last_click_ts = IF( ABS(csnd_like) + csnd_cta1 + csnd_cta2 + csnd_cta3 > 0, NOW(), NULL )
 							WHERE
 								csnd_camp_ID = '.$EmailCampaign->ID );
 
@@ -914,7 +922,7 @@ T_('Button examples:
 					SUM( IF( csnd_last_open_ts IS NULL, 0, 1 ) ) AS img_loads,
 					SUM( IF( csnd_last_click_ts IS NULL, 0, 1 ) ) AS link_clicks,
 					SUM( IF( csnd_last_open_ts IS NOT NULL OR csnd_last_click_ts IS NOT NULL OR
-						csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) AS open_count
+						csnd_like <> 0 OR csnd_cta1 > 0 OR csnd_cta2 > 0 OR csnd_cta3 > 0, 1, 0 ) ) AS open_count
 				FROM T_email__campaign_send
 				WHERE csnd_emlog_ID IS NOT NULL
 				GROUP BY csnd_camp_ID
