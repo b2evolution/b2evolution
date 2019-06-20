@@ -620,7 +620,11 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 				$post_results_num['no_changed']++;
 				$item_result_messages[] = /* TRANS: Result of imported Item */ T_('No change');
 			}
-			elseif( $Item->dbupdate( true, true, true, $force_item_update || $prev_last_import_hash != $item_content_hash/* Force to create new revision only when file hash(title+content) was changed after last import or when update is forced */ ) )      // This is UPDATE 1 of 2 (there is a 2nd UPDATE for images)
+			elseif( 
+				// This is UPDATE 1 of 2 (there is a 2nd UPDATE for [image:] tags. These tags cannot be created before the Item ID is known.):
+				$Item->dbupdate( true, true, true, 
+					$force_item_update || $prev_last_import_hash != $item_content_hash/* Force to create new revision only when file hash(title+content) was changed after last import or when update is forced */ ) )      
+// TODO: fp>yb: please give example of situation where we want to NOT create a new revision ? (I think we ALWAYS want to create a new revision)				
 			{	// Item has been updated successfully:
 				$item_is_updated_step_1 = true;
 				$item_result_class = 'text-warning';
@@ -737,7 +741,8 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 					}
 					echo '</li>';
 					$Item->set( 'content', $updated_item_content );
-					$Item->dbupdate( true, true, true, 'no'/* Force to do NOT create new revision because we do this above when store new content */ );      // This is UPDATE 2 of 2 only for images
+					// This is UPDATE 2 of 2 . It is only for [image:] tags.
+					$Item->dbupdate( true, true, true, 'no'/* Force to do NOT create new revision because we do this above when store new content */ );      
 				}
 
 				echo '</ul>';
