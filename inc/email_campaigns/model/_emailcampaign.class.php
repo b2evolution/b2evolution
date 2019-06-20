@@ -1306,10 +1306,14 @@ class EmailCampaign extends DataObject
 		{	// Update user send status for this email campaign:
 			if( $status == 'sent' )
 			{
-				list( $previous_status, $last_sent_ts ) = $DB->get_row( 'SELECT csnd_status, csnd_last_sent_ts FROM T_email__campaign_send WHERE csnd_camp_ID = '.$this->ID.' AND csnd_user_ID = '.$DB->quote( $user_ID ), ARRAY_N );
-				if( empty( $last_sent_ts ) && $previous_status != 'sent' )
-				{ // First time to send the email to this user
-					$update_send_count = true;
+				$r = $DB->get_row( 'SELECT csnd_status, csnd_last_sent_ts FROM T_email__campaign_send WHERE csnd_camp_ID = '.$this->ID.' AND csnd_user_ID = '.$DB->quote( $user_ID ), ARRAY_N );
+				if( ! empty( $r ) )
+				{
+					list( $previous_status, $last_sent_ts ) = $r;
+					if( empty( $last_sent_ts ) && $previous_status != 'sent' )
+					{ // First time to send the email to this user
+						$update_send_count = true;
+					}
 				}
 			}
 
