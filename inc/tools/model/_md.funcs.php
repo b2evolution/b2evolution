@@ -590,6 +590,9 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		// Set extra categories:
 		$Item->set( 'extra_cat_IDs', array_keys( $extra_cats ) );
 
+		// Flag to know Item is updated in STEP 1:
+		$item_is_updated_step_1 = false;
+
 		$item_result_messages = array();
 		$item_result_class = '';
 		$item_result_suffix = '';
@@ -597,6 +600,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		{	// Insert new Item:
 			if( $Item->dbinsert() )
 			{	// If post is inserted successfully:
+				$item_is_updated_step_1 = true;
 				$item_result_class = 'text-success';
 				$item_result_messages[] = /* TRANS: Result of imported Item */ T_('Is new');
 				$item_result_messages[] = /* TRANS: Result of imported Item */ T_('Added to DB');
@@ -618,6 +622,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			}
 			elseif( $Item->dbupdate( true, true, true, $force_item_update || $prev_last_import_hash != $item_content_hash/* Force to create new revision only when file hash(title+content) was changed after last import or when update is forced */ ) )      // This is UPDATE 1 of 2 (there is a 2nd UPDATE for images)
 			{	// Item has been updated successfully:
+				$item_is_updated_step_1 = true;
 				$item_result_class = 'text-warning';
 				if( $force_item_update )
 				{	// If item update was forced:
@@ -717,7 +722,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 					}
 				}
 
-				if( $new_links_count > 0 || ( $force_item_update && $all_links_count > 0 ) )
+				if( $new_links_count > 0 || ( $item_is_updated_step_1 && $all_links_count > 0 ) )
 				{	// Update content for new markdown image links which were replaced with b2evo inline tags format:
 					echo '<li class="text-warning">';
 					if( $new_links_count > 0 )
@@ -727,8 +732,8 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 					}
 					else
 					{	// Force to update content with inline image tags:
-						echo T_('No image file changes BUT Force Item Update requested')
-							.' -> './* TRANS: Result of imported Item */ T_('Force saving <code>[image:]</code> tags to DB').'.';
+						echo T_('No image file changes BUT Item Update is required')
+							.' -> './* TRANS: Result of imported Item */ T_('Saving <code>[image:]</code> tags to DB').'.';
 					}
 					echo '</li>';
 					$Item->set( 'content', $updated_item_content );
