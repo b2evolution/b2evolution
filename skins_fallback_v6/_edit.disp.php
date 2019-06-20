@@ -130,6 +130,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 		}
 		$Form->hidden( 'trackback_url', $trackback_url );
 		$Form->hidden( 'item_featured', $edited_Item->featured );
+		if( is_pro() && $Blog->get_setting( 'track_unread_content' ) )
+		{	// Update setting to mark Item as "must read" only for PRO version and when tracking of unread content is enabled for collection:
+			$Form->hidden( 'item_mustread', $edited_Item->get_setting( 'mustread' ) );
+		}
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
 		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
 		$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );

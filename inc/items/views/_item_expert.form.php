@@ -703,7 +703,7 @@ $Form->begin_form( '', '', $params );
 
 	if( $Blog->get_setting( 'track_unread_content' ) )
 	{	// Display setting to mark Item as "must read" when tracking of unread content is enabled for collection:
-		$Form->checkbox_basic_input( 'item_mustread', $edited_Item->get_setting( 'mustread' ), '<strong>'.T_('Must read').'</strong>' );
+		$Form->checkbox_basic_input( 'item_mustread', $edited_Item->get_setting( 'mustread' ), '<strong>'.T_('Must read').'</strong> '.get_pro_label(), array( 'disabled' => ! is_pro() ) );
 	}
 
 	if( $is_not_content_block && $edited_Item->get_type_setting( 'allow_breaks' ) )

@@ -961,9 +961,10 @@ class Item extends ItemLight
 		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
 
 		// MUST READ checkbox:
-		$item_Blog = & $this->get_Blog();
-		if( $item_Blog->get_setting( 'track_unread_content' ) )
-		{	// Update only when tracking of unread content is enabled for collection:
+		if( is_pro() && 
+		    ( $item_Blog = & $this->get_Blog() ) &&
+		    $item_Blog->get_setting( 'track_unread_content' ) )
+		{	// Update only for PRO version and when tracking of unread content is enabled for collection:
 			$this->set_setting( 'mustread', param( 'item_mustread', 'integer', 0 ) );
 		}
 

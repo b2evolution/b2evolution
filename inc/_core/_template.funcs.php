@@ -3944,4 +3944,14 @@ function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = tru
 	}
 }
 
+
+/**
+ * Get a label for PRO version
+ *
+ * @return string
+ */
+function get_pro_label()
+{
+	return '<span class="label label-sm label-primary">PRO</span>';
+}
 ?>
