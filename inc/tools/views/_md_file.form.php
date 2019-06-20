@@ -98,7 +98,7 @@ if( ! empty( $import_files ) )
 	echo '</div>';
 
 	$Form->checklist( array(
-			array( 'convert_md_links', '1', T_('Convert Markdown relative links to b2evolution ShortLinks'), $convert_md_links ),
+			array( 'convert_md_links', '1', T_('Convert Markdown links to b2evolution ShortLinks'), $convert_md_links ),
 			array( 'force_item_update', '1', T_('Force Item update, even if file hash has not changed'), $force_item_update ),
 		), 'md_options', T_('Options') );
 

@@ -59,7 +59,7 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 	$selected_options = array();
 	if( param( 'convert_md_links', 'integer', 0 ) )
 	{
-		$selected_options[] = T_('Convert Markdown relative links to b2evolution ShortLinks');
+		$selected_options[] = T_('Convert Markdown links to b2evolution ShortLinks');
 	}
 	if( param( 'force_item_update', 'integer', 0 ) )
 	{

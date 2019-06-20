@@ -77,7 +77,7 @@ function md_get_import_data( $source_path )
  */
 function md_import( $folder_path, $source_type, $source_folder_zip_name )
 {
-	global $Blog, $DB, $tableprefix, $media_path, $current_User, $localtimenow;
+	global $Blog, $DB, $tableprefix, $media_path, $current_User, $localtimenow, $evo_md_error_convert_links;
 
 	// Set Collection by requested ID:
 	$md_blog_ID = param( 'md_blog_ID', 'integer', 0 );
@@ -515,9 +515,10 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 		$extra_cats_errors = '';
 
 		if( $convert_md_links )
-		{	// Convert Markdown relative links to b2evolution ShortLinks:
+		{	// Convert Markdown links to b2evolution ShortLinks:
 			// NOTE: Do this even when last import hash is different because below we may update content on import images:
-			$item_content = preg_replace_callback( '#\[([^\]]*)\]\((.+/)?(.+?)\.md(\#[^\)]+)?\)#', 'md_callback_convert_links', $item_content );
+			$evo_md_error_convert_links = array();
+			$item_content = preg_replace_callback( '#([^\!])\[([^\[\]]*)\]\(((([a-z]*://)?([^\)]+/)?([^\)]+?)(\.md)?)(\#[^\)]+)?)?\)#i', 'md_callback_convert_links', $item_content );
 		}
 
 		$prev_last_import_hash = $Item->get_setting( 'last_import_hash' );
@@ -668,6 +669,16 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			echo ',<ul class="list-default" style="margin-bottom:0">'.$extra_cats_errors.'</ul>';
 		}
 
+		if( ! empty( $evo_md_error_convert_links ) )
+		{	// Display what links could not be converted:
+			echo ( empty( $extra_cats_errors ) ? ',' : '' ).'<ul class="list-default" style="margin-bottom:0">';
+			foreach( $evo_md_error_convert_links as $evo_md_error_convert_link )
+			{
+				echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Markdown link %s could not be convered to b2evolution ShortLink.', '<code>'.$evo_md_error_convert_link.'</code>' ).'</li>';
+			}
+			echo '</ul>';
+		}
+
 		$files_imported = false;
 		if( ! empty( $Item->ID ) )
 		{
@@ -684,7 +695,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 						'folder_path'    => 'quick-uploads/'.$Item->get( 'urltitle' ),
 						'import_type'    => $import_type,
 					);
-				echo ( empty( $extra_cats_errors ) ? ',' : '' ).'<ul class="list-default">';
+				echo ( empty( $extra_cats_errors ) && empty( $evo_md_error_convert_links ) ? ',' : '' ).'<ul class="list-default" style="margin-bottom:0">';
 				foreach( $image_matches[2] as $i => $image_relative_path )
 				{
 					$file_params['file_alt'] = trim( $image_matches[1][$i] );
@@ -729,10 +740,11 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 			}
 		}
 
-		if( ! $files_imported )
+		if( ! $files_imported && empty( $extra_cats_errors ) && empty( $evo_md_error_convert_links ) )
 		{
-			echo '.<br><br>';
+			echo '.<br>';
 		}
+		echo '<br>';
 		evo_flush();
 	}
 
@@ -1100,18 +1112,44 @@ function & md_get_Item( $item_slug, $coll_ID )
 
 
 /**
- * Callback function to Convert Markdown relative links to b2evolution ShortLinks
+ * Callback function to Convert Markdown links to b2evolution ShortLinks
  *
  * @param array Match data
  * @return string Link in b2evolution ShortLinks format
  */
 function md_callback_convert_links( $m )
 {
-	$item_slug = get_urltitle( $m[3] );
-	$link_title = trim( $m[1] );
-	$link_anchor = isset( $m[4] ) ? trim( $m[4], '# ' ) : '';
+	global $evo_md_error_convert_links;
 
-	return '(('.$item_slug
+	$link_title = trim( $m[2] );
+	$link_url = isset( $m[3] ) ? trim( $m[3] ) : '';
+
+	if( $link_url === '' )
+	{	// URL must be defined:
+		$evo_md_error_convert_links[] = $m[0];
+		return $m[0];
+	}
+
+	if( ! empty( $m[5] ) )
+	{	// Use full URL because this is URL with protocol like http://
+		$item_url = $m[3];
+		// Anchor is already included in the $m[3]:
+		$link_anchor = '';
+	}
+	elseif( isset( $m[8] ) && $m[8] === '.md' )
+	{	// Extract item slug from relative URL of md file:
+		$item_url = get_urltitle( $m[7] );
+		$link_anchor = isset( $m[9] ) ? trim( $m[9], '# ' ) : '';
+	}
+	else
+	{	// We cannot convert this markdown link:
+		$evo_md_error_convert_links[] = $m[0];
+		return $m[0];
+	}
+
+	return $m[1] // Suffix like space or new line before link
+		.( substr( $m[2], 0, 1 ) === ' ' ? ' ' : '' ) // space before link text inside []
+		.'(('.$item_url
 		.( empty( $link_anchor ) ? '' : '#'.$link_anchor )
 		.( empty( $link_title ) ? '' : ' '.$link_title ).'))';
 }
