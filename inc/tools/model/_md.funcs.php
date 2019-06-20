@@ -616,7 +616,7 @@ function md_import( $folder_path, $source_type, $source_folder_zip_name )
 				$post_results_num['no_changed']++;
 				$item_result_messages[] = /* TRANS: Result of imported Item */ T_('No change');
 			}
-			elseif( $Item->dbupdate( true, true, true, $prev_last_import_hash != $item_content_hash/* Force to create new revision only when file hash(title+content) was changed after last import */ ) )
+			elseif( $Item->dbupdate( true, true, true, $force_item_update || $prev_last_import_hash != $item_content_hash/* Force to create new revision only when file hash(title+content) was changed after last import or when update is forced */ ) )
 			{	// Item has been updated successfully:
 				$item_result_class = 'text-warning';
 				if( $force_item_update )
