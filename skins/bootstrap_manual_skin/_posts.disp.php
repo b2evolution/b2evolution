@@ -162,10 +162,7 @@ else
 	while( $Item = & mainlist_get_item() )
 	{	// For each blog post, do everything below up to the closing curly brace "}"
 		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-		skin_include( '_item_list.inc.php', array(
-				'before_title'   => '<h3>',
-				'after_title'    => '</h3>',
-			) );
+		skin_include( '_item_list.inc.php' );
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
 ?>

@@ -327,6 +327,13 @@ body.evo_toolbar_visible div#skin_wrapper {
 				margin-right: 5px;
 			}
 		}
+		.evo_post_read_status {
+			text-decoration: none;
+			display: inline-block;
+			vertical-align: middle;
+			font-size: 85%;
+			margin-top: -10px;
+		}
 	}
 	li, .evo_container__item_in_list .widget_core_item_title {
 		> .btn-group, > .evo_status {
@@ -360,12 +367,6 @@ ol.breadcrumb {
 		}
 	}
 }
-.evo_post_title {
-	.evo_post_read_status {
-		vertical-align: middle;
-		margin: 10px 2px 0 0;
-	}
-}
 @media (max-width: 767px) { // Bootstrap XS ends at 767, SM starts at 768
 	.evo_post_title, .cat_title {
 		display: block;
@@ -376,11 +377,6 @@ ol.breadcrumb {
 			display: block;
 			text-align: right;
 			padding: 0 0 10px 0;
-		}
-	}
-	.evo_post_title {
-		.evo_post_read_status {
-			margin: 0;
 		}
 	}
 }
