@@ -374,6 +374,9 @@ div.log_container {
   margin: 0;
   padding: 20px 0 0;
 }
+.evo_post_title h2 + .btn {
+  margin: -10px 0 0 30px;
+}
 .evo_post_title .btn-group {
   display: table-cell;
   padding: 20px 0 10px 30px;

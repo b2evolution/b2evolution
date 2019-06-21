@@ -6420,6 +6420,16 @@ class Item extends ItemLight
 
 
 	/**
+	 * Template tag
+	 * @see Item::get_changes_link()
+	 */
+	function changes_link( $params = array() )
+	{
+		echo $this->get_changes_link( $params );
+	}
+
+
+	/**
 	 * Get JavaScript code for onclick event of merge link
 	 *
 	 * @return boolean|string

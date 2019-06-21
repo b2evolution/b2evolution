@@ -127,6 +127,13 @@ $display_workflow = ( $disp == 'posts' ) &&
 								'link_class'      => 'topictitle ellipsis'.( $Item->get_read_status() != 'read' ? ' unread' : '' ),
 								'post_navigation' => $params['post_navigation'],
 							) );
+
+						if( $disp == 'mustread' )
+						{	// Display a link to view changes only for "must read" content:
+							$Item->changes_link( array(
+								'class' => button_class( 'text' ),
+							) );
+						}
 						?>
 					</div>
 				</div>
