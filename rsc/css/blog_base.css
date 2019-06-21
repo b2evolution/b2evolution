@@ -534,7 +534,7 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 }
 .widget_core_org_members {
   margin: 5em 0 30px;
-  color: #333333;
+  color: #333;
 }
 .widget_core_org_members div.widget_rwd_content {
   text-align: center;
@@ -570,7 +570,7 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   font-size: 18px;
 }
 .widget_core_org_members a.user_link {
-  color: #000000;
+  color: #000;
 }
 .widget_core_org_members a.user_link:hover {
   color: #23527c;
@@ -733,12 +733,12 @@ div.average_rating span.average_rating_score {
   background-position: 0 -208px;
 }
 .evo_stars {
-  color: #ff9900;
+  color: #F90;
   white-space: nowrap;
 }
 .evo_stars .evo_star_empty,
 .evo_stars .evo_star_percent {
-  color: #999999;
+  color: #999;
 }
 .evo_stars .evo_star_percent {
   position: relative;
@@ -747,7 +747,7 @@ div.average_rating span.average_rating_score {
   position: absolute;
   left: 0;
   overflow: hidden;
-  color: #ff9900;
+  color: #F90;
 }
 *[class^="listnav_distance_"],
 *[class*=" listnav_distance_"] {
@@ -824,12 +824,12 @@ td#prev,
 td#next {
   font-weight: bold;
   font-size: 105%;
-  padding: .5ex;
+  padding: 0.5ex;
   white-space: nowrap;
 }
 td#prev a,
 td#next a {
-  padding: .5ex;
+  padding: 0.5ex;
 }
 td#prev {
   text-align: left;
@@ -1141,12 +1141,12 @@ table.catselect {
   border: 1px solid #bbb;
 }
 table.catselect th {
-  padding: .3ex 1ex;
+  padding: 0.3ex 1ex;
   background-color: #ddd;
   border-bottom: 1px solid #bbb;
 }
 table.catselect td {
-  padding: .2ex 1ex;
+  padding: 0.2ex 1ex;
 }
 table.catselect th,
 table.catselect td {
@@ -1691,13 +1691,13 @@ div.other_profile_pictures img {
   font-weight: bold;
   line-height: 1;
   color: #000;
-  opacity: .2;
+  opacity: 0.2;
 }
 .close:hover {
   color: #000;
   text-decoration: none;
   cursor: pointer;
-  opacity: .5;
+  opacity: 0.5;
 }
 button.close {
   -webkit-appearance: none;

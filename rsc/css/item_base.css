@@ -12,11 +12,11 @@ pre.codeblock {
   background-color: #F2F1F0;
   border: 1px solid #CCCCCC;
   border-radius: 2px 2px 2px 2px;
-  padding: 0 .5ex;
+  padding: 0 0.5ex;
 }
 pre.codeblock {
   overflow: auto;
-  padding: .5ex 2ex;
+  padding: 0.5ex 2ex;
 }
 pre.codeblock code {
   display: block;
