@@ -77,6 +77,7 @@ switch( $action )
 	case 'edit':
 	case 'propose':
 	case 'history':
+	case 'history_lastseen':
 	case 'history_details':
 	case 'history_compare':
 	case 'history_restore':
@@ -1043,6 +1044,31 @@ switch( $action )
 	case 'history':
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		break;
+
+	case 'history_lastseen':
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		$SQL = new SQL( 'Find last not seen revision of the Item #'.$edited_Item->ID.' by current User' );
+		$SQL->SELECT( 'iver_ID' );
+		$SQL->FROM( 'T_items__version' );
+		$SQL->WHERE( 'iver_itm_ID = '.$DB->quote( $edited_Item->ID ) );
+		$SQL->WHERE_and( 'iver_type = "archived"' );
+		$SQL->WHERE_and( 'iver_edit_last_touched_ts <= '.$DB->quote( $edited_Item->get_user_data( 'item_date' ) ) );
+		$SQL->ORDER_BY( 'iver_edit_last_touched_ts DESC' );
+		$SQL->LIMIT( '1' );
+		$lastnotseen_revision_ID = $DB->get_var( $SQL );
+
+		if( $lastnotseen_revision_ID > 0 && $edited_Item->get_user_data( 'item_date' ) < $edited_Item->get( 'last_touched_ts' ) )
+		{	// Redirect to compare last not seen revision with current version:
+			header_redirect( $admin_url.'?ctrl=items&action=history_compare&p='.$edited_Item->ID.'&r1=a'.$lastnotseen_revision_ID.'&r2=c' );
+		}
+		else
+		{	// Redirect to view current version because User have already seen all changes before:
+			$Messages->add( T_('You have already seen all changes of this Item.'), 'note' );
+			header_redirect( $admin_url.'?ctrl=items&action=history_details&p='.$edited_Item->ID.'&r=c' );
+		}
 		break;
 
 	case 'history_details':

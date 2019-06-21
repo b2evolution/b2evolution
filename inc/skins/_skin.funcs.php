@@ -113,12 +113,20 @@ function skin_init( $disp )
 				break;
 			}
 
-			if( $disp == 'mustread' && ! $Blog->get_setting( 'track_unread_content' ) )
-			{	// Forbid access to flagged content for not logged in users:
-				global $disp;
-				$disp = '404';
-				$Messages->add( T_('This collection has no "Must Read" items.'), 'error' );
-				break;
+			if( $disp == 'mustread' )
+			{	// Check access to "must read" content:
+				if( ! is_logged_in() )
+				{	// Forbid access to "must read" content for not logged in users:
+					header_redirect( get_login_url( 'no access to must read content', NULL, false, NULL, 'access_requires_loginurl' ), 302 );
+					// Exit here.
+				}
+				if( ! $Blog->get_setting( 'track_unread_content' ) )
+				{	// Forbid access to "must read" content if collection doesn't track unread content:
+					global $disp;
+					$disp = '404';
+					$Messages->add( T_('This feature only works when <b>Tracking of unread content</b> is enabled.'), 'error' );
+					break;
+				}
 			}
 
 			if( $disp == 'terms' )

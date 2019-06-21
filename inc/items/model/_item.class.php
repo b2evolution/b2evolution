@@ -6358,6 +6358,68 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get a link to view changes of Item for current User
+	 *
+	 * @return string A link to history
+	 */
+	function get_changes_link( $params = array() )
+	{
+		$params = array_merge( array(
+				'before'    => '',
+				'after'     => '',
+				'link_text' => '#', // Use a mask $icon$ or some other text
+				'class'     => '',
+			), $params );
+
+		if( ( $changes_url = $this->get_changes_url() ) === false )
+		{	// No url available for current user, Don't display a link:
+			return;
+		}
+
+		if( $params['link_text'] == '#' )
+		{	// Default link text:
+			$params['link_text'] = '$icon$ '.T_('View changes');
+		}
+
+		// Replace all masks with values
+		$link_text = str_replace( '$icon$', $this->history_info_icon(), $params['link_text'] );
+
+		return $params['before']
+			.'<a href="'.$changes_url.'"'.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' ).'>'.$link_text.'</a>'
+			.$params['after'];
+	}
+
+
+	/**
+	 * Get URL to view changes of Item for current User
+	 *
+	 * @param string Glue between url params
+	 * @return string|boolean URL to history OR False when user cannot see a history
+	 */
+	function get_changes_url( $glue = '&amp;' )
+	{
+		global $current_User, $admin_url;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// Current user cannot see item changes:
+			return false;
+		}
+
+		if( ! $this->get_Blog()->get_setting( 'track_unread_content' ) )
+		{	// Tracking of unread content must be enabled to know last seen timestamp by current User:
+			return false;
+		}
+
+		if( $this->get_read_status() != 'updated' )
+		{	// Don't allow URL when no new changes for current User:
+			return false;
+		}
+
+		return $admin_url.'?ctrl=items'.$glue.'action=history_lastseen'.$glue.'p='.$this->ID;
+	}
+
+
+	/**
 	 * Get JavaScript code for onclick event of merge link
 	 *
 	 * @return boolean|string
