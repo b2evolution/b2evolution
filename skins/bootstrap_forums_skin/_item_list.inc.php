@@ -238,7 +238,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 			echo '<div class="ft_date_header">';	// fp> temp hack to get correct style
 
 			// Workflow status
-			echo '<b><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></b>';
+			echo '<b><a href="'.$url.'" style="color:'.$priority_color.'">'.item_td_task_cell( 'status', $Item, false ).'</a></b>';
 			echo '</div>';
 
 			// b2evonet:
