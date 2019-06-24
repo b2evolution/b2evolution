@@ -231,7 +231,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 
 					default:
 						// Incorrect object type, Skip this url
-						continue;
+						continue 2;
 				}
 				if( !empty( $new_url ) )
 				{ // Replace relative anchor url with new absolute url
