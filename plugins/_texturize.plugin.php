@@ -17,7 +17,7 @@ class texturize_plugin extends Plugin
 	var $code = 'b2WPTxrz';
 	var $name = 'Texturize';
 	var $priority = 90;
-	var $version = '7.0.1';
+	var $version = '7.0.2';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;

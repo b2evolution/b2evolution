@@ -33,7 +33,7 @@ class ping_pingomatic_plugin extends Plugin
 	 */
 	var $code = 'ping_pingomatic';
 	var $priority = 50;
-	var $version = '7.0.1';
+	var $version = '7.0.2';
 	var $author = 'http://daniel.hahler.de/';
 
 	/*

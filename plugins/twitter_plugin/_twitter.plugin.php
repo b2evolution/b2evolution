@@ -41,7 +41,7 @@ class twitter_plugin extends Plugin
 	 */
 	var $code = 'evo_twitter';
 	var $priority = 50;
-	var $version = '7.0.1';
+	var $version = '7.0.2';
 	var $author = 'b2evolution Group';
 
 	/*
