@@ -339,7 +339,7 @@ switch( $action )
 						else
 						{ // Error on creating new category
 							$Messages->add( sprintf( T_('New category %s creation failed.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'error' );
-							continue; // Skip this post
+							continue 2; // Skip this post
 						}
 						$cat_Array[ $fileNum ] = $new_Chapter->ID;
 						break;
