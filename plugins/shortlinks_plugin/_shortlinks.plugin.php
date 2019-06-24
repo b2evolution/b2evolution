@@ -807,7 +807,7 @@ class shortlinks_plugin extends Plugin
 		function shortlinks_load_window( prefix )
 		{
 			openModalWindow( '<div id="shortlinks_wrapper"></div>', 'auto', '', true,
-				'<?php echo TS_('Link to a Post'); ?>', // Window title
+				'<?php echo TS_('Link to a Post').get_manual_link( 'shortlinks-plugin-link-post-dialog' ); ?>', // Window title
 				[ '-', 'shortlinks_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back" and "Insert [[post-url-name]]"
 				true );
 
