@@ -8384,9 +8384,40 @@ function evo_version_compare( $version1, $version2, $operator = NULL )
 		$version1 = $app_version;
 	}
 
-	// Remove "stable" suffix to compare such versions as upper than "alpha", "beta" and etc.:
-	$version1 = str_replace( '-stable', '', $version1 );
-	$version2 = str_replace( '-stable', '', $version2 );
+	preg_match( '#^([\d\.]+)(-.+)?$#', $version1, $m_ver1 );
+	preg_match( '#^([\d\.]+)(-.+)?$#', $version2, $m_ver2 );
+
+	if( isset( $m_ver1[1], $m_ver2[1] ) && $m_ver1[1] == $m_ver2[1] )
+	{	// If versions number is same:
+		$version1_suffix = ( isset( $m_ver1[2] ) ? $m_ver1[2] : '' );
+		$version2_suffix = ( isset( $m_ver2[2] ) ? $m_ver2[2] : '' );
+
+		if( $version1_suffix == '-PRO' )
+		{	// Remove "PRO" suffix to compare such versions as upper than "stable", "alpha", "beta" and etc.:
+			$version1 = $m_ver1[1];
+			if( $version2_suffix === '' )
+			{	// Add suffix "stable" in order to make version(without suffix) lower than "PRO":
+				$version2 .= '-stable';
+			}
+		}
+		elseif( $version2_suffix == '-stable' )
+		{	// Remove "stable" suffix to compare such versions as upper than "alpha", "beta" and etc. except of "PRO":
+			$version2 = $m_ver2[1];
+		}
+
+		if( $version2_suffix == '-PRO' )
+		{	// Remove "PRO" suffix to compare such versions as upper than "stable", "alpha", "beta" and etc.:
+			$version2 = $m_ver2[1];
+			if( $version1_suffix === '' )
+			{	// Add suffix "stable" in order to make version(without suffix) lower than "PRO":
+				$version1 .= '-stable';
+			}
+		}
+		elseif( $version1_suffix == '-stable' )
+		{	// Remove "stable" suffix to compare such versions as upper than "alpha", "beta" and etc. except of "PRO":
+			$version1 = $m_ver1[1];
+		}
+	}
 
 	if( is_null( $operator ) )
 	{	// To return integer:
