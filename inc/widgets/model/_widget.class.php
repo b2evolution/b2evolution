@@ -1551,6 +1551,7 @@ class ComponentWidget extends DataObject
 		// Typically stuff that will help the content to validate
 		// Useful for code display.
 		// Will probably be used for validation also.
+		// + APPLY RENDERING from Rendering Plugins:
 		$Plugins_admin = & get_Plugins_admin();
 		$params = array(
 				'object_type' => 'Widget',
