@@ -296,7 +296,7 @@ function prepare_maintenance_dir( $dir_name, $deny_access = true )
  */
 function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_name = '' )
 {
-	global $Settings, $current_User, $basepath;
+	global $Settings, $current_User, $basepath, $upgrade_path;
 
 	if( ! is_logged_in() || ! $current_User->check_perm( 'files', 'all' ) )
 	{	// No permission to unzip files:
@@ -311,11 +311,22 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 		return false;
 	}
 
-	if( strpos( $src_file, $basepath ) !== 0 || // ZIP file path must be started with $basepath
-	    strpos( $src_file, '/../' ) !== false || // Deny ZIP file path with hack to up dir level
-	    strpos( $src_file, '://' ) !== false ) // Deny ZIP file from urls
+	if( strpos( $src_file, '://' ) !== false )
+	{	// Deny ZIP file from urls:
+		$invalid_path_error = sprintf( T_('Path must not contain %s'), '<code>://</code>' );
+	}
+	else
+	{	// Check if ZIP path is inside $basepath or $upgrade_path:
+		$canonical_path = get_canonical_path( $src_file );
+		if( strpos( $canonical_path, $basepath ) !== 0 &&
+		    strpos( $canonical_path, $upgrade_path ) !== 0 )
+		{	// ZIP file path must be started with $basepath or $upgrade_path:
+			$invalid_path_error = sprintf( T_('Path is outside $basepath=%s and outside $upgrade_path=%s.'), '<code>'.$basepath.'</code>', '<code>'.$upgrade_path.'</code>' );
+		}
+	}
+	if( isset( $invalid_path_error ) )
 	{	// Don't allow wrong ZIP file path:
-		echo '<p class="text-danger">Invalid ZIP file path <code>'.$src_file.'</code>!</p>';
+		echo '<p class="text-danger">'.sprintf( T_('Invalid ZIP file path %s:'), '<code>'.$src_file.'</code>' ).' '.$invalid_path_error.'</p>';
 		evo_flush();
 		return false;
 	}
