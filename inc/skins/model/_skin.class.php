@@ -1093,7 +1093,7 @@ class Skin extends DataObject
 
 					global $Collection, $Blog, $Item, $current_User;
 
-					if( isset( $Item ) && $Item->can_receive_webmentions() )
+					if( ! empty( $Item ) && $Item->can_receive_webmentions() )
 					{	// Send header and initialize <link> tags in order to mark current Item can receive webmentions by current User(usually anonymous user):
 						$webmention_url = $Blog->get_htsrv_url().'webmention.php';
 						header( 'Link: <'.$webmention_url.'>; rel="webmention"' );
