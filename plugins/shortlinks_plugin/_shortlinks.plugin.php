@@ -1024,7 +1024,7 @@ class shortlinks_plugin extends Plugin
 					var coll = data.colls[c];
 					r += '<option value="' + coll.urlname + '"'
 						+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
-						+ coll.name + '</option>';
+						+ coll.shortname + ' : ' + coll.name + '</option>';
 					if( coll_urlname == '' || coll.urlname == current_coll_urlname )
 					{	// Set these vars to load posts of the selected or first collection:
 						coll_urlname = coll.urlname;
