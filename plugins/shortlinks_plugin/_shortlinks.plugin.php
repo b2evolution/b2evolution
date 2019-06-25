@@ -1075,7 +1075,7 @@ class shortlinks_plugin extends Plugin
 				{	// Load posts list of the current or first collection:
 					shortlinks_load_coll_posts( coll_urlname, coll_name );
 				}
-			} );
+			}, { list_in_frontoffice: 'all' } );
 		}
 
 		/**
