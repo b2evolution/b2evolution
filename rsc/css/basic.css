@@ -228,11 +228,11 @@ div#evo_toolbar .actions_right {
 }
 .evobar-menu a.disabled,
 .evobar-menu a.disabled:hover {
-  color: #999999;
+  color: #999;
 }
 .evobar-menu a.active,
 .evobar-menu a.active:hover {
-  background-color: #ffffcc;
+  background-color: #ffc;
   border-radius: 4px;
   padding-top: 5px;
   padding-bottom: 5px;
@@ -298,7 +298,7 @@ div#evo_toolbar .actions_right {
   left: 0;
   width: 100%;
   text-align: center;
-  text-shadow: -1px -1px #000000, -2px 0 #000000, -1px 1px #000000, 0 2px #000000, 1px 1px #000000, 2px 0 #000000, 1px -1px #000000, 0 -2px #000000;
+  text-shadow: -1px -1px #000, -2px 0 #000, -1px 1px #000, 0 2px #000, 1px 1px #000, 2px 0 #000, 1px -1px #000, 0 -2px #000;
   color: #FFF;
   font-weight: bold;
 }
@@ -874,7 +874,7 @@ label.radiooption {
   margin: 0 0 1ex 0;
   background-color: #fff;
   /* dh> change to "transparent"? */
-  padding: .5ex 1ex;
+  padding: 0.5ex 1ex;
 }
 legend {
   font-weight: bold;
@@ -896,7 +896,7 @@ legend {
   text-align: right;
   font-weight: bold;
   margin: 0;
-  padding-top: .5ex;
+  padding-top: 0.5ex;
 }
 .fform fieldset.field_wide div.label,
 .fform fieldset.field_inline div.label {
@@ -924,7 +924,7 @@ legend {
 }
 .fform div.info {
   margin: 0 0 0 25%;
-  padding-top: .5ex;
+  padding-top: 0.5ex;
 }
 .fform fieldset.info_full div.info {
   margin-left: 5px;
