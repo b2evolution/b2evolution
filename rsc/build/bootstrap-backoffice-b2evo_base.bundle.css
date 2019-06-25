@@ -2437,6 +2437,11 @@ ol {
 p.margin-top {
   margin: 10px 0 0 0;
 }
+th > p:last-child,
+td > p:last-child,
+caption > p:last-child {
+  margin-bottom: 0;
+}
 .table-hover > tbody > tr:hover {
   background-color: #ffc;
 }

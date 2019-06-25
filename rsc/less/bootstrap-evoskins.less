@@ -58,6 +58,13 @@ p.margin-top {
 	margin: 10px 0 0 0;
 }
 
+// Remove unwanted space at the bottom of table cell:
+th, td, caption {
+	> p:last-child {
+		margin-bottom: 0;
+	}
+}
+
 // Use yellow color on hover table rows intead of grey standard color:
 .table-hover > tbody > tr:hover {
 	background-color: #ffc;
