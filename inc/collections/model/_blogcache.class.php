@@ -272,7 +272,7 @@ class BlogCache extends DataObjectCache
 
 
 	/**
-	 * Get SQL to load a list of public collections
+	 * Get SQL to load a list of public collections that can be seen by currently logged in User
 	 *
 	 * @param string Order By
 	 * @param string Order Direction
@@ -292,7 +292,7 @@ class BlogCache extends DataObjectCache
 			$order_dir = $Settings->get( 'blogs_order_dir' );
 		}
 
-		$SQL = new SQL();
+		$SQL = new SQL( 'Get public collections that can be seen by currently logged in User' );
 		$SQL->SELECT( '*' );
 		$SQL->FROM( $this->dbtablename );
 		$sql_where = 'blog_in_bloglist = "public"';
@@ -302,6 +302,68 @@ class BlogCache extends DataObjectCache
 			// Allow the collections that available for members:
 			global $current_User;
 			$sql_where .= ' OR ( blog_in_bloglist = "member" AND (
+					( SELECT grp_ID
+					    FROM T_groups
+					   WHERE grp_ID = '.$current_User->grp_ID.'
+					     AND grp_perm_blogs IN ( "viewall", "editall" ) ) OR
+					( SELECT bloguser_user_ID
+					    FROM T_coll_user_perms
+					   WHERE bloguser_blog_ID = blog_ID
+					     AND bloguser_ismember = 1
+					     AND bloguser_user_ID = '.$current_User->ID.' ) OR
+					( SELECT bloggroup_group_ID
+					    FROM T_coll_group_perms
+					   WHERE bloggroup_blog_ID = blog_ID
+					     AND bloggroup_ismember = 1
+					     AND ( bloggroup_group_ID = '.$current_User->grp_ID.'
+					           OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = '.$current_User->ID.' ) )
+					  LIMIT 1
+					)
+				) )';
+		}
+		$SQL->WHERE( '( '.$sql_where.' )' );
+		$SQL->ORDER_BY( gen_order_clause( $order_by, $order_dir, 'blog_', 'blog_ID' ) );
+
+		return $SQL;
+	}
+
+
+	/**
+	 * Get SQL to load a list of all collections that can be seen by currently logged in User
+	 *
+	 * @param string Order By
+	 * @param string Order Direction
+	 * @return object SQL
+	 */
+	function get_available_colls_SQL( $order_by = '', $order_dir = '' )
+	{
+		global $Settings;
+
+		if( $order_by == '' )
+		{	// Use default value from settings:
+			$order_by = $Settings->get( 'blogs_order_by' );
+		}
+
+		if( $order_dir == '' )
+		{	// Use default value from settings:
+			$order_dir = $Settings->get( 'blogs_order_dir' );
+		}
+
+		load_class( 'collections/model/_collsettings.class.php', 'CollectionSettings' );
+		$CollectionSettings = new CollectionSettings();
+		$default_allow_access = $CollectionSettings->get_default( 'allow_access' );
+
+		$SQL = new SQL( 'Get all collections that can be seen by currently logged in User' );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( $this->dbtablename );
+		$SQL->FROM_add( 'LEFT JOIN T_coll_settings ON cset_coll_ID = blog_ID AND cset_name = "allow_access"' );
+		$sql_where = '( cset_value = "public"'.( $default_allow_access == "public" ? ' OR cset_value IS NULL' : '' ).' )';
+		if( is_logged_in() )
+		{	// Allow the collections that available for logged in users:
+			$sql_where .= ' OR ( cset_value = "users"'.( $default_allow_access == "users" ? ' OR cset_value IS NULL' : '' ).' )';
+			// Allow the collections that available for members:
+			global $current_User;
+			$sql_where .= ' OR ( ( cset_value = "members"'.( $default_allow_access == "members" ? ' OR cset_value IS NULL' : '' ).' ) AND (
 					( SELECT grp_ID
 					    FROM T_groups
 					   WHERE grp_ID = '.$current_User->grp_ID.'

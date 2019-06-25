@@ -1038,7 +1038,7 @@ class shortlinks_plugin extends Plugin
 					var coll = data.colls[c];
 					r += '<option value="' + coll.urlname + '"'
 						+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
-						+ coll.name + '</option>';
+						+ coll.shortname + ' : ' + coll.name + '</option>';
 					if( coll_urlname == '' || coll.urlname == current_coll_urlname )
 					{	// Set these vars to load posts of the selected or first collection:
 						coll_urlname = coll.urlname;
@@ -1089,7 +1089,7 @@ class shortlinks_plugin extends Plugin
 				{	// Load posts list of the current or first collection:
 					shortlinks_load_coll_posts( coll_urlname, coll_name );
 				}
-			} );
+			}, { list_in_frontoffice: 'all' } );
 		}
 
 		/**

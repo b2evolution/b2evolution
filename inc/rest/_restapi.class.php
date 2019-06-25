@@ -422,7 +422,7 @@ class RestApi
 	 */
 	private function controller_coll_()
 	{
-		global $DB, $Settings, $current_User;
+		global $DB, $current_User;
 
 		$api_page = param( 'page', 'integer', 1 );
 		$api_per_page = param( 'per_page', 'integer', 10 );
@@ -431,24 +431,19 @@ class RestApi
 		$api_restrict_to_available_fileroots = param( 'restrict_to_available_fileroots', 'integer', 0 ); // 1 - Load only collections with available file roots for current user
 		$api_list_in_frontoffice = param( 'list_in_frontoffice', 'string', 'public' ); // 'public' - Load only collections which can be viewed for current user
 
+		$BlogCache = & get_BlogCache();
+
 		if( $api_list_in_frontoffice == 'public' )
 		{	// SQL to get ONLY public collections:
-			$BlogCache = & get_BlogCache();
 			$SQL = $BlogCache->get_public_colls_SQL();
 			$count_SQL = $BlogCache->get_public_colls_SQL();
 			$count_SQL->SELECT( 'COUNT( blog_ID )' );
 		}
 		else
-		{	// SQL to get ALL collections:
-			$sql_order_by = gen_order_clause( $Settings->get( 'blogs_order_by' ), $Settings->get( 'blogs_order_dir' ), 'blog_', 'blog_ID' );
-			$SQL = new SQL();
-			$SQL->SELECT( '*' );
-			$SQL->FROM( 'T_blogs' );
-			$SQL->ORDER_BY( $sql_order_by );
-			$count_SQL = new SQL( 'Get a count of collections for search request' );
+		{	// SQL to get ALL collections that can be seen by currently logged in User:
+			$SQL = $BlogCache->get_available_colls_SQL();
+			$count_SQL = $BlogCache->get_available_colls_SQL();
 			$count_SQL->SELECT( 'COUNT( blog_ID )' );
-			$count_SQL->FROM( 'T_blogs' );
-			$count_SQL->ORDER_BY( $sql_order_by );
 		}
 
 		if( ! empty( $api_q ) )
