@@ -945,6 +945,12 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		}
 	}
 
+	// Call methods of modules:
+	modules_call_method( 'handle_searched_results', array(
+			'keywords' => $search_keywords,
+			'results'  => $search_result,
+		) );
+
 	return $search_result;
 }
 
