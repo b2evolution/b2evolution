@@ -1458,7 +1458,15 @@ function make_clickable_callback( $text, $moredelim = '&amp;', $additional_attrs
  */
 function date2mysql( $ts )
 {
-	return date( 'Y-m-d H:i:s', $ts );
+	if( $ts > 0 )
+	{	// Allow only positive timestamp value:
+		return date( 'Y-m-d H:i:s', $ts );
+	}
+	else
+	{	// If timestamp is wrong(NULL or FALSE or negative value) use this mimimum date instead of default 1970-01-01 03:00:00,
+		// because with negative timezone like -2:00 it may returns 1970-01-01 01:00:00 which creates MySQL error "Incorrect datetime value".
+		return '2000-01-01 00:00:00';
+	}
 }
 
 /**

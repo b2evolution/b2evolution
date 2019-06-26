@@ -901,6 +901,10 @@ class File extends DataObject
 		if( ! isset( $this->_lastmod_ts ) )
 		{	// Get timestamp from disk file:
 			$this->_lastmod_ts = @filemtime( $this->_adfp_full_path );
+			if( $this->_lastmod_ts === false )
+			{	// Log failed result:
+				syslog_insert( sprintf( 'Could not get modification time of the file %s', '[['.$this->_adfp_full_path.']]' ), 'info', 'file', $this->ID );
+			}
 		}
 
 		if( $this->ID && // File is stored in DB before
