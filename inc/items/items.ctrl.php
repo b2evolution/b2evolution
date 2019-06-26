@@ -1132,7 +1132,6 @@ switch( $action )
 		// Compare the custom fields of two revisions:
 		$oneline_TableDiffFormatter = new TableDiffFormatter();
 		$oneline_TableDiffFormatter->block_header = '';
-		$revisions_difference_custom_fields = array();
 		// Switch to 1st revision:
 		$edited_Item->set( 'revision', get_param( 'r1' ) );
 		$custom_fields = $edited_Item->get_type_custom_fields();
@@ -1151,6 +1150,7 @@ switch( $action )
 				$custom_fields[ $r2_custom_field['name'] ] = $r2_custom_field;
 			}
 		}
+		$revisions_difference_custom_fields = empty( $custom_fields ) ? false : array(); // FALSE means Item has no custom fields
 		foreach( $custom_fields as $custom_field )
 		{
 			// Get custom field values of both revisions:
@@ -1221,9 +1221,10 @@ switch( $action )
 		$LinkOwner = new LinkItem( $edited_Item );
 		// Switch to 1st revision:
 		$edited_Item->set( 'revision', get_param( 'r1' ) );
-		$revisions_difference_links = array();
+		$revisions_difference_links = false; // FALSE means Item has no attached files
 		if( $r1_LinkList = $LinkOwner->get_attachment_LinkList() )
 		{
+			$revisions_difference_links = array();
 			while( $r1_Link = & $r1_LinkList->get_next() )
 			{
 				$revisions_difference_links[ $r1_Link->ID ]['r1'] = array(
@@ -1239,6 +1240,10 @@ switch( $action )
 		$edited_Item->set( 'revision', get_param( 'r2' ) );
 		if( $r2_LinkList = $LinkOwner->get_attachment_LinkList() )
 		{
+			if( ! is_array( $revisions_difference_links ) )
+			{
+				$revisions_difference_links = array();
+			}
 			while( $r2_Link = & $r2_LinkList->get_next() )
 			{
 				$r_link_data = array(
