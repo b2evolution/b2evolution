@@ -40,6 +40,40 @@ if( ! is_array( $legend_icons ) )
 	$legend_icons = array();
 }
 
+// ------------------------------- START OF POSTS ASSIGNED TO CURRENT USER -------------------------------
+if( is_logged_in() &&
+    $Blog->get_setting( 'use_workflow' ) &&
+    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+{	// Only if current User can be assigned to tasks of the current Collection:
+	$assigned_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+	$assigned_ItemList->set_filters( array(
+			'assignees' => $current_User->ID,
+			'unit'      => 'all', // Display all items, Don't limit by page
+		) );
+	$assigned_ItemList->query();
+	if( $assigned_ItemList->result_num_rows > 0 )
+	{	// Display panel with assigned posts if at least one is found:
+?>
+<div class="panel panel-default forums_list">
+	<header class="panel-heading"><?php echo T_('Assigned to me'); ?></header>
+<?php
+		while( $Item = $assigned_ItemList->get_item() )
+		{
+			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+			skin_include( '_item_list.inc.php', array(
+					'content_mode'  => 'auto', // 'auto' will auto select depending on $disp-detail
+					'image_size'    => 'fit-1280x720',
+					'workflow_mode' => true,
+				) );
+			// ----------------------------END ITEM BLOCK  ----------------------------
+		}
+?>
+</div>
+<?php
+	}
+}
+// -------------------------------- END OF POSTS ASSIGNED TO CURRENT USER --------------------------------
+
 // ------------------------------- START OF INTRO-FRONT POST -------------------------------
 if( $Item = & get_featured_Item( 'front' ) )
 { // We have a intro-front post to display:

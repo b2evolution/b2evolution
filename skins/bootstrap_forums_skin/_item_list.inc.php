@@ -17,6 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Default params:
 $params = array_merge( array(
 		'post_navigation' => 'same_category', // In this skin, it makes no sense to navigate in any different mode than "same category"
+		'workflow_mode'   => false, // TRUE - to force workflow view mode
 	), $params );
 
 global $Item, $cat, $disp;
@@ -63,12 +64,22 @@ elseif( $comments_number > 25 )
 }
 $Item->load_Blog();
 // There is a very restrictive case in which we display workflow:
-$display_workflow = ( $disp == 'posts' ) &&
+$display_workflow =
+  (
+    // Forced workflow mode:
+    $params['workflow_mode'] ||
+    // OR disp=posts and workflow is enabled for current Collection and current User has a permission
+    ( $disp == 'posts' &&
+      is_logged_in() &&
+      $Blog->get_setting( 'use_workflow' ) &&
+      $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID )
+    )
+  )
+  &&
+  ( // AND current User has a permission to edit the Item:
     ! empty( $Item ) &&
-    is_logged_in() &&
-    $Blog->get_setting( 'use_workflow' ) &&
-    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
-    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item );
+    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
+  );
 ?>
 
 <article class="container group_row posts_panel">
