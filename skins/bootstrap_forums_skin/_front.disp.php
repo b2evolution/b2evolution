@@ -45,11 +45,13 @@ if( is_logged_in() &&
     $Blog->get_setting( 'use_workflow' ) &&
     $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 {	// Only if current User can be assigned to tasks of the current Collection:
-	$assigned_ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+	$assigned_ItemList = new ItemList2( $Blog, NULL, NULL, 15, 'ItemCache', 'assigned_' );
 	$assigned_ItemList->set_filters( array(
 			'assignees' => $current_User->ID,
-			'unit'      => 'all', // Display all items, Don't limit by page
-		) );
+			'orderby'   => 'priority,datecreated',
+			'order'     => 'ASC,ASC',
+			'page'      => param( 'assigned_paged', 'integer', 1 ),
+		), false );
 	$assigned_ItemList->query();
 	if( $assigned_ItemList->result_num_rows > 0 )
 	{	// Display panel with assigned posts if at least one is found:
@@ -67,6 +69,19 @@ if( is_logged_in() &&
 				) );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
+
+		// Display pagination for assigned posts:
+		$assigned_ItemList->page_links(  array(
+				'block_start'           => '<div class="panel-body comments_link__pagination" style="margin-bottom:0"><ul class="pagination">',
+				'block_end'             => '</ul></div>',
+				'page_current_template' => '<span>$page_num$</span>',
+				'page_item_before'      => '<li>',
+				'page_item_after'       => '</li>',
+				'page_item_current_before' => '<li class="active">',
+				'page_item_current_after'  => '</li>',
+				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
+			) );
 ?>
 </div>
 <?php
