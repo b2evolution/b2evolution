@@ -56,15 +56,13 @@ $Form->begin_form( 'fform', sprintf( T_('Difference between revisions for: %s'),
 			<div class="center"><span<?php echo $Revision_1->iver_status != $Revision_2->iver_status ? ' style="color:#F00;font-weight:bold"' : ''; ?>><?php echo $post_statuses[ $Revision_2->iver_status ]; ?></span></div>
 		</td>
 	</tr>
+	<tr><td colspan="4">&nbsp;</td></tr>
+	<tr>
+		<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Title').':'; ?></b></td>
+	</tr>
 <?php
-	if( !empty( $revisions_difference_title ) )
-	{	// Display title difference
-		?>
-		<tr><td colspan="4">&nbsp;</td></tr>
-		<tr>
-			<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Title').':'; ?></b></td>
-		</tr>
-		<?php
+	if( ! empty( $revisions_difference_title ) )
+	{	// Display title difference:
 		echo $revisions_difference_title;
 	}
 	else
@@ -78,14 +76,12 @@ $Form->begin_form( 'fform', sprintf( T_('Difference between revisions for: %s'),
 	}
 ?>
 	<tr><td colspan="4">&nbsp;</td></tr>
-<?php
-if( !empty( $revisions_difference_content ) )
-{	// Display content difference
-	?>
 	<tr>
 		<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Content').':'; ?></b></td>
 	</tr>
-	<?php
+<?php
+if( ! empty( $revisions_difference_content ) )
+{	// Display content difference:
 	echo $revisions_difference_content;
 }
 else
