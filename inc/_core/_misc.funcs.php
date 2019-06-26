@@ -65,6 +65,33 @@ function modules_call_method( $method_name, $params = NULL )
 
 
 /**
+ * Call a method for all modules in a row and update params by reference
+ *
+ * @param string the name of the method which should be called
+ * @param array params
+ * @return array[module_name][return value], or NULL if the method doesn't have any return value
+ */
+function modules_call_method_reference_params( $method_name, & $params )
+{
+	global $modules;
+
+	$result = NULL;
+
+	foreach( $modules as $module )
+	{
+		$Module = & $GLOBALS[$module.'_Module'];
+		$ret = $Module->{$method_name}( $params );
+		if( isset( $ret ) )
+		{
+			$result[$module] = $ret;
+		}
+	}
+
+	return $result;
+}
+
+
+/**
  * Loads the b2evo database scheme.
  *
  * This gets updated through {@link db_delta()} which generates the queries needed to get

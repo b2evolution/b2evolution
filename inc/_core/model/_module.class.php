@@ -356,6 +356,16 @@ class Module
 	function handle_searched_results( $search_data )
 	{
 	}
+
+
+	/**
+	 * Prepare the display params of search result object by modules
+	 *
+	 * @param array Parameters of the displayed search result object (param is updated by reference)
+	 */
+	function prepare_search_result_display_params( & $params )
+	{
+	}
 }
 
 ?>

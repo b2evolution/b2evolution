@@ -945,7 +945,7 @@ function perform_scored_search( $search_keywords, $searched_content_types = 'all
 		}
 	}
 
-	// Call methods of modules:
+	// Handle searched results by modules:
 	modules_call_method( 'handle_searched_results', array(
 			'keywords' => $search_keywords,
 			'results'  => $search_result,
@@ -1615,6 +1615,9 @@ function display_search_result( $params = array() )
 			'cell_content_start' => '<div class="result_content">',
 			'cell_content_end'   => '</div>',
 		), $params );
+
+	// Prepare the display params of search result object by modules:
+	modules_call_method_reference_params( 'prepare_search_result_display_params', $params );
 
 	echo $params['row_start'];
 
