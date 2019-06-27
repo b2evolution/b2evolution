@@ -48,8 +48,8 @@ if( is_logged_in() &&
 	$assigned_ItemList = new ItemList2( $Blog, NULL, NULL, 15, 'ItemCache', 'assigned_' );
 	$assigned_ItemList->set_filters( array(
 			'assignees' => $current_User->ID,
-			'orderby'   => 'priority,datecreated',
-			'order'     => 'ASC,ASC',
+			'orderby'   => 'priority,last_touched_ts',
+			'order'     => 'ASC,DESC',
 			'page'      => param( 'assigned_paged', 'integer', 1 ),
 		), false );
 	$assigned_ItemList->query();
