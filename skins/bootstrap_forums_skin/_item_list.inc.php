@@ -17,7 +17,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Default params:
 $params = array_merge( array(
 		'post_navigation' => 'same_category', // In this skin, it makes no sense to navigate in any different mode than "same category"
-		'workflow_mode'   => false, // TRUE - to force workflow view mode
 	), $params );
 
 global $Item, $cat, $disp;
@@ -62,24 +61,14 @@ elseif( $comments_number > 25 )
 	$status_alt = T_('Popular topic');
 	$legend_icons['topic_popular'] = 1;
 }
-$Item->load_Blog();
 // There is a very restrictive case in which we display workflow:
 $display_workflow =
-  (
-    // Forced workflow mode:
-    $params['workflow_mode'] ||
-    // OR disp=posts and workflow is enabled for current Collection and current User has a permission
-    ( $disp == 'posts' &&
-      is_logged_in() &&
-      $Blog->get_setting( 'use_workflow' ) &&
-      $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID )
-    )
-  )
-  &&
-  ( // AND current User has a permission to edit the Item:
-    ! empty( $Item ) &&
-    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item )
-  );
+	// User must be logged in:
+	is_logged_in() &&
+	// Workflow must be enabled for current Collection:
+	$Item->get_coll_setting( 'use_workflow' ) &&
+	// Current User must has a permission to be assigned for tasks of the current Collection:
+	$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Item->get_blog_ID() );
 ?>
 
 <article class="container group_row posts_panel">
@@ -117,7 +106,7 @@ $display_workflow =
 						<?php
 						echo $status_title;
 
-						if( $Item->Blog->get_setting( 'track_unread_content' ) )
+						if( $Item->get_coll_setting( 'track_unread_content' ) )
 						{ // Update legend array to display the unread status icons in footer legend:
 							switch( $Item->get_read_status() )
 							{

@@ -1661,6 +1661,24 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Get setting of Item's collection
+	 *
+	 * @param string setting name
+	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
+	 */
+	function get_coll_setting( $parname )
+	{
+		if( $item_Blog = & $this->get_Blog() )
+		{	// Return setting value of this Item's collection 
+			return $item_Blog->get_setting( $parname );
+		}
+
+		// Error case when Item has no collection:
+		return false;
+	}
+
+
+	/**
 	 * Get array of tags.
 	 *
 	 * Load from DB if necessary, prefetching any other tags from MainList/ItemList.

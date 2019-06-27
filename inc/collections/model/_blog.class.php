@@ -3392,7 +3392,7 @@ class Blog extends DataObject
 	}
 
 
- 	/**
+	/**
 	 * Get a setting.
 	 *
 	 * @param string setting name
