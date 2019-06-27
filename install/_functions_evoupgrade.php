@@ -11775,6 +11775,33 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15490, 'Upgrading collection permission tables...') )
+	{	// part of 7.0.2-beta
+		db_upgrade_cols( 'T_coll_user_perms', array(
+			'ADD' => array(
+				'bloguser_workflow_status'   => 'tinyint NOT NULL default 0 AFTER bloguser_can_be_assignee',
+				'bloguser_workflow_user'     => 'tinyint NOT NULL default 0 AFTER bloguser_workflow_status',
+				'bloguser_workflow_priority' => 'tinyint NOT NULL default 0 AFTER bloguser_workflow_user',
+			),
+		) );
+		$DB->query( 'UPDATE T_coll_user_perms
+			  SET bloguser_workflow_status = 1,
+			      bloguser_workflow_user = 1
+			WHERE bloguser_can_be_assignee = 1' );
+		db_upgrade_cols( 'T_coll_group_perms', array(
+			'ADD' => array(
+				'bloggroup_workflow_status'   => 'tinyint NOT NULL default 0 AFTER bloggroup_can_be_assignee',
+				'bloggroup_workflow_user'     => 'tinyint NOT NULL default 0 AFTER bloggroup_workflow_status',
+				'bloggroup_workflow_priority' => 'tinyint NOT NULL default 0 AFTER bloggroup_workflow_user',
+			),
+		) );
+		$DB->query( 'UPDATE T_coll_group_perms
+			  SET bloggroup_workflow_status = 1,
+			      bloggroup_workflow_user = 1
+			WHERE bloggroup_can_be_assignee = 1' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

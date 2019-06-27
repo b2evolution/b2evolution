@@ -22,7 +22,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 function get_coll_user_perms_SQL( $Blog, $keywords = '', $use_order_mask = true )
 {
 	$SQL = new SQL( 'Get user permissions for collection #'.$Blog->ID );
-	$SQL->SELECT( $Blog->ID.' AS blog_ID, user_ID, user_login, user_level, bloguser_perm_item_propose, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_can_be_assignee,'
+	$SQL->SELECT( $Blog->ID.' AS blog_ID, user_ID, user_login, user_level, bloguser_perm_item_propose, bloguser_perm_poststatuses + 0 as perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit,'
+		.' bloguser_can_be_assignee, bloguser_workflow_status, bloguser_workflow_user, bloguser_workflow_priority,'
 		. 'bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses + 0 as perm_cmtstatuses, bloguser_perm_edit_cmt,'
 		. 'bloguser_perm_delpost, bloguser_perm_edit_ts, bloguser_perm_meta_comment, bloguser_perm_cats,'
 		. 'bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,'
@@ -59,7 +60,8 @@ function get_coll_user_perms_SQL( $Blog, $keywords = '', $use_order_mask = true 
 function get_coll_group_perms_SQL( $Blog, $keywords = '', $use_order_mask = true )
 {
 	$SQL = new SQL( 'Get group permissions for collection #'.$Blog->ID );
-	$SQL->SELECT( $Blog->ID.' AS blog_ID, grp_ID, grp_name, grp_usage, grp_level, bloggroup_perm_item_propose, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit, bloggroup_can_be_assignee,'
+	$SQL->SELECT( $Blog->ID.' AS blog_ID, grp_ID, grp_name, grp_usage, grp_level, bloggroup_perm_item_propose, bloggroup_perm_poststatuses + 0 as perm_poststatuses, bloggroup_perm_item_type, bloggroup_perm_edit,'
+		. 'bloggroup_can_be_assignee, bloggroup_workflow_status, bloggroup_workflow_user, bloggroup_workflow_priority,'
 		. 'bloggroup_perm_delcmts, bloggroup_perm_recycle_owncmts, bloggroup_perm_vote_spam_cmts, bloggroup_perm_cmtstatuses + 0 as perm_cmtstatuses, bloggroup_perm_edit_cmt,'
 		. 'bloggroup_perm_delpost, bloggroup_perm_edit_ts, bloggroup_perm_meta_comment, bloggroup_perm_cats,'
 		. 'bloggroup_perm_properties, bloggroup_perm_admin, bloggroup_perm_media_upload,'
@@ -618,7 +620,10 @@ function coll_grp_perm_col_member( $row )
 
 	if( $row_Blog->get_setting( 'use_workflow' ) )
 	{	// If the collection uses workflow:
-		$r .= coll_perm_checkbox( $row, 'bloggroup_', 'can_be_assignee', format_to_output( T_('Items can be assigned to members of this group'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
+		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'can_be_assignee', format_to_output( T_('Workflow Member (Items can be assigned to members of this Group)'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
+		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_status', format_to_output( T_('Members of this Group can change status'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
+		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_user', format_to_output( T_('Members of this Group can assign items to others'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
+		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_priority', format_to_output( T_('Members of this Group can set priority / deadline'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
 	}
 
 	return $r;
@@ -769,7 +774,7 @@ function colls_groups_perms_results( & $Results, $params = array() )
 
 	$Results->cols[] = array(
 			'th_group' => T_('Permissions on Posts'),
-			'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit<br />TS'),
+			'th' => /* TRANS: SHORT table header on TWO lines */ T_('Adv.<br />Edit'),
 			'th_class' => 'checkright',
 			'order' => 'bloggroup_perm_edit_ts',
 			'default_dir' => 'D',
@@ -933,6 +938,9 @@ function get_csv_coll_perms( $prefix, $perm_rows, $perm_Blog )
 		if( $perm_Blog->get_setting( 'use_workflow' ) )
 		{
 			$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'can_be_assignee', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'can_be_assignee'} );
+			$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'workflow_status', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'workflow_status'} );
+			$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'workflow_user', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'workflow_user'} );
+			$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'workflow_priority', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'workflow_priority'} );
 		}
 		$perm_row[] = is_always_coll_perm_enabled( $perm, $prefix, 'perm_item_propose', $perm_Blog->owner_user_ID ) ? 1 : intval( $perm->{$prefix.'perm_item_propose'} );
 		foreach( $post_statuses as $post_status )

@@ -3716,7 +3716,8 @@ class Blog extends DataObject
 		if( ! empty( $this->owner_user_ID ) )
 		{ // Proceed insertion:
 			$DB->query( 'INSERT INTO T_coll_user_perms
-					( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, bloguser_can_be_assignee,
+					( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+						bloguser_can_be_assignee, bloguser_workflow_status, bloguser_workflow_user, bloguser_workflow_priority,
 						bloguser_perm_item_propose, bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit,
 						bloguser_perm_delpost, bloguser_perm_edit_ts,
 						bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts,
@@ -3886,7 +3887,8 @@ class Blog extends DataObject
 		}
 
 		// Initialize fields of collection permission tables which must be duplicated:
-		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}perm_item_propose, {prefix}perm_poststatuses, {prefix}perm_item_type,
+		$coll_perm_fields = '{prefix}ismember, {prefix}can_be_assignee, {prefix}workflow_status, {prefix}workflow_user, {prefix}workflow_priority,
+				{prefix}perm_item_propose, {prefix}perm_poststatuses, {prefix}perm_item_type,
 				{prefix}perm_edit, {prefix}perm_delpost, {prefix}perm_edit_ts, {prefix}perm_delcmts,
 				{prefix}perm_recycle_owncmts, {prefix}perm_vote_spam_cmts, {prefix}perm_cmtstatuses,
 				{prefix}perm_edit_cmt, {prefix}perm_meta_comment, {prefix}perm_cats, {prefix}perm_properties,
@@ -4248,6 +4250,9 @@ class Blog extends DataObject
 			'admins' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 1,
+				'workflow_status'      => 1,
+				'workflow_user'        => 1,
+				'workflow_priority'    => 1,
 				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft,redirected',
 				'perm_item_type'       => 'admin',
@@ -4271,6 +4276,9 @@ class Blog extends DataObject
 			'moderators' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 1,
+				'workflow_status'      => 1,
+				'workflow_user'        => 1,
+				'workflow_priority'    => 1,
 				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => 'published,community,deprecated,protected,private,review,draft',
 				'perm_item_type'       => 'restricted',
@@ -4294,6 +4302,9 @@ class Blog extends DataObject
 			'editors' => array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'workflow_status'      => 0,
+				'workflow_user'        => 0,
+				'workflow_priority'    => 0,
 				'perm_item_propose'    => 1,
 				'perm_poststatuses'    => '',
 				'perm_item_type'       => 'standard',
@@ -4320,6 +4331,9 @@ class Blog extends DataObject
 			$group_permissions['editors'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'workflow_status'      => 0,
+				'workflow_user'        => 0,
+				'workflow_priority'    => 0,
 				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'community,protected,draft,deprecated',
 				'perm_item_type'       => 'standard',
@@ -4343,6 +4357,9 @@ class Blog extends DataObject
 			$group_permissions['users'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'workflow_status'      => 0,
+				'workflow_user'        => 0,
+				'workflow_priority'    => 0,
 				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'community,draft',
 				'perm_item_type'       => 'standard',
@@ -4366,6 +4383,9 @@ class Blog extends DataObject
 			$group_permissions['suspect'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'workflow_status'      => 0,
+				'workflow_user'        => 0,
+				'workflow_priority'    => 0,
 				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => 'review,draft',
 				'perm_item_type'       => 'standard',
@@ -4393,6 +4413,9 @@ class Blog extends DataObject
 			$group_permissions['blogb'] = array(
 				'ismember'             => 1,
 				'can_be_assignee'      => 0,
+				'workflow_status'      => 0,
+				'workflow_user'        => 0,
+				'workflow_priority'    => 0,
 				'perm_item_propose'    => 0,
 				'perm_poststatuses'    => '',
 				'perm_item_type'       => 'standard',

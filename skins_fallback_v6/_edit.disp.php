@@ -118,15 +118,22 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'metadesc', $edited_Item->get_setting( 'metadesc' ) );
 		$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 
-		if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
-		{	// We want to use workflow properties for this blog:
-			$Form->hidden( 'item_priority', $edited_Item->priority );
-			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
+		if( $edited_Item->can_edit_workflow( 'status' ) )
+		{	// Allow workflow status if current user can edit this property:
 			$Form->hidden( 'item_st_ID', $edited_Item->pst_ID );
-			if( $Blog->get_setting( 'use_deadline' ) )
-			{	// If deadline is enabled for collection:
-				$Form->hidden( 'item_deadline', $edited_Item->datedeadline );
-			}
+		}
+		if( $edited_Item->can_edit_workflow( 'status' ) )
+		{	// Allow workflow user if current user can edit this property:
+			$Form->hidden( 'item_assigned_user_ID', $edited_Item->assigned_user_ID );
+		}
+		if( $edited_Item->can_edit_workflow( 'priority' ) )
+		{	// Allow workflow priority if current user can edit this property:
+			$Form->hidden( 'item_priority', $edited_Item->priority );
+		}
+		if( $edited_Item->can_edit_workflow( 'deadline' ) )
+		{	// Allow workflow deadline if current user can edit this property:
+			$Form->hidden( 'item_deadline', mysql2date( locale_input_datefmt(), $edited_Item->datedeadline ) );
+			$Form->hidden( 'item_deadline_time', mysql2date( 'H:i', $edited_Item->datedeadline ) );
 		}
 		$Form->hidden( 'trackback_url', $trackback_url );
 		$Form->hidden( 'item_featured', $edited_Item->featured );

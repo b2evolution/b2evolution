@@ -368,9 +368,8 @@ switch( $action )
 
 		$item_Blog = & $edited_Item->get_Blog();
 
-		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
-		$current_User->check_perm( 'blog_can_be_assignee', 'edit', true, $item_Blog->ID );
+		// Check if current User has a permission to edit at least one workflow property:
+		$edited_Item->can_edit_workflow( 'any', true );
 
 		if( $edited_Item->load_workflow_from_Request() )
 		{	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:

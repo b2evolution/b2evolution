@@ -560,55 +560,26 @@ $Form->begin_form( '', '', $params );
 
 	// ############################ WORKFLOW #############################
 
-	if( $is_not_content_block && $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
-	{	// We want to use workflow properties for this blog:
+	if( $is_not_content_block && $edited_Item->can_edit_workflow() )
+	{	// Display workflow properties if current user can edit at least one workflow property:
 		$Form->begin_fieldset( T_('Workflow properties').get_manual_link( 'post-edit-workflow-panel' ), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
 
 			echo '<div id="itemform_edit_workflow" class="edit_fieldgroup">';
 			$Form->switch_layout( 'linespan' );
 
-			$Form->select_input_array( 'item_priority', $edited_Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+			$edited_Item->display_workflow_field( 'status', $Form );
 
 			echo ' '; // allow wrapping!
 
-			// Load current blog members into cache:
-			$UserCache = & get_UserCache();
-			// Load only first 21 users to know when we should display an input box instead of full users list
-			$UserCache->load_blogmembers( $Blog->ID, 21, false );
-
-			if( count( $UserCache->cache ) > 20 )
-			{
-				$assigned_User = & $UserCache->get_by_ID( $edited_Item->get( 'assigned_user_ID' ), false, false );
-				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
-			}
-			else
-			{
-				$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
-														'', true, '', 'get_assigned_user_options' );
-			}
+			$edited_Item->display_workflow_field( 'user', $Form );
 
 			echo ' '; // allow wrapping!
 
-			$ItemStatusCache = & get_ItemStatusCache();
-			$ItemStatusCache->load_all();
-			$ItemTypeCache = & get_ItemTypeCache();
-			$current_ItemType = & $edited_Item->get_ItemType();
-			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
+			$edited_Item->display_workflow_field( 'priority', $Form );
 
 			echo ' '; // allow wrapping!
 
-			if( $Blog->get_setting( 'use_deadline' ) )
-			{	// Display deadline fields only if it is enabled for collection:
-				$Form->begin_line( T_('Deadline'), 'item_deadline' );
-
-					$datedeadline = $edited_Item->get( 'datedeadline' );
-					$Form->date( 'item_deadline', $datedeadline, '' );
-
-					$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
-					$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
-
-				$Form->end_line();
-			}
+			$edited_Item->display_workflow_field( 'deadline', $Form );
 
 			$Form->switch_layout( NULL );
 			echo '</div>';

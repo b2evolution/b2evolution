@@ -2206,6 +2206,9 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 		$blog_perms[ $row[ $perm_target_key ] ] = array(
 				'blog_ismember'           => $row[$prefix.'_ismember'],
 				'blog_can_be_assignee'    => $row[$prefix.'_can_be_assignee'],
+				'blog_workflow_status'    => $row[$prefix.'_workflow_status'],
+				'blog_workflow_user'      => $row[$prefix.'_workflow_user'],
+				'blog_workflow_priority'  => $row[$prefix.'_workflow_priority'],
 				'blog_item_propose'       => $row[$prefix.'_perm_item_propose'],
 				'blog_post_statuses'      => $row['perm_poststatuses_bin'],
 				'blog_cmt_statuses'       => $row['perm_cmtstatuses_bin'],
@@ -2237,6 +2240,9 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				$blog_perms[ $perm_target_ID ] = array(
 						'blog_ismember'           => 0,
 						'blog_can_be_assignee'    => 0,
+						'blog_workflow_status'    => 0,
+						'blog_workflow_user'      => 0,
+						'blog_workflow_priority'  => 0,
 						'blog_item_propose'       => 0,
 						'blog_post_statuses'      => 0,
 						'blog_item_type'          => 'standard',

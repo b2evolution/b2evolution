@@ -1252,37 +1252,40 @@ class Item extends ItemLight
 		$item_Blog = & $this->get_Blog();
 
 		if( ( $this->get_type_setting( 'usage' ) != 'content-block' ) && // Item types "Content Block" cannot have the workflow properties
-		    $item_Blog->get_setting( 'use_workflow' ) && // Collection must has the workflow properties enabled
-		    is_logged_in() && // Current User must be logged in
-		    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) && // Current User must has a permission to edit this Item
-		    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) && // Current User must be assignee for items of the collection
-		    param( 'item_priority', 'integer', NULL ) !== NULL ) // At least Task Priority must be submitted to be sure the form really sends all other workflow properties
+		    $this->can_edit_workflow() ) // Current User has a permission to edit at least one workflow property
 		{	// Update workflow properties only when all conditions above is true:
-			// Assigned to:
-			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
-			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
-			$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
-
-			// Priority:
-			$this->set_from_Request( 'priority', 'item_priority', true );
-
-			// Task status:
-			$ItemTypeCache = & get_ItemTypeCache();
-			$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
-			$item_status = param( 'item_st_ID', 'integer', NULL );
-			if( in_array( $item_status, $current_ItemType->get_applicable_post_status() ) || $item_status === NULL )
-			{	// Save only task status which is allowed for item's type:
-				$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
-			}
-			else
-			{	// If the submitted task status is not allowed for item's type:
-				param_error( 'item_st_ID', sprintf( T_('Invalid task status for post type %s'), $current_ItemType->get_name() ) );
+			if( $this->can_edit_workflow( 'status' ) &&
+			    param( 'item_st_ID', 'integer', NULL ) !== NULL )
+			{	// Task status:
+				$ItemTypeCache = & get_ItemTypeCache();
+				$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
+				if( in_array( get_param( 'item_st_ID' ), $current_ItemType->get_applicable_post_status() ) || get_param( 'item_st_ID' ) === NULL )
+				{	// Save only task status which is allowed for item's type:
+					$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
+				}
+				else
+				{	// If the submitted task status is not allowed for item's type:
+					param_error( 'item_st_ID', sprintf( T_('Invalid task status for post type %s'), $current_ItemType->get_name() ) );
+				}
 			}
 
-			// Deadline:
-			if( $item_Blog->get_setting( 'use_deadline' ) &&
+			if( $this->can_edit_workflow( 'user' ) &&
+			    param( 'item_assigned_user_ID', 'integer', NULL ) !== NULL )
+			{	// Assigned to:
+				$item_assigned_user_ID = get_param( 'item_assigned_user_ID' );
+				$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
+				$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
+			}
+
+			if( $this->can_edit_workflow( 'priority' ) &&
+			    param( 'item_priority', 'integer', NULL ) !== NULL )
+			{	// Priority:
+				$this->set_from_Request( 'priority', 'item_priority', true );
+			}
+
+			if( $this->can_edit_workflow( 'deadline' ) &&
 			    param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL )
-			{	// Update deadline only when it is enabled for item's collection:
+			{	// Deadline:
 				param_time( 'item_deadline_time', '', false, false, true, true );
 				$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
 				$item_deadline_datetime = trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) );
@@ -13329,6 +13332,139 @@ class Item extends ItemLight
 
 		$r = NULL;
 		return $r;
+	}
+
+
+	/**
+	 * Check permission of current User to edit workflow properties
+	 *
+	 * @param string Permission name:
+	 *               - 'any' - Check to edit at least one workflow property
+	 *               - 'status', 'user', 'priority', 'deadline' - Check to edit one of these workflow properties
+	 * @param boolean Execution will halt if this is !0 and permission is denied
+	 */
+	function can_edit_workflow( $permname = 'any', $assert = false )
+	{
+		global $current_User;
+
+		$perm =
+			// Item must be saved in DB:
+			! empty( $this->ID ) &&
+			// User must be logged in:
+			is_logged_in() &&
+			// Workflow must be enabled for current Collection:
+			$this->get_coll_setting( 'use_workflow' ) &&
+			// Current User must has a permission to be assigned for tasks of the current Collection:
+			$current_User->check_perm( 'blog_can_be_assignee', 'edit', $assert, $this->get_blog_ID() );
+
+		if( $perm )
+		{	// Additional checking for several permissions when main checking is true:
+			switch( $permname )
+			{
+				case 'any':
+					// Check if current User can edit at least one workflow property:
+					$perm = $current_User->check_perm( 'blog_workflow_status', 'edit', false, $this->get_blog_ID() ) ||
+						$current_User->check_perm( 'blog_workflow_user', 'edit', false, $this->get_blog_ID() ) ||
+						$current_User->check_perm( 'blog_workflow_priority', 'edit', false, $this->get_blog_ID() );
+					break;
+				case 'deadline':
+					// Deadline has additional collection setting to be enabled:
+					$perm = $this->get_coll_setting( 'use_deadline' );
+			}
+		}
+
+		if( ! $perm )
+		{	// No permission:
+			if( $assert )
+			{	// We can't let this go on!
+				global $app_name;
+				debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name ).' (Item#'.$this->ID.':workflow:'.( $permname === NULL ? 'MAIN' : $permname ).')' );
+			}
+			return $perm;
+		}
+
+		switch( $permname )
+		{
+			case 'any':
+				// Check if current User can edit at least one workflow property:
+				return $perm;
+			case 'status':
+				// Check if current User can edit the workflow status:
+				return $current_User->check_perm( 'blog_workflow_status', 'edit', $assert, $this->get_blog_ID() );
+			case 'user':
+				// Check if current User can edit the workflow user:
+				return $current_User->check_perm( 'blog_workflow_user', 'edit', $assert, $this->get_blog_ID() );
+			case 'priority':
+			case 'deadline':
+				// Check if current User can edit the workflow priority or deadline:
+				return $current_User->check_perm( 'blog_workflow_priority', 'edit', $assert, $this->get_blog_ID() );
+			default:
+				// Wrong request:
+				debug_die( 'Unhandled Item workflow permission name "'.$permname.'"' );
+		}
+	}
+
+
+	/**
+	 * Display workflow field to edit
+	 *
+	 * @param string Field key: 'status', 'user', 'priority', 'deadline'
+	 * @param object Form
+	 * @param array Additional parameters
+	 */
+	function display_workflow_field( $field, & $Form, $params = array() )
+	{
+		if( ! $this->can_edit_workflow( $field ) )
+		{	// Current User has no permission to edit the requested workflow property:
+			return;
+		}
+
+		switch( $field )
+		{
+			case 'status':
+				$ItemStatusCache = & get_ItemStatusCache();
+				$ItemStatusCache->load_all();
+				$ItemTypeCache = & get_ItemTypeCache();
+				$current_ItemType = & $this->get_ItemType();
+				$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $this->get( 'pst_ID' ), true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
+				break;
+
+			case 'user':
+				// Load current blog members into cache:
+				$UserCache = & get_UserCache();
+				// Load only first 21 users to know when we should display an input box instead of full users list
+				$UserCache->load_blogmembers( $this->get_blog_ID(), 21, false );
+
+				if( count( $UserCache->cache ) > 20 )
+				{
+					$assigned_User = & $UserCache->get_by_ID( $this->get( 'assigned_user_ID' ), false, false );
+					$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
+				}
+				else
+				{
+					$Form->select_object( 'item_assigned_user_ID', NULL, $this, T_('Assigned to'), '', true, '', 'get_assigned_user_options' );
+				}
+				break;
+
+			case 'priority':
+				$Form->select_input_array( 'item_priority', $this->get( 'priority' ), item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+				break;
+
+			case 'deadline':
+				if( $this->get_coll_setting( 'use_deadline' ) )
+				{	// Display deadline fields only if it is enabled for collection:
+					$Form->begin_line( T_('Deadline'), 'item_deadline' );
+
+						$datedeadline = $this->get( 'datedeadline' );
+						$Form->date( 'item_deadline', $datedeadline, '' );
+
+						$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+						$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+
+					$Form->end_line();
+				}
+				break;
+		}
 	}
 }
 ?>

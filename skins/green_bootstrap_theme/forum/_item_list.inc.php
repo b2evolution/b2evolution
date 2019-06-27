@@ -63,12 +63,13 @@ elseif( $comments_number > 25 )
 }
 $Item->load_Blog();
 // There is a very restrictive case in which we display workflow:
-$display_workflow = ( $disp == 'posts' ) &&
-    ! empty( $Item ) &&
-    is_logged_in() &&
-    $Blog->get_setting( 'use_workflow' ) &&
-    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
-    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item );
+$display_workflow = 
+	// User must be logged in:
+	is_logged_in() &&
+	// Workflow must be enabled for current Collection:
+	$Item->get_coll_setting( 'use_workflow' ) &&
+	// Current User must has a permission to be assigned for tasks of the current Collection:
+	$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Item->get_blog_ID() );
 ?>
 
 <article class="container group_row posts_panel">

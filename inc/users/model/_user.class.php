@@ -3168,6 +3168,9 @@ class User extends DataObject
 			// NOTE: these are currently the only collections that will check multiple user groups:
 			case 'blog_ismember':
 			case 'blog_can_be_assignee':
+			case 'blog_workflow_status':
+			case 'blog_workflow_user':
+			case 'blog_workflow_priority':
 			case 'blog_item_propose':
 			case 'blog_post_statuses':
 			case 'blog_post!published':
@@ -3725,6 +3728,9 @@ class User extends DataObject
 	 * @param string Permission name, can be one of the following:
 	 *                  - blog_ismember
 	 *                  - blog_can_be_assignee
+	 *                  - blog_workflow_status
+	 *                  - blog_workflow_user
+	 *                  - blog_workflow_priority
 	 *                  - blog_post_statuses
 	 *                  - blog_del_post
 	 *                  - blog_edit_ts

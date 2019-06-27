@@ -111,7 +111,12 @@ $Results->cols[] = array(
 						'th' => /* TRANS: SHORT table header on TWO lines */ sprintf( T_('Member of<br />%s'), $edited_Blog->get( 'shortname' ) ),
 						'th_class' => 'checkright',
 						'td' => '%coll_perm_checkbox( {row}, \'bloguser_\', \'ismember\', \''.format_to_output( T_('Permission to read members posts'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'.
-						( $edited_Blog->get_setting( 'use_workflow' ) ? '%coll_perm_checkbox( {row}, \'bloguser_\', \'can_be_assignee\', \''.format_to_output( T_('Items can be assigned to this user'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%' : '' ),
+						( $edited_Blog->get_setting( 'use_workflow' )
+							? ' %coll_perm_checkbox( {row}, \'bloguser_\', \'can_be_assignee\', \''.format_to_output( T_('Workflow Member (Items can be assigned to this User)'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'
+							 .' %coll_perm_checkbox( {row}, \'bloguser_\', \'workflow_status\', \''.format_to_output( T_('User can change status'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'
+							 .' %coll_perm_checkbox( {row}, \'bloguser_\', \'workflow_user\', \''.format_to_output( T_('User can assign items to others'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'
+							 .' %coll_perm_checkbox( {row}, \'bloguser_\', \'workflow_priority\', \''.format_to_output( T_('User can set priority / deadline'), 'htmlattr' ).'\', \'checkallspan_state_$user_ID$\' )%'
+							: '' ),
 						'td_class' => 'center',
 					);
 
@@ -168,7 +173,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 						'th_group' => T_('Permissions on Posts'),
-						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Edit<br />TS'),
+						'th' => /* TRANS: SHORT table header on TWO lines */ T_('Adv.<br />Edit'),
 						'th_class' => 'checkright',
 						'order' => 'bloguser_perm_edit_ts',
 						'default_dir' => 'D',
