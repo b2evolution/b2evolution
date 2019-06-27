@@ -65,7 +65,6 @@ if( is_logged_in() &&
 			skin_include( '_item_list.inc.php', array(
 					'content_mode'  => 'auto', // 'auto' will auto select depending on $disp-detail
 					'image_size'    => 'fit-1280x720',
-					'workflow_mode' => true,
 				) );
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
