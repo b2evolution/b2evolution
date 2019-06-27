@@ -663,13 +663,16 @@ $Form->begin_form( '', '', $params );
 
 	echo '</table>';
 
-	if( $edited_Item->get_type_setting( 'allow_featured' ) )
-	{ // Display featured
-		$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
-	}
-	else
-	{ // Hide featured
-		$Form->hidden( 'item_featured', $edited_Item->featured );
+	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	{	// If user has a permission to edit advanced properties of items:
+		if( $edited_Item->get_type_setting( 'allow_featured' ) )
+		{ // Display featured
+			$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
+		}
+		else
+		{ // Hide featured
+			$Form->hidden( 'item_featured', $edited_Item->featured );
+		}
 	}
 
 	if( $Blog->get_setting( 'track_unread_content' ) )
@@ -683,20 +686,23 @@ $Form->begin_form( '', '', $params );
 	}
 
 	// Single/page view:
-	if( ! in_array( $edited_Item->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all', 'content-block', 'special' ) ) )
-	{	// We don't need this setting for intro, content block and special items:
-		echo '<div class="itemform_extra_radio">';
-		$Form->radio( 'post_single_view', $edited_Item->get( 'single_view' ), array(
-				array( 'normal', T_('Normal') ),
-				array( '404', '404' ),
-				array( 'redirected', T_('Redirected') ),
-			), T_('Single/page view'), true );
-		echo '</div>';
+	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	{	// If user has a permission to edit advanced properties of items:
+		if( ! in_array( $edited_Item->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all', 'content-block', 'special' ) ) )
+		{	// We don't need this setting for intro, content block and special items:
+			echo '<div class="itemform_extra_radio">';
+			$Form->radio( 'post_single_view', $edited_Item->get( 'single_view' ), array(
+					array( 'normal', T_('Normal') ),
+					array( '404', '404' ),
+					array( 'redirected', T_('Redirected') ),
+				), T_('Single/page view'), true );
+			echo '</div>';
+		}
 	}
 
 	// Issue date:
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
-	{	// If user has a permission to edit time of items:
+	{	// If user has a permission to edit advanced properties of items:
 		echo '<div class="itemform_extra_radio">';
 		$Form->output = false;
 		$item_issue_date_time = $Form->date( 'item_issue_date', $edited_Item->get( 'issue_date' ), '' );
@@ -817,18 +823,21 @@ $Form->begin_form( '', '', $params );
 			$Form->switch_layout( NULL );
 		}
 
-		if( $edited_Item->get_type_setting( 'use_comment_expiration' ) != 'never' )
-		{ // Display comment expiration
-			$Form->switch_layout( 'table' );
-			$Form->duration_input( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ), T_('Expiry delay'), 'months', 'hours',
-							array( 'minutes_step' => 1,
-								'required' => $edited_Item->get_type_setting( 'use_comment_expiration' ) == 'required',
-								'note' => T_( 'Older comments and ratings will no longer be displayed.' ) ) );
-			$Form->switch_layout( NULL );
-		}
-		else
-		{ // Hide comment expiration
-			$Form->hidden( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ) );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			if( $edited_Item->get_type_setting( 'use_comment_expiration' ) != 'never' )
+			{ // Display comment expiration
+				$Form->switch_layout( 'table' );
+				$Form->duration_input( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ), T_('Expiry delay'), 'months', 'hours',
+								array( 'minutes_step' => 1,
+									'required' => $edited_Item->get_type_setting( 'use_comment_expiration' ) == 'required',
+									'note' => T_( 'Older comments and ratings will no longer be displayed.' ) ) );
+				$Form->switch_layout( NULL );
+			}
+			else
+			{ // Hide comment expiration
+				$Form->hidden( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ) );
+			}
 		}
 
 		$Form->end_fieldset();
@@ -866,8 +875,10 @@ $Form->begin_form( '', '', $params );
 		$Form->end_fieldset();
 	}
 
-	if( $is_not_content_block )
-	{	// Display goal tracking and notifications for item with type usage except of content block:
+	if( $is_not_content_block &&
+	    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	{	// Display goal tracking and notifications for item with type usage except of content block
+		// and if user has a permission to edit advanced properties of items:
 
 		// ################### GOAL TRACKING ###################
 

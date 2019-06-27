@@ -1325,9 +1325,18 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Get params to skip/force/mark notifications and pings:
-		param( 'item_members_notified', 'string', NULL );
-		param( 'item_community_notified', 'string', NULL );
-		param( 'item_pings_sent', 'string', NULL );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			param( 'item_members_notified', 'string', NULL );
+			param( 'item_community_notified', 'string', NULL );
+			param( 'item_pings_sent', 'string', NULL );
+		}
+		else
+		{	// Use auto mode for notifications depending on the edited Item status:
+			$item_members_notified = false;
+			$item_community_notified = false;
+			$item_pings_sent = false;
+		}
 
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
@@ -1600,9 +1609,18 @@ switch( $action )
 		save_fieldset_folding_values( $Blog->ID );
 
 		// Get params to skip/force/mark notifications and pings:
-		param( 'item_members_notified', 'string', NULL );
-		param( 'item_community_notified', 'string', NULL );
-		param( 'item_pings_sent', 'string', NULL );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			param( 'item_members_notified', 'string', NULL );
+			param( 'item_community_notified', 'string', NULL );
+			param( 'item_pings_sent', 'string', NULL );
+		}
+		else
+		{	// Use auto mode for notifications depending on the edited Item status:
+			$item_members_notified = false;
+			$item_community_notified = false;
+			$item_pings_sent = false;
+		}
 
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
@@ -2013,9 +2031,18 @@ switch( $action )
 		}
 
 		// Get params to skip/force/mark notifications and pings:
-		param( 'item_members_notified', 'string', NULL );
-		param( 'item_community_notified', 'string', NULL );
-		param( 'item_pings_sent', 'string', NULL );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			param( 'item_members_notified', 'string', NULL );
+			param( 'item_community_notified', 'string', NULL );
+			param( 'item_pings_sent', 'string', NULL );
+		}
+		else
+		{	// Use auto mode for notifications depending on the edited Item status:
+			$item_members_notified = false;
+			$item_community_notified = false;
+			$item_pings_sent = false;
+		}
 
 		// Execute or schedule notifications & pings:
 		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );

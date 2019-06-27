@@ -137,14 +137,17 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'item_deadline_time', mysql2date( 'H:i', $edited_Item->datedeadline ) );
 		}
 		$Form->hidden( 'trackback_url', $trackback_url );
-		$Form->hidden( 'item_featured', $edited_Item->featured );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			$Form->hidden( 'item_featured', $edited_Item->featured );
+			$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
+			$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
+		}
 		if( is_pro() && $Blog->get_setting( 'track_unread_content' ) )
 		{	// Update setting to mark Item as "must read" only for PRO version and when tracking of unread content is enabled for collection:
 			$Form->hidden( 'item_mustread', $edited_Item->get_setting( 'mustread' ) );
 		}
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
-		$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
-		$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );

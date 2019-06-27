@@ -825,8 +825,9 @@ class Item extends ItemLight
 		}
 
 		// Single/page view:
-		if( ( $single_view = param( 'post_single_view', 'string', NULL ) ) !== NULL )
-		{
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) &&
+		    ( $single_view = param( 'post_single_view', 'string', NULL ) ) !== NULL )
+		{	// If user has a permission to edit advanced properties of items:
 			if( $this->get( 'status' ) == 'redirected' )
 			{	// Single view of "Redirected" item can be only redirected as well:
 				$single_view = 'redirected';
@@ -958,7 +959,10 @@ class Item extends ItemLight
 		$this->load_workflow_from_Request();
 
 		// FEATURED checkbox:
-		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
+		}
 
 		// MUST READ checkbox:
 		if( is_pro() && 
@@ -980,10 +984,13 @@ class Item extends ItemLight
 			}
 
 			// Goal ID:
-			$goal_ID = param( 'goal_ID', 'integer', NULL );
-			if( $goal_ID !== NULL )
-			{	// Save only if it is provided:
-				$this->set_setting( 'goal_ID', $goal_ID, true );
+			if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+			{	// If user has a permission to edit advanced properties of items:
+				$goal_ID = param( 'goal_ID', 'integer', NULL );
+				if( $goal_ID !== NULL )
+				{	// Save only if it is provided:
+					$this->set_setting( 'goal_ID', $goal_ID, true );
+				}
 			}
 		}
 
@@ -1070,16 +1077,19 @@ class Item extends ItemLight
 		}
 
 		// EXPIRY DELAY:
-		$expiry_delay = param_duration( 'expiry_delay' );
-		if( empty( $expiry_delay ) )
-		{ // Check if we have 'expiry_delay' param set as string from simple or mass form
-			$expiry_delay = param( 'expiry_delay', 'string', NULL );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			$expiry_delay = param_duration( 'expiry_delay' );
+			if( empty( $expiry_delay ) )
+			{ // Check if we have 'expiry_delay' param set as string from simple or mass form
+				$expiry_delay = param( 'expiry_delay', 'string', NULL );
+			}
+			if( empty( $expiry_delay ) && $this->get_type_setting( 'use_comment_expiration' ) == 'required' )
+			{ // Comment expiration must be entered
+				param_check_not_empty( 'expiry_delay', T_('Please provide a comment expiration delay.'), '' );
+			}
+			$this->set_setting( 'comment_expiry_delay', $expiry_delay, true );
 		}
-		if( empty( $expiry_delay ) && $this->get_type_setting( 'use_comment_expiration' ) == 'required' )
-		{ // Comment expiration must be entered
-			param_check_not_empty( 'expiry_delay', T_('Please provide a comment expiration delay.'), '' );
-		}
-		$this->set_setting( 'comment_expiry_delay', $expiry_delay, true );
 
 		// EXTRA PARAMS FROM MODULES:
 		modules_call_method( 'update_item_settings', array( 'edited_Item' => $this ) );
