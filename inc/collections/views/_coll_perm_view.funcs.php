@@ -621,7 +621,7 @@ function coll_grp_perm_col_member( $row )
 	if( $row_Blog->get_setting( 'use_workflow' ) )
 	{	// If the collection uses workflow:
 		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'can_be_assignee', format_to_output( T_('Workflow Member (Items can be assigned to members of this Group)'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
-		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_status', format_to_output( T_('Members of this Group can change status'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
+		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_status', format_to_output( T_('Members of this Group can change task status'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
 		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_user', format_to_output( T_('Members of this Group can assign items to others'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
 		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_priority', format_to_output( T_('Members of this Group can set priority / deadline'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
 	}
