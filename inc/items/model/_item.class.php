@@ -8448,13 +8448,13 @@ class Item extends ItemLight
 			unset( $post_moderators[$post_creator_User->ID] );
 		}
 
-		if( empty( $post_moderators ) )
-		{ // There are no moderator users who would like to receive notificaitons
-			return NULL;
-		}
-
 		// Collect all notified User IDs in this array:
 		$notified_user_IDs = array();
+
+		if( empty( $post_moderators ) )
+		{ // There are no moderator users who would like to receive notificaitons
+			return $notified_user_IDs;
+		}
 
 		$post_creator_level = $post_creator_User->level;
 		$UserCache = & get_UserCache();
@@ -8600,6 +8600,8 @@ class Item extends ItemLight
 	{
 		global $current_User, $Messages, $UserSettings;
 
+		$notified_user_IDs = array();
+
 		if( $executed_by_userid === NULL && is_logged_in() )
 		{	// Use current user by default:
 			global $current_User;
@@ -8614,8 +8616,8 @@ class Item extends ItemLight
 
 			if( $assigned_User &&
 					$UserSettings->get( 'notify_post_assignment', $assigned_User->ID ) &&
-					$assigned_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() ) )
-			{ // Assigned user wants to receive post assignment notifications and is a member of at least one collection:
+					$assigned_User->check_perm( 'blog_can_be_assignee', 'view', false, $this->get_blog_ID() ) )
+			{	// Assigned user wants to receive post assignment notifications and can be assigned to items of this Item's collection:
 				$user_Group = $assigned_User->get_Group();
 				$notify_full = $user_Group->check_perm( 'post_assignment_notif', 'full' );
 
@@ -8634,8 +8636,6 @@ class Item extends ItemLight
 				$subject = sprintf( $subject, $this->Blog->get('shortname'), $this->get('title') );
 
 				// Send the email:
-				$notified_user_IDs = array();
-
 				if( send_mail_to_User( $assigned_User->ID, $subject, 'post_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
 				{	// A send notification email request to the assigned user was processed:
 					$notified_user_IDs[] = $assigned_User->ID;
@@ -8643,16 +8643,10 @@ class Item extends ItemLight
 				}
 
 				locale_restore_previous();
-
-				return $notified_user_IDs;
-			}
-			else
-			{ // No valid assigned user or the user does not want to receive post assignment notifications
-				return NULL;
 			}
 		}
 
-		return NULL;
+		return $notified_user_IDs;
 	}
 
 
