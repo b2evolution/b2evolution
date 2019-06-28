@@ -208,21 +208,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$disp_edit_categories = false;
 	}
 
-	$Form->output = false;
-	$edit_links = $Form->begin_fieldset( get_request_title( array_merge( array(
-			'edit_links_template' => array(
-				'before'              => '<span class="pull-right panel_heading_action_icons">',
-				'after'               => '</span>',
-				'advanced_link_class' => 'btn btn-info btn-sm',
-				'close_link_class'    => 'btn btn-default btn-sm',
-			) ), $params ) ) );
-	$Form->output = true;
-	$advanced_edit_text = T_('Advanced editing');
-	$edit_links = preg_replace( '/ '.$advanced_edit_text.'/', '<span class="hidden-xs">$0</span>', $edit_links );
-	$cancel_text = T_('Cancel editing');
-	$edit_links = preg_replace( '/ '.$cancel_text.'/', '<span class="hidden-xs">$0</span>', $edit_links );
-	echo $edit_links;
-
 
 	// ############################ POST CONTENTS #############################
 	// Title input:
@@ -300,10 +285,8 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$Form->hidden( 'content', $item_content );
 	}
 
-	$Form->end_fieldset();
-
 	// =================================== INSTRUCTION ====================================
-	if( $edited_Item->get_type_setting( 'front_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
+	if( $edited_Item->get_type_setting( 'front_order_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
 	{
 		echo '<div class="alert alert-info fade in evo_instruction">'.$edited_Item->get_type_setting( 'instruction' ).'</div>';
 	}

@@ -2068,7 +2068,7 @@ class Form extends Widget
 	 * @param boolean an optional indicating whether the box is disabled or not
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function checkbox( $field_name, $field_checked, $field_label, $field_note = '',
+	function checkbox( $field_name, $field_checked, $field_label = '', $field_note = '',
 											$field_class = '', $field_value = 1, $field_disabled = false )
 	{
 		$field_params = array();
@@ -3797,7 +3797,7 @@ class Form extends Widget
 	 * @param mixed required set to 'true' if field should be marked as required and frontend validated (use 'mark_only' to skip frontend validation)
 	 * @return mixed true (if output) or the generated HTML if not outputting
 	 */
-	function radio( $field_name, $field_value, $field_options, $field_label, $field_lines = false, $field_note = '', $field_required = false )
+	function radio( $field_name, $field_value, $field_options, $field_label = '', $field_lines = false, $field_note = '', $field_required = false )
 	{
 		$new_field_options = array();
 

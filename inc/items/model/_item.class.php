@@ -1374,6 +1374,10 @@ class Item extends ItemLight
 				{
 					param( $param_name, $param_type, NULL ); // get par value
 				}
+				if( $custom_field['required'] )
+				{	// Check required field:
+					param_check_not_empty( $param_name, sprintf( T_('Custom "%s" cannot be empty.'), $custom_field['label'] ) );
+				}
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 
 				$custom_field_value = $this->get_custom_field_value( $custom_field['name'] );
@@ -2636,7 +2640,7 @@ class Item extends ItemLight
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
 			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop AS schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
-			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+			$SQL->SELECT_add( 'itcf_required AS required, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
 			$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
 			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge, ' );
 			$SQL->SELECT_add( 'icfv_value AS value, IFNULL( icfv_parent_sync, 1 )AS parent_sync' );
@@ -11530,7 +11534,7 @@ class Item extends ItemLight
 					global $DB;
 					$SQL = new SQL( 'Get custom fields of revision #'.$Revision->iver_ID.'('.$Revision->iver_type.') for Item #'.$this->ID );
 					$SQL->SELECT( 'ivcf_itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, ivcf_itcf_label AS label, IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ) AS name, itcf_type AS type, IFNULL( itcf_order, 999999999 ) AS `order`, itcf_note AS note, ' );
-					$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+					$SQL->SELECT_add( 'itcf_required AS required, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
 					$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
 					$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
 					$SQL->FROM( 'T_items__version_custom_field' );

@@ -138,12 +138,6 @@ siteskin_include( '_site_body_header.inc.php' );
 			'glue'              => ' - ',
 			'title_single_disp' => false,
 			'format'            => 'htmlbody',
-			'arcdir_text'       => T_('Index'),
-			'catdir_text'       => '',
-			'category_text'     => T_('Gallery').': ',
-			'categories_text'   => T_('Galleries').': ',
-			'user_text'         => '',
-			'display_edit_links'=> false,
 		) );
 	// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?>

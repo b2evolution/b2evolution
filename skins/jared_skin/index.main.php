@@ -96,7 +96,12 @@ if( $is_other_disp ) {
 					'user_text'         => T_( 'User settings' ),
 					'users_text'        => T_( 'Users' ),
 					'posts_text'        => T_( 'Posts' ),
-					'display_edit_links'=> false,
+					'edit_links_template' => array(
+						'before'              => '<span class="pull-right">',
+						'after'               => '</span>',
+						'advanced_link_class' => 'btn btn-info btn-sm',
+						'close_link_class'    => 'btn btn-default btn-sm',
+					),
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>

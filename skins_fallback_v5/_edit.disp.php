@@ -287,7 +287,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 	}
 
 	// =================================== INSTRUCTION ====================================
-	if( $edited_Item->get_type_setting( 'front_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
+	if( $edited_Item->get_type_setting( 'front_order_instruction' ) && $edited_Item->get_type_setting( 'instruction' ) )
 	{
 		echo '<div class="action_messages evo_instruction"><div class="log_note">'.$edited_Item->get_type_setting( 'instruction' ).'</div></div>';
 	}

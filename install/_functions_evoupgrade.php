@@ -11808,6 +11808,31 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15500, 'Upgrading item types and custom fields tables...') )
+	{	// part of 7.0.2-beta
+		db_upgrade_cols( 'T_items__type', array(
+			'ADD' => array(
+				'ityp_text_template'           => 'TEXT COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER ityp_instruction',
+				'ityp_front_order_title'       => 'SMALLINT NULL',
+				'ityp_front_order_short_title' => 'SMALLINT NULL',
+				'ityp_front_order_instruction' => 'SMALLINT NULL',
+				'ityp_front_order_attachments' => 'SMALLINT NULL',
+				'ityp_front_order_text'        => 'SMALLINT NULL',
+				'ityp_front_order_tags'        => 'SMALLINT NULL',
+				'ityp_front_order_excerpt'     => 'SMALLINT NULL',
+				'ityp_front_order_url'         => 'SMALLINT NULL',
+			),
+		) );
+		$DB->query( 'UPDATE T_items__type
+			SET ityp_front_order_title = 10,
+			    ityp_front_order_instruction = CASE WHEN ityp_front_instruction = 1 THEN 20 ELSE NULL END,
+			    ityp_front_order_attachments = 30,
+			    ityp_front_order_text = 80' );
+		db_drop_col( 'T_items__type', 'ityp_front_instruction' );
+		db_add_col( 'T_items__type_custom_field', 'itcf_required', 'TINYINT DEFAULT 0 AFTER itcf_note' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

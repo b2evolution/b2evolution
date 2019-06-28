@@ -151,21 +151,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
 					'format'            => 'htmlbody',
-					'category_text'     => '',
-					'categories_text'   => '',
-					'catdir_text'       => '',
 					'front_text'        => '',
-					'posts_text'        => '',
-					'flagged_text'      => '',
-					'mustread_text'     => '',
-					'register_text'     => '',
-					'login_text'        => '',
-					'lostpassword_text' => '',
-					'account_activation' => '',
-					'msgform_text'      => '',
-					'user_text'         => '',
-					'users_text'        => '',
-					'display_edit_links'=> false,
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 ?>

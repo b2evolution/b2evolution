@@ -142,7 +142,12 @@ siteskin_include( '_site_body_header.inc.php' );
 			'category_text'     => T_('Gallery').': ',
 			'categories_text'   => T_('Galleries').': ',
 			'user_text'         => '',
-			'display_edit_links'=> false,
+			'edit_links_template' => array(
+				'before'              => '<span class="pull-right">',
+				'after'               => '</span>',
+				'advanced_link_class' => 'btn btn-info btn-sm',
+				'close_link_class'    => 'btn btn-default btn-sm',
+			),
 		) );
 	// ------------------------------ END OF REQUEST TITLE -----------------------------
 	?>
