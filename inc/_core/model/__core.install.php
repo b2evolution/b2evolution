@@ -382,7 +382,7 @@ $schema_queries = array(
 			ctsk_repeat_variation int(10) unsigned DEFAULT 0,
 			ctsk_key              varchar(50) COLLATE ascii_general_ci not null,
 			ctsk_name             varchar(255) COLLATE utf8mb4_unicode_ci null COMMENT 'Specific name of this task. This value is set only if this job name was modified by an admin user',
-			ctsk_params           varchar(255) COLLATE utf8mb4_unicode_ci,
+			ctsk_params           TEXT COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY (ctsk_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
