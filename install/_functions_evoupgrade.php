@@ -10538,6 +10538,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13220, 'Upgrading cron tasks table...' ) )
+	{	// part of 6.11.3-stable
+		db_modify_col( 'T_cron__task', 'ctsk_params', 'TEXT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
