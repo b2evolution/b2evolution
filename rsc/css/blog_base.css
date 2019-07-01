@@ -1253,6 +1253,7 @@ div.item_location {
 }
 #ffield_item_tags ul.token-input-list-facebook {
   width: 100%;
+  max-width: 100%;
 }
 #register_form input.form_text_input {
   border: 1px solid #CCC;

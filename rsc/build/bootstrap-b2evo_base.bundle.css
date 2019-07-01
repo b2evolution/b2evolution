@@ -3471,6 +3471,7 @@ div.item_location {
 }
 #ffield_item_tags ul.token-input-list-facebook {
   width: 100%;
+  max-width: 100%;
 }
 .evo_content_block span.status_published,
 .evo_content_block span.status_community,
@@ -5249,4 +5250,10 @@ div.message_toolbars {
   .panel_heading_action_icons .btn-group.dropdown.single-group-xs a.btn.btn-sm {
     border-radius: 3px;
   }
+}
+div.fieldset_wrapper.folded .panel-body {
+  display: none;
+}
+span[id^=title_folding_] {
+  cursor: default;
 }

@@ -167,10 +167,10 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'item_issue_date', mysql2localedate( $edited_Item->get( 'issue_date' ) ) );
 			$Form->hidden( 'item_issue_time', substr( $edited_Item->get( 'issue_date' ), 11 ) );
 		}
-		// Tags
-		$Form->hidden( 'item_tags', $item_tags );
-		$Form->hidden( 'suggest_item_tags', $UserSettings->get( 'suggest_item_tags' ) );
 	}
+	// Tags
+	$Form->hidden( 'item_tags', $item_tags );
+	$Form->hidden( 'suggest_item_tags', $UserSettings->get( 'suggest_item_tags' ) );
 
 	if( $Blog->get_setting( 'in_skin_editing_category' ) )
 	{	// If categories are allowed to update from front-office:

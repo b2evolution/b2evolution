@@ -797,6 +797,7 @@ function create_default_data()
 			'link'            => 'nolink',
 			'line_highlight'  => 'differences',
 			'green_highlight' => 'never',
+			'red_highlight'   => 'never',
 		);
 	// Insert item type custom fields:
 	$custom_fields_sql = 'INSERT INTO T_items__type_custom_field ( itcf_'.implode( ', itcf_', array_keys( $custom_field_default_settings ) ).' ) VALUES ';

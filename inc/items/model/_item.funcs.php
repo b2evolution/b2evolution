@@ -4421,24 +4421,25 @@ function display_hidden_custom_fields( & $Form, & $edited_Item )
 /**
  * Display custom field settings as editable input fields
  *
+ * @param string Field name
  * @param object Form
  * @param object edited Item
- * @param boolean TRUE to force use custom fields of current version instead of revision
+ * @param array Additional parameters
  */
-function display_editable_custom_fields( & $Form, & $edited_Item, $force_current_fields = false )
+function display_editable_custom_field( $filed_name, & $Form, & $edited_Item, $params = array() )
 {
+	$params = array_merge( array(
+			'loop_index' => 0
+		), $params );
+
 	$custom_fields = $edited_Item->get_custom_fields_defs();
 
-	if( empty( $custom_fields ) )
-	{	// No custom fields
-		return;
-	}
+	if( isset( $custom_fields[ $filed_name ] ) )
+	{	// Custom field is found by requested name:
+		$custom_field = $custom_fields[ $filed_name ];
 
-	$parent_Item = & $edited_Item->get_parent_Item();
+		$parent_Item = & $edited_Item->get_parent_Item();
 
-	$c = 0;
-	foreach( $custom_fields as $custom_field )
-	{	// Loop through custom fields:
 		$custom_field_input_params = array();
 		$custom_field_note = '';
 		$parent_sync_checkbox_is_visible = false;
@@ -4523,7 +4524,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item, $force_current
 				$Form->text_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto', 'required' => $custom_field['required'] ) + $custom_field_input_params );
 				break;
 			case 'separator':
-				if( is_admin_page() && $c > 0 )
+				if( is_admin_page() && $params['loop_index'] > 0 )
 				{	// This is a hack for back-office because there is a css table layout:
 					$Form->end_fieldset();
 				}
@@ -4532,7 +4533,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item, $force_current
 				{
 					echo '<p class="note">'.$custom_field_note.'</p>';
 				}
-				if( is_admin_page() && $c > 0 && $c < count( $custom_fields ) )
+				if( is_admin_page() && $params['loop_index'] > 0 && $params['loop_index'] < count( $custom_fields ) )
 				{	// This is a hack for back-office because there is a css table layout:
 					$Form->begin_fieldset();
 				}
@@ -4540,20 +4541,20 @@ function display_editable_custom_fields( & $Form, & $edited_Item, $force_current
 		}
 
 		if( empty( $edited_Item->ID ) && // New object is creating or copying
-		    isset( $custom_field_input_params['disabled'] ) && // The custom field is disabled
-		    ! in_array( $custom_field['type'], array( 'computed', 'separator' ) ) ) // Theese fields don't have an editable value
+				isset( $custom_field_input_params['disabled'] ) && // The custom field is disabled
+				! in_array( $custom_field['type'], array( 'computed', 'separator' ) ) ) // Theese fields don't have an editable value
 		{	// When input field is disabled and new item is creating
 			// we should create additional hidden input field because the disabled inputs are not submitted:
 			$Form->hidden( 'item_cf_'.$custom_field['name'], $edited_Item->get_custom_field_value( $custom_field['name'] ) );
 		}
 
-		$c++;
-	}
-
-	if( $parent_Item )
-	{	// JS to refresh custom field values from parent post custom fields:
+		global $evo_js_parent_custom_fields;
+		if( $parent_Item && empty( $evo_js_parent_custom_fields ) )
+		{	// JS to refresh custom field values from parent post custom fields:
 ?>
 <script>
+jQuery( document ).ready( function()
+{
 jQuery( 'a[data-child-input-id]' ).click( function()
 {	// Update custom field value with value from parent post:
 	var child_field_obj = jQuery( '[name=' + jQuery( this ).data( 'child-input-id' ) + '][type!=hidden]' );
@@ -4570,8 +4571,37 @@ jQuery( 'a[data-child-input-id]' ).click( function()
 	}
 	return false;
 } );
+} );
 </script>
 <?php
+			// Flog to don't initialize this JS code twice:
+			$evo_js_parent_custom_fields = true;
+		}
+	}
+}
+
+
+/**
+ * Display custom field settings as editable input fields
+ *
+ * @param object Form
+ * @param object edited Item
+ * @param boolean TRUE to force use custom fields of current version instead of revision
+ */
+function display_editable_custom_fields( & $Form, & $edited_Item, $force_current_fields = false )
+{
+	$custom_fields = $edited_Item->get_custom_fields_defs();
+
+	if( empty( $custom_fields ) )
+	{	// No custom fields
+		return;
+	}
+
+	$c = 0;
+	foreach( $custom_fields as $custom_field )
+	{	// Loop through custom fields:
+		display_editable_custom_field( $custom_field['name'], $Form, $edited_Item, array( 'loop_index' => $c ) );
+		$c++;
 	}
 }
 

@@ -654,9 +654,6 @@ div.extended_search_form .search_options .search_option {
   display: inline-block;
   margin-right: 10px;
 }
-label.control-label[for=post_title] {
-  width: auto;
-}
 textarea.message_text {
   width: 95%;
 }

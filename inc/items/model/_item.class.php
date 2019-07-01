@@ -938,21 +938,18 @@ class Item extends ItemLight
 		}
 
 		// TAGS:
-		if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) )
-		{ // User should has an access to back-office to edit tags
-			$item_tags = param( 'item_tags', 'string', NULL );
-			if( $item_tags !== NULL )
-			{
-				$this->set_tags_from_string( get_param('item_tags') );
-				// Update setting 'suggest_item_tags' of the current User
-				global $UserSettings;
-				$UserSettings->set( 'suggest_item_tags', param( 'suggest_item_tags', 'integer', 0 ) );
-				$UserSettings->dbupdate();
-			}
-			if( empty( $item_tags ) && $this->get_type_setting( 'use_tags' ) == 'required' )
-			{ // Tags must be entered
-				param_check_not_empty( 'item_tags', T_('Please provide at least one tag.'), '' );
-			}
+		$item_tags = param( 'item_tags', 'string', NULL );
+		if( $item_tags !== NULL )
+		{
+			$this->set_tags_from_string( get_param('item_tags') );
+			// Update setting 'suggest_item_tags' of the current User
+			global $UserSettings;
+			$UserSettings->set( 'suggest_item_tags', param( 'suggest_item_tags', 'integer', 0 ) );
+			$UserSettings->dbupdate();
+		}
+		if( empty( $item_tags ) && $this->get_type_setting( 'use_tags' ) == 'required' )
+		{ // Tags must be entered
+			param_check_not_empty( 'item_tags', T_('Please provide at least one tag.'), '' );
 		}
 
 		// WORKFLOW stuff:
@@ -13473,6 +13470,77 @@ class Item extends ItemLight
 				}
 				break;
 		}
+	}
+
+
+	/**
+	 * Get ordered array of fields which can be edited on front-office
+	 *
+	 * @param array
+	 */
+	function get_front_edit_fields()
+	{
+		$fields = array();
+
+		// Item fields which may be displayed on front-office:
+		$item_fields = array(
+			'title',
+			'short_title',
+			'instruction',
+			'attachments',
+			'text',
+			'tags',
+			'excerpt',
+			'url',
+		);
+		foreach( $item_fields as $item_field )
+		{
+			$fields[] = array(
+				'name'  => $item_field,
+				'order' => $this->get_type_setting( 'front_order_'.$item_field ),
+				'type'  => 'item',
+			);
+		}
+
+		// Custom fields:
+		$custom_fields = $this->get_custom_fields_defs();
+		foreach( $custom_fields as $custom_field )
+		{
+			$fields[] = array(
+				'name'  => $custom_field['name'],
+				'order' => $custom_field['order'],
+				'type'  => 'custom',
+				'value' => $custom_field['value'],
+			);
+		}
+
+		// Sort fields by order value:
+		usort( $fields, array( $this, 'sort_front_edit_fields_callback' ) );
+
+		return $fields;
+	}
+
+
+	/**
+	 * Callback function to sort front edit fields by order value
+	 *
+	 * @param array Field data
+	 * @param array Field data
+	 * @return boolean
+	 */
+	function sort_front_edit_fields_callback( $a, $b )
+	{
+		if( $a['order'] == $b['order'] )
+		{	// Sort by field type or name:
+			if( $a['type'] == $b['type'] )
+			{	// Sort by name when type is same:
+				return $a['name'] > $b['name'] ? 1 : -1;
+			}
+			// Make item fields above custom fields:
+			return ( $a['type'] == 'custom' ? 1 : -1 );
+		}
+
+		return ( $a['order'] > $b['order'] ? 1 : -1 );
 	}
 }
 ?>

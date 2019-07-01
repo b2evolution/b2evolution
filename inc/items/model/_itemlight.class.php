@@ -1552,6 +1552,16 @@ class ItemLight extends DataObject
 				}
 				return $title;
 
+			case 'extra_cat_IDs':
+				if( isset( $this->extra_cat_IDs ) && is_array( $this->extra_cat_IDs ) )
+				{	// Get currently updating extra categories IDs:
+					return $this->extra_cat_IDs;
+				}
+				else
+				{	// Load chapters from DB:
+					return postcats_get_byID( $this->ID );
+				}
+
 			default:
 				return parent::get( $parname );
 		}

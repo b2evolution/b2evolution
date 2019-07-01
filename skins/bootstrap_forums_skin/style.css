@@ -681,9 +681,6 @@ a.btn + .vote_spam {
 .quote_button {
   margin-right: 10px;
 }
-label.control-label[for=post_title] {
-  width: auto;
-}
 .profile_avatar {
   float: right;
   padding: 10px;

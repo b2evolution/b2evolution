@@ -116,6 +116,7 @@ switch( $action )
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
 		$post_extracats = param( 'post_extracats', 'array:integer', $post_extracats );
+		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
@@ -151,6 +152,7 @@ switch( $action )
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
 		$post_extracats = param( 'post_extracats', 'array:integer', $post_extracats );
+		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
