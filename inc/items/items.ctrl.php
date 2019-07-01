@@ -2931,7 +2931,12 @@ switch( $action )
 		// We never allow HTML in titles, so we always encode and decode special chars.
 		$item_title = htmlspecialchars_decode( $edited_Item->get( 'title' ) );
 
-		$item_content = prepare_item_content( $edited_Item->get( 'content' ) );
+		$item_content = $edited_Item->get( 'content' );
+		if( $item_content === NULL )
+		{	// Use text template for new creating Item:
+			$item_content = $edited_Item->get_type_setting( 'text_template' );
+		}
+		$item_content = prepare_item_content( $item_content );
 
 		if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 		{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
