@@ -96,6 +96,7 @@ if( $is_other_disp ) {
 					'user_text'         => T_( 'User settings' ),
 					'users_text'        => T_( 'Users' ),
 					'posts_text'        => T_( 'Posts' ),
+					'display_edit_links'  => ( $disp == 'edit' ),
 					'edit_links_template' => array(
 						'before'              => '<span class="pull-right">',
 						'after'               => '</span>',
