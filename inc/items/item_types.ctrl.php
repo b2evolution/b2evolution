@@ -368,6 +368,7 @@ switch( $action )
 		param( 'itcf_link_class', 'string' );
 		param( 'itcf_note', 'string' );
 		param( 'itcf_required', 'integer' );
+		param( 'itcf_meta', 'integer' );
 		param( 'itcf_public', 'integer' );
 		param( 'itcf_line_highlight', 'string' );
 		param( 'itcf_green_highlight', 'string' );

@@ -174,6 +174,7 @@ $Table->cols = array(
 	array( 'th' => T_('Type'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Format'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Required'), 'td_class' => 'shrinkwrap' ),
+	array( 'th' => T_('With MC'), 'th_class' => 'shrinkwrap', 'td_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Public'), 'td_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Actions'), 'td_class' => 'shrinkwrap' ),
 );
@@ -286,6 +287,13 @@ $Table->display_col_end();
 $Table->display_col_start();
 custom_field_edit_form_template( array(
 		'<input type="checkbox" name="cf_required$cf_num$" value="1" />'
+	), array( '-computed,-separator' ), $custom_field_templates );
+$Table->display_col_end();
+
+// With MC
+$Table->display_col_start();
+custom_field_edit_form_template( array(
+		'<input type="checkbox" name="cf_meta$cf_num$" value="1" title="'.format_to_output( T_('Allow update with Meta Comment'), 'htmlattr' ).'" />'
 	), array( '-computed,-separator' ), $custom_field_templates );
 $Table->display_col_end();
 
@@ -420,6 +428,10 @@ foreach( $custom_fields as $custom_field )
 	if( $custom_field['required'] )
 	{	// Enabled "required" option:
 		$custom_field_type_template = preg_replace( '/(<input type="checkbox"[^>]+name="cf_required[^"]+")/', '$1 checked="checked"', $custom_field_type_template );
+	}
+	if( $custom_field['meta'] )
+	{	// Enabled "meta" option:
+		$custom_field_type_template = preg_replace( '/(<input type="checkbox"[^>]+name="cf_meta[^"]+")/', '$1 checked="checked"', $custom_field_type_template );
 	}
 	if( $custom_field['public'] )
 	{	// Enabled "public" option:
@@ -605,6 +617,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	var field_value_green_highlight = '';
 	var field_value_red_highlight = '';
 	var field_value_required = '';
+	var field_value_meta = '';
 	var field_value_public = '';
 	var field_value_description = '';
 	var field_value_merge = '';
@@ -632,6 +645,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_green_highlight = duplicated_field_obj.find( 'select[name^="cf_green_highlight"]' ).val();
 		field_value_red_highlight = duplicated_field_obj.find( 'select[name^="cf_red_highlight"]' ).val();
 		field_value_required = duplicated_field_obj.find( 'input[name^="cf_required"]' ).is( ':checked' );
+		field_value_meta = duplicated_field_obj.find( 'input[name^="cf_meta"]' ).is( ':checked' );
 		field_value_public = duplicated_field_obj.find( 'input[name^="cf_public"]' ).is( ':checked' );
 		field_value_description = duplicated_field_obj.find( 'input[name^="cf_description"]' ).val();
 		field_value_merge = duplicated_field_obj.find( 'input[name^="cf_merge"]' ).val();
@@ -655,6 +669,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_green_highlight = duplicated_field_data.data( 'green_highlight' );
 		field_value_red_highlight = duplicated_field_data.data( 'red_highlight' );
 		field_value_required = duplicated_field_data.data( 'required' );
+		field_value_meta = duplicated_field_data.data( 'meta' );
 		field_value_public = duplicated_field_data.data( 'public' );
 		field_value_description = duplicated_field_data.data( 'description' );
 		field_value_merge = duplicated_field_data.data( 'merge' );
@@ -732,9 +747,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 				custom_field_type_inputs = custom_field_type_inputs.replace( cf_field_regexp, '$1 selected="selected"' );
 			}
 		}
-		custom_field_type_inputs = custom_field_type_inputs
-			.replace( /(<input type="checkbox"[^>]+name="cf_required[^"]+")/, '$1 checked="checked"' )
-			.replace( /(<input type="checkbox"[^>]+name="cf_public[^"]+")/, '$1 checked="checked"' );
+		custom_field_type_inputs = custom_field_type_inputs.replace( /(<input type="checkbox"[^>]+name="cf_(required|meta|public)[^"]+")/, '$1 checked="checked"' );
 	}
 
 	// Insert a row of new adding field:
@@ -757,6 +770,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		new_field_obj.find( 'select[name^="cf_green_highlight"]' ).val( field_value_green_highlight );
 		new_field_obj.find( 'select[name^="cf_red_highlight"]' ).val( field_value_red_highlight );
 		new_field_obj.find( 'input[name^="cf_required"]' ).prop( 'checked', field_value_required );
+		new_field_obj.find( 'input[name^="cf_meta"]' ).prop( 'checked', field_value_meta );
 		new_field_obj.find( 'input[name^="cf_public"]' ).prop( 'checked', field_value_public );
 	}
 
@@ -954,6 +968,7 @@ jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
 			field_row.find( 'select[name^="cf_green_highlight"]' ).val( field_data_obj.data( 'green_highlight' ) );
 			field_row.find( 'select[name^="cf_red_highlight"]' ).val( field_data_obj.data( 'red_highlight' ) );
 			field_row.find( 'input[name^="cf_required"]' ).prop( 'checked', field_data_obj.data( 'required' ) );
+			field_row.find( 'input[name^="cf_meta"]' ).prop( 'checked', field_data_obj.data( 'meta' ) );
 			field_row.find( 'input[name^="cf_public"]' ).prop( 'checked', field_data_obj.data( 'public' ) );
 			field_row.find( 'input[name^="cf_description"]' ).val( field_data_obj.data( 'description' ) );
 			field_row.find( 'input[name^="cf_merge"]' ).val( field_data_obj.data( 'merge' ) );

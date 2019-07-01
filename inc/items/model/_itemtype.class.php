@@ -444,6 +444,7 @@ class ItemType extends DataObject
 			'order'           => 'integer',
 			'note'            => 'string',
 			'required'        => array( 'integer', 0 ),
+			'meta'            => array( 'integer', 0 ),
 			'public'          => array( 'integer', 0 ),
 			'format'          => 'string',
 			'formula'         => 'string',
@@ -655,6 +656,7 @@ class ItemType extends DataObject
 						.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).', '
 						.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).', '
 						.$DB->quote( $custom_field['required'] ).', '
+						.$DB->quote( $custom_field['meta'] ).', '
 						.$DB->quote( $custom_field['public'] ).', '
 						.$DB->quote( $custom_field['format'] ).', '
 						.$DB->quote( $custom_field['formula'] ).', '
@@ -669,7 +671,7 @@ class ItemType extends DataObject
 						.( empty( $custom_field['description'] ) ? 'NULL' : $DB->quote( $custom_field['description'] ) ).', '
 						.$DB->quote( $custom_field['merge'] ).' )';
 			}
-			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_schema_prop, itcf_type, itcf_order, itcf_note, itcf_required, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description, itcf_merge )
+			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_schema_prop, itcf_type, itcf_order, itcf_note, itcf_required, itcf_meta, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description, itcf_merge )
 					VALUES '.implode( ', ', $sql_data ) );
 		}
 
@@ -687,6 +689,7 @@ class ItemType extends DataObject
 						itcf_order = '.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).',
 						itcf_note = '.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).',
 						itcf_required = '.$DB->quote( $custom_field['required'] ).',
+						itcf_meta = '.$DB->quote( $custom_field['meta'] ).',
 						itcf_public = '.$DB->quote( $custom_field['public'] ).',
 						itcf_format = '.$DB->quote( $custom_field['format'] ).',
 						itcf_formula = '.$DB->quote( $custom_field['formula'] ).',
@@ -773,7 +776,7 @@ class ItemType extends DataObject
 				global $DB;
 				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
 				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop as schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
-				$SQL->SELECT_add( 'itcf_required AS required, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+				$SQL->SELECT_add( 'itcf_required AS required, itcf_meta AS meta, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
 				$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
 				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
 				$SQL->FROM( 'T_items__type_custom_field' );

@@ -376,6 +376,16 @@ if( $params['comment_type'] == 'meta' )
 
 			$Item->display_workflow_field( 'deadline', $Form );
 
+			// Display inputs of custom fields which are allowed to be updated with meta comment:
+			$custom_fields = $Item->get_custom_fields_defs();
+			foreach( $custom_fields as $custom_field )
+			{
+				if( $custom_field['meta'] )
+				{
+					display_editable_custom_field( $custom_field['name'], $Form, $Item );
+				}
+			}
+
 			// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
 			$params['form_submit_text'] = T_('Update Status').' / '.$params['form_submit_text'];
 		}

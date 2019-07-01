@@ -429,6 +429,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_order           INT NULL,
 			itcf_note            VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
 			itcf_required        TINYINT DEFAULT 0,
+			itcf_meta            TINYINT DEFAULT 0,
 			itcf_public          TINYINT DEFAULT 1,
 			itcf_format          VARCHAR(2000) COLLATE utf8mb4_unicode_ci NULL,
 			itcf_formula         VARCHAR(2000) COLLATE ascii_general_ci NULL,

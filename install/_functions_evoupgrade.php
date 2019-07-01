@@ -11829,7 +11829,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			    ityp_front_order_attachments = 30,
 			    ityp_front_order_text = 80' );
 		db_drop_col( 'T_items__type', 'ityp_front_instruction' );
-		db_add_col( 'T_items__type_custom_field', 'itcf_required', 'TINYINT DEFAULT 0 AFTER itcf_note' );
+		db_upgrade_cols( 'T_items__type_custom_field', array(
+			'ADD' => array(
+				'itcf_required' => 'TINYINT DEFAULT 0 AFTER itcf_note',
+				'itcf_meta'     => 'TINYINT DEFAULT 0 AFTER itcf_required',
+			),
+		) );
 		upg_task_end();
 	}
 

@@ -1303,7 +1303,7 @@ class Item extends ItemLight
 				$this->set( 'datedeadline', $item_deadline_datetime, true );
 			}
 
-			// Return TRUE when no errors and ata least one workflow property has been changed:
+			// Return TRUE when no errors and at least one workflow property has been changed:
 			return ! param_errors_detected() && (
 				isset( $this->dbchanges['post_assigned_user_ID'] ) ||
 				isset( $this->dbchanges['post_priority'] ) ||
@@ -1317,13 +1317,21 @@ class Item extends ItemLight
 
 	/**
 	 * Load custom fields values from Request form fields
+	 *
+	 * @param boolean TRUE to load only custom fields which are allowed to be updated with meta comment
+	 * @return boolean TRUE if loaded data seems valid, FALSE if some errors or no any property has been changed
 	 */
-	function load_custom_fields_from_Request()
+	function load_custom_fields_from_Request( $meta = NULL )
 	{
 		$custom_fields = $this->get_type_custom_fields();
 		$this->dbchanges_custom_fields = array();
+		$custom_fields_changed = false;
 		foreach( $custom_fields as $custom_field )
 		{ // update each custom field
+			if( $meta === true && ! $custom_field['meta'] )
+			{	// Skip not meta custom field when it is requested:
+				continue;
+			}
 			$param_name = 'item_cf_'.$custom_field['name'];
 			$param_error = false;
 			if( isset_param( $param_name ) )
@@ -1385,6 +1393,10 @@ class Item extends ItemLight
 					$this->dbchanges_flags['custom_fields'] = true;
 				}
 				$this->set_custom_field( $custom_field['name'], get_param( $param_name ), 'value', $custom_field_make_null );
+				if( ! $custom_fields_changed && $custom_field_value != get_param( $param_name ) )
+				{	// Mark that at least one custom field was changed:
+					$custom_fields_changed = true;
+				}
 			}
 		}
 		foreach( $custom_fields as $custom_field )
@@ -1394,6 +1406,9 @@ class Item extends ItemLight
 				$this->set_custom_field( $custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ) );
 			}
 		}
+
+		// Return TRUE when no errors and ata least one custom field has been changed:
+		return ! param_errors_detected() && $custom_fields_changed;
 	}
 
 
@@ -2637,7 +2652,7 @@ class Item extends ItemLight
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
 			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop AS schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
-			$SQL->SELECT_add( 'itcf_required AS required, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+			$SQL->SELECT_add( 'itcf_required AS required, itcf_meta AS meta, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
 			$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
 			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge, ' );
 			$SQL->SELECT_add( 'icfv_value AS value, IFNULL( icfv_parent_sync, 1 )AS parent_sync' );
@@ -11531,7 +11546,7 @@ class Item extends ItemLight
 					global $DB;
 					$SQL = new SQL( 'Get custom fields of revision #'.$Revision->iver_ID.'('.$Revision->iver_type.') for Item #'.$this->ID );
 					$SQL->SELECT( 'ivcf_itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, ivcf_itcf_label AS label, IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ) AS name, itcf_type AS type, IFNULL( itcf_order, 999999999 ) AS `order`, itcf_note AS note, ' );
-					$SQL->SELECT_add( 'itcf_required AS required, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+					$SQL->SELECT_add( 'itcf_required AS required, itcf_meta AS meta, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
 					$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
 					$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
 					$SQL->FROM( 'T_items__version_custom_field' );

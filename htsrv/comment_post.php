@@ -163,8 +163,14 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'comment' );
 
+if( $action != 'preview' )
+{	// Load workflow properties:
+	$load_workflow_result = $commented_Item->load_workflow_from_Request();
+	// Load meta custom fields:
+	$load_custom_fields_result = $commented_Item->load_custom_fields_from_Request( true );
+}
 $workflow_is_updated = false;
-if( $action != 'preview' && $commented_Item->load_workflow_from_Request() )
+if( ! empty( $load_workflow_result ) || ! empty( $load_custom_fields_result ) )
 {	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
 	if( $commented_Item->dbupdate() )
 	{	// Display a message on success result:
