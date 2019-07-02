@@ -685,9 +685,10 @@ class BlogCache extends DataObjectCache
 	 * @param boolean provide a choice for "none" with ID 0
 	 * @param string Callback method name
 	 * @param array IDs to ignore.
+	 * @param array Additional attributes for <option>, Key - attribute name, Value - object property
 	 * @return string HTML tags <option>
 	 */
-	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array() )
+	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array(), $option_attrs = array() )
 	{
 		// We force a full load!
 		$this->load_all();

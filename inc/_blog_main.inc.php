@@ -675,7 +675,7 @@ elseif( $disp == '-' )
 		{	// We are not on the canonical blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
-				header_redirect( $canonical_url, (empty( $display_containers ) && empty( $display_includes )) ? 301 : 303 );
+				header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) && empty( $_GET['debug'] ) ) ? 301 : 303 );
 			}
 			elseif( $Blog->get_setting( 'relcanonical_homepage' ) )
 			{	// Use link rel="canoncial":
