@@ -80,7 +80,7 @@ class RestApi
 			// Get user by email and password:
 			list( $User, $exists_more ) = $UserCache->get_by_emailAndPwd( $entered_login, $entered_password );
 		}
-		elseif( is_valid_login( $entered_login ) )
+		elseif( is_valid_login( $entered_login ) === true )
 		{	// Make sure that we can load the user:
 			$User = & $UserCache->get_by_login( $entered_login );
 		}
@@ -1717,7 +1717,7 @@ class RestApi
 		$api_mentioned = param( 'mentioned', 'array:string' ); // User logins mentioned on the page
 		$api_blog = param( 'blog', 'integer' );
 
-		if( ! is_valid_login( $api_q ) )
+		if( is_valid_login( $api_q ) !== true )
 		{	// Restrict a wrong request:
 			$this->halt( 'Wrong request', 'wrong_request', 403 );
 			// Exit here.

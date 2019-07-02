@@ -2666,7 +2666,7 @@ class User extends DataObject
 	 */
 	function get_media_subpath()
 	{
-		if( is_valid_login( $this->login, true ) )
+		if( is_valid_login( $this->login, true ) === true )
 		{	// Valid ASCII login, use it as is
 			return 'users/'.$this->login.'/';
 		}

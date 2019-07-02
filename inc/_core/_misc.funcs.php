@@ -2170,7 +2170,7 @@ function is_word( $word )
  * Check if the login is valid (in terms of allowed chars)
  *
  * @param string login
- * @return boolean true if OK
+ * @return boolean|string TRUE if OK, FALSE if error, special error cases: 'usr', 'long'
  */
 function is_valid_login( $login, $force_strict_logins = false )
 {
@@ -2212,6 +2212,13 @@ function is_valid_login( $login, $force_strict_logins = false )
 	{	// Logins cannot start with 'usr_', this prefix is reserved for system use
 		// We create user media directories for users with non-ASCII logins in format /media/users/usr_55/, where 55 is user ID
 		return 'usr';
+	}
+
+	// Step 4
+	// To avoid MySQL erro on insert long data
+	if( utf8_strlen( $login ) > 20 )
+	{	// Don't allow long login:
+		return 'long';
 	}
 
 	return true;

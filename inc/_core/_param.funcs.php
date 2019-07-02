@@ -913,13 +913,17 @@ function param_check_valid_login( $var )
 		return T_('Please choose a username.' );
 	}
 
-	$check = is_valid_login($GLOBALS[$var]);
+	$check = is_valid_login( $GLOBALS[$var] );
 
-	if( ! $check || $check === 'usr' )
+	if( $check !== true )
 	{
 		if( $check === 'usr' )
 		{	// Special case, the login is valid however we forbid it's usage.
 			$msg = sprintf( T_('Logins cannot start with %s, this prefix is reserved for system use.'), '<code>usr_</code>' );
+		}
+		elseif( $check === 'long' )
+		{	// Special case for long logins:
+			$msg = sprintf( T_('Logins cannot be longer %d characters.'), 20 );
 		}
 		elseif( ! isset( $Settings ) || $Settings->get('strict_logins') )
 		{
