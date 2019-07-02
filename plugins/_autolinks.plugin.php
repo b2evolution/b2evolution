@@ -623,7 +623,7 @@ class autolinks_plugin extends Plugin
 		$text = preg_replace( '/[@\p{L}0-9_\-]+\s*==!#DEL#!==/i'.$regexp_modifier, '', $text );
 
 		// Replace @usernames with user identity link:
-		$text = replace_content_outcode( '#@([A-Za-z0-9_.]+)#i', '@', $text, array( $this, 'replace_usernames' ) );
+		$text = replace_content_outcode( '#@([a-z0-9_.\-]+)#i', '@', $text, array( $this, 'replace_usernames' ) );
 
 		// Make tag names clickable:
 		$text = $this->replace_tags( $text );
