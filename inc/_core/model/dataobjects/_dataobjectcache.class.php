@@ -728,9 +728,10 @@ class DataObjectCache
 	 * @param boolean provide a choice for "none" with ID ''
 	 * @param string Callback method name
 	 * @param array IDs to ignore.
+	 * @param array Additional attributes for <option>, Key - attribute name, Value - object property
 	 * @return string
 	 */
-	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array() )
+	function get_option_list( $default = 0, $allow_none = false, $method = 'get_name', $ignore_IDs = array(), $option_attrs = array() )
 	{
 		if( !is_array( $default ) )
 		{
@@ -767,6 +768,10 @@ class DataObjectCache
 
 			$r .=  '<option value="'.$loop_Obj->ID.'"';
 			if( in_array( $loop_Obj->ID, $default ) ) $r .= ' selected="selected"';
+			foreach( $option_attrs as $option_attr_name => $option_attr_field )
+			{	// Additional attribute:
+				$r .=  ' '.$option_attr_name.'="'.format_to_output( $loop_Obj->get( $option_attr_field ), 'htmlattr' ).'"';
+			}
 			$r .= '>';
 			$r .= format_to_output( $loop_Obj->$method(), 'htmlbody' );
 			$r .=  '</option>'."\n";
