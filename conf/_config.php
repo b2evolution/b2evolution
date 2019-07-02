@@ -78,6 +78,9 @@ elseif( file_exists(dirname(__FILE__).'/_overrides_TEST.php') )
 	include_once dirname(__FILE__).'/_overrides_TEST.php';	// Will not be overridden on upgrade.
 }
 
+// Load to use evo_setcookie() for proper working with cookies on different domains from $baseurl:
+require_once $inc_path.'sessions/model/_cookie.funcs.php';
+
 // Handle debug cookie:
 if( $debug == 'pwd' )
 {	// Debug *can* be enabled/disabled by cookie:
@@ -92,11 +95,11 @@ if( $debug == 'pwd' )
 			if( $_GET['debug'] == $debug_pwd )
 			{	// Password matches
 				$debug = 1;
-				setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain, false, true );
+				evo_setcookie( 'debug', $debug_pwd, 0, $cookie_path, $cookie_domain, false, true );
 			}
 			else
 			{	// Password doesn't match: turn off debug mode:
-				setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
+				evo_setcookie( 'debug', '', $cookie_expired, $cookie_path, $cookie_domain, false, true );
 			}
 		}
 		elseif( !empty( $_COOKIE['debug'] ) && $_COOKIE['debug'] == $debug_pwd )
@@ -120,15 +123,15 @@ if( $debug_jslog == 'pwd' )
 			if( $_GET['jslog'] == $debug_pwd )
 			{	// Password matches
 				$debug_jslog = 1;
-				setcookie( 'jslog', $debug_pwd, 0, '/' );
+				evo_setcookie( 'jslog', $debug_pwd, 0, '/' );
 			}
 			else
 			{	// Password doesn't match: turn off debug mode:
-				setcookie( 'jslog', '', $cookie_expired, '/' );
+				evo_setcookie( 'jslog', '', $cookie_expired, '/' );
 				if( !empty( $_COOKIE['jslog_style'] ) )
 				{	// Change the saved styles to hide jslog
 					$_COOKIE['jslog_style'] = str_replace( 'display: block', 'display: none', $_COOKIE['jslog_style'] );
-					setcookie( 'jslog_style', $_COOKIE['jslog_style'], 0, '/' );
+					evo_setcookie( 'jslog_style', $_COOKIE['jslog_style'], 0, '/' );
 				}
 			}
 		}
@@ -138,7 +141,7 @@ if( $debug_jslog == 'pwd' )
 			if( !empty( $_COOKIE['jslog_style'] ) )
 			{	// Change the saved styles to show jslog
 				$_COOKIE['jslog_style'] = str_replace( 'display: none', 'display: block', $_COOKIE['jslog_style'] );
-				setcookie( 'jslog_style', $_COOKIE['jslog_style'], 0, '/' );
+				evo_setcookie( 'jslog_style', $_COOKIE['jslog_style'], 0, '/' );
 			}
 		}
 	}
