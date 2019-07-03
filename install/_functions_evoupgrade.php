@@ -11841,6 +11841,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 15510, 'Upgrading item types tables...' ) )
 	{	// part of 7.0.2-beta
 		db_add_col( 'T_items__type', 'ityp_front_order_location', 'SMALLINT NULL' );
+		$DB->query( 'UPDATE T_items__type
+			SET ityp_front_order_location = 90' );
 		upg_task_end();
 	}
 

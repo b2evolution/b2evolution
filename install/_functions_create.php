@@ -436,6 +436,7 @@ function create_default_data()
 			'front_order_title'        => 10,
 			'front_order_attachments'  => 30,
 			'front_order_text'         => 80,
+			'front_order_location'     => 90,
 		);
 	$post_types_sql = 'INSERT INTO T_items__type ( ityp_'.implode( ', ityp_', array_keys( $post_type_default_settings ) ).' ) VALUES ';
 	foreach( $post_types as $p => $post_type )
