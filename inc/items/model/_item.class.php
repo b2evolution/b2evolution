@@ -10634,16 +10634,16 @@ class Item extends ItemLight
 		$orig_iver_ID = $iver_ID;
 
 		if( $iver_ID == 'last_archived' || $iver_ID == 'last_proposed' )
-		{	// Get last revision:
-			list( , $iver_type ) = explode( '_', $iver_ID );
-			$revision_SQL = new SQL();
-			$revision_SQL->SELECT( 'a.*, CONCAT( "'.$iver_type.'", a.iver_ID ) AS param_ID' );
-			$revision_SQL->FROM( 'T_items__version a' );
-			$revision_SQL->FROM_add( 'LEFT OUTER JOIN T_items__version b ON a.iver_itm_ID = b.iver_itm_ID AND a.iver_ID < b.iver_ID AND b.iver_type = '.$DB->quote( $iver_type ) );
-			$revision_SQL->WHERE( 'b.iver_itm_ID IS NULL' );
-			$revision_SQL->WHERE_and( 'a.iver_itm_ID = '.$DB->quote( $this->ID ) );
-			$revision_SQL->WHERE_and( 'a.iver_type = '.$DB->quote( $iver_type ) );
-			$this->revisions[ $orig_iver_ID ] = $DB->get_row( $revision_SQL->get(), OBJECT, NULL, $revision_SQL->title );
+		{	// Get last archived version or last proposed change:
+			$iver_type = substr( $iver_ID, 5 );
+			$revision_SQL = new SQL( 'Get '.str_replace( '_', ' ', $iver_ID ).' version of the Item #'.$this->ID );
+			$revision_SQL->SELECT( '*, CONCAT( "'.( $iver_type == 'archived' ? 'a' : 'p' ).'", iver_ID ) AS param_ID' );
+			$revision_SQL->FROM( 'T_items__version' );
+			$revision_SQL->WHERE( 'iver_itm_ID = '.$DB->quote( $this->ID ) );
+			$revision_SQL->WHERE_and( 'iver_type = '.$DB->quote( $iver_type ) );
+			$revision_SQL->ORDER_BY( 'iver_ID DESC' );
+			$revision_SQL->LIMIT( '1' );
+			$this->revisions[ $orig_iver_ID ] = $DB->get_row( $revision_SQL );
 
 			return $this->revisions[ $orig_iver_ID ];
 		}

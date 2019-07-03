@@ -6525,54 +6525,41 @@ class Blog extends DataObject
 
 		foreach( $msgform_additional_fields as $UserField )
 		{
-			$field_value = '';
-			$field_value2 = '';
+			$field_values = array();
 
 			if( ! empty( $filled_user_fields[ $UserField->ID ] ) )
 			{	// Get values from the submitted form:
 				if( is_array( $filled_user_fields[ $UserField->ID ] ) )
 				{	// Multiple field:
-					$field_value = isset( $filled_user_fields[ $UserField->ID ][0] ) ? trim( $filled_user_fields[ $UserField->ID ][0] ) : '';
-					$field_value2 = isset( $filled_user_fields[ $UserField->ID ][1] ) ? trim( $filled_user_fields[ $UserField->ID ][1] ) : '';
+					$field_values = $filled_user_fields[ $UserField->ID ];
 				}
 				else
 				{	// Single field:
-					$field_value = $filled_user_fields[ $UserField->ID ];
+					$field_values = array( $filled_user_fields[ $UserField->ID ] );
 				}
 			}
 
-			if( is_logged_in() && empty( $field_value ) )
+			if( is_logged_in() && empty( $field_values ) )
 			{	// Get saved field value from the current logged in User:
 				global $current_User;
 				$userfields = $current_User->userfields_by_ID( $UserField->ID );
-
-				if( isset( $userfields[0] ) )
-				{	// Get a value for single field or first of multiple field:
-					$userfield_data = $userfields[0];
-					if( in_array( $UserField->get( 'duplicated' ), array( 'list', 'allowed' ) ) && isset( $userfield_data->list ) )
-					{	// Use only first value of the list field:
-						$field_values = array_values( $userfield_data->list );
-						$field_value = isset( $field_values[0] ) ? $field_values[0] : $userfield_data->uf_varchar;
-						$field_value2 = isset( $field_values[1] ) ? $field_values[1] : '';
-					}
-					else
+				if( is_array( $userfields ) )
+				{
+					foreach( $userfields as $userfield )
 					{
-						$field_value = $userfield_data->uf_varchar;
+						$field_values[] = $userfield->uf_varchar;
 					}
-				}
-
-				if( isset( $userfields[1] ) )
-				{	// Get a value for second of multiple field:
-					$field_value2 = $userfields[1]->uf_varchar;
 				}
 			}
 
-			// Display single additional field:
-			$this->display_msgform_additional_field( $Form, $UserField, $field_value );
+			if( empty( $field_values ) )
+			{	// Display at least one additional field if user is not filled that in profile yet:
+				$field_values = array( '' );
+			}
 
-			if( $field_value != '' && in_array( $UserField->get( 'duplicated' ), array( 'allowed', 'list' ) ) )
-			{	// If field is multiple the display one more additional field:
-				$this->display_msgform_additional_field( $Form, $UserField, $field_value2, true );
+			foreach( $field_values as $f => $field_value )
+			{	// Display additional fields:
+				$this->display_msgform_additional_field( $Form, $UserField, $field_value, $f != 0 );
 			}
 		}
 	}
