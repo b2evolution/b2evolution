@@ -147,7 +147,10 @@ $Form->begin_fieldset( T_('Use of Advanced Properties').get_manual_link( 'item-t
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Use of Location').get_manual_link( 'item-type-location' ), array( 'id' => 'itemtype_location' ) );
-	$Form->radio( 'ityp_use_country', $edited_Itemtype->use_country, $options, T_('Use country') );
+	$Form->begin_line( T_('Use country') );
+		$Form->radio( 'ityp_use_country', $edited_Itemtype->use_country, $options );
+		$Form->text_input( 'ityp_front_order_location', $edited_Itemtype->front_order_location, 6, ' &nbsp; <b>'.T_('Front-Office Order').':</b>', T_('Leave empty to hide'), $front_order_params );
+	$Form->end_line();
 	$Form->radio( 'ityp_use_region', $edited_Itemtype->use_region, $options, T_('Use region') );
 	$Form->radio( 'ityp_use_sub_region', $edited_Itemtype->use_sub_region, $options, T_('Use sub-region') );
 	$Form->radio( 'ityp_use_city', $edited_Itemtype->use_city, $options, T_('Use city') );

@@ -414,6 +414,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_front_order_tags         SMALLINT NULL,
 			ityp_front_order_excerpt      SMALLINT NULL,
 			ityp_front_order_url          SMALLINT NULL,
+			ityp_front_order_location     SMALLINT NULL,
 			PRIMARY KEY ( ityp_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

@@ -11766,7 +11766,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15480, 'Creating ICO file type...') )
+	if( upg_task_start( 15480, 'Creating ICO file type...' ) )
 	{	// part of 7.0.1-beta
 		$SQL = new SQL( 'Check for file type .ico' );
 		$SQL->SELECT( 'ftyp_ID' );
@@ -11781,7 +11781,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15490, 'Upgrading collection permission tables...') )
+	if( upg_task_start( 15490, 'Upgrading collection permission tables...' ) )
 	{	// part of 7.0.2-beta
 		db_upgrade_cols( 'T_coll_user_perms', array(
 			'ADD' => array(
@@ -11808,7 +11808,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15500, 'Upgrading item types and custom fields tables...') )
+	if( upg_task_start( 15500, 'Upgrading item types and custom fields tables...' ) )
 	{	// part of 7.0.2-beta
 		db_upgrade_cols( 'T_items__type', array(
 			'ADD' => array(
@@ -11835,6 +11835,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				'itcf_meta'     => 'TINYINT DEFAULT 0 AFTER itcf_required',
 			),
 		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15510, 'Upgrading item types tables...' ) )
+	{	// part of 7.0.2-beta
+		db_add_col( 'T_items__type', 'ityp_front_order_location', 'SMALLINT NULL' );
 		upg_task_end();
 	}
 

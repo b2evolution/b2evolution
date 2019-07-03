@@ -651,12 +651,18 @@ fieldset ul {
   width: 100%;
   max-width: 100%;
 }
+#item_locations th,
+#item_locations td {
+  white-space: nowrap;
+  padding: 2px 0;
+}
 #item_locations label {
   width: auto;
   float: right;
 }
 #item_locations select {
   width: 160px;
+  display: inline-block;
 }
 #item_locations td.input {
   width: 100%;

@@ -71,6 +71,7 @@ class ItemType extends DataObject
 	var $front_order_tags        = NULL;
 	var $front_order_excerpt     = NULL;
 	var $front_order_url         = NULL;
+	var $front_order_location    = NULL;
 
 	/**
 	 * Custom fields
@@ -154,6 +155,7 @@ class ItemType extends DataObject
 			$this->front_order_tags = isset( $db_row->ityp_front_order_tags ) ? $db_row->ityp_front_order_tags : NULL;
 			$this->front_order_excerpt = isset( $db_row->ityp_front_order_excerpt ) ? $db_row->ityp_front_order_excerpt : NULL;
 			$this->front_order_url = isset( $db_row->ityp_front_order_url ) ? $db_row->ityp_front_order_url : NULL;
+			$this->front_order_location = isset( $db_row->ityp_front_order_location ) ? $db_row->ityp_front_order_location : NULL;
 		}
 	}
 
@@ -371,6 +373,10 @@ class ItemType extends DataObject
 		// Use coordinates
 		param( 'ityp_use_coordinates', 'string' );
 		$this->set_from_Request( 'use_coordinates' );
+
+		// Front-Office Order (Location:Country/Region/Sub-region/City)
+		param( 'ityp_front_order_location', 'integer', NULL );
+		$this->set_from_Request( 'front_order_location' );
 
 		// Use comments
 		param( 'ityp_use_comments', 'integer', 0 );

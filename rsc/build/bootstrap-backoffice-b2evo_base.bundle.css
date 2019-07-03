@@ -2603,6 +2603,18 @@ a.btn.action_icon.hoverlink {
   vertical-align: middle;
   padding-right: 5px;
 }
+.form-horizontal #item_locations th,
+.form-horizontal #item_locations td {
+  white-space: nowrap;
+  padding: 2px 0;
+}
+.form-horizontal #item_locations label {
+  width: auto;
+  float: right;
+}
+.form-horizontal #item_locations select {
+  display: inline-block;
+}
 .form-horizontal #itemform_renderers div[id^="block_renderer_"] {
   padding-left: 20px;
   position: relative;

@@ -164,6 +164,14 @@ $Form->begin_form( 'inskin', '', $form_params );
 		}
 	}
 
+	if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
+	{
+		$Form->hidden( 'item_latitude', $edited_Item->get_setting( 'latitude' ) );
+		$Form->hidden( 'item_longitude', $edited_Item->get_setting( 'longitude' ) );
+		$Form->hidden( 'google_map_zoom', $edited_Item->get_setting( 'map_zoom' ) );
+		$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
+	}
+
 	if( $edited_Item->get_type_setting( 'allow_attachments' ) &&
 			$current_User->check_perm( 'files', 'view', false ) )
 	{	// If current user has a permission to view the files AND attachments are allowed for the item type:
@@ -380,6 +388,34 @@ $Form->begin_form( 'inskin', '', $form_params );
 						$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
 					}
 					break;
+
+				case 'location':
+					// Location:
+					if( ! $edited_Item->country_visible() )
+					{	// Skip, because it is not used for the Item Type:
+						break;
+					}
+					if( $front_edit_field_is_visible )
+					{	// Display only if it is visible on front-office:
+						echo_item_location_form( $Form, $edited_Item );
+					}
+					else
+					{	// Put value in hidden field for proper switching between back-office edit form:
+						$Form->hidden( 'item_ctry_ID', $edited_Item->ctry_ID );
+						if( $edited_Item->region_visible() )
+						{
+							$Form->hidden( 'item_rgn_ID', $edited_Item->rgn_ID );
+						}
+						if( $edited_Item->subregion_visible() )
+						{
+							$Form->hidden( 'item_subrg_ID', $edited_Item->subrg_ID );
+						}
+						if( $edited_Item->city_visible() )
+						{
+							$Form->hidden( 'item_ctry_ID', $edited_Item->ctry_ID );
+						}
+					}
+					break;
 			}
 		}
 		else
@@ -393,17 +429,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 				$Form->hidden( 'item_cf_'. $front_edit_field['name'],  $front_edit_field['value'] );
 			}
 		}
-	}
-
-	// ################### LOCATIONS ###################
-	echo_item_location_form( $Form, $edited_Item );
-
-	if( $edited_Item->get_type_setting( 'use_coordinates' ) != 'never' )
-	{
-		$Form->hidden( 'item_latitude', $edited_Item->get_setting( 'latitude' ) );
-		$Form->hidden( 'item_longitude', $edited_Item->get_setting( 'longitude' ) );
-		$Form->hidden( 'google_map_zoom', $edited_Item->get_setting( 'map_zoom' ) );
-		$Form->hidden( 'google_map_type', $edited_Item->get_setting( 'map_type' ) );
 	}
 
 	// ################### CATEGORIES ###################

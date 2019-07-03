@@ -13507,6 +13507,7 @@ class Item extends ItemLight
 			'tags',
 			'excerpt',
 			'url',
+			'location',
 		);
 		foreach( $item_fields as $item_field )
 		{
