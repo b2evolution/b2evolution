@@ -492,6 +492,4 @@ echo_fieldset_folding_js();
 echo_image_insert_modal();
 
 $edited_Item->load_Blog();
-// Location
-echo_regional_js( 'item', $edited_Item->region_visible() );
 ?>

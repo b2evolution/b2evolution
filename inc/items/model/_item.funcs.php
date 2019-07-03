@@ -4404,6 +4404,9 @@ function echo_item_location_form( & $Form, & $edited_Item, $params = array() )
 	$Form->switch_layout( NULL );
 
 	$Form->end_fieldset();
+
+	// Initialize JavaScript for AJAX loading of regions, subregions and cities:
+	echo_regional_js( 'item', $edited_Item->region_visible() );
 }
 
 

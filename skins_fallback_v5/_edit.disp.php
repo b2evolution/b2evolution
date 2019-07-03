@@ -418,6 +418,4 @@ echo_autocomplete_tags();
 echo_fieldset_folding_js();
 
 $edited_Item->load_Blog();
-// Location
-echo_regional_js( 'item', $edited_Item->region_visible() );
 ?>

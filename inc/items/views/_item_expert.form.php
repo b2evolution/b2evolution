@@ -1109,8 +1109,6 @@ else
 }
 // New category input box:
 echo_onchange_newcat();
-// Location
-echo_regional_js( 'item', $edited_Item->region_visible() );
 // Goal
 echo_onchange_goal_cat();
 // Fieldset folding
