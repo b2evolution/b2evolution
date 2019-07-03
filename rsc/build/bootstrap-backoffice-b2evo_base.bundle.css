@@ -2615,9 +2615,16 @@ a.btn.action_icon.hoverlink {
 .form-horizontal #item_locations select {
   display: inline-block;
 }
+.form-horizontal #itemform_renderers .dropdown-menu {
+  padding: 10px 10px 5px 10px;
+}
+.form-horizontal #itemform_renderers .popover {
+  max-width: initial;
+}
 .form-horizontal #itemform_renderers div[id^="block_renderer_"] {
   padding-left: 20px;
   position: relative;
+  white-space: nowrap;
 }
 .form-horizontal #itemform_renderers div[id^="block_renderer_"] input[type=checkbox] {
   margin: 4px 0 0;
@@ -2921,7 +2928,7 @@ div.messages {
   color: #333;
 }
 .popover.right {
-  text-align: left;
+  text-align: left !important;
 }
 .popover.right.popover-userfield {
   margin-left: 35px !important;
@@ -2954,12 +2961,10 @@ a:hover .glyphicon {
 #colorbox #cboxVoting label input {
   margin-top: 0;
 }
-#itemform_renderers label,
 table.catselect label {
   display: inline-block;
   margin-right: 5px;
 }
-#itemform_renderers label input,
 table.catselect label input {
   margin: 0 2px 4px 0;
 }

@@ -274,9 +274,16 @@ a.btn.action_icon {
 	}
 	// Text Renderers block on edit post form
 	#itemform_renderers {
+		.dropdown-menu {
+			padding: 10px 10px 5px 10px;
+		}
+		.popover {
+			max-width: initial;
+		}
 		div[id^="block_renderer_"] {
 			padding-left: 20px;
 			position: relative;
+			white-space: nowrap;
 			input[type=checkbox] {
 				margin: 4px 0 0;
 				position: absolute;
@@ -609,7 +616,7 @@ div.messages{
 	max-width: 100%;
 	color: #333;
 	&.right {
-		text-align: left;
+		text-align: left !important;
 		&.popover-userfield {
 			// Shift a popover window to the right on 35px to don't hide a plus icon
 			margin-left: 35px !important;
@@ -652,7 +659,7 @@ a:hover .glyphicon {
 }
 
 // Make a label inline
-#itemform_renderers, table.catselect {
+table.catselect {
 	label {
 		display: inline-block;
 		margin-right: 5px;

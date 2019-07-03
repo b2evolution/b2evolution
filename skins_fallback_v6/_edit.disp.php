@@ -270,6 +270,20 @@ $Form->begin_form( 'inskin', '', $form_params );
 
 						<?php
 						echo '<div class="edit_plugin_actions">';
+						// Text Renderers:
+						if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
+						{	// If text renderers are allowed to update from front-office:
+							$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
+						}
+						if( ! empty( $item_renderer_checkboxes ) )
+						{	// Display only if at least one text renderer is visible:
+							echo '<div id="itemform_renderers" class="btn-group dropup pull-right">
+								<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span> '.T_('Text Renderers').'</button>
+								<div class="dropdown-menu dropdown-menu-right">'.$item_renderer_checkboxes.'</div>
+							</div>';
+							// JS code to don't hide popup on click to checkbox:
+							echo '<script>jQuery( "#itemform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } )</script>';
+						}
 						// CALL PLUGINS NOW:
 						$display_editor_params = array(
 								'target_type'   => 'Item',
@@ -283,18 +297,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 						}
 						$Plugins->trigger_event( 'DisplayEditorButton', $display_editor_params );
 						echo '</div>';
-
-						// Text Renderers:
-						if( $Blog->get_setting( 'in_skin_editing_renderers' ) )
-						{	// If text renderers are allowed to update from front-office:
-							$item_renderer_checkboxes = $edited_Item->get_renderer_checkboxes();
-						}
-						if( ! empty( $item_renderer_checkboxes ) )
-						{
-							$Form->begin_fieldset( T_('Text Renderers'), array( 'id' => 'itemform_front_renderers', 'fold' => true, 'default_fold' => 1 ) );
-							echo $item_renderer_checkboxes;
-							$Form->end_fieldset();
-						}
 					}
 					else
 					{	// Put value in hidden field for proper switching between back-office edit form:
