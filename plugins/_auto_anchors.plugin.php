@@ -145,7 +145,13 @@ class auto_anchors_plugin extends Plugin
 		// Make anchor lowercase:
 		$anchor = utf8_strtolower( $anchor );
 
-		return $m[1].( empty( $anchor ) ? '' : ' id="'.$anchor.'"' ).'>'.$m[4].$m[5];
+		if( empty( $anchor ) )
+		{	// Return original header tag when anchor is empty:
+			return $m[0];
+		}
+
+		return $m[1].' id="'.$anchor.'">'.$m[4].$m[5];
+		//return $m[1].' id="'.$anchor.'">'.$m[4].' <a href="#'.$anchor.'">'.get_icon( 'merge' ).'</a>'.$m[5];
 	}
 }
 
