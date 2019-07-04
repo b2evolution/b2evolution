@@ -25,7 +25,7 @@ param( 'cat_focus', 'string', 'main' );
 // Filter list:
 $MainList->set_filters( array(
 		'visibility_array' => array( 'published' ),  // We only want to advertised published items
-		'itemtype_usage'   => 'post,page', // keep normal posts & pages BUT STILL EXCLUDE intros and sidebar links
+		'itemtype_usage'   => 'post,page,intro-front,intro-main,intro-cat,intro-tag,intro-sub,intro-all', // keep normal posts, pages and intro-* BUT STILL EXCLUDE all others special(sidebar link, advertisement), content blocks
 	  'unit' => 'all',						// We want to advertise all items (not just a page or a day)
 	  'cat_focus' => $cat_focus,
 	) );
@@ -56,6 +56,12 @@ echo '<?xml version="1.0" encoding="UTF-8"?'.'>';
 ?>
 
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<url>
+		<loc><?php echo $Blog->get( 'url' ); ?></loc>
+		<lastmod><?php echo $Blog->get_last_touched_date( 'isoZ', true ); ?></lastmod>
+		<priority>1</priority>
+		<changefreq>daily</changefreq>
+	</url>
 <?php
 while( $Item = & mainlist_get_item() )
 {	// For each blog post, do everything below up to the closing curly brace "}"
