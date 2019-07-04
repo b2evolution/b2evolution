@@ -68,19 +68,19 @@ class markdown_plugin extends Plugin
 					'label' => T_( 'Links' ),
 					'type' => 'checkbox',
 					'note' => T_( 'Detect and convert markdown link markup.' ),
-					'defaultvalue' => 0,
+					'defaultvalue' => 1,
 				),
 			'images' => array(
 					'label' => T_( 'Images' ),
 					'type' => 'checkbox',
 					'note' => T_( 'Detect and convert markdown image markup.' ),
-					'defaultvalue' => 0,
+					'defaultvalue' => 1,
 				),
 			'text_styles' => array(
 					'label' => T_( 'Italic & Bold styles' ),
 					'type' => 'checkbox',
 					'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
-					'defaultvalue' => 0,
+					'defaultvalue' => 1,
 				),
 			'table' => array(
 					'label' => T_('Tables'),
@@ -267,8 +267,6 @@ class markdown_plugin extends Plugin
 			case 'forum':
 			case 'manual':
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_comment_rendering', 'opt-out' );
-				$params['Blog']->set_setting( 'plugin'.$this->ID.'_images', '1' );
-				$params['Blog']->set_setting( 'plugin'.$this->ID.'_links', '1' );
 				break;
 		}
 	}
