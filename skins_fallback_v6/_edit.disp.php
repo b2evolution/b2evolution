@@ -102,10 +102,6 @@ $Form->begin_form( 'inskin', '', $form_params );
 	{ // DO NOT ADD HIDDEN FIELDS IF THEY ARE NOT SET
 		// These fields will be set only in case when switch tab from admin editing to in-skin editing
 		// Fields used in "advanced" form, but not here:
-		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
-		{
-			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
-		}
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );
 		$Form->hidden( 'post_locale_visibility', $edited_Item->get( 'locale_visibility' ) );
@@ -217,14 +213,14 @@ $Form->begin_form( 'inskin', '', $form_params );
 					}
 					if( $front_edit_field_is_visible )
 					{	// Display only if it is visible on front-office:
-						$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, T_('Short title'), '', array(
+						$Form->text_input( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ), 50, T_('Short title'), '', array(
 								'maxlength' => intval( $edited_Item->get_type_setting( 'short_title_maxlen' ) ),
 								'style'     => 'width:100%',
 							) );
 					}
 					else
 					{	// Put value in hidden field for proper switching between back-office edit form:
-						$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+						$Form->hidden( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ) );
 					}
 					break;
 
@@ -297,6 +293,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 						}
 						$Plugins->trigger_event( 'DisplayEditorButton', $display_editor_params );
 						echo '</div>';
+						echo '<div class="clear"></div>';
 					}
 					else
 					{	// Put value in hidden field for proper switching between back-office edit form:

@@ -106,7 +106,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		// Fields used in "advanced" form, but not here:
 		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
 		{
-			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+			$Form->hidden( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ) );
 		}
 		$Form->hidden( 'post_comment_status', $edited_Item->get( 'comment_status' ) );
 		$Form->hidden( 'post_locale', $edited_Item->get( 'locale' ) );

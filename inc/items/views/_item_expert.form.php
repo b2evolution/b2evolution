@@ -164,13 +164,13 @@ $Form->begin_form( '', '', $params );
 		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
 		{	// Display a post short title field:
 			$short_title_maxlen = intval( $edited_Item->get_type_setting( 'short_title_maxlen' ) );
-			$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, T_('Short title'), '', array(
+			$Form->text_input( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ), 50, T_('Short title'), '', array(
 					'maxlength' => $short_title_maxlen,
 					'data-recommended-length' => '20;30' ) );
 		}
 		else
 		{	// Hide a post short title field:
-			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+			$Form->hidden( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ) );
 		}
 		$Form->end_fieldset();
 	}
