@@ -6777,6 +6777,47 @@ class Blog extends DataObject
 
 
 	/**
+	 * Get last touched date of content in this collection
+	 *
+	 * @param string Date/Time format: leave empty to use locale default date format, use FALSE to don't format
+	 * @param boolean TRUE if you want GMT
+	 * @return string Last touched date
+	 */
+	function get_last_touched_date( $format = false, $useGM = false )
+	{
+		if( empty( $this->ID ) )
+		{	// Collection must be saved in DB:
+			return false;
+		}
+
+		if( ! isset( $this->last_touched_date ) )
+		{	// Load last touched date from DB:
+			global $DB;
+			$SQL = new SQL( 'Get last touched date for collection #'.$this->ID );
+			$SQL->SELECT( 'cat_last_touched_ts' );
+			$SQL->FROM( 'T_categories' );
+			$SQL->WHERE( 'cat_blog_ID = '.$this->ID );
+			$SQL->ORDER_BY( 'cat_last_touched_ts DESC' );
+			$SQL->LIMIT( '1' );
+			// Store date in cache:
+			$this->last_touched_date = $DB->get_var( $SQL );
+		}
+
+		if( $format === false )
+		{	// Don't format:
+			return $this->last_touched_date;
+		}
+
+		if( empty( $format ) )
+		{	// Use format of current locale:
+			$format = locale_datefmt();
+		}
+
+		return mysql2date( $format, $this->last_touched_date, $useGM );
+	}
+
+
+	/**
 	 * Get a marketing popup container code if it is enabled for current requested page
 	 *
 	 * @return string|boolean Container code, FALSE if marketing popup is not enabled
