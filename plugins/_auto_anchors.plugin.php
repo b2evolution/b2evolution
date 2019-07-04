@@ -46,12 +46,24 @@ class auto_anchors_plugin extends Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		$default_params = array_merge( $params,
-			array(
+		$default_params = array(
 				'default_comment_rendering' => 'opt-in',
 				'default_post_rendering' => 'opt-out'
-			)
-		);
+			);
+
+		if( ! empty( $params['blog_type'] ) )
+		{	// Set default settings depending on collection type:
+			switch( $params['blog_type'] )
+			{
+				case 'forum':
+					$default_params['default_comment_rendering'] = 'never';
+					$default_params['default_post_rendering'] = 'never';
+					break;
+			}
+		}
+
+		$default_params = array_merge( $params, $default_params );
+
 		return parent::get_coll_setting_definitions( $default_params );
 	}
 
@@ -133,7 +145,13 @@ class auto_anchors_plugin extends Plugin
 		// Make anchor lowercase:
 		$anchor = utf8_strtolower( $anchor );
 
-		return $m[1].( empty( $anchor ) ? '' : ' id="'.$anchor.'"' ).'>'.$m[4].$m[5];
+		if( empty( $anchor ) )
+		{	// Return original header tag when anchor is empty:
+			return $m[0];
+		}
+
+		return $m[1].' id="'.$anchor.'">'.$m[4].$m[5];
+		//return $m[1].' id="'.$anchor.'">'.$m[4].' <a href="#'.$anchor.'">'.get_icon( 'merge' ).'</a>'.$m[5];
 	}
 }
 

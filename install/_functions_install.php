@@ -749,8 +749,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Code highlight"' );
 		}
-		install_plugin( 'gmcode_plugin' );
-		install_plugin( 'wacko_plugin' );
 		install_plugin( 'shortlinks_plugin' );
 		install_plugin( 'wikitables_plugin' );
 		install_plugin( 'markdown_plugin' );

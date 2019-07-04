@@ -130,12 +130,24 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		$default_params = array_merge( $params,
-			array(
+		$default_params = array(
 				'default_comment_rendering' => 'stealth',
 				'default_post_rendering' => 'opt-out'
-			)
-		);
+			);
+
+		if( ! empty( $params['blog_type'] ) )
+		{	// Set default settings depending on collection type:
+			switch( $params['blog_type'] )
+			{
+				case 'forum':
+					$default_params['default_comment_rendering'] = 'never';
+					$default_params['default_post_rendering'] = 'never';
+					break;
+			}
+		}
+
+		$default_params = array_merge( $params, $default_params );
+
 		return parent::get_coll_setting_definitions( $default_params );
 	}
 
