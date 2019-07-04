@@ -315,8 +315,9 @@ function skin_init( $disp )
 				}
 			}
 
-			if( ! $MainList->result_num_rows )
-			{	// There is nothing to display for this page, don't index it!
+			if( $Blog->get_setting( 'single_noindex' ) || ! $MainList->result_num_rows )
+			{	// We prefer robots not to index these pages,
+				// OR There is nothing to display for this page, don't index it!
 				$robots_index = false;
 			}
 			break;

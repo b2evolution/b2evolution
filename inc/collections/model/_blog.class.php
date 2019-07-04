@@ -1356,6 +1356,7 @@ class Blog extends DataObject
 			$this->set_setting( 'posts_firstpage_noindex', param( 'posts_firstpage_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_noindex', param( 'paged_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_nofollowto', param( 'paged_nofollowto', 'integer', 0 ) );
+			$this->set_setting( 'single_noindex', param( 'single_noindex', 'integer', 0 ) );
 			$this->set_setting( 'archive_noindex', param( 'archive_noindex', 'integer', 0 ) );
 			$this->set_setting( 'archive_nofollowto', param( 'archive_nofollowto', 'integer', 0 ) );
 			$this->set_setting( 'chapter_noindex', param( 'chapter_noindex', 'integer', 0 ) );

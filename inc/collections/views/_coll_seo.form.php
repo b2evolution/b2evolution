@@ -114,6 +114,8 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_link('single-post-pages-seo') );
 
+	$Form->checkbox( 'single_noindex', $edited_Blog->get_setting( 'single_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
 		array(
 			  array( 'param_num', T_('Use param: post ID'), T_('E-g: ')

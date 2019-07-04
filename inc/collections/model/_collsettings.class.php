@@ -56,6 +56,7 @@ class CollectionSettings extends AbstractSettings
 			'paged_nofollowto' => '0',						// NOFOLLOW on links to following blog pages
 
 		// Single post settings:
+			'single_noindex' => 0,					// META NOINDEX on Single/Page pages
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
 			'self_canonical_item_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'allow_crosspost_urls' => 1,					// For cross-posted Items, allow non-canonical URL
