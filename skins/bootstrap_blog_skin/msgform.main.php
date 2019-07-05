@@ -173,7 +173,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 	if( $Skin->is_visible_sidebar( true ) )
 	{ // Display sidebar:
 	?>
-	<aside class="col-md-3<?php echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
+	<aside class="col-md-3<?php echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' pull-left-md' : '' ); ?>">
 		<?php
 		if( $Skin->show_container_when_access_denied( 'sidebar' ) )
 		{ // Display 'Sidebar' widget container

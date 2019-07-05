@@ -397,7 +397,7 @@ skin_widget( array(
 		if( $Skin->is_visible_sidebar( 'single' ) )
 		{	// Display sidebar:
 		?>
-		<aside class="col-md-3<?php echo ( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
+		<aside class="col-md-3<?php echo ( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left-md' : '' ); ?>">
 			<div class="evo_container evo_container__sidebar_single">
 			<?php
 				// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
