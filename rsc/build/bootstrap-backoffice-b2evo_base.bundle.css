@@ -2404,6 +2404,12 @@ span.NonExistentWikiWord {
   .text-right-sm {
     text-align: right;
   }
+  .pull-left-sm {
+    float: left;
+  }
+  .pull-right-sm {
+    float: right;
+  }
 }
 /* Medium devices (desktops, 992px and up) */
 @media (min-width: 992px) {
@@ -2413,6 +2419,12 @@ span.NonExistentWikiWord {
   .text-right-md {
     text-align: right;
   }
+  .pull-left-md {
+    float: left;
+  }
+  .pull-right-md {
+    float: right;
+  }
 }
 /* Large devices (large desktops, 1200px and up) */
 @media (min-width: 1200px) {
@@ -2421,6 +2433,12 @@ span.NonExistentWikiWord {
   }
   .text-right-lg {
     text-align: right;
+  }
+  .pull-left-lg {
+    float: left;
+  }
+  .pull-right-lg {
+    float: right;
   }
 }
 .glyphicon {

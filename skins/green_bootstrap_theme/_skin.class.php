@@ -1805,7 +1805,7 @@ jQuery( document ).ready( function()
 
 			case 'left_sidebar':
 				// Left Sidebar
-				return 'col-md-9 pull-right';
+				return 'col-md-9 pull-right-md';
 
 			case 'right_sidebar':
 				// Right Sidebar

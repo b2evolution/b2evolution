@@ -757,10 +757,6 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
     float: right;
     margin-left: 10px;
   }
-  div.col-md-9.pull-right,
-  aside.col-md-3.pull-left {
-    float: none !important;
-  }
 }
 @media screen and (max-width: 767px) {
   .ft_date {
