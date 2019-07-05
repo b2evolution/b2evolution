@@ -441,7 +441,7 @@ switch( $action )
 		if( ! $edited_EmailCampaign->send_email( $current_User->ID, $test_email_address, 'test' ) )
 		{ // Sending is failed
 			$Messages->add( T_('Sorry, the test email could not be sent.')
-				.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+				.'<br />'.get_send_mail_error(), 'error' );
 			break;
 		}
 
