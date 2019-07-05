@@ -564,7 +564,7 @@ if( $success_message )
 		else
 		{
 			$Messages->add( T_('Sorry, could not send email.')
-				.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+				.'<br />'.get_send_mail_error(), 'error' );
 		}
 	}
 }

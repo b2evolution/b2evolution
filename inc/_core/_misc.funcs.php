@@ -3877,6 +3877,26 @@ function check_cron_job_emails_limit()
 
 
 /**
+ * Get additional error message on failed mail sending
+ *
+ * @return string
+ */
+function get_send_mail_error()
+{
+	global $Settings;
+
+	if( $Settings->get( 'email_service' ) == 'smtp' && ! $Settings->get( 'force_email_sending' ) )
+	{	// Only SMTP is used:
+		return T_('Recipient email address does not seem to work.');
+	}
+	else
+	{	// PHP "mail" function is used by default or it was forced after failed SMTP sending:
+		return T_('Possible reason: the PHP mail() function may have been disabled on the server.');
+	}
+}
+
+
+/**
  * Sends an email, wrapping PHP's mail() function.
  * ALL emails sent by b2evolution must be sent through this function (for consistency and for logging)
  *
