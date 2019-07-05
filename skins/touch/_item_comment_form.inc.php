@@ -240,7 +240,7 @@ function validateCommentForm(form)
 	{	// User is not logged in or not activated:
 		if( is_logged_in() && empty( $comment_author ) && empty( $comment_author_email ) )
 		{
-			$comment_author = $current_User->login;
+			$comment_author = $current_User->get_username();
 			$comment_author_email = $current_User->email;
 		}
 		// Note: we use funky field names to defeat the most basic guestbook spam bots

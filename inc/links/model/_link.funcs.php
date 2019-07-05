@@ -831,11 +831,11 @@ function get_file_links( $file_ID, $params = array() )
 				{
 					if( $current_User->ID != $User->ID && !$current_User->check_perm( 'users', 'view' ) )
 					{ // No permission to view other users in admin form
-						$r .= $params['user_prefix'].'<a href="'.url_add_param( $baseurl, 'disp=user&amp;user_ID='.$User->ID ).'">'.$User->login.'</a>';
+						$r .= $params['user_prefix'].'<a href="'.url_add_param( $baseurl, 'disp=user&amp;user_ID='.$User->ID ).'">'.$User->get_username().'</a>';
 					}
 					else
 					{ // Build a link to display a user in admin form
-						$r .= $params['user_prefix'].'<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$User->ID.'">'.$User->login.'</a>';
+						$r .= $params['user_prefix'].'<a href="?ctrl=user&amp;user_tab=profile&amp;user_ID='.$User->ID.'">'.$User->get_username().'</a>';
 					}
 					$link_object_ID = $link->link_usr_ID;
 				}
