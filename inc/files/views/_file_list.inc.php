@@ -75,6 +75,9 @@ $Form->begin_form();
 	}
 ?>
 <table class="filelist table table-striped table-bordered table-hover table-condensed">
+	<?php
+	ob_start();
+	?>
 	<thead>
 	<?php
 		/*****************  Col headers  ****************/
@@ -153,7 +156,13 @@ $Form->begin_form();
 		echo '</tr>';
 	?>
 	</thead>
-
+	<?php
+	$table_headers = ob_get_clean();
+	if( $fm_Filelist->count() > 0 )
+	{	// Display table headers only when at least file is found in the selected folder and filter:
+		echo $table_headers;
+	}
+	?>
 	<tbody class="filelist_tbody">
 	<?php
 	$checkall = param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
@@ -515,29 +524,16 @@ $Form->begin_form();
 		+ (int)$UserSettings->get('fm_showdownloads')
 		+ (int)$UserSettings->get('fm_imglistpreview');
 
-
-	ob_start();
-	?>
-
-	<tr class="noresults">
-		<td class="firstcol">&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
-		<td class="lastcol" colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
-			<?php
-				if( ! $Messages->has_errors() )
-				{ // no Filelist errors, the directory must be empty
-					$Messages->clear();
-					$Messages->add( T_('No files found.')
-						.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'error' );
-					$Messages->display( '', '' );
-				}
-			?>
-		</td>
-	</tr>
-
-	<?php
-	$noresults = ob_get_clean();
+	$noresults = '';
 	if( $countFiles == 0 )
-	{ // Filelist errors or "directory is empty"
+	{	// Filelist errors or "directory is empty":
+		$noresults = '<tr class="noresults">
+			<td class="lastcol text-danger" colspan="'.$filetable_cols.'" id="fileman_error">'
+				.T_('No files found.')
+				.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' )
+			.'</td>
+		</tr>';
+		// Note: this var is also used for display_dragdrop_upload_button() below:
 		echo $noresults;
 	}
 
@@ -668,7 +664,9 @@ $Form->begin_form();
 					'display_support_msg'  => false,
 					'additional_dropzone'  => '[ jQuery( ".filelist_tbody" ).get(0) ]',
 					'filename_before'      => $icon_to_link_files,
+					'table_headers'        => $table_headers,
 					'noresults'            => $noresults,
+					'table_id'             => 'FilesForm',
 				) );
 			?>
 			</td>

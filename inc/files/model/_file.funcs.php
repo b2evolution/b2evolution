@@ -2415,6 +2415,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
 			'noresults'              => '',
 			'fieldset_prefix'        => '', // Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+			'table_id'               => 'attachments_fieldset_table', // ID of table with files (without 'fieldset_prefix')
 		), $params );
 
 	$LinkOwner = & $params['LinkOwner'];
@@ -2543,7 +2544,7 @@ function display_dragdrop_upload_button( $params = array() )
 				callbacks: {
 					onSubmit: function( id, fileName )
 					{
-						var noresults_row = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table tr.noresults' );
+						var noresults_row = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> tr.noresults' );
 						if( noresults_row.length )
 						{ // Add table headers and remove "No results" row
 							<?php
@@ -2563,13 +2564,13 @@ function display_dragdrop_upload_button( $params = array() )
 								{	// Resize attachments fieldset after upload new image:
 								?>
 								update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' );
-								jQuery( document ).on( 'load', '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table img', function() { update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' ); } );
+								jQuery( document ).on( 'load', '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> img', function() { update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' ); } );
 								<?php } ?>
 							}, 10 );
 					},
 					onProgress: function( id, fileName, uploadedBytes, totalBytes )
 					{
-						var progressbar = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table tr[qq-file-id=' + id + '] .progress-bar' );
+						var progressbar = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> tr[qq-file-id=' + id + '] .progress-bar' );
 						var percentCompleted = Math.round( uploadedBytes / totalBytes * 100 ) + '%';
 
 						//progressbar.style.width = percentCompleted;
@@ -2607,7 +2608,7 @@ function display_dragdrop_upload_button( $params = array() )
 							?>
 							if( responseJSON.data.status != undefined && responseJSON.data.status == 'rename' )
 							{
-								jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table #saveBtn' ).show();
+								jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> #saveBtn' ).show();
 							}
 							<?php } ?>
 						}
@@ -2615,7 +2616,7 @@ function display_dragdrop_upload_button( $params = array() )
 						if( $params['list_style'] == 'table' )
 						{ // Table view
 						?>
-						var this_row = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table tr[qq-file-id=' + id + ']' );
+						var this_row = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> tr[qq-file-id=' + id + ']' );
 
 						if( responseJSON == undefined || responseJSON.data == undefined || responseJSON.data.status == 'error' || responseJSON.data.status == 'fatal' )
 						{ // Failed
@@ -2724,7 +2725,7 @@ function display_dragdrop_upload_button( $params = array() )
 									+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
 									+ '</a>'
 									+ warning );
-								var old_file_obj = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table input[type=hidden][value="' + responseJSON.data.oldpath + '"]' );
+								var old_file_obj = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> input[type=hidden][value="' + responseJSON.data.oldpath + '"]' );
 								if( old_file_obj.length > 0 )
 								{
 									old_file_obj.parent().append( ' <span class="orange"><?php echo TS_('(Old File)'); ?></span>' );
@@ -2761,7 +2762,7 @@ function display_dragdrop_upload_button( $params = array() )
 						{	// Resize attachments fieldset after upload new image:
 						?>
 						update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' );
-						jQuery( document ).on( 'load', '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table img', function() { update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' ); } );
+						jQuery( document ).on( 'load', '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> img', function() { update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' ); } );
 						<?php } ?>
 					},
 					onCancel: function( id, fileName )
@@ -2772,7 +2773,7 @@ function display_dragdrop_upload_button( $params = array() )
 						?>
 							setTimeout( function()
 							{ // allow some time to remove cancelled row first before determining the number of rows
-								var container = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table .filelist_tbody' );
+								var container = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> .filelist_tbody' );
 								var rows = container.find( 'tr' );
 								if( !rows.length )
 								{
@@ -2797,7 +2798,7 @@ function display_dragdrop_upload_button( $params = array() )
 		?>
 		function update_iframe_height( fieldset_prefix )
 		{
-			var table_height = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).height();
+			var table_height = jQuery( '#' + fieldset_prefix + '<?php echo $params['table_id']; ?>' ).height();
 			jQuery( '#' + fieldset_prefix + 'attachments_fieldset_wrapper' ).css( { 'height': table_height, 'max-height': table_height } );
 		}
 		<?php } ?>
@@ -2807,14 +2808,14 @@ function display_dragdrop_upload_button( $params = array() )
 		{
 		// A click event for button to replace old file with name
 		?>
-		jQuery( document ).on( 'click', '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table .qq-conflict-replace', function()
+		jQuery( document ).on( 'click', '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> .qq-conflict-replace', function()
 		{
 			var this_obj = jQuery( this );
 
 			var is_replace = this_obj.children( 'div:first' ).is( ':visible' );
 
 			var old_file_name = this_obj.attr( 'old' );
-			var old_file_obj = jQuery( '#<?php echo $params['fieldset_prefix']; ?>attachments_fieldset_table input[type=hidden][value="' + old_file_name + '"]' );
+			var old_file_obj = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> input[type=hidden][value="' + old_file_name + '"]' );
 			// Element found with old file name on the page
 			var old_file_exists = ( old_file_obj.length > 0 );
 			this_obj.hide();
