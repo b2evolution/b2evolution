@@ -77,7 +77,7 @@ class auto_anchors_plugin extends Plugin
 	function get_msg_setting_definitions( & $params )
 	{
 		// set params to allow rendering for messages by default
-		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'opt-in' ) );
+		$default_params = array_merge( $params, array( 'default_msg_rendering' => 'never' ) );
 		return parent::get_msg_setting_definitions( $default_params );
 	}
 
@@ -91,7 +91,7 @@ class auto_anchors_plugin extends Plugin
 	function get_email_setting_definitions( & $params )
 	{
 		// set params to allow rendering for emails by default:
-		$default_params = array_merge( $params, array( 'default_email_rendering' => 'opt-in' ) );
+		$default_params = array_merge( $params, array( 'default_email_rendering' => 'never' ) );
 		return parent::get_email_setting_definitions( $default_params );
 	}
 
@@ -111,11 +111,51 @@ class auto_anchors_plugin extends Plugin
 
 
 	/**
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlHead( & $params )
+	{
+		global $Collection, $Blog;
+
+		if( ! isset( $Blog ) || (
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
+		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
+		{	// Don't load css/js files when plugin is not enabled:
+			return;
+		}
+
+		$this->require_css( 'auto_anchors.css' );
+	}
+
+
+	/**
+	 * Event handler: Called when ending the admin html head section.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we do something?
+	 */
+	function AdminEndHtmlHead( & $params )
+	{
+		$this->SkinBeginHtmlHead( $params );
+	}
+
+
+	/**
 	 * Perform rendering
 	 */
 	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
+
+		// Get current Item to render links for anchors:
+		if( ! ( $this->current_Item = $this->get_Item_from_params( $params ) ) )
+		{	// Render anchor link only for Item or Comment:
+			return true;
+		}
 
 		// Load for replace_special_chars():
 		load_funcs( 'locales/_charset.funcs.php' );
@@ -150,8 +190,19 @@ class auto_anchors_plugin extends Plugin
 			return $m[0];
 		}
 
-		return $m[1].' id="'.$anchor.'">'.$m[4].$m[5];
-		//return $m[1].' id="'.$anchor.'">'.$m[4].' <a href="#'.$anchor.'">'.get_icon( 'merge' ).'</a>'.$m[5];
+		$header_tag_start = $m[1];
+		if( strpos( $header_tag_start, ' class="' ) !== false )
+		{	// Append style class to current:
+			$header_tag_start = str_replace( ' class="', ' class="evo_auto_anchor_header ', $header_tag_start );
+		}
+		else
+		{	// Add new class attribute:
+			$header_tag_start .= ' class="evo_auto_anchor_header"';
+		}
+
+		$anchor_link = ' <a href="'.$this->current_Item->get_permanent_url().'#'.$anchor.'" class="evo_auto_anchor_link">'.get_icon( 'merge', 'imgtag', array( 'title' => false ) ).'</a>';
+
+		return $header_tag_start.' id="'.$anchor.'">'.$m[4].$anchor_link.$m[5];
 	}
 }
 

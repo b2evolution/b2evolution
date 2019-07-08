@@ -5150,6 +5150,11 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 				}
 
+				if( isset( $params['title'] ) && $params['title'] === false )
+				{	// Disable title:
+					unset( $params['title'] );
+				}
+
 				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
 				if( isset( $params['title'] ) )
 				{
@@ -5238,6 +5243,11 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					{
 						$params['title'] = $icon['alt'];
 					}
+				}
+
+				if( isset( $params['title'] ) && $params['title'] === false )
+				{	// Disable title:
+					unset( $params['title'] );
 				}
 
 				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:

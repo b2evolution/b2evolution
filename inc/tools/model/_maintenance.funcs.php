@@ -590,7 +590,6 @@ function dbm_delete_orphan_files()
 	$files_SQL->ORDER_BY( 'file_ID' );
 
 	$count_files_valid = 0;
-	$invalid_files = array();
 	$deleted_files = array();
 	$cannot_deleted_files = array();
 
@@ -604,11 +603,6 @@ function dbm_delete_orphan_files()
 		foreach( $loaded_files as $loaded_file_data )
 		{
 			$File = & $FileCache->get_by_ID( $loaded_file_data['file_ID'], false, false );
-			if( ! $File )
-			{ // The File object couldn't be created because the db entry is invalid
-				$invalid_files[] = $loaded_file_data;
-				continue;
-			}
 			if( $File->exists() )
 			{ // File exists on the disk
 				$count_files_valid++;
@@ -665,25 +659,6 @@ function dbm_delete_orphan_files()
 			}
 			echo '</ul>';
 		}
-	}
-
-	$count_files_invalid = count( $invalid_files );
-	if( $count_files_invalid )
-	{ // There are invalid files in the database
-		// Display warning to show that the 'Remove orphan file roots' tool should be also called
-		$remove_orphan_file_roots = 'href="'.$admin_url.'?ctrl=tools&amp;action=delete_orphan_file_roots&amp;'.url_crumb('tools').'"';
-		$invalid_files_note = '<div class="text-danger">'.( $count_files_invalid == 1 ? T_('An invalid File object was found in the database') : sprintf( T_('%d invalid File objects were found in the database'), $count_files_invalid ) ).( $count_files_invalid > 0 ? ':' : '.' ).'</div>';
-		if( $count_files_invalid > 0 )
-		{	// Print out invalid files:
-			$invalid_files_note .= '<ul>';
-			foreach( $invalid_files as $file_data )
-			{
-				$invalid_files_note .= '<li>#'.$file_data['file_ID'].' - <code>'.$file_data['file_root_type'].'_'.$file_data['file_root_ID'].':'.$file_data['file_path'].'</code></li>';
-			}
-			$invalid_files_note .= '</ul>';
-		}
-		echo $invalid_files_note
-			.'<div class="text-danger">'.sprintf( T_('It is strongly recommended to also execute the &lt;<a %s>Remove orphan file roots</a>&gt; tool to remove invalid files from the database and from the disk as well!'), $remove_orphan_file_roots ).'</div>';
 	}
 }
 
