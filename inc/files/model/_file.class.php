@@ -716,6 +716,22 @@ class File extends DataObject
 
 
 	/**
+	 * Get the file folder path relative to it's root
+	 *
+	 * @return string Relative path
+	 */
+	function get_dir_rel_path()
+	{
+		if( ! ( $FileRoot = & $this->get_FileRoot() ) )
+		{
+			return false;
+		}
+
+		return substr( $this->get_dir(), strlen( $FileRoot->ads_path ) );
+	}
+
+
+	/**
 	 * Get the file posix path relative to it's root (no trailing /)
 	 *
 	 * @return string full path

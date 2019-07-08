@@ -355,39 +355,8 @@ $Form->begin_form();
 				}
 			}
 
-			/********************  Filename  ********************/
-
-			if( $lFile->is_dir() )
-			{ // Directory
-				// Link to open the directory in the current window
-				echo '<a href="'.$browse_dir_url.'">'.$lFile->dget('name').'</a>';
-			}
-			else
-			{ // File
-				if( $view_link = $lFile->get_view_link( '<span class="fname">'.$lFile->get_name().'</span>', NULL, NULL ) )
-				{
-					echo $view_link;
-				}
-				else
-				{ // File extension unrecognized
-					echo $lFile->dget('name');
-				}
-			}
-
-			/***************  File meta data:  **************/
-
-			echo '<span class="filemeta">';
-			// Optionally display IMAGE pixel size:
-			if( $UserSettings->get( 'fm_getimagesizes' ) )
-			{
-				echo ' ('.$lFile->get_image_size( 'widthxheight' ).')';
-			}
-			// Optionally display meta data title:
-			if( $lFile->meta == 'loaded' )
-			{	// We have loaded meta data for this file:
-				echo ' - '.$lFile->title;
-			}
-			echo '</span>';
+			/******************** File name + meta data ********************/
+			echo file_td_name( $lFile );
 
 		echo '</td>';
 
@@ -430,16 +399,8 @@ $Form->begin_form();
 		{ // Show last modified datetime (always full in title attribute)
 			$lastmod_date = $lFile->get_lastmod_formatted( 'date' );
 			$lastmod_time = $lFile->get_lastmod_formatted( 'time' );
-			echo '<td class="timestamp" title="'.$lastmod_date.' '.$lastmod_time.'">';
-			if( $UserSettings->get('fm_showdate') == 'long' )
-			{
-				echo '<span class="date">'.$lastmod_date.'</span> ';
-				echo '<span class="time">'.$lastmod_time.'</span>';
-			}
-			else
-			{	// Compact format
-				echo $lFile->get_lastmod_formatted( 'compact' );
-			}
+			echo '<td class="timestamp" title="'.format_to_output( $lastmod_date.' '.$lastmod_time, 'htmlattr' ).'">';
+			echo file_td_lastmod( $lFile );
 			echo '</td>';
 		}
 
@@ -483,24 +444,7 @@ $Form->begin_form();
 		/*****************  Action icons  ****************/
 
 		echo '<td class="actions lastcol text-nowrap">';
-
-		if( $edit_allowed_perm )
-		{ // User can edit:
-			if( $lFile->is_editable( $all_perm ) )
-			{
-				echo action_icon( T_('Edit file...'), 'edit', regenerate_url( 'fm_selected', 'action=edit_file&amp;'.url_crumb('file').'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
-			}
-			else
-			{
-				echo get_icon( 'edit', 'noimg' );
-			}
-
-			echo action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ), NULL, NULL, NULL,
-							array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.$lFile->get_rdfp_rel_path().'\' )' ) );
-			echo action_icon( T_('Move'), 'file_move', regenerate_url( 'action,fm_selected,fm_sources_root', 'action=file_move&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
-			echo action_icon( T_('Copy'), 'file_copy', regenerate_url( 'action,fm_selected,fm_sources_root', 'action=file_copy&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
-			echo action_icon( T_('Delete'), 'file_delete', regenerate_url( 'fm_selected', 'action=delete&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ) );
-		}
+		echo file_td_actions( $lFile );
 		echo '</td>';
 
 		echo '</tr>';
@@ -631,7 +575,7 @@ $Form->begin_form();
 			$template .= '</td>';
 			if( $UserSettings->get('fm_showdate') != 'no' )
 			{
-				$template .= '<td class="qq-upload-status-text-selector qq-upload-status-text timestamp"></td>';
+				$template .= '<td class="fsdate timestamp"><span class="qq-upload-status-text-selector qq-upload-status-text"></span></td>';
 			}
 			if( $UserSettings->get('fm_showfsperms') )
 			{
@@ -662,6 +606,7 @@ $Form->begin_form();
 					'list_style'           => 'table',
 					'template'             => $template,
 					'display_support_msg'  => false,
+					'display_status_success' => false,
 					'additional_dropzone'  => '[ jQuery( ".filelist_tbody" ).get(0) ]',
 					'filename_before'      => $icon_to_link_files,
 					'table_headers'        => $table_headers,
@@ -674,9 +619,6 @@ $Form->begin_form();
 	<?php
 	}
 
-
-	if( $countFiles > 0 )
-	{
 		// -------------
 		// Footer with "check all", "with selected: ..":
 		// --------------
@@ -684,7 +626,8 @@ $Form->begin_form();
 		<tr class="listfooter firstcol lastcol file_selector">
 			<td colspan="<?php echo $filetable_cols ?>">
 
-			<?php
+		<?php
+		echo '<div id="evo_multi_file_selector" class="pull-left"'.( $countFiles == 0 ? ' style="display:none"' : '' ).'>';
 			echo $Form->check_all();
 			$Form->add_crumb( 'file' );
 
@@ -753,6 +696,8 @@ $Form->begin_form();
 			$Form->submit_input( array( 'name'=>'actionArray[group_action]', 'value'=>T_('Go!'), 'onclick'=>'return js_act_on_selected();' ) );
 			$Form->switch_layout( NULL );
 
+		echo '</div>';
+
 			/* fp> the following has been integrated into the select.
 			if( $mode == 'upload' )
 			{	// We are uploading in a popup opened by an edit screen
@@ -805,9 +750,6 @@ $Form->begin_form();
 			?>
 			</td>
 		</tr>
-		<?php
-	}
-	?>
 	</tfoot>
 </table>
 <?php
