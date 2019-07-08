@@ -310,7 +310,7 @@ if( $upload )
 		else
 		{ // Success uploading
 			$message = array(
-					'text'   => $newFile->get_preview_thumb( 'fulltype' ),
+					'text'   => $newFile->get_preview_thumb( 'fulltype', array( 'init' => true ) ),
 					'status' => 'success',
 				);
 			report_user_upload( $newFile );
@@ -319,7 +319,7 @@ if( $upload )
 		$creator = $newFile->get_creator();
 
 		$message['filetype'] = $newFile->get( 'type' );
-		$message['newname'] = $newName;
+		$message['newname'] = file_td_name( $newFile );
 		$message['newpath'] = $newFile->get_root_and_rel_path();
 		$message['filesize'] = bytesReadable( $newFile->get_size() );
 
@@ -347,6 +347,13 @@ if( $upload )
 		{
 			$message['group'] = $newFile->get_fsgroup_name();
 		}
+
+		if( $UserSettings->get( 'fm_showdate' ) != 'no' )
+		{	// Get last modified datetime:
+			$message['file_date'] = file_td_lastmod( $newFile );
+		}
+
+		$message['file_actions'] = file_td_actions( $newFile );
 
 		$message['warning'] = $warning;
 		$message['path'] = $newFile->get_rdfp_rel_path();

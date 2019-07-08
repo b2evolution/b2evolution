@@ -2699,6 +2699,21 @@ function display_dragdrop_upload_button( $params = array() )
 								{
 									this_row.find( '.fsgroup' ).html( responseJSON.data.group );
 								}
+
+								if( responseJSON.data.file_date )
+								{
+									this_row.find( '.fsdate' ).html( responseJSON.data.file_date );
+								}
+
+								if( responseJSON.data.file_actions )
+								{
+									this_row.find( '.actions' ).html( responseJSON.data.file_actions );
+								}
+
+								if( jQuery( '#evo_multi_file_selector' ).length )
+								{	// Show files selector for additional actions:
+									jQuery( '#evo_multi_file_selector' ).show();
+								}
 							}
 							else if( responseJSON.data.status == 'rename' )
 							{ // Conflict on upload
@@ -2741,8 +2756,8 @@ function display_dragdrop_upload_button( $params = array() )
 								{
 									this_row.find( '.qq-upload-link-position' ).html( responseJSON.data.link_position );
 								}
-								init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 							}
+							init_colorbox( this_row.find( '.qq-upload-image a[rel^="lightbox"]' ) );
 							evo_link_sort_list( '<?php echo $params['fieldset_prefix']; ?>' );
 						}
 						<?php
@@ -3425,5 +3440,118 @@ function sort_thumbnail_sizes_callback( $a, $b )
 	}
 
 	return ( $a[1] < $b[1] ? -1 : 1 );
+}
+
+
+/**
+ * Helper function to display file last modification date in table cell
+ *
+ * @param object File
+ * @return string
+ */
+function file_td_lastmod( & $File )
+{
+	global $UserSettings;
+
+	if( $UserSettings->get( 'fm_showdate' ) == 'long' )
+	{	// Full format:
+		return '<span class="date">'.$File->get_lastmod_formatted( 'date' ).'</span> '
+			.'<span class="time">'.$File->get_lastmod_formatted( 'time' ).'</span>';
+	}
+	else
+	{	// Compact format:
+		return $File->get_lastmod_formatted( 'compact' );
+	}
+}
+
+
+/**
+ * Helper function to display file name in table cell
+ *
+ * @param object File
+ * @return string
+ */
+function file_td_name( & $File )
+{
+	global $UserSettings;
+
+	$r = '';
+
+	// Filename:
+	if( $File->is_dir() )
+	{ // Directory
+		// Link to open the directory in the current window
+		$r .= '<a href="'.$File->get_view_url().'">'.$File->dget( 'name' ).'</a>';
+	}
+	else
+	{	// File
+		if( $view_link = $File->get_view_link( '<span class="fname">'.$File->get_name().'</span>', NULL, NULL ) )
+		{
+			$r .= $view_link;
+		}
+		else
+		{	// File extension unrecognized
+			$r .= $File->dget( 'name' );
+		}
+	}
+
+	// File meta data:
+	$r .= '<span class="filemeta">';
+	// Optionally display IMAGE pixel size:
+	if( $UserSettings->get( 'fm_getimagesizes' ) )
+	{
+		$r .= ' ('.$File->get_image_size( 'widthxheight' ).')';
+	}
+	// Optionally display meta data title:
+	if( $File->meta == 'loaded' )
+	{	// We have loaded meta data for this file:
+		$r .= ' - '.$File->title;
+	}
+	$r .= '</span>';
+
+	return $r;
+}
+
+
+/**
+ * Helper function to display file actions in table cell
+ *
+ * @param object File
+ * @return string
+ */
+function file_td_actions( & $File )
+{
+	global $current_User, $admin_url;
+
+	if( ! is_logged_in() ||
+			! ( $FileRoot = & $File->get_FileRoot() ) ||
+			! $current_User->check_perm( 'files', 'edit_allowed', false, $FileRoot ) )
+	{	// User cannot edit files in the File Root:
+		return '';
+	}
+
+	$action_url = $admin_url.'?ctrl=files&amp;root='.$FileRoot->ID
+		.'&amp;path='.rawurlencode( $File->get_dir_rel_path() )
+		.'&amp;fm_selected[]='.rawurlencode( $File->get_rdfp_rel_path() )
+		.'&amp;';
+	$action_crumb_url = $action_url.url_crumb( 'file' ).'&amp;';
+
+	$r = '';
+	if( $File->is_editable( $current_User->check_perm( 'files', 'all', false ) ) )
+	{
+		$r .= action_icon( T_('Edit file...'), 'edit', $action_crumb_url.'action=edit_file' );
+	}
+	else
+	{
+		$r .= get_icon( 'edit', 'noimg' );
+	}
+
+	$r .= action_icon( T_('Edit properties...'), 'properties', $action_crumb_url.'action=edit_properties', NULL, NULL, NULL,
+		array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.$File->get_rdfp_rel_path().'\' )' ) );
+	$r .= action_icon( T_('Move'), 'file_move', $action_url.'action=file_move&amp;fm_sources_root='.$FileRoot->ID );
+	$r .= action_icon( T_('Copy'), 'file_copy', $action_url.'action=file_copy&amp;fm_sources_root='.$FileRoot->ID );
+	$r .= action_icon( T_('Delete'), 'file_delete', $action_crumb_url.'action=delete' );
+
+	return $r;
 }
 ?>
