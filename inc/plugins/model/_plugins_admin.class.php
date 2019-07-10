@@ -136,6 +136,7 @@ class Plugins_admin extends Plugins
 				'PrependItemUpdateTransact' => 'This gets called before an item gets updated in the database..',
 				'AfterItemUpdate' => 'This gets called after an item has been updated in the database.',
 				'AppendItemPreviewTransact' => 'This gets called when instantiating an item for preview.',
+				'ItemLoadFromRequest' => 'This gets called to load additional Item fields.',
 
 				'FilterItemContents' => 'Filters the content of a post/item right after input.',
 				'UnfilterItemContents' => 'Unfilters the content of a post/item right before editing.',

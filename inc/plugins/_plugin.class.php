@@ -1814,6 +1814,18 @@ class Plugin
 
 
 	/**
+	 * Event handler: called at the end of {@link Item::load_from_Request() loading
+	 * item/post fields from request}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function ItemLoadFromRequest( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: Called at the end of the "Edit item" form.
 	 *
 	 * @param array Associative array of parameters

@@ -747,7 +747,7 @@ class Item extends ItemLight
 	 */
 	function load_from_Request( $editing = false, $creating = false )
 	{
-		global $default_locale, $current_User, $localtimenow, $Blog;
+		global $default_locale, $current_User, $localtimenow, $Blog, $Plugins;
 		global $item_typ_ID;
 
 		// LOCALE:
@@ -1097,7 +1097,6 @@ class Item extends ItemLight
 		{	// If text renderers are allowed to update from front-office:
 			if( param( 'renderers_displayed', 'integer', 0 ) )
 			{	// Use "renderers" value only if it has been displayed (may be empty):
-				global $Plugins;
 				$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'Item' => & $this ) );
 				$this->set( 'renderers', $renderers );
 			}
@@ -1242,6 +1241,9 @@ class Item extends ItemLight
 				}
 			}
 		}
+
+		// Call plugins events to load additional Item fields:
+		$Plugins->trigger_event( 'ItemLoadFromRequest', $params = array( 'Item' => & $this ) );
 
 		return ! param_errors_detected();
 	}
