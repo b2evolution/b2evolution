@@ -16,7 +16,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'edit', true );
 
-load_funcs( 'tools/model/_md.funcs.php' );
+load_class( 'tools/model/_markdownimport.class.php', 'MarkdownImport' );
 
 /**
  * @var action
@@ -44,33 +44,27 @@ switch( $action )
 		$md_blog_ID = param( 'md_blog_ID', 'integer', 0 );
 		param_check_not_empty( 'md_blog_ID', T_('Please select a collection!') );
 
-		// Save last import collection in Session:
-		$Session->set( 'last_import_coll_ID', $md_blog_ID );
-
 		// Import File/Folder:
 		$import_file = param( 'import_file', 'string', '' );
-		if( empty( $import_file ) )
-		{ // File is not selected
-			param_error( 'import_file', T_('Please select file or folder to import.') );
-		}
-		elseif( is_dir( $import_file ) )
-		{
-			if( ! check_folder_with_extensions( $import_file, 'md' ) )
-			{	// Folder has no markdown files:
-				param_error( 'import_file', sprintf( T_('Folder %s has no markdown files.'), '<code>'.$import_file.'</code>' ) );
-			}
-		}
-		elseif( ! preg_match( '/\.zip$/i', $import_file ) )
-		{	// Extension is incorrect:
-			param_error( 'import_file', sprintf( T_('%s has an unrecognized extension.'), '<code>'.$import_file.'</code>' ) );
-		}
 
-		if( param_errors_detected() )
-		{	// Stop import if errors have been detected:
+		// Initialize markdown import object:
+		$MarkdownImport = new MarkdownImport( $md_blog_ID, $import_file );
+
+		$check_result = $MarkdownImport->check_source();
+
+		if( $check_result !== true )
+		{	// Don't import if errors have been detected:
+			param_error( 'import_file', $check_result );
 			$action = 'file';
 			break;
 		}
 
+		// Set import options:
+		$MarkdownImport->set_option( 'mode', param( 'import_type', 'string', 'update' ) );
+		$MarkdownImport->set_option( 'reuse_cats', param( 'reuse_cats', 'integer', 0 ) );
+		$MarkdownImport->set_option( 'delete_files', param( 'delete_files', 'integer', 0 ) );
+		$MarkdownImport->set_option( 'convert_md_links', param( 'convert_md_links', 'integer', 0 ) );
+		$MarkdownImport->set_option( 'force_item_update', param( 'force_item_update', 'integer', 0 ) );
 		break;
 }
 
