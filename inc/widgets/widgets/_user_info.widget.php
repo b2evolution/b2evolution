@@ -162,11 +162,6 @@ class user_info_Widget extends ComponentWidget
 
 			case 'login':
 				// Login:
-				if( $Settings->get( 'username_display' ) == 'name' )
-				{	// Don't display user login when we don't want to disclose it:
-					$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because we cannot disclose login.' );
-					return false;
-				}
 				$r = $target_User->get_colored_login();
 				break;
 
