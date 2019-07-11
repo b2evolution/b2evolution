@@ -48,7 +48,15 @@ switch( $action )
 		$import_file = param( 'import_file', 'string', '' );
 
 		// Initialize markdown import object:
-		$MarkdownImport = new MarkdownImport( $md_blog_ID, $import_file );
+		if( $app_pro )
+		{	// Use PRO markdown import:
+			load_class( 'tools/model/_markdownimportpro.class.php', 'MarkdownImportPro' );
+			$MarkdownImport = new MarkdownImportPro( $md_blog_ID, $import_file );
+		}
+		else
+		{	// Use default markdown import:
+			$MarkdownImport = new MarkdownImport( $md_blog_ID, $import_file );
+		}
 
 		$check_result = $MarkdownImport->check_source();
 

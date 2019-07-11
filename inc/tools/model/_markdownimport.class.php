@@ -17,7 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Email Address Class
+ * Markdown Import Class
  *
  * @package evocore
  */
@@ -622,8 +622,8 @@ class MarkdownImport
 			$prev_category_ID = $Item->get( 'main_cat_ID' );
 			// Set new category for new Item or when post was moved to different category:
 			$Item->set( 'main_cat_ID', $category_ID );
-			// Store here errors on set extra categories from YAML data:
-			$this->item_extra_cats_errors = '';
+			// Reset YAML messages after import previous Item:
+			$this->reset_yaml_messages();
 
 			if( $this->get_option( 'convert_md_links' ) )
 			{	// Convert Markdown links to b2evolution ShortLinks:
@@ -745,14 +745,12 @@ class MarkdownImport
 			echo $item_result_suffix;
 			echo empty( $item_result_class ) ? '' : '</span>';
 
-			if( ! empty( $this->item_extra_cats_errors ) )
-			{	// Display errors of linking to extra categories:
-				echo ',<ul class="list-default" style="margin-bottom:0">'.$this->item_extra_cats_errors.'</ul>';
-			}
+			// Display messages of importing YAML fields:
+			$this->display_yaml_messages();
 
 			if( ! empty( $this->error_convert_links ) )
 			{	// Display what links could not be converted:
-				echo ( empty( $this->item_extra_cats_errors ) ? ',' : '' ).'<ul class="list-default" style="margin-bottom:0">';
+				echo ( $this->has_yaml_messages() ? '' : ',' ).'<ul class="list-default" style="margin-bottom:0">';
 				foreach( $this->error_convert_links as $error_convert_link )
 				{
 					echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Markdown link %s could not be convered to b2evolution ShortLink.', '<code>'.$error_convert_link.'</code>' ).'</li>';
@@ -775,7 +773,7 @@ class MarkdownImport
 							'file_root_ID'   => $this->coll_ID,
 							'folder_path'    => 'quick-uploads/'.$Item->get( 'urltitle' ),
 						);
-					echo ( empty( $this->item_extra_cats_errors ) && empty( $this->error_convert_links ) ? ',' : '' ).'<ul class="list-default" style="margin-bottom:0">';
+					echo ( ! $this->has_yaml_messages() && empty( $this->error_convert_links ) ? ',' : '' ).'<ul class="list-default" style="margin-bottom:0">';
 					foreach( $image_matches[2] as $i => $image_relative_path )
 					{
 						$file_params['file_alt'] = trim( $image_matches[1][$i] );
@@ -821,7 +819,7 @@ class MarkdownImport
 				}
 			}
 
-			if( ! $files_imported && empty( $this->item_extra_cats_errors ) && empty( $this->error_convert_links ) )
+			if( ! $files_imported && ! $this->has_yaml_messages() && empty( $this->error_convert_links ) )
 			{
 				echo '.<br>';
 			}
@@ -1251,6 +1249,66 @@ class MarkdownImport
 
 
 	/**
+	 * Reset YAML messages
+	 */
+	function reset_yaml_messages()
+	{
+		$this->yaml_messages = array();
+	}
+
+
+	/**
+	 * Add message to report about importing YAML field
+	 *
+	 * @param string Message
+	 * @param string Type
+	 */
+	function add_yaml_message( $message, $type = 'error' )
+	{
+		$this->yaml_messages[] = array( $message, $type );
+	}
+
+
+	/**
+	 * Display messages of importing YAML fields
+	 */
+	function display_yaml_messages()
+	{
+		if( ! empty( $this->yaml_messages ) )
+		{	// Display errors of linking to extra categories:
+			echo ',<ul class="list-default" style="margin-bottom:0">';
+			foreach( $this->yaml_messages as $yaml_message )
+			{
+				if( $yaml_message[1] == 'error' )
+				{	// Error message:
+					$label = '<span class="label label-danger">'.T_('ERROR').'</span> ';
+					$class = 'text-danger';
+				}
+				else
+				{	// Normal message:
+					$label = '';
+					$class = '';
+				}
+				// Print message:
+				echo '<li'.( empty( $class ) ? '' : ' class="'.$class.'"' ).'>'.$label.$yaml_message[0].'</li>';
+			}
+			echo '</ul>';
+		}
+	}
+
+
+	/**
+	 * Check for YAML messages were added during import
+	 *
+	 * @return boolean
+	 */
+	function has_yaml_messages()
+	{
+		return ! empty( $this->yaml_messages );
+	}
+
+
+	/**
 	 * Set Item title from YAML data
 	 *
 	 * @param string Value
@@ -1351,7 +1409,7 @@ class MarkdownImport
 			}
 			else
 			{	// Display error on not existing category:
-				$this->item_extra_cats_errors .= '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Skip extra category %s, because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>' ).'</li>';
+				$this->add_yaml_message( sprintf( T_('Skip extra category %s, because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>' ) );
 			}
 		}
 
