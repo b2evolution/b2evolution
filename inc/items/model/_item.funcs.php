@@ -483,8 +483,8 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 			$count_of_words = $Blog->get_setting('slug_limit');
 		}
 		if( empty( $count_of_words ) )
-		{	// Use 5 words to limit slug by default:
-			$count_of_words = 5;
+		{	// Use 8 words to limit slug by default:
+			$count_of_words = 8;
 		}
 
 		// Limit slug with max count of words:

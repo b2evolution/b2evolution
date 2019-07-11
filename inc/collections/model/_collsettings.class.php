@@ -62,7 +62,7 @@ class CollectionSettings extends AbstractSettings
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'single_links'   => 'short',
 			'single_item_footer_text' => '',
-			'slug_limit' => 5,
+			'slug_limit' => 8,
 			'tags_meta_keywords' => 1,
 			'tags_open_graph' => 1,
 			'tags_twitter_card' => 1,
