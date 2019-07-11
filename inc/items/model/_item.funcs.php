@@ -494,8 +494,8 @@ function get_urltitle( $title, $locale = NULL )
 			$count_of_words = $Blog->get_setting('slug_limit');
 		}
 		if( empty( $count_of_words ) )
-		{	// Use 5 words to limit slug by default:
-			$count_of_words = 5;
+		{	// Use 8 words to limit slug by default:
+			$count_of_words = 8;
 		}
 
 		// Limit slug with max count of words:

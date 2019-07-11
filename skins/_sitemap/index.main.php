@@ -24,10 +24,14 @@ param( 'cat_focus', 'string', 'main' );
 
 // Filter list:
 $MainList->set_filters( array(
-		'visibility_array' => array( 'published' ),  // We only want to advertised published items
-		'itemtype_usage'   => 'post,page,intro-front,intro-main,intro-cat,intro-tag,intro-sub,intro-all', // keep normal posts, pages and intro-* BUT STILL EXCLUDE all others special(sidebar link, advertisement), content blocks
-	  'unit' => 'all',						// We want to advertise all items (not just a page or a day)
-	  'cat_focus' => $cat_focus,
+		// We only want to advertised published items:
+		'visibility_array' => array( 'published' ),
+		// Keep normal posts, pages and intro (excluding intro-front and intro-main because they have same URL as collection homepage)
+		// BUT STILL EXCLUDE all others special(sidebar link, advertisement), content blocks:
+		'itemtype_usage' => 'post,page,intro-cat,intro-tag,intro-sub,intro-all',
+		// We want to advertise all items (not just a page or a day):
+		'unit' => 'all',
+		'cat_focus' => $cat_focus,
 	) );
 
 // pre_dump( $cat_focus, $MainList->filters );
