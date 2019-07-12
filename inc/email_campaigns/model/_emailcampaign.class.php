@@ -315,12 +315,30 @@ class EmailCampaign extends DataObject
 	{
 		switch( $parname )
 		{
+			case 'html_template_preview':
 			case 'plaintext_template_preview':
 				global $current_User;
-				$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $this->get( 'email_plaintext' ), 'include_greeting' => false, 'add_email_tracking' => false, 'template_mode' => 'preview' ), $current_User );
-				$text_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $text_mail_template );
-				$text_mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $text_mail_template );
-				return nl2br( $text_mail_template );
+				$mail_template = mail_template( 'newsletter',
+					( $parname == 'html_template_preview' ? 'html' : 'text' ),
+					array(
+						'message_html'       => $this->get( $parname == 'html_template_preview' ? 'email_html' : 'email_plaintext' ),
+						'include_greeting'   => false,
+						'add_email_tracking' => false,
+						'template_mode'      => 'preview',
+						'is_welcome_email'   => false,
+						'ecmp_ID'            => $this->ID,
+						'enlt_ID'            => $this->get( 'enlt_ID' ),
+					), $current_User );
+				$mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $mail_template );
+				$mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $mail_template );
+				if( $parname == 'html_template_preview' )
+				{	// Clear all html tags that may break styles of main html page:
+					return preg_replace( '#</?(html|head|meta|body)[^>]*>#i', '', $mail_template );
+				}
+				else
+				{	// Convert newline to html <br>:
+					return nl2br( $mail_template );
+				}
 
 			default:
 				return parent::get( $parname );
