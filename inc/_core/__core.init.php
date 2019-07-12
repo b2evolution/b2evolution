@@ -1924,7 +1924,7 @@ class _core_Module extends Module
 				);
 
 			$current_coll_locale = get_param( 'coll_locale' ) != '' ? get_param( 'coll_locale' ) : $current_locale;
-			foreach( $coll_locales as $coll_locale_key )
+			foreach( $coll_locales as $coll_locale_key => $linked_coll_ID )
 			{
 				if( ! isset( $locales[ $coll_locale_key ] ) || ! $locales[ $coll_locale_key ]['enabled'] )
 				{	// Skip wrong or disabled locale:

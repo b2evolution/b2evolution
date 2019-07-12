@@ -954,12 +954,44 @@ switch( $action )
 			{	// Set locale:
 				$edited_Item->set_from_Request( 'locale' );
 			}
+
 			if( param( 'post_create_child', 'integer', NULL ) === 1 )
 			{	// Set parent Item:
 				$edited_Item->set( 'parent_ID', $item_ID );
 			}
+
 			// Duplicate same images depending on setting from modal window:
 			$duplicate_same_images = param( 'post_same_images', 'integer', NULL );
+
+			if( param( 'post_coll_ID', 'integer', NULL ) !== NULL &&
+			    $post_coll_ID != $edited_Item->get_blog_ID() )
+			{	// Create Item in different collection:
+				$BlogCache = & get_BlogCache();
+				$linked_Blog = $BlogCache->get_by_ID( $post_coll_ID, false, false );
+				if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $post_coll_ID ) )
+				{	// If current User cannot create an Item in the selected locale collection,
+					// Redirect back to edit Item form:
+					$Messages->add( sprintf( T_('You don\'t have a permission to create new Item in the collection "%s"!'), $linked_Blog ? $linked_Blog->get( 'name' ) : '#'.$post_coll_ID ) );
+					header_redirect( $admin_url.'?ctrl=items&blog='.$edited_Item->get_blog_ID().'&action=edit&p='.$p );
+					// Exit here.
+				}
+				// Reset Item collection to new selected:
+				set_working_blog( $post_coll_ID );
+				unset( $edited_Item->Blog );
+				// Set default category in different selected collection:
+				$edited_Item->set( 'main_cat_ID', $linked_Blog->get_default_cat_ID() );
+				$post_extracats = array( $edited_Item->get( 'main_cat_ID' ) );
+			}
+
+			if( param( 'item_typ_ID', 'integer', NULL ) !== NULL )
+			{	// Set Item Type:
+				if( ! $edited_Item->get_Blog()->is_item_type_enabled( $item_typ_ID ) )
+				{	// Use default Item Type if it is NOT enabled for the selected collection:
+					$default_ItemType = & $edited_Item->get_Blog()->get_default_new_ItemType();
+					$item_typ_ID = $default_ItemType->ID;
+				}
+				$edited_Item->set( 'ityp_ID', $item_typ_ID );
+			}
 		}
 		else
 		{	// Always duplicate images on action=copy:
@@ -968,7 +1000,10 @@ switch( $action )
 
 		// Set post comment status and extracats
 		$post_comment_status = $edited_Item->get( 'comment_status' );
-		$post_extracats = postcats_get_byID( $p );
+		if( ! isset( $post_extracats ) )
+		{
+			$post_extracats = postcats_get_byID( $p );
+		}
 
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item );

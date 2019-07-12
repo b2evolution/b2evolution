@@ -280,7 +280,7 @@ if( ! $is_creating )
 		{ // More than 1 locale
 			$blog_locale_note = ( $current_User->check_perm( 'options', 'view' ) ) ?
 				'<a href="'.$admin_url.'?ctrl=regional">'.T_('Regional settings').' &raquo;</a>' : '';
-		$Form->locale_selector( 'blog_locale', $edited_Blog->get( 'locale' ), $edited_Blog->get_locales(), T_('Collection Locales'), $blog_locale_note, array( 'link_coll_ID' => $edited_Blog->ID ) );
+		$Form->locale_selector( 'blog_locale', $edited_Blog->get( 'locale' ), array_keys( $edited_Blog->get_locales() ), T_('Collection Locales'), $blog_locale_note, array( 'link_coll_ID' => $edited_Blog->ID ) );
 
 			$Form->radio( 'blog_locale_source', $edited_Blog->get_setting( 'locale_source' ),
 					array(

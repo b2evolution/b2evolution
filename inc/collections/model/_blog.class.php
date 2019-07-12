@@ -6278,9 +6278,7 @@ class Blog extends DataObject
 	 *        - 'locale' - locales of this collection,
 	 *        - 'coll' - locales as links to other collections,
 	 *        - 'all' - all locales of this and links with other collections,
-	 * @return array Array with structure depending on param $type:
-	 *        - 'locale' - Numbered array with locale keys in values
-	 *        - 'coll'/'all' - Key is locale key, Value is ID of another collection or NULL
+	 * @return array Array: Key is locale key, Value is ID of another collection or NULL
 	 */
 	function get_locales( $type = 'locale' )
 	{
@@ -6292,11 +6290,8 @@ class Blog extends DataObject
 			$locales = array();
 			foreach( $this->locales as $locale => $linked_coll_ID )
 			{
-				if( ( $type == 'locale' && empty( $linked_coll_ID ) ) )
-				{
-					$locales[] = $locale;
-				}
-				elseif( $type == 'coll' && ! empty( $linked_coll_ID ) )
+				if( ( $type == 'locale' && empty( $linked_coll_ID ) ) ||
+				    ( $type == 'coll' && ! empty( $linked_coll_ID ) ) )
 				{
 					$locales[ $locale ] = $linked_coll_ID;
 				}
@@ -6398,6 +6393,22 @@ class Blog extends DataObject
 		}
 
 		return true;
+	}
+	
+	
+	/**
+	 * Check if this collection has a requested locale
+	 *
+	 * @param string Locale key
+	 * @param string Type of locales:
+	 *        - 'locale' - locales of this collection,
+	 *        - 'coll' - locales as links to other collections,
+	 *        - 'all' - all locales of this and links with other collections,
+	 * @return boolean
+	 */
+	function has_locale( $locale_key, $type = 'locale' )
+	{
+		return array_key_exists( $locale_key, $this->get_locales( $type ) );
 	}
 
 

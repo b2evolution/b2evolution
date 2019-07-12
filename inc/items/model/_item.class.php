@@ -13192,37 +13192,46 @@ class Item extends ItemLight
 	/**
 	 * Get available locales
 	 *
+	 * @param string Type of locales:
+	 *        - 'locale' - locales of the Item's collection,
+	 *        - 'coll' - locales as links to other collections,
+	 *        - 'all' - all locales of this and links with other collections.
 	 * @return array
 	 */
-	function get_available_locales()
+	function get_available_locales( $type = 'locale' )
 	{
-		return ( $item_blog = & $this->get_Blog() ? $item_blog->get_locales() : array() );
+		return ( $item_Blog = & $this->get_Blog() ? $item_Blog->get_locales( $type ) : array() );
 	}
 
 
 	/**
 	 * Get locale options for selector on edit page
 	 *
+	 * @param string Type of locales:
+	 *        - 'locale' - locales of the Item's collection,
+	 *        - 'coll' - locales as links to other collections,
+	 *        - 'all' - all locales of this and links with other collections.
 	 * @param boolean Exclude locales that are already used in the group of this Item
 	 * @return string
 	 */
-	function get_locale_options( $exclude_used = false )
+	function get_locale_options( $type = 'locale', $exclude_used = false )
 	{
 		global $locales;
 
 		$r = '';
 
-		$available_locales = $this->get_available_locales();
+		$available_locales = $this->get_available_locales( $type );
 
 		if( $exclude_used )
-		{	// Exclude locales that are already used in the group of this Item
-			$exclude_locales = array( $this->get( 'locale' ) );
+		{	// Exclude locales that are already used in the group of this Item:
 			$other_version_items = $this->get_other_version_items();
 			foreach( $other_version_items as $other_version_Item )
 			{
-				$exclude_locales[] = $other_version_Item->get( 'locale' );
+				if( isset( $available_locales[ $other_version_Item->get( 'locale' ) ] ) )
+				{
+					unset( $available_locales[ $other_version_Item->get( 'locale' ) ] );
+				}
 			}
-			$available_locales = array_diff( $available_locales, $exclude_locales );
 		}
 
 		if( empty( $available_locales ) )
@@ -13230,16 +13239,32 @@ class Item extends ItemLight
 			return $r;
 		}
 
-		foreach( $available_locales as $locale_key )
+		$BlogCache = & get_BlogCache();
+
+		foreach( $available_locales as $locale_key => $linked_coll_ID )
 		{
 			if( ( isset( $locales[ $locale_key ] ) && $locales[ $locale_key ]['enabled'] ) ||
 			    $locale_key == $this->get( 'locale' ) )
 			{	// Allow enabled locales or if it is already selected for this Item:
+				if( ! empty( $linked_coll_ID ) )
+				{	// This is a linked locale from different collection:
+					$locale_Blog = & $BlogCache->get_by_ID( $linked_coll_ID, false, false );
+				}
+				else
+				{	// Use collection of this Item:
+					$locale_Blog = & $this->get_Blog();
+				}
+				if( ! $locale_Blog )
+				{	// Skip wrong locale:
+					continue;
+				}
 				$r .= '<option value="'.$locale_key.'"';
 				if( $locale_key == $this->get( 'locale' ) )
 				{	// This is a selected locale
 					$r .= ' selected="selected"';
 				}
+				$r .= ' data-coll-id="'.$locale_Blog->ID.'"';
+				$r .= ' data-coll-name="'.format_to_output( $locale_Blog->get( 'name' ), 'htmlattr' ).'"';
 				$r .= '>'.( isset( $locales[ $locale_key ] ) ? T_( $locales[ $locale_key ]['name'] ) : $locale_key ).'</option>'."\n";
 			}
 		}

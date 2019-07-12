@@ -174,7 +174,7 @@ $coll_locale = param( 'coll_locale', 'string', NULL, true );
 if( $coll_locale !== NULL )
 {	// Overriding locale from REQUEST with extra collection locale:
 	$Debuglog->add( 'Overriding collection locale from REQUEST: '.$coll_locale, 'locale' );
-	if( in_array( $coll_locale, $Blog->get_locales() ) )
+	if( $Blog->has_locale( $coll_locale ) )
 	{	// If locale is selected for current collection:
 		locale_activate( $coll_locale );
 	}
