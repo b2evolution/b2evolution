@@ -227,6 +227,9 @@ switch( $action )
 
 					// Delay between chunks in case all remaining recipients have reached max # of emails for the current day:
 					$Settings->set( 'email_campaign_cron_limited', param_duration( 'email_campaign_cron_limited' ) );
+
+					// Max emails to same domain:
+					$Settings->set( 'email_campaign_max_domain', param( 'email_campaign_max_domain', 'integer', 0 ) );
 					break;
 
 				case 'prune-old-hits-and-sessions':

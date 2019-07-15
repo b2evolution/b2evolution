@@ -1157,6 +1157,12 @@ class EmailCampaign extends DataObject
 		// Get chunk size to limit a sending at a time:
 		$email_campaign_chunk_size = intval( $Settings->get( 'email_campaign_chunk_size' ) );
 
+		// Get max emails to same domain to limit a sending at a time:
+		$email_campaign_max_domain = intval( $Settings->get( 'email_campaign_max_domain' ) );
+
+		// Store here number of sent emails per domain:
+		$email_domains_number = array();
+
 		$email_success_count = 0;
 		$email_skip_count = 0;
 		$email_error_count = 0;
@@ -1171,6 +1177,34 @@ class EmailCampaign extends DataObject
 			if( ! ( $User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
 			{	// Skip wrong recipient user:
 				continue;
+			}
+
+			if( $email_campaign_max_domain > 0 )
+			{	// Limit a sending by max emails to same domain:
+				$email_domain = $User->get_email_domain();
+
+				// Increase number of sent email per domain:
+				if( ! isset( $email_domains_number[ $email_domain ] ) )
+				{
+					$email_domains_number[ $email_domain ] = 0;
+				}
+
+				if( $email_domains_number[ $email_domain ] >= $email_campaign_max_domain )
+				{	// Skip sending because max emails to same domain is reached:
+					$error_msg = sprintf( T_('Email sending was skipped to user %s because max emails to same domain %s is reached.'), $User->get_identity_link(), '<code>'.$email_domain.'</code>' );
+					if( $display_messages === 'cron_job' )
+					{
+						cron_log_action_end( $error_msg, 'warning' );
+					}
+					else
+					{
+						echo '<span class="orange">'.$error_msg.'</span><br />';
+					}
+					$email_skip_count++;
+					continue;
+				}
+
+				$email_domains_number[ $email_domain ]++;
 			}
 
 			// Send email to user:

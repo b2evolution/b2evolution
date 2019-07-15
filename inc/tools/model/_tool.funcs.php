@@ -528,7 +528,8 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 				}
 				if( ! empty( $adv_perm_coll_insert_values ) )
 				{	// Insert advanced user perms for new created user in single query for all collections with advanced perms:
-					$DB->query( 'INSERT INTO T_coll_user_perms ( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, bloguser_can_be_assignee,
+					$DB->query( 'INSERT INTO T_coll_user_perms ( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+							bloguser_can_be_assignee, bloguser_workflow_status, bloguser_workflow_user, bloguser_workflow_priority,
 							bloguser_perm_item_propose, bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_perm_delpost, bloguser_perm_edit_ts,
 							bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses,
 							bloguser_perm_edit_cmt, bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,
@@ -806,9 +807,11 @@ function tool_create_sample_campaigns( $num_campaigns, $campaign_lists, $send_ca
 	$temp_email_send_simulate_only = $email_send_simulate_only;
 	$email_send_simulate_only = true;
 
-	// Temporarily increase email campaign chunk size
+	// Temporarily increase email campaign limit settings:
 	$temp_email_campaign_chunk_size = $Settings->get( 'email_campaign_chunk_size' );
 	$Settings->set( 'email_campaign_chunk_size', 10000 );
+	$temp_email_campaign_max_domain = $Settings->get( 'email_campaign_max_domain' );
+	$Settings->set( 'email_campaign_max_domain', 10000 );
 	$Settings->dbupdate();
 
 	for( $i = 1; $i <= $num_campaigns; $i++ )
@@ -954,8 +957,9 @@ T_('Button examples:
 	// Restore simulate email sending setting
 	$email_send_simulate_only = $temp_email_send_simulate_only;
 
-	// Restore emaili campaign chunk size
+	// Restore email campaign chunk size
 	$Settings->set( 'email_campaign_chunk_size', $temp_email_campaign_chunk_size );
+	$Settings->set( 'email_campaign_max_domain', $temp_email_campaign_max_domain );
 	$Settings->dbupdate();
 
 	$DB->commit();
