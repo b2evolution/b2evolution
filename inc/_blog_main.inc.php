@@ -564,11 +564,6 @@ elseif( !empty($preview) )
 	// Consider this as an admin hit!
 	$Hit->hit_type = 'admin';
 }
-elseif( ( $disp == 'visits' ) && ( ( $Settings->get( 'enable_visit_tracking' ) != 1 ) || ! is_logged_in() ) )
-{ // Check if visit tracking is enabled and the user is logged in before allowing profile visit display
-	$disp = '403';
-	$disp_detail = '403-visit-tracking-disabled';
-}
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post

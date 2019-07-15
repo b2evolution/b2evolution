@@ -234,6 +234,7 @@ class CollectionSettings extends AbstractSettings
 			'msgform_require_message' => 1, // Require message
 
 		// User directory:
+			'userdir_enable' => 1,
 			'userdir_filter_gender' => 1,
 			'userdir_filter_level' => 1,
 			'userdir_filter_org' => 1,
