@@ -211,6 +211,11 @@ div.dev-blocks--belowtoolbar {
 .evo_designer__widget {
   z-index: 10003;
 }
+.evo_designer__widget_animation {
+  position: absolute;
+  border: 3px solid #666;
+  border-radius: 4px;
+}
 .evo_designer__modal_backdrop.modal-backdrop {
   z-index: 10004;
 }

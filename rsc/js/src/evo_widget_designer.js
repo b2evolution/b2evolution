@@ -179,6 +179,28 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 			jQuery( '.evo_customizer__wrapper', window.parent.document ).removeClass( 'evo_customizer__collapsed' );
 			jQuery( '#evo_customizer__backoffice', window.parent.document ).get( 0 ).contentWindow.location
 				.href = b2evo_widget_edit_url.replace( '$wi_ID$', widget_ID );
+
+			// Animate moving desinger box to left back-office panel:
+			if( ! jQuery( '.evo_designer__widget_animation', window.parent.document ).length )
+			{	// Create temp for for animation:
+				jQuery( 'body', window.parent.document ).append( '<div class="evo_designer__widget_animation"></div>' );
+			}
+			jQuery( '.evo_designer__widget_animation', window.parent.document ).css(
+			{
+				top: jQuery( this ).position().top + jQuery( '#evo_customizer__frontoffice', window.parent.document ).offset().top,
+				left: jQuery( this ).position().left+ jQuery( '#evo_customizer__frontoffice', window.parent.document ).offset().left,
+				width: jQuery( this ).outerWidth(),
+				height: jQuery( this ).outerHeight(),
+				opacity: 1,
+			} )
+			.animate(
+			{
+				left: 0,
+				top: '120px',
+				width: jQuery( '#evo_customizer__backoffice', window.parent.document ).width(),
+				height: jQuery( '#evo_customizer__backoffice', window.parent.document ).height() - 160,
+			} )
+			.animate( { opacity: 0 }, 10 );
 		}
 	}
 
