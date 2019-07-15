@@ -1373,12 +1373,33 @@ function skin_init( $disp )
 			break;
 
 		case 'users':
-		case 'visits':
 			// Check if current user has an access to public list of the users:
 			check_access_users_list();
 
 			$seo_page_type = 'Users list';
 			$robots_index = false;
+
+			if( ! $Blog->get_setting( 'userdir_enable' ) )
+			{	// If user directory is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-user-directory-disabled';
+			}
+			break;
+
+		case 'visits':
+			// Check if current user has an access to public list of the users:
+			check_access_users_list();
+
+			$seo_page_type = 'User visits';
+			$robots_index = false;
+
+			if( ! is_logged_in() || ! $Settings->get( 'enable_visit_tracking' ) )
+			{	// Check if visit tracking is enabled and the user is logged in before allowing profile visit display:
+				global $disp;
+				$disp = '403';
+				$disp_detail = '403-visit-tracking-disabled';
+			}
 			break;
 
 		case 'user':
