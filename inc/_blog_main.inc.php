@@ -164,8 +164,10 @@ $is_front = false;	// So far we have not detected that we are displaying the fro
 fp>there is no blog defined in _main and there should not be any
 blueyed> Sure, but that means we should either split it, or use the locale here only, if there's no-one given with higher priority.
 */
-if( $Blog->get_setting( 'locale_source' ) == 'blog' )
-{ // Activate matching locale:
+if( $Blog->get_setting( 'locale_source' ) == 'blog' ||
+    ( $Blog->get_setting( 'locale_source' ) == 'user' && ! $Blog->has_locale( $current_locale ) ) )
+{ // Activate main collection locale when this is defined in settings of current collection
+	// OR when current user/browser locale is not used for current collection:
 	$Debuglog->add( 'Activating blog locale: '.$Blog->get( 'locale' ), 'locale' );
 	locale_activate( $Blog->get( 'locale' ) );
 }
@@ -179,7 +181,7 @@ if( $coll_locale !== NULL )
 		locale_activate( $coll_locale );
 	}
 	else
-	{	// Wrong colleciton locale is requested:
+	{	// Wrong collection locale is requested:
 		$Messages->add( sprintf( T_('The requested language/locale %s is not allowed for this collection.'), '<code>'.$coll_locale.'</code>' ), 'error' );
 	}
 }
