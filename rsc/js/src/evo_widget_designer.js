@@ -201,6 +201,16 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 				height: jQuery( '#evo_customizer__backoffice', window.parent.document ).height() - 160,
 			} )
 			.animate( { opacity: 0 }, 10 );
+
+			jQuery( '.evo_widget[data-z-index]' ).each( function()
+			{	// Revert z-index of previous active widget blocks,
+				// in order to keep only single current block with active html elements(links, forms, etc.):
+				jQuery( this ).css( 'z-index', jQuery( this ).data( 'z-index' ) );
+			} );
+			// Move original widget block over designer widger block(frame/box with grey border and action icons),
+			// in order to make active html elements(links, forms, etc.) inside original widget block:
+			widget.attr( 'data-z-index', widget.css( 'z-index' ) )
+				.css( 'z-index', jQuery( this ).css( 'z-index' ) + 1 );
 		}
 	}
 
