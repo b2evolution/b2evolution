@@ -77,6 +77,7 @@ switch( $action )
 	case 'edit':
 	case 'propose':
 	case 'history':
+	case 'history_lastseen':
 	case 'history_details':
 	case 'history_compare':
 	case 'history_restore':
@@ -338,7 +339,7 @@ switch( $action )
 						else
 						{ // Error on creating new category
 							$Messages->add( sprintf( T_('New category %s creation failed.'), '<b>'.$new_categories[ $fileNum ].'</b>' ), 'error' );
-							continue; // Skip this post
+							continue 2; // Skip this post
 						}
 						$cat_Array[ $fileNum ] = $new_Chapter->ID;
 						break;
@@ -882,6 +883,7 @@ switch( $action )
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
 		$post_extracats = param( 'post_extracats', 'array:integer', $post_extracats );
+		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
@@ -952,12 +954,44 @@ switch( $action )
 			{	// Set locale:
 				$edited_Item->set_from_Request( 'locale' );
 			}
+
 			if( param( 'post_create_child', 'integer', NULL ) === 1 )
 			{	// Set parent Item:
 				$edited_Item->set( 'parent_ID', $item_ID );
 			}
+
 			// Duplicate same images depending on setting from modal window:
 			$duplicate_same_images = param( 'post_same_images', 'integer', NULL );
+
+			if( param( 'post_coll_ID', 'integer', NULL ) !== NULL &&
+			    $post_coll_ID != $edited_Item->get_blog_ID() )
+			{	// Create Item in different collection:
+				$BlogCache = & get_BlogCache();
+				$linked_Blog = $BlogCache->get_by_ID( $post_coll_ID, false, false );
+				if( ! $current_User->check_perm( 'blog_post_statuses', 'edit', false, $post_coll_ID ) )
+				{	// If current User cannot create an Item in the selected locale collection,
+					// Redirect back to edit Item form:
+					$Messages->add( sprintf( T_('You don\'t have a permission to create new Item in the collection "%s"!'), $linked_Blog ? $linked_Blog->get( 'name' ) : '#'.$post_coll_ID ) );
+					header_redirect( $admin_url.'?ctrl=items&blog='.$edited_Item->get_blog_ID().'&action=edit&p='.$p );
+					// Exit here.
+				}
+				// Reset Item collection to new selected:
+				set_working_blog( $post_coll_ID );
+				unset( $edited_Item->Blog );
+				// Set default category in different selected collection:
+				$edited_Item->set( 'main_cat_ID', $linked_Blog->get_default_cat_ID() );
+				$post_extracats = array( $edited_Item->get( 'main_cat_ID' ) );
+			}
+
+			if( param( 'item_typ_ID', 'integer', NULL ) !== NULL )
+			{	// Set Item Type:
+				if( ! $edited_Item->get_Blog()->is_item_type_enabled( $item_typ_ID ) )
+				{	// Use default Item Type if it is NOT enabled for the selected collection:
+					$default_ItemType = & $edited_Item->get_Blog()->get_default_new_ItemType();
+					$item_typ_ID = $default_ItemType->ID;
+				}
+				$edited_Item->set( 'ityp_ID', $item_typ_ID );
+			}
 		}
 		else
 		{	// Always duplicate images on action=copy:
@@ -966,7 +1000,10 @@ switch( $action )
 
 		// Set post comment status and extracats
 		$post_comment_status = $edited_Item->get( 'comment_status' );
-		$post_extracats = postcats_get_byID( $p );
+		if( ! isset( $post_extracats ) )
+		{
+			$post_extracats = postcats_get_byID( $p );
+		}
 
 		// Check if new category was started to create. If yes then set up parameters for next page:
 		check_categories_nosave( $post_category, $post_extracats, $edited_Item );
@@ -1019,6 +1056,7 @@ switch( $action )
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
 		$post_extracats = param( 'post_extracats', 'array:integer', $post_extracats );
+		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
@@ -1043,6 +1081,31 @@ switch( $action )
 	case 'history':
 		// Check permission:
 		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+		break;
+
+	case 'history_lastseen':
+		// Check permission:
+		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
+
+		$SQL = new SQL( 'Find last not seen revision of the Item #'.$edited_Item->ID.' by current User' );
+		$SQL->SELECT( 'iver_ID' );
+		$SQL->FROM( 'T_items__version' );
+		$SQL->WHERE( 'iver_itm_ID = '.$DB->quote( $edited_Item->ID ) );
+		$SQL->WHERE_and( 'iver_type = "archived"' );
+		$SQL->WHERE_and( 'iver_edit_last_touched_ts <= '.$DB->quote( $edited_Item->get_user_data( 'item_date' ) ) );
+		$SQL->ORDER_BY( 'iver_edit_last_touched_ts DESC' );
+		$SQL->LIMIT( '1' );
+		$lastnotseen_revision_ID = $DB->get_var( $SQL );
+
+		if( $lastnotseen_revision_ID > 0 && $edited_Item->get_user_data( 'item_date' ) < $edited_Item->get( 'last_touched_ts' ) )
+		{	// Redirect to compare last not seen revision with current version:
+			header_redirect( $admin_url.'?ctrl=items&action=history_compare&p='.$edited_Item->ID.'&r1=a'.$lastnotseen_revision_ID.'&r2=c' );
+		}
+		else
+		{	// Redirect to view current version because User have already seen all changes before:
+			$Messages->add( T_('You have already seen all changes of this Item.'), 'note' );
+			header_redirect( $admin_url.'?ctrl=items&action=history_details&p='.$edited_Item->ID.'&r=c' );
+		}
 		break;
 
 	case 'history_details':
@@ -1106,7 +1169,6 @@ switch( $action )
 		// Compare the custom fields of two revisions:
 		$oneline_TableDiffFormatter = new TableDiffFormatter();
 		$oneline_TableDiffFormatter->block_header = '';
-		$revisions_difference_custom_fields = array();
 		// Switch to 1st revision:
 		$edited_Item->set( 'revision', get_param( 'r1' ) );
 		$custom_fields = $edited_Item->get_type_custom_fields();
@@ -1125,6 +1187,7 @@ switch( $action )
 				$custom_fields[ $r2_custom_field['name'] ] = $r2_custom_field;
 			}
 		}
+		$revisions_difference_custom_fields = empty( $custom_fields ) ? false : array(); // FALSE means Item has no custom fields
 		foreach( $custom_fields as $custom_field )
 		{
 			// Get custom field values of both revisions:
@@ -1195,9 +1258,10 @@ switch( $action )
 		$LinkOwner = new LinkItem( $edited_Item );
 		// Switch to 1st revision:
 		$edited_Item->set( 'revision', get_param( 'r1' ) );
-		$revisions_difference_links = array();
+		$revisions_difference_links = false; // FALSE means Item has no attached files
 		if( $r1_LinkList = $LinkOwner->get_attachment_LinkList() )
 		{
+			$revisions_difference_links = array();
 			while( $r1_Link = & $r1_LinkList->get_next() )
 			{
 				$revisions_difference_links[ $r1_Link->ID ]['r1'] = array(
@@ -1213,6 +1277,10 @@ switch( $action )
 		$edited_Item->set( 'revision', get_param( 'r2' ) );
 		if( $r2_LinkList = $LinkOwner->get_attachment_LinkList() )
 		{
+			if( ! is_array( $revisions_difference_links ) )
+			{
+				$revisions_difference_links = array();
+			}
 			while( $r2_Link = & $r2_LinkList->get_next() )
 			{
 				$r_link_data = array(
@@ -1294,9 +1362,18 @@ switch( $action )
 		$Session->assert_received_crumb( 'item' );
 
 		// Get params to skip/force/mark notifications and pings:
-		param( 'item_members_notified', 'string', NULL );
-		param( 'item_community_notified', 'string', NULL );
-		param( 'item_pings_sent', 'string', NULL );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			param( 'item_members_notified', 'string', NULL );
+			param( 'item_community_notified', 'string', NULL );
+			param( 'item_pings_sent', 'string', NULL );
+		}
+		else
+		{	// Use auto mode for notifications depending on the edited Item status:
+			$item_members_notified = false;
+			$item_community_notified = false;
+			$item_pings_sent = false;
+		}
 
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
@@ -1569,9 +1646,18 @@ switch( $action )
 		save_fieldset_folding_values( $Blog->ID );
 
 		// Get params to skip/force/mark notifications and pings:
-		param( 'item_members_notified', 'string', NULL );
-		param( 'item_community_notified', 'string', NULL );
-		param( 'item_pings_sent', 'string', NULL );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			param( 'item_members_notified', 'string', NULL );
+			param( 'item_community_notified', 'string', NULL );
+			param( 'item_pings_sent', 'string', NULL );
+		}
+		else
+		{	// Use auto mode for notifications depending on the edited Item status:
+			$item_members_notified = false;
+			$item_community_notified = false;
+			$item_pings_sent = false;
+		}
 
 		// We need early decoding of these in order to check permissions:
 		param( 'post_status', 'string', 'published' );
@@ -1982,9 +2068,18 @@ switch( $action )
 		}
 
 		// Get params to skip/force/mark notifications and pings:
-		param( 'item_members_notified', 'string', NULL );
-		param( 'item_community_notified', 'string', NULL );
-		param( 'item_pings_sent', 'string', NULL );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			param( 'item_members_notified', 'string', NULL );
+			param( 'item_community_notified', 'string', NULL );
+			param( 'item_pings_sent', 'string', NULL );
+		}
+		else
+		{	// Use auto mode for notifications depending on the edited Item status:
+			$item_members_notified = false;
+			$item_community_notified = false;
+			$item_pings_sent = false;
+		}
 
 		// Execute or schedule notifications & pings:
 		$edited_Item->handle_notifications( NULL, false, $item_members_notified, $item_community_notified, $item_pings_sent );
@@ -2267,7 +2362,7 @@ switch( $action )
 
 		if( $edited_Item->create_proposed_change() )
 		{	// If new proposed changes has been inserted in DB successfully:
-			$Messages->add( T_('New proposed change has been added.'), 'success' );
+			$Messages->add( T_('New proposed change has been recorded.'), 'success' );
 			if( $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 			{	// Redirect to item history page with new poroposed change if current User has a permisson:
 				header_redirect( $admin_url.'?ctrl=items&action=history&p='.$edited_Item->ID );
@@ -2871,7 +2966,12 @@ switch( $action )
 		// We never allow HTML in titles, so we always encode and decode special chars.
 		$item_title = htmlspecialchars_decode( $edited_Item->get( 'title' ) );
 
-		$item_content = prepare_item_content( $edited_Item->get( 'content' ) );
+		$item_content = $edited_Item->get( 'content' );
+		if( $item_content === NULL )
+		{	// Use text template for new creating Item:
+			$item_content = $edited_Item->get_type_setting( 'text_template' );
+		}
+		$item_content = prepare_item_content( $item_content );
 
 		if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 		{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:

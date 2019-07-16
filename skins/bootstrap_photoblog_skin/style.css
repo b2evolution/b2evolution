@@ -527,7 +527,7 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 }
 .widget_core_org_members {
   margin: 5em 0 30px;
-  color: #333333;
+  color: #333;
 }
 .widget_core_org_members div.widget_rwd_content {
   text-align: center;
@@ -563,7 +563,7 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   font-size: 18px;
 }
 .widget_core_org_members a.user_link {
-  color: #000000;
+  color: #000;
 }
 .widget_core_org_members a.user_link:hover {
   color: #23527c;
@@ -653,9 +653,6 @@ div.extended_search_form .search_options {
 div.extended_search_form .search_options .search_option {
   display: inline-block;
   margin-right: 10px;
-}
-label.control-label[for=post_title] {
-  width: auto;
 }
 textarea.message_text {
   width: 95%;
@@ -834,10 +831,19 @@ div.log_container {
   margin: 0;
   padding: 0 0 10px;
 }
+.evo_post .well .evo_post_title h2 + .btn,
+.evo_post .well .evo_post_title h3 + .btn {
+  margin: -10px 0 0 30px;
+}
 .evo_post .well .evo_post_title .btn-group {
   display: table-cell;
   padding: 20px 0 10px 30px;
   vertical-align: middle;
+}
+.evo_post .well .evo_post_title .evo_post_read_status {
+  display: table-cell;
+  vertical-align: middle;
+  padding: 0 2px 10px 0;
 }
 .well .evo_post_title h2,
 .featurepost .evo_post_title h2 {

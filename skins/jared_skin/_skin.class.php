@@ -192,20 +192,25 @@ class jared_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Top Navigation Bar Settings')
 				),
-					'nav_bg_transparent' => array(
-						'label' => T_('Transparent background'),
-						'note' => T_('Check this to enable transparent background until navigation breaks into hamburger layout.'),
-						'defaultvalue' => 1,
-						'type' => 'checkbox',
-					),
 					'nav_bg_color' => array(
 						'label' => T_('Background color'),
 						'note' => T_('This color will be used if Background image is not set or does not exist.'),
 						'defaultvalue' => '#333333',
 						'type' => 'color',
 					),
+					'nav_links_color' => array(
+						'label' => T_('Text/Links color'),
+						'defaultvalue' => '#FFFFFF',
+						'type' => 'color',
+					),
+					'nav_bg_transparent' => array(
+						'label' => T_('Transparent background'),
+						'note' => T_('Check this to enable transparent background until navigation breaks into hamburger layout.'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
 					'nav_colltitle_size' => array(
-						'label' => T_('Collection title font size'),
+						'label' => T_('Title font size'),
 						'note' => 'px. ' . T_('Set font size for collection title in navigation.'),
 						'defaultvalue' => '18',
 						'type' => 'integer',
@@ -220,12 +225,6 @@ class jared_Skin extends Skin
 						'size' => '2',
 						'allow_empty' => false,
 					),
-					'nav_links_color' => array(
-						'label' => T_('Links color'),
-						'note' => T_('Click to select a color.'),
-						'defaultvalue' => '#FFFFFF',
-						'type' => 'color',
-					),
 				'navigation_section_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -238,13 +237,11 @@ class jared_Skin extends Skin
 				),
 					'pagetop_button_bg_color' => array(
 						'label' => T_('Button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'pagetop_button_color' => array(
 						'label' => T_('Button text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -265,8 +262,7 @@ class jared_Skin extends Skin
 						'type' => 'checkbox',
 					),
 					'section_1_navbar_text_color' => array(
-						'label' => T_('Top navigation text color'),
-						'note' => T_('Click to select a color.'),
+						'label' => T_('Top nav text color for transparent bg'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -292,49 +288,41 @@ class jared_Skin extends Skin
 					),
 					'section_1_coll_title_color' => array(
 						'label' => T_('Collection title color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'section_1_title_color' => array(
 						'label' => T_('Content title color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'section_1_text_color' => array(
 						'label' => T_('Normal text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'section_1_link_color' => array(
 						'label' => T_('Links color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'section_1_muted_color' => array(
 						'label' => T_('Muted text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
 					'section_1_icon_color' => array(
 						'label' => T_('Inverse icon color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#CCCCCC',
 						'type' => 'color',
 					),
 					'section_1_button_bg_color' => array(
 						'label' => T_('Button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_1_button_color' => array(
 						'label' => T_('Button text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -387,37 +375,31 @@ class jared_Skin extends Skin
 					),
 					'section_2_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#222222',
 						'type' => 'color',
 					),
 					'section_2_text_color' => array(
 						'label' => T_('Normal text color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#adadad',
 						'type' => 'color',
 					),
 					'section_2_link_color' => array(
 						'label' => T_('Links color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_2_link_h_color' => array(
 						'label' => T_('Links hover color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_2_button_bg_color' => array(
 						'label' => T_('Button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_2_button_color' => array(
 						'label' => T_('Button text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -470,37 +452,31 @@ class jared_Skin extends Skin
 					),
 					'section_3_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#222222',
 						'type' => 'color',
 					),
 					'section_3_text_color' => array(
 						'label' => T_('Normal text color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#adadad',
 						'type' => 'color',
 					),
 					'section_3_link_color' => array(
 						'label' => T_('Links color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_3_link_h_color' => array(
 						'label' => T_('Links hover color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_3_button_bg_color' => array(
 						'label' => T_('Button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_3_button_color' => array(
 						'label' => T_('Button text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -554,37 +530,31 @@ class jared_Skin extends Skin
 					),
 					'section_4_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#222222',
 						'type' => 'color',
 					),
 					'section_4_text_color' => array(
 						'label' => T_('Normal text color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#adadad',
 						'type' => 'color',
 					),
 					'section_4_link_color' => array(
 						'label' => T_('Links color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_4_link_h_color' => array(
 						'label' => T_('Links hover color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_4_button_bg_color' => array(
 						'label' => T_('Button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_4_button_color' => array(
 						'label' => T_('Button text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -637,37 +607,31 @@ class jared_Skin extends Skin
 					),
 					'section_5_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#222222',
 						'type' => 'color',
 					),
 					'section_5_text_color' => array(
 						'label' => T_('Normal text color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#adadad',
 						'type' => 'color',
 					),
 					'section_5_link_color' => array(
 						'label' => T_('Links color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_5_link_h_color' => array(
 						'label' => T_('Links hover color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_5_button_bg_color' => array(
 						'label' => T_('Button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_5_button_color' => array(
 						'label' => T_('Button text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -693,8 +657,7 @@ class jared_Skin extends Skin
 					'label'  => T_('Section 6 - Header for Standalone Pages')
 				),
 					'section_6_navbar_text_color' => array(
-						'label' => T_('Top navigation text color'),
-						'note' => T_('Click to select a color.'),
+						'label' => T_('Top nav text color for transparent bg'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -721,37 +684,31 @@ class jared_Skin extends Skin
 					),
 					'section_6_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'section_6_text_color' => array(
 						'label' => T_('Normal text color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#adadad',
 						'type' => 'color',
 					),
 					'section_6_link_color' => array(
 						'label' => T_('Links color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_6_link_h_color' => array(
 						'label' => T_('Links hover color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_6_button_bg_color' => array(
 						'label' => T_('Button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_6_button_color' => array(
 						'label' => T_('Button text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -777,8 +734,7 @@ class jared_Skin extends Skin
 					'label'  => T_('Section 7 - Header for Contact form and Messaging')
 				),
 					'section_7_navbar_text_color' => array(
-						'label' => T_('Top navigation text color'),
-						'note' => T_('Click to select a color.'),
+						'label' => T_('Top nav text color for transparent bg'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -804,37 +760,31 @@ class jared_Skin extends Skin
 					),
 					'section_7_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'section_7_text_color' => array(
 						'label' => T_('Normal text color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#adadad',
 						'type' => 'color',
 					),
 					'section_7_link_color' => array(
 						'label' => T_('Links color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_7_link_h_color' => array(
 						'label' => T_('Links hover color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_7_button_bg_color' => array(
 						'label' => T_('Button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_7_button_color' => array(
 						'label' => T_('Button text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -860,8 +810,7 @@ class jared_Skin extends Skin
 					'label'  => T_('Section - Restricted access disps') . ' ( disp=login || disp=register || disp=lostpassword || disp=activateinfo || disp=access_denied || disp=access_requires_login )'
 				),
 					'section_access_navbar_text_color' => array(
-						'label' => T_('Top navigation text color'),
-						'note' => T_('Click to select a color.'),
+						'label' => T_('Top nav text color for transparent bg'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -888,8 +837,7 @@ class jared_Skin extends Skin
 					'label'  => T_('Section - Header for other disps')
 				),
 					'section_oth_navbar_text_color' => array(
-						'label' => T_('Top navigation text color'),
-						'note' => T_('Click to select a color.'),
+						'label' => T_('Top nav text color for transparent bg'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -915,37 +863,31 @@ class jared_Skin extends Skin
 					),
 					'section_oth_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'section_oth_text_color' => array(
 						'label' => T_('Normal text color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#adadad',
 						'type' => 'color',
 					),
 					'section_oth_link_color' => array(
 						'label' => T_('Links color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_oth_link_h_color' => array(
 						'label' => T_('Links hover color'),
-						'note' => T_('Click to select a color'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_oth_button_bg_color' => array(
 						'label' => T_('Button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'section_oth_button_color' => array(
 						'label' => T_('Button text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -972,37 +914,31 @@ class jared_Skin extends Skin
 				),
 					'footer_bg_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#222222',
 						'type' => 'color',
 					),
 					'footer_content_color' => array(
 						'label' => T_('Normal text color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#ffffff',
 						'type' => 'color',
 					),
 					'footer_link_color' => array(
 						'label' => T_('Links color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#ffffff',
 						'type' => 'color',
 					),
 					'footer_link_h_color' => array(
 						'label' => T_('Links hover color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#ffffff',
 						'type' => 'color',
 					),
 					'footer_button_bg_color' => array(
 						'label' => T_('Button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#318780',
 						'type' => 'color',
 					),
 					'footer_button_color' => array(
 						'label' => T_('Button text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
@@ -1029,19 +965,16 @@ class jared_Skin extends Skin
 				),
 					'bgimg_text_color' => array(
 						'label' => T_('Text color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
 					'bgimg_link_color' => array(
 						'label' => T_('Link color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#6cb2ef',
 						'type' => 'color',
 					),
 					'bgimg_hover_link_color' => array(
 						'label' => T_('Hover link color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#6cb2ef',
 						'type' => 'color',
 					),
@@ -1058,39 +991,33 @@ class jared_Skin extends Skin
 					// Login button
 					'login_button_color' => array(
 						'label' => T_('Login button color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#ffffff',
 						'type' => 'color',
 					),
 					'login_button_bg_color' => array(
 						'label' => T_('Login button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#5cb85c',
 						'type' => 'color',
 					),
 					// Register button
 					'register_button_color' => array(
 						'label' => T_('Register button color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#ffffff',
 						'type' => 'color',
 					),
 					'register_button_bg_color' => array(
 						'label' => T_('Register button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					// Contact button
 					'contact_button_color' => array(
 						'label' => T_('Contact and Subscribe button color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#ffffff',
 						'type' => 'color',
 					),
 					'contact_button_bg_color' => array(
 						'label' => T_('Contact and Subscribe button background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
@@ -1251,7 +1178,7 @@ class jared_Skin extends Skin
 				// ... exclude background-color in mentioned media queries and set transparent
 				'@media (min-width: 1025px) { .navbar { background-color: transparent } }' );
 			if( in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) ) )
-			{	// Links color:
+			{	// Text/Links color:
 				$this->dynamic_style_rule( 'nav_links_color', '@media (max-width: 1024px) { .affix-top a { color: $setting_value$ !important } }' );
 			}
 		}
@@ -1260,7 +1187,7 @@ class jared_Skin extends Skin
 			// Background color:
 			$this->dynamic_style_rule( 'nav_bg_color', '.navbar { background-color: $setting_value$ }' );
 		}
-		// Collection title font size:
+		// Title font size:
 		$this->dynamic_style_rule( 'nav_colltitle_size', '.navbar.main-header-navigation .navbar-brand > h3 a { font-size: $setting_value$ }', array(
 			'suffix' => 'px'
 		) );
@@ -1272,7 +1199,7 @@ class jared_Skin extends Skin
 			'.navbar.main-header-navigation.navbar-default .navbar-nav li > a { font-size: $setting_value$ }',
 			array( 'suffix' => 'px' )
 		);
-		// Links color:
+		// Text/Links color:
 		$this->dynamic_style_rule( 'nav_links_color',
 			'.navbar.navbar-default a, '.
 			'.navbar.navbar-default a:hover, '.
@@ -1298,7 +1225,7 @@ class jared_Skin extends Skin
 			if( $this->get_setting( 'section_1_display' ) )
 			{
 				if( $this->get_setting( 'nav_bg_transparent' ) )
-				{	// Top navigation text color:
+				{	// Top nav text color for transparent bg:
 					$this->dynamic_style_rule( 'section_1_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 				}
 				// Background image:
@@ -1518,7 +1445,7 @@ class jared_Skin extends Skin
 		{
 			if( $this->get_setting( 'nav_bg_transparent' ) )
 			{
-				// Top navigation text color:
+				// Top nav text color for transparent bg:
 				$this->dynamic_style_rule( 'section_6_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 			}
 			// Background image:
@@ -1563,8 +1490,8 @@ class jared_Skin extends Skin
 		{
 			if( $this->get_setting( 'nav_bg_transparent' ) )
 			{
-				// Top navigation text color:
-				$this->dynamic_style_rule( 'section_7_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }' );
+				// Top nav text color for transparent bg:
+				$this->dynamic_style_rule( 'section_7_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 			}
 			// Background image:
 			$this->dynamic_style_rule( 'section_7_image_file_ID', '.evo_container__standalone_page_area_7 { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
@@ -1573,7 +1500,7 @@ class jared_Skin extends Skin
 			// Maximum content width:
 			$this->dynamic_style_rule( 'section_7_cont_width', '.evo_container__standalone_page_area_7 > .container { max-width: $setting_value$ }', array( 'suffix' => 'px' ) );
 			// Title color:
-			$this->dynamic_style_rule( 'section_7_title_color', '.evo_container__standalone_page_area_7 .evo_post_title h1 { color: $setting_value$ }' );
+			$this->dynamic_style_rule( 'section_7_title_color', '.evo_container__standalone_page_area_7 .msgform_disp_title h1 { color: $setting_value$ }' );
 			// Normal text color:
 			$this->dynamic_style_rule( 'section_7_text_color', '.evo_container__standalone_page_area_7 { color: $setting_value$ }' );
 			// Links color:
@@ -1608,8 +1535,8 @@ class jared_Skin extends Skin
 		{
 			if( $this->get_setting( 'nav_bg_transparent' ) )
 			{
-				// Top navigation text color:
-				$this->dynamic_style_rule( 'section_access_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }' );
+				// Top nav text color for transparent bg:
+				$this->dynamic_style_rule( 'section_access_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 			}
 			// Background image:
 			$this->dynamic_style_rule( 'section_access_image_file_ID', '.restricted_access_disps { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );
@@ -1623,8 +1550,8 @@ class jared_Skin extends Skin
 		if( $this->get_setting( 'nav_bg_transparent' ) &&
 		    ! in_array( $disp, array( 'front', 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'msgform', 'threads', 'page' ) ) )
 		{
-			// Top navigation text color:
-			$this->dynamic_style_rule( 'section_oth_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $section_nav_color !important } }' );
+			// Top nav text color for transparent bg:
+			$this->dynamic_style_rule( 'section_oth_navbar_text_color', '@media (min-width: 1025px) { .affix-top a { color: $setting_value$ !important } }' );
 		}
 		// Background image:
 		$this->dynamic_style_rule( 'section_oth_image_file_ID', '.evo_container__standalone_page_area_oth { background-image: $setting_value$ }', array( 'type' => 'image_file' ) );

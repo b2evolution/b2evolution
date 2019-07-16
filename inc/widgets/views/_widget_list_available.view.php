@@ -95,7 +95,6 @@ $core_componentwidget_defs = array(
 			'basic_menu_link',
 			'msg_menu_link',
 			'flag_menu_link',
-			'mustread_menu_link',
 			'profile_menu_link',
 		),
 	'navigation' => array(
@@ -186,6 +185,11 @@ $core_componentwidget_defs = array(
 		),
 );
 
+if( is_pro() )
+{	// Additional widget for pro version:
+	$core_componentwidget_defs['menu_item'][] = 'mustread_menu_link';
+}
+
 // Set additional param to add new widget:
 $mode_url_param = $mode == 'customizer' ? '&amp;mode=customizer' : '';
 
@@ -206,6 +210,12 @@ foreach( $widget_groups as $widget_group_code => $widget_group_title )
 	{
 		foreach( $core_componentwidget_defs[ $widget_group_code ] as $widget_code )
 		{
+			if( ! file_exists( $inc_path.'widgets/widgets/_'.$widget_code.'.widget.php' ) )
+			{	// Skip not found widget to avoid die error:
+				echo '<li><span class="label label-warning evo_widget_icon"><span class="fa fa-warning"></span></span> <b>Not found widget by code</b> <code>'.$widget_code.'</code></li>';
+				continue;
+			}
+
 			$classname = $widget_code.'_Widget';
 			load_class( 'widgets/widgets/_'.$widget_code.'.widget.php', $classname);
 

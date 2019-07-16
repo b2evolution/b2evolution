@@ -37,8 +37,13 @@ class generic_menu_link_Widget extends ComponentWidget
 	 * @param string Link template, possible masks: $link_url$, $link_class$, $link_text$
 	 * @return string
 	 */
-	function get_layout_menu_link( $link_url, $link_text, $is_active_link, $link_template = '<a href="$link_url$" class="$link_class$">$link_text$</a>' )
+	function get_layout_menu_link( $link_url, $link_text, $is_active_link, $link_template = NULL )
 	{
+		if( $link_template === NULL )
+		{	// Use default template:
+			$link_template = '<a href="$link_url$" class="$link_class$">$link_text$</a>';
+		}
+
 		$r = $this->disp_params['block_start'];
 		$r .= $this->disp_params['block_body_start'];
 

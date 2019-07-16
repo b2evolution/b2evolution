@@ -132,14 +132,6 @@ if( $Item->get_cover_image_url() )
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
 					'format'            => 'htmlbody',
-					'register_text'     => '',
-					'login_text'        => '',
-					'lostpassword_text' => '',
-					'account_activation' => '',
-					'msgform_text'      => '',
-					'user_text'         => '',
-					'users_text'        => '',
-					'display_edit_links'=> false,
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>
@@ -175,6 +167,7 @@ if( $Item->get_cover_image_url() )
 		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$', array(
+					'disp_title'       => false,
 					'author_link_text' => 'auto',
 					// Profile tabs to switch between user edit forms
 					'profile_tabs' => array(

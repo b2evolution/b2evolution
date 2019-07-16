@@ -59,6 +59,12 @@ if( get_param( 'itcf_type' ) == 'computed' )
 // Note:
 $Form->text( 'itcf_note', get_param( 'itcf_note' ), 60, T_('Note'), '', 255 );
 
+// Required:
+$Form->checkbox( 'itcf_required', get_param( 'itcf_required' ), T_('Required') );
+
+// With MC(Meta Comment):
+$Form->checkbox( 'itcf_meta', get_param( 'itcf_meta' ), T_('With MC'), T_('Allow update with Meta Comment') );
+
 // Public:
 $Form->checkbox( 'itcf_public', get_param( 'itcf_public' ), T_('Public') );
 

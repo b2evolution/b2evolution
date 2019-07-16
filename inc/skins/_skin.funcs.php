@@ -113,12 +113,20 @@ function skin_init( $disp )
 				break;
 			}
 
-			if( $disp == 'mustread' && ! $Blog->get_setting( 'track_unread_content' ) )
-			{	// Forbid access to flagged content for not logged in users:
-				global $disp;
-				$disp = '404';
-				$Messages->add( T_('This collection has no "Must Read" items.'), 'error' );
-				break;
+			if( $disp == 'mustread' )
+			{	// Check access to "must read" content:
+				if( ! is_logged_in() )
+				{	// Forbid access to "must read" content for not logged in users:
+					header_redirect( get_login_url( 'no access to must read content', NULL, false, NULL, 'access_requires_loginurl' ), 302 );
+					// Exit here.
+				}
+				if( ! $Blog->get_setting( 'track_unread_content' ) )
+				{	// Forbid access to "must read" content if collection doesn't track unread content:
+					global $disp;
+					$disp = '404';
+					$Messages->add( T_('This feature only works when <b>Tracking of unread content</b> is enabled.'), 'error' );
+					break;
+				}
 			}
 
 			if( $disp == 'terms' )
@@ -196,21 +204,22 @@ function skin_init( $disp )
 			// Please document encountered problems.
 			if( ! $preview &&
 			    ( ( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
-			      || $Blog->get_setting( 'relcanonical_item_urls' ) 
+			      || $Blog->get_setting( 'relcanonical_item_urls' )
 			      || $Blog->get_setting( 'self_canonical_item_urls' )
 			    ) )
 			{	// We want to redirect to the Item's canonical URL:
 				$canonical_is_same_url = true;
 				$item_Blog = & $Item->get_Blog();
 				// Use item URL from first detected category of the current collection:
+				$main_canonical_url = $Item->get_permanent_url( '', '', '&' );
 				if( $item_Blog->get_setting( 'allow_crosspost_urls' ) )
 				{	// If non-canonical URL is allowed for cross-posted items,
-					// try to get a canonical URL in thecurrent collection even it is not main/canonical collection of the Item:
+					// try to get a canonical URL in the current collection even it is not main/canonical collection of the Item:
 					$canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID );
 				}
 				else
 				{	// If non-canonical URL is allowed for cross-posted items, then only get canonical URL in the main collection:
-					$canonical_url = $Item->get_permanent_url( '', '', '&' );
+					$canonical_url = $main_canonical_url;
 				}
 				$canonical_url_params_regexp = '#[&?](page=\d+|mode=quote&[qcp]+=\d+)+#';
 				if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
@@ -284,7 +293,6 @@ function skin_init( $disp )
 						}
 						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
-
 					if( ! $url_resolved &&
 					    $Blog->get_setting( 'canonical_item_urls' ) &&
 					    $redir == 'yes' &&
@@ -297,18 +305,19 @@ function skin_init( $disp )
 						// EXITED.
 					}
 					elseif( $Blog->get_setting( 'relcanonical_item_urls' ) )
-					{	// Use rel="canoncial":
-						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+					{	// Use rel="canoncial" with MAIN canoncial URL:
+						add_headline( '<link rel="canonical" href="'.$main_canonical_url.'" />' );
 					}
 				}
 				elseif( $Blog->get_setting( 'self_canonical_item_urls' ) )
-				{	// Use self-referencing rel="canonical" tag:
-					add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+				{	// Use self-referencing rel="canonical" tag with MAIN canoncial URL:
+					add_headline( '<link rel="canonical" href="'.$main_canonical_url.'" />' );
 				}
 			}
 
-			if( ! $MainList->result_num_rows )
-			{	// There is nothing to display for this page, don't index it!
+			if( $Blog->get_setting( 'single_noindex' ) || ! $MainList->result_num_rows )
+			{	// We prefer robots not to index these pages,
+				// OR There is nothing to display for this page, don't index it!
 				$robots_index = false;
 			}
 			break;
@@ -361,19 +370,51 @@ function skin_init( $disp )
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
 
-			if( !empty($active_filters) )
-			{	// The current page is being filtered...
+			$is_first_page = ( empty( $active_filters ) || array_diff( $active_filters, array( 'posts' ) ) == array() );
+			$is_next_pages = ( ! $is_first_page && array_diff( $active_filters, array( 'posts', 'page' ) ) == array() );
 
-				if( array_diff( $active_filters, array( 'posts' ) ) == array() )
-				{	// This is the default blog page only if the 'front_disp' is set to 'posts'
-					$disp_detail = 'posts-default';
-					$seo_page_type = 'Default page';
-					if( $Blog->get_setting( 'default_noindex' ) )
-					{	// We prefer robots not to index archive pages:
-						$robots_index = false;
+			if( ( $is_first_page && $Blog->get_setting( 'front_disp' ) != 'posts' ) || $is_next_pages )
+			{	// This is first(but not front disp) or next pages of disp=posts:
+				// Do we need to handle the canoncial url?
+				if( ( $Blog->get_setting( 'canonical_posts' ) && $redir == 'yes' )
+				    || $Blog->get_setting( 'relcanonical_posts' )
+				    || $Blog->get_setting( 'self_canonical_posts' ) )
+				{	// Check if the URL was canonical:
+					$canonical_url = url_add_param( $Blog->get( 'url' ), 'disp=posts', '&' );
+					if( $is_next_pages )
+					{	// Set param for paged url:
+						$canonical_url = url_add_param( $canonical_url, $MainList->page_param.'='.$MainList->filters['page'], '&' );
+					}
+					if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+					{	// We are not on the canonical blog url:
+						if( $Blog->get_setting( 'canonical_posts' ) && $redir == 'yes' )
+						{	// REDIRECT TO THE CANONICAL URL:
+							header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) ) ? 301 : 303 );
+						}
+						elseif( $Blog->get_setting( 'relcanonical_posts' ) )
+						{	// Use link rel="canoncial":
+							add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+						}
+					}
+					elseif( $Blog->get_setting( 'self_canonical_posts' ) )
+					{	// Use self-referencing rel="canonical" tag:
+						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
 					}
 				}
-				elseif( array_diff( $active_filters, array( 'posts', 'page' ) ) == array() )
+			}
+
+			if( $is_first_page )
+			{	// This is first page of disp=posts:
+				$disp_detail = 'posts-default';
+				$seo_page_type = 'First posts page';
+				if( $Blog->get_setting( 'posts_firstpage_noindex' ) )
+				{	// We prefer robots not to index archive pages:
+					$robots_index = false;
+				}
+			}
+			elseif( ! empty( $active_filters ) )
+			{	// The current page is being filtered...
+				if( $is_next_pages )
 				{ // This is just a follow "paged" page
 					$disp_detail = 'posts-next';
 					$seo_page_type = 'Next page';
@@ -534,15 +575,6 @@ function skin_init( $disp )
 					{	// We prefer robots not to index other filtered pages:
 						$robots_index = false;
 					}
-				}
-			}
-			elseif( $Blog->get_setting('front_disp') == 'posts' )
-			{	// This is the default blog page only if the 'front_disp' is set to 'posts'
-				$disp_detail = 'posts-default';
-				$seo_page_type = 'Default page';
-				if( $Blog->get_setting( 'default_noindex' ) )
-				{	// We prefer robots not to index archive pages:
-					$robots_index = false;
 				}
 			}
 			break;
@@ -1341,12 +1373,33 @@ function skin_init( $disp )
 			break;
 
 		case 'users':
-		case 'visits':
 			// Check if current user has an access to public list of the users:
 			check_access_users_list();
 
 			$seo_page_type = 'Users list';
 			$robots_index = false;
+
+			if( ! $Blog->get_setting( 'userdir_enable' ) )
+			{	// If user directory is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-user-directory-disabled';
+			}
+			break;
+
+		case 'visits':
+			// Check if current user has an access to public list of the users:
+			check_access_users_list();
+
+			$seo_page_type = 'User visits';
+			$robots_index = false;
+
+			if( ! is_logged_in() || ! $Settings->get( 'enable_visit_tracking' ) )
+			{	// Check if visit tracking is enabled and the user is logged in before allowing profile visit display:
+				global $disp;
+				$disp = '403';
+				$disp_detail = '403-visit-tracking-disabled';
+			}
 			break;
 
 		case 'user':
@@ -1457,7 +1510,7 @@ function skin_init( $disp )
 				header_redirect( $selected_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
 			}
 
-			// Prepare the 'In-skin editing':
+			// Prepare the 'In-skin editing' / 'In-skin change proposal':
 			init_inskin_editing();
 			break;
 
@@ -1742,6 +1795,15 @@ function skin_init( $disp )
 						.'href="'.format_to_output( $other_version_Item->get_permanent_url( '', '', '&' ), 'htmlattr' ).'">' );
 				}
 			}
+		}
+	}
+
+	if( $Blog->get_setting( 'front_disp' ) == $disp )
+	{	// This is the default/front collection page:
+		$seo_page_type = 'Default page';
+		if( $Blog->get_setting( 'default_noindex' ) )
+		{	// We prefer robots not to index archive pages:
+			$robots_index = false;
 		}
 	}
 
@@ -2457,6 +2519,29 @@ function skin_keywords_tag()
 	if( !empty($r) )
 	{
 		echo '<meta name="keywords" content="'.format_to_output( $r, 'htmlattr' )."\" />\n";
+	}
+}
+
+
+/**
+ * Template tag
+ *
+ * Note for future mods: we do NOT want to repeat identical content on multiple pages.
+ */
+function skin_favicon_tag()
+{
+	global $Collection, $Blog;
+
+	if( ! empty( $Blog ) )
+	{
+		if( $favicon_File = $Blog->get( 'collection_favicon') )
+		{
+			if( $favicon_File->exists() && $favicon_File->is_image() )
+			{
+				$favicon_Filetype = $favicon_File->get_Filetype();
+				echo sprintf( '<link rel="icon" type="%s" href="%s">', $favicon_Filetype->mimetype, $favicon_File->get_url() );
+			}
+		}
 	}
 }
 

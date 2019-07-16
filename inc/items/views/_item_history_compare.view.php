@@ -56,15 +56,13 @@ $Form->begin_form( 'fform', sprintf( T_('Difference between revisions for: %s'),
 			<div class="center"><span<?php echo $Revision_1->iver_status != $Revision_2->iver_status ? ' style="color:#F00;font-weight:bold"' : ''; ?>><?php echo $post_statuses[ $Revision_2->iver_status ]; ?></span></div>
 		</td>
 	</tr>
+	<tr><td colspan="4">&nbsp;</td></tr>
+	<tr>
+		<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Title').':'; ?></b></td>
+	</tr>
 <?php
-	if( !empty( $revisions_difference_title ) )
-	{	// Display title difference
-		?>
-		<tr><td colspan="4">&nbsp;</td></tr>
-		<tr>
-			<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Title').':'; ?></b></td>
-		</tr>
-		<?php
+	if( ! empty( $revisions_difference_title ) )
+	{	// Display title difference:
 		echo $revisions_difference_title;
 	}
 	else
@@ -78,31 +76,33 @@ $Form->begin_form( 'fform', sprintf( T_('Difference between revisions for: %s'),
 	}
 ?>
 	<tr><td colspan="4">&nbsp;</td></tr>
-<?php
-if( !empty( $revisions_difference_content ) )
-{	// Display content difference
-	?>
 	<tr>
-		<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Content').':'; ?></b></td>
+		<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Text').':'; ?></b></td>
 	</tr>
-	<?php
+<?php
+if( ! empty( $revisions_difference_content ) )
+{	// Display content difference:
 	echo $revisions_difference_content;
 }
 else
 {	// No content difference
-	echo '<tr><td colspan="4" class="center red"><b>';
-	echo T_('No difference between contents of the selected revisions');
-	echo '</b></td></tr>';
+	echo '<tr><td colspan="4" class="center">'.T_('No difference.').'</td></tr>';
 }
 
-if( ! empty( $revisions_difference_custom_fields ) )
-{	// Display custom fields difference:
+if( is_array( $revisions_difference_custom_fields ) )
+{	// Display custom fields difference only if Item revision had at least one custom field:
 ?>
 		<tr><td colspan="4">&nbsp;</td></tr>
 		<tr>
 			<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Custom fields').':'; ?></b></td>
 		</tr>
-	<?php
+<?php
+if( empty( $revisions_difference_custom_fields ) )
+{	// No difference in custom fields:
+	echo '<tr><td colspan="4" class="center">'.T_('No difference.').'</td></tr>';
+}
+else
+{	// Display custom fields difference:
 	foreach( $revisions_difference_custom_fields as $revisions_diff_data )
 	{
 		if( isset( $revisions_diff_data['diff_label'] ) )
@@ -144,14 +144,23 @@ if( ! empty( $revisions_difference_custom_fields ) )
 		}
 	}
 }
+}
 
-if( ! empty( $revisions_difference_links ) )
-{	// Display links/attachments difference:
+if( is_array( $revisions_difference_links ) )
+{	// Display links/attachments difference only if Item revision had at least one attached File:
 ?>
 		<tr><td colspan="4">&nbsp;</td></tr>
 		<tr>
 			<td colspan="4" class="diff-title-addedline diff-section-title"><b><?php echo T_('Images &amp; Attachments').':'; ?></b></td>
 		</tr>
+	<?php
+	if( empty( $revisions_difference_links ) )
+	{	// No difference in attached files:
+		echo '<tr><td colspan="4" class="center">'.T_('No difference.').'</td></tr>';
+	}
+	else
+	{	// Display links/attachments difference:
+	?>
 		<tr>
 			<td colspan="4">
 				<table class="table table-striped table-bordered table-condensed">
@@ -224,6 +233,7 @@ if( ! empty( $revisions_difference_links ) )
 			</td>
 		</tr>
 <?php
+	}
 }
 ?>
 </table>

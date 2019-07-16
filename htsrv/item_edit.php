@@ -116,6 +116,7 @@ switch( $action )
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
 		$post_extracats = param( 'post_extracats', 'array:integer', $post_extracats );
+		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
@@ -151,6 +152,7 @@ switch( $action )
 			$edited_Item->set('main_cat_ID', $Blog->get_default_cat_ID());
 		}
 		$post_extracats = param( 'post_extracats', 'array:integer', $post_extracats );
+		$edited_Item->set( 'extra_cat_IDs', $post_extracats );
 
 		param( 'item_tags', 'string', '' );
 
@@ -368,9 +370,8 @@ switch( $action )
 
 		$item_Blog = & $edited_Item->get_Blog();
 
-		// Check edit permission:
-		$current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $edited_Item );
-		$current_User->check_perm( 'blog_can_be_assignee', 'edit', true, $item_Blog->ID );
+		// Check if current User has a permission to edit at least one workflow property:
+		$edited_Item->can_edit_workflow( 'any', true );
 
 		if( $edited_Item->load_workflow_from_Request() )
 		{	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
@@ -401,7 +402,7 @@ switch( $action )
 
 		if( $edited_Item->create_proposed_change() )
 		{	// If new proposed changes has been inserted in DB successfully:
-			$Messages->add( T_('New proposed change has been added.'), 'success' );
+			$Messages->add( T_('New proposed change has been recorded.'), 'success' );
 			if( $current_User->check_perm( 'admin', 'restricted' ) &&
 			    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 			{	// Redirect to item history page with new poroposed change if current User has a permisson:

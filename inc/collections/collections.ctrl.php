@@ -375,8 +375,11 @@ switch( $action )
 		$Settings->set( 'cross_posting', param( 'cross_posting', 'integer', 0 ) );
 		$Settings->set( 'cross_posting_blogs', param( 'cross_posting_blogs', 'integer', 0 ) );
 
+		// Always try to match slug:
+		$Settings->set( 'always_match_slug', param( 'always_match_slug', 'integer', 0 ) );
+
 		// Redirect moved posts:
-		$Settings->set( 'redirect_moved_posts', param( 'redirect_moved_posts', 'integer', 0 ) );
+		$Settings->set( 'redirect_moved_posts', $Settings->get( 'always_match_slug' ) ? 1 : param( 'redirect_moved_posts', 'integer', 0 ) );
 
 		// Subscribing to new blogs:
 		$Settings->set( 'subscribe_new_blogs', param( 'subscribe_new_blogs', 'string', 'public' ) );

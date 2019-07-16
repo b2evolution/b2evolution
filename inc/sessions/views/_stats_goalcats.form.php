@@ -37,7 +37,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New goal category') : T_('Goal cate
 
 	$Form->text_input( 'gcat_name', $edited_GoalCategory->name, 40, T_('Name'), '', array( 'maxlength'=> 50, 'required'=>true ) );
 
-	$Form->color_input( 'gcat_color', $edited_GoalCategory->color, T_('Color'), T_('E-g: #ff0000 for red'), array( 'required'=>true ) );
+	$Form->color_input( 'gcat_color', $edited_GoalCategory->color, T_('Color'), '', array( 'required'=>true ) );
 
 if( $creating )
 {

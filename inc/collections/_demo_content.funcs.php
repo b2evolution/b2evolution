@@ -2974,6 +2974,7 @@ Hello
 		'title'    => T_('About widgets...'),
 		'tags'     => 'widgets',
 		'category' => 'background',
+		'mustread' => is_pro(),
 		'content'  => T_('<p>b2evolution blogs are installed with a default selection of Widgets. For example, the sidebar of this blog includes widgets like a calendar, a search field, a list of categories, a list of XML feeds, etc.</p>
 
 <p>You can add, remove and reorder widgets from the Blog Settings tab in the admin interface.</p>
@@ -2985,6 +2986,7 @@ Hello
 		'title'    => T_('About skins...'),
 		'tags'     => 'skins',
 		'category' => 'background',
+		'mustread' => is_pro(),
 		'content'  => sprintf( T_('<p>By default, b2evolution blogs are displayed using an evoskin.</p>
 
 <p>You can change the skin used by any blog by editing the blog settings in the admin interface.</p>
@@ -2999,9 +3001,10 @@ Hello
 	);
 
 	$demo_items['apache_optimization'] = array(
-		'title'      => T_('Apache optimization...'),
-		'category'   => 'background',
-		'content'    => sprintf( T_('<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please see the man page about <a %s>Tricky Stuff</a> for more information.</p>
+		'title'    => T_('Apache optimization...'),
+		'category' => 'background',
+		'mustread' => is_pro(),
+		'content'  => sprintf( T_('<p>b2evolution comes with an <code>.htaccess</code> file destined to optimize the way b2evolution is handled by your webseerver (if you are using Apache). In some circumstances, that file may not be automatically activated at setup. Please see the man page about <a %s>Tricky Stuff</a> for more information.</p>
 
 <p>For further optimization, please review the manual page about <a %s>Performance optimization</a>. Depending on your current configuration and on what your <a %s>web hosting</a> company allows you to do, you may increase the speed of b2evolution by up to a factor of 10!</p>'),
 'href="'.get_manual_url( 'tricky-stuff' ).'"',
@@ -4079,6 +4082,10 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			if( ! empty( $demo_item['assigned_user_ID'] ) )
 			{	// Set task assigned user ID:
 				$new_Item->set( 'assigned_user_ID', $demo_item['assigned_user_ID'] );
+			}
+			if( isset( $demo_item['mustread'] ) && $demo_item['mustread'] === true )
+			{	// Set "Must read" flag:
+				$new_Item->set_setting( 'mustread', 1 );
 			}
 			if( isset( $demo_item['qty_in_stock'] ) )
 			{	// Set item quantity in stock:

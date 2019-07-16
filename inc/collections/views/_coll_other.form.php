@@ -53,6 +53,7 @@ $Form->begin_fieldset( T_('Search results').get_manual_link( 'search-results-oth
 			'post_tags'           => T_('weight multiplier for keywords found in post tags'),
 			'post_excerpt'        => T_('weight multiplier for keywords found in post excerpt'),
 			'post_titletag'       => T_('weight multiplier for keywords found in post &lt;title&gt; tag'),
+			'post_metakeywords'   => T_('weight multiplier for keywords found in post &lt;meta&gt; keywords'),
 			'post_author'         => T_('weight multiplier for keywords found in post author login'),
 			'post_date_future'    => T_('weight multiplier for posts from future'),
 			'post_date_moremonth' => T_('weight multiplier for posts older month'),
@@ -174,14 +175,9 @@ $Form->end_fieldset();
 if( isset($GLOBALS['files_Module']) )
 {
 	load_funcs( 'files/model/_image.funcs.php' );
-	$params['force_keys_as_values'] = true;
-
-	$Form->begin_fieldset( T_('User directory').get_manual_link( 'user-directory-other' ) );
-			$Form->select_input_array( 'image_size_user_list', $edited_Blog->get_setting( 'image_size_user_list' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
-	$Form->end_fieldset();
 
 	$Form->begin_fieldset( T_('Messaging pages').get_manual_link( 'messaging-other' ) );
-			$Form->select_input_array( 'image_size_messaging', $edited_Blog->get_setting( 'image_size_messaging' ), get_available_thumb_sizes(), T_('Profile picture size'), '', $params );
+			$Form->select_input_array( 'image_size_messaging', $edited_Blog->get_setting( 'image_size_messaging' ), get_available_thumb_sizes(), T_('Profile picture size'), '', array( 'force_keys_as_values' => true ) );
 	$Form->end_fieldset();
 }
 

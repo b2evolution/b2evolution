@@ -164,8 +164,10 @@ $is_front = false;	// So far we have not detected that we are displaying the fro
 fp>there is no blog defined in _main and there should not be any
 blueyed> Sure, but that means we should either split it, or use the locale here only, if there's no-one given with higher priority.
 */
-if( $Blog->get_setting( 'locale_source' ) == 'blog' )
-{ // Activate matching locale:
+if( $Blog->get_setting( 'locale_source' ) == 'blog' ||
+    ( $Blog->get_setting( 'locale_source' ) == 'user' && ! $Blog->has_locale( $current_locale ) ) )
+{ // Activate main collection locale when this is defined in settings of current collection
+	// OR when current user/browser locale is not used for current collection:
 	$Debuglog->add( 'Activating blog locale: '.$Blog->get( 'locale' ), 'locale' );
 	locale_activate( $Blog->get( 'locale' ) );
 }
@@ -174,12 +176,12 @@ $coll_locale = param( 'coll_locale', 'string', NULL, true );
 if( $coll_locale !== NULL )
 {	// Overriding locale from REQUEST with extra collection locale:
 	$Debuglog->add( 'Overriding collection locale from REQUEST: '.$coll_locale, 'locale' );
-	if( in_array( $coll_locale, $Blog->get_locales() ) )
+	if( $Blog->has_locale( $coll_locale ) )
 	{	// If locale is selected for current collection:
 		locale_activate( $coll_locale );
 	}
 	else
-	{	// Wrong colleciton locale is requested:
+	{	// Wrong collection locale is requested:
 		$Messages->add( sprintf( T_('The requested language/locale %s is not allowed for this collection.'), '<code>'.$coll_locale.'</code>' ), 'error' );
 	}
 }
@@ -227,12 +229,14 @@ if( $resolve_extra_path )
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
 	// Check if we have one of these:
+	// - Always try to match slug
 	// - Either the ReqPath starts with collection base URI (always including trailing slash)
 	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
 	// ... followed by some extra path info.
-	if( preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
+	if( $Settings->get( 'always_match_slug' ) ||
+	    preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
 	{ // We have extra path info
-		$path_string = $matches[2];
+		$path_string = $Settings->get( 'always_match_slug' ) ? $ReqPath : $matches[2];
 
 		$Debuglog->add( 'Extra path info found! path_string=' . $path_string , 'params' );
 		// echo "path=[$path_string]<br />";
@@ -615,11 +619,6 @@ elseif( !empty($preview) )
 	// Consider this as an admin hit!
 	$Hit->hit_type = 'admin';
 }
-elseif( ( $disp == 'visits' ) && ( ( $Settings->get( 'enable_visit_tracking' ) != 1 ) || ! is_logged_in() ) )
-{ // Check if visit tracking is enabled and the user is logged in before allowing profile visit display
-	$disp = '403';
-	$disp_detail = '403-visit-tracking-disabled';
-}
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post
@@ -670,10 +669,10 @@ elseif( $disp == '-' )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
 		if( ! is_same_url( preg_replace( '#[\?&]coll_locale=([^&]+|$)#', '', $ReqURL ), $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
-		{	// We are not on the canonicial blog url:
+		{	// We are not on the canonical blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
-				header_redirect( $canonical_url, (empty( $display_containers ) && empty( $display_includes )) ? 301 : 303 );
+				header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) && empty( $_GET['debug'] ) ) ? 301 : 303 );
 			}
 			elseif( $Blog->get_setting( 'relcanonical_homepage' ) )
 			{	// Use link rel="canoncial":
@@ -944,7 +943,7 @@ $Timer->log_duration( '_BLOG_MAIN.inc' );
 skin_init_global_vars();
 
 
-// Check if current user has acces to this blog
+// Check if current user has access to this blog
 $Blog->check_access();
 
 

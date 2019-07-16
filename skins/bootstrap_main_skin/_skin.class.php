@@ -21,7 +21,7 @@ class bootstrap_main_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.0.1';
+	var $version = '7.0.2';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -204,38 +204,32 @@ class bootstrap_main_Skin extends Skin
 					),
 					'front_bg_cont_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => 'rgba(0,0,0,0.1)',
 						'type' => 'color',
 						'transparency' => true,
 					),
 					'pict_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
 					'front_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'front_link_color' => array(
 						'label' => T_('Link color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'pict_muted_color' => array(
 						'label' => T_('Muted text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
 					'front_icon_color' => array(
 						'label' => T_('Inverse icon color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#CCCCCC',
 						'type' => 'color',
 					),
@@ -248,14 +242,12 @@ class bootstrap_main_Skin extends Skin
 				),
 					'secondary_bg_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 						'transparency' => true,
 					),
 					'secondary_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
@@ -268,19 +260,16 @@ class bootstrap_main_Skin extends Skin
 				),
 					'bgimg_text_color' => array(
 						'label' => T_('Text color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
 					'bgimg_link_color' => array(
 						'label' => T_('Link color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#6cb2ef',
 						'type' => 'color',
 					),
 					'bgimg_hover_link_color' => array(
 						'label' => T_('Hover link color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#6cb2ef',
 						'type' => 'color',
 					),

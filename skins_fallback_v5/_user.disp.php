@@ -338,7 +338,7 @@ echo '<div class="profile_column_right">';
 					'after_image_legend'  => NULL,
 					'image_size'          => 'crop-top-80x80',
 					'image_link_to'       => 'original',
-					'image_link_title'    => $User->login,
+					'image_link_title'    => $User->get_username(),
 					'image_link_rel'      => 'lightbox[user]'
 				) );
 			}

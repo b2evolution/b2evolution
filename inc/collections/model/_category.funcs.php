@@ -280,6 +280,11 @@ function postcats_get_byID( $post_ID )
 {
 	global $DB, $cache_postcats;
 
+	if( empty( $post_ID ) )
+	{
+		return array();
+	}
+
 	if( ! is_array( $cache_postcats ) )
 	{	// Initialize cache array first time:
 		$cache_postcats = array();

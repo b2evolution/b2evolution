@@ -154,7 +154,13 @@ siteskin_include( '_site_body_header.inc.php' );
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
-					'display_edit_links'=> false,
+					'display_edit_links'  => ( $disp == 'edit' ),
+					'edit_links_template' => array(
+						'before'              => '<span class="pull-right">',
+						'after'               => '</span>',
+						'advanced_link_class' => 'btn btn-info btn-sm',
+						'close_link_class'    => 'btn btn-default btn-sm',
+					),
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>

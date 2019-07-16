@@ -213,6 +213,12 @@ class LinkItem extends LinkOwner
 		$edited_Link->set( $this->get_ID_field_name(), $this->get_ID() );
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
+		if( $order <= $this->get_last_order() )
+		{	// Don't allow order which may be already used:
+			$order = $this->get_last_order() + 1;
+			// Update last order for next adding:
+			$this->last_order = $order;
+		}
 		$edited_Link->set( 'order', $order );
 
 		if( ( $localtimenow - strtotime( $this->Item->last_touched_ts ) ) > 90 )

@@ -29,9 +29,9 @@ class ItemType extends DataObject
 	var $template_name;
 	var $schema = '';
 	var $add_aggregate_rating = 1;
-	var $front_instruction = 0;
 	var $back_instruction = 0;
 	var $instruction = '';
+	var $text_template;
 	var $use_short_title = 'never';
 	var $use_title = 'required';
 	var $use_url = 'optional';
@@ -65,6 +65,15 @@ class ItemType extends DataObject
 	var $can_be_purchased_online = 0;
 	var $short_title_maxlen = 30;
 	var $title_maxlen = 100;
+	var $front_order_title       = 10;
+	var $front_order_short_title = NULL;
+	var $front_order_instruction = NULL;
+	var $front_order_attachments = 30;
+	var $front_order_text        = 80;
+	var $front_order_tags        = NULL;
+	var $front_order_excerpt     = NULL;
+	var $front_order_url         = NULL;
+	var $front_order_location    = NULL;
 
 	/**
 	 * Custom fields
@@ -106,9 +115,9 @@ class ItemType extends DataObject
 			$this->template_name = $db_row->ityp_template_name;
 			$this->schema = isset( $db_row->ityp_schema ) ? $db_row->ityp_schema : $this->schema;
 			$this->add_aggregate_rating = isset( $db_row->ityp_add_aggregate_rating ) ? $db_row->ityp_add_aggregate_rating : $this->add_aggregate_rating;
-			$this->front_instruction = $db_row->ityp_front_instruction;
 			$this->back_instruction = $db_row->ityp_back_instruction;
 			$this->instruction = $db_row->ityp_instruction;
+			$this->text_template = isset( $db_row->ityp_text_template ) ? $db_row->ityp_text_template : $this->text_template;
 			$this->use_short_title = isset( $db_row->ityp_use_short_title ) ? $db_row->ityp_use_short_title : $this->use_short_title;
 			$this->use_title = $db_row->ityp_use_title;
 			$this->use_url = $db_row->ityp_use_url;
@@ -142,6 +151,15 @@ class ItemType extends DataObject
 			$this->can_be_purchased_online = isset( $db_row->ityp_can_be_purchased_online ) ? $db_row->ityp_can_be_purchased_online : $this->can_be_purchased_online;
 			$this->short_title_maxlen = isset( $db_row->ityp_short_title_maxlen ) ? $db_row->ityp_short_title_maxlen : $this->short_title_maxlen;
 			$this->title_maxlen = isset( $db_row->ityp_title_maxlen ) ? $db_row->ityp_title_maxlen : $this->title_maxlen;
+			$this->front_order_title = isset( $db_row->ityp_front_order_title ) ? $db_row->ityp_front_order_title : NULL;
+			$this->front_order_short_title = isset( $db_row->ityp_front_order_short_title ) ? $db_row->ityp_front_order_short_title : NULL;
+			$this->front_order_instruction = isset( $db_row->ityp_front_order_instruction ) ? $db_row->ityp_front_order_instruction : NULL;
+			$this->front_order_attachments = isset( $db_row->ityp_front_order_attachments ) ? $db_row->ityp_front_order_attachments : NULL;
+			$this->front_order_text = isset( $db_row->ityp_front_order_text ) ? $db_row->ityp_front_order_text : NULL;
+			$this->front_order_tags = isset( $db_row->ityp_front_order_tags ) ? $db_row->ityp_front_order_tags : NULL;
+			$this->front_order_excerpt = isset( $db_row->ityp_front_order_excerpt ) ? $db_row->ityp_front_order_excerpt : NULL;
+			$this->front_order_url = isset( $db_row->ityp_front_order_url ) ? $db_row->ityp_front_order_url : NULL;
+			$this->front_order_location = isset( $db_row->ityp_front_order_location ) ? $db_row->ityp_front_order_location : NULL;
 		}
 	}
 
@@ -220,20 +238,23 @@ class ItemType extends DataObject
 		param( 'ityp_skin_btn_text', 'string' );
 		$this->set_from_Request( 'skin_btn_text' );
 
-		// Show instruction in front-office
-		param( 'ityp_front_instruction', 'integer' );
-		$this->set_from_Request( 'front_instruction' );
-
 		// Show instruction in back-office
 		param( 'ityp_back_instruction', 'integer' );
 		$this->set_from_Request( 'back_instruction' );
 
-		// Post instruction
-		if( param( 'ityp_instruction', 'html', NULL ) !== NULL )
-		{
-			param_check_html( 'ityp_instruction', T_('Invalid instruction format.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'posting' );
-			$this->set_from_Request( 'instruction', NULL, true );
-		}
+		// Instructions:
+		param( 'ityp_instruction', 'html', NULL );
+		param_check_html( 'ityp_instruction', T_('Invalid instruction format.').' '.sprintf( T_('You can loosen this restriction in the <a %s>Group settings</a>.'), 'href='.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->grp_ID ), '#', 'posting' );
+		$this->set_from_Request( 'instruction', NULL, true );
+
+		// Front-Office Order (Instructions)
+		param( 'ityp_front_order_instruction', 'integer', NULL );
+		$this->set_from_Request( 'front_order_instruction' );
+
+		// Template:
+		param( 'ityp_text_template', 'html', NULL );
+		param_check_html( 'ityp_text_template', T_('Invalid template.') );
+		$this->set_from_Request( 'text_template', NULL, true );
 
 		// Use short title
 		param( 'ityp_use_short_title', 'string' );
@@ -243,6 +264,10 @@ class ItemType extends DataObject
 		param( 'ityp_short_title_maxlen', 'integer' );
 		$this->set_from_Request( 'short_title_maxlen' );
 
+		// Front-Office Order (Short title)
+		param( 'ityp_front_order_short_title', 'integer', NULL );
+		$this->set_from_Request( 'front_order_short_title' );
+
 		// Use title
 		param( 'ityp_use_title', 'string' );
 		$this->set_from_Request( 'use_title' );
@@ -251,9 +276,17 @@ class ItemType extends DataObject
 		param( 'ityp_title_maxlen', 'integer' );
 		$this->set_from_Request( 'title_maxlen' );
 
+		// Front-Office Order (Title)
+		param( 'ityp_front_order_title', 'integer', NULL );
+		$this->set_from_Request( 'front_order_title' );
+
 		// Use URL
 		param( 'ityp_use_url', 'string' );
 		$this->set_from_Request( 'use_url' );
+
+		// Front-Office Order (URL)
+		param( 'ityp_front_order_url', 'integer', NULL );
+		$this->set_from_Request( 'front_order_url' );
 
 		// Treat as Podcast Media
 		param( 'ityp_podcast', 'integer', 0 );
@@ -267,6 +300,10 @@ class ItemType extends DataObject
 		param( 'ityp_use_text', 'string' );
 		$this->set_from_Request( 'use_text' );
 
+		// Front-Office Order (Text)
+		param( 'ityp_front_order_text', 'integer', NULL );
+		$this->set_from_Request( 'front_order_text' );
+
 		// Allow HTML
 		param( 'ityp_allow_html', 'integer', 0 );
 		$this->set_from_Request( 'allow_html' );
@@ -279,9 +316,17 @@ class ItemType extends DataObject
 		param( 'ityp_allow_attachments', 'integer', 0 );
 		$this->set_from_Request( 'allow_attachments' );
 
+		// Front-Office Order (Attachments)
+		param( 'ityp_front_order_attachments', 'integer', NULL );
+		$this->set_from_Request( 'front_order_attachments' );
+
 		// Use excerpt
 		param( 'ityp_use_excerpt', 'string' );
 		$this->set_from_Request( 'use_excerpt' );
+
+		// Front-Office Order (Excerpt)
+		param( 'ityp_front_order_excerpt', 'integer', NULL );
+		$this->set_from_Request( 'front_order_excerpt' );
 
 		// Use title tag
 		param( 'ityp_use_title_tag', 'string' );
@@ -298,6 +343,10 @@ class ItemType extends DataObject
 		// Use tags
 		param( 'ityp_use_tags', 'string' );
 		$this->set_from_Request( 'use_tags' );
+
+		// Front-Office Order (Tags)
+		param( 'ityp_front_order_tags', 'integer', NULL );
+		$this->set_from_Request( 'front_order_tags' );
 
 		// Allow featured
 		param( 'ityp_allow_featured', 'integer', 0 );
@@ -328,6 +377,10 @@ class ItemType extends DataObject
 		// Use coordinates
 		param( 'ityp_use_coordinates', 'string' );
 		$this->set_from_Request( 'use_coordinates' );
+
+		// Front-Office Order (Location:Country/Region/Sub-region/City)
+		param( 'ityp_front_order_location', 'integer', NULL );
+		$this->set_from_Request( 'front_order_location' );
 
 		// Use comments
 		param( 'ityp_use_comments', 'integer', 0 );
@@ -406,6 +459,8 @@ class ItemType extends DataObject
 			'type'            => 'string',
 			'order'           => 'integer',
 			'note'            => 'string',
+			'required'        => array( 'integer', 0 ),
+			'meta'            => array( 'integer', 0 ),
 			'public'          => array( 'integer', 0 ),
 			'format'          => 'string',
 			'formula'         => 'string',
@@ -616,6 +671,8 @@ class ItemType extends DataObject
 						.$DB->quote( $custom_field['type'] ).', '
 						.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).', '
 						.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).', '
+						.$DB->quote( $custom_field['required'] ).', '
+						.$DB->quote( $custom_field['meta'] ).', '
 						.$DB->quote( $custom_field['public'] ).', '
 						.$DB->quote( $custom_field['format'] ).', '
 						.$DB->quote( $custom_field['formula'] ).', '
@@ -630,7 +687,7 @@ class ItemType extends DataObject
 						.( empty( $custom_field['description'] ) ? 'NULL' : $DB->quote( $custom_field['description'] ) ).', '
 						.$DB->quote( $custom_field['merge'] ).' )';
 			}
-			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_schema_prop, itcf_type, itcf_order, itcf_note, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description, itcf_merge )
+			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_schema_prop, itcf_type, itcf_order, itcf_note, itcf_required, itcf_meta, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description, itcf_merge )
 					VALUES '.implode( ', ', $sql_data ) );
 		}
 
@@ -647,6 +704,8 @@ class ItemType extends DataObject
 						itcf_schema_prop = '.$DB->quote( $custom_field['schema_prop'] ).',
 						itcf_order = '.( empty( $custom_field['order'] ) ? 'NULL' : $DB->quote( $custom_field['order'] ) ).',
 						itcf_note = '.( empty( $custom_field['note'] ) ? 'NULL' : $DB->quote( $custom_field['note'] ) ).',
+						itcf_required = '.$DB->quote( $custom_field['required'] ).',
+						itcf_meta = '.$DB->quote( $custom_field['meta'] ).',
 						itcf_public = '.$DB->quote( $custom_field['public'] ).',
 						itcf_format = '.$DB->quote( $custom_field['format'] ).',
 						itcf_formula = '.$DB->quote( $custom_field['formula'] ).',
@@ -733,7 +792,7 @@ class ItemType extends DataObject
 				global $DB;
 				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
 				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop as schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
-				$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+				$SQL->SELECT_add( 'itcf_required AS required, itcf_meta AS meta, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
 				$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
 				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
 				$SQL->FROM( 'T_items__type_custom_field' );
@@ -876,7 +935,7 @@ class ItemType extends DataObject
 		if( ! isset( $this->enabled_colls ) )
 		{	// Load into cache where this Item Type is enabled for all collections:
 			global $DB;
-			$SQL = new SQL( 'Load all colections IDs where Item Type #'.$this->ID.' is enabled' );
+			$SQL = new SQL( 'Load all collections IDs where Item Type #'.$this->ID.' is enabled' );
 			$SQL->SELECT( 'itc_coll_ID' );
 			$SQL->FROM( 'T_items__type_coll' );
 			$SQL->WHERE( 'itc_ityp_ID = '.$this->ID );

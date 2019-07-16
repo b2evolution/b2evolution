@@ -372,7 +372,7 @@ class ItemLight extends DataObject
 						$blog_ID = $blog;
 					}
 				}
-				if( $blog_ID !== NULL && $blog_ID != $this->get_blog_ID() )
+				if( $blog_ID !== NULL && $blogurl != $this->Blog->gen_blogurl() )
 				{	// If requested collection is not collection of main category:
 					if( ! empty( $this->current_extra_cat_ID ) )
 					{	// Use first detected extra category:
@@ -1553,6 +1553,16 @@ class ItemLight extends DataObject
 				}
 				return $title;
 
+			case 'extra_cat_IDs':
+				if( isset( $this->extra_cat_IDs ) && is_array( $this->extra_cat_IDs ) )
+				{	// Get currently updating extra categories IDs:
+					return $this->extra_cat_IDs;
+				}
+				else
+				{	// Load chapters from DB:
+					return postcats_get_byID( $this->ID );
+				}
+
 			default:
 				return parent::get( $parname );
 		}
@@ -1658,6 +1668,24 @@ class ItemLight extends DataObject
 			$BlogCache = & get_BlogCache();
 			$this->Blog = & $BlogCache->get_by_ID( $this->get_blog_ID() );
 		}
+	}
+
+
+	/**
+	 * Get setting of Item's collection
+	 *
+	 * @param string setting name
+	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
+	 */
+	function get_coll_setting( $parname )
+	{
+		if( $item_Blog = & $this->get_Blog() )
+		{	// Return setting value of this Item's collection 
+			return $item_Blog->get_setting( $parname );
+		}
+
+		// Error case when Item has no collection:
+		return false;
 	}
 
 

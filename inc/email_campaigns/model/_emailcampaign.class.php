@@ -315,12 +315,30 @@ class EmailCampaign extends DataObject
 	{
 		switch( $parname )
 		{
+			case 'html_template_preview':
 			case 'plaintext_template_preview':
 				global $current_User;
-				$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $this->get( 'email_plaintext' ), 'include_greeting' => false, 'add_email_tracking' => false, 'template_mode' => 'preview' ), $current_User );
-				$text_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $text_mail_template );
-				$text_mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $text_mail_template );
-				return nl2br( $text_mail_template );
+				$mail_template = mail_template( 'newsletter',
+					( $parname == 'html_template_preview' ? 'html' : 'text' ),
+					array(
+						'message_html'       => $this->get( $parname == 'html_template_preview' ? 'email_html' : 'email_plaintext' ),
+						'include_greeting'   => false,
+						'add_email_tracking' => false,
+						'template_mode'      => 'preview',
+						'is_welcome_email'   => false,
+						'ecmp_ID'            => $this->ID,
+						'enlt_ID'            => $this->get( 'enlt_ID' ),
+					), $current_User );
+				$mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $mail_template );
+				$mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $mail_template );
+				if( $parname == 'html_template_preview' )
+				{	// Clear all html tags that may break styles of main html page:
+					return preg_replace( '#</?(html|head|meta|body)[^>]*>#i', '', $mail_template );
+				}
+				else
+				{	// Convert newline to html <br>:
+					return nl2br( $mail_template );
+				}
 
 			default:
 				return parent::get( $parname );
@@ -1139,6 +1157,12 @@ class EmailCampaign extends DataObject
 		// Get chunk size to limit a sending at a time:
 		$email_campaign_chunk_size = intval( $Settings->get( 'email_campaign_chunk_size' ) );
 
+		// Get max emails to same domain to limit a sending at a time:
+		$email_campaign_max_domain = intval( $Settings->get( 'email_campaign_max_domain' ) );
+
+		// Store here number of sent emails per domain:
+		$email_domains_number = array();
+
 		$email_success_count = 0;
 		$email_skip_count = 0;
 		$email_error_count = 0;
@@ -1153,6 +1177,34 @@ class EmailCampaign extends DataObject
 			if( ! ( $User = & $UserCache->get_by_ID( $user_ID, false, false ) ) )
 			{	// Skip wrong recipient user:
 				continue;
+			}
+
+			if( $email_campaign_max_domain > 0 )
+			{	// Limit a sending by max emails to same domain:
+				$email_domain = $User->get_email_domain();
+
+				// Increase number of sent email per domain:
+				if( ! isset( $email_domains_number[ $email_domain ] ) )
+				{
+					$email_domains_number[ $email_domain ] = 0;
+				}
+
+				if( $email_domains_number[ $email_domain ] >= $email_campaign_max_domain )
+				{	// Skip sending because max emails to same domain is reached:
+					$error_msg = sprintf( T_('Email sending was skipped to user %s because max emails to same domain %s is reached.'), $User->get_identity_link(), '<code>'.$email_domain.'</code>' );
+					if( $display_messages === 'cron_job' )
+					{
+						cron_log_action_end( $error_msg, 'warning' );
+					}
+					else
+					{
+						echo '<span class="orange">'.$error_msg.'</span><br />';
+					}
+					$email_skip_count++;
+					continue;
+				}
+
+				$email_domains_number[ $email_domain ]++;
 			}
 
 			// Send email to user:
@@ -1306,10 +1358,14 @@ class EmailCampaign extends DataObject
 		{	// Update user send status for this email campaign:
 			if( $status == 'sent' )
 			{
-				list( $previous_status, $last_sent_ts ) = $DB->get_row( 'SELECT csnd_status, csnd_last_sent_ts FROM T_email__campaign_send WHERE csnd_camp_ID = '.$this->ID.' AND csnd_user_ID = '.$DB->quote( $user_ID ), ARRAY_N );
-				if( empty( $last_sent_ts ) && $previous_status != 'sent' )
-				{ // First time to send the email to this user
-					$update_send_count = true;
+				$r = $DB->get_row( 'SELECT csnd_status, csnd_last_sent_ts FROM T_email__campaign_send WHERE csnd_camp_ID = '.$this->ID.' AND csnd_user_ID = '.$DB->quote( $user_ID ), ARRAY_N );
+				if( ! empty( $r ) )
+				{
+					list( $previous_status, $last_sent_ts ) = $r;
+					if( empty( $last_sent_ts ) && $previous_status != 'sent' )
+					{ // First time to send the email to this user
+						$update_send_count = true;
+					}
 				}
 			}
 

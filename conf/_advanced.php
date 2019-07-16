@@ -921,6 +921,13 @@ $check_browser_version = false;
 $max_skin_api_version = 7;
 
 
+/**
+ * Header "Access-Control-Allow-Origin"
+ * Used to enable using of evo helpdesk widget from other sites
+ */
+$access_control_allow_origin = false; // set to '*' or to specific URL to enable CORS requests
+
+
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_protocol = 'http';
 $evonetsrv_host = 'rpc.b2evo.net';

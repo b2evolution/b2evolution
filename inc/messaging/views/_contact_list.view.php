@@ -277,7 +277,7 @@ if( in_array( 'login', $show_columns ) )
 				}
 				return $login_text;
 			}
-			return $User->login;
+			return $User->get_username();
 		}
 		return '';
 	}

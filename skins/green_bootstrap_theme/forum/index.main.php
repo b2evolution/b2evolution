@@ -168,7 +168,6 @@ siteskin_include( '_site_body_header.inc.php' );
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
 					'format'            => 'htmlbody',
-					'display_edit_links'=> false,
 					'category_text'     => '',
 					'categories_text'   => '',
 					'catdir_text'       => '',
@@ -186,6 +185,13 @@ siteskin_include( '_site_body_header.inc.php' );
 					'msgform_text'      => '',
 					'user_text'         => '',
 					'users_text'        => '',
+					'display_edit_links'  => ( $disp == 'edit' ),
+					'edit_links_template' => array(
+						'before'              => '<span class="pull-right">',
+						'after'               => '</span>',
+						'advanced_link_class' => 'btn btn-info btn-sm',
+						'close_link_class'    => 'btn btn-default btn-sm',
+					),
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 		?>
@@ -292,7 +298,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	if( $Skin->is_visible_sidebar() )
 	{ // Display sidebar:
 	?>
-	<aside class="col-md-3<?php echo ( $Skin->get_setting_layout() == 'left_sidebar' ? ' pull-left' : '' ); ?>">
+	<aside class="col-md-3<?php echo ( $Skin->get_setting_layout() == 'left_sidebar' ? ' pull-left-md' : '' ); ?>">
 		<!-- =================================== START OF SIDEBAR =================================== -->
 		<?php
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------

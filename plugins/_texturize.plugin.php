@@ -17,7 +17,7 @@ class texturize_plugin extends Plugin
 	var $code = 'b2WPTxrz';
 	var $name = 'Texturize';
 	var $priority = 90;
-	var $version = '7.0.1';
+	var $version = '7.0.2';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -155,7 +155,7 @@ It will also perform the following replacements:
 
 				$curl = preg_replace('/(d+)x(\d+)/', "$1&#215;$2", $curl);
 
-			} elseif (strstr($curl, '<code') || strstr($curl, '<pre') || strstr($curl, '<kbd' || strstr($curl, '<style') || strstr($curl, '<script'))) {
+			} elseif( strstr( $curl, '<code' ) || strstr( $curl, '<pre' ) || strstr( $curl, '<kbd' ) || strstr( $curl, '<style' ) || strstr( $curl, '<script' ) ) {
 				// strstr is fast
 				$next = false;
 			} else {

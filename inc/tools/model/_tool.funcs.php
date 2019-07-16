@@ -439,6 +439,9 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'user_ID'              => $User->ID,
 									'ismember'             => 1,
 									'can_be_assignee'      => 0,
+									'workflow_status'      => 0,
+									'workflow_user'        => 0,
+									'workflow_priority'    => 0,
 									'perm_item_propose'    => 0,
 									'perm_poststatuses'    => '""',
 									'perm_item_type'       => '"standard"',
@@ -467,6 +470,9 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'user_ID'              => $User->ID,
 									'ismember'             => 1,
 									'can_be_assignee'      => 1,
+									'workflow_status'      => 1,
+									'workflow_user'        => 1,
+									'workflow_priority'    => 1,
 									'perm_item_propose'    => 1,
 									'perm_poststatuses'    => '"published,community,protected,review,private,draft,deprecated"',
 									'perm_item_type'       => '"restricted"',
@@ -495,6 +501,9 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 									'user_ID'              => $User->ID,
 									'ismember'             => 1,
 									'can_be_assignee'      => 1,
+									'workflow_status'      => 1,
+									'workflow_user'        => 1,
+									'workflow_priority'    => 1,
 									'perm_item_propose'    => 1,
 									'perm_poststatuses'    => '"published,community,protected,review,private,draft,deprecated,redirected"',
 									'perm_item_type'       => '"admin"',
@@ -519,7 +528,8 @@ function tool_create_sample_users( $user_groups, $num_users, $advanced_user_perm
 				}
 				if( ! empty( $adv_perm_coll_insert_values ) )
 				{	// Insert advanced user perms for new created user in single query for all collections with advanced perms:
-					$DB->query( 'INSERT INTO T_coll_user_perms ( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember, bloguser_can_be_assignee,
+					$DB->query( 'INSERT INTO T_coll_user_perms ( bloguser_blog_ID, bloguser_user_ID, bloguser_ismember,
+							bloguser_can_be_assignee, bloguser_workflow_status, bloguser_workflow_user, bloguser_workflow_priority,
 							bloguser_perm_item_propose, bloguser_perm_poststatuses, bloguser_perm_item_type, bloguser_perm_edit, bloguser_perm_delpost, bloguser_perm_edit_ts,
 							bloguser_perm_delcmts, bloguser_perm_recycle_owncmts, bloguser_perm_vote_spam_cmts, bloguser_perm_cmtstatuses,
 							bloguser_perm_edit_cmt, bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin, bloguser_perm_media_upload,
@@ -797,17 +807,21 @@ function tool_create_sample_campaigns( $num_campaigns, $campaign_lists, $send_ca
 	$temp_email_send_simulate_only = $email_send_simulate_only;
 	$email_send_simulate_only = true;
 
-	// Temporarily increase email campaign chunk size
+	// Temporarily increase email campaign limit settings:
 	$temp_email_campaign_chunk_size = $Settings->get( 'email_campaign_chunk_size' );
 	$Settings->set( 'email_campaign_chunk_size', 10000 );
+	$temp_email_campaign_max_domain = $Settings->get( 'email_campaign_max_domain' );
+	$Settings->set( 'email_campaign_max_domain', 10000 );
 	$Settings->dbupdate();
 
 	for( $i = 1; $i <= $num_campaigns; $i++ )
 	{
+		$rand_list_ID = $campaign_lists[rand( 0, $campaign_lists_max_index )];
 		$EmailCampaign = new EmailCampaign();
-		$EmailCampaign->set( 'enlt_ID', $campaign_lists[rand( 0, $campaign_lists_max_index )] );
+		$EmailCampaign->set( 'enlt_ID', $rand_list_ID );
 		$EmailCampaign->set( 'name', T_('Markdown Example').' '.$i );
 		$EmailCampaign->set( 'email_defaultdest', $baseurl );
+		$EmailCampaign->set( 'email_title', T_('Markdown Example').' '.$i );
 		$EmailCampaign->set( 'email_text', T_('Heading
 =======
 
@@ -864,16 +878,22 @@ T_('Button examples:
 				if( $send_campaign_emails )
 				{
 					$EmailCampaign->send_all_emails( false, $loop_user_IDs );
-					// Randomly set values
+					// Randomly set clicked values
 					$DB->query( 'UPDATE T_email__campaign_send
 							SET
 								csnd_clicked_unsubscribe = IF( RAND() > 0.95, 1, 0 ),
-								csnd_last_open_ts = IF( RAND() > 0.7, NOW(), NULL ),
-								csnd_last_click_ts = IF( RAND() > 0.7, NOW(), NULL ),
 								csnd_like = IF( RAND() > 0.75, 1, IF( RAND() > 0.8, -1, 0 ) ),
 								csnd_cta1 = IF( RAND() > 0.85, 1, 0 ),
 								csnd_cta2 = IF( RAND() > 0.85, 1, 0 ),
 								csnd_cta3 = IF( RAND() > 0.85, 1, 0 )
+							WHERE
+								csnd_camp_ID = '.$EmailCampaign->ID );
+
+					// Update timestamps based on randomly generated click values above:
+					$DB->query( 'UPDATE T_email__campaign_send
+							SET
+								csnd_last_open_ts = IF( ABS(csnd_like) + csnd_cta1 + csnd_cta2 + csnd_cta3 + csnd_clicked_unsubscribe > 0, NOW(), IF( RAND() > 0.7, NOW(), NULL ) ),
+								csnd_last_click_ts = IF( ABS(csnd_like) + csnd_cta1 + csnd_cta2 + csnd_cta3 > 0, NOW(), NULL )
 							WHERE
 								csnd_camp_ID = '.$EmailCampaign->ID );
 
@@ -917,7 +937,7 @@ T_('Button examples:
 					SUM( IF( csnd_last_open_ts IS NULL, 0, 1 ) ) AS img_loads,
 					SUM( IF( csnd_last_click_ts IS NULL, 0, 1 ) ) AS link_clicks,
 					SUM( IF( csnd_last_open_ts IS NOT NULL OR csnd_last_click_ts IS NOT NULL OR
-						csnd_like IS NOT NULL OR csnd_cta1 IS NOT NULL OR csnd_cta2 IS NOT NULL OR csnd_cta3 IS NOT NULL, 1, 0 ) ) AS open_count
+						csnd_like <> 0 OR csnd_cta1 > 0 OR csnd_cta2 > 0 OR csnd_cta3 > 0, 1, 0 ) ) AS open_count
 				FROM T_email__campaign_send
 				WHERE csnd_emlog_ID IS NOT NULL
 				GROUP BY csnd_camp_ID
@@ -937,8 +957,9 @@ T_('Button examples:
 	// Restore simulate email sending setting
 	$email_send_simulate_only = $temp_email_send_simulate_only;
 
-	// Restore emaili campaign chunk size
+	// Restore email campaign chunk size
 	$Settings->set( 'email_campaign_chunk_size', $temp_email_campaign_chunk_size );
+	$Settings->set( 'email_campaign_max_domain', $temp_email_campaign_max_domain );
 	$Settings->dbupdate();
 
 	$DB->commit();

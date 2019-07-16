@@ -281,6 +281,9 @@ class ParsedownB2evo extends ParsedownExtra
 		$Block['element']['before'] = '<!-- codeblock '.$element_attrs.' -->';
 		$Block['element']['after'] = '<!-- /codeblock -->'."\n";
 
+		// Use special handler instead of parent::escape() to avoid htmlspecialchars():
+		$Block['element']['text']['handler'] = 'noescapeCodeHandler';
+
 		return $Block;
 		// Don't call parent function because it encodes HMTL entities,
 		// but we don't need this in b2evolution, because we have plugin "escape_code" for such purpose.
@@ -302,30 +305,38 @@ class ParsedownB2evo extends ParsedownExtra
 
 	/**
 	 * Inline code preparing
-	 * NOTE: We rewrite this function completely and don't use of parent
-	 *       because we don't want "htmlspecialchars()" and we need class "codespan"
+	 * NOTE: We don't want "htmlspecialchars()" because we apply for all content by default in b2evo core
+	 *       Also we need default class "codespan" for all <code> tags
 	 *
 	 * @param array Excerpt
-	 * @return array Excerpt
+	 * @return array Element data
 	 */
 	protected function inlineCode( $Excerpt )
 	{
-		$marker = $Excerpt['text'][0];
+		// Use parent function and add two params below:
+		$element_data = parent::inlineCode( $Excerpt );
 
-		if( preg_match( '/^('.$marker.'+)[ ]*(.+?)[ ]*(?<!'.$marker.')\1(?!'.$marker.')/s', $Excerpt['text'], $matches ) )
-		{
-			$text = $matches[2];
-			$text = preg_replace( '/[ ]*\n/', ' ', $text );
-
-			return array(
-					'extent'  => strlen( $matches[0] ),
-					'element' => array(
-						'name'       => 'code',
-						'text'       => $text,
-						'attributes' => array( 'class' => 'codespan' )
-					),
-				);
+		if( isset( $element_data['element'] ) )
+		{	// Use special handler instead of parent::escape() to avoid htmlspecialchars():
+			$element_data['element']['handler'] = 'noescapeCodeHandler';
+			// Add default class for all <code> tags:
+			$element_data['element']['attributes'] = array( 'class' => 'codespan' );
 		}
+
+		return $element_data;
+	}
+
+
+	/**
+	 * Special handler for inline and block tags <code> to avoid default htmlspecialchars() from parent::escape()
+	 *
+	 * @param string Text
+	 * @param array
+	 * @return string
+	 */
+	function noescapeCodeHandler( $text, $nonNestables )
+	{
+		return $text;
 	}
 
 

@@ -344,6 +344,28 @@ class Module
 			die('<h1>Insufficient Requirements</h1><p>'.$error_message.'</p>');
 		}
 	}
+
+
+	/**
+	 * Additional actions with searched results
+	 *
+	 * @param array Search data:
+	 *              - 'keywords' - Requested keywords to search
+	 *              - 'results'  - Searched results, @see perform_scored_search()
+	 */
+	function handle_searched_results( $search_data )
+	{
+	}
+
+
+	/**
+	 * Prepare the display params of search result object by modules
+	 *
+	 * @param array Parameters of the displayed search result object (param is updated by reference)
+	 */
+	function prepare_search_result_display_params( & $params )
+	{
+	}
 }
 
 ?>

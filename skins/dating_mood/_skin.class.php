@@ -21,7 +21,7 @@ class dating_mood_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.0.1';
+	var $version = '7.0.2';
 
 	/**
 	 * Get default name for the skin.
@@ -108,7 +108,6 @@ class dating_mood_Skin extends Skin
 		$r = array_merge( array(
 				'body_bg_color' => array(
 					'label' => T_('Background Color'),
-					'note' => T_('E-g: #000000 for black'),
 					'defaultvalue' => '#000',
 					'type' => 'color',
 				),

@@ -87,9 +87,6 @@ div.extended_search_form .search_options .search_option {
   display: inline-block;
   margin-right: 10px;
 }
-label.control-label[for=post_title] {
-  width: auto;
-}
 textarea.message_text {
   width: 95%;
 }
@@ -288,11 +285,21 @@ body.evo_toolbar_visible div#skin_wrapper .evo_container__site_header {
   font-size: inherit;
   margin-right: 5px;
 }
+.posts_list h3 + .btn {
+  margin: -10px 0 0 30px;
+}
+.posts_list h3 .evo_post_read_status {
+  text-decoration: none;
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 85%;
+  margin-top: -10px;
+}
 .posts_list li > .btn-group,
 .posts_list .evo_container__item_in_list .widget_core_item_title > .btn-group,
 .posts_list li > .evo_status,
 .posts_list .evo_container__item_in_list .widget_core_item_title > .evo_status {
-  margin: 0 0 6px 30px;
+  margin: -6px 0 0 30px;
 }
 ol.breadcrumb {
   margin-left: 0;

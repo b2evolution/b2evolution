@@ -559,8 +559,8 @@ class Results extends Table
 		if( $append_order_by && ($orders = $this->get_order_field_list()) )
 		{	// We have orders to append
 
-			if( strpos( $sql, 'ORDER BY') === false )
-			{ // there is no ORDER BY clause in the original SQL query
+			if( ! preg_match( '# \s ORDER \s+ BY \s+ [^\)]+$#xi', $sql ) )
+			{ // there is no ORDER BY clause in the original SQL query at the end(excluding order clause in sub queries)
 				$sql .= ' ORDER BY '.$orders.' ';
 			}
 			else
@@ -987,8 +987,10 @@ class Results extends Table
 			$this->display_filters();
 		}
 
-		// Flush in order to show the filters before slow SQL query will be executed below
-		evo_flush();
+		if( ! isset( $this->params['disable_evo_flush'] ) || ! $this->params['disable_evo_flush'] )
+		{	// Flush in order to show the filters before slow SQL query will be executed below
+			evo_flush();
+		}
 
 		// Initialize the order param
 		$this->init_order_param();

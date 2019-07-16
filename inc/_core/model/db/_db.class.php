@@ -362,9 +362,9 @@ class DB
 
 		if( ! extension_loaded( 'mysqli' ) )
 		{ // The mysql extension is not loaded, try to dynamically load it:
+			$mysql_ext_file = is_windows() ? 'php_mysqli.dll' : 'mysqli.so';
 			if( function_exists( 'dl' ) )
 			{
-				$mysql_ext_file = is_windows() ? 'php_mysqli.dll' : 'mysqli.so';
 				if( version_compare( PHP_VERSION, '7.2', '>=' ) )
 				{
 					error_clear_last();
@@ -398,9 +398,11 @@ class DB
 			if( ! extension_loaded( 'mysqli' ) )
 			{ // Still not loaded:
 				$this->print_error( 'The PHP MySQL Improved module could not be loaded.', '
+					<div class="alert alert-danger">
 					<p><strong>Error:</strong> '.$error_msg.'</p>
 					<p>You probably have to edit your php configuration (php.ini) and enable this module ('.$mysql_ext_file.').</p>
-					<p>Do not forget to restart your webserver (if necessary) after editing the PHP conf.</p>', false );
+					<p>Do not forget to restart your webserver (if necessary) after editing the PHP conf.</p>
+					</div>', false );
 				return;
 			}
 		}
@@ -449,11 +451,15 @@ class DB
 		{
 			$this->print_error( 'Error establishing a database connection!',
 				( $mysql_error ? '<p>('.$mysql_error.')</p>' : '' ).'
+				<div class="alert alert-danger">
+				We could not connect to the database. Please check the following:
 				<ol>
 					<li>Are you sure you have typed the correct user/password?</li>
 					<li>Are you sure that you have typed the correct hostname?</li>
 					<li>Are you sure that the database server is running?</li>
-				</ol>', false );
+				</ol>
+				</div>', false );
+			return;
 		}
 		elseif( isset( $this->dbname ) )
 		{
@@ -506,6 +512,10 @@ class DB
 	function __destruct()
 	{
 		@$this->flush();
+		if( ! $this->dbhandle )
+		{	// No handler to kill and close
+			return;
+		}
 		if (!$this->use_persistent)
 			@$this->dbhandle->kill($this->dbhandle->thread_id);
 		@$this->dbhandle->close();
@@ -551,16 +561,27 @@ class DB
 	 */
 	function select($db)
 	{
+		if( ! $this->dbhandle || $this->dbhandle->connect_errno != 0 )
+		{	// Don't try to select database with wrong connection:
+			return false;
+		}
+
 		if( !@$this->dbhandle->select_db($db) )
 		{
 			$this->print_error( 'Error selecting database ['.$db.']!', '
+				<div class="alert alert-danger">
+				We could not select the database. Please check the following:
 				<ol>
 					<li>Are you sure the database exists?</li>
 					<li>Are you sure the DB user is allowed to use that database?</li>
 					<li>Are you sure there is a valid database connection?</li>
-				</ol>', false );
+				</ol>
+				</div>', false );
+			return false;
 		}
 		$this->dbname = $db;
+
+		return true;
 	}
 
 

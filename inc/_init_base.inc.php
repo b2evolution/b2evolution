@@ -39,6 +39,10 @@ elseif( file_exists( $conf_path.'imaintenance.html' ) )
 	die();
 }
 
+if( ! empty( $access_control_allow_origin ) )
+{	// Allow access from origin if it is enabled in config:
+	header( 'Access-Control-Allow-Origin: '.$access_control_allow_origin );
+}
 
 /**
  * Absolute Unix timestamp for server

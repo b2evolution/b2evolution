@@ -405,7 +405,10 @@ class UserCache extends DataObjectCache
 			$this->load_all();
 		}
 
-		return parent::get_option_list( $default, $allow_none, 'get_preferred_name' );
+		return parent::get_option_list( $default, $allow_none, 'get_preferred_name', array(), array(
+				// Add attribute "data-login" for <option> in order to use the logins on autocomplete in comment textarea:
+				'data-login' => 'login'
+			) );
 	}
 
 

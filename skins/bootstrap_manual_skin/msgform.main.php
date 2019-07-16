@@ -117,7 +117,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 
 <div class="row">
 
-	<div class="<?php echo $Skin->is_left_navigation_visible() ? 'col-xs-12 col-md-9 pull-right' : 'col-md-12' ?>">
+	<div class="<?php echo $Skin->is_left_navigation_visible() ? 'col-xs-12 col-md-9 pull-right-md' : 'col-md-12' ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -156,19 +156,6 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 					'title_single_disp' => false,
 					'title_page_disp'   => false,
 					'format'            => 'htmlbody',
-					'category_text'     => '',
-					'categories_text'   => '',
-					'catdir_text'       => '',
-					'front_text'        => '',
-					'posts_text'        => '',
-					'register_text'     => '',
-					'login_text'        => '',
-					'lostpassword_text' => '',
-					'account_activation' => '',
-					'msgform_text'      => '',
-					'user_text'         => '',
-					'users_text'        => '',
-					'display_edit_links'=> false,
 				) );
 			// ----------------------------- END OF REQUEST TITLE ----------------------------
 ?>
@@ -192,7 +179,7 @@ skin_include( '$disp$' );
 	{ // Display a left column with navigation only for several pages
 	?>
 		<!-- =================================== START OF SIDEBAR =================================== -->
-		<aside class="col-xs-12 col-md-3 pull-left">
+		<aside class="col-xs-12 col-md-3 pull-left-md">
 
 			<div id="evo_container__sidebar">
 

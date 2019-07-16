@@ -128,7 +128,7 @@ function init_MainList( $items_nb_limit )
 
 
 /**
- * Prepare the 'In-skin editing'.
+ * Prepare the 'In-skin editing' / 'In-skin change proposal'.
  *
  */
 function init_inskin_editing()
@@ -137,18 +137,22 @@ function init_inskin_editing()
 	global $item_tags, $item_title, $item_content;
 	global $admin_url, $redirect_to, $advanced_edit_link;
 
-	if( ! $Blog->get_setting( 'in_skin_editing' ) )
-	{	// Redirect to the Back-office editing (setting is OFF)
-		header_redirect( $admin_url.'?ctrl=items&action=new&blog='.$Blog->ID );
-	}
-
-	$tab_switch_params = 'blog='.$Blog->ID;
-
 	// Post ID, go from $_GET when we edit post from Front-office
 	$post_ID = param( 'p', 'integer', 0 );
 
 	// Post ID, go from $_GET when we copy post from Front-office
 	$copy_post_ID = param( 'cp', 'integer', 0 );
+
+	if( $disp == 'edit' && ! $Blog->get_setting( 'in_skin_editing' ) )
+	{	// Redirect to the Back-office editing (setting is OFF)
+		header_redirect( $admin_url.'?ctrl=items&action='.( $post_ID == 0 ? ( $copy_post_ID == 0 ? 'new' : 'copy&p='.$copy_post_ID ) : 'edit&p='.$post_ID ).'&blog='.$Blog->ID );
+	}
+	elseif( $disp == 'proposechange' && ! $Blog->get_setting( 'in_skin_change_proposal' ) )
+	{	// Redirect to the Back-office editing (setting is OFF)
+		header_redirect( $admin_url.'?ctrl=items&action=propose&blog='.$Blog->ID.'&p='.$post_ID );
+	}
+
+	$tab_switch_params = 'blog='.$Blog->ID;
 
 	if( $disp == 'proposechange' )
 	{	// Propose a change:
@@ -253,7 +257,12 @@ function init_inskin_editing()
 	// We never allow HTML in titles, so we always encode and decode special chars.
 	$item_title = htmlspecialchars_decode( $edited_Item->get( 'title' ) );
 
-	$item_content = prepare_item_content( $edited_Item->get( 'content' ) );
+	$item_content = $edited_Item->get( 'content' );
+	if( $item_content === NULL )
+	{	// Use text template for new creating Item:
+		$item_content = $edited_Item->get_type_setting( 'text_template' );
+	}
+	$item_content = prepare_item_content( $item_content );
 
 	if( ! $edited_Item->get_type_setting( 'allow_html' ) )
 	{ // HTML is disallowed for this post, content is encoded in DB and we need to decode it for editing:
@@ -453,6 +462,72 @@ function & get_current_Item()
 
 
 /**
+ * Get url title / slug from provided title text
+ *
+ * @param string Title
+ * @param string Locale
+ * @return string
+ */
+function get_urltitle( $title, $locale = NULL )
+{
+	// Replace special chars/umlauts, if we can convert charsets:
+	load_funcs('locales/_charset.funcs.php');
+	$urltitle = replace_special_chars( $title, $locale );
+
+	// Make everything lowercase and use trim again after replace_special_chars
+	$urltitle = strtolower( trim ( $urltitle ) );
+
+	if( empty( $urltitle ) )
+	{
+		$urltitle = 'title';
+	}
+
+	// Leave only first 5 words in order to get a shorter URL
+	// (which is generally accepted as a better practice)
+	// User can manually enter a very long URL if he wants
+	$slug_changed = param( 'slug_changed' );
+	if( $slug_changed == 0 )
+	{ // this should only happen when the slug is auto generated
+		global $Collection, $Blog;
+		if( isset( $Blog ) )
+		{	// Get max length of slug from current blog setting:
+			$count_of_words = $Blog->get_setting('slug_limit');
+		}
+		if( empty( $count_of_words ) )
+		{	// Use 8 words to limit slug by default:
+			$count_of_words = 8;
+		}
+
+		// Limit slug with max count of words:
+		$title_words = explode( '-', $urltitle );
+		if( count( $title_words ) > $count_of_words )
+		{
+			$urltitle = '';
+			for( $i = 0; $i < $count_of_words; $i++ )
+			{
+				$urltitle .= $title_words[$i].'-';
+			}
+			//delete last '-'
+			$urltitle = substr( $urltitle, 0, strlen( $urltitle ) - 1 );
+		}
+	}
+
+	// Normalize to 200 chars + a number:
+	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
+	$urlbase = substr( $matches[1], 0, 200 );
+	// strip a possible dash at the end of the URL title:
+	$urlbase = rtrim( $urlbase, '-' );
+	$urltitle = $urlbase;
+	if( isset( $matches[4] ) && $matches[4] !== '' )
+	{	// Append only NOT empty string after last dash:
+		$urltitle .= '-'.$matches[4];
+	}
+
+	return $urltitle;
+}
+
+
+/**
  * Validate URL title (slug) / Also used for category slugs
  *
  * Using title as a source if url title is empty.
@@ -481,66 +556,13 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 
 	if( empty( $urltitle ) )
 	{
-		if( ! empty($title) )
-			$urltitle = $title;
-		else
-			$urltitle = 'title';
+		$urltitle = empty( $title ) ? 'title' : $title;
 	}
 
-	// echo 'starting with: '.$urltitle.'<br />';
+	// Convert title text to url title/slug:
+	$urltitle = get_urltitle( $urltitle );
 
-	// Replace special chars/umlauts, if we can convert charsets:
-	load_funcs('locales/_charset.funcs.php');
-	$urltitle = replace_special_chars($urltitle, $post_locale);
-
-	// Make everything lowercase and use trim again after replace_special_chars
-	$urltitle = strtolower( trim ( $urltitle ) );
-
-	if( empty( $urltitle ) )
-	{
-		$urltitle = 'title';
-	}
-
-	// Leave only first 5 words in order to get a shorter URL
-	// (which is generally accepted as a better practice)
-	// User can manually enter a very long URL if he wants
-	$slug_changed = param( 'slug_changed' );
-	if( $slug_changed == 0 )
-	{ // this should only happen when the slug is auto generated
-		global $Collection, $Blog;
-		if( isset( $Blog ) )
-		{	// Get max length of slug from current blog setting:
-			$count_of_words = $Blog->get_setting('slug_limit');
-		}
-		if( empty( $count_of_words ) )
-		{	// Use 5 words to limit slug by default:
-			$count_of_words = 5;
-		}
-
-		// Limit slug with max count of words:
-		$title_words = explode( '-', $urltitle );
-		if( count( $title_words ) > $count_of_words )
-		{
-			$urltitle = '';
-			for( $i = 0; $i < $count_of_words; $i++ )
-			{
-				$urltitle .= $title_words[$i].'-';
-			}
-			//delete last '-'
-			$urltitle = substr( $urltitle, 0, strlen( $urltitle ) - 1 );
-		}
-	}
-
-	// Normalize to 200 chars + a number:
-	preg_match( '/^(.*?)((-|_)+([0-9]+))?$/', $urltitle, $matches );
-	$urlbase = substr( $matches[1], 0, 200 );
-	// strip a possible dash at the end of the URL title:
-	$urlbase = rtrim( $urlbase, '-' );
-	$urltitle = $urlbase;
-	if( isset( $matches[4] ) && $matches[4] !== '' )
-	{	// Append only NOT empty string after last dash:
-		$urltitle .= '-'.$matches[4];
-	}
+	$urlbase = str_replace( '/-\d+$/', '', $urltitle );
 
 	if( !$query_only )
 	{
@@ -3681,7 +3703,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	}
 
 	if( empty( $limit ) )
-	{	// Get default limit from curent user's setting:
+	{	// Get default limit from current user's setting:
 		global $UserSettings;
 		$limit = $UserSettings->get( 'results_per_page' );
 	}
@@ -3744,7 +3766,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 
 		// Filter comments list:
 		$CommentList->set_filters( array(
-			'types'             => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback', 'webmentions' ),
+			'types'             => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback', 'webmention' ),
 			'statuses'          => $statuses,
 			'expiry_statuses'   => ( $expiry_status == 'all' ? array( 'active', 'expired' ) : array( $expiry_status ) ),
 			'comment_ID_list'   => ( empty( $exclude_comment_IDs ) ? NULL : '-'.implode( ",", $exclude_comment_IDs ) ),
@@ -3762,7 +3784,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 		param( 'redirect_to', 'url', url_add_param( $admin_url, 'ctrl=comments&blog='.$blog_ID.'&filter=restore', '&' ) );
 		// this is an ajax call we always have to restore the filterst (we can set filters only without ajax call)
 		$CommentList->set_filters( array(
-			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback', 'webmentions' ),
+			'types' => $comment_type == 'meta' ? array( 'meta' ) : array( 'comment', 'trackback', 'pingback', 'webmention' ),
 			'order' => 'DESC',
 		) );
 		$CommentList->restore_filterset();
@@ -4382,6 +4404,9 @@ function echo_item_location_form( & $Form, & $edited_Item, $params = array() )
 	$Form->switch_layout( NULL );
 
 	$Form->end_fieldset();
+
+	// Initialize JavaScript for AJAX loading of regions, subregions and cities:
+	echo_regional_js( 'item', $edited_Item->region_visible() );
 }
 
 
@@ -4404,24 +4429,25 @@ function display_hidden_custom_fields( & $Form, & $edited_Item )
 /**
  * Display custom field settings as editable input fields
  *
+ * @param string Field name
  * @param object Form
  * @param object edited Item
- * @param boolean TRUE to force use custom fields of current version instead of revision
+ * @param array Additional parameters
  */
-function display_editable_custom_fields( & $Form, & $edited_Item, $force_current_fields = false )
+function display_editable_custom_field( $filed_name, & $Form, & $edited_Item, $params = array() )
 {
+	$params = array_merge( array(
+			'loop_index' => 0
+		), $params );
+
 	$custom_fields = $edited_Item->get_custom_fields_defs();
 
-	if( empty( $custom_fields ) )
-	{	// No custom fields
-		return;
-	}
+	if( isset( $custom_fields[ $filed_name ] ) )
+	{	// Custom field is found by requested name:
+		$custom_field = $custom_fields[ $filed_name ];
 
-	$parent_Item = & $edited_Item->get_parent_Item();
+		$parent_Item = & $edited_Item->get_parent_Item();
 
-	$c = 0;
-	foreach( $custom_fields as $custom_field )
-	{	// Loop through custom fields:
 		$custom_field_input_params = array();
 		$custom_field_note = '';
 		$parent_sync_checkbox_is_visible = false;
@@ -4485,28 +4511,28 @@ function display_editable_custom_fields( & $Form, & $edited_Item, $force_current
 		switch( $custom_field['type'] )
 		{
 			case 'double':
-				$Form->text_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto', 'required' => $custom_field['required'] ) + $custom_field_input_params );
 				break;
 			case 'computed':
 				$Form->info( $custom_field_label, $edited_Item->get_custom_field_formatted( $custom_field['name'] ), $custom_field_note );
 				break;
 			case 'varchar':
-				$Form->text_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%', 'required' => $custom_field['required'] ) + $custom_field_input_params );
 				break;
 			case 'text':
-				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 5, $custom_field_label, array( 'note' => $custom_field_note, 'required' => $custom_field['required'] ) + $custom_field_input_params );
 				break;
 			case 'html':
-				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 5, $custom_field_label, array( 'note' => $custom_field_note ) + $custom_field_input_params );
+				$Form->textarea_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 5, $custom_field_label, array( 'note' => $custom_field_note, 'required' => $custom_field['required'] ) + $custom_field_input_params );
 				break;
 			case 'url':
-				$Form->text_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 20, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:100%', 'required' => $custom_field['required'] ) + $custom_field_input_params );
 				break;
 			case 'image':
-				$Form->text_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto' ) + $custom_field_input_params );
+				$Form->text_input( 'item_cf_'.$custom_field['name'], $custom_field['value'], 12, $custom_field_label, $custom_field_note, array( 'maxlength' => 10000, 'style' => 'width:auto', 'required' => $custom_field['required'] ) + $custom_field_input_params );
 				break;
 			case 'separator':
-				if( is_admin_page() && $c > 0 )
+				if( is_admin_page() && $params['loop_index'] > 0 )
 				{	// This is a hack for back-office because there is a css table layout:
 					$Form->end_fieldset();
 				}
@@ -4515,7 +4541,7 @@ function display_editable_custom_fields( & $Form, & $edited_Item, $force_current
 				{
 					echo '<p class="note">'.$custom_field_note.'</p>';
 				}
-				if( is_admin_page() && $c > 0 && $c < count( $custom_fields ) )
+				if( is_admin_page() && $params['loop_index'] > 0 && $params['loop_index'] < count( $custom_fields ) )
 				{	// This is a hack for back-office because there is a css table layout:
 					$Form->begin_fieldset();
 				}
@@ -4523,20 +4549,20 @@ function display_editable_custom_fields( & $Form, & $edited_Item, $force_current
 		}
 
 		if( empty( $edited_Item->ID ) && // New object is creating or copying
-		    isset( $custom_field_input_params['disabled'] ) && // The custom field is disabled
-		    ! in_array( $custom_field['type'], array( 'computed', 'separator' ) ) ) // Theese fields don't have an editable value
+				isset( $custom_field_input_params['disabled'] ) && // The custom field is disabled
+				! in_array( $custom_field['type'], array( 'computed', 'separator' ) ) ) // Theese fields don't have an editable value
 		{	// When input field is disabled and new item is creating
 			// we should create additional hidden input field because the disabled inputs are not submitted:
 			$Form->hidden( 'item_cf_'.$custom_field['name'], $edited_Item->get_custom_field_value( $custom_field['name'] ) );
 		}
 
-		$c++;
-	}
-
-	if( $parent_Item )
-	{	// JS to refresh custom field values from parent post custom fields:
+		global $evo_js_parent_custom_fields;
+		if( $parent_Item && empty( $evo_js_parent_custom_fields ) )
+		{	// JS to refresh custom field values from parent post custom fields:
 ?>
 <script>
+jQuery( document ).ready( function()
+{
 jQuery( 'a[data-child-input-id]' ).click( function()
 {	// Update custom field value with value from parent post:
 	var child_field_obj = jQuery( '[name=' + jQuery( this ).data( 'child-input-id' ) + '][type!=hidden]' );
@@ -4553,8 +4579,37 @@ jQuery( 'a[data-child-input-id]' ).click( function()
 	}
 	return false;
 } );
+} );
 </script>
 <?php
+			// Flog to don't initialize this JS code twice:
+			$evo_js_parent_custom_fields = true;
+		}
+	}
+}
+
+
+/**
+ * Display custom field settings as editable input fields
+ *
+ * @param object Form
+ * @param object edited Item
+ * @param boolean TRUE to force use custom fields of current version instead of revision
+ */
+function display_editable_custom_fields( & $Form, & $edited_Item, $force_current_fields = false )
+{
+	$custom_fields = $edited_Item->get_custom_fields_defs();
+
+	if( empty( $custom_fields ) )
+	{	// No custom fields
+		return;
+	}
+
+	$c = 0;
+	foreach( $custom_fields as $custom_field )
+	{	// Loop through custom fields:
+		display_editable_custom_field( $custom_field['name'], $Form, $edited_Item, array( 'loop_index' => $c ) );
+		$c++;
 	}
 }
 

@@ -204,7 +204,7 @@ class user_profile_pics_Widget extends ComponentWidget
 							'after_image'         => NULL,
 							'image_size'          => $this->disp_params['thumb_size'],
 							'image_link_to'       => $image_link_to,
-							'image_link_title'    => $target_User->login,
+							'image_link_title'    => $target_User->get_username(),
 							'image_link_rel'      => ( $this->disp_params['link_to'] == 'fullsize' ? 'lightbox[user]' : '' )
 						) );
 					}

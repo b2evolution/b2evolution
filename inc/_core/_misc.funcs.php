@@ -21,6 +21,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 load_funcs('antispam/model/_antispam.funcs.php');
 load_funcs('tools/model/_email.funcs.php');
+load_funcs('sessions/model/_cookie.funcs.php');
 
 // @todo sam2kb> Move core functions get_admin_skins, get_filenames, cleardir_r, rmdir_r and some other
 // to a separate file, and split files_Module from _core_Module
@@ -54,6 +55,33 @@ function modules_call_method( $method_name, $params = NULL )
 		{
 			$ret = $Module->{$method_name}( $params );
 		}
+		if( isset( $ret ) )
+		{
+			$result[$module] = $ret;
+		}
+	}
+
+	return $result;
+}
+
+
+/**
+ * Call a method for all modules in a row and update params by reference
+ *
+ * @param string the name of the method which should be called
+ * @param array params
+ * @return array[module_name][return value], or NULL if the method doesn't have any return value
+ */
+function modules_call_method_reference_params( $method_name, & $params )
+{
+	global $modules;
+
+	$result = NULL;
+
+	foreach( $modules as $module )
+	{
+		$Module = & $GLOBALS[$module.'_Module'];
+		$ret = $Module->{$method_name}( $params );
 		if( isset( $ret ) )
 		{
 			$result[$module] = $ret;
@@ -182,10 +210,7 @@ function shutdown()
 	 */
 	global $Session;
 
-	global $Settings;
-	global $Debuglog;
-
-	global $Timer;
+	global $Settings, $Debuglog, $DB, $Timer;
 
 	// Try forking a background process and let the parent return as fast as possbile.
 	if( is_callable('pcntl_fork') && function_exists('posix_kill') && defined('STDIN') )
@@ -254,6 +279,12 @@ function shutdown()
 	// Update the SESSION again, at the very end:
 	// (e.g. "Debuglogs" may have been removed in debug_info())
 	$Session->dbsave();
+
+	while( $DB->transaction_nesting_level )
+	{	// Rollback all transactions which could not finished correctly by some unknown error,
+		// Used to avoid errors like "Lock wait timeout exceeded; try restarting transaction":
+		$DB->rollback();
+	}
 
 	$Timer->pause('shutdown');
 }
@@ -1455,7 +1486,15 @@ function make_clickable_callback( $text, $moredelim = '&amp;', $additional_attrs
  */
 function date2mysql( $ts )
 {
-	return date( 'Y-m-d H:i:s', $ts );
+	if( $ts > 0 )
+	{	// Allow only positive timestamp value:
+		return date( 'Y-m-d H:i:s', $ts );
+	}
+	else
+	{	// If timestamp is wrong(NULL or FALSE or negative value) use this mimimum date instead of default 1970-01-01 00:00:00,
+		// because with negative timezone like -2:00 it may returns 1969-12-31 22:00:00 which creates MySQL error "Incorrect datetime value".
+		return '2000-01-01 00:00:00';
+	}
 }
 
 /**
@@ -2170,7 +2209,7 @@ function is_word( $word )
  * Check if the login is valid (in terms of allowed chars)
  *
  * @param string login
- * @return boolean true if OK
+ * @return boolean|string TRUE if OK, FALSE if error, special error cases: 'usr', 'long'
  */
 function is_valid_login( $login, $force_strict_logins = false )
 {
@@ -2212,6 +2251,13 @@ function is_valid_login( $login, $force_strict_logins = false )
 	{	// Logins cannot start with 'usr_', this prefix is reserved for system use
 		// We create user media directories for users with non-ASCII logins in format /media/users/usr_55/, where 55 is user ID
 		return 'usr';
+	}
+
+	// Step 4
+	// To avoid MySQL erro on insert long data
+	if( utf8_strlen( $login ) > 20 )
+	{	// Don't allow long login:
+		return 'long';
 	}
 
 	return true;
@@ -3831,6 +3877,26 @@ function check_cron_job_emails_limit()
 
 
 /**
+ * Get additional error message on failed mail sending
+ *
+ * @return string
+ */
+function get_send_mail_error()
+{
+	global $Settings;
+
+	if( $Settings->get( 'email_service' ) == 'smtp' && ! $Settings->get( 'force_email_sending' ) )
+	{	// Only SMTP is used:
+		return T_('Recipient email address does not seem to work.');
+	}
+	else
+	{	// PHP "mail" function is used by default or it was forced after failed SMTP sending:
+		return T_('Possible reason: the PHP mail() function may have been disabled on the server.');
+	}
+}
+
+
+/**
  * Sends an email, wrapping PHP's mail() function.
  * ALL emails sent by b2evolution must be sent through this function (for consistency and for logging)
  *
@@ -5084,6 +5150,11 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 				}
 
+				if( isset( $params['title'] ) && $params['title'] === false )
+				{	// Disable title:
+					unset( $params['title'] );
+				}
+
 				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
 				if( isset( $params['title'] ) )
 				{
@@ -5172,6 +5243,11 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					{
 						$params['title'] = $icon['alt'];
 					}
+				}
+
+				if( isset( $params['title'] ) && $params['title'] === false )
+				{	// Disable title:
+					unset( $params['title'] );
 				}
 
 				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
@@ -5949,6 +6025,19 @@ function is_front_page()
 	global $is_front;
 
 	return isset( $is_front ) && $is_front === true;
+}
+
+
+/**
+ * Is pro version?
+ *
+ * @return boolean
+ */
+function is_pro()
+{
+	global $app_pro;
+
+	return isset( $app_pro ) && $app_pro === true;
 }
 
 
@@ -7555,112 +7644,6 @@ function apm_log_custom_param( $name, $value )
 
 
 /**
- * Get cookie domain depending on current page:
- *     - For back-office the config var $cookie_domain is used
- *     - For front-office it is dynamically generated from collection url
- *
- * @return string Cookie domain
- */
-function get_cookie_domain()
-{
-	global $Collection, $Blog;
-
-	if( is_admin_page() || empty( $Blog ) )
-	{	// Use cookie domain of base url from config:
-		global $cookie_domain;
-		return $cookie_domain;
-	}
-	else
-	{	// Use cookie domain of current collection url:
-		return $Blog->get_cookie_domain();
-	}
-}
-
-
-/**
- * Get cookie path depending on current page:
- *     - For back-office the config var $cookie_path is used
- *     - For front-office it is dynamically generated from collection url
- *
- * @return string Cookie path
- */
-function get_cookie_path()
-{
-	global $Collection, $Blog;
-
-	if( is_admin_page() || empty( $Blog ) )
-	{	// Use cookie path of base url from config:
-		global $cookie_path;
-		return $cookie_path;
-	}
-	else
-	{	// Use base path of current collection url:
-		return $Blog->get_cookie_path();
-	}
-}
-
-
-/**
- * Set a cookie to send it by evo_sendcookies()
- *
- * @param string The name of the cookie
- * @param string The value of the cookie
- * @param integer The time the cookie expires
- * @param string DEPRECATED: The path on the server in which the cookie will be available on
- * @param string DEPRECATED: The domain that the cookie is available
- * @param boolean Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
- * @param boolean When TRUE the cookie will be made accessible only through the HTTP protocol
- */
-function evo_setcookie( $name, $value = '', $expire = 0, $dummy = '', $dummy2 = '', $secure = false, $httponly = false )
-{
-	global $evo_cookies;
-
-	if( ! is_array( $evo_cookies ) )
-	{	// Initialize array for cookies only first time:
-		$evo_cookies = array();
-	}
-
-	// Store cookie in global var:
-	$evo_cookies[ $name ] = array(
-			'value'    => $value,
-			'expire'   => $expire,
-			'secure'   => $secure,
-			'httponly' => $httponly,
-		);
-}
-
-
-/**
- * Send the predefined cookies (@see setcookie() for more details)
- */
-function evo_sendcookies()
-{
-	global $evo_cookies;
-
-	if( headers_sent() )
-	{	// Exit to avoid errors because headers already were sent:
-		return;
-	}
-
-	if( empty( $evo_cookies ) )
-	{	// No cookies:
-		return;
-	}
-
-	$current_cookie_domain = get_cookie_domain();
-	$current_cookie_path = get_cookie_path();
-
-	foreach( $evo_cookies as $evo_cookie_name => $evo_cookie )
-	{
-		setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'], $evo_cookie['httponly'] );
-
-		// Unset to don't send cookie twice:
-		unset( $evo_cookies[ $evo_cookie_name ] );
-	}
-}
-
-
-/**
  * Echo JavaScript to edit values of column in the table list
  *
  * @param array Params
@@ -8368,9 +8351,40 @@ function evo_version_compare( $version1, $version2, $operator = NULL )
 		$version1 = $app_version;
 	}
 
-	// Remove "stable" suffix to compare such versions as upper than "alpha", "beta" and etc.:
-	$version1 = str_replace( '-stable', '', $version1 );
-	$version2 = str_replace( '-stable', '', $version2 );
+	preg_match( '#^([\d\.]+)(-.+)?$#', $version1, $m_ver1 );
+	preg_match( '#^([\d\.]+)(-.+)?$#', $version2, $m_ver2 );
+
+	if( isset( $m_ver1[1], $m_ver2[1] ) && $m_ver1[1] == $m_ver2[1] )
+	{	// If versions number is same:
+		$version1_suffix = ( isset( $m_ver1[2] ) ? $m_ver1[2] : '' );
+		$version2_suffix = ( isset( $m_ver2[2] ) ? $m_ver2[2] : '' );
+
+		if( $version1_suffix == '-PRO' )
+		{	// Remove "PRO" suffix to compare such versions as upper than "stable", "alpha", "beta" and etc.:
+			$version1 = $m_ver1[1];
+			if( $version2_suffix === '' )
+			{	// Add suffix "stable" in order to make version(without suffix) lower than "PRO":
+				$version2 .= '-stable';
+			}
+		}
+		elseif( $version2_suffix == '-stable' )
+		{	// Remove "stable" suffix to compare such versions as upper than "alpha", "beta" and etc. except of "PRO":
+			$version2 = $m_ver2[1];
+		}
+
+		if( $version2_suffix == '-PRO' )
+		{	// Remove "PRO" suffix to compare such versions as upper than "stable", "alpha", "beta" and etc.:
+			$version2 = $m_ver2[1];
+			if( $version1_suffix === '' )
+			{	// Add suffix "stable" in order to make version(without suffix) lower than "PRO":
+				$version1 .= '-stable';
+			}
+		}
+		elseif( $version1_suffix == '-stable' )
+		{	// Remove "stable" suffix to compare such versions as upper than "alpha", "beta" and etc. except of "PRO":
+			$version1 = $m_ver1[1];
+		}
+	}
 
 	if( is_null( $operator ) )
 	{	// To return integer:
@@ -9643,8 +9657,6 @@ function display_importer_upload_panel( $params = array() )
 		// BODY START:
 		$Table->display_body_start();
 
-		$media_path_length = strlen( $media_path.'import/'.( empty( $params['folder'] ) ? '' : $params['folder'].'/' ) );
-
 		foreach( $import_files as $import_file )
 		{
 			$Table->display_line_start();
@@ -9656,7 +9668,7 @@ function display_importer_upload_panel( $params = array() )
 
 			// File
 			$Table->display_col_start();
-			echo substr( $import_file['path'], $media_path_length );
+			echo $import_file['name'];
 			$Table->display_col_end();
 
 			// Type
@@ -9669,7 +9681,7 @@ function display_importer_upload_panel( $params = array() )
 
 			// File date
 			$Table->display_col_start();
-			echo date( locale_datefmt().' '.locale_timefmt(), filemtime( $import_file['path'] ) );
+			echo date( locale_datefmt().' '.locale_timefmt(), $import_file['date'] );
 			$Table->display_col_end();
 
 			$Table->display_line_end();
@@ -9788,6 +9800,8 @@ function get_import_files( $folder = '', $allowed_extensions = 'xml|txt|zip', $i
 		}
 	}
 
+	$media_path_length = strlen( $media_path.'import/'.( empty( $folder ) ? '' : $folder.'/' ) );
+
 	foreach( $file_paths as $file_data )
 	{
 		switch( $file_data[1] )
@@ -9814,11 +9828,34 @@ function get_import_files( $folder = '', $allowed_extensions = 'xml|txt|zip', $i
 
 		$import_files[] = array(
 				'path' => $file_data[0],
+				'name' => substr( $file_data[0], $media_path_length ),
 				'type' => $file_type,
+				'date' => filemtime( $file_data[0] ),
 			);
 	}
 
+	// Sort import files by date DESC:
+	usort( $import_files, 'sort_import_files_callback' );
+
 	return $import_files;
+}
+
+
+/**
+ * Callback function to sort import files by date DESC
+ *
+ * @param array Import file data
+ * @param array Import file data
+ * @return boolean
+ */
+function sort_import_files_callback( $a, $b )
+{
+	if( $a['date'] == $b['date'] )
+	{	// Sort by file name with same dates:
+		return $a['name'] < $b['name'] ? -1 : 1;
+	}
+
+	return ( $a['date'] > $b['date'] ? -1 : 1 );
 }
 
 

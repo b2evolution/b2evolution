@@ -177,7 +177,7 @@ class LinkUser extends LinkOwner
 			case 'name':
 				return 'user';
 			case 'title':
-				return $this->User->login;
+				return $this->User->get_username();
 		}
 		return parent::get( $parname );
 	}

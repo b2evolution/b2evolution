@@ -1057,17 +1057,46 @@ class ItemQuery extends SQL
 	/**
 	 * Restrict to the flagged items
 	 *
-	 * @param boolean TRUE - Restrict to flagged items, FALSE - Don't restrict/Get all items
+	 * @param boolean TRUE/1/'all' - Restrict to all(Read and Unread) items with "must read" flag,
+	 *                FALSE - Don't restrict/Get all items,
+	 *               'unread' - Items which are not read by current User yet,
+	 *               'read' - Items which are already read by current User.
+	 * 
 	 */
 	function where_mustread( $mustread = false )
 	{
-		global $current_User;
+		global $current_User, $DB;
 
 		$this->mustread = $mustread;
 
 		if( ! $this->mustread )
 		{	// Don't restrict if it is not requested:
 			return;
+		}
+
+		if( $mustread === 'read' )
+		{	// Get Items which are already read by current User:
+			if( is_logged_in() )
+			{	// For logged in user:
+				$this->FROM_add( 'INNER JOIN T_items__user_data AS mustread_status ON mustread_status.itud_item_ID = post_ID AND mustread_status.itud_user_ID = '.$DB->quote( $current_User->ID ) );
+				$this->WHERE_and( 'mustread_status.itud_read_item_ts >= post_contents_last_updated_ts' );
+			}
+			else
+			{	// Decide all Items are not read by not logged in user,
+				// because we store read status only for logged in users:
+				$this->WHERE_and( 'FALSE' );
+				return;
+			}
+		}
+		elseif( $mustread === 'unread' )
+		{	// Get Items which are NOT read by current User yet:
+			if( is_logged_in() )
+			{	// For logged in user:
+				$this->FROM_add( 'LEFT JOIN T_items__user_data AS mustread_status ON mustread_status.itud_item_ID = post_ID AND mustread_status.itud_user_ID = '.$DB->quote( $current_User->ID ) );
+				$this->WHERE_and( 'mustread_status.itud_read_item_ts IS NULL OR mustread_status.itud_read_item_ts < post_contents_last_updated_ts' );
+			}
+			// Decide all Items are not read by not logged in user,
+			// because we store read status only for logged in users:
 		}
 
 		// Get items which are flagged by current user:

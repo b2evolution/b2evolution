@@ -28,7 +28,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 63;
-	var $version = '7.0.1';
+	var $version = '7.0.2';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -175,7 +175,6 @@ class autolinks_plugin extends Plugin
 			switch( $params['blog_type'] )
 			{
 				case 'forum':
-				case 'manual':
 					$default_values['autolink_post_nofollow_exist'] = 1;
 					$default_values['autolink_post_nofollow_explicit'] = 1;
 					break;
@@ -605,7 +604,7 @@ class autolinks_plugin extends Plugin
 		$text = preg_replace( '/[@\p{L}0-9_\-]+\s*==!#DEL#!==/i'.$regexp_modifier, '', $text );
 
 		// Replace @usernames with user identity link:
-		$text = replace_content_outcode( '#@([A-Za-z0-9_.]+)#i', '@', $text, array( $this, 'replace_usernames' ) );
+		$text = replace_content_outcode( '#@([a-z0-9_.\-]+)#i', '@', $text, array( $this, 'replace_usernames' ) );
 
 		// Make tag names clickable:
 		$text = $this->replace_tags( $text );

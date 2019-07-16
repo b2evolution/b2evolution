@@ -966,7 +966,7 @@ class Skin extends DataObject
 
 		if( $setting_value === NULL )
 		{	// No value for the requested setting:
-			return '';
+			return;
 		}
 
 		global $Session, $blog;
@@ -1045,7 +1045,7 @@ class Skin extends DataObject
 		{	// If customizer mode is disabled
 			if( $params['check'] == 'not_empty' && empty( $setting_value ) )
 			{	// Don't apply rule completely when value is empty:
-				return '';
+				return;
 			}
 		}
 
@@ -1342,7 +1342,7 @@ class Skin extends DataObject
 
 					global $Collection, $Blog, $Item, $current_User;
 
-					if( isset( $Item ) && $Item->can_receive_webmentions() )
+					if( ! empty( $Item ) && $Item->can_receive_webmentions() )
 					{	// Send header and initialize <link> tags in order to mark current Item can receive webmentions by current User(usually anonymous user):
 						$webmention_url = $Blog->get_htsrv_url().'webmention.php';
 						header( 'Link: <'.$webmention_url.'>; rel="webmention"' );

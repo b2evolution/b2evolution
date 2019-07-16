@@ -16,10 +16,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 // Default params:
 $params = array_merge( array(
-		'post_navigation' => 'same_category', // Always navigate through category in this skin
-		'before_title'    => '<h3>',
-		'after_title'     => '</h3>',
-		'Item'            => NULL
+		'post_navigation'   => 'same_category', // Always navigate through category in this skin
+		'Item'              => NULL,
+		// Params with mask values: $item_icon$, $flag_icon$, $item_status$, $read_status$, $link_view_changes$
+		'before_title'      => '<h3>',
+		'after_title'       => '$flag_icon$</h3>$item_status$',
+		'before_title_text' => '$item_icon$',
+		'after_title_text'  => '',
 	), $params );
 
 global $Item;
@@ -28,37 +31,47 @@ if( ! empty( $params['Item'] ) )
 	$Item = $params['Item'];
 }
 
-?>
-<li><?php
-		$item_action_links = $Item->get_edit_link( array(
-				'before' => '',
-				'after'  => '',
-				'class' => button_class( 'text' ),
-			) );
-		$item_action_links .= $Item->get_copy_link( array(
-				'before' => '',
-				'after'  => '',
-				'class' => button_class(),
-				'text'  => '#icon#',
-			) );
-		if( ! empty( $item_action_links ) )
-		{	// Group all action icons:
-			$item_action_links = '<div class="'.button_class( 'group' ).'">'.$item_action_links.'</div>';
-		}
-
-		// Flag:
-		$item_flag = $Item->get_flag( array(
+// Replace masks with values in params:
+$mask_params = array( 'before_title', 'after_title', 'before_title_text', 'after_title_text' );
+$mask_values = array();
+foreach( $mask_params as $mask_param )
+{
+	if( strpos( $params[ $mask_param ], '$flag_icon$' ) !== false && ! isset( $mask_values['$flag_icon$'] ) )
+	{	// Flag icon:
+		$mask_values['$flag_icon$'] = $Item->get_flag( array(
 				'before'       => ' ',
 				'only_flagged' => true,
 				'allow_toggle' => false,
 			) );
-
-		// Status(only not published):
-		$item_status = $Item->status == 'published' ? '' : $Item->get_format_status( array(
+	}
+	if( strpos( $params[ $mask_param ], '$item_icon$' ) !== false && ! isset( $mask_values['$item_icon$'] ) )
+	{	// Item icon:
+		$mask_values['$item_icon$'] = get_icon( 'file_message' );
+	}
+	if( strpos( $params[ $mask_param ], '$item_status$' ) !== false && ! isset( $mask_values['$item_status$'] ) )
+	{	// Status(only not published):
+		$mask_values['$item_status$'] = $Item->status == 'published' ? '' : $Item->get_format_status( array(
 				'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 			) );
-
-
+	}
+	if( strpos( $params[ $mask_param ], '$read_status$' ) !== false && ! isset( $mask_values['$read_status$'] ) )
+	{	// Read status(New/Updated/Read):
+		$mask_values['$read_status$'] = $Item->get_unread_status( array(
+				'style'  => 'text',
+				'before' => '<span class="evo_post_read_status">',
+				'after'  => '</span>'
+			) );
+	}
+	if( strpos( $params[ $mask_param ], '$link_view_changes$' ) !== false && ! isset( $mask_values['$link_view_changes$'] ) )
+	{	// Link to view changes:
+		$mask_values['$link_view_changes$'] = $Item->get_changes_link( array(
+				'class' => button_class( 'text' ),
+			) );
+	}
+	$params[ $mask_param ] = str_replace( array_keys( $mask_values ), $mask_values, $params[ $mask_param ] );
+}
+?>
+<li><?php
 		// ------------------------- "Item in List" CONTAINER EMBEDDED HERE --------------------------
 		// Display container contents:
 		widget_container( 'item_in_list', array(
@@ -75,8 +88,9 @@ if( ! empty( $params['Item'] ) )
 			// Controlling the title:
 			'widget_item_title_params'  => array(
 				'before'          => $params['before_title'],
-				'after'           => $item_flag.$params['after_title'].$item_status.$item_action_links.'<div class="clear"></div>',
-				'before_title'    => get_icon( 'file_message' ),
+				'after'           => $params['after_title'],
+				'before_title'    => $params['before_title_text'],
+				'after_title'     => $params['after_title_text'],
 				'post_navigation' => $params['post_navigation'],
 				'link_class'      => 'link',
 			),

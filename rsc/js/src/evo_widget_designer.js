@@ -179,6 +179,38 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 			jQuery( '.evo_customizer__wrapper', window.parent.document ).removeClass( 'evo_customizer__collapsed' );
 			jQuery( '#evo_customizer__backoffice', window.parent.document ).get( 0 ).contentWindow.location
 				.href = b2evo_widget_edit_url.replace( '$wi_ID$', widget_ID );
+
+			// Animate moving desinger box to left back-office panel:
+			if( ! jQuery( '.evo_designer__widget_animation', window.parent.document ).length )
+			{	// Create temp for for animation:
+				jQuery( 'body', window.parent.document ).append( '<div class="evo_designer__widget_animation"></div>' );
+			}
+			jQuery( '.evo_designer__widget_animation', window.parent.document ).css(
+			{
+				top: jQuery( this ).position().top + jQuery( '#evo_customizer__frontoffice', window.parent.document ).offset().top,
+				left: jQuery( this ).position().left+ jQuery( '#evo_customizer__frontoffice', window.parent.document ).offset().left,
+				width: jQuery( this ).outerWidth(),
+				height: jQuery( this ).outerHeight(),
+				opacity: 1,
+			} )
+			.animate(
+			{
+				left: 0,
+				top: '120px',
+				width: jQuery( '#evo_customizer__backoffice', window.parent.document ).width(),
+				height: jQuery( '#evo_customizer__backoffice', window.parent.document ).height() - 160,
+			} )
+			.animate( { opacity: 0 }, 10 );
+
+			jQuery( '.evo_widget[data-z-index]' ).each( function()
+			{	// Revert z-index of previous active widget blocks,
+				// in order to keep only single current block with active html elements(links, forms, etc.):
+				jQuery( this ).css( 'z-index', jQuery( this ).data( 'z-index' ) );
+			} );
+			// Move original widget block over designer widger block(frame/box with grey border and action icons),
+			// in order to make active html elements(links, forms, etc.) inside original widget block:
+			widget.attr( 'data-z-index', widget.css( 'z-index' ) )
+				.css( 'z-index', jQuery( this ).css( 'z-index' ) + 1 );
 		}
 	}
 

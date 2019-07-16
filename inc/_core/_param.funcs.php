@@ -913,13 +913,17 @@ function param_check_valid_login( $var )
 		return T_('Please choose a username.' );
 	}
 
-	$check = is_valid_login($GLOBALS[$var]);
+	$check = is_valid_login( $GLOBALS[$var] );
 
-	if( ! $check || $check === 'usr' )
+	if( $check !== true )
 	{
 		if( $check === 'usr' )
 		{	// Special case, the login is valid however we forbid it's usage.
 			$msg = sprintf( T_('Logins cannot start with %s, this prefix is reserved for system use.'), '<code>usr_</code>' );
+		}
+		elseif( $check === 'long' )
+		{	// Special case for long logins:
+			$msg = sprintf( T_('Logins cannot be longer %d characters.'), 20 );
 		}
 		elseif( ! isset( $Settings ) || $Settings->get('strict_logins') )
 		{
@@ -1460,7 +1464,7 @@ function param_extend_list( $var, $var_ext_array, $save_prefix = true )
  * Compiles the cat array from $cat (recursive + optional modifiers) and $catsel[] (non recursive)
  * and keeps those values available for future reference (category widget)
  *
- * @param integer Colection ID to restrict chapters only from this collection
+ * @param integer Collection ID to restrict chapters only from this collection
  * @param integer Default category ID
  * @param array Default categories IDs
  */

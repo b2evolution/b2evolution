@@ -1486,6 +1486,24 @@ class Comment extends DataObject
 
 
 	/**
+	 * Check if current User can edit this Comment
+	 *
+	 * @return boolean
+	 */
+	function can_be_edited()
+	{
+		global $current_User;
+
+		// Comment must be stored in DB:
+		return ! empty( $this->ID ) &&
+			// User must be logged in and activated:
+			is_logged_in( false ) &&
+			// User must has a permission to edit this Comment:
+			$current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this );
+	}
+
+
+	/**
 	 * Provide link to edit a comment if user has edit rights
 	 *
 	 * @param string to display before link
@@ -1500,17 +1518,10 @@ class Comment extends DataObject
 	 */
 	function edit_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true, $redirect_to = NULL )
 	{
-		global $current_User, $admin_url;
+		global $admin_url;
 
-		if( ! is_logged_in( false ) ) return false;
-
-		if( empty($this->ID) )
-		{	// Happens in Preview
-			return false;
-		}
-
-		if( ! $current_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
-		{ // If User has no permission to edit this comment:
+		if( ! $this->can_be_edited() )
+		{	// Don't allow to edit this Comment if it cannot be edited by curren User:
 			return false;
 		}
 
@@ -3601,13 +3612,13 @@ class Comment extends DataObject
 		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
 			$force_members = false;
 			$notified_flags[] = 'members_notified';
-			$Messages->add_to_group( T_('Marking email notifications for members as sent.'), 'note', T_('Sending notifications:') );
+			$this->display_notification_message( T_('Marking email notifications for members as sent.') );
 		}
 		if( $force_community == 'mark' )
 		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
 			$force_community = false;
 			$notified_flags[] = 'community_notified';
-			$Messages->add_to_group( T_('Marking email notifications for community as sent.'), 'note', T_('Sending notifications:') );
+			$this->display_notification_message( T_('Marking email notifications for community as sent.') );
 		}
 		if( ! empty( $notified_flags ) )
 		{	// Save the marked processing status to DB:
@@ -3619,7 +3630,7 @@ class Comment extends DataObject
 		if( ( $force_members != 'force' && $force_community != 'force' ) &&
 		    $this->check_notifications_flags( array( 'members_notified', 'community_notified' ) ) )
 		{	// All possible notifications have already been sent:
-			$Messages->add_to_group( T_('All possible notifications have already been sent: skipping notifications...'), 'note', T_('Sending notifications:') );
+			$this->display_notification_message( T_('All possible notifications have already been sent: skipping notifications...') );
 			return false;
 		}
 
@@ -3664,7 +3675,7 @@ class Comment extends DataObject
 			// Save cronjob to DB:
 			if( $comment_Cronjob->dbinsert() )
 			{
-				$Messages->add_to_group( T_('Scheduling email notifications for subscribers.'), 'note', T_('Sending notifications:') );
+				$this->display_notification_message( T_('Scheduling email notifications for subscribers.') );
 
 				// Memorize the cron job ID which is going to handle this post:
 				$this->set( 'notif_ctsk_ID', $comment_Cronjob->ID );
@@ -3763,7 +3774,7 @@ class Comment extends DataObject
 		// Update comment notification params:
 		$this->dbupdate();
 
-		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notify_users ) ), 'note', T_('Sending notifications:') );
+		$this->display_notification_message( sprintf( T_('Sending %d email notifications to moderators.'), count( $notify_users ) ) );
 
 		return $notified_user_IDs;
 	}
@@ -3798,15 +3809,7 @@ class Comment extends DataObject
 
 		if( ! $comment_item_Blog->get_setting( 'allow_item_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			$message = T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), $log_messages );
 			return array();
 		}
 
@@ -3814,67 +3817,27 @@ class Comment extends DataObject
 		{	// Don't send notifications about comments with not allowed status:
 			$status_titles = get_visibility_statuses( '', array() );
 			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
-			$message = sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title );
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n"  );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), $log_messages );
 			return array();
 		}
 
 		if( $force_members == 'skip' && $force_community == 'skip' )
 		{	// Skip subscriber notifications because of it is forced by param:
-			$message = T_('Skipping email notifications to subscribers.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n"  );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribers.'), $log_messages );
 			return array();
 		}
 
 		if( $force_members == 'force' && $force_community == 'force' )
 		{	// Force to members and community:
-			$message = T_('Force sending email notifications to subscribers...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n"  );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Force sending email notifications to subscribers...'), $log_messages );
 		}
 		elseif( $force_members == 'force' )
 		{	// Force to members only:
-			$message = T_('Force sending email notifications to subscribed members...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n"  );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Force sending email notifications to subscribed members...'), $log_messages );
 		}
 		elseif( $force_community == 'force' )
 		{	// Force to community only:
-			$message = T_('Force sending email notifications to other subscribers...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n"  );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Force sending email notifications to other subscribers...'), $log_messages );
 		}
 
 		$notify_members = false;
@@ -3901,42 +3864,18 @@ class Comment extends DataObject
 
 		if( ! $notify_members && ! $notify_community )
 		{	// Everyone has already been notified, nothing to do:
-			$message = T_('Skipping email notifications to subscribers because they were already notified.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n"  );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribers because they were already notified.'), $log_messages );
 			return array();
 		}
 
 		if( $notify_members && $force_members == 'skip' )
 		{	// Skip email notifications to members because it is forced by param:
-			$message = T_('Skipping email notifications to subscribed members.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n"  );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribed members.'), $log_messages );
 			$notify_members = false;
 		}
 		if( $notify_community && $force_community == 'skip' )
 		{	// Skip email notifications to community because it is forced by param:
-			$message = T_('Skipping email notifications to other subscribers.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n"  );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to other subscribers.'), $log_messages );
 			$notify_community = false;
 		}
 
@@ -4252,27 +4191,11 @@ class Comment extends DataObject
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
-			$message = sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count );
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n"  );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), $log_messages );
 		}
 		if( $notify_community )
 		{	// Display a message to know how many community users are notified:
-			$message = sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count );
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n"  );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), $log_messages );
 		}
 
 		if( empty( $notify_users ) && empty( $notify_anon_users ) )
@@ -5487,6 +5410,23 @@ class Comment extends DataObject
 
 		// Delete temporary object from DB:
 		$TemporaryID->dbdelete();
+	}
+
+
+	/**
+	 * Display or log notification message
+	 *
+	 * @param string Message
+	 * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
+	 * @param string Message type
+	 * @param string Message group title
+	 */
+	function display_notification_message( $message, $log_messages = false, $message_type = 'note', $message_group = NULL )
+	{
+		if( $commnet_Item = & $this->get_Item() )
+		{	// Call same function of the comment's Item for proper permission checking:
+			$commnet_Item->display_notification_message( $message, $log_messages, $message_type, $message_group );
+		}
 	}
 }
 

@@ -722,11 +722,6 @@ a.btn+.vote_spam {
 	margin-right: 10px;
 }
 
-// Form elements on item edit page
-label.control-label[for=post_title] {
-	width: auto;
-}
-
 // Profile page
 .profile_avatar {
 	float: right;
@@ -833,11 +828,6 @@ aside .widget_core_coll_search_form {
 	.forums_list .pagination {
 		float: right;
 		margin-left: 10px;
-	}
-	// Remove float properties from main and sidebar columns because they use 100% width on current screen size:
-	// (it was done to fix issue with .ellipsis when sidebar on the left)
-	div.col-md-9.pull-right, aside.col-md-3.pull-left {
-		float: none !important;
 	}
 }
 //@media screen and (min-width: 600px) and (max-width: 767px) {
@@ -1161,6 +1151,9 @@ aside .widget_core_coll_search_form {
 		.topictitle {
 			display: inline;
 			min-width: 200px;
+			+ .btn {
+				margin: -3px 0 0 30px;
+			}
 		}
 	}
 	.cell1 {

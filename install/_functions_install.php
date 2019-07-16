@@ -753,8 +753,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Code highlight"' );
 		}
-		install_plugin( 'gmcode_plugin' );
-		install_plugin( 'wacko_plugin' );
 		install_plugin( 'shortlinks_plugin' );
 		install_plugin( 'wikitables_plugin' );
 		install_plugin( 'markdown_plugin' );
@@ -809,6 +807,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	if( $old_db_version < 13090 )
 	{
 		install_plugin( 'webmention_plugin' );
+	}
+
+	if( $old_db_version < 13210 )
+	{
+		install_plugin( 'auto_anchors_plugin' );
 	}
 
 	if( $old_db_version < 15380 )
@@ -1182,8 +1185,13 @@ function do_install_htaccess( $upgrade = false, $force_htaccess = false )
 		{
 			if( @file_exists( $basepath.'sample.htaccess' ) )
 			{
-				$content_htaccess = trim( file_get_contents( $basepath.'.htaccess' ) );
-				$content_sample_htaccess = trim( file_get_contents( $basepath.'sample.htaccess' ) );
+				$content_sample_htaccess = @file_get_contents( $basepath.'sample.htaccess' );
+				if( $content_sample_htaccess === false )
+				{
+					return get_install_format_text( '<div class="alert alert-danger"><evo:error>We cannot read the <code>sample.htaccess</code> file. Please check <a href="'.get_manual_url( 'directory-and-file-permissions' ).'">file permissions</a> to make sure PHP can read this file.</evo:error></div>' );
+				}
+				$content_sample_htaccess = trim( $content_sample_htaccess );
+				$content_htaccess = trim( @file_get_contents( $basepath.'.htaccess' ) );
 
 				if( $content_htaccess != $content_sample_htaccess )
 				{ // The .htaccess file has content that different from a sample file
@@ -1972,7 +1980,6 @@ function update_basic_config_file( $params = array() )
 
 	if( $DB->error )
 	{ // restart conf
-		display_install_messages( T_('It seems that the database config settings you entered don\'t work. Please check them carefully and try again...') );
 		$action = 'start';
 		if( ! $params['print_messages'] )
 		{	// Return all messages instead of printing on screen:

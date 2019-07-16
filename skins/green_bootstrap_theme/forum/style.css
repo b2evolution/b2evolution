@@ -593,9 +593,6 @@ a.btn + .vote_spam {
 .quote_button {
   margin-right: 10px;
 }
-label.control-label[for=post_title] {
-  width: auto;
-}
 .profile_avatar {
   float: right;
   padding: 10px;
@@ -934,6 +931,9 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
 .posts_panel_title_wrapper .wrap .topictitle {
   display: inline;
   min-width: 200px;
+}
+.posts_panel_title_wrapper .wrap .topictitle + .btn {
+  margin: -3px 0 0 30px;
 }
 .posts_panel_title_wrapper .cell1 {
   width: 100%;

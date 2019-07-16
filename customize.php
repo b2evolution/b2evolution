@@ -60,17 +60,6 @@ if( ! is_logged_in() )
 	header_redirect( $Blog->get( 'url' ) );
 }
 
-// Try to get a collection access type in order to know if it has been changed temporarily for fix:
-$coll_access_type = $Blog->get( 'access_type' );
-if( isset( $Blog->orig_access_type, $Blog->orig_siteurl ) )
-{	// Fix frame origin blocking when collection used another domain than base site URL:
-	$forced_coll_url = $Blog->gen_blogurl();
-	$orig_coll_url = $Blog->gen_blogurl( 'original' );
-
-	// Use forced collection URL with same domain in order to avoid restriction of frame origin:
-	$customizing_url = url_add_param( $forced_coll_url, preg_replace( '#^'.preg_quote( $orig_coll_url ).'[/\?]?#', '', $customizing_url ) );
-}
-
 if( empty( $view ) )
 {	// If view is not defined try to get it from user settings per collection or set default:
 	$view = $UserSettings->get( 'customizer_view_'.$blog );
@@ -110,6 +99,17 @@ elseif( $customizer_mode == 'disable' )
 	}
 	// 303 Redirect to normal page:
 	header_redirect( $redirect_to );
+}
+
+// Try to get a collection access type in order to know if it has been changed temporarily for fix:
+$coll_access_type = $Blog->get( 'access_type' );
+if( isset( $Blog->orig_access_type, $Blog->orig_siteurl ) )
+{	// Fix frame origin blocking when collection used another domain than base site URL:
+	$forced_coll_url = $Blog->gen_blogurl();
+	$orig_coll_url = $Blog->gen_blogurl( 'original' );
+
+	// Use forced collection URL with same domain in order to avoid restriction of frame origin:
+	$customizing_url = url_add_param( $forced_coll_url, preg_replace( '#^'.preg_quote( $orig_coll_url ).'[/\?]?#', '', $customizing_url ) );
 }
 
 load_funcs( 'skins/_skin.funcs.php' );

@@ -172,7 +172,6 @@ class green_bootstrap_theme_Skin extends Skin
 					),
 					'front_bg_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#000000',
 						'type' => 'color',
 					),
@@ -191,31 +190,26 @@ class green_bootstrap_theme_Skin extends Skin
 					),
 					'pict_title_color' => array(
 						'label' => T_('Title color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
 					'front_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'front_link_color' => array(
 						'label' => T_('Link color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#FFFFFF',
 						'type' => 'color',
 					),
 					'pict_muted_color' => array(
 						'label' => T_('Muted text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#F0F0F0',
 						'type' => 'color',
 					),
 					'front_icon_color' => array(
 						'label' => T_('Inverse icon color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#CCCCCC',
 						'type' => 'color',
 					),
@@ -228,7 +222,6 @@ class green_bootstrap_theme_Skin extends Skin
 				),
 					'secondary_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
@@ -407,49 +400,41 @@ class green_bootstrap_theme_Skin extends Skin
 				),
 					'page_bg_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#dfd',
 						'type' => 'color',
 					),
 					'page_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Link color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'page_hover_link_color' => array(
 						'label' => T_('Hover link color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#23527c',
 						'type' => 'color',
 					),
 					'bgimg_text_color' => array(
 						'label' => T_('Text color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
 					'bgimg_link_color' => array(
 						'label' => T_('Link color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#6cb2ef',
 						'type' => 'color',
 					),
 					'bgimg_hover_link_color' => array(
 						'label' => T_('Hover link color on background image'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#6cb2ef',
 						'type' => 'color',
 					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
@@ -633,25 +618,21 @@ class green_bootstrap_theme_Skin extends Skin
 					),
 					'page_text_color' => array(
 						'label' => T_('Page text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Page link color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_bg_color' => array(
 						'label' => T_('Page background color'),
-						'note' => T_('Click to select a color.'),
 						'defaultvalue' => '#dfd',
 						'type' => 'color',
 					),
@@ -859,25 +840,21 @@ class green_bootstrap_theme_Skin extends Skin
 					),
 					'page_text_color' => array(
 						'label' => T_('Page text color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Page link color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
-						'note' => T_('E-g: #ff6600 for orange'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_bg_color' => array(
 						'label' => T_('Page background color'),
-						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 					),
@@ -1829,7 +1806,7 @@ jQuery( document ).ready( function()
 
 			case 'left_sidebar':
 				// Left Sidebar
-				return 'col-md-9 pull-right';
+				return 'col-md-9 pull-right-md';
 
 			case 'right_sidebar':
 				// Right Sidebar

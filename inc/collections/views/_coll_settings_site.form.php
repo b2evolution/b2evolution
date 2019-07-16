@@ -54,7 +54,7 @@ if( $current_User->check_perm( 'users', 'edit' ) )
 $Form->begin_fieldset( T_('Global Site Settings').get_manual_link('global-site-settings') );
 
 	$Form->text_input( 'site_code', $Settings->get( 'site_code' ), 10, T_('Site code'), '$instance_name = '.$instance_name, array( 'maxlength' => 20 ) );
-	$Form->color_input( 'site_color', $Settings->get( 'site_color' ), T_('Site color'), T_('E-g: #ff0000 for red') );
+	$Form->color_input( 'site_color', $Settings->get( 'site_color' ), T_('Site color') );
 	$Form->text_input( 'notification_short_name', $Settings->get( 'notification_short_name' ), 50, T_( 'Short site name' ), T_('Shared with email settings'), array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_long_name', $Settings->get( 'notification_long_name' ), 50, T_( 'Long site name' ), T_('Shared with email settings'), array( 'maxlength' => 255 ) );
 	$site_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select site logo'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );

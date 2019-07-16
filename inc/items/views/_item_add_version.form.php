@@ -24,9 +24,15 @@ $Form->begin_form();
 	$Form->hidden( 'blog', $edited_Item->get_blog_ID() );
 	$Form->hidden( 'p', $edited_Item->ID );
 
-	$Form->select_input_options( 'post_locale', $edited_Item->get_locale_options(), T_('Language'), '', array( 'style' => 'width:auto' ) );
+	$Form->select_input_options( 'post_locale', $edited_Item->get_locale_options( 'all' ), T_('Language'), '', array( 'style' => 'width:auto' ) );
+
+	$Form->info( T_('Collection'), '<span id="evo_item_new_version_coll"></span>' );
+	$Form->hidden( 'post_coll_ID', '' );
 
 	$Form->checkbox( 'post_same_images', 1, T_('Same images'), T_('Link all attachments of current Item to new version.') );
+
+	$ItemTypeCache = & get_ItemTypeCache();
+	$Form->select_input_object( 'item_typ_ID', $edited_Item->get( 'ityp_ID' ), $ItemTypeCache, T_('Item Type') );
 
 	if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
 	{	// If parent is allowed for the Item Type:
@@ -37,3 +43,16 @@ $Form->begin_form();
 
 $Form->end_form();
 ?>
+<script>
+function evo_set_new_version_collection()
+{
+	var selected_locale = jQuery( '#item_new_version_checkchanges #post_locale' ).find( 'option:selected' );
+	jQuery( '#evo_item_new_version_coll' ).html( selected_locale.data( 'coll-name' ) );
+	jQuery( '#item_new_version_checkchanges input[name=post_coll_ID]' ).val( selected_locale.data( 'coll-id' ) );
+}
+evo_set_new_version_collection();
+jQuery( '#item_new_version_checkchanges #post_locale' ).change( function()
+{
+	evo_set_new_version_collection();
+} );
+</script>

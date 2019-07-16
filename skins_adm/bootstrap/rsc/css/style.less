@@ -697,12 +697,17 @@ fieldset ul {
 
 // Form elements on item edit page
 #item_locations {
+	th, td {
+		white-space: nowrap;
+		padding: 2px 0;
+	}
 	label {
 		width: auto;
 		float: right;
 	}
 	select {
 		width: 160px;
+		display: inline-block;
 	}
 	td.input {
 		width: 100%;
@@ -1253,7 +1258,7 @@ div.available_widgets {
 	li {
 		text-indent: -25px;
 		padding-left: 25px;
-		a {
+		a, .label {
 			text-indent: initial;
 		}
 	}
@@ -1455,6 +1460,14 @@ ol.breadcrumb {
 	}
 	.col-sm-10 {
 		width: 80%;
+	}
+}
+// Action icon to restore skin setting to default value:
+.fa[data-default-value] {
+	font-size: 80%;
+	color: #999;
+	&:hover {
+		color: #666;
 	}
 }
 @media (max-width: 992px) {

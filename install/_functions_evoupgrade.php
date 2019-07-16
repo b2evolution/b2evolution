@@ -10817,6 +10817,28 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 13210, 'Inserting new collection settings...' ) )
+	{	// part of 6.11.2-stable
+		// This upgrade block is NOT critical/NOT required for users already on 7.0dev
+		$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_value, cset_name )
+			SELECT cset_coll_ID, cset_value,
+			  CASE cset_name
+			    WHEN "default_noindex"         THEN "posts_firstpage_noindex"
+			    WHEN "canonical_homepage"      THEN "canonical_posts"
+			    WHEN "self_canonical_homepage" THEN "self_canonical_posts"
+			    WHEN "relcanonical_homepage"   THEN "relcanonical_posts"
+			  END AS new_cset_name
+			  FROM T_coll_settings
+			 WHERE cset_name IN ( "default_noindex", "canonical_homepage", "self_canonical_homepage", "relcanonical_homepage" )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13220, 'Upgrading cron tasks table...' ) )
+	{	// part of 6.11.3-stable
+		db_modify_col( 'T_cron__task', 'ctsk_params', 'TEXT NULL' );
+		upg_task_end();
+	}
+
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '
@@ -11660,13 +11682,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15380, 'Upgrading posts table...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_add_col( 'T_items__item', 'post_locale_visibility', 'ENUM( "always", "follow-nav-locale" ) COLLATE ascii_general_ci NOT NULL DEFAULT "always" AFTER post_locale' );
 		upg_task_end();
 	}
 
 	if( upg_task_start( 15390, 'Creating table for collection extra locales...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_create_table( 'T_coll_locales', '
 			cl_coll_ID INT(10) UNSIGNED NOT NULL,
 			cl_locale  VARCHAR(20) COLLATE ascii_general_ci NOT NULL,
@@ -11675,7 +11697,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15400, 'Inserting collection extra locales...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		$DB->query( 'INSERT INTO T_coll_locales ( cl_coll_ID, cl_locale )
 			SELECT blog_ID, blog_locale
 			  FROM T_blogs' );
@@ -11683,7 +11705,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15410, 'Creating table for Post Groups...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_create_table( 'T_items__itemgroup', '
 			igrp_ID INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			PRIMARY KEY (igrp_ID)' );
@@ -11691,13 +11713,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15420, 'Upgrading posts table...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_add_col( 'T_items__item', 'post_igrp_ID', 'INT(10) UNSIGNED NULL AFTER post_ityp_ID' );
 		upg_task_end();
 	}
 
 	if( upg_task_start( 15430, 'Updating collection locale setting for new posts...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		$DB->query( 'UPDATE T_coll_settings
 			  SET cset_value = "select_coll"
 			WHERE cset_name = "new_item_locale_source"
@@ -11706,7 +11728,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15440, 'Upgrading table of collection extra locales and linking with other collections...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_add_col( 'T_coll_locales', 'cl_linked_coll_ID', 'INT(10) UNSIGNED NULL' );
 		upg_task_end();
 	}
@@ -11718,7 +11740,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 
 	if( upg_task_start( 15460, 'Upgrading files table...' ) )
-	{	// part of 7.0.1-alpha
+	{	// part of 7.0.1-beta
 		db_upgrade_cols( 'T_files', array(
 			'ADD' => array(
 				'file_ts'  => 'TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00" AFTER file_path',
@@ -11729,8 +11751,103 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15470, 'Creating table for item pricing...' ) )
-	{	// part of 7.0.1-alpha
+	if( upg_task_start( 15470, 'Creating SVG file type...' ) )
+	{	// part of 7.0.1-beta
+		$SQL = new SQL( 'Check for file type .svg' );
+		$SQL->SELECT( 'ftyp_ID' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_extensions REGEXP "(^| )svg( |$)"' );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Insert new SVG file type only if it doesn't exist:
+			$DB->query( 'INSERT INTO T_filetypes
+				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
+				VALUES ( "svg", "SVG file", "image/svg+xml", "file_document", "image", "admin" )' );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15480, 'Creating ICO file type...' ) )
+	{	// part of 7.0.1-beta
+		$SQL = new SQL( 'Check for file type .ico' );
+		$SQL->SELECT( 'ftyp_ID' );
+		$SQL->FROM( 'T_filetypes' );
+		$SQL->WHERE( 'ftyp_extensions REGEXP "(^| )ico( |$)"' );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Insert new ICO file type only if it doesn't exist:
+			$DB->query( 'INSERT INTO T_filetypes
+				       ( ftyp_extensions, ftyp_name, ftyp_mimetype, ftyp_icon, ftyp_viewtype, ftyp_allowed )
+				VALUES ( "ico", "ICO image", "image/x-icon", "file_image", "image", "admin" )' );
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15490, 'Upgrading collection permission tables...' ) )
+	{	// part of 7.0.2-beta
+		db_upgrade_cols( 'T_coll_user_perms', array(
+			'ADD' => array(
+				'bloguser_workflow_status'   => 'tinyint NOT NULL default 0 AFTER bloguser_can_be_assignee',
+				'bloguser_workflow_user'     => 'tinyint NOT NULL default 0 AFTER bloguser_workflow_status',
+				'bloguser_workflow_priority' => 'tinyint NOT NULL default 0 AFTER bloguser_workflow_user',
+			),
+		) );
+		$DB->query( 'UPDATE T_coll_user_perms
+			  SET bloguser_workflow_status = 1,
+			      bloguser_workflow_user = 1
+			WHERE bloguser_can_be_assignee = 1' );
+		db_upgrade_cols( 'T_coll_group_perms', array(
+			'ADD' => array(
+				'bloggroup_workflow_status'   => 'tinyint NOT NULL default 0 AFTER bloggroup_can_be_assignee',
+				'bloggroup_workflow_user'     => 'tinyint NOT NULL default 0 AFTER bloggroup_workflow_status',
+				'bloggroup_workflow_priority' => 'tinyint NOT NULL default 0 AFTER bloggroup_workflow_user',
+			),
+		) );
+		$DB->query( 'UPDATE T_coll_group_perms
+			  SET bloggroup_workflow_status = 1,
+			      bloggroup_workflow_user = 1
+			WHERE bloggroup_can_be_assignee = 1' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15500, 'Upgrading item types and custom fields tables...' ) )
+	{	// part of 7.0.2-beta
+		db_upgrade_cols( 'T_items__type', array(
+			'ADD' => array(
+				'ityp_text_template'           => 'TEXT COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER ityp_instruction',
+				'ityp_front_order_title'       => 'SMALLINT NULL',
+				'ityp_front_order_short_title' => 'SMALLINT NULL',
+				'ityp_front_order_instruction' => 'SMALLINT NULL',
+				'ityp_front_order_attachments' => 'SMALLINT NULL',
+				'ityp_front_order_text'        => 'SMALLINT NULL',
+				'ityp_front_order_tags'        => 'SMALLINT NULL',
+				'ityp_front_order_excerpt'     => 'SMALLINT NULL',
+				'ityp_front_order_url'         => 'SMALLINT NULL',
+			),
+		) );
+		$DB->query( 'UPDATE T_items__type
+			SET ityp_front_order_title = 10,
+			    ityp_front_order_instruction = CASE WHEN ityp_front_instruction = 1 THEN 20 ELSE NULL END,
+			    ityp_front_order_attachments = 30,
+			    ityp_front_order_text = 80' );
+		db_drop_col( 'T_items__type', 'ityp_front_instruction' );
+		db_upgrade_cols( 'T_items__type_custom_field', array(
+			'ADD' => array(
+				'itcf_required' => 'TINYINT DEFAULT 0 AFTER itcf_note',
+				'itcf_meta'     => 'TINYINT DEFAULT 0 AFTER itcf_required',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15510, 'Upgrading item types tables...' ) )
+	{	// part of 7.0.2-beta
+		db_add_col( 'T_items__type', 'ityp_front_order_location', 'SMALLINT NULL' );
+		$DB->query( 'UPDATE T_items__type
+			SET ityp_front_order_location = 90' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15520, 'Creating table for item pricing...' ) )
+	{	// part of 7.0.2-beta
 		db_create_table( 'T_items__pricing', "
 			iprc_ID         INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			iprc_itm_ID     INT UNSIGNED NOT NULL,
@@ -11745,8 +11862,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15480, 'Upgrade table currencies...' ) )
-	{	// part of 7.0.1-alpha
+	if( upg_task_start( 15530, 'Upgrade table currencies...' ) )
+	{	// part of 7.0.2-beta
 		db_add_col( 'T_regional__currency', 'curr_default', 'tinyint(1) NOT NULL DEFAULT 0' );
 		$DB->query( 'UPDATE T_regional__currency
 			  SET curr_default = 1
@@ -11754,14 +11871,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15490, 'Installing new default widgets in container "Shopping Cart"...' ) )
-	{	// part of 7.0.1-alpha
+	if( upg_task_start( 15540, 'Installing new default widgets in container "Shopping Cart"...' ) )
+	{	// part of 7.0.2-beta
 		install_new_default_widgets( 'shopping_cart' );
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15500, 'Upgrading items table...' ) )
-	{	// part of 7.0.1-alpha
+	if( upg_task_start( 15550, 'Upgrading items table...' ) )
+	{	// part of 7.0.2-beta
 		db_upgrade_cols( 'T_items__item', array(
 			'ADD' => array(
 				'post_qty_in_stock'  => 'INT(10) NOT NULL DEFAULT 0 AFTER post_countvotes',
@@ -11772,8 +11889,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15510, 'Upgrading item types table...' ) )
-	{	// part of 7.0.1-alpha
+	if( upg_task_start( 15560, 'Upgrading item types table...' ) )
+	{	// part of 7.0.2-beta
 		db_upgrade_cols( 'T_items__type', array(
 			'ADD' => array(
 				'ityp_can_be_purchased_instore' => 'TINYINT DEFAULT 0 AFTER ityp_skin_btn_text',
@@ -11783,8 +11900,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15520, 'Creating payment orders table...' ) )
-	{	// part of 7.0.1-alpha
+	if( upg_task_start( 15570, 'Creating payment orders table...' ) )
+	{	// part of 7.0.2-beta
 		db_create_table( 'T_order__payment', '
 			payt_ID              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			payt_user_ID         INT(10) UNSIGNED NULL,

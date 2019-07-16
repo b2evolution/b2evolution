@@ -15,7 +15,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $admin_url, $media_subdir, $media_path;
+global $admin_url, $media_subdir, $media_path, $Session;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
@@ -37,19 +37,27 @@ $import_files = display_importer_upload_panel( array(
 
 if( ! empty( $import_files ) )
 {
+	$import_type = param( 'import_type', 'string', 'append' );
+
 	$Form->begin_fieldset( T_('Destination collection') );
 
 	$BlogCache = & get_BlogCache();
 	$BlogCache->load_all( 'shortname,name', 'ASC' );
 	$BlogCache->none_option_text = T_('Please select...');
 
-	$Form->select_input_object( 'wp_blog_ID', param( 'wp_blog_ID', 'integer', 0 ), $BlogCache, T_('Destination collection'), array(
+	$Form->select_input_object( 'wp_blog_ID', $Session->get( 'last_import_coll_ID' ), $BlogCache, T_('Destination collection'), array(
 			'note' => T_('This blog will be used for import.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
 			'allow_none' => true,
 			'required' => true,
 			'loop_object_method' => 'get_extended_name' ) );
 
-	$import_type = param( 'import_type', 'string', 'replace' );
+	$Form->radio_input( 'import_type', $import_type, array(
+				array(
+					'value' => 'append',
+					'label' => T_('Append to existing contents'),
+					'id'    => 'import_type_append' ),
+			), T_('Import mode'), array( 'lines' => true ) );
+
 	$Form->radio_input( 'import_type', $import_type, array(
 				array(
 					'value' => 'replace',
@@ -60,18 +68,11 @@ if( ! empty( $import_files ) )
 
 	echo '<div id="checkbox_delete_files"'.( $import_type == 'replace' ? '' : ' style="display:none"' ).'>';
 	$Form->checkbox_input( 'delete_files', param( 'delete_files', 'integer', 0 ), '', array(
-		'input_suffix' => '<label for="delete_files">'.T_(' Also delete files that will no longer be referenced in the destination collection after replacing its contents').'</label>',
+		'input_suffix' => '<label for="delete_files">'.T_(' Also delete media files that will no longer be referenced in the destination collection after replacing its contents').'</label>',
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
-	$Form->radio_input( 'import_type', $import_type, array(
-				array(
-					'value' => 'append',
-					'label' => T_('Append to existing contents'),
-					'id'    => 'import_type_append' ),
-			), '', array( 'lines' => true ) );
-
-	$Form->checkbox_input( 'import_img', 1, '', array( 'input_suffix' => T_('Try to match any remaining <code>&lt;img&gt;</code> tags with imported attachments based on filename') ) );
+	$Form->checkbox_input( 'import_img', 1, T_('Options'), array( 'input_suffix' => T_('Try to match any remaining <code>&lt;img&gt;</code> tags with imported attachments based on filename') ) );
 
 	$Form->end_fieldset();
 

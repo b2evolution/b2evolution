@@ -35,7 +35,7 @@ if( empty( $template_action ) )
 else
 {
 	$block_item_Widget = new Widget( 'block_item' );
-	$block_item_Widget->title = 'WHOIS - '.$query;
+	$block_item_Widget->title = 'WHOIS - '.$query.get_manual_link('antispam-whois');
 	echo $block_item_Widget->replace_vars( $block_item_Widget->params[ 'block_start' ] );
 
 	echo antispam_get_whois( $query );

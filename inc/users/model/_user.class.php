@@ -2096,7 +2096,7 @@ class User extends DataObject
 			{
 				case 'login':
 				case 'avatar_login':
-					$link_login = $this->login;
+					$link_login = $this->get_username();
 					break;
 				case 'nickname':
 					$link_login = $this->nickname;
@@ -2670,7 +2670,7 @@ class User extends DataObject
 	 */
 	function get_media_subpath()
 	{
-		if( is_valid_login( $this->login, true ) )
+		if( is_valid_login( $this->login, true ) === true )
 		{	// Valid ASCII login, use it as is
 			return 'users/'.$this->login.'/';
 		}
@@ -3169,6 +3169,9 @@ class User extends DataObject
 			// NOTE: these are currently the only collections that will check multiple user groups:
 			case 'blog_ismember':
 			case 'blog_can_be_assignee':
+			case 'blog_workflow_status':
+			case 'blog_workflow_user':
+			case 'blog_workflow_priority':
 			case 'blog_item_propose':
 			case 'blog_post_statuses':
 			case 'blog_post!published':
@@ -3469,7 +3472,7 @@ class User extends DataObject
 				// Blog permission to edit its properties...
 				$this->get_Group();
 
-				// Group may grant VIEW acces, FULL access:
+				// Group may grant VIEW access, FULL access:
 				if( $this->Group->check_perm( $permname, $permlevel, $perm_target ) )
 				{ // If group grants a global permission:
 					$perm = true;
@@ -3726,6 +3729,9 @@ class User extends DataObject
 	 * @param string Permission name, can be one of the following:
 	 *                  - blog_ismember
 	 *                  - blog_can_be_assignee
+	 *                  - blog_workflow_status
+	 *                  - blog_workflow_user
+	 *                  - blog_workflow_priority
 	 *                  - blog_post_statuses
 	 *                  - blog_del_post
 	 *                  - blog_edit_ts
@@ -4703,7 +4709,16 @@ class User extends DataObject
 			$form_url = isset($Blog) ? $Blog->get('msgformurl') : '';
 		}
 
-		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode(url_rel_to_same_host(regenerate_url('','','','&'), $form_url)) );
+		if( param( 'redirect_to', 'url', NULL ) !== NULL )
+		{	// Use current redirect URL:
+			$redirect_to = get_param( 'redirect_to' );
+		}
+		else
+		{	// Generate new redirect URL:
+			$redirect_to = regenerate_url( '', '', '', '&' );
+		}
+
+		$form_url = url_add_param( $form_url, 'recipient_id='.$this->ID.'&amp;redirect_to='.rawurlencode( url_rel_to_same_host( $redirect_to, $form_url ) ) );
 
 		if( $title == '#' )
 		{
@@ -5076,7 +5091,7 @@ class User extends DataObject
 						'after_image_legend'  => '',
 						'after_image'         => '',
 						'image_size'          => $size,
-						'image_link_title'    => $this->login,
+						'image_link_title'    => $this->get_username(),
 						'image_link_rel'      => $link_rel,
 						'image_class'         => $class,
 						'image_align'         => $align,
@@ -7004,7 +7019,7 @@ class User extends DataObject
 			}
 
 			return sprintf( $params['text_simple'],
-				$this->login, $total_num_comments, $public_percent,
+				$this->get_username(), $total_num_comments, $public_percent,
 				'<b class="green">'.$votes_count_useful.'</b>', '<b>'.$users_count_useful.'</b>' );
 		}
 		else
@@ -7044,7 +7059,7 @@ class User extends DataObject
 			}
 
 			return sprintf( $params['text_extended'],
-				$this->login, $total_num_comments, $public_percent,
+				$this->get_username(), $total_num_comments, $public_percent,
 				'<b class="green">'.$votes_count_useful.'</b>', '<b>'.count( $users_count_useful ).'</b>',
 				'<b class="red">'.$votes_count_not.'</b>', '<b>'.count( $users_count_not ).'</b>',
 				'<b class="green">'.$votes_count_ok.'</b>', '<b>'.count( $users_count_ok ).'</b>',
@@ -7111,7 +7126,7 @@ class User extends DataObject
 						$votes_count_up += $user_votes;
 					}
 					return sprintf( $params['text_image_simple'],
-						$this->login, '<b>'.$this->get_num_files( 'image' ).'</b>',
+						$this->get_username(), '<b>'.$this->get_num_files( 'image' ).'</b>',
 						'<b class="green">'.$votes_count_up.'</b>', '<b>'.$users_count_up.'</b>' );
 				}
 				else
@@ -7151,7 +7166,7 @@ class User extends DataObject
 					}
 
 					return sprintf( $params['text_image_extended'],
-						$this->login, '<b>'.$this->get_num_files( 'image' ).'</b>',
+						$this->get_username(), '<b>'.$this->get_num_files( 'image' ).'</b>',
 						'<b class="green">'.$votes_count_up.'</b>', '<b>'.count( $users_count_up ).'</b>',
 						'<b class="red">'.$votes_count_down.'</b>', '<b>'.count( $users_count_down ).'</b>',
 						'<b class="red">'.$votes_count_inappropriate.'</b>', '<b>'.count( $users_count_inappropriate ).'</b>',
@@ -7161,15 +7176,15 @@ class User extends DataObject
 
 			case 'audio':
 				// Number of audio files
-				return sprintf( $params['text_audio'], $this->login, '<b>'.$this->get_num_files( 'audio' ).'</b>' );
+				return sprintf( $params['text_audio'], $this->get_username(), '<b>'.$this->get_num_files( 'audio' ).'</b>' );
 
 			case 'video':
 				// Number of video files
-				return sprintf( $params['text_video'], $this->login, '<b>'.$this->get_num_files( 'video' ).'</b>' );
+				return sprintf( $params['text_video'], $this->get_username(), '<b>'.$this->get_num_files( 'video' ).'</b>' );
 
 			case 'other':
 				// Number of other files
-				return sprintf( $params['text_other'], $this->login, '<b>'.$this->get_num_files( 'other' ).'</b>' );
+				return sprintf( $params['text_other'], $this->get_username(), '<b>'.$this->get_num_files( 'other' ).'</b>' );
 		}
 	}
 
@@ -7196,7 +7211,7 @@ class User extends DataObject
 			$total_upload = bytesreadable( $total_upload );
 		}
 
-		return sprintf( $params['text'], $this->login, '<b>'.$total_upload.'</b>' );
+		return sprintf( $params['text'], $this->get_username(), '<b>'.$total_upload.'</b>' );
 	}
 
 
@@ -7233,7 +7248,7 @@ class User extends DataObject
 		// Get spam fighter score for the users that were reported and deleted
 		$votes += intval( $UserSettings->get( 'spam_fighter_score', $this->ID ) );
 
-		return sprintf( $params['text'], $this->login, '<b>'.$votes.'</b>' );
+		return sprintf( $params['text'], $this->get_username(), '<b>'.$votes.'</b>' );
 	}
 
 

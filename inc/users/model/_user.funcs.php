@@ -906,7 +906,7 @@ function get_user_logout_link( $before = '', $after = '', $link_text = '', $link
 	$r .= '<a href="'.get_user_logout_url().'"';
 	$r .= get_field_attribs_as_string( $params, false );
 	$r .= ' title="'.$link_title.'">';
-	$r .= sprintf( $link_text, $current_User->login );
+	$r .= sprintf( $link_text, $current_User->get_username() );
 	$r .= '</a>';
 	$r .= $after;
 	return $r;
@@ -1046,13 +1046,13 @@ function get_user_profile_link( $before = '', $after = '', $link_text = '', $lin
 	}
 	else
 	{
-		$link_text = str_replace( '%s', $current_User->login, $link_text );
+		$link_text = str_replace( '%s', $current_User->get_username(), $link_text );
 	}
 	if( $link_title == '#' ) $link_title = T_('Edit your profile');
 
 	$r = $before
 		.'<a href="'.get_user_profile_url().'" title="'.$link_title.'">'
-		.sprintf( $link_text, $current_User->login )
+		.sprintf( $link_text, $current_User->get_username() )
 		.'</a>'
 		.$after;
 
@@ -1763,7 +1763,7 @@ function profile_check_params( $params, $User = NULL )
  */
 function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size = 'crop-top-15x15', $img_class = 'avatar_before_login', $align = '', $avatar_overlay_text = '', $link_class = '', $show_avatar = true, $rel = NULL )
 {
-	global $current_User;
+	global $current_User, $Settings;
 
 	$UserCache = & get_UserCache();
 	$User = & $UserCache->get_by_login( $user_login );
@@ -1780,7 +1780,8 @@ function get_avatar_imgtag( $user_login, $show_login = true, $link = true, $size
 	}
 
 	$login_class = '';
-	if( ! empty( $show_login ) )
+	if( ! empty( $show_login ) &&
+	    ( $show_login !== 'login' || $Settings->get( 'username_display' ) != 'name' ) )
 	{ // Dsiplay user login or preffered name
 		$login = ( $show_login === 'login' ? $User->login : $User->get_username() );
 		// Add class "login" to detect logins by js plugins
@@ -2206,6 +2207,9 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 		$blog_perms[ $row[ $perm_target_key ] ] = array(
 				'blog_ismember'           => $row[$prefix.'_ismember'],
 				'blog_can_be_assignee'    => $row[$prefix.'_can_be_assignee'],
+				'blog_workflow_status'    => $row[$prefix.'_workflow_status'],
+				'blog_workflow_user'      => $row[$prefix.'_workflow_user'],
+				'blog_workflow_priority'  => $row[$prefix.'_workflow_priority'],
 				'blog_item_propose'       => $row[$prefix.'_perm_item_propose'],
 				'blog_post_statuses'      => $row['perm_poststatuses_bin'],
 				'blog_cmt_statuses'       => $row['perm_cmtstatuses_bin'],
@@ -2237,6 +2241,9 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 				$blog_perms[ $perm_target_ID ] = array(
 						'blog_ismember'           => 0,
 						'blog_can_be_assignee'    => 0,
+						'blog_workflow_status'    => 0,
+						'blog_workflow_user'      => 0,
+						'blog_workflow_priority'  => 0,
 						'blog_item_propose'       => 0,
 						'blog_post_statuses'      => 0,
 						'blog_item_type'          => 'standard',

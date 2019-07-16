@@ -90,9 +90,6 @@ div.extended_search_form .search_options .search_option {
 table.catselect input#new_category_name {
   width: 98% !important;
 }
-label.control-label[for=post_title] {
-  width: auto;
-}
 textarea.message_text {
   width: 95%;
 }
@@ -270,8 +267,21 @@ body.evo_toolbar_visible div#skin_wrapper .evo_container__site_header {
   font-size: inherit;
   margin-right: 5px;
 }
-.posts_list li > .btn-group {
-  margin: 0 0 6px 30px;
+.posts_list h3 + .btn {
+  margin: -10px 0 0 30px;
+}
+.posts_list h3 .evo_post_read_status {
+  text-decoration: none;
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 85%;
+  margin-top: -10px;
+}
+.posts_list li > .btn-group,
+.posts_list .evo_container__item_in_list .widget_core_item_title > .btn-group,
+.posts_list li > .evo_status,
+.posts_list .evo_container__item_in_list .widget_core_item_title > .evo_status {
+  margin: -6px 0 0 30px;
 }
 ol.breadcrumb {
   margin-left: 0;
@@ -296,4 +306,8 @@ ol.breadcrumb {
 .evo_post_title .btn-group .btn,
 .cat_title .btn-group .btn {
   float: none;
+}
+.evo_post_title .evo_post_read_status {
+  vertical-align: middle;
+  margin: 10px 2px 0 0;
 }

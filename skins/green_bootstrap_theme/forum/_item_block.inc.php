@@ -331,7 +331,7 @@ skin_widget( array(
 				widget_container( 'sidebar_single', array(
 						// The following (optional) params will be used as defaults for widgets included in this container:
 						'container_display_if_empty' => false, // If no widget, don't display container at all
-						'container_start' => '<aside class="col-md-3'.( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left' : '' ).'"><div class="evo_container $wico_class$">',
+						'container_start' => '<aside class="col-md-3'.( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left-md' : '' ).'"><div class="evo_container $wico_class$">',
 						'container_end'   => '</div></aside>',
 						// This will enclose each widget in a block:
 						'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',

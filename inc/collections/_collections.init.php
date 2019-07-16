@@ -1604,7 +1604,7 @@ class collections_Module extends Module
 					else
 					{
 						$Messages->add( T_('Sorry, the email with the link to activate your account could not be sent.')
-							.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+							.'<br />'.get_send_mail_error(), 'error' );
 						// fp> TODO: allow to enter a different email address (just in case it's that kind of problem)
 					}
 				}
@@ -1624,6 +1624,10 @@ class collections_Module extends Module
 
 				if( $new_Item->dbinsert() )
 				{	// Successful new item creating:
+
+					// Execute or schedule notifications & pings:
+					$new_Item->handle_notifications( NULL, true );
+
 					$Messages->add( T_('Post has been created.'), 'success' );
 					$Messages->add( T_('Please double check your email address and choose a password so that you can log in next time you visit us.'), 'warning' );
 					$redirect_to = $item_Blog->get( 'register_finishurl', array( 'glue' => '&' ) );

@@ -70,8 +70,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 				// Controlling the title:
 				'widget_item_title_params'  => array(
-					'before' => '<div class="evo_post_title">'.( in_array( $disp, array( 'single', 'page' ) ) ? '<h1>' : '<h2>' ),
-					'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
+					'before' => $params['item_title_line_before'].$params['item_title_before'],
+					'after' => $params['item_title_after'].$params['item_title_line_after'],
 				),
 				// Item Visibility Badge widget template:
 				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
@@ -112,8 +112,8 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 
 				// Controlling the title:
 				'widget_item_title_params'  => array(
-						'before' => '<div class="evo_post_title">'.( in_array( $disp, array( 'single', 'page' ) ) ? '<h1>' : '<h2>' ),
-						'after' => ( in_array( $disp, array( 'single', 'page' ) ) ? '</h1>' : '</h2>' ).'</div>',
+						'before' => $params['item_title_line_before'].( $disp == 'single' ? $params['item_title_single_before'] : $params['item_title_before'] ),
+						'after' => ( $disp == 'single' ? $params['item_title_single_after'] : $params['item_title_after'] ).$params['item_title_line_after'],
 					),
 
 				// Item Visibility Badge widget template:
@@ -137,7 +137,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 			if( $params['disp_title'] )
 			{
 				echo $params['item_title_line_before'];
-				if( $disp == 'single' )
+				if( $disp == 'single' || $disp == 'page' )
 				{
 					$title_before = $params['item_title_single_before'];
 					$title_after = $params['item_title_single_after'];

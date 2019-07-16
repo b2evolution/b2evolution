@@ -123,13 +123,11 @@ class bootstrap_site_dropdown_Skin extends Skin
 					),
 						'menu_bar_bg_color' => array(
 							'label' => T_('Menu bar background color'),
-							'note' => T_('E-g: #ff0000 for red'),
 							'defaultvalue' => '#f8f8f8',
 							'type' => 'color',
 						),
 						'menu_bar_border_color' => array(
 							'label' => T_('Menu bar border color'),
-							'note' => T_('E-g: #0000ff for blue'),
 							'defaultvalue' => '#e7e7e7',
 							'type' => 'color',
 						),
@@ -143,31 +141,26 @@ class bootstrap_site_dropdown_Skin extends Skin
 						),
 						'tab_text_color' => array(
 							'label' => T_('Tab text color'),
-							'note' => T_('E-g: #ff0000 for red'),
 							'defaultvalue' => '#777',
 							'type' => 'color',
 						),
 						'hover_tab_bg_color' => array(
 							'label' => T_('Hover tab color'),
-							'note' => T_('E-g: #00ff00 for green'),
 							'defaultvalue' => '#f8f8f8',
 							'type' => 'color',
 						),
 						'hover_tab_text_color' => array(
 							'label' => T_('Hover tab text color'),
-							'note' => T_('E-g: #0000ff for blue'),
 							'defaultvalue' => '#333',
 							'type' => 'color',
 						),
 						'selected_tab_bg_color' => array(
 							'label' => T_('Selected tab color'),
-							'note' => T_('E-g: #ff0000 for red'),
 							'defaultvalue' => '#e7e7e7',
 							'type' => 'color',
 						),
 						'selected_tab_text_color' => array(
 							'label' => T_('Selected tab text color'),
-							'note' => T_('E-g: #00ff00 for green'),
 							'defaultvalue' => '#555',
 							'type' => 'color',
 						),
@@ -181,43 +174,36 @@ class bootstrap_site_dropdown_Skin extends Skin
 					),
 						'sub_tab_bg_color' => array(
 							'label' => T_('Menu bar background color'),
-							'note' => T_('E-g: #ff0000 for red'),
 							'defaultvalue' => '#fff',
 							'type' => 'color',
 						),
 						'sub_tab_border_color' => array(
 							'label' => T_('Menu bar border color'),
-							'note' => T_('E-g: #00ff00 for green'),
 							'defaultvalue' => '#ddd',
 							'type' => 'color',
 						),
 						'sub_tab_text_color' => array(
 							'label' => T_('Tab text color'),
-							'note' => T_('E-g: #0000ff for blue'),
 							'defaultvalue' => '#555',
 							'type' => 'color',
 						),
 						'sub_hover_tab_bg_color' => array(
 							'label' => T_('Hover tab color'),
-							'note' => T_('E-g: #ff0000 for red'),
 							'defaultvalue' => '#f5f5f5',
 							'type' => 'color',
 						),
 						'sub_hover_tab_text_color' => array(
 							'label' => T_('Hover tab text color'),
-							'note' => T_('E-g: #0000ff for blue'),
 							'defaultvalue' => '#555',
 							'type' => 'color',
 						),
 						'sub_selected_tab_bg_color' => array(
 							'label' => T_('Selected tab color'),
-							'note' => T_('E-g: #ff0000 for red'),
 							'defaultvalue' => '#eee',
 							'type' => 'color',
 						),
 						'sub_selected_tab_text_color' => array(
 							'label' => T_('Selected tab text color'),
-							'note' => T_('E-g: #0000ff for blue'),
 							'defaultvalue' => '#555',
 							'type' => 'color',
 						),
@@ -249,19 +235,16 @@ class bootstrap_site_dropdown_Skin extends Skin
 				),
 					'footer_bg_color' => array(
 						'label' => T_('Background color'),
-						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#f5f5f5',
 						'type' => 'color',
 					),
 					'footer_text_color' => array(
 						'label' => T_('Text color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#777',
 						'type' => 'color',
 					),
 					'footer_link_color' => array(
 						'label' => T_('Link color'),
-						'note' => T_('E-g: #0000ff for blue'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
@@ -499,19 +482,24 @@ footer.bootstrap_site_navbar_footer .container a {
 				$this->header_tab_active = $level0_index;
 			}
 
-			if( $contact_url = $Blog->get_contact_url( true ) )
+			if( $contact_url = $Blog->get_contact_url() )
 			{	// If contact page is allowed for current collection:
-				$tab_items[] = array(
+				$tab_item = array(
 						'name'   => T_('Contact'),
 						'url'    => $contact_url,
 						'active' => ( $current_disp == 'msgform' )
 					);
+				if( $Blog->get_setting( 'msgform_nofollowto' ) )
+				{	// Use nofollow attribute:
+					$tab_item['rel'] = 'nofollow';
+				}
+				$tab_items[] = $tab_item;
 			}
 
 			if( ! empty( $contact_url ) )
 			{	// Display additional tabs with static pages only user has an access to contact page:
 				$header_tabs[] = array(
-						'name'   => 'About',
+						'name'   => T_('About'),
 						'url'    => $contact_url,
 						'items'  => $tab_items
 					);

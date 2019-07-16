@@ -248,7 +248,21 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 			continue;
 		}
 
-		$text_value = utf8_trim( is_array( $user_field_value ) ? implode( ', ', $user_field_value ) : $user_field_value );
+		if( ! is_array( $user_field_value ) )
+		{
+			$user_field_value = array( $user_field_value );
+		}
+
+		$text_value = array();
+		foreach( $user_field_value as $text_val )
+		{
+			$text_val = utf8_trim( $text_val );
+			if( ! empty( $text_val ) )
+			{
+				$text_value[] = $text_val;
+			}
+		}
+		$text_value = implode( ', ', $text_value );
 		if( empty( $text_value ) )
 		{	// Skip empty values:
 			continue;
@@ -257,10 +271,6 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 		if( is_logged_in() )
 		{	// Update user fields of the logged in User:
 			$userfields = $current_User->userfields_by_ID( $UserField->ID );
-			if( ! is_array( $user_field_value ) )
-			{
-				$user_field_value = array(  $user_field_value );
-			}
 			foreach( $user_field_value as $u => $uf_value )
 			{
 				if( empty( $uf_value ) )
@@ -314,10 +324,6 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 						{	// Update a single field only if it was changed:
 							$current_User->userfield_update( $userfield_data->uf_ID, $uf_value );
 							$update_user_fields = true;
-						}
-						elseif( $UserField->get( 'duplicated' ) == 'allowed' )
-						{	// Add second value for multiple field:
-							$add_multifield_value = true;
 						}
 
 						if( $add_multifield_value && $u > $m && $u < 2 )
@@ -558,7 +564,7 @@ if( $success_message )
 		else
 		{
 			$Messages->add( T_('Sorry, could not send email.')
-				.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+				.'<br />'.get_send_mail_error(), 'error' );
 		}
 	}
 }
@@ -588,7 +594,21 @@ if( $success_message )
 		$Messages->add( sprintf( T_('You have successfully sent an email to %s.'),
 			( empty( $recipient_User ) ? $recipient_name : $recipient_User->get_username() ) ), 'success' );
 	}
-	if( empty( $redirect_to ) )
+	if( isset( $recipient_User, $Blog ) &&
+	    $Blog->get_owner_User() &&
+	    $recipient_User->ID == $Blog->get_owner_User()->ID )
+	{	// Message was sent to collection owner:
+		$ItemCache = & get_ItemCache();
+		if( $redirect_Item = & $ItemCache->get_by_urltitle( $Blog->get_setting( 'msgform_redirect_slug' ), false, false ) )
+		{	// Use item permanent URL from collection setting:
+			$redirect_to = $redirect_Item->get_permanent_url( '', '', '&' );
+		}
+		else
+		{	// Use collection home page URL:
+			$redirect_to = $Blog->gen_blogurl();
+		}
+	}
+	elseif( empty( $redirect_to ) )
 	{
 		$redirect_to = $Blog->gen_blogurl();
 		if( !empty( $recipient_User ) )

@@ -32,16 +32,20 @@ class CollectionSettings extends AbstractSettings
 	var $_defaults = array(
 		// Home page settings:
 			'front_disp'             => 'posts',
+			'default_noindex'         => 0, // META NOINDEX on Default/Front collection page
+			'canonical_homepage'      => 1, // Redirect front page to its canonical Url?
+			'self_canonical_homepage' => 1, // Use self-referencing rel="canonical" tag
+			'relcanonical_homepage'   => 1, // If no 301, fall back to rel="canoncial" ?
 
 		// Posts list settings:
 			'what_to_show'           => 'posts',      // posts, days
 			'main_content'           => 'normal',
 			'posts_per_page'         => '5',
 			'disp_featured_above_list' => 0,				// Don't display a featured post above the list by default
-			'canonical_homepage'     => 1,				// Redirect homepage to its canonical Url?
-			'self_canonical_homepage' => 1,				// Use self-referencing rel="canonical" tag
-			'relcanonical_homepage'  => 1,				// If no 301, fall back to rel="canoncial" ?
-			'default_noindex'        => '0',				// META NOINDEX on Default blog page
+			'canonical_posts'        => 1,				// Redirect disp=posts to its canonical Url?
+			'self_canonical_posts'   => 1,				// Use self-referencing rel="canonical" tag
+			'relcanonical_posts'     => 1,				// If no 301, fall back to rel="canoncial" ?
+			'posts_firstpage_noindex'=> 0,				// META NOINDEX on First page on disp=posts
 			'orderby'         => 'datestart',
 			'orderdir'        => 'DESC',
 			'title_link_type' => 'permalink',
@@ -52,13 +56,14 @@ class CollectionSettings extends AbstractSettings
 			'paged_nofollowto' => '0',						// NOFOLLOW on links to following blog pages
 
 		// Single post settings:
+			'single_noindex' => 0,					// META NOINDEX on Single/Page pages
 			'canonical_item_urls' => 1,					// Redirect posts to their canonical Url?
 			'self_canonical_item_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'allow_crosspost_urls' => 1,					// For cross-posted Items, allow non-canonical URL
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'single_links'   => 'short',
 			'single_item_footer_text' => '',
-			'slug_limit' => 5,
+			'slug_limit' => 8,
 			'tags_meta_keywords' => 1,
 			'tags_open_graph' => 1,
 			'tags_twitter_card' => 1,
@@ -143,6 +148,7 @@ class CollectionSettings extends AbstractSettings
 		// Other pages:
 			'feedback-popup_noindex' => '1',			// META NOINDEX on Feedback popups
 			'msgform_noindex' => '1',					// META NOINDEX on Message forms
+			'msgform_nofollowto' => '1',
 			'special_noindex' => '1',					// META NOINDEX on other special pages
 			'404_response' => '404',
 			'help_link' => 'slug',
@@ -169,6 +175,7 @@ class CollectionSettings extends AbstractSettings
 			'cache_enabled_widgets' => 0,
 			'in_skin_login' => 0,						// Use in skin login form every time it's possible
 			'in_skin_editing' => 0,
+			'in_skin_change_proposal' => 1,
 			'in_skin_editing_renderers' => 1,
 			'in_skin_editing_category' => 1,
 			'in_skin_editing_category_order' => 1,
@@ -231,6 +238,7 @@ class CollectionSettings extends AbstractSettings
 			'msgform_require_message' => 1, // Require message
 
 		// User directory:
+			'userdir_enable' => 1,
 			'userdir_filter_gender' => 1,
 			'userdir_filter_level' => 1,
 			'userdir_filter_org' => 1,
@@ -266,6 +274,7 @@ class CollectionSettings extends AbstractSettings
 			'search_score_post_tags'           => 4, // weight multiplier for keywords found in post tags
 			'search_score_post_excerpt'        => 1, // weight multiplier for keywords found in post excerpt
 			'search_score_post_titletag'       => 4, // weight multiplier for keywords found in post <title> tag
+			'search_score_post_metakeywords'   => 3, // weight multiplier for keywords found in post <meta> keywords
 			'search_score_post_author'         => 5, // weight multiplier for keywords found in post author login
 			'search_score_post_date_future'    => 0, // weight multiplier for posts from future
 			'search_score_post_date_moremonth' => 0, // weight multiplier for posts older month

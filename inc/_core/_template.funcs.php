@@ -249,6 +249,8 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 		$redirect_to = $baseurl;
 	}
 
+	// Send the predefined cookies:
+	evo_sendcookies();
 
 	if( is_integer($status) )
 	{
@@ -258,7 +260,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	{
 		$http_response_code = $status ? 301 : 303;
 	}
- 	$Debuglog->add('***** REDIRECT TO '.$redirect_to.' (status '.$http_response_code.') *****', 'request' );
+	$Debuglog->add('***** REDIRECT TO '.$redirect_to.' (status '.$http_response_code.') *****', 'request' );
 
 	if( ! empty($Session) )
 	{	// Session is required here
@@ -3950,4 +3952,14 @@ function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = tru
 	}
 }
 
+
+/**
+ * Get a label for PRO version
+ *
+ * @return string
+ */
+function get_pro_label()
+{
+	return '<span class="label label-sm label-primary">PRO</span>';
+}
 ?>

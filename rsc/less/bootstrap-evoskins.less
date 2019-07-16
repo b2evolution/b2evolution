@@ -18,6 +18,12 @@
 	.text-right-sm {
 		text-align: right;
 	}
+	.pull-left-sm {
+		float: left;
+	}
+	.pull-right-sm {
+		float: right;
+	}
 }
 
 /* Medium devices (desktops, 992px and up) */
@@ -28,6 +34,12 @@
 	.text-right-md {
 		text-align: right;
 	}
+	.pull-left-md {
+		float: left;
+	}
+	.pull-right-md {
+		float: right;
+	}
 }
 
 /* Large devices (large desktops, 1200px and up) */
@@ -37,6 +49,12 @@
 	}
 	.text-right-lg {
 		text-align: right;
+	}
+	.pull-left-lg {
+		float: left;
+	}
+	.pull-right-lg {
+		float: right;
 	}
 }
 
@@ -56,6 +74,13 @@ ul, ol {
 
 p.margin-top {
 	margin: 10px 0 0 0;
+}
+
+// Remove unwanted space at the bottom of table cell:
+th, td, caption {
+	> p:last-child {
+		margin-bottom: 0;
+	}
 }
 
 // Use yellow color on hover table rows intead of grey standard color:
@@ -251,11 +276,32 @@ a.btn.action_icon {
 			padding-right: 5px;
 		}
 	}
+	// Location:
+	#item_locations {
+		th, td {
+			white-space: nowrap;
+			padding: 2px 0;
+		}
+		label {
+			width: auto;
+			float: right;
+		}
+		select {
+			display: inline-block;
+		}
+	}
 	// Text Renderers block on edit post form
 	#itemform_renderers {
+		.dropdown-menu {
+			padding: 10px 10px 5px 10px;
+		}
+		.popover {
+			max-width: initial;
+		}
 		div[id^="block_renderer_"] {
 			padding-left: 20px;
 			position: relative;
+			white-space: nowrap;
 			input[type=checkbox] {
 				margin: 4px 0 0;
 				position: absolute;
@@ -588,7 +634,7 @@ div.messages{
 	max-width: 100%;
 	color: #333;
 	&.right {
-		text-align: left;
+		text-align: left !important;
 		&.popover-userfield {
 			// Shift a popover window to the right on 35px to don't hide a plus icon
 			margin-left: 35px !important;
@@ -631,7 +677,7 @@ a:hover .glyphicon {
 }
 
 // Make a label inline
-#itemform_renderers, table.catselect {
+table.catselect {
 	label {
 		display: inline-block;
 		margin-right: 5px;
@@ -1129,6 +1175,14 @@ div.edit_toolbars, div.message_toolbars {
 	.panel_heading_action_icons .btn-group.dropdown.single-group-xs a.btn.btn-sm {
 		border-radius: 3px;
 	}
+}
+
+// Fieldset folding:
+div.fieldset_wrapper.folded .panel-body {
+	display: none;
+}
+span[id^=title_folding_] {
+	cursor: default;
 }
 
 // Widgets containers "Shopping Cart":

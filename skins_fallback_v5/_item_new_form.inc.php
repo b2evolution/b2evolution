@@ -113,7 +113,7 @@ if( $new_Item->get_type_setting( 'use_text' ) != 'never' )
 
 
 	// =================================== INSTRUCTION ====================================
-	if( $new_Item->get_type_setting( 'front_instruction' ) && $new_Item->get_type_setting( 'instruction' ) )
+	if( $new_Item->get_type_setting( 'front_order_instruction' ) && $new_Item->get_type_setting( 'instruction' ) )
 	{
 		echo '<br><div class="alert alert-info fade in evo_instruction">'.$new_Item->get_type_setting( 'instruction' ).'</div>';
 	}

@@ -44,6 +44,9 @@ switch( $action )
 		$wp_blog_ID = param( 'wp_blog_ID', 'integer', 0 );
 		param_check_not_empty( 'wp_blog_ID', T_('Please select a collection!') );
 
+		// Save last import collection in Session:
+		$Session->set( 'last_import_coll_ID', $wp_blog_ID );
+
 		// XML File
 		$xml_file = param( 'import_file', 'string', '' );
 		if( empty( $xml_file ) )

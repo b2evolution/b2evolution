@@ -65,18 +65,29 @@ $Form->begin_fieldset( T_('General').get_manual_link( 'general-seo' ) );
 			sprintf( /* TRANS: %s replaced with <code></body></code> */ T_('Include Structured Data before %s'), '<code>&lt;/body&gt;</code>' ) );
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main-page-seo') );
-	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Default blog page'), T_('META NOINDEX') );
+$Form->begin_fieldset( T_('Special Front Page').' <span class="text-muted">(disp=front)</span>'.get_manual_link( 'special-front-page-seo' ) );
+	$Form->checkbox( 'default_noindex', $edited_Blog->get_setting( 'default_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+
 	$Form->checklist( array(
 		array( 'canonical_homepage', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_homepage' ) ),
-		array( 'self_canonical_homepage', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_homepage' ) ),
-		array( 'relcanonical_homepage', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_homepage' ) ),
+		array( 'relcanonical_homepage', 1, T_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_homepage' ) ),
+		array( 'self_canonical_homepage', 1, T_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_homepage' ) ),
 		), 'canonical_homepage_options', T_('Make canonical') );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(disp=posts)</span>'.get_manual_link('main-page-seo') );
+	$Form->checkbox( 'posts_firstpage_noindex', $edited_Blog->get_setting( 'posts_firstpage_noindex' ), T_('First posts page'), T_('META NOINDEX') );
 
 	$Form->checklist( array(
 			array( 'paged_noindex', 1, T_('META NOINDEX').' - '.T_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_noindex' ) ),
 			array( 'paged_nofollowto', 1, T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_nofollowto' ) ),
-		), 'paged', T_('"Next" blog pages') );
+		), 'paged', T_('Next posts pages') );
+
+	$Form->checklist( array(
+		array( 'canonical_posts', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_posts' ) ),
+		array( 'relcanonical_posts', 1, T_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_posts' ) ),
+		array( 'self_canonical_posts', 1, T_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_posts' ) ),
+		), 'canonical_posts_options', T_('Make canonical') );
 
 	$Form->radio( 'title_link_type', $edited_Blog->get_setting( 'title_link_type' ), array(
 			  array( 'permalink', T_('Link to the permanent url of the post') ),
@@ -103,6 +114,8 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_link('single-post-pages-seo') );
 
+	$Form->checkbox( 'single_noindex', $edited_Blog->get_setting( 'single_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+
 	$Form->radio( 'single_links', $edited_Blog->get_setting('single_links'),
 		array(
 			  array( 'param_num', T_('Use param: post ID'), T_('E-g: ')
@@ -127,9 +140,9 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 
 	$Form->checklist( array(
 		array( 'canonical_item_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_item_urls' ) ),
-		array( 'self_canonical_item_urls', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_item_urls' ) ),
-		array( 'allow_crosspost_urls', 1, T_('For cross-posted Items, allow non-canonical URL'), $edited_Blog->get_setting( 'allow_crosspost_urls' ), ! $edited_Blog->get_setting( 'canonical_item_urls' ) ),
-		array( 'relcanonical_item_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_item_urls' ) ),
+		array( 'allow_crosspost_urls', 1, T_('Do not 301 redirect cross-posted Items'), $edited_Blog->get_setting( 'allow_crosspost_urls' ), ! $edited_Blog->get_setting( 'canonical_item_urls' ) ),
+		array( 'relcanonical_item_urls', 1, T_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_item_urls' ) ),
+		array( 'self_canonical_item_urls', 1, T_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_item_urls' ) ),
 		), 'canonical_item_urls_options', T_('Make canonical') );
 
 	$Form->checkbox( 'excerpts_meta_description', $edited_Blog->get_setting( 'excerpts_meta_description' ),
@@ -151,8 +164,8 @@ $Form->begin_fieldset( T_('"By date" archives').get_manual_link('archive-pages-s
 
 	$Form->checklist( array(
 		array( 'canonical_archive_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_archive_urls' ) ),
-		array( 'self_canonical_archive_urls', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_archive_urls' ) ),
-		array( 'relcanonical_archive_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_archive_urls' ) ),
+		array( 'relcanonical_archive_urls', 1, T_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_archive_urls' ) ),
+		array( 'self_canonical_archive_urls', 1, T_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_archive_urls' ) ),
 		), 'canonical_archive_urls_options', T_('Make canonical') );
 
 	$Form->checkbox( 'archive_noindex', $edited_Blog->get_setting( 'archive_noindex' ), T_('Indexing'), T_('META NOINDEX') );
@@ -202,8 +215,8 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category-pages-seo'
 
 	$Form->checklist( array(
 		array( 'canonical_cat_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_cat_urls' ) ),
-		array( 'self_canonical_cat_urls', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_cat_urls' ) ),
-		array( 'relcanonical_cat_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_cat_urls' ) ),
+		array( 'relcanonical_cat_urls', 1, T_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_cat_urls' ) ),
+		array( 'self_canonical_cat_urls', 1, T_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_cat_urls' ) ),
 		), 'canonical_cat_urls_options', T_('Make canonical') );
 
 	$Form->checkbox( 'chapter_noindex', $edited_Blog->get_setting( 'chapter_noindex' ), T_('Indexing'), T_('META NOINDEX') );
@@ -251,8 +264,8 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag-pages-seo'), array('
 
 	$Form->checklist( array(
 		array( 'canonical_tag_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_tag_urls' ) ),
-		array( 'self_canonical_tag_urls', 1, T_('Use self-referencing rel="canonical" tag'), $edited_Blog->get_setting( 'self_canonical_tag_urls' ) ),
-		array( 'relcanonical_tag_urls', 1, T_('Use rel="canonical" if not 301 redirected'), $edited_Blog->get_setting( 'relcanonical_tag_urls' ) ),
+		array( 'relcanonical_tag_urls', 1, T_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_tag_urls' ) ),
+		array( 'self_canonical_tag_urls', 1, T_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_tag_urls' ) ),
 		), 'canonical_tag_urls_options', T_('Make canonical') );
 
 	$Form->checkbox( 'tag_noindex', $edited_Blog->get_setting( 'tag_noindex' ), T_('Indexing'), T_('META NOINDEX') );
@@ -317,11 +330,21 @@ $Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other-filtere
 			), T_('Post contents'), true );
 $Form->end_fieldset();
 
+$Form->begin_fieldset( T_('Download pages').get_manual_link( 'download-display-seo' ) );
+	$Form->checkbox( 'download_noindex', $edited_Blog->get_setting( 'download_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+	$Form->checkbox( 'download_nofollowto', $edited_Blog->get_setting( 'download_nofollowto' ), T_('No Follow TO'), T_('NOFOLLOW on links leading to download pages') );
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Contact/Message Form pages').get_manual_link( 'contact-message-form-pages-seo' ) );
+	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Indexing'),
+										T_('META NOINDEX').' - '.T_('WARNING: Letting search engines index contact forms will attract spam.') );
+	$Form->checkbox( 'msgform_nofollowto', $edited_Blog->get_setting( 'msgform_nofollowto' ), T_('No Follow TO'), T_('NOFOLLOW on links leading to contact/message form pages') );
+	$Form->text_input( 'msgform_redirect_slug', $edited_Blog->get_setting( 'msgform_redirect_slug' ), 100, T_('Default redirect after message send'), T_('Enter slug or leave empty to redirect to front page of current collection.') );
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('Other pages').get_manual_link('other-pages-seo') );
 	$Form->checkbox( 'feedback-popup_noindex', $edited_Blog->get_setting( 'feedback-popup_noindex' ), T_('Comment popups'),
 										T_('META NOINDEX').' - '.T_('For skins with comment popups only.') );
-	$Form->checkbox( 'msgform_noindex', $edited_Blog->get_setting( 'msgform_noindex' ), T_('Contact forms'),
-										T_('META NOINDEX').' - '.T_('WARNING: Letting search engines index contact forms will attract spam.') );
 	$Form->checkbox( 'special_noindex', $edited_Blog->get_setting( 'special_noindex' ), T_('Other special pages'),
 										T_('META NOINDEX').' - '.T_('Pages with no index setting of their own... yet.') );
 	$Form->radio( '404_response', $edited_Blog->get_setting('404_response'),
@@ -341,11 +364,6 @@ $Form->begin_fieldset( T_('Other pages').get_manual_link('other-pages-seo') );
 			array( 'slug', T_('Use extra-path').': '.'/help', T_('E-g: ')
 				.url_add_tail( $blogurl, '<strong>/help</strong>' ) ),
 			), T_('Help page'), true );
-$Form->end_fieldset();
-
-$Form->begin_fieldset( T_('Download pages').get_manual_link( 'download-display-seo' ) );
-	$Form->checkbox( 'download_noindex', $edited_Blog->get_setting( 'download_noindex' ), T_('Indexing'), T_('META NOINDEX') );
-	$Form->checkbox( 'download_nofollowto', $edited_Blog->get_setting( 'download_nofollowto' ), T_('No Follow TO'), T_('NOFOLLOW on links leading to download pages') );
 $Form->end_fieldset();
 
 

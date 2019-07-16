@@ -486,6 +486,9 @@ class Group extends DataObject
 	 * @param string Permission name can be any from the blog advanced perm names. A few possible permname:
 	 *                  - blog_ismember
 	 *                  - blog_can_be_assignee
+	 *                  - blog_workflow_status
+	 *                  - blog_workflow_user
+	 *                  - blog_workflow_priority
 	 *                  - blog_del_post
 	 *                  - blog_edit_ts
 	 *                  - blog_post_statuses

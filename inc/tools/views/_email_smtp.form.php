@@ -24,9 +24,7 @@ global $current_User;
  */
 global $Settings;
 
-global $baseurl, $admin_url;
-
-global $test_mail_output, $action, $email_send_allow_php_mail;
+global $action, $email_send_allow_php_mail;
 
 
 $Form = new Form( NULL, 'settings_checkchanges' );
@@ -36,30 +34,8 @@ $Form->begin_form( 'fform' );
 $Form->add_crumb( 'emailsettings' );
 $Form->hidden( 'ctrl', 'email' );
 $Form->hidden( 'tab', get_param( 'tab' ) );
-$Form->hidden( 'tab2', get_param( 'tab2' ) );
 $Form->hidden( 'tab3', get_param( 'tab3' ) );
 $Form->hidden( 'action', 'settings' );
-
-if( $current_User->check_perm( 'emails', 'edit' ) )
-{
-	$Form->begin_fieldset( T_('Test saved settings').get_manual_link( 'smtp-gateway-settings' ) );
-
-		$url = '?ctrl=email&amp;tab='.get_param( 'tab' ).'&amp;tab2='.get_param( 'tab2' ).'&amp;tab3='.get_param( 'tab3' ).'&amp;'.url_crumb('emailsettings').'&amp;action=';
-		$Form->info_field( T_('Perform tests'),
-					'<a href="'.$url.'test_smtp" class="btn btn-default">'.T_('SMTP server connection').'</a>&nbsp;&nbsp;'.
-					'<a href="'.$url.'test_email_smtp" class="btn btn-default">'.T_('Send test email via SMTP').'</a>&nbsp;&nbsp;'.
-					( $email_send_allow_php_mail ? '<a href="'.$url.'test_email_php" class="btn btn-default">'.T_('Send test email via PHP').'</a>' : '' ),
-					array( 'class' => 'info_full_height' ) );
-
-		if( !empty( $test_mail_output ) )
-		{
-			echo '<div style="margin-top:25px"></div>';
-			// Display scrollable div
-			echo '<div style="padding: 6px; margin:5px; border: 1px solid #CCC; overflow:scroll; height: 350px">'.$test_mail_output.'</div>';
-		}
-
-	$Form->end_fieldset();
-}
 
 
 if( $email_send_allow_php_mail )

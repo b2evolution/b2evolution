@@ -1421,7 +1421,7 @@ class _core_Module extends Module
 				    isset( $edited_Item ) &&
 				    $edited_Item->ID > 0 &&
 				    $view_item_url = $edited_Item->get_permanent_url() )
-				{	// If curent user has a permission to edit a current viewing post:
+				{	// If current user has a permission to edit a current viewing post:
 					$entries['permalink'] = array(
 							'text'        => get_icon( 'permalink' ).' '.T_('Permalink'),
 							'href'        => $view_item_url,
@@ -1432,7 +1432,7 @@ class _core_Module extends Module
 				if( ! is_admin_page() &&
 				    in_array( $disp, array( 'single', 'page', 'edit', 'proposechange', 'widget_page' ) ) &&
 				    $perm_admin_restricted )
-				{	// If curent user has a permission to edit a current editing/viewing/proposing post:
+				{	// If current user has a permission to edit a current editing/viewing/proposing post:
 					if( $disp != 'edit' &&
 					    $Blog->get_setting( 'in_skin_editing' ) &&
 					    ! empty( $Item ) &&
@@ -1944,7 +1944,7 @@ class _core_Module extends Module
 				);
 
 			$current_coll_locale = get_param( 'coll_locale' ) != '' ? get_param( 'coll_locale' ) : $current_locale;
-			foreach( $coll_locales as $coll_locale_key )
+			foreach( $coll_locales as $coll_locale_key => $linked_coll_ID )
 			{
 				if( ! isset( $locales[ $coll_locale_key ] ) || ! $locales[ $coll_locale_key ]['enabled'] )
 				{	// Skip wrong or disabled locale:
@@ -2188,23 +2188,14 @@ class _core_Module extends Module
 							'href' => '?ctrl=newsletters' ),
 						'campaigns' => array(
 							'text' => T_('Campaigns'),
-							'href' => '?ctrl=campaigns' ),
-						'settings' => array(
-							'text' => T_('Settings'),
-							'href' => '?ctrl=email&amp;tab=settings',
+							'href' => '?ctrl=campaigns',
 							'entries' => array(
+								'list' => array(
+									'text' => T_('List'),
+									'href' => '?ctrl=campaigns' ),
 								'plugins' => array(
 									'text' => T_('Plugins'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=plugins' ),
-								'envelope' => array(
-									'text' => T_('Envelope'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=envelope' ),
-								'smtp' => array(
-									'text' => T_('SMTP gateway'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=smtp' ),
-								'other' => array(
-									'text' => T_('Other'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab3=other' ),
+									'href' => '?ctrl=campaigns&amp;tab=plugins' ),
 							) ),
 						'sent' => array(
 							'text' => T_('Sent'),
@@ -2218,10 +2209,13 @@ class _core_Module extends Module
 									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=stats' ),
 								'envelope' => array(
 									'text' => T_('Envelope'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab2=sent&amp;tab3=envelope' ),
+									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=envelope' ),
+								'throttling' => array(
+									'text' => T_('Throttling'),
+									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=throttling' ),
 								'smtp' => array(
 									'text' => T_('SMTP gateway'),
-									'href' => '?ctrl=email&amp;tab=settings&amp;tab2=sent&amp;tab3=smtp' ),
+									'href' => '?ctrl=email&amp;tab=sent&amp;tab3=smtp' ),
 							) ),
 						'return' => array(
 							'text' => T_('Returned'),
@@ -2249,12 +2243,17 @@ class _core_Module extends Module
 			}
 
 			if( $current_User->check_perm( 'emails', 'edit' ) )
-			{	// Allow to test a returned email only if user has a permission to edit email settings:
+			{	// Allow to test a returned email and smtp sending only if user has a permission to edit email settings:
 				$AdminUI->add_menu_entries( array( 'email', 'return' ), array(
 						'test' => array(
 							'text' => T_('Test'),
 							'href' => '?ctrl=email&amp;tab=return&amp;tab3=test' ,
 					) ) );
+				$AdminUI->add_menu_entries( array( 'email', 'sent' ), array(
+					'test' => array(
+						'text' => T_('Test'),
+						'href' => '?ctrl=email&amp;tab=sent&amp;tab3=test' ),
+					) );
 			}
 		}
 

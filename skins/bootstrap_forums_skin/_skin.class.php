@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.0.1';
+	var $version = '7.0.2';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -228,25 +228,21 @@ class bootstrap_forums_Skin extends Skin
 					),
 					'page_text_color' => array(
 						'label' => T_('Page text color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_link_color' => array(
 						'label' => T_('Page link color'),
-						'note' => T_('E-g: #00ff00 for green'),
 						'defaultvalue' => '#337ab7',
 						'type' => 'color',
 					),
 					'current_tab_text_color' => array(
 						'label' => T_('Current tab text color'),
-						'note' => T_('E-g: #ff6600 for orange'),
 						'defaultvalue' => '#333',
 						'type' => 'color',
 					),
 					'page_bg_color' => array(
 						'label' => T_('Page background color'),
-						'note' => T_('E-g: #ff0000 for red'),
 						'defaultvalue' => '#fff',
 						'type' => 'color',
 						'transparency' => true,
@@ -572,7 +568,7 @@ class bootstrap_forums_Skin extends Skin
 		{
 			case 'left_sidebar':
 				// Left Sidebar
-				return 'col-md-9 pull-right';
+				return 'col-md-9 pull-right-md';
 
 			case 'right_sidebar':
 				// Right Sidebar

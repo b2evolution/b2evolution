@@ -66,6 +66,11 @@ class LinkOwner
 	 */
 	var $ID_field_name;
 
+	/**
+	 * @var integer Last order
+	 */
+	var $last_order = NULL;
+
 
 	/**
 	 * Abstract methods that needs to be overriden in every subclass
@@ -573,12 +578,16 @@ class LinkOwner
 			return 0;
 		}
 
-		$SQL = new SQL( 'Get last order number of the Link Owner ( '.$this->type.', #'.$this->get_ID().' )' );
-		$SQL->SELECT( 'MAX( link_order )' );
-		$SQL->FROM( 'T_links' );
-		$SQL->WHERE( 'link_'.$this->get_ID_field_name().' = '.$this->get_ID() );
+		if( $this->last_order === NULL )
+		{	// Get last order frin DB:
+			$SQL = new SQL( 'Get last order number of the Link Owner ( '.$this->type.', #'.$this->get_ID().' )' );
+			$SQL->SELECT( 'MAX( link_order )' );
+			$SQL->FROM( 'T_links' );
+			$SQL->WHERE( 'link_'.$this->get_ID_field_name().' = '.$this->get_ID() );
+			$this->last_order = intval( $DB->get_var( $SQL ) );
+		}
 
-		return intval( $DB->get_var( $SQL ) );
+		return $this->last_order;
 	}
 }
 

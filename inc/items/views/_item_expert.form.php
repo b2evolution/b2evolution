@@ -164,13 +164,13 @@ $Form->begin_form( '', '', $params );
 		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
 		{	// Display a post short title field:
 			$short_title_maxlen = intval( $edited_Item->get_type_setting( 'short_title_maxlen' ) );
-			$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, T_('Short title'), '', array(
+			$Form->text_input( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ), 50, T_('Short title'), '', array(
 					'maxlength' => $short_title_maxlen,
 					'data-recommended-length' => '20;30' ) );
 		}
 		else
 		{	// Hide a post short title field:
-			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+			$Form->hidden( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ) );
 		}
 		$Form->end_fieldset();
 	}
@@ -742,55 +742,26 @@ $Form->begin_form( '', '', $params );
 
 	// ############################ WORKFLOW #############################
 
-	if( $is_not_content_block && $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
-	{	// We want to use workflow properties for this blog:
+	if( $is_not_content_block && $edited_Item->can_edit_workflow() )
+	{	// Display workflow properties if current user can edit at least one workflow property:
 		$Form->begin_fieldset( T_('Workflow properties').get_manual_link( 'post-edit-workflow-panel' ), array( 'id' => 'itemform_workflow_props', 'fold' => true ) );
 
 			echo '<div id="itemform_edit_workflow" class="edit_fieldgroup">';
 			$Form->switch_layout( 'linespan' );
 
-			$Form->select_input_array( 'item_priority', $edited_Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+			$edited_Item->display_workflow_field( 'status', $Form );
 
 			echo ' '; // allow wrapping!
 
-			// Load current blog members into cache:
-			$UserCache = & get_UserCache();
-			// Load only first 21 users to know when we should display an input box instead of full users list
-			$UserCache->load_blogmembers( $Blog->ID, 21, false );
-
-			if( count( $UserCache->cache ) > 20 )
-			{
-				$assigned_User = & $UserCache->get_by_ID( $edited_Item->get( 'assigned_user_ID' ), false, false );
-				$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
-			}
-			else
-			{
-				$Form->select_object( 'item_assigned_user_ID', NULL, $edited_Item, T_('Assigned to'),
-														'', true, '', 'get_assigned_user_options' );
-			}
+			$edited_Item->display_workflow_field( 'user', $Form );
 
 			echo ' '; // allow wrapping!
 
-			$ItemStatusCache = & get_ItemStatusCache();
-			$ItemStatusCache->load_all();
-			$ItemTypeCache = & get_ItemTypeCache();
-			$current_ItemType = & $edited_Item->get_ItemType();
-			$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $edited_Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
+			$edited_Item->display_workflow_field( 'priority', $Form );
 
 			echo ' '; // allow wrapping!
 
-			if( $Blog->get_setting( 'use_deadline' ) )
-			{	// Display deadline fields only if it is enabled for collection:
-				$Form->begin_line( T_('Deadline'), 'item_deadline' );
-
-					$datedeadline = $edited_Item->get( 'datedeadline' );
-					$Form->date( 'item_deadline', $datedeadline, '' );
-
-					$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
-					$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
-
-				$Form->end_line();
-			}
+			$edited_Item->display_workflow_field( 'deadline', $Form );
 
 			$Form->switch_layout( NULL );
 			echo '</div>';
@@ -874,18 +845,21 @@ $Form->begin_form( '', '', $params );
 
 	echo '</table>';
 
-	if( $edited_Item->get_type_setting( 'allow_featured' ) )
-	{ // Display featured
-		$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
-	}
-	else
-	{ // Hide featured
-		$Form->hidden( 'item_featured', $edited_Item->featured );
+	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	{	// If user has a permission to edit advanced properties of items:
+		if( $edited_Item->get_type_setting( 'allow_featured' ) )
+		{ // Display featured
+			$Form->checkbox_basic_input( 'item_featured', $edited_Item->featured, '<strong>'.T_('Featured post').'</strong>' );
+		}
+		else
+		{ // Hide featured
+			$Form->hidden( 'item_featured', $edited_Item->featured );
+		}
 	}
 
 	if( $Blog->get_setting( 'track_unread_content' ) )
 	{	// Display setting to mark Item as "must read" when tracking of unread content is enabled for collection:
-		$Form->checkbox_basic_input( 'item_mustread', $edited_Item->get_setting( 'mustread' ), '<strong>'.T_('Must read').'</strong>' );
+		$Form->checkbox_basic_input( 'item_mustread', $edited_Item->get_setting( 'mustread' ), '<strong>'.T_('Must read').'</strong> '.get_pro_label(), array( 'disabled' => ! is_pro() ) );
 	}
 
 	if( $is_not_content_block && $edited_Item->get_type_setting( 'allow_breaks' ) )
@@ -894,20 +868,23 @@ $Form->begin_form( '', '', $params );
 	}
 
 	// Single/page view:
-	if( ! in_array( $edited_Item->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all', 'content-block', 'special' ) ) )
-	{	// We don't need this setting for intro, content block and special items:
-		echo '<div class="itemform_extra_radio">';
-		$Form->radio( 'post_single_view', $edited_Item->get( 'single_view' ), array(
-				array( 'normal', T_('Normal') ),
-				array( '404', '404' ),
-				array( 'redirected', T_('Redirected') ),
-			), T_('Single/page view'), true );
-		echo '</div>';
+	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	{	// If user has a permission to edit advanced properties of items:
+		if( ! in_array( $edited_Item->get_type_setting( 'usage' ), array( 'intro-front', 'intro-main', 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all', 'content-block', 'special' ) ) )
+		{	// We don't need this setting for intro, content block and special items:
+			echo '<div class="itemform_extra_radio">';
+			$Form->radio( 'post_single_view', $edited_Item->get( 'single_view' ), array(
+					array( 'normal', T_('Normal') ),
+					array( '404', '404' ),
+					array( 'redirected', T_('Redirected') ),
+				), T_('Single/page view'), true );
+			echo '</div>';
+		}
 	}
 
 	// Issue date:
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
-	{	// If user has a permission to edit time of items:
+	{	// If user has a permission to edit advanced properties of items:
 		echo '<div class="itemform_extra_radio">';
 		$Form->output = false;
 		$item_issue_date_time = $Form->date( 'item_issue_date', $edited_Item->get( 'issue_date' ), '' );
@@ -1028,18 +1005,21 @@ $Form->begin_form( '', '', $params );
 			$Form->switch_layout( NULL );
 		}
 
-		if( $edited_Item->get_type_setting( 'use_comment_expiration' ) != 'never' )
-		{ // Display comment expiration
-			$Form->switch_layout( 'table' );
-			$Form->duration_input( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ), T_('Expiry delay'), 'months', 'hours',
-							array( 'minutes_step' => 1,
-								'required' => $edited_Item->get_type_setting( 'use_comment_expiration' ) == 'required',
-								'note' => T_( 'Older comments and ratings will no longer be displayed.' ) ) );
-			$Form->switch_layout( NULL );
-		}
-		else
-		{ // Hide comment expiration
-			$Form->hidden( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ) );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			if( $edited_Item->get_type_setting( 'use_comment_expiration' ) != 'never' )
+			{ // Display comment expiration
+				$Form->switch_layout( 'table' );
+				$Form->duration_input( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ), T_('Expiry delay'), 'months', 'hours',
+								array( 'minutes_step' => 1,
+									'required' => $edited_Item->get_type_setting( 'use_comment_expiration' ) == 'required',
+									'note' => T_( 'Older comments and ratings will no longer be displayed.' ) ) );
+				$Form->switch_layout( NULL );
+			}
+			else
+			{ // Hide comment expiration
+				$Form->hidden( 'expiry_delay',  $edited_Item->get_setting( 'comment_expiry_delay' ) );
+			}
 		}
 
 		$Form->end_fieldset();
@@ -1077,8 +1057,10 @@ $Form->begin_form( '', '', $params );
 		$Form->end_fieldset();
 	}
 
-	if( $is_not_content_block )
-	{	// Display goal tracking and notifications for item with type usage except of content block:
+	if( $is_not_content_block &&
+	    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+	{	// Display goal tracking and notifications for item with type usage except of content block
+		// and if user has a permission to edit advanced properties of items:
 
 		// ################### GOAL TRACKING ###################
 
@@ -1309,8 +1291,6 @@ else
 }
 // New category input box:
 echo_onchange_newcat();
-// Location
-echo_regional_js( 'item', $edited_Item->region_visible() );
 // Goal
 echo_onchange_goal_cat();
 // Fieldset folding

@@ -1,0 +1,13 @@
+.evo_auto_anchor_header:hover .evo_auto_anchor_link {
+	visibility: visible;
+}
+.evo_auto_anchor_link {
+	visibility: hidden;
+	color: #999;
+}
+.evo_auto_anchor_link:hover {
+	color: inherit;
+}
+.evo_auto_anchor_link .fa {
+	font-size: inherit;
+}

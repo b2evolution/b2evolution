@@ -118,7 +118,7 @@ class coll_locale_switch_Widget extends ComponentWidget
 
 		if( count( $coll_locales ) < 2 )
 		{	// Don't display this widget when less 2 locales:
-			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there is no more 1 collection locale.' );
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden as long as you don\'t enable at least 2 locales in the collection.' );
 			return false;
 		}
 

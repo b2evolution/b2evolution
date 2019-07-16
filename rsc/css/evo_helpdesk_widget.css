@@ -252,49 +252,49 @@ svg {
   height: 7px;
   background: transparent;
   border-radius: 100%;
-  box-shadow: #ff8866 -14px -14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+  box-shadow: #f86 -14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   animation: evo_helpdesk_widget_loader 5s infinite ease-in-out;
   -ms-transform-origin: 50% 50%;
   transform-origin: 50% 50%;
 }
 @keyframes evo_helpdesk_widget_loader {
   0% {
-    box-shadow: #ff8866 -14px -14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 -14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
   8.33% {
-    box-shadow: #ff8866 14px -14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
   16.67% {
-    box-shadow: #ff8866 14px 14px 0 7px, #ffcc66 14px 14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 14px 14px 0 7px, #fc6 14px 14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
   25% {
-    box-shadow: #ff8866 -14px 14px 0 7px, #ffcc66 -14px 14px 0 7px, #66dd77 -14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 -14px 14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
   33.33% {
-    box-shadow: #ff8866 -14px -14px 0 7px, #ffcc66 -14px 14px 0 7px, #66dd77 -14px -14px 0 7px, #44aaee -14px -14px 0 7px;
+    box-shadow: #f86 -14px -14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae -14px -14px 0 7px;
   }
   41.67% {
-    box-shadow: #ff8866 14px -14px 0 7px, #ffcc66 -14px 14px 0 7px, #66dd77 -14px -14px 0 7px, #44aaee 14px -14px 0 7px;
+    box-shadow: #f86 14px -14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px;
   }
   50% {
-    box-shadow: #ff8866 14px 14px 0 7px, #ffcc66 -14px 14px 0 7px, #66dd77 -14px -14px 0 7px, #44aaee 14px -14px 0 7px;
+    box-shadow: #f86 14px 14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px;
   }
   58.33% {
-    box-shadow: #ff8866 -14px 14px 0 7px, #ffcc66 -14px 14px 0 7px, #66dd77 -14px -14px 0 7px, #44aaee 14px -14px 0 7px;
+    box-shadow: #f86 -14px 14px 0 7px, #fc6 -14px 14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px;
   }
   66.67% {
-    box-shadow: #ff8866 -14px -14px 0 7px, #ffcc66 -14px -14px 0 7px, #66dd77 -14px -14px 0 7px, #44aaee 14px -14px 0 7px;
+    box-shadow: #f86 -14px -14px 0 7px, #fc6 -14px -14px 0 7px, #6d7 -14px -14px 0 7px, #4ae 14px -14px 0 7px;
   }
   75% {
-    box-shadow: #ff8866 14px -14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px -14px 0 7px, #44aaee 14px -14px 0 7px;
+    box-shadow: #f86 14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px -14px 0 7px, #4ae 14px -14px 0 7px;
   }
   83.33% {
-    box-shadow: #ff8866 14px 14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee 14px 14px 0 7px;
+    box-shadow: #f86 14px 14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae 14px 14px 0 7px;
   }
   91.67% {
-    box-shadow: #ff8866 -14px 14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 -14px 14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
   100% {
-    box-shadow: #ff8866 -14px -14px 0 7px, #ffcc66 14px -14px 0 7px, #66dd77 14px 14px 0 7px, #44aaee -14px 14px 0 7px;
+    box-shadow: #f86 -14px -14px 0 7px, #fc6 14px -14px 0 7px, #6d7 14px 14px 0 7px, #4ae -14px 14px 0 7px;
   }
 }

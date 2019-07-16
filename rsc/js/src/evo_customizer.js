@@ -38,6 +38,8 @@ function evo_customizer_update_style( setting_input )
 	}
 	var skin_setting_name = setting_input.attr( 'name' ).replace( /^edit_skin_\d+_set_/, '' );
 
+	var is_dynamic_style_updated = false;
+
 	// Replace previous value with new updated:
 	var regexp = new RegExp( '(\\/\\*customize:\\*\\/).*?(\\/\\*(([a-z_\\+]+\\+)?' + skin_setting_name + '(\\+[a-z_\\+]+)?)(\\/([a-z]+):([^\\*]+))?\\*\\/)', 'ig' );
 	var new_value = setting_input.val();
@@ -84,8 +86,17 @@ function evo_customizer_update_style( setting_input )
 				break;
 		}
 
+		// Mark this field updated
+		is_dynamic_style_updated = true;
+
 		return m1 + new_value + m2;
 	} ) );
+
+	// Set color styles for submit and cancel buttons depending on dynamic style:
+	jQuery( '#evo_customizer__backoffice' ).contents()
+		.find( '.evo_customizer__buttons input[type=' + ( is_dynamic_style_updated ? 'button' : 'submit' ) + ']' )
+		.removeClass( 'btn-default' )
+		.addClass( is_dynamic_style_updated ? 'btn-danger' : 'btn-primary' );
 }
 
 jQuery( document ).on( 'ready', function()
@@ -162,11 +173,11 @@ jQuery( document ).on( 'ready', function()
 		backoffice_content.find( 'form#widget_checkchanges a:not([target])' ).attr( 'target', '_top' );
 
 		// Update custom styles of the skin:
-		backoffice_content.find( '.evo_customizer__content input' ).on( 'input', function()
+		backoffice_content.find( 'form#skin_settings_checkchanges' ).find( 'input, textarea' ).on( 'input', function()
 		{	// Update style with new changed value:
 			evo_customizer_update_style( jQuery( this ) );
 		} );
-		backoffice_content.find( '.evo_customizer__content select' ).on( 'change', function()
+		backoffice_content.find( 'form#skin_settings_checkchanges select' ).on( 'change', function()
 		{	// Update style with new changed value:
 			evo_customizer_update_style( jQuery( this ) );
 		} );

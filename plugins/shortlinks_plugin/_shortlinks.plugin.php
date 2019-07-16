@@ -22,7 +22,7 @@ class shortlinks_plugin extends Plugin
 	var $code = 'b2evWiLi';
 	var $name = 'Short Links';
 	var $priority = 35;
-	var $version = '7.0.1';
+	var $version = '7.0.2';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -807,7 +807,7 @@ class shortlinks_plugin extends Plugin
 		function shortlinks_load_window( prefix )
 		{
 			openModalWindow( '<div id="shortlinks_wrapper"></div>', 'auto', '', true,
-				'<?php echo TS_('Link to a Post'); ?>', // Window title
+				'<?php echo TS_('Link to a Post').get_manual_link( 'shortlinks-plugin-link-post-dialog' ); ?>', // Window title
 				[ '-', 'shortlinks_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back" and "Insert [[post-url-name]]"
 				true );
 
@@ -1038,7 +1038,7 @@ class shortlinks_plugin extends Plugin
 					var coll = data.colls[c];
 					r += '<option value="' + coll.urlname + '"'
 						+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
-						+ coll.name + '</option>';
+						+ coll.shortname + ' : ' + coll.name + '</option>';
 					if( coll_urlname == '' || coll.urlname == current_coll_urlname )
 					{	// Set these vars to load posts of the selected or first collection:
 						coll_urlname = coll.urlname;
@@ -1089,7 +1089,7 @@ class shortlinks_plugin extends Plugin
 				{	// Load posts list of the current or first collection:
 					shortlinks_load_coll_posts( coll_urlname, coll_name );
 				}
-			} );
+			}, { list_in_frontoffice: 'all' } );
 		}
 
 		/**
@@ -1275,7 +1275,9 @@ class shortlinks_plugin extends Plugin
 						}
 					}
 					// Item content:
-					item_content += '<div id="shortlinks_post_content">' + post.content + '</div>';
+					var post_content = post.content.replace( /(<h([1-6])\s+id\s*=\s*"[^"]+"[^>]*>.+?)(<\/h\2>)/ig,
+						'$1 <button class="btn btn-primary shortlinks_btn_insert_anchor"><?php echo TS_('Insert Short Link'); ?></button>$3' );
+					item_content += '<div id="shortlinks_post_content">' + post_content + '</div>';
 
 					shortlinks_end_loading( '#shortlinks_post_block', item_content );
 
@@ -1285,7 +1287,7 @@ class shortlinks_plugin extends Plugin
 						jQuery( '#shortlinks_post_content' );
 					jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).remove();
 					buttons_side_obj.after( '<button id="shortlinks_btn_back_to_list" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
-						+ '<button id="shortlinks_btn_insert" class="btn btn-primary"><?php echo sprintf( /* TRANS: %s is a shortlink preview like [[url-slug]] */ TS_('Insert %s'), '[[\' + post.urltitle + \']]' ); ?></button>'
+						+ '<button id="shortlinks_btn_insert" class="btn btn-primary"><?php echo TS_('Insert Short Link'); ?></button>'
 						+ '<button id="shortlinks_btn_options" class="btn btn-default"><?php echo TS_('Insert with options').'...'; ?></button>'
 						+ '<button id="shortlinks_btn_form" class="btn btn-info"><?php echo TS_('Insert Snippet + Link').'...'; ?></button>' );
 					jQuery( '#shortlinks_opt_slug' ).val( post.urltitle );
@@ -1300,6 +1302,13 @@ class shortlinks_plugin extends Plugin
 		jQuery( document ).on( 'click', '#shortlinks_btn_insert', function()
 		{
 			shortlinks_insert_link_text( '[[' + jQuery( '#shortlinks_hidden_urltitle' ).val() + ']]' );
+		} );
+
+		// Insert a post link with anchor(from header tags inside content) to textarea:
+		jQuery( document ).on( 'click', '.shortlinks_btn_insert_anchor', function()
+		{
+			var header_obj = jQuery( this ).parent();
+			shortlinks_insert_link_text( '((' + jQuery( '#shortlinks_hidden_urltitle' ).val() + '#' + header_obj.attr( 'id' ) + ' ' + header_obj.html().replace( /\s<button[^>]+>.+?<\/button>$/, '' ) + '))' );
 		} );
 
 		// Insert a post link with options to textarea:

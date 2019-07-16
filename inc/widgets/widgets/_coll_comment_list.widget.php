@@ -178,7 +178,7 @@ class coll_comment_list_Widget extends ComponentWidget
 		$CommentList = new CommentList2( $listBlog, $limit, 'CommentCache', $this->code.'_' );
 
 		$filters = array(
-				'types' => array( 'comment','trackback','pingback','webmentions' ),
+				'types' => array( 'comment', 'trackback', 'pingback', 'webmention' ),
 				'statuses' => explode( ',', $listBlog->get_setting( 'comment_inskin_statuses' ) ),
 				'order' => $order,
 				'comments' => $limit,
@@ -190,7 +190,7 @@ class coll_comment_list_Widget extends ComponentWidget
 		}
 
 		// Filter list:
-		$CommentList->set_filters( $filters );
+		$CommentList->set_filters( $filters, false ); // we don't want to memorize these params
 
 		// Get ready for display (runs the query):
 		$CommentList->display_init();

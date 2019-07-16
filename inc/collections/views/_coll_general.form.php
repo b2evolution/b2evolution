@@ -176,10 +176,7 @@ if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' 
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs-general-parameters' ), array( 'class'=>'fieldset clear' ) );
-
-	$collection_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select collection logo/image'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
-	$Form->fileselect( 'collection_logo_file_ID', $edited_Blog->get_setting( 'collection_logo_file_ID' ), T_('Collection logo/image'), NULL, $collection_logo_params );
+$Form->begin_fieldset( T_('Branding').get_manual_link( 'collection-settings-branding' ), array( 'class'=>'fieldset clear' ) );
 
 	$name_chars_count = utf8_strlen( html_entity_decode( $edited_Blog->get( 'name' ) ) );
 	$Form->text( 'blog_name', $edited_Blog->get( 'name' ), 50, T_('Title'), T_('Will be displayed on top of the blog.')
@@ -245,6 +242,12 @@ $Form->begin_fieldset( T_('General parameters').get_manual_link( 'blogs-general-
 		<?php
 	}
 
+	$collection_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select collection logo/image'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
+	$Form->fileselect( 'collection_logo_file_ID', $edited_Blog->get_setting( 'collection_logo_file_ID' ), T_('Collection logo/image'), NULL, $collection_logo_params );
+
+	$collection_favicon_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select collection favicon'), 'root' => 'shared_0', 'size_name' => 'fit-128x128' );
+	$Form->fileselect( 'collection_favicon_file_ID', $edited_Blog->get_setting( 'collection_favicon_file_ID' ), T_('Collection favicon'), NULL, $collection_favicon_params );
+
 	// Section:
 	$blog_section_id = $action == 'copy' ? 1 : $edited_Blog->get( 'sec_ID' );
 	$SectionCache = & get_SectionCache();
@@ -277,7 +280,7 @@ if( ! $is_creating )
 		{ // More than 1 locale
 			$blog_locale_note = ( $current_User->check_perm( 'options', 'view' ) ) ?
 				'<a href="'.$admin_url.'?ctrl=regional">'.T_('Regional settings').' &raquo;</a>' : '';
-		$Form->locale_selector( 'blog_locale', $edited_Blog->get( 'locale' ), $edited_Blog->get_locales(), T_('Collection Locales'), $blog_locale_note, array( 'link_coll_ID' => $edited_Blog->ID ) );
+		$Form->locale_selector( 'blog_locale', $edited_Blog->get( 'locale' ), array_keys( $edited_Blog->get_locales() ), T_('Collection Locales'), $blog_locale_note, array( 'link_coll_ID' => $edited_Blog->ID ) );
 
 			$Form->radio( 'blog_locale_source', $edited_Blog->get_setting( 'locale_source' ),
 					array(

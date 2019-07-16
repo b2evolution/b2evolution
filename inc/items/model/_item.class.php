@@ -773,7 +773,7 @@ class Item extends ItemLight
 	 */
 	function load_from_Request( $editing = false, $creating = false )
 	{
-		global $default_locale, $current_User, $localtimenow, $Blog;
+		global $default_locale, $current_User, $localtimenow, $Blog, $Plugins;
 		global $item_typ_ID;
 
 		// LOCALE:
@@ -851,8 +851,9 @@ class Item extends ItemLight
 		}
 
 		// Single/page view:
-		if( ( $single_view = param( 'post_single_view', 'string', NULL ) ) !== NULL )
-		{
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) &&
+		    ( $single_view = param( 'post_single_view', 'string', NULL ) ) !== NULL )
+		{	// If user has a permission to edit advanced properties of items:
 			if( $this->get( 'status' ) == 'redirected' )
 			{	// Single view of "Redirected" item can be only redirected as well:
 				$single_view = 'redirected';
@@ -980,21 +981,18 @@ class Item extends ItemLight
 		}
 
 		// TAGS:
-		if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) )
-		{ // User should has an access to back-office to edit tags
-			$item_tags = param( 'item_tags', 'string', NULL );
-			if( $item_tags !== NULL )
-			{
-				$this->set_tags_from_string( get_param('item_tags') );
-				// Update setting 'suggest_item_tags' of the current User
-				global $UserSettings;
-				$UserSettings->set( 'suggest_item_tags', param( 'suggest_item_tags', 'integer', 0 ) );
-				$UserSettings->dbupdate();
-			}
-			if( empty( $item_tags ) && $this->get_type_setting( 'use_tags' ) == 'required' )
-			{ // Tags must be entered
-				param_check_not_empty( 'item_tags', T_('Please provide at least one tag.'), '' );
-			}
+		$item_tags = param( 'item_tags', 'string', NULL );
+		if( $item_tags !== NULL )
+		{
+			$this->set_tags_from_string( get_param('item_tags') );
+			// Update setting 'suggest_item_tags' of the current User
+			global $UserSettings;
+			$UserSettings->set( 'suggest_item_tags', param( 'suggest_item_tags', 'integer', 0 ) );
+			$UserSettings->dbupdate();
+		}
+		if( empty( $item_tags ) && $this->get_type_setting( 'use_tags' ) == 'required' )
+		{ // Tags must be entered
+			param_check_not_empty( 'item_tags', T_('Please provide at least one tag.'), '' );
 		}
 
 		// ITEM PRICING stuff:
@@ -1004,12 +1002,16 @@ class Item extends ItemLight
 		$this->load_workflow_from_Request();
 
 		// FEATURED checkbox:
-		$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			$this->set( 'featured', param( 'item_featured', 'integer', 0 ), false );
+		}
 
 		// MUST READ checkbox:
-		$item_Blog = & $this->get_Blog();
-		if( $item_Blog->get_setting( 'track_unread_content' ) )
-		{	// Update only when tracking of unread content is enabled for collection:
+		if( is_pro() && 
+		    ( $item_Blog = & $this->get_Blog() ) &&
+		    $item_Blog->get_setting( 'track_unread_content' ) )
+		{	// Update only for PRO version and when tracking of unread content is enabled for collection:
 			$this->set_setting( 'mustread', param( 'item_mustread', 'integer', 0 ) );
 		}
 
@@ -1025,10 +1027,13 @@ class Item extends ItemLight
 			}
 
 			// Goal ID:
-			$goal_ID = param( 'goal_ID', 'integer', NULL );
-			if( $goal_ID !== NULL )
-			{	// Save only if it is provided:
-				$this->set_setting( 'goal_ID', $goal_ID, true );
+			if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+			{	// If user has a permission to edit advanced properties of items:
+				$goal_ID = param( 'goal_ID', 'integer', NULL );
+				if( $goal_ID !== NULL )
+				{	// Save only if it is provided:
+					$this->set_setting( 'goal_ID', $goal_ID, true );
+				}
 			}
 		}
 
@@ -1118,16 +1123,19 @@ class Item extends ItemLight
 		}
 
 		// EXPIRY DELAY:
-		$expiry_delay = param_duration( 'expiry_delay' );
-		if( empty( $expiry_delay ) )
-		{ // Check if we have 'expiry_delay' param set as string from simple or mass form
-			$expiry_delay = param( 'expiry_delay', 'string', NULL );
+		if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
+		{	// If user has a permission to edit advanced properties of items:
+			$expiry_delay = param_duration( 'expiry_delay' );
+			if( empty( $expiry_delay ) )
+			{ // Check if we have 'expiry_delay' param set as string from simple or mass form
+				$expiry_delay = param( 'expiry_delay', 'string', NULL );
+			}
+			if( empty( $expiry_delay ) && $this->get_type_setting( 'use_comment_expiration' ) == 'required' )
+			{ // Comment expiration must be entered
+				param_check_not_empty( 'expiry_delay', T_('Please provide a comment expiration delay.'), '' );
+			}
+			$this->set_setting( 'comment_expiry_delay', $expiry_delay, true );
 		}
-		if( empty( $expiry_delay ) && $this->get_type_setting( 'use_comment_expiration' ) == 'required' )
-		{ // Comment expiration must be entered
-			param_check_not_empty( 'expiry_delay', T_('Please provide a comment expiration delay.'), '' );
-		}
-		$this->set_setting( 'comment_expiry_delay', $expiry_delay, true );
 
 		// EXTRA PARAMS FROM MODULES:
 		modules_call_method( 'update_item_settings', array( 'edited_Item' => $this ) );
@@ -1138,7 +1146,6 @@ class Item extends ItemLight
 		{	// If text renderers are allowed to update from front-office:
 			if( param( 'renderers_displayed', 'integer', 0 ) )
 			{	// Use "renderers" value only if it has been displayed (may be empty):
-				global $Plugins;
 				$renderers = $Plugins->validate_renderer_list( param( 'renderers', 'array:string', array() ), array( 'Item' => & $this ) );
 				$this->set( 'renderers', $renderers );
 			}
@@ -1187,6 +1194,7 @@ class Item extends ItemLight
 			// Typically stuff that will help the content to validate
 			// Useful for code display.
 			// Will probably be used for validation also.
+			// + APPLY RENDERING from Rendering Plugins:
 			$Plugins_admin = & get_Plugins_admin();
 			$params = array(
 					'object_type' => 'Item',
@@ -1282,6 +1290,9 @@ class Item extends ItemLight
 				}
 			}
 		}
+
+		// Call plugins events to load additional Item fields:
+		$Plugins->trigger_event( 'ItemLoadFromRequest', $params = array( 'Item' => & $this ) );
 
 		return ! param_errors_detected();
 	}
@@ -1407,37 +1418,40 @@ class Item extends ItemLight
 		$item_Blog = & $this->get_Blog();
 
 		if( ( $this->get_type_setting( 'usage' ) != 'content-block' ) && // Item types "Content Block" cannot have the workflow properties
-		    $item_Blog->get_setting( 'use_workflow' ) && // Collection must has the workflow properties enabled
-		    is_logged_in() && // Current User must be logged in
-		    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) && // Current User must has a permission to edit this Item
-		    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $item_Blog->ID ) && // Current User must be assignee for items of the collection
-		    param( 'item_priority', 'integer', NULL ) !== NULL ) // At least Task Priority must be submitted to be sure the form really sends all other workflow properties
+		    $this->can_edit_workflow() ) // Current User has a permission to edit at least one workflow property
 		{	// Update workflow properties only when all conditions above is true:
-			// Assigned to:
-			$item_assigned_user_ID = param( 'item_assigned_user_ID', 'integer', NULL );
-			$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
-			$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
-
-			// Priority:
-			$this->set_from_Request( 'priority', 'item_priority', true );
-
-			// Task status:
-			$ItemTypeCache = & get_ItemTypeCache();
-			$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
-			$item_status = param( 'item_st_ID', 'integer', NULL );
-			if( in_array( $item_status, $current_ItemType->get_applicable_post_status() ) || $item_status === NULL )
-			{	// Save only task status which is allowed for item's type:
-				$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
-			}
-			else
-			{	// If the submitted task status is not allowed for item's type:
-				param_error( 'item_st_ID', sprintf( T_('Invalid task status for post type %s'), $current_ItemType->get_name() ) );
+			if( $this->can_edit_workflow( 'status' ) &&
+			    param( 'item_st_ID', 'integer', NULL ) !== NULL )
+			{	// Task status:
+				$ItemTypeCache = & get_ItemTypeCache();
+				$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
+				if( in_array( get_param( 'item_st_ID' ), $current_ItemType->get_applicable_post_status() ) || get_param( 'item_st_ID' ) === NULL )
+				{	// Save only task status which is allowed for item's type:
+					$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
+				}
+				else
+				{	// If the submitted task status is not allowed for item's type:
+					param_error( 'item_st_ID', sprintf( T_('Invalid task status for post type %s'), $current_ItemType->get_name() ) );
+				}
 			}
 
-			// Deadline:
-			if( $item_Blog->get_setting( 'use_deadline' ) &&
+			if( $this->can_edit_workflow( 'user' ) &&
+			    param( 'item_assigned_user_ID', 'integer', NULL ) !== NULL )
+			{	// Assigned to:
+				$item_assigned_user_ID = get_param( 'item_assigned_user_ID' );
+				$item_assigned_user_login = param( 'item_assigned_user_login', 'string', NULL );
+				$this->assign_to( $item_assigned_user_ID, $item_assigned_user_login );
+			}
+
+			if( $this->can_edit_workflow( 'priority' ) &&
+			    param( 'item_priority', 'integer', NULL ) !== NULL )
+			{	// Priority:
+				$this->set_from_Request( 'priority', 'item_priority', true );
+			}
+
+			if( $this->can_edit_workflow( 'deadline' ) &&
 			    param_date( 'item_deadline', T_('Please enter a valid deadline.'), false, NULL ) !== NULL )
-			{	// Update deadline only when it is enabled for item's collection:
+			{	// Deadline:
 				param_time( 'item_deadline_time', '', false, false, true, true );
 				$item_deadline_time = get_param( 'item_deadline' ) != '' ? substr( get_param( 'item_deadline_time' ), 0, 5 ) : '';
 				$item_deadline_datetime = trim( form_date( get_param( 'item_deadline' ), $item_deadline_time ) );
@@ -1448,7 +1462,7 @@ class Item extends ItemLight
 				$this->set( 'datedeadline', $item_deadline_datetime, true );
 			}
 
-			// Return TRUE when no errors and ata least one workflow property has been changed:
+			// Return TRUE when no errors and at least one workflow property has been changed:
 			return ! param_errors_detected() && (
 				isset( $this->dbchanges['post_assigned_user_ID'] ) ||
 				isset( $this->dbchanges['post_priority'] ) ||
@@ -1462,13 +1476,21 @@ class Item extends ItemLight
 
 	/**
 	 * Load custom fields values from Request form fields
+	 *
+	 * @param boolean TRUE to load only custom fields which are allowed to be updated with meta comment
+	 * @return boolean TRUE if loaded data seems valid, FALSE if some errors or no any property has been changed
 	 */
-	function load_custom_fields_from_Request()
+	function load_custom_fields_from_Request( $meta = NULL )
 	{
 		$custom_fields = $this->get_type_custom_fields();
 		$this->dbchanges_custom_fields = array();
+		$custom_fields_changed = false;
 		foreach( $custom_fields as $custom_field )
 		{ // update each custom field
+			if( $meta === true && ! $custom_field['meta'] )
+			{	// Skip not meta custom field when it is requested:
+				continue;
+			}
 			$param_name = 'item_cf_'.$custom_field['name'];
 			$param_error = false;
 			if( isset_param( $param_name ) )
@@ -1516,6 +1538,10 @@ class Item extends ItemLight
 				{
 					param( $param_name, $param_type, NULL ); // get par value
 				}
+				if( $custom_field['required'] )
+				{	// Check required field:
+					param_check_not_empty( $param_name, sprintf( T_('Custom "%s" cannot be empty.'), $custom_field['label'] ) );
+				}
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
 
 				$custom_field_value = $this->get_custom_field_value( $custom_field['name'] );
@@ -1526,6 +1552,10 @@ class Item extends ItemLight
 					$this->dbchanges_flags['custom_fields'] = true;
 				}
 				$this->set_custom_field( $custom_field['name'], get_param( $param_name ), 'value', $custom_field_make_null );
+				if( ! $custom_fields_changed && $custom_field_value != get_param( $param_name ) )
+				{	// Mark that at least one custom field was changed:
+					$custom_fields_changed = true;
+				}
 			}
 		}
 		foreach( $custom_fields as $custom_field )
@@ -1535,6 +1565,9 @@ class Item extends ItemLight
 				$this->set_custom_field( $custom_field['name'], $this->get_custom_field_computed( $custom_field['name'] ) );
 			}
 		}
+
+		// Return TRUE when no errors and ata least one custom field has been changed:
+		return ! param_errors_detected() && $custom_fields_changed;
 	}
 
 
@@ -2809,7 +2842,7 @@ class Item extends ItemLight
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
 			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop AS schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
-			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+			$SQL->SELECT_add( 'itcf_required AS required, itcf_meta AS meta, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
 			$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
 			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge, ' );
 			$SQL->SELECT_add( 'icfv_value AS value, IFNULL( icfv_parent_sync, 1 )AS parent_sync' );
@@ -6435,6 +6468,24 @@ class Item extends ItemLight
 
 
 	/**
+	 * Check if current User can edit this Item
+	 *
+	 * @return boolean
+	 */
+	function can_be_edited()
+	{
+		global $current_User;
+
+		// Item must be stored in DB:
+		return ! empty( $this->ID ) &&
+			// User must be logged in and activated:
+			is_logged_in( false ) &&
+			// User must has a permission to edit this Item:
+			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this );
+	}
+
+
+	/**
 	 * Get URL to edit a post if user has edit rights.
 	 *
 	 * @param array Params:
@@ -6444,15 +6495,8 @@ class Item extends ItemLight
 	{
 		global $admin_url, $current_User;
 
-		if( ! is_logged_in( false ) ) return false;
-
-		if( ! $this->ID )
-		{ // preview..
-			return false;
-		}
-
-		if( ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
-		{ // User has no right to edit this post
+		if( ! $this->can_be_edited() )
+		{	// Don't allow to edit this Item if it cannot be edited by curren User:
 			return false;
 		}
 
@@ -6576,7 +6620,7 @@ class Item extends ItemLight
 
 		$this->load_Blog();
 		$url = false;
-		if( ! is_admin_page() && $this->Blog->get_setting( 'in_skin_editing' ) )
+		if( ! is_admin_page() && $this->Blog->get_setting( 'in_skin_change_proposal' ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
 			$url = url_add_param( $this->Blog->get( 'url' ), 'disp=proposechange&p='.$this->ID );
 		}
@@ -6600,6 +6644,78 @@ class Item extends ItemLight
 	function propose_change_link( $params = array() )
 	{
 		echo $this->get_propose_change_link( $params );
+	}
+
+
+	/**
+	 * Get a link to view changes of Item for current User
+	 *
+	 * @return string A link to history
+	 */
+	function get_changes_link( $params = array() )
+	{
+		$params = array_merge( array(
+				'before'    => '',
+				'after'     => '',
+				'link_text' => '#', // Use a mask $icon$ or some other text
+				'class'     => '',
+			), $params );
+
+		if( ( $changes_url = $this->get_changes_url() ) === false )
+		{	// No url available for current user, Don't display a link:
+			return;
+		}
+
+		if( $params['link_text'] == '#' )
+		{	// Default link text:
+			$params['link_text'] = '$icon$ '.T_('View changes');
+		}
+
+		// Replace all masks with values
+		$link_text = str_replace( '$icon$', $this->history_info_icon(), $params['link_text'] );
+
+		return $params['before']
+			.'<a href="'.$changes_url.'"'.( empty( $params['class'] ) ? '' : ' class="'.$params['class'].'"' ).'>'.$link_text.'</a>'
+			.$params['after'];
+	}
+
+
+	/**
+	 * Get URL to view changes of Item for current User
+	 *
+	 * @param string Glue between url params
+	 * @return string|boolean URL to history OR False when user cannot see a history
+	 */
+	function get_changes_url( $glue = '&amp;' )
+	{
+		global $current_User, $admin_url;
+
+		if( ! is_logged_in() || ! $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $this ) )
+		{	// Current user cannot see item changes:
+			return false;
+		}
+
+		if( ! $this->get_Blog()->get_setting( 'track_unread_content' ) )
+		{	// Tracking of unread content must be enabled to know last seen timestamp by current User:
+			return false;
+		}
+
+		if( $this->get_read_status() != 'updated' )
+		{	// Don't allow URL when no new changes for current User:
+			return false;
+		}
+
+		return $admin_url.'?ctrl=items'.$glue.'action=history_lastseen'.$glue.'p='.$this->ID;
+	}
+
+
+	/**
+	 * Template tag
+	 * @see Item::get_changes_link()
+	 */
+	function changes_link( $params = array() )
+	{
+		echo $this->get_changes_link( $params );
 	}
 
 
@@ -8154,10 +8270,10 @@ class Item extends ItemLight
 	 * 	because of the item canonical url title was changed on the slugs edit form, so slug update is already done.
 	 *  If slug update wasn't done already, then this param has to be true.
 	 * @param boolean Update custom fields of child posts?
-	 * @param boolean TRUE to force to create revision
+	 * @param boolean|string TRUE - Force to create revision, FALSE - Auto create revision depending on last edit time, 'no' - Force to do NOT create revision
 	 * @return boolean true on success
 	 */
-	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true, $force_create_revision = false )
+	function dbupdate( $auto_track_modification = true, $update_slug = true, $update_child_custom_fields = true, $create_revision = false )
 	{
 		global $DB, $Plugins, $Messages;
 
@@ -8188,6 +8304,12 @@ class Item extends ItemLight
 		// save Item settings
 		if( isset( $this->ItemSettings ) )
 		{
+			if( $this->get_setting( 'last_import_hash' ) !== NULL &&
+			    ! isset( $this->ItemSettings->changes['last_import_hash'] ) )
+			{	// Clear the setting if it is a manual updating and not import updating:
+				$this->delete_setting( 'last_import_hash' );
+			}
+
 			$item_settings_changed = $this->ItemSettings->dbupdate();
 			$db_changed = $item_settings_changed || $db_changed;
 
@@ -8348,8 +8470,8 @@ class Item extends ItemLight
 			// fp> TODO: actually, only the fields that have been changed should be copied to the version, the other should be left as NULL
 
 			global $localtimenow;
-			if( $force_create_revision || $localtimenow - strtotime( $this->last_touched_ts ) > 10 )
-			{ // Create new revision
+			if( $create_revision !== 'no' && ( $create_revision || $localtimenow - strtotime( $this->last_touched_ts ) > 10 ) )
+			{	// Create new revision:
 				$result = $this->create_revision();
 			}
 
@@ -8984,19 +9106,19 @@ class Item extends ItemLight
 		{	// Only change DB flag to "members_notified" but do NOT actually send notifications:
 			$force_members = false;
 			$notified_flags[] = 'members_notified';
-			$Messages->add_to_group( T_('Marking email notifications for members as sent.'), 'note', T_('Sending notifications:') );
+			$this->display_notification_message( T_('Marking email notifications for members as sent.') );
 		}
 		if( $force_community == 'mark' )
 		{	// Only change DB flag to "community_notified" but do NOT actually send notifications:
 			$force_community = false;
 			$notified_flags[] = 'community_notified';
-			$Messages->add_to_group( T_('Marking email notifications for community as sent.'), 'note', T_('Sending notifications:') );
+			$this->display_notification_message( T_('Marking email notifications for community as sent.') );
 		}
 		if( $force_pings == 'mark' )
 		{	// Only change DB flag to "pings_sent" but do NOT actually send pings:
 			$force_pings = false;
 			$notified_flags[] = 'pings_sent';
-			$Messages->add_to_group( T_('Marking pings as sent.'), 'note', T_('Sending notifications:') );
+			$this->display_notification_message( T_('Marking pings as sent.') );
 		}
 		if( ! empty( $notified_flags ) )
 		{	// Save the marked processing status to DB:
@@ -9008,7 +9130,7 @@ class Item extends ItemLight
 		if( ( $force_members != 'force' && $force_community != 'force' && $force_pings != 'force' ) &&
 		    $this->check_notifications_flags( array( 'members_notified', 'community_notified', 'pings_sent' ) ) )
 		{	// All possible notifications have already been sent and no forcing for any notification:
-			$Messages->add_to_group( T_('All possible notifications have already been sent: skipping notifications...'), 'note', T_('Sending notifications:') );
+			$this->display_notification_message( T_('All possible notifications have already been sent: skipping notifications...') );
 			$Debuglog->add( 'Item->handle_notifications() : All possible notifications have already been sent: skipping notifications...', 'notifications' );
 			return false;
 		}
@@ -9075,7 +9197,7 @@ class Item extends ItemLight
 			// Save cronjob to DB:
 			if( $item_Cronjob->dbinsert() )
 			{
-				$Messages->add_to_group( T_('Scheduling Pings & Subscriber email notifications.'), 'note', T_('Sending notifications:') );
+				$this->display_notification_message( T_('Scheduling Pings & Subscriber email notifications.') );
 
 				// Memorize the cron job ID which is going to handle this post:
 				$this->set( 'notifications_ctsk_ID', $item_Cronjob->ID );
@@ -9175,13 +9297,13 @@ class Item extends ItemLight
 			unset( $post_moderators[$post_creator_User->ID] );
 		}
 
-		if( empty( $post_moderators ) )
-		{ // There are no moderator users who would like to receive notificaitons
-			return NULL;
-		}
-
 		// Collect all notified User IDs in this array:
 		$notified_user_IDs = array();
+
+		if( empty( $post_moderators ) )
+		{ // There are no moderator users who would like to receive notificaitons
+			return $notified_user_IDs;
+		}
 
 		$post_creator_level = $post_creator_User->level;
 		$UserCache = & get_UserCache();
@@ -9239,7 +9361,7 @@ class Item extends ItemLight
 		// Save the new processing status to DB, but do not update last edited by user, slug or child custom fields:
 		$this->dbupdate( false, false, false );
 
-		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ), 'note', T_('Sending notifications:')  );
+		$this->display_notification_message( sprintf( T_('Sending %d email notifications to moderators.'), count( $notified_user_IDs ) ) );
 
 		return $notified_user_IDs;
 	}
@@ -9313,7 +9435,7 @@ class Item extends ItemLight
 			locale_restore_previous();
 		}
 
-		$Messages->add_to_group( sprintf( T_('Sending %d email notifications to moderators.'), $notified_users_num ), 'note', T_('Sending notifications:')  );
+		$this->display_notification_message( sprintf( T_('Sending %d email notifications to moderators.'), $notified_users_num ) );
 	}
 
 
@@ -9326,6 +9448,8 @@ class Item extends ItemLight
 	function send_assignment_notification( $executed_by_userid = NULL )
 	{
 		global $current_User, $Messages, $UserSettings;
+
+		$notified_user_IDs = array();
 
 		if( $executed_by_userid === NULL && is_logged_in() )
 		{	// Use current user by default:
@@ -9341,8 +9465,8 @@ class Item extends ItemLight
 
 			if( $assigned_User &&
 					$UserSettings->get( 'notify_post_assignment', $assigned_User->ID ) &&
-					$assigned_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() ) )
-			{ // Assigned user wants to receive post assignment notifications and is a member of at least one collection:
+					$assigned_User->check_perm( 'blog_can_be_assignee', 'view', false, $this->get_blog_ID() ) )
+			{	// Assigned user wants to receive post assignment notifications and can be assigned to items of this Item's collection:
 				$user_Group = $assigned_User->get_Group();
 				$notify_full = $user_Group->check_perm( 'post_assignment_notif', 'full' );
 
@@ -9361,25 +9485,17 @@ class Item extends ItemLight
 				$subject = sprintf( $subject, $this->Blog->get('shortname'), $this->get('title') );
 
 				// Send the email:
-				$notified_user_IDs = array();
-
 				if( send_mail_to_User( $assigned_User->ID, $subject, 'post_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
 				{	// A send notification email request to the assigned user was processed:
 					$notified_user_IDs[] = $assigned_User->ID;
-					$Messages->add_to_group( T_('Sending email notification to assigned user.'), 'note', T_('Sending notifications:')  );
+					$this->display_notification_message( T_('Sending email notification to assigned user.') );
 				}
 
 				locale_restore_previous();
-
-				return $notified_user_IDs;
-			}
-			else
-			{ // No valid assigned user or the user does not want to receive post assignment notifications
-				return NULL;
 			}
 		}
 
-		return NULL;
+		return $notified_user_IDs;
 	}
 
 
@@ -9413,30 +9529,14 @@ class Item extends ItemLight
 
 		if( ! $edited_Blog->get_setting( 'allow_subscriptions' ) )
 		{	// Subscriptions not enabled!
-			$message = T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribers because subscriptions are turned Off for this collection.'), $log_messages );
 			return array();
 		}
 
 		if( ! $this->notifications_allowed() )
 		{	// Don't send notifications about some post/usages like "special":
 			// Note: this is a safety but this case should never happen, so don't make translators work on this:
-			$message = 'This post type/usage cannot support notifications: skipping notifications...';
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( 'This post type/usage cannot support notifications: skipping notifications...', $log_messages );
 			return array();
 		}
 
@@ -9444,67 +9544,27 @@ class Item extends ItemLight
 		{	// Don't send notifications about items with not allowed status:
 			$status_titles = get_visibility_statuses( '', array() );
 			$status_title = isset( $status_titles[ $this->get( 'status' ) ] ) ? $status_titles[ $this->get( 'status' ) ] : $this->get( 'status' );
-			$message = sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title );
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( sprintf( T_('Skipping email notifications to subscribers because status is still: %s.'), $status_title ), $log_messages );
 			return array();
 		}
 
 		if( $force_members == 'skip' && $force_community == 'skip' )
 		{	// Skip subscriber notifications because of it is forced by param:
-			$message = T_('Skipping email notifications to subscribers.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribers.'), $log_messages );
 			return array();
 		}
 
 		if( $force_members == 'force' && $force_community == 'force' )
 		{	// Force to members and community:
-			$message = T_('Force sending email notifications to subscribers...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Force sending email notifications to subscribers...'), $log_messages );
 		}
 		elseif( $force_members == 'force' )
 		{	// Force to members only:
-			$message = T_('Force sending email notifications to subscribed members...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Force sending email notifications to subscribed members...'), $log_messages );
 		}
 		elseif( $force_community == 'force' )
 		{	// Force to community only:
-			$message = T_('Force sending email notifications to other subscribers...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Force sending email notifications to other subscribers...'), $log_messages );
 		}
 		else
 		{	// Check if email notifications can be sent for this item currently:
@@ -9513,15 +9573,7 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$message = T_('This post type/usage doesn\'t need notifications by default: skipping notifications...');
-				if( $log_messages == 'cron_job' )
-				{
-					cron_log_append( $message."\n" );
-				}
-				else
-				{
-					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-				}
+				$this->display_notification_message( T_('This post type/usage doesn\'t need notifications by default: skipping notifications...'), $log_messages );
 				return array();
 			}
 		}
@@ -9550,42 +9602,18 @@ class Item extends ItemLight
 
 		if( ! $notify_members && ! $notify_community )
 		{	// Everyone has already been notified, nothing to do:
-			$message = T_('Skipping email notifications to subscribers because they were already notified.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribers because they were already notified.'), $log_messages );
 			return array();
 		}
 
 		if( $notify_members && $force_members == 'skip' )
 		{	// Skip email notifications to members because it is forced by param:
-			$message = T_('Skipping email notifications to subscribed members.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to subscribed members.'), $log_messages );
 			$notify_members = false;
 		}
 		if( $notify_community && $force_community == 'skip' )
 		{	// Skip email notifications to community because it is forced by param:
-			$message = T_('Skipping email notifications to other subscribers.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping email notifications to other subscribers.'), $log_messages );
 			$notify_community = false;
 		}
 
@@ -9688,7 +9716,7 @@ class Item extends ItemLight
 			$sql .= ' AND user_ID != '.$DB->quote( $executed_by_userid );
 		}
 
-		$notify_list = $DB->get_col( $sql, 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID() );
+		$notify_list = $DB->get_col( $sql, 0, 'Get list of users who want to be notified (and have not yet been notified) about new items on collection #'.$this->get_blog_ID() );
 
 		// Preprocess list:
 		foreach( $notify_list as $notify_user_ID )
@@ -9701,7 +9729,7 @@ class Item extends ItemLight
 
 		$notify_user_IDs = array_keys( $notify_users );
 
-		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'Number of users who want to be notified (and have not yet been notified) about new items on collection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
 		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		// Load all users who will be notified:
@@ -9760,32 +9788,16 @@ class Item extends ItemLight
 			}
 		}
 
-		$Debuglog->add( 'Number of users who are allowed to be notified about new items on colection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
+		$Debuglog->add( 'Number of users who are allowed to be notified about new items on collection #'.$this->get_blog_ID().' = '.count( $notify_users ), 'notifications' );
 		$Debuglog->add( 'First 10 user IDs: '.implode( ',', array_slice( $notify_user_IDs, 0, 10 ) ), 'notifications' );
 
 		if( $notify_members )
 		{	// Display a message to know how many members are notified:
-			$message = sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count );
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( sprintf( T_('Sending %d email notifications to subscribed members.'), $members_count ), $log_messages );
 		}
 		if( $notify_community )
 		{	// Display a message to know how many community users are notified:
-			$message = sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count );
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( sprintf( T_('Sending %d email notifications to other subscribers.'), $community_count ), $log_messages );
 		}
 
 		if( empty( $notify_users ) )
@@ -9892,72 +9904,32 @@ class Item extends ItemLight
 		if( ! $this->notifications_allowed() )
 		{	// Don't send pings about some post/usages like "special":
 			// Note: this is a safety but this case should never happen, so don't make translators work on this:
-			$message = 'This post type/usage cannot support pings: skipping pings...';
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( 'This post type/usage cannot support pings: skipping pings...', $log_messages );
 			return false;
 		}
 
 		if( $this->get( 'status' ) != 'published' )
 		{	// Don't send pings if item is not 'public':
-			$message = T_('Skipping outbound pings because item is not published yet.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping outbound pings because item is not published yet.'), $log_messages );
 			return false;
 		}
 
 		if( $force_pings == 'skip' )
 		{	// Skip pings because it is forced by param:
-			$message = T_('Skipping outbound pings.');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping outbound pings.'), $log_messages );
 			return false;
 		}
 
 		if( $force_pings == 'force' )
 		{	// Force pings:
-			$message = T_('Force sending outbound pings...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Force sending outbound pings...'), $log_messages );
 		}
 		else
 		{	// Check if pings can be sent for this item currently:
 
 			if( $this->check_notifications_flags( 'pings_sent' ) )
 			{	// Don't send pings if they have already been sent:
-				$message = T_('Skipping outbound pings because they were already sent.');
-				if( $log_messages == 'cron_job' )
-				{
-					cron_log_append( $message."\n" );
-				}
-				else
-				{
-					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-				}
+				$this->display_notification_message( T_('Skipping outbound pings because they were already sent.'), $log_messages );
 				return false;
 			}
 
@@ -9965,15 +9937,7 @@ class Item extends ItemLight
 			// fp> I think the only usage that makes sense to send automatic notifications to subscribers is "Post"
 			if( $this->get_type_setting( 'usage' ) != 'post' )
 			{	// Don't send outbound pings for items that are not regular posts:
-				$message = T_('This post type/usage doesn\'t need pings by default: skipping pings...');
-				if( $log_messages == 'cron_job' )
-				{
-					cron_log_append( $message."\n" );
-				}
-				else
-				{
-					$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-				}
+				$this->display_notification_message( T_('This post type/usage doesn\'t need pings by default: skipping pings...'), $log_messages );
 				return false;
 			}
 		}
@@ -9986,28 +9950,12 @@ class Item extends ItemLight
 		    ( preg_match( '#^http://localhost[/:]#', $baseurl ) ||
 		      preg_match( '~^\w+://[^/]+\.local/~', $baseurl ) ) ) /* domain ending in ".local" */
 		{	// Don't send pings from localhost:
-			$message = T_('Skipping pings (Running on localhost).');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Skipping pings (Running on localhost).'), $log_messages );
 			return false;
 		}
 		else
 		{	// Send pings:
-			$message = T_('Trying to find plugins for sending outbound pings...');
-			if( $log_messages == 'cron_job' )
-			{
-				cron_log_append( $message."\n" );
-			}
-			else
-			{
-				$Messages->add_to_group( $message, 'note', T_('Sending notifications:') );
-			}
+			$this->display_notification_message( T_('Trying to find plugins for sending outbound pings...'), $log_messages );
 
 			load_funcs('xmlrpc/model/_xmlrpc.funcs.php');
 
@@ -10100,16 +10048,9 @@ class Item extends ItemLight
 						}
 					}
 
-					if( !empty( $current_message ) )
-					{ // Display last message
-						if( $log_messages == 'cron_job' )
-						{
-							cron_log_append( $current_message."\n", $current_type );
-						}
-						else
-						{
-							$Messages->add_to_group( $current_message, $current_type, $current_title );
-						}
+					if( ! empty( $current_message ) )
+					{	// Display last message:
+						$this->display_notification_message( $current_message, $log_messages, $current_type, $current_title );
 					}
 				}
 			}
@@ -11023,16 +10964,16 @@ class Item extends ItemLight
 		$orig_iver_ID = $iver_ID;
 
 		if( $iver_ID == 'last_archived' || $iver_ID == 'last_proposed' )
-		{	// Get last revision:
-			list( , $iver_type ) = explode( '_', $iver_ID );
-			$revision_SQL = new SQL();
-			$revision_SQL->SELECT( 'a.*, CONCAT( "'.$iver_type.'", a.iver_ID ) AS param_ID' );
-			$revision_SQL->FROM( 'T_items__version a' );
-			$revision_SQL->FROM_add( 'LEFT OUTER JOIN T_items__version b ON a.iver_itm_ID = b.iver_itm_ID AND a.iver_ID < b.iver_ID AND b.iver_type = '.$DB->quote( $iver_type ) );
-			$revision_SQL->WHERE( 'b.iver_itm_ID IS NULL' );
-			$revision_SQL->WHERE_and( 'a.iver_itm_ID = '.$DB->quote( $this->ID ) );
-			$revision_SQL->WHERE_and( 'a.iver_type = '.$DB->quote( $iver_type ) );
-			$this->revisions[ $orig_iver_ID ] = $DB->get_row( $revision_SQL->get(), OBJECT, NULL, $revision_SQL->title );
+		{	// Get last archived version or last proposed change:
+			$iver_type = substr( $iver_ID, 5 );
+			$revision_SQL = new SQL( 'Get '.str_replace( '_', ' ', $iver_ID ).' version of the Item #'.$this->ID );
+			$revision_SQL->SELECT( '*, CONCAT( "'.( $iver_type == 'archived' ? 'a' : 'p' ).'", iver_ID ) AS param_ID' );
+			$revision_SQL->FROM( 'T_items__version' );
+			$revision_SQL->WHERE( 'iver_itm_ID = '.$DB->quote( $this->ID ) );
+			$revision_SQL->WHERE_and( 'iver_type = '.$DB->quote( $iver_type ) );
+			$revision_SQL->ORDER_BY( 'iver_ID DESC' );
+			$revision_SQL->LIMIT( '1' );
+			$this->revisions[ $orig_iver_ID ] = $DB->get_row( $revision_SQL );
 
 			return $this->revisions[ $orig_iver_ID ];
 		}
@@ -11707,16 +11648,19 @@ class Item extends ItemLight
 
 
 	/**
-	 * Display the icon if this post is unread by current User
+	 * Get a color read status icon if this post is unread by current User
 	 *
 	 * @param array Params
+	 * @return string
 	 */
-	function display_unread_status( $params = array() )
+	function get_unread_status( $params = array() )
 	{
+		$r = '';
+
 		$this->load_Blog();
 		if( ! $this->Blog->get_setting( 'track_unread_content' ) )
 		{	// The tracking of unread content is turned off for the collection
-			return;
+			return $r;
 		}
 
 		// Set titles by Blog type:
@@ -11729,31 +11673,85 @@ class Item extends ItemLight
 				'before'        => ' ',
 				'after'         => '',
 				'class'         => 'track_content',
+				'style'         => 'icon', // 'text'
 				'title_new'     => $title_new,
 				'title_updated' => $title_updated,
+				'title_read'    => T_('Read'),
+				'text_new'      => T_('New'),
+				'text_updated'  => T_('Updated'),
+				'text_read'     => T_('Read'),
+				'class_new'     => 'label label-warning',
+				'class_updated' => 'label label-danger',
+				'class_read'    => 'label label-success',
 			), $params );
 
 		switch( $this->get_read_status() )
 		{
 			case 'new':
 				// This post is new for the current User, it was never opened
-				echo $params['before'];
-				echo get_icon( 'bullet_orange', 'imgtag', array( 'title' => $params['title_new'], 'class' => $params['class'] ) );
-				echo $params['after'];
+				$r .= $params['before'];
+				if( $params['style'] == 'text' )
+				{	// Text style:
+					$r .= '<span'
+						.( empty( $params['class_new'] ) ? '' : ' class="'.$params['class_new'].'"')
+						.( empty( $params['title_new'] ) ? '' : ' class="'.$params['title_new'].'"').'>'
+							.$params['text_new']
+						.'</span>';
+				}
+				else
+				{	// Icon style:
+					$r .= get_icon( 'bullet_orange', 'imgtag', array( 'title' => $params['title_new'], 'class' => $params['class'] ) );
+				}
+				$r .= $params['after'];
 				break;
 
 			case 'updated':
 				// The last updates of this post was not read by the current User
-				echo $params['before'];
-				echo get_icon( 'bullet_brown', 'imgtag', array( 'title' => $params['title_updated'], 'class' => $params['class'] ) );
-				echo $params['after'];
+				$r .= $params['before'];
+				if( $params['style'] == 'text' )
+				{	// Text style:
+					$r .= '<span'
+						.( empty( $params['class_updated'] ) ? '' : ' class="'.$params['class_updated'].'"')
+						.( empty( $params['title_updated'] ) ? '' : ' class="'.$params['title_updated'].'"').'>'
+							.$params['text_updated']
+						.'</span>';
+				}
+				else
+				{	// Icon style:
+					$r .= get_icon( 'bullet_brown', 'imgtag', array( 'title' => $params['title_updated'], 'class' => $params['class'] ) );
+				}
+				$r .= $params['after'];
 				break;
 
 			case 'read':
 			default:
 				// Don't display status icons if user already have read this post
+				if( $params['style'] == 'text' )
+				{	// Text style:
+					$r .= $params['before'];
+					$r .= '<span'
+						.( empty( $params['class_read'] ) ? '' : ' class="'.$params['class_read'].'"')
+						.( empty( $params['title_read'] ) ? '' : ' class="'.$params['title_read'].'"').'>'
+							.$params['text_read']
+						.'</span>';
+					$r .= $params['after'];
+				}
+				// No icon for read status.
 				break;
 		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Display a color read status icon if this post is unread by current User
+	 *
+	 * @param array Params
+	 */
+	function display_unread_status( $params = array() )
+	{
+		echo $this->get_unread_status( $params );
 	}
 
 
@@ -11878,7 +11876,7 @@ class Item extends ItemLight
 					global $DB;
 					$SQL = new SQL( 'Get custom fields of revision #'.$Revision->iver_ID.'('.$Revision->iver_type.') for Item #'.$this->ID );
 					$SQL->SELECT( 'ivcf_itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, ivcf_itcf_label AS label, IFNULL( itcf_name, CONCAT( "!deleted_", ivcf_itcf_ID ) ) AS name, itcf_type AS type, IFNULL( itcf_order, 999999999 ) AS `order`, itcf_note AS note, ' );
-					$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
+					$SQL->SELECT_add( 'itcf_required AS required, itcf_meta AS meta, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
 					$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
 					$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
 					$SQL->FROM( 'T_items__version_custom_field' );
@@ -12237,8 +12235,8 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'before'       => '',
 				'after'        => '',
-				'title_flag'   => T_('Click to flag this.'),
-				'title_unflag' => T_('You have flagged this. Click to remove flag.'),
+				'title_flag'   => T_('You have flagged this. Click to remove flag.'),
+				'title_unflag' => T_('Click to flag this.'),
 				'only_flagged' => false, // Display the flag button only when this item is already flagged by current User
 				'allow_toggle' => true, // Allow to toggle flag state by AJAX
 			), $params );
@@ -13330,6 +13328,7 @@ class Item extends ItemLight
 		// Typically stuff that will help the content to validate
 		// Useful for code display.
 		// Will probably be used for validation also.
+		// + APPLY RENDERING from Rendering Plugins:
 		$Plugins_admin = & get_Plugins_admin();
 		$params = array(
 				'object_type' => 'Item',
@@ -13571,13 +13570,47 @@ class Item extends ItemLight
 
 
 	/**
+	 * Display or log notification message
+	 *
+	 * @param string Message
+	 * @param boolean|string 'cron_job' - to log messages for cron job, FALSE - to don't log
+	 * @param string Message type
+	 * @param string Message group title
+	 */
+	function display_notification_message( $message, $log_messages = false, $message_type = 'note', $message_group = NULL )
+	{
+		global $current_User, $Messages;
+
+		if( $log_messages == 'cron_job' )
+		{	// Log message for cron job:
+			cron_log_append( $message."\n", $message_type );
+		}
+		elseif( ! empty( $this->ID ) && // Item must be stored in DB
+			is_logged_in( false ) && // User must be logged in and activated
+			// User must be a collection admin
+			$current_User->check_perm( 'blog_admin', 'edit', false, $this->get_blog_ID() ) )
+		{	// Display notification message only for collection admin:
+			if( $message_group === NULL )
+			{	// Set default group title:
+				$message_group = T_('Sending notifications:');
+			}
+			$Messages->add_to_group( $message, $message_type, $message_group );
+		}
+	}
+
+
+	/**
 	 * Get available locales
 	 *
+	 * @param string Type of locales:
+	 *        - 'locale' - locales of the Item's collection,
+	 *        - 'coll' - locales as links to other collections,
+	 *        - 'all' - all locales of this and links with other collections.
 	 * @return array
 	 */
-	function get_available_locales()
+	function get_available_locales( $type = 'locale' )
 	{
-		return ( $item_blog = & $this->get_Blog() ? $item_blog->get_locales() : array() );
+		return ( $item_Blog = & $this->get_Blog() ? $item_Blog->get_locales( $type ) : array() );
 	}
 
 
@@ -13631,26 +13664,31 @@ class Item extends ItemLight
 	/**
 	 * Get locale options for selector on edit page
 	 *
+	 * @param string Type of locales:
+	 *        - 'locale' - locales of the Item's collection,
+	 *        - 'coll' - locales as links to other collections,
+	 *        - 'all' - all locales of this and links with other collections.
 	 * @param boolean Exclude locales that are already used in the group of this Item
 	 * @return string
 	 */
-	function get_locale_options( $exclude_used = false )
+	function get_locale_options( $type = 'locale', $exclude_used = false )
 	{
 		global $locales;
 
 		$r = '';
 
-		$available_locales = $this->get_available_locales();
+		$available_locales = $this->get_available_locales( $type );
 
 		if( $exclude_used )
-		{	// Exclude locales that are already used in the group of this Item
-			$exclude_locales = array( $this->get( 'locale' ) );
+		{	// Exclude locales that are already used in the group of this Item:
 			$other_version_items = $this->get_other_version_items();
 			foreach( $other_version_items as $other_version_Item )
 			{
-				$exclude_locales[] = $other_version_Item->get( 'locale' );
+				if( isset( $available_locales[ $other_version_Item->get( 'locale' ) ] ) )
+				{
+					unset( $available_locales[ $other_version_Item->get( 'locale' ) ] );
+				}
 			}
-			$available_locales = array_diff( $available_locales, $exclude_locales );
 		}
 
 		if( empty( $available_locales ) )
@@ -13658,16 +13696,32 @@ class Item extends ItemLight
 			return $r;
 		}
 
-		foreach( $available_locales as $locale_key )
+		$BlogCache = & get_BlogCache();
+
+		foreach( $available_locales as $locale_key => $linked_coll_ID )
 		{
 			if( ( isset( $locales[ $locale_key ] ) && $locales[ $locale_key ]['enabled'] ) ||
 			    $locale_key == $this->get( 'locale' ) )
 			{	// Allow enabled locales or if it is already selected for this Item:
+				if( ! empty( $linked_coll_ID ) )
+				{	// This is a linked locale from different collection:
+					$locale_Blog = & $BlogCache->get_by_ID( $linked_coll_ID, false, false );
+				}
+				else
+				{	// Use collection of this Item:
+					$locale_Blog = & $this->get_Blog();
+				}
+				if( ! $locale_Blog )
+				{	// Skip wrong locale:
+					continue;
+				}
 				$r .= '<option value="'.$locale_key.'"';
 				if( $locale_key == $this->get( 'locale' ) )
 				{	// This is a selected locale
 					$r .= ' selected="selected"';
 				}
+				$r .= ' data-coll-id="'.$locale_Blog->ID.'"';
+				$r .= ' data-coll-name="'.format_to_output( $locale_Blog->get( 'name' ), 'htmlattr' ).'"';
 				$r .= '>'.( isset( $locales[ $locale_key ] ) ? T_( $locales[ $locale_key ]['name'] ) : $locale_key ).'</option>'."\n";
 			}
 		}
@@ -13782,6 +13836,211 @@ class Item extends ItemLight
 
 		$r = NULL;
 		return $r;
+	}
+
+
+	/**
+	 * Check permission of current User to edit workflow properties
+	 *
+	 * @param string Permission name:
+	 *               - 'any' - Check to edit at least one workflow property
+	 *               - 'status', 'user', 'priority', 'deadline' - Check to edit one of these workflow properties
+	 * @param boolean Execution will halt if this is !0 and permission is denied
+	 */
+	function can_edit_workflow( $permname = 'any', $assert = false )
+	{
+		global $current_User;
+
+		$perm =
+			// Item must be saved in DB:
+			! empty( $this->ID ) &&
+			// User must be logged in:
+			is_logged_in() &&
+			// Workflow must be enabled for current Collection:
+			$this->get_coll_setting( 'use_workflow' ) &&
+			// Current User must has a permission to be assigned for tasks of the current Collection:
+			$current_User->check_perm( 'blog_can_be_assignee', 'edit', $assert, $this->get_blog_ID() );
+
+		if( $perm )
+		{	// Additional checking for several permissions when main checking is true:
+			switch( $permname )
+			{
+				case 'any':
+					// Check if current User can edit at least one workflow property:
+					$perm = $current_User->check_perm( 'blog_workflow_status', 'edit', false, $this->get_blog_ID() ) ||
+						$current_User->check_perm( 'blog_workflow_user', 'edit', false, $this->get_blog_ID() ) ||
+						$current_User->check_perm( 'blog_workflow_priority', 'edit', false, $this->get_blog_ID() );
+					break;
+				case 'deadline':
+					// Deadline has additional collection setting to be enabled:
+					$perm = $this->get_coll_setting( 'use_deadline' );
+			}
+		}
+
+		if( ! $perm )
+		{	// No permission:
+			if( $assert )
+			{	// We can't let this go on!
+				global $app_name;
+				debug_die( sprintf( /* %s is the application name, usually "b2evolution" */ T_('Group/user permission denied by %s!'), $app_name ).' (Item#'.$this->ID.':workflow:'.( $permname === NULL ? 'MAIN' : $permname ).')' );
+			}
+			return $perm;
+		}
+
+		switch( $permname )
+		{
+			case 'any':
+				// Check if current User can edit at least one workflow property:
+				return $perm;
+			case 'status':
+				// Check if current User can edit the workflow status:
+				return $current_User->check_perm( 'blog_workflow_status', 'edit', $assert, $this->get_blog_ID() );
+			case 'user':
+				// Check if current User can edit the workflow user:
+				return $current_User->check_perm( 'blog_workflow_user', 'edit', $assert, $this->get_blog_ID() );
+			case 'priority':
+			case 'deadline':
+				// Check if current User can edit the workflow priority or deadline:
+				return $current_User->check_perm( 'blog_workflow_priority', 'edit', $assert, $this->get_blog_ID() );
+			default:
+				// Wrong request:
+				debug_die( 'Unhandled Item workflow permission name "'.$permname.'"' );
+		}
+	}
+
+
+	/**
+	 * Display workflow field to edit
+	 *
+	 * @param string Field key: 'status', 'user', 'priority', 'deadline'
+	 * @param object Form
+	 * @param array Additional parameters
+	 */
+	function display_workflow_field( $field, & $Form, $params = array() )
+	{
+		if( ! $this->can_edit_workflow( $field ) )
+		{	// Current User has no permission to edit the requested workflow property:
+			return;
+		}
+
+		switch( $field )
+		{
+			case 'status':
+				$ItemStatusCache = & get_ItemStatusCache();
+				$ItemStatusCache->load_all();
+				$ItemTypeCache = & get_ItemTypeCache();
+				$current_ItemType = & $this->get_ItemType();
+				$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $this->get( 'pst_ID' ), true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
+				break;
+
+			case 'user':
+				// Load current blog members into cache:
+				$UserCache = & get_UserCache();
+				// Load only first 21 users to know when we should display an input box instead of full users list
+				$UserCache->load_blogmembers( $this->get_blog_ID(), 21, false );
+
+				if( count( $UserCache->cache ) > 20 )
+				{
+					$assigned_User = & $UserCache->get_by_ID( $this->get( 'assigned_user_ID' ), false, false );
+					$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
+				}
+				else
+				{
+					$Form->select_object( 'item_assigned_user_ID', NULL, $this, T_('Assigned to'), '', true, '', 'get_assigned_user_options' );
+				}
+				break;
+
+			case 'priority':
+				$Form->select_input_array( 'item_priority', $this->get( 'priority' ), item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+				break;
+
+			case 'deadline':
+				if( $this->get_coll_setting( 'use_deadline' ) )
+				{	// Display deadline fields only if it is enabled for collection:
+					$Form->begin_line( T_('Deadline'), 'item_deadline' );
+
+						$datedeadline = $this->get( 'datedeadline' );
+						$Form->date( 'item_deadline', $datedeadline, '' );
+
+						$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
+						$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
+
+					$Form->end_line();
+				}
+				break;
+		}
+	}
+
+
+	/**
+	 * Get ordered array of fields which can be edited on front-office
+	 *
+	 * @param array
+	 */
+	function get_front_edit_fields()
+	{
+		$fields = array();
+
+		// Item fields which may be displayed on front-office:
+		$item_fields = array(
+			'title',
+			'short_title',
+			'instruction',
+			'attachments',
+			'text',
+			'tags',
+			'excerpt',
+			'url',
+			'location',
+		);
+		foreach( $item_fields as $item_field )
+		{
+			$fields[] = array(
+				'name'  => $item_field,
+				'order' => $this->get_type_setting( 'front_order_'.$item_field ),
+				'type'  => 'item',
+			);
+		}
+
+		// Custom fields:
+		$custom_fields = $this->get_custom_fields_defs();
+		foreach( $custom_fields as $custom_field )
+		{
+			$fields[] = array(
+				'name'  => $custom_field['name'],
+				'order' => $custom_field['order'],
+				'type'  => 'custom',
+				'value' => $custom_field['value'],
+			);
+		}
+
+		// Sort fields by order value:
+		usort( $fields, array( $this, 'sort_front_edit_fields_callback' ) );
+
+		return $fields;
+	}
+
+
+	/**
+	 * Callback function to sort front edit fields by order value
+	 *
+	 * @param array Field data
+	 * @param array Field data
+	 * @return boolean
+	 */
+	function sort_front_edit_fields_callback( $a, $b )
+	{
+		if( $a['order'] == $b['order'] )
+		{	// Sort by field type or name:
+			if( $a['type'] == $b['type'] )
+			{	// Sort by name when type is same:
+				return $a['name'] > $b['name'] ? 1 : -1;
+			}
+			// Make item fields above custom fields:
+			return ( $a['type'] == 'custom' ? 1 : -1 );
+		}
+
+		return ( $a['order'] > $b['order'] ? 1 : -1 );
 	}
 }
 ?>

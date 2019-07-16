@@ -202,6 +202,17 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		$params['input_suffix'] = $parmeta['input_suffix'];
 	}
 
+	if( $set_type == 'Skin' &&
+	    in_array( $parmeta['type'], array( 'text', 'integer', 'color', 'select' ) ) )
+	{	// Append action icon to restore setting to default value by JavaScript:
+		$params['input_suffix'] = ( isset( $params['input_suffix'] ) ? $params['input_suffix'] : '' ).
+			' '.get_icon( 'reload', 'imgtag', array(
+				'data-default-value' => $Obj->get_setting_default_value( $parname, $group ),
+				'title' => T_('Restore to default value'),
+				'class' => 'pointer'
+			) );
+	}
+
 	if( isset($use_value) )
 	{
 		$set_value = $use_value;

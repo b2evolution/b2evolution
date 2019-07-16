@@ -26,6 +26,13 @@ $params = array_merge( array(
 		'image_class'       => 'img-responsive',
 		'image_size'        => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 		'item_link_type'    => 'post',
+		// Controlling the title:
+		'item_title_line_before'     => '<div class="evo_post_title">',	// Note: we use an extra class because it facilitates styling
+			'item_title_before'          => '<h2>',
+			'item_title_after'           => '</h2>',
+			'item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
+			'item_title_single_after'    => '</h1>',
+		'item_title_line_after'      => '</div>',
 	), $params );
 ?>
 
@@ -89,8 +96,8 @@ $params = array_merge( array(
 	{
 		$Item->title( array(
 				'link_type'  => $params['item_link_type'],
-				'before'     => '<div class="evo_post_title"><h1>',
-				'after'      => '</h1>'.$action_links.'</div>',
+				'before'     => $params['item_title_line_before'].$params['item_title_before'],
+				'after'      => $params['item_title_after'].$action_links.$params['item_title_line_after'],
 				'nav_target' => false,
 			) );
 	}
@@ -113,8 +120,8 @@ $params = array_merge( array(
 			'block_title_end' => '</h3>',
 			// Template params for "Item Title" widget:
 			'widget_item_title_params'  => array(
-					'before' => '<div class="evo_post_title"><h1>',
-					'after' => '</h1>'.$action_links.'</div>',
+					'before' => $params['item_title_line_before'].$params['item_title_single_before'],
+					'after' => $params['item_title_single_after'].$action_links.$params['item_title_line_after'],
 					'link_type' => $params['item_link_type'],
 				),
 			// Template params for "Item Visibility Badge" widget:
@@ -212,7 +219,7 @@ $params = array_merge( array(
 			'</p>';
 			echo $Item->get_history_link( array(
 					'before'    => ' &bull; ',
-					'link_text' => T_('View history')
+					'link_text' => T_('View change history')
 				) );
 		}
 	}

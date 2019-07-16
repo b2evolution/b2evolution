@@ -21,7 +21,7 @@ class custom_tags_plugin extends Plugin
 	var $group = 'rendering';
 	var $short_desc = 'Custom tags';
 	var $long_desc;
-	var $version = '7.0.1';
+	var $version = '7.0.2';
 	var $number_of_installs = 1;
 
 	// Internal
@@ -144,7 +144,22 @@ class custom_tags_plugin extends Plugin
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		$default_params = array_merge( $params, array( 'default_comment_rendering' => 'never' ) );
+		$default_params = array(
+				'default_comment_rendering' => 'never',
+			);
+
+		if( ! empty( $params['blog_type'] ) && get_class( $this ) == 'custom_tags_plugin' )
+		{	// Set default settings depending on collection type:
+			// (ONLY for current plugin excluding all child plugins like "BB code" or "GM code")
+			switch( $params['blog_type'] )
+			{
+				case 'forum':
+					$default_params['default_post_rendering'] = 'never';
+					break;
+			}
+		}
+
+		$default_params = array_merge( $params, $default_params );
 		$plugin_params = array();
 
 		if( $this->configurable_post_list )

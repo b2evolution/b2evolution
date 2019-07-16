@@ -585,35 +585,38 @@ function dbm_delete_orphan_files()
 	evo_flush();
 
 	$files_SQL = new SQL();
-	$files_SQL->SELECT( '*' );
+	$files_SQL->SELECT( 'file_ID, file_root_type, file_root_ID, file_path' );
 	$files_SQL->FROM( 'T_files' );
 	$files_SQL->ORDER_BY( 'file_ID' );
 
 	$count_files_valid = 0;
-	$count_files_invalid = 0;
-	$count_files_deleted = 0;
+	$deleted_files = array();
+	$cannot_deleted_files = array();
 
 	$page_size = 100;
 	$current_page = 0;
 	// Search the files by page to save memory
 	$files_SQL->LIMIT( '0, '.$page_size );
-	while( $loaded_Files = $FileCache->load_by_sql( $files_SQL ) )
+	while( $loaded_files = $DB->get_results( $files_SQL, ARRAY_A ) )
 	{ // Check all loaded files
-		foreach( $loaded_Files as $File )
+		$FileCache->load_list( array_column( $loaded_files, 'file_ID' ) );
+		foreach( $loaded_files as $loaded_file_data )
 		{
-			if( is_null( $File ) )
-			{ // The File object couldn't be created because the db entry is invalid
-				$count_files_invalid++;
-				continue;
-			}
+			$File = & $FileCache->get_by_ID( $loaded_file_data['file_ID'], false, false );
 			if( $File->exists() )
 			{ // File exists on the disk
 				$count_files_valid++;
 			}
 			else
 			{ // File doesn't exist on the disk, Remove it from DB
-				$File->dbdelete();
-				$count_files_deleted++;
+				if( $File->dbdelete() )
+				{	// Success deleting:
+					$deleted_files[] = $loaded_file_data;
+				}
+				else
+				{	// Some restrictions, see File::get_delete_restrictions():
+					$cannot_deleted_files[] = $loaded_file_data;
+				}
 			}
 		}
 
@@ -627,18 +630,35 @@ function dbm_delete_orphan_files()
 		$files_SQL->LIMIT( ( $current_page * $page_size ).', '.$page_size );
 	}
 
-	echo 'OK<p>';
-	echo sprintf( T_('Number of deleted orphan File objects: %d.'), $count_files_deleted ).'<br />';
-	echo sprintf( T_('Number of valid File objects in the database: %d.'), $count_files_valid ).'</p>';
+	echo T_('OK');
 
-	if( $count_files_invalid )
-	{ // There are invalid files in the database
-		// Display warning to show that the 'Remove orphan file roots' tool should be also called
-		$remove_orphan_file_roots = 'href="'.$admin_url.'?ctrl=tools&amp;action=delete_orphan_file_roots&amp;'.url_crumb('tools').'"';
-		$invalid_files_note = ( $count_files_invalid == 1 ) ? T_('An invalid File object was found in the database.') : sprintf( T_('%d invalid File objects were found in the database.'), $count_files_invalid );
-		echo '<p class="warning">'.$invalid_files_note."<br/>"
-			.sprintf( T_('It is strongly recommended to also execute the &lt;<a %s>Remove orphan file roots</a>&gt; tool to remove invalid files from the database and from the disk as well!'), $remove_orphan_file_roots )
-			.'</p>';
+	echo '<p style="margin-top:10px">'.sprintf( T_('Number of valid File objects in the database: %d.'), $count_files_valid ).'</p>';
+
+	$count_files_deleted = count( $deleted_files );
+	echo '<div class="text-warning"'.( $count_files_deleted == 0 ? ' style="margin-bottom:10px"' : '' ).'>'.sprintf( T_('Number of deleted orphan File objects: %d'), $count_files_deleted ).( $count_files_deleted > 0 ? ':' : '.' ).'</div>';
+	if( $count_files_deleted > 0 )
+	{	// Print out deleted files:
+		echo '<ul>';
+		foreach( $deleted_files as $file_data )
+		{
+			echo '<li>#'.$file_data['file_ID'].' - <code>'.$file_data['file_root_type'].'_'.$file_data['file_root_ID'].':'.$file_data['file_path'].'</code></li>';
+		}
+		echo '</ul>';
+	}
+
+	$count_cannot_deleted_files = count( $cannot_deleted_files );
+	if( $count_cannot_deleted_files > 0 )
+	{
+		echo '<div class="text-warning"'.( $count_cannot_deleted_files == 0 ? ' style="margin-bottom:10px"' : '' ).'>'.sprintf( T_('Number of File objects which could not be deleted because they are linked with other objects: %d'), $count_cannot_deleted_files ).( $count_cannot_deleted_files > 0 ? ':' : '.' ).'</div>';
+		if( $count_cannot_deleted_files > 0 )
+		{	// Print out deleted files:
+			echo '<ul>';
+			foreach( $cannot_deleted_files as $file_data )
+			{
+				echo '<li>#'.$file_data['file_ID'].' - <code>'.$file_data['file_root_type'].'_'.$file_data['file_root_ID'].':'.$file_data['file_path'].'</code></li>';
+			}
+			echo '</ul>';
+		}
 	}
 }
 

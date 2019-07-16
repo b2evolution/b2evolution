@@ -344,8 +344,16 @@ class File extends DataObject
 			}
 
 			// We check that we got something AND that the CASE matches (because of case insensitive collations on MySQL)
-			if( $row && $row->file_path == $this->_rdfp_rel_path )
+			if( $row &&
+			    ( $row->file_path == $this->_rdfp_rel_path ||
+			      $row->file_path == '/'.$this->_rdfp_rel_path ) )
 			{ // We found meta data
+				if( $row->file_path == '/'.$this->_rdfp_rel_path )
+				{	// Fix wrong path started with "/":
+					$DB->query( 'UPDATE T_files
+						  SET file_path = '.$DB->quote( $this->_rdfp_rel_path ).'
+						WHERE file_ID = '.$DB->quote( $row->file_ID ) );
+				}
 				$Debuglog->add( "Loaded metadata for {$this->_FileRoot->ID}:{$this->_rdfp_rel_path}", 'files' );
 				$this->meta  = 'loaded';
 				$this->ID    = $row->file_ID;
@@ -729,6 +737,22 @@ class File extends DataObject
 
 
 	/**
+	 * Get the file folder path relative to it's root
+	 *
+	 * @return string Relative path
+	 */
+	function get_dir_rel_path()
+	{
+		if( ! ( $FileRoot = & $this->get_FileRoot() ) )
+		{
+			return false;
+		}
+
+		return substr( $this->get_dir(), strlen( $FileRoot->ads_path ) );
+	}
+
+
+	/**
 	 * Get the file posix path relative to it's root (no trailing /)
 	 *
 	 * @return string full path
@@ -893,6 +917,10 @@ class File extends DataObject
 		if( ! isset( $this->_lastmod_ts ) )
 		{	// Get timestamp from disk file:
 			$this->_lastmod_ts = @filemtime( $this->_adfp_full_path );
+			if( $this->_lastmod_ts === false )
+			{	// Log failed result:
+				syslog_insert( sprintf( 'Could not get modification time of the file %s', '[['.$this->_adfp_full_path.']]' ), 'info', 'file', $this->ID );
+			}
 		}
 
 		if( $this->ID && // File is stored in DB before
@@ -1891,9 +1919,11 @@ class File extends DataObject
 	 * Also removes meta data from DB.
 	 *
 	 * @access public
+	 * @param boolean TRUE to use DB transaction
+	 * @param boolean TRUE to delete non-empty directory recursively
 	 * @return boolean true on success, false on failure
 	 */
-	function unlink( $use_transactions = true )
+	function unlink( $use_transactions = true, $recursively = false )
 	{
 		global $DB;
 
@@ -1917,7 +1947,9 @@ class File extends DataObject
 		// Physically remove file from disk:
 		if( $this->is_dir() )
 		{
-			$unlinked = @rmdir( $this->_adfp_full_path );
+			$unlinked = ( $recursively
+				? rmdir_r( $this->_adfp_full_path )
+				: @rmdir( $this->_adfp_full_path ) );
 			$syslog_message = $unlinked ?
 					'Folder %s was deleted' :
 					'Folder %s could not be deleted';
@@ -2207,7 +2239,7 @@ class File extends DataObject
 
 		$Filetype = & $this->get_Filetype();
 		if( $this->is_dir() || $ignore_popup || ( $Filetype && in_array( $Filetype->viewtype, array( 'external', 'download' ) ) ) )
-		{ // Link to open in the curent window
+		{ // Link to open in the current window
 			return '<a href="'.$url.'" title="'.$title.'"'.$class_attr.$rel_attr.'>'.$text.'</a>';
 		}
 		else
