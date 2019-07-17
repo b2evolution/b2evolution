@@ -31,6 +31,11 @@ class Payment extends DataObject
 	var $return_info;
 
 	/**
+	 * @var object Order
+	 */
+	var $Order;
+
+	/**
 	 * Constructor
 	 *
 	 * @param table Database row
@@ -44,13 +49,27 @@ class Payment extends DataObject
 		{
 			$this->ID              = $db_row->payt_ID;
 			$this->user_ID         = $db_row->payt_user_ID;
-			$this->sess_ID         = $db_row->payt_sess_ID;
+			$this->ord_ID          = $db_row->payt_ord_ID;
 			$this->status          = $db_row->payt_status;
 			$this->processor       = $db_row->payt_processor;
 			$this->secret          = $db_row->payt_secret;
 			$this->proc_session_ID = $db_row->payt_proc_session_ID;
 			$this->return_info     = $db_row->payt_return_info;
 		}
+	}
+
+
+	/**
+	 * Get payment Order
+	 *
+	 * @return object Order
+	 */
+	function & get_Order()
+	{
+		$OrderCache = & get_OrderCache();
+		$Order = & $OrderCache->get_by_ID( $this->get( 'ord_ID' ), false, false );
+
+		return $Order;
 	}
 }
 

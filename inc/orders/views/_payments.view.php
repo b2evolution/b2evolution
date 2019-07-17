@@ -46,11 +46,11 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th'       => T_('Session'),
+		'th'       => T_('Order'),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
-		'order'    => 'payt_sess_ID',
-		'td'       => '$payt_sess_ID$',
+		'order'    => 'payt_ord_ID',
+		'td'       => '$payt_ord_ID$',
 	);
 
 $Results->cols[] = array(

@@ -74,6 +74,8 @@ $db_config['aliases'] = array_merge( $db_config['aliases'], array(
 		'T_widget__container'        => $tableprefix.'widget__container',
 		'T_widget__widget'           => $tableprefix.'widget__widget',
 		'T_temporary_ID'             => $tableprefix.'temporary_ID',
+		'T_order__order'             => $tableprefix.'order__order',
+		'T_order__item'              => $tableprefix.'order__item',
 		'T_order__payment'           => $tableprefix.'order__payment',
 	) );
 

@@ -686,19 +686,40 @@ $schema_queries = array_merge( $schema_queries, array(
 			primary key (lvot_link_ID, lvot_user_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_order__order' => array(
+		'Creating table for orders',
+		"CREATE TABLE T_order__order (
+			ord_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			ord_user_ID INT(10) UNSIGNED NULL,
+			ord_status  ENUM ( 'cart', 'pending', 'paid' ) DEFAULT 'cart',
+			ord_curr_ID INT(10) UNSIGNED NOT NULL,
+			PRIMARY KEY ord_ID (ord_ID),
+			INDEX ord_user_ID (ord_user_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_order__item' => array(
+		'Creating table for order items',
+		"CREATE TABLE T_order__item (
+			oitm_ord_ID     INT(10) UNSIGNED NOT NULL,
+			oitm_item_ID    INT(10) UNSIGNED NOT NULL,
+			oitm_qty        INT(10) UNSIGNED NOT NULL,
+			oitm_unit_price DOUBLE NOT NULL,
+			PRIMARY KEY (oitm_ord_ID, oitm_item_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_order__payment' => array(
-		'Creating table for payment orders',
+		'Creating table for order payments',
 		"CREATE TABLE T_order__payment (
 			payt_ID              INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			payt_user_ID         INT(10) UNSIGNED NULL,
-			payt_sess_ID         INT(10) UNSIGNED NOT NULL,
+			payt_ord_ID          INT(10) UNSIGNED NOT NULL,
 			payt_status          ENUM ( 'new', 'pending', 'success', 'cancelled' ) COLLATE ascii_general_ci DEFAULT 'new' NOT NULL,
 			payt_processor       VARCHAR( 32 ) COLLATE ascii_general_ci NOT NULL,
 			payt_secret          VARCHAR( 32 ) COLLATE ascii_general_ci NOT NULL,
 			payt_proc_session_ID VARCHAR( 64 ) COLLATE ascii_general_ci NULL,
 			payt_return_info     TEXT NULL,
 			PRIMARY KEY payt_ID  (payt_ID),
-			INDEX payt_sess_ID   (payt_sess_ID)
+			INDEX payt_ord_ID    (payt_ord_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 ) );
 

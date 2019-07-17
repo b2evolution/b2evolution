@@ -648,6 +648,25 @@ function & get_PaymentCache()
 
 
 /**
+ * Get the OrderCache
+ *
+ * @return OrderCache
+ */
+function & get_OrderCache()
+{
+	global $OrderCache;
+
+	if( ! isset( $OrderCache ) )
+	{	// Cache doesn't exist yet:
+		load_class( 'orders/model/_order.class.php', 'Order' );
+		$OrderCache = new DataObjectCache( 'Order', false, 'T_order__order', 'ord_', 'ord_ID', 'ord_ID', 'ord_ID' );
+	}
+
+	return $OrderCache;
+}
+
+
+/**
  * _core_Module definition
  */
 class _core_Module extends Module

@@ -221,7 +221,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 		}
 
 		// Get items from the current cart:
-		$cart_items = $Cart->get_items();
+		$cart_items_data = $Cart->get_items_data();
 
 		$params = array_merge( array(
 				'message_container_selector' => 'jQuery( ".action_messages" )',
@@ -249,7 +249,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
-		if( empty( $cart_items ) )
+		if( empty( $cart_items_data ) )
 		{
 			echo $this->disp_params['shopping_cart_empty'];
 		}
@@ -275,8 +275,10 @@ class display_shopping_cart_Widget extends ComponentWidget
 
 			// Display products:
 			$total = 0.00;
-			foreach( $cart_items as $cart_item_ID => $cart_Item )
+			$ItemCache = & get_ItemCache();
+			foreach( $cart_items_data as $cart_item_ID => $cart_item_data )
 			{
+				$cart_Item = & $ItemCache->get_by_ID( $cart_item_ID );
 				$product_cell_masks = array( '$value$', '$class$' );
 				echo $this->disp_params['shopping_cart_row_start'];
 
@@ -292,7 +294,7 @@ class display_shopping_cart_Widget extends ComponentWidget
 				echo str_replace( $product_cell_masks, array( $Cart->get_title( $cart_item_ID ), $this->disp_params['class_product_cell'] ), $this->disp_params['shopping_cart_cell_value'] );
 
 				// Currency:
-				$Currency = & $Cart->get_Currency( $cart_item_ID );
+				$Currency = & $Cart->get_Currency();
 
 				// Unit Price:
 				$currency_shortcut = empty( $Currency ) ? '' : $Currency->get( 'shortcut' ).'&nbsp';
@@ -379,10 +381,10 @@ class display_shopping_cart_Widget extends ComponentWidget
 
 		// Get items form the current cart:
 		$Cart = & get_Cart();
-		$cart_items = $Cart->get_items();
+		$cart_items_data = $Cart->get_items_data();
 
 		// Add 1 cache key for each item that is in shopping card, in order to detect changes on each one:
-		foreach( $cart_items as $cart_item_ID => $cart_Item )
+		foreach( $cart_items_data as $cart_item_ID => $cart_item_data )
 		{
 			// 1 is a dummy value, only the key name is really important
 			$cache_keys['item_'.$cart_item_ID] = 1;

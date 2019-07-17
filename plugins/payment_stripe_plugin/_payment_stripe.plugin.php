@@ -164,9 +164,9 @@ class payment_stripe_plugin extends Plugin
 			return false;
 		}
 
-		$cart_items = $Cart->get_items();
+		$cart_items_data = $Cart->get_items_data();
 
-		if( empty( $cart_items ) )
+		if( empty( $cart_items_data ) )
 		{	// Don't display this widget without items in shopping cart:
 			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because no items in shopping cart.' );
 			return false;
@@ -257,10 +257,10 @@ class payment_stripe_plugin extends Plugin
 
 		// Get items form the current cart:
 		$Cart = & get_Cart();
-		$cart_items = $Cart->get_items();
+		$cart_items_data = $Cart->get_items_data();
 
 		// Add 1 cache key for each item that is in shopping card, in order to detect changes on each one:
-		foreach( $cart_items as $cart_item_ID => $cart_Item )
+		foreach( $cart_items_data as $cart_item_ID => $cart_item_data )
 		{
 			// 1 is a dummy value, only the key name is really important
 			$cache_keys['item_'.$cart_item_ID] = 1;
@@ -326,14 +326,14 @@ class payment_stripe_plugin extends Plugin
 				$session_data['customer_email'] = $current_User->get( 'email' );
 			}
 
-			$cart_items = $Cart->get_items();
-			foreach( $cart_items as $cart_item_ID => $cart_Item )
+			$cart_items_data = $Cart->get_items_data();
+			foreach( $cart_items_data as $cart_item_ID => $cart_item_data )
 			{	// Set all items from shopping cart:
 				$session_data['line_items'][] = [
 					'name'     => $Cart->get_title( $cart_item_ID, array( 'link_type' => 'none' ) ),
 					'images'   => $Cart->get_image_urls( $cart_item_ID, array( 'image_size' => 'original' ) ),
 					'amount'   => intval( $Cart->get_unit_price( $cart_item_ID ) * 100 ),
-					'currency' => $Cart->get_currency_code( $cart_item_ID ),
+					'currency' => $Cart->get_currency_code(),
 					'quantity' => $Cart->get_quantity( $cart_item_ID ),
 				];
 			}
