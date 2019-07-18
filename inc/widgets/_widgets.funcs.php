@@ -187,7 +187,7 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // Seen by
 		add_basic_widget( $blog_id, 'Item Single', 'item_seen_by', 'core', 50 );
 	}
-	if( $kind != 'forum' )
+	if( ! in_array( $kind, array( 'forum', 'group' ) ) )
 	{	// Item voting panel:
 		add_basic_widget( $blog_id, 'Item Single', 'item_vote', 'core', 60 );
 	}
@@ -196,7 +196,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Item Page', 'item_content', 'core', 10 );
 	add_basic_widget( $blog_id, 'Item Page', 'item_attachments', 'core', 15 );
 	add_basic_widget( $blog_id, 'Item Page', 'item_seen_by', 'core', 50 );
-	add_basic_widget( $blog_id, 'Item Page', 'item_vote', 'core', 60 );
+	if( ! in_array( $kind, array( 'forum', 'group' ) ) )
+	{	// Item voting panel:
+		add_basic_widget( $blog_id, 'Item Page', 'item_vote', 'core', 60 );
+	}
 
 	/* Sidebar Single */
 	if( $kind == 'forum' )
