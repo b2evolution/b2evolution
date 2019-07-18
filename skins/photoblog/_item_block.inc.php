@@ -190,18 +190,6 @@ $params = array_merge( array(
 				) );
 		?>
 
-		<?php
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => ' &bull; '.T_('Link').': ',
-					'after'         => ' ',
-					'text_template' => '$url$',
-					'url_template'  => '$url$',
-					'target'        => '',
-					'podcast'       => false,        // DO NOT display mp3 player if post type is podcast
-				) );
-		?>
-
 		</div>
 	</div>
 
