@@ -120,7 +120,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 40, 'item_small_print', 'coll_ID' => $blog_a_ID, 'params' => array( 'format' => 'standard' ) ),
 		array( 40, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'format' => 'revision' ) ),
 		array( 50, 'item_seen_by', 'coll_type' => '-forum,group' ),
-		array( 60, 'item_vote', 'coll_type' => '-forum' ),
+		array( 60, 'item_vote', 'coll_type' => '-forum,group' ),
 	);
 
 	/* Item Page */
@@ -128,7 +128,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 10, 'item_content' ),
 		array( 15, 'item_attachments' ),
 		array( 50, 'item_seen_by' ),
-		array( 60, 'item_vote' ),
+		array( 60, 'item_vote', 'coll_type' => '-forum,group' ),
 	);
 
 	/* Comment Area */
