@@ -1,0 +1,94 @@
+[
+    {
+        "name": "braintree/braintreehttp",
+        "version": "0.3.0",
+        "version_normalized": "0.3.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/braintree/braintreehttp_php.git",
+            "reference": "204e36494d9e4b31033328df96af54b17f68b698"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/braintree/braintreehttp_php/zipball/204e36494d9e4b31033328df96af54b17f68b698",
+            "reference": "204e36494d9e4b31033328df96af54b17f68b698",
+            "shasum": ""
+        },
+        "require": {
+            "ext-curl": "*"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^5.7",
+            "wiremock-php/wiremock-php": "1.43.2"
+        },
+        "time": "2018-04-17T20:53:31+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "BraintreeHttp\\": "lib/BraintreeHttp"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Braintree",
+                "email": "code@getbraintree.com"
+            }
+        ]
+    },
+    {
+        "name": "paypal/paypal-checkout-sdk",
+        "version": "1.0.0",
+        "version_normalized": "1.0.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/paypal/Checkout-PHP-SDK.git",
+            "reference": "b321066fdce122cd63368b559d54674bdf2f12a8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/paypal/Checkout-PHP-SDK/zipball/b321066fdce122cd63368b559d54674bdf2f12a8",
+            "reference": "b321066fdce122cd63368b559d54674bdf2f12a8",
+            "shasum": ""
+        },
+        "require": {
+            "braintree/braintreehttp": "0.3.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^5.7"
+        },
+        "time": "2019-02-04T06:59:08+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "PayPalCheckoutSdk\\": "lib/PayPalCheckoutSdk",
+                "Sample\\": "samples/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "PayPal",
+                "homepage": "https://github.com/paypal/Checkout-PHP-SDK/contributors"
+            }
+        ],
+        "description": "PayPal's PHP SDK for Checkout REST APIs",
+        "homepage": "http://github.com/paypal/Checkout-PHP-SDK/",
+        "keywords": [
+            "checkout",
+            "orders",
+            "payments",
+            "paypal",
+            "rest",
+            "sdk"
+        ]
+    }
+]

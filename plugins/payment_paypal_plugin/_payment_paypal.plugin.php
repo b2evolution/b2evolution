@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Payment Stripe plugin for b2evolution
+ * This file implements the Payment PayPal plugin for b2evolution
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
@@ -13,13 +13,19 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+require __DIR__.'/vendor/autoload.php';
+use PayPalCheckoutSdk\Core\PayPalHttpClient;
+use PayPalCheckoutSdk\Core\SandboxEnvironment;
+use PayPalCheckoutSdk\Orders\OrdersCreateRequest;
+use PayPalCheckoutSdk\Orders\OrdersCaptureRequest;
+
 /**
  * @package plugins
  */
-class payment_stripe_plugin extends Plugin
+class payment_paypal_plugin extends Plugin
 {
 	var $name;
-	var $code = 'payment_stripe';
+	var $code = 'payment_paypal';
 	var $priority = 100;
 	var $version = '7.0.2';
 	var $group = 'payment';
@@ -30,12 +36,12 @@ class payment_stripe_plugin extends Plugin
 
 	function PluginInit( & $params )
 	{
-		$this->name = T_('Stripe payment processor');
-		$this->short_desc = T_('Stripe payment processor');
-		$this->long_desc = T_('Stripe payment processor');
+		$this->name = T_('PayPal payment processor');
+		$this->short_desc = T_('PayPal payment processor');
+		$this->long_desc = T_('PayPal payment processor');
 
-		$this->payment_processor = 'Stripe';
-		$this->api_version = '2019-05-16';
+		$this->payment_processor = 'PayPal';
+		//$this->api_version = '2019-05-16';
 	}
 
 
@@ -52,30 +58,18 @@ class payment_stripe_plugin extends Plugin
 	function GetDefaultSettings( & $params )
 	{
 		return array(
-			'publish_api_key' => array(
-				'label' => T_('Publishable API key'),
+			'client_id' => array(
+				'label' => T_('Client ID'),
 				'size' => 80,
-				'note' => sprintf( T_('Visit the <a %s>Stripe dashboard</a> to get your API keys'),
-						'href="https://dashboard.stripe.com/account/apikeys" target="_blank"' ),
+				'note' => sprintf( T_('Visit the <a %s>PayPal dashboard</a> to get your Client ID'),
+						'href="https://developer.paypal.com/developer/applications/" target="_blank"' ),
 				),
-			'secret_api_key' => array(
-				'label' => T_('Secret API key'),
-				'size' => 80,
-				'type' => 'password',
-				'note' => sprintf( T_('Visit the <a %s>Stripe dashboard</a> to get your API keys'),
-						'href="https://dashboard.stripe.com/account/apikeys" target="_blank"' ),
-				),
-			'webhook_url' => array(
-				'label' => T_('Webhook url'),
-				'type' => 'info',
-				'info' => '<code>'.$this->get_htsrv_url( 'webhook', array(), '&amp;', true ).'</code>',
-				),
-			'webhook_key' => array(
-				'label' => T_('Webhook signing secret key'),
+			'secret_key' => array(
+				'label' => T_('Secret key'),
 				'size' => 80,
 				'type' => 'password',
-				'note' => sprintf( T_('Visit the <a %s>Stripe webhooks endpoints</a> to get your signing secret key'),
-						'href="https://dashboard.stripe.com/test/webhooks" target="_blank"' ),
+				'note' => sprintf( T_('Visit the <a %s>PayPal dashboard</a> to get your Secret key'),
+						'href="https://developer.paypal.com/developer/applications/" target="_blank"' ),
 				),
 			);
 	}
@@ -94,16 +88,6 @@ class payment_stripe_plugin extends Plugin
 				'label' => T_('Title'),
 				'size' => 60,
 				'defaultvalue' => '',
-			),
-			'button_class' => array(
-				'label' => T_('Button class'),
-				'size' => 60,
-				'defaultvalue' => 'btn btn-lg btn-success',
-			),
-			'button_text' => array(
-				'label' => T_('Button text'),
-				'size' => 60,
-				'defaultvalue' => T_('Checkout'),
 			),
 			'page_success' => array(
 				'label' => T_('Page for success'),
@@ -127,7 +111,7 @@ class payment_stripe_plugin extends Plugin
 	 */
 	function SkinTag( & $params )
 	{
-		global $Blog, $current_User;
+		global $Blog, $current_User, $rsc_url;
 
 		$this->init_widget_params( $params );
 
@@ -137,21 +121,15 @@ class payment_stripe_plugin extends Plugin
 			return false;
 		}
 
-		if( substr( $this->Settings->get( 'publish_api_key' ), 0, 3 ) != 'pk_' )
+		if( $this->Settings->get( 'client_id' ) == '' )
 		{	// Don't display this widget with wrong publishable API key:
-			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" cannot be used because "Publishable API key" must start with <code>pk_</code>.' );
+			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" cannot be used because "Client ID" is empty.' );
 			return false;
 		}
 
-		if( substr( $this->Settings->get( 'secret_api_key' ), 0, 3 ) != 'sk_' )
+		if( $this->Settings->get( 'secret_key' ) == '' )
 		{	// Don't display this widget with wrong secret API key:
-			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" cannot be used because "Secret API key" must start with <code>sk_</code>.' );
-			return false;
-		}
-
-		if( substr( $this->Settings->get( 'webhook_key' ), 0, 6 ) != 'whsec_' )
-		{	// Don't display this widget with wrong secret API key:
-			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" cannot be used because "Webhook signing secret key" must start with <code>whsec_</code>.' );
+			$this->display_widget_error_message( 'Plugin widget "'.$this->name.'" cannot be used because "Secret key" is empty.' );
 			return false;
 		}
 
@@ -177,12 +155,54 @@ class payment_stripe_plugin extends Plugin
 
 		echo $this->widget_params['block_body_start'];
 
-		$checkout_url = $this->get_htsrv_url( 'checkout', array(
-				'blog'  => $Blog->ID,
-				// Set widget ID in order to know what settings to use after redirect to success or cancel URLs:
-				'wi_ID' => $this->widget_params['wi_ID'],
-			) );
-		echo '<a href="'.$checkout_url.'" class="'.$this->get_widget_setting( 'button_class' ).'">'.$this->get_widget_setting( 'button_text' ).'</a>';
+		// Render PayPal checkout button here by JS below::
+		echo '<div id="evo_paypal_button_container_'.$this->widget_params['wi_ID'].'"></div>';
+
+		// Render the PayPal button:
+		echo '<script>
+		jQuery( document ).on( "ready", function()
+		{
+			var js_obj = document.createElement( "script" );
+			js_obj.src = "https://www.paypal.com/sdk/js?client-id='.$this->Settings->get( 'client_id' ).'&currency='.$Cart->get_currency_code().'";
+			document.body.appendChild( js_obj );
+
+			js_obj.onload = function()
+			{
+				paypal.Buttons(
+				{
+					style: { layout: "horizontal" },
+
+					// Set up the transaction:
+					createOrder: function( data, actions )
+					{
+						return fetch( "'.$this->get_htsrv_url( 'setup_transaction', array(), '&' ).'", {
+							method: "post",
+						} ).then(function( res ) {
+							return res.json();
+						} ).then(function( data ) {
+							return data.orderID;
+						} );
+					},
+
+					// Finalize the transaction:
+					onApprove: function(data, actions)
+					{
+						return actions.order.capture().then( function( details )
+						{	// Call your server to save the transaction
+							return fetch( "'.$this->get_htsrv_url( 'complete_transaction', array(), '&' ).'&order_id=" + data.orderID,
+							{
+								method: "post",
+								headers: { "content-type": "application/json" },
+								body: JSON.stringify({
+									orderID: data.orderID
+								} )
+							} );
+						} );
+					}
+				}).render( "#evo_paypal_button_container_'.$this->widget_params['wi_ID'].'" );
+			}
+		} );
+		</script>';
 
 		echo $this->widget_params['block_body_end'];
 
@@ -279,19 +299,17 @@ class payment_stripe_plugin extends Plugin
 	 */
 	function GetHtsrvMethods()
 	{
-		return array( 'checkout', 'success', 'cancel', 'webhook' );
+		return array( 'setup_transaction', 'complete_transaction', 'success', 'cancel' );
 	}
 
 
 	/**
-	 * Plugin action on click "Checkout" button before redirect to Stripe payment page
+	 * Plugin action to set up PayPal transaction
 	 *
 	 * @param array Params
 	 */
-	function htsrv_checkout( $params )
+	function htsrv_setup_transaction( $params )
 	{
-		global $Messages, $current_User, $Session;
-
 		$Cart = & get_Cart();
 
 		// Check order status:
@@ -301,68 +319,77 @@ class payment_stripe_plugin extends Plugin
 			// Exit here.
 		}
 
-		require_once( __DIR__.'/stripe-php/init.php' );
-		\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
-		\Stripe\Stripe::setApiVersion( $this->api_version );
+		// Construct a request object and set desired parameters
+		// Here, OrdersCreateRequest() creates a POST request to /v2/checkout/orders
+		$request = new OrdersCreateRequest();
+		$request->headers["prefer"] = "return=representation";
+		$request->body = array(
+			'intent' => 'CAPTURE',
+			'application_context' => array(
+				'return_url' => $this->get_htsrv_url( 'success', array(), '&' ),
+				'cancel_url' => $this->get_htsrv_url( 'cancel', array(), '&' )
+			),
+			'purchase_units' => array(
+				0 => array(
+					'amount' => array(
+						'currency_code' => 'USD',
+						'value' => '220.00'
+					)
+				)
+			)
+		);
 
 		try
-		{	// Try to get a session for Stripe payment:
+		{	// Call API with your client and get a response for your call:
+			$client = $this->get_paypal_client();
+			$response = $client->execute( $request );
 
-			// Insert new payment for Stripe processor:
-			$payment = $Cart->save_payment( $this->payment_processor );
-
-			$session_data = [
-				'billing_address_collection' => 'required',
-				'payment_method_types'       => ['card'],
-				'line_items'                 => [],
-				'success_url'                => $this->get_htsrv_url( 'success', $params, '&', true ),
-				'cancel_url'                 => $this->get_htsrv_url( 'cancel', $params, '&', true ),
-				'client_reference_id'        => $payment['ID'].'-'.$payment['secret'],
-			];
-
-			if( is_logged_in() )
-			{	// Use email address of current logged-in User:
-				$session_data['customer_email'] = $current_User->get( 'email' );
-			}
-
-			$cart_items_data = $Cart->get_items_data();
-			foreach( $cart_items_data as $cart_item_ID => $cart_item_data )
-			{	// Set all items from shopping cart:
-				$session_data['line_items'][] = [
-					'name'     => $Cart->get_title( $cart_item_ID, array( 'link_type' => 'none' ) ),
-					'images'   => $Cart->get_image_urls( $cart_item_ID, array( 'image_size' => 'original' ) ),
-					'amount'   => intval( $Cart->get_unit_price( $cart_item_ID ) * 100 ),
-					'currency' => $Cart->get_currency_code(),
-					'quantity' => $Cart->get_quantity( $cart_item_ID ),
-				];
-			}
-
-			// Request session:
-			$session = \Stripe\Checkout\Session::create( $session_data );
+			// If call returns body in response, you can get the deserialized version from the result attribute of the response
+			//print_r($response);
+			//return $response;
+			//echo evo_json_encode( $response->result );
 		}
-		catch( Exception $ex )
-		{	// Display unexpected error:
-			$Messages->add( 'Plugin widget "'.$this->name.'" cannot be used because of error "'.$ex->getMessage().'".', 'error' );
-			// Redirect back:
-			header_redirect();
+		catch( HttpException $ex )
+		{
+			echo $ex->statusCode;
+			print_r( $ex->getMessage() );
+		}
+	}
+
+
+	/**
+	 * Plugin action to complete PayPal transaction
+	 *
+	 * @param array Params
+	 */
+	function htsrv_complete_transaction( $params )
+	{
+		$Cart = & get_Cart();
+
+		// Check order status:
+		if( in_array( $Cart->get_payment_field( 'status', $this->payment_processor ), array( 'pending', 'success' ) ) )
+		{	// Display error message if order was already paid before:
+			debug_die( T_('This order has already been paid for.') );
 			// Exit here.
 		}
 
-		// Save ID of Stripe session for the new created payment:
-		$Cart->save_payment( $this->payment_processor, array(
-			'proc_session_ID' => $session['id'],
-		) );
+		// Here, OrdersCaptureRequest() creates a POST request to /v2/checkout/orders
+		// $response->result->id gives the orderId of the order created above
+		$request = new OrdersCaptureRequest( param( 'order_id', 'string' ) );
 
-		// Redirect to pay order:
-		echo '<script src="https://js.stripe.com/v3/"></script>';
-		echo '<script>
-			var stripe = Stripe( "'.$this->Settings->get( 'publish_api_key' ).'" );
-			stripe.redirectToCheckout({
-				sessionId: "'.$session['id'].'",
-			}).then(function (result) {
-				alert( result.error.message );
-			});
-		</script>';
+		try
+		{	// Call API with your client and get a response for your call:
+			$client = $this->get_paypal_client();
+			$response = $client->execute($request);
+
+			// If call returns body in response, you can get the deserialized version from the result attribute of the response
+			//print_r($response);
+		}
+		catch( HttpException $ex )
+		{
+			echo $ex->statusCode;
+			print_r( $ex->getMessage() );
+		}
 	}
 
 
@@ -396,76 +423,6 @@ class payment_stripe_plugin extends Plugin
 
 
 	/**
-	 * Plugin action to listen webhook from Stripe server
-	 *
-	 * @param array Params
-	 */
-	function htsrv_webhook( $params )
-	{
-		require_once( __DIR__.'/stripe-php/init.php' );
-		\Stripe\Stripe::setApiKey( $this->Settings->get( 'secret_api_key' ) );
-
-		$payload = @file_get_contents( 'php://input' );
-
-		try
-		{
-			$event = \Stripe\Webhook::constructEvent( $payload, $_SERVER['HTTP_STRIPE_SIGNATURE'], $this->Settings->get( 'webhook_key' ) );
-		}
-		catch( \UnexpectedValueException $ex )
-		{	// Invalid payload
-			echo 'Error: '.$ex->getMessage();
-			http_response_code( 400 );
-			exit();
-		}
-		catch( \Stripe\Error\SignatureVerification $ex )
-		{	// Invalid signature
-			echo 'Error: '.$ex->getMessage();
-			http_response_code( 400 );
-			exit();
-		}
-
-		// Handle the checkout.session.completed event
-		if( ! empty( $event ) && $event->type == 'checkout.session.completed' )
-		{
-			$session = $event->data->object;
-
-			// Extract payment ID and secret key:
-			$payment_data = explode( '-', $session->client_reference_id );
-			$payment_ID = $payment_data[0];
-			$payment_secret = isset( $payment_data[1] ) ? $payment_data[1] : false;
-
-			$Cart = & get_Cart();
-
-			// Try to get payment by ID
-			$payment = $Cart->get_payment_by_ID( $payment_ID, $this->payment_processor );
-
-			if( ! $payment || $payment['secret'] != $payment_secret )
-			{	// Could not find payment by ID and sercret key:
-				echo 'Could not find payment "'.$session->client_reference_id.'"';
-				http_response_code( 400 );
-				exit();
-			}
-
-			$payment_status = $Cart->get_payment_field( 'status', $this->payment_processor );
-			if( ! in_array( $payment_status, array( 'new', 'pending' ) ) )
-			{	// Payment was already completed or canceled:
-				echo 'Payment "'.$session->client_reference_id.'" was already processed with status "'.$payment_status.'"';
-				http_response_code( 400 );
-				exit();
-			}
-
-			// Update payment status to "success" and store payload data into DB:
-			$Cart->save_payment( $this->payment_processor, array(
-				'status'      => 'success',
-				'return_info' => $payload,
-			) );
-		}
-
-		http_response_code( 200 );
-	}
-
-
-	/**
 	 * Plugin action after success payment
 	 *
 	 * @param array Params
@@ -484,6 +441,20 @@ class payment_stripe_plugin extends Plugin
 		$Messages->add( T_('Payment has not been finished, please try it again.'), 'error' );
 
 		header_redirect( $this->get_result_page_url( 'page_cancel', $params ) );
+	}
+
+
+	/**
+	 * Get PayPal Client
+	 *
+	 * @return object
+	 */
+	function get_paypal_client()
+	{
+		$environment = new SandBoxEnvironment( $this->Settings->get( 'client_id' ), $this->Settings->get( 'secret_key' ) );
+		$client = new PayPalHttpClient( $environment );
+
+		return $client;
 	}
 }
 ?>
