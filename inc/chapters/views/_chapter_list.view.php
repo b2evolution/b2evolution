@@ -49,7 +49,7 @@ $line_class = 'odd';
  */
 function cat_line( $Chapter, $level )
 {
-	global $line_class, $permission_to_edit, $current_User, $Settings;
+	global $line_class, $permission_to_edit, $current_User, $Settings, $admin_url;
 	global $ChapterCache, $current_default_cat_ID;
 	global $number_of_posts_in_cat;
 
@@ -209,7 +209,7 @@ function cat_line( $Chapter, $level )
 	// Posts
 	if( isset($number_of_posts_in_cat[$Chapter->ID]) )
 	{
-		$r .= '<td class="center">'.(int)$number_of_posts_in_cat[$Chapter->ID].'</td>';
+		$r .= '<td class="center"><a href="'.$admin_url.'?ctrl=items&amp;blog='.$Chapter->get( 'blog_ID' ).'&amp;catsel[]='.$Chapter->ID.'">'.(int)$number_of_posts_in_cat[$Chapter->ID].'</a></td>';
 	}
 	else
 	{	// no posts in this category
