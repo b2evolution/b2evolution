@@ -368,6 +368,116 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 
 
 /**
+ * Pack ZIP archive from destination directory/file
+ *
+ * @param string Path of new archive
+ * @param string Directory path where files are located
+ * @param string|array Files which should be added into ZIP archive
+ * @param string Sub-directory name where files should added inside ZIP relative, Use empty to add in root of the ZIP archive
+ * @param array Exclude folders and files from folders with these names
+ * @return boolean TRUE on success
+ */
+function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdir = '', $exclude_folder_names = array() )
+{
+	global $Settings;
+
+	if( ! class_exists( 'ZipArchive' ) )
+	{	// Stop when no installed extension:
+		debug_die( 'Unable to compress the files because there is no \'ZipArchive\' extension installed in your PHP!' );
+	}
+
+	// Pack using 'ZipArchive' extension:
+	$ZipArchive = new ZipArchive();
+
+	if( $ZipArchive->open( $archive_path, ZipArchive::CREATE ) !== TRUE )
+	{	// Cannot create new ZIP archive:
+		echo '<p class="text-danger">'
+				.sprintf( T_('Error: %s'), $ZipArchive->getStatusString() ).'<br />'
+				.sprintf( T_('Unable to create ZIP archive %s.'), '<code>'.$archive_path.'</code>' )
+			.'</p>';
+		evo_flush();
+
+		return false;
+	}
+
+	if( ! is_array( $files ) )
+	{	// Make array from single file:
+		$files = array( $files );
+	}
+
+	$source_dir_path_length = strlen( $source_dir_path );
+
+	if( ! empty( $add_in_subdir ) )
+	{	// Format sub-directory:
+		$add_in_subdir = trim( $add_in_subdir, '/' ).'/';
+	}
+
+	foreach( $exclude_folder_names as $e => $exclude_folder_name )
+	{
+		$exclude_folder_names[ $e ] = preg_quote( trim( $exclude_folder_name, '/' ) );
+	}
+	$exclude_folder_names_regexp = empty( $exclude_folder_names ) ? false : '#(^|/)'.implode( '|', $exclude_folder_names ).'(/|$)#';
+
+	foreach( $files as $file )
+	{	// Add files into archive:
+		echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $source_dir_path.$file );
+		evo_flush();
+		if( is_dir( $source_dir_path.$file ) )
+		{	// Add directory:
+			if( $exclude_folder_names_regexp !== false &&
+			    preg_match( $exclude_folder_names_regexp, $file ) )
+			{	// Skip file by excluded folder name:
+				continue;
+			}
+			$zip_result = $ZipArchive->addEmptyDir( '/'.$add_in_subdir.trim( $file, '/' ) );
+			if( $zip_result && ( $dir_files = get_filenames( $source_dir_path.$file, array( 'inc_evocache' => true ) ) ) )
+			{	// Add files of the directory:
+				foreach( $dir_files as $dir_file )
+				{
+					$rel_dir_file_path = '/'.$add_in_subdir.substr( $dir_file, $source_dir_path_length );
+					if( $exclude_folder_names_regexp !== false &&
+					   preg_match( $exclude_folder_names_regexp, $rel_dir_file_path ) )
+					{	// Skip file by excluded folder name:
+						continue;
+					}
+					if( is_dir( $dir_file ) )
+					{	// Add empty sub-directory:
+						$zip_result = $ZipArchive->addEmptyDir( $rel_dir_file_path ) && $zip_result;
+					}
+					else
+					{	// Add file:
+						$zip_result = $ZipArchive->addFile( $dir_file, $rel_dir_file_path ) && $zip_result;
+					}
+				}
+			}
+		}
+		else
+		{	// Add file:
+			$zip_result = $ZipArchive->addFile( $source_dir_path.$file, '/'.$add_in_subdir.$file );
+		}
+
+		if( $zip_result )
+		{	// Display success result:
+			echo ' OK.<br />';
+		}
+		else
+		{	// Display error:
+			echo ' <span class="text-danger">'.sprintf( T_('Error: %s'), $ZipArchive->getStatusString() ).'</span>.<br />';
+		}
+		evo_flush();
+	}
+
+	$ZipArchive->close();
+
+	// Set rights for new created ZIP file:
+	@chmod( $archive_path, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );
+
+	return true;
+	
+}
+
+
+/**
  * Verify that destination files can be overwritten
  *
  * @param string source directory
@@ -973,35 +1083,5 @@ function autoupgrade_display_steps( $current_step, $type = '' )
 		);
 
 	echo get_tool_steps( $steps, $current_step );
-}
-
-
-/**
- * Callback function to decide what folders backup on zip
- *
- * @param integer Event number, e.g. PCLZIP_CB_PRE_ADD, see class PclZip
- * @param array Params of current file/folder
- * @return integer 1 - to include, 0 - to exclude
- */
-function callback_backup_files( $p_event, & $p_header )
-{
-	global $backup_current_exclude_folders;
-
-	if( empty( $backup_current_exclude_folders ) )
-	{	// Nothing to exclude:
-		return 1;
-	}
-
-	foreach( $backup_current_exclude_folders as $exclude_folder_name )
-	{
-		if( $p_header['stored_filename'] == $exclude_folder_name ||
-		    strpos( $p_header['stored_filename'].'/', '/'.$exclude_folder_name.'/' ) !== false )
-		{	// Skip this file/folder:
-			return 0;
-		}
-	}
-
-	// Include this file/folder to backup zip archive:
-	return 1;
 }
 ?>

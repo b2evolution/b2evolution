@@ -313,7 +313,7 @@ class Backup
 	 */
 	function backup_files( $backup_dirpath )
 	{
-		global $basepath, $backup_paths, $backup_exclude_folders, $backup_current_exclude_folders, $inc_path, $Settings;
+		global $basepath, $backup_paths, $backup_exclude_folders, $inc_path, $Settings;
 
 		echo '<h4>'.T_('Creating folders/files backup...').'</h4>';
 		evo_flush();
@@ -392,51 +392,13 @@ class Backup
 		$included_files = array_diff( $included_files, $excluded_files );
 
 		if( $this->pack_backup_files )
-		{ // Create ZIPped backup
+		{	// Create ZIPped backup:
 			$zip_filepath = $backup_dirpath.'www.zip';
-
-			// Pack using 'zlib' extension and PclZip wrapper
-
-			if( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
-			{ // Set path for temp files of PclZip
-				define( 'PCLZIP_TEMPORARY_DIR', $backup_dirpath );
-			}
-			// Load PclZip class (PHP4):
-			load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
-
-			$PclZip = new PclZip( $zip_filepath );
 
 			echo sprintf( T_('Archiving files to &laquo;<strong>%s</strong>&raquo;...'), $zip_filepath ).'<br/>';
 			evo_flush();
 
-			foreach( $included_files as $included_file )
-			{
-				echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $basepath.$included_file );
-				evo_flush();
-
-				$file_list = $PclZip->add( no_trailing_slash( $basepath.$included_file ),
-					PCLZIP_OPT_ADD_PATH, 'www',
-					PCLZIP_OPT_REMOVE_PATH, no_trailing_slash( $basepath ),
-					PCLZIP_CB_PRE_ADD, 'callback_backup_files' );
-				if( $file_list == 0 )
-				{
-					echo '<p style="color:red">'
-							.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'<br />'
-							.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath )
-						.'</p>';
-					evo_flush();
-
-					return false;
-				}
-				else
-				{
-					// Set rights for new created ZIP file:
-					@chmod( $zip_filepath, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );
-
-					echo ' OK.<br />';
-					evo_flush();
-				}
-			}
+			return pack_archive( $zip_filepath, $basepath, $included_files, 'www', $backup_current_exclude_folders );
 		}
 		else
 		{	// Copy directories and files to backup directory
@@ -635,37 +597,13 @@ class Backup
 		// Close backup file input stream
 		fclose( $f );
 
+		$result = true;
+
 		if( $this->pack_backup_files )
 		{ // Pack created backup SQL script
-
-			// Pack using 'zlib' extension and PclZip wrapper
-
-			if( ! defined( 'PCLZIP_TEMPORARY_DIR' ) )
-			{ // Set path for temp files of PclZip
-				define( 'PCLZIP_TEMPORARY_DIR', $backup_dirpath );
-			}
-			// Load PclZip class (PHP4):
-			load_class( '_ext/pclzip/pclzip.lib.php', 'PclZip' );
-
-			$zip_filepath = $backup_dirpath.'db.zip';
-			$PclZip = new PclZip( $zip_filepath );
-
-			$file_list = $PclZip->add( $backup_dirpath.$backup_sql_filename, PCLZIP_OPT_REMOVE_ALL_PATH );
-			if( $file_list == 0 )
-			{
-				echo '<p style="color:red">'
-						.sprintf( T_('Error: %s'), $PclZip->errorInfo( true ) ).'<br />'
-						.sprintf( T_('Unable to create &laquo;%s&raquo;'), $zip_filepath )
-					.'</p>';
-				evo_flush();
-
-				return false;
-			}
+			$result = pack_archive( $backup_dirpath.'db.zip', $backup_dirpath, $backup_sql_filename );
 
 			unlink( $backup_sql_filepath );
-
-			// Set rights for new created ZIP file:
-			@chmod( $zip_filepath, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );
 		}
 
 		return true;
