@@ -654,6 +654,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				$params['style'] = 'width:'.( 40 + $size * 8 ).'px';
 			}
 
+			if( isset( $parmeta['suffix'] ) )
+			{	// Set suffix text after input element:
+				$params['input_suffix'] = $parmeta['suffix'];
+			}
+
 			$Form->text_input( $input_name, $set_value, $size, $set_label, '', $params ); // TEMP: Note already in params
 			break;
 

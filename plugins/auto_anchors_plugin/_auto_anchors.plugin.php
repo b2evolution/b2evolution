@@ -2,7 +2,9 @@
 /**
  * This file implements the Auto Anchors plugin for b2evolution
  *
- * @author blueyed: Daniel HAHLER - {@link http://daniel.hahler.de/}
+ * b2evolution - {@link http://b2evolution.net/}
+ * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
+ * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  */
@@ -64,7 +66,17 @@ class auto_anchors_plugin extends Plugin
 
 		$default_params = array_merge( $params, $default_params );
 
-		return parent::get_coll_setting_definitions( $default_params );
+		return array_merge( parent::get_coll_setting_definitions( $default_params ),
+			array(
+				'offset_scroll' => array(
+						'label' => T_('Offset scrolling'),
+						'type' => 'integer',
+						'defaultvalue' => 0,
+						'suffix' => ' px',
+						'note' => T_('Use offset for propper scrolling to anchor if your skin has a top fixed header block.'),
+					),
+				)
+			);
 	}
 
 
@@ -119,7 +131,7 @@ class auto_anchors_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		global $Collection, $Blog;
+		global $Collection, $Blog, $disp;
 
 		if( ! isset( $Blog ) || (
 		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
@@ -129,6 +141,21 @@ class auto_anchors_plugin extends Plugin
 		}
 
 		$this->require_css( 'auto_anchors.css' );
+		if( $disp == 'single' || $disp == 'page' )
+		{	// Initialize JS for better scrolling only on Item's page:
+			add_js_headline( 'jQuery( document ).ready( function()
+			{
+				var evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0;
+				jQuery( ".evo_auto_anchor_link" ).on( "click", function()
+				{
+					jQuery( "html,body" ).animate(
+					{
+						scrollTop: jQuery( this ).offset().top - evo_toolbar_height - '.intval( $this->get_coll_setting( 'offset_scroll', $Blog ) ).'
+					} );
+					return false;
+				} );
+			} );' );
+		}
 	}
 
 
