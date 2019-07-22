@@ -1191,7 +1191,7 @@ class EmailCampaign extends DataObject
 
 				if( $email_domains_number[ $email_domain ] >= $email_campaign_max_domain )
 				{	// Skip sending because max emails to same domain is reached:
-					$error_msg = sprintf( T_('Email sending was skipped to user %s because max emails to same domain %s is reached.'), $User->get_identity_link(), '<code>'.$email_domain.'</code>' );
+					$error_msg = sprintf( T_('Email sending was skipped to user %s because max emails to same domain %s was reached.'), $User->get_identity_link(), '<code>'.$email_domain.'</code>' );
 					if( $display_messages === 'cron_job' )
 					{
 						cron_log_action_end( $error_msg, 'warning' );
