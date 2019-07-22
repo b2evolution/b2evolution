@@ -1024,7 +1024,7 @@ switch( $action )
 		if( set_max_execution_time(300) === false )
 		{ // max_execution_time ini setting could not be changed for this script, display a warning
 			$manual_url = 'href="'.get_manual_url( 'blank-or-partial-page' ).'" target = "_blank"';
-			echo '<div class="text-warning"><evo:warning>'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</evo:warning></div>';
+			echo '<div class="text-warning"><evo:warning>'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the process to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</evo:warning></div>';
 		}
 
 		// Try to display the messages here because they can be created during checking params of quick installation:
@@ -1131,7 +1131,7 @@ switch( $action )
 		if( set_max_execution_time(300) === false )
 		{ // max_execution_time ini setting could not be changed for this script, display a warning
 			$manual_url = 'href="'.get_manual_url( 'blank-or-partial-page' ).'" target = "_blank"';
-			echo '<div class="text-warning"><evo:warning>'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the upgrade to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</evo:warning></div>';
+			echo '<div class="text-warning"><evo:warning>'.sprintf( T_('WARNING: the max_execution_time is set to %s seconds in php.ini and cannot be increased automatically. This may lead to a PHP <a %s>timeout causing the process to fail</a>. If so please post a screenshot to the <a %s>forums</a>.'), ini_get( 'max_execution_time' ), $manual_url, 'href="http://forums.b2evolution.net/"' ).'</evo:warning></div>';
 		}
 
 		echo get_install_format_text( '<h2>'.T_('Upgrading data in existing b2evolution database...').'</h2>', 'h2' );
