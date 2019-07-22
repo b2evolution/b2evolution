@@ -7766,7 +7766,7 @@ class User extends DataObject
 		{	// Get it from DB only first time and then cache in var:
 			global $current_User;
 
-			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL, 'ItemCache', 'flagged' );
 
 			// Set additional debug info prefix for SQL queries in order to know what code executes it:
 			$flagged_ItemList2->query_title_prefix = 'Flagged Items';
