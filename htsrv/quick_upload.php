@@ -302,8 +302,8 @@ if( $upload )
 			$message = array(
 					'text'    => $message,
 					'status'  => 'rename',
-					'file'    => $newFile->get_preview_thumb( 'fulltype' ),
-					'oldname' => $oldName,
+					'file'    => $newFile->get_preview_thumb( 'fulltype', array( 'init' => true ) ),
+					'old_rootrelpath' => $old_File->get_root_and_rel_path(),
 					'oldpath' => $old_File->get_root_and_rel_path(),
 				);
 		}
@@ -319,7 +319,8 @@ if( $upload )
 		$creator = $newFile->get_creator();
 
 		$message['filetype'] = $newFile->get( 'type' );
-		$message['newname'] = file_td_name( $newFile );
+		$message['formatted_name'] = file_td_name( $newFile );
+		$message['new_rootrelpath'] = $newFile->get_root_and_rel_path();
 		$message['newpath'] = $newFile->get_root_and_rel_path();
 		$message['filesize'] = bytesReadable( $newFile->get_size() );
 

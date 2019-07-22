@@ -2598,7 +2598,7 @@ function display_dragdrop_upload_button( $params = array() )
 								warning = '<div class="orange">' + responseJSON.data.warning + '</div>';
 							}
 							// File name or url to view file
-							var file_name = ( typeof( responseJSON.data.link_url ) != 'undefined' ) ? responseJSON.data.link_url : responseJSON.data.newname;
+							var file_name = ( typeof( responseJSON.data.link_url ) != 'undefined' ) ? responseJSON.data.link_url : responseJSON.data.formatted_name;
 
 							this_row.find( '.qq-upload-checkbox' ).html( responseJSON.data.checkbox );
 
@@ -2670,6 +2670,7 @@ function display_dragdrop_upload_button( $params = array() )
 								<?php } else { ?>
 								this_row.find( '.qq-upload-status-text-selector' ).html( '' );
 								<?php } ?>
+								this_row.find( '.qq-upload-image' ).html( responseJSON.data.file );
 								this_row.find( '.qq-upload-image-selector' ).append( htmlspecialchars_decode( responseJSON.data.file ) );
 								this_row.find( '.qq-upload-file-selector' ).html( filename_before
 									+ select_file_template
@@ -2678,8 +2679,8 @@ function display_dragdrop_upload_button( $params = array() )
 									<?php echo ( $params['status_conflict_place'] == 'before_button' ) ? "+ ' - ".$status_conflict_message."'" : ''; ?>
 									+ ' - <a href="#" '
 									+ 'class="<?php echo button_class( 'text' ); ?> roundbutton_text_noicon qq-conflict-replace" '
-									+ 'old="' + responseJSON.data.oldname + '" '
-									+ 'new="' + responseJSON.data.newname + '">'
+									+ 'old="' + responseJSON.data.old_rootrelpath + '" '
+									+ 'new="' + responseJSON.data.new_rootrelpath + '">'
 									+ '<div><?php echo TS_('Use this new file to replace the old file'); ?></div>'
 									+ '<div style="display:none"><?php echo TS_('Revert'); ?></div>'
 									+ '</a>'
@@ -3391,9 +3392,9 @@ function file_td_name( & $File )
 	}
 	else
 	{	// File
-		if( $view_link = $File->get_view_link( '<span class="fname">'.$File->get_name().'</span>', NULL, NULL ) )
+		if( $view_link = $File->get_view_link( $File->get_name(), NULL, NULL ) )
 		{
-			$r .= $view_link;
+			$r .= '<span class="fname">'.$view_link.'</span>';
 		}
 		else
 		{	// File extension unrecognized
