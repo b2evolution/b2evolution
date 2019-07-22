@@ -69,11 +69,11 @@ class auto_anchors_plugin extends Plugin
 		return array_merge( parent::get_coll_setting_definitions( $default_params ),
 			array(
 				'offset_scroll' => array(
-						'label' => T_('Offset scrolling'),
+						'label' => T_('Anchor offset'),
 						'type' => 'integer',
 						'defaultvalue' => 0,
 						'suffix' => ' px',
-						'note' => T_('Use offset for propper scrolling to anchor if your skin has a top fixed header block.'),
+						'note' => T_('This will be used when scrolling to an anchor.'),
 					),
 				)
 			);

@@ -1269,7 +1269,7 @@ class shortlinks_plugin extends Plugin
 						item_content += '</div>';
 					}
 					// Item content:
-					var post_content = post.content.replace( /(<h([1-6])\s+id\s*=\s*"[^"]+"[^>]*>.+?)(<\/h\2>)/ig,
+					var post_content = post.content.replace( /(<h([1-6]).*id\s*=\s*"[^"]+"[^>]*>.+?)(<\/h\2>)/ig,
 						'$1 <button class="btn btn-primary shortlinks_btn_insert_anchor"><?php echo TS_('Insert Short Link'); ?></button>$3' );
 					item_content += '<div id="shortlinks_post_content">' + post_content + '</div>';
 
@@ -1302,7 +1302,7 @@ class shortlinks_plugin extends Plugin
 		jQuery( document ).on( 'click', '.shortlinks_btn_insert_anchor', function()
 		{
 			var header_obj = jQuery( this ).parent();
-			shortlinks_insert_link_text( '((' + jQuery( '#shortlinks_hidden_urltitle' ).val() + '#' + header_obj.attr( 'id' ) + ' ' + header_obj.html().replace( /\s<button[^>]+>.+?<\/button>$/, '' ) + '))' );
+			shortlinks_insert_link_text( '((' + jQuery( '#shortlinks_hidden_urltitle' ).val() + '#' + header_obj.attr( 'id' ) + ' ' + header_obj.html().replace( /(\s<a[^>]+>.+?<\/a>)?\s<button[^>]+>.+?<\/button>$/, '' ) + '))' );
 		} );
 
 		// Insert a post link with options to textarea:
