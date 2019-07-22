@@ -51,7 +51,7 @@ $Form->begin_fieldset( T_('Email campaign throttling').get_manual_link( 'email-t
 
 	$Form->text_input( 'email_campaign_chunk_size', $Settings->get( 'email_campaign_chunk_size' ), 5, T_('Chunk Size'), T_('emails at a time'), array( 'maxlength' => 10 ) );
 
-	$Form->text_input( 'email_campaign_max_domain', $Settings->get( 'email_campaign_max_domain' ), 5, T_('Max emails to same domain'), '', array( 'maxlength' => 10 ) );
+	$Form->text_input( 'email_campaign_max_domain', $Settings->get( 'email_campaign_max_domain' ), 5, T_('Max emails to same domain'), T_('In each chunk, avoid sending too many emails to same recipient domain (Useful to avoid balcklisting from gmail.com, hotmail.com, etc.)'), array( 'maxlength' => 10 ) );
 
 	$Form->duration_input( 'email_campaign_cron_repeat', $Settings->get( 'email_campaign_cron_repeat' ), T_('Delay between chunks'), 'days', 'minutes', array( 'note' => T_('timing between scheduled job runs') ) );
 

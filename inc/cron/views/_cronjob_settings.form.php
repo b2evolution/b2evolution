@@ -47,7 +47,7 @@ foreach( $cron_jobs as $cron_job_key => $cron_job_name )
 				$Form->duration_input( 'email_campaign_cron_limited', $Settings->get( 'email_campaign_cron_limited' ), T_('Delay in case all remaining recipients have reached max # of emails for the current day'), 'days', 'minutes', array( 'note' => T_('timing between scheduled job runs') ) );
 				if( $current_User->check_perm( 'emails', 'edit' ) )
 				{	// Allow to edit email cron settings only if user has a permission:
-					$Form->text_input( 'email_campaign_max_domain', $Settings->get( 'email_campaign_max_domain' ), 5, T_('Max emails to same domain'), '', array( 'maxlength' => 10 ) );
+					$Form->text_input( 'email_campaign_max_domain', $Settings->get( 'email_campaign_max_domain' ), 5, T_('Max emails to same domain'), T_('In each chunk, avoid sending too many emails to same recipient domain (Useful to avoid balcklisting from gmail.com, hotmail.com, etc.)'), array( 'maxlength' => 10 ) );
 				}
 				elseif( $current_User->check_perm( 'emails', 'view' ) )
 				{	// Only display setting value:
