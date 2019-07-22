@@ -402,7 +402,7 @@ function get_filler_text( $type = NULL )
 		case 'info_page':
 			$filler_text = T_('<p>This website is powered by b2evolution.</p>')."\r\n"
 				.T_('<p>You are currently looking at an info page about "%s".</p>')."\r\n"
-				.T_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically access directly from a navigation menu.</p>')."\r\n"
+				.T_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically accessed directly from a navigation menu.</p>')."\r\n"
 				.T_('<p>Note: If needed, skins may format info pages differently from regular posts.</p>');
 			break;
 
@@ -3036,7 +3036,7 @@ Hello
 				'type'     => 'Standalone Page',
 				'content'  => T_('<p>This website is powered by b2evolution.</p>')."\r\n"
 					.T_('<p>You are currently looking at an info page about this site.</p>')."\r\n"
-					.T_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically access directly from a navigation menu.</p>')."\r\n"
+					.T_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically accessed directly from a navigation menu.</p>')."\r\n"
 					.T_('<p>Note: If needed, skins may format info pages differently from regular posts.</p>'),
 				'files'    => array(
 					array( 'logos/b2evolution_1016x208_wbg.png' ),
