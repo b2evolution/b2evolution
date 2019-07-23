@@ -193,11 +193,15 @@ $Form->begin_form( 'inskin', '', $form_params );
 					}
 					if( $front_edit_field_is_visible )
 					{	// Display only if it is visible on front-office:
+						$Form->switch_layout( 'fields_table' );
+						$Form->begin_fieldset();
 						$Form->text_input( 'post_title', $item_title, 20, T_('Title'), '', array(
 								'maxlength' => intval( $edited_Item->get_type_setting( 'title_maxlen' ) ),
 								'required'  => ( $edited_Item->get_type_setting( 'use_title' ) == 'required' ),
 								'style'     => 'width:100%',
 							) );
+						$Form->end_fieldset();
+						$Form->switch_layout( NULL );
 					}
 					else
 					{	// Put value in hidden field for proper switching between back-office edit form:
@@ -213,10 +217,14 @@ $Form->begin_form( 'inskin', '', $form_params );
 					}
 					if( $front_edit_field_is_visible )
 					{	// Display only if it is visible on front-office:
+						$Form->switch_layout( 'fields_table' );
+						$Form->begin_fieldset();
 						$Form->text_input( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ), 50, T_('Short title'), '', array(
 								'maxlength' => intval( $edited_Item->get_type_setting( 'short_title_maxlen' ) ),
 								'style'     => 'width:100%',
 							) );
+						$Form->end_fieldset();
+						$Form->switch_layout( NULL );
 					}
 					else
 					{	// Put value in hidden field for proper switching between back-office edit form:
