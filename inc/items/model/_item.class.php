@@ -2573,20 +2573,21 @@ class Item extends ItemLight
 			global $DB;
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
-			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
-			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
-			$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
-			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
+			$SQL->SELECT( 'T_items__type_custom_field.*, iset_value' );
 			$SQL->FROM( 'T_items__type_custom_field' );
 			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON iset_name = CONCAT( "custom:", itcf_name ) AND iset_item_ID = '.$this->ID );
 			$SQL->WHERE_and( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
 			$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
-			$custom_fields = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+			$custom_fields = $DB->get_results( $SQL, ARRAY_A );
 
 			$this->custom_fields = array();
-			foreach( $custom_fields as $c => $custom_field )
+			foreach( $custom_fields as $custom_field )
 			{	// Use field name/code as key/index of array:
-				$this->custom_fields[ $custom_field['name'] ] = $custom_field;
+				$this->custom_fields[ $custom_field['itcf_name'] ] = array();
+				foreach( $custom_field as $custom_field_key => $custom_field_value )
+				{
+					$this->custom_fields[ $custom_field['itcf_name'] ][ substr( $custom_field_key, 5 ) ] = $custom_field_value;
+				}
 			}
 		}
 
