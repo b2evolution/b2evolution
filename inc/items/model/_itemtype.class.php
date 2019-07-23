@@ -781,14 +781,20 @@ class ItemType extends DataObject
 			{ // Get the custom fields from DB
 				global $DB;
 				$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->ID );
-				$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop as schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
-				$SQL->SELECT_add( 'itcf_required AS required, itcf_meta AS meta, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
-				$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
-				$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
+				$SQL->SELECT( '*' );
 				$SQL->FROM( 'T_items__type_custom_field' );
 				$SQL->WHERE( 'itcf_ityp_ID = '.$DB->quote( $this->ID ) );
 				$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
-				$this->custom_fields = $DB->get_results( $SQL, ARRAY_A );
+				$custom_fields = $DB->get_results( $SQL, ARRAY_A );
+				$this->custom_fields = array();
+				foreach( $custom_fields as $c => $custom_field )
+				{
+					$this->custom_fields[ $c ] = array();
+					foreach( $custom_field as $custom_field_key => $custom_field_value )
+					{
+						$this->custom_fields[ $c ][ substr( $custom_field_key, 5 ) ] = $custom_field_value;
+					}
+				}
 			}
 		}
 

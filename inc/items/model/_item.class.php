@@ -2653,21 +2653,30 @@ class Item extends ItemLight
 			global $DB;
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
-			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_schema_prop AS schema_prop, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, ' );
-			$SQL->SELECT_add( 'itcf_required AS required, itcf_meta AS meta, itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
-			$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
-			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge, ' );
-			$SQL->SELECT_add( 'icfv_value AS value, IFNULL( icfv_parent_sync, 1 )AS parent_sync' );
+			$SQL->SELECT( 'T_items__type_custom_field.*' );
 			$SQL->FROM( 'T_items__type_custom_field' );
-			$SQL->FROM_add( 'LEFT JOIN T_items__item_custom_field ON itcf_name = icfv_itcf_name AND icfv_item_ID = '.$this->ID );
+			if( $DB->get_var( 'SHOW TABLES LIKE "T_items__item_custom_field"' ) !== NULL )
+			{	// New version:
+				$SQL->SELECT_add( ', icfv_value, IFNULL( icfv_parent_sync, 1 ) AS icfv_parent_sync' );
+				$SQL->FROM_add( 'LEFT JOIN T_items__item_custom_field ON itcf_name = icfv_itcf_name AND icfv_item_ID = '.$this->ID );
+			}
+			else
+			{	// Old version < 15280, used on upgrade blocks by function Item->insert():
+				$SQL->SELECT_add( ', iset_value' );
+				$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON iset_name = CONCAT( "custom:", itcf_name ) AND iset_item_ID = '.$this->ID );
+			}
 			$SQL->WHERE_and( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
 			$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
-			$custom_fields = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+			$custom_fields = $DB->get_results( $SQL, ARRAY_A );
 
 			$this->custom_fields = array();
-			foreach( $custom_fields as $c => $custom_field )
+			foreach( $custom_fields as $custom_field )
 			{	// Use field name/code as key/index of array:
-				$this->custom_fields[ $custom_field['name'] ] = $custom_field;
+				$this->custom_fields[ $custom_field['itcf_name'] ] = array();
+				foreach( $custom_field as $custom_field_key => $custom_field_value )
+				{
+					$this->custom_fields[ $custom_field['itcf_name'] ][ substr( $custom_field_key, 5 ) ] = $custom_field_value;
+				}
 			}
 			// Store current Item Type in order to reload the custom fields when Item Type was changed:
 			$this->custom_fields_loaded_ityp_ID = $this->get( 'ityp_ID' );
@@ -2721,6 +2730,11 @@ class Item extends ItemLight
 
 		if( empty( $this->ID ) )
 		{	// Item must be stored in DB
+			return false;
+		}
+
+		if( $DB->get_var( 'SHOW TABLES LIKE "T_items__item_custom_field"' ) === NULL )
+		{	// Skip because T_items__item_custom_field doesn't exist in DB on old versions < 15280:
 			return false;
 		}
 

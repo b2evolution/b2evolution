@@ -10437,7 +10437,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// Insert content_hierarchy widget:
 		$SQL = new SQL();
 		$SQL->SELECT( 'wi_coll_ID, MAX(wi_order)' );
-		$SQL->FROM( 'T_widget' );
+		$SQL->FROM( $tableprefix.'widget' );
 		$SQL->FROM_add( 'INNER JOIN T_blogs ON blog_ID = wi_coll_ID' );
 		$SQL->WHERE( 'blog_type = "manual"' );
 		$SQL->WHERE_and( 'wi_sco_name = "Front Page Main Area"' );
@@ -10457,7 +10457,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		if( ! empty( $basic_widgets_insert_sql_rows ) )
 		{	// Insert the widget records by single SQL query:
-			$DB->query( 'INSERT INTO T_widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
+			$DB->query( 'INSERT INTO '.$tableprefix.'widget( wi_coll_ID, wi_sco_name, wi_order, wi_enabled, wi_type, wi_code, wi_params ) '
 								 .'VALUES '.implode( ', ', $basic_widgets_insert_sql_rows ) );
 		}
 		/* ---- Install basic widgets for containers "Front Page Main Area": ---- END */
