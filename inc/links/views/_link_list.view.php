@@ -203,6 +203,8 @@ display_dragdrop_upload_button( array(
 	) );
 ?>
 <script type="text/javascript">
-// Initialize attachments fieldset to set proper height and handler to resize it:
-evo_link_initialize_fieldset( '<?php echo $fieldset_prefix; ?>' );
+jQuery( document ).ready( function()
+{	// Initialize attachments fieldset to set proper height and handler to resize it:
+	evo_link_initialize_fieldset( '<?php echo $fieldset_prefix; ?>' );
+} );
 </script>
