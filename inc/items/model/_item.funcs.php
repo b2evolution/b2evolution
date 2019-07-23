@@ -3005,7 +3005,7 @@ function evo_add_version_load_window( item_ID )
 	evo_js_lang_close = '<?php echo TS_('Cancel');?>';
 
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo format_to_output( TS_('Loading'), 'htmlattr' );?>"></span>',
-		'600px', 'auto', true, evo_js_lang_add_version + ' <?php echo get_manual_link( 'post-language-versions' ); ?>', evo_js_lang_add_version, true );
+		'600px', 'auto', true, evo_js_lang_add_version + ' <?php echo get_manual_link( 'post-language-versions#add-version' ); ?>', evo_js_lang_add_version, true );
 	jQuery.ajax(
 	{
 		type: 'POST',
