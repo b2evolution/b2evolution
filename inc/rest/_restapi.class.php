@@ -618,6 +618,39 @@ class RestApi
 		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/items/<id>":
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
 
+		// Get params for full content:
+		$content_params = param( 'content_params', 'array', array() );
+		$content_params =  array_merge( array(
+			'before_content_teaser'    => '',
+			'after_content_teaser'     => '',
+			'before_content_extension' => '',
+			'after_content_extension'  => '',
+			'image_position_teaser'    => 'teaser,teaserperm,teaserlink',
+			'image_position_aftermore' => 'aftermore',
+			'before_images'            => '',
+			'after_images'             => '',
+			'before_image'             => '<figure class="evo_image_block">',
+			'before_image_legend'      => '<figcaption class="evo_image_legend">',
+			'after_image_legend'       => '</figcaption>',
+			'after_image'              => '</figure>',
+			'image_class'              => '',
+			'image_size'               => 'original',
+			'image_limit'              =>  1000,
+			'image_link_to'            => '', // Can be 'original', 'single' or empty
+			'before_gallery'           => '<div class="evo_post_gallery">',
+			'after_gallery'            => '</div>',
+			'gallery_table_start'      => '',
+			'gallery_table_end'        => '',
+			'gallery_row_start'        => '',
+			'gallery_row_end'          => '',
+			'gallery_cell_start'       => '<div class="evo_post_gallery__image">',
+			'gallery_cell_end'         => '</div>',
+			'gallery_image_size'       => 'crop-80x80',
+			'gallery_image_limit'      => 1000,
+			'gallery_colls'            => 5,
+			'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
+		), $content_params );
+
 		$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $api_per_page, 'ItemCache', '' );
 
 		if( $post_ID )
@@ -686,8 +719,11 @@ class RestApi
 			$api_details = explode( ',', $api_details );
 		}
 
+		// Set global $Item because it may be used by some rendering inline tags like custom fields
+		global $Item;
+
 		// Add each post row in the response array:
-		while( $Item = & $ItemList2->get_next() )
+		while( $Item = $ItemList2->get_next() )
 		{
 			// Initialize data for each item:
 			$item_data = array();
@@ -711,7 +747,27 @@ class RestApi
 						$item_data['title'] = $Item->get( 'title' );
 						break;
 					case 'content':
-						$item_data['content'] = $Item->get_prerendered_content( 'htmlbody' );
+						$item_data['content'] =
+							$Item->get_images( array_merge( $content_params, array(
+									'before' => $content_params['before_images'],
+									'after'  => $content_params['after_images'],
+									'limit'  => $content_params['image_limit'],
+									'restrict_to_image_position' => $content_params['image_position_teaser'],
+								) ) ).
+							$Item->get_content_teaser( '#', '#', 'htmlbody', array_merge( $content_params, array(
+									'before' => $content_params['before_content_teaser'],
+									'after'  => $content_params['after_content_teaser'],
+								) ) ).
+							$Item->get_images( array_merge( $content_params, array(
+									'before' => $content_params['before_images'],
+									'after'  => $content_params['after_images'],
+									'limit'  => $content_params['image_limit'],
+									'restrict_to_image_position' => $content_params['image_position_aftermore'],
+								) ) ).
+							$Item->get_content_extension( '#', true, 'htmlbody', array_merge( $content_params, array(
+									'before' => $content_params['before_content_extension'],
+									'after'  => $content_params['after_content_extension'],
+								) ) );
 						break;
 					case 'excerpt':
 						$item_data['excerpt'] = $Item->get( 'excerpt' );

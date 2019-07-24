@@ -2794,24 +2794,6 @@ jQuery( document ).on( 'click', '#evo_merge_posts_list a[data-id]', function()
 
 			// Item title:
 			var item_content = '<h2>' + post.title + '</h2>';
-			// Item attachments, Only images and on teaser positions:
-			if( typeof( post.attachments ) == 'object' && post.attachments.length > 0 )
-			{
-				item_content += '<div id="evo_merge_post_attachments">';
-				for( var a in post.attachments )
-				{
-					var attachment = post.attachments[a];
-					if( attachment.type == 'image' &&
-							( attachment.position == 'teaser' ||
-								attachment.position == 'teaserperm' ||
-								attachment.position == 'teaserlink' )
-						)
-					{
-						item_content += '<img src="' + attachment.url + '" />';
-					}
-				}
-				item_content += '</div>';
-			}
 			// Item content:
 			item_content += '<div id="evo_merge_post_content">' + post.content + '</div>';
 
