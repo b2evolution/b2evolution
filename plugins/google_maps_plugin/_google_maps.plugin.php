@@ -37,6 +37,7 @@ class google_maps_plugin extends Plugin
 	var $version = '6.11.3';
 	var $author = 'The b2evo Group';
 	var $help_url = '';  // empty URL defaults to manual wiki
+	var $help_topic = 'google-maps-plugin';
 
 	/*
 	 * These variables MAY be overriden.
@@ -228,7 +229,11 @@ class google_maps_plugin extends Plugin
 		// fp>vitaliy : make thhis title configurable per blog . default shoul dbe as below.
 		$plugin_title = $this->Settings->get( 'map_title_coll'.$Blog->ID );
 		$plugin_title = empty( $plugin_title ) ? T_( 'Google Maps plugin' ) : $plugin_title;
-		$params['Form']->begin_fieldset( $plugin_title, array( 'id' => 'itemform_googlemap', 'fold' => ( isset( $params['edit_layout'] ) && $params['edit_layout'] == 'expert' ) ) );
+		$params['Form']->begin_fieldset( $plugin_title.( is_admin_page() ? get_manual_link( $this->help_topic ) : '' ),
+			array(
+				'id' => 'itemform_googlemap',
+				'fold' => ( isset( $params['edit_layout'] ) && $params['edit_layout'] == 'expert' )
+			) );
 		$api_key = $this->get_coll_setting( 'api_key', $Blog );
 
 		$Item = $params['Item'];
