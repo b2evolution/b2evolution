@@ -636,7 +636,7 @@ class RestApi
 			'image_class'              => '',
 			'image_size'               => 'original',
 			'image_limit'              =>  1000,
-			'image_link_to'            => '', // Can be 'original', 'single' or empty
+			'image_link_to'            => 'original', // Can be 'original', 'single' or empty
 			'before_gallery'           => '<div class="evo_post_gallery">',
 			'after_gallery'            => '</div>',
 			'gallery_table_start'      => '',
@@ -647,6 +647,7 @@ class RestApi
 			'gallery_cell_end'         => '</div>',
 			'gallery_image_size'       => 'crop-80x80',
 			'gallery_image_limit'      => 1000,
+			'gallery_image_link_to' => 'original', // Can be 'original', 'single' or empty
 			'gallery_colls'            => 5,
 			'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 		), $content_params );
@@ -719,11 +720,8 @@ class RestApi
 			$api_details = explode( ',', $api_details );
 		}
 
-		// Set global $Item because it may be used by some rendering inline tags like custom fields
-		global $Item;
-
 		// Add each post row in the response array:
-		while( $Item = $ItemList2->get_next() )
+		while( $Item = & $ItemList2->get_next() )
 		{
 			// Initialize data for each item:
 			$item_data = array();
