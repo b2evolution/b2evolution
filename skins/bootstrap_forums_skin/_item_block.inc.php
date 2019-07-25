@@ -185,10 +185,17 @@ skin_widget( array(
 
 		<div class="panel-body">
 			<div class="ft_avatar col-md-1 col-sm-2"><?php
-				$Item->author( array(
-					'link_text'  => 'only_avatar',
-					'thumb_size' => 'crop-top-80x80',
-				) );
+				if( $Skin->get_setting( 'voting_place' ) == 'left_score' )
+				{	// Display voting panel instead of author avatar:
+					$Skin->display_item_voting_panel( $Item, 'left_score' );
+				}
+				else
+				{	// Display author avatar:
+					$Item->author( array(
+						'link_text'  => 'only_avatar',
+						'thumb_size' => 'crop-top-80x80',
+					) );
+				}
 			?></div>
 			<div class="post_main col-md-11 col-sm-10">
 				<?php
@@ -304,7 +311,7 @@ skin_widget( array(
 
 				if( $disp != 'page' )
 				{	// Display a panel with voting buttons for item:
-					$Skin->display_item_voting_panel( $Item );
+					$Skin->display_item_voting_panel( $Item, 'under_content' );
 				}
 
 				echo '<span class="pull-left">';

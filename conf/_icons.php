@@ -1066,6 +1066,39 @@ function get_icon_info( $name )
 			'color' => '#7f7f7f'
 		);
 
+		case 'thumb_arrow_up': return array(
+			'alt'  => T_('Thumb Up'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 80, 240 ),
+			'glyph' => 'arrow-up',
+			'fa' => 'arrow-up fa-x-rollover-grey',
+			'color' => '#0C0'
+		);
+		case 'thumb_arrow_up_disabled': return array(
+			'alt'  => T_('Thumb Up'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 144, 240 ),
+			'glyph' => 'arrow-up',
+			'fa' => 'arrow-up fa-x-rollover-green',
+			'color' => '#7f7f7f'
+		);
+		case 'thumb_arrow_down': return array(
+			'alt'  => T_('Thumb Down'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 80, 80 ),
+			'glyph' => 'arrow-down',
+			'fa' => 'arrow-down fa-x-rollover-grey',
+			'color' => '#ee2a2a'
+		);
+		case 'thumb_arrow_down_disabled': return array(
+			'alt'  => T_('Thumb Down'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 128, 240 ),
+			'glyph' => 'arrow-down',
+			'fa' => 'arrow-down fa-x-rollover-red-light',
+			'color' => '#7f7f7f'
+		);
+
 		case 'flag_on': return array(
 			'rollover' => true,
 			'alt'  => '',

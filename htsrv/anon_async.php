@@ -616,10 +616,12 @@ switch( $action )
 				if( param( 'skin_ID', 'integer', 0 ) > 0 )
 				{	// If request is from skin:
 					$SkinCache = & get_SkinCache();
+					// Initialize global Collection in order to get Skin settings values from the Collection and not from defaults of the Skin:
+					$Blog = $comment_Item->get_Blog();
 					$request_Skin = & $SkinCache->get_by_ID( get_param( 'skin_ID' ), false, false );
 					if( $request_Skin && method_exists( $request_Skin, 'display_comment_voting_panel' ) )
 					{	// Request skin to display a voting panel for item:
-						$request_Skin->display_comment_voting_panel( $Comment, array( 'display_wrapper' => false ) );
+						$request_Skin->display_comment_voting_panel( $Comment, $request_Skin->get_setting( 'voting_place' ), array( 'display_wrapper' => false ) );
 						break 2;
 					}
 				}
@@ -700,10 +702,12 @@ switch( $action )
 				elseif( param( 'skin_ID', 'integer', 0 ) > 0 )
 				{	// If request is from skin:
 					$SkinCache = & get_SkinCache();
+					// Initialize global Collection in order to get Skin settings values from the Collection and not from defaults of the Skin:
+					$Blog = $item_Blog;
 					$request_Skin = & $SkinCache->get_by_ID( get_param( 'skin_ID' ), false, false );
 					if( $request_Skin && method_exists( $request_Skin, 'display_item_voting_panel' ) )
 					{	// Request skin to display a voting panel for item:
-						$request_Skin->display_item_voting_panel( $Item, array( 'display_wrapper' => false ) );
+						$request_Skin->display_item_voting_panel( $Item, $request_Skin->get_setting( 'voting_place' ), array( 'display_wrapper' => false ) );
 						break 2;
 					}
 				}

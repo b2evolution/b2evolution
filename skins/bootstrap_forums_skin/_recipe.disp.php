@@ -164,9 +164,16 @@ if( mainlist_get_item() )
 			<div class="cell1 ellipsis">
 				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
 					<?php
-						$Item->author( array(
-							'link_text' => 'auto',
-						) );
+						if( $Skin->get_setting( 'voting_place' ) == 'left_score' )
+						{	// Display voting panel instead of author avatar:
+							$Skin->display_item_voting_panel( $Item, 'left_score' );
+						}
+						else
+						{	// Display author avatar:
+							$Item->author( array(
+								'link_text' => 'auto',
+							) );
+						}
 					?>
 					<?php
 						// Display the post date:
@@ -380,7 +387,7 @@ if( mainlist_get_item() )
 
 				if( $disp != 'page' )
 				{	// Display a panel with voting buttons for item:
-					$Skin->display_item_voting_panel( $Item );
+					$Skin->display_item_voting_panel( $Item, 'under_content' );
 				}
 
 				echo '<span class="pull-left">';

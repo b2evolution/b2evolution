@@ -42,7 +42,8 @@ $status_icon = 'fa-comments';
 $status_title = '';
 $status_alt = T_('Discussion topic');
 $legend_icons['topic_default'] = 1;
-if( $Item->is_featured() || $Item->is_intro() )
+$is_sticky_item = $Item->is_featured() || $Item->is_intro();
+if( $is_sticky_item )
 { // Special icon for featured & intro posts
 	$status_icon = 'fa-bullhorn';
 	$status_alt = T_('Sticky topic / Announcement');
@@ -75,6 +76,14 @@ $display_workflow =
 	<!-- Post Block -->
 	<div class="ft_status__ft_title col-lg-8 col-md-8 col-sm-6 col-xs-12">
 
+		<?php
+		if( ! $is_sticky_item && $Skin->get_setting( 'voting_place' ) == 'left_score' )
+		{	// Display voting panel in score mode:
+			$Skin->display_item_voting_panel( $Item, 'left_score' );
+		}
+		else
+		{	// Display read status icon:
+		?>
 		<!-- Thread icon -->
 		<div class="ft_status_topic">
 			<a href="<?php echo $Item->permanent_url(); ?>">
@@ -97,6 +106,9 @@ $display_workflow =
 				?>
 			</a>
 		</div>
+		<?php
+		}
+		?>
 
 		<!-- Title / excerpt -->
 		<div class="ft_title">

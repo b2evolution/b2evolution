@@ -177,6 +177,12 @@ ol.breadcrumb {
 .forums_list .ft_status_topic .fa:hover {
   color: inherit;
 }
+.forums_list .vote_score__status_new {
+  color: #FF6600;
+}
+.forums_list .vote_score__status_updated {
+  color: #990000;
+}
 .forums_list .ft_count {
   margin-top: 5px;
   font-size: 90%;
@@ -672,6 +678,23 @@ a.btn + .vote_spam {
 }
 .evo_voting_panel span.fa {
   line-height: 20px;
+}
+.evo_voting_panel__left_score {
+  height: auto;
+  text-align: center;
+  margin: 0;
+}
+.evo_voting_panel__left_score a.action_icon span.fa {
+  margin: 0;
+}
+.evo_voting_panel__left_score .vote_score {
+  display: block;
+  font-weight: bold;
+}
+.ft_avatar .evo_voting_panel__left_score,
+.evo_comment_avatar .evo_voting_panel__left_score {
+  width: 100%;
+  float: none;
 }
 .comment_reply {
   height: 22px;

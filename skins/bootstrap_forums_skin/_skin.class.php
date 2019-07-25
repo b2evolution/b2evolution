@@ -198,17 +198,26 @@ class bootstrap_forums_Skin extends Skin
 						'defaultvalue' => 1,
 						'type' => 'checkbox',
 					),
-				   'workflow_display_mode' => array(
-					  'label'    => T_('Workflow column'),
-					  'note'     => '',
-					  'type'     => 'radio',
-					  'field_lines' => true,
-					  'options'  => array(
-						 array( 'status_and_author', T_('Display Status & Item Author') ),
-						 array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
-					  ),
-					  'defaultvalue' => 'status_and_author',
-				   ),
+					'workflow_display_mode' => array(
+						'label' => T_('Workflow column'),
+						'type' => 'radio',
+						'field_lines' => true,
+						'options'  => array(
+							array( 'status_and_author', T_('Display Status & Item Author') ),
+							array( 'assignee_and_status', T_('Display Assignee (with Priority color coding) & Status') ),
+						),
+						'defaultvalue' => 'status_and_author',
+					),
+					'voting_place' => array(
+						'label' => T_('Voting'),
+						'type' => 'radio',
+						'field_lines' => true,
+						'options' => array(
+							array( 'under_content', T_('Under posts/comments') ),
+							array( 'left_score', T_('Show score on the left of each post/comment') ),
+						),
+						'defaultvalue' => 'under_content',
+					),
 				'section_forum_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -408,6 +417,18 @@ class bootstrap_forums_Skin extends Skin
 			init_autocomplete_login_js( 'blog', 'typeahead' );
 			// Initialize date picker for _item_expert.form.php:
 			init_datepicker_js( 'blog' );
+		}
+
+		if( $this->get_setting( 'voting_place' ) == 'left_score' )
+		{	// Initialize JS for voting for score mode on the left of each post/comment:
+			if( in_array( $disp, array( 'posts', 'flagged' ) ) )
+			{	// Used to vote on an item:
+				init_voting_item_js( 'blog' );
+			}
+			if( $disp == 'comments' )
+			{	// Used to vote on the comments:
+				init_voting_comment_js( 'blog' );
+			}
 		}
 
 		// Init JS to affix Messages:
@@ -658,19 +679,56 @@ class bootstrap_forums_Skin extends Skin
 	 * Display a panel with voting buttons for item
 	 *
 	 * @param object Item
+	 * @param string Place where panel is displayed: 'under_content', 'left_score'
 	 * @param array Params
 	 */
-	function display_item_voting_panel( $Item, $params = array() )
+	function display_item_voting_panel( $Item, $place, $params = array() )
 	{
-		skin_widget( array_merge( array(
-				// CODE for the widget:
-				'widget'      => 'item_vote',
-				// Optional display params
-				'Item'        => $Item,
-				'block_start' => '',
-				'block_end'   => '',
-				'skin_ID'     => $this->ID,
-			), $params ) );
+		if( $place != $this->get_setting( 'voting_place' ) )
+		{	// Skip because different place for panel is requested:
+			return;
+		}
+
+		switch( $place )
+		{
+			case 'under_content':
+				// Show under posts/comments:
+				skin_widget( array_merge( array(
+						// CODE for the widget:
+						'widget'      => 'item_vote',
+						// Optional display params
+						'Item'        => $Item,
+						'block_start' => '',
+						'block_end'   => '',
+						'skin_ID'     => $this->ID,
+					), $params ) );
+				break;
+
+			case 'left_score':
+				// Show score on the left of each post/comment:
+				global $disp;
+				skin_widget( array_merge( array(
+						// CODE for the widget:
+						'widget'                 => 'item_vote',
+						// Optional display params
+						'Item'                   => $Item,
+						'block_start'            => '',
+						'block_end'              => '',
+						'skin_ID'                => $this->ID,
+						'class'                  => 'evo_voting_panel__left_score',
+						'title_text'             => '',
+						'title_empty'            => '',
+						'display_summary'        => 'no',
+						'display_noopinion'      => false,
+						'display_score'          => true,
+						'score_class'            => ( in_array( $disp, array( 'posts', 'flagged' ) ) ? 'vote_score__status_'.$Item->get_read_status() : '' ),
+						'icon_like_active'       => 'thumb_arrow_up',
+						'icon_like_noactive'     => 'thumb_arrow_up_disabled',
+						'icon_dontlike_active'   => 'thumb_arrow_down',
+						'icon_dontlike_noactive' => 'thumb_arrow_down_disabled',
+					), $params ) );
+				break;
+			}
 	}
 
 
@@ -678,16 +736,46 @@ class bootstrap_forums_Skin extends Skin
 	 * Display a panel with voting buttons for item
 	 *
 	 * @param object Comment
+	 * @param string Place where panel is displayed: 'under_content', 'left_score'
 	 * @param array Params
 	 */
-	function display_comment_voting_panel( $Comment, $params = array() )
+	function display_comment_voting_panel( $Comment, $place, $params = array() )
 	{
-		$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
-				'before_title'          => '',
-				'helpful_text'          => T_('Is this reply helpful?'),
-				'class'                 => 'vote_helpful',
-				'skin_ID'               => $this->ID,
-			), $params ) );
+		if( $place != $this->get_setting( 'voting_place' ) )
+		{	// Skip because different place for panel is requested:
+			return;
+		}
+
+		switch( $place )
+		{
+			case 'under_content':
+				// Show under posts/comments:
+				$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+						'before_title' => '',
+						'helpful_text' => T_('Is this reply helpful?'),
+						'skin_ID'      => $this->ID,
+					), $params ) );
+				break;
+
+			case 'left_score':
+				// Show score on the left of each post/comment:
+				$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
+						'before_title'           => '',
+						'helpful_text'           => T_('Is this reply helpful?'),
+						'class'                  => '',
+						'skin_ID'                => $this->ID,
+						'class'                  => 'evo_voting_panel__left_score',
+						'display_noopinion'      => false,
+						'display_score'          => true,
+						'title_text'             => '',
+						'title_empty'            => '',
+						'icon_like_active'       => 'thumb_arrow_up',
+						'icon_like_noactive'     => 'thumb_arrow_up_disabled',
+						'icon_dontlike_active'   => 'thumb_arrow_down',
+						'icon_dontlike_noactive' => 'thumb_arrow_down_disabled',
+					), $params ) );
+				break;
+		}
 	}
 }
 

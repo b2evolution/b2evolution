@@ -4647,6 +4647,8 @@ function display_voting_form( $params = array() )
 			'display_dontlike'       => true,
 			'display_inappropriate'  => true,
 			'display_spam'           => true,
+			'display_score'          => false,
+			'score_class'            => '',
 			'title_text'             => T_('My vote:'),
 			'title_like'             => T_('I like this picture'),
 			'title_like_voted'       => T_('You like this!'),
@@ -4656,6 +4658,12 @@ function display_voting_form( $params = array() )
 			'title_dontlike_voted'   => T_('You don\'t like this.'),
 			'title_inappropriate'    => T_('I think the content of this picture is inappropriate'),
 			'title_spam'             => T_('I think this picture was posted by a spammer'),
+			'icon_like_active'       => 'thumb_up',
+			'icon_like_noactive'     => 'thumb_up_disabled',
+			'icon_noopinion_active'  => 'ban',
+			'icon_noopinion_noactive'=> 'ban_disabled',
+			'icon_dontlike_active'   => 'thumb_down',
+			'icon_dontlike_noactive' => 'thumb_down_disabled',
 			// Number of votes
 			'display_numbers'        => false,
 			'msg_no_votes'           => T_('No likes yet'),
@@ -4780,6 +4788,13 @@ function display_voting_form( $params = array() )
 			$SQL->WHERE_and( 'cmvt_helpful IS NOT NULL' );
 			$vote = $DB->get_row( $SQL->get() );
 
+			if( $params['display_score'] )
+			{	// Calculate score:
+				$SQL->SELECT( 'comment_helpful_addvotes' );
+				$SQL->FROM( 'T_comments' );
+				$SQL->WHERE( 'comment_ID = '.$DB->quote( $params['vote_ID'] ) );
+				$score = $DB->get_var( $SQL );
+			}
 			break;
 
 		case 'item':
@@ -4792,13 +4807,20 @@ function display_voting_form( $params = array() )
 			$SQL->WHERE_and( 'itvt_updown IS NOT NULL' );
 			$vote = $DB->get_row( $SQL );
 
+			if( $params['display_score'] )
+			{	// Calculate score:
+				$SQL->SELECT( 'post_addvotes' );
+				$SQL->FROM( 'T_items__item' );
+				$SQL->WHERE( 'post_ID = '.$DB->quote( $params['vote_ID'] ) );
+				$score = $DB->get_var( $SQL );
+			}
 			break;
 	}
 
 	// Set all icons disabled by default:
-	$icon_like = 'thumb_up_disabled';
-	$icon_noopinion = 'ban_disabled';
-	$icon_dontlike = 'thumb_down_disabled';
+	$icon_like = $params['icon_like_noactive'];
+	$icon_noopinion = $params['icon_noopinion_noactive'];
+	$icon_dontlike = $params['icon_dontlike_noactive'];
 	$type_voted = '';
 
 	if( ! empty( $vote ) && ! is_null( $vote->result ) )
@@ -4808,7 +4830,7 @@ function display_voting_form( $params = array() )
 			case '-1':
 				// Don't like
 				$type_voted = 'dontlike';
-				$icon_dontlike = 'thumb_down';
+				$icon_dontlike = $params['icon_dontlike_active'];
 				$params_dontlike['class'] .= ' voted';
 				$params_dontlike['title'] = $params['title_dontlike_voted'];
 				break;
@@ -4816,7 +4838,7 @@ function display_voting_form( $params = array() )
 			case '0':
 				// No opinion
 				$type_voted = 'noopinion';
-				$icon_noopinion = 'ban';
+				$icon_noopinion = $params['icon_noopinion_active'];
 				$params_noopinion['class'] .= ' voted';
 				$params_noopinion['title'] = $params['title_noopinion_voted'];
 				break;
@@ -4824,7 +4846,7 @@ function display_voting_form( $params = array() )
 			case '1':
 				// Like
 				$type_voted = 'like';
-				$icon_like = 'thumb_up';
+				$icon_like = $params['icon_like_active'];
 				$params_like['class'] .= ' voted';
 				$params_like['title'] = $params['title_like_voted'];
 				break;
@@ -4880,6 +4902,11 @@ function display_voting_form( $params = array() )
 	if( $params['display_noopinion'] )
 	{	// Display 'No opinion' icon:
 		echo action_icon( '', $icon_noopinion, $url.'&vote_action=noopinion', '', 0, 0, array(), $params_noopinion );
+	}
+
+	if( $params['display_score'] && isset( $score ) )
+	{	// Display score:
+		echo '<span class="vote_score'.( empty( $params['score_class'] ) ? '' : ' '.$params['score_class'] ).'">'.$score.'</span>';
 	}
 
 	if( $params['display_dontlike'] )

@@ -232,12 +232,19 @@ echo $params['comment_body_before'];
 
 // Avatar:
 echo $params['comment_avatar_before'];
-$Comment->author2( array(
-					'link_text'  => 'only_avatar',
-					'thumb_size' => 'crop-top-80x80',
-					'after_user' => '', // After registered user
-					'after'      => '', // After anonymous user
-				) );
+if( $Skin->get_setting( 'voting_place' ) == 'left_score' )
+{	// Display voting panel instead of author avatar:
+	$Skin->display_comment_voting_panel( $Comment, 'left_score' );
+}
+else
+{	// Display author avatar:
+	$Comment->author2( array(
+			'link_text'  => 'only_avatar',
+			'thumb_size' => 'crop-top-80x80',
+			'after_user' => '', // After registered user
+			'after'      => '', // After anonymous user
+		) );
+}
 echo $params['comment_avatar_after'];
 
 // Rating:
@@ -289,7 +296,7 @@ echo $params['comment_body_after'];
 
 	if( $params['display_vote_helpful'] )
 	{	// Display a voting panel for comment:
-		$Skin->display_comment_voting_panel( $Comment );
+		$Skin->display_comment_voting_panel( $Comment, 'under_content' );
 	}
 
 	// Display Spam Voting system

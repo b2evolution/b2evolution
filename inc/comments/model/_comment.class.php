@@ -2042,6 +2042,7 @@ class Comment extends DataObject
 				'before_title'          => ' &nbsp; ',
 				'skin_ID'               => 0,
 				'helpful_text'          => T_('Is this comment helpful?'),
+				'title_text'            => NULL, // NULL - Use default title text
 				'title_yes'             => T_('Cast a helpful vote!'),
 				'title_yes_voted'       => T_('You sent a "helpful" vote.'),
 				'title_noopinion'       => T_('Cast a "no opinion" vote!'),
@@ -2049,8 +2050,16 @@ class Comment extends DataObject
 				'title_no'              => T_('Cast a "not helpful" vote!'),
 				'title_no_voted'        => T_('You sent a "not helpful" vote.'),
 				'title_empty'           => T_('No user votes yet.'),
-				'class'                 => '',
+				'class'                 => 'nowrap',
 				'display_wrapper'       => true, // Use FALSE when you update this from AJAX request
+				'display_noopinion'     => true,
+				'display_score'         => false,
+				'icon_like_active'        => 'thumb_up',
+				'icon_like_noactive'      => 'thumb_up_disabled',
+				'icon_noopinion_active'   => 'ban',
+				'icon_noopinion_noactive' => 'ban_disabled',
+				'icon_dontlike_active'    => 'thumb_down',
+				'icon_dontlike_noactive'  => 'thumb_down_disabled',
 			), $params );
 
 		if( $this->is_meta() )
@@ -2072,44 +2081,67 @@ class Comment extends DataObject
 
 		if( $params['display_wrapper'] )
 		{	// Display wrapper:
-			echo '<span id="vote_helpful_'.$this->ID.'" class="nowrap evo_voting_panel'.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
+			echo '<span id="vote_helpful_'.$this->ID.'" class="evo_voting_panel'.( empty( $params['class'] ) ? '' : ' '.$params['class'] ).'">';
 		}
 
 		echo $params['before_title'];
 
 		if( $current_User->ID == $this->author_user_ID )
-		{ // Display only vote summary for users on their own comments
-			$params['result_title_undecided'] = T_('Helpfulness:');
-			$params['after_result'] = '.';
-			$result_summary = $this->get_vote_summary( 'helpful', $params );
-			echo ( !empty( $result_summary ) ? $result_summary : $params['title_empty'] );
+		{	// Display only vote summary/score for users on their own comments:
+			if( $params['display_score'] )
+			{	// Display score:
+				echo '<span class="vote_score">'.$this->get( 'helpful_addvotes' ).'</span>';
+			}
+			else
+			{	// Display summary:
+				$params['result_title_undecided'] = T_('Helpfulness:');
+				$params['after_result'] = '.';
+				$result_summary = $this->get_vote_summary( 'helpful', $params );
+				echo ( !empty( $result_summary ) ? $result_summary : $params['title_empty'] );
+			}
 		}
 		else
 		{ // Display form to vote
 			$vote_result = $this->get_vote_helpful_disabled();
 
-			if( !$vote_result['is_voted'] )
-			{ // Current user didn't vote on this comment
-				$title_text = $params['helpful_text'];
+			if( $params['title_text'] === NULL )
+			{	// Use default title text:
+				if( ! $vote_result['is_voted'] )
+				{ // Current user didn't vote on this comment
+					$title_text = $params['helpful_text'];
+				}
+				else
+				{ // Display vote summary if user already voted on this comment
+					$title_text = $this->get_vote_summary( 'helpful', $params );
+				}
+				$title_text .= ' ';
 			}
 			else
-			{ // Display vote summary if user already voted on this comment
-				$title_text = $this->get_vote_summary( 'helpful', $params );
+			{	// Use custom title text:
+				$title_text = $params['title_text'];
 			}
 
 			display_voting_form( array(
 					'vote_type'             => 'comment',
 					'vote_ID'               => $this->ID,
 					'skin_ID'               => $params['skin_ID'],
+					'display_noopinion'     => $params['display_noopinion'],
+					'display_score'         => $params['display_score'],
 					'display_inappropriate' => false,
 					'display_spam'          => false,
-					'title_text'            => $title_text.' ',
+					'title_text'            => $title_text,
 					'title_like'            => $params['title_yes'],
 					'title_like_voted'      => $params['title_yes_voted'],
 					'title_noopinion'       => $params['title_noopinion'],
 					'title_noopinion_voted' => $params['title_noopinion_voted'],
 					'title_dontlike'        => $params['title_no'],
 					'title_dontlike_voted'  => $params['title_no_voted'],
+					'icon_like_active'        => $params['icon_like_active'],
+					'icon_like_noactive'      => $params['icon_like_noactive'],
+					'icon_noopinion_active'   => $params['icon_noopinion_active'],
+					'icon_noopinion_noactive' => $params['icon_noopinion_noactive'],
+					'icon_dontlike_active'    => $params['icon_dontlike_active'],
+					'icon_dontlike_noactive'  => $params['icon_dontlike_noactive'],
 				) );
 		}
 

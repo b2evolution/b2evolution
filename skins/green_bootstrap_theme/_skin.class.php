@@ -1963,7 +1963,7 @@ jQuery( document ).ready( function()
 		$Comment->vote_helpful( '', '', '&amp;', true, true, array_merge( array(
 				'before_title'          => '',
 				'helpful_text'          => T_('Is this reply helpful?'),
-				'class'                 => 'vote_helpful',
+				'class'                 => 'nowrap',
 				'skin_ID'               => $this->ID,
 			), $params ) );
 	}

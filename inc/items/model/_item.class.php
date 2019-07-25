@@ -12088,9 +12088,13 @@ class Item extends ItemLight
 		}
 
 		if( $current_User->ID == $this->creator_user_ID )
-		{	// Display only vote summary for users on their own items:
-			if( $params['display_summary_author'] )
-			{
+		{	// Display only vote summary/score for users on their own items:
+			if( $params['display_score'] )
+			{	// Display score:
+				echo '<span class="vote_score">'.$this->get( 'addvotes' ).'</span>';
+			}
+			elseif( $params['display_summary_author'] )
+			{	// Display summary:
 				$params['result_title_undecided'] = T_('Voting:');
 				$params['after_result'] = '.';
 				$result_summary = $this->get_vote_summary( $params );
