@@ -510,16 +510,6 @@ function export_xml( $params )
 
 	if( ( $export_files || $export_avatars ) && count( $files_xml_data ) )
 	{ // If files are exported we should download them inside ZIP file
-		load_class( '_ext/_zip_archives.php', 'zip_file' );
-
-		$options = array (
-			'basedir'  => $media_path,
-			'inmemory' => 1,
-			'recurse'  => 1,
-			// Put files in this subfolder
-			'prepend'  => 'b2evolution_export_files',
-		);
-
 		// Add the files to ZIP file
 		$attached_files = array();
 		foreach( $files_xml_data as $file_data )
@@ -538,21 +528,24 @@ function export_xml( $params )
 		}
 		fwrite( $xml_file_handle, $XML );
 		fclose( $xml_file_handle );
+		$attached_files[] = $xml_file_name;
 
-		// Create ZIP file
-		$zipfile = new zip_file( $file_name.'.zip' );
-		$zipfile->set_options( $options );
-		$zipfile->add_files( $attached_files, array( '_evocache' ) );
-		// Add XML file to the root of zip
-		$zipfile->options['prepend'] = '';
-		$zipfile->add_files( array( $xml_file_name ), array( '_evocache' ) );
-		$zipfile->create_archive();
+		$add_in_subdirs = array(
+			// Put all files in this subfolder:
+			'b2evolution_export_files',
+			// Put XML file in root:
+			$xml_file_name => ''
+		);
+
+		// Pack ZIP archive:
+		pack_archive( $media_path.$file_name.'.zip', $media_path, $attached_files, $add_in_subdirs, array( '_evocache' ), 'msg_error' );
 
 		// Download ZIP file
-		$zipfile->download_file();
+		download_archive( $media_path.$file_name.'.zip' );
 
-		// Remove temp XML file
+		// Remove temp XML and ZIP files:
 		unlink( $xml_file_path );
+		unlink( $media_path.$file_name.'.zip' );
 	}
 	else 
 	{ // Download only XML file

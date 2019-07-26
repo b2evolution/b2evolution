@@ -373,17 +373,33 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
  * @param string Path of new archive
  * @param string Directory path where files are located
  * @param string|array Files which should be added into ZIP archive
- * @param string Sub-directory name where files should added inside ZIP relative, Use empty to add in root of the ZIP archive
- * @param array Exclude folders and files from folders with these names
+ * @param string|array Sub-directory name where files should added inside ZIP relative, Use empty to add in root of the ZIP archive; May be array: 0 key is for all files/folders, other key - for custom files/folders
+ * @param array|string Exclude folders and files from folders with these names, 'subdirs' - to exclude ALL subfolders
+ * @param string Type of log: 'print', 'msg_error'
  * @return boolean TRUE on success
  */
-function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdir = '', $exclude_folder_names = array() )
+function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdirs = '', $exclude_folder_names = array(), $log_type = 'print' )
 {
-	global $Settings;
+	global $Settings, $Messages;
 
 	if( ! class_exists( 'ZipArchive' ) )
 	{	// Stop when no installed extension:
 		debug_die( 'Unable to compress the files because there is no \'ZipArchive\' extension installed in your PHP!' );
+	}
+
+	if( file_exists( $archive_path ) )
+	{	// Don't try to create ZIP if same file already exists:
+		$log_msg = sprintf( T_('File %s already exists.'), '<code>'.$archive_path.'</code>' );
+		if( $log_type == 'print' )
+		{
+			echo '<p class="text-danger">'.$log_msg.'</p>';
+			evo_flush();
+		}
+		elseif( $log_type == 'msg_error' )
+		{
+			$Messages->add( $log_msg, 'error' );
+		}
+		return false;
 	}
 
 	// Pack using 'ZipArchive' extension:
@@ -391,11 +407,17 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdir =
 
 	if( $ZipArchive->open( $archive_path, ZipArchive::CREATE ) !== TRUE )
 	{	// Cannot create new ZIP archive:
-		echo '<p class="text-danger">'
-				.sprintf( T_('Error: %s'), $ZipArchive->getStatusString() ).'<br />'
-				.sprintf( T_('Unable to create ZIP archive %s.'), '<code>'.$archive_path.'</code>' )
-			.'</p>';
-		evo_flush();
+		$log_msg = sprintf( T_('Error: %s'), $ZipArchive->getStatusString() ).'<br />'
+			.sprintf( T_('Unable to create ZIP archive %s.'), '<code>'.$archive_path.'</code>' );
+		if( $log_type == 'print' )
+		{
+			echo '<p class="text-danger">'.$log_msg.'</p>';
+			evo_flush();
+		}
+		elseif( $log_type == 'msg_error' )
+		{
+			$Messages->add( $log_msg, 'error' );
+		}
 
 		return false;
 	}
@@ -407,21 +429,40 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdir =
 
 	$source_dir_path_length = strlen( $source_dir_path );
 
-	if( ! empty( $add_in_subdir ) )
-	{	// Format sub-directory:
-		$add_in_subdir = trim( $add_in_subdir, '/' ).'/';
-	}
-
-	foreach( $exclude_folder_names as $e => $exclude_folder_name )
+	if( ! is_array( $add_in_subdirs ) )
 	{
-		$exclude_folder_names[ $e ] = preg_quote( trim( $exclude_folder_name, '/' ) );
+		$add_in_subdirs = array( $add_in_subdirs );
 	}
-	$exclude_folder_names_regexp = empty( $exclude_folder_names ) ? false : '#(^|/)'.implode( '|', $exclude_folder_names ).'(/|$)#';
+	foreach( $add_in_subdirs as $a => $add_in_subdir )
+	{
+		if( ! empty( $add_in_subdir ) )
+		{	// Format sub-directory:
+			$add_in_subdirs[ $a ] = trim( $add_in_subdir, '/' ).'/';
+		}
+	}
 
+	if( is_array( $exclude_folder_names ) )
+	{	// Initialize array to exclude subfolders by name:
+		foreach( $exclude_folder_names as $e => $exclude_folder_name )
+		{
+			$exclude_folder_names[ $e ] = preg_quote( trim( $exclude_folder_name, '/' ) );
+		}
+		$exclude_folder_names_regexp = empty( $exclude_folder_names ) ? false : '#(^|/)'.implode( '|', $exclude_folder_names ).'(/|$)#';
+	}
+	else
+	{
+		$exclude_folder_names_regexp = false;
+	}
+
+	$zip_result = true;
 	foreach( $files as $file )
 	{	// Add files into archive:
-		echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $source_dir_path.$file );
-		evo_flush();
+		if( $log_type == 'print' )
+		{
+			echo sprintf( T_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $source_dir_path.$file );
+			evo_flush();
+		}
+		$add_in_subdir = isset( $add_in_subdirs[ $file ] ) ? $add_in_subdirs[ $file ] : $add_in_subdirs[0];
 		if( is_dir( $source_dir_path.$file ) )
 		{	// Add directory:
 			if( $exclude_folder_names_regexp !== false &&
@@ -429,8 +470,8 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdir =
 			{	// Skip file by excluded folder name:
 				continue;
 			}
-			$zip_result = $ZipArchive->addEmptyDir( '/'.$add_in_subdir.trim( $file, '/' ) );
-			if( $zip_result && ( $dir_files = get_filenames( $source_dir_path.$file, array( 'inc_evocache' => true ) ) ) )
+			$file_result = $ZipArchive->addEmptyDir( '/'.$add_in_subdir.trim( $file, '/' ) );
+			if( $file_result && ( $dir_files = get_filenames( $source_dir_path.$file, array( 'inc_evocache' => true, 'recurse' => ( $exclude_folder_names !== 'subdirs' ), ) ) ) )
 			{	// Add files of the directory:
 				foreach( $dir_files as $dir_file )
 				{
@@ -442,29 +483,46 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdir =
 					}
 					if( is_dir( $dir_file ) )
 					{	// Add empty sub-directory:
-						$zip_result = $ZipArchive->addEmptyDir( $rel_dir_file_path ) && $zip_result;
+						if( $exclude_folder_names !== 'subdirs' )
+						{
+							$file_result = $ZipArchive->addEmptyDir( $rel_dir_file_path ) && $file_result;
+						}
 					}
 					else
 					{	// Add file:
-						$zip_result = $ZipArchive->addFile( $dir_file, $rel_dir_file_path ) && $zip_result;
+						$file_result = $ZipArchive->addFile( $dir_file, $rel_dir_file_path ) && $file_result;
 					}
 				}
 			}
 		}
 		else
 		{	// Add file:
-			$zip_result = $ZipArchive->addFile( $source_dir_path.$file, '/'.$add_in_subdir.$file );
+			$file_result = $ZipArchive->addFile( $source_dir_path.$file, '/'.$add_in_subdir.$file );
 		}
 
-		if( $zip_result )
+		if( $file_result )
 		{	// Display success result:
-			echo ' OK.<br />';
+			if( $log_type == 'print' )
+			{
+				echo ' OK.<br />';
+				evo_flush();
+			}
 		}
 		else
 		{	// Display error:
-			echo ' <span class="text-danger">'.sprintf( T_('Error: %s'), $ZipArchive->getStatusString() ).'</span>.<br />';
+			$log_msg = sprintf( T_('Error: %s'), $ZipArchive->getStatusString() );
+			if( $log_type == 'print' )
+			{
+				echo ' <span class="text-danger">'.$log_msg.'</span>.<br />';
+				evo_flush();
+			}
+			elseif( $log_type == 'msg_error' )
+			{
+				$Messages->add( $log_msg, 'error' );
+			}
 		}
-		evo_flush();
+
+		$zip_result = $zip_result && $file_result;
 	}
 
 	$ZipArchive->close();
@@ -472,8 +530,33 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdir =
 	// Set rights for new created ZIP file:
 	@chmod( $archive_path, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );
 
-	return true;
-	
+	return $zip_result;
+}
+
+
+/**
+ * Download ZIP archive
+ *
+ * @param string Path of the archive
+ */
+function download_archive( $archive_path )
+{
+	if( ! file_exists( $archive_path ) ||
+	    ! preg_match( '/\.zip$/', $archive_path ) )
+	{	// Don't try to download not existing of not ZIP file:
+		return false;;
+	}
+
+	$archive_content = file_get_contents( $archive_path );
+
+	header( 'Content-Type: application/zip' );
+	header( 'Content-Disposition: attachment; filename="'.basename( $archive_path ).'"' );
+	header( 'Content-Length: '.strlen( $archive_content ) );
+	header( 'Content-Transfer-Encoding: binary' );
+	header( 'Cache-Control: no-cache, must-revalidate, max-age=60' );
+	header( 'Expires: 0' );
+
+	echo $archive_content;
 }
 
 

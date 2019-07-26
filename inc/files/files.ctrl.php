@@ -683,36 +683,14 @@ switch( $action )
 			break;
 		}
 
-		// Load class to work with ZIP files:
-		load_class( '_ext/_zip_archives.php', 'zip_file' );
-
-		$arraylist = $selected_Filelist->get_array( 'get_name' );
-
-		$options = array (
-			'basedir' => $fm_Filelist->get_ads_list_path(),
-			// Keep zip archive in memory only ifor download action:
-			'inmemory' => ( $action == 'download' ),
-			'recurse' => (1 - $exclude_sd),
-		);
-
-		// Create ZIP archive:
-		$zipfile = new zip_file( $zipname );
-		$zipfile->set_options( $options );
-		$zipfile->add_files( $arraylist, array( '_evocache' ) );
-		$zipfile->create_archive();
-
-		if( $zipfile->error )
-		{
-			foreach( $zipfile->error as $v )
-			{
-				$Messages->add( $v, 'error' );
-			}
+		if( ! pack_archive( $fm_Filelist->get_ads_list_path().$zipname, $fm_Filelist->get_ads_list_path(), $selected_Filelist->get_array( 'get_name' ), '', ( $exclude_sd ? 'subdirs' : array() ), 'msg_error' ) )
+		{	// Stop on error packing:
 			break;
 		}
 
 		if( $action == 'download' )
 		{	// Download ZIP archive:
-			$zipfile->download_file();
+			download_archive( $fm_Filelist->get_ads_list_path().$zipname );
 			exit(0);
 			/* EXITED! */
 		}
