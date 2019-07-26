@@ -185,7 +185,8 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 			{	// Create temp for for animation:
 				jQuery( 'body', window.parent.document ).append( '<div class="evo_designer__widget_animation"></div>' );
 			}
-			jQuery( '.evo_designer__widget_animation', window.parent.document ).css(
+			jQuery( '.evo_designer__widget_animation', window.parent.document ).show()
+			.css(
 			{
 				top: jQuery( this ).position().top + jQuery( '#evo_customizer__frontoffice', window.parent.document ).offset().top,
 				left: jQuery( this ).position().left+ jQuery( '#evo_customizer__frontoffice', window.parent.document ).offset().left,
@@ -200,7 +201,10 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 				width: jQuery( '#evo_customizer__backoffice', window.parent.document ).width(),
 				height: jQuery( '#evo_customizer__backoffice', window.parent.document ).height() - 160,
 			} )
-			.animate( { opacity: 0 }, 10 );
+			.animate( { opacity: 0 }, 10, function()
+			{
+				jQuery( this ).hide();
+			} );
 
 			jQuery( '.evo_widget[data-z-index]' ).each( function()
 			{	// Revert z-index of previous active widget blocks,

@@ -1970,6 +1970,9 @@ div.query-builder .rule-container .rule-value-container {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.evo_customizer__content div.fieldset_wrapper + div.fieldset_wrapper {
+  margin-top: 0;
+}
 table.evo_locale_selector {
   width: auto;
   margin-bottom: 0;
