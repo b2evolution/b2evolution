@@ -24,13 +24,17 @@ require_once $inc_path.'/_main.inc.php';
 
 if( ! isset($GLOBALS['files_Module']) )
 {
-	debug_die( 'Files module is disabled or missing!' );
+	debug_die( 'Files module is disabled or missing!', array(
+			'status' => '501 Not Implemented',
+		) );
 }
 
 // Check permission (#1):
-if( ! isset($current_User) )
+if( ! is_logged_in() )
 {
-	debug_die( 'No permissions to view file (not logged in)!' );
+	debug_die( 'No permissions to view file (not logged in)!', array(
+			'status' => '403 Forbidden',
+		) );
 }
 
 // We need this param early to check blog perms, if possible
