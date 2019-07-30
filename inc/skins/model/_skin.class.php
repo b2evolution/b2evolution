@@ -1666,7 +1666,7 @@ var downloadInterval = setInterval( function()
 		$marketing_popup_container_code = $Blog->get_marketing_popup_container();
 
 		// Load general JS file:
-		if( $this->get_api_version() == 6 )
+		if( $this->get_api_version() >= 6 )
 		{ // Bootstrap skin
 			require_js( $marketing_popup_container_code ? 'build/bootstrap-evo_frontoffice-with-ddexitpop.bmin.js' : 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
 		}
