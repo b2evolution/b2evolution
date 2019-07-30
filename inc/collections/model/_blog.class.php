@@ -1386,6 +1386,10 @@ class Blog extends DataObject
 
 		if( in_array( 'credits', $groups ) )
 		{	// We want to load the software credits settings:
+			if( is_pro() )
+			{	// Allow to remove "Powered by b2evolution" logos only for PRO version:
+				$this->set_setting( 'powered_by_logos', param( 'powered_by_logos', 'integer', 0 ) );
+			}
 			param_integer_range( 'max_footer_credits', 0, 3, T_('Max credits must be between %d and %d.') );
 			$this->set_setting( 'max_footer_credits', get_param( 'max_footer_credits' ) );
 		}

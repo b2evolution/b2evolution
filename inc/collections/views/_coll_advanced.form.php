@@ -184,12 +184,21 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Software credits').get_manual_link('software-credits') );
 	$max_credits = $edited_Blog->get_setting( 'max_footer_credits' );
-	$note = T_('You get the b2evolution software for <strong>free</strong>. We do appreciate you giving us credit. <strong>Thank you for your support!</strong>');
-	if( $max_credits < 1 )
-	{
-		$note = '<img src="'.$rsc_url.'smilies/icon_sad.gif" alt="" class="bottom"> '.$note;
+	if( is_pro() )
+	{	// Allow to remove "Powered by b2evolution" logos only for PRO version:
+		$Form->checkbox( 'powered_by_logos', $edited_Blog->get_setting( 'powered_by_logos' ), T_('Powered by logos'), T_('Check this to remove "Powered by b2evolution" logos.') );
+		// Don't inform about free version for PRO version:
+		$max_credits_note = '';
 	}
-	$Form->text( 'max_footer_credits', $max_credits, 1, T_('Max footer credits'), $note, 1 );
+	else
+	{	// Inform about free version:
+		$max_credits_note = T_('You get the b2evolution software for <strong>free</strong>. We do appreciate you giving us credit. <strong>Thank you for your support!</strong>');
+		if( $max_credits < 1 )
+		{
+			$max_credits_note = '<img src="'.$rsc_url.'smilies/icon_sad.gif" /> '.$max_credits_note;
+		}
+	}
+	$Form->text( 'max_footer_credits', $max_credits, 1, T_('Max footer credits'), $max_credits_note, 1 );
 $Form->end_fieldset();
 
 

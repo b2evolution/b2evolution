@@ -2405,12 +2405,15 @@ function star_rating( $stars, $class = 'not-used-any-more' )
  */
 function powered_by( $params = array() )
 {
-	/**
-	 * @var AbstractSettings
-	 */
-	global $global_Cache;
+	global $global_Cache, $rsc_uri, $Blog;
 
-	global $rsc_uri;
+	if( isset( $Blog ) &&
+	    ( $Blog instanceof Blog ) &&
+	    is_pro() &&
+	    $Blog->get_setting( 'powered_by_logos' ) )
+	{	// Don't display "Powered by b2evolution" logos if it is desabled on PRO version:
+		return;
+	}
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
