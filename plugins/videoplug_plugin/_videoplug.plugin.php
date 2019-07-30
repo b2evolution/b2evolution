@@ -68,6 +68,31 @@ class videoplug_plugin extends Plugin
 
 
 	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::GetDefaultSettings()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		return array_merge( parent::get_coll_setting_definitions( $params ),
+			array(
+				'replace_url_post' => array(
+						'label' => T_('Replace full video URLs found in posts' ),
+						'type' => 'checkbox',
+						'defaultvalue' => 1,
+					),
+				'replace_url_comment' => array(
+						'label' => T_('Replace full video URLs found in comments' ),
+						'type' => 'checkbox',
+						'defaultvalue' => 1,
+					),
+			)
+		);
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @todo add more video sites, anyone...
@@ -98,6 +123,15 @@ class videoplug_plugin extends Plugin
 			return;
 		}
 
+		if( ! empty( $setting_Blog ) && (
+		      ( $this->get_coll_setting( 'replace_url_comment', $setting_Blog ) && ! empty( $params['Comment'] ) && $params['Comment'] instanceof Comment ) ||
+		      ( $this->get_coll_setting( 'replace_url_post', $setting_Blog ) && ! empty( $params['Item'] ) && $params['Item'] instanceof Item )
+		  ) )
+		{	// Render full video URLs in post or comment content:
+			$content = replace_content_outcode( '#(<a[^>]+href=")?(https?://(www\.)?(youtube.com|youtu.be|dailymotion.com|vimeo.com|facebook.com)([^"\s\n\r<]+))("[^>]*>(.+?)</a>)?#i',
+				array( $this, 'parse_video_url_callback' ), $content, 'replace_content', 'preg_callback' );
+		}
+
 		// Move short tag outside of paragraph:
 		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo|facebook):?[^\[\]]*\]/i' );
 
@@ -106,6 +140,81 @@ class videoplug_plugin extends Plugin
 			array( $this, 'parse_video_tag_callback' ), $content, 'replace_content', 'preg_callback' );
 
 		return true;
+	}
+
+
+	/**
+	 * Callback function to build HTML video code from video URL or link tag <a> with video URL
+	 *
+	 * @param array Matches:
+	 *              0 - Full video URL or full link tag <a>
+	 *              1 - Start part of <a> tag, or empty string when simple URL without <a> tag
+	 *              2 - Full URL
+	 *              3 - "www." domain prefix of empty
+	 *              4 - Domain: youtube.com, youtu.be, dailymotion.com, vimeo.com, facebook.com
+	 *              5 - Part of video URL after domain
+	 *              6 - End part of <a> tag, or not defined when simple URL without <a> tag
+	 *              7 - Text of <a> tag, or not defined when simple URL without <a> tag
+	 * @return string HTML video code
+	 */
+	function parse_video_url_callback( $m )
+	{
+		if( isset( $m[7] ) && $m[7] != $m[2] )
+		{	// Skip if link text is different than URL(e.g. <a href="https://youtu.be/abc123">Click to see Video!</a>):
+			return $m[0];
+		}
+
+		// Try to exctract video code from URL depending on video server:
+		switch( $m[4] )
+		{
+			case 'youtube.com':
+			case 'youtu.be':
+				if( preg_match( '#(^/|[\?&]v=)([^&=\?]+)(&|$)#', $m[5], $code ) )
+				{
+					$video_block = '<iframe id="ytplayer" type="text/html" src="//www.youtube.com/embed/'.$code[2].'" allowfullscreen="allowfullscreen" frameborder="0"></iframe>';
+				}
+				break;
+
+			case 'dailymotion.com':
+				if( preg_match( '#^/video/(.+)$#', $m[5], $code ) )
+				{
+					$video_block = '<iframe src="//www.dailymotion.com/embed/video/'.$code[1].'" frameborder="0" allowfullscreen></iframe>';
+				}
+				break;
+
+			case 'vimeo.com':
+				if( preg_match( '#^/(.+)$#', $m[5], $code ) )
+				{
+					$video_block = '<iframe src="//player.vimeo.com/video/'.$code[1].'" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+				}
+				break;
+
+			case 'facebook.com':
+				if( preg_match( '#(/videos/|[\?&]v=)(\d+)(/|$)#', $m[5], $code ) )
+				{
+					$video_block = '<iframe src="https://www.facebook.com/plugins/video.php?href='.urlencode( $m[2] ).'" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>';
+				}
+				break;
+		}
+
+		if( ! isset( $video_block ) )
+		{	// No found correct video code in the URL:
+			return $m[0];
+		}
+
+		$style = '';
+
+		if( ! empty( $this->video_width ) )
+		{	// Set width depending on what units are used:
+			$style .= 'width:'.( strpos( $this->video_width, '%' ) === false ? $this->video_width.'px' : $this->video_width ).';';
+		}
+
+		if( ! empty( $this->video_height ) )
+		{	// Set height depending on what units are used:
+			$style .= 'padding-bottom:'.( strpos( $this->video_height, '%' ) === false ? '0;height:'.$this->video_height.'px' : $this->video_height );
+		}
+
+		return '<div class="videoblock"'.( $style == '' ? '' : ' style="'.$style.'"' ).'>'.$video_block.'</div>';
 	}
 
 
