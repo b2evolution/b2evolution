@@ -674,8 +674,8 @@ class MarkdownImport
 				{	// If post is inserted successfully:
 					$item_is_updated_step_1 = true;
 					$item_result_class = 'text-success';
-					$item_result_messages[] = /* TRANS: Result of imported Item */ T_('Is new');
-					$item_result_messages[] = /* TRANS: Result of imported Item */ T_('Added to DB');
+					$item_result_messages[] = /* TRANS: Result of imported Item */ T_('new file');
+					$item_result_messages[] = /* TRANS: Result of imported Item */ T_('New Post added to DB');
 					$post_results_num['added_success']++;
 				}
 				else
@@ -834,7 +834,7 @@ class MarkdownImport
 				switch( $post_result_type )
 				{
 					case 'added_success':
-						$post_msg_text = T_('%d posts added to DB');
+						$post_msg_text = T_('%d new posts added to DB');
 						$post_msg_class = 'text-success';
 						break;
 					case 'added_failed':
