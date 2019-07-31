@@ -12073,6 +12073,7 @@ class Item extends ItemLight
 				'display_summary'        => 'replace', // 'no' - Don't display, 'replace' - Replace label after vote, 'always' - Always display after icons
 				'display_summary_author' => true, // Display summary for author
 				'display_wrapper'        => true, // Use FALSE when you update this from AJAX request
+				'display_score'          => false,
 			), $params );
 
 		if( ! $this->can_vote() )
