@@ -173,7 +173,7 @@ class prism_plugin extends Plugin
 
 		// Language:
 		$lang = strtolower( preg_replace( '/.*lang="?([a-z]+)"?.*/i', '$1', html_entity_decode( $block[2] ) ) );
-		if( ! in_array( $lang, array( 'php', 'css', 'javascript', 'sql', 'markup', 'apacheconf' ) ) )
+		if( ! in_array( $lang, array( 'php', 'css', 'javascript', 'sql', 'html', 'markup', 'apacheconf' ) ) )
 		{ // Use Markup for unknown language
 			$lang = '';
 		}
@@ -259,7 +259,7 @@ class prism_plugin extends Plugin
 		{	// Add lang attribute only if it is defined:
 			preg_match( '/language-([a-z]+)/', $lang, $lang_match );
 			$lang = empty( $lang_match[1] ) ? '' : trim( $lang_match[1] );
-			if( empty( $lang ) || ! in_array( $lang_match[1], array( 'php', 'css', 'javascript', 'sql', 'markup', 'apacheconf' ) ) )
+			if( empty( $lang ) || ! in_array( $lang_match[1], array( 'php', 'css', 'javascript', 'sql', 'html', 'markup', 'apacheconf' ) ) )
 			{	// Don't allow unknown language:
 				$lang = '';
 			}
@@ -440,6 +440,7 @@ class prism_plugin extends Plugin
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_title_before' ).T_('Codespan').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" title="'.T_('Insert HTML codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|html|span" value="HTML" />';
 		echo '<input type="button" title="'.T_('Insert Markup codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|markup|span" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
 		echo '<input type="button" title="'.T_('Insert CSS codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|css|span" value="CSS" />';
 		echo '<input type="button" title="'.T_('Insert JavaScript codespan').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|javascript|span" value="JS" />';
@@ -453,6 +454,7 @@ class prism_plugin extends Plugin
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_title_before' ).T_('Codeblock').': '.$this->get_template( 'toolbar_title_after' );
 		echo $this->get_template( 'toolbar_group_before' );
+		echo '<input type="button" title="'.T_('Insert HTML codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|html" value="HTML" />';
 		echo '<input type="button" title="'.T_('Insert Markup codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|markup" value="'.format_to_output( T_('Markup'), 'htmlattr' ).'" />';
 		echo '<input type="button" title="'.T_('Insert CSS codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|css" value="CSS" />';
 		echo '<input type="button" title="'.T_('Insert JavaScript codeblock').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="'.$params['js_prefix'].'prism_tag|javascript" value="JS" />';
