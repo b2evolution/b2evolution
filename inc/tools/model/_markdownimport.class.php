@@ -1213,6 +1213,11 @@ class MarkdownImport
 			$item_url = get_urltitle( $m[7] );
 			$link_anchor = isset( $m[9] ) ? trim( $m[9], '# ' ) : '';
 		}
+		elseif( strpos( $m[7], '#' ) === 0 && strlen( $m[7] ) > 1 )
+		{	// This is anchor URL to current post:
+			$item_url = '';
+			$link_anchor = substr( $m[7], 1 );
+		}
 		else
 		{	// We cannot convert this markdown link:
 			$this->error_convert_links[] = $m[0];
