@@ -58,6 +58,13 @@ class breadcrumb_path_Widget extends ComponentWidget
 					'options' => array( 'blog' => T_('Collection name'), 'cat' => T_('Root parent category') ),
 					'defaultvalue' => 'blog',
 				),
+				'coll_logo_size' => array(
+					'type' => 'select',
+					'label' => T_('Collection logo size'),
+					'options' => get_available_thumb_sizes( T_('None') ),
+					'note' => T_('Select size to display collection logo at start of breadcrumb path.'),
+					'defaultvalue' => '',
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -109,7 +116,7 @@ class breadcrumb_path_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog, $cat, $disp;
+		global $Collection, $Blog, $cat, $disp, $thumbnail_sizes;
 
 		$params = array_merge( array(
 				'item_mask'        => '<a href="$url$">$title$</a>',
@@ -178,6 +185,13 @@ class breadcrumb_path_Widget extends ComponentWidget
 		}
 
 		echo $this->disp_params['block_start'];
+
+		if( ! empty( $this->disp_params['coll_logo_size'] ) &&
+		    isset( $thumbnail_sizes[ $this->disp_params['coll_logo_size'] ] ) &&
+		    $coll_logo_File = $Blog->get( 'collection_image' ) )
+		{	// 
+			echo $coll_logo_File->get_thumb_imgtag( $this->disp_params['coll_logo_size'] ).' ';
+		}
 
 		// Print out the breadcrumbs
 		$breadcrumbs = array_reverse( $breadcrumbs );

@@ -107,6 +107,7 @@ $thumbnail_sizes = array(
 			'fit-160x160-blur-18' => array( 'fit', 160, 160, 80, 18 ),
 			'fit-160x120' => array( 'fit', 160, 120, 80 ),
 			'fit-128x128' => array( 'fit', 128, 128, 80 ),
+			'fit-128x16' => array( 'fit', 128, 16, 80 ),
 			'fit-80x80' => array( 'fit', 80, 80, 80 ),
 			'crop-480x320' => array( 'crop', 480, 320, 90 ),
 			'crop-256x256' => array( 'crop', 256, 256, 85 ),

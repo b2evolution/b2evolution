@@ -46,6 +46,7 @@ skin_widget( array(
 		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
 		'item_active_mask' => '<li class="active">$title$</li>',
 		'suffix_text'      => empty( $single_cat_ID ) ? T_('Latest topics') : '',
+		'coll_logo_size'   => 'fit-128x16',
 	) );
 
 
