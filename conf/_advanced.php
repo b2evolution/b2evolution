@@ -112,6 +112,7 @@ $thumbnail_sizes = array(
 			'fit-160x160'			=> array( 'fit', 160, 160, 85 ),			// 1:1 square ratio 1
 			'fit-160x120'			=> array( 'fit', 160, 120, 85 ),			// 1:1 square ratio 1
 			'fit-128x128'			=> array( 'fit', 128, 128, 85 ),			// 1:1 square ratio 1
+			'fit-128x16'			=> array( 'fit', 128, 16, 85 ),				// 8:1 square ratio 8
 			'fit-80x80'				=> array( 'fit', 80, 80, 85 ),				// 1:1 square ratio 1
 	// FIT+BLUR: Blurred images (probably no need for Retina support, because the intended effect is to be blurred)
 			'fit-160x160-blur-13'=> array( 'fit', 160, 160, 80, 13 ),

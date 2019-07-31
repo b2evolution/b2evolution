@@ -33,6 +33,7 @@ skin_widget( array(
 		'separator'        => '',
 		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
 		'item_active_mask' => '<li class="active">$title$</li>',
+		'coll_logo_size'   => 'fit-128x16',
 	) );
 
 if( ! is_array( $legend_icons ) )
