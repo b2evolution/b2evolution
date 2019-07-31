@@ -150,7 +150,7 @@ skin_widget( array(
 	<div class="row">
 		<div class="<?php echo $Skin->get_column_class( 'single' ); ?>">
 
-	<section class="table evo_content_block">
+	<section class="table evo_content_block<?php echo ' evo_voting_layout__'.$Skin->get_setting( 'voting_place' ); ?>">
 	<div class="panel panel-default">
 		<div class="panel-heading posts_panel_title_wrapper">
 			<div class="cell1 ellipsis">
@@ -184,7 +184,7 @@ skin_widget( array(
 		</div>
 
 		<div class="panel-body">
-			<div class="ft_avatar col-md-1 col-sm-2"><?php
+			<div class="ft_avatar<?php echo $Skin->get_setting( 'voting_place' ) == 'under_content' ? ' col-md-1 col-sm-2' : ''; ?>"><?php
 				if( $Skin->get_setting( 'voting_place' ) == 'left_score' )
 				{	// Display voting panel instead of author avatar:
 					$Skin->display_item_voting_panel( $Item, 'left_score' );
@@ -197,7 +197,7 @@ skin_widget( array(
 					) );
 				}
 			?></div>
-			<div class="post_main col-md-11 col-sm-10">
+			<div class="post_main<?php echo $Skin->get_setting( 'voting_place' ) == 'under_content' ? ' col-md-11 col-sm-10' : ''; ?>">
 				<?php
 				if( $disp == 'single' )
 				{
@@ -371,9 +371,9 @@ skin_widget( array(
 			'comment_status_before' => '</h4></div>',
 			'comment_title_after'   => '</div>',
 
-			'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
+			'comment_avatar_before' => '<span class="evo_comment_avatar'.( $Skin->get_setting( 'voting_place' ) == 'under_content' ? ' col-md-1 col-sm-2' : '' ).'">',
 			'comment_avatar_after'  => '</span>',
-			'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
+			'comment_text_before'   => '<div class="evo_comment_text'.( $Skin->get_setting( 'voting_place' ) == 'under_content' ? ' col-md-11 col-sm-10' : '' ).'">',
 			'comment_text_after'    => '</div>',
 		) ) );
 		// Note: You can customize the default item feedback by copying the generic

@@ -632,6 +632,7 @@ ul.legend {
 			.ft_avatar {
 				padding: 0px;
 				text-align: center;
+				float: left;
 				/* @MILOS > Still testing to see if this is overrulled by: line 992
 				span > img.loadimg, a > img.loadimg {
 					border-radius: 50% !important;
@@ -661,6 +662,12 @@ ul.legend {
 		}
 		> a, > span, a > img {
 			display: inline-block;
+		}
+	}
+	// Special style for enabled voting panel with left score mode:
+	.evo_voting_layout__left_score {
+		.post_main, .evo_comment_text {
+			padding-left: 25px;
 		}
 	}
 }

@@ -595,6 +595,7 @@ ul.legend span.note {
 .single_topic .evo_content_block .panel-body .ft_avatar {
   padding: 0px;
   text-align: center;
+  float: left;
   /* @MILOS > Still testing to see if this is overrulled by: line 992
 				span > img.loadimg, a > img.loadimg {
 					border-radius: 50% !important;
@@ -621,6 +622,10 @@ ul.legend span.note {
 .single_topic .ft_avatar > span,
 .single_topic .ft_avatar a > img {
   display: inline-block;
+}
+.single_topic .evo_voting_layout__left_score .post_main,
+.single_topic .evo_voting_layout__left_score .evo_comment_text {
+  padding-left: 25px;
 }
 body.round_avatars .single_topic .evo_content_block .ft_avatar > a:before,
 body.round_avatars .single_topic .evo_content_block .ft_avatar > a,

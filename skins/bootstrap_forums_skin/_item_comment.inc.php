@@ -29,11 +29,11 @@ $params = array_merge( array(
 		'comment_body_before'   => '<div class="panel-body">',
 		'comment_body_after'    => '</div>',
 
-		'comment_avatar_before' => '<span class="evo_comment_avatar col-md-1 col-sm-2">',
+		'comment_avatar_before' => '<span class="evo_comment_avatar'.( $Skin->get_setting( 'voting_place' ) == 'under_content' ? ' col-md-1 col-sm-2' : '' ).'">',
 		'comment_avatar_after'  => '</span>',
 		'comment_rating_before' => '<div class="evo_comment_rating">',
 		'comment_rating_after'  => '</div>',
-		'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
+		'comment_text_before'   => '<div class="evo_comment_text'.( $Skin->get_setting( 'voting_place' ) == 'under_content' ? ' col-md-11 col-sm-10' : '' ).'">',
 		'comment_text_after'    => '</div>',
 		'link_to'               => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'author_link_text'      => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
@@ -76,7 +76,11 @@ $Comment->get_Item();
 $Comment->anchor();
 
 echo update_html_tag_attribs( $params['comment_start'], array(
-		'class' => 'vs_'.$Comment->status.( $Comment->is_meta() ? ' evo_comment__meta' : '' ), // Add style class for proper comment status
+		'class' =>
+			// Add style class for proper comment status:
+			'vs_'.$Comment->status.( $Comment->is_meta() ? ' evo_comment__meta' : '' ).' '.
+			// Add style for voting place mode:
+			'evo_voting_layout__'.$Skin->get_setting( 'voting_place' ),
 		'id'    => 'comment_'.$Comment->ID // Add id to know what comment is used on AJAX status changing
 	), array( 'id' => 'skip' ) );
 
@@ -232,7 +236,7 @@ echo $params['comment_body_before'];
 
 // Avatar:
 echo $params['comment_avatar_before'];
-if( $Skin->get_setting( 'voting_place' ) == 'left_score' )
+if( $Skin->get_setting( 'voting_place' ) == 'left_score' && ! $Comment->is_meta() )
 {	// Display voting panel instead of author avatar:
 	$Skin->display_comment_voting_panel( $Comment, 'left_score' );
 }

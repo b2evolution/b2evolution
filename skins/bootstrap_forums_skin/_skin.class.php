@@ -364,6 +364,29 @@ class bootstrap_forums_Skin extends Skin
 
 
 	/**
+	 * Set a skin specific param value for current Blog or Site
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 */
+	function set_setting( $parname, $parvalue )
+	{
+		global $Collection, $Blog;
+
+		// Set skin setting
+		parent::set_setting( $parname, $parvalue );
+
+		if( isset( $Blog ) &&
+		    $parname == 'voting_place' && 
+		    $parvalue == 'left_score' )
+		{	// Turn on positive and negative voting for collection when score voting mode is enabled for this Skin:
+			$Blog->set_setting( 'voting_positive', 1 );
+			$Blog->set_setting( 'voting_negative', 1 );
+		}
+	}
+
+
+	/**
 	 * Get current skin post navigation setting. Always use this navigation setting where this skin is applied.
 	 */
 	function get_post_navigation()
