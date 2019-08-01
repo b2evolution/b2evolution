@@ -148,9 +148,14 @@ class auto_anchors_plugin extends Plugin
 				var evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0;
 				jQuery( ".evo_auto_anchor_link" ).on( "click", function()
 				{
+					var link_href = jQuery( this ).attr( "href" );
 					jQuery( "html,body" ).animate(
-					{
+					{	// Scroll to anchor:
 						scrollTop: jQuery( this ).offset().top - evo_toolbar_height - '.intval( $this->get_coll_setting( 'offset_scroll', $Blog ) ).'
+					},
+					function()
+					{	// Update URL with proper anchor in browser address bar:
+						window.history.pushState( "", "", link_href );
 					} );
 					return false;
 				} );
