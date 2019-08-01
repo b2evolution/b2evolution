@@ -30,6 +30,9 @@ ol.breadcrumb {
   margin-left: 0;
   float: left;
 }
+ol.breadcrumb img {
+  margin-top: -2px;
+}
 .fa.icon {
   text-align: center;
   background: #FFF;
