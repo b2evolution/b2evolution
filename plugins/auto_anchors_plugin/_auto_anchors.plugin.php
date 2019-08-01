@@ -193,7 +193,7 @@ class auto_anchors_plugin extends Plugin
 		load_funcs( 'locales/_charset.funcs.php' );
 
 		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks:
-		$content = replace_content_outcode( '#(<h([1-6])((?!\sid\s*=).)*?)>(.+?)(</h\2>)#i', array( $this, 'callback_auto_anchor' ), $content, 'replace_content_callback' );
+		$content = replace_content_outcode( '#(<h([1-6])([^>]*\sid\s*=\s*["\']([^"\']+)["\'])?[^>]*)>(.+?)(</h\2>)#i', array( $this, 'callback_auto_anchor' ), $content, 'replace_content_callback' );
 
 		return true;
 	}
@@ -207,15 +207,26 @@ class auto_anchors_plugin extends Plugin
 	 */
 	function callback_auto_anchor( $m )
 	{
-		// Remove all HMTL tags from header text:
-		$anchor = utf8_strip_tags( $m[4] );
+		if( empty( $m[4] ) )
+		{	// Generate anchor from header text:
 
-		// Convert special chars/umlauts to ASCII,
-		// and replace all non-letter and non-digit chars to single char "-":
-		$anchor = replace_special_chars( $anchor );
+			// Remove all HMTL tags from header text:
+			$anchor = utf8_strip_tags( $m[5] );
 
-		// Make anchor lowercase:
-		$anchor = utf8_strtolower( $anchor );
+			// Convert special chars/umlauts to ASCII,
+			// and replace all non-letter and non-digit chars to single char "-":
+			$anchor = replace_special_chars( $anchor );
+
+			// Make anchor lowercase:
+			$anchor = utf8_strtolower( $anchor );
+
+			$anchor_attribute = ' id="'.$anchor.'"';
+		}
+		else
+		{	// Use custom defined anchor:
+			$anchor = $m[4];
+			$anchor_attribute = '';
+		}
 
 		if( empty( $anchor ) )
 		{	// Return original header tag when anchor is empty:
@@ -234,7 +245,7 @@ class auto_anchors_plugin extends Plugin
 
 		$anchor_link = ' <a href="'.$this->current_Item->get_permanent_url().'#'.$anchor.'" class="evo_auto_anchor_link">'.get_icon( 'merge', 'imgtag', array( 'title' => false ) ).'</a>';
 
-		return $header_tag_start.' id="'.$anchor.'">'.$m[4].$anchor_link.$m[5];
+		return $header_tag_start.$anchor_attribute.'>'.$m[5].$anchor_link.$m[6];
 	}
 }
 
