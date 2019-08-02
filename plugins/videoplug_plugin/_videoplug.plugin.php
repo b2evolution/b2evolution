@@ -128,15 +128,15 @@ class videoplug_plugin extends Plugin
 		      ( $this->get_coll_setting( 'replace_url_post', $setting_Blog ) && ! empty( $params['Item'] ) && $params['Item'] instanceof Item )
 		  ) )
 		{	// Render full video URLs in post or comment content:
-			$content = replace_content_outcode( '#(<a[^>]+href=")?(https?://(www\.)?(youtube.com|youtu.be|dailymotion.com|vimeo.com|facebook.com)([^"\s\n\r<]+))("[^>]*>(.+?)</a>)?#i',
+			$content = replace_content_outcode( '#(<a[^>]+href=")?(https?://(.+\.)?(youtube.com|youtu.be|dailymotion.com|vimeo.com|facebook.com|wistia.com)([^"\s\n\r<]+))("[^>]*>(.+?)</a>)?#i',
 				array( $this, 'parse_video_url_callback' ), $content, 'replace_content', 'preg_callback' );
 		}
 
 		// Move short tag outside of paragraph:
-		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo|facebook):?[^\[\]]*\]/i' );
+		$content = move_short_tags( $content, '/\[video:(youtube|dailymotion|vimeo|facebook|wistia):?[^\[\]]*\]/i' );
 
 		// Replace video tags with html code:
-		$content = replace_content_outcode( '#\[video:(youtube|dailymotion|vimeo|facebook|google|livevideo|ifilm):([^:\[\]\\\/]*|https?:\/\/.*\.facebook\.com\/[^:]*):?(\d+%?)?:?(\d+%?)?:?([^:\[\]\\\/]*)\]#',
+		$content = replace_content_outcode( '#\[video:(youtube|dailymotion|vimeo|facebook|wistia|google|livevideo|ifilm):([^:\[\]\\\/]*|https?:\/\/.*\.facebook\.com\/[^:]*):?(\d+%?)?:?(\d+%?)?:?([^:\[\]\\\/]*)\]#',
 			array( $this, 'parse_video_tag_callback' ), $content, 'replace_content', 'preg_callback' );
 
 		return true;
@@ -150,8 +150,8 @@ class videoplug_plugin extends Plugin
 	 *              0 - Full video URL or full link tag <a>
 	 *              1 - Start part of <a> tag, or empty string when simple URL without <a> tag
 	 *              2 - Full URL
-	 *              3 - "www." domain prefix of empty
-	 *              4 - Domain: youtube.com, youtu.be, dailymotion.com, vimeo.com, facebook.com
+	 *              3 - domain prefix like "www." or "www.subdomain." or empty
+	 *              4 - Domain: youtube.com, youtu.be, dailymotion.com, vimeo.com, facebook.com, wistia.com
 	 *              5 - Part of video URL after domain
 	 *              6 - End part of <a> tag, or not defined when simple URL without <a> tag
 	 *              7 - Text of <a> tag, or not defined when simple URL without <a> tag
@@ -195,6 +195,19 @@ class videoplug_plugin extends Plugin
 					$video_block = '<iframe src="https://www.facebook.com/plugins/video.php?href='.urlencode( $m[2] ).'" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>';
 				}
 				break;
+
+			case 'wistia.com':
+				if( preg_match( '#/medias/([a-z0-9]+)$#', $m[5], $code ) )
+				{
+					$video_block = '<script src="https://fast.wistia.com/embed/medias/'.$code[1].'.jsonp" async></script>'
+						.'<script src="https://fast.wistia.com/assets/external/E-v1.js" async></script>'
+						.'<div class="wistia_responsive_padding">'
+							.'<div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;">'
+								.'<span class="wistia_embed wistia_async_'.$code[1].' popover=true popoverAnimateThumbnail=true videoFoam=true" style="display:inline-block;height:100%;position:relative;width:100%"> </span>'
+							.'</div>'
+						.'</div>';
+				}
+				break;
 		}
 
 		if( ! isset( $video_block ) )
@@ -223,7 +236,7 @@ class videoplug_plugin extends Plugin
 	 *
 	 * @param array Matches:
 	 *              0 - Full video tag
-	 *              1 - Video type: youtube, dailymotion, vimeo, facebook, google, livevideo, ifilm
+	 *              1 - Video type: youtube, dailymotion, vimeo, facebook, wistia, google, livevideo, ifilm
 	 *              2 - Video code/key
 	 *              3 - Width
 	 *              4 - Height
@@ -248,6 +261,16 @@ class videoplug_plugin extends Plugin
 
 			case 'facebook':
 				$video_block = '<iframe src="https://www.facebook.com/plugins/video.php?href='.urlencode( $m[2] ).'" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>';
+				break;
+
+			case 'wistia':
+				$video_block = '<script src="https://fast.wistia.com/embed/medias/'.$m[2].'.jsonp" async></script>'
+					.'<script src="https://fast.wistia.com/assets/external/E-v1.js" async></script>'
+					.'<div class="wistia_responsive_padding">'
+						.'<div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;">'
+							.'<span class="wistia_embed wistia_async_'.$m[2].' popover=true popoverAnimateThumbnail=true videoFoam=true" style="display:inline-block;height:100%;position:relative;width:100%"> </span>'
+						.'</div>'
+					.'</div>';
 				break;
 
 			default: // google, livevideo, ifilm:
@@ -414,6 +437,7 @@ class videoplug_plugin extends Plugin
 		echo '<input type="button" id="video_vimeo" title="'.T_('Insert vimeo video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|vimeo|'.$params['js_prefix'].'" value="Vimeo" />';
 		echo '<input type="button" id="video_dailymotion" title="'.T_('Insert DailyMotion video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|dailymotion|'.$params['js_prefix'].'" value="DailyMotion" />';
 		echo '<input type="button" id="video_facebook" title="'.T_('Insert Facebook video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|facebook|'.$params['js_prefix'].'" value="Facebook" />';
+		echo '<input type="button" id="video_wistia" title="'.T_('Insert Wistia video').'" class="'.$this->get_template( 'toolbar_button_class' ).'" data-func="videotag|wistia|'.$params['js_prefix'].'" value="Wistia" />';
 		echo $this->get_template( 'toolbar_group_after' );
 
 		echo $this->get_template( 'toolbar_after' );
@@ -458,6 +482,11 @@ class videoplug_plugin extends Plugin
 						case 'facebook':
 							regexp_ID = /^https:\/\/.+\.facebook\.com\/.+/i;
 							regexp_URL = /^((https:\/\/.+\.facebook\.com\/.+))$/i;
+							break;
+
+						case 'wistia':
+							regexp_ID = /^[a-z0-9]+$/i;
+							regexp_URL = /^(.+\/medias\/)?([a-z0-9]+)$/i;
 							break;
 
 						default:
