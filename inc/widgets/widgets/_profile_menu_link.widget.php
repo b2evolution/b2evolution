@@ -139,6 +139,10 @@ class profile_menu_link_Widget extends generic_menu_link_Widget
 	 */
 	function init_display( $params )
 	{
+		$params = array_merge( array(
+				'profile_menu_link_text' => 'avatar_name',
+			), $params );
+
 		parent::init_display( $params );
 
 		// Disable "allow blockcache" because this widget uses the selected items
@@ -160,10 +164,6 @@ class profile_menu_link_Widget extends generic_menu_link_Widget
 			$this->display_debug_message( 'Hidden(Not logged in)' );
 			return false;
 		}
-
-		$params = array_merge( array(
-				'profile_menu_link_text' => 'avatar_name',
-			), $params );
 
 		$this->init_display( $params );
 

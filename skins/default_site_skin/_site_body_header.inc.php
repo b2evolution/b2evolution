@@ -26,6 +26,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 			'item_end'            => '',
 			'item_selected_start' => '',
 			'item_selected_end'   => '',
+			'profile_menu_link_text' => 'avatar_force_login',
 		) );
 	// ----------------------------- END OF "Site Header" CONTAINER -----------------------------
 
