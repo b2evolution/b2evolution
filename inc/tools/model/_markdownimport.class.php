@@ -629,7 +629,7 @@ class MarkdownImport
 			{	// Convert Markdown links to b2evolution ShortLinks:
 				// NOTE: Do this even when last import hash is different because below we may update content on import images:
 				$this->error_convert_links = array();
-				$item_content = preg_replace_callback( '#([^\!])\[([^\[\]]*)\]\(((([a-z]*://)?([^\)]+/)?([^\)]+?)(\.md)?)(\#[^\)]+)?)?\)#i', array( $this, 'callback_convert_links' ), $item_content );
+				$item_content = preg_replace_callback( '#(^|[^\!])\[([^\[\]]*)\]\(((([a-z]*://)?([^\)]+[/\\\\])?([^\)]+?)(\.md)?)(\#[^\)]+)?)?\)#i', array( $this, 'callback_convert_links' ), $item_content );
 			}
 
 			$prev_last_import_hash = $Item->get_setting( 'last_import_hash' );
