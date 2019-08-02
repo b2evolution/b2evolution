@@ -93,6 +93,7 @@ $Form->begin_fieldset( T_('Default user settings').get_manual_link('default-user
 			array( 'notify_edit_cmt_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is modified and I have permissions to moderate it.' ), $Settings->get( 'def_notify_edit_cmt_moderation' ) ),
 			array( 'notify_spam_cmt_moderation', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is reported as spam and I have permissions to moderate it.' ), $Settings->get( 'def_notify_spam_cmt_moderation' ) ),
 			array( 'notify_meta_comments', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a meta comment is posted and I have permission to view it.' ), $Settings->get( 'def_notify_meta_comments' ) ),
+			array( 'notify_comment_assignment', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'a comment is posted and post was assigned to me.' ), $Settings->get( 'def_notify_comment_assignment' ) ),
 		), 'default_user_notification', T_('Comments') );
 	$Form->checklist( array(
 			array( 'notify_post_mentioned', 1, /* TRANS: Here we imply "Notify me when:" */ T_( 'I have been mentioned on a post.' ), $Settings->get( 'def_notify_post_mentioned' ) ),

@@ -170,11 +170,6 @@ if( $action != 'preview' && $commented_Item->load_workflow_from_Request() )
 	{	// Display a message on success result:
 		$Messages->add( T_('The workflow properties have been updated.'), 'success' );
 		$workflow_is_updated = true;
-
-		if( $commented_Item->assigned_to_new_user && ! empty( $commented_Item->assigned_user_ID ) )
-		{ // Send post assignment notification
-			$commented_Item->send_assignment_notification();
-		}
 	}
 }
 
@@ -412,6 +407,13 @@ if( ( $Messages->has_errors() && $action != 'preview' ) ||
 	if( !empty( $reply_ID ) )
 	{
 		$redirect_to = url_add_param( $redirect_to, 'reply_ID='.$reply_ID.'&redir=no', '&' );
+	}
+
+	if( $workflow_is_updated &&
+	    $commented_Item->assigned_to_new_user &&
+	    ! empty( $commented_Item->assigned_user_ID ) )
+	{	// Send post assignment notification when only workflow assigned User was changed without posting new comment:
+		$commented_Item->send_assignment_notification();
 	}
 
 	header_redirect(); // 303 redirect

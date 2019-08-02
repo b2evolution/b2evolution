@@ -9276,7 +9276,7 @@ class Item extends ItemLight
 				$ItemStatusCache = & get_ItemStatusCache();
 				if( ! ($Element = & $ItemStatusCache->get_by_ID( $this->pst_ID, true, false ) ) )
 				{ // No status:
-					return '';
+					return T_('No status');
 				}
 				return $Element->get_name();
 
