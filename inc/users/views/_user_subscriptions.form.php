@@ -452,6 +452,10 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	{ // edited user has a permission to back-office
 		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_meta_comments', 1, T_('a meta comment is posted.'), $UserSettings->get( 'notify_meta_comments', $edited_User->ID ), $disabled );
 	}
+	if( $edited_User->check_role( 'member' ) )
+	{ // user is member of at least one collection
+		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_comment_assignment', 1, T_('a comment is posted and post was assigned to me.'), $UserSettings->get( 'notify_comment_assignment', $edited_User->ID ), $disabled );
+	}
 	$notify_options[ T_('Posts') ][] = array( 'edited_user_notify_post_mentioned', 1, T_( 'I have been mentioned on a post.' ), $UserSettings->get( 'notify_post_mentioned', $edited_User->ID ) );
 	if( $edited_User->check_role( 'post_moderator' ) )
 	{ // edited user is post moderator at least in one blog

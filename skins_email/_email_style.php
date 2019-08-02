@@ -288,6 +288,9 @@ $emailskins_styles = array(
 '.label-danger' => '
 	background-color: #d9534f;
 ',
+'.label-status-meta' => '
+	background-color: #5bc0de;
+',
 /* Polls */
 'li.evo_poll_option' => '
 	margin-top: 1ex;

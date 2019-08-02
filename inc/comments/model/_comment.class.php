@@ -3633,11 +3633,15 @@ class Comment extends DataObject
 			$executed_by_userid = $current_User->ID;
 		}
 
-		// FIRST: Moderators need to be notified immediately, even if the comment is a draft/review.
-		// Send email notifications to users who can moderate this comment:
-		$already_notified_user_IDs = $this->send_moderation_emails( $executed_by_userid, $is_new_comment );
+		// FIRST: New assigned user must be notified immediately:
+		// Send email notifications to user who was assigned to the Item of this Comment:
+		$already_notified_user_IDs = $this->send_assignment_notification( $executed_by_userid );
 
-		// SECOND: Subscribers may be notified asynchornously...
+		// SECOND: Moderators need to be notified immediately, even if the comment is a draft/review.
+		// Send email notifications to users who can moderate this comment:
+		$already_notified_user_IDs = array_merge( $already_notified_user_IDs, $this->send_moderation_emails( $executed_by_userid, $is_new_comment, $already_notified_user_IDs ) );
+
+		// THIRD: Subscribers may be notified asynchornously...
 
 		$notified_flags = array();
 		if( $force_members == 'mark' )
@@ -3736,9 +3740,10 @@ class Comment extends DataObject
 	 *
 	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by an anonymous user or current logged in User
 	 * @param boolean TRUE if it is notification about new comment, FALSE - for edited comment
+	 * @param array The already notified user IDs
 	 * @return array The notified user IDs
 	 */
-	function send_moderation_emails( $executed_by_userid = NULL, $is_new_comment = false )
+	function send_moderation_emails( $executed_by_userid = NULL, $is_new_comment = false, $already_notified_user_IDs = array() )
 	{
 		global $Settings, $UserSettings, $Messages;
 
@@ -3779,9 +3784,10 @@ class Comment extends DataObject
 			$UserCache->load_list( $moderators );
 			foreach( $moderators as $index => $moderator_ID )
 			{
-				$moderator_User = $UserCache->get_by_ID( $moderator_ID, false );
-				if( ( ! $moderator_User ) || ( ! $moderator_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) ) )
-				{	// User doesn't exists any more, or has no permission to edit this comment!
+				if( in_array( $moderator_ID, $already_notified_user_IDs ) ||
+				    ! ( $moderator_User = $UserCache->get_by_ID( $moderator_ID, false ) ) ||
+				    ! $moderator_User->check_perm( 'comment!CURSTATUS', 'edit', false, $this ) )
+				{	// User was already notified or it doesn't exist any more, or has no permission to edit this comment!
 					unset( $moderators[$index] );
 				}
 				else
@@ -4136,6 +4142,10 @@ class Comment extends DataObject
 			$meta_SQL->WHERE_and( 'uset_value = "1"'.( $Settings->get( 'def_notify_meta_comments' ) ? ' OR uset_value IS NULL' : '' ) );
 			// Check if users are activated:
 			$meta_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
+			if( ! empty( $already_notified_user_IDs ) )
+			{	// Set except moderators condition. Exclude moderators who already got a notification email:
+				$meta_SQL->WHERE_and( 'user_ID NOT IN ( "'.implode( '", "', $already_notified_user_IDs ).'" )' );
+			}
 			// Check if the users have permission to edit this Item:
 			$users_with_item_edit_perms = '( user_ID = '.$DB->quote( $comment_item_Blog->owner_user_ID ).' )';
 			$users_with_item_edit_perms .= ' OR ( grp_perm_blogs = "editall" )';
@@ -4477,6 +4487,76 @@ class Comment extends DataObject
 		blocked_emails_display( $log_messages );
 
 		return $notified_users_num;
+	}
+
+
+	/**
+	 * Send "comment assignment" notifications for user who have been assigned to the Comment's Item and would like to receive these notifications.
+	 *
+	 * @param integer User ID who executed the action which will be notified, or NULL if it was executed by current logged in User
+	 * @return array the notified user ids
+	 */
+	function send_assignment_notification( $executed_by_userid = NULL )
+	{
+		global $current_User, $Messages, $UserSettings;
+
+		$notified_user_IDs = array();
+
+		if( $executed_by_userid === NULL && is_logged_in() )
+		{	// Use current user by default:
+			global $current_User;
+			$executed_by_userid = $current_User->ID;
+		}
+
+		if( ! ( $commented_Item = & $this->get_Item() ) )
+		{	// Wrong Comment without Item:
+			return $notified_user_IDs;
+		}
+
+		if( $commented_Item->assigned_to_new_user &&
+		    $commented_Item->assigned_user_ID &&
+		    $executed_by_userid != $commented_Item->assigned_user_ID )
+		{	// Item has assigned user and the assigned user is not the one who posted this Comment:
+			$UserCache = & get_UserCache();
+			$principal_User = $UserCache->get_by_ID( $executed_by_userid, false, false );
+
+			if( ( $assigned_User = $commented_Item->get_assigned_User() ) &&
+					$UserSettings->get( 'notify_comment_assignment', $assigned_User->ID ) &&
+					$assigned_User->check_perm( 'blog_can_be_assignee', 'view', false, $commented_Item->get_blog_ID() ) )
+			{	// Assigned user wants to receive post assignment notifications and can be assigned to items of this Item's collection:
+				$user_Group = $assigned_User->get_Group();
+				$notify_full = $user_Group->check_perm( 'post_assignment_notif', 'full' );
+
+				$email_template_params = array(
+					'locale'         => $assigned_User->locale,
+					'notify_full'    => $notify_full,
+					'Comment'        => $this,
+					'principal_User' => $principal_User,
+					'recipient_User' => $assigned_User,
+				);
+
+				locale_temp_switch( $assigned_User->locale );
+
+				/* TRANS: Subject of the mail to send on new comment + post assignment to a user. First %s is collection name, 2nd - item/task priority, 3rd - task status, 4th - user login, 5th - item title. */
+				$subject = sprintf( T_('[%s][%s][%s] %s assigned you on: "%s"'),
+					$commented_Item->Blog->get( 'shortname' ),
+					$commented_Item->get( 'priority' ),
+					$commented_Item->get( 't_extra_status' ),
+					'@'.$principal_User->get( 'login' ),
+					$commented_Item->get( 'title' ) );
+
+				// Send the email:
+				if( send_mail_to_User( $assigned_User->ID, $subject, 'comment_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
+				{	// A send notification email request to the assigned user was processed:
+					$notified_user_IDs[] = $assigned_User->ID;
+					$commented_Item->display_notification_message( T_('Sending email notification to assigned user.') );
+				}
+
+				locale_restore_previous();
+			}
+		}
+
+		return $notified_user_IDs;
 	}
 
 
