@@ -63,7 +63,7 @@ class breadcrumb_path_Widget extends ComponentWidget
 					'label' => T_('Collection logo size'),
 					'options' => get_available_thumb_sizes( T_('None') ),
 					'note' => T_('Select size to display collection logo at start of breadcrumb path.'),
-					'defaultvalue' => '',
+					'defaultvalue' => 'fit-128x16',
 				),
 			), parent::get_param_definitions( $params ) );
 
