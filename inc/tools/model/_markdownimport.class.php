@@ -534,6 +534,7 @@ class MarkdownImport
 			'updated_failed'  => 0,
 			'no_changed'      => 0,
 		);
+		$imported_slugs = array();
 		foreach( $files as $file_path )
 		{
 			$file_path = str_replace( '\\', '/', $file_path );
@@ -577,6 +578,16 @@ class MarkdownImport
 
 			echo sprintf( T_('Importing post: %s'), '"<b>'.$item_title.'</b>" <code>'.$source_folder_zip_name.substr( $file_path, strlen( $folder_path ) ).'</code>: ' );
 			evo_flush();
+
+			if( in_array( $item_slug, $imported_slugs ) )
+			{	// Skip md file/post with same name from different folder/category:
+				echo '<ul class="list-default"><li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( '%s already found before, ignoring second instance.', '<code>'.$item_slug.'.md</code>' ).'</li></ul><br>';
+				evo_flush();
+				continue;
+			}
+
+			// Store imported posts slugs to avoid import md files with same name:
+			$imported_slugs[] = $item_slug;
 
 			$relative_path = substr( $file_path, $folder_path_length + 1 );
 
