@@ -161,6 +161,10 @@ class profile_menu_link_Widget extends generic_menu_link_Widget
 			return false;
 		}
 
+		$params = array_merge( array(
+				'profile_menu_link_text' => 'avatar_name',
+			), $params );
+
 		$this->init_display( $params );
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
@@ -203,6 +207,7 @@ class profile_menu_link_Widget extends generic_menu_link_Widget
 				'thumb_size'        => $this->disp_params['profile_picture_size'],
 				'link_class'        => '$link_class$',
 				'blog_ID'           => $current_Blog->ID,
+				'link_text'         => $this->disp_params['profile_menu_link_text'],
 			) );
 		echo $this->get_layout_menu_link( '', '', $highlight_current, $menu_link_template );
 

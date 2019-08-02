@@ -214,6 +214,7 @@ else
 							'widget' => 'profile_menu_link',
 							// Optional display params
 							'profile_picture_size' => 'crop-top-32x32',
+							'profile_menu_link_text' => 'avatar_force_login',
 						) ) );
 
 						// Messaging link:

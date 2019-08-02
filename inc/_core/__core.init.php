@@ -1958,7 +1958,7 @@ class _core_Module extends Module
 		$userprefs_entries = array(
 			'name' => array(
 					'text' => $current_User->get_avatar_imgtag( 'crop-top-32x32', '', 'left' ).'&nbsp;'
-										.$current_User->get_preferred_name()
+										.$current_User->get( 'login' )
 										.'<br />&nbsp;<span class="note">'.$current_user_Group->get_name().'</span>',
 					'href' => get_user_profile_url(),
 				),
@@ -2008,7 +2008,7 @@ class _core_Module extends Module
 		}
 
 		$entries['userprefs'] = array(
-				'text'    => '<strong>'.$current_User->get_colored_login( array( 'login_text' => 'name' ) ).'</strong>',
+				'text'    => '<strong>'.$current_User->get_colored_login().'</strong>',
 				'href'    => get_user_profile_url(),
 				'entries' => $userprefs_entries,
 			);
