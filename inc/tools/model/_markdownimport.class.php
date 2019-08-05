@@ -526,6 +526,8 @@ class MarkdownImport
 		load_class( 'items/model/_item.class.php', 'Item' );
 		$ItemCache = get_ItemCache();
 
+		$Plugins_admin = & get_Plugins_admin();
+
 		$posts_count = 0;
 		$post_results_num = array(
 			'added_success'   => 0,
@@ -648,9 +650,18 @@ class MarkdownImport
 			if( $this->get_option( 'force_item_update' ) || $prev_last_import_hash != $item_content_hash )
 			{	// Set new fields only when import hash(title + content + YAML data) was really changed:
 				$Item->set( 'lastedit_user_ID', $current_User->ID );
+				$Item->set( 'datemodified', date2mysql( $localtimenow ) );
+
+				// Set title and content filtered by plugins:
+				$item_Blog = & $Item->get_Blog();
+				$item_plugin_params = array(
+						'object_type' => 'Item',
+						'object'      => & $Item,
+						'object_Blog' => & $item_Blog,
+					);
+				$Plugins_admin->filter_contents( $item_title /* by ref */, $item_content /* by ref */, $Item->get_renderers(), $item_plugin_params /* by ref */ );
 				$Item->set( 'title', $item_title );
 				$Item->set( 'content', $item_content );
-				$Item->set( 'datemodified', date2mysql( $localtimenow ) );
 
 				foreach( $this->yaml_fields as $yaml_field )
 				{	// Set YAML field:
