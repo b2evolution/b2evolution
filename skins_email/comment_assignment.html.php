@@ -92,7 +92,7 @@ echo "</div>\n";
 
 // Footer vars:
 $params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more notifications when posts are assigned to you, click here:' )
-			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=comment_assignment&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
+			.' <a href="'.get_htsrv_url().'quick_unsubscribe.php?type=post_assignment&user_ID=$user_ID$&key=$unsubscribe_key$"'.emailskin_style( '.a' ).'>'
 			.T_('instant unsubscribe').'</a>.';
 
 // ---------------------------- EMAIL FOOTER INCLUDED HERE ----------------------------

@@ -188,12 +188,6 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
-				case 'comment_assignment':
-					// unsubscribe from new comment + post assignment notifications:
-					$UserSettings->set( 'notify_comment_assignment', '0', $edited_User->ID );
-					$UserSettings->dbupdate();
-					break;
-
 				case 'pst_moderation_reminder':
 					// unsubscribe from post moderation reminder notifications
 					$UserSettings->set( 'send_pst_moderation_reminder', '0', $edited_User->ID );
@@ -534,12 +528,6 @@ elseif( $confirmed )
 					$UserSettings->dbupdate();
 					break;
 
-				case 'comment_assignment':
-					// resubscribe to new comment + post assignment notifications::
-					$UserSettings->set( 'notify_comment_assignment', '1', $edited_User->ID );
-					$UserSettings->dbupdate();
-					break;
-
 				case 'pst_moderation_reminder':
 					// resubscribe from post moderation reminder notifications
 					$UserSettings->set( 'send_pst_moderation_reminder', '1', $edited_User->ID );
@@ -794,11 +782,6 @@ switch( $type )
 	case 'comment_moderator_spam':
 		// unsubscribe from spam comment may need moderation notifications:
 		$type_str = $notification_prefix.': '.T_('a comment is reported as spam and I have permissions to moderate it.');
-		break;
-
-	case 'comment_assignment':
-		// unsubscribe from new comment + post assignment notifications:
-		$type_str = $notification_prefix.': '.T_('a comment is posted and post was assigned to me.');
 		break;
 
 	case 'pst_moderation_reminder':
