@@ -213,11 +213,10 @@ $Form->begin_fieldset( T_('Category pages').get_manual_link('category-pages-seo'
 		array( 'self_canonical_cat_urls', 1, T_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_cat_urls' ) ),
 		), 'canonical_cat_urls_options', T_('Make canonical') );
 
-	$Form->checkbox( 'chapter_noindex', $edited_Blog->get_setting( 'chapter_noindex' ), T_('Indexing for set of categories'), T_('META NOINDEX') );
-
-	$Form->checkbox( 'chapter_intro_noindex', $edited_Blog->get_setting( 'chapter_intro_noindex' ), T_('Indexing for category with intro'), T_('META NOINDEX') );
-
-	$Form->checkbox( 'chapter_nointro_noindex', $edited_Blog->get_setting( 'chapter_nointro_noindex' ), T_('Indexing for category without intro'), T_('META NOINDEX') );
+	$Form->checklist( array(
+		array( 'chapter_noindex', 1, T_('META NOINDEX for category pages without intro'), $edited_Blog->get_setting( 'chapter_noindex' ) ),
+		array( 'chapter_intro_noindex', 1, T_('META NOINDEX for category pages with an intro'), $edited_Blog->get_setting( 'chapter_intro_noindex' ) ),
+		), 'chapter_noindex', T_('Indexing') );
 
 	$Form->radio( 'chapter_content', $edited_Blog->get_setting('chapter_content'),
 		array(

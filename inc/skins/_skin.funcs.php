@@ -479,7 +479,6 @@ function skin_init( $disp )
 						else
 						{	// If current category has no Intro post:
 							$disp_detail .= '-nointro';
-							$robots_index = ! $Blog->get_setting( 'chapter_nointro_noindex' );
 						}
 					}
 				}
