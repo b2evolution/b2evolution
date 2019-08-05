@@ -471,7 +471,7 @@ function skin_init( $disp )
 							break;
 						}
 
-						if( get_featured_Item( 'posts', NULL, true ) )
+						if( has_featured_Item() )
 						{	// If current category has Intro post:
 							$disp_detail .= '-intro';
 							$robots_index = ! $Blog->get_setting( 'chapter_intro_noindex' );
