@@ -494,6 +494,16 @@ function skin_init( $disp )
 							$disp = '404';
 							break;
 						}
+
+						if( get_featured_Item( 'posts', NULL, true ) )
+						{	// If current category has Intro post:
+							$disp_detail .= '-intro';
+							$robots_index = ! $Blog->get_setting( 'chapter_intro_noindex' );
+						}
+						else
+						{	// If current category has no Intro post:
+							$disp_detail .= '-nointro';
+						}
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )

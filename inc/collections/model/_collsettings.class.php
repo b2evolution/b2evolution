@@ -125,7 +125,8 @@ class CollectionSettings extends AbstractSettings
 			'relcanonical_cat_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'chapter_content'   => 'normal',
 			'chapter_posts_per_page' => 100,
-			'chapter_noindex'   => '1',					// META NOINDEX on Category pages
+			'chapter_noindex' => '1',       // META NOINDEX on Category pages without intro
+			'chapter_intro_noindex' => '0', // META NOINDEX on Category pages with an intro
 			'category_prefix'   => '',
 			'categories_meta_description' => 1,
 			'category_ordering' => 'alpha',             // Ordering of categories
