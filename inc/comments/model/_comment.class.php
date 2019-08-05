@@ -4521,7 +4521,7 @@ class Comment extends DataObject
 			$principal_User = $UserCache->get_by_ID( $executed_by_userid, false, false );
 
 			if( ( $assigned_User = $commented_Item->get_assigned_User() ) &&
-					$UserSettings->get( 'notify_comment_assignment', $assigned_User->ID ) &&
+					$UserSettings->get( 'notify_post_assignment', $assigned_User->ID ) &&
 					$assigned_User->check_perm( 'blog_can_be_assignee', 'view', false, $commented_Item->get_blog_ID() ) )
 			{	// Assigned user wants to receive post assignment notifications and can be assigned to items of this Item's collection:
 				$user_Group = $assigned_User->get_Group();

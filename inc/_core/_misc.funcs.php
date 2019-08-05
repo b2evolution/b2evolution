@@ -1367,6 +1367,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 			if( ( $b = strpos( $text, '[', $i ) ) !== false )
 			{	// Check if a bracket '[]' short tag is really opening:
 				// (we are finding here short tags like [image:], [emailcapture:], [fields:], [compare:] and etc., see full list in the Item->render_inline_tags())
+				$i = $b; // Set index to call user func below between two inline short tags
 				$b++;
 				$short_tag_name = '';
 				while( isset( $text[ $b ] ) && $text[ $b ] != ':' && $text[ $b ] != ']' )
@@ -4198,8 +4199,6 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				// 'notify_spam_cmt_moderation' - "a comment is reported as spam and I have permissions to moderate it."
 			case 'comments_unmoderated_reminder':
 				// 'send_cmt_moderation_reminder' - "comments are awaiting moderation for more than X seconds."(X = $Settings->get( 'comment_moderation_reminder_threshold' ))
-			case 'comment_assignment':
-				// 'notify_comment_assignment' - "a comment is posted and post was assigned to me."
 			case 'post_new':
 				// 'notify_post_mentioned' - "I have been mentioned on a post.",
 				// 'notify_post_moderation' - "a post is created and I have permissions to moderate it."

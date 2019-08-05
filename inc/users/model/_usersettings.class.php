@@ -144,7 +144,6 @@ class UserSettings extends AbstractSettings
 		'notify_comment_moderation' => 1, // Notify when new comment is awaiting moderation and the user has right to moderate that comment
 		'notify_edit_cmt_moderation' => 1, // Notify when edited comment is awaiting moderation and the user has right to moderate that comment
 		'notify_spam_cmt_moderation' => 1, // Notify when comment is reported as spam and the user has right to moderate that comment
-		'notify_comment_assignment' => 1, // Notify user when new comment is posted and a post is assigned to the user
 		'notify_post_mentioned' => 1, // Notify user when I have been mentioned on a post
 		'notify_post_moderation' => 1, // Notify when a new post is awaiting moderation and the user has right to moderate that post
 		'notify_edit_pst_moderation' => 1, // Notify when a edited post is awaiting moderation and the user has right to moderate that post

@@ -435,6 +435,25 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 }
 
 
+
+/**
+ * Check if the requested disp has a featured/intro Item
+ *
+ * @param string Name of $disp where we should display it
+ * @param string Collection IDs:
+ *                 NULL: depend on blog setting "Collections to aggregate"
+ *                 empty: current blog only
+ *                 "*": all blogs
+ *                 "1,2,3":blog IDs separated by comma
+ *                 "-": current blog only and exclude the aggregated blogs
+ * @return boolean
+ */
+function has_featured_item( $restrict_disp = 'posts', $coll_IDs = NULL )
+{
+	return (boolean)get_featured_Item( $restrict_disp, $coll_IDs, true );
+}
+
+
 /**
  * Get currently viewing Item or Intro Item of the current Chapter
  *

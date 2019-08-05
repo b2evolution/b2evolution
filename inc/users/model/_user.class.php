@@ -1622,7 +1622,6 @@ class User extends DataObject
 				}
 				if( $this->check_role( 'member' ) )
 				{
-					$UserSettings->set( 'notify_comment_assignment', param( 'edited_user_notify_comment_assignment', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_post_assignment', param( 'edited_user_notify_post_assignment', 'integer', 0 ), $this->ID );
 				}
 				if( $has_full_access )

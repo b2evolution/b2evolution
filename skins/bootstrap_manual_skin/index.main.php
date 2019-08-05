@@ -141,7 +141,8 @@ siteskin_include( '_site_body_header.inc.php' );
 					'categories_text'   => '',
 					'catdir_text'       => '',
 					'front_text'        => '',
-					'posts_text'        => '',
+					// Display default title only for tag page without intro Item:
+					'posts_text'        => ( isset( $tag ) && ! has_featured_Item() ? '#' : '' ),
 					'flagged_text'      => '',
 					'mustread_text'     => '',
 					'register_text'     => '',
