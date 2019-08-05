@@ -161,7 +161,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					'categories_text'   => '',
 					'catdir_text'       => '',
 					'front_text'        => '',
-					'posts_text'        => '',
+					'posts_text'        => isset( $tag ) ? '#' : '',
 					'flagged_text'      => '',
 					'register_text'     => '',
 					'login_text'        => '',
