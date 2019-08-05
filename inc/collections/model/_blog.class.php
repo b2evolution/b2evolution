@@ -3732,7 +3732,8 @@ class Blog extends DataObject
 						bloguser_perm_meta_comment, bloguser_perm_cats, bloguser_perm_properties, bloguser_perm_admin,
 						bloguser_perm_media_upload, bloguser_perm_media_browse, bloguser_perm_media_change,
 						bloguser_perm_analytics )
-					VALUES ( '.$this->ID.', '.$this->owner_user_ID.', 1, 1,
+					VALUES ( '.$this->ID.', '.$this->owner_user_ID.', 1,
+						1, 1, 1, 1,
 						1, "published,community,deprecated,protected,private,review,draft,redirected", "admin", "all",
 						1, 1,
 						1, 1, 1,
