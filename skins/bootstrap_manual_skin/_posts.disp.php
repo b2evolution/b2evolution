@@ -21,7 +21,28 @@ global $cat, $tag, $MainList;
 
 
 if( isset( $tag ) )
-{ // Display posts list for selected tag
+{	// Display posts list for selected tag:
+
+	// Go Grab the featured post:
+	$intro_Item = & get_featured_Item(); // $intro_Item is used below for comments form
+
+	if( ! empty( $intro_Item ) )
+	{ // We have a featured/intro post to display:
+		$Item = $intro_Item;
+		echo '<div class="evo_content_block">'; // Beginning of posts display
+		// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+		skin_include( '_item_block.inc.php', array_merge( array(
+				'feature_block'     => true,
+				'content_mode'      => 'auto',		// 'auto' will auto select depending on $disp-detail
+				'intro_mode'        => 'normal',	// Intro posts will be displayed in normal mode
+				'item_class'        => 'well evo_post evo_content_block',
+				'disp_notification' => false,
+				'item_link_type'    => 'none',
+				'Item'              => $Item,
+			), $Skin->get_template( 'disp_params' ) ) );
+		// ----------------------------END ITEM BLOCK  ----------------------------
+		echo '</div>'; // End of posts display
+	}
 
 	// Display message if no post:
 	display_if_empty();
@@ -51,6 +72,34 @@ if( isset( $tag ) )
 		// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 		mainlist_page_links( $params['pagination'] );
 		// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
+	}
+
+	if( ! empty( $intro_Item ) )
+	{
+		global $c, $ReqURI;
+		$c = 1; // Display comments
+
+		echo '<div class="evo_content_block">'; // Beginning of posts display
+		// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
+		skin_include( '_item_feedback.inc.php', array_merge( array(
+				'disp_comments'        => true,
+				'disp_comment_form'    => true,
+				'disp_trackbacks'      => false,
+				'disp_trackback_url'   => false,
+				'disp_pingbacks'       => false,
+				'disp_webmentions'     => false,
+				'disp_meta_comments'   => false,
+				'before_section_title' => '<h3 class="evo_comment__list_title">',
+				'after_section_title'  => '</h3>',
+				'Item'                 => $intro_Item,
+				'form_title_text'      => T_('Comment form'),
+				'comments_title_text'  => T_('Comments on this tag'),
+				'form_comment_redirect_to' => $ReqURI,
+			), $Skin->get_template( 'disp_params' ) ) );
+		// Note: You can customize the default item feedback by copying the generic
+		// /skins/_item_feedback.inc.php file into the current skin folder.
+		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
+		echo '</div>'; // End of posts display
 	}
 }
 elseif( !empty( $cat ) && ( $cat > 0 ) )

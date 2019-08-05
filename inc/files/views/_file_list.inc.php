@@ -533,7 +533,7 @@ $Form->begin_form();
 
 			$template = '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
 				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
-				.'<span class="qq-upload-drop-area-text-selector"></span>'
+				.'<div>#button_text#</div>'
 				.'</div>'
 				.'<div class="qq-upload-button-selector qq-upload-button">'
 				.'<div>#button_text#</div>'

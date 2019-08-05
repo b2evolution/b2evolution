@@ -2805,7 +2805,7 @@ function display_dragdrop_upload_button( $params = array() )
 			} );
 
 			// Update upload button text
-			jQuery( 'div.qq-upload-button-selector > div' ).html( button_text );
+			jQuery( 'div.qq-upload-button-selector > div, div.qq-upload-drop-area > div' ).html( button_text );
 		} );
 
 		<?php

@@ -164,7 +164,7 @@ display_dragdrop_upload_button( array(
 		'list_style'       => 'table',
 		'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
 				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
-					.'<span class="qq-upload-drop-area-text-selector"></span>'
+					.'<div>#button_text#</div>'
 				.'</div>'
 				.'<div class="qq-upload-button-selector qq-upload-button">'
 					.'<div>#button_text#</div>'
@@ -193,7 +193,7 @@ display_dragdrop_upload_button( array(
 							.'<td class="qq-upload-link-position lastcol shrinkwrap"></td>'
 						.'</tr>',
 		'display_support_msg'    => false,
-		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody" )',
+		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table" ).closest( "form" )',
 		'filename_before'        => '',
 		'LinkOwner'              => $LinkOwner,
 		'display_status_success' => false,

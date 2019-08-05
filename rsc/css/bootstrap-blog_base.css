@@ -1674,8 +1674,19 @@ div.qq-upload-drop-area-active {
   background: #5bc0de;
   border-radius: 9px;
 }
+div.qq-upload-drop-area {
+  background: #efbd5b;
+  padding: 7px 0;
+  text-align: center;
+  color: #FFF;
+  font-weight: bold;
+}
+div.qq-upload-drop-area > div > span {
+  font-weight: normal;
+  font-size: small;
+  margin-top: 2px;
+}
 div.qq-upload-button-hover,
-div.qq-upload-drop-area,
 div.qq-upload-drop-area-active {
   background: #5cb85c;
 }
