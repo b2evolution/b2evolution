@@ -802,6 +802,7 @@ if( in_array( $action, array( 'edit', 'elevate', 'update_publish', 'update', 'up
 switch( $action )
 {
 	case 'edit':
+		init_shortlinks_js();
 	case 'elevate':
 	case 'update':
 	case 'update_publish':

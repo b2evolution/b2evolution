@@ -349,7 +349,7 @@ ol.breadcrumb img {
 }
 .evo_comment_title .label {
   display: inline-block;
-  padding-top: 0.3em;
+  padding-top: .3em;
   position: relative;
   top: -1px;
 }
