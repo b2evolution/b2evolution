@@ -1208,6 +1208,8 @@ class Blog extends DataObject
 			$this->set_setting( 'archive_noindex', param( 'archive_noindex', 'integer', 0 ) );
 			$this->set_setting( 'archive_nofollowto', param( 'archive_nofollowto', 'integer', 0 ) );
 			$this->set_setting( 'chapter_noindex', param( 'chapter_noindex', 'integer', 0 ) );
+			$this->set_setting( 'chapter_intro_noindex', param( 'chapter_intro_noindex', 'integer', 0 ) );
+			$this->set_setting( 'chapter_nointro_noindex', param( 'chapter_nointro_noindex', 'integer', 0 ) );
 			$this->set_setting( 'tag_noindex', param( 'tag_noindex', 'integer', 0 ) );
 			$this->set_setting( 'filtered_noindex', param( 'filtered_noindex', 'integer', 0 ) );
 			$this->set_setting( 'arcdir_noindex', param( 'arcdir_noindex', 'integer', 0 ) );

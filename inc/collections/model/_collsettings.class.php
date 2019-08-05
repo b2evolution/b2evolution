@@ -123,6 +123,8 @@ class CollectionSettings extends AbstractSettings
 			'chapter_content'   => 'normal',
 			'chapter_posts_per_page' => 100,
 			'chapter_noindex'   => '1',					// META NOINDEX on Category pages
+			'chapter_intro_noindex' => '1',			// META NOINDEX on Category pages with Intro post
+			'chapter_nointro_noindex' => '1',		// META NOINDEX on Category pages without Intro post
 			'category_prefix'   => '',
 			'categories_meta_description' => 1,
 			'category_ordering' => 'alpha',             // Ordering of categories
