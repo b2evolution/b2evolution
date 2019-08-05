@@ -1337,6 +1337,7 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 			if( ( $b = strpos( $text, '[', $i ) ) !== false )
 			{	// Check if a bracket '[]' short tag is really opening:
 				// (we are finding here short tags like [image:], [emailcapture:], [fields:], [compare:] and etc., see full list in the Item->render_inline_tags())
+				$i = $b; // Set index to call user func below between two inline short tags
 				$b++;
 				$short_tag_name = '';
 				while( isset( $text[ $b ] ) && $text[ $b ] != ':' && $text[ $b ] != ']' )
