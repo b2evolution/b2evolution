@@ -484,19 +484,12 @@ class item_comment_form_Widget extends ComponentWidget
 			}
 
 			// Workflow properties:
-			if( $Comment->is_meta() &&
-			    $Item->can_edit_workflow() )
+			if( $Comment->is_meta() )
 			{	// Display workflow properties if current user can edit at least one workflow property:
-				$Item->display_workflow_field( 'status', $Form );
-
-				$Item->display_workflow_field( 'user', $Form );
-
-				$Item->display_workflow_field( 'priority', $Form );
-
-				$Item->display_workflow_field( 'deadline', $Form );
-
-				// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
-				$widget_params['form_submit_text'] = T_('Update Status').' / '.$widget_params['form_submit_text'];
+				skin_include( '_item_comment_workflow.inc.php', array_merge( $params, array(
+					'Form'    => & $Form,
+					'Comment' => & $Comment,
+				) ) );
 			}
 
 			// Set prefix for js code in plugins:
@@ -615,6 +608,19 @@ class item_comment_form_Widget extends ComponentWidget
 			}
 			// Display attachments fieldset:
 			$Form->attachments_fieldset( $Comment, false, $Comment->is_meta() ? 'meta_' : '' );
+
+			if( ! $Comment->is_meta() )
+			{	// Display workflow properties for normal comment form here:
+				skin_include( '_item_comment_workflow.inc.php', array_merge( $params, array(
+						'Form'    => & $Form,
+						'Comment' => & $Comment,
+					) ) );
+			}
+
+			if( $Item->can_edit_workflow() )
+			{	// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
+				$widget_params['form_submit_text'] = T_('Update Status').' / '.$widget_params['form_submit_text'];
+			}
 
 			$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
 

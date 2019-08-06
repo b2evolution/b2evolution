@@ -170,7 +170,7 @@ class LinkOwner
 				$this->link_Object->tmp_ID = $tmp_link_Object->ID;
 				$this->link_Object->tmp_coll_ID = $tmp_link_Object->get( 'coll_ID' );
 				$this->link_Object->tmp_item_ID = $tmp_link_Object->get( 'item_ID' );
-				$this->link_Object->type = $tmp_link_Object->get( 'type' );
+				$this->link_Object->tmp_type = $tmp_link_Object->get( 'type' );
 			}
 		}
 	}

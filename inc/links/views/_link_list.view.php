@@ -127,7 +127,7 @@ else
 // Load FileRoot class to get fileroot ID of collection below:
 load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
 
-$link_owner_type = ( $LinkOwner->type == 'temporary' ) ? $LinkOwner->link_Object->type : $LinkOwner->type;
+$link_owner_type = ( $LinkOwner->type == 'temporary' ) ? $LinkOwner->link_Object->tmp_type : $LinkOwner->type;
 
 switch( $link_owner_type )
 {

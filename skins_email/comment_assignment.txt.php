@@ -49,7 +49,17 @@ if( $params['notify_full'] )
 
 	echo str_pad( T_('Status'), $pad_len ).': '.$Item->get( 't_extra_status' )."\n";
 
-	echo T_('With the following Meta-Comment').': '."\n\n";
+	if( $Comment->is_meta() )
+	{	// Meta comment:
+		echo T_('With the following Meta-Comment');
+	}
+	else
+	{	// Normal comment:
+		$visibility_statuses = get_visibility_statuses( '', array() );
+		// TRANS: %s is comment status title, like Public, Community, etc.
+		printf( T_('With the following [%s] Comment'), $visibility_statuses[ $Comment->get( 'status' ) ] );
+	}
+	echo ': '."\n\n";
 
 	echo $Comment->get( 'content' )."\n";
 
@@ -74,7 +84,7 @@ else
 	echo sprintf( T_( '%s assigned you a post on %s with title %s.' ), $principal_User->get_username(), '"'.$Blog->get( 'shortname' ).'"', '"'.$Item->get( 'title' ).'"' );
 
 	echo "\n\n"
-		.T_('Status').': '.$Item->get( 't_extra_status' )."\n"
+		.T_('Status').': '.$Item->get( 't_extra_status' )."\n\n"
 		.T_( 'This is a short form notification. To make these emails more useful, ask the administrator to send you long form notifications instead.' )
 		."\n";
 }

@@ -291,6 +291,27 @@ $emailskins_styles = array(
 '.label-status-meta' => '
 	background-color: #5bc0de;
 ',
+'.label-status-draft' => '
+	background-color: #ff9;
+	color: #000;
+	border: 1px solid #ccc;
+',
+'.label-status-private' => '
+	background-color: #DC143C;
+',
+'.label-status-review' => '
+	background-color: #CC0099;
+',
+'.label-status-protected' => '
+	background-color: #FF9C2A;
+',
+'.label-status-community' => '
+	background-color: #2E8BB9;
+',
+'.label-status-published' => '
+	background-color: #99EE44;
+	color: #000;
+',
 /* Polls */
 'li.evo_poll_option' => '
 	margin-top: 1ex;

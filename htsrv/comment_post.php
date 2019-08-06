@@ -163,20 +163,18 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 // Check that this action request is not a CSRF hacked request:
 $Session->assert_received_crumb( 'comment' );
 
-if( $action != 'preview' )
-{	// Load workflow properties:
-	$load_workflow_result = $commented_Item->load_workflow_from_Request();
-	// Load meta custom fields:
-	$load_custom_fields_result = $commented_Item->load_custom_fields_from_Request( true );
-}
+// Load workflow properties:
+$load_workflow_result = $commented_Item->load_workflow_from_Request();
+// Load meta custom fields:
+$load_custom_fields_result = ( $comment_type == 'meta' && $commented_Item->load_custom_fields_from_Request( true ) );
+
 $workflow_is_updated = false;
-if( ! empty( $load_workflow_result ) || ! empty( $load_custom_fields_result ) )
+if( $action != 'preview' &&
+    ( ! empty( $load_workflow_result ) || ! empty( $load_custom_fields_result ) ) &&
+    $commented_Item->dbupdate() )
 {	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
-	if( $commented_Item->dbupdate() )
-	{	// Display a message on success result:
-		$Messages->add( T_('The workflow properties have been updated.'), 'success' );
-		$workflow_is_updated = true;
-	}
+	$Messages->add( T_('The workflow properties have been updated.'), 'success' );
+	$workflow_is_updated = true;
 }
 
 $comments_email_is_detected = false;
@@ -399,6 +397,16 @@ $Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
 	'Comment'    => & $Comment,
 	'is_preview' => ( $action == 'preview' ),
 ) );
+
+if( $load_workflow_result )
+{	// Store changed Item workflow properties in session Comment in order to display them after redirect:
+	$Comment->item_workflow = array(
+		'assigned_user_ID' => $commented_Item->get( 'assigned_user_ID' ),
+		'priority' => $commented_Item->get( 'priority' ),
+		'pst_ID' => $commented_Item->get( 'pst_ID' ),
+		'datedeadline' => $commented_Item->get( 'datedeadline' ),
+	);
+}
 
 // Redirect and:
 // Display error messages for the comment form OR

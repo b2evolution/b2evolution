@@ -364,29 +364,14 @@ if( $params['comment_type'] == 'meta' )
 			$Form->info_field( '', $params['policy_text'] );
 		}
 
-		// Workflow properties:
-		if( $Comment->is_meta() &&
-		    $Item->can_edit_workflow() )
-		{	// Display workflow properties if current user can edit at least one workflow property:
-			$Item->display_workflow_field( 'status', $Form );
+		// Display workflow properties if current user can edit at least one workflow property:
+		skin_include( '_item_comment_workflow.inc.php', array_merge( $params, array(
+			'Form'    => & $Form,
+			'Comment' => & $Comment,
+		) ) );
 
-			$Item->display_workflow_field( 'user', $Form );
-
-			$Item->display_workflow_field( 'priority', $Form );
-
-			$Item->display_workflow_field( 'deadline', $Form );
-
-			// Display inputs of custom fields which are allowed to be updated with meta comment:
-			$custom_fields = $Item->get_custom_fields_defs();
-			foreach( $custom_fields as $custom_field )
-			{
-				if( $custom_field['meta'] )
-				{
-					display_editable_custom_field( $custom_field['name'], $Form, $Item );
-				}
-			}
-
-			// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
+		if( $Item->can_edit_workflow() )
+		{	// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
 			$params['form_submit_text'] = T_('Update Status').' / '.$params['form_submit_text'];
 		}
 
