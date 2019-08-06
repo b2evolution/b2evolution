@@ -12579,5 +12579,29 @@ class Item extends ItemLight
 			$Messages->add_to_group( $message, $message_type, $message_group );
 		}
 	}
+
+
+	/**
+	 * Check permission of current User to edit workflow properties
+	 *
+	 * @param boolean Execution will halt if this is !0 and permission is denied
+	 * @param boolean
+	 */
+	function can_edit_workflow( $assert = false )
+	{
+		global $current_User;
+
+		return
+			// Item must be saved in DB:
+			! empty( $this->ID ) &&
+			// User must be logged in:
+			is_logged_in() &&
+			// Workflow must be enabled for current Collection:
+			$this->get_coll_setting( 'use_workflow' ) &&
+			// Current User must has a permission to be assigned for tasks of the current Collection:
+			$current_User->check_perm( 'blog_can_be_assignee', 'edit', $assert, $this->get_blog_ID() ) &&
+			// Current User must has a permission to edit this Item:
+			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', $assert, $this );
+	}
 }
 ?>

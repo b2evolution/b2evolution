@@ -4509,7 +4509,7 @@ class Comment extends DataObject
 				$subject = sprintf( T_('[%s][%s][%s] %s assigned you on: "%s"'),
 					$commented_Item->Blog->get( 'shortname' ),
 					$commented_Item->get( 'priority' ),
-					$commented_Item->get( 't_extra_status' ),
+					trim( $commented_Item->get( 't_extra_status' ) ),
 					'@'.$principal_User->get( 'login' ),
 					$commented_Item->get( 'title' ) );
 
