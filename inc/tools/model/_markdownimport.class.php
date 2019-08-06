@@ -642,7 +642,7 @@ class MarkdownImport
 			{	// Convert Markdown links to b2evolution ShortLinks:
 				// NOTE: Do this even when last import hash is different because below we may update content on import images:
 				$this->error_convert_links = array();
-				$item_content = preg_replace_callback( '#(^|[^\!])\[([^\[\]]*)\]\(((([a-z]*://)?([^\)]+[/\\\\])?([^\)]+?)(\.md)?)(\#[^\)]+)?)?\)#i', array( $this, 'callback_convert_links' ), $item_content );
+				$item_content = preg_replace_callback( '#(^|[^\!])\[([^\[\]]*)\]\(((([a-z]*://)?([^\)]+[/\\\\])?([^\)]+?)(\.[a-z]{2,4})?)(\#[^\)]+)?)?\)#i', array( $this, 'callback_convert_links' ), $item_content );
 			}
 
 			$prev_last_import_hash = $Item->get_setting( 'last_import_hash' );
@@ -775,7 +775,20 @@ class MarkdownImport
 				echo ( $this->has_yaml_messages() ? '' : ',' ).'<ul class="list-default" style="margin-bottom:0">';
 				foreach( $this->error_convert_links as $error_convert_link )
 				{
+					if( is_array( $error_convert_link ) )
+					{
+						$error_convert_link_type = $error_convert_link[1];
+						$error_convert_link = $error_convert_link[0];
+					}
+					else
+					{
+						$error_convert_link_type = 'link';
+					}
 					echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Markdown link %s could not be convered to b2evolution ShortLink.', '<code>'.$error_convert_link.'</code>' ).'</li>';
+					if( $error_convert_link_type == 'image' )
+					{	// Special warning when URL to image is used in link markdown tag:
+						echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> The above is a markdown link to an image file. Did you forget the <code>!</code> in order to make it an image inclusion, rather than a link?</li>';
+					}
 				}
 				echo '</ul>';
 			}
@@ -1242,7 +1255,9 @@ class MarkdownImport
 		}
 		else
 		{	// We cannot convert this markdown link:
-			$this->error_convert_links[] = $m[0];
+			$this->error_convert_links[] = isset( $m[8] ) && in_array( strtolower( substr( $m[8], 1 ) ), array( 'png', 'gif', 'jpg', 'jpeg', 'svg' ) )
+				? array( $m[0], 'image' )
+				: $m[0];
 			return $m[0];
 		}
 
