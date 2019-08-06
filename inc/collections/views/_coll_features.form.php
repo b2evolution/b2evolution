@@ -131,58 +131,6 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Create/Edit options').get_manual_link('blog-features-settings'), array( 'id' => 'post_options' ) );
 
-	$Form->radio( 'enable_goto_blog', $edited_Blog->get_setting( 'enable_goto_blog' ),
-		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
-			array( 'blog', T_( 'View home page' ), T_( 'Check this to automatically view the blog after publishing a post.' ) ),
-			array( 'post', T_( 'View new post' ), T_( 'Check this to automatically view the post page.' ) ), ),
-			T_( 'View blog after creating' ), true );
-
-	$Form->radio( 'editing_goto_blog', $edited_Blog->get_setting( 'editing_goto_blog' ),
-		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
-			array( 'blog', T_( 'View home page' ), T_( 'Check this to automatically view the blog after editing a post.' ) ),
-			array( 'post', T_( 'View edited post' ), T_( 'Check this to automatically view the post page.' ) ), ),
-			T_( 'View blog after editing' ), true );
-
-	// FP> TODO:
-	// -post_url  always('required')|optional|never
-	// -multilingual:  true|false   or better yet: provide a list to narrow down the active locales
-	// -tags  always('required')|optional|never
-
-	$Form->radio( 'post_categories', $edited_Blog->get_setting('post_categories'),
-		array( array( 'one_cat_post', T_('Allow only one category per post') ),
-			array( 'multiple_cat_post', T_('Allow multiple categories per post') ),
-			array( 'main_extra_cat_post', T_('Allow one main + several extra categories') ),
-			array( 'no_cat_post', T_('Don\'t allow category selections'), T_('(Main cat will be assigned automatically)') ) ),
-			T_('Post category options'), true );
-
-	$coll_in_skin_editing_options = array();
-	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
-	{	// Permission to edit advanced admin settings:
-		$coll_in_skin_editing_options[] = array( 'in_skin_editing', 1, T_('Allow posting/editing from the Front-Office').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing' ) );
-		$coll_in_skin_editing_options[] = array( 'in_skin_editing_renderers', 1, T_('Allow Text Renderers selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_renderers' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) );
-	}
-	$coll_in_skin_editing_options[] = array( 'in_skin_editing_category', 1, T_('Allow Category selection in Front-Office edit screen'), $edited_Blog->get_setting( 'in_skin_editing_category' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) );
-	$coll_in_skin_editing_options[] = array( 'in_skin_editing_category_order', 1, T_('Allow Order field in Category selection in Front-Office edit screen'), $edited_Blog->get_setting( 'in_skin_editing_category_order' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) || ! $edited_Blog->get_setting( 'in_skin_editing_category' ) );
-	$Form->checklist( $coll_in_skin_editing_options, 'front_office_posting', T_('Front-Office posting') );
-
-$Form->end_fieldset();
-
-
-$Form->begin_fieldset( T_('Voting options').get_manual_link( 'item-voting-options' ), array( 'id' => 'voting_options' ) );
-
-	$voting_disabled = ! $edited_Blog->get_setting( 'voting_positive' );
-
-	$Form->checkbox( 'voting_positive', $edited_Blog->get_setting( 'voting_positive' ), T_('Allow Positive vote'), get_icon( 'thumb_up', 'imgtag', array( 'title' => T_('Allow Positive vote') ) ) );
-
-	$Form->checkbox( 'voting_neutral', $edited_Blog->get_setting( 'voting_neutral' ), T_('Allow Neutral vote'), get_icon( 'ban', 'imgtag', array( 'title' => T_('Allow Neutral vote') ) ), '', 1, $voting_disabled );
-
-	$Form->checkbox( 'voting_negative', $edited_Blog->get_setting( 'voting_negative' ), T_('Allow Negative vote'), get_icon( 'thumb_down', 'imgtag', array( 'title' => T_('Allow Negative vote') ) ), '', 1, $voting_disabled );
-
-$Form->end_fieldset();
-
-
-$Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' ) );
-
 	$Form->checkbox( 'post_anonymous', $edited_Blog->get_setting( 'post_anonymous' ), T_('New posts by anonymous users'), T_('Check to allow anonymous users to create new posts (useful for Forums). NOTE: a user account will be automatically created when they post.') );
 
 	// Get max allowed visibility status:
@@ -222,6 +170,44 @@ $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' 
 		$Form->select_input_array( 'default_post_status_anon', $edited_Blog->get_setting( 'default_post_status_anon' ), get_visibility_statuses( 'notes-string', $exclude_statuses ), T_('Default status for new anonymous posts'), T_('Typically Review if you want to prevent Spam.') );
 	}
 
+	$Form->radio( 'enable_goto_blog', $edited_Blog->get_setting( 'enable_goto_blog' ),
+		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
+			array( 'blog', T_( 'View home page' ), T_( 'Check this to automatically view the blog after publishing a post.' ) ),
+			array( 'post', T_( 'View new post' ), T_( 'Check this to automatically view the post page.' ) ), ),
+			T_( 'View blog after creating' ), true );
+
+	$Form->radio( 'editing_goto_blog', $edited_Blog->get_setting( 'editing_goto_blog' ),
+		array( array( 'no', T_( 'No' ), T_( 'Check this to view list of the posts.' ) ),
+			array( 'blog', T_( 'View home page' ), T_( 'Check this to automatically view the blog after editing a post.' ) ),
+			array( 'post', T_( 'View edited post' ), T_( 'Check this to automatically view the post page.' ) ), ),
+			T_( 'View blog after editing' ), true );
+
+	// FP> TODO:
+	// -post_url  always('required')|optional|never
+	// -multilingual:  true|false   or better yet: provide a list to narrow down the active locales
+	// -tags  always('required')|optional|never
+
+	$Form->radio( 'post_categories', $edited_Blog->get_setting('post_categories'),
+		array( array( 'one_cat_post', T_('Allow only one category per post') ),
+			array( 'multiple_cat_post', T_('Allow multiple categories per post') ),
+			array( 'main_extra_cat_post', T_('Allow one main + several extra categories') ),
+			array( 'no_cat_post', T_('Don\'t allow category selections'), T_('(Main cat will be assigned automatically)') ) ),
+			T_('Post category options'), true );
+
+	$coll_in_skin_editing_options = array();
+	if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
+	{	// Permission to edit advanced admin settings:
+		$coll_in_skin_editing_options[] = array( 'in_skin_editing', 1, T_('Allow posting/editing from the Front-Office').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing' ) );
+		$coll_in_skin_editing_options[] = array( 'in_skin_editing_renderers', 1, T_('Allow Text Renderers selection in Front-Office edit screen').get_admin_badge(), $edited_Blog->get_setting( 'in_skin_editing_renderers' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) );
+	}
+	$coll_in_skin_editing_options[] = array( 'in_skin_editing_category', 1, T_('Allow Category selection in Front-Office edit screen'), $edited_Blog->get_setting( 'in_skin_editing_category' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) );
+	$coll_in_skin_editing_options[] = array( 'in_skin_editing_category_order', 1, T_('Allow Order field in Category selection in Front-Office edit screen'), $edited_Blog->get_setting( 'in_skin_editing_category_order' ), ! $edited_Blog->get_setting( 'in_skin_editing' ) || ! $edited_Blog->get_setting( 'in_skin_editing_category' ) );
+	$Form->checklist( $coll_in_skin_editing_options, 'front_office_posting', T_('Front-Office posting') );
+
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' ) );
+
 	// Moderation statuses setting:
 	$all_statuses = get_visibility_statuses( 'keys', NULL );
 	$not_moderation_statuses = array_diff( $all_statuses, get_visibility_statuses( 'moderation' ) );
@@ -260,6 +246,18 @@ $Form->begin_fieldset( T_('Post moderation').get_manual_link( 'post-moderation' 
 	$Form->checklist( $checklist_options, 'post_moderation_statuses', T_('"Require moderation" statuses'), false, false, array( 'note' => T_('Posts with the selected statuses will be considered to require moderation. They will trigger "moderation required" notifications and will appear as such on the collection dashboard.') ) );
 
 	$Form->text_input( 'old_content_alert', $edited_Blog->get_setting( 'old_content_alert' ), 2, T_('Stale content alert'), T_('Posts that have not been updated within the set delay will be reported to content moderators. Leave empty if you don\'t want such alerts.'), array( 'input_suffix' => ' '.T_('months').'.' ) );
+
+$Form->end_fieldset();
+
+$Form->begin_fieldset( T_('Voting options').get_manual_link( 'item-voting-options' ), array( 'id' => 'voting_options' ) );
+
+	$voting_disabled = ! $edited_Blog->get_setting( 'voting_positive' );
+
+	$Form->checkbox( 'voting_positive', $edited_Blog->get_setting( 'voting_positive' ), T_('Allow Positive vote'), get_icon( 'thumb_up', 'imgtag', array( 'title' => T_('Allow Positive vote') ) ) );
+
+	$Form->checkbox( 'voting_neutral', $edited_Blog->get_setting( 'voting_neutral' ), T_('Allow Neutral vote'), get_icon( 'ban', 'imgtag', array( 'title' => T_('Allow Neutral vote') ) ), '', 1, $voting_disabled );
+
+	$Form->checkbox( 'voting_negative', $edited_Blog->get_setting( 'voting_negative' ), T_('Allow Negative vote'), get_icon( 'thumb_down', 'imgtag', array( 'title' => T_('Allow Negative vote') ) ), '', 1, $voting_disabled );
 
 $Form->end_fieldset();
 
