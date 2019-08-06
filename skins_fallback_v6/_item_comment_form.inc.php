@@ -363,6 +363,14 @@ function validateCommentForm(form)
 			$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
 			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{	// Display workflow properties if current user has a permission:
+		if( isset( $Comment->item_workflow ) && is_array( $Comment->item_workflow ) )
+		{	// Load item workflow properties from session Comment on preview mode or after error in submitted comment form:
+			foreach( $Comment->item_workflow as $field_key => $field_value )
+			{
+				$Item->set( $field_key, $field_value );
+			}
+		}
+
 		$Form->select_input_array( 'item_priority', $Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
 
 		// Load only first 21 users to know when we should display an input box instead of full users list:

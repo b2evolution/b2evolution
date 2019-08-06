@@ -164,13 +164,12 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 $Session->assert_received_crumb( 'comment' );
 
 $workflow_is_updated = false;
-if( $action != 'preview' && $commented_Item->load_workflow_from_Request() )
+if( ( $workflow_is_loaded = $commented_Item->load_workflow_from_Request() ) &&
+    $action != 'preview' &&
+    $commented_Item->dbupdate() )
 {	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
-	if( $commented_Item->dbupdate() )
-	{	// Display a message on success result:
-		$Messages->add( T_('The workflow properties have been updated.'), 'success' );
-		$workflow_is_updated = true;
-	}
+	$Messages->add( T_('The workflow properties have been updated.'), 'success' );
+	$workflow_is_updated = true;
 }
 
 $comments_email_is_detected = false;
@@ -393,6 +392,16 @@ $Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
 	'Comment'    => & $Comment,
 	'is_preview' => ( $action == 'preview' ),
 ) );
+
+if( $workflow_is_loaded )
+{	// Store changed Item workflow properties in session Comment in order to display them after redirect:
+	$Comment->item_workflow = array(
+		'assigned_user_ID' => $commented_Item->get( 'assigned_user_ID' ),
+		'priority' => $commented_Item->get( 'priority' ),
+		'pst_ID' => $commented_Item->get( 'pst_ID' ),
+		'datedeadline' => $commented_Item->get( 'datedeadline' ),
+	);
+}
 
 // Redirect and:
 // Display error messages for the comment form OR
