@@ -476,20 +476,31 @@ body.modal-open div.token-input-dropdown-facebook {
 	z-index: 10002;
 }
 // Fix style for form of editing tags from widget:
-.evo_widget.widget_core_item_tags form {
-	display: inline-block;
-	vertical-align: middle;
-	ul.token-input-list-facebook {
-		width: 100%;
-		max-width: 100%;
-	}
-	#item_tags {
+.evo_widget.widget_core_item_tags {
+	form {
 		display: inline-block;
-		width: auto;
 		vertical-align: middle;
+		ul.token-input-list-facebook {
+			width: 100%;
+			max-width: 100%;
+		}
+		#item_tags {
+			display: inline-block;
+			width: auto;
+			vertical-align: middle;
+			width: 100%;
+		}
+		input[type=submit] {
+			margin: 0;
+		}
 	}
-	input[type=submit] {
-		margin: 0;
+	.panel-body {
+		.post_tags {
+			margin: 0;
+		}
+		form, #item_tags {
+			width: 100%;
+		}
 	}
 }
 // Fix style for author input field in search form
