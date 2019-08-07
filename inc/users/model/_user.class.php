@@ -1749,11 +1749,17 @@ class User extends DataObject
 						$subs_item_IDs = explode( ',', $subs_item_IDs );
 						$opt_out_values = array();
 						$unsubscribed = array();
+
+						// get list of aggregated items:
+						$sub_group_IDs = param( 'item_grp_sub', 'array:string' );
+						$sub_group_IDs = implode( ',', $sub_group_IDs );
+						$sub_group_IDs = explode( ',', $sub_group_IDs );
+
 						foreach( $subs_item_IDs as $loop_item_ID )
 						{
 							$isub_comments = param( 'items_subs_'.$loop_item_ID, 'integer', 0 );
 
-							if( !param( 'item_sub_'.$loop_item_ID, 'integer', 0 ) )
+							if( !param( 'item_sub_'.$loop_item_ID, 'integer', 0 ) && !in_array( $loop_item_ID, $sub_group_IDs ) )
 							{ // user wants to unsubscribe from this post notifications
 								$Item = $ItemCache->get_by_ID( $loop_item_ID );
 								$blog_ID = $Item->get_blog_ID();
