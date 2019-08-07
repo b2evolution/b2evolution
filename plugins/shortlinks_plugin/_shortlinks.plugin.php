@@ -54,6 +54,7 @@ class shortlinks_plugin extends Plugin
 				'type' => 'checklist',
 				'options' => array(
 						array( 'absolute_urls',         sprintf( $this->T_('Absolute URLs (starting with %s or %s) in brackets'), '<code>http://</code>, <code>https://</code>, <code>mailto://</code>', '<code>//</code>' ), 1 ),
+						array( 'abs_target_blank',      $this->T_('Open in new tab').' (<code>target="_blank"</code>)', 1, NULL, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:20px' ) ),
 						array( 'relative_urls',         sprintf( $this->T_('Relative URLs (starting with %s followed by a letter or digit) in brackets'), '<code>/</code>' ), 0 ),
 						array( 'anchor',                sprintf( $this->T_('Current page anchor URLs (starting with %s) in brackets'), '<code>#</code>' ), 1 ),
 						array( 'cat_slugs',             $this->T_('Category slugs in brackets'), 1 ),
@@ -427,8 +428,14 @@ class shortlinks_plugin extends Plugin
 		// Clear custom link style classes:
 		$custom_link_class = utf8_trim( str_replace( '.', ' ', $m[4] ) );
 
-		// Clear custom link target:
-		$custom_link_target = utf8_trim( $m[5] );
+		if( $m[3] != '/' && ! empty( $this->link_types['abs_target_blank'] ) )
+		{	// Force target to "_blank" for absolute URLs when it is defined in plugin settings:
+			$custom_link_target = '_blank';
+		}
+		else
+		{	// Use custom link target:
+			$custom_link_target = utf8_trim( $m[5] );
+		}
 
 		// Build a link from bracketed URL:
 		$r = '<a href="'.$m[2].'"';
