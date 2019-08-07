@@ -1467,6 +1467,13 @@ form#comment_edit {
 .evo_content_block table.item_custom_fields td {
   vertical-align: middle;
 }
+div.item_custom_fields div.row {
+  margin-top: 8px;
+  word-break: break-all;
+}
+div.item_custom_fields div.row:first-child {
+  margin-top: 0;
+}
 .evo_form__comment .panel {
   margin: 0;
   border: none;
