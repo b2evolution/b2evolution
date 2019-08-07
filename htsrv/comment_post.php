@@ -408,6 +408,19 @@ if( $load_workflow_result )
 	);
 }
 
+if( $load_custom_fields_result )
+{	// Store changed Item custom fields in session Comment in order to display them after redirect:
+	$custom_fields = $commented_Item->get_custom_fields_defs();
+	$Comment->item_custom_fields = array();
+	foreach( $custom_fields as $custom_field )
+	{
+		if( $custom_field['meta'] )
+		{
+			$Comment->item_custom_fields[ $custom_field['name'] ] = $custom_field['value'];
+		}
+	}
+}
+
 // Redirect and:
 // Display error messages for the comment form OR
 // Display success message when workflow has been updated but comment text has not been filled:

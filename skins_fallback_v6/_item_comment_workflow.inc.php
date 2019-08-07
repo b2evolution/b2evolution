@@ -51,6 +51,18 @@ $Item->display_workflow_field( 'deadline', $Form );
 if( $Comment->is_meta() )
 {	// Display inputs of custom fields which are allowed to be updated with meta comment:
 	$custom_fields = $Item->get_custom_fields_defs();
+
+	if( isset( $Comment->item_custom_fields ) && is_array( $Comment->item_custom_fields ) )
+	{	// Load item custom fields from session Comment on preview mode or after error in submitted comment form:
+		foreach( $Comment->item_custom_fields as $field_key => $field_value )
+		{
+			if( isset( $Item->custom_fields[ $field_key ] ) )
+			{	// Update value if custom field really exists for the Item:
+				$Item->custom_fields[ $field_key ]['value'] = $field_value;
+			}
+		}
+	}
+
 	foreach( $custom_fields as $custom_field )
 	{
 		if( $custom_field['meta'] )
