@@ -342,10 +342,8 @@ class bootstrap_manual_Skin extends Skin
 					}
 				}
 
-				if( ! empty( $cat ) || ! empty( $tag ) )
-				{	// Used to quick upload several files for comment of intro post:
-					init_fileuploader_js( 'blog' );
-				}
+				// Used to quick upload several files for comment of intro post:
+				init_fileuploader_js( 'blog' );
 				break;
 		}
 
