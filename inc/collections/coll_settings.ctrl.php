@@ -151,6 +151,7 @@ switch( $action )
 			case 'userdir':
 			case 'other':
 			case 'popup':
+			case 'metadata':
 			case 'more':
 				if( $edited_Blog->load_from_Request( array( $tab ) ) )
 				{ // Commit update to the DB:
@@ -1098,6 +1099,13 @@ else
 			$AdminUI->set_page_manual_link( 'features-popups' );
 			break;
 
+		case 'metadata':
+			$AdminUI->set_path( 'collections', 'features', $tab );
+			$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
+			$AdminUI->breadcrumbpath_add( T_('Meta data'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
+			$AdminUI->set_page_manual_link( 'blog-meta-data' );
+			break;
+
 		case 'more':
 			$AdminUI->set_path( 'collections', 'features', $tab );
 			$AdminUI->breadcrumbpath_add( T_('Features'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab=home' );
@@ -1206,6 +1214,9 @@ else
 					break;
 				case 'popup':
 					$AdminUI->disp_view( 'collections/views/_coll_popup.form.php' );
+					break;
+				case 'metadata':
+					$AdminUI->disp_view( 'collections/views/_coll_metadata.form.php' );
 					break;
 				case 'more':
 					$AdminUI->disp_view( 'collections/views/_coll_more.form.php' );

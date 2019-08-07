@@ -724,12 +724,6 @@ class Blog extends DataObject
 				}
 			}
 			$this->set( 'in_bloglist', param( 'blog_in_bloglist' ), $default_in_bloglist );
-
-			// Collection logo
-			$this->set_setting( 'logo_file_ID', param( 'blog_logo_file_ID' ) );
-
-			// Collection social media boilderplate
-			$this->set_setting( 'social_media_image_file_ID', param( 'blog_social_media_image_file_ID' ) );
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
@@ -773,12 +767,52 @@ class Blog extends DataObject
 			$this->set_setting( 'allow_duplicate', param( 'blog_allow_duplicate', 'integer', 0 ) );
 		}
 
-		if( in_array( 'meta', $groups ) )
-		{ // Publisher logo:
+		if( in_array( 'metadata', $groups ) )
+		{
+			// Social media boilerplate
+			$this->set_setting( 'social_media_image_file_ID', param( 'social_media_image_file_ID', 'integer', NULL ) );
+
+			if( param( 'blog_shortdesc', 'string', NULL ) !== NULL )
+			{	// Description:
+				$this->set_from_Request( 'shortdesc' );
+			}
+
+			if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
+			{	// HTML long description:
+				param_check_html( 'blog_longdesc', T_('Invalid long description') );
+				$this->set( 'longdesc', get_param( 'blog_longdesc' ) );
+			}
+
+			if( param( 'blog_keywords', 'string', NULL ) !== NULL )
+			{	// Keywords:
+				$this->set_from_Request( 'keywords' );
+			}
+
+			// Publisher logo:
 			$this->set_setting( 'publisher_logo_file_ID', param( 'blog_publisher_logo_file_ID' ) );
 
-			// Publisher name:
-			$this->set_setting( 'publisher_name', param( 'blog_publisher_name' ) );
+			if( param( 'blog_publisher_name', 'string', NULL ) !== NULL )
+			{	// Publisher name:
+				$this->set_setting( 'publisher_name', param( 'blog_publisher_name' ) );
+			}
+
+			if( param( 'blog_footer_text', 'html', NULL ) !== NULL )
+			{ // Blog footer:
+				param_check_html( 'blog_footer_text', T_('Invalid blog footer') );
+				$this->set_setting( 'blog_footer_text', get_param( 'blog_footer_text' ) );
+			}
+
+			if( param( 'single_item_footer_text', 'html', NULL ) !== NULL )
+			{ // Blog footer:
+				param_check_html( 'single_item_footer_text', T_('Invalid single post footer') );
+				$this->set_setting( 'single_item_footer_text', get_param( 'single_item_footer_text' ) );
+			}
+
+			if( param( 'xml_item_footer_text', 'html', NULL ) !== NULL )
+			{ // Blog footer:
+				param_check_html( 'xml_item_footer_text', T_('Invalid RSS footer') );
+				$this->set_setting( 'xml_item_footer_text', get_param( 'xml_item_footer_text' ) );
+			}
 		}
 
 		if( param( 'image_size', 'string', NULL ) !== NULL )
@@ -918,43 +952,11 @@ class Blog extends DataObject
 			$this->set_setting( 'comments_per_feed', get_param( 'comments_per_feed' ) );
 		}
 
-		if( param( 'blog_shortdesc', 'string', NULL ) !== NULL )
-		{	// Description:
-			$this->set_from_Request( 'shortdesc' );
-		}
-
-		$this->set_setting( 'social_media_image_file_ID', param( 'social_media_image_file_ID', 'integer', NULL ) );
-
-		if( param( 'blog_keywords', 'string', NULL ) !== NULL )
-		{	// Keywords:
-			$this->set_from_Request( 'keywords' );
-		}
-
 		if( param( 'blog_tagline', 'string', NULL ) !== NULL )
 		{	// tagline:
 			$this->set( 'tagline', get_param( 'blog_tagline' ) );
 		}
-		if( param( 'blog_longdesc', 'html', NULL ) !== NULL )
-		{	// HTML long description:
-			param_check_html( 'blog_longdesc', T_('Invalid long description') );
-			$this->set( 'longdesc', get_param( 'blog_longdesc' ) );
-		}
 
-		if( param( 'blog_footer_text', 'html', NULL ) !== NULL )
-		{ // Blog footer:
-			param_check_html( 'blog_footer_text', T_('Invalid blog footer') );
-			$this->set_setting( 'blog_footer_text', get_param( 'blog_footer_text' ) );
-		}
-		if( param( 'single_item_footer_text', 'html', NULL ) !== NULL )
-		{ // Blog footer:
-			param_check_html( 'single_item_footer_text', T_('Invalid single post footer') );
-			$this->set_setting( 'single_item_footer_text', get_param( 'single_item_footer_text' ) );
-		}
-		if( param( 'xml_item_footer_text', 'html', NULL ) !== NULL )
-		{ // Blog footer:
-			param_check_html( 'xml_item_footer_text', T_('Invalid RSS footer') );
-			$this->set_setting( 'xml_item_footer_text', get_param( 'xml_item_footer_text' ) );
-		}
 		if( param( 'blog_notes', 'html', NULL ) !== NULL )
 		{	// HTML notes:
 			param_check_html( 'blog_notes', T_('Invalid Blog Notes') );
@@ -6401,8 +6403,8 @@ class Blog extends DataObject
 
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * Check if this collection has a requested locale
 	 *

@@ -406,20 +406,10 @@ if( ! $is_creating )
 
 	$Form->begin_fieldset( T_('Description').get_manual_link( 'collection-description' ) );
 
-		$collection_logo_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select collection logo'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
-		$Form->fileselect( 'blog_logo_file_ID', $edited_Blog->get_setting( 'logo_file_ID' ), T_('Collection logo'), T_('This is used to add Structured Data to your pages.'), $collection_logo_params );
-
-		$social_media_boilerplate_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select logo for social media boilerplate'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
-		$Form->fileselect( 'blog_social_media_image_file_ID', $edited_Blog->get_setting( 'social_media_image_file_ID' ), T_('Social media boilerplate'), T_('This is used to add Structured Data to your pages.'), $social_media_boilerplate_params );
-
 		$Form->text( 'blog_tagline', $edited_Blog->get( 'tagline' ), 50, T_('Tagline'), T_('This is typically displayed by a widget right under the collection name in the front-office.'), 250 );
 
-		$shortdesc_chars_count = utf8_strlen( html_entity_decode( $edited_Blog->get( 'shortdesc' ) ) );
-		$Form->text( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ), 60, T_('Short Description'), T_('This is is used in meta tag description and RSS feeds. NO HTML!')
-			.' ('.sprintf( T_('%s characters'), '<span id="blog_shortdesc_chars_count">'.$shortdesc_chars_count.'</span>' ).')', 250, 'large' );
-
-		$Form->textarea( 'blog_longdesc', $edited_Blog->get( 'longdesc' ), 5, T_('Long Description'), T_('This will be used in Open Graph tags and XML feeds. This may also be displayed by widgets in the front-office.')
-			.' '.T_(' HTML markup possible but not recommended.'), 50 );
+		$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 5, T_('Dashboard notes'),
+			T_('Additional info. Appears in the backoffice.'), 50 );
 
 	$Form->end_fieldset();
 }
@@ -431,33 +421,6 @@ else
 	$Form->hidden( 'blog_shortdesc', $edited_Blog->get( 'shortdesc' ) );
 	$Form->hidden( 'blog_longdesc', $edited_Blog->get( 'longdesc' ) );
 }
-
-if( ! $is_creating )
-{
-	$Form->begin_fieldset( T_('Meta data').get_manual_link('blog-meta-data') );
-		$social_media_boilerplate_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select logo for social media boilerplate'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
-		$Form->fileselect( 'social_media_image_file_ID', $edited_Blog->get_setting( 'social_media_image_file_ID' ), T_('Social media boilerplate'), NULL, $social_media_boilerplate_params );
-		$Form->text( 'blog_keywords', $edited_Blog->get( 'keywords' ), 60, T_('Keywords'), T_('This is is used in meta tag keywords. NO HTML!'), 250, 'large' );
-		$Form->text( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ), 60, T_('Blog footer'), sprintf(
-			T_('Use &lt;br /&gt; to insert a line break. You might want to put your copyright or <a href="%s" target="_blank">creative commons</a> notice here.'),
-			'http://creativecommons.org/license/' ), 1000, 'large' );
-		$Form->textarea( 'single_item_footer_text', $edited_Blog->get_setting( 'single_item_footer_text' ), 2, T_('Single post footer'),
-			T_('This will be displayed after each post in single post view.').' '.sprintf( T_('Available variables: %s.'), '<b>$perm_url$</b>, <b>$title$</b>, <b>$excerpt$</b>, <b>$author$</b>, <b>$author_login$</b>' ), 50 );
-		$Form->textarea( 'xml_item_footer_text', $edited_Blog->get_setting( 'xml_item_footer_text' ), 2, T_('Post footer in RSS/Atom'),
-			T_('This will be appended to each post in your RSS/Atom feeds.').' '.sprintf( T_('Available variables: %s.'), T_('same as above') ), 50 );
-		$Form->textarea( 'blog_notes', $edited_Blog->get( 'notes' ), 5, T_('Notes'),
-			T_('Additional info. Appears in the backoffice.'), 50 );
-	$Form->end_fieldset();
-}
-else
-{
-	$Form->hidden( 'blog_keywords', $edited_Blog->get( 'keywords' ) );
-	$Form->hidden( 'blog_footer_text', $edited_Blog->get_setting( 'blog_footer_text' ) );
-	$Form->hidden( 'single_item_footer_text', $edited_Blog->get_setting( 'single_item_footer_text' ) );
-	$Form->hidden( 'xml_item_footer_text', $edited_Blog->get_setting( 'xml_item_footer_text' ) );
-	$Form->hidden( 'blog_notes', $edited_Blog->get( 'notes' ) );
-}
-
 
 $Form->buttons( array( array( 'submit', 'submit', ( $action == 'copy' ? T_('Duplicate NOW!') : T_('Save Changes!') ), 'SaveButton' ) ) );
 

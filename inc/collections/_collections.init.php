@@ -879,6 +879,9 @@ class collections_Module extends Module
 							'popup' => array(
 								'text' => T_('Popups'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=popup&amp;blog='.$blog ),
+							'metadata' => array(
+								'text' => T_('Meta data'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=metadata&amp;blog='.$blog ),
 							'more' => array(
 								'text' => T_('More'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=more&amp;blog='.$blog ),

@@ -2762,7 +2762,7 @@ function skin_structured_data()
 					}
 					if( empty( $publisher_logo_url ) )
 					{ // No publisher logo found, fallback to collection logo:
-						$collection_logo_file_ID = $Blog->get_setting( 'logo_file_ID' );
+						$collection_logo_file_ID = $Blog->get_setting( 'collection_logo_file_ID' );
 						$collection_logo_File = & $FileCache->get_by_ID( $collection_logo_file_ID, false, false );
 						if( $collection_logo_File && $collection_logo_File->is_image() )
 						{

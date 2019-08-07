@@ -1607,6 +1607,10 @@ class _core_Module extends Module
 											'text' => T_('Popups').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=popup'.$blog_param,
 										),
+									'metadata' => array(
+											'text' => T_('Meta data').'&hellip;',
+											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=metadata'.$blog_param,
+										),
 									'more' => array(
 											'text' => T_('More').'&hellip;',
 											'href' => $admin_url.'?ctrl=coll_settings&amp;tab=more'.$blog_param,
