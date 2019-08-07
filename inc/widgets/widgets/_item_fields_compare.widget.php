@@ -253,32 +253,6 @@ class item_fields_compare_Widget extends ComponentWidget
 				'lines_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
-				'layout_layout_start' => array(
-					'layout' => 'begin_fieldset',
-					'label'  => T_('Layout')
-				),
-					'layout' => array(
-						'label' => T_('Layout'),
-						'type' => 'select',
-						'options' => array(
-								'table' => T_('Table'),
-								'rwd'   => T_('RWD'),
-							),
-						'defaultvalue' => 'table',
-					),
-					'rwd_class_label' => array(
-						'label' => T_('RWD Class for Labels'),
-						'defaultvalue' => 'col-md-12 col-xs-6',
-						'size' => 100,
-					),
-					'rwd_class_content' => array(
-						'label' => T_('RWD Class for Contents'),
-						'defaultvalue' => 'col-md-12 col-xs-6',
-						'size' => 100,
-					),
-				'layout_layout_end' => array(
-					'layout' => 'end_fieldset',
-				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -294,67 +268,26 @@ class item_fields_compare_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
-		switch( $this->get_param( 'layout' ) )
-		{
-			case 'rwd':
-				$rwd_class_label = trim( $this->get_param( 'rwd_class_label' ) );
-				if( ! empty( $rwd_class_label ) )
-				{
-					$rwd_class_label .= ' ';
-				}
-				$rwd_class_content = trim( $this->get_param( 'rwd_class_content' ) );
-				if( ! empty( $rwd_class_content ) )
-				{
-					$rwd_class_content .= ' ';
-				}
-				$default_layout_params = array(
-						'custom_fields_table_start'                => '<div class="evo_content_block"><div class="item_custom_fields">',
-						'custom_fields_row_start'                  => '<div class="row">',
-						'custom_fields_topleft_cell'               => '<div class="'.$rwd_class_label.'" style="border:none"></div>',
-						'custom_fields_col_header_item'            => '<div class="'.$rwd_class_label.'center" width="$col_width$"$col_attrs$>$item_link$$item_status$</div>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
-						'custom_fields_row_header_field'           => '<div class="'.$rwd_class_label.'$header_cell_class$"><b>$field_title$$field_description_icon$:</b></div>',
-						'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
-						'custom_fields_description_icon_class'     => 'grey',
-						'custom_fields_value_default'              => '<div class="'.$rwd_class_content.'$data_cell_class$"$data_cell_attrs$>$field_value$</div>',
-						'custom_fields_value_difference_highlight' => '<div class="'.$rwd_class_content.'$data_cell_class$ bg-warning"$data_cell_attrs$>$field_value$</div>',
-						'custom_fields_value_green'                => '<div class="'.$rwd_class_content.'$data_cell_class$ bg-success"$data_cell_attrs$>$field_value$</div>',
-						'custom_fields_value_red'                  => '<div class="'.$rwd_class_content.'$data_cell_class$ bg-danger"$data_cell_attrs$>$field_value$</div>',
-						'custom_fields_edit_link_cell'             => '<div class="'.$rwd_class_content.'center">$edit_link$</div>',
-						'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
-						'custom_fields_row_end'                    => '</div>',
-						'custom_fields_table_end'                  => '</div></div>',
-						// Separate template for separator fields:
-						// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-						'custom_fields_separator_row_header_field' => '<div class="col-xs-12 $header_cell_class$" colspan="$cols_count$"><b>$field_title$$field_description_icon$</b></div>',
-					);
-				break;
-
-			case 'table':
-			default:
-				$default_layout_params = array(
-						'custom_fields_table_start'                => '<div class="evo_content_block"><table class="item_custom_fields">',
-						'custom_fields_row_start'                  => '<tr>',
-						'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
-						'custom_fields_col_header_item'            => '<th class="center" width="$col_width$"$col_attrs$>$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
-						'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
-						'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
-						'custom_fields_description_icon_class'     => 'grey',
-						'custom_fields_value_default'              => '<td class="$data_cell_class$"$data_cell_attrs$>$field_value$</td>',
-						'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning"$data_cell_attrs$>$field_value$</td>',
-						'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success"$data_cell_attrs$>$field_value$</td>',
-						'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger"$data_cell_attrs$>$field_value$</td>',
-						'custom_fields_edit_link_cell'             => '<td class="center">$edit_link$</td>',
-						'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
-						'custom_fields_row_end'                    => '</tr>',
-						'custom_fields_table_end'                  => '</table></div>',
-						// Separate template for separator fields:
-						// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
-						'custom_fields_separator_row_header_field' => '<th class="$header_cell_class$" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
-					);
-				break;
-		}
-
-		$this->disp_params = array_merge( $default_layout_params, $this->disp_params );
+		$this->disp_params = array_merge( array(
+				'custom_fields_table_start'                => '<div class="evo_content_block"><table class="item_custom_fields">',
+				'custom_fields_row_start'                  => '<tr>',
+				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
+				'custom_fields_col_header_item'            => '<th class="center" width="$col_width$"$col_attrs$>$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
+				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
+				'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
+				'custom_fields_description_icon_class'     => 'grey',
+				'custom_fields_value_default'              => '<td class="$data_cell_class$"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger"$data_cell_attrs$>$field_value$</td>',
+				'custom_fields_edit_link_cell'             => '<td class="center">$edit_link$</td>',
+				'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
+				'custom_fields_row_end'                    => '</tr>',
+				'custom_fields_table_end'                  => '</table></div>',
+				// Separate template for separator fields:
+				// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
+				'custom_fields_separator_row_header_field' => '<th class="$header_cell_class$" colspan="$cols_count$">$field_title$$field_description_icon$</th>',
+			), $this->disp_params );
 
 		// Get IDs of items which should be compared:
 		$items = $this->get_items_IDs();
@@ -571,7 +504,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				continue;
 			}
 
-			if( isset( $Item ) && $Item->ID == $widget_Item->ID && $Item->is_revision() )
+			if( ! empty( $Item ) && $Item->ID == $widget_Item->ID && $Item->is_revision() )
 			{	// Display data from requested revision of the Item:
 				$widget_Item->set( 'revision', $Item->revision );
 			}

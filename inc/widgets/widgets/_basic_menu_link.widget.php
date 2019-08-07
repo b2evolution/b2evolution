@@ -153,6 +153,8 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		$coll_id_is_disabled = ( in_array( $current_link_type, array( 'ownercontact', 'owneruserinfo', 'myprofile', 'profile', 'avatar' ) )
 			&& $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) );
 
+		load_funcs( 'files/model/_image.funcs.php' );
+
 		$r = array_merge( array(
 				'link_type' => array(
 					'label' => T_( 'Link Type' ),
@@ -166,6 +168,12 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'note' => T_( 'Text to use for the link (leave empty for default).' ),
 					'type' => 'text',
 					'size' => 20,
+					'defaultvalue' => '',
+				),
+				'coll_logo_size' => array(
+					'type' => 'select',
+					'label' => T_('Collection logo before link text'),
+					'options' => get_available_thumb_sizes( T_('No logo') ),
 					'defaultvalue' => '',
 				),
 				'blog_ID' => array(
@@ -288,7 +296,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		* @var Blog
 		*/
 		global $Collection, $Blog;
-		global $disp, $cat;
+		global $disp, $cat, $thumbnail_sizes;
 
 		$this->init_display( $params );
 
@@ -673,6 +681,13 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		if( ! empty( $this->disp_params['link_text'] ) )
 		{ // We have a custom link text:
 			$text = $this->disp_params['link_text'];
+		}
+
+		if( ! empty( $this->disp_params['coll_logo_size'] ) &&
+		    isset( $thumbnail_sizes[ $this->disp_params['coll_logo_size'] ] ) &&
+		    $coll_logo_File = $current_Blog->get( 'collection_image' ) )
+		{	// Display collection logo before breadcrumb path:
+			$text = $coll_logo_File->get_thumb_imgtag( $this->disp_params['coll_logo_size'] ).' '.$text;
 		}
 
 		// Display a layout with menu link:

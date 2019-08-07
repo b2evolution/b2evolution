@@ -304,6 +304,9 @@ body.evo_toolbar_visible div#skin_wrapper .evo_container__site_header {
 ol.breadcrumb {
   margin-left: 0;
 }
+ol.breadcrumb img {
+  margin-top: -2px;
+}
 .evo_post_title,
 .cat_title {
   display: -ms-flexbox;

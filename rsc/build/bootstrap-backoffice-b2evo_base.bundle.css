@@ -2837,9 +2837,17 @@ body.modal-open div.token-input-dropdown-facebook {
   display: inline-block;
   width: auto;
   vertical-align: middle;
+  width: 100%;
 }
 .evo_widget.widget_core_item_tags form input[type=submit] {
   margin: 0;
+}
+.evo_widget.widget_core_item_tags .panel-body .post_tags {
+  margin: 0;
+}
+.evo_widget.widget_core_item_tags .panel-body form,
+.evo_widget.widget_core_item_tags .panel-body #item_tags {
+  width: 100%;
 }
 .extended_search_form ul.token-input-list-facebook {
   max-width: 100%;
