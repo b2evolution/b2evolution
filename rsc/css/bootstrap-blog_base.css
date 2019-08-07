@@ -1818,3 +1818,6 @@ div.evo_fileuploader_form {
   outline-offset: -1px;
   vertical-align: top;
 }
+.evo_widget.widget_core_basic_menu_link img {
+  margin-top: -2px;
+}

@@ -293,6 +293,9 @@ div#skin_wrapper.skin_wrapper_loggedin .sitewide_header {
 ol.breadcrumb {
   margin-left: 0;
 }
+ol.breadcrumb img {
+  margin-top: -2px;
+}
 .evo_post_title,
 .cat_title {
   display: table;

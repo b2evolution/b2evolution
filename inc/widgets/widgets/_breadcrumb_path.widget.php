@@ -189,7 +189,7 @@ class breadcrumb_path_Widget extends ComponentWidget
 		if( ! empty( $this->disp_params['coll_logo_size'] ) &&
 		    isset( $thumbnail_sizes[ $this->disp_params['coll_logo_size'] ] ) &&
 		    $coll_logo_File = $Blog->get( 'collection_image' ) )
-		{	// 
+		{	// Display collection logo before breadcrumb path:
 			echo $coll_logo_File->get_thumb_imgtag( $this->disp_params['coll_logo_size'] ).' ';
 		}
 
