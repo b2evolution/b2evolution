@@ -14,7 +14,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $Item, $Collection, $Blog, $app_version;
+global $Item, $Collection, $Blog, $cat, $app_version;
 
 // Default params:
 $params = array_merge( array(
@@ -68,7 +68,7 @@ $params = array_merge( array(
 			'text'   => '#icon#',
 			'class'  => button_class(),
 		) );
-	if( $Item->is_intro() )
+	if( $Item->is_intro() && ! empty( $cat ) )
 	{ // Link to edit category
 		$ItemChapter = & $Item->get_main_Chapter();
 		if( !empty( $ItemChapter ) )
