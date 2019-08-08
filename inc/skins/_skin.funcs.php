@@ -136,9 +136,8 @@ function skin_init( $disp )
 
 		case 'search':
 			// Searching post, comments and categories
+			// Load functions to work with search results:
 			load_funcs( 'collections/_search.funcs.php' );
-			// Check previous search keywords so it can be displayed in the search input box
-			param( 's', 'string', '', true );
 			break;
 	}
 
@@ -1756,6 +1755,8 @@ function skin_init( $disp )
 			// This MAY or MAY not have exited -- will exit on 30x redirect, otherwise will return here.
 			// Just in case some dumb robot needs extra directives on this:
 			$robots_index = false;
+			// Load functions to work with search results:
+			load_funcs( 'collections/_search.funcs.php' );
 			break;
 	}
 
