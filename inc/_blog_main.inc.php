@@ -946,6 +946,21 @@ skin_init_global_vars();
 // Check if current user has access to this blog
 $Blog->check_access();
 
+// Set correct status code for 403 and 404 pages:
+switch( $disp )
+{
+	case '403':
+		// We have a 403 forbidden content error:
+		header_http_response( '403 Forbidden' );
+		break;
+
+	case '404':
+		// We have a 404 unresolved content error
+		// How do we want do deal with it?
+		skin_404_header();
+		break;
+}
+
 
 /*
  * _______________________________ READY TO DISPLAY _______________________________
