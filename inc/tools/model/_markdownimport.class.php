@@ -645,6 +645,9 @@ class MarkdownImport
 				$item_content = preg_replace_callback( '#(^|[^\!])\[([^\[\]]*)\]\(((([a-z]*://)?([^\)]+[/\\\\])?([^\)]+?)(\.[a-z]{2,4})?)(\#[^\)]+)?)?\)#i', array( $this, 'callback_convert_links' ), $item_content );
 			}
 
+			// Set flag to don't filter content twice by renderer plugins:
+			$item_is_filtered_by_plugins = false;
+
 			$prev_last_import_hash = $Item->get_setting( 'last_import_hash' );
 			$Item->set_setting( 'last_import_hash', $item_content_hash );
 			if( $this->get_option( 'force_item_update' ) || $prev_last_import_hash != $item_content_hash )
@@ -652,14 +655,15 @@ class MarkdownImport
 				$Item->set( 'lastedit_user_ID', $current_User->ID );
 				$Item->set( 'datemodified', date2mysql( $localtimenow ) );
 
-				// Set title and content filtered by plugins:
+				// Filter title and content by renderer plugins:
+				$item_is_filtered_by_plugins = true;
 				$item_Blog = & $Item->get_Blog();
 				$item_plugin_params = array(
 						'object_type' => 'Item',
 						'object'      => & $Item,
 						'object_Blog' => & $item_Blog,
 					);
-				$Plugins_admin->filter_contents( $item_title /* by ref */, $item_content /* by ref */, $Item->get_renderers(), $item_plugin_params /* by ref */ );
+				$Plugins_admin->filter_contents( $item_title /* by ref */, $item_content /* by ref */, $Item->get_renderers_validated(), $item_plugin_params /* by ref */ );
 				$Item->set( 'title', $item_title );
 				$Item->set( 'content', $item_content );
 
@@ -844,6 +848,16 @@ class MarkdownImport
 								.' -> './* TRANS: Result of imported Item */ T_('Saving <code>[image:]</code> tags to DB').'.';
 						}
 						echo '</li>';
+						if( ! $item_is_filtered_by_plugins )
+						{	// Filter title and content by renderer plugins:
+							$item_Blog = & $Item->get_Blog();
+							$item_plugin_params = array(
+									'object_type' => 'Item',
+									'object'      => & $Item,
+									'object_Blog' => & $item_Blog,
+								);
+							$Plugins_admin->filter_contents( $item_title /* by ref */, $updated_item_content /* by ref */, $Item->get_renderers_validated(), $item_plugin_params /* by ref */ );
+						}
 						$Item->set( 'content', $updated_item_content );
 						// This is UPDATE 2 of 2 . It is only for [image:] tags.
 						$Item->dbupdate( true, true, true, 'no'/* Force to do NOT create new revision because we do this above when store new content */ );      
