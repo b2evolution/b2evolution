@@ -9800,4 +9800,37 @@ function get_import_attachments_folder( $file_path, $first_folder = false )
 	// File has no attachments folder
 	return false;
 }
+
+
+/**
+ * Clear string list of IDs to exclude wrong not ID/number/integer value
+ *
+ * @param string ID values separated by second param
+ * @param string Separator
+ * @return string Fixed list
+ */
+function clear_ids_list( $ids_list, $separator = ',' )
+{
+	if( $ids_list === '' )
+	{	// Empty list:
+		return $ids_list;
+	}
+
+	if( strpos( $ids_list, '-' ) === 0 )
+	{	// Remove first '-' char from start, which is used for exluding list:
+		$ids_list = substr( $ids_list, 1 );
+	}
+
+	$ids_list = explode( $separator, $ids_list );
+
+	foreach( $ids_list as $i => $ID )
+	{
+		if( ! is_number( $ID ) )
+		{	// Remove a not number value from list:
+			unset( $ids_list[ $i ] );
+		}
+	}
+
+	return implode( $separator, $ids_list );
+}
 ?>
