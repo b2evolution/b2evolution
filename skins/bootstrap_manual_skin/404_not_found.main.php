@@ -31,7 +31,7 @@ if( ! empty( $requested_404_title ) )
 
 // This is the main template; it may be used to display very different things.
 // Do inits depending on current $disp:
-skin_init( ! empty( $requested_404_title ) ? 'search' : $disp );
+skin_init( $disp );
 
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------

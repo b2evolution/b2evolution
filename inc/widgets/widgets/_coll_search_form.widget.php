@@ -172,9 +172,12 @@ class coll_search_form_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Settings;
+		global $Settings, $requested_404_title;
 
 		$this->init_display( $params );
+
+		// Check previous search keywords so it can be displayed in the search input box
+		param( 's', 'string', empty( $requested_404_title ) ? '' : $requested_404_title, true );
 
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 		if( $blog_ID > 0 )
