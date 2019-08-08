@@ -1787,6 +1787,15 @@ class _core_Module extends Module
 					);
 				}
 
+				global $http_response_code;
+				if( ! empty( $http_response_code ) )
+				{
+					$dev_entries['http_response_code'] = array(
+						'text' => 'HTTP Resp: '.$http_response_code,
+						'disabled' => true,
+					);
+				}
+
 				if( $robots_index === false )
 				{
 					$debug_text = 'NO INDEX';
