@@ -417,9 +417,16 @@ function skin_init( $disp )
 				{ // This is just a follow "paged" page
 					$disp_detail = 'posts-next';
 					$seo_page_type = 'Next page';
-					if( $Blog->get_setting( 'paged_noindex' ) )
-					{	// We prefer robots not to index category pages:
-						$robots_index = false;
+
+					if( has_featured_Item() )
+					{	// If current next page has Intro post:
+						$disp_detail .= '-intro';
+						$robots_index = ! $Blog->get_setting( 'paged_intro_noindex' );
+					}
+					else
+					{	// If current next page has no Intro post:
+						$disp_detail .= '-nointro';
+						$robots_index = ! $Blog->get_setting( 'paged_noindex' );
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'cat_single', 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
@@ -509,10 +516,6 @@ function skin_init( $disp )
 				{ // This is a tag page
 					$disp_detail = 'posts-tag';
 					$seo_page_type = 'Tag page';
-					if( $Blog->get_setting( 'tag_noindex' ) )
-					{	// We prefer robots not to index tag pages:
-						$robots_index = false;
-					}
 
 					if( ( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 					    || $Blog->get_setting( 'relcanonical_tag_urls' )
@@ -540,6 +543,17 @@ function skin_init( $disp )
 					if( $post_navigation == 'same_tag' && !empty( $tag ) )
 					{ // Tag is set and post navigation should go through the same tag, set navigation target param
 						$MainList->nav_target = $tag;
+					}
+
+					if( has_featured_Item() )
+					{	// If current tag has Intro post:
+						$disp_detail .= '-intro';
+						$robots_index = ! $Blog->get_setting( 'tag_intro_noindex' );
+					}
+					else
+					{	// If current tag has no Intro post:
+						$disp_detail .= '-nointro';
+						$robots_index = ! $Blog->get_setting( 'tag_noindex' );
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'ymdhms', 'week', 'posts', 'page' ) ) == array() ) // fp> added 'posts' 2009-05-19; can't remember why it's not in there
@@ -580,9 +594,16 @@ function skin_init( $disp )
 					// pre_dump( $active_filters );
 					$disp_detail = 'posts-filtered';
 					$seo_page_type = 'Other filtered page';
-					if( $Blog->get_setting( 'filtered_noindex' ) )
-					{	// We prefer robots not to index other filtered pages:
-						$robots_index = false;
+
+					if( has_featured_Item() )
+					{	// If current filtered page has Intro post:
+						$disp_detail .= '-intro';
+						$robots_index = ! $Blog->get_setting( 'filtered_intro_noindex' );
+					}
+					else
+					{	// If current filtered page has no Intro post:
+						$disp_detail .= '-nointro';
+						$robots_index = ! $Blog->get_setting( 'filtered_noindex' );
 					}
 				}
 			}

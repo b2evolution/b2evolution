@@ -79,7 +79,8 @@ $Form->begin_fieldset( T_('Browsing posts pages').' <span class="text-muted">(di
 	$Form->checkbox( 'posts_firstpage_noindex', $edited_Blog->get_setting( 'posts_firstpage_noindex' ), T_('First posts page'), T_('META NOINDEX') );
 
 	$Form->checklist( array(
-			array( 'paged_noindex', 1, T_('META NOINDEX').' - '.T_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_noindex' ) ),
+			array( 'paged_noindex', 1, T_('META NOINDEX').' - '.T_('Page 2,3,4, etc. without intro'), $edited_Blog->get_setting( 'paged_noindex' ) ),
+			array( 'paged_intro_noindex', 1, T_('META NOINDEX').' - '.T_('Page 2,3,4, etc. with an intro'), $edited_Blog->get_setting( 'paged_intro_noindex' ) ),
 			array( 'paged_nofollowto', 1, T_('NOFOLLOW on links to').' '.T_('Page 2,3,4...'), $edited_Blog->get_setting( 'paged_nofollowto' ) ),
 		), 'paged', T_('Next posts pages') );
 
@@ -271,7 +272,10 @@ $Form->begin_fieldset( T_('Tag pages').get_manual_link('tag-pages-seo'), array('
 		array( 'self_canonical_tag_urls', 1, T_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_tag_urls' ) ),
 		), 'canonical_tag_urls_options', T_('Make canonical') );
 
-	$Form->checkbox( 'tag_noindex', $edited_Blog->get_setting( 'tag_noindex' ), T_('Indexing'), T_('META NOINDEX') );
+	$Form->checklist( array(
+		array( 'tag_noindex', 1, T_('META NOINDEX for tag pages without intro'), $edited_Blog->get_setting( 'tag_noindex' ) ),
+		array( 'tag_intro_noindex', 1, T_('META NOINDEX for tag pages with an intro'), $edited_Blog->get_setting( 'tag_intro_noindex' ) ),
+		), 'tag_noindex', T_('Indexing') );
 
 	$Form->radio( 'tag_content', $edited_Blog->get_setting('tag_content'),
 		array(
@@ -323,7 +327,10 @@ jQuery("#tag_prefix").keyup( function() {
 
 <?php
 $Form->begin_fieldset( T_('Other filtered pages').get_manual_link('other-filtered-pages-seo') );
-	$Form->checkbox( 'filtered_noindex', $edited_Blog->get_setting( 'filtered_noindex' ), T_('Other filtered posts pages'), T_('META NOINDEX').' - '.T_('Filtered by keyword search, by author, etc.') );
+	$Form->checklist( array(
+		array( 'filtered_noindex', 1, T_('META NOINDEX for filtered pages without intro'), $edited_Blog->get_setting( 'filtered_noindex' ) ),
+		array( 'filtered_intro_noindex', 1, T_('META NOINDEX for filtered pages with an intro'), $edited_Blog->get_setting( 'filtered_intro_noindex' ) ),
+		), 'filtered_noindex', T_('Indexing'), false, false, array( 'note' => T_('Filtered by keyword search, by author, etc.') ) );
 
 	$Form->radio( 'filtered_content', $edited_Blog->get_setting('filtered_content'),
 		array(

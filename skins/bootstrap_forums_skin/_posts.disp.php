@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $number_of_posts_in_cat, $cat, $legend_icons;
+global $number_of_posts_in_cat, $cat, $legend_icons, $tag;
 
 if( ! is_array( $legend_icons ) )
 { // Init this array only first time
@@ -49,9 +49,17 @@ skin_widget( array(
 		'coll_logo_size'   => 'fit-128x16',
 	) );
 
+// Display default title only for tag page without intro Item:
+request_title( array(
+		'title_before'      => '<h2 class="page_title">',
+		'title_after'       => '</h2>',
+		'format'            => 'htmlbody',
+		'posts_text'        => ( isset( $tag ) && ! has_featured_Item() ? '#' : '' ),
+	) );
 
 // Go Grab the featured post:
-if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item( 'posts', NULL, false, NULL ) )
+if( ! in_array( $disp, array( 'single', 'page' ) ) &&
+    $Item = & get_featured_Item( 'posts', NULL, false, ( isset( $tag ) || $single_cat_ID ? false : NULL ) ) )
 {	// We have a intro post to display:
 	$intro_item_style = '';
 	$LinkOwner = new LinkItem( $Item );
