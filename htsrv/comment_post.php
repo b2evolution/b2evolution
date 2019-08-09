@@ -137,6 +137,16 @@ $now = date( 'Y-m-d H:i:s', $localtimenow );
 
 $original_comment = $comment;
 
+// CHECK and FORMAT content
+$perm_comment_edit = $User && $User->check_perm( 'blog_comments', 'edit', false, $commented_Item->Blog->ID );
+$saved_comment = $comment;
+// Following call says "WARNING: this does *NOT* (necessarilly) make the HTML code safe.":
+$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $User );
+if( $comment === false )
+{	// ERROR! Restore original comment for further editing:
+	$comment = $saved_comment;
+}
+
 $comment_renderers = param( 'renderers', 'array:string', array() );
 
 // Trigger event: a Plugin could add a $category="error" message here..
@@ -174,15 +184,8 @@ if( ( $workflow_is_loaded = $commented_Item->load_workflow_from_Request() ) &&
 
 $comments_email_is_detected = false;
 
-if( $User )
-{	// User is logged in (or provided, e.g. via OpenID plugin)
-	// Does user have permission to edit?
-	$perm_comment_edit = $User->check_perm( 'blog_comments', 'edit', false, $commented_Item->Blog->ID );
-}
-else
+if( ! $User )
 {	// User is still not logged in
-	// NO permission to edit!
-	$perm_comment_edit = false;
 
 	// We need some id info from the anonymous user:
 	if( $commented_Item->Blog->get_setting( 'require_anon_name' ) && empty( $author ) )
@@ -237,15 +240,6 @@ else
 			$comments_email_is_detected = true;
 		}
 	}
-}
-
-// CHECK and FORMAT content
-$saved_comment = $comment;
-// Following call says "WARNING: this does *NOT* (necessarilly) make the HTML code safe.":
-$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $User );
-if( $comment === false )
-{	// ERROR! Restore original comment for further editing:
-	$comment = $saved_comment;
 }
 
 // Flood protection was here and SHOULD NOT have moved down!
