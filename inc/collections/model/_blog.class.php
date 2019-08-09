@@ -1204,13 +1204,16 @@ class Blog extends DataObject
 			$this->set_setting( 'default_noindex', param( 'default_noindex', 'integer', 0 ) );
 			$this->set_setting( 'posts_firstpage_noindex', param( 'posts_firstpage_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_noindex', param( 'paged_noindex', 'integer', 0 ) );
+			$this->set_setting( 'paged_intro_noindex', param( 'paged_intro_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_nofollowto', param( 'paged_nofollowto', 'integer', 0 ) );
 			$this->set_setting( 'archive_noindex', param( 'archive_noindex', 'integer', 0 ) );
 			$this->set_setting( 'archive_nofollowto', param( 'archive_nofollowto', 'integer', 0 ) );
 			$this->set_setting( 'chapter_noindex', param( 'chapter_noindex', 'integer', 0 ) );
 			$this->set_setting( 'chapter_intro_noindex', param( 'chapter_intro_noindex', 'integer', 0 ) );
 			$this->set_setting( 'tag_noindex', param( 'tag_noindex', 'integer', 0 ) );
+			$this->set_setting( 'tag_intro_noindex', param( 'tag_intro_noindex', 'integer', 0 ) );
 			$this->set_setting( 'filtered_noindex', param( 'filtered_noindex', 'integer', 0 ) );
+			$this->set_setting( 'filtered_intro_noindex', param( 'filtered_intro_noindex', 'integer', 0 ) );
 			$this->set_setting( 'arcdir_noindex', param( 'arcdir_noindex', 'integer', 0 ) );
 			$this->set_setting( 'catdir_noindex', param( 'catdir_noindex', 'integer', 0 ) );
 			$this->set_setting( 'feedback-popup_noindex', param( 'feedback-popup_noindex', 'integer', 0 ) );

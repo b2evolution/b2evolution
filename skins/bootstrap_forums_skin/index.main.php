@@ -21,7 +21,7 @@ if( evo_version_compare( $app_version, '6.4' ) < 0 )
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
-global $Skin;
+global $Skin, $tag;
 
 
 // This is the main template; it may be used to display very different things.
@@ -52,7 +52,8 @@ skin_include( '_html_header.inc.php', array(
 	'category_text'     => T_('Forum').': ',
 	'comments_text'     => T_('Latest Replies'),
 	'front_text'        => T_('Forum'),
-	'posts_text'        => $posts_text,
+	// Display default title only for tag page without intro Item:
+	'posts_text'        => ( isset( $tag ) && ! has_featured_Item() ? '#' : $posts_text ),
 	'useritems_text'    => T_('User\'s topics'),
 	'usercomments_text' => T_('User\'s replies'),
 	'flagged_text'      => T_('Flagged topics'),
