@@ -5320,6 +5320,12 @@ div.message_toolbars {
     border-radius: 3px;
   }
 }
+.evo_widget.widget_core_item_workflow .panel-body img.avatar_before_login {
+  vertical-align: middle;
+}
+.evo_widget.widget_core_item_workflow .panel-body p:last-child {
+  margin-bottom: 0;
+}
 div.fieldset_wrapper.folded .panel-body {
   display: none;
 }

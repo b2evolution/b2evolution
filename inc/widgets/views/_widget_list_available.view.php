@@ -137,6 +137,7 @@ $core_componentwidget_defs = array(
 			'item_vote',
 			'item_next_previous',
 			'item_custom_fields',
+			'item_workflow',
 		),
 	'collection' => array(
 			'coll_logo',
