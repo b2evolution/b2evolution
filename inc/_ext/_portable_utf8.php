@@ -376,7 +376,7 @@ function utf8_split( $str, $split_length = 1 )
 		$ret = array_map( 'implode', $ret );
 	}
 
-	if( $ret[ 0 ] === '' )
+	if( $ret === false || $ret[ 0 ] === '' )
 	{
 		return array();
 	}

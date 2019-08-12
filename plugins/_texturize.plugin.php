@@ -125,7 +125,7 @@ It will also perform the following replacements:
 		$textarr = preg_split("/(<.*>)/Us", $content, -1, PREG_SPLIT_DELIM_CAPTURE); // capture the tags as well as in between
 		$stop = count($textarr); $next = true; // loop stuff
 		for ($i = 0; $i < $stop; $i++) {
-			$curl = $textarr[$i];
+			$curl = strval( $textarr[$i] );
 
 			if (strlen($curl) && '<' != $curl{0} && $next) { // If it's not a tag
 				$curl = str_replace('---', '&#8212;', $curl);
