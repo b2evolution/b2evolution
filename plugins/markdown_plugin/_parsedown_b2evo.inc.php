@@ -19,6 +19,22 @@ class ParsedownB2evo extends ParsedownExtra
 
 
 	/**
+	 * Constructor
+	 */
+	function __construct()
+	{
+		parent::__construct();
+
+		if( isset( $this->unmarkedBlockTypes ) &&
+		    is_array( $this->unmarkedBlockTypes ) &&
+		    ( $code_index = array_search( 'Code', $this->unmarkedBlockTypes ) ) !== false )
+		{	// Don't parse code blocks by indent spaces or tab:
+			unset( $this->unmarkedBlockTypes[ $code_index ] );
+		}
+	}
+
+
+	/**
 	 * Set flag to parse font styles
 	 *
 	 * @param boolean
@@ -234,7 +250,7 @@ class ParsedownB2evo extends ParsedownExtra
 	 */
 	protected function blockListContinue( $Line, array $Block )
 	{
-		if( ! empty( $Block['interrupted'] ) )
+		if( ! empty( $Block['interrupted'] ) && empty( $Line['indent'] ) )
 		{	// If a list is interrupted now(for example, new line after list line),
 			// then we should end this list in order to start one new if that exists:
 			// Do nothing here in order to end the current list element.
