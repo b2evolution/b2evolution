@@ -430,6 +430,7 @@ class item_comment_form_Widget extends ComponentWidget
 			$Form->hidden( 'comment_type', $widget_params['comment_type'] );
 			$Form->hidden( 'comment_item_ID', $Item->ID );
 
+			$comment_reply_ID = param( 'reply_ID', 'integer', 0 );
 			$comment_type = param( 'comment_type', 'string', 'comment' );
 			if( ! empty( $comment_reply_ID ) && $comment_type == $widget_params['comment_type'] )
 			{
