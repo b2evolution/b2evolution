@@ -40,7 +40,11 @@ if( isset( $Comment->item_workflow ) && is_array( $Comment->item_workflow ) )
 	}
 }
 
-$Form->select_input_array( 'item_priority', $Item->get( 'priority' ), item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+$ItemStatusCache = & get_ItemStatusCache();
+$ItemStatusCache->load_all();
+$ItemTypeCache = & get_ItemTypeCache();
+$current_ItemType = & $Item->get_ItemType();
+$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
 
 // Load only first 21 users to know when we should display an input box instead of full users list:
 $UserCache = & get_UserCache();
@@ -55,11 +59,7 @@ else
 	$Form->select_object( 'item_assigned_user_ID', NULL, $Item, T_('Assigned to'), '', true, '', 'get_assigned_user_options' );
 }
 
-$ItemStatusCache = & get_ItemStatusCache();
-$ItemStatusCache->load_all();
-$ItemTypeCache = & get_ItemTypeCache();
-$current_ItemType = & $Item->get_ItemType();
-$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
+$Form->select_input_array( 'item_priority', $Item->get( 'priority' ), item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
 
 if( $Blog->get_setting( 'use_deadline' ) )
 {	// Display deadline fields only if it is enabled for collection:
