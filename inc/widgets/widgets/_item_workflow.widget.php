@@ -141,16 +141,19 @@ class item_workflow_Widget extends ComponentWidget
 
 		if( empty( $Item ) )
 		{ // Don't display this widget when no Item object
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
 			return false;
 		}
 
 		if( ! $Item->get_coll_setting( 'use_workflow' ) )
 		{	// Workflow is disabled for current Collection:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because workflow is disabled for Item\'s Collection.' );
 			return false;
 		}
 
 		if( ! is_logged_in() || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Item->get_blog_ID() ) )
 		{	// Current User has no permission to be assigned for tasks of the Item's Collection:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because you don\'t have a permission to be assigned for tasks of the Item\'s Collection.' );
 			return false;
 		}
 
