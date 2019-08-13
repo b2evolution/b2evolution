@@ -1485,6 +1485,7 @@ class Item extends ItemLight
 	function get_assigned_user_options()
 	{
 		$UserCache = & get_UserCache();
+		$UserCache->clear();
 		return $UserCache->get_blog_member_option_list( $this->get_blog_ID(), $this->assigned_user_ID,
 							true,	($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
 	}
