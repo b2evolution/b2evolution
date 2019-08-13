@@ -366,7 +366,7 @@ class Message extends DataObject
 	 */
 	function dbinsert_discussion( $from_User = NULL, $source_msg_ID = NULL )
 	{
-		global $DB;
+		global $DB, $Plugins;
 
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
 
@@ -374,9 +374,14 @@ class Message extends DataObject
 
 		$this->get_Thread();
 
-		if ( $this->Thread->dbinsert() )
+		if( $this->Thread->dbinsert() )
 		{
-			$this->set_param( 'thread_ID', 'integer', $this->Thread->ID);
+			$this->set_param( 'thread_ID', 'integer', $this->Thread->ID );
+
+			if( isset( $Plugins ) )
+			{	// Note: Plugins may not be available during maintenance, install or test cases
+				$Plugins->trigger_event( 'PrependMessageInsertTransact', $params = array( 'Message' => & $this ) );
+			}
 
 			if( parent::dbinsert() )
 			{
@@ -450,7 +455,7 @@ class Message extends DataObject
 	 */
 	function dbinsert_message()
 	{
-		global $DB, $localtimenow;
+		global $DB, $localtimenow, $Plugins;
 
 		if( $this->ID != 0 ) die( 'Existing object cannot be inserted!' );
 
@@ -463,6 +468,11 @@ class Message extends DataObject
 		if( $this->Thread->dbupdate() )
 		{
 			$this->set_param( 'thread_ID', 'integer', $this->Thread->ID);
+
+			if( isset( $Plugins ) )
+			{	// Note: Plugins may not be available during maintenance, install or test cases
+				$Plugins->trigger_event( 'PrependMessageInsertTransact', $params = array( 'Message' => & $this ) );
+			}
 
 			if( parent::dbinsert() )
 			{

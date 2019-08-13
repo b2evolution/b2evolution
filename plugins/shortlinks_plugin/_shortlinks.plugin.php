@@ -64,6 +64,14 @@ class shortlinks_plugin extends Plugin
 						array( 'item_without_brackets', $this->T_('WikiWords without brackets matching item slugs'), 0 ),
 					),
 				),
+			'optimize' => array(
+				'label' => T_('Optimize URLs'),
+				'type' => 'checklist',
+				'options' => array(
+						array( 'absolute_urls', $this->T_('If an absolute URL references a collection on this system, try to identity and keep just the slug '), 1 ),
+						array( 'relative_urls', $this->T_('If a relative URL references a collection on this system, try to identity and keep just the slug'), 1 ),
+					),
+				),
 			);
 	}
 
@@ -804,6 +812,211 @@ class shortlinks_plugin extends Plugin
 		?><script>shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link Item::dbinsert() inserting
+	 * an item/post in the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function PrependItemInsertTransact( & $params )
+	{
+		$Item = & $params['Item'];
+
+		// Get collection from given params:
+		$setting_Blog = $this->get_Blog_from_params( $params );
+
+		if( ! $this->is_renderer_enabled( $this->get_coll_setting( 'coll_apply_rendering', $setting_Blog ), $Item->get_renderers_validated() ) )
+		{	// Don't try to optimize when this plugin is not applied for Items:
+			return;
+		}
+
+		// Get settings to know what should be optimized:
+		$this->optimize = $this->get_coll_setting( 'optimize', $setting_Blog );
+
+		// Optimize URLs:
+		$Item->set( 'content', $this->optimize_urls( $Item->get( 'content' ) ) );
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link Item::dbupdate() updating
+	 * an item/post in the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Item': the related Item (by reference)
+	 */
+	function PrependItemUpdateTransact( & $params )
+	{
+		$this->PrependItemInsertTransact( $params );
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link Comment::dbinsert() inserting
+	 * a Comment in the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the related Comment (by reference)
+	 */
+	function PrependCommentInsertTransact( & $params )
+	{
+		$Comment = & $params['Comment'];
+
+		// Get collection from given params:
+		$setting_Blog = $this->get_Blog_from_params( $params );
+
+		if( ! $this->is_renderer_enabled( $this->get_coll_setting( 'coll_apply_comment_rendering', $setting_Blog ), $Comment->get_renderers_validated() ) )
+		{	// Don't try to optimize when this plugin is not applied for Comments:
+			return;
+		}
+
+		// Get settings to know what should be optimized:
+		$this->optimize = $this->get_coll_setting( 'optimize', $setting_Blog );
+
+		// Optimize URLs:
+		$Comment->set( 'content', $this->optimize_urls( $Comment->get( 'content' ) ) );
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link Comment::dbupdate() updating
+	 * a Comment in the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the related Comment (by reference)
+	 */
+	function PrependCommentUpdateTransact( & $params )
+	{
+		$this->PrependCommentInsertTransact( $params );
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link Message::dbinsert_discussion() inserting
+	 * an Message in the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Message': the related Message (by reference)
+	 */
+	function PrependMessageInsertTransact( & $params )
+	{
+		$Message = & $params['Message'];
+
+		if( ! $this->is_renderer_enabled( $this->get_msg_setting( 'msg_apply_rendering' ), $Message->get_renderers_validated() ) )
+		{	// Don't try to optimize when this plugin is not applied for Items:
+			return;
+		}
+
+		$this->optimize = $this->get_msg_setting( 'optimize' );
+
+		$Message->set( 'text', $this->optimize_urls( $Message->get( 'text' ) ) );
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link EmailCampaign::dbinsert() inserting
+	 * an Email Campaign in the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the related EmailCampaign (by reference)
+	 */
+	function PrependEmailInsertTransact( & $params )
+	{
+		$EmailCampaign = & $params['EmailCampaign'];
+
+		if( ! $this->is_renderer_enabled( $this->get_email_setting( 'email_apply_rendering' ), $EmailCampaign->get_renderers_validated() ) )
+		{	// Don't try to optimize when this plugin is not applied for Items:
+			return;
+		}
+
+		$this->optimize = $this->get_email_setting( 'optimize' );
+
+		$EmailCampaign->set( 'email_text', $this->optimize_urls( $EmailCampaign->get( 'email_text' ) ) );
+		//$EmailCampaign->set( 'email_html', $this->optimize_urls( $EmailCampaign->get( 'email_html' ) ) );
+		//$EmailCampaign->set( 'email_plaintext', $this->optimize_urls( $EmailCampaign->get( 'email_plaintext' ) ) );
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link EmailCampaign::dbupdate() updating
+	 * an Email Campaign in the database}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the related EmailCampaign (by reference)
+	 */
+	function PrependEmailUpdateTransact( & $params )
+	{
+		$this->PrependEmailInsertTransact( $params );
+	}
+
+
+	/**
+	 * Optimize URLs in content
+	 *
+	 * @param string Source content
+	 * @return string Optimized content
+	 */
+	function optimize_urls( $content )
+	{
+		if( ! empty( $this->optimize['absolute_urls'] ) )
+		{	// Optimize absolute URLs:
+			$content = replace_content_outcode( '*
+					( \[\[ | \(\( ) # Lookbehind for (( or [[
+					( ( (https?://|//).+/ ) ( [^/][^<>{}\s\]\)]+ ) ) # URL
+					( \s.+ )?       # Additional attributes like style classes, link target, custon link text (Optional)
+					( \]\] | \)\) ) # Lookahead for )) or ]]
+					*ix', // x = extended (spaces + comments allowed)
+				array( $this, 'optimize_urls_callback' ), $content, 'replace_content', 'preg_callback' );
+		}
+
+		if( ! empty( $this->optimize['relative_urls'] ) )
+		{	// Optimize relative URLs:
+			$content = replace_content_outcode( '*
+					( \[\[ | \(\( ) # Lookbehind for (( or [[
+					( ( /(.+/)? ) ( [^/][^<>{}\s\]\)]+ ) ) # URL
+					( \s.+ )?       # Additional attributes like style classes, link target, custon link text (Optional)
+					( \]\] | \)\) ) # Lookahead for )) or ]]
+					*ix', // x = extended (spaces + comments allowed)
+				array( $this, 'optimize_urls_callback' ), $content, 'replace_content', 'preg_callback' );
+		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Callback function for URLs optimization
+	 *
+	 * @param array $m
+	 * @return string
+	 */
+	function optimize_urls_callback( $m )
+	{
+		if( ! ( $m[1] == '[[' && $m[7] == ']]' ) &&
+		    ! ( $m[1] == '((' && $m[7] == '))' ) )
+		{	// Wrong pattern, Return original text:
+			return $m[0];
+		}
+
+		if( preg_match( '#^(https?://|//)$#', $m[4] ) &&
+		    ! is_internal_url( $m[3] ) )
+		{	// This is an absolute URL but this is an external URLs,
+			// don't optimize this URL to slug:
+			return $m[0];
+		}
+
+		$SlugCache = & get_SlugCache();
+		if( ! $SlugCache->get_by_name( $m[5], false, false ) )
+		{	// The Slug is not found in system, Keep it as is without optimization:
+			return $m[0];
+		}
+
+		// Return short link tag only with slug(without absolute or relative path):
+		return $m[1].$m[5].$m[6].$m[7];
 	}
 }
 ?>

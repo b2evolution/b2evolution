@@ -321,7 +321,8 @@ class EmailCampaign extends DataObject
 				$mail_template = mail_template( 'newsletter',
 					( $parname == 'html_template_preview' ? 'html' : 'text' ),
 					array(
-						'message_html'       => $this->get( $parname == 'html_template_preview' ? 'email_html' : 'email_plaintext' ),
+						'message_html'       => $this->get( 'email_html' ),
+						'message_text'       => $this->get( 'email_plaintext' ),
 						'include_greeting'   => false,
 						'add_email_tracking' => false,
 						'template_mode'      => 'preview',
@@ -590,7 +591,12 @@ class EmailCampaign extends DataObject
 	 */
 	function dbinsert()
 	{
-		global $baseurl;
+		global $baseurl, $Plugins;
+
+		if( isset( $Plugins ) )
+		{	// Note: Plugins may not be available during maintenance, install or test cases
+			$Plugins->trigger_event( 'PrependEmailInsertTransact', $params = array( 'EmailCampaign' => & $this ) );
+		}
 
 		// Update the message fields:
 		$this->update_message_fields();
@@ -617,6 +623,13 @@ class EmailCampaign extends DataObject
 	 */
 	function dbupdate()
 	{
+		global $Plugins;
+
+		if( isset( $Plugins ) )
+		{	// Note: Plugins may not be available during maintenance, install or test cases
+			$Plugins->trigger_event( 'PrependEmailUpdateTransact', $params = array( 'EmailCampaign' => & $this ) );
+		}
+
 		// Update the message fields:
 		$this->update_message_fields();
 

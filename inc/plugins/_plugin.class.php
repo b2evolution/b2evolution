@@ -2021,6 +2021,20 @@ class Plugin
 
 
 	/**
+	 * Event handler: called at the beginning of {@link Comment::dbupdate() updating
+	 * a Comment in the database}.
+	 *
+	 * Use this to manipulate the {@link Comment}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the related Comment (by reference)
+	 */
+	function PrependCommentUpdateTransact( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: called at the end of {@link Comment::dbupdate() updating
 	 * a comment in the database}.
 	 *
@@ -2030,6 +2044,20 @@ class Plugin
 	 *                  before they got applied (since 1.9)
 	 */
 	function AfterCommentUpdate( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link Comment::dbinsert() inserting
+	 * a Comment in the database}.
+	 *
+	 * Use this to manipulate the {@link Comment}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the related Comment (by reference)
+	 */
+	function PrependCommentInsertTransact( & $params )
 	{
 	}
 
@@ -2259,6 +2287,21 @@ class Plugin
 		}
 	}
 
+
+	/**
+	 * Event handler: called at the beginning of {@link Message::dbinsert_discussion() or Message::dbinsert_message() inserting
+	 * an Message in the database}.
+	 *
+	 * Use this to manipulate the {@link Message}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Message': the related Message (by reference)
+	 */
+	function PrependMessageInsertTransact( & $params )
+	{
+	}
+
+
 	/**
 	 * Event handler: Called when rendering message contents as HTML. (CACHED)
 	 *
@@ -2363,6 +2406,35 @@ class Plugin
 			}
 		}
 	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link EmailCampaign::dbinsert() inserting
+	 * an Email Campaign in the database}.
+	 *
+	 * Use this to manipulate the {@link EmailCampaign}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the related EmailCampaign (by reference)
+	 */
+	function PrependEmailInsertTransact( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link EmailCampaign::dbupdate() updating
+	 * an Email Campaign in the database}.
+	 *
+	 * Use this to manipulate the {@link EmailCampaign}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the related EmailCampaign (by reference)
+	 */
+	function PrependEmailUpdateTransact( & $params )
+	{
+	}
+
 
 	/**
 	 * Event handler: Called when rendering email contents as HTML. (CACHED)

@@ -4764,6 +4764,11 @@ class Comment extends DataObject
 			( $previous_item_latest_Comment = & $previous_Item->get_latest_Comment() ) && // Get the latest Comment of the previous Item
 			( $previous_item_latest_Comment->ID == $this->ID ) ); // This Comment was the latest comment of the previous Item
 
+		if( isset( $Plugins ) )
+		{	// Note: Plugins may not be available during maintenance, install or test cases
+			$Plugins->trigger_event( 'PrependCommentUpdateTransact', $params = array( 'Comment' => & $this ) );
+		}
+
 		if( ( $r = parent::dbupdate() ) !== false )
 		{
 			if( isset( $dbchanges['comment_content'] ) || isset( $dbchanges['comment_renderers'] ) )
@@ -4872,6 +4877,11 @@ class Comment extends DataObject
 		}
 
 		$this->set_last_touched_date();
+
+		if( isset( $Plugins ) )
+		{	// Note: Plugins may not be available during maintenance, install or test cases
+			$Plugins->trigger_event( 'PrependCommentInsertTransact', $params = array( 'Comment' => & $this ) );
+		}
 
 		$dbchanges = $this->dbchanges;
 
