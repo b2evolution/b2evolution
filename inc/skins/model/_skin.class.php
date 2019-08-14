@@ -1172,13 +1172,8 @@ class Skin extends DataObject
 					// Require functions.js to show/hide a panel with filters:
 					require_js( 'functions.js', 'blog' );
 
-					// Require Fine Uploader js and css:
-					require_js( 'multiupload/fine-uploader.js', 'blog' );
-					require_css( 'fine-uploader.css', 'blog' );
-
-					// Load JS files to make the links table sortable:
-					require_js( '#jquery#', 'blog' );
-					require_js( 'jquery/jquery.sortable.min.js', 'blog' );
+					// Init JS to quick upload several files:
+					init_fileuploader_js( 'blog' );
 
 					// Include this file to expand/collapse the filters panel when JavaScript is disabled
 					global $inc_path;
