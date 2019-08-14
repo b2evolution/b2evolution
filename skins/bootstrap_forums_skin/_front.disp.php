@@ -52,14 +52,17 @@ if( is_logged_in() &&
 			'orderby'   => 'priority,last_touched_ts',
 			'order'     => 'ASC,DESC',
 			'page'      => param( 'assigned_paged', 'integer', 1 ),
+			'statuses'  => param( 'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', '' ),
 		), false );
 	$assigned_ItemList->query();
-	if( $assigned_ItemList->result_num_rows > 0 )
-	{	// Display panel with assigned posts if at least one is found:
 ?>
 <div class="panel panel-default forums_list">
-	<header class="panel-heading"><?php echo T_('Assigned to me'); ?></header>
 <?php
+	// Display header for list of assigned tasks for current User:
+	$Skin->display_posts_list_header( T_('Assigned to me') );
+
+	if( $assigned_ItemList->result_num_rows > 0 )
+	{	// Display panel with assigned posts if at least one is found:
 		while( $Item = $assigned_ItemList->get_item() )
 		{
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
@@ -82,10 +85,14 @@ if( is_logged_in() &&
 				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
 				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
 			) );
+	}
+	else
+	{	// No assigned tasks:
+		echo '<div class="ft_no_post">'.T_('No assigned tasks.').'</div>';
+	}
 ?>
 </div>
 <?php
-	}
 }
 // -------------------------------- END OF POSTS ASSIGNED TO CURRENT USER --------------------------------
 

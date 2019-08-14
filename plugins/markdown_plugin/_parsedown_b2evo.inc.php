@@ -278,11 +278,11 @@ class ParsedownB2evo extends ParsedownExtra
 		// Append class "codeblock":
 		if( isset( $Block['element']['attributes']['class'] ) )
 		{
-			$Block['element']['attributes']['class'] .= ' codeblock';
+			$Block['element']['attributes']['class'] .= ' codeblock line-numbers';
 		}
 		else
 		{
-			$Block['element']['attributes']['class'] = 'codeblock';
+			$Block['element']['attributes']['class'] = 'codeblock line-numbers';
 		}
 
 		// Add these params for correct code detecting by codehighlight plugin:
@@ -291,8 +291,12 @@ class ParsedownB2evo extends ParsedownExtra
 		    preg_match( '/language-([a-z]+)/i', $Block['element']['text']['attributes']['class'], $lang_match ) )
 		{
 			$element_attrs .= ' lang='.$lang_match[1];
-			// Unset this because codehighlight plugin doesn't detect codeblock when tag <code> has any attributes:
-			unset( $Block['element']['text']['attributes']['class'] );
+		}
+		else
+		{	// Set default language code for rendering by prism plugin:
+			$Block['element']['text']['attributes']['class'] = isset( $Block['element']['text']['attributes']['class'] )
+				? $Block['element']['text']['attributes']['class'].' language-code'
+				: 'language-code';
 		}
 		$Block['element']['before'] = '<!-- codeblock '.$element_attrs.' -->';
 		$Block['element']['after'] = '<!-- /codeblock -->'."\n";
