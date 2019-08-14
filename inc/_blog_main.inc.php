@@ -611,7 +611,7 @@ elseif( $disp == '-' )
 		$canonical_url = $Blog->gen_blogurl();
 		if( ! is_same_url( $ReqURL, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 		{	// We are not on the canonical blog url:
-			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
+			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' && ! isset( $_GET['status'] ) )
 			{	// REDIRECT TO THE CANONICAL URL:
 				header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) && empty( $_GET['debug'] ) ) ? 301 : 303 );
 			}

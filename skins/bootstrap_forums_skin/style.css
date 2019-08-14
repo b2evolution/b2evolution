@@ -90,7 +90,16 @@ ol.breadcrumb img {
   margin-top: 0;
 }
 .forums_list .panel-heading .btn {
-  margin: -6px 0 0 6px;
+  margin: -6px 0 -6px 6px;
+}
+.forums_list .panel-heading.panel-heading-columns {
+  padding-left: 0;
+  padding-right: 0;
+}
+.forums_list .panel-heading.panel-heading-columns select {
+  margin-top: -5px;
+  margin-bottom: -6px;
+  width: auto;
 }
 .forums_list.panel > a + .table {
   border-top: 1px solid #ddd;

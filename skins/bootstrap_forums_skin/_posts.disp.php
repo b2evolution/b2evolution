@@ -214,17 +214,18 @@ if( isset( $MainList ) &&
 	{	// Display category title:
 		$ChapterCache = & get_ChapterCache();
 		if( $category = & $ChapterCache->get_by_ID( $single_cat_ID ) )
-		{ // Display category title
-			echo '<div class="panel-heading">'
-					// Buttons to post/reply:
-					.$Skin->get_post_button( $single_cat_ID, NULL, array(
+		{	// Display category title:
+			$Skin->display_posts_list_header( '<h3 class="panel-title">'.$category->get( 'name' ).'</h3>', array(
+					'actions' => $Skin->get_post_button( $single_cat_ID, NULL, array(
 							'group_class'  => 'pull-right',
 							'button_class' => 'btn-sm',
-						) )
-					// Category title:
-					.'<h3 class="panel-title">'.$category->get( 'name' ).'</h3>'
-				.'</div>';
+						) ),
+				) );
 		}
+	}
+	else
+	{	// Display header for latest topics:
+		$Skin->display_posts_list_header( T_('Latest topics') );
 	}
 	?>
 
@@ -257,11 +258,11 @@ if( $MainList->result_num_rows > 0 )
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
 }
-elseif( isset( $current_Chapter ) )
-{ // Display a message about no posts in this category
+else
+{	// Display a message about no posts:
 ?>
 <div class="ft_no_post">
-	<?php echo T_('There is no topic in this forum yet.'); ?>
+	<?php echo isset( $current_Chapter ) ? T_('There is no topic in this forum yet.') : T_('No topics.'); ?>
 </div>
 <?php
 }
