@@ -4193,7 +4193,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( $old_db_version < 10600 )
 	{	//  part 4
 
-		// For create_default_regions() and create_default_subregions():
+		// For create_default_regions():
 		require_once dirname(__FILE__).'/_functions_create.php';
 
 		task_begin( 'Renaming Countries table...' );
@@ -4231,8 +4231,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			UNIQUE subrg_rgn_ID_code (subrg_rgn_ID, subrg_code)
 		) ENGINE = innodb' );
 		task_end();
-
-		create_default_subregions();
 
 		task_begin( 'Creating Cities table...' );
 		$DB->query( 'CREATE TABLE T_regional__city (
