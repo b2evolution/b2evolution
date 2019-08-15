@@ -555,7 +555,7 @@ class MarkdownImport
 			// Extract title from content:
 			$item_content = trim( file_get_contents( $file_path ) );
 			$item_content_hash = md5( $item_content );
-			if( preg_match( '~^(---[\r\n]+(.+?)[\r\n]+---[\r\n]+)?(#+\s*(.+?)\s*#*\s*[\r\n]+)?(.+)$~s', $item_content, $content_match ) )
+			if( preg_match( '~^(---[\r\n]+(.+?)[\r\n]+---[\r\n]*)?(#+\s*(.+?)\s*#*\s*([\r\n]+|$))?(.*)$~s', $item_content, $content_match ) )
 			{
 				$item_yaml_data = trim( $content_match[2] );
 				if( ! empty( $this->yaml_fields ) && ! empty( $item_yaml_data ) )
@@ -566,8 +566,12 @@ class MarkdownImport
 				{	// Don't parse when no supported YAML fields or no provided YAML data:
 					$item_yaml_data = NULL;
 				}
-				$item_title = empty( $content_match[4] ) ? $item_slug : $content_match[4];
-				$item_content = $content_match[5];
+				$item_title = empty( $content_match[4] )
+					// Use yaml short title or item slug as title when title in content is not defined:
+					? ( empty( $item_yaml_data['short-title'] ) ? $item_slug : $item_yaml_data['short-title'] )
+					// Use title from content:
+					: $content_match[4];
+				$item_content = $content_match[6];
 			}
 			else
 			{
