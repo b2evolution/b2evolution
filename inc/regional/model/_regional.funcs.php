@@ -484,12 +484,20 @@ function import_cities( $country_ID, $file_path )
 	// Begin transaction
 	$DB->begin();
 
-	// Get all sub-regions of the current country
-	$subregions_data = $DB->get_results( '
-		SELECT subrg_ID, subrg_code, rgn_ID, rgn_ctry_ID
-		  FROM T_regional__subregion
-		  LEFT JOIN T_regional__region ON subrg_rgn_ID = rgn_ID
-		 WHERE rgn_ctry_ID = '.$DB->quote( $country_ID ) );
+	// Get all regions of the requested country:
+	$SQL = new SQL( 'Get regions of country #'.$country_ID.' before importing cities' );
+	$SQL->SELECT( 'rgn_code, rgn_ID' );
+	$SQL->FROM( 'T_regional__region' );
+	$SQL->WHERE( 'rgn_ctry_ID = '.$DB->quote( $country_ID ) );
+	$regions = $DB->get_assoc( $SQL );
+
+	// Get all sub-regions of the requested country:
+	$SQL = new SQL( 'Get sub-regions of country #'.$country_ID.' before importing cities' );
+	$SQL->SELECT( 'subrg_ID, subrg_code, rgn_ID' );
+	$SQL->FROM( 'T_regional__subregion' );
+	$SQL->FROM_add( 'LEFT JOIN T_regional__region ON subrg_rgn_ID = rgn_ID' );
+	$SQL->WHERE( 'rgn_ctry_ID = '.$DB->quote( $country_ID ) );
+	$subregions_data = $DB->get_results( $SQL );
 
 	$subregions = array();
 	foreach( $subregions_data as $subregion )
@@ -513,23 +521,19 @@ function import_cities( $country_ID, $file_path )
 			continue;
 		}
 
+		// Post code:
 		$postcode = trim( $data[0], " \xA0" ); // \xA0 - ASCII Non-breaking space
+		// City name:
 		$name = trim( $data[1], " \xA0" );
-		$subregion_code = '';
-		if( isset( $data[2] ) )
-		{	// Optional field
-			$subregion_code = trim( $data[2], " \xA0" );
-		}
+		// Sub-region code (optional column; recommended):
+		$subregion_code = ( isset( $data[2] ) ? trim( $data[2], " \xA0" ) : '' );
+		// Region code (optional column; provide only if no sub-region):
+		$region_code = ( isset( $data[3] ) ? trim( $data[3], " \xA0" ) : '' );
 
 		if( empty( $postcode ) && empty( $name ) )
 		{	// Skip empty row
 			continue;
 		}
-
-		/*if( empty( $subregion_code ) )
-		{	// If field subregion_code is NOT defined, we get it from city postcode ( 2 first letters )
-			$subregion_code = substr( $postcode, 0, 2 );
-		}*/
 
 		$city = array(
 			'ctry_ID'  => $country_ID,
@@ -537,15 +541,20 @@ function import_cities( $country_ID, $file_path )
 			'name'     => $DB->quote( $name ),
 		);
 
-		if( empty( $subregion_code ) || ! isset( $subregions[$subregion_code] ) )
-		{	// Subregion is not defined and not found in DB
-			$city['rgn_ID'] = 'NULL';
+		if( ! empty( $subregion_code ) && isset( $subregions[ $subregion_code ] ) )
+		{	// Set region ID & subregion ID for current city:
+			$city['rgn_ID'] = $subregions[ $subregion_code ]->rgn_ID;
+			$city['subrg_ID'] = $subregions[ $subregion_code ]->subrg_ID;
+		}
+		elseif( ! empty( $region_code ) && isset( $regions[ $region_code ] ) )
+		{	// Set region ID for current city:
+			$city['rgn_ID'] = $regions[ $region_code ];
 			$city['subrg_ID'] = 'NULL';
 		}
 		else
-		{	// Set region ID & subregion ID for current city
-			$city['rgn_ID'] = $subregions[$subregion_code]->rgn_ID;
-			$city['subrg_ID'] = $subregions[$subregion_code]->subrg_ID;
+		{	// Subregion and Region are not defined and not found in DB:
+			$city['rgn_ID'] = 'NULL';
+			$city['subrg_ID'] = 'NULL';
 		}
 
 		// Get city from DB with current country, postcode & name
