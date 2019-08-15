@@ -794,6 +794,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'auto_anchors_plugin' );
 	}
+
+	if( $old_db_version < 13220 )
+	{
+		install_plugin( 'table_contents_plugin' );
+	}
 }
 
 
