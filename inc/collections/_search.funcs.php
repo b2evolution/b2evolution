@@ -706,8 +706,12 @@ function search_and_score_files( $search_term, $keywords, $quoted_parts, $author
 		$files_SQL->WHERE_and( '( post_datestart >= '.$DB->quote( $date_min ).' OR comment_date >= '.$DB->quote( $date_min ).' )' );
 		//$files_SQL->WHERE_and( '( post_datestart <= '.$DB->quote( $date_min ).' OR comment_date <= '.$DB->quote( $date_min ).' )' );
 	}
+	// Restrict files from posts and comments which are visible for current User:
+	$files_SQL->WHERE_and( 'post_ID IS NULL OR '.statuses_where_clause( get_inskin_statuses( $Blog->ID, 'post' ), 'post_', $Blog->ID, 'blog_post!' ) );
+	$files_SQL->WHERE_and( 'comment_ID IS NULL OR '.statuses_where_clause( get_inskin_statuses( $Blog->ID, 'comment' ), 'comment_', $Blog->ID, 'blog_comment!' ) );
+	// Group same files linked with different objects:
 	$files_SQL->GROUP_BY( 'file_path, file_title, file_alt, file_desc' );
-	$files = $DB->get_results( $files_SQL, OBJECT, 'Search files query' );
+	$files = $DB->get_results( $files_SQL );
 
 	foreach( $files as $file )
 	{
