@@ -441,9 +441,16 @@ class ComponentWidget extends DataObject
 				return $setting_value;
 			}
 		}
-		elseif( isset( $this->param_array[ $parname ] ) )
+		else
 		{	// Get normal(not array) setting value:
-			return $this->param_array[ $parname ];
+			if( isset( $this->disp_params[ $parname ] ) )
+			{	// Get an overridden value from skin:
+				return $this->disp_params[ $parname ];
+			}
+			elseif( isset( $this->param_array[ $parname ] ) )
+			{	// Get value from DB:
+				return $this->param_array[ $parname ];
+			}
 		}
 
 		if( $default_value !== NULL )
