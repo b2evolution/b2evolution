@@ -478,6 +478,7 @@ $comments_allowed_tags = array
 	'dd' => $C_E_Flow,
 	'address' => $C_E_Iinline,
 	'hr' => '',
+	'pre' => $E_pre_content,
 );
 if( $use_strict )
 {
