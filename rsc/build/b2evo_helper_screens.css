@@ -150,3 +150,46 @@ div.action_messages ul {
 .modal-dialog {
   margin-top: 175px;
 }
+div.system_check_table div.panel-heading:not(:first-child) {
+  border-radius: 0;
+  border-top: 1px solid #ddd;
+}
+div.system_check {
+  margin: 1ex 0;
+  border-top: 1px solid #ddd;
+  padding-top: 1ex;
+  word-break: break-all;
+}
+div.system_check_name {
+  font-weight: bold;
+  float: left;
+}
+div.system_check_value_note,
+div.system_check_value_ok,
+div.system_check_value_warning,
+div.system_check_value_error {
+  font-weight: bold;
+  margin-left: 40ex;
+}
+div.system_check_value_ok {
+  color: #093;
+}
+div.system_check_value_warning {
+  color: #e60;
+}
+div.system_check_value_error {
+  color: #c00;
+}
+div.system_check_message_ok,
+div.system_check_message_warning,
+div.system_check_message_error {
+  margin: 1ex;
+}
+div.system_check_message_warning {
+  padding: 3px;
+  background: #feb;
+}
+div.system_check_message_error {
+  padding: 3px;
+  background: #fbb;
+}

@@ -114,7 +114,7 @@ function display_locale_selector()
 /**
  * Base config recap
  */
-function display_base_config_recap()
+function display_base_config_recap( $display_system_check = false )
 {
 	global $default_locale, $conf_db_user, $conf_db_password, $conf_db_name, $conf_db_host, $db_config, $tableprefix, $baseurl, $admin_email;
 
@@ -148,6 +148,19 @@ function display_base_config_recap()
 	'</samp>';
 
 	block_close();
+
+	if( $display_system_check )
+	{	// Dispaly system check table:
+		echo "\n".'<div class="panel panel-default system_check_table">'."\n";
+		load_funcs( 'tools/model/_system.funcs.php' );
+		display_system_check( array(
+				'mode'                => 'install',
+				'section_start'       => '<div class="panel-heading">#section_title#</div>'."\n".'<div class="panel-body">'."\n",
+				'section_end'         => '</div>'."\n",
+				'section_b2evo_title' => T_('System check'),
+			) );
+		echo '</div>'."\n\n";
+	}
 }
 
 

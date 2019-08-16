@@ -751,7 +751,7 @@ switch( $action )
 			</form>
 		<?php
 
-		display_base_config_recap();
+		display_base_config_recap( true );
 		echo_install_button_js();
 		break;
 
