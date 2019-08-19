@@ -1,127 +1,4 @@
-function base64_decode (data) {
-	// http://kevin.vanzonneveld.net
-	// +   original by: Tyler Akins (http://rumkin.com)
-	// +   improved by: Thunder.m
-	// +	  input by: Aman Gupta
-	// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-	// +   bugfixed by: Onno Marsman
-	// +   bugfixed by: Pellentesque Malesuada
-	// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-	// +	  input by: Brett Zamir (http://brett-zamir.me)
-	// +   bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-	// -	depends on: utf8_decode
-	// *	 example 1: base64_decode('S2V2aW4gdmFuIFpvbm5ldmVsZA==');
-	// *	 returns 1: 'Kevin van Zonneveld'
-	// mozilla has this native
-	// - but breaks in 2.0.0.12!
-	//if (typeof this.window['btoa'] == 'function') {
-	//	return btoa(data);
-	//}
-	var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-	var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
-		ac = 0,
-		dec = "",
-		tmp_arr = [];
-
-	if (!data) {
-		return data;
-	}
-
-	data += '';
-
-	do { // unpack four hexets into three octets using index points in b64
-		h1 = b64.indexOf(data.charAt(i++));
-		h2 = b64.indexOf(data.charAt(i++));
-		h3 = b64.indexOf(data.charAt(i++));
-		h4 = b64.indexOf(data.charAt(i++));
-
-		bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
-
-		o1 = bits >> 16 & 0xff;
-		o2 = bits >> 8 & 0xff;
-		o3 = bits & 0xff;
-
-		if (h3 == 64) {
-			tmp_arr[ac++] = String.fromCharCode(o1);
-		} else if (h4 == 64) {
-			tmp_arr[ac++] = String.fromCharCode(o1, o2);
-		} else {
-			tmp_arr[ac++] = String.fromCharCode(o1, o2, o3);
-		}
-	} while (i < data.length);
-
-	dec = tmp_arr.join('');
-	//dec = this.utf8_decode(dec);
-
-	return dec;
-}
-
-
-function htmlspecialchars_decode (string, quote_style) {
-	// http://kevin.vanzonneveld.net
-	// +   original by: Mirek Slugen
-	// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-	// +   bugfixed by: Mateusz "loonquawl" Zalega
-	// +	  input by: ReverseSyntax
-	// +	  input by: Slawomir Kaniecki
-	// +	  input by: Scott Cariss
-	// +	  input by: Francois
-	// +   bugfixed by: Onno Marsman
-	// +	revised by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
-	// +   bugfixed by: Brett Zamir (http://brett-zamir.me)
-	// +	  input by: Ratheous
-	// +	  input by: Mailfaker (http://www.weedem.fr/)
-	// +	  reimplemented by: Brett Zamir (http://brett-zamir.me)
-	// +	bugfixed by: Brett Zamir (http://brett-zamir.me)
-	// *	 example 1: htmlspecialchars_decode("<p>this -&gt; &quot;</p>", 'ENT_NOQUOTES');
-	// *	 returns 1: '<p>this -> &quot;</p>'
-	// *	 example 2: htmlspecialchars_decode("&amp;quot;");
-	// *	 returns 2: '&quot;'
-	var optTemp = 0,
-		i = 0,
-		noquotes = false;
-	if (typeof quote_style === 'undefined') {
-		quote_style = 2;
-	}
-	string = string.toString().replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-	var OPTS = {
-		'ENT_NOQUOTES': 0,
-		'ENT_HTML_QUOTE_SINGLE': 1,
-		'ENT_HTML_QUOTE_DOUBLE': 2,
-		'ENT_COMPAT': 2,
-		'ENT_QUOTES': 3,
-		'ENT_IGNORE': 4
-	};
-	if (quote_style === 0) {
-		noquotes = true;
-	}
-	if (typeof quote_style !== 'number') { // Allow for a single string or an array of string flags
-		quote_style = [].concat(quote_style);
-		for (i = 0; i < quote_style.length; i++) {
-			// Resolve string input to bitwise e.g. 'PATHINFO_EXTENSION' becomes 4
-			if (OPTS[quote_style[i]] === 0) {
-				noquotes = true;
-			} else if (OPTS[quote_style[i]]) {
-				optTemp = optTemp | OPTS[quote_style[i]];
-			}
-		}
-		quote_style = optTemp;
-	}
-	if (quote_style & OPTS.ENT_HTML_QUOTE_SINGLE) {
-		string = string.replace(/&#0*39;/g, "'"); // PHP doesn't currently escape if more than one 0, but it should
-		// string = string.replace(/&apos;|&#x0*27;/g, "'"); // This would also be useful here, but not a part of PHP
-	}
-	if (!noquotes) {
-		string = string.replace(/&quot;/g, '"');
-	}
-	// Put this in last place to avoid escape being double-decoded
-	string = string.replace(/&amp;/g, '&');
-
-	return string;
-}
-
-
-// Fine Uploader 5.11.9 - (c) 2013-present Widen Enterprises, Inc. MIT licensed. http://fineuploader.com
+// Fine Uploader 5.16.2 - MIT licensed. http://fineuploader.com
 (function(global) {
     var qq = function(element) {
         "use strict";
@@ -528,13 +405,11 @@ function htmlspecialchars_decode (string, quote_style) {
             }
         };
         qq.toElement = function() {
-            return function(html, containerTag) {
-                var validContainerTags = ["div", "tbody", "ul"];
-                if (!containerTag || validContainerTags.indexOf(containerTag.toLowerCase()) == -1) containerTag = "div";
-                var container = document.createElement(containerTag);
-                container.innerHTML = html;
-                var element = container.firstChild;
-                container.removeChild(element);
+            var div = document.createElement("div");
+            return function(html) {
+                div.innerHTML = html;
+                var element = div.firstChild;
+                div.removeChild(element);
                 return element;
             };
         }();
@@ -710,7 +585,7 @@ function htmlspecialchars_decode (string, quote_style) {
         };
         qq.Error.prototype = new Error();
     })();
-    qq.version = "5.11.9";
+    qq.version = "5.16.2";
     qq.supportedFeatures = function() {
         "use strict";
         var supportsUploading, supportsUploadingBlobs, supportsFileDrop, supportsAjaxFileUploading, supportsFolderDrop, supportsChunking, supportsResume, supportsUploadViaPaste, supportsUploadCors, supportsDeleteFileXdr, supportsDeleteFileCorsXhr, supportsDeleteFileCors, supportsFolderSelection, supportsImagePreviews, supportsUploadProgress;
@@ -727,9 +602,6 @@ function htmlspecialchars_decode (string, quote_style) {
                 supported = false;
             }
             return supported;
-        }
-        function isChrome21OrHigher() {
-            return (qq.chrome() || qq.opera()) && navigator.userAgent.match(/Chrome\/[2][1-9]|Chrome\/[3-9][0-9]/) !== undefined;
         }
         function isChrome14OrHigher() {
             return (qq.chrome() || qq.opera()) && navigator.userAgent.match(/Chrome\/[1][4-9]|Chrome\/[2-9][0-9]/) !== undefined;
@@ -768,7 +640,11 @@ function htmlspecialchars_decode (string, quote_style) {
         supportsAjaxFileUploading = supportsUploading && qq.isXhrUploadSupported();
         supportsUploadingBlobs = supportsAjaxFileUploading && !qq.androidStock();
         supportsFileDrop = supportsAjaxFileUploading && isDragAndDropSupported();
-        supportsFolderDrop = supportsFileDrop && isChrome21OrHigher();
+        supportsFolderDrop = supportsFileDrop && function() {
+            var input = document.createElement("input");
+            input.type = "file";
+            return !!("webkitdirectory" in (input || document.querySelectorAll("input[type=file]")[0]));
+        }();
         supportsChunking = supportsAjaxFileUploading && qq.isFileChunkingSupported();
         supportsResume = supportsAjaxFileUploading && supportsChunking && isLocalStorageSupported();
         supportsUploadViaPaste = supportsAjaxFileUploading && isChrome14OrHigher();
@@ -1028,7 +904,8 @@ function htmlspecialchars_decode (string, quote_style) {
                     originalName: spec.name,
                     uuid: spec.uuid,
                     size: spec.size == null ? -1 : spec.size,
-                    status: status
+                    status: status,
+                    file: spec.file
                 }) - 1;
                 if (spec.batchId) {
                     data[id].batchId = spec.batchId;
@@ -1050,6 +927,7 @@ function htmlspecialchars_decode (string, quote_style) {
                     byStatus[status] = [];
                 }
                 byStatus[status].push(id);
+                spec.onBeforeStatusChange && spec.onBeforeStatusChange(id);
                 uploaderProxy.onStatusChange(id, null, status);
                 return id;
             },
@@ -1064,6 +942,12 @@ function htmlspecialchars_decode (string, quote_style) {
                     }
                 } else {
                     return qq.extend([], data, true);
+                }
+            },
+            removeFileRef: function(id) {
+                var record = getDataByIds(id);
+                if (record) {
+                    delete record.file;
                 }
             },
             reset: function() {
@@ -1118,6 +1002,7 @@ function htmlspecialchars_decode (string, quote_style) {
         CANCELED: "canceled",
         PAUSED: "paused",
         UPLOADING: "uploading",
+        UPLOAD_FINALIZING: "upload finalizing",
         UPLOAD_RETRYING: "retrying upload",
         UPLOAD_SUCCESSFUL: "upload successful",
         UPLOAD_FAILED: "upload failed",
@@ -1198,7 +1083,14 @@ function htmlspecialchars_decode (string, quote_style) {
                 }
             },
             cancel: function(id) {
-                this._handler.cancel(id);
+                var uploadData = this._uploadData.retrieve({
+                    id: id
+                });
+                if (uploadData && uploadData.status === qq.status.UPLOAD_FINALIZING) {
+                    this.log(qq.format("Ignoring cancel for file ID {} ({}).  Finalizing upload.", id, this.getName(id)), "error");
+                } else {
+                    this._handler.cancel(id);
+                }
             },
             cancelAll: function() {
                 var storedIdsCopy = [], self = this;
@@ -1275,7 +1167,17 @@ function htmlspecialchars_decode (string, quote_style) {
                 return this._endpointStore.get(fileId);
             },
             getFile: function(fileOrBlobId) {
-                return this._handler.getFile(fileOrBlobId) || null;
+                var file = this._handler.getFile(fileOrBlobId);
+                var uploadDataRecord;
+                if (!file) {
+                    uploadDataRecord = this._uploadData.retrieve({
+                        id: fileOrBlobId
+                    });
+                    if (uploadDataRecord) {
+                        file = uploadDataRecord.file;
+                    }
+                }
+                return file || null;
             },
             getInProgress: function() {
                 return this._uploadData.retrieve({
@@ -1324,6 +1226,9 @@ function htmlspecialchars_decode (string, quote_style) {
                     id: id
                 }).uuid;
             },
+            isResumable: function(id) {
+                return this._handler.hasResumeRecord(id);
+            },
             log: function(str, level) {
                 if (this._options.debug && (!level || level === "info")) {
                     qq.log("[Fine Uploader " + qq.version + "] " + str);
@@ -1350,6 +1255,10 @@ function htmlspecialchars_decode (string, quote_style) {
                 }
                 return false;
             },
+            removeFileRef: function(id) {
+                this._handler.expunge(id);
+                this._uploadData.removeFileRef(id);
+            },
             reset: function() {
                 this.log("Resetting uploader...");
                 this._handler.reset();
@@ -1372,6 +1281,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 this._succeededSinceLastAllComplete = [];
                 this._failedSinceLastAllComplete = [];
                 this._totalProgress && this._totalProgress.reset();
+                this._customResumeDataStore.reset();
             },
             retry: function(id) {
                 return this._manualRetry(id);
@@ -1386,6 +1296,9 @@ function htmlspecialchars_decode (string, quote_style) {
             },
             setCustomHeaders: function(headers, id) {
                 this._customHeadersStore.set(headers, id);
+            },
+            setCustomResumeData: function(id, data) {
+                this._customResumeDataStore.set(data, id);
             },
             setDeleteFileCustomHeaders: function(headers, id) {
                 this._deleteFileCustomHeadersStore.set(headers, id);
@@ -1414,6 +1327,28 @@ function htmlspecialchars_decode (string, quote_style) {
             setUuid: function(id, newUuid) {
                 return this._uploadData.uuidChanged(id, newUuid);
             },
+            setStatus: function(id, newStatus) {
+                var fileRecord = this.getUploads({
+                    id: id
+                });
+                if (!fileRecord) {
+                    throw new qq.Error(id + " is not a valid file ID.");
+                }
+                switch (newStatus) {
+                  case qq.status.DELETED:
+                    this._onDeleteComplete(id, null, false);
+                    break;
+
+                  case qq.status.DELETE_FAILED:
+                    this._onDeleteComplete(id, null, true);
+                    break;
+
+                  default:
+                    var errorMessage = "Method setStatus called on '" + name + "' not implemented yet for " + newStatus;
+                    this.log(errorMessage);
+                    throw new qq.Error(errorMessage);
+                }
+            },
             uploadStoredFiles: function() {
                 if (this._storedIds.length === 0) {
                     this._itemError("noFilesError");
@@ -1424,20 +1359,22 @@ function htmlspecialchars_decode (string, quote_style) {
         };
         qq.basePrivateApi = {
             _addCannedFile: function(sessionData) {
-                var id = this._uploadData.addFile({
+                var self = this;
+                return this._uploadData.addFile({
                     uuid: sessionData.uuid,
                     name: sessionData.name,
                     size: sessionData.size,
-                    status: qq.status.UPLOAD_SUCCESSFUL
+                    status: qq.status.UPLOAD_SUCCESSFUL,
+                    onBeforeStatusChange: function(id) {
+                        sessionData.deleteFileEndpoint && self.setDeleteFileEndpoint(sessionData.deleteFileEndpoint, id);
+                        sessionData.deleteFileParams && self.setDeleteFileParams(sessionData.deleteFileParams, id);
+                        if (sessionData.thumbnailUrl) {
+                            self._thumbnailUrls[id] = sessionData.thumbnailUrl;
+                        }
+                        self._netUploaded++;
+                        self._netUploadedOrQueued++;
+                    }
                 });
-                sessionData.deleteFileEndpoint && this.setDeleteFileEndpoint(sessionData.deleteFileEndpoint, id);
-                sessionData.deleteFileParams && this.setDeleteFileParams(sessionData.deleteFileParams, id);
-                if (sessionData.thumbnailUrl) {
-                    this._thumbnailUrls[id] = sessionData.thumbnailUrl;
-                }
-                this._netUploaded++;
-                this._netUploadedOrQueued++;
-                return id;
             },
             _annotateWithButtonId: function(file, associatedInput) {
                 if (qq.isFile(file)) {
@@ -1672,17 +1609,28 @@ function htmlspecialchars_decode (string, quote_style) {
                     onUploadPrep: qq.bind(this._onUploadPrep, this),
                     onUpload: function(id, name) {
                         self._onUpload(id, name);
-                        self._options.callbacks.onUpload(id, name);
+                        var onUploadResult = self._options.callbacks.onUpload(id, name);
+                        if (qq.isGenericPromise(onUploadResult)) {
+                            self.log(qq.format("onUpload for {} returned a Promise - waiting for resolution.", id));
+                            return onUploadResult;
+                        }
+                        return new qq.Promise().success();
                     },
                     onUploadChunk: function(id, name, chunkData) {
                         self._onUploadChunk(id, chunkData);
-                        self._options.callbacks.onUploadChunk(id, name, chunkData);
+                        var onUploadChunkResult = self._options.callbacks.onUploadChunk(id, name, chunkData);
+                        if (qq.isGenericPromise(onUploadChunkResult)) {
+                            self.log(qq.format("onUploadChunk for {}.{} returned a Promise - waiting for resolution.", id, chunkData.partIndex));
+                            return onUploadChunkResult;
+                        }
+                        return new qq.Promise().success();
                     },
                     onUploadChunkSuccess: function(id, chunkData, result, xhr) {
+                        self._onUploadChunkSuccess(id, chunkData);
                         self._options.callbacks.onUploadChunkSuccess.apply(self, arguments);
                     },
-                    onResume: function(id, name, chunkData) {
-                        return self._options.callbacks.onResume(id, name, chunkData);
+                    onResume: function(id, name, chunkData, customResumeData) {
+                        return self._options.callbacks.onResume(id, name, chunkData, customResumeData);
                     },
                     onAutoRetry: function(id, name, responseJSON, xhr) {
                         return self._onAutoRetry.apply(self, arguments);
@@ -1707,7 +1655,16 @@ function htmlspecialchars_decode (string, quote_style) {
                         return status === qq.status.QUEUED || status === qq.status.SUBMITTED || status === qq.status.UPLOAD_RETRYING || status === qq.status.PAUSED;
                     },
                     getIdsInProxyGroup: self._uploadData.getIdsInProxyGroup,
-                    getIdsInBatch: self._uploadData.getIdsInBatch
+                    getIdsInBatch: self._uploadData.getIdsInBatch,
+                    isInProgress: function(id) {
+                        return self.getUploads({
+                            id: id
+                        }).status === qq.status.UPLOADING;
+                    },
+                    getCustomResumeData: qq.bind(self._getCustomResumeData, self),
+                    setStatus: function(id, status) {
+                        self._uploadData.setStatus(id, status);
+                    }
                 };
                 qq.each(this._options.request, function(prop, val) {
                     options[prop] = val;
@@ -1725,12 +1682,15 @@ function htmlspecialchars_decode (string, quote_style) {
                 this._uploadData.setStatus(id, qq.status.REJECTED);
             },
             _formatSize: function(bytes) {
+                if (bytes === 0) {
+                    return bytes + this._options.text.sizeSymbols[0];
+                }
                 var i = -1;
                 do {
                     bytes = bytes / 1e3;
                     i++;
                 } while (bytes > 999);
-                return Math.max(bytes, .1).toFixed(1) + '\xa0' +this._options.text.sizeSymbols[i];
+                return Math.max(bytes, .1).toFixed(1) + this._options.text.sizeSymbols[i];
             },
             _generateExtraButtonSpecs: function() {
                 var self = this;
@@ -1780,6 +1740,9 @@ function htmlspecialchars_decode (string, quote_style) {
                         return fileInput.getAttribute(qq.UploadButton.BUTTON_ID_ATTR_NAME);
                     }
                 }
+            },
+            _getCustomResumeData: function(fileId) {
+                return this._customResumeDataStore.get(fileId);
             },
             _getNotFinished: function() {
                 return this._uploadData.retrieve({
@@ -1882,7 +1845,8 @@ function htmlspecialchars_decode (string, quote_style) {
                     uuid: uuid,
                     name: name,
                     size: size,
-                    batchId: batchId
+                    batchId: batchId,
+                    file: file
                 });
                 this._handler.add(id, file);
                 this._trackButton(id);
@@ -1902,6 +1866,28 @@ function htmlspecialchars_decode (string, quote_style) {
                     name: name,
                     blob: blob
                 });
+            },
+            _handleDeleteSuccess: function(id) {
+                if (this.getUploads({
+                    id: id
+                }).status !== qq.status.DELETED) {
+                    var name = this.getName(id);
+                    this._netUploadedOrQueued--;
+                    this._netUploaded--;
+                    this._handler.expunge(id);
+                    this._uploadData.setStatus(id, qq.status.DELETED);
+                    this.log("Delete request for '" + name + "' has succeeded.");
+                }
+            },
+            _handleDeleteFailed: function(id, xhrOrXdr) {
+                var name = this.getName(id);
+                this._uploadData.setStatus(id, qq.status.DELETE_FAILED);
+                this.log("Delete request for '" + name + "' has failed.", "error");
+                if (!xhrOrXdr || xhrOrXdr.withCredentials === undefined) {
+                    this._options.callbacks.onError(id, name, "Delete request failed", xhrOrXdr);
+                } else {
+                    this._options.callbacks.onError(id, name, "Delete request failed with response code " + xhrOrXdr.status, xhrOrXdr);
+                }
             },
             _initExtraButton: function(spec) {
                 var button = this._createUploadButton({
@@ -1970,7 +1956,6 @@ function htmlspecialchars_decode (string, quote_style) {
                 extensionsForMessage = allowedExtensions.join(", ").toLowerCase();
                 r("{file}", this._options.formatFileName(name));
                 r("{extensions}", extensionsForMessage);
-                r("{fileSize}", this._formatSize(item.size));
                 r("{sizeLimit}", this._formatSize(validationBase.sizeLimit));
                 r("{minSizeLimit}", this._formatSize(validationBase.minSizeLimit));
                 placeholderMatch = message.match(/(\{\w+\})/g);
@@ -2056,7 +2041,7 @@ function htmlspecialchars_decode (string, quote_style) {
             _onAutoRetry: function(id, name, responseJSON, xhr, callback) {
                 var self = this;
                 self._preventRetries[id] = responseJSON[self._options.retry.preventRetryResponseProperty];
-                if (self._shouldAutoRetry(id, name, responseJSON)) {
+                if (self._shouldAutoRetry(id)) {
                     var retryWaitPeriod = self._options.retry.autoAttemptDelay * 1e3;
                     self._maybeParseAndSendUploadError.apply(self, arguments);
                     self._options.callbacks.onAutoRetry(id, name, self._autoRetries[id]);
@@ -2129,19 +2114,9 @@ function htmlspecialchars_decode (string, quote_style) {
             _onDeleteComplete: function(id, xhrOrXdr, isError) {
                 var name = this.getName(id);
                 if (isError) {
-                    this._uploadData.setStatus(id, qq.status.DELETE_FAILED);
-                    this.log("Delete request for '" + name + "' has failed.", "error");
-                    if (xhrOrXdr.withCredentials === undefined) {
-                        this._options.callbacks.onError(id, name, "Delete request failed", xhrOrXdr);
-                    } else {
-                        this._options.callbacks.onError(id, name, "Delete request failed with response code " + xhrOrXdr.status, xhrOrXdr);
-                    }
+                    this._handleDeleteFailed(id, xhrOrXdr);
                 } else {
-                    this._netUploadedOrQueued--;
-                    this._netUploaded--;
-                    this._handler.expunge(id);
-                    this._uploadData.setStatus(id, qq.status.DELETED);
-                    this.log("Delete request for '" + name + "' has succeeded.");
+                    this._handleDeleteSuccess(id);
                 }
             },
             _onInputChange: function(input) {
@@ -2201,6 +2176,11 @@ function htmlspecialchars_decode (string, quote_style) {
                 this._uploadData.setStatus(id, qq.status.UPLOADING);
             },
             _onUploadChunk: function(id, chunkData) {},
+            _onUploadChunkSuccess: function(id, chunkData) {
+                if (!this._preventRetries[id] && this._options.retry.enableAuto) {
+                    this._autoRetries[id] = 0;
+                }
+            },
             _onUploadStatusChange: function(id, oldStatus, newStatus) {
                 if (newStatus === qq.status.PAUSED) {
                     clearTimeout(this._retryTimeouts[id]);
@@ -2296,7 +2276,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 this._uploadData.updateSize(id, newSize);
                 this._totalProgress && this._totalProgress.onNewSize(id);
             },
-            _shouldAutoRetry: function(id, name, responseJSON) {
+            _shouldAutoRetry: function(id) {
                 var uploadData = this._uploadData.retrieve({
                     id: id
                 });
@@ -2387,7 +2367,7 @@ function htmlspecialchars_decode (string, quote_style) {
                     this._itemError("typeError", name, file);
                     return validityChecker.failure();
                 }
-                if (size === 0) {
+                if (!this._options.validation.allowEmpty && size === 0) {
                     this._itemError("emptyError", name, file);
                     return validityChecker.failure();
                 }
@@ -2445,6 +2425,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 maxConnections: 3,
                 disableCancelForFormUploads: false,
                 autoUpload: true,
+                warnBeforeUnload: true,
                 request: {
                     customHeaders: {},
                     endpoint: "/server/upload",
@@ -2452,8 +2433,10 @@ function htmlspecialchars_decode (string, quote_style) {
                     forceMultipart: true,
                     inputName: "qqfile",
                     method: "POST",
+                    omitDefaultParams: false,
                     params: {},
                     paramsInBody: true,
+                    requireSuccessJson: true,
                     totalFileSizeName: "qqtotalfilesize",
                     uuidName: "qquuid"
                 },
@@ -2469,7 +2452,8 @@ function htmlspecialchars_decode (string, quote_style) {
                         maxWidth: 0,
                         minHeight: 0,
                         minWidth: 0
-                    }
+                    },
+                    allowEmpty: false
                 },
                 callbacks: {
                     onSubmit: function(id, name) {},
@@ -2480,7 +2464,7 @@ function htmlspecialchars_decode (string, quote_style) {
                     onUpload: function(id, name) {},
                     onUploadChunk: function(id, name, chunkData) {},
                     onUploadChunkSuccess: function(id, chunkData, responseJSON, xhr) {},
-                    onResume: function(id, fileName, chunkData) {},
+                    onResume: function(id, fileName, chunkData, customResumeData) {},
                     onProgress: function(id, name, loaded, total) {},
                     onTotalProgress: function(loaded, total) {},
                     onError: function(id, name, reason, maybeXhrOrXdr) {},
@@ -2533,9 +2517,20 @@ function htmlspecialchars_decode (string, quote_style) {
                         totalFileSize: "qqtotalfilesize",
                         totalParts: "qqtotalparts"
                     },
-                    partSize: 2e6,
+                    partSize: function(id) {
+                        return 2e6;
+                    },
                     success: {
-                        endpoint: null
+                        endpoint: null,
+                        headers: function(id) {
+                            return null;
+                        },
+                        jsonPayload: false,
+                        method: "POST",
+                        params: function(id) {
+                            return null;
+                        },
+                        resetOnStatus: []
                     }
                 },
                 resume: {
@@ -2543,6 +2538,9 @@ function htmlspecialchars_decode (string, quote_style) {
                     recordsExpireIn: 7,
                     paramNames: {
                         resuming: "qqresume"
+                    },
+                    customKeys: function(fileId) {
+                        return [];
                     }
                 },
                 formatFileName: function(fileOrBlobName) {
@@ -2641,7 +2639,7 @@ function htmlspecialchars_decode (string, quote_style) {
                     this.log("Paste support module not found", "error");
                 }
             }
-            this._preventLeaveInProgress();
+            this._options.warnBeforeUnload && this._preventLeaveInProgress();
             this._imageGenerator = qq.ImageGenerator && new qq.ImageGenerator(qq.bind(this.log, this));
             this._refreshSessionData();
             this._succeededSinceLastAllComplete = [];
@@ -2659,6 +2657,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 });
             }
             this._currentItemLimit = this._options.validation.itemLimit;
+            this._customResumeDataStore = this._createStore();
         };
         qq.FineUploaderBasic.prototype = qq.basePublicApi;
         qq.extend(qq.FineUploaderBasic.prototype, qq.basePrivateApi);
@@ -2728,7 +2727,7 @@ function htmlspecialchars_decode (string, quote_style) {
             return xhrOrXdr;
         }
         function getXhrOrXdr(id, suppliedXhr) {
-            var xhrOrXdr = requestData[id].xhr;
+            var xhrOrXdr = requestData[id] && requestData[id].xhr;
             if (!xhrOrXdr) {
                 if (suppliedXhr) {
                     xhrOrXdr = suppliedXhr;
@@ -2991,13 +2990,14 @@ function htmlspecialchars_decode (string, quote_style) {
             onUploadChunk: function(id, fileName, chunkData) {},
             onUploadChunkSuccess: function(id, chunkData, response, xhr) {},
             onAutoRetry: function(id, fileName, response, xhr) {},
-            onResume: function(id, fileName, chunkData) {},
+            onResume: function(id, fileName, chunkData, customResumeData) {},
             onUuidChanged: function(id, newUuid) {},
             getName: function(id) {},
             setSize: function(id, newSize) {},
             isQueued: function(id) {},
             getIdsInProxyGroup: function(id) {},
-            getIdsInBatch: function(id) {}
+            getIdsInBatch: function(id) {},
+            isInProgress: function(id) {}
         }, chunked = {
             done: function(id, chunkIdx, response, xhr) {
                 var chunkData = handler._getChunkData(id, chunkIdx);
@@ -3016,13 +3016,13 @@ function htmlspecialchars_decode (string, quote_style) {
                     handler._maybeDeletePersistedChunkData(id);
                     upload.cleanup(id, normaizedResponse, xhr);
                 }, function(response, xhr) {
-                    var normaizedResponse = upload.normalizeResponse(response, false);
-                    log("Problem finalizing chunks for file ID " + id + " - " + normaizedResponse.error, "error");
-                    if (normaizedResponse.reset) {
+                    var normalizedResponse = upload.normalizeResponse(response, false);
+                    log("Problem finalizing chunks for file ID " + id + " - " + normalizedResponse.error, "error");
+                    if (normalizedResponse.reset || xhr && options.chunking.success.resetOnStatus.indexOf(xhr.status) >= 0) {
                         chunked.reset(id);
                     }
-                    if (!options.onAutoRetry(id, name, normaizedResponse, xhr)) {
-                        upload.cleanup(id, normaizedResponse, xhr);
+                    if (!options.onAutoRetry(id, name, normalizedResponse, xhr)) {
+                        upload.cleanup(id, normalizedResponse, xhr);
                     }
                 });
             },
@@ -3034,7 +3034,8 @@ function htmlspecialchars_decode (string, quote_style) {
                 if (responseToReport.reset) {
                     chunked.reset(id);
                 } else {
-                    inProgressIdx = qq.indexOf(handler._getFileState(id).chunking.inProgress, chunkIdx);
+                    var inProgressChunksArray = handler._getFileState(id).chunking.inProgress;
+                    inProgressIdx = inProgressChunksArray ? qq.indexOf(inProgressChunksArray, chunkIdx) : -1;
                     if (inProgressIdx >= 0) {
                         handler._getFileState(id).chunking.inProgress.splice(inProgressIdx, 1);
                         handler._getFileState(id).chunking.remaining.unshift(chunkIdx);
@@ -3072,13 +3073,14 @@ function htmlspecialchars_decode (string, quote_style) {
                 handler._maybeDeletePersistedChunkData(id);
                 handler.reevaluateChunking(id);
                 handler._getFileState(id).loaded = 0;
+                handler._getFileState(id).attemptingResume = false;
             },
             sendNext: function(id) {
-                var size = options.getSize(id), name = options.getName(id), chunkIdx = chunked.nextPart(id), chunkData = handler._getChunkData(id, chunkIdx), resuming = handler._getFileState(id).attemptingResume, inProgressChunks = handler._getFileState(id).chunking.inProgress || [];
-                if (handler._getFileState(id).loaded == null) {
-                    handler._getFileState(id).loaded = 0;
+                var size = options.getSize(id), name = options.getName(id), chunkIdx = chunked.nextPart(id), chunkData = handler._getChunkData(id, chunkIdx), fileState = handler._getFileState(id), resuming = fileState.attemptingResume, inProgressChunks = fileState.chunking.inProgress || [];
+                if (fileState.loaded == null) {
+                    fileState.loaded = 0;
                 }
-                if (resuming && options.onResume(id, name, chunkData) === false) {
+                if (resuming && options.onResume(id, name, chunkData, fileState.customResumeData) === false) {
                     chunked.reset(id);
                     chunkIdx = chunked.nextPart(id);
                     chunkData = handler._getChunkData(id, chunkIdx);
@@ -3087,8 +3089,6 @@ function htmlspecialchars_decode (string, quote_style) {
                 if (chunkIdx == null && inProgressChunks.length === 0) {
                     chunked.finalize(id);
                 } else {
-                    log(qq.format("Sending chunked upload request for item {}.{}, bytes {}-{} of {}.", id, chunkIdx, chunkData.start + 1, chunkData.end, size));
-                    options.onUploadChunk(id, name, handler._getChunkDataForCallback(chunkData));
                     inProgressChunks.push(chunkIdx);
                     handler._getFileState(id).chunking.inProgress = inProgressChunks;
                     if (concurrentChunkingPossible) {
@@ -3100,30 +3100,45 @@ function htmlspecialchars_decode (string, quote_style) {
                     if (chunkData.blob.size === 0) {
                         log(qq.format("Chunk {} for file {} will not be uploaded, zero sized chunk.", chunkIdx, id), "error");
                         chunked.handleFailure(chunkIdx, id, "File is no longer available", null);
-                    } else {
-                        handler.uploadChunk(id, chunkIdx, resuming).then(function success(response, xhr) {
-                            log("Chunked upload request succeeded for " + id + ", chunk " + chunkIdx);
-                            handler.clearCachedChunk(id, chunkIdx);
-                            var inProgressChunks = handler._getFileState(id).chunking.inProgress || [], responseToReport = upload.normalizeResponse(response, true), inProgressChunkIdx = qq.indexOf(inProgressChunks, chunkIdx);
-                            log(qq.format("Chunk {} for file {} uploaded successfully.", chunkIdx, id));
-                            chunked.done(id, chunkIdx, responseToReport, xhr);
-                            if (inProgressChunkIdx >= 0) {
-                                inProgressChunks.splice(inProgressChunkIdx, 1);
-                            }
-                            handler._maybePersistChunkedState(id);
-                            if (!chunked.hasMoreParts(id) && inProgressChunks.length === 0) {
-                                chunked.finalize(id);
-                            } else if (chunked.hasMoreParts(id)) {
-                                chunked.sendNext(id);
-                            } else {
-                                log(qq.format("File ID {} has no more chunks to send and these chunk indexes are still marked as in-progress: {}", id, JSON.stringify(inProgressChunks)));
-                            }
-                        }, function failure(response, xhr) {
-                            chunked.handleFailure(chunkIdx, id, response, xhr);
-                        }).done(function() {
-                            handler.clearXhr(id, chunkIdx);
-                        });
                     }
+                    var onUploadChunkPromise = options.onUploadChunk(id, name, handler._getChunkDataForCallback(chunkData));
+                    onUploadChunkPromise.then(function(requestOverrides) {
+                        if (!options.isInProgress(id)) {
+                            log(qq.format("Not sending chunked upload request for item {}.{} - no longer in progress.", id, chunkIdx));
+                        } else {
+                            log(qq.format("Sending chunked upload request for item {}.{}, bytes {}-{} of {}.", id, chunkIdx, chunkData.start + 1, chunkData.end, size));
+                            var uploadChunkData = {
+                                chunkIdx: chunkIdx,
+                                id: id,
+                                overrides: requestOverrides,
+                                resuming: resuming
+                            };
+                            handler.uploadChunk(uploadChunkData).then(function success(response, xhr) {
+                                log("Chunked upload request succeeded for " + id + ", chunk " + chunkIdx);
+                                handler.clearCachedChunk(id, chunkIdx);
+                                var inProgressChunks = handler._getFileState(id).chunking.inProgress || [], responseToReport = upload.normalizeResponse(response, true), inProgressChunkIdx = qq.indexOf(inProgressChunks, chunkIdx);
+                                log(qq.format("Chunk {} for file {} uploaded successfully.", chunkIdx, id));
+                                chunked.done(id, chunkIdx, responseToReport, xhr);
+                                if (inProgressChunkIdx >= 0) {
+                                    inProgressChunks.splice(inProgressChunkIdx, 1);
+                                }
+                                handler._maybePersistChunkedState(id);
+                                if (!chunked.hasMoreParts(id) && inProgressChunks.length === 0) {
+                                    chunked.finalize(id);
+                                } else if (chunked.hasMoreParts(id)) {
+                                    chunked.sendNext(id);
+                                } else {
+                                    log(qq.format("File ID {} has no more chunks to send and these chunk indexes are still marked as in-progress: {}", id, JSON.stringify(inProgressChunks)));
+                                }
+                            }, function failure(response, xhr) {
+                                chunked.handleFailure(chunkIdx, id, response, xhr);
+                            }).done(function() {
+                                handler.clearXhr(id, chunkIdx);
+                            });
+                        }
+                    }, function(error) {
+                        chunked.handleFailure(chunkIdx, id, error, null);
+                    });
                 }
             }
         }, connectionManager = {
@@ -3199,7 +3214,12 @@ function htmlspecialchars_decode (string, quote_style) {
             }
         }, simple = {
             send: function(id, name) {
-                handler._getFileState(id).loaded = 0;
+                var fileState = handler._getFileState(id);
+                if (!fileState) {
+                    log("Ignoring send request as this upload may have been cancelled, File ID " + id, "warn");
+                    return;
+                }
+                fileState.loaded = 0;
                 log("Sending simple upload request for " + id);
                 handler.uploadFile(id).then(function(response, optXhr) {
                     log("Simple upload request succeeded for " + id);
@@ -3235,6 +3255,7 @@ function htmlspecialchars_decode (string, quote_style) {
             initHandler: function() {
                 var handlerType = namespace ? qq[namespace] : qq.traditional, handlerModuleSubtype = qq.supportedFeatures.ajaxUploading ? "Xhr" : "Form";
                 handler = new handlerType[handlerModuleSubtype + "UploadHandler"](options, {
+                    getCustomResumeData: options.getCustomResumeData,
                     getDataByUuid: options.getDataByUuid,
                     getName: options.getName,
                     getSize: options.getSize,
@@ -3242,7 +3263,10 @@ function htmlspecialchars_decode (string, quote_style) {
                     log: log,
                     onCancel: options.onCancel,
                     onProgress: options.onProgress,
-                    onUuidChanged: options.onUuidChanged
+                    onUuidChanged: options.onUuidChanged,
+                    onFinalizing: function(id) {
+                        options.setStatus(id, qq.status.UPLOAD_FINALIZING);
+                    }
                 });
                 if (handler._removeExpiredChunkingRecords) {
                     handler._removeExpiredChunkingRecords();
@@ -3315,12 +3339,26 @@ function htmlspecialchars_decode (string, quote_style) {
                 if (!controller.isValid(id)) {
                     throw new qq.Error(id + " is not a valid file ID to upload!");
                 }
-                options.onUpload(id, name);
-                if (chunkingPossible && handler._shouldChunkThisFile(id)) {
-                    chunked.sendNext(id);
-                } else {
-                    simple.send(id, name);
-                }
+                options.onUpload(id, name).then(function(response) {
+                    if (response && response.pause) {
+                        options.setStatus(id, qq.status.PAUSED);
+                        handler.pause(id);
+                        connectionManager.free(id);
+                    } else {
+                        if (chunkingPossible && handler._shouldChunkThisFile(id)) {
+                            chunked.sendNext(id);
+                        } else {
+                            simple.send(id, name);
+                        }
+                    }
+                }, function(error) {
+                    error = error || {};
+                    log(id + " upload start aborted due to rejected onUpload Promise - details: " + error, "error");
+                    if (!options.onAutoRetry(id, name, error.responseJSON || {})) {
+                        var response = upload.normalizeResponse(error.responseJSON, false);
+                        upload.cleanup(id, response);
+                    }
+                });
             },
             start: function(id) {
                 var blobToUpload = upload.getProxyOrBlob(id);
@@ -3399,6 +3437,13 @@ function htmlspecialchars_decode (string, quote_style) {
             isValid: function(id) {
                 return handler.isValid(id);
             },
+            hasResumeRecord: function(id) {
+                var key = handler.isValid(id) && handler._getLocalStorageId && handler._getLocalStorageId(id);
+                if (key) {
+                    return !!localStorage.getItem(key);
+                }
+                return false;
+            },
             getResumableFilesData: function() {
                 if (handler.getResumableFilesData) {
                     return handler.getResumableFilesData();
@@ -3417,6 +3462,9 @@ function htmlspecialchars_decode (string, quote_style) {
                     return true;
                 }
                 return false;
+            },
+            isAttemptingResume: function(id) {
+                return !!handler.isAttemptingResume && handler.isAttemptingResume(id);
             },
             isResumable: function(id) {
                 return !!handler.isResumable && handler.isResumable(id);
@@ -3608,7 +3656,19 @@ function htmlspecialchars_decode (string, quote_style) {
     };
     qq.XhrUploadHandler = function(spec) {
         "use strict";
-        var handler = this, namespace = spec.options.namespace, proxy = spec.proxy, chunking = spec.options.chunking, resume = spec.options.resume, chunkFiles = chunking && spec.options.chunking.enabled && qq.supportedFeatures.chunking, resumeEnabled = resume && spec.options.resume.enabled && chunkFiles && qq.supportedFeatures.resume, getName = proxy.getName, getSize = proxy.getSize, getUuid = proxy.getUuid, getEndpoint = proxy.getEndpoint, getDataByUuid = proxy.getDataByUuid, onUuidChanged = proxy.onUuidChanged, onProgress = proxy.onProgress, log = proxy.log;
+        var handler = this, namespace = spec.options.namespace, proxy = spec.proxy, chunking = spec.options.chunking, getChunkSize = function(id) {
+            var fileState = handler._getFileState(id);
+            if (fileState.chunkSize) {
+                return fileState.chunkSize;
+            } else {
+                var chunkSize = chunking.partSize;
+                if (qq.isFunction(chunkSize)) {
+                    chunkSize = chunkSize(id, getSize(id));
+                }
+                fileState.chunkSize = chunkSize;
+                return chunkSize;
+            }
+        }, resume = spec.options.resume, chunkFiles = chunking && spec.options.chunking.enabled && qq.supportedFeatures.chunking, resumeEnabled = resume && spec.options.resume.enabled && chunkFiles && qq.supportedFeatures.resume, getName = proxy.getName, getSize = proxy.getSize, getUuid = proxy.getUuid, getEndpoint = proxy.getEndpoint, getDataByUuid = proxy.getDataByUuid, onUuidChanged = proxy.onUuidChanged, onProgress = proxy.onProgress, log = proxy.log, getCustomResumeData = proxy.getCustomResumeData;
         function abort(id) {
             qq.each(handler._getXhrs(id), function(xhrId, xhr) {
                 var ajaxRequester = handler._getAjaxRequester(id, xhrId);
@@ -3646,7 +3706,10 @@ function htmlspecialchars_decode (string, quote_style) {
         });
         qq.extend(this, {
             clearCachedChunk: function(id, chunkIdx) {
-                delete handler._getFileState(id).temp.cachedChunks[chunkIdx];
+                var fileState = handler._getFileState(id);
+                if (fileState) {
+                    delete fileState.temp.cachedChunks[chunkIdx];
+                }
             },
             clearXhr: function(id, chunkIdx) {
                 var tempState = handler._getFileState(id).temp;
@@ -3683,15 +3746,21 @@ function htmlspecialchars_decode (string, quote_style) {
                     if (uploadData.key) {
                         data.key = uploadData.key;
                     }
+                    if (uploadData.customResumeData) {
+                        data.customResumeData = uploadData.customResumeData;
+                    }
                     resumableFilesData.push(data);
                 });
                 return resumableFilesData;
+            },
+            isAttemptingResume: function(id) {
+                return handler._getFileState(id).attemptingResume;
             },
             isResumable: function(id) {
                 return !!chunking && handler.isValid(id) && !handler._getFileState(id).notResumable;
             },
             moveInProgressToRemaining: function(id, optInProgress, optRemaining) {
-                var inProgress = optInProgress || handler._getFileState(id).chunking.inProgress, remaining = optRemaining || handler._getFileState(id).chunking.remaining;
+                var fileState = handler._getFileState(id) || {}, chunkingState = fileState.chunking || {}, inProgress = optInProgress || chunkingState.inProgress, remaining = optRemaining || chunkingState.remaining;
                 if (inProgress) {
                     log(qq.format("Moving these chunks from in-progress {}, to remaining.", JSON.stringify(inProgress)));
                     inProgress.reverse();
@@ -3750,7 +3819,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 return handler._getFileState(id).temp.ajaxRequesters[chunkIdx];
             },
             _getChunkData: function(id, chunkIndex) {
-                var chunkSize = chunking.partSize, fileSize = getSize(id), fileOrBlob = handler.getFile(id), startBytes = chunkSize * chunkIndex, endBytes = startBytes + chunkSize >= fileSize ? fileSize : startBytes + chunkSize, totalChunks = handler._getTotalChunks(id), cachedChunks = this._getFileState(id).temp.cachedChunks, blob = cachedChunks[chunkIndex] || qq.sliceBlob(fileOrBlob, startBytes, endBytes);
+                var chunkSize = getChunkSize(id), fileSize = getSize(id), fileOrBlob = handler.getFile(id), startBytes = chunkSize * chunkIndex, endBytes = startBytes + chunkSize >= fileSize ? fileSize : startBytes + chunkSize, totalChunks = handler._getTotalChunks(id), cachedChunks = this._getFileState(id).temp.cachedChunks, blob = cachedChunks[chunkIndex] || qq.sliceBlob(fileOrBlob, startBytes, endBytes);
                 cachedChunks[chunkIndex] = blob;
                 return {
                     part: chunkIndex,
@@ -3770,8 +3839,11 @@ function htmlspecialchars_decode (string, quote_style) {
                 };
             },
             _getLocalStorageId: function(id) {
-                var formatVersion = "5.0", name = getName(id), size = getSize(id), chunkSize = chunking.partSize, endpoint = getEndpoint(id);
-                return qq.format("qq{}resume{}-{}-{}-{}-{}", namespace, formatVersion, name, size, chunkSize, endpoint);
+                var formatVersion = "5.0", name = getName(id), size = getSize(id), chunkSize = getChunkSize(id), endpoint = getEndpoint(id), customKeys = resume.customKeys(id), localStorageId = qq.format("qq{}resume{}-{}-{}-{}-{}", namespace, formatVersion, name, size, chunkSize, endpoint);
+                customKeys.forEach(function(key) {
+                    localStorageId += "-" + key;
+                });
+                return localStorageId;
             },
             _getMimeType: function(id) {
                 return handler.getFile(id).type;
@@ -3781,7 +3853,7 @@ function htmlspecialchars_decode (string, quote_style) {
             },
             _getTotalChunks: function(id) {
                 if (chunking) {
-                    var fileSize = getSize(id), chunkSize = chunking.partSize;
+                    var fileSize = getSize(id), chunkSize = getChunkSize(id);
                     return Math.ceil(fileSize / chunkSize);
                 }
             },
@@ -3839,6 +3911,7 @@ function htmlspecialchars_decode (string, quote_style) {
                             state.key = persistedData.key;
                             state.chunking = persistedData.chunking;
                             state.loaded = persistedData.loaded;
+                            state.customResumeData = persistedData.customResumeData;
                             state.attemptingResume = true;
                             handler.moveInProgressToRemaining(id);
                         }
@@ -3848,6 +3921,7 @@ function htmlspecialchars_decode (string, quote_style) {
             _maybePersistChunkedState: function(id) {
                 var state = handler._getFileState(id), localStorageId, persistedData;
                 if (resumeEnabled && handler.isResumable(id)) {
+                    var customResumeData = getCustomResumeData(id);
                     localStorageId = handler._getLocalStorageId(id);
                     persistedData = {
                         name: getName(id),
@@ -3858,6 +3932,9 @@ function htmlspecialchars_decode (string, quote_style) {
                         loaded: state.loaded,
                         lastUpdated: Date.now()
                     };
+                    if (customResumeData) {
+                        persistedData.customResumeData = customResumeData;
+                    }
                     try {
                         localStorage.setItem(localStorageId, JSON.stringify(persistedData));
                     } catch (error) {
@@ -3914,10 +3991,12 @@ function htmlspecialchars_decode (string, quote_style) {
             },
             _shouldChunkThisFile: function(id) {
                 var state = handler._getFileState(id);
-                if (!state.chunking) {
-                    handler.reevaluateChunking(id);
+                if (state) {
+                    if (!state.chunking) {
+                        handler.reevaluateChunking(id);
+                    }
+                    return state.chunking.enabled;
                 }
-                return state.chunking.enabled;
             }
         });
     };
@@ -4551,69 +4630,6 @@ function htmlspecialchars_decode (string, quote_style) {
         });
         this._testing = {};
         this._testing.parseLittleEndian = parseLittleEndian;
-    };
-    qq.Identify = function(fileOrBlob, log) {
-        "use strict";
-        function isIdentifiable(magicBytes, questionableBytes) {
-            var identifiable = false, magicBytesEntries = [].concat(magicBytes);
-            qq.each(magicBytesEntries, function(idx, magicBytesArrayEntry) {
-                if (questionableBytes.indexOf(magicBytesArrayEntry) === 0) {
-                    identifiable = true;
-                    return false;
-                }
-            });
-            return identifiable;
-        }
-        qq.extend(this, {
-            isPreviewable: function() {
-                var self = this, identifier = new qq.Promise(), previewable = false, name = fileOrBlob.name === undefined ? "blob" : fileOrBlob.name;
-                log(qq.format("Attempting to determine if {} can be rendered in this browser", name));
-                log("First pass: check type attribute of blob object.");
-                if (this.isPreviewableSync()) {
-                    log("Second pass: check for magic bytes in file header.");
-                    qq.readBlobToHex(fileOrBlob, 0, 4).then(function(hex) {
-                        qq.each(self.PREVIEWABLE_MIME_TYPES, function(mime, bytes) {
-                            if (isIdentifiable(bytes, hex)) {
-                                if (mime !== "image/tiff" || qq.supportedFeatures.tiffPreviews) {
-                                    previewable = true;
-                                    identifier.success(mime);
-                                }
-                                return false;
-                            }
-                        });
-                        log(qq.format("'{}' is {} able to be rendered in this browser", name, previewable ? "" : "NOT"));
-                        if (!previewable) {
-                            identifier.failure();
-                        }
-                    }, function() {
-                        log("Error reading file w/ name '" + name + "'.  Not able to be rendered in this browser.");
-                        identifier.failure();
-                    });
-                } else {
-                    identifier.failure();
-                }
-                return identifier;
-            },
-            isPreviewableSync: function() {
-                var fileMime = fileOrBlob.type, isRecognizedImage = qq.indexOf(Object.keys(this.PREVIEWABLE_MIME_TYPES), fileMime) >= 0, previewable = false, name = fileOrBlob.name === undefined ? "blob" : fileOrBlob.name;
-                if (isRecognizedImage) {
-                    if (fileMime === "image/tiff") {
-                        previewable = qq.supportedFeatures.tiffPreviews;
-                    } else {
-                        previewable = true;
-                    }
-                }
-                !previewable && log(name + " is not previewable in this browser per the blob's type attr");
-                return previewable;
-            }
-        });
-    };
-    qq.Identify.prototype.PREVIEWABLE_MIME_TYPES = {
-        "image/jpeg": "ffd8ff",
-        "image/gif": "474946",
-        "image/png": "89504e",
-        "image/bmp": "424d",
-        "image/tiff": [ "49492a00", "4d4d002a" ]
     };
     qq.Identify = function(fileOrBlob, log) {
         "use strict";
@@ -5507,18 +5523,24 @@ function htmlspecialchars_decode (string, quote_style) {
         "use strict";
         var handler = this, getName = proxy.getName, getSize = proxy.getSize, getUuid = proxy.getUuid, log = proxy.log, multipart = spec.forceMultipart || spec.paramsInBody, addChunkingSpecificParams = function(id, params, chunkData) {
             var size = getSize(id), name = getName(id);
-            params[spec.chunking.paramNames.partIndex] = chunkData.part;
-            params[spec.chunking.paramNames.partByteOffset] = chunkData.start;
-            params[spec.chunking.paramNames.chunkSize] = chunkData.size;
-            params[spec.chunking.paramNames.totalParts] = chunkData.count;
-            params[spec.totalFileSizeName] = size;
-            if (multipart) {
+            if (!spec.omitDefaultParams) {
+                params[spec.chunking.paramNames.partIndex] = chunkData.part;
+                params[spec.chunking.paramNames.partByteOffset] = chunkData.start;
+                params[spec.chunking.paramNames.chunkSize] = chunkData.size;
+                params[spec.chunking.paramNames.totalParts] = chunkData.count;
+                params[spec.totalFileSizeName] = size;
+            }
+            if (multipart && !spec.omitDefaultParams) {
                 params[spec.filenameParam] = name;
             }
         }, allChunksDoneRequester = new qq.traditional.AllChunksDoneAjaxRequester({
             cors: spec.cors,
             endpoint: spec.chunking.success.endpoint,
-            log: log
+            headers: spec.chunking.success.headers,
+            jsonPayload: spec.chunking.success.jsonPayload,
+            log: log,
+            method: spec.chunking.success.method,
+            params: spec.chunking.success.params
         }), createReadyStateChangedHandler = function(id, xhr) {
             var promise = new qq.Promise();
             xhr.onreadystatechange = function() {
@@ -5540,7 +5562,7 @@ function htmlspecialchars_decode (string, quote_style) {
             params[spec.chunking.paramNames.totalParts] = handler._getTotalChunks(id);
             return params;
         }, isErrorUploadResponse = function(xhr, response) {
-            return qq.indexOf([ 200, 201, 202, 203, 204 ], xhr.status) < 0 || !response.success || response.reset;
+            return qq.indexOf([ 200, 201, 202, 203, 204 ], xhr.status) < 0 || spec.requireSuccessJson && !response.success || response.reset;
         }, onUploadOrChunkComplete = function(id, xhr) {
             var response;
             log("xhr - server response received for " + id);
@@ -5556,7 +5578,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 log(qq.format("Received response status {} with body: {}", xhr.status, xhr.responseText));
                 response = qq.parseJson(xhr.responseText);
             } catch (error) {
-                upload && log("Error when attempting to parse xhr response text (" + error.message + ")", "error");
+                upload && spec.requireSuccessJson && log("Error when attempting to parse xhr response text (" + error.message + ")", "error");
             }
             return response;
         }, sendChunksCompleteRequest = function(id) {
@@ -5567,17 +5589,32 @@ function htmlspecialchars_decode (string, quote_style) {
                 promise.failure(parseResponse(false, xhr), xhr);
             });
             return promise;
-        }, setParamsAndGetEntityToSend = function(params, xhr, fileOrBlob, id) {
-            var formData = new FormData(), method = spec.method, endpoint = spec.endpointStore.get(id), name = getName(id), size = getSize(id);
-            params[spec.uuidName] = getUuid(id);
-            params[spec.filenameParam] = name;
-            if (multipart) {
-                params[spec.totalFileSizeName] = size;
-            }
-            if (!spec.paramsInBody) {
-                if (!multipart) {
+        }, setParamsAndGetEntityToSend = function(entityToSendParams) {
+            var fileOrBlob = entityToSendParams.fileOrBlob;
+            var id = entityToSendParams.id;
+            var xhr = entityToSendParams.xhr;
+            var xhrOverrides = entityToSendParams.xhrOverrides || {};
+            var customParams = entityToSendParams.customParams || {};
+            var defaultParams = entityToSendParams.params || {};
+            var xhrOverrideParams = xhrOverrides.params || {};
+            var params;
+            var formData = multipart ? new FormData() : null, method = xhrOverrides.method || spec.method, endpoint = xhrOverrides.endpoint || spec.endpointStore.get(id), name = getName(id), size = getSize(id);
+            if (spec.omitDefaultParams) {
+                params = qq.extend({}, customParams);
+                qq.extend(params, xhrOverrideParams);
+            } else {
+                params = qq.extend({}, customParams);
+                qq.extend(params, xhrOverrideParams);
+                qq.extend(params, defaultParams);
+                params[spec.uuidName] = getUuid(id);
+                params[spec.filenameParam] = name;
+                if (multipart) {
+                    params[spec.totalFileSizeName] = size;
+                } else if (!spec.paramsInBody) {
                     params[spec.inputName] = name;
                 }
+            }
+            if (!spec.paramsInBody) {
                 endpoint = qq.obj2url(params, endpoint);
             }
             xhr.open(method, endpoint, true);
@@ -5592,42 +5629,74 @@ function htmlspecialchars_decode (string, quote_style) {
                 return formData;
             }
             return fileOrBlob;
-        }, setUploadHeaders = function(id, xhr) {
-            var extraHeaders = spec.customHeaders.get(id), fileOrBlob = handler.getFile(id);
-            xhr.setRequestHeader("Accept", "application/json");
-            xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-            xhr.setRequestHeader("Cache-Control", "no-cache");
-            if (!multipart) {
-                xhr.setRequestHeader("Content-Type", "application/octet-stream");
-                xhr.setRequestHeader("X-Mime-Type", fileOrBlob.type);
+        }, setUploadHeaders = function(headersOptions) {
+            var headerOverrides = headersOptions.headerOverrides;
+            var id = headersOptions.id;
+            var xhr = headersOptions.xhr;
+            if (headerOverrides) {
+                qq.each(headerOverrides, function(headerName, headerValue) {
+                    xhr.setRequestHeader(headerName, headerValue);
+                });
+            } else {
+                var extraHeaders = spec.customHeaders.get(id), fileOrBlob = handler.getFile(id);
+                xhr.setRequestHeader("Accept", "application/json");
+                xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                xhr.setRequestHeader("Cache-Control", "no-cache");
+                if (!multipart) {
+                    xhr.setRequestHeader("Content-Type", "application/octet-stream");
+                    xhr.setRequestHeader("X-Mime-Type", fileOrBlob.type);
+                }
+                qq.each(extraHeaders, function(name, val) {
+                    xhr.setRequestHeader(name, val);
+                });
             }
-            qq.each(extraHeaders, function(name, val) {
-                xhr.setRequestHeader(name, val);
-            });
         };
         qq.extend(this, {
-            uploadChunk: function(id, chunkIdx, resuming) {
-                var chunkData = handler._getChunkData(id, chunkIdx), xhr = handler._createXhr(id, chunkIdx), size = getSize(id), promise, toSend, params;
+            uploadChunk: function(uploadChunkParams) {
+                var id = uploadChunkParams.id;
+                var chunkIdx = uploadChunkParams.chunkIdx;
+                var overrides = uploadChunkParams.overrides || {};
+                var resuming = uploadChunkParams.resuming;
+                var chunkData = handler._getChunkData(id, chunkIdx), xhr = handler._createXhr(id, chunkIdx), promise, toSend, customParams, params = {};
                 promise = createReadyStateChangedHandler(id, xhr);
                 handler._registerProgressHandler(id, chunkIdx, chunkData.size);
-                params = spec.paramsStore.get(id);
+                customParams = spec.paramsStore.get(id);
                 addChunkingSpecificParams(id, params, chunkData);
                 if (resuming) {
                     params[spec.resume.paramNames.resuming] = true;
                 }
-                toSend = setParamsAndGetEntityToSend(params, xhr, chunkData.blob, id);
-                setUploadHeaders(id, xhr);
+                toSend = setParamsAndGetEntityToSend({
+                    fileOrBlob: chunkData.blob,
+                    id: id,
+                    customParams: customParams,
+                    params: params,
+                    xhr: xhr,
+                    xhrOverrides: overrides
+                });
+                setUploadHeaders({
+                    headerOverrides: overrides.headers,
+                    id: id,
+                    xhr: xhr
+                });
                 xhr.send(toSend);
                 return promise;
             },
             uploadFile: function(id) {
-                var fileOrBlob = handler.getFile(id), promise, xhr, params, toSend;
+                var fileOrBlob = handler.getFile(id), promise, xhr, customParams, toSend;
                 xhr = handler._createXhr(id);
                 handler._registerProgressHandler(id);
                 promise = createReadyStateChangedHandler(id, xhr);
-                params = spec.paramsStore.get(id);
-                toSend = setParamsAndGetEntityToSend(params, xhr, fileOrBlob, id);
-                setUploadHeaders(id, xhr);
+                customParams = spec.paramsStore.get(id);
+                toSend = setParamsAndGetEntityToSend({
+                    fileOrBlob: fileOrBlob,
+                    id: id,
+                    customParams: customParams,
+                    xhr: xhr
+                });
+                setUploadHeaders({
+                    id: id,
+                    xhr: xhr
+                });
                 xhr.send(toSend);
                 return promise;
             }
@@ -5643,6 +5712,7 @@ function htmlspecialchars_decode (string, quote_style) {
         qq.override(this, function(super_) {
             return {
                 finalizeChunks: function(id) {
+                    proxy.onFinalizing(id);
                     if (spec.chunking.success.endpoint) {
                         return sendChunksCompleteRequest(id);
                     } else {
@@ -5654,24 +5724,29 @@ function htmlspecialchars_decode (string, quote_style) {
     };
     qq.traditional.AllChunksDoneAjaxRequester = function(o) {
         "use strict";
-        var requester, method = "POST", options = {
+        var requester, options = {
             cors: {
                 allowXdr: false,
                 expected: false,
                 sendCredentials: false
             },
             endpoint: null,
-            log: function(str, level) {}
+            log: function(str, level) {},
+            method: "POST"
         }, promises = {}, endpointHandler = {
             get: function(id) {
+                if (qq.isFunction(options.endpoint)) {
+                    return options.endpoint(id);
+                }
                 return options.endpoint;
             }
         };
         qq.extend(options, o);
         requester = qq.extend(this, new qq.AjaxRequester({
             acceptHeader: "application/json",
-            validMethods: [ method ],
-            method: method,
+            contentType: options.jsonPayload ? "application/json" : "application/x-www-form-urlencoded",
+            validMethods: [ options.method ],
+            method: options.method,
             endpointStore: endpointHandler,
             allowXRequestedWithAndCacheControl: false,
             cors: options.cors,
@@ -5691,7 +5766,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 var promise = new qq.Promise();
                 options.log("Submitting All Chunks Done request for " + id);
                 promises[id] = promise;
-                requester.initTransport(id).withParams(params).withHeaders(headers).send(xhr);
+                requester.initTransport(id).withParams(options.params(id) || params).withHeaders(options.headers(id) || headers).send(xhr);
                 return promise;
             }
         });
@@ -5718,12 +5793,7 @@ function htmlspecialchars_decode (string, quote_style) {
             var parseEntryPromise = new qq.Promise();
             if (entry.isFile) {
                 entry.file(function(file) {
-                    var name = entry.name, fullPath = entry.fullPath, indexOfNameInFullPath = fullPath.indexOf(name);
-                    fullPath = fullPath.substr(0, indexOfNameInFullPath);
-                    if (fullPath.charAt(0) === "/") {
-                        fullPath = fullPath.substr(1);
-                    }
-                    file.qqPath = fullPath;
+                    file.qqPath = extractDirectoryPath(entry);
                     droppedFiles.push(file);
                     parseEntryPromise.success();
                 }, function(fileError) {
@@ -5750,6 +5820,14 @@ function htmlspecialchars_decode (string, quote_style) {
                 });
             }
             return parseEntryPromise;
+        }
+        function extractDirectoryPath(entry) {
+            var name = entry.name, fullPath = entry.fullPath, indexOfNameInFullPath = fullPath.lastIndexOf(name);
+            fullPath = fullPath.substr(0, indexOfNameInFullPath);
+            if (fullPath.charAt(0) === "/") {
+                fullPath = fullPath.substr(1);
+            }
+            return fullPath;
         }
         function getFilesInDirectory(entry, reader, accumEntries, existingPromise) {
             var promise = existingPromise || new qq.Promise(), dirReader = reader || entry.createReader();
@@ -5838,9 +5916,6 @@ function htmlspecialchars_decode (string, quote_style) {
             return fileDrag;
         }
         function leavingDocumentOut(e) {
-            if (qq.firefox()) {
-                return !e.relatedTarget;
-            }
             if (qq.safari()) {
                 return e.x < 0 || e.y < 0;
             }
@@ -5880,8 +5955,10 @@ function htmlspecialchars_decode (string, quote_style) {
                 maybeHideDropZones();
             });
             disposeSupport.attach(document, "drop", function(e) {
-                e.preventDefault();
-                maybeHideDropZones();
+                if (isFileDrag(e)) {
+                    e.preventDefault();
+                    maybeHideDropZones();
+                }
             });
             disposeSupport.attach(document, HIDE_ZONES_EVENT_NAME, maybeHideDropZones);
         }
@@ -5906,6 +5983,8 @@ function htmlspecialchars_decode (string, quote_style) {
                 });
             }
         });
+        this._testing = {};
+        this._testing.extractDirectoryPath = extractDirectoryPath;
     };
     qq.DragAndDrop.callbacks = function() {
         "use strict";
@@ -5958,7 +6037,7 @@ function htmlspecialchars_decode (string, quote_style) {
             }
             var effectTest, dt = e.dataTransfer, isSafari = qq.safari();
             effectTest = qq.ie() && qq.supportedFeatures.fileDrop ? true : dt.effectAllowed !== "none";
-            return dt && effectTest && (dt.files || !isSafari && dt.types.contains && dt.types.contains("Files"));
+            return dt && effectTest && (dt.files && dt.files.length || !isSafari && dt.types.contains && dt.types.contains("Files") || dt.types.includes && dt.types.includes("Files"));
         }
         function isOrSetDropDisabled(isDisabled) {
             if (isDisabled !== undefined) {
@@ -6041,6 +6120,8 @@ function htmlspecialchars_decode (string, quote_style) {
                 return element;
             }
         });
+        this._testing = {};
+        this._testing.isValidFileDrag = isValidFileDrag;
     };
     (function() {
         "use strict";
@@ -6280,7 +6361,7 @@ function htmlspecialchars_decode (string, quote_style) {
             _onProgress: function(id, name, loaded, total) {
                 this._parent.prototype._onProgress.apply(this, arguments);
                 this._templating.updateProgress(id, loaded, total);
-                if (Math.round(loaded / total * 100) === 100) {
+                if (total === 0 || Math.round(loaded / total * 100) === 100) {
                     this._templating.hideCancel(id);
                     this._templating.hidePause(id);
                     this._templating.hideProgress(id);
@@ -6769,7 +6850,7 @@ function htmlspecialchars_decode (string, quote_style) {
             dropProcessing: "qq-drop-processing-selector",
             dropProcessingSpinner: "qq-drop-processing-spinner-selector",
             thumbnail: "qq-thumbnail-selector"
-        }, previewGeneration = {}, cachedThumbnailNotAvailableImg = new qq.Promise(), cachedWaitingForThumbnailImg = new qq.Promise(), log, isEditElementsExist, isRetryElementExist, templateHtml, container, fileList, showThumbnails, serverScale, cacheThumbnailPlaceholders = function() {
+        }, previewGeneration = {}, cachedThumbnailNotAvailableImg = new qq.Promise(), cachedWaitingForThumbnailImg = new qq.Promise(), log, isEditElementsExist, isRetryElementExist, templateDom, container, fileList, showThumbnails, serverScale, cacheThumbnailPlaceholders = function() {
             var notAvailableUrl = options.placeholders.thumbnailNotAvailable, waitingUrl = options.placeholders.waitingForThumbnail, spec = {
                 maxSize: thumbnailMaxSize,
                 scale: serverScale
@@ -6901,7 +6982,7 @@ function htmlspecialchars_decode (string, quote_style) {
             });
             return notAvailableImgPlacement;
         }, parseAndGetTemplate = function() {
-            var scriptEl, scriptHtml, fileListNode, tempTemplateEl, fileListHtml, defaultButton, dropArea, thumbnail, dropProcessing, dropTextEl, uploaderEl;
+            var scriptEl, scriptHtml, fileListNode, tempTemplateEl, fileListEl, defaultButton, dropArea, thumbnail, dropProcessing, dropTextEl, uploaderEl;
             log("Parsing template");
             if (options.templateIdOrEl == null) {
                 throw new Error("You MUST specify either a template element or ID!");
@@ -6965,15 +7046,15 @@ function htmlspecialchars_decode (string, quote_style) {
             if (fileListNode == null) {
                 throw new Error("Could not find the file list container in the template!");
             }
-            fileListHtml = fileListNode.innerHTML;
+            fileListEl = fileListNode.children[0].cloneNode(true);
             fileListNode.innerHTML = "";
             if (tempTemplateEl.getElementsByTagName("DIALOG").length) {
                 document.createElement("dialog");
             }
             log("Template parsing complete");
             return {
-                template: qq.trimStr(tempTemplateEl.innerHTML),
-                fileTemplate: qq.trimStr(fileListHtml)
+                template: tempTemplateEl,
+                fileTemplate: fileListEl
             };
         }, prependFile = function(el, index, fileList) {
             var parentEl = fileList, beforeEl = parentEl.firstChild;
@@ -7079,13 +7160,13 @@ function htmlspecialchars_decode (string, quote_style) {
         }
         container = options.containerEl;
         showThumbnails = options.imageGenerator !== undefined;
-        templateHtml = parseAndGetTemplate();
+        templateDom = parseAndGetTemplate();
         cacheThumbnailPlaceholders();
         qq.extend(this, {
             render: function() {
                 log("Rendering template in DOM.");
                 generatedThumbnails = 0;
-                container.innerHTML = templateHtml.template;
+                container.appendChild(templateDom.template.cloneNode(true));
                 hide(getDropProcessing());
                 this.hideTotalProgress();
                 fileList = options.fileContainerEl || getTemplateEl(container, selectorClasses.list);
@@ -7097,6 +7178,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 container.appendChild(cantRenderEl);
             },
             reset: function() {
+                container.innerHTML = "";
                 this.render();
             },
             clearFiles: function() {
@@ -7106,7 +7188,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 isCancelDisabled = true;
             },
             addFile: function(id, name, prependInfo, hideForever, batch) {
-                var fileEl = qq.toElement(templateHtml.fileTemplate, fileList.tagName), fileNameEl = getTemplateEl(fileEl, selectorClasses.file), uploaderEl = getTemplateEl(container, selectorClasses.uploader), fileContainer = batch ? fileBatch.content : fileList, thumb;
+                var fileEl = templateDom.fileTemplate.cloneNode(true), fileNameEl = getTemplateEl(fileEl, selectorClasses.file), uploaderEl = getTemplateEl(container, selectorClasses.uploader), fileContainer = batch ? fileBatch.content : fileList, thumb;
                 if (batch) {
                     fileBatch.map[id] = fileEl;
                 }
