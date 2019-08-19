@@ -1,3 +1,126 @@
+function base64_decode (data) {
+	// http://kevin.vanzonneveld.net
+	// +   original by: Tyler Akins (http://rumkin.com)
+	// +   improved by: Thunder.m
+	// +	  input by: Aman Gupta
+	// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+	// +   bugfixed by: Onno Marsman
+	// +   bugfixed by: Pellentesque Malesuada
+	// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+	// +	  input by: Brett Zamir (http://brett-zamir.me)
+	// +   bugfixed by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+	// -	depends on: utf8_decode
+	// *	 example 1: base64_decode('S2V2aW4gdmFuIFpvbm5ldmVsZA==');
+	// *	 returns 1: 'Kevin van Zonneveld'
+	// mozilla has this native
+	// - but breaks in 2.0.0.12!
+	//if (typeof this.window['btoa'] == 'function') {
+	//	return btoa(data);
+	//}
+	var b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+	var o1, o2, o3, h1, h2, h3, h4, bits, i = 0,
+		ac = 0,
+		dec = "",
+		tmp_arr = [];
+
+	if (!data) {
+		return data;
+	}
+
+	data += '';
+
+	do { // unpack four hexets into three octets using index points in b64
+		h1 = b64.indexOf(data.charAt(i++));
+		h2 = b64.indexOf(data.charAt(i++));
+		h3 = b64.indexOf(data.charAt(i++));
+		h4 = b64.indexOf(data.charAt(i++));
+
+		bits = h1 << 18 | h2 << 12 | h3 << 6 | h4;
+
+		o1 = bits >> 16 & 0xff;
+		o2 = bits >> 8 & 0xff;
+		o3 = bits & 0xff;
+
+		if (h3 == 64) {
+			tmp_arr[ac++] = String.fromCharCode(o1);
+		} else if (h4 == 64) {
+			tmp_arr[ac++] = String.fromCharCode(o1, o2);
+		} else {
+			tmp_arr[ac++] = String.fromCharCode(o1, o2, o3);
+		}
+	} while (i < data.length);
+
+	dec = tmp_arr.join('');
+	//dec = this.utf8_decode(dec);
+
+	return dec;
+}
+
+
+function htmlspecialchars_decode (string, quote_style) {
+	// http://kevin.vanzonneveld.net
+	// +   original by: Mirek Slugen
+	// +   improved by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+	// +   bugfixed by: Mateusz "loonquawl" Zalega
+	// +	  input by: ReverseSyntax
+	// +	  input by: Slawomir Kaniecki
+	// +	  input by: Scott Cariss
+	// +	  input by: Francois
+	// +   bugfixed by: Onno Marsman
+	// +	revised by: Kevin van Zonneveld (http://kevin.vanzonneveld.net)
+	// +   bugfixed by: Brett Zamir (http://brett-zamir.me)
+	// +	  input by: Ratheous
+	// +	  input by: Mailfaker (http://www.weedem.fr/)
+	// +	  reimplemented by: Brett Zamir (http://brett-zamir.me)
+	// +	bugfixed by: Brett Zamir (http://brett-zamir.me)
+	// *	 example 1: htmlspecialchars_decode("<p>this -&gt; &quot;</p>", 'ENT_NOQUOTES');
+	// *	 returns 1: '<p>this -> &quot;</p>'
+	// *	 example 2: htmlspecialchars_decode("&amp;quot;");
+	// *	 returns 2: '&quot;'
+	var optTemp = 0,
+		i = 0,
+		noquotes = false;
+	if (typeof quote_style === 'undefined') {
+		quote_style = 2;
+	}
+	string = string.toString().replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+	var OPTS = {
+		'ENT_NOQUOTES': 0,
+		'ENT_HTML_QUOTE_SINGLE': 1,
+		'ENT_HTML_QUOTE_DOUBLE': 2,
+		'ENT_COMPAT': 2,
+		'ENT_QUOTES': 3,
+		'ENT_IGNORE': 4
+	};
+	if (quote_style === 0) {
+		noquotes = true;
+	}
+	if (typeof quote_style !== 'number') { // Allow for a single string or an array of string flags
+		quote_style = [].concat(quote_style);
+		for (i = 0; i < quote_style.length; i++) {
+			// Resolve string input to bitwise e.g. 'PATHINFO_EXTENSION' becomes 4
+			if (OPTS[quote_style[i]] === 0) {
+				noquotes = true;
+			} else if (OPTS[quote_style[i]]) {
+				optTemp = optTemp | OPTS[quote_style[i]];
+			}
+		}
+		quote_style = optTemp;
+	}
+	if (quote_style & OPTS.ENT_HTML_QUOTE_SINGLE) {
+		string = string.replace(/&#0*39;/g, "'"); // PHP doesn't currently escape if more than one 0, but it should
+		// string = string.replace(/&apos;|&#x0*27;/g, "'"); // This would also be useful here, but not a part of PHP
+	}
+	if (!noquotes) {
+		string = string.replace(/&quot;/g, '"');
+	}
+	// Put this in last place to avoid escape being double-decoded
+	string = string.replace(/&amp;/g, '&');
+
+	return string;
+}
+
+
 // Fine Uploader 5.16.2 - MIT licensed. http://fineuploader.com
 (function(global) {
     var qq = function(element) {
@@ -1690,7 +1813,7 @@
                     bytes = bytes / 1e3;
                     i++;
                 } while (bytes > 999);
-                return Math.max(bytes, .1).toFixed(1) + this._options.text.sizeSymbols[i];
+                return Math.max(bytes, .1).toFixed(1) + '\xa0' +this._options.text.sizeSymbols[i];
             },
             _generateExtraButtonSpecs: function() {
                 var self = this;
@@ -1956,6 +2079,7 @@
                 extensionsForMessage = allowedExtensions.join(", ").toLowerCase();
                 r("{file}", this._options.formatFileName(name));
                 r("{extensions}", extensionsForMessage);
+                r("{fileSize}", this._formatSize(item.size));
                 r("{sizeLimit}", this._formatSize(validationBase.sizeLimit));
                 r("{minSizeLimit}", this._formatSize(validationBase.minSizeLimit));
                 placeholderMatch = message.match(/(\{\w+\})/g);
