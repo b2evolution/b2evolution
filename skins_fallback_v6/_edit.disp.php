@@ -256,7 +256,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 
 						// ---------------------------- TEXTAREA -------------------------------------
 						$Form->switch_layout( 'none' );
-						$Form->fieldstart = '<div class="edit_area">';
+						$Form->fieldstart = '<div class="edit_area" data-filedrop-callback="helloWorld">';
 						$Form->fieldend = "</div>\n";
 						$Form->textarea_input( 'content', $item_content, 16, NULL, array(
 								'cols' => 50 ,

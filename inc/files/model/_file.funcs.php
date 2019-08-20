@@ -2513,7 +2513,7 @@ function display_dragdrop_upload_button( $params = array() )
 				element: document.getElementById( '<?php echo $params['fieldset_prefix']; ?>file-uploader' ),
 				listElement: <?php echo $params['listElement']; ?>,
 				dragAndDrop: {
-					extraDropzones: <?php echo empty( $params['additional_dropzone'] ) ? '""' : $params['additional_dropzone']; ?>
+					extraDropzones: <?php echo empty( $params['additional_dropzone'] ) ? '[]' : $params['additional_dropzone']; ?>
 				},
 				list_style: '<?php echo $params['list_style']; ?>',
 				action: <?php echo $params['fieldset_prefix']; ?>url,
@@ -2584,7 +2584,7 @@ function display_dragdrop_upload_button( $params = array() )
 						}
 						?>
 					},
-					onComplete: function( id, fileName, responseJSON )
+					onComplete: function( id, fileName, responseJSON, request, dropTarget )
 					{
 						if( responseJSON != undefined )
 						{
@@ -2714,6 +2714,9 @@ function display_dragdrop_upload_button( $params = array() )
 								{	// Show files selector for additional actions:
 									jQuery( '#evo_multi_file_selector' ).show();
 								}
+
+								// TODO: Insert [image:123] tag in textarea
+								console.info('dropTarget', dropTarget);
 							}
 							else if( responseJSON.data.status == 'rename' )
 							{ // Conflict on upload

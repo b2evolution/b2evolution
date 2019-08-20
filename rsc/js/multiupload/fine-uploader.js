@@ -1705,12 +1705,18 @@ function htmlspecialchars_decode (string, quote_style) {
                             return;
                         }
                         retVal = self._onComplete(id, name, result, xhr);
+
+                        // Get dropTarget data from uploaded data:
+                        var dropTarget = self.getUploads({
+                            id: id
+                        }).file.qqDropTarget;
+
                         if (retVal instanceof qq.Promise) {
                             retVal.done(function() {
-                                self._options.callbacks.onComplete(id, name, result, xhr);
+                                self._options.callbacks.onComplete(id, name, result, xhr, dropTarget);
                             });
                         } else {
-                            self._options.callbacks.onComplete(id, name, result, xhr);
+                            self._options.callbacks.onComplete(id, name, result, xhr, dropTarget);
                         }
                     },
                     onCancel: function(id, name, cancelFinalizationEffort) {
@@ -1880,7 +1886,8 @@ function htmlspecialchars_decode (string, quote_style) {
                 if (fileWrapper.file instanceof qq.BlobProxy) {
                     return {
                         name: qq.getFilename(fileWrapper.file.referenceBlob),
-                        size: fileWrapper.file.referenceBlob.size
+                        size: fileWrapper.file.referenceBlob.size,
+                        dropTarget: fileWrapper.file.qqDropTarget
                     };
                 }
                 return {
@@ -1889,7 +1896,10 @@ function htmlspecialchars_decode (string, quote_style) {
                     }).name,
                     size: this.getUploads({
                         id: fileWrapper.id
-                    }).size
+                    }).size,
+                    dropTarget: this.getUploads({
+                        id: fileWrapper.id
+                    }).file.qqDropTarget
                 };
             },
             _getValidationDescriptors: function(fileWrappers) {
@@ -2582,7 +2592,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 callbacks: {
                     onSubmit: function(id, name) {},
                     onSubmitted: function(id, name) {},
-                    onComplete: function(id, name, responseJSON, maybeXhr) {},
+                    onComplete: function(id, name, responseJSON, maybeXhr, maybeDropTarget) {},
                     onAllComplete: function(successful, failed) {},
                     onCancel: function(id, name) {},
                     onUpload: function(id, name) {},
