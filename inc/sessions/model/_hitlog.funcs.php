@@ -739,6 +739,14 @@ function generate_hit_stat( $days, $min_interval, $max_interval, $display_proces
 			}
 		}
 
+		if( isset( $Test_hit ) && ! empty( $Test_hit->ID ) && rand( 0, 2 ) == 2 )
+		{	// Insert sample goal hits per random new Hit:
+			$DB->query( 'INSERT INTO T_track__goalhit ( ghit_goal_ID, ghit_hit_ID )
+				SELECT goal_ID, '.$Test_hit->ID.' FROM T_track__goal
+				 ORDER BY RAND()
+				 LIMIT 1' );
+		}
+
 		$sessions[$rand_i] = $cur_session;
 
 		if( $display_process )
@@ -1153,7 +1161,8 @@ function display_hits_filter_form( $mode, $diagram_columns, $display_filter_peri
 
 	echo '<div class="evo_filter_diagram_hits"'.$block_style.'>';
 	$Form = new Form();
-	$Form->hidden_ctrl();
+	$Form->hidden( 'ctrl', 'stats' );
+	$Form->hidden( 'from_ctrl', get_param( 'ctrl' ) );
 	$Form->hidden( 'tab', get_param( 'tab' ) );
 	$Form->hidden( 'tab3', get_param( 'tab3' ) );
 	$Form->hidden( 'blog', get_param( 'blog' ) );
