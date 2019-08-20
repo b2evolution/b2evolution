@@ -1082,53 +1082,6 @@ function get_hits_results_rss( $mode = 'live' )
 
 
 /**
- * Get goal hits data for chart and table for Analytics -> Goals -> Stats
- *
- * @param string Mode: 'live', 'aggregate', 'compare'
- * @return array Hits data
- */
-function get_hits_results_goal( $mode = 'live' )
-{
-	global $DB;
-
-	$SQL = new SQL( 'Get goal hits (mode: '.$mode.')' );
-	if( $mode == 'live' )
-	{	// Get the live data:
-		$SQL->SELECT( 'ghit_goal_ID AS goal_ID, COUNT( ghit_ID ) AS hits,
-			EXTRACT( YEAR FROM hit_datetime ) AS year,
-			EXTRACT( MONTH FROM hit_datetime ) AS month,
-			EXTRACT( DAY FROM hit_datetime ) AS day' );
-		$SQL->FROM( 'T_track__goalhit' );
-		$SQL->FROM_add( 'INNER JOIN T_hitlog ON ghit_hit_ID = hit_ID' );
-
-		$hits_start_date = NULL;
-		$hits_end_date = date( 'Y-m-d' );
-	}
-	else
-	{	// Get the aggregated/compared data:}
-		$SQL->SELECT( 'ghag_date as day, ghag_goal_ID AS goal_ID, ghag_count AS hits,
-			EXTRACT( YEAR FROM ghag_date ) AS year,
-			EXTRACT( MONTH FROM ghag_date ) AS month,
-			EXTRACT( DAY FROM ghag_date ) AS day' );
-		$SQL->FROM( 'T_track__goalhit_aggregate' );
-		// Filter by date:
-		list( $hits_start_date, $hits_end_date ) = get_filter_aggregated_hits_dates( $mode );
-		$SQL->WHERE_and( 'ghag_date >= '.$DB->quote( $hits_start_date ) );
-		$SQL->WHERE_and( 'ghag_date <= '.$DB->quote( $hits_end_date ) );
-	}
-	$SQL->GROUP_BY( 'year, month, day, goal_ID' );
-	$SQL->ORDER_BY( 'year DESC, month DESC, day DESC, goal_ID' );
-
-	$hits = $DB->get_results( $SQL, ARRAY_A );
-
-	// Find the dates without hits and fill them with 0 to display on graph and table:
-	$hits = fill_empty_hit_days( $hits, $hits_start_date, $hits_end_date );
-
-	return $hits;
-}
-
-
-/**
  * Display diagram for hits data
  *
  * @param string Diagram type: 'global', 'browser', 'search_referers', 'api', 'robot', 'rss'
@@ -1173,10 +1126,6 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 		case 'rss':
 			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=hits&datestartinput=$date$&datestopinput=$date$&blog='.$blog.'&hit_type=$param1$';
 			break;
-
-		case 'goal':
-			$chart['link_data']['url'] = $admin_url.'?ctrl=stats&tab=goals&tab3=hits&blog='.$blog.'&datestartinput=$date$&datestopinput=$date$&goal_name=$param1$';
-			break;
 	}
 
 	// This defines what hits will go where
@@ -1204,7 +1153,6 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 	}
 
 	$count = 0;
-	//pre_dump( $res_hits );
 	foreach( $res_hits as $row_stats )
 	{
 		$this_date = mktime( 0, 0, 0, $row_stats['month'], $row_stats['day'], $row_stats['year'] );
@@ -1258,10 +1206,6 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 			case 'rss':
 				$hit_key = 'rss';
 				break;
-
-			case 'goal':
-				$hit_key = $row_stats['goal_ID'];
-				break;
 		}
 
 		if( isset( $col_mapping[ $hit_key ] ) )
@@ -1286,7 +1230,6 @@ function display_hits_diagram( $type, $diagram_columns, $res_hits, $canvas_id = 
 	}
 
 	$chart['canvas_bg'] = array( 'width' => '100%', 'height' => 355 );
-	//pre_dump( $chart );
 
 	echo '<div class="center">';
 	load_funcs('_ext/_canvascharts.php');

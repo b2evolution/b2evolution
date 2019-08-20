@@ -323,14 +323,7 @@ switch( $action )
 		$UserSettings->dbupdate();
 
 		// Redirect to referer page:
-		if( param( 'from_ctrl', 'string' ) == 'goals' )
-		{
-			header_redirect( $admin_url.'?ctrl=goals&tab3=stats&blog='.$blog, 303 ); // Will EXIT
-		}
-		else
-		{
-			header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
-		}
+		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 
@@ -354,14 +347,7 @@ switch( $action )
 		$UserSettings->dbupdate();
 
 		// Redirect to referer page:
-		if( param( 'from_ctrl', 'string' ) == 'goals' )
-		{
-			header_redirect( $admin_url.'?ctrl=goals&tab3=stats&blog='.$blog, 303 ); // Will EXIT
-		}
-		else
-		{
-			header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
-		}
+		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 }

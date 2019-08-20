@@ -166,17 +166,6 @@ $schema_queries['T_track__goalhit'] = array(
 		  KEY ghit_hit_ID (ghit_hit_ID)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
 
-$schema_queries['T_track__goalhit_aggregate'] = array(
-		'Creating table for aggregations of goal hits',
-		"CREATE TABLE T_track__goalhit_aggregate (
-		  ghag_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-		  ghag_date    DATE NOT NULL DEFAULT '2000-01-01',
-		  ghag_goal_ID INT(10) UNSIGNED NOT NULL,
-		  ghag_count   INT(10) UNSIGNED NOT NULL,
-		  PRIMARY KEY  (ghag_ID),
-		  UNIQUE       ghag_date_goal_ID (ghag_date, ghag_goal_ID)
-		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );
-
 $schema_queries['T_track__goalcat'] = array(
 	'Creating goal categories table',
 	"CREATE TABLE T_track__goalcat (
