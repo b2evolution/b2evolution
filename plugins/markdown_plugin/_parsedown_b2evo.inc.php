@@ -275,15 +275,10 @@ class ParsedownB2evo extends ParsedownExtra
 			$Block['element']['attributes'] = array();
 		}
 
-		// Append class "codeblock":
-		if( isset( $Block['element']['attributes']['class'] ) )
-		{
-			$Block['element']['attributes']['class'] .= ' codeblock line-numbers';
-		}
-		else
-		{
-			$Block['element']['attributes']['class'] = 'codeblock line-numbers';
-		}
+		// Append class "codeblock" and "line-numbers" for prism plugin:
+		$Block['element']['attributes']['class'] = isset( $Block['element']['attributes']['class'] )
+			? $Block['element']['attributes']['class'].' codeblock'
+			: 'codeblock';
 
 		// Add these params for correct code detecting by codehighlight plugin:
 		$element_attrs = 'line=1'; // set this param because codehighlight plugin doesn't detect language without this
@@ -291,12 +286,8 @@ class ParsedownB2evo extends ParsedownExtra
 		    preg_match( '/language-([a-z]+)/i', $Block['element']['text']['attributes']['class'], $lang_match ) )
 		{
 			$element_attrs .= ' lang='.$lang_match[1];
-		}
-		else
-		{	// Set default language code for rendering by prism plugin:
-			$Block['element']['text']['attributes']['class'] = isset( $Block['element']['text']['attributes']['class'] )
-				? $Block['element']['text']['attributes']['class'].' language-code'
-				: 'language-code';
+			// Unset class like "language-XXXX" to avoid rendering by Js of prism even when this plugin is not selected for rendered content:
+			unset( $Block['element']['text']['attributes']['class'] );
 		}
 		$Block['element']['before'] = '<!-- codeblock '.$element_attrs.' -->';
 		$Block['element']['after'] = '<!-- /codeblock -->'."\n";

@@ -118,7 +118,39 @@ class prism_plugin extends Plugin
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		/* Required a declaration of this method to identify this plugin as renderer */
+		$content = & $params['data'];
+
+		// Add style classes "line-numbers" for <pre> and "language-XXXX" for <code>
+		// for proper rendering prism by JavaScript.
+		// Used for rendering after markdown plugin.
+		$content = preg_replace_callback( '#(\<p>)?\<!--\s*codeblock([^-]*?)\s*-->(\</p>)?\<pre[^>]*><code[^>]*>([\s\S]+?)</code>\</pre>(\<p>)?\<!--\s*/codeblock\s*-->(\</p>)?#i',
+			array( $this, 'render_codeblock_callback' ), $content );
+
+		return true;
+	}
+
+
+	/**
+	 * Callback to render code block
+	 *
+	 * @param array Matches
+	 *     2 - attribs : lang &| line
+	 *     4 - codeblock content
+	 * @return string Formatted code block
+	 */
+	function render_codeblock_callback( $block )
+	{
+		// set the offset if present - default : 0
+		preg_match( '#line=([^\s]+)#', $block[2], $match );
+		$line = isset( $match[1] ) ? intval( trim( $match[1], '"\'' ) ) : 0;
+		$line = ( $line > 1 ? ' data-start="'.$line.'"' : '' );
+
+		// set the language if present - default : code
+		preg_match( '#lang=([^\s]+)#', $block[2], $match );
+		$language = isset( $match[1] ) ? trim( $match[1], '"\'' ) : '';
+		$language = ( empty( $language ) ? 'code' : strtolower( $language ) );
+
+		return '<pre class="line-numbers"'.$line.'><code class="language-'.$language.'">'.$block[4].'</code></pre>';
 	}
 
 
