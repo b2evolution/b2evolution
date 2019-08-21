@@ -200,11 +200,6 @@ class table_contents_plugin extends Plugin
 	{
 		global $Item, $disp;
 
-		if( $disp != 'single' && $disp != 'page' )
-		{	// Don't display this widget for not post pages:
-			return false;
-		}
-
 		$this->init_widget_params( $params, array(
 				'block_start'       => '<div class="evo_widget $wi_class$ panel panel-default">',
 				'block_end'         => '</div>',
@@ -213,6 +208,12 @@ class table_contents_plugin extends Plugin
 				'block_body_start'  => '<div class="panel-body">',
 				'block_body_end'    => '</div>',
 			) );
+
+		if( $disp != 'single' && $disp != 'page' )
+		{	// Don't display this widget for not post pages:
+			$this->display_widget_debug_message( 'Plugin widget "'.$this->name.'" is hidden because no proper disp.' );
+			return false;
+		}
 
 		if( empty( $Item ) )
 		{	// Don't display this widget when no Item object:
