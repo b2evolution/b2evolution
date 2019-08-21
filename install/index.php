@@ -382,6 +382,10 @@ $booststrap_install_form_params = array(
 		'checkbox_newline_end'   => "</div>\n",
 	);
 
+require_js( '#jquery#' );
+require_js( '#bootstrap#' );
+require_css( '#bootstrap_css#' );
+require_css( 'b2evo_helper_screens.min.css' );
 // Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 init_fontawesome_icons( 'fontawesome-glyphicons' );
 
@@ -400,12 +404,7 @@ if( $display != 'cli' )
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="robots" content="noindex, follow" />
 		<title><?php echo format_to_output( T_('b2evo installer').( $title ? ': '.$title : '' ), 'htmlhead' ); ?></title>
-		<script src="../rsc/js/jquery.min.js"></script>
-		<!-- Bootstrap -->
-		<script src="../rsc/js/bootstrap/bootstrap.min.js"></script>
-		<link href="../rsc/css/bootstrap/bootstrap.min.css" rel="stylesheet">
-		<link href="../rsc/build/b2evo_helper_screens.css" rel="stylesheet">
-		<link href="../rsc/css/font-awesome.min.css" rel="stylesheet">
+		<?php include_headlines() /* Add javascript and css files included above */ ?>
 	</head>
 	<body>
 		<div class="container" id="content_wrapper">

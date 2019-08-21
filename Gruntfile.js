@@ -203,6 +203,10 @@ module.exports = function(grunt) {
 				src: 'rsc/css/evo_helpdesk_widget.css',
 				dest: 'rsc/css/evo_helpdesk_widget.min.css',
 			},
+			helper_pages: {
+				src: 'rsc/build/b2evo_helper_screens.css',
+				dest: 'rsc/build/b2evo_helper_screens.min.css',
+			},
 		},
 
 		// Configuration for the uglify minifying tasks:
