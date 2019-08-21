@@ -358,7 +358,7 @@ ol.breadcrumb img {
 }
 .evo_comment_title .label {
   display: inline-block;
-  padding-top: 0.3em;
+  padding-top: .3em;
   position: relative;
   top: -1px;
 }
@@ -1109,4 +1109,7 @@ a.to_top {
 }
 .panel.evo_item_new_form {
   margin-bottom: 0;
+}
+.sidebar_wrapper.affix-forced-top {
+  position: static !important;
 }

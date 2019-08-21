@@ -375,6 +375,9 @@ class bootstrap_forums_Skin extends Skin
 			init_datepicker_js( 'blog' );
 		}
 
+		// Do not affix sidebar for screen width below and lesser:
+		add_css_headline( '@media (max-width: 992px ) { .sidebar_wrapper.affix { position: static } }' );
+
 		// Init JS to affix Messages:
 		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}

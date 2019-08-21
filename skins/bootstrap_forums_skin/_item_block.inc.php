@@ -122,7 +122,7 @@ skin_widget( array(
 	<?php } ?>
 
 	<div class="row">
-		<div class="<?php echo $Skin->get_column_class( 'single' ); ?>">
+		<div class="evo_content_col <?php echo $Skin->get_column_class( 'single' ); ?>">
 
 	<section class="table evo_content_block">
 	<div class="panel panel-default">
@@ -398,7 +398,7 @@ skin_widget( array(
 		if( $Skin->is_visible_sidebar( 'single' ) )
 		{	// Display sidebar:
 		?>
-		<aside class="col-md-3<?php echo ( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left-md' : '' ); ?>">
+		<aside class="evo_sidebar_col col-md-3<?php echo ( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left-md' : '' ); ?>">
 			<div class="evo_container evo_container__sidebar_single">
 			<?php
 				// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
