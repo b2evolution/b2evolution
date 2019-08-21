@@ -492,89 +492,108 @@ siteskin_include( '_site_body_footer.inc.php' );
 skin_include( '_html_footer.inc.php' );
 // ------------------------------- END OF FOOTER --------------------------------
 
-$sidebar_offset = $Skin->get_setting( 'message_affix_offset' ) == '' ? 20 : $Skin->get_setting( 'message_affix_offset' );
-?>
-<script>
-	jQuery( document ).ready( function()
-	{
-		var affix_obj = jQuery( ".evo_container", ".evo_sidebar_col" ),
-				evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0,
-				affix_offset = evo_toolbar_height + <?php echo $sidebar_offset;?>;
-
-		if( !affix_obj.length )
-		{	// Nothing to affix:
-			return;
-		}
-
-		var affix_obj_top = affix_obj.offset().top;
-
-		// Wrap sidebar containers:
-		affix_obj.wrapAll( '<div class="sidebar_wrapper"></div>' );
-		var wrapper = affix_obj.parent();
-
-		wrapper.affix( {
-			offset: {
-				top: function() {
-					return affix_obj_top - affix_offset - parseInt( wrapper.css( "margin-top" ) );
-				}
-			}
-		} );
-
-		wrapper.on( "affix.bs.affix", function() {
-			// Create a placeholder for the affix obj berfore we fix it into position:
-			wrapper.wrap( '<div class="sidebar_placeholder"></div>' );
-			var placeholder = wrapper.parent();
-			placeholder.css( 'width', '100%' );
-
-			// Fix wrapper into position:
-			wrapper.css( { "width": wrapper.outerWidth(), "top": affix_offset, "z-index": 1050 } );
-
-			check_sidebar_overflow();
-		} );
-
-		wrapper.on( "affixed-top.bs.affix", function() {
-			// Remove the placeholder:
-			wrapper.unwrap( 'div.sidebar_placeholder' );
-
-			// Reset wrapper style:
-			wrapper.css( { "width": "", "top": "", "z-index": "" } );
-		} );
-
-		function check_sidebar_overflow()
+if( $Skin->is_visible_sidebar( 'single', true ) && $Skin->get_setting( 'sidebar_single_affix' ) )
+{	// Sidebar enabled, add script that will affix the sidebar:
+	$sidebar_offset = $Skin->get_setting( 'message_affix_offset' ) == '' ? 20 : $Skin->get_setting( 'message_affix_offset' );
+	?>
+	<script>
+		jQuery( document ).ready( function()
 		{
-			var content_col = jQuery( '.evo_content_col' );
-			var exceed_viewport = window.innerHeight < ( wrapper.height() + affix_offset );
-			var exceed_content = wrapper.height() > content_col.height();
+			var affix_obj = jQuery( ".evo_container", ".evo_sidebar_col" ),
+			    evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0,
+			    affix_offset = evo_toolbar_height + <?php echo $sidebar_offset;?>;
 
-			console.log( exceed_viewport, exceed_content );
-			console.log( wrapper.height(), content_col.height() );
-
-			if( exceed_viewport || exceed_content )
-			{
-				wrapper.addClass( 'affix-forced-top' );
+			if( !affix_obj.length )
+			{	// Nothing to affix:
+				return;
 			}
-			else
+
+			var affix_obj_top = affix_obj.offset().top;
+
+			// Wrap sidebar containers:
+			affix_obj.wrapAll( '<div class="sidebar_wrapper"></div>' );
+			var wrapper = affix_obj.parent(),
+			    wrapper_width = wrapper.outerWidth();
+
+			wrapper.affix( {
+				offset: {
+					top: function() {
+						return affix_obj_top - affix_offset - parseInt( wrapper.css( "margin-top" ) );
+					}
+				}
+			} );
+
+			// This is needed when we refresh the page that was already scrolled and the sidebar is already affixed.
+			// The affix.bs.affix event does not get trigger in this case!
+			if( wrapper.hasClass( 'affix' ) && ! wrapper.attr( 'style' ) && ! jQuery( 'div.sidebar_placeholder' ).length )
 			{
-				wrapper.removeClass( 'affix-forced-top' );
+				affix_sidebar();
+				check_sidebar_overflow();
 			}
-		}
 
-		jQuery( window ).on( "resize", function()
-			{
-				var placeholder = jQuery( '.sidebar_placeholder' );
-
-				if( placeholder.length )
-				{	// Adapt same width as placeholder:
-					wrapper.css( { 'width': placeholder.width() } );
-				}
-				else
-				{
-					// Reset wrapper style:
-					wrapper.css( { "width": "", "top": "", "z-index": "" } );
-				}
-
+			wrapper.on( "affix.bs.affix", function() {
+				affix_sidebar();
 				check_sidebar_overflow();
 			} );
 
-	} );
+			wrapper.on( "affixed-top.bs.affix", function() {
+				// Remove the placeholder:
+				if( jQuery( 'div.sidebar_placeholder' ).length )
+				{
+					wrapper.unwrap();
+				}
+
+				// Reset wrapper style:
+				wrapper.css( { "width": "", "top": "", "z-index": "" } );
+			} );
+
+			function affix_sidebar()
+			{
+				// Create a placeholder for the affix obj berfore we fix it into position:
+				wrapper.wrap( '<div class="sidebar_placeholder"></div>' );
+				var placeholder = wrapper.parent();
+				placeholder.css( 'width', '100%' );
+
+				// Fix wrapper into position:
+				wrapper.css( { "width": wrapper_width, "top": affix_offset, "z-index": 1050 } );
+			}
+
+			function check_sidebar_overflow()
+			{
+				var content_col = jQuery( '.evo_content_col' ),
+				    exceed_viewport = window.innerHeight < ( wrapper.height() + affix_offset ),
+				    exceed_content = wrapper.height() > content_col.height();
+
+				if( exceed_viewport || exceed_content )
+				{
+					wrapper.addClass( 'affix-forced-top' );
+				}
+				else
+				{
+					wrapper.removeClass( 'affix-forced-top' );
+				}
+			}
+
+			jQuery( window ).on( "resize", function()
+				{
+					var placeholder = jQuery( '.sidebar_placeholder' );
+
+					if( placeholder.length )
+					{	// Adapt same width as placeholder:
+						wrapper.css( { 'width': placeholder.outerWidth() } );
+						wrapper_width = placeholder.outerWidth();
+					}
+					else
+					{
+						// Reset wrapper style:
+						wrapper.css( { "width": "", "top": "", "z-index": "" } );
+					}
+
+					check_sidebar_overflow();
+				} );
+
+		} );
 	</script>
+	<?php
+}
+?>

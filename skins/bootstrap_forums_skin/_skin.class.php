@@ -133,6 +133,12 @@ class bootstrap_forums_Skin extends Skin
 							),
 						'type' => 'select',
 					),
+					'sidebar_single_affix' => array(
+						'label' => T_('Sidebar Single'),
+						'note'  => T_('Use affix to keep visible when scrolling down.'),
+						'type'  => 'checkbox',
+						'defaultvalue' => 1,
+					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
 						'note' => 'px. ' . T_('Set maximum height for post images.'),
