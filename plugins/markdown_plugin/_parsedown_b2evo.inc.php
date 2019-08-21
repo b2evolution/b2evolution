@@ -409,6 +409,27 @@ class ParsedownB2evo extends ParsedownExtra
 		// in order to don't add unnecessary <p> e.g. by plugin "Auto P":
 		return preg_replace( '#[\n\r]+<ul>#i', '<ul>', $markup );
 	}
+
+
+	/**
+	 * Parse inline URL
+	 *
+	 * @param array Excerpt
+	 * @return string
+	 */
+	protected function inlineUrl( $Excerpt )
+	{
+		$Inline = parent::inlineUrl( $Excerpt );
+
+		if( isset( $Inline['element'] ) )
+		{	// Force element type from <a> to simple text without html tag to avoid rendering of URLs as html links:
+			$Inline['element']['name'] = 'notag';
+			// NOTE: We cannot use `Parsedown->setUrlsLinked( false )` to disable rendering of URLs, because
+			// in such case URLs may be broken by char `_` to `<em>` or by `__` to `<strong>` that we don't like.
+		}
+
+		return $Inline;
+	}
 }
 
 ?>
