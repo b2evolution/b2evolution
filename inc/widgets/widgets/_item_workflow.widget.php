@@ -162,25 +162,30 @@ class item_workflow_Widget extends ComponentWidget
 
 		if( ! empty( $this->disp_params['show_properties']['status'] ) )
 		{	// Display task status:
-			echo '<p><b>'.T_('Task status').':</b> '.$Item->get( 't_extra_status' ).'</p>';
+			echo '<p><b>'.T_('Task status').':</b> <span class="pointer">'.$Item->get( 't_extra_status' ).'</span></p>';
 		}
 
 		if( ! empty( $this->disp_params['show_properties']['user'] ) )
 		{	// Display assigned user:
 			$UserCache = & get_UserCache();
 			$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
-			echo '<p><b>'.T_('Assigned to').':</b> '.( $assigned_User ? $assigned_User->get_identity_link() : T_('No user') ).'</p>';
+			echo '<p><b>'.T_('Assigned to').':</b> <span class="pointer">'.( $assigned_User ? $assigned_User->get_identity_link() : T_('No user') ).'</span></p>';
 		}
 
 		if( ! empty( $this->disp_params['show_properties']['priority'] ) )
 		{	// Display priority:
-			echo '<p><b>'.T_('Priority').':</b> <span style="color:'.item_priority_color( $Item->get( 'priority' ) ).'">'.item_priority_title( $Item->get( 'priority' ) ).'</span></p>';
+			echo '<p><b>'.T_('Priority').':</b> <span class="pointer" style="color:'.item_priority_color( $Item->get( 'priority' ) ).'">'.item_priority_title( $Item->get( 'priority' ) ).'</span></p>';
 		}
 
 		if( ! empty( $this->disp_params['show_properties']['deadline'] ) )
 		{	// Display deadline:
-			echo '<p><b>'.T_('Deadline').':</b> '.( $Item->get( 'datedeadline' ) === NULL ? T_('None') : mysql2localedatetime( $Item->get( 'datedeadline' ) ) ).'</p>';
+			echo '<p><b>'.T_('Deadline').':</b> <span class="pointer">'.( $Item->get( 'datedeadline' ) === NULL ? T_('None') : mysql2localedatetime( $Item->get( 'datedeadline' ) ) ).'</span></p>';
 		}
+
+		// 
+		echo '<script>jQuery( ".evo_widget.widget_core_item_workflow .pointer" ).click( function() {
+			location.href = location.href.replace( /#meta-comment-form$/, "" ) + "#meta-comment-form";
+		} )</script>';
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];

@@ -90,6 +90,8 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 		$Item->can_comment( $params['before_comment_error'], $params['after_comment_error'], '#', $params['comment_closed_text'], $section_title, $params ) ) )
 { // We want to display the comments form and the item can be commented on:
 
+	echo '<a name="'.( $params['comment_type'] == 'meta' ? 'meta-comment-form' : 'comment-form' ).'"></a>';
+
 	echo $params['before_comment_form'];
 
 	// INIT/PREVIEW:
