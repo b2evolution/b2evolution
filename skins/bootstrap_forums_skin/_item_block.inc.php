@@ -149,7 +149,7 @@ skin_widget( array(
 	<?php } ?>
 
 	<div class="row">
-		<div class="<?php echo $Skin->get_column_class( 'single' ); ?>">
+		<div class="evo_content_col <?php echo $Skin->get_column_class( 'single' ); ?>">
 
 	<section class="table evo_content_block<?php echo ' evo_voting_layout__'.$Skin->get_setting( 'voting_place' ); ?>">
 	<div class="panel panel-default">
@@ -426,7 +426,7 @@ skin_widget( array(
 				widget_container( 'sidebar_single', array(
 						// The following (optional) params will be used as defaults for widgets included in this container:
 						'container_display_if_empty' => false, // If no widget, don't display container at all
-						'container_start' => '<aside class="col-md-3'.( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left-md' : '' ).'"><div class="evo_container $wico_class$">',
+						'container_start' => '<aside class="evo_sidebar_col col-md-3'.( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left-md' : '' ).'"><div class="evo_container $wico_class$">',
 						'container_end'   => '</div></aside>',
 						// This will enclose each widget in a block:
 						'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',

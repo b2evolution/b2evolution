@@ -1138,3 +1138,6 @@ a.to_top {
 .panel.evo_item_new_form {
   margin-bottom: 0;
 }
+.sidebar_wrapper.affix-forced-top {
+  position: static !important;
+}

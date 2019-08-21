@@ -198,7 +198,12 @@ class table_contents_plugin extends Plugin
 	 */
 	function SkinTag( & $params )
 	{
-		global $Item;
+		global $Item, $disp;
+
+		if( $disp != 'single' && $disp != 'page' )
+		{	// Don't display this widget for not post pages:
+			return false;
+		}
 
 		$this->init_widget_params( $params, array(
 				'block_start'       => '<div class="evo_widget $wi_class$ panel panel-default">',

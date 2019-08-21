@@ -218,6 +218,8 @@ class item_comment_form_Widget extends ComponentWidget
 				$Item->can_comment( $widget_params['before_comment_error'], $widget_params['after_comment_error'], '#', $widget_params['comment_closed_text'], $section_title, $widget_params ) ) )
 		{ // We want to display the comments form and the item can be commented on:
 
+			echo '<a name="'.( $widget_params['comment_type'] == 'meta' ? 'meta-comment-form' : 'comment-form' ).'"></a>';
+
 			echo $widget_params['before_comment_form'];
 
 			// INIT/PREVIEW:
