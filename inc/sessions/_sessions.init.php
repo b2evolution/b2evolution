@@ -38,7 +38,6 @@ $db_config['aliases']['T_hits__aggregate_sessions'] = $tableprefix.'hits__aggreg
 $db_config['aliases']['T_sessions'] = $tableprefix.'sessions';
 $db_config['aliases']['T_track__goal'] = $tableprefix.'track__goal';
 $db_config['aliases']['T_track__goalhit'] = $tableprefix.'track__goalhit';
-$db_config['aliases']['T_track__goalhit_aggregate'] = $tableprefix.'track__goalhit_aggregate';
 $db_config['aliases']['T_track__goalcat'] = $tableprefix.'track__goalcat';
 $db_config['aliases']['T_track__keyphrase'] = $tableprefix.'track__keyphrase';
 

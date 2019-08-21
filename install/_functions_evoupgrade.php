@@ -10837,19 +10837,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 13230, 'Creating table for aggregations of goal hits...' ) )
-	{	// part of 6.11.3-stable
-		db_create_table( 'T_track__goalhit_aggregate', '
-			ghag_ID      INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-			ghag_date    DATE NOT NULL DEFAULT "2000-01-01",
-			ghag_goal_ID INT(10) UNSIGNED NOT NULL,
-			ghag_count   INT(10) UNSIGNED NOT NULL,
-			PRIMARY KEY  (ghag_ID),
-			UNIQUE       ghag_date_goal_ID (ghag_date, ghag_goal_ID)',
-			'ENGINE = myisam' );
-		upg_task_end();
-	}
-
 	if( upg_task_start( 15000, 'Creating sections table...' ) )
 	{	// part of 7.0.0-alpha
 		db_create_table( 'T_section', '

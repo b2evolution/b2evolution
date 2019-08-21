@@ -68,7 +68,6 @@ class Goal extends DataObject
 	{
 		return array(
 				array( 'table'=>'T_track__goalhit', 'fk'=>'ghit_goal_ID', 'msg'=>T_('%d related goal hits') ),
-				array( 'table'=>'T_track__goalhit_aggregate', 'fk'=>'ghag_goal_ID', 'msg'=>T_('%d related goal hits aggregations') ),
 			);
 	}
 
