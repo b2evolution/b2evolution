@@ -182,9 +182,9 @@ class item_workflow_Widget extends ComponentWidget
 			echo '<p><b>'.T_('Deadline').':</b> <span class="pointer">'.( $Item->get( 'datedeadline' ) === NULL ? T_('None') : mysql2localedatetime( $Item->get( 'datedeadline' ) ) ).'</span></p>';
 		}
 
-		// 
+		// Scroll to meta comment form on click to value of any workflow property:
 		echo '<script>jQuery( ".evo_widget.widget_core_item_workflow .pointer" ).click( function() {
-			location.href = location.href.replace( /#meta-comment-form$/, "" ) + "#meta-comment-form";
+			location.href = location.href.replace( /#.*$/, "" ) + "#meta-comment-form";
 		} )</script>';
 
 		echo $this->disp_params['block_body_end'];
