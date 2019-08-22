@@ -1334,8 +1334,9 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 		else
 		{ // State: we're not currently in any tag:
 			// Find next tag opening:
-			if( ( $b = strpos( $text, '[', $i ) ) !== false )
-			{	// Check if a bracket '[]' short tag is really opening:
+			if( ( $b = strpos( $text, '[', $i ) ) !== false &&
+			    $b < strpos( $text, '<', $i ) )
+			{	// Check if a bracket '[]' short tag is really opening but not after html tag:
 				// (we are finding here short tags like [image:], [emailcapture:], [fields:], [compare:] and etc., see full list in the Item->render_inline_tags())
 				$start_b = $b;
 				$b++;
