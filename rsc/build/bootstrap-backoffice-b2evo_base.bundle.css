@@ -2561,6 +2561,7 @@ body.modal-open div.token-input-dropdown-facebook {
 }
 .evo_widget.widget_core_item_tags .panel-body .post_tags {
   margin: 0;
+  display: inline;
 }
 .evo_widget.widget_core_item_tags .panel-body form,
 .evo_widget.widget_core_item_tags .panel-body #item_tags {

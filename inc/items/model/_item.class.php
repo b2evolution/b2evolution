@@ -5831,11 +5831,17 @@ class Item extends ItemLight
 		}
 
 		// default params
-		$params += array( 'save_context' => true );
+		$params += array(
+				'save_context'             => true,
+				'force_in_skin_editing'    => false,
+				'force_backoffice_editing' => false,
+			);
 
 		$this->load_Blog();
 		$url = false;
-		if( $this->Blog->get_setting( 'in_skin_editing' ) && ( ! is_admin_page() || ! empty( $params['force_in_skin_editing'] ) ) )
+		if( $this->Blog->get_setting( 'in_skin_editing' ) &&
+		    ( ! $params['force_backoffice_editing'] || ! $current_User->check_perm( 'admin', 'restricted' ) ) &&
+		    ( ! is_admin_page() || $params['force_in_skin_editing'] ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
 			if( check_item_perm_edit( $this->ID, false ) )
 			{	// Current user can edit this post

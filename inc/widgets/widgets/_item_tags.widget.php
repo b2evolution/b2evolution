@@ -176,40 +176,52 @@ class item_tags_Widget extends ComponentWidget
 				'widget_item_tags_before'      => '<nav class="small post_tags">',
 				'widget_item_tags_before_list' => $this->disp_params['before_list'],
 				'widget_item_tags_after'       => '</nav>',
-				'widget_item_tags_separator'   => ', ',
+				'widget_item_tags_separator'   => '',
 			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		if( $this->get_param( 'allow_edit' ) && is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+		if( $this->get_param( 'allow_edit' ) && $Item->can_be_edited() )
 		{	// Allow to edit tags if it is enabled by widget setting and current User has a permission to edit them:
+			echo '<span id="evo_widget_item_tags_edit_form_'.$this->ID.'" style="display:none">';
 			echo $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' );
-			$Form = new Form( get_htsrv_url().'action.php?mname=collections&item_ID='.$Item->ID );
+			$Form = new Form();
 			$Form->switch_layout( 'none' );
 			$Form->begin_form();
 			$Form->add_crumb( 'collections_update_tags' );
 			$Form->text_input( 'item_tags', implode( ', ', $Item->get_tags() ), 40, '' );
-			// Display the submit button only when JS is disabled, because with enabled JS we use AJAX to update tags:
-			echo '<noscript>';
-			$Form->button( array( 'submit', 'actionArray[update_tags]', T_('Save Changes!'), 'SaveButton' ) );
-			echo '</noscript>';
 			$Form->end_form();
 			echo_autocomplete_tags( array(
 					'item_ID'        => $Item->ID,
 					'update_by_ajax' => true,
 				) );
 			echo $this->disp_params['widget_item_tags_after'];
+			echo '</span>';
+
+			// Action icon to display a form to edit tags:
+			$this->disp_params['widget_item_tags_before'] = '<span id="evo_widget_item_tags_list_'.$this->ID.'"">'.$this->disp_params['widget_item_tags_before'];
+			$this->disp_params['widget_item_tags_after'] .= ' '.action_icon( T_('Edit tags'), 'edit',
+					$Item->get_edit_url( array( 'force_backoffice_editing' => true ) ), NULL, NULL, NULL, array( 'id' => 'evo_widget_item_tags_edit_icon_'.$this->ID ) )
+				.'</span>'
+				// JS to activate an edit tags form:
+				.'<script>
+				jQuery( "#evo_widget_item_tags_edit_icon_'.$this->ID.'" ).click( function()
+				{
+					jQuery( "#evo_widget_item_tags_edit_form_'.$this->ID.'" ).show();
+					jQuery( "#evo_widget_item_tags_list_'.$this->ID.'" ).hide();
+					return false;
+				} );
+				</script>';
 		}
-		else
-		{	// Display a list of all tags attached to the Item:
-			$Item->tags( array(
-					'before'    => $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' ),
-					'after'     => $this->disp_params['widget_item_tags_after'],
-					'separator' => $this->disp_params['widget_item_tags_separator'],
-				) );
-		}
+
+		// Display a list of all tags attached to the Item:
+		$Item->tags( array(
+				'before'    => $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' ),
+				'after'     => $this->disp_params['widget_item_tags_after'],
+				'separator' => $this->disp_params['widget_item_tags_separator'],
+			) );
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
