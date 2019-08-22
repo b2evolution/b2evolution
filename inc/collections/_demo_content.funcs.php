@@ -1298,7 +1298,7 @@ function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo
 				$now = date( 'Y-m-d H:i:s', $post_timestamp_array[$post_count] );
 				$edited_Item = new Item();
 				$edited_Item->set_tags_from_string( 'demo' );
-				$edited_Item->insert( $owner_ID, T_('Login Required'), '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+				$edited_Item->insert( $owner_ID, T_('Login Required'), '<div class="alert alert-danger" style="max-width:400px;margin:20px auto">'.T_( 'You need to log in before you can access this section.' ).'</div>',
 						$now, $cat_home_b2evo, array(), 'published', '#', 'login-required', '', 'open', array( 'default' ), 'Content Block' );
 
 				// Insert a post:

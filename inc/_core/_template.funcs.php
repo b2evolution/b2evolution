@@ -474,6 +474,7 @@ function get_request_title( $params = array() )
 			'msgform_text'        => T_('Contact'),
 			'messages_text'       => T_('Messages'),
 			'contacts_text'       => T_('Contacts'),
+			'requires_login_text_seo' => T_('Login Required'),
 			'login_text'          => /* TRANS: trailing space = verb */ T_('Login '),
 			'register_text'       => T_('Register'),
 			'register_finish_text'=> T_('Finish Registration'),
@@ -653,6 +654,15 @@ function get_request_title( $params = array() )
 		case 'contacts':
 			// We are requesting the message form:
 			$r[] = $params['contacts_text'];
+			break;
+
+		case 'access_requires_login':
+		case 'content_requires_login':
+			// We are requesting the login form when anonymous user has no access to the Collection:
+			if( $params['auto_pilot'] == 'seo_title' )
+			{	// Use text only for <title> tag in <head>:
+				$r[] = $params['requires_login_text_seo'];
+			}
 			break;
 
 		case 'login':
@@ -2840,6 +2850,50 @@ function display_login_form( $params )
 	echo $params['form_after'];
 
 	display_login_js_handler( $params );
+}
+
+
+/**
+ * Display footer under login form
+ *
+ * @param array Params
+ */
+function display_login_form_footer( $params = array() )
+{
+	global $Hit;
+
+	$params = array_merge( array(
+			'login_link_class' => 'evo_login_dialog_standard_link',
+			'ip_address_class' => 'evo_login_dialog_footer text-muted',
+			'source'           => NULL,
+			'redirect_to'      => NULL,
+			'return_to'        => NULL,
+		), $params );
+	
+	if( $params['source'] === NULL )
+	{	// Default source:
+		$params['source'] = param( 'source', 'string', 'inskin login form' );
+	}
+
+	if( $params['redirect_to'] === NULL )
+	{	// Default redirect URL:
+		$params['redirect_to'] = param( 'redirect_to', 'url', '' );
+	}
+
+	if( $params['return_to'] === NULL )
+	{	// Default return URL:
+		$params['return_to'] = param( 'return_to', 'url', '' );
+	}
+
+	echo '<div class="'.$params['login_link_class'].'">'
+			.'<a href="'.get_htsrv_url( 'login' ).'login.php?source='.rawurlencode( $params['source'] ).'&amp;redirect_to='.rawurlencode( $params['redirect_to'] ).'&amp;return_to='.rawurlencode( $params['return_to'] ).'">'
+				.T_('Use basic login form instead').' &raquo;'
+			.'</a>'
+		.'</div>';
+
+	echo '<div class="'.$params['ip_address_class'].'">'
+			.sprintf( T_('Your IP address: %s'), $Hit->IP )
+		.'</div>';
 }
 
 

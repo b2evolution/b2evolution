@@ -123,10 +123,8 @@ if( $params['display_form_messages'] )
 display_login_form( $login_form_params );
 
 if( $params['login_form_footer'] )
-{ // Display login form footer
-	echo '<div class="evo_login_dialog_standard_link"><a href="'.get_htsrv_url( 'login' ).'login.php?source='.rawurlencode( $source ).'&amp;redirect_to='.rawurlencode( $redirect_to ).'&amp;return_to='.rawurlencode( $return_to ).'">'.T_( 'Use basic login form instead').' &raquo;</a></div>';
-
-	echo '<div class="evo_login_dialog_footer text-muted">'.sprintf( T_('Your IP address: %s'), $Hit->IP ).'</div>';
+{	// Display login form footer:
+	display_login_form_footer();
 }
 
 echo $params['login_page_after'];
