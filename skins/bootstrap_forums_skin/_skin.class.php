@@ -168,6 +168,12 @@ class bootstrap_forums_Skin extends Skin
 						'options' => get_available_thumb_sizes(),
 						'type' => 'select',
 					),
+					'sidebar_single_affix' => array(
+						'label' => T_('Sidebar Single'),
+						'note'  => T_('Use affix to keep visible when scrolling down.'),
+						'type'  => 'checkbox',
+						'defaultvalue' => 1,
+					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
 						'input_suffix' => ' px ',

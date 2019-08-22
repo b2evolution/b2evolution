@@ -236,7 +236,6 @@ class markdown_plugin extends Plugin
 
 		// Initialize object to parse markdown code:
 		$ParsedownB2evo = new ParsedownB2evo();
-		$ParsedownB2evo->setUrlsLinked( false ); // Don't parse urls to links
 		$ParsedownB2evo->set_b2evo_parse_font_styles( $text_styles_enabled );
 		$ParsedownB2evo->set_b2evo_parse_links( $links_enabled );
 		$ParsedownB2evo->set_b2evo_parse_images( $images_enabled );
