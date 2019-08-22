@@ -557,10 +557,8 @@ class autolinks_plugin extends Plugin
 			$content = make_clickable( $content, '&amp;', 'make_clickable_callback', $link_attrs, true );
 		}
 
-		if( ! empty( $this->replacement_link_array ) )
-		{	// Make the desired remaining terms/definitions clickable:
-			$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ), $link_attrs, true );
-		}
+		// Make the desired remaining terms/definitions, usernames or tags clickable:
+		$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ), $link_attrs, true );
 
 		return true;
 	}
@@ -591,36 +589,39 @@ class autolinks_plugin extends Plugin
 	{
 		global $evo_charset;
 
-		$regexp_modifier = '';
-		if( $evo_charset == 'utf-8' )
-		{ // Add this modifier to work with UTF-8 strings correctly
-			$regexp_modifier = 'u';
-		}
-
-		// Previous word in lower case format
-		$this->previous_lword = null;
-		// Previous word was already used/converted to a link
-		$this->previous_used = false;
-
-		// Optimization: Check if the text contains words from the replacement links strings, and call replace callback only if there is at least one word which needs to be replaced.
-		$text_words = preg_split( '/\s/', utf8_strtolower( $text ) );
-		foreach( $text_words as $text_word )
-		{ // Trim the signs [({/ from start and the signs ])}/.,:;!? from end of each word
-			$clear_word = preg_replace( '#^[\[\({/]?([@\p{L}0-9_\-]{3,})[\.,:;!\?\]\)}/]?$#i', '$1', $text_word );
-			if( $clear_word != $text_word )
-			{ // Append a clear word to array if word has the punctuation signs
-				$text_words[] = $clear_word;
+		if( ! empty( $this->replacement_link_array ) )
+		{	// Make the desired remaining terms/definitions clickable:
+			$regexp_modifier = '';
+			if( $evo_charset == 'utf-8' )
+			{ // Add this modifier to work with UTF-8 strings correctly
+				$regexp_modifier = 'u';
 			}
-		}
-		// Check if a content has at least one definition to make an url from word
-		$text_contains_replacement = ( count( array_intersect( $text_words, array_keys( $this->replacement_link_array ) ) ) > 0 );
-		if( $text_contains_replacement )
-		{ // Find word with 3 characters at least:
-			$text = preg_replace_callback( '#(^|\s|[(),;\'\"\[{/])([@\p{L}0-9_\-\.]{3,})([\.,:;!\'\"\?\]\)}/]?)#i'.$regexp_modifier, array( & $this, 'replace_callback' ), $text );
-		}
 
-		// Cleanup words to be deleted:
-		$text = preg_replace( '/[@\p{L}0-9_\-]+\s*==!#DEL#!==/i'.$regexp_modifier, '', $text );
+			// Previous word in lower case format
+			$this->previous_lword = null;
+			// Previous word was already used/converted to a link
+			$this->previous_used = false;
+
+			// Optimization: Check if the text contains words from the replacement links strings, and call replace callback only if there is at least one word which needs to be replaced.
+			$text_words = preg_split( '/\s/', utf8_strtolower( $text ) );
+			foreach( $text_words as $text_word )
+			{ // Trim the signs [({/ from start and the signs ])}/.,:;!? from end of each word
+				$clear_word = preg_replace( '#^[\[\({/]?([@\p{L}0-9_\-]{3,})[\.,:;!\?\]\)}/]?$#i', '$1', $text_word );
+				if( $clear_word != $text_word )
+				{ // Append a clear word to array if word has the punctuation signs
+					$text_words[] = $clear_word;
+				}
+			}
+			// Check if a content has at least one definition to make an url from word
+			$text_contains_replacement = ( count( array_intersect( $text_words, array_keys( $this->replacement_link_array ) ) ) > 0 );
+			if( $text_contains_replacement )
+			{ // Find word with 3 characters at least:
+				$text = preg_replace_callback( '#(^|\s|[(),;\'\"\[{/])([@\p{L}0-9_\-\.]{3,})([\.,:;!\'\"\?\]\)}/]?)#i'.$regexp_modifier, array( & $this, 'replace_callback' ), $text );
+			}
+
+			// Cleanup words to be deleted:
+			$text = preg_replace( '/[@\p{L}0-9_\-]+\s*==!#DEL#!==/i'.$regexp_modifier, '', $text );
+		}
 
 		// Replace @usernames with user identity link:
 		$text = replace_content_outcode( '#@([a-z0-9_.\-]+)#i', '@', $text, array( $this, 'replace_usernames' ) );
