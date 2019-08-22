@@ -3144,7 +3144,7 @@ Hello
 				'tags'     => 'demo',
 				'category' => 'b2evolution',
 				'type'     => 'Content Block',
-				'content'  => '<p class="center">'.T_( 'You need to log in before you can access this section.' ).'</p>',
+				'content'  => '<div class="alert alert-danger" style="max-width:400px;margin:20px auto">'.T_( 'You need to log in before you can access this section.' ).'</div>',
 			);
 
 			$demo_items['this_is_a_content_block'] = array(

@@ -2563,8 +2563,10 @@ function skin_opengraph_tags()
 {
 	global $Collection, $Blog, $disp, $MainList;
 
-	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_open_graph' ) )
-	{ // Open Graph tags are not allowed
+	if( empty( $Blog ) ||
+	    ! $Blog->get_setting( 'tags_open_graph' ) ||
+	    in_array( $disp, array( 'content_requires_login', 'access_requires_login', 'access_denied' ) ) )
+	{	// Open Graph tags are not allowed for current Collection or for current disp:
 		return;
 	}
 
