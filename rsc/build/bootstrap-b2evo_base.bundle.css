@@ -3041,7 +3041,8 @@ main .well header .small.text-muted a {
 .post_tags {
   margin: 15px 0px 10px 0px;
 }
-.post_tags a {
+.post_tags > a,
+.post_tags > span {
   display: inline-block;
   padding: 3px 5px;
   margin-bottom: 5px;
@@ -3054,14 +3055,22 @@ main .well header .small.text-muted a {
   color: black;
   margin-right: 3px;
 }
-.post_tags a:before {
+.post_tags > a:hover,
+.post_tags > span:hover {
+  text-decoration: none;
+  background: #ddd;
+}
+.post_tags > a:before {
   font-family: FontAwesome;
   content: '\f02b \00a0 ';
   color: #aaa;
 }
-.post_tags a:hover {
-  text-decoration: none;
-  background: #ddd;
+.post_tags > span a {
+  color: black;
+}
+.post_tags > span span.fa {
+  font-size: inherit;
+  color: #aaa;
 }
 .post_comments_link {
   margin-bottom: 10px;

@@ -186,6 +186,63 @@ siteskin_include( '_site_body_header.inc.php' );
 
 			<div id="evo_container__sidebar">
 				<?php
+				if( $disp == 'single' )
+				{	// Container only for single disp:
+					// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
+					// Display container contents:
+					widget_container( 'sidebar_single', array(
+							// The following (optional) params will be used as defaults for widgets included in this container:
+							'container_display_if_empty' => false, // If no widget, don't display container at all
+							// This will enclose each widget in a block:
+							'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
+							'block_end' => '</div>',
+							// This will enclose the title of each widget:
+							'block_title_start' => '<div class="panel-heading"><h4 class="panel-title">',
+							'block_title_end' => '</h4></div>',
+							// This will enclose the body of each widget:
+							'block_body_start' => '<div class="panel-body">',
+							'block_body_end' => '</div>',
+							// If a widget displays a list, this will enclose that list:
+							'list_start' => '<ul>',
+							'list_end' => '</ul>',
+							// This will enclose each item in a list:
+							'item_start' => '<li>',
+							'item_end' => '</li>',
+							// This will enclose sub-lists in a list:
+							'group_start' => '<ul>',
+							'group_end' => '</ul>',
+							// This will enclose (foot)notes:
+							'notes_start' => '<div class="notes">',
+							'notes_end' => '</div>',
+							// Widget 'Search form':
+							'search_class'         => 'compact_search_form',
+							'search_input_before'  => '<div class="input-group">',
+							'search_input_after'   => '',
+							'search_submit_before' => '<span class="input-group-btn">',
+							'search_submit_after'  => '</span></div>',
+							// Widget 'Item Custom Fields':
+							'custom_fields_table_start'                => '<div class="item_custom_fields">',
+							'custom_fields_row_start'                  => '<div class="row">',
+							'custom_fields_topleft_cell'               => '<div class="col-md-12 col-xs-6" style="border:none"></div>',
+							'custom_fields_col_header_item'            => '<div class="col-md-12 col-xs-6 center" width="$col_width$"$col_attrs$>$item_link$$item_status$</div>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
+							'custom_fields_row_header_field'           => '<div class="col-md-12 col-xs-6"><b>$field_title$$field_description_icon$:</b></div>',
+							'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
+							'custom_fields_description_icon_class'     => 'grey',
+							'custom_fields_value_default'              => '<div class="col-md-12 col-xs-6"$data_cell_attrs$>$field_value$</div>',
+							'custom_fields_value_difference_highlight' => '<div class="col-md-12 col-xs-6 bg-warning"$data_cell_attrs$>$field_value$</div>',
+							'custom_fields_value_green'                => '<div class="col-md-12 col-xs-6 bg-success"$data_cell_attrs$>$field_value$</div>',
+							'custom_fields_value_red'                  => '<div class="col-md-12 col-xs-6 bg-danger"$data_cell_attrs$>$field_value$</div>',
+							'custom_fields_edit_link_cell'             => '<div class="col-md-12 col-xs-6 center">$edit_link$</div>',
+							'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
+							'custom_fields_row_end'                    => '</div>',
+							'custom_fields_table_end'                  => '</div>',
+							// Separate template for separator fields:
+							// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
+							'custom_fields_separator_row_header_field' => '<div class="col-xs-12" colspan="$cols_count$"><b>$field_title$$field_description_icon$</b></div>',
+						) );
+					// ----------------------------- END OF "Sidebar Single" CONTAINER -----------------------------
+				}
+
 					// <div data-spy="affix" data-offset-top="165" class="affix_block">
 					// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 					// Display container and contents:

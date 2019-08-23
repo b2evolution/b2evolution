@@ -7162,10 +7162,12 @@ class Item extends ItemLight
 		global $evo_charset;
 
 		$params = array_merge( array(
-				'before' =>           '<div>'.T_('Tags').': ',
-				'after' =>            '</div>',
-				'separator' =>        ', ',
-				'links' =>            true,
+				'before'     => '<div>'.T_('Tags').': ',
+				'after'      => '</div>',
+				'separator'  => ', ',
+				'links'      => true,
+				'before_tag' => '',
+				'after_tag'  => '',
 			), $params );
 
 		$tags = $this->get_tags();
@@ -7187,6 +7189,7 @@ class Item extends ItemLight
 					echo $params['separator'];
 				}
 
+				echo $params['before_tag'];
 				if( $links )
 				{	// We want links
 					echo $this->Blog->get_tag_link( $tag );
@@ -7195,6 +7198,7 @@ class Item extends ItemLight
 				{
 					echo htmlspecialchars( $tag, NULL, $evo_charset );
 				}
+				echo $params['after_tag'];
 			}
 
 			echo $params['after'];

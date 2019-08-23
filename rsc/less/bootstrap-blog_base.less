@@ -62,7 +62,7 @@ main .well {
 }
 .post_tags {
 	margin: 15px 0px 10px 0px;
-	a {
+	> a, > span {
 		display: inline-block;
 		padding: 3px 5px;
 		margin-bottom: 5px;
@@ -70,14 +70,23 @@ main .well {
 		.border-radius;
 		color: black;
 		margin-right: 3px;
-		&:before {
-			font-family: FontAwesome;
-			content: '\f02b \00a0 ';
-			color: #aaa;
-		}
 		&:hover {
 			text-decoration: none;
 			background: #ddd;
+		}
+	}
+	> a:before {
+		font-family: FontAwesome;
+		content: '\f02b \00a0 ';
+		color: #aaa;
+	}
+	> span {
+		a {
+			color: black;
+		}
+		span.fa {
+			font-size: inherit;
+			color: #aaa;
 		}
 	}
 }
