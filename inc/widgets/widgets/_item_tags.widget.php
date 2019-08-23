@@ -183,6 +183,10 @@ class item_tags_Widget extends ComponentWidget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
+		$tags_params = array(
+				'separator' => $this->disp_params['widget_item_tags_separator'],
+			);
+
 		if( $this->get_param( 'allow_edit' ) && $Item->can_be_edited() )
 		{	// Allow to edit tags if it is enabled by widget setting and current User has a permission to edit them:
 			echo '<span id="evo_widget_item_tags_edit_form_'.$this->ID.'" style="display:none">';
@@ -200,10 +204,12 @@ class item_tags_Widget extends ComponentWidget
 			echo $this->disp_params['widget_item_tags_after'];
 			echo '</span>';
 
+			$edit_tags_url = $Item->get_edit_url( array( 'force_backoffice_editing' => true ) ).'#itemform_adv_props';
+
 			// Action icon to display a form to edit tags:
 			$this->disp_params['widget_item_tags_before'] = '<span id="evo_widget_item_tags_list_'.$this->ID.'"">'.$this->disp_params['widget_item_tags_before'];
 			$this->disp_params['widget_item_tags_after'] .= ' '.action_icon( T_('Edit tags'), 'edit',
-					$Item->get_edit_url( array( 'force_backoffice_editing' => true ) ), NULL, NULL, NULL, array( 'id' => 'evo_widget_item_tags_edit_icon_'.$this->ID ) )
+					$edit_tags_url, NULL, NULL, NULL, array( 'id' => 'evo_widget_item_tags_edit_icon_'.$this->ID ) )
 				.'</span>'
 				// JS to activate an edit tags form:
 				.'<script>
@@ -214,14 +220,16 @@ class item_tags_Widget extends ComponentWidget
 					return false;
 				} );
 				</script>';
+
+			// Use different style for edit mode, make tag icon as link to edit item tags in back-office:
+			$tags_params['before_tag'] = '<span>'.action_icon( T_('Edit tags'), 'tag', $edit_tags_url );
+			$tags_params['after_tag'] = '</span>';
 		}
 
 		// Display a list of all tags attached to the Item:
-		$Item->tags( array(
-				'before'    => $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' ),
-				'after'     => $this->disp_params['widget_item_tags_after'],
-				'separator' => $this->disp_params['widget_item_tags_separator'],
-			) );
+		$tags_params['before'] = $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' );
+		$tags_params['after'] = $this->disp_params['widget_item_tags_after'];
+		$Item->tags( $tags_params );
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
