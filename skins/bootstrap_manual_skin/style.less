@@ -21,28 +21,19 @@
 }
 
 // -------------------------- Left sidebar --------------------------
-#evo_container__sidebar {
+#evo_container__sidebar, #evo_container__sidebar_single {
 	background: #FFF;
-	width: 262px;
-}
-#evo_container__sidebar.fixed {
-	position: fixed;
-}
-@media (max-width:1200px) {
-	#evo_container__sidebar {
-		width: 212px;
-	}
-}
-@media (max-width:992px) {
-	#evo_container__sidebar {
-		width: 100%;
+	&.fixed {
+		position: fixed;
 	}
 }
 // Windows with height <= 800px OR width <= 992px:
 // Don't fix a position of the left side bar
 @media (max-height:800px),(max-width:992px) {
-	#evo_container__sidebar.fixed {
-		position: static;
+	#evo_container__sidebar, #evo_container__sidebar_single {
+		&.fixed {
+			position: static;
+		}
 	}
 	.fixed_spacer {
 		display: none;

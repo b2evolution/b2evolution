@@ -16,25 +16,17 @@
 .evo_container__footer {
   padding-top: 30px;
 }
-#evo_container__sidebar {
+#evo_container__sidebar,
+#evo_container__sidebar_single {
   background: #FFF;
-  width: 262px;
 }
-#evo_container__sidebar.fixed {
+#evo_container__sidebar.fixed,
+#evo_container__sidebar_single.fixed {
   position: fixed;
 }
-@media (max-width: 1200px) {
-  #evo_container__sidebar {
-    width: 212px;
-  }
-}
-@media (max-width: 992px) {
-  #evo_container__sidebar {
-    width: 100%;
-  }
-}
 @media (max-height: 800px), (max-width: 992px) {
-  #evo_container__sidebar.fixed {
+  #evo_container__sidebar.fixed,
+  #evo_container__sidebar_single.fixed {
     position: static;
   }
   .fixed_spacer {

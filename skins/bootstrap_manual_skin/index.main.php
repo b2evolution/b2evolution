@@ -44,7 +44,7 @@ siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 ?>
 
-<div class="container">
+<div class="container<?php echo ( $disp == 'single' ? ' container-xxl' : '' ); ?>">
 
 <header id="header" class="row<?php echo $Settings->get( 'site_skins_enabled' ) ? ' site_skins' : ''; ?>">
 
@@ -118,7 +118,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="row">
 
-	<div class="<?php echo $Skin->is_left_navigation_visible() ? 'col-md-9 pull-right-md' : 'col-md-12' ?>">
+	<div class="<?php echo $Skin->is_left_navigation_visible() ? ( $disp == 'single' ? 'col-xxl-8 col-xxl-pull-2' : '' ).' col-md-9 pull-right-md' : 'col-md-12' ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -191,18 +191,13 @@ siteskin_include( '_site_body_header.inc.php' );
 	</div><!-- .col -->
 
 	<?php
-	if( $Skin->is_left_navigation_visible() )
-	{ // Display a left column with navigation only for several pages
+	if( $disp == 'single' )
+	{	// Only for single disp:
 	?>
-		<!-- =================================== START OF SIDEBAR =================================== -->
-		<aside class="col-xs-12 col-md-3 pull-left-md">
+		<aside class="col-xxl-2 col-xxl-push-8 col-md-3 col-xs-12 pull-right-md">
 
-			<div id="evo_container__sidebar">
+			<div id="evo_container__sidebar_single">
 
-				<?php
-				if( $disp == 'single' )
-				{	// Container only for single disp:
-				?>
 				<div class="evo_container evo_container__sidebar_single">
 				<?php
 					// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
@@ -259,7 +254,22 @@ siteskin_include( '_site_body_header.inc.php' );
 					// ----------------------------- END OF "Sidebar Single" CONTAINER -----------------------------
 				?>
 				</div>
-				<?php } ?>
+
+			</div>
+
+		</aside>
+	<?php
+	}
+	?>
+
+	<?php
+	if( $Skin->is_left_navigation_visible() )
+	{ // Display a left column with navigation only for several pages
+	?>
+		<!-- =================================== START OF SIDEBAR =================================== -->
+		<aside class="<?php echo ( $disp == 'single' ? 'col-xxl-2 ' : '' ); ?>col-md-3 col-xs-12 pull-left-md">
+
+			<div id="evo_container__sidebar">
 
 				<div class="evo_container evo_container__sidebar">
 				<?php
