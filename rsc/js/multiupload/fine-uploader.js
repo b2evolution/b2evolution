@@ -2611,7 +2611,10 @@ function htmlspecialchars_decode (string, quote_style) {
                     onDeleteComplete: function(id, xhrOrXdr, isError) {},
                     onPasteReceived: function(blob) {},
                     onStatusChange: function(id, oldStatus, newStatus) {},
-                    onSessionRequestComplete: function(response, success, xhrOrXdr) {}
+                    onSessionRequestComplete: function(response, success, xhrOrXdr) {},
+                    onDropzoneDragOver: function(dropzone) {},
+                    onDropzoneDragOut: function(dropzone) {},
+                    onDropzoneDragDrop: function(dropzone) {}
                 },
                 messages: {
                     typeError: "{file} has an invalid extension. Valid extension(s): {extensions}.",
@@ -6018,13 +6021,16 @@ function htmlspecialchars_decode (string, quote_style) {
                 HIDE_ZONES_EVENT_NAME: HIDE_ZONES_EVENT_NAME,
                 element: dropArea,
                 onEnter: function(e) {
+                    options.callbacks.handleDragOver(dropZone);
                     qq(dropArea).addClass(options.classes.dropActive);
                     e.stopPropagation();
                 },
                 onLeaveNotDescendants: function(e) {
+                    options.callbacks.handleDragOut(dropZone);
                     qq(dropArea).removeClass(options.classes.dropActive);
                 },
                 onDrop: function(e) {
+                    options.callbacks.handleDragDrop(dropZone);
                     handleDataTransfer(e.dataTransfer, dropZone).then(function() {
                         uploadDroppedFiles(droppedFiles, dropZone);
                     }, function() {
@@ -6130,7 +6136,10 @@ function htmlspecialchars_decode (string, quote_style) {
             },
             dropLog: function(message, level) {
                 qq.log(message, level);
-            }
+            },
+            handleDragOver: function(dropzone) {},
+            handleDragOut: function(dropzone) {},
+            handleDragDrop: function(dropzone) {}
         };
     };
     qq.UploadDropZone = function(o) {
@@ -6370,6 +6379,15 @@ function htmlspecialchars_decode (string, quote_style) {
                         },
                         dropLog: function(message, level) {
                             self.log(message, level);
+                        },
+                        handleDragOver: function(dropzone) {
+                            self._options.callbacks.onDropzoneDragOver(dropzone);
+                        },
+                        handleDragOut: function(dropzone) {
+                            self._options.callbacks.onDropzoneDragOut(dropzone);
+                        },
+                        handleDragDrop: function(dropzone) {
+                            self._options.callbacks.onDropzoneDragDrop(dropzone);
                         }
                     }
                 });

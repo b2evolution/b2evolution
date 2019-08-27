@@ -2584,6 +2584,18 @@ function display_dragdrop_upload_button( $params = array() )
 						}
 						?>
 					},
+					onDropzoneDragOver: function( dropzone )
+					{
+						jQuery('.qq-upload-button').addClass('qq-upload-button-dragover');
+					},
+					onDropzoneDragOut: function( dropzone )
+					{
+						jQuery('.qq-upload-button').removeClass('qq-upload-button-dragover');
+					},
+					onDropzoneDragDrop: function( dropzone )
+					{
+						jQuery('.qq-upload-button').removeClass('qq-upload-button-dragover');
+					},
 					onComplete: function( id, fileName, responseJSON, request, dropTarget )
 					{
 						if( responseJSON != undefined )

@@ -821,9 +821,7 @@ table.filelist .file_selector .form-control {
   width: auto;
   display: inline-block;
 }
-div.qq-upload-button,
-div.qq-upload-drop-area,
-div.qq-upload-drop-area-active {
+div.qq-upload-button {
   border: 2px dashed #fff;
   background: #5bc0de;
   border-radius: 9px;
@@ -831,7 +829,8 @@ div.qq-upload-drop-area-active {
 div.qq-upload-drop-area {
   padding: 7px 0;
   text-align: center;
-  color: #FFF;
+  color: transparent;
+  background: transparent;
   font-weight: bold;
 }
 div.qq-upload-drop-area > div > span {
@@ -839,10 +838,11 @@ div.qq-upload-drop-area > div > span {
   font-size: small;
   margin-top: 2px;
 }
-div.qq-upload-button-hover,
-div.qq-upload-drop-area,
-div.qq-upload-drop-area-active {
+div.qq-upload-button-hover {
   background: #5cb85c;
+}
+div.qq-upload-button-dragover {
+  background: #efbd5b !important;
 }
 ul.qq-upload-list {
   margin: 0;

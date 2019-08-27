@@ -163,8 +163,10 @@ display_dragdrop_upload_button( array(
 		'listElement'      => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody" ).get(0)',
 		'list_style'       => 'table',
 		'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
-				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
-					.'<div>#button_text#</div>'
+				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'	// Main dropzone
+					// The div below is not necessary because were making the main dropzone transparent so
+					// the upload button below will not be covered when the main dropzone is "displayed" on drop ((see qq-hide-dropzone doc)):
+					//.'<div>#button_text#</div>'
 				.'</div>'
 				.'<div class="qq-upload-button-selector qq-upload-button">'
 					.'<div>#button_text#</div>'
