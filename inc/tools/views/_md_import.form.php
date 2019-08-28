@@ -55,15 +55,56 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 	$selected_options = array();
 	if( param( 'convert_md_links', 'integer', 0 ) )
 	{
-		$selected_options[] = T_('Convert Markdown links to b2evolution ShortLinks');
+		$selected_options['convert_md_links'] = T_('Convert Markdown links to b2evolution ShortLinks');
 	}
 	if( param( 'force_item_update', 'integer', 0 ) )
 	{
-		$selected_options[] = T_('Force Item update, even if file hash has not changed');
+		$selected_options['force_item_update'] = T_('Force Item update, even if file hash has not changed');
+	}
+	if( param( 'check_links', 'integer', 0 ) )
+	{
+		$selected_options['check_links'] = T_('Check all internal links (slugs) to see if they link to a page of the same language (if not, log a Warning)');
+	}
+	if( param( 'diff_lang_suggest', 'integer', 0 ) )
+	{
+		$selected_options['diff_lang_suggest'] = T_('If different language, use the "linked languages/versions" table to find the equivalent in the same language (and log the suggestion)');
+	}
+	if( param( 'same_lang_replace_link', 'integer', 0 ) )
+	{
+		$selected_options['same_lang_replace_link'] = T_('If a same language match was found, replace the link slug in the post while importing');
+	}
+	if( param( 'same_lang_update_file', 'integer', 0 ) )
+	{
+		$selected_options['same_lang_update_file'] = T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git). This requires using a directory to import, not a ZIP file.');
 	}
 	if( $selected_options_count = count( $selected_options ) )
 	{
-		echo '<b>'.T_('Options').':</b> '.( $selected_options_count == 1 ? $selected_options[0] : '<ul class="list-default"><li>'.implode( '</li><li>', $selected_options ).'</li></ul>' );
+		echo '<b>'.T_('Options').':</b> ';
+		if( $selected_options_count == 1 )
+		{
+			echo $selected_options[0];
+		}
+		else
+		{
+			echo '<ul class="list-default">';
+			foreach( $selected_options as $option_key => $option_title )
+			{
+				if( $option_key == 'diff_lang_suggest' )
+				{
+					$attrs = ' style="margin-left:20px"';
+				}
+				elseif( in_array( $option_key, array( 'same_lang_replace_link', 'same_lang_update_file' ) ) )
+				{
+					$attrs = ' style="margin-left:40px"';
+				}
+				else
+				{
+					$attrs = '';
+				}
+				echo '<li'.$attrs.'>'.$option_title.'</li>';
+			}
+			echo '</ul>';
+		}
 	}
 
 	if( $MarkdownImport->get_data( 'errors' ) === false )

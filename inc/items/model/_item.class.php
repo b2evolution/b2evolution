@@ -13384,9 +13384,10 @@ class Item extends ItemLight
 	 * Get version Item by locale
 	 *
 	 * @param string Locale
+	 * @param boolean TRUE to check if the Item can be displayed for current User
 	 * @return object|NULL Item object
 	 */
-	function & get_version_Item( $locale )
+	function & get_version_Item( $locale, $check_visibility = true )
 	{
 		$version_items = $this->get_other_version_items();
 		array_unshift( $version_items, $this );
@@ -13394,7 +13395,7 @@ class Item extends ItemLight
 		foreach( $version_items as $version_Item )
 		{
 			if( $version_Item->get( 'locale' ) == $locale &&
-			    $version_Item->can_be_displayed() )
+			    ( ! $check_visibility || $version_Item->can_be_displayed() ) )
 			{	// Use first detected Item with requested locale and visible for current User:
 				return $version_Item;
 			}

@@ -50,6 +50,10 @@ class MarkdownImport
 				'delete_files'      => 0, // Delete files on 'replace' mode
 				'convert_md_links'  => 1, // Convert Markdown links to b2evolution ShortLinks
 				'force_item_update' => 0, // Force Item update, even if file hash has not changed
+				'check_links'            => 1,	// Check all internal links (slugs) to see if they link to a page of the same language (if not, log a Warning)
+				'diff_lang_suggest'      => 1,		// If different language, use the "linked languages/versions" table to find the equivalent in the same language (and log the suggestion)
+				'same_lang_replace_link' => 1,			// If a same language match was found, replace the link slug in the post while importing
+				'same_lang_update_file'  => 1,			// If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git). This requires using a directory to import, not a ZIP file.
 			);
 
 		// Supported YAML fields:
@@ -646,6 +650,8 @@ class MarkdownImport
 			{	// Convert Markdown links to b2evolution ShortLinks:
 				// NOTE: Do this even when last import hash is different because below we may update content on import images:
 				$this->error_convert_links = array();
+				$this->warning_check_links = array();
+				$this->current_item_locale = $Item->get( 'locale' );
 				$item_content = preg_replace_callback( '#(^|[^\!])\[([^\[\]]*)\]\(((([a-z]*://)?([^\)]+[/\\\\])?([^\)]+?)(\.[a-z]{2,4})?)(\#[^\)]+)?)?\)#i', array( $this, 'callback_convert_links' ), $item_content );
 			}
 
@@ -797,6 +803,35 @@ class MarkdownImport
 					{	// Special warning when URL to image is used in link markdown tag:
 						echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> The above is a markdown link to an image file. Did you forget the <code>!</code> in order to make it an image inclusion, rather than a link?</li>';
 					}
+				}
+				echo '</ul>';
+			}
+
+			if( ! empty( $this->warning_check_links ) )
+			{	// Display what links is from different locale:
+				echo '<ul class="list-default" style="margin-bottom:0">';
+				foreach( $this->warning_check_links as $warning_check_link )
+				{
+					echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> ';
+					switch( $warning_check_link['msg_type'] )
+					{
+						case 'check':
+							printf( 'Post %s of the link %s has a different locale %s than current post locale %s.',
+									$warning_check_link['post_link'],
+									'<code>'.$warning_check_link['link_code'].'</code>',
+									'<code>'.$warning_check_link['locale'].'</code>',
+									'<code>'.$Item->get( 'locale' ).'</code>'
+								);
+							break;
+						case 'equivalent':
+							printf( 'You should use a post %s with slug %s in the link %s.',
+									$warning_check_link['post_link'],
+									'<code>'.$warning_check_link['post_slug'].'</code>',
+									'<code>'.$warning_check_link['link_code'].'</code>'
+								);
+							break;
+					}
+					echo '</li>';
 				}
 				echo '</ul>';
 			}
@@ -1264,6 +1299,7 @@ class MarkdownImport
 		elseif( isset( $m[8] ) && $m[8] === '.md' )
 		{	// Extract item slug from relative URL of md file:
 			$item_url = get_urltitle( $m[7] );
+			$item_slug = $item_url;
 			$link_anchor = isset( $m[9] ) ? trim( $m[9], '# ' ) : '';
 		}
 		elseif( strpos( $m[7], '#' ) === 0 && strlen( $m[7] ) > 1 )
@@ -1277,6 +1313,38 @@ class MarkdownImport
 				? array( $m[0], 'image' )
 				: $m[0];
 			return $m[0];
+		}
+
+		if( $this->get_option( 'check_links' ) &&
+		    isset( $item_slug ) &&
+		    ( $ItemCache = & get_ItemCache() ) &&
+		    ( $slug_Item = $ItemCache->get_by_urltitle( $item_slug, false, false ) ) )
+		{	// Check internal link (slug) to see if it links to a page of the same language:
+			if( $slug_Item->get( 'locale' ) != $this->current_item_locale )
+			{	// Different locale:
+				$this->warning_check_links[] = array(
+						'msg_type'  => 'check',
+						'link_code' => $m[0],
+						'locale'    => $slug_Item->get( 'locale' ),
+						'post_link' => $slug_Item->get_title( array( 'link_type' => 'admin_view' ) ),
+					);
+				if( $this->get_option( 'diff_lang_suggest' ) )
+				{	// Find and suggest equivalent from "linked languages/versions" table:
+					if( $version_Slug = & $slug_Item->get_version_Item( $this->current_item_locale, false ) )
+					{	// We found a version Item with required locale:
+						$this->warning_check_links[] = array(
+							'msg_type'  => 'equivalent',
+							'link_code' => $m[0],
+							'post_slug' => $version_Slug->get( 'urltitle' ),
+							'post_link' => $version_Slug->get_title( array( 'link_type' => 'admin_view' ) ),
+						);
+						if( $this->get_option( 'diff_lang_suggest' ) )
+						{	// Replace the link slug in the post:
+							$item_url = $version_Slug->get( 'urltitle' );
+						}
+					}
+				}
+			}
 		}
 
 		return $m[1] // Suffix like space or new line before link

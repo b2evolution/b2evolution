@@ -73,6 +73,10 @@ switch( $action )
 		$MarkdownImport->set_option( 'delete_files', param( 'delete_files', 'integer', 0 ) );
 		$MarkdownImport->set_option( 'convert_md_links', param( 'convert_md_links', 'integer', 0 ) );
 		$MarkdownImport->set_option( 'force_item_update', param( 'force_item_update', 'integer', 0 ) );
+		$MarkdownImport->set_option( 'check_links', param( 'check_links', 'integer', 0 ) );
+		$MarkdownImport->set_option( 'diff_lang_suggest', param( 'diff_lang_suggest', 'integer', 0 ) );
+		$MarkdownImport->set_option( 'same_lang_replace_link', param( 'same_lang_replace_link', 'integer', 0 ) );
+		$MarkdownImport->set_option( 'same_lang_update_file', param( 'same_lang_update_file', 'integer', 0 ) );
 		break;
 }
 
