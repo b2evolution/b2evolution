@@ -2542,8 +2542,19 @@ function display_dragdrop_upload_button( $params = array() )
 					allowedExtensions: <?php echo json_encode( $allowed_extensions );?>
 				},
 				callbacks: {
-					onSubmit: function( id, fileName )
+					onSubmit: function( id, fileName, dropTarget )
 					{
+						var textarea_dropzone = document.getElementById('itemform_post_content'),
+								defaultParams = { root_and_path: <?php echo $params['fieldset_prefix']; ?>root_and_path },
+								finalParams = defaultParams;
+
+						if( dropTarget == textarea_dropzone )
+						{	// File dropped over textarea, set link position to "inline"
+							var newParams = { link_position: 'inline' };
+							qq.extend( finalParams, newParams );
+						}
+						this.setParams( finalParams );
+
 						var noresults_row = jQuery( '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> tr.noresults' );
 						if( noresults_row.length )
 						{ // Add table headers and remove "No results" row
@@ -2727,12 +2738,17 @@ function display_dragdrop_upload_button( $params = array() )
 									jQuery( '#evo_multi_file_selector' ).show();
 								}
 
-								var myField = document.getElementById('itemform_post_content');
-								if( dropTarget == myField )
+								var textarea_dropzone = document.getElementById('itemform_post_content');
+								if( dropTarget == textarea_dropzone )
 								{	// Dropped file in edit content textarea:
-									if( in_array( responseJSON.data.filetype, ['image', 'video', 'audio'] ) )
-									{	// Insert appropriate short tag:
-										textarea_wrap_selection( myField, '[' + responseJSON.data.filetype + ':' + responseJSON.data.link_ID + ']', '', 0 );
+									switch( responseJSON.data.filetype )
+									{
+										case 'image':
+										case 'video':
+										case 'audio':
+											// Insert appropriate short tag:
+											textarea_wrap_selection( textarea_dropzone, '[' + responseJSON.data.filetype + ':' + responseJSON.data.link_ID + ']', '', 0 );
+											break;
 									}
 								}
 							}

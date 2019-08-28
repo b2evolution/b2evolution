@@ -96,6 +96,7 @@ param( 'upload', 'boolean', true );
 param( 'root_and_path', 'filepath', true );
 param( 'blog', 'integer' );
 param( 'link_owner', 'string' );
+param( 'link_position', 'string', NULL );
 param( 'fm_mode', 'string' );
 // Use the glyph or font-awesome icons if requested by skin
 param( 'b2evo_icons_type', 'string', '' );
@@ -252,7 +253,7 @@ if( $upload )
 			$LinkCache = & get_LinkCache();
 			do
 			{
-				$new_link_ID = $newFile->link_to_Object( $LinkOwner );
+				$new_link_ID = $newFile->link_to_Object( $LinkOwner, 0, $link_position );
 				// Check if Link has been created really
 				$new_Link = & $LinkCache->get_by_ID( $new_link_ID, false, false );
 			}

@@ -2460,7 +2460,7 @@ function htmlspecialchars_decode (string, quote_style) {
                 }
                 this._handleCheckedCallback({
                     name: "onSubmit",
-                    callback: qq.bind(this._options.callbacks.onSubmit, this, id, name),
+                    callback: qq.bind(this._options.callbacks.onSubmit, this, id, name, this.getDropTarget(id)),
                     onSuccess: qq.bind(this._onSubmitCallbackSuccess, this, id, name),
                     onFailure: qq.bind(this._fileOrBlobRejected, this, id, name),
                     identifier: id
@@ -2590,7 +2590,7 @@ function htmlspecialchars_decode (string, quote_style) {
                     allowEmpty: false
                 },
                 callbacks: {
-                    onSubmit: function(id, name) {},
+                    onSubmit: function(id, name, maybeDropTarget) {},
                     onSubmitted: function(id, name) {},
                     onComplete: function(id, name, responseJSON, maybeXhr, maybeDropTarget) {},
                     onAllComplete: function(successful, failed) {},
