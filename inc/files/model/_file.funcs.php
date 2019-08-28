@@ -2727,8 +2727,14 @@ function display_dragdrop_upload_button( $params = array() )
 									jQuery( '#evo_multi_file_selector' ).show();
 								}
 
-								// TODO: Insert [image:123] tag in textarea
-								console.info('dropTarget', dropTarget);
+								var myField = document.getElementById('itemform_post_content');
+								if( dropTarget == myField )
+								{	// Dropped file in edit content textarea:
+									if( in_array( responseJSON.data.filetype, ['image', 'video', 'audio'] ) )
+									{	// Insert appropriate short tag:
+										textarea_wrap_selection( myField, '[' + responseJSON.data.filetype + ':' + responseJSON.data.link_ID + ']', '', 0 );
+									}
+								}
 							}
 							else if( responseJSON.data.status == 'rename' )
 							{ // Conflict on upload
