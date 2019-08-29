@@ -825,10 +825,8 @@ class MarkdownImport
 							break;
 						case 'content':
 							echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
-								.sprintf( 'We updated a content to use a link of "%s" instead of %s.',
-									$link_message['link'],
-									'<code>'.$link_message['tag'].'</code>'
-								).'</li>';
+									.'We will update the content accordingly.'
+								.'</li>';
 							break;
 					}
 				}
@@ -849,7 +847,7 @@ class MarkdownImport
 					else
 					{	// No file rights to write into the file:
 						echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '
-							.sprintf( 'Impossible update file %s for links with match language, please check file rights.',
+							.sprintf( 'Impossible to update file %s for links with match language, please check file permissions.',
 								'<code>'.$file_path.'</code>'
 							).'</li>';
 					}
