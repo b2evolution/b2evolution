@@ -491,8 +491,7 @@ if( $Skin->is_visible_sidebar( 'single', true ) && $Skin->get_setting( 'sidebar_
 		jQuery( document ).ready( function()
 		{
 			var affix_obj = jQuery( ".evo_container", ".evo_sidebar_col" ),
-			    evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0,
-			    affix_offset = evo_toolbar_height + <?php echo $sidebar_offset;?>;
+			    evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0;
 
 			if( !affix_obj.length )
 			{	// Nothing to affix:
@@ -509,7 +508,7 @@ if( $Skin->is_visible_sidebar( 'single', true ) && $Skin->get_setting( 'sidebar_
 			wrapper.affix( {
 				offset: {
 					top: function() {
-						return affix_obj_top - affix_offset - parseInt( wrapper.css( "margin-top" ) );
+						return affix_obj_top - get_affix_offset() - parseInt( wrapper.css( "margin-top" ) );
 					}
 				}
 			} );
@@ -538,6 +537,22 @@ if( $Skin->is_visible_sidebar( 'single', true ) && $Skin->get_setting( 'sidebar_
 				wrapper.css( { "width": "", "top": "", "z-index": "" } );
 			} );
 
+			function get_affix_offset()
+			{
+				var affix_offset = evo_toolbar_height + <?php echo $sidebar_offset;?>,
+					  sitewide_header_affix_offset = 0;
+
+				// This is specific to b2evolution.net forum site.
+				// Sites with a custom sitewide header that contains fixed elements should declare the JS function below
+				// or compensate with the "Messages affix offset" skin setting:
+				if( window.get_sitewide_header_affix_offset && typeof window.get_sitewide_header_affix_offset === 'function' )
+				{
+					sitewide_header_affix_offset = window.get_sitewide_header_affix_offset();
+				}
+
+				return affix_offset + sitewide_header_affix_offset;
+			}
+
 			function affix_sidebar()
 			{
 				// Create a placeholder for the affix obj berfore we fix it into position:
@@ -546,13 +561,13 @@ if( $Skin->is_visible_sidebar( 'single', true ) && $Skin->get_setting( 'sidebar_
 				placeholder.css( 'width', '100%' );
 
 				// Fix wrapper into position:
-				wrapper.css( { "width": wrapper_width, "top": affix_offset, "z-index": 1050 } );
+				wrapper.css( { "width": wrapper_width, "top": get_affix_offset(), "z-index": 1050 } );
 			}
 
 			function check_sidebar_overflow()
 			{
 				var content_col = jQuery( '.evo_content_col' ),
-				    exceed_viewport = window.innerHeight < ( wrapper.height() + affix_offset ),
+				    exceed_viewport = window.innerHeight < ( wrapper.height() + get_affix_offset() ),
 				    exceed_content = wrapper.height() > content_col.height();
 
 				if( exceed_viewport || exceed_content )
@@ -579,7 +594,7 @@ if( $Skin->is_visible_sidebar( 'single', true ) && $Skin->get_setting( 'sidebar_
 						// Reset wrapper style:
 						wrapper.css( { "width": "", "top": "", "z-index": "" } );
 					}
-
+					affix_sidebar();
 					check_sidebar_overflow();
 				} );
 
