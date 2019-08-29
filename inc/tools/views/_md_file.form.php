@@ -107,11 +107,11 @@ if( ! empty( $import_files ) )
 
 	$Form->checklist( array(
 			array( 'convert_md_links', '1', T_('Convert Markdown links to b2evolution ShortLinks'), $convert_md_links ),
+			array( 'check_links', '1', T_('Check all internal links (slugs) to see if they link to a page of the same language (if not, log a Warning)'), $check_links, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:20px' ) ),
+			array( 'diff_lang_suggest', '1', T_('If different language, use the "linked languages/versions" table to find the equivalent in the same language (and log the suggestion)'), $diff_lang_suggest, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:40px' ) ),
+			array( 'same_lang_replace_link', '1', T_('If a same language match was found, replace the link slug in the post while importing'), $same_lang_replace_link, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:60px' ) ),
+			array( 'same_lang_update_file', '1', T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git). This requires using a directory to import, not a ZIP file.'), $same_lang_update_file, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:60px' ) ),
 			array( 'force_item_update', '1', T_('Force Item update, even if file hash has not changed'), $force_item_update ),
-			array( 'check_links', '1', T_('Check all internal links (slugs) to see if they link to a page of the same language (if not, log a Warning)'), $check_links ),
-			array( 'diff_lang_suggest', '1', T_('If different language, use the "linked languages/versions" table to find the equivalent in the same language (and log the suggestion)'), $diff_lang_suggest, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:20px' ) ),
-			array( 'same_lang_replace_link', '1', T_('If a same language match was found, replace the link slug in the post while importing'), $same_lang_replace_link, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:40px' ) ),
-			//array( 'same_lang_update_file', '1', T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git). This requires using a directory to import, not a ZIP file.'), $same_lang_update_file, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:40px' ) ),
 		), 'md_options', T_('Options') );
 
 	$Form->end_fieldset();

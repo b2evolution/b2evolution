@@ -46,14 +46,14 @@ class MarkdownImport
 		// Default options:
 		$this->options = array(
 				'mode'              => 'update', // The import type/mode ( update | append | replace )
-				'reuse_cats'        => 0, 
+				'reuse_cats'        => 0, // Reuse existing categories on 'append' mode
 				'delete_files'      => 0, // Delete files on 'replace' mode
-				'convert_md_links'  => 1, // Convert Markdown links to b2evolution ShortLinks
-				'force_item_update' => 0, // Force Item update, even if file hash has not changed
-				'check_links'            => 1,	// Check all internal links (slugs) to see if they link to a page of the same language (if not, log a Warning)
-				'diff_lang_suggest'      => 1,		// If different language, use the "linked languages/versions" table to find the equivalent in the same language (and log the suggestion)
-				'same_lang_replace_link' => 1,			// If a same language match was found, replace the link slug in the post while importing
-				'same_lang_update_file'  => 1,			// If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git). This requires using a directory to import, not a ZIP file.
+				'convert_md_links'       => 1, // Convert Markdown links to b2evolution ShortLinks
+				'check_links'            => 1,   // Check all internal links (slugs) to see if they link to a page of the same language (if not, log a Warning)
+				'diff_lang_suggest'      => 1,     // If different language, use the "linked languages/versions" table to find the equivalent in the same language (and log the suggestion)
+				'same_lang_replace_link' => 1,       // If a same language match was found, replace the link slug in the post while importing
+				'same_lang_update_file'  => 1,       // If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git). This requires using a directory to import, not a ZIP file.
+				'force_item_update'      => 0, // Force Item update, even if file hash has not changed
 			);
 
 		// Supported YAML fields:
@@ -557,7 +557,8 @@ class MarkdownImport
 			$item_slug = $file_match[1];
 
 			// Extract title from content:
-			$item_content = trim( file_get_contents( $file_path ) );
+			$md_file_content = file_get_contents( $file_path );
+			$item_content = trim( $md_file_content );
 			$item_content_hash = md5( $item_content );
 			if( preg_match( '~^(---[\r\n]+(.+?)[\r\n]+---[\r\n]*)?(#+\s*(.+?)\s*#*\s*([\r\n]+|$))?(.*)$~s', $item_content, $content_match ) )
 			{
@@ -649,9 +650,11 @@ class MarkdownImport
 			if( $this->get_option( 'convert_md_links' ) )
 			{	// Convert Markdown links to b2evolution ShortLinks:
 				// NOTE: Do this even when last import hash is different because below we may update content on import images:
-				$this->error_convert_links = array();
-				$this->warning_check_links = array();
+				$this->link_messages = array();
 				$this->current_item_locale = $Item->get( 'locale' );
+				// Allow to update md file only in folder and not in ZIP archive:
+				$this->update_md_file_links = ( $this->get_data( 'type' ) == 'dir' ? array() : false );
+				// Do convert:
 				$item_content = preg_replace_callback( '#(^|[^\!])\[([^\[\]]*)\]\(((([a-z]*://)?([^\)]+[/\\\\])?([^\)]+?)(\.[a-z]{2,4})?)(\#[^\)]+)?)?\)#i', array( $this, 'callback_convert_links' ), $item_content );
 			}
 
@@ -784,54 +787,72 @@ class MarkdownImport
 			// Display messages of importing YAML fields:
 			$this->display_yaml_messages();
 
-			if( ! empty( $this->error_convert_links ) )
+			if( ! empty( $this->link_messages ) )
 			{	// Display what links could not be converted:
 				echo ( $this->has_yaml_messages() ? '' : ',' ).'<ul class="list-default" style="margin-bottom:0">';
-				foreach( $this->error_convert_links as $error_convert_link )
+				foreach( $this->link_messages as $link_message )
 				{
-					if( is_array( $error_convert_link ) )
+					switch( $link_message['type'] )
 					{
-						$error_convert_link_type = $error_convert_link[1];
-						$error_convert_link = $error_convert_link[0];
-					}
-					else
-					{
-						$error_convert_link_type = 'link';
-					}
-					echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Markdown link %s could not be convered to b2evolution ShortLink.', '<code>'.$error_convert_link.'</code>' ).'</li>';
-					if( $error_convert_link_type == 'image' )
-					{	// Special warning when URL to image is used in link markdown tag:
-						echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> The above is a markdown link to an image file. Did you forget the <code>!</code> in order to make it an image inclusion, rather than a link?</li>';
+						case 'error_link':
+						case 'error_image':
+							echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '
+									.sprintf( 'Markdown link %s could not be convered to b2evolution ShortLink.',
+										'<code>'.$link_message['tag'].'</code>'
+									).'</li>';
+							if( $link_message['type'] == 'error_image' )
+							{	// Special warning when URL to image is used in link markdown tag:
+								echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
+										.'The above is a markdown link to an image file. Did you forget the <code>!</code> in order to make it an image inclusion, rather than a link?'
+									.'</li>';
+							}
+							break;
+						case 'check':
+							echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
+								.sprintf( 'Link %s points to "%s" which is in %s instead of %s.',
+									'<code>'.$link_message['tag'].'</code>',
+									$link_message['link'],
+									'<code>'.$link_message['locale'].'</code>',
+									'<code>'.$Item->get( 'locale' ).'</code>'
+								).'</li>';
+							break;
+						case 'recommend':
+							echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
+								.sprintf( 'We recommend "%s" (%s) as destination.',
+									$link_message['link'],
+									'<code>'.$Item->get( 'locale' ).'</code>'
+								).'</li>';
+							break;
+						case 'content':
+							echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
+								.sprintf( 'We updated a content to use a link of "%s" instead of %s.',
+									$link_message['link'],
+									'<code>'.$link_message['tag'].'</code>'
+								).'</li>';
+							break;
 					}
 				}
-				echo '</ul>';
-			}
-
-			if( ! empty( $this->warning_check_links ) )
-			{	// Display what links is from different locale:
-				echo '<ul class="list-default" style="margin-bottom:0">';
-				foreach( $this->warning_check_links as $warning_check_link )
-				{
-					echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> ';
-					switch( $warning_check_link['msg_type'] )
-					{
-						case 'check':
-							printf( 'Post %s of the link %s has a different locale %s than current post locale %s.',
-									$warning_check_link['post_link'],
-									'<code>'.$warning_check_link['link_code'].'</code>',
-									'<code>'.$warning_check_link['locale'].'</code>',
-									'<code>'.$Item->get( 'locale' ).'</code>'
-								);
-							break;
-						case 'equivalent':
-							printf( 'You should use a post %s with slug %s in the link %s.',
-									$warning_check_link['post_link'],
-									'<code>'.$warning_check_link['post_slug'].'</code>',
-									'<code>'.$warning_check_link['link_code'].'</code>'
-								);
-							break;
+				if( ! empty( $this->update_md_file_links ) )
+				{	// Update file to use new replaced links to posts with proper locale:
+					if( ( $md_file_handle = @fopen( $file_path, 'w' ) ) &&
+					    fwrite( $md_file_handle, str_replace( array_column( $this->update_md_file_links, 'old' ), array_column( $this->update_md_file_links, 'new' ), $md_file_content ) ) )
+					{	// Inform about updated file content:
+						echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
+							.sprintf( 'We modified the file %s accordingly.',
+								'<code>'.$item_slug.'.md</code>'
+							).'</li>';
+						if( $md_file_handle )
+						{	// Close file handle:
+							fclose( $md_file_handle );
+						}
 					}
-					echo '</li>';
+					else
+					{	// No file rights to write into the file:
+						echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '
+							.sprintf( 'Impossible update file %s for links with match language, please check file rights.',
+								'<code>'.$file_path.'</code>'
+							).'</li>';
+					}
 				}
 				echo '</ul>';
 			}
@@ -851,7 +872,7 @@ class MarkdownImport
 							'file_root_ID'   => $this->coll_ID,
 							'folder_path'    => 'quick-uploads/'.$Item->get( 'urltitle' ),
 						);
-					echo ( ! $this->has_yaml_messages() && empty( $this->error_convert_links ) ? ',' : '' ).'<ul class="list-default" style="margin-bottom:0">';
+					echo ( ! $this->has_yaml_messages() && empty( $this->link_messages ) ? ',' : '' ).'<ul class="list-default" style="margin-bottom:0">';
 					foreach( $image_matches[2] as $i => $image_relative_path )
 					{
 						$file_params['file_alt'] = trim( $image_matches[1][$i] );
@@ -907,7 +928,7 @@ class MarkdownImport
 				}
 			}
 
-			if( ! $files_imported && ! $this->has_yaml_messages() && empty( $this->error_convert_links ) )
+			if( ! $files_imported && ! $this->has_yaml_messages() && empty( $this->link_messages ) )
 			{
 				echo '.<br>';
 			}
@@ -1286,7 +1307,10 @@ class MarkdownImport
 
 		if( $link_url === '' )
 		{	// URL must be defined:
-			$this->error_convert_links[] = $m[0];
+			$this->link_messages[] = array(
+					'type' => 'error_link',
+					'tag'  => $m[0],
+				);
 			return $m[0];
 		}
 
@@ -1309,9 +1333,10 @@ class MarkdownImport
 		}
 		else
 		{	// We cannot convert this markdown link:
-			$this->error_convert_links[] = isset( $m[8] ) && in_array( strtolower( substr( $m[8], 1 ) ), array( 'png', 'gif', 'jpg', 'jpeg', 'svg' ) )
-				? array( $m[0], 'image' )
-				: $m[0];
+			$this->link_messages[] = array(
+					'type' => ( isset( $m[8] ) && in_array( strtolower( substr( $m[8], 1 ) ), array( 'png', 'gif', 'jpg', 'jpeg', 'svg' ) ) ? 'error_image' : 'error_link' ),
+					'tag'  => $m[0],
+				);
 			return $m[0];
 		}
 
@@ -1322,25 +1347,37 @@ class MarkdownImport
 		{	// Check internal link (slug) to see if it links to a page of the same language:
 			if( $slug_Item->get( 'locale' ) != $this->current_item_locale )
 			{	// Different locale:
-				$this->warning_check_links[] = array(
-						'msg_type'  => 'check',
-						'link_code' => $m[0],
-						'locale'    => $slug_Item->get( 'locale' ),
-						'post_link' => $slug_Item->get_title( array( 'link_type' => 'admin_view' ) ),
+				$this->link_messages[] = array(
+						'type'   => 'check',
+						'tag'    => $m[0],
+						'locale' => $slug_Item->get( 'locale' ),
+						'link'   => $slug_Item->get_title( array( 'link_type' => 'admin_view' ) ),
 					);
 				if( $this->get_option( 'diff_lang_suggest' ) )
 				{	// Find and suggest equivalent from "linked languages/versions" table:
-					if( $version_Slug = & $slug_Item->get_version_Item( $this->current_item_locale, false ) )
+					if( $version_Item = & $slug_Item->get_version_Item( $this->current_item_locale, false ) )
 					{	// We found a version Item with required locale:
-						$this->warning_check_links[] = array(
-							'msg_type'  => 'equivalent',
-							'link_code' => $m[0],
-							'post_slug' => $version_Slug->get( 'urltitle' ),
-							'post_link' => $version_Slug->get_title( array( 'link_type' => 'admin_view' ) ),
+						$version_item_link = $version_Item->get_title( array( 'link_type' => 'admin_view' ) );
+						$this->link_messages[] = array(
+							'type' => 'recommend',
+							'link' => $version_item_link,
 						);
-						if( $this->get_option( 'diff_lang_suggest' ) )
+						if( $this->get_option( 'same_lang_replace_link' ) )
 						{	// Replace the link slug in the post:
-							$item_url = $version_Slug->get( 'urltitle' );
+							$item_url = $version_Item->get( 'urltitle' );
+							$this->link_messages[] = array(
+								'type' => 'content',
+								'link' => $version_item_link,
+								'tag'  => $m[0],
+							);
+							if( $this->get_option( 'same_lang_update_file' ) &&
+							    $this->update_md_file_links !== false )
+							{	// Update md file with new replaced slugs ONLY when source is a folder and not a ZIP archive:
+								$this->update_md_file_links[] = array(
+									'old' => $m[0],
+									'new' => str_replace( $m[7].'.md', $version_Item->get( 'urltitle' ).'.md', $m[0] )
+								);
+							}
 						}
 					}
 				}
