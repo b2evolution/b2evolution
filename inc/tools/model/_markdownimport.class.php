@@ -27,34 +27,85 @@ class MarkdownImport
 	var $source;
 	var $data;
 	var $options;
+	var $options_defs;
 	var $yaml_fields;
 
 	/**
-	 * Initialize params for markdown import
-	 *
-	 * @param integer Collection ID
-	 * @param string Source path
-	 * @return 
+	 * Initialize data for markdown import
 	 */
-	function __construct( $coll_ID, $source_path )
+	function __construct()
 	{
-		global $Session;
-
-		$this->coll_ID = $coll_ID;
-		$this->source = $source_path;
-
-		// Default options:
-		$this->options = array(
-				'mode'              => 'update', // The import type/mode ( update | append | replace )
-				'reuse_cats'        => 0, // Reuse existing categories on 'append' mode
-				'delete_files'      => 0, // Delete files on 'replace' mode
-				'convert_md_links'       => 1, // Convert Markdown links to b2evolution ShortLinks
-				'check_links'            => 1,   // Check all internal links (slugs) to see if they link to a page of the same language (if not, log a Warning)
-				'diff_lang_suggest'      => 1,     // If different language, use the "linked languages/versions" table to find the equivalent in the same language (and log the suggestion)
-				'same_lang_replace_link' => 1,       // If a same language match was found, replace the link slug in the post while importing
-				'same_lang_update_file'  => 1,       // If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git). This requires using a directory to import, not a ZIP file.
-				'force_item_update'      => 0, // Force Item update, even if file hash has not changed
-			);
+		// Options definitions:
+		$this->options_defs = array(
+			// Import mode:
+			'import_type' => array(
+				'group'   => 'mode',
+				'title'   => T_('Import mode'),
+				'options' => array(
+					'update'  => array( 'title' => T_('Update existing contents'), 'note' => T_('Existing Categories & Posts will be re-used (based on slug).') ),
+					'append'  => array( 'title' => T_('Append to existing contents') ),
+					'replace' => array( 'title' => T_('Replace existing contents'), 'note' => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.') ),
+				),
+				'type'    => 'string',
+				'default' => 'update',
+			),
+			'reuse_cats' => array(
+				'group'    => 'import_type',
+				'subgroup' => 'append',
+				'title'    => T_('Reuse existing categories'),
+				'note'     => '('.T_('based on folder name = slug name').')',
+				'type'     => 'integer',
+				'default'  => 1,
+			),
+			'delete_files' => array(
+				'group'    => 'import_type',
+				'subgroup' => 'replace',
+				'title'    => T_('Also delete media files that will no longer be referenced in the destination collection after replacing its contents'),
+				'type'     => 'integer',
+				'default'  => 0,
+			),
+			// Options:
+			'convert_md_links' => array(
+				'group'   => 'options',
+				'title'   => T_('Convert Markdown links to b2evolution ShortLinks'),
+				'type'    => 'integer',
+				'default' => 1,
+			),
+			'check_links' => array(
+				'group'   => 'options',
+				'title'   => T_('Check all internal links (slugs) to see if they link to a page of the same language (if not, log a Warning)'),
+				'type'    => 'integer',
+				'default' => 1,
+				'indent'  => 1,
+			),
+			'diff_lang_suggest' => array(
+				'group'   => 'options',
+				'title'   => T_('If different language, use the "linked languages/versions" table to find the equivalent in the same language (and log the suggestion)'),
+				'type'    => 'integer',
+				'default' => 1,
+				'indent'  => 2,
+			),
+			'same_lang_replace_link' => array(
+				'group'   => 'options',
+				'title'   => T_('If a same language match was found, replace the link slug in the post while importing'),
+				'type'    => 'integer',
+				'default' => 1,
+				'indent'  => 3,
+			),
+			'same_lang_update_file' => array(
+				'group'   => 'options',
+				'title'   => T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git). This requires using a directory to import, not a ZIP file.'),
+				'type'    => 'integer',
+				'default' => 1,
+				'indent'  => 3,
+			),
+			'force_item_update' => array(
+				'group'   => 'options',
+				'title'   => T_('Force Item update, even if file hash has not changed'),
+				'type'    => 'integer',
+				'default' => 0,
+			),
+		);
 
 		// Supported YAML fields:
 		$this->yaml_fields = array(
@@ -66,9 +117,6 @@ class MarkdownImport
 				'tags',
 				'extra-cats',
 			);
-
-		// Save last import collection in Session:
-		$Session->set( 'last_import_coll_ID', $this->coll_ID );
 	}
 
 
@@ -98,6 +146,54 @@ class MarkdownImport
 		return true;
 	}
 
+
+	/**
+	 * Unzip archive
+	 *
+	 * @return boolean
+	 */
+	function unzip()
+	{
+		if( isset( $this->unzip_result ) )
+		{	// Don't unzip archive twice:
+			return $this->unzip_result;
+		}
+
+		if( is_dir( $this->source ) )
+		{	// Source is a folder:
+			$this->unzip_result = false;
+			$this->unzip_errors = '';
+			return false;
+		}
+
+		if( ! preg_match( '/\.zip$/i', $this->source ) )
+		{	// Wrong source:
+			$this->unzip_result = false;
+			$this->unzip_errors = '';
+			return false;
+		}
+
+		evo_flush();
+
+		// Extract ZIP and check if it contians at least one markdown file:
+		global $media_path;
+
+		// $ZIP_folder_path must be deleted after import!
+		$this->unzip_folder_path = $media_path.'import/temp-'.md5( rand() );
+
+		// Try to unpack:
+		$this->unzip_result = unpack_archive( $this->source, $this->unzip_folder_path, true, basename( $this->source ), false );
+
+		if( $this->unzip_result !== true )
+		{	// Store unzip error from unpack_archive():
+			$this->unzip_errors = $this->unzip_result;
+			$this->unzip_result = false;
+		}
+
+		return $this->unzip_result;
+	}
+
+
 	/**
 	 * Get data to start import from markdown folder or ZIP file
 	 *
@@ -113,46 +209,41 @@ class MarkdownImport
 		if( ! isset( $this->data ) )
 		{	// Load data in cache:
 
-			// Start to collect all printed errors from buffer:
-			ob_start();
-
-			$ZIP_folder_path = NULL;
+			$errors = '';
 
 			$folder_path = NULL;
 			if( is_dir( $this->source ) )
 			{	// Use a folder:
 				$folder_path = $this->source;
 			}
-			elseif( preg_match( '/\.zip$/i', $this->source ) )
-			{	// Extract ZIP and check if it contians at least one markdown file:
-				global $media_path;
-
-				// $ZIP_folder_path must be deleted after import!
-				$ZIP_folder_path = $media_path.'import/temp-'.md5( rand() );
-
-				if( unpack_archive( $this->source, $ZIP_folder_path, true, basename( $this->source ) ) )
-				{	// If ZIP archive is unpacked successfully:
-					$folder_path = $ZIP_folder_path;
+			else
+			{	// Try to extract ZIP:
+				if( $this->unzip() )
+				{	// Set folder on success unzipping:
+					$folder_path = $this->unzip_folder_path;
+				}
+				else
+				{	// Display errors:
+					$errors .= $this->unzip_errors;
 				}
 			}
 
-			if( $folder_path === NULL || ! check_folder_with_extensions( $folder_path, 'md' ) )
+			// Check if folder contians at least one markdown file:
+			if( empty( $this->unzip_errors ) &&
+			    ( $folder_path === NULL || ! check_folder_with_extensions( $folder_path, 'md' ) ) )
 			{	// No markdown is detected in ZIP package:
-				echo '<p class="text-danger">'.T_('No markdown file is detected in the selected source.').'</p>';
-				if( $ZIP_folder_path !== NULL && file_exists( $ZIP_folder_path ) )
+				$errors .= '<p class="text-danger">'.T_('No markdown file is detected in the selected source.').'</p>';
+				if( ! empty( $this->unzip_folder_path ) && file_exists( $this->unzip_folder_path ) )
 				{	// Delete temporary folder that contains the files from extracted ZIP package:
-					rmdir_r( $ZIP_folder_path );
+					rmdir_r( $this->unzip_folder_path );
 				}
 			}
-
-			// Get all printed errors:
-			$errors = ob_get_clean();
 
 			// Cache data:
 			$this->data = array(
 				'errors' => empty( $errors ) ? false : $errors,
 				'path'   => $folder_path,
-				'type'   => ( $ZIP_folder_path === NULL ? 'dir' : 'zip' ),
+				'type'   => ( empty( $this->unzip_folder_path ) ? 'dir' : 'zip' ),
 			);
 		}
 
@@ -183,11 +274,54 @@ class MarkdownImport
 	 * Set option
 	 *
 	 * @param string Option name
-	 * @return string Option value
+	 * @return string|NULL Option value, NULL - unknown option
 	 */
 	function get_option( $option_name )
 	{
-		return isset( $this->options[ $option_name ] ) ? $this->options[ $option_name ] : false;
+		if( isset( $this->options[ $option_name ] ) )
+		{	// Use custom value:
+			return $this->options[ $option_name ];
+		}
+
+		if( isset( $this->options_defs[ $option_name ] ) )
+		{	// Use default value:
+			return $this->options_defs[ $option_name ]['default'];
+		}
+
+		return NULL;
+	}
+
+
+	/**
+	 * Load import data from request
+	 *
+	 * @return boolean TRUE on load all fields without error
+	 */
+	function load_from_Request()
+	{
+		global $Session;
+
+		// Collection:
+		$this->coll_ID = param( 'md_blog_ID', 'integer', 0 );
+		param_check_not_empty( 'md_blog_ID', T_('Please select a collection!') );
+		// Save last import collection in Session:
+		$Session->set( 'last_import_coll_ID', $this->coll_ID );
+
+		// Import File/Folder:
+		$this->source = param( 'import_file', 'string', '' );
+		$check_source_result = $this->check_source();
+		if( $check_source_result !== true )
+		{	// Don't import if errors have been detected:
+			param_error( 'import_file', $check_source_result );
+		}
+
+		// Load options:
+		foreach( $this->options_defs as $option_key => $option )
+		{
+			$this->set_option( $option_key, param( $option_key, $option['type'], ( $option['type'] == 'integer' ? 0 : $option['default'] ) ) );
+		}
+
+		return ! param_errors_detected();
 	}
 
 
@@ -209,7 +343,7 @@ class MarkdownImport
 
 		$DB->begin();
 
-		if( $this->get_option( 'mode' ) == 'replace' )
+		if( $this->get_option( 'import_type' ) == 'replace' )
 		{	// Remove data from selected collection:
 
 			// Get existing categories
@@ -424,9 +558,9 @@ class MarkdownImport
 			$category_name = $last_index === false ? $relative_path : substr( $relative_path, $last_index + 1 );
 
 			// Always reuse existing categories on "update" mode:
-			$reuse_cats = ( $this->get_option( 'mode' ) == 'update' ||
+			$reuse_cats = ( $this->get_option( 'import_type' ) == 'update' ||
 				// Should we reuse existing categories on "append" mode?
-				( $this->get_option( 'mode' ) == 'append' && $this->get_option( 'reuse_cats' ) ) );
+				( $this->get_option( 'import_type' ) == 'append' && $this->get_option( 'reuse_cats' ) ) );
 				// Don't try to use find existing categories on replace mode.
 
 			if( $reuse_cats && $Chapter = & $this->get_Chapter( $relative_path ) )
@@ -628,7 +762,7 @@ class MarkdownImport
 			}
 
 			$item_slug = get_urltitle( $item_slug );
-			if( $this->get_option( 'mode' ) != 'update' ||
+			if( $this->get_option( 'import_type' ) != 'update' ||
 					! ( $Item = & $this->get_Item( $item_slug ) ) )
 			{	// Create new Item for not update mode or if it is not found by slug in the requested Collection:
 				$Item = new Item();
@@ -653,7 +787,7 @@ class MarkdownImport
 				$this->link_messages = array();
 				$this->current_item_locale = $Item->get( 'locale' );
 				// Allow to update md file only in folder and not in ZIP archive:
-				$this->update_md_file_links = ( $this->get_data( 'type' ) == 'dir' ? array() : false );
+				$this->update_md_file_links = array();
 				// Do convert:
 				$item_content = preg_replace_callback( '#(^|[^\!])\[([^\[\]]*)\]\(((([a-z]*://)?([^\)]+[/\\\\])?([^\)]+?)(\.[a-z]{2,4})?)(\#[^\)]+)?)?\)#i', array( $this, 'callback_convert_links' ), $item_content );
 			}
@@ -967,6 +1101,9 @@ class MarkdownImport
 			}
 		}
 
+		// Execute additonal actions after import, e.g. by extended classes:
+		$this->event_after_import();
+
 		if( $this->get_data( 'type' ) == 'zip' && file_exists( $root_folder_path ) )
 		{	// This folder was created only to extract files from ZIP package, Remove it now:
 			rmdir_r( $root_folder_path );
@@ -1068,7 +1205,7 @@ class MarkdownImport
 		$replaced_File = NULL;
 		$replaced_link_ID = NULL;
 
-		if( $this->get_option( 'mode' ) == 'update' )
+		if( $this->get_option( 'import_type' ) == 'update' )
 		{	// Try to find existing and linked image File:
 			$item_Links = $LinkOwner->get_Links();
 			foreach( $item_Links as $item_Link )
@@ -1094,7 +1231,7 @@ class MarkdownImport
 			}
 		}
 
-		if( $this->get_option( 'mode' ) != 'append' &&
+		if( $this->get_option( 'import_type' ) != 'append' &&
 				$replaced_File === NULL )
 		{	// Find an existing File on disk to replace with new:
 			$File = & $FileCache->get_by_root_and_path( $FileRoot->type, $FileRoot->in_type_ID, trailing_slash( $params['folder_path'] ).$file_source_name, true );
@@ -1368,9 +1505,8 @@ class MarkdownImport
 								'link' => $version_item_link,
 								'tag'  => $m[0],
 							);
-							if( $this->get_option( 'same_lang_update_file' ) &&
-							    $this->update_md_file_links !== false )
-							{	// Update md file with new replaced slugs ONLY when source is a folder and not a ZIP archive:
+							if( $this->get_option( 'same_lang_update_file' ) )
+							{	// Update md file with new replaced slugs:
 								$this->update_md_file_links[] = array(
 									'old' => $m[0],
 									'new' => str_replace( $m[7].'.md', $version_Item->get( 'urltitle' ).'.md', $m[0] )
@@ -1577,6 +1713,16 @@ class MarkdownImport
 		}
 
 		$Item->set( 'extra_cat_IDs', $extra_cat_IDs );
+	}
+
+
+	/**
+	 * Additional actions after import is done
+	 *
+	 * Useful for extended classes
+	 */
+	function event_after_import()
+	{
 	}
 }
 ?>

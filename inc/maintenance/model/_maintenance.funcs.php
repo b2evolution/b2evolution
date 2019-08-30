@@ -292,9 +292,10 @@ function prepare_maintenance_dir( $dir_name, $deny_access = true )
  * @param string destination directory path
  * @param boolean true if create destination directory
  * @param string Zip file name
- * @return boolean results
+ * @param boolean TRUE to print error, FALSE to return error
+ * @return boolean|string TRUE on success, FALSE|string on error
  */
-function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_name = '' )
+function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_name = '', $print_error = true )
 {
 	global $Settings, $current_User, $basepath, $upgrade_path;
 
@@ -306,9 +307,17 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 			global $admin_url;
 			$error .= ' ('.sprintf( T_('You can change this <a %s>here</a>'), 'href="'.$admin_url.'?ctrl=groups&amp;action=edit&amp;grp_ID='.$current_User->get( 'grp_ID' ).'#fieldset_wrapper_file"' ).')';
 		}
-		echo '<p>'.$error.'</p>';
-		evo_flush();
-		return false;
+		$error = '<p>'.$error.'</p>';
+		if( $print_error )
+		{	// Print error:
+			echo $error;
+			evo_flush();
+			return false;
+		}
+		else
+		{	// Return error message:
+			return $error;
+		}
 	}
 
 	if( strpos( $src_file, '://' ) !== false )
@@ -326,16 +335,32 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 	}
 	if( isset( $invalid_path_error ) )
 	{	// Don't allow wrong ZIP file path:
-		echo '<p class="text-danger">'.sprintf( T_('Invalid ZIP file path %s:'), '<code>'.$src_file.'</code>' ).' '.$invalid_path_error.'</p>';
-		evo_flush();
-		return false;
+		$error = '<p class="text-danger">'.sprintf( T_('Invalid ZIP file path %s:'), '<code>'.$src_file.'</code>' ).' '.$invalid_path_error.'</p>';
+		if( $print_error )
+		{	// Print error:
+			echo $error;
+			evo_flush();
+			return false;
+		}
+		else
+		{	// Return error message:
+			return $error;
+		}
 	}
 
 	if( ! file_exists( $dest_dir ) && ! mkdir_r( $dest_dir ) )
 	{	// Destination directory doesn't exist and it couldn't be created:
-		echo '<p class="text-danger">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.' ), $dest_dir ).'</p>';
-		evo_flush();
-		return false;
+		$error = '<p class="text-danger">'.sprintf( T_( 'Unable to create &laquo;%s&raquo; directory to extract files from ZIP archive.' ), $dest_dir ).'</p>';
+		if( $print_error )
+		{	// Print error:
+			echo $error;
+			evo_flush();
+			return false;
+		}
+		else
+		{	// Return error message:
+			return $error;
+		}
 	}
 
 	if( class_exists( 'ZipArchive' ) )
@@ -349,13 +374,20 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 		}
 		else
 		{
-			echo '<p class="text-danger">'
+			$error = '<p class="text-danger">'
 					.sprintf( T_( 'Error: %s' ), $ZipArchive->getStatusString() ).'<br />'
 					.sprintf( T_( 'Unable to decompress &laquo;%s&raquo; ZIP archive.' ), ( empty( $src_file_name ) ? $src_file : $src_file_name ) )
 				.'</p>';
-			evo_flush();
-
-			return false;
+			if( $print_error )
+			{	// Print error:
+				echo $error;
+				evo_flush();
+				return false;
+			}
+			else
+			{	// Return error message:
+				return $error;
+			}
 		}
 	}
 	else

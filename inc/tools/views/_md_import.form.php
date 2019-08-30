@@ -25,13 +25,18 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 
 	echo '<p style="margin-bottom:0">';
 
-	if( $MarkdownImport->get_data( 'type' ) == 'zip' )
+	if( preg_match( '/\.zip$/i', $MarkdownImport->source ) )
 	{	// ZIP archive:
 		echo '<b>'.T_('Source ZIP').':</b> <code>'.$MarkdownImport->source.'</code><br />';
+		echo '<b>'.T_('Unzipping').'...</b> '.( $MarkdownImport->unzip() ? T_('OK').'<br />' : '' );
 	}
 	else
 	{	// Folder:
 		echo '<b>'.T_('Source folder').':</b> <code>'.$MarkdownImport->source.'</code><br />';
+	}
+	if( $MarkdownImport->get_data( 'errors' ) !== false )
+	{	// Display errors:
+		echo $MarkdownImport->get_data( 'errors' );
 	}
 
 	$BlogCache = & get_BlogCache();
@@ -39,43 +44,22 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 	echo '<b>'.T_('Destination collection').':</b> '.$Blog->dget( 'shortname' ).' &ndash; '.$Blog->dget( 'name' ).'<br />';
 
 	echo '<b>'.T_('Mode').':</b> ';
-	switch( param( 'import_type', 'string', NULL ) )
-	{
-		case 'replace':
-			echo T_('Replace existing contents');
-			break;
-		case 'update':
-			echo T_('Update existing contents');
-			break;
-		case 'append':
-			echo T_('Append to existing contents');
-			break;
-	}
+	$import_type = param( 'import_type', 'string', NULL );
+	echo isset( $MarkdownImport->options_defs['import_type']['options'][ $import_type ] )
+		? $MarkdownImport->options_defs['import_type']['options'][ $import_type ]['title']
+		: '<b class="red">Unknown mode!</b>';
 	echo '</p>';
 	$selected_options = array();
-	if( param( 'convert_md_links', 'integer', 0 ) )
+	foreach( $MarkdownImport->options_defs as $option_key => $option )
 	{
-		$selected_options['convert_md_links'] = T_('Convert Markdown links to b2evolution ShortLinks');
-		if( param( 'check_links', 'integer', 0 ) )
-		{
-			$selected_options['check_links'] = T_('Check all internal links (slugs) to see if they link to a page of the same language (if not, log a Warning)');
-			if( param( 'diff_lang_suggest', 'integer', 0 ) )
-			{
-				$selected_options['diff_lang_suggest'] = T_('If different language, use the "linked languages/versions" table to find the equivalent in the same language (and log the suggestion)');
-				if( param( 'same_lang_replace_link', 'integer', 0 ) )
-				{
-					$selected_options['same_lang_replace_link'] = T_('If a same language match was found, replace the link slug in the post while importing');
-				}
-				if( param( 'same_lang_update_file', 'integer', 0 ) )
-				{
-					$selected_options['same_lang_update_file'] = T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git). This requires using a directory to import, not a ZIP file.');
-				}
-			}
+		if( $option['group'] != 'options' )
+		{	// Skip option from different group:
+			continue;
 		}
-	}
-	if( param( 'force_item_update', 'integer', 0 ) )
-	{
-		$selected_options['force_item_update'] = T_('Force Item update, even if file hash has not changed');
+		if( param( $option_key, $option['type'], 0 ) )
+		{
+			$selected_options[ $option_key ] = array( $option['title'], isset( $option['indent'] ) ? $option['indent'] : 0 );
+		}
 	}
 	if( $selected_options_count = count( $selected_options ) )
 	{
@@ -87,25 +71,9 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 		else
 		{
 			echo '<ul class="list-default">';
-			foreach( $selected_options as $option_key => $option_title )
+			foreach( $selected_options as $option_key => $option )
 			{
-				switch( $option_key )
-				{
-					case 'check_links':
-						$indent = 1;
-						break;
-					case 'diff_lang_suggest':
-						$indent = 2;
-						break;
-					case 'same_lang_replace_link':
-					case 'same_lang_update_file':
-						$indent = 3;
-						break;
-					default:
-						$indent = false;
-						break;
-				}
-				echo '<li'.( $indent ? ' style="margin-left:'.( $indent * 10 ).'px"' : '' ).'>'.$option_title.'</li>';
+				echo '<li'.( $option[1] ? ' style="margin-left:'.( $option[1] * 10 ).'px"' : '' ).'>'.$option[0].'</li>';
 			}
 			echo '</ul>';
 		}
@@ -117,8 +85,7 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 	}
 	else
 	{	// Display errors if import cannot be done:
-		echo $MarkdownImport->get_data( 'errors' );
-		echo '<br /><p class="text-danger">'.T_('Import failed.').'</p>';
+		echo '<p class="text-danger">'.T_('Import failed.').'</p>';
 	}
 
 $Form->end_fieldset();

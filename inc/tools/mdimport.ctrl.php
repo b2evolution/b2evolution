@@ -41,42 +41,23 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'mdimport' );
 
-		$md_blog_ID = param( 'md_blog_ID', 'integer', 0 );
-		param_check_not_empty( 'md_blog_ID', T_('Please select a collection!') );
-
-		// Import File/Folder:
-		$import_file = param( 'import_file', 'string', '' );
-
 		// Initialize markdown import object:
 		if( $app_pro )
 		{	// Use PRO markdown import:
 			load_class( 'tools/model/_markdownimportpro.class.php', 'MarkdownImportPro' );
-			$MarkdownImport = new MarkdownImportPro( $md_blog_ID, $import_file );
+			$MarkdownImport = new MarkdownImportPro();
 		}
 		else
 		{	// Use default markdown import:
-			$MarkdownImport = new MarkdownImport( $md_blog_ID, $import_file );
+			$MarkdownImport = new MarkdownImport();
 		}
 
-		$check_result = $MarkdownImport->check_source();
-
-		if( $check_result !== true )
+		// Load import data from request:
+		if( ! $MarkdownImport->load_from_Request() )
 		{	// Don't import if errors have been detected:
-			param_error( 'import_file', $check_result );
 			$action = 'file';
 			break;
 		}
-
-		// Set import options:
-		$MarkdownImport->set_option( 'mode', param( 'import_type', 'string', 'update' ) );
-		$MarkdownImport->set_option( 'reuse_cats', param( 'reuse_cats', 'integer', 0 ) );
-		$MarkdownImport->set_option( 'delete_files', param( 'delete_files', 'integer', 0 ) );
-		$MarkdownImport->set_option( 'convert_md_links', param( 'convert_md_links', 'integer', 0 ) );
-		$MarkdownImport->set_option( 'force_item_update', param( 'force_item_update', 'integer', 0 ) );
-		$MarkdownImport->set_option( 'check_links', param( 'check_links', 'integer', 0 ) );
-		$MarkdownImport->set_option( 'diff_lang_suggest', param( 'diff_lang_suggest', 'integer', 0 ) );
-		$MarkdownImport->set_option( 'same_lang_replace_link', param( 'same_lang_replace_link', 'integer', 0 ) );
-		$MarkdownImport->set_option( 'same_lang_update_file', param( 'same_lang_update_file', 'integer', 0 ) );
 		break;
 }
 
@@ -113,6 +94,16 @@ switch( $action )
 	case 'file':
 	default:
 		// Step 1:
+		// Initialize markdown import object:
+		if( $app_pro )
+		{	// Use PRO markdown import:
+			load_class( 'tools/model/_markdownimportpro.class.php', 'MarkdownImportPro' );
+			$MarkdownImport = new MarkdownImportPro();
+		}
+		else
+		{	// Use default markdown import:
+			$MarkdownImport = new MarkdownImport();
+		}
 		$AdminUI->disp_view( 'tools/views/_md_file.form.php' );
 		break;
 }
