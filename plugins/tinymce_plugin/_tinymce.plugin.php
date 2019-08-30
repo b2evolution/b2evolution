@@ -637,9 +637,9 @@ class tinymce_plugin extends Plugin
 							jQuery( '#tinymce_plugin_toggle_button_html' ).removeAttr( 'disabled' );
 							jQuery( '[name="editor_code"]').attr('value', '<?php echo $this->code; ?>' );
 							// Hide the plugin toolbars that allow to insert html tags
-							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar' ).hide();
-							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark' ).addClass( 'disabled' );
-							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark' ).each( function()
+							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar, .evo_mermaid_toolbar' ).hide();
+							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark, #block_renderer_evo_mermaid' ).addClass( 'disabled' );
+							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark, input#renderer_evo_mermaid' ).each( function()
 							{
 								if( jQuery( this ).is( ':checked' ) )
 								{
@@ -662,9 +662,9 @@ class tinymce_plugin extends Plugin
 							jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).removeAttr( 'disabled' );
 							jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
 							// Show the plugin toolbars that allow to insert html tags
-							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar' ).show();
-							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark' ).removeClass( 'disabled' );
-							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark' ).each( function()
+							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar, .evo_mermaid_toolbar' ).show();
+							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark, #block_renderer_evo_mermaid' ).removeClass( 'disabled' );
+							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark, input#renderer_evo_mermaid' ).each( function()
 							{
 								if( jQuery( this ).hasClass( 'checked' ) )
 								{
