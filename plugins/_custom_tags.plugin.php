@@ -17,7 +17,7 @@ class custom_tags_plugin extends Plugin
 	var $code = 'b2evCTag';
 	var $name = 'Custom Tags';
 	var $author = 'The b2evo Group';
-	var $priority = 40;
+	var $priority = 17;
 	var $group = 'rendering';
 	var $short_desc = 'Custom tags';
 	var $long_desc;
@@ -49,13 +49,13 @@ class custom_tags_plugin extends Plugin
 [justify] #\[justify](.+?)\[/justify]#is
 [note] #\[note](.+?)\[/note]#is';
 
-	var $default_replace_list = '<div class="alert alert-warning">$1</div>
-<div class="alert alert-info">$1</div>
-<div class="clear"></div>
-<div class="left">$1</div>
-<div class="right">$1</div>
-<div class="center">$1</div>
-<div class="justify">$1</div>
+	var $default_replace_list = '<div class="alert alert-warning" markdown="1">$1</div>
+<div class="alert alert-info" markdown="1">$1</div>
+<div class="clear" markdown="1"></div>
+<div class="left" markdown="1">$1</div>
+<div class="right" markdown="1">$1</div>
+<div class="center" markdown="1">$1</div>
+<div class="justify" markdown="1">$1</div>
 <span class="note">$1</span>';
 
 
@@ -395,6 +395,18 @@ class custom_tags_plugin extends Plugin
 	function AdminDisplayToolbar( & $params )
 	{
 		$params['target_type'] = 'Item';
+		return $this->DisplayCodeToolbar( $params );
+	}
+
+	/**
+	 * Event handler: Called when displaying editor toolbars on comment form.
+	 *
+	 * @param array Associative array of parameters
+	 * @return boolean did we display a toolbar?
+	 */
+	function DisplayCommentToolbar( & $params )
+	{
+		$params['target_type'] = 'Comment';
 		return $this->DisplayCodeToolbar( $params );
 	}
 
