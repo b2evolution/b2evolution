@@ -675,6 +675,7 @@ $Form->begin_form();
 				$field_options['resize'] = T_('Resize images...');
 				$field_options['delete'] = T_('Delete files...');
 				$field_options['create_zip'] = T_('Create ZIP archive').'...';
+				$field_options['unpack_zip'] = T_('Unpack ZIP archives').'...';
 				// NOTE: No delete confirmation by javascript, we need to check DB integrity!
 			}
 

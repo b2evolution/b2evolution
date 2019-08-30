@@ -738,6 +738,19 @@ switch( $action )
 		}
 		break;
 
+	case 'unpack_zip':
+		// Unpack selected ZIP archives:
+
+		// Check permission for action to edit files in the selected File Root:
+		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+
+		if( ! $selected_Filelist->count() )
+		{
+			$Messages->add( T_('Nothing selected.'), 'error' );
+			$action = 'list';
+			break;
+		}
+		break;
 
 	case 'rename':
 	case 'move_copy':
@@ -1675,6 +1688,10 @@ if( !empty($action ) && $action != 'list' && $action != 'nil' )
 
 		case 'create_zip':
 			$AdminUI->disp_view( 'files/views/_file_create_zip.form.php' );
+			break;
+
+		case 'unpack_zip':
+			$AdminUI->disp_view( 'files/views/_file_unpack_zip.view.php' );
 			break;
 
 		case 'edit_perms':
