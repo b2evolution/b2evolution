@@ -171,6 +171,8 @@ class LinkEmailCampaign extends LinkOwner
 		{
 			case 'name':
 				return 'emailcampaign';
+			case 'title':
+				return $this->EmailCampaign->get_name();
 		}
 		return parent::get( $parname );
 	}
