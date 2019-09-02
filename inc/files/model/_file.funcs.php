@@ -2799,8 +2799,8 @@ function display_dragdrop_upload_button( $params = array() )
 					action: 'conflict_files',
 					fileroot_ID: '<?php echo $params['fileroot_ID']; ?>',
 					path: '<?php echo $params['path']; ?>',
-					oldfile: old_file_name.replace( /^(.+\/)?([^\/]+)$/, '$2' ),
-					newfile: this_obj.attr( 'new' ).replace( /^(.+\/)?([^\/]+)$/, '$2' ),
+					oldfile: old_file_name.replace( /^(.+[\/:])?([^\/]+)$/, '$2' ),
+					newfile: this_obj.attr( 'new' ).replace( /^(.+[\/:])?([^\/]+)$/, '$2' ),
 					format: '<?php echo $params['conflict_file_format']; ?>',
 					crumb_conflictfiles: '<?php echo get_crumb( 'conflictfiles' ); ?>'
 				},
