@@ -23,13 +23,13 @@ $Form->begin_form( 'fform', T_('Unpack ZIP archives') );
 	echo '<ul>';
 	foreach( $selected_Filelist->get_array() as $selected_File )
 	{
-		echo '<li>'.sprintf( T_('Unpack %s').'... ', '<code>'.$selected_File->get_name().'</code>' );
+		echo '<li>'.sprintf( T_('Unpacking %s').'... ', '<code>'.$selected_File->get_name().'</code>' );
 		evo_flush();
 
 		if( ! is_file( $selected_File->get_full_path() ) ||
 		    ! preg_match( '/\.zip$/i', $selected_File->get_full_path() ) )
 		{	// Not ZIP archive was selected:
-			echo '<span class="text-danger">'.T_('Skip because this is not ZIP archive!').'</span>';
+			echo '<span class="text-danger">'.T_('Skipped because this is not ZIP archive!').'</span>';
 		}
 		else
 		{	// Try to unpack:
