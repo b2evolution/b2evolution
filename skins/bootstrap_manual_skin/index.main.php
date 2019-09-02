@@ -45,7 +45,7 @@ siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 ?>
 
-<div class="container<?php echo ( $disp == 'single' ? ' container-xxl' : '' ); ?>">
+<div class="<?php echo $Skin->get_layout_class( 'container' ); ?>">
 
 <header id="header" class="row<?php echo $Settings->get( 'site_skins_enabled' ) ? ' site_skins' : ''; ?>">
 
@@ -112,7 +112,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="row">
 
-	<div class="<?php echo $Skin->is_left_navigation_visible() ? ( $disp == 'single' ? 'col-xxl-8 col-xxl-pull-2' : '' ).' col-md-9 pull-right-md' : 'col-md-12' ?>">
+	<div class="<?php echo $Skin->get_layout_class( 'main_column' ); ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -181,7 +181,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	if( $disp == 'single' )
 	{	// Only for single disp:
 	?>
-		<aside class="col-xxl-2 col-xxl-push-8 col-md-3 col-xs-12 pull-right-md">
+		<aside class="<?php echo $Skin->get_layout_class( 'single_column' ); ?>">
 
 			<div id="evo_container__sidebar_single">
 
@@ -252,7 +252,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	{ // Display a left column with navigation only for several pages
 	?>
 		<!-- =================================== START OF SIDEBAR =================================== -->
-		<aside class="<?php echo ( $disp == 'single' ? 'col-xxl-2 ' : '' ); ?>col-md-3 col-xs-12 pull-left-md">
+		<aside class="<?php echo $Skin->get_layout_class( 'left_column' ); ?>">
 
 			<div id="evo_container__sidebar">
 
