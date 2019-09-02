@@ -1885,11 +1885,9 @@ function create_default_posts_location()
 		global $DB;
 
 		$DB->query( 'UPDATE T_items__item SET
-			post_ctry_ID = '.$DB->quote( '74'/* France */ ).',
-			post_rgn_ID = '.$DB->quote( '60'/* Île-de-France */ ).',
-			post_subrg_ID = '.$DB->quote( '76'/* Paris */ ) );
+			post_ctry_ID = '.$DB->quote( '74'/* France */ ) );
 
-		echo_install_log( 'TEST FEATURE: Defining default location "France, Île-de-France, Paris" for all posts' );
+		echo_install_log( 'TEST FEATURE: Defining default location "France" for all posts' );
 	}
 }
 

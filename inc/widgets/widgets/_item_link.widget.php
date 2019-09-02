@@ -153,8 +153,13 @@ class item_link_Widget extends ComponentWidget
 		global $Item;
 
 		if( empty( $Item ) )
-		{ // Don't display this widget when no Item object
+		{	// Don't display this widget when no Item object:
 			return;
+		}
+
+		if( empty( $Item->url ) )
+		{	// Don't display this widget when Item has no link:
+			return false;
 		}
 
 		$this->init_display( $params );

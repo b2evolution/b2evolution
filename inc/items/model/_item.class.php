@@ -9917,13 +9917,13 @@ class Item extends ItemLight
 
 
 	/**
-	 * Display location of current Item
+	 * Get location of current Item
 	 *
 	 * @param string Text before location
 	 * @param string Text after location
 	 * @param string Separator
 	 */
-	function location( $before, $after, $separator = ', ' )
+	function get_location( $before, $after, $separator = ', ' )
 	{
 		$location = array();
 		$location[] = $this->get_city();
@@ -9934,14 +9934,31 @@ class Item extends ItemLight
 		// Delete empty elements
 		$location = array_filter($location);
 
+		$r = '';
+
 		if( !empty( $location ) )
 		{	// Display location
-			echo $before;
+			$r .= $before;
 
-			echo implode( $separator, $location );
+			$r .= implode( $separator, $location );
 
-			echo $after;
+			$r .= $after;
 		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Display location of current Item
+	 *
+	 * @param string Text before location
+	 * @param string Text after location
+	 * @param string Separator
+	 */
+	function location( $before, $after, $separator = ', ' )
+	{
+		echo $this->get_location( $before, $after, $separator );
 	}
 
 
@@ -9968,7 +9985,7 @@ class Item extends ItemLight
 		load_class( 'regional/model/_country.class.php', 'Country' );
 		$CountryCache = & get_CountryCache();
 
-		if( $Country = $CountryCache->get_by_ID( $this->ctry_ID ) )
+		if( $Country = $CountryCache->get_by_ID( $this->ctry_ID, false, false ) )
 		{	// Display country name
 			$result = $params['before'];
 
@@ -10004,7 +10021,7 @@ class Item extends ItemLight
 		load_class( 'regional/model/_region.class.php', 'Region' );
 		$RegionCache = & get_RegionCache();
 
-		if( $Region = $RegionCache->get_by_ID( $this->rgn_ID ) )
+		if( $Region = $RegionCache->get_by_ID( $this->rgn_ID, false, false ) )
 		{	// Display region name
 			$result = $params['before'];
 
@@ -10040,7 +10057,7 @@ class Item extends ItemLight
 		load_class( 'regional/model/_subregion.class.php', 'Subregion' );
 		$SubregionCache = & get_SubregionCache();
 
-		if( $Subregion = $SubregionCache->get_by_ID( $this->subrg_ID ) )
+		if( $Subregion = $SubregionCache->get_by_ID( $this->subrg_ID, false, false ) )
 		{	// Display subregion name
 			$result = $params['before'];
 
@@ -10077,7 +10094,7 @@ class Item extends ItemLight
 		load_class( 'regional/model/_city.class.php', 'City' );
 		$CityCache = & get_CityCache();
 
-		if( $City = $CityCache->get_by_ID( $this->city_ID ) )
+		if( $City = $CityCache->get_by_ID( $this->city_ID, false, false ) )
 		{	// Display city info
 			$result = $params['before'];
 

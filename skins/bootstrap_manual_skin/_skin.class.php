@@ -132,6 +132,12 @@ class bootstrap_manual_Skin extends Skin
 						'defaultvalue' => 0,
 						'type' => 'checkbox',
 					),
+					'single_3_cols' => array(
+						'label' => T_('Use 3 cols'),
+						'note' => T_('On disp=single'),
+						'defaultvalue' => 1,
+						'type' => 'checkbox',
+					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -410,6 +416,63 @@ class bootstrap_manual_Skin extends Skin
 
 		// Display left navigation column only on these pages:
 		return in_array( $disp, array( 'front', 'posts', 'flagged', 'single', 'search', 'edit', 'edit_comment', 'catdir', '404' ) );
+	}
+
+
+	/**
+	 * Get layout style class depending on skin settings and current disp
+	 *
+	 * @param string Place where class is used
+	 */
+	function get_layout_class( $place )
+	{
+		global $disp;
+
+		$r = '';
+
+		switch( $place )
+		{
+			case 'container':
+				$r .= 'container';
+				if( $disp == 'single' && $this->get_setting( 'single_3_cols' ) )
+				{	// Layout with 3 columns on disp=single:
+					$r .= ' container-xxl';
+				}
+				break;
+
+			case 'main_column':
+				if( $this->is_left_navigation_visible() )
+				{	// Layout with visible left sidebar:
+					if( $disp == 'single' && $this->get_setting( 'single_3_cols' ) )
+					{	// Layout with 3 columns on disp=single:
+						$r .= 'col-xxl-8 col-xxl-pull-2 ';
+					}
+					$r .= 'col-md-9 pull-right-md';
+				}
+				else
+				{
+					$r .= 'col-md-12';
+				}
+				break;
+
+			case 'left_column':
+				if( $disp == 'single' && $this->get_setting( 'single_3_cols' ) )
+				{	// Layout with 3 columns on disp=single:
+					$r .= 'col-xxl-2 ';
+				}
+				$r .= 'col-md-3 col-xs-12 pull-left-md';
+				break;
+
+			case 'single_column':
+				if( $disp == 'single' && $this->get_setting( 'single_3_cols' ) )
+				{	// Layout with 3 columns on disp=single:
+					$r .= 'col-xxl-2 col-xxl-push-8 ';
+				}
+				$r .= 'col-md-3 col-xs-12 pull-right-md';
+				break;
+		}
+
+		return $r;
 	}
 }
 ?>

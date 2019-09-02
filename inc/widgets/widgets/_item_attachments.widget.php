@@ -147,23 +147,31 @@ class item_attachments_Widget extends ComponentWidget
 			return false;
 		}
 
+		if( empty( $item_files ) )
+		{	// Don't display this widget when Item has no attachments:
+			return false;
+		}
+
 		$this->init_display( $params );
 
 		$this->disp_params = array_merge( array(
 				'widget_item_attachments_params' => array(),
 			), $this->disp_params );
 
-		echo $this->disp_params['block_start'];
-		$this->disp_title();
-		echo $this->disp_params['block_body_start'];
-
-		// Display attachments/files that are linked to the current item:
-		$Item->files( array_merge( $this->disp_params['widget_item_attachments_params'], array(
+		// Get attachments/files that are linked to the current item:
+		$item_files = $Item->get_files( array_merge( $this->disp_params['widget_item_attachments_params'], array(
 				'display_download_icon' => $this->disp_params['disp_download_icon'],
 				'file_link_text'        => $this->disp_params['link_text'],
 				'display_file_size'     => $this->disp_params['disp_file_size'],
 				'display_file_desc'     => $this->disp_params['disp_file_desc'],
 			) ) );
+
+		echo $this->disp_params['block_start'];
+		$this->disp_title();
+		echo $this->disp_params['block_body_start'];
+
+		// Display attachments/files that are linked to the current item:
+		echo $item_files;
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];

@@ -2142,9 +2142,9 @@ span.NonExistentWikiWord {
 }
 
 /* This file is used to fix the style issues on all bootstrap skins of b2evolution */
-@media (min-width: 1500px) {
+@media (min-width: 1785px) {
   .container-xxl {
-    width: 1470px;
+    width: 1755px;
   }
   .col-xxl-1,
   .col-xxl-2,

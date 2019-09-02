@@ -121,13 +121,22 @@ class item_location_Widget extends ComponentWidget
 			return false;
 		}
 
+		// Get item locations:
+		$item_location = $Item->get_location( '<div class="evo_post_location"><strong>'.T_('Location').': </strong>', '</div>' );
+
+		if( empty( $item_location ) )
+		{	// Don't display this widget when Item has no locations:
+			return false;
+		}
+
 		$this->init_display( $params );
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		$Item->location( '<div class="evo_post_location"><strong>'.T_('Location').': </strong>', '</div>' );
+		// Display item locations:
+		echo $item_location;
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
