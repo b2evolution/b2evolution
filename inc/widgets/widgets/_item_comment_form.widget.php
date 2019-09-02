@@ -525,7 +525,7 @@ class item_comment_form_Widget extends ComponentWidget
 			$Form->textarea_input( $dummy_fields['content'], $comment_content, $widget_params['textarea_lines'], $widget_params['form_comment_text'], array(
 					'note'  => $note,
 					'cols'  => 38,
-					'class' => 'autocomplete_usernames',
+					'class' => 'autocomplete_usernames link_attachment_dropzone',
 					'id'    => $content_id,
 					'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
 				) );

@@ -127,7 +127,7 @@ function & get_LinkOwner( $link_type, $object_ID )
 function get_link_owner_type( $link_ID )
 {
 	$LinkCache = & get_LinkCache();
-	if( ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) && 
+	if( ( $Link = & $LinkCache->get_by_ID( $link_ID, false, false ) ) &&
 	    ( $LinkOwner = & $Link->get_LinkOwner() ) )
 	{
 		return $LinkOwner->type;

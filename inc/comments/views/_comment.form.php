@@ -153,7 +153,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 	$Form->textarea_input( 'content', $content, 16, '', array(
 			'cols' => 40 ,
 			'id' => 'commentform_post_content',
-			'class' => 'autocomplete_usernames',
+			'class' => 'autocomplete_usernames link_attachment_dropzone',
 			'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
 		) );
 	$Form->fieldstart = '<div class="tile">';

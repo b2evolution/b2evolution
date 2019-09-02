@@ -219,7 +219,7 @@ $Form->begin_form( '', '', $params );
 		// ---------------------------- TEXTAREA -------------------------------------
 		$Form->fieldstart = '<div class="edit_area">';
 		$Form->fieldend = "</div>\n";
-		$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content', 'class' => 'autocomplete_usernames' ) );
+		$Form->textarea_input( 'content', $item_content, 16, '', array( 'cols' => 40 , 'id' => 'itemform_post_content', 'class' => 'autocomplete_usernames link_attachment_dropzone' ) );
 		?>
 		<script>
 			<!--

@@ -2544,11 +2544,10 @@ function display_dragdrop_upload_button( $params = array() )
 				callbacks: {
 					onSubmit: function( id, fileName, dropTarget )
 					{
-						var textarea_dropzone = document.getElementById('itemform_post_content'),
-								defaultParams = { root_and_path: <?php echo $params['fieldset_prefix']; ?>root_and_path },
+						var defaultParams = { root_and_path: <?php echo $params['fieldset_prefix']; ?>root_and_path },
 								finalParams = defaultParams;
 
-						if( dropTarget == textarea_dropzone )
+						if( jQuery( dropTarget ).hasClass( 'link_attachment_dropzone') )
 						{	// File dropped over textarea, set link position to "inline"
 							var newParams = { link_position: 'inline' };
 							qq.extend( finalParams, newParams );
@@ -2737,20 +2736,6 @@ function display_dragdrop_upload_button( $params = array() )
 								{	// Show files selector for additional actions:
 									jQuery( '#evo_multi_file_selector' ).show();
 								}
-
-								var textarea_dropzone = document.getElementById('itemform_post_content');
-								if( dropTarget == textarea_dropzone )
-								{	// Dropped file in edit content textarea:
-									switch( responseJSON.data.filetype )
-									{
-										case 'image':
-										case 'video':
-										case 'audio':
-											// Insert appropriate short tag:
-											textarea_wrap_selection( textarea_dropzone, '[' + responseJSON.data.filetype + ':' + responseJSON.data.link_ID + ']', '', 0 );
-											break;
-									}
-								}
 							}
 							else if( responseJSON.data.status == 'rename' )
 							{ // Conflict on upload
@@ -2817,6 +2802,20 @@ function display_dragdrop_upload_button( $params = array() )
 						update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' );
 						jQuery( document ).on( 'load', '#<?php echo $params['fieldset_prefix'].$params['table_id']; ?> img', function() { update_iframe_height( '<?php echo $params['fieldset_prefix']; ?>' ); } );
 						<?php } ?>
+
+						// Insert short tag if file was dropped in the textarea:
+						if( jQuery( dropTarget ).hasClass( 'link_attachment_dropzone' ) )
+						{	// Dropped file in edit content textarea:
+							switch( responseJSON.data.filetype )
+							{
+								case 'image':
+								case 'video':
+								case 'audio':
+									// Insert appropriate short tag:
+									textarea_wrap_selection( dropTarget, '[' + responseJSON.data.filetype + ':' + responseJSON.data.link_ID + ']', '', 0 );
+									break;
+							}
+						}
 					},
 					onCancel: function( id, fileName )
 					{

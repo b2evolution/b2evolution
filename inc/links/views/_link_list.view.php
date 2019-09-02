@@ -195,7 +195,7 @@ display_dragdrop_upload_button( array(
 							.'<td class="qq-upload-link-position lastcol shrinkwrap"></td>'
 						.'</tr>',
 		'display_support_msg'    => false,
-		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table" ).closest( "form" ).add( "#itemform_post_content" )',
+		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table" ).closest( "form" ).add( jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table" ).closest( "form" ).find( "textarea.link_attachment_dropzone" ) )',
 		'filename_before'        => '',
 		'LinkOwner'              => $LinkOwner,
 		'display_status_success' => false,
