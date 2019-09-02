@@ -60,7 +60,7 @@ $required_mysql_version = array( 'application' => '5.5.3' );
 /**
  * Is displayed on the login screen:
  */
-$app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website"><strong>b2evolution '.$app_version.'</strong></a>
+$app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'s website"><strong>b2evolution '.$app_version_long.'</strong></a>
 		&ndash;
 		<a href="http://b2evolution.net/about/gnu-gpl-license" class="nobr">GPL License</a>';
 
