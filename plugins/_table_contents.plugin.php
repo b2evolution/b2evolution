@@ -43,6 +43,75 @@ class table_contents_plugin extends Plugin
 
 
 	/**
+	 * Define here default collection/blog settings that are to be made available in the backoffice.
+	 *
+	 * @param array Associative array of parameters.
+	 * @return array See {@link Plugin::get_coll_setting_definitions()}.
+	 */
+	function get_coll_setting_definitions( & $params )
+	{
+		return array_merge( parent::get_coll_setting_definitions( $params ),
+			array(
+				'offset_scroll' => array(
+						'label' => T_('Anchor offset'),
+						'type' => 'integer',
+						'defaultvalue' => 0,
+						'suffix' => ' px',
+						'note' => T_('This will be used when scrolling to an anchor.'),
+					),
+				)
+			);
+	}
+
+
+	/**
+	 * Event handler: Called at the beginning of the skin's HTML HEAD section.
+	 *
+	 * Use this to add any HTML HEAD lines (like CSS styles or links to resource files (CSS, JavaScript, ..)).
+	 *
+	 * @param array Associative array of parameters
+	 */
+	function SkinBeginHtmlHead( & $params )
+	{
+		global $Collection, $Blog, $disp;
+
+		if( ! isset( $Blog ) || (
+		    $this->get_coll_setting( 'coll_apply_rendering', $Blog ) == 'never' &&
+		    $this->get_coll_setting( 'coll_apply_comment_rendering', $Blog ) == 'never' ) )
+		{	// Don't load css/js files when plugin is not enabled:
+			return;
+		}
+
+		if( $disp == 'single' || $disp == 'page' )
+		{	// Initialize JS for better scrolling only on Item's page:
+			add_js_headline( 'jQuery( document ).ready( function()
+			{
+				var evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0;
+				jQuery( ".evo_plugin__table_of_contents a" ).on( "click", function()
+				{
+					var header_object = jQuery( "#" + jQuery( this ).data( "anchor" ) );
+					if( header_object.length == 0 ||
+					    ! header_object.prop( "tagName" ).match( /^h[1-6]$/i ) )
+					{	// No header tag with required anchor:
+						return true;
+					}
+					var link_href = jQuery( this ).attr( "href" );
+					jQuery( "html,body" ).animate(
+					{	// Scroll to anchor:
+						scrollTop: header_object.offset().top - evo_toolbar_height - '.intval( $this->get_coll_setting( 'offset_scroll', $Blog ) ).'
+					},
+					function()
+					{	// Update URL with proper anchor in browser address bar:
+						window.history.pushState( "", "", link_href );
+					} );
+					return false;
+				} );
+			} );' );
+		}
+	}
+
+
+	/**
 	 * Perform rendering
 	 *
 	 * @param array Associative array of parameters
@@ -124,8 +193,9 @@ class table_contents_plugin extends Plugin
 			$toc .= '<ul class="evo_plugin__table_of_contents">';
 			foreach( $header_matches[3] as $h => $header_text )
 			{
+				$anchor = trim( $header_matches[2][ $h ], '"\'' );
 				$toc .= '<li style="margin-left:'.( ( $header_matches[1][ $h ] - $min_header_level ) * 10 ).'px">'
-						.'<a href="'.$item_url.'#'.trim( $header_matches[2][ $h ], '"\'' ).'">'.utf8_strip_tags( $header_text ).'</a>'
+						.'<a href="'.$item_url.'#'.$anchor.'" data-anchor="'.$anchor.'">'.utf8_strip_tags( $header_text ).'</a>'
 					.'</li>';
 			}
 			$toc .= '</ul>';
@@ -184,7 +254,7 @@ class table_contents_plugin extends Plugin
 			'title' => array(
 				'label' => T_('Title'),
 				'size' => 60,
-				'defaultvalue' => T_('Table of Contents'),
+				'defaultvalue' => T_('On this page'),
 			),
 		);
 	}
