@@ -699,6 +699,8 @@ class MarkdownImport
 				$item_yaml_data = trim( $content_match[2] );
 				if( ! empty( $this->yaml_fields ) && ! empty( $item_yaml_data ) )
 				{	// Parse YAML data:
+					// Replace each indent tab char with 2 spaces:
+					$item_yaml_data = preg_replace_callback( '#\n\t+#', array( $this, 'callback_fix_yaml_data' ), $item_yaml_data );
 					$item_yaml_data = spyc_load( $item_yaml_data );
 				}
 				else
@@ -1713,6 +1715,18 @@ class MarkdownImport
 		}
 
 		$Item->set( 'extra_cat_IDs', $extra_cat_IDs );
+	}
+
+
+	/**
+	 * Callback function to fix YAML data
+	 *
+	 * @param array Matches
+	 */
+	function callback_fix_yaml_data( $m )
+	{
+		// Replace each indent tab char with 2 spaces:
+		return str_replace( "\t", '  ', $m[0] );
 	}
 
 
