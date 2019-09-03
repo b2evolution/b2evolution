@@ -1676,6 +1676,11 @@ class MarkdownImport
 	 */
 	function set_yaml_tags( $value, & $Item )
 	{
+		if( ! $this->check_yaml_array( 'tags', $value, true ) )
+		{	// Skip wrong data:
+			return;
+		}
+
 		if( empty( $value ) )
 		{	// Clear tags:
 			$Item->set_tags_from_string( '' );
@@ -1699,6 +1704,11 @@ class MarkdownImport
 	 */
 	function set_yaml_extra_cats( $value, & $Item )
 	{
+		if( ! $this->check_yaml_array( 'extra-cats', $value ) )
+		{	// Skip wrong data:
+			return;
+		}
+
 		$extra_cat_IDs = array();
 		foreach( $value as $extra_cat_slug )
 		{
@@ -1713,6 +1723,40 @@ class MarkdownImport
 		}
 
 		$Item->set( 'extra_cat_IDs', $extra_cat_IDs );
+	}
+
+
+	/**
+	 * Check YAML data array
+	 * 
+	 * @param string YALM field name
+	 * @param array|string Value
+	 * @param boolean TRUE to allow string for the YAML field
+	 * @return boolean TRUE - correct data, FALSE - wrong data
+	 */
+	function check_yaml_array( $field_name, $array, $allow_string_format = false )
+	{
+		if( $allow_string_format && is_string( $array ) )
+		{	// Don't check array if the YAML field is allowed to be a string:
+			return true;
+		}
+
+		if( ! is_array( $array ) )
+		{	// Wrong not array data:
+			$this->add_yaml_message( sprintf( T_('Skip yaml field %s, because it must be an array.'), '<code>'.$field_name.'</code>' ) );
+			return false;
+		}
+
+		foreach( $array as $string )
+		{
+			if( is_array( $string ) )
+			{	// Skip wrong indented data:
+				$this->add_yaml_message( sprintf( T_('Skip yaml field %s, because it is wrong indented.'), '<code>'.$field_name.'</code>' ) );
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 
