@@ -1751,7 +1751,7 @@ class MarkdownImport
 		{
 			if( is_array( $string ) )
 			{	// Skip wrong indented data:
-				$this->add_yaml_message( sprintf( T_('Skip yaml field %s, because it is wrong indented.'), '<code>'.$field_name.'</code>' ) );
+				$this->add_yaml_message( sprintf( T_('Skip yaml field %s, because it is wrongly indented.'), '<code>'.$field_name.'</code>' ) );
 				return false;
 			}
 		}
