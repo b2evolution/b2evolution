@@ -571,9 +571,9 @@ class Backup
 
 						fwrite( $f, $values );
 					}
-					unset( $rows );
 					$page++;
 				}
+				unset( $rows );
 
 				if( $is_insert_sql_started )
 				{ // End SQL INSERT clause
