@@ -21,7 +21,7 @@ class _sitemap_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.11.3';
+	var $version = "6.11.4";
 
 	/**
 	 * Get default name for the skin.
