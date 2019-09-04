@@ -97,13 +97,25 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		#echo '<hr style="border:1em solid blue;" />';
+		$content = & $params['data'];
 
+		$content = $this->render_autop( $content );
+
+		return true;
+	}
+
+
+	/**
+	 * Render content to apply auto <p> and <br>
+	 *
+	 * @param string Source content
+	 * @return string Rendered content
+	 */
+	function render_autop( $content )
+	{
 		$this->use_auto_br = $this->Settings->get('br');
 		$this->add_p_in_block = $this->Settings->get('add_p_in_block');
 		$this->skip_tags = preg_split( '~\s+~', $this->Settings->get('skip_tags'), -1, PREG_SPLIT_NO_EMPTY );
-
-		$content = & $params['data'];
 
 		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
 
@@ -118,7 +130,7 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 			$content .= $content_parts[ $i + 1 ];
 		}
 
-		return true;
+		return $content;
 	}
 
 
