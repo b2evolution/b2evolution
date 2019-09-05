@@ -1698,16 +1698,17 @@ class ItemLight extends DataObject
 				}
 
 				// Now fetch the tags:
-				foreach( $DB->get_results('
-					SELECT itag_itm_ID, tag_name
-						FROM T_items__itemtag INNER JOIN T_items__tag ON itag_tag_ID = tag_ID
-					 WHERE itag_itm_ID IN ('.$DB->quote($prefetch_item_IDs).')
-					 ORDER BY tag_name', OBJECT, 'Get tags for items' ) as $row )
+				$SQL = new SQL( 'Get tags for items #'.implode( ',', $prefetch_item_IDs ) );
+				$SQL->SELECT( 'itag_itm_ID, tag_ID, tag_name' );
+				$SQL->FROM( 'T_items__itemtag' );
+				$SQL->FROM_add( 'INNER JOIN T_items__tag ON itag_tag_ID = tag_ID' );
+				$SQL->WHERE( 'itag_itm_ID IN ('.$DB->quote($prefetch_item_IDs ).')' );
+				$SQL->ORDER_BY( 'tag_name' );
+				$tags = $DB->get_results( $SQL );
+				foreach( $tags as $tag )
 				{
-					$ItemTagsCache[$row->itag_itm_ID][] = $row->tag_name;
+					$ItemTagsCache[ $tag->itag_itm_ID ][ $tag->tag_ID ] = $tag->tag_name;
 				}
-
-				//pre_dump( $ItemTagsCache );
 			}
 
 			$this->tags = $ItemTagsCache[$this->ID];

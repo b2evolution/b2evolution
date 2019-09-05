@@ -6660,21 +6660,21 @@ class Item extends ItemLight
 			}
 
 			$i = 0;
-			foreach( $tags as $tag )
+			foreach( $tags as $tag_ID => $tag_name )
 			{
 				if( $i++ > 0 )
 				{
 					echo $params['separator'];
 				}
 
-				echo $params['before_tag'];
+				echo str_replace( '$tag_ID$', $tag_ID, $params['before_tag'] );
 				if( $links )
 				{	// We want links
-					echo $this->Blog->get_tag_link( $tag );
+					echo $this->Blog->get_tag_link( $tag_name );
 				}
 				else
 				{
-					echo htmlspecialchars( $tag, NULL, $evo_charset );
+					echo htmlspecialchars( $tag_name, NULL, $evo_charset );
 				}
 				echo $params['after_tag'];
 			}
