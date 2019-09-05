@@ -2944,19 +2944,30 @@ class Blog extends DataObject
 	 *
 	 * This is used to construct the various RSS/Atom feeds
 	 *
-	 * @param string
-	 * @param string
-	 * @param boolean
+	 * @param string Skin folder name
+	 * @param string Additional params
+	 * @param boolean Halt on unknown feed skin
+	 * @return string|false URL or FALSE if none feed skin is not installed in system
 	 */
 	function get_tempskin_url( $skin_folder_name, $additional_params = '', $halt_on_error = false )
 	{
-		/**
-		 * @var SkinCache
-		 */
-	 	$SkinCache = & get_SkinCache();
+		$SkinCache = & get_SkinCache();
 		if( ! $Skin = & $SkinCache->get_by_folder( $skin_folder_name, $halt_on_error ) )
-		{
-			return NULL;
+		{	// If no requested skin try to fallback to first found feed skin:
+			$SkinCache->load_by_type( 'feed' );
+			$skin_folder_name = false;
+			foreach( $SkinCache->cache as $Skin )
+			{
+				if( $Skin->type == 'feed' )
+				{	// Use the first found feed skin:
+					$skin_folder_name = $Skin->folder;
+					break;
+				}
+			}
+			if( $skin_folder_name === false )
+			{	// No feed skin found:
+				return false;
+			}
 		}
 
 		return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin='.$skin_folder_name );
@@ -2978,10 +2989,12 @@ class Blog extends DataObject
 	 * Get URL to display the blog comments in an XML feed.
 	 *
 	 * @param string
+	 * @return string|false URL or FALSE if none feed skin is not installed in system
 	 */
 	function get_comment_feed_url( $skin_folder_name )
 	{
-		return url_add_param( $this->get_tempskin_url( $skin_folder_name ), 'disp=comments' );
+		$tempskin_url = $this->get_tempskin_url( $skin_folder_name );
+		return ( $tempskin_url ? url_add_param( $tempskin_url, 'disp=comments' ) : false );
 	}
 
 
