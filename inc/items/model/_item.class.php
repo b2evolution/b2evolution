@@ -4934,12 +4934,15 @@ class Item extends ItemLight
 			return;
 		}
 
+		if( ! ( $url = $this->get_feedback_feed_url( $skin ) ) )
+		{	// Don't display feed link when no feed skin is installed in system:
+			return;
+		}
+
 		if( $title == '#' )
 		{
 			$title = get_icon( 'feed' ).' '.T_('Comment feed for this post');
 		}
-
-		$url = $this->get_feedback_feed_url($skin);
 
 		echo $before;
 		echo '<a href="'.$url.'">'.format_to_output($title).'</a>';
@@ -4950,13 +4953,14 @@ class Item extends ItemLight
 	/**
 	 * Get URL to display the post comments in an XML feed.
 	 *
-	 * @param string
+	 * @param string Skin folder name
+	 * @return string|false URL or FALSE if none feed skin is not installed in system
 	 */
 	function get_feedback_feed_url( $skin_folder_name )
 	{
-		$this->load_Blog();
-
-		return url_add_param( $this->Blog->get_tempskin_url( $skin_folder_name ), 'disp=comments&amp;p='.$this->ID );
+		$item_Blog = & $this->get_Blog();
+		$comment_feed_url = $item_Blog->get_comment_feed_url( $skin_folder_name );
+		return ( $comment_feed_url ? url_add_param( $comment_feed_url, 'p='.$this->ID ) : false );
 	}
 
 
