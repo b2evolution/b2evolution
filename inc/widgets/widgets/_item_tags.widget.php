@@ -165,6 +165,12 @@ class item_tags_Widget extends ComponentWidget
 			return;
 		}
 
+		if( ! ( $this->get_param( 'allow_edit' ) && $Item->can_be_edited() ) &&
+		    ! count( $Item->get_tags() ) )
+		{	// Nothing to display because current User cannot edit the Item and the Item has no tags:
+			return;
+		}
+
 		$this->init_display( $params );
 
 		// We renamed some params; older skin may use the old names; let's convert those params now:
@@ -261,6 +267,7 @@ class item_tags_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $this->disp_params['blog_ID'] ) ? $Blog->ID : $this->disp_params['blog_ID'], // Has the content of the displayed blog changed ?
 				'item_ID'      => $Item->ID, // Has the Item page changed?
+				'user_ID'      => ( is_logged_in() ? $current_User->ID : 0 ), // Has the current User changed?
 			);
 	}
 }
