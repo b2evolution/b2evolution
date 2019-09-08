@@ -148,6 +148,12 @@ class item_attachments_Widget extends ComponentWidget
 			return false;
 		}
 
+		$this->init_display( $params );
+
+		$this->disp_params = array_merge( array(
+				'widget_item_attachments_params' => array(),
+			), $this->disp_params );
+
 		// Get attachments/files that are linked to the current item:
 		$item_files = $Item->get_files( array_merge( $this->disp_params['widget_item_attachments_params'], array(
 				'display_download_icon' => $this->disp_params['disp_download_icon'],
@@ -161,12 +167,6 @@ class item_attachments_Widget extends ComponentWidget
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no attachments.' );
 			return false;
 		}
-
-		$this->init_display( $params );
-
-		$this->disp_params = array_merge( array(
-				'widget_item_attachments_params' => array(),
-			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
