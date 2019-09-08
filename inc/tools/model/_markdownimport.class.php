@@ -1101,6 +1101,9 @@ class MarkdownImport
 			}
 		}
 
+		// Commit changes before event_after_import() in order ot avoid unexpected rollback from there:
+		$DB->commit();
+
 		// Execute additonal actions after import, e.g. by extended classes:
 		$this->event_after_import();
 
@@ -1110,8 +1113,6 @@ class MarkdownImport
 		}
 
 		echo '<h4 class="text-success">'.T_('Import completed.').'</h4>';
-
-		$DB->commit();
 	}
 
 
