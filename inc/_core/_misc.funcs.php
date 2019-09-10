@@ -8882,7 +8882,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					{
 						case 'Item':
 							// Get the IMG tag with link to original image or to Item page:
-							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params )
+								.'<div class="clearfix"></div>';
 							break;
 
 						case 'EmailCampaign':
@@ -8898,12 +8899,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 									'image_link_to' => false,
 									'image_style'   => 'border: none; max-width: 100%; height: auto;'.$image_style,
 									'add_loadimg'   => false,
-								) ) );
+								) ) )
+								.'<div class="clearfix"></div>';;
 							break;
 
 						default:
 							// Get the IMG tag with link to original big image:
-							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) );
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) )
+								.'<div class="clearfix"></div>';
 							break;
 					}
 				}
