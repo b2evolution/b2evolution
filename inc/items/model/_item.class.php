@@ -792,6 +792,10 @@ class Item extends ItemLight
 		{ // URL must be entered
 			param_check_not_empty( 'post_url', T_('Please provide a "Link To" URL.'), '' );
 		}
+		if( is_pro() )
+		{	// Only PRO feature for using of post link URL as an External Canonical URL:
+			$this->set_setting( 'external_canonical_url', param( 'post_external_canonical_url', 'integer', 0 ) );
+		}
 
 		// Item parent ID:
 		$post_parent_ID = param( 'post_parent_ID', 'integer', NULL );

@@ -4616,6 +4616,9 @@ a.btn.action_icon.hoverlink {
   color: #999;
   font-size: 84%;
 }
+.form-horizontal .controls .help-inline label {
+  font-weight: normal;
+}
 .form-horizontal .controls .form-control {
   display: inline-block;
   width: auto;

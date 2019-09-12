@@ -140,7 +140,7 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 	$Form->text_input( 'slug_limit', $edited_Blog->get_setting('slug_limit'), 3, T_('Limit slug length to'), '', array( 'input_suffix' => ' '.T_('words') ) );
 
 	$Form->checklist( array(
-		array( 'canonical_item_urls', 1, T_('301 redirect to canonical URL when possible'), $edited_Blog->get_setting( 'canonical_item_urls' ) ),
+		array( 'canonical_item_urls', 1, T_('301 redirect to internal canonical URL when possible (but not to external canonical)'), $edited_Blog->get_setting( 'canonical_item_urls' ) ),
 		array( 'allow_crosspost_urls', 1, T_('Do not 301 redirect cross-posted Items'), $edited_Blog->get_setting( 'allow_crosspost_urls' ), ! $edited_Blog->get_setting( 'canonical_item_urls' ) ),
 		array( 'relcanonical_item_urls', 1, T_('Use rel="canonical" whenever necessary'), $edited_Blog->get_setting( 'relcanonical_item_urls' ) ),
 		array( 'self_canonical_item_urls', 1, T_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_item_urls' ) ),

@@ -202,6 +202,13 @@ function skin_init( $disp )
 			// Check if we want to redirect to a canonical URL for the post
 			// Please document encountered problems.
 			if( ! $preview &&
+			    is_pro() &&
+			    $Item->get_setting( 'external_canonical_url' ) &&
+			    $Item->get( 'url' ) != '' )
+			{	// Use post link to URL as an External Canonical URL:
+				add_headline( '<link rel="canonical" href="'.format_to_output( $Item->get( 'url' ), 'htmlattr' ).'" />' );
+			}
+			elseif( ! $preview &&
 			    ( ( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 			      || $Blog->get_setting( 'relcanonical_item_urls' )
 			      || $Blog->get_setting( 'self_canonical_item_urls' )

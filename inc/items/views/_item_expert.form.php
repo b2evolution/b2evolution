@@ -408,7 +408,18 @@ $Form->begin_form( '', '', $params );
 
 	if( $edited_Item->get_type_setting( 'use_url' ) != 'never' )
 	{	// Display url:
-		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, T_('Link to url'), '', array(
+		if( is_pro() )
+		{	// Only PRO feature for using of post link URL as an External Canonical URL:
+			$external_canonical_url_checkbox = '<label>'
+					.'<input name="post_external_canonical_url" value="1" type="checkbox"'.( $edited_Item->get_setting( 'external_canonical_url' ) ? ' checked="checked"' : '' ).' /> '
+					.T_('Use as an External Canonical URL').' '.get_pro_label()
+				.'</label>';
+		}
+		else
+		{
+			$external_canonical_url_checkbox = '';
+		}
+		$Form->text_input( 'post_url', $edited_Item->get( 'url' ), 20, T_('Link to url'), $external_canonical_url_checkbox, array(
 				'maxlength' => 255,
 				'data-maxlength' => 255,
 				'required'  => ( $edited_Item->get_type_setting( 'use_url' ) == 'required' )
@@ -417,6 +428,10 @@ $Form->begin_form( '', '', $params );
 	else
 	{	// Hide url:
 		$Form->hidden( 'post_url', $edited_Item->get( 'url' ) );
+		if( is_pro() )
+		{	// Only PRO feature for using of post link URL as an External Canonical URL:
+			$Form->hidden( 'post_external_canonical_url', $edited_Item->get_setting( 'external_canonical_url' ) );
+		}
 	}
 
 	if( $is_not_content_block )
