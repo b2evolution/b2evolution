@@ -86,6 +86,7 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		$Form->switch_template_parts( array(
 			'infostart' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div>',
 		));
+		init_shortlinks_js();
 		$Form->info( T_('In response to'), $comment_Item->get_title( array(
 				'link_type'  => 'admin_view',
 				'link_class' => 'comment_item_title',
