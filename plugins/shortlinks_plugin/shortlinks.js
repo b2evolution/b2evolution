@@ -1,49 +1,36 @@
 /**
  * Load main modal window to select collection and posts
  */
-function shortlinks_load_window( mode, prefix )
+function shortlinks_load_window( prefix )
 {
-	var window_title;
+	shortlinks_action_buttons = '<button id="shortlinks_btn_insert" class="btn btn-primary">' + shortlinks_insert_short_link + '</button>'
+		+ '<button id="shortlinks_btn_options" class="btn btn-default">' + shortlinks_insert_with_options + '...</button>'
+		+ '<button id="shortlinks_btn_form" class="btn btn-info">' + shortlinks_insert_snippet_link + '...</button>';
 
-	switch( mode )
-	{
-		case 'move_comment_to_post':
-			window_title = shortlinks_title_move_comment_to_post;
-			shortlinks_action_buttons = '<button id="shortlinks_btn_move_comment" class="btn btn-primary">' + shortlinks_move_to_post + '</button>';
-			break;
-
-		case 'shortlinks':
-			window_title = shortlinks_title_link_to_post;
-			shortlinks_action_buttons = '<button id="shortlinks_btn_insert" class="btn btn-primary">' + shortlinks_insert_short_link + '</button>'
-					+ '<button id="shortlinks_btn_options" class="btn btn-default">' + shortlinks_insert_with_options + '...</button>'
-					+ '<button id="shortlinks_btn_form" class="btn btn-info">' + shortlinks_insert_snippet_link + '...</button>';
-			break;
-	}
-
-  openModalWindow( '<div id="shortlinks_wrapper"></div>', 'auto', '', true,
-    window_title, // Window title
-    [ '-', 'shortlinks_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back" and "Insert [[post-url-name]]"
-    true );
+	openModalWindow( '<div id="shortlinks_wrapper"></div>', 'auto', '', true,
+		shortlinks_title_link_to_post, // Window title
+		[ '-', 'shortlinks_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back" and "Insert [[post-url-name]]"
+		true );
 
 	// Load collections:
-  shortlinks_load_colls( shortlinks_coll_urlname, prefix );
+	shortlinks_load_colls( shortlinks_coll_urlname, prefix );
 
-  // Set max-height to keep the action buttons on screen:
-  var modal_window = jQuery( '#shortlinks_wrapper' ).parent();
-  var modal_height = jQuery( window ).height() - 20;
-  if( modal_window.hasClass( 'modal-body' ) )
-  {	// Extract heights of header and footer:
-    modal_height -= 55 + 64 +
-      parseInt( modal_window.css( 'padding-top' ) ) + parseInt( modal_window.css( 'padding-bottom' ) );
-  }
-  modal_window.css( {
-    'display': 'block',
-    'overflow': 'auto',
-    'max-height': modal_height
-  } );
+	// Set max-height to keep the action buttons on screen:
+	var modal_window = jQuery( '#shortlinks_wrapper' ).parent();
+	var modal_height = jQuery( window ).height() - 20;
+	if( modal_window.hasClass( 'modal-body' ) )
+	{	// Extract heights of header and footer:
+		modal_height -= 55 + 64 +
+			parseInt( modal_window.css( 'padding-top' ) ) + parseInt( modal_window.css( 'padding-bottom' ) );
+	}
+	modal_window.css( {
+		'display': 'block',
+		'overflow': 'auto',
+		'max-height': modal_height
+	} );
 
-  // To prevent link default event:
-  return false;
+	// To prevent link default event:
+	return false;
 }
 
 /**
@@ -498,7 +485,7 @@ if( typeof( b2evo_shortlinks_initialized ) == 'undefined' )
 				var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
 					jQuery( '.shortlinks_post_buttons' ) :
 					jQuery( '#shortlinks_post_content' );
-				jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_move_comment, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).remove();
+				jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).remove();
 				buttons_side_obj.after( '<button id="shortlinks_btn_back_to_list" class="btn btn-default">&laquo; ' + shortlinks_back + '</button>'
 					+ shortlinks_action_buttons );
 				jQuery( '#shortlinks_opt_slug' ).val( post.urltitle );
@@ -507,24 +494,6 @@ if( typeof( b2evo_shortlinks_initialized ) == 'undefined' )
 
 		// To prevent link default event:
 		return false;
-	} );
-
-	// Set new comment Item:
-	jQuery( document ).on( 'click', '#shortlinks_btn_move_comment', function()
-	{
-		// Update info field link:
-		var item_link = jQuery('.comment_item_title')[0];
-		item_link.innerHTML = jQuery('#shortlinks_hidden_title').val();
-		item_link.href = '?ctrl=items&blog=' + jQuery('#shortlinks_collections').find(':selected').data('coll-id') + '&p=' + jQuery( '#shortlinks_hidden_ID').val();
-
-		// Update modal selected collection:
-		shortlinks_coll_urlname = jQuery('#shortlinks_collections').find(':selected').val();
-
-		// Update moveto_post field:
-		jQuery('input[name="moveto_post"]').val( jQuery('#shortlinks_hidden_ID').val() );
-
-		// Close main modal window:
-		closeModalWindow();
 	} );
 
 	// Insert a post link to textarea:
@@ -603,7 +572,7 @@ if( typeof( b2evo_shortlinks_initialized ) == 'undefined' )
 		var buttons_side_obj = jQuery( '.shortlinks_post_buttons' ).length ?
 			jQuery( '.shortlinks_post_buttons' ) :
 			jQuery( '#shortlinks_post_content' );
-		jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_move_comment, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).hide();
+		jQuery( '#shortlinks_btn_back_to_list, #shortlinks_btn_insert, #shortlinks_btn_form, #shortlinks_btn_options' ).hide();
 		buttons_side_obj.after( '<button id="shortlinks_btn_back_to_post" class="btn btn-default">&laquo; ' + shortlinks_back + '</button>'
 			+ '<button id="shortlinks_btn_insert_complex" class="btn btn-primary">' + shortlinks_insert_snippet_link + '</button>' );
 
