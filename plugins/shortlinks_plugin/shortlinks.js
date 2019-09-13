@@ -4,8 +4,8 @@
 function shortlinks_load_window( prefix )
 {
 	shortlinks_action_buttons = '<button id="shortlinks_btn_insert" class="btn btn-primary">' + shortlinks_insert_short_link + '</button>'
-		+ '<button id="shortlinks_btn_options" class="btn btn-default">' + shortlinks_insert_with_options + '...</button>'
-		+ '<button id="shortlinks_btn_form" class="btn btn-info">' + shortlinks_insert_snippet_link + '...</button>';
+		+ '<button id="shortlinks_btn_options" class="btn btn-default">' + shortlinks_insert_with_options + '</button>'
+		+ '<button id="shortlinks_btn_form" class="btn btn-info">' + shortlinks_insert_snippet_link + '</button>';
 
 	openModalWindow( '<div id="shortlinks_wrapper"></div>', 'auto', '', true,
 		shortlinks_title_link_to_post, // Window title

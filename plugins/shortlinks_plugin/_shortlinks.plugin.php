@@ -869,7 +869,6 @@ class shortlinks_plugin extends Plugin
 		var shortlinks_insert_link = \''.TS_('Insert Link').'\';
 		var shortlinks_read_more = \''.TS_('Read more').'\';
 		var shortlinks_link_to_post = \''.TS_('Link to a Post').'\';
-		var shortlinks_move_to_post = \''.TS_('Link comment to this post').'\';
 		</script>';
 	}
 
