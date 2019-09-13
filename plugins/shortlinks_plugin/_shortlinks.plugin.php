@@ -780,14 +780,15 @@ class shortlinks_plugin extends Plugin
 		// Load js to work with textarea:
 		require_js( 'functions.js', 'blog', true, true );
 
-		// Load css for modal window:
+		// Load js and css for modal window:
+		$this->require_js( 'shortlinks.js', true );
 		$this->require_css( 'shortlinks.css', true );
 
 		// Initialize JavaScript to build and open window:
 		echo_modalwindow_js();
 
 		// Initialize Javascript to build shortlinks modal window;
-		init_shortlinks_js();
+		$this->init_js_lang_vars();
 
 		?><script>
 		//<![CDATA[
@@ -798,7 +799,7 @@ class shortlinks_plugin extends Plugin
 
 				+ '<input type="button" title="<?php echo TS_('Link to a Post') ?>"'
 				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="shortlinks_load_window|shortlinks|' + prefix + '" value="<?php echo TS_('Link to a Post') ?>" />'
+				+ ' data-func="shortlinks_load_window|' + prefix + '" value="<?php echo TS_('Link to a Post') ?>" />'
 
 				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
@@ -812,6 +813,50 @@ class shortlinks_plugin extends Plugin
 		?><script>shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
 
 		return true;
+	}
+
+
+	/**
+	 * Initialize JavaScript to build and open window for shortlinks
+	 */
+	function init_js_lang_vars( $relative_to = 'rsc_url' )
+	{
+		global $Blog;
+
+		// Initialize variables for the file "shortlinks.js":
+		echo '<script>
+		var shortlinks_coll_urlname = \''.( empty( $Blog ) ? 'undefined' : $Blog->urlname ).'\';
+		var shortlinks_title_link_to_post = \''.TS_('Link to a Post').get_manual_link( 'shortlinks-plugin-link-post-dialog' ).'\';
+		var shortlinks_collections = \''.TS_('Collections').'\';
+		var shortlinks_insert_full_cover_image = \''.TS_('Insert full cover image').'\';
+		var shortlinks_insert_title = \''.TS_('Insert title').'\';
+		var shortlinks_insert_thumbnail_of_cover = \''.TS_('Insert thumbnail of cover or first image').'\';
+		var shortlinks_insert_excerpt = \''.TS_('Insert excerpt').'\';
+		var shortlinks_insert_teaser = \''.TS_('Insert teaser').'\';
+		var shortlinks_insert_read_more_link = \''.TS_('Insert "Read more" link').'\';
+		var shortlinks_slug = \''.TS_('Slug').'\';
+		var shortlinks_mode = \''.TS_('Mode').'\';
+		var shortlinks_use_title = \''.TS_('Use title of destination post as link text').'\';
+		var shortlinks_use_slug_words = \''.TS_('Use slug words as link text').'\';
+		var shortlinks_classes = \''.TS_('Classes').'\';
+		var shortlinks_target = \''.TS_('Target').'\';
+		var shortlinks_none = \''.TS_('None').'\';
+		var shortlinks_blank = \''.TS_('Blank').'\';
+		var shortlinks_parent = \''.TS_('Parent').'\';
+		var shortlinks_top = \''.TS_('Top').'\';
+		var shortlinks_text = \''.TS_('Text').'\';
+		var shortlinks_search = \''.TS_('Search').'\';
+		var shortlinks_clear = \''.TS_('Clear').'\';
+		var shortlinks_back = \''.TS_('Back').'\';
+		var shortlinks_insert_short_link = \''.TS_('Insert Short Link').'\';
+		var shortlinks_insert_with_options = \''.TS_('Insert with options').'...'.'\';
+		var shortlinks_insert_snippet_link = \''.TS_('Insert Snippet + Link').'...'.'\';
+		var shortlinks_select_item = \''.TS_('Please select at least one item option to insert.').'\';
+		var shortlinks_insert_link = \''.TS_('Insert Link').'\';
+		var shortlinks_read_more = \''.TS_('Read more').'\';
+		var shortlinks_link_to_post = \''.TS_('Link to a Post').'\';
+		var shortlinks_move_to_post = \''.TS_('Link comment to this post').'\';
+		</script>';
 	}
 
 

@@ -1403,7 +1403,7 @@ function comments_results( & $comments_Results, $params = array() )
 
 
 /**
- * JS Behaviour: Output JavaScript code to merge an item with another item
+ * JS Behaviour: Output JavaScript code to change Item of the Comment
  */
 function echo_comment_change_item_js()
 {

@@ -1158,7 +1158,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		return;
 	}
 
-	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js', 'shortlinks.js' ) ) )
+	if( in_array( $js_file, array( '#jqueryUI#', 'communication.js', 'functions.js' ) ) )
 	{	// Dependency : ensure jQuery is loaded
 		// Don't use TRUE for $async and $output because it may loads jQuery twice on AJAX request, e.g. on comment AJAX form,
 		// and all jQuery UI libraries(like resizable, sortable and etc.) will not work, e.g. on attachments fieldset
@@ -3804,51 +3804,6 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 		add_js_headline( 'var blog = '.$Blog->ID );
 	}
 	require_js( 'build/textcomplete.bmin.js', $relative_to );
-}
-
-
-/**
- * Initialize JavaScript to build and open window for shortlinks
- */
-function init_shortlinks_js( $relative_to = 'rsc_url' )
-{
-	global $Blog;
-
-	// Initialize variables for the file "shortlinks.js":
-	echo '<script>
-	var shortlinks_coll_urlname = \''.( empty( $Blog ) ? 'undefined' : $Blog->urlname ).'\';
-	var shortlinks_title_move_comment_to_post = \''.TS_('Link to Another Post').'\';
-	var shortlinks_title_link_to_post = \''.TS_('Link to a Post').get_manual_link( 'shortlinks-plugin-link-post-dialog' ).'\';
-	var shortlinks_collections = \''.TS_('Collections').'\';
-	var shortlinks_insert_full_cover_image = \''.TS_('Insert full cover image').'\';
-	var shortlinks_insert_title = \''.TS_('Insert title').'\';
-	var shortlinks_insert_thumbnail_of_cover = \''.TS_('Insert thumbnail of cover or first image').'\';
-	var shortlinks_insert_excerpt = \''.TS_('Insert excerpt').'\';
-	var shortlinks_insert_teaser = \''.TS_('Insert teaser').'\';
-	var shortlinks_insert_read_more_link = \''.TS_('Insert "Read more" link').'\';
-	var shortlinks_slug = \''.TS_('Slug').'\';
-	var shortlinks_mode = \''.TS_('Mode').'\';
-	var shortlinks_use_title = \''.TS_('Use title of destination post as link text').'\';
-	var shortlinks_use_slug_words = \''.TS_('Use slug words as link text').'\';
-	var shortlinks_classes = \''.TS_('Classes').'\';
-	var shortlinks_target = \''.TS_('Target').'\';
-	var shortlinks_none = \''.TS_('None').'\';
-	var shortlinks_blank = \''.TS_('Blank').'\';
-	var shortlinks_parent = \''.TS_('Parent').'\';
-	var shortlinks_top = \''.TS_('Top').'\';
-	var shortlinks_text = \''.TS_('Text').'\';
-	var shortlinks_search = \''.TS_('Search').'\';
-	var shortlinks_clear = \''.TS_('Clear').'\';
-	var shortlinks_back = \''.TS_('Back').'\';
-	var shortlinks_insert_short_link = \''.TS_('Insert Short Link').'\';
-	var shortlinks_insert_with_options = \''.TS_('Insert with options').'...'.'\';
-	var shortlinks_insert_snippet_link = \''.TS_('Insert Snippet + Link').'...'.'\';
-	var shortlinks_select_item = \''.TS_('Please select at least one item option to insert.').'\';
-	var shortlinks_insert_link = \''.TS_('Insert Link').'\';
-	var shortlinks_read_more = \''.TS_('Read more').'\';
-	var shortlinks_link_to_post = \''.TS_('Link to a Post').'\';
-	var shortlinks_move_to_post = \''.TS_('Link comment to this post').'\';
-	</script>';
 }
 
 
