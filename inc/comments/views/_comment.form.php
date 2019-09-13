@@ -86,12 +86,11 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		$Form->switch_template_parts( array(
 			'infostart' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div>',
 		));
-		init_shortlinks_js();
 		$Form->info( T_('In response to'), $comment_Item->get_title( array(
 				'link_type'  => 'admin_view',
 				'link_class' => 'comment_item_title',
 			) ),
-			'<button type="button" class="btn btn-default btn-sm" data-func="shortlinks_load_window|move_comment_to_post">'.T_('Link to Another Post').'...</button>' );
+			'<button type="button" class="btn btn-default btn-sm" data-func="evo_comment_change_item_load_window|'.$comment_Item->ID.'">'.T_('Link to Another Post').'...</button>' );
 		echo '</div>';
 		echo '<div class="col-sm-12">';
 
@@ -319,4 +318,6 @@ echo_status_dropdown_button_js( 'comment' );
 echo_fieldset_folding_js();
 // JS code for inserting preview image
 echo_image_insert_modal();
+// JS code to link the Comment to another Item:
+echo_comment_change_item_js();
 ?>

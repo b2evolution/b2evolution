@@ -2444,56 +2444,58 @@ function echo_item_content_position_js( $height, $scroll_position )
 
 
 /**
- * JS Behaviour: Output JavaScript code to merge an item with another item
+ * JS Behaviour: Output JavaScript code to display selector an item from another item to do some actions like merging or linking
  */
-function echo_item_merge_js()
+function echo_item_selector_js()
 {
-	global $Blog, $admin_url, $evo_item_merge_js_initialized;
+	global $evo_item_selector_js_initialized;
 
-	if( ! empty( $evo_item_merge_js_initialized ) )
+	if( ! empty( $evo_item_selector_js_initialized ) )
 	{	// Don't initialize this JS code twice on same page:
 		return;
 	}
 
 	// Set flag to know this is initialized:
-	$evo_item_merge_js_initialized = true;
-
-	// Initialize JavaScript to build and open window:
-	echo_modalwindow_js();
+	$evo_item_selector_js_initialized = true;
 ?>
 <script>
-function evo_merge_load_window( item_ID )
+function evo_item_selector_load_window( item_ID, window_titles, restriction_message, submit_buttons, default_coll_ID, api_coll_path, api_coll_params )
 {
-	if( typeof( bozo ) && bozo.nb_changes > 0 )
-	{	// Don't allow to merge if item edit form is changed and not saved yet:
-		alert( '<?php echo TS_('You must save the Item before you can merge it.'); ?>' );
+	if( restriction_message !== false && typeof( bozo ) && bozo.nb_changes > 0 )
+	{	// Don't allow to select another item if item edit form is changed and not saved yet:
+		alert( restriction_message );
 		return false;
 	}
 
-	openModalWindow( '<div id="evo_merge_wrapper"></div>', 'auto', '', true,
-		'<?php echo TS_('Select destination Post...'); ?>', // Window title
-		[ '-', 'evo_merge_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back", "Merge with original dates",  "Append to this post with new dates"
+	openModalWindow( '<div id="evo_item_selector_wrapper"></div>', 'auto', '', true,
+		window_titles[0],
+		[ '-', 'evo_item_selector_post_buttons' ], // Fake button that is hidden by default, Used to build buttons "Back", and other additional submit buttons
 		true );
+	jQuery( '.modal-title' ).data( 'titles', window_titles );
 
 	// Load collections:
-	var current_coll_urlname = '<?php echo empty( $Blog ) ? '' : format_to_js( $Blog->get( 'urlname' ) ); ?>';
-	evo_rest_api_start_loading( '#evo_merge_wrapper' );
-	evo_rest_api_request( 'collections', { per_page: 0, list_in_frontoffice: 'all' }, function( data )
+	evo_rest_api_start_loading( '#evo_item_selector_wrapper' );
+	if( typeof( api_coll_params ) == 'undefined' )
+	{	// Default params:
+		api_coll_params = {};
+	}
+	evo_rest_api_request( api_coll_path, api_coll_params, function( data )
 	{	// Display the colllections on success request:
 		var coll_urlname = '';
 		var coll_name = '';
 
 		// Initialize html code to view the loaded collections:
-		var r = '<div id="evo_merge_colls_list">'
+		var r = '<div id="evo_item_selector_colls_list">'
 			+ '<h2><?php echo TS_('Collections'); ?></h2>'
 			+ '<select class="form-control">';
 		for( var c in data.colls )
 		{
 			var coll = data.colls[c];
 			r += '<option value="' + coll.urlname + '"'
-				+ ( current_coll_urlname == coll.urlname ? ' selected="selected"' : '' )+ '>'
+				+ ' data-coll-id="' + coll.id + '"'
+				+ ( default_coll_ID == coll.id ? ' selected="selected"' : '' )+ '>'
 				+ coll.name + '</option>';
-			if( coll_urlname == '' || coll.urlname == current_coll_urlname )
+			if( coll_urlname == '' || coll.id == default_coll_ID )
 			{	// Set these vars to load posts of the selected or first collection:
 				coll_urlname = coll.urlname;
 				coll_name = coll.name;
@@ -2501,21 +2503,58 @@ function evo_merge_load_window( item_ID )
 		}
 		r += '</select>'
 			+ '</div>'
-			+ '<div id="evo_merge_posts_block"></div>'
-			+ '<div id="evo_merge_post_block"></div>'
-			+ '<input type="hidden" id="evo_merge_post_ID" value="' + item_ID + '" />'
-			+ '<input type="hidden" id="evo_merge_dest_post_ID" />';
+			+ '<div id="evo_item_selector_posts_block"></div>'
+			+ '<div id="evo_item_selector_post_block"></div>'
+			+ '<input type="hidden" id="evo_item_selector_post_ID" value="' + item_ID + '" />'
+			+ '<input type="hidden" id="evo_item_selector_dest_post_ID" />';
 
-		evo_rest_api_end_loading( '#evo_merge_wrapper', r );
+		evo_rest_api_end_loading( '#evo_item_selector_wrapper', r );
 
 		if( coll_urlname != '' )
 		{	// Load posts list of the current or first collection:
-			evo_merge_load_coll_posts( coll_urlname, coll_name );
+			evo_item_selector_load_coll_posts( coll_urlname, coll_name );
 		}
+
+		// Initialize the buttons to back and additional buttons:
+		var buttons_side_obj = jQuery( '.evo_item_selector_post_buttons' ).length ?
+			jQuery( '.evo_item_selector_post_buttons' ) :
+			jQuery( '#evo_item_selector_post_content' );
+		var buttons_html = '<button id="evo_item_selector_btn_back_to_list" class="btn btn-default" style="display:none">&laquo; <?php echo TS_('Back'); ?></button>';
+		if( typeof( submit_buttons ) == 'object' )
+		{
+			buttons_html += '<span id="evo_item_selector_btns_group" style="margin:0 5px;display:none">';
+			for( var b in submit_buttons )
+			{
+				switch( typeof( submit_buttons[b] ) )
+				{
+					case 'string':
+						// Plain text:
+						buttons_html += submit_buttons[b];
+						break;
+					case 'object':
+						if( typeof( submit_buttons[b][0] ) == 'undefined' )
+						{	// Single button:
+							buttons_html += '<button id="' + submit_buttons[b]['id'] + '" class="' + submit_buttons[b]['class'] + '">' + submit_buttons[b]['text'] + '</button>';
+						}
+						else
+						{	// Grouped buttons:
+							buttons_html += ' <div class="btn-group">';
+							for( var bb in submit_buttons[b] )
+							{
+								buttons_html += '<button id="' + submit_buttons[b][bb]['id'] + '" class="' + submit_buttons[b][bb]['class'] + '">' + submit_buttons[b][bb]['text'] + '</button>';
+							}
+							buttons_html += '</div>';
+						}
+						break;
+				}
+			}
+			buttons_html += '</span>';
+		}
+		buttons_side_obj.after( buttons_html );
 	} );
 
 	// Set max-height to keep the action buttons on screen:
-	var modal_window = jQuery( '#evo_item_merge_wrapper' ).parent();
+	var modal_window = jQuery( '#evo_item_item_selector_wrapper' ).parent();
 	var modal_height = jQuery( window ).height() - 20;
 	if( modal_window.hasClass( 'modal-body' ) )
 	{	// Extract heights of header and footer:
@@ -2540,19 +2579,19 @@ function evo_merge_load_window( item_ID )
  * @param string Collection name
  * @param string Predefined Search keyword
  */
-function evo_merge_display_search_form( coll_urlname, coll_name, search_keyword )
+function evo_item_selector_display_search_form( coll_urlname, coll_name, search_keyword )
 {
 	var r = '<h2>' + coll_name + '</h2>' +
-		'<form class="form-inline" id="evo_merge_search__form" data-urlname="' + coll_urlname + '">' +
+		'<form class="form-inline" id="evo_item_selector_search__form" data-urlname="' + coll_urlname + '">' +
 			'<div class="input-group">' +
-				'<input type="text" id="evo_merge_search__input" class="form-control" value="' + ( typeof( search_keyword ) == 'undefined' ? '' : search_keyword ) + '">' +
-				'<span class="input-group-btn"><button id="evo_merge_search__submit" class="btn btn-primary"><?php echo TS_('Search'); ?></button></span>' +
+				'<input type="text" id="evo_item_selector_search__input" class="form-control" value="' + ( typeof( search_keyword ) == 'undefined' ? '' : search_keyword ) + '">' +
+				'<span class="input-group-btn"><button id="evo_item_selector_search__submit" class="btn btn-primary"><?php echo TS_('Search'); ?></button></span>' +
 			'</div> ' +
-			'<button id="evo_merge_search__clear" class="btn btn-default"><?php echo TS_('Clear'); ?></button>' +
+			'<button id="evo_item_selector_search__clear" class="btn btn-default"><?php echo TS_('Clear'); ?></button>' +
 		'</form>' +
-		'<div id="evo_merge_posts_list"></div>';
+		'<div id="evo_item_selector_posts_list"></div>';
 
-	jQuery( '#evo_merge_posts_block' ).html( r );
+	jQuery( '#evo_item_selector_posts_block' ).html( r );
 }
 
 
@@ -2563,18 +2602,18 @@ function evo_merge_display_search_form( coll_urlname, coll_name, search_keyword 
  * @param string Collection name
  * @param integer Page
  */
-function evo_merge_load_coll_posts( coll_urlname, coll_name, page )
+function evo_item_selector_load_coll_posts( coll_urlname, coll_name, page )
 {
 	if( typeof( coll_name ) != 'undefined' && coll_name !== false )
 	{
-		evo_merge_display_search_form( coll_urlname, coll_name );
+		evo_item_selector_display_search_form( coll_urlname, coll_name );
 	}
 
-	var current_post_exclude_param = '&pl=-' + jQuery( '#evo_merge_post_ID' ).val();
+	var current_post_exclude_param = '&pl=-' + jQuery( '#evo_item_selector_post_ID' ).val();
 
 	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
-	evo_rest_api_start_loading( '#evo_merge_posts_list' );
+	evo_rest_api_start_loading( '#evo_item_selector_posts_list' );
 	evo_rest_api_request( 'collections/' + coll_urlname + '/items&orderby=datemodified&order=DESC' + current_post_exclude_param +page_param, function( data )
 	{	// Display the posts on success request:
 		var r = '<ul>';
@@ -2584,8 +2623,8 @@ function evo_merge_load_coll_posts( coll_urlname, coll_name, page )
 			r += '<li><a href="#" data-id="' + post.id + '" data-urlname="' + coll_urlname + '">' + post.title + '</a></li>';
 		}
 		r += '</ul>';
-		r += evo_merge_get_pagination( data );
-		evo_rest_api_end_loading( '#evo_merge_posts_list', r );
+		r += evo_item_selector_get_pagination( data );
+		evo_rest_api_end_loading( '#evo_item_selector_posts_list', r );
 	} );
 }
 
@@ -2597,7 +2636,7 @@ function evo_merge_load_coll_posts( coll_urlname, coll_name, page )
  * @param string Search keyword
  * @return string Pagination
  */
-function evo_merge_get_pagination( data, search_keyword )
+function evo_item_selector_get_pagination( data, search_keyword )
 {
 	var r = '';
 
@@ -2638,7 +2677,7 @@ function evo_merge_get_pagination( data, search_keyword )
 		page_list_end = Math.min( total_pages, page_list_start + page_list_span - 1 );
 	}
 
-	r += '<ul class="evo_merge_pagination pagination"' + search_keyword_attr + '>';
+	r += '<ul class="evo_item_selector_pagination pagination"' + search_keyword_attr + '>';
 
 	if( current_page > 1 )
 	{	// A link to previous page:
@@ -2697,18 +2736,18 @@ function evo_merge_get_pagination( data, search_keyword )
  * @param string Search keyword
  * @param integer Page
  */
-function evo_merge_load_coll_search( coll_urlname, search_keyword, page )
+function evo_item_selector_load_coll_search( coll_urlname, search_keyword, page )
 {
-	var current_post_exclude_param = '&exclude_posts=' + jQuery( '#evo_merge_post_ID' ).val();
+	var current_post_exclude_param = '&exclude_posts=' + jQuery( '#evo_item_selector_post_ID' ).val();
 
 	var page_param = ( typeof( page ) == 'undefined' || page < 2 ) ? '' : '&page=' + page;
 
-	evo_rest_api_start_loading( '#evo_merge_posts_list' );
+	evo_rest_api_start_loading( '#evo_item_selector_posts_list' );
 	evo_rest_api_request( 'collections/' + coll_urlname + '/search/' + search_keyword + '&kind=item' + current_post_exclude_param + page_param, function( data )
 	{	// Display the post data in third column on success request:
 		if( typeof( data.code ) != 'undefined' )
 		{	// Error code was responsed:
-			evo_rest_api_print_error( '#evo_merge_posts_list', data );
+			evo_rest_api_print_error( '#evo_item_selector_posts_list', data );
 			return;
 		}
 
@@ -2725,57 +2764,57 @@ function evo_merge_load_coll_search( coll_urlname, search_keyword, page )
 			r += '</li>';
 		}
 		r += '</ul>';
-		r += evo_merge_get_pagination( data, search_keyword );
-		evo_rest_api_end_loading( '#evo_merge_posts_list', r );
+		r += evo_item_selector_get_pagination( data, search_keyword );
+		evo_rest_api_end_loading( '#evo_item_selector_posts_list', r );
 	} );
 }
 
 // Load the posts of the selected collection:
-jQuery( document ).on( 'change', '#evo_merge_colls_list select', function()
+jQuery( document ).on( 'change', '#evo_item_selector_colls_list select', function()
 {
-	evo_merge_load_coll_posts( jQuery( this ).val(), jQuery( 'option:selected', this ).text() );
+	evo_item_selector_load_coll_posts( jQuery( this ).val(), jQuery( 'option:selected', this ).text() );
 
 	// To prevent link default event:
 	return false;
 } );
 
 // Submit a search form:
-jQuery( document ).on( 'submit', '#evo_merge_search__form', function()
+jQuery( document ).on( 'submit', '#evo_item_selector_search__form', function()
 {
 	var coll_urlname = jQuery( this ).data( 'urlname' );
-	var search_keyword = jQuery( '#evo_merge_search__input' ).val();
+	var search_keyword = jQuery( '#evo_item_selector_search__input' ).val();
 
-	evo_merge_load_coll_search( coll_urlname, search_keyword );
+	evo_item_selector_load_coll_search( coll_urlname, search_keyword );
 
 	// To prevent link default event:
 	return false;
 } );
 
 // Clear the search results:
-jQuery( document ).on( 'click', '#evo_merge_search__clear', function()
+jQuery( document ).on( 'click', '#evo_item_selector_search__clear', function()
 {
-	evo_merge_load_coll_posts( jQuery( this ).closest( 'form' ).data( 'urlname' ) );
+	evo_item_selector_load_coll_posts( jQuery( this ).closest( 'form' ).data( 'urlname' ) );
 
 	// Clear search input field:
-	jQuery( '#evo_merge_search__input' ).val( '' );
+	jQuery( '#evo_item_selector_search__input' ).val( '' );
 
 	// To prevent link default event:
 	return false;
 } );
 
 // Switch page:
-jQuery( document ).on( 'click', '.evo_merge_pagination a', function()
+jQuery( document ).on( 'click', '.evo_item_selector_pagination a', function()
 {
-	var coll_selector = jQuery( '#evo_merge_colls_list select' );
-	var pages_list = jQuery( this ).closest( '.evo_merge_pagination' );
+	var coll_selector = jQuery( '#evo_item_selector_colls_list select' );
+	var pages_list = jQuery( this ).closest( '.evo_item_selector_pagination' );
 
 	if( pages_list.data( 'search' ) == undefined )
 	{	// Load posts/items for selected page:
-		evo_merge_load_coll_posts( coll_selector.val(), false, jQuery( this ).data( 'page' ) );
+		evo_item_selector_load_coll_posts( coll_selector.val(), false, jQuery( this ).data( 'page' ) );
 	}
 	else
 	{	// Load search list for selected page:
-		evo_merge_load_coll_search( coll_selector.val(), pages_list.data( 'search' ), jQuery( this ).data( 'page' ) );
+		evo_item_selector_load_coll_search( coll_selector.val(), pages_list.data( 'search' ), jQuery( this ).data( 'page' ) );
 	}
 
 	// To prevent link default event:
@@ -2784,55 +2823,44 @@ jQuery( document ).on( 'click', '.evo_merge_pagination a', function()
 
 
 // Load the data of the selected post:
-jQuery( document ).on( 'click', '#evo_merge_posts_list a[data-id]', function()
+jQuery( document ).on( 'click', '#evo_item_selector_posts_list a[data-id]', function()
 {
 	var coll_urlname = jQuery( this ).data( 'urlname' );
 	var post_id = jQuery( this ).data( 'id' );
 
 	// Hide the lists of collectionss and posts:
-	jQuery( '#evo_merge_colls_list, #evo_merge_posts_block' ).hide();
+	jQuery( '#evo_item_selector_colls_list, #evo_item_selector_posts_block' ).hide();
 
 	// Show the post preview block, because it can be hidded after prevous preview:
-	jQuery( '#evo_merge_post_block' ).show();
+	jQuery( '#evo_item_selector_post_block' ).show();
 
-	if( jQuery( '#evo_merge_post_block' ).data( 'post' ) == post_id )
+	if( jQuery( '#evo_item_selector_post_block' ).data( 'post' ) == post_id )
 	{	// If user loads the same post, just display the cached content to save ajax calls:
 		// Show the action buttons:
-		jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btns_group' ).show();
+		jQuery( '#evo_item_selector_btn_back_to_list, #evo_item_selector_btns_group' ).show();
 	}
 	else
 	{	// Load new post:
-		jQuery( '#evo_merge_post_block' ).html( '' ); // Clear previous cached content
-		evo_rest_api_start_loading( '#evo_merge_post_block' );
+		jQuery( '#evo_item_selector_post_block' ).html( '' ); // Clear previous cached content
+		evo_rest_api_start_loading( '#evo_item_selector_post_block' );
 		evo_rest_api_request( 'collections/' + coll_urlname + '/items/' + post_id, function( post )
 		{	// Display the post data on success request:
-			jQuery( '#evo_merge_post_block' ).data( 'post', post.id );
+			jQuery( '#evo_item_selector_post_block' ).data( 'post', post.id );
 
 			// Store item field values in hidden inputs to use on insert complex link:
-			jQuery( '#evo_merge_dest_post_ID' ).val( post.id );
+			jQuery( '#evo_item_selector_dest_post_ID' ).val( post.id ).data( 'post', post );
 
 			// Item title:
 			var item_content = '<h2>' + post.title + '</h2>';
 			// Item content:
-			item_content += '<div id="evo_merge_post_content">' + post.content + '</div>';
+			item_content += '<div id="evo_item_selector_post_content">' + post.content + '</div>';
 
-			evo_rest_api_end_loading( '#evo_merge_post_block', item_content );
+			evo_rest_api_end_loading( '#evo_item_selector_post_block', item_content );
 
-			jQuery( '.modal-title' ).html( '<?php echo T_('Destination Post:'); ?>' );
+			jQuery( '.modal-title' ).html( jQuery( '.modal-title' ).data( 'titles' )[1] );
 
-			// Display the buttons to back and merge/append a post:
-			var buttons_side_obj = jQuery( '.evo_merge_post_buttons' ).length ?
-				jQuery( '.evo_merge_post_buttons' ) :
-				jQuery( '#evo_merge_post_content' );
-			jQuery( '#evo_merge_btn_back_to_list, #evo_merge_btns_group, #evo_merge_btn_form' ).remove();
-			buttons_side_obj.after( '<button id="evo_merge_btn_back_to_list" class="btn btn-default">&laquo; <?php echo TS_('Back'); ?></button>'
-				+ '<span id="evo_merge_btns_group" style="margin:0 5px">'
-				+ '<?php echo TS_('Move source post & comments'); ?>: '
-				+ '<div class="btn-group">'
-				+ '<button id="evo_merge_btn_merge" class="btn btn-primary"><?php echo TS_('by keeping original dates (merge)'); ?></button>'
-				+ '<button id="evo_merge_btn_append" class="btn btn-default"><?php echo TS_('by assigning new dates (append)'); ?></button>'
-				+ '</div>'
-				+ '</span>' );
+			// Show the action buttons:
+			jQuery( '#evo_item_selector_btn_back_to_list, #evo_item_selector_btns_group' ).show();
 		} );
 	}
 
@@ -2840,30 +2868,73 @@ jQuery( document ).on( 'click', '#evo_merge_posts_list a[data-id]', function()
 	return false;
 } );
 
+// Back to previous list:
+jQuery( document ).on( 'click', '#evo_item_selector_btn_back_to_list', function()
+{
+	jQuery( '.modal-title' ).html( jQuery( '.modal-title' ).data( 'titles' )[0] );
+
+	// Show the lists of collections and posts:
+	jQuery( '#evo_item_selector_colls_list, #evo_item_selector_posts_block' ).show();
+
+	// Hide the post preview block and action buttons:
+	jQuery( '#evo_item_selector_post_block, #evo_item_selector_btn_back_to_list, #evo_item_selector_btns_group' ).hide();
+
+	// To prevent link default event:
+	return false;
+} );
+</script>
+<?php
+}
+
+
+/**
+ * JS Behaviour: Output JavaScript code to merge an item with another item
+ */
+function echo_item_merge_js()
+{
+	global $Blog, $admin_url, $evo_item_merge_js_initialized;
+
+	if( ! empty( $evo_item_merge_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
+
+	// Set flag to know this is initialized:
+	$evo_item_merge_js_initialized = true;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize JavaScript for item selector window:
+	echo_item_selector_js();
+?>
+<script>
+function evo_merge_load_window( item_ID )
+{
+	return evo_item_selector_load_window( item_ID,
+		[ '<?php echo TS_('Select destination Post...'); ?>', '<?php echo T_('Destination Post:'); ?>' ],
+		'<?php echo TS_('You must save the Item before you can merge it.'); ?>',
+		[
+			'<?php echo TS_('Move source post & comments'); ?>: ',
+			[
+				{ 'text': '<?php echo TS_('by keeping original dates (merge)'); ?>', 'id': 'evo_merge_btn_merge', 'class': 'btn btn-primary' },
+				{ 'text': '<?php echo TS_('by assigning new dates (append)'); ?>', 'id': 'evo_merge_btn_append', 'class': 'btn btn-default' },
+			]
+		],
+		<?php echo empty( $Blog ) ? 0 : $Blog->ID; // Default collection ?>,
+		'collections', { per_page: 0, list_in_frontoffice: 'all' }
+	);
+}
+
 // Submit form to merge/append a post:
 jQuery( document ).on( 'click', '#evo_merge_btn_merge, #evo_merge_btn_append', function()
 {
 	var action = jQuery( this ).attr( 'id' ) == 'evo_merge_btn_merge' ? 'merge' : 'append';
 
 	location.href = '<?php echo $admin_url; ?>?ctrl=items&action=' + action
-		+ '&post_ID=' + jQuery( '#evo_merge_post_ID' ).val()
-		+ '&dest_post_ID=' + jQuery( '#evo_merge_dest_post_ID' ).val()
+		+ '&post_ID=' + jQuery( '#evo_item_selector_post_ID' ).val()
+		+ '&dest_post_ID=' + jQuery( '#evo_item_selector_dest_post_ID' ).val()
 		+ '&<?php echo url_crumb( 'item' ); ?>';
-} );
-
-// Back to previous list:
-jQuery( document ).on( 'click', '#evo_merge_btn_back_to_list', function()
-{
-	jQuery( '.modal-title' ).html( '<?php echo T_('Select destination Post...'); ?>' );
-
-	// Show the lists of collections and posts:
-	jQuery( '#evo_merge_colls_list, #evo_merge_posts_block' ).show();
-
-	// Hide the post preview block and action buttons:
-	jQuery( '#evo_merge_post_block, #evo_merge_btn_back_to_list, #evo_merge_btns_group' ).hide();
-
-	// To prevent link default event:
-	return false;
 } );
 </script>
 <?php
