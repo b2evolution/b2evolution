@@ -102,11 +102,10 @@ class basic_antispam_plugin extends Plugin
 					'defaultvalue' => 1,
 				),
 				'nofollow_for_hours' => array(
-					'type' => 'integer',
+					'type' => 'checkbox',
 					'label' => T_('Apply rel="nofollow"'),
-					'note'=>T_('hours. For how long should rel="nofollow" be applied to comment links? (0 means never, -1 means always)'),
-					'defaultvalue' => '-1', // use "nofollow" infinitely by default so lazy admins won't promote spam
-					'size' => 5,
+					'note' => sprintf( T_('Check to apply %s for links in comments.'), '<code>rel="nofollow"</code>' ),
+					'defaultvalue' => 1,
 				),
 				'check_url_referers' => array(
 					'type' => 'checkbox',
@@ -314,7 +313,7 @@ class basic_antispam_plugin extends Plugin
 			return false;
 		}
 
-		$this->apply_nofollow( $params['data'], $params['Comment'] );
+		$this->apply_nofollow( $params['data'] );
 	}
 
 
@@ -336,7 +335,7 @@ class basic_antispam_plugin extends Plugin
 	 */
 	function FilterCommentContent( & $params )
 	{
-		$this->apply_nofollow( $params['data'], $params['Comment'] );
+		$this->apply_nofollow( $params['data'] );
 	}
 
 
@@ -369,28 +368,18 @@ class basic_antispam_plugin extends Plugin
 
 
 	/**
-	 * Do we want to apply rel="nofollow" tag?
+	 * Apply rel="nofollow" attribute for links in comment content
 	 *
+	 * @param string Comment content
 	 * @return boolean
 	 */
-	function apply_nofollow( & $data, $Comment )
+	function apply_nofollow( & $data )
 	{
-		global $localtimenow;
-
-		$hours = $this->Settings->get('nofollow_for_hours'); // 0=never, -1 always, otherwise for x hours
-
-		if( $hours == 0 )
-		{ // "never"
-			return;
+		if( $this->Settings->get( 'nofollow_for_hours' ) != 0 )
+		{	// Apply rel="nofollow":
+			// (NOTE: old version could have values -1, 1, 2, 3, etc. so decide all them as 1 to apply rel="nofollow")
+			$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', array( 'basic_antispam_plugin', '_apply_nofollow_callback' ), $data );
 		}
-
-		if( $hours > 0 // -1 is "always"
-			&& mysql2timestamp( $Comment->date ) <= ( $localtimenow - $hours*3600 ) )
-		{
-			return;
-		}
-
-		$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', array( 'basic_antispam_plugin', '_apply_nofollow_callback' ), $data );
 	}
 
 
