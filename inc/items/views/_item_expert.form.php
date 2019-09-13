@@ -412,7 +412,7 @@ $Form->begin_form( '', '', $params );
 		{	// Only PRO feature for using of post link URL as an External Canonical URL:
 			$external_canonical_url_checkbox = '<label>'
 					.'<input name="post_external_canonical_url" value="1" type="checkbox"'.( $edited_Item->get_setting( 'external_canonical_url' ) ? ' checked="checked"' : '' ).' /> '
-					.T_('Use as an External Canonical URL').' '.get_pro_label()
+					.sprintf( T_('Use as <a %s>External canonical URL</a>'), 'href="'.get_manual_url( 'external-canonical-url' ).'"' ).' '.get_pro_label()
 				.'</label>';
 		}
 		else
