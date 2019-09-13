@@ -2514,7 +2514,7 @@ function echo_item_selector_js()
 <script>
 function evo_item_selector_load_window( item_ID, window_titles, restriction_message, submit_buttons, default_coll_ID, api_coll_path, api_coll_params )
 {
-	if( item_ID < 1 || ( typeof( bozo ) && bozo.nb_changes > 0 ) )
+	if( item_ID < 1 || ( restriction_message !== false && typeof( bozo ) && bozo.nb_changes > 0 ) )
 	{	// Don't allow to select another item if item edit form is changed and not saved yet:
 		alert( restriction_message );
 		return false;
@@ -2545,6 +2545,7 @@ function evo_item_selector_load_window( item_ID, window_titles, restriction_mess
 		{
 			var coll = data.colls[c];
 			r += '<option value="' + coll.urlname + '"'
+				+ ' data-coll-id="' + coll.id + '"'
 				+ ( default_coll_ID == coll.id ? ' selected="selected"' : '' )+ '>'
 				+ coll.name + '</option>';
 			if( coll_urlname == '' || coll.id == default_coll_ID )
@@ -2900,7 +2901,7 @@ jQuery( document ).on( 'click', '#evo_item_selector_posts_list a[data-id]', func
 			jQuery( '#evo_item_selector_post_block' ).data( 'post', post.id );
 
 			// Store item field values in hidden inputs to use on insert complex link:
-			jQuery( '#evo_item_selector_dest_post_ID' ).val( post.id );
+			jQuery( '#evo_item_selector_dest_post_ID' ).val( post.id ).data( 'post', post );
 
 			// Item title:
 			var item_content = '<h2>' + post.title + '</h2>';
