@@ -54,22 +54,16 @@ class shortlinks_plugin extends Plugin
 				'type' => 'checklist',
 				'options' => array(
 						array( 'absolute_urls',         sprintf( $this->T_('Absolute URLs (starting with %s or %s) in brackets'), '<code>http://</code>, <code>https://</code>, <code>mailto://</code>', '<code>//</code>' ), 1 ),
-						array( 'abs_target_blank',      $this->T_('Open in new tab').' (<code>target="_blank"</code>)', 1, NULL, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:20px' ) ),
+						array( 'abs_url_target_blank',  $this->T_('Open in new tab').' (<code>target="_blank"</code>)', 1, NULL, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:20px' ) ),
+						array( 'abs_url_optimize',      $this->T_('If an absolute URL references a collection on this system, try to optimize and keep just the slug '), 1, NULL, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:20px' ) ),
 						array( 'relative_urls',         sprintf( $this->T_('Relative URLs (starting with %s followed by a letter or digit) in brackets'), '<code>/</code>' ), 0 ),
+						array( 'rel_url_optimize',      $this->T_('If a relative URL references a collection on this system, try to optimize and keep just the slug'), 1, NULL, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:20px' ) ),
 						array( 'anchor',                sprintf( $this->T_('Current page anchor URLs (starting with %s) in brackets'), '<code>#</code>' ), 1 ),
 						array( 'cat_slugs',             $this->T_('Category slugs in brackets'), 1 ),
 						array( 'item_slugs',            $this->T_('Item slugs in brackets'), 1 ),
 						array( 'item_id',               $this->T_('Item ID in brackets'), 1 ),
 						array( 'cat_without_brackets',  $this->T_('WikiWords without brackets matching category slugs'), 0 ),
 						array( 'item_without_brackets', $this->T_('WikiWords without brackets matching item slugs'), 0 ),
-					),
-				),
-			'optimize' => array(
-				'label' => T_('Optimize URLs'),
-				'type' => 'checklist',
-				'options' => array(
-						array( 'absolute_urls', $this->T_('If an absolute URL references a collection on this system, try to identity and keep just the slug '), 1 ),
-						array( 'relative_urls', $this->T_('If a relative URL references a collection on this system, try to identity and keep just the slug'), 1 ),
 					),
 				),
 			);
@@ -450,7 +444,7 @@ class shortlinks_plugin extends Plugin
 		// Clear custom link style classes:
 		$custom_link_class = utf8_trim( str_replace( '.', ' ', $m[4] ) );
 
-		if( $m[3] != '/' && ! empty( $this->link_types['abs_target_blank'] ) )
+		if( $m[3] != '/' && ! empty( $this->link_types['abs_url_target_blank'] ) )
 		{	// Force target to "_blank" for absolute URLs when it is defined in plugin settings:
 			$custom_link_target = '_blank';
 		}
@@ -893,7 +887,7 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// Get settings to know what should be optimized:
-		$this->optimize = $this->get_coll_setting( 'optimize', $setting_Blog );
+		$this->link_types = $this->get_coll_setting( 'link_types', $setting_Blog );
 
 		// Optimize URLs:
 		$Item->set( 'content', $this->optimize_urls( $Item->get( 'content' ) ) );
@@ -933,7 +927,7 @@ class shortlinks_plugin extends Plugin
 		}
 
 		// Get settings to know what should be optimized:
-		$this->optimize = $this->get_coll_setting( 'optimize', $setting_Blog );
+		$this->link_types = $this->get_coll_setting( 'link_types', $setting_Blog );
 
 		// Optimize URLs:
 		$Comment->set( 'content', $this->optimize_urls( $Comment->get( 'content' ) ) );
@@ -969,7 +963,7 @@ class shortlinks_plugin extends Plugin
 			return;
 		}
 
-		$this->optimize = $this->get_msg_setting( 'optimize' );
+		$this->link_types = $this->get_msg_setting( 'link_types' );
 
 		$Message->set( 'text', $this->optimize_urls( $Message->get( 'text' ) ) );
 	}
@@ -991,7 +985,7 @@ class shortlinks_plugin extends Plugin
 			return;
 		}
 
-		$this->optimize = $this->get_email_setting( 'optimize' );
+		$this->link_types = $this->get_email_setting( 'link_types' );
 
 		$EmailCampaign->set( 'email_text', $this->optimize_urls( $EmailCampaign->get( 'email_text' ) ) );
 		//$EmailCampaign->set( 'email_html', $this->optimize_urls( $EmailCampaign->get( 'email_html' ) ) );
@@ -1020,7 +1014,7 @@ class shortlinks_plugin extends Plugin
 	 */
 	function optimize_urls( $content )
 	{
-		if( ! empty( $this->optimize['absolute_urls'] ) )
+		if( ! empty( $this->link_types['abs_url_optimize'] ) )
 		{	// Optimize absolute URLs:
 			$content = replace_content_outcode( '*
 					( \[\[ | \(\( ) # Lookbehind for (( or [[
@@ -1031,7 +1025,7 @@ class shortlinks_plugin extends Plugin
 				array( $this, 'optimize_urls_callback' ), $content, 'replace_content', 'preg_callback' );
 		}
 
-		if( ! empty( $this->optimize['relative_urls'] ) )
+		if( ! empty( $this->link_types['rel_url_optimize'] ) )
 		{	// Optimize relative URLs:
 			$content = replace_content_outcode( '*
 					( \[\[ | \(\( ) # Lookbehind for (( or [[

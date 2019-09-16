@@ -11857,6 +11857,101 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15530, 'Upgrading settings of the plugin "Short Links"...' ) )
+	{	// part of 7.0.2-beta
+		// Get plugin settings per collections:
+		$coll_SQL = new SQL();
+		$coll_SQL->SELECT( 'cset_coll_ID AS coll_ID_type, cset_name AS name, cset_value AS value' );
+		$coll_SQL->FROM( 'T_coll_settings' );
+		$coll_SQL->WHERE( 'cset_name LIKE "plugin%_link_types"' );
+		$coll_SQL->WHERE_or( 'cset_name LIKE "plugin%_optimize"' );
+		// Get plugin settings for Email Campaign and Private Messages:
+		$msg_email_SQL = new SQL();
+		$msg_email_SQL->SELECT( 'IF( pset_name IN ( "msg_link_types", "msg_optimize" ), "msg", "email" ) AS coll_ID_type, ' );
+		$msg_email_SQL->SELECT_add( 'CONCAT( "plugin", pset_plug_ID, "_", REPLACE( REPLACE( pset_name, "email_", "" ), "msg_", "" ) ) AS name, ' );
+		$msg_email_SQL->SELECT_add( 'pset_value AS value' );
+		$msg_email_SQL->FROM( 'T_pluginsettings' );
+		$msg_email_SQL->WHERE( 'pset_name IN ( "msg_link_types", "msg_optimize", "email_link_types", "email_optimize" )' );
+		// Union two SQL queries above:
+		$plug_SQL = new SQL( 'Get settings of the plugin "Short Links" to upgrade' );
+		$plug_SQL->SELECT( 'coll_ID_type, name, value' );
+		$plug_SQL->FROM( '( '.$coll_SQL->get().' UNION '.$msg_email_SQL->get().' ) AS plugin_settings' );
+		$plug_SQL->ORDER_BY( 'coll_ID_type, name, value' );
+		$plugin_rows = $DB->get_results( $plug_SQL );
+
+		$plugin_settings = array();
+		foreach( $plugin_rows as $plugin_row )
+		{
+			if( ! isset( $plugin_settings[ $plugin_row->coll_ID_type ] ) )
+			{
+				$plugin_settings[ $plugin_row->coll_ID_type ] = array();
+			}
+			if( ! preg_match( '#^plugin(\d+)_(.+)$#', $plugin_row->name, $set_match ) )
+			{
+				continue;
+			}
+			if( ! isset( $plugin_settings[ $plugin_row->coll_ID_type ][ $set_match[1] ] ) )
+			{
+				$plugin_settings[ $plugin_row->coll_ID_type ][ $set_match[1] ] = array();
+			}
+			$value = @unserialize( $plugin_row->value );
+			$plugin_settings[ $plugin_row->coll_ID_type ][ $set_match[1] ][ $set_match[2] ] = $value ? $value : array();
+		}
+
+		foreach( $plugin_settings as $coll_ID_type => $plugin_data )
+		{
+			foreach( $plugin_data as $plugin_ID => $plugin_settings )
+			{
+				if( ! isset( $plugin_settings['link_types'] ) )
+				{	// Skip if detault values are still used:
+					continue;
+				}
+				if( isset( $plugin_settings['link_types']['abs_target_blank'] ) )
+				{	// Rename old setting:
+					$plugin_settings['link_types']['abs_url_target_blank'] = $plugin_settings['link_types']['abs_target_blank'];
+					unset( $plugin_settings['link_types']['abs_target_blank'] );
+				}
+				if( isset( $plugin_settings['optimize']['absolute_urls'] ) )
+				{	// Add new setting:
+					$plugin_settings['link_types']['abs_url_optimize'] = $plugin_settings['optimize']['absolute_urls'];
+				}
+				if( isset( $plugin_settings['optimize']['relative_urls'] ) )
+				{	// Add new setting:
+					$plugin_settings['link_types']['rel_url_optimize'] = $plugin_settings['optimize']['relative_urls'];
+				}
+				switch( $coll_ID_type )
+				{
+					case 'msg':
+					case 'email':
+						// Plugin settings for Email Campaign and Private Messages
+						// Update to new settings:
+						$DB->query( 'UPDATE T_pluginsettings
+							  SET pset_value = '.$DB->quote( serialize( $plugin_settings['link_types'] ) ).'
+							WHERE pset_plug_ID = '.$DB->quote( $plugin_ID ).'
+							  AND pset_name = '.$DB->quote( $coll_ID_type.'_link_types' ) );
+						// Delete old setting:
+						$DB->query( 'DELETE FROM T_pluginsettings
+							WHERE pset_plug_ID = '.$DB->quote( $plugin_ID ).'
+							  AND pset_name = '.$DB->quote( $coll_ID_type.'_optimize' ) );
+						break;
+					default:
+						// Plugin settings per collection:
+						// Update to new settings:
+						$DB->query( 'UPDATE T_coll_settings
+							  SET cset_value = '.$DB->quote( serialize( $plugin_settings['link_types'] ) ).'
+							WHERE cset_coll_ID = '.$DB->quote( $coll_ID_type ).'
+							  AND cset_name = '.$DB->quote( 'plugin'.$plugin_ID.'_link_types' ) );
+						// Delete old setting:
+						$DB->query( 'DELETE FROM T_coll_settings
+							WHERE cset_coll_ID = '.$DB->quote( $coll_ID_type ).'
+							  AND cset_name = '.$DB->quote( 'plugin'.$plugin_ID.'_optimize' ) );
+						break;
+				}
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
