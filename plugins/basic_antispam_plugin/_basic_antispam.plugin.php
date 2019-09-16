@@ -101,19 +101,12 @@ class basic_antispam_plugin extends Plugin
 					'note'=>T_('Block comments with both "[link=" and "[url=" tags.'),
 					'defaultvalue' => 1,
 				),
-				'nofollow_for_hours' => array(
-					'type' => 'checkbox',
-					'label' => T_('Apply rel="nofollow"'),
-					'note' => sprintf( T_('Check to apply %s for links in comments.'), '<code>rel="nofollow"</code>' ),
-					'defaultvalue' => 1,
-				),
 				'check_url_referers' => array(
 					'type' => 'checkbox',
 					'label' => T_('Check referers for URL'),
 					'note' => T_('Check refering pages, if they contain our URL. This may generate a lot of additional traffic!'),
 					'defaultvalue' => '0',
 				),
-
 			);
 	}
 
@@ -297,88 +290,6 @@ class basic_antispam_plugin extends Plugin
 					syslog_insert( 'The comment was rejected because it appeared to be spam', 'warning', 'item', $comment_Item->ID, 'plugin', $this->ID );
 				}
 			}
-		}
-	}
-
-
-	/**
-	 * If we use "makelink", handle nofollow rel attrib.
-	 *
-	 * @uses basic_antispam_plugin::apply_nofollow()
-	 */
-	function FilterCommentAuthor( & $params )
-	{
-		if( ! $params['makelink'] )
-		{
-			return false;
-		}
-
-		$this->apply_nofollow( $params['data'] );
-	}
-
-
-	/**
-	 * Handle nofollow in author URL (if it's made clickable)
-	 *
-	 * @uses basic_antispam_plugin::FilterCommentAuthor()
-	 */
-	function FilterCommentAuthorUrl( & $params )
-	{
-		$this->FilterCommentAuthor( $params );
-	}
-
-
-	/**
-	 * Handle nofollow rel attrib in comment content.
-	 *
-	 * @uses basic_antispam_plugin::FilterCommentAuthor()
-	 */
-	function FilterCommentContent( & $params )
-	{
-		$this->apply_nofollow( $params['data'] );
-	}
-
-
-	/**
-	 * Callback for preg_replace_callback ini apply_nofollow()
-	 */
-	private static function _apply_nofollow_callback( $matches )
-	{
-		if( preg_match( '~\brel=([\'"])(.*?)\1~', $matches[2], $match ) )
-		{ // there is already a rel attrib:
-			$rel_values = explode( " ", $match[2] );
-
-			if( ! in_array( 'nofollow', $rel_values ) )
-			{
-				$rel_values[] = 'nofollow';
-			}
-
-			return $matches[1]
-				.preg_replace(
-					'~\brel=([\'"]).*?\1~',
-					'rel=$1'.implode( " ", $rel_values ).'$1',
-					$matches[2] )
-				.">";
-		}
-		else
-		{
-			return $matches[1].$matches[2].' rel="nofollow">';
-		}
-	}
-
-
-	/**
-	 * Apply rel="nofollow" attribute for links in comment content
-	 *
-	 * @param string Comment content
-	 * @return boolean
-	 */
-	function apply_nofollow( & $data )
-	{
-		if( $this->Settings->get( 'nofollow_for_hours' ) != 0 )
-		{	// Apply rel="nofollow":
-			// (NOTE: old version could have values -1, 1, 2, 3, etc. so decide all them as 1 to apply rel="nofollow")
-			$data = preg_replace_callback( '~(<a\s)([^>]+)>~i', array( 'basic_antispam_plugin', '_apply_nofollow_callback' ), $data );
 		}
 	}
 
