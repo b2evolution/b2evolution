@@ -837,6 +837,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'mermaid_plugin' );
 	}
+
+	if( $old_db_version < 15540 )
+	{
+		install_plugin( 'nofollow_plugin' );
+	}
 }
 
 
