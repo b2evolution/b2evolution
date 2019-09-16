@@ -1110,7 +1110,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				}
 				$Comment->set( 'rating', $comment['comment_rating'] );
 				$Comment->set( 'featured', $comment['comment_featured'] );
-				$Comment->set( 'nofollow', $comment['comment_nofollow'] );
+				$Comment->set( 'author_url_nofollow', $comment['comment_author_url_nofollow'] );
+				$Comment->set( 'author_url_ugc', $comment['comment_author_url_ugc'] );
+				$Comment->set( 'author_url_sponsored', $comment['comment_author_url_sponsored'] );
 				$Comment->set( 'helpful_addvotes', $comment['comment_helpful_addvotes'] );
 				$Comment->set( 'helpful_countvotes', $comment['comment_helpful_countvotes'] );
 				$Comment->set( 'spam_addvotes', $comment['comment_spam_addvotes'] );
@@ -1426,7 +1428,9 @@ function wpxml_parser( $file )
 				'comment_IP_country'         => (string) $evo_comment->comment_IP_country,
 				'comment_rating'             => (int) $evo_comment->comment_rating,
 				'comment_featured'           => (int) $evo_comment->comment_featured,
-				'comment_nofollow'           => (int) $evo_comment->comment_nofollow,
+				'comment_author_url_nofollow'  => isset( $evo_comment->comment_author_url_nofollow ) ? (int) $evo_comment->comment_author_url_nofollow : (int) $evo_comment->comment_nofollow,
+				'comment_author_url_ugc'       => isset( $evo_comment->comment_author_url_ugc ) ? (int) $evo_comment->comment_author_url_ugc : 1,
+				'comment_author_url_sponsored' => isset( $evo_comment->comment_author_url_sponsored ) ? (int) $evo_comment->comment_author_url_sponsored : 0,
 				'comment_helpful_addvotes'   => (int) $evo_comment->comment_helpful_addvotes,
 				'comment_helpful_countvotes' => (int) $evo_comment->comment_helpful_countvotes,
 				'comment_spam_addvotes'      => (int) $evo_comment->comment_spam_addvotes,

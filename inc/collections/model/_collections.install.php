@@ -252,7 +252,9 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_renderers          VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			comment_rating             TINYINT(1) NULL DEFAULT NULL,
 			comment_featured           TINYINT(1) NOT NULL DEFAULT 0,
-			comment_nofollow           TINYINT(1) NOT NULL DEFAULT 1,
+			comment_author_url_nofollow  TINYINT(1) NOT NULL DEFAULT 1,
+			comment_author_url_ugc       TINYINT(1) NOT NULL DEFAULT 1,
+			comment_author_url_sponsored TINYINT(1) NOT NULL DEFAULT 0,
 			comment_helpful_addvotes   INT NOT NULL default 0,
 			comment_helpful_countvotes INT unsigned NOT NULL default 0,
 			comment_spam_addvotes      INT NOT NULL default 0,

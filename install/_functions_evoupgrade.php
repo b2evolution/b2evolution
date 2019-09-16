@@ -11952,6 +11952,20 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15540, 'Upgrading comments table...' ) )
+	{	// part of 7.0.2-beta
+		db_upgrade_cols( 'T_comments', array(
+			'CHANGE' => array(
+				'comment_nofollow' => 'comment_author_url_nofollow TINYINT(1) NOT NULL DEFAULT 1',
+			),
+			'ADD' => array(
+				'comment_author_url_ugc'       => 'TINYINT(1) NOT NULL DEFAULT 1 AFTER comment_author_url_nofollow',
+				'comment_author_url_sponsored' => 'TINYINT(1) NOT NULL DEFAULT 0 AFTER comment_author_url_ugc',
+			),
+		) );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

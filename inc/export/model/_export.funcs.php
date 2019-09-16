@@ -438,7 +438,7 @@ function export_xml( $params )
 					{	// Export comments
 						$comments_SQL = new SQL();
 						$comments_SQL->SELECT( 'comment_id, comment_author, comment_author_email, comment_author_url, comment_author_IP, comment_date, comment_content, comment_status, comment_type, comment_in_reply_to_cmt_ID, comment_author_user_ID, 
-							comment_IP_ctry_ID, comment_rating, comment_featured, comment_nofollow, comment_helpful_addvotes, comment_helpful_countvotes, comment_spam_addvotes, comment_spam_countvotes, comment_karma, comment_spam_karma, comment_allow_msgform, comment_notif_status' );
+							comment_IP_ctry_ID, comment_rating, comment_featured, comment_author_url_nofollow, comment_author_url_ugc, comment_author_url_sponsored, comment_helpful_addvotes, comment_helpful_countvotes, comment_spam_addvotes, comment_spam_countvotes, comment_karma, comment_spam_karma, comment_allow_msgform, comment_notif_status' );
 						$comments_SQL->FROM( 'T_comments' );
 						$comments_SQL->WHERE( 'comment_item_ID = '.$DB->quote( $Item->ID ) );
 						$comments = $DB->get_results( $comments_SQL->get() );
@@ -472,7 +472,9 @@ function export_xml( $params )
 											'evo:comment_IP_country'         => $comment_country_code,
 											'evo:comment_rating'             => $comment->comment_rating,
 											'evo:comment_featured'           => $comment->comment_featured,
-											'evo:comment_nofollow'           => $comment->comment_nofollow,
+											'evo:comment_author_url_nofollow'  => $comment->comment_author_url_nofollow,
+											'evo:comment_author_url_ugc'       => $comment->comment_author_url_ugc,
+											'evo:comment_author_url_sponsored' => $comment->comment_author_url_sponsored,
 											'evo:comment_helpful_addvotes'   => $comment->comment_helpful_addvotes,
 											'evo:comment_helpful_countvotes' => $comment->comment_helpful_countvotes,
 											'evo:comment_spam_addvotes'      => $comment->comment_spam_addvotes,

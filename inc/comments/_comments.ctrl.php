@@ -414,8 +414,14 @@ switch( $action )
 			$edited_Comment->set( 'status', $comment_status );
 		}
 
-		param( 'comment_nofollow', 'integer', 0 );
-		$edited_Comment->set_from_Request( 'nofollow' );
+		param( 'comment_author_url_nofollow', 'integer', 0 );
+		$edited_Comment->set_from_Request( 'author_url_nofollow' );
+
+		param( 'comment_author_url_ugc', 'integer', 0 );
+		$edited_Comment->set_from_Request( 'author_url_ugc' );
+
+		param( 'comment_author_url_sponsored', 'integer', 0 );
+		$edited_Comment->set_from_Request( 'author_url_sponsored' );
 
 		if( $Messages->has_errors() )
 		{	// There have been some validation errors:

@@ -142,7 +142,13 @@ class Comment extends DataObject
 	 */
 	var $anon_notify_last;
 
-	var $nofollow;
+	/**
+	 * Active values for attribute "rel" of author URL link
+	 */
+	var $author_url_nofollow;
+	var $author_url_ugc;
+	var $author_url_sponsored;
+
 	/**
 	 * @var string
 	 */
@@ -231,7 +237,9 @@ class Comment extends DataObject
 			// echo 'null comment';
 			$this->rating = NULL;
 			$this->featured = 0;
-			$this->nofollow = 1;
+			$this->author_url_nofollow = 1;
+			$this->author_url_ugc = 1;
+			$this->author_url_sponsored = 0;
 			$this->notif_status = 'noreq';
 			$this->in_reply_to_cmt_ID = 0;
 			$this->set_renderers( array( 'default' ) );
@@ -263,7 +271,9 @@ class Comment extends DataObject
 			$this->renderers = $db_row->comment_renderers;
 			$this->rating = $db_row->comment_rating;
 			$this->featured = $db_row->comment_featured;
-			$this->nofollow = $db_row->comment_nofollow;
+			$this->author_url_nofollow = isset( $db_row->comment_author_url_nofollow ) ? $db_row->comment_author_url_nofollow : 1;
+			$this->author_url_ugc = isset( $db_row->comment_author_url_ugc ) ? $db_row->comment_author_url_ugc : 1;
+			$this->author_url_sponsored = isset( $db_row->comment_author_url_sponsored ) ? $db_row->comment_author_url_sponsored : 0;
 			$this->spam_karma = $db_row->comment_spam_karma;
 			$this->allow_msgform = $db_row->comment_allow_msgform;
 			$this->anon_notify = $db_row->comment_anon_notify;
@@ -1389,9 +1399,22 @@ class Comment extends DataObject
 		if( $makelink )
 		{
 			$r .= '<a ';
-			if( $this->nofollow )
+			$rel_values = array();
+			if( $this->get( 'author_url_nofollow' ) )
 			{
-				$r .= 'rel="nofollow" ';
+				$rel_values[] = 'nofollow';
+			}
+			if( $this->get( 'author_url_ugc' ) )
+			{
+				$rel_values[] = 'ugc';
+			}
+			if( $this->get( 'author_url_sponsored' ) )
+			{
+				$rel_values[] = 'sponsored';
+			}
+			if( ! empty( $rel_values ) )
+			{
+				$r .= 'rel="'.implode( ' ', $rel_values ).'" ';
 			}
 			if( ! empty( $link_class ) )
 			{

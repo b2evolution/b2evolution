@@ -133,6 +133,11 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 			$Form->checkbox( 'comment_allow_msgform', $edited_Comment->allow_msgform, T_('Allow contact'), T_('If checked, the comment author can be contacted through a form that will send him an email.') );
 			$Form->checkbox( 'comment_anon_notify', $edited_Comment->anon_notify, T_('Notify me of replies') );
 			$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
+			$Form->begin_line();
+				$Form->checkbox_input( 'comment_author_url_nofollow', $edited_Comment->author_url_nofollow, '<label class="text-normal pointer">', array( 'input_suffix' => ' '.T_('Nofollow').'</label> &nbsp; ' ) );
+				$Form->checkbox_input( 'comment_author_url_ugc', $edited_Comment->author_url_ugc, '<label class="text-normal pointer">', array( 'input_suffix' => ' '.T_('UGC').'</label> &nbsp; ' ) );
+				$Form->checkbox_input( 'comment_author_url_sponsored', $edited_Comment->author_url_sponsored, '<label class="text-normal pointer">', array( 'input_suffix' => ' '.T_('Sponsored').'</label>' ) );
+			$Form->end_line();
 		}
 
 		echo '</div>';
@@ -241,14 +246,6 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 
 		$Form->end_fieldset();
 	}
-
-	// ####################### LINKS #########################
-	$Form->begin_fieldset( T_('Links'), array( 'id' => 'cmntform_html', 'fold' => true ) );
-		echo '<p>';
-		$Form->checkbox_basic_input( 'comment_nofollow', $edited_Comment->nofollow, T_('Nofollow website URL') );
-		// TODO: apply to all links  -- note: see basic antispam plugin that does this for x hours
-		echo '</p>';
-	$Form->end_fieldset();
 
 
 	// ####################### FEEDBACK INFO #########################
