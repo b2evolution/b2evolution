@@ -108,7 +108,6 @@ class autolinks_plugin extends Plugin
 						'label' => T_('Create auto-links for'),
 						'type' => 'checklist',
 						'options' => array(
-							array( 'urls', sprintf( T_('Urls starting with %s as well as adresses of the form %s or %s'), '<code>http:</code> <code>https:</code> <code>mailto:</code> <code>aim:</code> <code>icq:</code>', '<code>www.*.*</code>', '<code>*@*.*</code>' ), 1 ),
 							array( 'defs_default', sprintf( T_('Definitions as defined in %s'), '<code>definitions.default.txt</code>' ), 1 ),
 							array( 'defs_local', sprintf( T_('Definitions as defined in %s'), '<code>definitions.local.txt</code>' ), 0 ),
 						)
@@ -140,6 +139,18 @@ class autolinks_plugin extends Plugin
 					'rows' => 15,
 					'note' => $this->T_( 'Enter custom definitions above.' ),
 					'defaultvalue' => '',
+				),
+			'autolink_urls' => array(
+					'label' => $this->T_('Autolink URLs'),
+					'type' => 'checkbox',
+					'note' => sprintf( $this->T_('Find URLs that match %s, %s or %s'), '<code>http://*</code>', '<code>https://*</code>', '<code>www.*.*</code>' ),
+					'defaultvalue' => 1,
+				),
+			'autolink_emails' => array(
+					'label' => $this->T_('Autolink email addresses'),
+					'type' => 'checkbox',
+					'note' => sprintf( $this->T_('Find addresses that match %s or %s'), '<code>mailto:</code>', '<code>*@*.*</code>' ),
+					'defaultvalue' => 1,
 				),
 			'autolink_username' => array(
 					'label' => T_( 'Autolink usernames' ),
@@ -415,6 +426,8 @@ class autolinks_plugin extends Plugin
 		}
 
 		$this->setting_autolink_defs_coll_db = $this->get_coll_setting( 'autolink_defs_coll_db', $this->current_Blog );
+		$this->setting_autolink_urls = $this->get_coll_setting( 'autolink_urls', $this->current_Blog );
+		$this->setting_autolink_emails = $this->get_coll_setting( 'autolink_emails', $this->current_Blog );
 		$this->setting_autolink_username = $this->get_coll_setting( 'autolink_username', $this->current_Blog );
 		$this->setting_autolink_tag = $this->get_coll_setting( 'autolink_tag', $this->current_Blog );
 
@@ -436,6 +449,8 @@ class autolinks_plugin extends Plugin
 		// Message is rendering
 		$this->setting_nofollow_auto = $this->get_checklist_setting( 'autolink_nofollow', 'auto', 'msg' );
 		$this->setting_autolink_defs_coll_db = $this->get_msg_setting( 'autolink_defs_coll_db' );
+		$this->setting_autolink_urls = $this->get_msg_setting( 'autolink_urls' );
+		$this->setting_autolink_emails = $this->get_msg_setting( 'autolink_emails' );
 		$this->setting_autolink_username = $this->get_msg_setting( 'autolink_username' );
 		$this->setting_autolink_tag = false;
 
@@ -457,6 +472,8 @@ class autolinks_plugin extends Plugin
 		// Email is rendering
 		$this->setting_nofollow_auto = $this->get_checklist_setting( 'autolink_nofollow', 'auto', 'email' );
 		$this->setting_autolink_defs_coll_db = $this->get_email_setting( 'autolink_defs_coll_db' );
+		$this->setting_autolink_urls = $this->get_email_setting( 'autolink_urls' );
+		$this->setting_autolink_emails = $this->get_email_setting( 'autolink_emails' );
 		$this->setting_autolink_username = $this->get_email_setting( 'autolink_username' );
 		$this->setting_autolink_tag = false;
 
@@ -491,13 +508,18 @@ class autolinks_plugin extends Plugin
 			$this->already_linked_array = $matches[1];
 		}
 
-		if( $this->get_checklist_setting( 'autolink', 'urls' ) )
-		{	// First, make the URLs clickable:
-			$content = make_clickable( $content, '&amp;', 'make_clickable_callback', '', true );
+		if( $this->setting_autolink_urls )
+		{	// Make the URLs clickable:
+			$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback_urls' ), '', true );
+		}
+
+		if( $this->setting_autolink_emails )
+		{	// Make the email addresses clickable:
+			$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback_emails' ), '', true );
 		}
 
 		// Make the desired remaining terms/definitions, usernames or tags clickable:
-		$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback' ), '', true );
+		$content = make_clickable( $content, '&amp;', array( $this, 'make_clickable_callback_definitions' ), '', true );
 
 		return true;
 	}
@@ -518,13 +540,73 @@ class autolinks_plugin extends Plugin
 
 
 	/**
-	 * Callback function for {@link make_clickable()}.
+	 * Callback function to make URLs clickable
+	 *
+	 * @param string Text
+	 * @param string Url delimeter
+	 * @param string Additional attributes for tag <a>
+	 * @return string The clickable text.
+	 */
+	function make_clickable_callback_urls( $text, $moredelim = '&amp;', $additional_attrs = '' )
+	{
+		if( ! empty( $additional_attrs ) )
+		{
+			$additional_attrs = ' '.trim( $additional_attrs );
+		}
+
+		$pattern_domain = '([\p{L}0-9\-]+\.[\p{L}0-9\-.\~]+)'; // a domain name (not very strict)
+		$text = preg_replace(
+			/* Tblue> I removed the double quotes from the first RegExp because
+						it made URLs in tag attributes clickable.
+						See http://forums.b2evolution.net/viewtopic.php?p=92073 */
+			array( '#(^|[\s>\(]|\[url=)(https?)://([^"<>{}\s]+[^".,:;!\?<>{}\s\]\)])#i',
+				'#(^|[\s>\(]|\[url=)www\.'.$pattern_domain.'([^"<>{}\s]*[^".,:;!\?\s\]\)])#i' ),
+			array( '$1<a href="$2://$3"'.$additional_attrs.'>$2://$3</a>',
+				'$1<a href="http://www.$2$3$4"'.$additional_attrs.'>www.$2$3$4</a>' ),
+			$text );
+
+		return $text;
+	}
+
+
+	/**
+	 * Callback function to make email addresses clickable
+	 *
+	 * @param string Text
+	 * @param string Url delimeter
+	 * @param string Additional attributes for tag <a>
+	 * @return string The clickable text.
+	 */
+	function make_clickable_callback_emails( $text, $moredelim = '&amp;', $additional_attrs = '' )
+	{
+		if( ! empty( $additional_attrs ) )
+		{
+			$additional_attrs = ' '.trim( $additional_attrs );
+		}
+
+		$pattern_domain = '([\p{L}0-9\-]+\.[\p{L}0-9\-.\~]+)'; // a domain name (not very strict)
+		$text = preg_replace(
+			/* Tblue> I removed the double quotes from the first RegExp because
+						it made URLs in tag attributes clickable.
+						See http://forums.b2evolution.net/viewtopic.php?p=92073 */
+			array( '#(^|[\s>\(]|\[url=)mailto://([^"<>{}\s]+[^".,:;!\?<>{}\s\]\)])#i',
+				'#(^|[\s>\(]|\[url=)([a-z0-9\-_.]+?)@'.$pattern_domain.'([^".,:;!\?&<\s\]\)]+)#i' ),
+			array( '$1<a href="mailto://$2"'.$additional_attrs.'>mailto://$2</a>',
+				'$1<a href="mailto:$2@$3$4"'.$additional_attrs.'>$2@$3$4</a>' ),
+			$text );
+
+		return $text;
+	}
+
+
+	/**
+	 * Callback function to make terms/definitions, usernames or tags clickable
 	 *
 	 * @param string Text
 	 * @param string Url delimeter
 	 * @return string The clickable text.
 	 */
-	function make_clickable_callback( $text, $moredelim = '&amp;' )
+	function make_clickable_callback_definitions( $text, $moredelim = '&amp;' )
 	{
 		global $evo_charset;
 

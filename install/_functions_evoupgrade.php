@@ -12003,6 +12003,30 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15560, 'Upgrading settings of the plugin "Auto Links"...' ) )
+	{	// part of 7.0.2-beta
+		$autolinks_plugin_SQL = new SQL( 'Get autolinks plugin ID by class name' );
+		$autolinks_plugin_SQL->SELECT( 'plug_ID, pset_value' );
+		$autolinks_plugin_SQL->FROM( 'T_plugins' );
+		$autolinks_plugin_SQL->FROM_add( 'LEFT JOIN T_pluginsettings ON plug_ID = pset_plug_ID' );
+		$autolinks_plugin_SQL->WHERE( 'plug_classname = "autolinks_plugin"' );
+		$autolinks_plugin_SQL->WHERE_and( 'pset_name = "autolink"' );
+		if( $autolinks_plugin = $DB->get_row( $autolinks_plugin_SQL ) )
+		{	// Only if autolinks plugin is detected in DB:
+			$plugin_value = ( empty( $autolinks_plugin->pset_value ) ? false : @unserialize( $autolinks_plugin->pset_value ) );
+			if( is_array( $plugin_value ) && empty( $plugin_value['urls'] ) )
+			{	// Try to update only not default value (default value is checked):
+				$DB->query( 'INSERT INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+					SELECT blog_ID, "plugin'.$autolinks_plugin->plug_ID.'_autolink_urls", 0
+					  FROM T_blogs' );
+				$DB->query( 'INSERT INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+					SELECT blog_ID, "plugin'.$autolinks_plugin->plug_ID.'_autolink_emails", 0
+					  FROM T_blogs' );
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
