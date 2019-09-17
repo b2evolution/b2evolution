@@ -515,7 +515,7 @@ function convert_lang_to_locale( $table, $columnlang, $columnID )
  * Initialize some environment global variables like $Setting, $Plugins and etc.
  * which are used to work with objects like Blog, Item, ItemType and etc.
  *
- * @param string Name of environment global variables separated by comma, possible values: 'Settings', 'Plugins'
+ * @param string Name of environment global variables separated by comma, possible values: 'Settings', 'Plugins', 'Plugins_admin'
  */
 function upg_init_environment( $env_vars = 'Settings' )
 {
@@ -550,6 +550,12 @@ function upg_init_environment( $env_vars = 'Settings' )
 				global $Plugins;
 				load_class( 'plugins/model/_plugins.class.php', 'Plugins' );
 				$Plugins = new Plugins();
+				break;
+
+			case 'Plugins_admin':
+				// Create Plugins object:
+				global $Plugins_admin;
+				$Plugins_admin = & get_Plugins_admin();
 				break;
 		}
 
@@ -11963,6 +11969,37 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				'comment_author_url_sponsored' => 'TINYINT(1) NOT NULL DEFAULT 0 AFTER comment_author_url_ugc',
 			),
 		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15550, 'Installing new plugin "Nofollow UGC Sponsored"...' ) )
+	{	// part of 7.0.2-beta
+		upg_init_environment( 'Settings,Plugins,Plugins_admin' );
+		install_plugin( 'nofollow_plugin',true, array(), array( 'single_task' => false ) );
+		$nofollow_plugin_SQL = new SQL( 'Get nofollow plugin ID by class name' );
+		$nofollow_plugin_SQL->SELECT( 'plug_ID' );
+		$nofollow_plugin_SQL->FROM( 'T_plugins' );
+		$nofollow_plugin_SQL->WHERE( 'plug_classname = "nofollow_plugin"' );
+		if( $nofollow_plugin_ID = $DB->get_var( $nofollow_plugin_SQL ) )
+		{	// Only if nofollow plugin is detected in DB:
+			$coll_plug_settings_SQL = new SQL( 'Get autolinks plugin settings per collections in order to move them into nofollow plugin' );
+			$coll_plug_settings_SQL->SELECT( 'cset_coll_ID, cset_value' );
+			$coll_plug_settings_SQL->FROM( 'T_coll_settings' );
+			$coll_plug_settings_SQL->FROM_add( 'INNER JOIN T_plugins ON cset_name = CONCAT( "plugin", plug_ID, "_autolink_post_nofollow" )' );
+			$coll_plug_settings_SQL->WHERE( 'plug_classname = "autolinks_plugin"' );
+			$coll_plug_settings = $DB->get_results( $coll_plug_settings_SQL );
+			foreach( $coll_plug_settings as $coll_plug_setting )
+			{
+				$coll_plug_setting_values = @unserialize( $coll_plug_setting->cset_value );
+				// If "No follow in posts" was enabled for pre-existings or explicit links in autolinks plugin:
+				$nofollow_value = ( ! empty( $coll_plug_setting_values['exist'] ) || ! empty( $coll_plug_setting_values['explicit'] ) ? 1 : 0 );
+				$DB->query( 'REPLACE INTO T_coll_settings ( cset_coll_ID, cset_name, cset_value )
+					VALUES ( '.$coll_plug_setting->cset_coll_ID.',
+					         "plugin'.$nofollow_plugin_ID.'_abs_links_posts",
+					         '.$DB->quote( serialize( array( 'nofollow' => $nofollow_value ) ) ).' )' );
+			}
+		}
+		upg_clear_environment();
 		upg_task_end();
 	}
 

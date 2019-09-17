@@ -851,16 +851,25 @@ function install_basic_plugins( $old_db_version = 0 )
  * @param string Plugin name
  * @param boolean TRUE - to activate plugin
  * @param array Plugin settings
+ * @param array Additional params
  * @return true on success
  */
-function install_plugin( $plugin, $activate = true, $settings = array() )
+function install_plugin( $plugin, $activate = true, $settings = array(), $params = array() )
 {
 	/**
 	 * @var Plugins_admin
 	 */
 	global $Plugins_admin;
 
-	task_begin( 'Installing plugin: '.$plugin.'... ' );
+	$params = array_merge( array(
+			'single_task' => true,
+		), $params );
+
+	if( $params['single_task'] )
+	{
+		task_begin( 'Installing plugin: '.$plugin.'... ' );
+	}
+
 	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later
 	if( ! ( $edit_Plugin instanceof Plugin ) )
 	{ // Broken plugin
@@ -900,7 +909,11 @@ function install_plugin( $plugin, $activate = true, $settings = array() )
 		$Plugins_admin->set_Plugin_status( $edit_Plugin, 'disabled' );
 	}
 
-	task_end();
+	if( $params['single_task'] )
+	{
+		task_end();
+	}
+
 	return true;
 }
 
