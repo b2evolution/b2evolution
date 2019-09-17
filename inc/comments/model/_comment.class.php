@@ -4141,6 +4141,16 @@ class Comment extends DataObject
 
 			// Select users which have permission to the edited_Item meta comments and would like to recieve notifications:
 			$notify_users = $DB->get_assoc( $meta_SQL );
+
+			// Get list of users who want to be notified when his login is mentioned in the comment content by @user's_login:
+			$mentioned_user_IDs = get_mentioned_user_IDs( 'comment', $this->get( 'content' ), $already_notified_user_IDs );
+			foreach( $mentioned_user_IDs as $mentioned_user_ID )
+			{
+				if( ! isset( $notify_users[ $mentioned_user_ID ] ) )
+				{	// Don't rewrite a notify type if user already is notified by other type before:
+					$notify_users[ $mentioned_user_ID ] = 'comment_mentioned';
+				}
+			}
 		}
 
 		if( $executed_by_userid !== NULL && isset( $notify_users[ $executed_by_userid ] ) )
