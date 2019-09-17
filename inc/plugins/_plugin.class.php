@@ -4365,6 +4365,36 @@ class Plugin
 		$Blog->delete_setting( $blog_setting_name );
 	}
 
+
+	/**
+	 * Get a specific param value
+	 *
+	 * @param string Setting name
+	 * @param string Input group name
+	 * @return string Setting value
+	 */
+	function get_setting( $parname, $group = NULL )
+	{
+		if( empty( $this->Settings ) )
+		{
+			global $Plugins;
+			$Plugins->instantiate_Settings( $this, 'Settings' );
+		}
+
+		$value = $this->Settings->get( $parname );
+
+		if( $value !== NULL )
+		{ // We have a value for this param:
+			return $value;
+		}
+
+		// Try default values:
+		$tmp_params = array( 'for_editing' => true );
+		$params = $this->GetDefaultSettings( $tmp_params );
+
+		return $this->get_default_setting( $parname, $params, $group );
+	}
+
 	/**
 	 * Get a message specific param value
 	 *
@@ -4707,7 +4737,7 @@ class Plugin
 				break;
 
 			default:
-				$group_array = $this->Settings->get( $group_name );
+				$group_array = $this->get_setting( $group_name );
 		}
 
 		return isset( $group_array[ $setting_name ] ) ? $group_array[ $setting_name ] : NULL;
