@@ -256,6 +256,10 @@ switch( $action )
 		// Update the folding positions for current user per collection:
 		save_fieldset_folding_values( $Blog->ID );
 
+		// Check if current User can edit special comment settings which are allowed only from back-office:
+		$can_edit_backoffice_settings = ( param( 'from', 'string' ) == 'backoffice' &&
+			$current_User->check_perm( 'admin', 'restricted' ) );
+
 		if( $edited_Comment->get_author_User() )
 		{	// This comment has been created by member
 			if( $current_User->check_perm( 'users', 'edit' ) && param( 'comment_author_login', 'string', NULL ) !== NULL )
@@ -274,8 +278,6 @@ switch( $action )
 			param( 'newcomment_author', 'string', true );
 			param( 'newcomment_author_email', 'string' );
 			param( 'newcomment_author_url', 'string' );
-			param( 'comment_allow_msgform', 'integer', 0 /* checkbox */ );
-			param( 'comment_anon_notify', 'integer', 0 );
 
 			param_check_not_empty( 'newcomment_author', T_('Please enter an author name.'), '' );
 			$edited_Comment->set( 'author', $newcomment_author );
@@ -283,8 +285,14 @@ switch( $action )
 			$edited_Comment->set( 'author_email', $newcomment_author_email );
 			param_check_url( 'newcomment_author_url', 'posting', '' ); // Give posting permissions here
 			$edited_Comment->set( 'author_url', $newcomment_author_url );
-			$edited_Comment->set( 'allow_msgform', $comment_allow_msgform );
-			$edited_Comment->set( 'anon_notify', $comment_anon_notify );
+			
+			if( $can_edit_backoffice_settings )
+			{	// It can be updated only from back-office:
+				param( 'comment_allow_msgform', 'integer', 0 );
+				$edited_Comment->set( 'allow_msgform', $comment_allow_msgform );
+				param( 'comment_anon_notify', 'integer', 0 );
+				$edited_Comment->set( 'anon_notify', $comment_anon_notify );
+			}
 		}
 
 		// Move to different post
@@ -414,14 +422,17 @@ switch( $action )
 			$edited_Comment->set( 'status', $comment_status );
 		}
 
-		param( 'comment_author_url_nofollow', 'integer', 0 );
-		$edited_Comment->set_from_Request( 'author_url_nofollow' );
+		if( $can_edit_backoffice_settings )
+		{	// It can be updated only from back-office:
+			param( 'comment_author_url_nofollow', 'integer', 0 );
+			$edited_Comment->set_from_Request( 'author_url_nofollow' );
 
-		param( 'comment_author_url_ugc', 'integer', 0 );
-		$edited_Comment->set_from_Request( 'author_url_ugc' );
+			param( 'comment_author_url_ugc', 'integer', 0 );
+			$edited_Comment->set_from_Request( 'author_url_ugc' );
 
-		param( 'comment_author_url_sponsored', 'integer', 0 );
-		$edited_Comment->set_from_Request( 'author_url_sponsored' );
+			param( 'comment_author_url_sponsored', 'integer', 0 );
+			$edited_Comment->set_from_Request( 'author_url_sponsored' );
+		}
 
 		if( $Messages->has_errors() )
 		{	// There have been some validation errors:

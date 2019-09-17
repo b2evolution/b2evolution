@@ -333,7 +333,7 @@ function tool_create_sample_revisions( $blog_ID, $min_revisions = 1, $max_revisi
 				$editor_user_id = $editor_Users[rand( 0, $editors_count - 1 )];
 			}
 
-			$sql = 'INSERT INTO T_items__version( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_datetime, iver_status, iver_title, iver_content )
+			$sql = 'INSERT INTO T_items__version( iver_ID, iver_itm_ID, iver_edit_user_ID, iver_edit_last_touched_ts, iver_status, iver_title, iver_content )
 				SELECT "'.$iver_ID.'" AS iver_ID, post_ID, '.$editor_user_id.', post_datemodified, post_status, CONCAT( post_title, " - revision '.$iver_ID.'" ), post_content
 					FROM T_items__item
 				WHERE post_ID = '.$Item->ID;
