@@ -68,6 +68,7 @@ $Form->add_crumb( 'comment' );
 $Form->hidden( 'ctrl', 'comments' );
 $Form->hidden( 'redirect_to', $redirect_to );
 $Form->hidden( 'comment_ID', $edited_Comment->ID );
+$Form->hidden( 'from', 'backoffice' );
 ?>
 
 <div class="row">
