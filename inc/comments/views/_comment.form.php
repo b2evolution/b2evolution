@@ -132,12 +132,11 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 			$Form->email_input( 'newcomment_author_email', $edited_Comment->author_email, 20, T_('Email'), array( 'maxlength' => 255, 'style' => 'width:100%' ) );
 			$Form->checkbox( 'comment_allow_msgform', $edited_Comment->allow_msgform, T_('Allow contact'), T_('If checked, the comment author can be contacted through a form that will send him an email.') );
 			$Form->checkbox( 'comment_anon_notify', $edited_Comment->anon_notify, T_('Notify me of replies') );
-			$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'), '', array( 'maxlength' => 255, 'style' => 'width:100%' ) );
-			$Form->begin_line();
-				$Form->checkbox_input( 'comment_author_url_nofollow', $edited_Comment->author_url_nofollow, '<label class="text-normal pointer">', array( 'input_suffix' => ' '.T_('Nofollow').'</label> &nbsp; ' ) );
-				$Form->checkbox_input( 'comment_author_url_ugc', $edited_Comment->author_url_ugc, '<label class="text-normal pointer">', array( 'input_suffix' => ' '.T_('UGC').'</label> &nbsp; ' ) );
-				$Form->checkbox_input( 'comment_author_url_sponsored', $edited_Comment->author_url_sponsored, '<label class="text-normal pointer">', array( 'input_suffix' => ' '.T_('Sponsored').'</label>' ) );
-			$Form->end_line();
+			$Form->text_input( 'newcomment_author_url', $edited_Comment->author_url, 20, T_('Website URL'),
+				'<label><input type="checkbox" name="comment_author_url_nofollow" value="1"'.( $edited_Comment->author_url_nofollow ? ' checked="checked"' : '' ).' /> Nofollow</label> &nbsp; '.
+				'<label><input type="checkbox" name="comment_author_url_ugc" value="1"'.( $edited_Comment->author_url_ugc ? ' checked="checked"' : '' ).' /> UGC</label> &nbsp; '.
+				'<label><input type="checkbox" name="comment_author_url_sponsored" value="1"'.( $edited_Comment->author_url_sponsored ? ' checked="checked"' : '' ).' /> Sponsored</label>',
+				array( 'maxlength' => 255, 'style' => 'width:100%' ) );
 		}
 
 		echo '</div>';
