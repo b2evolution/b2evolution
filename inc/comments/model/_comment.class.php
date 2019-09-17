@@ -925,6 +925,8 @@ class Comment extends DataObject
 	 */
 	function get_author_name_anonymous( $format = 'htmlbody', $params = array() )
 	{
+		global $Plugins;
+
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before' => '',
@@ -939,6 +941,12 @@ class Comment extends DataObject
 		}
 
 		$author_name = $this->dget( 'author', $format );
+
+		// Call plugins to filter name of anonymous user:
+		$Plugins->trigger_event( 'FilterCommentAuthor', array(
+			'data' => & $author_name,
+			'Comment' => & $this,
+		) );
 
 		if( is_null( $params['rel'] ) )
 		{ // Set default rel:
@@ -1200,14 +1208,6 @@ class Comment extends DataObject
 					break;
 			}
 		}
-
-		$hook_params = array(
-			'data' => & $r,
-			'Comment' => & $this,
-			'makelink' => ! empty($params['link_to']),
-		);
-
-		$Plugins->trigger_event( 'FilterCommentAuthor', $hook_params );
 
 		return $r;
 	}

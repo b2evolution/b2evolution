@@ -2212,11 +2212,10 @@ class Plugin
 	}
 
 	/**
-	 * Event handler: called to filter the comment's author name (blog name for trackbacks)
+	 * Event handler: called to filter the comment's anonymous author name
 	 *
 	 * @param array Associative array of parameters
 	 *   - 'data': the name of the author/blog (by reference)
-	 *   - 'makelink': true, if the "data" contains a link
 	 *   - 'Comment': the {@link Comment} object
 	 */
 	function FilterCommentAuthor( & $params )
