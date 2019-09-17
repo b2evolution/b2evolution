@@ -2512,6 +2512,10 @@ function echo_item_selector_js()
 	$evo_item_selector_js_initialized = true;
 ?>
 <script>
+/**
+ * This opens a modal window to select another Item for different purposes like posts merging, comment's post changing, post versions linking and etc. in future.
+ * There is almost similar function in the plugin "Short Links" named shortlinks_load_window() that allows to select a post and insert various types of short links in brackets.
+ */
 function evo_item_selector_load_window( item_ID, window_titles, restriction_message, submit_buttons, default_coll_ID, api_coll_path, api_coll_params )
 {
 	if( item_ID < 1 || ( restriction_message !== false && typeof( bozo ) && bozo.nb_changes > 0 ) )

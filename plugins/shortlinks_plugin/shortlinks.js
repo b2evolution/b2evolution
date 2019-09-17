@@ -1,5 +1,6 @@
 /**
- * Load main modal window to select collection and posts
+ * This opens a modal window to select a post and insert various types of short links in brackets.
+ * There is a similar function in the core named evo_item_selector_load_window() that is used for posts merging, comment's post changing, post versions linking and etc. in future.
  */
 function shortlinks_load_window( prefix )
 {
