@@ -63,6 +63,7 @@ $params = array_merge( array(
 		'excerpt_image_limit'      => 0,
 		'excerpt_image_link_to'    => 'single',
 		'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
+		'display_teaser_images'    => true,
 
 		'before_gallery'           => '<div class="evo_post_gallery">',
 		'after_gallery'            => '</div>',
@@ -160,7 +161,7 @@ switch( $content_mode )
 		// Compact display:
 		echo $params['content_start_excerpt'];
 
-		if( !empty($params['excerpt_image_size']) && !empty($params['excerpt_image_limit']) )
+		if( $params['display_teaser_images'] && !empty($params['excerpt_image_size']) && !empty($params['excerpt_image_limit']) )
 		{
 			// Display images that are linked to this post:
 			$Item->images( array(
@@ -212,7 +213,7 @@ switch( $content_mode )
 		// Normal dislpay:  (and Full display if force_more is true)
 		echo $params['content_start_full'];
 
-		if( ! empty($params['image_size']) )
+		if( $params['display_teaser_images'] && ! empty($params['image_size']) )
 		{
 			// Display images that are linked to this post:
 			$Item->images( array(
