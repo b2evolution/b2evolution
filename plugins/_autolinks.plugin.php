@@ -206,7 +206,7 @@ class autolinks_plugin extends Plugin
 						'label' => T_('No follow in posts'),
 						'type' => 'checklist',
 						'options' => array(
-							array( 'auto', $this->T_('Add rel="nofollow" to auto-links'), $default_values['autolink_post_nofollow_auto'] ),
+							array( 'auto', $this->T_('Add rel="nofollow" to links from autolink definitions'), $default_values['autolink_post_nofollow_auto'] ),
 						)
 					),
 				// No follow in comments
@@ -214,7 +214,7 @@ class autolinks_plugin extends Plugin
 						'label' => T_('No follow in comments'),
 						'type' => 'checklist',
 						'options' => array(
-							array( 'auto', $this->T_('Add rel="nofollow" to auto-links'), $default_values['autolink_comment_nofollow_auto'] ),
+							array( 'auto', $this->T_('Add rel="nofollow" to links from autolink definitions'), $default_values['autolink_comment_nofollow_auto'] ),
 						)
 					),
 			)
@@ -791,13 +791,7 @@ class autolinks_plugin extends Plugin
 		if( preg_match_all( $search_list, $content, $user_matches ) )
 		{
 			// Add this for rel attribute in order to activate bubbletips on usernames
-			$link_attr_rel = 'bubbletip_user_%user_ID%';
-
-			if( $this->setting_nofollow_auto )
-			{	// Add attribute rel="nofollow" for auto-links:
-				$link_attr_rel .= ' nofollow';
-			}
-			$link_attrs = ' rel="'.$link_attr_rel.'"';
+			$link_attrs = ' rel="bubbletip_user_%user_ID%"';
 			$link_attrs .= ' class="user"';
 
 			if( !empty( $user_matches[1] ) )
