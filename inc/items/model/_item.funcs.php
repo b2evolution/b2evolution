@@ -4915,7 +4915,7 @@ function echo_image_insert_modal()
 	echo_modalwindow_js();
 ?>
 <script>
-	function evo_item_image_insert( blog, tagType, linkID )
+	function evo_item_image_insert( blog, tagType, linkID, prefix )
 	{
 		var evo_js_lang_loading = '<?php echo TS_('Loading');?>';
 		var evo_js_lang_insert_image = '<?php echo TS_('Insert image into content');?>';
@@ -4935,6 +4935,7 @@ function echo_image_insert_modal()
 				'link_ID': linkID,
 				'blog': blog,
 				'request_from': '<?php echo is_admin_page() ? 'back' : 'front';?>',
+				'prefix': ( typeof( prefix ) == 'undefined' ? '' : prefix ),
 			},
 			success: function(result)
 			{

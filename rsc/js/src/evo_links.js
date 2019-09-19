@@ -124,15 +124,16 @@ function evo_link_change_position( selectInput, url, crumb )
  * @param string Caption text
  * @param boolean Replace a selected text
  * @param string Caption, when this param is filled then tag is inserted in format like [image:123]Caption[/image]
+ * @param object Current canvas where inline tag should be inserted
  */
-function evo_link_insert_inline( type, link_ID, option, replace, caption )
+function evo_link_insert_inline( type, link_ID, option, replace, caption, current_b2evoCanvas )
 {
 	if( replace == undefined )
 	{
 		replace = 0;
 	}
 
-	if( typeof( b2evoCanvas ) != 'undefined' )
+	if( typeof( current_b2evoCanvas ) != 'undefined' )
 	{	// Canvas exists
 		var insert_tag = '[' + type + ':' + link_ID;
 
@@ -164,18 +165,18 @@ function evo_link_insert_inline( type, link_ID, option, replace, caption )
 						$position_selector.closest( 'td' ).removeClass( 'error' );
 
 						// Insert an image tag
-						textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+						textarea_wrap_selection( current_b2evoCanvas, insert_tag, '', replace, window.document );
 					}, 'POST' );
 				deferInlineReminder = false;
 			}
 			else
 			{	// Already an inline, insert image tag
-				textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+				textarea_wrap_selection( current_b2evoCanvas, insert_tag, '', replace, window.document );
 			}
 		}
 		else
 		{
-			textarea_wrap_selection( b2evoCanvas, insert_tag, '', replace, window.document );
+			textarea_wrap_selection( current_b2evoCanvas, insert_tag, '', replace, window.document );
 		}
 	}
 }
@@ -273,8 +274,9 @@ function evo_link_change_order( event_object, link_ID, action )
  * @param integer ID of Item or Comment
  * @param string Root (example: 'collection_1')
  * @param string Path to the file relative to root
+ * @param string Prefix, e.g. "meta_"
  */
-function evo_link_attach( type, object_ID, root, path )
+function evo_link_attach( type, object_ID, root, path, prefix )
 {
 	// Call REST API request to attach a file to Item/Comment:
 	evo_rest_api_request( 'links',
@@ -287,8 +289,11 @@ function evo_link_attach( type, object_ID, root, path )
 	},
 	function( data )
 	{
-		var table_obj = jQuery( '#attachments_fieldset_table .results table', window.parent.document );
-		var table_parent = table_obj.parent;
+		if( typeof( prefix ) == 'undefined' )
+		{
+			prefix = '';
+		}
+		var table_obj = jQuery( '#' + prefix + 'attachments_fieldset_table .results table', window.parent.document );
 		var results_obj = jQuery( data.list_content );
 		table_obj.replaceWith( jQuery( 'table', results_obj ) ).promise().done( function( e ) {
 			// Delay for a few milleseconds after content is loaded to get the correct height

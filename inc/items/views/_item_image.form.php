@@ -247,7 +247,7 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 					echo "\n".'// END JS from plugin #'.$plugin_ID.'.'."\n\n";
 				}
 				?>
-				window.parent.evo_link_insert_inline( tagType, linkID, options, <?php echo $replace;?>, tag_caption );
+				window.parent.evo_link_insert_inline( tagType, linkID, options, <?php echo $replace;?>, tag_caption, <?php echo param( 'prefix', 'string' ); ?>b2evoCanvas );
 
 				closeModalWindow();
 

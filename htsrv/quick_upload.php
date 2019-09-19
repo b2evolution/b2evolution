@@ -383,7 +383,7 @@ if( $upload )
 					'file_type'     => $newFile->get_file_type(),
 					'link_position' => $new_Link->get( 'position' ),
 				);
-			$message['link_position'] = display_link_position( $mask_row, $fm_mode != 'file_select'  );
+			$message['link_position'] = display_link_position( $mask_row, $fm_mode != 'file_select', param( 'prefix', 'string' ) );
 		}
 
 		out_echo( $message, $specialchars );
