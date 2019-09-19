@@ -133,13 +133,6 @@ class autolinks_plugin extends Plugin
 	function get_custom_setting_definitions( & $params )
 	{
 		return array(
-			'autolink_defs_coll_db' => array(
-					'label' => T_( 'Custom autolink definitions' ),
-					'type' => 'html_textarea',
-					'rows' => 15,
-					'note' => $this->T_( 'Enter custom definitions above.' ),
-					'defaultvalue' => '',
-				),
 			'autolink_urls' => array(
 					'label' => $this->T_('Autolink URLs'),
 					'type' => 'checkbox',
@@ -158,6 +151,13 @@ class autolinks_plugin extends Plugin
 					// TRANS: the user can type in any username after "@" but it's typically only lowercase letters and no spaces.
 					'note' => $this->T_( '@username will link to the user profile page' ),
 					'defaultvalue' => 0,
+				),
+			'autolink_defs_coll_db' => array(
+					'label' => T_( 'Custom autolink definitions' ),
+					'type' => 'html_textarea',
+					'rows' => 15,
+					'note' => $this->T_( 'Enter custom definitions above.' ),
+					'defaultvalue' => '',
 				),
 		);
 	}
@@ -179,14 +179,28 @@ class autolinks_plugin extends Plugin
 
 		// set params to allow rendering for comments by default
 		$default_params = array_merge( $params, array( 'default_comment_rendering' => 'stealth' ) );
-		return array_merge( parent::get_coll_setting_definitions( $default_params ),
+		$coll_params = parent::get_coll_setting_definitions( $default_params );
+
+		if( isset( $coll_params['autolink_defs_coll_db'] ) )
+		{	// Store this param in order to put under "Autolink tags":
+			$coll_param_autolink_defs_coll_db = $coll_params['autolink_defs_coll_db'];
+			unset( $coll_params['autolink_defs_coll_db'] );
+		}
+
+		$coll_params['autolink_tag'] = array(
+				'label' => T_('Autolink tags'),
+				'type' => 'checkbox',
+				'note' => $this->T_( 'Find text matching tags of the current collection and autolink them to the tag page in the current collection' ),
+				'defaultvalue' => $default_values['autolink_tag'],
+			);
+
+		if( isset( $coll_param_autolink_defs_coll_db ) )
+		{	// Put the setting under "Autolink tags":
+			$coll_params['autolink_defs_coll_db'] = $coll_param_autolink_defs_coll_db;
+		}
+
+		return array_merge( $coll_params,
 			array(
-				'autolink_tag' => array(
-						'label' => T_( 'Autolink tags' ),
-						'type' => 'checkbox',
-						'note' => $this->T_( 'Find text matching tags of the current collection and autolink them to the tag page in the current collection' ),
-						'defaultvalue' => $default_values['autolink_tag'],
-					),
 				// No follow in posts
 				'autolink_post_nofollow' => array(
 						'label' => T_('No follow in posts'),
