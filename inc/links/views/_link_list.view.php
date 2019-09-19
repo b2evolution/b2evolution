@@ -94,7 +94,7 @@ $Results->cols[] = array(
 					'th' => T_('Position'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'nowrap '.( count( $LinkOwner->get_positions() ) > 1 ? 'left' : 'center' ),
-					'td' => '%display_link_position( {row}, '.( $fm_mode == 'file_select' ? 'false' : 'true' ).' )%',
+					'td' => '%display_link_position( {row}, '.( $fm_mode == 'file_select' ? 'false' : 'true' ).', "'.$fieldset_prefix.'" )%',
 				);
 
 // Add attr "id" to handle quick uploader

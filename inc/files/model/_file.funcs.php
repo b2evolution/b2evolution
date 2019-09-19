@@ -2375,7 +2375,8 @@ function display_dragdrop_upload_button( $params = array() )
 	$root_and_path = $params['fileroot_ID'].'::'.$params['path'];
 	$quick_upload_url = get_htsrv_url().'quick_upload.php?upload=true'
 		.( empty( $blog ) ? '' : '&blog='.$blog )
-		.'&b2evo_icons_type='.$b2evo_icons_type;
+		.'&b2evo_icons_type='.$b2evo_icons_type
+		.'&prefix='.$params['fieldset_prefix'];
 
 	echo $params['before'];
 

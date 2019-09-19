@@ -558,9 +558,10 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
  *
  * @param object Row of SQL query from T_links and T_files
  * @param boolean Show additional link actions
+ * @param string Fieldset prefix, e.g. "meta_"
  * @return string
  */
-function display_link_position( & $row, $show_actions = true )
+function display_link_position( & $row, $show_actions = true, $fieldset_prefix = '' )
 {
 	global $LinkOwner, $blog, $Blog;
 	global $current_File;
@@ -613,7 +614,7 @@ function display_link_position( & $row, $show_actions = true )
 			{
 				$r .= ' '.get_icon( 'add', 'imgtag', array(
 						'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
-						'onclick' => 'return evo_item_image_insert( '.( empty( $blog ) ? 'null' : $blog ).', \'image\', '.$row->link_ID.' );',
+						'onclick' => 'return evo_item_image_insert( '.( empty( $blog ) ? 'null' : $blog ).', \'image\', '.$row->link_ID.', \''.$fieldset_prefix.'\' );',
 						'style'   => 'cursor:pointer;'
 					) );
 
@@ -622,7 +623,7 @@ function display_link_position( & $row, $show_actions = true )
 			{
 				$r .= ' '.get_icon( 'add__blue', 'imgtag', array(
 							'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
-							'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\' )',
+							'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\', 0, \'\', '.$fieldset_prefix.'b2evoCanvas )',
 							'style'   => 'cursor:pointer;'
 						) );
 
@@ -631,7 +632,7 @@ function display_link_position( & $row, $show_actions = true )
 			{
 				$r .= ' '.get_icon( 'add__cyan', 'imgtag', array(
 							'title'   => sprintf( T_('Insert %s tag into the post'), '[folder:]' ),
-							'onclick' => 'evo_link_insert_inline( \'folder\', '.$row->link_ID.', \'\' )',
+							'onclick' => 'evo_link_insert_inline( \'folder\', '.$row->link_ID.', \'\', 0, \'\', '.$fieldset_prefix.'b2evoCanvas )',
 							'style'   => 'cursor:default;'
 						) );
 			}
