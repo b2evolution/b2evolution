@@ -1048,13 +1048,25 @@ class Skin extends DataObject
 			}
 		}
 
+		// Replace mask with setting value:
+		$this->add_dynamic_style( str_replace( '$setting_value$', $setting_value, $style_template ) );
+	}
+
+
+	/**
+	 * Add style rule in array $this->dynamic_styles
+	 *
+	 * @param string Style rule
+	 */
+	function add_dynamic_style( $style_rule )
+	{
 		if( ! isset( $this->dynamic_styles ) )
 		{
 			$this->dynamic_styles = array();
 		}
 
 		// Replace mask with setting value:
-		$this->dynamic_styles[] = str_replace( '$setting_value$', $setting_value, $style_template );
+		$this->dynamic_styles[] = $style_rule;
 	}
 
 
