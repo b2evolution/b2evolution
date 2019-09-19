@@ -273,8 +273,9 @@ function evo_link_change_order( event_object, link_ID, action )
  * @param integer ID of Item or Comment
  * @param string Root (example: 'collection_1')
  * @param string Path to the file relative to root
+ * @param string Prefix, e.g. "meta_"
  */
-function evo_link_attach( type, object_ID, root, path )
+function evo_link_attach( type, object_ID, root, path, prefix )
 {
 	// Call REST API request to attach a file to Item/Comment:
 	evo_rest_api_request( 'links',
@@ -287,8 +288,11 @@ function evo_link_attach( type, object_ID, root, path )
 	},
 	function( data )
 	{
-		var table_obj = jQuery( '#attachments_fieldset_table .results table', window.parent.document );
-		var table_parent = table_obj.parent;
+		if( typeof( prefix ) == 'undefined' )
+		{
+			prefix = '';
+		}
+		var table_obj = jQuery( '#' + prefix + 'attachments_fieldset_table .results table', window.parent.document );
 		var results_obj = jQuery( data.list_content );
 		table_obj.replaceWith( jQuery( 'table', results_obj ) ).promise().done( function( e ) {
 			// Delay for a few milleseconds after content is loaded to get the correct height

@@ -309,7 +309,7 @@ $Form->begin_form();
 						$link_attribs['target'] = $iframe_name;
 						$link_attribs['onclick'] = 'return evo_link_attach( \''.$LinkOwner->type.'\', '.$LinkOwner->get_ID()
 								.', \''.FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() )
-								.'\', \''.$lFile->get_rdfp_rel_path().'\' )';
+								.'\', \''.$lFile->get_rdfp_rel_path().'\', \''.param( 'prefix', 'string' ).'\' )';
 						$link_action = 'link_inpost';
 					}
 					echo action_icon( T_('Link this file!'), 'link',
