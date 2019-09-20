@@ -4094,8 +4094,16 @@ class Comment extends DataObject
 		}
 		else
 		{	// Get the notify users for META comments:
+
+			// Get list of users who want to be notified when his login is mentioned in the meta comment content by @user's_login:
+			$mentioned_user_IDs = get_mentioned_user_IDs( 'meta_comment', $this->get( 'content' ), $already_notified_user_IDs );
+			foreach( $mentioned_user_IDs as $mentioned_user_ID )
+			{
+				$notify_users[ $mentioned_user_ID ] = 'meta_comment_mentioned';
+			}
+
 			$meta_SQL = new SQL( 'Select users which have permission to the edited_Item #'.$comment_Item->ID.' meta comments and would like to recieve notifications' );
-			$meta_SQL->SELECT( 'user_ID, "meta_comment"' );
+			$meta_SQL->SELECT( 'user_ID' );
 			$meta_SQL->FROM( 'T_users' );
 			$meta_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
 			$meta_SQL->FROM_add( 'LEFT JOIN T_groups__groupsettings ON user_grp_ID = gset_grp_ID AND gset_name = "perm_admin"' );
@@ -4140,15 +4148,14 @@ class Comment extends DataObject
 			$meta_SQL->WHERE_and( $users_with_item_edit_perms );
 
 			// Select users which have permission to the edited_Item meta comments and would like to recieve notifications:
-			$notify_users = $DB->get_assoc( $meta_SQL );
+			$notify_list = $DB->get_col( $meta_SQL );
 
-			// Get list of users who want to be notified when his login is mentioned in the comment content by @user's_login:
-			$mentioned_user_IDs = get_mentioned_user_IDs( 'comment', $this->get( 'content' ), $already_notified_user_IDs );
-			foreach( $mentioned_user_IDs as $mentioned_user_ID )
+			// Preprocess list:
+			foreach( $notify_list as $notification_user_ID )
 			{
-				if( ! isset( $notify_users[ $mentioned_user_ID ] ) )
+				if( ! isset( $notify_users[ $notification_user_ID ] ) )
 				{	// Don't rewrite a notify type if user already is notified by other type before:
-					$notify_users[ $mentioned_user_ID ] = 'comment_mentioned';
+					$notify_users[ $notification_user_ID ] = 'meta_comment';
 				}
 			}
 		}
@@ -4390,6 +4397,7 @@ class Comment extends DataObject
 
 				case 'blog_subscription': // blog subscription
 				case 'comment_mentioned': // user was mentioned in the comment content
+				case 'meta_comment_mentioned': // user was mentioned in the meta comment content
 				case 'item_subscription': // item subscription for registered user
 				case 'anon_subscription': // item subscription for anonymous user
 				case 'meta_comment': // meta comment notification

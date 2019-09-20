@@ -34,7 +34,7 @@ $Collection = $Blog = $params['Blog'];
 $Item = $params['Item'];
 $recipient_User = & $params['recipient_User'];
 
-if( $params['notify_type'] == 'meta_comment' )
+if( $params['notify_type'] == 'meta_comment' || $params['notify_type'] == 'meta_comment_mentioned' )
 { // Meta comment
 	$info_text = T_( '%s posted a new meta comment on %s in %s.' );
 }
@@ -48,6 +48,10 @@ $notify_message = sprintf( $info_text, $params['author_name'].$author_type, '"'.
 if( $params['notify_type'] == 'comment_mentioned' )
 {	// Add this info line if user was mentioned in the comment content:
 	$notify_message .= T_( 'You were mentioned in this comment.' )."\n\n";
+}
+elseif( $params['notify_type'] == 'meta_comment_mentioned' )
+{	// Add this info line if user was mentioned in the meta comment content:
+	$notify_message .= T_( 'You were mentioned in this meta comment.' )."\n\n";
 }
 
 if( $params['notify_full'] )
@@ -172,6 +176,13 @@ switch( $params['notify_type'] )
 		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mention your name in a comment.' )."\n"
 			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a comment, click here' ).': '
 			.get_htsrv_url().'quick_unsubscribe.php?type=comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$';
+		break;
+
+	case 'meta_comment_mentioned':
+		// user is mentioned in the meta comment
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this meta comment, and you are receiving notifications when anyone mention your name in a meta comment.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a meta comment, click here' ).': '
+			.get_htsrv_url().'quick_unsubscribe.php?type=meta_comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 
 	case 'blog_subscription':

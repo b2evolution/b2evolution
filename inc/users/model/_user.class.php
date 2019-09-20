@@ -1604,7 +1604,8 @@ class User extends DataObject
 					$UserSettings->set( 'notify_spam_cmt_moderation', param( 'edited_user_notify_spam_cmt_moderation', 'integer', 0 ), $this->ID );
 				}
 				if( $this->check_perm( 'admin', 'restricted', false ) )
-				{ // update 'notify_meta_comments' only if edited user has a permission to back-office
+				{	// update 'notify_meta_comment_mentioned' ans 'notify_meta_comments' only if edited user has a permission to back-office:
+					$UserSettings->set( 'notify_meta_comment_mentioned', param( 'edited_user_notify_meta_comment_mentioned', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_meta_comments', param( 'edited_user_notify_meta_comments', 'integer', 0 ), $this->ID );
 				}
 				if( $is_comment_moderator )
