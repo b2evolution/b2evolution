@@ -8304,6 +8304,11 @@ function get_mentioned_user_IDs( $type, $content, $exclude_user_IDs = NULL )
 			$default_setting_name = 'def_notify_comment_mentioned';
 			break;
 
+		case 'meta_comment':
+			$setting_name = 'notify_meta_comment_mentioned';
+			$default_setting_name = 'def_notify_meta_comment_mentioned';
+			break;
+
 		default:
 			debug_die( 'Unknown type "'.$type.'" for function '.__FUNCTION__ );
 	}

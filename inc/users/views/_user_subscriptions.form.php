@@ -476,6 +476,7 @@ $Form->begin_fieldset( T_('Receiving notifications').( is_admin_page() ? get_man
 	}
 	if( $edited_User->check_perm( 'admin', 'restricted', false ) )
 	{ // edited user has a permission to back-office
+		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_meta_comment_mentioned', 1, T_( 'I have been mentioned on a meta comment.' ), $UserSettings->get( 'notify_meta_comment_mentioned', $edited_User->ID ) );
 		$notify_options[ T_('Comments') ][] = array( 'edited_user_notify_meta_comments', 1, T_('a meta comment is posted.'), $UserSettings->get( 'notify_meta_comments', $edited_User->ID ), $disabled );
 	}
 	$notify_options[ T_('Posts') ][] = array( 'edited_user_notify_post_mentioned', 1, T_( 'I have been mentioned on a post.' ), $UserSettings->get( 'notify_post_mentioned', $edited_User->ID ) );
