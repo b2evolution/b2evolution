@@ -2103,6 +2103,7 @@ class User extends DataObject
 				case 'avatar_login':
 					$link_login = $this->get_username();
 					break;
+				case 'force_login':
 				case 'avatar_force_login':
 					$link_login = $this->get( 'login' );
 					break;

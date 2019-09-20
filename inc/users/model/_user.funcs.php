@@ -6781,7 +6781,7 @@ function users_results( & $UserList, $params = array() )
 				'th_class' => $params['th_class_login'],
 				'td_class' => $params['td_class_login'],
 				'order' => 'user_login',
-				'td' => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "login" )%',
+				'td' => '%get_user_identity_link( #user_login#, #user_ID#, "profile", "force_login" )%',
 			);
 	}
 
