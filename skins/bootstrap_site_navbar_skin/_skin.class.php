@@ -469,7 +469,9 @@ footer.bootstrap_site_navbar_footer .container a {
 		// Load all collection from "No Section" and put them after all section tabs:
 		$BlogCache = & get_BlogCache();
 		$BlogCache->clear();
-		$BlogCache->load_where( 'blog_sec_ID = 1' );
+		$public_colls_SQL = $BlogCache->get_public_colls_SQL();
+		$public_colls_SQL->WHERE_and( 'blog_sec_ID = 1' );
+		$BlogCache->load_by_sql( $public_colls_SQL );
 
 		foreach( $BlogCache->cache as $nosec_Blog )
 		{
