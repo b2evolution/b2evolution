@@ -2926,8 +2926,14 @@ Hello
 				'contributors' => T_('Contributors'),
 			);
 
-			// Don't install generic items for this collection type:
-			$demo_items = array();
+			// Don't install generic items(except of two recipes) for this collection type:
+			foreach( $demo_items as $demo_item_key => $demo_item_data )
+			{
+				if( $demo_item_key != 'mongolian_beef' && $demo_item_key != 'stuffed_peppers' )
+				{
+					unset( $demo_items[ $demo_item_key ] );
+				}
+			}
 
 			// Additional sample Items:
 			$demo_items['about_minisite'] = array(

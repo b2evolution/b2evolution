@@ -1,0 +1,25 @@
+#tbhs_items_menu_large {
+  text-align: center;
+}
+#tbhs_items_menu_large li {
+  float: none;
+  display: inline-block;
+}
+#tbhs_items_menu_small {
+  margin-top: 20px;
+  text-align: center;
+}
+.tbhs_item_content {
+  max-height: auto;
+  width: auto;
+  overflow: auto;
+}
+.evo_container__front_page_main_area {
+  max-height: auto;
+  width: auto;
+  overflow: auto;
+  margin-top: 10px;
+}
+.evo_container__front_page_secondary_area {
+  margin-top: 50px;
+}
