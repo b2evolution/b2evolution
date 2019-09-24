@@ -114,9 +114,9 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating components container table',
 		"CREATE TABLE T_widget__container (
 			wico_ID        INT(10) UNSIGNED auto_increment,
-			wico_code      VARCHAR(32) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			wico_code      VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			wico_skin_type ENUM( 'normal', 'mobile', 'tablet' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'normal',
-			wico_name      VARCHAR( 40 ) COLLATE utf8mb4_unicode_ci NOT NULL,
+			wico_name      VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 			wico_coll_ID   INT(10) NULL DEFAULT NULL,
 			wico_order     INT(10) NOT NULL,
 			wico_main      TINYINT(1) NOT NULL DEFAULT 0,

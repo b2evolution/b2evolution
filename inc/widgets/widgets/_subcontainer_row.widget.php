@@ -170,6 +170,10 @@ class subcontainer_row_Widget extends ComponentWidget
 				$auto_container_name = $this->get_container_param( 'name' ).' Column '.$i;
 				$new_container_name = $auto_container_name;
 				$auto_container_code = strtolower( preg_replace( '/[^0-9a-z\-]+/i', '_', $new_container_name ) );
+				if( strlen( $auto_container_code ) > 125 )
+				{	// Limit widget code to avoid mysql error of long data:
+					$auto_container_code = substr( $auto_container_code, strlen( $auto_container_code ) - 123 );
+				}
 				$new_container_code = $auto_container_code;
 				$c = 1;
 				while( in_array( $new_container_code, $existing_containers ) )
@@ -179,7 +183,7 @@ class subcontainer_row_Widget extends ComponentWidget
 					$c++;
 				}
 				$new_WidgetContainer->set( 'code', $new_container_code );
-				$new_WidgetContainer->set( 'name', $new_container_name );
+				$new_WidgetContainer->set( 'name', utf8_substr( $new_container_name, 0, 128 ) );
 				$new_WidgetContainer->set( 'skin_type', $this->get_container_param( 'skin_type' ) );
 				$new_WidgetContainer->set( 'main', 0 );
 				// Insert new sub-container:

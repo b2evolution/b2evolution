@@ -12027,6 +12027,17 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15570, 'Upgrading widget containers table...' ) )
+	{	// part of 7.0.2-beta
+		db_upgrade_cols( 'T_widget__container', array(
+			'MODIFY' => array(
+				'wico_code' => 'VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL',
+				'wico_name' => 'VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL',
+			),
+		) );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
