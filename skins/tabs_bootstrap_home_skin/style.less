@@ -26,21 +26,48 @@
 }
 
 // Class to align post images left or right automatically inside widget "Content Block":
-.alternate-left-right {
-	.evo_widget.widget_core_content_block {
-		.evo_post_images {
-			width: 50%;
-		}
-		&:nth-child( even ) {
+@media (min-width: 768px) {
+	.alternate-left-right {
+		.evo_widget.widget_core_content_block {
 			.evo_post_images {
-				float: left;
-				margin-right: 1em;
+				width: 40%;
+			}
+			&:nth-child( even ) {
+				.evo_post_images {
+					float: left;
+					margin-right: 1em;
+				}
+			}
+			&:nth-child( odd ) {
+				.evo_post_images {
+					float: right;
+					margin-left: 1em;
+				}
 			}
 		}
-		&:nth-child( odd ) {
+	}
+}
+@media (min-width: 1785px) {
+	.alternate-left-right {
+		.evo_widget.widget_core_content_block {
 			.evo_post_images {
-				float: right;
-				margin-left: 1em;
+				position: relative;
+				width: 60%;
+			}
+			.evo_post__full_text {
+				position: relative;
+				width: 125%;
+			}
+			&:nth-child( even ) {
+				.evo_post_images, .evo_post__full_text {
+					left: -295px;
+				}
+			}
+			&:nth-child( odd ) {
+				.evo_post_images {
+					left: 295px;
+					margin-left: -285px;
+				}
 			}
 		}
 	}
