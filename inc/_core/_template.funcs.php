@@ -2842,7 +2842,7 @@ function display_login_form( $params )
 		// Passthrough REQUEST data (when login is required after having POSTed something)
 		// (Exclusion of 'login_action', 'login', and 'action' has been removed. This should get handled via detection in Form (included_input_field_names),
 		//  and "action" is protected via crumbs)
-		$Form->hiddens_by_key( remove_magic_quotes( $_REQUEST ), array( 'pwd_hashed' ) );
+		$Form->hiddens_by_key( remove_magic_quotes( $_REQUEST ), array( 'pwd_hashed', 'submit' ) );
 	}
 
 	$Form->end_form();
