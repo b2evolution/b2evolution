@@ -334,10 +334,10 @@ class Poll extends DataObject
 
 
 	/**
-	 * Get vote of the user
+	 * Get votes of the user
 	 *
 	 * @param integer User ID of specific user
-	 * @return integer|boolean Poll option ID OR FALSE if current user didn't vote on this poll yet
+	 * @return array|boolean Poll option IDs OR FALSE if current user didn't vote on this poll yet
 	 */
 	function get_user_vote( $user_ID = NULL )
 	{

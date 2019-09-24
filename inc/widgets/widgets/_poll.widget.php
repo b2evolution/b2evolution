@@ -154,15 +154,14 @@ class poll_Widget extends ComponentWidget
 					$Form->hidden( 'poll_ID', $Poll->ID );
 				}
 
-				// Get the option ID if current user already voted on this poll question:
-				$user_vote_option_ID = $Poll->get_user_vote();
+				// Get the voted option IDs if current user already voted on this poll question:
+				$user_votes = $Poll->get_user_vote();
 
-				if( $user_vote_option_ID )
+				if( $user_votes !== false )
 				{	// Get max percent:
 					$max_poll_options_percent = $Poll->get_max_poll_options_percent();
 				}
 
-				$user_vote = $Poll->get_user_vote();
 				echo '<table class="evo_poll__table"'
 					// Set param to restrict user with max selected answers:
 					.( $Poll->get( 'max_answers' ) > 0 ? ' data-max-answers="'.intval( $Poll->get( 'max_answers' ) ).'"' : '' ).'>';
@@ -172,22 +171,22 @@ class poll_Widget extends ComponentWidget
 					if( $Poll->max_answers > 1 )
 					{
 						$max_answer_reached = false;
-						if( count( $user_vote ) >= $Poll->max_answers )
+						if( $user_votes !== false && count( $user_votes ) >= $Poll->max_answers )
 						{
 							$max_answer_reached = true;
 						}
 						echo '<td class="evo_poll__selector"><input type="checkbox" id="poll_answer_'.$poll_option->ID.'"'
 								.' name="poll_answer[]" value="'.$poll_option->ID.'"'
-								.( $user_vote && in_array( $poll_option->ID, $user_vote ) ? ' checked="checked"' : ( $max_answer_reached ? ' disabled="disabled"' : '' ) ).' /></td>';
+								.( $user_votes !== false && in_array( $poll_option->ID, $user_votes ) ? ' checked="checked"' : ( $max_answer_reached ? ' disabled="disabled"' : '' ) ).' /></td>';
 					}
 					else
 					{
 						echo '<td class="evo_poll__selector"><input type="radio" id="poll_answer_'.$poll_option->ID.'"'
 								.' name="poll_answer[]" value="'.$poll_option->ID.'"'
-								.( $user_vote && in_array( $poll_option->ID, $user_vote ) ? ' checked="checked"' : '' ).' /></td>';
+								.( $user_votes !== false && in_array( $poll_option->ID, $user_votes ) ? ' checked="checked"' : '' ).' /></td>';
 					}
 					echo '<td class="evo_poll__title"><label for="poll_answer_'.$poll_option->ID.'">'.$poll_option->option_text.'</label></td>';
-					if( $user_vote )
+					if( $user_votes !== false )
 					{	// If current user already voted on this poll, Display the voting results:
 						// Calculate a percent for style relating on max percent:
 						$style_percent = $max_poll_options_percent > 0 ? ceil( $poll_option->percent / $max_poll_options_percent * 100 ) : 0;
@@ -234,8 +233,8 @@ class poll_Widget extends ComponentWidget
 				if( is_logged_in() )
 				{	// Display a button to vote:
 					$Form->button( array( 'submit', 'submit',
-							( $user_vote_option_ID ? T_('Change vote') : T_('Vote') ),
-							'SaveButton'.( $user_vote_option_ID ? ' btn-default' : '' ) ) );
+							( $user_votes !== false ? T_('Change vote') : T_('Vote') ),
+							'SaveButton'.( $user_votes !== false ? ' btn-default' : '' ) ) );
 				}
 				else
 				{	// Display a button to log in:
