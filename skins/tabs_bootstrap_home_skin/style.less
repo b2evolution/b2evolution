@@ -25,18 +25,23 @@
 	margin-top: 50px;
 }
 
-// Classes to align post images inside widget "Content Block":
-.evo_content_block_left_images {
-	.evo_post_images {
-		float: left;
-		width: 50%;
-		margin-right: 1em;
-	}
-}
-.evo_content_block_right_images {
-	.evo_post_images {
-		float: right;
-		width: 50%;
-		margin-left: 1em;
+// Class to align post images left or right automatically inside widget "Content Block":
+.alternate-left-right {
+	.evo_widget.widget_core_content_block {
+		.evo_post_images {
+			width: 50%;
+		}
+		&:nth-child( even ) {
+			.evo_post_images {
+				float: left;
+				margin-right: 1em;
+			}
+		}
+		&:nth-child( odd ) {
+			.evo_post_images {
+				float: right;
+				margin-left: 1em;
+			}
+		}
 	}
 }

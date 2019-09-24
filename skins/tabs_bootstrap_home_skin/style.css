@@ -23,13 +23,14 @@
 .evo_container__front_page_secondary_area {
   margin-top: 50px;
 }
-.evo_content_block_left_images .evo_post_images {
-  float: left;
+.alternate-left-right .evo_widget.widget_core_content_block .evo_post_images {
   width: 50%;
+}
+.alternate-left-right .evo_widget.widget_core_content_block:nth-child( even ) .evo_post_images {
+  float: left;
   margin-right: 1em;
 }
-.evo_content_block_right_images .evo_post_images {
+.alternate-left-right .evo_widget.widget_core_content_block:nth-child( odd ) .evo_post_images {
   float: right;
-  width: 50%;
   margin-left: 1em;
 }
