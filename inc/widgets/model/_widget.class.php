@@ -1696,5 +1696,62 @@ class ComponentWidget extends DataObject
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
 	}
+
+
+	/**
+	 * Create new sub-container automatically
+	 *
+	 * @param string Suffix for new sub-container
+	 * @return string|boolean Code of new created sub-container OR FALSE on fail
+	 */
+	function create_auto_subcontainer( $name_suffix = '' )
+	{
+		if( ! isset( $this->cached_existing_containers ) )
+		{	// Get existing containers to avoid duplicate error on inserting:
+			global $DB;
+			$SQL = new SQL( 'Get existing widget containers before auto create new' );
+			$SQL->SELECT( 'wico_code' );
+			$SQL->FROM( 'T_widget__container' );
+			$SQL->WHERE( 'wico_coll_ID = '.$this->get_coll_ID() );
+			$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $this->get_container_param( 'skin_type' ) ) );
+			$this->cached_existing_containers = array_map( 'strtolower', $DB->get_col( $SQL ) );
+		}
+
+		// Set data for new creating sub-container:
+		$new_WidgetContainer = new WidgetContainer();
+		$new_WidgetContainer->set( 'coll_ID', $this->get_coll_ID() );
+		$auto_container_name = $this->get_container_param( 'name' ).$name_suffix;
+		$new_container_name = $auto_container_name;
+		$auto_container_code = strtolower( preg_replace( '/[^0-9a-z\-]+/i', '_', $new_container_name ) );
+		if( strlen( $auto_container_code ) > 125 )
+		{	// Limit widget code to avoid mysql error of long data:
+			$auto_container_code = substr( $auto_container_code, strlen( $auto_container_code ) - 123 );
+		}
+		$new_container_code = $auto_container_code;
+		$c = 1;
+		while( in_array( $new_container_code, $this->cached_existing_containers ) )
+		{	// Find unique container code per collection and skin type:
+			$new_container_code = $auto_container_code.'_'.$c;
+			$new_container_name = $auto_container_name.' '.$c;
+			$c++;
+		}
+		$new_WidgetContainer->set( 'code', $new_container_code );
+		$new_WidgetContainer->set( 'name', utf8_substr( $new_container_name, 0, 128 ) );
+		$new_WidgetContainer->set( 'skin_type', $this->get_container_param( 'skin_type' ) );
+		$new_WidgetContainer->set( 'main', 0 );
+
+		// Insert new sub-container:
+		if( ! $new_WidgetContainer->dbinsert() )
+		{	// Stop updating if some new container cannot be created:
+			return false;
+		}
+
+		// Cache new created sub-container:
+		$this->cached_existing_containers[] = $new_container_code;
+		// Set this temp flag to update widget form with new created sub-container:
+		$this->reload_page_after_update = true;
+
+		return $new_container_code;
+	}
 }
 ?>

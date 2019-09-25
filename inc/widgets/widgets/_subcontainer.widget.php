@@ -96,6 +96,7 @@ class subcontainer_Widget extends ComponentWidget
 		$coll_widget_containers = $WidgetContainerCache->get_by_coll_skintype( $coll_ID, $this->get_container_param( 'skin_type' ) );
 		$container_options = array(
 				'' => T_('None'),
+				'!create_new' => T_('Create New'),
 				T_('Existing Sub-Containers') => array(),
 			);
 		foreach( $coll_widget_containers as $WidgetContainer )
@@ -128,6 +129,46 @@ class subcontainer_Widget extends ComponentWidget
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Update the DB based on previously recorded changes
+	 */
+	function dbupdate()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		$result = true;
+
+		if( $this->get_param( 'container' ) == '!create_new' )
+		{	// This is a request to create new sub-container:
+			$new_container_code = $this->create_auto_subcontainer();
+			if( $new_container_code === false )
+			{	// Stop updating if new container cannot be created:
+				$result = false;
+			}
+			else
+			{	// Use new created sub-container for this updating widget:
+				$this->set( 'container', $new_container_code );
+			}
+		}
+
+		// Do update only if all requested sub-containers have been created successfully:
+		$result = $result && parent::dbupdate();
+
+		if( $result )
+		{
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $result;
 	}
 
 
