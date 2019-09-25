@@ -160,6 +160,7 @@ $user_agents = array(
 	1067 => array('robot', 'IstellaBot/', 'IstellaBot' ),
 	1068 => array('robot', 'exb.de/crawler', 'ExB Language Crawler' ),
 	1069 => array('robot', 'SemrushBot', 'SemrushBot' ),
+	1071 => array('robot', 'Qwantify', 'Qwant' ),
 	// Unknown robots:
 	5000 => array('robot', 'psycheclone', 'Psycheclone' ),
 	// Aggregators:
