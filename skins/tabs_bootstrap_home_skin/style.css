@@ -24,33 +24,37 @@
   margin-top: 50px;
 }
 @media (min-width: 768px) {
-  .alternate-left-right .evo_widget.widget_core_content_block .evo_post_images {
+  .evo_widget.widget_core_subcontainer.alternate-left-right .evo_widget.widget_core_content_block .evo_post_images {
     width: 40%;
   }
-  .alternate-left-right .evo_widget.widget_core_content_block:nth-child( even ) .evo_post_images {
+  .evo_widget.widget_core_subcontainer.alternate-left-right .evo_widget.widget_core_content_block:nth-child( even ) .evo_post_images {
     float: left;
     margin-right: 1em;
   }
-  .alternate-left-right .evo_widget.widget_core_content_block:nth-child( odd ) .evo_post_images {
+  .evo_widget.widget_core_subcontainer.alternate-left-right .evo_widget.widget_core_content_block:nth-child( odd ) .evo_post_images {
     float: right;
     margin-left: 1em;
   }
 }
 @media (min-width: 1785px) {
-  .alternate-left-right .evo_widget.widget_core_content_block .evo_post_images {
+  .evo_widget.widget_core_subcontainer.alternate-left-right .evo_widget.widget_core_content_block .evo_post_images {
     position: relative;
     width: 60%;
   }
-  .alternate-left-right .evo_widget.widget_core_content_block .evo_post__full_text {
+  .evo_widget.widget_core_subcontainer.alternate-left-right .evo_widget.widget_core_content_block .evo_post__full_text {
     position: relative;
     width: 125%;
   }
-  .alternate-left-right .evo_widget.widget_core_content_block:nth-child( even ) .evo_post_images,
-  .alternate-left-right .evo_widget.widget_core_content_block:nth-child( even ) .evo_post__full_text {
+  .evo_widget.widget_core_subcontainer.alternate-left-right .evo_widget.widget_core_content_block:nth-child( even ) .evo_post_images,
+  .evo_widget.widget_core_subcontainer.alternate-left-right .evo_widget.widget_core_content_block:nth-child( even ) .evo_post__full_text {
     left: -295px;
   }
-  .alternate-left-right .evo_widget.widget_core_content_block:nth-child( odd ) .evo_post_images {
+  .evo_widget.widget_core_subcontainer.alternate-left-right .evo_widget.widget_core_content_block:nth-child( odd ) .evo_post_images {
     left: 295px;
     margin-left: -285px;
   }
+}
+.evo_container__front_page_secondary_area .evo_widget.widget_core_subcontainer .evo_widget.widget_core_content_block h2.page-header {
+  text-align: center;
+  border: none;
 }
