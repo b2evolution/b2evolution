@@ -3026,6 +3026,10 @@ div.average_rating span.average_rating_score {
   overflow: hidden;
   color: #F90;
 }
+div.children-widgets-inline > div.evo_widget {
+  display: inline-block;
+  margin-right: 4px;
+}
 .evo_container__footer {
   margin-bottom: 10px;
 }
