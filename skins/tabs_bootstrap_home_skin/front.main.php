@@ -279,14 +279,19 @@ siteskin_include( '_site_body_header.inc.php' );
 <script>
 function tbhs_activate_front_tab( slug )
 {
-	if( slug.indexOf( '#' ) > -1 )
-	{
-		slug = slug.replace( /^.*#+(.+)$/, '$1' );
-	}
+	slug = slug.indexOf( '#' ) > -1
+		? slug.replace( /^.*#+(.+)$/, '$1' )
+		: '';
 
-	if( slug == "" )
-	{
-		return;
+	if( slug == '' )
+	{	// First page without anchor:
+		var first_tab = jQuery( '#tbhs_items_menu_large li:first a[data-slug]' );
+		if( ! first_tab.length )
+		{	// Not found first tab:
+			return;
+		}
+		// Use anchor of first tab:
+		slug = first_tab.data( 'slug' );
 	}
 
 	var item_slug_selector = '[data-slug="' + slug + '"]';
