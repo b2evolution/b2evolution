@@ -112,7 +112,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="row">
 
-	<div class="<?php echo $Skin->is_left_navigation_visible() ? 'col-xs-12 col-md-9 pull-right-md' : 'col-md-12' ?>">
+	<div class="<?php echo $Skin->is_side_navigation_visible() ? 'col-xs-12 col-md-9 pull-right-md' : 'col-md-12' ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -241,7 +241,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	</div><!-- .col -->
 
 	<?php
-	if( $Skin->is_left_navigation_visible() )
+	if( $Skin->is_side_navigation_visible() )
 	{ // Display a left column with navigation only for several pages
 	?>
 		<!-- =================================== START OF SIDEBAR =================================== -->
