@@ -390,7 +390,7 @@ footer.sitewide_footer .container a {
 	 */
 	function get_header_tabs()
 	{
-		global $Blog, $disp, $Settings;
+		global $Blog, $disp, $Settings, $current_User;
 
 		$header_tabs = array();
 
@@ -454,7 +454,7 @@ footer.sitewide_footer .container a {
 				}
 
 				if( $in_bloglist == 'member' &&
-						! $current_User->check_perm( 'blog_ismember', 'view', false, $skin_coll_ID ) )
+						! $current_User->check_perm( 'blog_ismember', 'view', false, $group_Blog->ID ) )
 				{	// Only members have an access to this collection, Skip it:
 					continue;
 				}
