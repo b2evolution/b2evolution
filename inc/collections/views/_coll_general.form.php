@@ -388,7 +388,7 @@ if( ! $is_creating )
 												array( 'logged', T_('For logged-in users only') ),
 												array( 'member', T_('For members only') ),
 												array( 'never', T_('Never') )
-											), T_('Show in front-office list'), true, T_('Select when you want this blog to appear in the list of blogs on this system.') );
+											), T_('Show in front-office / front-end'), true, T_('Select when you want this blog to appear in the list of blogs on this system.') );
 
 	$Form->end_fieldset();
 
