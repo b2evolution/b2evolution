@@ -209,12 +209,26 @@ jQuery( document ).on( 'click', '.evo_designer__widget', function( e )
 			jQuery( '.evo_widget[data-z-index]' ).each( function()
 			{	// Revert z-index of previous active widget blocks,
 				// in order to keep only single current block with active html elements(links, forms, etc.):
-				jQuery( this ).css( 'z-index', jQuery( this ).data( 'z-index' ) );
+				jQuery( this ).css( 'z-index', jQuery( this ).data( 'z-index' ) )
+					.removeData( 'z-index' );
 			} );
-			// Move original widget block over designer widger block(frame/box with grey border and action icons),
-			// in order to make active html elements(links, forms, etc.) inside original widget block:
-			widget.attr( 'data-z-index', widget.css( 'z-index' ) )
-				.css( 'z-index', jQuery( this ).css( 'z-index' ) + 1 );
+
+			// NOTE: Ignore sub-containers to allow click on widgets to edit them:
+			if( ! widget.hasClass( 'widget_core_subcontainer' ) &&
+			    ! widget.hasClass( 'widget_core_subcontainer_row' ) )
+			{	// Move original widget block over designer widger block(frame/box with grey border and action icons),
+				// in order to make active html elements(links, forms, etc.) inside original widget block:
+				widget.attr( 'data-z-index', widget.css( 'z-index' ) )
+					.css( 'z-index', parseInt( jQuery( this ).css( 'z-index' ) ) + 1 );
+				// Set auto z-index for parent sub-container widgets in order to make the clicked widget active over the wrapper sub-sontainer:
+				var parent_subcontainer = widget.parents( '.widget_core_subcontainer, .widget_core_subcontainer_row' );
+				while( parent_subcontainer.length > 0 )
+				{
+					parent_subcontainer.attr( 'data-z-index', parent_subcontainer.css( 'z-index' ) )
+						.css( 'z-index', 'auto' );
+					parent_subcontainer = parent_subcontainer.parents( '.widget_core_subcontainer, .widget_core_subcontainer_row' );
+				}
+			}
 		}
 	}
 
@@ -298,7 +312,7 @@ jQuery( document ).on( 'mousemove', function( e )
 	      ( typeof( evo_subcontainer_containers ) != 'undefined' && evo_subcontainer_containers.length > 0 ) ) )
 	{	// If sub-container is selected to edit its widgets:
 		var active_subcontainer_designer_block = jQuery( '.evo_designer__subcontainer_active' );
-		var subcontainer_zindex = active_subcontainer_designer_block.css( 'z-index' );
+		var subcontainer_zindex = parseInt( active_subcontainer_designer_block.css( 'z-index' ) );
 		var active_subcontainer_widgets = jQuery( '.evo_widget.evo_widget__subcontainer_active' );
 		var one_subcontainer_is_displayed = true; // Single sub-container widget doesn't contain other sub-containers, Set TRUE in order to don't try to search empty sub-containers below.
 		if( active_subcontainer_widgets.hasClass( 'widget_core_subcontainer_row' ) )
