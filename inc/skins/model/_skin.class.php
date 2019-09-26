@@ -816,6 +816,21 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get value of setting with format "checklist" which values are stored as array
+	 *
+	 * @param string Setting name
+	 * @param string Option name
+	 * @return string|NULL Option value or NULL if setting doesn't exist
+	 */
+	function get_checklist_setting( $setting_name, $option_name )
+	{
+		$setting_values = $this->get_setting( $setting_name );
+
+		return isset( $setting_values[ $option_name ] ) ? $setting_values[ $option_name ] : NULL;
+	}
+
+
+	/**
 	 * Get a skin specific param default value
 	 *
 	 * @param string Setting name

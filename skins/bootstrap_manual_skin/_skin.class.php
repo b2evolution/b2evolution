@@ -132,11 +132,16 @@ class bootstrap_manual_Skin extends Skin
 						'defaultvalue' => 0,
 						'type' => 'checkbox',
 					),
-					'single_3_cols' => array(
+					'use_3_cols' => array(
 						'label' => T_('Use 3 cols'),
-						'note' => T_('On disp=single'),
-						'defaultvalue' => 1,
-						'type' => 'checkbox',
+						'type' => 'checklist',
+						'options' => array(
+							array( 'single',       sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=single</code>' ), 1 ),
+							array( 'posts-topcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-topcat-intro</code>, <code>disp=posts-topcat-nointro</code>' ), 1 ),
+							array( 'posts-subcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-subcat-intro</code>, <code>disp=posts-subcat-nointro</code>' ), 1 ),
+							array( 'front',        sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=front</code>' ), 1 ),
+							array( 'other',        T_('On other disps'), 0 ),
+						),
 					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
@@ -309,7 +314,7 @@ class bootstrap_manual_Skin extends Skin
 				break;
 		}
 
-		if( $this->is_left_navigation_visible() )
+		if( $this->is_side_navigation_visible() )
 		{ // Include JS code for left navigation panel only when it is displayed:
 			$this->require_js( 'left_navigation.js' );
 		}
@@ -401,11 +406,11 @@ class bootstrap_manual_Skin extends Skin
 
 
 	/**
-	 * Check if left navigation is visible for current page
+	 * Check if side(left and/or right) navigations are visible for current page
 	 *
-	 * @return boolean TRUE
+	 * @return boolean TRUE on visible
 	 */
-	function is_left_navigation_visible()
+	function is_side_navigation_visible()
 	{
 		global $disp;
 
@@ -415,7 +420,49 @@ class bootstrap_manual_Skin extends Skin
 		}
 
 		// Display left navigation column only on these pages:
-		return in_array( $disp, array( 'front', 'posts', 'flagged', 'single', 'search', 'edit', 'edit_comment', 'catdir', '404' ) );
+		return in_array( $disp, array( 'front', 'posts', 'comments', 'flagged', 'single', 'search', 'edit', 'edit_comment', 'catdir', '404' ) );
+	}
+
+
+	/**
+	 * Check if 3rd/right column layout can be used for current page
+	 *
+	 * @return boolean
+	 */
+	function is_3rd_right_column_layout()
+	{
+		global $disp, $disp_detail;
+
+		if( ! $this->is_side_navigation_visible() )
+		{	// Side navigation is hidden for current page:
+			return false;
+		}
+
+		// Check when we should use layout with 3 columns:
+		if( $disp == 'front' )
+		{	// Front page
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'front' );
+		}
+
+		if( $disp == 'single' )
+		{	// Single post/item page:
+			return ( $this->get_checklist_setting( 'use_3_cols', 'single' )
+				// old setting should be supported:
+				|| $this->get_setting( 'single_3_cols' ) );
+		}
+
+		if( $disp_detail == 'posts-topcat-nointro' || $disp_detail == 'posts-topcat-intro' )
+		{	// Category page with or without intro:
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-topcat' );
+		}
+
+		if( $disp_detail == 'posts-subcat-nointro' || $disp_detail == 'posts-subcat-intro' )
+		{	// Sub-category page with or without intro:
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-subcat' );
+		}
+
+		// All other disps:
+		return (boolean)$this->get_checklist_setting( 'use_3_cols', 'other' );
 	}
 
 
@@ -426,25 +473,23 @@ class bootstrap_manual_Skin extends Skin
 	 */
 	function get_layout_class( $place )
 	{
-		global $disp;
-
 		$r = '';
 
 		switch( $place )
 		{
 			case 'container':
 				$r .= 'container';
-				if( $disp == 'single' && $this->get_setting( 'single_3_cols' ) )
-				{	// Layout with 3 columns on disp=single:
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
 					$r .= ' container-xxl';
 				}
 				break;
 
 			case 'main_column':
-				if( $this->is_left_navigation_visible() )
+				if( $this->is_side_navigation_visible() )
 				{	// Layout with visible left sidebar:
-					if( $disp == 'single' && $this->get_setting( 'single_3_cols' ) )
-					{	// Layout with 3 columns on disp=single:
+					if( $this->is_3rd_right_column_layout() )
+					{	// Layout with 3 columns on current page:
 						$r .= 'col-xxl-8 col-xxl-pull-2 ';
 					}
 					$r .= 'col-md-9 pull-right-md';
@@ -456,16 +501,16 @@ class bootstrap_manual_Skin extends Skin
 				break;
 
 			case 'left_column':
-				if( $disp == 'single' && $this->get_setting( 'single_3_cols' ) )
-				{	// Layout with 3 columns on disp=single:
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
 					$r .= 'col-xxl-2 ';
 				}
 				$r .= 'col-md-3 col-xs-12 pull-left-md';
 				break;
 
-			case 'single_column':
-				if( $disp == 'single' && $this->get_setting( 'single_3_cols' ) )
-				{	// Layout with 3 columns on disp=single:
+			case 'right_column':
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
 					$r .= 'col-xxl-2 col-xxl-push-8 ';
 				}
 				$r .= 'col-md-3 col-xs-12 pull-right-md';

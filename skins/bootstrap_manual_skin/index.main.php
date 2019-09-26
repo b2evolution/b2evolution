@@ -191,13 +191,17 @@ siteskin_include( '_site_body_header.inc.php' );
 	</div><!-- .col -->
 
 	<?php
-	if( $disp == 'single' )
-	{	// Only for single disp:
+	if( $Skin->is_side_navigation_visible() )
+	{	// Display side (left and/or right) columns with navigation only for several pages:
 	?>
-		<aside class="<?php echo $Skin->get_layout_class( 'single_column' ); ?>">
+		<aside class="<?php echo $Skin->get_layout_class( 'right_column' ); ?>">
 
 			<div id="evo_container__sidebar_single">
 
+			<?php
+			if( $disp == 'single' )
+			{	// Only for single disp:
+			?>
 				<div class="evo_container evo_container__sidebar_single">
 				<?php
 					// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
@@ -254,30 +258,17 @@ siteskin_include( '_site_body_header.inc.php' );
 					// ----------------------------- END OF "Sidebar Single" CONTAINER -----------------------------
 				?>
 				</div>
+			<?php
+			}
+			?>
 
-			</div>
-
-		</aside>
-	<?php
-	}
-	?>
-
-	<?php
-	if( $Skin->is_left_navigation_visible() )
-	{ // Display a left column with navigation only for several pages
-	?>
-		<!-- =================================== START OF SIDEBAR =================================== -->
-		<aside class="<?php echo $Skin->get_layout_class( 'left_column' ); ?>">
-
-			<div id="evo_container__sidebar">
-
-				<div class="evo_container evo_container__sidebar">
+				<div class="evo_container evo_container__sidebar2">
 				<?php
 					// <div data-spy="affix" data-offset-top="165" class="affix_block">
 					// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 					// Display container and contents:
 					// Note: this container is designed to be a single <ul> list
-					skin_container( NT_('Sidebar'), array(
+					skin_container( NT_('Sidebar 2'), array(
 							// The following (optional) params will be used as defaults for widgets included in this container:
 							// This will enclose each widget in a block:
 							'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
@@ -308,13 +299,22 @@ siteskin_include( '_site_body_header.inc.php' );
 				?>
 				</div>
 
-				<div class="evo_container evo_container__sidebar2">
+			</div>
+
+		</aside>
+
+		<!-- =================================== START OF SIDEBAR =================================== -->
+		<aside class="<?php echo $Skin->get_layout_class( 'left_column' ); ?>">
+
+			<div id="evo_container__sidebar">
+
+				<div class="evo_container evo_container__sidebar">
 				<?php
 					// <div data-spy="affix" data-offset-top="165" class="affix_block">
 					// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
 					// Display container and contents:
 					// Note: this container is designed to be a single <ul> list
-					skin_container( NT_('Sidebar 2'), array(
+					skin_container( NT_('Sidebar'), array(
 							// The following (optional) params will be used as defaults for widgets included in this container:
 							// This will enclose each widget in a block:
 							'block_start' => '<div class="panel panel-default evo_widget $wi_class$">',
