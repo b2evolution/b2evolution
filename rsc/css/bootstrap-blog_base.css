@@ -717,6 +717,10 @@ div.children-widgets-inline > div.evo_widget {
   display: inline-block;
   margin-right: 4px;
 }
+.evo_widget.widget-no-border {
+  border: none;
+  box-shadow: none;
+}
 .evo_container__footer {
   margin-bottom: 10px;
 }
