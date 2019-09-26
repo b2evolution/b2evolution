@@ -403,6 +403,11 @@ function create_default_data()
 			'name'   => 'Review',
 			'schema' => 'Review',
 		);
+	$post_types[] = array(
+			'name'            => 'Homepage Content Tab',
+			'usage'           => 'post',
+			'use_short_title' => 'optional',
+		);
 	// Default settings:
 	$post_type_default_settings = array(
 			'name'                     => '',

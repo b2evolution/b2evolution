@@ -5919,8 +5919,13 @@ class Blog extends DataObject
 		$default_post_types = array( 'Post with Custom Fields', 'Child Post', 'Recipe' );
 		switch( $this->type )
 		{
+			case 'minisite':
+				$default_post_types[] = 'Homepage Content Tab';
+				break;
+
 			case 'main':
 				$default_post_types[] = 'Post';
+				$default_post_types[] = 'Homepage Content Tab';
 				break;
 
 			case 'photo':

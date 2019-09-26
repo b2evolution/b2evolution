@@ -12038,6 +12038,28 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15580, 'Creating default item type "Homepage Content Tab"...' ) )
+	{	// part of 7.0.2-beta
+		$SQL = new SQL( 'Check at least one item type with name "Homepage Content Tab" for existence' );
+		$SQL->SELECT( 'ityp_ID' );
+		$SQL->FROM( 'T_items__type' );
+		$SQL->WHERE( 'ityp_name = "Homepage Content Tab"' );
+		$SQL->LIMIT( 1 );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Create one default item type "Homepage Content Tab":
+			$r = $DB->query( 'INSERT INTO T_items__type ( ityp_name, ityp_usage, ityp_use_short_title )
+					VALUES ( "Homepage Content Tab", "post", "optional" )' );
+			if( $r && $DB->insert_id > 0 )
+			{	// Enable new created item type for all collections:
+				$DB->query( 'INSERT INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID )
+					SELECT '.$DB->insert_id.', blog_ID
+					  FROM T_blogs
+					 WHERE blog_type IN ( "main", "minisite" )' );
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
