@@ -775,6 +775,12 @@ class MarkdownImport
 				$Item->set( 'urltitle', urltitle_validate( $item_slug, $item_slug, 0, false, 'post_urltitle', 'post_ID', 'T_items__item' ) );
 			}
 
+			// Get and update item content hash:
+			$prev_last_import_hash = $Item->get_setting( 'last_import_hash' );
+			$Item->set_setting( 'last_import_hash', $item_content_hash );
+			// Decide content was changed when current hash is different than previous:
+			$item_content_was_changed = ( $prev_last_import_hash != $item_content_hash );
+
 			$prev_category_ID = $Item->get( 'main_cat_ID' );
 			// Set new category for new Item or when post was moved to different category:
 			$Item->set( 'main_cat_ID', $category_ID );
@@ -790,14 +796,20 @@ class MarkdownImport
 				$this->update_md_file_links = array();
 				// Do convert:
 				$item_content = preg_replace_callback( '#(^|[^\!])\[([^\[\]]*)\]\(((([a-z]*://)?([^\)]+[/\\\\])?([^\)]+?)(\.[a-z]{2,4})?)(\#[^\)]+)?)?\)#i', array( $this, 'callback_convert_links' ), $item_content );
+				foreach( $this->link_messages as $link_message )
+				{
+					if( $link_message['type'] == 'content' )
+					{	// Force to update content when at least one link was replaced with proper link to post with same language as current post:
+						$item_content_was_changed = true;
+						break;
+					}
+				}
 			}
 
 			// Set flag to don't filter content twice by renderer plugins:
 			$item_is_filtered_by_plugins = false;
 
-			$prev_last_import_hash = $Item->get_setting( 'last_import_hash' );
-			$Item->set_setting( 'last_import_hash', $item_content_hash );
-			if( $this->get_option( 'force_item_update' ) || $prev_last_import_hash != $item_content_hash )
+			if( $this->get_option( 'force_item_update' ) || $item_content_was_changed )
 			{	// Set new fields only when import hash(title + content + YAML data) was really changed:
 				$Item->set( 'lastedit_user_ID', $current_User->ID );
 				$Item->set( 'datemodified', date2mysql( $localtimenow ) );
@@ -860,7 +872,7 @@ class MarkdownImport
 			}
 			else
 			{	// Update existing Item:
-				if( ! $this->get_option( 'force_item_update' ) && $prev_last_import_hash == $item_content_hash && $prev_category_ID == $category_ID )
+				if( ! $this->get_option( 'force_item_update' ) && ! $item_content_was_changed && $prev_category_ID == $category_ID )
 				{	// Don't try to update item in DB because import hash(title + content) was not changed after last import:
 					$post_results_num['no_changed']++;
 					$item_result_messages[] = /* TRANS: Result of imported Item */ T_('No change');
@@ -868,7 +880,7 @@ class MarkdownImport
 				elseif( 
 					// This is UPDATE 1 of 2 (there is a 2nd UPDATE for [image:] tags. These tags cannot be created before the Item ID is known.):
 					$Item->dbupdate( true, true, true, 
-						$this->get_option( 'force_item_update' ) || $prev_last_import_hash != $item_content_hash/* Force to create new revision only when file hash(title+content) was changed after last import or when update is forced */ ) )      
+						$this->get_option( 'force_item_update' ) || $item_content_was_changed/* Force to create new revision only when file hash(title+content) was changed after last import or when update is forced */ ) )      
 	// TODO: fp>yb: please give example of situation where we want to NOT create a new revision ? (I think we ALWAYS want to create a new revision)				
 				{	// Item has been updated successfully:
 					$item_is_updated_step_1 = true;
@@ -885,7 +897,7 @@ class MarkdownImport
 					{	// If moved to different category:
 						$item_result_messages[] =/* TRANS: Result of imported Item */  T_('Moved to different category');
 					}
-					if( $prev_last_import_hash != $item_content_hash )
+					if( $item_content_was_changed )
 					{	// If content was changed:
 						$item_result_messages[] = /* TRANS: Result of imported Item */ T_('New revision added to DB');
 						if( $prev_last_import_hash === NULL )
