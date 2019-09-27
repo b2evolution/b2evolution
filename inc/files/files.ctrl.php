@@ -1041,7 +1041,7 @@ switch( $action )
 			$action = 'list';
 			$redirect_to = param( 'redirect_to', 'url', NULL );
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( empty( $redirect_to ) ? regenerate_url( '', '', '', '&' ) : $redirect_to, 303 ); // Will EXIT
+			header_redirect( empty( $redirect_to ) ? regenerate_url( 'fm_selected', '', '', '&' ) : $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		else
