@@ -864,7 +864,12 @@ class bootstrap_forums_Skin extends Skin
 		if( $can_view_workflow )
 		{	// Display status filter only when current User a permission to view workflow properties:
 			$ItemStatusCache = & get_ItemStatusCache();
-			$ItemStatusCache->load_all();
+			$ItemStatusCache->clear();
+			$item_statuses_SQL = $ItemStatusCache->get_SQL_object();
+			$item_statuses_SQL->FROM_add( 'INNER JOIN T_items__status_type ON pst_ID = its_pst_ID' );
+			$item_statuses_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON its_ityp_ID = itc_ityp_ID' );
+			$item_statuses_SQL->WHERE( 'itc_coll_ID = '.$Blog->ID );
+			$ItemStatusCache->load_by_sql( $item_statuses_SQL );
 			$status = param( 'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', '' );
 
 			echo $params['before_workflow_status'];
