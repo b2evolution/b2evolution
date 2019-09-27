@@ -128,6 +128,8 @@ class coll_locale_switch_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_start'];
 
+		echo $this->disp_params['list_start'];
+
 		// Get currently viewing Item:
 		$current_Item = & get_current_Item();
 		// Get currently viewing locale:
@@ -166,15 +168,19 @@ class coll_locale_switch_Widget extends ComponentWidget
 				}
 			}
 
-			echo '<div class="evo_locale_switcher">';
+			$class = empty( $this->disp_params['widget_css_class'] ) ? $this->disp_params['link_default_class'] : $this->disp_params['widget_css_class'];
 
-			echo '<a href="'.$locale_switch_url.'">'.
+			echo $this->disp_params['item_start'];
+
+			echo '<a href="'.$locale_switch_url.'"'.( empty( $class ) ? '' : ' class="'.$class.'"' ).'>'.
 					locale_flag( $coll_locale, 'w16px', 'flag', '', false ).' '.
 					$locales[ $coll_locale ]['name'].
 				'</a>';
 
-			echo '</div>';
+			echo $this->disp_params['item_end'];
 		}
+
+		echo $this->disp_params['list_end'];
 
 		echo $this->disp_params['block_body_end'];
 

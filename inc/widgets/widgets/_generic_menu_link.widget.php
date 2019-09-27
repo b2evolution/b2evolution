@@ -72,18 +72,26 @@ class generic_menu_link_Widget extends ComponentWidget
 			if( $is_active_link )
 			{	// Use template and class to highlight current menu item:
 				$r .= $this->disp_params['item_selected_start'];
-				$link_class = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['link_selected_class'] : $this->disp_params['widget_active_link_class'];
+				$link_class = $this->disp_params['link_selected_class'];
+				if( ! empty( $this->disp_params['widget_active_link_class'] ) )
+				{
+					$link_class .= ' '.$this->disp_params['widget_active_link_class'];
+				}
 			}
 			else
 			{	// Use normal template:
 				$r .= $this->disp_params['item_start'];
-				$link_class = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['link_default_class'] : $this->disp_params['widget_link_class'];
+				$link_class = $this->disp_params['link_default_class'];
+				if( ! empty( $this->disp_params['widget_link_class'] ) )
+				{
+					$link_class .= ' '.$this->disp_params['widget_link_class'];
+				}
 			}
 
 			// Get a link from template:
 			$r .= str_replace(
 				array( '$link_url$', '$link_class$', '$link_text$' ),
-				array( $link_url, $link_class, $link_text ),
+				array( $link_url, trim( $link_class ), $link_text ),
 				$link_template );
 
 			if( $is_active_link )

@@ -44,6 +44,9 @@
     border-top: none;
     padding: 0;
   }
+  .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right li.evo_widget > a {
+    display: inline-block;
+  }
   .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right .login {
     padding-top: 8px;
     padding-bottom: 9px;
