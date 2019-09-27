@@ -616,9 +616,9 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	var field_value_link = 'nolink';
 	var field_value_link_nofollow = 0;
 	var field_value_link_class = '';
-	var field_value_line_highlight = '';
-	var field_value_green_highlight = '';
-	var field_value_red_highlight = '';
+	var field_value_line_highlight = 'never';
+	var field_value_green_highlight = 'never';
+	var field_value_red_highlight = 'never';
 	var field_value_required = '';
 	var field_value_meta = '';
 	var field_value_public = '';

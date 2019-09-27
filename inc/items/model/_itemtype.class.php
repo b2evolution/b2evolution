@@ -459,9 +459,9 @@ class ItemType extends DataObject
 			'link'            => array( 'string', 'nolink' ),
 			'link_nofollow'   => 'integer',
 			'link_class'      => 'string',
-			'line_highlight'  => 'string',
-			'green_highlight' => 'string',
-			'red_highlight'   => 'string',
+			'line_highlight'  => array( 'string', 'never' ),
+			'green_highlight' => array( 'string', 'never' ),
+			'red_highlight'   => array( 'string', 'never' ),
 			'description'     => 'html',
 			'merge'           => array( 'integer', 0 ),
 		);
@@ -474,7 +474,23 @@ class ItemType extends DataObject
 				// Get input data:
 				$input_type = is_array( $input_data ) ? $input_data[0] : $input_data;
 				$input_default_value = is_array( $input_data )  ? $input_data[1] : NULL;
-				$input_value = isset( $custom_fields_data->{$input_name.$i} ) ? $custom_fields_data->{$input_name.$i} : $input_default_value;
+				if( isset( $custom_fields_data->{$input_name.$i} ) )
+				{
+					if( $input_type == 'string' &&
+					    $input_default_value !== NULL &&
+					    $custom_fields_data->{$input_name.$i} === '' )
+					{	// Use default value for empty string:
+						$input_value = $input_default_value;
+					}
+					else
+					{	// Use submitted value:
+						$input_value = $custom_fields_data->{$input_name.$i};
+					}
+				}
+				else
+				{	// Use default value:
+					$input_value = $input_default_value;
+				}
 
 				if( $input_value !== $input_default_value )
 				{	// Format input value to requested type only when it is not default value:
