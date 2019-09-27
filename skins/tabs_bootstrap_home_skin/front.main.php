@@ -106,12 +106,15 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Item Long Title:
 			foreach( $Skin->get_front_items() as $i => $Item )
 			{
-				// Item long title:
-				echo '<h2 class="tbhs_item_title" '
-					.'data-slug="'.$Item->dget( 'urltitle', 'htmlattr' ).'"'
+				// Item long title + edit icon:
+				echo '<div class="tbhs_item_title"'
+					.' data-slug="'.$Item->dget( 'urltitle', 'htmlattr' ).'"'
 					.( $i > 0 ? ' style="display:none"' : '' ).'>'
-						.$Item->dget( 'title' )
-					.'</h2>';
+					.'<h2>'.$Item->dget( 'title' ).'</h2>'
+					.$Item->get_edit_link( array(
+							'class' => 'btn btn-default btn-xs'
+						) )
+				.'</div>';
 			}
 		?>
 		</div>

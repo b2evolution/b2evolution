@@ -463,7 +463,7 @@ class tabs_bootstrap_home_Skin extends Skin
 					'check' => 'not_empty'
 			) );
 			// Title font size:
-			$this->dynamic_style_rule( $screen_key.'_title_font_size', '.tbhs_item_title { font-size: $setting_value$; }', array(
+			$this->dynamic_style_rule( $screen_key.'_title_font_size', '.tbhs_item_title h2 { font-size: $setting_value$; }', array(
 					'check' => 'not_empty'
 			) );
 			// Text font size:

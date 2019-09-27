@@ -9,6 +9,14 @@
   margin-top: 20px;
   text-align: center;
 }
+.tbhs_item_title h2 {
+  display: inline-block;
+}
+.tbhs_item_title > a {
+  display: inline-block;
+  margin-left: 20px;
+  vertical-align: text-bottom;
+}
 .tbhs_item_content {
   max-height: auto;
   width: auto;
