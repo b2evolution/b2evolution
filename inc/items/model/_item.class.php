@@ -6768,7 +6768,8 @@ class Item extends ItemLight
 			$params[ $param_key ] = & $params[ $param_key ];
 		}
 
-		if( count( $Plugins->trigger_event_first_true( 'RenderURL', $params ) ) != 0 )
+		$params = $Plugins->trigger_event_first_true( 'RenderURL', $params );
+		if( count( $params ) != 0 )
 		{	// Display a rendered url, for example as video/audio player:
 			return $params['data'];
 		}
