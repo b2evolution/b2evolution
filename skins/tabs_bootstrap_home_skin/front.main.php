@@ -112,7 +112,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					.( $i > 0 ? ' style="display:none"' : '' ).'>'
 					.'<h2>'.$Item->dget( 'title' ).'</h2>'
 					.$Item->get_edit_link( array(
-							'class' => 'btn btn-default btn-xs'
+							'text' => '#icon#'
 						) )
 				.'</div>';
 			}
