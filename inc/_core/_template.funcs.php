@@ -2942,7 +2942,7 @@ function display_login_form_footer( $params = array() )
 			'redirect_to'      => NULL,
 			'return_to'        => NULL,
 		), $params );
-	
+
 	if( $params['source'] === NULL )
 	{	// Default source:
 		$params['source'] = param( 'source', 'string', 'inskin login form' );

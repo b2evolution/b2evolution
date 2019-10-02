@@ -96,10 +96,10 @@ $date_default_timezone = '';
 $thumbnail_sizes = array(
 	// FIT: Typical images that will be shrunk to max width and/or max height but keep original aspect ratio (the ratios below are only for reference)
 		// 16:9 ratio 1.77
-			'fit-2880x1620'		=> array( 'fit', 2880, 1620, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays 
-			'fit-2560x1440'		=> array( 'fit', 2560, 1440, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays 
-			'fit-1920x1080'		=> array( 'fit', 1920, 1080, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays 
-			'fit-1600x900'			=> array( 'fit', 1600, 900, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays 
+			'fit-2880x1620'			=> array( 'fit', 2880, 1620, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
+			'fit-2560x1440'			=> array( 'fit', 2560, 1440, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
+			'fit-1920x1080'			=> array( 'fit', 1920, 1080, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
+			'fit-1600x900'			=> array( 'fit', 1600, 900, 80 ),		// 16:9 ratio 1.77	EXPERIMENTAL For Retina displays
 			'fit-1280x720'			=> array( 'fit', 1280, 720, 85 ),		// 16:9 ratio 1.77
 			'fit-960x540'			=> array( 'fit', 960, 540, 85 ),			// 16:9 ratio 1.77	EXPERIMENTAL
 			'fit-720x500'			=> array( 'fit', 720, 500, 90 ),			// ratio 1.44
@@ -115,13 +115,13 @@ $thumbnail_sizes = array(
 			'fit-128x16'			=> array( 'fit', 128, 16, 85 ),				// 8:1 square ratio 8
 			'fit-80x80'				=> array( 'fit', 80, 80, 85 ),				// 1:1 square ratio 1
 	// FIT+BLUR: Blurred images (probably no need for Retina support, because the intended effect is to be blurred)
-			'fit-160x160-blur-13'=> array( 'fit', 160, 160, 80, 13 ),
-			'fit-160x160-blur-18'=> array( 'fit', 160, 160, 80, 18 ),
+			'fit-160x160-blur-13'		=> array( 'fit', 160, 160, 80, 13 ),
+			'fit-160x160-blur-18'		=> array( 'fit', 160, 160, 80, 18 ),
 	// CROPPED: Images that will be shrunk AND cropped to completely FILL the request aspect ratio
 		// 3:2 ratio 1.5
 			'crop-480x320'			=> array( 'crop', 480, 320, 90 ),
 		// 1:1 square ratio 1
-			'crop-512x512'			=> array( 'crop', 512, 512, 85 ),		// EXPERIMENTAL For Retina 
+			'crop-512x512'			=> array( 'crop', 512, 512, 85 ),		// EXPERIMENTAL For Retina
 			'crop-320x320'			=> array( 'crop', 320, 320, 85 ),
 			'crop-256x256'			=> array( 'crop', 256, 256, 85 ),
 			'crop-192x192'			=> array( 'crop', 192, 192, 85 ),
@@ -132,10 +132,10 @@ $thumbnail_sizes = array(
 			'crop-32x32'			=> array( 'crop', 32, 32, 85 ),
 			'crop-15x15'			=> array( 'crop', 15, 15, 85 ),
 	// CROPPED near TOP: Images that will be shrunk with preference towards the top AND cropped to completely FILL the request aspect ratio (typically used for profile pictures)
-			'crop-top-640x640'	=> array( 'crop-top', 640, 640, 85 ),		// EXPERIMENTAL For Retina 
-			'crop-top-320x320'	=> array( 'crop-top', 320, 320, 85 ),
-			'crop-top-200x200'	=> array( 'crop-top', 200, 200, 85 ),
-			'crop-top-160x160'	=> array( 'crop-top', 160, 160, 85 ),
+			'crop-top-640x640'		=> array( 'crop-top', 640, 640, 85 ),		// EXPERIMENTAL For Retina
+			'crop-top-320x320'		=> array( 'crop-top', 320, 320, 85 ),
+			'crop-top-200x200'		=> array( 'crop-top', 200, 200, 85 ),
+			'crop-top-160x160'		=> array( 'crop-top', 160, 160, 85 ),
 			'crop-top-80x80'		=> array( 'crop-top', 80, 80, 85 ),
 			'crop-top-64x64'		=> array( 'crop-top', 64, 64, 85 ),
 			'crop-top-48x48'		=> array( 'crop-top', 48, 48, 85 ),
@@ -843,6 +843,7 @@ $library_cdn_urls = array(
 		//'#mediaelement_css#' => array( '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.min.css', '//cdnjs.cloudflare.com/ajax/libs/mediaelement/2.13.2/css/mediaelementplayer.css' ),
 		//'#videojs#' => array( 'http://vjs.zencdn.net/4.2.0/video.js' ),
 		//'#videojs_css#' => array( 'http://vjs.zencdn.net/4.2.0/video-js.css' ),
+		//'#clipboardjs#' => array( '//cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js', '//cdn.rawgit.com/zenorocha/clipboard.js/v2.0.4/dist/clipboard.min.js' ),
 		'#fontawesome#' => array( '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css', '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' ),
 	);
 
@@ -886,6 +887,7 @@ $library_local_urls = array(
 		'#jcrop#' => array( 'jquery/jquery.jcrop.min.js', 'jquery/jquery.jcrop.js' ),
 		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
 		'#fontawesome#' => array( 'font-awesome.min.css', 'font-awesome.css' ),
+		'#clipboardjs#' => array( 'clipboardjs/clipboard.min.js' ),
 	);
 
 

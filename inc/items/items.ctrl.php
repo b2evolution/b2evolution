@@ -2494,6 +2494,9 @@ function init_list_mode()
 			// require colorbox js
 			require_js_helper( 'colorbox' );
 
+			// require clipboardjs
+			require_js( '#clipboardjs#' );
+
 			$AdminUI->breadcrumbpath_add( T_('All'), '?ctrl=items&amp;blog=$blog$&amp;tab=full&amp;filter=restore' );
 			break;
 

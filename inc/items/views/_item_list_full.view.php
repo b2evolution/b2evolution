@@ -152,6 +152,8 @@ while( $Item = & $ItemList->get_item() )
 				$Item->permanent_link( array(
 						'before' => '',
 						'text'   => get_icon( 'permalink' ).' '.T_('Permalink'),
+						'after'  => ' '.action_icon( T_('Copy Item Slug to the clipboard.'), 'clipboard-copy', '#',
+							NULL, NULL, NULL, array( 'class' => 'small clipboard-copy', 'data-clipboard-text' => $Item->urltitle, 'onclick' => 'return false;' ) ),
 					) );
 				// Item slug control:
 				$Item->tinyurl_link( array(
@@ -839,6 +841,9 @@ while( $Item = & $ItemList->get_item() )
 		<?php
 	} // / comments requested
 }
+
+// Instantiate ClipboardJS:
+echo '<script>var clipboard = new ClipboardJS("a.clipboard-copy");</script>';
 
 if( $action == 'view' )
 { // Load JS functions to work with comments
