@@ -628,6 +628,11 @@ $public_access_to_media = true;
 $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'pl', 'vbs' );
 
 /**
+ * Should we allow admins to upload sensitive files?
+ */
+$admins_can_upload_sensitive_files = false;
+
+/**
  * The admin can configure the regexp for valid file names in the Settings interface
  * However if the following values are set to non empty, the admin will not be able to customize these values.
  */

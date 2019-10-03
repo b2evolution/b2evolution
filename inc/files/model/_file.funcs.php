@@ -763,7 +763,7 @@ function get_upload_restriction( $params = array() )
 
 	if( is_logged_in( false ) )
 	{
-		$condition = ( $current_User->check_perm( 'files', 'all' ) ) ? '' : 'ftyp_allowed <> "admin"';
+		$condition = ( $current_User->check_perm( 'files', 'all' ) && !empty( $admins_can_upload_sensitive_files ) ) ? '' : 'ftyp_allowed <> "admin"';
 	}
 	else
 	{
@@ -1385,7 +1385,7 @@ function check_showparams( & $Filelist )
  */
 function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perms = true, $upload_quickmode = true, $warn_invalid_filenames = true, $min_size = 0 )
 {
-	global $Settings, $Plugins, $Messages, $current_User, $force_upload_forbiddenext;
+	global $Settings, $Plugins, $Messages, $current_User, $force_upload_forbiddenext, $admins_can_upload_sensitive_files;
 
 	if( empty($_FILES) )
 	{	// We have NO uploaded files to process...
@@ -1578,6 +1578,29 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 					$newName = $path_info['filename'].'.'.$correct_extension;
 					$Messages->add( sprintf(T_('The extension of the file &laquo;%s&raquo; has been corrected. The new filename is &laquo;%s&raquo;.'), $old_name, $newName), 'warning' );
 				}
+			}
+
+			// Check if uploading of sensitive file is allowed:
+			if( !allow_sensitive_filetype_upload( $correct_FileType ) )
+			{
+				$failedFiles[$lKey] = $newName.' - '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+						'<code>$admins_can_upload_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );
+				// Abort upload for this file:
+				continue;
+			}
+		}
+		else
+		{
+			$path_info = pathinfo( $newName );
+			$FiletypeCache = & get_FiletypeCache();
+			$upload_Filetype = $FiletypeCache->get_by_extension( $path_info['extension'] );
+
+			if( !allow_sensitive_filetype_upload( $upload_Filetype ) )
+			{
+				$failedFiles[$lKey] = $newName.' - '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+						'<code>$admins_can_upload_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );
+				// Abort upload for this file:
+				continue;
 			}
 		}
 
@@ -2280,7 +2303,7 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $blog, $Settings, $current_User, $b2evo_icons_type, $DB;
+	global $blog, $Settings, $current_User, $b2evo_icons_type, $DB, $admins_can_upload_sensitive_files;
 
 	$params = array_merge( array(
 			'before'           => '',
@@ -2390,7 +2413,7 @@ function display_dragdrop_upload_button( $params = array() )
 	// Get list of allowed filetype extensions
 	if( is_logged_in( false ) )
 	{
-		$condition = ( $current_User->check_perm( 'files', 'all' ) ) ? '' : 'ftyp_allowed <> "admin"';
+		$condition = ( $current_User->check_perm( 'files', 'all' ) && !empty($admins_can_upload_sensitive_files) ) ? '' : 'ftyp_allowed <> "admin"';
 	}
 	else
 	{
@@ -2574,7 +2597,7 @@ function display_dragdrop_upload_button( $params = array() )
 							{ // Message for unknown error
 								text = '<?php echo TS_('Server dropped the connection.'); ?>';
 							}
-							this_row.find( '.qq-upload-file-selector' ).append( ' <span class="result_error">' + text + '</span>' );
+							this_row.find( '.qq-upload-file-selector' ).append( ': <span class="text-danger result_error">' + text + '</span>' );
 							this_row.find( '.qq-upload-image-selector, td.size' ).prepend( '<?php echo get_icon( 'warning_yellow' ); ?>' );
 						}
 						else
@@ -3348,6 +3371,20 @@ function check_perm_upload_files( $LinkOwner, $FileRoot, $assert = false )
 	{	// Check perm when we upload new files for the object like Item, Comment, Message or EmailCampaign:
 		return $LinkOwner->check_perm( 'add', $assert, $FileRoot );
 	}
+}
+
+
+/**
+ * Check if we allow uploading of sensitive filetype
+ *
+ * @param object Filetype
+ * @return boolean
+ */
+function allow_sensitive_filetype_upload( $Filetype )
+{
+	global $admins_can_upload_sensitive_files;
+
+	return !( $Filetype->allowed == 'admin' && empty( $admins_can_upload_sensitive_files ) );
 }
 
 
