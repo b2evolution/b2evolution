@@ -116,7 +116,11 @@ foreach( $backup_tables as $name => $settings )
 	$Form->checkbox( 'bk_'.$name, $current_Backup->backup_tables[$name], $settings['label'], $note );
 }
 
-$Form->checkbox( 'db_structure',$current_Backup->backup_db_structure, T_('DB Structure'), sprintf( T_('Add %s statements for ALL tables, in order to allow quick restore.'), '<code>CREATE TABLE</code>' ) );
+$db_structure_checkboxes = array(
+	array( 'db_structure', 1, sprintf( T_('Add %s statements for ALL tables, in order to allow quick restore.'), '<code>CREATE TABLE</code>' ), $current_Backup->backup_db_structure ),
+	array( 'drop_table_first', 1, sprintf( T_('Add %s before every %s.'), '<code>DROP TABLE IF EXISTS</code>', '<code>CREATE TABLE</code>' ), $current_Backup->drop_table_first )
+);
+$Form->checklist( $db_structure_checkboxes, 'db_structure_options', T_('DB Structure') );
 
 if( function_exists( 'gzopen' ) )
 {

@@ -156,6 +156,19 @@ if( $upload )
 		$size_limits[] = $Settings->get( 'upload_maxkb' ) * 1024;
 	}
 
+	// Check for sensitive filetype upload:
+	$path_info = pathinfo( param( 'qqfilename', 'string', true ) );
+	$FiletypeCache = & get_FiletypeCache();
+	$upload_Filetype = $FiletypeCache->get_by_extension( $path_info['extension'] );
+	if( !allow_sensitive_filetype_upload( $upload_Filetype ) )
+	{
+		$message['error'] = sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+				'<code>$admins_can_upload_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );
+		$message['status'] = 'error';
+		$response = out_echo( $message, $specialchars, false );
+		exit( $response );
+	}
+
 	$file = new UploadHandler();
 	// Specify the list of valid extensions, ex. array("jpeg", "xml", "bmp")
 	$file->allowedExtensions = array(); // all files types allowed by default
@@ -164,7 +177,6 @@ if( $upload )
 	// Specify the input name set in the javascript.
 	$file->inputName = "qqfile"; // matches Fine Uploader's default inputName value by default
 	// If you want to use the chunking/resume feature, specify the folder to temporarily save parts.
-
 	$file->chunksFolder = 'chunks';
 	$method = $_SERVER['REQUEST_METHOD'];
 	if ( $method == 'POST' )
