@@ -196,6 +196,19 @@ class tabs_bootstrap_home_Skin extends Skin
 		// Revert back to original value:
 		$ItemTypeCache->load_all = $item_type_cache_load_all;
 
+		// Set default value tabs item type to "Homepage Content Tab":
+		$homepage_content_tab_key = array_search( 'Homepage Content Tab', $item_type_option_array );
+		if( $homepage_content_tab_key === false )
+		{	// Homepage Content Tab not found, default to show all posts:
+			$default_tabs_item_type = 'all';
+			$default_tabs_item_type_ID = '';
+		}
+		else
+		{
+			$default_tabs_item_type = 'custom';
+			$default_tabs_item_type_ID = $homepage_content_tab_key;
+		}
+
 		$r = array_merge( array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -243,13 +256,13 @@ class tabs_bootstrap_home_Skin extends Skin
 							array( 'featured', T_('Only featured posts') ),
 							array( 'custom', T_('Only posts of type:') ),
 						),
-						'defaultvalue' => 'all',
+						'defaultvalue' => $default_tabs_item_type,
 					),
 					'tabs_item_type_ID' =>  array(
 						'label' => '',
 						'type' => 'select',
 						'options' => $item_type_option_array,
-						'defaultvalue' => '',
+						'defaultvalue' => $default_tabs_item_type_ID,
 						'allow_empty' => true,
 					),
 					'tabs_item_type_end_line' => array(
@@ -529,7 +542,7 @@ class tabs_bootstrap_home_Skin extends Skin
 					'order'          => 'ASC',
 				) );
 			$front_ItemList->query();
-;
+
 			$this->front_items = array();
 			while( $Item = & $front_ItemList->get_next() )
 			{
