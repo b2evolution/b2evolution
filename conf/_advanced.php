@@ -623,14 +623,15 @@ $public_access_to_media = true;
 
 
 /**
- * File extensions that the admin will not be able to enable in the Settings
+ * File extensions that can never be made "NOT sensitive"
+ * Admins will NOT be able to enable these for non-admin users in the FileType Settings.
  */
 $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'pl', 'vbs' );
 
 /**
- * Should we allow admins to upload sensitive files?
+ * Should Admins be able to upload/rename/edit sensitive files?
  */
-$admins_can_upload_sensitive_files = false;
+$admins_can_manipulate_sensitive_files = true;
 
 /**
  * The admin can configure the regexp for valid file names in the Settings interface

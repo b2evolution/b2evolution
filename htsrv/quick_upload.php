@@ -162,7 +162,7 @@ if( $upload )
 	if( !allow_sensitive_filetype_upload( $upload_Filetype ) )
 	{
 		$message['error'] = sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
-				'<code>$admins_can_upload_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );
+				'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );
 		$message['status'] = 'error';
 		$response = out_echo( $message, $specialchars, false );
 		exit( $response );

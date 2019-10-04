@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $edited_Filetype;
 
-global $force_upload_forbiddenext, $admins_can_upload_sensitive_files;
+global $force_upload_forbiddenext, $admins_can_manipulate_sensitive_files;
 global $rsc_path;
 
 // Determine if we are creating or updating...
@@ -73,11 +73,11 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 		}
 	}
 
-	if( empty( $admins_can_upload_sensitive_files ) )
+	if( empty( $admins_can_manipulate_sensitive_files ) )
 	{
 		$admin_allow_text = T_('Prevent uploading/renaming/editing files of this type');
 		$allow_upload_note = sprintf( T_('You can unlock this for admins by setting %s in the <a %s>configuration files</a>'),
-				'<code>$admins_can_upload_sensitive_files = true</code>', get_manual_url( 'advanced-php') );
+				'<code>$admins_can_manipulate_sensitive_files = true</code>', get_manual_url( 'advanced-php') );
 	}
 	else
 	{
