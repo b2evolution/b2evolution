@@ -559,7 +559,7 @@ function upg_init_environment( $env_vars = 'Settings' )
 				break;
 		}
 
-		// Store the iniatlized object to don't iniatlize it twice:
+		// Store the initialized object so we don't initialize it twice:
 		$upg_initialized_env_vars[] = $env_var;
 	}
 }
@@ -581,6 +581,9 @@ function upg_clear_environment()
 	{	// Reset each temporary initialized environment global variable:
 		$GLOBALS[ $env_var ] = NULL;
 	}
+
+	// Clear the initialized object:
+	$upg_initialized_env_vars = array();
 }
 
 
@@ -12059,6 +12062,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		}
 		upg_task_end();
 	}
+
+	if( upg_task_start( 15590, 'Installing new default widgets...' ) )
+	{	// part of 7.0.2-beta
+		install_new_default_widgets( 'item_single', 'breadcrumb_path' );
+		upg_task_end();
+	}
+
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.

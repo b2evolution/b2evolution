@@ -109,6 +109,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Item Single */
 	$default_widgets['item_single'] = array(
+		array(  4, 'breadcrumb_path', 'coll_type' => 'manual' ),
 		array(  5, 'item_visibility_badge', 'coll_type' => 'manual' ),
 		array(  7, 'item_title', 'coll_type' => 'manual' ),
 		array( 10, 'item_content' ),
