@@ -192,7 +192,7 @@ class Filetype extends DataObject
 	/**
 	 * Get if filetype is allowed for the currentUser
 	 *
-	 * @param boolean locked files are allowed for the current user.  @fplanque: this could be used to ovveride. I don't like this. what's the use case?
+	 * @param boolean locked files are allowed for the current user.  @fplanque: this could be used to override. I don't like this. what's the use case?
 	 * @return boolean true if currentUser is allowed to upload/rename files with this filetype, false otherwise
 	 */
 	function is_allowed( $IGNORE_allow_locked = NULL )
@@ -206,13 +206,13 @@ class Filetype extends DataObject
 
 		if( $this->allowed != 'admin')
 		{	// User is logged in and the filetype is not sensitive ("admin"), allow:
-				return true;
+			return true;
 		}
 
 		// The file type can be manipulated only by admins:
 
-		if( empty($admins_can_manipulate_sensitive_files) )
-		{	// b2evo is configured to NEVER allow admins to manipulate sensisitve files:
+		if( empty( $admins_can_manipulate_sensitive_files ) )
+		{	// b2evo is configured to NEVER allow admins to manipulate sensitive files:
 			return false;
 		}
 

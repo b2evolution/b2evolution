@@ -159,7 +159,7 @@ if( $upload )
 	$path_info = pathinfo( param( 'qqfilename', 'string', true ) );
 	$FiletypeCache = & get_FiletypeCache();
 	$upload_Filetype = $FiletypeCache->get_by_extension( $path_info['extension'] );
-	if( !allow_sensitive_filetype_upload( $upload_Filetype ) )
+	if( !$upload_Filetype->is_allowed() )
 	{
 		$message['error'] = sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
 				'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );

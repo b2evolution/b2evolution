@@ -631,7 +631,7 @@ $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php',
 /**
  * Should Admins be able to upload/rename/edit sensitive files?
  */
-$admins_can_manipulate_sensitive_files = true;
+$admins_can_manipulate_sensitive_files = false;
 
 /**
  * The admin can configure the regexp for valid file names in the Settings interface
