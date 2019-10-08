@@ -125,6 +125,20 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 					) );
 				// --------------------------------- END OF MESSAGES ---------------------------------
 			}
+
+			if( ! empty( $cat ) )
+			{ // Display breadcrumbs if some category is selected
+				skin_widget( array(
+						// CODE for the widget:
+						'widget' => 'breadcrumb_path',
+						// Optional display params
+						'block_start'      => '<nav><ol class="breadcrumb">',
+						'block_end'        => '</ol></nav>',
+						'separator'        => '',
+						'item_mask'        => '<li><a href="$url$">$title$</a></li>',
+						'item_active_mask' => '<li class="active">$title$</li>',
+					) );
+			}
 		?>
 
 		<?php
