@@ -1666,6 +1666,7 @@ class File extends DataObject
 		$this->load_meta();
 
 		$this->_name = $newname;
+		unset($this->Filetype);
 		$this->Filetype = NULL; // depends on name
 
 		$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
@@ -1774,6 +1775,7 @@ class File extends DataObject
 		$this->_rdfp_rel_path = $rdfp_rel_path;
 		$this->_adfp_full_path = $adfp_posix_path;
 		$this->_name = basename( $this->_adfp_full_path );
+		unset($this->Filetype);
 		$this->Filetype = NULL; // depends on name
 		$this->_dir = dirname( $this->_adfp_full_path ).'/';
 		$this->_md5ID = md5( $this->_adfp_full_path );

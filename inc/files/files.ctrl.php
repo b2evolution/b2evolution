@@ -801,6 +801,7 @@ switch( $action )
 		param( 'new_names', 'array:filepath', array() );
 
 		// Check params for each file to rename:
+		$index = 0;
 		while( $loop_src_File = & $source_Filelist->get_next() )
 		{
 			if( !$loop_src_File->can_be_manipulated() )
@@ -808,6 +809,9 @@ switch( $action )
 				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $loop_src_File->get_name().' - '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
 						'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ) );
 				$source_Filelist->remove( $loop_src_File );
+				unset( $fm_selected[$index] );
+				$confirmed = 0;
+				$index++;
 				continue;
 			}
 
@@ -815,6 +819,7 @@ switch( $action )
 			{ // We have not yet provided a name to rename to...
 				$confirmed = 0;
 				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get_name();
+				$index++;
 				continue;
 			}
 
@@ -823,6 +828,7 @@ switch( $action )
 			{
 				$confirmed = 0;
 				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $check_error );
+				$index++;
 				continue;
 			}
 		}
@@ -1730,7 +1736,7 @@ if( $mode != 'modal' )
 /*
  * Display payload:
  */
-if( !empty($action ) && $action != 'list' && $action != 'nil' )
+if( !empty( $action ) && $action != 'list' && $action != 'nil' )
 {
 
 	// Action displays:
