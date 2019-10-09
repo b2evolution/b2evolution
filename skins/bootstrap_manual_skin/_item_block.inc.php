@@ -120,12 +120,12 @@ $params = array_merge( array(
 			'block_title_end' => '</h3>',
 			// Template params for "Breadcrumb Path" widget:
 			'override_params_for_breadcrumb_path' => array(
-				'block_start'      => '<div class="evo_widget $wi_class$"><ol class="breadcrumb">',
-				'block_end'        => '</ol></div>',
-				'separator'        => '',
-				'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-				'item_active_mask' => '<li class="active">$title$</li>',
-			),
+					'block_start'      => '<div class="evo_widget $wi_class$"><ol class="breadcrumb">',
+					'block_end'        => '</ol></div>',
+					'separator'        => '',
+					'item_mask'        => '<li><a href="$url$">$title$</a></li>',
+					'item_active_mask' => '<li class="active">$title$</li>',
+				),
 			// Template params for "Item Title" widget:
 			'widget_item_title_params'  => array(
 					'before' => $params['item_title_line_before'].$params['item_title_single_before'],

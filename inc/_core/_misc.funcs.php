@@ -5931,6 +5931,7 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
 
 /**
  * Update values of HTML tag attributes
+ * This will only update the first HTML tag at the beginning of the passed param.
  *
  * @param string HTML tag
  * @param array Attributes
@@ -5942,12 +5943,16 @@ function get_field_attribs_as_string( $field_attribs, $format_to_output = true )
  */
 function update_html_tag_attribs( $html_tag, $new_attribs, $attrib_actions = array() )
 {
-	if( ! preg_match( '#^<([\S]+)[^>]*>$#i', $html_tag, $tag_match ) )
+	// Check for a valid html tag at the beginning of the string:
+	if( ! preg_match( '#^<([\S]+)[^>]*>#i', $html_tag, $tag_match ) )
 	{	// Wrong HTML tag format, Return original string:
 		return $html_tag;
 	}
 
 	$html_tag_name = $tag_match[1];
+
+	// Get the remaining string after the first HTML tag:
+	$trailing_str = str_replace( $tag_match[0], '', $html_tag );
 
 	$old_attribs = array();
 	$updated_attribs = array();
@@ -5992,7 +5997,7 @@ function update_html_tag_attribs( $html_tag, $new_attribs, $attrib_actions = arr
 		$updated_attribs[] = $new_attrib_name.'="'.format_to_output( $new_attrib_value, 'formvalue' ).'"';
 	}
 
-	return '<'.$html_tag_name.' '.implode( ' ', $updated_attribs ).'>';
+	return '<'.$html_tag_name.' '.implode( ' ', $updated_attribs ).'>'.$trailing_str;
 }
 
 

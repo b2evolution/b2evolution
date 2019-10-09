@@ -914,16 +914,24 @@ class ComponentWidget extends DataObject
 					$wrapper_is_found = false;
 					foreach( $widget_wrapper_items as $widget_wrapper )
 					{
-						if( ! empty( $params[ $widget_wrapper ] ) )
-						{	// If this wrapper is filled and used with current widget,
-							// Append new data for widget wrapper:
+						if( !empty( $params[ $widget_wrapper ] ) || !empty( $params['override_params_for_'.$this->code][ $widget_wrapper ] ) )
+						{	// Append new data for widget wrapper:
 							$attrib_actions = array(
 									'data-id'        => 'replace',
 									'data-type'      => 'replace',
 									'data-container' => 'replace',
 									'data-can-edit'  => 'replace',
 								);
-							$params[ $widget_wrapper ] = update_html_tag_attribs( $params[ $widget_wrapper ], $designer_mode_data, $attrib_actions );
+							if( !empty( $params[ $widget_wrapper ] ) )
+							{	// If this wrapper is filled and used with current widget,
+								$params[ $widget_wrapper ] = update_html_tag_attribs( $params[ $widget_wrapper ], $designer_mode_data, $attrib_actions );
+							}
+
+							if( !empty( $params['override_params_for_'.$this->code][ $widget_wrapper ] ) )
+							{	// Also update override params:
+								$params['override_params_for_'.$this->code][ $widget_wrapper ] = update_html_tag_attribs( $params['override_params_for_'.$this->code][ $widget_wrapper ], $designer_mode_data, $attrib_actions );
+							}
+
 							if( isset( $this->disp_params[ $widget_wrapper ] ) )
 							{	// Also update params if they already have been initialized before:
 								$this->disp_params[ $widget_wrapper ] = update_html_tag_attribs( $this->disp_params[ $widget_wrapper ], $designer_mode_data, $attrib_actions );
