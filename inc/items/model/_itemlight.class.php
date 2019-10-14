@@ -244,7 +244,7 @@ class ItemLight extends DataObject
 	 */
 	function & get_ItemType()
 	{
-		if( $this->ItemType === NULL )
+		if( empty( $this->ItemType ) )
 		{
 			$ItemTypeCache = & get_ItemTypeCache();
 			$this->ItemType = & $ItemTypeCache->get_by_ID( $this->ityp_ID, false, false );
