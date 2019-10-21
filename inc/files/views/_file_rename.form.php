@@ -23,31 +23,38 @@ global $selected_Filelist;
  */
 global $new_names;
 
+if( !empty( $new_names ) )
+{
 
-$Form = new Form( NULL, 'fm_rename_checkchanges' );
+	$Form = new Form( NULL, 'fm_rename_checkchanges' );
 
-$Form->global_icon( T_('Cancel rename!'), 'close', regenerate_url() );
+	$Form->global_icon( T_('Cancel rename!'), 'close', regenerate_url() );
 
-$Form->begin_form( 'fform', T_('Rename') );
+	$Form->begin_form( 'fform', T_('Rename') );
 
-	$Form->add_crumb( 'file' );
-	$Form->hidden_ctrl();
-	$Form->hiddens_by_key( get_memorized() );
-	$Form->hidden( 'action', 'rename' );
-	$Form->hidden( 'confirmed', 1 );
+		$Form->add_crumb( 'file' );
+		$Form->hidden_ctrl();
+		$Form->hiddens_by_key( get_memorized() );
+		$Form->hidden( 'action', 'rename' );
+		$Form->hidden( 'confirmed', 1 );
 
-	$selected_Filelist->restart();
-	while( $loop_src_File = & $selected_Filelist->get_next() )
-	{
-		$Form->begin_fieldset( T_('File').': '.$loop_src_File->dget('name') );
+		$selected_Filelist->restart();
+		while( $loop_src_File = & $selected_Filelist->get_next() )
+		{
+			if( !isset( $new_names[$loop_src_File->get_md5_ID()] ) )
+			{
+				continue;
+			}
 
-		$Form->text( 'new_names['.$loop_src_File->get_md5_ID().']', $new_names[$loop_src_File->get_md5_ID()], 32,
-									T_('New name'), $loop_src_File->dget('title'), 128 );
+			$Form->begin_fieldset( T_('File').': '.$loop_src_File->dget('name') );
 
-		$Form->end_fieldset();
+			$Form->text( 'new_names['.$loop_src_File->get_md5_ID().']', $new_names[$loop_src_File->get_md5_ID()], 32,
+										T_('New name'), $loop_src_File->dget('title'), 128 );
+
+			$Form->end_fieldset();
+		}
+
+
+	$Form->end_form( array( array( 'submit', 'submit', T_('Rename'), 'SaveButton' ) ) );
 	}
-
-
-$Form->end_form( array( array( 'submit', 'submit', T_('Rename'), 'SaveButton' ) ) );
-
 ?>

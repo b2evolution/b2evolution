@@ -595,7 +595,7 @@ class File extends DataObject
 
 
 	/**
-	 * Is the file editable?
+	 * Is the file editable? Meaning file contents can be edited in-app.
 	 *
 	 * @param mixed true/false allow locked file types? NULL value means that FileType will decide
 	 */
@@ -614,6 +614,29 @@ class File extends DataObject
 
 		// user can edit only allowed file types
 		return $Filetype->is_allowed( $allow_locked );
+	}
+
+
+	/**
+	 * Can the file be manipulated? i.e., edited, uploaded, renamed, moved, copied, deleted, chmod
+	 *
+	 * @return bool
+	 */
+	function can_be_manipulated()
+	{
+		if( $this->is_dir() )
+		{ // directories don't have filetypes to restrict them:
+			return true;
+		}
+
+		$Filetype = & $this->get_Filetype();
+		if( empty($Filetype) )
+		{
+			return false;
+		}
+
+		// user can edit only allowed file types
+		return $Filetype->is_allowed();
 	}
 
 
@@ -1682,6 +1705,11 @@ class File extends DataObject
 	 */
 	function rename_to( $newname )
 	{
+		if( !$this->can_be_manipulated() )
+		{	// check if we can manipulate the file first:
+			return false;
+		}
+
 		$old_file_name = $this->get_name();
 
 		// rename() will fail if newname already exists on windows
@@ -1732,6 +1760,7 @@ class File extends DataObject
 		$this->load_meta();
 
 		$this->_name = $newname;
+		unset($this->Filetype);
 		$this->Filetype = NULL; // depends on name
 
 		$rel_dir = dirname( $this->_rdfp_rel_path ).'/';
@@ -1794,6 +1823,11 @@ class File extends DataObject
 	 */
 	function move_to( $root_type, $root_ID, $rdfp_rel_path, $keep_unique = false )
 	{
+		if( !$this->can_be_manipulated() )
+		{	// check if we can manipulate the file first:
+			return false;
+		}
+
 		$old_file_name = $this->get_name();
 
 		// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
@@ -1835,6 +1869,7 @@ class File extends DataObject
 		$this->_rdfp_rel_path = $rdfp_rel_path;
 		$this->_adfp_full_path = $adfp_posix_path;
 		$this->_name = basename( $this->_adfp_full_path );
+		unset($this->Filetype);
 		$this->Filetype = NULL; // depends on name
 		$this->_dir = dirname( $this->_adfp_full_path ).'/';
 		$this->_md5ID = md5( $this->_adfp_full_path );
@@ -1873,6 +1908,11 @@ class File extends DataObject
 	 */
 	function copy_to( & $dest_File )
 	{
+		if( !$this->can_be_manipulated() )
+		{	// check if we can manipulate the file first:
+			return false;
+		}
+
 		if( ! $this->exists() || $dest_File->exists() )
 		{
 			syslog_insert( sprintf( 'File %s could not be copied', '[['.$this->get_name().']]' ), 'info', 'file', $this->ID );
@@ -1925,6 +1965,11 @@ class File extends DataObject
 	 */
 	function unlink( $use_transactions = true, $recursively = false )
 	{
+		if( !$this->can_be_manipulated() )
+		{	// check if we can manipulate the file first:
+			return false;
+		}
+
 		global $DB;
 
 		$old_file_ID = $this->ID;
@@ -2000,6 +2045,11 @@ class File extends DataObject
 	 */
 	function chmod( $chmod = NULL )
 	{
+		if( !$this->can_be_manipulated() )
+		{	// check if we can manipulate the file first:
+			return false;
+		}
+
 		if( $chmod === NULL )
 		{
 			global $Settings;

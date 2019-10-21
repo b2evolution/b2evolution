@@ -162,8 +162,9 @@ switch( $action )
 			param( 'from_tab', 'string', '' );
 		}
 
-		if( empty( $edited_Item ) )
+		if( empty( $edited_Item ) || ( $action == 'edit_type' && $from_tab == 'type' ) )
 		{ // Load post to edit from DB:
+			// ...force the loading of post from DB if we are changing the Item Type from a post list
 			$ItemCache = & get_ItemCache();
 			$edited_Item = & $ItemCache->get_by_ID( $post_ID );
 		}
@@ -1040,10 +1041,12 @@ switch( $action )
 		$edited_Item->status = $Blog->get_allowed_item_status( $edited_Item->status, $edited_Item );
 
 		param( 'load_from_request', 'integer', 1 );
-		if( $load_from_request )
-		{
-			// We use the request variables to fill the edit form, because we need to be able to pass those values
+		param( 'from_tab', 'string', NULL );
+
+		if( $load_from_request && !( $action == 'edit_type' && $from_tab == 'type' ) )
+		{	// We use the request variables to fill the edit form, because we need to be able to pass those values
 			// from tab to tab via javascript when the editor wants to switch views...
+			// ...except when we are changing the Item Type from a post list where no request variables are available for the Item
 			$edited_Item->load_from_Request( true ); // needs Blog set
 		}
 

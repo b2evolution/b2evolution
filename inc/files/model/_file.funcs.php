@@ -647,7 +647,8 @@ function validate_filename( $filename, $allow_locked_filetypes = NULL )
 			}
 			else
 			{	// Filename hasn't an allowed extension
-				return sprintf( T_('&laquo;%s&raquo; is a locked extension.'), htmlentities($match[1]) );
+				return sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+						'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );
 			}
 		}
 		else
@@ -763,7 +764,7 @@ function get_upload_restriction( $params = array() )
 
 	if( is_logged_in( false ) )
 	{
-		$condition = ( $current_User->check_perm( 'files', 'all' ) && !empty( $admins_can_upload_sensitive_files ) ) ? '' : 'ftyp_allowed <> "admin"';
+		$condition = ( $current_User->check_perm( 'files', 'all' ) && !empty( $admins_can_manipulate_sensitive_files ) ) ? '' : 'ftyp_allowed <> "admin"';
 	}
 	else
 	{
@@ -1441,7 +1442,7 @@ function check_showparams( & $Filelist )
  */
 function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perms = true, $upload_quickmode = true, $warn_invalid_filenames = true, $min_size = 0 )
 {
-	global $Settings, $Plugins, $Messages, $current_User, $force_upload_forbiddenext, $admins_can_upload_sensitive_files;
+	global $Settings, $Plugins, $Messages, $current_User, $force_upload_forbiddenext, $admins_can_manipulate_sensitive_files;
 
 	if( empty($_FILES) )
 	{	// We have NO uploaded files to process...
@@ -1634,29 +1635,6 @@ function process_upload( $root_ID, $path, $create_path_dirs = false, $check_perm
 					$newName = $path_info['filename'].'.'.$correct_extension;
 					$Messages->add( sprintf(T_('The extension of the file &laquo;%s&raquo; has been corrected. The new filename is &laquo;%s&raquo;.'), $old_name, $newName), 'warning' );
 				}
-			}
-
-			// Check if uploading of sensitive file is allowed:
-			if( !allow_sensitive_filetype_upload( $correct_FileType ) )
-			{
-				$failedFiles[$lKey] = $newName.' - '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
-						'<code>$admins_can_upload_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );
-				// Abort upload for this file:
-				continue;
-			}
-		}
-		else
-		{
-			$path_info = pathinfo( $newName );
-			$FiletypeCache = & get_FiletypeCache();
-			$upload_Filetype = $FiletypeCache->get_by_extension( $path_info['extension'] );
-
-			if( !allow_sensitive_filetype_upload( $upload_Filetype ) )
-			{
-				$failedFiles[$lKey] = $newName.' - '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
-						'<code>$admins_can_upload_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );
-				// Abort upload for this file:
-				continue;
 			}
 		}
 
@@ -2359,7 +2337,7 @@ function create_htaccess_deny( $dir )
  */
 function display_dragdrop_upload_button( $params = array() )
 {
-	global $blog, $Settings, $current_User, $b2evo_icons_type, $DB, $admins_can_upload_sensitive_files;
+	global $blog, $Settings, $current_User, $b2evo_icons_type, $DB, $admins_can_manipulate_sensitive_files;
 
 	$params = array_merge( array(
 			'before'           => '',
@@ -2469,7 +2447,7 @@ function display_dragdrop_upload_button( $params = array() )
 	// Get list of allowed filetype extensions
 	if( is_logged_in( false ) )
 	{
-		$condition = ( $current_User->check_perm( 'files', 'all' ) && !empty($admins_can_upload_sensitive_files) ) ? '' : 'ftyp_allowed <> "admin"';
+		$condition = ( $current_User->check_perm( 'files', 'all' ) && !empty($admins_can_manipulate_sensitive_files) ) ? '' : 'ftyp_allowed <> "admin"';
 	}
 	else
 	{
@@ -3505,20 +3483,6 @@ function sort_thumbnail_sizes_callback( $a, $b )
 
 
 /**
- * Check if we allow uploading of sensitive filetype
- *
- * @param object Filetype
- * @return boolean
- */
-function allow_sensitive_filetype_upload( $Filetype )
-{
-	global $admins_can_upload_sensitive_files;
-
-	return !( $Filetype->allowed == 'admin' && empty( $admins_can_upload_sensitive_files ) );
-}
-
-
-/**
  * Helper function to display file last modification date in table cell
  *
  * @param object File
@@ -3621,11 +3585,14 @@ function file_td_actions( & $File )
 		$r .= get_icon( 'edit', 'noimg' );
 	}
 
-	$r .= action_icon( T_('Edit properties...'), 'properties', $action_crumb_url.'action=edit_properties', NULL, NULL, NULL,
-		array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.$File->get_rdfp_rel_path().'\' )' ) );
-	$r .= action_icon( T_('Move'), 'file_move', $action_url.'action=file_move&amp;fm_sources_root='.$FileRoot->ID );
-	$r .= action_icon( T_('Copy'), 'file_copy', $action_url.'action=file_copy&amp;fm_sources_root='.$FileRoot->ID );
-	$r .= action_icon( T_('Delete'), 'file_delete', $action_crumb_url.'action=delete' );
+	if( $File->can_be_manipulated() )
+	{
+		$r .= action_icon( T_('Edit properties...'), 'properties', $action_crumb_url.'action=edit_properties', NULL, NULL, NULL,
+			array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.$File->get_rdfp_rel_path().'\' )' ) );
+		$r .= action_icon( T_('Move'), 'file_move', $action_url.'action=file_move&amp;fm_sources_root='.$FileRoot->ID );
+		$r .= action_icon( T_('Copy'), 'file_copy', $action_url.'action=file_copy&amp;fm_sources_root='.$FileRoot->ID );
+		$r .= action_icon( T_('Delete'), 'file_delete', $action_crumb_url.'action=delete' );
+	}
 
 	return $r;
 }

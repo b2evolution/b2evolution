@@ -792,12 +792,25 @@ switch( $action )
 		param( 'new_names', 'array:filepath', array() );
 
 		// Check params for each file to rename:
+		$index = 0;
 		while( $loop_src_File = & $source_Filelist->get_next() )
 		{
+			if( !$loop_src_File->can_be_manipulated() )
+			{
+				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $loop_src_File->get_name().' - '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+						'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ) );
+				$source_Filelist->remove( $loop_src_File );
+				unset( $fm_selected[$index] );
+				$confirmed = 0;
+				$index++;
+				continue;
+			}
+
 			if( ! isset( $new_names[$loop_src_File->get_md5_ID()] ) )
 			{ // We have not yet provided a name to rename to...
 				$confirmed = 0;
 				$new_names[$loop_src_File->get_md5_ID()] = $loop_src_File->get_name();
+				$index++;
 				continue;
 			}
 
@@ -806,8 +819,14 @@ switch( $action )
 			{
 				$confirmed = 0;
 				param_error( 'new_names['.$loop_src_File->get_md5_ID().']', $check_error );
+				$index++;
 				continue;
 			}
+		}
+
+		if( empty( $new_names ) )
+		{
+			$confirmed = 0;
 		}
 
 		if( $confirmed )
@@ -826,6 +845,13 @@ switch( $action )
 						// Rename file
 						$old_name = $loop_src_File->get_name();
 						$new_name = $new_names[$loop_src_File->get_md5_ID()];
+
+						if( !$loop_src_File->can_be_manipulated() )
+						{
+							$Messages->add_to_group( $old_name.' - '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+									'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error', T_('Renaming files:') );
+							continue 2;
+						}
 
 						if( $new_name == $old_name )
 						{ // Name has not changed...
@@ -848,6 +874,13 @@ switch( $action )
 						// Copy file
 						$old_path = $loop_src_File->get_rdfp_rel_path();
 						$new_path = $selected_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
+
+						if( !$loop_src_File->can_be_manipulated() )
+						{
+							$Messages->add_to_group( $old_path.' - '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+									'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error', T_('Copying files:') );
+							continue 2;
+						}
 
 						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
 						{ // File path has not changed...
@@ -877,6 +910,13 @@ switch( $action )
 						// Move file
 						$old_path = $loop_src_File->get_rdfp_rel_path();
 						$new_path = $selected_Filelist->get_rds_list_path().$new_names[$loop_src_File->get_md5_ID()];
+
+						if( !$loop_src_File->can_be_manipulated() )
+						{
+							$Messages->add_to_group( $old_path.' - '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+									'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error', T_('Moving files:') );
+							continue 2;
+						}
 
 						if( $old_path == $new_path && $loop_src_File->_FileRoot->ID == $selected_Filelist->_FileRoot->ID )
 						{ // File path has not changed...
@@ -1008,6 +1048,22 @@ switch( $action )
 			{
 				// Check if there are delete restrictions on this file:
 				$restriction_Messages = $l_File->check_relations( 'delete_restrictions', array(), true );
+
+				// if( !$l_File->can_be_manipulated() )
+				// {
+				// 	$Messages->add_to_group( $l_File->get_name().' - '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+				// 			'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error', T_('Deleting files...') );
+				// 	$selected_Filelist->remove( $l_File );
+				// 	continue 2;
+				// }
+
+				if( !$l_File->can_be_manipulated() )
+				{	// File can not be manipulated:
+					$Messages->add_to_group( $l_File->get_prefixed_name().': '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+							'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error', T_('Deleting files...') );
+					// Skip this file
+					continue;
+				}
 
 				if( $restriction_Messages->count() )
 				{ // There are restrictions:
@@ -1240,64 +1296,75 @@ switch( $action )
 		$Session->assert_received_crumb( 'file' );
 
 		// Check permission!
- 		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
 
 		$edited_File = & $selected_Filelist->get_by_idx(0);
-		// Load meta data:
-		$edited_File->load_meta();
+		$error_occured = false;
 
-		$edited_File->set( 'title', param( 'title', 'string', '' ) );
-		$edited_File->set( 'alt', param( 'alt', 'string', '' ) );
-		$edited_File->set( 'desc', param( 'desc', 'text', '' ) );
-
-		$resize_image = param( 'resize_image', 'boolean', false );
-		if( $resize_image )
+		if( !$edited_File->can_be_manipulated() )
 		{
-			load_funcs( 'files/model/_image.funcs.php' );
-
-			$current_dimensions = $edited_File->get_image_size('widthheight_assoc');
-			$new_dimensions = fit_into_constraint( $current_dimensions['width'], $current_dimensions['height'],
-					$Settings->get( 'fm_resize_width' ), $Settings->get( 'fm_resize_height' ));
-			resize_image( $edited_File, (int)$new_dimensions[0], (int)$new_dimensions[1] );
-		}
-
-		// Store File object into DB:
-		if( $edited_File->dbsave() )
-		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $edited_File->dget('name') ), 'success' );
+			$error_occurred = true;
+			$Messages->add( sprintf( $edited_File->get_name().' - '.T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+					'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error' );
+			break;
 		}
 		else
 		{
-			$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edited_File->dget('name') ), 'note' );
-		}
+			// Load meta data:
+			$edited_File->load_meta();
 
-		$old_name = $edited_File->get_name();
-		$new_name = param( 'name', 'string', '' );
-		$error_occured = false;
+			$edited_File->set( 'title', param( 'title', 'string', '' ) );
+			$edited_File->set( 'alt', param( 'alt', 'string', '' ) );
+			$edited_File->set( 'desc', param( 'desc', 'text', '' ) );
 
-		if( $new_name != $old_name)
-		{ // Name has changed...
-			$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
-			if( $check_error = check_rename( $new_name, $edited_File->is_dir(), $edited_File->get_dir(), $allow_locked_filetypes ) )
+			$resize_image = param( 'resize_image', 'boolean', false );
+			if( $resize_image )
 			{
-				$error_occured = true;
-				param_error( 'new_name', $check_error );
+				load_funcs( 'files/model/_image.funcs.php' );
+
+				$current_dimensions = $edited_File->get_image_size('widthheight_assoc');
+				$new_dimensions = fit_into_constraint( $current_dimensions['width'], $current_dimensions['height'],
+						$Settings->get( 'fm_resize_width' ), $Settings->get( 'fm_resize_height' ));
+				resize_image( $edited_File, (int)$new_dimensions[0], (int)$new_dimensions[1] );
+			}
+
+			// Store File object into DB:
+			if( $edited_File->dbsave() )
+			{
+				$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have been updated.' ), $edited_File->dget('name') ), 'success' );
 			}
 			else
-			{ // Perform rename:
-				if( $edited_File->rename_to( $new_name ) )
-				{
-					$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
-							$old_name, $new_name ), 'success' );
+			{
+				$Messages->add( sprintf( T_( 'File properties for &laquo;%s&raquo; have not changed.' ), $edited_File->dget('name') ), 'note' );
+			}
 
-					// We have renamed teh file, update caches:
-					$fm_Filelist->update_caches();
-				}
-				else
+			$old_name = $edited_File->get_name();
+			$new_name = param( 'name', 'string', '' );
+
+			if( $new_name != $old_name)
+			{ // Name has changed...
+				$allow_locked_filetypes = $current_User->check_perm( 'files', 'all' );
+				if( $check_error = check_rename( $new_name, $edited_File->is_dir(), $edited_File->get_dir(), $allow_locked_filetypes ) )
 				{
 					$error_occured = true;
-					$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
-							$old_name, $new_name ), 'error' );
+					param_error( 'new_name', $check_error );
+				}
+				else
+				{ // Perform rename:
+					if( $edited_File->rename_to( $new_name ) )
+					{
+						$Messages->add( sprintf( T_('&laquo;%s&raquo; has been successfully renamed to &laquo;%s&raquo;'),
+								$old_name, $new_name ), 'success' );
+
+						// We have renamed teh file, update caches:
+						$fm_Filelist->update_caches();
+					}
+					else
+					{
+						$error_occured = true;
+						$Messages->add( sprintf( T_('&laquo;%s&raquo; could not be renamed to &laquo;%s&raquo;'),
+								$old_name, $new_name ), 'error' );
+					}
 				}
 			}
 		}
@@ -1529,6 +1596,12 @@ switch( $action )
 					$Messages->add( sprintf( T_('Permissions for &laquo;%s&raquo; have not been changed.'), $l_File->dget('name') ), 'note' );
 					continue;
 				}
+				elseif( !$l_File->can_be_manipulated() )
+				{
+					$Messages->add( $l_File->get_name().' - '.sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+							'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ), 'error' );
+					continue;
+				}
 				else
 				{ // provided for this file
 					$chmod = $perms[ $l_File->get_md5_ID() ];
@@ -1654,7 +1727,7 @@ if( $mode != 'modal' )
 /*
  * Display payload:
  */
-if( !empty($action ) && $action != 'list' && $action != 'nil' )
+if( !empty( $action ) && $action != 'list' && $action != 'nil' )
 {
 
 	// Action displays:
