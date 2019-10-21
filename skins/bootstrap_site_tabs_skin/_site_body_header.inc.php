@@ -112,7 +112,7 @@ else
 							) );
 				// ---------------------------------- END OF COLLECTION LIST ---------------------------------
 
-				if( $Settings->get( 'info_blog_ID' ) > 0 )
+				if( $site_Skin->get_info_coll_ID() > 0 )
 				{	// We have a collection for shared content blocks:
 					// --------------------------------- START OF PAGES LIST --------------------------------
 					// Call widget directly (without container):
@@ -131,7 +131,7 @@ else
 									'item_selected_end' => '</li>',
 									'link_selected_class' => 'active',
 									'link_default_class' => '',
-									'blog_ID' => $Settings->get( 'info_blog_ID' ),
+									'blog_ID' => $site_Skin->get_info_coll_ID(),
 									'item_group_by' => 'none',
 									'order_by' => 'order',		// Order (as explicitly specified)
 							) );
@@ -202,7 +202,7 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 							'item_end' => '</li>',
 							'item_selected_start' => '<li class="active">',
 							'item_selected_end' => '</li>',
-							'blog_ID' => $Settings->get( 'info_blog_ID' ),
+							'blog_ID' => $site_Skin->get_info_coll_ID(),
 							'item_group_by' => 'none',
 							'order_by' => 'order',		// Order (as explicitly specified)
 					) );

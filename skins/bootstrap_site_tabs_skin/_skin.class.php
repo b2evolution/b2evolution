@@ -86,6 +86,10 @@ class bootstrap_site_tabs_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		// Set params for setting "Collection for Info Pages":
+		$BlogCache = & get_BlogCache();
+		$BlogCache->none_option_text = T_('Same as "Default collection to display"');
+
 		$r = array_merge( array(
 				'section_layout_start' => array(
 					'layout' => 'begin_fieldset',
@@ -112,9 +116,15 @@ class bootstrap_site_tabs_Skin extends Skin
 				),
 					'grouping' => array(
 						'label' => T_('Grouping'),
-						'note' => T_('Check to group collections into tabs'),
+						'note' => T_('Check to group collections into dropdown menus'),
 						'type' => 'checkbox',
 						'defaultvalue' => 1,
+					),
+					'info_coll_ID' => array(
+						'label' => T_('Collection for Info Pages'),
+						'type' => 'select_blog',
+						'allow_none' => true,
+						'defaultvalue' => 0,
 					),
 
 					'section_topmenu_start' => array(
@@ -390,7 +400,7 @@ footer.sitewide_footer .container a {
 	 */
 	function get_header_tabs()
 	{
-		global $Blog, $disp, $Settings, $current_User;
+		global $Blog, $disp, $current_User;
 
 		$header_tabs = array();
 
@@ -419,7 +429,7 @@ footer.sitewide_footer .container a {
 			{
 				$coll_is_active = false;
 				if( $current_blog_ID == $group_Blog->ID &&
-						( $Settings->get( 'info_blog_ID' ) != $current_blog_ID || ( $current_disp != 'page' && $current_disp != 'msgform' ) ) )
+						( $this->get_info_coll_ID() != $current_blog_ID || ( $current_disp != 'page' && $current_disp != 'msgform' ) ) )
 				{	// Mark this menu as active:
 					$coll_is_active = true;
 				}
@@ -510,7 +520,7 @@ footer.sitewide_footer .container a {
 				$this->header_tab_active = $level0_index;
 			}
 
-			if( $current_disp == 'page' && $Settings->get( 'info_blog_ID' ) == $Blog->ID )
+			if( $current_disp == 'page' && $this->get_info_coll_ID() == $Blog->ID )
 			{	// If this menu contains the links to pages of the info/shared collection:
 				$this->header_tab_active = $level0_index;
 			}
@@ -541,6 +551,24 @@ footer.sitewide_footer .container a {
 
 		return $header_tabs;
 	}
-}
 
+
+	/**
+	 * Get ID of collection for Info Pages
+	 *
+	 * @return integer ID
+	 */
+	function get_info_coll_ID()
+	{
+		$info_coll_ID = $this->get_setting( 'info_coll_ID' );
+
+		if( empty( $info_coll_ID ) )
+		{	// Use same collection as "Default collection to display":
+			global $Settings;
+			return $Settings->get( 'default_blog_ID' );
+		}
+
+		return $info_coll_ID;
+	}
+}
 ?>
