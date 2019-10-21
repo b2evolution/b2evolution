@@ -220,6 +220,8 @@ class WidgetContainer extends DataObject
 				break;
 
 			case 'page':
+				// Page container cannot be a sub-container:
+				$this->set( 'main', '1' );
 				$container_page_type = param( 'container_page_type', 'string', NULL );
 				param_check_not_empty( 'container_page_type', T_('Please select page container type.') );
 				switch( $container_page_type )
