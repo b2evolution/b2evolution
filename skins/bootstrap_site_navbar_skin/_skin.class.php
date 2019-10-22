@@ -116,7 +116,7 @@ class bootstrap_site_navbar_Skin extends Skin
 				),
 					'grouping' => array(
 						'label' => T_('Grouping'),
-						'note' => T_('Check to group collections into dropdown menus'),
+						'note' => T_('Check to group collections into tabs / sub tabs'),
 						'type' => 'checkbox',
 						'defaultvalue' => 1,
 					),
