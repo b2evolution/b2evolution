@@ -881,6 +881,26 @@ jQuery( document ).ready( function()
 		}
 		else
 		{ // We have rows to display:
+			if( ! empty( $this->list_mass_actions ) )
+			{	// Start form for list with mass actions:
+				$this->Form = new Form();
+				$this->Form->begin_form();
+				if( ! empty( $this->list_form_hiddens ) )
+				{
+					foreach( $this->list_form_hiddens as $list_form_hidden_key => $list_form_hidden_value )
+					{
+						if( $list_form_hidden_key == 'crumb' )
+						{	// Special hidden for crumb:
+							$this->Form->add_crumb( $list_form_hidden_value );
+						}
+						else
+						{	// Normal hidden field:
+							$this->Form->hidden( $list_form_hidden_key, $list_form_hidden_value );
+						}
+					}
+				}
+			}
+
 			$list_class = empty( $this->params['list_class'] ) ? '' : ' '.$this->params['list_class'];
 			$list_attrs = empty( $this->params['list_attrib'] ) ? '' : ' '.$this->params['list_attrib'];
 			echo str_replace( array( ' $list_class$', ' $list_attrib$' ), array( $list_class, $list_attrs ), $this->params['list_start'] );
@@ -902,6 +922,11 @@ jQuery( document ).ready( function()
 		else
 		{	// We have rows to display:
 			echo $this->params['list_end'];
+
+			if( ! empty( $this->list_mass_actions ) && isset( $this->Form ) )
+			{	// Start form for list with mass actions:
+				$this->Form->end_form();
+			}
 		}
 	}
 

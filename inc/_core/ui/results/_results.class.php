@@ -1497,9 +1497,9 @@ class Results extends Table
 						$r .= '<option value="'.format_to_output( $selector, 'formvalue' ).'">'.$label.'</option>';
 					}
 					$r .= '</select> ';
-					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.T_('Check all').'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
-							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Uncheck all').'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
-							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Reverse').'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Check all'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Uncheck all'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Reverse'), 'htmlattr' ).'" onclick="jQuery( jQuery( this ).prevAll( \'select\' ).val(), jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
 				}
 				else
 				{
@@ -1511,14 +1511,39 @@ class Results extends Table
 					{
 						$selector = $this->checkbox_toggle_selectors;
 					}
-					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.T_('Check all').'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
-							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Uncheck all').'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
-							'<input type="button" class="btn btn-default btn-xs" value="'.T_('Reverse').'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+					$r .= '<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Check all'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', true );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Uncheck all'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).prop( \'checked\', false );" /> '.
+							'<input type="button" class="btn btn-default btn-xs" value="'.format_to_output( T_('Reverse'), 'htmlattr' ).'" onclick="jQuery( \''.format_to_js( $selector ).'\', jQuery( this ).closest( \'.results\' ) ).each( function() { this.checked = !this.checked } );"  />';
+				}
+
+				if( ! empty( $this->list_mass_actions ) )
+				{	// Additional actions:
+					foreach( $this->list_mass_actions as $toggle_action_key => $toggle_action )
+					{
+						$r .= ' ';
+						switch( $toggle_action['type'] )
+						{
+							case 'text':
+								$r .= $toggle_action['text'];
+								break;
+							case 'button':
+							case 'submit':
+								$r .= '<input type="'.$toggle_action['type'].'" name="actionArray['.$toggle_action_key.']"'
+									.' value="'.format_to_output( $toggle_action['text'] ).'"'
+									.' class="btn btn-xs '.( empty( $toggle_action['class'] ) ? 'btn-default' : ''.$toggle_action['class'] ).'" />';
+								break;
+						}
+					}
 				}
 				$r .= '</div>';
 				$r .= $this->params['footer_end'];
 			}
 			echo $this->params['list_end'].$r;
+
+			if( ! empty( $this->list_mass_actions ) && isset( $this->Form ) )
+			{	// Start form for list with mass actions:
+				$this->Form->end_form();
+			}
 		}
 	}
 

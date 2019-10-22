@@ -45,6 +45,10 @@ global $postIDarray;
 $postIDarray = $ItemList->get_page_ID_array();
 
 
+// Display a panel to confirm mass action with selected items:
+display_mass_items_confirmation_panel();
+
+
 $block_item_Widget = new Widget( 'block_item' );
 
 // This block is used to keep correct css style for the post status banners
@@ -123,6 +127,7 @@ if( $allow_items_list_form )
 
 	$Form->begin_form();
 	$Form->hidden( 'ctrl', 'items' );
+	$Form->hidden( 'tab', get_param( 'tab' ) );
 	$Form->hidden( 'blog', $blog );
 	$Form->hidden( 'page', $ItemList->page );
 	$Form->add_crumb( 'items' );
@@ -854,11 +859,19 @@ if( $action == 'view' )
 }
 elseif( $allow_items_list_form )
 {	// Allow to select item for action only on items list if current user can edit at least one item status:
+	echo '<input type="button" class="btn btn-default" value="'.T_('Check all').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\' ).prop( \'checked\', true );" /> '.
+		'<input type="button" class="btn btn-default" value="'.T_('Uncheck all').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\', jQuery( this ).closest( \'form\' ) ).prop( \'checked\', false );" /> '.
+		'<input type="button" class="btn btn-default" value="'.T_('Reverse').'" onclick="jQuery( \'input[name=selected_items\\\[\\\]]:checkbox\', jQuery( this ).closest( \'form\' ) ).each( function() { this.checked = !this.checked } );" /> ';
+
 	echo T_('With checked posts').': ';
 
 	// Display a button to change visibility of selected comments:
 	echo_item_status_buttons( $Form, NULL, 'items_visibility' );
 	echo_status_dropdown_button_js( 'post' );
+
+	//$Form->button( array( 'button', 'mass_change_main_cat', T_('Change primary category') ) );
+	//$Form->button( array( 'button', 'mass_add_extra_cat', T_('Add secondary category') ) );
+	$Form->button( array( 'submit', 'actionArray[mass_delete]', T_('Delete'), 'btn-danger' ) );
 
 	$Form->end_form();
 }

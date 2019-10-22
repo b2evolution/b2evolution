@@ -2234,11 +2234,25 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 /**
  * Display buttons to update a post
  *
- * @param object Form
+ * @param object Form @deprecated
  * @param object edited Item
  * @param string Action: NULL - to get action from global var
  */
 function echo_item_status_buttons( $Form, $edited_Item, $button_action = NULL )
+{
+	echo get_item_status_buttons( $edited_Item, $button_action );
+}
+
+
+/**
+ * Get html code of buttons to update a post
+ *
+ * @param object edited Item
+ * @param string Action: NULL - to get action from global var
+ * @param string Button class
+ * @return string
+ */
+function get_item_status_buttons( $edited_Item, $button_action = NULL, $button_class = '' )
 {
 	global $next_action, $action, $Collection, $Blog;
 
@@ -2274,26 +2288,28 @@ function echo_item_status_buttons( $Form, $edited_Item, $button_action = NULL )
 
 	if( empty( $status_options ) )
 	{	// If current User has no permission to edit to any status:
-		return;
+		return '';
 	}
 
 	$status_icon_options = get_visibility_statuses( 'icons', $exclude_statuses );
 
-	$Form->hidden( 'post_status', $item_status );
-	echo '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="'.$tooltip_placement.'" data-container="body" title="'.get_status_tooltip_title( $item_status ).'">';
-	echo '<button type="submit" class="btn btn-status-'.$item_status.'" name="actionArray['.$next_action.']">'
+	$r = '<input type="hidden" name="post_status" value="'.format_to_output( $item_status, 'formvalue' ).'" />';
+	$r .= '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="'.$tooltip_placement.'" data-container="body" title="'.get_status_tooltip_title( $item_status ).'">';
+	$r .= '<button type="submit" class="btn btn-status-'.$item_status.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray['.$next_action.']">'
 				.'<span>'.$status_options[ $item_status ].'</span>'
 			.'</button>'
-			.'<button type="button" class="btn btn-status-'.$item_status.' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
+			.'<button type="button" class="btn btn-status-'.$item_status.( empty( $button_class ) ? '' : ' '.$button_class ).' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
 				.'<span class="caret"></span>'
 			.'</button>';
-	echo '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
+	$r .= '<ul class="dropdown-menu" role="menu" aria-labelledby="post_status_dropdown">';
 	foreach( $status_options as $status_key => $status_title )
 	{
-		echo '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
+		$r .= '<li rel="'.$status_key.'" role="presentation"><a href="#" role="menuitem" tabindex="-1">'.$status_icon_options[ $status_key ].' <span>'.$status_title.'</span></a></li>';
 	}
-	echo '</ul>';
-	echo '</div>';
+	$r .= '</ul>';
+	$r .= '</div>';
+
+	return $r;
 }
 
 
@@ -2388,6 +2404,8 @@ function echo_status_dropdown_button_js( $type = 'post' )
 
 	?>
 	<script>
+	jQuery( document ).ready( function()
+	{
 		jQuery( '.<?php echo $type; ?>_status_dropdown li a' ).click( function()
 		{
 			var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};
@@ -2426,6 +2444,7 @@ function echo_status_dropdown_button_js( $type = 'post' )
 
 			return false;
 		} );
+	} );
 	</script>
 	<?php
 }
@@ -5552,12 +5571,13 @@ function get_item_version_title( $Version )
  */
 function items_results( & $items_Results, $params = array() )
 {
-	global $Collection, $Blog;
+	global $Collection, $Blog, $current_User;
 
 	// Make sure we are not missing any param:
 	$params = array_merge( array(
 			'tab'                        => '',
 			'field_prefix'               => '',
+			'display_selector'           => false,
 			'display_date'               => true,
 			'display_blog'               => true,
 			'display_author'             => true,
@@ -5572,6 +5592,50 @@ function items_results( & $items_Results, $params = array() )
 			'display_history'            => true,
 			'display_actions'            => true,
 		), $params );
+
+	if( $params['display_selector'] &&
+	    is_logged_in() && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+	{	// Display item selector only if current User has a permission to edit:
+		$items_Results->cols[] = array(
+				'th' => '',
+				'th_class' => 'shrinkwrap',
+				'td' => '%item_row_checkbox( {Obj} )%',
+				'td_class' => 'center'
+			);
+		$items_Results->checkbox_toggle_selectors = 'input[name=selected_items\[\]]:checkbox';
+		$items_Results->list_mass_actions = array(
+			'prefix_text' => array(
+					'type' => 'text',
+					'text' => T_('With checked posts').':',
+				),
+			'items_visibility' => array(
+					'type' => 'text',
+					'text' => get_item_status_buttons( NULL, 'items_visibility', 'btn-xs' ),
+				),
+			/*'mass_change_main_cat' => array(
+					'type' => 'button',
+					'text' => T_('Change primary category'),
+				),
+			'mass_add_extra_cat' => array(
+					'type' => 'button',
+					'text' => T_('Add secondary category'),
+				),*/
+			'mass_delete' => array(
+					'type'  => 'submit',
+					'text'  => T_('Delete'),
+					'class' => 'btn-danger',
+				),
+		);
+		$items_Results->list_form_hiddens = array(
+				'ctrl'     => 'items',
+				'tab'      => get_param( 'tab' ),
+				'tab_type' => get_param( 'tab_type' ),
+				'blog'     => $Blog->ID,
+				'page'     => $items_Results->page,
+				'crumb'    => 'items',
+			);
+		echo_status_dropdown_button_js( 'post' );
+	}
 
 	if( $params['display_date'] )
 	{	// Display Date column
@@ -5879,6 +5943,80 @@ function collection_item_type_titles( $coll_ID, $item_type_ID = NULL, $key_prefi
 
 
 /**
+ * Display a panel to confirm mass action with selected items
+ */
+function display_mass_items_confirmation_panel()
+{
+	global $blog, $current_User, $admin_url;
+
+	if( ! is_logged_in() )
+	{
+		return;
+	}
+
+	$selected_items = param( 'selected_items', 'string' );
+	$tab = param( 'tab', 'string', 'type' );
+	$page = param( 'items_'.$tab.'_paged', 'integer', 1 );
+	$tab_type = param( 'tab_type', 'string', '' );
+
+	$selected_items = explode( ',', $selected_items );
+	$selected_items_list = '';
+	$selected_items_hiddens = '';
+	$ItemCache = & get_ItemCache();
+
+	switch( param( 'confirm_action', 'string' ) )
+	{
+		case 'mass_delete':
+			foreach( $selected_items as $i => $selected_item_ID )
+			{	// Check if current User has a permission to delete the selected Item:
+				if( ( $Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false ) ) )
+				{
+					$selected_items_list .= '<li>'.$Item->get_title( array(
+							'link_type' => 'admin_view'
+						) ).'</li>';
+					$selected_items_hiddens .= '<input type="hidden" name="selected_items[]" value="'.$Item->ID.'" />';
+				}
+			}
+			$title = T_('You are about to delete the following items:');
+			$confirm_question = T_('Delete these items?');
+			break;
+	}
+
+	if( empty( $selected_items_list ) )
+	{	// No selected items which can be edited by current User:
+		return;
+	}
+
+	echo '<div class="panel panel-danger">'
+		.'<div class="panel-heading">'
+			.'<h3 class="panel-title">'.$title.'</h3>'
+		.'</div>'
+		.'<div class="panel-body">'
+			.'<form class="form-horizontal" method="post">'
+				.'<ul>'.$selected_items_list.'</ul>'
+				.'<p class="warning text-danger">'.$confirm_question.'</p>'
+				.'<p class="warning text-danger">'.T_('THIS CANNOT BE UNDONE!').'</p>'
+				.'<input type="submit" class="btn btn-danger" name="actionArray[mass_delete]" value="'.format_to_output( T_('I am sure!'), 'htmlattr' ).'" /> '
+				.'<a href="'.$admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;tab='.$tab
+						.( $page > 1 ? '&amp;items_'.$tab.'_paged='.$page : '' )
+						.( $tab == 'type' && ! empty( $tab_type ) ? '&tab_type='.$tab_type : '' ).'" class="btn btn-default">'
+					.T_('CANCEL')
+				.'</a>'
+				.'<input type="hidden" name="confirm" value="1" />'
+				.'<input type="hidden" name="ctrl" value="items" />'
+				.'<input type="hidden" name="tab" value="'.$tab.'" />'
+				.( $tab == 'type' && ! empty( $tab_type ) ? '<input type="hidden" name="tab_type" value="'.$tab_type.'" />' : '' )
+				.(  $page > 1 ? '<input type="hidden" name="items_'.$tab.'_paged" value="'.$page.'" />' : '' )
+				.'<input type="hidden" name="blog" value="'.$blog.'" />'
+				.'<input type="hidden" name="crumb_items" value="'.get_crumb( 'items' ).'" />'
+				.$selected_items_hiddens
+			.'</form>'
+		.'</div>'
+	.'</div>';
+}
+
+
+/**
  * Helper functions to display Items results.
  * New ( not display helper ) functions must be created above item_results function
  */
@@ -6073,6 +6211,23 @@ function item_row_order( $Item )
 	else
 	{	// If current user cannot edit the Item then display a static text
 		return $item_order;
+	}
+}
+
+
+/**
+ * Helper function to get checkbox to selcect item for multi actions
+ *
+ * @param object Item
+ * @return string
+ */
+function item_row_checkbox( $Item )
+{
+	global $current_User;
+
+	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	{	// Allow to select Item only if current User can edit it:
+		return '<input type="checkbox" name="selected_items[]" value="'.$Item->ID.'" />';
 	}
 }
 

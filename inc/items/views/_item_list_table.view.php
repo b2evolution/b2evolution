@@ -66,9 +66,13 @@ $ItemList->filter_area = array(
 
 $ItemList->title = sprintf( /* TRANS: list of "posts"/"intros"/"custom types"/etc */ T_('"%s" list'), $tab_type ).get_manual_link( $tab_type.'-list' );
 
+// Display a panel to confirm mass action with selected items:
+display_mass_items_confirmation_panel();
+
 // Initialize Results object
 items_results( $ItemList, array(
 		'tab' => $tab,
+		'display_selector' => true,
 	) );
 
 if( $ItemList->is_filtered() )

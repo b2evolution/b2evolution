@@ -573,9 +573,15 @@ switch( $action )
 
 		$selected_items = param( 'selected_items', 'array:integer' );
 		$page = param( 'page', 'integer', 1 );
+		$tab = param( 'tab', 'string', 'type' );
+		$tab_type = param( 'tab_type', 'string', '' );
 
 		// Set an URL to redirect to items list after this action:
-		$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.( $page > 1 ? '&items_full_paged='.$page : '' );
+		$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab='.$tab.( $page > 1 ? '&items_'.$tab.'_paged='.$page : '' );
+		if( $tab == 'type' && ! empty( $tab_type ) )
+		{
+			$redirect_to .= '&tab_type='.$tab_type;
+		}
 
 		if( empty( $selected_items ) )
 		{	// If no items selected:
@@ -630,6 +636,69 @@ switch( $action )
 		if( $items_failed )
 		{	// Inform about failed updates:
 			$Messages->add( sprintf( T_('Visibility of %d items could not be updated to %s.'), $items_failed, $item_status_title ), 'error' );
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $redirect_to );
+		break;
+
+	case 'mass_delete':
+		// Change visibility of selected items:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'items' );
+
+		$selected_items = param( 'selected_items', 'array:integer' );
+		$page = param( 'page', 'integer', 1 );
+		$tab = param( 'tab', 'string', 'type' );
+		$tab_type = param( 'tab_type', 'string', '' );
+		$confirm = param( 'confirm', 'integer', 0 );
+
+		// Set an URL to redirect to items list after this action:
+		$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab='.$tab.( $page > 1 ? '&items_'.$tab.'_paged='.$page : '' );
+		if( $tab == 'type' && ! empty( $tab_type ) )
+		{
+			$redirect_to .= '&tab_type='.$tab_type;
+		}
+
+		if( empty( $selected_items ) )
+		{	// If no items selected:
+			$Messages->add( T_('Please select at least one item.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		if( $confirm )
+		{	// Mass deleting of the selected items after confirmation:
+			$ItemCache = & get_ItemCache();
+			$items_success = 0;
+			$items_restricted = array();
+			$items_failed = 0;
+			foreach( $selected_items as $selected_item_ID )
+			{
+				if( ( $selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false ) ) &&
+				    $current_User->check_perm( 'item_post!CURSTATUS', 'delete', false, $selected_Item ) &&
+				    $selected_Item->dbdelete() )
+				{	// If current User has a permission to delete the selected Item:
+					$items_success++;
+				}
+				else
+				{	// Wrong item or current User has no perm to delete the selected item:
+					$items_failed++;
+				}
+			}
+			if( $items_success )
+			{	// Inform about success deletes:
+				$Messages->add( sprintf( T_('%d items have been deleted.'), $items_success ), 'success' );
+			}
+			if( $items_failed )
+			{	// Inform about failed updates:
+				$Messages->add( sprintf( T_('%d items could not be deleted.'), $items_failed ), 'error' );
+			}
+		}
+		else
+		{	// Redirect to page for confirmation of mass deleting items:
+			$redirect_to .= '&confirm_action=mass_delete&selected_items='.implode( ',', $selected_items );
 		}
 
 		// REDIRECT / EXIT:
