@@ -134,7 +134,7 @@ if( $edited_SiteMenu->ID > 0 )
 		}
 
 		// Entry type:
-		$r .= '<td class="nowrap">'.get_menu_type_title( $SiteMenuEntry->get( 'type' ) ).'</td>';
+		$r .= '<td class="nowrap">'.get_site_menu_type_title( $SiteMenuEntry->get( 'type' ) ).'</td>';
 
 		// Actions
 		$r .= '<td class="lastcol shrinkwrap">';

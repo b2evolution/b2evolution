@@ -116,7 +116,7 @@ class SiteMenu extends DataObject
 							case 'sec':
 								// Section entry:
 								$SiteMenuEntry->set( 'text', $menu_entry_text );
-								$SiteMenuEntry->set( 'type', 'url' );
+								$SiteMenuEntry->set( 'type', 'text' );
 								if( $SiteMenuEntry->dbinsert() )
 								{
 									$entry_sections[ $m[2] ] = $SiteMenuEntry->ID;

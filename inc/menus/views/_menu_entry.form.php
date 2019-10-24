@@ -42,7 +42,7 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New Menu Entry') : T_('Menu Entry
 
 	$Form->text_input( 'ment_text', $edited_SiteMenuEntry->get( 'text' ), 50, T_('Text'), '', array( 'maxlength' => 128, 'required' => true ) );
 
-	$Form->select_input_array( 'ment_type', $edited_SiteMenuEntry->get( 'text' ), get_menu_types(), T_('Type') );
+	$Form->select_input_array( 'ment_type', $edited_SiteMenuEntry->get( 'type' ), get_site_menu_types(), T_('Type') );
 
 	load_funcs( 'files/model/_image.funcs.php' );
 	$Form->select_input_array( 'ment_coll_logo_size', $edited_SiteMenuEntry->get( 'coll_logo_size' ), get_available_thumb_sizes( T_('No logo') ), T_('Collection logo before link text') );

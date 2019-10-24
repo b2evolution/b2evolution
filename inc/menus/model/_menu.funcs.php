@@ -60,15 +60,30 @@ function get_menu_types()
 		);
 }
 
+
 /**
- * Get menu type title by type key
+ * Get types for Site Menu
+ *
+ * @return array
+ */
+function get_site_menu_types( $additional_types = array() )
+{
+	$menu_types = get_menu_types();
+	$menu_types[ T_('Other') ]['text'] = T_('Text');
+
+	return $menu_types;
+}
+
+
+/**
+ * Get site menu type title by type key
  *
  * @param string Type key
  * @return string Type title
  */
-function get_menu_type_title( $type )
+function get_site_menu_type_title( $type )
 {
-	$grouped_menu_types = get_menu_types();
+	$grouped_menu_types = get_site_menu_types();
 
 	foreach( $grouped_menu_types as $menu_type_group => $menu_types )
 	{
