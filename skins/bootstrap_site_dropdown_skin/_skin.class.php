@@ -86,9 +86,14 @@ class bootstrap_site_dropdown_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		global $current_User, $admin_url;
+
 		// Set params for setting "Collection for Info Pages":
 		$BlogCache = & get_BlogCache();
 		$BlogCache->none_option_text = T_('Same as "Default collection to display"');
+
+		$SiteMenuCache = & get_SiteMenuCache();
+		$SiteMenuCache->load_all();
 
 		$r = array_merge( array(
 				'section_layout_start' => array(
@@ -114,17 +119,38 @@ class bootstrap_site_dropdown_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Header')
 				),
+					'menu_type' => array(
+						'label' => T_('Menu type'),
+						'options' => array(
+								array( 'auto', T_('Automatic (from collection List)') ),
+								array( 'custom', T_('Custom menu') ),
+							),
+						'defaultvalue' => 'auto',
+						'type' => 'radio',
+						'field_lines' => true,
+					),
 					'grouping' => array(
 						'label' => T_('Grouping'),
 						'note' => T_('Check to group collections into dropdown menus'),
 						'type' => 'checkbox',
 						'defaultvalue' => 1,
+						'hide' => ( $this->get_setting( 'menu_type' ) == 'custom' ),
 					),
 					'info_coll_ID' => array(
 						'label' => T_('Collection for Info Pages'),
 						'type' => 'select_blog',
 						'allow_none' => true,
 						'defaultvalue' => 0,
+						'hide' => ( $this->get_setting( 'menu_type' ) == 'custom' ),
+					),
+					'menu_ID' => array(
+						'label' => T_('Menu to display'),
+						'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? ' <a href="'.$admin_url.'?ctrl=menus">'.T_('Manage Menus').' &gt;&gt;</a>' : '' ),
+						'type' => 'select_object',
+						'object' => $SiteMenuCache,
+						'allow_none' => true,
+						'defaultvalue' => '',
+						'hide' => ( $this->get_setting( 'menu_type' ) == 'auto' ),
 					),
 
 					'section_topmenu_start' => array(
@@ -538,6 +564,24 @@ footer.bootstrap_site_navbar_footer .container a {
 		}
 
 		return $info_coll_ID;
+	}
+
+
+	/**
+	 * Additional JavaScript code for skin settings form
+	 */
+	function echo_settings_form_js()
+	{
+?>
+<script>
+jQuery( '[name=edit_skin_<?php echo $this->ID; ?>_set_menu_type]' ).click( function()
+{
+	var is_auto_mode = ( jQuery( '[name=edit_skin_<?php echo $this->ID; ?>_set_menu_type]:checked' ).val() == 'auto' );
+	jQuery( '#ffield_edit_skin_<?php echo $this->ID; ?>_set_grouping, #ffield_edit_skin_<?php echo $this->ID; ?>_set_info_coll_ID' ).toggle( is_auto_mode );
+	jQuery( '#ffield_edit_skin_<?php echo $this->ID; ?>_set_menu_ID' ).toggle( ! is_auto_mode );
+} );
+</script>
+<?php
 	}
 }
 ?>

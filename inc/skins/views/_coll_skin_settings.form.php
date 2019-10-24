@@ -229,4 +229,11 @@ jQuery( document ).ready( function()
 
 // Enable JS for fieldset folding:
 echo_fieldset_folding_js();
+
+// Additional JavaScript code for skin settings form:
+$SkinCache = & get_SkinCache();
+if( $edited_Skin = & $SkinCache->get_by_ID( $skin_ID ) )
+{
+	$edited_Skin->echo_settings_form_js();
+}
 ?>

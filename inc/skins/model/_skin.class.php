@@ -2475,6 +2475,14 @@ var downloadInterval = setInterval( function()
 
 		return ( ! empty( $access ) && ! empty( $access[ $container_key ] ) );
 	}
+
+
+	/**
+	 * Additional JavaScript code for skin settings form
+	 */
+	function echo_settings_form_js()
+	{
+	}
 }
 
 ?>

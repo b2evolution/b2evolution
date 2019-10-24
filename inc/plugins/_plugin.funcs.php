@@ -203,7 +203,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	}
 
 	if( $set_type == 'Skin' &&
-	    in_array( $parmeta['type'], array( 'text', 'integer', 'color', 'select' ) ) )
+	    in_array( $parmeta['type'], array( 'text', 'integer', 'color', 'select', 'select_object' ) ) )
 	{	// Append action icon to restore setting to default value by JavaScript:
 		$params['input_suffix'] = ( isset( $params['input_suffix'] ) ? $params['input_suffix'] : '' ).
 			' '.get_icon( 'reload', 'imgtag', array(
@@ -315,6 +315,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	{	// Hide this field on the editing form:
 		$original_form_fieldstart = $Form->fieldstart;
 		$Form->fieldstart = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart );
+		if( isset( $Form->fieldstart_checkbox ) )
+		{
+			$original_form_fieldstart_checkbox = $Form->fieldstart_checkbox;
+			$Form->fieldstart_checkbox = preg_replace( '/>$/', 'style="display:none">', $Form->fieldstart_checkbox );
+		}
 	}
 
 	switch( $parmeta['type'] )
@@ -361,6 +366,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		case 'select':
 			$params['force_keys_as_values'] = true; // so that numeric keys get used as values! autoform_validate_param_value() checks for the keys only.
 			$Form->select_input_array( $input_name, $set_value, $parmeta['options'], $set_label, isset($parmeta['note']) ? $parmeta['note'] : NULL, $params );
+			break;
+
+		case 'select_object':
+			$Form->select_input_object( $input_name, $set_value, $parmeta['object'], $set_label, $params );
 			break;
 
 		case 'select_blog':
@@ -721,6 +730,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 	if( isset( $original_form_fieldstart ) )
 	{	// Revert original field start html code:
 		$Form->fieldstart = $original_form_fieldstart;
+	}
+	if( isset( $original_form_fieldstart_checkbox ) )
+	{	// Revert original field start html code:
+		$Form->fieldstart_checkbox = $original_form_fieldstart_checkbox;
 	}
 
 	if( $outer_most && $has_array_type )
