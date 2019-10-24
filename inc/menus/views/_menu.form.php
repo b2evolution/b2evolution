@@ -136,6 +136,22 @@ if( $edited_SiteMenu->ID > 0 )
 		// Entry type:
 		$r .= '<td class="nowrap">'.get_site_menu_type_title( $SiteMenuEntry->get( 'type' ) ).'</td>';
 
+		// Destination:
+		$destination = '';
+		if( $SiteMenuEntry->get( 'type' ) == 'url' )
+		{	// Destination to any URL:
+			$destination = get_link_tag( $SiteMenuEntry->get( 'url' ) );
+		}
+		elseif( $SiteMenuEntry->get( 'coll_ID' ) > 0 )
+		{	// Destination to collection page:
+			$BlogCache = & get_BlogCache();
+			if( $menu_entry_Blog = $BlogCache->get_by_ID( $SiteMenuEntry->get( 'coll_ID' ), false, false ) )
+			{
+				$destination = get_link_tag( $menu_entry_Blog->get( 'url' ), $menu_entry_Blog->get( 'name' ) );
+			}
+		}
+		$r .= '<td class="nowrap">'.$destination.'</td>';
+
 		// Actions
 		$r .= '<td class="lastcol shrinkwrap">';
 		if( $current_User->check_perm( 'options', 'edit' ) )
@@ -201,6 +217,10 @@ if( $edited_SiteMenu->ID > 0 )
 		);
 	$Table->cols[] = array(
 			'th' => T_('Entry type'),
+			'th_class' => 'shrinkwrap',
+		);
+	$Table->cols[] = array(
+			'th' => T_('Destination'),
 			'th_class' => 'shrinkwrap',
 		);
 	if( $current_User->check_perm( 'options', 'edit' ) )
