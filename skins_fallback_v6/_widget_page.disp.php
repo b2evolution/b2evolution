@@ -22,11 +22,8 @@ display_if_empty();
 if( $Item = & mainlist_get_item() )
 {	// If Item is found for current filter request (for item type usage 'widget-page'):
 	widget_page_containers( $Item->ID, array(
-			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
 			'container_display_if_empty' => false, // If no widget, don't display container at all
-			// Restrict Page Container with these item ID and item type ID:
-			'container_item_ID' => $Item->ID,
 			// This will enclose each widget in a block:
 			'block_start' => '<div class="evo_widget $wi_class$">',
 			'block_end' => '</div>',

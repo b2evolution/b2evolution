@@ -3038,6 +3038,19 @@ function widget_page_containers( $item_ID, $params = array() )
 	$WidgetContainerCache = & get_WidgetContainerCache();
 	$widget_containers = $WidgetContainerCache->get_by_coll_skintype( $Blog->ID, $Blog->get_skin_type() );
 
+	if( empty( $widget_containers ) )
+	{	// No widget containers for current Collection and skin type:
+		return;
+	}
+
+	// Set params for widget page containers:
+	$params = array_merge( $params, array(
+			// Signal that we are displaying within an Item:
+			'widget_context' => 'item',
+			// Restrict Page Container with these item ID and item type ID:
+			'container_item_ID' => $item_ID,
+		) );
+
 	foreach( $widget_containers as $WidgetContainer )
 	{
 		if( $WidgetContainer->get_type() == 'page' &&
