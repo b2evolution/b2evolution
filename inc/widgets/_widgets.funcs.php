@@ -1101,7 +1101,18 @@ function display_container( $WidgetContainer, $params = array() )
 			$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.( $mode == 'customizer' ? '&amp;mode='.$mode : '' ).'">'.$widget_container_name.'</a>';
 			if( $WidgetContainer->get_type() == 'page' )
 			{	// Display additional info for Page Container:
-				$widget_container_name .= ' '.sprintf( T_('on Page #%s'), $WidgetContainer->get( 'item_ID' ) );
+				$ItemCache = & get_ItemCache();
+				if( $widget_Item = & $ItemCache->get_by_ID( $WidgetContainer->get( 'item_ID' ), false, false ) )
+				{	// If Item is found by ID:
+					$widget_container_name .= ' '.sprintf( /* TRANS: widget container position On specific Item(Widget Page) */T_('on %s'), $widget_Item->get_title( array(
+							'title_field' => 'short_title,title',
+							'link_type'   => 'edit_view_url',
+						) ) );
+				}
+				else
+				{	// Not found Item by ID:
+					$widget_container_name .= ' <span class="red">'.sprintf( T_('on nonexistent Item #%s'), $WidgetContainer->get( 'item_ID' ) ).'</span>';
+				}
 			}
 		}
 		$Table->title = '<span class="dimmed">'.$WidgetContainer->get( 'order' ).'</span> '

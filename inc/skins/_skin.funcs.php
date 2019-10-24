@@ -3020,6 +3020,36 @@ function widget_container( $container_code, $params = array() )
 
 
 /**
+ * Display all widget containers for the requested Item
+ *
+ * @param integer Item ID
+ * @param array Additional widget container params
+ */
+function widget_page_containers( $item_ID, $params = array() )
+{
+	global $Blog;
+
+	if( empty( $Blog ) )
+	{	// Skip wrong reuqest without current Collection:
+		return;
+	}
+
+	// Try to find widget container by code for current collection and skin type:
+	$WidgetContainerCache = & get_WidgetContainerCache();
+	$widget_containers = $WidgetContainerCache->get_by_coll_skintype( $Blog->ID, $Blog->get_skin_type() );
+
+	foreach( $widget_containers as $WidgetContainer )
+	{
+		if( $WidgetContainer->get_type() == 'page' &&
+		    $WidgetContainer->get( 'item_ID' ) == $item_ID )
+		{	// Display only widget page container for the requested Item:
+			widget_container( $WidgetContainer->get( 'code' ), $params );
+		}
+	}
+}
+
+
+/**
  * Customize params with widget container properties on designer mode;
  * Replace variables/masks in params with widget container properties;
  * possible variables/masks in params:

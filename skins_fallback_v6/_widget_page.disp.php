@@ -21,7 +21,7 @@ display_if_empty();
 
 if( $Item = & mainlist_get_item() )
 {	// If Item is found for current filter request (for item type usage 'widget-page'):
-	$widget_params = array(
+	widget_page_containers( $Item->ID, array(
 			'widget_context' => 'item',	// Signal that we are displaying within an Item
 			// The following (optional) params will be used as defaults for widgets included in this container:
 			'container_display_if_empty' => false, // If no widget, don't display container at all
@@ -51,18 +51,6 @@ if( $Item = & mainlist_get_item() )
 					'before_attach_size' => ' <span class="evo_file_size">(',
 					'after_attach_size'  => ')</span>',
 				),
-		);
-
-	// ------------------------- "Widget Page Section 1" CONTAINER EMBEDDED HERE --------------------------
-	widget_container( 'widget_page_section_1', $widget_params );
-	// ----------------------------- END OF "Widget Page Section 1" CONTAINER -----------------------------
-
-	// ------------------------- "Widget Page Section 2" CONTAINER EMBEDDED HERE --------------------------
-	widget_container( 'widget_page_section_2', $widget_params );
-	// ----------------------------- END OF "Widget Page Section 2" CONTAINER -----------------------------
-
-	// ------------------------- "Widget Page Section 3" CONTAINER EMBEDDED HERE --------------------------
-	widget_container( 'widget_page_section_3', $widget_params );
-	// ----------------------------- END OF "Widget Page Section 3" CONTAINER -----------------------------
+		) );
 }
 ?>
