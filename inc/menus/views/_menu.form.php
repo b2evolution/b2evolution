@@ -43,6 +43,38 @@ $Form->begin_form( 'fform', $creating ?  T_('New Menu') . get_manual_link( 'menu
 	}
 	$Form->select_input_array( 'menu_locale', $edited_SiteMenu->get( 'locale' ), $locales_options, T_('Locale') );
 
+	if( $edited_SiteMenu->ID == 0 )
+	{	// Suggest menu entries based on existing collections:
+		$SectionCache = & get_SectionCache();
+		$SectionCache->load_all();
+		$BlogCache = & get_BlogCache();
+		$suggested_menu_entries = array();
+		foreach( $SectionCache->cache as $Section )
+		{
+			if( $Section->ID == 1 )
+			{	// Skip "No Section" in order to add it at the end:
+				continue;
+			}
+			$suggested_menu_entries[] = array( 'menu_entries[sec_'.$Section->ID.']', $Section->get( 'name' ), $Section->get( 'name' ), 1 );
+			$BlogCache->clear();
+			$BlogCache->load_where( 'blog_sec_ID = '.$Section->ID );
+			foreach( $BlogCache->cache as $section_Blog )
+			{
+				$suggested_menu_entries[] = array( 'menu_entries[coll_'.$section_Blog->ID.'_'.$Section->ID.']', $section_Blog->get( 'shortname' ), $section_Blog->get( 'shortname' ), 1, NULL, NULL, NULL, NULL, array( 'style' => 'margin-left:20px' ) );
+			}
+		}
+		// Display collections from "No Section" at the end:
+		$BlogCache->clear();
+		$BlogCache->load_where( 'blog_sec_ID = 1' );
+		foreach( $BlogCache->cache as $section_Blog )
+		{
+			$suggested_menu_entries[] = array( 'menu_entries[coll_'.$section_Blog->ID.']', $section_Blog->get( 'shortname' ), $section_Blog->get( 'shortname' ), 1 );
+		}
+		// Contact menu entry:
+		$suggested_menu_entries[] = array( 'menu_entries[#contact#]', '#contact#', T_('Contact'), 1 );
+		$Form->checklist( $suggested_menu_entries, '', T_('Menu entries') );
+	}
+
 	$buttons = array();
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{	// Allow to save menu if current User has a permission:
@@ -102,7 +134,7 @@ if( $edited_SiteMenu->ID > 0 )
 		}
 
 		// Entry type:
-		$r .= '<td>'.$SiteMenuEntry->dget( 'type' ).'</td>';
+		$r .= '<td class="nowrap">'.get_menu_type_title( $SiteMenuEntry->get( 'type' ) ).'</td>';
 
 		// Actions
 		$r .= '<td class="lastcol shrinkwrap">';

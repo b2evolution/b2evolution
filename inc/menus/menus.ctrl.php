@@ -81,7 +81,7 @@ switch( $action )
 			$Messages->add( T_('New menu created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=menus' ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=menus&action=edit&menu_ID='.$edited_SiteMenu->ID ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'new';

@@ -76,7 +76,79 @@ class SiteMenu extends DataObject
 		param( 'menu_locale', 'string' );
 		$this->set_from_Request( 'locale' );
 
+		// Store auto menu entries in temp var, they will be inserted in SiteMenu::dbinsert():
+		$this->insert_menu_entries = param( 'menu_entries', 'array' );
+
 		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * Insert object into DB based on previously recorded changes.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbinsert()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		if( $r = parent::dbinsert() )
+		{	// If Menu has been inserted successfully:
+			if( ! empty( $this->insert_menu_entries ) )
+			{
+				$entry_sections = array();
+				foreach( $this->insert_menu_entries as $menu_entry_key => $menu_entry_text )
+				{
+					$SiteMenuEntry = new SiteMenuEntry();
+					$SiteMenuEntry->set( 'menu_ID', $this->ID );
+					if( $menu_entry_key == '#contact#' )
+					{	// Special "Contact" entry:
+						$SiteMenuEntry->set( 'text', T_('Contact') );
+						$SiteMenuEntry->set( 'type', 'ownercontact' );
+						$SiteMenuEntry->dbinsert();
+					}
+					elseif( preg_match( '/^([a-z]+)_(\d+)(_(\d+))?$/', $menu_entry_key, $m ) )
+					{	// Section or Collection entry:
+						switch( $m[1] )
+						{
+							case 'sec':
+								// Section entry:
+								$SiteMenuEntry->set( 'text', $menu_entry_text );
+								$SiteMenuEntry->set( 'type', 'url' );
+								if( $SiteMenuEntry->dbinsert() )
+								{
+									$entry_sections[ $m[2] ] = $SiteMenuEntry->ID;
+								}
+								break;
+							case 'coll':
+								// Collection entry:
+								$SiteMenuEntry->set( 'text', $menu_entry_text );
+								$SiteMenuEntry->set( 'coll_ID', $m[2] );
+								$SiteMenuEntry->set( 'type', 'home' );
+								if( isset( $m[4], $entry_sections[ $m[4] ] ) )
+								{
+									$SiteMenuEntry->set( 'parent_ID', $entry_sections[ $m[4] ] );
+								}
+								$SiteMenuEntry->dbinsert();
+								break;
+						}
+					}
+				}
+			}
+		}
+
+		if( $r )
+		{	
+			$DB->commit();
+		}
+		else
+		{
+			$DB->rollback();
+		}
+
+		return $r;
 	}
 
 

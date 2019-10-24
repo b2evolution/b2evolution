@@ -59,4 +59,25 @@ function get_menu_types()
 			),
 		);
 }
+
+/**
+ * Get menu type title by type key
+ *
+ * @param string Type key
+ * @return string Type title
+ */
+function get_menu_type_title( $type )
+{
+	$grouped_menu_types = get_menu_types();
+
+	foreach( $grouped_menu_types as $menu_type_group => $menu_types )
+	{
+		if( isset( $menu_types[ $type ] ) )
+		{
+			return $menu_types[ $type ];
+		}
+	}
+
+	return $type;
+}
 ?>
