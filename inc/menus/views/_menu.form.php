@@ -122,7 +122,7 @@ if( $edited_SiteMenu->ID > 0 )
 		{	// We have permission permission to edit:
 			$edit_url = regenerate_url( 'action,ment_ID', 'ment_ID='.$SiteMenuEntry->ID.'&amp;action=edit_entry' );
 			$r .= '<td>
-					<strong style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$SiteMenuEntry->dget( 'text' ).'</a></strong>
+					<strong style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$SiteMenuEntry->get_text().'</a></strong>
 				</td>';
 		}
 		else
@@ -139,15 +139,11 @@ if( $edited_SiteMenu->ID > 0 )
 		$destination = '';
 		if( $SiteMenuEntry->get( 'type' ) == 'url' )
 		{	// Destination to any URL:
-			$destination = get_link_tag( $SiteMenuEntry->get( 'url' ) );
+			$destination = get_link_tag( $SiteMenuEntry->get_url() );
 		}
-		elseif( $SiteMenuEntry->get( 'coll_ID' ) > 0 )
-		{	// Destination to collection page:
-			$BlogCache = & get_BlogCache();
-			if( $menu_entry_Blog = $BlogCache->get_by_ID( $SiteMenuEntry->get( 'coll_ID' ), false, false ) )
-			{
-				$destination = get_link_tag( $menu_entry_Blog->get( 'url' ), $menu_entry_Blog->get( 'name' ) );
-			}
+		elseif( $SiteMenuEntry->get_url() )
+		{	// Destination to other pages:
+			$destination = get_link_tag( $SiteMenuEntry->get_url(), $SiteMenuEntry->get_text() );
 		}
 		$r .= '<td class="nowrap">'.$destination.'</td>';
 

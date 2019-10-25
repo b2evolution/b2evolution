@@ -40,7 +40,7 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New Menu Entry') : T_('Menu Entry
 
 	$Form->text_input( 'ment_order', $edited_SiteMenuEntry->get( 'order' ), 11, T_('Order'), '', array( 'maxlength' => 11 ) );
 
-	$Form->text_input( 'ment_text', $edited_SiteMenuEntry->get( 'text' ), 50, T_('Text'), '', array( 'maxlength' => 128, 'required' => true ) );
+	$Form->text_input( 'ment_text', $edited_SiteMenuEntry->get( 'text' ), 50, T_('Text'), sprintf( T_('Leave empty for default: %s'), '<code>'.$edited_SiteMenuEntry->get_text( true ).'</code>' ), array( 'maxlength' => 128 ) );
 
 	$Form->select_input_array( 'ment_type', $edited_SiteMenuEntry->get( 'type' ), get_site_menu_types(), T_('Type') );
 
@@ -49,7 +49,11 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New Menu Entry') : T_('Menu Entry
 
 	$Form->text_input( 'ment_coll_ID', $edited_SiteMenuEntry->get( 'coll_ID' ), 11, T_('Collection ID'), '', array( 'maxlength' => 11 ) );
 
-	$Form->text_input( 'ment_url', $edited_SiteMenuEntry->get( 'url' ), 128, T_('URL'), '', array( 'maxlength' => 2000 ) );
+	$Form->text_input( 'ment_cat_ID', $edited_SiteMenuEntry->get( 'cat_ID' ), 11, T_('Category ID'), '', array( 'maxlength' => 11, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'recentposts' && $edited_SiteMenuEntry->get( 'type' ) != 'postnew' ) ) );
+
+	$Form->text_input( 'ment_item_ID', $edited_SiteMenuEntry->get( 'item_ID' ), 11, T_('Item ID'), '', array( 'maxlength' => 11, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'item' ) ) );
+
+	$Form->text_input( 'ment_url', $edited_SiteMenuEntry->get( 'url' ), 128, T_('URL'), '', array( 'maxlength' => 2000, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'url' ) ) );
 
 	$Form->radio( 'ment_visibility', $edited_SiteMenuEntry->get( 'visibility' ),
 		array(
@@ -71,3 +75,16 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New Menu Entry') : T_('Menu Entry
 
 $Form->end_form( $buttons );
 ?>
+
+<script>
+jQuery( '#ment_type' ).change( function()
+{
+	var link_type_value = jQuery( this ).val();
+	// Hide/Show category ID:
+	jQuery( '#ffield_ment_cat_ID' ).toggle( link_type_value == 'recentposts' || link_type_value == 'postnew' );
+	// Hide/Show item ID:
+	jQuery( '#ffield_ment_item_ID' ).toggle( link_type_value == 'item' );
+	// Hide/Show URL:
+	jQuery( '#ffield_ment_url' ).toggle( link_type_value == 'url' );
+} );
+</script>

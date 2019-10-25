@@ -454,49 +454,34 @@ footer.bootstrap_site_navbar_footer .container a {
 
 		$header_tab = false;
 
-		switch( $SiteMenuEntry->get( 'type' ) )
-		{
-			case 'text':
-				$sub_entries = $SiteMenuEntry->get_children();
-				$sub_tabs = array();
-				foreach( $sub_entries as $sub_SiteMenuEntry )
+		if( $SiteMenuEntry->get( 'type' ) == 'text' )
+		{	// Only type "Text" supports sub-entries:
+			$sub_entries = $SiteMenuEntry->get_children();
+			$sub_tabs = array();
+			foreach( $sub_entries as $sub_SiteMenuEntry )
+			{
+				if( $sub_tab = $this->get_header_tab_custom( $sub_SiteMenuEntry ) )
 				{
-					if( $sub_tab = $this->get_header_tab_custom( $sub_SiteMenuEntry ) )
-					{
-						$sub_tabs[] = $sub_tab;
-					}
+					$sub_tabs[] = $sub_tab;
 				}
+			}
 
-				if( ! empty( $sub_tabs ) )
-				{	// Display parent tab only if at least one sub tab is allowed for current display:
-					$header_tab = array(
-							'name'  => $SiteMenuEntry->get( 'text' ),
-							'url'   => $sub_tabs[0]['url'],
-							'items' => $sub_tabs,
-						);
-				}
-				break;
-
-			case 'home':
-				if( $entry_Blog = & $SiteMenuEntry->get_Blog() )
-				{
-					// Get current collection ID:
-					$current_blog_ID = isset( $Blog ) ? $Blog->ID : NULL;
-
-					$header_tab = array(
-							'name' => $SiteMenuEntry->get( 'text' ),
-							'url'  => $entry_Blog->get( 'url' ),
-							'active' => ( $current_blog_ID == $entry_Blog->ID )
-						);
-				}
-				break;
-
-			case 'url':
+			if( ! empty( $sub_tabs ) )
+			{	// Display parent tab only if at least one sub tab is allowed for current display:
 				$header_tab = array(
-						'name'  => $SiteMenuEntry->get( 'text' ),
-						'url'   => $SiteMenuEntry->get( 'url' ),
+						'name'  => $SiteMenuEntry->get_text(),
+						'url'   => $sub_tabs[0]['url'],
+						'items' => $sub_tabs,
 					);
-				break;
+			}
+		}
+		elseif( $menu_entry_url = $SiteMenuEntry->get_url() )
+		{	// Only if the menu entry is allowed for current User, page and etc.:
+			$header_tab = array(
+					'name'   => $SiteMenuEntry->get_text(),
+					'url'    => $menu_entry_url,
+					'active' => $SiteMenuEntry->is_active(),
+				);
 		}
 
 		return $header_tab;

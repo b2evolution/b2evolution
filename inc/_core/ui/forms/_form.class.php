@@ -761,6 +761,10 @@ class Form extends Widget
 		{ // Use default field start
 			$r = $this->fieldstart;
 		}
+		if( ! empty( $this->_common_params['hide'] ) && $this->_common_params['hide'] )
+		{	// Hidden field
+			$r = preg_replace( '/>$/', ' style="display:none">', $r );
+		}
 
 		if( count( $field_classes ) > 0 )
 		{
@@ -4768,6 +4772,11 @@ class Form extends Widget
 			unset($field_params['required']);
 		}
 
+		if( isset($field_params['hide']) )
+		{
+			$this->_common_params['hide'] = $field_params['hide'];
+			unset($field_params['hide']);
+		}
 
 		if( !empty($field_params['name']) )
 		{
