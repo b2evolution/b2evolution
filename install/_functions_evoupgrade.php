@@ -12084,7 +12084,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_create_table( 'T_menus__entry', '
 			ment_ID             INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			ment_menu_ID        INT(10) UNSIGNED NOT NULL,
-			ment_parent_ID      INT(10) UNSIGNED NOT NULL,
+			ment_parent_ID      INT(10) UNSIGNED NULL,
 			ment_order          INT(11) NULL,
 			ment_text           VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 			ment_type           VARCHAR(32) COLLATE ascii_general_ci NULL,
