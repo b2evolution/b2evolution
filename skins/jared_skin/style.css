@@ -788,6 +788,9 @@ body.pictured .secondary_area .widget_core_org_members a.user_link:hover {
   cursor: pointer;
   opacity: 0.9;
 }
+.navbar .evo_widget {
+  padding: 0;
+}
 .evo_widget {
   padding: 20px 0;
 }
