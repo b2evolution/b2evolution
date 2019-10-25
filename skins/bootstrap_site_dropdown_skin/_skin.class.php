@@ -389,11 +389,126 @@ footer.bootstrap_site_navbar_footer .container a {
 
 
 	/**
-	 * Get header tabs
+	 * Get header tabs if custom menu is selected or when automatic menu is grouped
+	 *
+	 * @return array|boolean Array of header tabs OR FALSE when
+	 */
+	function get_header_tabs()
+	{
+		if( $this->get_setting( 'menu_type' ) == 'custom' &&
+		    ( $SiteMenuCache = & get_SiteMenuCache() ) &&
+		    ( $SiteMenu = & $SiteMenuCache->get_by_ID( $this->get_setting( 'menu_ID' ), false, false ) ) )
+		{	// Use custom menu if it is found in DB:
+			return $this->get_header_tabs_custom( $SiteMenu->ID );
+		}
+		elseif( $this->get_setting( 'grouping' ) )
+		{	// Use automatic menu:
+			return $this->get_header_tabs_auto();
+		}
+
+		// Don't use grouped header tabs:
+		return false;
+	}
+
+
+	/**
+	 * Get header tabs from custom menu
 	 *
 	 * @return array
 	 */
-	function get_header_tabs()
+	function get_header_tabs_custom( $menu_ID )
+	{
+		$header_tabs = array();
+
+		$SiteMenuCache = & get_SiteMenuCache();
+
+		if( ! ( $SiteMenu = & $SiteMenuCache->get_by_ID( $this->get_setting( 'menu_ID' ), false, false ) ) )
+		{	// Wrong Menu:
+			return $header_tabs;
+		}
+
+		$this->header_tab_active = NULL;
+
+		$site_menu_entries = $SiteMenu->get_entries();
+		foreach( $site_menu_entries as $SiteMenuEntry )
+		{
+			if( $header_tab = $this->get_header_tab_custom( $SiteMenuEntry ) )
+			{
+				$header_tabs[] = $header_tab;
+			}
+		}
+
+		return $header_tabs;
+	}
+
+
+	/**
+	 * Get custom header tab
+	 *
+	 * @param object SiteMenuEntry
+	 * @param array header tab params
+	 */
+	function get_header_tab_custom( $SiteMenuEntry )
+	{
+		global $Blog;
+
+		$header_tab = false;
+
+		switch( $SiteMenuEntry->get( 'type' ) )
+		{
+			case 'text':
+				$sub_entries = $SiteMenuEntry->get_children();
+				$sub_tabs = array();
+				foreach( $sub_entries as $sub_SiteMenuEntry )
+				{
+					if( $sub_tab = $this->get_header_tab_custom( $sub_SiteMenuEntry ) )
+					{
+						$sub_tabs[] = $sub_tab;
+					}
+				}
+
+				if( ! empty( $sub_tabs ) )
+				{	// Display parent tab only if at least one sub tab is allowed for current display:
+					$header_tab = array(
+							'name'  => $SiteMenuEntry->get( 'text' ),
+							'url'   => $sub_tabs[0]['url'],
+							'items' => $sub_tabs,
+						);
+				}
+				break;
+
+			case 'home':
+				if( $entry_Blog = & $SiteMenuEntry->get_Blog() )
+				{
+					// Get current collection ID:
+					$current_blog_ID = isset( $Blog ) ? $Blog->ID : NULL;
+
+					$header_tab = array(
+							'name' => $SiteMenuEntry->get( 'text' ),
+							'url'  => $entry_Blog->get( 'url' ),
+							'active' => ( $current_blog_ID == $entry_Blog->ID )
+						);
+				}
+				break;
+
+			case 'url':
+				$header_tab = array(
+						'name'  => $SiteMenuEntry->get( 'text' ),
+						'url'   => $SiteMenuEntry->get( 'url' ),
+					);
+				break;
+		}
+
+		return $header_tab;
+	}
+
+
+	/**
+	 * Get automatic (from collection List) header tabs
+	 *
+	 * @return array
+	 */
+	function get_header_tabs_auto()
 	{
 		global $Blog, $disp, $current_User;
 

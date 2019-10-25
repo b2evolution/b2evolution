@@ -95,17 +95,16 @@ if( $edited_SiteMenu->ID > 0 )
 	);
 
 	/**
-	 * Generate category line when it has children
+	 * Generate Site Menu Entry line when it has children
 	 *
-	 * @param object Chapter we want to display
-	 * @param integer Level of the category in the recursive tree
+	 * @param object SiteMenuEntry we want to display
+	 * @param integer Level of the Site Menu Entry in the recursive tree
 	 * @return string HTML
 	 */
 	function site_menu_entry_line( $SiteMenuEntry, $level )
 	{
 		global $line_class, $current_User, $Settings, $admin_url;
-		global $SiteMenuEntryCache, $current_default_cat_ID;
-		global $number_of_posts_in_cat;
+		global $SiteMenuEntryCache;
 
 		global $Session;
 		$result_fadeout = $Session->get( 'fadeout_array' );
@@ -157,10 +156,6 @@ if( $edited_SiteMenu->ID > 0 )
 		if( $current_User->check_perm( 'options', 'edit' ) )
 		{	// We have permission permission to edit, so display action column:
 			$r .= action_icon( T_('Edit...'), 'edit', $edit_url );
-			if( $Settings->get('allow_moving_chapters') )
-			{ // If moving cats between blogs is allowed:
-				$r .= action_icon( T_('Move to a different blog...'), 'file_move', regenerate_url( 'action,cat_ID', 'cat_ID='.$SiteMenuEntry->ID.'&amp;action=move' ), T_('Move') );
-			}
 			$r .= action_icon( T_('New').'...', 'new', regenerate_url( 'action,ment_ID,blog', 'ment_parent_ID='.$SiteMenuEntry->ID.'&amp;action=new_entry' ) )
 						.action_icon( T_('Delete').'...', 'delete', regenerate_url( 'action,ment_ID,blog', 'ment_ID='.$SiteMenuEntry->ID.'&amp;action=delete_entry&amp;'.url_crumb( 'menuentry' ) ) );
 		}
@@ -172,10 +167,10 @@ if( $edited_SiteMenu->ID > 0 )
 
 
 	/**
-	 * Generate category line when it has no children
+	 * Generate Site Menu Entry line when it has no children
 	 *
-	 * @param object Chapter generic category we want to display
-	 * @param integer Level of the category in the recursive tree
+	 * @param object SiteMenuEntry generic Site Menu Entry we want to display
+	 * @param integer Level of the Site Menu Entry in the recursive tree
 	 * @return string HTML
 	 */
 	function site_menu_entry_no_children( $SiteMenuEntry, $level )
@@ -187,7 +182,7 @@ if( $edited_SiteMenu->ID > 0 )
 	/**
 	 * Generate code when entering a new level
 	 *
-	 * @param int level of the category in the recursive tree
+	 * @param int level of the Site Menu Entry in the recursive tree
 	 * @return string HTML
 	 */
 	function site_menu_entry_before_level( $level )
@@ -198,7 +193,7 @@ if( $edited_SiteMenu->ID > 0 )
 	/**
 	 * Generate code when exiting from a level
 	 *
-	 * @param int level of the category in the recursive tree
+	 * @param int level of the Site Menu Entry in the recursive tree
 	 * @return string HTML
 	 */
 	function site_menu_entry_after_level( $level )

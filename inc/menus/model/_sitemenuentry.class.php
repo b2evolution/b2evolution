@@ -37,7 +37,12 @@ class SiteMenuEntry extends DataObject
 	var $highlight;
 
 	/**
-	 * Category children list
+	 * Collection
+	 */
+	var $Blog = NULL;
+
+	/**
+	 * Site Menu Entry children list
 	 */
 	var $children = array();
 	var $children_sorted = false;
@@ -162,18 +167,55 @@ class SiteMenuEntry extends DataObject
 
 
 	/**
-	 * Sort chapter childen
+	 * Sort Site Menu Entry childen
 	 */
 	function sort_children()
 	{
 		if( $this->children_sorted )
-		{ // Category children list is already sorted
+		{ // Site Menu Entry children list is already sorted
 			return;
 		}
 
 		// Sort children list
 		uasort( $this->children, array( 'SiteMenuEntryCache','compare_site_menu_entries' ) );
 	}
-}
 
+
+	/**
+	 * Get children/sub-entires of this category
+	 *
+	 * @param boolean set to true to sort children, leave false otherwise
+	 * @return array of SiteMenuEntries - children of this SiteMenuEntry
+	 */
+	function get_children( $sorted = false )
+	{
+		$SiteMenuEntryCache = & get_SiteMenuEntryCache();
+		$SiteMenuEntryCache->reveal_children( $this->get( 'menu_ID' ), $sorted );
+
+		$parent_SiteMenuEntry = & $SiteMenuEntryCache->get_by_ID( $this->ID );
+		if( $sorted )
+		{	// Sort child entries:
+			$parent_SiteMenuEntry->sort_children();
+		}
+
+		return $parent_SiteMenuEntry->children;
+	}
+
+
+	/**
+	 * Get Collection
+	 *
+	 * @return object Collection
+	 */
+	function & get_Blog()
+	{
+		if( $this->Blog === NULL )
+		{	// Load collection once:
+			$BlogCache = & get_BlogCache();
+			$this->Blog = & $BlogCache->get_by_ID( $this->get( 'coll_ID' ), false, false );
+		}
+
+		return $this->Blog;
+	}
+}
 ?>

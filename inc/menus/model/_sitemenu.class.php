@@ -29,6 +29,11 @@ class SiteMenu extends DataObject
 	var $locale;
 
 	/**
+	 * @var array Site Menu Entries
+	 */
+	var $entries = NULL;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -160,6 +165,32 @@ class SiteMenu extends DataObject
 	function get_name()
 	{
 		return $this->get( 'name' );
+	}
+
+
+	/**
+	 * Get menu entries
+	 *
+	 * @return array Objects of Site Menu Entries
+	 */
+	function get_entries()
+	{
+		if( $this->entries !== NULL )
+		{	// Use already loaded menu entries:
+			return $this->entries;
+		}
+
+		$SiteMenuEntryCache = & get_SiteMenuEntryCache();
+		$SiteMenuEntryCache->clear();
+		$entries_SQL = $SiteMenuEntryCache->get_SQL_object();
+		$entries_SQL->WHERE( 'ment_menu_ID = '.$this->ID );
+		$entries_SQL->WHERE_and( 'ment_parent_ID IS NULL' );
+		$entries_SQL->ORDER_BY( 'ment_order, ment_ID' );
+		$SiteMenuEntryCache->load_by_sql( $entries_SQL );
+
+		$this->entries = $SiteMenuEntryCache->cache;
+
+		return $this->entries;
 	}
 }
 

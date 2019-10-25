@@ -48,10 +48,8 @@ else
 			<div class="collapse navbar-collapse" id="navbar-collapse-menu">
 				<ul class="nav navbar-nav navbar-left">
 				<?php
-				if( $site_Skin->get_setting( 'grouping' ) )
+				if( ( $header_tabs = $site_Skin->get_header_tabs() ) !== false )
 				{	// Display the grouped header tabs:
-					$header_tabs = $site_Skin->get_header_tabs();
-
 					foreach( $header_tabs as $s => $header_tab )
 					{	// Display level 0 tabs:
 						// Current collection gets class "active"
