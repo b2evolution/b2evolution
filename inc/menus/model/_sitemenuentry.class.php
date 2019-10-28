@@ -291,125 +291,164 @@ class SiteMenuEntry extends DataObject
 	 */
 	function get_text( $force_default = false )
 	{
-		if( ! $force_default )
-		{
-			$menu_entry_text = $this->get( 'text' );
-			if( $menu_entry_text !== '' )
-			{	// Use custom text:
-				return $menu_entry_text;
-			}
-		}
+		global $thumbnail_sizes;
 
 		$entry_Blog = & $this->get_Blog();
 
-		switch( $this->get( 'type' ) )
-		{
-			case 'home':
-				return T_('Front Page');
+		if( ! $force_default && $this->get( 'text' ) != '' )
+		{	// Use custom text:
+			$text = $this->get( 'text' );
+		}
+		else
+		{	// Use default text:
+			switch( $this->get( 'type' ) )
+			{
+				case 'home':
+					$text = T_('Front Page');
+					break;
 
-			case 'recentposts':
-				if( $entry_Chapter = & $this->get_Chapter() )
-				{	// Use category name instead of default if the defined category is found in DB:
-					return $entry_Chapter->get( 'name' );
-				}
-				return T_('Recently');
+				case 'recentposts':
+					if( $entry_Chapter = & $this->get_Chapter() )
+					{	// Use category name instead of default if the defined category is found in DB:
+						$text = $entry_Chapter->get( 'name' );
+					}
+					else
+					{
+						$text = T_('Recently');
+					}
+					break;
 
-			case 'search':
-				return T_('Search');
+				case 'search':
+					$text = T_('Search');
+					break;
 
-			case 'arcdir':
-				return T_('Archives');
+				case 'arcdir':
+					$text = T_('Archives');
+					break;
 
-			case 'catdir':
-				return T_('Categories');
+				case 'catdir':
+					$text = T_('Categories');
+					break;
 
-			case 'tags':
-				return T_('Tags');
+				case 'tags':
+					$text = T_('Tags');
+					break;
 
-			case 'postidx':
-				return T_('Post index');
+				case 'postidx':
+					$text = T_('Post index');
+					break;
 
-			case 'mediaidx':
-				return T_('Photo index');
+				case 'mediaidx':
+					$text = T_('Photo index');
+					break;
 
-			case 'sitemap':
-				return T_('Site map');
+				case 'sitemap':
+					$text = T_('Site map');
+					break;
 
-			case 'latestcomments':
-				return T_('Latest comments');
+				case 'latestcomments':
+					$text = T_('Latest comments');
+					break;
 
-			case 'owneruserinfo':
-				return T_('Owner details');
+				case 'owneruserinfo':
+					$text = T_('Owner details');
+					break;
 
-			case 'ownercontact':
-				return T_('Contact');
+				case 'ownercontact':
+					$text = T_('Contact');
+					break;
 
-			case 'login':
-				return T_('Log in');
+				case 'login':
+					$text = T_('Log in');
+					break;
 
-			case 'logout':
-				return T_('Log out');
+				case 'logout':
+					$text = T_('Log out');
+					break;
 
-			case 'register':
-				return T_('Register');
+				case 'register':
+					$text = T_('Register');
+					break;
 
-			case 'profile':
-				return T_('Edit profile');
+				case 'profile':
+					$text = T_('Edit profile');
+					break;
 
-			case 'avatar':
-				return T_('Profile picture');
+				case 'avatar':
+					$text = T_('Profile picture');
+					break;
 
-			case 'visits':
-				$text = T_('My visits');
-				$visit_count = is_logged_in() && $current_User->get_profile_visitors_count();
-				if( $visit_count )
-				{
-					$text .= ' <span class="badge badge-info">'.$visit_count.'</span>';
-				}
-				return $text;
+				case 'visits':
+					$text = T_('My visits');
+					if( is_logged_in() )
+					{
+						global $current_User;
+						$text .= ' <span class="badge badge-info">'.$current_User->get_profile_visitors_count().'</span>';
+					}
+					break;
 
-			case 'useritems':
-				return T_('User\'s posts/items');
+				case 'useritems':
+					$text = T_('User\'s posts/items');
+					break;
 
-			case 'usercomments':
-				return url_add_param( $Blog->gen_blogurl(), 'disp=usercomments' );
+				case 'usercomments':
+					$text = url_add_param( $entry_Blog->gen_blogurl(), 'disp=usercomments' );
+					break;
 
-			case 'users':
-				return $entry_Blog->get( 'usersurl' );
+				case 'users':
+					$text = $entry_Blog->get( 'usersurl' );
+					break;
 
-			case 'item':
-				$entry_Item = & $this->get_Item();
-				if( $entry_Item && $entry_Item->can_be_displayed() )
-				{	// Item is not found or it cannot be displayed for current user on front-office:
-					return $entry_Item->get( 'title');
-				}
-				else
-				{
-					return '[NOT FOUND]';
-				}
+				case 'item':
+					$entry_Item = & $this->get_Item();
+					if( $entry_Item && $entry_Item->can_be_displayed() )
+					{	// Item is not found or it cannot be displayed for current user on front-office:
+						$text = $entry_Item->get( 'title');
+					}
+					else
+					{
+						$text = '[NOT FOUND]';
+					}
+					break;
 
-			case 'url':
-				return $this->get( 'url' );
+				case 'url':
+					$text = $this->get( 'url' );
+					break;
 
-			case 'postnew':
-				$text = T_('Write a new post');
-				if( $entry_Chapter = & $this->get_Chapter() )
-				{	// Use button name from Category Item Type:
-					if( $cat_ItemType = & $entry_Chapter->get_ItemType( true ) )
-					{	// Use button text depending on default category's Item Type:
+				case 'postnew':
+					if( ( $entry_Chapter = & $this->get_Chapter() ) &&
+					    ( $cat_ItemType = & $entry_Chapter->get_ItemType( true ) ) )
+					{	// Use text depending on default category's Item Type:
 						$text = $cat_ItemType->get_item_denomination( 'inskin_new_btn' );
 					}
-				}
-				return $text;
+					else
+					{
+						$text = T_('Write a new post');
+					}
+					break;
 
-			case 'myprofile':
-				return T_('My profile');
+				case 'myprofile':
+					$text = T_('My profile');
+					break;
 
-			case 'admin':
-				return T_('Admin').' &raquo;';
+				case 'admin':
+					$text = T_('Admin').' &raquo;';
+					break;
+
+				default:
+					$text = '[UNKNOWN]';
+			}
 		}
 
-		return '[UNKNOWN]';
+		$coll_logo_size = $this->get( 'coll_logo_size' );
+		if( ! empty( $coll_logo_size ) &&
+		    isset( $thumbnail_sizes[ $coll_logo_size ] ) &&
+		    ( $coll_logo_File = $entry_Blog->get( 'collection_image' ) ) )
+		{	// Display collection logo before Menu text:
+			$text = $coll_logo_File->get_thumb_imgtag( $coll_logo_size ).' '.$text;
+		}
+
+		return $text;
 	}
 
 
@@ -421,6 +460,16 @@ class SiteMenuEntry extends DataObject
 	function get_url()
 	{
 		$entry_Blog = & $this->get_Blog();
+
+		if( empty( $entry_Blog ) )
+		{	// We cannot use this menu entry without current collection:
+			return false;
+		}
+
+		if( $this->get( 'visibility' ) == 'access' && ! $entry_Blog->has_access() )
+		{	// Don't use this menu entry because current user has no access to the collection:
+			return false;
+		}
 
 		switch( $this->get( 'type' ) )
 		{

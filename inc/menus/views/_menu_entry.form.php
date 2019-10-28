@@ -40,7 +40,7 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New Menu Entry') : T_('Menu Entry
 
 	$Form->text_input( 'ment_order', $edited_SiteMenuEntry->get( 'order' ), 11, T_('Order'), '', array( 'maxlength' => 11 ) );
 
-	$Form->text_input( 'ment_text', $edited_SiteMenuEntry->get( 'text' ), 50, T_('Text'), sprintf( T_('Leave empty for default: %s'), '<code>'.$edited_SiteMenuEntry->get_text( true ).'</code>' ), array( 'maxlength' => 128 ) );
+	$Form->text_input( 'ment_text', $edited_SiteMenuEntry->get( 'text' ), 50, T_('Text'), ( $edited_SiteMenuEntry->get( 'type' ) != 'text' ? T_('Leave empty for default').( $edited_SiteMenuEntry->ID > 0 ? ': <code>'.$edited_SiteMenuEntry->get_text( true ).'</code>' : '' ) : '' ), array( 'maxlength' => 128 ) );
 
 	$Form->select_input_array( 'ment_type', $edited_SiteMenuEntry->get( 'type' ), get_site_menu_types(), T_('Type') );
 
@@ -57,8 +57,8 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New Menu Entry') : T_('Menu Entry
 
 	$Form->radio( 'ment_visibility', $edited_SiteMenuEntry->get( 'visibility' ),
 		array(
-			array( 'always', T_( 'Always show (cacheable)') ),
-			array( 'access', T_( 'Only show if access is allowed (not cacheable)' ) )
+			array( 'always', T_( 'Always show') ),
+			array( 'access', T_( 'Only show if access is allowed' ) )
 		), T_('Visibility'), true );
 
 	$Form->radio( 'ment_highlight', $edited_SiteMenuEntry->get( 'highlight' ),
