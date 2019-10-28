@@ -846,9 +846,10 @@ class Skin extends DataObject
 	 *
 	 * @param string Setting name
 	 * @param string Input group name
+	 * @param mixed Default value, Set to different than NULL only if it is called from a Skin::get_param_definitions() function to avoid infinite loop
 	 * @return string|array|NULL
 	 */
-	function get_setting( $parname, $group = NULL )
+	function get_setting( $parname, $group = NULL, $default_value = NULL )
 	{
 		global $Collection, $Blog, $Settings;
 
@@ -876,6 +877,12 @@ class Skin extends DataObject
 		if( ! is_null( $value ) )
 		{	// We have a value for this param:
 			return $value;
+		}
+
+		if( $default_value !== NULL )
+		{	// Use defined default value when it is not saved in DB yet:
+			// (This call is used to get a value from function Skin::get_param_definition() to avoid infinite loop)
+			return $default_value;
 		}
 
 		return $this->get_setting_default_value( $group.$parname, $group );

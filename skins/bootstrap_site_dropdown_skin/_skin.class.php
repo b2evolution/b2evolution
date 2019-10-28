@@ -134,14 +134,14 @@ class bootstrap_site_dropdown_Skin extends Skin
 						'note' => T_('Check to group collections into dropdown menus'),
 						'type' => 'checkbox',
 						'defaultvalue' => 1,
-						'hide' => ( $this->get_setting( 'menu_type' ) == 'custom' ),
+						'hide' => ( $this->get_setting( 'menu_type', NULL, 'auto' ) == 'custom' ),
 					),
 					'info_coll_ID' => array(
 						'label' => T_('Collection for Info Pages'),
 						'type' => 'select_blog',
 						'allow_none' => true,
 						'defaultvalue' => 0,
-						'hide' => ( $this->get_setting( 'menu_type' ) == 'custom' ),
+						'hide' => ( $this->get_setting( 'menu_type', NULL, 'auto' ) == 'custom' ),
 					),
 					'menu_ID' => array(
 						'label' => T_('Menu to display'),
@@ -150,7 +150,7 @@ class bootstrap_site_dropdown_Skin extends Skin
 						'object' => $SiteMenuCache,
 						'allow_none' => true,
 						'defaultvalue' => '',
-						'hide' => ( $this->get_setting( 'menu_type' ) == 'auto' ),
+						'hide' => ( $this->get_setting( 'menu_type', NULL, 'auto' ) == 'auto' ),
 					),
 
 					'section_topmenu_start' => array(
