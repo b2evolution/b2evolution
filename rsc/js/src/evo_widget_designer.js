@@ -91,17 +91,29 @@ function evo_widget_initialize_designer_block( widget )
 	if( widget.data( 'can-edit' ) == '1' )
 	{	// Display a panel with actions if current user has a permission to edit widget:
 		jQuery( '>div', designer_block_selector ).append( '<div class="evo_designer__actions">' +
+				b2evo_widget_icon_top +
 				b2evo_widget_icon_up +
 				b2evo_widget_icon_down +
+				b2evo_widget_icon_bottom +
 				b2evo_widget_icon_disable +
 			'</div>' );
-		if( same_widgets.eq( same_widgets.length - 1 ).next( '.evo_widget' ).length == 0 )
+		var next_widget = same_widgets.eq( same_widgets.length - 1 ).next( '.evo_widget' );
+		if( next_widget.length == 0 )
 		{	// Hide action icon to move widget down if it is the last widget in container:
 			jQuery( designer_block_selector ).find( '.evo_designer__action_order_down' ).hide();
 		}
-		if( same_widgets.eq( 0 ).prev( '.evo_widget' ).length == 0 )
+		if( next_widget.next( '.evo_widget' ).length == 0 )
+		{	// Hide action icon to move widget to bottom if it is the penultimate widget in container:
+			jQuery( designer_block_selector ).find( '.evo_designer__action_order_bottom' ).hide();
+		}
+		var prev_widget = same_widgets.eq( 0 ).prev( '.evo_widget' );
+		if( prev_widget.length == 0 )
 		{	// Hide action icon to move widget up if it is the first widget in container:
 			jQuery( designer_block_selector ).find( '.evo_designer__action_order_up' ).hide();
+		}
+		if( prev_widget.prev( '.evo_widget' ).length == 0 )
+		{	// Hide action icon to move widget to top if it is the second widget in container:
+			jQuery( designer_block_selector ).find( '.evo_designer__action_order_top' ).hide();
 		}
 	}
 	for( var w = 2; w <= same_widgets.length; w++ )
@@ -385,17 +397,32 @@ jQuery( document ).on( 'mousemove', function( e )
 	}
 } );
 
-jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__action_order_down', function()
+jQuery( document ).on( 'click', '.evo_designer__action_order_top, .evo_designer__action_order_up, .evo_designer__action_order_down, .evo_designer__action_order_bottom', function()
 {	// Change an order of widget:
 	var designer_block = jQuery( this ).closest( '.evo_designer__widget' );
 	var widget = jQuery( evo_widget_selector( designer_block ) );
-	var order_type = jQuery( this ).hasClass( 'evo_designer__action_order_up' ) ? 'up' : 'down';
+	var order_type = 'top';
+	if( jQuery( this ).hasClass( 'evo_designer__action_order_up' ) )
+	{
+		order_type = 'up';
+	}
+	else if( jQuery( this ).hasClass( 'evo_designer__action_order_down' ) )
+	{
+		order_type = 'down';
+	}
+	else if( jQuery( this ).hasClass( 'evo_designer__action_order_bottom' ) )
+	{
+		order_type = 'bottom';
+	}
 
 	// Re-select designer block because it may be several blocks for some widgets, e.g. for items/posts list widget in Menu container:
 	designer_block = jQuery( evo_widget_designer_block_selector( widget ) );
 
 	// Mark current widget with process class:
 	designer_block.removeClass( 'evo_designer__status_failed' ).addClass( 'evo_designer__status_process' );
+
+	// Save current index of the widget in container:
+	var widget_index = widget.index();
 
 	// Change an order of the widget with near widget:
 	evo_widget_reorder( widget, order_type );
@@ -426,7 +453,7 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__
 			result = ajax_debug_clear( result );
 			if( result != '' )
 			{	// Error:
-				evo_widget_display_error( result, widget, order_type );
+				evo_widget_display_error( result, widget, order_type, widget_index );
 			}
 			else
 			{	// Success:
@@ -442,7 +469,7 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_up, .evo_designer__
 		error: function( jqXHR, textStatus, errorThrown )
 		{	// Display error text on error request:
 			var error_text = ( jqXHR.statusText == 'Bad Crumb Request' ? jqXHR.responseText : evo_js_lang_server_error );
-			evo_widget_display_error( error_text + ' ' + evo_js_lang_sync_error, widget, order_type );
+			evo_widget_display_error( error_text + ' ' + evo_js_lang_sync_error, widget, order_type, widget_index );
 		}
 	} );
 } );
@@ -589,15 +616,16 @@ function evo_widget_container_block_selector( container_code )
  * 
  * @param string Error message
  * @param object Widget
- * @param string Action: 'up', 'down', 'disable'
+ * @param string Action: 'top', 'up', 'down', 'disable'
+ * @param integer Widget index/position before action
  */
-function evo_widget_display_error( error, widget, action )
+function evo_widget_display_error( error, widget, action, widget_index )
 {
 	jQuery( evo_widget_designer_block_selector( widget ) ).removeClass( 'evo_designer__status_process' ).addClass( 'evo_designer__status_failed' );
 	alert( error );
-	if( action == 'up' || action == 'down' )
+	if( action != 'disable' )
 	{	// Revert widget order back:
-		evo_widget_reorder( widget, action == 'up' ? 'down' : 'up' );
+		evo_widget_reorder( widget, widget_index );
 	}
 }
 
@@ -606,24 +634,53 @@ function evo_widget_display_error( error, widget, action )
  * Change an order of the widget with near widget in same container
  *
  * @param object Widget
- * @param string Order direction: 'up', 'down'
+ * @param string|integer Order direction: 'top', 'up', 'down', 'bottom' or number of index
  */
 function evo_widget_reorder( widget, direction )
 {
 	var curr_widget = widget.eq( 0 );
 
-	if( direction == 'up' )
-	{	// Move HTML of the widget before previous widget:
-		var near_widget = evo_widget_get_duplicates( curr_widget.prev() );
-		near_widget.eq( 0 ).before( widget );
-	}
-	else
-	{	// Move HTML of the widget after next widget:
-		var near_widget = evo_widget_get_duplicates( widget.eq( widget.length - 1 ).next() );
-		near_widget.eq( near_widget.length - 1 ).after( widget );
+	switch( direction )
+	{
+		case 'top':
+			// Move HTML of the widget to the top:
+			var near_widget = evo_widget_get_duplicates( curr_widget.closest( '.evo_container' ).find( '.evo_widget' ).first() );
+			near_widget.eq( 0 ).before( widget );
+			break;
+
+		case 'up':
+			// Move HTML of the widget before previous widget:
+			var near_widget = evo_widget_get_duplicates( curr_widget.prev() );
+			near_widget.eq( 0 ).before( widget );
+			break;
+
+		case 'bottom':
+			// Move HTML of the widget to the bottom:
+			var near_widget = evo_widget_get_duplicates( curr_widget.closest( '.evo_container' ).find( '.evo_widget' ).last() );
+			near_widget.eq( near_widget.length - 1 ).after( widget );
+			break;
+
+		case 'down':
+			// Move HTML of the widget after next widget:
+			var near_widget = evo_widget_get_duplicates( widget.eq( widget.length - 1 ).next() );
+			near_widget.eq( near_widget.length - 1 ).after( widget );
+			break;
+
+		default:
+			// Move to specific index:
+			var widget_index = parseInt( direction );
+			var near_widget = evo_widget_get_duplicates( curr_widget.closest( '.evo_container' ).find( '.evo_widget' ).eq( widget_index ) );
+			if( widget_index == 0 )
+			{
+				near_widget.eq( 0 ).before( widget );
+			}
+			else
+			{
+				near_widget.eq( 0 ).after( widget );
+			}
 	}
 
-	// Update visibility of up/down action icons of first/last widgets:
+	// Update visibility of up/down action icons of first, second, penultimate and last widgets:
 	evo_widget_update_order_actions( evo_widget_container_wrapper( widget ) );
 
 	evo_widget_update_designer_position( widget );
@@ -648,15 +705,23 @@ function evo_widget_update_order_actions( container )
 		{	// If designer block is initialized:
 			if( prev_widget_ID != designer_block.data( 'id' ) )
 			{	// If it is block for next different widget:
-				designer_block.find( '.evo_designer__action_order_up, .evo_designer__action_order_down' ).show();
+				designer_block.find( '.evo_designer__action_order_top, .evo_designer__action_order_up, .evo_designer__action_order_down, .evo_designer__action_order_bottom' ).show();
 			}
 			if( widget_num == 1 )
 			{	// Hide action icon to move widget up for the first widget in container:
 				designer_block.find( '.evo_designer__action_order_up' ).hide();
 			}
+			if( widget_num <= 2 )
+			{	// Hide action icon to move widget to top for the second widget in container:
+				designer_block.find( '.evo_designer__action_order_top' ).hide();
+			}
 			if( widget_num == container_widgets.length )
 			{	// Hide action icon to move widget down for the last widget in container:
 				designer_block.find( '.evo_designer__action_order_down' ).hide();
+			}
+			if( widget_num >= container_widgets.length - 1 )
+			{	// Hide action icon to move widget to bottom for the penultimate widget in container:
+				designer_block.find( '.evo_designer__action_order_bottom' ).hide();
 			}
 			prev_widget_ID = designer_block.data( 'id' );
 		}

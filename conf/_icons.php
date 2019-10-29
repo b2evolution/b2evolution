@@ -1384,14 +1384,28 @@ function get_icon_info( $name )
 			'size' => array( 12, 13 ),
 			'xy' => array( 96, 80 ),
 			'glyph' => 'circle-arrow-up',
-			'fa' => 'arrow-circle-up',
+			'fa' => 'angle-up',
+		);
+		case 'designer_widget_top': return array(
+			'alt'  => T_('Up'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 96, 80 ),
+			'glyph' => 'circle-arrow-up',
+			'fa' => 'angle-double-up',
 		);
 		case 'designer_widget_down': return array(
 			'alt'  => T_('Down'),
 			'size' => array( 12, 13 ),
 			'xy' => array( 64, 80 ),
 			'glyph' => 'circle-arrow-down',
-			'fa' => 'arrow-circle-down',
+			'fa' => 'angle-down',
+		);
+		case 'designer_widget_bottom': return array(
+			'alt'  => T_('Down'),
+			'size' => array( 12, 13 ),
+			'xy' => array( 64, 80 ),
+			'glyph' => 'circle-arrow-down',
+			'fa' => 'angle-double-down',
 		);
 		case 'designer_widget_list': return array(
 			'alt'  => T_('List'),
