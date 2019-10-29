@@ -5777,7 +5777,7 @@ function item_row_status( $Item, $index, $cat_ID = NULL )
  */
 function item_row_order( $Item )
 {
-	global $current_User, $ItemList;
+	global $current_User, $ItemList, $Blog;
 
 	if( isset( $ItemList, $ItemList->filters['cat_single'] ) &&
 	    ! empty( $ItemList->filters['cat_single'] ) )
@@ -5799,7 +5799,12 @@ function item_row_order( $Item )
 
 	$item_order = $Item->get_order( $order_cat_ID );
 
-	if( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
+	if( ( ! isset( $ItemList, $ItemList->filters['cat_array'] ) || count( $ItemList->filters['cat_array'] ) != 1 ) &&
+	    $Blog->ID != $Item->get_blog_ID() )
+	{	// Don't allow to edit order because in such case we display a sum of orders from all extra categories of the Item:
+		return $item_order;
+	}
+	elseif( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{	// If current user can edit the Item then allow to edit an order by AJAX:
 		return '<a href="#" rel="'.$Item->ID.'"'.$order_cat_attr.'>'.( $item_order === NULL ? '-' : $item_order ).'</a>';
 	}

@@ -9339,10 +9339,23 @@ class Item extends ItemLight
 		{	// Initialize item orders in all assigned categories:
 			global $DB;
 			$SQL = new SQL( 'Get all orders per categories of Item #'.$this->ID );
-			$SQL->SELECT( 'postcat_cat_ID, postcat_order' );
+			$SQL->SELECT( 'cat_ID, cat_blog_ID, postcat_order' );
 			$SQL->FROM( 'T_postcats' );
+			$SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = postcat_cat_ID' );
 			$SQL->WHERE( 'postcat_post_ID = '.$this->ID );
-			$this->orders = $DB->get_assoc( $SQL );
+			$orders = $DB->get_results( $SQL );
+			$this->orders = array();
+			$this->orders_per_coll = array();
+			foreach( $orders as $order )
+			{
+				$this->orders[ $order->cat_ID ] = $order->postcat_order;
+				// Initialize categories per collection, useful in cross-posted mode:
+				if( ! isset( $this->orders_per_coll[ $order->cat_blog_ID ] ) )
+				{
+					$this->orders_per_coll[ $order->cat_blog_ID ] = array();
+				}
+				$this->orders_per_coll[ $order->cat_blog_ID ][ $order->cat_ID ] = $order->postcat_order;
+			}
 		}
 	}
 
@@ -9359,7 +9372,27 @@ class Item extends ItemLight
 
 		if( $cat_ID === NULL )
 		{	// Use main category:
-			$cat_ID = $this->get( 'main_cat_ID' );
+			global $Blog;
+			if( isset( $Blog ) &&
+			    ! empty( $this->orders_per_coll[ $Blog->ID ] ) &&
+			    $Blog->ID != $this->get_blog_ID() )
+			{	// Use sum of post orders from categories of cross-posted collection,
+				// if current collection is a collection of extra category of this Item:
+				$orders_sum = NULL;
+				foreach( $this->orders_per_coll[ $Blog->ID ] as $extra_cat_order )
+				{
+					if( $extra_cat_order !== NULL )
+					{
+						$orders_sum += $extra_cat_order;
+					}
+				}
+				return $orders_sum;
+			}
+			else
+			{	// Use order of main category,
+				// If current collection is same as collection of main category:
+				$cat_ID = $this->get( 'main_cat_ID' );
+			}
 		}
 
 		return isset( $this->orders[ $cat_ID ] ) ? $this->orders[ $cat_ID ] : NULL;

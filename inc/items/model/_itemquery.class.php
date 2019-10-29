@@ -243,15 +243,15 @@ class ItemQuery extends SQL
 
 		if( ! empty( $coll_IDs ) )
 		{ // Force to aggregate the collection IDs from current param and not from blog setting
-			$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID', $coll_IDs ) );
+			$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs( 'T_categories.cat_blog_ID', $coll_IDs ) );
 		}
 		elseif( $cat_focus == 'main' )
 		{ // We are requesting a narrow search
-			$this->WHERE_and( 'cat_blog_ID = '.$Blog->ID );
+			$this->WHERE_and( 'T_categories.cat_blog_ID = '.$Blog->ID );
 		}
 		else
 		{ // Aggregate the collections IDs from blog setting
-			$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs( 'cat_blog_ID' ) );
+			$this->WHERE_and( $Blog->get_sql_where_aggregate_coll_IDs( 'T_categories.cat_blog_ID' ) );
 		}
 
 
@@ -342,7 +342,7 @@ class ItemQuery extends SQL
 		$status_restrictions = array();
 		foreach( $status_coll_clauses as $status_coll_clause => $status_coll_IDs )
 		{	// Initialize status permission restriction for each grouped condition that is formed above:
-			$status_restrictions[] = 'cat_blog_ID IN ( '.implode( ',', $status_coll_IDs ).' ) AND '.$status_coll_clause;
+			$status_restrictions[] = 'T_categories.cat_blog_ID IN ( '.implode( ',', $status_coll_IDs ).' ) AND '.$status_coll_clause;
 		}
 
 		$this->WHERE_and( '( '.implode( ' ) OR ( ', $status_restrictions ).' )' );
@@ -1105,6 +1105,8 @@ class ItemQuery extends SQL
 			// Join table of categories for field 'postcat_order':
 			$current_cat_ID = ( isset( $this->cat_array ) && count( $this->cat_array ) == 1 ? $DB->quote( $this->cat_array[0] ) : 'post_main_cat_ID' );
 			$this->FROM_add( 'INNER JOIN T_postcats AS postcatsorders ON postcatsorders.postcat_post_ID = post_ID AND '.$current_cat_ID.' = postcatsorders.postcat_cat_ID' );
+			// Join table to know collection of main category when list should be ordered by SUM of all extra categories from not main(cross-posted) collection:
+			$this->FROM_add( 'INNER JOIN T_categories AS postmaincat ON post_main_cat_ID = postmaincat.cat_ID' );
 			// Replace field to real name:
 			$order_by = str_replace( 'order', 'postcatsorders.postcat_order', $order_by );
 		}
