@@ -664,6 +664,7 @@ class SiteMenuEntry extends DataObject
 		switch( $this->get( 'type' ) )
 		{
 			case 'home':
+				global $is_front;
 				return ( $disp == 'front' || ! empty( $is_front ) );
 
 			case 'recentposts':
