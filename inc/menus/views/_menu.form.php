@@ -117,17 +117,20 @@ if( $edited_SiteMenu->ID > 0 )
 
 		$r = '';
 
-		// Name
+		// Order:
+		$r .= '<td class="right">'.$SiteMenuEntry->dget( 'order' ).'</td>';
+
+		// Name:
 		if( $current_User->check_perm( 'options', 'edit' ) )
 		{	// We have permission permission to edit:
 			$edit_url = regenerate_url( 'action,ment_ID', 'ment_ID='.$SiteMenuEntry->ID.'&amp;action=edit_entry' );
-			$r .= '<td>
+			$r .= '<td class="nowrap">
 					<strong style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$SiteMenuEntry->get_text().'</a></strong>
 				</td>';
 		}
 		else
 		{
-			$r .= '<td>
+			$r .= '<td class="nowrap">
 					<strong style="padding-left: '.($level).'em;">'.$SiteMenuEntry->dget( 'text' ).'</strong>
 				</td>';
 		}
@@ -204,7 +207,12 @@ if( $edited_SiteMenu->ID > 0 )
 	$Table->global_icon( T_('New menu entry'), 'new', regenerate_url( 'action,blog', 'action=new_entry' ), T_('New menu entry').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 	$Table->cols[] = array(
+			'th' => T_('Order'),
+			'th_class' => 'shrinkwrap',
+		);
+	$Table->cols[] = array(
 			'th' => T_('Entry'),
+			'th_class' => 'shrinkwrap',
 		);
 	$Table->cols[] = array(
 			'th' => T_('Entry type'),
@@ -212,7 +220,6 @@ if( $edited_SiteMenu->ID > 0 )
 		);
 	$Table->cols[] = array(
 			'th' => T_('Destination'),
-			'th_class' => 'shrinkwrap',
 		);
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{	// We have permission to edit, so display action column:

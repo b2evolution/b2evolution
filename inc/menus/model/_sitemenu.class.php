@@ -104,6 +104,8 @@ class SiteMenu extends DataObject
 			if( ! empty( $this->insert_menu_entries ) )
 			{
 				$entry_sections = array();
+				$root_order = 10;
+				$prev_parent = NULL;
 				foreach( $this->insert_menu_entries as $menu_entry_key => $menu_entry_text )
 				{
 					$SiteMenuEntry = new SiteMenuEntry();
@@ -112,6 +114,8 @@ class SiteMenu extends DataObject
 					{	// Special "Contact" entry:
 						$SiteMenuEntry->set( 'text', T_('Contact') );
 						$SiteMenuEntry->set( 'type', 'ownercontact' );
+						$SiteMenuEntry->set( 'order', $root_order );
+						$root_order += 10;
 						$SiteMenuEntry->dbinsert();
 					}
 					elseif( preg_match( '/^([a-z]+)_(\d+)(_(\d+))?$/', $menu_entry_key, $m ) )
@@ -122,6 +126,8 @@ class SiteMenu extends DataObject
 								// Section entry:
 								$SiteMenuEntry->set( 'text', $menu_entry_text );
 								$SiteMenuEntry->set( 'type', 'text' );
+								$SiteMenuEntry->set( 'order', $root_order );
+								$root_order += 10;
 								if( $SiteMenuEntry->dbinsert() )
 								{
 									$entry_sections[ $m[2] ] = $SiteMenuEntry->ID;
@@ -134,7 +140,19 @@ class SiteMenu extends DataObject
 								$SiteMenuEntry->set( 'type', 'home' );
 								if( isset( $m[4], $entry_sections[ $m[4] ] ) )
 								{
+									if( $prev_parent != $entry_sections[ $m[4] ] )
+									{
+										$sub_order = 10;
+									}
 									$SiteMenuEntry->set( 'parent_ID', $entry_sections[ $m[4] ] );
+									$prev_parent = $entry_sections[ $m[4] ];
+									$SiteMenuEntry->set( 'order', $sub_order );
+									$sub_order += 10;
+								}
+								else
+								{
+									$SiteMenuEntry->set( 'order', $root_order );
+									$root_order += 10;
 								}
 								$SiteMenuEntry->dbinsert();
 								break;

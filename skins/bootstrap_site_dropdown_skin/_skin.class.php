@@ -430,11 +430,24 @@ footer.bootstrap_site_navbar_footer .container a {
 		$this->header_tab_active = NULL;
 
 		$site_menu_entries = $SiteMenu->get_entries();
+		$level0_index = 0;
 		foreach( $site_menu_entries as $SiteMenuEntry )
 		{
 			if( $header_tab = $this->get_header_tab_custom( $SiteMenuEntry ) )
 			{
 				$header_tabs[] = $header_tab;
+				if( ! empty( $header_tab['items'] ) )
+				{
+					foreach( $header_tab['items'] as $sub_item )
+					{
+						if( ! empty( $sub_item['active'] ) )
+						{
+							$this->header_tab_active = $level0_index;
+							break;
+						}
+					}
+				}
+				$level0_index++;
 			}
 		}
 

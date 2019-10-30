@@ -53,7 +53,7 @@ else
 					foreach( $header_tabs as $s => $header_tab )
 					{	// Display level 0 tabs:
 						// Current collection gets class "active"
-						echo '<li'.( $site_Skin->header_tab_active === $s ? ' class="active"' : '' ) . '>';
+						echo '<li'.( $site_Skin->header_tab_active === $s || ! empty( $header_tab['active'] ) ? ' class="active"' : '' ) . '>';
 
 						// If collections grouped in a section exist and have at least one collection:
 						if( isset( $header_tab['items'] ) &&
