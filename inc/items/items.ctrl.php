@@ -870,6 +870,114 @@ switch( $action )
 		header_redirect( $redirect_to );
 		break;
 
+	case 'mass_change_cat':
+		// Mass change main category or add extra categories of selected items:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'items' );
+
+		$selected_items = param( 'selected_items', 'array:integer' );
+		$page = param( 'page', 'integer', 1 );
+		$tab = param( 'tab', 'string', 'type' );
+		$tab_type = param( 'tab_type', 'string', '' );
+		$cat_type = param( 'cat_type', 'string' );
+
+		// Set an URL to redirect to items list after this action:
+		$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab='.$tab.( $page > 1 ? '&items_'.$tab.'_paged='.$page : '' );
+		if( $tab == 'type' && ! empty( $tab_type ) )
+		{
+			$redirect_to .= '&tab_type='.$tab_type;
+		}
+
+		if( empty( $selected_items ) )
+		{	// If no items selected:
+			$Messages->add( T_('Please select at least one item.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		$ChapterCache = & get_ChapterCache();
+		if( $cat_type == 'main' )
+		{	// Get a selected main category:
+			$main_cat_ID = param( 'post_category', 'integer', true );
+			$main_Chapter = & $ChapterCache->get_by_ID( $main_cat_ID );
+		}
+		else
+		{	// Get the selected extra categories:
+			$extra_categories = param( 'post_extracats', 'array:integer' );
+		}
+
+		if( empty( $main_cat_ID ) && empty( $extra_categories ) )
+		{	// If no categories selected:
+			$Messages->add( T_('Please select a category.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		$ItemCache = & get_ItemCache();
+		$items_success = 0;
+		$items_failed = 0;
+		foreach( $selected_items as $selected_item_ID )
+		{
+			if( ( $selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false ) ) &&
+			    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $selected_Item ) )
+			{	// If current User has a permission to edit the selected Item:
+				$current_extra_categories = postcats_get_byID( $selected_Item->ID );
+				if( $cat_type == 'main' )
+				{	// Change main category:
+					$selected_Item->set( 'main_cat_ID', $main_cat_ID );
+					// Don't lose current extra categories:
+					$selected_Item->set( 'extra_cat_IDs', $current_extra_categories );
+				}
+				else
+				{	// Add extra categories to previous linked categories:
+					$selected_Item->set( 'extra_cat_IDs', array_unique( array_merge( $current_extra_categories, $extra_categories ) ) );
+				}
+				if( $selected_Item->dbupdate() )
+				{	// If the item has been updated to the requested categories:
+					$items_success++;
+					continue;
+				}
+			}
+			// Wrong item or current User has no perm to edit the selected item:
+			$items_failed++;
+		}
+
+		if( $cat_type == 'main' )
+		{	// Report about changed main category:
+			if( $items_success )
+			{	// Inform about success updates:
+				$Messages->add( sprintf( T_('Main category of %d items have been changed to %s.'), $items_success, '"'.$main_Chapter->get( 'name' ).'"' ), 'success' );
+			}
+			if( $items_failed )
+			{	// Inform about failed updates:
+				$Messages->add( sprintf( T_('Main category of %d items could not be changed to %s.'), $items_failed, '"'.$main_Chapter->get( 'name' ).'"' ), 'error' );
+			}
+		}
+		else
+		{	// Report about added extra categories:
+			$extra_cats_names = array();
+			foreach( $extra_categories as $extra_cat_ID )
+			{
+				if( $extra_Chapter = & $ChapterCache->get_by_ID( $extra_cat_ID, false, false ) )
+				{
+					$extra_cats_names[] = '"'.$extra_Chapter->get( 'name' ).'"';
+				}
+			}
+			if( $items_success )
+			{	// Inform about success updates:
+				$Messages->add( sprintf( T_('Extra categories %s of %d items have been added.'), implode( ', ', $extra_cats_names ), $items_success ), 'success' );
+			}
+			if( $items_failed )
+			{	// Inform about failed updates:
+				$Messages->add( sprintf( T_('Extra categories %s of %d items could not be added.'), implode( ', ', $extra_cats_names ), $items_failed ), 'error' );
+			}
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $redirect_to );
+		break;
+
 	default:
 		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
 }

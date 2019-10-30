@@ -869,11 +869,14 @@ elseif( $allow_items_list_form )
 	echo_item_status_buttons( $Form, NULL, 'items_visibility' );
 	echo_status_dropdown_button_js( 'post' );
 
-	//$Form->button( array( 'button', 'mass_change_main_cat', T_('Change primary category') ) );
-	//$Form->button( array( 'button', 'mass_add_extra_cat', T_('Add secondary category') ) );
+	$Form->button( array( 'button', 'mass_change_main_cat', T_('Change primary category') ) );
+	$Form->button( array( 'button', 'mass_add_extra_cat', T_('Add secondary category') ) );
 	$Form->button( array( 'submit', 'actionArray[mass_delete]', T_('Delete'), 'btn-danger' ) );
 
 	$Form->end_form();
+
+	// JavaScript code to mass change category of Items:
+	echo_item_mass_change_cat_js();
 }
 
 // Display navigation:

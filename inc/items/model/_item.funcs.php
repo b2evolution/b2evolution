@@ -1222,6 +1222,10 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	$params = array_merge( array(
 			'categories_name' => T_('Categories'),
 			'fold'            => false,
+			'display_main'    => true,
+			'display_extra'   => true,
+			'display_order'   => true,
+			'display_new'     => true,
 		), $params );
 
 	$cat = param( 'cat', 'integer', 0 );
@@ -1262,7 +1266,7 @@ function cat_select( $Form, $form_fields = true, $show_title_links = true, $para
 	);
 
 	// Init cat display param
-	$cat_display_params = array( 'total_count' => 0 );
+	$cat_display_params = array_merge( $params, array( 'total_count' => 0 ) );
 
 	if( $current_User->check_perm( 'blog_admin', '', false, $blog ) &&
 		( get_allow_cross_posting() >= 2 ||
@@ -1382,18 +1386,29 @@ function cat_select_header( $params = array() )
 			'category_extra_title' => T_('Additional category'),
 			'category_order_text'  => T_('Ord'),
 			'category_order_title' => T_('Order'),
+			'display_main'         => true,
+			'display_extra'        => true,
+			'display_order'        => true,
+			'display_new'          => true,
 		), $params );
 
-	// Radio option for main category:
-	$r = '<thead><tr><th class="catsel_main col-narrow" title="'.format_to_output( $params['category_main_title'], 'htmlattr' ).'">'.format_to_output( $params['category_main_text'] ).'</th>';
+	$r = '';
 
-	// Checkbox for extra category:
-	$r .= '<th class="catsel_extra col-narrow" title="'.format_to_output( $params['category_extra_title'], 'htmlattr' ).'">'.format_to_output( $params['category_extra_text'] ).'</th>';
+	if( $params['display_main'] )
+	{	// Radio option for main category:
+		$r .= '<thead><tr><th class="catsel_main col-narrow" title="'.format_to_output( $params['category_main_title'], 'htmlattr' ).'">'.format_to_output( $params['category_main_text'] ).'</th>';
+	}
+
+	if( $params['display_extra'] )
+	{	// Checkbox for extra category:
+		$r .= '<th class="catsel_extra col-narrow" title="'.format_to_output( $params['category_extra_title'], 'htmlattr' ).'">'.format_to_output( $params['category_extra_text'] ).'</th>';
+	}
 
 	// Category name:
 	$r .= '<th class="catsel_name">'.$params['category_name'].'</th>';
 
-	if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+	if( $params['display_order'] &&
+	    ( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) ) )
 	{	// Item order per category:
 		$r .= '<th class="catsel_order col-narrow" title="'.format_to_output( $params['category_order_title'], 'htmlattr' ).'">'.format_to_output( $params['category_order_text'] ).'</th>'
 			.'</tr></thead>';
@@ -1417,6 +1432,10 @@ function cat_select_display( $Chapter, $callbacks, & $params = array() )
 			'level'  => 1,
 			'sorted' => true,
 			'total_count' => 0,
+			'display_main'  => true,
+			'display_extra' => true,
+			'display_order' => true,
+			'display_new'   => true,
 		), $params );
 
 	$callbacks = array_merge( array(
@@ -1433,11 +1452,11 @@ function cat_select_display( $Chapter, $callbacks, & $params = array() )
 
 	if( is_array( $callbacks['before_each'] ) )
 	{ // object callback:
-		$r .= $callbacks['before_each'][0]->{$callbacks['before_each'][1]}( $Chapter->ID, $params['level'], $params['total_count'] );
+		$r .= $callbacks['before_each'][0]->{$callbacks['before_each'][1]}( $Chapter->ID, $params['level'], $params['total_count'], $params );
 	}
 	else
 	{
-		$r .= $callbacks['before_each']( $Chapter->ID, $params['level'], $params['total_count'] );
+		$r .= $callbacks['before_each']( $Chapter->ID, $params['level'], $params['total_count'], $params );
 	}
 
 	if( is_array( $callbacks['after_each'] ) )
@@ -1499,10 +1518,17 @@ function cat_select_before_first( $parent_cat_ID, $level )
 /**
  * callback to display sublist element
  */
-function cat_select_before_each( $cat_ID, $level, $total_count )
+function cat_select_before_each( $cat_ID, $level, $total_count, $params = array() )
 { // callback to display sublist element
 	global $current_blog_ID, $blog, $Blog, $post_extracats, $edited_Item, $current_User;
 	global $creating, $cat_select_level, $cat_select_form_fields;
+
+	$params = array_merge( array(
+			'display_main'  => true,
+			'display_extra' => true,
+			'display_order' => true,
+			'display_new'   => true,
+		), $params );
 
 	$ChapterCache = & get_ChapterCache();
 	$thisChapter = $ChapterCache->get_by_ID($cat_ID);
@@ -1515,7 +1541,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	$r = "\n".'<tr class="'.( $total_count%2 ? 'odd' : 'even' ).'">';
 
 	// RADIO for main cat:
-	if( get_post_cat_setting($blog) != 2 )
+	if( $params['display_main'] && get_post_cat_setting($blog) != 2 )
 	{ // if no "Multiple categories per post" option is set display radio
 		if( !$thisChapter->meta
 			&& ! ( ! is_admin_page() && ( $thisChapter->get_ItemType() === false ) && $edited_Item->ID === 0 )
@@ -1544,7 +1570,7 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 	}
 
 	// CHECKBOX:
-	if( get_post_cat_setting( $blog ) >= 2 )
+	if( $params['display_extra'] && get_post_cat_setting( $blog ) >= 2 )
 	{ // We allow multiple categories or main + extra cat,  display checkbox:
 		if( !$thisChapter->meta
 			&& ! ( ! is_admin_page() && ( $thisChapter->get_ItemType() === false ) && $edited_Item->ID === 0 )
@@ -1599,7 +1625,8 @@ function cat_select_before_each( $cat_ID, $level, $total_count )
 				.'&nbsp;&raquo;&nbsp;' // TODO: dh> provide an icon instead? // fp> maybe the A(dmin)/B(log) icon from the toolbar? And also use it for permalinks to posts?
 				.'</a></td>';
 
-	if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+	if( $params['display_order'] &&
+	    ( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) ) )
 	{	// Display item order per category only on back-office or when it is enabled for front-office:
 		$r .= '<td class="catsel_order"><input type="text" name="post_cat_orders['.$cat_ID.']" class="form_text_input form-control" value="'.$edited_Item->get_order( $cat_ID ).'" title="'.format_to_output( T_('can be decimal'), 'htmlattr' ).'" /></td>';
 	}
@@ -1634,6 +1661,11 @@ function cat_select_after_last( $parent_cat_ID, $level )
 function cat_select_new( & $cat_display_params )
 {
 	global $blog, $Blog, $current_User;
+	
+	if( ! $cat_display_params['display_new'] )
+	{	// Don't display an input to create new category:
+		return '';
+	}
 
 	if( ! $current_User->check_perm( 'blog_cats', '', false, $blog ) )
 	{	// Current user cannot add/edit a categories for this blog
@@ -1656,7 +1688,7 @@ function cat_select_new( & $cat_display_params )
 	$cat_display_params['total_count'] = $cat_display_params['total_count']  + 1;
 	$r = "\n".'<tr class="'.( $cat_display_params['total_count'] % 2 ? 'odd' : 'even' ).'">';
 
-	if( get_post_cat_setting( $blog ) != 2 )
+	if( $cat_display_params['display_main'] && get_post_cat_setting( $blog ) != 2 )
 	{
 		// RADIO for new main cat:
 		$r .= '<td class="selector catsel_main"><input type="radio" name="post_category" class="checkbox" title="'
@@ -1670,7 +1702,7 @@ function cat_select_new( & $cat_display_params )
 		$r .= '/></td>';
 	}
 
-	if( get_post_cat_setting( $blog ) >= 2 )
+	if( $cat_display_params['display_extra'] && get_post_cat_setting( $blog ) >= 2 )
 	{
 		// CHECKBOX
 		$r .= '<td class="selector catsel_extra"><input type="checkbox" name="post_extracats[]" class="checkbox" title="'
@@ -1687,7 +1719,8 @@ function cat_select_new( & $cat_display_params )
 				.'<input maxlength="255" style="width:100%" value="'.format_to_output( $category_name, 'htmlattr' ).'" size="20" type="text" name="category_name" id="new_category_name" class="form_text_input form-control" />'
 				.'</td>';
 
-	if( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) )
+	if( $cat_display_params['display_order'] &&
+	    ( is_admin_page() || $Blog->get_setting( 'in_skin_editing_category_order' ) ) )
 	{	// INPUT TEXT for item order in new category:
 		$r .= '<td class="catsel_order">'
 				.'<input type="text" name="post_cat_orders[0]" value="'.format_to_output( $category_order, 'htmlattr' ).'" name="category_order" class="form_text_input form-control" title="'.format_to_output( T_('can be decimal'), 'htmlattr' ).'" />'
@@ -3117,6 +3150,76 @@ jQuery( document ).on( 'click', '#evo_link_version_btn', function()
 		+ '&post_ID=' + jQuery( '#evo_item_selector_post_ID' ).val()
 		+ '&dest_post_ID=' + jQuery( '#evo_item_selector_dest_post_ID' ).val()
 		+ '&<?php echo url_crumb( 'item' ); ?>';
+} );
+</script>
+<?php
+}
+
+
+/**
+ * JS Behaviour: Output JavaScript code to mass change category of Items
+ */
+function echo_item_mass_change_cat_js()
+{
+	global $evo_item_mass_change_cat_js_initialized, $blog;
+
+	if( ! empty( $evo_item_mass_change_cat_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
+
+	// Set flag to know this is initialized:
+	$evo_item_mass_change_cat_js_initialized = true;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+?>
+<script>
+jQuery( document ).ready( function ()
+{
+	jQuery( '#mass_change_main_cat, #mass_add_extra_cat' ).click( function()
+	{
+		var selected_items = new Array();
+		jQuery( 'input[name="selected_items\[\]"]:checked' ).each( function()
+		{
+			selected_items.push( jQuery( this ).val() );
+		} );
+
+		if( selected_items.length == 0 )
+		{	// Don't try to load a form to change a category if no selected items:
+			alert( '<?php echo TS_('Please select at least one item.'); ?>' );
+			return false;
+		}
+
+		var is_main_cat_mode = ( jQuery( this ).prop( 'id' ) == 'mass_change_main_cat' );
+
+		var evo_js_lang_mass_change_item_category = ( is_main_cat_mode ? '<?php echo TS_('Change primary category'); ?>' : '<?php echo TS_('Add secondary category'); ?>' );
+		evo_js_lang_close = '<?php echo TS_('Cancel'); ?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo format_to_output( TS_('Loading'), 'htmlattr' ); ?>"></span>',
+			'600px', 'auto', true, evo_js_lang_mass_change_item_category + ' <?php echo get_manual_link( 'post-language-versions#add-version' ); ?>', evo_js_lang_mass_change_item_category, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>async.php',
+			data:
+			{
+				'action': 'get_item_mass_change_cat_form',
+				'blog': '<?php echo $blog; ?>',
+				'cat_type': ( is_main_cat_mode ? 'main' : 'extra' ),
+				'selected_items': selected_items,
+				'tab': '<?php echo get_param( 'tab' ); ?>',
+				'tab_type': '<?php echo get_param( 'tab_type' ); ?>',
+				'page': '<?php echo param( 'items_'.get_param( 'tab' ).'_paged', 'integer', 1 ); ?>',
+			},
+			success: function(result)
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '600px', 'auto', true, evo_js_lang_mass_change_item_category, evo_js_lang_mass_change_item_category );
+			}
+		} );
+		return false;
+	} );
 } );
 </script>
 <?php
@@ -5612,14 +5715,14 @@ function items_results( & $items_Results, $params = array() )
 					'type' => 'text',
 					'text' => get_item_status_buttons( NULL, 'items_visibility', 'btn-xs' ),
 				),
-			/*'mass_change_main_cat' => array(
+			'mass_change_main_cat' => array(
 					'type' => 'button',
 					'text' => T_('Change primary category'),
 				),
 			'mass_add_extra_cat' => array(
 					'type' => 'button',
 					'text' => T_('Add secondary category'),
-				),*/
+				),
 			'mass_delete' => array(
 					'type'  => 'submit',
 					'text'  => T_('Delete'),
@@ -5635,6 +5738,9 @@ function items_results( & $items_Results, $params = array() )
 				'crumb'    => 'items',
 			);
 		echo_status_dropdown_button_js( 'post' );
+
+		// JavaScript code to mass change category of Items:
+		echo_item_mass_change_cat_js();
 	}
 
 	if( $params['display_date'] )

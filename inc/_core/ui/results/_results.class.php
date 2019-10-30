@@ -1528,7 +1528,7 @@ class Results extends Table
 								break;
 							case 'button':
 							case 'submit':
-								$r .= '<input type="'.$toggle_action['type'].'" name="actionArray['.$toggle_action_key.']"'
+								$r .= '<input type="'.$toggle_action['type'].'" name="actionArray['.$toggle_action_key.']" id="'.$toggle_action_key.'"'
 									.' value="'.format_to_output( $toggle_action['text'] ).'"'
 									.' class="btn btn-xs '.( empty( $toggle_action['class'] ) ? 'btn-default' : ''.$toggle_action['class'] ).'" />';
 								break;
