@@ -9400,6 +9400,40 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get item order per category by requested collection ID
+	 *
+	 * @param integer Collection ID
+	 * @param boolean TRUE to exclude NULL orders from result
+	 * @return array Array of orders (Key - Category ID, Value - Item's order)
+	 */
+	function get_orders_by_coll_ID( $coll_ID, $exclude_null_orders = false )
+	{
+		$this->load_orders();
+
+		if( isset( $this->orders_per_coll[ $coll_ID ] ) )
+		{
+			$orders_per_coll = $this->orders_per_coll[ $coll_ID ];
+			if( $exclude_null_orders )
+			{	// Exclude NULL orders:
+				foreach( $orders_per_coll as $order_cat_ID => $order )
+				{
+					if( $order === NULL )
+					{
+						unset( $orders_per_coll[ $order_cat_ID ] );
+					}
+				}
+			}
+		}
+		else
+		{	// No orders for the requested collection:
+			$orders_per_coll = array();
+		}
+
+		return $orders_per_coll;
+	}
+
+
+	/**
 	 * Update item order per category
 	 *
 	 * @param double New order value

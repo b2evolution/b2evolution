@@ -5802,7 +5802,7 @@ function item_row_order( $Item )
 	if( ( ! isset( $ItemList, $ItemList->filters['cat_array'] ) || count( $ItemList->filters['cat_array'] ) != 1 ) &&
 	    $Blog->ID != $Item->get_blog_ID() )
 	{	// Don't allow to edit order because in such case we display a sum of orders from all extra categories of the Item:
-		return $item_order;
+		return '<span data-toggle="tooltip" title="'.format_to_output( sprintf( T_('Several order numbers were found: %s. This will sort as %s.'), implode( '+', $Item->get_orders_by_coll_ID( $Blog->ID, true ) ), $item_order ), 'htmlattr' ).'">'.$item_order.'</span>';
 	}
 	elseif( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 	{	// If current user can edit the Item then allow to edit an order by AJAX:
