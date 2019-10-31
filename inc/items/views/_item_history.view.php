@@ -45,12 +45,12 @@ $proposed_changes_SQL->WHERE_and( 'iver_type = "proposed"' );
 
 // SQL to get current version:
 $current_sql = 'SELECT "current" AS iver_ID, "c" AS param_ID,
-		"'.$edited_Item->last_touched_ts.'" AS iver_edit_last_touched_ts,
-		"'.$edited_Item->lastedit_user_ID.'" AS iver_edit_user_ID,
+		'.$DB->quote( $edited_Item->last_touched_ts ).' AS iver_edit_last_touched_ts,
+		'.$DB->quote( $edited_Item->lastedit_user_ID ).' AS iver_edit_user_ID,
 		"current" AS iver_type,
-		"'.$edited_Item->status.'" AS iver_status,
-		"'.$edited_Item->title.'" AS iver_title,
-		"'.str_replace( '"', '\"', $lastedit_user_login ).'" AS user_login,
+		'.$DB->quote( $edited_Item->status ).' AS iver_status,
+		'.$DB->quote( $edited_Item->title ).' AS iver_title,
+		'.$DB->quote( $lastedit_user_login ).' AS user_login,
 		0 AS version_order';
 
 // SQL to get old versions:
