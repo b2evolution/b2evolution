@@ -40,21 +40,7 @@ widget_container( 'item_list', array(
 	)
 ) );
 // ----------------------------- END OF "Item List" CONTAINER -----------------------------
-/* To be removed. Replaced by Item Next Previous widget in Item Single Header container:
-// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
-mainlist_page_links( array(
-		'block_start'           => '<div class="center"><ul class="pagination">',
-		'block_end'             => '</ul></div>',
-		'page_item_before'      => '<li>',
-		'page_item_after'       => '</li>',
-		'page_item_current_before' => '<li class="active">',
-		'page_item_current_after'  => '</li>',
-		'page_current_template' => '<span>$page_num$</span>',
-		'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
-		'next_text'             => '<i class="fa fa-angle-double-right"></i>',
-	) );
-// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-*/
+
 // --------------------------------- START OF POSTS -------------------------------------
 // Display message if no post:
 display_if_empty();
@@ -64,20 +50,20 @@ while( $Item = & mainlist_get_item() )
 { // For each blog post, do everything below up to the closing curly brace "}"
 	echo '<div class="'.$Skin->get_setting( 'posts_list_block_class' ).'">';
 	echo '<div class="bbbs_post_block">';
-	$item_cover_image_url = $Item->get_cover_image_url();
+	echo '<a href="'.$Item->get_permanent_url().'"></a>';
+	$item_cover_image_url = $Item->get_cover_image_url( 'cover,teaser' );
 	echo '<div class="bbbs_post_cover"'.( $item_cover_image_url ? ' style="background-image:url('.$item_cover_image_url.')"' : '' ).'>';
 	if( $item_main_Chapter = & $Item->get_main_Chapter() )
 	{
 		echo $item_main_Chapter->get_name();
 	}
-	echo '</div>';
-	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-	skin_include( '_item_block.inc.php', array_merge( array(
-			'content_mode' => 'auto', // 'auto' will auto select depending on $disp-detail
-		), $params ) );
-	// ----------------------------END ITEM BLOCK  ----------------------------
-	echo '</div>';
-	echo '</div>';
+	echo '</div>'; // End of bbbs_post_cover
+	echo '<div class="bbbs_post_content">';
+		echo '<h2>'.$Item->dget( 'title' ).'</h2>';
+		$Item->excerpt();
+	echo '</div>'; // End of bbbs_post_content
+	echo '</div>'; // End of bbbs_post_block
+	echo '</div>'; // End of Settings:posts_list_block_class
 } // ---------------------------------- END OF POSTS ------------------------------------
 echo '</div>';
 

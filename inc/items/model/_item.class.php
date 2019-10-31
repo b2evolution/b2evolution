@@ -4711,12 +4711,15 @@ class Item extends ItemLight
 	/**
 	 * Get URL of a first cover image
 	 *
+	 * @param string Restrict to files/images linked to a specific position.
+	 *               Position can be 'cover'|'teaser'|'aftermore'|'inline'
+	 *               Use comma as separator
 	 * @return string|NULL cover URL or NULL if it doesn't exist
 	 */
-	function get_cover_image_url()
+	function get_cover_image_url( $position = 'cover' )
 	{
 		$LinkOwner = new LinkItem( $this );
-		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' ) )
+		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1, $position ) )
 		{ // No cover image
 			return NULL;
 		}

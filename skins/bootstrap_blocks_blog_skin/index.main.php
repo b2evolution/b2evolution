@@ -38,7 +38,7 @@ siteskin_include( '_site_body_header.inc.php' );
 ?>
 
 
-<div class="container">
+<div class="container<?php echo ( $disp == 'posts' ? ' container-xxl' : '' ); ?>">
 
 
 <header class="row">
