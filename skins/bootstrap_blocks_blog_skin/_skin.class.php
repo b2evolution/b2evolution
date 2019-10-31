@@ -136,15 +136,15 @@ class bootstrap_blocks_blog_Skin extends Skin
 				'min_width'    => '768px',
 				'title'        => T_('Small screen'),
 				// Default values:
-				'block_height' => '500',
-				'cover_height' => '350',
+				'block_height' => '400',
+				'cover_height' => '270',
 			),
 			'md' => array(
 				'min_width'    => '992px',
 				'title'        => T_('Medium screen'),
 				// Default values:
-				'block_height' => '400',
-				'cover_height' => '270',
+				'block_height' => '350',
+				'cover_height' => '220',
 			),
 			'lg' => array(
 				'min_width'    => '1200px',
@@ -152,6 +152,13 @@ class bootstrap_blocks_blog_Skin extends Skin
 				// Default values:
 				'block_height' => '300',
 				'cover_height' => '200',
+			),
+			'xxl' => array(
+				'min_width'    => '1785px',
+				'title'        => T_('Extra large screen'),
+				// Default values:
+				'block_height' => '400',
+				'cover_height' => '270',
 			),
 		);
 	}
@@ -262,7 +269,7 @@ class bootstrap_blocks_blog_Skin extends Skin
 				),
 				'posts_list_block_class' => array(
 					'label' => T_('Block class'),
-					'defaultvalue' => 'col-xs-12 col-sm-6 col-lg-4',
+					'defaultvalue' => 'col-xs-12 col-sm-6 col-lg-6 col-xxl-4',
 					'allow_empty' => true,
 					'size' => 50,
 				),
