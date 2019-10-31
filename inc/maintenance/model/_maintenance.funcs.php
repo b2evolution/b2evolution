@@ -199,7 +199,7 @@ a clean DB may make it impossible to ever ugrade your b2evolution in the future.
 		}
 		else
 		{	// Unlink failed:
-			echo '</p><p style="color:red"><evo:error>'.sprintf( T_( 'Unable to delete a maintenance file: &laquo;%s&raquo;' ), $maintenance_mode_file ).'</evo:error></p>';
+			echo '</p><p style="color:red"><evo:error>'.sprintf( T_( 'Unable to delete maintenance file: &laquo;%s&raquo;' ), $maintenance_mode_file ).'</evo:error></p>';
 			evo_flush();
 
 			return false;
