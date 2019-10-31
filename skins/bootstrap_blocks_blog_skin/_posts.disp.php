@@ -51,6 +51,7 @@ while( $Item = & mainlist_get_item() )
 	echo '<div class="'.$Skin->get_setting( 'posts_list_block_class' ).'">';
 	echo '<div class="bbbs_post_block">';
 	echo '<a href="'.$Item->get_permanent_url().'"></a>';
+	echo '<div>';
 	$item_cover_image_url = $Item->get_cover_image_url( 'cover,teaser' );
 	echo '<div class="bbbs_post_cover"'.( $item_cover_image_url ? ' style="background-image:url('.$item_cover_image_url.')"' : '' ).'>';
 	if( $item_main_Chapter = & $Item->get_main_Chapter() )
@@ -62,6 +63,7 @@ while( $Item = & mainlist_get_item() )
 		echo '<h2>'.$Item->dget( 'title' ).'</h2>';
 		$Item->excerpt();
 	echo '</div>'; // End of bbbs_post_content
+	echo '</div>';
 	echo '</div>'; // End of bbbs_post_block
 	echo '</div>'; // End of Settings:posts_list_block_class
 } // ---------------------------------- END OF POSTS ------------------------------------

@@ -150,8 +150,8 @@ class bootstrap_blocks_blog_Skin extends Skin
 				'min_width'    => '1200px',
 				'title'        => T_('Large screen'),
 				// Default values:
-				'block_height' => '300',
-				'cover_height' => '200',
+				'block_height' => '400',
+				'cover_height' => '270',
 			),
 			'xxl' => array(
 				'min_width'    => '1785px',

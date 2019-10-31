@@ -260,6 +260,11 @@ footer.row {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   position: relative;
+  padding-bottom: 10px;
+}
+.bbbs_posts_list .bbbs_post_block > div {
+  height: 100%;
+  overflow: hidden;
 }
 .bbbs_posts_list .bbbs_post_block > a {
   position: absolute;
@@ -270,6 +275,7 @@ footer.row {
 .bbbs_posts_list .bbbs_post_cover {
   background-color: #EEE;
   background-size: cover;
+  background-position: center;
   padding: 10px;
   color: #FFF;
   text-shadow: 0px 0px 2px #000;
