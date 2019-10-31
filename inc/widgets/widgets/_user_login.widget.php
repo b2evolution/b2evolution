@@ -178,11 +178,13 @@ class user_login_Widget extends ComponentWidget
 	{
 		if( is_logged_in() )
 		{	// Don't display because user is already logged in:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because user is already logged in.' );
 			return false;
 		}
 
 		if( get_param( 'disp' ) == 'login' )
 		{	// Don't display a duplicate form for inskin login mode:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden in order to don\'t duplicate same form on disp=login.' );
 			return false;
 		}
 

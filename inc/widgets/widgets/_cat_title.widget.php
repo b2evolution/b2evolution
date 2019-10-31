@@ -190,8 +190,6 @@ class cat_title_Widget extends ComponentWidget
 
 				echo $this->disp_params['block_body_end'];
 				echo $this->disp_params['block_end'];
-
-				return true;
 			}
 			else
 			{
@@ -200,7 +198,7 @@ class cat_title_Widget extends ComponentWidget
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 

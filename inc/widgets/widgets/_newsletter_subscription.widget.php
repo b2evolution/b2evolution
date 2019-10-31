@@ -221,6 +221,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 
 		if( ! is_logged_in() )
 		{	// Don't display when user is not logged in:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because user is not logged in.' );
 			return false;
 		}
 

@@ -268,6 +268,7 @@ class user_register_quick_Widget extends ComponentWidget
 		if( $Settings->get( 'newusers_canregister' ) != 'yes' || ! $Settings->get( 'quick_registration' ) )
 		{ // Display error message when quick registration is disabled
 			echo '<p class="error">'.T_('Quick registration is currently disabled on this system.').'</p>';
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because quick registration is currently disabled on this system.' );
 			return false;
 		}
 

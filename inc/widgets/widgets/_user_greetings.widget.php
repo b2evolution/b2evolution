@@ -176,6 +176,7 @@ class user_greetings_Widget extends ComponentWidget
 	{
 		if( ! is_logged_in() )
 		{	// Don't display because user is not logged in yet:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because user is not logged in.' );
 			return false;
 		}
 
