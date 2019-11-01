@@ -104,7 +104,9 @@ class bootstrap_blocks_blog_Skin extends Skin
 		// - Key is widget container code;
 		// - Value: array( 0 - container name, 1 - container order ),
 		//          NULL - means don't use the container, WARNING: it(only empty/without widgets) will be deleted from DB on changing of collection skin or on reload container definitions.
-		return array();
+		return array(
+				'sidebar_single' => array( NT_('Sidebar Single'), 95 ),
+			);
 	}
 
 
@@ -181,19 +183,17 @@ class bootstrap_blocks_blog_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
 				),
-					'layout' => array(
-						'label' => T_('Layout'),
-						'note' => T_('Select skin layout.'),
-						'defaultvalue' => 'left_sidebar',
+					'use_3_cols' => array(
+						'label' => T_('Use 3 cols'),
+						'type' => 'checklist',
 						'options' => array(
-								'single_column'              => T_('Single Column Large'),
-								'single_column_normal'       => T_('Single Column'),
-								'single_column_narrow'       => T_('Single Column Narrow'),
-								'single_column_extra_narrow' => T_('Single Column Extra Narrow'),
-								'left_sidebar'               => T_('Left Sidebar'),
-								'right_sidebar'              => T_('Right Sidebar'),
-							),
-						'type' => 'select',
+							array( 'single',       sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=single</code>' ), 1 ),
+							array( 'posts-default',sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-default</code>' ), 1 ),
+							array( 'posts-topcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-topcat-intro</code>, <code>disp=posts-topcat-nointro</code>' ), 1 ),
+							array( 'posts-subcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-subcat-intro</code>, <code>disp=posts-subcat-nointro</code>' ), 1 ),
+							array( 'front',        sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=front</code>' ), 1 ),
+							array( 'other',        T_('On other disps'), 0 ),
+						),
 					),
 					'main_content_image_size' => array(
 						'label' => T_('Image size for main content'),
@@ -656,73 +656,21 @@ class bootstrap_blocks_blog_Skin extends Skin
 
 
 	/**
-	 * Check if we can display a sidebar for the current layout
+	 * Check if side(left and/or right) navigations are visible for current page
 	 *
-	 * @param boolean TRUE to check if at least one sidebar container is visible
-	 * @return boolean TRUE to display a sidebar
+	 * @return boolean TRUE on visible
 	 */
-	function is_visible_sidebar( $check_containers = false )
+	function is_side_navigation_visible()
 	{
 		global $disp;
 
-		if( $disp == 'single' || $disp == 'page' )
-		{	// Force to display sidebar for Item pages:
-			return true;
+		if( in_array( $disp, array( 'access_requires_login', 'content_requires_login', 'access_denied' ) ) )
+		{ // Display left navigation column on this page when at least one sidebar container is visible:
+			return $this->show_container_when_access_denied( 'sidebar' ) || $this->show_container_when_access_denied( 'sidebar2' );
 		}
 
-		$layout = $this->get_setting( 'layout' );
-
-		if( $layout != 'left_sidebar' && $layout != 'right_sidebar' )
-		{ // Sidebar is not displayed for selected skin layout
-			return false;
-		}
-
-		if( $check_containers )
-		{ // Check if at least one sidebar container is visible
-			return ( $this->show_container_when_access_denied( 'sidebar' ) ||  $this->show_container_when_access_denied( 'sidebar2' ) );
-		}
-		else
-		{ // We should not check the visibility of the sidebar containers for this case
-			return true;
-		}
-	}
-
-
-	/**
-	 * Get value for attbiute "class" of column block
-	 * depending on skin setting "Layout"
-	 *
-	 * @return string
-	 */
-	function get_column_class()
-	{
-		switch( $this->get_setting( 'layout' ) )
-		{
-			case 'single_column':
-				// Single Column Large
-				return 'col-md-12';
-
-			case 'single_column_normal':
-				// Single Column
-				return 'col-xs-12 col-sm-12 col-md-12 col-lg-10 col-lg-offset-1';
-
-			case 'single_column_narrow':
-				// Single Column Narrow
-				return 'col-xs-12 col-sm-12 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2';
-
-			case 'single_column_extra_narrow':
-				// Single Column Extra Narrow
-				return 'col-xs-12 col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3';
-
-			case 'left_sidebar':
-				// Left Sidebar
-				return 'col-md-9 pull-right-md';
-
-			case 'right_sidebar':
-				// Right Sidebar
-			default:
-				return 'col-md-9';
-		}
+		// Display left navigation column only on these pages:
+		return in_array( $disp, array( 'front', 'posts', 'comments', 'flagged', 'mustread', 'single', 'search', 'edit', 'edit_comment', 'catdir', '404' ) );
 	}
 
 
@@ -735,13 +683,41 @@ class bootstrap_blocks_blog_Skin extends Skin
 	{
 		global $disp, $disp_detail;
 
-		if( ! $this->is_visible_sidebar() )
+		if( ! $this->is_side_navigation_visible() )
 		{	// Side navigation is hidden for current page:
 			return false;
 		}
 
 		// Check when we should use layout with 3 columns:
-		return ( $disp == 'single' || $disp == 'page' );
+		if( $disp == 'front' )
+		{	// Front page
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'front' );
+		}
+
+		if( $disp == 'single' )
+		{	// Single post/item page:
+			return ( $this->get_checklist_setting( 'use_3_cols', 'single' )
+				// old setting should be supported:
+				|| $this->get_setting( 'single_3_cols' ) );
+		}
+
+		if( $disp_detail == 'posts-default' )
+		{	// Category page:
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-default' );
+		}
+
+		if( $disp_detail == 'posts-topcat-nointro' || $disp_detail == 'posts-topcat-intro' )
+		{	// Category page with or without intro:
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-topcat' );
+		}
+
+		if( $disp_detail == 'posts-subcat-nointro' || $disp_detail == 'posts-subcat-intro' )
+		{	// Sub-category page with or without intro:
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-subcat' );
+		}
+
+		// All other disps:
+		return (boolean)$this->get_checklist_setting( 'use_3_cols', 'other' );
 	}
 
 
@@ -752,22 +728,20 @@ class bootstrap_blocks_blog_Skin extends Skin
 	 */
 	function get_layout_class( $place )
 	{
-		global $disp;
-
 		$r = '';
 
 		switch( $place )
 		{
 			case 'container':
 				$r .= 'container';
-				if( $disp == 'posts' || $this->is_3rd_right_column_layout() )
+				if( $this->is_3rd_right_column_layout() )
 				{	// Layout with 3 columns on current page:
 					$r .= ' container-xxl';
 				}
 				break;
 
 			case 'main_column':
-				if( $this->is_visible_sidebar() )
+				if( $this->is_side_navigation_visible() )
 				{	// Layout with visible left sidebar:
 					if( $this->is_3rd_right_column_layout() )
 					{	// Layout with 3 columns on current page:
@@ -793,10 +767,6 @@ class bootstrap_blocks_blog_Skin extends Skin
 				if( $this->is_3rd_right_column_layout() )
 				{	// Layout with 3 columns on current page:
 					$r .= 'col-xxl-2 col-xxl-push-8 ';
-				}
-				else
-				{
-					$r .= 'col-md-push-6 ';
 				}
 				$r .= 'col-md-3 col-xs-12 pull-right-md';
 				break;
