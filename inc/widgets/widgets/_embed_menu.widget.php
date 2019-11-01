@@ -115,6 +115,17 @@ class embed_menu_Widget extends generic_menu_link_Widget
 					'defaultvalue' => '',
 					'allow_empty' => false,
 				),
+				'display_mode' => array(
+					'type' => 'select',
+					'label' => T_('Display as'),
+					'options' => array(
+							'auto'    => T_('Auto'),
+							'list'    => T_('List'),
+							'buttons' => T_('Buttons'),
+						),
+					'note' => sprintf( T_('Auto is based on the %s param.'), '<code>inlist</code>' ),
+					'defaultvalue' => 'auto',
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -151,6 +162,18 @@ class embed_menu_Widget extends generic_menu_link_Widget
 		{	// Don't display if menu has no entries:
 			$this->display_debug_message( 'No menu entries' );
 			return false;
+		}
+
+		switch( $this->get_param( 'display_mode' ) )
+		{
+			case 'list':
+				$this->disp_params['inlist'] = true;
+				break;
+			case 'buttons':
+				$this->disp_params['inlist'] = false;
+				break;
+			default:
+				$this->disp_params['inlist'] = 'auto';
 		}
 
 		echo $this->disp_params['block_start'];

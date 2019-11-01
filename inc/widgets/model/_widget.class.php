@@ -714,8 +714,8 @@ class ComponentWidget extends DataObject
 					// Automatically detect whether we are displaying menu links as list elements or as standalone buttons:
 					'inlist' => 'auto',		// may alose be true or false
 					// Button styles used for Menu Links / Buttons widgets:
-					'button_default_class' => 'btn btn-default',
-					'button_selected_class' => 'btn btn-default active',
+					'button_default_class' => 'btn btn-default btn-margin-right',
+					'button_selected_class' => 'btn btn-default btn-margin-right active',
 
 					'grid_start' => '<table cellspacing="1" class="widget_grid">',
 						'grid_colstart' => '<tr>',

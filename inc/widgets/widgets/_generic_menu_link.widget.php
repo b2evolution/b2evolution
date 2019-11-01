@@ -50,7 +50,7 @@ class generic_menu_link_Widget extends ComponentWidget
 		// "Menu" Containers are 'inlist'. Some sub-containers will also be 'inlist' (displaying a local menu).
 		// fp> Maybe this should be moved up to container level? 
 		$inlist = $this->disp_params['inlist'];
-		if( $inlist == 'auto' )
+		if( $inlist === 'auto' )
 		{
 			if( empty( $this->disp_params['list_start'] ) )
 			{	// We're not starting a list. This means (very high probability) that we are already in a list:

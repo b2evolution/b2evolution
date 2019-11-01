@@ -4575,6 +4575,9 @@ caption > p:last-child {
   margin-top: 0;
   margin-bottom: 0;
 }
+.btn-margin-right {
+  margin-right: 5px;
+}
 .btn.active[disabled] {
   opacity: 1;
   color: #333;
