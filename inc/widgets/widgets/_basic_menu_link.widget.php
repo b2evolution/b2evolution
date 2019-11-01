@@ -335,7 +335,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		}
 
 		// Display a layout with menu link:
-		echo $this->get_layout_menu_link( $url, $SiteMenuEntry->get_text(), $SiteMenuEntry->is_active(), $link_template );
+		echo $this->get_layout_standalone_menu_link( $url, $SiteMenuEntry->get_text(), $SiteMenuEntry->is_active(), $link_template );
 
 		return true;
 	}

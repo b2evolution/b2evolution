@@ -214,7 +214,7 @@ class flag_menu_link_Widget extends generic_menu_link_Widget
 		}
 
 		// Display a layout with menu link:
-		echo $this->get_layout_menu_link( $url, $text.$badge, $highlight_current );
+		echo $this->get_layout_standalone_menu_link( $url, $text.$badge, $highlight_current );
 
 		return true;
 	}

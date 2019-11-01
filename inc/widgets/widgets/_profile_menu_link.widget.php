@@ -209,7 +209,7 @@ class profile_menu_link_Widget extends generic_menu_link_Widget
 				'blog_ID'           => $current_Blog->ID,
 				'link_text'         => $this->disp_params['profile_menu_link_text'],
 			) );
-		echo $this->get_layout_menu_link( '', '', $highlight_current, $menu_link_template );
+		echo $this->get_layout_standalone_menu_link( '', '', $highlight_current, $menu_link_template );
 
 		return true;
 	}

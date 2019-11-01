@@ -44,8 +44,7 @@ class generic_menu_link_Widget extends ComponentWidget
 			$link_template = '<a href="$link_url$" class="$link_class$">$link_text$</a>';
 		}
 
-		$r = $this->disp_params['block_start'];
-		$r .= $this->disp_params['block_body_start'];
+		$r = '';
 
 		// Are we displaying a link in a list or a standalone button?
 		// "Menu" Containers are 'inlist'. Some sub-containers will also be 'inlist' (displaying a local menu).
@@ -123,6 +122,26 @@ class generic_menu_link_Widget extends ComponentWidget
 				array( $link_url, $button_class, $link_text ),
 				$link_template );
 		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Get a layout for standalone menu link
+	 *
+	 * @param string Link URL
+	 * @param string Link text
+	 * @param boolean Is active menu link?
+	 * @param string Link template, possible masks: $link_url$, $link_class$, $link_text$
+	 * @return string
+	 */
+	function get_layout_standalone_menu_link( $link_url, $link_text, $is_active_link, $link_template = NULL )
+	{
+		$r = $this->disp_params['block_start'];
+		$r .= $this->disp_params['block_body_start'];
+
+		$r .= $this->get_layout_menu_link( $link_url, $link_text, $is_active_link, $link_template );
 
 		$r .= $this->disp_params['block_body_end'];
 		$r .= $this->disp_params['block_end'];

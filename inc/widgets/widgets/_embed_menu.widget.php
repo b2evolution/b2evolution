@@ -101,6 +101,12 @@ class embed_menu_Widget extends generic_menu_link_Widget
 		$SiteMenuCache->load_all();
 
 		$r = array_merge( array(
+				'title' => array(
+					'label' => T_('Block title'),
+					'note' => T_('Title to display in your skin.'),
+					'size' => 40,
+					'defaultvalue' => '',
+				),
 				'menu_ID' => array(
 					'label' => T_('Menu to display'),
 					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? ' <a href="'.$admin_url.'?ctrl=menus">'.T_('Manage Menus').' &gt;&gt;</a>' : '' ),
@@ -147,6 +153,10 @@ class embed_menu_Widget extends generic_menu_link_Widget
 			return false;
 		}
 
+		echo $this->disp_params['block_start'];
+		$this->disp_title();
+		echo $this->disp_params['block_body_start'];
+
 		foreach( $menu_entries as $MenuEntry )
 		{
 			if( $url = $MenuEntry->get_url() )
@@ -154,6 +164,9 @@ class embed_menu_Widget extends generic_menu_link_Widget
 				echo $this->get_layout_menu_link( $url, $MenuEntry->get_text(), $MenuEntry->is_active() );
 			}
 		}
+
+		echo $this->disp_params['block_body_end'];
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}
