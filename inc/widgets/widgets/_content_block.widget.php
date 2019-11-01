@@ -185,7 +185,7 @@ class content_block_Widget extends ComponentWidget
 			// Hide/Show Item ID and Slug:
 			jQuery( "#ffield_'.$this->get_param_prefix().'item_ID, #ffield_'.$this->get_param_prefix().'item_slug" ).toggle( select_type_value == "item" );
 			// Hide/Show Exact Item Type:
-			jQuery( "#ffield_'.$this->get_param_prefix().'item_type" ).toggle( select_type_value == "random" );
+			jQuery( "#ffield_'.$this->get_param_prefix().'item_type_ID" ).toggle( select_type_value == "random" );
 		} );';
 	}
 
