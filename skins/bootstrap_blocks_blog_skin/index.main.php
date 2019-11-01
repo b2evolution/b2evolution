@@ -38,7 +38,7 @@ siteskin_include( '_site_body_header.inc.php' );
 ?>
 
 
-<div class="container<?php echo ( $disp == 'posts' ? ' container-xxl' : '' ); ?>">
+<div class="<?php echo $Skin->get_layout_class( 'container' ); ?>">
 
 
 <header class="row">
@@ -106,7 +106,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="row">
 
-	<div class="<?php echo $Skin->get_column_class(); ?>">
+	<div class="<?php echo $Skin->get_layout_class( 'main_column' ); ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -270,7 +270,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	if( $Skin->is_visible_sidebar() )
 	{ // Display sidebar:
 	?>
-	<aside class="col-md-3<?php echo ( $Skin->get_setting( 'layout' ) == 'left_sidebar' ? ' pull-left-md' : '' ); ?>">
+	<aside class="<?php echo $Skin->get_layout_class( 'left_column' ); ?>">
 		<!-- =================================== START OF SIDEBAR =================================== -->
 		<?php
 			// ------------------------- "Sidebar" CONTAINER EMBEDDED HERE --------------------------
@@ -308,7 +308,10 @@ siteskin_include( '_site_body_header.inc.php' );
 				) );
 			// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
 		?>
+		</aside><!-- .col -->
 
+		<!-- =================================== START OF SIDEBAR 2 =================================== -->
+		<aside class="<?php echo $Skin->get_layout_class( 'right_column' ); ?>">
 		<?php
 			// ------------------------- "Sidebar 2" CONTAINER EMBEDDED HERE --------------------------
 			// Display container contents:

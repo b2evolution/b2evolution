@@ -663,6 +663,13 @@ class bootstrap_blocks_blog_Skin extends Skin
 	 */
 	function is_visible_sidebar( $check_containers = false )
 	{
+		global $disp;
+
+		if( $disp == 'single' || $disp == 'page' )
+		{	// Force to display sidebar for Item pages:
+			return true;
+		}
+
 		$layout = $this->get_setting( 'layout' );
 
 		if( $layout != 'left_sidebar' && $layout != 'right_sidebar' )
@@ -716,6 +723,86 @@ class bootstrap_blocks_blog_Skin extends Skin
 			default:
 				return 'col-md-9';
 		}
+	}
+
+
+	/**
+	 * Check if 3rd/right column layout can be used for current page
+	 *
+	 * @return boolean
+	 */
+	function is_3rd_right_column_layout()
+	{
+		global $disp, $disp_detail;
+
+		if( ! $this->is_visible_sidebar() )
+		{	// Side navigation is hidden for current page:
+			return false;
+		}
+
+		// Check when we should use layout with 3 columns:
+		return ( $disp == 'single' || $disp == 'page' );
+	}
+
+
+	/**
+	 * Get layout style class depending on skin settings and current disp
+	 *
+	 * @param string Place where class is used
+	 */
+	function get_layout_class( $place )
+	{
+		global $disp;
+
+		$r = '';
+
+		switch( $place )
+		{
+			case 'container':
+				$r .= 'container';
+				if( $disp == 'posts' || $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= ' container-xxl';
+				}
+				break;
+
+			case 'main_column':
+				if( $this->is_visible_sidebar() )
+				{	// Layout with visible left sidebar:
+					if( $this->is_3rd_right_column_layout() )
+					{	// Layout with 3 columns on current page:
+						$r .= 'col-xxl-8 col-xxl-pull-2 ';
+					}
+					$r .= 'col-md-9 pull-right-md';
+				}
+				else
+				{
+					$r .= 'col-md-12';
+				}
+				break;
+
+			case 'left_column':
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= 'col-xxl-2 ';
+				}
+				$r .= 'col-md-3 col-xs-12 pull-left-md';
+				break;
+
+			case 'right_column':
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= 'col-xxl-2 col-xxl-push-8 ';
+				}
+				else
+				{
+					$r .= 'col-md-push-6 ';
+				}
+				$r .= 'col-md-3 col-xs-12 pull-right-md';
+				break;
+		}
+
+		return $r;
 	}
 }
 
