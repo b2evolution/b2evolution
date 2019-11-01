@@ -188,10 +188,10 @@ class bootstrap_blocks_blog_Skin extends Skin
 						'type' => 'checklist',
 						'options' => array(
 							array( 'single',       sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=single</code>' ), 1 ),
-							array( 'posts-default',sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-default</code>' ), 1 ),
-							array( 'posts-topcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-topcat-intro</code>, <code>disp=posts-topcat-nointro</code>' ), 1 ),
-							array( 'posts-subcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-subcat-intro</code>, <code>disp=posts-subcat-nointro</code>' ), 1 ),
-							array( 'front',        sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=front</code>' ), 1 ),
+							array( 'posts-default',sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-default</code>' ), 0 ),
+							array( 'posts-topcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-topcat-intro</code>, <code>disp=posts-topcat-nointro</code>' ), 0 ),
+							array( 'posts-subcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-subcat-intro</code>, <code>disp=posts-subcat-nointro</code>' ), 0 ),
+							array( 'front',        sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=front</code>' ), 0 ),
 							array( 'other',        T_('On other disps'), 0 ),
 						),
 					),
@@ -728,13 +728,15 @@ class bootstrap_blocks_blog_Skin extends Skin
 	 */
 	function get_layout_class( $place )
 	{
+		global $disp;
+
 		$r = '';
 
 		switch( $place )
 		{
 			case 'container':
 				$r .= 'container';
-				if( $this->is_3rd_right_column_layout() )
+				if( $disp == 'posts' || $this->is_3rd_right_column_layout() )
 				{	// Layout with 3 columns on current page:
 					$r .= ' container-xxl';
 				}
@@ -746,6 +748,10 @@ class bootstrap_blocks_blog_Skin extends Skin
 					if( $this->is_3rd_right_column_layout() )
 					{	// Layout with 3 columns on current page:
 						$r .= 'col-xxl-8 col-xxl-pull-2 ';
+					}
+					elseif( $disp == 'posts' )
+					{
+						$r .= 'col-xxl-10 ';
 					}
 					$r .= 'col-md-9 pull-right-md';
 				}
@@ -760,6 +766,10 @@ class bootstrap_blocks_blog_Skin extends Skin
 				{	// Layout with 3 columns on current page:
 					$r .= 'col-xxl-2 ';
 				}
+				elseif( $disp == 'posts' )
+				{
+					$r .= 'col-xxl-2 ';
+				}
 				$r .= 'col-md-3 col-xs-12 pull-left-md';
 				break;
 
@@ -767,6 +777,10 @@ class bootstrap_blocks_blog_Skin extends Skin
 				if( $this->is_3rd_right_column_layout() )
 				{	// Layout with 3 columns on current page:
 					$r .= 'col-xxl-2 col-xxl-push-8 ';
+				}
+				elseif( $disp == 'posts' )
+				{
+					$r .= 'col-xxl-2 ';
 				}
 				$r .= 'col-md-3 col-xs-12 pull-right-md';
 				break;
