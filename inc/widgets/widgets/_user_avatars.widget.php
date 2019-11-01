@@ -482,7 +482,7 @@ class user_avatars_Widget extends ComponentWidget
 		if( $count == 0 )
 		{	// Exit if no users found:
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there no users found with avatars.' );
-			return;
+			return false;
 		}
 
 		echo $this->disp_params['block_start'];

@@ -197,7 +197,7 @@ class item_seen_by_Widget extends ComponentWidget
 		if( empty( $user_IDs ) )
 		{	// Don't display this widget if no users:
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no users.' );
-			return;
+			return false;
 		}
 
 		$user_IDs = array_unique( $user_IDs );

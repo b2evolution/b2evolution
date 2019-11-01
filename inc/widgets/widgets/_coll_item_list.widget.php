@@ -425,13 +425,9 @@ class coll_item_list_Widget extends ComponentWidget
 		$listBlog = ( $blog_ID ? $BlogCache->get_by_ID( $blog_ID, false ) : $Blog );
 
 		if( empty( $listBlog ) )
-		{
-			echo $this->disp_params['block_start'];
-			echo $this->disp_params['block_body_start'];
-			echo T_('The requested Blog doesn\'t exist any more!');
-			echo $this->disp_params['block_body_end'];
-			echo $this->disp_params['block_end'];
-			return;
+		{	// Display error when wrong collection is requested by this widget:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because the requested Collection #'.$this->disp_params['blog_ID'].' doesn\'t exist any more.' );
+			return false;
 		}
 
 		// @var $placeholder_dimension is empty by default

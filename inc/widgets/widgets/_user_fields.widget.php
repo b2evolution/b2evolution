@@ -108,7 +108,8 @@ class user_fields_Widget extends ComponentWidget
 
 		if( ! ( $target_User = & $this->get_target_User() ) )
 		{	// The target user is not detected, Nothing to display:
-			return true;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because no user found.' );
+			return false;
 		}
 
 		$r = '';
@@ -118,7 +119,8 @@ class user_fields_Widget extends ComponentWidget
 
 		if( empty( $target_User->userfields ) )
 		{	// The fields of target user is empty, Nothing to display:
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because no fields of the User #'.$target_User->ID.'.' );
+			return false;
 		}
 
 		echo $this->disp_params['block_start'];

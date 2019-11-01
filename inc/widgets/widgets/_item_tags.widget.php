@@ -172,7 +172,7 @@ class item_tags_Widget extends ComponentWidget
 		    ! count( $Item->get_tags() ) )
 		{	// Nothing to display because current User cannot edit the Item and the Item has no tags:
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item has no tags and you cannot add new for the Item.' );
-			return;
+			return false;
 		}
 
 		// We renamed some params; older skin may use the old names; let's convert those params now:

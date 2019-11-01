@@ -188,8 +188,6 @@ class content_hierarchy_Widget extends ComponentWidget
 			$params['widget_content_hierarchy_params'] = array();
 		}
 
-		echo $this->disp_params['block_start'];
-
 		if( ( $disp == 'single' || $disp == 'page' ) && ! empty( $Item ) )
 		{	// Set selected Item in the params ONLY if we really view item page:
 			$params['selected_item_ID'] = $Item->ID;
@@ -203,8 +201,6 @@ class content_hierarchy_Widget extends ComponentWidget
 				'item_title_fields'    => isset( $this->disp_params['item_title_fields'] ) ? $this->disp_params['item_title_fields'] : 'title',
 				'sorted' => true
 			), $params, $params['widget_content_hierarchy_params'] ) );
-
-		echo $this->disp_params['block_end'];
 
 		return true;
 	}
@@ -261,7 +257,8 @@ class content_hierarchy_Widget extends ComponentWidget
 
 		if( empty( $this->Blog ) )
 		{ // No Blog, Exit here
-			return;
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because the requested Collection #'.$this->disp_params['blog_ID'].' doesn\'t exist any more.' );
+			return false;
 		}
 
 		$chapter_path = array();
@@ -273,6 +270,8 @@ class content_hierarchy_Widget extends ComponentWidget
 		{ // A post is opened (Ignore intro posts)
 			$params['chapter_path'] = $ChapterCache->get_chapter_path( $this->Blog->ID, $Item->main_cat_ID );
 		}
+
+		echo $params['block_start'];
 
 		echo $params['block_body_start'];
 
@@ -309,6 +308,8 @@ class content_hierarchy_Widget extends ComponentWidget
 		echo $params['list_end'];
 
 		echo $params['block_body_end'];
+
+		echo $params['block_end'];
 	}
 
 

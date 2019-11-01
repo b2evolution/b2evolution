@@ -194,7 +194,8 @@ class display_item_Widget extends ComponentWidget
 
 		if( ! $widget_Item )
 		{	// No correct Item:
-			return;
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because Item is not found.' );
+			return false;
 		}
 
 		echo $this->disp_params['block_start'];

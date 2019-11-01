@@ -188,7 +188,7 @@ class coll_current_filters_Widget extends ComponentWidget
 		if( empty( $filters ) && ! $params['display_empty_filter'] )
 		{	// No filters
 			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because there are no filters.' );
-			return;
+			return false;
 		}
 
 		// START DISPLAY:

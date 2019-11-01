@@ -297,6 +297,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		if( empty( $custom_fields ) )
 		{	// Nothing to compare:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because no fields to compare.' );
 			return;
 		}
 
