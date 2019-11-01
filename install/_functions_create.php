@@ -363,6 +363,14 @@ function create_default_data()
 			'use_comments'   => 0,
 		);
 	$post_types[] = array(
+			'name'           => 'Text Ad',
+			'usage'          => 'content-block',
+			'template_name'  => NULL,
+			'allow_breaks'   => 0,
+			'allow_featured' => 0,
+			'use_comments'   => 0,
+		);
+	$post_types[] = array(
 			'name'           => 'Sidebar link',
 			'usage'          => 'special',
 			'template_name'  => NULL,
@@ -459,8 +467,8 @@ function create_default_data()
 	$parent_ityp_ID = 3;
 	$child_ityp_ID = 4;
 	$recipe_ityp_ID = 2;
-	$product_ityp_ID = 20;
-	$review_ityp_ID = 21;
+	$product_ityp_ID = 21;
+	$review_ityp_ID = 22;
 	$forum_topic_ityp_ID = 8;
 	$custom_fields = array(
 		// for Item Type "Post with Custom Fields":

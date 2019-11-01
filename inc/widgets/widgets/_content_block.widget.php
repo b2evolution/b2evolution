@@ -26,6 +26,8 @@ class content_block_Widget extends ComponentWidget
 {
 	var $icon = 'file-text-o';
 
+	var $widget_Item = NULL;
+
 	/**
 	 * Constructor
 	 */
@@ -109,10 +111,35 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		$ItemTypeCache = & get_ItemTypeCache();
+		$ItemTypeCache->clear();
+		$ItemTypeCache->load_where( 'ityp_usage = "content-block"' ); // Load only post item types
+		$item_type_cache_load_all = $ItemTypeCache->load_all; // Save original value
+		$ItemTypeCache->load_all = false; // Force to don't load all item types in get_option_array() below
+		$post_item_type_options =
+			array(
+				''  => T_('All content blocks'),
+			) + $ItemTypeCache->get_option_array();
+		// Revert back to original value:
+		$ItemTypeCache->load_all = $item_type_cache_load_all;
+
+		$default_select_type = 'item';
+		$current_select_type = $this->get_param( 'select_type', $default_select_type );
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_('Block title'),
 					'size' => 60,
+				),
+				'select_type' => array(
+					'label' => T_('Select content block'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+							array( 'item', T_('By Item ID or Slug') ),
+							array( 'random', T_('Randomly') ) ),
+					'defaultvalue' => $default_select_type,
+					'field_lines' => true,
 				),
 				'item_ID' => array(
 					'label' => T_('Item ID'),
@@ -124,15 +151,42 @@ class content_block_Widget extends ComponentWidget
 						'max' => 4294967295,
 					),
 					'note' => $this->get_param_item_info( 'item_ID' ),
+					'hide' => ( $current_select_type != 'item' ),
 				),
 				'item_slug' => array(
 					'label' => T_('Item Slug'),
 					'size' => 60,
 					'note' => $this->get_param_item_info( 'item_slug' ),
+					'hide' => ( $current_select_type != 'item' ),
+				),
+				'item_type_ID' => array(
+					'label' => T_('Exact Item Type'),
+					'type' => 'select',
+					'options' => $post_item_type_options,
+					'defaultvalue' => '',
+					'hide' => ( $current_select_type != 'random' ),
 				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
+	}
+
+
+	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		return 'jQuery( "[name='.$this->get_param_prefix().'select_type]" ).click( function()
+		{
+			var select_type_value = jQuery( this ).val();
+			// Hide/Show Item ID and Slug:
+			jQuery( "#ffield_'.$this->get_param_prefix().'item_ID, #ffield_'.$this->get_param_prefix().'item_slug" ).toggle( select_type_value == "item" );
+			// Hide/Show Exact Item Type:
+			jQuery( "#ffield_'.$this->get_param_prefix().'item_type" ).toggle( select_type_value == "random" );
+		} );';
 	}
 
 
@@ -159,6 +213,11 @@ class content_block_Widget extends ComponentWidget
 	function init_display( $params )
 	{
 		parent::init_display( $params );
+
+		if( $this->get_param( 'select_type' ) == 'random' )
+		{	// Disable block caching for this widget when items are displayed randomly:
+			$this->disp_params['allow_blockcache'] = 0;
+		}
 
 		$widget_Item = & $this->get_widget_Item();
 
@@ -187,7 +246,11 @@ class content_block_Widget extends ComponentWidget
 		// Get item by ID or slug:
 		$widget_Item = & $this->get_widget_Item();
 
-		if( ! $widget_Item || $widget_Item->get_type_setting( 'usage' ) != 'content-block' )
+		if( ! $widget_Item && $this->get_param( 'select_type' ) == 'random' )
+		{	// If no item found ramdomly:
+			echo '<p class="evo_param_error">'.T_('No Item is found randomly.').'</p>';
+		}
+		elseif( ! $widget_Item || $widget_Item->get_type_setting( 'usage' ) != 'content-block' )
 		{	// Item is not found by ID and slug or it is not a content block:
 			if( $widget_Item )
 			{	// It is not a content block:
@@ -269,14 +332,55 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function & get_widget_Item()
 	{
-		$ItemCache = & get_ItemCache();
+		if( $this->widget_Item === NULL )
+		{	// Get widget Item once:
+			$ItemCache = & get_ItemCache();
 
-		if( ! ( $widget_Item = & $ItemCache->get_by_ID( $this->disp_params['item_ID'], false, false ) ) )
-		{	// Try to get item by slug if it is not found by ID:
-			$widget_Item = & $ItemCache->get_by_urltitle( trim( $this->disp_params['item_slug'] ), false, false );
+			switch( $this->get_param( 'select_type' ) )
+			{
+				case 'random':
+					// Get Item randomly:
+					global $Collection, $Blog;
+
+					// Use ItemList in order to get only available items by visibility for current User:
+					$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), 1, 'ItemCache', $this->code.'_' );
+					// Set additional debug info prefix for SQL queries to know what widget executes it:
+					$ItemList->query_title_prefix = get_class( $this );
+
+					// Set filters:
+					$filters = array(
+						'itemtype_usage' => 'content-block',
+						'orderby' => 'RAND',
+					);
+					$item_type_ID = intval( $this->get_param( 'item_type_ID' ) );
+					if( ! empty( $item_type_ID ) )
+					{	// Filter by Exact Item Type:
+						$filters['types'] = $item_type_ID;
+					}
+					$ItemList->set_filters( $filters, false ); // we don't want to memorize these params
+
+					// Run the query:
+					$ItemList->query();
+
+					// Try to get an Item from filtered list:
+					$this->widget_Item = & $ItemList->get_item();
+					break;
+
+				default:
+					// Get Item by ID or fallback by slug:
+					if( ! ( $this->widget_Item = & $ItemCache->get_by_ID( $this->disp_params['item_ID'], false, false ) ) )
+					{	// Try to get item by slug if it is not found by ID:
+						$this->widget_Item = & $ItemCache->get_by_urltitle( trim( $this->disp_params['item_slug'] ), false, false );
+					}
+			}
+
+			if( $this->widget_Item === NULL )
+			{	// Set false to don't call this twice:
+				$this->widget_Item = false;
+			}
 		}
 
-		return $widget_Item;
+		return $this->widget_Item;
 	}
 }
 ?>

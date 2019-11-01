@@ -12101,6 +12101,28 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15620, 'Creating default item type "Text Ad"...' ) )
+	{	// part of 7.0.2-beta
+		$SQL = new SQL( 'Check item type "Text Ad" with usage "content-block" for existence' );
+		$SQL->SELECT( 'ityp_ID' );
+		$SQL->FROM( 'T_items__type' );
+		$SQL->WHERE( 'ityp_usage = "content-block"' );
+		$SQL->WHERE_and( 'ityp_name = "Text Ad"' );
+		$SQL->LIMIT( 1 );
+		if( ! $DB->get_var( $SQL ) )
+		{	// Create content block item type "Text Ad":
+			$r = $DB->query( 'INSERT INTO T_items__type ( ityp_name, ityp_usage, ityp_allow_breaks, ityp_allow_featured, ityp_use_comments )
+					VALUES ( '.$DB->quote( 'Text Ad' ).', '.$DB->quote( 'content-block' ).', 0, 0, 0 )' );
+			if( $r && $DB->insert_id > 0 )
+			{	// Enable new created item type for all collections:
+				$DB->query( 'INSERT INTO T_items__type_coll ( itc_ityp_ID, itc_coll_ID )
+					SELECT '.$DB->insert_id.', blog_ID
+					  FROM T_blogs' );
+			}
+		}
+		upg_task_end();
+	}
+
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
