@@ -102,7 +102,7 @@ class coll_current_filters_Widget extends ComponentWidget
 						array( 'assignee', T_('Assignee'), 1 ),
 						array( 'locale', T_('Locale'), 1 ),
 						array( 'status', T_('Status'), 1 ),
-						array( 'visibility', T_('Visibility'), 1 ),
+						array( 'visibility', T_('Visibility'), 0 ),
 						array( 'time', T_('Past/Future'), 0 ),
 						array( 'limit', T_('Limit by days'), 1 ),
 						array( 'flagged', T_('Flagged'), 1 ),

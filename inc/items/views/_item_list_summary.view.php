@@ -71,7 +71,7 @@ echo '<div class="evo_content_block evo_content_summary">';
 			'block_end'            => '',
 			'block_title_start'    => '<b>',
 			'block_title_end'      => ':</b> ',
-			'show_filters'         => array( 'time' => 1 ),
+			'show_filters'         => array( 'time' => 1, 'visibility' => 1 ),
 			'display_button_reset' => false,
 			'display_empty_filter' => true,
 		) );

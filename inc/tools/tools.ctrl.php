@@ -610,6 +610,9 @@ if( empty( $tab ) )
 			$AdminUI->disp_view( 'tools/views/_misc_tools.view.php' );
 			break;
 
+		case 'show_orphan_files_form':
+			$AdminUI->disp_view( 'tools/views/_tool_orphan_files.form.php' );
+			break;
 
 		default:
 			switch( $tab3 )

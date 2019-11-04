@@ -716,6 +716,12 @@ input.loader_img {
   padding: 4px 5px 5px;
   margin: 0;
 }
+.filter_item div .identity_link_username {
+  color: #FFF;
+}
+.filter_item div.icon a.action_icon > span {
+  color: #FFF !important;
+}
 .filter_item .name {
   background: #3d8f3d;
 }

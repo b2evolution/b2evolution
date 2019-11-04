@@ -573,8 +573,10 @@ function dbm_delete_orphan_comment_uploads()
 
 /**
  * Find and delete orphan File objects with no matching file on disk
+ *
+ * @param integer Delete linked files
  */
-function dbm_delete_orphan_files()
+function dbm_delete_orphan_files( $delete_linked_files = false )
 {
 	global $DB, $admin_url;
 
@@ -585,13 +587,20 @@ function dbm_delete_orphan_files()
 	evo_flush();
 
 	$files_SQL = new SQL();
-	$files_SQL->SELECT( 'file_ID, file_root_type, file_root_ID, file_path' );
+	$files_SQL->SELECT( 'file_ID, file_root_type, file_root_ID, file_path, COUNT( file_ID ) AS links_num, GROUP_CONCAT( link_ID ) AS link_IDs' );
 	$files_SQL->FROM( 'T_files' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_links ON file_ID = link_file_ID' );
 	$files_SQL->ORDER_BY( 'file_ID' );
+	$files_SQL->GROUP_BY( 'file_ID' );
 
 	$count_files_valid = 0;
 	$deleted_files = array();
 	$cannot_deleted_files = array();
+
+	if( $delete_linked_files )
+	{
+		$LinkCache = & get_LinkCache();
+	}
 
 	$page_size = 100;
 	$current_page = 0;
@@ -609,6 +618,18 @@ function dbm_delete_orphan_files()
 			}
 			else
 			{ // File doesn't exist on the disk, Remove it from DB
+				if( $delete_linked_files && ! empty( $loaded_file_data['link_IDs'] ) )
+				{	// Try to delete ALL Link objects of the orphan File before deleting it:
+					$deleted_link_IDs = explode( ',', $loaded_file_data['link_IDs'] );
+					$LinkCache->load_list( $deleted_link_IDs );
+					foreach( $deleted_link_IDs as $deleted_link_ID )
+					{
+						if( $deleted_Link = & $LinkCache->get_by_ID( $deleted_link_ID, false, false ) )
+						{
+							$deleted_Link->dbdelete();
+						}
+					}
+				}
 				if( $File->dbdelete() )
 				{	// Success deleting:
 					$deleted_files[] = $loaded_file_data;
@@ -655,7 +676,7 @@ function dbm_delete_orphan_files()
 			echo '<ul>';
 			foreach( $cannot_deleted_files as $file_data )
 			{
-				echo '<li>#'.$file_data['file_ID'].' - <code>'.$file_data['file_root_type'].'_'.$file_data['file_root_ID'].':'.$file_data['file_path'].'</code></li>';
+				echo '<li>#'.$file_data['file_ID'].' - <code>'.$file_data['file_root_type'].'_'.$file_data['file_root_ID'].':'.$file_data['file_path'].'</code> ('.sprintf( T_('Number of links: %s'), '<b>'.$file_data['links_num'].'</b>' ).')</li>';
 			}
 			echo '</ul>';
 		}
