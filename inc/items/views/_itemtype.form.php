@@ -642,11 +642,11 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_header_class = duplicated_field_obj.find( 'input[name^="cf_header_class"]' ).val();
 		field_value_cell_class = duplicated_field_obj.find( 'input[name^="cf_cell_class"]' ).val();
 		field_value_link = duplicated_field_obj.find( 'input[name^="cf_link"]' ).val();
-		field_value_link_nofollow = duplicated_field_obj.find( 'input[name^="cf_link_nofollow"]' ).is( ':checked' );
+		field_value_link_nofollow = duplicated_field_obj.find( 'input[name^="cf_link_nofollow"]' ).val();
 		field_value_link_class = duplicated_field_obj.find( 'input[name^="cf_link_class"]' ).val();
-		field_value_line_highlight = duplicated_field_obj.find( 'select[name^="cf_line_highlight"]' ).val();
-		field_value_green_highlight = duplicated_field_obj.find( 'select[name^="cf_green_highlight"]' ).val();
-		field_value_red_highlight = duplicated_field_obj.find( 'select[name^="cf_red_highlight"]' ).val();
+		field_value_line_highlight = duplicated_field_obj.find( 'input[name^="cf_line_highlight"]' ).val();
+		field_value_green_highlight = duplicated_field_obj.find( 'input[name^="cf_green_highlight"]' ).val();
+		field_value_red_highlight = duplicated_field_obj.find( 'input[name^="cf_red_highlight"]' ).val();
 		field_value_required = duplicated_field_obj.find( 'input[name^="cf_required"]' ).is( ':checked' );
 		field_value_meta = duplicated_field_obj.find( 'input[name^="cf_meta"]' ).is( ':checked' );
 		field_value_public = duplicated_field_obj.find( 'input[name^="cf_public"]' ).is( ':checked' );
@@ -721,7 +721,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		.replace( '$cf_header_class$', field_value_header_class )
 		.replace( '$cf_cell_class$', field_value_cell_class )
 		.replace( '$cf_link$', field_value_link )
-		.replace( '$cf_link_nofollow$', field_value_link_nofollow ? 1 : 0 )
+		.replace( '$cf_link_nofollow$', field_value_link_nofollow )
 		.replace( '$cf_link_class$', field_value_link_class )
 		.replace( '$cf_line_highlight$', field_value_line_highlight )
 		.replace( '$cf_green_highlight$', field_value_green_highlight )
