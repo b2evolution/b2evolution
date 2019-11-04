@@ -457,7 +457,7 @@ skin_widget( array(
 						'search_submit_after'  => '</span></div>',
 						// Widget 'Item Custom Fields':
 						'custom_fields_table_start'                => '<div class="item_custom_fields">',
-						'custom_fields_row_start'                  => '<div class="row">',
+						'custom_fields_row_start'                  => '<div class="row"$row_attrs$>',
 						'custom_fields_topleft_cell'               => '<div class="col-md-12 col-xs-6" style="border:none"></div>',
 						'custom_fields_col_header_item'            => '<div class="col-md-12 col-xs-6 center" width="$col_width$"$col_attrs$>$item_link$$item_status$</div>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
 						'custom_fields_row_header_field'           => '<div class="col-md-12 col-xs-6"><b>$field_title$$field_description_icon$:</b></div>',

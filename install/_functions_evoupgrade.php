@@ -12123,6 +12123,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15630, 'Upgrading post type custom fields table...' ) )
+	{	// part of 7.0.2-beta
+		db_add_col( 'T_items__type_custom_field', 'itcf_disp_condition', 'VARCHAR(2000) COLLATE utf8mb4_unicode_ci NULL AFTER itcf_formula' );
+		upg_task_end();
+	}
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.

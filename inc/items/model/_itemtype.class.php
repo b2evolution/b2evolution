@@ -454,6 +454,7 @@ class ItemType extends DataObject
 			'public'          => array( 'integer', 0 ),
 			'format'          => 'string',
 			'formula'         => 'string',
+			'disp_condition'  => 'string',
 			'header_class'    => 'string',
 			'cell_class'      => 'string',
 			'link'            => array( 'string', 'nolink' ),
@@ -682,6 +683,7 @@ class ItemType extends DataObject
 						.$DB->quote( $custom_field['public'] ).', '
 						.$DB->quote( $custom_field['format'] ).', '
 						.$DB->quote( $custom_field['formula'] ).', '
+						.$DB->quote( $custom_field['disp_condition'] ).', '
 						.$DB->quote( $custom_field['header_class'] ).', '
 						.$DB->quote( $custom_field['cell_class'] ).', '
 						.$DB->quote( $custom_field['link'] ).', '
@@ -693,7 +695,7 @@ class ItemType extends DataObject
 						.( empty( $custom_field['description'] ) ? 'NULL' : $DB->quote( $custom_field['description'] ) ).', '
 						.$DB->quote( $custom_field['merge'] ).' )';
 			}
-			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_schema_prop, itcf_type, itcf_order, itcf_note, itcf_required, itcf_meta, itcf_public, itcf_format, itcf_formula, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description, itcf_merge )
+			$DB->query( 'INSERT INTO T_items__type_custom_field ( itcf_ityp_ID, itcf_label, itcf_name, itcf_schema_prop, itcf_type, itcf_order, itcf_note, itcf_required, itcf_meta, itcf_public, itcf_format, itcf_formula, itcf_disp_condition, itcf_header_class, itcf_cell_class, itcf_link, itcf_link_nofollow, itcf_link_class, itcf_line_highlight, itcf_green_highlight, itcf_red_highlight, itcf_description, itcf_merge )
 					VALUES '.implode( ', ', $sql_data ) );
 		}
 
@@ -716,6 +718,7 @@ class ItemType extends DataObject
 						itcf_format = '.$DB->quote( $custom_field['format'] ).',
 						itcf_formula = '.$DB->quote( $custom_field['formula'] ).',
 						itcf_cell_class = '.$DB->quote( $custom_field['cell_class'] ).',
+						itcf_disp_condition = '.$DB->quote( $custom_field['disp_condition'] ).',
 						itcf_header_class = '.$DB->quote( $custom_field['header_class'] ).',
 						itcf_link = '.$DB->quote( $custom_field['link'] ).',
 						itcf_link_nofollow = '.$DB->quote( $custom_field['link_nofollow'] ).',

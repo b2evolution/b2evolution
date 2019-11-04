@@ -436,6 +436,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			itcf_public          TINYINT DEFAULT 1,
 			itcf_format          VARCHAR(2000) COLLATE utf8mb4_unicode_ci NULL,
 			itcf_formula         VARCHAR(2000) COLLATE ascii_general_ci NULL,
+			itcf_disp_condition  VARCHAR(2000) COLLATE utf8mb4_unicode_ci NULL,
 			itcf_header_class    VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_cell_class      VARCHAR(255) COLLATE ascii_general_ci NULL DEFAULT NULL,
 			itcf_link            ENUM( 'nolink', 'linkto', 'permalink', 'zoom', 'linkpermzoom', 'permzoom', 'linkperm', 'fieldurl', 'fieldurlblank' ) COLLATE ascii_general_ci NOT NULL default 'nolink',

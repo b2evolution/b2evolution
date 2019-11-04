@@ -208,7 +208,7 @@ if( mainlist_get_item() )
 			$Item->custom_fields( array(
 					'fields'                               => 'course,cuisine,servings',
 					'custom_fields_table_start'            => '',
-					'custom_fields_row_start'              => '<div class="row">',
+					'custom_fields_row_start'              => '<div class="row"$row_attrs$>',
 					'custom_fields_row_header_field'       => '<div class="col-xs-3 $header_cell_class$"><b>$field_title$$field_description_icon$</b></div>',
 					'custom_fields_description_icon_class' => 'grey',
 					'custom_fields_value_default'          => '<div class="col-xs-9 $data_cell_class$"$data_cell_attrs$>$field_value$</div>',
@@ -220,11 +220,11 @@ if( mainlist_get_item() )
 			$Item->custom_fields( array(
 					'fields'                               => 'prep_time,cook_time,passive_time,total_time',
 					'custom_fields_table_start'            => '<br /><div class="row">',
-					'custom_fields_row_start'              => '',
+					'custom_fields_row_start'              => '<span$row_attrs$>',
 					'custom_fields_row_header_field'       => '<div class="col-sm-3 col-xs-6 $header_cell_class$"><b>$field_title$$field_description_icon$</b>',
 					'custom_fields_description_icon_class' => 'grey',
 					'custom_fields_value_default'          => '<br /><span class="$data_cell_class$"$data_cell_attrs$>$field_value$</span></div>',
-					'custom_fields_row_end'                => '',
+					'custom_fields_row_end'                => '</span>',
 					'custom_fields_table_end'              => '</div>',
 					'hide_empty_lines'                     => true,
 				) );

@@ -249,6 +249,7 @@ echo '<input type="hidden" name="cf_ID$cf_num$" value="$cf_ID$" />';
 echo '<input type="hidden" name="cf_type$cf_num$" value="$cf_type$" />';
 echo '<input type="hidden" name="cf_note$cf_num$" value="$cf_note$" />';
 custom_field_edit_form_template( '<input type="hidden" name="cf_formula$cf_num$" value="$cf_formula$" />', 'computed', $custom_field_templates );
+echo '<input type="hidden" name="cf_disp_condition$cf_num$" value="$cf_disp_condition$" />';
 echo '<input type="hidden" name="cf_header_class$cf_num$" value="$cf_header_class$" />';
 custom_field_edit_form_template( '<input type="hidden" name="cf_cell_class$cf_num$" value="$cf_cell_class$" />', '-separator', $custom_field_templates );
 custom_field_edit_form_template( '<input type="hidden" name="cf_link$cf_num$" value="$cf_link$" />'
@@ -410,6 +411,7 @@ foreach( $custom_fields as $custom_field )
 		'$cf_name_class$'    => $custom_field_name_class,
 		'$cf_format$'        => format_to_output( $custom_field['format'], 'htmlattr' ),
 		'$cf_formula$'       => format_to_output( $custom_field['formula'], 'htmlattr' ),
+		'$cf_disp_condition$'=> format_to_output( $custom_field['disp_condition'], 'htmlattr' ),
 		'$cf_header_class$'  => format_to_output( $custom_field['header_class'], 'htmlattr' ),
 		'$cf_cell_class$'    => format_to_output( $custom_field['cell_class'], 'htmlattr' ),
 		'$cf_link$'          => format_to_output( $custom_field['link'], 'htmlattr' ),
@@ -611,6 +613,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 	var field_value_note = '';
 	var field_value_format = '';
 	var field_value_formula = '';
+	var field_value_disp_condition = '';
 	var field_value_header_class = ( type == 'separator' ? 'left' : 'right' ) + ' nowrap';
 	var field_value_cell_class = ( type == 'double' || type == 'computed' ) ? 'right' : ( type == 'separator' ? '' : 'center' );
 	var field_value_link = 'nolink';
@@ -639,6 +642,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_note = duplicated_field_obj.find( 'input[name^="cf_note"]' ).val();
 		field_value_format = duplicated_field_obj.find( '[name^="cf_format"]' ).val();
 		field_value_formula = duplicated_field_obj.find( 'input[name^="cf_formula"]' ).val();
+		field_value_disp_condition = duplicated_field_obj.find( 'input[name^="cf_disp_condition"]' ).val();
 		field_value_header_class = duplicated_field_obj.find( 'input[name^="cf_header_class"]' ).val();
 		field_value_cell_class = duplicated_field_obj.find( 'input[name^="cf_cell_class"]' ).val();
 		field_value_link = duplicated_field_obj.find( 'input[name^="cf_link"]' ).val();
@@ -663,6 +667,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		field_value_note = duplicated_field_data.data( 'note' );
 		field_value_format = duplicated_field_data.data( 'format' );
 		field_value_formula = duplicated_field_data.data( 'formula' );
+		field_value_disp_condition = duplicated_field_data.data( 'disp_condition' );
 		field_value_header_class = duplicated_field_data.data( 'header_class' );
 		field_value_cell_class = duplicated_field_data.data( 'cell_class' );
 		field_value_link = duplicated_field_data.data( 'link' );
@@ -718,6 +723,7 @@ function add_new_custom_field( type, duplicated_field_obj, duplicated_field_data
 		.replace( '$cf_name_class$', '' )
 		.replace( '$cf_format$', field_value_format )
 		.replace( '$cf_formula$', field_value_formula )
+		.replace( '$cf_disp_condition$', field_value_disp_condition )
 		.replace( '$cf_header_class$', field_value_header_class )
 		.replace( '$cf_cell_class$', field_value_cell_class )
 		.replace( '$cf_link$', field_value_link )
@@ -962,6 +968,7 @@ jQuery( document ).on( 'submit', 'form#itemtype_select_fields', function()
 			field_row.find( '[name^="cf_format"]' ).val( field_data_obj.data( 'format' ) );
 			field_row.find( 'input[name^="cf_schema_prop"]' ).val( field_data_obj.data( 'schema_prop' ) );
 			field_row.find( 'input[name^="cf_formula"]' ).val( field_data_obj.data( 'formula' ) );
+			field_row.find( 'input[name^="cf_disp_condition"]' ).val( field_data_obj.data( 'disp_condition' ) );
 			field_row.find( 'input[name^="cf_header_class"]' ).val( field_data_obj.data( 'header_class' ) );
 			field_row.find( 'input[name^="cf_cell_class"]' ).val( field_data_obj.data( 'cell_class' ) );
 			field_row.find( 'input[name^="cf_link"]' ).val( field_data_obj.data( 'link' ) );

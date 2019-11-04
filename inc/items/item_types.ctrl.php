@@ -361,6 +361,7 @@ switch( $action )
 		param( 'itcf_schema_prop', 'string' );
 		param( 'itcf_format', 'string' );
 		param( 'itcf_formula', 'string' );
+		param( 'itcf_disp_condition', 'string' );
 		param( 'itcf_header_class', 'string' );
 		param( 'itcf_cell_class', 'string' );
 		param( 'itcf_link', 'string' );

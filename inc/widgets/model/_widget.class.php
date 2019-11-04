@@ -716,6 +716,8 @@ class ComponentWidget extends DataObject
 					// Button styles used for Menu Links / Buttons widgets:
 					'button_default_class' => 'btn btn-default btn-margin-right',
 					'button_selected_class' => 'btn btn-default btn-margin-right active',
+					'button_group_start' => '',
+					'button_group_end' => '',
 
 					'grid_start' => '<table cellspacing="1" class="widget_grid">',
 						'grid_colstart' => '<tr>',

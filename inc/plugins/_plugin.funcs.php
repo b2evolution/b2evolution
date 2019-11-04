@@ -242,6 +242,7 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 				break;
 
 			case 'Widget':
+			case 'PluginWidget':
 				$set_value = $Obj->get_param( $parname, NULL, $group );
 				$error_value = NULL;
 				break;
@@ -817,8 +818,12 @@ function _set_setting_by_path( & $Plugin, $set_type, $path, $init_value = array(
 	{
 		case 'Settings':
 		case 'CollSettings':
-		case 'Widget':
+		case 'PluginWidget':
 			$Plugin->Settings->set( $set_name, $setting );
+			break;
+
+		case 'Widget':
+			$Plugin->set( $set_name, $setting );
 			break;
 
 		case 'UserSettings':
@@ -924,9 +929,14 @@ function get_plugin_settings_node_by_path( & $Plugin, $set_type, $path, $create 
 			$defaults = $Plugin->get_email_setting_definitions( $tmp_params );
 			break;
 
-		case 'Widget':
+		case 'PluginWidget':
 			$setting = $Plugin->Settings->get( $set_name );
 			$defaults = $Plugin->get_widget_param_definitions( $tmp_params );
+			break;
+
+		case 'Widget':
+			$setting = $Plugin->get_param( $set_name );
+			$defaults = $Plugin->get_param_definitions( $tmp_params );
 			break;
 
 		case 'Skin':

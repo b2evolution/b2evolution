@@ -270,7 +270,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		$this->disp_params = array_merge( array(
 				'custom_fields_table_start'                => '<div class="evo_content_block"><table class="item_custom_fields">',
-				'custom_fields_row_start'                  => '<tr>',
+				'custom_fields_row_start'                  => '<tr$row_attrs$>',
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
 				'custom_fields_col_header_item'            => '<th class="center" width="$col_width$"$col_attrs$>$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
 				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
@@ -781,7 +781,33 @@ class item_fields_compare_Widget extends ComponentWidget
 	{
 		$ItemCache = & get_ItemCache();
 
-		echo $this->get_field_template( 'row_start', $custom_field['type'] );
+		$row_start_template = $this->get_field_template( 'row_start', $custom_field['type'] );
+		if( $custom_field['disp_condition'] != '' )
+		{	// Set additional params for display condition:
+			$row_start_attrs = ' data-custom-field-condition="'.$custom_field['disp_condition'].'"';
+			// Check current params:
+			$disp_conditions = explode( '&', $custom_field['disp_condition'] );
+			$display_field = true;
+			foreach( $disp_conditions as $disp_condition )
+			{
+				$disp_condition = explode( '=', $disp_condition );
+				$param_value = param( $disp_condition[0], 'string' );
+				if( empty( $param_value ) || ! preg_match( '/^[a-z0-9_\-]+$/', $param_value ) )
+				{	// Wrong param value consider as empty:
+					continue;
+				}
+				if( $param_value != $disp_condition[1] )
+				{	// Hide custom field if at least one param is not match:
+					$row_start_attrs .= ' style="display:none"';
+					continue;
+				}
+			}
+		}
+		else
+		{	// No display conditions for the custom field:
+			$row_start_attrs = '';
+		}
+		echo str_replace( '$row_attrs$', $row_start_attrs, $row_start_template );
 
 		if( empty( $custom_field['description'] ) )
 		{	// The custom field has no description:

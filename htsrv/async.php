@@ -127,7 +127,14 @@ switch( $action )
 			case 'Widget':
 				$WidgetCache = & get_WidgetCache();
 				$Widget = & $WidgetCache->get_by_ID( $plugin_ID );
-				$Plugin = & $Widget->get_Plugin();
+				if( ( $Plugin = & $Widget->get_Plugin() ) )
+				{	// Set abstract type for Widget initialized from Plugin:
+					$set_type = 'PluginWidget';
+				}
+				else
+				{	// This is a normal Widget:
+					$Plugin = $Widget;
+				}
 				$plugin_Object = $Widget;
 				break;
 

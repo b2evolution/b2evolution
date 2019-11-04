@@ -97,6 +97,7 @@ $core_componentwidget_defs = array(
 			'flag_menu_link',
 			'profile_menu_link',
 			'embed_menu',
+			'param_switcher',
 		),
 	'navigation' => array(
 			'coll_search_form',

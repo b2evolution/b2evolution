@@ -68,6 +68,9 @@ $Form->checkbox( 'itcf_meta', get_param( 'itcf_meta' ), T_('With MC'), T_('Allow
 // Public:
 $Form->checkbox( 'itcf_public', get_param( 'itcf_public' ), T_('Public') );
 
+// Display condition:
+$Form->text( 'itcf_disp_condition', get_param( 'itcf_disp_condition' ), 60, T_('Display condition'), '', 2000 );
+
 // Header cell class:
 $Form->text( 'itcf_header_class', get_param( 'itcf_header_class' ), 60, T_('Header cell class'), sprintf( T_('Enter class names such as %s etc. (Separate with space)'), '<code>left</code> <code>center</code> <code>right</code> <code>nowrap</code>' ), 255 );
 
