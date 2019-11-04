@@ -736,13 +736,13 @@ class bootstrap_forums_Skin extends Skin
 				echo '<script>
 				jQuery( "#evo_workflow_status_filter" ).change( function()
 				{
-					var url = location.href.replace( /[\?&]status=[^&]*(&|$)/, "" );
+					var url = location.href.replace( /([\?&])((status|redir)=[^&]*(&|$))+/, "$1" );
 					var status_ID = jQuery( this ).val();
 					if( status_ID !== "" )
 					{
-						url += ( url.indexOf( "?" ) == -1 ? "?" : "&" ) + "status=" + status_ID;
+						url += ( url.indexOf( "?" ) == -1 ? "?" : "&" ) + "status=" + status_ID + "&redir=no";
 					}
-					location.href = url;
+					location.href = url.replace( "?&", "?" ).replace( /\?$/, "" );
 				} );
 				</script>';
 			echo $params['after_workflow_status'];
