@@ -97,8 +97,7 @@ ol.breadcrumb img {
   padding-right: 0;
 }
 .forums_list .panel-heading.panel-heading-columns select {
-  margin-top: -5px;
-  margin-bottom: -6px;
+  margin-top: 3px;
   width: auto;
 }
 .forums_list.panel > a + .table {
