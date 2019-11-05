@@ -218,8 +218,6 @@ class param_switcher_Widget extends generic_menu_link_Widget
 
 		echo $this->disp_params['block_body_end'];
 
-		echo $this->disp_params['block_end'];
-
 		if( $this->get_param( 'allow_switch_js' ) )
 		{	// Initialize JS to allow switching by JavaScript:
 		?>
@@ -247,6 +245,8 @@ jQuery( 'a[data-param-switcher=<?php echo $this->ID; ?>]' ).click( function()
 </script>
 		<?php
 		}
+
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}

@@ -461,8 +461,6 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_body_end'];
 
-		echo $this->disp_params['block_end'];
-
 		global $evo_widget_item_fields_compare_js_initied;
 		if( empty( $evo_widget_item_fields_compare_js_initied ) )
 		{	// Initialize JS to allow switching by JavaScript once:
@@ -506,17 +504,13 @@ window.addEventListener( 'locationchange', function()
 	custom_fields.each( function()
 	{	// Check each custom fields by display condition:
 		var conditions = get_url_params( jQuery( this ).data( 'custom-field-condition' ) );
-		conditions_loop:
 		for( var cond_param in conditions )
 		{
-			for( var url_param in url_params )
-			{
-				if( cond_param == url_param &&
-				    conditions[ cond_param ] != url_params[ url_param ] )
-				{	// Hide the custom field if at least one condition is not equal:
-					jQuery( this ).hide();
-					break conditions_loop;
-				}
+			if( typeof( url_params[ cond_param ] ) == 'undefined' ||
+					conditions[ cond_param ] != url_params[ cond_param ] )
+			{	// Hide the custom field if at least one condition is not equal:
+				jQuery( this ).hide();
+				break;
 			}
 		}
 	} );
@@ -525,6 +519,8 @@ window.addEventListener( 'locationchange', function()
 		<?php
 			$evo_widget_item_fields_compare_js_initied = true;
 		}
+
+		echo $this->disp_params['block_end'];
 
 		return true;
 	}
@@ -850,17 +846,14 @@ window.addEventListener( 'locationchange', function()
 			$row_start_attrs = ' data-custom-field-condition="'.$custom_field['disp_condition'].'"';
 			// Check current params:
 			$disp_conditions = explode( '&', $custom_field['disp_condition'] );
-			$display_field = true;
 			foreach( $disp_conditions as $disp_condition )
 			{
 				$disp_condition = explode( '=', $disp_condition );
 				$param_value = param( $disp_condition[0], 'string' );
-				if( empty( $param_value ) || ! preg_match( '/^[a-z0-9_\-]+$/', $param_value ) )
-				{	// Wrong param value consider as empty:
-					continue;
-				}
-				if( $param_value != $disp_condition[1] )
-				{	// Hide custom field if at least one param is not match:
+				if( empty( $param_value ) ||
+				    ! preg_match( '/^[a-z0-9_\-]+$/', $param_value ) ||
+				    $param_value != $disp_condition[1] )
+				{	// Hide custom field if at least one param is not match or empty:
 					$row_start_attrs .= ' style="display:none"';
 					continue;
 				}

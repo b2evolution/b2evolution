@@ -2024,7 +2024,7 @@ function regenerate_url( $ignore = '', $set = '', $pagefileurl = '', $glue = '&a
 		$skip = false;
 		foreach( $ignore as $ignore_pattern )
 		{
-			if( $ignore_pattern[0] == '/' )
+			if( substr( $ignore_pattern, 0, 1 ) == '/' )
 			{ // regexp:
 				if( preg_match( $ignore_pattern, $var ) )
 				{	// Skip this param!
