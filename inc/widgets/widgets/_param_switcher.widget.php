@@ -89,6 +89,21 @@ class param_switcher_Widget extends generic_menu_link_Widget
 					'label' => T_('Param code'),
 					'size' => 60,
 				),
+				'buttons' => array(
+					'type' => 'array',
+					'label' => T_('Buttons'),
+					'entries' => array(
+						'value' => array(
+							'label' => T_('Value'),
+							'valid_pattern' => '/^[a-z0-9_\-]+$/',
+							'defaultvalue' => '',
+						),
+						'text' => array(
+							'label' => T_('Text'),
+							'defaultvalue' => '',
+						),
+					)
+				),
 				'display_mode' => array(
 					'type' => 'select',
 					'label' => T_('Display as'),
@@ -122,21 +137,6 @@ class param_switcher_Widget extends generic_menu_link_Widget
 				'url_end_line' => array(
 					'type' => 'end_line',
 				),
-				'buttons' => array(
-					'type' => 'array',
-					'label' => T_('Buttons'),
-					'entries' => array(
-						'value' => array(
-							'label' => T_('Value'),
-							'valid_pattern' => '/^[a-z0-9_\-]+$/',
-							'defaultvalue' => '',
-						),
-						'text' => array(
-							'label' => T_('Text'),
-							'defaultvalue' => '',
-						),
-					)
-				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -159,6 +159,12 @@ class param_switcher_Widget extends generic_menu_link_Widget
 	function display( $params )
 	{
 		$this->init_display( $params );
+
+		if( $this->get_param( 'param_code' ) == '' )
+		{	// Param code must be defined:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" cannot be displayed with empty param code.' );
+			return false;
+		}
 
 		$buttons = $this->get_param( 'buttons' );
 
