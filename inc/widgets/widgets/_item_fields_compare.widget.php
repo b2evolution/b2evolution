@@ -482,32 +482,32 @@ window.addEventListener( 'locationchange', function()
 		return false;
 	}
 
-	function get_url_params( url )
+	function get_url_params( url, multiple_values )
 	{
-		var url = url.replace( /^.+\?/, '' ).split( '&' );
+		url = url.replace( /^.+\?/, '' ).split( '&' );
 		var params = [];
 		url.forEach( function( url_param )
 		{
-			url_param = url_param.split( '=' )
-			params[ url_param[0] ] = url_param[1];
+			url_param = url_param.split( '=' );
+			params[ url_param[0] ] = multiple_values ? url_param[1].split( '|' ) : url_param[1];
 		} );
 
 		return params;
 	}
 
 	// Get params of the current URL:
-	var url_params = get_url_params( location.href );
+	var url_params = get_url_params( location.href, false );
 
 	// Show all custom fields by default:
 	custom_fields.show();
 
 	custom_fields.each( function()
 	{	// Check each custom fields by display condition:
-		var conditions = get_url_params( jQuery( this ).data( 'custom-field-condition' ) );
+		var conditions = get_url_params( jQuery( this ).data( 'custom-field-condition' ), true );
 		for( var cond_param in conditions )
 		{
-			if( typeof( url_params[ cond_param ] ) == 'undefined' ||
-					conditions[ cond_param ] != url_params[ cond_param ] )
+			if( ( ( typeof( url_params[ cond_param ] ) == 'undefined' || url_params[ cond_param ] === '' ) && conditions[ cond_param ].indexOf( '' ) === -1 ) ||
+			    conditions[ cond_param ].indexOf( url_params[ cond_param ] ) === -1 )
 			{	// Hide the custom field if at least one condition is not equal:
 				jQuery( this ).hide();
 				break;
@@ -849,11 +849,15 @@ window.addEventListener( 'locationchange', function()
 			foreach( $disp_conditions as $disp_condition )
 			{
 				$disp_condition = explode( '=', $disp_condition );
+				// Get all allowed value by the condition of the custom field:
+				$disp_condition_values = explode( '|', $disp_condition[1] );
+				// Get current value of the param from $_GET or $_POST:
 				$param_value = param( $disp_condition[0], 'string' );
-				if( empty( $param_value ) ||
-				    ! preg_match( '/^[a-z0-9_\-]+$/', $param_value ) ||
-				    $param_value != $disp_condition[1] )
-				{	// Hide custom field if at least one param is not match or empty:
+				// Check if we should hide the custom field by condition:
+				if( ( $param_value === '' && ! in_array( '', $disp_condition_values ) ) || // current param value is empty but condition doesn't allow empty values
+				    ! preg_match( '/^[a-z0-9_\-]*$/', $param_value ) || // wrong param value
+				    ! in_array( $param_value, $disp_condition_values ) ) // current param value is not allowed by the condition of the custom field
+				{	// Hide custom field if at least one param is not allowed by condition of the custom field:
 					$row_start_attrs .= ' style="display:none"';
 					continue;
 				}
