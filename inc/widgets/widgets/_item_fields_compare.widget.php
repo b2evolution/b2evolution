@@ -463,6 +463,69 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_end'];
 
+		global $evo_widget_item_fields_compare_js_initied;
+		if( empty( $evo_widget_item_fields_compare_js_initied ) )
+		{	// Initialize JS to allow switching by JavaScript once:
+		?>
+<script>
+// Modifications to listen event when URL in browser address bar is changed:
+history.pushState = ( f => function pushState(){
+	var ret = f.apply(this, arguments);
+	window.dispatchEvent(new Event('pushstate'));
+	window.dispatchEvent(new Event('locationchange'));
+	return ret;
+})(history.pushState);
+
+window.addEventListener( 'locationchange', function()
+{	// Show/Hide custom fields by condition depending on current URL in browser address:
+	var custom_fields = jQuery( '[data-custom-field-condition]' );
+	if( custom_fields.length == 0 )
+	{	// No custom fields with display conditions:
+		return false;
+	}
+
+	function get_url_params( url )
+	{
+		var url = url.replace( /^.+\?/, '' ).split( '&' );
+		var params = [];
+		url.forEach( function( url_param )
+		{
+			url_param = url_param.split( '=' )
+			params[ url_param[0] ] = url_param[1];
+		} );
+
+		return params;
+	}
+
+	// Get params of the current URL:
+	var url_params = get_url_params( location.href );
+
+	// Show all custom fields by default:
+	custom_fields.show();
+
+	custom_fields.each( function()
+	{	// Check each custom fields by display condition:
+		var conditions = get_url_params( jQuery( this ).data( 'custom-field-condition' ) );
+		conditions_loop:
+		for( var cond_param in conditions )
+		{
+			for( var url_param in url_params )
+			{
+				if( cond_param == url_param &&
+				    conditions[ cond_param ] != url_params[ url_param ] )
+				{	// Hide the custom field if at least one condition is not equal:
+					jQuery( this ).hide();
+					break conditions_loop;
+				}
+			}
+		}
+	} );
+} );
+</script>
+		<?php
+			$evo_widget_item_fields_compare_js_initied = true;
+		}
+
 		return true;
 	}
 

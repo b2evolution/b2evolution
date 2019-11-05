@@ -197,6 +197,11 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 		}
 	}
 
+	if( isset( $parmeta['input_prefix'] ) )
+	{	// Use prefix before input element if it is defined:
+		$params['input_prefix'] = $parmeta['input_prefix'];
+	}
+
 	if( isset( $parmeta['input_suffix'] ) )
 	{	// Use suffix after input element if it is defined:
 		$params['input_suffix'] = $parmeta['input_suffix'];

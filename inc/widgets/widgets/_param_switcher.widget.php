@@ -100,6 +100,28 @@ class param_switcher_Widget extends generic_menu_link_Widget
 					'note' => sprintf( T_('Auto is based on the %s param.'), '<code>inlist</code>' ),
 					'defaultvalue' => 'auto',
 				),
+				'allow_switch_js' => array(
+					'type' => 'checkbox',
+					'label' => T_('Allow Javascript switching (dynamic)'),
+					'defaultvalue' => 1,
+				),
+				'url_start_line' => array(
+					'type' => 'begin_line',
+					'label' => T_('Allow Standard switching (page reload)'),
+				),
+					'allow_switch_url' => array(
+						'type' => 'checkbox',
+						'label' => '',
+						'defaultvalue' => 1,
+					),
+					'url_param_codes' => array(
+						'label' => T_('Param codes to keep in the URL').': ',
+						'note' => sprintf( T_('Separate by %s. These codes will be merged with auto-detected codes (current widget and switching widgets above this one) but this is required to take into account any switching widgets below this one.'), '<code>,</code>' ),
+						'defaultvalue' => '',
+					),
+				'url_end_line' => array(
+					'type' => 'end_line',
+				),
 				'buttons' => array(
 					'type' => 'array',
 					'label' => T_('Buttons'),
@@ -155,17 +177,41 @@ class param_switcher_Widget extends generic_menu_link_Widget
 		// Get current param value and memorize it for regenerating url:
 		$param_value = param( $this->get_param( 'param_code' ), 'string', '', true );
 
+		if( $this->get_param( 'allow_switch_url' ) )
+		{	// Keep additional param codes in the URL:
+			$url_param_codes = $this->get_param( 'url_param_codes' );
+			if( ! empty( $url_param_codes ) )
+			{
+				$url_param_codes = explode( ',', $url_param_codes );
+				foreach( $url_param_codes as $url_param_code )
+				{
+					$url_param_code = trim( $url_param_code );
+					if( ! empty( $url_param_code ) )
+					{	// Memorize additional param to regenerate proper URL below:
+						param( $url_param_code, 'string', '', true );
+					}
+				}
+			}
+		}
+
 		echo $this->disp_params['button_group_start'];
 
 		foreach( $buttons as $button )
 		{	// Display button:
+			$link_js_attrs = ( $this->get_param( 'allow_switch_js' )
+				? ' data-param-switcher="'.$this->ID.'"'
+				 .' data-code="'.format_to_output( $this->get_param( 'param_code' ), 'htmlattr' ).'"'
+				 .' data-value="'.format_to_output( $button['value'], 'htmlattr' ).'"'
+				: '' );
 			echo $this->get_layout_menu_link(
 				// URL to filter current page:
-				regenerate_url( $this->get_param( 'param_code' ).',redir', $this->get_param( 'param_code' ).'='.$button['value'].'&amp;redir=no' ),
+				( $this->get_param( 'allow_switch_url' ) ? regenerate_url( $this->get_param( 'param_code' ).',redir', $this->get_param( 'param_code' ).'='.$button['value'].'&amp;redir=no' ) : '#' ),
 				// Title of the button:
 				$button['text'],
 				// Mark the button as active:
-				( $param_value == $button['value'] ) );
+				( $param_value == $button['value'] ),
+				// Link template:
+				'<a href="$link_url$" class="$link_class$"'.$link_js_attrs.'>$link_text$</a>' );
 		}
 
 		echo $this->disp_params['button_group_end'];
@@ -173,6 +219,34 @@ class param_switcher_Widget extends generic_menu_link_Widget
 		echo $this->disp_params['block_body_end'];
 
 		echo $this->disp_params['block_end'];
+
+		if( $this->get_param( 'allow_switch_js' ) )
+		{	// Initialize JS to allow switching by JavaScript:
+		?>
+<script>
+jQuery( 'a[data-param-switcher=<?php echo $this->ID; ?>]' ).click( function()
+{
+	// Remove previous value from the URL:
+	var regexp = new RegExp( '([\?&])((' + jQuery( this ).data( 'code' ) + '|redir)=[^&]*(&|$))+', 'g' );
+	var url = location.href.replace( regexp, '$1' );
+	url = url.replace( /[\?&]$/, '' );
+	// Add param code with value of the clicked button:
+	url += ( url.indexOf( '?' ) === -1 ? '?' : '&' );
+	url += jQuery( this ).data( 'code' ) + '=' + jQuery( this ).data( 'value' );
+	url += '&redir=no'
+
+	// Change URL in browser address bar:
+	window.history.pushState( '', '', url );
+
+	// Change active button:
+	jQuery( 'a[data-param-switcher=<?php echo $this->ID; ?>]' ).attr( 'class', '<?php echo ( empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'] ); ?>' );
+	jQuery( this ).attr( 'class', '<?php echo ( empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'] ); ?>' );
+
+	return false;
+} );
+</script>
+		<?php
+		}
 
 		return true;
 	}
