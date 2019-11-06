@@ -149,7 +149,7 @@ class embed_menu_Widget extends generic_menu_link_Widget
 		$this->init_display( $params );
 
 		$SiteMenuCache = & get_SiteMenuCache();
-		if( ! ( $SiteMenu = & $SiteMenuCache->get_by_ID( $this->get_param( 'menu_ID' ) ) ) )
+		if( ! ( $SiteMenu = & $SiteMenuCache->get_by_ID( $this->get_param( 'menu_ID' ), false, false ) ) )
 		{	// We cannot use this widget without Menu:
 			$this->display_error_message( 'Not found Menu #'.$this->get_param( 'menu_ID' ) );
 			return false;

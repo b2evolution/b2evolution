@@ -168,7 +168,7 @@ class generic_menu_link_Widget extends ComponentWidget
 				}
 			}
 
-			echo $this->get_layout_menu_link( '#', $message, false );
+			echo $this->get_layout_standalone_menu_link( '#', $message, false );
 		}
 	}
 }
