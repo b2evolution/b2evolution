@@ -1069,8 +1069,11 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		$comments_IDs = array();
 		foreach( $comments as $post_ID => $comments )
 		{
+			$post_comments_count = 0;
+			echo '<p>'.sprintf( T_('Importing comments of the post #%d'), intval( $post_ID ) ).'... ';
 			if( empty( $comments ) )
 			{	// Skip if no comments
+				echo '<span class="text-warning">'.T_('Skip because the post has no comments.').'</span>';
 				continue;
 			}
 
@@ -1142,7 +1145,14 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 				$comments_IDs[ $comment['comment_id'] ] = $Comment->ID;
 				$comments_count++;
+				$post_comments_count++;
+				
+				echo '.';
 			}
+
+			echo ' <span class="text-success">'.sprintf( T_('%d comments'), $post_comments_count ).'.</span>';
+
+			echo '</p>';
 		}
 
 		echo '<b>'.sprintf( T_('%d records'), $comments_count ).'</b></p>';
