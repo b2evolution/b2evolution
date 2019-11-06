@@ -506,8 +506,9 @@ window.addEventListener( 'locationchange', function()
 		var conditions = get_url_params( jQuery( this ).data( 'custom-field-condition' ), true );
 		for( var cond_param in conditions )
 		{
-			if( ( ( typeof( url_params[ cond_param ] ) == 'undefined' || url_params[ cond_param ] === '' ) && conditions[ cond_param ].indexOf( '' ) === -1 ) ||
-			    conditions[ cond_param ].indexOf( url_params[ cond_param ] ) === -1 )
+			var url_param_value = ( typeof( url_params[ cond_param ] ) == 'undefined' ? '' : url_params[ cond_param ] );
+			if( ( url_param_value === '' && conditions[ cond_param ].indexOf( '' ) === -1 ) ||
+			    conditions[ cond_param ].indexOf( url_param_value ) === -1 )
 			{	// Hide the custom field if at least one condition is not equal:
 				jQuery( this ).hide();
 				break;
