@@ -701,7 +701,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				$custom_field_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
 
 				if( $this_line_values_are_empty &&
-				    ( ! empty( $custom_field_value ) || $custom_field['type'] == 'separator' ) )
+				    ( $custom_field_value !== NULL || $custom_field['type'] == 'separator' ) )
 				{	// At least one field is not empty:
 					$this_line_values_are_empty = false;
 				}
