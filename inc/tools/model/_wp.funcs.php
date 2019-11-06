@@ -585,7 +585,13 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		$categories_count = 0;
 		foreach( $xml_data['categories'] as $cat )
 		{
-			if( empty( $categories[ (string) $cat['category_nicename'] ] ) )
+			echo '<p>'.sprintf( T_('Importing category: %s'), '"'.$cat['cat_name'].'"' ).'... ';
+
+			if( ! empty( $categories[ (string) $cat['category_nicename'] ] ) )
+			{
+				echo '<span class="text-warning">'.sprintf( T_('Skip because category #%d already exists with same slug %s.'), intval( $categories[ (string) $cat['category_nicename'] ] ), '<code>'.$cat['category_nicename'].'</code>' ).'</span>';
+			}
+			else
 			{
 				$Chapter = new Chapter( NULL, $wp_blog_ID );
 				$Chapter->set( 'name', $cat['cat_name'] );
@@ -604,8 +610,11 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					$category_default = $Chapter->ID;
 				}
 				$categories_count++;
+				echo '<span class="text-success">'.T_('OK').'.</span>';
 			}
 		}
+
+		echo '</p>';
 
 		echo '<b>'.sprintf( T_('%d records'), $categories_count ).'</b></p>';
 	}
@@ -645,7 +654,12 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		foreach( $xml_data['tags'] as $tag )
 		{
 			$tag_name = substr( html_entity_decode( $tag['tag_name'] ), 0, 50 );
-			if( empty( $tags[ $tag_name ] ) )
+			echo '<p>'.sprintf( T_('Importing tag: %s'), '"'.$tag_name.'"' ).'... ';
+			if( ! empty( $tags[ $tag_name ] ) )
+			{
+				echo '<span class="text-warning">'.sprintf( T_('Skip because tag #%d already exists with same name %s.'), intval( $tags[ $tag_name ] ), '<code>'.$tag_name.'</code>' ).'</span>';
+			}
+			else
 			{	// Insert new tag into DB if tag doesn't exist with current name
 				$DB->query( 'INSERT INTO '.$tableprefix.'items__tag ( tag_name )
 					VALUES ( '.$DB->quote( $tag_name ).' )' );
@@ -653,8 +667,10 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				// Save new tag
 				$tags[ $tag_name ] = (string) $tag_ID;
 				$tags_count++;
+				echo '<span class="text-success">'.T_('OK').'.</span>';
 			}
 		}
+		echo '</p>';
 		echo '<b>'.sprintf( T_('%d records'), $tags_count ).'</b></p>';
 	}
 
@@ -813,7 +829,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$ChapterCache->add( $page_Chapter );
 			}
 
-			echo '<p>'.sprintf( T_('Importing post: %s'), '#'.$post['post_id'].' - "'.$post['post_title'].'"' );
+			echo '<p>'.sprintf( T_('Importing post: %s'), '#'.$post['post_id'].' - "'.$post['post_title'].'"... ' );
 
 			$author_ID = isset( $authors[ (string) $post['post_author'] ] ) ? $authors[ (string) $post['post_author'] ] : 1;
 			$last_edit_user_ID = isset( $authors[ (string) $post['post_lastedit_user'] ] ) ? $authors[ (string) $post['post_lastedit_user'] ] : $author_ID;
@@ -1023,6 +1039,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$comments[ $Item->ID ] = $post['comments'];
 			}
 
+			echo '<span class="text-success">'.T_('OK').'.</span>';
 			echo '</p>';
 			evo_flush();
 			$posts_count++;
