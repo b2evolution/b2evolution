@@ -4954,6 +4954,10 @@ div.message_toolbars {
   background-color: #F00 !important;
   color: #FFF !important;
 }
+.badge-primary {
+  background-color: #337ab7 !important;
+  color: #FFF !important;
+}
 .badge-info {
   background-color: #5bc0de !important;
   color: #FFF !important;

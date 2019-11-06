@@ -128,7 +128,7 @@ skin_widget( array(
 	<div class="panel panel-default">
 		<div class="panel-heading posts_panel_title_wrapper">
 			<div class="cell1 ellipsis">
-				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
+				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="badge badge-primary">1</a>
 					<?php
 						$Item->author( array(
 							'link_text' => 'auto',
