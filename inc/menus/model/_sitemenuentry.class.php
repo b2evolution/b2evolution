@@ -392,11 +392,11 @@ class SiteMenuEntry extends DataObject
 					break;
 
 				case 'usercomments':
-					$text = url_add_param( $entry_Blog->gen_blogurl(), 'disp=usercomments' );
+					$text = T_('User\'s usercomments');
 					break;
 
 				case 'users':
-					$text = $entry_Blog->get( 'usersurl' );
+					$text = T_('User directory');
 					break;
 
 				case 'item':
