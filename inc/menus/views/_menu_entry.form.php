@@ -47,9 +47,9 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New Menu Entry') : T_('Menu Entry
 	load_funcs( 'files/model/_image.funcs.php' );
 	$Form->select_input_array( 'ment_coll_logo_size', $edited_SiteMenuEntry->get( 'coll_logo_size' ), get_available_thumb_sizes( T_('No logo') ), T_('Collection logo before link text') );
 
-	$Form->text_input( 'ment_coll_ID', $edited_SiteMenuEntry->get( 'coll_ID' ), 11, T_('Collection ID'), '', array( 'maxlength' => 11 ) );
+	$Form->text_input( 'ment_coll_ID', $edited_SiteMenuEntry->get( 'coll_ID' ), 11, T_('Collection ID'), '', array( 'maxlength' => 11, 'hide' => in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'item', 'admin', 'url', 'text' ) ) ) );
 
-	$Form->text_input( 'ment_cat_ID', $edited_SiteMenuEntry->get( 'cat_ID' ), 11, T_('Category ID'), '', array( 'maxlength' => 11, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'recentposts' && $edited_SiteMenuEntry->get( 'type' ) != 'postnew' ) ) );
+	$Form->text_input( 'ment_cat_ID', $edited_SiteMenuEntry->get( 'cat_ID' ), 11, T_('Category ID'), '', array( 'maxlength' => 11, 'hide' => ! in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'recentposts', 'postnew' ) ) ) );
 
 	$Form->text_input( 'ment_item_ID', $edited_SiteMenuEntry->get( 'item_ID' ), 11, T_('Item ID'), '', array( 'maxlength' => 11, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'item' ) ) );
 
@@ -80,6 +80,8 @@ $Form->end_form( $buttons );
 jQuery( '#ment_type' ).change( function()
 {
 	var link_type_value = jQuery( this ).val();
+	// Hide/Show collection ID:
+	jQuery( '#ffield_ment_coll_ID' ).toggle( link_type_value != 'item' && link_type_value != 'admin' && link_type_value != 'url' && link_type_value != 'text' );
 	// Hide/Show category ID:
 	jQuery( '#ffield_ment_cat_ID' ).toggle( link_type_value == 'recentposts' || link_type_value == 'postnew' );
 	// Hide/Show item ID:

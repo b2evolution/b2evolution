@@ -2775,30 +2775,29 @@ class User extends DataObject
 	/**
 	 * Get url visits url
 	 *
+	 * @param integer Collection ID
 	 * @return string
 	 */
-	function get_visits_url( )
+	function get_visits_url( $blog_ID = NULL )
 	{
-		global $Settings;
-
 		if( ! empty( $blog_ID ) )
-		{ // Use blog from param by ID
+		{	// Use collection from param by ID:
 			$BlogCache = & get_BlogCache();
-			$current_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
+			$url_Blog = & $BlogCache->get_by_ID( $blog_ID, false, false );
 		}
 
-		if( empty( $current_Blog ) )
-		{ // Use current blog
+		if( empty( $url_Blog ) )
+		{	// Use current collection:
 			global $Collection, $Blog;
-			$current_Blog = & $Blog;
+			$url_Blog = & $Blog;
 		}
 
-		if( empty( $current_Blog ) || empty( $Settings ) )
-		{ // Wrong request
+		if( empty( $url_Blog ) )
+		{	// Wrong request:
 			return NULL;
 		}
 
-		return url_add_param( $current_Blog->get( 'visitsurl' ), 'user_ID='.$this->ID );
+		return url_add_param( $url_Blog->get( 'visitsurl' ), 'user_ID='.$this->ID );
 	}
 
 

@@ -36,7 +36,7 @@ class SiteMenuEntry extends DataObject
 	var $item_ID;
 	var $url;
 	var $visibility = 'always';
-	var $highlight;
+	var $highlight = 1;
 
 	/**
 	 * Collection
@@ -556,7 +556,7 @@ class SiteMenuEntry extends DataObject
 					return false;
 				}
 
-				return $current_User->get_visits_url();
+				return $current_User->get_visits_url( $entry_Blog->ID );
 
 			case 'useritems':
 				if( ! is_logged_in() )

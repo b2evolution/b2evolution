@@ -152,6 +152,7 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 					'size' => 5,
 					'defaultvalue' => '',
 					'disabled' => $coll_id_is_disabled ? 'disabled' : false,
+					'hide' => in_array( $current_link_type, array( 'item', 'admin', 'url' ) ),
 				),
 				'cat_ID' => array(
 					'label' => T_('Category ID'),
@@ -217,18 +218,14 @@ class basic_menu_link_Widget extends generic_menu_link_Widget
 		return 'jQuery( "#'.$this->get_param_prefix().'link_type" ).change( function()
 		{
 			var link_type_value = jQuery( this ).val();
+			// Hide/Show collection ID:
+			jQuery( "#ffield_'.$this->get_param_prefix().'blog_ID" ).toggle( link_type_value != "item" && link_type_value != "admin" && link_type_value != "url" );
 			// Hide/Show category ID:
-			( link_type_value == "recentposts" || link_type_value == "postnew" )
-				? jQuery( "#ffield_'.$this->get_param_prefix().'cat_ID" ).show()
-				: jQuery( "#ffield_'.$this->get_param_prefix().'cat_ID" ).hide();
+			jQuery( "#ffield_'.$this->get_param_prefix().'cat_ID" ).toggle( link_type_value == "recentposts" || link_type_value == "postnew" );
 			// Hide/Show item ID:
-			( link_type_value == "item" )
-				? jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).show()
-				: jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).hide();
+			jQuery( "#ffield_'.$this->get_param_prefix().'item_ID" ).toggle( link_type_value == "item" );
 			// Hide/Show URL:
-			( link_type_value == "url" )
-				? jQuery( "#ffield_'.$this->get_param_prefix().'link_href" ).show()
-				: jQuery( "#ffield_'.$this->get_param_prefix().'link_href" ).hide();
+			jQuery( "#ffield_'.$this->get_param_prefix().'url" ).toggle( link_type_value == "url" );
 		} );';
 	}
 

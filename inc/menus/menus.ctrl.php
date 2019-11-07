@@ -146,9 +146,12 @@ switch( $action )
 		break;
 
 	case 'new_entry':
+		$ment_parent_ID = param( 'ment_parent_ID', 'integer', 0 );
 		$edited_SiteMenuEntry = new SiteMenuEntry();
 		$edited_SiteMenuEntry->set( 'menu_ID', $edited_SiteMenu->ID );
-		$edited_SiteMenuEntry->set( 'parent_ID', param( 'ment_parent_ID', 'integer', 0 ) );
+		$edited_SiteMenuEntry->set( 'parent_ID', $ment_parent_ID );
+		$edited_SiteMenuEntry->set( 'order', $edited_SiteMenu->get_max_order( $ment_parent_ID ) + 10 );
+		$edited_SiteMenuEntry->set( 'type', 'item' );
 		break;
 
 	case 'edit_entry':

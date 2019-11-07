@@ -210,6 +210,30 @@ class SiteMenu extends DataObject
 
 		return $this->entries;
 	}
+
+
+	/**
+	 * Get max order of menu entries
+	 *
+	 * @param integer Parent Menu Entry ID
+	 * @return integer
+	 */
+	function get_max_order( $parent_ID = NULL )
+	{
+		if( empty( $this->ID ) )
+		{
+			return 0;
+		}
+
+		global $DB;
+		$SQL = new SQL( 'Get max order of entries in Menu #'.$this->ID.' for parent Menu Entry #'.intval( $parent_ID ) );
+		$SQL->SELECT( 'MAX( ment_order )' );
+		$SQL->FROM( 'T_menus__entry' );
+		$SQL->WHERE( 'ment_menu_ID = '.$DB->quote( $this->ID ) );
+		$SQL->WHERE_and( 'ment_parent_ID '.( empty( $parent_ID ) ? 'IS NULL' : '= '.$DB->quote( $parent_ID ) ) );
+
+		return intval( $DB->get_var( $SQL ) );
+	}
 }
 
 ?>
