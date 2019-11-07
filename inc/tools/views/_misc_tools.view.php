@@ -90,8 +90,10 @@ if( !empty( $template_action ) )
 			break;
 
 		case 'delete_orphan_files':
-			// delete orphan File objects with no matching file on disk
-			dbm_delete_orphan_files( param( 'delete_linked_files', 'integer' ) );
+			// delete orphan File objects with no matching file on disk:
+			$delete_files = param( 'delete_files', 'integer' ); // Should we try to delete the found orphan files?
+			$delete_linked = param( 'delete_linked', 'integer' ); // Should we delete the found orphan files together with links?
+			dbm_delete_orphan_files( $delete_files, $delete_linked );
 			break;
 
 		case 'delete_orphan_file_roots':

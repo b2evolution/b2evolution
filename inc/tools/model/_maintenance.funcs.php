@@ -574,113 +574,133 @@ function dbm_delete_orphan_comment_uploads()
 /**
  * Find and delete orphan File objects with no matching file on disk
  *
- * @param integer Delete linked files
+ * @param boolean TRUE - to delete the found orphan files, FALSE - only display ALL found files in DB
+ * @param boolean TRUE - to delete orphan files even if they are linked to other objects
  */
-function dbm_delete_orphan_files( $delete_linked_files = false )
+function dbm_delete_orphan_files( $delete_orphan_files, $delete_orphan_linked_files = false )
 {
 	global $DB, $admin_url;
 
 	$FileCache = & get_FileCache();
 	$FileCache->clear();
 
-	echo T_('Deleting of the orphan File objects from the database...');
+	echo T_('Finding of the orphan File objects in the database...');
+	echo '<ul>';
 	evo_flush();
 
-	$files_SQL = new SQL();
-	$files_SQL->SELECT( 'file_ID, file_root_type, file_root_ID, file_path, COUNT( file_ID ) AS links_num, GROUP_CONCAT( link_ID ) AS link_IDs' );
+	$files_SQL = new SQL( 'Find orphan files for deleting' );
+	$files_SQL->SELECT( 'file_ID, file_root_type, file_root_ID, file_path, COUNT( link_ID ) AS links_num, GROUP_CONCAT( link_ID ) AS link_IDs' );
 	$files_SQL->FROM( 'T_files' );
 	$files_SQL->FROM_add( 'LEFT JOIN T_links ON file_ID = link_file_ID' );
 	$files_SQL->ORDER_BY( 'file_ID' );
 	$files_SQL->GROUP_BY( 'file_ID' );
+	// Limit the files by 100 recordsto save memory:
+	$files_SQL->LIMIT( '0, 100' );
 
-	$count_files_valid = 0;
-	$deleted_files = array();
-	$cannot_deleted_files = array();
+	$num_valid_files = 0;
+	$num_missing_no_linked_files = 0;
+	$num_missing_linked_files = 0;
+	$num_total_links = 0;
+	$num_total_files = 0;
 
-	if( $delete_linked_files )
-	{
+	$skip_files = array();
+
+	if( $delete_orphan_files && $delete_orphan_linked_files )
+	{	// Initalize LinkCache once for code below:
 		$LinkCache = & get_LinkCache();
 	}
 
-	$page_size = 100;
-	$current_page = 0;
-	// Search the files by page to save memory
-	$files_SQL->LIMIT( '0, '.$page_size );
 	while( $loaded_files = $DB->get_results( $files_SQL, ARRAY_A ) )
-	{ // Check all loaded files
+	{	// Check the found files:
 		$FileCache->load_list( array_column( $loaded_files, 'file_ID' ) );
-		foreach( $loaded_files as $loaded_file_data )
+		foreach( $loaded_files as $file_data )
 		{
-			$File = & $FileCache->get_by_ID( $loaded_file_data['file_ID'], false, false );
+			$File = & $FileCache->get_by_ID( $file_data['file_ID'], false, false );
+			echo '<li>#'.$file_data['file_ID'].' - <code>'.$file_data['file_root_type'].'_'.$file_data['file_root_ID'].':'.$file_data['file_path'].'</code> - ';
 			if( $File->exists() )
-			{ // File exists on the disk
-				$count_files_valid++;
+			{	// File exists on the disk:
+				$num_valid_files++;
+				echo '<span class="label label-success">'.T_('OK').'</span>';
+				// Skip this File on next page searching:
+				$skip_files[] = $File->ID;
 			}
 			else
-			{ // File doesn't exist on the disk, Remove it from DB
-				if( $delete_linked_files && ! empty( $loaded_file_data['link_IDs'] ) )
-				{	// Try to delete ALL Link objects of the orphan File before deleting it:
-					$deleted_link_IDs = explode( ',', $loaded_file_data['link_IDs'] );
-					$LinkCache->load_list( $deleted_link_IDs );
-					foreach( $deleted_link_IDs as $deleted_link_ID )
-					{
-						if( $deleted_Link = & $LinkCache->get_by_ID( $deleted_link_ID, false, false ) )
-						{
-							$deleted_Link->dbdelete();
-						}
-					}
-				}
-				if( $File->dbdelete() )
-				{	// Success deleting:
-					$deleted_files[] = $loaded_file_data;
+			{	// File doesn't exist on the disk:
+				echo '<span class="label label-danger">'.T_('MISSING').'</span>';
+				echo ' - ('.sprintf( T_('linked %s times'), '<b>'.$file_data['links_num'].'</b>' ).')';
+				if( empty( $file_data['links_num'] ) )
+				{	// Count number of missing files without links:
+					$num_missing_no_linked_files++;
 				}
 				else
-				{	// Some restrictions, see File::get_delete_restrictions():
-					$cannot_deleted_files[] = $loaded_file_data;
+				{	// Count number of missing files with links:
+					$num_missing_linked_files++;
+					$num_total_links += $file_data['links_num'];
+				}
+				$file_num_deleted_links = 0;
+				if( $delete_orphan_files )
+				{	// Try to delete File only if it is requested:
+					echo ' - ';
+					if( $delete_orphan_linked_files && ! empty( $file_data['link_IDs'] ) )
+					{	// Try to delete ALL Link objects of the orphan File before deleting it:
+						$deleted_link_IDs = explode( ',', $file_data['link_IDs'] );
+						$LinkCache->load_list( $deleted_link_IDs );
+						foreach( $deleted_link_IDs as $deleted_link_ID )
+						{
+							if( $deleted_Link = & $LinkCache->get_by_ID( $deleted_link_ID, false, false ) )
+							{
+								$deleted_Link->dbdelete();
+								$file_num_deleted_links++;
+							}
+						}
+					}
+					if( $File->dbdelete() )
+					{	// Success deleting:
+						if( $file_num_deleted_links )
+						{	// Inform about deleted with links:
+							echo '<span class="text-danger">'.sprintf( T_('Deleted with %d links'), $file_num_deleted_links ).'.</span>';
+						}
+						else
+						{	// Inform about deleted without links:
+							echo '<span class="text-warning">'.T_('Deleted without links').'.</span>';
+						}
+					}
+					else
+					{	// Some restrictions, see File::get_delete_restrictions():
+						echo '<span class="text-danger">'.T_('Could not be deleted!').'</span>';
+						// Skip this File on next page searching:
+						$skip_files[] = $File->ID;
+					}
+				}
+				else
+				{	// Skip this File on next page searching:
+					$skip_files[] = $File->ID;
 				}
 			}
+			$num_total_files++;
+			echo '</li>';
+			evo_flush();
 		}
-
-		echo ' .';
-		evo_flush();
 
 		// Clear cache after each page to save memory
 		$FileCache->clear();
 
-		$current_page++;
-		$files_SQL->LIMIT( ( $current_page * $page_size ).', '.$page_size );
+		if( ! empty( $skip_files ) )
+		{	// Skip files which have been already processed:
+			$files_SQL->WHERE( 'file_ID NOT IN ( '.implode( ',', $skip_files ).' )' );
+		}
 	}
 
-	echo T_('OK');
+	echo '</ul>';
 
-	echo '<p style="margin-top:10px">'.sprintf( T_('Number of valid File objects in the database: %d.'), $count_files_valid ).'</p>';
-
-	$count_files_deleted = count( $deleted_files );
-	echo '<div class="text-warning"'.( $count_files_deleted == 0 ? ' style="margin-bottom:10px"' : '' ).'>'.sprintf( T_('Number of deleted orphan File objects: %d'), $count_files_deleted ).( $count_files_deleted > 0 ? ':' : '.' ).'</div>';
-	if( $count_files_deleted > 0 )
-	{	// Print out deleted files:
+	echo '<p>'.T_('Summary').':';
 		echo '<ul>';
-		foreach( $deleted_files as $file_data )
-		{
-			echo '<li>#'.$file_data['file_ID'].' - <code>'.$file_data['file_root_type'].'_'.$file_data['file_root_ID'].':'.$file_data['file_path'].'</code></li>';
-		}
+			echo '<li>'.sprintf( T_('%s valid Files'), '<b class="text-success">'.$num_valid_files.'</b>' ).'</li>';
+			echo '<li>'.sprintf( T_('%s missing File with no links'), '<b class="text-warning">'.$num_missing_no_linked_files.'</b>' ).'</li>';
+			echo '<li>'.sprintf( T_('%s missing File with links (total number of Links: %s)'), '<b class="text-danger">'.$num_missing_linked_files.'</b>', '<b class="text-danger">'.$num_total_links.'</b>' ).'</li>';
+			echo '<li>'.sprintf( T_('Total number of File objects: %s'), '<b>'.$num_total_files.'</b>' ).'</li>';
 		echo '</ul>';
-	}
-
-	$count_cannot_deleted_files = count( $cannot_deleted_files );
-	if( $count_cannot_deleted_files > 0 )
-	{
-		echo '<div class="text-warning"'.( $count_cannot_deleted_files == 0 ? ' style="margin-bottom:10px"' : '' ).'>'.sprintf( T_('Number of File objects which could not be deleted because they are linked with other objects: %d'), $count_cannot_deleted_files ).( $count_cannot_deleted_files > 0 ? ':' : '.' ).'</div>';
-		if( $count_cannot_deleted_files > 0 )
-		{	// Print out deleted files:
-			echo '<ul>';
-			foreach( $cannot_deleted_files as $file_data )
-			{
-				echo '<li>#'.$file_data['file_ID'].' - <code>'.$file_data['file_root_type'].'_'.$file_data['file_root_ID'].':'.$file_data['file_path'].'</code> ('.sprintf( T_('Number of links: %s'), '<b>'.$file_data['links_num'].'</b>' ).')</li>';
-			}
-			echo '</ul>';
-		}
-	}
+	echo '</p>';
 }
 
 
