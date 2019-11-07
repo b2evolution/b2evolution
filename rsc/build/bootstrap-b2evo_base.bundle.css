@@ -1533,7 +1533,7 @@ div.dev-blocks--belowtoolbar {
   text-align: center;
   padding: 2px;
 }
-a[rel~=nofollow]:not([class~=btn]):hover {
+a[rel~=nofollow]:not([class~=btn]):not([class~=badge]):hover {
   background: #f8e0e0;
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
