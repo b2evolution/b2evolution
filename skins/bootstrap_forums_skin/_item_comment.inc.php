@@ -142,11 +142,13 @@ switch( $Comment->get( 'type' ) )
 	case 'meta': // Display a meta comment:
 		if( $Comment->is_meta() )
 		{	// Meta comment:
-			?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="badge badge-info"><?php echo $Comment->get_inlist_order(); ?></a> <?php
+			$permalink_text = $Comment->get_inlist_order();
+			$permalink_class = 'badge badge-info';
 		}
 		else
 		{	// Normal comment:
-			?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="badge badge-primary"><?php echo $Comment->get_inlist_order() + $comment_order_shift; ?></a> <?php
+			$permalink_text = $Comment->get_inlist_order() + $comment_order_shift;
+			$permalink_class = 'badge badge-primary';
 		}
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
@@ -156,9 +158,9 @@ switch( $Comment->get( 'type' ) )
 		{	// Normal comment
 			$Comment->permanent_link( array(
 					'before'    => '',
-					'after'     => '',
-					'text'      => '',
-					'class'     => 'evo_comment_type',
+					'after'     => ' ',
+					'text'      => $permalink_text,
+					'class'     => $permalink_class,
 					'nofollow'  => true,
 				) );
 		}
