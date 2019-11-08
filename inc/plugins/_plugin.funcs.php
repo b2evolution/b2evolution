@@ -471,9 +471,9 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 					{	// TRUE to don't allow fold the block and keep it opened always on page loading:
 						$fieldset_params['deny_fold'] = $parmeta['deny_fold'];
 					}
-					// Unique ID of fieldset to store in user  settings or in user per collection settings:
-					$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
 				}
+				// Unique ID of fieldset to store in user settings or in user per collection settings:
+				$fieldset_params['id'] = isset( $parmeta['id'] ) ? $parmeta['id'] : $parname;
 				$Form->begin_fieldset( $fieldset_title, $fieldset_params );
 
 				if( ! empty($params['note']) )

@@ -97,10 +97,18 @@ class param_switcher_Widget extends generic_menu_link_Widget
 							'label' => T_('Value'),
 							'valid_pattern' => '/^[a-z0-9_\-]+$/',
 							'defaultvalue' => '',
+							'size' => 5,
 						),
 						'text' => array(
 							'label' => T_('Text'),
 							'defaultvalue' => '',
+							'size' => 10,
+						),
+						'default' => array(
+							'label' => T_('Default'),
+							'note' => T_('if param is empty'),
+							'type' => 'checkbox',
+							'defaultvalue' => 0,
 						),
 					)
 				),
@@ -202,8 +210,22 @@ class param_switcher_Widget extends generic_menu_link_Widget
 
 		echo $this->disp_params['button_group_start'];
 
+		$button_is_active_by_default = false;
 		foreach( $buttons as $button )
 		{	// Display button:
+			if( $param_value === $button['value'] )
+			{	// Active button by current param value:
+				$button_is_active = true;
+			}
+			elseif( ! $button_is_active_by_default && ! empty( $button['default'] ) && $param_value === '' )
+			{	// Active button by default with empty param:
+				$button_is_active = true;
+				$button_is_active_by_default = true;
+			}
+			else
+			{	// No active button:
+				$button_is_active = false;
+			}
 			$link_js_attrs = ( $this->get_param( 'allow_switch_js' )
 				? ' data-param-switcher="'.$this->ID.'"'
 				 .' data-code="'.format_to_output( $this->get_param( 'param_code' ), 'htmlattr' ).'"'
@@ -215,7 +237,7 @@ class param_switcher_Widget extends generic_menu_link_Widget
 				// Title of the button:
 				$button['text'],
 				// Mark the button as active:
-				( $param_value == $button['value'] ),
+				$button_is_active,
 				// Link template:
 				'<a href="$link_url$" class="$link_class$"'.$link_js_attrs.'>$link_text$</a>' );
 		}

@@ -50,7 +50,7 @@ else
 	$form_title = sprintf( $creating ?  T_('New widget "%s" in container "%s"') : T_('Edit widget "%s" in container "%s"'), $edited_ComponentWidget->get_name(), $edited_ComponentWidget->get_container_param( 'name' ) )
 		.' '.action_icon( T_('Open relevant page in online manual'), 'manual', $edited_ComponentWidget->get_help_url(), NULL, 5, NULL, array( 'target' => '_blank' ) );
 }
-$Form->begin_form( 'fform', $form_title );
+$Form->begin_form( 'fform', $form_title, array( 'data-widget-code' => $edited_ComponentWidget->get( 'code' ) ) );
 
 // Plugin widget form event:
 $Plugins->trigger_event( 'WidgetBeginSettingsForm', array(
