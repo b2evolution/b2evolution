@@ -166,8 +166,14 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	$all_wp_attachments = array();
 
 	// Parse WordPress XML file into array
+	echo T_('Loading & parsing the XML file...').'<br />';
+	evo_flush();
 	$xml_data = wpxml_parser( $XML_file_path );
-
+	echo '<ul class="list-default">';
+		echo '<li>'.T_('Memory used by XML parsing (difference between free RAM before loading XML and after)').': <b>'.bytesreadable( $xml_data['memory']['parsing'] ).'</b></li>';
+		echo '<li>'.T_('Memory used by temporary arrays (difference between free RAM after loading XML and after copying all the various data into temporary arrays)').': <b>'.bytesreadable( $xml_data['memory']['arrays'] ).'</b></li>';
+	echo '</ul>';
+	evo_flush();
 
 	$DB->begin();
 
@@ -1192,12 +1198,19 @@ function wpxml_parser( $file )
 	$tags = array();
 	$terms = array();
 	$files = array();
+	$memory = array();
 
 	// Register filter to avoid wrong chars in XML content:
 	stream_filter_register( 'xmlutf8', 'ValidUTF8XMLFilter' );
 
+	// Start to get amount of memory for parsing:
+	$memory_usage = memory_get_usage();
+
 	// Load XML content from file with xmlutf8 filter:
 	$xml = simplexml_load_file( 'php://filter/read=xmlutf8/resource='.$file );
+
+	// Store here what memory was used for XML parsing:
+	$memory['parsing'] = memory_get_usage() - $memory_usage;
 
 	// Get WXR version
 	$wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' );
@@ -1232,6 +1245,9 @@ function wpxml_parser( $file )
 	{
 		$namespaces['excerpt'] = 'http://wordpress.org/export/1.1/excerpt/';
 	}
+
+	// Start to get amount of memory for temporary arrays:
+	$memory_usage = memory_get_usage();
 
 	// Get authors
 	foreach( $xml->xpath('/rss/channel/wp:author') as $author_arr )
@@ -1493,6 +1509,9 @@ function wpxml_parser( $file )
 		$posts[] = $post;
 	}
 
+	// Store here what memory was used for temporary arrays:
+	$memory['arrays'] = memory_get_usage() - $memory_usage;
+
 	return array(
 		'authors'    => $authors,
 		'files'      => $files,
@@ -1501,7 +1520,8 @@ function wpxml_parser( $file )
 		'tags'       => $tags,
 		'terms'      => $terms,
 		'base_url'   => $base_url,
-		'version'    => $wxr_version
+		'version'    => $wxr_version,
+		'memory'     => $memory,
 	);
 }
 
