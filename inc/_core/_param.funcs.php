@@ -140,7 +140,7 @@ function param_format( $value, $type = 'raw' )
  * - htmlspecialchars (convert all html to special characters)
  * Value type will be forced only if resulting value (probably from default then) is !== NULL
  * @param mixed Default value or TRUE if user input required
- * @param boolean Do we need to memorize this to regenerate the URL for this page?
+ * @param boolean|string TRUE to memorize this to regenerate the URL for this page, FALSE - don't memorize, 'auto' - to memorize only if param is coming from $_GET, $_POST or $_COOKIE
  * @param boolean Override if variable already set
  * @param boolean Force setting of variable to default if no param is sent and var wasn't set before
  * @param mixed true will refuse illegal values,
@@ -519,8 +519,9 @@ function param( $var, $type = 'raw', $default = '', $memorize = false,
 	/*
 	 * STEP 3: memorize the value for later url regeneration
 	 */
-	if( $memorize )
-	{ // Memorize this parameter
+	if( $memorize === true ||
+	    ( $memorize === 'auto' && ( isset( $_POST[$var] ) || isset( $_GET[$var] ) || isset( $_COOKIE[$var] ) ) ) )
+	{	// Memorize this parameter:
 		memorize_param( $var, $type, $default );
 	}
 

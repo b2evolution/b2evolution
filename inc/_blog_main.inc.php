@@ -150,7 +150,7 @@ if( $Session->get( 'customizer_mode_'.$Blog->ID ) && $redir != 'no' )
 
 // Init $disp
 $default_disp = '-'; // '-' means we have no explicit disp request yet... this may change with extraptah info or by detecting front page later
-param( 'disp', '/^[a-z0-9\-_]+$/', $default_disp, true );
+param( 'disp', '/^[a-z0-9\-_]+$/', $default_disp, 'auto' );
 $disp_detail = '';
 $is_front = false;	// So far we have not detected that we are displaying the front page
 
@@ -419,7 +419,7 @@ if( $resolve_extra_path )
  * Note: if the params have been set by the extra-path-info above, param() will not touch them.
  */
 param( 'p', 'integer', '', true );              // Specific post number to display
-param( 'title', 'string', '', true );						// urtitle of post to display
+param( 'title', 'string', '', 'auto' );						// urtitle of post to display
 param( 'preview', 'integer', 0, true );         // Is this preview ?
 param( 'stats', 'integer', 0 );									// Deprecated but might still be used by spambots
 
