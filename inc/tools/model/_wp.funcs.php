@@ -596,7 +596,8 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$Chapter = new Chapter( NULL, $wp_blog_ID );
 				$Chapter->set( 'name', $cat['cat_name'] );
 				$Chapter->set( 'urlname', $cat['category_nicename'] );
-				$Chapter->set( 'description', $cat['category_description'] );
+				$Chapter->set( 'description', $cat['cat_description'] );
+				$Chapter->set( 'order', ( $cat['cat_order'] === '' ? NULL : $cat['cat_order'] ), true );
 				if( !empty( $cat['category_parent'] ) && isset( $categories[ (string) $cat['category_parent'] ] ) )
 				{	// Set category parent ID
 					$Chapter->set( 'parent_ID', $categories[ (string) $cat['category_parent'] ] );
@@ -1115,6 +1116,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$Comment->set( 'author', utf8_substr( $comment['comment_author'], 0, 100 ) );
 				$Comment->set( 'author_IP', $comment['comment_author_IP'] );
 				$Comment->set( 'author_email', $comment['comment_author_email'] );
+				$Comment->set( 'author_url', $comment['comment_author_url'] );
 				$Comment->set( 'content', $comment['comment_content'] );
 				if( empty( $comment['comment_status'] ) )
 				{	// If comment status is empty (the export of wordpress doesn't provide this field)
@@ -1314,7 +1316,8 @@ function wpxml_parser( $file )
 			'category_nicename'    => wpxml_convert_value( $t->category_nicename ),
 			'category_parent'      => (string) $t->category_parent,
 			'cat_name'             => wpxml_convert_value( $t->cat_name ),
-			'category_description' => wpxml_convert_value( $t->category_description )
+			'cat_description'      => wpxml_convert_value( $t->cat_description ),
+			'cat_order'            => wpxml_convert_value( $t->cat_order ),
 		);
 	}
 
