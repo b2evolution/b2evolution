@@ -341,7 +341,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		$SQL->FROM( 'T_users' );
 		$existing_users = $DB->get_assoc( $SQL->get() );
 
-		$authors_count = 0;
+		$new_users_num = 0;
+		$skipped_users_num = 0;
+		$failed_users_num = 0;
 		foreach( $xml_data['authors'] as $author )
 		{
 			// Replace unauthorized chars of username:
@@ -431,7 +433,12 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$User->set_datecreated( empty( $author['author_created_ts'] ) ? time() : intval( $author['author_created_ts'] ) );
 				$User->set( 'lastseen_ts', ( empty( $author['author_lastseen_ts'] ) ? NULL : $author['author_lastseen_ts'] ), true );
 				$User->set( 'profileupdate_date', empty( $author['author_profileupdate_date'] ) ? date( 'Y-m-d H:i:s' ): $author['author_profileupdate_date'] );
-				$User->dbinsert();
+				if( ! $User->dbinsert() )
+				{	// Error on insert new user:
+					$failed_users_num++;
+					echo '<span class="text-danger">'.sprintf( T_('User %s could not be inserted in DB.'), '<code>'.$author_login.'</code>' ).'</span>';
+					continue;
+				}
 				$user_ID = $User->ID;
 				if( !empty( $user_ID ) && !empty( $author['author_created_fromIPv4'] ) )
 				{
@@ -452,13 +459,14 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					}
 				}
 
-				$authors_count++;
+				$new_users_num++;
 				echo '<span class="text-success">'.T_('OK').'.</span>';
 			}
 			else
 			{	// Get ID of existing user
 				$user_ID = $existing_users[ $author_login ];
 				echo '<span class="text-warning">'.sprintf( T_('Skip because user already exists with same login and ID #%d.'), intval( $user_ID ) ).'</span>';
+				$skipped_users_num++;
 			}
 			// Save user ID of current author
 			$authors[ $author_login ] = (string) $user_ID;
@@ -470,7 +478,16 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 		$UserSettings->dbupdate();
 
-		echo '<b>'.sprintf( T_('%d records'), $authors_count ).'</b></p>';
+		echo '<b class="text-success">'.sprintf( T_('%d new users'), $new_users_num ).'</b>';
+		if( $skipped_users_num )
+		{
+			echo '<br /><b class="text-warning">'.sprintf( T_('%d skipped users'), $skipped_users_num ).'</b>';
+		}
+		if( $failed_users_num )
+		{
+			echo '<br /><b class="text-danger">'.sprintf( T_('%d users could not be imported'), $failed_users_num ).'</b>';
+		}
+		echo '</p>';
 	}
 
 	/* Import files, Copy them all to media folder */
