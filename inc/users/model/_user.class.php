@@ -2001,6 +2001,7 @@ class User extends DataObject
 				'avatar_size'  => 'crop-top-15x15',
 				'login_text'   => 'login', // name | login
 				'use_style'    => false, // true - to use attr "style", e.g. on email templates
+				'extra_class'  => '',
 				'protocol'     => '', // Protocol is used for gravatar, example: 'http:' or 'https:'
 			), $params );
 
@@ -2032,13 +2033,22 @@ class User extends DataObject
 		$data = array( $login, $avatar );
 
 		$gender_class = $this->get_gender_class();
+		$extra_class = '';
+		if( !empty( $params['extra_class'] ) )
+		{
+			if( !is_array( $params['extra_class']))
+			{
+				$params['extra_class'] = array($params['extra_class']);
+			}
+			$extra_class = ' '.implode( ' ', $params['extra_class'] );
+		}
 		$attr_style = '';
 		if( $params['use_style'] )
 		{ // Use "style"
-			$attr_style = emailskin_style( '.user+.'.str_replace( ' ', '.', $gender_class ) );
+			$attr_style = emailskin_style( '.user+.'.str_replace( ' ', '.', $gender_class ).str_replace( ' ', '+.user.', $extra_class ) );
 		}
 
-		return '<span class="'.trim( $class.' '.$gender_class ).'"'.$attr_style.'>'.str_replace( $mask, $data, $params['mask'] ).'</span>';
+		return '<span class="'.trim( $class.' '.$gender_class.$extra_class ).'"'.$attr_style.'>'.str_replace( $mask, $data, $params['mask'] ).'</span>';
 	}
 
 
