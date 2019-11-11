@@ -737,6 +737,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		echo '<p><b>'.T_('Importing the files from attachment posts...').' </b>';
 		evo_flush();
 
+		$attached_post_files = array();
 		$attachment_IDs = array();
 		$attachments_count = 0;
 		foreach( $xml_data['posts'] as $post )
@@ -747,6 +748,15 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			}
 
 			echo '<p>'.sprintf( T_('Importing attachment: %s'), '#'.$post['post_id'].' - "'.$post['post_title'].'"' );
+
+			if( ! empty( $post['post_parent'] ) )
+			{	// Store what post the File is linked to:
+				if( ! isset( $attached_post_files[ $post['post_parent'] ] ) )
+				{
+					$attached_post_files[ $post['post_parent'] ] = array();
+				}
+				$attached_post_files[ $post['post_parent'] ][] = $post['post_id'];
+			}
 
 			if( isset( $post['postmeta'] ) )
 			{	// Link the files to the Item from meta data:
@@ -998,6 +1008,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				}
 			}
 
+			$linked_post_files = array();
 			if( isset( $post['postmeta'] ) )
 			{	// Extract additional data:
 				foreach( $post['postmeta'] as $postmeta )
@@ -1006,6 +1017,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					{
 						case '_thumbnail_id':
 							// Try to link the File as cover:
+							$linked_post_files[] = $postmeta['value'];
 							$file_is_linked = false;
 							if( isset( $attachment_IDs[ $postmeta['value'] ] ) && isset( $files[ $attachment_IDs[ $postmeta['value'] ] ] ) )
 							{
@@ -1031,6 +1043,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			{	// If [caption ...] tag is detected
 				foreach( $caption_matches[1] as $caption_post_ID )
 				{
+					$linked_post_files[] = $caption_post_ID;
 					$file_is_linked = false;
 					if( isset( $attachment_IDs[ $caption_post_ID ] ) && isset( $files[ $attachment_IDs[ $caption_post_ID ] ] ) )
 					{
@@ -1063,6 +1076,10 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						if( isset( $all_wp_attachments[ $img_file_name ], $files[ $all_wp_attachments[ $img_file_name ] ] ) )
 						{
 							$File = $files[ $all_wp_attachments[ $img_file_name ] ];
+							if( $linked_post_ID = array_search( $File->ID, $attachment_IDs ) )
+							{
+								$linked_post_files[] = $linked_post_ID;
+							}
 							if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
 							{	// If file has been linked to the post
 								echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
@@ -1076,6 +1093,33 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						{	// If file could not be linked to the post:
 							echo '<p class="text-warning">'.sprintf( T_('File of image url %s could not be attached to this post because it is not found in the source attachments folder.'), '<code>'.$img_url.'</code>' ).'</p>';
 						}
+					}
+				}
+			}
+
+			if( isset( $attached_post_files[ $post['post_id'] ] ) )
+			{	// Link all found attached files for the Item which were not linked yer above as cover or inline image tags:
+				pre_dump( $attached_post_files[ $post['post_id'] ] );
+				foreach( $attached_post_files[ $post['post_id'] ] as $attachment_post_ID )
+				{
+					if( in_array( $attachment_post_ID, $linked_post_files ) )
+					{	// Skip already linked File:
+						continue;
+					}
+					$file_is_linked = false;
+					if( isset( $attachment_IDs[ $attachment_post_ID ] ) && isset( $files[ $attachment_IDs[ $attachment_post_ID ] ] ) )
+					{
+						$File = $files[ $attachment_IDs[ $attachment_post_ID ] ];
+						if( $File->link_to_Object( $LinkOwner, $link_order, 'aftermore' ) )
+						{	// If file has been linked to the post:
+							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							$file_is_linked = true;
+							$link_order++;
+						}
+					}
+					if( ! $file_is_linked )
+					{	// If file could not be linked to the post:
+						echo '<p class="text-warning">'.sprintf( T_('File %s could not be attached to this post because it is not found in the source attachments folder.'), '#'.$attachment_post_ID ).'</p>';
 					}
 				}
 			}
