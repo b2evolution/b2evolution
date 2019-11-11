@@ -998,6 +998,34 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				}
 			}
 
+			if( isset( $post['postmeta'] ) )
+			{	// Extract additional data:
+				foreach( $post['postmeta'] as $postmeta )
+				{
+					switch( $postmeta['key'] )
+					{
+						case '_thumbnail_id':
+							// Try to link the File as cover:
+							$file_is_linked = false;
+							if( isset( $attachment_IDs[ $postmeta['value'] ] ) && isset( $files[ $attachment_IDs[ $postmeta['value'] ] ] ) )
+							{
+								$File = $files[ $attachment_IDs[ $postmeta['value'] ] ];
+								if( $File->link_to_Object( $LinkOwner, $link_order, 'cover' ) )
+								{	// If file has been linked to the post:
+									echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post as cover.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+									$file_is_linked = true;
+									$link_order++;
+								}
+							}
+							if( ! $file_is_linked )
+							{	// If file could not be linked to the post:
+								echo '<p class="text-warning">'.sprintf( T_('Cover file %s could not be attached to this post because it is not found in the source attachments folder.'), '#'.$postmeta['value'] ).'</p>';
+							}
+							break;
+					}
+				}
+			}
+
 			// Try to extract files from content tag [caption ...]:
 			if( preg_match_all( '#\[caption[^\]]+id="attachment_(\d+)"[^\]]+\].+?\[/caption\]#i', $updated_post_content, $caption_matches ) )
 			{	// If [caption ...] tag is detected
