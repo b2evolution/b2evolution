@@ -166,6 +166,18 @@ class content_block_Widget extends ComponentWidget
 					'defaultvalue' => '',
 					'hide' => ( $current_select_type != 'random' ),
 				),
+				'coll_ID' => array(
+					'label' => T_('From Collection ID'),
+					'note' => T_('Leave empty for current collection.'),
+					'type' => 'integer',
+					'allow_empty' => true,
+					'size' => 5,
+					'valid_range' => array(
+						'min' => 1,
+						'max' => 4294967295,
+					),
+					'hide' => ( $current_select_type != 'random' ),
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -185,7 +197,7 @@ class content_block_Widget extends ComponentWidget
 			// Hide/Show Item ID and Slug:
 			jQuery( "#ffield_'.$this->get_param_prefix().'item_ID, #ffield_'.$this->get_param_prefix().'item_slug" ).toggle( select_type_value == "item" );
 			// Hide/Show Exact Item Type:
-			jQuery( "#ffield_'.$this->get_param_prefix().'item_type_ID" ).toggle( select_type_value == "random" );
+			jQuery( "#ffield_'.$this->get_param_prefix().'item_type_ID, #ffield_'.$this->get_param_prefix().'coll_ID" ).toggle( select_type_value == "random" );
 		} );';
 	}
 
@@ -340,10 +352,15 @@ class content_block_Widget extends ComponentWidget
 			{
 				case 'random':
 					// Get Item randomly:
-					global $Collection, $Blog;
+					$BlogCache = & get_BlogCache();
+					if( ! ( $widget_Blog = & $BlogCache->get_by_ID( $this->get_param( 'coll_ID' ), false, false ) ) )
+					{	// Use current Collection if not defined in widget settings:
+						global $Collection, $Blog;
+						$widget_Blog = $Blog;
+					}
 
 					// Use ItemList in order to get only available items by visibility for current User:
-					$ItemList = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), 1, 'ItemCache', $this->code.'_' );
+					$ItemList = new ItemList2( $widget_Blog, $widget_Blog->get_timestamp_min(), $widget_Blog->get_timestamp_max(), 1, 'ItemCache', $this->code.'_' );
 					// Set additional debug info prefix for SQL queries to know what widget executes it:
 					$ItemList->query_title_prefix = get_class( $this );
 
