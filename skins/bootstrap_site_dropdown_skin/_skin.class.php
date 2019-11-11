@@ -152,6 +152,12 @@ class bootstrap_site_dropdown_Skin extends Skin
 						'defaultvalue' => '',
 						'hide' => ( $this->get_setting( 'menu_type', NULL, 'auto' ) == 'auto' ),
 					),
+					'fixed_header' => array(
+						'label' => T_('Fixed position'),
+						'note' => T_('Check to fix header top on scroll down'),
+						'type' => 'checkbox',
+						'defaultvalue' => 0,
+					),
 
 					'section_topmenu_start' => array(
 						'layout' => 'begin_fieldset',
@@ -338,7 +344,7 @@ class bootstrap_site_dropdown_Skin extends Skin
 		$footer_link_color = $this->get_setting( 'footer_link_color' );
 
 
-		add_css_headline( '
+		$css = '
 .bootstrap_site_navbar_header .navbar {
 	background-color: '.$menu_bar_bg_color.';
 	border-color: '.$menu_bar_border_color.';
@@ -384,7 +390,25 @@ footer.bootstrap_site_navbar_footer {
 footer.bootstrap_site_navbar_footer .container a {
 	color: '.$footer_link_color.';
 }
-');
+';
+
+		if( $this->get_setting( 'fixed_header' ) )
+		{	// Enable fixed position for header:
+			$css .= '.bootstrap_site_navbar_header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10000;
+}
+body.evo_toolbar_visible .bootstrap_site_navbar_header {
+	top: 27px;
+}
+body {
+	padding-top: 50px;
+}';
+		}
+
+		add_css_headline( $css );
 	}
 
 
