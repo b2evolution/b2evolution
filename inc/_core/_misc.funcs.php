@@ -4418,11 +4418,20 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 					'use_style' => true,
 					'protocol'  => 'http:',
 				) );
+
+			$greeting_username = $User->get_colored_login( array(
+					'mask'        => '$avatar$ $login$',
+					'login_text'  => 'name',
+					'use_style'   => true,
+					'extra_class' => 'normal_weight',
+					'protocol'    => 'http:',
+				) );
 		}
 		else
 		{
 			$username = $User->get_username();
 			$user_login = $User->login;
+			$greeting_username = $username;
 		}
 
 		$firstname = $User->get( 'firstname' );
@@ -4452,6 +4461,7 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 	{	// Get data of anonymous user:
 		$username = $user_name;
 		$user_login = $user_name;
+		$greeting_username = $user_name;
 		$firstname = $user_name;
 		$lastname = $user_name;
 		$firstname_and_login = $user_name;
@@ -4463,8 +4473,8 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 		$newsletter_ID = '';
 	}
 
-	$rpls_from = array( '$login$', '$username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$', '$reminder_key$', '$newsletter_ID$' );
-	$rpls_to = array( $user_login, $username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key, $reminder_key, $newsletter_ID );
+	$rpls_from = array( '$login$', '$username$', '$greeting_username$', '$firstname$', '$lastname$', '$firstname_and_login$', '$firstname_or_login$', '$email$', '$user_ID$', '$unsubscribe_key$', '$reminder_key$', '$newsletter_ID$' );
+	$rpls_to = array( $user_login, $username, $greeting_username, $firstname, $lastname, $firstname_and_login, $firstname_or_login, $user_email, $user_ID, $unsubscribe_key, $reminder_key, $newsletter_ID );
 
 	return str_replace( $rpls_from, $rpls_to, $text );
 }

@@ -103,6 +103,9 @@ $emailskins_styles = array(
 '.user' => '
 	font-weight: bold;
 ',
+'.user.normal_weight' => '
+	font-weight: normal;
+',
 '.user.closed' => '
 	color: #666;
 ',

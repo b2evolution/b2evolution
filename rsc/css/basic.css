@@ -565,6 +565,9 @@ a.overlay_link:hover b {
 .user.anonymous.nogender {
   color: #000;
 }
+.user.normal_weight {
+  font-weight: normal;
+}
 div.debug {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 10pt;
