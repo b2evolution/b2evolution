@@ -1099,7 +1099,6 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 			if( isset( $attached_post_files[ $post['post_id'] ] ) )
 			{	// Link all found attached files for the Item which were not linked yer above as cover or inline image tags:
-				pre_dump( $attached_post_files[ $post['post_id'] ] );
 				foreach( $attached_post_files[ $post['post_id'] ] as $attachment_post_ID )
 				{
 					if( in_array( $attachment_post_ID, $linked_post_files ) )
