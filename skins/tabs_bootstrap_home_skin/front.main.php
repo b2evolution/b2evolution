@@ -110,7 +110,7 @@ siteskin_include( '_site_body_header.inc.php' );
 				echo '<div class="tbhs_item_title"'
 					.' data-slug="'.$Item->dget( 'urltitle', 'htmlattr' ).'"'
 					.( $i > 0 ? ' style="display:none"' : '' ).'>'
-					.'<h2>'.$Item->dget( 'title' ).'</h2>'
+					.'<h1>'.$Item->dget( 'title' ).'</h1>'
 					.$Item->get_edit_link( array(
 							'text' => '#icon#'
 						) )

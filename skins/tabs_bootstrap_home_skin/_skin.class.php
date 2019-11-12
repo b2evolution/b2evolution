@@ -476,12 +476,19 @@ class tabs_bootstrap_home_Skin extends Skin
 					'check' => 'not_empty'
 			) );
 			// Title font size:
-			$this->dynamic_style_rule( $screen_key.'_title_font_size', '.tbhs_item_title h2 { font-size: $setting_value$; }', array(
+			$this->dynamic_style_rule( $screen_key.'_title_font_size', '.tbhs_item_title h1, .tbhs_item_content h1 { font-size: $setting_value$; }', array(
 					'check' => 'not_empty'
 			) );
 			// Text font size:
 			$this->dynamic_style_rule( $screen_key.'_text_font_size', '.tbhs_item_content, .tbhs_item_content * { font-size: $setting_value$; }', array(
 					'check' => 'not_empty'
+			) );
+			// H2 header tag inside text content:
+			$this->dynamic_style_rule( $screen_key.'_h2_in_text_font_size', '.tbhs_item_content h2 { font-size: $setting_value$; }', array(
+					'check' => 'not_empty',
+					// Use special middle value for H@ inside text content,
+					// NOTE: This cannot be updated from customizer mode:
+					'value' => ( ( intval( $this->get_setting( $screen_key.'_title_font_size' ) ) + intval( $this->get_setting( $screen_key.'_text_font_size' ) ) ) / 2 ).'px',
 			) );
 			// Tab text height:
 			$this->dynamic_style_rule( $screen_key.'_tab_text_height', '.tbhs_item_content { height: $setting_value$px; }', array(
