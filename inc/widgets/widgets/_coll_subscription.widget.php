@@ -52,7 +52,7 @@ class coll_subscription_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Subscribe to Updates');
+		return T_('Subscribe to Items');
 	}
 
 

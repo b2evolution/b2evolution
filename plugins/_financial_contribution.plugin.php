@@ -35,7 +35,7 @@ class financial_contribution_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->name = T_('Financial Contribution Widget');
+		$this->name = T_('Financial Contribution');
 		$this->short_desc = T_('This skin tag displays a form for financial contribution.');
 		$this->long_desc = T_('This skin tag displays a form for financial contribution.');
 	}

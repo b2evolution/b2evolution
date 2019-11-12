@@ -62,7 +62,7 @@ class item_info_line_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Info Line');
+		return T_('Info Line');
 	}
 
 

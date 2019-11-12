@@ -59,7 +59,7 @@ class item_workflow_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Workflow Properties');
+		return T_('Workflow Properties');
 	}
 
 

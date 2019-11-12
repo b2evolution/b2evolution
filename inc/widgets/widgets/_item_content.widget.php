@@ -64,7 +64,7 @@ class item_content_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Content');
+		return T_('Content');
 	}
 
 

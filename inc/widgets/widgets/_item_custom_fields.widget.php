@@ -52,7 +52,7 @@ class item_custom_fields_Widget extends item_fields_compare_Widget
 	 */
 	function get_name()
 	{
-		return T_('Item Custom Fields');
+		return T_('Custom Fields');
 	}
 
 

@@ -52,7 +52,7 @@ class image_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Free Image');
+		return T_('Image');
 	}
 
 

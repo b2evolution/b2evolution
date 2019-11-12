@@ -62,7 +62,7 @@ class coll_item_notification_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Collection Item Notification');
+		return T_('Subscribe to Item');
 	}
 
 

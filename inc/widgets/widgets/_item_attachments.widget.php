@@ -62,7 +62,7 @@ class item_attachments_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Attachments');
+		return T_('Attachments');
 	}
 
 

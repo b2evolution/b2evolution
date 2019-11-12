@@ -52,7 +52,7 @@ class coll_tagline_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Collection tagline');
+		return T_('Tagline');
 	}
 
 

@@ -62,7 +62,7 @@ class item_comment_notification_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Comment Notification');
+		return T_('Comment Notification');
 	}
 
 

@@ -73,7 +73,7 @@ class coll_title_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Collection title');
+		return T_('Title');
 	}
 
 

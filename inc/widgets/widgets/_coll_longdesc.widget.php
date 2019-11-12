@@ -52,7 +52,7 @@ class coll_longdesc_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Long Description of this Collection');
+		return T_('Long description');
 	}
 
 

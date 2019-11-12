@@ -1266,13 +1266,6 @@ div.available_widgets {
 .widget_list {
 	list-style: none;
 	margin: 0;
-	li {
-		text-indent: -25px;
-		padding-left: 25px;
-		a, .label {
-			text-indent: initial;
-		}
-	}
 }
 
 // Widget icon:
@@ -1928,13 +1921,12 @@ div.query-builder .rule-container .rule-value-container {
 		}
 	}
 	.evo_customizer__available_widgets {
-		padding: 15px;
+		.panel:first-child {
+			border-top: 1px solid #ddd;
+		}
 		ul.widget_list {
 			list-style: none;
 			margin: 0 0 0 2px;
-		}
-		h3 {
-			margin: 10px 0 5px 0;
 		}
 	}
 	.evo_customizer__other_lists {

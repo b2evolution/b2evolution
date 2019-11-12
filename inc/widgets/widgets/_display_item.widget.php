@@ -52,7 +52,7 @@ class display_item_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Display Item' );
+		return T_('Specific Item');
 	}
 
 

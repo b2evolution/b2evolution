@@ -116,7 +116,7 @@ class coll_related_post_list_Widget extends coll_item_list_Widget
 	 */
 	function get_name()
 	{
-		return T_('Simple Related Posts list');
+		return T_('Related Posts list');
 	}
 
 

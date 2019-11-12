@@ -46,7 +46,7 @@ class calendar_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->name = T_( 'Calendar Widget' );
+		$this->name = T_( 'Calendar' );
 		$this->short_desc = T_('This skin tag displays a navigable calendar.');
 		$this->long_desc = T_('Days containing posts are highlighted.');
 

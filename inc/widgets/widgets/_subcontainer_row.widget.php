@@ -48,7 +48,7 @@ class subcontainer_row_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Columns(Sub-Containers)');
+		return T_('Columns (Sub-Containers)');
 	}
 
 

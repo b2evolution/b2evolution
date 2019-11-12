@@ -1168,14 +1168,6 @@ div.available_widgets #available_widgets_inner {
   list-style: none;
   margin: 0;
 }
-.widget_list li {
-  text-indent: -25px;
-  padding-left: 25px;
-}
-.widget_list li a,
-.widget_list li .label {
-  text-indent: initial;
-}
 .evo_widget_icon {
   display: inline-block;
   min-width: 22px;
@@ -1856,15 +1848,12 @@ div.query-builder .rule-container .rule-value-container {
 #customizer_wrapper .row .col-md-12 {
   padding: 0;
 }
-#customizer_wrapper .evo_customizer__available_widgets {
-  padding: 15px;
+#customizer_wrapper .evo_customizer__available_widgets .panel:first-child {
+  border-top: 1px solid #ddd;
 }
 #customizer_wrapper .evo_customizer__available_widgets ul.widget_list {
   list-style: none;
   margin: 0 0 0 2px;
-}
-#customizer_wrapper .evo_customizer__available_widgets h3 {
-  margin: 10px 0 5px 0;
 }
 #customizer_wrapper .evo_customizer__other_lists {
   margin: 0 0 10px 31px;

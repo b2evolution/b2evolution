@@ -51,7 +51,7 @@ class subcontainer_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Embed Sub-Container');
+		return T_('Sub-Container');
 	}
 
 

@@ -52,7 +52,7 @@ class coll_logo_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Logo title');
+		return T_('Logo');
 	}
 
 

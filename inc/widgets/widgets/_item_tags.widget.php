@@ -64,7 +64,7 @@ class item_tags_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Tags');
+		return T_('Tags');
 	}
 
 

@@ -53,7 +53,7 @@ class user_profile_pics_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('User Profile Picture(s)');
+		return T_('User Profile Picture');
 	}
 
 

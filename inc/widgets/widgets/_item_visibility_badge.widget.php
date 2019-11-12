@@ -62,7 +62,7 @@ class item_visibility_badge_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Visibility Badge');
+		return T_('Visibility Badge');
 	}
 
 

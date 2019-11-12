@@ -115,7 +115,7 @@ class coll_post_list_Widget extends coll_item_list_Widget
 	 */
 	function get_name()
 	{
-		return T_('Simple Post list');
+		return T_('Post list');
 	}
 
 

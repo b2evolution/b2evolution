@@ -116,7 +116,7 @@ class coll_page_list_Widget extends coll_item_list_Widget
 	 */
 	function get_name()
 	{
-		return T_('Simple Page list');
+		return T_('Page list');
 	}
 
 

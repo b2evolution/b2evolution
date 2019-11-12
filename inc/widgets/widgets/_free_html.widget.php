@@ -52,7 +52,7 @@ class free_html_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		$title = T_( 'Free HTML' );
+		$title = 'HTML';
 		return $title;
 	}
 

@@ -62,7 +62,7 @@ class item_title_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Title');
+		return T_('Title');
 	}
 
 

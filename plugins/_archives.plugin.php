@@ -47,7 +47,7 @@ class archives_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->name = T_( 'Archives Widget' );
+		$this->name = T_( 'Date Archives' );
 		$this->short_desc = T_('This skin tag displays a list of post archives.');
 		$this->long_desc = T_('Archives can be grouped monthly, daily, weekly or post by post.');
 

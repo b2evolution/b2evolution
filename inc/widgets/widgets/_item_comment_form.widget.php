@@ -62,7 +62,7 @@ class item_comment_form_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Comment Form');
+		return T_('Comment Form');
 	}
 
 

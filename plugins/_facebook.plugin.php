@@ -43,7 +43,7 @@ class facebook_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->name = T_( 'Facebook Widget' );
+		$this->name = T_( 'Facebook Like/Share' );
 		$this->short_desc = T_('This widget displays Facebook Like and Share buttons.');
 		$this->long_desc = $this->short_desc.' '.T_('Also shows how many users liked and shared the current page.');
 	}

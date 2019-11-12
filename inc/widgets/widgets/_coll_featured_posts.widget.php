@@ -120,7 +120,7 @@ class coll_featured_posts_Widget extends coll_item_list_Widget
 	 */
 	function get_name()
 	{
-		return T_('Featured Posts');
+		return T_('Featured Posts list');
 	}
 
 

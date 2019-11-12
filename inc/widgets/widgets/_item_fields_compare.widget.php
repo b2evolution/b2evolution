@@ -52,7 +52,7 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Compare Item Fields');
+		return T_('Compare Items');
 	}
 
 

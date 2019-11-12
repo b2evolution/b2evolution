@@ -55,7 +55,7 @@ class colls_list_public_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Public collections list');
+		return T_('Collections list');
 	}
 
 

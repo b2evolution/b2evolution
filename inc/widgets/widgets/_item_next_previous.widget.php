@@ -62,7 +62,7 @@ class item_next_previous_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Next/Previous');
+		return T_('Next/Previous Item');
 	}
 
 

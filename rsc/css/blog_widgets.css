@@ -172,14 +172,6 @@ display:block;
 	display:none;
 }
 
-.available_widgets h3 {
-	margin-top: 0;
-}
-
-.available_widgets ul {
-	padding-bottom: 1em;
-}
-
 /**
  * Widget settings page
  */

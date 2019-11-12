@@ -62,7 +62,7 @@ class coll_item_list_pages_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item List Pages');
+		return T_('List Pager');
 	}
 
 

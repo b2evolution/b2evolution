@@ -62,7 +62,7 @@ class coll_comment_notification_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Collection Comment Notification');
+		return T_('Subscribe to Comments');
 	}
 
 

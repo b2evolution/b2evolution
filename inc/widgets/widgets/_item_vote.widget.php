@@ -52,7 +52,7 @@ class item_vote_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Item Vote');
+		return T_('Voting');
 	}
 
 
