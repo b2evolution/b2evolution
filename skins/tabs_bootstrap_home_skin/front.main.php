@@ -166,15 +166,17 @@ siteskin_include( '_site_body_header.inc.php' );
 		?>
 
 		<?php
-		// ------------------ "Front Page Main Area" CONTAINER EMBEDDED HERE -------------------
-		// Display container and contents:
-		widget_container( 'front_page_main_area', array(
-				// The following params will be used as defaults for widgets included in this container:
-				'container_display_if_empty' => false, // If no widget, don't display container at all
-				'container_start'         => '<div class="evo_container $wico_class$">',
-				'container_end'           => '</div>',
-			) );
-		// --------------------- END OF "Front Page Main Area" CONTAINER -----------------------
+		if( $Skin->get_setting( 'primary_area' ) == 'below_tab_text' )
+		{	// ------------------ "Front Page Main Area" CONTAINER EMBEDDED HERE -------------------
+			// Display container and contents:
+			widget_container( 'front_page_main_area', array(
+					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_start'         => '<div class="evo_container $wico_class$">',
+					'container_end'           => '</div>',
+				) );
+			// --------------------- END OF "Front Page Main Area" CONTAINER -----------------------
+		}
 		?>
 		</div>
 
@@ -187,6 +189,20 @@ siteskin_include( '_site_body_header.inc.php' );
 <div class="container">
 
 	<div class="row">
+
+			<?php
+			if( $Skin->get_setting( 'primary_area' ) == 'below_tabs' )
+			{	// ------------------ "Front Page Main Area" CONTAINER EMBEDDED HERE -------------------
+				// Display container and contents:
+				widget_container( 'front_page_main_area', array(
+						// The following params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start'         => '<div class="evo_container $wico_class$">',
+						'container_end'           => '</div>',
+					) );
+				// --------------------- END OF "Front Page Main Area" CONTAINER -----------------------
+			}
+			?>
 
 			<?php
 				// ------------------------- "Front Page Secondary Area" CONTAINER EMBEDDED HERE --------------------------

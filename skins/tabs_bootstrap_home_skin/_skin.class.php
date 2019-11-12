@@ -268,6 +268,16 @@ class tabs_bootstrap_home_Skin extends Skin
 					'tabs_item_type_end_line' => array(
 						'type' => 'end_line',
 					),
+					'primary_area' => array(
+						'label' => T_('Primary Area'),
+						'type' => 'radio',
+						'field_lines' => true,
+						'options'  => array(
+							array( 'below_tab_text', T_('Display at static position below tab text') ),
+							array( 'below_tabs', T_('Display below tabs') ),
+						),
+						'defaultvalue' => 'below_tab_text',
+					),
 			)
 		);
 
@@ -309,14 +319,16 @@ class tabs_bootstrap_home_Skin extends Skin
 						'type' => 'integer',
 						'allow_empty' => true,
 						'valid_range' => array( 'min' => 1 ),
+						'hide' => ( $this->get_setting( 'primary_area', NULL, 'below_tab_text' ) != 'below_tab_text' ),
 					),
 					$screen_key.'_static_text_height' => array(
-						'label' => T_('Static text height'),
+						'label' => T_('Primary Area height'),
 						'input_suffix' => ' px ',
 						'defaultvalue' => isset( $screen['static_text_height'] ) ? $screen['static_text_height'] : '',
 						'type' => 'integer',
 						'allow_empty' => true,
 						'valid_range' => array( 'min' => 1 ),
+						'hide' => ( $this->get_setting( 'primary_area', NULL, 'below_tab_text' ) != 'below_tab_text' ),
 					),
 				$screen_key.'_front_page_end' => array(
 					'layout' => 'end_fieldset',
@@ -428,6 +440,23 @@ class tabs_bootstrap_home_Skin extends Skin
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
+	}
+
+
+	/**
+	 * Additional JavaScript code for skin settings form
+	 */
+	function echo_settings_form_js()
+	{
+?>
+<script>
+jQuery( '[name=edit_skin_<?php echo $this->ID; ?>_set_primary_area]' ).click( function()
+{
+	jQuery( '[id^=ffield_edit_skin_<?php echo $this->ID; ?>_set_][id$=_tab_text_height], [id^=ffield_edit_skin_<?php echo $this->ID; ?>_set_][id$=_static_text_height]' ).toggle( jQuery( this ).val() == 'below_tab_text' );
+	
+} );
+</script>
+<?php
 	}
 
 
