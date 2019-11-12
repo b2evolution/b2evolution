@@ -53,7 +53,7 @@ class newsletter_subscription_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Newsletter/Email list subscription');
+		return T_('Email list subscription');
 	}
 
 

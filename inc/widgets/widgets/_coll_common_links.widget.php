@@ -74,7 +74,7 @@ class coll_common_links_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display these links: Recently, Archives, Categories, Latest Comments');
+		return  T_('DEPRECATED').' - '.T_('Display these links: Recently, Archives, Categories, Latest Comments');
 	}
 
 

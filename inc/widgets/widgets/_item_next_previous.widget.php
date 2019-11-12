@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class item_next_previous_Widget extends ComponentWidget
 {
-	var $icon = 'window-minimize';
+	var $icon = 'angle-left';
 
 	/**
 	 * Constructor

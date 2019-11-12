@@ -24,7 +24,7 @@ load_class( 'widgets/widgets/_coll_item_list.widget.php', 'coll_item_list_Widget
  */
 class coll_flagged_list_Widget extends coll_item_list_Widget
 {
-	var $icon = 'flag-o';
+	var $icon = 'flag';
 
 	/**
 	 * Constructor

@@ -34,7 +34,7 @@ load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
  */
 class coll_item_list_pages_Widget extends ComponentWidget
 {
-	var $icon = 'window-minimize';
+	var $icon = 'ellipsis-h';
 
 	/**
 	 * Constructor

@@ -247,7 +247,7 @@ class user_tools_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display user tools: Log in, Admin, Profile, Subscriptions, Log out');
+		return T_('DEPRECATED').' - '.T_('Display user tools: Log in, Admin, Profile, Subscriptions, Log out');
 	}
 
 

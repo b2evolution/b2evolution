@@ -72,7 +72,7 @@ class param_switcher_Widget extends generic_menu_link_Widget
 	 */
 	function get_desc()
 	{
-		return T_('Display buttons to switch between params.');
+		return T_('Display buttons to switch between params. Useful for Compare Items widget.');
 	}
 
 

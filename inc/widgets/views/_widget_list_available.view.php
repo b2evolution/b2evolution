@@ -63,7 +63,7 @@ unset( $Plugin_array );
 
 $widget_groups = array (
 	'free_content' => T_('Basic blocks'),
-	'embed_blocks' => T_('Embedded blocks'),
+	'embed_blocks' => T_('Embedded contents'),
 	'menu_item'    => T_('Menu Items / Buttons'),
 	'navigation'   => T_('Navigation'),
 	'content'      => T_('Listing Contents'),
@@ -82,11 +82,11 @@ $core_componentwidget_defs = array(
 			'image',        // Image
 			'spacer',       // Spacer
 			'separator',    // Separator
-			'social_links', // Free Social Links
 		),
 	'embed_blocks' => array(
 			'subcontainer',        // Sub-Container
 			'subcontainer_row',    // Columns (Sub-Containers)
+			'embed_menu',        // Embed Menu
 			'content_block',       // Content Block
 			'coll_featured_intro', // Featured/Intro Post
 			'display_item',        // Specific Item
@@ -99,11 +99,10 @@ $core_componentwidget_defs = array(
 			'flag_menu_link',    // Flagged Items Menu link or button
 			'profile_menu_link', // My Profile Menu link or button
 			'embed_menu',        // Embed Menu
-			'coll_common_links', // Common Navigation Links
-			'user_tools',        // User Tools
 			'colls_list_public', // Collections list
 			'colls_list_owner',  // Same owner's collections list
-			'param_switcher',    // Param Switcher
+			'coll_common_links', // Common Navigation Links
+			'user_tools',        // User Tools
 		),
 	'navigation' => array(
 			'breadcrumb_path',      // Breadcrumb Path
@@ -136,6 +135,7 @@ $core_componentwidget_defs = array(
 			'coll_featured_intro', // Featured/Intro Post
 			'display_item',        // Specific Item
 			'item_fields_compare', // Compare Items
+			'param_switcher',    // Param Switcher
 		),
 	'infoitem' => array(
 			'item_title',                // Title
@@ -186,8 +186,9 @@ $core_componentwidget_defs = array(
 			'online_users',            // Online users
 		),
 	'other' => array(
-			'mobile_skin_switcher', // Mobile Skin Switcher
+			'social_links', // Free Social Links
 			'page_404_not_found',   // 404 Not Found
+			'mobile_skin_switcher', // Mobile Skin Switcher
 			// Plugin: Facebook Like/Share
 			// Plugin: Financial Contribution
 			// Plugin: Who's online Widget

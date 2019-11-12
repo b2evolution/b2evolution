@@ -80,7 +80,7 @@ class item_seen_by_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display what users have seen item.');
+		return T_('Display which Users have seen the current Item.');
 	}
 
 
