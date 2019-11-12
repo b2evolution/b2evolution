@@ -275,7 +275,11 @@ class coll_category_list_Widget extends ComponentWidget
 			}
 
 			// Load current collection categories (if needed) and recurse through them:
-			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, /* subset ID */ $Blog->ID, NULL, 0, $depth_level, array( 'sorted' => true ) );
+			$r = $tmp_disp . $ChapterCache->recurse( $callbacks, /* subset ID */ $Blog->ID, NULL, 0, $depth_level, array(
+					'sorted' => true,
+					// Don't expand all categories by default for this widget, because it has a separate parameter "Recurse X levels":
+					'expand_all' => false,
+				) );
 
 			if( ! empty($r) )
 			{
@@ -342,7 +346,11 @@ class coll_category_list_Widget extends ComponentWidget
 				}
 
 				// Load current collection categories (if needed) and recurse through them:
-				$r = $ChapterCache->recurse( $callbacks, /* subset ID */ $curr_blog_ID, NULL, 0, $depth_level, array( 'sorted' => true ) );
+				$r = $ChapterCache->recurse( $callbacks, /* subset ID */ $curr_blog_ID, NULL, 0, $depth_level, array(
+						'sorted' => true,
+						// Don't expand all categories by default for this widget, because it has a separate parameter "Recurse X levels":
+						'expand_all' => false,
+					) );
 
 				if( ! empty($r) )
 				{
