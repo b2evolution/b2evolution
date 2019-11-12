@@ -1924,7 +1924,7 @@ function blogs_all_results_block( $params = array() )
 	}
 
 	// Create result set:
-	$blogs_Results = new Results( $SQL->get(), $params['results_param_prefix'], '---------A' );
+	$blogs_Results = new Results( $SQL->get(), $params['results_param_prefix'], '----------A' );
 	$blogs_Results->Cache = & get_BlogCache();
 	$blogs_Results->title = $params['results_title'];
 	$blogs_Results->no_results_text = $no_results;
