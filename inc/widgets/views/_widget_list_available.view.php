@@ -25,7 +25,7 @@ if( $mode == 'customizer' )
 	echo '<div class="evo_customizer__content evo_customizer__available_widgets">';
 
 	// Display page title:
-	echo '<p style="margin:10px">'.sprintf( T_('Choose a widget to add to "%s":'), $WidgetContainer->get( 'name' ) ).'</p>';
+	echo '<p class="alert alert-info" style="margin:10px">'.sprintf( T_('Choose a widget to add to "%s":'), $WidgetContainer->get( 'name' ) ).'</p>';
 }
 else
 {	// Display this title for normal view from back-office:
@@ -165,8 +165,8 @@ $core_componentwidget_defs = array(
 			'coll_member_count',         // Member count
 			'coll_xml_feeds',            // XML Feeds (RSS / Atom)
 			'coll_subscription',         // Subscribe to Items
-			'coll_activity_stats',       // Activity Statistics
 			'coll_comment_notification', // Subscribe to Comments
+			'coll_activity_stats',       // Activity Statistics
 		),
 	'about_user' => array(
 			'user_profile_pics', // User Profile Picture
