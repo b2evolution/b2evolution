@@ -1502,6 +1502,16 @@ class _core_Module extends Module
 
 					$entries['blog']['entries'][] = array( 'separator' => true );
 
+					$contents_submenu = array();
+
+					if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+					{ // Workflow view
+						$contents_submenu['workflow'] = array(
+								'text' => T_('Workflow view').'&hellip;',
+								'href' => $items_url.'&amp;tab=tracker',
+							);
+					}
+
 					if( $Blog->get( 'type' ) == 'manual' )
 					{ // Manual view
 						global $cat, $Item;
@@ -1519,23 +1529,36 @@ class _core_Module extends Module
 						{	// No selected category and item/post:
 							$manual_view_cat_param = '';
 						}
-						$entries['blog']['entries']['manual'] = array(
+						$contents_submenu['manual'] = array(
 								'text' => T_('Manual view').'&hellip;',
 								'href' => $items_url.'&amp;tab=manual'.$manual_view_cat_param,
 							);
 					}
 
-					if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
-					{ // Workflow view
-						$entries['blog']['entries']['workflow'] = array(
-								'text' => T_('Workflow view').'&hellip;',
-								'href' => $items_url.'&amp;tab=tracker',
-							);
+					$contents_submenu['full'] = array(
+							'text' => T_('All').'&hellip;',
+							'href' => $admin_url.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
+						);
+
+					$contents_submenu['summary'] = array(
+							'text' => T_('Summary').'&hellip;',
+							'href' => $admin_url.'?ctrl=items&amp;tab=summary&amp;filter=restore&amp;blog='.$Blog->ID,
+						);
+
+					$type_tabs = get_item_type_tabs();
+					foreach( $type_tabs as $type_tab => $type_tab_name )
+					{
+						$type_tab_key = 'type_'.str_replace( ' ', '_', utf8_strtolower( $type_tab ) );
+						$contents_submenu[ $type_tab_key ] = array(
+							'text' => T_( $type_tab_name ).'&hellip;',
+							'href' => $admin_url.'?ctrl=items&amp;tab=type&amp;tab_type='.urlencode( $type_tab ).'&amp;filter=restore&amp;blog='.$Blog->ID,
+						);
 					}
 
 					$entries['blog']['entries']['posts'] = array(
-							'text' => T_('Contents').'&hellip;',
+							'text' => T_('Contents'),
 							'href' => $items_url,
+							'entries' => $contents_submenu,
 						);
 					$display_separator = true;
 				}

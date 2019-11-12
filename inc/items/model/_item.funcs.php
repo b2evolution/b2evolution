@@ -1661,7 +1661,7 @@ function cat_select_after_last( $parent_cat_ID, $level )
 function cat_select_new( & $cat_display_params )
 {
 	global $blog, $Blog, $current_User;
-	
+
 	if( ! $cat_display_params['display_new'] )
 	{	// Don't display an input to create new category:
 		return '';
@@ -1747,16 +1747,7 @@ function attach_browse_tabs( $display_tabs3 = true )
 		return;
 	}
 
-	$menu_entries = array(
-		'full' => array(
-			'text' => T_('All'),
-			'href' => $admin_url.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
-		),
-		'summary' => array(
-			'text' => T_('Summary'),
-			'href' => $admin_url.'?ctrl=items&amp;tab=summary&amp;filter=restore&amp;blog='.$Blog->ID,
-		),
-	);
+	$menu_entries = array();
 
 	if( $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
 	{ // We want to use workflow properties for this blog:
@@ -1773,6 +1764,16 @@ function attach_browse_tabs( $display_tabs3 = true )
 			'href' => $admin_url.'?ctrl=items&amp;tab=manual&amp;filter=restore&amp;blog='.$Blog->ID,
 		);
 	}
+
+	$menu_entries['full'] = array(
+			'text' => T_('All'),
+			'href' => $admin_url.'?ctrl=items&amp;tab=full&amp;filter=restore&amp;blog='.$Blog->ID,
+		);
+
+	$menu_entries['summary'] = array(
+			'text' => T_('Summary'),
+			'href' => $admin_url.'?ctrl=items&amp;tab=summary&amp;filter=restore&amp;blog='.$Blog->ID,
+		);
 
 	$type_tabs = get_item_type_tabs();
 	foreach( $type_tabs as $type_tab => $type_tab_name )
