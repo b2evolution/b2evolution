@@ -49,6 +49,17 @@ class inc_file_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'inc-file-widget' );
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params

@@ -47,6 +47,17 @@ class subcontainer_Widget extends ComponentWidget
 
 
 	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'embed-sub-container-widget' );
+	}
+
+
+	/**
 	 * Get name of widget
 	 */
 	function get_name()
