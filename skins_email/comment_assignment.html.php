@@ -34,7 +34,7 @@ if( $params['notify_full'] )
 {	/* Full notification */
 	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s assigned you the following post' ).':', $principal_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:', 'login_text' => 'name' ) ) )."</p>\n";
 
-	echo '<p'.emailskin_style( '.p' ).'>'.$Item->get( 'title' )." &ndash; ".get_link_tag( $Blog->gen_blogurl(), $Blog->get( 'shortname' ), '.a' )."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'><b>'.$Item->get( 'title' )."</b> &ndash; ".get_link_tag( $Blog->gen_blogurl(), $Blog->get( 'shortname' ), '.a' )."</p>\n";
 
 	echo '<p'.emailskin_style( '.p' ).'>'.T_('Status').': <b>'.$Item->get( 't_extra_status' )."</b></p>\n";
 
@@ -81,7 +81,7 @@ else
 { /* Short notification */
 	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s assigned you a post on %s with title %s.' ), $principal_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:', 'login_text' => 'name' ) ), '<b>'.$Blog->get( 'shortname' ).'</b>', '<b>'.$Item->get( 'title' ).'</b>' )."</p>\n";
 
-	echo '<p'.emailskin_style( '.p' ).'>'.T_('Status').': '.$Item->get( 't_extra_status' )."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'>'.T_('Status').': <b>'.$Item->get( 't_extra_status' )."</b></p>\n";
 
 	echo '<div class="email_ugc"'.emailskin_style( 'div.email_ugc' ).'>'."\n";
 	echo '<p'.emailskin_style( '.p' ).'><i'.emailskin_style( '.note' ).'>'.T_( 'This is a short form notification. To make these emails more useful, ask the administrator to send you long form notifications instead.' ).'</i></p>';
