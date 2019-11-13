@@ -654,9 +654,9 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 			'fieldset_end'   => '</fieldset>',
 			'fieldstart'     => '',
 			'fieldend'       => '',
-			'labelstart'     => '<div class="label"><label for="p">',
+			'labelstart'     => '<div class="evo_label"><label for="p">',
 			'labelend'       => '</label></div>',
-			'inputstart'     => '<div class="input">',
+			'inputstart'     => '<div class="evo_input">',
 			'inputend'       => '</div>',
 		), $params['form_params'] );
 

@@ -34,7 +34,7 @@ if( $params['notify_full'] )
 {	/* Full notification */
 	echo sprintf( T_('%s assigned you the following post'), $principal_User->get( 'login' ) ).':'."\n\n";
 
-	echo $Item->get( 'title' )." &ndash; ".$Blog->get( 'shortname' ).' ( '.str_replace( '&amp;', '&', $Blog->gen_blogurl() ).' )'."\n";
+	echo $Item->get( 'title' ).' -- '.$Blog->get( 'shortname' ).' ( '.str_replace( '&amp;', '&', $Blog->gen_blogurl() ).' )'."\n";
 
 	echo T_('Status').': '.$Item->get( 't_extra_status' )."\n";
 
