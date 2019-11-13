@@ -773,7 +773,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		install_plugin( 'widescroll_plugin' );
 		// widget
 		install_plugin( 'facebook_plugin' );
-		install_plugin( 'whosonline_plugin' );
 		// Unclassified
 		install_plugin( 'bookmarklet_plugin' );
 	}
