@@ -1051,6 +1051,15 @@ if( $display_mode != 'js')
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'user-activity-tab' );
 			break;
+		default:
+			// Display back-office UI for modules:
+			modules_call_method( 'init_backoffice_UI', array(
+					'ctrl'    => 'user',
+					'action'  => $action,
+					'tab'     => $user_tab,
+					'user_ID' => $edited_User->ID,
+				) );
+			break;
 	}
 
 	// Display messages depending on user email status
@@ -1368,6 +1377,15 @@ switch( $action )
 				{
 					$AdminUI->disp_payload_end();
 				}
+				break;
+
+			default:
+				// Display back-office UI for modules:
+				modules_call_method( 'display_backoffice_UI', array(
+						'ctrl'   => 'user',
+						'action' => $action,
+						'tab'    => $user_tab,
+					) );
 				break;
 		}
 

@@ -65,6 +65,29 @@ class Module
 
 
 	/**
+	 * Builds the user menu. This is the one with the configuration features
+	 *
+	 * @param array Parameters: 'user_ID', 'page_url', 'url_params', 'is_admin_page'
+	 * @return array Menus config
+	 */
+	function build_user_menu( $params = array() )
+	{
+	}
+
+
+	/**
+	 * Get allowed user tabs
+	 *
+	 * @return array Array:
+	 *               Key - menu key,
+	 *               Value - 'backoffice' - if user tab can be displayed only on back-office, 'frontoffice' - tab is allowed on front-office as well
+	 */
+	function get_allowed_user_tabs()
+	{
+	}
+
+
+	/**
 	 * Provide translation in the context of this module:
 	 *
 	 * You can override this in specific modules.
@@ -364,6 +387,26 @@ class Module
 	 * @param array Parameters of the displayed search result object (param is updated by reference)
 	 */
 	function prepare_search_result_display_params( & $params )
+	{
+	}
+
+
+	/**
+	 * Initialize back-office UI
+	 *
+	 * @param array Parameters: 'ctrl', 'action', 'tab'
+	 */
+	function init_backoffice_UI( $params = array() )
+	{
+	}
+
+
+	/**
+	 * Display back-office UI
+	 *
+	 * @param array Parameters: 'ctrl', 'action', 'tab'
+	 */
+	function display_backoffice_UI( $params = array() )
 	{
 	}
 }

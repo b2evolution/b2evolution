@@ -1308,16 +1308,32 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL, $gl
 		debug_die( 'Active user not found.' );
 	}
 
-	if( in_array( $user_tab, array( 'marketing', 'advanced', 'admin', 'sessions', 'activity' ) ) )
+	$backoffice_user_tabs = array( 'marketing', 'advanced', 'admin', 'sessions', 'activity' );
+	$frontoffice_user_tabs = array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits', 'report' );
+
+	// Check allowed user tabs from modules:
+	$modules_allowed_user_tabs = modules_call_method( 'get_allowed_user_tabs' );
+	if( is_array( $modules_allowed_user_tabs ) )
 	{
-		$is_admin_tab = true;
-	}
-	else
-	{
-		$is_admin_tab = false;
+		foreach( $modules_allowed_user_tabs as $module_allowed_user_tabs )
+		{
+			if( isset( $module_allowed_user_tabs[ $user_tab ] ) )
+			{	// We found the user tab is allowed:
+				if( $module_allowed_user_tabs[ $user_tab ] == 'backoffice' )
+				{	// for back-office:
+					$backoffice_user_tabs[] = $user_tab;
+				}
+				elseif( $module_allowed_user_tabs[ $user_tab ] == 'frontoffice' )
+				{	// for front-office:
+					$frontoffice_user_tabs[] = $user_tab;
+				}
+			}
+		}
 	}
 
-	if( ( !$is_admin_tab ) && ( ! in_array( $user_tab, array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits', 'report' ) ) ) )
+	$is_admin_tab = in_array( $user_tab, $backoffice_user_tabs );
+
+	if( ! $is_admin_tab && ! in_array( $user_tab, $frontoffice_user_tabs ) )
 	{
 		debug_die( 'Not supported user tab!' );
 	}
@@ -2675,6 +2691,21 @@ function get_user_sub_entries( $is_admin, $user_ID )
 				$users_sub_entries['activity'] = array(
 									'text' => $current_User->ID == $user_ID ? T_('My Activity') : T_('User Activity'),
 									'href' => url_add_param( $base_url, 'ctrl=user&amp;user_tab=activity'.$user_param ) );
+			}
+		}
+
+		// Additional user menus from modules:
+		$modules_user_menus = modules_call_method( 'build_user_menu', array(
+				'user_ID'       => $user_ID,
+				'page_url'      => $base_url,
+				'url_params'    => $user_param,
+				'is_admin_page' => $is_admin,
+			) );
+		if( is_array( $modules_user_menus ) )
+		{
+			foreach( $modules_user_menus as $module_user_menus )
+			{
+				$users_sub_entries = array_merge( $users_sub_entries, $module_user_menus );
 			}
 		}
 	}
