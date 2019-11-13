@@ -21,7 +21,7 @@ $app_version = '7.0.2-beta';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2019-11-12';
+$app_date = '2019-11-13';
 
 /**
  * Is this b2evolution PRO?
@@ -92,7 +92,6 @@ $modules = array(
 		'messaging',
 		'maintenance',
 		// 'central_antispam',		// will also require $enable_blacklist_server_API = true;
-		'export',
 		'menus',
 	);
 ?>
