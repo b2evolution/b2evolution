@@ -977,10 +977,11 @@ function get_hit_agent_name_by_ID( $agent_ID )
 /**
  * Extract keyphrases from the hitlog
  *
+ * @param boolean|string TRUE to print out messages, 'cron_job' - to log messages for cron job
  * @return integer Number of new inserted key phrases,
  *         string Error message if the process is already running and not allowed to run
  */
-function extract_keyphrase_from_hitlogs()
+function extract_keyphrase_from_hitlogs( $display_messages = true )
 {
 	global $DB, $Messages;
 
@@ -1000,6 +1001,25 @@ function extract_keyphrase_from_hitlogs()
 
 	// Get lock with a 20 seconds timeout
 	$DB->get_var( 'SELECT GET_LOCK( '.$DB->quote( $lock_name ).', 20 )' );
+
+	if( $display_messages )
+	{	// Display info:
+		$SQL = new SQL( 'Get number of hitlog records that have a keyphrase that was not processed yet' );
+		$SQL->SELECT( 'COUNT( hit_ID )' );
+		$SQL->FROM( 'T_hitlog' );
+		$SQL->WHERE( 'hit_keyphrase IS NOT NULL' );
+		$SQL->WHERE_and( 'hit_keyphrase_keyp_ID IS NULL' );
+		$log_message = sprintf( T_('Number of hitlog records that have a keyphrase that was not processed yet: %d'), intval( $DB->get_var( $SQL ) ) );
+		if( $display_messages === 'cron_job' )
+		{	// Log a message for cron job:
+			cron_log_append( $log_message );
+		}
+		else
+		{	// Print out a message:
+			echo '<p>'.$log_message.'</p>';
+			evo_flush();
+		}
+	}
 
 	// Look for unextracted keyphrases:
 	$sql = 'SELECT MIN(h.hit_ID) as min, MAX(h.hit_ID) as max
@@ -1035,6 +1055,35 @@ function extract_keyphrase_from_hitlogs()
 				T_track__keyphrase.keyp_count_internal_searches = T_track__keyphrase.keyp_count_internal_searches + 1';
 		$inserted_keyphrases_num += $DB->query( $sql, 'Insert/Update internal keyphrase' );
 
+		if( $display_messages )
+		{	// Display info:
+			$log_message = sprintf( T_('%d key phrases have been inserted or updated.'), $inserted_keyphrases_num );
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message );
+			}
+			else
+			{	// Print out a message:
+				echo '<p>'.$log_message.'</p>';
+				evo_flush();
+			}
+		}
+
+		if( $display_messages )
+		{	// Display info:
+			$log_message = T_('Updating hit logs table...');
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message, NULL, '' );
+			}
+			else
+			{	// Print out a message:
+				echo '<p>'.$log_message;
+				evo_flush();
+			}
+		}
+		global $Timer;
+		$Timer->start( 'hit_keyphrase_keyp_ID' );
 		$sql = 'UPDATE T_hitlog as h, T_track__keyphrase as k
 				SET h.hit_keyphrase_keyp_ID = k.keyp_ID
 				WHERE
@@ -1042,7 +1091,21 @@ function extract_keyphrase_from_hitlogs()
 					AND ( h.hit_ID >= '.$ids['min'].' )
 					AND ( h.hit_ID <= '.$ids['max'].' )
 					AND ( h.hit_keyphrase_keyp_ID IS NULL )';
-		$DB->query( $sql, 'Update hitlogs keyphrase id' );
+		$updated_keyphrases_num = $DB->query( $sql, 'Update hitlogs keyphrase id' );
+		$Timer->stop( 'hit_keyphrase_keyp_ID' );
+		if( $display_messages )
+		{	// Display info:
+			$log_message = sprintf( T_('Done (%d records; %s seconds)'), $updated_keyphrases_num, $Timer->get_duration( 'hit_keyphrase_keyp_ID' ) );
+			if( $display_messages === 'cron_job' )
+			{	// Log a message for cron job:
+				cron_log_append( $log_message );
+			}
+			else
+			{	// Print out a message:
+				echo $log_message.'</p>';
+				evo_flush();
+			}
+		}
 	}
 
 	$DB->get_var( 'SELECT RELEASE_LOCK( '.$DB->quote( $lock_name ).' )' );
