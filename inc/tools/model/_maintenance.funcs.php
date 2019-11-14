@@ -626,7 +626,7 @@ function dbm_delete_orphan_files( $delete_orphan_files, $delete_orphan_linked_fi
 			}
 			else
 			{	// File doesn't exist on the disk:
-				echo '<span class="label label-danger">'.T_('MISSING').'</span>';
+				echo '<span class="label '.( empty( $file_data['links_num'] ) ? 'label-warning' : 'label-danger' ).'">'.T_('MISSING').'</span>';
 				echo ' - ('.sprintf( T_('linked %s times'), '<b>'.$file_data['links_num'].'</b>' ).')';
 				if( empty( $file_data['links_num'] ) )
 				{	// Count number of missing files without links:
@@ -696,8 +696,8 @@ function dbm_delete_orphan_files( $delete_orphan_files, $delete_orphan_linked_fi
 	echo '<p>'.T_('Summary').':';
 		echo '<ul>';
 			echo '<li>'.sprintf( T_('%s valid Files'), '<b class="text-success">'.$num_valid_files.'</b>' ).'</li>';
-			echo '<li>'.sprintf( T_('%s missing File with no links'), '<b class="text-warning">'.$num_missing_no_linked_files.'</b>' ).'</li>';
-			echo '<li>'.sprintf( T_('%s missing File with links (total number of Links: %s)'), '<b class="text-danger">'.$num_missing_linked_files.'</b>', '<b class="text-danger">'.$num_total_links.'</b>' ).'</li>';
+			echo '<li>'.( $delete_orphan_files && $num_missing_no_linked_files ? '<b>'.T_('DELETED').': </b>' : '' ).sprintf( T_('%s missing File with no links'), '<b class="text-warning">'.$num_missing_no_linked_files.'</b>' ).'</li>';
+			echo '<li>'.( $delete_orphan_linked_files && $num_missing_linked_files ? '<b>'.T_('DELETED').': </b>' : '' ).sprintf( T_('%s missing File with links (total number of Links: %s)'), '<b class="text-danger">'.$num_missing_linked_files.'</b>', '<b class="text-danger">'.$num_total_links.'</b>' ).'</li>';
 			echo '<li>'.sprintf( T_('Total number of File objects: %s'), '<b>'.$num_total_files.'</b>' ).'</li>';
 		echo '</ul>';
 	echo '</p>';
