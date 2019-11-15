@@ -1591,15 +1591,22 @@ class MarkdownImport
 			echo ',<ul class="list-default" style="margin-bottom:0">';
 			foreach( $this->yaml_messages as $yaml_message )
 			{
-				if( $yaml_message[1] == 'error' )
-				{	// Error message:
-					$label = '<span class="label label-danger">'.T_('ERROR').'</span> ';
-					$class = 'text-danger';
-				}
-				else
-				{	// Normal message:
-					$label = '';
-					$class = '';
+				switch( $yaml_message[1] )
+				{
+					case 'error':
+						// Error message:
+						$label = '<span class="label label-danger">'.T_('ERROR').'</span> ';
+						$class = 'text-danger';
+						break;
+					case 'warning':
+						// Warning message:
+						$label = '<span class="label label-warning">'.T_('WARNING').'</span> ';
+						$class = 'text-warning';
+						break;
+					default:
+						// Normal message:
+						$label = '';
+						$class = '';
 				}
 				// Print message:
 				echo '<li'.( empty( $class ) ? '' : ' class="'.$class.'"' ).'>'.$label.$yaml_message[0].'</li>';
@@ -1691,6 +1698,7 @@ class MarkdownImport
 	{
 		if( ! $this->check_yaml_array( 'tags', $value, true ) )
 		{	// Skip wrong data:
+			// Don't print error messages here because all messages are initialized inside $this->check_yaml_array().
 			return;
 		}
 
@@ -1719,6 +1727,7 @@ class MarkdownImport
 	{
 		if( ! $this->check_yaml_array( 'extra-cats', $value ) )
 		{	// Skip wrong data:
+			// Don't print error messages here because all messages are initialized inside $this->check_yaml_array().
 			return;
 		}
 
@@ -1743,24 +1752,31 @@ class MarkdownImport
 	 * Check YAML data array
 	 * 
 	 * @param string YALM field name
-	 * @param array|string Value
+	 * @param array|string YALM field value
 	 * @param boolean TRUE to allow string for the YAML field
 	 * @return boolean TRUE - correct data, FALSE - wrong data
 	 */
-	function check_yaml_array( $field_name, $array, $allow_string_format = false )
+	function check_yaml_array( $field_name, $field_value, $allow_string_format = false )
 	{
-		if( $allow_string_format && is_string( $array ) )
+		if( ( $allow_string_format && $field_value === '' ) ||
+		    ( $field_value === array() ) )
+		{	// Skip empty yaml field:
+			$this->add_yaml_message( sprintf( T_('Skip yaml field %s, because it was specified without content.'), '<code>'.$field_name.'</code>' ), 'warning' );
+			return false;
+		}
+
+		if( $allow_string_format && is_string( $field_value ) )
 		{	// Don't check array if the YAML field is allowed to be a string:
 			return true;
 		}
 
-		if( ! is_array( $array ) )
+		if( ! is_array( $field_value ) )
 		{	// Wrong not array data:
 			$this->add_yaml_message( sprintf( T_('Skip yaml field %s, because it must be an array.'), '<code>'.$field_name.'</code>' ) );
 			return false;
 		}
 
-		foreach( $array as $string )
+		foreach( $field_value as $string )
 		{
 			if( is_array( $string ) )
 			{	// Skip wrong indented data:
