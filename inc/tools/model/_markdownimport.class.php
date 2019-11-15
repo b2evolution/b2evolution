@@ -1696,13 +1696,13 @@ class MarkdownImport
 	 */
 	function set_yaml_tags( $value, & $Item )
 	{
-		if( ! $this->check_yaml_array( 'tags', $value, true ) )
+		if( ! $this->check_yaml_array( 'tags', $value, true, true ) )
 		{	// Skip wrong data:
 			// Don't print error messages here because all messages are initialized inside $this->check_yaml_array().
 			return;
 		}
 
-		if( empty( $value ) )
+		if( $value === '' ||  $value === array() )
 		{	// Clear tags:
 			$Item->set_tags_from_string( '' );
 		}
@@ -1754,15 +1754,19 @@ class MarkdownImport
 	 * @param string YALM field name
 	 * @param array|string YALM field value
 	 * @param boolean TRUE to allow string for the YAML field
+	 * @param boolean TRUE to allow empty value for the YAML field
 	 * @return boolean TRUE - correct data, FALSE - wrong data
 	 */
-	function check_yaml_array( $field_name, $field_value, $allow_string_format = false )
+	function check_yaml_array( $field_name, $field_value, $allow_string_format = false, $allow_empty = false )
 	{
-		if( ( $allow_string_format && $field_value === '' ) ||
-		    ( $field_value === array() ) )
-		{	// Skip empty yaml field:
-			$this->add_yaml_message( sprintf( T_('Skip yaml field %s, because it was specified without content.'), '<code>'.$field_name.'</code>' ), 'warning' );
-			return false;
+		if( ! $allow_empty )
+		{	// Check for not empty value:
+			if( ( $allow_string_format && $field_value === '' ) ||
+					( $field_value === array() ) )
+			{	// Skip empty yaml field:
+				$this->add_yaml_message( sprintf( T_('Skip yaml field %s, because it was specified without content.'), '<code>'.$field_name.'</code>' ), 'warning' );
+				return false;
+			}
 		}
 
 		if( $allow_string_format && is_string( $field_value ) )
