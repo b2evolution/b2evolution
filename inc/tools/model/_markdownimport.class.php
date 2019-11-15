@@ -1764,7 +1764,7 @@ class MarkdownImport
 			if( ( $allow_string_format && $field_value === '' ) ||
 					( $field_value === array() ) )
 			{	// Skip empty yaml field:
-				$this->add_yaml_message( sprintf( T_('Skip yaml field %s, because it was specified without content.'), '<code>'.$field_name.'</code>' ), 'warning' );
+				$this->add_yaml_message( sprintf( T_('Skipping YAML field %s, because it is empty.'), '<code>'.$field_name.'</code>' ), 'warning' );
 				return false;
 			}
 		}
@@ -1776,7 +1776,7 @@ class MarkdownImport
 
 		if( ! is_array( $field_value ) )
 		{	// Wrong not array data:
-			$this->add_yaml_message( sprintf( T_('Skip yaml field %s, because it must be an array.'), '<code>'.$field_name.'</code>' ) );
+			$this->add_yaml_message( sprintf( T_('Skipping YAML field %s, because it is not an array.'), '<code>'.$field_name.'</code>' ) );
 			return false;
 		}
 
@@ -1784,7 +1784,7 @@ class MarkdownImport
 		{
 			if( is_array( $string ) )
 			{	// Skip wrong indented data:
-				$this->add_yaml_message( sprintf( T_('Skip yaml field %s, because it is wrongly indented.'), '<code>'.$field_name.'</code>' ) );
+				$this->add_yaml_message( sprintf( T_('Skipping YAML field %s, because it is wrongly indented.'), '<code>'.$field_name.'</code>' ) );
 				return false;
 			}
 		}
