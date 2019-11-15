@@ -691,8 +691,9 @@ class MarkdownImport
 			$item_slug = $file_match[1];
 
 			// Extract title from content:
-			$md_file_content = file_get_contents( $file_path );
-			$item_content = trim( $md_file_content );
+			$this->item_file_is_updated = false;
+			$this->item_file_content = file_get_contents( $file_path );
+			$item_content = trim( $this->item_file_content );
 			$item_content_hash = md5( $item_content );
 			if( preg_match( '~^(---[\r\n]+(.+?)[\r\n]+---[\r\n]*)?(#+\s*(.+?)\s*#*\s*([\r\n]+|$))?(.*)$~s', $item_content, $content_match ) )
 			{
@@ -792,8 +793,6 @@ class MarkdownImport
 				// NOTE: Do this even when last import hash is different because below we may update content on import images:
 				$this->link_messages = array();
 				$this->current_item_locale = $Item->get( 'locale' );
-				// Allow to update md file only in folder and not in ZIP archive:
-				$this->update_md_file_links = array();
 				// Do convert:
 				$item_content = preg_replace_callback( '#(^|[^\!])\[([^\[\]]*)\]\(((([a-z]*://)?([^\)]+[/\\\\])?([^\)]+?)(\.[a-z]{2,4})?)(\#[^\)]+)?)?\)#i', array( $this, 'callback_convert_links' ), $item_content );
 				foreach( $this->link_messages as $link_message )
@@ -976,28 +975,6 @@ class MarkdownImport
 							break;
 					}
 				}
-				if( ! empty( $this->update_md_file_links ) )
-				{	// Update file to use new replaced links to posts with proper locale:
-					if( ( $md_file_handle = @fopen( $file_path, 'w' ) ) &&
-					    fwrite( $md_file_handle, str_replace( array_column( $this->update_md_file_links, 'old' ), array_column( $this->update_md_file_links, 'new' ), $md_file_content ) ) )
-					{	// Inform about updated file content:
-						echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
-							.sprintf( 'We modified the file %s accordingly.',
-								'<code>'.$item_slug.'.md</code>'
-							).'</li>';
-						if( $md_file_handle )
-						{	// Close file handle:
-							fclose( $md_file_handle );
-						}
-					}
-					else
-					{	// No file rights to write into the file:
-						echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '
-							.sprintf( 'Impossible to update file %s for links with match language, please check file permissions.',
-								'<code>'.$file_path.'</code>'
-							).'</li>';
-					}
-				}
 				echo '</ul>';
 			}
 
@@ -1070,6 +1047,31 @@ class MarkdownImport
 					echo '</ul>';
 					$files_imported = true;
 				}
+			}
+
+			if( ! empty( $this->item_file_is_updated ) )
+			{	// Update item's file with fixed content:
+				echo '<ul class="list-default" style="margin-bottom:0">';
+				if( ( $md_file_handle = @fopen( $file_path, 'w' ) ) &&
+						fwrite( $md_file_handle, $this->item_file_content ) )
+				{	// Inform about updated file content:
+					echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
+						.sprintf( 'We modified the file %s accordingly.',
+							'<code>'.$item_slug.'.md</code>'
+						).'</li>';
+					if( $md_file_handle )
+					{	// Close file handle:
+						fclose( $md_file_handle );
+					}
+				}
+				else
+				{	// No file rights to write into the file:
+					echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '
+						.sprintf( 'Impossible to update file %s with fixed content, please check file permissions.',
+							'<code>'.$file_path.'</code>'
+						).'</li>';
+				}
+				echo '</ul>';
 			}
 
 			if( ! $files_imported && ! $this->has_yaml_messages() && empty( $this->link_messages ) )
@@ -1519,11 +1521,9 @@ class MarkdownImport
 								'tag'  => $m[0],
 							);
 							if( $this->get_option( 'same_lang_update_file' ) )
-							{	// Update md file with new replaced slugs:
-								$this->update_md_file_links[] = array(
-									'old' => $m[0],
-									'new' => str_replace( $m[7].'.md', $version_Item->get( 'urltitle' ).'.md', $m[0] )
-								);
+							{	// Update md file with new replaced links:
+								$updated_link = str_replace( $m[7].'.md', $version_Item->get( 'urltitle' ).'.md', $m[0] );
+								$this->set_item_file_content( str_replace( $m[0], $updated_link, $this->item_file_content ) );
 							}
 						}
 					}
@@ -1800,6 +1800,20 @@ class MarkdownImport
 	 */
 	function event_after_import()
 	{
+	}
+
+
+	/**
+	 * Set new content for item *.md file
+	 */
+	function set_item_file_content( $new_content )
+	{
+		if( $this->item_file_content != $new_content )
+		{	// Update item content only when content is really changed:
+			$this->item_file_content = $new_content;
+			// Set flag to know the item content was updated:
+			$this->item_file_is_updated = true;
+		}
 	}
 }
 ?>
