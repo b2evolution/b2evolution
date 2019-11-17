@@ -1056,7 +1056,7 @@ class MarkdownImport
 						fwrite( $md_file_handle, $this->item_file_content ) )
 				{	// Inform about updated file content:
 					echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
-						.sprintf( 'We modified the file %s accordingly.',
+						.sprintf( 'The file %s was updated on disk (import folder).',
 							'<code>'.$item_slug.'.md</code>'
 						).'</li>';
 					if( $md_file_handle )
