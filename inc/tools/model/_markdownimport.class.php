@@ -94,7 +94,7 @@ class MarkdownImport
 			),
 			'same_lang_update_file' => array(
 				'group'   => 'options',
-				'title'   => T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git). This requires using a directory to import, not a ZIP file.'),
+				'title'   => T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git).').' <span class="note">'.T_('This requires using a directory to import, not a ZIP file.').'</span>',
 				'type'    => 'integer',
 				'default' => 1,
 				'indent'  => 3,
@@ -1157,7 +1157,7 @@ class MarkdownImport
 
 		if( strpos( get_canonical_path( $file_source_path ), $source_folder_absolute_path ) !== 0 )
 		{	// Don't allow a traversal directory:
-			echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Skip file %s, because path is invalid.', '<code>'.$requested_file_relative_path.'</code>' ).'</li>';
+			echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Skipping file %s, because path is invalid.', '<code>'.$requested_file_relative_path.'</code>' ).'</li>';
 			evo_flush();
 			// Skip it:
 			return false;
@@ -1740,7 +1740,7 @@ class MarkdownImport
 			}
 			else
 			{	// Display error on not existing category:
-				$this->add_yaml_message( sprintf( T_('Skip extra category %s, because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>' ) );
+				$this->add_yaml_message( sprintf( T_('Skiping extra category %s, because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>' ) );
 			}
 		}
 
