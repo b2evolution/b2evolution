@@ -150,7 +150,7 @@ if( $Session->get( 'customizer_mode_'.$Blog->ID ) && $redir != 'no' )
 
 // Init $disp
 $default_disp = '-'; // '-' means we have no explicit disp request yet... this may change with extraptah info or by detecting front page later
-param( 'disp', '/^[a-z0-9\-_]+$/', $default_disp, 'auto' );
+param( 'disp', '/^[a-z0-9\-_]+$/', $default_disp, true/* 'auto' does not work yet, e-g homepage /collname/?paged=2 redirect to /collname/ */ );
 $disp_detail = '';
 $is_front = false;	// So far we have not detected that we are displaying the front page
 
