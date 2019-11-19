@@ -44,7 +44,11 @@ class MarkdownImport
 				'options' => array(
 					'update'  => array( 'title' => T_('Update existing contents'), 'note' => T_('Existing Categories & Posts will be re-used (based on slug).') ),
 					'append'  => array( 'title' => T_('Append to existing contents') ),
-					'replace' => array( 'title' => T_('Replace existing contents'), 'note' => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.') ),
+					'replace' => array(
+							'title'  => T_('DELETE & replace ALL contents'),
+							'note'   => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.'),
+							'suffix' => '<div id="import_type_replace_confirm_block" class="alert alert-danger" style="display:none;margin:0">'.T_('WARNING').': '.T_('you will LOSE any data that is not part of the files you import.').' '.sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).': <input name="import_type_replace_confirm" type="text" class="form-control" size="8" style="margin:-8px 0" /></div>',
+						),
 				),
 				'type'    => 'string',
 				'default' => 'update',
@@ -319,6 +323,12 @@ class MarkdownImport
 		foreach( $this->options_defs as $option_key => $option )
 		{
 			$this->set_option( $option_key, param( $option_key, $option['type'], ( $option['type'] == 'integer' ? 0 : $option['default'] ) ) );
+		}
+
+		if( $this->get_option( 'import_type' ) == 'replace' &&
+		    param( 'import_type_replace_confirm', 'string' ) !== 'DELETE' )
+		{	// If deleting/replacing is not confirmed:
+			param_error( 'import_type_replace_confirm', sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).'!' );
 		}
 
 		return ! param_errors_detected();

@@ -59,6 +59,7 @@ if( ! empty( $import_files ) )
 					'value' => $option_value,
 					'label' => $option['title'],
 					'note'  => isset( $option['note'] ) ? $option['note'] : '',
+					'suffix'=> isset( $option['suffix'] ) ? $option['suffix'] : '',
 					'id'    => 'import_type_'.$option_value ),
 			), ( $i == 0 ? $MarkdownImport->options_defs['import_type']['title'] : '' ), array( 'lines' => true ) );
 		foreach( $MarkdownImport->options_defs as $sub_option_key => $sub_option )
@@ -106,9 +107,20 @@ if( ! empty( $import_files ) )
 $Form->end_form();
 ?>
 <script>
-jQuery( 'input[name=import_type]' ).click( function()
-{	// Show/Hide checkbox to delete files:
-	jQuery( '#checkbox_delete_files' ).toggle( jQuery( this ).val() == 'replace' );
-	jQuery( '#checkbox_reuse_cats' ).toggle( jQuery( this ).val() == 'append' );
-} );
+function evo_md_import_update_mode_visibility()
+{	// Show/Hide additional options for import mode:
+	var mode = jQuery( 'input[name=import_type]:checked' ).val();
+	jQuery( '#checkbox_delete_files' ).toggle( mode == 'replace' );
+	jQuery( '#checkbox_reuse_cats' ).toggle( mode == 'append' );
+	if( mode == 'replace' )
+	{
+		jQuery( '#import_type_replace_confirm_block' ).css( 'display', 'inline-block' );
+	}
+	else
+	{
+		jQuery( '#import_type_replace_confirm_block' ).hide();
+	}
+}
+jQuery( 'input[name=import_type]' ).click( evo_md_import_update_mode_visibility );
+jQuery( document ).ready( evo_md_import_update_mode_visibility );
 </script>
