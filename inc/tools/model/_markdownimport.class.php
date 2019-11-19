@@ -695,8 +695,8 @@ class MarkdownImport
 
 			// Extract title from content:
 			$this->item_file_is_updated = false;
-			$this->item_file_content = file_get_contents( $file_path );
-			$item_content = trim( $this->item_file_content );
+			$item_content = trim( file_get_contents( $file_path ) );
+			$this->item_file_content = $item_content;
 			$item_content_hash = md5( $item_content );
 			if( preg_match( '~^(---[\r\n]+(.+?)[\r\n]+---[\r\n]*)?(#+\s*(.+?)\s*#*\s*([\r\n]+|$))?(.*)$~s', $item_content, $content_match ) )
 			{
@@ -880,7 +880,7 @@ class MarkdownImport
 					$item_result_messages[] = /* TRANS: Result of imported Item */ T_('No change');
 				}
 				elseif( 
-					// This is UPDATE 1 of 2 (there is a 2nd UPDATE for [image:] tags. These tags cannot be created before the Item ID is known.):
+					// This is UPDATE 1 of 3 (there is a 2nd UPDATE for [image:] tags. These tags cannot be created before the Item ID is known.):
 					$Item->dbupdate( true, true, true, 
 						$this->get_option( 'force_item_update' ) || $item_content_was_changed/* Force to create new revision only when file hash(title+content) was changed after last import or when update is forced */ ) )      
 	// TODO: fp>yb: please give example of situation where we want to NOT create a new revision ? (I think we ALWAYS want to create a new revision)				
@@ -1047,8 +1047,8 @@ class MarkdownImport
 							$Plugins_admin->filter_contents( $item_title /* by ref */, $updated_item_content /* by ref */, $Item->get_renderers_validated(), $item_plugin_params /* by ref */ );
 						}
 						$Item->set( 'content', $updated_item_content );
-						// This is UPDATE 2 of 2 . It is only for [image:] tags.
-						$Item->dbupdate( true, true, true, 'no'/* Force to do NOT create new revision because we do this above when store new content */ );      
+						// This is UPDATE 2 of 3 . It is only for [image:] tags.
+						$Item->dbupdate( true, true, true, 'no'/* Force to do NOT create new revision because we do this above when store new content */ );
 					}
 
 					echo '</ul>';
@@ -1060,16 +1060,18 @@ class MarkdownImport
 			{	// Update item's file with fixed content:
 				echo '<ul class="list-default" style="margin-bottom:0">';
 				if( ( $md_file_handle = @fopen( $file_path, 'w' ) ) &&
-						fwrite( $md_file_handle, $this->item_file_content ) )
+				    fwrite( $md_file_handle, $this->item_file_content ) )
 				{	// Inform about updated file content:
 					echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
 						.sprintf( 'The file %s was updated on disk (import folder).',
 							'<code>'.$item_slug.'.md</code>'
 						).'</li>';
-					if( $md_file_handle )
-					{	// Close file handle:
-						fclose( $md_file_handle );
-					}
+					// Close file handle:
+					fclose( $md_file_handle );
+					// Update file hash after changing of the file's content in order to don't update the Item twice on next import:
+					$Item->set_setting( 'last_import_hash', md5( $this->item_file_content ) );
+					// This is UPDATE 3 of 3 . It is only changed YAML data.
+					$Item->dbupdate( true, true, true, 'no'/* Force to do NOT create new revision because we do this above when store new content */ );
 				}
 				else
 				{	// No file rights to write into the file:
