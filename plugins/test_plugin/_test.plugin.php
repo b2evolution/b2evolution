@@ -492,12 +492,14 @@ class test_plugin extends Plugin
 	 */
 	function GetDbLayout()
 	{
+		global $DB;
+
 		return array(
 				'CREATE TABLE '.$this->get_sql_table( 'test_table_name' ).' (
 					test_ID   INT UNSIGNED NOT NULL AUTO_INCREMENT,
-					test_name VARCHAR( 255 ) NOT NULL,
+					test_name VARCHAR( 255 ) COLLATE utf8mb4_unicode_ci NOT NULL,
 					PRIMARY KEY( test_ID )
-				) ENGINE = innodb DEFAULT CHARSET = utf8'
+				) ENGINE = innodb DEFAULT CHARSET = '.$DB->connection_charset
 			);
 	}
 
