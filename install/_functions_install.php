@@ -158,6 +158,7 @@ function display_base_config_recap( $display_system_check = false )
 				'section_start'       => '<div class="panel-heading">#section_title#</div>'."\n".'<div class="panel-body">'."\n",
 				'section_end'         => '</div>'."\n",
 				'section_b2evo_title' => T_('System check'),
+				'check_version'       => false,
 			) );
 		echo '</div>'."\n\n";
 	}

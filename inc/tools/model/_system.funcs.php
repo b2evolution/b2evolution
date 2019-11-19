@@ -676,14 +676,44 @@ function display_system_check( $params )
 		$baseurl, $htsrv_url, $host,
 		$media_path, $basepath, $install_subdir, $cache_path,
 		$DB, $required_mysql_version, $required_php_version,
-		$global_Cache;
+		$Messages, $global_Cache;
 
 	$params = array_merge( array(
 			'mode'                => 'backoffice', // 'backoffice' or 'install'
 			'section_start'       => '',
 			'section_end'         => '',
 			'section_b2evo_title' => 'b2evolution'.get_manual_link( 'system-status-tab' ),
+			'check_version'       => true,
 		), $params );
+
+	// Note: hopefully, the update swill have been downloaded in the shutdown function of a previous page (including the login screen)
+	// However if we have outdated info, we will load updates here.
+	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+
+	// Let's clear any remaining messages that should already have been displayed before:
+	$Messages->clear();
+
+	if( $params['check_version'] && b2evonet_get_updates( true ) !== NULL )
+	{	// Updates are allowed, display them:
+
+		// Display info & error messages
+		$Messages->display();
+
+		$version_status_msg = $global_Cache->getx( 'version_status_msg' );
+		if( ! empty( $version_status_msg ) )
+		{	// We have managed to get updates (right now or in the past):
+			$msg = '<p>'.$version_status_msg.'</p>';
+			$extra_msg = $global_Cache->getx( 'extra_msg' );
+			if( ! empty( $extra_msg ) )
+			{
+				$msg .= '<p>'.$extra_msg.'</p>';
+			}
+		}
+	}
+	else
+	{
+		$msg = '';
+	}
 
 	// Get system stats to display:
 	$system_stats = get_system_stats();
@@ -700,8 +730,13 @@ function display_system_check( $params )
 	// Version:
 	$app_timestamp = mysql2timestamp( $app_date );
 	init_system_check( T_( 'b2evolution version' ), sprintf( /* TRANS: First %s: App version, second %s: release date */ T_( '%s released on %s' ), $app_version, date_i18n( locale_datefmt(), $app_timestamp ) ) );
-	if( ! empty($msg) )
-	{
+	if( ! $params['check_version'] )
+	{	// Version was not checked above,
+		// e.g. this is impossible to do from install page where some global vars like $Settings, $global_Cache cannot be initialized:
+		disp_system_check( 'note' );
+	}
+	elseif( ! empty( $msg ) )
+	{	// Display status of checked version:
 		switch( $global_Cache->getx( 'version_status_color' ) )
 		{
 			case 'green':
@@ -717,7 +752,7 @@ function display_system_check( $params )
 		}
 	}
 	else
-	{
+	{	// Display error when no access to check version:
 		$msg = '<p>Updates from b2evolution.net are disabled!</p>
 				<p>You will <b>NOT</b> be alerted if you are running an insecure configuration.</p>';
 

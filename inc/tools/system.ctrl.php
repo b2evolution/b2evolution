@@ -51,40 +51,6 @@ $change_ini = '<p>'.T_('If possible, change this setting to <code>%s</code> in y
 
 echo '<h2 class="page-title">'.T_('System status').'</h2>';
 
-// Note: hopefully, the update swill have been downloaded in the shutdown function of a previous page (including the login screen)
-// However if we have outdated info, we will load updates here.
-load_funcs( 'dashboard/model/_dashboard.funcs.php' );
-// Let's clear any remaining messages that should already have been displayed before...
-$Messages->clear();
-
-if( b2evonet_get_updates( true ) !== NULL )
-{	// Updates are allowed, display them:
-
-	// Display info & error messages
-	$Messages->display();
-
-	/**
-	 * @var AbstractSettings
-	 */
-	global $global_Cache;
-	$version_status_msg = $global_Cache->getx( 'version_status_msg' );
-	if( !empty($version_status_msg) )
-	{	// We have managed to get updates (right now or in the past):
-		$msg = '<p>'.$version_status_msg.'</p>';
-		$extra_msg = $global_Cache->getx( 'extra_msg' );
-		if( !empty($extra_msg) )
-		{
-			$msg .= '<p>'.$extra_msg.'</p>';
-		}
-	}
-
-}
-else
-{
-	$msg = '';
-}
-
-
 $block_item_Widget = new Widget( 'block_item' );
 $block_item_Widget->title = '#section_title#';
 
