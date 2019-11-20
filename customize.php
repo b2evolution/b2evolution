@@ -109,7 +109,7 @@ if( isset( $Blog->orig_access_type, $Blog->orig_siteurl ) )
 	$orig_coll_url = $Blog->gen_blogurl( 'original' );
 
 	// Use forced collection URL with same domain in order to avoid restriction of frame origin:
-	$customizing_url = url_add_param( $forced_coll_url, preg_replace( '#^'.preg_quote( $orig_coll_url ).'[/\?]?#', '', $customizing_url ) );
+	$customizing_url = $forced_coll_url.preg_replace( '#^'.preg_quote( $orig_coll_url ).'/?#', '', $customizing_url );
 }
 
 load_funcs( 'skins/_skin.funcs.php' );
