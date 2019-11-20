@@ -976,6 +976,10 @@ class ItemListLight extends DataObjectList2
 				'status_text'         => T_('Status').': ',
 				'statuses_text'       => T_('Statuses').': ',
 
+				'display_type'        => true,
+				'type_text'           => T_('Item Type').': ',
+				'types_text'          => T_('Item Types').': ',
+
 				'display_archive'     => true,
 				'archives_text'       => T_('Archives for').': ',
 
@@ -1390,6 +1394,38 @@ class ItemListLight extends DataObjectList2
 							array( $params['visibility_text'], implode( $params['separator_comma'], $status_titles ) ) ),
 						$params['group_mask'] );
 				}
+			}
+		}
+
+		// ITEM TYPE:
+		if( $params['display_type'] )
+		{
+			$item_type_IDs = $this->filters['types'];
+
+			if( !empty( $item_type_IDs ) )
+			{	// We want to show some category names:
+				$item_type_IDs = explode(',', $this->filters['types']);
+				$type_names = array();
+				$ItemTypeCache = & get_ItemTypeCache();
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				foreach( $item_type_IDs as $item_type_ID )
+				{
+					if( ( $tmp_ItemType = & $ItemTypeCache->get_by_ID( $item_type_ID, false, false ) ) !== false )
+					{
+						$type_clear_url = regenerate_url( $this->param_prefix.'types='.$item_type_ID );
+						$type_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', $type_clear_url ) : '';
+						$type_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+							array( $params['type_text'], $tmp_ItemType->name, $type_clear_icon, $filter_classes[ $filter_class_i ] ),
+							$params['filter_mask'] );
+					}
+				}
+				$filter_class_i++;
+				$type_name_string = implode( $params['separator_and'], $type_names );
+				$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+					( count( $type_names ) > 1 ?
+						array( $params['types_text'], $params['before_items'].$tags.$params['after_items'] ) :
+						array( $params['type_text'], $type_name_string ) ),
+					$params['group_mask'] );
 			}
 		}
 

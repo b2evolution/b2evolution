@@ -303,14 +303,9 @@ div.delete_messages ul label {
 .evo_content_summary .evo_post .bText {
   padding-left: 420px;
 }
-.evo_sidebar_filters fieldset {
-  margin-bottom: 20px;
-}
-.evo_sidebar_filters fieldset legend {
-  margin-bottom: 10px;
-}
-.evo_sidebar_filters .pull-right[type=submit] {
-  margin: -3px 0 0 0;
+.evo_sidebar_filters .filter_buttons {
+  margin-bottom: 5px;
+  text-align: right;
 }
 .evo_sidebar_filters .rating input[name$=_rating_limit] {
   margin-right: 10px;
