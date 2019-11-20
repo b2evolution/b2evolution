@@ -519,14 +519,18 @@ jQuery( '[name=edit_skin_<?php echo $this->ID; ?>_set_primary_area]' ).click( fu
 					// NOTE: This cannot be updated from customizer mode:
 					'value' => ( ( intval( $this->get_setting( $screen_key.'_title_font_size' ) ) + intval( $this->get_setting( $screen_key.'_text_font_size' ) ) ) / 2 ).'px',
 			) );
-			// Tab text height:
-			$this->dynamic_style_rule( $screen_key.'_tab_text_height', '.tbhs_item_content { height: $setting_value$px; }', array(
-					'check' => 'not_empty'
-			) );
-			// Static text height:
-			$this->dynamic_style_rule( $screen_key.'_static_text_height', '.evo_container__front_page_main_area { height: $setting_value$px; }', array(
-					'check' => 'not_empty'
-			) );
+			if( $this->get_setting( 'primary_area' ) == 'below_tab_text' )
+			{	// Use the settings only when Primary Area is displayed at static position below tab text:
+
+				// Tab text height:
+				$this->dynamic_style_rule( $screen_key.'_tab_text_height', '.tbhs_item_content { height: $setting_value$px; }', array(
+						'check' => 'not_empty'
+				) );
+				// Primary Area height:
+				$this->dynamic_style_rule( $screen_key.'_static_text_height', '.evo_container__front_page_main_area { height: $setting_value$px; }', array(
+						'check' => 'not_empty'
+				) );
+			}
 			// End of @media screen wrapper:
 			$this->add_dynamic_style( ' }' );
 		}
