@@ -858,10 +858,10 @@ class Hit
 			{
 				$s = $this->test_uri['s'];
 			}
-			else
+			elseif( isset( $_GET['s'] ) || isset( $_POST['s'] ) )
 			{	// Consider a request as search ONLY if a keyword is passed through GET or POST,
 				// and not in automatic searches like 404 page with search widget:
-				$s = ( isset( $_GET['s'] ) ? $_GET['s'] : ( isset( $_POST['s'] ) ? $_POST['s'] : NULL ) );
+				$s = get_param( 's' );
 			}
 			if( ! empty( $s ) && ! empty( $blog_ID ) )
 			{	// Record Internal Search:
