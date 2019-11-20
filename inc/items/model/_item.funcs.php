@@ -471,7 +471,7 @@ function & get_current_Item()
 		$current_Item = $Item;
 	}
 
-	if( in_array( $disp_detail, array( 'posts-topcat', 'posts-subcat' ) ) )
+	if( in_array( $disp_detail, array( 'posts-cat', 'posts-topcat-intro', 'posts-subcat-intro' ) ) )
 	{	// Try to get intro Item:
 		$current_Item = & get_featured_Item( 'posts', NULL, true );
 	}

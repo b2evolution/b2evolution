@@ -1065,7 +1065,7 @@ class ItemListLight extends DataObjectList2
 					if( ( $tmp_Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) ) !== false )
 					{ // It is almost never meaningful to die over an invalid cat when generating title
 						$cat_clear_url = regenerate_url( ( empty( $catsel_param ) ? 'cat=' : 'catsel=' ).$cat_ID );
-						if( $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' || $disp_detail == 'posts-cat' )
+						if( in_array( $disp_detail, array( 'posts-cat', 'posts-topcat-intro', 'posts-topcat-nointro', 'posts-subcat-intro', 'posts-subcat-nointro' ) ) )
 						{ // Remove category url from $ReqPath when we use the cat url instead of cat ID
 							$cat_clear_url = str_replace( '/'.$tmp_Chapter->get_url_path(), '', $cat_clear_url );
 						}

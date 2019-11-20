@@ -500,14 +500,6 @@ function skin_init( $disp )
 							$MainList->nav_target = $cat;
 						}
 
-						if( empty( $Chapter ) )
-						{	// If the requested chapter was not found display 404 page:
-							$Messages->add( T_('The requested chapter was not found') );
-							global $disp;
-							$disp = '404';
-							break;
-						}
-
 						if( has_featured_Item() )
 						{	// If current category has Intro post:
 							$disp_detail .= '-intro';
@@ -516,6 +508,14 @@ function skin_init( $disp )
 						else
 						{	// If current category has no Intro post:
 							$disp_detail .= '-nointro';
+						}
+
+						if( empty( $Chapter ) )
+						{	// If the requested chapter was not found display 404 page:
+							$Messages->add( T_('The requested chapter was not found') );
+							global $disp;
+							$disp = '404';
+							break;
 						}
 					}
 				}
@@ -2464,7 +2464,7 @@ function skin_description_tag()
 			$r = $Blog->get( 'shortdesc' );
 		}
 	}
-	elseif( $disp_detail == 'posts-cat' || $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
+	elseif( in_array( $disp_detail, array( 'posts-cat', 'posts-topcat-intro', 'posts-topcat-nointro', 'posts-subcat-intro', 'posts-subcat-nointro' ) ) )
 	{
 		if( $Blog->get_setting( 'categories_meta_description' ) && ( ! empty( $Chapter ) ) )
 		{

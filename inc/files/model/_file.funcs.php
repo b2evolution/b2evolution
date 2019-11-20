@@ -3377,7 +3377,7 @@ function get_social_tag_image_file( $disp )
 			{
 				global $disp_detail;
 
-				if( $disp_detail == 'posts-topcat' || $disp_detail == 'posts-subcat' )
+				if( in_array( $disp_detail, array( 'posts-cat', 'posts-topcat-nointro', 'posts-subcat-nointro' ) ) )
 				{ // No intro post or intro post has no image, use current category's social media boiler plate or category image as fallback:
 					global $MainList;
 					// Get current category ID:
