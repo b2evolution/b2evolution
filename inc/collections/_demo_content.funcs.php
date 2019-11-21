@@ -3044,7 +3044,7 @@ Hello
 					.T_('You are currently looking at an info page about this site.')."\r\n\r\n"
 					.T_('Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically accessed directly from a navigation menu.')."\r\n\r\n"
 					.'<div data-display-condition="view=detailed" markdown="1">'."\r\n"
-						.sprintf( T_('This extra information is only displayed when detailed view is requested. This is achieved by adding a condition to the paragraph tag like %s.'), '`&lt;div data-display-condition="view=detailed"&gt;`' )."\r\n\r\n"
+						.sprintf( T_('This extra information is only displayed when detailed view is requested. This is achieved by adding a display condition like %s.'), '`&lt;div data-display-condition="view=detailed"&gt;`' )."\r\n\r\n"
 						.T_('Note: If needed, skins may format info pages differently from regular posts.')."\r\n"
 					.'</div>',
 				'files'    => array(
