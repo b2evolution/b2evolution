@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Current filters Widget class.
+ * This file implements the Current Item filters Widget class.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -53,7 +53,7 @@ class coll_current_filters_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Current filters');
+		return T_('Current Item filters');
 	}
 
 
@@ -71,7 +71,7 @@ class coll_current_filters_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Summary of the current filters.');
+		return T_('Summary of the current Item filters.');
 	}
 
 
@@ -87,7 +87,7 @@ class coll_current_filters_Widget extends ComponentWidget
 			'title' => array(
 					'type' => 'text',
 					'label' => T_('Block title'),
-					'defaultvalue' => T_('Current filters'),
+					'defaultvalue' => T_('Current Item filters'),
 					'maxlength' => 100,
 				),
 			'show_filters' => array(
@@ -102,6 +102,7 @@ class coll_current_filters_Widget extends ComponentWidget
 						array( 'assignee', T_('Assignee'), 1 ),
 						array( 'locale', T_('Locale'), 1 ),
 						array( 'status', T_('Status'), 1 ),
+						array( 'itemtype', T_('Item Type'), 0 ),
 						array( 'visibility', T_('Visibility'), 0 ),
 						array( 'time', T_('Past/Future'), 0 ),
 						array( 'limit', T_('Limit by days'), 1 ),
@@ -179,6 +180,7 @@ class coll_current_filters_Widget extends ComponentWidget
 				'display_locale'     => ! empty( $this->disp_params['show_filters']['locale'] ),
 				'display_status'     => ! empty( $this->disp_params['show_filters']['status'] ),
 				'display_visibility' => ! empty( $this->disp_params['show_filters']['visibility'] ),
+				'display_itemtype'   => ! empty( $this->disp_params['show_filters']['itemtype'] ),
 				'display_time'       => ! empty( $this->disp_params['show_filters']['time'] ),
 				'display_limit'      => ! empty( $this->disp_params['show_filters']['limit'] ),
 				'display_flagged'    => ! empty( $this->disp_params['show_filters']['flagged'] ),

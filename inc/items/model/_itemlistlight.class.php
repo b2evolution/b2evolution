@@ -976,7 +976,7 @@ class ItemListLight extends DataObjectList2
 				'status_text'         => T_('Status').': ',
 				'statuses_text'       => T_('Statuses').': ',
 
-				'display_type'        => true,
+				'display_itemtype'    => true,
 				'type_text'           => T_('Item Type').': ',
 				'types_text'          => T_('Item Types').': ',
 
@@ -1398,16 +1398,24 @@ class ItemListLight extends DataObjectList2
 		}
 
 		// ITEM TYPE:
-		if( $params['display_type'] )
+		if( $params['display_itemtype'] )
 		{
 			$item_type_IDs = $this->filters['types'];
 
-			if( !empty( $item_type_IDs ) )
-			{	// We want to show some category names:
-				$item_type_IDs = explode(',', $this->filters['types']);
+			if( !empty( $item_type_IDs ) && !in_array( 'itemtype', $ignore ) )
+			{	// We want to show some Item Type names:
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
 				$type_names = array();
 				$ItemTypeCache = & get_ItemTypeCache();
-				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$invert = false;
+				if( substr( $item_type_IDs, 0, 1) == '-' )
+				{
+					$invert = true;
+					$item_type_IDs = substr( $item_type_IDs, 1 );
+				}
+				$item_type_IDs = explode(',', $this->filters['types']);
+				$ItemTypeCache->load_list( $item_type_IDs, $invert );
+				$item_type_IDs = $ItemTypeCache->get_ID_array();
 				foreach( $item_type_IDs as $item_type_ID )
 				{
 					if( ( $tmp_ItemType = & $ItemTypeCache->get_by_ID( $item_type_ID, false, false ) ) !== false )
@@ -1423,7 +1431,7 @@ class ItemListLight extends DataObjectList2
 				$type_name_string = implode( $params['separator_and'], $type_names );
 				$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
 					( count( $type_names ) > 1 ?
-						array( $params['types_text'], $params['before_items'].$tags.$params['after_items'] ) :
+						array( $params['types_text'], $params['before_items'].$type_name_string.$params['after_items'] ) :
 						array( $params['type_text'], $type_name_string ) ),
 					$params['group_mask'] );
 			}

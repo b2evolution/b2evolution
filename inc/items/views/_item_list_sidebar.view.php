@@ -312,7 +312,12 @@ if( $user_count )
 $Form->end_fieldset();
 
 // CATEGORIES:
-$Form->begin_fieldset( T_('Categories'), array( 'id' => 'items_filter_categories', 'fold' => true, 'default_fold' => empty( $catsel ) ) );
+$fold_cat_array = ( $ItemList->default_filters['cat_array'] == $ItemList->filters['cat_array'] );
+$fold_cat_single = ( $ItemList->default_filters['cat_single'] == $ItemList->filters['cat_single'] );
+$fold_cat_modifier = ( $ItemList->default_filters['cat_modifier'] == $ItemList->filters['cat_modifier'] )
+		|| !in_array( $ItemList->filters['cat_modifier'], array( '-', '*' ) );
+$fold_categories = $fold_cat_array && $fold_cat_single && $fold_cat_modifier;
+$Form->begin_fieldset( T_('Categories'), array( 'id' => 'items_filter_categories', 'fold' => true, 'default_fold' => $fold_categories ) );
 // --------------------------------- START OF CATEGORY LIST --------------------------------
 skin_widget( array(
 	// CODE for the widget:

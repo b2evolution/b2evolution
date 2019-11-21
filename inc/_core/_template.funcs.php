@@ -924,7 +924,7 @@ function get_request_title( $params = array() )
 		default:
 			if( isset( $MainList ) )
 			{
-				$r = array_merge( $r, $MainList->get_filter_titles( array( 'visibility', 'hide_future' ), $params ) );
+				$r = array_merge( $r, $MainList->get_filter_titles( array( 'visibility', 'hide_future', 'itemtype' ), $params ) );
 			}
 			break;
 	}
