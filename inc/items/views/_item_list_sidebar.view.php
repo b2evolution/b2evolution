@@ -236,8 +236,8 @@ if( ! empty( $tab_type ) )
 }
 $item_types_SQL->ORDER_BY( 'fix_order, ityp_ID' );
 $item_types = $DB->get_results( $item_types_SQL->get() );
-
-$Form->begin_fieldset( T_('Item Type'), array( 'id' => 'items_filter_item_types', 'fold' => true, 'default_fold' => empty( $types ) ) );
+$fold_item_type = ( $ItemList->default_filters['types'] == $ItemList->filters['types'] );
+$Form->begin_fieldset( T_('Item Type'), array( 'id' => 'items_filter_item_types', 'fold' => true, 'default_fold' => $fold_item_type ) );
 echo '<ul>';
 echo '<li><input type="radio" name="'.$pp.'types" value="" class="radio"'.( $types == '' || empty( $types ) ? ' checked="checked"' : '' ).' />';
 echo ' <a href="'.regenerate_url( $pp.'types', $pp.'types=' ).'">'.T_('Any').'</a></li>';
