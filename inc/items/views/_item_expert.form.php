@@ -700,6 +700,11 @@ $Form->begin_form( '', '', $params );
 		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
 	}
 
+	if( $edited_Item->get_type_setting( 'allow_switchable' ) )
+	{	// Display "Includes switchable content" checkbox:
+		$Form->checkbox_basic_input( 'item_switchable', $edited_Item->get_setting( 'switchable' ), '<strong>'.T_('Includes switchable content').'</strong>' );
+	}
+
 	// Single/page view:
 	if( $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 	{	// If user has a permission to edit advanced properties of items:

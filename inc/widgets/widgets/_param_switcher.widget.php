@@ -274,6 +274,66 @@ jQuery( 'a[data-param-switcher=<?php echo $this->ID; ?>]' ).click( function()
 		<?php
 		}
 
+		global $evo_widget_param_switcher_js_initied;
+		if( empty( $evo_widget_param_switcher_js_initied ) )
+		{	// Initialize JS to allow switching by JavaScript once:
+		?>
+<script>
+// Modifications to listen event when URL in browser address bar is changed:
+history.pushState = ( f => function pushState(){
+	var ret = f.apply(this, arguments);
+	window.dispatchEvent(new Event('pushstate'));
+	window.dispatchEvent(new Event('locationchange'));
+	return ret;
+})(history.pushState);
+
+window.addEventListener( 'locationchange', function()
+{	// Show/Hide custom fields by condition depending on current URL in browser address:
+	var custom_fields = jQuery( '[data-display-condition]' );
+	if( custom_fields.length == 0 )
+	{	// No custom fields with display conditions:
+		return false;
+	}
+
+	function get_url_params( url, multiple_values )
+	{
+		url = url.replace( /^.+\?/, '' ).split( '&' );
+		var params = [];
+		url.forEach( function( url_param )
+		{
+			url_param = url_param.split( '=' );
+			params[ url_param[0] ] = multiple_values ? url_param[1].split( '|' ) : url_param[1];
+		} );
+
+		return params;
+	}
+
+	// Get params of the current URL:
+	var url_params = get_url_params( location.href, false );
+
+	// Show all custom fields by default:
+	custom_fields.show();
+
+	custom_fields.each( function()
+	{	// Check each custom fields by display condition:
+		var conditions = get_url_params( jQuery( this ).data( 'display-condition' ), true );
+		for( var cond_param in conditions )
+		{
+			var url_param_value = ( typeof( url_params[ cond_param ] ) == 'undefined' ? '' : url_params[ cond_param ] );
+			if( ( url_param_value === '' && conditions[ cond_param ].indexOf( '' ) === -1 ) ||
+			    conditions[ cond_param ].indexOf( url_param_value ) === -1 )
+			{	// Hide the custom field if at least one condition is not equal:
+				jQuery( this ).hide();
+				break;
+			}
+		}
+	} );
+} );
+</script>
+		<?php
+			$evo_widget_param_switcher_js_initied = true;
+		}
+
 		echo $this->disp_params['block_end'];
 
 		return true;

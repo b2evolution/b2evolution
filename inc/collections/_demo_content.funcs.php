@@ -3040,14 +3040,19 @@ Hello
 				'title'    => T_('About this site'),
 				'category' => 'b2evolution',
 				'type'     => 'Standalone Page',
-				'content'  => T_('<p>This website is powered by b2evolution.</p>')."\r\n"
-					.T_('<p>You are currently looking at an info page about this site.</p>')."\r\n"
-					.T_('<p>Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically accessed directly from a navigation menu.</p>')."\r\n"
-					.T_('<p>Note: If needed, skins may format info pages differently from regular posts.</p>'),
+				'content'  => T_('This website is powered by b2evolution.')."\r\n\r\n"
+					.T_('You are currently looking at an info page about this site.')."\r\n\r\n"
+					.T_('Info pages are Standalone pages: contrary to regular Posts, do not appear in the regular flow of posts. Instead, they are typically accessed directly from a navigation menu.')."\r\n\r\n"
+					.'<div data-display-condition="view=detailed" markdown="1">'.sprintf( T_('This extra information is only displayed when detailed view is requested. This is achieved by adding a condition to the paragraph tag like %s.'), '`&lt;div data-display-condition="view=detailed"&gt;`' ).'</div>'."\r\n\r\n"
+					.'<div data-display-condition="view=detailed">'.T_('Note: If needed, skins may format info pages differently from regular posts.').'</div>',
 				'files'    => array(
 					array( 'logos/b2evolution_1016x208_wbg.png' ),
 				),
 				'widget_info_page' => 'about_this_site',
+				'settings' => array(
+						'editor_code' => 'html',
+						'switchable'  => 1
+					),
 			);
 
 			$demo_items['widget_page'] = array(
@@ -3632,6 +3637,14 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 			if( isset( $demo_item['mustread'] ) && $demo_item['mustread'] === true )
 			{	// Set "Must read" flag:
 				$new_Item->set_setting( 'mustread', 1 );
+			}
+
+			if( isset( $demo_item['settings'] ) && is_array( $demo_item['settings'] ) )
+			{	// Additional settings:
+				foreach( $demo_item['settings'] as $demo_item_setting_key => $demo_item_setting_value )
+				{
+					$new_Item->set_setting( $demo_item_setting_key, $demo_item_setting_value );
+				}
 			}
 
 			$item_date = date( 'Y-m-d H:i:s', $item_timestamp_array[ $item_i++ ] );

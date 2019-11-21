@@ -127,6 +127,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Item Page */
 	$default_widgets['item_page'] = array(
 		array( 10, 'item_content' ),
+		array( 13, 'param_switcher', 'coll_type' => 'main', 'params' => array( 'param_code' => 'view', 'buttons' => array( array( 'value' => 'simple', 'text' => 'Simple', 'default' => 1 ), array( 'value' => 'detailed', 'text' => 'Detailed' ) ) ) ),
 		array( 15, 'item_attachments' ),
 		array( 50, 'item_seen_by' ),
 		array( 60, 'item_vote', 'coll_type' => '-forum,group' ),

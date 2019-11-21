@@ -990,6 +990,9 @@ class Item extends ItemLight
 			}
 		}
 
+		// Includes switchable content:
+		$this->set_setting( 'switchable', param( 'item_switchable', 'integer', 0 ) );
+
 		// OWNER:
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
 		if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) && param( 'item_owner_login_displayed', 'string', NULL ) !== NULL )
@@ -2488,6 +2491,9 @@ class Item extends ItemLight
 		// Render all inline tags to HTML code:
 		$output = $this->render_inline_tags( $output, $params );
 
+		// Render switchable content:
+		$output = $this->render_switchable_content( $output );
+
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
 				'Item' => $this,
@@ -2611,6 +2617,9 @@ class Item extends ItemLight
 
 		// Render all inline tags to HTML code:
 		$output = $this->render_inline_tags( $output, $params );
+
+		// Render switchable content:
+		$output = $this->render_switchable_content( $output );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
 		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
@@ -3982,6 +3991,72 @@ class Item extends ItemLight
 		}
 
 		return $content;
+	}
+
+
+	/**
+	 * Render switchable content
+	 *
+	 * @param string Content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_switchable_content( $content, $params = array() )
+	{
+		if( ! $this->get_type_setting( 'allow_switchable' ) ||
+		    ! $this->get_setting( 'switchable' ) )
+		{	// Don't render switchable content if it is not allowed by Item Type and disabled for this Item:
+			return $content;
+		}
+
+		$params = array_merge( array(
+				'check_code_block' => true,
+			), $params );
+
+		if( $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call render_switchable_content() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_switchable_content' ), array( $params ) );
+			return $content;
+		}
+
+		$content = preg_replace_callback( '#(<[a-z]+.+?)(data-display-condition="(.+?)")(.*?>)#i', array( $this, 'render_switchable_content_callback' ), $content );
+
+		return $content;
+	}
+
+
+	/**
+	 * Callback funciton to render switchable content
+	 *
+	 * @param array Match
+	 */
+	function render_switchable_content_callback( $m )
+	{
+		$display_attrs = '';
+
+		// Check display conditions:
+		$disp_conditions = explode( '&', $m[3] );
+		foreach( $disp_conditions as $disp_condition )
+		{
+			$disp_condition = explode( '=', $disp_condition );
+			// Get all allowed value by the condition of the custom field:
+			$disp_condition_values = explode( '|', $disp_condition[1] );
+			// Get current value of the param from $_GET or $_POST:
+			$param_value = param( $disp_condition[0], 'string' );
+			// Check if we should hide the custom field by condition:
+			if( ( $param_value === '' && ! in_array( '', $disp_condition_values ) ) || // current param value is empty but condition doesn't allow empty values
+					! preg_match( '/^[a-z0-9_\-]*$/', $param_value ) || // wrong param value
+					! in_array( $param_value, $disp_condition_values ) ) // current param value is not allowed by the condition of the custom field
+			{	// Hide custom field if at least one param is not allowed by condition of the custom field:
+				$display_attrs .= ' style="display:none"';
+				continue;
+			}
+		}
+
+		return $m[1].$m[2].$display_attrs.$m[4];
 	}
 
 

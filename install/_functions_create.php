@@ -286,6 +286,7 @@ function create_default_data()
 			'template_name'  => 'page',
 			'perm_level'     => 'restricted',
 			'use_comments'   => 0,
+			'allow_featured' => 0,
 		);
 	$post_types[] = array(
 			'name'           => 'Widget Page',
@@ -376,12 +377,14 @@ function create_default_data()
 			'template_name'  => NULL,
 			'perm_level'     => 'admin',
 			'allow_disabling_comments' => 1,
+			'allow_featured' => 0,
 		);
 	$post_types[] = array(
 			'name'           => 'Advertisement',
 			'usage'          => 'special',
 			'template_name'  => NULL,
 			'perm_level'     => 'admin',
+			'allow_featured' => 0,
 		);
 	$post_types[] = array(
 			'name'                   => 'Terms & Conditions',

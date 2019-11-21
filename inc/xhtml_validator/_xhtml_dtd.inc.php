@@ -136,7 +136,8 @@ else
 // Allowed Attribute classes
 // TODO: individual checkboxes for class / style / id
 $A_coreattrs = 'class title data-*'.( $allow_css_tweaks ? ' style' : '' )					// 'id' is really nasty
-					.( $allow_javascript ? ' onmouseover onmouseout onclick' : '' );
+					.( $allow_javascript ? ' onmouseover onmouseout onclick' : '' )
+					.' markdown'; // Allow markdown code inside html tags
 $A_i18n = 'lang xml:lang dir';
 $A_attrs = $A_coreattrs.' '.$A_i18n;
 
