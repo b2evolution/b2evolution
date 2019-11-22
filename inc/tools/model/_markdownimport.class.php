@@ -98,7 +98,7 @@ class MarkdownImport
 			),
 			'same_lang_update_file' => array(
 				'group'   => 'options',
-				'title'   => T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn’t trigger warnings next times (and can be versioned into Git).').' <span class="note">'.T_('This requires using a directory to import, not a ZIP file.').'</span>',
+				'title'   => T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn\'t trigger warnings next time (and can be versioned into Git).').' <span class="note">'.T_('This requires using a directory to import, not a ZIP file.').'</span>',
 				'type'    => 'integer',
 				'default' => 1,
 				'indent'  => 3,
