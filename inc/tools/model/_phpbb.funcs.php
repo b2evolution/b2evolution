@@ -105,7 +105,7 @@ function phpbb_log( $message, $type = 'message', $nl = '<br />', $bl = '' )
 			break;
 
 		case 'warning':
-			echo $bl.'<span class="orange">'.T_('WARNING: ').$message.'</span>'.$nl;
+			echo $bl.'<span class="orange">'.'WARNING: '.$message.'</span>'.$nl;
 			break;
 
 		default:
@@ -399,7 +399,7 @@ function b2evo_groups()
 	$SQL->FROM( 'T_groups' );
 	$SQL->ORDER_BY( 'grp_level DESC, grp_name ASC' );
 
-	$groups = array( '0' => T_( 'No import' ) );
+	$groups = array( '0' => 'No import' );
 	$groups = array_merge( $groups, $DB->get_assoc( $SQL->get() ) );
 
 	return $groups;
@@ -424,7 +424,7 @@ function phpbb_import_users()
 	phpbb_unset_var( 'avatars_count_imported' );
 	phpbb_unset_var( 'avatars_count_missing' );
 
-	phpbb_log( T_('Importing users...') );
+	phpbb_log( 'Importing users...' );
 
 	/**
 	 * @var array IDs of the Users;
@@ -470,11 +470,11 @@ function phpbb_import_users()
 
 	if( $phpbb_users_count > 0 )
 	{
-		phpbb_log( sprintf( T_('%s users have been found in the phpBB database'), $phpbb_users_count ) );
+		phpbb_log( sprintf( '%s users have been found in the phpBB database', $phpbb_users_count ) );
 	}
 	else
 	{	// No users
-		phpbb_log( T_('No users found in the phpBB database.'), 'error' );
+		phpbb_log( 'No users found in the phpBB database.', 'error' );
 		$DB->commit();
 		return; // Exit here
 	}
@@ -487,7 +487,7 @@ function phpbb_import_users()
 	$emails_SQL->HAVING( 'COUNT( user_id ) > 1' );
 	$phpbb_emails_duplicated = $phpbb_DB->get_assoc( $emails_SQL->get() );
 
-	phpbb_log( T_('Start importing <b>users</b> into the b2evolution database...'), 'message', '' );
+	phpbb_log( 'Start importing <b>users</b> into the b2evolution database...', 'message', '' );
 
 	// Init SQL to get the users
 	$users_SQL = $phpbb_users_SQL;
@@ -557,7 +557,7 @@ function phpbb_import_users()
 
 			if( $phpbb_user->user_id < 1 )
 			{	// Skip the users with invalid ID
-				phpbb_log( sprintf( T_( 'User "%s" with ID %s ignored' ), $phpbb_user->username, $phpbb_user->user_id ), 'error', ' ', '<br />' );
+				phpbb_log( sprintf( 'User "%s" with ID %s ignored', $phpbb_user->username, $phpbb_user->user_id ), 'error', ' ', '<br />' );
 				continue;
 			}
 
@@ -580,7 +580,7 @@ function phpbb_import_users()
 			{	// The user has the duplicate email
 				if( !empty( $phpbb_emails_duplicated[$phpbb_user->user_email] ) )
 				{	// The other user already was imported with such email
-					phpbb_log( '<br />'.sprintf( T_( 'The phpBB users "%s" and "%s" have the same email address "%s" and will be merged in b2evolution as just "%s"' ),
+					phpbb_log( '<br />'.sprintf( 'The phpBB users "%s" and "%s" have the same email address "%s" and will be merged in b2evolution as just "%s"',
 							$phpbb_emails_duplicated[$phpbb_user->user_email]['username'], // Username of the first user
 							$user_login, // Username of the second user (duplicate)
 							$phpbb_user->user_email, // The same email address
@@ -619,7 +619,7 @@ function phpbb_import_users()
 				// Import user's avatar:
 				phpbb_import_avatar( $phpbb_user, $b2evo_user->user_ID, $path_avatars );
 
-				phpbb_log( sprintf( T_( 'The user #%s already exists with E-mail address "%s" in the b2evolution database -- Merging User "%s" with user "%s".' ), $phpbb_user->user_id, $phpbb_user->user_email, $user_login, $b2evo_user->user_login ), 'warning', ' ', '<br />' );
+				phpbb_log( sprintf( 'The user #%s already exists with E-mail address "%s" in the b2evolution database -- Merging User "%s" with user "%s".', $phpbb_user->user_id, $phpbb_user->user_email, $user_login, $b2evo_user->user_login ), 'warning', ' ', '<br />' );
 				continue;
 			}
 
@@ -641,7 +641,7 @@ function phpbb_import_users()
 			while( $b2evo_user_ID );
 			if( $user_login != $next_login )
 			{	// Duplicated login was changed, Display a message about this event
-				phpbb_log( sprintf( T_( 'The login "%s" already exists with a different email address. The user "%s" will be imported as "%s"' ), $user_login, $user_login, $next_login ), 'warning', ' ', '<br />' );
+				phpbb_log( sprintf( 'The login "%s" already exists with a different email address. The user "%s" will be imported as "%s"', $user_login, $user_login, $next_login ), 'warning', ' ', '<br />' );
 				$user_login = $next_login;
 			}
 
@@ -706,7 +706,7 @@ function phpbb_import_users()
 
 			if( !$DB->get_results() )
 			{	// User was not inserted
-				phpbb_log( sprintf( T_( 'User "%s" with ID %s cannot be imported. MySQL error: %s.' ) , $phpbb_user->username, $phpbb_user->user_id, $DB->last_error ), 'error', ' ', '<br />' );
+				phpbb_log( sprintf( 'User "%s" with ID %s cannot be imported. MySQL error: %s.' , $phpbb_user->username, $phpbb_user->user_id, $DB->last_error ), 'error', ' ', '<br />' );
 				continue;
 			}
 
@@ -953,7 +953,7 @@ function phpbb_import_invalid_user( $phpbb_user_ID, & $users_IDs, $phpbb_usernam
 
 			if( !$DB->get_results() )
 			{	// User was not inserted
-				phpbb_log( sprintf( T_( 'User "%s" cannot be imported. MySQL error: %s.' ) , $phpbb_user_ID, $DB->last_error ), 'error', ' ', '<br />' );
+				phpbb_log( sprintf( 'User "%s" cannot be imported. MySQL error: %s.' , $phpbb_user_ID, $DB->last_error ), 'error', ' ', '<br />' );
 				return false;
 			}
 
@@ -963,7 +963,7 @@ function phpbb_import_invalid_user( $phpbb_user_ID, & $users_IDs, $phpbb_usernam
 			$Group = & $GroupCache->get_by_ID( $group_invalid_ID, false );
 			if( $Group )
 			{
-				phpbb_log( sprintf( T_( 'Created user "%s" in the "%s" group' ) , $user_login, $Group->get_name() ), 'message', ' ', '<br />' );
+				phpbb_log( sprintf( 'Created user "%s" in the "%s" group' , $user_login, $Group->get_name() ), 'message', ' ', '<br />' );
 			}
 		}
 
@@ -990,7 +990,7 @@ function phpbb_import_forums()
 
 	phpbb_unset_var( 'forums_count_imported' );
 
-	phpbb_log( T_('Importing forums...') );
+	phpbb_log( 'Importing forums...' );
 
 	/**
 	 * @var array IDs of the Forums
@@ -1058,16 +1058,16 @@ function phpbb_import_forums()
 
 	if( count( $phpbb_forums ) > 0 )
 	{
-		phpbb_log( sprintf( T_('%s forums have been found in the phpBB database'), count( $phpbb_forums ) ) );
+		phpbb_log( sprintf( '%s forums have been found in the phpBB database', count( $phpbb_forums ) ) );
 	}
 	else
 	{	// No forums
-		phpbb_log( T_('No found forums in the phpBB database.'), 'error' );
+		phpbb_log( 'No found forums in the phpBB database.', 'error' );
 		$DB->commit();
 		return; // Exit here
 	}
 
-	phpbb_log( T_('Start importing <b>forums</b> as <b>categories</b> into the b2evolution database...') );
+	phpbb_log( 'Start importing <b>forums</b> as <b>categories</b> into the b2evolution database...' );
 
 	// Insert the new forums
 	$phpbb_forums_count_imported = 0;
@@ -1105,7 +1105,7 @@ function phpbb_import_forums()
 			$forums_parents[$phpbb_forum->forum_id] = $phpbb_forum->forum_parent;
 		}
 
-		phpbb_log( sprintf( T_('The forum "%s" is imported.'), $phpbb_forum->forum_name ) );
+		phpbb_log( sprintf( 'The forum "%s" is imported.', $phpbb_forum->forum_name ) );
 		$phpbb_forums_count_imported++;
 	}
 
@@ -1185,7 +1185,7 @@ function phpbb_import_topics()
 	phpbb_unset_var( 'attachments_count_imported' );
 	phpbb_unset_var( 'attachments_count_missing' );
 
-	phpbb_log( T_('Importing topics...') );
+	phpbb_log( 'Importing topics...' );
 
 	/**
 	 * @var array IDs of the Topics;
@@ -1221,11 +1221,11 @@ function phpbb_import_topics()
 
 	if( $phpbb_topics_count > 0 )
 	{
-		phpbb_log( sprintf( T_('%s topics have been found in the phpBB database'), $phpbb_topics_count ) );
+		phpbb_log( sprintf( '%s topics have been found in the phpBB database', $phpbb_topics_count ) );
 	}
 	else
 	{	// No topics
-		phpbb_log( T_('No found topics in the phpBB database.'), 'error' );
+		phpbb_log( 'No found topics in the phpBB database.', 'error' );
 		$DB->commit();
 		return; // Exit here
 	}
@@ -1256,7 +1256,7 @@ function phpbb_import_topics()
 			'post_wordcount'
 		);
 
-	phpbb_log( T_('Start importing <b>topics</b> as <b>posts</b> into the b2evolution database...'), 'message', '' );
+	phpbb_log( 'Start importing <b>topics</b> as <b>posts</b> into the b2evolution database...', 'message', '' );
 
 	$BlogCache = & get_BlogCache();
 	$phpbbBlog = & $BlogCache->get_by_ID( phpbb_get_var( 'blog_ID' ) );
@@ -1291,7 +1291,7 @@ function phpbb_import_topics()
 		{
 			if( !isset( $forums_IDs[ (string) $phpbb_topic->forum_id ] ) )
 			{	// The topic has the incorrect forum's ID by some reason
-				phpbb_log( sprintf( '<br />'.T_('Skipped topic: %s. Incorrect forum ID: %s. <b>Content:</b> %s'), $phpbb_topic->topic_id, $phpbb_topic->forum_id, substr( $phpbb_topic->post_text, 0, 250 ).' ...' ), 'error' );
+				phpbb_log( sprintf( '<br />'.'Skipped topic: %s. Incorrect forum ID: %s. <b>Content:</b> %s', $phpbb_topic->topic_id, $phpbb_topic->forum_id, substr( $phpbb_topic->post_text, 0, 250 ).' ...' ), 'error' );
 				continue;
 			}
 
@@ -1299,7 +1299,7 @@ function phpbb_import_topics()
 			{	// The topic has the incorrect user's ID by some reason
 				if( !phpbb_import_invalid_user( $phpbb_topic->topic_poster, $users_IDs, $phpbb_topic->post_username ) )
 				{	// We cannot create invalid user
-					phpbb_log( sprintf( '<br />'.T_('Skipped topic: %s. Incorrect user ID: %s. <b>Content:</b> %s'), $phpbb_topic->topic_id, $phpbb_topic->topic_poster, substr( $phpbb_topic->post_text, 0, 250 ).' ...' ), 'error' );
+					phpbb_log( sprintf( '<br />'.'Skipped topic: %s. Incorrect user ID: %s. <b>Content:</b> %s', $phpbb_topic->topic_id, $phpbb_topic->topic_poster, substr( $phpbb_topic->post_text, 0, 250 ).' ...' ), 'error' );
 					continue;
 				}
 			}
@@ -1531,7 +1531,7 @@ function phpbb_import_replies()
 	// Reset previous value
 	phpbb_unset_var( 'replies_count_imported' );
 
-	phpbb_log( T_('Importing replies...') );
+	phpbb_log( 'Importing replies...' );
 
 	$DB->begin();
 
@@ -1561,11 +1561,11 @@ function phpbb_import_replies()
 
 	if( $phpbb_replies_count > 0 )
 	{
-		phpbb_log( sprintf( T_('%s post have been found in the phpBB database, %s of which are replies'), $phpbb_replies_count, $phpbb_replies_count - (int)phpbb_get_var( 'topics_count_imported' ) ) );
+		phpbb_log( sprintf( '%s post have been found in the phpBB database, %s of which are replies', $phpbb_replies_count, $phpbb_replies_count - (int)phpbb_get_var( 'topics_count_imported' ) ) );
 	}
 	else
 	{	// No replies
-		phpbb_log( T_('No found replies in the phpBB database.'), 'error' );
+		phpbb_log( 'No found replies in the phpBB database.', 'error' );
 		$DB->commit();
 		return; // Exit here
 	}
@@ -1573,7 +1573,7 @@ function phpbb_import_replies()
 	$users_IDs = phpbb_table_get_links( 'users' );
 	$topics_IDs = phpbb_table_get_links( 'topics' );
 
-	phpbb_log( T_('Start importing <b>replies</b> as <b>comments</b> into the b2evolution database...'), 'message', '' );
+	phpbb_log( 'Start importing <b>replies</b> as <b>comments</b> into the b2evolution database...', 'message', '' );
 
 	$BlogCache = & get_BlogCache();
 	$phpbbBlog = & $BlogCache->get_by_ID( phpbb_get_var( 'blog_ID' ) );
@@ -1612,13 +1612,13 @@ function phpbb_import_replies()
 			{	// This post is a content of the topic
 				// It is first post; for b2evo this post is Item, not Comment
 				// Do NOT import this post as Comment
-				//phpbb_log( sprintf( '<br />'.T_('Skipped reply: %s. The reply is first post of the topic. <b>Content:</b> %s'), $phpbb_reply->post_id, substr( $phpbb_reply->post_text, 0, 250 ).' ...' ), 'error' );
+				//phpbb_log( sprintf( '<br />'.'Skipped reply: %s. The reply is first post of the topic. <b>Content:</b> %s', $phpbb_reply->post_id, substr( $phpbb_reply->post_text, 0, 250 ).' ...' ), 'error' );
 				continue;
 			}
 
 			if( !isset( $topics_IDs[ (string) $phpbb_reply->topic_id ] ) )
 			{	// The reply has the incorrect topic's ID by some reason
-				phpbb_log( sprintf( '<br />'.T_('Skipped reply: %s. Incorrect topic ID: %s. <b>Content:</b> %s'), $phpbb_reply->post_id, $phpbb_reply->topic_id, substr( $phpbb_reply->post_text, 0, 250 ).' ...' ), 'error' );
+				phpbb_log( sprintf( '<br />'.'Skipped reply: %s. Incorrect topic ID: %s. <b>Content:</b> %s', $phpbb_reply->post_id, $phpbb_reply->topic_id, substr( $phpbb_reply->post_text, 0, 250 ).' ...' ), 'error' );
 				continue;
 			}
 
@@ -1636,7 +1636,7 @@ function phpbb_import_replies()
 			{	// Incorrect user ID, Do NOT import this reply
 				if( !phpbb_import_invalid_user( $phpbb_reply->poster_id, $users_IDs, $phpbb_reply->post_username ) )
 				{	// We cannot create invalid user
-					phpbb_log( sprintf( '<br />'.T_('Skipped reply: %s. Incorrect user ID: %s. <b>Content:</b> %s'), $phpbb_reply->post_id, $phpbb_reply->poster_id, substr( $phpbb_reply->post_text, 0, 250 ).' ...' ), 'error' );
+					phpbb_log( sprintf( '<br />'.'Skipped reply: %s. Incorrect user ID: %s. <b>Content:</b> %s', $phpbb_reply->post_id, $phpbb_reply->poster_id, substr( $phpbb_reply->post_text, 0, 250 ).' ...' ), 'error' );
 					continue;
 				}
 			}
@@ -1713,7 +1713,7 @@ function phpbb_insert_comments( $comments_import_data, $comments_slugs_import_da
 
 	if( ! $comment_insert_result )
 	{	// Some errors
-		phpbb_log( '<br />'.sprintf( T_( 'MySQL error: %s.' ) , $DB->last_error ), 'error', ' ' );
+		phpbb_log( '<br />'.sprintf( 'MySQL error: %s.' , $DB->last_error ), 'error', ' ' );
 	}
 	else
 	{
@@ -1805,7 +1805,7 @@ function phpbb_import_messages()
 	// Reset previous value
 	phpbb_unset_var( 'messages_count_imported' );
 
-	phpbb_log( T_('Importing messages...') );
+	phpbb_log( 'Importing messages...' );
 
 	$DB->begin();
 
@@ -1835,18 +1835,18 @@ function phpbb_import_messages()
 
 	if( $phpbb_messages_count > 0 )
 	{
-		phpbb_log( sprintf( T_('%s messages have been found in the phpBB database'), $phpbb_messages_count ) );
+		phpbb_log( sprintf( '%s messages have been found in the phpBB database', $phpbb_messages_count ) );
 	}
 	else
 	{	// No messages
-		phpbb_log( T_('No found messages in the phpBB database.'), 'error' );
+		phpbb_log( 'No found messages in the phpBB database.', 'error' );
 		$DB->commit();
 		return; // Exit here
 	}
 
 	$users_IDs = phpbb_table_get_links( 'users' );
 
-	phpbb_log( T_('Start importing <b>private messages</b> into the b2evolution database...'), 'message', '' );
+	phpbb_log( 'Start importing <b>private messages</b> into the b2evolution database...', 'message', '' );
 
 	// Init SQL to get the messages from phpbb database:
 	if( $phpbb_version == 3 )
@@ -1882,17 +1882,17 @@ function phpbb_import_messages()
 			{	// The message has the incorrect user's ID by some reason
 				/*if( !phpbb_import_invalid_user( $message->from_user_id, $users_IDs ) )
 				{	// We cannot create invalid user
-					phpbb_log( sprintf( '<br />'.T_('Skipped message: %s. Incorrect user ID: %s. <b>Content:</b> %s'), $message->id, $message->from_user_id, substr( $message->subject, 0, 250 ).' ...' ), 'error' );
+					phpbb_log( sprintf( '<br />'.'Skipped message: %s. Incorrect user ID: %s. <b>Content:</b> %s', $message->id, $message->from_user_id, substr( $message->subject, 0, 250 ).' ...' ), 'error' );
 					continue;
 				}*/
 				$phpbb_missing_users++;
-				//phpbb_log( sprintf( '<br />'.T_('Skipped message: %s. Incorrect sender user ID: %s. <b>Content:</b> %s'), $message->id, $message->from_user_id, substr( $message->subject, 0, 250 ).' ...' ), 'error', ' ' );
+				//phpbb_log( sprintf( '<br />'.'Skipped message: %s. Incorrect sender user ID: %s. <b>Content:</b> %s', $message->id, $message->from_user_id, substr( $message->subject, 0, 250 ).' ...' ), 'error', ' ' );
 				continue;
 			}
 			if( !isset( $users_IDs[ (string) $message->to_user_id ] ) )
 			{	// The message has the incorrect user's ID by some reason
 				$phpbb_missing_users++;
-				//phpbb_log( sprintf( '<br />'.T_('Skipped message: %s. Incorrect reciever user ID: %s. <b>Content:</b> %s'), $message->id, $message->to_user_id, substr( $message->subject, 0, 250 ).' ...' ), 'error', ' ' );
+				//phpbb_log( sprintf( '<br />'.'Skipped message: %s. Incorrect reciever user ID: %s. <b>Content:</b> %s', $message->id, $message->to_user_id, substr( $message->subject, 0, 250 ).' ...' ), 'error', ' ' );
 				continue;
 			}
 
@@ -2288,7 +2288,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 
 	if( empty( $path_avatars ) )
 	{	// Only count what missing avatars if the path is not correct:
-		phpbb_log( sprintf( T_( 'Impossible to copy avatar file of the user #%s(%s) because the source for avatars %s is wrong.' ),
+		phpbb_log( sprintf( 'Impossible to copy avatar file of the user #%s(%s) because the source for avatars %s is wrong.',
 			$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.phpbb_get_var( 'path_avatars' ).'</code>' ), 'error', ' ', '<br />' );
 		phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
 		return false;
@@ -2321,9 +2321,9 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 		$avatar_file_content = fetch_remote_page( $avatar_file_url, $avatar_file_url_info );
 		if( $avatar_file_content === false )
 		{	// Some server restriction to get files from remote server:
-			$avatar_file_url_error = ' '.sprintf( T_('Error: %s'), $avatar_file_url_info['message'] )
-				.'; '.sprintf( T_('Status code: %s'), $avatar_file_url_info['status'] );
-			phpbb_log( sprintf( T_( 'Impossible to get avatar file of the user #%s(%s) because your server has a restriction to get avatar file from remote url %s.' ),
+			$avatar_file_url_error = ' '.sprintf( 'Error: %s', $avatar_file_url_info['message'] )
+				.'; '.sprintf( 'Status code: %s', $avatar_file_url_info['status'] );
+			phpbb_log( sprintf( 'Impossible to get avatar file of the user #%s(%s) because your server has a restriction to get avatar file from remote url %s.',
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ).$avatar_file_url_error, 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
@@ -2331,7 +2331,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 		}
 		if( empty( $avatar_file_url_info['mimetype'] ) || ! in_array( $avatar_file_url_info['mimetype'], array( 'image/gif', 'image/jpeg', 'image/png' ) ) )
 		{	// Wrong image type of remote url:
-			phpbb_log( sprintf( T_( 'Impossible to get avatar file of the user #%s(%s) because wrong image type of the remote avatar file %s.' ),
+			phpbb_log( sprintf( 'Impossible to get avatar file of the user #%s(%s) because wrong image type of the remote avatar file %s.',
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
@@ -2354,7 +2354,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 	{	// Check if the avatar file really exists on the disk:
 		if( ! file_exists( $avatar_file_path ) )
 		{	// Display an error if avatar file is not found on the disk:
-			phpbb_log( sprintf( T_( 'Avatar file of the user #%s(%s) is not found on %s.' ),
+			phpbb_log( sprintf( 'Avatar file of the user #%s(%s) is not found on %s.',
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_path.'</code>' ), 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
@@ -2373,7 +2373,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 		if( ! $user_File->create() ||
 		    ! ( $avatar_file_handle = fopen( $user_File->_adfp_full_path, 'w' ) ) )
 		{	// Impossible to create new file:
-			phpbb_log( sprintf( T_( 'Impossible to create new avatar file of the user #%s(%s) from the remote url %s on %s.' ),
+			phpbb_log( sprintf( 'Impossible to create new avatar file of the user #%s(%s) from the remote url %s on %s.',
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>', '<code>'.$user_File->_adfp_full_path.'</code>' ), 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
@@ -2387,7 +2387,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 
 		if( empty( $imported_file_ID ) )
 		{	// Display an error if there is some error on copying the avatar file:
-			phpbb_log( sprintf( T_( 'Impossible to save avatar file of the user #%s(%s) from the remote url %s in DB.' ),
+			phpbb_log( sprintf( 'Impossible to save avatar file of the user #%s(%s) from the remote url %s in DB.',
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_url.'</code>' ), 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
@@ -2400,7 +2400,7 @@ function phpbb_import_avatar( $phpbb_user, $user_ID, $path_avatars )
 
 		if( empty( $imported_file_ID ) )
 		{	// Display an error if there is some error on copying the avatar file:
-			phpbb_log( sprintf( T_( 'Impossible to copy avatar file of the user #%s(%s) from %s to %s, please check file rights of the files and folders.' ),
+			phpbb_log( sprintf( 'Impossible to copy avatar file of the user #%s(%s) from %s to %s, please check file rights of the files and folders.',
 				$phpbb_user->user_id, $phpbb_user->username.' / '.$phpbb_user->user_email, '<code>'.$avatar_file_path.'</code>', '<code>'.$user_FileRoot->ads_path.'</code>' ), 'error', ' ', '<br />' );
 			// Update the count of missing avatars:
 			phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
@@ -2454,7 +2454,7 @@ function phpbb_import_attachments( $target_type, $path_attachments, $target_ID, 
 	{	// Only count what missing attachments if the path is not correct:
 		phpbb_count_missing_attachments( $target_ID );
 		// Display an error to inform user about missing attachments:
-		phpbb_log( sprintf( T_( 'Impossible to copy attachment of #%s because the source for attachments %s is wrong.' ),
+		phpbb_log( sprintf( 'Impossible to copy attachment of #%s because the source for attachments %s is wrong.',
 			$target_ID, '<code>'.phpbb_get_var( 'path_attachments' ).'</code>' ), 'error', ' ', '<br />' );
 		phpbb_set_var( 'avatars_count_missing', phpbb_get_var( 'avatars_count_missing' ) + 1 );
 		return false;
@@ -2586,7 +2586,7 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 			{	// The file with real name doesn't exist too, Skip this attachment:
 				$attachments_count_missing++;
 				// Display an error to inform user about the missing attachment:
-				phpbb_log( sprintf( T_( 'Attachment of the object #%s(%s) is not found on %s or %s.' ),
+				phpbb_log( sprintf( 'Attachment of the object #%s(%s) is not found on %s or %s.',
 					$target_ID, $target_type, '<code>'.$path_attachments.$attachment->physical_filename.'</code>', '<code>'.$path_attachments.$attachment->real_filename.'</code>' ), 'error', ' ', '<br />' );
 				continue;
 			}
@@ -2600,7 +2600,7 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 		{	// Wrong file author:
 			$attachments_count_missing++;
 			// Display an error to inform user about the missing attachment:
-			phpbb_log( sprintf( T_( 'Impossible to import attachment of the object #%s(%s) because file author could not be detected by id #%s.' ),
+			phpbb_log( sprintf( 'Impossible to import attachment of the object #%s(%s) because file author could not be detected by id #%s.',
 				$target_ID, $target_type, $attachment->poster_id ), 'error', ' ', '<br />' );
 			continue;
 		}
@@ -2627,7 +2627,7 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 		{	// Impossible to rename file from phpBB format like "2_1df806e219313f4432b82040685b8ff1" to real file name with extension, Skip it:
 			$attachments_count_missing++;
 			// Display an error to inform user about the missing attachment:
-			phpbb_log( sprintf( T_( 'Impossible to rename attachment of the object #%s(%s) from physical file name %s to real %s.' ),
+			phpbb_log( sprintf( 'Impossible to rename attachment of the object #%s(%s) from physical file name %s to real %s.',
 				$target_ID, $target_type, '<code>'.$path_attachments.$attachment->physical_filename.'</code>', '<code>'.$path_attachments.$attachment->real_filename.'</code>' ), 'error', ' ', '<br />' );
 			continue;
 		}
@@ -2638,7 +2638,7 @@ function phpbb_get_attachments_insert_data( $target_type, $path_attachments, $ta
 		{	// Impossible to copy the file:
 			$attachments_count_missing++;
 			// Display an error to inform user about the missing attachment:
-			phpbb_log( sprintf( T_( 'Impossible to copy attachment of the object #%s(%s) from %s to the folder %s, please check system log and file rights of the files and folders.' ),
+			phpbb_log( sprintf( 'Impossible to copy attachment of the object #%s(%s) from %s to the folder %s, please check system log and file rights of the files and folders.',
 				$target_ID, $target_type, '<code>'.$path_attachments.$attachment->real_filename.'</code>', '<code>'.$object_FileRoot->ads_path.$root_path.'</code>' ), 'error', ' ', '<br />' );
 		}
 
@@ -2700,9 +2700,9 @@ function phpbb_check_step( $step_name )
 	}/*
 	else if( $steps_levels[ $step_name ] <= $steps_levels[ $current_step ] )
 	{	// User tries open previous step that already been processed
-		phpbb_log( T_('This import step has already been processed.'), 'error', ' ' );
+		phpbb_log( 'This import step has already been processed.', 'error', ' ' );
 		// Continue button
-		// echo '<input type="submit" class="SaveButton" value="'.( $steps_levels[ $step_name ] < max( $steps_levels ) ? T_('Continue').'!' : T_('Go to Forum') ).'" name="submit" />';
+		// echo '<input type="submit" class="SaveButton" value="'.( $steps_levels[ $step_name ] < max( $steps_levels ) ? 'Continue'.'!' : 'Go to Forum' ).'" name="submit" />';
 		return false;
 	}*/
 
@@ -2722,13 +2722,13 @@ function phpbb_check_step( $step_name )
 function phpbb_display_steps( $current_step )
 {
 	$steps = array(
-			1 => T_('Database connection'),
-			2 => T_('User group mapping'),
-			3 => T_('Import users'),
-			4 => T_('Import forums'),
-			5 => T_('Import topics'),
-			6 => T_('Import replies'),
-			7 => T_('Import messages'),
+			1 => 'Database connection',
+			2 => 'User group mapping',
+			3 => 'Import users',
+			4 => 'Import forums',
+			5 => 'Import topics',
+			6 => 'Import replies',
+			7 => 'Import messages',
 		);
 
 	echo get_tool_steps( $steps, $current_step );

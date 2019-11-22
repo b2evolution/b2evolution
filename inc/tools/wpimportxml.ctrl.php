@@ -42,7 +42,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'wpxml' );
 
 		$wp_blog_ID = param( 'wp_blog_ID', 'integer', 0 );
-		param_check_not_empty( 'wp_blog_ID', T_('Please select a collection!') );
+		param_check_not_empty( 'wp_blog_ID', 'Please select a collection!' );
 
 		// Save last import collection in Session:
 		$Session->set( 'last_import_coll_ID', $wp_blog_ID );
@@ -51,11 +51,11 @@ switch( $action )
 		$xml_file = param( 'import_file', 'string', '' );
 		if( empty( $xml_file ) )
 		{ // File is not selected
-			param_error( 'import_file', T_('Please select file to import.') );
+			param_error( 'import_file', 'Please select file to import.' );
 		}
 		else if( ! preg_match( '/\.(xml|txt|zip)$/i', $xml_file ) )
 		{ // Extension is incorrect
-			param_error( 'import_file', sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), $xml_file ) );
+			param_error( 'import_file', sprintf( '&laquo;%s&raquo; has an unrecognized extension.', $xml_file ) );
 		}
 
 		if( param_errors_detected() )
@@ -72,10 +72,10 @@ switch( $action )
 $AdminUI->set_path( 'options', 'misc', 'import' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
-$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
-$AdminUI->breadcrumbpath_add( T_('WordPress XML Importer'), $admin_url.'?ctrl=wpimportxml' );
+$AdminUI->breadcrumbpath_add( 'System', $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( 'Maintenance', $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( 'Import', $admin_url.'?ctrl=tools&amp;tab3=import' );
+$AdminUI->breadcrumbpath_add( 'WordPress XML Importer', $admin_url.'?ctrl=wpimportxml' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'xml-importer' );
