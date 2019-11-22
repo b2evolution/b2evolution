@@ -37,20 +37,28 @@ $default_ids = ItemType::get_default_ids();
  */
 function get_actions_for_itemtype( $id )
 {
-	global $default_ids;
-	$action = action_icon( T_('Duplicate this Item Type...'), 'copy',
-										regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=new') );
+	global $default_ids, $admin_url;
 
-	// Edit all item types except of not reserved item type
+	// Exit Item Type:
 	$action = action_icon( T_('Edit this Item Type...'), 'edit',
-									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=edit') )
-						.$action;
+		regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=edit' ) );
+
+	// Copy Item Type:
+	$action .= action_icon( T_('Duplicate this Item Type...'), 'copy',
+		regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=new' ) );
+
+	if( is_pro() )
+	{	// Export Item Type only for PRO version:
+		$action .= action_icon( T_('Export this Item Type...'), 'download',
+			$admin_url.'?ctrl=exportxml&amp;action=export_itemtype&amp;ityp_ID='.$id.'&amp;'.url_crumb( 'itemtype' ) );
+	}
 
 	if( ! in_array( $id, $default_ids ) )
 	{	// Delete only the not default item types:
 		$action .= action_icon( T_('Delete this Item Type!'), 'delete',
-									regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=delete&amp;'.url_crumb('itemtype').'') );
+			regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=delete&amp;'.url_crumb( 'itemtype' ) ) );
 	}
+
 	return $action;
 }
 
