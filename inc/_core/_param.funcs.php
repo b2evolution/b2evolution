@@ -923,7 +923,7 @@ function param_check_valid_login( $var )
 		}
 		elseif( $check === 'long' )
 		{	// Special case for long logins:
-			$msg = sprintf( T_('Logins cannot be longer %d characters.'), 20 );
+			$msg = sprintf( T_('Logins cannot be longer than %d characters.'), 20 );
 		}
 		elseif( ! isset( $Settings ) || $Settings->get('strict_logins') )
 		{
