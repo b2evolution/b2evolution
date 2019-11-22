@@ -871,6 +871,10 @@ elseif( $allow_items_list_form )
 
 	$Form->button( array( 'button', 'mass_change_main_cat', T_('Change primary category') ) );
 	$Form->button( array( 'button', 'mass_add_extra_cat', T_('Add secondary category') ) );
+	if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+	{	// Export Items only for PRO version:
+		$Form->button( array( 'submit', 'actionArray[mass_export]', T_('Export to XML') ) );
+	}
 	$Form->button( array( 'submit', 'actionArray[mass_delete]', T_('Delete'), 'btn-danger' ) );
 
 	$Form->end_form();

@@ -392,6 +392,17 @@ class Module
 
 
 	/**
+	 * Handle back-office action
+	 *
+	 * @param array Parameters: 'ctrl', 'action'
+	 * @return boolean|NULL TRUE to mark that at least one module handles this action, NULL - this module does NOT handle the requested action
+	 */
+	function handle_backoffice_action( $params = array() )
+	{
+	}
+
+
+	/**
 	 * Initialize back-office UI
 	 *
 	 * @param array Parameters: 'ctrl', 'action', 'tab'

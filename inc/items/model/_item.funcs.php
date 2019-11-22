@@ -5724,12 +5724,19 @@ function items_results( & $items_Results, $params = array() )
 					'type' => 'button',
 					'text' => T_('Add secondary category'),
 				),
-			'mass_delete' => array(
+			);
+		if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+		{	// Export Items only for PRO version:
+			$items_Results->list_mass_actions['mass_export'] = array(
 					'type'  => 'submit',
-					'text'  => T_('Delete'),
-					'class' => 'btn-danger',
-				),
-		);
+					'text'  => T_('Export to XML'),
+				);
+		}
+		$items_Results->list_mass_actions['mass_delete'] = array(
+				'type'  => 'submit',
+				'text'  => T_('Delete'),
+				'class' => 'btn-danger',
+			);
 		$items_Results->list_form_hiddens = array(
 				'ctrl'     => 'items',
 				'tab'      => get_param( 'tab' ),
@@ -6351,6 +6358,8 @@ function item_row_checkbox( $Item )
  */
 function item_edit_actions( $Item )
 {
+	global $admin_url, $blog, $current_User;
+
 	$r = '';
 
 	// Display edit button if current user has the rights:
@@ -6368,6 +6377,12 @@ function item_edit_actions( $Item )
 		'text' => get_icon( 'copy', 'imgtag', array( 'title' => T_('Duplicate this post...') ) ),
 		'title' => '#',
 		'class' => '' ) );
+
+	if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
+	{	// Export Item only for PRO version:
+		$r .= action_icon( T_('Export this Item...'), 'download',
+			$admin_url.'?ctrl=exportxml&amp;action=export_item&amp;blog_ID='.$blog.'&amp;item_ID='.$Item->ID.'&amp;'.url_crumb( 'item' ) );
+	}
 
 	// Display delete button if current user has the rights:
 	$r .= $Item->get_delete_link( ' ', ' ', get_icon( 'delete' ), '#', '', false, '#', '#', regenerate_url( '', '', '', '&' ) );

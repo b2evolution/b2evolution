@@ -37,7 +37,7 @@ $default_ids = ItemType::get_default_ids();
  */
 function get_actions_for_itemtype( $id )
 {
-	global $default_ids, $admin_url;
+	global $default_ids, $admin_url, $current_User;
 
 	// Exit Item Type:
 	$action = action_icon( T_('Edit this Item Type...'), 'edit',
@@ -47,7 +47,7 @@ function get_actions_for_itemtype( $id )
 	$action .= action_icon( T_('Duplicate this Item Type...'), 'copy',
 		regenerate_url( 'action', 'ityp_ID='.$id.'&amp;action=new' ) );
 
-	if( is_pro() )
+	if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
 	{	// Export Item Type only for PRO version:
 		$action .= action_icon( T_('Export this Item Type...'), 'download',
 			$admin_url.'?ctrl=exportxml&amp;action=export_itemtype&amp;ityp_ID='.$id.'&amp;'.url_crumb( 'itemtype' ) );

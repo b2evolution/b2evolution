@@ -643,7 +643,7 @@ switch( $action )
 		break;
 
 	case 'mass_delete':
-		// Change visibility of selected items:
+		// Delete selected items:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'items' );
@@ -979,7 +979,16 @@ switch( $action )
 		break;
 
 	default:
-		debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
+		// Try to handle action by modules:
+		$module_result = modules_call_method( 'handle_backoffice_action', array(
+				'ctrl'        => 'items',
+				'action'      => $action,
+				'action_type' => 'action1',
+			) );
+		if( $module_result === NULL )
+		{	// Deny wrong action if it is not handled by any module:
+			debug_die( 'unhandled action 1:'.htmlspecialchars($action) );
+		}
 }
 
 $AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
