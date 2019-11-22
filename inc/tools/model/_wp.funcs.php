@@ -104,7 +104,7 @@ function wpxml_get_import_data( $XML_file_path )
 	}
 	else
 	{	// Unrecognized extension:
-		echo '<p class="text-danger">'.sprintf( T_( '%s has an unrecognized extension.' ), '<code>'.$xml_file['name'].'</code>' ).'</p>';
+		echo '<p class="text-danger">'.sprintf( '%s has an unrecognized extension.', '<code>'.$xml_file['name'].'</code>' ).'</p>';
 	}
 
 	if( $XML_file_path )
@@ -118,7 +118,7 @@ function wpxml_get_import_data( $XML_file_path )
 
 	if( isset( $xml_exists_in_zip ) && $xml_exists_in_zip === false && file_exists( $ZIP_folder_path ) )
 	{	// No XML is detected in ZIP package:
-		echo '<p class="text-danger">'.T_( 'Correct XML file is not detected in your ZIP package.' ).'</p>';
+		echo '<p class="text-danger">'.'Correct XML file is not detected in your ZIP package.'.'</p>';
 		// Delete temporary folder that contains the files from extracted ZIP package:
 		rmdir_r( $ZIP_folder_path );
 	}
@@ -166,12 +166,12 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	$all_wp_attachments = array();
 
 	// Parse WordPress XML file into array
-	echo T_('Loading & parsing the XML file...').'<br />';
+	echo 'Loading & parsing the XML file...'.'<br />';
 	evo_flush();
 	$xml_data = wpxml_parser( $XML_file_path );
 	echo '<ul class="list-default">';
-		echo '<li>'.T_('Memory used by XML parsing (difference between free RAM before loading XML and after)').': <b>'.bytesreadable( $xml_data['memory']['parsing'] ).'</b></li>';
-		echo '<li>'.T_('Memory used by temporary arrays (difference between free RAM after loading XML and after copying all the various data into temporary arrays)').': <b>'.bytesreadable( $xml_data['memory']['arrays'] ).'</b></li>';
+		echo '<li>'.'Memory used by XML parsing (difference between free RAM before loading XML and after)'.': <b>'.bytesreadable( $xml_data['memory']['parsing'] ).'</b></li>';
+		echo '<li>'.'Memory used by temporary arrays (difference between free RAM after loading XML and after copying all the various data into temporary arrays)'.': <b>'.bytesreadable( $xml_data['memory']['arrays'] ).'</b></li>';
 	echo '</ul>';
 	evo_flush();
 
@@ -195,7 +195,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			$old_posts = $DB->get_col( $SQL->get() );
 		}
 
-		echo T_('Removing the comments... ');
+		echo 'Removing the comments... ';
 		evo_flush();
 		if( !empty( $old_posts ) )
 		{
@@ -211,9 +211,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$DB->query( 'DELETE FROM T_links WHERE link_cmt_ID IN ( '.implode( ', ', $old_comments ).' )' );
 			}
 		}
-		echo T_('OK').'<br />';
+		echo 'OK'.'<br />';
 
-		echo T_('Removing the posts... ');
+		echo 'Removing the posts... ';
 		evo_flush();
 		if( !empty( $old_categories ) )
 		{
@@ -240,14 +240,14 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$DB->query( 'DELETE FROM T_items__user_data WHERE itud_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
 			}
 		}
-		echo T_('OK').'<br />';
+		echo 'OK'.'<br />';
 
-		echo T_('Removing the categories... ');
+		echo 'Removing the categories... ';
 		evo_flush();
 		$DB->query( 'DELETE FROM T_categories WHERE cat_blog_ID = '.$DB->quote( $wp_blog_ID ) );
-		echo T_('OK').'<br />';
+		echo 'OK'.'<br />';
 
-		echo T_('Removing the tags that are no longer used... ');
+		echo 'Removing the tags that are no longer used... ';
 		evo_flush();
 		if( !empty( $old_posts ) )
 		{ // Remove the tags
@@ -278,11 +278,11 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			// Remove the links of tags with posts
 			$DB->query( 'DELETE FROM T_items__itemtag WHERE itag_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
 		}
-		echo T_('OK').'<br />';
+		echo 'OK'.'<br />';
 
 		if( $delete_files )
 		{ // Delete the files
-			echo T_('Removing the files... ');
+			echo 'Removing the files... ';
 
 			if( ! empty( $deleted_file_IDs ) )
 			{
@@ -303,11 +303,11 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				{
 					if( ! ( $deleted_File = & $FileCache->get_by_ID( $deleted_file_ID, false, false ) ) )
 					{ // Incorrect file ID
-						echo '<p class="text-danger">'.sprintf( T_('No file #%s found in DB. It cannot be deleted.'), $deleted_file_ID ).'</p>';
+						echo '<p class="text-danger">'.sprintf( 'No file #%s found in DB. It cannot be deleted.', $deleted_file_ID ).'</p>';
 					}
 					if( ! $deleted_File->unlink() )
 					{ // No permission to delete file
-						echo '<p class="text-danger">'.sprintf( T_('Could not delete the file %s.'), '<code>'.$deleted_File->get_full_path().'</code>' ).'</p>';
+						echo '<p class="text-danger">'.sprintf( 'Could not delete the file %s.', '<code>'.$deleted_File->get_full_path().'</code>' ).'</p>';
 					}
 					// Clear cache to save memory
 					$FileCache->clear();
@@ -317,7 +317,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$DB->begin();
 			}
 
-			echo T_('OK').'<br />';
+			echo 'OK'.'<br />';
 		}
 
 		echo '<br />';
@@ -332,7 +332,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	{
 		global $Settings, $UserSettings;
 
-		echo '<p><b>'.T_('Importing users...').' </b>';
+		echo '<p><b>'.'Importing users...'.' </b>';
 		evo_flush();
 
 		// Get existing users
@@ -350,7 +350,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			$author_login = preg_replace( '/([^a-z0-9_\-\.])/i', '_', $author['author_login'] );
 			$author_login = utf8_substr( utf8_strtolower( $author_login ), 0, 20 );
 
-			echo '<p>'.sprintf( T_('Importing user: %s'), '#'.$author['author_id'].' - "'.$author_login.'"' ).'... ';
+			echo '<p>'.sprintf( 'Importing user: %s', '#'.$author['author_id'].' - "'.$author_login.'"' ).'... ';
 
 			if( empty( $existing_users[ $author_login ] ) )
 			{	// Insert new user into DB if User doesn't exist with current login name
@@ -436,7 +436,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				if( ! $User->dbinsert() )
 				{	// Error on insert new user:
 					$failed_users_num++;
-					echo '<span class="text-danger">'.sprintf( T_('User %s could not be inserted in DB.'), '<code>'.$author_login.'</code>' ).'</span>';
+					echo '<span class="text-danger">'.sprintf( 'User %s could not be inserted in DB.', '<code>'.$author_login.'</code>' ).'</span>';
 					continue;
 				}
 				$user_ID = $User->ID;
@@ -460,12 +460,12 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				}
 
 				$new_users_num++;
-				echo '<span class="text-success">'.T_('OK').'.</span>';
+				echo '<span class="text-success">'.'OK'.'.</span>';
 			}
 			else
 			{	// Get ID of existing user
 				$user_ID = $existing_users[ $author_login ];
-				echo '<span class="text-warning">'.sprintf( T_('Skip because user already exists with same login and ID #%d.'), intval( $user_ID ) ).'</span>';
+				echo '<span class="text-warning">'.sprintf( 'Skip because user already exists with same login and ID #%d.', intval( $user_ID ) ).'</span>';
 				$skipped_users_num++;
 			}
 			// Save user ID of current author
@@ -478,14 +478,14 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 		$UserSettings->dbupdate();
 
-		echo '<b class="text-success">'.sprintf( T_('%d new users'), $new_users_num ).'</b>';
+		echo '<b class="text-success">'.sprintf( '%d new users', $new_users_num ).'</b>';
 		if( $skipped_users_num )
 		{
-			echo '<br /><b class="text-warning">'.sprintf( T_('%d skipped users'), $skipped_users_num ).'</b>';
+			echo '<br /><b class="text-warning">'.sprintf( '%d skipped users', $skipped_users_num ).'</b>';
 		}
 		if( $failed_users_num )
 		{
-			echo '<br /><b class="text-danger">'.sprintf( T_('%d users could not be imported'), $failed_users_num ).'</b>';
+			echo '<br /><b class="text-danger">'.sprintf( '%d users could not be imported', $failed_users_num ).'</b>';
 		}
 		echo '</p>';
 	}
@@ -494,12 +494,12 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	$files = array();
 	if( isset( $xml_data['files'] ) && count( $xml_data['files'] ) > 0 )
 	{
-		echo '<p><b>'.T_('Importing the files...').' </b>';
+		echo '<p><b>'.'Importing the files...'.' </b>';
 		evo_flush();
 
 		if( ! $attached_files_path || ! file_exists( $attached_files_path ) )
 		{	// Display an error if files are attached but folder doesn't exist:
-			echo '<p class="text-danger">'.sprintf( T_('No attachments folder %s found. It must exists to import the attached files properly.'), ( $attached_files_path ? '<code>'.$attached_files_path.'</code>' : '' ) ).'</p>';
+			echo '<p class="text-danger">'.sprintf( 'No attachments folder %s found. It must exists to import the attached files properly.', ( $attached_files_path ? '<code>'.$attached_files_path.'</code>' : '' ) ).'</p>';
 		}
 		else
 		{	// Try to import files from the selected subfolder:
@@ -571,11 +571,11 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						}
 						if( $File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] ) )
 						{	// If file has been linked to the post:
-							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to User %s.'), '<code>'.$File->_adfp_full_path.'</code>', $User->get_identity_link() ).'</p>';
+							echo '<p class="text-success">'.sprintf( 'File %s has been linked to User %s.', '<code>'.$File->_adfp_full_path.'</code>', $User->get_identity_link() ).'</p>';
 						}
 						else
 						{	// If file could not be linked to the post:
-							echo '<p class="text-warning">'.sprintf( T_('File %s could not be linked to User %s.'), '<code>'.$File->_adfp_full_path.'</code>', $User->get_identity_link() ).'</p>';
+							echo '<p class="text-warning">'.sprintf( 'File %s could not be linked to User %s.', '<code>'.$File->_adfp_full_path.'</code>', $User->get_identity_link() ).'</p>';
 						}
 					}
 
@@ -583,7 +583,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				}
 			}
 
-			echo '<b>'.sprintf( T_('%d records'), $files_count ).'</b></p>';
+			echo '<b>'.sprintf( '%d records', $files_count ).'</b></p>';
 		}
 	}
 
@@ -600,7 +600,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 	if( isset( $xml_data['categories'] ) && count( $xml_data['categories'] ) > 0 )
 	{
-		echo '<p><b>'.T_('Importing the categories...').' </b>';
+		echo '<p><b>'.'Importing the categories...'.' </b>';
 		evo_flush();
 
 		load_funcs( 'locales/_charset.funcs.php' );
@@ -608,11 +608,11 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		$categories_count = 0;
 		foreach( $xml_data['categories'] as $cat )
 		{
-			echo '<p>'.sprintf( T_('Importing category: %s'), '"'.$cat['cat_name'].'"' ).'... ';
+			echo '<p>'.sprintf( 'Importing category: %s', '"'.$cat['cat_name'].'"' ).'... ';
 
 			if( ! empty( $categories[ (string) $cat['category_nicename'] ] ) )
 			{
-				echo '<span class="text-warning">'.sprintf( T_('Skip because category #%d already exists with same slug %s.'), intval( $categories[ (string) $cat['category_nicename'] ] ), '<code>'.$cat['category_nicename'].'</code>' ).'</span>';
+				echo '<span class="text-warning">'.sprintf( 'Skip because category #%d already exists with same slug %s.', intval( $categories[ (string) $cat['category_nicename'] ] ), '<code>'.$cat['category_nicename'].'</code>' ).'</span>';
 			}
 			else
 			{
@@ -634,13 +634,13 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					$category_default = $Chapter->ID;
 				}
 				$categories_count++;
-				echo '<span class="text-success">'.T_('OK').'.</span>';
+				echo '<span class="text-success">'.'OK'.'.</span>';
 			}
 		}
 
 		echo '</p>';
 
-		echo '<b>'.sprintf( T_('%d records'), $categories_count ).'</b></p>';
+		echo '<b>'.sprintf( '%d records', $categories_count ).'</b></p>';
 	}
 
 	if( empty( $category_default ) )
@@ -655,7 +655,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	if( empty( $category_default ) )
 	{ // If category is still not defined then we should create default, because blog must has at least one category
 		$new_Chapter = new Chapter( NULL, $wp_blog_ID );
-		$new_Chapter->set( 'name', T_('Uncategorized') );
+		$new_Chapter->set( 'name', 'Uncategorized' );
 		$new_Chapter->set( 'urlname', $wp_Blog->get( 'urlname' ).'-main' );
 		$new_Chapter->dbinsert();
 		$category_default = $new_Chapter->ID;
@@ -665,7 +665,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	$tags = array();
 	if( isset( $xml_data['tags'] ) && count( $xml_data['tags'] ) > 0 )
 	{
-		echo '<p><b>'.T_('Importing the tags...').' </b>';
+		echo '<p><b>'.'Importing the tags...'.' </b>';
 		evo_flush();
 
 		// Get existing tags
@@ -678,10 +678,10 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		foreach( $xml_data['tags'] as $tag )
 		{
 			$tag_name = substr( html_entity_decode( $tag['tag_name'] ), 0, 50 );
-			echo '<p>'.sprintf( T_('Importing tag: %s'), '"'.$tag_name.'"' ).'... ';
+			echo '<p>'.sprintf( 'Importing tag: %s', '"'.$tag_name.'"' ).'... ';
 			if( ! empty( $tags[ $tag_name ] ) )
 			{
-				echo '<span class="text-warning">'.sprintf( T_('Skip because tag #%d already exists with same name %s.'), intval( $tags[ $tag_name ] ), '<code>'.$tag_name.'</code>' ).'</span>';
+				echo '<span class="text-warning">'.sprintf( 'Skip because tag #%d already exists with same name %s.', intval( $tags[ $tag_name ] ), '<code>'.$tag_name.'</code>' ).'</span>';
 			}
 			else
 			{	// Insert new tag into DB if tag doesn't exist with current name
@@ -691,11 +691,11 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				// Save new tag
 				$tags[ $tag_name ] = (string) $tag_ID;
 				$tags_count++;
-				echo '<span class="text-success">'.T_('OK').'.</span>';
+				echo '<span class="text-success">'.'OK'.'.</span>';
 			}
 		}
 		echo '</p>';
-		echo '<b>'.sprintf( T_('%d records'), $tags_count ).'</b></p>';
+		echo '<b>'.sprintf( '%d records', $tags_count ).'</b></p>';
 	}
 
 
@@ -746,7 +746,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			}
 		}
 
-		echo '<p><b>'.T_('Importing the files from attachment posts...').' </b>';
+		echo '<p><b>'.'Importing the files from attachment posts...'.' </b>';
 		evo_flush();
 
 		$attached_post_files = array();
@@ -759,7 +759,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				continue;
 			}
 
-			echo '<p>'.sprintf( T_('Importing attachment: %s'), '#'.$post['post_id'].' - "'.$post['post_title'].'"' );
+			echo '<p>'.sprintf( 'Importing attachment: %s', '#'.$post['post_id'].' - "'.$post['post_title'].'"' );
 
 			if( ! empty( $post['post_parent'] ) )
 			{	// Store what post the File is linked to:
@@ -843,9 +843,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			$attachments_count++;
 		}
 
-		echo '<b>'.sprintf( T_('%d records'), $attachments_count ).'</b></p>';
+		echo '<b>'.sprintf( '%d records', $attachments_count ).'</b></p>';
 
-		echo '<p><b>'.T_('Importing the posts...').' </b>';
+		echo '<p><b>'.'Importing the posts...'.' </b>';
 		evo_flush();
 
 		$posts_count = 0;
@@ -853,7 +853,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		{
 			if( $post['post_type'] == 'revision' )
 			{	// Ignore post with type "revision":
-				echo '<p class="text-warning">'.sprintf( T_('Ignore post "%s" because of post type is %s'),
+				echo '<p class="text-warning">'.sprintf( 'Ignore post "%s" because of post type is %s',
 						'#'.$post['post_id'].' - '.$post['post_title'],
 						'<code>'.$post['post_type'].'</code>' )
 					.'</p>';
@@ -866,7 +866,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			elseif( $post['post_type'] == 'page' && ! isset( $categories['standalone-pages'] ) )
 			{	// Try to create special category "Standalone Pages" for pages only it doesn't exist:
 				$page_Chapter = new Chapter( NULL, $wp_blog_ID );
-				$page_Chapter->set( 'name', T_('Standalone Pages') );
+				$page_Chapter->set( 'name', 'Standalone Pages' );
 				$page_Chapter->set( 'urlname', 'standalone-pages' );
 				$page_Chapter->dbinsert();
 				$categories['standalone-pages'] = $page_Chapter->ID;
@@ -875,7 +875,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$ChapterCache->add( $page_Chapter );
 			}
 
-			echo '<p>'.sprintf( T_('Importing post: %s'), '#'.$post['post_id'].' - "'.$post['post_title'].'"... ' );
+			echo '<p>'.sprintf( 'Importing post: %s', '#'.$post['post_id'].' - "'.$post['post_title'].'"... ' );
 
 			$author_ID = isset( $authors[ (string) $post['post_author'] ] ) ? $authors[ (string) $post['post_author'] ] : 1;
 			$last_edit_user_ID = isset( $authors[ (string) $post['post_lastedit_user'] ] ) ? $authors[ (string) $post['post_lastedit_user'] ] : $author_ID;
@@ -935,7 +935,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			$ItemTypeCache = & get_ItemTypeCache();
 			if( ! ( $ItemType = & $ItemTypeCache->get_by_ID( $post_type_ID, false, false ) ) )
 			{	// Skip not found Item Type:
-				echo '<p class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Skip Item because Item Type %s is not found.'), '<code>'.( isset( $post['itemtype'] ) ? $post['itemtype'] : $post['post_type'] ).'</code>' ).'</p>';
+				echo '<p class="text-danger"><span class="label label-danger">'.'ERROR'.'</span> '.sprintf( 'Skip Item because Item Type %s is not found.', '<code>'.( isset( $post['itemtype'] ) ? $post['itemtype'] : $post['post_type'] ).'</code>' ).'</p>';
 				continue;
 			}
 
@@ -949,12 +949,12 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				{
 					if( ! isset( $item_type_custom_fields[ $custom_field_name ] ) )
 					{	// Skip unknown custom field:
-						echo '<p class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Skip custom field %s because Item Type %s has no it.'), '<code>'.$custom_field_name.'</code>', '#'.$ItemType->ID.' "'.$ItemType->get( 'name' ).'"' ).'</p>';
+						echo '<p class="text-danger"><span class="label label-danger">'.'ERROR'.'</span> '.sprintf( 'Skip custom field %s because Item Type %s has no it.', '<code>'.$custom_field_name.'</code>', '#'.$ItemType->ID.' "'.$ItemType->get( 'name' ).'"' ).'</p>';
 						continue;
 					}
 					if( $item_type_custom_fields[ $custom_field_name ]['type'] != $custom_field['type'] )
 					{	// Skip wrong custom field type:
-						echo '<p class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Cannot import custom field %s because it has type %s and we expect type %s'), '<code>'.$custom_field_name.'</code>', '<code>'.$custom_field['type'].'</code>', '<code>'.$item_type_custom_fields[ $custom_field_name ]['type'].'</code>' ).'</p>';
+						echo '<p class="text-danger"><span class="label label-danger">'.'ERROR'.'</span> '.sprintf( 'Cannot import custom field %s because it has type %s and we expect type %s', '<code>'.$custom_field_name.'</code>', '<code>'.$custom_field['type'].'</code>', '<code>'.$item_type_custom_fields[ $custom_field_name ]['type'].'</code>' ).'</p>';
 						continue;
 					}
 					$Item->set_custom_field( $custom_field_name, $custom_field['value'] );
@@ -1046,7 +1046,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						$File = $files[ $link['link_file_ID'] ];
 						if( $File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] ) )
 						{	// If file has been linked to the post
-							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post.', '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
 							$file_is_linked = true;
 							// Update link order to the latest for two other ways([caption] and <img />) below:
 							$link_order = $link['link_order'];
@@ -1054,7 +1054,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					}
 					if( ! $file_is_linked )
 					{	// If file could not be linked to the post:
-						echo '<p class="text-warning">'.sprintf( T_('Link %s could not be attached to this post because file %s is not found.'), '#'.$link['link_ID'], '#'.$link['link_file_ID'] ).'</p>';
+						echo '<p class="text-warning">'.sprintf( 'Link %s could not be attached to this post because file %s is not found.', '#'.$link['link_ID'], '#'.$link['link_file_ID'] ).'</p>';
 					}
 				}
 			}
@@ -1075,14 +1075,14 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 								$File = $files[ $attachment_IDs[ $postmeta['value'] ] ];
 								if( $File->link_to_Object( $LinkOwner, $link_order, 'cover' ) )
 								{	// If file has been linked to the post:
-									echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post as cover.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+									echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post as cover.', '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
 									$file_is_linked = true;
 									$link_order++;
 								}
 							}
 							if( ! $file_is_linked )
 							{	// If file could not be linked to the post:
-								echo '<p class="text-warning">'.sprintf( T_('Cover file %s could not be attached to this post because it is not found in the source attachments folder.'), '#'.$postmeta['value'] ).'</p>';
+								echo '<p class="text-warning">'.sprintf( 'Cover file %s could not be attached to this post because it is not found in the source attachments folder.', '#'.$postmeta['value'] ).'</p>';
 							}
 							break;
 					}
@@ -1101,7 +1101,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						$File = $files[ $attachment_IDs[ $caption_post_ID ] ];
 						if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
 						{	// If file has been linked to the post
-							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post.', '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
 							// Replace this caption tag from content with b2evolution format:
 							$updated_post_content = preg_replace( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
 							$file_is_linked = true;
@@ -1110,7 +1110,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					}
 					if( ! $file_is_linked )
 					{	// If file could not be linked to the post:
-						echo '<p class="text-warning">'.sprintf( T_('Caption file %s could not be attached to this post because it is not found in the source attachments folder.'), '#'.$caption_post_ID ).'</p>';
+						echo '<p class="text-warning">'.sprintf( 'Caption file %s could not be attached to this post because it is not found in the source attachments folder.', '#'.$caption_post_ID ).'</p>';
 					}
 				}
 			}
@@ -1133,7 +1133,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 							}
 							if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
 							{	// If file has been linked to the post
-								echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+								echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post.', '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
 								// Replace this img tag from content with b2evolution format:
 								$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
 								$file_is_linked = true;
@@ -1142,7 +1142,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						}
 						if( ! $file_is_linked )
 						{	// If file could not be linked to the post:
-							echo '<p class="text-warning">'.sprintf( T_('File of image url %s could not be attached to this post because it is not found in the source attachments folder.'), '<code>'.$img_url.'</code>' ).'</p>';
+							echo '<p class="text-warning">'.sprintf( 'File of image url %s could not be attached to this post because it is not found in the source attachments folder.', '<code>'.$img_url.'</code>' ).'</p>';
 						}
 					}
 				}
@@ -1162,14 +1162,14 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						$File = $files[ $attachment_IDs[ $attachment_post_ID ] ];
 						if( $File->link_to_Object( $LinkOwner, $link_order, 'aftermore' ) )
 						{	// If file has been linked to the post:
-							echo '<p class="text-success">'.sprintf( T_('File %s has been linked to this post.'), '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post.', '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
 							$file_is_linked = true;
 							$link_order++;
 						}
 					}
 					if( ! $file_is_linked )
 					{	// If file could not be linked to the post:
-						echo '<p class="text-warning">'.sprintf( T_('File %s could not be attached to this post because it is not found in the source attachments folder.'), '#'.$attachment_post_ID ).'</p>';
+						echo '<p class="text-warning">'.sprintf( 'File %s could not be attached to this post because it is not found in the source attachments folder.', '#'.$attachment_post_ID ).'</p>';
 					}
 				}
 			}
@@ -1185,7 +1185,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$comments[ $Item->ID ] = $post['comments'];
 			}
 
-			echo '<span class="text-success">'.T_('OK').'.</span>';
+			echo '<span class="text-success">'.'OK'.'.</span>';
 			echo '</p>';
 			evo_flush();
 			$posts_count++;
@@ -1201,14 +1201,14 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			}
 		}
 
-		echo '<b>'.sprintf( T_('%d records'), $posts_count ).'</b></p>';
+		echo '<b>'.sprintf( '%d records', $posts_count ).'</b></p>';
 	}
 
 
 	/* Import comments */
 	if( !empty( $comments ) )
 	{
-		echo '<p><b>'.T_('Importing the comments...').' </b>';
+		echo '<p><b>'.'Importing the comments...'.' </b>';
 		evo_flush();
 
 		$comments_count = 0;
@@ -1216,10 +1216,10 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		foreach( $comments as $post_ID => $comments )
 		{
 			$post_comments_count = 0;
-			echo '<p>'.sprintf( T_('Importing comments of the post #%d'), intval( $post_ID ) ).'... ';
+			echo '<p>'.sprintf( 'Importing comments of the post #%d', intval( $post_ID ) ).'... ';
 			if( empty( $comments ) )
 			{	// Skip if no comments
-				echo '<span class="text-warning">'.T_('Skip because the post has no comments.').'</span>';
+				echo '<span class="text-warning">'.'Skip because the post has no comments.'.'</span>';
 				continue;
 			}
 
@@ -1297,12 +1297,12 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				echo '.';
 			}
 
-			echo ' <span class="text-success">'.sprintf( T_('%d comments'), $post_comments_count ).'.</span>';
+			echo ' <span class="text-success">'.sprintf( '%d comments', $post_comments_count ).'.</span>';
 
 			echo '</p>';
 		}
 
-		echo '<b>'.sprintf( T_('%d records'), $comments_count ).'</b></p>';
+		echo '<b>'.sprintf( '%d records', $comments_count ).'</b></p>';
 	}
 
 	if( ! empty( $ZIP_folder_path ) && file_exists( $ZIP_folder_path ) )
@@ -1310,7 +1310,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		rmdir_r( $ZIP_folder_path );
 	}
 
-	echo '<p class="text-success">'.T_('Import complete.').'</p>';
+	echo '<p class="text-success">'.'Import complete.'.'</p>';
 
 	$DB->commit();
 }
@@ -1715,10 +1715,10 @@ function wpxml_check_xml_file( $file, $halt = false )
 		{	// Display error:
 			foreach( libxml_get_errors() as $error )
 			{
-				$errors[] = sprintf( T_('Line %s'), '<code>'.$error->line.'</code>' ).' - '.'"'.format_to_output( $error->message, 'htmlspecialchars' ).'"';
+				$errors[] = sprintf( 'Line %s', '<code>'.$error->line.'</code>' ).' - '.'"'.format_to_output( $error->message, 'htmlspecialchars' ).'"';
 			}
-			echo '<p class="text-danger">'.sprintf( T_('There was an error when reading XML file %s.'), '<code>'.$file.'</code>' ).'<br />'
-				.sprintf( T_('Error: %s'), implode( ',<br />', $errors ) ).'</p>';
+			echo '<p class="text-danger">'.sprintf( 'There was an error when reading XML file %s.', '<code>'.$file.'</code>' ).'<br />'
+				.sprintf( 'Error: %s', implode( ',<br />', $errors ) ).'</p>';
 			return false;
 		}
 	}
@@ -1739,7 +1739,7 @@ function wpxml_check_xml_file( $file, $halt = false )
 		}
 		else
 		{	// Display error:
-			echo '<p class="text-danger">'.T_('This does not appear to be a XML file, missing/invalid WXR version number.').'</p>';
+			echo '<p class="text-danger">'.'This does not appear to be a XML file, missing/invalid WXR version number.'.'</p>';
 			return false;
 		}
 	}
@@ -1903,7 +1903,7 @@ function & wpxml_create_File( $file_source_path, $params )
 
 	if( ! file_exists( $file_source_path ) )
 	{	// File doesn't exist
-		echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</p>';
+		echo '<p class="text-warning">'.sprintf( 'Unable to copy file %s, because it does not exist.', '<code>'.$file_source_path.'</code>' ).'</p>';
 		// Skip it:
 		return $File;
 	}
@@ -1925,11 +1925,11 @@ function & wpxml_create_File( $file_source_path, $params )
 	{	// No permission to copy to the destination folder
 		if( is_dir( $file_source_path ) )
 		{	// Folder
-			echo '<p class="text-warning">'.sprintf( T_('Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+			echo '<p class="text-warning">'.sprintf( 'Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
 		}
 		else
 		{	// File
-			echo '<p class="text-warning">'.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+			echo '<p class="text-warning">'.sprintf( 'Unable to copy file %s to %s. Please, check the permissions assigned to this folder.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
 		}
 		// Skip it:
 		return $File;
@@ -1941,7 +1941,7 @@ function & wpxml_create_File( $file_source_path, $params )
 	$File->set( 'desc', $params['file_desc'] );
 	$File->dbsave();
 
-	echo '<p class="text-success">'.sprintf( T_('File %s has been imported to %s successfully.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+	echo '<p class="text-success">'.sprintf( 'File %s has been imported to %s successfully.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
 
 	evo_flush();
 
