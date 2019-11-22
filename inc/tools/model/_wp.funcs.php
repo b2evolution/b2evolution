@@ -902,7 +902,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 							break;
 
 						case 'post_tag':
-							$tag_name = substr( html_entity_decode( $tag['tag_name'] ), 0, 50 );
+							$tag_name = substr( html_entity_decode( $term['slug'] ), 0, 50 );
 							if( isset( $tags[ $tag_name ] ) )
 							{ // Set tag
 								$post_tags[] = $tag_name;
@@ -932,12 +932,40 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$post_type_ID = $wp_Blog->get_setting( 'default_post_type' );
 			}
 
+			$ItemTypeCache = & get_ItemTypeCache();
+			if( ! ( $ItemType = & $ItemTypeCache->get_by_ID( $post_type_ID, false, false ) ) )
+			{	// Skip not found Item Type:
+				echo '<p class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Skip Item because Item Type %s is not found.'), '<code>'.( isset( $post['itemtype'] ) ? $post['itemtype'] : $post['post_type'] ).'</code>' ).'</p>';
+				continue;
+			}
+
+			$Item = new Item();
+
+			if( ! empty( $post['custom_fields'] ) )
+			{	// Import custom fields:
+				$item_type_custom_fields = $ItemType->get_custom_fields();
+				//pre_dump( $post['custom_fields'], $item_type_custom_fields );
+				foreach( $post['custom_fields'] as $custom_field_name => $custom_field )
+				{
+					if( ! isset( $item_type_custom_fields[ $custom_field_name ] ) )
+					{	// Skip unknown custom field:
+						echo '<p class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Skip custom field %s because Item Type %s has no it.'), '<code>'.$custom_field_name.'</code>', '#'.$ItemType->ID.' "'.$ItemType->get( 'name' ).'"' ).'</p>';
+						continue;
+					}
+					if( $item_type_custom_fields[ $custom_field_name ]['type'] != $custom_field['type'] )
+					{	// Skip wrong custom field type:
+						echo '<p class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Cannot import custom field %s because it has type %s and we expect type %s'), '<code>'.$custom_field_name.'</code>', '<code>'.$custom_field['type'].'</code>', '<code>'.$item_type_custom_fields[ $custom_field_name ]['type'].'</code>' ).'</p>';
+						continue;
+					}
+					$Item->set_custom_field( $custom_field_name, $custom_field['value'] );
+				}
+			}
+
 			// Get regional IDs by their names
 			$item_regions = wp_get_regional_data( $post['post_country'], $post['post_region'], $post['post_subregion'], $post['post_city'] );
 
 			$post_content = $post['post_content'];
 
-			$Item = new Item();
 			$Item->set( 'main_cat_ID', $post_main_cat_ID );
 			$Item->set( 'creator_user_ID', $author_ID );
 			$Item->set( 'lastedit_user_ID', $last_edit_user_ID );
@@ -1542,6 +1570,18 @@ function wpxml_parser( $file )
 					'slug'   => wpxml_convert_value( $att['nicename'] ),
 					'domain' => (string) $att['domain']
 				);
+			}
+		}
+
+		if( isset( $evo->custom_field ) )
+		{	// Parse values of custom fields of the Item:
+			foreach( $evo->custom_field as $custom_field )
+			{
+				$custom_field_attrs = $custom_field->attributes();
+				$post['custom_fields'][ wpxml_convert_value( $custom_field_attrs->name ) ] = array(
+						'type'  => wpxml_convert_value( $custom_field_attrs->type ),
+						'value' => wpxml_convert_value( $custom_field ),
+					);
 			}
 		}
 
