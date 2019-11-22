@@ -19,7 +19,7 @@ global $backup_paths, $backup_tables, $backup_path, $backup_exclude_folders;
 $new_version_status = check_version( $upgrade_name );
 if( empty( $new_version_status ) )
 { // New version
-	echo '<p><b>'.T_( 'The new files are ready to be installed.' ).'</b></p>';
+	echo '<p><b>'.TB_('The new files are ready to be installed.').'</b></p>';
 }
 else
 { // Old/Same version
@@ -27,15 +27,15 @@ else
 }
 
 echo '<p>'
-	.sprintf( T_( 'If you continue, the following sequence will be carried out automatically (trying to minimize "<a %s>maintenance time</a>" for the site):' ),
+	.sprintf( TB_('If you continue, the following sequence will be carried out automatically (trying to minimize "<a %s>maintenance time</a>" for the site):'),
 		'href="http://b2evolution.net/man/installation-upgrade/configuration-files/maintenance-html" target="_blank"' )
-	.'<ul><li>'.sprintf( T_( 'The site will switch to <a %s>maintenance mode</a>' ),
+	.'<ul><li>'.sprintf( TB_('The site will switch to <a %s>maintenance mode</a>'),
 				'href="http://b2evolution.net/man/installation-upgrade/configuration-files/maintenance-html" target="_blank"' ).'</li>'
-		.'<li>'.T_( 'A backup will be performed' ).'</li>'
-		.'<li>'.T_( 'The upgrade will be applied' ).'</li>'
-		.'<li>'.T_( 'The install script of the new version will be called' ).'</li>'
-		.'<li>'.sprintf( T_( 'The cleanup rules from %s will be applied' ), '<code>'.get_upgrade_config_file_name().'</code>' ).'</li>'
-		.'<li>'.T_( 'The site will switch to normal mode again at the end of the install script.' ).'</li>'
+		.'<li>'.TB_('A backup will be performed').'</li>'
+		.'<li>'.TB_('The upgrade will be applied').'</li>'
+		.'<li>'.TB_('The install script of the new version will be called').'</li>'
+		.'<li>'.sprintf( TB_('The cleanup rules from %s will be applied'), '<code>'.get_upgrade_config_file_name().'</code>' ).'</li>'
+		.'<li>'.TB_('The site will switch to normal mode again at the end of the install script.').'</li>'
 	.'</ul></p>';
 
 if( isset( $block_item_Widget ) )
@@ -51,7 +51,7 @@ $Form->hiddens_by_key( get_memorized( 'action' ) );
 $Form->begin_form( 'fform' );
 
 // Display the backup options to select what should be backuped:
-$Form->begin_fieldset( T_( 'Advanced backup options' ).get_manual_link( 'upgrade-advanced-backup-options' ), array( 'id' => 'upgrade_backup_options', 'fold' => true ) );
+$Form->begin_fieldset( TB_('Advanced backup options').get_manual_link( 'upgrade-advanced-backup-options' ), array( 'id' => 'upgrade_backup_options', 'fold' => true ) );
 
 // Create Backup object:
 load_class( 'maintenance/model/_backup.class.php', 'Backup' );
@@ -85,20 +85,20 @@ foreach( $backup_exclude_folders as $name => $settings )
 		$exclude_folder_name_last = $settings['path'][ count( $settings['path'] ) - 1 ];
 		array_pop( $settings['path'] );
 		$exclude_folder_names = '<code>'.implode( '</code>, <code>', $settings['path'] ).'</code>';
-		$exclude_folder_names .= ' '.T_('or').' <code>'.$exclude_folder_name_last.'</code>';
+		$exclude_folder_names .= ' '.TB_('or').' <code>'.$exclude_folder_name_last.'</code>';
 	}
 	else
 	{
-		$exclude_folder_names = '<code>'.implode( '</code> '.T_('or').' <code>', $settings['path'] ).'</code>';
+		$exclude_folder_names = '<code>'.implode( '</code> '.TB_('or').' <code>', $settings['path'] ).'</code>';
 	}
-	$backup_exclude_checkboxes[] = array( 'exclude_bk_'.$name, $current_Backup->exclude_folders[ $name ], sprintf( T_('Exclude all %s folders'), $exclude_folder_names ), $settings['excluded'] );
+	$backup_exclude_checkboxes[] = array( 'exclude_bk_'.$name, $current_Backup->exclude_folders[ $name ], sprintf( TB_('Exclude all %s folders'), $exclude_folder_names ), $settings['excluded'] );
 }
 if( count( $backup_exclude_checkboxes ) )
 {
-	$Form->checklist( $backup_exclude_checkboxes, 'exclude_bk', T_('Exclude folders') );
+	$Form->checklist( $backup_exclude_checkboxes, 'exclude_bk', TB_('Exclude folders') );
 }
 
-$Form->checkbox( 'ignore_bk_config', $current_Backup->ignore_config, 'backup_ignore.conf', sprintf( T_('Ignore files and folders listed in %s'), '<code>conf/backup_ignore.conf</code>' ) );
+$Form->checkbox( 'ignore_bk_config', $current_Backup->ignore_config, 'backup_ignore.conf', sprintf( TB_('Ignore files and folders listed in %s'), '<code>conf/backup_ignore.conf</code>' ) );
 
 // Display checkboxes
 foreach( $backup_tables as $name => $settings )
@@ -117,28 +117,28 @@ foreach( $backup_tables as $name => $settings )
 }
 
 $db_structure_checkboxes = array(
-	array( 'db_structure', 1, sprintf( T_('Add %s statements for ALL tables, in order to allow quick restore.'), '<code>CREATE TABLE</code>' ), $current_Backup->backup_db_structure ),
-	array( 'drop_table_first', 1, sprintf( T_('Add %s before every %s.'), '<code>DROP TABLE IF EXISTS</code>', '<code>CREATE TABLE</code>' ), $current_Backup->drop_table_first )
+	array( 'db_structure', 1, sprintf( TB_('Add %s statements for ALL tables, in order to allow quick restore.'), '<code>CREATE TABLE</code>' ), $current_Backup->backup_db_structure ),
+	array( 'drop_table_first', 1, sprintf( TB_('Add %s before every %s.'), '<code>DROP TABLE IF EXISTS</code>', '<code>CREATE TABLE</code>' ), $current_Backup->drop_table_first )
 );
-$Form->checklist( $db_structure_checkboxes, 'db_structure_options', T_('DB Structure') );
+$Form->checklist( $db_structure_checkboxes, 'db_structure_options', TB_('DB Structure') );
 
 if( function_exists( 'gzopen' ) )
 {
-	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, 'ZIP', T_('Compress backup files into ZIP archive.') );
+	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, 'ZIP', TB_('Compress backup files into ZIP archive.') );
 }
 
 $Form->end_fieldset();
 
 // Display file options:
-$Form->begin_fieldset( T_('File options').get_manual_link( 'upgrade-file-options' ), array( 'id' => 'upgrade_file_options', 'fold' => true ) );
-	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, T_('Permissions for new folders'), T_('Default CHMOD (UNIX permissions) for new directories created by b2evolution.') );
-	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, T_('Permissions for new files'), T_('Default CHMOD (UNIX permissions) for new files created by b2evolution.') );
+$Form->begin_fieldset( TB_('File options').get_manual_link( 'upgrade-file-options' ), array( 'id' => 'upgrade_file_options', 'fold' => true ) );
+	$Form->text_input( 'fm_default_chmod_dir', $Settings->get('fm_default_chmod_dir'), 4, TB_('Permissions for new folders'), TB_('Default CHMOD (UNIX permissions) for new directories created by b2evolution.') );
+	$Form->text_input( 'fm_default_chmod_file', $Settings->get('fm_default_chmod_file'), 4, TB_('Permissions for new files'), TB_('Default CHMOD (UNIX permissions) for new files created by b2evolution.') );
 $Form->end_fieldset();
 
 // Display the form buttons
-$Form->begin_fieldset( T_( 'Actions' ) );
+$Form->begin_fieldset( TB_('Actions') );
 
-$action_backup_title = ( empty( $new_version_status ) ) ? T_( 'Backup & Upgrade' ) : T_( 'Force Backup & Upgrade' );
+$action_backup_title = ( empty( $new_version_status ) ) ? TB_('Backup & Upgrade') : TB_('Force Backup & Upgrade');
 
 $Form->end_form( array( array( 'submit', 'actionArray[backup_and_overwrite]', $action_backup_title, 'SaveButton'.( empty( $new_version_status ) ? '' : ' btn-warning' ) ) ) );
 

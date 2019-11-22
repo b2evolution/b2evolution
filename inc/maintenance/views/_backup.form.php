@@ -33,13 +33,13 @@ global $current_Backup;
 $Form = new Form( NULL, 'backup_settings', 'post' );
 
 
-$Form->begin_form( 'fform', T_('Backup application files and data') );
+$Form->begin_form( 'fform', TB_('Backup application files and data') );
 
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 
-$Form->begin_fieldset( T_( 'Existing Backups' ).get_manual_link( 'existing-backups' ) );
+$Form->begin_fieldset( TB_('Existing Backups').get_manual_link( 'existing-backups' ) );
 
-	$Form->info( T_('Folder'), '<code>'.$backup_path.'</code>' );
+	$Form->info( TB_('Folder'), '<code>'.$backup_path.'</code>' );
 
 	// Get all backup folders:
 	$backup_folders = array();
@@ -68,16 +68,16 @@ $Form->begin_fieldset( T_( 'Existing Backups' ).get_manual_link( 'existing-backu
 				.'<a href="'.$admin_url.'?ctrl=backup&amp;action=delete&amp;folder='.rawurlencode( $dir_name ).'&amp;'.url_crumb( 'backup' ).'"'
 						.' class="btn btn-danger btn-xs"'
 						.' onclick="return confirm(\''.TS_('Are you sure want to delete this folder?').'\')">'
-					.T_('Delete')
+					.TB_('Delete')
 				.'</a>';
 		}
-		$Form->info( T_('Subfolders'), implode( '<br>', $backup_folders ) );
+		$Form->info( TB_('Subfolders'), implode( '<br>', $backup_folders ) );
 	}
 
 $Form->end_fieldset();
 
 // Backup settings for folders and files
-$Form->begin_fieldset( T_( 'Folders & files' ).get_manual_link( 'backup-tab' ) );
+$Form->begin_fieldset( TB_('Folders & files').get_manual_link( 'backup-tab' ) );
 
 // Display checkboxes to include the paths:
 foreach( $backup_paths as $name => $settings )
@@ -107,32 +107,32 @@ foreach( $backup_exclude_folders as $name => $settings )
 		$exclude_folder_name_last = $settings['path'][ count( $settings['path'] ) - 1 ];
 		array_pop( $settings['path'] );
 		$exclude_folder_names = '<code>'.implode( '</code>, <code>', $settings['path'] ).'</code>';
-		$exclude_folder_names .= ' '.T_('or').' <code>'.$exclude_folder_name_last.'</code>';
-		$exclude_folder_note = T_('Exclude all %s folders');
+		$exclude_folder_names .= ' '.TB_('or').' <code>'.$exclude_folder_name_last.'</code>';
+		$exclude_folder_note = TB_('Exclude all %s folders');
 	}
 	elseif( count( $settings['path'] ) == 2 )
 	{
-		$exclude_folder_names = '<code>'.implode( '</code> '.T_('or').' <code>', $settings['path'] ).'</code>';
-		$exclude_folder_note = T_('Exclude all %s folders');
+		$exclude_folder_names = '<code>'.implode( '</code> '.TB_('or').' <code>', $settings['path'] ).'</code>';
+		$exclude_folder_note = TB_('Exclude all %s folders');
 	}
 	else
 	{
 		$exclude_folder_names = '<code>'.$settings['path'][0].'</code>';
-		$exclude_folder_note = T_('Exclude the %s folder');
+		$exclude_folder_note = TB_('Exclude the %s folder');
 	}
 	$backup_exclude_checkboxes[] = array( 'exclude_bk_'.$name, $current_Backup->exclude_folders[ $name ], sprintf( $exclude_folder_note, $exclude_folder_names ), $settings['excluded'] );
 }
 if( count( $backup_exclude_checkboxes ) )
 {
-	$Form->checklist( $backup_exclude_checkboxes, 'exclude_bk', T_('Exclude folders') );
+	$Form->checklist( $backup_exclude_checkboxes, 'exclude_bk', TB_('Exclude folders') );
 }
 
-$Form->checkbox( 'ignore_bk_config', $current_Backup->ignore_config, 'backup_ignore.conf', sprintf( T_('Ignore files and folders listed in %s'), '<code>conf/backup_ignore.conf</code>' ) );
+$Form->checkbox( 'ignore_bk_config', $current_Backup->ignore_config, 'backup_ignore.conf', sprintf( TB_('Ignore files and folders listed in %s'), '<code>conf/backup_ignore.conf</code>' ) );
 
 $Form->end_fieldset();
 
 // Backup settings for database tables
-$Form->begin_fieldset( T_( 'Database tables' ), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( TB_('Database tables'), array( 'class'=>'fieldset clear' ) );
 
 // Display checkboxes
 foreach( $backup_tables as $name => $settings )
@@ -151,30 +151,30 @@ foreach( $backup_tables as $name => $settings )
 }
 
 $db_structure_checkboxes = array(
-	array( 'db_structure', 1, sprintf( T_('Add %s statements for ALL tables, in order to allow quick restore.'), '<code>CREATE TABLE</code>' ), $current_Backup->backup_db_structure ),
-	array( 'drop_table_first', 1, sprintf( T_('Add %s before every %s.'), '<code>DROP TABLE IF EXISTS</code>', '<code>CREATE TABLE</code>' ), $current_Backup->drop_table_first )
+	array( 'db_structure', 1, sprintf( TB_('Add %s statements for ALL tables, in order to allow quick restore.'), '<code>CREATE TABLE</code>' ), $current_Backup->backup_db_structure ),
+	array( 'drop_table_first', 1, sprintf( TB_('Add %s before every %s.'), '<code>DROP TABLE IF EXISTS</code>', '<code>CREATE TABLE</code>' ), $current_Backup->drop_table_first )
 );
-$Form->checklist( $db_structure_checkboxes, 'db_structure_options', T_('DB Structure') );
+$Form->checklist( $db_structure_checkboxes, 'db_structure_options', TB_('DB Structure') );
 
 $Form->end_fieldset();
 
 // Enable/Disable maintenance mode
-$Form->begin_fieldset( T_('General Options').get_manual_link( 'set-system-lock-during-backup' ), array( 'class'=>'fieldset clear' ) );
+$Form->begin_fieldset( TB_('General Options').get_manual_link( 'set-system-lock-during-backup' ), array( 'class'=>'fieldset clear' ) );
 
 $Form->radio( 'bk_lock_type', 'maintenance_mode',
 		array(
-			array( 'maintenance_mode', T_('Maintenance mode').' ('.T_('Recommended').')', T_('check this to completely lock b2evolution' ) ),
-			array( 'maintenance_lock', T_('Maintenance lock'), T_('check this to prevent login (except for admins), sending comments/messages and receiving DB updates (other than logging)') ),
-			array( 'open', T_( 'Leave the site open for modifications during backup. (Not recommended).') )
-		), T_( 'Lock b2evolution while backing up' ), true );
+			array( 'maintenance_mode', TB_('Maintenance mode').' ('.TB_('Recommended').')', TB_('check this to completely lock b2evolution') ),
+			array( 'maintenance_lock', TB_('Maintenance lock'), TB_('check this to prevent login (except for admins), sending comments/messages and receiving DB updates (other than logging)') ),
+			array( 'open', TB_('Leave the site open for modifications during backup. (Not recommended).') )
+		), TB_('Lock b2evolution while backing up'), true );
 
 if( function_exists('gzopen') )
 {
-	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, 'ZIP', T_('Compress backup files into ZIP archive.') );
+	$Form->checkbox( 'bk_pack_backup_files', $current_Backup->pack_backup_files, 'ZIP', TB_('Compress backup files into ZIP archive.') );
 }
 $Form->add_crumb( 'backup' );
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'actionArray[backup]', T_('Backup'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray[backup]', TB_('Backup'), 'SaveButton' ) ) );
 
 ?>

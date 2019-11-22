@@ -29,21 +29,21 @@ $Form->hiddens_by_key( get_memorized( 'action' ) );
 $Form->begin_form( 'fform' );
 
 // Display the form buttons
-$Form->begin_fieldset( T_( 'Actions' ) );
+$Form->begin_fieldset( TB_('Actions') );
 
 $form_buttons = array();
 if( $action_success && $download_success )
 { // Init a button to unzip
-	$form_buttons[] = array( 'submit', 'actionArray[unzip]', T_( 'Unzip package' ), 'SaveButton' );
+	$form_buttons[] = array( 'submit', 'actionArray[unzip]', TB_('Unzip package'), 'SaveButton' );
 }
 elseif( $download_success )
 { // Init the buttons to select next action
-	$form_buttons[] = array( 'submit', 'actionArray[unzip]', T_( 'Skip Download' ), 'SaveButton' );
-	$form_buttons[] = array( 'submit', 'actionArray[force_download]', T_( 'Force New Download' ), 'SaveButton btn-warning' );
+	$form_buttons[] = array( 'submit', 'actionArray[unzip]', TB_('Skip Download'), 'SaveButton' );
+	$form_buttons[] = array( 'submit', 'actionArray[force_download]', TB_('Force New Download'), 'SaveButton btn-warning' );
 }
 else
 { // Init a button to back step
-	$form_buttons[] = array( 'submit', 'actionArray[start]', T_( 'Back to Package Selection' ), 'SaveButton' );
+	$form_buttons[] = array( 'submit', 'actionArray[start]', TB_('Back to Package Selection'), 'SaveButton' );
 }
 
 $Form->end_form( $form_buttons );

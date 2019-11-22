@@ -256,7 +256,18 @@ function TS_( $string, $req_locale = '', $params = array() )
 function TD_( $string )
 {
 	// TODO: Later we will make a specific .POT file containing ONLY demo contents.
-	return $string;
+	return T_($string);
+}
+
+/**
+ * Translate strings in Back-office UI.
+ *
+ * @param string String to translate
+ * @return string The translated string
+ */
+function TB_( $string )
+{
+	return T_($string);
 }
 
 
