@@ -173,14 +173,14 @@ switch( $params['notify_type'] )
 
 	case 'comment_mentioned':
 		// user is mentioned in the comment
-		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mention your name in a comment.' )."\n"
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mentions your name in a comment.' )."\n"
 			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a comment, click here' ).': '
 			.get_htsrv_url().'quick_unsubscribe.php?type=comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 
 	case 'meta_comment_mentioned':
 		// user is mentioned in the meta comment
-		$params['unsubscribe_text'] = T_( 'You were mentioned in this meta comment, and you are receiving notifications when anyone mention your name in a meta comment.' )."\n"
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this meta comment, and you are receiving notifications when anyone mentions your name in a meta comment.' )."\n"
 			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a meta comment, click here' ).': '
 			.get_htsrv_url().'quick_unsubscribe.php?type=meta_comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;

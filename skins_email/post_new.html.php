@@ -130,7 +130,7 @@ switch( $params['notify_type'] )
 
 	case 'post_mentioned':
 		// user is mentioned in the post
-		$params['unsubscribe_text'] = T_( 'You were mentioned in this post, and you are receiving notifications when anyone mention your name in a post.' ).'<br />'
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this post, and you are receiving notifications when anyone mentions your name in a post.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a post, click here' ).': '
 			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=post_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' ).'.';
 		break;
