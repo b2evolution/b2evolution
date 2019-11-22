@@ -85,14 +85,14 @@ switch( $action )
 		if( $del_result )
 		{	// Successful deleting:
 			$Messages->add( sprintf( $is_dir
-				? T_('The directory &laquo;%s&raquo; has been deleted.')
-				: T_('The file &laquo;%s&raquo; has been deleted.'), $file ), 'success' );
+				? TB_('The directory &laquo;%s&raquo; has been deleted.')
+				: TB_('The file &laquo;%s&raquo; has been deleted.'), $file ), 'success' );
 		}
 		else
 		{	// Failed deleting:
 			$Messages->add( sprintf( $is_dir
-				? T_('Cannot delete directory %s. Please check the permissions or delete it manually.')
-				: T_('File %s could not be deleted.'), '<code>'.$file.'</code>' ), 'error' );
+				? TB_('Cannot delete directory %s. Please check the permissions or delete it manually.')
+				: TB_('File %s could not be deleted.'), '<code>'.$file.'</code>' ), 'error' );
 		}
 
 		// Redirect back to don't try delete the same file/folder twice:
@@ -105,18 +105,18 @@ switch( $action )
 check_upgrade_config( true );
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( TB_('Maintenance'), $admin_url.'?ctrl=tools' );
 if( $tab == 'git' )
 {
-	$AdminUI->breadcrumbpath_add( T_('Upgrade from Git'), $admin_url.'?ctrl=upgrade&amp;tab='.$tab );
+	$AdminUI->breadcrumbpath_add( TB_('Upgrade from Git'), $admin_url.'?ctrl=upgrade&amp;tab='.$tab );
 
 	// Set an url for manual page:
 	$AdminUI->set_page_manual_link( 'upgrade-from-git' );
 }
 else
 {
-	$AdminUI->breadcrumbpath_add( T_('Auto Upgrade'), $admin_url.'?ctrl=upgrade' );
+	$AdminUI->breadcrumbpath_add( TB_('Auto Upgrade'), $admin_url.'?ctrl=upgrade' );
 
 	// Set an url for manual page:
 	$AdminUI->set_page_manual_link( 'auto-upgrade' );
@@ -131,7 +131,7 @@ $AdminUI->disp_body_top();
 
 $AdminUI->disp_payload_begin();
 
-echo '<h2 class="red">'.T_('WARNING: USE WITH CAUTION!').'</h2>';
+echo '<h2 class="red">'.TB_('WARNING: USE WITH CAUTION!').'</h2>';
 
 evo_flush();
 
@@ -149,7 +149,7 @@ switch( $action )
 		if( $tab == '' )
 		{
 			$block_item_Widget = new Widget( 'block_item' );
-			$block_item_Widget->title = T_('Updates from b2evolution.net').get_manual_link( 'auto-upgrade' );
+			$block_item_Widget->title = TB_('Updates from b2evolution.net').get_manual_link( 'auto-upgrade' );
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			// Note: hopefully, the update will have been downloaded in the shutdown function of a previous page (including the login screen)
@@ -204,7 +204,7 @@ switch( $action )
 		if( $demo_mode )
 		{
 			$Messages->clear();
-			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->add( TB_('This feature is disabled on the demo server.'), 'error' );
 			$Messages->display();
 			break;
 		}
@@ -218,7 +218,7 @@ switch( $action )
 
 		$Messages->clear(); // Clear the messages to avoid a double displaying here
 
-		if( param_check_not_empty( 'git_url', T_('Please enter the URL of repository') ) &&
+		if( param_check_not_empty( 'git_url', TB_('Please enter the URL of repository') ) &&
 		    param_check_url( 'git_url', 'download_src' ) &&
 		    preg_match( '#([^/]+)/([^/]+)/?$#', $git_url, $git_data ) )
 		{	// Generate an URL to download GIT branch as ZIP archive:
@@ -247,7 +247,7 @@ switch( $action )
 		if( $demo_mode )
 		{
 			$Messages->clear();
-			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->add( TB_('This feature is disabled on the demo server.'), 'error' );
 			$Messages->display();
 			break;
 		}
@@ -258,17 +258,17 @@ switch( $action )
 		autoupgrade_display_steps( 2, $tab );
 
 		$block_item_Widget = new Widget( 'block_item' );
-		$block_item_Widget->title = T_('Downloading package...');
+		$block_item_Widget->title = TB_('Downloading package...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 
 		$download_url = param( 'upd_url', 'string', '', true );
 		$Messages->clear(); // Clear the messages to avoid a double displaying here
-		param_check_not_empty( 'upd_url', T_('Please enter the URL to download ZIP archive') );
+		param_check_not_empty( 'upd_url', TB_('Please enter the URL to download ZIP archive') );
 		// Check the download url for correct http, https, ftp URI
 		$success = param_check_url( 'upd_url', 'download_src', NULL );
 		if( $success && ! preg_match( '#\.zip$#i', $download_url ) )
 		{ // Check the download url is a .zip or .ZIP
-			param_error( 'upd_url', sprintf( T_( 'The URL "%s" must point to a ZIP archive.' ), $download_url ) );
+			param_error( 'upd_url', sprintf( TB_('The URL "%s" must point to a ZIP archive.'), $download_url ) );
 		}
 
 		if( $Messages->count() )
@@ -296,14 +296,14 @@ switch( $action )
 			{ // Try to delete previous package if the downloading is forced
 				if( ! @unlink( $upgrade_file ) )
 				{
-					echo '<p class="red">'.sprintf( T_('Unable to delete previously downloaded package %s before forcing the download.'), '<b>'.$upgrade_file.'</b>' ).'</p>';
+					echo '<p class="red">'.sprintf( TB_('Unable to delete previously downloaded package %s before forcing the download.'), '<b>'.$upgrade_file.'</b>' ).'</p>';
 					$action_success = false;
 				}
 			}
 			else
 			{
 				echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'
-					.sprintf( T_( 'The package %s is already downloaded.' ), $upgrade_name ).'</div></div>';
+					.sprintf( TB_('The package %s is already downloaded.'), $upgrade_name ).'</div></div>';
 				$action_success = false;
 			}
 			evo_flush();
@@ -314,7 +314,7 @@ switch( $action )
 			// Set maximum execution time
 			set_max_execution_time( 1800 ); // 30 minutes
 
-			echo '<p>'.sprintf( T_( 'Downloading package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_file );
+			echo '<p>'.sprintf( TB_('Downloading package to &laquo;<strong>%s</strong>&raquo;...'), $upgrade_file );
 			evo_flush();
 
 			// Downloading
@@ -323,18 +323,18 @@ switch( $action )
 			if( $info['status'] != 200 || empty( $file_contents ) )
 			{ // Impossible to download
 				$download_success = false;
-				echo '</p><p style="color:red">'.sprintf( T_( 'Unable to download package from &laquo;%s&raquo;' ), $download_url ).'</p>';
+				echo '</p><p style="color:red">'.sprintf( TB_('Unable to download package from &laquo;%s&raquo;'), $download_url ).'</p>';
 			}
 			elseif( ! save_to_file( $file_contents, $upgrade_file, 'w' ) )
 			{ // Impossible to save file...
 				$download_success = false;
-				echo '</p><p style="color:red">'.sprintf( T_( 'Unable to create file: &laquo;%s&raquo;' ), $upgrade_file ).'</p>';
+				echo '</p><p style="color:red">'.sprintf( TB_('Unable to create file: &laquo;%s&raquo;'), $upgrade_file ).'</p>';
 
 				if( file_exists( $upgrade_file ) )
 				{ // Remove file from disk
 					if( ! @unlink( $upgrade_file ) )
 					{
-						echo '<p style="color:red">'.sprintf( T_( 'Unable to remove file: &laquo;%s&raquo;' ), $upgrade_file ).'</p>';
+						echo '<p style="color:red">'.sprintf( TB_('Unable to remove file: &laquo;%s&raquo;'), $upgrade_file ).'</p>';
 					}
 				}
 			}
@@ -360,7 +360,7 @@ switch( $action )
 		if( $demo_mode )
 		{
 			$Messages->clear();
-			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->add( TB_('This feature is disabled on the demo server.'), 'error' );
 			$Messages->display();
 			break;
 		}
@@ -371,7 +371,7 @@ switch( $action )
 		autoupgrade_display_steps( 3, $tab );
 
 		$block_item_Widget = new Widget( 'block_item' );
-		$block_item_Widget->title = T_('Unzipping package...');
+		$block_item_Widget->title = TB_('Unzipping package...');
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		evo_flush();
 
@@ -396,14 +396,14 @@ switch( $action )
 			{ // Try to delete previous package if the downloading is forced
 				if( ! rmdir_r( $upgrade_dir ) )
 				{
-					echo '<p class="red">'.sprintf( T_('Unable to delete previous unzipped package %s before forcing the unzip.'), '<b>'.$upgrade_dir.'</b>' ).'</p>';
+					echo '<p class="red">'.sprintf( TB_('Unable to delete previous unzipped package %s before forcing the unzip.'), '<b>'.$upgrade_dir.'</b>' ).'</p>';
 					$action_success = false;
 				}
 			}
 			else
 			{
 				echo '<div class="action_messages"><div class="log_error" style="text-align:center;font-weight:bold">'
-					.sprintf( T_( 'The package %s is already unzipped.' ), $upd_file ).'</div></div>';
+					.sprintf( TB_('The package %s is already unzipped.'), $upd_file ).'</div></div>';
 				$action_success = false;
 			}
 			evo_flush();
@@ -414,7 +414,7 @@ switch( $action )
 			// Set maximum execution time
 			set_max_execution_time( 1800 ); // 30 minutes
 
-			echo '<p>'.sprintf( T_( 'Unpacking package to &laquo;<strong>%s</strong>&raquo;...' ), $upgrade_dir );
+			echo '<p>'.sprintf( TB_('Unpacking package to &laquo;<strong>%s</strong>&raquo;...'), $upgrade_dir );
 			evo_flush();
 
 			// Unpack package
@@ -447,7 +447,7 @@ switch( $action )
 		$upgrade_name = param( 'upd_dir', 'string', '', true );
 
 		$block_item_Widget = new Widget( 'block_item' );
-		$block_item_Widget->title = T_('Ready to upgrade').'...';
+		$block_item_Widget->title = TB_('Ready to upgrade').'...';
 		$block_item_Widget->disp_template_replaced( 'block_start' );
 		evo_flush();
 
@@ -467,7 +467,7 @@ switch( $action )
 		if( $demo_mode )
 		{
 			$Messages->clear();
-			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->add( TB_('This feature is disabled on the demo server.'), 'error' );
 			$Messages->display();
 			break;
 		}
@@ -481,12 +481,12 @@ switch( $action )
 		// File options:
 		if( param( 'fm_default_chmod_dir', 'string', NULL ) !== NULL )
 		{
-			param_check_regexp( 'fm_default_chmod_dir', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
+			param_check_regexp( 'fm_default_chmod_dir', '~^[0-7]{3}$~', TB_('Invalid CHMOD value. Use 3 digits.') );
 			$Settings->set( 'fm_default_chmod_dir', $fm_default_chmod_dir );
 		}
 		if( param( 'fm_default_chmod_file', 'string', NULL ) !== NULL )
 		{
-			param_check_regexp( 'fm_default_chmod_file', '~^[0-7]{3}$~', T_('Invalid CHMOD value. Use 3 digits.') );
+			param_check_regexp( 'fm_default_chmod_file', '~^[0-7]{3}$~', TB_('Invalid CHMOD value. Use 3 digits.') );
 			$Settings->set( 'fm_default_chmod_file', $fm_default_chmod_file );
 		}
 
@@ -497,7 +497,7 @@ switch( $action )
 			$Messages->display();
 
 			$block_item_Widget = new Widget( 'block_item' );
-			$block_item_Widget->title = T_('Ready to upgrade').'...';
+			$block_item_Widget->title = TB_('Ready to upgrade').'...';
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 			evo_flush();
 
@@ -512,7 +512,7 @@ switch( $action )
 		if( !isset( $block_item_Widget ) )
 		{
 			$block_item_Widget = new Widget( 'block_item' );
-			$block_item_Widget->title = T_('Installing package...');
+			$block_item_Widget->title = TB_('Installing package...');
 			$block_item_Widget->disp_template_replaced( 'block_start' );
 
 			$upgrade_name = param( 'upd_name', 'string', NULL, true );
@@ -526,7 +526,7 @@ switch( $action )
 		}
 
 		// Enable maintenance mode:
-		$success = ( $success && switch_maintenance_mode( true, 'upgrade', T_( 'System upgrade is in progress. Please reload this page in a few minutes.' ) ) );
+		$success = ( $success && switch_maintenance_mode( true, 'upgrade', TB_('System upgrade is in progress. Please reload this page in a few minutes.') ) );
 
 		if( $success )
 		{
@@ -534,7 +534,7 @@ switch( $action )
 			set_max_execution_time( 1800 ); // 30 minutes
 
 			// Verify that all destination files can be overwritten
-			echo '<h4>'.T_( 'Verifying that all destination files can be overwritten...' ).'</h4>';
+			echo '<h4>'.TB_('Verifying that all destination files can be overwritten...').'</h4>';
 			evo_flush();
 
 			$read_only_list = array();
@@ -556,13 +556,13 @@ switch( $action )
 				{ // We can upgrade files and database
 
 					// Copying new folders and files
-					echo '<h4>'.T_( 'Copying new folders and files...' ).'</h4>';
+					echo '<h4>'.TB_('Copying new folders and files...').'</h4>';
 					evo_flush();
 
 					$success = verify_overwrite( $upgrade_folder_path, no_trailing_slash( $basepath ), 'Copying', true, $read_only_list );
 					if( ( ! $success ) || ( ! empty( $read_only_list ) ) )
 					{ // In case if something was changed before the previous verify_overwrite check
-						echo '<p style="color:red"><strong>'.T_( 'The files and database backup was created successfully but all folders and files could not be overwritten' );
+						echo '<p style="color:red"><strong>'.TB_('The files and database backup was created successfully but all folders and files could not be overwritten');
 						if( empty( $read_only_list ) )
 						{ // There was some error in the verify_overwrite() function, but the corresponding error message was already displayed.
 							echo '.</strong></p>';
@@ -575,14 +575,14 @@ switch( $action )
 								echo $read_only_file.'<br/>';
 							}
 						}
-						echo '<p style="color:red"><strong>'.sprintf( T_('Please restore the backup files from the &laquo;%s&raquo; package. The database was not changed.'), $backup_path ).'</strong></p>';
+						echo '<p style="color:red"><strong>'.sprintf( TB_('Please restore the backup files from the &laquo;%s&raquo; package. The database was not changed.'), $backup_path ).'</strong></p>';
 						evo_flush();
 					}
 				}
 			}
 			else
 			{
-				echo '<p style="color:red">'.T_( '<strong>The following folders and files can\'t be overwritten:</strong>' ).'</p>';
+				echo '<p style="color:red">'.TB_('<strong>The following folders and files can\'t be overwritten:</strong>').'</p>';
 				evo_flush();
 				foreach( $read_only_list as $read_only_file )
 				{
@@ -597,16 +597,16 @@ switch( $action )
 			$block_item_Widget->disp_template_replaced( 'block_end' );
 			$Form = new Form();
 			$Form->begin_form( 'fform' );
-			$Form->begin_fieldset( T_( 'Actions' ) );
-			echo '<p><b>'.T_('All new b2evolution files are in place. You will now be redirected to the installer to perform a DB upgrade.').'</b> '.T_('Note: the User Interface will look different.').'</p>';
+			$Form->begin_fieldset( TB_('Actions') );
+			echo '<p><b>'.TB_('All new b2evolution files are in place. You will now be redirected to the installer to perform a DB upgrade.').'</b> '.TB_('Note: the User Interface will look different.').'</p>';
 			$continue_onclick = 'location.href=\''.$baseurl.'install/index.php?action=auto_upgrade&locale='.$current_locale.'\'';
-			$Form->end_form( array( array( 'button', 'continue', T_('Continue to installer'), 'SaveButton', $continue_onclick ) ) );
+			$Form->end_form( array( array( 'button', 'continue', TB_('Continue to installer'), 'SaveButton', $continue_onclick ) ) );
 			unset( $block_item_Widget );
 		}
 		else
 		{ // Disable maintenance mode
 			switch_maintenance_mode( false, 'upgrade' );
-			echo '<h4 style="color:red">'.T_( 'Upgrade failed!' ).'</h4>';
+			echo '<h4 style="color:red">'.TB_('Upgrade failed!').'</h4>';
 
 			// Display a form to resubmit a previous form
 			$block_item_Widget->disp_template_replaced( 'block_end' );
@@ -614,8 +614,8 @@ switch( $action )
 			$Form->add_crumb( 'upgrade_is_launched' ); // In case we want to continue
 			$Form->hiddens_by_key( get_memorized( 'action' ) );
 			$Form->begin_form( 'fform' );
-			$Form->begin_fieldset( T_( 'Actions' ) );
-			$Form->end_form( array( array( 'submit', 'actionArray['.$action.']', T_('Retry'), 'SaveButton' ) ) );
+			$Form->begin_fieldset( TB_('Actions') );
+			$Form->end_form( array( array( 'submit', 'actionArray['.$action.']', TB_('Retry'), 'SaveButton' ) ) );
 			unset( $block_item_Widget );
 		}
 		break;

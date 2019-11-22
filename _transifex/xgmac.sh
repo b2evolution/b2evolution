@@ -3,17 +3,25 @@ echo Generate file list.
 # exclude: events module and events skin
 find .. -name "*.php" -not -wholename "*/_tests/*" > files.txt
 
-echo Extract strings.
-xgettext -D . -f files.txt --package-version=6 --no-wrap --add-comments=TRANS --copyright-holder="Francois Planque" --msgid-bugs-address=http://fplanque.com/ -o messages.pot --keyword=T_ --keyword=NT_ --keyword=TS_ --package-name=b2evolution --sort-by-file
-
+echo "Extract main strings: T_(), NT_(), TS_()"
+xgettext -D . -f files.txt --package-version=7 --no-wrap --add-comments=TRANS --copyright-holder="Francois Planque" --msgid-bugs-address=http://fplanque.com/ -o messages.pot --keyword=T_ --keyword=NT_ --keyword=TS_ --package-name=b2evolution --sort-by-file
 #echo Correct paths.
 sed -i .bak "s#:\ \.\./#: ../../../#g" messages.pot
-
 #echo Correct Header.
 sed -i .bak s/CHARSET/UTF-8/ messages.pot
-
 echo Copy to locales folder.
 cp messages.pot ../locales/
+
+echo "Extract backoffice strings: TB_()"
+xgettext -D . -f files.txt --package-version=7 --no-wrap --add-comments=TRANS --copyright-holder="Francois Planque" --msgid-bugs-address=http://fplanque.com/ -o messages-backoffice.pot --keyword=TB_ --package-name="b2evolution backoffice" --sort-by-file
+#echo Correct paths.
+sed -i .bak "s#:\ \.\./#: ../../../#g" messages-backoffice.pot
+#echo Correct Header.
+sed -i .bak s/CHARSET/UTF-8/ messages-backoffice.pot
+echo Copy to locales folder.
+
+
+
 
 #echo Correct Header.
 #sed -i .bak s/PACKAGE/b2evolution/ ../blogs/locales/messages.pot

@@ -2,8 +2,13 @@
 host = https://www.transifex.com
 type = PO
 
-[b2evolution.messages-v-6-10]
+[b2evolution.messages-v-7-0]
 file_filter = translations/b2evolution.messages/<lang>.po
 source_file = messages.pot
+source_lang = en
+
+[b2evolution.messages-v-7-0-backoffice]
+file_filter = translations/b2evolution.messages-backoffice/<lang>.po
+source_file = messages-backoffice.pot
 source_lang = en
 

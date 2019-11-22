@@ -90,15 +90,15 @@ class maintenance_Module extends Module
 		// 'options' is permission options
 		$permissions = array(
 			'perm_maintenance' => array(
-				'label' => T_('Maintenance'),
+				'label' => TB_('Maintenance'),
 				'user_func'  => 'check_maintenance_user_perm',
 				'group_func' => 'check_maintenance_group_perm',
 				'perm_block' => 'system',
 				'options'  => array(
 						// format: array( radio_button_value, radio_button_label, radio_button_note )
-						array( 'none', T_( 'No Access' ), '' ),
-						array( 'backup', T_( 'Create backups' ), '' ),
-						array( 'upgrade', T_( 'Create backups & upgrade b2evolution' ), '' ),
+						array( 'none', TB_('No Access'), '' ),
+						array( 'backup', TB_('Create backups'), '' ),
+						array( 'upgrade', TB_('Create backups & upgrade b2evolution'), '' ),
 					),
 				),
 			);
@@ -173,7 +173,7 @@ class maintenance_Module extends Module
 			// Display Backup tab in System -> Maintenance menu
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
 									'backup' => array(
-									'text' => T_('Backup'),
+									'text' => TB_('Backup'),
 									'href' => '?ctrl=backup'	),
 							) );
 		}
@@ -183,12 +183,12 @@ class maintenance_Module extends Module
 			// Display Updates tab in System -> Maintenance menu
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
 									'upgrade' => array(
-									'text' => T_('Auto Upgrade'),
+									'text' => TB_('Auto Upgrade'),
 									'href' => '?ctrl=upgrade' ),
 							) );
 			$AdminUI->add_menu_entries( array( 'options', 'misc' ), array(
 									'upgradegit' => array(
-									'text' => T_('Upgrade from Git'),
+									'text' => TB_('Upgrade from Git'),
 									'href' => '?ctrl=upgrade&amp;tab=git' ),
 							) );
 		}
@@ -204,49 +204,49 @@ class maintenance_Module extends Module
 	{
 		return array(
 			'test' => array(
-				'name'   => T_('Basic test job'),
+				'name'   => TB_('Basic test job'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_test.job.php',
 				'params' => NULL,
 			),
 			'error-test' => array(
-				'name'   => T_('Error test job'),
+				'name'   => TB_('Error test job'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_error_test.job.php',
 				'params' => NULL,
 			),
 			'cleanup-scheduled-jobs' => array(
-				'name'   => T_('Clean up scheduled jobs older than a threshold'),
+				'name'   => TB_('Clean up scheduled jobs older than a threshold'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_cleanup_jobs.job.php',
 				'params' => NULL,
 			),
 			'cleanup-email-logs' => array(
-				'name'   => T_('Clean up email logs older than a threshold'),
+				'name'   => TB_('Clean up email logs older than a threshold'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_cleanup_email_logs.job.php',
 				'params' => NULL,
 			),
 			'heavy-db-maintenance' => array(
-				'name'   => T_('Heavy DB maintenance (CHECK & OPTIMIZE)'),
+				'name'   => TB_('Heavy DB maintenance (CHECK & OPTIMIZE)'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_heavy_db_maintenance.job.php',
 				'params' => NULL,
 			),
 			'light-db-maintenance' => array(
-				'name'   => T_('Light DB maintenance (ANALYZE)'),
+				'name'   => TB_('Light DB maintenance (ANALYZE)'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_light_db_maintenance.job.php',
 				'params' => NULL,
 			),
 			'prune-old-files-from-page-cache' => array(
-				'name'   => T_('Prune old files from page cache'),
+				'name'   => TB_('Prune old files from page cache'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_prune_page_cache.job.php',
 				'params' => NULL,
 			),
 			'prune-recycled-comments' => array(
-				'name'   => T_('Prune recycled comments'),
+				'name'   => TB_('Prune recycled comments'),
 				'help'   => '#',
 				'ctrl'   => 'cron/jobs/_prune_recycled_comments.job.php',
 				'params' => NULL,

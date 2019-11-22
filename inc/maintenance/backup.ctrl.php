@@ -48,15 +48,15 @@ switch( $action )
 
 		if( ! file_exists( $deleting_folder_path ) || ! is_dir( $deleting_folder_path ) )
 		{	// Display error message if the requested folder doesn't exist:
-			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), '<code>'.$deleting_folder_path.'</code>' ), 'error' );
+			$Messages->add( sprintf( TB_('The directory &laquo;%s&raquo; does not exist.'), '<code>'.$deleting_folder_path.'</code>' ), 'error' );
 		}
 		elseif( rmdir_r( $deleting_folder_path ) )
 		{	// Display a message after successful deleting:
-			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; has been deleted.'), '<code>'.$deleting_folder_path.'</code>' ), 'success' );
+			$Messages->add( sprintf( TB_('The directory &laquo;%s&raquo; has been deleted.'), '<code>'.$deleting_folder_path.'</code>' ), 'success' );
 		}
 		else
 		{	// Display error message if the requested folder could not be deleted:
-			$Messages->add( sprintf( T_('Could not delete directory: %s'), '<code>'.$deleting_folder_path.'</code>' ), 'error' );
+			$Messages->add( sprintf( TB_('Could not delete directory: %s'), '<code>'.$deleting_folder_path.'</code>' ), 'error' );
 		}
 
 		header_redirect( $admin_url.'?ctrl=backup' );
@@ -80,9 +80,9 @@ if( $action == 'backup' && !$current_Backup->load_from_Request() )
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
-$AdminUI->breadcrumbpath_add( T_('Backup'), $admin_url.'?ctrl=backup' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( TB_('Maintenance'), $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( TB_('Backup'), $admin_url.'?ctrl=backup' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'backup-tab' );
@@ -109,7 +109,7 @@ switch( $action )
 		if( $demo_mode )
 		{
 			$Messages->clear();
-			$Messages->add( T_( 'This feature is disabled on the demo server.' ), 'error' );
+			$Messages->add( TB_('This feature is disabled on the demo server.'), 'error' );
 			$Messages->display();
 			break;
 		}
@@ -120,7 +120,7 @@ switch( $action )
 		$Form = new Form( NULL, 'backup_progress', 'post' );
 
 		// Interactive / flush() backup should start here
-		$Form->begin_form( 'fform', T_('System backup is in progress...') );
+		$Form->begin_form( 'fform', TB_('System backup is in progress...') );
 
 		evo_flush();
 
@@ -138,7 +138,7 @@ switch( $action )
 
 			case 'maintenance_mode':
 				// Enable maintenance mode
-				$success = switch_maintenance_mode( true, 'all', T_( 'System backup is in progress. Please reload this page in a few minutes.' ) );
+				$success = switch_maintenance_mode( true, 'all', TB_('System backup is in progress. Please reload this page in a few minutes.') );
 				// Make sure we exit the maintenance mode if PHP dies
 				register_shutdown_function( 'switch_maintenance_mode', false, '', true );
 				break;

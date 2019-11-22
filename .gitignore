@@ -23,3 +23,4 @@ npm-debug.log
 /_db/b2evo_schema.mwb.bak
 media/import/LRT-*
 media/blogs/*
+/_transifex/messages-backoffice.pot.bak
