@@ -725,14 +725,26 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		);
 
 		// Get post types
-		$SQL = new SQL();
-		$SQL->SELECT( 'LOWER( ityp_usage ), ityp_ID' );
+		$SQL = new SQL( 'Get item types of the colleciton #'.$wp_blog_ID.' for XML import' );
+		$SQL->SELECT( 'ityp_ID, ityp_name, LOWER( ityp_usage ) AS ityp_usage' );
 		$SQL->FROM( 'T_items__type' );
 		$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID' );
 		$SQL->WHERE( 'itc_coll_ID = '.$DB->quote( $wp_blog_ID ) );
-		$SQL->GROUP_BY( 'ityp_usage' );
 		$SQL->ORDER_BY( 'ityp_ID' );
-		$post_types = $DB->get_assoc( $SQL->get() );
+		$item_types = $DB->get_results( $SQL );
+		$item_type_names = array();
+		$item_type_usages = array();
+		foreach( $item_types as $item_type )
+		{
+			if( ! isset( $item_type_names[ $item_type->ityp_name ] ) )
+			{
+				$item_type_names[ $item_type->ityp_name ] = $item_type->ityp_ID;
+			}
+			if( ! isset( $item_type_names[ $item_type->ityp_usage ] ) )
+			{
+				$item_type_usages[ $item_type->ityp_usage ] = $item_type->ityp_ID;
+			}
+		}
 
 		echo '<p><b>'.T_('Importing the files from attachment posts...').' </b>';
 		evo_flush();
@@ -906,8 +918,19 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$post_extra_cat_IDs[] = $categories['standalone-pages'];
 			}
 
-			// Set post type ID
-			$post_type_ID = isset( $post_types[ strtolower( $post['post_type'] ) ] ) ? $post_types[ strtolower( $post['post_type'] ) ] : '1';
+			// Set item type ID:
+			if( isset( $item_type_names[ $post['itemtype'] ] ) )
+			{	// We found Item Type by name:
+				$post_type_ID = $item_type_names[ $post['itemtype'] ];
+			}
+			elseif( isset( $item_type_usages[ $post['post_type'] ] ) )
+			{	// We found Item Type by usage:
+				$post_type_ID = $item_type_usages[ $post['post_type'] ];
+			}
+			else
+			{	// Use default Item Type of the importing Collection:
+				$post_type_ID = $wp_Blog->get_setting( 'default_post_type' );
+			}
 
 			// Get regional IDs by their names
 			$item_regions = wp_get_regional_data( $post['post_country'], $post['post_region'], $post['post_subregion'], $post['post_city'] );
@@ -1482,6 +1505,7 @@ function wpxml_parser( $file )
 		$post['post_type']      = (string) $wp->post_type;
 		$post['post_password']  = (string) $wp->post_password;
 		$post['is_sticky']      = (int) $wp->is_sticky;
+		$post['itemtype']       = (string) $evo->itemtype;
 		$post['post_date_mode']     = (string) $evo->post_date_mode;
 		$post['post_lastedit_user'] = (string) $evo->post_lastedit_user;
 		$post['post_assigned_user'] = (string) $evo->post_assigned_user;
