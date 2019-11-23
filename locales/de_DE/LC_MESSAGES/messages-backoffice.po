@@ -1,0 +1,1295 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Francois Planque
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Francois Planque, 2019
+# Ralf Hilgenstock <rh@dialoge.info>, 2019
+# Marvin Kobold <koboldspost@web.de>, 2019
+# experiri <webdesign@stephan-frank.de>, 2019
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: b2evolution backoffice 7\n"
+"Report-Msgid-Bugs-To: http://fplanque.com/\n"
+"POT-Creation-Date: 2019-11-23 01:23+0100\n"
+"PO-Revision-Date: 2019-11-22 23:44+0000\n"
+"Last-Translator: experiri <webdesign@stephan-frank.de>, 2019\n"
+"Language-Team: German (Germany) (https://www.transifex.com/fplanque/teams/23/de_DE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../../../inc/maintenance/_maintenance.init.php:93
+#: ../../../inc/maintenance/backup.ctrl.php:84
+#: ../../../inc/maintenance/upgrade.ctrl.php:109
+msgid "Maintenance"
+msgstr "Wartung"
+
+#: ../../../inc/maintenance/_maintenance.init.php:99
+msgid "No Access"
+msgstr "Kein Zugriff"
+
+#: ../../../inc/maintenance/_maintenance.init.php:100
+msgid "Create backups"
+msgstr "Backups erstellen"
+
+#: ../../../inc/maintenance/_maintenance.init.php:101
+msgid "Create backups & upgrade b2evolution"
+msgstr "Backups erstellen & b2evolution Upgrade"
+
+#: ../../../inc/maintenance/_maintenance.init.php:176
+#: ../../../inc/maintenance/backup.ctrl.php:85
+#: ../../../inc/maintenance/views/_backup.form.php:178
+msgid "Backup"
+msgstr "Backup"
+
+#: ../../../inc/maintenance/_maintenance.init.php:186
+#: ../../../inc/maintenance/upgrade.ctrl.php:119
+msgid "Auto Upgrade"
+msgstr "Auto Upgrade"
+
+#: ../../../inc/maintenance/_maintenance.init.php:191
+#: ../../../inc/maintenance/upgrade.ctrl.php:112
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:24
+msgid "Upgrade from Git"
+msgstr ""
+
+#: ../../../inc/maintenance/_maintenance.init.php:207
+msgid "Basic test job"
+msgstr "Einfacher Testjob"
+
+#: ../../../inc/maintenance/_maintenance.init.php:213
+msgid "Error test job"
+msgstr "Fehlertestjob"
+
+#: ../../../inc/maintenance/_maintenance.init.php:219
+msgid "Clean up scheduled jobs older than a threshold"
+msgstr "Geplante Jobs bereinigen, die älter als der gesetzte Grenzwert sind"
+
+#: ../../../inc/maintenance/_maintenance.init.php:225
+msgid "Clean up email logs older than a threshold"
+msgstr ""
+
+#: ../../../inc/maintenance/_maintenance.init.php:231
+msgid "Heavy DB maintenance (CHECK & OPTIMIZE)"
+msgstr "Starke DB-Wartung (PRÜFEN & OPTIMIEREN)"
+
+#: ../../../inc/maintenance/_maintenance.init.php:237
+msgid "Light DB maintenance (ANALYZE)"
+msgstr "Leichte DB-Wartung (ANALYSE)"
+
+#: ../../../inc/maintenance/_maintenance.init.php:243
+msgid "Prune old files from page cache"
+msgstr "Seiten-Cache von alten Dateien bereinigen"
+
+#: ../../../inc/maintenance/_maintenance.init.php:249
+msgid "Prune recycled comments"
+msgstr "Recycelte Kommentare bereinigen"
+
+#: ../../../inc/maintenance/backup.ctrl.php:51
+#, php-format
+msgid "The directory &laquo;%s&raquo; does not exist."
+msgstr "Das Verzeichnis &laquo;%s&raquo; existiert nicht."
+
+#: ../../../inc/maintenance/backup.ctrl.php:55
+#: ../../../inc/maintenance/upgrade.ctrl.php:88
+#, php-format
+msgid "The directory &laquo;%s&raquo; has been deleted."
+msgstr "Das Verzeichnis &laquo;%s&raquo; wurde gelöscht."
+
+#: ../../../inc/maintenance/backup.ctrl.php:59
+#, php-format
+msgid "Could not delete directory: %s"
+msgstr "Verzeichnis %s nicht löschbar"
+
+#: ../../../inc/maintenance/backup.ctrl.php:83
+#: ../../../inc/maintenance/upgrade.ctrl.php:108
+#: ../../../inc/settings/remotepublish.ctrl.php:190
+msgid "System"
+msgstr "System"
+
+#: ../../../inc/maintenance/backup.ctrl.php:112
+#: ../../../inc/maintenance/upgrade.ctrl.php:207
+#: ../../../inc/maintenance/upgrade.ctrl.php:250
+#: ../../../inc/maintenance/upgrade.ctrl.php:363
+#: ../../../inc/maintenance/upgrade.ctrl.php:470
+msgid "This feature is disabled on the demo server."
+msgstr "Dieses Feature ist auf dem Demo-Server deaktiviert."
+
+#: ../../../inc/maintenance/backup.ctrl.php:123
+msgid "System backup is in progress..."
+msgstr "System-Backup wird durchgeführt..."
+
+#: ../../../inc/maintenance/backup.ctrl.php:141
+msgid ""
+"System backup is in progress. Please reload this page in a few minutes."
+msgstr ""
+"System-Backup wird durchgeführt. Bitte laden Sie diese Seite in ein paar "
+"Minuten neu."
+
+#: ../../../inc/maintenance/model/_backup.class.php:50
+msgid "Application files"
+msgstr "Anwendungsdateien"
+
+#: ../../../inc/maintenance/model/_backup.class.php:55
+msgid "Configuration files"
+msgstr "Konfigurationsdateien"
+
+#: ../../../inc/maintenance/model/_backup.class.php:60
+msgid "Skins"
+msgstr "Skins"
+
+#: ../../../inc/maintenance/model/_backup.class.php:66
+msgid "Plugins"
+msgstr "Plugins"
+
+#: ../../../inc/maintenance/model/_backup.class.php:71
+msgid "Media folder"
+msgstr "Medienordner"
+
+#: ../../../inc/maintenance/model/_backup.class.php:116
+msgid "Content tables"
+msgstr "Inhaltstabellen"
+
+#: ../../../inc/maintenance/model/_backup.class.php:121
+msgid "Logs & stats tables"
+msgstr "Protokoll- & Statistiktabellen"
+
+#: ../../../inc/maintenance/model/_backup.class.php:258
+msgid "You have not selected anything to backup."
+msgstr "Sie haben nichts für das Backup ausgewählt."
+
+#: ../../../inc/maintenance/model/_backup.class.php:276
+#, php-format
+msgid "Starting backup to: &laquo;%s&raquo; ..."
+msgstr "Beginne Backup nach: &laquo;%s&raquo; ..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:306
+#, php-format
+msgid "Backup complete. Directory: &laquo;%s&raquo;"
+msgstr "Backup fertig. Verzeichnis: &laquo;%s&raquo;"
+
+#: ../../../inc/maintenance/model/_backup.class.php:325
+msgid "Creating folders/files backup..."
+msgstr "Erstelle Backup von Verzeichnisn/Dateien..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:393
+#, php-format
+msgid "Config file %s cannot be read."
+msgstr "Config-Datei %s ist nicht lesbar."
+
+#: ../../../inc/maintenance/model/_backup.class.php:405
+#, php-format
+msgid "Archiving files to &laquo;<strong>%s</strong>&raquo;..."
+msgstr "Archiviere Dateien nach &laquo;<strong>%s</strong>&raquo;..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:433
+msgid "Creating database backup..."
+msgstr "Erstelle Datenbank-Backup..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:504
+#, php-format
+msgid ""
+"Unable to write database dump. Database dump already exists: "
+"&laquo;%s&raquo;"
+msgstr ""
+"Der Datenbank-Dump konnte nicht geschrieben werden. Der Datenbank-Dump "
+"existiert bereits: &laquo;%s&raquo;"
+
+#: ../../../inc/maintenance/model/_backup.class.php:513
+#, php-format
+msgid ""
+"Unable to write database dump. Could not open &laquo;%s&raquo; for writing."
+msgstr ""
+"Der Datenbank-Dump konnte nicht geschrieben werden. &laquo;%s&raquo; konnte "
+"zum Schreiben nicht geöffnet werden."
+
+#: ../../../inc/maintenance/model/_backup.class.php:519
+#, php-format
+msgid "Dumping tables to &laquo;<strong>%s</strong>&raquo;..."
+msgstr "Dump der Tabellen nach &laquo;<strong>%s</strong>&raquo;..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:532
+#, php-format
+msgid "Backing up table &laquo;<strong>%s</strong>&raquo; ..."
+msgstr "Backup der Tabelle &laquo;<strong>%s</strong>&raquo; ..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:602
+msgid "only structure"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_backup.class.php:677
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:494
+#, php-format
+msgid "Backing up &laquo;<strong>%s</strong>&raquo; ..."
+msgstr "Backup von &laquo;<strong>%s</strong>&raquo; ..."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:101
+msgid "This is an old version!"
+msgstr "Dies ist eine alte Version!"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:102
+msgid "You should NOT install this older version."
+msgstr "Sie sollten diese ältere Version NICHT installieren."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:109
+msgid "This package is already installed!"
+msgstr "Dieses Paket ist bereits installiert!"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:110
+msgid ""
+"No upgrade is needed at this time. You might force a re-install if you want "
+"to force a cleanup."
+msgstr ""
+"Es ist momentan kein Upgrade nötig. Sie könnten eine Neuinstallation "
+"erzwingen, wenn Sie eine Bereinigung erzwingen möchten."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:148
+msgid "Switching to maintenance mode..."
+msgstr "Wechsel in den Wartungsmodus..."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:179
+#, php-format
+msgid ""
+"Unable to switch to maintenance mode. Maintenance file can't be created: "
+"&laquo;%s&raquo;"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:189
+msgid "Switching out of maintenance mode..."
+msgstr "Wechsel aus dem Wartungsmodus..."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:202
+#, php-format
+msgid "Unable to delete maintenance file: &laquo;%s&raquo;"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:248
+#, php-format
+msgid "Unable to create &laquo;%s&raquo; directory."
+msgstr "&laquo;%s&raquo; Verzeichnis konnte nicht erstellt werden."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:257
+msgid "Checking .htaccess denial for directory: "
+msgstr "Überprüfe Ablehnung von .htaccess für das Verzeichnis:"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:266
+#, php-format
+msgid "Unable to create &laquo;%s&raquo; file in directory."
+msgstr "&laquo;%s&raquo;-Datei konnte nicht im Verzeichnis erstellt werden."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:304
+msgid "You don't have permission to UNZIP files automatically on the server."
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:308
+#, php-format
+msgid "You can change this <a %s>here</a>"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:325
+#, php-format
+msgid "Path must not contain %s"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:333
+#, php-format
+msgid "Path is outside $basepath=%s and outside $upgrade_path=%s."
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:338
+#, php-format
+msgid "Invalid ZIP file path %s:"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:353
+#, php-format
+msgid ""
+"Unable to create &laquo;%s&raquo; directory to extract files from ZIP "
+"archive."
+msgstr ""
+"&laquo;%s&raquo;-Verzeichnis zum Extrahieren von Dateien aus dem ZIP-Archiv "
+"konnte nicht erstellt werden."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:378
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:442
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:545
+#, php-format
+msgid "Error: %s"
+msgstr "Fehler: %s"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:379
+#, php-format
+msgid "Unable to decompress &laquo;%s&raquo; ZIP archive."
+msgstr "Das ZIP-Archiv &laquo;%s&raquo; konnte nicht entpackt werden."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:424
+#, php-format
+msgid "File %s already exists."
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:443
+#, php-format
+msgid "Unable to create ZIP archive %s."
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:668
+#, php-format
+msgid "Unknown policy command: %s"
+msgstr "Unbekannter Policy-Befehl: %s"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:677
+#, php-format
+msgid "Incorrect policy command: %s"
+msgstr "Inkorrekter Policy-Befehl: %s"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:685
+#, php-format
+msgid ""
+"To continue the upgrade process please fix the issues of the file %s or "
+"delete it."
+msgstr ""
+"Um mit dem Upgrade fortzufahren, beseitigen Sie bitte das Problem mit der "
+"Datei %s oder löschen Sie sie."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:701
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:712
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:749
+#, php-format
+msgid "Ignoring %s because of %s"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:727
+#, php-format
+msgid "Unavailable creating of folder %s, probably no permissions."
+msgstr ""
+"Das Erstellen von Verzeichnis %s ist nicht verfügbar, wahrscheinlich fehlt "
+"die Berechtigung."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:772
+#, php-format
+msgid "Ignoring softmove of %s because %s is already in place (see %s)"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:782
+#, php-format
+msgid "Moving %s to %s as stated in %s"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:797
+#, php-format
+msgid "Unavailable copying to %s, probably no permissions."
+msgstr ""
+"Kopieren nach %s nicht verfügbar, wahrscheinlich fehlt die Berechtigung."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:856
+msgid ""
+"WARNING: <code>upgrade_policy.conf</code> not found. We will use "
+"<code>/conf/upgrade_policy_sample.conf</code> by default but it is highly "
+"recommended you duplicate this file to <code>upgrade_policy.conf</code> and "
+"check its contents to make sure the upgrade policy is appropriate for your "
+"particluar site."
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:914
+#, php-format
+msgid "No permission to open the %s file."
+msgstr "Kein Berechtigung zum Öffnen von der %s Datei"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:928
+#, php-format
+msgid "The %s file is empty."
+msgstr "Die %s Datei ist leer."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:998
+msgid "Cleaning up..."
+msgstr "Bereinige..."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1007
+#, php-format
+msgid "No \"remove\" sections have been defined in the file %s."
+msgstr "Es wurden keine \"entfernen\"-Bereiche in der Datei %s festgelegt."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1014
+msgid ""
+"No cleanup is being done. You should manually remove the "
+"<code>/install</code> folder and check for other unwanted files..."
+msgstr ""
+"Es wird keine Bereinigung durchgeführt. Sie sollten den Verzeichnis "
+"<code>/install</code> manuell entfernen und nach ungewollten Dateien "
+"suchen..."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1022
+#, php-format
+msgid "Removing %s as stated in %s..."
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1030
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1042
+msgid "OK"
+msgstr "Ok"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1034
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1046
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1052
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1058
+msgid "Failed"
+msgstr "Fehlgeschlagen"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1034
+msgid "No permissions to delete the folder"
+msgstr "Keine Berechtigung den Verzeichnis zu löschen"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1046
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1052
+msgid "No permissions to delete the file"
+msgstr "Keine Berechtigung die Datei zu löschen"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1058
+msgid "No file found"
+msgstr "Keine Datei gefunden"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1078
+msgid "Affected paths:"
+msgstr "Betroffene Pfade:"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1114
+msgid "Affected tables:"
+msgstr "Betroffene Tabellen:"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1192
+#: ../../../inc/maintenance/views/_upgrade.form.php:26
+msgid "Check for updates"
+msgstr "Auf Updates prüfen"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1192
+msgid "Connect to Git"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1193
+msgid "Download"
+msgstr "Herunterladen"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1194
+msgid "Unzip"
+msgstr "Entpacken"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1195
+#: ../../../inc/maintenance/upgrade.ctrl.php:450
+#: ../../../inc/maintenance/upgrade.ctrl.php:500
+msgid "Ready to upgrade"
+msgstr "Bereit für Upgrade"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1196
+msgid "Backup &amp; Upgrade"
+msgstr "Upgrade &amp; Backup"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1197
+msgid "Installer script"
+msgstr "Installer-Script"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:89
+#, php-format
+msgid "The file &laquo;%s&raquo; has been deleted."
+msgstr "Die Datei &laquo;%s&raquo; wurde gelöscht."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:94
+#, php-format
+msgid ""
+"Cannot delete directory %s. Please check the permissions or delete it "
+"manually."
+msgstr ""
+"Verzeichnis %s nicht löschbar. Bitte überprüfen Sie die Berechtigungen oder "
+"löschen Sie es manuell."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:95
+#, php-format
+msgid "File %s could not be deleted."
+msgstr "Datei %s nicht löschbar."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:134
+msgid "WARNING: USE WITH CAUTION!"
+msgstr "HINWEIS: MIT GROSSER VORSICHT VERWENDEN!"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:152
+msgid "Updates from b2evolution.net"
+msgstr "Updates von b2evolution.net"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:221
+msgid "Please enter the URL of repository"
+msgstr "Bitte die URL des Repositorys eingeben"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:261
+msgid "Downloading package..."
+msgstr "Paket herunterladen..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:266
+msgid "Please enter the URL to download ZIP archive"
+msgstr "Geben Sie bitte die URL an, um das ZIP-Archiv herunterzuladen"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:271
+#, php-format
+msgid "The URL \"%s\" must point to a ZIP archive."
+msgstr "Die URL \"%s\" muss auf ein ZIP-Archiv verweisen"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:299
+#, php-format
+msgid ""
+"Unable to delete previously downloaded package %s before forcing the "
+"download."
+msgstr ""
+"Das Löschen des zuvor heruntergeladenen Pakets %s ist nicht möglich, bevor "
+"der Download erzwungen wird."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:306
+#, php-format
+msgid "The package %s is already downloaded."
+msgstr "Das Paket %s wurde bereits heruntergeladen."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:317
+#, php-format
+msgid "Downloading package to &laquo;<strong>%s</strong>&raquo;..."
+msgstr "Lade Paket herunter nach &laquo;<strong>%s</strong>&raquo;..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:326
+#, php-format
+msgid "Unable to download package from &laquo;%s&raquo;"
+msgstr "Paket von &laquo;%s&raquo; konnte nicht heruntergeladen werden"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:331
+#, php-format
+msgid "Unable to create file: &laquo;%s&raquo;"
+msgstr "Folgende Datei konnte nicht erstellt werden: &laquo;%s&raquo;"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:337
+#, php-format
+msgid "Unable to remove file: &laquo;%s&raquo;"
+msgstr "Folgende Datei konnte nicht entfernt werden: &laquo;%s&raquo;"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:374
+msgid "Unzipping package..."
+msgstr "Entpacke Pakete..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:399
+#, php-format
+msgid ""
+"Unable to delete previous unzipped package %s before forcing the unzip."
+msgstr ""
+"Das vorherige, entpackte Paket %s kann nicht gelöscht werden, bevor das "
+"Entpacken erzwungen wird."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:406
+#, php-format
+msgid "The package %s is already unzipped."
+msgstr "Das Paket %s wurde bereits entpackt."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:417
+#, php-format
+msgid "Unpacking package to &laquo;<strong>%s</strong>&raquo;..."
+msgstr "Entpacke das Paket nach &laquo;<strong>%s</strong>&raquo;..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:484
+#: ../../../inc/maintenance/upgrade.ctrl.php:489
+msgid "Invalid CHMOD value. Use 3 digits."
+msgstr "Ungültiger CHMOD-Wert. Benutzen Sie 3 Ziffern."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:515
+msgid "Installing package..."
+msgstr "Installiere Paket..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:529
+msgid ""
+"System upgrade is in progress. Please reload this page in a few minutes."
+msgstr ""
+"System-Upgrade wird durchgeführt. Bitte laden Sie diese Seite in ein paar "
+"Minuten neu."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:537
+msgid "Verifying that all destination files can be overwritten..."
+msgstr "Überprüfe ob alle Ziel-Dateien überschrieben werden können..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:559
+msgid "Copying new folders and files..."
+msgstr "Kopiere neue Verzeichnis und Dateien..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:565
+msgid ""
+"The files and database backup was created successfully but all folders and "
+"files could not be overwritten"
+msgstr ""
+"Das Backup für die Dateien und die Datenbank wurde erfolgreich erstellt, "
+"aber es konnten nicht alle Verzeichnis und Dateien überschrieben werden"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:578
+#, php-format
+msgid ""
+"Please restore the backup files from the &laquo;%s&raquo; package. The "
+"database was not changed."
+msgstr ""
+"Bitte stellen Sie die Backup-Dateien aus dem Paket &laquo;%s&raquo;  wieder "
+"her. Die Datenbank wurde nicht verändert."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:585
+msgid "<strong>The following folders and files can't be overwritten:</strong>"
+msgstr ""
+"<strong>Die folgenden Verzeichnis und Dateien können nicht überschrieben "
+"werden:</strong>"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:600
+#: ../../../inc/maintenance/upgrade.ctrl.php:617
+#: ../../../inc/maintenance/views/_upgrade.form.php:60
+#: ../../../inc/maintenance/views/_upgrade_downloaded.form.php:32
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:139
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:33
+msgid "Actions"
+msgstr "Aktionen"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:601
+msgid ""
+"All new b2evolution files are in place. You will now be redirected to the "
+"installer to perform a DB upgrade."
+msgstr ""
+"Alle neuen b2evolution-Dateien sind vorhanden. Sie werden nun zum Installer "
+"weitergeleitet, um ein DB-Upgrade durchzuführen."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:601
+msgid "Note: the User Interface will look different."
+msgstr "Hinweis: Die Benutzeroberfläche wird anders aussehen."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:603
+msgid "Continue to installer"
+msgstr "Weiter zum Installer"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:609
+msgid "Upgrade failed!"
+msgstr "Upgrade fehlgeschlagen!"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:618
+msgid "Retry"
+msgstr "Wiederholen"
+
+#: ../../../inc/maintenance/views/_backup.form.php:36
+msgid "Backup application files and data"
+msgstr "Anwendungs-Dateien und -Daten Backup"
+
+#: ../../../inc/maintenance/views/_backup.form.php:40
+msgid "Existing Backups"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_backup.form.php:42
+#: ../../../inc/maintenance/views/_upgrade.form.php:59
+msgid "Folder"
+msgstr "Verzeichnis"
+
+#: ../../../inc/maintenance/views/_backup.form.php:71
+#: ../../../inc/maintenance/views/_upgrade.form.php:137
+msgid "Delete"
+msgstr "Löschen"
+
+#: ../../../inc/maintenance/views/_backup.form.php:74
+msgid "Subfolders"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_backup.form.php:80
+msgid "Folders & files"
+msgstr "Verzeichnis & Dateien"
+
+#: ../../../inc/maintenance/views/_backup.form.php:110
+#: ../../../inc/maintenance/views/_backup.form.php:115
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:88
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:92
+msgid "or"
+msgstr "oder"
+
+#: ../../../inc/maintenance/views/_backup.form.php:111
+#: ../../../inc/maintenance/views/_backup.form.php:116
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:94
+#, php-format
+msgid "Exclude all %s folders"
+msgstr "Alle %s Verzeichnis ausschließen"
+
+#: ../../../inc/maintenance/views/_backup.form.php:121
+#, php-format
+msgid "Exclude the %s folder"
+msgstr "Den %s Verzeichnis ausschließen"
+
+#: ../../../inc/maintenance/views/_backup.form.php:127
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:98
+msgid "Exclude folders"
+msgstr "Verzeichnis ausschließen"
+
+#: ../../../inc/maintenance/views/_backup.form.php:130
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:101
+#, php-format
+msgid "Ignore files and folders listed in %s"
+msgstr "In %s aufgelistete Dateien und Verzeichnis ignorieren"
+
+#: ../../../inc/maintenance/views/_backup.form.php:135
+msgid "Database tables"
+msgstr "Datenbanktabellen"
+
+#: ../../../inc/maintenance/views/_backup.form.php:154
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:120
+#, php-format
+msgid "Add %s statements for ALL tables, in order to allow quick restore."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_backup.form.php:155
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:121
+#, php-format
+msgid "Add %s before every %s."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_backup.form.php:157
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:123
+msgid "DB Structure"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_backup.form.php:162
+msgid "General Options"
+msgstr "Allgemeine Optionen"
+
+#: ../../../inc/maintenance/views/_backup.form.php:166
+msgid "Maintenance mode"
+msgstr "Wartungsmodus"
+
+#: ../../../inc/maintenance/views/_backup.form.php:166
+msgid "Recommended"
+msgstr "Empfohlen"
+
+#: ../../../inc/maintenance/views/_backup.form.php:166
+msgid "check this to completely lock b2evolution"
+msgstr "Auswählen, um b2evolution komplett zu sperren"
+
+#: ../../../inc/maintenance/views/_backup.form.php:167
+msgid "Maintenance lock"
+msgstr "Wartungssperre"
+
+#: ../../../inc/maintenance/views/_backup.form.php:167
+msgid ""
+"check this to prevent login (except for admins), sending comments/messages "
+"and receiving DB updates (other than logging)"
+msgstr ""
+"Auswählen, um Logins (Admins ausgenommen), das Senden von "
+"Kommentaren/Nachrichten und das Erhalten von DB Updates (Protokolle "
+"ausgenommen) zu verhindern"
+
+#: ../../../inc/maintenance/views/_backup.form.php:168
+msgid ""
+"Leave the site open for modifications during backup. (Not recommended)."
+msgstr ""
+"Diese Seite während des Backups für Modifikationen offen lassen. (Nicht "
+"empfohlen)."
+
+#: ../../../inc/maintenance/views/_backup.form.php:169
+msgid "Lock b2evolution while backing up"
+msgstr "b2evolution während des Backups sperren"
+
+#: ../../../inc/maintenance/views/_backup.form.php:173
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:127
+msgid "Compress backup files into ZIP archive."
+msgstr "Backup-Dateien ins ZIP-Archiv komprimieren"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:31
+msgid "There are no new updates."
+msgstr "Es gibt keine neuen Updates."
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:40
+msgid "Update"
+msgstr "Aktualisieren"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:41
+msgid "Description"
+msgstr "Beschreibung"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:42
+msgid "Version"
+msgstr "Version"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:45
+msgid "URL"
+msgstr "URL"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:45
+msgid ""
+"You <i>might</i> replace this with a different URL in case you want to "
+"upgrade to a custom version."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:50
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:38
+msgid "Continue"
+msgstr "Fortfahren"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:56
+msgid "Already Downloaded"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:59
+msgid "Zip archive"
+msgstr "Zip-Archiv"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:88
+msgid "No files found."
+msgstr "Keine Dateien gefunden."
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:136
+msgid "Use this..."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_downloaded.form.php:37
+msgid "Unzip package"
+msgstr "Paket entpacken"
+
+#: ../../../inc/maintenance/views/_upgrade_downloaded.form.php:41
+msgid "Skip Download"
+msgstr "Download überspringen"
+
+#: ../../../inc/maintenance/views/_upgrade_downloaded.form.php:42
+msgid "Force New Download"
+msgstr "Neuen Download erzwingen"
+
+#: ../../../inc/maintenance/views/_upgrade_downloaded.form.php:46
+msgid "Back to Package Selection"
+msgstr "Zurück zur Auswahl der Pakete"
+
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:26
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:27
+#, php-format
+msgid "E.g. %s"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:26
+msgid "URL of repository"
+msgstr "Repository URL"
+
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:27
+msgid "Branch"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:29
+msgid "Export from Git..."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:22
+msgid "The new files are ready to be installed."
+msgstr "Die neuen Dateien können jetzt installiert werden."
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:30
+#, php-format
+msgid ""
+"If you continue, the following sequence will be carried out automatically "
+"(trying to minimize \"<a %s>maintenance time</a>\" for the site):"
+msgstr ""
+"Wenn Sie fortfahren, wird die folgende Sequenz automatisch durchgeführt "
+"(Versuch, die <a %s>Wartungszeit</a> für die Seite zu minimieren):"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:32
+#, php-format
+msgid "The site will switch to <a %s>maintenance mode</a>"
+msgstr "Die Seite wird in den <a %s>Wartungsmodus</a> gesetzt"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:34
+msgid "A backup will be performed"
+msgstr "Ein Backup wird durchgeführt"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:35
+msgid "The upgrade will be applied"
+msgstr "Das Upgrade wird aufgespielt"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:36
+msgid "The install script of the new version will be called"
+msgstr "Das Install-Script der neuen Version wird abgerufen"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:37
+#, php-format
+msgid "The cleanup rules from %s will be applied"
+msgstr "Die Bereinigungsregeln aus %s werden angewendet"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:38
+msgid ""
+"The site will switch to normal mode again at the end of the install script."
+msgstr ""
+"Die Seite wird in den normalen Modus wechseln, sobald das Install-Script "
+"beendet ist."
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:54
+msgid "Advanced backup options"
+msgstr "Erweiterte Backup-Optionen"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:133
+msgid "File options"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:134
+msgid ""
+"Default CHMOD (UNIX permissions) for new directories created by b2evolution."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:134
+msgid "Permissions for new folders"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:135
+msgid "Default CHMOD (UNIX permissions) for new files created by b2evolution."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:135
+msgid "Permissions for new files"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:141
+msgid "Backup & Upgrade"
+msgstr "Backup & Upgrade"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:141
+msgid "Force Backup & Upgrade"
+msgstr "Backup & Upgrade erzwingen"
+
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:42
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:52
+msgid "Skip Unzip"
+msgstr "Entpacken überspringen"
+
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:45
+msgid "Force New Unzip"
+msgstr "Neues Entpacken erzwingen"
+
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:54
+msgid "Back to download package"
+msgstr "Zurück zum Paket-Download"
+
+#: ../../../inc/settings/remotepublish.ctrl.php:117
+msgid "General settings updated."
+msgstr "Allgemeine Einstellungen aktualisiert."
+
+#: ../../../inc/settings/remotepublish.ctrl.php:174
+msgid "There are no messages in the mailbox"
+msgstr "Es befinden sich keine Nachrichten im Briefkasten"
+
+#: ../../../inc/settings/remotepublish.ctrl.php:191
+msgid ""
+"Global settings are shared between all blogs; see Blog settings for more "
+"granular settings."
+msgstr ""
+"Globale Einstellungen gelten für alle Blogs. In den Blog-Einstellungen "
+"können sie genauere Einstellungen vornehmen."
+
+#: ../../../inc/settings/remotepublish.ctrl.php:192
+#: ../../../inc/settings/views/_xmlrpc.form.php:40
+msgid "Remote publishing"
+msgstr "Fernveröffentlichung"
+
+#: ../../../inc/settings/remotepublish.ctrl.php:197
+msgid "Post by Email"
+msgstr "Beitrag per E-Mail"
+
+#: ../../../inc/settings/remotepublish.ctrl.php:204
+msgid "XML-RPC"
+msgstr "XML-RPC"
+
+#: ../../../inc/settings/views/_eblog.form.php:38
+msgid "Test saved settings"
+msgstr "Testgespeicherte Einstellungen"
+
+#: ../../../inc/settings/views/_eblog.form.php:41
+msgid "Perform tests"
+msgstr "Tests durchführen"
+
+#: ../../../inc/settings/views/_eblog.form.php:42
+msgid "server connection"
+msgstr "Serververbindung"
+
+#: ../../../inc/settings/views/_eblog.form.php:43
+msgid "simulate posting"
+msgstr "Beitragssimulation"
+
+#: ../../../inc/settings/views/_eblog.form.php:44
+msgid "create one post"
+msgstr "Einen Beitrag erstellen"
+
+#: ../../../inc/settings/views/_eblog.form.php:51
+msgid ""
+"This is just a test run. Nothing will be posted to the database nor will "
+"your inbox be altered"
+msgstr ""
+"Dies ist nur ein Testlauf. Es wird weder etwas in die Datenbank eingetragen,"
+" noch wird der Posteingang verändert"
+
+#: ../../../inc/settings/views/_eblog.form.php:59
+msgid "General settings"
+msgstr "Allgemeine Einstellungen"
+
+#: ../../../inc/settings/views/_eblog.form.php:63
+msgid "(INSTALLED)"
+msgstr "(INSTALLIERT)"
+
+#: ../../../inc/settings/views/_eblog.form.php:67
+msgid "(NOT INSTALLED)"
+msgstr "(NICHT INSTALLIERT)"
+
+#: ../../../inc/settings/views/_eblog.form.php:70
+msgid "Enable Post by email"
+msgstr "Beiträge per E-Mail aktivieren"
+
+#: ../../../inc/settings/views/_eblog.form.php:71
+#, php-format
+msgid "Note: This feature needs the php_imap extension %s."
+msgstr "Hinweis: Dieses Feature benötigt die php_imap Erweiterung %s."
+
+#: ../../../inc/settings/views/_eblog.form.php:74
+msgid "Test Mode"
+msgstr "Testmodus"
+
+#: ../../../inc/settings/views/_eblog.form.php:75
+msgid ""
+"Check to run Post by Email in test mode. Nothing will be posted to the "
+"database nor will your inbox be altered."
+msgstr ""
+"Auswählen, um einen Test für Beiträge per E-Mail laufen zu lassen. Es wird "
+"weder etwas in die Datenbank eingetragen, noch wird der Posteingang "
+"verändert."
+
+#: ../../../inc/settings/views/_eblog.form.php:77
+msgid "Hostname or IP address of your incoming mail server."
+msgstr "Hostname oder IP-Adresse des Eingangsmailservers"
+
+#: ../../../inc/settings/views/_eblog.form.php:77
+msgid "Mail Server"
+msgstr "Mailserver"
+
+#: ../../../inc/settings/views/_eblog.form.php:80
+msgid "POP3"
+msgstr "POP3"
+
+#. TRANS: E-Mail retrieval method
+#: ../../../inc/settings/views/_eblog.form.php:81
+msgid "IMAP"
+msgstr "IMAP"
+
+#. TRANS: E-Mail retrieval method
+#: ../../../inc/settings/views/_eblog.form.php:82
+msgid "Retrieval method"
+msgstr "Abrufmethode"
+
+#: ../../../inc/settings/views/_eblog.form.php:85
+msgid "None"
+msgstr "Nichts"
+
+#: ../../../inc/settings/views/_eblog.form.php:86
+msgid "SSL"
+msgstr "SSL"
+
+#: ../../../inc/settings/views/_eblog.form.php:87
+msgid "TLS"
+msgstr "TLS"
+
+#: ../../../inc/settings/views/_eblog.form.php:88
+msgid "Encryption method"
+msgstr "Verschlüsselungsmethode"
+
+#: ../../../inc/settings/views/_eblog.form.php:96
+msgid ""
+"Do not validate the certificate from the TLS/SSL server. Check this if you "
+"are using a self-signed certificate."
+msgstr ""
+"Das Zertifikat des TLS-/SSL-Servers nicht validieren. Auswählen, wenn Sie "
+"ein selbst unterzeichnetes Zertifikat benutzen."
+
+#: ../../../inc/settings/views/_eblog.form.php:97
+msgid ""
+"Validate that the certificate from the TLS/SSL server can be trusted. Use "
+"this if you have a correctly signed certificate."
+msgstr ""
+"Validieren Sie, dass dem Zertifikat des TLS-/SSL-Servers vertraut werden "
+"kann. Verwenden Sie dies, wenn Sie ein rechtmäßig unterzeichnetes Zertifikat"
+" haben."
+
+#: ../../../inc/settings/views/_eblog.form.php:98
+msgid "Certificate validation"
+msgstr "Zertifikat-Validierung"
+
+#: ../../../inc/settings/views/_eblog.form.php:100
+msgid "Port Number"
+msgstr "Portnummer"
+
+#: ../../../inc/settings/views/_eblog.form.php:100
+msgid ""
+"Port number of your incoming mail server (Defaults: POP3: 110, IMAP: 143, "
+"SSL/TLS: 993)."
+msgstr ""
+"Port-Nummer für den Posteingangsserver (Standard: POP3: 110, IMAP: 143, "
+"SSL/TLS: 993)."
+
+#: ../../../inc/settings/views/_eblog.form.php:103
+msgid "Account Name"
+msgstr "Benutzerkonto Name"
+
+#: ../../../inc/settings/views/_eblog.form.php:103
+msgid ""
+"User name for authenticating on your mail server. Usually it's your email "
+"address or a part before the @ sign."
+msgstr ""
+"Benutzername für die Authentifizierung Ihres Mailservers. Normalerweise ist "
+"dies Ihre E-Mail-Adresse oder der Teil vor dem @ Zeichen."
+
+#: ../../../inc/settings/views/_eblog.form.php:106
+msgid "Password"
+msgstr "Passwort"
+
+#: ../../../inc/settings/views/_eblog.form.php:106
+msgid "Password for authenticating on your mail server."
+msgstr "Passwort für die Authentifizierung Ihres Mailservers."
+
+#: ../../../inc/settings/views/_eblog.form.php:108
+msgid "Delete processed emails"
+msgstr "Verarbeitete Mails löschen"
+
+#: ../../../inc/settings/views/_eblog.form.php:109
+msgid ""
+"Check this if you want processed messages to be deleted from server after "
+"successful processing."
+msgstr ""
+"Wählen Sie dies aus, wenn Sie möchten, dass verarbeitete Nachrichten, nach "
+"dem erfolgreichen Verarbeiten, vom Server gelöscht werden."
+
+#: ../../../inc/settings/views/_eblog.form.php:113
+msgid "Posting settings"
+msgstr "Beitragsoptionen"
+
+#: ../../../inc/settings/views/_eblog.form.php:117
+msgid "Default Category ID"
+msgstr "Standard-Kategorie-ID"
+
+#: ../../../inc/settings/views/_eblog.form.php:117
+msgid "This is a default category for your posts."
+msgstr "Dies ist die Standard-Kategorie für Ihre Beiträge."
+
+#: ../../../inc/settings/views/_eblog.form.php:118
+#, php-format
+msgid ""
+"You can use the following code in message body to define categories: %s. In "
+"this example 2 will be main category and 5, 47 extra categories."
+msgstr ""
+"Sie können folgenden Code im Nachrichtentext verwenden, um Kategorien "
+"festzulegen: %s. In diesem Beispiel ist 2 die Hauptkategorie und 5 und 47 "
+"sind zusätzliche Kategorien."
+
+#: ../../../inc/settings/views/_eblog.form.php:121
+#: ../../../inc/settings/views/_xmlrpc.form.php:42
+msgid "Default title"
+msgstr "Standardtitel"
+
+#: ../../../inc/settings/views/_eblog.form.php:121
+msgid "This is a default title for your posts."
+msgstr "Dies ist ein Standardtitel für Ihre Beiträge."
+
+#: ../../../inc/settings/views/_eblog.form.php:122
+#, php-format
+msgid ""
+"You can use the following code in message body to define post title: %s."
+msgstr ""
+"Sie können den folgenden Code in Nachrichtentext verwenden, um den "
+"Beitragstitel festzulegen: %s."
+
+#: ../../../inc/settings/views/_eblog.form.php:124
+msgid "Add &lt;img&gt; tags"
+msgstr "&lt;img&gt;-Tags hinzufügen"
+
+#: ../../../inc/settings/views/_eblog.form.php:125
+msgid ""
+"Display image attachments using &lt;img&gt; tags (instead of linking them "
+"through file manager)."
+msgstr ""
+"Lassen Sie Bildanhänge anzeigen, indem Sie &lt;img&gt; Tags benutzen "
+"(anstatt sie durch die Dateiverwaltung zu verlinken)."
+
+#: ../../../inc/settings/views/_eblog.form.php:128
+msgid ""
+"Email subject must start with this prefix to be imported, messages that "
+"don't have this tag will be skipped."
+msgstr ""
+"Der E-Mail-Betreff muss mit diesem Präfix beginnen, um importiert zu werden."
+" Nachrichten, die dieses Tag nicht haben, werden übersprungen."
+
+#: ../../../inc/settings/views/_eblog.form.php:128
+msgid "Subject Prefix"
+msgstr "Betreffpräfix"
+
+#: ../../../inc/settings/views/_eblog.form.php:131
+msgid "Body Terminator"
+msgstr "Inhalts-Endmarke"
+
+#: ../../../inc/settings/views/_eblog.form.php:131
+msgid ""
+"Starting from this string, everything will be ignored, including this "
+"string."
+msgstr ""
+"Beginnend mit diesem String wird alles ignoriert, der String eingeschlossen."
+
+#: ../../../inc/settings/views/_eblog.form.php:132
+msgid "You can use this to remove signature from message body."
+msgstr ""
+"Sie können dies benutzen, um die Signatur aus dem Nachrichtentext zu "
+"entfernen."
+
+#: ../../../inc/settings/views/_eblog.form.php:138
+msgid "Text Renderers"
+msgstr "Text-Renderer"
+
+#: ../../../inc/settings/views/_eblog.form.php:142
+msgid "HTML messages"
+msgstr "HTML-Nachrichten"
+
+#: ../../../inc/settings/views/_eblog.form.php:145
+msgid "Enable HTML messages"
+msgstr "HTML-Nachrichten aktivieren"
+
+#: ../../../inc/settings/views/_eblog.form.php:146
+msgid ""
+"Check this if you want HTML messages to be processed and posted in your "
+"blog."
+msgstr ""
+"Wählen Sie dies aus, wenn Sie möchten, dass HTML-Nachrichten verarbeitet und"
+" in Ihren Blog gesendet werden."
+
+#: ../../../inc/settings/views/_eblog.form.php:148
+msgid "Limit allowed tags"
+msgstr "Erlaubtes Tag-Limit"
+
+#: ../../../inc/settings/views/_eblog.form.php:149
+msgid ""
+"Check this if you want to limit allowed HTML tags to the following list:"
+msgstr ""
+"Wählen Sie dies aus, wenn Sie die erlaubten HTML-Tags auf die folgende Liste"
+" begrenzen wollen:"
+
+#: ../../../inc/settings/views/_eblog.form.php:156
+#: ../../../inc/settings/views/_xmlrpc.form.php:47
+msgid "Save Changes!"
+msgstr "Änderungen speichern!"
+
+#: ../../../inc/settings/views/_xmlrpc.form.php:41
+msgid "Enable XML-RPC"
+msgstr "XML-RPC aktivieren"
+
+#: ../../../inc/settings/views/_xmlrpc.form.php:41
+msgid ""
+"Enable the Movable Type, MetaWeblog, WordPress, Blogger and B2 XML-RPC "
+"publishing protocols."
+msgstr ""
+"Publishing-Protokolle: Movable Type, MetaWeblog, WordPress, Blogger and B2 "
+"XML-RPC aktivieren."
+
+#: ../../../inc/settings/views/_xmlrpc.form.php:42
+msgid ""
+"Default title for items created with a XML-RPC API that doesn't send a post "
+"title (e. g. the Blogger API)."
+msgstr ""
+"Standardtitel für Elemente, die über ein XML-RPC-API erstellt werden, das "
+"keinen Beitragstitel sendet (z. B. das Blogger-API)."

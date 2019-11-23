@@ -1,0 +1,1294 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Francois Planque
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Alex, 2019
+# Yury Bakhtin <yurybakh@gmail.com>, 2019
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: b2evolution backoffice 7\n"
+"Report-Msgid-Bugs-To: http://fplanque.com/\n"
+"POT-Creation-Date: 2019-11-23 01:23+0100\n"
+"PO-Revision-Date: 2019-11-22 23:44+0000\n"
+"Last-Translator: Yury Bakhtin <yurybakh@gmail.com>, 2019\n"
+"Language-Team: Russian (Russia) (https://www.transifex.com/fplanque/teams/23/ru_RU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#: ../../../inc/maintenance/_maintenance.init.php:93
+#: ../../../inc/maintenance/backup.ctrl.php:84
+#: ../../../inc/maintenance/upgrade.ctrl.php:109
+msgid "Maintenance"
+msgstr "Обслуживание"
+
+#: ../../../inc/maintenance/_maintenance.init.php:99
+msgid "No Access"
+msgstr "Нет доступа"
+
+#: ../../../inc/maintenance/_maintenance.init.php:100
+msgid "Create backups"
+msgstr "Создать резервную копию"
+
+#: ../../../inc/maintenance/_maintenance.init.php:101
+msgid "Create backups & upgrade b2evolution"
+msgstr "Резервное копирование и обновление b2evolution"
+
+#: ../../../inc/maintenance/_maintenance.init.php:176
+#: ../../../inc/maintenance/backup.ctrl.php:85
+#: ../../../inc/maintenance/views/_backup.form.php:178
+msgid "Backup"
+msgstr "Резервное копирование"
+
+#: ../../../inc/maintenance/_maintenance.init.php:186
+#: ../../../inc/maintenance/upgrade.ctrl.php:119
+msgid "Auto Upgrade"
+msgstr "Авто Обновление"
+
+#: ../../../inc/maintenance/_maintenance.init.php:191
+#: ../../../inc/maintenance/upgrade.ctrl.php:112
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:24
+msgid "Upgrade from Git"
+msgstr ""
+
+#: ../../../inc/maintenance/_maintenance.init.php:207
+msgid "Basic test job"
+msgstr "Основной тест"
+
+#: ../../../inc/maintenance/_maintenance.init.php:213
+msgid "Error test job"
+msgstr "Тест ошибок"
+
+#: ../../../inc/maintenance/_maintenance.init.php:219
+msgid "Clean up scheduled jobs older than a threshold"
+msgstr "Очистить назначенные задания старше порога"
+
+#: ../../../inc/maintenance/_maintenance.init.php:225
+msgid "Clean up email logs older than a threshold"
+msgstr ""
+
+#: ../../../inc/maintenance/_maintenance.init.php:231
+msgid "Heavy DB maintenance (CHECK & OPTIMIZE)"
+msgstr "Серьезное обслуживание БД (CHECK & OPTIMIZE)"
+
+#: ../../../inc/maintenance/_maintenance.init.php:237
+msgid "Light DB maintenance (ANALYZE)"
+msgstr "Легкое обслуживание БД (ANALYZE)"
+
+#: ../../../inc/maintenance/_maintenance.init.php:243
+msgid "Prune old files from page cache"
+msgstr "Очистить устаревшие файлы"
+
+#: ../../../inc/maintenance/_maintenance.init.php:249
+msgid "Prune recycled comments"
+msgstr "Очистка корзины комментариев"
+
+#: ../../../inc/maintenance/backup.ctrl.php:51
+#, php-format
+msgid "The directory &laquo;%s&raquo; does not exist."
+msgstr "Каталог &laquo;%s&raquo; не существует."
+
+#: ../../../inc/maintenance/backup.ctrl.php:55
+#: ../../../inc/maintenance/upgrade.ctrl.php:88
+#, php-format
+msgid "The directory &laquo;%s&raquo; has been deleted."
+msgstr "Папка &laquo;%s&raquo; была удалена."
+
+#: ../../../inc/maintenance/backup.ctrl.php:59
+#, php-format
+msgid "Could not delete directory: %s"
+msgstr "Не удалось удалить директорию: %s"
+
+#: ../../../inc/maintenance/backup.ctrl.php:83
+#: ../../../inc/maintenance/upgrade.ctrl.php:108
+#: ../../../inc/settings/remotepublish.ctrl.php:190
+msgid "System"
+msgstr "Система"
+
+#: ../../../inc/maintenance/backup.ctrl.php:112
+#: ../../../inc/maintenance/upgrade.ctrl.php:207
+#: ../../../inc/maintenance/upgrade.ctrl.php:250
+#: ../../../inc/maintenance/upgrade.ctrl.php:363
+#: ../../../inc/maintenance/upgrade.ctrl.php:470
+msgid "This feature is disabled on the demo server."
+msgstr "Эта функция отключена на демо сервере."
+
+#: ../../../inc/maintenance/backup.ctrl.php:123
+msgid "System backup is in progress..."
+msgstr "Выполняется резервное копирование системы..."
+
+#: ../../../inc/maintenance/backup.ctrl.php:141
+msgid ""
+"System backup is in progress. Please reload this page in a few minutes."
+msgstr ""
+"Выполняется резервное копирование системы. Пожалуйста, обновите страницу "
+"через несколько минут."
+
+#: ../../../inc/maintenance/model/_backup.class.php:50
+msgid "Application files"
+msgstr "Файлы системы"
+
+#: ../../../inc/maintenance/model/_backup.class.php:55
+msgid "Configuration files"
+msgstr "Файлы настроек"
+
+#: ../../../inc/maintenance/model/_backup.class.php:60
+msgid "Skins"
+msgstr "Темы"
+
+#: ../../../inc/maintenance/model/_backup.class.php:66
+msgid "Plugins"
+msgstr "Плагины"
+
+#: ../../../inc/maintenance/model/_backup.class.php:71
+msgid "Media folder"
+msgstr "Медиа папка"
+
+#: ../../../inc/maintenance/model/_backup.class.php:116
+msgid "Content tables"
+msgstr "Таблицы содержимого"
+
+#: ../../../inc/maintenance/model/_backup.class.php:121
+msgid "Logs & stats tables"
+msgstr "Таблицы статистики"
+
+#: ../../../inc/maintenance/model/_backup.class.php:258
+msgid "You have not selected anything to backup."
+msgstr "Вы ничего не выбрали для создания резервной копии."
+
+#: ../../../inc/maintenance/model/_backup.class.php:276
+#, php-format
+msgid "Starting backup to: &laquo;%s&raquo; ..."
+msgstr "Начинаем копирование в &laquo;%s&raquo; ..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:306
+#, php-format
+msgid "Backup complete. Directory: &laquo;%s&raquo;"
+msgstr "Копирование завершено. Директория: &laquo;%s&raquo;"
+
+#: ../../../inc/maintenance/model/_backup.class.php:325
+msgid "Creating folders/files backup..."
+msgstr "Сохраняем папки и файлы..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:393
+#, php-format
+msgid "Config file %s cannot be read."
+msgstr "Файл конфигурации %s не может прочитаться."
+
+#: ../../../inc/maintenance/model/_backup.class.php:405
+#, php-format
+msgid "Archiving files to &laquo;<strong>%s</strong>&raquo;..."
+msgstr "Сохраняем файлы в &laquo;<strong>%s</strong>&raquo;..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:433
+msgid "Creating database backup..."
+msgstr "Сохраняем базу данных..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:504
+#, php-format
+msgid ""
+"Unable to write database dump. Database dump already exists: "
+"&laquo;%s&raquo;"
+msgstr ""
+"Невозможно сохранить базу данных. Файл уже существует: &laquo;%s&raquo;"
+
+#: ../../../inc/maintenance/model/_backup.class.php:513
+#, php-format
+msgid ""
+"Unable to write database dump. Could not open &laquo;%s&raquo; for writing."
+msgstr ""
+"Невозможно сохранить базу данных. Файл &laquo;%s&raquo; не доступен для "
+"записи."
+
+#: ../../../inc/maintenance/model/_backup.class.php:519
+#, php-format
+msgid "Dumping tables to &laquo;<strong>%s</strong>&raquo;..."
+msgstr "Сохраняем таблицы в &laquo;<strong>%s</strong>&raquo;..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:532
+#, php-format
+msgid "Backing up table &laquo;<strong>%s</strong>&raquo; ..."
+msgstr "Сохраняем таблицу &laquo;<strong>%s</strong>&raquo; ..."
+
+#: ../../../inc/maintenance/model/_backup.class.php:602
+msgid "only structure"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_backup.class.php:677
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:494
+#, php-format
+msgid "Backing up &laquo;<strong>%s</strong>&raquo; ..."
+msgstr "Копируем &laquo;<strong>%s</strong>&raquo; ..."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:101
+msgid "This is an old version!"
+msgstr "Это устаревшая версия!"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:102
+msgid "You should NOT install this older version."
+msgstr "Вам НЕ следует устанавливать эту старую версию."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:109
+msgid "This package is already installed!"
+msgstr "Эта версия уже установлена!"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:110
+msgid ""
+"No upgrade is needed at this time. You might force a re-install if you want "
+"to force a cleanup."
+msgstr ""
+"Нет необходимости обновления на данный момент. Вы можете принудительно "
+"переустановить, если вы хотите форсировать очистку."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:148
+msgid "Switching to maintenance mode..."
+msgstr "Переводим систему в режим обслуживания..."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:179
+#, php-format
+msgid ""
+"Unable to switch to maintenance mode. Maintenance file can't be created: "
+"&laquo;%s&raquo;"
+msgstr ""
+"Не удалось перевести систему в режим обслуживания. Файл не может быть "
+"создан: &laquo;%s&raquo;"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:189
+msgid "Switching out of maintenance mode..."
+msgstr "Выводим систему из режима обслуживания..."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:202
+#, php-format
+msgid "Unable to delete maintenance file: &laquo;%s&raquo;"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:248
+#, php-format
+msgid "Unable to create &laquo;%s&raquo; directory."
+msgstr "Не удалось создать директорию &laquo;%s&raquo;"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:257
+msgid "Checking .htaccess denial for directory: "
+msgstr "Создаем файл .htaccess для запрета доступа к директории: "
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:266
+#, php-format
+msgid "Unable to create &laquo;%s&raquo; file in directory."
+msgstr "Не удалось создать файл &laquo;%s&raquo; в директории."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:304
+msgid "You don't have permission to UNZIP files automatically on the server."
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:308
+#, php-format
+msgid "You can change this <a %s>here</a>"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:325
+#, php-format
+msgid "Path must not contain %s"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:333
+#, php-format
+msgid "Path is outside $basepath=%s and outside $upgrade_path=%s."
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:338
+#, php-format
+msgid "Invalid ZIP file path %s:"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:353
+#, php-format
+msgid ""
+"Unable to create &laquo;%s&raquo; directory to extract files from ZIP "
+"archive."
+msgstr ""
+"Невозможно создать &laquo;%s&raquo; директорию, чтобы извлечь файлы из ZIP "
+"архива."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:378
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:442
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:545
+#, php-format
+msgid "Error: %s"
+msgstr "Ошибка: %s"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:379
+#, php-format
+msgid "Unable to decompress &laquo;%s&raquo; ZIP archive."
+msgstr "Невозможно распаковать &laquo;%s&raquo; ZIP архив."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:424
+#, php-format
+msgid "File %s already exists."
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:443
+#, php-format
+msgid "Unable to create ZIP archive %s."
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:668
+#, php-format
+msgid "Unknown policy command: %s"
+msgstr "Неизвестная команда файла политики: %s"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:677
+#, php-format
+msgid "Incorrect policy command: %s"
+msgstr "Некорректная команда файла политики: %s"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:685
+#, php-format
+msgid ""
+"To continue the upgrade process please fix the issues of the file %s or "
+"delete it."
+msgstr ""
+"Чтобы продолжить процесс обновления, пожалуйста, исправьте ошибки в файле %s"
+" или удалите его."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:701
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:712
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:749
+#, php-format
+msgid "Ignoring %s because of %s"
+msgstr "Игнорировать %s, потому что %s"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:727
+#, php-format
+msgid "Unavailable creating of folder %s, probably no permissions."
+msgstr "Недоступно создание папки %s, возможно нет прав."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:772
+#, php-format
+msgid "Ignoring softmove of %s because %s is already in place (see %s)"
+msgstr ""
+"Перемещение %s проигнорировано, потому что %s уже находится на месте "
+"(смотрите %s)"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:782
+#, php-format
+msgid "Moving %s to %s as stated in %s"
+msgstr "Перемещение %s в %s, как это определено в %s"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:797
+#, php-format
+msgid "Unavailable copying to %s, probably no permissions."
+msgstr "Недоступно копирование в %s, возможно нет прав."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:856
+msgid ""
+"WARNING: <code>upgrade_policy.conf</code> not found. We will use "
+"<code>/conf/upgrade_policy_sample.conf</code> by default but it is highly "
+"recommended you duplicate this file to <code>upgrade_policy.conf</code> and "
+"check its contents to make sure the upgrade policy is appropriate for your "
+"particluar site."
+msgstr ""
+"ВНИМАНИЕ: <code>upgrade_policy.conf</code> не найден. Мы будем использовать "
+"<code>/conf/upgrade_policy_sample.conf</code> по умолчанию, но строго "
+"рекомендуется, чтобы вы дублировали этот файл в "
+"<code>upgrade_policy.conf</code> и проверили его содержимое, чтобы быть "
+"уверенными, что политика обновлений соответсвует вашему сайту."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:914
+#, php-format
+msgid "No permission to open the %s file."
+msgstr "Нет прав для открытия файла %s."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:928
+#, php-format
+msgid "The %s file is empty."
+msgstr "Файл %s - пустой."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:998
+msgid "Cleaning up..."
+msgstr "Очистка..."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1007
+#, php-format
+msgid "No \"remove\" sections have been defined in the file %s."
+msgstr "Секции \"remove\" не были определены в файле %s."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1014
+msgid ""
+"No cleanup is being done. You should manually remove the "
+"<code>/install</code> folder and check for other unwanted files..."
+msgstr ""
+"Очистка не была выполнена. Вы должны вручную удалить папку "
+"<code>/install</code> и проверить другие нежелательные файлы..."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1022
+#, php-format
+msgid "Removing %s as stated in %s..."
+msgstr "Удаление %s, как это определено в %s..."
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1030
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1042
+msgid "OK"
+msgstr "OK"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1034
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1046
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1052
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1058
+msgid "Failed"
+msgstr "Неудачно"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1034
+msgid "No permissions to delete the folder"
+msgstr "Нет прав для удаления папки"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1046
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1052
+msgid "No permissions to delete the file"
+msgstr "Нет прав для удаления файла"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1058
+msgid "No file found"
+msgstr "Файл не найден"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1078
+msgid "Affected paths:"
+msgstr "Используемые пути:"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1114
+msgid "Affected tables:"
+msgstr "Используемые таблицы:"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1192
+#: ../../../inc/maintenance/views/_upgrade.form.php:26
+msgid "Check for updates"
+msgstr "Проверить обновления"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1192
+msgid "Connect to Git"
+msgstr ""
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1193
+msgid "Download"
+msgstr "Скачать"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1194
+msgid "Unzip"
+msgstr "Распаковка"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1195
+#: ../../../inc/maintenance/upgrade.ctrl.php:450
+#: ../../../inc/maintenance/upgrade.ctrl.php:500
+msgid "Ready to upgrade"
+msgstr "Готово к обновлению"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1196
+msgid "Backup &amp; Upgrade"
+msgstr "Бэкап &amp; Апгрейд"
+
+#: ../../../inc/maintenance/model/_maintenance.funcs.php:1197
+msgid "Installer script"
+msgstr "Скрипт установки"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:89
+#, php-format
+msgid "The file &laquo;%s&raquo; has been deleted."
+msgstr "Файл &laquo;%s&raquo; был удален."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:94
+#, php-format
+msgid ""
+"Cannot delete directory %s. Please check the permissions or delete it "
+"manually."
+msgstr ""
+"Невозможно удалить директорию %s. Пожалуйста, проверьте права или удалите ее"
+" вручную."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:95
+#, php-format
+msgid "File %s could not be deleted."
+msgstr "Файл %s не может быть удален."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:134
+msgid "WARNING: USE WITH CAUTION!"
+msgstr "ПРЕДУПРЕЖДЕНИЕ: ИСПОЛЬЗУЙТЕ С ОСТОРОЖНОСТЬЮ!"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:152
+msgid "Updates from b2evolution.net"
+msgstr "Обновления из b2evolution.net"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:221
+msgid "Please enter the URL of repository"
+msgstr "Пожалуйста, введите URL хранилища"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:261
+msgid "Downloading package..."
+msgstr "Загрузка пакета..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:266
+msgid "Please enter the URL to download ZIP archive"
+msgstr "Пожалуйста, введите URL для загрузки ZIP архива"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:271
+#, php-format
+msgid "The URL \"%s\" must point to a ZIP archive."
+msgstr "URL \"%s\" должен быть ссылкой до ZIP архива."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:299
+#, php-format
+msgid ""
+"Unable to delete previously downloaded package %s before forcing the "
+"download."
+msgstr ""
+"Невозможно удалить предыдущий загруженный пакет %s до принудительной "
+"загрузки."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:306
+#, php-format
+msgid "The package %s is already downloaded."
+msgstr "Пакет %s уже загружен."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:317
+#, php-format
+msgid "Downloading package to &laquo;<strong>%s</strong>&raquo;..."
+msgstr "Загружаем пакет в &laquo;<strong>%s</strong>&raquo;..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:326
+#, php-format
+msgid "Unable to download package from &laquo;%s&raquo;"
+msgstr "Не удалось загрузить пакет из &laquo;%s&raquo;"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:331
+#, php-format
+msgid "Unable to create file: &laquo;%s&raquo;"
+msgstr "Невозможно создать файл: &laquo;%s&raquo;"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:337
+#, php-format
+msgid "Unable to remove file: &laquo;%s&raquo;"
+msgstr "Невозможно удалить файл: &laquo;%s&raquo;"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:374
+msgid "Unzipping package..."
+msgstr "Распаковка пакета..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:399
+#, php-format
+msgid ""
+"Unable to delete previous unzipped package %s before forcing the unzip."
+msgstr ""
+"Невозможно удалить предыдущий распакованный пакет %s до принудительной "
+"распаковки."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:406
+#, php-format
+msgid "The package %s is already unzipped."
+msgstr "Пакет %s уже распакован."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:417
+#, php-format
+msgid "Unpacking package to &laquo;<strong>%s</strong>&raquo;..."
+msgstr "Распаковка архива в &laquo;<strong>%s</strong>&raquo;..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:484
+#: ../../../inc/maintenance/upgrade.ctrl.php:489
+msgid "Invalid CHMOD value. Use 3 digits."
+msgstr "Недопустимое значение CHMOD. Используйте 3 цифры."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:515
+msgid "Installing package..."
+msgstr "Установка обновления..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:529
+msgid ""
+"System upgrade is in progress. Please reload this page in a few minutes."
+msgstr ""
+"Выполняется обновление системы. Пожалуйста, обновите страницу через "
+"несколько минут."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:537
+msgid "Verifying that all destination files can be overwritten..."
+msgstr "Проверяем могут ли используемые файлы быть перезаписаны..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:559
+msgid "Copying new folders and files..."
+msgstr "Копируем новые файлы и папки..."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:565
+msgid ""
+"The files and database backup was created successfully but all folders and "
+"files could not be overwritten"
+msgstr ""
+"Резервная копия файлов и базы данных была создана удачно, но все папки и "
+"файлы не смогли переписаться"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:578
+#, php-format
+msgid ""
+"Please restore the backup files from the &laquo;%s&raquo; package. The "
+"database was not changed."
+msgstr ""
+"Пожалуйста, восстановите резервную копию файлов из архива &laquo;%s&raquo;. "
+"База данных не была изменена."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:585
+msgid "<strong>The following folders and files can't be overwritten:</strong>"
+msgstr "<strong>Следующие файлы и папки НЕ МОГУТ быть перезаписаны:</strong>"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:600
+#: ../../../inc/maintenance/upgrade.ctrl.php:617
+#: ../../../inc/maintenance/views/_upgrade.form.php:60
+#: ../../../inc/maintenance/views/_upgrade_downloaded.form.php:32
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:139
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:33
+msgid "Actions"
+msgstr "Действия"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:601
+msgid ""
+"All new b2evolution files are in place. You will now be redirected to the "
+"installer to perform a DB upgrade."
+msgstr ""
+"Все файлы b2evolution на месте. Вы сейчас будете перенаправлены на "
+"установщик, чтобы выполнить обновление БД."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:601
+msgid "Note: the User Interface will look different."
+msgstr "Примечание: Интерфейс пользователя будет выглядеть иначе."
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:603
+msgid "Continue to installer"
+msgstr "Продолжить установку"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:609
+msgid "Upgrade failed!"
+msgstr "Обновление прервано!"
+
+#: ../../../inc/maintenance/upgrade.ctrl.php:618
+msgid "Retry"
+msgstr "Повторить"
+
+#: ../../../inc/maintenance/views/_backup.form.php:36
+msgid "Backup application files and data"
+msgstr "Резервное копирование системы"
+
+#: ../../../inc/maintenance/views/_backup.form.php:40
+msgid "Existing Backups"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_backup.form.php:42
+#: ../../../inc/maintenance/views/_upgrade.form.php:59
+msgid "Folder"
+msgstr "Папка"
+
+#: ../../../inc/maintenance/views/_backup.form.php:71
+#: ../../../inc/maintenance/views/_upgrade.form.php:137
+msgid "Delete"
+msgstr "Удалить"
+
+#: ../../../inc/maintenance/views/_backup.form.php:74
+msgid "Subfolders"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_backup.form.php:80
+msgid "Folders & files"
+msgstr "Файлы и папки"
+
+#: ../../../inc/maintenance/views/_backup.form.php:110
+#: ../../../inc/maintenance/views/_backup.form.php:115
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:88
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:92
+msgid "or"
+msgstr "или"
+
+#: ../../../inc/maintenance/views/_backup.form.php:111
+#: ../../../inc/maintenance/views/_backup.form.php:116
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:94
+#, php-format
+msgid "Exclude all %s folders"
+msgstr "Исключить все %s папки"
+
+#: ../../../inc/maintenance/views/_backup.form.php:121
+#, php-format
+msgid "Exclude the %s folder"
+msgstr "Исключить %s папку"
+
+#: ../../../inc/maintenance/views/_backup.form.php:127
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:98
+msgid "Exclude folders"
+msgstr "Исключить папки"
+
+#: ../../../inc/maintenance/views/_backup.form.php:130
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:101
+#, php-format
+msgid "Ignore files and folders listed in %s"
+msgstr "Игнорировать файлы и папки, перечисленные в %s"
+
+#: ../../../inc/maintenance/views/_backup.form.php:135
+msgid "Database tables"
+msgstr "Таблицы базы данных"
+
+#: ../../../inc/maintenance/views/_backup.form.php:154
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:120
+#, php-format
+msgid "Add %s statements for ALL tables, in order to allow quick restore."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_backup.form.php:155
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:121
+#, php-format
+msgid "Add %s before every %s."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_backup.form.php:157
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:123
+msgid "DB Structure"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_backup.form.php:162
+msgid "General Options"
+msgstr "Основные Опции"
+
+#: ../../../inc/maintenance/views/_backup.form.php:166
+msgid "Maintenance mode"
+msgstr "Служебный режим"
+
+#: ../../../inc/maintenance/views/_backup.form.php:166
+msgid "Recommended"
+msgstr "Рекомендуемый"
+
+#: ../../../inc/maintenance/views/_backup.form.php:166
+msgid "check this to completely lock b2evolution"
+msgstr "отметьте это, чтобы полностью заблокировать b2evolution"
+
+#: ../../../inc/maintenance/views/_backup.form.php:167
+msgid "Maintenance lock"
+msgstr "Служебное блокирование"
+
+#: ../../../inc/maintenance/views/_backup.form.php:167
+msgid ""
+"check this to prevent login (except for admins), sending comments/messages "
+"and receiving DB updates (other than logging)"
+msgstr ""
+"отметьте это для предотвращения входа в систему (за исключением "
+"администраторов), отправки комментариев/сообщений и получения обновления БД "
+"(кроме записи логов)"
+
+#: ../../../inc/maintenance/views/_backup.form.php:168
+msgid ""
+"Leave the site open for modifications during backup. (Not recommended)."
+msgstr ""
+"Оставить этот сайт открытым для модификаций во время резервного копирования."
+" (Не рекомендуется)."
+
+#: ../../../inc/maintenance/views/_backup.form.php:169
+msgid "Lock b2evolution while backing up"
+msgstr "Заблокировать b2evolution, пока резервное копирование работает"
+
+#: ../../../inc/maintenance/views/_backup.form.php:173
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:127
+msgid "Compress backup files into ZIP archive."
+msgstr "Сжимать файлы в ZIP архив."
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:31
+msgid "There are no new updates."
+msgstr "Нет новых обновлений."
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:40
+msgid "Update"
+msgstr "Обновить"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:41
+msgid "Description"
+msgstr "Описание"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:42
+msgid "Version"
+msgstr "Версия"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:45
+msgid "URL"
+msgstr "URL"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:45
+msgid ""
+"You <i>might</i> replace this with a different URL in case you want to "
+"upgrade to a custom version."
+msgstr ""
+"Вы <i>могли бы</i> заменить это другой ссылкой в случае, если вы хотите "
+"обновиться до текущей версии."
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:50
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:38
+msgid "Continue"
+msgstr "Продолжить"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:56
+msgid "Already Downloaded"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:59
+msgid "Zip archive"
+msgstr "Архив Zip"
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:88
+msgid "No files found."
+msgstr "Файлы не найдены."
+
+#: ../../../inc/maintenance/views/_upgrade.form.php:136
+msgid "Use this..."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_downloaded.form.php:37
+msgid "Unzip package"
+msgstr "Распаковать пакет"
+
+#: ../../../inc/maintenance/views/_upgrade_downloaded.form.php:41
+msgid "Skip Download"
+msgstr "Пропустить Загрузку"
+
+#: ../../../inc/maintenance/views/_upgrade_downloaded.form.php:42
+msgid "Force New Download"
+msgstr "Форсировать Новую Загрузку"
+
+#: ../../../inc/maintenance/views/_upgrade_downloaded.form.php:46
+msgid "Back to Package Selection"
+msgstr "Назад к Выбору Пакета"
+
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:26
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:27
+#, php-format
+msgid "E.g. %s"
+msgstr "Например, %s"
+
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:26
+msgid "URL of repository"
+msgstr "URL хранилища"
+
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:27
+msgid "Branch"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_git.form.php:29
+msgid "Export from Git..."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:22
+msgid "The new files are ready to be installed."
+msgstr "Новые файлы готовы к установке."
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:30
+#, php-format
+msgid ""
+"If you continue, the following sequence will be carried out automatically "
+"(trying to minimize \"<a %s>maintenance time</a>\" for the site):"
+msgstr ""
+"Если вы продолжите, то следующая последовательность будет выполнена "
+"автоматически (стараясь минимизировать \"<a %s>время обслуживания</a>\" для "
+"сайта):"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:32
+#, php-format
+msgid "The site will switch to <a %s>maintenance mode</a>"
+msgstr "Сайт будет переключен в <a %s>режим обслуживания</a>"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:34
+msgid "A backup will be performed"
+msgstr "Резервное копирование будет выполнено"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:35
+msgid "The upgrade will be applied"
+msgstr "Обновление будет применено"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:36
+msgid "The install script of the new version will be called"
+msgstr "Скрипт установки новой версии будет вызван"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:37
+#, php-format
+msgid "The cleanup rules from %s will be applied"
+msgstr "Правила очистки из %s будут применены"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:38
+msgid ""
+"The site will switch to normal mode again at the end of the install script."
+msgstr ""
+"Сайт переключится в нормальный режим обратно в конце выполнения скрипта "
+"установки."
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:54
+msgid "Advanced backup options"
+msgstr "Дополнительные опции резервного копирования"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:133
+msgid "File options"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:134
+msgid ""
+"Default CHMOD (UNIX permissions) for new directories created by b2evolution."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:134
+msgid "Permissions for new folders"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:135
+msgid "Default CHMOD (UNIX permissions) for new files created by b2evolution."
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:135
+msgid "Permissions for new files"
+msgstr ""
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:141
+msgid "Backup & Upgrade"
+msgstr "Бэкап & Апгрейд"
+
+#: ../../../inc/maintenance/views/_upgrade_ready.form.php:141
+msgid "Force Backup & Upgrade"
+msgstr "Форсировать Бэкап & Апгрейд"
+
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:42
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:52
+msgid "Skip Unzip"
+msgstr "Пропустить Распаковку"
+
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:45
+msgid "Force New Unzip"
+msgstr "Форсировать Новую Распаковку"
+
+#: ../../../inc/maintenance/views/_upgrade_unzip.form.php:54
+msgid "Back to download package"
+msgstr "Назад к загрузке пакета"
+
+#: ../../../inc/settings/remotepublish.ctrl.php:117
+msgid "General settings updated."
+msgstr "Основные настройки обновлены."
+
+#: ../../../inc/settings/remotepublish.ctrl.php:174
+msgid "There are no messages in the mailbox"
+msgstr "Нет сообщений в почтовом ящике"
+
+#: ../../../inc/settings/remotepublish.ctrl.php:191
+msgid ""
+"Global settings are shared between all blogs; see Blog settings for more "
+"granular settings."
+msgstr ""
+"Общие настройки задают глобальные параметры блогов; используйте Настройки "
+"блога для настройки конкретных блогов."
+
+#: ../../../inc/settings/remotepublish.ctrl.php:192
+#: ../../../inc/settings/views/_xmlrpc.form.php:40
+msgid "Remote publishing"
+msgstr "Удаленная публикация"
+
+#: ../../../inc/settings/remotepublish.ctrl.php:197
+msgid "Post by Email"
+msgstr "Публикация по email"
+
+#: ../../../inc/settings/remotepublish.ctrl.php:204
+msgid "XML-RPC"
+msgstr "XML-RPC"
+
+#: ../../../inc/settings/views/_eblog.form.php:38
+msgid "Test saved settings"
+msgstr "Проверить сохраненные настройки"
+
+#: ../../../inc/settings/views/_eblog.form.php:41
+msgid "Perform tests"
+msgstr "Выполнить тесты"
+
+#: ../../../inc/settings/views/_eblog.form.php:42
+msgid "server connection"
+msgstr "подключение к серверу"
+
+#: ../../../inc/settings/views/_eblog.form.php:43
+msgid "simulate posting"
+msgstr "симуляция публикации"
+
+#: ../../../inc/settings/views/_eblog.form.php:44
+msgid "create one post"
+msgstr "создание одной записи"
+
+#: ../../../inc/settings/views/_eblog.form.php:51
+msgid ""
+"This is just a test run. Nothing will be posted to the database nor will "
+"your inbox be altered"
+msgstr ""
+"Это просто тестовый запуск. Ничего не будет опубликовано в базу данных, и "
+"ваш почтовый ящик не будет затронут"
+
+#: ../../../inc/settings/views/_eblog.form.php:59
+msgid "General settings"
+msgstr "Основные настройки"
+
+#: ../../../inc/settings/views/_eblog.form.php:63
+msgid "(INSTALLED)"
+msgstr "(УСТАНОВЛЕНО)"
+
+#: ../../../inc/settings/views/_eblog.form.php:67
+msgid "(NOT INSTALLED)"
+msgstr "(НЕ УСТАНОВЛЕНО)"
+
+#: ../../../inc/settings/views/_eblog.form.php:70
+msgid "Enable Post by email"
+msgstr "Разрешить публикацию по email"
+
+#: ../../../inc/settings/views/_eblog.form.php:71
+#, php-format
+msgid "Note: This feature needs the php_imap extension %s."
+msgstr "Примечание: Для это функции необходимо php_imap расширение %s."
+
+#: ../../../inc/settings/views/_eblog.form.php:74
+msgid "Test Mode"
+msgstr "Тестовый режим"
+
+#: ../../../inc/settings/views/_eblog.form.php:75
+msgid ""
+"Check to run Post by Email in test mode. Nothing will be posted to the "
+"database nor will your inbox be altered."
+msgstr ""
+"Отметьте, чтобы запускать публикацию по email в тестовом режиме. Ничего не "
+"будет опубликовано в базу данных, и ваш почтовый ящик не будет затронут."
+
+#: ../../../inc/settings/views/_eblog.form.php:77
+msgid "Hostname or IP address of your incoming mail server."
+msgstr "Имя хоста или IP вашего сервера входящей почты."
+
+#: ../../../inc/settings/views/_eblog.form.php:77
+msgid "Mail Server"
+msgstr "Почтовый сервер"
+
+#: ../../../inc/settings/views/_eblog.form.php:80
+msgid "POP3"
+msgstr "POP3"
+
+#. TRANS: E-Mail retrieval method
+#: ../../../inc/settings/views/_eblog.form.php:81
+msgid "IMAP"
+msgstr "IMAP"
+
+#. TRANS: E-Mail retrieval method
+#: ../../../inc/settings/views/_eblog.form.php:82
+msgid "Retrieval method"
+msgstr "Метод передачи"
+
+#: ../../../inc/settings/views/_eblog.form.php:85
+msgid "None"
+msgstr "Нет"
+
+#: ../../../inc/settings/views/_eblog.form.php:86
+msgid "SSL"
+msgstr "SSL"
+
+#: ../../../inc/settings/views/_eblog.form.php:87
+msgid "TLS"
+msgstr "TLS"
+
+#: ../../../inc/settings/views/_eblog.form.php:88
+msgid "Encryption method"
+msgstr "Алгоритм шифрования"
+
+#: ../../../inc/settings/views/_eblog.form.php:96
+msgid ""
+"Do not validate the certificate from the TLS/SSL server. Check this if you "
+"are using a self-signed certificate."
+msgstr ""
+"Не проверять TLS/SSL сертификат сервера. Отметьте, если вы пользуетесь "
+"самоподписанным сертификатом."
+
+#: ../../../inc/settings/views/_eblog.form.php:97
+msgid ""
+"Validate that the certificate from the TLS/SSL server can be trusted. Use "
+"this if you have a correctly signed certificate."
+msgstr ""
+"Проверять, что сертификат от TLS/SSL сервера может быть доверенным. "
+"Используйте это, если у вас есть правильно подписанный сертификат."
+
+#: ../../../inc/settings/views/_eblog.form.php:98
+msgid "Certificate validation"
+msgstr "Проверка сертификата"
+
+#: ../../../inc/settings/views/_eblog.form.php:100
+msgid "Port Number"
+msgstr "Номер порта"
+
+#: ../../../inc/settings/views/_eblog.form.php:100
+msgid ""
+"Port number of your incoming mail server (Defaults: POP3: 110, IMAP: 143, "
+"SSL/TLS: 993)."
+msgstr ""
+"Номер порта вашего сервера для почтового ящика входящих сообщений (По "
+"умолчанию: POP3: 110, IMAP: 143, SSL/TLS: 993)."
+
+#: ../../../inc/settings/views/_eblog.form.php:103
+msgid "Account Name"
+msgstr "Имя аккаунта"
+
+#: ../../../inc/settings/views/_eblog.form.php:103
+msgid ""
+"User name for authenticating on your mail server. Usually it's your email "
+"address or a part before the @ sign."
+msgstr ""
+"Имя пользователя для аутентификации на вашем почтовом сервере. Обычно это "
+"ваш email адрес или его часть до знака @."
+
+#: ../../../inc/settings/views/_eblog.form.php:106
+msgid "Password"
+msgstr "Пароль"
+
+#: ../../../inc/settings/views/_eblog.form.php:106
+msgid "Password for authenticating on your mail server."
+msgstr "Пароль для аутентификации на вашем почтовом сервере."
+
+#: ../../../inc/settings/views/_eblog.form.php:108
+msgid "Delete processed emails"
+msgstr "Удалять обработанные email сообщения"
+
+#: ../../../inc/settings/views/_eblog.form.php:109
+msgid ""
+"Check this if you want processed messages to be deleted from server after "
+"successful processing."
+msgstr ""
+"Отметьте это, если вы хотите, чтобы обработанные сообщения были удалены с "
+"сервера после удачной обработки."
+
+#: ../../../inc/settings/views/_eblog.form.php:113
+msgid "Posting settings"
+msgstr "Настройки публикации"
+
+#: ../../../inc/settings/views/_eblog.form.php:117
+msgid "Default Category ID"
+msgstr "ID рубрики по умолчанию"
+
+#: ../../../inc/settings/views/_eblog.form.php:117
+msgid "This is a default category for your posts."
+msgstr "Это категория по умолчанию для ваших записей."
+
+#: ../../../inc/settings/views/_eblog.form.php:118
+#, php-format
+msgid ""
+"You can use the following code in message body to define categories: %s. In "
+"this example 2 will be main category and 5, 47 extra categories."
+msgstr ""
+"Вы можете использовать следующий код в теле сообщения для задания категорий:"
+" %s. В этом примере 2 будет главной категорией, а 5 и 47 - дополнительными "
+"категориями."
+
+#: ../../../inc/settings/views/_eblog.form.php:121
+#: ../../../inc/settings/views/_xmlrpc.form.php:42
+msgid "Default title"
+msgstr "Заголовок по умолчанию"
+
+#: ../../../inc/settings/views/_eblog.form.php:121
+msgid "This is a default title for your posts."
+msgstr "Это заголовок по умолчанию для ваших записей."
+
+#: ../../../inc/settings/views/_eblog.form.php:122
+#, php-format
+msgid ""
+"You can use the following code in message body to define post title: %s."
+msgstr ""
+"Вы можете использовать следующий код в теле сообщения для задания заголовка "
+"записи: %s."
+
+#: ../../../inc/settings/views/_eblog.form.php:124
+msgid "Add &lt;img&gt; tags"
+msgstr "Добавлять &lt;img&gt; теги"
+
+#: ../../../inc/settings/views/_eblog.form.php:125
+msgid ""
+"Display image attachments using &lt;img&gt; tags (instead of linking them "
+"through file manager)."
+msgstr ""
+"Показывать прикрепленные изображения, используя &lt;img&gt; теги (вместо их "
+"привязки через менеджер файлов)."
+
+#: ../../../inc/settings/views/_eblog.form.php:128
+msgid ""
+"Email subject must start with this prefix to be imported, messages that "
+"don't have this tag will be skipped."
+msgstr ""
+"Тема email сообщения должна начинаться с этого префикса, чтобы оно было "
+"импортировано, иначе сообщения без этого префикса будут пропущены."
+
+#: ../../../inc/settings/views/_eblog.form.php:128
+msgid "Subject Prefix"
+msgstr "Префикс темы письма"
+
+#: ../../../inc/settings/views/_eblog.form.php:131
+msgid "Body Terminator"
+msgstr "Терминатор тела письма"
+
+#: ../../../inc/settings/views/_eblog.form.php:131
+msgid ""
+"Starting from this string, everything will be ignored, including this "
+"string."
+msgstr ""
+"Все что начинается с этой строки будет проигнорировано, включая эту строку."
+
+#: ../../../inc/settings/views/_eblog.form.php:132
+msgid "You can use this to remove signature from message body."
+msgstr "Вы можете использовать это для удаления подписи из тела сообщения."
+
+#: ../../../inc/settings/views/_eblog.form.php:138
+msgid "Text Renderers"
+msgstr "Обработчики текста"
+
+#: ../../../inc/settings/views/_eblog.form.php:142
+msgid "HTML messages"
+msgstr "HTML сообщения"
+
+#: ../../../inc/settings/views/_eblog.form.php:145
+msgid "Enable HTML messages"
+msgstr "Включить обработку HTML сообщений"
+
+#: ../../../inc/settings/views/_eblog.form.php:146
+msgid ""
+"Check this if you want HTML messages to be processed and posted in your "
+"blog."
+msgstr ""
+"Отметьте это, если вы хотите, чтобы HTML сообщения были обработаны и "
+"опубликованы в вашем блоге."
+
+#: ../../../inc/settings/views/_eblog.form.php:148
+msgid "Limit allowed tags"
+msgstr "Ограничить разрешенные теги"
+
+#: ../../../inc/settings/views/_eblog.form.php:149
+msgid ""
+"Check this if you want to limit allowed HTML tags to the following list:"
+msgstr ""
+"Отметьте это, если вы хотите ограничить разрешенные HTML теги следующим "
+"списком:"
+
+#: ../../../inc/settings/views/_eblog.form.php:156
+#: ../../../inc/settings/views/_xmlrpc.form.php:47
+msgid "Save Changes!"
+msgstr "Сохранить Изменения!"
+
+#: ../../../inc/settings/views/_xmlrpc.form.php:41
+msgid "Enable XML-RPC"
+msgstr "Включить XML-RPC"
+
+#: ../../../inc/settings/views/_xmlrpc.form.php:41
+msgid ""
+"Enable the Movable Type, MetaWeblog, WordPress, Blogger and B2 XML-RPC "
+"publishing protocols."
+msgstr ""
+"Включить поддержку протоколов Movable Type, MetaWeblog, WordPress, Blogger "
+"and B2 XML-RPC для публикации записей."
+
+#: ../../../inc/settings/views/_xmlrpc.form.php:42
+msgid ""
+"Default title for items created with a XML-RPC API that doesn't send a post "
+"title (e. g. the Blogger API)."
+msgstr ""
+"Заголовок по умолчанию для записей, созданных через XML-RPC API, который не "
+"поддерживает создание заголовков (напимер Blogger API)."
