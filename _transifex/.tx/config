@@ -12,3 +12,8 @@ file_filter = translations/b2evolution.messages-backoffice/<lang>.po
 source_file = messages-backoffice.pot
 source_lang = en
 
+[b2evolution.messages-v-7-0-demo-contents]
+file_filter = translations/b2evolution.messages-demo-contents/<lang>.po
+source_file = messages-demo-contents.pot
+source_lang = en
+
