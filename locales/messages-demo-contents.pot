@@ -1,0 +1,252 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Francois Planque
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: b2evolution demo contents 7\n"
+"Report-Msgid-Bugs-To: http://fplanque.com/\n"
+"POT-Creation-Date: 2019-11-23 01:37+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../../inc/collections/_demo_content.funcs.php:2392
+msgid "Mongolian Beef"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2397
+msgid "A quick go-to dinner. Can be made with almost any meat. I often used ground. Works perfect for lettuce wraps. Try replacing the onion with thinly sliced fennel."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2398
+msgid "Optional: spice this thing up, with a dose of your favorite chili paste/sauce."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2401
+msgid "Slice the beef thin and cook with a bit of oil (your choice) and the yellow onion (cut into petals) in a medium saucepan. Set aside when done."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2402
+msgid "Make the sauce by heating 2 tsp of vegetable oil over med/low heat in the same pan. Don't get the oil too hot."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2403
+msgid "Add ginger and garlic to the pan and quickly add the soy sauce and water before the garlic scorches."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2404
+msgid "Dissolve the brown sugar in the sauce, then raise the heat to medium and boil the sauce for 2-3 minutes or until the sauce thickens."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2405
+msgid "Remove from the heat, add beef back in. Toss"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2406
+msgid "Serve with rice, top with green onions"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2409
+#: ../../../inc/collections/_demo_content.funcs.php:2445
+msgid "Main Course"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2410
+msgid "Mongolian"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2415
+msgid ""
+"vegetable oil\n"
+"1/2 teaspoon ginger\n"
+"1 tablespoon garlic\n"
+"1/2 cup soy sauce\n"
+"1/2 cup water\n"
+"3/4 cup dark brown sugar\n"
+"1 lb flank steak\n"
+"1 yellow onion\n"
+"2 large green onions"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2431
+msgid "Stuffed Peppers"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2436
+msgid "We found these during Happy Hour at Chiso's Grill in Bee Cave, Tx. W've since tweaked the recipe a bit. This recipe is just a starting point, add/remove anything you want (like more hot sauce if you're into that)."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2439
+msgid "combine goat cheese, mayo, sour cream, 2/3rds of your chives, hot sauce, black pepper"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2440
+msgid "if you are feeling spry, beat the mixture to make it fluffy"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2441
+msgid "put filling in a plastic bag, snip of the tip with scissors to make a piping bag"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2442
+msgid "fill peppers, place in bowl, top with chives and hot sauce"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2446
+msgid "South African"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2451
+msgid ""
+"1 jar Peppedew Peppers (or piquante pepper)\n"
+"4oz goat cheese (any flavor)\n"
+"1 tbsp mayonnaise\n"
+"1 tbsp sour cream\n"
+"1 bunch of chives, chopped\n"
+"hearty shot of hot sauce (Franks, Yellowbird)\n"
+"hearty crack of pepper"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2465
+msgid "Custom Fields Example"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2469
+#: ../../../inc/collections/_demo_content.funcs.php:2499
+msgid "This post has a special post type called \"Post with Custom Fields\"."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2470
+#: ../../../inc/collections/_demo_content.funcs.php:2500
+msgid "This post type defines 4 custom fields. Here are the sample values that have been entered in these fields:"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2473
+#: ../../../inc/collections/_demo_content.funcs.php:2503
+#: ../../../inc/collections/_demo_content.funcs.php:2535
+msgid "It is also possible to selectively display only a couple of these fields:"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2475
+#: ../../../inc/collections/_demo_content.funcs.php:2505
+#: ../../../inc/collections/_demo_content.funcs.php:2537
+#, php-format
+msgid "Finally, we can also display just the value of a specific field, like this: %s."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2476
+#: ../../../inc/collections/_demo_content.funcs.php:2506
+#, php-format
+msgid "It is also possible to create links using a custom field URL: %s"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2495
+msgid "Another Custom Fields Example"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2526
+msgid "Child Post Example"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2531
+#, php-format
+msgid "This post has a special post type called \"Child Post\". This allowed to specify a parent post ID. Consequently, this child post is linked to: %s."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2532
+msgid "This also allows us to access the custom fields of the parent post:"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2538
+#, php-format
+msgid "We can also reference fields of any other post like this: %s or like this: %s."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2539
+#, php-format
+msgid "It is also possible to create links using a custom field URL from the parent post: %s"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2540
+msgid "Replicated fields"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2541
+msgid "By using the same field names, it is also possible to automatically replicate some fields from parent to child (recursively)."
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2542
+msgid "This child post has the following fields which automatically replicate from its parent:"
+msgstr ""
+
+#: ../../../inc/collections/_demo_content.funcs.php:2544
+#, php-format
+msgid "Another way to show this, is to use b2evolution's %s short tag:"
+msgstr ""
+
+#: ../../../install/_functions_create.php:606
+msgid "Course"
+msgstr ""
+
+#: ../../../install/_functions_create.php:610
+msgid "Dessert"
+msgstr ""
+
+#: ../../../install/_functions_create.php:616
+msgid "Cuisine"
+msgstr ""
+
+#: ../../../install/_functions_create.php:620
+msgid "Italian"
+msgstr ""
+
+#: ../../../install/_functions_create.php:626
+msgid "Servings"
+msgstr ""
+
+#: ../../../install/_functions_create.php:629
+msgid "people"
+msgstr ""
+
+#: ../../../install/_functions_create.php:630
+#, php-format
+msgid "%d people"
+msgstr ""
+
+#: ../../../install/_functions_create.php:636
+msgid "Prep Time"
+msgstr ""
+
+#: ../../../install/_functions_create.php:639 ../install/_functions_create.php:649
+#: ../../../install/_functions_create.php:659
+msgid "minutes"
+msgstr ""
+
+#: ../../../install/_functions_create.php:640 ../install/_functions_create.php:650
+#: ../../../install/_functions_create.php:660 ../install/_functions_create.php:670
+#, php-format
+msgid "%s minutes"
+msgstr ""
+
+#: ../../../install/_functions_create.php:646
+msgid "Cook Time"
+msgstr ""
+
+#: ../../../install/_functions_create.php:656
+msgid "Passive Time"
+msgstr ""
+
+#: ../../../install/_functions_create.php:666
+msgid "Total time"
+msgstr ""
+
+#: ../../../install/_functions_create.php:677
+msgid "Ingredients"
+msgstr ""
