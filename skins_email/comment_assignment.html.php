@@ -41,7 +41,7 @@ if( $params['notify_full'] )
 	echo '<p'.emailskin_style( '.p' ).'>';
 	if( $Comment->is_meta() )
 	{	// Meta comment:
-		printf( T_('With the following <span %s>Meta-Comment</span>'), emailskin_style( '.label+.label-status-meta' ) );
+		printf( T_('With the following <span %s>%s</span> Comment'), emailskin_style( '.label+.label-status-meta' ), T_('Meta') );
 	}
 	else
 	{	// Normal comment:
