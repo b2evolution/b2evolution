@@ -107,6 +107,7 @@ $ctrl_mappings = array_merge( $ctrl_mappings, array(
 		'wpimportxml'  => 'tools/wpimportxml.ctrl.php',
 		'phpbbimport'  => 'tools/phpbbimport.ctrl.php',
 		'mdimport'     => 'tools/mdimport.ctrl.php',
+		'itimport'     => 'tools/itimport.ctrl.php',
 	) );
 
 

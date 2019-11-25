@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
-global $Collection, $Blog;
+global $Collection, $Blog, $admin_url;
 
 // Create query
 $SQL = new SQL();
@@ -250,6 +250,9 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 							'td_class' => 'shrinkwrap',
 							'td' => '%get_actions_for_itemtype( #ityp_ID# )%',
 						);
+
+	$Results->global_icon( T_('Import Item Type'), 'import',
+		$admin_url.'?ctrl=itimport&amp;it_blog_ID='.$Blog->ID, T_('Import Item Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-default' ) );
 
 	$Results->global_icon( T_('Create a new element...'), 'new',
 				regenerate_url( 'action', 'action=new' ), T_('New Item Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );

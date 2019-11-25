@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
- * Get data to start import from wordpress XML/ZIP file
+ * Get data to start import from wordpress XML/ZIP file or from Item Type XML file
  *
  * @param string Path of XML/ZIP file
  * @return array Data array:
@@ -1723,13 +1723,18 @@ function wpxml_check_xml_file( $file, $halt = false )
 		}
 	}
 
-	// Check WXR version for correct format:
 	$r = false;
 	if( $wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' ) )
-	{
+	{	// Check WXR version for correct format:
 		$wxr_version = (string) trim( $wxr_version[0] );
 		$r = preg_match( '/^\d+\.\d+$/', $wxr_version );
 	}
+	elseif( $app_version = $xml->xpath( '/rss/channel/evo:app_version' ) )
+	{	// Check application version for correct format:
+		$app_version = (string) trim( $app_version[0] );
+		$r = preg_match( '/^[\d\.]+(-[a-z]+)?$/i', $app_version );
+	}
+	
 
 	if( ! $r )
 	{	// If file format is wrong:
