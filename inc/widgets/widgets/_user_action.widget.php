@@ -200,7 +200,7 @@ class user_action_Widget extends ComponentWidget
 
 				// Report User:
 				if( is_logged_in() && ( $current_User->ID != $target_User->ID ) &&
-						$current_User->check_status( 'can_report_user' ) )
+						$current_User->check_status( 'can_report_user', $target_User->ID ) )
 				{	// Current user must be logged in, cannot report own account, and must has a permission to report:
 					// Get current User report from edited User:
 					$current_report = get_report_from( $target_User->ID );
