@@ -3741,6 +3741,7 @@ function callback_filter_userlist( & $Form )
 		'custom_sender_name'  => NULL, // Uses custom sender name
 	);
 
+	echo '<div class="filter-inputs">';
 	$Form->hidden( 'filter', 'new' );
 
 	if( ! is_admin_page() && ! empty( $Blog ) && ( $Blog->get_setting( 'allow_access' ) == 'members' ) && ( $Blog->get_setting( 'userdir_filter_restrict_to_members' ) ) )
@@ -3818,6 +3819,8 @@ function callback_filter_userlist( & $Form )
 		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, '<span class="text-info">'.T_('Campaign Status').'</span>', '', array( 'allow_none' => true ) );
 	}
 	echo '<br />';
+
+	echo '</div>';
 
 	// Gender:
 	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_gender' ) ) )

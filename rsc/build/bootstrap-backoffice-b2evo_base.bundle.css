@@ -2100,6 +2100,9 @@ label.radiooption {
 .filters .form-inline {
   margin: 0 -10px -5px;
 }
+.filters .form-inline .filter-inputs {
+  min-height: 40px;
+}
 .filters .form-inline .form-group {
   margin: 5px 10px;
 }
