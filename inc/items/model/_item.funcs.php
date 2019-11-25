@@ -5862,7 +5862,7 @@ function items_results( & $items_Results, $params = array() )
  */
 function item_type_global_icons( $object_Widget )
 {
-	global $current_User, $admin_url, $DB, $Collection, $Blog;
+	global $current_User, $admin_url, $DB, $Collection, $Blog, $Session;
 
 	if( is_logged_in() && ! empty( $Blog ) && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 	{ // We have permission to add a post with at least one status:
@@ -5894,13 +5894,66 @@ function item_type_global_icons( $object_Widget )
 				$icon_group_create_mass = NULL;
 			}
 
+			if( $current_User->check_perm( 'admin', 'normal' ) &&
+			    $current_User->check_perm( 'options', 'edit' ) )
+			{	// Icon buttons for import:
+				$import_buttons = array(
+					'xml' => array(
+						'title' => TB_('XML Import'),
+						'url'   => $admin_url.'?ctrl=wpimportxml&amp;wp_blog_ID='.$Blog->ID,
+					),
+					'markdown' => array(
+						'title' => TB_('Markdown Import'),
+						'url'   => $admin_url.'?ctrl=mdimport&amp;md_blog_ID='.$Blog->ID,
+					),
+				);
+				if( $Blog->get( 'type' ) == 'forum' )
+				{	// Only for forums collection:
+					$import_buttons['phpbb'] = array(
+						'title' => TB_('phpBB Import'),
+						'url'   => $admin_url.'?ctrl=phpbbimport&amp;forum_blog_ID='.$Blog->ID,
+					);
+					$import_buttons['phpbb3'] = array(
+						'title' => TB_('phpBB 3 Import'),
+						'url'   => $admin_url.'?ctrl=phpbbimport&amp;ver=3&amp;forum_blog_ID='.$Blog->ID,
+					);
+				}
+				$import_buttons['mt'] = array(
+					'title' => TB_('Daniel\'s Movable Type Import'),
+					'url'   => $admin_url.'?ctrl=mtimport&amp;default_blog='.$Blog->ID,
+				);
+				// Make last used import controller first:
+				$last_import_controller = $Session->get( 'last_import_controller_'.$Blog->ID );
+				if( isset( $import_buttons[ $last_import_controller ] ) )
+				{
+					$first_import_button = $import_buttons[ $last_import_controller ];
+					unset( $import_buttons[ $last_import_controller ] );
+					array_unshift( $import_buttons, $first_import_button );
+				}
+				// Display the import buttons:
+				foreach( $import_buttons as $import_button )
+				{
+					$object_Widget->global_icon( $import_button['title'], 'import',
+						$import_button['url'],
+						' '.$import_button['title'], 3, 4,
+						array( 'class' => 'action_icon btn-default hidden-xs' ),
+						'import',
+						array(
+							'parent'     => $icon_group_create_type,
+							'class'      => 'hidden-xs',
+							'item_class' => 'visible-xs',
+						)
+					);
+				}
+			}
+
 			$object_Widget->global_icon( T_('Mass edit the current post list').'...', 'edit',
 				$admin_url.'?ctrl=items&amp;action=mass_edit&amp;filter=restore&amp;blog='.$Blog->ID.'&amp;redirect_to='.rawurlencode( regenerate_url( 'action', '', '', '&' ) ),
 				T_('Mass edit'), 3, 4,
 				array( 'class' => 'action_icon btn-default hidden-xs' ),
 				NULL,
 				array(
-					'parent'    => $icon_group_create_type,
+					'parent'     => $icon_group_create_type,
 					'item_class' => 'visible-xs',
 				)
 			);

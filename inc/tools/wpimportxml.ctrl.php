@@ -34,6 +34,13 @@ if( !empty( $action ) )
 	@ini_set( 'output_buffering', 'off' );
 }
 
+if( param( 'wp_blog_ID', 'integer', 0 ) > 0 )
+{	// Save last import collection in Session:
+	$Session->set( 'last_import_coll_ID', get_param( 'wp_blog_ID' ) );
+
+	// Save last used import controller in Session:
+	$Session->set( 'last_import_controller_'.get_param( 'wp_blog_ID' ), 'xml' );
+}
 
 switch( $action )
 {
@@ -41,11 +48,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'wpxml' );
 
-		$wp_blog_ID = param( 'wp_blog_ID', 'integer', 0 );
 		param_check_not_empty( 'wp_blog_ID', 'Please select a collection!' );
-
-		// Save last import collection in Session:
-		$Session->set( 'last_import_coll_ID', $wp_blog_ID );
 
 		// XML File
 		$xml_file = param( 'import_file', 'string', '' );

@@ -29,6 +29,14 @@ if( !empty( $action ) )
 	@ini_set( 'output_buffering', 'off' );
 }
 
+if( param( 'forum_blog_ID', 'integer', 0 ) > 0 )
+{	// Save last import collection in Session:
+	$Session->set( 'last_import_coll_ID', get_param( 'forum_blog_ID' ) );
+
+	// Save last used import controller in Session:
+	$Session->set( 'last_import_controller_'.get_param( 'forum_blog_ID' ), ( $phpbb_version == 3 ? 'phpbb3' : 'phpbb' ) );
+}
+
 /**
  * @var step
  *
@@ -60,7 +68,6 @@ switch( $action )
 		$phpbb_db_prefix = param( 'db_prefix', 'string', '' );
 		$phpbb_path_avatars = param( 'path_avatars', 'string', '' );
 		$phpbb_path_attachments = param( 'path_attachments', 'string', '' );
-		$forum_blog_ID = param( 'forum_blog_ID', 'integer', 0 );
 
 		param_check_not_empty( 'db_host', 'Please enter a database host!' );
 		param_check_not_empty( 'db_name', 'Please enter a database name!' );

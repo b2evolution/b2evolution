@@ -34,6 +34,13 @@ if( !empty( $action ) )
 	@ini_set( 'output_buffering', 'off' );
 }
 
+if( param( 'md_blog_ID', 'integer', 0 ) > 0 )
+{	// Save last import collection in Session:
+	$Session->set( 'last_import_coll_ID', get_param( 'md_blog_ID' ) );
+
+	// Save last used import controller in Session:
+	$Session->set( 'last_import_controller_'.get_param( 'md_blog_ID' ), 'markdown' );
+}
 
 switch( $action )
 {

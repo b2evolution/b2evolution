@@ -325,6 +325,13 @@ function get_icon_info( $name )
 			'glyph' => 'download-alt',
 			'fa' => 'download'
 		);
+		case 'import': return array(
+			'alt'  => T_('Import'),
+			'size' => array( 16, 16 ),
+			'xy' => array( 128, 0 ),
+			'glyph' => 'upload',
+			'fa' => 'upload'
+		);
 
 
 		case 'warning': return array( // TODO: not really transparent at its borders

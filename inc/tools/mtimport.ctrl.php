@@ -71,6 +71,14 @@ else
 	@ini_set( 'magic_quotes_runtime', 0 );
 }
 
+if( param( 'default_blog', 'integer', 0 ) > 0 )
+{	// Save last import collection in Session:
+	$Session->set( 'last_import_coll_ID', get_param( 'default_blog' ) );
+
+	// Save last used import controller in Session:
+	$Session->set( 'last_import_controller_'.get_param( 'default_blog' ), 'mt' );
+}
+
 // TODO: $io_charset !!
 $head = <<<EOB
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -876,7 +884,7 @@ param( 'import_mode', 'string', 'normal' );
 					case 'ignore':
 						$message .= '<li style="color:blue">User ignored!</li>';
 						echo $message.'</ul>';
-						continue;  // next post
+						continue 2;  // next post
 
 					case 'b2evo':
 						$item_Author = & $UserCache->get_by_login( $usersmapped[ $post_author ][1] );
@@ -914,7 +922,7 @@ param( 'import_mode', 'string', 'normal' );
 					default:
 						$message .= '<li style="color:red">unknown type in checkauthor ('.$usersmapped[ $author ][0].'). This should never ever happen. Post ignored. Please report it.</li>';
 						echo $message.'</ul>';
-						continue;  // next post
+						continue 2;  // next post
 				}
 
 
@@ -932,7 +940,7 @@ param( 'import_mode', 'string', 'normal' );
 							array_shift($checkcat);
 							while( $cat_id = array_shift($checkcat) )
 								$post_catids[] = $cat_id; // get all catids
-							continue;
+							continue 2;
 
 						case 'ignore': // category is ignored
 							if( $i_cat == 0 )
