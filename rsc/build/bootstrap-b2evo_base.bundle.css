@@ -2097,6 +2097,15 @@ label.radiooption {
   margin-right: 1em;
   cursor: pointer;
 }
+.filters .form-inline {
+  margin: 0 -10px -5px;
+}
+.filters .form-inline .form-group {
+  margin: 5px 10px;
+}
+.filters .form-inline .checkbox {
+  margin-left: 10px;
+}
 .file_select_wrapper {
   display: flex;
   flex-flow: row wrap;

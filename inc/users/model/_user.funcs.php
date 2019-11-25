@@ -3743,34 +3743,39 @@ function callback_filter_userlist( & $Form )
 
 	$Form->hidden( 'filter', 'new' );
 
-	if( ! is_admin_page() && ! empty( $Blog ) && $Blog->get_setting( 'allow_access' ) == 'members' )
+	if( ! is_admin_page() && ! empty( $Blog ) && ( $Blog->get_setting( 'allow_access' ) == 'members' ) && ( $Blog->get_setting( 'userdir_filter_restrict_to_members' ) ) )
 	{ // Restrict by members only when it is frontoffice and Blog allow access only for members
-		$Form->checkbox( 'membersonly', get_param( 'membersonly' ), T_('Restrict to members of this blog') );
+		$Form->checkbox( 'membersonly', get_param( 'membersonly' ), sprintf( T_('Only members of %s'), $Blog->get_shortname() ) );
 	}
 
-	$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
+	if( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name' ) )
+	{
+		$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
+	}
 
 	$location_filter_displayed = false;
-	if( user_country_visible() )
-	{ // Filter by country
-		load_class( 'regional/model/_country.class.php', 'Country' );
-		load_funcs( 'regional/model/_regional.funcs.php' );
-		if( has_cross_country_restriction( 'users', 'list' ) )
-		{ // User cannot browse other users from other country
-			global $current_User;
-			$Form->info( T_('Country'), $current_User->get_country_name() );
-			// Create a hidden country field to correct ajax request to load regions, subregions and cities
-			$Form->hidden( 'country', $current_User->ctry_ID, array( 'id' => 'country' ) );
-		}
-		else
-		{ // User can browse other users from other country
-			$CountryCache = & get_CountryCache( NT_('All') );
-			$Form->select_country( 'country', get_param('country'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
-			$location_filter_displayed = true;
+	if( user_country_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) )
+	{
+		{ // Filter by country
+			load_class( 'regional/model/_country.class.php', 'Country' );
+			load_funcs( 'regional/model/_regional.funcs.php' );
+			if( has_cross_country_restriction( 'users', 'list' ) )
+			{ // User cannot browse other users from other country
+				global $current_User;
+				$Form->info( T_('Country'), $current_User->get_country_name() );
+				// Create a hidden country field to correct ajax request to load regions, subregions and cities
+				$Form->hidden( 'country', $current_User->ctry_ID, array( 'id' => 'country' ) );
+			}
+			else
+			{ // User can browse other users from other country
+				$CountryCache = & get_CountryCache( NT_('All') );
+				$Form->select_country( 'country', get_param('country'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
+				$location_filter_displayed = true;
+			}
 		}
 	}
 
-	if( user_region_visible() )
+	if( user_region_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_region' ) )
 	{	// Filter by region
 		$region_filter_disp_style = regions_exist( get_param('country'), true ) ? '' : ' style="display:none"';
 		echo '<span id="region_filter"'.$region_filter_disp_style.'>';
@@ -3779,24 +3784,27 @@ function callback_filter_userlist( & $Form )
 		$location_filter_displayed = $location_filter_displayed || empty( $region_filter_disp_style );
 	}
 
-	if( user_subregion_visible() )
+	if( user_subregion_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_subregion' ) )
 	{	// Filter by subregion
 		echo '<span id="subregion_filter"'.( !subregions_exist( get_param('region'), true ) ? ' style="display:none"' : '' ).'>';
 		$Form->select_input_options( 'subregion', get_subregions_option_list( get_param('region'), get_param('subregion') ), T_('Sub-region') );
 		echo '</span>';
 	}
 
-	if( user_city_visible() )
+	if( user_city_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_city' ) )
 	{	// Filter by city
 		echo '<span id="city_filter"'.( !cities_exist( get_param('country'), get_param('region'), get_param('subregion'), true ) ? ' style="display:none"' : '' ).'>';
 		$Form->select_input_options( 'city', get_cities_option_list( get_param('country'), get_param('region'), get_param('subregion'), get_param('city') ), T_('City') );
 		echo '</span>';
 	}
 
-	$Form->begin_line( T_('Age group'), 'age_min' );
-		$Form->text( 'age_min', get_param('age_min'), 3, '' );
-		$Form->text( 'age_max', get_param('age_max'), 3, T_('to') );
-	$Form->end_line();
+	if( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_age_group' ) )
+	{
+		$Form->begin_line( T_('Age group'), 'age_min' );
+			$Form->text( 'age_min', get_param('age_min'), 3, '' );
+			$Form->text( 'age_max', get_param('age_max'), 3, T_('to') );
+		$Form->end_line();
+	}
 
 	if( is_admin_page() && $edited_EmailCampaign )
 	{

@@ -239,6 +239,13 @@ class CollectionSettings extends AbstractSettings
 
 		// User directory:
 			'userdir_enable' => 1,
+			'userdir_filter_restrict_to_members' => 1,
+			'userdir_filter_name' => 1,
+			'userdir_filter_country' => 1,
+			'userdir_filter_region' => 1,
+			'userdir_filter_subregion' => 1,
+			'userdir_filter_city' => 1,
+			'userdir_filter_age_group' => 1,
 			'userdir_filter_gender' => 1,
 			'userdir_filter_level' => 1,
 			'userdir_filter_org' => 1,

@@ -1156,6 +1156,13 @@ class Blog extends DataObject
 		if( in_array( 'userdir', $groups ) )
 		{ // we want to load the user directory settings:
 			$this->set_setting( 'userdir_enable', param( 'userdir_enable', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_restrict_to_members', param( 'userdir_filter_restrict_to_members', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_name', param( 'userdir_filter_name', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_country', param( 'userdir_filter_country', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_region', param( 'userdir_filter_region', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_subregion', param( 'userdir_filter_subregion', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_city', param( 'userdir_filter_city', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_age_group', param( 'userdir_filter_age_group', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_gender', param( 'userdir_filter_gender', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_level', param( 'userdir_filter_level', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_org', param( 'userdir_filter_org', 'integer', 0 ) );
