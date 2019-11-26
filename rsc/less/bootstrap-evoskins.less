@@ -1393,3 +1393,41 @@ span[id^=title_folding_] {
 		list-style: none;
 	}
 }
+
+// Comment status badge
+.evo_comment_title {
+	position: relative;
+	>.evo_status.pull-right {
+		position: absolute;
+		top: 50%;
+		right: 0;
+		transform: translateY(-50%);
+	}
+}
+.evo_comment_subtitle.pull-right {
+	.evo_status.pull-right {
+		position: relative;
+		float: none !important;
+		display: inline-block;
+		margin-left: 6px;
+	}
+}
+
+// Comment footer
+.evo_content_block {
+	.evo_comment_info {
+		.action_btn_group {
+			float: right;
+		}
+	}
+
+	.comment_edit_btn {
+		margin-right: 5px;
+	}
+
+	// Fix buttons for comment actions
+	.btn-group>.btn.first-child {
+		border-top-left-radius: 3px !important;
+		border-bottom-left-radius: 3px !important;
+	}
+}

@@ -3652,3 +3652,28 @@ span[id^=title_folding_] {
 .evo_widget.widget_core_coll_locale_switch ul {
   list-style: none;
 }
+.evo_comment_title {
+  position: relative;
+}
+.evo_comment_title > .evo_status.pull-right {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+}
+.evo_comment_subtitle.pull-right .evo_status.pull-right {
+  position: relative;
+  float: none !important;
+  display: inline-block;
+  margin-left: 6px;
+}
+.evo_content_block .evo_comment_info .action_btn_group {
+  float: right;
+}
+.evo_content_block .comment_edit_btn {
+  margin-right: 5px;
+}
+.evo_content_block .btn-group > .btn.first-child {
+  border-top-left-radius: 3px !important;
+  border-bottom-left-radius: 3px !important;
+}

@@ -71,7 +71,22 @@ $block_item_Widget->title = ( $tab3 == 'meta' ? T_('Meta comments') : T_('Feedba
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title
-echo $CommentList->get_filter_title( '<h3>', '</h3>', '<br />', NULL, 'htmlbody' );
+//echo $CommentList->get_filter_title( '<h3>', '</h3>', '<br />', NULL, 'htmlbody' );
+// --------------------------------- START OF CURRENT FILTERS --------------------------------
+skin_widget( array(
+	// CODE for the widget:
+	'widget' => 'coll_current_comment_filters',
+	// Optional display params
+	'CommentList'             => $CommentList,
+	'block_start'          => '',
+	'block_end'            => '',
+	'block_title_start'    => '<b>',
+	'block_title_end'      => ':</b> ',
+	'show_filters'         => array( 'visibility' => 1 ),
+	'display_button_reset' => false,
+	'display_empty_filter' => true,
+) );
+// ---------------------------------- END OF CURRENT FILTERS ---------------------------------
 
 $block_item_Widget->disp_template_replaced( 'block_end' );
 

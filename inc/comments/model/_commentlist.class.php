@@ -597,28 +597,305 @@ class CommentList2 extends DataObjectList2
 	 */
 	function get_filter_titles( $ignore = array(), $params = array() )
 	{
+		$params = array_merge( array(
+			'display_author'      => true,
+			'author_text'         => T_('Author').': ',
+			'authors_text'        => T_('Authors').': ',
+			'authors_nor_text'    => T_('All authors except').': ',
+
+			'display_author_url'  => true,
+			'author_url_text'     => T_('Author URL').': ',
+			'author_url_without_text'  => T_('Without this').' ',
+
+			'display_author_IP'   => true,
+			'author_IP_text'      => T_('IP'),
+
+			'display_visibility'  => true,
+			'visibility_text'     => T_('Visibility').': ',
+
+			'display_keyword'     => true,
+			'keyword_text'        => T_('Keyword').': ',
+			'keywords_text'       => T_('Keywords').': ',
+			'keywords_exact_text' => T_('Exact match').' ',
+
+			'display_active'      => true,
+			'active_hide_text'    => T_('Hide active'),
+
+			'display_expired'     => true,
+			'expired_show_text'   => T_('Show expired'),
+
+			'display_rating'      => true,
+			'rating_text'         => T_('Rating').': ',
+			'rating_none_text'    => T_('No rating'),
+			'rating_having_text'  => T_('Have rating'),
+			'rating_above_text'   => T_('Above'),
+			'rating_below_text'   => T_('Below'),
+
+			'group_mask'          => '$group_title$$filter_items$', // $group_title$, $filter_items$
+			'filter_mask'         => '"$filter_name$"', // $group_title$, $filter_name$, $clear_icon$
+			'filter_mask_nogroup' => '"$filter_name$"', // $filter_name$, $clear_icon$
+
+			'before_items'        => '',
+			'after_items'         => '',
+
+			'separator_and'       => ' '.T_('and').' ',
+			'separator_or'        => ' '.T_('or').' ',
+			'separator_nor'       => ' '.T_('or').' ',
+			'separator_comma'     => ', ',
+		), $params );
+
 		$title_array = array();
 
-		if( empty ($this->filters) )
+		if( empty( $this->filters ) )
 		{ // Filters have no been set before, we'll use the default filterset
 			$this->set_filters( $this->default_filters );
 		}
 
-		if( isset( $this->filters['statuses'] ) )
-		{
-			$visibility_statuses = get_visibility_statuses( '', array( 'redirected' ) );
+		// Check if the filter mask has an icon to clear the filter item
+		$clear_icon = ( strpos( $params['filter_mask'], '$clear_icon$' ) !== false );
 
-			$visibility_array = array();
-			foreach( $this->filters['statuses'] as $status )
-			{
-				$visibility_array[] = $visibility_statuses[ $status ];
-			}
-			$title_array['statuses'] = T_('Visibility').': '.implode( ', ', $visibility_array );
+		$filter_classes = array( 'green' );
+		$filter_class_i = 0;
+		if( strpos( $params['filter_mask'], '$filter_class$' ) !== false )
+		{ // Initialize array with available classes for filter items
+			$filter_classes = array( 'green', 'yellow', 'orange', 'red', 'magenta', 'blue' );
 		}
 
-		if( !empty($this->filters['keywords']) )
+		// COMMENT TO SHOW:
+		if( $params['display_visibility'] && isset( $this->filters['statuses'] ) )
 		{
-			$title_array['keywords'] = T_('Keywords').': '.$this->filters['keywords'];
+			$exclude_statuses = array_merge( get_restricted_statuses( $this->Blog->ID, 'blog_comment!' ), array( 'redirected' ) );
+			$comment_statuses = get_visibility_statuses( '', $exclude_statuses );
+
+			if( count( $this->filters['statuses'] ) != count( $comment_statuses ) )
+			{
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				if( $this->filters['statuses'] == '-' )
+				{
+					$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_statuses=-' ) ) : '';
+					$title_array[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( T_('Without status'), $status_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask_nogroup'] );
+				}
+				else
+				{
+					$status_IDs = $this->filters['statuses'];
+
+					$statuses = array();
+					foreach( $status_IDs as $status_ID )
+					{
+						$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_statuses='.$status_ID ) ) : '';
+						$statuses[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+							array( $params['visibility_text'], $comment_statuses[$status_ID], $status_clear_icon, $filter_classes[ $filter_class_i ] ),
+							$params['filter_mask'] );
+					}
+					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+						( ( count( $statuses ) > 1 ) ?
+							array( $params['visibility_text'], $params['before_items'].implode( $params['separator_comma'], $statuses ).$params['after_items'] ):
+							array( $params['visibility_text'], implode( $params['separator_comma'], $statuses ) ) ),
+						$params['group_mask'] );
+				}
+				$filter_class_i++;
+			}
+		}
+
+		// SHOW ACTIVE:
+		if( $params['display_active'] )
+		{
+			if( ! in_array( 'active', $this->filters['expiry_statuses'] ) && ! empty( $this->filters['expiry_statuses'] ) )
+			{	// Display when only "Show expired" comments:
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( '', $this->param_prefix.'expiry_statuses[]=active' ) ) : '';
+				$title_array['active'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+					array( $params['active_hide_text'], $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
+					$params['filter_mask_nogroup'] );
+				$filter_class_i++;
+			}
+		}
+
+		// SHOW EXPIRED:
+		if( $params['display_expired'] )
+		{
+			if( in_array( 'expired', $this->filters['expiry_statuses'] ) )
+			{	// Display when only "Show expired" comments:
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'expiry_statuses=expired' ) ) : '';
+				$title_array['expired'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+					array( $params['expired_show_text'], $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
+					$params['filter_mask_nogroup'] );
+				$filter_class_i++;
+			}
+		}
+
+		// KEYWORDS:
+		if( $params['display_keyword'] )
+		{
+			if( ! empty( $this->filters['keywords'] ) )
+			{
+				if( $this->filters['phrase'] == 'OR' || $this->filters['phrase'] == 'AND' )
+				{ // Search by each keyword
+					$keywords = trim( preg_replace( '/("|, *)/', ' ', $this->filters['keywords'] ) );
+					$keywords = explode( ' ', $keywords );
+				}
+				else
+				{ // Exact match (Single keyword)
+					$keywords = array( $this->filters['keywords'] );
+				}
+
+				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+				$keyword_names = array();
+				foreach( $keywords as $keyword )
+				{
+					$word_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'s='.$keyword ) ) : '';
+					$keyword_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+						array( $params['keyword_text'], $keyword, $word_clear_icon, $filter_classes[ $filter_class_i ] ),
+						$params['filter_mask'] );
+				}
+				$filter_class_i++;
+				$keywords = ( $this->filters['exact'] ? $params['keywords_exact_text'] : '' )
+					.implode( ( $this->filters['phrase'] == 'OR' ? $params['separator_or'] : $params['separator_and'] ), $keyword_names );
+
+				$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+					( count( $keyword_names ) > 1 ?
+						array( $params['keywords_text'], $params['before_items'].$keywords.$params['after_items'] ) :
+						array( $params['keyword_text'], $keywords ) ),
+					$params['group_mask'] );
+			}
+		}
+
+		// RATING:
+		if( $params['display_rating'] && isset( $this->filters['rating_toshow'] ) )
+		{
+			$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+			$ratings = array();
+			if( in_array( 'norating', $this->filters['rating_toshow'] ) )
+			{
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'rating_toshow=norating' ) ) : '';
+				$ratings[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$', '$group_title$' ),
+					array( $params['rating_none_text'], $unit_clear_icon, $filter_classes[ $filter_class_i ], $params['rating_text'] ),
+					$params['filter_mask'] );
+			}
+
+			if( in_array( 'haverating', $this->filters['rating_toshow'] ) )
+			{
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'rating_toshow=haverating' ) ) : '';
+				switch( $this->filters['rating_turn'] )
+				{
+					case 'above':
+						$rating_operator = "&ge;";
+						break;
+
+					case 'below':
+						$rating_operator = "&le;";
+						break;
+
+					case 'exact':
+						$rating_operator = "=";
+				}
+				$ratings[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$', '$group_title$' ),
+					array( $rating_operator.' '.$this->filters['rating_limit'], $unit_clear_icon, $filter_classes[ $filter_class_i ], $params['rating_text'] ),
+					$params['filter_mask'] );
+			}
+
+			$ratings = implode( $params['separator_or'], $ratings );
+			$title_array[] = str_replace( array( '$group_title$', '$filter_items$'),
+				array( $params['rating_text'], $params['before_items'].$ratings.$params['after_items'] ), $params['group_mask'] );
+			$filter_class_i++;
+		}
+
+		// AUTHORS:
+		if( $params['display_author'] )
+		{
+			if( ! empty( $this->filters['author_IDs'] ) || ! empty( $this->filters['authors_login'] ) )
+			{
+
+				$authors = trim( $this->filters['author_IDs'].','.get_users_IDs_by_logins( $this->filters['authors_login'] ), ',' );
+				$exclude_authors = false;
+				if( substr( $authors, 0, 1 ) == '-' )
+				{ // Authors are excluded
+					$authors = substr( $authors, 1 );
+					$exclude_authors = true;
+				}
+				$authors = preg_split( '~\s*,\s*~', $authors, -1, PREG_SPLIT_NO_EMPTY );
+				$author_names = array();
+				if( $authors )
+				{
+					$UserCache = & get_UserCache();
+					$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+					foreach( $authors as $author_ID )
+					{
+						if( $tmp_User = $UserCache->get_by_ID( $author_ID, false, false ) )
+						{
+							$user_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'author_IDs='.$author_ID ) ) : '';
+							$author_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
+								array( $params['author_text'], $tmp_User->get( 'login' ), $user_clear_icon, $filter_classes[ $filter_class_i ] ),
+								$params['filter_mask'] );
+						}
+					}
+					$filter_class_i++;
+				}
+				if( count( $author_names ) > 0 )
+				{ // Display info of filter by authors
+					if( $exclude_authors )
+					{ // Exclude authors
+						$author_names_string = $params['authors_nor_text'].implode( $params['separator_nor'], $author_names );
+					}
+					else
+					{ // Filter by authors
+						$author_names_string = implode( $params['separator_comma'], $author_names );
+					}
+
+					$title_array[] = str_replace( array( '$group_title$', '$filter_items$' ),
+						( count( $author_names ) > 1 ?
+							array( $params['authors_text'], $params['before_items'].$author_names_string.$params['after_items'] ) :
+							array( $params['author_text'], $author_names_string ) ),
+						$params['group_mask'] );
+				}
+			}
+		}
+
+		// AUTHOR URL:
+		if( $params['display_author_url'] )
+		{
+			$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+			$author_url = array();
+			if( ! empty( $this->filters['author_url'] ) )
+			{
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'include_emptyurl' ) ) : '';
+				$author_url[] = ( $this->filters['url_match'] == '!=' ?  $params['author_url_without_text'] : '' )
+					.str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$', '$group_title$' ),
+					array( $this->filters['author_url'], $unit_clear_icon, $filter_classes[ $filter_class_i ], $params['author_url_text'] ),
+					$params['filter_mask'] );
+			}
+
+			if( ! empty( $this->filters['include_emptyurl'] ) )
+			{	// Display when only "include empty url" is checked:
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'include_emptyurl' ) ) : '';
+				$author_url[] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$', '$group_title$' ),
+					array( T_('Include comments with no url'), $unit_clear_icon, $filter_classes[ $filter_class_i ], $params['author_url_text'] ),
+					$params['filter_mask_nogroup'] );
+			}
+
+			if( ! empty($author_url ) )
+			{
+				$author_url = implode( $params['separator_or'], $author_url );
+				$title_array[] = str_replace( array( '$group_title$', '$filter_items$'),
+					array( $params['author_url_text'], $params['before_items'].$author_url.$params['after_items'] ), $params['group_mask'] );
+				$filter_class_i++;
+			}
+		}
+
+		// IP ADDRESS:
+		if( $params['display_author_IP'] )
+		{
+			$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
+			if( ! empty( $this->filters['author_IP'] ) )
+			{
+				$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'author_IP' ) ) : '';
+				$title_array['author_IP'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$', '$group_title$' ),
+					array( $this->filters['author_IP'], $unit_clear_icon, $filter_classes[ $filter_class_i ], $params['author_IP_text'] ),
+					$params['filter_mask'] );
+			}
 		}
 
 		return $title_array;

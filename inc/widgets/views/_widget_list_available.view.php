@@ -105,17 +105,18 @@ $core_componentwidget_defs = array(
 			'user_tools',        // User Tools
 		),
 	'navigation' => array(
-			'breadcrumb_path',      // Breadcrumb Path
-			'coll_search_form',     // Search Form
-			'site_logo',            // Site logo
-			'cat_title',            // Category Title
-			'coll_current_filters', // Current filters
-			'coll_item_list_pages', // List Pager
-			'item_next_previous',   // Next/Previous Item
-			'coll_locale_switch',   // Language/Locale/Version switch
-			'coll_category_list',   // Category list
-			'content_hierarchy',    // Content Hierarchy
-			'coll_tag_cloud',       // Tag cloud
+			'breadcrumb_path',              // Breadcrumb Path
+			'coll_search_form',             // Search Form
+			'site_logo',                    // Site logo
+			'cat_title',                    // Category Title
+			'coll_current_filters',         // Current Item filters
+			'coll_current_comment_filters', // Current Comment filters
+			'coll_item_list_pages',         // List Pager
+			'item_next_previous',           // Next/Previous Item
+			'coll_locale_switch',           // Language/Locale/Version switch
+			'coll_category_list',           // Category list
+			'content_hierarchy',            // Content Hierarchy
+			'coll_tag_cloud',               // Tag cloud
 			// Plugin: Calendar
 			// Plugin: Date Archives
 		),

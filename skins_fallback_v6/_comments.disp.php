@@ -27,7 +27,7 @@ $params = array_merge( array(
 		'comment_post_display'    => true,	// We want to display the title of the post we're referring to
 		'comment_post_before'     => '<div class="panel-heading"><h4 class="evo_comment_title panel-title pull-left">',
 		'comment_post_after'      => '</h4>',
-		'comment_title_before'    => '<h4 class="panel-title pull-right">',
+		'comment_title_before'    => '<h4 class="evo_comment_subtitle panel-title pull-right">',
 		'comment_title_after'     => '</h4><div class="clearfix"></div></div><div class="panel-body">',
 		'comment_avatar_before'   => '<div class="evo_comment_avatar">',
 		'comment_avatar_after'    => '</div>',
