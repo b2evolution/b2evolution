@@ -48,7 +48,7 @@ $block_item_Widget->disp_template_raw( 'block_end' );
 $block_item_Widget->title = TB_('Item Type Import');
 $block_item_Widget->disp_template_replaced( 'block_start' );
 echo '<ul>';
-printf( '<li>'.TB_('Use the <a %s>Item Type Importer</a> to import contents previously exported as XML file.').'</li>', ' href="?ctrl=itimport"' );
+printf( '<li>'.TB_('Use the <a %s>Item Type Importer</a> to import Item Type Definitions previously exported as XML file.').'</li>', ' href="?ctrl=itimport"' );
 echo '</ul>';
 $block_item_Widget->disp_template_raw( 'block_end' );
 

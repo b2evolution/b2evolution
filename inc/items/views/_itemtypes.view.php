@@ -252,7 +252,7 @@ if( $current_User->check_perm( 'options', 'edit', false ) )
 						);
 
 	$Results->global_icon( T_('Import Item Type'), 'import',
-		$admin_url.'?ctrl=itimport&amp;it_blog_ID='.$Blog->ID, T_('Import Item Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-default' ) );
+		$admin_url.'?ctrl=itimport&amp;it_blog_IDs[]='.$Blog->ID, T_('Import Item Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-default' ) );
 
 	$Results->global_icon( T_('Create a new element...'), 'new',
 				regenerate_url( 'action', 'action=new' ), T_('New Item Type').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );

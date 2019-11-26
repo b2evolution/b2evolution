@@ -21,12 +21,22 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function itxml_import( $XML_file_path )
 {
-	global $DB;
+	global $DB, $admin_url;
 
-	// Set Collection from by requested ID:
-	$it_blog_ID = param( 'it_blog_ID', 'integer', 0 );
-	$BlogCache = & get_BlogCache();
-	$it_Blog = & $BlogCache->get_by_ID( $it_blog_ID, false, false );
+	// Get collections IDs from request:
+	$it_blog_IDs = param( 'it_blog_IDs', 'array:integer', NULL );
+	if( is_array( $it_blog_IDs ) && ! empty( $it_blog_IDs ) )
+	{
+		$BlogCache = & get_BlogCache();
+		$BlogCache->load_list( $it_blog_IDs );
+		foreach( $it_blog_IDs as $it => $it_blog_ID )
+		{
+			if( ! ( $it_Blog = & $BlogCache->get_by_ID( $it_blog_ID, false, false ) ) )
+			{	// Exclude wrong collection:
+				unset( $it_blog_IDs[ $it_blog_ID ] );
+			}
+		}
+	}
 
 	// The import type ( skip | update )
 	$import_type = param( 'import_type', 'string', 'skip' );
@@ -74,7 +84,7 @@ function itxml_import( $XML_file_path )
 			}
 			elseif( $import_type == 'skip' )
 			{	// Skip existing Item Type:
-				echo '<span class="text-warning">'.sprintf( 'Skip because Item Type already exists with same name and ID #%d.', intval( $existing_item_types[ $item_type['name'] ] ) ).'</span>';
+				echo '<span class="text-warning">'.sprintf( 'Skip because Item Type already exists with same name <a %s>%s</a>.', 'href="'.$admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$existing_item_types[ $item_type['name'] ].'"', $item_type['name'] ).'</span>';
 				$skipped_item_types_num++;
 				echo '</p>';
 				evo_flush();
@@ -96,60 +106,68 @@ function itxml_import( $XML_file_path )
 				}
 			}
 
-			$ItemType->update_custom_fields = array();
-			$ItemType->insert_custom_fields = array();
-			$old_custom_fields = $ItemType->get_custom_fields();
-			foreach( $item_type['custom_fields'] as $custom_field_name => $new_custom_field )
-			{
-				$custom_field_cols = array(
-						'type',
-						'label',
-						'name',
-						'schema_prop',
-						'order',
-						'note',
-						'required',
-						'meta',
-						'public',
-						'format',
-						'formula',
-						'cell_class',
-						'disp_condition',
-						'header_class',
-						'link',
-						'link_nofollow',
-						'link_class',
-						'line_highlight',
-						'green_highlight',
-						'red_highlight',
-						'description',
-						'merge',
-					);
-				foreach( $custom_field_cols as $custom_field_col )
-				{	// Check the imported custom field has all required columns:
-					if( ! array_key_exists( $custom_field_col, $new_custom_field ) )
-					{	// Skip wrong custom field:
-						echo '<span class="text-warning">'.sprintf( 'Skip custom field %s because no required column %s.', '<code>'.$custom_field_name.'</code>', '<code>'.$custom_field_col.'</code>' ).'</span> ';
-						continue 2;
+			if( ! empty( $item_type['custom_fields'] ) )
+			{	// Import custom fields:
+				$ItemType->update_custom_fields = array();
+				$ItemType->insert_custom_fields = array();
+				$old_custom_fields = $ItemType->get_custom_fields();
+				foreach( $item_type['custom_fields'] as $custom_field_name => $new_custom_field )
+				{
+					$custom_field_cols = array(
+							'type',
+							'label',
+							'name',
+							'schema_prop',
+							'order',
+							'note',
+							'required',
+							'meta',
+							'public',
+							'format',
+							'formula',
+							'cell_class',
+							'disp_condition',
+							'header_class',
+							'link',
+							'link_nofollow',
+							'link_class',
+							'line_highlight',
+							'green_highlight',
+							'red_highlight',
+							'description',
+							'merge',
+						);
+					foreach( $custom_field_cols as $custom_field_col )
+					{	// Check the imported custom field has all required columns:
+						if( ! array_key_exists( $custom_field_col, $new_custom_field ) )
+						{	// Skip wrong custom field:
+							echo '<span class="text-warning">'.sprintf( 'Skip custom field %s because no required column %s.', '<code>'.$custom_field_name.'</code>', '<code>'.$custom_field_col.'</code>' ).'</span> ';
+							continue 2;
+						}
 					}
-				}
-				if( isset( $old_custom_fields[ $custom_field_name ] ) )
-				{	// Update existing custom field:
-					$ItemType->update_custom_fields[ $old_custom_fields[ $custom_field_name ]['ID'] ] = $new_custom_field;
-				}
-				else
-				{	// Insert new custom field:
-					$ItemType->insert_custom_fields[] = $new_custom_field;
+					if( isset( $old_custom_fields[ $custom_field_name ] ) )
+					{	// Update existing custom field:
+						$ItemType->update_custom_fields[ $old_custom_fields[ $custom_field_name ]['ID'] ] = $new_custom_field;
+					}
+					else
+					{	// Insert new custom field:
+						$ItemType->insert_custom_fields[] = $new_custom_field;
+					}
 				}
 			}
 
 			if( $ItemType && $ItemType->dbsave() )
 			{	// If Item Type is added/updated successfully:
-				if( $it_Blog )
-				{	// Enable the Item Type for the selected Collection:
+				if( ! empty( $it_blog_IDs ) )
+				{	// Enable the Item Type for the selected Collections:
+					$it_colls_insert_sql_values = array();
+					foreach( $it_blog_IDs as $it_blog_ID )
+					{
+						$it_colls_insert_sql_values[] = '( '.$DB->quote( $ItemType->ID ).', '.$DB->quote( $it_blog_ID ).' )';
+					}
 					$DB->query( 'REPLACE INTO T_items__type_coll
 						       ( itc_ityp_ID, itc_coll_ID )
-						VALUES ( '.$DB->quote( $ItemType->ID ).', '.$DB->quote( $it_Blog->ID ).' )' );
+						VALUES '.implode( ', ', $it_colls_insert_sql_values ) );
 				}
 
 				// Log success result:

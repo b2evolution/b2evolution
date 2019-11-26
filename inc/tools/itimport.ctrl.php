@@ -35,9 +35,9 @@ if( !empty( $action ) )
 	@ini_set( 'output_buffering', 'off' );
 }
 
-if( param( 'it_blog_ID', 'integer', 0 ) > 0 )
-{	// Save last import collection in Session:
-	$Session->set( 'last_import_coll_ID', get_param( 'it_blog_ID' ) );
+if( param( 'it_blog_IDs', 'array:integer', NULL ) !== NULL )
+{	// Save last import collections in Session:
+	$Session->set( 'last_import_coll_IDs', get_param( 'it_blog_IDs' ) );
 }
 
 switch( $action )

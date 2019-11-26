@@ -5899,7 +5899,7 @@ function item_type_global_icons( $object_Widget )
 			{	// Icon buttons for import:
 				$import_buttons = array(
 					'xml' => array(
-						'title' => TB_('XML Import'),
+						'title' => TB_('XML Import (b2evolution, WordPress, RSS2)'),
 						'url'   => $admin_url.'?ctrl=wpimportxml&amp;wp_blog_ID='.$Blog->ID,
 					),
 					'markdown' => array(
@@ -5919,7 +5919,7 @@ function item_type_global_icons( $object_Widget )
 					);
 				}
 				$import_buttons['mt'] = array(
-					'title' => TB_('Daniel\'s Movable Type Import'),
+					'title' => TB_('Movable Type Import'),
 					'url'   => $admin_url.'?ctrl=mtimport&amp;default_blog='.$Blog->ID,
 				);
 				// Make last used import controller first:

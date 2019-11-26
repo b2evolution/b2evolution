@@ -41,12 +41,16 @@ if( ! empty( $import_files ) )
 
 	$BlogCache = & get_BlogCache();
 	$BlogCache->load_all( 'shortname,name', 'ASC' );
-	//$BlogCache->none_option_text = TB_('Please select...');
 
-	$Form->select_input_object( 'it_blog_ID', $Session->get( 'last_import_coll_ID' ), $BlogCache, TB_('Enable for collection'), array(
-			'note' => TB_('All item types from the selected XML file will be enabled for this collection.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.TB_('Create new blog').' &raquo;</a>',
-			'allow_none' => true,
-			'loop_object_method' => 'get_extended_name' ) );
+	$last_import_coll_IDs = $Session->get( 'last_import_coll_IDs' );
+	$coll_options = array();
+	foreach( $BlogCache->cache as $it_Blog )
+	{
+		$coll_options[] = array( 'it_blog_IDs[]', $it_Blog->ID, $it_Blog->get_extended_name(), ( is_array( $last_import_coll_IDs ) && in_array( $it_Blog->ID, $last_import_coll_IDs ) ) );
+	}
+	$Form->checklist( $coll_options, 'it_blog_IDs', TB_('Enable for collections'), false, false, array(
+			'note' => TB_('All item types from the selected XML file will be enabled for the checked collections.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.TB_('Create new blog').' &raquo;</a>',
+		) );
 
 	$Form->radio_input( 'import_type', $import_type, array(
 				array(
