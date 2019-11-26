@@ -24,3 +24,4 @@ npm-debug.log
 media/import/LRT-*
 media/blogs/*
 /_transifex/messages-backoffice.pot.bak
+media/import/logs

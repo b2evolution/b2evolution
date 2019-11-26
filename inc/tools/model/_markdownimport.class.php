@@ -47,7 +47,7 @@ class MarkdownImport
 					'replace' => array(
 							'title'  => T_('DELETE & replace ALL contents'),
 							'note'   => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.'),
-							'suffix' => '<div id="import_type_replace_confirm_block" class="alert alert-danger" style="display:none;margin:0">'.T_('WARNING').': '.T_('you will LOSE any data that is not part of the files you import.').' '.sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).': <input name="import_type_replace_confirm" type="text" class="form-control" size="8" style="margin:-8px 0" /></div>',
+							'suffix' => '<br /><div id="import_type_replace_confirm_block" class="alert alert-danger" style="display:none;margin:0">'.T_('WARNING').': '.T_('you will LOSE any data that is not part of the files you import.').' '.sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).': <input name="import_type_replace_confirm" type="text" class="form-control" size="8" style="margin:-8px 0" /></div>',
 						),
 				),
 				'type'    => 'string',
@@ -345,9 +345,8 @@ class MarkdownImport
 		$folder_path = $this->get_data( 'path' );
 		$source_folder_zip_name = basename( $this->source );
 
-		// Set Collection by requested ID:
-		$BlogCache = & get_BlogCache();
-		$md_Blog = & $BlogCache->get_by_ID( $this->coll_ID );
+		// Get Collection for current import:
+		$md_Blog = & $this->get_Blog();
 		// Set current collection because it is used inside several functions like urltitle_validate():
 		$Blog = $md_Blog;
 
@@ -371,8 +370,7 @@ class MarkdownImport
 				$old_posts = $DB->get_col( $SQL->get() );
 			}
 
-			echo T_('Removing the comments... ');
-			evo_flush();
+			$this->log( T_('Removing the comments... ') );
 			if( !empty( $old_posts ) )
 			{
 				$SQL = new SQL();
@@ -387,10 +385,9 @@ class MarkdownImport
 					$DB->query( 'DELETE FROM T_links WHERE link_cmt_ID IN ( '.implode( ', ', $old_comments ).' )' );
 				}
 			}
-			echo T_('OK').'<br />';
+			$this->log( T_('OK').'<br />' );
 
-			echo T_('Removing the posts... ');
-			evo_flush();
+			$this->log( T_('Removing the posts... ') );
 			if( !empty( $old_categories ) )
 			{
 				$DB->query( 'DELETE FROM T_items__item WHERE post_main_cat_ID IN ( '.implode( ', ', $old_categories ).' )' );
@@ -416,17 +413,15 @@ class MarkdownImport
 					$DB->query( 'DELETE FROM T_items__user_data WHERE itud_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
 				}
 			}
-			echo T_('OK').'<br />';
+			$this->log( T_('OK').'<br />' );
 
-			echo T_('Removing the categories... ');
-			evo_flush();
+			$this->log( T_('Removing the categories... ') );
 			$DB->query( 'DELETE FROM T_categories WHERE cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
 			$ChapterCache = & get_ChapterCache();
 			$ChapterCache->clear();
-			echo T_('OK').'<br />';
+			$this->log( T_('OK').'<br />' );
 
-			echo T_('Removing the tags that are no longer used... ');
-			evo_flush();
+			$this->log( T_('Removing the tags that are no longer used... ') );
 			if( !empty( $old_posts ) )
 			{ // Remove the tags
 
@@ -456,11 +451,11 @@ class MarkdownImport
 				// Remove the links of tags with posts
 				$DB->query( 'DELETE FROM T_items__itemtag WHERE itag_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
 			}
-			echo T_('OK').'<br />';
+			$this->log( T_('OK').'<br />' );
 
 			if( $this->get_option( 'delete_files' ) )
 			{ // Delete the files
-				echo T_('Removing the files... ');
+				$this->log( T_('Removing the files... ') );
 
 				if( ! empty( $deleted_file_IDs ) )
 				{
@@ -481,11 +476,11 @@ class MarkdownImport
 					{
 						if( ! ( $deleted_File = & $FileCache->get_by_ID( $deleted_file_ID, false, false ) ) )
 						{ // Incorrect file ID
-							echo '<p class="text-danger">'.sprintf( T_('No file #%s found in DB. It cannot be deleted.'), $deleted_file_ID ).'</p>';
+							$this->log( '<p class="text-danger">'.sprintf( T_('No file #%s found in DB. It cannot be deleted.'), $deleted_file_ID ).'</p>' );
 						}
 						if( ! $deleted_File->unlink() )
 						{ // No permission to delete file
-							echo '<p class="text-danger">'.sprintf( T_('Could not delete the file %s.'), '<code>'.$deleted_File->get_full_path().'</code>' ).'</p>';
+							$this->log( '<p class="text-danger">'.sprintf( T_('Could not delete the file %s.'), '<code>'.$deleted_File->get_full_path().'</code>' ).'</p>' );
 						}
 						// Clear cache to save memory
 						$FileCache->clear();
@@ -495,10 +490,10 @@ class MarkdownImport
 					$DB->begin();
 				}
 
-				echo T_('OK').'<br />';
+				$this->log( T_('OK').'<br />' );
 			}
 
-			echo '<br />';
+			$this->log( '<br />' );
 		}
 
 		// Check if we should skip a single folder in ZIP archive root which is the same as ZIP file name:
@@ -534,8 +529,7 @@ class MarkdownImport
 		$folder_path_length = strlen( $folder_path );
 
 		/* Import categories: */
-		echo '<h3>'.T_('Importing the categories...').' </h3>';
-		evo_flush();
+		$this->log( '<h3>'.T_('Importing the categories...').' </h3>' );
 
 		load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
 		$ChapterCache = & get_ChapterCache();
@@ -560,8 +554,7 @@ class MarkdownImport
 
 			$relative_path = substr( $file_path, $folder_path_length + 1 );
 
-			echo '<p>'.sprintf( T_('Importing category: %s'), '"<b>'.$relative_path.'</b>"...' );
-			evo_flush();
+			$this->log( '<p>'.sprintf( T_('Importing category: %s'), '"<b>'.$relative_path.'</b>"...' ) );
 
 			// Get name of current category:
 			$last_index = strrpos( $relative_path, '/' );
@@ -579,19 +572,19 @@ class MarkdownImport
 				if( $category_name == $Chapter->get( 'name' ) )
 				{	// Don't update category with same name:
 					$cat_results_num['no_changed']++;
-					echo T_('No change');
+					$this->log( T_('No change') );
 				}
 				else
 				{	// Try to update category with different name but same slug:
 					$Chapter->set( 'name', $category_name );
 					if( $Chapter->dbupdate() )
 					{	// If category is updated successfully:
-						echo '<span class="text-warning">'.T_('Updated').'</span>';
+						$this->log( '<span class="text-warning">'.T_('Updated').'</span>' );
 						$cat_results_num['updated_success']++;
 					}
 					else
 					{	// Don't translate because it should not happens:
-						echo '<span class="text-danger">Cannot be updated</span>';
+						$this->log( '<span class="text-danger">Cannot be updated</span>' );
 						$cat_results_num['updated_failed']++;
 					}
 				}
@@ -613,19 +606,18 @@ class MarkdownImport
 				{	// If category is inserted successfully:
 					// Save new category in cache:
 					$categories[ $relative_path ] = $Chapter->ID;
-					echo '<span class="text-success">'.T_('Added').'</span>';
+					$this->log( '<span class="text-success">'.T_('Added').'</span>' );
 					$cat_results_num['added_success']++;
 					// Add new created Chapter into cache to avoid wrong main category ID in ItemLight::get_main_Chapter():
 					$ChapterCache->add( $Chapter );
 				}
 				else
 				{	// Don't translate because it should not happens:
-					echo '<span class="text-danger">Cannot be inserted</span>';
+					$this->log( '<span class="text-danger">Cannot be inserted</span>' );
 					$cat_results_num['added_failed']++;
 				}
 			}
-			echo '.</p>';
-			evo_flush();
+			$this->log( '.</p>' );
 
 			// Unset folder in order to don't check it twice on creating posts below:
 			unset( $files[ $f ] );
@@ -660,7 +652,7 @@ class MarkdownImport
 						$cat_msg_class = '';
 						break;
 				}
-				echo '<b'.( empty( $cat_msg_class ) ? '' : ' class="'.$cat_msg_class.'"').'>'.sprintf( $cat_msg_text, $cat_result_num ).'</b><br>';
+				$this->log( '<b'.( empty( $cat_msg_class ) ? '' : ' class="'.$cat_msg_class.'"').'>'.sprintf( $cat_msg_text, $cat_result_num ).'</b><br>' );
 			}
 		}
 
@@ -668,8 +660,7 @@ class MarkdownImport
 		load_funcs( '_ext/spyc/Spyc.php' );
 
 		/* Import posts: */
-		echo '<h3>'.T_('Importing the posts...').'</h3>';
-		evo_flush();
+		$this->log( '<h3>'.T_('Importing the posts...').'</h3>' );
 
 		load_class( 'items/model/_item.class.php', 'Item' );
 		$ItemCache = get_ItemCache();
@@ -735,13 +726,11 @@ class MarkdownImport
 			// Limit title by max possible length:
 			$item_title = utf8_substr( $item_title, 0, 255 );
 
-			echo sprintf( T_('Importing post: %s'), '"<b>'.$item_title.'</b>" <code>'.$source_folder_zip_name.substr( $file_path, strlen( $folder_path ) ).'</code>: ' );
-			evo_flush();
+			$this->log( sprintf( T_('Importing post: %s'), '"<b>'.$item_title.'</b>" <code>'.$source_folder_zip_name.substr( $file_path, strlen( $folder_path ) ).'</code>: ' ) );
 
 			if( in_array( $item_slug, $imported_slugs ) )
 			{	// Skip md file/post with same name from different folder/category:
-				echo '<ul class="list-default"><li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( '%s already found before, ignoring second instance.', '<code>'.$item_slug.'.md</code>' ).'</li></ul><br>';
-				evo_flush();
+				$this->log( '<ul class="list-default"><li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( '%s already found before, ignoring second instance.', '<code>'.$item_slug.'.md</code>' ).'</li></ul><br>' );
 				continue;
 			}
 
@@ -936,63 +925,63 @@ class MarkdownImport
 			}
 
 			// Display result messages of Item inserting or updating:
-			echo empty( $item_result_class ) ? '' : '<span class="'.$item_result_class.'">';
+			$this->log( empty( $item_result_class ) ? '' : '<span class="'.$item_result_class.'">' );
 			if( $Item->ID > 0 )
 			{	// Set last message text as link to permanent URL of the inserted/updated Item:
 				$last_msg_i = count( $item_result_messages ) - 1;
 				$item_result_messages[ $last_msg_i ] = '<a href="'.$Item->get_permanent_url().'" target="_blank">'.$item_result_messages[ $last_msg_i ].'</a>';
 			}
-			echo implode( ' -> ', $item_result_messages );
-			echo $item_result_suffix;
-			echo empty( $item_result_class ) ? '' : '</span>';
+			$this->log( implode( ' -> ', $item_result_messages ) );
+			$this->log( $item_result_suffix );
+			$this->log( empty( $item_result_class ) ? '' : '</span>' );
 
 			// Display messages of importing YAML fields:
 			$this->display_yaml_messages();
 
 			if( ! empty( $this->link_messages ) )
 			{	// Display what links could not be converted:
-				echo ( $this->has_yaml_messages() ? '' : ',' ).'<ul class="list-default" style="margin-bottom:0">';
+				$this->log( ( $this->has_yaml_messages() ? '' : ',' ).'<ul class="list-default" style="margin-bottom:0">' );
 				foreach( $this->link_messages as $link_message )
 				{
 					switch( $link_message['type'] )
 					{
 						case 'error_link':
 						case 'error_image':
-							echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '
+							$this->log( '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '
 									.sprintf( 'Markdown link %s could not be convered to b2evolution ShortLink.',
 										'<code>'.$link_message['tag'].'</code>'
-									).'</li>';
+									).'</li>' );
 							if( $link_message['type'] == 'error_image' )
 							{	// Special warning when URL to image is used in link markdown tag:
-								echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
+								$this->log( '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
 										.'The above is a markdown link to an image file. Did you forget the <code>!</code> in order to make it an image inclusion, rather than a link?'
-									.'</li>';
+									.'</li>' );
 							}
 							break;
 						case 'check':
-							echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
+							$this->log( '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
 								.sprintf( 'Link %s points to "%s" which is in %s instead of %s.',
 									'<code>'.$link_message['tag'].'</code>',
 									$link_message['link'],
 									'<code>'.$link_message['locale'].'</code>',
 									'<code>'.$Item->get( 'locale' ).'</code>'
-								).'</li>';
+								).'</li>' );
 							break;
 						case 'recommend':
-							echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
+							$this->log( '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
 								.sprintf( 'We recommend "%s" (%s) as destination.',
 									$link_message['link'],
 									'<code>'.$Item->get( 'locale' ).'</code>'
-								).'</li>';
+								).'</li>' );
 							break;
 						case 'content':
-							echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
+							$this->log( '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
 									.'We will update the content accordingly.'
-								.'</li>';
+								.'</li>' );
 							break;
 					}
 				}
-				echo '</ul>';
+				$this->log( '</ul>' );
 			}
 
 			$files_imported = false;
@@ -1010,7 +999,7 @@ class MarkdownImport
 							'file_root_ID'   => $this->coll_ID,
 							'folder_path'    => 'quick-uploads/'.$Item->get( 'urltitle' ),
 						);
-					echo ( ! $this->has_yaml_messages() && empty( $this->link_messages ) ? ',' : '' ).'<ul class="list-default" style="margin-bottom:0">';
+					$this->log( ( ! $this->has_yaml_messages() && empty( $this->link_messages ) ? ',' : '' ).'<ul class="list-default" style="margin-bottom:0">' );
 					foreach( $image_matches[2] as $i => $image_relative_path )
 					{
 						$file_params['file_alt'] = trim( $image_matches[1][$i] );
@@ -1034,18 +1023,18 @@ class MarkdownImport
 
 					if( $new_links_count > 0 || ( $item_is_updated_step_1 && $all_links_count > 0 ) )
 					{	// Update content for new markdown image links which were replaced with b2evo inline tags format:
-						echo '<li class="text-warning">';
+						$this->log( '<li class="text-warning">' );
 						if( $new_links_count > 0 )
 						{	// Update content with new inline image tags:
-							echo sprintf( T_('%d new image files were linked to the Item'), $new_links_count )
-								.' -> './* TRANS: Result of imported Item */ T_('Saving to DB').'.';
+							$this->log( sprintf( T_('%d new image files were linked to the Item'), $new_links_count )
+								.' -> './* TRANS: Result of imported Item */ T_('Saving to DB').'.' );
 						}
 						else
 						{	// Force to update content with inline image tags:
-							echo T_('No image file changes BUT Item Update is required')
-								.' -> './* TRANS: Result of imported Item */ T_('Saving <code>[image:]</code> tags to DB').'.';
+							$this->log( T_('No image file changes BUT Item Update is required')
+								.' -> './* TRANS: Result of imported Item */ T_('Saving <code>[image:]</code> tags to DB').'.' );
 						}
-						echo '</li>';
+						$this->log( '</li>' );
 						if( ! $item_is_filtered_by_plugins )
 						{	// Filter title and content by renderer plugins:
 							$item_Blog = & $Item->get_Blog();
@@ -1061,21 +1050,21 @@ class MarkdownImport
 						$Item->dbupdate( true, true, true, 'no'/* Force to do NOT create new revision because we do this above when store new content */ );
 					}
 
-					echo '</ul>';
+					$this->log( '</ul>' );
 					$files_imported = true;
 				}
 			}
 
 			if( ! empty( $this->item_file_is_updated ) )
 			{	// Update item's file with fixed content:
-				echo '<ul class="list-default" style="margin-bottom:0">';
+				$this->log( '<ul class="list-default" style="margin-bottom:0">' );
 				if( ( $md_file_handle = @fopen( $file_path, 'w' ) ) &&
 				    fwrite( $md_file_handle, $this->item_file_content ) )
 				{	// Inform about updated file content:
-					echo '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
+					$this->log( '<li class="text-warning"><span class="label label-warning">'.T_('WARNING').'</span> '
 						.sprintf( 'The file %s was updated on disk (import folder).',
 							'<code>'.$item_slug.'.md</code>'
-						).'</li>';
+						).'</li>' );
 					// Close file handle:
 					fclose( $md_file_handle );
 					// Update file hash after changing of the file's content in order to don't update the Item twice on next import:
@@ -1085,20 +1074,19 @@ class MarkdownImport
 				}
 				else
 				{	// No file rights to write into the file:
-					echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '
+					$this->log( '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '
 						.sprintf( 'Impossible to update file %s with fixed content, please check file permissions.',
 							'<code>'.$file_path.'</code>'
-						).'</li>';
+						).'</li>' );
 				}
-				echo '</ul>';
+				$this->log( '</ul>' );
 			}
 
 			if( ! $files_imported && ! $this->has_yaml_messages() && empty( $this->link_messages ) )
 			{
-				echo '.<br>';
+				$this->log( '.<br>' );
 			}
-			echo '<br>';
-			evo_flush();
+			$this->log( '<br>' );
 		}
 
 		foreach( $post_results_num as $post_result_type => $post_result_num )
@@ -1130,7 +1118,7 @@ class MarkdownImport
 						$post_msg_class = '';
 						break;
 				}
-				echo '<b'.( empty( $post_msg_class ) ? '' : ' class="'.$post_msg_class.'"').'>'.sprintf( $post_msg_text, $post_result_num ).'</b><br>';
+				$this->log( '<b'.( empty( $post_msg_class ) ? '' : ' class="'.$post_msg_class.'"').'>'.sprintf( $post_msg_text, $post_result_num ).'</b><br>' );
 			}
 		}
 
@@ -1145,7 +1133,7 @@ class MarkdownImport
 			rmdir_r( $root_folder_path );
 		}
 
-		echo '<h4 class="text-success">'.T_('Import completed.').'</h4>';
+		$this->log( '<h4 class="text-success">'.T_('Import completed.').'</h4>' );
 	}
 
 
@@ -1176,16 +1164,14 @@ class MarkdownImport
 
 		if( strpos( get_canonical_path( $file_source_path ), $source_folder_absolute_path ) !== 0 )
 		{	// Don't allow a traversal directory:
-			echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Skipping file %s, because path is invalid.', '<code>'.$requested_file_relative_path.'</code>' ).'</li>';
-			evo_flush();
+			$this->log( '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Skipping file %s, because path is invalid.', '<code>'.$requested_file_relative_path.'</code>' ).'</li>' );
 			// Skip it:
 			return false;
 		}
 
 		if( ! file_exists( $file_source_path ) )
 		{	// File doesn't exist
-			echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</li>';
-			evo_flush();
+			$this->log( '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Unable to copy file %s, because it does not exist.'), '<code>'.$file_source_path.'</code>' ).'</li>' );
 			// Skip it:
 			return false;
 		}
@@ -1211,22 +1197,19 @@ class MarkdownImport
 		{
 			if( ! empty( $file_data['link_ID'] ) )
 			{	// The found File is already linked to the Item:
-				echo '<li>'.sprintf( T_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
-				evo_flush();
+				$this->log( '<li>'.sprintf( T_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
 				return array( 'ID' => $file_data['link_ID'], 'type' => 'old' );
 			}
 			else
 			{	// Try to link the found File object to the Item:
 				if( $link_ID = $File->link_to_Object( $LinkOwner, 0, 'inline' ) )
 				{	// If file has been linked to the post
-					echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been linked to this post.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
-					evo_flush();
+					$this->log( '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been linked to this post.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
 					return array( 'ID' => $link_ID, 'type' => 'new' );
 				}
 				else
 				{	// If file could not be linked to the post:
-					echo '<li class="text-warning">'.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
-					evo_flush();
+					$this->log( '<li class="text-warning">'.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
 					return false;
 				}
 			}
@@ -1257,8 +1240,7 @@ class MarkdownImport
 					}
 					else
 					{	// No change for same file:
-						echo '<li>'.sprintf( T_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
-						evo_flush();
+						$this->log( '<li>'.sprintf( T_('No file change, because %s is same as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
 						return array( 'ID' => $item_Link->ID, 'type' => 'old' );
 					}
 				}
@@ -1283,8 +1265,7 @@ class MarkdownImport
 				$replaced_File->set( 'alt', $params['file_alt'] );
 				if( ! $replaced_File->dbinsert() )
 				{	// Don't translate
-					echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Cannot to create file %s in DB.', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>';
-					evo_flush();
+					$this->log( '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Cannot to create file %s in DB.', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>' );
 					return false;
 				}
 			}
@@ -1292,8 +1273,7 @@ class MarkdownImport
 			// Try to replace old file with new:
 			if( ! copy_r( $file_source_path, $replaced_File->get_full_path() ) )
 			{	// No permission to replace file:
-				echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>';
-				evo_flush();
+				$this->log( '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$replaced_File->get_full_path().'</code>' ).'</li>' );
 				return false;
 			}
 
@@ -1306,21 +1286,19 @@ class MarkdownImport
 
 			if( $replaced_link_ID !== NULL )
 			{	// Inform about replaced file:
-				echo '<li class="text-warning">'.sprintf( T_('File %s has been replaced in %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
+				$this->log( '<li class="text-warning">'.sprintf( T_('File %s has been replaced in %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
 			}
 			elseif( $replaced_link_ID = $replaced_File->link_to_Object( $LinkOwner, 0, 'inline' ) )
 			{	// If file has been linked to the post
 				$replaced_link_type = 'new';
-				echo '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been updated and linked to this post successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>';
+				$this->log( '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been updated and linked to this post successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>' );
 			}
 			else
 			{	// If file could not be linked to the post:
-				echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>';
-				evo_flush();
+				$this->log( '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( 'Existing file of %s could not be linked to this post.', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>' );
 				return false;
 			}
 
-			evo_flush();
 			return array( 'ID' => $replaced_link_ID, 'type' => $replaced_link_type );
 		}
 
@@ -1333,8 +1311,7 @@ class MarkdownImport
 
 		if( ! $File || ! copy_r( $file_source_path, $File->get_full_path() ) )
 		{	// No permission to copy to the destination folder
-			echo '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>';
-			evo_flush();
+			$this->log( '<li class="text-danger"><span class="label label-danger">'.T_('ERROR').'</span> '.sprintf( T_('Unable to copy file %s to %s. Please, check the permissions assigned to this folder.'), '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</li>' );
 			return false;
 		}
 
@@ -1345,17 +1322,15 @@ class MarkdownImport
 
 		if( $link_ID = $File->link_to_Object( $LinkOwner, 0, 'inline' ) )
 		{	// If file has been linked to the post
-			echo '<li class="text-success">'.sprintf( T_('New file %s has been imported to %s successfully.'),
+			$this->log( '<li class="text-success">'.sprintf( T_('New file %s has been imported to %s successfully.'),
 				'<code>'.$source_file_relative_path.'</code>',
 				'<code>'.$File->get_rdfs_rel_path().'</code>'.
 				( $file_source_name == $File->get( 'name' ) ? '' : '<span class="note">('.T_('Renamed').'!)</span>')
-			).'</li>';
-			evo_flush();
+			).'</li>' );
 		}
 		else
 		{	// If file could not be linked to the post:
-			echo '<li class="text-warning">'.sprintf( 'New file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>';
-			evo_flush();
+			$this->log( '<li class="text-warning">'.sprintf( 'New file of %s could not be linked to this post.', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
 			return false;
 		}
 
@@ -1607,7 +1582,7 @@ class MarkdownImport
 	{
 		if( ! empty( $this->yaml_messages ) )
 		{	// Display errors of linking to extra categories:
-			echo ',<ul class="list-default" style="margin-bottom:0">';
+			$this->log( ',<ul class="list-default" style="margin-bottom:0">' );
 			foreach( $this->yaml_messages as $yaml_message )
 			{
 				switch( $yaml_message[1] )
@@ -1633,9 +1608,9 @@ class MarkdownImport
 						$class = '';
 				}
 				// Print message:
-				echo '<li'.( empty( $class ) ? '' : ' class="'.$class.'"' ).'>'.$label.$yaml_message[0].'</li>';
+				$this->log( '<li'.( empty( $class ) ? '' : ' class="'.$class.'"' ).'>'.$label.$yaml_message[0].'</li>' );
 			}
-			echo '</ul>';
+			$this->log( '</ul>' );
 		}
 	}
 
@@ -1838,6 +1813,137 @@ class MarkdownImport
 			// Set flag to know the item content was updated:
 			$this->item_file_is_updated = true;
 		}
+	}
+
+
+	/**
+	 * Get collection
+	 *
+	 * @param object|NULL|FALSE Collection
+	 */
+	function & get_Blog()
+	{
+		$BlogCache = & get_BlogCache();
+		$md_Blog = & $BlogCache->get_by_ID( $this->coll_ID );
+
+		return $md_Blog;
+	}
+
+
+	/**
+	 * Start to log into file on disk
+	 */
+	function start_log()
+	{
+		global $baseurl, $media_path, $rsc_url, $app_version_long;
+
+		// Get file path for log:
+		$log_file_path = $media_path.'import/logs/'
+			// Current data/time:
+			.date( 'Y-m-d-H-i-s' ).'-'
+			// Site base URL:
+			.str_replace( '/', '-', preg_replace( '#^https?://#i', '', trim( 'https://b2evo.yb/folder/sub/', '/' ) ) ).'-'
+			// Collection short name:
+			.( $md_Blog = & $this->get_Blog() ? preg_replace( '#[^a-z\d]+#', '-', strtolower( $md_Blog->get( 'shortname' ) ) ).'-' : '' )
+			// Suffix for this import tool:
+			.'markdown-import-log-'
+			// Random hash:
+			.generate_random_key( 16 ).'.html';
+
+		// Try to create folder for log files:
+		if( ! mkdir_r( $media_path.'import/logs/' ) )
+		{	// Display error if folder cannot be created for log files:
+			$this->display_log_file_error( 'Cannot create the folder <code>'.$media_path.'import/logs/</code> for log files!' );
+			return false;
+		}
+
+		if( ! ( $this->log_file_handle = fopen( $log_file_path, 'w' ) ) )
+		{	// Display error if the log fiel cannot be created in the log folder:
+			$this->display_log_file_error( 'Cannot create the file <code>'.$log_file_path.'</code> for current log!' );
+			return false;
+		}
+
+		// Display where log will be stored:
+		echo '<b>Log file:</b> <code>'.$log_file_path.'</code><br />';
+
+		// Write header of the log file:
+		$this->log_to_file( '<!DOCTYPE html>'."\r\n"
+			.'<html lang="en-US">'."\r\n"
+			.'<head>'."\r\n"
+			.'<link href="'.$rsc_url.'css/bootstrap/bootstrap.css?v='.$app_version_long.'" type="text/css" rel="stylesheet" />'."\r\n"
+			.'<link href="'.$rsc_url.'build/bootstrap-backoffice-b2evo_base.bundle.css?v='.$app_version_long.'" type="text/css" rel="stylesheet" />'."\r\n"
+			.'</head>'."\r\n"
+			.'<body>' );
+	}
+
+
+	/**
+	 * Display error when log cannot be stored in file on disk
+	 *
+	 * @param string Message
+	 */
+	function display_log_file_error( $message )
+	{
+		if( empty( $this->log_file_error_reported ) )
+		{	// Report only first detected error to avoid next duplicated errors on screen:
+			echo '<p class="text-danger"><span class="label label-danger">ERROR</span> '.$message.'</p>';
+			$this->log_file_error_reported = true;
+		}
+	}
+
+
+	/**
+	 * End of log into file on disk
+	 */
+	function end_log()
+	{
+		// Write footer of the log file:
+		$this->log_to_file( '</body>'."\r\n"
+			.'</html>' );
+
+		if( isset( $this->log_file_handle ) && $this->log_file_handle )
+		{	// Close the log file:
+			fclose( $this->log_file_handle );
+		}
+	}
+
+
+	/**
+	 * Log a message on screen and into file on disk
+	 *
+	 * @param string Message
+	 */
+	function log( $message )
+	{
+		if( $message === '' )
+		{	// Don't log empty strings:
+			return;
+		}
+
+		// Display message on screen:
+		echo $message;
+		evo_flush();
+
+		// Try to store a message into the log file on the disk:
+		$this->log_to_file( $message );
+	}
+
+
+	/**
+	 * Log a message into file on disk
+	 *
+	 * @param string Message
+	 */
+	function log_to_file( $message )
+	{
+		if( ! isset( $this->log_file_handle ) || ! $this->log_file_handle )
+		{	// Log must be started:
+			$this->display_log_file_error( 'You must start log by function <code>'.get_class( $this ).'->start_log()</code>!' );
+			return false;
+		}
+
+		// Put a message into the log file on the disk:
+		fwrite( $this->log_file_handle, $message."\r\n" );
 	}
 }
 ?>
