@@ -107,6 +107,7 @@ $Form->begin_form( '', '', $params );
 	$Form->hidden( 'trackback_url', $trackback_url );
 	$Form->hidden( 'item_featured', $edited_Item->featured );
 	$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
+	$Form->hidden( 'item_switchable', $edited_Item->get_setting( 'switchable' ) );
 	$Form->hidden( 'expiry_delay', $edited_Item->get_setting( 'comment_expiry_delay' ) );
 	$Form->hidden( 'goal_ID', $edited_Item->get_setting( 'goal_ID' ) );
 	// CUSTOM FIELDS

@@ -139,6 +139,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 			$Form->hidden( 'item_mustread', $edited_Item->get_setting( 'mustread' ) );
 		}
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
+		$Form->hidden( 'item_switchable', $edited_Item->get_setting( 'switchable' ) );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );

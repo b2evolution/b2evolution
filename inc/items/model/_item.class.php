@@ -990,8 +990,10 @@ class Item extends ItemLight
 			}
 		}
 
-		// Includes switchable content:
-		$this->set_setting( 'switchable', param( 'item_switchable', 'integer', 0 ) );
+		if( $this->get_type_setting( 'allow_switchable' ) )
+		{	// Includes switchable content:
+			$this->set_setting( 'switchable', param( 'item_switchable', 'integer', 0 ) );
+		}
 
 		// OWNER:
 		$this->creator_user_login = param( 'item_owner_login', 'string', NULL );
