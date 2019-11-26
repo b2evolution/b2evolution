@@ -40,7 +40,7 @@ if( $params['notify_full'] )
 
 	if( $Comment->is_meta() )
 	{	// Meta comment:
-		echo T_('With the following Meta-Comment');
+		printf( T_('With the following [%s] Comment'), T_('Meta') );
 	}
 	else
 	{	// Normal comment:
