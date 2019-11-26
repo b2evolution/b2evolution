@@ -1378,7 +1378,7 @@ function wpxml_parser( $file )
 	}
 	if( !isset( $namespaces['evo'] ) )
 	{
-		$namespaces['evo'] = 'http://b2evolution.net/export/1.0/';
+		$namespaces['evo'] = 'http://b2evolution.net/export/2.0/';
 	}
 	if( !isset( $namespaces['excerpt'] ) )
 	{
@@ -1446,8 +1446,11 @@ function wpxml_parser( $file )
 		$authors[ $login ] = $author;
 	}
 
-	// Get files
-	foreach( $xml->xpath('/rss/channel/file') as $file_arr )
+	// Get files:
+	$files_data = $xml->xpath( $namespaces['evo'] == 'http://b2evolution.net/export/2.0/'
+		? '/rss/channel/evo:file' // ver 2.0
+		: '/rss/channel/file' ); // ver 1.0
+	foreach( $files_data as $file_arr )
 	{
 		$t = $file_arr->children( $namespaces['evo'] );
 		$files[] = array(
