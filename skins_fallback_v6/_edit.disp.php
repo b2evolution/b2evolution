@@ -140,6 +140,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 		}
 		$Form->hidden( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ) );
 		$Form->hidden( 'item_switchable', $edited_Item->get_setting( 'switchable' ) );
+		$Form->hidden( 'item_switchable_params', $edited_Item->get_setting( 'switchable_params' ) );
 
 		$creator_User = $edited_Item->get_creator_User();
 		$Form->hidden( 'item_owner_login', $creator_User->login );

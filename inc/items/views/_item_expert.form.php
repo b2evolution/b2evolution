@@ -474,6 +474,14 @@ $Form->begin_form( '', '', $params );
 		{	// Hide <meta> keywords:
 			$Form->hidden( 'metakeywords', $edited_Item->get_setting( 'metakeywords' ) );
 		}
+
+		if( $edited_Item->get_type_setting( 'allow_switchable' ) )
+		{	// Display "Switchable content" options:
+			$Form->text_input( 'item_switchable_params', $edited_Item->get_setting( 'switchable_params' ), 40, T_('Switchable content'), '', array(
+					'maxlength' => 500,
+					'input_prefix' => '<div><input type="checkbox" id="item_switchable_params" name="item_switchable" value="1"'.( $edited_Item->get_setting( 'switchable' ) ? ' checked="checked"' : '' ).' /> '.TB_('Enabled with params').':</div>',
+				) );
+		}
 	}
 
 	$Form->end_fieldset();
@@ -698,11 +706,6 @@ $Form->begin_form( '', '', $params );
 	if( $is_not_content_block && $edited_Item->get_type_setting( 'allow_breaks' ) )
 	{	// Display "hide teaser" checkbox for item with type usage except of content block:
 		$Form->checkbox_basic_input( 'item_hideteaser', $edited_Item->get_setting( 'hide_teaser' ), '<strong>'.sprintf( T_('Hide teaser when displaying part after %s'), '<code>[teaserbreak]</code>' ).'</strong>' );
-	}
-
-	if( $edited_Item->get_type_setting( 'allow_switchable' ) )
-	{	// Display "Includes switchable content" checkbox:
-		$Form->checkbox_basic_input( 'item_switchable', $edited_Item->get_setting( 'switchable' ), '<strong>'.T_('Includes switchable content').'</strong>' );
 	}
 
 	// Single/page view:

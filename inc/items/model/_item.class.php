@@ -993,6 +993,7 @@ class Item extends ItemLight
 		if( $this->get_type_setting( 'allow_switchable' ) )
 		{	// Includes switchable content:
 			$this->set_setting( 'switchable', param( 'item_switchable', 'integer', 0 ) );
+			$this->set_setting( 'switchable_params', param( 'item_switchable_params', 'string' ) );
 		}
 
 		// OWNER:
@@ -4040,7 +4041,7 @@ class Item extends ItemLight
 		$display_attrs = '';
 
 		// Check display conditions:
-		$disp_conditions = explode( '&', $m[3] );
+		$disp_conditions = explode( '&', str_replace( '&amp;', '&', $m[3] ) );
 		foreach( $disp_conditions as $disp_condition )
 		{
 			$disp_condition = explode( '=', $disp_condition );
@@ -4049,9 +4050,9 @@ class Item extends ItemLight
 			// Get current value of the param from $_GET or $_POST:
 			$param_value = param( $disp_condition[0], 'string' );
 			// Check if we should hide the custom field by condition:
-			if( ( $param_value === '' && ! in_array( '', $disp_condition_values ) ) || // current param value is empty but condition doesn't allow empty values
-					! preg_match( '/^[a-z0-9_\-]*$/', $param_value ) || // wrong param value
-					! in_array( $param_value, $disp_condition_values ) ) // current param value is not allowed by the condition of the custom field
+			if( ( $param_value === '' && ! in_array( $this->get_switchable_param( $disp_condition[0] ), $disp_condition_values ) ) || // current param value is empty but condition doesn't allow empty values
+			    ! preg_match( '/^[a-z0-9_\-]*$/', $param_value ) || // wrong param value
+			    ( $param_value !== '' && ! in_array( $param_value, $disp_condition_values ) ) ) // current param value is not allowed by the condition of the custom field
 			{	// Hide custom field if at least one param is not allowed by condition of the custom field:
 				$display_attrs .= ' style="display:none"';
 				continue;
@@ -4059,6 +4060,56 @@ class Item extends ItemLight
 		}
 
 		return $m[1].$m[2].$display_attrs.$m[4];
+	}
+
+
+	/**
+	 * Load switchable params
+	 */
+	function load_switchable_params()
+	{
+		if( ! $this->get_type_setting( 'allow_switchable' ) ||
+		    ! $this->get_setting( 'switchable' ) )
+		{	// Don't render switchable content if it is not allowed by Item Type and disabled for this Item:
+			return;
+		}
+
+		if( isset( $this->switchable_params ) )
+		{	// Don't initialize params twice:
+			return;
+		}
+
+		$this->switchable_params = array();
+
+		// Keep additional param codes in the URL:
+		$url_param_codes = $this->get_setting( 'switchable_params' );
+		if( ! empty( $url_param_codes ) )
+		{
+			$url_param_codes = explode( ',', $url_param_codes );
+			foreach( $url_param_codes as $url_param_code )
+			{
+				$url_param_code = explode( '=', trim( $url_param_code ) );
+				if( ! empty( $url_param_code[0] ) )
+				{	// Memorize additional param to regenerate proper URL below:
+					param( $url_param_code[0], 'string', '', true );
+					$this->switchable_params[ $url_param_code[0] ] = isset( $url_param_code[1] ) ? $url_param_code[1] : '';
+				}
+			}
+		}
+	}
+
+
+	/**
+	 * Initialize switchable params
+	 *
+	 * @param string Param code
+	 * @param string|NULL Param value
+	 */
+	function get_switchable_param( $param_code )
+	{
+		$this->load_switchable_params();
+
+		return ( isset( $this->switchable_params[ $param_code ] ) ? $this->switchable_params[ $param_code ] : NULL );
 	}
 
 

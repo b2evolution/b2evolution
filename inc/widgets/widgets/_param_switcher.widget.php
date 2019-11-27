@@ -104,12 +104,6 @@ class param_switcher_Widget extends generic_menu_link_Widget
 							'defaultvalue' => '',
 							'size' => 10,
 						),
-						'default' => array(
-							'label' => T_('Default'),
-							'note' => T_('if param is empty'),
-							'type' => 'checkbox',
-							'defaultvalue' => 0,
-						),
 					)
 				),
 				'display_mode' => array(
@@ -128,22 +122,10 @@ class param_switcher_Widget extends generic_menu_link_Widget
 					'label' => T_('Allow Javascript switching (dynamic)'),
 					'defaultvalue' => 1,
 				),
-				'url_start_line' => array(
-					'type' => 'begin_line',
+				'allow_switch_url' => array(
+					'type' => 'checkbox',
 					'label' => T_('Allow Standard switching (page reload)'),
-				),
-					'allow_switch_url' => array(
-						'type' => 'checkbox',
-						'label' => '',
-						'defaultvalue' => 1,
-					),
-					'url_param_codes' => array(
-						'label' => T_('Param codes to keep in the URL').': ',
-						'note' => sprintf( T_('Separate by %s. These codes will be merged with auto-detected codes (current widget and switching widgets above this one) but this is required to take into account any switching widgets below this one.'), '<code>,</code>' ),
-						'defaultvalue' => '',
-					),
-				'url_end_line' => array(
-					'type' => 'end_line',
+					'defaultvalue' => 1,
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -166,7 +148,18 @@ class param_switcher_Widget extends generic_menu_link_Widget
 	 */
 	function display( $params )
 	{
+		global $Item;
+
 		$this->init_display( $params );
+
+		if( ! isset( $Item ) ||
+		    ! $Item instanceof Item ||
+		    ! $Item->get_type_setting( 'allow_switchable' ) ||
+		    ! $Item->get_setting( 'switchable' ) )
+		{	// No current Item or Item doesn't use a switcher:
+			$this->display_debug_message( 'Widget "'.$this->get_name().'" is hidden because current Item does not use swicther params.' );
+			return false;
+		}
 
 		if( $this->get_param( 'param_code' ) == '' )
 		{	// Param code must be defined:
@@ -191,23 +184,6 @@ class param_switcher_Widget extends generic_menu_link_Widget
 		// Get current param value and memorize it for regenerating url:
 		$param_value = param( $this->get_param( 'param_code' ), 'string', '', true );
 
-		if( $this->get_param( 'allow_switch_url' ) )
-		{	// Keep additional param codes in the URL:
-			$url_param_codes = $this->get_param( 'url_param_codes' );
-			if( ! empty( $url_param_codes ) )
-			{
-				$url_param_codes = explode( ',', $url_param_codes );
-				foreach( $url_param_codes as $url_param_code )
-				{
-					$url_param_code = trim( $url_param_code );
-					if( ! empty( $url_param_code ) )
-					{	// Memorize additional param to regenerate proper URL below:
-						param( $url_param_code, 'string', '', true );
-					}
-				}
-			}
-		}
-
 		echo $this->disp_params['button_group_start'];
 
 		$button_is_active_by_default = false;
@@ -217,7 +193,9 @@ class param_switcher_Widget extends generic_menu_link_Widget
 			{	// Active button by current param value:
 				$button_is_active = true;
 			}
-			elseif( ! $button_is_active_by_default && ! empty( $button['default'] ) && $param_value === '' )
+			elseif( ! $button_is_active_by_default &&
+			        $param_value === '' &&
+			        $Item->get_switchable_param( $this->get_param( 'param_code' ) ) == $button['value'] )
 			{	// Active button by default with empty param:
 				$button_is_active = true;
 				$button_is_active_by_default = true;

@@ -1058,6 +1058,18 @@ h2.user_title::first-line {
 #itemform_extra .itemform_extra_radio .form-group input {
   margin-left: 0;
 }
+#ffield_item_switchable_params .evo_fields_table__input {
+  display: table;
+}
+#ffield_item_switchable_params .evo_fields_table__input > div {
+  display: table-cell;
+  width: 1%;
+  white-space: nowrap;
+  padding-right: 5px;
+}
+#ffield_item_switchable_params .evo_fields_table__input > input[type=text] {
+  display: table-cell;
+}
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
   background-image: url("../../../../rsc/img/ajax-loader/fff.gif");

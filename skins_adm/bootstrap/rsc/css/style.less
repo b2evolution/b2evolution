@@ -1135,6 +1135,21 @@ h2.user_title::first-line {
 	}
 }
 
+#ffield_item_switchable_params {
+	.evo_fields_table__input {
+		display: table;
+		> div {
+			display: table-cell;
+			width: 1%;
+			white-space: nowrap;
+			padding-right: 5px;
+		}
+		> input[type=text] {
+			display: table-cell;
+		}
+	}
+}
+
 // Loader animation
 span.loader_img.loader_user_report,
 span.loader_img.loader_user_deldata {
