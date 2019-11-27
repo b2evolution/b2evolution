@@ -59,7 +59,7 @@ function itxml_import( $XML_file_path )
 	$authors_links = array();
 	if( isset( $xml_data['item_types'] ) && count( $xml_data['item_types'] ) > 0 )
 	{
-		echo '<p><b>'.'Importing item types...'.' </b>';
+		echo '<b>'.'Importing Item Types...'.' </b><br>';
 		evo_flush();
 
 		// Get existing item types:
@@ -74,7 +74,9 @@ function itxml_import( $XML_file_path )
 		$failed_item_types_num = 0;
 		foreach( $xml_data['item_types'] as $item_type )
 		{
-			echo '<p>'.sprintf( 'Importing item type: %s', '"'.$item_type['name'].'"' ).'... ';
+			echo sprintf( 'Importing Item Type: %s', '"'.$item_type['name'].'"' ).'...';
+
+			echo '<ul class="list-default">';
 
 			$is_new_item_type = true;
 			if( empty( $existing_item_types[ $item_type['name'] ] ) )
@@ -84,9 +86,9 @@ function itxml_import( $XML_file_path )
 			}
 			elseif( $import_type == 'skip' )
 			{	// Skip existing Item Type:
-				echo '<span class="text-warning">'.sprintf( 'Skip because Item Type already exists with same name <a %s>%s</a>.', 'href="'.$admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$existing_item_types[ $item_type['name'] ].'"', $item_type['name'] ).'</span>';
+				echo '<li class="text-warning"><span class="label label-warning">WARNING</span> '.sprintf( 'Skipped because we already have an Item Type with the same name <a %s>%s</a>.', 'href="'.$admin_url.'?ctrl=itemtypes&amp;action=edit&amp;ityp_ID='.$existing_item_types[ $item_type['name'] ].'"', $item_type['name'] ).'</li>';
 				$skipped_item_types_num++;
-				echo '</p>';
+				echo '</ul>';
 				evo_flush();
 				continue;
 			}
@@ -106,11 +108,12 @@ function itxml_import( $XML_file_path )
 				}
 			}
 
+			$old_custom_fields = $ItemType->get_custom_fields();
+
 			if( ! empty( $item_type['custom_fields'] ) )
 			{	// Import custom fields:
 				$ItemType->update_custom_fields = array();
 				$ItemType->insert_custom_fields = array();
-				$old_custom_fields = $ItemType->get_custom_fields();
 				foreach( $item_type['custom_fields'] as $custom_field_name => $new_custom_field )
 				{
 					$custom_field_cols = array(
@@ -141,18 +144,51 @@ function itxml_import( $XML_file_path )
 					{	// Check the imported custom field has all required columns:
 						if( ! array_key_exists( $custom_field_col, $new_custom_field ) )
 						{	// Skip wrong custom field:
-							echo '<span class="text-warning">'.sprintf( 'Skip custom field %s because no required column %s.', '<code>'.$custom_field_name.'</code>', '<code>'.$custom_field_col.'</code>' ).'</span> ';
+							echo '<li class="text-danger"><span class="label label-danger">ERROR</span> '.sprintf( 'Skip custom field %s because no required property %s.', '<code>'.$custom_field_name.'</code>', '<code>'.$custom_field_col.'</code>' ).'</li>';
+							evo_flush();
 							continue 2;
 						}
 					}
+
 					if( isset( $old_custom_fields[ $custom_field_name ] ) )
-					{	// Update existing custom field:
-						$ItemType->update_custom_fields[ $old_custom_fields[ $custom_field_name ]['ID'] ] = $new_custom_field;
+					{	// If Item Type is found:
+						if( $old_custom_fields[ $custom_field_name ]['type'] == $new_custom_field['type'] )
+						{	// Update existing custom field only if type is the same:
+							$ItemType->update_custom_fields[ $old_custom_fields[ $custom_field_name ]['ID'] ] = $new_custom_field;
+							echo '<li>'.sprintf( 'Update custom field %s.', '<code>'.$custom_field_name.'</code>' ).'</li>';
+							evo_flush();
+						}
+						else
+						{	// Don't allow to update custom field with a different type:
+							echo '<li class="text-danger"><span class="label label-danger">ERROR</span> '.sprintf( 'Cannot update custom field %s because it has type %s and we expect type %s', '<code>'.$custom_field_name.'</code>', '<code>'.$new_custom_field['type'].'</code>', '<code>'.$old_custom_fields[ $custom_field_name ]['type'].'</code>' ).'.</li>';
+							evo_flush();
+						}
 					}
 					else
 					{	// Insert new custom field:
 						$ItemType->insert_custom_fields[] = $new_custom_field;
+						echo '<li class="text-success">'.sprintf( 'Add new custom field %s.', '<code>'.$custom_field_name.'</code>' ).'</li>';
+						evo_flush();
 					}
+				}
+			}
+
+			if( ! empty( $old_custom_fields ) )
+			{	// Find and delete old custom fields if they are not present in the imported Item Type:
+				$deleted_custom_fields = array();
+				$ItemType->delete_custom_fields = array();
+				foreach( $old_custom_fields as $old_custom_field_key => $old_custom_field )
+				{
+					if( ! isset( $item_type['custom_fields'][ $old_custom_field_key ] ) )
+					{	// Delete custom field from DB:
+						$deleted_custom_fields[] = $old_custom_field_key;
+						$ItemType->delete_custom_fields[] = $old_custom_field['ID'];
+					}
+				}
+				if( ! empty( $deleted_custom_fields ) )
+				{	// Display what custom fields will be deleted:
+					echo '<li class="text-warning"><span class="label label-warning">WARNING</span> '.sprintf( 'Delete custom fields: %s.', '<code>'.implode( '</code>, <code>', $deleted_custom_fields ).'</code>' ).'</li>';
+					evo_flush();
 				}
 			}
 
@@ -174,44 +210,43 @@ function itxml_import( $XML_file_path )
 				if( $is_new_item_type )
 				{
 					$new_item_types_num++;
-					echo '<span class="text-success">'.'Added'.'.</span>';
+					echo '<li class="text-success">Item Type added.</li>';
 				}
 				else
 				{
 					$update_item_types_num++;
-					echo '<span class="text-success">'.'Updated'.'.</span>';
+					echo '<li class="text-info">Item Type updated.</li>';
 				}
 			}
 			else
 			{	// Log failed result:
 				$failed_item_types_num++;
-				echo '<span class="text-danger">'.sprintf( 'Item Type %s could not be imported.', '<code>'.$item_type['name'].'</code>' ).'</span>';
+				echo '<li class="text-danger">'.sprintf( 'Item Type %s could not be imported.', '<code>'.$item_type['name'].'</code>' ).'</li>';
 			}
 
-			echo '</p>';
+			echo '</ul>';
 			evo_flush();
 		}
 
 		if( $new_item_types_num )
 		{
-			echo '<b class="text-success">'.sprintf( '%d new item types', $new_item_types_num ).'</b><br />';
+			echo '<b class="text-success">'.sprintf( '%d new Item Types', $new_item_types_num ).'</b><br />';
 		}
 		if( $update_item_types_num )
 		{
-			echo '<b class="text-success">'.sprintf( '%d updated item types', $update_item_types_num ).'</b><br />';
+			echo '<b class="text-info">'.sprintf( '%d updated Item Types', $update_item_types_num ).'</b><br />';
 		}
 		if( $skipped_item_types_num )
 		{
-			echo '<b class="text-warning">'.sprintf( '%d skipped item types', $skipped_item_types_num ).'</b><br />';
+			echo '<b class="text-warning">'.sprintf( '%d skipped Item Types', $skipped_item_types_num ).'</b><br />';
 		}
 		if( $failed_item_types_num )
 		{
-			echo '<b class="text-danger">'.sprintf( '%d item types could not be imported', $failed_item_types_num ).'</b>';
+			echo '<b class="text-danger">'.sprintf( '%d Item Types could not be imported', $failed_item_types_num ).'</b>';
 		}
-		echo '</p>';
 	}
 
-	echo '<p class="text-success">'.'Import complete.'.'</p>';
+	echo '<br><p class="text-success">'.'Import complete.'.'</p>';
 
 	$DB->commit();
 }

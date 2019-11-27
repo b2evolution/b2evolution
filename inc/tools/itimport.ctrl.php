@@ -57,6 +57,12 @@ switch( $action )
 			param_error( 'import_file', sprintf( '&laquo;%s&raquo; has an unrecognized extension.', $xml_file ) );
 		}
 
+		if( param( 'import_type', 'string', 'skip' ) == 'update' &&
+		    param( 'import_type_update_confirm', 'string' ) !== 'DELETE' )
+		{	// If deleting/replacing is not confirmed:
+			param_error( 'import_type_update_confirm', sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).'!' );
+		}
+
 		if( param_errors_detected() )
 		{ // Stop import if errors exist
 			$action = 'file';

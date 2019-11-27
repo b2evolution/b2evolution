@@ -49,17 +49,19 @@ if( ! empty( $import_files ) )
 		$coll_options[] = array( 'it_blog_IDs[]', $it_Blog->ID, $it_Blog->get_extended_name(), ( is_array( $last_import_coll_IDs ) && in_array( $it_Blog->ID, $last_import_coll_IDs ) ) );
 	}
 	$Form->checklist( $coll_options, 'it_blog_IDs', TB_('Enable for collections'), false, false, array(
-			'note' => TB_('All item types from the selected XML file will be enabled for the checked collections.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.TB_('Create new blog').' &raquo;</a>',
+			'note' => TB_('All Item Types from the selected XML file will be enabled for the checked collections.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.TB_('Create new blog').' &raquo;</a>',
 		) );
 
 	$Form->radio_input( 'import_type', $import_type, array(
 				array(
 					'value' => 'skip',
-					'label' => TB_('Import only not existing item types'),
+					'label' => TB_('Import only non existing Item Types'),
 				),
 				array(
 					'value' => 'update',
-					'label' => TB_('Update existing item types'),
+					'label' => TB_('Update existing Item Types'),
+					'note'  => TB_('This may DELETE some existing custom fields.'),
+					'suffix' => '<br /><div id="import_type_update_confirm_block" class="alert alert-danger" style="display:none;margin:0">'.T_('WARNING').': '.TB_('you will LOSE custom fields that are not part of the Item Types you import.').' '.sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).': <input name="import_type_update_confirm" type="text" class="form-control" size="8" style="margin:-8px 0" /></div>',
 				),
 			), TB_('Import mode'), array( 'lines' => true ) );
 
@@ -70,3 +72,11 @@ if( ! empty( $import_files ) )
 
 $Form->end_form();
 ?>
+<script>
+function evo_it_import_update_mode_visibility()
+{	// Show/Hide additional options for import mode:
+	jQuery( '#import_type_update_confirm_block' ).css( 'display', ( jQuery( 'input[name=import_type]:checked' ).val() == 'update' ? 'inline-block' : 'none' ) );
+}
+jQuery( 'input[name=import_type]' ).click( evo_it_import_update_mode_visibility );
+jQuery( document ).ready( evo_it_import_update_mode_visibility );
+</script>
