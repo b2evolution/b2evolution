@@ -70,6 +70,10 @@ class CollectionSettings extends AbstractSettings
 			'tags_structured_data' => 1,
 			// 'post_moderation_statuses' => NULL,			// Possible values are a list of statuses from: 'community', 'protected', 'review', 'draft', but we don't specify a general default because it depends from the blog type ( see @Blog::get_setting() )
 
+		// Tiny URLs settings:
+			'tinyurl_type'   => 'basic',
+			'tinyurl_domain' => 'http://tiny.url/',
+
 		// Item voting settings:
 			'voting_positive' => 1, // Allow Positive vote
 			'voting_neutral'  => 0, // Allow Neutral vote

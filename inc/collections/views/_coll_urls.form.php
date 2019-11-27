@@ -616,6 +616,26 @@ $Form->begin_fieldset( T_('Single post URLs') . get_manual_link('single-post-url
 
 $Form->end_fieldset();
 
+$Form->begin_fieldset( TB_('Tiny URLs').get_manual_link('tiny-url-settings') );
+
+
+$Form->switch_layout( 'none' );
+$Form->output = false;
+$tinyurl_slug = 'aA1';
+$tinyurl_domain = 'http://tiny.url/';
+$tinyurl_domain_field = $Form->text( 'tinyurl_domain', $edited_Blog->get_setting( 'tinyurl_domain' ), 20, '', '', 120 );
+$tinyurl_domain_note = '<span class="notes">'.sprintf( TB_('Enter absolute URL ending with /, e-g: %s. This domain must be an alias to your base domain.'), '<code>'.$tinyurl_domain.'</code>' ).'</span>';
+$Form->output = true;
+$Form->switch_layout( NULL );
+
+$Form->radio( 'tinyurl_type', $edited_Blog->get_setting( 'tinyurl_type' ), array(
+		array( 'basic', TB_('Basic: Append to collection URL'), TB_('E-g:')
+					 .url_add_tail( $blogurl, '/'.$tinyurl_slug ) ),
+		array( 'advanced', TB_('Advanced: Append to special domain URL').':', '', $tinyurl_domain_field.$tinyurl_domain_note, 'class="radio-input"' ),
+	), TB_('Tiny URLs'), true );
+
+$Form->end_fieldset();
+
 
 $Form->buttons( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
 

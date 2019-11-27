@@ -961,7 +961,7 @@ class Item extends ItemLight
 		}
 
 		// MUST READ checkbox:
-		if( is_pro() && 
+		if( is_pro() &&
 		    ( $item_Blog = & $this->get_Blog() ) &&
 		    $item_Blog->get_setting( 'track_unread_content' ) )
 		{	// Update only for PRO version and when tracking of unread content is enabled for collection:
@@ -10293,14 +10293,30 @@ class Item extends ItemLight
 	 * Get the item tiny url
 	 * @return string the tiny url on success, empty string otherwise
 	 */
-	function get_tinyurl()
+	function get_tinyurl( $use_tinyslug = true )
 	{
-		if( ( $tinyslug = $this->get_tinyslug() ) == false )
+		if( $use_tinyslug )
 		{
-			return '';
+			if( ( $slug = $this->get_tinyslug() ) == false )
+			{
+				return '';
+			}
 		}
+		else
+		{
+			$slug = $this->urltitle;
+		}
+
 		$Collection = $Blog = & $this->get_Blog();
-		return url_add_tail( $Blog->get( 'url'), '/'.$tinyslug );
+		if( ( $Blog->get_setting('tinyurl_type') == 'advanced' ) && ( $tinyurl_domain = $Blog->get_setting('tinyurl_domain') ) )
+		{
+			return url_add_tail( $tinyurl_domain, '/'.$slug );
+		}
+		else
+		{
+			return url_add_tail( $Blog->get( 'url'), '/'.$slug );
+		}
+
 	}
 
 
@@ -10318,16 +10334,6 @@ class Item extends ItemLight
 	 */
 	function get_tinyurl_link( $params = array() )
 	{
-		if( ( $tinyslug = $this->get_tinyslug() ) == false )
-		{
-			return '';
-		}
-
-		if( ! $this->ID )
-		{ // preview..
-			return false;
-		}
-
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'       => ' ',
@@ -10335,8 +10341,26 @@ class Item extends ItemLight
 				'text'         => '#',
 				'title'        => '#',
 				'class'        => '',
-				'style'		   => '',
+				'style'	       => '',
+				'use_tinyslug' => true,
 			), $params );
+
+		if( $params['use_tinyslug'] )
+		{
+			if( ( $slug = $this->get_tinyslug() ) == false )
+			{
+				return '';
+			}
+		}
+		else
+		{
+			$slug = $this->urltitle;
+		}
+
+		if( ! $this->ID )
+		{ // preview..
+			return false;
+		}
 
 		if( $params['title'] == '#' )
 		{
@@ -10344,10 +10368,10 @@ class Item extends ItemLight
 		}
 		if( $params['text'] == '#' )
 		{
-			$params['text'] = $tinyslug;
+			$params['text'] = $slug;
 		}
 
-		$actionurl = $this->get_tinyurl();
+		$actionurl = $this->get_tinyurl( $params['use_tinyslug'] );
 
 		$r = $params['before'];
 		$r .= '<a href="'.$actionurl;

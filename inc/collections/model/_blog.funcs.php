@@ -717,7 +717,7 @@ function init_requested_blog( $use_blog_param_first = true )
 		{ // Tail must start with '/'
 			$tail_Path = '/'.$tail_Path;
 		}
-		if( $Blog->get( 'http_protocol' ) == 'always_redirect' )
+		if( $Blog->get_setting( 'http_protocol' ) == 'always_redirect' )
 		{
 			$redirect_to = url_same_protocol( url_add_tail( $Blog->gen_blogurl(), $tail_Path ), $alias );
 		}

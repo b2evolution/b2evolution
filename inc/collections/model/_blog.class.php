@@ -1645,6 +1645,29 @@ class Blog extends DataObject
 				}
 			}
 
+			if( param( 'tinyurl_type', 'string', NULL ) !== NULL )
+			{ // Tiny URL type:
+				if( get_param( 'tinyurl_type') == 'advanced' )
+				{
+					$tinyurl_domain = param( 'tinyurl_domain', 'string', NULL );
+					if( empty( $tinyurl_domain ) )
+					{
+						$Messages->add( sprintf( T_('Absolute URL for %s cannot be empty!'), T_('Tiny URLs') ) );
+					}
+					elseif( ! preg_match( '#^https?://[^/]+/.*#', $tinyurl_domain, $matches ) )
+					{ // It is not valid absolute URL
+						$Messages->add( T_('Tiny URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $tinyurl_domain ).'&raquo;' )
+							.'. '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one \'/\' sign after the domain name!'), 'error' );
+					}
+					$this->set_setting( 'tinyurl_type', get_param( 'tinyurl_type' ) );
+					$this->set_setting( 'tinyurl_domain', $tinyurl_domain );
+				}
+				else
+				{
+					$this->set_setting( 'tinyurl_type', get_param( 'tinyurl_type' ) );
+				}
+			}
+
 			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{	// Cookies:
 				$this->set_setting( 'cookie_domain_type', get_param( 'cookie_domain_type' ) );

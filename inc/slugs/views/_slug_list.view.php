@@ -106,6 +106,42 @@ $Results->cols[] = array(
 			'td' => '%get_slug_link({Obj})%',
 		);
 
+/** Get TinyURL
+ *
+ * @param Slug Slug object
+ * @return string
+ */
+function get_tinyurl( $Slug )
+{
+	switch( $Slug->type )
+	{
+		case 'item':
+		// case other: (add here)
+			$target = & $Slug->get_object();
+			if( empty( $target ) )
+			{	// The Item was not found... (it has probably been deleted):
+				return '<i>'.T_('(missing)').'</i>';
+			}
+
+
+			$use_tinyslug = $target->tiny_slug_ID == $Slug->ID;
+			return $target->get_tinyurl_link( array(
+					'text' => $target->get_tinyurl( $use_tinyslug ),
+					'use_tinyslug' => $use_tinyslug,
+				) );
+
+		default:
+			return /* TRANS: "Not Available" */ T_('N/A');
+	}
+}
+$Results->cols[] = array(
+			'th' => T_('Tiny URL'),
+			'th_class' => 'small',
+			'td_class' => 'small',
+			'td' =>  '%get_tinyurl({Obj})%',
+		);
+
+
 $Results->cols[] = array(
 			'th' => T_('Type'),
 			'th_class' => 'small',
