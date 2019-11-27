@@ -123,12 +123,21 @@ function get_tinyurl( $Slug )
 				return '<i>'.T_('(missing)').'</i>';
 			}
 
-
 			$use_tinyslug = $target->tiny_slug_ID == $Slug->ID;
-			return $target->get_tinyurl_link( array(
-					'text' => $target->get_tinyurl( $use_tinyslug ),
-					'use_tinyslug' => $use_tinyslug,
-				) );
+			$Collection = $Blog = & $target->get_Blog();
+
+			if( $Blog->get_setting( 'tinyurl_type') == 'advanced' )
+			{
+				$tinyurl = url_add_tail( $Blog->get_setting( 'tinyurl_domain' ), '/'.$Slug->title );
+			}
+			else
+			{
+				$tinyurl = url_add_tail( $Blog->get( 'url' ), '/'.$Slug->title );;
+			}
+
+			$title = T_( 'This is a tinyurl you can copy/paste into twitter, emails and other places where you need a short link to this post' );
+
+			return sprintf( '<a href="%s" title="%s">%s</a>', $tinyurl, $title, $tinyurl );
 
 		default:
 			return /* TRANS: "Not Available" */ T_('N/A');
