@@ -1122,6 +1122,9 @@ switch( $action )
 		$edited_Item->ItemSettings->_load( $edited_Item->ID, NULL );
 		$edited_Item->ItemSettings->cache[0] = $edited_Item->ItemSettings->cache[ $edited_Item->ID ];
 
+		// Load all custom fields:
+		$edited_Item->get_custom_fields_defs();
+
 		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
 		$edited_Item->ID = 0;
 
