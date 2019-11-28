@@ -852,7 +852,7 @@ class Hit
 		// Extract the keyphrase from search referers:
 		$keyphrase = $this->get_keyphrase();
 
-		if( $keyphrase === NULL )
+		if( $keyphrase === NULL || $keyphrase === '' )
 		{	// No search hit
 			if( ! empty( $this->test_mode ) && ! empty( $this->test_uri['s'] ) )
 			{
@@ -867,6 +867,11 @@ class Hit
 			{	// Record Internal Search:
 				$keyphrase = $s;
 			}
+		}
+
+		if( $keyphrase === '' )
+		{	// Consider empty string as no search request:
+			$keyphrase = NULL;
 		}
 
 		if( $keyphrase !== NULL )
