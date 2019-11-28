@@ -136,7 +136,7 @@ class Hitlist
 
 		// Prune when $localtime is a NEW day (which will be the 1st request after midnight):
 		$last_prune = $Settings->get( 'auto_prune_stats_done' );
-		if( 0 && $last_prune >= date( 'Y-m-d', $localtimenow ) && $last_prune <= date( 'Y-m-d', $localtimenow + 86400 ) )
+		if( $last_prune >= date( 'Y-m-d', $localtimenow ) && $last_prune <= date( 'Y-m-d', $localtimenow + 86400 ) )
 		{ // Already pruned today (and not more than one day in the future -- which typically never happens)
 			$error_message = Hitlist::log_pruning( T_('Pruning has already been done today'), $output_message );
 			if( $output_message )
