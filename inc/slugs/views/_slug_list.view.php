@@ -111,6 +111,53 @@ $Results->cols[] = array(
  * @param Slug Slug object
  * @return string
  */
+function get_slug_type( $Slug )
+{
+	switch( $Slug->type )
+	{
+		case 'item':
+		// case other: (add here)
+			$target = & $Slug->get_object();
+			if( empty( $target ) )
+			{	// The Item was not found... (it has probably been deleted):
+				return '<i>'.T_('(missing)').'</i>';
+			}
+
+			if( $target->urltitle == $Slug->title )
+			{
+				return TB_('Canonical');
+			}
+			elseif( $target->tiny_slug_ID == $Slug->ID )
+			{
+				return TB_('Tiny');
+			}
+			else
+			{
+				$slugs = explode(',', $target->get_slugs( ',' ) );
+				if( in_array( $Slug->title, $slugs ) )
+				{
+					return TB_('Extra');
+				}
+			}
+			break;
+
+		default:
+			return /* TRANS: "Not Available" */ T_('N/A');
+	}
+}
+$Results->cols[] = array(
+			'th' => TB_('Slug type'),
+			'th_class' => 'shrinkwrap',
+			'td_class' => 'shrinkwrap',
+			'td' => '%get_slug_type({Obj})%',
+		);
+
+
+/** Get TinyURL
+ *
+ * @param Slug Slug object
+ * @return string
+ */
 function get_tinyurl( $Slug )
 {
 	switch( $Slug->type )

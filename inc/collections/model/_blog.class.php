@@ -1650,14 +1650,9 @@ class Blog extends DataObject
 				if( get_param( 'tinyurl_type') == 'advanced' )
 				{
 					$tinyurl_domain = param( 'tinyurl_domain', 'string', NULL );
-					if( empty( $tinyurl_domain ) )
-					{
-						$Messages->add( sprintf( T_('Absolute URL for %s cannot be empty!'), T_('Tiny URLs') ) );
-					}
-					elseif( ! preg_match( '#^https?://[^/]+/.*#', $tinyurl_domain, $matches ) )
+					if( ! preg_match( '#^https?://[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]+/$#', $tinyurl_domain, $matches ) )
 					{ // It is not valid absolute URL
-						$Messages->add( T_('Tiny URL').': '.sprintf( T_('%s is an invalid absolute URL'), '&laquo;'.htmlspecialchars( $tinyurl_domain ).'&raquo;' )
-							.'. '.T_('You must provide an absolute URL (starting with <code>http://</code> or <code>https://</code>) and it must contain at least one \'/\' sign after the domain name!'), 'error' );
+						$Messages->add( T_('Tiny URL').': '.sprintf( T_('Supplied URL is invalid. (%s)'), '<code>'.htmlspecialchars( $tinyurl_domain ).'</code>' ), 'error' );
 					}
 					$this->set_setting( 'tinyurl_type', get_param( 'tinyurl_type' ) );
 					$this->set_setting( 'tinyurl_domain', $tinyurl_domain );
