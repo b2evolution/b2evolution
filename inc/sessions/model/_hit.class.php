@@ -954,14 +954,8 @@ class Hit
 		$sql .= ' VALUES ( '.implode( ', ', $sql_insert_fields ).' )';
 
 		$DB->query( $sql, 'Record the hit' );
-		$hit_ID = $DB->insert_id;
 
-		if( ! empty( $keyphrase ) )
-		{
-			$DB->commit();
-		}
-
-		$this->ID = $hit_ID;
+		$this->ID = $DB->insert_id;
 	}
 
 
