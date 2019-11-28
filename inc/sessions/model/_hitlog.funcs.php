@@ -259,7 +259,7 @@ function stats_search_keywords( $keyphrase, $length = 45 )
 {
 	global $evo_charset;
 
-	if( empty( $keyphrase ) )
+	if( $keyphrase === NULL )
 	{
 		return '<span class="note">['./* TRANS: "Not Available" */ T_('N/A').']</span>';
 	}
