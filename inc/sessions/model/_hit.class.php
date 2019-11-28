@@ -852,7 +852,7 @@ class Hit
 		// Extract the keyphrase from search referers:
 		$keyphrase = $this->get_keyphrase();
 
-		if( empty( $keyphrase ) )
+		if( $keyphrase === NULL )
 		{	// No search hit
 			if( ! empty( $this->test_mode ) && ! empty( $this->test_uri['s'] ) )
 			{
@@ -863,10 +863,15 @@ class Hit
 				// and not in automatic searches like 404 page with search widget:
 				$s = get_param( 's' );
 			}
-			if( ! empty( $s ) && ! empty( $blog_ID ) )
+			if( isset( $s ) && ! empty( $blog_ID ) )
 			{	// Record Internal Search:
-				$keyphrase  = $s;
+				$keyphrase = $s;
 			}
+		}
+
+		if( $keyphrase !== NULL )
+		{	// Limit keyphrase but do NOT convert NULL to empty string:
+			$keyphrase = substr( $keyphrase, 0, 255 );
 		}
 
 		// Extract the serprank from search referers:
@@ -926,7 +931,7 @@ class Hit
 				'hit_referer'           => $DB->quote( substr( $this->referer, 0, 250 ) ), // VARCHAR(250) and likely to be longer
 				'hit_referer_dom_ID'    => $DB->quote( $this->get_referer_domain_ID() ),
 				'hit_keyphrase_keyp_ID' => $DB->quote( NULL ),
-				'hit_keyphrase'         => $DB->quote( substr( $keyphrase, 0, 255 ) ), // VARCHAR(255) and likely to be longer
+				'hit_keyphrase'         => $DB->quote( $keyphrase ), // VARCHAR(255) and likely to be longer
 				'hit_serprank'          => $DB->quote( $serprank ),
 				'hit_coll_ID'           => $DB->quote( $blog_ID ),
 				'hit_remote_addr'       => $DB->quote( $this->IP ),
