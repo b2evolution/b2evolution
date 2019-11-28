@@ -416,6 +416,7 @@ if( !empty($p) || !empty($title) )
 		}
 
 		if( ! empty( $Item ) &&
+		    $Blog->get_setting( 'canonical_item_urls' ) &&
 		    ( $SlugCache = & get_SlugCache() ) && 
 		    ( $item_Slug = & $SlugCache->get_by_ID( $Item->get( 'canonical_slug_ID' ), false, false ) ) &&
 		    ( $item_Slug->get( 'title' ) != $title ) && // If current slug is NOT canonical slug of the Item
