@@ -10446,6 +10446,97 @@ class Item extends ItemLight
 
 
 	/**
+	 * Check if the requested/current URL is tiny URL of this Item
+	 *
+	 * @param string|NULL URL to check, use NULL to check current URL from $ReqURL
+	 * @return boolean
+	 */
+	function is_tinyurl( $check_url = NULL )
+	{
+		global $ReqURL;
+
+		if( $check_url === NULL && isset( $ReqURL ) )
+		{	// Use current URL:
+			$check_url = $ReqURL;
+		}
+
+		if( empty( $check_url ) )
+		{	// No URL to check:
+			return false;
+		}
+
+		// Get slug from the URL:
+		$check_url_slug = preg_replace( '#^.+?([^/\?]+)(\?.+)?$#', '$1', $check_url );
+
+		// 1) Check if the requested/current URL has a TINY slug of this Item:
+		if( $check_url_slug == $this->get_tinyslug() )
+		{	// Slug from the checked URL is tiny slug of this Item
+			return true;
+		}
+		// below we check URLs with canonical or extra slugs:
+		// NOTE: 2) & 3) check points need for case when collection URL is like http://your_site.com/index.php?blog=123
+		//       and canonical URL is like http://your_site.com/index.php/item-canonical-slug?blog=123
+		//       and extra URL is like http://your_site.com/index.php/item-extra-slug?blog=123
+		//       so in such case we cannot apply the checking from 4) point
+
+		// Remove protocol http:// or https:// for the checked URL becase we should consider them as same URLs:
+		$check_url_without_protocol = preg_replace( '#^https?://#', '', $check_url );
+
+		$item_Blog = & $this->get_Blog();
+
+		if( $item_Blog->get( 'access_type' ) == 'index.php' )
+		{	// Only when "Collection base URL" = "Explicit param on index.php" like http://your_site.com/index.php?blog=123
+
+			// 2) Check the requested/current URL for CANONICAL URL:
+			$canonical_url_without_protocol = preg_replace( '#^https?://#', '', $this->get_permanent_url() );
+			if( strpos( $check_url_without_protocol, $canonical_url_without_protocol ) === 0 )
+			{	// The checked URL starts with Item's canonical/permanent URL:
+				return false;
+			}
+
+			// 3) Check the requested/current URL for EXTRA URL:
+			// Replace canonical slug with slug from the checked URL in order to check that as extra Item's URL:
+			$check_extra_url_without_protocol = preg_replace( '#/'.preg_quote( $check_url_slug ).'(/|\?|$)#', '/'.$this->get( 'urltitle' ).'$1', $check_url_without_protocol );
+			if( strpos( $check_extra_url_without_protocol, $canonical_url_without_protocol ) === 0 )
+			{	// The checked URL starts with Item's extra URL:
+				return false;
+			}
+		}
+
+		// 4) Check if the URL starts with collection URL(except of case when collection URL is like http://your_site.com/index.php?blog=123):
+		$coll_url_without_protocol = preg_replace( '#^https?://#', '', $item_Blog->get( 'url' ) );
+		if( strpos( $check_url_without_protocol, $coll_url_without_protocol ) !== 0 )
+		{	// The checked URL does NOT start with collection URL:
+			return true;
+		}
+
+		// 5) The checked URL is NOT detected as tiny URL of this Item
+		return false;
+	}
+
+
+	/**
+	 * Check if we can redirect to canonical URL from the requested/current URL
+	 *
+	 * @param string|NULL URL to check, use NULL to check current URL from $ReqURL
+	 * @return boolean
+	 */
+	function allow_redirect_to_canonical_url( $check_url = NULL )
+	{
+		$item_Blog = & $this->get_Blog();
+
+		if( ! $item_Blog->get_setting( 'canonical_item_urls' ) )
+		{	// Redirect is not allowed to canonical URL from any URL by collection setting:
+			return false;
+		}
+
+		// Allow to redirect when the requested/current URL is not Tiny URL of this Item
+		// OR when Item's collection allows a redirect from Tiny URL to Canonical URL:
+		return ( ! $this->is_tinyurl() || $item_Blog->get_setting( 'redirect_tiny_item_urls' ) );
+	}
+
+
+	/**
 	 * Get an url to this item
 	 * @param string values:
 	 * 		- 'admin_view': url to this item admin interface view

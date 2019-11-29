@@ -1353,6 +1353,7 @@ class Blog extends DataObject
 			$this->set_setting( 'self_canonical_item_urls', param( 'self_canonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'allow_crosspost_urls', param( 'allow_crosspost_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_item_urls', param( 'relcanonical_item_urls', 'integer', 0 ) );
+			$this->set_setting( 'redirect_tiny_item_urls', param( 'redirect_tiny_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_archive_urls', param( 'canonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'self_canonical_archive_urls', param( 'self_canonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_archive_urls', param( 'relcanonical_archive_urls', 'integer', 0 ) );
