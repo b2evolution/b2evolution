@@ -131,6 +131,46 @@ class BlogCache extends DataObjectCache
 
 
 	/**
+	 * Get Collection from cache by Tiny domain URL
+	 *
+	 * @param string URL of collection to load (should be the whole requested URL/path, e.g. "http://mr.example.com/permalink")
+	 * @param boolean false if you want to return false on error
+	 * @return object Collection object on success, FALSE on failure (may also halt!)
+	 */
+	function & get_by_tiny_url( $req_url, $halt_on_error = true )
+	{
+		global $DB, $Debuglog, $baseurl, $basehost, $baseport;
+
+		// Load just the requested object:
+		$Debuglog->add( "Loading <strong>$this->objtype($req_url)</strong> into cache", 'dataobjects' );
+
+		$req_url_wo_proto = substr( $req_url, strpos( $req_url, '://' ) ); // req_url without protocol, so it matches http and https below
+
+		$SQL = new SQL( 'BlogCache::get_by_tiny_url()' );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_blogs' );
+		$SQL->FROM_add( 'INNER JOIN T_coll_settings ON cset_coll_ID = blog_ID' );
+		$SQL->WHERE( 'blog_ID IN ( SELECT cset_coll_ID FROM T_coll_settings WHERE cset_name = "tinyurl_type" AND cset_value = "advanced")' );
+		$SQL->WHERE_and( 'cset_name = "tinyurl_domain"' );
+		$SQL->WHERE_and( $DB->quote( 'http'.$req_url_wo_proto ).' LIKE CONCAT( cset_value, "%" ) OR '.$DB->quote( 'https'.$req_url_wo_proto ).' LIKE CONCAT( cset_value, "%" )' );
+		$row = $DB->get_row( $SQL );
+
+		if( empty( $row ) )
+		{ // Requested object does not exist
+			if( $halt_on_error ) debug_die( "Requested $this->objtype does not exist!" );
+
+			$r = false;
+			return $r; // we return by reference!
+		}
+
+		$Collection = $Blog = new Blog( $row );
+		$this->add( $Blog );
+
+		return $Blog;
+	}
+
+
+	/**
 	 * Get a blog from cache by its URL name.
 	 *
 	 * Load the object into cache, if necessary.

@@ -693,6 +693,13 @@ function init_requested_blog( $use_blog_param_first = true )
 		return true;
 	}
 
+	if( ( $Collection = $Blog = & $BlogCache->get_by_tiny_url( $ReqAbsUrl, false ) ) !== false )
+	{	// We found a matching collection by Tiny URL:
+		$blog = $Blog->ID;
+		$Debuglog->add( 'Found collection by Tiny URL: '.$blog, 'detectblog' );
+		return true;
+	}
+
 	// If we did NOT give priority to ?blog=123, check for param now:
 	if( $use_blog_param_first == false )
 	{	// Check if a specific blog has been requested in the URL:

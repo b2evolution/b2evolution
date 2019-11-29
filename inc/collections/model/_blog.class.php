@@ -7087,6 +7087,45 @@ class Blog extends DataObject
 
 		return $r;
 	}
+
+
+	/**
+	 * Check if we can redirect to canonical URL from the requested/current URL
+	 *
+	 * @param string|NULL URL to check, use NULL to check current URL from $ReqURL
+	 * @return boolean
+	 */
+	function allow_redirect_to_canonical_url( $check_url = NULL )
+	{
+		if( ! $this->get_setting( 'canonical_homepage' ) )
+		{	// Redirect is not allowed to canonical URL by collection setting:
+			return false;
+		}
+
+		if( $this->get_setting( 'tinyurl_type' ) == 'basic' )
+		{	// Collection doesn't use different domain for Tiny URLs:
+			return true;
+		}
+
+		global $ReqURL;
+
+		if( $check_url === NULL && isset( $ReqURL ) )
+		{	// Use current URL:
+			$check_url = $ReqURL;
+		}
+
+		if( empty( $check_url ) )
+		{	// No URL to check, Allow redirect:
+			return true;
+		}
+
+		// Remove protocol http:// or https:// from the checked URLs because we should consider them as same URLs:
+		$check_url_without_protocol = preg_replace( '#^https?://#', '', $check_url );
+		$coll_tiny_url_without_protocol = preg_replace( '#^https?://#', '', $this->get_setting( 'tinyurl_domain' ) );
+
+		// Allow to redirect when the requested/current URL is not Tiny URL of this Collection:
+		return ( strpos( $check_url_without_protocol, $coll_tiny_url_without_protocol ) !== 0 );
+	}
 }
 
 ?>

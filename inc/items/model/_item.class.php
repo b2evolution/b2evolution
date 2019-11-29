@@ -10479,7 +10479,7 @@ class Item extends ItemLight
 		//       and extra URL is like http://your_site.com/index.php/item-extra-slug?blog=123
 		//       so in such case we cannot apply the checking from 4) point
 
-		// Remove protocol http:// or https:// for the checked URL becase we should consider them as same URLs:
+		// Remove protocol http:// or https:// from the checked URLs because we should consider them as same URLs:
 		$check_url_without_protocol = preg_replace( '#^https?://#', '', $check_url );
 
 		$item_Blog = & $this->get_Blog();
@@ -10532,7 +10532,7 @@ class Item extends ItemLight
 
 		// Allow to redirect when the requested/current URL is not Tiny URL of this Item
 		// OR when Item's collection allows a redirect from Tiny URL to Canonical URL:
-		return ( ! $this->is_tinyurl() || $item_Blog->get_setting( 'redirect_tiny_item_urls' ) );
+		return ( ! $this->is_tinyurl( $check_url ) || $item_Blog->get_setting( 'redirect_tiny_item_urls' ) );
 	}
 
 

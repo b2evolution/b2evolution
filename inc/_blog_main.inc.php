@@ -228,13 +228,19 @@ if( $resolve_extra_path )
 	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
+	if( $Blog->get_setting( 'tinyurl_type' ) == 'advanced' && $Blog->get_setting( 'tinyurl_domain' ) != '' )
+	{	// BaseURI is the part after the Tiny URL domain name and it will always end with / :
+		$tiny_url_baseuri = preg_replace( '#^https?://[^/]+#', '', $Blog->get_setting( 'tinyurl_domain' ) );
+	}
+
 	// Check if we have one of these:
 	// - Always try to match slug
 	// - Either the ReqPath starts with collection base URI (always including trailing slash)
 	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
 	// ... followed by some extra path info.
 	if( $Settings->get( 'always_match_slug' ) ||
-	    preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
+	    preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) ||
+	    ( isset( $tiny_url_baseuri ) && preg_match( '~(^'.preg_quote( $tiny_url_baseuri, '~' ).')(.+)$~', $ReqPath, $matches ) ) )
 	{ // We have extra path info
 		$path_string = $Settings->get( 'always_match_slug' ) ? $ReqPath : $matches[2];
 
@@ -664,14 +670,14 @@ elseif( $disp == '-' )
 	$is_front = true; // we have detected that we are displaying the front page
 
 	// Do we need to handle the canoncial url?
-	if( ( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
+	if( ( $Blog->allow_redirect_to_canonical_url() && $redir == 'yes' )
 	    || $Blog->get_setting( 'relcanonical_homepage' )
 	    || $Blog->get_setting( 'self_canonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
 		if( ! is_same_url( preg_replace( '#[\?&]coll_locale=([^&]+|$)#', '', $ReqURL ), $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 		{	// We are not on the canonical blog url:
-			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
+			if( $Blog->allow_redirect_to_canonical_url() && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
 				header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) && empty( $_GET['debug'] ) ) ? 301 : 303 );
 			}
