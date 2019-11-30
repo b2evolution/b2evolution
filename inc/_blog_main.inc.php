@@ -219,6 +219,11 @@ if( init_charsets( $current_charset ) )
  * baseurl/blog-urlname/junk/.../junk/chap-urlname/ -> points to a single chapter/category (because of ending slash)
  * Note: category names cannot be named like this [a-z][0-9]+
  */
+
+
+// TODO: fp>yb: We have already parsed the $path_elements, $first_part ,$last_char ,$last_part in init_requested_coll_or_process_tinyurl(), so please simplify the processing below.
+
+
 if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
@@ -228,6 +233,9 @@ if( $resolve_extra_path )
 	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
+// TODO: fp>yb: NO, we never care about setting( 'tinyurl_type' and ''tinyurl_domain'' ). This is for backoffice generation of tinyurls only. This is NOT be to used for decoding! 
+// Also TinyURL decoding must have been done way before reching this part of the code!!
+// Remove:
 	if( $Blog->get_setting( 'tinyurl_type' ) == 'advanced' && $Blog->get_setting( 'tinyurl_domain' ) != '' )
 	{	// BaseURI is the part after the Tiny URL domain name and it will always end with / :
 		$tiny_url_baseuri = preg_replace( '#^https?://[^/]+#', '', $Blog->get_setting( 'tinyurl_domain' ) );
@@ -238,8 +246,8 @@ if( $resolve_extra_path )
 	// - Either the ReqPath starts with collection base URI (always including trailing slash)
 	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
 	// ... followed by some extra path info.
-	if( $Settings->get( 'always_match_slug' ) ||
-	    preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) ||
+	if( $Settings->get( 'always_match_slug' ) // do we want to redirect to correct Collection if an Item Slug was found in <b>any</b> URL
+		|| preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) ||
 	    ( isset( $tiny_url_baseuri ) && preg_match( '~(^'.preg_quote( $tiny_url_baseuri, '~' ).')(.+)$~', $ReqPath, $matches ) ) )
 	{ // We have extra path info
 		$path_string = $Settings->get( 'always_match_slug' ) ? $ReqPath : $matches[2];
@@ -278,7 +286,6 @@ if( $resolve_extra_path )
 		// Do we still have extra path info to decode?
 		if( count($path_elements) )
 		{
-			// TODO: dh> add plugin hook here, which would allow to handle path elements (name spaces in clean URLs), and to override internal functionality (e.g. handle tags in a different way).
 			// Is this a tag ("prefix-only" mode)?
 			if( $Blog->get_setting('tag_links') == 'prefix-only'
 				&& count($path_elements) == 2
@@ -300,7 +307,9 @@ if( $resolve_extra_path )
 				$last_char = substr( $path_string, -1 );
 				$last_part = $path_elements[count( $path_elements )-1];
 				$last_len  = strlen( $last_part );
-				if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) ) || $last_char == ':'|| $last_char == ';' )
+				if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) )   // In very old b2evo version we had ITEM slugs truncated at 40 and possibly ending with `-`
+					|| $last_char == ':'
+					|| $last_char == ';' )
 				{	// - : or ; -> We'll consider this to be a tag page
 					$tag = substr( $last_part, 0, -1 );
 					$tag = urldecode($tag);
@@ -317,7 +326,7 @@ if( $resolve_extra_path )
 				elseif( ( $tags_dash_fix && $last_char == '-' && $last_len == 40 ) || $last_char != '/' )
 				{	// NO ENDING SLASH or ends with a dash, is 40 chars long and $tags_dash_fix is true
 					// -> We'll consider this to be a ref to a post.
-					$Debuglog->add( 'We consider this o be a ref to a post - last char: '.$last_char, 'params' );
+					$Debuglog->add( 'We consider this to be a ref to a post - last char: '.$last_char, 'params' );
 
 					// Set a lot of defaults as if we had received a complex URL:
 					$m = '';
