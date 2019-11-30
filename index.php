@@ -1,7 +1,11 @@
 <?php
 /**
- * This is the main public interface file. It will try to detect which collection is being requested
- * or display the default collection. If there is none, it will call default.php.
+ * This is the main public interface file. It will try to:
+ *   1. redirect any TinyURL to it's Canonical URL
+ *   2. detect which Collection is being requested
+ *   3. if none, fall back to display the default collection
+ *   4. if none, fall back to display default.php
+ *   5. if none, display the admin page.
  *
  * ---------------------------------------------------------------------------------------------------------------
  * IF YOU ARE READING THIS IN YOUR WEB BROWSER, IT MEANS THAT YOU DID NOT LOAD THIS FILE THROUGH A PHP WEB SERVER.
@@ -28,20 +32,21 @@ require_once $inc_path.'_main.inc.php';
 $Timer->resume('index.php');
 
 if( ! isset($collections_Module) )
-{	// The evocore framework is not used as a blog app here / we don't know how to display a public interface...
+{	// The evocore framework is not used as a CMS app here / we don't know how to display a public interface...
 	header_redirect( $admin_url, 302 );
 	exit(0);
 }
 
-// initialize which blog should be displayed, and display default page if blog could not be initialized
-if( !init_requested_blog( false ) )
-{	// No specific blog to be displayed:
+// initialize which collection should be displayed, and display default page if collection could not be initialized
+if( !init_requested_coll_or_process_tinyurl( false, true, true ) )
+{	// No specific collection to be displayed:
 	if( $Settings->get( 'default_blog_ID' ) == -1 )
 	{	// we are going to display the admin page:
 		global $dispatcher;
 
 		if( ! is_logged_in() )
-		{	// user must be logged in and his/her account must be validated before access to admin:
+		{	// User must be logged in and his/her account must be validated before access to admin:
+// TODO: fp>yb: Why is this case not handled inside of `evoadm.php` ?
 			$login_required = true;
 			$validate_required = true;
 			require $inc_path.'_init_login.inc.php';
@@ -55,13 +60,13 @@ if( !init_requested_blog( false ) )
 	exit();
 }
 
-// A blog has been requested... Let's set a few default params:
+// A collection has been requested... Let's set a few default params:
 
 # You could *force* a specific skin here with this setting:
 # $skin = 'basic';
 
 # Additionnaly, you can set other values (see URL params in the manual)...
-# $order = 'ASC'; // This for example would display the blog in chronological order...
+# $order = 'ASC'; // This for example would display the collection in chronological order...
 
 $Timer->pause('index.php');
 

@@ -618,11 +618,14 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 
 
 /**
- * Initialize global $blog variable to the requested blog
+ * Initialize global $blog variable to the requested collection
  *
+ * @param boolean $use_blog_param_first is used in _init_login.php --> fp>yb: WHY do we need that?
+ * @param boolean try to identify a TinySlug before trying to identify a collection
+ * @param boolean if the domain does not match a collection, try to process as a TinyURL and redirect before fallback to default collection
  * @return boolean true if $blog was initialized successful, false otherwise
  */
-function init_requested_blog( $use_blog_param_first = true )
+function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $process_tinyslug_first = true, $process_unkonwn_domain_as_tinyurl = true )
 {
 	global $blog, $ReqHost, $ReqPath, $baseurl;
 	global $Settings;
@@ -633,40 +636,48 @@ function init_requested_blog( $use_blog_param_first = true )
 		return true;
 	}
 
+	if( $process_tinyslug_first /* && $Settings->get( 'tinyurlprocessing' ) */)
+	{
+// TODO: fp>yb: We must check for a TinySlug here and possibly redirect
+// This means that decoding the url parts `xxxx/yyyy/zzzz` must be done here and not much later as it is now.
+// something like decode_url_parts() 
+// Of course this must be cached in vaiables so the results can also be used later.
+// we need some if( is_tinyuri( $x) ) that matches regexp like approx ^[a-z]+[A-Z][a-zA-Z0-9]+$ but I don't remember exactly how a tinyslug is defined
+	}
+
 	// If we want to give priority to ?blog=123..
 	if( $use_blog_param_first == true )
-	{	// Check if a specific blog has been requested in the URL:
+	{	// Check if a specific collection has been requested in the URL:
+// TODO:? maybe this should work only with $baseurl
 		$Debuglog->add( 'Checking for explicit "blog" param', 'detectblog' );
 		$blog = param( 'blog', 'integer', '', true );
 
 		if( !empty($blog) )
-		{ // a specific blog has been requested in the URL:
+		{ // a specific collection has been requested in the URL:
 			return true;
 		}
 	}
 
 	$Debuglog->add( 'No blog param received, checking extra path...', 'detectblog' );
 
-	// No blog requested by URL param, let's try to match something in the URL:
+	// No collection requested by URL param, let's try to match something in the URL:
+// Note: we try to find a matching collection URL BEFORE falling back to considering a tinyURL:
 	$BlogCache = & get_BlogCache();
 
-	$re = "/^https?(.*)/i";
-	$str = preg_quote( $baseurl );
-	$subst = "https?$1";
-
-	$baseurl_regex = preg_replace($re, $subst, $str);
+// fp>yb: What is this for? Make protocol lowercase?
+	$baseurl_regex = preg_replace( '/^https?(.*)/i', 'https?$1', preg_quote( $baseurl ));
 
 	if( preg_match( '#^'.$baseurl_regex.'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
-	{ // We have an URL blog name:
+	{ // We have an URL that is of the form `http://domain.com/slug` or `http://domain.com/index.php/slug` (NOTE: may still contain `slug.php`)
 		$Debuglog->add( 'Found a potential URL collection name: '.$matches[2].' (in: '.$ReqHost.$ReqPath.')', 'detectblog' );
 		if( strpos( $matches[2], '.' ) !== false )
 		{	// There is an extension (like .php) in the collection name, ignore...
 			$Debuglog->add( 'Ignoring because it contains a dot.', 'detectblog' );
 		}
 		elseif( ( $Collection = $Blog = & $BlogCache->get_by_urlname( $matches[2], false ) ) !== false ) /* SQL request '=' */
-		{ // We found a matching blog:
+		{ // We found a matching Collection by collection Slug:
 			$blog = $Blog->ID;
-			$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );
+			$Debuglog->add( 'Found matching collection: '.$blog, 'detectblog' );
 			return true;
 		}
 		else
@@ -675,24 +686,28 @@ function init_requested_blog( $use_blog_param_first = true )
 		}
 	}
 
-	// No blog identified by URL name, let's try to match the absolute URL: (remove optional index.php)
+
+	// No collection identified by URL name, let's try to match the absolute URL: 
+	// Remove optional index.php:
 	if( preg_match( '#^(.+?)index.php#', $ReqHost.$ReqPath, $matches ) )
-	{ // Remove what's not part of the absolute URL:
+	{ // Remove everything starting at `index.php...`:
 		$ReqAbsUrl = $matches[1];
 	}
 	else
 	{	// Match on the whole URL (we'll try to find the base URL at the beginning)
 		$ReqAbsUrl = $ReqHost.$ReqPath;
 	}
+
 	$Debuglog->add( 'Looking up absolute url: '.$ReqAbsUrl, 'detectblog' );
 	// SQL request 'LIKE':
 	if( ( $Collection = $Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false ) ) !== false )
-	{ // We found a matching blog:
+	{ // We found a matching collection:
 		$blog = $Blog->ID;
-		$Debuglog->add( 'Found matching blog: '.$blog, 'detectblog' );
+		$Debuglog->add( 'Found matching collection: '.$blog, 'detectblog' );
 		return true;
 	}
 
+// TODO: fp>yb: this is WRONG. We NEVER want to know which tinyURL is currently configured for a collection.
 	if( ( $Collection = $Blog = & $BlogCache->get_by_tiny_url( $ReqAbsUrl, false ) ) !== false )
 	{	// We found a matching collection by Tiny URL:
 		$blog = $Blog->ID;
@@ -700,24 +715,13 @@ function init_requested_blog( $use_blog_param_first = true )
 		return true;
 	}
 
-	// If we did NOT give priority to ?blog=123, check for param now:
-	if( $use_blog_param_first == false )
-	{	// Check if a specific blog has been requested in the URL:
-		$Debuglog->add( 'Checking for explicit "blog" param', 'detectblog' );
-		$blog = param( 'blog', 'integer', '', true );
 
-		if( !empty($blog) )
-		{ // a specific blog has been requested in the URL:
-			return true;
-		}
-	}
-
-	// No blog identified by absolute URL, try searching URL aliases
+	// No collection identified by absolute URL, try searching URL aliases:
 	$Debuglog->add( 'Checking for URL alias match', 'detectblog' );
 	$alias = NULL;
 	if( ( $Collection = $Blog = & $BlogCache->get_by_url_alias( $ReqAbsUrl, $alias, false ) ) !== false )
-	{ // We found a matching blog:
-		$Debuglog->add( 'Found matching blog: '.$blog. 'using alias '.$alias, 'detectblog' );
+	{ // We found a matching collection:
+		$Debuglog->add( 'Found matching collection: '.$blog. 'using alias '.$alias, 'detectblog' );
 		$same_protocol_alias = url_same_protocol( $alias, $ReqAbsUrl );
 		$tail_Path = str_replace( $same_protocol_alias, '', $ReqAbsUrl );
 		if( substr( $tail_Path, 0, 1 ) != '/' )
@@ -735,7 +739,31 @@ function init_requested_blog( $use_blog_param_first = true )
 		header_redirect( $redirect_to, 301 );
 	}
 
-	// Still no blog requested, use default:
+
+	// No collection identified by Absolute URL or URL alias...
+	// If we did NOT give priority to ?blog=123, check for param now:
+	if( $use_blog_param_first == false )
+	{	// Check if a specific collection has been requested in the URL:
+// TODO:? maybe this should work only with $baseurl
+		$Debuglog->add( 'Checking for explicit "blog" param', 'detectblog' );
+		$blog = param( 'blog', 'integer', '', true );
+
+		if( !empty($blog) )
+		{ // a specific collection has been requested in the URL:
+			return true;
+		}
+	}
+
+
+	// No collection identified, we MUST now consider the domain as being a TinyURL domain:
+	if( $process_unkonwn_domain_as_tinyurl /* && $Settings->get( 'tinyurlprocessing' ) */ )
+	{
+// TODO: fp>yb: test if the URL matches a tinyurl scheme `https?://domain.tld/slug` without extra folders or params
+// If yes, find item by slug, if found, redirect.
+	}
+
+
+	// Still no collection matches and no TinyURL identified, use default Collection:
 	$blog = $Settings->get( 'default_blog_ID' );
 	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 	if( $Blog !== false && $Blog !== NULL )

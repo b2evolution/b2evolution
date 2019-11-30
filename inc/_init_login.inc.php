@@ -495,7 +495,7 @@ if( ! empty( $login_error ) || ( $login_required && ! is_logged_in() ) )
 			$email = $current_User->email;
 		}
 
-		if( empty( $Blog ) && init_requested_blog() )
+		if( empty( $Blog ) && init_requested_coll_or_process_tinyurl( true /* $use_blog_param_first */, false, false ) )
 		{ // $blog is set, init $Blog also
 			$BlogCache = & get_BlogCache();
 			$Collection = $Blog = $BlogCache->get_by_ID( $blog, false, false );
