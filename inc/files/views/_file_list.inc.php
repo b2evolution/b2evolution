@@ -75,6 +75,9 @@ $Form->begin_form();
 	}
 ?>
 <table class="filelist table table-striped table-bordered table-hover table-condensed">
+	<?php
+	ob_start();
+	?>
 	<thead>
 	<?php
 		/*****************  Col headers  ****************/
@@ -153,7 +156,13 @@ $Form->begin_form();
 		echo '</tr>';
 	?>
 	</thead>
-
+	<?php
+	$table_headers = ob_get_clean();
+	if( $fm_Filelist->count() > 0 )
+	{	// Display table headers only when at least file is found in the selected folder and filter:
+		echo $table_headers;
+	}
+	?>
 	<tbody class="filelist_tbody">
 	<?php
 	$checkall = param( 'checkall', 'integer', 0 );  // Non-Javascript-CheckAll
@@ -260,13 +269,13 @@ $Form->begin_form();
 			{
 				if( $error_filename = validate_filename( $lFile->get_name() ) )
 				{ // TODO: Warning icon with hint
-					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_filename ) );
+					echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => strip_tags( $error_filename ) ) ).'&nbsp;';
 					syslog_insert( sprintf( 'The unrecognized extension is detected for file %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 				}
 			}
 			elseif( $error_dirname = validate_dirname( $lFile->get_name() ) )
 			{ // TODO: Warning icon with hint
-				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => $error_dirname ) );
+				echo get_icon( 'warning', 'imgtag', array( 'class' => 'filenameIcon', 'title' => strip_tags( $error_dirname ) ) ).'&nbsp;';
 				syslog_insert( sprintf( 'Invalid name is detected for folder %s', '[['.$lFile->get_name().']]' ), 'warning', 'file', $lFile->ID );
 			}
 
@@ -300,7 +309,7 @@ $Form->begin_form();
 						$link_attribs['target'] = $iframe_name;
 						$link_attribs['onclick'] = 'return evo_link_attach( \''.$LinkOwner->type.'\', '.$LinkOwner->get_ID()
 								.', \''.FileRoot::gen_ID( $fm_Filelist->get_root_type(), $fm_Filelist->get_root_ID() )
-								.'\', \''.$lFile->get_rdfp_rel_path().'\' )';
+								.'\', \''.$lFile->get_rdfp_rel_path().'\', \''.param( 'prefix', 'string' ).'\' )';
 						$link_action = 'link_inpost';
 					}
 					echo action_icon( T_('Link this file!'), 'link',
@@ -346,39 +355,8 @@ $Form->begin_form();
 				}
 			}
 
-			/********************  Filename  ********************/
-
-			if( $lFile->is_dir() )
-			{ // Directory
-				// Link to open the directory in the current window
-				echo '<a href="'.$browse_dir_url.'">'.$lFile->dget('name').'</a>';
-			}
-			else
-			{ // File
-				if( $view_link = $lFile->get_view_link( '<span class="fname">'.$lFile->get_name().'</span>', NULL, NULL ) )
-				{
-					echo $view_link;
-				}
-				else
-				{ // File extension unrecognized
-					echo $lFile->dget('name');
-				}
-			}
-
-			/***************  File meta data:  **************/
-
-			echo '<span class="filemeta">';
-			// Optionally display IMAGE pixel size:
-			if( $UserSettings->get( 'fm_getimagesizes' ) )
-			{
-				echo ' ('.$lFile->get_image_size( 'widthxheight' ).')';
-			}
-			// Optionally display meta data title:
-			if( $lFile->meta == 'loaded' )
-			{	// We have loaded meta data for this file:
-				echo ' - '.$lFile->title;
-			}
-			echo '</span>';
+			/******************** File name + meta data ********************/
+			echo file_td_name( $lFile );
 
 		echo '</td>';
 
@@ -421,16 +399,8 @@ $Form->begin_form();
 		{ // Show last modified datetime (always full in title attribute)
 			$lastmod_date = $lFile->get_lastmod_formatted( 'date' );
 			$lastmod_time = $lFile->get_lastmod_formatted( 'time' );
-			echo '<td class="timestamp" title="'.$lastmod_date.' '.$lastmod_time.'">';
-			if( $UserSettings->get('fm_showdate') == 'long' )
-			{
-				echo '<span class="date">'.$lastmod_date.'</span> ';
-				echo '<span class="time">'.$lastmod_time.'</span>';
-			}
-			else
-			{	// Compact format
-				echo $lFile->get_lastmod_formatted( 'compact' );
-			}
+			echo '<td class="timestamp" title="'.format_to_output( $lastmod_date.' '.$lastmod_time, 'htmlattr' ).'">';
+			echo file_td_lastmod( $lFile );
 			echo '</td>';
 		}
 
@@ -443,7 +413,8 @@ $Form->begin_form();
 
 			if( $edit_allowed_perm )
 			{ // User can edit:
-				echo '<a title="'.T_('Edit permissions').'" href="'.regenerate_url( 'fm_selected,action', 'action=edit_perms&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ).'">'
+				echo '<a title="'.T_('Edit permissions').'" href="'.regenerate_url( 'fm_selected,action', 'action=edit_perms&amp;fm_selected[]='
+							.rawurlencode($lFile->get_rdfp_rel_path()) ).'&amp;'.url_crumb( 'file' ).'">'
 							.$lFile->get_perms( $fm_permlikelsl ? 'lsl' : '' ).'</a>';
 			}
 			else
@@ -474,24 +445,7 @@ $Form->begin_form();
 		/*****************  Action icons  ****************/
 
 		echo '<td class="actions lastcol text-nowrap">';
-
-		if( $edit_allowed_perm )
-		{ // User can edit:
-			if( $lFile->is_editable( $all_perm ) )
-			{
-				echo action_icon( T_('Edit file...'), 'edit', regenerate_url( 'fm_selected', 'action=edit_file&amp;'.url_crumb('file').'&amp;fm_selected[]='.rawurlencode($lFile->get_rdfp_rel_path()) ) );
-			}
-			else
-			{
-				echo get_icon( 'edit', 'noimg' );
-			}
-
-			echo action_icon( T_('Edit properties...'), 'properties', regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ), NULL, NULL, NULL,
-							array( 'onclick' => 'return file_properties( \''.get_param( 'root' ).'\', \''.get_param( 'path' ).'\', \''.$lFile->get_rdfp_rel_path().'\' )' ) );
-			echo action_icon( T_('Move'), 'file_move', regenerate_url( 'action,fm_selected,fm_sources_root', 'action=file_move&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
-			echo action_icon( T_('Copy'), 'file_copy', regenerate_url( 'action,fm_selected,fm_sources_root', 'action=file_copy&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;fm_sources_root='.$fm_Filelist->_FileRoot->ID ) );
-			echo action_icon( T_('Delete'), 'file_delete', regenerate_url( 'fm_selected', 'action=delete&amp;fm_selected[]='.rawurlencode( $lFile->get_rdfp_rel_path() ).'&amp;'.url_crumb('file') ) );
-		}
+		echo file_td_actions( $lFile );
 		echo '</td>';
 
 		echo '</tr>';
@@ -515,29 +469,16 @@ $Form->begin_form();
 		+ (int)$UserSettings->get('fm_showdownloads')
 		+ (int)$UserSettings->get('fm_imglistpreview');
 
-
-	ob_start();
-	?>
-
-	<tr class="noresults">
-		<td class="firstcol">&nbsp;</td> <?php /* blueyed> This empty column is needed so that the defaut width:100% style of the main column below makes the column go over the whole screen */ ?>
-		<td class="lastcol" colspan="<?php echo $filetable_cols - 1 ?>" id="fileman_error">
-			<?php
-				if( ! $Messages->has_errors() )
-				{ // no Filelist errors, the directory must be empty
-					$Messages->clear();
-					$Messages->add( T_('No files found.')
-						.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' ), 'error' );
-					$Messages->display( '', '' );
-				}
-			?>
-		</td>
-	</tr>
-
-	<?php
-	$noresults = ob_get_clean();
+	$noresults = '';
 	if( $countFiles == 0 )
-	{ // Filelist errors or "directory is empty"
+	{	// Filelist errors or "directory is empty":
+		$noresults = '<tr class="noresults">
+			<td class="lastcol text-danger" colspan="'.$filetable_cols.'" id="fileman_error">'
+				.T_('No files found.')
+				.( $fm_Filelist->is_filtering() ? '<br />'.T_('Filter').': &laquo;'.$fm_Filelist->get_filter().'&raquo;' : '' )
+			.'</td>
+		</tr>';
+		// Note: this var is also used for display_dragdrop_upload_button() below:
 		echo $noresults;
 	}
 
@@ -593,7 +534,7 @@ $Form->begin_form();
 
 			$template = '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
 				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
-				.'<span class="qq-upload-drop-area-text-selector"></span>'
+				.'<div>#button_text#</div>'
 				.'</div>'
 				.'<div class="qq-upload-button-selector qq-upload-button">'
 				.'<div>#button_text#</div>'
@@ -635,7 +576,7 @@ $Form->begin_form();
 			$template .= '</td>';
 			if( $UserSettings->get('fm_showdate') != 'no' )
 			{
-				$template .= '<td class="qq-upload-status-text-selector qq-upload-status-text timestamp"></td>';
+				$template .= '<td class="fsdate timestamp"><span class="qq-upload-status-text-selector qq-upload-status-text"></span></td>';
 			}
 			if( $UserSettings->get('fm_showfsperms') )
 			{
@@ -666,9 +607,12 @@ $Form->begin_form();
 					'list_style'           => 'table',
 					'template'             => $template,
 					'display_support_msg'  => false,
+					'display_status_success' => false,
 					'additional_dropzone'  => '[ jQuery( ".filelist_tbody" ).get(0) ]',
 					'filename_before'      => $icon_to_link_files,
+					'table_headers'        => $table_headers,
 					'noresults'            => $noresults,
+					'table_id'             => 'FilesForm',
 				) );
 			?>
 			</td>
@@ -676,9 +620,6 @@ $Form->begin_form();
 	<?php
 	}
 
-
-	if( $countFiles > 0 )
-	{
 		// -------------
 		// Footer with "check all", "with selected: ..":
 		// --------------
@@ -686,7 +627,8 @@ $Form->begin_form();
 		<tr class="listfooter firstcol lastcol file_selector">
 			<td colspan="<?php echo $filetable_cols ?>">
 
-			<?php
+		<?php
+		echo '<div id="evo_multi_file_selector" class="pull-left"'.( $countFiles == 0 ? ' style="display:none"' : '' ).'>';
 			echo $Form->check_all();
 			$Form->add_crumb( 'file' );
 
@@ -720,7 +662,7 @@ $Form->begin_form();
 			if( $mode == 'upload' &&
 			    isset( $LinkOwner ) &&
 			    ( $LinkOwner->type == 'item' ||
-			      ( $LinkOwner->is_temp() && $LinkOwner->link_Object->type == 'item' )
+			      ( $LinkOwner->is_temp() && $LinkOwner->link_Object->tmp_type == 'item' )
 			    ) )
 			{	// We are uploading in a popup opened by an edit/new item form:
 				$field_options['img_tag'] = T_('Insert IMG/link into post');
@@ -754,6 +696,8 @@ $Form->begin_form();
 			$Form->select_input_array( 'group_action', $action, $field_options, ' &mdash; <strong>'.T_('With selected files').'</strong>' );
 			$Form->submit_input( array( 'name'=>'actionArray[group_action]', 'value'=>T_('Go!'), 'onclick'=>'return js_act_on_selected();' ) );
 			$Form->switch_layout( NULL );
+
+		echo '</div>';
 
 			/* fp> the following has been integrated into the select.
 			if( $mode == 'upload' )
@@ -807,9 +751,6 @@ $Form->begin_form();
 			?>
 			</td>
 		</tr>
-		<?php
-	}
-	?>
 	</tfoot>
 </table>
 <?php

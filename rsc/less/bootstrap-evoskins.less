@@ -8,6 +8,169 @@
 	border-radius: @radius;
 }
 
+
+@media (min-width: 1785px) {
+	.container-xxl {
+		width: 1755px;
+	}
+	.col-xxl-1, .col-xxl-2, .col-xxl-3, .col-xxl-4, .col-xxl-5, .col-xxl-6, .col-xxl-7, .col-xxl-8, .col-xxl-9, .col-xxl-10, .col-xxl-11, .col-xxl-12 {
+		float: left;
+	}
+	.col-xxl-12 {
+		width: 100%;
+	}
+	.col-xxl-11 {
+		width: 91.66666667%;
+	}
+	.col-xxl-10 {
+		width: 83.33333333%;
+	}
+	.col-xxl-9 {
+		width: 75%;
+	}
+	.col-xxl-8 {
+		width: 66.66666667%;
+	}
+	.col-xxl-7 {
+		width: 58.33333333%;
+	}
+	.col-xxl-6 {
+		width: 50%;
+	}
+	.col-xxl-5 {
+		width: 41.66666667%;
+	}
+	.col-xxl-4 {
+		width: 33.33333333%;
+	}
+	.col-xxl-3 {
+		width: 25%;
+	}
+	.col-xxl-2 {
+		width: 16.66666667%;
+	}
+	.col-xxl-1 {
+		width: 8.33333333%;
+	}
+	.col-xxl-pull-12 {
+		right: 100%;
+	}
+	.col-xxl-pull-11 {
+		right: 91.66666667%;
+	}
+	.col-xxl-pull-10 {
+		right: 83.33333333%;
+	}
+	.col-xxl-pull-9 {
+		right: 75%;
+	}
+	.col-xxl-pull-8 {
+		right: 66.66666667%;
+	}
+	.col-xxl-pull-7 {
+		right: 58.33333333%;
+	}
+	.col-xxl-pull-6 {
+		right: 50%;
+	}
+	.col-xxl-pull-5 {
+		right: 41.66666667%;
+	}
+	.col-xxl-pull-4 {
+		right: 33.33333333%;
+	}
+	.col-xxl-pull-3 {
+		right: 25%;
+	}
+	.col-xxl-pull-2 {
+		right: 16.66666667%;
+	}
+	.col-xxl-pull-1 {
+		right: 8.33333333%;
+	}
+	.col-xxl-pull-0 {
+		right: auto;
+	}
+	.col-xxl-push-12 {
+		left: 100%;
+	}
+	.col-xxl-push-11 {
+		left: 91.66666667%;
+	}
+	.col-xxl-push-10 {
+		left: 83.33333333%;
+	}
+	.col-xxl-push-9 {
+		left: 75%;
+	}
+	.col-xxl-push-8 {
+		left: 66.66666667%;
+	}
+	.col-xxl-push-7 {
+		left: 58.33333333%;
+	}
+	.col-xxl-push-6 {
+		left: 50%;
+	}
+	.col-xxl-push-5 {
+		left: 41.66666667%;
+	}
+	.col-xxl-push-4 {
+		left: 33.33333333%;
+	}
+	.col-xxl-push-3 {
+		left: 25%;
+	}
+	.col-xxl-push-2 {
+		left: 16.66666667%;
+	}
+	.col-xxl-push-1 {
+		left: 8.33333333%;
+	}
+	.col-xxl-push-0 {
+		left: auto;
+	}
+	.col-xxl-offset-12 {
+		margin-left: 100%;
+	}
+	.col-xxl-offset-11 {
+		margin-left: 91.66666667%;
+	}
+	.col-xxl-offset-10 {
+		margin-left: 83.33333333%;
+	}
+	.col-xxl-offset-9 {
+		margin-left: 75%;
+	}
+	.col-xxl-offset-8 {
+		margin-left: 66.66666667%;
+	}
+	.col-xxl-offset-7 {
+		margin-left: 58.33333333%;
+	}
+	.col-xxl-offset-6 {
+		margin-left: 50%;
+	}
+	.col-xxl-offset-5 {
+		margin-left: 41.66666667%;
+	}
+	.col-xxl-offset-4 {
+		margin-left: 33.33333333%;
+	}
+	.col-xxl-offset-3 {
+		margin-left: 25%;
+	}
+	.col-xxl-offset-2 {
+		margin-left: 16.66666667%;
+	}
+	.col-xxl-offset-1 {
+		margin-left: 8.33333333%;
+	}
+	.col-xxl-offset-0 {
+		margin-left: 0;
+	}
+}
+
 // Fix for forms
 // We want this only on Small devices and up(tablets, 768px and up)
 // We DON'T want this when labels are stacked
@@ -17,6 +180,12 @@
 	}
 	.text-right-sm {
 		text-align: right;
+	}
+	.pull-left-sm {
+		float: left;
+	}
+	.pull-right-sm {
+		float: right;
 	}
 }
 
@@ -28,6 +197,12 @@
 	.text-right-md {
 		text-align: right;
 	}
+	.pull-left-md {
+		float: left;
+	}
+	.pull-right-md {
+		float: right;
+	}
 }
 
 /* Large devices (large desktops, 1200px and up) */
@@ -37,6 +212,12 @@
 	}
 	.text-right-lg {
 		text-align: right;
+	}
+	.pull-left-lg {
+		float: left;
+	}
+	.pull-right-lg {
+		float: right;
 	}
 }
 
@@ -56,6 +237,13 @@ ul, ol {
 
 p.margin-top {
 	margin: 10px 0 0 0;
+}
+
+// Remove unwanted space at the bottom of table cell:
+th, td, caption {
+	> p:last-child {
+		margin-bottom: 0;
+	}
 }
 
 // Use yellow color on hover table rows intead of grey standard color:
@@ -451,20 +639,32 @@ body.modal-open div.token-input-dropdown-facebook {
 	z-index: 10002;
 }
 // Fix style for form of editing tags from widget:
-.evo_widget.widget_core_item_tags form {
-	display: inline-block;
-	vertical-align: middle;
-	ul.token-input-list-facebook {
-		width: 100%;
-		max-width: 100%;
-	}
-	#item_tags {
+.evo_widget.widget_core_item_tags {
+	form {
 		display: inline-block;
-		width: auto;
 		vertical-align: middle;
+		ul.token-input-list-facebook {
+			width: 100%;
+			max-width: 100%;
+		}
+		#item_tags {
+			display: inline-block;
+			width: auto;
+			vertical-align: middle;
+			width: 100%;
+		}
+		input[type=submit] {
+			margin: 0;
+		}
 	}
-	input[type=submit] {
-		margin: 0;
+	.panel-body {
+		.post_tags {
+			margin: 0;
+			display: inline;
+		}
+		form, #item_tags {
+			width: 100%;
+		}
 	}
 }
 // Fix style for author input field in search form
@@ -843,6 +1043,10 @@ div.edit_toolbars, div.message_toolbars {
 	background-color: #F00 !important;
 	color: #FFF !important;
 }
+.badge-primary {
+	background-color: #337ab7 !important;
+	color: #FFF !important;
+}
 .badge-info {
 	background-color: #5bc0de !important;
 	color: #FFF !important;
@@ -1109,7 +1313,6 @@ div.edit_toolbars, div.message_toolbars {
 			}
 		}
 		&.widget_core_user_login {
-			min-width: 290px;
 			max-width: 400px;
 			margin: 10px auto;
 		}
@@ -1120,5 +1323,17 @@ div.edit_toolbars, div.message_toolbars {
 @media (min-width: 768px) {
 	.panel_heading_action_icons .btn-group.dropdown.single-group-xs a.btn.btn-sm {
 		border-radius: 3px;
+	}
+}
+
+// Widget "Item Workflow Properties":
+.evo_widget.widget_core_item_workflow {
+	.panel-body {
+		img.avatar_before_login {
+			vertical-align: middle;
+		}
+		p:last-child {
+			margin-bottom: 0;
+		}
 	}
 }

@@ -416,6 +416,7 @@ if( !empty($p) || !empty($title) )
 		}
 
 		if( ! empty( $Item ) &&
+		    $Blog->get_setting( 'canonical_item_urls' ) &&
 		    ( $SlugCache = & get_SlugCache() ) && 
 		    ( $item_Slug = & $SlugCache->get_by_ID( $Item->get( 'canonical_slug_ID' ), false, false ) ) &&
 		    ( $item_Slug->get( 'title' ) != $title ) && // If current slug is NOT canonical slug of the Item
@@ -564,11 +565,6 @@ elseif( !empty($preview) )
 	// Consider this as an admin hit!
 	$Hit->hit_type = 'admin';
 }
-elseif( ( $disp == 'visits' ) && ( ( $Settings->get( 'enable_visit_tracking' ) != 1 ) || ! is_logged_in() ) )
-{ // Check if visit tracking is enabled and the user is logged in before allowing profile visit display
-	$disp = '403';
-	$disp_detail = '403-visit-tracking-disabled';
-}
 elseif( $disp == '-' && !empty($Item) )
 { // We have not requested a specific disp but we have identified a specific post to be displayed
 	// We are going to display a single post
@@ -618,7 +614,7 @@ elseif( $disp == '-' )
 		{	// We are not on the canonical blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
-				header_redirect( $canonical_url, (empty( $display_containers ) && empty( $display_includes )) ? 301 : 303 );
+				header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) && empty( $_GET['debug'] ) ) ? 301 : 303 );
 			}
 			elseif( $Blog->get_setting( 'relcanonical_homepage' ) )
 			{	// Use link rel="canoncial":

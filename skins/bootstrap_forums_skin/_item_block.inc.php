@@ -56,6 +56,7 @@ skin_widget( array(
 		'separator'        => '',
 		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
 		'item_active_mask' => '<li class="active">$title$</li>',
+		'coll_logo_size'   => 'fit-128x16',
 	) );
 ?>
 
@@ -121,13 +122,13 @@ skin_widget( array(
 	<?php } ?>
 
 	<div class="row">
-		<div class="<?php echo $Skin->get_column_class( 'single' ); ?>">
+		<div class="evo_content_col <?php echo $Skin->get_column_class( 'single' ); ?>">
 
 	<section class="table evo_content_block">
 	<div class="panel panel-default">
 		<div class="panel-heading posts_panel_title_wrapper">
 			<div class="cell1 ellipsis">
-				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="permalink">#1</a>
+				<h4 class="evo_comment_title panel-title"><a href="<?php echo $Item->get_permanent_url(); ?>" class="badge badge-primary">1</a>
 					<?php
 						$Item->author( array(
 							'link_text' => 'auto',
@@ -397,7 +398,7 @@ skin_widget( array(
 		if( $Skin->is_visible_sidebar( 'single' ) )
 		{	// Display sidebar:
 		?>
-		<aside class="col-md-3<?php echo ( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left' : '' ); ?>">
+		<aside class="evo_sidebar_col col-md-3<?php echo ( $Skin->get_setting_layout( 'single' ) == 'left_sidebar' ? ' pull-left-md' : '' ); ?>">
 			<div class="evo_container evo_container__sidebar_single">
 			<?php
 				// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
@@ -431,6 +432,25 @@ skin_widget( array(
 						'search_input_after'   => '',
 						'search_submit_before' => '<span class="input-group-btn">',
 						'search_submit_after'  => '</span></div>',
+						// Widget 'Item Custom Fields':
+						'custom_fields_table_start'                => '<div class="item_custom_fields">',
+						'custom_fields_row_start'                  => '<div class="row">',
+						'custom_fields_topleft_cell'               => '<div class="col-md-12 col-xs-6" style="border:none"></div>',
+						'custom_fields_col_header_item'            => '<div class="col-md-12 col-xs-6 center" width="$col_width$"$col_attrs$>$item_link$$item_status$</div>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
+						'custom_fields_row_header_field'           => '<div class="col-md-12 col-xs-6"><b>$field_title$$field_description_icon$:</b></div>',
+						'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
+						'custom_fields_description_icon_class'     => 'grey',
+						'custom_fields_value_default'              => '<div class="col-md-12 col-xs-6"$data_cell_attrs$>$field_value$</div>',
+						'custom_fields_value_difference_highlight' => '<div class="col-md-12 col-xs-6 bg-warning"$data_cell_attrs$>$field_value$</div>',
+						'custom_fields_value_green'                => '<div class="col-md-12 col-xs-6 bg-success"$data_cell_attrs$>$field_value$</div>',
+						'custom_fields_value_red'                  => '<div class="col-md-12 col-xs-6 bg-danger"$data_cell_attrs$>$field_value$</div>',
+						'custom_fields_edit_link_cell'             => '<div class="col-md-12 col-xs-6 center">$edit_link$</div>',
+						'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
+						'custom_fields_row_end'                    => '</div>',
+						'custom_fields_table_end'                  => '</div>',
+						// Separate template for separator fields:
+						// (Possible to use templates for all field types: 'numeric', 'string', 'html', 'text', 'url', 'image', 'computed', 'separator')
+						'custom_fields_separator_row_header_field' => '<div class="col-xs-12" colspan="$cols_count$"><b>$field_title$$field_description_icon$</b></div>',
 					) );
 				// ----------------------------- END OF "Sidebar Single" CONTAINER -----------------------------
 			?>

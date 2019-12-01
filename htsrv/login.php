@@ -238,7 +238,7 @@ switch( $action )
 			if( ! send_mail_to_User( $forgetful_User->ID, $subject, 'account_password_reset', $email_template_params, true ) )
 			{
 				$Messages->add( T_('Sorry, the email with the link to reset your password could not be sent.')
-					.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+					.'<br />'.get_send_mail_error(), 'error' );
 			}
 			else
 			{
@@ -563,7 +563,7 @@ switch( $action )
 			else
 			{
 				$Messages->add( T_('Sorry, the email with the link to activate your account could not be sent.')
-							.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+							.'<br />'.get_send_mail_error(), 'error' );
 			}
 		}
 		else

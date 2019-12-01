@@ -68,6 +68,7 @@ $Form->add_crumb( 'comment' );
 $Form->hidden( 'ctrl', 'comments' );
 $Form->hidden( 'redirect_to', $redirect_to );
 $Form->hidden( 'comment_ID', $edited_Comment->ID );
+$Form->hidden( 'from', 'backoffice' );
 ?>
 
 <div class="row">
@@ -82,18 +83,22 @@ $Form->hidden( 'comment_ID', $edited_Comment->ID );
 		echo '<div class="col-sm-12">';
 
 		$comment_Item = & $edited_Comment->get_Item();
+		$form_infostart = $Form->infostart;
+		$Form->switch_template_parts( array(
+			'infostart' => '<div class="controls col-lg-8 col-md-8 col-sm-9"><div>',
+		));
 		$Form->info( T_('In response to'), $comment_Item->get_title( array(
 				'link_type'  => 'admin_view',
-				'max_length' => '30'
-			) ) );
-
+				'link_class' => 'comment_item_title',
+			) ),
+			'<button type="button" class="btn btn-default btn-sm" data-func="evo_comment_change_item_load_window|'.$comment_Item->ID.'">'.T_('Link to Another Post').'...</button>' );
 		echo '</div>';
 		echo '<div class="col-sm-12">';
 
 		$Blog_owner_User = & $Blog->get_owner_User();
 		if( ( $Blog_owner_User->ID == $current_User->ID ) || $current_User->check_perm( 'blog_admin', 'edit', false, $Blog->ID ) )
 		{	// User has permission to change comment's post, because user is the owner of the current blog, or user has admin full access permission for current blog
-			$Form->text_input( 'moveto_post', $comment_Item->ID, 20, T_('Move to post ID'), '', array( 'maxlength' => 100, 'size' => 10 ) );
+			$Form->hidden( 'moveto_post', $comment_Item->ID );
 		}
 
 		echo '</div>';
@@ -314,4 +319,6 @@ echo_status_dropdown_button_js( 'comment' );
 echo_fieldset_folding_js();
 // JS code for inserting preview image
 echo_image_insert_modal();
+// JS code to link the Comment to another Item:
+echo_comment_change_item_js();
 ?>

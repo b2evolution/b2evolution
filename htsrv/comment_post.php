@@ -137,6 +137,16 @@ $now = date( 'Y-m-d H:i:s', $localtimenow );
 
 $original_comment = $comment;
 
+// CHECK and FORMAT content
+$perm_comment_edit = $User && $User->check_perm( 'blog_comments', 'edit', false, $commented_Item->Blog->ID );
+$saved_comment = $comment;
+// Following call says "WARNING: this does *NOT* (necessarilly) make the HTML code safe.":
+$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $User );
+if( $comment === false )
+{	// ERROR! Restore original comment for further editing:
+	$comment = $saved_comment;
+}
+
 $comment_renderers = param( 'renderers', 'array:string', array() );
 
 // Trigger event: a Plugin could add a $category="error" message here..
@@ -164,31 +174,18 @@ $Plugins->trigger_event( 'CommentFormSent', array(
 $Session->assert_received_crumb( 'comment' );
 
 $workflow_is_updated = false;
-if( $action != 'preview' && $commented_Item->load_workflow_from_Request() )
+if( ( $workflow_is_loaded = $commented_Item->load_workflow_from_Request() ) &&
+    $action != 'preview' &&
+    $commented_Item->dbupdate() )
 {	// Update workflow properties if they are loaded from request without errors and at least one of them has been changed:
-	if( $commented_Item->dbupdate() )
-	{	// Display a message on success result:
-		$Messages->add( T_('The workflow properties have been updated.'), 'success' );
-		$workflow_is_updated = true;
-
-		if( $commented_Item->assigned_to_new_user && ! empty( $commented_Item->assigned_user_ID ) )
-		{ // Send post assignment notification
-			$commented_Item->send_assignment_notification();
-		}
-	}
+	$Messages->add( T_('The workflow properties have been updated.'), 'success' );
+	$workflow_is_updated = true;
 }
 
 $comments_email_is_detected = false;
 
-if( $User )
-{	// User is logged in (or provided, e.g. via OpenID plugin)
-	// Does user have permission to edit?
-	$perm_comment_edit = $User->check_perm( 'blog_comments', 'edit', false, $commented_Item->Blog->ID );
-}
-else
+if( ! $User )
 {	// User is still not logged in
-	// NO permission to edit!
-	$perm_comment_edit = false;
 
 	// We need some id info from the anonymous user:
 	if( $commented_Item->Blog->get_setting( 'require_anon_name' ) && empty( $author ) )
@@ -243,15 +240,6 @@ else
 			$comments_email_is_detected = true;
 		}
 	}
-}
-
-// CHECK and FORMAT content
-$saved_comment = $comment;
-// Following call says "WARNING: this does *NOT* (necessarilly) make the HTML code safe.":
-$comment = check_html_sanity( $comment, $perm_comment_edit ? 'posting' : 'commenting', $User );
-if( $comment === false )
-{	// ERROR! Restore original comment for further editing:
-	$comment = $saved_comment;
 }
 
 // Flood protection was here and SHOULD NOT have moved down!
@@ -399,6 +387,16 @@ $Plugins->trigger_event_first_return( 'ValidateCaptcha', array(
 	'is_preview' => ( $action == 'preview' ),
 ) );
 
+if( $workflow_is_loaded )
+{	// Store changed Item workflow properties in session Comment in order to display them after redirect:
+	$Comment->item_workflow = array(
+		'assigned_user_ID' => $commented_Item->get( 'assigned_user_ID' ),
+		'priority' => $commented_Item->get( 'priority' ),
+		'pst_ID' => $commented_Item->get( 'pst_ID' ),
+		'datedeadline' => $commented_Item->get( 'datedeadline' ),
+	);
+}
+
 // Redirect and:
 // Display error messages for the comment form OR
 // Display success message when workflow has been updated but comment text has not been filled:
@@ -412,6 +410,13 @@ if( ( $Messages->has_errors() && $action != 'preview' ) ||
 	if( !empty( $reply_ID ) )
 	{
 		$redirect_to = url_add_param( $redirect_to, 'reply_ID='.$reply_ID.'&redir=no', '&' );
+	}
+
+	if( $workflow_is_updated &&
+	    $commented_Item->assigned_to_new_user &&
+	    ! empty( $commented_Item->assigned_user_ID ) )
+	{	// Send post assignment notification when only workflow assigned User was changed without posting new comment:
+		$commented_Item->send_assignment_notification();
 	}
 
 	header_redirect(); // 303 redirect

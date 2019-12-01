@@ -1478,7 +1478,7 @@ class collections_Module extends Module
 					else
 					{
 						$Messages->add( T_('Sorry, the email with the link to activate your account could not be sent.')
-							.'<br />'.T_('Possible reason: the PHP mail() function may have been disabled on the server.'), 'error' );
+							.'<br />'.get_send_mail_error(), 'error' );
 						// fp> TODO: allow to enter a different email address (just in case it's that kind of problem)
 					}
 				}

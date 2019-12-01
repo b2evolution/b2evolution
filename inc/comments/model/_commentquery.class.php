@@ -99,35 +99,23 @@ class CommentQuery extends SQL
 	 */
 	function where_ID_list( $cl = '' )
 	{
-		$r = false;
+		$this->cl = clear_ids_list( $cl );
 
-		$this->cl = $cl;
+		if( empty( $this->cl ) )
+		{	// Nothing to filter:
+			return;
+		}
 
-		if( empty( $cl ) ) return $r; // nothing to do
-
-		if( substr( $this->cl, 0, 1 ) == '-' )
+		if( substr( $cl, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$eq = 'NOT IN';
-			$this->cl = substr( $this->cl, 1 );
 		}
 		else
 		{
 			$eq = 'IN';
 		}
 
-		$c_ID_array = array();
-		$c_id_list = explode( ',', $this->cl );
-		foreach( $c_id_list as $c_id )
-		{
-			$c_ID_array[] = intval( $c_id );// make sure they're all numbers
-		}
-
-		$this->cl = implode( ',', $c_ID_array );
-
 		$this->WHERE_and( $this->dbIDname.' '.$eq.'( '.$this->cl.' )' );
-		$r = true;
-
-		return $r;
 	}
 
 
@@ -223,9 +211,9 @@ class CommentQuery extends SQL
 	 */
 	function where_author( $author )
 	{
-		$this->author = $author;
+		$this->author = clear_ids_list( $author );
 
-		if( empty( $author ) )
+		if( empty( $this->author ) )
 		{
 			return;
 		}
@@ -233,20 +221,13 @@ class CommentQuery extends SQL
 		if( substr( $author, 0, 1 ) == '-' )
 		{	// List starts with MINUS sign:
 			$eq = 'NOT IN';
-			$author_list = substr( $author, 1 );
 		}
 		else
 		{
 			$eq = 'IN';
-			$author_list = $author;
 		}
 
-		if( preg_match( '/^[0-9]+(,[0-9]+)*$/', $author_list ) === false )
-		{
-			debug_die( 'Invalid comment author filter request' );
-		}
-
-		$this->WHERE_and( $this->dbprefix.'author_user_ID '.$eq.' ('.$author_list.')' );
+		$this->WHERE_and( $this->dbprefix.'author_user_ID '.$eq.' ('.$this->author.')' );
 	}
 
 
@@ -323,6 +304,8 @@ class CommentQuery extends SQL
 	 */
 	function where_author_url( $author_url, $url_match, $include_emptyurl )
 	{
+		global $DB;
+
 		$this->author_url = $author_url;
 		$this->url_match = $url_match;
 		$this->include_emptyurl = $include_emptyurl;
@@ -353,7 +336,7 @@ class CommentQuery extends SQL
 			$include_empty = ' OR '.$this->dbprefix.'author_url IS NULL';
 		}
 
-		$this->WHERE_and( $this->dbprefix.'author_url '.$url_match.' ("'.$author_url.'")'.$include_empty );
+		$this->WHERE_and( $this->dbprefix.'author_url '.$url_match.' ('.$DB->quote( $author_url ).')'.$include_empty );
 	}
 
 

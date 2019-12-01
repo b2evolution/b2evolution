@@ -254,7 +254,7 @@ switch( $action )
 				}
 				else
 				{ // Redirect so that a reload doesn't write to the DB twice:
-					header_redirect( '?ctrl=email&tab='.$tab.'&tab2='.$tab2.'&tab3='.$tab3, 303 ); // Will EXIT
+					header_redirect( '?ctrl=email&tab='.$tab.'&tab3='.$tab3, 303 ); // Will EXIT
 					// We have EXITed already at this point!!
 				}
 			}

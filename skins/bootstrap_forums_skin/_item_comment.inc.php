@@ -86,7 +86,7 @@ switch( $Comment->get( 'type' ) )
 {
 	// ON *DISP = COMMENTS* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case $disp == 'comments': // Display a comment:
-	?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $Comment->get_inlist_order() + $comment_order_shift; ?></a> <?php
+	?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="badge badge-primary"><?php echo $Comment->get_inlist_order() + $comment_order_shift; ?></a> <?php
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
 			echo '<span class="evo_comment_type_preview">'.T_('PREVIEW Comment from:').'</span> ';
@@ -138,11 +138,13 @@ switch( $Comment->get( 'type' ) )
 	case 'meta': // Display a meta comment:
 		if( $Comment->is_meta() )
 		{	// Meta comment:
-			?><span class="badge badge-info"><?php echo $Comment->get_inlist_order(); ?></span> <?php
+			$permalink_text = $Comment->get_inlist_order();
+			$permalink_class = 'badge badge-info';
 		}
 		else
 		{	// Normal comment:
-			?><a href="<?php echo $Comment->get_permanent_url(); ?>" class="permalink">#<?php echo $Comment->get_inlist_order() + $comment_order_shift; ?></a> <?php
+			$permalink_text = $Comment->get_inlist_order() + $comment_order_shift;
+			$permalink_class = 'badge badge-primary';
 		}
 		if( empty($Comment->ID) )
 		{	// PREVIEW comment
@@ -152,9 +154,9 @@ switch( $Comment->get( 'type' ) )
 		{	// Normal comment
 			$Comment->permanent_link( array(
 					'before'    => '',
-					'after'     => '',
-					'text'      => '',
-					'class'     => 'evo_comment_type',
+					'after'     => ' ',
+					'text'      => $permalink_text,
+					'class'     => $permalink_class,
 					'nofollow'  => true,
 				) );
 		}

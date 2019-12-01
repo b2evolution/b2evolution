@@ -158,11 +158,11 @@ $Form->begin_form( '', '', $params );
 		$Form->begin_fieldset( '', array( 'class' => 'evo_fields_table__single_row' ) );
 		if( $edited_Item->get_type_setting( 'use_short_title' ) == 'optional' )
 		{	// Display a post short title field:
-			$Form->text_input( 'post_short_title', $edited_Item->get( 'short_title' ), 50, T_('Short title'), '', array( 'maxlength' => 50 ) );
+			$Form->text_input( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ), 50, T_('Short title'), '', array( 'maxlength' => 50 ) );
 		}
 		else
 		{	// Hide a post short title field:
-			$Form->hidden( 'post_short_title', $edited_Item->get( 'short_title' ) );
+			$Form->hidden( 'post_short_title', htmlspecialchars_decode( $edited_Item->get( 'short_title' ) ) );
 		}
 		$Form->end_fieldset();
 	}

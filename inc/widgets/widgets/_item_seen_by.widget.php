@@ -99,6 +99,25 @@ class item_seen_by_Widget extends ComponentWidget
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
 				),
+				'include' => array(
+					'type' => 'checklist',
+					'label' => T_('Include'),
+					'options' => array(
+						array( 'author', T_('Author'), 1 ),
+						array( 'commenters', T_('Commenters'), 0 ),
+						array( 'assignees', T_('Potential assignees'), 1 ),
+						array( 'members', T_('Collection members'), 0 ),
+					),
+				),
+				'limit' => array(
+					'label' => T_('Limit to'),
+					'type' => 'integer',
+					'suffix' => ' '.T_('usernames max'),
+					'defaultvalue' => 30,
+					'valid_range' => array(
+						'min' => 1,
+					),
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -136,17 +155,46 @@ class item_seen_by_Widget extends ComponentWidget
 			return;
 		}
 
-		// Get all memebers of the current collection:
 		$UserCache = & get_UserCache();
-		$UserCache->load_blogmembers( $Blog->ID );
+		$users_limit = intval( $this->disp_params['limit'] );
+		$user_IDs = array();
 
-		if( empty( $UserCache->cache ) )
-		{	// Don't display this widget if the collection has no members:
+		if( ! empty( $this->disp_params['include']['author'] ) )
+		{	// Include author:
+			$user_IDs[] = $Item->get( 'creator_user_ID' );
+		}
+
+		if( ! empty( $this->disp_params['include']['commenters'] ) )
+		{	// Include commenters:
+			$commenters_SQL = new SQL( '' );
+			$commenters_SQL->SELECT( 'DISTINCT comment_author_user_ID' );
+			$commenters_SQL->FROM( 'T_comments' );
+			$commenters_SQL->WHERE( 'comment_item_ID = '.$DB->quote( $Item->ID ) );
+			$commenters_SQL->WHERE_and( 'comment_author_user_ID IS NOT NULL' );
+			$commenters_SQL->WHERE_and( statuses_where_clause( get_inskin_statuses( $Blog->ID, 'comment' ), 'comment_', $Blog->ID, 'blog_comment!' ) );
+			$user_IDs = array_merge( $user_IDs, $DB->get_col( $commenters_SQL ) );
+		}
+
+		if( ! empty( $this->disp_params['include']['assignees'] ) )
+		{	// Include potential assignees:
+			$UserCache->clear();
+			$UserCache->load_blogmembers( $Blog->ID, $users_limit, false/*assignees*/ );
+			$user_IDs = array_merge( $user_IDs, array_keys( $UserCache->cache ) );
+		}
+
+		if( ! empty( $this->disp_params['include']['members'] ) )
+		{	// Include collection members:
+			$UserCache->clear();
+			$UserCache->load_blogmembers( $Blog->ID, $users_limit, true/*members*/ );
+			$user_IDs = array_merge( $user_IDs, array_keys( $UserCache->cache ) );
+		}
+
+		if( empty( $user_IDs ) )
+		{	// Don't display this widget if no users:
 			return;
 		}
 
-		// Get IDs of all collection members:
-		$member_user_IDs = array_keys( $UserCache->cache );
+		$user_IDs = array_unique( $user_IDs );
 
 		$this->init_display( $params );
 
@@ -159,16 +207,21 @@ class item_seen_by_Widget extends ComponentWidget
 		$SQL->SELECT( 'itud_user_ID, IF( itud_read_item_ts >= '.$DB->quote( $Item->last_touched_ts ).', "read", "updated" ) AS read_post_status' );
 		$SQL->FROM( 'T_items__user_data' );
 		$SQL->FROM_add( 'INNER JOIN T_users ON itud_user_ID = user_ID' );
-		$SQL->WHERE( 'itud_user_ID IN ( '.$DB->quote( $member_user_IDs ).' )' );
+		$SQL->WHERE( 'itud_user_ID IN ( '.$DB->quote( $user_IDs ).' )' );
 		$SQL->WHERE_and( 'itud_item_ID = '.$DB->quote( $Item->ID ) );
 		$SQL->ORDER_BY( 'read_post_status, user_login' );
+		$SQL->LIMIT( $users_limit );
 		$read_statuses = $DB->get_assoc( $SQL );
 
-		foreach( $member_user_IDs as $member_user_ID )
+		foreach( $user_IDs as $user_ID )
 		{
-			if( ! isset( $read_statuses[ $member_user_ID ] ) )
+			if( ! isset( $read_statuses[ $user_ID ] ) )
 			{	// Append users that don't see the item at the end of list:
-				$read_statuses[ $member_user_ID ] = NULL;
+				if( count( $read_statuses ) == $users_limit )
+				{	// Limit user statuses by max value for this widget:
+					break;
+				}
+				$read_statuses[ $user_ID ] = NULL;
 			}
 		}
 
@@ -194,7 +247,7 @@ class item_seen_by_Widget extends ComponentWidget
 			}
 
 			// Display each user as login with colored status icon:
-			$login_users[] = $status_icon.' '.$seen_post_User->get_identity_link( array( 'link_text' => 'auto' ) );
+			$login_users[] = '<span class="nowrap">'.$status_icon.' '.$seen_post_User->get_identity_link( array( 'link_text' => 'auto' ) ).'</span>';
 		}
 
 		// Print out all member logins with post read statuses:

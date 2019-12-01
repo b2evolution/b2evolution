@@ -202,11 +202,25 @@ function blog_update_perms( $object_ID, $context = 'user' )
 	// Unassign users that no longer can be assignees from the items of the collection:
 	$DB->query( 'UPDATE T_items__item
 			SET post_assigned_user_ID = NULL
-		WHERE post_main_cat_ID IN
+		WHERE post_assigned_user_ID IS NOT NULL
+		  AND post_main_cat_ID IN
 		  (
 		    SELECT cat_ID
 		      FROM T_categories
 		     WHERE cat_blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
+		  )
+		  AND post_assigned_user_ID NOT IN
+		  (
+		    SELECT user_ID
+		      FROM T_users
+		     INNER JOIN T_groups ON user_grp_ID = grp_ID
+		     WHERE grp_perm_blogs = "editall"
+		  )
+		  AND post_assigned_user_ID NOT IN
+		  (
+		    SELECT blog_owner_user_ID
+		      FROM T_blogs
+		     WHERE blog_ID IN ( '.$DB->quote( $coll_IDs ).' )
 		  )
 		  AND post_assigned_user_ID NOT IN
 		  (
@@ -1910,7 +1924,7 @@ function blogs_all_results_block( $params = array() )
 	}
 
 	// Create result set:
-	$blogs_Results = new Results( $SQL->get(), $params['results_param_prefix'], '---------A' );
+	$blogs_Results = new Results( $SQL->get(), $params['results_param_prefix'], '----------A' );
 	$blogs_Results->Cache = & get_BlogCache();
 	$blogs_Results->title = $params['results_title'];
 	$blogs_Results->no_results_text = $no_results;

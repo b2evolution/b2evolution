@@ -30,6 +30,9 @@ ol.breadcrumb {
   margin-left: 0;
   float: left;
 }
+ol.breadcrumb img {
+  margin-top: -2px;
+}
 .fa.icon {
   text-align: center;
   background: #FFF;
@@ -87,7 +90,16 @@ ol.breadcrumb {
   margin-top: 0;
 }
 .forums_list .panel-heading .btn {
-  margin: -6px 0 0 6px;
+  margin: -6px 0 -6px 6px;
+}
+.forums_list .panel-heading.panel-heading-columns {
+  padding-left: 0;
+  padding-right: 0;
+}
+.forums_list .panel-heading.panel-heading-columns select {
+  margin-top: -5px;
+  margin-bottom: -6px;
+  width: auto;
 }
 .forums_list.panel > a + .table {
   border-top: 1px solid #ddd;
@@ -346,7 +358,7 @@ ol.breadcrumb {
 }
 .evo_comment_title .label {
   display: inline-block;
-  padding-top: .3em;
+  padding-top: 0.3em;
   position: relative;
   top: -1px;
 }
@@ -760,10 +772,6 @@ aside .widget_core_coll_search_form div.compact_search_form input.search_field {
     float: right;
     margin-left: 10px;
   }
-  div.col-md-9.pull-right,
-  aside.col-md-3.pull-left {
-    float: none !important;
-  }
 }
 @media screen and (max-width: 767px) {
   .ft_date {
@@ -1101,4 +1109,7 @@ a.to_top {
 }
 .panel.evo_item_new_form {
   margin-bottom: 0;
+}
+.sidebar_wrapper.affix-forced-top {
+  position: static !important;
 }

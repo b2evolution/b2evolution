@@ -244,7 +244,7 @@ class ItemLight extends DataObject
 	 */
 	function & get_ItemType()
 	{
-		if( $this->ItemType === NULL )
+		if( empty( $this->ItemType ) )
 		{
 			$ItemTypeCache = & get_ItemTypeCache();
 			$this->ItemType = & $ItemTypeCache->get_by_ID( $this->ityp_ID, false, false );
@@ -371,7 +371,7 @@ class ItemLight extends DataObject
 						$blog_ID = $blog;
 					}
 				}
-				if( $blog_ID !== NULL && $blog_ID != $this->get_blog_ID() )
+				if( $blog_ID !== NULL && $blogurl != $this->Blog->gen_blogurl() )
 				{	// If requested collection is not collection of main category:
 					if( ! empty( $this->current_extra_cat_ID ) )
 					{	// Use first detected extra category:
@@ -1653,6 +1653,24 @@ class ItemLight extends DataObject
 
 
 	/**
+	 * Get setting of Item's collection
+	 *
+	 * @param string setting name
+	 * @return string|false|NULL value as string on success; NULL if not found; false in case of error
+	 */
+	function get_coll_setting( $parname )
+	{
+		if( $item_Blog = & $this->get_Blog() )
+		{	// Return setting value of this Item's collection 
+			return $item_Blog->get_setting( $parname );
+		}
+
+		// Error case when Item has no collection:
+		return false;
+	}
+
+
+	/**
 	 * Get array of tags.
 	 *
 	 * Load from DB if necessary, prefetching any other tags from MainList/ItemList.
@@ -1680,16 +1698,17 @@ class ItemLight extends DataObject
 				}
 
 				// Now fetch the tags:
-				foreach( $DB->get_results('
-					SELECT itag_itm_ID, tag_name
-						FROM T_items__itemtag INNER JOIN T_items__tag ON itag_tag_ID = tag_ID
-					 WHERE itag_itm_ID IN ('.$DB->quote($prefetch_item_IDs).')
-					 ORDER BY tag_name', OBJECT, 'Get tags for items' ) as $row )
+				$SQL = new SQL( 'Get tags for items #'.implode( ',', $prefetch_item_IDs ) );
+				$SQL->SELECT( 'itag_itm_ID, tag_ID, tag_name' );
+				$SQL->FROM( 'T_items__itemtag' );
+				$SQL->FROM_add( 'INNER JOIN T_items__tag ON itag_tag_ID = tag_ID' );
+				$SQL->WHERE( 'itag_itm_ID IN ('.$DB->quote($prefetch_item_IDs ).')' );
+				$SQL->ORDER_BY( 'tag_name' );
+				$tags = $DB->get_results( $SQL );
+				foreach( $tags as $tag )
 				{
-					$ItemTagsCache[$row->itag_itm_ID][] = $row->tag_name;
+					$ItemTagsCache[ $tag->itag_itm_ID ][ $tag->tag_ID ] = $tag->tag_name;
 				}
-
-				//pre_dump( $ItemTagsCache );
 			}
 
 			$this->tags = $ItemTagsCache[$this->ID];

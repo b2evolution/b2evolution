@@ -167,6 +167,11 @@ class Backup
 	var $backup_db_structure = true;
 
 	/**
+	 * Add "DROP TABLE IF EXISTS" before every "CREATE TABLE"
+	 */
+	var $drop_table_first = true;
+
+	/**
 	 * True if pack backup files
 	 * @var boolean
 	 */
@@ -240,6 +245,8 @@ class Backup
 		}
 
 		$this->backup_db_structure = param( 'db_structure', 'boolean', false, $memorize_params );
+
+		$this->drop_table_first = param( 'drop_table_first', 'boolean', false, $memorize_params );
 
 		$this->pack_backup_files = param( 'bk_pack_backup_files', 'boolean', 0, $memorize_params );
 
@@ -550,6 +557,12 @@ class Backup
 		echo sprintf( T_('Dumping tables to &laquo;<strong>%s</strong>&raquo;...'), $backup_sql_filepath ).'<br/>';
 		evo_flush();
 
+		if( $this->drop_table_first )
+		{	// Disable foreign key check to avoid errors due to referencial constraints:
+			fwrite( $f, "SET @fkey_check = @@foreign_key_checks;\n" );
+			fwrite( $f, "SET FOREIGN_KEY_CHECKS=0;\n\n" );
+		}
+
 		// Create and save created SQL backup script
 		foreach( $backup_structure as $table )
 		{
@@ -557,6 +570,10 @@ class Backup
 			echo sprintf( T_('Backing up table &laquo;<strong>%s</strong>&raquo; ...'), $table );
 			evo_flush();
 
+			if( $this->drop_table_first )
+			{	// Drop existing table before creating a new one:
+				fwrite( $f, 'DROP TABLE IF EXISTS `'.$table."`;\n" );
+			}
 			$row_table_data = $DB->get_row( 'SHOW CREATE TABLE '.$table, ARRAY_N );
 			fwrite( $f, $row_table_data[1].";\n\n" );
 
@@ -609,9 +626,9 @@ class Backup
 
 						fwrite( $f, $values );
 					}
-					unset( $rows );
 					$page++;
 				}
+				unset( $rows );
 
 				if( $is_insert_sql_started )
 				{ // End SQL INSERT clause
@@ -630,6 +647,11 @@ class Backup
 			}
 			echo '<br />';
 			evo_flush();
+		}
+
+		if( $this->drop_table_first )
+		{	// Restore foreign key check:
+			fwrite( $f, "SET FOREIGN_KEY_CHECKS=@fkey_check;\n" );
 		}
 
 		// Close backup file input stream

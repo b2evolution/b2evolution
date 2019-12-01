@@ -107,6 +107,7 @@ $thumbnail_sizes = array(
 			'fit-160x160-blur-18' => array( 'fit', 160, 160, 80, 18 ),
 			'fit-160x120' => array( 'fit', 160, 120, 80 ),
 			'fit-128x128' => array( 'fit', 128, 128, 80 ),
+			'fit-128x16' => array( 'fit', 128, 16, 80 ),
 			'fit-80x80' => array( 'fit', 80, 80, 80 ),
 			'crop-480x320' => array( 'crop', 480, 320, 90 ),
 			'crop-256x256' => array( 'crop', 256, 256, 85 ),
@@ -622,9 +623,15 @@ $public_access_to_media = true;
 
 
 /**
- * File extensions that the admin will not be able to enable in the Settings
+ * File extensions that can never be made "NOT sensitive"
+ * Admins will NOT be able to enable these for non-admin users in the FileType Settings.
  */
 $force_upload_forbiddenext = array( 'cgi', 'exe', 'htaccess', 'htpasswd', 'php', 'php3', 'php4', 'php5', 'php6', 'phtml', 'pl', 'vbs' );
+
+/**
+ * Should Admins be able to upload/rename/edit sensitive files?
+ */
+$admins_can_manipulate_sensitive_files = false;
 
 /**
  * The admin can configure the regexp for valid file names in the Settings interface

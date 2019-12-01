@@ -21,6 +21,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 load_funcs('antispam/model/_antispam.funcs.php');
 load_funcs('tools/model/_email.funcs.php');
+load_funcs('sessions/model/_cookie.funcs.php');
 
 // @todo sam2kb> Move core functions get_admin_skins, get_filenames, cleardir_r, rmdir_r and some other
 // to a separate file, and split files_Module from _core_Module
@@ -1333,9 +1334,11 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 		else
 		{ // State: we're not currently in any tag:
 			// Find next tag opening:
-			if( ( $b = strpos( $text, '[', $i ) ) !== false )
-			{	// Check if a bracket '[]' short tag is really opening:
+			if( ( $b = strpos( $text, '[', $i ) ) !== false &&
+			    $b < strpos( $text, '<', $i ) )
+			{	// Check if a bracket '[]' short tag is really opening but not after html tag:
 				// (we are finding here short tags like [image:], [emailcapture:], [fields:], [compare:] and etc., see full list in the Item->render_inline_tags())
+				$start_b = $b;
 				$b++;
 				$short_tag_name = '';
 				while( isset( $text[ $b ] ) && $text[ $b ] != ':' && $text[ $b ] != ']' )
@@ -1345,6 +1348,10 @@ function make_clickable( $text, $moredelim = '&amp;', $callback = 'make_clickabl
 				}
 				// We are inside bracket short tag if its name contains only letters:
 				$inside_bracket_short_tag = preg_match( '/^[a-z]+$/', $short_tag_name );
+				if( $inside_bracket_short_tag )
+				{	// Set index to call user func below between two inline short tags:
+					$i = $start_b;
+				}
 			}
 
 			if( ! $inside_bracket_short_tag )
@@ -2170,7 +2177,7 @@ function is_word( $word )
  * Check if the login is valid (in terms of allowed chars)
  *
  * @param string login
- * @return boolean true if OK
+ * @return boolean|string TRUE if OK, FALSE if error, special error cases: 'usr', 'long'
  */
 function is_valid_login( $login, $force_strict_logins = false )
 {
@@ -2212,6 +2219,13 @@ function is_valid_login( $login, $force_strict_logins = false )
 	{	// Logins cannot start with 'usr_', this prefix is reserved for system use
 		// We create user media directories for users with non-ASCII logins in format /media/users/usr_55/, where 55 is user ID
 		return 'usr';
+	}
+
+	// Step 4
+	// To avoid MySQL erro on insert long data
+	if( utf8_strlen( $login ) > 20 )
+	{	// Don't allow long login:
+		return 'long';
 	}
 
 	return true;
@@ -3823,6 +3837,26 @@ function check_cron_job_emails_limit()
 
 
 /**
+ * Get additional error message on failed mail sending
+ *
+ * @return string
+ */
+function get_send_mail_error()
+{
+	global $Settings;
+
+	if( $Settings->get( 'email_service' ) == 'smtp' && ! $Settings->get( 'force_email_sending' ) )
+	{	// Only SMTP is used:
+		return T_('Recipient email address does not seem to work.');
+	}
+	else
+	{	// PHP "mail" function is used by default or it was forced after failed SMTP sending:
+		return T_('Possible reason: the PHP mail() function may have been disabled on the server.');
+	}
+}
+
+
+/**
  * Sends an email, wrapping PHP's mail() function.
  * ALL emails sent by b2evolution must be sent through this function (for consistency and for logging)
  *
@@ -4119,6 +4153,7 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				// 'notify_published_comments' - "a comment is published on one of my posts.",
 				// 'notify_comment_moderation' - "a comment is posted and I have permissions to moderate it.",
 				// 'notify_edit_cmt_moderation' - "a comment is modified and I have permissions to moderate it.",
+				// 'notify_meta_comment_mentioned' - "I have been mentioned on a meta comment.",
 				// 'notify_meta_comments' - "a meta comment is posted.".
 			case 'comment_spam':
 				// 'notify_spam_cmt_moderation' - "a comment is reported as spam and I have permissions to moderate it."
@@ -4326,16 +4361,17 @@ function mail_autoinsert_user_data( $text, $User = NULL, $format = 'text', $user
 		if( $format == 'html' )
 		{
 			$username = $User->get_colored_login( array(
-					'mask'      => '$avatar$ $login$',
-					'login_text'=> 'name',
-					'use_style' => true,
-					'protocol'  => 'http:',
+					'mask'        => '$avatar$ $login$',
+					'login_text'  => 'name',
+					'use_style'   => true,
+					'extra_class' => 'normal_weight',
+					'protocol'    => 'http:',
 				) );
 
 			$user_login = $User->get_colored_login( array(
-					'mask'      => '$avatar$ $login$',
-					'use_style' => true,
-					'protocol'  => 'http:',
+					'mask'        => '$avatar$ $login$',
+					'use_style'   => true,
+					'protocol'    => 'http:',
 				) );
 		}
 		else
@@ -5076,6 +5112,11 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					}
 				}
 
+				if( isset( $params['title'] ) && $params['title'] === false )
+				{	// Disable title:
+					unset( $params['title'] );
+				}
+
 				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
 				if( isset( $params['title'] ) )
 				{
@@ -5164,6 +5205,11 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 					{
 						$params['title'] = $icon['alt'];
 					}
+				}
+
+				if( isset( $params['title'] ) && $params['title'] === false )
+				{	// Disable title:
+					unset( $params['title'] );
 				}
 
 				// Format title and alt attributes because they may contain the unexpected chars from translatable strings:
@@ -7542,112 +7588,6 @@ function apm_log_custom_param( $name, $value )
 
 
 /**
- * Get cookie domain depending on current page:
- *     - For back-office the config var $cookie_domain is used
- *     - For front-office it is dynamically generated from collection url
- *
- * @return string Cookie domain
- */
-function get_cookie_domain()
-{
-	global $Collection, $Blog;
-
-	if( is_admin_page() || empty( $Blog ) )
-	{	// Use cookie domain of base url from config:
-		global $cookie_domain;
-		return $cookie_domain;
-	}
-	else
-	{	// Use cookie domain of current collection url:
-		return $Blog->get_cookie_domain();
-	}
-}
-
-
-/**
- * Get cookie path depending on current page:
- *     - For back-office the config var $cookie_path is used
- *     - For front-office it is dynamically generated from collection url
- *
- * @return string Cookie path
- */
-function get_cookie_path()
-{
-	global $Collection, $Blog;
-
-	if( is_admin_page() || empty( $Blog ) )
-	{	// Use cookie path of base url from config:
-		global $cookie_path;
-		return $cookie_path;
-	}
-	else
-	{	// Use base path of current collection url:
-		return $Blog->get_cookie_path();
-	}
-}
-
-
-/**
- * Set a cookie to send it by evo_sendcookies()
- *
- * @param string The name of the cookie
- * @param string The value of the cookie
- * @param integer The time the cookie expires
- * @param string DEPRECATED: The path on the server in which the cookie will be available on
- * @param string DEPRECATED: The domain that the cookie is available
- * @param boolean Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client
- * @param boolean When TRUE the cookie will be made accessible only through the HTTP protocol
- */
-function evo_setcookie( $name, $value = '', $expire = 0, $dummy = '', $dummy2 = '', $secure = false, $httponly = false )
-{
-	global $evo_cookies;
-
-	if( ! is_array( $evo_cookies ) )
-	{	// Initialize array for cookies only first time:
-		$evo_cookies = array();
-	}
-
-	// Store cookie in global var:
-	$evo_cookies[ $name ] = array(
-			'value'    => $value,
-			'expire'   => $expire,
-			'secure'   => $secure,
-			'httponly' => $httponly,
-		);
-}
-
-
-/**
- * Send the predefined cookies (@see setcookie() for more details)
- */
-function evo_sendcookies()
-{
-	global $evo_cookies;
-
-	if( headers_sent() )
-	{	// Exit to avoid errors because headers already were sent:
-		return;
-	}
-
-	if( empty( $evo_cookies ) )
-	{	// No cookies:
-		return;
-	}
-
-	$current_cookie_domain = get_cookie_domain();
-	$current_cookie_path = get_cookie_path();
-
-	foreach( $evo_cookies as $evo_cookie_name => $evo_cookie )
-	{
-		setcookie( $evo_cookie_name, $evo_cookie['value'], $evo_cookie['expire'], $current_cookie_path, $current_cookie_domain, $evo_cookie['secure'], $evo_cookie['httponly'] );
-
-		// Unset to don't send cookie twice:
-		unset( $evo_cookies[ $evo_cookie_name ] );
-	}
-}
-
-
-/**
  * Echo JavaScript to edit values of column in the table list
  *
  * @param array Params
@@ -8843,7 +8783,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					{
 						case 'Item':
 							// Get the IMG tag with link to original image or to Item page:
-							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
+							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params )
+								.'<div class="clearfix"></div>';
 							break;
 
 						case 'EmailCampaign':
@@ -8859,12 +8800,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 									'image_link_to' => false,
 									'image_style'   => 'border: none; max-width: 100%; height: auto;'.$image_style,
 									'add_loadimg'   => false,
-								) ) );
+								) ) )
+								.'<div class="clearfix"></div>';;
 							break;
 
 						default:
 							// Get the IMG tag with link to original big image:
-							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) );
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) )
+								.'<div class="clearfix"></div>';
 							break;
 					}
 				}
@@ -9862,5 +9805,38 @@ function get_import_attachments_folder( $file_path, $first_folder = false )
 
 	// File has no attachments folder
 	return false;
+}
+
+
+/**
+ * Clear string list of IDs to exclude wrong not ID/number/integer value
+ *
+ * @param string ID values separated by second param
+ * @param string Separator
+ * @return string Fixed list
+ */
+function clear_ids_list( $ids_list, $separator = ',' )
+{
+	if( $ids_list === '' )
+	{	// Empty list:
+		return $ids_list;
+	}
+
+	if( strpos( $ids_list, '-' ) === 0 )
+	{	// Remove first '-' char from start, which is used for exluding list:
+		$ids_list = substr( $ids_list, 1 );
+	}
+
+	$ids_list = explode( $separator, $ids_list );
+
+	foreach( $ids_list as $i => $ID )
+	{
+		if( ! is_number( $ID ) )
+		{	// Remove a not number value from list:
+			unset( $ids_list[ $i ] );
+		}
+	}
+
+	return implode( $separator, $ids_list );
 }
 ?>

@@ -15,56 +15,80 @@ jQuery( document ).ready( function()
 	/**
 	 * Change header position to fixed or revert to static
 	 */
-	function change_position_leftnav()
+	function change_position_leftnav( $sidebar, $sidebarSpacer )
 	{
 		if( has_touch_event )
 		{ // Don't fix the objects on touch devices
 			return;
 		}
 
-		if( sidebar_size )
-		{ // Sidebar exists
-			if( !$sidebar.hasClass( 'fixed' ) && jQuery( window ).scrollTop() > $sidebar.offset().top - sidebar_top )
-			{ // Make sidebar as fixed if we scroll down
+		if( $sidebar.size() )
+		{	// Sidebar exists
+			var column_top_point = $sidebar.offset().top;
+			var sidebar_top_start_point = top_start_point;
+			var sidebar_height = $sidebar.outerHeight();
+			jQuery( sidebar_selectors ).each( function()
+			{
+				if( $sidebar.offset().left == jQuery( this ).offset().left )
+				{	// This is the same column:
+					if( column_top_point > jQuery( this ).offset().top )
+					{	// Find the toppest point of the column:
+						column_top_point = jQuery( this ).offset().top;
+					}
+					if( jQuery( this ).attr( 'id' ) != $sidebar.attr( 'id' ) )
+					{	// This another sidebar but from the same column:
+						sidebar_height += jQuery( this ).outerHeight();
+						if( $sidebar.offset().top > jQuery( this ).offset().top )
+						{
+							sidebar_top_start_point += jQuery( this ).outerHeight();
+						}
+					}
+				}
+			} );
+
+			$sidebar.css( 'width', $sidebar.parent().width() );
+			if( ! $sidebar.hasClass( 'fixed' ) &&
+					sidebar_height < jQuery( window ).height() &&
+					jQuery( window ).scrollTop() > $sidebar.offset().top - sidebar_top_start_point )
+			{	// Make sidebar as fixed if we scroll down:
 				$sidebar.before( $sidebarSpacer );
-				$sidebar.addClass( 'fixed' ).css( 'top', sidebar_top + 'px' );
+				$sidebar.addClass( 'fixed' ).css( 'top', sidebar_top_start_point + 'px' );
 			}
-			else if( $sidebar.hasClass( 'fixed' )  && jQuery( window ).scrollTop() < $sidebarSpacer.offset().top - sidebar_top )
-			{ // Remove 'fixed' class from sidebar if we scroll to the top of page
+			else if( $sidebar.hasClass( 'fixed' ) &&
+					jQuery( window ).scrollTop() < $sidebarSpacer.offset().top - sidebar_top_start_point )
+			{	// Remove 'fixed' class from sidebar if we scroll to the top of page:
 				$sidebar.removeClass( 'fixed' ).css( 'top', '' );
 				$sidebarSpacer.remove();
 			}
 
 			if( $sidebar.hasClass( 'fixed' ) )
-			{ // Check and fix an overlapping of footer with sidebar
-				$sidebar.css( 'top', sidebar_top + 'px' );
-				var diff = parseInt( $sidebar.offset().top + $sidebar.outerHeight() - jQuery( '.evo_container__footer' ).offset().top );
+			{	// Check and fix an overlapping of footer with sidebar:
+				$sidebar.css( 'top', sidebar_top_start_point + 'px' );
+				var diff = parseInt( column_top_point + sidebar_height - jQuery( '.evo_container__footer' ).offset().top );
 				if( diff >= 0 )
 				{
-					$sidebar.css( 'top', parseInt( sidebar_top - diff - 5 ) + 'px' );
+					$sidebar.css( 'top', parseInt( sidebar_top_start_point - diff - 5 ) + 'px' );
 				}
 			}
 		}
 	}
 
-	var sidebar_shift = jQuery( '.sitewide_header' ).length > 0 ? 54 : 0;
-	var $sidebar = jQuery( '#evo_container__sidebar' );
-	if( $sidebar.outerHeight( true ) + 70/* footer height */ < jQuery( window ).height() )
+	var top_start_point = ( jQuery( '#evo_toolbar' ).length > 0 ? 28 : 0 ) + ( jQuery( '.sitewide_header' ).length > 0 ? 54 : 0 );
+	var sidebar_selectors = '#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single';
+	jQuery( sidebar_selectors ).each( function()
 	{
-		var sidebar_size = $sidebar.size();
-		var sidebar_top = ( jQuery( '#evo_toolbar' ).length > 0 ? 28 : 0 ) + sidebar_shift;
-		var $sidebarSpacer = $( '<div />', {
-				"class" : "evo_container__sidebar fixed_spacer",
-				"height": $sidebar.outerHeight()
+		var $sidebar = jQuery( this );
+		if( $sidebar.outerHeight( true ) + 70/* footer height */ < jQuery( window ).height() )
+		{
+			var $sidebarSpacer = jQuery( '<div />', {
+					"class" : "evo_container__sidebar fixed_spacer",
+					"height": $sidebar.outerHeight( true )
+				} );
+			jQuery( window ).bind( 'scroll resize', function ()
+			{
+				change_position_leftnav( $sidebar, $sidebarSpacer );
 			} );
-		jQuery( window ).scroll( function ()
-		{
-			change_position_leftnav();
-		} );
-		jQuery( window ).resize( function()
-		{
-			change_position_leftnav();
-		} );
-	}
-
+			change_position_leftnav( $sidebar, $sidebarSpacer );
+		}
+	} );
 } );

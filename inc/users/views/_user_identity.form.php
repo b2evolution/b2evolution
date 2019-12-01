@@ -244,7 +244,7 @@ if( $action != 'view' )
 		$Form->info( T_('Profile picture'), $user_pictures );
 	}
 
-	$Form->text_input( 'edited_user_login', $edited_User->login, 20, /* TRANS: noun */ T_('Login'), '', array( 'maxlength' => 60, 'required' => true ) );
+	$Form->text_input( 'edited_user_login', $edited_User->login, 20, /* TRANS: noun */ T_('Login'), '', array( 'maxlength' => 20, 'required' => true ) );
 
 	$firstname_editing = $Settings->get( 'firstname_editing' );
 	if( ( in_array( $firstname_editing, $edited_user_perms ) && $edited_User->ID == $current_User->ID ) || ( $firstname_editing != 'hidden' && $has_moderate_access ) )

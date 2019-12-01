@@ -2021,6 +2021,20 @@ class Plugin
 
 
 	/**
+	 * Event handler: called at the beginning of {@link Comment::dbupdate() updating
+	 * a Comment in the database}.
+	 *
+	 * Use this to manipulate the {@link Comment}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the related Comment (by reference)
+	 */
+	function PrependCommentUpdateTransact( & $params )
+	{
+	}
+
+
+	/**
 	 * Event handler: called at the end of {@link Comment::dbupdate() updating
 	 * a comment in the database}.
 	 *
@@ -2030,6 +2044,20 @@ class Plugin
 	 *                  before they got applied (since 1.9)
 	 */
 	function AfterCommentUpdate( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link Comment::dbinsert() inserting
+	 * a Comment in the database}.
+	 *
+	 * Use this to manipulate the {@link Comment}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Comment': the related Comment (by reference)
+	 */
+	function PrependCommentInsertTransact( & $params )
 	{
 	}
 
@@ -2259,6 +2287,21 @@ class Plugin
 		}
 	}
 
+
+	/**
+	 * Event handler: called at the beginning of {@link Message::dbinsert_discussion() or Message::dbinsert_message() inserting
+	 * an Message in the database}.
+	 *
+	 * Use this to manipulate the {@link Message}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'Message': the related Message (by reference)
+	 */
+	function PrependMessageInsertTransact( & $params )
+	{
+	}
+
+
 	/**
 	 * Event handler: Called when rendering message contents as HTML. (CACHED)
 	 *
@@ -2363,6 +2406,35 @@ class Plugin
 			}
 		}
 	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link EmailCampaign::dbinsert() inserting
+	 * an Email Campaign in the database}.
+	 *
+	 * Use this to manipulate the {@link EmailCampaign}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the related EmailCampaign (by reference)
+	 */
+	function PrependEmailInsertTransact( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: called at the beginning of {@link EmailCampaign::dbupdate() updating
+	 * an Email Campaign in the database}.
+	 *
+	 * Use this to manipulate the {@link EmailCampaign}.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'EmailCampaign': the related EmailCampaign (by reference)
+	 */
+	function PrependEmailUpdateTransact( & $params )
+	{
+	}
+
 
 	/**
 	 * Event handler: Called when rendering email contents as HTML. (CACHED)
@@ -3870,24 +3942,42 @@ class Plugin
 	{
 		$setting_Blog = false;
 
-		if( ! empty( $params['Item'] ) )
-		{	// Get Blog from given Item:
-			$Item = & $params['Item'];
-			$setting_Blog = & $Item->get_Blog();
-		}
-		elseif( ! empty( $params['Comment'] ) )
-		{	// Get Blog from given Comment:
-			$Comment = & $params['Comment'];
-			$Item = & $Comment->get_Item();
-			$setting_Blog = & $Item->get_Blog();
+		if( $setting_Item = & $this->get_Item_from_params( $params ) )
+		{	// Get Collection from given Item or Comment:
+			$setting_Blog = & $setting_Item->get_Blog();
 		}
 		elseif( ! empty( $params['Blog'] ) )
-		{	// Get Blog from params:
+		{	// Get Collection from params:
 			$setting_Blog = & $params['Blog'];
 		}
 
 		return $setting_Blog;
 	}
+
+
+	/**
+	 * Get Item from given params
+	 *
+	 * @param array Params: 'Item', 'Comment'
+	 * @return object|false Item object or FALSE with wrong params
+	 */
+	function & get_Item_from_params( $params )
+	{
+		$setting_Item = false;
+
+		if( ! empty( $params['Item'] ) && $params['Item'] instanceof Item )
+		{	// Use the passed Item:
+			$setting_Item = & $params['Item'];
+		}
+		elseif( ! empty( $params['Comment'] ) && $params['Comment'] instanceof Comment )
+		{	// Get Item from given Comment:
+			$Comment = & $params['Comment'];
+			$setting_Item = & $Comment->get_Item();
+		}
+
+		return $setting_Item;
+	}
+
 
 	/**
 	 * Get a skin specific param value from current Blog

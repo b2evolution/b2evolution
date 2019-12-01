@@ -78,7 +78,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Username display in back-office').get_manual_link('user-bubble-tips-settings')  );
+$Form->begin_fieldset( T_('Username display in back-office').get_manual_link('user-username-display-backoffice')  );
 
 	$Form->checkbox_input( 'bubbletip', $Settings->get('bubbletip'), T_('Username bubble tips'), array( 'note'=>T_('Check to enable bubble tips on usernames') ) );
 
@@ -91,7 +91,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Username display for logged-in users (front-office)').get_manual_link('user-bubble-tips-settings') );
+$Form->begin_fieldset( T_('Username display for logged-in users (front-office)').get_manual_link('user-username-display-frontoffice') );
 
 	$Form->radio( 'user_url_loggedin', $Settings->get( 'user_url_loggedin' ),
 		array( array( 'page', T_('Always user page'), '' ),
@@ -109,7 +109,7 @@ $Form->end_fieldset();
 
 // --------------------------------------------
 
-$Form->begin_fieldset( T_('Username display for anonymous user (front-office)').get_manual_link('user-bubble-tips-settings') );
+$Form->begin_fieldset( T_('Username display for anonymous user (front-office)').get_manual_link('user-username-display-anonymous') );
 
 	$Form->radio( 'user_url_anonymous', $Settings->get( 'user_url_anonymous' ),
 		array( array( 'page', T_('Always user page (if allowed)'), '' ),

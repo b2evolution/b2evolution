@@ -1316,6 +1316,14 @@ function get_icon_info( $name )
 			'glyph' => 'link',
 			'fa' => 'link'
 		);
+
+		case 'tag': return array(
+			'alt' => T_('Tag'),
+			'size' => array( 11, 13 ),
+			'xy' => array( 0, 128 ),
+			'glyph' => 'tag',
+			'fa' => 'tag'
+		);
 	}
 }
 ?>

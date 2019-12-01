@@ -382,10 +382,31 @@ switch( $action )
 			}
 		}
 
+		if( $edited_Blog->get_setting( 'default_cat_ID' ) != $edited_Chapter->ID )
+		{	// Move all "content-block" items from previous main Category to new:
+			// (we need to do this because impossible delete a category with items,
+			// but "content-block" items have no possibility to change category from edit form)
+			$moved_items_num = $DB->query( 'UPDATE T_items__item
+				INNER JOIN T_items__type ON post_ityp_ID = ityp_ID
+				  SET post_main_cat_ID = '.$DB->quote( $edited_Chapter->ID ).'
+				WHERE post_main_cat_ID = '.$DB->quote( $edited_Blog->get_setting( 'default_cat_ID' ) ).'
+				  AND ityp_usage = "content-block"' );
+			$DB->query( 'UPDATE T_postcats
+				INNER JOIN T_items__item ON post_ID = postcat_post_ID
+				INNER JOIN T_items__type ON post_ityp_ID = ityp_ID
+				  SET postcat_cat_ID = '.$DB->quote( $edited_Chapter->ID ).'
+				WHERE postcat_cat_ID = '.$DB->quote( $edited_Blog->get_setting( 'default_cat_ID' ) ).'
+				  AND ityp_usage = "content-block"' );
+		}
+
 		$edited_Blog->set_setting( 'default_cat_ID', $edited_Chapter->ID );
 		$edited_Blog->dbsave();
 
 		$Messages->add( sprintf( T_('Default category of this collection has been updated to "%s".'), $edited_Chapter->get( 'name' ) ), 'success' );
+		if( ! empty( $moved_items_num ) )
+		{	// Inform about moved items:
+			$Messages->add( sprintf( T_('Please note %d "content-block" items have been moved to new default category.'), $moved_items_num ), 'note' );
+		}
 
 		// We want to highlight the edited object on next list display:
 		$Session->set( 'fadeout_array', array( $edited_Chapter->ID ) );

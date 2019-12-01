@@ -33,12 +33,68 @@ skin_widget( array(
 		'separator'        => '',
 		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
 		'item_active_mask' => '<li class="active">$title$</li>',
+		'coll_logo_size'   => 'fit-128x16',
 	) );
 
 if( ! is_array( $legend_icons ) )
 { // Init this array only first time
 	$legend_icons = array();
 }
+
+// ------------------------------- START OF POSTS ASSIGNED TO CURRENT USER -------------------------------
+if( is_logged_in() &&
+    $Blog->get_setting( 'use_workflow' ) &&
+    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
+{	// Only if current User can be assigned to tasks of the current Collection:
+	$assigned_ItemList = new ItemList2( $Blog, NULL, NULL, 15, 'ItemCache', 'assigned_' );
+	$assigned_ItemList->set_filters( array(
+			'assignees' => $current_User->ID,
+			'orderby'   => 'priority,last_touched_ts',
+			'order'     => 'ASC,DESC',
+			'page'      => param( 'assigned_paged', 'integer', 1 ),
+			'statuses'  => param( 'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', '' ),
+		), false );
+	$assigned_ItemList->query();
+?>
+<div class="panel panel-default forums_list">
+<?php
+	// Display header for list of assigned tasks for current User:
+	$Skin->display_posts_list_header( T_('Assigned to me') );
+
+	if( $assigned_ItemList->result_num_rows > 0 )
+	{	// Display panel with assigned posts if at least one is found:
+		while( $Item = $assigned_ItemList->get_item() )
+		{
+			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
+			skin_include( '_item_list.inc.php', array(
+					'content_mode'  => 'auto', // 'auto' will auto select depending on $disp-detail
+					'image_size'    => 'fit-1280x720',
+				) );
+			// ----------------------------END ITEM BLOCK  ----------------------------
+		}
+
+		// Display pagination for assigned posts:
+		$assigned_ItemList->page_links(  array(
+				'block_start'           => '<div class="panel-body comments_link__pagination" style="margin-bottom:0"><ul class="pagination">',
+				'block_end'             => '</ul></div>',
+				'page_current_template' => '<span>$page_num$</span>',
+				'page_item_before'      => '<li>',
+				'page_item_after'       => '</li>',
+				'page_item_current_before' => '<li class="active">',
+				'page_item_current_after'  => '</li>',
+				'prev_text'             => '<i class="fa fa-angle-double-left"></i>',
+				'next_text'             => '<i class="fa fa-angle-double-right"></i>',
+			) );
+	}
+	else
+	{	// No assigned tasks:
+		echo '<div class="ft_no_post">'.T_('No assigned tasks.').'</div>';
+	}
+?>
+</div>
+<?php
+}
+// -------------------------------- END OF POSTS ASSIGNED TO CURRENT USER --------------------------------
 
 // ------------------------------- START OF INTRO-FRONT POST -------------------------------
 if( $Item = & get_featured_Item( 'front' ) )

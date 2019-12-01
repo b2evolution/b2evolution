@@ -90,8 +90,10 @@ if( !empty( $template_action ) )
 			break;
 
 		case 'delete_orphan_files':
-			// delete orphan File objects with no matching file on disk
-			dbm_delete_orphan_files();
+			// delete orphan File objects with no matching file on disk:
+			$delete_files = param( 'delete_files', 'integer' ); // Should we try to delete the found orphan files?
+			$delete_linked = param( 'delete_linked', 'integer' ); // Should we delete the found orphan files together with links?
+			dbm_delete_orphan_files( $delete_files, $delete_linked );
 			break;
 
 		case 'delete_orphan_file_roots':
@@ -236,7 +238,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		echo '<li><a href="'.regenerate_url( 'action', 'action=find_broken_slugs&amp;'.url_crumb( 'tools')).'">'.T_('Find all broken slugs (with no matching Item) + Option to delete - DB only.').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_comments&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan Comments (with no matching Item) - Disk &amp; DB.').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_comment_uploads&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan comment Uploads - Disk &amp; DB.').'</a></li>';
-		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_files&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan File objects (with no matching file on disk) - DB only.').'</a></li>';
+		echo '<li><a href="'.regenerate_url( 'action', 'action=show_orphan_files_form&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan File objects (with no matching file on disk) - DB only.').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=delete_orphan_file_roots&amp;'.url_crumb( 'tools' ) ).'">'.T_('Find and delete all orphan file roots (with no matching Collection or User) and all of their content recursively - Disk &amp; DB.').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=prune_hits_sessions&amp;'.url_crumb( 'tools' ) ).'">'.T_('Prune old hits &amp; sessions (includes OPTIMIZE) - DB only.').'</a></li>';
 		echo '<li><a href="'.regenerate_url( 'action', 'action=recreate_itemslugs&amp;'.url_crumb( 'tools' ) ).'">'.T_('Recreate all item Slugs (change title-[0-9] canonical slugs to a slug generated from current title). Old slugs will still work, but will redirect to the new ones - DB only.').'</a></li>';

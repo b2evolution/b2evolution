@@ -22,7 +22,7 @@ class auto_p_plugin extends Plugin
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
 	var $priority = 80;
-	var $version = '6.11.2';
+	var $version = '6.11.4';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -97,13 +97,25 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 	 */
 	function RenderItemAsHtml( & $params )
 	{
-		#echo '<hr style="border:1em solid blue;" />';
+		$content = & $params['data'];
 
+		$content = $this->render_autop( $content );
+
+		return true;
+	}
+
+
+	/**
+	 * Render content to apply auto <p> and <br>
+	 *
+	 * @param string Source content
+	 * @return string Rendered content
+	 */
+	function render_autop( $content )
+	{
 		$this->use_auto_br = $this->Settings->get('br');
 		$this->add_p_in_block = $this->Settings->get('add_p_in_block');
 		$this->skip_tags = preg_split( '~\s+~', $this->Settings->get('skip_tags'), -1, PREG_SPLIT_NO_EMPTY );
-
-		$content = & $params['data'];
 
 		$content = preg_replace( "~(\r\n|\r)~", "\n", $content ); // cross-platform newlines
 
@@ -118,7 +130,7 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 			$content .= $content_parts[ $i + 1 ];
 		}
 
-		return true;
+		return $content;
 	}
 
 
@@ -130,12 +142,24 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 	 */
 	function get_coll_setting_definitions( & $params )
 	{
-		$default_params = array_merge( $params,
-			array(
+		$default_params = array(
 				'default_comment_rendering' => 'stealth',
 				'default_post_rendering' => 'opt-out'
-			)
-		);
+			);
+
+		if( ! empty( $params['blog_type'] ) )
+		{	// Set default settings depending on collection type:
+			switch( $params['blog_type'] )
+			{
+				case 'forum':
+					$default_params['default_comment_rendering'] = 'never';
+					$default_params['default_post_rendering'] = 'never';
+					break;
+			}
+		}
+
+		$default_params = array_merge( $params, $default_params );
+
 		return parent::get_coll_setting_definitions( $default_params );
 	}
 

@@ -3864,7 +3864,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( $old_db_version < 10600 )
 	{	//  part 4
 
-		// For create_default_regions() and create_default_subregions():
+		// For create_default_regions():
 		require_once dirname(__FILE__).'/_functions_create.php';
 
 		task_begin( 'Renaming Countries table...' );
@@ -3902,8 +3902,6 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			UNIQUE subrg_rgn_ID_code (subrg_rgn_ID, subrg_code)
 		) ENGINE = innodb' );
 		task_end();
-
-		create_default_subregions();
 
 		task_begin( 'Creating Cities table...' );
 		$DB->query( 'CREATE TABLE T_regional__city (
@@ -10535,6 +10533,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			  END AS new_cset_name
 			  FROM T_coll_settings
 			 WHERE cset_name IN ( "default_noindex", "canonical_homepage", "self_canonical_homepage", "relcanonical_homepage" )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 13220, 'Upgrading cron tasks table...' ) )
+	{	// part of 6.11.3-stable
+		db_modify_col( 'T_cron__task', 'ctsk_params', 'TEXT NULL' );
 		upg_task_end();
 	}
 

@@ -136,9 +136,8 @@ function skin_init( $disp )
 
 		case 'search':
 			// Searching post, comments and categories
+			// Load functions to work with search results:
 			load_funcs( 'collections/_search.funcs.php' );
-			// Check previous search keywords so it can be displayed in the search input box
-			param( 's', 'string', '', true );
 			break;
 	}
 
@@ -188,14 +187,15 @@ function skin_init( $disp )
 				$canonical_is_same_url = true;
 				$item_Blog = & $Item->get_Blog();
 				// Use item URL from first detected category of the current collection:
+				$main_canonical_url = $Item->get_permanent_url( '', '', '&' );
 				if( $item_Blog->get_setting( 'allow_crosspost_urls' ) )
 				{	// If non-canonical URL is allowed for cross-posted items,
-					// try to get a canonical URL in thecurrent collection even it is not main/canonical collection of the Item:
+					// try to get a canonical URL in the current collection even it is not main/canonical collection of the Item:
 					$canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID );
 				}
 				else
 				{	// If non-canonical URL is allowed for cross-posted items, then only get canonical URL in the main collection:
-					$canonical_url = $Item->get_permanent_url( '', '', '&' );
+					$canonical_url = $main_canonical_url;
 				}
 				$canonical_url_params_regexp = '#[&?](page=\d+|mode=quote&[qcp]+=\d+)+#';
 				if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
@@ -269,7 +269,6 @@ function skin_init( $disp )
 						}
 						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
-
 					if( ! $url_resolved &&
 					    $Blog->get_setting( 'canonical_item_urls' ) &&
 					    $redir == 'yes' &&
@@ -282,13 +281,13 @@ function skin_init( $disp )
 						// EXITED.
 					}
 					elseif( $Blog->get_setting( 'relcanonical_item_urls' ) )
-					{	// Use rel="canoncial":
-						add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+					{	// Use rel="canoncial" with MAIN canoncial URL:
+						add_headline( '<link rel="canonical" href="'.$main_canonical_url.'" />' );
 					}
 				}
 				elseif( $Blog->get_setting( 'self_canonical_item_urls' ) )
-				{	// Use self-referencing rel="canonical" tag:
-					add_headline( '<link rel="canonical" href="'.$canonical_url.'" />' );
+				{	// Use self-referencing rel="canonical" tag with MAIN canoncial URL:
+					add_headline( '<link rel="canonical" href="'.$main_canonical_url.'" />' );
 				}
 			}
 
@@ -394,9 +393,16 @@ function skin_init( $disp )
 				{ // This is just a follow "paged" page
 					$disp_detail = 'posts-next';
 					$seo_page_type = 'Next page';
-					if( $Blog->get_setting( 'paged_noindex' ) )
-					{	// We prefer robots not to index category pages:
-						$robots_index = false;
+
+					if( has_featured_Item() )
+					{	// If current next page has Intro post:
+						$disp_detail .= '-intro';
+						$robots_index = ! $Blog->get_setting( 'paged_intro_noindex' );
+					}
+					else
+					{	// If current next page has no Intro post:
+						$disp_detail .= '-nointro';
+						$robots_index = ! $Blog->get_setting( 'paged_noindex' );
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'cat_single', 'cat_array', 'cat_modifier', 'cat_focus', 'posts', 'page' ) ) == array() )
@@ -470,16 +476,22 @@ function skin_init( $disp )
 							$disp = '404';
 							break;
 						}
+
+						if( has_featured_Item() )
+						{	// If current category has Intro post:
+							$disp_detail .= '-intro';
+							$robots_index = ! $Blog->get_setting( 'chapter_intro_noindex' );
+						}
+						else
+						{	// If current category has no Intro post:
+							$disp_detail .= '-nointro';
+						}
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'tags', 'posts', 'page' ) ) == array() )
 				{ // This is a tag page
 					$disp_detail = 'posts-tag';
 					$seo_page_type = 'Tag page';
-					if( $Blog->get_setting( 'tag_noindex' ) )
-					{	// We prefer robots not to index tag pages:
-						$robots_index = false;
-					}
 
 					if( ( $Blog->get_setting( 'canonical_tag_urls' ) && $redir == 'yes' )
 					    || $Blog->get_setting( 'relcanonical_tag_urls' )
@@ -507,6 +519,17 @@ function skin_init( $disp )
 					if( $post_navigation == 'same_tag' && !empty( $tag ) )
 					{ // Tag is set and post navigation should go through the same tag, set navigation target param
 						$MainList->nav_target = $tag;
+					}
+
+					if( has_featured_Item() )
+					{	// If current tag has Intro post:
+						$disp_detail .= '-intro';
+						$robots_index = ! $Blog->get_setting( 'tag_intro_noindex' );
+					}
+					else
+					{	// If current tag has no Intro post:
+						$disp_detail .= '-nointro';
+						$robots_index = ! $Blog->get_setting( 'tag_noindex' );
 					}
 				}
 				elseif( array_diff( $active_filters, array( 'ymdhms', 'week', 'posts', 'page' ) ) == array() ) // fp> added 'posts' 2009-05-19; can't remember why it's not in there
@@ -547,9 +570,16 @@ function skin_init( $disp )
 					// pre_dump( $active_filters );
 					$disp_detail = 'posts-filtered';
 					$seo_page_type = 'Other filtered page';
-					if( $Blog->get_setting( 'filtered_noindex' ) )
-					{	// We prefer robots not to index other filtered pages:
-						$robots_index = false;
+
+					if( has_featured_Item() )
+					{	// If current filtered page has Intro post:
+						$disp_detail .= '-intro';
+						$robots_index = ! $Blog->get_setting( 'filtered_intro_noindex' );
+					}
+					else
+					{	// If current filtered page has no Intro post:
+						$disp_detail .= '-nointro';
+						$robots_index = ! $Blog->get_setting( 'filtered_noindex' );
 					}
 				}
 			}
@@ -1350,12 +1380,33 @@ function skin_init( $disp )
 			break;
 
 		case 'users':
-		case 'visits':
 			// Check if current user has an access to public list of the users:
 			check_access_users_list();
 
 			$seo_page_type = 'Users list';
 			$robots_index = false;
+
+			if( ! $Blog->get_setting( 'userdir_enable' ) )
+			{	// If user directory is disabled for current Collection:
+				global $disp;
+				$disp = '404';
+				$disp_detail = '404-user-directory-disabled';
+			}
+			break;
+
+		case 'visits':
+			// Check if current user has an access to public list of the users:
+			check_access_users_list();
+
+			$seo_page_type = 'User visits';
+			$robots_index = false;
+
+			if( ! is_logged_in() || ! $Settings->get( 'enable_visit_tracking' ) )
+			{	// Check if visit tracking is enabled and the user is logged in before allowing profile visit display:
+				global $disp;
+				$disp = '403';
+				$disp_detail = '403-visit-tracking-disabled';
+			}
 			break;
 
 		case 'user':
@@ -1466,7 +1517,7 @@ function skin_init( $disp )
 				header_redirect( $selected_Chapter->get_permanent_url( NULL, NULL, 1, NULL, '&' ), 302 );
 			}
 
-			// Prepare the 'In-skin editing':
+			// Prepare the 'In-skin editing' / 'In-skin change proposal':
 			init_inskin_editing();
 			break;
 
@@ -1533,12 +1584,8 @@ function skin_init( $disp )
 			// Restrict comment status by parent item:
 			$edited_Comment->restrict_status();
 
-			// require Fine Uploader js and css:
-			require_js( 'multiupload/fine-uploader.js' );
-			require_css( 'fine-uploader.css' );
-			// Load JS files to make the links table sortable:
-			require_js( '#jquery#' );
-			require_js( 'jquery/jquery.sortable.min.js' );
+			// Init JS to quick upload several files:
+			init_fileuploader_js( 'blog' );
 			break;
 
 		case 'useritems':
@@ -1725,6 +1772,8 @@ function skin_init( $disp )
 			// This MAY or MAY not have exited -- will exit on 30x redirect, otherwise will return here.
 			// Just in case some dumb robot needs extra directives on this:
 			$robots_index = false;
+			// Load functions to work with search results:
+			load_funcs( 'collections/_search.funcs.php' );
 			break;
 	}
 
@@ -2371,8 +2420,10 @@ function skin_opengraph_tags()
 {
 	global $Collection, $Blog, $disp, $MainList;
 
-	if( empty( $Blog ) || ! $Blog->get_setting( 'tags_open_graph' ) )
-	{ // Open Graph tags are not allowed
+	if( empty( $Blog ) ||
+	    ! $Blog->get_setting( 'tags_open_graph' ) ||
+	    in_array( $disp, array( 'content_requires_login', 'access_requires_login', 'access_denied' ) ) )
+	{	// Open Graph tags are not allowed for current Collection or for current disp:
 		return;
 	}
 

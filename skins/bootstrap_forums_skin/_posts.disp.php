@@ -16,7 +16,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-global $number_of_posts_in_cat, $cat, $legend_icons;
+global $number_of_posts_in_cat, $cat, $legend_icons, $tag;
 
 if( ! is_array( $legend_icons ) )
 { // Init this array only first time
@@ -46,11 +46,20 @@ skin_widget( array(
 		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
 		'item_active_mask' => '<li class="active">$title$</li>',
 		'suffix_text'      => empty( $single_cat_ID ) ? T_('Latest topics') : '',
+		'coll_logo_size'   => 'fit-128x16',
 	) );
 
+// Display default title only for tag page without intro Item:
+request_title( array(
+		'title_before'      => '<h2 class="page_title">',
+		'title_after'       => '</h2>',
+		'format'            => 'htmlbody',
+		'posts_text'        => ( isset( $tag ) && ! has_featured_Item() ? '#' : '' ),
+	) );
 
 // Go Grab the featured post:
-if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item( 'posts', NULL, false, NULL ) )
+if( ! in_array( $disp, array( 'single', 'page' ) ) &&
+    $Item = & get_featured_Item( 'posts', NULL, false, ( isset( $tag ) || $single_cat_ID ? false : NULL ) ) )
 {	// We have a intro post to display:
 	$intro_item_style = '';
 	$LinkOwner = new LinkItem( $Item );
@@ -205,17 +214,18 @@ if( isset( $MainList ) &&
 	{	// Display category title:
 		$ChapterCache = & get_ChapterCache();
 		if( $category = & $ChapterCache->get_by_ID( $single_cat_ID ) )
-		{ // Display category title
-			echo '<div class="panel-heading">'
-					// Buttons to post/reply:
-					.$Skin->get_post_button( $single_cat_ID, NULL, array(
+		{	// Display category title:
+			$Skin->display_posts_list_header( '<h3 class="panel-title">'.$category->get( 'name' ).'</h3>', array(
+					'actions' => $Skin->get_post_button( $single_cat_ID, NULL, array(
 							'group_class'  => 'pull-right',
 							'button_class' => 'btn-sm',
-						) )
-					// Category title:
-					.'<h3 class="panel-title">'.$category->get( 'name' ).'</h3>'
-				.'</div>';
+						) ),
+				) );
 		}
+	}
+	else
+	{	// Display header for latest topics:
+		$Skin->display_posts_list_header( T_('Latest topics') );
 	}
 	?>
 
@@ -248,11 +258,11 @@ if( $MainList->result_num_rows > 0 )
 		// ----------------------------END ITEM BLOCK  ----------------------------
 	}
 }
-elseif( isset( $current_Chapter ) )
-{ // Display a message about no posts in this category
+else
+{	// Display a message about no posts:
 ?>
 <div class="ft_no_post">
-	<?php echo T_('There is no topic in this forum yet.'); ?>
+	<?php echo isset( $current_Chapter ) ? T_('There is no topic in this forum yet.') : T_('No topics.'); ?>
 </div>
 <?php
 }

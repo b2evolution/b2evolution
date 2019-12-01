@@ -88,7 +88,7 @@ class XHTML_Validator
 			case 'body_extension':
 			case 'footer_extension':
 				$this->tags = array(
-					'body' => 'meta link style script',
+					'body' => '#PCDATA meta link style script',
 					'meta' => '',
 					'link' => '',
 					'style' => '#PCDATA',

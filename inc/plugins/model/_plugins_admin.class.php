@@ -115,7 +115,9 @@ class Plugins_admin extends Plugins
 				'CacheIsCollectingContent' => 'Gets asked for if we are generating cached content.',
 
 				'AfterCommentDelete' => 'Gets called after a comment has been deleted from the database.',
+				'PrependCommentInsertTransact' => 'This gets called before a comment is inserted into the database.',
 				'AfterCommentInsert' => 'Gets called after a comment has been inserted into the database.',
+				'PrependCommentUpdateTransact' => 'This gets called before a comment gets updated in the database.',
 				'AfterCommentUpdate' => 'Gets called after a comment has been updated in the database.',
 
 				'AfterCollectionDelete' => 'Gets called after a blog has been deleted from the database.',
@@ -132,7 +134,7 @@ class Plugins_admin extends Plugins
 				'AfterItemDelete' => 'This gets called after an item has been deleted from the database.',
 				'PrependItemInsertTransact' => 'This gets called before an item is inserted into the database.',
 				'AfterItemInsert' => 'This gets called after an item has been inserted into the database.',
-				'PrependItemUpdateTransact' => 'This gets called before an item gets updated in the database..',
+				'PrependItemUpdateTransact' => 'This gets called before an item gets updated in the database.',
 				'AfterItemUpdate' => 'This gets called after an item has been updated in the database.',
 				'AppendItemPreviewTransact' => 'This gets called when instantiating an item for preview.',
 
@@ -169,7 +171,10 @@ class Plugins_admin extends Plugins
 				'FilterCommentAuthorUrl' => 'Filters the URL of the comment author.',
 				'FilterCommentContent' => 'Filters the content of a comment.',
 
+				'PrependMessageInsertTransact' => 'This gets called before a message is inserted into the database.',
 				'FilterMsgContent' => 'Filters the content of a message.',
+				'PrependEmailInsertTransact' => 'This gets called before an email campaign is inserted into the database.',
+				'PrependEmailUpdateTransact' => 'This gets called before an email campaign gets updated in the database.',
 				'FilterEmailContent' => 'Filters the content of an email.',
 
 				'EmailFormSent' => 'Called when the email form has been submitted.',

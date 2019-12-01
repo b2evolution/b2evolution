@@ -223,7 +223,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 		$fieldset_title .= ' - '
 			.action_icon( T_('Attach existing files'), 'folder', $attach_files_url,
 				T_('Attach existing files'), 3, 4,
-				array( 'onclick' => 'return link_attachment_window( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) );
+				array( 'onclick' => 'return link_attachment_window( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'\', \'\', \'\', \''.$fieldset_prefix.'\' )' ) );
 		if( ! $LinkOwner->is_temp() )
 		{	// Don't allow this option for new creating objects:
 			$fieldset_title .= action_icon( T_('Attach existing files'), 'permalink', $attach_files_url,
@@ -278,7 +278,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 		echo_modalwindow_js();
 ?>
 <script>
-function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight )
+function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight, prefix )
 {
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
 		'90%', '80%', true, '<?php echo $window_title; ?>', '', true );
@@ -294,7 +294,8 @@ function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_
 			'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
 			'root': typeof( root ) == 'undefined' ? '' : root,
 			'path': typeof( path ) == 'undefined' ? '' : path,
-			'fm_highlight': typeof( fm_highlight ) == 'undefined' ? '' : fm_highlight
+			'fm_highlight': typeof( fm_highlight ) == 'undefined' ? '' : fm_highlight,
+			'prefix': typeof( prefix ) == 'undefined' ? '' : prefix,
 		},
 		success: function(result)
 		{
@@ -384,7 +385,7 @@ function link_destination()
 
 	if( empty( $current_File ) )
 	{
-		return '?';
+		return '<span class="text-danger">Broken File!</span>';
 	}
 
 	$r = '';
@@ -532,7 +533,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 		// Delete icon:
 		$LinkCache = & get_LinkCache();
 		$Link = & $LinkCache->get_by_ID( $link_ID, false, false );
-		if( ! $current_File->is_dir() && $Link && $Link->can_be_file_deleted() )
+		if( $current_File && ! $current_File->is_dir() && $Link && $Link->can_be_file_deleted() )
 		{	// If current user has a permission to delete a file(not folder) completely
 			$File = & $Link->get_File();
 			$r .= action_icon( T_('Delete this file!'), 'delete',
@@ -557,9 +558,10 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
  *
  * @param object Row of SQL query from T_links and T_files
  * @param boolean Show additional link actions
+ * @param string Fieldset prefix, e.g. "meta_"
  * @return string
  */
-function display_link_position( & $row, $show_actions = true )
+function display_link_position( & $row, $show_actions = true, $fieldset_prefix = '' )
 {
 	global $LinkOwner, $blog, $Blog;
 	global $current_File;
@@ -612,7 +614,7 @@ function display_link_position( & $row, $show_actions = true )
 			{
 				$r .= ' '.get_icon( 'add', 'imgtag', array(
 						'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
-						'onclick' => 'return evo_item_image_insert( '.( empty( $blog ) ? 'null' : $blog ).', \'image\', '.$row->link_ID.' );',
+						'onclick' => 'return evo_item_image_insert( '.( empty( $blog ) ? 'null' : $blog ).', \'image\', '.$row->link_ID.', \''.$fieldset_prefix.'\' );',
 						'style'   => 'cursor:pointer;'
 					) );
 
@@ -621,7 +623,7 @@ function display_link_position( & $row, $show_actions = true )
 			{
 				$r .= ' '.get_icon( 'add__blue', 'imgtag', array(
 							'title'   => sprintf( T_('Insert %s tag into the post'), '['.$type.':]' ),
-							'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\' )',
+							'onclick' => 'evo_link_insert_inline( \''.$type.'\', '.$row->link_ID.', \'\', 0, \'\', '.$fieldset_prefix.'b2evoCanvas )',
 							'style'   => 'cursor:pointer;'
 						) );
 
@@ -630,7 +632,7 @@ function display_link_position( & $row, $show_actions = true )
 			{
 				$r .= ' '.get_icon( 'add__cyan', 'imgtag', array(
 							'title'   => sprintf( T_('Insert %s tag into the post'), '[folder:]' ),
-							'onclick' => 'evo_link_insert_inline( \'folder\', '.$row->link_ID.', \'\' )',
+							'onclick' => 'evo_link_insert_inline( \'folder\', '.$row->link_ID.', \'\', 0, \'\', '.$fieldset_prefix.'b2evoCanvas )',
 							'style'   => 'cursor:default;'
 						) );
 			}
@@ -1025,7 +1027,7 @@ function link_add_iframe( $link_destination )
 	global $LinkOwner, $current_File, $iframe_name, $link_type;
 	$link_owner_ID = $LinkOwner->get_ID();
 
-	if( $current_File->is_dir() && isset( $iframe_name ) )
+	if( $current_File && $current_File->is_dir() && isset( $iframe_name ) )
 	{
 		$root = $current_File->get_FileRoot()->ID;
 		$path = $current_File->get_rdfp_rel_path();

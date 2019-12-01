@@ -66,7 +66,7 @@ class code_highlight_plugin extends Plugin
 	var $name = 'Code highlight';
 	var $code = 'evo_code';
 	var $priority = 27;
-	var $version = '6.11.2';
+	var $version = '6.11.4';
 	var $author = 'Astonish Me';
 	var $group = 'rendering';
 	var $help_topic = 'code-highlight-plugin';
@@ -499,7 +499,7 @@ class code_highlight_plugin extends Plugin
 
 		// 2 - attribs : lang &| line
 		// 4 - codeblock
-		$content = preg_replace_callback( '#(\<p>)?\<!--\s*codeblock([^-]*?)\s*-->(\</p>)?\<pre[^>]*><code>([\s\S]+?)</code>\</pre>(\<p>)?\<!--\s*/codeblock\s*-->(\</p>)?#i',
+		$content = preg_replace_callback( '#(\<p>)?\<!--\s*codeblock([^-]*?)\s*-->(\</p>)?\<pre[^>]*><code[^>]*>([\s\S]+?)</code>\</pre>(\<p>)?\<!--\s*/codeblock\s*-->(\</p>)?#i',
 								array( $this, 'render_codeblock_callback' ), $content );
 
 		if( strpos( $content, '\\/codespan' ) !== false || strpos( $content, '\\/codeblock' ) !== false )
@@ -739,12 +739,14 @@ class code_highlight_plugin extends Plugin
 	function render_codeblock_callback( $block )
 	{
 		// set the offset if present - default : 0
-		preg_match( '#line=("|\'?)([0-9]+?)(["\']?)$#', $block[2], $match );
-		$offset = ( empty( $match[2] ) ? 0 : $match[2] - 1 );
+		preg_match( '#line=([^\s]+)#', $block[2], $match );
+		$offset = isset( $match[1] ) ? intval( trim( $match[1], '"\'' ) ) : 0;
+		$offset = ( empty( $offset ) ? 0 : $offset - 1 );
 
 		// set the language if present - default : code
-		preg_match( '#lang=("|\'?)([^\1]+?)([\s"\']+?)#', $block[2], $match );
-		$language = strtolower( ( empty( $match[2] ) ? 'code' : $match[2] ) );
+		preg_match( '#lang=([^\s]+)#', $block[2], $match );
+		$language = isset( $match[1] ) ? trim( $match[1], '"\'' ) : '';
+		$language = ( empty( $language ) ? 'code' : strtolower( $language ) );
 
 		if( $code = trim( $block[4] ) )
 		{ // we have a code block

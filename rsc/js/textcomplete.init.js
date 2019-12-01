@@ -22,9 +22,11 @@ jQuery( document ).ready( function()
 	}
 
 	var mentions = [];
-	jQuery( ".user.login" ).each( function()
+	jQuery( ".user.login, option[data-login]" ).each( function()
 	{ // Init array with all usernames from the page
-		var login = jQuery( this ).text();
+		var login = jQuery( this ).prop( 'tagName') == 'OPTION'
+			? jQuery( this ).data( 'login' )
+			: jQuery( this ).text();
 		if( login != "" && mentions.indexOf( login ) == -1 )
 		{
 			if( login[0] == "@" )

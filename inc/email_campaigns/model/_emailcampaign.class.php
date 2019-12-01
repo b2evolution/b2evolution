@@ -315,12 +315,31 @@ class EmailCampaign extends DataObject
 	{
 		switch( $parname )
 		{
+			case 'html_template_preview':
 			case 'plaintext_template_preview':
 				global $current_User;
-				$text_mail_template = mail_template( 'newsletter', 'text', array( 'message_text' => $this->get( 'email_plaintext' ), 'include_greeting' => false, 'add_email_tracking' => false, 'template_mode' => 'preview' ), $current_User );
-				$text_mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $text_mail_template );
-				$text_mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $text_mail_template );
-				return nl2br( $text_mail_template );
+				$mail_template = mail_template( 'newsletter',
+					( $parname == 'html_template_preview' ? 'html' : 'text' ),
+					array(
+						'message_html'       => $this->get( 'email_html' ),
+						'message_text'       => $this->get( 'email_plaintext' ),
+						'include_greeting'   => false,
+						'add_email_tracking' => false,
+						'template_mode'      => 'preview',
+						'is_welcome_email'   => false,
+						'ecmp_ID'            => $this->ID,
+						'enlt_ID'            => $this->get( 'enlt_ID' ),
+					), $current_User );
+				$mail_template = str_replace( array( '$email_key$', '$mail_log_ID$', '$email_key_start$', '$email_key_end$' ), array( '***email-key***', '', '', '' ), $mail_template );
+				$mail_template = preg_replace( '~\$secret_content_start\$.*\$secret_content_end\$~', '***secret-content-removed***', $mail_template );
+				if( $parname == 'html_template_preview' )
+				{	// Clear all html tags that may break styles of main html page:
+					return preg_replace( '#</?(html|head|meta|body)[^>]*>#i', '', $mail_template );
+				}
+				else
+				{	// Convert newline to html <br>:
+					return nl2br( $mail_template );
+				}
 
 			default:
 				return parent::get( $parname );
@@ -572,7 +591,12 @@ class EmailCampaign extends DataObject
 	 */
 	function dbinsert()
 	{
-		global $baseurl;
+		global $baseurl, $Plugins;
+
+		if( isset( $Plugins ) )
+		{	// Note: Plugins may not be available during maintenance, install or test cases
+			$Plugins->trigger_event( 'PrependEmailInsertTransact', $params = array( 'EmailCampaign' => & $this ) );
+		}
 
 		// Update the message fields:
 		$this->update_message_fields();
@@ -599,6 +623,13 @@ class EmailCampaign extends DataObject
 	 */
 	function dbupdate()
 	{
+		global $Plugins;
+
+		if( isset( $Plugins ) )
+		{	// Note: Plugins may not be available during maintenance, install or test cases
+			$Plugins->trigger_event( 'PrependEmailUpdateTransact', $params = array( 'EmailCampaign' => & $this ) );
+		}
+
 		// Update the message fields:
 		$this->update_message_fields();
 
@@ -1306,10 +1337,14 @@ class EmailCampaign extends DataObject
 		{	// Update user send status for this email campaign:
 			if( $status == 'sent' )
 			{
-				list( $previous_status, $last_sent_ts ) = $DB->get_row( 'SELECT csnd_status, csnd_last_sent_ts FROM T_email__campaign_send WHERE csnd_camp_ID = '.$this->ID.' AND csnd_user_ID = '.$DB->quote( $user_ID ), ARRAY_N );
-				if( empty( $last_sent_ts ) && $previous_status != 'sent' )
-				{ // First time to send the email to this user
-					$update_send_count = true;
+				$r = $DB->get_row( 'SELECT csnd_status, csnd_last_sent_ts FROM T_email__campaign_send WHERE csnd_camp_ID = '.$this->ID.' AND csnd_user_ID = '.$DB->quote( $user_ID ), ARRAY_N );
+				if( ! empty( $r ) )
+				{
+					list( $previous_status, $last_sent_ts ) = $r;
+					if( empty( $last_sent_ts ) && $previous_status != 'sent' )
+					{ // First time to send the email to this user
+						$update_send_count = true;
+					}
 				}
 			}
 

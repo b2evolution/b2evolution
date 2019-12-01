@@ -90,6 +90,8 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 		$Item->can_comment( $params['before_comment_error'], $params['after_comment_error'], '#', $params['comment_closed_text'], $section_title, $params ) ) )
 { // We want to display the comments form and the item can be commented on:
 
+	echo '<a name="'.( $params['comment_type'] == 'meta' ? 'meta-comment-form' : 'comment-form' ).'"></a>';
+
 	echo $params['before_comment_form'];
 
 	// INIT/PREVIEW:
@@ -356,49 +358,12 @@ function validateCommentForm(form)
 		$Form->info_field( '', $params['policy_text'] );
 	}
 
-	// Workflow properties:
-	if( $Comment->is_meta() &&
-			is_logged_in() &&
-			$Blog->get_setting( 'use_workflow' ) &&
-			$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
-			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
-	{	// Display workflow properties if current user has a permission:
-		$Form->select_input_array( 'item_priority', $Item->priority, item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
-
-		// Load only first 21 users to know when we should display an input box instead of full users list:
-		$UserCache = & get_UserCache();
-		$UserCache->load_blogmembers( $Blog->ID, 21, false );
-		if( count( $UserCache->cache ) > 20 )
-		{	// Display a text input field with autocompletion if members more than 20:
-			$assigned_User = & $UserCache->get_by_ID( $Item->get( 'assigned_user_ID' ), false, false );
-			$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
-		}
-		else
-		{	// Display a select field if members less than 21:
-			$Form->select_object( 'item_assigned_user_ID', NULL, $Item, T_('Assigned to'), '', true, '', 'get_assigned_user_options' );
-		}
-
-		$ItemStatusCache = & get_ItemStatusCache();
-		$ItemStatusCache->load_all();
-		$ItemTypeCache = & get_ItemTypeCache();
-		$current_ItemType = & $Item->get_ItemType();
-		$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $Item->pst_ID, true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
-
-		if( $Blog->get_setting( 'use_deadline' ) )
-		{	// Display deadline fields only if it is enabled for collection:
-			$Form->begin_line( T_('Deadline'), 'item_deadline' );
-
-				$datedeadline = $Item->get( 'datedeadline' );
-				$Form->date( 'item_deadline', $datedeadline, '' );
-
-				$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
-				$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
-
-			$Form->end_line();
-		}
-
-		// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
-		$params['form_submit_text'] = T_('Update Status').' / '.$params['form_submit_text'];
+	if( $Comment->is_meta() )
+	{	// Display workflow properties for meta comment form here:
+		skin_include( '_item_comment_workflow.inc.php', array_merge( $params, array(
+				'Form'    => & $Form,
+				'Comment' => & $Comment,
+			) ) );
 	}
 
 	// Set prefix for js code in plugins:
@@ -515,6 +480,19 @@ function validateCommentForm(form)
 	}
 	// Display attachments fieldset:
 	$Form->attachments_fieldset( $Comment, false, $Comment->is_meta() ? 'meta_' : '' );
+
+	if( ! $Comment->is_meta() )
+	{	// Display workflow properties for normal comment form here:
+		skin_include( '_item_comment_workflow.inc.php', array_merge( $params, array(
+				'Form'    => & $Form,
+				'Comment' => & $Comment,
+			) ) );
+	}
+
+	if( $Item->can_edit_workflow() )
+	{	// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
+		$params['form_submit_text'] = T_('Update Status').' / '.$params['form_submit_text'];
+	}
 
 	$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
 

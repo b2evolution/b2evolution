@@ -47,6 +47,9 @@
 ol.breadcrumb {
 	margin-left: 0;
 	float: left;
+	img {
+		margin-top: -2px;
+	}
 }
 
 // Status icons
@@ -110,7 +113,16 @@ ol.breadcrumb {
 			margin-top: 0;
 		}
 		.btn {
-			margin: -6px 0 0 6px;
+			margin: -6px 0 -6px 6px;
+		}
+		&.panel-heading-columns {
+			padding-left: 0;
+			padding-right: 0;
+			select {
+				margin-top: -5px;
+				margin-bottom: -6px;
+				width: auto;
+			}
 		}
 	}
 	&.panel>a+.table {
@@ -834,11 +846,6 @@ aside .widget_core_coll_search_form {
 		float: right;
 		margin-left: 10px;
 	}
-	// Remove float properties from main and sidebar columns because they use 100% width on current screen size:
-	// (it was done to fix issue with .ellipsis when sidebar on the left)
-	div.col-md-9.pull-right, aside.col-md-3.pull-left {
-		float: none !important;
-	}
 }
 //@media screen and (min-width: 600px) and (max-width: 767px) {
 //	.ft_workflow_info {
@@ -1233,4 +1240,9 @@ a.to_top {
 // Wrapper for form to create new post by anonymous user:
 .panel.evo_item_new_form {
 	margin-bottom: 0;
+}
+
+// Force affixed sidebar to static top position:
+.sidebar_wrapper.affix-forced-top {
+	position: static !important;
 }

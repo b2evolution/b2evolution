@@ -207,7 +207,9 @@ class ItemList2 extends ItemListLight
 		if( !empty( $this->ItemQuery->order_by ) && preg_match( '/'.preg_quote( 'postcatsorders.postcat_order' ).' (DESC|ASC)/i', $this->ItemQuery->order_by, $order_dir_match ) )
 		{	// Move the items with NULL order to the end of the list
 			$null_orders = ( $order_dir_match[1] == 'DESC' ? '-' : '' ).'999999999'; // Always keep the not ordered posts at the end
-			$select_temp_order = ', IF( postcatsorders.postcat_order IS NULL, '.$null_orders.', postcatsorders.postcat_order ) AS temp_order';
+			$select_temp_order = ', IF( postmaincat.cat_blog_ID != T_categories.cat_blog_ID, '
+				.'( SELECT SUM( subpostcatorder.postcat_order ) FROM T_postcats AS subpostcatorder INNER JOIN T_categories AS subpostmaincat ON subpostcatorder.postcat_cat_ID = subpostmaincat.cat_ID WHERE subpostmaincat.cat_blog_ID = T_categories.cat_blog_ID AND subpostcatorder.postcat_post_ID = post_ID ), '
+				.'IF( postcatsorders.postcat_order IS NULL, '.$null_orders.', postcatsorders.postcat_order ) ) AS temp_order';
 			$this->ItemQuery->ORDER_BY( str_replace( 'postcatsorders.postcat_order', 'temp_order', $this->ItemQuery->get_order_by( '' ) ) );
 		}
 

@@ -36,7 +36,7 @@ class tinymce_plugin extends Plugin
 	var $code = 'evo_TinyMCE';
 	var $name = 'TinyMCE';
 	var $priority = 10;
-	var $version = '6.11.2';
+	var $version = '6.11.4';
 	var $group = 'editor';
 	var $number_of_installs = 1;
 
@@ -797,6 +797,29 @@ class tinymce_plugin extends Plugin
 								ed.on( 'init', tmce_init.oninit );
 							}
 
+							tinymce.on( 'AddEditor', function( e )
+							{	// Switching to WYSIWYG mode:
+								var textarea = jQuery( '#<?php echo $params['content_id'];?>' );
+								if( ! textarea.val().match( /<(p\s?|br\s?\/?)[^>]*>/i ) )
+								{	// Try to apply "Auto P" plugin(if it is installed) in order to replace
+									// new lines with <p> or <br> html tags if content has no them yet:
+									jQuery.ajax(
+									{
+										type: 'POST',
+										url: '<?php echo $this->get_htsrv_url( 'update_content', array(), '&' ); ?>',
+										data:
+										{
+											'content': textarea.val(),
+										},
+										success: function( result )
+										{
+											e.editor.setContent( result );
+										}
+									} );
+								}
+								return false;
+							} );
+
 							tinymce.init( tmce_init );
 						}
 					}
@@ -1370,6 +1393,29 @@ class tinymce_plugin extends Plugin
 
 
 	/**
+	 * AJAX callback to update content for WYSIWYG mode
+	 *
+	 * @param array Params
+	 */
+	function htsrv_update_content( $params )
+	{
+		global $Plugins;
+
+		$content = param( 'content', 'raw' );
+
+		if( isset( $Plugins ) &&
+		    ( $Plugins instanceof Plugins ) &&
+		    ( $autop_Plugin = & $Plugins->get_by_classname( 'auto_p_plugin' ) ) &&
+		    method_exists( $autop_Plugin, 'render_autop' ) )
+		{	// Convert new lines to <p> or <br> html tags by installed plugin "Auto P":
+			$content = $autop_Plugin->render_autop( $content );
+		}
+
+		echo $content;
+	}
+
+
+	/**
 	 * Return the list of Htsrv (HTTP-Services) provided by the plugin.
 	 *
 	 * This implements the plugin interface for the list of methods that are valid to
@@ -1379,7 +1425,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function GetHtsrvMethods()
 	{
-		return array( 'save_editor_state', 'save_wysiwyg_warning_state', 'insert_inline'/*, 'get_item_content_css'*/ );
+		return array( 'save_editor_state', 'save_wysiwyg_warning_state', 'insert_inline'/*, 'get_item_content_css'*/, 'update_content' );
 	}
 
 

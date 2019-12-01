@@ -21,7 +21,7 @@ class bootstrap_forums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.11.2';
+	var $version = '6.11.4';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -132,6 +132,12 @@ class bootstrap_forums_Skin extends Skin
 								'right_sidebar' => T_('Right Sidebar'),
 							),
 						'type' => 'select',
+					),
+					'sidebar_single_affix' => array(
+						'label' => T_('Sidebar Single'),
+						'note'  => T_('Use affix to keep visible when scrolling down.'),
+						'type'  => 'checkbox',
+						'defaultvalue' => 1,
 					),
 					'max_image_height' => array(
 						'label' => T_('Max image height'),
@@ -375,6 +381,9 @@ class bootstrap_forums_Skin extends Skin
 			init_datepicker_js( 'blog' );
 		}
 
+		// Do not affix sidebar for screen width below and lesser:
+		add_css_headline( '@media (max-width: 992px ) { .sidebar_wrapper.affix { position: static } }' );
+
 		// Init JS to affix Messages:
 		init_affix_messages_js( $this->get_setting( 'message_affix_offset' ) );
 	}
@@ -532,7 +541,7 @@ class bootstrap_forums_Skin extends Skin
 		{
 			case 'left_sidebar':
 				// Left Sidebar
-				return 'col-md-9 pull-right';
+				return 'col-md-9 pull-right-md';
 
 			case 'right_sidebar':
 				// Right Sidebar
@@ -653,6 +662,100 @@ class bootstrap_forums_Skin extends Skin
 				'class'                 => 'vote_helpful',
 				'skin_ID'               => $this->ID,
 			), $params ) );
+	}
+
+
+	/**
+	 * Display header for posts list
+	 *
+	 * @param string Title
+	 */
+	function display_posts_list_header( $title, $params = array() )
+	{
+		global $Blog, $current_User;
+
+		$params = array_merge( array(
+				'actions' => '',
+				// Normal template:
+				'before_normal_header'  => '<header class="panel-heading">',
+				'after_normal_header'   => '<div class="clearfix"></header>',
+				'before_normal_title'   => '<div class="pull-left">',
+				'after_normal_title'    => '</div>',
+				'before_normal_status'  => '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">',
+				'after_normal_status'   => '</div>',
+				'before_normal_actions' => '',
+				'after_normal_actions'  => '',
+				// Template with workflow task status selector:
+				'before_workflow_header'  => '<header class="panel-heading panel-heading-columns">',
+				'after_workflow_header'   => '<div class="clearfix"></header>',
+				'before_workflow_title'   => '<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">',
+				'after_workflow_title'    => '</div>',
+				'before_workflow_status'  => '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">',
+				'after_workflow_status'   => '</div>',
+				'before_workflow_actions' => '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12 text-right">',
+				'after_workflow_actions'  => '</div>',
+			), $params );
+
+		// Check if current User can view workflow properties:
+		$can_view_workflow =
+			// User must be logged in:
+			is_logged_in() &&
+			// Workflow must be enabled for current Collection:
+			$Blog->get_setting( 'use_workflow' ) &&
+			// Current User must has a permission to be assigned for tasks of the current Collection:
+			$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID );
+
+		// Get template depending on permission of current User:
+		$template = ( $can_view_workflow ? 'workflow' : 'normal' );
+
+		echo $params['before_'.$template.'_header'];
+
+		// Title:
+		echo $params['before_'.$template.'_title'];
+		echo $title;
+		echo $params['after_'.$template.'_title'];
+
+		if( $can_view_workflow )
+		{	// Display status filter only when current User a permission to view workflow properties:
+			$ItemStatusCache = & get_ItemStatusCache();
+			$ItemStatusCache->clear();
+			$item_statuses_SQL = $ItemStatusCache->get_SQL_object();
+			$item_statuses_SQL->FROM_add( 'INNER JOIN T_items__status_type ON pst_ID = its_pst_ID' );
+			$item_statuses_SQL->FROM_add( 'INNER JOIN T_items__type_coll ON its_ityp_ID = itc_ityp_ID' );
+			$item_statuses_SQL->WHERE( 'itc_coll_ID = '.$Blog->ID );
+			$ItemStatusCache->load_by_sql( $item_statuses_SQL );
+			$status = param( 'status', '/^(-|-[0-9]+|[0-9]+)(,[0-9]+)*$/', '' );
+
+			echo $params['before_workflow_status'];
+			echo '<select id="evo_workflow_status_filter" class="form-control input-sm">'
+					.'<option value="">'.T_('All statuses').'</option>'
+					.'<option value="-"'.( $status == '-' ? ' selected="selected"' : '' ).'>'.T_('No status').'</option>'
+					.$ItemStatusCache->get_option_list( $status )
+				.'</select>';
+				// JavaScript to reload page with new selected task status:
+				echo '<script>
+				jQuery( "#evo_workflow_status_filter" ).change( function()
+				{
+					var url = location.href.replace( /([\?&])((status|redir)=[^&]*(&|$))+/, "$1" );
+					var status_ID = jQuery( this ).val();
+					if( status_ID !== "" )
+					{
+						url += ( url.indexOf( "?" ) == -1 ? "?" : "&" ) + "status=" + status_ID + "&redir=no";
+					}
+					location.href = url.replace( "?&", "?" ).replace( /\?$/, "" );
+				} );
+				</script>';
+			echo $params['after_workflow_status'];
+		}
+
+		if( ! empty( $params['actions'] ) )
+		{	// Actions:
+			echo $params['before_'.$template.'_actions'];
+			echo $params['actions'];
+			echo $params['after_'.$template.'_actions'];
+		}
+
+		echo $params['after_'.$template.'_header'];
 	}
 }
 

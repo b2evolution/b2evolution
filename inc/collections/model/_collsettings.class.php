@@ -62,7 +62,7 @@ class CollectionSettings extends AbstractSettings
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'single_links'   => 'short',
 			'single_item_footer_text' => '',
-			'slug_limit' => 5,
+			'slug_limit' => 8,
 			'tags_meta_keywords' => 1,
 			'tags_open_graph' => 1,
 			'tags_twitter_card' => 1,
@@ -122,7 +122,7 @@ class CollectionSettings extends AbstractSettings
 			'relcanonical_cat_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
 			'chapter_content'   => 'normal',
 			'chapter_posts_per_page' => 100,
-			'chapter_noindex'   => '1',					// META NOINDEX on Category pages
+			'chapter_noindex' => '1',       // META NOINDEX on Category pages without intro
 			'category_prefix'   => '',
 			'categories_meta_description' => 1,
 			'category_ordering' => 'alpha',             // Ordering of categories
@@ -234,6 +234,7 @@ class CollectionSettings extends AbstractSettings
 			'msgform_require_message' => 1, // Require message
 
 		// User directory:
+			'userdir_enable' => 1,
 			'userdir_filter_gender' => 1,
 			'userdir_filter_level' => 1,
 			'userdir_filter_org' => 1,
@@ -269,6 +270,7 @@ class CollectionSettings extends AbstractSettings
 			'search_score_post_tags'           => 4, // weight multiplier for keywords found in post tags
 			'search_score_post_excerpt'        => 1, // weight multiplier for keywords found in post excerpt
 			'search_score_post_titletag'       => 4, // weight multiplier for keywords found in post <title> tag
+			'search_score_post_metakeywords'   => 3, // weight multiplier for keywords found in post <meta> keywords
 			'search_score_post_author'         => 5, // weight multiplier for keywords found in post author login
 			'search_score_post_date_future'    => 0, // weight multiplier for posts from future
 			'search_score_post_date_moremonth' => 0, // weight multiplier for posts older month

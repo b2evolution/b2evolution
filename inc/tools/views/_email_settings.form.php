@@ -73,7 +73,7 @@ $Form->begin_fieldset( T_( 'Email envelope' ).get_manual_link( 'email-notificati
 	$Form->text_input( 'notification_return_path', $Settings->get( 'notification_return_path' ), 50, T_( 'Return path' ), '', array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_short_name', $Settings->get( 'notification_short_name' ), 50, T_( 'Short site name' ), T_('Shared with site settings'), array( 'maxlength' => 127, 'required' => true ) );
 	$Form->text_input( 'notification_long_name', $Settings->get( 'notification_long_name' ), 50, T_( 'Long site name' ), T_('Shared with site settings'), array( 'maxlength' => 255 ) );
-	$fileselect_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select site logo'), 'root' => 'shared_0' );
+	$fileselect_params = array( 'file_type' => 'image', 'max_file_num' => 1, 'window_title' => T_('Select site logo'), 'root' => 'shared_0', 'size_name' => 'fit-320x320' );
 	$Form->fileselect( 'notification_logo_file_ID', $Settings->get( 'notification_logo_file_ID' ), T_('Select site logo'), NULL, $fileselect_params );
 $Form->end_fieldset();
 

@@ -49,7 +49,7 @@ else
 			'visitor_after'  => '</span>',
 		) );
 }
-if( $params['notify_type'] == 'meta_comment' )
+if( $params['notify_type'] == 'meta_comment' || $params['notify_type'] == 'meta_comment_mentioned' )
 { // Meta comment
 	$info_text = T_( '%s posted a new meta comment on %s in %s.' );
 }
@@ -62,6 +62,10 @@ $notify_message = '<p'.emailskin_style( '.p' ).'>'.sprintf( $info_text, '<b>'.$a
 if( $params['notify_type'] == 'comment_mentioned' )
 {	// Add this info line if user was mentioned in the comment content:
 	$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_( 'You were mentioned in this comment.' )."</p>\n";
+}
+elseif( $params['notify_type'] == 'meta_comment_mentioned' )
+{	// Add this info line if user was mentioned in the meta comment content:
+	$notify_message .= '<p'.emailskin_style( '.p' ).'>'.T_( 'You were mentioned in this meta comment.' )."</p>\n";
 }
 
 if( $params['notify_full'] )
@@ -182,9 +186,16 @@ switch( $params['notify_type'] )
 
 	case 'comment_mentioned':
 		// user is mentioned in the comment
-		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mention your name in a comment.' ).'<br />'
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this comment, and you are receiving notifications when anyone mentions your name in a comment.' ).'<br />'
 			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a comment, click here' ).': '
 			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
+		break;
+
+	case 'meta_comment_mentioned':
+		// user is mentioned in the meta comment
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this meta comment, and you are receiving notifications when anyone mentions your name in a meta comment.' ).'<br />'
+			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a meta comment, click here' ).': '
+			.get_link_tag( get_htsrv_url().'quick_unsubscribe.php?type=meta_comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$', T_('instant unsubscribe'), '.a' );
 		break;
 
 	case 'blog_subscription':

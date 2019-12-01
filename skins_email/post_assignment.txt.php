@@ -33,20 +33,9 @@ if( $params['notify_full'] )
 {	/* Full notification */
 	echo sprintf( T_('%s assigned you the following post'), $principal_User->get( 'login' ) ).':'."\n\n";
 
-	// Calculate length for str_pad to align labels:
-	$pad_len = max( utf8_strlen( T_('Collection') ), utf8_strlen( T_('Author') ), utf8_strlen( T_('Title') ), utf8_strlen( T_('Url') ), utf8_strlen( T_('Content') ) );
+	echo $Item->get( 'title' ).' -- '.$Blog->get( 'shortname' ).' ( '.str_replace( '&amp;', '&', $Blog->gen_blogurl() ).' )'."\n";
 
-	echo str_pad( T_('Collection'), $pad_len ).': '.$Blog->get( 'shortname' ).' ( '.str_replace( '&amp;', '&', $Blog->gen_blogurl() ).' )'."\n";
-
-	$Item->get_creator_User();
-	echo str_pad( T_('Author'), $pad_len ).': '.$Item->creator_User->get( 'preferredname' ).' ('.$Item->creator_User->get('login').")\n";
-
-	echo str_pad( T_('Title'), $pad_len ).': '.$Item->get( 'title' )."\n";
-
-	// linked URL or "-" if empty:
-	echo str_pad( T_('Url'), $pad_len ).': '.( empty( $Item->url ) ? '-' : str_replace( '&amp;', '&', $Item->get('url') ) )."\n";
-
-	echo str_pad( T_('Content'), $pad_len ).': ';
+	echo T_('Content').': ';
 	// TODO: We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 	// TODO: might get moved onto a single line, at the end of the content..
 	echo $Item->get_permanent_url( '', '', '&' )."\n\n";

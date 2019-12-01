@@ -573,73 +573,134 @@ function dbm_delete_orphan_comment_uploads()
 
 /**
  * Find and delete orphan File objects with no matching file on disk
+ *
+ * @param boolean TRUE - to delete the found orphan files, FALSE - only display ALL found files in DB
+ * @param boolean TRUE - to delete orphan files even if they are linked to other objects
  */
-function dbm_delete_orphan_files()
+function dbm_delete_orphan_files( $delete_orphan_files, $delete_orphan_linked_files = false )
 {
 	global $DB, $admin_url;
 
 	$FileCache = & get_FileCache();
 	$FileCache->clear();
 
-	echo T_('Deleting of the orphan File objects from the database...');
+	echo T_('Finding of the orphan File objects in the database...');
+	echo '<ul>';
 	evo_flush();
 
-	$files_SQL = new SQL();
-	$files_SQL->SELECT( '*' );
+	$files_SQL = new SQL( 'Find orphan files for deleting' );
+	$files_SQL->SELECT( 'file_ID, file_root_type, file_root_ID, file_path, COUNT( link_ID ) AS links_num, GROUP_CONCAT( link_ID ) AS link_IDs' );
 	$files_SQL->FROM( 'T_files' );
+	$files_SQL->FROM_add( 'LEFT JOIN T_links ON file_ID = link_file_ID' );
 	$files_SQL->ORDER_BY( 'file_ID' );
+	$files_SQL->GROUP_BY( 'file_ID' );
+	// Limit the files by 100 recordsto save memory:
+	$files_SQL->LIMIT( '0, 100' );
 
-	$count_files_valid = 0;
-	$count_files_invalid = 0;
-	$count_files_deleted = 0;
+	$num_valid_files = 0;
+	$num_missing_no_linked_files = 0;
+	$num_missing_linked_files = 0;
+	$num_total_links = 0;
+	$num_total_files = 0;
 
-	$page_size = 100;
-	$current_page = 0;
-	// Search the files by page to save memory
-	$files_SQL->LIMIT( '0, '.$page_size );
-	while( $loaded_Files = $FileCache->load_by_sql( $files_SQL ) )
-	{ // Check all loaded files
-		foreach( $loaded_Files as $File )
+	$skip_files = array();
+
+	if( $delete_orphan_files && $delete_orphan_linked_files )
+	{	// Initalize LinkCache once for code below:
+		$LinkCache = & get_LinkCache();
+	}
+
+	while( $loaded_files = $DB->get_results( $files_SQL, ARRAY_A ) )
+	{	// Check the found files:
+		$FileCache->load_list( array_column( $loaded_files, 'file_ID' ) );
+		foreach( $loaded_files as $file_data )
 		{
-			if( is_null( $File ) )
-			{ // The File object couldn't be created because the db entry is invalid
-				$count_files_invalid++;
-				continue;
-			}
+			$File = & $FileCache->get_by_ID( $file_data['file_ID'], false, false );
+			echo '<li>#'.$file_data['file_ID'].' - <code>'.$file_data['file_root_type'].'_'.$file_data['file_root_ID'].':'.$file_data['file_path'].'</code> - ';
 			if( $File->exists() )
-			{ // File exists on the disk
-				$count_files_valid++;
+			{	// File exists on the disk:
+				$num_valid_files++;
+				echo '<span class="label label-success">'.T_('OK').'</span>';
+				// Skip this File on next page searching:
+				$skip_files[] = $File->ID;
 			}
 			else
-			{ // File doesn't exist on the disk, Remove it from DB
-				$File->dbdelete();
-				$count_files_deleted++;
+			{	// File doesn't exist on the disk:
+				echo '<span class="label '.( empty( $file_data['links_num'] ) ? 'label-warning' : 'label-danger' ).'">'.T_('MISSING').'</span>';
+				echo ' - ('.sprintf( T_('linked %s times'), '<b>'.$file_data['links_num'].'</b>' ).')';
+				if( empty( $file_data['links_num'] ) )
+				{	// Count number of missing files without links:
+					$num_missing_no_linked_files++;
+				}
+				else
+				{	// Count number of missing files with links:
+					$num_missing_linked_files++;
+					$num_total_links += $file_data['links_num'];
+				}
+				$file_num_deleted_links = 0;
+				if( $delete_orphan_files )
+				{	// Try to delete File only if it is requested:
+					echo ' - ';
+					if( $delete_orphan_linked_files && ! empty( $file_data['link_IDs'] ) )
+					{	// Try to delete ALL Link objects of the orphan File before deleting it:
+						$deleted_link_IDs = explode( ',', $file_data['link_IDs'] );
+						$LinkCache->load_list( $deleted_link_IDs );
+						foreach( $deleted_link_IDs as $deleted_link_ID )
+						{
+							if( $deleted_Link = & $LinkCache->get_by_ID( $deleted_link_ID, false, false ) )
+							{
+								$deleted_Link->dbdelete();
+								$file_num_deleted_links++;
+							}
+						}
+					}
+					if( $File->dbdelete() )
+					{	// Success deleting:
+						if( $file_num_deleted_links )
+						{	// Inform about deleted with links:
+							echo '<span class="text-danger">'.sprintf( T_('Deleted with %d links'), $file_num_deleted_links ).'.</span>';
+						}
+						else
+						{	// Inform about deleted without links:
+							echo '<span class="text-warning">'.T_('Deleted without links').'.</span>';
+						}
+					}
+					else
+					{	// Some restrictions, see File::get_delete_restrictions():
+						echo '<span class="text-danger">'.T_('Could not be deleted!').'</span>';
+						// Skip this File on next page searching:
+						$skip_files[] = $File->ID;
+					}
+				}
+				else
+				{	// Skip this File on next page searching:
+					$skip_files[] = $File->ID;
+				}
 			}
+			$num_total_files++;
+			echo '</li>';
+			evo_flush();
 		}
-
-		echo ' .';
-		evo_flush();
 
 		// Clear cache after each page to save memory
 		$FileCache->clear();
 
-		$current_page++;
-		$files_SQL->LIMIT( ( $current_page * $page_size ).', '.$page_size );
+		if( ! empty( $skip_files ) )
+		{	// Skip files which have been already processed:
+			$files_SQL->WHERE( 'file_ID NOT IN ( '.implode( ',', $skip_files ).' )' );
+		}
 	}
 
-	echo 'OK<p>';
-	echo sprintf( T_('Number of deleted orphan File objects: %d.'), $count_files_deleted ).'<br />';
-	echo sprintf( T_('Number of valid File objects in the database: %d.'), $count_files_valid ).'</p>';
+	echo '</ul>';
 
-	if( $count_files_invalid )
-	{ // There are invalid files in the database
-		// Display warning to show that the 'Remove orphan file roots' tool should be also called
-		$remove_orphan_file_roots = 'href="'.$admin_url.'?ctrl=tools&amp;action=delete_orphan_file_roots&amp;'.url_crumb('tools').'"';
-		$invalid_files_note = ( $count_files_invalid == 1 ) ? T_('An invalid File object was found in the database.') : sprintf( T_('%d invalid File objects were found in the database.'), $count_files_invalid );
-		echo '<p class="warning">'.$invalid_files_note."<br/>"
-			.sprintf( T_('It is strongly recommended to also execute the &lt;<a %s>Remove orphan file roots</a>&gt; tool to remove invalid files from the database and from the disk as well!'), $remove_orphan_file_roots )
-			.'</p>';
-	}
+	echo '<p>'.T_('Summary').':';
+		echo '<ul>';
+			echo '<li>'.sprintf( T_('%s valid Files'), '<b class="text-success">'.$num_valid_files.'</b>' ).'</li>';
+			echo '<li>'.( $delete_orphan_files && $num_missing_no_linked_files ? '<b>'.T_('DELETED').': </b>' : '' ).sprintf( T_('%s missing File with no links'), '<b class="text-warning">'.$num_missing_no_linked_files.'</b>' ).'</li>';
+			echo '<li>'.( $delete_orphan_linked_files && $num_missing_linked_files ? '<b>'.T_('DELETED').': </b>' : '' ).sprintf( T_('%s missing File with links (total number of Links: %s)'), '<b class="text-danger">'.$num_missing_linked_files.'</b>', '<b class="text-danger">'.$num_total_links.'</b>' ).'</li>';
+			echo '<li>'.sprintf( T_('Total number of File objects: %s'), '<b>'.$num_total_files.'</b>' ).'</li>';
+		echo '</ul>';
+	echo '</p>';
 }
 
 

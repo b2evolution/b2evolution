@@ -94,7 +94,7 @@ $Results->cols[] = array(
 					'th' => T_('Position'),
 					'th_class' => 'shrinkwrap',
 					'td_class' => 'nowrap '.( count( $LinkOwner->get_positions() ) > 1 ? 'left' : 'center' ),
-					'td' => '%display_link_position( {row}, '.( $fm_mode == 'file_select' ? 'false' : 'true' ).' )%',
+					'td' => '%display_link_position( {row}, '.( $fm_mode == 'file_select' ? 'false' : 'true' ).', "'.$fieldset_prefix.'" )%',
 				);
 
 // Add attr "id" to handle quick uploader
@@ -124,7 +124,7 @@ else
 // Load FileRoot class to get fileroot ID of collection below:
 load_class( '/files/model/_fileroot.class.php', 'FileRoot' );
 
-$link_owner_type = ( $LinkOwner->type == 'temporary' ) ? $LinkOwner->link_Object->type : $LinkOwner->type;
+$link_owner_type = ( $LinkOwner->type == 'temporary' ) ? $LinkOwner->link_Object->tmp_type : $LinkOwner->type;
 
 switch( $link_owner_type )
 {
@@ -161,7 +161,7 @@ display_dragdrop_upload_button( array(
 		'list_style'       => 'table',
 		'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
 				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'
-					.'<span class="qq-upload-drop-area-text-selector"></span>'
+					.'<div>#button_text#</div>'
 				.'</div>'
 				.'<div class="qq-upload-button-selector qq-upload-button">'
 					.'<div>#button_text#</div>'
@@ -190,7 +190,7 @@ display_dragdrop_upload_button( array(
 							.'<td class="qq-upload-link-position lastcol shrinkwrap"></td>'
 						.'</tr>',
 		'display_support_msg'    => false,
-		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody" )',
+		'additional_dropzone'    => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table" ).closest( "form" )',
 		'filename_before'        => '',
 		'LinkOwner'              => $LinkOwner,
 		'display_status_success' => false,
@@ -203,6 +203,8 @@ display_dragdrop_upload_button( array(
 	) );
 ?>
 <script type="text/javascript">
-// Initialize attachments fieldset to set proper height and handler to resize it:
-evo_link_initialize_fieldset( '<?php echo $fieldset_prefix; ?>' );
+jQuery( document ).ready( function()
+{	// Initialize attachments fieldset to set proper height and handler to resize it:
+	evo_link_initialize_fieldset( '<?php echo $fieldset_prefix; ?>' );
+} );
 </script>

@@ -165,9 +165,12 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 
 	/* Item Single */
 	add_basic_widget( $blog_id, 'Item Single', 'item_content', 'core', 10 );
-	add_basic_widget( $blog_id, 'Item Single', 'item_attachments', 'core', 15 );
-	add_basic_widget( $blog_id, 'Item Single', 'item_link', 'core', 17 );
-	if( $blog_id != $blog_a_ID && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) && ! in_array( $kind, array( 'forum', 'group' ) ) )
+	if( $kind != 'manual' )
+	{
+		add_basic_widget( $blog_id, 'Item Single', 'item_attachments', 'core', 15 );
+		add_basic_widget( $blog_id, 'Item Single', 'item_link', 'core', 17 );
+	}
+	if( $blog_id != $blog_a_ID && ( empty( $events_blog_ID ) || $blog_id != $events_blog_ID ) && ! in_array( $kind, array( 'forum', 'group', 'manual' ) ) )
 	{ // Item Tags
 		add_basic_widget( $blog_id, 'Item Single', 'item_tags', 'core', 20 );
 	}
@@ -183,12 +186,10 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	{ // Small Print
 		add_basic_widget( $blog_id, 'Item Single', 'item_small_print', 'core', 40, array( 'format' => ( $blog_id == $blog_a_ID ? 'standard' : 'revision' ) ) );
 	}
-	if( ! in_array( $kind, array( 'forum', 'group' ) ) )
-	{ // Seen by
+	if( ! in_array( $kind, array( 'forum', 'group', 'manual' ) ) )
+	{	// Seen by:
 		add_basic_widget( $blog_id, 'Item Single', 'item_seen_by', 'core', 50 );
-	}
-	if( $kind != 'forum' )
-	{	// Item voting panel:
+		// Item voting panel:
 		add_basic_widget( $blog_id, 'Item Single', 'item_vote', 'core', 60 );
 	}
 
@@ -196,12 +197,24 @@ function insert_basic_widgets( $blog_id, $initial_install = false, $kind = '' )
 	add_basic_widget( $blog_id, 'Item Page', 'item_content', 'core', 10 );
 	add_basic_widget( $blog_id, 'Item Page', 'item_attachments', 'core', 15 );
 	add_basic_widget( $blog_id, 'Item Page', 'item_seen_by', 'core', 50 );
-	add_basic_widget( $blog_id, 'Item Page', 'item_vote', 'core', 60 );
+	if( ! in_array( $kind, array( 'forum', 'group' ) ) )
+	{	// Item voting panel:
+		add_basic_widget( $blog_id, 'Item Page', 'item_vote', 'core', 60 );
+	}
 
 	/* Sidebar Single */
 	if( $kind == 'forum' )
 	{
 		add_basic_widget( $blog_id, 'Sidebar Single', 'coll_related_post_list', 'core', 1 );
+	}
+	if( $kind == 'manual' )
+	{
+		add_basic_widget( $blog_id, 'Sidebar Single', 'item_vote', 'core', 10 );
+		add_basic_widget( $blog_id, 'Sidebar Single', 'item_tags', 'core', 20 );
+		add_basic_widget( $blog_id, 'Sidebar Single', 'item_attachments', 'core', 30 );
+		add_basic_widget( $blog_id, 'Sidebar Single', 'item_link', 'core', 40 );
+		add_basic_widget( $blog_id, 'Sidebar Single', 'item_custom_fields', 'core', 50 );
+		add_basic_widget( $blog_id, 'Sidebar Single', 'item_seen_by', 'core', 60 );
 	}
 
 

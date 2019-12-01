@@ -21,7 +21,7 @@ class bootstrap_blog_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '6.11.2';
+	var $version = '6.11.4';
 
 	/**
 	 * Do we want to use style.min.css instead of style.css ?
@@ -616,7 +616,7 @@ class bootstrap_blog_Skin extends Skin
 
 			case 'left_sidebar':
 				// Left Sidebar
-				return 'col-md-9 pull-right';
+				return 'col-md-9 pull-right-md';
 
 			case 'right_sidebar':
 				// Right Sidebar

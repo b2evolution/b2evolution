@@ -40,7 +40,7 @@ $Results->title = T_('Top IPs').get_manual_link( 'top-ips' );
 // IP address
 $Results->cols[] = array(
 		'th' => T_('IP'),
-		'td' => '$hit_remote_addr$',
+		'td' => '%hit_ip_address_lookup( #hit_remote_addr# )%',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'nowrap'
 	);

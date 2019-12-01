@@ -80,7 +80,7 @@ class RestApi
 			// Get user by email and password:
 			list( $User, $exists_more ) = $UserCache->get_by_emailAndPwd( $entered_login, $entered_password );
 		}
-		elseif( is_valid_login( $entered_login ) )
+		elseif( is_valid_login( $entered_login ) === true )
 		{	// Make sure that we can load the user:
 			$User = & $UserCache->get_by_login( $entered_login );
 		}
@@ -422,7 +422,7 @@ class RestApi
 	 */
 	private function controller_coll_()
 	{
-		global $DB, $Settings, $current_User;
+		global $DB, $current_User;
 
 		$api_page = param( 'page', 'integer', 1 );
 		$api_per_page = param( 'per_page', 'integer', 10 );
@@ -431,24 +431,19 @@ class RestApi
 		$api_restrict_to_available_fileroots = param( 'restrict_to_available_fileroots', 'integer', 0 ); // 1 - Load only collections with available file roots for current user
 		$api_list_in_frontoffice = param( 'list_in_frontoffice', 'string', 'public' ); // 'public' - Load only collections which can be viewed for current user
 
+		$BlogCache = & get_BlogCache();
+
 		if( $api_list_in_frontoffice == 'public' )
 		{	// SQL to get ONLY public collections:
-			$BlogCache = & get_BlogCache();
 			$SQL = $BlogCache->get_public_colls_SQL();
 			$count_SQL = $BlogCache->get_public_colls_SQL();
 			$count_SQL->SELECT( 'COUNT( blog_ID )' );
 		}
 		else
-		{	// SQL to get ALL collections:
-			$sql_order_by = gen_order_clause( $Settings->get( 'blogs_order_by' ), $Settings->get( 'blogs_order_dir' ), 'blog_', 'blog_ID' );
-			$SQL = new SQL();
-			$SQL->SELECT( '*' );
-			$SQL->FROM( 'T_blogs' );
-			$SQL->ORDER_BY( $sql_order_by );
-			$count_SQL = new SQL( 'Get a count of collections for search request' );
+		{	// SQL to get ALL collections that can be seen by currently logged in User:
+			$SQL = $BlogCache->get_available_colls_SQL();
+			$count_SQL = $BlogCache->get_available_colls_SQL();
 			$count_SQL->SELECT( 'COUNT( blog_ID )' );
-			$count_SQL->FROM( 'T_blogs' );
-			$count_SQL->ORDER_BY( $sql_order_by );
 		}
 
 		if( ! empty( $api_q ) )
@@ -623,6 +618,40 @@ class RestApi
 		// Try to get a post ID for request "<baseurl>/api/v1/collections/<collname>/items/<id>":
 		$post_ID = empty( $this->args[3] ) ? 0 : $this->args[3];
 
+		// Get params for full content:
+		$content_params = param( 'content_params', 'array', array() );
+		$content_params =  array_merge( array(
+			'before_content_teaser'    => '',
+			'after_content_teaser'     => '',
+			'before_content_extension' => '',
+			'after_content_extension'  => '',
+			'image_position_teaser'    => 'teaser,teaserperm,teaserlink',
+			'image_position_aftermore' => 'aftermore',
+			'before_images'            => '',
+			'after_images'             => '',
+			'before_image'             => '<figure class="evo_image_block">',
+			'before_image_legend'      => '<figcaption class="evo_image_legend">',
+			'after_image_legend'       => '</figcaption>',
+			'after_image'              => '</figure>',
+			'image_class'              => '',
+			'image_size'               => 'original',
+			'image_limit'              =>  1000,
+			'image_link_to'            => 'original', // Can be 'original', 'single' or empty
+			'before_gallery'           => '<div class="evo_post_gallery">',
+			'after_gallery'            => '</div>',
+			'gallery_table_start'      => '',
+			'gallery_table_end'        => '',
+			'gallery_row_start'        => '',
+			'gallery_row_end'          => '',
+			'gallery_cell_start'       => '<div class="evo_post_gallery__image">',
+			'gallery_cell_end'         => '</div>',
+			'gallery_image_size'       => 'crop-80x80',
+			'gallery_image_limit'      => 1000,
+			'gallery_image_link_to' => 'original', // Can be 'original', 'single' or empty
+			'gallery_colls'            => 5,
+			'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
+		), $content_params );
+
 		$ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), $api_per_page, 'ItemCache', '' );
 
 		if( $post_ID )
@@ -716,7 +745,27 @@ class RestApi
 						$item_data['title'] = $Item->get( 'title' );
 						break;
 					case 'content':
-						$item_data['content'] = $Item->get_prerendered_content( 'htmlbody' );
+						$item_data['content'] =
+							$Item->get_images( array_merge( $content_params, array(
+									'before' => $content_params['before_images'],
+									'after'  => $content_params['after_images'],
+									'limit'  => $content_params['image_limit'],
+									'restrict_to_image_position' => $content_params['image_position_teaser'],
+								) ) ).
+							$Item->get_content_teaser( '#', '#', 'htmlbody', array_merge( $content_params, array(
+									'before' => $content_params['before_content_teaser'],
+									'after'  => $content_params['after_content_teaser'],
+								) ) ).
+							$Item->get_images( array_merge( $content_params, array(
+									'before' => $content_params['before_images'],
+									'after'  => $content_params['after_images'],
+									'limit'  => $content_params['image_limit'],
+									'restrict_to_image_position' => $content_params['image_position_aftermore'],
+								) ) ).
+							$Item->get_content_extension( '#', true, 'htmlbody', array_merge( $content_params, array(
+									'before' => $content_params['before_content_extension'],
+									'after'  => $content_params['after_content_extension'],
+								) ) );
 						break;
 					case 'excerpt':
 						$item_data['excerpt'] = $Item->get( 'excerpt' );
@@ -1722,7 +1771,7 @@ class RestApi
 		$api_mentioned = param( 'mentioned', 'array:string' ); // User logins mentioned on the page
 		$api_blog = param( 'blog', 'integer' );
 
-		if( ! is_valid_login( $api_q ) )
+		if( is_valid_login( $api_q ) !== true )
 		{	// Restrict a wrong request:
 			$this->halt( 'Wrong request', 'wrong_request', 403 );
 			// Exit here.

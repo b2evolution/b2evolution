@@ -334,9 +334,9 @@ param( 'import_mode', 'string', 'normal' );
 			form_text( 'default_password', $default_password, 20, 'Password for new users', 'this will be the password for users created during migration (default is "changeme")', 30 , '', 'password' );
 			form_text( 'default_password2', $default_password, 20, 'Confirm password', 'please confirm the password', 30 , '', 'password' );
 			$GroupCache = & get_GroupCache();
-			form_select_object( 'default_usergroup', $Settings->get('newusers_grp_ID'), $GroupCache, T_('User group') );
+			form_select_object( 'default_usergroup', $Settings->get('newusers_grp_ID'), $GroupCache, 'User group' );
 			$field_note = '[0 - 10]';
-			form_text( 'default_userlevel', $Settings->get('newusers_level'), 2, T_('Level'), $field_note, 2 );
+			form_text( 'default_userlevel', $Settings->get('newusers_level'), 2, 'Level', $field_note, 2 );
 			?>
 		</fieldset>
 
@@ -380,7 +380,7 @@ param( 'import_mode', 'string', 'normal' );
 		<fieldset><legend>Post/Entry defaults</legend>
 			<?php
 			form_checkbox( 'default_convert_breaks', $default_convert_breaks, 'Convert-Breaks default', 'will be used for posts with empty CONVERT BREAKS or "__default__"' );
-			form_select( 'post_locale', $Settings->get('default_locale'), 'locale_options', T_('Default locale'), 'Locale for posts.' );
+			form_select( 'post_locale', $Settings->get('default_locale'), 'locale_options', 'Default locale', 'Locale for posts.' );
 			form_checkbox( 'convert_html_tags', $convert_html_tags, 'Convert ugly HTML', 'this will lowercase all html tags and add a XHTML compliant closing tag to &lt;br&gt;, &lt;img&gt;, &lt;hr&gt; (you\'ll get notes)' );
 
 			if( $import_mode != 'easy' )
@@ -1252,7 +1252,7 @@ function fieldset_cats()
 		<?php
 			if( count( $ChapterCache->cache ) )
 			{
-				echo T_('Select main category in target blog and optionally check additional categories').':';
+				echo 'Select main category in target blog and optionally check additional categories'.':';
 			}
 			else
 			{
@@ -1279,7 +1279,7 @@ function fieldset_cats()
 
 			if( get_allow_cross_posting() >= 1 )
 			{ // We allow cross posting, display checkbox:
-				$r .= '<input type="checkbox" name="post_extracats[]" class="checkbox" title="'.format_to_output( T_('Select as an additionnal category'), 'htmlattr' ).'" value="'.$Chapter->ID.'"';
+				$r .= '<input type="checkbox" name="post_extracats[]" class="checkbox" title="'.format_to_output( 'Select as an additionnal category', 'htmlattr' ).'" value="'.$Chapter->ID.'"';
 				$r .= ' />';
 			}
 
@@ -1290,7 +1290,7 @@ function fieldset_cats()
 				{	// Assign default cat for new post
 					$default_main_cat = $Chapter->ID;
 				}
-				$r .= ' <input type="radio" name="post_category" class="checkbox" title="'.format_to_output( T_('Select as MAIN category'), 'htmlattr' ).'" value="'.$Chapter->ID.'"';
+				$r .= ' <input type="radio" name="post_category" class="checkbox" title="'.format_to_output( 'Select as MAIN category', 'htmlattr' ).'" value="'.$Chapter->ID.'"';
 				if( ($Chapter->ID == $postdata["Category"]) || ($Chapter->ID == $default_main_cat))
 					$r .= ' checked="checked"';
 				$r .= ' />';

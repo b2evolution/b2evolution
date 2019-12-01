@@ -17,7 +17,7 @@ class texturize_plugin extends Plugin
 	var $code = 'b2WPTxrz';
 	var $name = 'Texturize';
 	var $priority = 90;
-	var $version = '6.11.2';
+	var $version = '6.11.4';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -111,7 +111,7 @@ It will also perform the following replacements:
 		$textarr = preg_split("/(<.*>)/Us", $content, -1, PREG_SPLIT_DELIM_CAPTURE); // capture the tags as well as in between
 		$stop = count($textarr); $next = true; // loop stuff
 		for ($i = 0; $i < $stop; $i++) {
-			$curl = $textarr[$i];
+			$curl = strval( $textarr[$i] );
 
 			if (strlen($curl) && '<' != $curl{0} && $next) { // If it's not a tag
 				$curl = str_replace('---', '&#8212;', $curl);
@@ -141,7 +141,7 @@ It will also perform the following replacements:
 
 				$curl = preg_replace('/(d+)x(\d+)/', "$1&#215;$2", $curl);
 
-			} elseif (strstr($curl, '<code') || strstr($curl, '<pre') || strstr($curl, '<kbd' || strstr($curl, '<style') || strstr($curl, '<script'))) {
+			} elseif( strstr( $curl, '<code' ) || strstr( $curl, '<pre' ) || strstr( $curl, '<kbd' ) || strstr( $curl, '<style' ) || strstr( $curl, '<script' ) ) {
 				// strstr is fast
 				$next = false;
 			} else {

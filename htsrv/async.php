@@ -826,6 +826,7 @@ switch( $action )
 		param( 'root', 'string', '' );
 		param( 'path', 'filepath', '' );
 		param( 'fm_highlight', 'string', '' );
+		param( 'prefix', 'string' );
 
 		$additional_params = empty( $root ) ? '' : '&amp;root='.$root;
 		$additional_params .= empty( $path ) ? '' : '&amp;path='.$path;
@@ -833,7 +834,7 @@ switch( $action )
 
 		echo '<div style="background:#FFF;height:90%">'
 				.'<span id="link_attachment_loader" class="loader_img absolute_center" title="'.T_('Loading...').'"></span>'
-				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$link_owner_type.'&amp;link_object_ID='.$link_owner_ID.$additional_params.'"'
+				.'<iframe src="'.$admin_url.'?ctrl=files&amp;mode=upload&amp;ajax_request=1&amp;iframe_name='.$iframe_name.'&amp;fm_mode=link_object&amp;link_type='.$link_owner_type.'&amp;link_object_ID='.$link_owner_ID.$additional_params.'&amp;prefix='.$prefix.'"'
 					.' width="100%" height="100%" marginwidth="0" marginheight="0" align="top" scrolling="auto" frameborder="0"'
 					.' onload="document.getElementById(\'link_attachment_loader\').style.display=\'none\'">loading</iframe>'
 			.'</div>';

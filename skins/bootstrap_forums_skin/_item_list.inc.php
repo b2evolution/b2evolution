@@ -61,14 +61,14 @@ elseif( $comments_number > 25 )
 	$status_alt = T_('Popular topic');
 	$legend_icons['topic_popular'] = 1;
 }
-$Item->load_Blog();
 // There is a very restrictive case in which we display workflow:
-$display_workflow = ( $disp == 'posts' ) &&
-    ! empty( $Item ) &&
-    is_logged_in() &&
-    $Blog->get_setting( 'use_workflow' ) &&
-    $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) &&
-    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item );
+$display_workflow =
+	// User must be logged in:
+	is_logged_in() &&
+	// Workflow must be enabled for current Collection:
+	$Item->get_coll_setting( 'use_workflow' ) &&
+	// Current User must has a permission to be assigned for tasks of the current Collection:
+	$current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Item->get_blog_ID() );
 ?>
 
 <article class="container group_row posts_panel">
@@ -106,7 +106,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 						<?php
 						echo $status_title;
 
-						if( $Item->Blog->get_setting( 'track_unread_content' ) )
+						if( $Item->get_coll_setting( 'track_unread_content' ) )
 						{ // Update legend array to display the unread status icons in footer legend:
 							switch( $Item->get_read_status() )
 							{
@@ -231,7 +231,7 @@ $display_workflow = ( $disp == 'posts' ) &&
 			echo '<div class="ft_date_header">';	// fp> temp hack to get correct style
 
 			// Workflow status
-			echo '<b><a href="'.$url.'">'.item_td_task_cell( 'status', $Item, false ).'</a></b>';
+			echo '<b><a href="'.$url.'" style="color:'.$priority_color.'">'.item_td_task_cell( 'status', $Item, false ).'</a></b>';
 			echo '</div>';
 
 			// b2evonet:

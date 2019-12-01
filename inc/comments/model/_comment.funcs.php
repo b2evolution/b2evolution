@@ -654,9 +654,9 @@ function echo_disabled_comments( $allow_comments_value, $item_url, $params = arr
 			'fieldset_end'   => '</fieldset>',
 			'fieldstart'     => '',
 			'fieldend'       => '',
-			'labelstart'     => '<div class="label"><label for="p">',
+			'labelstart'     => '<div class="evo_label"><label for="p">',
 			'labelend'       => '</label></div>',
-			'inputstart'     => '<div class="input">',
+			'inputstart'     => '<div class="evo_input">',
 			'inputend'       => '</div>',
 		), $params['form_params'] );
 
@@ -1399,6 +1399,60 @@ function comments_results( & $comments_Results, $params = array() )
 				'td' => '%comment_edit_actions( {Obj} )%'
 			);
 	}
+}
+
+
+/**
+ * JS Behaviour: Output JavaScript code to change Item of the Comment
+ */
+function echo_comment_change_item_js()
+{
+	global $Blog, $admin_url, $evo_comment_change_item_js_initialized;
+
+	if( ! empty( $evo_comment_change_item_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
+
+	// Set flag to know this is initialized:
+	$evo_comment_change_item_js_initialized = true;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize JavaScript for item selector window:
+	echo_item_selector_js();
+?>
+<script>
+function evo_comment_change_item_load_window( item_ID )
+{
+	return evo_item_selector_load_window( item_ID,
+		[ '<?php echo TS_('Link to Another Post'); ?>', '<?php echo T_('Link to Another Post'); ?>' ],
+		false,
+		[ { 'text': '<?php echo TS_('Link comment to this post'); ?>', 'id': 'evo_comment_change_item_btn', 'class': 'btn btn-primary' } ],
+		<?php echo empty( $Blog ) ? 0 : $Blog->ID; // Default collection ?>,
+		'collections', { list_in_frontoffice: 'all', per_page: -1 }
+	);
+}
+
+// Submit form to link the Comment to another Item:
+jQuery( document ).on( 'click', '#evo_comment_change_item_btn', function()
+{
+	var post = jQuery( '#evo_item_selector_dest_post_ID' ).data( 'post' )
+
+	// Update info field link:
+	var item_link = jQuery('.comment_item_title')[0];
+	item_link.innerHTML = post.title;
+	item_link.href = '<?php echo $admin_url; ?>?ctrl=items&blog=' + jQuery( '#evo_item_selector_colls_list' ).find( ':selected' ).data( 'coll-id' ) + '&p=' + jQuery( '#evo_item_selector_dest_post_ID').val();
+
+	// Update moveto_post field:
+	jQuery( 'input[name="moveto_post"]' ).val( jQuery('#evo_item_selector_dest_post_ID').val() );
+
+	// Close main modal window:
+	closeModalWindow();
+} );
+</script>
+<?php
 }
 
 

@@ -33,15 +33,7 @@ if( $params['notify_full'] )
 {	/* Full notification */
 	echo '<p'.emailskin_style( '.p' ).'>'.sprintf( T_( '%s assigned you the following post' ).':', $principal_User->get_colored_login( array( 'mask' => '$avatar$ $login$', 'protocol' => 'http:', 'login_text' => 'name' ) ) )."</p>\n";
 
-	echo '<p'.emailskin_style( '.p' ).'>'.T_('Collection').': '.get_link_tag( $Blog->gen_blogurl(), $Blog->get('shortname'), '.a' )."</p>\n";
-
-	$Item->get_creator_User();
-	echo '<p'.emailskin_style( '.p' ).'>'.T_('Author').': '.get_user_colored_login_link( $Item->creator_User->login, array( 'use_style' => true, 'protocol' => 'http:' ) ).' ('.$Item->creator_User->get('login').")</p>\n";
-
-	echo '<p'.emailskin_style( '.p' ).'>'.T_('Title').': '.$Item->get('title')."</p>\n";
-
-	// linked URL or "-" if empty:
-	echo '<p'.emailskin_style( '.p' ).'>'.T_('Url').': '.( empty( $Item->url ) ? '-' : get_link_tag( $Item->get('url'), '', '.a' ) )."</p>\n";
+	echo '<p'.emailskin_style( '.p' ).'><b>'.$Item->get('title')."</b> &ndash; ".get_link_tag( $Blog->gen_blogurl(), $Blog->get('shortname'), '.a' )."</p>\n";
 
 	// Content:
 	echo '<div class="email_ugc"'.emailskin_style( 'div.email_ugc' ).'>'."\n";

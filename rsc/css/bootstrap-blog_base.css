@@ -534,7 +534,7 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 }
 .widget_core_org_members {
   margin: 5em 0 30px;
-  color: #333333;
+  color: #333;
 }
 .widget_core_org_members div.widget_rwd_content {
   text-align: center;
@@ -570,7 +570,7 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   font-size: 18px;
 }
 .widget_core_org_members a.user_link {
-  color: #000000;
+  color: #000;
 }
 .widget_core_org_members a.user_link:hover {
   color: #23527c;
@@ -697,12 +697,12 @@ div.average_rating span.average_rating_score {
   background-position: 0 -208px;
 }
 .evo_stars {
-  color: #ff9900;
+  color: #F90;
   white-space: nowrap;
 }
 .evo_stars .evo_star_empty,
 .evo_stars .evo_star_percent {
-  color: #999999;
+  color: #999;
 }
 .evo_stars .evo_star_percent {
   position: relative;
@@ -711,7 +711,7 @@ div.average_rating span.average_rating_score {
   position: absolute;
   left: 0;
   overflow: hidden;
-  color: #ff9900;
+  color: #F90;
 }
 .evo_container__footer {
   margin-bottom: 10px;
@@ -728,7 +728,8 @@ main .well header .small.text-muted a {
 .post_tags {
   margin: 15px 0px 10px 0px;
 }
-.post_tags a {
+.post_tags > a,
+.post_tags > span {
   display: inline-block;
   padding: 3px 5px;
   margin-bottom: 5px;
@@ -737,14 +738,22 @@ main .well header .small.text-muted a {
   color: black;
   margin-right: 3px;
 }
-.post_tags a:before {
+.post_tags > a:hover,
+.post_tags > span:hover {
+  text-decoration: none;
+  background: #ddd;
+}
+.post_tags > a:before {
   font-family: FontAwesome;
   content: '\f02b \00a0 ';
   color: #aaa;
 }
-.post_tags a:hover {
-  text-decoration: none;
-  background: #ddd;
+.post_tags > span a {
+  color: black;
+}
+.post_tags > span span.fa {
+  font-size: inherit;
+  color: #aaa;
 }
 .post_comments_link {
   margin-bottom: 10px;
@@ -801,12 +810,12 @@ td#prev,
 td#next {
   font-weight: bold;
   font-size: 105%;
-  padding: .5ex;
+  padding: 0.5ex;
   white-space: nowrap;
 }
 td#prev a,
 td#next a {
-  padding: .5ex;
+  padding: 0.5ex;
 }
 td#prev {
   text-align: left;
@@ -829,6 +838,9 @@ div.error_additional_content {
 .evo_comment ul {
   list-style-position: inside;
   margin: 0 0 10px 0px;
+}
+.evo_comment ul ul {
+  margin: 0 0 0 20px;
 }
 .evo_comment_rating {
   margin: 3px;
@@ -1014,7 +1026,7 @@ table.catselect {
   border: 1px solid #bbb;
 }
 table.catselect thead tr th {
-  padding: .3ex 1ex;
+  padding: 0.3ex 1ex;
   background-color: #d4d4d4;
   border-bottom: 1px solid #bbb;
   color: #333;
@@ -1034,7 +1046,7 @@ table.catselect.table > thead > tr > th {
   border-color: #bbb;
 }
 table.catselect td {
-  padding: .2ex 1ex;
+  padding: 0.2ex 1ex;
   background: none;
 }
 table.catselect tr.group td {
@@ -1467,6 +1479,13 @@ form#comment_edit {
 .evo_content_block table.item_custom_fields td {
   vertical-align: middle;
 }
+div.item_custom_fields div.row {
+  margin-top: 8px;
+  word-break: break-all;
+}
+div.item_custom_fields div.row:first-child {
+  margin-top: 0;
+}
 .evo_form__comment .panel {
   margin: 0;
   border: none;
@@ -1639,6 +1658,17 @@ div.qq-upload-drop-area-active {
   background: #5bc0de;
   border-radius: 9px;
 }
+div.qq-upload-drop-area {
+  padding: 7px 0;
+  text-align: center;
+  color: #FFF;
+  font-weight: bold;
+}
+div.qq-upload-drop-area > div > span {
+  font-weight: normal;
+  font-size: small;
+  margin-top: 2px;
+}
 div.qq-upload-button-hover,
 div.qq-upload-drop-area,
 div.qq-upload-drop-area-active {
@@ -1654,7 +1684,7 @@ div.evo_fileuploader_form {
 }
 .evo_attachments_fieldset__wrapper {
   width: 100%;
-  height: 160px;
+  height: 97px;
   position: relative;
   padding-bottom: 6px;
   box-sizing: content-box;
@@ -1806,4 +1836,7 @@ div.evo_fileuploader_form {
   outline: 1px solid #ccc;
   outline-offset: -1px;
   vertical-align: top;
+}
+.evo_widget.widget_core_basic_menu_link img {
+  margin-top: -2px;
 }

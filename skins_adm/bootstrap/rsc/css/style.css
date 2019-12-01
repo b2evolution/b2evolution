@@ -718,7 +718,7 @@ fieldset ul {
 }
 .evo_attachments_fieldset__wrapper {
   width: 100%;
-  height: 160px;
+  height: 97px;
   position: relative;
   padding-bottom: 6px;
   box-sizing: content-box;
@@ -792,6 +792,17 @@ div.qq-upload-drop-area-active {
   border: 2px dashed #fff;
   background: #5bc0de;
   border-radius: 9px;
+}
+div.qq-upload-drop-area {
+  padding: 7px 0;
+  text-align: center;
+  color: #FFF;
+  font-weight: bold;
+}
+div.qq-upload-drop-area > div > span {
+  font-weight: normal;
+  font-size: small;
+  margin-top: 2px;
 }
 div.qq-upload-button-hover,
 div.qq-upload-drop-area,
@@ -1325,7 +1336,7 @@ ol.breadcrumb {
 .skinshot .skinshot_placeholder {
   width: 240px;
   height: 180px;
-  margin: 1ex 1ex .5ex 1ex;
+  margin: 1ex 1ex 0.5ex 1ex;
   background: #FFF;
   text-align: center;
   border-radius: 4px;
@@ -1558,31 +1569,31 @@ table.diff td.diff-section-title {
   min-width: 1px;
 }
 .status_color_draft {
-  color: #ffff99;
+  color: #ff9;
 }
 .status_color_review {
-  color: #cc0099;
+  color: #CC0099;
 }
 .status_color_community {
-  color: #2e8bb9;
+  color: #2E8BB9;
 }
 .status_color_protected {
-  color: #ff9c2a;
+  color: #FF9C2A;
 }
 .status_color_private {
-  color: #dc143c;
+  color: #DC143C;
 }
 .status_color_published {
-  color: #99ee44;
+  color: #99EE44;
 }
 .status_color_deprecated {
-  color: #000000;
+  color: #000;
 }
 .status_color_redirected {
   color: #663399;
 }
 .status_color_trash {
-  color: #ff6666;
+  color: #f66;
 }
 .status_color_meta {
   color: #5bc0de;
@@ -1592,7 +1603,7 @@ table.diff td.diff-section-title {
 }
 .btn-status-draft {
   color: #000;
-  background-color: #ffff99;
+  background-color: #ff9;
   border-color: #dfdfdf;
 }
 .btn-status-draft:hover {
@@ -1601,7 +1612,7 @@ table.diff td.diff-section-title {
 }
 .btn-status-review {
   color: #fff;
-  background-color: #cc0099;
+  background-color: #CC0099;
 }
 .btn-status-review:hover {
   color: #fff;
@@ -1609,7 +1620,7 @@ table.diff td.diff-section-title {
 }
 .btn-status-community {
   color: #fff;
-  background-color: #2e8bb9;
+  background-color: #2E8BB9;
 }
 .btn-status-community:hover {
   color: #fff;
@@ -1617,7 +1628,7 @@ table.diff td.diff-section-title {
 }
 .btn-status-protected {
   color: #fff;
-  background-color: #ff9c2a;
+  background-color: #FF9C2A;
 }
 .btn-status-protected:hover {
   color: #fff;
@@ -1625,7 +1636,7 @@ table.diff td.diff-section-title {
 }
 .btn-status-private {
   color: #fff;
-  background-color: #dc143c;
+  background-color: #DC143C;
 }
 .btn-status-private:hover {
   color: #fff;
@@ -1633,7 +1644,7 @@ table.diff td.diff-section-title {
 }
 .btn-status-published {
   color: #000;
-  background-color: #99ee44;
+  background-color: #99EE44;
 }
 .btn-status-published .glyphicon {
   color: inherit !important;
@@ -1644,11 +1655,11 @@ table.diff td.diff-section-title {
 }
 .btn-status-deprecated {
   color: #fff;
-  background-color: #000000;
+  background-color: #000;
 }
 .btn-status-deprecated:hover {
   color: #fff;
-  background-color: #333333;
+  background-color: #333;
 }
 .btn-status-redirected {
   color: #fff;
@@ -1660,11 +1671,11 @@ table.diff td.diff-section-title {
 }
 .btn-status-trash {
   color: #fff;
-  background-color: #ff6666;
+  background-color: #f66;
 }
 .btn-status-trash:hover {
   color: #fff;
-  background-color: #ff4444;
+  background-color: #f44;
 }
 .evo_checkbox_status {
   padding: 0 1px 1px 1px;
@@ -1675,31 +1686,31 @@ table.diff td.diff-section-title {
   padding: 1px 1px 2px 1px;
 }
 .evo_checkbox_status__published {
-  background-color: #99ee44;
+  background-color: #99EE44;
 }
 .evo_checkbox_status__community {
-  background-color: #2e8bb9;
+  background-color: #2E8BB9;
 }
 .evo_checkbox_status__protected {
-  background-color: #ff9c2a;
+  background-color: #FF9C2A;
 }
 .evo_checkbox_status__review {
-  background-color: #cc0099;
+  background-color: #CC0099;
 }
 .evo_checkbox_status__private {
-  background-color: #dc143c;
+  background-color: #DC143C;
 }
 .evo_checkbox_status__draft {
-  background-color: #ffff99;
+  background-color: #ff9;
 }
 .evo_checkbox_status__deprecated {
-  background-color: #000000;
+  background-color: #000;
 }
 .evo_checkbox_status__redirected {
   background-color: #663399;
 }
 .evo_checkbox_status__trash {
-  background-color: #ff6666;
+  background-color: #f66;
 }
 .evo_checkbox_status__meta {
   background-color: #5bc0de;

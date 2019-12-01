@@ -33,6 +33,8 @@ $Form->hidden( 'blog', $edited_Blog->ID );
 
 $Form->begin_fieldset( T_('User directory').get_manual_link( 'user-directory-other' ) );
 
+	$Form->checkbox( 'userdir_enable', $edited_Blog->get_setting( 'userdir_enable' ), T_('Enable User directory') );
+
 	$Form->checklist( array(
 			array( 'userdir_filter_gender', 1, T_('Gender'), $edited_Blog->get_setting( 'userdir_filter_gender' ) ),
 			array( 'userdir_filter_level', 1, T_('User level'), $edited_Blog->get_setting( 'userdir_filter_level' ) ),

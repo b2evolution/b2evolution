@@ -816,6 +816,21 @@ class Skin extends DataObject
 
 
 	/**
+	 * Get value of setting with format "checklist" which values are stored as array
+	 *
+	 * @param string Setting name
+	 * @param string Option name
+	 * @return string|NULL Option value or NULL if setting doesn't exist
+	 */
+	function get_checklist_setting( $setting_name, $option_name )
+	{
+		$setting_values = $this->get_setting( $setting_name );
+
+		return isset( $setting_values[ $option_name ] ) ? $setting_values[ $option_name ] : NULL;
+	}
+
+
+	/**
 	 * Get a skin specific param default value
 	 *
 	 * @param string Setting name
@@ -1093,7 +1108,7 @@ class Skin extends DataObject
 
 					global $Collection, $Blog, $Item, $current_User;
 
-					if( isset( $Item ) && $Item->can_receive_webmentions() )
+					if( ! empty( $Item ) && $Item->can_receive_webmentions() )
 					{	// Send header and initialize <link> tags in order to mark current Item can receive webmentions by current User(usually anonymous user):
 						$webmention_url = $Blog->get_htsrv_url().'webmention.php';
 						header( 'Link: <'.$webmention_url.'>; rel="webmention"' );
@@ -1172,13 +1187,8 @@ class Skin extends DataObject
 					// Require functions.js to show/hide a panel with filters:
 					require_js( 'functions.js', 'blog' );
 
-					// Require Fine Uploader js and css:
-					require_js( 'multiupload/fine-uploader.js', 'blog' );
-					require_css( 'fine-uploader.css', 'blog' );
-
-					// Load JS files to make the links table sortable:
-					require_js( '#jquery#', 'blog' );
-					require_js( 'jquery/jquery.sortable.min.js', 'blog' );
+					// Init JS to quick upload several files:
+					init_fileuploader_js( 'blog' );
 
 					// Include this file to expand/collapse the filters panel when JavaScript is disabled
 					global $inc_path;

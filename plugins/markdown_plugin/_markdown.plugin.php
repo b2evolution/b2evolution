@@ -22,7 +22,7 @@ class markdown_plugin extends Plugin
 	var $code = 'b2evMark';
 	var $name = 'Markdown';
 	var $priority = 20;
-	var $version = '6.11.2';
+	var $version = '6.11.4';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -68,19 +68,19 @@ class markdown_plugin extends Plugin
 					'label' => T_( 'Links' ),
 					'type' => 'checkbox',
 					'note' => T_( 'Detect and convert markdown link markup.' ),
-					'defaultvalue' => 0,
+					'defaultvalue' => 1,
 				),
 			'images' => array(
 					'label' => T_( 'Images' ),
 					'type' => 'checkbox',
 					'note' => T_( 'Detect and convert markdown image markup.' ),
-					'defaultvalue' => 0,
+					'defaultvalue' => 1,
 				),
 			'text_styles' => array(
 					'label' => T_( 'Italic & Bold styles' ),
 					'type' => 'checkbox',
 					'note' => T_( 'Detect and convert markdown italics and bold markup.' ),
-					'defaultvalue' => 0,
+					'defaultvalue' => 1,
 				),
 			'table' => array(
 					'label' => T_('Tables'),
@@ -222,7 +222,6 @@ class markdown_plugin extends Plugin
 
 		// Initialize object to parse markdown code:
 		$ParsedownB2evo = new ParsedownB2evo();
-		$ParsedownB2evo->setUrlsLinked( false ); // Don't parse urls to links
 		$ParsedownB2evo->set_b2evo_parse_font_styles( $text_styles_enabled );
 		$ParsedownB2evo->set_b2evo_parse_links( $links_enabled );
 		$ParsedownB2evo->set_b2evo_parse_images( $images_enabled );
@@ -267,8 +266,6 @@ class markdown_plugin extends Plugin
 			case 'forum':
 			case 'manual':
 				$params['Blog']->set_setting( 'plugin'.$this->ID.'_coll_apply_comment_rendering', 'opt-out' );
-				$params['Blog']->set_setting( 'plugin'.$this->ID.'_images', '1' );
-				$params['Blog']->set_setting( 'plugin'.$this->ID.'_links', '1' );
 				break;
 		}
 	}

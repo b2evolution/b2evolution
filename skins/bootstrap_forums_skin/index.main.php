@@ -21,7 +21,7 @@ if( evo_version_compare( $app_version, '6.4' ) < 0 )
 	die( 'This skin is designed for b2evolution 6.4 and above. Please <a href="http://b2evolution.net/downloads/index.html">upgrade your b2evolution</a>.' );
 }
 
-global $Skin;
+global $Skin, $tag;
 
 
 // This is the main template; it may be used to display very different things.
@@ -52,7 +52,8 @@ skin_include( '_html_header.inc.php', array(
 	'category_text'     => T_('Forum').': ',
 	'comments_text'     => T_('Latest Replies'),
 	'front_text'        => T_('Forum'),
-	'posts_text'        => $posts_text,
+	// Display default title only for tag page without intro Item:
+	'posts_text'        => ( isset( $tag ) && ! has_featured_Item() ? '#' : $posts_text ),
 	'useritems_text'    => T_('User\'s topics'),
 	'usercomments_text' => T_('User\'s replies'),
 	'flagged_text'      => T_('Flagged topics'),
@@ -144,7 +145,7 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <div class="row">
 
-	<div class="<?php echo $Skin->get_column_class(); ?>">
+	<div class="evo_content_col <?php echo $Skin->get_column_class(); ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -292,7 +293,7 @@ siteskin_include( '_site_body_header.inc.php' );
 	if( $Skin->is_visible_sidebar() )
 	{ // Display sidebar:
 	?>
-	<aside class="col-md-3<?php echo ( $Skin->get_setting_layout() == 'left_sidebar' ? ' pull-left' : '' ); ?>">
+	<aside class="evo_sidebar_col col-md-3<?php echo ( $Skin->get_setting_layout() == 'left_sidebar' ? ' pull-left-md' : '' ); ?>">
 		<!-- =================================== START OF SIDEBAR =================================== -->
 		<div class="evo_container evo_container__sidebar">
 		<?php
@@ -490,4 +491,124 @@ siteskin_include( '_site_body_footer.inc.php' );
 // ------------------------- HTML FOOTER INCLUDED HERE --------------------------
 skin_include( '_html_footer.inc.php' );
 // ------------------------------- END OF FOOTER --------------------------------
+
+if( $Skin->is_visible_sidebar( 'single', true ) && $Skin->get_setting( 'sidebar_single_affix' ) )
+{	// Sidebar enabled, add script that will affix the sidebar:
+	$sidebar_offset = $Skin->get_setting( 'message_affix_offset' ) == '' ? 20 : $Skin->get_setting( 'message_affix_offset' );
+	?>
+	<script>
+		jQuery( document ).ready( function()
+		{
+			var affix_obj = jQuery( ".evo_container", ".evo_sidebar_col" ),
+			    evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0;
+
+			if( !affix_obj.length )
+			{	// Nothing to affix:
+				return;
+			}
+
+			var affix_obj_top = affix_obj.offset().top;
+
+			// Wrap sidebar containers:
+			affix_obj.wrapAll( '<div class="sidebar_wrapper"></div>' );
+			var wrapper = affix_obj.parent(),
+			    wrapper_width = wrapper.outerWidth();
+
+			wrapper.affix( {
+				offset: {
+					top: function() {
+						return affix_obj_top - get_affix_offset() - parseInt( wrapper.css( "margin-top" ) );
+					}
+				}
+			} );
+
+			// This is needed when we refresh the page that was already scrolled and the sidebar is already affixed.
+			// The affix.bs.affix event does not get trigger in this case!
+			if( wrapper.hasClass( 'affix' ) && ! wrapper.attr( 'style' ) && ! jQuery( 'div.sidebar_placeholder' ).length )
+			{
+				affix_sidebar();
+				check_sidebar_overflow();
+			}
+
+			wrapper.on( "affix.bs.affix", function() {
+				affix_sidebar();
+				check_sidebar_overflow();
+			} );
+
+			wrapper.on( "affixed-top.bs.affix", function() {
+				// Remove the placeholder:
+				if( jQuery( 'div.sidebar_placeholder' ).length )
+				{
+					wrapper.unwrap();
+				}
+
+				// Reset wrapper style:
+				wrapper.css( { "width": "", "top": "", "z-index": "" } );
+			} );
+
+			function get_affix_offset()
+			{
+				var affix_offset = evo_toolbar_height + <?php echo $sidebar_offset;?>,
+					  sitewide_header_affix_offset = 0;
+
+				// This is specific to b2evolution.net forum site.
+				// Sites with a custom sitewide header that contains fixed elements should declare the JS function below
+				// or compensate with the "Messages affix offset" skin setting:
+				if( window.get_sitewide_header_affix_offset && typeof window.get_sitewide_header_affix_offset === 'function' )
+				{
+					sitewide_header_affix_offset = window.get_sitewide_header_affix_offset();
+				}
+
+				return affix_offset + sitewide_header_affix_offset;
+			}
+
+			function affix_sidebar()
+			{
+				// Create a placeholder for the affix obj berfore we fix it into position:
+				wrapper.wrap( '<div class="sidebar_placeholder"></div>' );
+				var placeholder = wrapper.parent();
+				placeholder.css( 'width', '100%' );
+
+				// Fix wrapper into position:
+				wrapper.css( { "width": wrapper_width, "top": get_affix_offset(), "z-index": 1050 } );
+			}
+
+			function check_sidebar_overflow()
+			{
+				var content_col = jQuery( '.evo_content_col' ),
+				    exceed_viewport = window.innerHeight < ( wrapper.height() + get_affix_offset() ),
+				    exceed_content = wrapper.height() > content_col.height();
+
+				if( exceed_viewport || exceed_content )
+				{
+					wrapper.addClass( 'affix-forced-top' );
+				}
+				else
+				{
+					wrapper.removeClass( 'affix-forced-top' );
+				}
+			}
+
+			jQuery( window ).on( "resize", function()
+				{
+					var placeholder = jQuery( '.sidebar_placeholder' );
+
+					if( placeholder.length )
+					{	// Adapt same width as placeholder:
+						wrapper.css( { 'width': placeholder.outerWidth() } );
+						wrapper_width = placeholder.outerWidth();
+					}
+					else
+					{
+						// Reset wrapper style:
+						wrapper.css( { "width": "", "top": "", "z-index": "" } );
+					}
+					affix_sidebar();
+					check_sidebar_overflow();
+				} );
+
+		} );
+	</script>
+	<?php
+}
 ?>

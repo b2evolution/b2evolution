@@ -1020,6 +1020,7 @@ class Blog extends DataObject
 
 		if( in_array( 'userdir', $groups ) )
 		{ // we want to load the user directory settings:
+			$this->set_setting( 'userdir_enable', param( 'userdir_enable', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_gender', param( 'userdir_filter_gender', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_level', param( 'userdir_filter_level', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_org', param( 'userdir_filter_org', 'integer', 0 ) );
@@ -1066,6 +1067,7 @@ class Blog extends DataObject
 			$this->set_setting( 'search_score_post_tags', param( 'search_score_post_tags', 'integer', 0 ) );
 			$this->set_setting( 'search_score_post_excerpt', param( 'search_score_post_excerpt', 'integer', 0 ) );
 			$this->set_setting( 'search_score_post_titletag', param( 'search_score_post_titletag', 'integer', 0 ) );
+			$this->set_setting( 'search_score_post_metakeywords', param( 'search_score_post_metakeywords', 'integer', 0 ) );
 			$this->set_setting( 'search_score_post_author', param( 'search_score_post_author', 'integer', 0 ) );
 			$this->set_setting( 'search_score_post_date_future', param( 'search_score_post_date_future', 'integer', 0 ) );
 			$this->set_setting( 'search_score_post_date_moremonth', param( 'search_score_post_date_moremonth', 'integer', 0 ) );
@@ -1202,12 +1204,16 @@ class Blog extends DataObject
 			$this->set_setting( 'default_noindex', param( 'default_noindex', 'integer', 0 ) );
 			$this->set_setting( 'posts_firstpage_noindex', param( 'posts_firstpage_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_noindex', param( 'paged_noindex', 'integer', 0 ) );
+			$this->set_setting( 'paged_intro_noindex', param( 'paged_intro_noindex', 'integer', 0 ) );
 			$this->set_setting( 'paged_nofollowto', param( 'paged_nofollowto', 'integer', 0 ) );
 			$this->set_setting( 'archive_noindex', param( 'archive_noindex', 'integer', 0 ) );
 			$this->set_setting( 'archive_nofollowto', param( 'archive_nofollowto', 'integer', 0 ) );
 			$this->set_setting( 'chapter_noindex', param( 'chapter_noindex', 'integer', 0 ) );
+			$this->set_setting( 'chapter_intro_noindex', param( 'chapter_intro_noindex', 'integer', 0 ) );
 			$this->set_setting( 'tag_noindex', param( 'tag_noindex', 'integer', 0 ) );
+			$this->set_setting( 'tag_intro_noindex', param( 'tag_intro_noindex', 'integer', 0 ) );
 			$this->set_setting( 'filtered_noindex', param( 'filtered_noindex', 'integer', 0 ) );
+			$this->set_setting( 'filtered_intro_noindex', param( 'filtered_intro_noindex', 'integer', 0 ) );
 			$this->set_setting( 'arcdir_noindex', param( 'arcdir_noindex', 'integer', 0 ) );
 			$this->set_setting( 'catdir_noindex', param( 'catdir_noindex', 'integer', 0 ) );
 			$this->set_setting( 'feedback-popup_noindex', param( 'feedback-popup_noindex', 'integer', 0 ) );
@@ -2658,19 +2664,30 @@ class Blog extends DataObject
 	 *
 	 * This is used to construct the various RSS/Atom feeds
 	 *
-	 * @param string
-	 * @param string
-	 * @param boolean
+	 * @param string Skin folder name
+	 * @param string Additional params
+	 * @param boolean Halt on unknown feed skin
+	 * @return string|false URL or FALSE if none feed skin is not installed in system
 	 */
 	function get_tempskin_url( $skin_folder_name, $additional_params = '', $halt_on_error = false )
 	{
-		/**
-		 * @var SkinCache
-		 */
-	 	$SkinCache = & get_SkinCache();
+		$SkinCache = & get_SkinCache();
 		if( ! $Skin = & $SkinCache->get_by_folder( $skin_folder_name, $halt_on_error ) )
-		{
-			return NULL;
+		{	// If no requested skin try to fallback to first found feed skin:
+			$SkinCache->load_by_type( 'feed' );
+			$skin_folder_name = false;
+			foreach( $SkinCache->cache as $Skin )
+			{
+				if( $Skin->type == 'feed' )
+				{	// Use the first found feed skin:
+					$skin_folder_name = $Skin->folder;
+					break;
+				}
+			}
+			if( $skin_folder_name === false )
+			{	// No feed skin found:
+				return false;
+			}
 		}
 
 		return url_add_param( $this->gen_blogurl( 'default' ), 'tempskin='.$skin_folder_name );
@@ -2692,10 +2709,12 @@ class Blog extends DataObject
 	 * Get URL to display the blog comments in an XML feed.
 	 *
 	 * @param string
+	 * @return string|false URL or FALSE if none feed skin is not installed in system
 	 */
 	function get_comment_feed_url( $skin_folder_name )
 	{
-		return url_add_param( $this->get_tempskin_url( $skin_folder_name ), 'disp=comments' );
+		$tempskin_url = $this->get_tempskin_url( $skin_folder_name );
+		return ( $tempskin_url ? url_add_param( $tempskin_url, 'disp=comments' ) : false );
 	}
 
 
@@ -3061,7 +3080,7 @@ class Blog extends DataObject
 	}
 
 
- 	/**
+	/**
 	 * Get a setting.
 	 *
 	 * @param string setting name
@@ -4426,24 +4445,28 @@ class Blog extends DataObject
 	 */
 	function contact_link( $params = array() )
 	{
-		$owner_User = & $this->get_owner_User();
-		if( ! $owner_User->get_msgform_possibility() )
-		{
-			return false;
-		}
-
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'before'      => ' ',
 				'after'       => ' ',
 				'text'        => 'Contact', // Note: left untranslated, should be translated in skin anyway
 				'title'       => 'Send a message to the owner of this blog...',
+				'class'       => 'contact_link',
+				'with_redirect'=> true,
 			), $params );
 
+		$contact_url = $this->get_contact_url( $params['with_redirect'] );
+		if( empty( $contact_url ) )
+		{	// If contact URL is not available:
+			return false;
+		}
 
 		echo $params['before'];
-		echo '<a href="'.$this->get_contact_url(true).'" title="'.$params['title'].'" class="contact_link">'
-					.$params['text'].'</a>';
+		echo '<a href="'.$contact_url.'" '
+					.'title="'.format_to_output( $params['title'], 'htmlattr' ).'" '
+					.'class="'.format_to_output( $params['class'], 'htmlattr' ).'">'
+				.format_to_output( $params['text'] )
+			.'</a>';
 		echo $params['after'];
 
 		return true;
@@ -4524,16 +4547,19 @@ class Blog extends DataObject
 
 		if( $with_redirect )
 		{
-			if( $owner_User->get_msgform_possibility() != 'login' )
-			{
-				$blog_contact_url = url_add_param( $blog_contact_url, 'redirect_to='
-					// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
-					.rawurlencode( regenerate_url('','','','&') ) );
+			if( param( 'redirect_to', 'url', NULL ) !== NULL )
+			{	// Use current redirect URL:
+				$redirect_to = get_param( 'redirect_to' );
+			}
+			elseif( $owner_User->get_msgform_possibility() != 'login' )
+			{	// The URL will be made relative on the next page (this is needed when $htsrv_url is on another domain! -- multiblog situation )
+				$redirect_to = regenerate_url( '', '', '', '&' );
 			}
 			else
-			{ // no email option - try to log in and send private message (only registered users can send PM)
-				$blog_contact_url = url_add_param( $blog_contact_url, 'redirect_to='.rawurlencode( url_add_param( $this->gen_blogurl(), 'disp=msgform', '&' ) ) );
+			{	// no email option - try to log in and send private message (only registered users can send PM):
+				$redirect_to = url_add_param( $this->gen_blogurl(), 'disp=msgform', '&' );
 			}
+			$blog_contact_url = url_add_param( $blog_contact_url, 'redirect_to='.rawurlencode( $redirect_to ) );
 		}
 
 		return $blog_contact_url;
@@ -5642,54 +5668,41 @@ class Blog extends DataObject
 
 		foreach( $msgform_additional_fields as $UserField )
 		{
-			$field_value = '';
-			$field_value2 = '';
+			$field_values = array();
 
 			if( ! empty( $filled_user_fields[ $UserField->ID ] ) )
 			{	// Get values from the submitted form:
 				if( is_array( $filled_user_fields[ $UserField->ID ] ) )
 				{	// Multiple field:
-					$field_value = isset( $filled_user_fields[ $UserField->ID ][0] ) ? trim( $filled_user_fields[ $UserField->ID ][0] ) : '';
-					$field_value2 = isset( $filled_user_fields[ $UserField->ID ][1] ) ? trim( $filled_user_fields[ $UserField->ID ][1] ) : '';
+					$field_values = $filled_user_fields[ $UserField->ID ];
 				}
 				else
 				{	// Single field:
-					$field_value = $filled_user_fields[ $UserField->ID ];
+					$field_values = array( $filled_user_fields[ $UserField->ID ] );
 				}
 			}
 
-			if( is_logged_in() && empty( $field_value ) )
+			if( is_logged_in() && empty( $field_values ) )
 			{	// Get saved field value from the current logged in User:
 				global $current_User;
 				$userfields = $current_User->userfields_by_ID( $UserField->ID );
-
-				if( isset( $userfields[0] ) )
-				{	// Get a value for single field or first of multiple field:
-					$userfield_data = $userfields[0];
-					if( in_array( $UserField->get( 'duplicated' ), array( 'list', 'allowed' ) ) && isset( $userfield_data->list ) )
-					{	// Use only first value of the list field:
-						$field_values = array_values( $userfield_data->list );
-						$field_value = isset( $field_values[0] ) ? $field_values[0] : $userfield_data->uf_varchar;
-						$field_value2 = isset( $field_values[1] ) ? $field_values[1] : '';
-					}
-					else
+				if( is_array( $userfields ) )
+				{
+					foreach( $userfields as $userfield )
 					{
-						$field_value = $userfield_data->uf_varchar;
+						$field_values[] = $userfield->uf_varchar;
 					}
-				}
-
-				if( isset( $userfields[1] ) )
-				{	// Get a value for second of multiple field:
-					$field_value2 = $userfields[1]->uf_varchar;
 				}
 			}
 
-			// Display single additional field:
-			$this->display_msgform_additional_field( $Form, $UserField, $field_value );
+			if( empty( $field_values ) )
+			{	// Display at least one additional field if user is not filled that in profile yet:
+				$field_values = array( '' );
+			}
 
-			if( $field_value != '' && in_array( $UserField->get( 'duplicated' ), array( 'allowed', 'list' ) ) )
-			{	// If field is multiple the display one more additional field:
-				$this->display_msgform_additional_field( $Form, $UserField, $field_value2, true );
+			foreach( $field_values as $f => $field_value )
+			{	// Display additional fields:
+				$this->display_msgform_additional_field( $Form, $UserField, $field_value, $f != 0 );
 			}
 		}
 	}
@@ -5902,6 +5915,47 @@ class Blog extends DataObject
 		}
 
 		return isset( $denominations[ $position ] ) ? $denominations[ $position ] : '';
+	}
+
+
+	/**
+	 * Get last touched date of content in this collection
+	 *
+	 * @param string Date/Time format: leave empty to use locale default date format, use FALSE to don't format
+	 * @param boolean TRUE if you want GMT
+	 * @return string Last touched date
+	 */
+	function get_last_touched_date( $format = false, $useGM = false )
+	{
+		if( empty( $this->ID ) )
+		{	// Collection must be saved in DB:
+			return false;
+		}
+
+		if( ! isset( $this->last_touched_date ) )
+		{	// Load last touched date from DB:
+			global $DB;
+			$SQL = new SQL( 'Get last touched date for collection #'.$this->ID );
+			$SQL->SELECT( 'cat_last_touched_ts' );
+			$SQL->FROM( 'T_categories' );
+			$SQL->WHERE( 'cat_blog_ID = '.$this->ID );
+			$SQL->ORDER_BY( 'cat_last_touched_ts DESC' );
+			$SQL->LIMIT( '1' );
+			// Store date in cache:
+			$this->last_touched_date = $DB->get_var( $SQL );
+		}
+
+		if( $format === false )
+		{	// Don't format:
+			return $this->last_touched_date;
+		}
+
+		if( empty( $format ) )
+		{	// Use format of current locale:
+			$format = locale_datefmt();
+		}
+
+		return mysql2date( $format, $this->last_touched_date, $useGM );
 	}
 }
 

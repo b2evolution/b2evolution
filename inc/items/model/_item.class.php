@@ -749,14 +749,9 @@ class Item extends ItemLight
 
 		// URL associated with Item:
 		$post_url = param( 'post_url', 'string', NULL );
-		$url_error = validate_url( $post_url, 'http-https' );
-		if( $url_error !== false )
-		{
-			param_error( 'post_url', $url_error );
-		}
 		if( $post_url !== NULL )
 		{
-			param_check_url( 'post_url', 'posting', '' );
+			param_check_url( 'post_url', 'http-https' );
 			$this->set_from_Request( 'url' );
 		}
 		if( empty( $post_url ) && $this->get_type_setting( 'use_url' ) == 'required' )
@@ -1485,6 +1480,7 @@ class Item extends ItemLight
 	function get_assigned_user_options()
 	{
 		$UserCache = & get_UserCache();
+		$UserCache->clear();
 		return $UserCache->get_blog_member_option_list( $this->get_blog_ID(), $this->assigned_user_ID,
 							true,	($this->ID != 0) /* if this Item is already serialized we'll load the default anyway */ );
 	}
@@ -2573,20 +2569,21 @@ class Item extends ItemLight
 			global $DB;
 
 			$SQL = new SQL( 'Load all custom fields definitions of Item Type #'.$this->get( 'ityp_ID' ).' with values for Item #'.$this->ID );
-			$SQL->SELECT( 'itcf_ID AS ID, itcf_ityp_ID AS ityp_ID, itcf_label AS label, itcf_name AS name, itcf_type AS type, itcf_order AS `order`, itcf_note AS note, iset_value AS value, ' );
-			$SQL->SELECT_add( 'itcf_public AS public, itcf_format AS format, itcf_formula AS formula, itcf_header_class AS header_class, itcf_cell_class AS cell_class, ' );
-			$SQL->SELECT_add( 'itcf_link AS link, itcf_link_nofollow AS link_nofollow, itcf_link_class AS link_class, ' );
-			$SQL->SELECT_add( 'itcf_line_highlight AS line_highlight, itcf_green_highlight AS green_highlight, itcf_red_highlight AS red_highlight, itcf_description AS description, itcf_merge AS merge' );
+			$SQL->SELECT( 'T_items__type_custom_field.*, iset_value' );
 			$SQL->FROM( 'T_items__type_custom_field' );
 			$SQL->FROM_add( 'LEFT JOIN T_items__item_settings ON iset_name = CONCAT( "custom:", itcf_name ) AND iset_item_ID = '.$this->ID );
 			$SQL->WHERE_and( 'itcf_ityp_ID = '.$DB->quote( $this->get( 'ityp_ID' ) ) );
 			$SQL->ORDER_BY( 'itcf_order, itcf_ID' );
-			$custom_fields = $DB->get_results( $SQL->get(), ARRAY_A, $SQL->title );
+			$custom_fields = $DB->get_results( $SQL, ARRAY_A );
 
 			$this->custom_fields = array();
-			foreach( $custom_fields as $c => $custom_field )
+			foreach( $custom_fields as $custom_field )
 			{	// Use field name/code as key/index of array:
-				$this->custom_fields[ $custom_field['name'] ] = $custom_field;
+				$this->custom_fields[ $custom_field['itcf_name'] ] = array();
+				foreach( $custom_field as $custom_field_key => $custom_field_value )
+				{
+					$this->custom_fields[ $custom_field['itcf_name'] ][ substr( $custom_field_key, 5 ) ] = $custom_field_value;
+				}
 			}
 		}
 
@@ -4937,12 +4934,15 @@ class Item extends ItemLight
 			return;
 		}
 
+		if( ! ( $url = $this->get_feedback_feed_url( $skin ) ) )
+		{	// Don't display feed link when no feed skin is installed in system:
+			return;
+		}
+
 		if( $title == '#' )
 		{
 			$title = get_icon( 'feed' ).' '.T_('Comment feed for this post');
 		}
-
-		$url = $this->get_feedback_feed_url($skin);
 
 		echo $before;
 		echo '<a href="'.$url.'">'.format_to_output($title).'</a>';
@@ -4953,13 +4953,14 @@ class Item extends ItemLight
 	/**
 	 * Get URL to display the post comments in an XML feed.
 	 *
-	 * @param string
+	 * @param string Skin folder name
+	 * @return string|false URL or FALSE if none feed skin is not installed in system
 	 */
 	function get_feedback_feed_url( $skin_folder_name )
 	{
-		$this->load_Blog();
-
-		return url_add_param( $this->Blog->get_tempskin_url( $skin_folder_name ), 'disp=comments&amp;p='.$this->ID );
+		$item_Blog = & $this->get_Blog();
+		$comment_feed_url = $item_Blog->get_comment_feed_url( $skin_folder_name );
+		return ( $comment_feed_url ? url_add_param( $comment_feed_url, 'p='.$this->ID ) : false );
 	}
 
 
@@ -5829,11 +5830,17 @@ class Item extends ItemLight
 		}
 
 		// default params
-		$params += array( 'save_context' => true );
+		$params += array(
+				'save_context'             => true,
+				'force_in_skin_editing'    => false,
+				'force_backoffice_editing' => false,
+			);
 
 		$this->load_Blog();
 		$url = false;
-		if( $this->Blog->get_setting( 'in_skin_editing' ) && ( ! is_admin_page() || ! empty( $params['force_in_skin_editing'] ) ) )
+		if( $this->Blog->get_setting( 'in_skin_editing' ) &&
+		    ( ! $params['force_backoffice_editing'] || ! $current_User->check_perm( 'admin', 'restricted' ) ) &&
+		    ( ! is_admin_page() || $params['force_in_skin_editing'] ) )
 		{	// We have a mode 'In-skin editing' for the current Blog
 			if( check_item_perm_edit( $this->ID, false ) )
 			{	// Current user can edit this post
@@ -6637,10 +6644,12 @@ class Item extends ItemLight
 		global $evo_charset;
 
 		$params = array_merge( array(
-				'before' =>           '<div>'.T_('Tags').': ',
-				'after' =>            '</div>',
-				'separator' =>        ', ',
-				'links' =>            true,
+				'before'     => '<div>'.T_('Tags').': ',
+				'after'      => '</div>',
+				'separator'  => ', ',
+				'links'      => true,
+				'before_tag' => '',
+				'after_tag'  => '',
 			), $params );
 
 		$tags = $this->get_tags();
@@ -6655,21 +6664,23 @@ class Item extends ItemLight
 			}
 
 			$i = 0;
-			foreach( $tags as $tag )
+			foreach( $tags as $tag_ID => $tag_name )
 			{
 				if( $i++ > 0 )
 				{
 					echo $params['separator'];
 				}
 
+				echo str_replace( '$tag_ID$', $tag_ID, $params['before_tag'] );
 				if( $links )
 				{	// We want links
-					echo $this->Blog->get_tag_link( $tag );
+					echo $this->Blog->get_tag_link( $tag_name );
 				}
 				else
 				{
-					echo htmlspecialchars( $tag, NULL, $evo_charset );
+					echo htmlspecialchars( $tag_name, NULL, $evo_charset );
 				}
+				echo $params['after_tag'];
 			}
 
 			echo $params['after'];
@@ -6757,7 +6768,8 @@ class Item extends ItemLight
 			$params[ $param_key ] = & $params[ $param_key ];
 		}
 
-		if( count( $Plugins->trigger_event_first_true( 'RenderURL', $params ) ) != 0 )
+		$params = $Plugins->trigger_event_first_true( 'RenderURL', $params );
+		if( count( $params ) != 0 )
 		{	// Display a rendered url, for example as video/audio player:
 			return $params['data'];
 		}
@@ -8448,13 +8460,13 @@ class Item extends ItemLight
 			unset( $post_moderators[$post_creator_User->ID] );
 		}
 
-		if( empty( $post_moderators ) )
-		{ // There are no moderator users who would like to receive notificaitons
-			return NULL;
-		}
-
 		// Collect all notified User IDs in this array:
 		$notified_user_IDs = array();
+
+		if( empty( $post_moderators ) )
+		{ // There are no moderator users who would like to receive notificaitons
+			return $notified_user_IDs;
+		}
 
 		$post_creator_level = $post_creator_User->level;
 		$UserCache = & get_UserCache();
@@ -8600,6 +8612,8 @@ class Item extends ItemLight
 	{
 		global $current_User, $Messages, $UserSettings;
 
+		$notified_user_IDs = array();
+
 		if( $executed_by_userid === NULL && is_logged_in() )
 		{	// Use current user by default:
 			global $current_User;
@@ -8614,8 +8628,8 @@ class Item extends ItemLight
 
 			if( $assigned_User &&
 					$UserSettings->get( 'notify_post_assignment', $assigned_User->ID ) &&
-					$assigned_User->check_perm( 'blog_ismember', 'view', false, $this->get_blog_ID() ) )
-			{ // Assigned user wants to receive post assignment notifications and is a member of at least one collection:
+					$assigned_User->check_perm( 'blog_can_be_assignee', 'view', false, $this->get_blog_ID() ) )
+			{	// Assigned user wants to receive post assignment notifications and can be assigned to items of this Item's collection:
 				$user_Group = $assigned_User->get_Group();
 				$notify_full = $user_Group->check_perm( 'post_assignment_notif', 'full' );
 
@@ -8634,8 +8648,6 @@ class Item extends ItemLight
 				$subject = sprintf( $subject, $this->Blog->get('shortname'), $this->get('title') );
 
 				// Send the email:
-				$notified_user_IDs = array();
-
 				if( send_mail_to_User( $assigned_User->ID, $subject, 'post_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
 				{	// A send notification email request to the assigned user was processed:
 					$notified_user_IDs[] = $assigned_User->ID;
@@ -8643,16 +8655,10 @@ class Item extends ItemLight
 				}
 
 				locale_restore_previous();
-
-				return $notified_user_IDs;
-			}
-			else
-			{ // No valid assigned user or the user does not want to receive post assignment notifications
-				return NULL;
 			}
 		}
 
-		return NULL;
+		return $notified_user_IDs;
 	}
 
 
@@ -9281,7 +9287,7 @@ class Item extends ItemLight
 				$ItemStatusCache = & get_ItemStatusCache();
 				if( ! ($Element = & $ItemStatusCache->get_by_ID( $this->pst_ID, true, false ) ) )
 				{ // No status:
-					return '';
+					return T_('No status');
 				}
 				return $Element->get_name();
 
@@ -9333,10 +9339,23 @@ class Item extends ItemLight
 		{	// Initialize item orders in all assigned categories:
 			global $DB;
 			$SQL = new SQL( 'Get all orders per categories of Item #'.$this->ID );
-			$SQL->SELECT( 'postcat_cat_ID, postcat_order' );
+			$SQL->SELECT( 'cat_ID, cat_blog_ID, postcat_order' );
 			$SQL->FROM( 'T_postcats' );
+			$SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = postcat_cat_ID' );
 			$SQL->WHERE( 'postcat_post_ID = '.$this->ID );
-			$this->orders = $DB->get_assoc( $SQL );
+			$orders = $DB->get_results( $SQL );
+			$this->orders = array();
+			$this->orders_per_coll = array();
+			foreach( $orders as $order )
+			{
+				$this->orders[ $order->cat_ID ] = $order->postcat_order;
+				// Initialize categories per collection, useful in cross-posted mode:
+				if( ! isset( $this->orders_per_coll[ $order->cat_blog_ID ] ) )
+				{
+					$this->orders_per_coll[ $order->cat_blog_ID ] = array();
+				}
+				$this->orders_per_coll[ $order->cat_blog_ID ][ $order->cat_ID ] = $order->postcat_order;
+			}
 		}
 	}
 
@@ -9353,10 +9372,64 @@ class Item extends ItemLight
 
 		if( $cat_ID === NULL )
 		{	// Use main category:
-			$cat_ID = $this->get( 'main_cat_ID' );
+			global $Blog;
+			if( isset( $Blog ) &&
+			    ! empty( $this->orders_per_coll[ $Blog->ID ] ) &&
+			    $Blog->ID != $this->get_blog_ID() )
+			{	// Use sum of post orders from categories of cross-posted collection,
+				// if current collection is a collection of extra category of this Item:
+				$orders_sum = NULL;
+				foreach( $this->orders_per_coll[ $Blog->ID ] as $extra_cat_order )
+				{
+					if( $extra_cat_order !== NULL )
+					{
+						$orders_sum += $extra_cat_order;
+					}
+				}
+				return $orders_sum;
+			}
+			else
+			{	// Use order of main category,
+				// If current collection is same as collection of main category:
+				$cat_ID = $this->get( 'main_cat_ID' );
+			}
 		}
 
 		return isset( $this->orders[ $cat_ID ] ) ? $this->orders[ $cat_ID ] : NULL;
+	}
+
+
+	/**
+	 * Get item order per category by requested collection ID
+	 *
+	 * @param integer Collection ID
+	 * @param boolean TRUE to exclude NULL orders from result
+	 * @return array Array of orders (Key - Category ID, Value - Item's order)
+	 */
+	function get_orders_by_coll_ID( $coll_ID, $exclude_null_orders = false )
+	{
+		$this->load_orders();
+
+		if( isset( $this->orders_per_coll[ $coll_ID ] ) )
+		{
+			$orders_per_coll = $this->orders_per_coll[ $coll_ID ];
+			if( $exclude_null_orders )
+			{	// Exclude NULL orders:
+				foreach( $orders_per_coll as $order_cat_ID => $order )
+				{
+					if( $order === NULL )
+					{
+						unset( $orders_per_coll[ $order_cat_ID ] );
+					}
+				}
+			}
+		}
+		else
+		{	// No orders for the requested collection:
+			$orders_per_coll = array();
+		}
+
+		return $orders_per_coll;
 	}
 
 
@@ -9916,13 +9989,13 @@ class Item extends ItemLight
 
 
 	/**
-	 * Display location of current Item
+	 * Get location of current Item
 	 *
 	 * @param string Text before location
 	 * @param string Text after location
 	 * @param string Separator
 	 */
-	function location( $before, $after, $separator = ', ' )
+	function get_location( $before, $after, $separator = ', ' )
 	{
 		$location = array();
 		$location[] = $this->get_city();
@@ -9933,14 +10006,31 @@ class Item extends ItemLight
 		// Delete empty elements
 		$location = array_filter($location);
 
+		$r = '';
+
 		if( !empty( $location ) )
 		{	// Display location
-			echo $before;
+			$r .= $before;
 
-			echo implode( $separator, $location );
+			$r .= implode( $separator, $location );
 
-			echo $after;
+			$r .= $after;
 		}
+
+		return $r;
+	}
+
+
+	/**
+	 * Display location of current Item
+	 *
+	 * @param string Text before location
+	 * @param string Text after location
+	 * @param string Separator
+	 */
+	function location( $before, $after, $separator = ', ' )
+	{
+		echo $this->get_location( $before, $after, $separator );
 	}
 
 
@@ -9967,7 +10057,7 @@ class Item extends ItemLight
 		load_class( 'regional/model/_country.class.php', 'Country' );
 		$CountryCache = & get_CountryCache();
 
-		if( $Country = $CountryCache->get_by_ID( $this->ctry_ID ) )
+		if( $Country = $CountryCache->get_by_ID( $this->ctry_ID, false, false ) )
 		{	// Display country name
 			$result = $params['before'];
 
@@ -10003,7 +10093,7 @@ class Item extends ItemLight
 		load_class( 'regional/model/_region.class.php', 'Region' );
 		$RegionCache = & get_RegionCache();
 
-		if( $Region = $RegionCache->get_by_ID( $this->rgn_ID ) )
+		if( $Region = $RegionCache->get_by_ID( $this->rgn_ID, false, false ) )
 		{	// Display region name
 			$result = $params['before'];
 
@@ -10039,7 +10129,7 @@ class Item extends ItemLight
 		load_class( 'regional/model/_subregion.class.php', 'Subregion' );
 		$SubregionCache = & get_SubregionCache();
 
-		if( $Subregion = $SubregionCache->get_by_ID( $this->subrg_ID ) )
+		if( $Subregion = $SubregionCache->get_by_ID( $this->subrg_ID, false, false ) )
 		{	// Display subregion name
 			$result = $params['before'];
 
@@ -10076,7 +10166,7 @@ class Item extends ItemLight
 		load_class( 'regional/model/_city.class.php', 'City' );
 		$CityCache = & get_CityCache();
 
-		if( $City = $CityCache->get_by_ID( $this->city_ID ) )
+		if( $City = $CityCache->get_by_ID( $this->city_ID, false, false ) )
 		{	// Display city info
 			$result = $params['before'];
 
@@ -10121,16 +10211,16 @@ class Item extends ItemLight
 		$orig_iver_ID = $iver_ID;
 
 		if( $iver_ID == 'last_archived' || $iver_ID == 'last_proposed' )
-		{	// Get last revision:
-			list( , $iver_type ) = explode( '_', $iver_ID );
-			$revision_SQL = new SQL();
-			$revision_SQL->SELECT( 'a.*, CONCAT( "'.$iver_type.'", a.iver_ID ) AS param_ID' );
-			$revision_SQL->FROM( 'T_items__version a' );
-			$revision_SQL->FROM_add( 'LEFT OUTER JOIN T_items__version b ON a.iver_itm_ID = b.iver_itm_ID AND a.iver_ID < b.iver_ID AND b.iver_type = '.$DB->quote( $iver_type ) );
-			$revision_SQL->WHERE( 'b.iver_itm_ID IS NULL' );
-			$revision_SQL->WHERE_and( 'a.iver_itm_ID = '.$DB->quote( $this->ID ) );
-			$revision_SQL->WHERE_and( 'a.iver_type = '.$DB->quote( $iver_type ) );
-			$this->revisions[ $orig_iver_ID ] = $DB->get_row( $revision_SQL->get(), OBJECT, NULL, $revision_SQL->title );
+		{	// Get last archived version or last proposed change:
+			$iver_type = substr( $iver_ID, 5 );
+			$revision_SQL = new SQL( 'Get '.str_replace( '_', ' ', $iver_ID ).' version of the Item #'.$this->ID );
+			$revision_SQL->SELECT( '*, CONCAT( "'.( $iver_type == 'archived' ? 'a' : 'p' ).'", iver_ID ) AS param_ID' );
+			$revision_SQL->FROM( 'T_items__version' );
+			$revision_SQL->WHERE( 'iver_itm_ID = '.$DB->quote( $this->ID ) );
+			$revision_SQL->WHERE_and( 'iver_type = '.$DB->quote( $iver_type ) );
+			$revision_SQL->ORDER_BY( 'iver_ID DESC' );
+			$revision_SQL->LIMIT( '1' );
+			$this->revisions[ $orig_iver_ID ] = $DB->get_row( $revision_SQL );
 
 			return $this->revisions[ $orig_iver_ID ];
 		}
@@ -12583,6 +12673,30 @@ class Item extends ItemLight
 			}
 			$Messages->add_to_group( $message, $message_type, $message_group );
 		}
+	}
+
+
+	/**
+	 * Check permission of current User to edit workflow properties
+	 *
+	 * @param boolean Execution will halt if this is !0 and permission is denied
+	 * @param boolean
+	 */
+	function can_edit_workflow( $assert = false )
+	{
+		global $current_User;
+
+		return
+			// Item must be saved in DB:
+			! empty( $this->ID ) &&
+			// User must be logged in:
+			is_logged_in() &&
+			// Workflow must be enabled for current Collection:
+			$this->get_coll_setting( 'use_workflow' ) &&
+			// Current User must has a permission to be assigned for tasks of the current Collection:
+			$current_User->check_perm( 'blog_can_be_assignee', 'edit', $assert, $this->get_blog_ID() ) &&
+			// Current User must has a permission to edit this Item:
+			$current_User->check_perm( 'item_post!CURSTATUS', 'edit', $assert, $this );
 	}
 }
 ?>

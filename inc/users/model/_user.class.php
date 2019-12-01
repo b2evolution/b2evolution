@@ -1604,7 +1604,8 @@ class User extends DataObject
 					$UserSettings->set( 'notify_spam_cmt_moderation', param( 'edited_user_notify_spam_cmt_moderation', 'integer', 0 ), $this->ID );
 				}
 				if( $this->check_perm( 'admin', 'restricted', false ) )
-				{ // update 'notify_meta_comments' only if edited user has a permission to back-office
+				{	// update 'notify_meta_comment_mentioned' ans 'notify_meta_comments' only if edited user has a permission to back-office:
+					$UserSettings->set( 'notify_meta_comment_mentioned', param( 'edited_user_notify_meta_comment_mentioned', 'integer', 0 ), $this->ID );
 					$UserSettings->set( 'notify_meta_comments', param( 'edited_user_notify_meta_comments', 'integer', 0 ), $this->ID );
 				}
 				if( $is_comment_moderator )
@@ -2000,6 +2001,7 @@ class User extends DataObject
 				'avatar_size'  => 'crop-top-15x15',
 				'login_text'   => 'login', // name | login
 				'use_style'    => false, // true - to use attr "style", e.g. on email templates
+				'extra_class'  => '',
 				'protocol'     => '', // Protocol is used for gravatar, example: 'http:' or 'https:'
 			), $params );
 
@@ -2031,13 +2033,22 @@ class User extends DataObject
 		$data = array( $login, $avatar );
 
 		$gender_class = $this->get_gender_class();
+		$extra_class = '';
+		if( !empty( $params['extra_class'] ) )
+		{
+			if( !is_array( $params['extra_class']))
+			{
+				$params['extra_class'] = array($params['extra_class']);
+			}
+			$extra_class = ' '.implode( ' ', $params['extra_class'] );
+		}
 		$attr_style = '';
 		if( $params['use_style'] )
 		{ // Use "style"
-			$attr_style = emailskin_style( '.user+.'.str_replace( ' ', '.', $gender_class ) );
+			$attr_style = emailskin_style( '.user+.'.str_replace( ' ', '.', $gender_class ).str_replace( ' ', '+.user.', $extra_class ) );
 		}
 
-		return '<span class="'.trim( $class.' '.$gender_class ).'"'.$attr_style.'>'.str_replace( $mask, $data, $params['mask'] ).'</span>';
+		return '<span class="'.trim( $class.' '.$gender_class.$extra_class ).'"'.$attr_style.'>'.str_replace( $mask, $data, $params['mask'] ).'</span>';
 	}
 
 
@@ -2666,7 +2677,7 @@ class User extends DataObject
 	 */
 	function get_media_subpath()
 	{
-		if( is_valid_login( $this->login, true ) )
+		if( is_valid_login( $this->login, true ) === true )
 		{	// Valid ASCII login, use it as is
 			return 'users/'.$this->login.'/';
 		}
@@ -7766,7 +7777,7 @@ class User extends DataObject
 		{	// Get it from DB only first time and then cache in var:
 			global $current_User;
 
-			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max() );
+			$flagged_ItemList2 = new ItemList2( $Blog, $Blog->get_timestamp_min(), $Blog->get_timestamp_max(), NULL, 'ItemCache', 'flagged' );
 
 			// Set additional debug info prefix for SQL queries in order to know what code executes it:
 			$flagged_ItemList2->query_title_prefix = 'Flagged Items';

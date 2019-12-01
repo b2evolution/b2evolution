@@ -155,6 +155,19 @@ if( $upload )
 		$size_limits[] = $Settings->get( 'upload_maxkb' ) * 1024;
 	}
 
+	// Check for sensitive filetype upload:
+	$path_info = pathinfo( param( 'qqfilename', 'string', true ) );
+	$FiletypeCache = & get_FiletypeCache();
+	$upload_Filetype = $FiletypeCache->get_by_extension( $path_info['extension'] );
+	if( !$upload_Filetype->is_allowed() )
+	{
+		$message['error'] = sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+				'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );
+		$message['status'] = 'error';
+		$response = out_echo( $message, $specialchars, false );
+		exit( $response );
+	}
+
 	$file = new UploadHandler();
 	// Specify the list of valid extensions, ex. array("jpeg", "xml", "bmp")
 	$file->allowedExtensions = array(); // all files types allowed by default
@@ -163,7 +176,6 @@ if( $upload )
 	// Specify the input name set in the javascript.
 	$file->inputName = "qqfile"; // matches Fine Uploader's default inputName value by default
 	// If you want to use the chunking/resume feature, specify the folder to temporarily save parts.
-
 	$file->chunksFolder = 'chunks';
 	$method = $_SERVER['REQUEST_METHOD'];
 	if ( $method == 'POST' )
@@ -302,15 +314,15 @@ if( $upload )
 			$message = array(
 					'text'    => $message,
 					'status'  => 'rename',
-					'file'    => $newFile->get_preview_thumb( 'fulltype' ),
-					'oldname' => $oldName,
+					'file'    => $newFile->get_preview_thumb( 'fulltype', array( 'init' => true ) ),
+					'old_rootrelpath' => $old_File->get_root_and_rel_path(),
 					'oldpath' => $old_File->get_root_and_rel_path(),
 				);
 		}
 		else
 		{ // Success uploading
 			$message = array(
-					'text'   => $newFile->get_preview_thumb( 'fulltype' ),
+					'text'   => $newFile->get_preview_thumb( 'fulltype', array( 'init' => true ) ),
 					'status' => 'success',
 				);
 			report_user_upload( $newFile );
@@ -319,7 +331,8 @@ if( $upload )
 		$creator = $newFile->get_creator();
 
 		$message['filetype'] = $newFile->get( 'type' );
-		$message['newname'] = $newName;
+		$message['formatted_name'] = file_td_name( $newFile );
+		$message['new_rootrelpath'] = $newFile->get_root_and_rel_path();
 		$message['newpath'] = $newFile->get_root_and_rel_path();
 		$message['filesize'] = bytesReadable( $newFile->get_size() );
 
@@ -348,6 +361,13 @@ if( $upload )
 			$message['group'] = $newFile->get_fsgroup_name();
 		}
 
+		if( $UserSettings->get( 'fm_showdate' ) != 'no' )
+		{	// Get last modified datetime:
+			$message['file_date'] = file_td_lastmod( $newFile );
+		}
+
+		$message['file_actions'] = file_td_actions( $newFile );
+
 		$message['warning'] = $warning;
 		$message['path'] = $newFile->get_rdfp_rel_path();
 		$message['checkbox'] = '<span name="surround_check" class="checkbox_surround_init">'
@@ -374,7 +394,7 @@ if( $upload )
 					'file_type'     => $newFile->get_file_type(),
 					'link_position' => $new_Link->get( 'position' ),
 				);
-			$message['link_position'] = display_link_position( $mask_row, $fm_mode != 'file_select'  );
+			$message['link_position'] = display_link_position( $mask_row, $fm_mode != 'file_select', param( 'prefix', 'string' ) );
 		}
 
 		out_echo( $message, $specialchars );

@@ -49,7 +49,10 @@ else
 	if( param_check_serialized_array( 'params' ) )
 	{	// If the params is a serialized array and doesn't contain any object inside:
 		// (This may result in "false", but this means that unserializing failed)
-		$params = @unserialize( $params );
+		if( ( $params = @unserialize( $params ) ) === false )
+		{
+			bad_request_die( 'Invalid params! Cannot unserialize.' );
+		}
 	}
 	else
 	{	// Restrict all non array params to empty array:

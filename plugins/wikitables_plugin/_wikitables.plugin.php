@@ -22,7 +22,7 @@ class wikitables_plugin extends Plugin
 	var $code = 'b2evWiTa';
 	var $name = 'Wiki Tables';
 	var $priority = 15;
-	var $version = '6.11.2';
+	var $version = '6.11.4';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -265,18 +265,21 @@ See manual for more.');
 					// A cell could contain both parameters and data
 					$cell_data = explode( '|', $cell, 2 );
 
+					// Set attribute to allow render markdown inside tables:
+					$markdown_attribute = ' markdown="1"';
+
 					if( strpos( $cell_data[0], '[[' ) !== false )
 					{
-						$cell = "{$previous}<{$last_tag}>{$cell}";
+						$cell = "{$previous}<{$last_tag}{$markdown_attribute}>{$cell}";
 					}
 					elseif ( count( $cell_data ) == 1 )
 					{
-						$cell = "{$previous}<{$last_tag}>{$cell_data[0]}";
+						$cell = "{$previous}<{$last_tag}{$markdown_attribute}>{$cell_data[0]}";
 					}
 					else
 					{
 						$attributes = Sanitizer::fixTagAttributes( $cell_data[0], $last_tag );
-						$cell = "{$previous}<{$last_tag}{$attributes}>{$cell_data[1]}";
+						$cell = "{$previous}<{$last_tag}{$markdown_attribute}{$attributes}>{$cell_data[1]}";
 					}
 
 					$outLine .= $cell;
