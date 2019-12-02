@@ -239,8 +239,8 @@ if( $resolve_extra_path )
 		|| preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
 	{ // We have extra path info
 		if( ! isset( $path_elements ) )
-		{	// Try to initialize $path_elements:
-			init_requested_coll_or_process_tinyurl( false, true, true );
+		{	// Don't allow next code without initialized global $path_elements:
+			debug_die( 'You must initialize $path_elements by init_requested_coll_or_process_tinyurl() before call this code!' );
 		}
 
 		if( isset( $path_elements[0] )
