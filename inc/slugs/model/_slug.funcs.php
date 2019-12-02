@@ -217,6 +217,6 @@ function getnext_tinyurl()
  */
 function is_tiny_slug( $slug )
 {
-	return preg_match( '#^[a-z][A-Z][0-9]$#', $slug );
+	return preg_match( '#^[a-z][A-Z][0-9][a-zA-Z0-9]*$#', $slug );
 }
 ?>
