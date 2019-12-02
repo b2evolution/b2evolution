@@ -209,7 +209,7 @@ function skin_init( $disp )
 				add_headline( '<link rel="canonical" href="'.format_to_output( $Item->get( 'url' ), 'htmlattr' ).'" />' );
 			}
 			elseif( ! $preview &&
-			    ( ( $Item->allow_redirect_to_canonical_url() && $redir == 'yes' )
+			    ( ( $Blog->get_setting( 'canonical_item_urls' ) && $redir == 'yes' )
 			      || $Blog->get_setting( 'relcanonical_item_urls' )
 			      || $Blog->get_setting( 'self_canonical_item_urls' )
 			    ) )
@@ -300,7 +300,7 @@ function skin_init( $disp )
 						$url_resolved = is_same_url( $ReqURL, $extended_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' );
 					}
 					if( ! $url_resolved &&
-					    $Item->allow_redirect_to_canonical_url() &&
+					    $Blog->get_setting( 'canonical_item_urls' ) &&
 					    $redir == 'yes' &&
 					    ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) || // If Item has main category in the current collection
 					      $Item->is_part_of_blog( $Blog->ID ) // If Item has extra category from not main collection

@@ -61,7 +61,6 @@ class CollectionSettings extends AbstractSettings
 			'self_canonical_item_urls' => 1,		// Use self-referencing rel="canonical" tag
 			'allow_crosspost_urls' => 1,					// For cross-posted Items, allow non-canonical URL
 			'relcanonical_item_urls' => 1,				// If no 301, fall back to rel="canoncial" ?
-			'redirect_tiny_item_urls' => 1, // Redirect from items tiny URL to their canonical URL?
 			'single_links'   => 'short',
 			'single_item_footer_text' => '',
 			'slug_limit' => 8,

@@ -1353,7 +1353,6 @@ class Blog extends DataObject
 			$this->set_setting( 'self_canonical_item_urls', param( 'self_canonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'allow_crosspost_urls', param( 'allow_crosspost_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_item_urls', param( 'relcanonical_item_urls', 'integer', 0 ) );
-			$this->set_setting( 'redirect_tiny_item_urls', param( 'redirect_tiny_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_archive_urls', param( 'canonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'self_canonical_archive_urls', param( 'self_canonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_archive_urls', param( 'relcanonical_archive_urls', 'integer', 0 ) );
@@ -7086,45 +7085,6 @@ class Blog extends DataObject
 		$r .= '</select>';
 
 		return $r;
-	}
-
-
-	/**
-	 * Check if we can redirect to canonical URL from the requested/current URL
-	 *
-	 * @param string|NULL URL to check, use NULL to check current URL from $ReqURL
-	 * @return boolean
-	 */
-	function allow_redirect_to_canonical_url( $check_url = NULL )
-	{
-		if( ! $this->get_setting( 'canonical_homepage' ) )
-		{	// Redirect is not allowed to canonical URL by collection setting:
-			return false;
-		}
-
-		if( $this->get_setting( 'tinyurl_type' ) == 'basic' )
-		{	// Collection doesn't use different domain for Tiny URLs:
-			return true;
-		}
-
-		global $ReqURL;
-
-		if( $check_url === NULL && isset( $ReqURL ) )
-		{	// Use current URL:
-			$check_url = $ReqURL;
-		}
-
-		if( empty( $check_url ) )
-		{	// No URL to check, Allow redirect:
-			return true;
-		}
-
-		// Remove protocol http:// or https:// from the checked URLs because we should consider them as same URLs:
-		$check_url_without_protocol = preg_replace( '#^https?://#', '', $check_url );
-		$coll_tiny_url_without_protocol = preg_replace( '#^https?://#', '', $this->get_setting( 'tinyurl_domain' ) );
-
-		// Allow to redirect when the requested/current URL is not Tiny URL of this Collection:
-		return ( strpos( $check_url_without_protocol, $coll_tiny_url_without_protocol ) !== 0 );
 	}
 }
 

@@ -191,6 +191,8 @@ class GeneralSettings extends AbstractSettings
 		'cross_posting' => 0,						// Allow additional categories from other blogs
 		'cross_posting_blog' => 0,					// Allow to choose main category from another blog
 		'redirect_moved_posts' => 0,				// Allow to redirect moved posts link to the correct blog
+		'always_match_slug' => 1, // Allow to redirect to correct Collection if an Item Slug was found in any URL
+		'redirect_tinyurl' => 1, // Allow 301 redirect from Tiny URLs to canonical URL
 
 		'subscribe_new_blogs' => 'public', // Subscribing to new blogs: 'page', 'public', 'all'
 

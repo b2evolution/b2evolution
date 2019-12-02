@@ -146,10 +146,6 @@ $Form->begin_fieldset( T_('Single post pages / "Permalink" pages').get_manual_li
 		array( 'self_canonical_item_urls', 1, T_('Use rel="canonical" even when not necessary (self-refering)'), $edited_Blog->get_setting( 'self_canonical_item_urls' ) ),
 		), 'canonical_item_urls_options', T_('Make canonical') );
 
-	$Form->checklist( array(
-		array( 'redirect_tiny_item_urls', 1, T_('301 redirect to canonical URL'), $edited_Blog->get_setting( 'redirect_tiny_item_urls' ) ),
-		), 'canonical_item_urls_options', T_('Tiny URLs') );
-
 	$Form->checkbox( 'excerpts_meta_description', $edited_Blog->get_setting( 'excerpts_meta_description' ),
 			T_('Meta description'), T_('When no meta description is provided for an item, use the excerpt instead.') );
 

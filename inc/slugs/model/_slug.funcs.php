@@ -21,7 +21,7 @@ load_class( 'slugs/model/_slug.class.php', 'Slug' );
  * Generetae a tiny url (Slug)
  * The first character is always a lowercase letter
  * The second character is always a capital letter
- * The third caharacter is always a number
+ * The third character is always a number
  * at most three letter (uppercase or lowercase) can be after each other -> every fourth character is a number
  * at most three number can be after each other -> every fourth character is a letter
  * 
@@ -208,4 +208,15 @@ function getnext_tinyurl()
 	return $url;
 }
 
+
+/**
+ * Check if the checked slug is formatted as tiny slug
+ *
+ * @param string Slug
+ * @return boolean
+ */
+function is_tiny_slug( $slug )
+{
+	return preg_match( '#^[a-z][A-Z][0-9]$#', $slug );
+}
 ?>

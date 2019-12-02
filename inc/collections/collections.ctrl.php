@@ -387,6 +387,9 @@ switch( $action )
 		// Redirect moved posts:
 		$Settings->set( 'redirect_moved_posts', $Settings->get( 'always_match_slug' ) ? 1 : param( 'redirect_moved_posts', 'integer', 0 ) );
 
+		// Tiny URLs - 301 redirect to canonical URL:
+		$Settings->set( 'redirect_tinyurl', param( 'redirect_tinyurl', 'integer', 0 ) );
+
 		// Subscribing to new blogs:
 		$Settings->set( 'subscribe_new_blogs', param( 'subscribe_new_blogs', 'string', 'public' ) );
 

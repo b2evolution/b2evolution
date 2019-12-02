@@ -221,9 +221,6 @@ if( init_charsets( $current_charset ) )
  */
 
 
-// TODO: fp>yb: We have already parsed the $path_elements, $first_part ,$last_char ,$last_part in init_requested_coll_or_process_tinyurl(), so please simplify the processing below.
-
-
 if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
@@ -233,45 +230,17 @@ if( $resolve_extra_path )
 	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
 	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
 
-// TODO: fp>yb: NO, we never care about setting( 'tinyurl_type' and ''tinyurl_domain'' ). This is for backoffice generation of tinyurls only. This is NOT be to used for decoding! 
-// Also TinyURL decoding must have been done way before reching this part of the code!!
-// Remove:
-	if( $Blog->get_setting( 'tinyurl_type' ) == 'advanced' && $Blog->get_setting( 'tinyurl_domain' ) != '' )
-	{	// BaseURI is the part after the Tiny URL domain name and it will always end with / :
-		$tiny_url_baseuri = preg_replace( '#^https?://[^/]+#', '', $Blog->get_setting( 'tinyurl_domain' ) );
-	}
-
 	// Check if we have one of these:
 	// - Always try to match slug
 	// - Either the ReqPath starts with collection base URI (always including trailing slash)
 	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
 	// ... followed by some extra path info.
 	if( $Settings->get( 'always_match_slug' ) // do we want to redirect to correct Collection if an Item Slug was found in <b>any</b> URL
-		|| preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) ||
-	    ( isset( $tiny_url_baseuri ) && preg_match( '~(^'.preg_quote( $tiny_url_baseuri, '~' ).')(.+)$~', $ReqPath, $matches ) ) )
+		|| preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
 	{ // We have extra path info
-		$path_string = $Settings->get( 'always_match_slug' ) ? $ReqPath : $matches[2];
-
-		$Debuglog->add( 'Extra path info found! path_string=' . $path_string , 'params' );
-		// echo "path=[$path_string]<br />";
-
-		// Replace encoded ";" and ":" with regular chars (used for tags)
-		// TODO: dh> why not urldecode it altogether? fp> would prolly make sense but requires testing -- note: check with tags (move urldecode from tags up here)
-		// TODO: PHP5: use str_ireplace
-		$path_string = str_replace(
-			array('%3b', '%3B', '%3a', '%3A'),
-			array(';', ';', ':', ':'),
-			$path_string );
-
-		// Slice the path:
-		$path_elements = preg_split( '~/~', $path_string, 20, PREG_SPLIT_NO_EMPTY );
-		// pre_dump( '', $path_elements, $pagenow );
-
-		// PREVENT index.php or blog1.php etc from being considered as a slug later on.
-		if( isset( $path_elements[0] ) && $path_elements[0] == $pagenow )
-		{ // Ignore element that is the current PHP file name (ideally this URL will later be redirected to a canonical URL without any .php file in the URL)
-			array_shift( $path_elements );
-			$Debuglog->add( 'Ignoring *.php in extra path info' , 'params' );
+		if( ! isset( $path_elements ) )
+		{	// Try to initialize $path_elements:
+			init_requested_coll_or_process_tinyurl( false, true, true );
 		}
 
 		if( isset( $path_elements[0] )
@@ -304,8 +273,6 @@ if( $resolve_extra_path )
 			else
 			{
 				// Does the pathinfo end with a / or a ; ?
-				$last_char = substr( $path_string, -1 );
-				$last_part = $path_elements[count( $path_elements )-1];
 				$last_len  = strlen( $last_part );
 				if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) )   // In very old b2evo version we had ITEM slugs truncated at 40 and possibly ending with `-`
 					|| $last_char == ':'
@@ -484,7 +451,7 @@ if( !empty($p) || !empty($title) )
 		}
 
 		if( ! empty( $Item ) &&
-		    $Item->allow_redirect_to_canonical_url() &&
+		    $Blog->get_setting( 'canonical_item_urls' ) &&
 		    ( $SlugCache = & get_SlugCache() ) && 
 		    ( $item_Slug = & $SlugCache->get_by_ID( $Item->get( 'canonical_slug_ID' ), false, false ) ) &&
 		    ( $item_Slug->get( 'title' ) != $title ) && // If current slug is NOT canonical slug of the Item
@@ -679,14 +646,14 @@ elseif( $disp == '-' )
 	$is_front = true; // we have detected that we are displaying the front page
 
 	// Do we need to handle the canoncial url?
-	if( ( $Blog->allow_redirect_to_canonical_url() && $redir == 'yes' )
+	if( ( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 	    || $Blog->get_setting( 'relcanonical_homepage' )
 	    || $Blog->get_setting( 'self_canonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
 		if( ! is_same_url( preg_replace( '#[\?&]coll_locale=([^&]+|$)#', '', $ReqURL ), $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 		{	// We are not on the canonical blog url:
-			if( $Blog->allow_redirect_to_canonical_url() && $redir == 'yes' )
+			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
 				header_redirect( $canonical_url, ( empty( $display_containers ) && empty( $display_includes ) && empty( $_GET['debug'] ) ) ? 301 : 303 );
 			}

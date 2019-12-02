@@ -625,7 +625,7 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
  * @param boolean if the domain does not match a collection, try to process as a TinyURL and redirect before fallback to default collection
  * @return boolean true if $blog was initialized successful, false otherwise
  */
-function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $process_tinyslug_first = true, $process_unkonwn_domain_as_tinyurl = true )
+function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $process_tinyslug_first = true, $process_unknown_domain_as_tinyurl = true )
 {
 	global $blog, $ReqHost, $ReqPath, $baseurl, $pagenow; 
 	global $Settings;
@@ -638,13 +638,18 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 	}
 
 	// Set some defaults in case we cannot get those from the URL:
+	global $resolve_extra_path, $path_elements, $last_char, $last_part;
 	$first_part = '';
 	$last_char = '';
 	$last_part = '';
 	// TODO: we may need more and we may need to make them global
 
 
-	if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
+	if( ! isset( $resolve_extra_path ) )
+	{	// Resolve extra path by default:
+		$resolve_extra_path = true;
+	}
+
 	if( $resolve_extra_path )
 	{
 		/*
@@ -687,11 +692,7 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 		// echo "path=[$path_string]<br />";
 
 		// Replace encoded ";" and ":" with regular chars (used for tags)
-		// TODO: dh> why not urldecode it altogether? fp> would prolly make sense but requires testing -- note: check with tags (move urldecode from tags up here)
-		// TODO: PHP5: use str_ireplace
-		$path_string = str_replace( array('%3b', '%3B', '%3a', '%3A'), array(';', ';', ':', ':'), $path_string );
-		// TODO: fp>yb Use urldecode()  
-		// TODO: fp>yb Then remove any char that is not [A-Za-E0-9./_\-:;] 
+		$path_string = preg_replace( '#[^a-zA-Z0-9./_\-:;]#', '', urldecode( $path_string ) );
 		$Debuglog->add( 'Cleaned up path_string to '.$path_string , 'initial_url_decode' );
 
 		// Slice the path:
@@ -703,7 +704,6 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 		{ // Ignore element that is the current PHP file name (ideally this URL will later be redirected to a canonical URL without any .php file in the URL)
 			array_shift( $path_elements );
 			$Debuglog->add( 'Ignoring *.php in extra path info' , 'initial_url_decode' );
-			// pre_dump( $path_elements );
 		}
 
 		// Do we still have extra path info to decode?
@@ -718,19 +718,29 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 			// this is the LAST path element!
 			$last_part = $path_elements[count( $path_elements )-1];
 		}
-
-		// TODO: Some of the above MUST be cached into global variables so the results can be used again in _blog_main.inc.php for further URL decoding (tags, categories, date ranges, etc)
 	}
 
 
-	if( false /* disabled but should be like: if( $process_tinyslug_first && $Settings->get( 'tinyurlprocessing' ) */)
-	{
-		// TODO: fp>yb: we need some if( is_tinyuri( $x) ) that matches regexp like approx ^[a-z]+[A-Z][a-zA-Z0-9]+$ but I don't remember exactly how a tinyslug is defined
-		// also complete tech info here: https://b2evolution.net/man/tiny-slug
-		$Debuglog->add( '$last_part has correct TinySlug format:', 'initial_url_decode' );
-		// if we have a tiny-slug and we find a matching item, do 301 redirect
-		$Debuglog->add( 'Found Item for that slug:', 'initial_url_decode' );
-		$Debuglog->add( 'Redirecting to:', 'initial_url_decode' );
+	if( $process_tinyslug_first && ! empty( $last_part ) && $Settings->get( 'redirect_tinyurl' ) )
+	{	// We should redirect from Tiny URLs to canonical URLs:
+		load_funcs( 'slugs/model/_slug.funcs.php' );
+		if( is_tiny_slug( $last_part ) )
+		{	// The last part of the current URL looks like Tiny URL:
+			$Debuglog->add( '$last_part has correct TinySlug format: '.$last_part, 'initial_url_decode' );
+			if( ( $ItemCache = & get_ItemCache() ) &&
+			    ( $Item = & $ItemCache->get_by_urltitle( $last_part, false, false ) ) && // Item is found by the requested Tiny URL
+			    ( $SlugCache = & get_SlugCache() ) && 
+			    ( $item_Slug = & $SlugCache->get_by_ID( $Item->get( 'tiny_slug_ID' ), false, false ) ) ) // Tiny Slug is found in DB)
+			{	// If we have a tiny-slug and we find a matching Item:
+				$Debuglog->add( 'Found Item for that slug: #'.$Item->ID.' ('.$Item->get( 'title' ).')', 'initial_url_decode' );
+
+				// Do 301 redirect from tiny URL to canonical URL of the detected Item:
+				$item_permanent_url = $Item->get_permanent_url( '', '', '&' );
+				$Debuglog->add( 'Redirecting to: '.$item_permanent_url, 'initial_url_decode' );
+				header_redirect( $item_permanent_url, 301 );
+				// Exit here.
+			}
+		}
 	}
 
 
@@ -796,14 +806,6 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 		return true;
 	}
 
-	// TODO: fp>yb: this is WRONG. We NEVER want to know which tinyURL is currently configured for a collection.
-	if( ( $Collection = $Blog = & $BlogCache->get_by_tiny_url( $ReqAbsUrl, false ) ) !== false )
-	{	// We found a matching collection by Tiny URL:
-		$blog = $Blog->ID;
-		$Debuglog->add( 'Found collection by Tiny URL: '.$blog, 'detectblog' );
-		return true;
-	}
-
 
 	// No collection identified by absolute URL, try searching URL aliases:
 	$Debuglog->add( 'Checking for URL alias match', 'detectblog' );
@@ -844,13 +846,25 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 
 
 	// No collection identified, we MUST now consider the domain as being a TinyURL domain:
-	if( false /* if( $process_unkonwn_domain_as_tinyurl && $Settings->get( 'tinyurlprocessing' ) */ )
+	if( $process_unknown_domain_as_tinyurl && ! empty( $last_part ) && $Settings->get( 'redirect_tinyurl' ) )
 	{
-		// TODO: fp>yb: test if the URL matches a tinyurl scheme `https?://domain.tld/slug` without extra folders or params
-		$Debuglog->add( 'URL has correct TinyURL format:', 'initial_url_decode' );
-		// If yes, find item by slug ($last_part from above), if found, redirect.
-		$Debuglog->add( 'Found Item for the slug:', 'initial_url_decode' );
-		$Debuglog->add( 'Redirecting to:', 'initial_url_decode' );
+		// Check if the URL matches a tinyurl scheme `https?://domain.tld/slug` without extra folders or params:
+		if( preg_match( '#^https?://[a-z0-9\-_.]+\.[a-z]+/[a-z0-9\-_]+$#i', $ReqAbsUrl ) )
+		{
+			$Debuglog->add( 'URL has correct TinyURL format: '.$ReqAbsUrl, 'initial_url_decode' );
+
+			if( ( $ItemCache = & get_ItemCache() ) &&
+			    ( $Item = & $ItemCache->get_by_urltitle( $last_part, false, false ) ) )
+			{	// If we find a matching Item by slug:
+				$Debuglog->add( 'Found Item for that slug: #'.$Item->ID.' ('.$Item->get( 'title' ).')', 'initial_url_decode' );
+
+				// Do 301 redirect from tiny URL to canonical URL of the detected Item:
+				$item_permanent_url = $Item->get_permanent_url( '', '', '&' );
+				$Debuglog->add( 'Redirecting to: '.$item_permanent_url, 'initial_url_decode' );
+				header_redirect( $item_permanent_url, 301 );
+				// Exit here.
+			}
+		}
 	}
 
 
