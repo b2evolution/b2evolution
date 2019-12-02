@@ -3162,6 +3162,7 @@ function get_skin_default_containers()
 			'item_single_header'        => array( NT_('Item Single Header'), 50 ),
 			'item_single'               => array( NT_('Item Single'), 51 ),
 			'item_page'                 => array( NT_('Item Page'), 55 ),
+			'comment_list'              => array( NT_('Comment List'), 57 ),
 			'comment_area'              => array( NT_('Comment Area'), 60 ),
 			'sidebar'                   => array( NT_('Sidebar'), 80 ),
 			'sidebar_2'                 => array( NT_('Sidebar 2'), 90 ),

@@ -57,6 +57,20 @@ $CommentList->set_filters( array(
 // Get ready for display (runs the query):
 $CommentList->display_init();
 
+// ------------------------- "Comment List" CONTAINER EMBEDDED HERE --------------------------
+// Display container contents:
+widget_container( 'comment_list', array(
+	// The following (optional) params will be used as defaults for widgets included in this container:
+	'container_display_if_empty' => false, // If no widget, don't display container at all
+	// This will enclose each widget in a block:
+	'block_start'           => '<div class="evo_widget $wi_class$">',
+	'block_end'             => '</div>',
+	// This will enclose the title of each widget:
+	'block_title_start'     => '<h3>',
+	'block_title_end'       => '</h3>',
+) );
+// ----------------------------- END OF "Item List" CONTAINER -----------------------------
+
 $CommentList->display_if_empty();
 
 echo '<div class="evo_content_block">';

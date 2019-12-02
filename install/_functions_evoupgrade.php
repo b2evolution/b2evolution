@@ -649,7 +649,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 						);
 				}
 
-				if( ! empty( $container_widgets ) )
+				if( $container_widgets !== false )
 				{	// If the requested container has at least one widget:
 					if( ! isset( $coll_containers[ $new_container_code ] ) )
 					{	// Skip container which is not supported by current collection's skin:
@@ -12132,6 +12132,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 15640, 'Upgrading item types table...' ) )
 	{	// part of 7.0.2-beta
 		db_add_col( 'T_items__type', 'ityp_allow_switchable', 'TINYINT DEFAULT 1 AFTER ityp_allow_featured' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15650, 'Installing new widget container "Comment List"...' ) )
+	{	// part of 7.0.2-beta
+		install_new_default_widgets( 'comment_list' );
 		upg_task_end();
 	}
 

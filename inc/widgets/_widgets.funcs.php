@@ -133,6 +133,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 60, 'item_vote', 'coll_type' => '-forum,group' ),
 	);
 
+	/* Comment List */
+	$default_widgets['comment_list'] = array();
+
 	/* Comment Area */
 	$default_widgets['comment_area'] = array(
 		array(  5, 'fin_contrib', 'coll_type' => 'forum', 'type' => 'plugin' ),
