@@ -688,12 +688,12 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 		 */
 		$path_string = $ReqPath;
 
-		$Debuglog->add( 'Extra path info found! path_string='.$path_string , 'initial_url_decode' );
+		$Debuglog->add( 'Extra path info found! path_string='.$path_string , 'url_decode_part_1' );
 		// echo "path=[$path_string]<br />";
 
 		// Replace encoded ";" and ":" with regular chars (used for tags)
 		$path_string = preg_replace( '#[^a-zA-Z0-9./_\-:;]#', '', urldecode( $path_string ) );
-		$Debuglog->add( 'Cleaned up path_string to '.$path_string , 'initial_url_decode' );
+		$Debuglog->add( 'Cleaned up path_string to '.$path_string , 'url_decode_part_1' );
 
 		// Slice the path:
 		$path_elements = preg_split( '~/~', $path_string, 20, PREG_SPLIT_NO_EMPTY );
@@ -703,7 +703,7 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 		if( isset( $path_elements[0] ) && $path_elements[0] == $pagenow )
 		{ // Ignore element that is the current PHP file name (ideally this URL will later be redirected to a canonical URL without any .php file in the URL)
 			array_shift( $path_elements );
-			$Debuglog->add( 'Ignoring *.php in extra path info' , 'initial_url_decode' );
+			$Debuglog->add( 'Ignoring *.php in extra path info' , 'url_decode_part_1' );
 		}
 
 		// Do we still have extra path info to decode?
@@ -726,17 +726,17 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 		load_funcs( 'slugs/model/_slug.funcs.php' );
 		if( is_tiny_slug( $last_part ) )
 		{	// The last part of the current URL looks like Tiny URL:
-			$Debuglog->add( '$last_part has correct TinySlug format: '.$last_part, 'initial_url_decode' );
+			$Debuglog->add( '$last_part has correct TinySlug format: '.$last_part, 'url_decode_part_1' );
 			if( ( $ItemCache = & get_ItemCache() ) &&
 			    ( $Item = & $ItemCache->get_by_urltitle( $last_part, false, false ) ) && // Item is found by the requested Tiny URL
 			    ( $SlugCache = & get_SlugCache() ) && 
 			    ( $item_Slug = & $SlugCache->get_by_ID( $Item->get( 'tiny_slug_ID' ), false, false ) ) ) // Tiny Slug is found in DB)
 			{	// If we have a tiny-slug and we find a matching Item:
-				$Debuglog->add( 'Found Item for that slug: #'.$Item->ID.' ('.$Item->get( 'title' ).')', 'initial_url_decode' );
+				$Debuglog->add( 'Found Item for that slug: #'.$Item->ID.' ('.$Item->get( 'title' ).')', 'url_decode_part_1' );
 
 				// Do 301 redirect from tiny URL to canonical URL of the detected Item:
 				$item_permanent_url = $Item->get_permanent_url( '', '', '&' );
-				$Debuglog->add( 'Redirecting to: '.$item_permanent_url, 'initial_url_decode' );
+				$Debuglog->add( 'Redirecting to: '.$item_permanent_url, 'url_decode_part_1' );
 				header_redirect( $item_permanent_url, 301 );
 				// Exit here.
 			}
@@ -745,10 +745,10 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 
 
 	// If we want to give priority to ?blog=123..
-	// fp>yb: why would we ever want to give priority to ?blog=123..  (not urgent)
+// fp>yb: why would we ever want to give priority to ?blog=123..
 	if( $use_blog_param_first == true )
 	{	// Check if a specific collection has been requested in the URL:
-		$Debuglog->add( 'Checking for explicit "blog" param', 'initial_url_decode' );
+		$Debuglog->add( 'Checking for explicit "blog" param', 'url_decode_part_1' );
 		$blog = param( 'blog', 'integer', '', true );
 
 		if( !empty($blog) )
@@ -757,7 +757,7 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 		}
 	}
 
-	$Debuglog->add( 'No blog param received, checking extra path...', 'initial_url_decode' );
+	$Debuglog->add( 'Trying to identify collection by extra path...', 'url_decode_part_1' );
 
 	// No collection requested by URL param, let's try to match something in the URL:
 	// Note: we try to find a matching collection URL BEFORE falling back to considering a tinyURL:
@@ -768,20 +768,20 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 
 	if( preg_match( '#^'.$baseurl_regex.'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
 	{ // We have an URL that is of the form `http://domain.com/slug` or `http://domain.com/index.php/slug` (NOTE: may still contain `slug.php`)
-		$Debuglog->add( 'Found a potential URL collection name: '.$matches[2].' (in: '.$ReqHost.$ReqPath.')', 'initial_url_decode' );
+		$Debuglog->add( 'Found a potential URL collection name: '.$matches[2].' (in: '.$ReqHost.$ReqPath.')', 'url_decode_part_1' );
 		if( strpos( $matches[2], '.' ) !== false )
 		{	// There is an extension (like .php) in the collection name, ignore...
-			$Debuglog->add( 'Ignoring because it contains a dot.', 'initial_url_decode' );
+			$Debuglog->add( 'Ignoring because it contains a dot.', 'url_decode_part_1' );
 		}
 		elseif( ( $Collection = $Blog = & $BlogCache->get_by_urlname( $matches[2], false ) ) !== false ) /* SQL request '=' */
 		{ // We found a matching Collection by collection Slug:
 			$blog = $Blog->ID;
-			$Debuglog->add( 'Found matching collection: '.$blog, 'initial_url_decode' );
+			$Debuglog->add( 'Found matching collection: '.$blog, 'url_decode_part_1' );
 			return true;
 		}
 		else
 		{
-			$Debuglog->add( 'No match.', 'initial_url_decode' );
+			$Debuglog->add( 'No match.', 'url_decode_part_1' );
 		}
 	}
 
@@ -797,22 +797,22 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 		$ReqAbsUrl = $ReqHost.$ReqPath;
 	}
 
-	$Debuglog->add( 'Looking up absolute url: '.$ReqAbsUrl, 'detectblog' );
+	$Debuglog->add( 'Trying to identify collection by looking up Absolute url: '.$ReqAbsUrl, 'url_decode_part_1' );
 	// SQL request 'LIKE':
 	if( ( $Collection = $Blog = & $BlogCache->get_by_url( $ReqAbsUrl, false ) ) !== false )
 	{ // We found a matching collection:
 		$blog = $Blog->ID;
-		$Debuglog->add( 'Found matching collection: '.$blog, 'detectblog' );
+		$Debuglog->add( 'Found matching collection: '.$blog, 'url_decode_part_1' );
 		return true;
 	}
 
 
 	// No collection identified by absolute URL, try searching URL aliases:
-	$Debuglog->add( 'Checking for URL alias match', 'detectblog' );
+	$Debuglog->add( 'Trying to identify collection by looking up URL aliases...', 'url_decode_part_1' );
 	$alias = NULL;
 	if( ( $Collection = $Blog = & $BlogCache->get_by_url_alias( $ReqAbsUrl, $alias, false ) ) !== false )
 	{ // We found a matching collection:
-		$Debuglog->add( 'Found matching collection: '.$blog. 'using alias '.$alias, 'detectblog' );
+		$Debuglog->add( 'Found matching collection: '.$blog. 'using alias '.$alias, 'url_decode_part_1' );
 		$same_protocol_alias = url_same_protocol( $alias, $ReqAbsUrl );
 		$tail_Path = str_replace( $same_protocol_alias, '', $ReqAbsUrl );
 		if( substr( $tail_Path, 0, 1 ) != '/' )
@@ -835,7 +835,7 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 	// If we did NOT give priority to ?blog=123, check for param now:
 	if( $use_blog_param_first == false )
 	{	// Check if a specific collection has been requested in the URL:
-		$Debuglog->add( 'Checking for explicit "blog" param', 'detectblog' );
+		$Debuglog->add( 'Checking for explicit "blog" param', 'url_decode_part_1' );
 		$blog = param( 'blog', 'integer', '', true );
 
 		if( !empty($blog) )
@@ -851,16 +851,16 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 		// Check if the URL matches a tinyurl scheme `https?://domain.tld/slug` without extra folders or params:
 		if( preg_match( '#^https?://[a-z0-9\-_.]+\.[a-z]+/[a-z0-9\-_]+$#i', $ReqAbsUrl ) )
 		{
-			$Debuglog->add( 'URL has correct TinyURL format: '.$ReqAbsUrl, 'initial_url_decode' );
+			$Debuglog->add( 'URL has correct TinyURL format: '.$ReqAbsUrl, 'url_decode_part_1' );
 
 			if( ( $ItemCache = & get_ItemCache() ) &&
 			    ( $Item = & $ItemCache->get_by_urltitle( $last_part, false, false ) ) )
 			{	// If we find a matching Item by slug:
-				$Debuglog->add( 'Found Item for that slug: #'.$Item->ID.' ('.$Item->get( 'title' ).')', 'initial_url_decode' );
+				$Debuglog->add( 'Found Item for that slug: #'.$Item->ID.' ('.$Item->get( 'title' ).')', 'url_decode_part_1' );
 
 				// Do 301 redirect from tiny URL to canonical URL of the detected Item:
 				$item_permanent_url = $Item->get_permanent_url( '', '', '&' );
-				$Debuglog->add( 'Redirecting to: '.$item_permanent_url, 'initial_url_decode' );
+				$Debuglog->add( 'Redirecting to: '.$item_permanent_url, 'url_decode_part_1' );
 				header_redirect( $item_permanent_url, 301 );
 				// Exit here.
 			}
@@ -873,11 +873,12 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
 	if( $Blog !== false && $Blog !== NULL )
 	{ // We found a matching blog:
-		$Debuglog->add( 'Using default blog '.$blog, 'detectblog' );
+		$Debuglog->add( 'Falling back to default collection: '.$blog, 'url_decode_part_1' );
 		return true;
 	}
 
 	// No collection has been selected (we'll probably display the default.php page):
+	$Debuglog->add( 'We cannot use any specific collection.', 'url_decode_part_1' );
 	$blog = NULL;
 	return false;
 }

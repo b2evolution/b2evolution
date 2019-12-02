@@ -93,7 +93,7 @@ class PageCache
 
 			if( ! $Blog->get_setting('cache_enabled') )
 			{	// We do NOT want caching for this collection
-				$Debuglog->add( 'Cache not enabled for this blog.', 'pagecache' );
+				$Debuglog->add( 'Cache not enabled for this collection.', 'pagecache' );
 			}
 			else
 			{

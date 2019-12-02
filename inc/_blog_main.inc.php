@@ -156,14 +156,9 @@ $is_front = false;	// So far we have not detected that we are displaying the fro
 
 
 /*
- * _______________________________ Locale / Charset for the Blog _________________________________
+ * _______________________________ Locale / Charset for the Collection _________________________________
  *
-	TODO: blueyed>> This should get moved as default to the locale detection in _main.inc.php,
-	        as we only want to activate the I/O charset, which is probably the user's..
-	        It prevents using a locale/charset in the front office, apart from the one given as default for the blog!!
-fp>there is no blog defined in _main and there should not be any
-blueyed> Sure, but that means we should either split it, or use the locale here only, if there's no-one given with higher priority.
-*/
+ */
 if( $Blog->get_setting( 'locale_source' ) == 'blog' ||
     ( $Blog->get_setting( 'locale_source' ) == 'user' && ! $Blog->has_locale( $current_locale ) ) )
 { // Activate main collection locale when this is defined in settings of current collection
@@ -220,27 +215,27 @@ if( init_charsets( $current_charset ) )
  * Note: category names cannot be named like this [a-z][0-9]+
  */
 
-
 if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
 	// Check and Remove blog base URI from ReqPath:
 
 	// BaseURI is the part after the domain name and it will always end with / :
-	$blog_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
-	$Debuglog->add( 'blog_baseuri: "'.$blog_baseuri.'"', 'params' );
-
+	$coll_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
+	$Debuglog->add( 'Collection base URI: "'.$coll_baseuri.'"', 'url_decode_part_2' );
+	$coll_baseuri_matched_in_url = preg_match( '~(^'.preg_quote( $coll_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches );
 	// Check if we have one of these:
 	// - Always try to match slug
 	// - Either the ReqPath starts with collection base URI (always including trailing slash)
 	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
 	// ... followed by some extra path info.
 	if( $Settings->get( 'always_match_slug' ) // do we want to redirect to correct Collection if an Item Slug was found in <b>any</b> URL
-		|| preg_match( '~(^'.preg_quote( $blog_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches ) )
-	{ // We have extra path info
+		|| $coll_baseuri_matched_in_url )
+	{ // We have EXTRA path info:
+
 		if( ! isset( $path_elements ) )
 		{	// Don't allow next code without initialized global $path_elements:
-			debug_die( 'You must initialize $path_elements by init_requested_coll_or_process_tinyurl() before call this code!' );
+			debug_die( '$path_elements should have been initialized by init_requested_coll_or_process_tinyurl() before calling this code!' );
 		}
 
 		if( isset( $path_elements[0] )
@@ -248,7 +243,7 @@ if( $resolve_extra_path )
 						|| $path_elements[0] == $Blog->urlname ) )
 		{ // Ignore stub file (if it ends with .php it should already have been filtered out above)
 			array_shift( $path_elements );
-			$Debuglog->add( 'Ignoring stub filename OR blog urlname in extra path info' , 'params' );
+			$Debuglog->add( 'Ignoring stub filename OR blog urlname in extra path info' , 'url_decode_part_2' );
 		}
 		// pre_dump( $path_elements );
 
@@ -293,7 +288,7 @@ if( $resolve_extra_path )
 				elseif( ( $tags_dash_fix && $last_char == '-' && $last_len == 40 ) || $last_char != '/' )
 				{	// NO ENDING SLASH or ends with a dash, is 40 chars long and $tags_dash_fix is true
 					// -> We'll consider this to be a ref to a post.
-					$Debuglog->add( 'We consider this to be a ref to a post - last char: '.$last_char, 'params' );
+					$Debuglog->add( 'We consider this to be a ref to a post: '.$last_part.' -- last char of URI: '.$last_char, 'url_decode_part_2' );
 
 					// Set a lot of defaults as if we had received a complex URL:
 					$m = '';
@@ -301,30 +296,29 @@ if( $resolve_extra_path )
 
 					if( preg_match( '#^p([0-9]+)$#', $last_part, $req_post ) )
 					{ // The last param is of the form p000
-						// echo 'post number';
 						$p = $req_post[1];		// Post to display
 					}
 					else
 					{ // Last param is a string, we'll consider this to be a post urltitle
 						$title = $last_part;
-						// echo 'post title : ', $title;
+						$Debuglog->add( 'Post slug to look for: '.$title, 'url_decode_part_2' );
 					}
 				}
 				else
 				{	// ENDING SLASH -> we are looking for a daterange OR a chapter:
-					$Debuglog->add( 'Last part: '.$last_part , 'params' );
+					$Debuglog->add( 'Last part: '.$last_part , 'url_decode_part_2' );
 					// echo $last_part;
 					if( preg_match( '|^w?[0-9]+$|', $last_part ) )
 					{ // Last part is a number or a "week" number:
 						$i=0;
-						$Debuglog->add( 'Last part is a number or a "week" number: '.$path_elements[$i] , 'params' );
+						$Debuglog->add( 'Last part is a number or a "week" number: '.$path_elements[$i] , 'url_decode_part_2' );
 						// echo $path_elements[$i];
 						if( isset( $path_elements[$i] ) )
 						{
 							if( preg_match( '#^\d{4}$#', $path_elements[$i] ) )
 							{ // We'll consider this to be the year
 								$m = $path_elements[$i++];
-								$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'params' );
+								$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'url_decode_part_2' );
 
 								// Also use the prefered posts per page for archives (may be NULL, in which case the blog default will be used later on)
 								if( ! $posts = $Blog->get_setting( 'archive_posts_per_page' ) )
@@ -335,12 +329,12 @@ if( $resolve_extra_path )
 								if( isset( $path_elements[$i] ) && preg_match( '#^(0[1-9]|1[0-2])$#', $path_elements[$i] ) )
 								{ // We'll consider this to be the month
 									$m .= $path_elements[$i++];
-									$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'params' );
+									$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'url_decode_part_2' );
 
 									if( isset( $path_elements[$i] ) && preg_match( '#^(0[1-9]|[12][0-9]|3[01])$#', $path_elements[$i] ) )
 									{ // We'll consider this to be the day
 										$m .= $path_elements[$i++];
-										$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'params' );
+										$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'url_decode_part_2' );
 									}
 								}
 								elseif( isset( $path_elements[$i] ) && preg_match( '#^w(0?[0-9]|[1-4][0-9]|5[0-3])$#', $path_elements[$i] ) )
@@ -394,17 +388,15 @@ if( $resolve_extra_path )
 	}
 }
 
-
 /*
  * ____________________________ Query params ____________________________
  *
  * Note: if the params have been set by the extra-path-info above, param() will not touch them.
  */
 param( 'p', 'integer', '', true );              // Specific post number to display
-param( 'title', 'string', '', 'auto' );						// urtitle of post to display
+param( 'title', 'string', '', 'auto' );			// urtitle of post to display
 param( 'preview', 'integer', 0, true );         // Is this preview ?
-param( 'stats', 'integer', 0 );									// Deprecated but might still be used by spambots
-
+param( 'stats', 'integer', 0 );						// Deprecated but might still be used by spambots
 
 /*
  * ____________________________ Get specific Item if requested ____________________________
@@ -417,6 +409,10 @@ if( !empty($p) || !empty($title) )
 	if( !empty($p) )
 	{	// Get from post ID:
 		$Item = & $ItemCache->get_by_ID( $p, false );
+		if( !empty($Item) )
+		{
+			$Debuglog->add( 'Requested Item found by $p: '.$Item->get_title(), 'url_decode_part_2' );
+		}
 	}
 	else
 	{	// Get from post title:
@@ -437,30 +433,40 @@ if( !empty($p) || !empty($title) )
 			$Item = & $ItemCache->get_by_urltitle( $title, false, false );
 		}
 
-		if( ! empty( $Item ) && ! $Item->is_part_of_blog( $blog ) )
-		{ // We have found an Item object, but it doesn't belong to the current blog!
-			// Check if we want to redirect moved posts:
-			if( $Settings->get( 'redirect_moved_posts' ) )
-			{	// Set disp to 'redirect' in order to store this value in hitlog table:
-				$disp = 'redirect';
-				// Redirect to the item current permanent url:
-				header_redirect( $Item->get_permanent_url(), 301 );
-				// already exited
-			}
-			unset($Item);
-		}
+		if( !empty($Item) )
+		{
+			$Debuglog->add( 'Requested Item found by title: '.$Item->get_title(), 'url_decode_part_2' );
 
-		if( ! empty( $Item ) &&
-		    $Blog->get_setting( 'canonical_item_urls' ) &&
-		    ( $SlugCache = & get_SlugCache() ) && 
-		    ( $item_Slug = & $SlugCache->get_by_ID( $Item->get( 'canonical_slug_ID' ), false, false ) ) &&
-		    ( $item_Slug->get( 'title' ) != $title ) && // If current slug is NOT canonical slug of the Item
-		    $Item->is_part_of_blog( $blog ) ) // If the Item has a category from current collection
-		{	// Redirect permanently to the item main/canonical permanent url in the current collection:
-			header_redirect( $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $blog ), 301 );
-			// Exit here.
+			if( ! $Item->is_part_of_blog( $blog ) )
+			{	// We have found an Item object, but it doesn't belong to the current collection!
+				// Check if we want to redirect moved posts:
+				if( $Settings->get( 'redirect_moved_posts' ) )
+				{	// Set disp to 'redirect' in order to store this value in hitlog table:
+					$disp = 'redirect';
+					// Redirect to the item current permanent url:
+					header_redirect( $Item->get_permanent_url(), 301 );
+					// already exited
+				}
+
+				$Debuglog->add( 'FORGETTING that Item now because it\'s in a different collection and we don\'t want to redirect moved posts', 'url_decode_part_2' );
+				
+				unset($Item);
+			}
+
+			if( !empty($Item) &&
+				 $Blog->get_setting( 'canonical_item_urls' ) &&
+			    ( $SlugCache = & get_SlugCache() ) && 
+			    ( $item_Slug = & $SlugCache->get_by_ID( $Item->get( 'canonical_slug_ID' ), false, false ) ) &&
+			    ( $item_Slug->get( 'title' ) != $title ) && // If current slug is NOT canonical slug of the Item
+			    $Item->is_part_of_blog( $blog ) ) // If the Item has a category from current collection
+			{	// Redirect permanently to the item main/canonical permanent url in the current collection:
+				header_redirect( $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $blog ), 301 );
+				// Exit here.
+			}
 		}
 	}
+
+
 	if( empty( $Item ) )
 	{	// Post doesn't exist!
 
@@ -471,6 +477,8 @@ if( !empty($p) || !empty($title) )
 
 		if( ! $tag_fallback && !empty($title) && empty($already_looked_into_chapters) )
 		{	// Let's try to fall back to a category/chapter...
+			$Debuglog->add( 'Trying to identify a Category/Chapter...', 'url_decode_part_2' );
+
 			$ChapterCache = & get_ChapterCache();
 			/**
 			 * @var Chapter
@@ -491,6 +499,7 @@ if( !empty($p) || !empty($title) )
 
 		if( !empty($title) )
 		{	// Let's try to fall back to a tag...
+			$Debuglog->add( 'Trying to identify a Tag...', 'url_decode_part_2' );
 			if( $tag_fallback )
 			{
 				$title = substr( $orig_title, 0, -1 );
@@ -505,6 +514,7 @@ if( !empty($p) || !empty($title) )
 
 		if( ! $title_fallback )
 		{	// Let's try to fall back to a help slug...
+			$Debuglog->add( 'Trying to identify a help slug..', 'url_decode_part_2' );
 			$SlugCache = & get_SlugCache();
 			$Slug = & $SlugCache->get_by_name( $title, false, false );
 			if( ! empty($Slug) && $Slug->get( 'type' ) == 'help' )
@@ -517,12 +527,15 @@ if( !empty($p) || !empty($title) )
 
 		if( ! $title_fallback )
 		{	// We were not able to fallback to anything meaningful:
+			$Debuglog->add( 'Could not identify anything! This is a 404!', 'url_decode_part_2' );
 			$disp = '404';
 			$disp_detail = '404-post_not_found';
 			$requested_404_title = $title;
 		}
 	}
 }
+
+$Debuglog->add( 'Disp detail: '.$disp_detail, 'url_decode_part_2' );
 
 
 // Check if a forced skin has been requested (used by mobile skin switcher widget):
