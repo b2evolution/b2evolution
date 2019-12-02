@@ -1242,18 +1242,15 @@ class _core_Module extends Module
 					}
 
 					$entries['site']['entries']['email']['entries'] += array(
-								'settings' => array(
-									'text' => T_('Settings').'&hellip;',
-									'href' => $admin_url.'?ctrl=email&amp;tab=settings' ),
-								'blocked' => array(
-									'text' => T_('Addresses').'&hellip;',
-									'href' => $admin_url.'?ctrl=email' ),
 								'sent' => array(
 									'text' => T_('Sent').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=sent' ),
 								'return' => array(
 									'text' => T_('Returned').'&hellip;',
 									'href' => $admin_url.'?ctrl=email&amp;tab=return' ),
+								'blocked' => array(
+										'text' => T_('Addresses').'&hellip;',
+										'href' => $admin_url.'?ctrl=email' ),
 								);
 				}
 
