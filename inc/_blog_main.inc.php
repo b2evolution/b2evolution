@@ -386,6 +386,11 @@ if( $resolve_extra_path )
 		}
 
 	}
+	elseif( !$coll_baseuri_matched_in_url && !empty( $path_elements))
+	{ // Case of calling http://baseurl/slug when main coll is set as http://baseurl/index.php and we did not elect to always match the slug.
+		$disp = '404';
+		$disp_detail = '404-unexpected-extra-path';
+	}
 }
 
 /*
