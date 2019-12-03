@@ -737,7 +737,7 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 				// Do 301 redirect from tiny URL to canonical URL of the detected Item:
 				$item_permanent_url = $Item->get_permanent_url( '', '', '&' );
 				$Debuglog->add( 'Redirecting to: '.$item_permanent_url, 'url_decode_part_1' );
-				header_redirect( $item_permanent_url, 301 );
+				$Item->tinyurl_redirect();
 				// Exit here.
 			}
 		}
@@ -861,7 +861,7 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 				// Do 301 redirect from tiny URL to canonical URL of the detected Item:
 				$item_permanent_url = $Item->get_permanent_url( '', '', '&' );
 				$Debuglog->add( 'Redirecting to: '.$item_permanent_url, 'url_decode_part_1' );
-				header_redirect( $item_permanent_url, 301 );
+				$Item->tinyurl_redirect();
 				// Exit here.
 			}
 		}

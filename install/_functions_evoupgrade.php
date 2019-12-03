@@ -12141,6 +12141,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15660, 'Upgrading base domains table...') )
+	{	// part of 7.0.2-beta
+		db_add_col( 'T_basedomains', 'dom_source_tag', 'VARCHAR(32) COLLATE utf8mb4_unicode_ci NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

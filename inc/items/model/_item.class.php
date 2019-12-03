@@ -13857,5 +13857,31 @@ class Item extends ItemLight
 
 		return ( $a['order'] > $b['order'] ? 1 : -1 );
 	}
+
+
+	/**
+	 * Do 301 redirect from tiny URL to canonical URL of this Item
+	 */
+	function tinyurl_redirect()
+	{
+		global $Hit;
+
+		// Get item's canonical URL for redirect from tiny URL:
+		$redirect_to = $this->get_permanent_url( '', '', '&' );
+
+		if( ( $item_Blog = & $this->get_Blog() ) && // Item has a Collection
+		    $item_Blog->get_setting( 'tinyurl_tag_source_enabled' ) && // Tag source is enabled for Collection
+		    $item_Blog->get_setting( 'tinyurl_tag_source' ) != '' && // Tag source is defined
+		    isset( $Hit ) &&
+		    ( $Hit instanceof Hit ) && // Hit is initialized
+		    ( $DomainCache = & get_DomainCache() ) &&
+		    ( $referer_Domain = & $DomainCache->get_by_ID( $Hit->get_referer_domain_ID(), false, false ) ) && // Referer Domain is found in DB
+		    ( $referer_Domain->get( 'source_tag' ) !== NULL ) ) // Source Tag is defiend for the referer Domain
+		{	// Append source tag to the redirect URL:
+			$redirect_to = url_add_param( $redirect_to, urlencode( $item_Blog->get_setting( 'tinyurl_tag_source' ) ).'='.urlencode( $referer_Domain->get( 'source_tag' ) ).'&redir=no', '&' );
+		}
+
+		header_redirect( $redirect_to, 301 );
+	}
 }
 ?>

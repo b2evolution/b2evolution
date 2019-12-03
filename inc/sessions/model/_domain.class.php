@@ -33,6 +33,8 @@ class Domain extends DataObject
 
 	var $comment;
 
+	var $source;
+
 	/**
 	 * Constructor
 	 *
@@ -50,6 +52,7 @@ class Domain extends DataObject
 			$this->status = $db_row->dom_status;
 			$this->type = $db_row->dom_type;
 			$this->comment = $db_row->dom_comment;
+			$this->source_tag = $db_row->dom_source_tag;
 		}
 	}
 
@@ -87,6 +90,8 @@ class Domain extends DataObject
 
 		$dom_comment = param( 'dom_comment', 'string', true );
 		$this->set( 'comment', $dom_comment, true );
+
+		$this->set( 'source_tag', param( 'dom_source_tag', 'string', NULL ), true );
 
 		if( ! param_errors_detected() )
 		{ // Check domains with the same name

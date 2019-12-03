@@ -38,6 +38,8 @@ $Form->begin_form( 'fform', $creating ?  T_('New Domain') : T_('Domain') );
 
 	$Form->select_input_array( 'dom_type', $edited_Domain->get( 'type' ), stats_dom_type_titles() , T_('Referrer type'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
 
+	$Form->text_input( 'dom_source_tag', $edited_Domain->get( 'source_tag' ), 32, TB_('Source Tag'), '', array( 'maxlength' => 32 ) );
+
 	$Form->select_input_array( 'dom_status', $edited_Domain->get( 'status' ), stats_dom_status_titles() , T_('Spam status'), '', array( 'force_keys_as_values' => true, 'background_color' => stats_dom_status_colors(), 'required' => true ) );
 
 	$Form->text_input( 'dom_comment', $edited_Domain->get( 'comment' ), 255, T_('Comment'), '', array( 'maxlength' => 255 ) );

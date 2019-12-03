@@ -50,6 +50,7 @@ $schema_queries['T_basedomains'] = array(
 			dom_status ENUM('unknown','trusted','suspect','blocked') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			dom_type   ENUM('unknown','normal','searcheng','aggregator','email') COLLATE ascii_general_ci NOT NULL DEFAULT 'unknown',
 			dom_comment VARCHAR(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+			dom_source_tag VARCHAR(32) COLLATE utf8mb4_unicode_ci NULL,
 			PRIMARY KEY     (dom_ID),
 			UNIQUE dom_name ( dom_name)
 		) ENGINE = myisam DEFAULT CHARACTER SET = $db_storage_charset" );

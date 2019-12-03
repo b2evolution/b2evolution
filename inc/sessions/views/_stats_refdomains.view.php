@@ -101,7 +101,7 @@ else
 }
 
 // Create result set:
-$SQL->SELECT( 'SQL_NO_CACHE dom_ID, dom_name, dom_comment, dom_status, dom_type'.$sql_select );
+$SQL->SELECT( 'SQL_NO_CACHE dom_ID, dom_name, dom_comment, dom_source_tag, dom_status, dom_type'.$sql_select );
 $SQL->GROUP_BY( 'dom_ID' );
 
 $count_SQL = new SQL();
@@ -170,12 +170,16 @@ $Results->filter_area = array(
 
 $Results->title = $page_title.get_manual_link('referring-domains-tab');
 
-$Results->cols[] = array(
+$dom_name_col = array(
 						'th' => T_('Domain name'),
 						'order' => 'dom_name',
 						'td' => '$dom_name$',
-						'total' => '<strong>'.T_('Global total').'</strong>',
 					);
+if( $tab3 == 'top' )
+{	// Display the hit counts only for "top" tab:
+	$dom_name_col['total'] = '<strong>'.T_('Global total').'</strong>';
+}
+$Results->cols[] = $dom_name_col;
 
 $Results->cols[] = array(
 		'th' => T_('Comment'),
@@ -189,7 +193,13 @@ $Results->cols[] = array(
 		'td' => /* Check permission: */$current_User->check_perm( 'stats', 'edit' ) ?
 			/* Current user can edit Domains */'<a href="#" rel="$dom_type$">%stats_dom_type_title( #dom_type# )%</a>' :
 			/* No edit */'%stats_dom_type_title( #dom_type# )%',
-		'total' => '',
+	);
+
+$Results->cols[] = array(
+		'th' => TB_('Source Tag'),
+		'td' => '$dom_source_tag$',
+		'th_class' => 'shrinkwrap',
+		'td_class' => 'nowrap',
 	);
 
 $Results->cols[] = array(
@@ -199,7 +209,6 @@ $Results->cols[] = array(
 		'td' => /* Check permission: */$current_User->check_perm( 'stats', 'edit' ) ?
 			/* Current user can edit Domains */'<a href="#" rel="$dom_status$">%stats_dom_status_title( #dom_status# )%</a>' :
 			/* No edit */'%stats_dom_status_title( #dom_status# )%',
-		'total' => '',
 		'extra' => array( 'style' => 'background-color: %stats_dom_status_color( "#dom_status#" )%;', 'format_to_output' => false )
 	);
 
