@@ -3046,7 +3046,11 @@ Hello
 					.'<div data-display-condition="view=detailed" markdown="1">'."\r\n"
 						.sprintf( T_('This extra information is only displayed when detailed view is requested. This is achieved by adding a display condition like %s.'), '`&lt;div data-display-condition="view=detailed"&gt;`' )."\r\n\r\n"
 						.T_('Note: If needed, skins may format info pages differently from regular posts.')."\r\n"
-					.'</div>',
+					.'</div>'."\r\n\r\n"
+					.'[switcher:view:buttons]'."\r\n"
+					.'	[option:simple]Simple[/option]'."\r\n"
+					.'	[option:detailed]Detailed[/option]'."\r\n"
+					.'[/switcher]',
 				'files'    => array(
 					array( 'logos/b2evolution_1016x208_wbg.png' ),
 				),
