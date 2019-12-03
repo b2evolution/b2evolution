@@ -785,6 +785,17 @@ class item_fields_compare_Widget extends ComponentWidget
 		if( $custom_field['disp_condition'] != '' )
 		{	// Set additional params for display condition:
 			$row_start_attrs = ' data-display-condition="'.$custom_field['disp_condition'].'"';
+
+			// Load switchable params of all compared Items in order to initialize default values:
+			foreach( $items as $item_ID )
+			{
+				if( in_array( $item_ID, $custom_field['items'] ) &&
+				    ( $widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) )
+				{	// If Item is detected:
+					$widget_Item->load_switchable_params();
+				}
+			}
+
 			// Check current params:
 			$disp_conditions = explode( '&', $custom_field['disp_condition'] );
 			foreach( $disp_conditions as $disp_condition )

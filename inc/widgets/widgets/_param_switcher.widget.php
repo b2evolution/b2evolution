@@ -230,6 +230,19 @@ class param_switcher_Widget extends generic_menu_link_Widget
 <script>
 jQuery( 'a[data-param-switcher=<?php echo $this->ID; ?>]' ).click( function()
 {
+	var default_params = {};
+<?php
+	// Load switchable params in order to add all default values in the current URL:
+	$Item->load_switchable_params();
+	if( ! empty( $Item->switchable_params ) )
+	{
+		foreach( $Item->switchable_params as $switchable_param_name => $switchable_param_default_value )
+		{
+			echo "\t".'default_params.'.$switchable_param_name.' = \''.$switchable_param_default_value.'\';'."\r\n";
+		}
+	}
+?>
+
 	// Remove previous value from the URL:
 	var regexp = new RegExp( '([\?&])((' + jQuery( this ).data( 'code' ) + '|redir)=[^&]*(&|$))+', 'g' );
 	var url = location.href.replace( regexp, '$1' );
@@ -237,7 +250,15 @@ jQuery( 'a[data-param-switcher=<?php echo $this->ID; ?>]' ).click( function()
 	// Add param code with value of the clicked button:
 	url += ( url.indexOf( '?' ) === -1 ? '?' : '&' );
 	url += jQuery( this ).data( 'code' ) + '=' + jQuery( this ).data( 'value' );
-	url += '&redir=no'
+	for( default_param in default_params )
+	{
+		regexp = new RegExp( '[\?&]' + default_param + '=', 'g' );
+		if( ! url.match( regexp ) )
+		{	// Append defaul param if it is not found in the current URL:
+			url += '&' + default_param + '=' + default_params[ default_param ];
+		}
+	}
+	url += '&redir=no';
 
 	// Change URL in browser address bar:
 	window.history.pushState( '', '', url );

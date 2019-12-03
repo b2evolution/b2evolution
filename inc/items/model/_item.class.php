@@ -4195,8 +4195,14 @@ class Item extends ItemLight
 				$url_param_code = explode( '=', trim( $url_param_code ) );
 				if( ! empty( $url_param_code[0] ) )
 				{	// Memorize additional param to regenerate proper URL below:
-					param( $url_param_code[0], 'string', '', true );
-					$this->switchable_params[ $url_param_code[0] ] = isset( $url_param_code[1] ) ? $url_param_code[1] : '';
+					$default_value = ( isset( $url_param_code[1] ) ? $url_param_code[1] : '' );
+					$url_param_value = param( $url_param_code[0], 'string', '', true );
+					if( $url_param_value === '' )
+					{	// Memorize and set default value as default:
+						memorize_param( $url_param_code[0], 'string', '', $default_value );
+						set_param( $url_param_code[0], $default_value );
+					}
+					$this->switchable_params[ $url_param_code[0] ] = $default_value;
 				}
 			}
 		}
