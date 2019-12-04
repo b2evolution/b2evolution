@@ -175,6 +175,12 @@ class param_switcher_Widget extends generic_menu_link_Widget
 			return false;
 		}
 
+		if( $Item->get_switchable_param( $this->get_param( 'param_code' ) ) === NULL )
+		{	// No default value:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because the param <code>'.$this->get_param( 'param_code' ).'</code> has not been declared/initialized in the Item.' );
+			return false;
+		}
+
 		echo $this->disp_params['block_start'];
 
 		$this->disp_title();

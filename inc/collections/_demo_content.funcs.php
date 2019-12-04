@@ -3057,7 +3057,8 @@ Hello
 				'widget_info_page' => 'about_this_site',
 				'settings' => array(
 						'editor_code' => 'html',
-						'switchable'  => 1
+						'switchable'  => 1,
+						'switchable_params' => 'view=simple',
 					),
 			);
 
