@@ -13970,13 +13970,15 @@ class Item extends ItemLight
 
 
 	/**
-	 * Do 301 redirect from tiny URL to canonical URL of this Item
+	 * Do 302 redirect from tiny URL to canonical URL of this Item
 	 *
 	 * @param string Slug
 	 */
 	function tinyurl_redirect( $slug = NULL )
 	{
-		global $Hit;
+		global $Hit, $Debuglog;
+
+		$Debuglog->add( 'Processing Tiny URL...', 'url_decode_part_1' );
 
 		// Get item's canonical URL for redirect from tiny URL:
 		$redirect_to = $this->get_permanent_url( '', '', '&' );
@@ -13999,6 +14001,7 @@ class Item extends ItemLight
 		    ( $referer_Domain = & $DomainCache->get_by_ID( $Hit->get_referer_domain_ID(), false, false ) ) && // Referer Domain is found in DB
 		    ( $referer_Domain->get( 'source_tag' ) !== NULL ) ) // Source Tag is defined for the referer Domain
 		{	// Append source tag to the redirect URL:
+			$Debuglog->add( 'Tagging source with: '.$item_Blog->get_setting( 'tinyurl_tag_source' ), 'url_decode_part_1' );
 			$redirect_to = url_add_param( $redirect_to, urlencode( $item_Blog->get_setting( 'tinyurl_tag_source' ) ).'='.urlencode( $referer_Domain->get( 'source_tag' ) ), '&' );
 			$redirect_url_is_changed = true;
 		}
@@ -14009,6 +14012,7 @@ class Item extends ItemLight
 		    $item_Blog->get_setting( 'tinyurl_tag_slug' ) != '' && // Tag slug is defined
 		    $slug !== NULL ) // Slug is provided
 		{	// Append slug tag to the redirect URL:
+			$Debuglog->add( 'Tagging slug with: '.$item_Blog->get_setting( 'tinyurl_tag_slug' ), 'url_decode_part_1' );
 			$redirect_to = url_add_param( $redirect_to, urlencode( $item_Blog->get_setting( 'tinyurl_tag_slug' ) ).'='.urlencode( $slug ), '&' );
 			$redirect_url_is_changed = true;
 		}
@@ -14018,7 +14022,7 @@ class Item extends ItemLight
 			$redirect_to = url_add_param( $redirect_to, 'redir=no', '&' );
 		}
 
-		header_redirect( $redirect_to, 301 );
+		header_redirect( $redirect_to, 302 );  // 302 is easier for debugging; TODO: setting to choose type of redirect
 	}
 }
 ?>
