@@ -626,6 +626,7 @@ $tinyurl_domain = 'http://tiny.url/';
 $tinyurl_domain_field = $Form->text( 'tinyurl_domain', $edited_Blog->get_setting( 'tinyurl_domain' ), 20, '', '', 120 );
 $tinyurl_domain_note = '<span class="notes">'.sprintf( TB_('Enter absolute URL ending with /, e-g: %s. This domain must be an alias to your base domain.'), '<code>'.$tinyurl_domain.'</code>' ).'</span>';
 $tag_source_field = $Form->text( 'tinyurl_tag_source', $edited_Blog->get_setting( 'tinyurl_tag_source' ), 20, '', '', 255 );
+$tag_slug_field = $Form->text( 'tinyurl_tag_slug', $edited_Blog->get_setting( 'tinyurl_tag_slug' ), 20, '', '', 255 );
 $Form->output = true;
 $Form->switch_layout( NULL );
 
@@ -638,6 +639,11 @@ $Form->radio( 'tinyurl_type', $edited_Blog->get_setting( 'tinyurl_type' ), array
 $Form->begin_line( TB_('Tag source') );
 	$Form->checkbox_input( 'tinyurl_tag_source_enabled', $edited_Blog->get_setting( 'tinyurl_tag_source_enabled' ), '' );
 	printf( TB_('use param %s to record referer domain -> source tag'), $tag_source_field );
+$Form->end_line();
+
+$Form->begin_line( TB_('Tag slug') );
+	$Form->checkbox_input( 'tinyurl_tag_slug_enabled', $edited_Blog->get_setting( 'tinyurl_tag_slug_enabled' ), '' );
+	printf( TB_('use param %s to record the tiny slug'), $tag_slug_field );
 $Form->end_line();
 
 $Form->end_fieldset();

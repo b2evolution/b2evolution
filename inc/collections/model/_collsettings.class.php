@@ -73,6 +73,8 @@ class CollectionSettings extends AbstractSettings
 		// Tiny URLs settings:
 			'tinyurl_type'   => 'basic',
 			'tinyurl_domain' => '',
+			'tinyurl_tag_source' => 'utm_source',
+			'tinyurl_tag_slug' => 'utm_campaign',
 
 		// Item voting settings:
 			'voting_positive' => 1, // Allow Positive vote
