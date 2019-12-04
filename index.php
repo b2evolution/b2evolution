@@ -38,7 +38,7 @@ if( ! isset($collections_Module) )
 }
 
 // initialize which collection should be displayed, and display default page if collection could not be initialized
-if( !init_requested_coll_or_process_tinyurl( false, true, true ) )
+if( !init_requested_coll_or_process_tinyurl( true, true ) )
 {	// No specific collection to be displayed:
 	if( $Settings->get( 'default_blog_ID' ) == -1 )
 	{	// we are going to display the admin page:

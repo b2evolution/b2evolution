@@ -625,7 +625,7 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
  * @param boolean if the domain does not match a collection, try to process as a TinyURL and redirect before fallback to default collection
  * @return boolean true if $blog was initialized successful, false otherwise
  */
-function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $process_tinyslug_first = true, $process_unknown_domain_as_tinyurl = true )
+function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true, $process_unknown_domain_as_tinyurl = true )
 {
 	global $blog, $ReqHost, $ReqPath, $baseurl, $pagenow; 
 	global $Settings;
@@ -744,19 +744,6 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 	}
 
 
-	// If we want to give priority to ?blog=123..
-// fp>yb: why would we ever want to give priority to ?blog=123..
-	if( $use_blog_param_first == true )
-	{	// Check if a specific collection has been requested in the URL:
-		$Debuglog->add( 'Checking for explicit "blog" param', 'url_decode_part_1' );
-		$blog = param( 'blog', 'integer', '', true );
-
-		if( !empty($blog) )
-		{ // a specific collection has been requested in the URL:
-			return true;
-		}
-	}
-
 	$Debuglog->add( 'Trying to identify collection by extra path...', 'url_decode_part_1' );
 
 	// No collection requested by URL param, let's try to match something in the URL:
@@ -832,16 +819,13 @@ function init_requested_coll_or_process_tinyurl( $use_blog_param_first = true, $
 
 
 	// No collection identified by Absolute URL or URL alias...
-	// If we did NOT give priority to ?blog=123, check for param now:
-	if( $use_blog_param_first == false )
-	{	// Check if a specific collection has been requested in the URL:
-		$Debuglog->add( 'Checking for explicit "blog" param', 'url_decode_part_1' );
-		$blog = param( 'blog', 'integer', '', true );
+	// Check for ?blog=123 param now:
+	$Debuglog->add( 'Checking for explicit "blog" param', 'url_decode_part_1' );
+	$blog = param( 'blog', 'integer', '', true );
 
-		if( !empty($blog) )
-		{ // a specific collection has been requested in the URL:
-			return true;
-		}
+	if( !empty($blog) )
+	{ // a specific collection has been requested in the URL:
+		return true;
 	}
 
 
