@@ -35,6 +35,8 @@ class MarkdownImport
 	 */
 	function __construct()
 	{
+		global $Plugins;
+
 		// Options definitions:
 		$this->options_defs = array(
 			// Import mode:
@@ -121,6 +123,12 @@ class MarkdownImport
 				'tags',
 				'extra-cats',
 			);
+
+		// Call plugin event for additional initialization:
+		$Plugins->trigger_event( 'ImporterConstruct', array(
+				'type'     => 'markdown',
+				'Importer' => $this,
+			) );
 	}
 
 
@@ -340,7 +348,7 @@ class MarkdownImport
 	 */
 	function execute()
 	{
-		global $Blog, $DB, $tableprefix, $media_path, $current_User, $localtimenow;
+		global $Blog, $DB, $tableprefix, $media_path, $current_User, $localtimenow, $Plugins;
 
 		$folder_path = $this->get_data( 'path' );
 		$source_folder_zip_name = basename( $this->source );
@@ -846,6 +854,16 @@ class MarkdownImport
 				{	// Call method to set YAML field:
 					$this->$yaml_method( $item_yaml_data[ $yaml_field ], $Item );
 				}
+
+				// Call plugin event to set YAML field:
+				$Plugins->trigger_event( 'ImporterSetItemField', array(
+						'type'       => 'markdown',
+						'Importer'   => $this,
+						'Item'       => $Item,
+						'field_type' => 'yaml',
+						'field_name' => $yaml_field,
+						'field_data' => $item_yaml_data[ $yaml_field ],
+					) );
 			}
 
 			// Flag to know Item is updated in STEP 1:

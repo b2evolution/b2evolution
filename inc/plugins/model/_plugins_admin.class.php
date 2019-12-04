@@ -276,6 +276,10 @@ class Plugins_admin extends Plugins
 				'InitImageInlineTagForm' => 'Called to initialize params for form of additional tab on the modal/popup window "Insert image into content"',
 				'DisplayImageInlineTagForm' => 'Called to display a form for additional tab on the modal/popup window "Insert image into content"',
 				'GetInsertImageInlineTagJavaScript' => 'Called to get an additional JavaScript before submit/insert inline tag from the modal/popup window "Insert image into content"',
+
+				// Importer events:
+				'ImporterConstruct' => 'Called for additional initialization of importer classes.',
+				'ImporterSetItemField' => 'Called to set Item field from Importer class.',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )

@@ -4742,6 +4742,34 @@ class Plugin
 
 		return isset( $group_array[ $setting_name ] ) ? $group_array[ $setting_name ] : NULL;
 	}
+
+
+	/**
+	 * Event handler: Called for additional initialization of importer classes
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 */
+	function ImporterConstruct( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called to set Item field from Importer class
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'Item'     - $Item,
+	 *   - 'field_type' - Field type, e.g. 'yaml',
+	 *   - 'field_name' - Field name
+	 *   - 'field_data' - Field data
+	 */
+	function ImporterSetItemField( & $params )
+	{
+	}
 }
 
 ?>
