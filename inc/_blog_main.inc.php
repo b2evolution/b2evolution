@@ -223,14 +223,15 @@ if( $resolve_extra_path )
 	// BaseURI is the part after the domain name and it will always end with / :
 	$coll_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
 	$Debuglog->add( 'Collection base URI: "'.$coll_baseuri.'"', 'url_decode_part_2' );
-	$coll_baseuri_matched_in_url = preg_match( '~(^'.preg_quote( $coll_baseuri, '~' ).'|\.php[0-9]*/)(.+)$~', $ReqPath, $matches );
+	$coll_baseuri_matched_in_url = preg_match( '~(^'.preg_quote( $coll_baseuri, '~' ).'|\.php[0-9]*/)(.*)$~', $ReqPath, $matches );
+
 	// Check if we have one of these:
 	// - Always try to match slug
 	// - Either the ReqPath starts with collection base URI (always including trailing slash)
 	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
 	// ... followed by some extra path info.
-	if( $Settings->get( 'always_match_slug' ) // do we want to redirect to correct Collection if an Item Slug was found in <b>any</b> URL
-		|| $coll_baseuri_matched_in_url )
+	if( $Settings->get( 'always_match_slug' ) // do we (no matter what) want to redirect to correct Collection if an Item Slug was found in <b>any</b> URL?
+		|| ($coll_baseuri_matched_in_url & !empty($matches[2]) ) ) // do we have a potential slug (AFTER collection url_name or index.php)?
 	{ // We have EXTRA path info:
 
 		if( ! isset( $path_elements ) )
