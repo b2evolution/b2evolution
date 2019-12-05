@@ -618,6 +618,13 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( TB_('Tiny URLs').get_manual_link('tiny-url-settings') );
 
+// Params for tag settings:
+$tag_setting_params = array();
+if( ! is_pro() )
+{	// Disable for not-PRO version:
+	$tag_setting_params['disabled'] = 'disabled';
+}
+$tag_setting_input_params = array_merge( $tag_setting_params, array( 'maxlength' => 255 ) );
 
 $Form->switch_layout( 'none' );
 $Form->output = false;
@@ -625,8 +632,8 @@ $tinyurl_slug = 'aA1';
 $tinyurl_domain = 'http://tiny.url/';
 $tinyurl_domain_field = $Form->text( 'tinyurl_domain', $edited_Blog->get_setting( 'tinyurl_domain' ), 20, '', '', 120 );
 $tinyurl_domain_note = '<span class="notes">'.sprintf( TB_('Enter absolute URL ending with /, e-g: %s. This domain must be an alias to your base domain.'), '<code>'.$tinyurl_domain.'</code>' ).'</span>';
-$tag_source_field = $Form->text( 'tinyurl_tag_source', $edited_Blog->get_setting( 'tinyurl_tag_source' ), 20, '', '', 255 );
-$tag_slug_field = $Form->text( 'tinyurl_tag_slug', $edited_Blog->get_setting( 'tinyurl_tag_slug' ), 20, '', '', 255 );
+$tag_source_field = $Form->text_input( 'tinyurl_tag_source', $edited_Blog->get_setting( 'tinyurl_tag_source' ), 20, '', '', $tag_setting_input_params );
+$tag_slug_field = $Form->text_input( 'tinyurl_tag_slug', $edited_Blog->get_setting( 'tinyurl_tag_slug' ), 20, '', '', $tag_setting_input_params );
 $Form->output = true;
 $Form->switch_layout( NULL );
 
@@ -637,13 +644,15 @@ $Form->radio( 'tinyurl_type', $edited_Blog->get_setting( 'tinyurl_type' ), array
 	), TB_('Tiny URLs'), true );
 
 $Form->begin_line( TB_('Tag source') );
-	$Form->checkbox_input( 'tinyurl_tag_source_enabled', $edited_Blog->get_setting( 'tinyurl_tag_source_enabled' ), '' );
+	$Form->checkbox_input( 'tinyurl_tag_source_enabled', $edited_Blog->get_setting( 'tinyurl_tag_source_enabled' ), '', $tag_setting_params );
 	printf( TB_('use param %s to record referer domain -> source tag'), $tag_source_field );
+	echo ' '.get_pro_label();
 $Form->end_line();
 
 $Form->begin_line( TB_('Tag slug') );
-	$Form->checkbox_input( 'tinyurl_tag_slug_enabled', $edited_Blog->get_setting( 'tinyurl_tag_slug_enabled' ), '' );
+	$Form->checkbox_input( 'tinyurl_tag_slug_enabled', $edited_Blog->get_setting( 'tinyurl_tag_slug_enabled' ), '', $tag_setting_params );
 	printf( TB_('use param %s to record the tiny slug'), $tag_slug_field );
+	echo ' '.get_pro_label();
 $Form->end_line();
 
 $Form->end_fieldset();

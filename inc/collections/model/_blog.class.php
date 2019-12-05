@@ -1663,13 +1663,17 @@ class Blog extends DataObject
 				}
 			}
 
-			// Tag source:
-			$this->set_setting( 'tinyurl_tag_source_enabled', param( 'tinyurl_tag_source_enabled', 'integer', 0 ) );
-			$this->set_setting( 'tinyurl_tag_source', param( 'tinyurl_tag_source', 'string', NULL ), true );
+			if( is_pro() )
+			{	// Only PRO version:
 
-			// Tag slug:
-			$this->set_setting( 'tinyurl_tag_slug_enabled', param( 'tinyurl_tag_slug_enabled', 'integer', 0 ) );
-			$this->set_setting( 'tinyurl_tag_slug', param( 'tinyurl_tag_slug', 'string', NULL ), true );
+				// Tag source:
+				$this->set_setting( 'tinyurl_tag_source_enabled', param( 'tinyurl_tag_source_enabled', 'integer', 0 ) );
+				$this->set_setting( 'tinyurl_tag_source', param( 'tinyurl_tag_source', 'string', NULL ), true );
+
+				// Tag slug:
+				$this->set_setting( 'tinyurl_tag_slug_enabled', param( 'tinyurl_tag_slug_enabled', 'integer', 0 ) );
+				$this->set_setting( 'tinyurl_tag_slug', param( 'tinyurl_tag_slug', 'string', NULL ), true );
+			}
 
 			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
 			{	// Cookies:
