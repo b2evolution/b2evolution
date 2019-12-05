@@ -706,6 +706,10 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	{
 		load_class( 'items/model/_item.class.php', 'Item' );
 
+		$ChapterCache = & get_ChapterCache();
+		// We MUST clear Chapters Cache here in order to avoid inserting new Items with wrong/previous/deleted Chapters from DB:
+		$ChapterCache->clear();
+
 		// Set status's links between WP and b2evo names
 		$post_statuses = array(
 			// WP statuses => Their analogs in b2evolution
@@ -871,7 +875,6 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$page_Chapter->dbinsert();
 				$categories['standalone-pages'] = $page_Chapter->ID;
 				// Add new created chapter to cache to avoid error when this cache loaded all elements before:
-				$ChapterCache = & get_ChapterCache();
 				$ChapterCache->add( $page_Chapter );
 			}
 
@@ -966,6 +969,17 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 			$post_content = $post['post_content'];
 
+			// Use title by default to generate new slug:
+			$post_urltitle = $post['post_title'];
+			if( ! empty( $post['post_urltitle'] ) )
+			{	// Use top priority urltitle if it is provided:
+				$post_urltitle = $post['post_urltitle'];
+			}
+			elseif( ! empty( $post['post_link'] ) && preg_match( '#/([^/]+)/?$#', $post['post_link'], $post_link_match ) )
+			{	// Try to extract canonical slug from post URL:
+				$post_urltitle = $post_link_match[1];
+			}
+
 			$Item->set( 'main_cat_ID', $post_main_cat_ID );
 			$Item->set( 'creator_user_ID', $author_ID );
 			$Item->set( 'lastedit_user_ID', $last_edit_user_ID );
@@ -974,7 +988,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			$Item->set( 'datestart', $post['post_date'] );
 			$Item->set( 'datecreated', !empty( $post['post_datecreated'] ) ? $post['post_datecreated'] : $post['post_date'] );
 			$Item->set( 'datemodified', !empty( $post['post_datemodified'] ) ? $post['post_datemodified'] : $post['post_date'] );
-			$Item->set( 'urltitle', !empty( $post['post_urltitle'] ) ? $post['post_urltitle'] : $post['post_title'] );
+			$Item->set( 'urltitle', $post_urltitle );
 			$Item->set( 'url', $post['post_url'] );
 			$Item->set( 'status', isset( $post_statuses[ (string) $post['status'] ] ) ? $post_statuses[ (string) $post['status'] ] : 'review' );
 			// If 'comment_status' has the unappropriate value set it to 'open'
@@ -1529,6 +1543,7 @@ function wpxml_parser( $file )
 	{
 		$post = array(
 			'post_title' => wpxml_convert_value( $item->title ),
+			'post_link'  => ( isset( $item->link ) ? wpxml_convert_value( $item->link ) : '' ),
 			'guid'       => (string) $item->guid,
 		);
 
