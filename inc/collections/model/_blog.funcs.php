@@ -827,6 +827,23 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 	}
 
 
+	// Verify if the default collection uses the current domain as baseurl:
+	// (because we do NOT want to process as tinyURL in that case, that would prevent loading pages like http://domain.com/about )
+	$default_blog_ID = $Settings->get( 'default_blog_ID' );
+	$default_Collection = & $BlogCache->get_by_ID( $default_blog_ID, false, false );
+	if( $default_Collection !== NULL )
+	{ // There is a default collection:
+		$default_Collection_baseurl = $default_Collection->gen_baseurl();
+		$Debuglog->add( 'The default collection lives on: '.$default_Collection_baseurl, 'url_decode_part_1' );
+		if( is_same_url( $default_Collection_baseurl, $ReqHost.'/' ) )
+		{	
+			$Debuglog->add( 'Match! We will consider that we are requesting a page of the default collection: '.$default_blog_ID, 'url_decode_part_1' );
+			$blog = $default_blog_ID;
+			$Collection = $default_Collection;
+			return true;
+		}
+	}
+
 	// No collection identified, we MUST now consider the domain as being a TinyURL domain:
 	if( $process_unknown_domain_as_tinyurl && ! empty( $last_part ) && $Settings->get( 'redirect_tinyurl' ) )
 	{
@@ -849,10 +866,10 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 
 
 	// Still no collection matches and no TinyURL identified, use default Collection:
-	$blog = $Settings->get( 'default_blog_ID' );
-	$Collection = $Blog = & $BlogCache->get_by_ID( $blog, false, false );
-	if( $Blog !== false && $Blog !== NULL )
+	if( $default_Collection !== NULL )
 	{ // We found a matching blog:
+		$blog = $default_blog_ID;
+		$Collection = $default_Collection;
 		$Debuglog->add( 'Falling back to default collection: '.$blog, 'url_decode_part_1' );
 		return true;
 	}
