@@ -3316,6 +3316,7 @@ class Item extends ItemLight
 				'render_content_blocks' => true,
 				'render_inline_widgets' => true,
 				'render_block_widgets'  => true,
+				'render_switchable_blocks' => true,
 			), $params );
 
 		if( $params['render_inline_widgets'] )
@@ -3356,6 +3357,11 @@ class Item extends ItemLight
 		if( $params['render_content_blocks'] )
 		{	// Render Content block tags like [include:123], [include:item-slug]:
 			$content = $this->render_content_blocks( $content, $params );
+		}
+
+		if( $params['render_switchable_blocks'] )
+		{	// Render switchable block tags like [div::view=detailed]Multiline Content Text[/div]:
+			$content = $this->render_switchable_blocks( $content, $params );
 		}
 
 		return $content;
@@ -4102,6 +4108,77 @@ class Item extends ItemLight
 
 
 	/**
+	 * Render switchable blocks
+	 *   from [div:.optional.classnames:view=detailed&size=middle]Multiline Content Text[/div]
+	 *   to <div class="optional classnames" data-display-condition="view=detailed&size=middle" style="display:none">Multiline Content Text</div>
+	 *
+	 * @param string Content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_switchable_blocks( $content, $params = array() )
+	{
+		$params = array_merge( array(
+				'check_code_block' => true,
+			), $params );
+
+		if( $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call render_switchable_content() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_switchable_blocks' ), array( $params ) );
+			return $content;
+		}
+
+		$content = preg_replace_callback( '#(<p>)?\[div:(.+?)\](.*?)\[/div\](</p>)?#is', array( $this, 'render_switchable_blocks_callback' ), $content );
+
+		return $content;
+	}
+
+
+	/**
+	 * Callback function to render switchable content
+	 *
+	 * @param array Match
+	 */
+	function render_switchable_blocks_callback( $m )
+	{
+		$params = explode( ':', $m[2] );
+
+		$div_attrs = array();
+
+		if( isset( $params[0] ) )
+		{	// Optional classes:
+			$classes = trim( str_replace( '.', ' ', $params[0] ) );
+			if( $classes !== '' )
+			{	// Use only provided classes:
+				$div_attrs['class'] = $classes;
+			}
+		}
+
+		if( isset( $params[1] ) )
+		{	// If switchable conditions are provided:
+			$visibility_conditions = $params[1];
+			$div_attrs['data-display-condition'] = $visibility_conditions;
+			// Check visibility conditions:
+			if( ! $this->check_switchable_visibility( $visibility_conditions ) )
+			{
+				$div_attrs['style'] = 'display:none';
+			}
+		}
+
+		// Fix content which may be wrong rendered by plugin like Auto-P and Markdown because shorttag [div:] is not HTML tag:
+		// Trim <br /> tags from begin and end:
+		$div_content = preg_replace( '#^(<br[\s/]*>)?(.+?)(<br[\s/]*>)$#is', '$2', $m[3] );
+		// Balance <p> and </p> tags by moving them from outside [div:] to inside it:
+		$div_content = $m[1].$div_content.$m[4];
+
+		return '<div'.get_field_attribs_as_string( $div_attrs ).'>'.$div_content.'</div>';
+	}
+
+
+	/**
 	 * Render switchable content
 	 *
 	 * @param string Content
@@ -4136,16 +4213,34 @@ class Item extends ItemLight
 
 
 	/**
-	 * Callback funciton to render switchable content
+	 * Callback function to render switchable content
 	 *
 	 * @param array Match
 	 */
 	function render_switchable_content_callback( $m )
 	{
-		$display_attrs = '';
+		if( strpos( $m[4].$m[1], 'style="display:' ) !== false )
+		{	// Skip already rendered content, probably by render_switchable_blocks() from short tags [div:]Content[/div]:
+			return $m[0];
+		}
 
-		// Check display conditions:
-		$disp_conditions = explode( '&', str_replace( '&amp;', '&', $m[3] ) );
+		// Check visibility conditions:
+		$display_attrs = ( $this->check_switchable_visibility( $m[3] ) ? '' : ' style="display:none"' );
+
+		return $m[1].$m[2].$display_attrs.$m[4];
+	}
+
+
+	/**
+	 * Check if block/row/field can be visible by requested conditions
+	 *
+	 * @param string Conditions, e.g. view=detailed&size=middle
+	 * @return boolean TRUE if block/row/field can be visible, FALSE if it must be hidden
+	 */
+	function check_switchable_visibility( $conditions )
+	{
+		$disp_conditions = explode( '&', str_replace( '&amp;', '&', $conditions ) );
+
 		foreach( $disp_conditions as $disp_condition )
 		{
 			$disp_condition = explode( '=', $disp_condition );
@@ -4158,12 +4253,11 @@ class Item extends ItemLight
 			    ! preg_match( '/^[a-z0-9_\-]*$/', $param_value ) || // wrong param value
 			    ( $param_value !== '' && ! in_array( $param_value, $disp_condition_values ) ) ) // current param value is not allowed by the condition of the custom field
 			{	// Hide custom field if at least one param is not allowed by condition of the custom field:
-				$display_attrs .= ' style="display:none"';
-				continue;
+				return false;
 			}
 		}
 
-		return $m[1].$m[2].$display_attrs.$m[4];
+		return true;
 	}
 
 
