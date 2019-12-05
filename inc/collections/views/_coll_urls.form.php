@@ -631,7 +631,7 @@ $Form->output = false;
 $tinyurl_slug = 'aA1';
 $tinyurl_domain = 'http://tiny.url/';
 $tinyurl_domain_field = $Form->text( 'tinyurl_domain', $edited_Blog->get_setting( 'tinyurl_domain' ), 20, '', '', 120 );
-$tinyurl_domain_note = '<span class="notes">'.sprintf( TB_('Enter absolute URL ending with /, e-g: %s. This domain must be an alias to your base domain.'), '<code>'.$tinyurl_domain.'</code>' ).'</span>';
+$tinyurl_domain_note = '<span class="notes">'.sprintf( TB_('Enter absolute URL ending with /, e-g: %s.'), '<code>'.$tinyurl_domain.'</code>' ).'</span>';
 $tag_source_field = $Form->text_input( 'tinyurl_tag_source', $edited_Blog->get_setting( 'tinyurl_tag_source' ), 20, '', '', $tag_setting_input_params );
 $tag_slug_field = $Form->text_input( 'tinyurl_tag_slug', $edited_Blog->get_setting( 'tinyurl_tag_slug' ), 20, '', '', $tag_setting_input_params );
 $Form->output = true;
