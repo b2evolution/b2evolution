@@ -445,7 +445,6 @@ if( !empty($p) || !empty($title) )
 			if( ! $Item->is_part_of_blog( $blog ) )
 			{	// We have found an Item object, but it doesn't belong to the current collection!
 				// Check if we want to redirect moved posts:
-// TODO: fp>yb: BUG: the following always uses the default value, not the value configured in UI!?
 				if( $Settings->get( 'redirect_moved_posts' ) )
 				{	// Set disp to 'redirect' in order to store this value in hitlog table:
 					$disp = 'redirect';
