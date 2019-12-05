@@ -13983,6 +13983,8 @@ class Item extends ItemLight
 		// Get item's canonical URL for redirect from tiny URL:
 		$redirect_to = $this->get_permanent_url( '', '', '&' );
 
+		$Debuglog->add( 'Preparing to redirect to: '.$redirect_to, 'url_decode_part_1' );
+
 		// Flag to know that redirect URL is changing below by collection settings,
 		// and we must append &redir=no in order to stay on the URL with additional
 		// params without redirecting to canonical permanent Item's URL:

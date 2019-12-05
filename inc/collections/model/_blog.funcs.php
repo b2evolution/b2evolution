@@ -734,9 +734,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 			{	// If we have a tiny-slug and we find a matching Item:
 				$Debuglog->add( 'Found Item for that slug: #'.$Item->ID.' ('.$Item->get( 'title' ).')', 'url_decode_part_1' );
 
-				// Do 301 redirect from tiny URL to canonical URL of the detected Item:
-				$item_permanent_url = $Item->get_permanent_url( '', '', '&' );
-				$Debuglog->add( 'Redirecting to: '.$item_permanent_url, 'url_decode_part_1' );
+				// Redirect from tiny URL to canonical URL of the detected Item:
 				$Item->tinyurl_redirect( $last_part );
 				// Exit here.
 			}
@@ -832,7 +830,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 	// No collection identified, we MUST now consider the domain as being a TinyURL domain:
 	if( $process_unknown_domain_as_tinyurl && ! empty( $last_part ) && $Settings->get( 'redirect_tinyurl' ) )
 	{
-		// Check if the URL matches a tinyurl scheme `https?://domain.tld/slug` without extra folders or params:
+		// Check if the URL matches a tinyurl scheme `https?://x.y.z.domain.tld/slug` without extra folders or params:
 		if( preg_match( '#^https?://[a-z0-9\-_.]+\.[a-z]+/[a-z0-9\-_]+$#i', $ReqAbsUrl ) )
 		{
 			$Debuglog->add( 'URL has correct TinyURL format: '.$ReqAbsUrl, 'url_decode_part_1' );
@@ -842,9 +840,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 			{	// If we find a matching Item by slug:
 				$Debuglog->add( 'Found Item for that slug: #'.$Item->ID.' ('.$Item->get( 'title' ).')', 'url_decode_part_1' );
 
-				// Do 301 redirect from tiny URL to canonical URL of the detected Item:
-				$item_permanent_url = $Item->get_permanent_url( '', '', '&' );
-				$Debuglog->add( 'Redirecting to: '.$item_permanent_url, 'url_decode_part_1' );
+				// Redirect from tiny URL to canonical URL of the detected Item:
 				$Item->tinyurl_redirect( $last_part );
 				// Exit here.
 			}
