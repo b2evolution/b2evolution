@@ -13976,52 +13976,18 @@ class Item extends ItemLight
 	 */
 	function tinyurl_redirect( $slug = NULL )
 	{
-		global $Hit, $Debuglog;
-
-		$Debuglog->add( 'Processing Tiny URL...', 'url_decode_part_1' );
-
 		// Get item's canonical URL for redirect from tiny URL:
 		$redirect_to = $this->get_permanent_url( '', '', '&' );
 
-		$Debuglog->add( 'Preparing to redirect to: '.$redirect_to, 'url_decode_part_1' );
+		if( is_pro() )
+		{	// Load extra code for extra processing:
+			load_funcs( '_core/_pro_features.funcs.php' );
 
-		// Flag to know that redirect URL is changing below by collection settings,
-		// and we must append &redir=no in order to stay on the URL with additional
-		// params without redirecting to canonical permanent Item's URL:
-		$redirect_url_is_changed = false;
+			// Get Collection of this Item:
+			$item_Blog = & $this->get_Blog();
 
-		// Get Collection of this Item:
-		$item_Blog = & $this->get_Blog();
-
-		// Tag source:
-		if( $item_Blog && // Item has a Collection
-		    $item_Blog->get_setting( 'tinyurl_tag_source_enabled' ) && // Tag source is enabled for Collection
-		    $item_Blog->get_setting( 'tinyurl_tag_source' ) != '' && // Tag source is defined
-		    isset( $Hit ) &&
-		    ( $Hit instanceof Hit ) && // Hit is initialized
-		    ( $DomainCache = & get_DomainCache() ) &&
-		    ( $referer_Domain = & $DomainCache->get_by_ID( $Hit->get_referer_domain_ID(), false, false ) ) && // Referer Domain is found in DB
-		    ( $referer_Domain->get( 'source_tag' ) !== NULL ) ) // Source Tag is defined for the referer Domain
-		{	// Append source tag to the redirect URL:
-			$Debuglog->add( 'Tagging source with: '.$item_Blog->get_setting( 'tinyurl_tag_source' ), 'url_decode_part_1' );
-			$redirect_to = url_add_param( $redirect_to, urlencode( $item_Blog->get_setting( 'tinyurl_tag_source' ) ).'='.urlencode( $referer_Domain->get( 'source_tag' ) ), '&' );
-			$redirect_url_is_changed = true;
-		}
-
-		// Tag slug:
-		if( $item_Blog && // Item has a Collection
-		    $item_Blog->get_setting( 'tinyurl_tag_slug_enabled' ) && // Tag slug is enabled for Collection
-		    $item_Blog->get_setting( 'tinyurl_tag_slug' ) != '' && // Tag slug is defined
-		    $slug !== NULL ) // Slug is provided
-		{	// Append slug tag to the redirect URL:
-			$Debuglog->add( 'Tagging slug with: '.$item_Blog->get_setting( 'tinyurl_tag_slug' ), 'url_decode_part_1' );
-			$redirect_to = url_add_param( $redirect_to, urlencode( $item_Blog->get_setting( 'tinyurl_tag_slug' ) ).'='.urlencode( $slug ), '&' );
-			$redirect_url_is_changed = true;
-		}
-
-		if( $redirect_url_is_changed )
-		{	// Append special param in order to stay on the URL with additional tag params without redirecting to canonical Item's URL:
-			$redirect_to = url_add_param( $redirect_to, 'redir=no', '&' );
+			// Add params for PRO version:
+			$redirect_to = pro_tinyurl_redirect_add_params( $redirect_to, $item_Blog, $slug );
 		}
 
 		header_redirect( $redirect_to, 302 );  // 302 is easier for debugging; TODO: setting to choose type of redirect
