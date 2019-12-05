@@ -1353,15 +1353,15 @@ function wpxml_parser( $file )
 
 	// Get WXR version
 	$wxr_version = $xml->xpath( '/rss/channel/wp:wxr_version' );
-	$wxr_version = (string) trim( $wxr_version[0] );
+	$wxr_version = isset( $wxr_version[0] ) ? (string) trim( $wxr_version[0] ) : '';
 
 	$base_url = $xml->xpath( '/rss/channel/wp:base_site_url' );
-	$base_url = (string) trim( $base_url[0] );
+	$base_url = isset( $base_url[0] ) ? (string) trim( $base_url[0] ) : '';
 
 	// Check language
 	global $evo_charset, $xml_import_convert_to_latin;
 	$language = $xml->xpath( '/rss/channel/language' );
-	$language = (string) trim( $language[0] );
+	$language = isset( $language[0] ) ? (string) trim( $language[0] ) : '';
 	if( $evo_charset != 'utf-8' && ( strpos( $language, 'utf8' ) !== false ) )
 	{ // We should convert the text values from utf8 to latin1
 		$xml_import_convert_to_latin = true;
@@ -1388,121 +1388,140 @@ function wpxml_parser( $file )
 	// Start to get amount of memory for temporary arrays:
 	$memory_usage = memory_get_usage();
 
-	// Get authors
-	foreach( $xml->xpath('/rss/channel/wp:author') as $author_arr )
+	// Get authors:
+	$authors_data = $xml->xpath( '/rss/channel/wp:author' );
+	if( is_array( $authors_data ) )
 	{
-		$a = $author_arr->children( $namespaces['wp'] );
-		$ae = $author_arr->children( $namespaces['evo'] );
-		$login = (string) $a->author_login;
-		$author = array(
-			'author_id'                   => (int) $a->author_id,
-			'author_login'                => $login,
-			'author_email'                => (string) $a->author_email,
-			'author_display_name'         => wpxml_convert_value( $a->author_display_name ),
-			'author_first_name'           => wpxml_convert_value( $a->author_first_name ),
-			'author_last_name'            => wpxml_convert_value( $a->author_last_name ),
-			'author_pass'                 => (string) $ae->author_pass,
-			'author_salt'                 => isset( $ae->author_salt ) ? (string) $ae->author_salt : '',
-			'author_pass_driver'          => isset( $ae->author_pass_driver ) ? (string) $ae->author_pass_driver : 'evo$md5',
-			'author_group'                => (string) $ae->author_group,
-			'author_status'               => (string) $ae->author_status,
-			'author_nickname'             => wpxml_convert_value( $ae->author_nickname ),
-			'author_url'                  => (string) $ae->author_url,
-			'author_level'                => (int) $ae->author_level,
-			'author_locale'               => (string) $ae->author_locale,
-			'author_gender'               => (string) $ae->author_gender,
-			'author_age_min'              => (int) $ae->author_age_min,
-			'author_age_max'              => (int) $ae->author_age_max,
-			'author_created_from_country' => (string) $ae->author_created_from_country,
-			'author_country'              => (string) $ae->author_country,
-			'author_region'               => (string) $ae->author_region,
-			'author_subregion'            => (string) $ae->author_subregion,
-			'author_city'                 => (string) $ae->author_city,
-			'author_source'               => (string) $ae->author_source,
-			'author_created_ts'           => (string) $ae->author_created_ts,
-			'author_lastseen_ts'          => (string) $ae->author_lastseen_ts,
-			'author_created_fromIPv4'     => (string) $ae->author_created_fromIPv4,
-			'author_profileupdate_date'   => (string) $ae->author_profileupdate_date,
-			'author_avatar_file_ID'       => (int) $ae->author_avatar_file_ID,
-		);
-
-		foreach( $ae->link as $link )
-		{	// Get the links:
-			$author['links'][] = array(
-				'link_ID'               => (int) $link->link_ID,
-				'link_datecreated'      => (string) $link->link_datecreated,
-				'link_datemodified'     => (string) $link->link_datemodified,
-				'link_creator_user_ID'  => (int) $link->link_creator_user_ID,
-				'link_lastedit_user_ID' => (int) $link->link_lastedit_user_ID,
-				'link_itm_ID'           => (int) $link->link_itm_ID,
-				'link_cmt_ID'           => (int) $link->link_cmt_ID,
-				'link_usr_ID'           => (int) $link->link_usr_ID,
-				'link_file_ID'          => (int) $link->link_file_ID,
-				'link_position'         => (string) $link->link_position,
-				'link_order'            => (int) $link->link_order,
+		foreach( $authors_data as $author_arr )
+		{
+			$a = $author_arr->children( $namespaces['wp'] );
+			$ae = $author_arr->children( $namespaces['evo'] );
+			$login = (string) $a->author_login;
+			$author = array(
+				'author_id'                   => (int) $a->author_id,
+				'author_login'                => $login,
+				'author_email'                => (string) $a->author_email,
+				'author_display_name'         => wpxml_convert_value( $a->author_display_name ),
+				'author_first_name'           => wpxml_convert_value( $a->author_first_name ),
+				'author_last_name'            => wpxml_convert_value( $a->author_last_name ),
+				'author_pass'                 => (string) $ae->author_pass,
+				'author_salt'                 => isset( $ae->author_salt ) ? (string) $ae->author_salt : '',
+				'author_pass_driver'          => isset( $ae->author_pass_driver ) ? (string) $ae->author_pass_driver : 'evo$md5',
+				'author_group'                => (string) $ae->author_group,
+				'author_status'               => (string) $ae->author_status,
+				'author_nickname'             => wpxml_convert_value( $ae->author_nickname ),
+				'author_url'                  => (string) $ae->author_url,
+				'author_level'                => (int) $ae->author_level,
+				'author_locale'               => (string) $ae->author_locale,
+				'author_gender'               => (string) $ae->author_gender,
+				'author_age_min'              => (int) $ae->author_age_min,
+				'author_age_max'              => (int) $ae->author_age_max,
+				'author_created_from_country' => (string) $ae->author_created_from_country,
+				'author_country'              => (string) $ae->author_country,
+				'author_region'               => (string) $ae->author_region,
+				'author_subregion'            => (string) $ae->author_subregion,
+				'author_city'                 => (string) $ae->author_city,
+				'author_source'               => (string) $ae->author_source,
+				'author_created_ts'           => (string) $ae->author_created_ts,
+				'author_lastseen_ts'          => (string) $ae->author_lastseen_ts,
+				'author_created_fromIPv4'     => (string) $ae->author_created_fromIPv4,
+				'author_profileupdate_date'   => (string) $ae->author_profileupdate_date,
+				'author_avatar_file_ID'       => (int) $ae->author_avatar_file_ID,
 			);
-		}
 
-		$authors[ $login ] = $author;
+			foreach( $ae->link as $link )
+			{	// Get the links:
+				$author['links'][] = array(
+					'link_ID'               => (int) $link->link_ID,
+					'link_datecreated'      => (string) $link->link_datecreated,
+					'link_datemodified'     => (string) $link->link_datemodified,
+					'link_creator_user_ID'  => (int) $link->link_creator_user_ID,
+					'link_lastedit_user_ID' => (int) $link->link_lastedit_user_ID,
+					'link_itm_ID'           => (int) $link->link_itm_ID,
+					'link_cmt_ID'           => (int) $link->link_cmt_ID,
+					'link_usr_ID'           => (int) $link->link_usr_ID,
+					'link_file_ID'          => (int) $link->link_file_ID,
+					'link_position'         => (string) $link->link_position,
+					'link_order'            => (int) $link->link_order,
+				);
+			}
+
+			$authors[ $login ] = $author;
+		}
 	}
 
 	// Get files:
 	$files_data = $xml->xpath( $namespaces['evo'] == 'http://b2evolution.net/export/2.0/'
 		? '/rss/channel/evo:file' // ver 2.0
 		: '/rss/channel/file' ); // ver 1.0
-	foreach( $files_data as $file_arr )
+	if( is_array( $files_data ) )
 	{
-		$t = $file_arr->children( $namespaces['evo'] );
-		$files[] = array(
-			'file_ID'        => (int) $t->file_ID,
-			'file_root_type' => (string) $t->file_root_type,
-			'file_root_ID'   => (int) $t->file_root_ID,
-			'file_path'      => (string) $t->file_path,
-			'file_title'     => wpxml_convert_value( $t->file_title ),
-			'file_alt'       => wpxml_convert_value( $t->file_alt ),
-			'file_desc'      => wpxml_convert_value( $t->file_desc ),
-			'zip_path'       => (string) $t->zip_path,
-		);
+		foreach( $files_data as $file_arr )
+		{
+			$t = $file_arr->children( $namespaces['evo'] );
+			$files[] = array(
+				'file_ID'        => (int) $t->file_ID,
+				'file_root_type' => (string) $t->file_root_type,
+				'file_root_ID'   => (int) $t->file_root_ID,
+				'file_path'      => (string) $t->file_path,
+				'file_title'     => wpxml_convert_value( $t->file_title ),
+				'file_alt'       => wpxml_convert_value( $t->file_alt ),
+				'file_desc'      => wpxml_convert_value( $t->file_desc ),
+				'zip_path'       => (string) $t->zip_path,
+			);
+		}
 	}
 
-	// Get categories
-	foreach( $xml->xpath('/rss/channel/wp:category') as $term_arr )
+	// Get categories:
+	$categories_data = $xml->xpath( '/rss/channel/wp:category' );
+	if( is_array( $categories_data ) )
 	{
-		$t = $term_arr->children( $namespaces['wp'] );
-		$categories[] = array(
-			'term_id'              => (int) $t->term_id,
-			'category_nicename'    => wpxml_convert_value( $t->category_nicename ),
-			'category_parent'      => (string) $t->category_parent,
-			'cat_name'             => wpxml_convert_value( $t->cat_name ),
-			'cat_description'      => wpxml_convert_value( $t->cat_description ),
-			'cat_order'            => wpxml_convert_value( $t->cat_order ),
-		);
+		foreach( $categories_data as $term_arr )
+		{
+			$t = $term_arr->children( $namespaces['wp'] );
+			$categories[] = array(
+				'term_id'              => (int) $t->term_id,
+				'category_nicename'    => wpxml_convert_value( $t->category_nicename ),
+				'category_parent'      => (string) $t->category_parent,
+				'cat_name'             => wpxml_convert_value( $t->cat_name ),
+				'cat_description'      => wpxml_convert_value( $t->cat_description ),
+				'cat_order'            => wpxml_convert_value( $t->cat_order ),
+			);
+		}
 	}
 
-	// Get tags
-	foreach( $xml->xpath('/rss/channel/wp:tag') as $term_arr )
+	// Get tags:
+	$tags_data = $xml->xpath( '/rss/channel/wp:tag' );
+	if( is_array( $tags_data ) )
 	{
-		$t = $term_arr->children( $namespaces['wp'] );
-		$tags[] = array(
-			'term_id'         => (int) $t->term_id,
-			'tag_slug'        => (string) $t->tag_slug,
-			'tag_name'        => wpxml_convert_value( $t->tag_name ),
-			'tag_description' => wpxml_convert_value( $t->tag_description )
-		);
+		foreach( $tags_data as $term_arr )
+		{
+			$t = $term_arr->children( $namespaces['wp'] );
+			$tags[] = array(
+				'term_id'         => (int) $t->term_id,
+				'tag_slug'        => (string) $t->tag_slug,
+				'tag_name'        => wpxml_convert_value( $t->tag_name ),
+				'tag_description' => wpxml_convert_value( $t->tag_description )
+			);
+		}
 	}
 
-	// Get terms
-	foreach( $xml->xpath('/rss/channel/wp:term') as $term_arr )
+	// Get terms:
+	$terms_data = $xml->xpath( '/rss/channel/wp:term' );
+	if( is_array( $terms_data ) )
 	{
-		$t = $term_arr->children( $namespaces['wp'] );
-		$terms[] = array(
-			'term_id'          => (int) $t->term_id,
-			'term_taxonomy'    => (string) $t->term_taxonomy,
-			'slug'             => (string) $t->term_slug,
-			'term_parent'      => (string) $t->term_parent,
-			'term_name'        => wpxml_convert_value( $t->term_name ),
-			'term_description' => wpxml_convert_value( $t->term_description )
-		);
+		foreach( $terms_data as $term_arr )
+		{
+			$t = $term_arr->children( $namespaces['wp'] );
+			$terms[] = array(
+				'term_id'          => (int) $t->term_id,
+				'term_taxonomy'    => (string) $t->term_taxonomy,
+				'slug'             => (string) $t->term_slug,
+				'term_parent'      => (string) $t->term_parent,
+				'term_name'        => wpxml_convert_value( $t->term_name ),
+				'term_description' => wpxml_convert_value( $t->term_description )
+			);
+		}
 	}
 
 	// Get posts
