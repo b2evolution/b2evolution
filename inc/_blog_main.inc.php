@@ -450,6 +450,7 @@ if( !empty($p) || !empty($title) )
 				{	// Set disp to 'redirect' in order to store this value in hitlog table:
 					$disp = 'redirect';
 					// Redirect to the item current permanent url:
+					$Debuglog->add( 'Redirecting to correct collection (through canonical URL)', 'url_decode_part_2' );
 					header_redirect( $Item->get_permanent_url(), 301 );
 					// already exited
 				}
@@ -466,6 +467,7 @@ if( !empty($p) || !empty($title) )
 			    ( $item_Slug->get( 'title' ) != $title ) && // If current slug is NOT canonical slug of the Item
 			    $Item->is_part_of_blog( $blog ) ) // If the Item has a category from current collection
 			{	// Redirect permanently to the item main/canonical permanent url in the current collection:
+				$Debuglog->add( 'Redirecting to correct canonical slug but stay in current collection', 'url_decode_part_2' );
 				header_redirect( $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $blog ), 301 );
 				// Exit here.
 			}
