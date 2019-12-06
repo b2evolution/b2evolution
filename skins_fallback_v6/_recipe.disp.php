@@ -113,12 +113,6 @@ if( mainlist_get_item() )
 				'widget_item_title_display' => false,
 				// Item Previous Next widget
 				'widget_item_next_previous_params' => array(
-						'block_start' => '<nav><ul class="pager">',
-						'block_end' => '</ul></nav>',
-						'prev_start' => '<li class="previous">',
-						'prev_end' => '</li>',
-						'next_start' => '<li class="next">',
-						'next_end' => '</li>',
 					),
 				// Item Visibility Badge widge template
 				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
