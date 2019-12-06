@@ -129,7 +129,7 @@ See manual for more.');
 			{ // First check if we are starting a new table
 				$indent_level = strlen( $matches[1] );
 
-				$attributes = Sanitizer::fixTagAttributes( $matches[2], 'table' );
+				$attributes = $this->fix_tag_attributes( $matches[2], 'table' );
 
 				$outLine = str_repeat( '<dl><dd>', $indent_level ) . "<table{$attributes}>";
 				array_push( $td_history, false );
@@ -170,7 +170,7 @@ See manual for more.');
 				$line = preg_replace( '#^\|-+#', '', $line );
 
 				// Whats after the tag is now only attributes
-				$attributes = Sanitizer::fixTagAttributes( $line, 'tr' );
+				$attributes = $this->fix_tag_attributes( $line, 'tr' );
 				array_pop( $tr_attributes );
 				array_push( $tr_attributes, $attributes );
 
@@ -273,7 +273,7 @@ See manual for more.');
 					}
 					else
 					{
-						$attributes = Sanitizer::fixTagAttributes( $cell_data[0], $last_tag );
+						$attributes = $this->fix_tag_attributes( $cell_data[0], $last_tag );
 						$cell = "{$previous}<{$last_tag}{$markdown_attribute}{$attributes}>{$cell_data[1]}";
 					}
 
@@ -348,6 +348,29 @@ See manual for more.');
 	function AdminEndHtmlHead( & $params )
 	{
 		$this->SkinBeginHtmlHead( $params );
+	}
+
+
+	/**
+	 * Fix tag attributes
+	 *
+	 * @param string Attributes, e.g. 'style="color:green;" data-display-condition="cur=eur"'
+	 * @param string Element name, e.g. 'tr', 'td', 'table'
+	 * @return string Fixed attributes
+	 */
+	function fix_tag_attributes( $attributes, $element )
+	{
+		$extended_attributes = '';
+
+		if( $attributes !== '' &&
+		    in_array( $element, array( 'table', 'tr', 'td', 'th' ) ) &&
+		    preg_match_all( '#(^|\s)data-[^\s]+="[^"]*"+#', $attributes, $data_attributes ) )
+		{	// Allow extended attributes for several tags:
+			$extended_attributes = implode( '', $data_attributes[0] );
+		}
+
+		// Fix attributes by Sanitizer and append data-* 
+		return $extended_attributes.Sanitizer::fixTagAttributes( $attributes, $element );
 	}
 }
 
