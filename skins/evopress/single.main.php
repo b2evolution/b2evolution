@@ -106,7 +106,7 @@ $item_class_params = array(
 		'item_status_class' => 'post',
 	);
 
-while( $Item = & mainlist_get_item() )
+if( $Item = & mainlist_get_item() )
 {	// For each blog post, do everything below up to the closing curly brace "}"
 	?>
 

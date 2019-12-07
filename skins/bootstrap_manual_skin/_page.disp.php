@@ -20,7 +20,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Display message if no post:
 display_if_empty();
 
-while( mainlist_get_item() )
+if( mainlist_get_item() )
 { // For each blog post, do everything below up to the closing curly brace "}"
 	echo '<div class="evo_content_block">'; // Beginning of posts display
 	// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------

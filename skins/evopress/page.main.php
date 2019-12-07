@@ -84,7 +84,7 @@ skin_include( '_body_header.inc.php' );
 // Display message if no post:
 display_if_empty();
 
-while( $Item = & mainlist_get_item() )
+if( $Item = & mainlist_get_item() )
 {	// For each blog post, do everything below up to the closing curly brace "}"
 	?>
 
