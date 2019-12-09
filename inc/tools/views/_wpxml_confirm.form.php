@@ -1,6 +1,6 @@
 <?php
 /**
- * This file display the 3rd step of WordPress XML importer
+ * This file display the 2nd step of WordPress XML importer
  *
  * This file is part of the b2evolution/evocms project - {@link http://b2evolution.net/}.
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -18,15 +18,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
 $Form->begin_form( 'fform', T_('WordPress XML Importer') );
+$Form->add_crumb( 'wpxml' );
+$Form->hidden_ctrl();
+$Form->hidden( 'action', 'import' );
+$Form->hiddens_by_key( get_memorized( 'blog' ) );
 
-$Form->begin_fieldset( T_('Report of the import') );
+$Form->begin_fieldset( TD_('Confirm import') );
 
 	// Display info for the wordpress importer:
 	$wpxml_import_data = wpxml_info();
 
 	if( $wpxml_import_data['errors'] === false )
-	{	// Import the data and display a report on the screen:
-		wpxml_import( $wpxml_import_data['XML_file_path'], $wpxml_import_data['attached_files_path'], $wpxml_import_data['temp_zip_folder_path'] );
+	{	// Display found Item Types as selector:
+		wpxml_item_types_selector( $wpxml_import_data['XML_file_path'] );
 	}
 	else
 	{	// Display errors if import cannot be done:
@@ -37,7 +41,7 @@ $Form->begin_fieldset( T_('Report of the import') );
 $Form->end_fieldset();
 
 $Form->buttons( array(
-		array( 'button', 'button', T_('Go to collection').' >>', 'SaveButton', 'onclick' => 'location.href=\''.$wpxml_import_data['Blog']->get( 'url' ).'\'' ),
+		array( 'submit', 'submit', T_('Confirm import'), 'SaveButton' ),
 	) );
 
 $Form->end_form();

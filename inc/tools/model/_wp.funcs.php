@@ -153,16 +153,19 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	load_class( 'regional/model/_city.class.php', 'City' );
 
 	// Set Blog from request blog ID
-	$wp_blog_ID = param( 'wp_blog_ID', 'integer', 0 );
+	$wp_blog_ID = get_param( 'wp_blog_ID' );
 	$BlogCache = & get_BlogCache();
 	$wp_Blog = & $BlogCache->get_by_ID( $wp_blog_ID );
 
 	// The import type ( replace | append )
-	$import_type = param( 'import_type', 'string', 'replace' );
+	$import_type = get_param( 'import_type' );
 	// Should we delete files on 'replace' mode?
-	$delete_files = param( 'delete_files', 'integer', 0 );
+	$delete_files = get_param( 'delete_files' );
 	// Should we try to match <img> tags with imported attachments based on filename in post content after import?
-	$import_img = param( 'import_img', 'integer', 0 );
+	$import_img = get_param( 'import_img' );
+	// Item Types relations:
+	$selected_item_types = param( 'item_types', 'array:integer' );
+
 	$all_wp_attachments = array();
 
 	// Parse WordPress XML file into array
@@ -922,14 +925,20 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			}
 
 			// Set item type ID:
-			if( isset( $item_type_names[ $post['itemtype'] ] ) )
+			$post_type_ID = NULL;
+			if( isset( $selected_item_types[ $post['post_type'] ] ) )
+			{	// We found Item Type by usage:
+				$post_type_ID = $selected_item_types[ $post['post_type'] ];
+				if( $post_type_ID == 0 )
+				{	// Skip Item because this was selected on the confirm form:
+					echo '<p class="text-warning"><span class="label label-warning">'.'WARNING'.'</span> '.sprintf( 'Skip Item because Item Type %s is not selected for import.', '<code>'.$post['post_type'].'</code>' ).'</p>';
+					continue;
+				}
+			}
+			/*elseif( isset( $item_type_names[ $post['itemtype'] ] ) )
 			{	// We found Item Type by name:
 				$post_type_ID = $item_type_names[ $post['itemtype'] ];
-			}
-			elseif( isset( $item_type_usages[ $post['post_type'] ] ) )
-			{	// We found Item Type by usage:
-				$post_type_ID = $item_type_usages[ $post['post_type'] ];
-			}
+			}*/
 			else
 			{	// Use default Item Type of the importing Collection:
 				$post_type_ID = $wp_Blog->get_setting( 'default_post_type' );
@@ -2013,4 +2022,145 @@ class ValidUTF8XMLFilter extends php_user_filter
 	}
 }
 
+
+/**
+ * Display info for the wordpress importer
+ *
+ * @return array Data of the parsed XML file, @see wpxml_get_import_data()
+ */
+function wpxml_info()
+{
+	$wp_file = get_param( 'import_file' );
+
+	// Get data to import from wordpress XML file:
+	$wpxml_import_data = wpxml_get_import_data( $wp_file );
+
+	echo '<p>';
+
+	if( preg_match( '/\.zip$/i', $wp_file ) )
+	{	// ZIP archive:
+		echo '<b>'.TD_('Source ZIP').':</b> <code>'.$wp_file.'</code><br />';
+		// XML file from ZIP archive:
+		echo '<b>'.TD_('Source XML').':</b> '
+			.( empty( $wpxml_import_data['XML_file_path'] ) ? T_('Not found') : '<code>'.$wpxml_import_data['XML_file_path'].'</code>' ).'<br />';
+	}
+	else
+	{	// XML file:
+		echo '<b>'.TD_('Source XML').':</b> <code>'.$wp_file.'</code><br />';
+	}
+
+	echo '<b>'.TD_('Source attachments folder').':</b> '
+		.( empty( $wpxml_import_data['attached_files_path'] ) ? T_('Not found') : '<code>'.$wpxml_import_data['attached_files_path'].'</code>' ).'<br />';
+
+	$BlogCache = & get_BlogCache();
+	$Collection = $Blog = & $BlogCache->get_by_ID( get_param( 'wp_blog_ID' ) );
+	$wpxml_import_data['Blog'] = & $Blog;
+	echo '<b>'.TD_('Destination collection').':</b> '.$Blog->dget( 'shortname' ).' &ndash; '.$Blog->dget( 'name' ).'<br />';
+
+	echo '<b>'.TD_('Import mode').':</b> ';
+	switch( get_param( 'import_type' ) )
+	{
+		case 'append':
+			echo TD_('Append to existing contents');
+			break;
+		case 'replace':
+			echo TD_('Replace existing contents').' <span class="note">'.TD_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.').'</span>';
+			if( get_param( 'delete_files' ) )
+			{
+				echo '<br /> &nbsp; &nbsp; [√] '.TD_(' Also delete media files that will no longer be referenced in the destination collection after replacing its contents');
+			}
+			break;
+	}
+	echo '<br />';
+
+	if( get_param( 'import_img' ) )
+	{
+		echo '<b>'.TD_('Options').':</b> [√] '.TD_('Try to match any remaining <code>&lt;img&gt;</code> tags with imported attachments based on filename');
+	}
+
+	echo '</p>';
+
+	return $wpxml_import_data;
+}
+
+
+/**
+ * Display a selector for Item Types
+ *
+ * @param string XML file path
+ */
+function wpxml_item_types_selector( $XML_file_path )
+{
+	// Parse WordPress XML file into array
+	echo 'Loading & parsing the XML file...'.'<br />';
+	evo_flush();
+	$xml_data = wpxml_parser( $XML_file_path );
+	echo '<ul class="list-default">';
+		echo '<li>'.'Memory used by XML parsing (difference between free RAM before loading XML and after)'.': <b>'.bytesreadable( $xml_data['memory']['parsing'] ).'</b></li>';
+		echo '<li>'.'Memory used by temporary arrays (difference between free RAM after loading XML and after copying all the various data into temporary arrays)'.': <b>'.bytesreadable( $xml_data['memory']['arrays'] ).'</b></li>';
+	echo '</ul>';
+	evo_flush();
+
+	$item_types = array();
+	if( ! empty( $xml_data['posts'] ) )
+	{	// Count items number per item type:
+		foreach( $xml_data['posts'] as $post )
+		{
+			if( $post['post_type'] == 'attachment' || $post['post_type'] == 'revision' )
+			{	// Skip reserved post type:
+				continue;
+			}
+
+			if( ! isset( $item_types[ $post['post_type'] ] ) )
+			{
+				$item_types[ $post['post_type'] ] = 1;
+			}
+			else
+			{
+				$item_types[ $post['post_type'] ]++;
+			}
+		}
+	}
+
+	if( empty( $item_types ) )
+	{	// No posts:
+		echo '<p>No posts found in XML file, you can try to import other data like catefories and etc.</p>';
+	}
+	else
+	{	// Display Item Types selectors:
+		$ItemTypeCache = & get_ItemTypeCache();
+		$ItemTypeCache->clear();
+		$SQL = $ItemTypeCache->get_SQL_object();
+		$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID' );
+		$SQL->WHERE( 'itc_coll_ID = '.get_param( 'wp_blog_ID' ) );
+		$ItemTypeCache->load_by_sql( $SQL );
+
+		echo '<b>'.TD_('Select item types:').'</b>';
+		echo '<ul class="list-default controls">';
+		foreach( $item_types as $item_type => $items_num )
+		{
+			echo '<li>Import '.$items_num.' items of type <code>'.$item_type.'</code> as '
+					.'<select name="item_types['.$item_type.']" class="form-control" style="margin:2px">'
+						.'<option value="0">'.TD_('Do not import').'</option>';
+			$is_auto_selected = false;
+			$is_first_selected = false;
+			foreach( $ItemTypeCache->cache as $ItemType )
+			{
+				if( ! $is_first_selected && $ItemType->get( 'usage' ) == $item_type  )
+				{
+					$is_auto_selected = true;
+					$is_first_selected = true;
+				}
+				else
+				{
+					$is_auto_selected = false;
+				}
+				echo '<option value="'.$ItemType->ID.'"'.( $is_auto_selected ? ' selected="selected"' : '' ).'>'.$ItemType->get( 'name' ).'</option>';
+			}
+			echo '</select>'
+				.'</li>';
+		}
+		echo '</ul>';
+	}
+}
 ?>

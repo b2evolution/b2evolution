@@ -23,7 +23,7 @@ $Form->begin_form( 'fform', T_('WordPress XML Importer') );
 
 $Form->add_crumb( 'wpxml' );
 $Form->hidden_ctrl();
-$Form->hidden( 'action', 'import' );
+$Form->hidden( 'action', 'confirm' );
 
 // Display a panel to upload files before import:
 $import_files = display_importer_upload_panel( array(

@@ -23,7 +23,8 @@ load_funcs( 'tools/model/_wp.funcs.php' );
  *
  * values:
  * 1) 'file'
- * 2) 'import'
+ * 2) 'confirm'
+ * 3) 'import'
  */
 param( 'action', 'string' );
 
@@ -34,7 +35,7 @@ if( !empty( $action ) )
 	@ini_set( 'output_buffering', 'off' );
 }
 
-if( param( 'wp_blog_ID', 'integer', 0 ) > 0 )
+if( param( 'wp_blog_ID', 'integer', 0, true ) > 0 )
 {	// Save last import collection in Session:
 	$Session->set( 'last_import_coll_ID', get_param( 'wp_blog_ID' ) );
 
@@ -44,14 +45,22 @@ if( param( 'wp_blog_ID', 'integer', 0 ) > 0 )
 
 switch( $action )
 {
+	case 'confirm':
 	case 'import':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'wpxml' );
 
 		param_check_not_empty( 'wp_blog_ID', 'Please select a collection!' );
 
+		// The import type ( replace | append )
+		$import_type = param( 'import_type', 'string', 'replace', true );
+		// Should we delete files on 'replace' mode?
+		$delete_files = param( 'delete_files', 'integer', 0, true );
+		// Should we try to match <img> tags with imported attachments based on filename in post content after import?
+		$import_img = param( 'import_img', 'integer', 0, true );
+
 		// XML File
-		$xml_file = param( 'import_file', 'string', '' );
+		$xml_file = param( 'import_file', 'string', '', true );
 		if( empty( $xml_file ) )
 		{ // File is not selected
 			param_error( 'import_file', 'Please select file to import.' );
@@ -95,7 +104,11 @@ $AdminUI->disp_payload_begin();
 
 switch( $action )
 {
-	case 'import':	// Step 2
+	case 'confirm':	// Step 2
+		$AdminUI->disp_view( 'tools/views/_wpxml_confirm.form.php' );
+		break;
+
+	case 'import':	// Step 3
 		$AdminUI->disp_view( 'tools/views/_wpxml_import.form.php' );
 		break;
 

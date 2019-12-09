@@ -9595,6 +9595,8 @@ function display_importer_upload_panel( $params = array() )
 			'refresh_url'            => '',
 		), $params );
 
+	evo_flush();
+
 	// Get available files to import from the folder /media/import/
 	$import_files = get_import_files( $params['folder'], $params['allowed_extensions'], $params['infolder_extensions'], $params['find_attachments'], $params['folder_with_extensions'] );
 
