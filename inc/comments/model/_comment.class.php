@@ -1747,10 +1747,18 @@ class Comment extends DataObject
 		else
 		{
 			// JS confirm is required only when the comment is not in the recycle bin yet
-			$display_js_confirm = ( $this->status == 'trash' );
+			// ...or comment is a meta comment where it cannot be recycled
+			$display_js_confirm = ( $this->status == 'trash' ) || $this->is_meta();
 			if( $display_js_confirm && ( $confirm_text == '#' ) )
 			{ // Set js confirm text on comment delete action
-				$confirm_text = TS_('You are about to delete this comment!\\nThis cannot be undone!');
+				if( $this->is_meta() )
+				{
+					$confirm_text = TS_('Are you sure you want to DELETE this Meta Comment?\\nThis cannot be undone!');
+				}
+				else
+				{
+					$confirm_text = TS_('You are about to delete this comment!\\nThis cannot be undone!');
+				}
 			}
 
 			if( $button )
