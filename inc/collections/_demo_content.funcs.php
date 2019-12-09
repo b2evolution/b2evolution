@@ -1746,7 +1746,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 
 /**
  * Create default email lists
- * 
+ *
  * @return integer Number of new created email lists
  */
 function create_default_newsletters()
@@ -1941,7 +1941,7 @@ function create_default_automations()
 
 /**
  * Create demo emails data like lists, campaigns, automations
- * 
+ *
  * @return integer Number of new created email lists
  */
 function create_demo_emails()
@@ -3741,7 +3741,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 					break;
 			}
 
-			
+
 		}
 	}
 
@@ -3898,7 +3898,7 @@ function get_demo_category_ID( $category_key, $categories, $use_first = true )
 				return $first_cat_ID;
 			}
 		}
-		
+
 
 		if( $category_key == $cat_key && ! empty( $cat_data['ID'] ) )
 		{	// Return ID of the detected category:

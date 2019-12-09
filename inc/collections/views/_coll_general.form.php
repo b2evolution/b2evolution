@@ -155,23 +155,32 @@ $Form->begin_fieldset( T_('Collection type').get_manual_link( 'collection-type-p
 $Form->end_fieldset();
 
 if( in_array( $action, array( 'create', 'new-name' ) ) && $ctrl = 'collections' )
-{ // Only show demo content option when creating a new collection
+{	// Only show demo content option when creating a new collection
+	load_funcs( 'dashboard/model/_dashboard.funcs.php' );
+
 	$Form->begin_fieldset( T_( 'Demo contents' ).get_manual_link( 'collection-demo-content' ) );
 		$Form->radio( 'create_demo_contents', param( 'create_demo_contents', 'integer', -1 ),
 					array(
 						array( 1, T_('Initialize this collection with some demo contents') ),
 						array( 0, T_('Create an empty collection') ),
 					), T_('New contents'), true, '', true );
-		if( $current_User->check_perm( 'orgs', 'create', false ) && $current_User->check_perm( 'blog_admin', 'editall', false ) )
-		{ // Permission to create organizations
-			$Form->checkbox( 'create_demo_org', param( 'create_demo_org', 'integer', 1 ),
-					T_( 'Create demo organization' ), T_( 'Create a demo organization if none exists.' ) );
+
+		if( get_table_count( 'T_users__organization' ) === 0 )
+		{
+			if( $current_User->check_perm( 'orgs', 'create', false ) && $current_User->check_perm( 'blog_admin', 'editall', false ) )
+			{	// Permission to create organizations
+				$Form->checkbox( 'create_demo_org', param( 'create_demo_org', 'integer', 1 ),
+						T_( 'Create demo organization' ), T_( 'Create a demo organization if none exists.' ) );
+			}
 		}
 
-		if( $current_User->check_perm( 'users', 'edit', false ) && $current_User->check_perm( 'blog_admin', 'editall', false ) )
-		{ // Permission to edit users
-			$Form->checkbox( 'create_demo_users', param( 'create_demo_users', 'integer', 1 ),
-					T_( 'Create demo users' ), T_( 'Create demo users as comment authors.' ) );
+		if( get_table_count( 'T_users', 'user_ID != 1' ) === 0 )
+		{
+			if( $current_User->check_perm( 'users', 'edit', false ) && $current_User->check_perm( 'blog_admin', 'editall', false ) )
+			{	// Permission to edit users
+				$Form->checkbox( 'create_demo_users', param( 'create_demo_users', 'integer', 1 ),
+						T_( 'Create demo users' ), T_( 'Create demo users as comment authors.' ) );
+			}
 		}
 	$Form->end_fieldset();
 }
