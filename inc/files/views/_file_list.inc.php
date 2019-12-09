@@ -210,6 +210,7 @@ $Form->begin_form();
 		}
 
 		echo '</td>';
+		evo_flush();
 
 
 		/********************  Icon / File type:  *******************/
@@ -238,6 +239,7 @@ $Form->begin_form();
 			}
 		}
 		echo '</td>';
+		evo_flush();
 
 		/*******************  Path (flatmode): ******************/
 
@@ -246,6 +248,7 @@ $Form->begin_form();
 			echo '<td class="filepath">';
 			echo dirname( $lFile->get_rdfs_rel_path() ).'/';
 			echo '</td>';
+			evo_flush();
 		}
 
 		/*******************  File name: ******************/
@@ -359,12 +362,14 @@ $Form->begin_form();
 			echo file_td_name( $lFile );
 
 		echo '</td>';
+		evo_flush();
 
 		/*******************  File type  ******************/
 
 		if( $UserSettings->get('fm_showtypes') )
 		{ // Show file types
 			echo '<td class="type">'.$lFile->get_type().'</td>';
+			evo_flush();
 		}
 
 		/*******************  Added by  *******************/
@@ -379,6 +384,7 @@ $Form->begin_form();
 			{
 				echo '<td class="center">unknown</td>';
 			}
+			evo_flush();
 		}
 
 		/****************  Download Count  ****************/
@@ -387,6 +393,7 @@ $Form->begin_form();
 		{ // Show download count
 			// erhsatingin> Can't seem to find proper .less file to add the 'download' class, using class 'center' instead
 			echo '<td class="center">'.$lFile->get_download_count().'</td>';
+			evo_flush();
 		}
 
 		/*******************  File size  ******************/
@@ -402,6 +409,7 @@ $Form->begin_form();
 			echo '<td class="timestamp" title="'.format_to_output( $lastmod_date.' '.$lastmod_time, 'htmlattr' ).'">';
 			echo file_td_lastmod( $lFile );
 			echo '</td>';
+			evo_flush();
 		}
 
 		/****************  File pemissions  ***************/
@@ -422,6 +430,7 @@ $Form->begin_form();
 				echo $lFile->get_perms( $fm_permlikelsl ? 'lsl' : '' );
 			}
 			echo '</td>';
+			evo_flush();
 		}
 
 		/****************  File owner  ********************/
@@ -431,6 +440,7 @@ $Form->begin_form();
 			echo '<td class="fsowner">';
 			echo $lFile->get_fsowner_name();
 			echo '</td>';
+			evo_flush();
 		}
 
 		/****************  File group *********************/
@@ -440,6 +450,7 @@ $Form->begin_form();
 			echo '<td class="fsgroup">';
 			echo $lFile->get_fsgroup_name();
 			echo '</td>';
+			evo_flush();
 		}
 
 		/*****************  Action icons  ****************/
@@ -447,8 +458,10 @@ $Form->begin_form();
 		echo '<td class="actions lastcol text-nowrap">';
 		echo file_td_actions( $lFile );
 		echo '</td>';
+		evo_flush();
 
 		echo '</tr>';
+		evo_flush();
 
 		$countFiles++;
 	}

@@ -357,6 +357,26 @@ function cleardir_r( $path )
 	return $r;
 }
 
+
+/**
+ * Fast check if the requested file is image
+ *
+ * @param string File path
+ * @return boolean TRUE - if file is image
+ */
+function is_image_file( $file_path )
+{
+	if( ! file_exists( $file_path ) )
+	{
+		return false;
+	}
+
+	$file_info = finfo_open( FILEINFO_MIME_TYPE );
+	$file_type = finfo_file( $file_info, $file_path );
+
+	return in_array( $file_type, array( 'image/png', 'image/jpeg', 'image/gif' ) );
+}
+
 /**
  * Get the size of an image file
  *
@@ -377,8 +397,9 @@ function imgsize( $path, $param = 'widthheight' )
 	{
 		$size = $cache_imgsize[$path];
 	}
-	elseif( !($size = @getimagesize( $path )) )
-	{
+	elseif( ! is_image_file( $path ) || // Fast check for image file
+	        ! ( $size = @getimagesize( $path ) ) ) // Try to get size of image file
+	{	// If file is not image, or size could not get by some reason:
 		return false;
 	}
 	else
@@ -3537,9 +3558,10 @@ function file_td_name( & $File )
 	// File meta data:
 	$r .= '<span class="filemeta">';
 	// Optionally display IMAGE pixel size:
-	if( $UserSettings->get( 'fm_getimagesizes' ) )
+	if( $UserSettings->get( 'fm_getimagesizes' ) &&
+	    ( $file_image_size = $File->get_image_size( 'widthxheight' ) ) !== false )
 	{
-		$r .= ' ('.$File->get_image_size( 'widthxheight' ).')';
+		$r .= ' ('.$file_image_size.')';
 	}
 	// Optionally display meta data title:
 	if( $File->meta == 'loaded' )
