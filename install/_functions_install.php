@@ -224,12 +224,22 @@ function install_newdb()
 		if( $create_demo_organization )
 		{
 			task_begin( 'Creating demo organization...' );
-			$user_org_IDs = array( create_demo_organization( 1 )->ID );
-			task_end();
+			if( $new_demo_organization = create_demo_organization( 1 ) )
+			{
+				$user_org_IDs = array( $new_demo_organization->ID );
+				task_end();
+			}
+			else
+			{
+				task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
+			}
 
-			task_begin( 'Adding admin user to demo organization...' );
-			$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
-			task_end();
+			if( $user_org_IDs )
+			{
+				task_begin( 'Adding admin user to demo organization...' );
+				$admin_user->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
+				task_end();
+			}
 		}
 
 		// Create demo users if selected
@@ -258,8 +268,15 @@ function install_newdb()
 			if( $create_demo_messages )
 			{
 				task_begin( 'Creating demo private messages...' );
-				create_demo_messages();
-				task_end();
+				$demo_messages = create_demo_messages();
+				if( $demo_messages )
+				{
+					task_end();
+				}
+				else
+				{
+					task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
+				}
 			}
 		}
 	}

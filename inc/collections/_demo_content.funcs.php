@@ -56,6 +56,24 @@ function task_end( $message = 'OK.' )
 
 
 /**
+ * Display task errors.
+ */
+function task_errors( $errors = array(), $type = 'danger' )
+{
+	if( empty( $errors ) )
+	{
+		return;
+	}
+
+	echo get_install_format_text( '<br />', 'br' );
+	foreach( $errors as $error )
+	{
+		echo get_install_format_text( '<span class="text-'.$type.'">'.$error.'</span><br />', 'br' );
+	}
+}
+
+
+/**
  * Adjust timestamp value, adjusts it to the current time if not yet set
  *
  * @param timestamp Base timestamp
@@ -815,6 +833,11 @@ function create_demo_organization( $owner_ID, $org_name = 'Company XYZ', $add_cu
 			$demo_org_ID = $Organization->ID;
 			$Messages->add_to_group( sprintf( T_('The sample organization %s has been created.'), $org_name ), 'success', T_('Demo contents').':' );
 		}
+		else
+		{
+			$Messages->add_to_group( sprintf( T_('Unable to create sample organization %s.'), '"'.$org_name.'"' ), 'error', T_('Demo contents').':' );
+			return false;
+		}
 	}
 
 	// Add current user to the demo organization
@@ -971,9 +994,10 @@ function get_demo_users_defaults()
  *
  * @param boolean Create the demo users if they do not exist
  * @param boolean Display ouput
+ * @param array Error messages
  * @return array Array of available demo users indexed by login
  */
-function get_demo_users( $create = false, $output = true )
+function get_demo_users( $create = false, $output = true, &$error_messages = NULL )
 {
 	$demo_users = get_demo_users_defaults();
 	$demo_users_logins = array_keys( $demo_users );
@@ -981,7 +1005,7 @@ function get_demo_users( $create = false, $output = true )
 	$available_demo_users = array();
 	foreach( $demo_users_logins as $demo_user_login )
 	{
-		$demo_User = get_demo_user( $demo_user_login, $create, $output );
+		$demo_User = get_demo_user( $demo_user_login, $create, $output, $error_messages );
 		if( $demo_User )
 		{
 			$available_demo_users[$demo_user_login] = $demo_User;
@@ -998,9 +1022,10 @@ function get_demo_users( $create = false, $output = true )
  * @param string User $login
  * @param boolean Create demo user if it does not exist
  * @param boolean Display output
+ * @param array Error messages
  * @return mixed object Demo user if successful, false otherwise
  */
-function get_demo_user( $login, $create = false, $output = true )
+function get_demo_user( $login, $create = false, $output = true, &$error_messages = NULL )
 {
 	global $DB;
 	global $current_User;
@@ -1067,6 +1092,11 @@ function get_demo_user( $login, $create = false, $output = true )
 		$demo_user = create_user( $user_defaults );
 		if( $demo_user === false )
 		{	// Cannot create demo user, exiting:
+			$error_messages[] = sprintf( TB_('Unable to create demo user %s.'), '"'.$login.'"' );
+			if( $output )
+			{
+				task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
+			}
 			return false;
 		}
 
@@ -1122,6 +1152,7 @@ function create_demo_messages()
 	$users_SQL->ORDER_BY( 'user_ID' );
 	$users = $DB->get_results( $users_SQL->get() );
 
+	$demo_messages = array();
 	for( $i = 0; $i < count( $users ); $i++ )
 	{
 		if( $i % 2 == 0 )
@@ -1164,6 +1195,7 @@ function create_demo_messages()
 						if( $loop_Message->dbupdate_last_contact_datetime() )
 						{
 							$conversation_saved = true;
+							$demo_messages[] = $loop_Message;
 						}
 					}
 				}
@@ -1210,6 +1242,7 @@ function create_demo_messages()
 					{
 						$DB->commit();
 						$conversation_saved = true;
+						$demo_messages[] = $loop_reply_Message;
 					}
 				}
 			}
@@ -1220,6 +1253,8 @@ function create_demo_messages()
 			$DB->rollback();
 		}
 	}
+
+	return $demo_messages;
 }
 
 /**
@@ -1365,7 +1400,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 
 	if( $demo_content_type == 'complex_site' || $create_sample_contents == 'full' )
 	{
-		task_begin( T_('Creating default sections...') );
+		task_begin( TB_('Creating default sections...') );
 		$SectionCache = & get_SectionCache();
 
 		$sections = array();
@@ -1391,6 +1426,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 			$sections['Manual'] = array( 'owner_ID' => $dave_blogger_ID, 'order' => 6 );
 		}
 
+		$section_error_messages = array();
 		foreach( $sections as $section_name => $section_data )
 		{
 			if( $loop_Section = $SectionCache->get_by_name( $section_name, false, false ) )
@@ -1403,20 +1439,42 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				$new_Section->set( 'name', $section_name );
 				$new_Section->set( 'order', $section_data['order'] );
 				$new_Section->set( 'owner_user_ID', $section_data['owner_ID'] );
-				$new_Section->dbsave();
-
-				$sections[$section_name]['ID'] = $new_Section->ID;
+				$insert_section_result = $new_Section->dbsave();
+				if( $insert_section_result )
+				{
+					$sections[$section_name]['ID'] = $new_Section->ID;
+				}
+				else
+				{
+					$section_error_messages[] = sprintf( TB_('Failed to create %s section'), $section_name );
+				}
 			}
 		}
-		task_end();
+
+		if( $section_error_messages )
+		{
+			task_errors( $section_error_messages );
+		}
+		else
+		{
+			task_end();
+		}
 	}
 
 	// Create demo polls:
 	// (global $demo_poll_ID may be used in default widgets e-g for collection "Blog B")
 	global $demo_poll_ID;
-	task_begin( T_('Creating default polls...') );
+	task_begin( TB_('Creating default polls...') );
 	$demo_poll_ID = create_demo_poll();
-	task_end();
+	if( empty( $demo_poll_ID ) )
+	{
+		task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
+	}
+	else
+	{
+		task_end();
+	}
+
 
 	// Number of demo collections created:
 	$collection_created = 0;
@@ -1426,9 +1484,10 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 
 	if( $install_collection_home )
 	{	// Install Home blog
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Home') ) );
+		$coll_error_messages = array();
+		task_begin( sprintf( TB_('Creating %s collection...'), T_('Home') ) );
 		$section_ID = isset( $sections['Home']['ID'] ) ? $sections['Home']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'main', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'main', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1445,7 +1504,14 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 			}
 
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
@@ -1455,10 +1521,11 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 
 	if( $install_collection_bloga )
 	{	// Install Blog A
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Blog A') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), T_('Blog A') ) );
 		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'blog_a', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'blog_a', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1474,20 +1541,28 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.T_('Failed').'</span>' );
 		}
 	}
 
 	if( $install_collection_blogb )
 	{	// Install Blog B
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Blog B') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), T_('Blog B') ) );
 		$section_ID = isset( $sections['Blogs']['ID'] ) ? $sections['Blogs']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'blog_b', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1503,20 +1578,28 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
 		}
 	}
 
 	if( $install_collection_photos )
 	{	// Install Photos blog
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Photos') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), T_('Photos') ) );
 		$section_ID = isset( $sections['Photos']['ID'] ) ? $sections['Photos']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'photo', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'photo', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1532,20 +1615,28 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'photo' );
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
 		}
 	}
 
 	if( $install_collection_forums )
 	{	// Install Forums blog
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Forums') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), T_('Forums') ) );
 		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'forum', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'forum', $paul_blogger_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1561,20 +1652,28 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'forum' );
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
 		}
 	}
 
 	if( $install_collection_manual )
 	{	// Install Manual blog
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Manual') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), T_('Manual') ) );
 		$section_ID = isset( $sections['Manual']['ID'] ) ? $sections['Manual']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'manual', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'manual', $dave_blogger_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1590,20 +1689,28 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'manual' );
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
 		}
 	}
 
 	if( $install_collection_tracker )
 	{	// Install Tracker blog
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Tracker') ) );
+		task_begin( sprintf( TB_('Creating %s collection...'), T_('Tracker') ) );
 		$section_ID = isset( $sections['Forums']['ID'] ) ? $sections['Forums']['ID'] : 1;
-		if( $blog_ID = create_demo_collection( 'group', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID ) )
+		if( $blog_ID = create_demo_collection( 'group', $jay_moderator_ID, $use_demo_users, $timeshift, $section_ID, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1619,19 +1726,27 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'group' );
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
 		}
 	}
 
 	if( $install_collection_minisite )
 	{	// Install Mini-site collection
+		$coll_error_messages = array();
 		$timeshift += 86400;
-		task_begin( sprintf( T_('Creating %s collection...'), T_('Mini-Site') ) );
-		if( $blog_ID = create_demo_collection( 'minisite', $jay_moderator_ID, $use_demo_users, $timeshift, 1 ) )
+		task_begin( sprintf( TB_('Creating %s collection...'), T_('Mini-Site') ) );
+		if( $blog_ID = create_demo_collection( 'minisite', $jay_moderator_ID, $use_demo_users, $timeshift, 1, $coll_error_messages ) )
 		{
 			if( $initial_install )
 			{
@@ -1648,23 +1763,30 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'minisite' );
 			}
 			$collection_created++;
-			task_end();
+			if( $coll_error_messages )
+			{
+				task_errors( $coll_error_messages );
+			}
+			else
+			{
+				task_end();
+			}
 		}
 		else
 		{
-			task_end( '<span class="text-danger">Failed.</span>' );
+			task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
 		}
 	}
 
 	// Install default shared widgets:
 	global $installed_default_shared_widgets;
-	task_begin( T_('Installing default shared widgets...') );
+	task_begin( TB_('Installing default shared widgets...') );
 	insert_shared_widgets( 'normal', true );
 	task_end();
 	$installed_default_shared_widgets = true;
 
 	// Setting default login and default messaging collection:
-	task_begin( T_('Setting default login and default messaging collection...') );
+	task_begin( TB_('Setting default login and default messaging collection...') );
 	if( $demo_content_type == 'minisite' )
 	{
 		$Settings->set( 'login_blog_ID', 0 );
@@ -1703,7 +1825,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 		if( $install_test_features )
 		{
 			echo_install_log( 'TEST FEATURE: Creating fake hit statistics' );
-			task_begin( T_('Creating fake hit statistics...') );
+			task_begin( TB_('Creating fake hit statistics...') );
 			load_funcs('sessions/model/_hitlog.funcs.php');
 			load_funcs('_core/_url.funcs.php');
 			$insert_data_count = generate_hit_stat(10, 0, 5000);
@@ -1753,7 +1875,7 @@ function create_default_newsletters()
 {
 	global $DB;
 
-	task_begin( T_('Creating demo email lists...') );
+	task_begin( TB_('Creating demo email lists...') );
 
 	// Insert default newsletters:
 	$created_lists_num = $DB->query( 'INSERT INTO T_email__newsletter ( enlt_name, enlt_label, enlt_order, enlt_owner_user_ID )
@@ -1777,7 +1899,7 @@ function create_default_email_campaigns()
 {
 	global $DB, $Settings, $baseurl;
 
-	task_begin( T_('Creating demo email campaigns...') );
+	task_begin( TB_('Creating demo email campaigns...') );
 
 	load_class( 'email_campaigns/model/_emailcampaign.class.php', 'EmailCampaign' );
 	load_funcs( 'email_campaigns/model/_emailcampaign.funcs.php' );
@@ -1872,7 +1994,7 @@ function create_default_automations()
 {
 	global $DB;
 
-	task_begin( T_('Creating demo automations...') );
+	task_begin( TB_('Creating demo automations...') );
 
 	//load_funcs( 'automations/model/_automation.funcs.php' );
 	load_class( 'automations/model/_automation.class.php', 'Automation' );
@@ -2060,7 +2182,7 @@ Admins and moderators can very quickly approve or reject comments from the colle
  * @param integer Section ID
  * @return integer ID of created blog
  */
-function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 86400, $section_ID = 1 )
+function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = true, $timeshift = 86400, $section_ID = 1, &$error_messages = NULL )
 {
 	global $install_test_features, $DB, $admin_url, $timestamp;
 	global $blog_minisite_ID, $blog_home_ID, $blog_a_ID, $blog_b_ID, $blog_photoblog_ID, $blog_forums_ID, $blog_manual_ID, $events_blog_ID;
@@ -2307,13 +2429,13 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 			break;
 
 		default:
-			// do nothing
+			debug_die( 'Invalid collection type' );
 	}
 
 	if( ! empty( $blog_ID ) )
 	{
 		// Create sample contents for the collection:
-		create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user, $timeshift );
+		create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user, $timeshift, $error_messages );
 		return $blog_ID;
 	}
 	else
@@ -2332,7 +2454,7 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
  * @param boolean Use demo users as comment authors
  * @param integer Shift post time in ms
  */
-function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user = true, $timeshift = 86400 )
+function create_sample_content( $collection_type, $blog_ID, $owner_ID, $use_demo_user = true, $timeshift = 86400, &$error_messages = NULL )
 {
 	global $DB, $install_test_features, $timestamp, $Settings, $admin_url, $installed_collection_info_pages;
 
@@ -3577,11 +3699,13 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			if( ! is_available_item_type( $blog_ID, $item_type ) )
 			{	// Skip not supported Item Type:
+				$error_messages[] = sprintf( TB_('Unable to create demo post "%s"'), $demo_item['title'] ).': '.sprintf( TB_('The required %s is not found.'), T_('Item Type') );
 				continue;
 			}
 
 			if( ! ( $category_ID = get_demo_category_ID( $demo_item['category'], $categories ) ) )
 			{	// Skip Item without category:
+				$error_messages[] = sprintf( TB_('Unable to create demo post "%s"'), $demo_item['title'] ).': '.sprintf( TB_('The required %s is not found.'), T_('Category') );
 				continue;
 			}
 
@@ -3626,7 +3750,15 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			if( ! empty( $demo_item['parent_ID'] ) )
 			{	// Set parent ID:
-				$new_Item->set( 'parent_ID', replace_demo_content_vars( $demo_item['parent_ID'], $demo_items, $demo_vars ) );
+				if( $parent_ID = replace_demo_content_vars( $demo_item['parent_ID'], $demo_items, $demo_vars ) )
+				{
+					$new_Item->set( 'parent_ID', $parent_ID );
+				}
+				else
+				{
+					$error_messages[] = sprintf( TB_('Unable to create demo post "%s"'), $demo_item['title'] ).': '.TB_('The parent of this child post does not exist.');
+					continue;
+				}
 			}
 
 			if( ! empty( $demo_item['priority'] ) )
@@ -3677,6 +3809,7 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 
 			if( ! $insert_new_item_result )
 			{	// Skip next code if Item could not be inserted successfully:
+				$error_messages[] = sprintf( TB_('Unable to create demo post "%s"'), $demo_item['title'] );
 				continue;
 			}
 
@@ -3690,15 +3823,22 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 				foreach( $demo_item['files'] as $f => $demo_item_file )
 				{
 					$new_File = new File( 'shared', 0, $demo_item_file[0] );
-					$new_file_link_ID = $new_File->link_to_Object( $LinkOwner, $f + 1, ( isset( $demo_item_file[1] ) ? $demo_item_file[1] : NULL ) );
-					if( isset( $demo_item_file['custom_field'] ) )
-					{	// Update custom field with new linked file:
-						$new_Item->set_custom_field( $demo_item_file['custom_field'], $new_file_link_ID );
-						$update_new_item = true;
+					if( $new_File->exists() )
+					{
+						$new_file_link_ID = $new_File->link_to_Object( $LinkOwner, $f + 1, ( isset( $demo_item_file[1] ) ? $demo_item_file[1] : NULL ) );
+						if( isset( $demo_item_file['custom_field'] ) )
+						{	// Update custom field with new linked file:
+							$new_Item->set_custom_field( $demo_item_file['custom_field'], $new_file_link_ID );
+							$update_new_item = true;
+						}
+						if( isset( $demo_item_file['set_var'] ) )
+						{	// Set var which may be used for next inserted Items:
+							$demo_vars[ $demo_item_file['set_var'] ] = $new_file_link_ID;
+						}
 					}
-					if( isset( $demo_item_file['set_var'] ) )
-					{	// Set var which may be used for next inserted Items:
-						$demo_vars[ $demo_item_file['set_var'] ] = $new_file_link_ID;
+					else
+					{
+						$error_messages[] = sprintf( T_('Missing attachment!').' '.TB_('File <code>%s</code> not found.'), $demo_item_file[0] );
 					}
 				}
 			}
@@ -3935,45 +4075,48 @@ function create_demo_poll()
 	if( empty( $demo_poll_ID ) )
 	{
 		// Add poll question:
-		$DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
+		$result = $DB->query( 'INSERT INTO T_polls__question ( pqst_owner_user_ID, pqst_question_text, pqst_max_answers )
 			VALUES ( 1, '.$DB->quote( $demo_question ).', '.$max_answers.' )' );
 
-		$demo_poll_ID = $DB->insert_id;
-
-		// Add poll answers:
-		$answer_texts = array(
-				array( T_('Multiple blogs'), 1 ),
-				array( T_('Photo Galleries'), 2 ),
-				array( T_('Forums'), 3 ),
-				array( T_('Online Manuals'), 4 ),
-				array( T_('Lists / E-mailing'), 5 ),
-				array( T_('Easy Maintenance'), 6 )
-			);
-
-		$answer_IDs = array();
-		foreach( $answer_texts as $answer_text )
+		if( $result )
 		{
-			$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
-					VALUES ( '.$demo_poll_ID.', '.$DB->quote( $answer_text[0] ).', '.$DB->quote( $answer_text[1] ).' )' );
-			$answer_IDs[] = $DB->insert_id;
-		}
+			$demo_poll_ID = $DB->insert_id;
 
-		// Generate answers:
-		$insert_values = array();
-		foreach( $demo_users as $demo_user )
-		{
-			$answers = $answer_IDs;
-			for( $i = 0; $i < $max_answers; $i++ )
+			// Add poll answers:
+			$answer_texts = array(
+					array( T_('Multiple blogs'), 1 ),
+					array( T_('Photo Galleries'), 2 ),
+					array( T_('Forums'), 3 ),
+					array( T_('Online Manuals'), 4 ),
+					array( T_('Lists / E-mailing'), 5 ),
+					array( T_('Easy Maintenance'), 6 )
+				);
+
+			$answer_IDs = array();
+			foreach( $answer_texts as $answer_text )
 			{
-				$rand_key = array_rand( $answers );
-				$insert_values[] = '( '.$demo_poll_ID.', '.$demo_user->ID.', '.$answers[$rand_key].' )';
-				unset( $answers[$rand_key] );
+				$DB->query( 'INSERT INTO T_polls__option ( popt_pqst_ID, popt_option_text, popt_order )
+						VALUES ( '.$demo_poll_ID.', '.$DB->quote( $answer_text[0] ).', '.$DB->quote( $answer_text[1] ).' )' );
+				$answer_IDs[] = $DB->insert_id;
 			}
-		}
-		if( $insert_values )
-		{
-			$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
-				VALUES '.implode( ', ', $insert_values ) );
+
+			// Generate answers:
+			$insert_values = array();
+			foreach( $demo_users as $demo_user )
+			{
+				$answers = $answer_IDs;
+				for( $i = 0; $i < $max_answers; $i++ )
+				{
+					$rand_key = array_rand( $answers );
+					$insert_values[] = '( '.$demo_poll_ID.', '.$demo_user->ID.', '.$answers[$rand_key].' )';
+					unset( $answers[$rand_key] );
+				}
+			}
+			if( $insert_values )
+			{
+				$DB->query( 'INSERT INTO T_polls__answer ( pans_pqst_ID, pans_user_ID, pans_popt_ID )
+					VALUES '.implode( ', ', $insert_values ) );
+			}
 		}
 	}
 
@@ -4010,12 +4153,22 @@ function install_demo_content()
 		if( $create_demo_organization )
 		{
 			task_begin( T_('Creating demo organization...') );
-			$user_org_IDs = array( create_demo_organization( $current_User->ID )->ID );
-			task_end();
+			if( $new_demo_organization = create_demo_organization( $current_User->ID ) )
+			{
+				$user_org_IDs = array( $new_demo_organization->ID );
+				task_end();
+			}
+			else
+			{
+				task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
+			}
 
-			task_begin( T_('Adding admin user to demo organization...') );
-			$current_User->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
-			task_end();
+			if( $user_org_IDs )
+			{
+				task_begin( T_('Adding admin user to demo organization...') );
+				$current_User->update_organizations( $user_org_IDs, array( 'King of Spades' ), array( 0 ), true );
+				task_end();
+			}
 		}
 	}
 
@@ -4024,8 +4177,15 @@ function install_demo_content()
 	if( $create_demo_users && $create_demo_messages )
 	{
 		task_begin( T_('Creating demo private messages...') );
-		create_demo_messages();
-		task_end();
+		$demo_messages = create_demo_messages();
+		if( $demo_messages )
+		{
+			task_end();
+		}
+		else
+		{
+			task_end( '<span class="text-danger">'.T_('Failed').'.</span>' );
+		}
 	}
 
 	$collections_installed = 0;

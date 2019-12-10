@@ -248,18 +248,29 @@ switch( $action )
 
 				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', true ) )
 				{ // Create the demo organization
-					$user_org_IDs = array( create_demo_organization( $edited_Blog->owner_user_ID )->ID );
+					if( $new_demo_organization = create_demo_organization( $edited_Blog->owner_user_ID ) )
+					{
+						$user_org_IDs = array( $new_demo_organization->ID );
+					}
 				}
 
 				// Switch locale to translate content
 				locale_temp_switch( param( 'blog_locale', 'string' ) );
 
+				$error_messages = array();
 				if( $create_demo_users )
 				{
-					get_demo_users( true, false );
+					get_demo_users( true, false, $error_messages );
 				}
 
-				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID );
+				create_sample_content( $kind, $edited_Blog->ID, $edited_Blog->owner_user_ID, true, 86400, $error_messages );
+				if( $error_messages )
+				{
+					foreach( $error_messages as $error_message )
+					{
+						$Messages->add_to_group( $error_message, 'error', TB_('Demo contents').':' );
+					}
+				}
 				locale_restore_previous();
 			}
 
