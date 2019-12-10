@@ -30,7 +30,7 @@ $Form->begin_fieldset( TD_('Confirm import') );
 
 	if( $wpxml_import_data['errors'] === false )
 	{	// Display found Item Types as selector:
-		wpxml_item_types_selector( $wpxml_import_data['XML_file_path'] );
+		wpxml_item_types_selector( $wpxml_import_data['XML_file_path'], $wpxml_import_data['temp_zip_folder_path'] );
 	}
 	else
 	{	// Display errors if import cannot be done:

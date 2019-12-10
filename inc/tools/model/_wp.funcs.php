@@ -19,10 +19,12 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *
  * @param string Path of XML/ZIP file
  * @return array Data array:
- *                 'error' - FALSE on success OR error message ,
+ *                 'error' - FALSE on success OR error message,
  *                 'XML_file_path' - Path to XML file,
  *                 'attached_files_path' - Path to attachments folder,
- *                 'temp_zip_folder_path' - Path to temp extracted ZIP files
+ *                 'temp_zip_folder_path' - Path to temp extracted ZIP files,
+ *                 'temp_zip_folder_name' - Name of temp folder for extracted ZIP files,
+ *                 'zip_file_name' - ZIP archive file name.
  */
 function wpxml_get_import_data( $XML_file_path )
 {
@@ -31,6 +33,8 @@ function wpxml_get_import_data( $XML_file_path )
 
 	$XML_file_name = basename( $XML_file_path );
 	$ZIP_folder_path = NULL;
+	$zip_file_name = NULL;
+	$temp_zip_folder_name = NULL;
 
 	// Do NOT use first found folder for attachments:
 	$use_first_folder_for_attachments = false;
@@ -45,13 +49,16 @@ function wpxml_get_import_data( $XML_file_path )
 		// Extract ZIP and check WordPress XML file
 		global $media_path;
 
+		$zip_file_name = $XML_file_name;
+
 		// $ZIP_folder_path must be deleted after import!
-		$ZIP_folder_path = $media_path.'import/temp-'.md5( rand() );
+		$temp_zip_folder_name = 'temp-'.md5( rand() );
+		$ZIP_folder_path = $media_path.'import/'.$temp_zip_folder_name;
 
 		if( unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
 		{	// If ZIP archive is unpacked successfully:
 
-			//
+			// Reset path and set only if XML file is found in ZIP archive:
 			$XML_file_path = false;
 
 			// Find valid XML file in ZIP package:
@@ -131,6 +138,8 @@ function wpxml_get_import_data( $XML_file_path )
 			'XML_file_path'        => $XML_file_path,
 			'attached_files_path'  => $attached_files_path,
 			'temp_zip_folder_path' => $ZIP_folder_path,
+			'temp_zip_folder_name' => $temp_zip_folder_name,
+			'zip_file_name'        => $zip_file_name,
 		);
 }
 
@@ -2024,6 +2033,8 @@ class ValidUTF8XMLFilter extends php_user_filter
  */
 function wpxml_info()
 {
+	evo_flush();
+
 	$wp_file = get_param( 'import_file' );
 
 	// Get data to import from wordpress XML file:
@@ -2036,7 +2047,9 @@ function wpxml_info()
 		echo '<b>'.TD_('Source ZIP').':</b> <code>'.$wp_file.'</code><br />';
 		// XML file from ZIP archive:
 		echo '<b>'.TD_('Source XML').':</b> '
-			.( empty( $wpxml_import_data['XML_file_path'] ) ? T_('Not found') : '<code>'.$wpxml_import_data['XML_file_path'].'</code>' ).'<br />';
+			.( empty( $wpxml_import_data['XML_file_path'] )
+				? T_('Not found')
+				: '<code>'.str_replace( '/'.$wpxml_import_data['temp_zip_folder_name'].'/', '/'.$wpxml_import_data['zip_file_name'].'/', $wpxml_import_data['XML_file_path'] ).'</code>' ).'<br />';
 	}
 	else
 	{	// XML file:
@@ -2044,7 +2057,12 @@ function wpxml_info()
 	}
 
 	echo '<b>'.TD_('Source attachments folder').':</b> '
-		.( empty( $wpxml_import_data['attached_files_path'] ) ? T_('Not found') : '<code>'.$wpxml_import_data['attached_files_path'].'</code>' ).'<br />';
+		.( empty( $wpxml_import_data['attached_files_path'] )
+			? T_('Not found')
+			: '<code>'.( $wpxml_import_data['temp_zip_folder_name'] === NULL
+						? $wpxml_import_data['attached_files_path']
+						: str_replace( '/'.$wpxml_import_data['temp_zip_folder_name'].'/', '/'.$wpxml_import_data['zip_file_name'].'/', $wpxml_import_data['attached_files_path'] )
+			).'</code>' ).'<br />';
 
 	$BlogCache = & get_BlogCache();
 	$Collection = $Blog = & $BlogCache->get_by_ID( get_param( 'wp_blog_ID' ) );
@@ -2082,8 +2100,9 @@ function wpxml_info()
  * Display a selector for Item Types
  *
  * @param string XML file path
+ * @param string|NULL Temporary folder of unpacked ZIP archive
  */
-function wpxml_item_types_selector( $XML_file_path )
+function wpxml_item_types_selector( $XML_file_path, $ZIP_folder_path = NULL )
 {
 	// Parse WordPress XML file into array
 	echo 'Loading & parsing the XML file...'.'<br />';
@@ -2160,6 +2179,11 @@ function wpxml_item_types_selector( $XML_file_path )
 			wpxml_display_item_type_selector( array( $no_item_types ), 'none' );
 		}
 		echo '</ul>';
+	}
+
+	if( ! empty( $ZIP_folder_path ) && file_exists( $ZIP_folder_path ) )
+	{	// This folder was created only to extract files from ZIP package, Remove it now:
+		rmdir_r( $ZIP_folder_path );
 	}
 }
 
