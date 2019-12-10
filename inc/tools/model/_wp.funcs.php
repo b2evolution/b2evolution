@@ -164,7 +164,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 	// Should we try to match <img> tags with imported attachments based on filename in post content after import?
 	$import_img = get_param( 'import_img' );
 	// Item Types relations:
-	$selected_item_types = param( 'item_types', 'array:integer' );
+	$selected_item_type_names = param( 'item_type_names', 'array:integer' );
+	$selected_item_type_usages = param( 'item_type_usages', 'array:integer' );
+	$selected_item_type_none = param( 'item_type_none', 'integer' );
 
 	$all_wp_attachments = array();
 
@@ -731,28 +733,6 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			// All other unknown statuses will be converted to 'review'
 		);
 
-		// Get post types
-		$SQL = new SQL( 'Get item types of the colleciton #'.$wp_blog_ID.' for XML import' );
-		$SQL->SELECT( 'ityp_ID, ityp_name, LOWER( ityp_usage ) AS ityp_usage' );
-		$SQL->FROM( 'T_items__type' );
-		$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_ityp_ID = ityp_ID' );
-		$SQL->WHERE( 'itc_coll_ID = '.$DB->quote( $wp_blog_ID ) );
-		$SQL->ORDER_BY( 'ityp_ID' );
-		$item_types = $DB->get_results( $SQL );
-		$item_type_names = array();
-		$item_type_usages = array();
-		foreach( $item_types as $item_type )
-		{
-			if( ! isset( $item_type_names[ $item_type->ityp_name ] ) )
-			{
-				$item_type_names[ $item_type->ityp_name ] = $item_type->ityp_ID;
-			}
-			if( ! isset( $item_type_names[ $item_type->ityp_usage ] ) )
-			{
-				$item_type_usages[ $item_type->ityp_usage ] = $item_type->ityp_ID;
-			}
-		}
-
 		echo '<p><b>'.'Importing the files from attachment posts...'.' </b>';
 		evo_flush();
 
@@ -924,24 +904,38 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 				$post_extra_cat_IDs[] = $categories['standalone-pages'];
 			}
 
-			// Set item type ID:
-			$post_type_ID = NULL;
-			if( isset( $selected_item_types[ $post['post_type'] ] ) )
-			{	// We found Item Type by usage:
-				$post_type_ID = $selected_item_types[ $post['post_type'] ];
+			// Set Item Type ID:
+			if( ! empty( $post['itemtype'] ) && isset( $selected_item_type_names[ $post['itemtype'] ] ) )
+			{	// Try to use Item Type by name:
+				$post_type_ID = $selected_item_type_names[ $post['itemtype'] ];
 				if( $post_type_ID == 0 )
 				{	// Skip Item because this was selected on the confirm form:
-					echo '<p class="text-warning"><span class="label label-warning">'.'WARNING'.'</span> '.sprintf( 'Skip Item because Item Type %s is not selected for import.', '<code>'.$post['post_type'].'</code>' ).'</p>';
+					echo '<p class="text-warning"><span class="label label-warning">'.'WARNING'.'</span> '
+						.sprintf( 'Skip Item because Item Type %s is not selected for import.',
+							'<code>&lt;evo:itemtype&gt;</code> = <code>'.$post['itemtype'].'</code>' ).'</p>';
 					continue;
 				}
 			}
-			/*elseif( isset( $item_type_names[ $post['itemtype'] ] ) )
-			{	// We found Item Type by name:
-				$post_type_ID = $item_type_names[ $post['itemtype'] ];
-			}*/
+			elseif( ! empty( $post['post_type'] ) && isset( $selected_item_type_usages[ $post['post_type'] ] ) )
+			{	// Try to use Item Type by usage:
+				$post_type_ID = $selected_item_type_usages[ $post['post_type'] ];
+				if( $post_type_ID == 0 )
+				{	// Skip Item because this was selected on the confirm form:
+					echo '<p class="text-warning"><span class="label label-warning">'.'WARNING'.'</span> '
+						.sprintf( 'Skip Item because Item Type %s is not selected for import.',
+							'<code>&lt;wp:post_type&gt;</code> = <code>'.$post['post_type'].'</code>' ).'</p>';
+					continue;
+				}
+			}
 			else
-			{	// Use default Item Type of the importing Collection:
-				$post_type_ID = $wp_Blog->get_setting( 'default_post_type' );
+			{	// Try to use Item Type without provided value sin XML:
+				$post_type_ID = $selected_item_type_none;
+				if( $post_type_ID == 0 )
+				{	// Skip Item because this was selected on the confirm form:
+					echo '<p class="text-warning"><span class="label label-warning">'.'WARNING'.'</span> '
+						.'Skip Item because you didn\'t select to import without provided item type.'.'</p>';
+					continue;
+				}
 			}
 
 			$ItemTypeCache = & get_ItemTypeCache();
@@ -2101,7 +2095,9 @@ function wpxml_item_types_selector( $XML_file_path )
 	echo '</ul>';
 	evo_flush();
 
-	$item_types = array();
+	$item_type_names = array();
+	$item_type_usages = array();
+	$no_item_types = 0;
 	if( ! empty( $xml_data['posts'] ) )
 	{	// Count items number per item type:
 		foreach( $xml_data['posts'] as $post )
@@ -2111,18 +2107,36 @@ function wpxml_item_types_selector( $XML_file_path )
 				continue;
 			}
 
-			if( ! isset( $item_types[ $post['post_type'] ] ) )
-			{
-				$item_types[ $post['post_type'] ] = 1;
+			if( ! empty( $post['itemtype'] ) )
+			{	// Use evo field Item Type name as first priority:
+				if( ! isset( $item_type_names[ $post['itemtype'] ] ) )
+				{
+					$item_type_names[ $post['itemtype'] ] = 1;
+				}
+				else
+				{
+					$item_type_names[ $post['itemtype'] ]++;
+				}
+			}
+			elseif( ! empty( $post['post_type'] ) )
+			{	// Use wp field Item Type usage as second priority:
+				if( ! isset( $item_type_usages[ $post['post_type'] ] ) )
+				{
+					$item_type_usages[ $post['post_type'] ] = 1;
+				}
+				else
+				{
+					$item_type_usages[ $post['post_type'] ]++;
+				}
 			}
 			else
-			{
-				$item_types[ $post['post_type'] ]++;
+			{	// If Item Type is not defined at all:
+				$no_item_types++;
 			}
 		}
 	}
 
-	if( empty( $item_types ) )
+	if( empty( $item_type_names ) && empty( $item_type_usages ) && $no_item_types == 0 )
 	{	// No posts:
 		echo '<p>No posts found in XML file, you can try to import other data like catefories and etc.</p>';
 	}
@@ -2137,30 +2151,67 @@ function wpxml_item_types_selector( $XML_file_path )
 
 		echo '<b>'.TD_('Select item types:').'</b>';
 		echo '<ul class="list-default controls">';
-		foreach( $item_types as $item_type => $items_num )
-		{
-			echo '<li>Import '.$items_num.' items of type <code>'.$item_type.'</code> as '
-					.'<select name="item_types['.$item_type.']" class="form-control" style="margin:2px">'
-						.'<option value="0">'.TD_('Do not import').'</option>';
-			$is_auto_selected = false;
-			$is_first_selected = false;
-			foreach( $ItemTypeCache->cache as $ItemType )
-			{
-				if( ! $is_first_selected && $ItemType->get( 'usage' ) == $item_type  )
-				{
-					$is_auto_selected = true;
-					$is_first_selected = true;
-				}
-				else
-				{
-					$is_auto_selected = false;
-				}
-				echo '<option value="'.$ItemType->ID.'"'.( $is_auto_selected ? ' selected="selected"' : '' ).'>'.$ItemType->get( 'name' ).'</option>';
-			}
-			echo '</select>'
-				.'</li>';
+		// Selector for Item Types by name:
+		wpxml_display_item_type_selector( $item_type_names, 'name' );
+		// Selector for Item Types by usage:
+		wpxml_display_item_type_selector( $item_type_usages, 'usage' );
+		if( $no_item_types > 0 )
+		{	// Selector for without provided Item Types:
+			wpxml_display_item_type_selector( array( $no_item_types ), 'none' );
 		}
 		echo '</ul>';
+	}
+}
+
+
+/**
+ * Display item type selector
+ *
+ * @param array
+ */
+function wpxml_display_item_type_selector( $item_types, $item_type_field )
+{
+	$ItemTypeCache = & get_ItemTypeCache();
+
+	foreach( $item_types as $item_type => $items_num )
+	{
+		echo '<li>';
+		switch( $item_type_field )
+		{
+			case 'name':
+				printf( '%d items with %s -> import as', $items_num, '<code>&lt;evo:itemtype&gt;</code> = <code>'.$item_type.'</code>' );
+				$form_field_name = 'item_type_names['.$item_type.']';
+				break;
+			case 'usage':
+				printf( '%d items with %s -> import as', $items_num, '<code>&lt;wp:post_type&gt;</code> = <code>'.$item_type.'</code>' );
+				$form_field_name = 'item_type_usages['.$item_type.']';
+				break;
+			case 'none':
+				printf( '%d items without provided item type -> import as', $items_num );
+				$form_field_name = 'item_type_none';
+				break;
+		}
+		echo ' <select name="'.$form_field_name.'" class="form-control" style="margin:2px">'
+					.'<option value="0">'.format_to_output( TD_('Do not import') ).'</option>';
+		$is_auto_selected = false;
+		$is_first_selected = false;
+		foreach( $ItemTypeCache->cache as $ItemType )
+		{
+			if( $item_type_field != 'none' &&
+			    ! $is_first_selected &&
+			    $ItemType->get( $item_type_field ) == $item_type )
+			{
+				$is_auto_selected = true;
+				$is_first_selected = true;
+			}
+			else
+			{
+				$is_auto_selected = false;
+			}
+			echo '<option value="'.$ItemType->ID.'"'.( $is_auto_selected ? ' selected="selected"' : '' ).'>'.format_to_output( $ItemType->get( 'name' ) ).'</option>';
+		}
+		echo '</select>'
+			.'</li>';
 	}
 }
 ?>
