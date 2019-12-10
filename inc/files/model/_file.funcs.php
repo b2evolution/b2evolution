@@ -1962,14 +1962,21 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 	while( $newFile->exists() )
 	{ // The file already exists in the target location!
 		$num_ext++;
-		$ext_pos = strrpos( $newName, '.');
+		$ext_pos = strrpos( $newName, '.' );
 		if( $num_ext == 1 )
 		{
 			if( $newFile->is_image() && $image_info == NULL )
 			{	// Get image info only for real image files:
 				$image_info = getimagesize( $newFile->get_full_path() );
 			}
-			$newName = substr_replace( $newName, '-'.$num_ext.'.', $ext_pos, 1 );
+			if( $ext_pos === false )
+			{	// If file/folder name has no '.' dot:
+				$newName .= '-'.$num_ext;
+			}
+			else
+			{
+				$newName = substr_replace( $newName, '-'.$num_ext.'.', $ext_pos, 1 );
+			}
 			if( $image_info )
 			{	// Get thumbnail of old image:
 				$oldFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
@@ -1981,6 +1988,10 @@ function check_file_exists( $fm_FileRoot, $path, $newName, $image_info = NULL )
 		}
 		else
 		{
+			if( $ext_pos === false )
+			{	// If file/folder name has no '.' dot:
+				$ext_pos = strlen( $newName );
+			}
 			$replace_length = strlen( '-'.($num_ext-1) );
 			$newName = substr_replace( $newName, '-'.$num_ext, $ext_pos-$replace_length, $replace_length );
 		}

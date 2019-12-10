@@ -1983,7 +1983,7 @@ function & wpxml_create_File( $file_source_path, $params )
 		}
 		else
 		{	// File
-			echo '<p class="text-warning">'.sprintf( 'Unable to copy file %s to %s. Please, check the permissions assigned to this folder.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
+			echo '<p class="text-warning">'.sprintf( 'Unable to copy file %s to %s. Please, check the permissions assigned to this file.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>';
 		}
 		// Skip it:
 		return $File;
