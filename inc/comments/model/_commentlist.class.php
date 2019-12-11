@@ -662,7 +662,7 @@ class CommentList2 extends DataObjectList2
 		}
 
 		// COMMENT TO SHOW:
-		if( $params['display_visibility'] && isset( $this->filters['statuses'] ) )
+		if( $params['display_visibility'] && isset( $this->filters['statuses'] ) && !$this->is_trashfilter() )
 		{
 			$exclude_statuses = array_merge( get_restricted_statuses( $this->Blog->ID, 'blog_comment!' ), array( 'redirected' ) );
 			$comment_statuses = get_visibility_statuses( '', $exclude_statuses );

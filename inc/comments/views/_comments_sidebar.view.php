@@ -70,7 +70,7 @@ echo '<div class="filter_buttons">';
 echo '</div>';
 
 // COMMENTS TO SHOW:
-if( $tab3 != 'meta' )
+if( $tab3 != 'meta' && !$CommentList->is_trashfilter() )
 { // These filters only for normal comments:
 	$fold_statuses = ( $CommentList->default_filters['statuses'] == $CommentList->filters['statuses'] );
 	$fold_expiry = ( $CommentList->default_filters['expiry_statuses'] == $CommentList->filters['expiry_statuses'] );
@@ -97,6 +97,13 @@ if( $tab3 != 'meta' )
 
 	<?php
 	$Form->end_fieldset();
+}
+elseif( $CommentList->is_trashfilter() )
+{
+	foreach( $show_statuses as $show_status )
+	{
+		$Form->hidden( $pp.'show_statuses[]', $show_status );
+	}
 }
 
 // KEYWORDS:
