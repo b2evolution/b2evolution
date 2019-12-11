@@ -18,15 +18,14 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Get data to start import from wordpress XML/ZIP file or from Item Type XML file
  *
  * @param string Path of XML/ZIP file
+ * @param boolean TRUE to allow to use already extracted ZIP archive
  * @return array Data array:
  *                 'error' - FALSE on success OR error message,
  *                 'XML_file_path' - Path to XML file,
  *                 'attached_files_path' - Path to attachments folder,
- *                 'temp_zip_folder_path' - Path to temp extracted ZIP files,
- *                 'temp_zip_folder_name' - Name of temp folder for extracted ZIP files,
- *                 'zip_file_name' - ZIP archive file name.
+ *                 'ZIP_folder_path' - Path of the extracted ZIP files.
  */
-function wpxml_get_import_data( $XML_file_path )
+function wpxml_get_import_data( $XML_file_path, $allow_use_extracted_folder = false )
 {
 	// Start to collect all printed errors from buffer:
 	ob_start();
@@ -34,7 +33,6 @@ function wpxml_get_import_data( $XML_file_path )
 	$XML_file_name = basename( $XML_file_path );
 	$ZIP_folder_path = NULL;
 	$zip_file_name = NULL;
-	$temp_zip_folder_name = NULL;
 
 	// Do NOT use first found folder for attachments:
 	$use_first_folder_for_attachments = false;
@@ -51,12 +49,22 @@ function wpxml_get_import_data( $XML_file_path )
 
 		$zip_file_name = $XML_file_name;
 
-		// $ZIP_folder_path must be deleted after import!
-		$temp_zip_folder_name = 'temp-'.md5( rand() );
-		$ZIP_folder_path = $media_path.'import/'.$temp_zip_folder_name;
+		$ZIP_folder_name = substr( $XML_file_name, 0, -4 );
+		$ZIP_folder_path = $media_path.'import/'.$ZIP_folder_name;
 
-		if( unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
-		{	// If ZIP archive is unpacked successfully:
+		$zip_folder_exists = ( file_exists( $ZIP_folder_path ) && is_dir( $ZIP_folder_path ) );
+
+		if( ! $allow_use_extracted_folder && $zip_folder_exists )
+		{	// Don't try to extract into already existing folder:
+			echo '<p class="text-danger">'.sprintf( 'The destination folder %s already exists. If you want to unzip %s again, delete %s first.',
+					'<code>'.$ZIP_folder_path.'/</code>',
+					'<code>'.$XML_file_name.'</code>',
+					'<code>'.$ZIP_folder_path.'/</code>'
+				).'</p>';
+		}
+		elseif( ( $allow_use_extracted_folder && $zip_folder_exists ) ||
+		        unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
+		{	// If we can use already extracted ZIP archive or it is unpacked successfully now:
 
 			// Reset path and set only if XML file is found in ZIP archive:
 			$XML_file_path = false;
@@ -137,9 +145,7 @@ function wpxml_get_import_data( $XML_file_path )
 			'errors'               => empty( $errors ) ? false : $errors,
 			'XML_file_path'        => $XML_file_path,
 			'attached_files_path'  => $attached_files_path,
-			'temp_zip_folder_path' => $ZIP_folder_path,
-			'temp_zip_folder_name' => $temp_zip_folder_name,
-			'zip_file_name'        => $zip_file_name,
+			'ZIP_folder_path'      => $ZIP_folder_path,
 		);
 }
 
@@ -1335,11 +1341,6 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 		echo '<b>'.sprintf( '%d records', $comments_count ).'</b></p>';
 	}
 
-	if( ! empty( $ZIP_folder_path ) && file_exists( $ZIP_folder_path ) )
-	{	// This folder was created only to extract files from ZIP package, Remove it now:
-		rmdir_r( $ZIP_folder_path );
-	}
-
 	echo '<p class="text-success">'.'Import complete.'.'</p>';
 
 	$DB->commit();
@@ -2033,65 +2034,83 @@ class ValidUTF8XMLFilter extends php_user_filter
 /**
  * Display info for the wordpress importer
  *
+ * @param boolean TRUE to allow to use already extracted ZIP archive
  * @return array Data of the parsed XML file, @see wpxml_get_import_data()
  */
-function wpxml_info()
+function wpxml_info( $allow_use_extracted_folder = false )
 {
 	evo_flush();
 
-	$wp_file = get_param( 'import_file' );
-
-	// Get data to import from wordpress XML file:
-	$wpxml_import_data = wpxml_get_import_data( $wp_file );
-
 	echo '<p>';
 
+	$wp_file = get_param( 'import_file' );
+
 	if( preg_match( '/\.zip$/i', $wp_file ) )
-	{	// ZIP archive:
-		echo '<b>'.TD_('Source ZIP').':</b> <code>'.$wp_file.'</code><br />';
-		// XML file from ZIP archive:
-		echo '<b>'.TD_('Source XML').':</b> '
-			.( empty( $wpxml_import_data['XML_file_path'] )
+	{	// Inform about unzipping before start this in wpxml_get_import_data():
+		$zip_folder_path = substr( $wp_file, 0, -4 );
+		if( ! $allow_use_extracted_folder ||
+		    ! file_exists( $zip_folder_path ) ||
+		    ! is_dir( $zip_folder_path ) )
+		{
+			echo '<b>'.TB_('Unzipping ZIP').':</b> <code>'.$wp_file.'</code>...<br />';
+			evo_flush();
+		}
+	}
+
+	// Get data to import from wordpress XML file:
+	$wpxml_import_data = wpxml_get_import_data( $wp_file, $allow_use_extracted_folder );
+
+	if( $wpxml_import_data['errors'] === false )
+	{
+		if( preg_match( '/\.zip$/i', $wp_file ) )
+		{	// ZIP archive:
+			echo '<b>'.TB_('Source ZIP').':</b> <code>'.$wp_file.'</code><br />';
+			// XML file from ZIP archive:
+			echo '<b>'.TB_('Source XML').':</b> '
+				.( empty( $wpxml_import_data['XML_file_path'] )
+					? T_('Not found')
+					: '<code>'.$wpxml_import_data['XML_file_path'].'</code>' ).'<br />';
+		}
+		else
+		{	// XML file:
+			echo '<b>'.TB_('Source XML').':</b> <code>'.$wp_file.'</code><br />';
+		}
+
+		echo '<b>'.TB_('Source attachments folder').':</b> '
+			.( empty( $wpxml_import_data['attached_files_path'] )
 				? T_('Not found')
-				: '<code>'.str_replace( '/'.$wpxml_import_data['temp_zip_folder_name'].'/', '/'.$wpxml_import_data['zip_file_name'].'/', $wpxml_import_data['XML_file_path'] ).'</code>' ).'<br />';
+				: '<code>'.$wpxml_import_data['attached_files_path'].'</code>' ).'<br />';
+
+		$BlogCache = & get_BlogCache();
+		$Collection = $Blog = & $BlogCache->get_by_ID( get_param( 'wp_blog_ID' ) );
+		$wpxml_import_data['Blog'] = & $Blog;
+		echo '<b>'.TB_('Destination collection').':</b> '.$Blog->dget( 'shortname' ).' &ndash; '.$Blog->dget( 'name' ).'<br />';
+
+		echo '<b>'.TB_('Import mode').':</b> ';
+		switch( get_param( 'import_type' ) )
+		{
+			case 'append':
+				echo TB_('Append to existing contents');
+				break;
+			case 'replace':
+				echo TB_('Replace existing contents').' <span class="note">'.TB_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.').'</span>';
+				if( get_param( 'delete_files' ) )
+				{
+					echo '<br /> &nbsp; &nbsp; [√] '.TB_(' Also delete media files that will no longer be referenced in the destination collection after replacing its contents');
+				}
+				break;
+		}
+		echo '<br />';
+
+		if( get_param( 'import_img' ) )
+		{
+			echo '<b>'.TB_('Options').':</b> [√] '.TB_('Try to match any remaining <code>&lt;img&gt;</code> tags with imported attachments based on filename');
+		}
 	}
 	else
-	{	// XML file:
-		echo '<b>'.TD_('Source XML').':</b> <code>'.$wp_file.'</code><br />';
-	}
-
-	echo '<b>'.TD_('Source attachments folder').':</b> '
-		.( empty( $wpxml_import_data['attached_files_path'] )
-			? T_('Not found')
-			: '<code>'.( $wpxml_import_data['temp_zip_folder_name'] === NULL
-						? $wpxml_import_data['attached_files_path']
-						: str_replace( '/'.$wpxml_import_data['temp_zip_folder_name'].'/', '/'.$wpxml_import_data['zip_file_name'].'/', $wpxml_import_data['attached_files_path'] )
-			).'</code>' ).'<br />';
-
-	$BlogCache = & get_BlogCache();
-	$Collection = $Blog = & $BlogCache->get_by_ID( get_param( 'wp_blog_ID' ) );
-	$wpxml_import_data['Blog'] = & $Blog;
-	echo '<b>'.TD_('Destination collection').':</b> '.$Blog->dget( 'shortname' ).' &ndash; '.$Blog->dget( 'name' ).'<br />';
-
-	echo '<b>'.TD_('Import mode').':</b> ';
-	switch( get_param( 'import_type' ) )
-	{
-		case 'append':
-			echo TD_('Append to existing contents');
-			break;
-		case 'replace':
-			echo TD_('Replace existing contents').' <span class="note">'.TD_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.').'</span>';
-			if( get_param( 'delete_files' ) )
-			{
-				echo '<br /> &nbsp; &nbsp; [√] '.TD_(' Also delete media files that will no longer be referenced in the destination collection after replacing its contents');
-			}
-			break;
-	}
-	echo '<br />';
-
-	if( get_param( 'import_img' ) )
-	{
-		echo '<b>'.TD_('Options').':</b> [√] '.TD_('Try to match any remaining <code>&lt;img&gt;</code> tags with imported attachments based on filename');
+	{	// Display errors if import cannot be done:
+		echo $wpxml_import_data['errors'];
+		echo '<br /><p class="text-danger">'.T_('Import failed.').'</p>';
 	}
 
 	echo '</p>';
@@ -2172,7 +2191,7 @@ function wpxml_item_types_selector( $XML_file_path, $ZIP_folder_path = NULL )
 		$SQL->WHERE( 'itc_coll_ID = '.get_param( 'wp_blog_ID' ) );
 		$ItemTypeCache->load_by_sql( $SQL );
 
-		echo '<b>'.TD_('Select item types:').'</b>';
+		echo '<b>'.TB_('Select item types:').'</b>';
 		echo '<ul class="list-default controls">';
 		// Selector for Item Types by name:
 		wpxml_display_item_type_selector( $item_type_names, 'name' );
@@ -2183,11 +2202,6 @@ function wpxml_item_types_selector( $XML_file_path, $ZIP_folder_path = NULL )
 			wpxml_display_item_type_selector( array( $no_item_types ), 'none' );
 		}
 		echo '</ul>';
-	}
-
-	if( ! empty( $ZIP_folder_path ) && file_exists( $ZIP_folder_path ) )
-	{	// This folder was created only to extract files from ZIP package, Remove it now:
-		rmdir_r( $ZIP_folder_path );
 	}
 }
 
@@ -2220,7 +2234,7 @@ function wpxml_display_item_type_selector( $item_types, $item_type_field )
 				break;
 		}
 		echo ' <select name="'.$form_field_name.'" class="form-control" style="margin:2px">'
-					.'<option value="0">'.format_to_output( TD_('Do not import') ).'</option>';
+					.'<option value="0">'.format_to_output( TB_('Do not import') ).'</option>';
 		$is_auto_selected = false;
 		$is_first_selected = false;
 		foreach( $ItemTypeCache->cache as $ItemType )

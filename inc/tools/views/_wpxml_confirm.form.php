@@ -23,26 +23,22 @@ $Form->hidden_ctrl();
 $Form->hidden( 'action', 'import' );
 $Form->hiddens_by_key( get_memorized( 'blog' ) );
 
-$Form->begin_fieldset( TD_('Confirm import') );
+$Form->begin_fieldset( TB_('Confirm import') );
 
 	// Display info for the wordpress importer:
 	$wpxml_import_data = wpxml_info();
 
+	$form_buttons = array();
+
 	if( $wpxml_import_data['errors'] === false )
 	{	// Display found Item Types as selector:
-		wpxml_item_types_selector( $wpxml_import_data['XML_file_path'], $wpxml_import_data['temp_zip_folder_path'] );
-	}
-	else
-	{	// Display errors if import cannot be done:
-		echo $wpxml_import_data['errors'];
-		echo '<br /><p class="text-danger">'.T_('Import failed.').'</p>';
+		wpxml_item_types_selector( $wpxml_import_data['XML_file_path'], $wpxml_import_data['ZIP_folder_path'] );
+		$form_buttons[] = array( 'submit', 'submit', T_('Confirm import'), 'SaveButton' );
 	}
 
 $Form->end_fieldset();
 
-$Form->buttons( array(
-		array( 'submit', 'submit', T_('Confirm import'), 'SaveButton' ),
-	) );
+$Form->buttons( $form_buttons );
 
 $Form->end_form();
 

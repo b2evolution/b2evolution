@@ -22,23 +22,19 @@ $Form->begin_form( 'fform', T_('WordPress XML Importer') );
 $Form->begin_fieldset( T_('Report of the import') );
 
 	// Display info for the wordpress importer:
-	$wpxml_import_data = wpxml_info();
+	$wpxml_import_data = wpxml_info( true );
+
+	$form_buttons = array();
 
 	if( $wpxml_import_data['errors'] === false )
 	{	// Import the data and display a report on the screen:
-		wpxml_import( $wpxml_import_data['XML_file_path'], $wpxml_import_data['attached_files_path'], $wpxml_import_data['temp_zip_folder_path'] );
-	}
-	else
-	{	// Display errors if import cannot be done:
-		echo $wpxml_import_data['errors'];
-		echo '<br /><p class="text-danger">'.T_('Import failed.').'</p>';
+		wpxml_import( $wpxml_import_data['XML_file_path'], $wpxml_import_data['attached_files_path'], $wpxml_import_data['ZIP_folder_path'] );
+		$form_buttons[] = array( 'button', 'button', T_('Go to collection').' >>', 'SaveButton', 'onclick' => 'location.href=\''.$wpxml_import_data['Blog']->get( 'url' ).'\'' );
 	}
 
 $Form->end_fieldset();
 
-$Form->buttons( array(
-		array( 'button', 'button', T_('Go to collection').' >>', 'SaveButton', 'onclick' => 'location.href=\''.$wpxml_import_data['Blog']->get( 'url' ).'\'' ),
-	) );
+$Form->buttons( $form_buttons );
 
 $Form->end_form();
 
