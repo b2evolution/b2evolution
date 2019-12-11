@@ -632,7 +632,7 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 			if( ! empty( $categories[ (string) $cat['category_nicename'] ] ) )
 			{
-				echo '<span class="text-warning">'.sprintf( 'Skip because category #%d already exists with same slug %s.', intval( $categories[ (string) $cat['category_nicename'] ] ), '<code>'.$cat['category_nicename'].'</code>' ).'</span>';
+				echo '<span class="text-warning">'.sprintf( 'Skip creating, use existing category #%d with same slug %s.', intval( $categories[ (string) $cat['category_nicename'] ] ), '<code>'.$cat['category_nicename'].'</code>' ).'</span>';
 			}
 			else
 			{
