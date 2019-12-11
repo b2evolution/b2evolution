@@ -324,24 +324,67 @@ switch( $action )
 		// Get PO file for that edit_locale:
 		$AdminUI->append_to_titlearea( sprintf( T_('Extracting language file for %s...'), '<b>'.$edit_locale.'</b>' ) );
 
-		$po_file = $locales_path.$locales[$edit_locale]['messages'].'/LC_MESSAGES/messages.po';
-		if( ! is_file( $po_file ) )
+		$error = false;
+		$po_files['global']       = $locales_path.$locales[$edit_locale]['messages'].'/LC_MESSAGES/messages.po';
+		$po_files['backoffice']    = $locales_path.$locales[$edit_locale]['messages'].'/LC_MESSAGES/messages-backoffice.po';
+		$po_files['demo_contents'] = $locales_path.$locales[$edit_locale]['messages'].'/LC_MESSAGES/messages-demo-contents.po';
+		foreach( $po_files as $po_file )
 		{
-			$Messages->add( sprintf(T_('File <code>%s</code> not found.'), '/'.$locales_subdir.$locales[$edit_locale]['messages'].'/LC_MESSAGES/messages.po'), 'error' );
+			if( ! is_file( $po_file ) )
+			{
+				$Messages->add( sprintf(T_('File <code>%s</code> not found.'), '/'.$locales_subdir.$locales[$edit_locale]['messages'].'/LC_MESSAGES/messages.po'), 'error' );
+				$error = true;
+			}
+		}
+		if( $error )
+		{
 			break;
 		}
 
-		$outfile = $locales_path.$locales[$edit_locale]['messages'].'/_global.php';
-		if( file_exists( $outfile ) && ( !is_writable( $outfile ) ) )
+		$outfiles['global'] = array(
+				'file'   => $locales_path.$locales[$edit_locale]['messages'].'/_global.php',
+				'title'  => 'Global lang file',
+				'source' => $po_files['global'],
+				'type'   => 'global',
+			);
+
+		$outfiles['backoffice'] = array(
+				'file'   => $locales_path.$locales[$edit_locale]['messages'].'/_back-office.php',
+				'title'  => 'Back-Office lang file',
+				'source' => $po_files['backoffice'],
+				'type'   => 'backoffice',
+			);
+
+		$outfiles['demo_contents'] = array(
+				'file'   => $locales_path.$locales[$edit_locale]['messages'].'/_demo-contents.php',
+				'title'  => 'Demo Contents lang file',
+				'source' => $po_files['demo_contents'],
+				'type'   => 'demo_content',
+			);
+
+		foreach( $outfiles as $key => $outfile )
+		if( file_exists( $outfile['file'] ) && ( !is_writable( $outfile['file'] ) ) )
 		{ // The '_global.php' file exists but it is not writable
-			$Messages->add( sprintf( T_('The file %s is not writable.'), '<b>'.$outfile.'</b>' ) );
+			$Messages->add( sprintf( T_('The file %s is not writable.'), '<b>'.$outfile['file'].'</b>' ) );
+			$error = true;
+		}
+		if( $error )
+		{
 			break;
 		}
 
 		load_class( 'locales/_pofile.class.php', 'POFile' );
-		$POFile = new POFile($po_file);
-		$POFile->read(true); // adds info about sources to $Messages
-		$POFile->write_evo_trans($outfile, $locales[$edit_locale]['messages']);
+
+		foreach( $outfiles as $key => $outfile )
+		{
+			$POFile = new POFile( $outfile['source'] );
+			$POFile->read( true ); // adds info about sources to $Messages
+			$POFile->write_evo_trans( $outfile['file'], $locales[$edit_locale]['messages'], array(
+					'title'  => $outfile['title'],
+					'source' => basename( $outfile['source'] ),
+					'type'   => $outfile['type'],
+				) );
+		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=locales'.( $loc_transinfo ? '&loc_transinfo=1' : '' ), 303 ); // Will EXIT

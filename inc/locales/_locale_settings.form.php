@@ -247,7 +247,7 @@ else
 	if( $loc_transinfo )
 	{
 		global $messages_pot_file_info;
-		$messages_pot_file_info = locale_file_po_info( $locales_path.'messages.pot' );
+		$messages_pot_file_info['messages.pot'] = locale_file_po_info( $locales_path.'messages.pot' );
 		$messages_DB_info = $DB->get_var( 'SELECT COUNT(iost_ID) FROM T_i18n_original_string' );
 
 		echo '<a href="'.$pagenow.'?ctrl=locales&amp;loc_transinfo=0">' . T_('Hide translation info'), '</a><br /><br />';
@@ -257,7 +257,7 @@ else
 		$button_import_POT_file = $Form->button( array( 'submit', 'actionArray[import_pot]', T_('(Re)import POT file'), 'SaveButton' ) );
 		$Form->output = true;
 		echo sprintf( T_('# strings in .POT file: %s - # strings in DB: %s '),
-				$messages_pot_file_info['all'].' '.$button_generate_POT_file,
+				$messages_pot_file_info['messages.pot']['all'].' '.$button_generate_POT_file,
 				$messages_DB_info.' '.$button_import_POT_file
 			).'<br />';
 		if( $current_User->check_perm( 'options', 'edit' ) && !$allow_po_extraction )
@@ -277,40 +277,54 @@ else
 
 	?>
 	<tr>
-		<th class="firstcol"><?php echo T_('Locale') ?></th>
-		<th><?php echo T_('Enabled') ?></th>
-		<th><?php echo T_('Name') ?></th>
-		<th><?php echo T_('Charset') ?></th>
-		<th><?php echo T_('Date fmt') ?></th>
-		<th><?php echo T_('Long date fmt') ?></th>
-		<th><?php echo T_('Extended date fmt') ?></th>
-		<th><?php echo T_('Input date fmt') ?></th>
-		<th><?php echo T_('Time fmt') ?></th>
-		<th><?php echo T_('Short time fmt') ?></th>
-		<th><?php echo T_('Input time fmt') ?></th>
-		<th title="<?php echo T_('Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc');
+		<th class="firstcol"<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Locale') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Enabled') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Name') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Charset') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Date fmt') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Long date fmt') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Extended date fmt') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Input date fmt') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Time fmt') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Short time fmt') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Input time fmt') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?> title="<?php echo T_('Day at the start of the week: 0 for Sunday, 1 for Monday, 2 for Tuesday, etc');
 			?>"><?php echo T_('Start of week') ?></th>
-		<th><?php echo T_('Priority') ?></th>
+		<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Priority') ?></th>
 		<?php if( $current_User->check_perm( 'options', 'edit' ) )
 		{ ?>
-			<th><?php echo T_('Edit') ?></th>
+			<th<?php echo $loc_transinfo ? ' rowspan="2"' : '';?>><?php echo T_('Edit') ?></th>
 			<?php
 		}
 		if( $loc_transinfo )
 		{
 			?>
-			<th><?php echo T_('Strings') ?></th>
-			<th><?php echo T_('Translated') ?></th>
+			<th colspan="2"><?php echo T_('General') ?></th>
+			<th colspan="2"><?php echo T_('Back-office') ?></th>
+			<th colspan="2"><?php echo T_('Demo contents') ?></th>
 			<?php
 			if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
 			{
-				echo '<th class="lastcol">'.T_('Extract').'</th>';
+				echo '<th rowspan="2" class="lastcol">'.T_('Extract').'</th>';
 			}
 		} ?>
 	</tr>
-
-
 	<?php
+	if( $loc_transinfo )
+	{
+		?>
+		<tr>
+			<th><?php echo T_('Strings') ?></th>
+			<th><?php echo T_('Translated') ?></th>
+			<th><?php echo T_('Strings') ?></th>
+			<th><?php echo T_('Translated') ?></th>
+			<th><?php echo T_('Strings') ?></th>
+			<th><?php echo T_('Translated') ?></th>
+		</tr>
+		<?php
+	}
+
+
 	$i = 0; // counter to distinguish POSTed locales later
 	foreach( $locales as $lkey => $locale_data )
 	{
@@ -526,21 +540,30 @@ else
 		if( $loc_transinfo )
 		{ // Show translation info:
 			// Get PO file for that locale:
-			$po_file = $locales_path.$locale_data['messages'].'/LC_MESSAGES/messages.po';
-			if( ! is_file( $po_file ) )
+			$po_files = array(
+					'global'        => 'messages.po',
+					'backoffice'    => 'messages-backoffice.po',
+					'demo_contents' => 'messages-demo-contents.po',
+				);
+
+			foreach( $po_files as $key => $po_file )
 			{
-				echo '<td class="lastcol center" colspan="'.(2 + (int)($current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction)).'"><a href="?ctrl=translation&edit_locale='.$lkey.'">'.T_('No PO file').'</a></td>';
-			}
-			else
-			{ // File exists:
-				$po_file_info = locale_file_po_info( $po_file, true );
+				$po_file = $locales_path.$locale_data['messages'].'/LC_MESSAGES/'.$po_file;
+				if( ! is_file( $po_file ) )
+				{
+					echo '<td class="lastcol center" colspan="'.(1 + (int)($current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction)).'"><a href="?ctrl=translation&edit_locale='.$lkey.'">'.T_('No PO file').'</a></td>';
+				}
+				else
+				{ // File exists:
+					$po_file_info = locale_file_po_info( $po_file, true );
 
-				// $all=$translated+$fuzzy+$untranslated;
-				echo "\n\t".'<td class="center">'.$po_file_info['all'].'</td>';
+					// $all=$translated+$fuzzy+$untranslated;
+					echo "\n\t".'<td class="center">'.$po_file_info['all'].'</td>';
 
-				$percent_done = $po_file_info['percent'];
-				$color = sprintf( '%02x%02x00', 255 - round( $percent_done * 2.55 ), round( $percent_done * 2.55 ) );
-				echo "\n\t<td class=\"center\" style=\"background-color:#". $color . "\"><a href=\"?ctrl=translation&edit_locale=".$lkey."\">".sprintf( T_('%d%% in PO'), $percent_done )."</a></td>";
+					$percent_done = $po_file_info['percent'];
+					$color = sprintf( '%02x%02x00', 255 - round( $percent_done * 2.55 ), round( $percent_done * 2.55 ) );
+					echo "\n\t<td class=\"center\" style=\"background-color:#". $color . "\"><a href=\"?ctrl=translation&edit_locale=".$lkey."\">".sprintf( T_('%d%% in PO'), $percent_done )."</a></td>";
+				}
 			}
 
 			if( $current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction )
@@ -549,6 +572,10 @@ else
 				{
 					echo "\n\t".'<td class="lastcol">[<a href="'.$pagenow.'?ctrl=locales&amp;action=extract&amp;edit_locale='.$lkey
 					.( $loc_transinfo ? '&amp;loc_transinfo=1' : '' ).'&amp;'.url_crumb( 'locales' ).'" title="'.T_('Extract .po file into b2evo-format').'">'.T_('Extract').'</a>]</td>';
+				}
+				else
+				{
+					echo '<td></td>';
 				}
 			}
 		} // show message file percentage/extraction

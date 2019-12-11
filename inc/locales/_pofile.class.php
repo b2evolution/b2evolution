@@ -22,7 +22,7 @@ class POFile
 {
 	var $msgids = array();
 
-	function __construct($filename=null)
+	function __construct( $filename=nulll )
 	{
 		// We probably don't need the windows backslashes replacing any more but leave it for safety because it doesn't hurt:
 		$this->filename = str_replace( '\\', '/', $filename );
@@ -201,9 +201,8 @@ class POFile
 			$list_counts = '';
 			foreach( $loc_vars as $source => $c )
 			{
-				$list_counts .= "\n<li>$source = $c</li>";
+				$Messages->add_to_group( "<code>${source}</code>: ${c}", 'note', sprintf( TB_('Sources and number of strings (%s):'), '<code>'.basename( $this->filename ).'</code>' ) );
 			}
-			$Messages->add( 'Sources and number of strings: <ul>'.$list_counts.'</ul>', 'note' );
 		}
 
 		return $this->msgids;
@@ -215,7 +214,7 @@ class POFile
 	 *
 	 * @return true|string True on success, string with error on failure
 	 */
-	function write_evo_trans($file_path, $locale)
+	function write_evo_trans( $file_path, $locale, $params = array() )
 	{
 		$fp = fopen( $file_path, 'w+' );
 
@@ -224,16 +223,28 @@ class POFile
 			return "Could not open $file_path for writing!";
 		}
 
+		$params = array_merge( array(
+				'title'   => 'Global lang file',
+				'source'  => 'messages.po',
+				'type'    => 'global',
+			), $params );
+
 		fwrite( $fp, "<?php\n" );
 		fwrite( $fp, "/*\n" );
-		fwrite( $fp, " * Global lang file\n" );
-		fwrite( $fp, " * This file was generated automatically from messages.po\n" );
+		fwrite( $fp, " * ".$params['title']."\n" );
+		fwrite( $fp, " * This file was generated automatically from ".$params['source']."\n" );
 		fwrite( $fp, " */\n" );
 		fwrite( $fp, "if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );" );
 		fwrite( $fp, "\n\n" );
 
-
-		fwrite( $fp, '$trans[\''.$locale."'] = array(\n" );
+		if( $params['type'] == 'global' )
+		{
+			fwrite( $fp, '$trans[\''.$locale."'] = array(\n" );
+		}
+		else
+		{
+			fwrite( $fp, '$trans[\''.$locale."']['".$params['type']."'] = array(\n" );
+		}
 
 		// Write meta/format info:
 		$charset = 'utf-8'; // default
@@ -250,7 +261,7 @@ class POFile
 		{
 			$msgstr = $msginfo['trans'];
 
-			fwrite( $fp, POFile::quote($msgid).' => '.POFile::quote($msgstr).",\n" );
+			fwrite( $fp, POFile::quote( $msgid ).' => '.POFile::quote( $msgstr ).",\n" );
 		}
 		fwrite( $fp, "\n);\n?>" );
 		fclose( $fp );

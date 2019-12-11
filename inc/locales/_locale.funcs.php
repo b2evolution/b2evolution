@@ -66,6 +66,7 @@ if( isset( $use_l10n ) && $use_l10n )
 								'ext_transarray' => NULL,
 								'alt_basedir'    => '',
 								'for_helper'     => false,
+								'add_transarray' => NULL,
 								), $params );
 
 		if( empty( $req_locale ) )
@@ -156,6 +157,73 @@ if( isset( $use_l10n ) && $use_l10n )
 			}
 		}
 
+		if( ! empty( $params['add_transarray'] ) && ! isset( $trans[ $messages ][ $params['add_transarray'] ] ) )
+		{ // Additional translations for current locale have not yet been loaded:
+			$Debuglog->add( 'We need to load additional translation file to translate: "'. $string.'"', 'locale' );
+
+			switch( $params['add_transarray'] )
+			{
+				case 'backoffice':
+					$trans_file_name = '_back-office.php';
+					break;
+
+				case 'demo_contents':
+					$trans_file_name = '_demo-contents.php';
+					break;
+
+				default:
+					$trans_file_name = $params['add_transarray'];
+			}
+
+			if ( $params['alt_basedir'] != '' )
+			{	// Load the translation file from the alternative base dir:
+				//$Debuglog->add( 'Using alternative basedir ['.$params['alt_basedir'].']', 'locale' );
+				$path = $params['alt_basedir'].'/locales/'.$messages.'/'.$trans_file_name;
+			}
+			else
+			{	// Load our additional translation file.
+				$path = $locales_path.$messages.'/'.$trans_file_name;
+			}
+
+			if( file_exists($path) && is_readable($path) )
+			{
+				$Debuglog->add( 'T_: Loading additional file: '.$path, 'locale' );
+				include_once $path;
+			}
+			else
+			{
+				$Debuglog->add( 'T_: Messages file does not exist or is not readable: '.$path, 'locale' );
+			}
+			if( ! isset( $trans[ $messages ][ $params['add_transarray'] ] ) )
+			{ // Still not loaded... file doesn't exist, memorize that no translations are available
+				// echo 'file not found!';
+				$trans[ $messages ][ $params['add_transarray'] ] = array();
+			}
+			else
+			{
+				if( ! isset($trans[$messages][ $params['add_transarray'] ]['__meta__']) )
+				{ // Unknown/old messages format (< version 1):
+					$Debuglog->add( 'Found deprecated messages format (no __meta__ info).', 'locale' );
+					// Translate keys (e.g. 'foo\nbar') to real strings ("foo\nbar")
+					// Doing this here for all strings, is actually faster than doing it on key lookup (like it has been done before always)
+					foreach($trans[$messages][ $params['add_transarray'] ] as $k => $v)
+					{
+						if( ($pos = strpos($k, '\\')) === false )
+						{ // fast-path-skip
+							continue;
+						}
+						// Replace string as done in the good old days:
+						$new_k = str_replace( array('\n', '\r', '\t'), array("\n", "\r", "\t"), $k );
+						if( $new_k != $k )
+						{
+							$trans[$messages][ $params['add_transarray'] ][$new_k] = $v;
+							unset($trans[$messages][ $params['add_transarray'] ][$k]);
+						}
+					}
+				}
+			}
+		}
+
 		// sam2kb> b2evolution creates _global.php files with "\n" line breaks, and we must normalize newlines
 		// in supplied string before trying to translate it. Otherwise strings won't match.
 		// fp> TODO: this is not really satisfying in the long term. We need our own
@@ -164,7 +232,30 @@ if( isset( $use_l10n ) && $use_l10n )
 		// That way translators can concentrate on the most essential stuff first.
 		$search_string = str_replace( array("\r\n", "\r"), "\n", $string );
 
-		if( isset( $trans[ $messages ][ $search_string ] ) )
+		if( ! empty( $params['add_transarray'] ) && isset( $trans[ $messages ][ $params['add_transarray'] ][ $search_string ] ) )
+		{ // If the string has been translated:
+			//$Debuglog->add( 'String ['.$string.'] found', 'locale' );
+			$r = $trans[ $messages ][ $params['add_transarray'] ][ $search_string ];
+			if( isset($trans[$messages][ $params['add_transarray'] ]['__meta__']['charset']) )
+			{ // new format: charset in meta data:
+				$messages_charset = $trans[$messages][ $params['add_transarray'] ]['__meta__']['charset'];
+			}
+			else
+			{ // old format.. extract charset from content type or fall back to setting from global locale definition:
+				$meta = $trans[$messages][ $params['add_transarray'] ][''];
+				if( preg_match( '~^Content-Type: text/plain; charset=(.*);?$~m', $meta, $match ) )
+				{
+					$messages_charset = $match[1];
+				}
+				else
+				{
+					$messages_charset = $locales[$req_locale]['charset'];
+				}
+				// Set it accordingly to new format.
+				$trans[$messages][ $params['add_transarray'] ]['__meta__']['charset'] = $messages_charset;
+			}
+		}
+		elseif( isset( $trans[ $messages ][ $search_string ] ) )
 		{ // If the string has been translated:
 			//$Debuglog->add( 'String ['.$string.'] found', 'locale' );
 			$r = $trans[ $messages ][ $search_string ];
@@ -216,6 +307,38 @@ if( isset( $use_l10n ) && $use_l10n )
 		return $r;
 	}
 
+	/**
+	 * Translate strings in Back-office UI.
+	 *
+	 * @param string String to translate
+	 * @return string The translated string
+	 */
+	function TB_( $string, $req_locale = '', $params = array() )
+	{
+		$params = array_merge( array(
+				'add_transarray' => 'backoffice',
+			), $params );
+
+		return T_( $string, $req_locale, $params );
+	}
+
+
+	/**
+	 * Translate strings in demo/sample contents.
+	 *
+	 * @param string String to translate
+	 * @return string The translated string
+	 */
+	function TD_( $string )
+	{
+		// TODO: Later we will make a specific .POT file containing ONLY demo contents.
+		$params = array_merge( array(
+			'add_transarray' => 'demo_contents',
+		), $params );
+
+		return T_( $string, $req_locale, $params );
+	}
+
 }
 else
 { // We are not localizing at all:
@@ -224,6 +347,24 @@ else
 	 * @ignore
 	 */
 	function T_( $string, $req_locale = '', $params = array() )
+	{
+		return $string;
+	}
+
+
+	/**
+	 * @ignore
+	 */
+	function TB_( $string, $req_locale = '', $params = array() )
+	{
+		return $string;
+	}
+
+
+	/**
+	 * @ignore
+	 */
+	function TD_( $string, $req_locale = '', $params = array() )
 	{
 		return $string;
 	}
@@ -244,30 +385,6 @@ else
 function TS_( $string, $req_locale = '', $params = array() )
 {
 	return str_replace( "'", "\\'", T_( $string, $req_locale, $params ) );
-}
-
-
-/**
- * Translate strings in demo/sample contents.
- *
- * @param string String to translate
- * @return string The translated string
- */
-function TD_( $string )
-{
-	// TODO: Later we will make a specific .POT file containing ONLY demo contents.
-	return T_($string);
-}
-
-/**
- * Translate strings in Back-office UI.
- *
- * @param string String to translate
- * @return string The translated string
- */
-function TB_( $string )
-{
-	return T_($string);
 }
 
 
@@ -1540,7 +1657,9 @@ function locale_file_po_info( $po_file_name, $calc_percent_done = false )
 
 	if( $calc_percent_done )
 	{
-		$info['percent'] = locale_file_po_percent_done( $info );
+		$po_path_info    = pathinfo( $po_file_name );
+		$pot_file_name   = $po_path_info['filename'].'.pot';
+		$info['percent'] = locale_file_po_percent_done( $info, $pot_file_name );
 	}
 
 	return $info;
@@ -1553,17 +1672,17 @@ function locale_file_po_info( $po_file_name, $calc_percent_done = false )
  * @param array File info (see result of the function locale_file_po_info() )
  * @return integer Percent
  */
-function locale_file_po_percent_done( $po_file_info )
+function locale_file_po_percent_done( $po_file_info, $pot_file )
 {
 	global $messages_pot_file_info;
 
-	if( !isset( $messages_pot_file_info ) )
+	if( !isset( $messages_pot_file_info[$pot_file] ) )
 	{	// Initialize a file info for the main language file if it doesn't yet set
 		global $locales_path;
-		$messages_pot_file_info = locale_file_po_info( $locales_path.'messages.pot' );
+		$messages_pot_file_info[$pot_file] = locale_file_po_info( $locales_path.$pot_file );
 	}
 
-	$percent_done = ( $messages_pot_file_info['all'] > 0 ) ? round( ( $po_file_info['translated'] - $po_file_info['fuzzy'] / 2 ) / $messages_pot_file_info['all'] * 100 ) : 0;
+	$percent_done = ( $messages_pot_file_info[$pot_file]['all'] > 0 ) ? round( ( $po_file_info['translated'] - $po_file_info['fuzzy'] / 2 ) / $messages_pot_file_info[$pot_file]['all'] * 100 ) : 0;
 
 	return $percent_done;
 }
