@@ -329,7 +329,7 @@ if( isset( $use_l10n ) && $use_l10n )
 	 * @param string String to translate
 	 * @return string The translated string
 	 */
-	function TD_( $string )
+	function TD_( $string, $req_locale = '', $params = array() )
 	{
 		// TODO: Later we will make a specific .POT file containing ONLY demo contents.
 		$params = array_merge( array(
