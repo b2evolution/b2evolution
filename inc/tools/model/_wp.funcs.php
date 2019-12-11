@@ -1168,7 +1168,11 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						}
 						if( ! $file_is_linked )
 						{	// If file could not be linked to the post:
-							echo '<p class="text-warning">'.sprintf( 'File of image url %s could not be attached to this post because it is not found in the source attachments folder.', '<code>'.$img_url.'</code>' ).'</p>';
+							echo '<p class="text-warning">'.sprintf( 'File of img src=%s could not be attached to this post because the name %s does not match any %s or %s.',
+								'<code>'.$img_url.'</code>',
+								'<code>'.$img_file_name.'</code>',
+								'<code>&lt;evo:file&gt;</code>',
+								'<code>&lt;item&gt;&lt;wp:post_type&gt;attachment&lt;/wp:post_type&gt;...</code>' ).'</p>';
 						}
 					}
 				}
