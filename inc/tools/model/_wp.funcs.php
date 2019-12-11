@@ -1948,6 +1948,8 @@ function wpxml_convert_value( $value )
  */
 function & wpxml_create_File( $file_source_path, $params )
 {
+	global $DB;
+
 	$params = array_merge( array(
 			'file_root_type' => 'collection',
 			'file_root_ID'   => '',
@@ -1964,6 +1966,23 @@ function & wpxml_create_File( $file_source_path, $params )
 	{	// File doesn't exist
 		echo '<p class="text-warning">'.sprintf( 'Unable to copy file %s, because it does not exist.', '<code>'.$file_source_path.'</code>' ).'</p>';
 		// Skip it:
+		return $File;
+	}
+
+	// Try to find already existing File by hash in DB:
+	$FileCache = & get_FileCache();
+	$SQL = new SQL( 'Find file by hash' );
+	$SQL->SELECT( 'file_ID' );
+	$SQL->FROM( 'T_files' );
+	$SQL->WHERE( 'file_hash = '.$DB->quote( md5_file( $file_source_path, true ) ) );
+	$SQL->ORDER_BY( 'file_ID' );
+	$SQL->LIMIT( '1' );
+	$existing_file_ID = $DB->get_var( $SQL );
+	if( ! empty( $existing_file_ID ) &&
+	    ( $File = & $FileCache->get_by_ID( $existing_file_ID, false, false ) ) &&
+	    $File->exists() )
+	{	// Use already exsiting File:
+		echo '<p class="text-warning">'.sprintf( 'Use already existing File #%d in %s for the imported file %s.', $File->ID, '<code>'.$File->get_full_path().'</code>', '<code>'.$file_source_path.'</code>' ).'</p>';
 		return $File;
 	}
 
