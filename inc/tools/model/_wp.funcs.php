@@ -25,7 +25,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  *                 'attached_files_path' - Path to attachments folder,
  *                 'ZIP_folder_path' - Path of the extracted ZIP files.
  */
-function wpxml_get_import_data( $XML_file_path, $allow_use_extracted_folder = false )
+function wpxml_get_import_data( & $XML_file_path, $allow_use_extracted_folder = false )
 {
 	// Start to collect all printed errors from buffer:
 	ob_start();
@@ -140,6 +140,17 @@ function wpxml_get_import_data( $XML_file_path, $allow_use_extracted_folder = fa
 
 	// Get all printed errors:
 	$errors = ob_get_clean();
+
+	global $wpxml_file_path_renamed, $wpxml_file_path_orig;
+	if( isset( $wpxml_file_path_renamed ) )
+	{	// Display these messages only after $errors = ob_get_clean(); because they are not errors of XML parsing:
+		if( $wpxml_file_path_renamed === true )
+		{	// Success renaming:
+			echo '<p class="text-warning"><span class="label label-warning">WARNING</span> '.sprintf( 'We renamed %s to %s. The PHP XML parser doesn\'t support spaces in filenames.',
+				'<code>'.$wpxml_file_path_orig.'</code>',
+				'<code>'.$XML_file_path.'</code>' ).'</p>';
+		}
+	}
 
 	return array(
 			'errors'               => empty( $errors ) ? false : $errors,
@@ -1381,6 +1392,56 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 
 
 /**
+ * Get XML content from file
+ *
+ * @param string File path
+ * @return object|FALSE SimpleXMLElement
+ */
+function wpxml_get_xml_from_file( & $file_path )
+{
+	global $wpxml_file_path_renamed, $wpxml_file_path_orig;
+
+	// Register filter to avoid wrong chars in XML content:
+	stream_filter_register( 'xmlutf8', 'ValidUTF8XMLFilter' );
+
+	if( strpos( $file_path, ' ' ) !== false )
+	{	// Try to rename file:
+		$wpxml_file_path_orig = $file_path;
+		$new_file_path = str_replace( ' ', '-', $file_path );
+
+		if( ! file_exists( $new_file_path ) )
+		{	// If file was not renamed yet:
+			if( $wpxml_file_path_renamed = @rename( $file_path, $new_file_path ) )
+			{
+				$file_path = $new_file_path;
+			}
+			else
+			{	// Failed renaming:
+				echo '<p class="text-warning"><span class="label label-danger">ERROR</span> '.sprintf( 'Cannot rename %s to %s. The PHP XML parset doesn’t support spaces in filenames.',
+					'<code>'.$file_path.'</code>',
+					'<code>'.$new_file_path.'</code>' ).'</p>';
+			}
+		}
+		else
+		{
+			$file_path = $new_file_path;
+		}
+	}
+
+	if( ! isset( $wpxml_file_path_renamed ) || $wpxml_file_path_renamed === true )
+	{	// Load XML content from file with xmlutf8 filter:
+		$xml = simplexml_load_file( 'php://filter/read=xmlutf8/resource='.$file_path );
+	}
+	else
+	{
+		$xml = false;
+	}
+
+	return $xml;
+}
+
+
+/**
  * Parse WordPress XML file into array
  *
  * @param string File path
@@ -1403,14 +1464,11 @@ function wpxml_parser( $file )
 	$files = array();
 	$memory = array();
 
-	// Register filter to avoid wrong chars in XML content:
-	stream_filter_register( 'xmlutf8', 'ValidUTF8XMLFilter' );
-
 	// Start to get amount of memory for parsing:
 	$memory_usage = memory_get_usage();
 
 	// Load XML content from file with xmlutf8 filter:
-	$xml = simplexml_load_file( 'php://filter/read=xmlutf8/resource='.$file );
+	$xml = wpxml_get_xml_from_file( $file );
 
 	// Store here what memory was used for XML parsing:
 	$memory['parsing'] = memory_get_usage() - $memory_usage;
@@ -1772,19 +1830,23 @@ function wpxml_parser( $file )
  * @param boolean TRUE to halt process of error, FALSE to print out error
  * @return boolean TRUE on success, FALSE or HALT on errors
  */
-function wpxml_check_xml_file( $file, $halt = false )
+function wpxml_check_xml_file( & $file, $halt = false )
 {
+	global $wpxml_file_path_renamed;
+
 	// Enable XML error handling:
 	$internal_errors = libxml_use_internal_errors( true );
 
 	// Clear error of previous XML file (e.g. when ZIP archive has several XML files):
 	libxml_clear_errors();
 
-	// Register filter to avoid wrong chars in XML content:
-	stream_filter_register( 'xmlutf8', 'ValidUTF8XMLFilter' );
-
 	// Load XML content from file with xmlutf8 filter:
-	$xml = simplexml_load_file( 'php://filter/read=xmlutf8/resource='.$file );
+	$xml = wpxml_get_xml_from_file( $file );
+
+	if( isset( $wpxml_file_path_renamed ) && $wpxml_file_path_renamed === false )
+	{	// Don't display errors messages here, because they arready were displayed inside wpxml_get_xml_from_file():
+		return false;
+	}
 
 	if( ! $xml )
 	{	// Halt/Display if loading produces an error:

@@ -267,14 +267,11 @@ function itxml_parser( $file )
 	$item_types = array();
 	$memory = array();
 
-	// Register filter to avoid wrong chars in XML content:
-	stream_filter_register( 'xmlutf8', 'ValidUTF8XMLFilter' );
-
 	// Start to get amount of memory for parsing:
 	$memory_usage = memory_get_usage();
 
 	// Load XML content from file with xmlutf8 filter:
-	$xml = simplexml_load_file( 'php://filter/read=xmlutf8/resource='.$file );
+	$xml = wpxml_get_xml_from_file( $file );
 
 	// Store here what memory was used for XML parsing:
 	$memory['parsing'] = memory_get_usage() - $memory_usage;
