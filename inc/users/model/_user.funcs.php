@@ -1309,6 +1309,10 @@ function get_user_settings_url( $user_tab, $user_ID = NULL, $blog_ID = NULL, $gl
 	}
 
 	$backoffice_user_tabs = array( 'marketing', 'advanced', 'admin', 'sessions', 'activity' );
+	if( is_pro() )
+	{
+		$backoffice_user_tabs[] = 'social';
+	}
 	$frontoffice_user_tabs = array( 'profile', 'user', 'avatar', 'pwdchange', 'userprefs', 'subs', 'register_finish', 'visits', 'report' );
 
 	// Check allowed user tabs from modules:
@@ -2638,6 +2642,13 @@ function get_user_sub_entries( $is_admin, $user_ID )
 			$users_sub_entries['avatar'] = array(
 							'text' => T_('Profile picture'),
 							'href' => url_add_param( $base_url, $ctrl_param.'avatar'.$user_param ) );
+		}
+
+		if( is_pro() )
+		{	// Social Accounts tab available to PRO version only:
+			$users_sub_entries['social'] = array(
+							'text' => T_('Social Accounts'),
+							'href' => url_add_param( $base_url, $ctrl_param.'social'.$user_param ) );
 		}
 
 		if( $user_ID == $current_User->ID || $current_User->can_moderate_user( $user_ID ) )

@@ -625,6 +625,18 @@ $upgrade_path = $basepath.$upgrade_subdir;  // You should not need to change thi
 
 
 /**
+ * Location of the external library folder.
+ *
+ * Note: This folder does NOT NEED to be accessible through HTTP.
+ * This folder MUST be writable by PHP.
+ *
+ * @global string $ext_subdir
+ */
+$ext_subdir = 'ext/';               // Subdirectory relative to base
+$ext_path = $basepath.$ext_subdir;  // You should not need to change this
+
+
+/**
  * Do you want to allow public access to the media dir?
  *
  * WARNING: If you set this to false, evocore will use /htsrv/getfile.php as a stub
