@@ -157,67 +157,76 @@ if( isset( $use_l10n ) && $use_l10n )
 			}
 		}
 
-		if( ! empty( $params['add_transarray'] ) && ! isset( $trans[ $messages ][ $params['add_transarray'] ] ) )
-		{ // Additional translations for current locale have not yet been loaded:
-			$Debuglog->add( 'We need to load additional translation file to translate: "'. $string.'"', 'locale' );
-
+		if( ! empty( $params['add_transarray'] ) )
+		{
 			switch( $params['add_transarray'] )
 			{
 				case 'backoffice':
-					$trans_file_name = '_back-office.php';
+					static $_backoffice_array = array();
+					$add_transarray_var = 'trans_backoffice';
+					${$add_transarray_var} = & $_backoffice_array;
+					$trans_file_name    = '_back-office.php';
 					break;
 
 				case 'demo_contents':
-					$trans_file_name = '_demo-contents.php';
+					static $_demo_contents_array = array();
+					$add_transarray_var    = 'trans_demo_contents';
+					${$add_transarray_var} = & $_demo_contents_array;
+					$trans_file_name       = '_demo-contents.php';
 					break;
 
 				default:
-					$trans_file_name = $params['add_transarray'];
+					debug_die( 'Invalid additional translation array.' );
 			}
 
-			if ( $params['alt_basedir'] != '' )
-			{	// Load the translation file from the alternative base dir:
-				//$Debuglog->add( 'Using alternative basedir ['.$params['alt_basedir'].']', 'locale' );
-				$path = $params['alt_basedir'].'/locales/'.$messages.'/'.$trans_file_name;
-			}
-			else
-			{	// Load our additional translation file.
-				$path = $locales_path.$messages.'/'.$trans_file_name;
-			}
+			if( ! isset( ${$add_transarray_var}[ $messages ] ) )
+			{ // Additional translations for current locale have not yet been loaded:
+				$Debuglog->add( 'We need to load additional translation file to translate: "'. $string.'"', 'locale' );
 
-			if( file_exists($path) && is_readable($path) )
-			{
-				$Debuglog->add( 'T_: Loading additional file: '.$path, 'locale' );
-				include_once $path;
-			}
-			else
-			{
-				$Debuglog->add( 'T_: Messages file does not exist or is not readable: '.$path, 'locale' );
-			}
-			if( ! isset( $trans[ $messages ][ $params['add_transarray'] ] ) )
-			{ // Still not loaded... file doesn't exist, memorize that no translations are available
-				// echo 'file not found!';
-				$trans[ $messages ][ $params['add_transarray'] ] = array();
-			}
-			else
-			{
-				if( ! isset($trans[$messages][ $params['add_transarray'] ]['__meta__']) )
-				{ // Unknown/old messages format (< version 1):
-					$Debuglog->add( 'Found deprecated messages format (no __meta__ info).', 'locale' );
-					// Translate keys (e.g. 'foo\nbar') to real strings ("foo\nbar")
-					// Doing this here for all strings, is actually faster than doing it on key lookup (like it has been done before always)
-					foreach($trans[$messages][ $params['add_transarray'] ] as $k => $v)
-					{
-						if( ($pos = strpos($k, '\\')) === false )
-						{ // fast-path-skip
-							continue;
-						}
-						// Replace string as done in the good old days:
-						$new_k = str_replace( array('\n', '\r', '\t'), array("\n", "\r", "\t"), $k );
-						if( $new_k != $k )
+				if ( $params['alt_basedir'] != '' )
+				{	// Load the translation file from the alternative base dir:
+					//$Debuglog->add( 'Using alternative basedir ['.$params['alt_basedir'].']', 'locale' );
+					$path = $params['alt_basedir'].'/locales/'.$messages.'/'.$trans_file_name;
+				}
+				else
+				{	// Load our additional translation file.
+					$path = $locales_path.$messages.'/'.$trans_file_name;
+				}
+
+				if( file_exists($path) && is_readable($path) )
+				{
+					$Debuglog->add( 'T_: Loading additional file: '.$path, 'locale' );
+					include_once $path;
+				}
+				else
+				{
+					$Debuglog->add( 'T_: Messages file does not exist or is not readable: '.$path, 'locale' );
+				}
+				if( ! isset( ${$add_transarray_var}[ $messages ] ) )
+				{ // Still not loaded... file doesn't exist, memorize that no translations are available
+					// echo 'file not found!';
+					${$add_transarray_var}[ $messages ] = array();
+				}
+				else
+				{
+					if( ! isset( ${$add_transarray_var}[$messages]['__meta__'] ) )
+					{ // Unknown/old messages format (< version 1):
+						$Debuglog->add( 'Found deprecated messages format (no __meta__ info).', 'locale' );
+						// Translate keys (e.g. 'foo\nbar') to real strings ("foo\nbar")
+						// Doing this here for all strings, is actually faster than doing it on key lookup (like it has been done before always)
+						foreach( ${$add_transarray_var}[$messages] as $k => $v )
 						{
-							$trans[$messages][ $params['add_transarray'] ][$new_k] = $v;
-							unset($trans[$messages][ $params['add_transarray'] ][$k]);
+							if( ($pos = strpos($k, '\\')) === false )
+							{ // fast-path-skip
+								continue;
+							}
+							// Replace string as done in the good old days:
+							$new_k = str_replace( array( '\n', '\r', '\t' ), array( "\n", "\r", "\t" ), $k );
+							if( $new_k != $k )
+							{
+								${$add_transarray_var}[$messages][$new_k] = $v;
+								unset( ${$add_transarray_var}[$messages][$k] );
+							}
 						}
 					}
 				}
@@ -232,17 +241,17 @@ if( isset( $use_l10n ) && $use_l10n )
 		// That way translators can concentrate on the most essential stuff first.
 		$search_string = str_replace( array("\r\n", "\r"), "\n", $string );
 
-		if( ! empty( $params['add_transarray'] ) && isset( $trans[ $messages ][ $params['add_transarray'] ][ $search_string ] ) )
+		if( ! empty( $params['add_transarray'] ) && isset( ${$add_transarray_var}[ $messages ][ $search_string ] ) )
 		{ // If the string has been translated:
 			//$Debuglog->add( 'String ['.$string.'] found', 'locale' );
-			$r = $trans[ $messages ][ $params['add_transarray'] ][ $search_string ];
-			if( isset($trans[$messages][ $params['add_transarray'] ]['__meta__']['charset']) )
+			$r = ${$add_transarray_var}[ $messages ][ $search_string ];
+			if( isset( ${$add_transarray_var}[$messages]['__meta__']['charset']) )
 			{ // new format: charset in meta data:
-				$messages_charset = $trans[$messages][ $params['add_transarray'] ]['__meta__']['charset'];
+				$messages_charset = ${$add_transarray_var}[$messages]['__meta__']['charset'];
 			}
 			else
 			{ // old format.. extract charset from content type or fall back to setting from global locale definition:
-				$meta = $trans[$messages][ $params['add_transarray'] ][''];
+				$meta = ${$add_transarray_var}[$messages][''];
 				if( preg_match( '~^Content-Type: text/plain; charset=(.*);?$~m', $meta, $match ) )
 				{
 					$messages_charset = $match[1];
@@ -252,7 +261,7 @@ if( isset( $use_l10n ) && $use_l10n )
 					$messages_charset = $locales[$req_locale]['charset'];
 				}
 				// Set it accordingly to new format.
-				$trans[$messages][ $params['add_transarray'] ]['__meta__']['charset'] = $messages_charset;
+				${$add_transarray_var}[$messages]['__meta__']['charset'] = $messages_charset;
 			}
 		}
 		elseif( isset( $trans[ $messages ][ $search_string ] ) )

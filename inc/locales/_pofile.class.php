@@ -243,7 +243,7 @@ class POFile
 		}
 		else
 		{
-			fwrite( $fp, '$trans[\''.$locale."']['".$params['type']."'] = array(\n" );
+			fwrite( $fp, '$trans_'.$params['type'].'[\''.$locale."'] = array(\n" );
 		}
 
 		// Write meta/format info:

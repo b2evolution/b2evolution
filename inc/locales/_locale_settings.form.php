@@ -551,7 +551,7 @@ else
 				$po_file = $locales_path.$locale_data['messages'].'/LC_MESSAGES/'.$po_file;
 				if( ! is_file( $po_file ) )
 				{
-					echo '<td class="lastcol center" colspan="'.(1 + (int)($current_User->check_perm( 'options', 'edit' ) && $allow_po_extraction)).'"><a href="?ctrl=translation&edit_locale='.$lkey.'">'.T_('No PO file').'</a></td>';
+					echo '<td class="lastcol center" colspan="'.(1 + (int)($current_User->check_perm( 'options', 'edit' ) )).'"><a href="?ctrl=translation&edit_locale='.$lkey.'">'.T_('No PO file').'</a></td>';
 				}
 				else
 				{ // File exists:
