@@ -90,7 +90,7 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 		$MarkdownImport->log( '<p class="text-danger">'.T_('Import failed.').'</p>' );
 	}
 
-	// Start of log:
+	// End log:
 	$MarkdownImport->end_log();
 
 $Form->end_fieldset();

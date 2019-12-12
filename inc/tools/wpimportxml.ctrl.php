@@ -17,6 +17,7 @@ $current_User->check_perm( 'admin', 'normal', true );
 $current_User->check_perm( 'options', 'edit', true );
 
 load_funcs( 'tools/model/_wp.funcs.php' );
+load_class( 'tools/model/_wordpressimport.class.php', 'WordpressImport' );
 
 /**
  * @var action
@@ -50,32 +51,19 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'wpxml' );
 
-		param_check_not_empty( 'wp_blog_ID', 'Please select a collection!' );
+		$WordpressImport = new WordpressImport();
 
-		// The import type ( replace | append )
-		$import_type = param( 'import_type', 'string', 'replace', true );
-		// Should we delete files on 'replace' mode?
-		$delete_files = param( 'delete_files', 'integer', 0, true );
-		// Should we try to match <img> tags with imported attachments based on filename in post content after import?
-		$import_img = param( 'import_img', 'integer', 0, true );
-
-		// XML File
-		$xml_file = param( 'import_file', 'string', '', true );
-		if( empty( $xml_file ) )
-		{ // File is not selected
-			param_error( 'import_file', 'Please select file to import.' );
-		}
-		else if( ! preg_match( '/\.(xml|txt|zip)$/i', $xml_file ) )
-		{ // Extension is incorrect
-			param_error( 'import_file', sprintf( '&laquo;%s&raquo; has an unrecognized extension.', $xml_file ) );
+		if( $action == 'confirm' )
+		{	// Don't log into file for the confirm screen before start importing:
+			$WordpressImport->log_file = false;
 		}
 
-		if( param_errors_detected() )
-		{ // Stop import if errors exist
+		// Load import data from request:
+		if( ! $WordpressImport->load_from_Request() )
+		{	// Don't import if errors have been detected:
 			$action = 'file';
 			break;
 		}
-
 		break;
 }
 

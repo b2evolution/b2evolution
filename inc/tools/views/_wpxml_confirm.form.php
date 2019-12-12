@@ -15,6 +15,9 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+
+global $WordpressImport;
+
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
 $Form->begin_form( 'fform', T_('WordPress XML Importer') );
@@ -26,13 +29,13 @@ $Form->hiddens_by_key( get_memorized( 'blog' ) );
 $Form->begin_fieldset( TB_('Confirm import') );
 
 	// Display info for the wordpress importer:
-	$wpxml_import_data = wpxml_info();
+	$WordpressImport->display_info();
 
 	$form_buttons = array();
 
-	if( $wpxml_import_data['errors'] === false )
+	if( $WordpressImport->info_data['errors'] === false )
 	{	// Display found Item Types as selector:
-		wpxml_item_types_selector( $wpxml_import_data['XML_file_path'], $wpxml_import_data['ZIP_folder_path'] );
+		wpxml_item_types_selector( $WordpressImport->info_data['XML_file_path'], $WordpressImport->info_data['ZIP_folder_path'] );
 		$form_buttons[] = array( 'submit', 'submit', T_('Confirm import'), 'SaveButton' );
 	}
 

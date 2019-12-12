@@ -16,14 +16,18 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 
+load_class( 'tools/model/_abstractimport.class.php', 'AbstractImport' );
+
 /**
  * Markdown Import Class
  *
  * @package evocore
  */
-class MarkdownImport
+class MarkdownImport extends AbstractImport
 {
+	var $import_code = 'markdown';
 	var $coll_ID;
+
 	var $source;
 	var $data;
 	var $options;
@@ -126,7 +130,7 @@ class MarkdownImport
 
 		// Call plugin event for additional initialization:
 		$Plugins->trigger_event( 'ImporterConstruct', array(
-				'type'     => 'markdown',
+				'type'     => $this->import_code,
 				'Importer' => $this,
 			) );
 	}
@@ -857,7 +861,7 @@ class MarkdownImport
 
 				// Call plugin event to set YAML field:
 				$Plugins->trigger_event( 'ImporterSetItemField', array(
-						'type'       => 'markdown',
+						'type'       => $this->import_code,
 						'Importer'   => $this,
 						'Item'       => $Item,
 						'field_type' => 'yaml',
@@ -1831,137 +1835,6 @@ class MarkdownImport
 			// Set flag to know the item content was updated:
 			$this->item_file_is_updated = true;
 		}
-	}
-
-
-	/**
-	 * Get collection
-	 *
-	 * @param object|NULL|FALSE Collection
-	 */
-	function & get_Blog()
-	{
-		$BlogCache = & get_BlogCache();
-		$md_Blog = & $BlogCache->get_by_ID( $this->coll_ID );
-
-		return $md_Blog;
-	}
-
-
-	/**
-	 * Start to log into file on disk
-	 */
-	function start_log()
-	{
-		global $baseurl, $media_path, $rsc_url, $app_version_long;
-
-		// Get file path for log:
-		$log_file_path = $media_path.'import/logs/'
-			// Current data/time:
-			.date( 'Y-m-d-H-i-s' ).'-'
-			// Site base URL:
-			.str_replace( '/', '-', preg_replace( '#^https?://#i', '', trim( 'https://b2evo.yb/folder/sub/', '/' ) ) ).'-'
-			// Collection short name:
-			.( $md_Blog = & $this->get_Blog() ? preg_replace( '#[^a-z\d]+#', '-', strtolower( $md_Blog->get( 'shortname' ) ) ).'-' : '' )
-			// Suffix for this import tool:
-			.'markdown-import-log-'
-			// Random hash:
-			.generate_random_key( 16 ).'.html';
-
-		// Try to create folder for log files:
-		if( ! mkdir_r( $media_path.'import/logs/' ) )
-		{	// Display error if folder cannot be created for log files:
-			$this->display_log_file_error( 'Cannot create the folder <code>'.$media_path.'import/logs/</code> for log files!' );
-			return false;
-		}
-
-		if( ! ( $this->log_file_handle = fopen( $log_file_path, 'w' ) ) )
-		{	// Display error if the log fiel cannot be created in the log folder:
-			$this->display_log_file_error( 'Cannot create the file <code>'.$log_file_path.'</code> for current log!' );
-			return false;
-		}
-
-		// Display where log will be stored:
-		echo '<b>Log file:</b> <code>'.$log_file_path.'</code><br />';
-
-		// Write header of the log file:
-		$this->log_to_file( '<!DOCTYPE html>'."\r\n"
-			.'<html lang="en-US">'."\r\n"
-			.'<head>'."\r\n"
-			.'<link href="'.$rsc_url.'css/bootstrap/bootstrap.css?v='.$app_version_long.'" type="text/css" rel="stylesheet" />'."\r\n"
-			.'<link href="'.$rsc_url.'build/bootstrap-backoffice-b2evo_base.bundle.css?v='.$app_version_long.'" type="text/css" rel="stylesheet" />'."\r\n"
-			.'</head>'."\r\n"
-			.'<body>' );
-	}
-
-
-	/**
-	 * Display error when log cannot be stored in file on disk
-	 *
-	 * @param string Message
-	 */
-	function display_log_file_error( $message )
-	{
-		if( empty( $this->log_file_error_reported ) )
-		{	// Report only first detected error to avoid next duplicated errors on screen:
-			echo '<p class="text-danger"><span class="label label-danger">ERROR</span> '.$message.'</p>';
-			$this->log_file_error_reported = true;
-		}
-	}
-
-
-	/**
-	 * End of log into file on disk
-	 */
-	function end_log()
-	{
-		// Write footer of the log file:
-		$this->log_to_file( '</body>'."\r\n"
-			.'</html>' );
-
-		if( isset( $this->log_file_handle ) && $this->log_file_handle )
-		{	// Close the log file:
-			fclose( $this->log_file_handle );
-		}
-	}
-
-
-	/**
-	 * Log a message on screen and into file on disk
-	 *
-	 * @param string Message
-	 */
-	function log( $message )
-	{
-		if( $message === '' )
-		{	// Don't log empty strings:
-			return;
-		}
-
-		// Display message on screen:
-		echo $message;
-		evo_flush();
-
-		// Try to store a message into the log file on the disk:
-		$this->log_to_file( $message );
-	}
-
-
-	/**
-	 * Log a message into file on disk
-	 *
-	 * @param string Message
-	 */
-	function log_to_file( $message )
-	{
-		if( ! isset( $this->log_file_handle ) || ! $this->log_file_handle )
-		{	// Log must be started:
-			$this->display_log_file_error( 'You must start log by function <code>'.get_class( $this ).'->start_log()</code>!' );
-			return false;
-		}
-
-		// Put a message into the log file on the disk:
-		fwrite( $this->log_file_handle, $message."\r\n" );
 	}
 }
 ?>

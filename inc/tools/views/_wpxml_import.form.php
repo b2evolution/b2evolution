@@ -15,22 +15,31 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+global $WordpressImport;
+
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
 $Form->begin_form( 'fform', T_('WordPress XML Importer') );
 
 $Form->begin_fieldset( T_('Report of the import') );
 
+	// Start to log:
+	$WordpressImport->start_log();
+
 	// Display info for the wordpress importer:
-	$wpxml_import_data = wpxml_info( true );
+	$WordpressImport->display_info( true );
 
 	$form_buttons = array();
 
-	if( $wpxml_import_data['errors'] === false )
+	if( $WordpressImport->info_data['errors'] === false )
 	{	// Import the data and display a report on the screen:
-		wpxml_import( $wpxml_import_data['XML_file_path'], $wpxml_import_data['attached_files_path'], $wpxml_import_data['ZIP_folder_path'] );
-		$form_buttons[] = array( 'button', 'button', T_('Go to collection').' >>', 'SaveButton', 'onclick' => 'location.href=\''.$wpxml_import_data['Blog']->get( 'url' ).'\'' );
+		$WordpressImport->execute();
+		$import_Blog = & $WordpressImport->get_Blog();
+		$form_buttons[] = array( 'button', 'button', T_('Go to collection').' >>', 'SaveButton', 'onclick' => 'location.href=\''.$import_Blog->get( 'url' ).'\'' );
 	}
+
+	// End log:
+	$WordpressImport->end_log();
 
 $Form->end_fieldset();
 
