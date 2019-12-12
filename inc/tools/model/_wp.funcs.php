@@ -2123,7 +2123,7 @@ function wpxml_info( $allow_use_extracted_folder = false )
 
 		if( get_param( 'import_img' ) )
 		{
-			echo '<b>'.TB_('Options').':</b> [√] '.TB_('Try to match any remaining <code>&lt;img&gt;</code> tags with imported attachments based on filename');
+			echo '<b>'.TB_('Options').':</b> [√] '.TB_('Try to replace <code>&lt;img src="...&gt;</code> tags with imported attachments based on filename');
 		}
 	}
 	else

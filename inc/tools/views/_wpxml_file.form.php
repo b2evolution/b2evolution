@@ -72,7 +72,7 @@ if( ! empty( $import_files ) )
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
-	$Form->checkbox_input( 'import_img', 1, T_('Options'), array( 'input_suffix' => T_('Try to match any remaining <code>&lt;img&gt;</code> tags with imported attachments based on filename') ) );
+	$Form->checkbox_input( 'import_img', 1, T_('Options'), array( 'input_suffix' => T_('Try to replace <code>&lt;img src="...&gt;</code> tags with imported attachments based on filename') ) );
 
 	$Form->end_fieldset();
 
