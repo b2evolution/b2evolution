@@ -9832,7 +9832,7 @@ function get_import_files( $folder = '', $allowed_extensions = 'xml|txt|zip', $i
 			default:
 				if( $find_attachments && ( $file_attachments_folder = get_import_attachments_folder( $file_data[0] ) ) )
 				{	// Probably it is a file with attachments folder:
-					$file_type = sprintf( T_('Complete export (attachments folder: %s)'), '<code>'.basename( $file_attachments_folder ).'</code>' );
+					$file_type = sprintf( T_('Complete export (attachments folder: %s)'), '<code>'.substr( $file_attachments_folder, strlen( dirname( $file_data[0] ) ) + 1, -1 ).'</code>' );
 				}
 				else
 				{	// Single XML file without attachments folder:
@@ -9921,6 +9921,14 @@ function get_import_attachments_folder( $file_path, $first_folder = false )
 	{	// 8th priority folder:
 		return $file_folder_path.'attachments/';
 	}
+	if( is_dir( $file_folder_path.'uploads' ) )
+	{	// 9th priority folder:
+		return $file_folder_path.'uploads/';
+	}
+	if( is_dir( $file_folder_path.'wp-content/uploads' ) )
+	{	// 10th priority folder:
+		return $file_folder_path.'wp-content/uploads/';
+	}
 
 	if( $first_folder )
 	{	// Try to use first found folder:
@@ -9932,7 +9940,7 @@ function get_import_attachments_folder( $file_path, $first_folder = false )
 				continue;
 			}
 			if( is_dir( $file_folder_path.$file ) )
-			{	// 9th priority folder:
+			{	// 11th priority folder:
 				return $file_folder_path.$file.'/';
 			}
 		}

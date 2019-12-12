@@ -1417,7 +1417,7 @@ function wpxml_get_xml_from_file( & $file_path )
 			}
 			else
 			{	// Failed renaming:
-				echo '<p class="text-warning"><span class="label label-danger">ERROR</span> '.sprintf( 'Cannot rename %s to %s. The PHP XML parset doesn’t support spaces in filenames.',
+				echo '<p class="text-warning"><span class="label label-danger">ERROR</span> '.sprintf( 'Cannot rename %s to %s. The PHP XML parser doesn’t support spaces in filenames.',
 					'<code>'.$file_path.'</code>',
 					'<code>'.$new_file_path.'</code>' ).'</p>';
 			}
