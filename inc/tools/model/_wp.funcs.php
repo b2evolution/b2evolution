@@ -571,6 +571,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						if( isset( $all_wp_attachments[ $file_name ] ) )
 						{	// Don't use this file if more than one use same name, e.g. from different folders:
 							$all_wp_attachments[ $file_name ] = false;
+							echo '<p class="text-danger"><span class="label label-danger">ERROR</span> '
+								.sprintf( 'there are 2+ attachements with conflicting name %s.',
+									'<code>'.$file_name.'</code>' ).'</p>';
 						}
 						else
 						{	// This is a first detected file with current name:
@@ -824,6 +827,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 							if( isset( $all_wp_attachments[ $file_name ] ) )
 							{	// Don't use this file if more than one use same name, e.g. from different folders:
 								$all_wp_attachments[ $file_name ] = false;
+								echo '<p class="text-danger"><span class="label label-danger">ERROR</span> '
+									.sprintf( 'there are 2+ attachements with conflicting name %s.',
+										'<code>'.$file_name.'</code>' ).'</p>';
 							}
 							else
 							{	// This is a first detected file with current name:
@@ -965,7 +971,6 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 			if( ! empty( $post['custom_fields'] ) )
 			{	// Import custom fields:
 				$item_type_custom_fields = $ItemType->get_custom_fields();
-				//pre_dump( $post['custom_fields'], $item_type_custom_fields );
 				foreach( $post['custom_fields'] as $custom_field_name => $custom_field )
 				{
 					if( ! isset( $item_type_custom_fields[ $custom_field_name ] ) )
@@ -1078,10 +1083,13 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						$File = $files[ $link['link_file_ID'] ];
 						if( $File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] ) )
 						{	// If file has been linked to the post
-							echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post.', '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post as %s from %s.',
+								'<code>'.$File->_adfp_full_path.'</code>',
+								'<code>'.$link['link_position'].'</code>',
+								'<code>&lt;evo:link&gt;</code>' ).'</p>';
 							$file_is_linked = true;
 							// Update link order to the latest for two other ways([caption] and <img />) below:
-							$link_order = $link['link_order'];
+							$link_order = $link['link_order'] + 1;
 						}
 					}
 					if( ! $file_is_linked )
@@ -1107,14 +1115,18 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 								$File = $files[ $attachment_IDs[ $postmeta['value'] ] ];
 								if( $File->link_to_Object( $LinkOwner, $link_order, 'cover' ) )
 								{	// If file has been linked to the post:
-									echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post as cover.', '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+									echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post as cover from %s.',
+										'<code>'.$File->_adfp_full_path.'</code>',
+										'<code>&lt;wp:meta_key&gt;_thumbnail_id&lt;/wp:meta_key&gt;</code>' ).'</p>';
 									$file_is_linked = true;
 									$link_order++;
 								}
 							}
 							if( ! $file_is_linked )
 							{	// If file could not be linked to the post:
-								echo '<p class="text-warning">'.sprintf( 'Cover file %s could not be attached to this post because it is not found in the source attachments folder.', '#'.$postmeta['value'] ).'</p>';
+								echo '<p class="text-warning">'.sprintf( 'Cover file %s could not be attached to this post because it is not found in the source attachments by %s.',
+									'#'.$postmeta['value'],
+									'<code>&lt;wp:meta_key&gt;_thumbnail_id&lt;/wp:meta_key&gt;</code> = <code>'.$postmeta['value'].'</code>' ).'</p>';
 							}
 							break;
 					}
@@ -1133,7 +1145,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						$File = $files[ $attachment_IDs[ $caption_post_ID ] ];
 						if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
 						{	// If file has been linked to the post
-							echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post.', '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post from %s.',
+								'<code>'.$File->_adfp_full_path.'</code>',
+								'<code>[caption id="attachment_'.$caption_post_ID.'"]</code>' ).'</p>';
 							// Replace this caption tag from content with b2evolution format:
 							$updated_post_content = preg_replace( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
 							$file_is_linked = true;
@@ -1142,7 +1156,9 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					}
 					if( ! $file_is_linked )
 					{	// If file could not be linked to the post:
-						echo '<p class="text-warning">'.sprintf( 'Caption file %s could not be attached to this post because it is not found in the source attachments folder.', '#'.$caption_post_ID ).'</p>';
+						echo '<p class="text-warning">'.sprintf( 'Caption file %s could not be attached to this post because it is not found in the source attachments folder by %s.',
+							'#'.$caption_post_ID,
+							'<code>[caption id="attachment_'.$caption_post_ID.'"]</code>' ).'</p>';
 					}
 				}
 			}
@@ -1156,20 +1172,33 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 					{
 						$file_is_linked = false;
 						$img_file_name = basename( $img_url );
-						if( isset( $all_wp_attachments[ $img_file_name ], $files[ $all_wp_attachments[ $img_file_name ] ] ) )
+						if( isset( $all_wp_attachments[ $img_file_name ] ) )
 						{
-							$File = $files[ $all_wp_attachments[ $img_file_name ] ];
-							if( $linked_post_ID = array_search( $File->ID, $attachment_IDs ) )
-							{
-								$linked_post_files[] = $linked_post_ID;
+							if( $all_wp_attachments[ $img_file_name ] === false )
+							{	// Skip a duplicated file by name:
+								echo '<p class="text-danger"><span class="label label-danger">ERROR</span> '
+									.sprintf( 'cannot replace img src="%s" because the file name %s is a duplicate.',
+										'<code>'.$img_url.'</code>',
+										'<code>'.$img_file_name.'</code>' ).'</p>';
+								continue;
 							}
-							if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
-							{	// If file has been linked to the post
-								echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post.', '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
-								// Replace this img tag from content with b2evolution format:
-								$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
-								$file_is_linked = true;
-								$link_order++;
+							if( isset( $files[ $all_wp_attachments[ $img_file_name ] ] ) )
+							{	// Try to link File to the Item:
+								$File = $files[ $all_wp_attachments[ $img_file_name ] ];
+								if( $linked_post_ID = array_search( $File->ID, $attachment_IDs ) )
+								{
+									$linked_post_files[] = $linked_post_ID;
+								}
+								if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
+								{	// If file has been linked to the post
+									echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post as inline from img src="%s".',
+										'<code>'.$File->_adfp_full_path.'</code>',
+										'<code>'.$img_url.'</code>' ).'</p>';
+									// Replace this img tag from content with b2evolution format:
+									$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
+									$file_is_linked = true;
+									$link_order++;
+								}
 							}
 						}
 						if( ! $file_is_linked )
@@ -1198,14 +1227,18 @@ function wpxml_import( $XML_file_path, $attached_files_path = false, $ZIP_folder
 						$File = $files[ $attachment_IDs[ $attachment_post_ID ] ];
 						if( $File->link_to_Object( $LinkOwner, $link_order, 'aftermore' ) )
 						{	// If file has been linked to the post:
-							echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post.', '<code>'.$File->_adfp_full_path.'</code>' ).'</p>';
+							echo '<p class="text-success">'.sprintf( 'File %s has been linked to this post as aftermore by %s.',
+								'<code>'.$File->_adfp_full_path.'</code>',
+								'<code>&lt;wp:post_id&gt;'.$post['post_id'].'&lt;/wp:post_id&gt;</code>' ).'</p>';
 							$file_is_linked = true;
 							$link_order++;
 						}
 					}
 					if( ! $file_is_linked )
 					{	// If file could not be linked to the post:
-						echo '<p class="text-warning">'.sprintf( 'File %s could not be attached to this post because it is not found in the source attachments folder.', '#'.$attachment_post_ID ).'</p>';
+						echo '<p class="text-warning">'.sprintf( 'File %s could not be attached to this post because it is not found in the source attachments by %s.',
+							'#'.$attachment_post_ID,
+							'<code>&lt;wp:post_parent&gt;'.$post['post_id'].'&lt;/wp:post_parent&gt;</code>' ).'</p>';
 					}
 				}
 			}
@@ -1982,7 +2015,8 @@ function & wpxml_create_File( $file_source_path, $params )
 	    ( $File = & $FileCache->get_by_ID( $existing_file_ID, false, false ) ) &&
 	    $File->exists() )
 	{	// Use already exsiting File:
-		echo '<p class="text-warning">'.sprintf( 'Use already existing File #%d in %s for the imported file %s.', $File->ID, '<code>'.$File->get_full_path().'</code>', '<code>'.$file_source_path.'</code>' ).'</p>';
+		echo '<p class="text-warning">'.sprintf( 'Don\'t copy/import the file %s, use already existing File #%d in %s instead.',
+			'<code>'.$file_source_path.'</code>', $File->ID, '<code>'.$File->get_full_path().'</code>' ).'</p>';
 		return $File;
 	}
 
@@ -2123,7 +2157,7 @@ function wpxml_info( $allow_use_extracted_folder = false )
 
 		if( get_param( 'import_img' ) )
 		{
-			echo '<b>'.TB_('Options').':</b> [√] '.TB_('Try to replace <code>&lt;img src="...&gt;</code> tags with imported attachments based on filename');
+			echo '<b>'.TB_('Options').':</b> [√] '.sprintf( TB_('Try to replace %s tags with imported attachments based on filename'), '<code>&lt;img src="...&gt;</code>' );
 		}
 	}
 	else

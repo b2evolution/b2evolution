@@ -26,7 +26,7 @@ $Form->hiddens_by_key( get_memorized( 'blog' ) );
 $Form->begin_fieldset( TB_('Confirm import') );
 
 	// Display info for the wordpress importer:
-	$wpxml_import_data = wpxml_info();
+	$wpxml_import_data = wpxml_info( true );
 
 	$form_buttons = array();
 

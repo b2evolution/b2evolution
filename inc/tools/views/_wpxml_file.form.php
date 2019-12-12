@@ -68,11 +68,11 @@ if( ! empty( $import_files ) )
 
 	echo '<div id="checkbox_delete_files"'.( $import_type == 'replace' ? '' : ' style="display:none"' ).'>';
 	$Form->checkbox_input( 'delete_files', param( 'delete_files', 'integer', 0 ), '', array(
-		'input_suffix' => '<label for="delete_files">'.T_(' Also delete media files that will no longer be referenced in the destination collection after replacing its contents').'</label>',
+		'input_suffix' => '<label for="delete_files" style="padding-left:0">'.T_(' Also delete media files that will no longer be referenced in the destination collection after replacing its contents').'</label>',
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
-	$Form->checkbox_input( 'import_img', 1, T_('Options'), array( 'input_suffix' => T_('Try to replace <code>&lt;img src="...&gt;</code> tags with imported attachments based on filename') ) );
+	$Form->checkbox_input( 'import_img', 1, T_('Options'), array( 'input_suffix' => sprintf( TB_('Try to replace %s tags with imported attachments based on filename'), '<code>&lt;img src="...&gt;</code>' ) ) );
 
 	$Form->end_fieldset();
 
