@@ -191,7 +191,9 @@ class WordpressImport extends AbstractImport
 		$selected_item_type_usages = param( 'item_type_usages', 'array:integer' );
 		$selected_item_type_none = param( 'item_type_none', 'integer' );
 
-		$all_wp_attachments = array();
+		// Store here all imported files:
+		$imported_file_names = array(); // Key - file name, Value - File ID or FALSE when same file name is used in different folders
+		$imported_file_paths = array(); // Key - relative file path, Value - File ID
 
 		// Parse WordPress XML file into array
 		$this->log( 'Loading & parsing the XML file...'.'<br />' );
@@ -325,11 +327,11 @@ class WordpressImport extends AbstractImport
 					{
 						if( ! ( $deleted_File = & $FileCache->get_by_ID( $deleted_file_ID, false, false ) ) )
 						{ // Incorrect file ID
-							$this->log( '<p class="text-danger">'.sprintf( 'No file #%s found in DB. It cannot be deleted.', $deleted_file_ID ).'</p>' );
+							$this->log_error( sprintf( 'No file #%s found in DB. It cannot be deleted.', $deleted_file_ID ) );
 						}
 						if( ! $deleted_File->unlink() )
 						{ // No permission to delete file
-							$this->log( '<p class="text-danger">'.sprintf( 'Could not delete the file %s.', '<code>'.$deleted_File->get_full_path().'</code>' ).'</p>' );
+							$this->log_error( sprintf( 'Could not delete the file %s.', '<code>'.$deleted_File->get_full_path().'</code>' ) );
 						}
 						// Clear cache to save memory
 						$FileCache->clear();
@@ -518,7 +520,7 @@ class WordpressImport extends AbstractImport
 
 			if( ! $attached_files_path || ! file_exists( $attached_files_path ) )
 			{	// Display an error if files are attached but folder doesn't exist:
-				$this->log( '<p class="text-danger">'.sprintf( 'No attachments folder %s found. It must exists to import the attached files properly.', ( $attached_files_path ? '<code>'.$attached_files_path.'</code>' : '' ) ).'</p>' );
+				$this->log_error( sprintf( 'No attachments folder %s found. It must exists to import the attached files properly.', ( $attached_files_path ? '<code>'.$attached_files_path.'</code>' : '' ) ) );
 			}
 			else
 			{	// Try to import files from the selected subfolder:
@@ -567,17 +569,18 @@ class WordpressImport extends AbstractImport
 						if( $import_img )
 						{	// Collect file name in array to link with post below:
 							$file_name = basename( $file['file_path'] );
-							if( isset( $all_wp_attachments[ $file_name ] ) )
+							if( isset( $imported_file_names[ $file_name ] ) )
 							{	// Don't use this file if more than one use same name, e.g. from different folders:
-								$all_wp_attachments[ $file_name ] = false;
-								$this->log( '<p class="text-danger"><span class="label label-danger">ERROR</span> '
-									.sprintf( 'there are 2+ attachements with conflicting name %s.',
-										'<code>'.$file_name.'</code>' ).'</p>' );
+								$imported_file_names[ $file_name ] = false;
+								$this->log_error( sprintf( 'there are 2+ attachements with conflicting name %s.',
+										'<code>'.$file_name.'</code>' ) );
 							}
 							else
 							{	// This is a first detected file with current name:
-								$all_wp_attachments[ $file_name ] = $File->ID;
+								$imported_file_names[ $file_name ] = $File->ID;
 							}
+							// Store relative file path:
+							$imported_file_paths[ $file['zip_path'].$file['file_path'] ] = $File->ID;
 						}
 
 						if( $file['file_root_type'] == 'user' &&
@@ -593,11 +596,11 @@ class WordpressImport extends AbstractImport
 							}
 							if( $File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] ) )
 							{	// If file has been linked to the post:
-								$this->log( '<p class="text-success">'.sprintf( 'File %s has been linked to User %s.', '<code>'.$File->_adfp_full_path.'</code>', $User->get_identity_link() ).'</p>' );
+								$this->log_success( sprintf( 'File %s has been linked to User %s.', '<code>'.$File->_adfp_full_path.'</code>', $User->get_identity_link() ) );
 							}
 							else
 							{	// If file could not be linked to the post:
-								$this->log( '<p class="text-warning">'.sprintf( 'File %s could not be linked to User %s.', '<code>'.$File->_adfp_full_path.'</code>', $User->get_identity_link() ).'</p>' );
+								$this->log_warning( sprintf( 'File %s could not be linked to User %s.', '<code>'.$File->_adfp_full_path.'</code>', $User->get_identity_link() ) );
 							}
 						}
 
@@ -820,17 +823,18 @@ class WordpressImport extends AbstractImport
 							if( $import_img )
 							{	// Collect file name in array to link with post below:
 								$file_name = basename( $file_source_path );
-								if( isset( $all_wp_attachments[ $file_name ] ) )
+								if( isset( $imported_file_names[ $file_name ] ) )
 								{	// Don't use this file if more than one use same name, e.g. from different folders:
-									$all_wp_attachments[ $file_name ] = false;
-									$this->log( '<p class="text-danger"><span class="label label-danger">ERROR</span> '
-										.sprintf( 'there are 2+ attachements with conflicting name %s.',
-											'<code>'.$file_name.'</code>' ).'</p>' );
+									$imported_file_names[ $file_name ] = false;
+									$this->log_error( sprintf( 'there are 2+ attachements with conflicting name %s.',
+											'<code>'.$file_name.'</code>' ) );
 								}
 								else
 								{	// This is a first detected file with current name:
-									$all_wp_attachments[ $file_name ] = $File->ID;
+									$imported_file_names[ $file_name ] = $File->ID;
 								}
+								// Store relative file path:
+								$imported_file_paths[ $attch_file_name ] = $File->ID;
 							}
 
 							$attachments_count++;
@@ -855,10 +859,9 @@ class WordpressImport extends AbstractImport
 			{
 				if( $post['post_type'] == 'revision' )
 				{	// Ignore post with type "revision":
-					$this->log( '<p class="text-warning">'.sprintf( 'Ignore post "%s" because of post type is %s',
+					$this->log_warning( sprintf( 'Ignore post "%s" because of post type is %s',
 							'#'.$post['post_id'].' - '.$post['post_title'],
-							'<code>'.$post['post_type'].'</code>' )
-						.'</p>' );
+							'<code>'.$post['post_type'].'</code>' ) );
 					continue;
 				}
 				elseif( $post['post_type'] == 'attachment' )
@@ -925,9 +928,8 @@ class WordpressImport extends AbstractImport
 					$post_type_ID = $selected_item_type_names[ $post['itemtype'] ];
 					if( $post_type_ID == 0 )
 					{	// Skip Item because this was selected on the confirm form:
-						$this->log( '<p class="text-warning"><span class="label label-warning">'.'WARNING'.'</span> '
-							.sprintf( 'Skip Item because Item Type %s is not selected for import.',
-								'<code>&lt;evo:itemtype&gt;</code> = <code>'.$post['itemtype'].'</code>' ).'</p>' );
+						$this->log_warning( sprintf( 'Skip Item because Item Type %s is not selected for import.',
+								'<code>&lt;evo:itemtype&gt;</code> = <code>'.$post['itemtype'].'</code>' ) );
 						continue;
 					}
 				}
@@ -936,9 +938,8 @@ class WordpressImport extends AbstractImport
 					$post_type_ID = $selected_item_type_usages[ $post['post_type'] ];
 					if( $post_type_ID == 0 )
 					{	// Skip Item because this was selected on the confirm form:
-						$this->log( '<p class="text-warning"><span class="label label-warning">'.'WARNING'.'</span> '
-							.sprintf( 'Skip Item because Item Type %s is not selected for import.',
-								'<code>&lt;wp:post_type&gt;</code> = <code>'.$post['post_type'].'</code>' ).'</p>' );
+						$this->log_warning( sprintf( 'Skip Item because Item Type %s is not selected for import.',
+								'<code>&lt;wp:post_type&gt;</code> = <code>'.$post['post_type'].'</code>' ) );
 						continue;
 					}
 				}
@@ -947,8 +948,7 @@ class WordpressImport extends AbstractImport
 					$post_type_ID = $selected_item_type_none;
 					if( $post_type_ID == 0 )
 					{	// Skip Item because this was selected on the confirm form:
-						$this->log( '<p class="text-warning"><span class="label label-warning">'.'WARNING'.'</span> '
-							.'Skip Item because you didn\'t select to import without provided item type.'.'</p>' );
+						$this->log_warning( 'Skip Item because you didn\'t select to import without provided item type.' );
 						continue;
 					}
 				}
@@ -956,7 +956,8 @@ class WordpressImport extends AbstractImport
 				$ItemTypeCache = & get_ItemTypeCache();
 				if( ! ( $ItemType = & $ItemTypeCache->get_by_ID( $post_type_ID, false, false ) ) )
 				{	// Skip not found Item Type:
-					$this->log( '<p class="text-danger"><span class="label label-danger">'.'ERROR'.'</span> '.sprintf( 'Skip Item because Item Type %s is not found.', '<code>'.( isset( $post['itemtype'] ) ? $post['itemtype'] : $post['post_type'] ).'</code>' ).'</p>' );
+					$this->log_error( sprintf( 'Skip Item because Item Type %s is not found.',
+						'<code>'.( isset( $post['itemtype'] ) ? $post['itemtype'] : $post['post_type'] ).'</code>' ) );
 					continue;
 				}
 
@@ -969,12 +970,17 @@ class WordpressImport extends AbstractImport
 					{
 						if( ! isset( $item_type_custom_fields[ $custom_field_name ] ) )
 						{	// Skip unknown custom field:
-							$this->log( '<p class="text-danger"><span class="label label-danger">'.'ERROR'.'</span> '.sprintf( 'Skip custom field %s because Item Type %s has no it.', '<code>'.$custom_field_name.'</code>', '#'.$ItemType->ID.' "'.$ItemType->get( 'name' ).'"' ).'</p>' );
+							$this->log_error( sprintf( 'Skip custom field %s because Item Type %s has no it.',
+								'<code>'.$custom_field_name.'</code>',
+								'#'.$ItemType->ID.' "'.$ItemType->get( 'name' ).'"' ) );
 							continue;
 						}
 						if( $item_type_custom_fields[ $custom_field_name ]['type'] != $custom_field['type'] )
 						{	// Skip wrong custom field type:
-							$this->log( '<p class="text-danger"><span class="label label-danger">'.'ERROR'.'</span> '.sprintf( 'Cannot import custom field %s because it has type %s and we expect type %s', '<code>'.$custom_field_name.'</code>', '<code>'.$custom_field['type'].'</code>', '<code>'.$item_type_custom_fields[ $custom_field_name ]['type'].'</code>' ).'</p>' );
+							$this->log_error( sprintf( 'Cannot import custom field %s because it has type %s and we expect type %s',
+								'<code>'.$custom_field_name.'</code>',
+								'<code>'.$custom_field['type'].'</code>',
+								'<code>'.$item_type_custom_fields[ $custom_field_name ]['type'].'</code>' ) );
 							continue;
 						}
 						$Item->set_custom_field( $custom_field_name, $custom_field['value'] );
@@ -1077,10 +1083,10 @@ class WordpressImport extends AbstractImport
 							$File = $files[ $link['link_file_ID'] ];
 							if( $File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] ) )
 							{	// If file has been linked to the post
-								$this->log( '<p class="text-success">'.sprintf( 'File %s has been linked to this post as %s from %s.',
+								$this->log_success( sprintf( 'File %s has been linked to this post as %s from %s.',
 									'<code>'.$File->_adfp_full_path.'</code>',
 									'<code>'.$link['link_position'].'</code>',
-									'<code>&lt;evo:link&gt;</code>' ).'</p>' );
+									'<code>&lt;evo:link&gt;</code>' ) );
 								$file_is_linked = true;
 								// Update link order to the latest for two other ways([caption] and <img />) below:
 								$link_order = $link['link_order'] + 1;
@@ -1088,7 +1094,7 @@ class WordpressImport extends AbstractImport
 						}
 						if( ! $file_is_linked )
 						{	// If file could not be linked to the post:
-							$this->log( '<p class="text-warning">'.sprintf( 'Link %s could not be attached to this post because file %s is not found.', '#'.$link['link_ID'], '#'.$link['link_file_ID'] ).'</p>' );
+							$this->log_warning( sprintf( 'Link %s could not be attached to this post because file %s is not found.', '#'.$link['link_ID'], '#'.$link['link_file_ID'] ) );
 						}
 					}
 				}
@@ -1109,18 +1115,19 @@ class WordpressImport extends AbstractImport
 									$File = $files[ $attachment_IDs[ $postmeta['value'] ] ];
 									if( $File->link_to_Object( $LinkOwner, $link_order, 'cover' ) )
 									{	// If file has been linked to the post:
-										$this->log( '<p class="text-success">'.sprintf( 'File %s has been linked to this post as cover from %s.',
+										$this->log_success( sprintf( 'File %s has been linked to this post as %s from %s.',
 											'<code>'.$File->_adfp_full_path.'</code>',
-											'<code>&lt;wp:meta_key&gt;_thumbnail_id&lt;/wp:meta_key&gt;</code>' ).'</p>' );
+											'<code>cover</code>',
+											'<code>&lt;wp:meta_key&gt;_thumbnail_id&lt;/wp:meta_key&gt;</code>' ) );
 										$file_is_linked = true;
 										$link_order++;
 									}
 								}
 								if( ! $file_is_linked )
 								{	// If file could not be linked to the post:
-									$this->log( '<p class="text-warning">'.sprintf( 'Cover file %s could not be attached to this post because it is not found in the source attachments by %s.',
+									$this->log_warning( sprintf( 'Cover file %s could not be attached to this post because it is not found in the source attachments by %s.',
 										'#'.$postmeta['value'],
-										'<code>&lt;wp:meta_key&gt;_thumbnail_id&lt;/wp:meta_key&gt;</code> = <code>'.$postmeta['value'].'</code>' ).'</p>' );
+										'<code>&lt;wp:meta_key&gt;_thumbnail_id&lt;/wp:meta_key&gt;</code> = <code>'.$postmeta['value'].'</code>' ) );
 								}
 								break;
 						}
@@ -1139,9 +1146,9 @@ class WordpressImport extends AbstractImport
 							$File = $files[ $attachment_IDs[ $caption_post_ID ] ];
 							if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
 							{	// If file has been linked to the post
-								$this->log( '<p class="text-success">'.sprintf( 'File %s has been linked to this post from %s.',
+								$this->log_success( sprintf( 'File %s has been linked to this post from %s.',
 									'<code>'.$File->_adfp_full_path.'</code>',
-									'<code>[caption id="attachment_'.$caption_post_ID.'"]</code>' ).'</p>' );
+									'<code>[caption id="attachment_'.$caption_post_ID.'"]</code>' ) );
 								// Replace this caption tag from content with b2evolution format:
 								$updated_post_content = preg_replace( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
 								$file_is_linked = true;
@@ -1150,58 +1157,95 @@ class WordpressImport extends AbstractImport
 						}
 						if( ! $file_is_linked )
 						{	// If file could not be linked to the post:
-							$this->log( '<p class="text-warning">'.sprintf( 'Caption file %s could not be attached to this post because it is not found in the source attachments folder by %s.',
+							$this->log_warning( sprintf( 'Caption file %s could not be attached to this post because it is not found in the source attachments folder by %s.',
 								'#'.$caption_post_ID,
-								'<code>[caption id="attachment_'.$caption_post_ID.'"]</code>' ).'</p>' );
+								'<code>[caption id="attachment_'.$caption_post_ID.'"]</code>' ) );
 						}
 					}
 				}
 
 				// Try to extract files from html tag <img />:
-				if( $import_img && count( $all_wp_attachments ) )
+				if( $import_img && count( $imported_file_names ) )
 				{	// Only if it is requested and at least one attachment has been detected above:
 					if( preg_match_all( '#<img[^>]+src="([^"]+)"[^>]+>#i', $updated_post_content, $img_matches ) )
 					{	// If <img /> tag is detected
 						foreach( $img_matches[1] as $img_url )
 						{
+							$matched_file_ID = NULL;
+							$matched_file_place = NULL;
 							$file_is_linked = false;
 							$img_file_name = basename( $img_url );
-							if( isset( $all_wp_attachments[ $img_file_name ] ) )
-							{
-								if( $all_wp_attachments[ $img_file_name ] === false )
-								{	// Skip a duplicated file by name:
-									$this->log( '<p class="text-danger"><span class="label label-danger">ERROR</span> '
-										.sprintf( 'cannot replace img src="%s" because the file name %s is a duplicate.',
-											'<code>'.$img_url.'</code>',
-											'<code>'.$img_file_name.'</code>' ).'</p>' );
-									continue;
+							$img_file_rel_path = NULL;
+
+							if( ! empty( $this->info_data['attached_files_folder'] ) &&
+							    strpos( $img_url, $this->info_data['attached_files_folder'] ) !== false )
+							{	// Get relative path because image URL contains it:
+								$img_file_rel_path = preg_replace( '#^.+?'.preg_quote( $this->info_data['attached_files_folder'] ).'#', '', $img_url );
+							}
+
+							if( $img_file_rel_path !== NULL &&
+							    ! empty( $imported_file_paths[ $img_file_rel_path ] ) )
+							{	// We find file by relative path:
+								$matched_file_ID = $imported_file_paths[ $img_file_rel_path ];
+								$matched_file_place = 'path';
+							}
+							elseif( isset( $imported_file_names[ $img_file_name ] ) )
+							{	// We find file by name:
+								$matched_file_ID = $imported_file_names[ $img_file_name ];
+								$matched_file_place = 'file';
+							}
+
+							if( $matched_file_ID === false )
+							{	// Skip a duplicated file by name:
+								$this->log_error( sprintf( 'Cannot replace img src="%s" because the file name %s is a duplicate and it was not found in %s.',
+										'<code>'.$img_url.'</code>',
+										'<code>'.$img_file_name.'</code>',
+										( empty( $this->info_data['attached_files_folder'] ) ? ' attachments folder because it is not detected for the imported XML file' : '<code>'.$this->info_data['attached_files_folder'].'</code>' ) ) );
+								continue;
+							}
+
+							if( isset( $files[ $matched_file_ID ] ) )
+							{	// Try to link File to the Item:
+								$File = $files[ $matched_file_ID ];
+								if( $linked_post_ID = array_search( $File->ID, $attachment_IDs ) )
+								{
+									$linked_post_files[] = $linked_post_ID;
 								}
-								if( isset( $files[ $all_wp_attachments[ $img_file_name ] ] ) )
-								{	// Try to link File to the Item:
-									$File = $files[ $all_wp_attachments[ $img_file_name ] ];
-									if( $linked_post_ID = array_search( $File->ID, $attachment_IDs ) )
-									{
-										$linked_post_files[] = $linked_post_ID;
+								if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
+								{	// If file has been linked to the post
+									$this->log_success( sprintf( 'File %s has been linked to this post as %s from img src="%s"'.( $matched_file_place == 'path' ? ' and matched with <code>'.$img_file_rel_path.'</code>' : '' ).'.',
+										'<code>'.$File->_adfp_full_path.'</code>',
+										'<code>inline</code>',
+										'<code>'.$img_url.'</code>' ) );
+									if( $matched_file_place == 'file' )
+									{	// Inform the file was matched only by name:
+										$this->log_warning( sprintf( 'We could not match file name %s but we could match %s.',
+											( empty( $img_file_rel_path )
+												? ' by relative path '.( empty( $this->info_data['attached_files_folder'] ) ? '' : '<code>'.$this->info_data['attached_files_folder'].'</code>' ).' because it is not found in image URL'
+												: '<code>'.$img_file_rel_path.'</code>' ),
+											'<code>'.$img_file_name.'</code>' ) );
 									}
-									if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
-									{	// If file has been linked to the post
-										$this->log( '<p class="text-success">'.sprintf( 'File %s has been linked to this post as inline from img src="%s".',
-											'<code>'.$File->_adfp_full_path.'</code>',
-											'<code>'.$img_url.'</code>' ).'</p>' );
-										// Replace this img tag from content with b2evolution format:
-										$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
-										$file_is_linked = true;
-										$link_order++;
-									}
+									// Replace this img tag from content with b2evolution format:
+									$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
+									$file_is_linked = true;
+									$link_order++;
+								}
+								else
+								{	// If file could not be linked:
+									$this->log_error( sprintf( 'File %s could not be linked to this post as %s from img src="%s".',
+										'<code>'.$File->_adfp_full_path.'</code>',
+										'<code>inline</code>',
+										'<code>'.$img_url.'</code>' ) );
 								}
 							}
+
 							if( ! $file_is_linked )
 							{	// If file could not be linked to the post:
-								$this->log( '<p class="text-warning">'.sprintf( 'File of img src=%s could not be attached to this post because the name %s does not match any %s or %s.',
+								$this->log_warning( sprintf( 'File of img src=%s could not be attached to this post because the name %s does not match any %s or %s.',
 									'<code>'.$img_url.'</code>',
 									'<code>'.$img_file_name.'</code>',
 									'<code>&lt;evo:file&gt;</code>',
-									'<code>&lt;item&gt;&lt;wp:post_type&gt;attachment&lt;/wp:post_type&gt;...</code>' ).'</p>' );
+									'<code>&lt;item&gt;&lt;wp:post_type&gt;attachment&lt;/wp:post_type&gt;...</code>' ) );
 							}
 						}
 					}
@@ -1221,18 +1265,18 @@ class WordpressImport extends AbstractImport
 							$File = $files[ $attachment_IDs[ $attachment_post_ID ] ];
 							if( $File->link_to_Object( $LinkOwner, $link_order, 'aftermore' ) )
 							{	// If file has been linked to the post:
-								$this->log( '<p class="text-success">'.sprintf( 'File %s has been linked to this post as aftermore by %s.',
+								$this->log_success( sprintf( 'File %s has been linked to this post as aftermore by %s.',
 									'<code>'.$File->_adfp_full_path.'</code>',
-									'<code>&lt;wp:post_id&gt;'.$post['post_id'].'&lt;/wp:post_id&gt;</code>' ).'</p>' );
+									'<code>&lt;wp:post_id&gt;'.$post['post_id'].'&lt;/wp:post_id&gt;</code>' ) );
 								$file_is_linked = true;
 								$link_order++;
 							}
 						}
 						if( ! $file_is_linked )
 						{	// If file could not be linked to the post:
-							$this->log( '<p class="text-warning">'.sprintf( 'File %s could not be attached to this post because it is not found in the source attachments by %s.',
+							$this->log_warning( sprintf( 'File %s could not be attached to this post because it is not found in the source attachments by %s.',
 								'#'.$attachment_post_ID,
-								'<code>&lt;wp:post_parent&gt;'.$post['post_id'].'&lt;/wp:post_parent&gt;</code>' ).'</p>' );
+								'<code>&lt;wp:post_parent&gt;'.$post['post_id'].'&lt;/wp:post_parent&gt;</code>' ) );
 						}
 					}
 				}
@@ -1248,7 +1292,7 @@ class WordpressImport extends AbstractImport
 					$comments[ $Item->ID ] = $post['comments'];
 				}
 
-				$this->log( '<span class="text-success">'.'OK'.'.</span>' );
+				$this->log( '<span class="text-success">'.'OK -> '.$Item->get_title().'.</span>' );
 				$this->log( '</p>' );
 				$posts_count++;
 			}
@@ -1366,7 +1410,7 @@ class WordpressImport extends AbstractImport
 			$this->log( '<b>'.sprintf( '%d records', $comments_count ).'</b></p>' );
 		}
 
-		$this->log( '<p class="text-success">'.'Import complete.'.'</p>' );
+		$this->log_success( 'Import complete.' );
 
 		$DB->commit();
 	}
@@ -1397,7 +1441,7 @@ class WordpressImport extends AbstractImport
 
 		if( ! file_exists( $file_source_path ) )
 		{	// File doesn't exist
-			$this->log( '<p class="text-warning">'.sprintf( 'Unable to copy file %s, because it does not exist.', '<code>'.$file_source_path.'</code>' ).'</p>' );
+			$this->log_warning( sprintf( 'Unable to copy file %s, because it does not exist.', '<code>'.$file_source_path.'</code>' ) );
 			// Skip it:
 			return $File;
 		}
@@ -1415,8 +1459,8 @@ class WordpressImport extends AbstractImport
 				( $File = & $FileCache->get_by_ID( $existing_file_ID, false, false ) ) &&
 				$File->exists() )
 		{	// Use already exsiting File:
-			$this->log( '<p class="text-warning">'.sprintf( 'Don\'t copy/import the file %s, use already existing File #%d in %s instead.',
-				'<code>'.$file_source_path.'</code>', $File->ID, '<code>'.$File->get_full_path().'</code>' ).'</p>' );
+			$this->log_warning( sprintf( 'Don\'t copy/import the file %s, use already existing File #%d in %s instead.',
+				'<code>'.$file_source_path.'</code>', $File->ID, '<code>'.$File->get_full_path().'</code>' ) );
 			return $File;
 		}
 
@@ -1437,11 +1481,11 @@ class WordpressImport extends AbstractImport
 		{	// No permission to copy to the destination folder
 			if( is_dir( $file_source_path ) )
 			{	// Folder
-				$this->log( '<p class="text-warning">'.sprintf( 'Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>' );
+				$this->log_warning( sprintf( 'Unable to copy folder %s to %s. Please, check the permissions assigned to this folder.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ) );
 			}
 			else
 			{	// File
-				$this->log( '<p class="text-warning">'.sprintf( 'Unable to copy file %s to %s. Please, check the permissions assigned to this file.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>' );
+				$this->log_warning( sprintf( 'Unable to copy file %s to %s. Please, check the permissions assigned to this file.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ) );
 			}
 			// Skip it:
 			return $File;
@@ -1453,7 +1497,7 @@ class WordpressImport extends AbstractImport
 		$File->set( 'desc', $params['file_desc'] );
 		$File->dbsave();
 
-		$this->log( '<p class="text-success">'.sprintf( 'File %s has been imported to %s successfully.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ).'</p>' );
+		$this->log_success( sprintf( 'File %s has been imported to %s successfully.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ) );
 
 		return $File;
 	}

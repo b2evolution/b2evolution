@@ -123,13 +123,39 @@ class AbstractImport
 	 * Log a message on screen and into file on disk
 	 *
 	 * @param string Message
+	 * @param string Type: 'success', 'error', 'warning'
 	 */
-	function log( $message )
+	function log( $message, $type = NULL )
 	{
 		if( $message === '' )
 		{	// Don't log empty strings:
 			return;
 		}
+
+		switch( $type )
+		{
+			case 'success':
+				$before = '<p class="text-success"> ';
+				$after = '</p>';
+				break;
+
+			case 'error':
+				$before = '<p class="text-danger"><span class="label label-danger">ERROR</span> ';
+				$after = '</p>';
+				break;
+
+			case 'warning':
+				$before = '<p class="text-warning"><span class="label label-warning">WARNING</span> ';
+				$after = '</p>';
+				break;
+
+			default:
+				$before = '';
+				$after = '';
+				break;
+		}
+
+		$message = $before.$message.$after;
 
 		// Display message on screen:
 		echo $message;
@@ -137,6 +163,39 @@ class AbstractImport
 
 		// Try to store a message into the log file on the disk:
 		$this->log_to_file( $message );
+	}
+
+
+	/**
+	 * Log SUCCESS message on screen and into file on disk
+	 *
+	 * @param string Message
+	 */
+	function log_success( $message )
+	{
+		$this->log( $message, 'success' );
+	}
+
+
+	/**
+	 * Log ERROR message on screen and into file on disk
+	 *
+	 * @param string Message
+	 */
+	function log_error( $message )
+	{
+		$this->log( $message, 'error' );
+	}
+
+
+	/**
+	 * Log WARNING message on screen and into file on disk
+	 *
+	 * @param string Message
+	 */
+	function log_warning( $message )
+	{
+		$this->log( $message, 'warning' );
 	}
 
 

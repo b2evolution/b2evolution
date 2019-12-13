@@ -125,10 +125,12 @@ function wpxml_get_import_data( & $XML_file_path, $allow_use_extracted_folder = 
 	if( $XML_file_path )
 	{	// Get a path with attached files for the XML file:
 		$attached_files_path = get_import_attachments_folder( $XML_file_path, $use_first_folder_for_attachments );
+		$attached_files_folder = substr( $attached_files_path, strlen( dirname( $XML_file_path ) ) );
 	}
 	else
 	{	// Wrong source file:
 		$attached_files_path = false;
+		$attached_files_folder = false;
 	}
 
 	if( isset( $xml_exists_in_zip ) && $xml_exists_in_zip === false && file_exists( $ZIP_folder_path ) )
@@ -156,6 +158,7 @@ function wpxml_get_import_data( & $XML_file_path, $allow_use_extracted_folder = 
 			'errors'               => empty( $errors ) ? false : $errors,
 			'XML_file_path'        => $XML_file_path,
 			'attached_files_path'  => $attached_files_path,
+			'attached_files_folder'=> $attached_files_folder,
 			'ZIP_folder_path'      => $ZIP_folder_path,
 		);
 }
