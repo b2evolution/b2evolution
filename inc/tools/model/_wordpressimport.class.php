@@ -230,44 +230,49 @@ class WordpressImport extends AbstractImport
 			$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
 			$old_categories = $DB->get_col( $SQL );
 			if( !empty( $old_categories ) )
-			{ // Get existing posts
-				$SQL = new SQL();
+			{	// Get existing posts:
+				$SQL = new SQL( 'WP Import: Get existing posts for deleting' );
 				$SQL->SELECT( 'post_ID' );
 				$SQL->FROM( 'T_items__item' );
 				$SQL->WHERE( 'post_main_cat_ID IN ( '.implode( ', ', $old_categories ).' )' );
-				$old_posts = $DB->get_col( $SQL->get() );
+				$old_posts = $DB->get_col( $SQL );
 			}
 
 			$this->log( 'Removing the comments... ' );
-			if( !empty( $old_posts ) )
+			$deleted_comments_num = 0;
+			if( ! empty( $old_posts ) )
 			{
-				$SQL = new SQL();
+				$SQL = new SQL( 'WP Import: Get existing comments for deleting' );
 				$SQL->SELECT( 'comment_ID' );
 				$SQL->FROM( 'T_comments' );
 				$SQL->WHERE( 'comment_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
-				$old_comments = $DB->get_col( $SQL->get() );
-				$DB->query( 'DELETE FROM T_comments WHERE comment_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
+				$old_comments = $DB->get_col( $SQL );
+				$deleted_comments_num = $DB->query( 'DELETE FROM T_comments WHERE comment_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
 				if( !empty( $old_comments ) )
 				{
 					$DB->query( 'DELETE FROM T_comments__votes WHERE cmvt_cmt_ID IN ( '.implode( ', ', $old_comments ).' )' );
 					$DB->query( 'DELETE FROM T_links WHERE link_cmt_ID IN ( '.implode( ', ', $old_comments ).' )' );
 				}
 			}
-			$this->log( 'OK'.'<br />' );
+			$this->log( '<b>'.( $deleted_comments_num
+					? sprintf( '%d comments were deleted', $deleted_comments_num )
+					: 'No comments were deleted'
+				).'</b><br />' );
 
 			$this->log( 'Removing the posts... ' );
+			$deleted_posts_num = 0;
 			if( !empty( $old_categories ) )
 			{
-				$DB->query( 'DELETE FROM T_items__item WHERE post_main_cat_ID IN ( '.implode( ', ', $old_categories ).' )' );
+				$deleted_posts_num = $DB->query( 'DELETE FROM T_items__item WHERE post_main_cat_ID IN ( '.implode( ', ', $old_categories ).' )' );
 				if( !empty( $old_posts ) )
 				{ // Remove the post's data from related tables
 					if( $delete_files )
 					{ // Get the file IDs that should be deleted from hard drive
-						$SQL = new SQL();
+						$SQL = new SQL( 'WP Import: Get the file IDs that should be deleted from hard drive' );
 						$SQL->SELECT( 'DISTINCT link_file_ID' );
 						$SQL->FROM( 'T_links' );
 						$SQL->WHERE( 'link_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
-						$deleted_file_IDs = $DB->get_col( $SQL->get() );
+						$deleted_file_IDs = $DB->get_col( $SQL );
 					}
 					$DB->query( 'DELETE FROM T_items__item_settings WHERE iset_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
 					$DB->query( 'DELETE FROM T_items__prerendering WHERE itpr_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
@@ -281,35 +286,42 @@ class WordpressImport extends AbstractImport
 					$DB->query( 'DELETE FROM T_items__user_data WHERE itud_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
 				}
 			}
-			$this->log( 'OK'.'<br />' );
+			$this->log( '<b>'.( $deleted_posts_num
+					? sprintf( '%d posts were deleted', $deleted_posts_num )
+					: 'No posts were deleted'
+				).'</b><br />' );
 
 			$this->log( 'Removing the categories... ' );
-			$DB->query( 'DELETE FROM T_categories WHERE cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
-			$this->log( 'OK'.'<br />' );
+			$deleted_cats_num = $DB->query( 'DELETE FROM T_categories WHERE cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
+			$this->log( '<b>'.( $deleted_cats_num
+					? sprintf( '%d cats were deleted', $deleted_cats_num )
+					: 'No cats were deleted'
+				).'</b><br />' );
 
 			$this->log( 'Removing the tags that are no longer used... ' );
+			$deleted_tags_num = 0;
 			if( !empty( $old_posts ) )
 			{ // Remove the tags
 
-				// Get tags from selected blog
-				$SQL = new SQL();
+				// Get tags from selected collection:
+				$SQL = new SQL( 'WP Import: Get tags from selected collection for deleting' );
 				$SQL->SELECT( 'itag_tag_ID' );
 				$SQL->FROM( 'T_items__itemtag' );
 				$SQL->WHERE( 'itag_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
-				$old_tags_this_blog = array_unique( $DB->get_col( $SQL->get() ) );
+				$old_tags_this_blog = array_unique( $DB->get_col( $SQL ) );
 
-				if( !empty( $old_tags_this_blog ) )
+				if( ! empty( $old_tags_this_blog ) )
 				{
-					// Get tags from other blogs
-					$SQL = new SQL();
+					// Get tags from other collections:
+					$SQL = new SQL( 'WP Import: Get tags from other collections for deleting' );
 					$SQL->SELECT( 'itag_tag_ID' );
 					$SQL->FROM( 'T_items__itemtag' );
 					$SQL->WHERE( 'itag_itm_ID NOT IN ( '.implode( ', ', $old_posts ).' )' );
-					$old_tags_other_blogs = array_unique( $DB->get_col( $SQL->get() ) );
+					$old_tags_other_blogs = array_unique( $DB->get_col( $SQL ) );
 					$old_tags_other_blogs_sql = !empty( $old_tags_other_blogs ) ? ' AND tag_ID NOT IN ( '.implode( ', ', $old_tags_other_blogs ).' )': '';
 
 					// Remove the tags that are no longer used
-					$DB->query( 'DELETE FROM T_items__tag
+					$deleted_tags_num = $DB->query( 'DELETE FROM T_items__tag
 						WHERE tag_ID IN ( '.implode( ', ', $old_tags_this_blog ).' )'.
 						$old_tags_other_blogs_sql );
 				}
@@ -317,23 +329,27 @@ class WordpressImport extends AbstractImport
 				// Remove the links of tags with posts
 				$DB->query( 'DELETE FROM T_items__itemtag WHERE itag_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
 			}
-			$this->log( 'OK'.'<br />' );
+			$this->log( '<b>'.( $deleted_tags_num
+					? sprintf( '%d tags were deleted', $deleted_tags_num )
+					: 'No tags were deleted'
+				).'</b><br />' );
 
 			if( $delete_files )
 			{ // Delete the files
 				$this->log( 'Removing the files... ' );
 
+				$deleted_files_num = 0;
 				if( ! empty( $deleted_file_IDs ) )
 				{
 					// Commit the DB changes before files deleting
 					$DB->commit();
 
 					// Get the deleted file IDs that are linked to other objects
-					$SQL = new SQL();
+					$SQL = new SQL( 'WP Import: Get the file IDs that are linked to other objects' );
 					$SQL->SELECT( 'DISTINCT link_file_ID' );
 					$SQL->FROM( 'T_links' );
 					$SQL->WHERE( 'link_file_ID IN ( '.implode( ', ', $deleted_file_IDs ).' )' );
-					$linked_file_IDs = $DB->get_col( $SQL->get() );
+					$linked_file_IDs = $DB->get_col( $SQL );
 					// We can delete only the files that are NOT linked to other objects
 					$deleted_file_IDs = array_diff( $deleted_file_IDs, $linked_file_IDs );
 
@@ -341,10 +357,17 @@ class WordpressImport extends AbstractImport
 					foreach( $deleted_file_IDs as $deleted_file_ID )
 					{
 						if( ! ( $deleted_File = & $FileCache->get_by_ID( $deleted_file_ID, false, false ) ) )
-						{ // Incorrect file ID
+						{	// Incorrect file ID:
 							$this->log_error( sprintf( 'No file #%s found in DB. It cannot be deleted.', $deleted_file_ID ) );
+							continue;
 						}
-						if( ! $deleted_File->unlink() )
+						$deleted_file_path = $deleted_File->get_full_path();
+						if( $deleted_File->unlink() )
+						{	// Successful deleting:
+							$this->log_success( sprintf( 'File #%d %s has been deleted.', $deleted_file_ID, '<code>'.$deleted_file_path.'</code>' ) );
+							$deleted_files_num++;
+						}
+						else
 						{ // No permission to delete file
 							$this->log_error( sprintf( 'Could not delete the file %s.', '<code>'.$deleted_File->get_full_path().'</code>' ) );
 						}
@@ -356,7 +379,10 @@ class WordpressImport extends AbstractImport
 					$DB->begin();
 				}
 
-				$this->log( 'OK'.'<br />' );
+				$this->log( '<b>'.( $deleted_files_num
+						? sprintf( '%d files were deleted', $deleted_files_num )
+						: 'No files were deleted'
+					).'</b><br />' );
 			}
 
 			$this->log( '<br />' );
@@ -373,11 +399,11 @@ class WordpressImport extends AbstractImport
 
 			$this->log( '<p><b>'.'Importing users...'.' </b>' );
 
-			// Get existing users
-			$SQL = new SQL();
+			// Get existing users:
+			$SQL = new SQL( 'WP Import: Get existing users before importing' );
 			$SQL->SELECT( 'user_login, user_ID' );
 			$SQL->FROM( 'T_users' );
-			$existing_users = $DB->get_assoc( $SQL->get() );
+			$existing_users = $DB->get_assoc( $SQL );
 
 			$new_users_num = 0;
 			$skipped_users_num = 0;
@@ -632,11 +658,11 @@ class WordpressImport extends AbstractImport
 		load_class( 'chapters/model/_chapter.class.php', 'Chapter' );
 
 		// Get existing categories
-		$SQL = new SQL();
+		$SQL = new SQL( 'WP Import: Get existing categories before importing' );
 		$SQL->SELECT( 'cat_urlname, cat_ID' );
 		$SQL->FROM( 'T_categories' );
 		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
-		$categories = $DB->get_assoc( $SQL->get() );
+		$categories = $DB->get_assoc( $SQL );
 
 		if( isset( $xml_data['categories'] ) && count( $xml_data['categories'] ) > 0 )
 		{
@@ -706,11 +732,11 @@ class WordpressImport extends AbstractImport
 		{
 			$this->log( '<p><b>'.'Importing the tags...'.' </b>' );
 
-			// Get existing tags
-			$SQL = new SQL();
+			// Get existing tags:
+			$SQL = new SQL( 'WP Import: Get existing tags before importing' );
 			$SQL->SELECT( 'tag_name, tag_ID' );
 			$SQL->FROM( 'T_items__tag' );
-			$tags = $DB->get_assoc( $SQL->get() );
+			$tags = $DB->get_assoc( $SQL );
 
 			$tags_count = 0;
 			foreach( $xml_data['tags'] as $tag )
