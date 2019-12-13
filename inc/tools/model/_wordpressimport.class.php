@@ -1265,8 +1265,9 @@ class WordpressImport extends AbstractImport
 							$File = $files[ $attachment_IDs[ $attachment_post_ID ] ];
 							if( $File->link_to_Object( $LinkOwner, $link_order, 'aftermore' ) )
 							{	// If file has been linked to the post:
-								$this->log_success( sprintf( 'File %s has been linked to this post as aftermore by %s.',
+								$this->log_success( sprintf( 'File %s has been linked to this post as %s by %s.',
 									'<code>'.$File->_adfp_full_path.'</code>',
+									'<code>aftermore</code>',
 									'<code>&lt;wp:post_id&gt;'.$post['post_id'].'&lt;/wp:post_id&gt;</code>' ) );
 								$file_is_linked = true;
 								$link_order++;
