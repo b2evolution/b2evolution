@@ -74,6 +74,13 @@ class WordpressImport extends AbstractImport
 			param_error( 'import_file', sprintf( '&laquo;%s&raquo; has an unrecognized extension.', $xml_file ) );
 		}
 
+		if( get_param( 'action' ) == 'import' && 
+		    $import_type == 'replace' &&
+		    param( 'import_type_replace_confirm', 'string' ) !== 'DELETE' )
+		{	// If deleting/replacing is not confirmed:
+			param_error( 'import_type_replace_confirm', sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).'!' );
+		}
+
 		return ! param_errors_detected();
 	}
 
@@ -138,6 +145,14 @@ class WordpressImport extends AbstractImport
 					break;
 				case 'replace':
 					$this->log( TB_('Replace existing contents').' <span class="note">'.TB_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.').'</span>' );
+					if( get_param( 'action' ) == 'confirm' )
+					{	// Display an input to confirm replace import mode:
+						echo '<br /><div class="alert alert-danger" style="display:inline-block;width:auto;margin:0">'
+							.TB_('WARNING').': '
+							.TB_('you will LOSE any data that is not part of the files you import.').' '
+							.sprintf( TB_('Type %s to confirm'), '<code>DELETE</code>' ).': '
+							.'<input name="import_type_replace_confirm" type="text" class="form-control" size="8" style="display:inline-block;width:auto;margin:-8px 0" /></div>';
+					}
 					if( get_param( 'delete_files' ) )
 					{
 						$this->log( '<br /> &nbsp; &nbsp; [√] '.TB_(' Also delete media files that will no longer be referenced in the destination collection after replacing its contents') );

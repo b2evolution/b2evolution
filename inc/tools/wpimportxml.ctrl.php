@@ -53,16 +53,15 @@ switch( $action )
 
 		$WordpressImport = new WordpressImport();
 
-		if( $action == 'confirm' )
-		{	// Don't log into file for the confirm screen before start importing:
-			$WordpressImport->log_file = false;
-		}
-
 		// Load import data from request:
 		if( ! $WordpressImport->load_from_Request() )
 		{	// Don't import if errors have been detected:
-			$action = 'file';
-			break;
+			$action = ( $action == 'confirm' ? 'file' : 'confirm' );
+		}
+
+		if( $action == 'confirm' )
+		{	// Don't log into file for the confirm screen before start importing:
+			$WordpressImport->log_file = false;
 		}
 		break;
 }
