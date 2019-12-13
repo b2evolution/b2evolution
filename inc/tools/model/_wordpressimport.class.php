@@ -168,8 +168,8 @@ class WordpressImport extends AbstractImport
 		}
 		else
 		{	// Display errors if import cannot be done:
-			$this->log( $this->info_data['errors'] );
-			$this->log( '<br /><p class="text-danger">'.T_('Import failed.').'</p>' );
+			$this->log( $this->info_data['errors'].'<br />' );
+			$this->log_error( T_('Import failed.'), 'p', false );
 		}
 
 		$this->log( '</p>' );
@@ -500,7 +500,7 @@ class WordpressImport extends AbstractImport
 					if( ! $User->dbinsert() )
 					{	// Error on insert new user:
 						$failed_users_num++;
-						$this->log( '<span class="text-danger">'.sprintf( 'User %s could not be inserted in DB.', '<code>'.$author_login.'</code>' ).'</span>' );
+						$this->log_error( sprintf( 'User %s could not be inserted in DB.', '<code>'.$author_login.'</code>' ), 'span', false );
 						continue;
 					}
 					$user_ID = $User->ID;
@@ -524,12 +524,12 @@ class WordpressImport extends AbstractImport
 					}
 
 					$new_users_num++;
-					$this->log( '<span class="text-success">'.'OK'.'.</span>' );
+					$this->log_success( 'OK', 'span' );
 				}
 				else
 				{	// Get ID of existing user
 					$user_ID = $existing_users[ $author_login ];
-					$this->log( '<span class="text-warning">'.sprintf( 'Skip because user already exists with same login and ID #%d.', intval( $user_ID ) ).'</span>' );
+					$this->log_warning( sprintf( 'Skip because user already exists with same login and ID #%d.', intval( $user_ID ) ), 'span', false );
 					$skipped_users_num++;
 				}
 				// Save user ID of current author
@@ -541,14 +541,16 @@ class WordpressImport extends AbstractImport
 
 			$UserSettings->dbupdate();
 
-			$this->log( '<b class="text-success">'.sprintf( '%d new users', $new_users_num ).'</b>' );
+			$this->log_success( sprintf( '%d new users', $new_users_num ), 'b' );
 			if( $skipped_users_num )
 			{
-				$this->log( '<br /><b class="text-warning">'.sprintf( '%d skipped users', $skipped_users_num ).'</b>' );
+				$this->log( '<br />' );
+				$this->log_warning( sprintf( '%d skipped users', $skipped_users_num ), 'b', false );
 			}
 			if( $failed_users_num )
 			{
-				$this->log( '<br /><b class="text-danger">'.sprintf( '%d users could not be imported', $failed_users_num ).'</b>' );
+				$this->log( '<br />' );
+				$this->log_error( sprintf( '%d users could not be imported', $failed_users_num ), 'b', false );
 			}
 			$this->log( '</p>' );
 		}
@@ -677,7 +679,7 @@ class WordpressImport extends AbstractImport
 
 				if( ! empty( $categories[ (string) $cat['category_nicename'] ] ) )
 				{
-					$this->log( '<span class="text-warning">'.sprintf( 'Skip creating, use existing category #%d with same slug %s.', intval( $categories[ (string) $cat['category_nicename'] ] ), '<code>'.$cat['category_nicename'].'</code>' ).'</span>' );
+					$this->log_warning( sprintf( 'Skip creating, use existing category #%d with same slug %s.', intval( $categories[ (string) $cat['category_nicename'] ] ), '<code>'.$cat['category_nicename'].'</code>' ), 'span', false );
 				}
 				else
 				{
@@ -699,7 +701,7 @@ class WordpressImport extends AbstractImport
 						$category_default = $Chapter->ID;
 					}
 					$categories_count++;
-					$this->log( '<span class="text-success">'.'OK'.'.</span>' );
+					$this->log_success( 'OK', 'span' );
 				}
 			}
 
@@ -745,7 +747,7 @@ class WordpressImport extends AbstractImport
 				$this->log( '<p>'.sprintf( 'Importing tag: %s', '"'.$tag_name.'"' ).'... ' );
 				if( ! empty( $tags[ $tag_name ] ) )
 				{
-					$this->log( '<span class="text-warning">'.sprintf( 'Skip because tag #%d already exists with same name %s.', intval( $tags[ $tag_name ] ), '<code>'.$tag_name.'</code>' ).'</span>' );
+					$this->log_warning( sprintf( 'Skip because tag #%d already exists with same name %s.', intval( $tags[ $tag_name ] ), '<code>'.$tag_name.'</code>' ), 'span', false );
 				}
 				else
 				{	// Insert new tag into DB if tag doesn't exist with current name
@@ -755,7 +757,7 @@ class WordpressImport extends AbstractImport
 					// Save new tag
 					$tags[ $tag_name ] = (string) $tag_ID;
 					$tags_count++;
-					$this->log( '<span class="text-success">'.'OK'.'.</span>' );
+					$this->log_success( 'OK', 'span' );
 				}
 			}
 			$this->log( '</p>' );
@@ -1254,18 +1256,22 @@ class WordpressImport extends AbstractImport
 								}
 								if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
 								{	// If file has been linked to the post
-									$this->log_success( sprintf( 'File %s has been linked to this post as %s from img src="%s"'.( $matched_file_place == 'path' ? ' and matched with <code>'.$img_file_rel_path.'</code>' : '' ).'.',
-										'<code>'.$File->_adfp_full_path.'</code>',
-										'<code>inline</code>',
-										'<code>'.$img_url.'</code>' ) );
 									if( $matched_file_place == 'file' )
 									{	// Inform the file was matched only by name:
-										$this->log_warning( sprintf( 'We could not match file name %s but we could match %s.',
+										$additional_file_log = ' '.$this->get_log( sprintf( 'We could not match file name %s but we could match %s.',
 											( empty( $img_file_rel_path )
 												? ' by relative path '.( empty( $this->info_data['attached_files_folder'] ) ? '' : '<code>'.$this->info_data['attached_files_folder'].'</code>' ).' because it is not found in image URL'
 												: '<code>'.$img_file_rel_path.'</code>' ),
-											'<code>'.$img_file_name.'</code>' ) );
+											'<code>'.$img_file_name.'</code>' ), 'warning', 'span' );
 									}
+									else
+									{
+										$additional_file_log = '';
+									}
+									$this->log_success( sprintf( 'File %s has been linked to this post as %s from img src="%s"'.( $matched_file_place == 'path' ? ' and matched with <code>'.$img_file_rel_path.'</code>' : '' ).'.',
+										'<code>'.$File->_adfp_full_path.'</code>',
+										'<code>inline</code>',
+										'<code>'.$img_url.'</code>' ).$additional_file_log );
 									// Replace this img tag from content with b2evolution format:
 									$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
 									$file_is_linked = true;
@@ -1334,7 +1340,7 @@ class WordpressImport extends AbstractImport
 					$comments[ $Item->ID ] = $post['comments'];
 				}
 
-				$this->log( '<span class="text-success">'.'OK -> '.$Item->get_title().'.</span>' );
+				$this->log_success( 'OK -> '.$Item->get_title(), 'span' );
 				$this->log( '</p>' );
 				$posts_count++;
 			}
@@ -1366,7 +1372,7 @@ class WordpressImport extends AbstractImport
 				$this->log( '<p>'.sprintf( 'Importing comments of the post #%d', intval( $post_ID ) ).'... ' );
 				if( empty( $comments ) )
 				{	// Skip if no comments
-					$this->log( '<span class="text-warning">'.'Skip because the post has no comments.'.'</span>' );
+					$this->log_warning( 'Skip because the post has no comments.', 'span', false );
 					continue;
 				}
 
@@ -1444,7 +1450,7 @@ class WordpressImport extends AbstractImport
 					$this->log( '.' );
 				}
 
-				$this->log( ' <span class="text-success">'.sprintf( '%d comments', $post_comments_count ).'.</span>' );
+				$this->log_success( ' '.sprintf( '%d comments', $post_comments_count ).'.', 'span' );
 
 				$this->log( '</p>' );
 			}

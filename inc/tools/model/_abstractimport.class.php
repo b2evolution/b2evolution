@@ -120,33 +120,36 @@ class AbstractImport
 
 
 	/**
-	 * Log a message on screen and into file on disk
+	 * Get a log message
 	 *
 	 * @param string Message
 	 * @param string Type: 'success', 'error', 'warning'
+	 * @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
+	 * @param boolean TRUE to display label
+	 * @return string|FALSE Formatted log message, FALSE - when message should not be displayed
 	 */
-	function log( $message, $type = NULL )
+	function get_log( $message, $type = NULL, $type_html_tag = 'p', $display_label = true )
 	{
 		if( $message === '' )
 		{	// Don't log empty strings:
-			return;
+			return false;
 		}
 
 		switch( $type )
 		{
 			case 'success':
-				$before = '<p class="text-success"> ';
-				$after = '</p>';
+				$before = '<'.$type_html_tag.' class="text-success"> ';
+				$after = '</'.$type_html_tag.'>';
 				break;
 
 			case 'error':
-				$before = '<p class="text-danger"><span class="label label-danger">ERROR</span> ';
-				$after = '</p>';
+				$before = '<'.$type_html_tag.' class="text-danger">'.( $display_label ? '<span class="label label-danger">ERROR</span>' : '' ).' ';
+				$after = '</'.$type_html_tag.'>';
 				break;
 
 			case 'warning':
-				$before = '<p class="text-warning"><span class="label label-warning">WARNING</span> ';
-				$after = '</p>';
+				$before = '<'.$type_html_tag.' class="text-warning">'.( $display_label ? '<span class="label label-warning">WARNING</span>' : '' ).' ';
+				$after = '</'.$type_html_tag.'>';
 				break;
 
 			default:
@@ -155,7 +158,26 @@ class AbstractImport
 				break;
 		}
 
-		$message = $before.$message.$after;
+		return $before.$message.$after;
+	}
+
+
+	/**
+	 * Log a message on screen and into file on disk
+	 *
+	 * @param string Message
+	 * @param string Type: 'success', 'error', 'warning'
+	 * @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
+	 * @param boolean TRUE to display label
+	 */
+	function log( $message, $type = NULL, $type_html_tag = 'p', $display_label = true )
+	{
+		$message = $this->get_log( $message, $type, $type_html_tag, $display_label );
+
+		if( $message === false )
+		{	// Skip when message should not be displayed:
+			return;
+		}
 
 		// Display message on screen:
 		echo $message;
@@ -170,10 +192,12 @@ class AbstractImport
 	 * Log SUCCESS message on screen and into file on disk
 	 *
 	 * @param string Message
+	 * @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
+	 * @param boolean TRUE to display label
 	 */
-	function log_success( $message )
+	function log_success( $message, $type_html_tag = 'p', $display_label = true )
 	{
-		$this->log( $message, 'success' );
+		$this->log( $message, 'success', $type_html_tag, $display_label );
 	}
 
 
@@ -181,10 +205,12 @@ class AbstractImport
 	 * Log ERROR message on screen and into file on disk
 	 *
 	 * @param string Message
+	 * @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
+	 * @param boolean TRUE to display label
 	 */
-	function log_error( $message )
+	function log_error( $message, $type_html_tag = 'p', $display_label = true )
 	{
-		$this->log( $message, 'error' );
+		$this->log( $message, 'error', $type_html_tag, $display_label );
 	}
 
 
@@ -192,10 +218,12 @@ class AbstractImport
 	 * Log WARNING message on screen and into file on disk
 	 *
 	 * @param string Message
+	 * @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
+	 * @param boolean TRUE to display label
 	 */
-	function log_warning( $message )
+	function log_warning( $message, $type_html_tag = 'p', $display_label = true )
 	{
-		$this->log( $message, 'warning' );
+		$this->log( $message, 'warning', $type_html_tag, $display_label );
 	}
 
 
