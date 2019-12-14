@@ -72,6 +72,14 @@ $schema_queries = array(
 			PRIMARY KEY ( cach_name )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
+	'T_social__network' => array(
+		'Creating table for social networks',
+		"CREATE TABLE T_social__network (
+			sn_ID int(10) UNSIGNED NOT NULL auto_increment,
+			sn_name VARCHAR(32) NOT NULL,
+			PRIMARY KEY (sn_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
 	'T_users' => array(
 		'Creating table for Users',
 		"CREATE TABLE T_users (
@@ -241,6 +249,17 @@ $schema_queries = array(
 			uutg_emtag_ID INT(10)  UNSIGNED NOT NULL,
 			PRIMARY KEY (uutg_user_ID, uutg_emtag_ID),
 			UNIQUE taguser(uutg_emtag_ID, uutg_user_ID)
+		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
+
+	'T_users__social_network' => array(
+		'Creating table for user social network',
+		"CREATE TABLE T_users__social_network (
+			usn_user_ID INT(10) UNSIGNED NOT NULL,
+			usn_sn_ID INT(10) UNSIGNED NOT NULL,
+			usn_network_ID VARCHAR(256) NOT NULL,
+			usn_token VARCHAR(256) NOT NULL,
+			usn_token_expiration_ts TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
+			PRIMARY KEY (usn_user_ID, usn_sn_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_i18n_original_string' => array(

@@ -12147,6 +12147,23 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15670, 'Creating tables for Social Networks and User Social Networks...' ) )
+	{	// part of 7.0.2-beta
+		db_create_table( 'T_social__network', '
+			sn_ID int(10) UNSIGNED NOT NULL auto_increment,
+			sn_name VARCHAR(32) NOT NULL,
+			PRIMARY KEY (sn_ID)' );
+
+		db_create_table( 'T_users__social_network', '
+			usn_user_ID INT(10) UNSIGNED NOT NULL,
+			usn_sn_ID INT(10) UNSIGNED NOT NULL,
+			usn_network_ID VARCHAR(256) NOT NULL,
+			usn_token VARCHAR(256) NOT NULL,
+			usn_token_expiration_ts TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+			PRIMARY KEY (usn_user_ID, usn_sn_ID )' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
