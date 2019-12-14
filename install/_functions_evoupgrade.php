@@ -12158,8 +12158,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			usn_user_ID INT(10) UNSIGNED NOT NULL,
 			usn_sn_ID INT(10) UNSIGNED NOT NULL,
 			usn_network_ID VARCHAR(256) NOT NULL,
-			usn_token VARCHAR(256) NOT NULL,
-			usn_token_expiration_ts TIMESTAMP NOT NULL DEFAULT "2000-01-01 00:00:00",
+			usn_token VARCHAR(1000) NOT NULL,
+			usn_token_expiration_ts TIMESTAMP NULL DEFAULT NULL,
 			PRIMARY KEY (usn_user_ID, usn_sn_ID )' );
 		upg_task_end();
 	}
