@@ -2951,6 +2951,15 @@ class Item extends ItemLight
 				}
 
 				// Format number:
+				if( preg_match( '#^(.+?)\[\.([a-z0-9\-_\.]+)\]$#i', $format, $format_class ) )
+				{	// Format has a class:
+					$format = $format_class[1];
+					$format_class = str_replace( '.', ' ', $format_class[2] );
+				}
+				else
+				{	// No class for the format:
+					$format_class = '';
+				}
 				$format = preg_split( '#(\d+)#', $format, -1, PREG_SPLIT_DELIM_CAPTURE );
 				$f_num = count( $format );
 				$format_decimals = 0;
@@ -2986,6 +2995,10 @@ class Item extends ItemLight
 				}
 				// Add prefix and suffix:
 				$custom_field_value = $format_prefix.$custom_field_value.$format_suffix;
+				if( $format_class !== '' )
+				{	// Apply class for the format:
+					$custom_field_value = '<span class="'.format_to_output( $format_class, 'htmlattr' ).'">'.$custom_field_value.'</span>';
+				}
 				break;
 
 			case 'text':

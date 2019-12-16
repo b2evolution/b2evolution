@@ -4780,7 +4780,7 @@ function render_custom_field( $value, $params = array() )
 			'field_value_plus'    => '<span class="fa fa-plus-circle green"></span>', // (+)
 			'field_value_minus'   => '<span class="fa fa-minus-circle red"></span>', // (-)
 			'field_value_warning' => '<span class="fa fa-exclamation-triangle orange"></span>', // (!)
-			'field_value_note'    => '<span class="note">$note_text$</span>', // {note text}
+			'field_value_note'    => '<span class="note$note_class$">$note_text$</span>', // {note text} or {note text}[.class1.class2.classX]
 			'expansion'           => 'default', // 'default': || = '<br />', | | = space; 'vertical': both = '<br />'; 'horizontal': both = space.
 		), $params );
 
@@ -4799,7 +4799,9 @@ function render_custom_field( $value, $params = array() )
 	$value = str_replace( array_keys( $value_masks ), $value_masks, $value );
 
 	// Render a note text:
-	$value = preg_replace( '/\{([^}]+)\}/', str_replace( '$note_text$', '$1', $params['field_value_note'] ), $value );
+	global $evo_render_custom_field_note_template;
+	$evo_render_custom_field_note_template = $params['field_value_note'];
+	$value = preg_replace_callback( '/\{([^}]+)\}(\[\.([a-z0-9\-_\.]+)\])?/i', 'render_custom_field_note_callback', $value );
 
 	// Render stars:
 	if( preg_match_all( '/(#stars(:\d+.?\d+?)?(\/\d+)?)#/', $value, $star_matches ) )
@@ -4822,6 +4824,25 @@ function render_custom_field( $value, $params = array() )
 	}
 
 	return $value;
+}
+
+
+/**
+ * Callback function to render {note text}[.class1.class2.classX] in custom field value
+ *
+ * @param array Matches
+ * @return string
+ */
+function render_custom_field_note_callback( $m )
+{
+	global $evo_render_custom_field_note_template;
+
+	// Note class is optional:
+	$note_class = ( isset( $m[3] ) ? ' '.str_replace( '.', ' ', $m[3] ) : '' );
+
+	return str_replace( array( '$note_class$', '$note_text$' ),
+		array( $note_class, $m[1] ),
+		$evo_render_custom_field_note_template );
 }
 
 
