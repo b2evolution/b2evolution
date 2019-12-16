@@ -3321,16 +3321,21 @@ class Item extends ItemLight
 	{
 		$params = array_merge( array(
 				'check_code_block'      => true, // TRUE to find inline tags only outside of codeblocks
+				'render_content_blocks' => true,
 				'render_inline_files'   => true,
 				'render_links'          => true,
 				'render_custom_fields'  => true,
 				'render_other_item'     => true,
 				'render_collection'     => true,
-				'render_content_blocks' => true,
 				'render_inline_widgets' => true,
 				'render_block_widgets'  => true,
 				'render_switchable_blocks' => true,
 			), $params );
+
+		if( $params['render_content_blocks'] )
+		{	// Render Content block tags like [include:123], [include:item-slug]:
+			$content = $this->render_content_blocks( $content, $params );
+		}
 
 		if( $params['render_inline_widgets'] )
 		{	// Render widget tags (subscribe, emailcapture, compare, fields):
@@ -3365,11 +3370,6 @@ class Item extends ItemLight
 		if( $params['render_collection'] )
 		{	// Render Collection Data [coll:name], [coll:shortname]:
 			$content = $this->render_collection_data( $content, $params );
-		}
-
-		if( $params['render_content_blocks'] )
-		{	// Render Content block tags like [include:123], [include:item-slug]:
-			$content = $this->render_content_blocks( $content, $params );
 		}
 
 		if( $params['render_switchable_blocks'] )
@@ -4109,12 +4109,40 @@ class Item extends ItemLight
 			// Get item content from buffer:
 			$current_tag_item_content = ob_get_clean();
 
+			// Update level inline tags like [---fields:] into [--fields:] in order to make them render by top caller level Item:
+			$current_tag_item_content = $this->update_level_inline_tags( $current_tag_item_content );
+
 			// Replace inline content block tag with item content:
 			$content = str_replace( $source_tag, $current_tag_item_content, $content );
 
 			// Remove
 			array_shift( $content_block_items );
 		}
+
+		return $content;
+	}
+
+
+	/**
+	 * Update level inline tags like [---fields:] into [--fields:] in order to make them render by top caller level Item:
+	 *
+	 * @param string Content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function update_level_inline_tags( $content, $params = array() )
+	{
+		if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call $this->update_level_inline_tags() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'update_level_inline_tags' ), array( $params ) );
+			return $content;
+		}
+
+		// Remove one char '-' in order to allow to render the inline tag on top caller Item:
+		$content = preg_replace( '#\[-([\-a-z:]+.*?\])#i', '[$1', $content );
 
 		return $content;
 	}
