@@ -273,7 +273,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_row_start'                  => '<tr$row_attrs$>',
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
 				'custom_fields_col_header_item'            => '<th class="center" width="$col_width$"$col_attrs$>$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
-				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$:</th>',
+				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$</th>',
 				'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
 				'custom_fields_description_icon_class'     => 'grey',
 				'custom_fields_value_default'              => '<td class="$data_cell_class$"$data_cell_attrs$>$field_value$</td>',
