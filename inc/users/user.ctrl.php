@@ -12,6 +12,10 @@ if( empty( $user_tab ) )
 {
 	$user_tab = 'profile';
 }
+elseif( $user_tab == 'social' && ! is_pro() )
+{	// Don't allow social accounts tabs for non-PRO:
+	$user_tab = 'profile';
+}
 
 $AdminUI->set_path( 'users', 'users' );
 
