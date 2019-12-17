@@ -758,6 +758,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 		{ // We found a matching Collection by collection Slug:
 			$blog = $Blog->ID;
 			$Debuglog->add( 'Found matching collection: '.$blog, 'url_decode_part_1' );
+// fp>TODO: isolate remaining extra path for later
 			return true;
 		}
 		else
@@ -784,6 +785,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 	{ // We found a matching collection:
 		$blog = $Blog->ID;
 		$Debuglog->add( 'Found matching collection: '.$blog, 'url_decode_part_1' );
+// fp>TODO: isolate remaining extra path for later
 		return true;
 	}
 
@@ -806,6 +808,8 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 		}
 		else
 		{
+// fp> DO we really want to redirect here (in case there is extra path?)
+// fp>TODO: isolate remaining extra path for later
 			$redirect_to = url_same_protocol( url_add_tail( $Blog->gen_blogurl(), $tail_Path ), $ReqAbsUrl );
 		}
 		header_redirect( $redirect_to, 301 );
@@ -819,6 +823,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 
 	if( !empty($blog) )
 	{ // a specific collection has been requested in the URL:
+// fp>TODO: verify that extra path is correct for later
 		return true;
 	}
 
@@ -836,6 +841,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 			$Debuglog->add( 'Match! We will consider that we are requesting a page of the default collection: '.$default_blog_ID, 'url_decode_part_1' );
 			$blog = $default_blog_ID;
 			$Collection = $default_Collection;
+// fp>TODO: verify that extra path is correct for later
 			return true;
 		}
 	}
@@ -867,6 +873,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 		$blog = $default_blog_ID;
 		$Collection = $default_Collection;
 		$Debuglog->add( 'Falling back to default collection: '.$blog, 'url_decode_part_1' );
+// fp>TODO: verify that extra path is correct for later
 		return true;
 	}
 
