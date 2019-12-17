@@ -259,7 +259,8 @@ $schema_queries = array(
 			usn_network_ID VARCHAR(256) NOT NULL,
 			usn_token VARCHAR(1000) NOT NULL,
 			usn_token_expiration_ts TIMESTAMP NULL DEFAULT NULL,
-			PRIMARY KEY (usn_user_ID, usn_sn_ID )
+			PRIMARY KEY (usn_user_ID, usn_sn_ID ),
+			INDEX usn_network_ID (usn_network_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
 	'T_i18n_original_string' => array(
