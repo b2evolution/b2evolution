@@ -101,23 +101,12 @@ elseif( $customizer_mode == 'disable' )
 	header_redirect( $redirect_to );
 }
 
-// Try to get a collection access type in order to know if it has been changed temporarily for fix:
-$coll_access_type = $Blog->get( 'access_type' );
-if( isset( $Blog->orig_access_type, $Blog->orig_siteurl ) )
-{	// Fix frame origin blocking when collection used another domain than base site URL:
-	$forced_coll_url = $Blog->gen_blogurl();
-	$orig_coll_url = $Blog->gen_blogurl( 'original' );
-
-	// Use forced collection URL with same domain in order to avoid restriction of frame origin:
-	$customizing_url = $forced_coll_url.preg_replace( '#^'.preg_quote( $orig_coll_url ).'/?#', '', $customizing_url );
-}
-
 load_funcs( 'skins/_skin.funcs.php' );
 
 // Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
-init_fontawesome_icons( 'fontawesome-glyphicons' );
+init_fontawesome_icons( 'fontawesome-glyphicons', 'blog' );
 
-add_js_headline( 'var customizer_url = "'.$customizer_url.'";'
+add_js_headline( 'var customizer_url = "'.get_customizer_url().'";'
 	.'var evo_js_lang_not_controlled_page = \''.TS_('This page is not controlled by b2evolution.').'\'' );
 require_css( 'bootstrap-b2evo_base.bmin.css' );
 require_js( '#jquery#' );

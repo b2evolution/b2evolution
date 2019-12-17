@@ -10038,4 +10038,30 @@ function convert_path_to_array( $property, $value, $separator = '.' )
 
 	return $output;
 }
+
+
+/**
+ * Get customizer url
+ *
+ * @param object Collection
+ * @return string Customizer URL
+ */
+function get_customizer_url( $url_Blog = NULL )
+{
+	global $customizer_url, $Blog;
+
+	if( $url_Blog === NULL && isset( $Blog ) )
+	{	// Use current collection:
+		$url_Blog = $Blog;
+	}
+
+	if( preg_match( '#^https?://.+?/#i', $url_Blog->gen_blogurl( 'original' ), $coll_url_match ) &&
+	    preg_match( '#/([^/]+)$#i', $customizer_url, $customizer_url_match ) )
+	{	// Collection domain like `http://colection.com/` + script name like `customize.php`:
+		return $coll_url_match[0].$customizer_url_match[1];
+	}
+
+	// Use default customizer URL from config:
+	return $customizer_url;
+}
 ?>

@@ -3136,7 +3136,6 @@ class Blog extends DataObject
 				    ( $current_User->check_perm( 'blog_properties', 'edit', false, $this->ID ) ||
 				      $Settings->get( 'site_skins_enabled' ) && $current_User->check_perm( 'options', 'edit' ) ) )
 				{	// Return customizer URL only if currnet User can edit skin settings of collection or site:
-					global $customizer_url;
 					$customizing_url = isset( $params['customizing_url'] ) ? $params['customizing_url'] : get_current_url();
 					if( $customizing_url == '#baseurl#' )
 					{	// Use base URL of this collection:
@@ -3144,7 +3143,7 @@ class Blog extends DataObject
 					}
 					$customizer_mode_param = ( isset( $params['mode'] ) ? 'customizer_mode='.$params['mode'].$params['glue'] : '' );
 					$customizer_view_param = ( isset( $params['view'] ) ? 'view='.$params['view'].$params['glue'] : '' );
-					return $customizer_url.'?'.$customizer_mode_param.$customizer_view_param.'blog='.$this->ID.$params['glue'].'customizing_url='.urlencode( $customizing_url );
+					return get_customizer_url().'?'.$customizer_mode_param.$customizer_view_param.'blog='.$this->ID.$params['glue'].'customizing_url='.urlencode( $customizing_url );
 				}
 				else
 				{	// Return this collection URL instead:

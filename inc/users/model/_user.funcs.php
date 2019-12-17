@@ -683,7 +683,7 @@ function use_in_skin_login()
  */
 function show_toolbar()
 {
-	global $current_User, $show_toolbar, $customizer_url;
+	global $current_User, $show_toolbar;
 
 	return (
 		// If evo toolbar is not disabled for specific page:
