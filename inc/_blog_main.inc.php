@@ -218,170 +218,176 @@ if( init_charsets( $current_charset ) )
 if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
-	// Check and Remove blog base URI from ReqPath:
+// fp> TODO: the following is kinda ok but to realy work in all cases (like baseurl/a/ when coll url is baseurl/index.php/a/), we need to get the extra path rigth after identifying the collection
 
+	// Check and Remove blog base URI from ReqPath:
 	// BaseURI is the part after the domain name and it will always end with / :
 	$coll_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
 	$Debuglog->add( 'Collection base URI: "'.$coll_baseuri.'"', 'url_decode_part_2' );
-	$coll_baseuri_matched_in_url = preg_match( '~(^'.preg_quote( $coll_baseuri, '~' ).'|\.php[0-9]*/)(.*)$~', $ReqPath, $matches );
-
-	// Check if we have one of these:
-	// - Always try to match slug
-	// - Either the ReqPath starts with collection base URI (always including trailing slash)
-	// - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases)
-	// ... followed by some extra path info.
-	if( $Settings->get( 'always_match_slug' ) // do we (no matter what) want to redirect to correct Collection if an Item Slug was found in <b>any</b> URL?
-		|| ($coll_baseuri_matched_in_url & !empty($matches[2]) ) ) // do we have a potential slug (AFTER collection url_name or index.php)?
-	{ // We have EXTRA path info:
-
-		if( ! isset( $path_elements ) )
-		{	// Don't allow next code without initialized global $path_elements:
-			debug_die( '$path_elements should have been initialized by init_requested_coll_or_process_tinyurl() before calling this code!' );
-		}
-
-		if( isset( $path_elements[0] )
-				&& ( $path_elements[0] == $Blog->stub
-						|| $path_elements[0] == $Blog->urlname ) )
-		{ // Ignore stub file (if it ends with .php it should already have been filtered out above)
-			array_shift( $path_elements );
-			$Debuglog->add( 'Ignoring stub filename OR blog urlname in extra path info' , 'url_decode_part_2' );
-		}
-		// pre_dump( $path_elements );
-
-		// Do we still have extra path info to decode?
-		if( count($path_elements) )
+	if( $coll_baseuri_matched_in_url = preg_match( '~(^'.preg_quote( $coll_baseuri, '~' ).'|\.php[0-9]*/)(.*)$|\.php[0-9]*$~', $ReqPath, $matches ) )
+	{  // Either the ReqPath starts with collection base URI (always including trailing slash) followed by some extra path info.
+	   // - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases) followed by some extra path info.
+		if( !empty($matches[2]) )
 		{
-			// Is this a tag ("prefix-only" mode)?
-			if( $Blog->get_setting('tag_links') == 'prefix-only'
-				&& count($path_elements) == 2
-				&& $path_elements[0] == $Blog->get_setting('tag_prefix')
-				&& isset($path_elements[1]) )
-			{
-				$tag = strip_tags(urldecode($path_elements[1]));
+			$Debuglog->add( 'Collection base URI found, with extra path', 'url_decode_part_2' );
+			$path_elements = preg_split( '~/~', $matches[2], 20, PREG_SPLIT_NO_EMPTY );
+			// pre_dump( '', $path_elements );
+		}
+		else
+		{
+			$Debuglog->add( 'Collection base URI found, but no extra path', 'url_decode_part_2' );
+			$path_elements = array();
+		}
+	}
+	elseif( $Settings->get( 'always_match_slug' )  // do we (no matter what) want to redirect to correct Collection if an Item Slug was found in <b>any</b> URL?
+		 && strlen($ReqPath) > strlen($basesubpath) 
+		 && $last_part != $Blog->stub  // Ignore stub file (if it ends with .php it should already have been filtered out above
+		 && $last_part !=  $Blog->urlname )
+	{
+		$Debuglog->add( 'Collection base URI not found, but we want to always match slug, which is: "'.$last_part.'"', 'url_decode_part_2' );
+		$path_elements = array( $last_part );
+	}
+	else
+	{
+		$Debuglog->add( 'Collection base URI not found, nothing else to do', 'url_decode_part_2' );
+		$path_elements = array();
+	}
 
-				// # of posts per page for tag page:
+// TODO: $path_elements no longer needs to be global
+
+	// Do we have extra path info to decode?
+	if( count($path_elements) )
+	{
+		// TAG? Is this a tag ("prefix-only" mode)?
+		if( $Blog->get_setting('tag_links') == 'prefix-only'
+			&& count($path_elements) == 2
+			&& $path_elements[0] == $Blog->get_setting('tag_prefix')
+			&& isset($path_elements[1]) )
+		{
+			$tag = strip_tags(urldecode($path_elements[1]));
+
+			// # of posts per page for tag page:
+			if( ! $posts = $Blog->get_setting( 'tag_posts_per_page' ) )
+			{ // use blog default
+				$posts = $Blog->get_setting( 'posts_per_page' );
+			}
+			$disp = 'posts';
+		}
+		else
+		{
+			// TAG? Does the pathinfo end with a / or a ; ?
+			$last_len  = strlen( $last_part );
+			if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) )   // In very old b2evo version we had ITEM slugs truncated at 40 and possibly ending with `-`
+				|| $last_char == ':'
+				|| $last_char == ';' )
+			{	// - : or ; -> We'll consider this to be a tag page
+				$tag = substr( $last_part, 0, -1 );
+				$tag = urldecode($tag);
+				$tag = strip_tags($tag);	// security
+				// pre_dump( $tag );
+
+				// # of posts per page:
 				if( ! $posts = $Blog->get_setting( 'tag_posts_per_page' ) )
 				{ // use blog default
 					$posts = $Blog->get_setting( 'posts_per_page' );
 				}
 				$disp = 'posts';
 			}
-			else
-			{
-				// Does the pathinfo end with a / or a ; ?
-				$last_len  = strlen( $last_part );
-				if( ( $last_char == '-' && ( ! $tags_dash_fix || $last_len != 40 ) )   // In very old b2evo version we had ITEM slugs truncated at 40 and possibly ending with `-`
-					|| $last_char == ':'
-					|| $last_char == ';' )
-				{	// - : or ; -> We'll consider this to be a tag page
-					$tag = substr( $last_part, 0, -1 );
-					$tag = urldecode($tag);
-					$tag = strip_tags($tag);	// security
-					// pre_dump( $tag );
+			elseif( ( $tags_dash_fix && $last_char == '-' && $last_len == 40 ) || $last_char != '/' )
+			{	// NO ENDING SLASH or ends with a dash, is 40 chars long and $tags_dash_fix is true
+				// -> We'll consider this to be a ref to a post.
+				$Debuglog->add( 'We consider this to be a ref to a post: '.$last_part.' -- last char of URI: '.$last_char, 'url_decode_part_2' );
 
-					// # of posts per page:
-					if( ! $posts = $Blog->get_setting( 'tag_posts_per_page' ) )
-					{ // use blog default
-						$posts = $Blog->get_setting( 'posts_per_page' );
-					}
-					$disp = 'posts';
-				}
-				elseif( ( $tags_dash_fix && $last_char == '-' && $last_len == 40 ) || $last_char != '/' )
-				{	// NO ENDING SLASH or ends with a dash, is 40 chars long and $tags_dash_fix is true
-					// -> We'll consider this to be a ref to a post.
-					$Debuglog->add( 'We consider this to be a ref to a post: '.$last_part.' -- last char of URI: '.$last_char, 'url_decode_part_2' );
+				// Set a lot of defaults as if we had received a complex URL:
+				$m = '';
+				$more = 1; // Display the extended entries' text
 
-					// Set a lot of defaults as if we had received a complex URL:
-					$m = '';
-					$more = 1; // Display the extended entries' text
-
-					if( preg_match( '#^p([0-9]+)$#', $last_part, $req_post ) )
-					{ // The last param is of the form p000
-						$p = $req_post[1];		// Post to display
-					}
-					else
-					{ // Last param is a string, we'll consider this to be a post urltitle
-						$title = $last_part;
-						$Debuglog->add( 'Post slug to look for: '.$title, 'url_decode_part_2' );
-					}
+				if( preg_match( '#^p([0-9]+)$#', $last_part, $req_post ) )
+				{ // The last param is of the form p000
+					$p = $req_post[1];		// Post to display
 				}
 				else
-				{	// ENDING SLASH -> we are looking for a daterange OR a chapter:
-					$Debuglog->add( 'Last part: '.$last_part , 'url_decode_part_2' );
-					// echo $last_part;
-					if( preg_match( '|^w?[0-9]+$|', $last_part ) )
-					{ // Last part is a number or a "week" number:
-						$i=0;
-						$Debuglog->add( 'Last part is a number or a "week" number: '.$path_elements[$i] , 'url_decode_part_2' );
-						// echo $path_elements[$i];
-						if( isset( $path_elements[$i] ) )
-						{
-							if( preg_match( '#^\d{4}$#', $path_elements[$i] ) )
-							{ // We'll consider this to be the year
-								$m = $path_elements[$i++];
-								$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'url_decode_part_2' );
+				{ // Last param is a string, we'll consider this to be a post urltitle
+					$title = $last_part;
+					$Debuglog->add( 'Post slug to look for: '.$title, 'url_decode_part_2' );
+				}
+			}
+			else
+			{	// ENDING SLASH -> we are looking for a daterange OR a chapter:
+				$Debuglog->add( 'Last part: '.$last_part , 'url_decode_part_2' );
+				// echo $last_part;
+				if( preg_match( '|^w?[0-9]+$|', $last_part ) )
+				{ // Last part is a number or a "week" number:
+					$i=0;
+					$Debuglog->add( 'Last part is a number or a "week" number: '.$path_elements[$i] , 'url_decode_part_2' );
+					// echo $path_elements[$i];
+					if( isset( $path_elements[$i] ) )
+					{
+						if( preg_match( '#^\d{4}$#', $path_elements[$i] ) )
+						{ // We'll consider this to be the year
+							$m = $path_elements[$i++];
+							$Debuglog->add( 'Setting year from extra path info. $m=' . $m , 'url_decode_part_2' );
 
-								// Also use the prefered posts per page for archives (may be NULL, in which case the blog default will be used later on)
-								if( ! $posts = $Blog->get_setting( 'archive_posts_per_page' ) )
-								{ // use blog default
-									$posts = $Blog->get_setting( 'posts_per_page' );
-								}
-
-								if( isset( $path_elements[$i] ) && preg_match( '#^(0[1-9]|1[0-2])$#', $path_elements[$i] ) )
-								{ // We'll consider this to be the month
-									$m .= $path_elements[$i++];
-									$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'url_decode_part_2' );
-
-									if( isset( $path_elements[$i] ) && preg_match( '#^(0[1-9]|[12][0-9]|3[01])$#', $path_elements[$i] ) )
-									{ // We'll consider this to be the day
-										$m .= $path_elements[$i++];
-										$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'url_decode_part_2' );
-									}
-								}
-								elseif( isset( $path_elements[$i] ) && preg_match( '#^w(0?[0-9]|[1-4][0-9]|5[0-3])$#', $path_elements[$i] ) )
-								{ // We consider this a week number
-									$w = substr( $path_elements[$i], 1, 2 );
-								}
-								$disp = 'posts';
-							}
-							else
-							{	// We did not get a number/year...
-								$disp = '404';
-								$disp_detail = '404-malformed_url-missing_year';
-							}
-						}
-					}
-					elseif( preg_match( '|^[A-Za-z0-9\-_]+$|', $last_part ) )	// UNDERSCORES for catching OLD URLS!!!
-					{	// We are pointing to a chapter/category:
-						$ChapterCache = & get_ChapterCache();
-						/**
-						 * @var Chapter
-						 */
-						$Chapter = & $ChapterCache->get_by_urlname( $last_part, false );
-						if( empty( $Chapter ) )
-						{	// We could not match a chapter...
-							// We are going to consider this to be a post title with a misplaced trailing slash.
-							// That happens when upgrading from WP for example.
-							$title = $last_part; // Will be sought later
-							$already_looked_into_chapters = true;
-						}
-						else
-						{	// We could match a chapter from the extra path:
-							$cat = $Chapter->ID;
-							// Also use the prefered posts per page for a cat
-							if( ! $posts = $Blog->get_setting( 'chapter_posts_per_page' ) )
+							// Also use the prefered posts per page for archives (may be NULL, in which case the blog default will be used later on)
+							if( ! $posts = $Blog->get_setting( 'archive_posts_per_page' ) )
 							{ // use blog default
 								$posts = $Blog->get_setting( 'posts_per_page' );
 							}
+
+							if( isset( $path_elements[$i] ) && preg_match( '#^(0[1-9]|1[0-2])$#', $path_elements[$i] ) )
+							{ // We'll consider this to be the month
+								$m .= $path_elements[$i++];
+								$Debuglog->add( 'Setting month from extra path info. $m=' . $m , 'url_decode_part_2' );
+
+								if( isset( $path_elements[$i] ) && preg_match( '#^(0[1-9]|[12][0-9]|3[01])$#', $path_elements[$i] ) )
+								{ // We'll consider this to be the day
+									$m .= $path_elements[$i++];
+									$Debuglog->add( 'Setting day from extra path info. $m=' . $m , 'url_decode_part_2' );
+								}
+							}
+							elseif( isset( $path_elements[$i] ) && preg_match( '#^w(0?[0-9]|[1-4][0-9]|5[0-3])$#', $path_elements[$i] ) )
+							{ // We consider this a week number
+								$w = substr( $path_elements[$i], 1, 2 );
+							}
 							$disp = 'posts';
 						}
+						else
+						{	// We did not get a number/year...
+							$disp = '404';
+							$disp_detail = '404-malformed_url-missing_year';
+						}
+					}
+				}
+				elseif( preg_match( '|^[A-Za-z0-9\-_]+$|', $last_part ) )	// UNDERSCORES for catching OLD URLS!!!
+				{	// We are pointing to a chapter/category:
+					$ChapterCache = & get_ChapterCache();
+					/**
+					 * @var Chapter
+					 */
+					$Chapter = & $ChapterCache->get_by_urlname( $last_part, false );
+					if( empty( $Chapter ) )
+					{	// We could not match a chapter...
+						// We are going to consider this to be a post title with a misplaced trailing slash.
+						// That happens when upgrading from WP for example.
+						$title = $last_part; // Will be sought later
+						$already_looked_into_chapters = true;
 					}
 					else
-					{	// We did not get anything we can decode...
-						// echo 'neither number nor cat';
-						$disp = '404';
-						$disp_detail = '404-malformed_url-bad_char';
+					{	// We could match a chapter from the extra path:
+						$cat = $Chapter->ID;
+						// Also use the prefered posts per page for a cat
+						if( ! $posts = $Blog->get_setting( 'chapter_posts_per_page' ) )
+						{ // use blog default
+							$posts = $Blog->get_setting( 'posts_per_page' );
+						}
+						$disp = 'posts';
 					}
+				}
+				else
+				{	// We did not get anything we can decode...
+					// echo 'neither number nor cat';
+					$disp = '404';
+					$disp_detail = '404-malformed_url-bad_char';
 				}
 			}
 		}
