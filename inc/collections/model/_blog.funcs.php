@@ -639,7 +639,6 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 
 	// Set some defaults in case we cannot get those from the URL:
 	global $resolve_extra_path, $path_elements, $last_char, $last_part;
-	$first_part = '';
 	$last_char = '';
 	$last_part = '';
 	// TODO: we may need more and we may need to make them global
@@ -709,9 +708,6 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 		// Do we still have extra path info to decode?
 		if( count($path_elements) )
 		{
-			// this is the FIRST path element!
-			$first_part = $path_elements[0];
-
 			// Does the pathinfo end with a / or a ; ?
 			$last_char = substr( $path_string, -1 );
 
