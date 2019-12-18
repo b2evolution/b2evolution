@@ -2770,7 +2770,15 @@ class Item extends ItemLight
 				$format_suffix = $f_num > 1 ? $format[ $f_num - 1 ] : '';
 				if( $f_num > 2 )
 				{	// Extract data for number fomatting:
-					if( in_array( $format[ $f_num - 3 ], array( '.', ',' ) ) )
+					if( in_array( $format_suffix, array( '.', ',' ) ) &&
+					    isset( $format[2] ) &&
+					    in_array( $format[2], array( '.', ',' ) ) )
+					{	// If last char is decimal char (dot or comma) then this format has no decimal part:
+						$format_suffix = '';
+						$format_decimals = 0;
+						$thousands_sep_pos = 3;
+					}
+					elseif( in_array( $format[ $f_num - 3 ], array( '.', ',' ) ) )
 					{	// Allow only chars '.' and ',' as decimal separator:
 						if( $f_num > 3 && preg_match( '#^\d+$#', $format[ $f_num - 2 ] ) )
 						{	// Get a number of digits after dot:
