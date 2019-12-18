@@ -1134,29 +1134,6 @@ switch( $action )
 				// Display social accounts form:
 				if( is_pro() )
 				{	// Social Accounts tab available to PRO version only:
-
-					/**
-					 * TODO: We shouldn't be running the code block below everytime we access the user's social accounts tab.
-					 * Move this somewhere else later.
-					 */
-					// Make sure that we all have DB records of available social networks:
-					global $social_network_providers;
-					if( ! empty( $social_network_providers ) )
-					{
-						load_class( 'users/model/_socialnetwork.class.php', 'SocialNetwork' );
-						$SocialNetworkCache = new DataObjectCache( 'SocialNetwork', true, 'T_social__network', 'sn_', 'sn_ID', 'sn_name', 'sn_name' );
-						foreach( $social_network_providers as $provider => $config )
-						{
-							$socialNetwork = & $SocialNetworkCache->get_by_name( $provider, false, false );
-							if( empty( $socialNetwork ) )
-							{
-								$socialNetwork = new SocialNetwork();
-								$socialNetwork->set( 'name', $provider );
-								$socialNetwork->dbinsert();
-							}
-						}
-					}
-
 					$AdminUI->disp_payload_begin();
 					$AdminUI->disp_view( 'users/views/_user_social.form.php' );
 					$AdminUI->disp_payload_end();

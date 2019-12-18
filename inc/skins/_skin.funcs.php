@@ -1382,6 +1382,7 @@ function skin_init( $disp )
 					set_param( 'action', '' );
 				}
 			}
+		case 'social':
 		case 'register_finish':
 		case 'pwdchange':
 		case 'userprefs':
@@ -2103,6 +2104,11 @@ function skin_include( $template_name, $params = array() )
 				'disp_users'                 => '_users.disp.php',
 				'disp_compare'               => '_compare.disp.php',
 			);
+
+		if( is_pro() )
+		{	// Additional disp handler for PRO version:
+			$disp_handlers['disp_social'] = '_profile.disp.php';
+		}
 
 		// Add plugin disp handlers:
 		if( $disp_Plugins = $Plugins->get_list_by_event( 'GetHandledDispModes' ) )

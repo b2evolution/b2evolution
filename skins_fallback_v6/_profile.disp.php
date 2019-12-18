@@ -124,6 +124,12 @@ switch( $disp )
 			echo_user_crop_avatar_window();
 		}
 		break;
+	case 'social':
+		if( is_pro() )
+		{
+			require $inc_path.'users/views/_user_social.form.php';
+		}
+		break;
 	case 'pwdchange':
 		require $inc_path.'users/views/_user_password.form.php';
 		break;

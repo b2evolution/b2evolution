@@ -104,6 +104,13 @@ switch( $action )
 {
 	case 'register':
 	case 'quick_register':
+	case 'social_register':
+		// Use this boolean var to know when registration using social network credential is used:
+		$is_social = ( $action == 'social_register' ) && is_pro();
+		if( $action == 'social_register' )
+		{	// Consider social registration as quick registration:
+			$action = 'quick_register';
+		}
 		// Use this boolean var to know when quick registration is used
 		$is_quick = ( $action == 'quick_register' );
 		$is_inline = param( 'inline', 'integer', 0 ) == 1;
@@ -124,15 +131,15 @@ switch( $action )
 		$Session->assert_received_crumb( 'regform' );
 
 		if( $is_quick || $is_inline )
-		{ // Check if we can use a quick registration now:
+		{	// Check if we can use a quick registration now:
 			if( $Settings->get( 'newusers_canregister' ) != 'yes' || ! $Settings->get( 'quick_registration' ) )
-			{ // Display error message when quick registration is disabled
+			{	// Display error message when quick registration is disabled
 				$Messages->add( T_('Quick registration is currently disabled on this system.'), 'error' );
 				break;
 			}
 
-			if( empty( $Blog ) || ( empty( $widget ) && ! $is_inline ) )
-			{ // Don't use a quick registration if the request goes from not blog page
+			if( ! $is_social && ( empty( $Blog ) || ( empty( $widget ) && ! $is_inline ) ) )
+			{	// Don't use a quick registration if the request goes from not blog page except for social registration:
 				debug_die( 'Quick registration is currently disabled on this system.' );
 				break;
 			}
@@ -565,7 +572,7 @@ switch( $action )
 		// extra confusion when account validation is required.
 		$Session->set_User( $new_User );
 
-		if( $is_quick )
+		if( $is_quick && !$is_social )
 		{	// Set redirect_to after quick registration from widget or inline tag "[emailcapture:]":
 			if( ! empty( $widget_redirect_to ) )
 			{	// If a redirect param is defined:
