@@ -148,6 +148,10 @@ function itxml_import( $XML_file_path )
 							evo_flush();
 							continue 2;
 						}
+						if( in_array( $custom_field_col, array( 'required', 'meta', 'public', 'link_nofollow', 'merge' ) ) )
+						{	// Format number fields in order to avoid error on insert/update data in DB:
+							$new_custom_field[ $custom_field_col ] = empty( $new_custom_field[ $custom_field_col ] ) ? 0 : 1;
+						}
 					}
 
 					if( isset( $old_custom_fields[ $custom_field_name ] ) )
@@ -315,7 +319,7 @@ function itxml_parser( $file )
 				$custom_field_data = (array) $custom_field_data;
 				foreach( $custom_field_data as $custom_field_key => $custom_field_value )
 				{
-					$item_type['custom_fields'][ $custom_field_data['name'] ][ $custom_field_key ] = ( string )$custom_field_value;
+					$item_type['custom_fields'][ ( string )$custom_field_data['name'] ][ $custom_field_key ] = ( string )$custom_field_value;
 				}
 			}
 		}
