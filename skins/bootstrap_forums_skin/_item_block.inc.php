@@ -458,7 +458,7 @@ skin_widget( array(
 						'custom_fields_value_difference_highlight' => '<div class="col-md-12 col-xs-6 bg-warning"$data_cell_attrs$>$field_value$</div>',
 						'custom_fields_value_green'                => '<div class="col-md-12 col-xs-6 bg-success"$data_cell_attrs$>$field_value$</div>',
 						'custom_fields_value_red'                  => '<div class="col-md-12 col-xs-6 bg-danger"$data_cell_attrs$>$field_value$</div>',
-						'custom_fields_edit_link_cell'             => '<div class="col-md-12 col-xs-6 center">$edit_link$</div>',
+						'custom_fields_edit_link_cell'             => '<div class="col-md-12 col-xs-6 center"$edit_link_attrs$>$edit_link$</div>',
 						'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
 						'custom_fields_row_end'                    => '</div>',
 						'custom_fields_table_end'                  => '</div>',

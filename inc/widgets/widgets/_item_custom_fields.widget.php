@@ -92,6 +92,7 @@ class item_custom_fields_Widget extends item_fields_compare_Widget
 		$generic_params['restrict_cats']['no_edit'] = true;
 		$generic_params['restrict_tags']['no_edit'] = true;
 		$generic_params['items_limit']['no_edit'] = true;
+		$generic_params['display_condition']['no_edit'] = true;
 		$generic_params['allow_filter']['no_edit'] = true;
 		$generic_params['show_headers']['no_edit'] = true;
 		$generic_params['merge_headers']['no_edit'] = true;

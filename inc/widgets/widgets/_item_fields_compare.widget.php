@@ -155,6 +155,10 @@ class item_fields_compare_Widget extends ComponentWidget
 					'note' => sprintf( T_('Check to allow filtering/ordering with URL params such as %s etc.'), '<code>cat=</code>, <code>tag=</code>, <code>orderby=</code>' ),
 					'defaultvalue' => 0,
 				),
+				'display_condition' => array(
+					'label' => TB_('Show/Hide columns based on condition found in field'),
+					'size' => 50,
+				),
 			);
 		for( $order_index = 0; $order_index <= 2; $order_index++ )
 		{	// Default order settings:
@@ -280,7 +284,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_value_difference_highlight' => '<td class="$data_cell_class$ bg-warning"$data_cell_attrs$>$field_value$</td>',
 				'custom_fields_value_green'                => '<td class="$data_cell_class$ bg-success"$data_cell_attrs$>$field_value$</td>',
 				'custom_fields_value_red'                  => '<td class="$data_cell_class$ bg-danger"$data_cell_attrs$>$field_value$</td>',
-				'custom_fields_edit_link_cell'             => '<td class="center">$edit_link$</td>',
+				'custom_fields_edit_link_cell'             => '<td class="center"$edit_link_attrs$>$edit_link$</td>',
 				'custom_fields_edit_link_class'            => 'btn btn-xs btn-default',
 				'custom_fields_row_end'                    => '</tr>',
 				'custom_fields_table_end'                  => '</table></div>',
@@ -376,11 +380,17 @@ class item_fields_compare_Widget extends ComponentWidget
 
 				if( empty( $skip_duplicate_header_cell ) )
 				{	// Display header cell only if it not hidden on merging same headers:
-					$table_header_cells[] = array(
+					$table_header_cell = array(
 						'title'  => $item_title_link,
 						'status' => $item_status_badge,
 						'cols'   => 1,
 					);
+					if( ! empty( $this->disp_params['display_condition'] ) &&
+					    ( $display_condition = $widget_Item->get_custom_field_value( $this->disp_params['display_condition'] ) ) != '' )
+					{	// Use a display condition for column of the Item:
+						$table_header_cell['display_condition'] = $display_condition;
+					}
+					$table_header_cells[] = $table_header_cell;
 				}
 			}
 
@@ -390,7 +400,8 @@ class item_fields_compare_Widget extends ComponentWidget
 					'$item_link$'   => $table_header_cell['title'],
 					'$item_status$' => $table_header_cell['status'],
 					'$col_width$'   => ( $col_width * $table_header_cell['cols'] ).'%',
-					'$col_attrs$'   => ( $table_header_cell['cols'] > 1 ? ' colspan="'.$table_header_cell['cols'].'"' : '' ),
+					'$col_attrs$'   => ( $table_header_cell['cols'] > 1 ? ' colspan="'.$table_header_cell['cols'].'"' : '' )
+						.( isset( $table_header_cell['display_condition'] ) ? $this->get_display_condition_attr( $table_header_cell['display_condition'], $items ) : '' ),
 				);
 				echo str_replace( array_keys( $cell_params ), $cell_params, $this->get_field_template( 'col_header_item' ) );
 			}
@@ -421,25 +432,36 @@ class item_fields_compare_Widget extends ComponentWidget
 			$items_can_be_edited = false;
 			foreach( $items as $item_ID )
 			{
+				if( ! ( $widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) )
+				{	// Skip wrong Item:
+					continue;
+				}
+
+				$item_edit_link_params = array();
 				if( isset( $Item ) && ( $Item instanceof Item ) && $Item->ID == $item_ID && count( $items ) == 1 )
 				{	// Don't display an edit link when this is a page of currently displayed Item:
-					$items_edit_links[] = '';
+					$item_edit_link_params['link'] = '';
 				}
 				else
 				{	// Try to display an edit link depending on permissions of current User:
-					$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
-					$items_edit_link = $widget_Item->get_edit_link( array( 'class' => $this->disp_params['custom_fields_edit_link_class'] ) );
-					if( $items_edit_link === false )
+					$item_edit_link = $widget_Item->get_edit_link( array( 'class' => $this->disp_params['custom_fields_edit_link_class'] ) );
+					if( $item_edit_link === false )
 					{	// The edit link is not available for current User:
-						$items_edit_links[] = '';
+						$item_edit_link_params['link'] = '';
 					}
 					else
 					{	// The Item can be edited by current User:
-						$items_edit_links[] = $items_edit_link;
+						$item_edit_link_params['link'] = $item_edit_link;
 						// Set flag to know at least one compared item can be edited by current User:
 						$items_can_be_edited = true;
 					}
 				}
+				if( ! empty( $this->disp_params['display_condition'] ) &&
+				    ( $display_condition = $widget_Item->get_custom_field_value( $this->disp_params['display_condition'] ) ) != '' )
+				{	// Use a display condition for column of the Item:
+					$item_edit_link_params['display_condition'] = $display_condition;
+				}
+				$items_edit_links[] = $item_edit_link_params;
 			}
 
 			if( $items_can_be_edited )
@@ -450,7 +472,11 @@ class item_fields_compare_Widget extends ComponentWidget
 
 				foreach( $items_edit_links as $items_edit_link )
 				{
-					echo str_replace( '$edit_link$', $items_edit_link, $this->get_field_template( 'edit_link_cell' ) );
+					$item_edit_cell_params = array(
+						'$edit_link$'       => $items_edit_link['link'],
+						'$edit_link_attrs$' => ( isset( $items_edit_link['display_condition'] ) ? $this->get_display_condition_attr( $items_edit_link['display_condition'], $items ) : '' ),
+					);
+					echo str_replace( array_keys( $item_edit_cell_params ), $item_edit_cell_params, $this->get_field_template( 'edit_link_cell' ) );
 				}
 
 				echo $this->get_field_template( 'row_end' );
@@ -779,47 +805,7 @@ class item_fields_compare_Widget extends ComponentWidget
 	 */
 	function display_field_row_template( $custom_field, $items, $params = array() )
 	{
-		$ItemCache = & get_ItemCache();
-
-		$row_start_template = $this->get_field_template( 'row_start', $custom_field['type'] );
-		if( $custom_field['disp_condition'] != '' )
-		{	// Set additional params for display condition:
-			$row_start_attrs = ' data-display-condition="'.$custom_field['disp_condition'].'"';
-
-			// Load switchable params of all compared Items in order to initialize default values:
-			foreach( $items as $item_ID )
-			{
-				if( in_array( $item_ID, $custom_field['items'] ) &&
-				    ( $widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) )
-				{	// If Item is detected:
-					$widget_Item->load_switchable_params();
-				}
-			}
-
-			// Check current params:
-			$disp_conditions = explode( '&', $custom_field['disp_condition'] );
-			foreach( $disp_conditions as $disp_condition )
-			{
-				$disp_condition = explode( '=', $disp_condition );
-				// Get all allowed value by the condition of the custom field:
-				$disp_condition_values = explode( '|', $disp_condition[1] );
-				// Get current value of the param from $_GET or $_POST:
-				$param_value = param( $disp_condition[0], 'string' );
-				// Check if we should hide the custom field by condition:
-				if( ( $param_value === '' && ! in_array( '', $disp_condition_values ) ) || // current param value is empty but condition doesn't allow empty values
-				    ! preg_match( '/^[a-z0-9_\-]*$/', $param_value ) || // wrong param value
-				    ! in_array( $param_value, $disp_condition_values ) ) // current param value is not allowed by the condition of the custom field
-				{	// Hide custom field if at least one param is not allowed by condition of the custom field:
-					$row_start_attrs .= ' style="display:none"';
-					continue;
-				}
-			}
-		}
-		else
-		{	// No display conditions for the custom field:
-			$row_start_attrs = '';
-		}
-		echo str_replace( '$row_attrs$', $row_start_attrs, $row_start_template );
+		echo str_replace( '$row_attrs$', $this->get_display_condition_attr( $custom_field['disp_condition'], $items ), $this->get_field_template( 'row_start', $custom_field['type'] ) );
 
 		if( empty( $custom_field['description'] ) )
 		{	// The custom field has no description:
@@ -845,12 +831,17 @@ class item_fields_compare_Widget extends ComponentWidget
 		if( $custom_field['type'] != 'separator' )
 		{	// Separator fields have no values:
 			$table_row_cells = array();
+			$ItemCache = & get_ItemCache();
 			foreach( $items as $item_ID )
 			{
+				if( ! ( $widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) ) )
+				{	// Skip wrong Item:
+					continue;
+				}
+
 				// Custom field value per each post:
 				if( in_array( $item_ID, $custom_field['items'] ) )
 				{	// Get a formatted value if post has this custom field:
-					$widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 					$custom_field_value = $widget_Item->get_custom_field_formatted( $custom_field['name'], $params );
 					$custom_field_orig_value = $widget_Item->get_custom_field_value( $custom_field['name'] );
 				}
@@ -922,16 +913,25 @@ class item_fields_compare_Widget extends ComponentWidget
 
 				if( empty( $skip_duplicate_field_value ) )
 				{	// Display field value cell only if it not hidden on merging same values:
-					$table_row_cells[] = array(
+					$table_row_cell = array(
 						'template' => str_replace( array( '$data_cell_class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template ),
 						'cols'     => 1,
 					);
+					if( ! empty( $this->disp_params['display_condition'] ) &&
+					    ( $display_condition = $widget_Item->get_custom_field_value( $this->disp_params['display_condition'] ) ) != '' )
+					{	// Use a display condition for column of the Item:
+						$table_row_cell['display_condition'] = $display_condition;
+					}
+					$table_row_cells[] = $table_row_cell;
 				}
 			}
 
 			foreach( $table_row_cells as $table_row_cell )
 			{	// Print out table field value cells:
-				echo str_replace( '$data_cell_attrs$', ( $table_row_cell['cols'] > 1 ? ' colspan="'.$table_row_cell['cols'].'"' : '' ), $table_row_cell['template'] );
+				echo str_replace( '$data_cell_attrs$',
+					( $table_row_cell['cols'] > 1 ? ' colspan="'.$table_row_cell['cols'].'"' : '' )
+					.( isset( $table_row_cell['display_condition'] ) ? $this->get_display_condition_attr( $table_row_cell['display_condition'], $items ) : '' ),
+					$table_row_cell['template'] );
 			}
 		}
 
@@ -1261,6 +1261,56 @@ class item_fields_compare_Widget extends ComponentWidget
 		}
 
 		return $cache_keys;
+	}
+
+
+	/**
+	 * Get HTML attribute for display condition
+	 *
+	 * @param string Condition, e.g. cur=usd&dur=1mo
+	 * @param array Items IDs
+	 * @return string HTML attribute, e.g. ' data-display-condition="cur=usd&dur=1mo" style="display:none"'
+	 */
+	function get_display_condition_attr( $condition, $items = array() )
+	{
+		if( $condition == '' )
+		{	// No display condition:
+			return '';
+		}
+
+		// Set additional params for display condition:
+		$attrs = ' data-display-condition="'.format_to_output( $condition, 'htmlattr' ).'"';
+
+		// Load switchable params of all compared Items in order to initialize default values:
+		$ItemCache = & get_ItemCache();
+		foreach( $items as $item_ID )
+		{
+			if( $widget_Item = & $ItemCache->get_by_ID( $item_ID, false, false ) )
+			{	// If Item is detected:
+				$widget_Item->load_switchable_params();
+			}
+		}
+
+		// Check current params:
+		$disp_conditions = explode( '&', $condition );
+		foreach( $disp_conditions as $disp_condition )
+		{
+			$disp_condition = explode( '=', $disp_condition );
+			// Get all allowed value by the condition of the custom field:
+			$disp_condition_values = explode( '|', $disp_condition[1] );
+			// Get current value of the param from $_GET or $_POST:
+			$param_value = param( $disp_condition[0], 'string' );
+			// Check if we should hide the custom field by condition:
+			if( ( $param_value === '' && ! in_array( '', $disp_condition_values ) ) || // current param value is empty but condition doesn't allow empty values
+					! preg_match( '/^[a-z0-9_\-]*$/', $param_value ) || // wrong param value
+					! in_array( $param_value, $disp_condition_values ) ) // current param value is not allowed by the condition of the custom field
+			{	// Hide custom field if at least one param is not allowed by condition of the custom field:
+				$attrs .= ' style="display:none"';
+				break;
+			}
+		}
+
+		return $attrs;
 	}
 }
 
