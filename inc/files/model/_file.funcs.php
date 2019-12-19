@@ -3629,4 +3629,80 @@ function file_td_actions( & $File )
 
 	return $r;
 }
+
+
+/**
+ * Move all files and sub-folders of single top level folder to top/root level of the folder
+ *
+ * @param string Top/root folder path
+ * @return boolean
+ */
+function move_single_dir_to_top_level( $root_folder_path )
+{
+	$root_folder_path = rtrim( $root_folder_path, '/' );
+
+	$folders_num = 1;
+	$files_num = 0;
+	$check_folder_path = $root_folder_path;
+	$top_empty_folder_path = NULL;
+	while( $folders_num == 1 && $files_num == 0 )
+	{
+		if( ! ( $dir_handle = @opendir( $check_folder_path ) ) )
+		{	// Unable to open dir:
+			break;
+		}
+
+		$folders_num = 0;
+		$files_num = 0;
+		while( $file = readdir( $dir_handle ) )
+		{
+			if( $file == '.' || $file == '..' )
+			{	// Skip reserved folders:
+				continue;
+			}
+
+			if( is_dir( $check_folder_path.'/'.$file ) )
+			{	// Count folders:
+				$folders_num++;
+				$single_folder_name = $file;
+			}
+			else
+			{	// Count files:
+				$files_num++;
+			}
+
+			if( $files_num == 2 )
+			{	// Stop if the folder already contains more 1 files or folder:
+				break;
+			}
+		}
+
+		// Close the folder handler:
+		closedir( $dir_handle );
+
+		if( $folders_num == 1 && $files_num == 0 )
+		{	// The current folder has only single folder, go to search next level down:
+			$check_folder_path = $check_folder_path.'/'.$single_folder_name;
+			if( $top_empty_folder_path === NULL )
+			{	// Store top empty folder in order to clear this below:
+				$top_empty_folder_path = $check_folder_path;
+			}
+		}
+	}
+
+	if( $check_folder_path != $root_folder_path )
+	{	// Move contens of single root folder to top/root folder:
+		$result = move_files_r( $check_folder_path, $root_folder_path );
+		if( $top_empty_folder_path !== NULL && is_empty_directory( $top_empty_folder_path ) )
+		{	// Remove the single empty folder:
+			rmdir_r( $top_empty_folder_path );
+		}
+	}
+	else
+	{	// No need to move because root folder has not only single folder:
+		$result = true;
+	}
+
+	return $result;
+}
 ?>

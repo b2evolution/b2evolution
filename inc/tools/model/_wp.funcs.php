@@ -66,6 +66,9 @@ function wpxml_get_import_data( & $XML_file_path, $allow_use_extracted_folder = 
 		        unpack_archive( $XML_file_path, $ZIP_folder_path, true, $XML_file_name ) )
 		{	// If we can use already extracted ZIP archive or it is unpacked successfully now:
 
+			// Move all files and sub-folders of single top level folder to top/root level of the folder:
+			move_single_dir_to_top_level( $ZIP_folder_path );
+
 			// Reset path and set only if XML file is found in ZIP archive:
 			$XML_file_path = false;
 
