@@ -2795,6 +2795,10 @@ a.btn.action_icon.hoverlink {
 .form-horizontal div.checkbox label {
   font-weight: normal;
 }
+.form-horizontal .checkbox_with_input input[type=checkbox] {
+  position: relative;
+  margin-right: 5px;
+}
 .form-horizontal div.radio label .form_text_input {
   vertical-align: top;
   margin-left: 7px;

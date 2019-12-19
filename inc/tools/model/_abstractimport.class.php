@@ -26,6 +26,7 @@ class AbstractImport
 	var $import_code;
 	var $coll_ID;
 	var $log_file = true;
+	var $log_errors_num = 0;
 
 	/**
 	 * Get collection
@@ -177,6 +178,11 @@ class AbstractImport
 		if( $message === false )
 		{	// Skip when message should not be displayed:
 			return;
+		}
+
+		if( $display_label && ( $type == 'error' || $type == 'warning' ) )
+		{	// Count a number of errors + warnings:
+			$this->log_errors_num++;
 		}
 
 		// Display message on screen:

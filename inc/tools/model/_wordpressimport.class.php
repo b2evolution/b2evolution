@@ -30,6 +30,9 @@ class WordpressImport extends AbstractImport
 
 	var $info_data;
 
+	// Number of errors to stop import:
+	var $errors_limit = false;
+
 	/**
 	 * Initialize data for WordPress import
 	 */
@@ -42,6 +45,38 @@ class WordpressImport extends AbstractImport
 				'type'     => $this->import_code,
 				'Importer' => $this,
 			) );
+	}
+
+
+	/**
+	 * Log a message on screen and into file on disk
+	 *
+	 * @param string Message
+	 * @param string Type: 'success', 'error', 'warning'
+	 * @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
+	 * @param boolean TRUE to display label
+	 */
+	function log( $message, $type = NULL, $type_html_tag = 'p', $display_label = true )
+	{
+		parent::log( $message, $type, $type_html_tag, $display_label );
+
+		if( $this->errors_limit && $this->log_errors_num >= $this->errors_limit )
+		{	// Stop import because of errors limit:
+			global $DB;
+			$errors_limit = $this->errors_limit;
+
+			// Reset this var in order to avoid infinite recursion for the error logging below:
+			$this->errors_limit = false;
+
+			// Inform user about this stopping:
+			$this->log_error( 'Stop import because <code>'.$errors_limit.'</code> errors have been reached!' );
+
+			// Rollback all DB changes:
+			$DB->rollback();
+
+			// Exit here:
+			exit;
+		}
 	}
 
 
@@ -59,9 +94,23 @@ class WordpressImport extends AbstractImport
 		// The import type ( replace | append )
 		$import_type = param( 'import_type', 'string', 'replace', true );
 		// Should we delete files on 'replace' mode?
-		$delete_files = param( 'delete_files', 'integer', 0, true );
+		param( 'delete_files', 'integer', 0, true );
 		// Should we try to match <img> tags with imported attachments based on filename in post content after import?
-		$import_img = param( 'import_img', 'integer', 0, true );
+		param( 'import_img', 'integer', 0, true );
+		// Stop import after X errors:
+		$stop_error_enabled = param( 'stop_error_enabled', 'integer', 0, true );
+		$stop_error_num = param( 'stop_error_num', 'integer', 0, true );
+		if( $stop_error_enabled )
+		{	// Wrong stop errors number:
+			if( $stop_error_num < 1 )
+			{
+				param_error( 'stop_error_num', 'Stop errors number must be greater than 0.' );
+			}
+			else
+			{	// Set limit by errors:
+				$this->errors_limit = $stop_error_num;
+			}
+		}
 
 		// XML File:
 		$xml_file = param( 'import_file', 'string', '', true );
@@ -161,9 +210,33 @@ class WordpressImport extends AbstractImport
 			}
 			$this->log( '<br />' );
 
+			// Display selected options:
+			$selected_options = array();
 			if( get_param( 'import_img' ) )
 			{
-				$this->log( '<b>'.TB_('Options').':</b> [√] '.sprintf( TB_('Try to replace %s tags with imported attachments based on filename'), '<code>&lt;img src="...&gt;</code>' ) );
+				$selected_options[] = sprintf( TB_('Try to replace %s tags with imported attachments based on filename'), '<code>&lt;img src="...&gt;</code>' );
+			}
+			if( get_param( 'stop_error_enabled' ) )
+			{
+				$selected_options[] = sprintf( TB_('Stop import after %s errors'), '<code>'.get_param( 'stop_error_num' ).'</code>' );
+			}
+			$selected_options_count = count( $selected_options );
+			if( $selected_options_count )
+			{
+				$this->log( '<b>'.TB_('Options').':</b> ' );
+				if( $selected_options_count == 1 )
+				{
+					$this->log( $selected_options[0] );
+				}
+				else
+				{
+					$this->log( '<ul class="list-default">' );
+					foreach( $selected_options as $option )
+					{
+						$this->log( '<li>'.$option.'</li>' );
+					}
+					$this->log( '</ul>' );
+				}
 			}
 		}
 		else

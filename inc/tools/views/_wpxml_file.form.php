@@ -72,7 +72,10 @@ if( ! empty( $import_files ) )
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
 	echo '</div>';
 
-	$Form->checkbox_input( 'import_img', 1, T_('Options'), array( 'input_suffix' => sprintf( TB_('Try to replace %s tags with imported attachments based on filename'), '<code>&lt;img src="...&gt;</code>' ) ) );
+	$Form->checklist( array(
+			array( 'import_img', 1, sprintf( TB_('Try to replace %s tags with imported attachments based on filename'), '<code>&lt;img src="...&gt;</code>' ), param( 'import_img', 'integer', 1 ) ),
+			array( 'stop_error_enabled', 1, sprintf( TB_('Stop import after %s errors'), '<input type="text" name="stop_error_num" class="form-control" size="6" value="'.param( 'stop_error_num', 'integer', 100 ).'" />' ), param( 'stop_error_enabled', 'integer', 1 ), '', '', 'checkbox_with_input' ),
+		), 'perm_management', T_('Options') );
 
 	$Form->end_fieldset();
 
