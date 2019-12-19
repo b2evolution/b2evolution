@@ -893,7 +893,7 @@ function param_check_new_user_email( $var, $value = NULL, $link_Blog = NULL )
 
 		$error_message = sprintf( T_('You already have an account with email address "%s" on this site.'), $value );
 
-		if( ! empty( $user_pass ) )
+		if( ! empty( $result->user_pass ) )
 		{
 			$error_message .= ' '.sprintf( T_('You can <a %s>log in with your password here</a>.'), 'href="'.( $link_Blog === NULL ? get_login_url( '' ) : $link_Blog->get( 'loginurl' ) ).'"' );
 		}
