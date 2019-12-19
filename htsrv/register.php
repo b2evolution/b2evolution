@@ -42,16 +42,33 @@ if( empty( $session_registration_trigger_url ) && isset( $_SERVER['HTTP_REFERER'
 	$Session->set( 'registration_trigger_url', $session_registration_trigger_url );
 }
 
+// Check if email is required
+$registration_require_email = true;
 // Check if country is required
 $registration_require_country = (bool)$Settings->get('registration_require_country');
 // Check if firstname is required
 $registration_require_firstname = (bool)$Settings->get('registration_require_firstname');
 // Check if firstname is required (It can be required for quick registration by widget)
 $registration_require_lastname = false;
+// Check if nickname is required
+$registration_require_nickname = false;
 // Check if gender is required
 $registration_require_gender = $Settings->get('registration_require_gender');
 // Check if registration ask for locale
 $registration_ask_locale = $Settings->get('registration_ask_locale');
+
+// Do not set email:
+$ignore_email = false;
+// Do not set country:
+$ignore_country = false;
+// Do not set firstname:
+$ignore_firstname = false;
+// Do not set lastname:
+$ignore_lastname = false;
+// Do not set nickname:
+$ignore_nickname = false;
+// Do not set gender:
+$ignore_gender = false;
 
 $login = param( $dummy_fields[ 'login' ], 'string', '' );
 $email = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
@@ -59,6 +76,7 @@ param( 'action', 'string', '' );
 param( 'country', 'integer', '' );
 param( 'firstname', 'string', '' );
 param( 'lastname', 'string', '' );
+param( 'nickname', 'string', '' );
 param( 'gender', 'string', NULL );
 param( 'locale', 'string', '' );
 param( 'source', 'string', '' );
@@ -111,6 +129,56 @@ switch( $action )
 		{	// Consider social registration as quick registration:
 			$action = 'quick_register';
 		}
+
+		if( $is_social )
+		{	// Set params for registration using social network credentials:
+			$social_params = $Session->get( 'social.registration_params' );
+			$Session->delete( 'social.registration_params' );
+
+			// By default we do not require the following:
+			$registration_require_firstname = ( isset( $social_params['require_firstname'] ) && ( $social_params['require_firstname'] == 'required' ) );
+			$registration_require_lastname  = ( isset( $social_params['require_lastname'] ) && ( $social_params['require_lastname'] == 'required' ) );
+			$registration_require_nickname  = ( isset( $social_params['require_nickname'] ) && ( $social_params['require_nickname'] == 'required' ) );
+			$registration_require_country   = ( isset( $social_params['require_country'] ) && ( $social_params['require_country'] == 'required' ) );
+			$registration_require_gender    = ( isset( $social_params['require_gender'] ) && ( $social_params['require_gender'] == 'required' ) );
+
+			// Except for email address that should be required by default:
+			$registration_require_email = isset( $social_params['require_email'] ) ? ( $social_params['require_email'] == 'required' ) : true;
+
+			$ignore_firstname = ( isset( $social_params['require_firstname'] ) && ( $social_params['require_firstname'] == 'ignore' ) );
+			$ignore_lastname  = ( isset( $social_params['require_lastname'] ) && ( $social_params['require_lastname'] == 'ignore' ) );
+			$ignore_nickname  = ( isset( $social_params['require_nickname'] ) && ( $social_params['require_nickname'] == 'ignore' ) );
+			$ignore_country   = ( isset( $social_params['require_country'] ) && ( $social_params['require_country'] == 'ignore' ) );
+			$ignore_gender    = ( isset( $social_params['require_gender'] ) && ( $social_params['require_gender'] == 'ignore' ) );
+			$ignore_email     = ( isset( $social_params['require_email'] ) && ( $social_params['require_email'] == 'ignore' ) );
+
+			// Set ignored fields to NULL so we wouldn't need to check them:
+			if( $ignore_firstname )
+			{
+				$firstname = NULL;
+			}
+			if( $ignore_lastname )
+			{
+				$lastname = NULL;
+			}
+			if( $ignore_nickname )
+			{
+				$nickname = NULL;
+			}
+			if( $ignore_country )
+			{
+				$country = NULL;
+			}
+			if( $ignore_gender )
+			{
+				$gender = NULL;
+			}
+			if( $ignore_email )
+			{	// Email cannot be NULL:
+				$email = '';
+			}
+		}
+
 		// Use this boolean var to know when quick registration is used
 		$is_quick = ( $action == 'quick_register' );
 		$is_inline = param( 'inline', 'integer', 0 ) == 1;
@@ -119,13 +187,19 @@ switch( $action )
 		antispam_block_request();
 
 		// Check email:
-		param_check_new_user_email( $dummy_fields['email'], $email );
+		if( $registration_require_email || !empty( $email ) )
+		{
+			param_check_new_user_email( $dummy_fields['email'], $email );
+		}
 
 		// We will need the following parameter for the session data that will be set later:
 		param( 'widget', 'integer', 0 );
 
 		// Stop a request from the blocked email address or its domain:
-		antispam_block_by_email( $email );
+		if( $registration_require_email || !empty( $email ) )
+		{
+			antispam_block_by_email( $email );
+		}
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'regform' );
@@ -135,9 +209,15 @@ switch( $action )
 			if( $Settings->get( 'newusers_canregister' ) != 'yes' || ! $Settings->get( 'quick_registration' ) )
 			{	// Display error message when quick registration is disabled
 				$Messages->add( T_('Quick registration is currently disabled on this system.'), 'error' );
+				if( $is_social )
+				{
+					$Session->delete( 'social.access_credentials' );
+					$Session->delete( 'social.user_profile' );
+				}
 				break;
 			}
 
+			// TODO: Check
 			if( ! $is_social && ( empty( $Blog ) || ( empty( $widget ) && ! $is_inline ) ) )
 			{	// Don't use a quick registration if the request goes from not blog page except for social registration:
 				debug_die( 'Quick registration is currently disabled on this system.' );
@@ -229,7 +309,11 @@ switch( $action )
 		// Set params:
 		if( $is_quick )
 		{ // For quick registration
-			$paramsList = array( 'email' => $email );
+			$paramsList = array();
+			if( $registration_require_email || !empty( $email ) )
+			{
+				$paramsList = array( 'email' => $email );
+			}
 		}
 		else
 		{ // For normal registration
@@ -237,23 +321,32 @@ switch( $action )
 				'login'   => $login,
 				'pass1'   => $pass1,
 				'pass2'   => $pass2,
-				'email'   => $email,
 				'pass_required' => true );
+
+			if( $registration_require_email || !empty( $email ) )
+			{
+				$paramsList['email'] = $email;
+			}
 		}
 
-		if( $registration_require_country )
+		if( $registration_require_country || !empty( $country ) )
 		{
 			$paramsList['country'] = $country;
 		}
 
-		if( $registration_require_firstname )
+		if( $registration_require_firstname || !empty( $firstname ) )
 		{
 			$paramsList['firstname'] = $firstname;
 		}
 
-		if( $registration_require_lastname )
+		if( $registration_require_lastname || !empty( $lastname ) )
 		{
 			$paramsList['lastname'] = $lastname;
+		}
+
+		if( $registration_require_nickname || !empty( $nickname ) )
+		{
+			$paramsList['nickname'] = $nickname;
 		}
 
 		if( $registration_require_gender == 'required' )
@@ -286,7 +379,7 @@ switch( $action )
 				$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( implode( '.', $login ) ) );
 				$login = generate_login_from_string( $login );
 			}
-			else
+			elseif( ! empty( $email ) )
 			{ // Get the login from email address:
 				$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
 				$login = preg_replace( '/[\'"><@\s]/', '', $login );
@@ -307,6 +400,16 @@ switch( $action )
 					$login = generate_login_from_string( $login );
 				}
 			}
+			elseif( ! empty( $nickname ) )
+			{
+				$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( trim( $nickname ) ) );
+				$login = generate_login_from_string( $login );
+			}
+			else
+			{	// Nothing else to use as login, use random numbers:
+				$login = 'user_'.rand( 1, 999 );
+				$login = generate_login_from_string( $login );
+			}
 		}
 
 		if( ! $is_quick )
@@ -323,6 +426,11 @@ switch( $action )
 
 		if( $Messages->has_errors() )
 		{ // Stop registration if the errors exist
+			if( $is_social )
+			{
+				$Session->delete( 'social.access_credentials' );
+				$Session->delete( 'social.user_profile' );
+			}
 			break;
 		}
 
@@ -360,6 +468,13 @@ switch( $action )
 				{
 					$prefilled_params['widget'] = $widget;
 				}
+
+				if( $is_social )
+				{
+					$Session->delete( 'social.access_credentials' );
+					$Session->delete( 'social.user_profile' );
+				}
+
 				// Redirect to normal registration form with prefilled data from quick registration form:
 				header_redirect( url_add_param( get_user_register_url( $redirect_to, $source, false, '&' ), $prefilled_params, '&' ) );
 				// Exit here.
@@ -418,6 +533,7 @@ switch( $action )
 		$new_User->set( 'ctry_ID', $country );
 		$new_User->set( 'firstname', $firstname );
 		$new_User->set( 'lastname', $lastname );
+		$new_User->set( 'nickname', $nickname );
 		$new_User->set( 'gender', $gender );
 		$new_User->set( 'source', $source );
 		$new_User->set_email( $email );

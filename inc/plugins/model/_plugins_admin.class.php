@@ -231,6 +231,7 @@ class Plugins_admin extends Plugins
 				'Logout' => 'Called when a user logs out.',
 
 				'GetSpamKarmaForComment' => 'Asks plugin for the spam karma of a comment/trackback.',
+				'GetAuthLinksForSocialNetworks' => 'Asks the plugin for authorization link to specified social network.',
 
 				// Other Plugins can use this:
 				'RequestCaptcha' => 'Return data to display captcha html code.',

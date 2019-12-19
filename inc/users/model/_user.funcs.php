@@ -1700,6 +1700,12 @@ function profile_check_params( $params, $User = NULL )
 		param_error( $params['lastname'][1], T_('Please enter your last name.') );
 	}
 
+	// Checking nick name
+	if( isset( $params['nickname'] ) && empty( $params['nickname'][0] ) )
+	{
+		param_error( $params['nickname'][1], T_('Please enter your nick name.') );
+	}
+
 	// Checking gender
 	if( isset( $params['gender'] ) )
 	{

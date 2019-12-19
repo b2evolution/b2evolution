@@ -3384,6 +3384,22 @@ class Plugin
 	}
 
 
+	/**
+	 * Event handler: Called to ask the plugin for authorization links to specified social networks providers.
+	 *
+	 * @param array Associative array of parameters
+	 *   - 'providers': array of names of social network providers.
+	 *   - 'links': array that will contain the links (by reference)
+	 *   - 'link_params': array of parameters for displaying the link
+	 *
+	 * @return string link to authorization
+	 */
+	function GetAuthLinksForSocialNetworks( & $params )
+	{
+		return false;
+	}
+
+
 	/*
 	 * Event handlers }}}
 	 */
