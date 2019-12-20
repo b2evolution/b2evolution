@@ -111,6 +111,8 @@ class WordpressImport extends AbstractImport
 				$this->errors_limit = $stop_error_num;
 			}
 		}
+		// Convert wp links like "?page_id=" to b2evo shortlinks:
+		param( 'convert_links', 'integer', 0, true );
 
 		// XML File:
 		$xml_file = param( 'import_file', 'string', '', true );
@@ -220,6 +222,10 @@ class WordpressImport extends AbstractImport
 			{
 				$selected_options[] = sprintf( TB_('Stop import after %s errors'), '<code>'.get_param( 'stop_error_num' ).'</code>' );
 			}
+			if( get_param( 'convert_links' ) )
+			{
+				$selected_options[] = sprintf( TB_('Convert wp links like %s to b2evo shortlinks'), '<code>?page_id=</code>' );
+			}
 			$selected_options_count = count( $selected_options );
 			if( $selected_options_count )
 			{
@@ -278,6 +284,8 @@ class WordpressImport extends AbstractImport
 		$selected_item_type_names = param( 'item_type_names', 'array:integer' );
 		$selected_item_type_usages = param( 'item_type_usages', 'array:integer' );
 		$selected_item_type_none = param( 'item_type_none', 'integer' );
+		// Convert wp links like "?page_id=" to b2evo shortlinks:
+		$convert_links = param( 'convert_links', 'integer', 0, true );
 
 		// Store here all imported files:
 		$imported_file_names = array(); // Key - file name, Value - File ID or FALSE when same file name is used in different folders
@@ -1251,7 +1259,7 @@ class WordpressImport extends AbstractImport
 				}
 
 				// Try to extract files from content tag [caption ...]:
-				if( preg_match_all( '#\[caption[^\]]+id="attachment_(\d+)"[^\]]+\].+?\[/caption\]#i', $updated_post_content, $caption_matches ) )
+				if( preg_match_outcode( '#\[caption[^\]]+id="attachment_(\d+)"[^\]]+\].+?\[/caption\]#i', $updated_post_content, $caption_matches ) )
 				{	// If [caption ...] tag is detected
 					foreach( $caption_matches[1] as $caption_post_ID )
 					{
@@ -1266,7 +1274,7 @@ class WordpressImport extends AbstractImport
 									'<code>'.$File->_adfp_full_path.'</code>',
 									'<code>[caption id="attachment_'.$caption_post_ID.'"]</code>' ) );
 								// Replace this caption tag from content with b2evolution format:
-								$updated_post_content = preg_replace( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
+								$updated_post_content = replace_content_outcode( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
 								$file_is_linked = true;
 								$link_order++;
 							}
@@ -1283,7 +1291,7 @@ class WordpressImport extends AbstractImport
 				// Try to extract files from html tag <img />:
 				if( $import_img && count( $imported_file_names ) )
 				{	// Only if it is requested and at least one attachment has been detected above:
-					if( preg_match_all( '#<img[^>]+src="([^"]+)"[^>]+>#i', $updated_post_content, $img_matches ) )
+					if( preg_match_outcode( '#<img[^>]+src="([^"]+)"[^>]*>#i', $updated_post_content, $img_matches ) )
 					{	// If <img /> tag is detected
 						foreach( $img_matches[1] as $img_url )
 						{
@@ -1346,7 +1354,7 @@ class WordpressImport extends AbstractImport
 										'<code>inline</code>',
 										'<code>'.$img_url.'</code>' ).$additional_file_log );
 									// Replace this img tag from content with b2evolution format:
-									$updated_post_content = preg_replace( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]+>#i', '[image:'.$link_ID.']', $updated_post_content );
+									$updated_post_content = replace_content_outcode( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]*>#i', '[image:'.$link_ID.']', $updated_post_content );
 									$file_is_linked = true;
 									$link_order++;
 								}
@@ -1429,6 +1437,70 @@ class WordpressImport extends AbstractImport
 			}
 
 			$this->log( '<b>'.sprintf( '%d records', $posts_count ).'</b></p>' );
+
+			if( $convert_links && ! empty( $posts ) )
+			{	// Convert wp links like "?page_id=" to b2evo shortlinks:
+				$converted_links_num = 0;
+				$updated_posts_num = 0;
+				$this->log( '<p><b>'.'Converting wp links to b2evo shortlinks...'.' </b>' );
+
+				$ItemCache = & get_ItemCache();
+				foreach( $posts as $wp_post_ID => $evo_item_ID )
+				{
+					if( ! ( $Item = & $ItemCache->get_by_ID( $evo_item_ID, false, false ) ) )
+					{	// Skip unknown Item:
+						$this->log_error( 'Cannot find Item #'.$evo_item_ID.' in DB for converting wp links!' );
+						continue;
+					}
+
+					$log_prefix = 'Converted links for the Item #'.$Item->ID.'('.$Item->get_title().'): ';
+
+					$item_content = $Item->get( 'content' );
+					if( preg_match_outcode( '#<a.+?href="\?page_id=(\d+)".*?>(.+?)</a>#i', $item_content, $link_matches ) )
+					{	// If a link like <a href="?page_id=123"> is detected in item content:
+						$converted_links = array();
+						foreach( $link_matches[1] as $l => $link_wp_post_ID )
+						{
+							if( ! isset( $posts[ $link_wp_post_ID ] ) )
+							{	// Skip unknown wordpress post:
+								$this->log_warning( $log_prefix.'No wp post #'.$link_wp_post_ID.' for link <code>'.format_to_output( $link_matches[0][ $l ], 'htmlspecialchars' ).'</code> in content of the Item' );
+								continue;
+							}
+
+							if( ! ( $link_Item = & $ItemCache->get_by_ID( $posts[ $link_wp_post_ID ], false, false ) ) )
+							{	// Skip not found Item in DB:
+								$this->log_warning( $log_prefix.'Cannot find evo Item #'.$posts[ $link_wp_post_ID ].' in DB for wp post #'.$link_wp_post_ID.'!' );
+								continue;
+							}
+
+							$evo_short_link = '[['.$link_Item->get( 'urltitle' ).' '.$link_matches[2][ $l ].']]';
+
+							// Replace a link tag with evo short link:
+							$item_content = replace_content_outcode( $link_matches[0][ $l ], $evo_short_link, $item_content, 'replace_content', 'str' );
+
+							// For log:
+							$converted_links[] = '<code>'.format_to_output( $link_matches[0][ $l ], 'htmlspecialchars' ).'</code> => <code>'.$evo_short_link.'</code>';
+						}
+						$item_converted_links_num = count( $converted_links );
+						if( $item_converted_links_num > 0 )
+						{	// If at least one links is converted:
+							$Item->set( 'content', $item_content );
+							if( $Item->dbupdate() )
+							{	// Success updating:
+								$this->log_success( $log_prefix.implode( ', ', $converted_links ) );
+								$updated_posts_num++;
+								$converted_links_num += $item_converted_links_num;
+							}
+							else
+							{	// Failed updating:
+								$this->log_error( $log_prefix.'Cannot update content for converted links: '.implode( ', ', $converted_links ) );
+							}
+						}
+					}
+				}
+
+				$this->log( '<b>'.sprintf( '%d converted links in %d posts', $converted_links_num, $updated_posts_num ).'</b></p>' );
+			}
 		}
 
 
