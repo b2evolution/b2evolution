@@ -688,7 +688,7 @@ switch( $action )
 		// extra confusion when account validation is required.
 		$Session->set_User( $new_User );
 
-		if( $is_quick && !$is_social )
+		if( $is_quick )
 		{	// Set redirect_to after quick registration from widget or inline tag "[emailcapture:]":
 			if( ! empty( $widget_redirect_to ) )
 			{	// If a redirect param is defined:
@@ -709,6 +709,26 @@ switch( $action )
 			if( $Settings->get( 'registration_after_quick' ) == 'regform' )
 			{	// If we should display additional registration screen after quick registration:
 				$Messages->add( T_('Please double check your email address and choose a password so that you can log in next time you visit us.'), 'warning' );
+				if( $is_social && empty( $Blog ) )
+				{
+					global $blog, $current_User;
+
+					$widget_redirect_to_url = $redirect_to;
+
+					// We do not have a $Blog and $current_User to autoselect a collection yet:
+					$temp_current_User = $current_User;
+					$current_User = $new_User;
+					$temp_blog = $blog;  // need to restore later?
+					$temp_Blog = $Blog;  // need to restore later?
+
+					// Auto select a collection so we can get the redirect URL to the finish register form:
+					$blog = autoselect_blog( 'blog_ismember' );
+					$Blog = $BlogCache->get_by_ID( $blog );
+
+					// Restore temporary var:
+					$current_User = $temp_current_User;
+				}
+
 				$widget_redirect_to_url = $Blog->get( 'register_finishurl', array(
 						'glue'       => '&',
 						'url_suffix' => 'redirect_to='.rawurlencode( empty( $widget_redirect_to_url ) ? get_returnto_url() : $widget_redirect_to_url ),
