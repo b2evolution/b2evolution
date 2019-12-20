@@ -1195,6 +1195,7 @@ class WordpressImport extends AbstractImport
 
 				$LinkOwner = new LinkItem( $Item );
 				$updated_post_content = $post_content;
+				$item_content_was_changed = false;
 				$link_order = 1;
 
 				if( ! empty( $files ) && ! empty( $post['links'] ) )
@@ -1228,10 +1229,8 @@ class WordpressImport extends AbstractImport
 				{	// Extract additional data:
 					foreach( $post['postmeta'] as $postmeta )
 					{
-						switch( $postmeta['key'] )
-						{
-							case '_thumbnail_id':
-								// Try to link the File as cover:
+						if( $postmeta['key'] == '_thumbnail_id' )
+						{	// Try to link the File as cover:
 								$linked_post_files[] = $postmeta['value'];
 								$file_is_linked = false;
 								if( isset( $attachment_IDs[ $postmeta['value'] ] ) && isset( $files[ $attachment_IDs[ $postmeta['value'] ] ] ) )
@@ -1253,7 +1252,58 @@ class WordpressImport extends AbstractImport
 										'#'.$postmeta['value'],
 										'<code>&lt;wp:meta_key&gt;_thumbnail_id&lt;/wp:meta_key&gt;</code> = <code>'.$postmeta['value'].'</code>' ) );
 								}
-								break;
+						}
+						elseif( strpos( $postmeta['key'], 'wpcf-' ) === 0 )
+						{	// Custom field:
+							$custom_field_name = substr( $postmeta['key'], 5 );
+
+							if( $custom_field_name === '' )
+							{	// Empty custom field name:
+								$this->log_error( sprintf( 'Skip wp custom field without name; value %s',
+									isset( $postmeta['value'] ) ? '= <code>'.$postmeta['value'].'</code>' : 'is not defined' ) );
+								continue;
+							}
+
+							if( ! isset( $postmeta['value'] ) || $postmeta['value'] === NULL )
+							{	// No provided value:
+								$this->log_error( sprintf( 'Skip wp custom field %s without value!',
+									'<code>'.$custom_field_name.'</code>' ) );
+								continue;
+							}
+
+							$custom_field_value = $postmeta['value'];
+
+							$item_type_custom_fields = $ItemType->get_custom_fields();
+
+							if( ! isset( $item_type_custom_fields[ $custom_field_name ] ) )
+							{	// Skip unknown custom field:
+								$this->log_warning( sprintf( 'Custom field %s has been ignored because there is no %s custom field in Item Type %s.',
+									'<code>wpcf-'.$custom_field_name.'</code>',
+									'<code>'.$custom_field_name.'</code>',
+									'#'.$ItemType->ID.' "'.$ItemType->get( 'name' ).'"' ) );
+								continue;
+							}
+
+							if( ( in_array( $item_type_custom_fields[ $custom_field_name ]['type'], array( 'double', 'computed' ) ) && ! empty( $custom_field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $custom_field_value ) ) ||
+							    ( $item_type_custom_fields[ $custom_field_name ]['type'] == 'url' && validate_url( $custom_field_value, 'http-https' ) !== false ) ||
+							    ( $item_type_custom_fields[ $custom_field_name ]['type'] == 'image' && ! empty( $custom_field_value ) && ! is_number( $custom_field_value ) ) )
+							{	// Skip wrong custom field type format:
+								$this->log_error( sprintf( 'Custom field %s type mismatch: value %s cannot be imported into %s',
+									'<code>wpcf-'.$custom_field_name.'</code>',
+									'<code>'.$custom_field_value.'</code>',
+									'<code>'.$custom_field_name.'</code>' ) );
+								continue;
+							}
+
+							// Set custom field value and log this:
+							$Item->set_custom_field( $custom_field_name, $custom_field_value );
+							$this->log( '<p>'.sprintf( 'Custom field %s imported into %s with value %s.',
+								'<code>wpcf-'.$custom_field_name.'</code>',
+								'<code>'.$custom_field_name.'</code>',
+								'<code>'.$custom_field_value.'</code>' ).'</p>' );
+
+							// Set flag to update Item:
+							$item_content_was_changed = true;
 						}
 					}
 				}
@@ -1411,8 +1461,13 @@ class WordpressImport extends AbstractImport
 				}
 
 				if( $updated_post_content != $post_content )
-				{	// Update new content:
+				{	// Set new content:
 					$Item->set( 'content', $updated_post_content );
+					$item_content_was_changed = true;
+				}
+
+				if( $item_content_was_changed )
+				{	// Update Item:
 					$Item->dbupdate();
 				}
 

@@ -510,7 +510,7 @@ function wpxml_parser( $file )
 		{
 			$post['postmeta'][] = array(
 				'key'   => (string) $meta->meta_key,
-				'value' => wpxml_convert_value( $meta->meta_value )
+				'value' => isset( $meta->meta_value) ? wpxml_convert_value( $meta->meta_value ) : NULL,
 			);
 		}
 
