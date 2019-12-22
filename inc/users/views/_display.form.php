@@ -137,6 +137,10 @@ $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Other permissions for anonymous users').get_manual_link('anonymous-users-permissions') );
 
+	$Form->checkbox_input( 'show_reputation_data', $Settings->get('show_reputation_data'), T_('Show reputation data') );
+
+	$Form->checkbox_input( 'blur_avatar_if_anonymous', $Settings->get('blur_avatar_if_anonymous'), T_('Blur avatar image') );
+
 	$Form->checkbox_input( 'allow_anonymous_user_list', $Settings->get('allow_anonymous_user_list'), T_('Allow to see user list') );
 
 	$user_level_params = array();

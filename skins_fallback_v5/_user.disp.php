@@ -82,7 +82,12 @@ echo '<div class="profile_column_left">';
 	}
 	else
 	{ // Avatar settings for anonymous user
-		$avatar_image_size = $params['avatar_image_size_if_anonymous'];
+        if ($Settings->get( 'blur_avatar_if_anonymous' ) ) {
+            $avatar_image_size = $params['avatar_image_size_if_anonymous'];
+        } else {
+            $avatar_image_size = $params['avatar_image_size'];
+        }
+		
 		if( $params['avatar_overlay_text_if_anonymous'] != '#default#' )
 		{ // Get overlay text from params
 			$avatar_overlay_text = $params['avatar_overlay_text_if_anonymous'];
@@ -128,21 +133,25 @@ echo '<div class="profile_column_left">';
 	}
 
 	// Login:
-	echo '<h2 class="'.$User->get_gender_class().'">'.$User->get( 'login' ).'</h2>';
+	if ( $is_logged_in ) {
+        echo '<h2 class="'.$User->get_gender_class().'">'.$User->get( 'login' ).'</h2>';
+	}
 
 	echo '<hr class="profile_separator" />'."\n";
 
 	// Gender & age group:
-	$gender_age_group = $User->get_gender();
-	if( ! empty( $User->age_min ) || ! empty( $User->age_max ) )
-	{
-		if( ! empty( $gender_age_group ) )
-		{
-			$gender_age_group .= ' &bull; ';
-		}
-		$gender_age_group .= sprintf( T_('%s years old'), $User->get( 'age_min' ).'-'.$User->get( 'age_max' ) );
-	}
-	echo '<p>'.$gender_age_group.'</p>';
+	if ( $is_logged_in ) {
+        $gender_age_group = $User->get_gender();
+        if( ! empty( $User->age_min ) || ! empty( $User->age_max ) )
+        {
+            if( ! empty( $gender_age_group ) )
+            {
+                $gender_age_group .= ' &bull; ';
+            }
+            $gender_age_group .= sprintf( T_('%s years old'), $User->get( 'age_min' ).'-'.$User->get( 'age_max' ) );
+        }
+        echo '<p>'.$gender_age_group.'</p>';
+    }
 
 	// Location:
 	$location = array();
@@ -379,28 +388,31 @@ echo '<div class="profile_column_right">';
 		$profileForm->end_fieldset();
 	}
 
-	$profileForm->begin_fieldset( T_( 'Reputation' ) );
+	if ($Settings->get( 'show_reputation_data' ) )
+		{
+        	$profileForm->begin_fieldset( T_( 'Reputation' ) );
 
-		$profileForm->info( T_('Registration date'), mysql2localedate( $User->datecreated ) );
+            $profileForm->info( T_('Registration date'), mysql2localedate( $User->datecreated ) );
 
-		if( $Blog->get_setting( 'userdir_lastseen' ) )
-		{	// Display last visit only if it is enabled by current collection:
-			$profileForm->info( T_('Last seen on'), get_lastseen_date( $User->get( 'lastseen_ts' ), $Blog->get_setting( 'userdir_lastseen_view' ), $Blog->get_setting( 'userdir_lastseen_cheat' ) ) );
-		}
+            if( $Blog->get_setting( 'userdir_lastseen' ) )
+            {	// Display last visit only if it is enabled by current collection:
+                $profileForm->info( T_('Last seen on'), get_lastseen_date( $User->get( 'lastseen_ts' ), $Blog->get_setting( 'userdir_lastseen_view' ), $Blog->get_setting( 'userdir_lastseen_cheat' ) ) );
+            }
 
-		$profileForm->info( T_('Posts'), $User->get_reputation_posts() );
+            $profileForm->info( T_('Posts'), $User->get_reputation_posts() );
 
-		$profileForm->info( T_('Comments'), '<span class="reputation_message">'.$User->get_reputation_comments().'</span>' );
+            $profileForm->info( T_('Comments'), '<span class="reputation_message">'.$User->get_reputation_comments().'</span>' );
 
-		$profileForm->info( T_('Photos'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'image' ) ).'</span>' );
+            $profileForm->info( T_('Photos'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'image' ) ).'</span>' );
 
-		$profileForm->info( T_('Audio'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'audio' ) ).'</span>' );
+            $profileForm->info( T_('Audio'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'audio' ) ).'</span>' );
 
-		$profileForm->info( T_('Other files'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'other' ) ).'</span>' );
+            $profileForm->info( T_('Other files'), '<span class="reputation_message">'.$User->get_reputation_files( array( 'file_type' => 'other' ) ).'</span>' );
 
-		$profileForm->info( T_('Spam fighter score'), '<span class="reputation_message">'.$User->get_reputation_spam().'</span>' );
+            $profileForm->info( T_('Spam fighter score'), '<span class="reputation_message">'.$User->get_reputation_spam().'</span>' );
 
-	$profileForm->end_fieldset();
+        $profileForm->end_fieldset();
+    }
 
 	$Plugins->trigger_event( 'DisplayProfileFormFieldset', array( 'Form' => & $profileForm, 'User' => & $User, 'edit_layout' => 'public' ) );
 

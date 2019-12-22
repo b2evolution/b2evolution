@@ -331,6 +331,8 @@ C message size exceeds',
 		'bubbletip_anonymous' => 1, // Display bubbletips in Front-office for anonymous users
 		'bubbletip_size_anonymous' => 'fit-160x160-blur-18', // Avatar size in the bubbletip in the Front-office for anonymous users
 		'bubbletip_overlay' => "Log in to\r\nsee this\r\nimage",// Overlay text on the profile image for anonymous users
+		'show_reputation_data' => 0, //Display reputation data in the Front-Office to anonymous users
+		'blur_avatar_if_anonymous' => 1, //Display a blurred avatar image to anonymous users
 		'allow_anonymous_user_list' => 1, // Allow anonymous users to see user list (disp=users)
 		'allow_anonymous_user_profiles' => 0, // Allow anonymous users to see the user display ( disp=user )
 		'allow_anonymous_user_level_min' => 0, // Min value of user group level to display for anonymous users
