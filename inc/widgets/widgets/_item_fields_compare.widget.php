@@ -1297,7 +1297,7 @@ class item_fields_compare_Widget extends ComponentWidget
 		{
 			$disp_condition = explode( '=', $disp_condition );
 			// Get all allowed value by the condition of the custom field:
-			$disp_condition_values = explode( '|', $disp_condition[1] );
+			$disp_condition_values = isset( $disp_condition[1] ) ? explode( '|', $disp_condition[1] ) : array( '' );
 			// Get current value of the param from $_GET or $_POST:
 			$param_value = param( $disp_condition[0], 'string' );
 			// Check if we should hide the custom field by condition:
