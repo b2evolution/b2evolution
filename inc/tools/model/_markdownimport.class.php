@@ -126,6 +126,8 @@ class MarkdownImport extends AbstractImport
 				'short-title',
 				'tags',
 				'extra-cats',
+				'order',
+				'item-type',
 			);
 
 		// Call plugin event for additional initialization:
@@ -1031,10 +1033,23 @@ class MarkdownImport extends AbstractImport
 							$file_params['file_alt'] = '';
 						}
 						$file_params['file_title'] = trim( $image_matches[4][$i], ' "' );
+						// Detect link position:
+						$content_image_parts = explode( $image_matches[0][$i], $updated_item_content );
+						$header_regexp = '/(^|[\n\r\t\s]+)#+.+[\n\r]/';
+						if( count( $content_image_parts ) > 1 &&
+						    ! preg_match( $header_regexp, $content_image_parts[0] ) &&
+						    preg_match( $header_regexp, $content_image_parts[1] ) )
+						{	// Link image as teaser when image is first before header:
+							$file_params['link_position'] = 'teaser';
+						}
+						else
+						{	// Link image as inline when header is before the image or no header in item's content:
+							$file_params['link_position'] = 'inline';
+						}
 						// Try to find existing and linked image File or create, copy and link image File:
 						if( $link_data = $this->link_file( $LinkOwner, $folder_path, $category_path, rtrim( $image_relative_path ), $file_params ) )
 						{	// Replace this img tag from content with b2evolution format:
-							$updated_item_content = str_replace( $image_matches[0][$i], '[image:'.$link_data['ID'].']', $updated_item_content );
+							$updated_item_content = str_replace( $image_matches[0][$i], ( $file_params['link_position'] == 'inline' ? '[image:'.$link_data['ID'].']' : '' ), $updated_item_content );
 							if( $link_data['type'] == 'new' )
 							{	// Count new linked files:
 								$new_links_count++;
@@ -1177,6 +1192,7 @@ class MarkdownImport extends AbstractImport
 				'file_title'     => '',
 				'file_alt'       => '',
 				'folder_path'    => '',
+				'link_position'  => 'inline',
 			), $params );
 
 		$requested_file_relative_path = ltrim( str_replace( '\\', '/', $requested_file_relative_path ), '/' );
@@ -1224,9 +1240,9 @@ class MarkdownImport extends AbstractImport
 			}
 			else
 			{	// Try to link the found File object to the Item:
-				if( $link_ID = $File->link_to_Object( $LinkOwner, 0, 'inline' ) )
+				if( $link_ID = $File->link_to_Object( $LinkOwner, 0, $params['link_position'] ) )
 				{	// If file has been linked to the post
-					$this->log( '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been linked to this post.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
+					$this->log( '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been linked to this post as %s.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>', '<code>'.$params['link_position'].'</code>' ).'</li>' );
 					return array( 'ID' => $link_ID, 'type' => 'new' );
 				}
 				else
@@ -1310,10 +1326,10 @@ class MarkdownImport extends AbstractImport
 			{	// Inform about replaced file:
 				$this->log( '<li class="text-warning">'.sprintf( T_('File %s has been replaced in %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$File->get_rdfs_rel_path().'</code>' ).'</li>' );
 			}
-			elseif( $replaced_link_ID = $replaced_File->link_to_Object( $LinkOwner, 0, 'inline' ) )
+			elseif( $replaced_link_ID = $replaced_File->link_to_Object( $LinkOwner, 0, $params['link_position'] ) )
 			{	// If file has been linked to the post
 				$replaced_link_type = 'new';
-				$this->log( '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been updated and linked to this post successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>' ).'</li>' );
+				$this->log( '<li class="text-warning">'.sprintf( T_('File %s already exists in %s, it has been updated and linked to this post as %s successfully.'), '<code>'.$source_file_relative_path.'</code>', '<code>'.$replaced_File->get_rdfs_rel_path().'</code>', '<code>'.$params['link_position'].'</code>' ).'</li>' );
 			}
 			else
 			{	// If file could not be linked to the post:
@@ -1342,12 +1358,13 @@ class MarkdownImport extends AbstractImport
 		$File->set( 'alt', $params['file_alt'] );
 		$File->dbsave();
 
-		if( $link_ID = $File->link_to_Object( $LinkOwner, 0, 'inline' ) )
+		if( $link_ID = $File->link_to_Object( $LinkOwner, 0, $params['link_position'] ) )
 		{	// If file has been linked to the post
-			$this->log( '<li class="text-success">'.sprintf( T_('New file %s has been imported to %s successfully.'),
+			$this->log( '<li class="text-success">'.sprintf( T_('New file %s has been imported to %s as %s successfully.'),
 				'<code>'.$source_file_relative_path.'</code>',
 				'<code>'.$File->get_rdfs_rel_path().'</code>'.
-				( $file_source_name == $File->get( 'name' ) ? '' : '<span class="note">('.T_('Renamed').'!)</span>')
+					( $file_source_name == $File->get( 'name' ) ? '' : '<span class="note">('.T_('Renamed').'!)</span>'),
+				'<code>'.$params['link_position'].'</code>'
 			).'</li>' );
 		}
 		else
@@ -1766,6 +1783,59 @@ class MarkdownImport extends AbstractImport
 		}
 
 		$Item->set( 'extra_cat_IDs', $extra_cat_IDs );
+	}
+
+
+	/**
+	 * Set Item order from YAML data
+	 *
+	 * @param array Value
+	 * @param object Item (by reference)
+	 */
+	function set_yaml_order( $value, & $Item )
+	{
+		if( ! preg_match( '#^-?[0-9]*(\.[0-9]+)?$#', $value ) )
+		{	// Order value must be a decimal number:
+			$this->add_yaml_message( sprintf( 'Wrong value %s in yaml field %s.', '<code>'.$value.'</code>', '<code>order</code>' ) );
+			return;
+		}
+
+		// Set same order per each category of the Item:
+		$Item->set( 'order', $value );
+		$this->add_yaml_message( sprintf( 'Use order %s from yaml field %s for all categories of the Item.', '<code>'.$value.'</code>', '<code>order</code>' ), 'info' );
+	}
+
+
+	/**
+	 * Set Item Type from YAML data
+	 *
+	 * @param array Value
+	 * @param object Item (by reference)
+	 */
+	function set_yaml_item_type( $value, & $Item )
+	{
+		if( $value === '' )
+		{	// Skip empty Item Type name
+			$this->add_yaml_message( sprintf( 'Skip empty yaml field %s.', '<code>item-type</code>' ), 'warning' );
+			return;
+		}
+
+		$ItemTypeCache = & get_ItemTypeCache();
+		if( ! ( $ItemType = & $ItemTypeCache->get_by_name( $value, false, false ) ) )
+		{	// Skip unknown Item Type:
+			$this->add_yaml_message( sprintf( 'Not found Item Type %s for yaml field %s.', '"'.$value.'"', '<code>item-type</code>' ) );
+			return;
+		}
+
+		if( ! $ItemType->is_enabled( $Item->get_blog_ID() ) )
+		{	// Skip not enabled Item Type:
+			$this->add_yaml_message( sprintf( 'Cannot use Item Type %s from yaml field %s because it is not enabled for the collection.', '"'.$value.'"', '<code>item-type</code>' ) );
+			return;
+		}
+
+		// Set Item Type:
+		$Item->set( 'ityp_ID', $ItemType->ID );
+		$this->add_yaml_message( sprintf( 'Use Item Type %s from yaml field %s.', '"'.$value.'"', '<code>item-type</code>' ), 'info' );
 	}
 
 
