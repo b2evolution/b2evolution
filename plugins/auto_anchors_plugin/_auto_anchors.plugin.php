@@ -179,13 +179,15 @@ class auto_anchors_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 */
-	function RenderItemAsHtml( & $params )
+	function DisplayItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
 
 		// Get current Item to render links for anchors:
-		if( ! ( $this->current_Item = $this->get_Item_from_params( $params ) ) )
-		{	// Render anchor link only for Item or Comment:
+		if( ! ( $this->current_Item = $this->get_Item_from_params( $params ) ) ||
+		    $this->current_Item->get_type_setting( 'usage' ) == 'content-block' )
+		{	// Render anchor link only for Item or Comment,
+			// and exclude rendering for content-block Items because they are included inside current Item and have no own permanent URL:
 			return true;
 		}
 
