@@ -4786,6 +4786,33 @@ class Plugin
 	function ImporterSetItemField( & $params )
 	{
 	}
+
+
+	/**
+	 * Event handler: Called for additional updating Item after it was imported
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'     - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer' - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'Item'     - $Item,
+	 *   - 'data'     - Data of the Item from imported file,
+	 */
+	function ImporterAfterItemImport( & $params )
+	{
+	}
+
+
+	/**
+	 * Event handler: Called after Items were deleted in Importer class
+	 *
+	 * @param array Array of parameters:
+	 *   - 'type'             - Type of importer class, e.g. 'markdown'
+	 *   - 'Importer'         - Importer Object, e.g. Object of the class MarkdownImport
+	 *   - 'deleted_item_IDs' - IDs of deleted Items,
+	 */
+	function ImporterAfterItemsDelete( & $params )
+	{
+	}
 }
 
 ?>

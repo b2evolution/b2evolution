@@ -281,6 +281,8 @@ class Plugins_admin extends Plugins
 				// Importer events:
 				'ImporterConstruct' => 'Called for additional initialization of importer classes.',
 				'ImporterSetItemField' => 'Called to set Item field from Importer class.',
+				'ImporterAfterItemImport' => 'Called for additional updating Item after it was imported.',
+				'ImporterAfterItemsDelete' => 'Called after Items were deleted in Importer class.',
 			);
 
 			if( ! defined('EVO_IS_INSTALLING') || ! EVO_IS_INSTALLING )

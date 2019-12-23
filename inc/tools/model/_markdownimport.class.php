@@ -959,6 +959,14 @@ class MarkdownImport extends AbstractImport
 			$this->log( $item_result_suffix );
 			$this->log( empty( $item_result_class ) ? '' : '</span>' );
 
+			// Call plugin event after Item was imported:
+			$Plugins->trigger_event( 'ImporterAfterItemImport', array(
+					'type'     => $this->import_code,
+					'Importer' => $this,
+					'Item'     => $Item,
+					'data'     => $item_yaml_data,
+				) );
+
 			// Display messages of importing YAML fields:
 			$this->display_yaml_messages();
 

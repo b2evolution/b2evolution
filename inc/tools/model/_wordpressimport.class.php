@@ -260,7 +260,7 @@ class WordpressImport extends AbstractImport
 	 */
 	function execute()
 	{
-		global $DB, $tableprefix, $media_path;
+		global $DB, $tableprefix, $media_path, $Plugins;
 
 		// Load classes:
 		load_class( 'regional/model/_country.class.php', 'Country' );
@@ -365,6 +365,13 @@ class WordpressImport extends AbstractImport
 												 LEFT JOIN T_links__vote AS lv ON lv.lvot_link_ID = l.link_ID
 												WHERE l.link_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
 					$DB->query( 'DELETE FROM T_items__user_data WHERE itud_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
+
+					// Call plugin event after Items were deleted:
+					$Plugins->trigger_event( 'ImporterAfterItemsDelete', array(
+							'type'             => $this->import_code,
+							'Importer'         => $this,
+							'deleted_item_IDs' => $old_posts,
+						) );
 				}
 			}
 			$this->log( '<b>'.( $deleted_posts_num
@@ -1475,6 +1482,14 @@ class WordpressImport extends AbstractImport
 				{ // Set comments
 					$comments[ $Item->ID ] = $post['comments'];
 				}
+
+				// Call plugin event after Item was imported:
+				$Plugins->trigger_event( 'ImporterAfterItemImport', array(
+						'type'     => $this->import_code,
+						'Importer' => $this,
+						'Item'     => $Item,
+						'data'     => $post,
+					) );
 
 				$this->log_success( 'OK -> '.$Item->get_title(), 'span' );
 				$this->log( '</p>' );
