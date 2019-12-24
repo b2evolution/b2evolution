@@ -257,7 +257,23 @@ class ParsedownB2evo extends ParsedownExtra
 		}
 		else
 		{	// Call standard preparing:
-			return parent::blockListContinue( $Line, $Block );
+			$before_list_items_num = ( isset( $Block['li']['text'] ) && is_array( $Block['li']['text'] ) ? count( $Block['li']['text'] ) : 0 );
+			$Block = parent::blockListContinue( $Line, $Block );
+
+			if( isset( $Line['body'] ) &&
+			    isset( $Block['li']['text'] ) &&
+			    is_array( $Block['li']['text'] ) )
+			{	// If list has at least one item:
+				$after_list_items_num = count( $Block['li']['text'] );
+				if( $after_list_items_num > $before_list_items_num &&
+				    $Block['li']['text'][ $after_list_items_num - 1 ] !== $Line['body'] )
+				{	// If new list item was added in parent::blockListContinue() above,
+					// We should use indent = 2 spaces instead of 4 spaces from parent class Parsedown:
+					$Block['li']['text'][ $after_list_items_num - 1 ] = preg_replace( '/^[ ]{0,2}/', '', $Line['body'] );
+				}
+			}
+
+			return $Block;
 		}
 	}
 
