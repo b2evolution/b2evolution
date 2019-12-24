@@ -113,6 +113,8 @@ class WordpressImport extends AbstractImport
 		}
 		// Convert wp links like "?page_id=" to b2evo shortlinks:
 		param( 'convert_links', 'integer', 0, true );
+		// Use Yoast opengraph or twitter image as Cover image if available:
+		param( 'use_yoast_cover', 'integer', 0, true );
 
 		// XML File:
 		$xml_file = param( 'import_file', 'string', '', true );
@@ -226,6 +228,10 @@ class WordpressImport extends AbstractImport
 			{
 				$selected_options[] = sprintf( TB_('Convert wp links like %s to b2evo shortlinks'), '<code>?page_id=</code>' );
 			}
+			if( get_param( 'use_yoast_cover' ) )
+			{
+				$selected_options[] = TB_('Use Yoast opengraph or twitter image as Cover image if available');
+			}
 			$selected_options_count = count( $selected_options );
 			if( $selected_options_count )
 			{
@@ -286,10 +292,12 @@ class WordpressImport extends AbstractImport
 		$selected_item_type_none = param( 'item_type_none', 'integer' );
 		// Convert wp links like "?page_id=" to b2evo shortlinks:
 		$convert_links = param( 'convert_links', 'integer', 0, true );
+		// Use Yoast opengraph or twitter image as Cover image if available:
+		$use_yoast_cover = param( 'use_yoast_cover', 'integer', 0, true );
 
 		// Store here all imported files:
-		$imported_file_names = array(); // Key - file name, Value - File ID or FALSE when same file name is used in different folders
-		$imported_file_paths = array(); // Key - relative file path, Value - File ID
+		$this->imported_file_names = array(); // Key - file name, Value - File ID or FALSE when same file name is used in different folders
+		$this->imported_file_paths = array(); // Key - relative file path, Value - File ID
 
 		// Parse WordPress XML file into array
 		$this->log( 'Loading & parsing the XML file...'.'<br />' );
@@ -644,7 +652,7 @@ class WordpressImport extends AbstractImport
 		}
 
 		/* Import files, Copy them all to media folder */
-		$files = array();
+		$this->imported_files = array();
 		if( isset( $xml_data['files'] ) && count( $xml_data['files'] ) > 0 )
 		{
 			$this->log( '<p><b>'.'Importing the files...'.' </b>' );
@@ -695,23 +703,23 @@ class WordpressImport extends AbstractImport
 					// Try to import file from source path:
 					if( $File = & $this->create_File( $file_source_path, $file ) )
 					{	// Store the created File in array because it will be linked to the Items below:
-						$files[ $file['file_ID'] ] = $File;
+						$this->imported_files[ $file['file_ID'] ] = $File;
 
 						if( $import_img )
 						{	// Collect file name in array to link with post below:
 							$file_name = basename( $file['file_path'] );
-							if( isset( $imported_file_names[ $file_name ] ) )
+							if( isset( $this->imported_file_names[ $file_name ] ) )
 							{	// Don't use this file if more than one use same name, e.g. from different folders:
-								$imported_file_names[ $file_name ] = false;
+								$this->imported_file_names[ $file_name ] = false;
 								$this->log_error( sprintf( 'there are 2+ attachements with conflicting name %s.',
 										'<code>'.$file_name.'</code>' ) );
 							}
 							else
 							{	// This is a first detected file with current name:
-								$imported_file_names[ $file_name ] = $File->ID;
+								$this->imported_file_names[ $file_name ] = $File->ID;
 							}
 							// Store relative file path:
-							$imported_file_paths[ $file['zip_path'].$file['file_path'] ] = $File->ID;
+							$this->imported_file_paths[ $file['zip_path'].$file['file_path'] ] = $File->ID;
 						}
 
 						if( $file['file_root_type'] == 'user' &&
@@ -885,7 +893,7 @@ class WordpressImport extends AbstractImport
 			$this->log( '<p><b>'.'Importing the files from attachment posts...'.' </b>' );
 
 			$attached_post_files = array();
-			$attachment_IDs = array();
+			$this->attachment_IDs = array();
 			$attachments_count = 0;
 			foreach( $xml_data['posts'] as $post )
 			{	// Import ONLY attachment posts here, all other posts are imported below:
@@ -948,24 +956,24 @@ class WordpressImport extends AbstractImport
 						// Try to import file from source path:
 						if( $File = & $this->create_File( $file_source_path, $file_params ) )
 						{	// Store the created File in array because it will be linked to the Items below:
-							$attachment_IDs[ $post['post_id'] ] = $File->ID;
-							$files[ $File->ID ] = $File;
+							$this->attachment_IDs[ $post['post_id'] ] = $File->ID;
+							$this->imported_files[ $File->ID ] = $File;
 
 							if( $import_img )
 							{	// Collect file name in array to link with post below:
 								$file_name = basename( $file_source_path );
-								if( isset( $imported_file_names[ $file_name ] ) )
+								if( isset( $this->imported_file_names[ $file_name ] ) )
 								{	// Don't use this file if more than one use same name, e.g. from different folders:
-									$imported_file_names[ $file_name ] = false;
+									$this->imported_file_names[ $file_name ] = false;
 									$this->log_error( sprintf( 'there are 2+ attachements with conflicting name %s.',
 											'<code>'.$file_name.'</code>' ) );
 								}
 								else
 								{	// This is a first detected file with current name:
-									$imported_file_names[ $file_name ] = $File->ID;
+									$this->imported_file_names[ $file_name ] = $File->ID;
 								}
 								// Store relative file path:
-								$imported_file_paths[ $attch_file_name ] = $File->ID;
+								$this->imported_file_paths[ $attch_file_name ] = $File->ID;
 							}
 
 							$attachments_count++;
@@ -1205,60 +1213,60 @@ class WordpressImport extends AbstractImport
 				$item_content_was_changed = false;
 				$link_order = 1;
 
-				if( ! empty( $files ) && ! empty( $post['links'] ) )
+				if( ! empty( $this->imported_files ) && ! empty( $post['links'] ) )
 				{	// Link the files to the Item if it has them:
 					foreach( $post['links'] as $link )
 					{
-						$file_is_linked = false;
-						if( isset( $files[ $link['link_file_ID'] ] ) )
-						{	// Link a File to Item:
-							$File = $files[ $link['link_file_ID'] ];
-							if( $File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] ) )
-							{	// If file has been linked to the post
-								$this->log_success( sprintf( 'File %s has been linked to this post as %s from %s.',
-									'<code>'.$File->_adfp_full_path.'</code>',
-									'<code>'.$link['link_position'].'</code>',
-									'<code>&lt;evo:link&gt;</code>' ) );
-								$file_is_linked = true;
-								// Update link order to the latest for two other ways([caption] and <img />) below:
-								$link_order = $link['link_order'] + 1;
-							}
+						if( ( $File = & $this->get_File_by_ID( $link['link_file_ID'] ) ) &&
+						    $File->link_to_Object( $LinkOwner, $link['link_order'], $link['link_position'] ) )
+						{	// If imported File has been linked to the post
+							$this->log_success( sprintf( 'File %s has been linked to this post as %s from %s.',
+								'<code>'.$File->_adfp_full_path.'</code>',
+								'<code>'.$link['link_position'].'</code>',
+								'<code>&lt;evo:link&gt;</code>' ) );
+							// Update link order to the latest for two other ways([caption] and <img />) below:
+							$link_order = $link['link_order'] + 1;
 						}
-						if( ! $file_is_linked )
+						else
 						{	// If file could not be linked to the post:
 							$this->log_warning( sprintf( 'Link %s could not be attached to this post because file %s is not found.', '#'.$link['link_ID'], '#'.$link['link_file_ID'] ) );
 						}
 					}
 				}
 
-				$linked_post_files = array();
+				$this->linked_post_files = array();
 				if( isset( $post['postmeta'] ) )
 				{	// Extract additional data:
+					$cover_image_is_imported = false;
+					if( $use_yoast_cover )
+					{	// Use Yoast opengraph or twitter image as Cover image if available:
+						// (1) Opengraph is 1st priority:
+						$cover_image_is_imported = $this->link_from_meta_data( '_yoast_wpseo_opengraph-image', 'cover', $link_order, $post['postmeta'], $LinkOwner );
+						if( ! $cover_image_is_imported )
+						{	// (2) Twitter is 2nd priority if cover image was not imported from opengraph:
+							$cover_image_is_imported = $this->link_from_meta_data( '_yoast_wpseo_twitter-image', 'cover', $link_order, $post['postmeta'], $LinkOwner );
+						}
+					}
 					foreach( $post['postmeta'] as $postmeta )
 					{
-						if( $postmeta['key'] == '_thumbnail_id' )
-						{	// Try to link the File as cover:
-								$linked_post_files[] = $postmeta['value'];
-								$file_is_linked = false;
-								if( isset( $attachment_IDs[ $postmeta['value'] ] ) && isset( $files[ $attachment_IDs[ $postmeta['value'] ] ] ) )
-								{
-									$File = $files[ $attachment_IDs[ $postmeta['value'] ] ];
-									if( $File->link_to_Object( $LinkOwner, $link_order, 'cover' ) )
-									{	// If file has been linked to the post:
-										$this->log_success( sprintf( 'File %s has been linked to this post as %s from %s.',
-											'<code>'.$File->_adfp_full_path.'</code>',
-											'<code>cover</code>',
-											'<code>&lt;wp:meta_key&gt;_thumbnail_id&lt;/wp:meta_key&gt;</code>' ) );
-										$file_is_linked = true;
-										$link_order++;
-									}
-								}
-								if( ! $file_is_linked )
-								{	// If file could not be linked to the post:
-									$this->log_warning( sprintf( 'Cover file %s could not be attached to this post because it is not found in the source attachments by %s.',
-										'#'.$postmeta['value'],
-										'<code>&lt;wp:meta_key&gt;_thumbnail_id&lt;/wp:meta_key&gt;</code> = <code>'.$postmeta['value'].'</code>' ) );
-								}
+						if( ! $cover_image_is_imported && $postmeta['key'] == '_thumbnail_id' )
+						{	// (3) Thumbnail ID is 3rd priority after Yoast Opengraph and Twitter:
+							$this->linked_post_files[] = $postmeta['value'];
+							if( ( $File = & $this->get_File_by_attachment_ID( $postmeta['value'] ) ) &&
+									$File->link_to_Object( $LinkOwner, $link_order, 'cover' ) )
+							{	// If imported File has been linked to the post:
+								$this->log_success( sprintf( 'File %s has been linked to this post as %s from %s.',
+									'<code>'.$File->_adfp_full_path.'</code>',
+									'<code>cover</code>',
+									'<code>&lt;wp:meta_key&gt;_thumbnail_id&lt;/wp:meta_key&gt;</code>' ) );
+								$link_order++;
+							}
+							else
+							{	// If file could not be linked to the post:
+								$this->log_warning( sprintf( 'Cover file %s could not be attached to this post because it is not found in the source attachments by %s.',
+									'#'.$postmeta['value'],
+									'<code>&lt;wp:meta_key&gt;_thumbnail_id&lt;/wp:meta_key&gt;</code> = <code>'.$postmeta['value'].'</code>' ) );
+							}
 						}
 						elseif( strpos( $postmeta['key'], 'wpcf-' ) === 0 )
 						{	// Custom field:
@@ -1320,23 +1328,18 @@ class WordpressImport extends AbstractImport
 				{	// If [caption ...] tag is detected
 					foreach( $caption_matches[1] as $caption_post_ID )
 					{
-						$linked_post_files[] = $caption_post_ID;
-						$file_is_linked = false;
-						if( isset( $attachment_IDs[ $caption_post_ID ] ) && isset( $files[ $attachment_IDs[ $caption_post_ID ] ] ) )
-						{
-							$File = $files[ $attachment_IDs[ $caption_post_ID ] ];
-							if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
-							{	// If file has been linked to the post
-								$this->log_success( sprintf( 'File %s has been linked to this post from %s.',
-									'<code>'.$File->_adfp_full_path.'</code>',
-									'<code>[caption id="attachment_'.$caption_post_ID.'"]</code>' ) );
-								// Replace this caption tag from content with b2evolution format:
-								$updated_post_content = replace_content_outcode( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
-								$file_is_linked = true;
-								$link_order++;
-							}
+						$this->linked_post_files[] = $caption_post_ID;
+						if( ( $File = & $this->get_File_by_attachment_ID( $caption_post_ID ) ) &&
+						    ( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) ) )
+						{	// If imported File has been linked to the post
+							$this->log_success( sprintf( 'File %s has been linked to this post from %s.',
+								'<code>'.$File->_adfp_full_path.'</code>',
+								'<code>[caption id="attachment_'.$caption_post_ID.'"]</code>' ) );
+							// Replace this caption tag from content with b2evolution format:
+							$updated_post_content = replace_content_outcode( '#\[caption[^\]]+id="attachment_'.$caption_post_ID.'"[^\]]+\].+?\[/caption\]#i', ( $File->is_image() ? '[image:'.$link_ID.']' : '[file:'.$link_ID.']' ), $updated_post_content );
+							$link_order++;
 						}
-						if( ! $file_is_linked )
+						else
 						{	// If file could not be linked to the post:
 							$this->log_warning( sprintf( 'Caption file %s could not be attached to this post because it is not found in the source attachments folder by %s.',
 								'#'.$caption_post_ID,
@@ -1346,91 +1349,15 @@ class WordpressImport extends AbstractImport
 				}
 
 				// Try to extract files from html tag <img />:
-				if( $import_img && count( $imported_file_names ) )
+				if( $import_img && count( $this->imported_file_names ) )
 				{	// Only if it is requested and at least one attachment has been detected above:
 					if( preg_match_outcode( '#<img[^>]+src="([^"]+)"[^>]*>#i', $updated_post_content, $img_matches ) )
 					{	// If <img /> tag is detected
-						foreach( $img_matches[1] as $img_url )
-						{
-							$matched_file_ID = NULL;
-							$matched_file_place = NULL;
-							$file_is_linked = false;
-							$img_file_name = basename( $img_url );
-							$img_file_rel_path = NULL;
-
-							if( ! empty( $this->info_data['attached_files_folder'] ) &&
-							    strpos( $img_url, $this->info_data['attached_files_folder'] ) !== false )
-							{	// Get relative path because image URL contains it:
-								$img_file_rel_path = preg_replace( '#^.+?'.preg_quote( $this->info_data['attached_files_folder'] ).'#', '', $img_url );
-							}
-
-							if( $img_file_rel_path !== NULL &&
-							    ! empty( $imported_file_paths[ $img_file_rel_path ] ) )
-							{	// We find file by relative path:
-								$matched_file_ID = $imported_file_paths[ $img_file_rel_path ];
-								$matched_file_place = 'path';
-							}
-							elseif( isset( $imported_file_names[ $img_file_name ] ) )
-							{	// We find file by name:
-								$matched_file_ID = $imported_file_names[ $img_file_name ];
-								$matched_file_place = 'file';
-							}
-
-							if( $matched_file_ID === false )
-							{	// Skip a duplicated file by name:
-								$this->log_error( sprintf( 'Cannot replace img src="%s" because the file name %s is a duplicate and it was not found in %s.',
-										'<code>'.$img_url.'</code>',
-										'<code>'.$img_file_name.'</code>',
-										( empty( $this->info_data['attached_files_folder'] ) ? ' attachments folder because it is not detected for the imported XML file' : '<code>'.$this->info_data['attached_files_folder'].'</code>' ) ) );
-								continue;
-							}
-
-							if( isset( $files[ $matched_file_ID ] ) )
-							{	// Try to link File to the Item:
-								$File = $files[ $matched_file_ID ];
-								if( $linked_post_ID = array_search( $File->ID, $attachment_IDs ) )
-								{
-									$linked_post_files[] = $linked_post_ID;
-								}
-								if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, 'inline' ) )
-								{	// If file has been linked to the post
-									if( $matched_file_place == 'file' )
-									{	// Inform the file was matched only by name:
-										$additional_file_log = ' '.$this->get_log( sprintf( 'We could not match file name %s but we could match %s.',
-											( empty( $img_file_rel_path )
-												? ' by relative path '.( empty( $this->info_data['attached_files_folder'] ) ? '' : '<code>'.$this->info_data['attached_files_folder'].'</code>' ).' because it is not found in image URL'
-												: '<code>'.$img_file_rel_path.'</code>' ),
-											'<code>'.$img_file_name.'</code>' ), 'warning', 'span' );
-									}
-									else
-									{
-										$additional_file_log = '';
-									}
-									$this->log_success( sprintf( 'File %s has been linked to this post as %s from img src="%s"'.( $matched_file_place == 'path' ? ' and matched with <code>'.$img_file_rel_path.'</code>' : '' ).'.',
-										'<code>'.$File->_adfp_full_path.'</code>',
-										'<code>inline</code>',
-										'<code>'.$img_url.'</code>' ).$additional_file_log );
-									// Replace this img tag from content with b2evolution format:
-									$updated_post_content = replace_content_outcode( '#<img[^>]+src="[^"]+'.preg_quote( $img_file_name ).'"[^>]*>#i', '[image:'.$link_ID.']', $updated_post_content );
-									$file_is_linked = true;
-									$link_order++;
-								}
-								else
-								{	// If file could not be linked:
-									$this->log_error( sprintf( 'File %s could not be linked to this post as %s from img src="%s".',
-										'<code>'.$File->_adfp_full_path.'</code>',
-										'<code>inline</code>',
-										'<code>'.$img_url.'</code>' ) );
-								}
-							}
-
-							if( ! $file_is_linked )
-							{	// If file could not be linked to the post:
-								$this->log_warning( sprintf( 'File of img src=%s could not be attached to this post because the name %s does not match any %s or %s.',
-									'<code>'.$img_url.'</code>',
-									'<code>'.$img_file_name.'</code>',
-									'<code>&lt;evo:file&gt;</code>',
-									'<code>&lt;item&gt;&lt;wp:post_type&gt;attachment&lt;/wp:post_type&gt;...</code>' ) );
+						foreach( $img_matches[1] as $i => $img_url )
+						{	// Try to link File:
+							if( $link_ID = $this->link_by_URL( $img_url, 'inline', $link_order, $LinkOwner ) )
+							{	// Replace this img tag from content with b2evolution format:
+								$updated_post_content = replace_content_outcode( $img_matches[0][$i], '[image:'.$link_ID.']', $updated_post_content, 'replace_content', 'str' );
 							}
 						}
 					}
@@ -1440,25 +1367,20 @@ class WordpressImport extends AbstractImport
 				{	// Link all found attached files for the Item which were not linked yer above as cover or inline image tags:
 					foreach( $attached_post_files[ $post['post_id'] ] as $attachment_post_ID )
 					{
-						if( in_array( $attachment_post_ID, $linked_post_files ) )
+						if( in_array( $attachment_post_ID, $this->linked_post_files ) )
 						{	// Skip already linked File:
 							continue;
 						}
-						$file_is_linked = false;
-						if( isset( $attachment_IDs[ $attachment_post_ID ] ) && isset( $files[ $attachment_IDs[ $attachment_post_ID ] ] ) )
-						{
-							$File = $files[ $attachment_IDs[ $attachment_post_ID ] ];
-							if( $File->link_to_Object( $LinkOwner, $link_order, 'aftermore' ) )
-							{	// If file has been linked to the post:
-								$this->log_success( sprintf( 'File %s has been linked to this post as %s by %s.',
-									'<code>'.$File->_adfp_full_path.'</code>',
-									'<code>aftermore</code>',
-									'<code>&lt;wp:post_id&gt;'.$post['post_id'].'&lt;/wp:post_id&gt;</code>' ) );
-								$file_is_linked = true;
-								$link_order++;
-							}
+						if( ( $File = & $this->get_File_by_attachment_ID( $attachment_post_ID ) ) &&
+						    $File->link_to_Object( $LinkOwner, $link_order, 'aftermore' ) )
+						{	// If imported File has been linked to the post:
+							$this->log_success( sprintf( 'File %s has been linked to this post as %s by %s.',
+								'<code>'.$File->_adfp_full_path.'</code>',
+								'<code>aftermore</code>',
+								'<code>&lt;wp:post_id&gt;'.$post['post_id'].'&lt;/wp:post_id&gt;</code>' ) );
+							$link_order++;
 						}
-						if( ! $file_is_linked )
+						else
 						{	// If file could not be linked to the post:
 							$this->log_warning( sprintf( 'File %s could not be attached to this post because it is not found in the source attachments by %s.',
 								'#'.$attachment_post_ID,
@@ -1763,6 +1685,190 @@ class WordpressImport extends AbstractImport
 		$this->log_success( sprintf( 'File %s has been imported to %s successfully.', '<code>'.$file_source_path.'</code>', '<code>'.$File->get_full_path().'</code>' ) );
 
 		return $File;
+	}
+
+
+	/**
+	 * Get imported File by ID
+	 *
+	 * @param integer File ID from b2evo DB
+	 * @return object|false File
+	 */
+	function & get_File_by_ID( $file_ID )
+	{
+		if( isset( $this->imported_files[ $file_ID ] ) )
+		{	// If File was imported and found by ID:
+			$File = & $this->imported_files[ $file_ID ];
+			return $File;
+		}
+
+		// Not found file:
+		$r = false;
+		return $r;
+	}
+
+
+	/**
+	 * Get imported File by attachment post ID
+	 *
+	 * @param integer ID of post with <wp:post_type> == "attachment"
+	 * @return object|false File
+	 */
+	function & get_File_by_attachment_ID( $attachment_post_ID )
+	{
+		if( isset( $this->attachment_IDs[ $attachment_post_ID ] ) )
+		{	// If File was imported and found by attachment post ID:
+			$File = & $this->get_File_by_ID( $this->attachment_IDs[ $attachment_post_ID ] );
+			return $File;
+		}
+
+		// Not found file:
+		$r = false;
+		return $r;
+	}
+
+
+	/**
+	 * Link File from meta data
+	 *
+	 * @param string Meta key
+	 * @param string Link position
+	 * @param integer Link order, updated by reference
+	 * @param array Meta data
+	 * @param object Link Owner, updated by reference
+	 * @return integer|boolean Link ID on success, FALSE otherwise
+	 */
+	function link_from_meta_data( $meta_key, $link_position, & $link_order, $meta_data, & $LinkOwner )
+	{
+		foreach( $meta_data as $meta )
+		{
+			if( $meta['key'] == $meta_key )
+			{
+				$meta_key_tag = '<code>&lt;wp:meta_key&gt;'.$meta_key.'&lt;/wp:meta_key&gt;</code>';
+				if( empty( $meta['value'] ) )
+				{	// Skip empty value:
+					$this->log_warning( sprintf( 'Cover file could not be used from %s because value is empty.', $meta_key_tag ) );
+					return false;
+				}
+
+				// Try to link file by URL from the requested meta data:
+				return $this->link_by_URL( $meta['value'], 'cover', $link_order, $LinkOwner, array(
+						'msg_no_found'       => 'Cannot link file from '.$meta_key_tag.' = "%s" because the file name %s is a duplicate and it was not found in %s.',
+						'msg_no_match'       => 'Cover file from '.$meta_key_tag.' = %s could not be attached to this post because the name %s does not match any %s or %s.',
+						'msg_linked_by_path' => 'File %s has been linked to this post as %s from '.$meta_key_tag.' = "%s" and matched with %s.',
+						'msg_linked_by_name' => 'File %s has been linked to this post as %s from '.$meta_key_tag.' = "%s".',
+						'msg_cannot_link'    => 'File %s could not be linked to this post as %s from '.$meta_key_tag.' = "%s".',
+					) );
+			}
+		}
+
+		// Could not link by URL or no requested meta data:
+		return false;
+	}
+
+
+	/**
+	 * Link File by URL
+	 *
+	 * @param string File/Image URL
+	 * @param string Link position
+	 * @param integer Link order, updated by reference
+	 * @param object Link Owner, updated by reference
+	 * @return integer|boolean Link ID on success, FALSE otherwise
+	 */
+	function link_by_URL( $file_url, $link_position, & $link_order, & $LinkOwner, $params = array() )
+	{
+		$params = array_merge( array(
+				'msg_no_found'           => 'Cannot replace img src="%s" because the file name %s is a duplicate and it was not found in %s.',
+				'msg_no_match'           => 'File of img src=%s could not be attached to this post because the name %s does not match any %s or %s.',
+				'msg_linked_by_path'     => 'File %s has been linked to this post as %s from img src="%s" and matched with %s.',
+				'msg_linked_by_name'     => 'File %s has been linked to this post as %s from img src="%s".',
+				'msg_match_only_by_name' => 'We could not match file name %s but we could match %s.',
+				'msg_cannot_link'        => 'File %s could not be linked to this post as %s from img src="%s".',
+			), $params );
+
+		$matched_file_ID = NULL;
+		$matched_file_place = NULL;
+		$img_file_name = basename( $file_url );
+		$img_file_rel_path = NULL;
+
+		if( ! empty( $this->info_data['attached_files_folder'] ) &&
+				strpos( $file_url, $this->info_data['attached_files_folder'] ) !== false )
+		{	// Get relative path because image URL contains it:
+			$img_file_rel_path = preg_replace( '#^.+?'.preg_quote( $this->info_data['attached_files_folder'] ).'#', '', $file_url );
+		}
+
+		if( $img_file_rel_path !== NULL &&
+				! empty( $this->imported_file_paths[ $img_file_rel_path ] ) )
+		{	// We find file by relative path:
+			$matched_file_ID = $this->imported_file_paths[ $img_file_rel_path ];
+			$matched_file_place = 'path';
+		}
+		elseif( isset( $this->imported_file_names[ $img_file_name ] ) )
+		{	// We find file by name:
+			$matched_file_ID = $this->imported_file_names[ $img_file_name ];
+			$matched_file_place = 'file';
+		}
+
+		if( $matched_file_ID === false )
+		{	// Skip a duplicated file by name:
+			$this->log_error( sprintf( $params['msg_no_found'],
+					'<code>'.$file_url.'</code>',
+					'<code>'.$img_file_name.'</code>',
+					( empty( $this->info_data['attached_files_folder'] ) ? ' attachments folder because it is not detected for the imported XML file' : '<code>'.$this->info_data['attached_files_folder'].'</code>' ) ) );
+			return false;
+		}
+
+		if( ! ( $File = & $this->get_File_by_ID( $matched_file_ID ) ) )
+		{	// If file could not be linked to the post:
+			$this->log_warning( sprintf( $params['msg_no_match'],
+				'<code>'.$file_url.'</code>',
+				'<code>'.$img_file_name.'</code>',
+				'<code>&lt;evo:file&gt;</code>',
+				'<code>&lt;item&gt;&lt;wp:post_type&gt;attachment&lt;/wp:post_type&gt;...</code>' ) );
+			return false;
+		}
+
+		if( $linked_post_ID = array_search( $File->ID, $this->attachment_IDs ) )
+		{	// Store what files were tried to be linked in order to don't link twice:
+			$this->linked_post_files[] = $linked_post_ID;
+		}
+
+		// Try to link File to the Item/LinkOwner:
+		if( $link_ID = $File->link_to_Object( $LinkOwner, $link_order, $link_position ) )
+		{	// If file has been linked to the Item
+			if( $matched_file_place == 'path' )
+			{	// Inform the file was matched by path:
+				$this->log_success( sprintf( $params['msg_linked_by_path'],
+					'<code>'.$File->_adfp_full_path.'</code>',
+					'<code>'.$link_position.'</code>',
+					'<code>'.$file_url.'</code>',
+					'<code>'.$img_file_rel_path.'</code>' ) );
+			}
+			else
+			{	// Inform the file was matched only by name:
+				$this->log_success( sprintf( $params['msg_linked_by_name'],
+					'<code>'.$File->_adfp_full_path.'</code>',
+					'<code>'.$link_position.'</code>',
+					'<code>'.$file_url.'</code>' ).' '
+					.$this->get_log( sprintf( $params['msg_match_only_by_name'],
+					( empty( $img_file_rel_path )
+						? ' by relative path '.( empty( $this->info_data['attached_files_folder'] ) ? '' : '<code>'.$this->info_data['attached_files_folder'].'</code>' ).' because it is not found in image URL'
+						: '<code>'.$img_file_rel_path.'</code>' ),
+					'<code>'.$img_file_name.'</code>' ), 'warning', 'span' ) );
+			}
+
+			$link_order++;
+
+			return $link_ID;
+		}
+
+		// If file could not be linked:
+		$this->log_error( sprintf( $params['msg_cannot_link'],
+			'<code>'.$File->_adfp_full_path.'</code>',
+			'<code>'.$link_position.'</code>',
+			'<code>'.$file_url.'</code>' ) );
+		return false;
 	}
 }
 ?>

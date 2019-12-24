@@ -76,6 +76,7 @@ if( ! empty( $import_files ) )
 			array( 'import_img', 1, sprintf( TB_('Try to replace %s tags with imported attachments based on filename'), '<code>&lt;img src="...&gt;</code>' ), param( 'import_img', 'integer', 1 ) ),
 			array( 'stop_error_enabled', 1, sprintf( TB_('Stop import after %s errors'), '<input type="text" name="stop_error_num" class="form-control" size="6" value="'.param( 'stop_error_num', 'integer', 100 ).'" />' ), param( 'stop_error_enabled', 'integer', 1 ), '', '', 'checkbox_with_input' ),
 			array( 'convert_links', 1, sprintf( TB_('Convert wp links like %s to b2evo shortlinks'), '<code>?page_id=</code>' ), param( 'convert_links', 'integer', 1 ) ),
+			array( 'use_yoast_cover', 1, TB_('Use Yoast opengraph or twitter image as Cover image if available'), param( 'use_yoast_cover', 'integer', 1 ) ),
 		), 'perm_management', T_('Options') );
 
 	$Form->end_fieldset();
