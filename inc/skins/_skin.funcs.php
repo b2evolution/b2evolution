@@ -735,8 +735,8 @@ function skin_init( $disp )
 					}
 				}
 
-				if( $allow_msgform == 'email' )
-				{ // set recippient user param
+				if( empty( $recipient_id ) && ! empty( $recipient_User ) )
+				{	// Set recipient user param when it is not specified in GET/POST:
 					set_param( 'recipient_id', $recipient_User->ID );
 				}
 			}
