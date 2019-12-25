@@ -560,6 +560,14 @@ function create_default_data()
 			'format'          => '#yes#;;#no#;n/a',
 			'cell_class'      => 'right',
 		),
+		array(
+			'label'           => TD_('Numeric Average'),
+			'name'            => 'numeric_average',
+			'type'            => 'computed',
+			'order'           => 210,
+			'cell_class'      => 'right',
+			'formula'         => '($first_numeric_field$+$second_numeric_field$)/2',
+		),
 		// for Item Type "Child Post":
 		array(
 			'ityp_ID'         => $child_ityp_ID,

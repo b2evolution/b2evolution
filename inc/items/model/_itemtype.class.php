@@ -431,6 +431,9 @@ class ItemType extends DataObject
 		// Field names array is used to check the diplicates
 		$field_names = array();
 
+		// Get previous computed custom fields:
+		$old_computed_custom_fields = $this->get_custom_fields( 'computed' );
+
 		// Empty and Initialize the custom fields from POST data
 		$this->custom_fields = array();
 
@@ -472,6 +475,9 @@ class ItemType extends DataObject
 			'description'     => 'html',
 			'merge'           => array( 'integer', 0 ),
 		);
+
+		// Flag to inform user once about changed formula:
+		$formula_was_changed = false;
 
 		for( $i = 1 ; $i <= $custom_field_count; $i++ )
 		{
@@ -561,6 +567,25 @@ class ItemType extends DataObject
 			{
 				$field_names[] = $custom_field_data['name'];
 			}
+
+			// Checks for computed custom fields:
+			if( $custom_field_data['type'] == 'computed' )
+			{
+				if( $custom_field_data['formula'] === '' )
+				{	// Formula must be not empty:
+					$Messages->add( sprintf( TB_('Please enter formula for computed custom field "%s".'), $custom_field_data['label'] ) );
+				}
+
+				if( ! $formula_was_changed &&
+				    ! $custom_field_is_new &&
+				    isset( $old_computed_custom_fields[ $custom_field_data['name'] ] ) &&
+				    $old_computed_custom_fields[ $custom_field_data['name'] ]['formula'] != $custom_field_data['formula'] )
+				{	// Inform once user about changed formula:
+					$Messages->add( TB_('You changed one or several formulas. All posts need to be re-saved to update the results of these formulas.'), 'warning' );
+					$formula_was_changed = true;
+				}
+			}
+
 			if( $custom_field_is_new )
 			{ // Insert custom field
 				$this->insert_custom_fields[ $custom_field_ID ] = $custom_field_data;
@@ -568,6 +593,75 @@ class ItemType extends DataObject
 			else
 			{ // Update custom field
 				$this->update_custom_fields[ $custom_field_ID ] = $custom_field_data;
+			}
+		}
+
+		// Check formulas of computed fields:
+		$custom_fields = $this->get_custom_fields();
+		foreach( $custom_fields as $custom_field )
+		{
+			if( $custom_field['type'] != 'computed' )
+			{	// Skip not computed field:
+				continue;
+			}
+
+			$formula_has_wrong_field = false;
+			if( preg_match_all( '#\$(.+?)\$#', $custom_field['formula'], $formula_fields ) )
+			{	// If formula has at least one field:
+				foreach( $formula_fields[1] as $formula_field )
+				{
+					if( ! isset( $custom_fields[ $formula_field ] ) )
+					{	// Not found field:
+						$Messages->add( sprintf( TB_('You use a not recognized field %s in the formula %s of the field "%s".'),
+								'<code>'.$formula_field.'</code>',
+								'<code>'.$custom_field['formula'].'</code>',
+								$custom_field['label']
+							), 'warning' );
+						$formula_has_wrong_field = true;
+					}
+					elseif( ! in_array( $custom_fields[ $formula_field ]['type'], array( 'double', 'computed' ) ) )
+					{	// Field with wrong type is used in formula:
+						$Messages->add( sprintf( TB_('Only numeric or computed field can be used in formula, please remove field %s from the formula %s of the field "%s".'),
+								'<code>'.$formula_field.'</code>',
+								'<code>'.$custom_field['formula'].'</code>', 
+								$custom_field['label']
+							), 'warning' );
+						$formula_has_wrong_field = true;
+					}
+				}
+			}
+
+			if( ! $formula_has_wrong_field && $custom_field['formula'] !== '' )
+			{	// Check for correct formula:
+				$test_formula = preg_replace( '#\$(.+?)\$#', '1', $custom_field['formula'] );
+				try
+				{	// Compute value:
+					ob_start();
+					$test_value = eval( "return $test_formula;" );
+					$formula_code_output = ob_get_clean();
+					if( ( $formula_code_output !== '' && $formula_code_output !== false ) ||
+							! is_numeric( $test_value ) )
+					{	// If output buffer contains some text it means there is some error;
+						// Don't allow to use not numeric value for the "computed" custom field:
+						$test_value = NULL;
+					}
+				}
+				catch( Error $e )
+				{	// Set NULL value for wrong formula:
+					$test_value = NULL;
+				}
+				catch( ParseError $e )
+				{	// Set NULL value for wrong formula:
+					$test_value = NULL;
+				}
+
+				if( $test_value === NULL )
+				{	// Display warning when formula cannot be executed properly:
+					$Messages->add( sprintf( TB_('Please check formula %s of the field "%s" because it is wrong and cannot be executed properly.'),
+							'<code>'.$custom_field['formula'].'</code>',
+							$custom_field['label']
+						), 'warning' );
+				}
 			}
 		}
 	}
