@@ -634,11 +634,12 @@ $tinyurl_domain_field = $Form->text( 'tinyurl_domain', $edited_Blog->get_setting
 $tinyurl_domain_note = '<span class="notes">'.sprintf( TB_('Enter absolute URL ending with /, e-g: %s.'), '<code>'.$tinyurl_domain.'</code>' ).'</span>';
 $tag_source_field = $Form->text_input( 'tinyurl_tag_source', $edited_Blog->get_setting( 'tinyurl_tag_source' ), 20, '', '', $tag_setting_input_params );
 $tag_slug_field = $Form->text_input( 'tinyurl_tag_slug', $edited_Blog->get_setting( 'tinyurl_tag_slug' ), 20, '', '', $tag_setting_input_params );
+$tag_extra_term_field = $Form->text_input( 'tinyurl_tag_extra_term', $edited_Blog->get_setting( 'tinyurl_tag_extra_term' ), 20, '', '', $tag_setting_input_params );
 $Form->output = true;
 $Form->switch_layout( NULL );
 
 $Form->radio( 'tinyurl_type', $edited_Blog->get_setting( 'tinyurl_type' ), array(
-		array( 'basic', TB_('Basic: Append to collection URL'), TB_('E-g:')
+		array( 'basic', TB_('Basic: Append to collection URL'), T_('E-g: ')
 					 .url_add_tail( $blogurl, '/'.$tinyurl_slug ) ),
 		array( 'advanced', TB_('Advanced: Append to special domain URL').':', '', $tinyurl_domain_field.$tinyurl_domain_note, 'class="radio-input"' ),
 	), TB_('Tiny URLs'), true );
@@ -652,6 +653,13 @@ $Form->end_line();
 $Form->begin_line( TB_('Tag slug') );
 	$Form->checkbox_input( 'tinyurl_tag_slug_enabled', $edited_Blog->get_setting( 'tinyurl_tag_slug_enabled' ), '', $tag_setting_params );
 	printf( TB_('use param %s to record the tiny slug'), $tag_slug_field );
+	echo ' '.get_pro_label();
+$Form->end_line();
+
+$Form->begin_line( TB_('Tag extra term') );
+	$Form->checkbox_input( 'tinyurl_tag_extra_term_enabled', $edited_Blog->get_setting( 'tinyurl_tag_extra_term_enabled' ), '', $tag_setting_params );
+	printf( TB_('use param %s to record an extra keyword'), $tag_extra_term_field );
+	echo ' <span class="note">'.T_('E-g: ').'<code>/tinyslug+extra-term/</code>'.'</span>';
 	echo ' '.get_pro_label();
 $Form->end_line();
 

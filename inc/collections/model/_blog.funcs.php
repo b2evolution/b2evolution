@@ -638,9 +638,10 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 	}
 
 	// Set some defaults in case we cannot get those from the URL:
-	global $resolve_extra_path, $path_elements, $last_char, $last_part;
+	global $resolve_extra_path, $path_elements, $last_char, $last_part, $slug_extra_term;
 	$last_char = '';
 	$last_part = '';
+	$slug_extra_term = '';
 	// TODO: we may need more and we may need to make them global
 
 
@@ -691,7 +692,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 		// echo "path=[$path_string]<br />";
 
 		// Replace encoded ";" and ":" with regular chars (used for tags)
-		$path_string = preg_replace( '#[^a-zA-Z0-9./_\-:;]#', '', urldecode( $path_string ) );
+		$path_string = preg_replace( '#[^a-zA-Z0-9./_\-:;\s]#', '', urldecode( $path_string ) );
 		$Debuglog->add( 'Cleaned up path_string to '.$path_string , 'url_decode_part_1' );
 
 		// Slice the path:
@@ -706,13 +707,24 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 		}
 
 		// Do we still have extra path info to decode?
-		if( count($path_elements) )
+		if( count( $path_elements ) )
 		{
 			// Does the pathinfo end with a / or a ; ?
 			$last_char = substr( $path_string, -1 );
 
 			// this is the LAST path element!
 			$last_part = $path_elements[count( $path_elements )-1];
+
+			if( strpos( $last_part, ' ' ) !== false )
+			{	// Extract extra term form slug with space as separator:
+				$last_part = explode( ' ', $last_part, 2 );
+				if( isset( $last_part[1] ) )
+				{	// Set extra term from part of slug after first space:
+					$slug_extra_term = $last_part[1];
+				}
+				// Use only part before first space, because slug cannot has a space:
+				$last_part = $last_part[0];
+			}
 		}
 	}
 
@@ -731,7 +743,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 				$Debuglog->add( 'Found Item for that slug: #'.$Item->ID.' ('.$Item->get( 'title' ).')', 'url_decode_part_1' );
 
 				// Redirect from tiny URL to canonical URL of the detected Item:
-				$Item->tinyurl_redirect( $last_part );
+				$Item->tinyurl_redirect( $last_part, $slug_extra_term );
 				// Exit here.
 			}
 		}
@@ -850,7 +862,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 	if( $process_unknown_domain_as_tinyurl && ! empty( $last_part ) && $Settings->get( 'redirect_tinyurl' ) )
 	{
 		// Check if the URL matches a tinyurl scheme `https?://x.y.z.domain.tld/slug` without extra folders or params:
-		if( preg_match( '#^https?://[a-z0-9\-_.]+\.[a-z]+/[a-z0-9\-_]+$#i', $ReqAbsUrl ) )
+		if( preg_match( '#^https?://[a-z0-9\-_.]+\.[a-z]+/[a-z0-9\-_\+\s%]+$#i', $ReqAbsUrl ) )
 		{
 			$Debuglog->add( 'URL has correct TinyURL format: '.$ReqAbsUrl, 'url_decode_part_1' );
 
@@ -860,7 +872,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 				$Debuglog->add( 'Found Item for that slug: #'.$Item->ID.' ('.$Item->get( 'title' ).')', 'url_decode_part_1' );
 
 				// Redirect from tiny URL to canonical URL of the detected Item:
-				$Item->tinyurl_redirect( $last_part );
+				$Item->tinyurl_redirect( $last_part, $slug_extra_term );
 				// Exit here.
 			}
 		}

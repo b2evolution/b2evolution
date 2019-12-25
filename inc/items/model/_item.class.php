@@ -14116,8 +14116,9 @@ class Item extends ItemLight
 	 * Do 302 redirect from tiny URL to canonical URL of this Item
 	 *
 	 * @param string Slug
+	 * @param string Slug extra term
 	 */
-	function tinyurl_redirect( $slug = NULL )
+	function tinyurl_redirect( $slug = NULL, $slug_extra_term = NULL )
 	{
 		// Get item's canonical URL for redirect from tiny URL:
 		$redirect_to = $this->get_permanent_url( '', '', '&' );
@@ -14130,7 +14131,7 @@ class Item extends ItemLight
 			$item_Blog = & $this->get_Blog();
 
 			// Add params for PRO version:
-			$redirect_to = pro_tinyurl_redirect_add_params( $redirect_to, $item_Blog, $slug );
+			$redirect_to = pro_tinyurl_redirect_add_params( $redirect_to, $item_Blog, $slug, $slug_extra_term );
 		}
 
 		header_redirect( $redirect_to, 302 );  // 302 is easier for debugging; TODO: setting to choose type of redirect

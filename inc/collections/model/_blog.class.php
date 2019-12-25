@@ -1673,6 +1673,10 @@ class Blog extends DataObject
 				// Tag slug:
 				$this->set_setting( 'tinyurl_tag_slug_enabled', param( 'tinyurl_tag_slug_enabled', 'integer', 0 ) );
 				$this->set_setting( 'tinyurl_tag_slug', param( 'tinyurl_tag_slug', 'string', NULL ), true );
+
+				// Tag extra term:
+				$this->set_setting( 'tinyurl_tag_extra_term_enabled', param( 'tinyurl_tag_extra_term_enabled', 'integer', 0 ) );
+				$this->set_setting( 'tinyurl_tag_extra_term', param( 'tinyurl_tag_extra_term', 'string', NULL ), true );
 			}
 
 			if( ( param( 'cookie_domain_type', 'string', NULL ) !== NULL ) &&  $current_User->check_perm( 'blog_admin', 'edit', false, $this->ID ) )
