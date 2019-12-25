@@ -1101,25 +1101,26 @@ class WordpressImport extends AbstractImport
 				}
 
 				$Item = new Item();
+				$Item->set( 'ityp_ID', $post_type_ID );
 
 				if( ! empty( $post['custom_fields'] ) )
 				{	// Import custom fields:
-					$item_type_custom_fields = $ItemType->get_custom_fields();
+					$item_custom_fields = $Item->get_custom_fields_defs();
 					foreach( $post['custom_fields'] as $custom_field_name => $custom_field )
 					{
-						if( ! isset( $item_type_custom_fields[ $custom_field_name ] ) )
+						if( ! isset( $item_custom_fields[ $custom_field_name ] ) )
 						{	// Skip unknown custom field:
 							$this->log_error( sprintf( 'Skip custom field %s because Item Type %s has no it.',
 								'<code>'.$custom_field_name.'</code>',
 								'#'.$ItemType->ID.' "'.$ItemType->get( 'name' ).'"' ) );
 							continue;
 						}
-						if( $item_type_custom_fields[ $custom_field_name ]['type'] != $custom_field['type'] )
+						if( $item_custom_fields[ $custom_field_name ]['type'] != $custom_field['type'] )
 						{	// Skip wrong custom field type:
 							$this->log_error( sprintf( 'Cannot import custom field %s because it has type %s and we expect type %s',
 								'<code>'.$custom_field_name.'</code>',
 								'<code>'.$custom_field['type'].'</code>',
-								'<code>'.$item_type_custom_fields[ $custom_field_name ]['type'].'</code>' ) );
+								'<code>'.$item_custom_fields[ $custom_field_name ]['type'].'</code>' ) );
 							continue;
 						}
 						$Item->set_custom_field( $custom_field_name, $custom_field['value'] );
@@ -1155,7 +1156,6 @@ class WordpressImport extends AbstractImport
 				$Item->set( 'status', isset( $post_statuses[ (string) $post['status'] ] ) ? $post_statuses[ (string) $post['status'] ] : 'review' );
 				// If 'comment_status' has the unappropriate value set it to 'open'
 				$Item->set( 'comment_status', ( in_array( $post['comment_status'], array( 'open', 'closed', 'disabled' ) ) ? $post['comment_status'] : 'open' ) );
-				$Item->set( 'ityp_ID', $post_type_ID );
 				if( empty( $post['post_excerpt'] ) )
 				{	// If excerpt is not provided:
 					if( ! empty( $post_content ) )
@@ -1199,6 +1199,8 @@ class WordpressImport extends AbstractImport
 						}
 					}
 				}
+				$Item->set_setting( 'switchable', $post['switchable'] );
+				$Item->set_setting( 'switchable_params', $post['switchable_params'] );
 
 				if( count( $post_tags ) > 0 )
 				{
@@ -1288,9 +1290,9 @@ class WordpressImport extends AbstractImport
 
 							$custom_field_value = $postmeta['value'];
 
-							$item_type_custom_fields = $ItemType->get_custom_fields();
+							$item_custom_fields = $Item->get_custom_fields_defs();
 
-							if( ! isset( $item_type_custom_fields[ $custom_field_name ] ) )
+							if( ! isset( $item_custom_fields[ $custom_field_name ] ) )
 							{	// Skip unknown custom field:
 								$this->log_warning( sprintf( 'Custom field %s has been ignored because there is no %s custom field in Item Type %s.',
 									'<code>wpcf-'.$custom_field_name.'</code>',
@@ -1299,9 +1301,9 @@ class WordpressImport extends AbstractImport
 								continue;
 							}
 
-							if( ( in_array( $item_type_custom_fields[ $custom_field_name ]['type'], array( 'double', 'computed' ) ) && ! empty( $custom_field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $custom_field_value ) ) ||
-							    ( $item_type_custom_fields[ $custom_field_name ]['type'] == 'url' && validate_url( $custom_field_value, 'http-https' ) !== false ) ||
-							    ( $item_type_custom_fields[ $custom_field_name ]['type'] == 'image' && ! empty( $custom_field_value ) && ! is_number( $custom_field_value ) ) )
+							if( ( in_array( $item_custom_fields[ $custom_field_name ]['type'], array( 'double', 'computed' ) ) && ! empty( $custom_field_value ) && ! preg_match( '/^(\+|-)?[0-9]+(\.[0-9]+)?$/', $custom_field_value ) ) ||
+							    ( $item_custom_fields[ $custom_field_name ]['type'] == 'url' && validate_url( $custom_field_value, 'http-https' ) !== false ) ||
+							    ( $item_custom_fields[ $custom_field_name ]['type'] == 'image' && ! empty( $custom_field_value ) && ! is_number( $custom_field_value ) ) )
 							{	// Skip wrong custom field type format:
 								$this->log_error( sprintf( 'Custom field %s type mismatch: value %s cannot be imported into %s',
 									'<code>wpcf-'.$custom_field_name.'</code>',

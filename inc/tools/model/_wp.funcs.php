@@ -475,6 +475,8 @@ function wpxml_parser( $file )
 		$post['post_region']        = (string) $evo->post_region;
 		$post['post_subregion']     = (string) $evo->post_subregion;
 		$post['post_city']          = (string) $evo->post_city;
+		$post['switchable']         = (int) $evo->switchable;
+		$post['switchable_params']  = (string) $evo->switchable_params;
 
 		if( isset( $wp->attachment_url ) )
 		{
