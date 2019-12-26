@@ -256,7 +256,7 @@ $schema_queries = array(
 		"CREATE TABLE T_users__social_network (
 			usn_user_ID INT(10) UNSIGNED NOT NULL,
 			usn_sn_ID INT(10) UNSIGNED NOT NULL,
-			usn_network_ID VARCHAR(256) NOT NULL,
+			usn_network_ID VARCHAR(256) COLLATE ascii_general_ci NOT NULL,
 			usn_token VARCHAR(1000) NOT NULL,
 			usn_token_expiration_ts TIMESTAMP NULL DEFAULT NULL,
 			PRIMARY KEY (usn_user_ID, usn_sn_ID ),
