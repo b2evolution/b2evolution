@@ -953,7 +953,12 @@ class MarkdownImport extends AbstractImport
 			if( $Item->ID > 0 )
 			{	// Set last message text as link to permanent URL of the inserted/updated Item:
 				$last_msg_i = count( $item_result_messages ) - 1;
-				$item_result_messages[ $last_msg_i ] = '<a href="'.$Item->get_permanent_url().'" target="_blank">'.$item_result_messages[ $last_msg_i ].'</a>';
+				$item_result_messages[ $last_msg_i ] = $Item->get_title( array(
+						'title_field'    => 'title_override',
+						'title_override' => $item_result_messages[ $last_msg_i ],
+						'link_type'      => ( $Item->get_permalink_type() == 'none' ? 'admin_view' : '#' ),
+						'link_target'    => '_blank',
+					) );
 			}
 			$this->log( implode( ' -> ', $item_result_messages ) );
 			$this->log( $item_result_suffix );

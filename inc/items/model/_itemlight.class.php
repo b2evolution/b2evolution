@@ -1363,8 +1363,9 @@ class ItemLight extends DataObject
 				'after_title'     => '',
 				'format'          => 'htmlbody',
 				'link_type'       => '#',
-				'custom_url'		=> '',
+				'custom_url'      => '',
 				'link_class'      => '#',
+				'link_target'     => '',
 				'max_length'      => '',
 				'target_blog'     => '',
 				'nav_target'      => NULL,
@@ -1468,17 +1469,14 @@ class ItemLight extends DataObject
 			$url = $this->add_navigation_param( $url, $params['post_navigation'], $nav_target );
 		}
 
-		$link_class = '';
-		if( $params['link_class'] != '#' )
-		{
-			$link_class = ' class="'.$params['link_class'].'"';
-		}
+		$link_class = ( $params['link_class'] == '#' ? '' : ' class="'.format_to_output( $params['link_class'], 'htmlattr' ).'"' );
+		$link_target = ( $params['link_target'] === '' ? '' : ' target="'.format_to_output( $params['link_target'], 'htmlattr' ).'"' );
 
 		$r = $params['before'];
 		$title = $params['before_title'].$title.$params['after_title'];
 		if( !empty($url) )
 		{
-			$r .= '<a href="'.$url.'"'.$link_class.'>'.$title.'</a>';
+			$r .= '<a href="'.$url.'"'.$link_class.$link_target.'>'.$title.'</a>';
 		}
 		else
 		{
