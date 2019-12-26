@@ -4026,7 +4026,9 @@ class Item extends ItemLight
 
 		foreach( $tags[0] as $t => $source_tag )
 		{
-			$item_ID_slug = trim( $tags[1][ $t ] );
+			$tag_options = explode( ':', $tags[1][ $t ] );
+
+			$item_ID_slug = trim( $tag_options[0] );
 
 			if( ! ( $content_Item = & $ItemCache->get_by_ID( $item_ID_slug, false, false ) ) )
 			{	// Try to get item by slug if it is not found by ID:
@@ -4120,10 +4122,17 @@ class Item extends ItemLight
 			// Update level inline tags like [---fields:] into [--fields:] in order to make them render by top caller level Item:
 			$current_tag_item_content = $this->update_level_inline_tags( $current_tag_item_content );
 
+			$tag_class = isset( $tag_options[1] ) ? trim( $tag_options[1], ' .' ) : '';
+			if( $tag_class !== '' )
+			{	// If tag has an option with style class
+				$tag_class = str_replace( array( '.*', '.' ), array( '.'.$item_ID_slug, ' ' ),$tag_class );
+				$current_tag_item_content = '<div class="'.format_to_output( $tag_class, 'htmlattr' ).'">'.$current_tag_item_content.'</div>';
+			}
+
 			// Replace inline content block tag with item content:
 			$content = str_replace( $source_tag, $current_tag_item_content, $content );
 
-			// Remove
+			// Remove current item from global array which is used to avoid recursion:
 			array_shift( $content_block_items );
 		}
 
