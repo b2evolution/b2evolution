@@ -1025,7 +1025,7 @@ class MarkdownImport extends AbstractImport
 			if( ! empty( $Item->ID ) )
 			{
 				// Link files:
-				if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)"]+\.('.$this->get_image_extensions().'))\s*("[^"]*")?\)#i', $item_content, $image_matches ) )
+				if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)"]+\.('.$this->get_image_extensions().'))\s*("[^"]*")?\)(\{\..+?\})?(\r?\n?\*.*?\*(\r|\n|$))?#i', $item_content, $image_matches ) )
 				{
 					$updated_item_content = $item_content;
 					$all_links_count = 0;
@@ -1062,7 +1062,20 @@ class MarkdownImport extends AbstractImport
 						// Try to find existing and linked image File or create, copy and link image File:
 						if( $link_data = $this->link_file( $LinkOwner, $folder_path, $category_path, rtrim( $image_relative_path ), $file_params ) )
 						{	// Replace this img tag from content with b2evolution format:
-							$updated_item_content = str_replace( $image_matches[0][$i], ( $file_params['link_position'] == 'inline' ? '[image:'.$link_data['ID'].']' : '' ), $updated_item_content );
+							if( $file_params['link_position'] == 'inline' )
+							{	// Generate image inline tag:
+								$image_inline_caption = preg_replace( '#^[\r\n\s"\*]+(.+?)[\r\n\s"\*]+$#', '$1', $image_matches[6][$i] ); // note: trim() doesn't remove char * on the right side as expected
+								$image_inline_class = trim( $image_matches[5][$i], ' {}' );
+								$image_inline_tag = '[image:'.$link_data['ID']
+									.( $image_inline_class === '' && $image_inline_caption === '' ? '' : ':'.$image_inline_caption )
+									.( $image_inline_class === '' ? '' : ':'.$image_inline_class )
+									.']';
+							}
+							else // 'teaser'
+							{	// Don't provide inline tag for teaser image:
+								$image_inline_tag = '';
+							}
+							$updated_item_content = replace_content( $updated_item_content, $image_matches[0][$i], $image_inline_tag, 'str', 1 );
 							if( $link_data['type'] == 'new' )
 							{	// Count new linked files:
 								$new_links_count++;
