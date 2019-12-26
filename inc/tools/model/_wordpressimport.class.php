@@ -507,8 +507,7 @@ class WordpressImport extends AbstractImport
 			foreach( $xml_data['authors'] as $author )
 			{
 				// Replace unauthorized chars of username:
-				$author_login = preg_replace( '/([^a-z0-9_\-\.])/i', '_', $author['author_login'] );
-				$author_login = utf8_substr( utf8_strtolower( $author_login ), 0, 20 );
+				$author_login = $this->fix_author_login( $author['author_login'] );
 
 				$this->log( '<p>'.sprintf( 'Importing user: %s', '#'.$author['author_id'].' - "'.$author_login.'"' ).'... ' );
 
@@ -628,8 +627,7 @@ class WordpressImport extends AbstractImport
 					$this->log_warning( sprintf( 'Skip because user already exists with same login and ID #%d.', intval( $user_ID ) ), 'span', false );
 					$skipped_users_num++;
 				}
-				// Save user ID of current author
-				$authors[ $author_login ] = (string) $user_ID;
+				// Save wp/b2evo user ID of the imported author:
 				$authors_IDs[ $author['author_id'] ] = (string) $user_ID;
 
 				$this->log( '</p>' );
@@ -1020,8 +1018,8 @@ class WordpressImport extends AbstractImport
 
 				$this->log( '<p>'.sprintf( 'Importing post: %s', '#'.$post['post_id'].' - "'.$post['post_title'].'"... ' ) );
 
-				$author_ID = isset( $authors[ (string) $post['post_author'] ] ) ? $authors[ (string) $post['post_author'] ] : 1;
-				$last_edit_user_ID = isset( $authors[ (string) $post['post_lastedit_user'] ] ) ? $authors[ (string) $post['post_lastedit_user'] ] : $author_ID;
+				$author_ID = $this->get_user_ID_by_login( $post['post_author'], 1 );
+				$last_edit_user_ID = $this->get_user_ID_by_login( $post['post_lastedit_user'], $author_ID );
 
 				$post_main_cat_ID = $category_default;
 				$post_extra_cat_IDs = array();
@@ -1170,9 +1168,9 @@ class WordpressImport extends AbstractImport
 				}
 				$Item->set( 'extra_cat_IDs', $post_extra_cat_IDs );
 				$Item->set( 'dateset', $post['post_date_mode'] == 'set' ? 1 : 0 );
-				if( isset( $authors[ (string) $post['post_assigned_user'] ] ) )
+				if( ( $post_assigned_user_ID = $this->get_user_ID_by_login( $post['post_assigned_user'] ) ) !== false )
 				{
-					$Item->set( 'assigned_user', $authors[ (string) $post['post_assigned_user'] ] );
+					$Item->set( 'assigned_user', $post_assigned_user_ID );
 				}
 				$Item->set( 'datedeadline', $post['post_datedeadline'] );
 				$Item->set( 'locale', $post['post_locale'] );
@@ -1871,6 +1869,45 @@ class WordpressImport extends AbstractImport
 			'<code>'.$link_position.'</code>',
 			'<code>'.$file_url.'</code>' ) );
 		return false;
+	}
+
+
+	/**
+	 * Fix wordpress author login to b2evolution format
+	 *
+	 * @param string Author login
+	 * @return string Author login
+	 */
+	function fix_author_login( $author_login )
+	{
+		// Replace unauthorized chars:
+		$author_login = preg_replace( '/([^a-z0-9_\-\.])/i', '_', $author_login );
+		return utf8_substr( utf8_strtolower( $author_login ), 0, 20 );
+	}
+
+
+	/**
+	 * Get b2evo user ID by login
+	 *
+	 * @param string User login
+	 * @param integer Default user ID when no user found in DB
+	 * @return integer User ID
+	 */
+	function get_user_ID_by_login( $login, $default_user_ID = false )
+	{
+		if( ! isset( $this->users ) )
+		{	// Load all b2evo users from DB once in cache array:
+			global $DB;
+			$SQL = new SQL( 'Load users array for WP import' );
+			$SQL->SELECT( 'user_login, user_ID' );
+			$SQL->FROM( 'T_users' );
+			$this->users = $DB->get_assoc( $SQL );
+		}
+
+		// Replace unauthorized chars of username:
+		$login = $this->fix_author_login( $login );
+
+		return ( isset( $this->users[ $login ] ) ? $this->users[ $login ] : $default_user_ID );
 	}
 }
 ?>

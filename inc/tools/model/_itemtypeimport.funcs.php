@@ -53,10 +53,7 @@ function itxml_import( $XML_file_path )
 
 	$DB->begin();
 
-	/* Import authors */
-	$authors = array();
-	$authors_IDs = array();
-	$authors_links = array();
+	/* Import Item Types */
 	if( isset( $xml_data['item_types'] ) && count( $xml_data['item_types'] ) > 0 )
 	{
 		echo '<b>'.'Importing Item Types...'.' </b><br>';
