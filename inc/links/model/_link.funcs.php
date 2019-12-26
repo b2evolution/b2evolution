@@ -306,6 +306,8 @@ function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_
 }
 </script>
 <?php
+// Print JS function to allow edit file properties on modal window
+echo_file_properties();
 	}
 }
 
@@ -515,12 +517,26 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 
 		// A link to open file manager in modal window:
 		$r .= ' <a href="'.$url.'" onclick="return window.parent.link_attachment_window( \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \''.$current_File->get_FileRoot()->ID.'\', \''.$rdfp_path.'\', \''.rawurlencode( $current_File->get_name() ).'\' )"'
-					.' target="_parent" title="'.$title.'">'
+					.' target="_parent" title="'.format_to_output( $title, 'htmlattr' ).'">'
 					.get_icon( 'locate', 'imgtag', array( 'title' => $title ) ).'</a> ';
+	}
 
-		// A link to open file manager in new window:
-		$r .= '<a href="'.$url.'" target="_blank" title="'.$title.'">'
-					.get_icon( 'permalink', 'imgtag', array( 'title' => $title ) ).'</a> ';
+	if( $current_File && is_logged_in() &&
+	    $current_User->check_perm( 'admin', 'restricted' ) &&
+	    $current_User->check_perm( 'files', 'edit_allowed', true, $current_File->get_FileRoot() ) )
+	{	// Edit file:
+		$title = T_('Edit properties...');
+		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );
+		$rdfp_path = ( $current_File->is_dir() ? $current_File->get_rdfp_rel_path() : dirname( $current_File->get_rdfp_rel_path() ) ).'/';
+
+		// A link to open file manager in modal window:
+		$r .= ' <a href="'.$admin_url.'?ctrl=files&amp;root='.$current_File->get_FileRoot()->ID
+					.'&amp;path='.rawurlencode( $current_File->get_dir_rel_path() )
+					.'&amp;fm_selected[]='.rawurlencode( $current_File->get_rdfp_rel_path() )
+					.'&amp;action=edit_properties&amp;'.url_crumb( 'file' ).'"'
+				.' onclick="return window.parent.file_properties( \''.$current_File->get_FileRoot()->ID.'\', \''.$rdfp_path.'\', \''.$current_File->get_rdfp_rel_path().'\', \''.$LinkOwner->type.'\', \''.$LinkOwner->get_ID().'\', \''.( is_admin_page() ? 'backoffice' : 'frontoffice' ).'\' )"'
+				.' target="_parent" title="'.format_to_output( $title, 'htmlattr' ).'">'
+			.get_icon( 'edit', 'imgtag', array( 'title' => $title ) ).'</a> ';
 	}
 
 	// Unlink/Delete icons:

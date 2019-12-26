@@ -362,23 +362,26 @@ class LinkItem extends LinkOwner
 		return parent::get( $parname );
 	}
 
+
 	/**
 	 * Get Item edit url
 	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
 	 * @return string URL
 	 */
-	function get_edit_url()
+	function get_edit_url( $glue = '&amp;', $url_type = NULL )
 	{
-		if( is_admin_page() )
+		if( $url_type == 'backoffice' || ( $url_type === NULL  && is_admin_page() ) )
 		{	// Back-office:
 			global $admin_url;
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=new';
+				return $admin_url.'?ctrl=items'.$glue.'blog='.$this->get_blog_ID().$glue.'action=new';
 			}
 			else
 			{	// The edited Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=edit&amp;p='.$this->get_ID();
+				return $admin_url.'?ctrl=items'.$glue.'blog='.$this->get_blog_ID().$glue.'action=edit'.$glue.'p='.$this->get_ID();
 			}
 		}
 		else
@@ -386,30 +389,35 @@ class LinkItem extends LinkOwner
 			$item_Blog = & $this->get_Blog();
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit' );
+				return url_add_param( $item_Blog->get( 'url', array( 'glue' => $glue ) ), 'disp=edit', $glue );
 			}
 			else
 			{	// The editing Item:
-				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit&amp;p='.$this->get_ID() );
+				return url_add_param( $item_Blog->get( 'url', array( 'glue' => $glue ) ), 'disp=edit'.$glue.'p='.$this->get_ID(), $glue );
 			}
 		}
 	}
 
+
 	/**
 	 * Get Item view url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_view_url()
+	function get_view_url( $glue = '&amp;', $url_type = NULL )
 	{
-		if( is_admin_page() )
+		if( $url_type == 'backoffice' || ( $url_type === NULL  && is_admin_page() ) )
 		{	// Back-office:
 			global $admin_url;
 			if( $this->is_temp() )
 			{	// New creating Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;action=new';
+				return $admin_url.'?ctrl=items'.$glue.'blog='.$this->get_blog_ID().$glue.'action=new';
 			}
 			else
 			{	// The editing Item:
-				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->get_ID();
+				return $admin_url.'?ctrl=items'.$glue.'blog='.$this->get_blog_ID().$glue.'p='.$this->get_ID();
 			}
 		}
 		else
@@ -417,11 +425,11 @@ class LinkItem extends LinkOwner
 			if( $this->is_temp() )
 			{	// New creating Item:
 				$item_Blog = & $this->get_Blog();
-				return url_add_param( $item_Blog->get( 'url' ), 'disp=edit' );
+				return url_add_param( $item_Blog->get( 'url', array( 'glue' => $glue ) ), 'disp=edit', $glue );
 			}
 			else
 			{	// The editing Item:
-				return $this->Item->get_permanent_url();
+				return $this->Item->get_permanent_url( '', '', $glue );
 			}
 		}
 	}

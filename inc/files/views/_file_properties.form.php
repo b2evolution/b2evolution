@@ -20,11 +20,11 @@ global $edited_File, $selected_Filelist;
 
 global $blog, $filename_max_length;
 
-global $Settings;
+global $Settings, $admin_url;
 
 $edit_allowed_perm = $current_User->check_perm( 'files', 'edit_allowed', false, $selected_Filelist->get_FileRoot() );
 
-$Form = new Form( NULL, 'fm_properties_checkchanges' );
+$Form = new Form( $admin_url, 'fm_properties_checkchanges' );
 
 if( get_param( 'mode' ) != 'modal' )
 {

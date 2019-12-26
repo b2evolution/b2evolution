@@ -1285,6 +1285,10 @@ switch( $action )
 
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 		$edited_File->load_meta();
+
+		param( 'link_owner_type', 'string', '', true );
+		param( 'link_owner_ID', 'integer', 0, true );
+		param( 'from', 'string', '', true );
 		break;
 
 
@@ -1297,6 +1301,10 @@ switch( $action )
 
 		// Check permission!
 		$current_User->check_perm( 'files', 'edit_allowed', true, $selected_Filelist->get_FileRoot() );
+
+		param( 'link_owner_type', 'string', '' );
+		param( 'link_owner_ID', 'integer', 0 );
+		param( 'from', 'string', '' );
 
 		$edited_File = & $selected_Filelist->get_by_idx(0);
 		$error_occured = false;
@@ -1369,13 +1377,22 @@ switch( $action )
 			}
 		}
 
-		// Redirect so that a reload doesn't write to the DB twice:
-		if( $error_occured )
-		{
-			header_redirect( regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode($edited_File->get_rdfp_rel_path() ).'&amp;'.url_crumb('file'), '', '&' ), 303 );
-			// We have EXITed already, no need else.
+		if( $LinkOwner = & get_LinkOwner( $link_owner_type, $link_owner_ID ) )
+		{	// Redirect back to link owner object edit form where the File was edited:
+			$redirect_to = $LinkOwner->get_edit_url( '&', ( $from == 'backoffice' ) );
 		}
-		header_redirect( regenerate_url( '', '', '', '&' ), 303 ); // Will EXIT
+
+		// Redirect so that a reload doesn't write to the DB twice:
+		if( empty( $redirect_to ) )
+		{
+			if( $error_occured )
+			{
+				$redirect_to = regenerate_url( 'fm_selected', 'action=edit_properties&amp;fm_selected[]='.rawurlencode($edited_File->get_rdfp_rel_path() ).'&amp;'.url_crumb('file'), '', '&' );
+				// We have EXITed already, no need else.
+			}
+			$redirect_to = regenerate_url( '', '', '', '&' );
+		}
+		header_redirect( $redirect_to, 303 ); // Will EXIT
 		// We have EXITed already at this point!!
 		break;
 

@@ -184,18 +184,30 @@ class LinkUser extends LinkOwner
 
 	/**
 	 * Get User edit url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_edit_url()
+	function get_edit_url( $glue = '&amp;', $url_type = NULL )
 	{
-		return '?ctrl=user&amp;user_tab=avatar&amp;user_ID='.$this->User->ID;
+		global $admin_url;
+
+		return $admin_url.'?ctrl=user'.$glue.'user_tab=avatar'.$glue.'user_ID='.$this->User->ID;
 	}
 
 	/**
 	 * Get User view url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_view_url()
+	function get_view_url( $glue = '&amp;', $url_type = NULL )
 	{
-		return '?ctrl=user&amp;user_tab=profile&amp;user_ID='.$this->User->ID;
+		global $admin_url;
+
+		return $admin_url.'?ctrl=user'.$glue.'user_tab=profile'.$glue.'user_ID='.$this->User->ID;
 	}
 }
 

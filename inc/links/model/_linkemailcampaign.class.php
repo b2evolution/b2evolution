@@ -180,22 +180,31 @@ class LinkEmailCampaign extends LinkOwner
 
 	/**
 	 * Get Email Campaign edit url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_edit_url()
+	function get_edit_url( $glue = '&amp;', $url_type = NULL )
 	{
 		global $admin_url;
 
-		return $admin_url.'?ctrl=campaigns&amp;action=edit&amp;tab=compose&amp;ecmp_ID='.$this->EmailCampaign->ID;
+		return $admin_url.'?ctrl=campaigns'.$glue.'action=edit'.$glue.'tab=compose'.$glue.'ecmp_ID='.$this->EmailCampaign->ID;
 	}
+
 
 	/**
 	 * Get Email Campaign view url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_view_url()
+	function get_view_url( $glue = '&amp;', $url_type = NULL )
 	{
 		global $admin_url;
 
-		return $admin_url.'?ctrl=campaigns&amp;action=edit&amp;tab=send&amp;ecmp_ID='.$this->EmailCampaign->ID;
+		return $admin_url.'?ctrl=campaigns'.$glue.'action=edit'.$glue.'tab=send'.$glue.'ecmp_ID='.$this->EmailCampaign->ID;
 	}
 
 

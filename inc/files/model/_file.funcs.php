@@ -3179,7 +3179,7 @@ function open_temp_file( & $temp_file_name )
 
 
 /**
- * Initialize JavaScript for AJAX loading of popup window to report user
+ * Initialize JavaScript for AJAX loading of popup window to edit file properties
  *
  * @param array Params
  */
@@ -3193,7 +3193,7 @@ function echo_file_properties()
 <script>
 	//<![CDATA[
 	// Window to edit file
-	function file_properties( root, path, file )
+	function file_properties( root, path, file, link_owner_type, link_owner_ID, from )
 	{
 		openModalWindow( '<span class="loader_img loader_file_edit absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
 			'80%', '', true,
@@ -3211,6 +3211,9 @@ function echo_file_properties()
 				'path': path,
 				'fm_selected': [ file ],
 				'mode': 'modal',
+				'link_owner_type': typeof( link_owner_type ) == 'undefined' ? '' : link_owner_type,
+				'link_owner_ID': typeof( link_owner_ID ) == 'undefined' ? '' : link_owner_ID,
+				'from': typeof( from ) == 'undefined' ? '' : from,
 				'crumb_file': '<?php echo get_crumb( 'file' ); ?>',
 			},
 			success: function( result )

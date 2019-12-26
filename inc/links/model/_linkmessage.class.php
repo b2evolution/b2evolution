@@ -190,23 +190,32 @@ class LinkMessage extends LinkOwner
 
 	/**
 	 * Get Message edit url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_edit_url()
+	function get_edit_url( $glue = '&amp;', $url_type = NULL )
 	{
-		return $this->get_view_url();
+		return $this->get_view_url( $glue, $url_type );
 	}
+
 
 	/**
 	 * Get Message view url
+	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_view_url()
+	function get_view_url( $glue = '&amp;', $url_type = NULL )
 	{
 		global $admin_url;
 
 		$view_url = '';
 		if( ! empty( $this->Message ) && ( $this->Message instanceof Message ) && $Thread = & $this->Message->get_Thread() )
 		{
-			$view_url = $admin_url.'?ctrl=messages&amp;thrd_ID='.$Thread->ID;
+			$view_url = $admin_url.'?ctrl=messages'.$glue.'thrd_ID='.$Thread->ID;
 		}
 
 		return $view_url;

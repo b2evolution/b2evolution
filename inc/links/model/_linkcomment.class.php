@@ -234,21 +234,23 @@ class LinkComment extends LinkOwner
 	/**
 	 * Get Comment edit url
 	 *
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
 	 * @return string
 	 */
-	function get_edit_url()
+	function get_edit_url( $glue = '&amp;', $url_type = NULL )
 	{
-		if( is_admin_page() )
+		if( $url_type == 'backoffice' || ( $url_type === NULL  && is_admin_page() ) )
 		{	// Back-office:
 			global $admin_url;
 			if( $this->is_temp() )
 			{	// New creating Comment:
 				$comment_Item = & $this->get_Item();
-				return $admin_url.'?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$comment_Item->ID.'#form_p'.$comment_Item->ID;
+				return $admin_url.'?ctrl=items'.$glue.'blog='.$this->get_blog_ID().$glue.'p='.$comment_Item->ID.'#form_p'.$comment_Item->ID;
 			}
 			else
 			{	// The edited Comment:
-				return $admin_url.'?ctrl=comments&amp;blog='.$this->get_blog_ID().'&amp;action=edit&amp;comment_ID='.$this->get_ID();
+				return $admin_url.'?ctrl=comments'.$glue.'blog='.$this->get_blog_ID().$glue.'action=edit'.$glue.'comment_ID='.$this->get_ID();
 			}
 		}
 		else
@@ -256,12 +258,12 @@ class LinkComment extends LinkOwner
 			if( $this->is_temp() )
 			{	// New creating Comment:
 				$comment_Item = & $this->get_Item();
-				return $comment_Item->get_permanent_url().'#evo_comment_form_id_'.$comment_Item->ID;
+				return $comment_Item->get_permanent_url( '', '', $glue ).'#evo_comment_form_id_'.$comment_Item->ID;
 			}
 			else
 			{	// The edited Comment:
 				$comment_Blog = & $this->get_Blog();
-				return url_add_param( $comment_Blog->get( 'url' ), 'disp=edit_comment&amp;c='.$this->get_ID() );
+				return url_add_param( $comment_Blog->get( 'url', array( 'glue' => $glue ) ), 'disp=edit_comment'.$glue.'c='.$this->get_ID(), $glue );
 			}
 		}
 	}
@@ -270,21 +272,23 @@ class LinkComment extends LinkOwner
 	/**
 	 * Get Comment view url
 	 *
-	 * @return string
+	 * @param string Delimiter to use for multiple params (typically '&amp;' or '&')
+	 * @param string URL type: 'frontoffice', 'backoffice'
+	 * @return string URL
 	 */
-	function get_view_url()
+	function get_view_url( $glue = '&amp;', $url_type = NULL )
 	{
-		if( is_admin_page() )
+		if( $url_type == 'backoffice' || ( $url_type === NULL  && is_admin_page() ) )
 		{	// Back-office:
 			global $admin_url;
 			$comment_Item = & $this->get_Item();
 			if( $this->is_temp() )
 			{	// New creating Comment:
-				return $admin_url.'?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'#form_p'.$comment_Item->ID;
+				return $admin_url.'?ctrl=items'.$glue.'blog='.$comment_Item->get_blog_ID().$glue.'p='.$comment_Item->ID.'#form_p'.$comment_Item->ID;
 			}
 			else
 			{	// The editing Comment:
-				return $admin_url.'?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'#c'.$this->get_ID();
+				return $admin_url.'?ctrl=items'.$glue.'blog='.$comment_Item->get_blog_ID().$glue.'p='.$comment_Item->ID.'#c'.$this->get_ID();
 			}
 		}
 		else
@@ -292,11 +296,11 @@ class LinkComment extends LinkOwner
 			if( $this->is_temp() )
 			{	// New creating Comment:
 				$comment_Item = & $this->get_Item();
-				return $comment_Item->get_permanent_url();
+				return $comment_Item->get_permanent_url( '', '', $glue );
 			}
 			else
 			{	// The editing Comment:
-				return $this->Comment->get_permanent_url();
+				return $this->Comment->get_permanent_url( $glue );
 			}
 		}
 	}

@@ -77,8 +77,8 @@ class LinkOwner
 	 *
 	 * function check_perm( $perm_name, $assert = false ); // check link owner object ( item, comment, ... ) edit/view permission
 	 * function get_positions( $file_ID = NULL ); // get all positions where link can be displayed ( 'teaser', 'aftermore' )
-	 * function get_edit_url(); // get link owner edit url
-	 * function get_view_url(); // get link owner view url
+	 * function get_edit_url( $glue = '&amp;', $url_type = NULL ); // get link owner edit url
+	 * function get_view_url( $glue = '&amp;', $url_type = NULL ); // get link owner view url
 	 * function load_Links(); // load link owner all links
 	 * function add_link( $file_ID, $position, $order, $update_owner = true ); // add a new link to link owner
 	 * function load_Blog(); // set Link Owner Blog
