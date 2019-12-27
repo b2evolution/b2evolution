@@ -3683,3 +3683,34 @@ span[id^=title_folding_] {
   border-top-left-radius: 3px !important;
   border-bottom-left-radius: 3px !important;
 }
+@media (min-width: 768px) {
+  .alternate-left-right > div .evo_image_block {
+    width: 40%;
+  }
+  .alternate-left-right > div:nth-child( even ) .evo_image_block {
+    float: left;
+    margin-right: 1em;
+  }
+  .alternate-left-right > div:nth-child( odd ) .evo_image_block {
+    float: right;
+    margin-left: 1em;
+  }
+}
+@media (min-width: 1785px) {
+  .alternate-left-right > div .evo_image_block {
+    position: relative;
+    width: 60%;
+  }
+  .alternate-left-right > div .evo_post__full_text {
+    position: relative;
+    width: 125%;
+  }
+  .alternate-left-right > div:nth-child( even ) .evo_image_block,
+  .alternate-left-right > div:nth-child( even ) .evo_post__full_text {
+    left: -295px;
+  }
+  .alternate-left-right > div:nth-child( odd ) .evo_image_block {
+    left: 295px;
+    margin-left: -285px;
+  }
+}

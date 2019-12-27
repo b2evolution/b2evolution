@@ -1437,3 +1437,51 @@ span[id^=title_folding_] {
 		border-bottom-left-radius: 3px !important;
 	}
 }
+
+// Align post images left or right automatically inside widget "Content Block":
+@media (min-width: 768px) {
+	.alternate-left-right {
+		> div {
+			.evo_image_block {
+				width: 40%;
+			}
+			&:nth-child( even ) {
+				.evo_image_block {
+					float: left;
+					margin-right: 1em;
+				}
+			}
+			&:nth-child( odd ) {
+				.evo_image_block {
+					float: right;
+					margin-left: 1em;
+				}
+			}
+		}
+	}
+}
+@media (min-width: 1785px) {
+	.alternate-left-right {
+		> div {
+			.evo_image_block {
+				position: relative;
+				width: 60%;
+			}
+			.evo_post__full_text {
+				position: relative;
+				width: 125%;
+			}
+			&:nth-child( even ) {
+				.evo_image_block, .evo_post__full_text {
+					left: -295px;
+				}
+			}
+			&:nth-child( odd ) {
+				.evo_image_block {
+					left: 295px;
+					margin-left: -285px;
+				}
+			}
+		}
+	}
+}

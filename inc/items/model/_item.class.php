@@ -4097,6 +4097,11 @@ class Item extends ItemLight
 					) ) );
 			}
 
+			if( isset( $params['content_start_full_text'] ) )
+			{
+				echo $params['content_start_full_text'];
+			}
+
 			// Display CONTENT (at least the TEASER part):
 			$content_Item->content_teaser( $params );
 
@@ -4116,16 +4121,21 @@ class Item extends ItemLight
 			// Display Item footer text (text can be edited in Blog Settings):
 			$content_Item->footer( $params );
 
+			if( isset( $params['content_end_full_text'] ) )
+			{
+				echo $params['content_end_full_text'];
+			}
+
 			// Get item content from buffer:
 			$current_tag_item_content = ob_get_clean();
 
 			// Update level inline tags like [---fields:] into [--fields:] in order to make them render by top caller level Item:
 			$current_tag_item_content = $this->update_level_inline_tags( $current_tag_item_content );
 
-			$tag_class = isset( $tag_options[1] ) ? trim( $tag_options[1], ' .' ) : '';
+			$tag_class = isset( $tag_options[1] ) ? trim( $tag_options[1] ) : '';
 			if( $tag_class !== '' )
 			{	// If tag has an option with style class
-				$tag_class = str_replace( array( '.*', '.' ), array( '.'.$item_ID_slug, ' ' ),$tag_class );
+				$tag_class = trim( str_replace( array( '.*', '.' ), array( '.'.$item_ID_slug, ' ' ),$tag_class ) );
 				$current_tag_item_content = '<div class="'.format_to_output( $tag_class, 'htmlattr' ).'">'.$current_tag_item_content.'</div>';
 			}
 
@@ -4230,7 +4240,7 @@ class Item extends ItemLight
 		// Trim <br /> tags from begin and end:
 		$div_content = preg_replace( '#^(<br[\s/]*>)?(.+?)(<br[\s/]*>)$#is', '$2', $m[3] );
 		// Balance <p> and </p> tags by moving them from outside [div:] to inside it:
-		$div_content = $m[1].$div_content.$m[4];
+		$div_content = $m[1].$div_content.( isset( $m[4] ) ? $m[4] : '' );
 
 		return '<div'.get_field_attribs_as_string( $div_attrs ).'>'.$div_content.'</div>';
 	}

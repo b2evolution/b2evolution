@@ -253,6 +253,8 @@ switch( $content_mode )
 
 			// Display CONTENT (at least the TEASER part):
 			$Item->content_teaser( array(
+					'content_start_full_text' => $params['content_start_full_text'],
+					'content_end_full_text'   => $params['content_end_full_text'],
 					'before'              => $params['before_content_teaser'],
 					'after'               => $params['after_content_teaser'],
 					'before_image'        => $params['before_image'],
@@ -319,6 +321,8 @@ switch( $content_mode )
 
 			// Display the "after more" part of the text: (part after "[teaserbreak]")
 			$Item->content_extension( array(
+					'content_start_full_text' => $params['content_start_full_text'],
+					'content_end_full_text'   => $params['content_end_full_text'],
 					'before'              => $params['before_content_extension'],
 					'after'               => $params['after_content_extension'],
 					'before_image'        => $params['before_image'],
