@@ -612,7 +612,7 @@ class ItemType extends DataObject
 				{
 					if( ! isset( $custom_fields[ $formula_field ] ) )
 					{	// Not found field:
-						$Messages->add( sprintf( TB_('You use a not recognized field %s in the formula %s of the field "%s".'),
+						$Messages->add( sprintf( TB_('The field name %s is not recognized (in the formula %s of the field "%s".'),
 								'<code>'.$formula_field.'</code>',
 								'<code>'.$custom_field['formula'].'</code>',
 								$custom_field['label']
@@ -621,7 +621,7 @@ class ItemType extends DataObject
 					}
 					elseif( ! in_array( $custom_fields[ $formula_field ]['type'], array( 'double', 'computed' ) ) )
 					{	// Field with wrong type is used in formula:
-						$Messages->add( sprintf( TB_('Only numeric or computed field can be used in formula, please remove field %s from the formula %s of the field "%s".'),
+						$Messages->add( sprintf( TB_('Only numeric or computed fields can be used in formulas. Please remove the field %s from the formula %s of the field "%s".'),
 								'<code>'.$formula_field.'</code>',
 								'<code>'.$custom_field['formula'].'</code>', 
 								$custom_field['label']
@@ -657,7 +657,7 @@ class ItemType extends DataObject
 
 				if( $test_value === NULL )
 				{	// Display warning when formula cannot be executed properly:
-					$Messages->add( sprintf( TB_('Please check formula %s of the field "%s" because it is wrong and cannot be executed properly.'),
+					$Messages->add( sprintf( TB_('Please check formula %s of the field "%s" because it cannot be evaluated properly.'),
 							'<code>'.$custom_field['formula'].'</code>',
 							$custom_field['label']
 						), 'warning' );
