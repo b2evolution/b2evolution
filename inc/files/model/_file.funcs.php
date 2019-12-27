@@ -3223,6 +3223,35 @@ function echo_file_properties()
 					'<?php echo TS_('Save Changes!'); ?>', false, true );
 			}
 		} );
+
+		if( typeof( link_owner_type ) != 'undefined' &&
+		    typeof( link_owner_ID ) != 'undefined' )
+		{	// If we edit file properties from links/attachments table we should submit the form by AJAX:
+			jQuery( document ).on( 'submit', 'form#fm_properties_checkchanges', function( e )
+			{
+				e.preventDefault();
+				jQuery.ajax(
+				{	// Submit form by AJAX request:
+					type: 'POST',
+					url: jQuery( this ).attr( 'action' ),
+					data: jQuery( this ).serialize(),
+					success: function()
+					{	// On success updating,
+						// Close modal window:
+						closeModalWindow();
+						// Refresh links/attachments table:
+						evo_link_refresh_list( link_owner_type, link_owner_ID );
+					},
+					error: function( jqXHR )
+					{	// On failed updating,
+						// Display error:
+						alert( jqXHR.responseText.replace( /<.+?>/g, "\n" ) );
+						// Close modal window:
+						closeModalWindow();
+					}
+				} );
+			} );
+		}
 		return false;
 	}
 	//]]>
