@@ -266,7 +266,7 @@ class WordpressImport extends AbstractImport
 	 */
 	function execute()
 	{
-		global $DB, $tableprefix, $media_path, $Plugins;
+		global $DB, $tableprefix, $media_path, $Plugins, $current_User;
 
 		// Load classes:
 		load_class( 'regional/model/_country.class.php', 'Country' );
@@ -1018,7 +1018,7 @@ class WordpressImport extends AbstractImport
 
 				$this->log( '<p>'.sprintf( 'Importing post: %s', '#'.$post['post_id'].' - "'.$post['post_title'].'"... ' ) );
 
-				$author_ID = $this->get_user_ID_by_login( $post['post_author'], 1 );
+				$author_ID = $this->get_user_ID_by_login( $post['post_author'], $current_User->ID );
 				$last_edit_user_ID = $this->get_user_ID_by_login( $post['post_lastedit_user'], $author_ID );
 
 				$post_main_cat_ID = $category_default;
