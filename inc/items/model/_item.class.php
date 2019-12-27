@@ -3340,6 +3340,9 @@ class Item extends ItemLight
 				'render_switchable_blocks' => true,
 			), $params );
 
+		// Remove block level short tags inside <p> blocks and move them before the paragraph:
+		$content = move_short_tags( $content );
+
 		if( $params['render_content_blocks'] )
 		{	// Render Content block tags like [include:123], [include:item-slug]:
 			$content = $this->render_content_blocks( $content, $params );
@@ -3357,7 +3360,9 @@ class Item extends ItemLight
 
 		if( $params['render_inline_files'] )
 		{	// Render inline file tags like [image:123:caption] or [file:123:caption]:
-			$content = render_inline_files( $content, $this, $params );
+			$content = render_inline_files( $content, $this, array_merge( $params, array(
+					'clear_paragraph' => false, // Don't clear paragraph twice
+				) ) );
 		}
 
 		if( $params['render_links'] )
@@ -8958,7 +8963,12 @@ class Item extends ItemLight
 
 		// Render inline tags to HTML code, except of inline file tags because they are removed below:
 		$first_content_part = $this->render_inline_tags( $first_content_part, array(
-				'render_inline_files' => false
+				'render_inline_files'      => false,
+				'render_links'             => false,
+				'render_other_item'        => false,
+				'render_inline_widgets'    => false,
+				'render_block_widgets'     => false,
+				'render_switchable_blocks' => false,
 			) );
 
 		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:

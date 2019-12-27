@@ -1176,7 +1176,7 @@ function split_outcode( $separators, $content, $capture_separator = false )
 
 
 /**
- * Remove [image:] and [video:] short tags that are inside <p> blocks and move them before the paragraph
+ * Remove [image:] and [video:] short tags that are inside <p> blocks and before <br> and move them before the paragraph
  *
  * @param string Source content
  * @param string Search pattern
@@ -1187,11 +1187,11 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL )
 {	// Move [image:], [video:] and [audio:] tags out of <p> blocks
 
 	// Get individual paragraphs
-	preg_match_all( '/<p[\s*|>].*?<\/p>/i', $content, $paragraphs );
+	preg_match_all( '#(<p[\s*|>])?.*?<(/p|br\s?/?)>#i', $content, $paragraphs );
 
 	if( is_null( $pattern ) )
 	{
-		$pattern = '/\[(image|video|audio):\d+:?[^\[\]]*\]/i';
+		$pattern = '#\[(image|video|audio|include|/?div|(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields)):?.*?\]#i';
 	}
 
 	foreach( $paragraphs[0] as $i => $current_paragraph )
@@ -1213,7 +1213,7 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL )
 				// convert &nbsp; to space
 				$x = str_replace( "\xC2\xA0", ' ', $new_paragraph );
 
-				if( preg_match( '/<p[\s*|>]\s*<\/p>/i', $x ) === 1 )
+				if( preg_match( '#(<p[\s*|>])?\s*<(/p|br\s?/?)>#i', $x ) === 1 )
 				{ // remove paragraph the if moving out the short tag will result to an empty paragraph
 					$new_paragraph = '';
 				}
@@ -8523,7 +8523,12 @@ function can_use_hashed_password()
  */
 function render_inline_files( $content, $Object, $params = array() )
 {
-	if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+	$params = array_merge( array(
+			'check_code_block' => false,
+			'clear_paragraph'  => true,
+		), $params );
+
+	if( $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
 	{	// Call render_inline_files() on everything outside code/pre:
 		$params['check_code_block'] = false;
 		$content = callback_on_non_matching_blocks( $content,
@@ -8534,8 +8539,10 @@ function render_inline_files( $content, $Object, $params = array() )
 
 	// No code/pre blocks, replace on the whole thing
 
-	// Remove block level short tags inside <p> blocks and move them before the paragraph
-	$content = move_short_tags( $content );
+	if( $params['clear_paragraph'] )
+	{	// Remove block level short tags inside <p> blocks and move them before the paragraph:
+		$content = move_short_tags( $content );
+	}
 
 	// Find all matches with inline tags
 	preg_match_all( '/\[(image|file|inline|video|audio|thumbnail|folder):(\d+)(:?)([^\]]*)\]/i', $content, $inlines );
