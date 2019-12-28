@@ -45,6 +45,12 @@ class coll_title_Widget extends ComponentWidget
 	function get_param_definitions( $params )
 	{
 		$r = array_merge( array(
+				'add_title_link' => array(
+					'label' => T_('Add link in title'),
+					'note' => T_('check to add a link in the title.'),
+					'type' => 'checkbox',
+					'defaultvalue' => true,
+				),
 				'add_tagline' => array(
 					'label' => T_('Add tagline'),
 					'note' => T_('check to add the collection tagline after the title.'),
@@ -113,9 +119,12 @@ class coll_title_Widget extends ComponentWidget
 		// Collection title:
 		echo $this->disp_params['block_start'];
 
-		$title = '<a href="'.$Blog->get( 'url' ).'">'
-							.$Blog->dget( 'name', 'htmlbody' )
-							.'</a>';
+		$title = $Blog->dget( 'name', 'htmlbody' );
+		
+		if( $this->disp_params['add_title_link'] )
+		{ // Add a link to the collection in the title
+			$title = '<a href="'.$Blog->get( 'url' ).'">' .$title .'</a>';
+		}
 		if( $this->disp_params['add_tagline'] )
 		{ // Add a tagline after blog title
 			$title .= ' <small>'.$Blog->dget( 'tagline', 'htmlbody' ).'</small>';
