@@ -51,6 +51,12 @@ class coll_title_Widget extends ComponentWidget
 					'type' => 'checkbox',
 					'defaultvalue' => false,
 				),
+				'break_tagline' => array(
+					'label' => T_('Break tagline'),
+					'note' => T_('check to display the collection tagline in a new line, below the title.'),
+					'type' => 'checkbox',
+					'defaultvalue' => false
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -118,6 +124,10 @@ class coll_title_Widget extends ComponentWidget
 							.'</a>';
 		if( $this->disp_params['add_tagline'] )
 		{ // Add a tagline after blog title
+			if( $this->disp_params['break_tagline'] )
+			{// Break tagline into a new line
+				$title .= ' <br>';
+			}
 			$title .= ' <small>'.$Blog->dget( 'tagline', 'htmlbody' ).'</small>';
 		}
 		$this->disp_title( $title );
