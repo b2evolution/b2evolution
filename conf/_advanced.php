@@ -512,7 +512,7 @@ $emailskins_url = $assets_baseurl.$emailskins_subdir;     // You should not need
 /**
  * Location of the customizer mode interface
  */
-$customizer_url = $baseurl.'customize.php';
+$customizer_relative_url = $basesubpath.'customize.php';
 
 /**
  * Location of the admin interface dispatcher

@@ -10055,20 +10055,17 @@ function convert_path_to_array( $property, $value, $separator = '.' )
  */
 function get_customizer_url( $url_Blog = NULL )
 {
-	global $customizer_url, $Blog;
+	global $baseurlroot, $customizer_relative_url, $Blog;
 
 	if( $url_Blog === NULL && isset( $Blog ) )
 	{	// Use current collection:
 		$url_Blog = $Blog;
 	}
 
-	if( preg_match( '#^https?://.+?/#i', $url_Blog->gen_blogurl( 'original' ), $coll_url_match ) &&
-	    preg_match( '#/([^/]+)$#i', $customizer_url, $customizer_url_match ) )
-	{	// Collection domain like `http://colection.com/` + script name like `customize.php`:
-		return $coll_url_match[0].$customizer_url_match[1];
-	}
+	return $url_Blog->get_baseurl_root().$customizer_relative_url;
 
+// TODO: remove the following. It is only to show how we would fall back if we needed to.
 	// Use default customizer URL from config:
-	return $customizer_url;
+	return $baseurlroot.$customizer_relative_url;
 }
 ?>

@@ -2033,6 +2033,7 @@ class Blog extends DataObject
 		if( $type == 'original' && isset( $this->orig_access_type, $this->orig_siteurl ) )
 		{	// Use original access type if it has been forced temporarily to another value
 			// (probably to solve frame origin issue on customize mode):
+// TODO: fp>yura: do we still need this?
 			$coll_access_type = $this->orig_access_type;
 			$coll_siteurl = $this->orig_siteurl;
 		}
@@ -2097,6 +2098,7 @@ class Blog extends DataObject
 	{
 		global $baseprotocol, $basehost, $baseport, $baseurl;
 
+// TODO: fp>yura: why is this not factorized to $this->gen_blogurl() ?
 		switch( $this->get( 'access_type' ) )
 		{
 			case 'baseurl':
