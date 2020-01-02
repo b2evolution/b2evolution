@@ -1160,31 +1160,31 @@ class DataObject
 		$UserCache = & get_UserCache();
 
 		// HANDLE CREATOR STUFF
-		if( !empty($this->creator_field) && !empty($this->{$this->creator_field}) )
+		if( !empty( $this->creator_field ) && !empty( $this->{$this->creator_field} ) )
 		{	// We have a creator:
 			$creator_User = & $UserCache->get_by_ID( $this->{$this->creator_field} );
 
-			if( !empty($this->datecreated_field) && !empty($this->{$this->datecreated_field}) )
+			if( !empty($this->datecreated_field) && !empty( $this->{$this->datecreated_field} ) )
 			{	// We also have a create date:
 				$history[0] = sprintf( T_('Created on %s by %s'), mysql2localedate( $this->{$this->datecreated_field} ),
 					$creator_User->dget('preferredname') );
 			}
 			else
 			{	// We only have a cretaor:
-				$history[0] = sprintf( T_('Created by %s'), $creator_User->dget('preferredname') );
+				$history[0] = sprintf( T_('Created by %s'), $creator_User->dget( 'preferredname' ) );
 			}
 		}
-		elseif( !empty($this->datecreated_field) && !empty($this->{$this->datecreated_field}) )
+		elseif( !empty( $this->datecreated_field ) && !empty( $this->{$this->datecreated_field} ) )
 		{	// We only have a create date:
 			$history[0] = sprintf( T_('Created on %s'), mysql2localedate( $this->{$this->datecreated_field} ) );
 		}
 
 		// HANDLE LAST UPDATE STUFF
-		if( !empty($this->lasteditor_field) && !empty($this->{$this->lasteditor_field}) )
+		if( !empty( $this->lasteditor_field ) && !empty( $this->{$this->lasteditor_field} ) )
 		{	// We have a creator:
 			$creator_User = & $UserCache->get_by_ID( $this->{$this->lasteditor_field} );
 
-			if( !empty($this->datemodified_field) && !empty($this->{$this->datemodified_field}) )
+			if( !empty( $this->datemodified_field ) && !empty( $this->{$this->datemodified_field} ) )
 			{	// We also have a create date:
 				$history[1] = sprintf( T_('Last mod on %s by %s'), mysql2localedate( $this->{$this->datemodified_field} ),
 					$creator_User->dget('preferredname') );
@@ -1197,6 +1197,18 @@ class DataObject
 		elseif( !empty($this->datemodified_field) && !empty($this->{$this->datemodified_field}) )
 		{	// We only have a create date:
 			$history[1] = sprintf( T_('Last mod on %s'), mysql2localedate( $this->{$this->datemodified_field} ) );
+		}
+
+		// HANDLE CONTENT UPDATE STUFF
+		if( !empty( $this->contents_last_updated_ts ) )
+		{
+			$history[2] = T_('Contents updated').': '.mysql2localedatetime( $this->contents_last_updated_ts );
+		}
+
+		// HANDLE LAST TOUCHED STUFF
+		if( !empty( $this->last_touched_ts ) )
+		{
+			$history[3] = T_('Last touched').': '.mysql2localedatetime( $this->last_touched_ts );
 		}
 
 		return get_icon( 'history', 'imgtag', array( 'title'=>implode( ' - ', $history ) ), true );
