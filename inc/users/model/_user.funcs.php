@@ -1715,7 +1715,7 @@ function profile_check_params( $params, $User = NULL )
 		}
 		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) && ( $params['gender'][0] != 'O' ) )
 		{
-			param_error( $params['gender'][1], 'Gender value is invalid' );
+			param_error( $params['gender'][1], T_('Gender value is invalid') );
 		}
 	}
 
@@ -1767,6 +1767,88 @@ function profile_check_params( $params, $User = NULL )
 			{ // Checking the not allowed chars
 				param_error_multiple( array( $dummy_fields[ $params['pass1'][1] ], $dummy_fields[ $params['pass2'][1] ] ), T_('Passwords cannot contain the characters &lt;, &gt; and &amp;.') );
 			}
+		}
+	}
+}
+
+
+/**
+ * Check profile parameters provided by social network provider and add errors through {@link param_error()}.
+ *
+ * @param array associative array.
+ *     Either array( $value, $input_name ) or just $value;
+ *     ($input_name gets used for associating it to a form fieldname)
+ *     - 'login': check for non-empty
+ *     - 'nickname': check for non-empty
+ *     - 'email': mandatory, must be well formed
+ *     - 'country': check for non-empty
+ *     - 'firstname': check for non-empty
+ *     - 'lastname': check for non-empty
+ * @param string Social network provider name
+ */
+function social_profile_check_params( $params, $provider )
+{
+	global $Messages, $Settings, $dummy_fields;
+
+	foreach( $params as $k => $v )
+	{
+		// normalize params:
+		if( $k != 'pass_required' && ! is_array( $v ) )
+		{
+			$params[ $k ] = array( $v, $k );
+		}
+	}
+
+	$error_messages_header = sprintf( T_('We cannot create an account based on your %s profile because your %s profile is missing the following information').':',
+			'<b>'.$provider.'</b>', '<b>'.$provider.'</b>' );
+
+	// checking e-mail address
+	if( isset( $params['email'][0] ) )
+	{
+		if( empty( $params['email'][0] ) )
+		{
+			param_error( $dummy_fields[ $params['email'][1] ], T_('Email address'), NULL, $error_messages_header );
+		}
+		elseif( ! is_email( $params['email'][0] ) )
+		{
+			param_error( $dummy_fields[ $params['email'][1] ], T_('The email address is invalid.'), NULL, $error_messages_header );
+		}
+	}
+
+	// Checking country
+	if( isset( $params['country'] ) && empty( $params['country'][0] ) )
+	{
+		param_error( $params['country'][1], T_('Country'), NULL, $error_messages_header );
+	}
+
+	// Checking first name
+	if( isset( $params['firstname'] ) && empty( $params['firstname'][0] ) )
+	{
+		param_error( $params['firstname'][1], T_('First name'), NULL, $error_messages_header );
+	}
+
+	// Checking last name
+	if( isset( $params['lastname'] ) && empty( $params['lastname'][0] ) )
+	{
+		param_error( $params['lastname'][1], T_('Last name'), NULL, $error_messages_header );
+	}
+
+	// Checking nick name
+	if( isset( $params['nickname'] ) && empty( $params['nickname'][0] ) )
+	{
+		param_error( $params['nickname'][1], T_('Nickname'), NULL, $error_messages_header );
+	}
+
+	// Checking gender
+	if( isset( $params['gender'] ) )
+	{
+		if( empty( $params['gender'][0] ) )
+		{
+			param_error( $params['gender'][1], T_('Gender'), NULL, $error_messages_header );
+		}
+		elseif( ( $params['gender'][0] != 'M' ) && ( $params['gender'][0] != 'F' ) && ( $params['gender'][0] != 'O' ) )
+		{
+			param_error( $params['gender'][1], T_('Gender value is invalid'), NULL, $error_messages_header );
 		}
 	}
 }

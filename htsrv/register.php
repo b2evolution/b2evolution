@@ -132,6 +132,7 @@ switch( $action )
 
 		if( $is_social )
 		{	// Set params for registration using social network credentials:
+			param( 'provider', 'string', true );
 			$social_params = $Session->get( 'social.registration_params' );
 			$Session->delete( 'social.registration_params' );
 
@@ -360,7 +361,14 @@ switch( $action )
 		}
 
 		// Check profile params:
-		profile_check_params( $paramsList );
+		if( $is_social )
+		{
+			social_profile_check_params( $paramsList, $provider );
+		}
+		else
+		{
+			profile_check_params( $paramsList );
+		}
 
 		if( $is_quick && ! $Messages->has_errors() )
 		{	// Generate a login for quick registration:
