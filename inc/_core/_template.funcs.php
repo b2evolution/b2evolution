@@ -2123,6 +2123,15 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
 
 
 /**
+ * Initialize Hotkeys library
+ */
+function init_hotkeys_js( $relative_to = 'rsc_url' )
+{
+	require_js( '#hotkeys#', $relative_to );
+}
+
+
+/**
  * Outputs the collected HTML HEAD lines.
  * @see add_headline()
  * @return string

@@ -180,6 +180,31 @@ function skin_init( $disp )
 				break;
 			}
 
+			if( is_logged_in() && ( $disp == 'single' || $disp == 'page' ) && $Item )
+			{	// Enable "F2" hotkey that will redirect user to edit screen of Item:
+				global $admin_url;
+
+				if( $Blog->get_setting( 'in_skin_editing' ) )
+				{
+					$edit_item_url = $Item->get_edit_url();
+				}
+				elseif( $current_User->check_perm( 'admin', 'restricted' ) )
+				{
+					$edit_item_url = $admin_url.'?ctrl=items&action=edit&p='.$Item->ID.'&blog='.$Blog->ID;
+				}
+
+				if( ! empty( $edit_item_url ) )
+				{	// Current user can edit post:
+					init_hotkeys_js();
+					add_js_headline('jQuery( document ).ready( function()
+					{
+						hotkeys( \'f2\', function( event, handler ) {
+							window.location.href = \''.format_to_js( $edit_item_url ).'\';
+						});
+					});');
+				}
+			}
+
 			if( ( ! $preview ) && ( empty( $Item ) ) )
 			{ // No Item, incorrect request and incorrect state of the application, a 404 redirect should have already happened
 				//debug_die( 'Invalid page URL!' );

@@ -906,6 +906,7 @@ $library_local_urls = array(
 		'#jcrop_css#' => array( 'jquery/jcrop/jquery.jcrop.min.css', 'jquery/jcrop/jquery.jcrop.css' ),
 		'#fontawesome#' => array( 'font-awesome.min.css', 'font-awesome.css' ),
 		'#clipboardjs#' => array( 'clipboardjs/clipboard.min.js' ),
+		'#hotkeys#' => array( 'hotkeys/hotkeys.min.js' ),
 	);
 
 
