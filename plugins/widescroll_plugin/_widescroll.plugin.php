@@ -22,7 +22,7 @@ class widescroll_plugin extends Plugin
 	var $code = 'evo_widescroll';
 	var $name = 'Wide scroll';
 	var $priority = 100;
-	var $version = '7.0.2';
+	var $version = '7.1.0';
 	var $group = 'rendering';
 	var $number_of_installs = 1;
 

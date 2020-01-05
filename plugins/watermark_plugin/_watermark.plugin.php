@@ -25,7 +25,7 @@ class watermark_plugin extends Plugin
 	var $priority = 10;
 	var $short_desc;
 	var $long_desc;
-	var $version = '7.0.2';
+	var $version = '7.1.0';
 	var $number_of_installs = 1;
 
 	var $fonts_dir = '';

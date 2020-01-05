@@ -21,7 +21,7 @@ class twitter_tweet_renderer_plugin extends Plugin
 	var $code = 'embTweetRdr';
 	var $name = 'Twitter Tweet renderer';
 	var $priority = 60;
-	var $version = '7.0.2';
+	var $version = '7.1.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;

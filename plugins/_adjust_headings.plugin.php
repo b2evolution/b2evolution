@@ -19,7 +19,7 @@ class adjust_headings_plugin extends Plugin
 	var $code = 'h_levels';
 	var $name = 'Adjust headings';
 	var $priority = 105;
-	var $version = '7.0.2';
+	var $version = '7.1.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
