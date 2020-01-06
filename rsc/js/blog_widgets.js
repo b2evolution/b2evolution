@@ -565,10 +565,10 @@ function addNewWidget( widget_list_item, admin_call )
  * @param string wi_name Name of the new widget
  * @param string wi_cache_status Cache status
  */
-function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_plugin_status, wi_cache_status )
+function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_enabled, wi_plugin_status, wi_cache_status )
 {
 	jQuery( '.fade_me' ).removeClass( 'fade_me' ); // kill any active fades
-	createWidget( 'wi_ID_' + wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, wi_name, '', 1, wi_plugin_status, wi_cache_status );
+	createWidget( 'wi_ID_' + wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, wi_name, '', wi_enabled, wi_plugin_status, wi_cache_status );
 	doFade( '#wi_ID_'+wi_ID );
 	if( reorder_delay_remaining > 0 )
 	{ // send outstanding updates
@@ -604,14 +604,14 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 	// Add state indicator:
 	jQuery( newWidget ).prepend( jQuery( '<span class="widget_state">'+
 			( wi_plugin_disabled ? disabled_plugin_tag :
-			'<a href="#" class="toggle_action" onclick="return toggleWidget( \''+wi_ID+'\' );">' +
+			'<a href="#" class="toggle_action" onclick="return toggleWidget( \''+ wi_ID +'\' );">' +
 				( wi_enabled ? enabled_icon_tag : disabled_icon_tag )+
 			'</a>' ) +
 		'</span>' ) );
 
 	// Add checkbox:
 	jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox' + ( wi_enabled ? ' widget_checkbox_enabled' : '' ) + '">' +
-			'<input type="checkbox" name="widgets[]" value="'+wi_ID.replace( 'wi_ID_', '' ) + '" ' + ( wi_plugin_disabled ? 'disabled="disabled" ' : '' ) + '/>'+
+			'<input type="checkbox" name="widgets[]" value="' + wi_ID.replace( 'wi_ID_', '' ) + '" ' + ( wi_plugin_disabled ? 'disabled="disabled" ' : '' ) + '/>'+
 		'</span>' ) );
 
 	// Add icon to toggle cache status:

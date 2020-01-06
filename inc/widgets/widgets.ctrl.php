@@ -301,6 +301,8 @@ switch( $action )
 				ORDER BY wi_order ASC' );
 			*/
 
+			$edited_ComponentWidget->set( 'enabled', $duplicated_Widget->get( 'enabled' ) );
+
 			if( ! empty( $duplicated_Widget->get_param( 'title' ) ) )
 			{	// Append "(copy)" to title:
 				$edited_ComponentWidget->set( 'title', $duplicated_Widget->get_param( 'title' ).' ('.T_('copy').')' );
@@ -335,6 +337,7 @@ switch( $action )
 						'<a href="'.regenerate_url( 'blog', 'action=edit&amp;wi_ID='.$edited_ComponentWidget->ID ).'" class="widget_name">'
 							.$edited_ComponentWidget->get_desc_for_list()
 						.'</a> '.$edited_ComponentWidget->get_help_link(),
+						$edited_ComponentWidget->enabled,
 						$plugin_disabled,
 						$edited_ComponentWidget->get_cache_status( true ),
 					),
