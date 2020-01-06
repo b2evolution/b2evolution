@@ -125,6 +125,30 @@ class item_info_line_Widget extends ComponentWidget
 					'defaultvalue' => 'posted_by',
 					'field_lines' => true,
 				),
+				'display_date' => array(
+					'label' => T_('Post date to display'),
+					'note' => '',
+					'type' => 'radio',
+					'options' => array(
+						array( 'issue_date', T_('Issue date') ),
+						array( 'date_created', T_('Date created') ),
+						array( 'none', T_('None') )
+					),
+					'defaultvalue' => in_array( $Blog->type, array( 'forum', 'group' ) ) ? 'date_created' : 'issue_date',
+					'field_lines' => true
+				),
+				'last_touched' => array(
+					'label' => T_( 'Last touched' ),
+					'note' => T_( 'Display date and time when item/post was last touched' ),
+					'type' => 'checkbox',
+					'defaultvalue' => false
+				),
+				'contents_updated' => array(
+					'label' => T_( 'Contents last updated' ),
+					'note' => T_( 'Display date and time when item/post contents (title, content, URL or attachments) were last updated' ),
+					'type' => 'checkbox',
+					'defaultvalue' => false
+				),
 				'date_format' => array(
 					'label' => T_( 'Date format' ),
 					'note' => T_( 'Item/post date display format' ),
@@ -133,7 +157,6 @@ class item_info_line_Widget extends ComponentWidget
 						array( 'extended', sprintf( T_('Extended format %s'), '<code>'.locale_extdatefmt().'</code>' ) ),
 						array( 'long', sprintf( T_('Long format %s'), '<code>'.locale_longdatefmt().'</code>' ) ),
 						array( 'short', sprintf( T_('Short format %s'), '<code>'.locale_datefmt().'</code>' ) ),
-						array( 'none', T_('None') )
 					),
 					'defaultvalue' => 'extended',
 					'field_lines' => true,
@@ -149,29 +172,6 @@ class item_info_line_Widget extends ComponentWidget
 					),
 					'defaultvalue' => 'none',
 					'field_lines' => true,
-				),
-				'display_date' => array(
-					'label' => T_('Date and time to use'),
-					'note' => '',
-					'type' => 'radio',
-					'options' => array(
-						array( 'issue_date', T_('Issue date') ),
-						array( 'date_created', T_('Date created') )
-					),
-					'defaultvalue' => in_array( $Blog->type, array( 'forum', 'group' ) ) ? 'date_created' : 'issue_date',
-					'field_lines' => true,
-				),
-				'last_touched' => array(
-					'label' => T_( 'Last touched' ),
-					'note' => T_( 'Display date and time when item/post was last touched' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
-				),
-				'contents_updated' => array(
-					'label' => T_( 'Contents last updated' ),
-					'note' => T_( 'Display date and time when item/post contents (title, content, URL or attachments) were last updated' ),
-					'type' => 'checkbox',
-					'defaultvalue' => false,
 				),
 				'category' => array(
 					'label' => T_( 'Category' ),
@@ -241,23 +241,21 @@ class item_info_line_Widget extends ComponentWidget
 
 		// Get datetime format:
 		$date_format = '';
-		if( $this->disp_params['date_format'] != 'none' )
+		switch( $this->disp_params['date_format'] )
 		{
-			switch( $this->disp_params['date_format'] )
-			{
-				case 'extended':
-					$date_format = locale_extdatefmt();
-					break;
+			case 'extended':
+				$date_format = locale_extdatefmt();
+				break;
 
-				case 'long':
-					$date_format = locale_longdatefmt();
-					break;
+			case 'long':
+				$date_format = locale_longdatefmt();
+				break;
 
-				case 'short':
-					$date_format = locale_datefmt();
-					break;
-			}
+			case 'short':
+				$date_format = locale_datefmt();
+				break;
 		}
+
 		$time_format = '';
 		if( $this->disp_params['time_format'] != 'none' )
 		{
@@ -337,28 +335,24 @@ class item_info_line_Widget extends ComponentWidget
 		}
 
 		// We want to display the post time:
-		$post_time = '';
-		if( $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' )
+		switch( $this->disp_params['display_date'] )
 		{
-			switch( $this->disp_params['display_date'] )
-			{
-				case 'issue_date':
-					$Item->issue_time( array(
-							'before'      => $widget_params['before_post_time'],
-							'after'       => $widget_params['after_post_time'],
-							'time_format' => $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format
-						) );
-					break;
+			case 'issue_date':
+				$Item->issue_time( array(
+						'before'      => $widget_params['before_post_time'],
+						'after'       => $widget_params['after_post_time'],
+						'time_format' => $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format
+					) );
+				break;
 
-				case 'date_created':
-					echo $widget_params['before_post_time'];
-					echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
-					echo $widget_params['after_post_time'];
-					break;
-			}
-			$post_time = ob_get_contents();
-			ob_clean();
+			case 'date_created':
+				echo $widget_params['before_post_time'];
+				echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
+				echo $widget_params['after_post_time'];
+				break;
 		}
+		$post_time = ob_get_contents();
+		ob_clean();
 
 		// Categories:
 		$categories = '';
@@ -422,7 +416,7 @@ class item_info_line_Widget extends ComponentWidget
 			);
 
 		$display_widget = $this->disp_params['flag_icon'] || $this->disp_params['permalink_icon'] || $this->disp_params['before_author'] != 'none'
-				|| $this->disp_params['date_format'] != 'none' || $this->disp_params['time_format'] != 'none' || $this->disp_params['category']
+				|| $this->disp_params['display_date'] != 'none' || $this->disp_params['category']
 				|| $this->disp_params['last_touched'] || $this->disp_params['contents_updated'] || $this->disp_params['edit_link'];
 
 		if( ! $display_widget && empty( $info_line ) )
