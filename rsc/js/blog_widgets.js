@@ -361,6 +361,17 @@ function deleteWidget( widget )
 }
 
 /**
+ * Duplicate widget
+ */
+function duplicateWidget( widget )
+{
+	var widget_id = widget.substr( 6, widget.length );
+	SendAdminRequest( 'widgets', 'duplicate', 'wi_ID=' + widget_id + '&' + widget_crumb_url_param, true );
+	return false;
+}
+
+
+/**
  * Request edit screen from server...
  */
 function editWidget( widget )
@@ -557,7 +568,7 @@ function addNewWidget( widget_list_item, admin_call )
 function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_plugin_status, wi_cache_status )
 {
 	jQuery( '.fade_me' ).removeClass( 'fade_me' ); // kill any active fades
-	createWidget( 'wi_ID_'+wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, wi_name, '', 1, wi_plugin_status, wi_cache_status );
+	createWidget( 'wi_ID_' + wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, wi_name, '', 1, wi_plugin_status, wi_cache_status );
 	doFade( '#wi_ID_'+wi_ID );
 	if( reorder_delay_remaining > 0 )
 	{ // send outstanding updates
@@ -609,12 +620,11 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 
 	// Add action icons:
 	// Toggle state
-	var actionIcons = '<span class="widget_actions"><a href="#" class="toggle_action" onclick="return toggleWidget( \''+ wi_ID + '\' );"' + ( wi_plugin_disabled ? ' style="visibility: hidden">' : '>' )
-				+ ( wi_enabled ? deactivate_icon_tag : activate_icon_tag ) + '</a>';
+	var actionIcons = '<span class="widget_actions">';
 
-	actionIcons += '<a href="#" onclick="return editWidget( \'' + wi_ID + '\' );">'
-			+ edit_icon_tag + '</a><a href="#" onclick="return deleteWidget( \'' + wi_ID + '\' );">'
-			+ delete_icon_tag + '</a></span>'
+	actionIcons += '<a href="#" onclick="return editWidget( \'' + wi_ID + '\' );">' + edit_icon_tag + '</a>'
+			+ '<a href="#" onclick="return duplicateWidget( \'' + wi_ID + '\' );">' + duplicate_icon_tag + '</a>'
+			+ '<a href="#" onclick="return deleteWidget( \'' + wi_ID + '\' );">' + delete_icon_tag + '</a></span>'
 
 	actionIcons = jQuery( actionIcons );
 	jQuery( newWidget ).append( actionIcons ); // add widget action icons

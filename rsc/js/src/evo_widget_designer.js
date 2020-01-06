@@ -95,6 +95,7 @@ function evo_widget_initialize_designer_block( widget )
 				b2evo_widget_icon_up +
 				b2evo_widget_icon_down +
 				b2evo_widget_icon_bottom +
+				b2evo_widget_icon_duplicate +
 				b2evo_widget_icon_disable +
 			'</div>' );
 		var next_widget = same_widgets.eq( same_widgets.length - 1 ).next( '.evo_widget' );
@@ -320,7 +321,7 @@ jQuery( document ).on( 'mousemove', function( e )
 	}
 
 	if( jQuery( '.evo_designer__subcontainer_active' ).length > 0 &&
-	    ( ( typeof( evo_subcontainer_widgets ) != 'undefined' && evo_subcontainer_widgets.length > 0 ) || 
+	    ( ( typeof( evo_subcontainer_widgets ) != 'undefined' && evo_subcontainer_widgets.length > 0 ) ||
 	      ( typeof( evo_subcontainer_containers ) != 'undefined' && evo_subcontainer_containers.length > 0 ) ) )
 	{	// If sub-container is selected to edit its widgets:
 		var active_subcontainer_designer_block = jQuery( '.evo_designer__subcontainer_active' );
@@ -474,6 +475,18 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_top, .evo_designer_
 	} );
 } );
 
+jQuery( document ).on( 'click', '.evo_designer__action_duplicate', function()
+{	// Duplicate widget:
+	var designer_block = jQuery( this ).closest( '.evo_designer__widget' );
+	var widget = jQuery( evo_widget_selector( designer_block ) );
+
+	if( typeof( b2evo_widget_duplicate_url ) != 'undefined' )
+	{	// If global widget duplicate url is defined:
+		jQuery( '#evo_customizer__backoffice', window.parent.document ).get( 0 ).contentWindow.location
+				.href = b2evo_widget_duplicate_url.replace( '$wi_ID$', widget.data( 'id' ) ).replace( '$crumb_widget$', b2evo_widget_crumb );
+	}
+} );
+
 jQuery( document ).on( 'click', '.evo_designer__action_disable', function()
 {	// Disable widget:
 	var designer_block = jQuery( this ).closest( '.evo_designer__widget' );
@@ -613,7 +626,7 @@ function evo_widget_container_block_selector( container_code )
 
 /**
  * Display an error after failed widget action
- * 
+ *
  * @param string Error message
  * @param object Widget
  * @param string Action: 'top', 'up', 'down', 'disable'

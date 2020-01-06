@@ -1001,7 +1001,7 @@ class Skin extends DataObject
 		if( $params['type'] == 'image_file' )
 		{	// Special setting type as ID of image file:
 			if( $this->get_setting( $setting_name ) &&
-					( $FileCache = & get_FileCache() ) && 
+					( $FileCache = & get_FileCache() ) &&
 					( $image_File = & $FileCache->get_by_ID( $this->get_setting( $setting_name ), false, false ) ) &&
 					$image_File->exists() )
 			{
@@ -1341,7 +1341,7 @@ class Skin extends DataObject
 					if( $this->get_api_version() == 7 )
 					{	// Get skin css file from folder of collection kind:
 						$skin_css_folder = $Blog->get( 'type' ).'/';
-						if( file_exists( $this->get_path().$skin_css_folder.'style.css' ) && 
+						if( file_exists( $this->get_path().$skin_css_folder.'style.css' ) &&
 							( $this->use_min_css == false
 							|| $debug
 							|| ( $this->use_min_css == 'check' && ! file_exists( $this->get_path().$skin_css_folder.'style.min.css' ) ) ) )
@@ -1713,6 +1713,7 @@ var downloadInterval = setInterval( function()
 				global $admin_url;
 				add_js_headline( 'var b2evo_widget_edit_url = "'.$admin_url.'?ctrl=widgets&action=edit&wi_ID=$wi_ID$&mode=customizer";'
 					.'var b2evo_widget_add_url = "'.$admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container=$container$&container_code=$container_code$&mode=customizer";'
+					.'var b2evo_widget_duplicate_url = "'.$admin_url.'?ctrl=widgets&action=duplicate&wi_ID=$wi_ID$&mode=customizer&crumb_widget=$crumb_widget$";'
 					.'var b2evo_widget_list_url = "'.$admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=customize&container=$container$&container_code=$container_code$&mode=customizer";'
 					.'var b2evo_widget_blog = \''.$Blog->ID.'\';'
 					.'var b2evo_widget_crumb = \''.get_crumb( 'widget' ).'\';'
@@ -1720,6 +1721,7 @@ var downloadInterval = setInterval( function()
 					.'var b2evo_widget_icon_up = \''.format_to_js( get_icon( 'designer_widget_up', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_up' ) ) ).'\';'
 					.'var b2evo_widget_icon_down = \''.format_to_js( get_icon( 'designer_widget_down', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_down' ) ) ).'\';'
 					.'var b2evo_widget_icon_bottom = \''.format_to_js( get_icon( 'designer_widget_bottom', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_bottom' ) ) ).'\';'
+					.'var b2evo_widget_icon_duplicate = \''.format_to_js( get_icon( 'copy', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_duplicate', 'title' => T_('Duplicate') ) ) ).'\';'
 					.'var b2evo_widget_icon_disable = \''.format_to_js( get_icon( 'minus', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_disable', 'title' => T_('Disable') ) ) ).'\';'
 					.'var b2evo_widget_icon_add = \''.format_to_js( get_icon( 'add', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_add', 'title' => T_('Add Widget to container') ) ) ).'\';'
 					.'var b2evo_widget_icon_list = \''.format_to_js( get_icon( 'designer_widget_list', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_list', 'title' => T_('Manage Widgets of container') ) ) ).'\';'

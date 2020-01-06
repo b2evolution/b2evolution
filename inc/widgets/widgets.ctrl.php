@@ -94,6 +94,10 @@ switch( $action )
 		// Do nothing
 		break;
 
+	case 'duplicate':
+		param( 'wi_ID', 'integer', true );
+		break;
+
 	case 'create':
 		param( 'type', 'string', true );
 		param( 'code', 'string', true );
@@ -210,13 +214,31 @@ switch( $action )
 		$edited_WidgetContainer = $WidgetContainerCache->get_by_ID( $wico_ID );
 		break;
 
+	case 'duplicate':
+		// Duplicate a Widget to container:
+
+		$WidgetCache = & get_WidgetCache();
+		$duplicated_Widget = & $WidgetCache->get_by_ID( $wi_ID );
+		$duplicated_Widget->load_param_array();
+
+		$type = $duplicated_Widget->type;
+		$code = $duplicated_Widget->code;
+
 	case 'create':
 		// Add a Widget to container:
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
-		$WidgetContainer = & get_WidgetContainer_by_coll_skintype_fieldset( $Blog->ID, $skin_type, $container );
+		if( $action == 'duplicate' )
+		{
+			$WidgetContainer = & $duplicated_Widget->get_WidgetContainer();
+			$container = 'wico_ID_'.$WidgetContainer->ID;
+		}
+		else
+		{
+			$WidgetContainer = & get_WidgetContainer_by_coll_skintype_fieldset( $Blog->ID, $skin_type, $container );
+		}
 		if( ! in_array( $WidgetContainer->get( 'code' ), array_keys( $Blog->get_main_containers( $skin_type ) ) ) )
 		{ // The container is not part of the current skin
 			$Messages->add( T_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'error' );
@@ -255,6 +277,35 @@ switch( $action )
 		}
 		$edited_ComponentWidget->set( 'wico_ID', $WidgetContainer->ID );
 		$edited_ComponentWidget->set( 'enabled', 1 );
+
+		if( $action == 'duplicate' )
+		{	// Copy all params from the original widget:
+			$duplicated_Widget->load_param_array();
+			$edited_ComponentWidget->param_array = $duplicated_Widget->param_array;
+
+			// Commented block below can be used to insert the duplicate widget below the original widget:
+			/*
+			$widget_order = $duplicated_Widget->order + 1;
+			$edited_ComponentWidget->set( 'order', $widget_order );
+
+			// Move other widgets in the same container down, two-step update necessary to prevent unique key violation:
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_order = wi_order + 1
+				WHERE wi_wico_ID = '.$DB->quote( $WidgetContainer->ID ).'
+				ORDER BY wi_order DESC' );
+
+			$DB->query( 'UPDATE T_widget__widget
+					SET wi_order = wi_order - 1
+				WHERE wi_wico_ID = '.$DB->quote( $WidgetContainer->ID ).'
+				AND wi_order <= '.$DB->quote( $widget_order ).'
+				ORDER BY wi_order ASC' );
+			*/
+
+			if( ! empty( $duplicated_Widget->get_param( 'title' ) ) )
+			{	// Append "(copy)" to title:
+				$edited_ComponentWidget->set( 'title', $duplicated_Widget->get_param( 'title' ).' ('.T_('copy').')' );
+			}
+		}
 
 		// INSERT INTO DB:
 		$edited_ComponentWidget->dbinsert();
@@ -755,6 +806,7 @@ if( $display_mode == 'normal' )
 	 * @internal Tblue> We get the whole img tags here (easier).
 	 */
 	var edit_icon_tag = \''.get_icon( 'edit', 'imgtag', array( 'title' => T_( 'Edit widget settings!' ) ) ).'\';
+	var duplicate_icon_tag = \''.get_icon( 'copy', 'imgtag', array( 'title' => T_('Duplicate') ) ).'\';
 	var delete_icon_tag = \''.get_icon( 'delete', 'imgtag', array( 'title' => T_( 'Remove this widget!' ) ) ).'\';
 	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) ).'\';
 	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';

@@ -1261,20 +1261,6 @@ function display_container( $WidgetContainer, $params = array() )
 
 			// Actions:
 			echo '<span class="widget_actions">';
-			if( $disabled_plugin )
-			{	// If widget's plugin is disabled:
-				// Display a space same as the enable/disable icons:
-				echo action_icon( '', 'deactivate', '#', NULL, NULL, NULL, array( 'style' => 'visibility:hidden', 'class' => 'toggle_action' ) );
-			}
-			else
-			{	// If this is a normal widget or widget's plugin is enabled:
-					// Enable/Disable:
-					echo action_icon( ( $enabled ? T_('Disable this widget!') : T_('Enable this widget!') ),
-							( $enabled ? 'deactivate' : 'activate' ),
-							regenerate_url( 'blog', 'action=toggle&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb('widget') ), NULL, NULL, NULL,
-							array( 'onclick' => 'return toggleWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => 'toggle_action' )
-						);
-			}
 					// Edit:
 					if( $mode != 'customizer' )
 					{	// Don't display on customizer mode:
@@ -1284,6 +1270,14 @@ function display_container( $WidgetContainer, $params = array() )
 							array( 'onclick' => 'return editWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
 						);
 					}
+
+					// Duplicate:
+					echo action_icon( T_('Duplicate'),
+							'copy',
+							regenerate_url( 'blog', 'action=duplicate&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
+							array( 'onclick' => 'return duplicateWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
+						);
+
 					// Remove:
 					echo action_icon( T_('Remove this widget!'),
 							'delete',
