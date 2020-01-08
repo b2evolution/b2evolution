@@ -1721,7 +1721,7 @@ var downloadInterval = setInterval( function()
 					.'var b2evo_widget_icon_up = \''.format_to_js( get_icon( 'designer_widget_up', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_up' ) ) ).'\';'
 					.'var b2evo_widget_icon_down = \''.format_to_js( get_icon( 'designer_widget_down', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_down' ) ) ).'\';'
 					.'var b2evo_widget_icon_bottom = \''.format_to_js( get_icon( 'designer_widget_bottom', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_order_bottom' ) ) ).'\';'
-					.'var b2evo_widget_icon_duplicate = \''.format_to_js( get_icon( 'copy', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_duplicate', 'title' => T_('Duplicate') ) ) ).'\';'
+					.'var b2evo_widget_icon_duplicate = \''.format_to_js( get_icon( 'duplicate', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_duplicate', 'title' => T_('Duplicate') ) ) ).'\';'
 					.'var b2evo_widget_icon_disable = \''.format_to_js( get_icon( 'minus', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_disable', 'title' => T_('Disable') ) ) ).'\';'
 					.'var b2evo_widget_icon_add = \''.format_to_js( get_icon( 'add', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_add', 'title' => T_('Add Widget to container') ) ) ).'\';'
 					.'var b2evo_widget_icon_list = \''.format_to_js( get_icon( 'designer_widget_list', 'imgtag', array( 'class' => 'evo_designer__action evo_designer__action_list', 'title' => T_('Manage Widgets of container') ) ) ).'\';'

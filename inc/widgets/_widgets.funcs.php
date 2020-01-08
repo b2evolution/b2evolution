@@ -1273,7 +1273,7 @@ function display_container( $WidgetContainer, $params = array() )
 
 					// Duplicate:
 					echo action_icon( T_('Duplicate'),
-							'copy',
+							'duplicate',
 							regenerate_url( 'blog', 'action=duplicate&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
 							array( 'onclick' => 'return duplicateWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
 						);

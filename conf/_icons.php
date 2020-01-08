@@ -421,6 +421,13 @@ function get_icon_info( $name )
 			'glyph' => 'share',
 			'fa' => 'copy'
 		);
+		case 'duplicate': return array(
+			'alt' => T_('Duplicate'),
+			'size' => array( 0, 0 ),
+			'xy' => array( 0, 0),
+			'glyph' => 'clone',
+			'fa' => 'clone'
+		);
 		case 'clipboard-copy': return array(
 			'alt'  => T_('Copy'),
 			'size' => array( 14, 15 ),
