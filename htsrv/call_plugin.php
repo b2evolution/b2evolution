@@ -87,6 +87,11 @@ if( $plugin_ID )
 		bad_request_die( 'htsrv method does not exist!' );
 	}
 
+	if( $Plugin->code == 'evo_sociallogin' && $method == 'request_login_credentials' )
+	{	// Instruct crawlers not to index:
+		header( 'X-Robots-Tag: noindex' );
+	}
+
 	// Call the method:
 	$Plugins->call_method( $Plugin->ID, 'htsrv_'.$method, $params );
 }
