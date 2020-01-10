@@ -152,7 +152,7 @@ class Skin extends DataObject
 
 
 	/**
-	 * Does this skin providesnormal (collection) skin functionality?
+	 * Does this skin provide normal (collection) skin functionality?
 	 */
 	function provides_collection_skin()
 	{

@@ -48,7 +48,7 @@ class bootstrap_site_tabs_Skin extends Skin
 
 
 	/**
-	 * Does this skin providesnormal (collection) skin functionality?
+	 * Does this skin provide normal (collection) skin functionality?
 	 */
 	function provides_collection_skin()
 	{
