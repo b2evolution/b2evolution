@@ -618,7 +618,8 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
 
 
 /**
- * Initialize global $blog variable to the requested collection
+ * Identify requested collection & initialize global $blog variable to the requested collection
+ * This is when we go through index.php (NOT through stub file).
  *
  * @param boolean $use_blog_param_first is used in _init_login.php --> fp>yb: WHY do we need that?
  * @param boolean try to identify a TinySlug before trying to identify a collection
@@ -627,9 +628,10 @@ function set_cache_enabled( $cache_key, $new_status, $coll_ID = NULL, $save_sett
  */
 function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true, $process_unknown_domain_as_tinyurl = true )
 {
-	global $blog, $ReqHost, $ReqPath, $baseurl, $pagenow; 
+	global $blog, $ReqHost, $sanitized_ReqPath, $baseurl, $pagenow; 
 	global $Settings;
 	global $Debuglog;
+	global $resolve_extra_path, $slug_extra_term;
 
 	if( !empty( $blog ) )
 	{	// $blog was already initialized (maybe through a stub file)
@@ -638,11 +640,8 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 	}
 
 	// Set some defaults in case we cannot get those from the URL:
-	global $resolve_extra_path, $path_elements, $last_char, $last_part, $slug_extra_term;
-	$last_char = '';
 	$last_part = '';
 	$slug_extra_term = '';
-	// TODO: we may need more and we may need to make them global
 
 
 	if( ! isset( $resolve_extra_path ) )
@@ -686,17 +685,11 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 		 * domain/first-part/.../.../.../last-part/
 		 * The FIRST and LAST part may have special meanings, so we need to extract them and STORE them for use in multiple places.
 		 */
-		$path_string = $ReqPath;
-
-		$Debuglog->add( 'Extra path info found! path_string='.$path_string , 'url_decode_part_1' );
-		// echo "path=[$path_string]<br />";
-
-		// Replace encoded ";" and ":" with regular chars (used for tags)
-		$path_string = preg_replace( '#[^a-zA-Z0-9./_\-:;\s]#', '', urldecode( $path_string ) );
-		$Debuglog->add( 'Cleaned up path_string to '.$path_string , 'url_decode_part_1' );
+		$Debuglog->add( 'Extra path info found! path_string='.$sanitized_ReqPath, 'url_decode_part_1' );
+		// echo "path=[$sanitized_ReqPath]<br />";
 
 		// Slice the path:
-		$path_elements = preg_split( '~/~', $path_string, 20, PREG_SPLIT_NO_EMPTY );
+		$path_elements = preg_split( '~/~', $sanitized_ReqPath, 20, PREG_SPLIT_NO_EMPTY );
 		// pre_dump( '', $path_elements, $pagenow );
 
 		// PREVENT index.php or blog1.php etc from being considered as a slug later on.
@@ -709,8 +702,6 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 		// Do we still have extra path info to decode?
 		if( count( $path_elements ) )
 		{
-			// Does the pathinfo end with a / or a ; ?
-			$last_char = substr( $path_string, -1 );
 
 			// this is the LAST path element!
 			$last_part = $path_elements[count( $path_elements )-1];
@@ -759,9 +750,9 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 	// fp>yb: What is this for? Make protocol lowercase?
 	$baseurl_regex = preg_replace( '/^https?(.*)/i', 'https?$1', preg_quote( $baseurl ));
 
-	if( preg_match( '#^'.$baseurl_regex.'(index.php/)?([^/]+)#', $ReqHost.$ReqPath, $matches ) )
+	if( preg_match( '#^'.$baseurl_regex.'(index.php/)?([^/]+)#', $ReqHost.$sanitized_ReqPath, $matches ) )
 	{ // We have an URL that is of the form `http://domain.com/slug` or `http://domain.com/index.php/slug` (NOTE: may still contain `slug.php`)
-		$Debuglog->add( 'Found a potential URL collection name: '.$matches[2].' (in: '.$ReqHost.$ReqPath.')', 'url_decode_part_1' );
+		$Debuglog->add( 'Found a potential URL collection name: '.$matches[2].' (in: '.$ReqHost.$sanitized_ReqPath.')', 'url_decode_part_1' );
 		if( strpos( $matches[2], '.' ) !== false )
 		{	// There is an extension (like .php) in the collection name, ignore...
 			$Debuglog->add( 'Ignoring because it contains a dot.', 'url_decode_part_1' );
@@ -770,7 +761,6 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 		{ // We found a matching Collection by collection Slug:
 			$blog = $Blog->ID;
 			$Debuglog->add( 'Found matching collection: '.$blog, 'url_decode_part_1' );
-// fp>TODO: isolate remaining extra path for later
 			return true;
 		}
 		else
@@ -782,13 +772,13 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 
 	// No collection identified by URL name, let's try to match the absolute URL: 
 	// Remove optional index.php:
-	if( preg_match( '#^(.+?)index.php#', $ReqHost.$ReqPath, $matches ) )
+	if( preg_match( '#^(.+?)index.php#', $ReqHost.$sanitized_ReqPath, $matches ) )
 	{ // Remove everything starting at `index.php...`:
 		$ReqAbsUrl = $matches[1];
 	}
 	else
 	{	// Match on the whole URL (we'll try to find the base URL at the beginning)
-		$ReqAbsUrl = $ReqHost.$ReqPath;
+		$ReqAbsUrl = $ReqHost.$sanitized_ReqPath;
 	}
 
 	$Debuglog->add( 'Trying to identify collection by looking up Absolute url: '.$ReqAbsUrl, 'url_decode_part_1' );
@@ -797,7 +787,6 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 	{ // We found a matching collection:
 		$blog = $Blog->ID;
 		$Debuglog->add( 'Found matching collection: '.$blog, 'url_decode_part_1' );
-// fp>TODO: isolate remaining extra path for later
 		return true;
 	}
 
@@ -820,8 +809,7 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 		}
 		else
 		{
-// fp> DO we really want to redirect here (in case there is extra path?)
-// fp>TODO: isolate remaining extra path for later
+// fp> DO we really want to redirect immediately here (in case there is extra path?)
 			$redirect_to = url_same_protocol( url_add_tail( $Blog->gen_blogurl(), $tail_Path ), $ReqAbsUrl );
 		}
 		header_redirect( $redirect_to, 301 );
@@ -835,12 +823,11 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 
 	if( !empty($blog) )
 	{ // a specific collection has been requested in the URL:
-// fp>TODO: verify that extra path is correct for later
 		return true;
 	}
 
 
-	// Verify if the default collection uses the current domain as baseurl:
+	// Check if the default collection uses the current domain as baseurl:
 	// (because we do NOT want to process as tinyURL in that case, that would prevent loading pages like http://domain.com/about )
 	$default_blog_ID = $Settings->get( 'default_blog_ID' );
 	$default_Collection = & $BlogCache->get_by_ID( $default_blog_ID, false, false );
@@ -853,7 +840,6 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 			$Debuglog->add( 'Match! We will consider that we are requesting a page of the default collection: '.$default_blog_ID, 'url_decode_part_1' );
 			$blog = $default_blog_ID;
 			$Collection = $default_Collection;
-// fp>TODO: verify that extra path is correct for later
 			return true;
 		}
 	}
@@ -885,7 +871,6 @@ function init_requested_coll_or_process_tinyurl( $process_tinyslug_first = true,
 		$blog = $default_blog_ID;
 		$Collection = $default_Collection;
 		$Debuglog->add( 'Falling back to default collection: '.$blog, 'url_decode_part_1' );
-// fp>TODO: verify that extra path is correct for later
 		return true;
 	}
 

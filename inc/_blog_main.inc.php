@@ -218,13 +218,13 @@ if( init_charsets( $current_charset ) )
 if( ! isset( $resolve_extra_path ) ) { $resolve_extra_path = true; }
 if( $resolve_extra_path )
 {
-// fp> TODO: the following is kinda ok but to realy work in all cases (like baseurl/a/ when coll url is baseurl/index.php/a/), we need to get the extra path rigth after identifying the collection
+// fp> TODO: the following is kinda ok but to really work in all cases (like baseurl/a/ when coll url is baseurl/index.php/a/), we need to get the extra path right after identifying the collection
 
 	// Check and Remove blog base URI from ReqPath:
 	// BaseURI is the part after the domain name and it will always end with / :
 	$coll_baseuri = substr( $Blog->gen_baseurl(), strlen( $Blog->get_baseurl_root() ) );
 	$Debuglog->add( 'Collection base URI: "'.$coll_baseuri.'"', 'url_decode_part_2' );
-	if( $coll_baseuri_matched_in_url = preg_match( '~(^'.preg_quote( $coll_baseuri, '~' ).'|\.php[0-9]*/)(.*)$|\.php[0-9]*$~', $ReqPath, $matches ) )
+	if( $coll_baseuri_matched_in_url = preg_match( '~(^'.preg_quote( $coll_baseuri, '~' ).'|\.php[0-9]*/)(.*)$|\.php[0-9]*$~', $sanitized_ReqPath, $matches ) )
 	{  // Either the ReqPath starts with collection base URI (always including trailing slash) followed by some extra path info.
 	   // - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases) followed by some extra path info.
 		if( !empty($matches[2]) )
@@ -232,32 +232,61 @@ if( $resolve_extra_path )
 			$Debuglog->add( 'Collection base URI found, with extra path', 'url_decode_part_2' );
 			$path_elements = preg_split( '~/~', $matches[2], 20, PREG_SPLIT_NO_EMPTY );
 			// pre_dump( '', $path_elements );
+			$last_part = $path_elements[count( $path_elements )-1];
 		}
 		else
 		{
 			$Debuglog->add( 'Collection base URI found, but no extra path', 'url_decode_part_2' );
 			$path_elements = array();
+			$last_part = '';
 		}
 	}
 	elseif( $Settings->get( 'always_match_slug' )  // do we (no matter what) want to redirect to correct Collection if an Item Slug was found in <b>any</b> URL?
-		 && strlen($ReqPath) > strlen($basesubpath) 
-		 && $last_part != $Blog->stub  // Ignore stub file (if it ends with .php it should already have been filtered out above
-		 && $last_part !=  $Blog->urlname )
+		 && strlen($sanitized_ReqPath) > strlen($basesubpath) 
+		)
 	{
-		$Debuglog->add( 'Collection base URI not found, but we want to always match slug, which is: "'.$last_part.'"', 'url_decode_part_2' );
-		$path_elements = array( $last_part );
+		$Debuglog->add( 'Collection base URI not found, but we want to always match slug...', 'url_decode_part_2' );
+		// Find last part "/possible-slug" (possible slug):
+		if( preg_match( '~/([a-zA-Z0-9._\-:;]+)/?$~', $sanitized_ReqPath, $matches ) )
+		{
+			$last_part = $matches[1];
+			if ( $last_part != $Blog->stub  // Ignore stub file (if it ends with .php it should already have been filtered out above
+				 && $last_part !=  $Blog->urlname )
+			{	// e-g: http://localhost/x/y/image-post instead of http://localhost/x/y/index.php/a/image-post
+				// e-g: http://localhost/x/y/music/ instead of http://localhost/x/y/index.php/a/fun/in-real-life/music/
+				$Debuglog->add( 'Possible slug: "'.$last_part.'"', 'url_decode_part_2' );
+				$path_elements = array( $last_part );
+			}
+			else
+			{
+				$Debuglog->add( 'Possible slug: "'.$last_part.'" but it is likely the blog ID, so not trying to match a slug', 'url_decode_part_2' );
+				$path_elements = array();
+				$last_part = '';
+			}
+		}
+		else
+		{
+			$Debuglog->add( 'no possible slug found', 'url_decode_part_2' );
+			$path_elements = array();
+			$last_part = '';
+		}
 	}
 	else
 	{
 		$Debuglog->add( 'Collection base URI not found, nothing else to do', 'url_decode_part_2' );
 		$path_elements = array();
+		$last_part = '';
 	}
 
-// TODO: $path_elements no longer needs to be global
 
 	// Do we have extra path info to decode?
 	if( count($path_elements) )
 	{
+
+
+		// Does the pathinfo end with a / or a ; ?
+		$last_char = substr( $sanitized_ReqPath, -1 );
+
 		// TAG? Is this a tag ("prefix-only" mode)?
 		if( $Blog->get_setting('tag_links') == 'prefix-only'
 			&& count($path_elements) == 2
