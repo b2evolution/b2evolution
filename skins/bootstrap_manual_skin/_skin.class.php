@@ -250,8 +250,8 @@ class bootstrap_manual_Skin extends Skin
 							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
 							array( 'sidebar',  sprintf( T_('"%s" container'), NT_('Sidebar') ),   0 ),
 							array( 'sidebar2', sprintf( T_('"%s" container'), NT_('Sidebar 2') ), 0 ),
-							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
-						),
+							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ),
+						) ),
 				'section_access_end' => array(
 					'layout' => 'end_fieldset',
 				),
