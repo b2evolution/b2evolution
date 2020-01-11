@@ -46,10 +46,16 @@ class coll_title_Widget extends ComponentWidget
 	{
 		$r = array_merge( array(
 				'add_title_link' => array(
-					'label' => T_('Add link in title'),
-					'note' => T_('check to add a link in the title.'),
-					'type' => 'checkbox',
-					'defaultvalue' => true,
+					'label' => T_('Add link'),
+					'note' => T_('Choose when do you want the title to include a link to the page.'),
+					'type' => 'radio',
+					'defaultvalue' => 'auto',
+						'options' => array(
+								array( 'auto', T_('Automatically (only when not already on the collection frontpage)') ),
+								array( 'always', T_('Always') ),
+								array( 'never', T_('Never') ) ),
+						'defaultvalue' => 'auto',
+						'field_lines' => true,
 				),
 				'add_tagline' => array(
 					'label' => T_('Add tagline'),
@@ -121,7 +127,10 @@ class coll_title_Widget extends ComponentWidget
 
 		$title = $Blog->dget( 'name', 'htmlbody' );
 		
-		if( $this->disp_params['add_title_link'] )
+		// Check whether the title should have a link or not
+		$linked_title = $this->disp_params['add_title_link'];
+		
+		if( $linked_title == 'always' || ($linked_title == 'auto' && $disp != 'front') )
 		{ // Add a link to the collection in the title
 			$title = '<a href="'.$Blog->get( 'url' ).'">' .$title .'</a>';
 		}
