@@ -713,7 +713,11 @@ class MarkdownImport extends AbstractImport
 			$item_content = trim( file_get_contents( $file_path ) );
 			$this->item_file_content = $item_content;
 			$item_content_hash = md5( $item_content );
-			if( preg_match( '~^(---[\r\n]+(.+?)[\r\n]+---[\r\n]*)?(#+\s*(.+?)\s*#*\s*([\r\n]+|$))?(.*)$~s', $item_content, $content_match ) )
+			$content_regexp = '~^(---[\r\n]+(.+?)[\r\n]+---[\r\n]*)?' // YAML data
+			  .'(!\[.*?\]\(.+?\)(\{.+?\})?(\r?\n\*.+?\*)?[\r\n]*)?'   // Teaser image
+			  .'(#+\s*(.+?)\s*#*\s*([\r\n]+|$))?'                     // First header is used as Item Title
+			  .'(.*)$~s';                                             // Item content
+			if( preg_match( $content_regexp, $item_content, $content_match ) )
 			{
 				$item_yaml_data = trim( $content_match[2] );
 				if( ! empty( $this->yaml_fields ) && ! empty( $item_yaml_data ) )
@@ -724,12 +728,12 @@ class MarkdownImport extends AbstractImport
 				{	// Don't parse when no supported YAML fields or no provided YAML data:
 					$item_yaml_data = NULL;
 				}
-				$item_title = empty( $content_match[4] )
+				$item_title = empty( $content_match[7] )
 					// Use yaml short title or item slug as title when title in content is not defined:
 					? ( empty( $item_yaml_data['short-title'] ) ? $item_slug : $item_yaml_data['short-title'] )
 					// Use title from content:
-					: $content_match[4];
-				$item_content = $content_match[6];
+					: $content_match[7];
+				$item_content = $content_match[3].$content_match[9];
 			}
 			else
 			{
