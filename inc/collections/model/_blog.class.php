@@ -5052,11 +5052,13 @@ class Blog extends DataObject
 
 			// Check all main containers and create insert rows for those which are not saved yet,
 			$update_widget_containers_sql_rows = array();
+			$new_widget_containers = array();
 			foreach( $skin_containers as $wico_code => $wico_data )
 			{
 				if( ! isset( $coll_containers_skin_types[ $skin_type ][ $wico_code ] ) )
 				{	// Create only those containers which are not saved yet:
 					$update_widget_containers_sql_rows[] = '( '.$DB->quote( $wico_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $wico_data[0] ).', '.$this->ID.', '.$DB->quote( $wico_data[1] ).', 1 )';
+					$new_widget_containers[] = $wico_code;
 				}
 				else
 				{	// Check if we should update some container data:
@@ -5109,6 +5111,14 @@ class Blog extends DataObject
 				$created_containers_num += $DB->query( 'REPLACE INTO T_widget__container( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES'
 						.implode( ', ', $update_widget_containers_sql_rows ),
 					'Insert new widget containers for collection #'.$this->ID );
+			}
+
+			if( ! empty( $new_widget_containers ) )
+			{	// Install default widgets:
+				foreach( $new_widget_containers as $new_widget_container_code )
+				{
+					install_new_default_widgets( $new_widget_container_code );
+				}
 			}
 
 			if( ! empty( $delete_widget_containers ) )

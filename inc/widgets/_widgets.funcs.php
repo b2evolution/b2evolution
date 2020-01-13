@@ -755,6 +755,239 @@ function get_default_widgets_by_container( $container_code, $kind = '', $blog_id
 	return isset( $default_widgets[ $container_code ] ) ? $default_widgets[ $container_code ] : false;
 }
 
+/**
+ * Install new default widgets
+ *
+ * @param string Container code
+ * @param string Widget codes, separated by comma
+ */
+function install_new_default_widgets( $new_container_code, $new_widget_codes = '*' )
+{
+	global $DB, $Settings;
+
+	if( function_exists( 'upg_init_environment' ) )
+	{	// We're going to need some environment in order to init item type cache and create item:
+		upg_init_environment();
+	}
+
+	// Get config of default widgets for the requested container:
+	$container_widgets = get_default_widgets_by_container( $new_container_code );
+
+	// Install new default widgets only for normal skin:
+	$skin_type = 'normal';
+
+	// Get container type:
+	$container_type = isset( $container_widgets['type'] ) ? $container_widgets['type'] : 'main';
+
+	$new_widgets_insert_sql_rows = array();
+	switch( $container_type )
+	{
+		case 'main':
+		case 'sub':
+		case 'page':
+			// Install widgets for collection/skin container:
+			$BlogCache = & get_BlogCache();
+			$BlogCache->load_all();
+
+			if( empty( $BlogCache->cache ) )
+			{	// No collections in DB:
+				break;
+			}
+
+			foreach( $BlogCache->cache as $widget_Blog )
+			{
+				// Get all containers declared in the given blog's skins
+				$coll_containers = $widget_Blog->get_main_containers( $skin_type, true );
+
+				// Get again config of default widgets for the requested container because several settings depend on collection type/kind:
+				$container_widgets = get_default_widgets_by_container( $new_container_code, $widget_Blog->get( 'type' ) );
+
+				if( isset( $container_widgets['coll_type'] ) &&
+				    ! is_allowed_option( $widget_Blog->get( 'type' ), $container_widgets['coll_type'] ) )
+				{	// Skip container because it should not be installed for the given collection kind:
+					continue;
+				}
+
+				if( ! isset( $coll_containers[ $new_container_code ] ) &&
+				    ( $container_type == 'sub' || $container_type == 'page' ) )
+				{	// Initialize sub-container and page containers data in order to install it below:
+					$coll_containers[ $new_container_code ] = array(
+							isset( $container_widgets['name'] ) ? $container_widgets['name'] : $new_container_code,
+							isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
+						);
+				}
+
+				if( $container_widgets !== false )
+				{	// If the requested container has at least one widget:
+					if( ! isset( $coll_containers[ $new_container_code ] ) )
+					{	// Skip container which is not supported by current collection's skin:
+						continue;
+					}
+
+					$coll_container = $coll_containers[ $new_container_code ];
+
+					if( ! isset( $coll_container['ID'] ) )
+					{	// Create new container if it is not installed yet:
+						if( ! isset( $coll_container[0] ) || ! isset( $coll_container[1] ) )
+						{	// We cannot create a container without name and order, Skip it:
+							continue;
+						}
+						// Insert new widget container into DB:
+						$new_container_fields = array(
+							'wico_code'      => $new_container_code,
+							'wico_skin_type' => $skin_type,
+							'wico_name'      => $coll_container[0],
+							'wico_coll_ID'   => $widget_Blog->ID,
+							'wico_order'     => $coll_container[1],
+							'wico_main'      => $container_type == 'sub' ? 0 : 1,
+						);
+						if( $container_type == 'page' && isset( $container_widgets['item_ID'] ) )
+						{	// Page container has an additional field for Item:
+							$new_container_fields['wico_item_ID'] = $container_widgets['item_ID'];
+						}
+						$DB->query( 'INSERT INTO T_widget__container ( '.implode( ', ', array_keys( $new_container_fields ) ).' )
+								VALUES ( '.$DB->quote( $new_container_fields ).' )' );
+						// Update ID of new inserted widget container:
+						$coll_container['ID'] = $DB->insert_id;
+						// Also update ID in collection cache for next calls:
+						$widget_Blog->widget_containers[ $skin_type ][ $new_container_code ]['ID'] = $coll_container['ID'];
+					}
+					elseif( ! isset( $widget_orders_in_containers ) )
+					{	// For existing containers we should get all widget orders in order to avoid duplicate error on insert new widgets:
+						$SQL = new SQL( 'Get widget orders in container #'.$coll_container['ID'].' of collection #'.$widget_Blog->ID );
+						$SQL->SELECT( 'wi_wico_ID, GROUP_CONCAT( wi_order )' );
+						$SQL->FROM( 'T_widget__widget' );
+						$SQL->GROUP_BY( 'wi_wico_ID' );
+						$SQL->ORDER_BY( 'wi_wico_ID, wi_order' );
+						$widget_orders_in_containers = $DB->get_assoc( $SQL );
+						foreach( $widget_orders_in_containers as $order_wico_ID => $widget_orders_in_container )
+						{
+							$widget_orders_in_containers[ $order_wico_ID ] = explode( ',', $widget_orders_in_container );
+						}
+					}
+
+					// Create array to cache widget orders per container:
+					if( ! isset( $widget_orders_in_containers ) )
+					{
+						$widget_orders_in_containers = array();
+					}
+					if( ! isset( $widget_orders_in_containers[ $coll_container['ID'] ] ) )
+					{
+						$widget_orders_in_containers[ $coll_container['ID'] ] = array();
+					}
+
+					foreach( $container_widgets as $key => $widget )
+					{
+						if( ! is_number( $key ) )
+						{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+							continue;
+						}
+
+						if( ! is_allowed_option( $widget[1], $new_widget_codes ) )
+						{	// Skip not requested widget:
+							continue;
+						}
+
+						if( isset( $widget['install'] ) && ! $widget['install'] )
+						{	// Skip widget because it should not be installed by condition from config:
+							continue;
+						}
+
+						if( isset( $widget['coll_type'] ) && ! is_allowed_option( $widget_Blog->get( 'type' ), $widget['coll_type'] ) )
+						{	// Skip widget because it should not be installed for the given collection kind:
+							continue;
+						}
+
+						// Initialize a widget row to insert into DB below by single query:
+						$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
+						$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
+						$widget_enabled = isset( $widget['enabled'] ) ? intval( $widget['enabled'] ) : 1;
+						// Fix a widget order to avoid mysql error of duplicated rows with same order per container:
+						$widget_order = intval( $widget[0] );
+						while( in_array( $widget_order, $widget_orders_in_containers[ $coll_container['ID'] ] ) )
+						{	// Search next free order inside the container:
+							$widget_order++;
+						}
+						if( $widget_order != $widget[0] )
+						{	// Update widget order in cache:
+							$widget_orders_in_containers[ $coll_container['ID'] ][] = $widget_order;
+						}
+						// A row with new widget values:
+						$new_widgets_insert_sql_rows[] = '( '.$coll_container['ID'].', '.$widget_order.', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[1] ).', '.$DB->quote( $widget_params ).' )';
+					}
+				}
+			}
+			break;
+
+		case 'shared':
+		case 'shared-sub':
+			// Install widgets for shared container:
+			global $cache_installed_shared_containers, $cache_installed_shared_container_order;
+			if( ! isset( $cache_installed_shared_containers ) )
+			{	// Load all shared containers in cache global array once:
+				$shared_containers_SQL = new SQL( 'Get all shared widget containers' );
+				$shared_containers_SQL->SELECT( 'wico_code, wico_ID' );
+				$shared_containers_SQL->FROM( 'T_widget__container' );
+				$shared_containers_SQL->WHERE( 'wico_coll_ID IS NULL' );
+				$shared_containers_SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $skin_type ) );
+				$cache_installed_shared_containers = $DB->get_assoc( $shared_containers_SQL );
+				// Get max order of the shared widget containers:
+				$max_order_SQL = new SQL( 'Get max order of the shared widget containers' );
+				$max_order_SQL->SELECT( 'wico_order' );
+				$max_order_SQL->FROM( 'T_widget__container' );
+				$max_order_SQL->WHERE( 'wico_coll_ID IS NULL' );
+				$max_order_SQL->ORDER_BY( 'wico_order DESC' );
+				$max_order_SQL->LIMIT( '1' );
+				$cache_installed_shared_container_order = intval( $DB->get_var( $max_order_SQL ) );
+			}
+
+			if( isset( $container_widgets['name'] ) )
+			{	// Handle special array item with container data:
+				if( ! isset( $cache_installed_shared_containers[ $new_container_code ] ) )
+				{	// Insert new shared container:
+					$insert_result = $DB->query( 'INSERT INTO T_widget__container( wico_code, wico_skin_type, wico_name, wico_coll_ID, wico_order, wico_main ) VALUES '
+						.'( '.$DB->quote( $new_container_code ).', '.$DB->quote( $skin_type ).', '.$DB->quote( $container_widgets['name'] ).', '.'NULL, '.( ++$cache_installed_shared_container_order ).', '.$DB->quote( $container_type == 'shared' ? 1 : 0 ).' )',
+						'Insert default shared widget container' );
+					if( $insert_result && $DB->insert_id > 0 )
+					{
+						$cache_installed_shared_containers[ $new_container_code ] = $DB->insert_id;
+					}
+				}
+			}
+
+			if( ! isset( $cache_installed_shared_containers[ $new_container_code ] ) )
+			{	// Skip container which is not installed as shared:
+				break;
+			}
+
+			foreach( $container_widgets as $key => $widget )
+			{
+				if( ! is_number( $key ) )
+				{	// Skip the config data which is used as additional info for container like 'type', 'name', 'order', 'item_ID', 'coll_type':
+					continue;
+				}
+
+				if( isset( $widget['install'] ) && ! $widget['install'] )
+				{	// Skip widget because it should not be installed by condition from config:
+					continue;
+				}
+
+				// Initialize a widget row to insert into DB below by single query:
+				$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
+				$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
+				$widget_enabled = isset( $widget['enabled'] ) ? intval( $widget['enabled'] ) : 1;
+				$new_widgets_insert_sql_rows[] = '( '.$cache_installed_shared_containers[ $new_container_code ].', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[1] ).', '.$DB->quote( $widget_params ).' )';
+			}
+			break;
+	}
+
+	if( ! empty( $new_widgets_insert_sql_rows ) )
+	{	// Insert the widget rows by single SQL query:
+		$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params )
+			VALUES '.implode( ', ', $new_widgets_insert_sql_rows ) );
+	}
+}
+
 
 /**
  * Insert the basic widgets for a collection
@@ -1060,6 +1293,11 @@ function display_container( $WidgetContainer, $params = array() )
 			'group_item_id' => NULL,
 		), $params );
 
+	if( $mode != 'customizer' )
+	{	// Use simple icons instead of buttons on back-office:
+		$params['global_icons_class'] = '';
+	}
+
 	$Table = new Table( $params['table_layout'] );
 
 	// Table ID - fp> needs to be handled cleanly by Table object
@@ -1085,7 +1323,7 @@ function display_container( $WidgetContainer, $params = array() )
 	if( $WidgetContainer->get_type() != 'main' )
 	{	// Allow to destroy sub-container when it is not included into the selected skin:
 		$destroy_btn_title = ( $WidgetContainer->main ? T_('Destroy container') : T_('Destroy sub-container') );
-		$Table->global_icon( $destroy_btn_title, 'delete', $destroy_container_url, $destroy_btn_title, $mode == 'customizer' ? 0 : 3, $mode == 'customizer' ? 0 : 4, array( 'onclick' => 'return confirm( \''.TS_('Are you sure you want to destroy this container?').'\' )') );
+		$Table->global_icon( $destroy_btn_title, 'delete', $destroy_container_url, '', 0, 0, array( 'onclick' => 'return confirm( \''.TS_('Are you sure you want to destroy this container?').'\' )') );
 	}
 
 	$widget_container_name = T_( $WidgetContainer->get( 'name' ) );
@@ -1122,7 +1360,14 @@ function display_container( $WidgetContainer, $params = array() )
 			.'<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span> '
 			.'<span class="dimmed">'.$WidgetContainer->get( 'code' ).'</span>';
 
-		$add_widget_link_params = array( 'class' => 'action_icon btn-primary' );
+		if( get_default_widgets_by_container( $WidgetContainer->get( 'code' ) ) !== false )
+		{	// Action icon to remove all widgets and replace with default widgets of the container from config:
+			$Table->global_icon( T_('Reload container widgets'), 'reload',
+				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;skin_type='.get_param( 'skin_type' ).'&amp;'.url_crumb( 'widget_container' ),
+				'', 0, 0, array( 'onclick' => 'return confirm( \''.TS_('Do you want to reload the default widgets for this container?').'\n'.TS_('THIS CANNOT BE UNDONE!').'\n'.TS_('YOU MAY LOSE SOME CUSTOMIZATIONS!').'\' )' ) );
+		}
+
+		$add_widget_link_params = array();
 		if( $mode == 'customizer' )
 		{	// Set special url to add new widget on customizer mode:
 			$add_widget_url = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container='.urlencode( $WidgetContainer->get( 'name' ) ).'&container_code='.urlencode( $WidgetContainer->get( 'code' ) ).'&mode=customizer';
@@ -1132,7 +1377,7 @@ function display_container( $WidgetContainer, $params = array() )
 			// because in customizer mode we should open this as simple link in the same left customizer panel:
 			$add_widget_link_params['id'] = 'add_new_'.$widget_container_id;
 		}
-		$Table->global_icon( T_('Add a widget...'), 'new', $add_widget_url, /* TRANS: ling used to add a new widget */ T_('Add widget').' &raquo;', 3, 4, $add_widget_link_params );
+		$Table->global_icon( T_('Add a widget...'), 'new', $add_widget_url, '', 0, 0, $add_widget_link_params );
 	}
 
 	if( $params['table_layout'] == 'accordion_table' )

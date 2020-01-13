@@ -89,6 +89,7 @@ switch( $action )
 	case 'edit_container':
 	case 'create_container':
 	case 'update_container':
+	case 'reload_container':
 	case 'activate':
 	case 'deactivate':
 		// Do nothing
@@ -772,6 +773,33 @@ switch( $action )
 			$redirect_to = $admin_url.'?ctrl=widgets&blog='.$blog;
 		}
 		header_redirect( $redirect_to, 303 );
+		break;
+
+	case 'reload_container':
+		// Reload widget container:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'widget_container' );
+
+		// Get the existing widget container:
+		$WidgetContainerCache = & get_WidgetContainerCache();
+		$edited_WidgetContainer = & $WidgetContainerCache->get_by_ID( $wico_ID );
+
+		if( get_default_widgets_by_container( $edited_WidgetContainer->get( 'code' ) ) == false )
+		{	// Display error when container is not found 
+			// Do NOT translate because it must not happen in normal work:
+			$Messages->add( sprintf( '%s cannot be reloaded because it is not configured for default widgets.', $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"' ), 'error' );
+		}
+		else
+		{	// Reload widgets:
+			$DB->query( 'DELETE FROM T_widget__widget
+				WHERE wi_wico_ID = '.$edited_WidgetContainer->ID );
+			install_new_default_widgets( $edited_WidgetContainer->get( 'code' ) );
+			$Messages->add( sprintf( T_('%s has been reloaded.'), $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"' ), 'success' );
+		}
+
+		// Redirect back to back-office widgets list:
+		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' ), 303 );
 		break;
 
 	default:
