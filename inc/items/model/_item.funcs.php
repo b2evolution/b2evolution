@@ -3239,6 +3239,7 @@ function echo_autocomplete_tags( $params = array() )
 	$params = array_merge( array(
 			'item_ID'        => NULL,
 			'update_by_ajax' => false,
+			'use_quick_tags' => false,
 		), $params );
 ?>
 	<script>
@@ -3251,7 +3252,7 @@ function echo_autocomplete_tags( $params = array() )
 			tags = tags.split( ',' );
 			for( var t in tags )
 			{
-				tags_json.push( { id: tags[t], name: tags[t] } );
+				tags_json.push( { id: tags[t].trim(), name: tags[t].trim() } );
 			}
 		}
 
@@ -3268,15 +3269,46 @@ function echo_autocomplete_tags( $params = array() )
 			searchingText: '<?php echo TS_('Searching...') ?>',
 			jsonContainer: 'tags',
 			<?php if( $params['update_by_ajax'] ) { ?>
-			onAdd: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
-			onDelete: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
+			onAdd: function( obj ) { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector, obj, 'add' ) },
+			onDelete: function( obj ) { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector, obj, 'delete' ) },
 			<?php } ?>
 		} );
 	}
 
 	<?php if( $params['update_by_ajax'] ) { ?>
-	function evo_update_item_tags_by_ajax( item_ID, tags_selector )
+	function evo_update_item_tags_by_ajax( item_ID, tags_selector, tag_object, operation )
 	{
+		<?php if( $params['use_quick_tags'] ) { ?>
+		// Update quick tags:
+		if( operation == 'add' )
+		{
+			var item_tag = tag_object.name.trim();
+			var quick_item_tags = jQuery.cookie( 'quick_item_tags' );
+			if( quick_item_tags.length == 0 )
+			{
+				quick_item_tags = [];
+			}
+			else
+			{
+				quick_item_tags = quick_item_tags.split( ',' );
+			}
+			var tag_index = quick_item_tags.indexOf( item_tag );
+
+			if( tag_index === -1 )
+			{
+				quick_item_tags.push( item_tag );
+			}
+			else
+			{
+				quick_item_tags.splice( tag_index, 1 );
+				quick_item_tags.push( item_tag );
+			}
+
+			quick_item_tags = quick_item_tags.splice( -5 );
+			jQuery.cookie( 'quick_item_tags', quick_item_tags.join( ',' ) );
+		}
+
+		<?php } ?>
 		// Mark input background with yellow color during AJAX updating:
 		var token_input = jQuery( '.token-input-' + tags_selector.substr( 1 ) );
 		token_input.removeClass( 'token-input-list-error' ).addClass( 'token-input-list-process' );

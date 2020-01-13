@@ -129,6 +129,8 @@ class item_tags_Widget extends ComponentWidget
 		if( ! empty( $Item ) && $this->get_param( 'allow_edit' ) && is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{	// Load JS to edit tags if it is enabled by widget setting and current User has a permission to edit them:
 			init_tokeninput_js( 'blog' );
+			require_js( '#jquery#' );
+			require_js( 'jquery/jquery.cookie.min.js' );
 		}
 	}
 
@@ -197,6 +199,25 @@ class item_tags_Widget extends ComponentWidget
 
 		if( $this->get_param( 'allow_edit' ) && $Item->can_be_edited() )
 		{	// Allow to edit tags if it is enabled by widget setting and current User has a permission to edit them:
+
+			if( isset( $_COOKIE['quick_item_tags'] ) )
+			{
+				$quick_item_tags = explode( ',', $_COOKIE['quick_item_tags'] );
+			}
+			else
+			{
+				$quick_item_tags = array();
+			}
+
+			$quick_tag_buttons = '<div class="evo_widget_item_tags_quick_tags btn-group">';
+
+			foreach( $quick_item_tags as $item_tag )
+			{
+				$quick_tag_buttons .= '<button type="button" class="btn btn-default btn-xs" onclick="add_quick_tag( this )">'.format_to_output( $item_tag ).'</button>';
+			}
+
+			$quick_tag_buttons .= '</div>';
+
 			echo '<span id="evo_widget_item_tags_edit_form_'.$this->ID.'" style="display:none">';
 			echo $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' );
 			$Form = new Form();
@@ -204,10 +225,12 @@ class item_tags_Widget extends ComponentWidget
 			$Form->begin_form();
 			$Form->add_crumb( 'collections_update_tags' );
 			$Form->text_input( 'item_tags', implode( ', ', $Item->get_tags() ), 40, '' );
+			echo $quick_tag_buttons;
 			$Form->end_form();
 			echo_autocomplete_tags( array(
 					'item_ID'        => $Item->ID,
 					'update_by_ajax' => true,
+					'use_quick_tags' => true,
 				) );
 			echo $this->disp_params['widget_item_tags_after'];
 			echo '</span>';
@@ -220,9 +243,16 @@ class item_tags_Widget extends ComponentWidget
 				.'</span>'
 				// JS to activate an edit tags form:
 				.'<script>
+				function add_quick_tag( obj )
+				{
+					var item_tag = jQuery( obj ).text();
+					jQuery( "#item_tags" ).tokenInput( "add", { id: item_tag, name: item_tag } );
+				}
+
 				jQuery( "#evo_widget_item_tags_edit_icon_'.$this->ID.'" ).click( function()
 				{
 					jQuery( "#evo_widget_item_tags_edit_form_'.$this->ID.'" ).show();
+					jQuery( "#evo_widget_item_tags_edit_form_'.$this->ID.' input" ).focus();
 					jQuery( "#evo_widget_item_tags_list_'.$this->ID.'" ).hide();
 					return false;
 				} );
