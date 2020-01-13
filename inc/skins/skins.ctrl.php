@@ -117,24 +117,32 @@ switch( $action )
 			if( ! skin_check_compatibility( $edited_Skin->ID, 'site' ) )
 			{	// Redirect to admin skins page selector if the skin cannot be selected:
 				$Messages->add( T_('This skin cannot be used as a site skin.'), 'error' );
-				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skinpage=selection&skin_type='.$edited_Skin->type );
+				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skinpage=selection'.( !empty( $skin_type ) ? '&skin_type='.$skin_type : '' ) );
 				break;
 			}
 
-			$Settings->set( $edited_Skin->type.'_skin_ID', $edited_Skin->ID );
-			$Settings->dbupdate();
-
-			$Messages->add( T_('The site skin has been changed.')
-								.' <a href="'.$admin_url.'?ctrl=collections&amp;tab=site_skin">'.T_('Edit...').'</a>', 'success' );
-			if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && $edited_Skin->type == 'normal' ) ||
-					( $Session->is_mobile_session() && $edited_Skin->type == 'mobile' ) ||
-					( $Session->is_tablet_session() && $edited_Skin->type == 'tablet' ) )
-			{	// Redirect to home page if we change the skin for current device type:
-				header_redirect( $baseurl );
+			if( ! empty( $skin_type ) )
+			{
+				$Settings->set( $skin_type.'_skin_ID', $edited_Skin->ID );
+				if( $Settings->dbupdate() )
+				{
+					$Messages->add( T_('The site skin has been changed.')
+										.' <a href="'.$admin_url.'?ctrl=collections&amp;tab=site_skin">'.T_('Edit...').'</a>', 'success' );
+					if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && $skin_type == 'normal' ) ||
+							( $Session->is_mobile_session() && $skin_type == 'mobile' ) ||
+							( $Session->is_tablet_session() && $skin_type == 'tablet' ) )
+					{	// Redirect to home page if we change the skin for current device type:
+						header_redirect( $baseurl );
+					}
+					else
+					{	// Redirect to admin skins page if we change the skin for another device type:
+						header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skin_type='.$skin_type );
+					}
+				}
 			}
 			else
-			{	// Redirect to admin skins page if we change the skin for another device type:
-				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin' );
+			{	// Redirect to admin skins page if we installed a site skin for an unknown device:
+				header_redirect( $admin_url.'?ctrl=skins&tab=site_skin' );
 			}
 		}
 		else

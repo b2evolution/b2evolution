@@ -12165,6 +12165,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15680, 'Installing default site skins...' ) )
+	{	// part of 7.1.0-beta
+		load_funcs( 'skins/_skin.funcs.php' );
+		skin_install( 'bootstrap_site_navbar_skin', true );
+		skin_install( 'bootstrap_site_tabs_skin', true );
+		skin_install( 'bootstrap_site_dropdown_skin', true );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
