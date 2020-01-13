@@ -229,14 +229,27 @@ if( $resolve_extra_path )
 	   // - Or the ReqPath contains a .php file (which will be the case when using any slug, including old slug aliases) followed by some extra path info.
 		if( !empty($matches[2]) )
 		{
-			$Debuglog->add( 'Collection base URI found, with extra path', 'url_decode_part_2' );
+			$Debuglog->add( 'Collection base URI found, WITH extra path', 'url_decode_part_2' );
 			$path_elements = preg_split( '~/~', $matches[2], 20, PREG_SPLIT_NO_EMPTY );
+			// PREVENT index.php or blog1.php etc from being considered as a slug later on.
+			if( isset( $path_elements[0] ) && $path_elements[0] == $pagenow )
+			{ // Ignore element that is the current PHP file name (ideally this URL will later be redirected to a canonical URL without any .php file in the URL)
+				array_shift( $path_elements );
+				$Debuglog->add( 'Ignoring *.php in extra path info' , 'url_decode_part_2' );
+			}
 			// pre_dump( '', $path_elements );
-			$last_part = $path_elements[count( $path_elements )-1];
+			if( !empty($path_elements) )
+			{
+				$last_part = $path_elements[count( $path_elements )-1];
+			}
+			else
+			{
+				$last_part = '';
+			}
 		}
 		else
 		{
-			$Debuglog->add( 'Collection base URI found, but no extra path', 'url_decode_part_2' );
+			$Debuglog->add( 'Collection base URI found, but NO extra path', 'url_decode_part_2' );
 			$path_elements = array();
 			$last_part = '';
 		}
@@ -282,7 +295,6 @@ if( $resolve_extra_path )
 	// Do we have extra path info to decode?
 	if( count($path_elements) )
 	{
-
 
 		// Does the pathinfo end with a / or a ; ?
 		$last_char = substr( $sanitized_ReqPath, -1 );
