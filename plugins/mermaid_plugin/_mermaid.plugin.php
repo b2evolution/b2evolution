@@ -374,7 +374,7 @@ class mermaid_plugin extends Plugin
 		echo $this->get_template( 'toolbar_after' );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js( 'functions.js', 'blog', 'async', true );
 
 		?><script>
 			//<![CDATA[

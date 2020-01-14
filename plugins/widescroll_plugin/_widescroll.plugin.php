@@ -83,7 +83,7 @@ class widescroll_plugin extends Plugin
 			), $params );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js( 'functions.js', 'blog', 'async', true );
 
 		?><script>
 		//<![CDATA[

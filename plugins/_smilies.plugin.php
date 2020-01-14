@@ -308,7 +308,7 @@ XX(      graydead.gif
 		}
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js( 'functions.js', 'blog', 'async', true );
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_group_before' );

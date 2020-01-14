@@ -431,7 +431,7 @@ class adsense_plugin extends Plugin
 			), $params );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js( 'functions.js', 'blog', 'async', true );
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_title_before' ).'AdSense: '.$this->get_template( 'toolbar_title_after' );

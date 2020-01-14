@@ -125,7 +125,7 @@ class quicktags_plugin extends Plugin
 		$simple = ( isset( $params['edit_layout'] ) && $params['edit_layout'] == 'inskin' );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', true, true );
+		require_js( 'functions.js', 'blog', 'async', true );
 
 		?><script>
 		//<![CDATA[

@@ -3522,7 +3522,7 @@ function debug_info( $force = false, $force_clean = false )
 
 			// add jquery.tablesorter to the "Debug info" table.
 			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
-			require_js( 'jquery/jquery.tablesorter.min.js', $relative_to, true, true );
+			require_js( 'jquery/jquery.tablesorter.min.js', $relative_to, 'async', true );
 			echo '
 			<script>
 			(function($){

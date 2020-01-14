@@ -1156,11 +1156,13 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
  *
  * @param string alias, url or filename (relative to rsc/js) for javascript file
  * @param boolean|string Is the file's path relative to the base path/url?
- * @param boolean TRUE to add attribute "async" to load javascript asynchronously
+ * @param boolean 'async' or TRUE to add attribute "async" to load javascript asynchronously,
+ *                'defer' to add attribute "defer" asynchronously in the order they occur in the page,
+ *                'immediate' or FALSE to load javascript immediately
  * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
  */
-function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output = false, $version = '#' )
+function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $output = false, $version = '#' )
 {
 	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
 	global $dequeued_headlines;
@@ -1191,7 +1193,15 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 		$required_js[] = strtolower( $js_url );
 
 		$script_tag = '<script';
-		$script_tag .= $async ? ' async' : '';
+		if( $async_defer == 'async' || $async_defer === true )
+		{
+			$script_tag .= ' async';
+		}
+		elseif( $async_defer == 'defer' )
+		{
+			$script_tag .= ' defer';
+		}
+		//else 'immediate' or false
 		$script_tag .= ' src="'.$js_url.'">';
 		$script_tag .= '</script>';
 
@@ -1445,7 +1455,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 					b2evo_colorbox_params = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_other );' );
 				// TODO: translation strings for colorbox buttons
 
-				require_js( 'build/colorbox.bmin.js', $relative_to, true );
+				require_js( 'build/colorbox.bmin.js', $relative_to, 'async' );
 				if( is_admin_page() )
 				{
 					global $AdminUI;
@@ -1610,14 +1620,14 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover.bmin.js', $relative_to, true );
+			require_js( 'build/popover.bmin.js', $relative_to, 'async' );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
+			require_js( 'build/bubbletip.bmin.js', $relative_to, 'async' );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1640,14 +1650,14 @@ function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover.bmin.js', $relative_to, true );
+			require_js( 'build/popover.bmin.js', $relative_to, 'async' );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
+			require_js( 'build/bubbletip.bmin.js', $relative_to, 'async' );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1682,14 +1692,14 @@ function init_popover_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover.bmin.js', $relative_to, true );
+			require_js( 'build/popover.bmin.js', $relative_to, 'async' );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
 			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip.bmin.js', $relative_to, true );
+			require_js( 'build/bubbletip.bmin.js', $relative_to, 'async' );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
