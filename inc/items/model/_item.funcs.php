@@ -3002,7 +3002,7 @@ function echo_autocomplete_tags( $params = array() )
 		{
 			var item_tag = tag_object.name.trim();
 			var quick_item_tags = jQuery.cookie( 'quick_item_tags' );
-			if( quick_item_tags.length == 0 )
+			if( quick_item_tags == null || quick_item_tags.length == 0 )
 			{
 				quick_item_tags = [];
 			}
