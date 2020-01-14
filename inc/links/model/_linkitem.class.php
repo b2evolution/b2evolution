@@ -191,7 +191,7 @@ class LinkItem extends LinkOwner
 	 *
 	 * @param integer file ID
 	 * @param integer link position ( 'teaser', 'teaserperm', 'teaserlink', 'aftermore', 'inline', 'fallback' )
-	 * @param int order of the link
+	 * @param integer Order of the link, Use 0 to set autoincremented order
 	 * @param boolean true to update owner last touched timestamp after link was created, false otherwise
 	 * @return integer|boolean Link ID on success, false otherwise
 	 */
@@ -213,7 +213,7 @@ class LinkItem extends LinkOwner
 		$edited_Link->set( $this->get_ID_field_name(), $this->get_ID() );
 		$edited_Link->set( 'file_ID', $file_ID );
 		$edited_Link->set( 'position', $position );
-		if( $order <= $this->get_last_order() )
+		if( $order > 0 && $order <= $this->get_last_order() )
 		{	// Don't allow order which may be already used:
 			$order = $this->get_last_order() + 1;
 			// Update last order for next adding:
