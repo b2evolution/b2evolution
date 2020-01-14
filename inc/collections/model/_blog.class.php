@@ -5115,9 +5115,16 @@ class Blog extends DataObject
 
 			if( ! empty( $new_widget_containers ) )
 			{	// Install default widgets:
+				load_funcs( 'widgets/_widgets.funcs.php' );
+				$WidgetContainerCache = & get_WidgetContainerCache();
+				$new_container_messages = array();
 				foreach( $new_widget_containers as $new_widget_container_code )
 				{
-					install_new_default_widgets( $new_widget_container_code );
+					$new_inserted_widgets_num = install_new_default_widgets( $new_widget_container_code, '*', $this->ID, $skin_type );
+					$new_WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $this->ID, $skin_type, $new_widget_container_code );
+					$new_container_messages[] = sprintf( T_('%s has been added (populated with %d widgets)'),
+						( $new_WidgetContainer ? $new_WidgetContainer->get_type_title().' "'.$new_WidgetContainer->get( 'name' ).'"' : $new_widget_container_code ),
+						$new_inserted_widgets_num );
 				}
 			}
 
@@ -5133,7 +5140,8 @@ class Blog extends DataObject
 		{
 			if( $created_containers_num > 0 )
 			{
-				$Messages->add( sprintf( T_('%d new container(s) were created.'), $created_containers_num ), 'success' );
+				$Messages->add( sprintf( T_('%d Containers have been added:'), $created_containers_num )
+					.( empty( $new_container_messages ) ? '' : '<ul class="message_group"><li>'.implode( '</li><li>', $new_container_messages ).'</li></ul>' ), 'success' );
 			}
 			else
 			{

@@ -760,8 +760,11 @@ function get_default_widgets_by_container( $container_code, $kind = '', $blog_id
  *
  * @param string Container code
  * @param string Widget codes, separated by comma
+ * @param integer|NULL Collection ID, NULL - to install widgets for all collections
+ * @param string Skin type
+ * @return integer Number of new installed widgets
  */
-function install_new_default_widgets( $new_container_code, $new_widget_codes = '*' )
+function install_new_default_widgets( $new_container_code, $new_widget_codes = '*', $coll_ID = NULL, $skin_type = 'normal' )
 {
 	global $DB, $Settings;
 
@@ -772,9 +775,6 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 
 	// Get config of default widgets for the requested container:
 	$container_widgets = get_default_widgets_by_container( $new_container_code );
-
-	// Install new default widgets only for normal skin:
-	$skin_type = 'normal';
 
 	// Get container type:
 	$container_type = isset( $container_widgets['type'] ) ? $container_widgets['type'] : 'main';
@@ -787,7 +787,14 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 		case 'page':
 			// Install widgets for collection/skin container:
 			$BlogCache = & get_BlogCache();
-			$BlogCache->load_all();
+			if( $coll_ID === NULL )
+			{	// Load all collections:
+				$BlogCache->load_all();
+			}
+			else
+			{	// Load a requested collection:
+				$BlogCache->load_list( array( $coll_ID ) );
+			}
 
 			if( empty( $BlogCache->cache ) )
 			{	// No collections in DB:
@@ -815,6 +822,11 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 							isset( $container_widgets['name'] ) ? $container_widgets['name'] : $new_container_code,
 							isset( $container_widgets['order'] ) ? $container_widgets['order'] : 1,
 						);
+					$WidgetContainerCache = & get_WidgetContainerCache();
+					if( $sub_WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $widget_Blog->ID, $skin_type, $new_container_code ) )
+					{	// Set ID if widget container already exists for the collection:
+						$coll_containers[ $new_container_code ]['ID'] = $sub_WidgetContainer->ID;
+					}
 				}
 
 				if( $container_widgets !== false )
@@ -981,11 +993,14 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 			break;
 	}
 
+	$new_inserted_widgets_num = 0;
 	if( ! empty( $new_widgets_insert_sql_rows ) )
 	{	// Insert the widget rows by single SQL query:
-		$DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params )
+		$new_inserted_widgets_num = $DB->query( 'INSERT INTO T_widget__widget( wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params )
 			VALUES '.implode( ', ', $new_widgets_insert_sql_rows ) );
 	}
+
+	return $new_inserted_widgets_num;
 }
 
 

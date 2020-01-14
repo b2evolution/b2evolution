@@ -794,8 +794,8 @@ switch( $action )
 		{	// Reload widgets:
 			$DB->query( 'DELETE FROM T_widget__widget
 				WHERE wi_wico_ID = '.$edited_WidgetContainer->ID );
-			install_new_default_widgets( $edited_WidgetContainer->get( 'code' ) );
-			$Messages->add( sprintf( T_('%s has been reloaded.'), $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"' ), 'success' );
+			$new_inserted_widgets_num = install_new_default_widgets( $edited_WidgetContainer->get( 'code' ), '*', $Blog->ID, $edited_WidgetContainer->get( 'skin_type' ) );
+			$Messages->add( sprintf( T_('%s has been reset to defaults (populated with %d widgets).'), $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"', $new_inserted_widgets_num ), 'success' );
 		}
 
 		// Redirect back to back-office widgets list:
