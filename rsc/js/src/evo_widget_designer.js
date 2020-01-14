@@ -538,7 +538,7 @@ jQuery( document ).on( 'click', '.evo_designer__action_disable', function()
 } );
 
 
-jQuery( document ).on( 'ready', function()
+jQuery( document ).ready( function()
 {
 	jQuery( 'div' ).scroll( function()
 	{	// Update position of all visible designer blocks on scroll all divs with enabled css overflow scroll property:
