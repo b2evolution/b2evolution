@@ -159,7 +159,7 @@ if( $upload )
 	// Check for sensitive filetype upload:
 	$path_info = pathinfo( param( 'qqfilename', 'string', true ) );
 	$FiletypeCache = & get_FiletypeCache();
-	$upload_Filetype = $FiletypeCache->get_by_extension( $path_info['extension'] );
+	$upload_Filetype = $FiletypeCache->get_by_extension( strtolower( $path_info['extension'] ) );
 	if( !$upload_Filetype->is_allowed() )
 	{
 		$message['error'] = sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),

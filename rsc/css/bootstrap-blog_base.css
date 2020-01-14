@@ -606,6 +606,19 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
     line-height: 45px;
   }
 }
+.widget_core_item_tags .evo_widget_item_tags_edit_form .post_tags {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: stretch;
+      align-items: stretch;
+}
+.widget_core_item_tags .evo_widget_item_tags_edit_form .post_tags_label {
+  line-height: 3em;
+  margin-right: 5px;
+}
+.widget_core_item_tags .evo_widget_item_tags_edit_form .evo_widget_item_tags_quicklist .btn + .btn {
+  margin-left: 3px;
+}
 .videojs_block .vjs-default-skin .vjs-big-play-button {
   left: 0;
   top: 0;

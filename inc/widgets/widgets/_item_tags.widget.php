@@ -183,10 +183,14 @@ class item_tags_Widget extends ComponentWidget
 		$this->convert_legacy_param( 'widget_coll_item_tags_separator', 'widget_item_tags_separator' );
 
 		$this->disp_params = array_merge( array(
-				'widget_item_tags_before'      => '<nav class="small post_tags">',
-				'widget_item_tags_before_list' => $this->disp_params['before_list'],
-				'widget_item_tags_after'       => '</nav>',
-				'widget_item_tags_separator'   => '',
+				'widget_item_tags_before'             => '<nav class="small post_tags">',
+				'widget_item_tags_before_list_before' => '<div class="post_tags_label">',
+				'widget_item_tags_before_list'        => $this->disp_params['before_list'],
+				'widget_item_tags_before_list_after'  => '</div><div>',
+				'widget_item_tags_after'              => '</div></nav>',
+				'widget_item_tags_separator'          => '',
+				'widget_item_tags_before_quicklist'   => '<div class="evo_widget_item_tags_quicklist">',
+				'widget_item_tags_after_quicklist'    => '</div>',
 			), $this->disp_params );
 
 		echo $this->disp_params['block_start'];
@@ -209,17 +213,21 @@ class item_tags_Widget extends ComponentWidget
 				$quick_item_tags = array();
 			}
 
-			$quick_tag_buttons = '<div class="evo_widget_item_tags_quick_tags btn-group">';
-
+			$quick_tag_buttons = $this->disp_params['widget_item_tags_before_quicklist'];
 			foreach( $quick_item_tags as $item_tag )
 			{
 				$quick_tag_buttons .= '<button type="button" class="btn btn-default btn-xs" onclick="add_quick_tag( this )">'.format_to_output( $item_tag ).'</button>';
 			}
+			$quick_tag_buttons .= $this->disp_params['widget_item_tags_after_quicklist'];;
 
-			$quick_tag_buttons .= '</div>';
-
-			echo '<span id="evo_widget_item_tags_edit_form_'.$this->ID.'" style="display:none">';
-			echo $this->disp_params['widget_item_tags_before'].( $this->disp_params['widget_item_tags_before_list'] ? $this->disp_params['widget_item_tags_before_list'].' ' : '' );
+			echo '<span class="evo_widget_item_tags_edit_form" id="evo_widget_item_tags_edit_form_'.$this->ID.'" style="display:none">';
+			echo $this->disp_params['widget_item_tags_before'];
+			if( $this->disp_params['widget_item_tags_before_list'] )
+			{
+				echo $this->disp_params['widget_item_tags_before_list_before'];
+				echo $this->disp_params['widget_item_tags_before_list'];
+				echo $this->disp_params['widget_item_tags_before_list_after'];
+			}
 			$Form = new Form();
 			$Form->switch_layout( 'none' );
 			$Form->begin_form();
