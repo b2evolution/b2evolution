@@ -27,11 +27,17 @@ class SiteMenu extends DataObject
 {
 	var $name;
 	var $locale;
+	var $parent_ID;
 
 	/**
 	 * @var array Site Menu Entries
 	 */
 	var $entries = NULL;
+
+	/**
+	 * @var integer Child menu count
+	 */
+	var $count_child_menus = NULL;
 
 	/**
 	 * Constructor
@@ -46,6 +52,7 @@ class SiteMenu extends DataObject
 		if( $db_row != NULL )
 		{	// Get menu data from DB:
 			$this->ID = $db_row->menu_ID;
+			$this->parent_ID = $db_row->menu_parent_ID;
 			$this->name = $db_row->menu_name;
 			$this->locale = $db_row->menu_locale;
 		}
@@ -60,6 +67,7 @@ class SiteMenu extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
+				array( 'table' => 'T_menus__menu', 'fk' => 'menu_parent_ID', 'msg' => T_('%d child menus') ),
 				array( 'table' => 'T_menus__entry', 'fk' => 'ment_menu_ID', 'msg' => T_('%d menu entries') ),
 			);
 	}
@@ -80,6 +88,15 @@ class SiteMenu extends DataObject
 		// Locale:
 		param( 'menu_locale', 'string' );
 		$this->set_from_Request( 'locale' );
+
+		// Parent Menu:
+		param( 'menu_parent_ID', 'integer', NULL );
+		if( $menu_parent_ID && $this->has_child_menus() )
+		{	// Display error message if we want make the meta category from category with posts
+			global $Messages;
+			$Messages->add( sprintf( T_('This menu cannot become a child of another because it has %d children itself.'), $this->count_child_menus ) );
+		}
+		$this->set_from_Request( 'parent_ID' );
 
 		// Store auto menu entries in temp var, they will be inserted in SiteMenu::dbinsert():
 		$this->insert_menu_entries = param( 'menu_entries', 'array' );
@@ -176,6 +193,84 @@ class SiteMenu extends DataObject
 
 
 	/**
+	 * Duplicate menu
+	 * 
+	 * @return boolean True if duplication was successfull, false otherwise
+	 */
+	function duplicate()
+	{
+		global $DB;
+
+		$DB->begin();
+
+		$duplicated_menu_ID = $this->ID;
+		$this->ID = 0;
+
+		// Fields that should not be duplicated must be included in the array below:
+		$skipped_fields = array( 'ID' );
+
+		// Get all fields of the duplicated menu:
+		$source_fields_SQL = new SQL( 'Get all fields of the duplicated menu #'.$duplicated_menu_ID );
+		$source_fields_SQL->SELECT( '*' );
+		$source_fields_SQL->FROM( 'T_menus__menu' );
+		$source_fields_SQL->WHERE( 'menu_ID = '.$DB->quote( $duplicated_menu_ID ) );
+		$source_fields = $DB->get_row( $source_fields_SQL, ARRAY_A );
+
+		// Use field values of duplicated collection by default:
+		foreach( $source_fields as $source_field_name => $source_field_value )
+		{
+			// Cut prefix "menu_" of each field:
+			$source_field_name = substr( $source_field_name, 5 );
+			if( in_array( $source_field_name, $skipped_fields ) )
+			{ // Do not duplicate skipped fields
+				continue;
+			}
+			if( isset( $this->$source_field_name ) )
+			{	// Unset current value in order to assign new below, especially to update this in array $this->dbchanges:
+				unset( $this->$source_field_name );
+			}
+			$this->set( $source_field_name, $source_field_value );
+		}
+
+		// Call this firstly to find all possible errors before inserting:
+		// Also to set new values from submitted form:
+		if( ! $this->load_from_Request() )
+		{	// Error on handle new values from form:
+			$this->ID = $duplicated_menu_ID;
+			$DB->rollback();
+			return false;
+		}
+
+		// Try insert new collection in DB:
+		if( ! $this->dbinsert() )
+		{	// Error on insert collection in DB:
+			$this->ID = $duplicated_menu_ID;
+			$DB->rollback();
+			return false;
+		}
+
+		// Copy all menu entries linked to the menu:
+		$menu_entry_fields = array( 'ment_menu_ID', 'ment_parent_ID', 'ment_order', 'ment_text', 'ment_type',
+				'ment_coll_logo_size', 'ment_coll_ID', 'ment_item_ID', 'ment_url', 'ment_visibility', 'ment_highlight' );
+
+		$DB->query( 'INSERT INTO T_menus__entry ('.implode( ', ', $menu_entry_fields ).')
+				SELECT '.$DB->quote( $this->ID ).' AS '.implode( ', ', $menu_entry_fields ).'
+				FROM T_menus__entry
+				WHERE ment_menu_ID = '.$DB->quote( $duplicated_menu_ID ),
+				'Duplicate menu entries from menu #'.$duplicated_menu_ID.' to #'.$this->ID );
+
+		// Duplication is successful, commit all above changes:
+		$DB->commit();
+
+		// Commit changes in cache:
+		$SiteMenuCache = & get_SiteMenuCache();
+		$SiteMenuCache->add( $this );
+
+		return true;
+	}
+
+
+	/**
 	 * Get name of Menu Entry
 	 *
 	 * @return string Menu Entry
@@ -233,6 +328,33 @@ class SiteMenu extends DataObject
 		$SQL->WHERE_and( 'ment_parent_ID '.( empty( $parent_ID ) ? 'IS NULL' : '= '.$DB->quote( $parent_ID ) ) );
 
 		return intval( $DB->get_var( $SQL ) );
+	}
+
+
+	/**
+	 * Check if this menu has at least one post
+	 *
+	 * @return boolean
+	 */
+	function has_child_menus()
+	{
+		global $DB;
+
+		if( $this->ID == 0 )
+		{	// New menu has no child menus:
+			return false;
+		}
+
+		if( !isset( $this->count_child_menus ) )
+		{
+			$SQL = new SQL( 'Check if menu has child menus' );
+			$SQL->SELECT( 'COUNT( menu_parent_ID )' );
+			$SQL->FROM( 'T_menus__menu' );
+			$SQL->WHERE( 'menu_parent_ID = '.$DB->quote( $this->ID ) );
+			$this->count_child_menus = $DB->get_var( $SQL );
+		}
+
+		return ( $this->count_child_menus > 0 );
 	}
 }
 

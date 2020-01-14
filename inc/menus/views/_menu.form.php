@@ -25,13 +25,41 @@ $Form = new Form( NULL, 'menu_checkchanges', 'post', 'compact' );
 
 $Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,menu_ID,blog' ) );
 
-$Form->begin_form( 'fform', $creating ?  T_('New Menu') . get_manual_link( 'menu-form' ) : T_('Menu') . get_manual_link( 'menu-form' ) );
+if( $action == 'copy' )
+{
+	$fieldset_title = T_('Duplicate menu').get_manual_link( 'menu_form');
+}
+else
+{
+	$fieldset_title = $creating ?  T_('New Menu') . get_manual_link( 'menu-form' ) : T_('Menu') . get_manual_link( 'menu-form' );
+}
+
+$Form->begin_form( 'fform', $fieldset_title );
 
 	$Form->add_crumb( 'menu' );
-	$Form->hidden( 'action',  $creating ? 'create' : 'update' );
-	$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',menu_ID' : '' ) ) );
+	if( $action == 'copy' )
+	{
+		$Form->hidden( 'action', 'duplicate' );
+		$Form->hiddens_by_key( get_memorized( 'action' ) );
+	}
+	else
+	{
+		$Form->hidden( 'action',  $creating ? 'create' : 'update' );
+		$Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',menu_ID' : '' ) ) );
+	}
+	
 
 	$Form->text_input( 'menu_name', $edited_SiteMenu->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 128, 'required' => true ) );
+
+	$parent_menu_options = array( NULL => '('.TB_('No Parent').')' );
+	$SQL = new SQL('Get possible parent menus');
+	$SQL->SELECT( 'menu_ID, menu_name' );
+	$SQL->FROM( 'T_menus__menu' );
+	$SQL->WHERE( 'menu_parent_ID IS NULL' );
+	$SQL->WHERE_and( 'NOT menu_ID ='.$DB->quote( $edited_SiteMenu->ID ) );
+	$SQL->ORDER_BY( 'menu_name ASC' );
+	$parent_menu_options += $DB->get_assoc( $SQL->get() );
+	$Form->select_input_array( 'menu_parent_ID', $edited_SiteMenu->get('parent_ID'), $parent_menu_options, T_('Parent'), NULL, array( 'force_keys_as_values' => true ) );
 
 	$locales_options = array();
 	foreach( $locales as $locale_key => $locale_data )
@@ -78,7 +106,14 @@ $Form->begin_form( 'fform', $creating ?  T_('New Menu') . get_manual_link( 'menu
 	$buttons = array();
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{	// Allow to save menu if current User has a permission:
-		$buttons[] = array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' );
+		if( $action == 'copy' )
+		{
+			$buttons[] = array( 'submit', 'submit', sprintf( T_('Save and duplicate all settings from %s'), $edited_SiteMenu->get( 'name' ) ), 'SaveButton' );
+		}
+		else
+		{
+			$buttons[] = array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' );
+		}
 	}
 
 $Form->end_form( $buttons );

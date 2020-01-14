@@ -18,23 +18,30 @@ global $admin_url;
 
 $SQL = new SQL( 'Get menus' );
 
-$SQL->SELECT( '*' );
-$SQL->FROM( 'T_menus__menu' );
+$SQL->SELECT( 'menu.menu_ID, menu.menu_parent_ID, menu.menu_name, menu.menu_locale, parent.menu_name AS menu_parent_name' );
+$SQL->FROM( 'T_menus__menu menu' );
+$SQL->FROM_add( 'LEFT JOIN T_menus__menu parent ON menu.menu_parent_ID = parent.menu_ID' );
 
-$Results = new Results( $SQL->get(), 'menu_', 'A' );
+$Results = new Results( $SQL->get(), 'menu_', '-A' );
 
 $Results->title = T_('Menus').' ('.$Results->get_total_rows().')' . get_manual_link( 'menus-list' );
 
 $Results->cols[] = array(
 		'th' => T_('Name'),
 		'td' => '<a href="'.$admin_url.'?ctrl=menus&amp;action=edit&amp;menu_ID=$menu_ID$">$menu_name$</a>',
-		'order' => 'menu_name',
+		'order' => 'menu_name, menu_parent_name, menu_locale',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Parent'),
+		'td' => '<a href="'.$admin_url.'?ctrl=menus&amp;action=edit&amp;menu_ID=$menu_parent_ID$">$menu_parent_name$</a>',
+		'order' => 'menu_parent_name, menu_name, menu_locale',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Locale'),
 		'td' => '%locale_flag( #menu_locale#, "", "flag", "", false )% $menu_locale$',
-		'order' => 'menu_locale',
+		'order' => 'menu_locale, menu_parent_name, menu_name',
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'nowrap',
 	);
@@ -46,6 +53,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		'th_class' => 'shrinkwrap small',
 		'td_class' => 'shrinkwrap',
 		'td' => action_icon( TS_('Edit this menu...'), 'properties', $admin_url.'?ctrl=menus&amp;action=edit&amp;menu_ID=$menu_ID$' )
+				.action_icon( TB_('Duplicate').'...', 'duplicate', $admin_url.'?ctrl=menus&amp;action=copy&amp;menu_ID=$menu_ID$&amp;'.url_crumb( 'menu') )
 				.action_icon( T_('Delete this menu!'), 'delete', regenerate_url( 'menu_ID,action', 'menu_ID=$menu_ID$&amp;action=delete&amp;'.url_crumb( 'menu' ) ) ),
 		);
 

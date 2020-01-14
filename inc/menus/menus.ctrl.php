@@ -57,10 +57,27 @@ switch( $action )
 		$edited_SiteMenu = new SiteMenu();
 		break;
 
+	case 'copy':
 	case 'edit':
 		// Menu edit form:
 		// Make sure we got a menu_ID:
 		param( 'menu_ID', 'integer', true );
+		break;
+
+	case 'duplicate':
+		// Duplicate menu
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'menu' );
+
+		// Check that current user has permission to create menus:
+		$current_User->check_perm( 'options', 'edit', true );
+
+		if( $edited_SiteMenu && $edited_SiteMenu->duplicate() )
+		{
+			$Messages->add( TB_('The menu has been duplicated.'), 'success' );
+			header_redirect( $admin_url.'?ctrl=menus&action=edit&menu_ID='.$edited_SiteMenu->ID ); // will save $Messages into Session
+			// We have EXITed already at this point!!
+		}
 		break;
 
 	case 'create':
@@ -283,6 +300,7 @@ switch( $action )
 		// NO BREAK
 	case 'new':
 	case 'edit':
+	case 'copy':
 		// Display menu form:
 		$AdminUI->disp_view( 'menus/views/_menu.form.php' );
 		break;

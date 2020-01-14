@@ -11942,6 +11942,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15690, 'Upgrading menus table...' ) )
+	{	// part of 7.1.0-beta
+		db_add_col( 'T_menus__menu', 'menu_parent_ID', 'INT(10) UNSIGNED NULL DEFAULT NULL AFTER menu_ID' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
