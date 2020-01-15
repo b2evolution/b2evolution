@@ -4087,6 +4087,26 @@ class Item extends ItemLight
 			// Store current item in global array to avoid recursion:
 			array_unshift( $content_block_items, $content_Item->ID );
 
+			$image_params = array();
+			if( ! empty( $params['image_size'] ) )
+			{	// Set only image params:
+				if( isset( $params['content_block_before_images'] ) )
+				{
+					$image_params['before'] = $params['content_block_before_images'];
+				}
+				if( isset( $params['content_block_after_images'] ) )
+				{
+					$image_params['after'] = $params['content_block_after_images'];
+				}
+				foreach( $params as $param_key => $param_value )
+				{
+					if( strpos( $param_key, 'image_' ) === 0 )
+					{
+						$image_params[ $param_key ] = $param_value;
+					}
+				}
+			}
+
 			// Start to collect item content in buffer:
 			ob_start();
 
@@ -4097,14 +4117,14 @@ class Item extends ItemLight
 				{	// Include the cover images on teaser place:
 					$teaser_image_positions = 'cover,'.$teaser_image_positions;
 				}
-				$content_Item->images( array_merge( $params, array(
+				$content_Item->images( array_merge( $image_params, array(
 						'restrict_to_image_position' => $teaser_image_positions,
 					) ) );
 			}
 
-			if( isset( $params['content_start_full_text'] ) )
+			if( isset( $params['content_block_before_text'] ) )
 			{
-				echo $params['content_start_full_text'];
+				echo $params['content_block_before_text'];
 			}
 
 			// Display CONTENT (at least the TEASER part):
@@ -4112,7 +4132,7 @@ class Item extends ItemLight
 
 			if( ! empty( $params['image_size'] ) && $content_Item->has_content_parts( $params ) /* only if not displayed all images already */ )
 			{	// Display images that are linked "after more" to this post:
-				$content_Item->images( array_merge( $params, array(
+				$content_Item->images( array_merge( $image_params, array(
 						'restrict_to_image_position' => 'aftermore',
 					) ) );
 			}
@@ -4126,9 +4146,9 @@ class Item extends ItemLight
 			// Display Item footer text (text can be edited in Blog Settings):
 			$content_Item->footer( $params );
 
-			if( isset( $params['content_end_full_text'] ) )
+			if( isset( $params['content_block_after_text'] ) )
 			{
-				echo $params['content_end_full_text'];
+				echo $params['content_block_after_text'];
 			}
 
 			// Get item content from buffer:

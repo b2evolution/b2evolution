@@ -5607,32 +5607,32 @@ span[id^=title_folding_] {
   border-bottom-left-radius: 3px !important;
 }
 @media (min-width: 768px) {
-  .alternate-left-right > div .evo_image_block {
+  .alternate-left-right > div .evo_content_block_images {
     width: 40%;
   }
-  .alternate-left-right > div:nth-child( even ) .evo_image_block {
+  .alternate-left-right > div:nth-child( even ) .evo_content_block_images {
     float: left;
     margin-right: 1em;
   }
-  .alternate-left-right > div:nth-child( odd ) .evo_image_block {
+  .alternate-left-right > div:nth-child( odd ) .evo_content_block_images {
     float: right;
     margin-left: 1em;
   }
 }
 @media (min-width: 1785px) {
-  .alternate-left-right > div .evo_image_block {
+  .alternate-left-right > div .evo_content_block_images {
     position: relative;
     width: 60%;
   }
-  .alternate-left-right > div .evo_post__full_text {
+  .alternate-left-right > div .evo_content_block_text {
     position: relative;
     width: 125%;
   }
-  .alternate-left-right > div:nth-child( even ) .evo_image_block,
-  .alternate-left-right > div:nth-child( even ) .evo_post__full_text {
+  .alternate-left-right > div:nth-child( even ) .evo_content_block_images,
+  .alternate-left-right > div:nth-child( even ) .evo_content_block_text {
     left: -295px;
   }
-  .alternate-left-right > div:nth-child( odd ) .evo_image_block {
+  .alternate-left-right > div:nth-child( odd ) .evo_content_block_images {
     left: 295px;
     margin-left: -285px;
   }

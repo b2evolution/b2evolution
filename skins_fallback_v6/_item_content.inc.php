@@ -55,11 +55,11 @@ $params = array_merge( array(
 		'before_images'            => '<div class="evo_post_images">',
 		'after_images'             => '</div>',
 
-		// In case we display a CONTENT BLOCK (included in another post):
-		'content_block_before_images' => '<div class="evo_content_block_images">'
-		'content_block_after_images'  => '</div>'
-		'content_block_before_text'   => '<div class="evo_content_block_text">'
-		'content_block_after_text'  => '</div>'		
+		// In case we display a CONTENT BLOCK (included in another post by short tag [include:item-slug]):
+		'content_block_before_images' => '<div class="evo_content_block_images">',
+		'content_block_after_images'  => '</div>',
+		'content_block_before_text'   => '<div class="evo_content_block_text">',
+		'content_block_after_text'    => '</div>',
 
 		// For all images, including inline images like [image:] and [thumbnail:]:
 		'before_image'             => '<figure class="evo_image_block">',
@@ -266,8 +266,10 @@ switch( $content_mode )
 
 			// Display CONTENT (at least the TEASER part):
 			$Item->content_teaser( array(
-					'content_start_full_text' => $params['content_start_full_text'],
-					'content_end_full_text'   => $params['content_end_full_text'],
+					'content_block_before_images' => $params['content_block_before_images'],
+					'content_block_after_images'  => $params['content_block_after_images'],
+					'content_block_before_text'   => $params['content_block_before_text'],
+					'content_block_after_text'    => $params['content_block_after_text'],
 					'before'              => $params['before_content_teaser'],
 					'after'               => $params['after_content_teaser'],
 					'before_image'        => $params['before_image'],
@@ -334,8 +336,10 @@ switch( $content_mode )
 
 			// Display the "after more" part of the text: (part after "[teaserbreak]")
 			$Item->content_extension( array(
-					'content_start_full_text' => $params['content_start_full_text'],
-					'content_end_full_text'   => $params['content_end_full_text'],
+					'content_block_before_images' => $params['content_block_before_images'],
+					'content_block_after_images'  => $params['content_block_after_images'],
+					'content_block_before_text'   => $params['content_block_before_text'],
+					'content_block_after_text'    => $params['content_block_after_text'],
 					'before'              => $params['before_content_extension'],
 					'after'               => $params['after_content_extension'],
 					'before_image'        => $params['before_image'],
