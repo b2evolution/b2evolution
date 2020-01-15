@@ -728,6 +728,7 @@ class MarkdownImport extends AbstractImport
 				{	// Don't parse when no supported YAML fields or no provided YAML data:
 					$item_yaml_data = NULL;
 				}
+				$item_teaser_image_tag = trim( $content_match[3], "\r\n" );
 				$item_title = empty( $content_match[7] )
 					// Use yaml short title or item slug as title when title in content is not defined:
 					? ( empty( $item_yaml_data['short-title'] ) ? $item_slug : $item_yaml_data['short-title'] )
@@ -739,6 +740,7 @@ class MarkdownImport extends AbstractImport
 			{
 				$item_yaml_data = NULL;
 				$item_title = $item_slug;
+				$item_teaser_image_tag = NULL;
 			}
 
 			// Limit title by max possible length:
@@ -1051,11 +1053,10 @@ class MarkdownImport extends AbstractImport
 						}
 						$file_params['file_title'] = trim( $image_matches[4][$i], ' "' );
 						// Detect link position:
-						$content_image_parts = explode( $image_matches[0][$i], $updated_item_content );
-						$header_regexp = '/(^|[\n\r\t\s]+)#+.+[\n\r]/';
-						if( count( $content_image_parts ) > 1 &&
-						    ! preg_match( $header_regexp, $content_image_parts[0] ) &&
-						    preg_match( $header_regexp, $content_image_parts[1] ) )
+						$content_image_parts = explode( $image_matches[0][$i], $updated_item_content, 2 );
+						if( $item_teaser_image_tag == $image_matches[0][$i] &&
+						    count( $content_image_parts ) > 1 &&
+						    trim( $content_image_parts[0], " \r\n" ) === '' )
 						{	// Link image as teaser when image is first before header:
 							$file_params['link_position'] = 'teaser';
 						}
