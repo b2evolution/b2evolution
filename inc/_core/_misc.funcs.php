@@ -1176,7 +1176,7 @@ function split_outcode( $separators, $content, $capture_separator = false )
 
 
 /**
- * Remove [image:] and [video:] short tags that are inside <p> blocks and before <br> and move them before the paragraph
+ * Remove short tags like [image:], [video:] and etc. that are inside <p> blocks and before <br> and move them before the paragraph
  *
  * @param string Source content
  * @param string Search pattern
@@ -1184,13 +1184,12 @@ function split_outcode( $separators, $content, $capture_separator = false )
  * @return string Content
  */
 function move_short_tags( $content, $pattern = NULL, $callback = NULL )
-{	// Move [image:], [video:] and [audio:] tags out of <p> blocks
-
-	// Get individual paragraphs
+{
+	// Get individual paragraphs:
 	preg_match_all( '#(<p[\s*|>])?.*?<(/p|br\s?/?)>#i', $content, $paragraphs );
 
 	if( is_null( $pattern ) )
-	{
+	{	// Default pattern:
 		$pattern = '#\[(image|video|audio|include|/?div|(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields)):?.*?\]#i';
 	}
 
@@ -1213,8 +1212,8 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL )
 				// convert &nbsp; to space
 				$x = str_replace( "\xC2\xA0", ' ', $new_paragraph );
 
-				if( preg_match( '#(<p[\s*|>])?\s*<(/p|br\s?/?)>#i', $x ) === 1 )
-				{ // remove paragraph the if moving out the short tag will result to an empty paragraph
+				if( preg_match( '#^(<p[\s*|>])?\s*<(/p|br\s?/?)>$#i', $x ) === 1 )
+				{	// Remove paragraph the if moving out the short tag will result to an empty paragraph:
 					$new_paragraph = '';
 				}
 
