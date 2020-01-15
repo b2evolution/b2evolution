@@ -56,7 +56,10 @@ $Form->begin_form( 'fform', $fieldset_title );
 	$SQL->SELECT( 'menu_ID, menu_name' );
 	$SQL->FROM( 'T_menus__menu' );
 	$SQL->WHERE( 'menu_parent_ID IS NULL' );
-	$SQL->WHERE_and( 'NOT menu_ID ='.$DB->quote( $edited_SiteMenu->ID ) );
+	if( $action != 'copy' )
+	{
+		$SQL->WHERE_and( 'NOT menu_ID ='.$DB->quote( $edited_SiteMenu->ID ) );
+	}
 	$SQL->ORDER_BY( 'menu_name ASC' );
 	$parent_menu_options += $DB->get_assoc( $SQL->get() );
 	$Form->select_input_array( 'menu_parent_ID', $edited_SiteMenu->get('parent_ID'), $parent_menu_options, T_('Parent'), NULL, array( 'force_keys_as_values' => true ) );
