@@ -98,7 +98,7 @@ class embed_menu_Widget extends generic_menu_link_Widget
 		global $current_User, $admin_url;
 
 		$SiteMenuCache = & get_SiteMenuCache();
-		$SiteMenuCache->load_all();
+		$SiteMenuCache->load_where( 'menu_parent_ID IS NULL' );
 
 		$r = array_merge( array(
 				'title' => array(
@@ -146,6 +146,8 @@ class embed_menu_Widget extends generic_menu_link_Widget
 	 */
 	function display( $params )
 	{
+		global $current_locale;
+
 		$this->init_display( $params );
 
 		$SiteMenuCache = & get_SiteMenuCache();
@@ -153,6 +155,13 @@ class embed_menu_Widget extends generic_menu_link_Widget
 		{	// We cannot use this widget without Menu:
 			$this->display_error_message( 'Not found Menu #'.$this->get_param( 'menu_ID' ) );
 			return false;
+		}
+
+		// Check if the menu has a child matching the current locale:
+		$localized_menus = $SiteMenu->get_localized_menus( $current_locale );
+		if( ! empty( $localized_menus ) )
+		{	// Use localized menu:
+			$SiteMenu = & $localized_menus[0];
 		}
 
 		// Get Menu Entries:

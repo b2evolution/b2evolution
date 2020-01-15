@@ -93,7 +93,7 @@ class bootstrap_site_dropdown_Skin extends Skin
 		$BlogCache->none_option_text = T_('Same as "Default collection to display"');
 
 		$SiteMenuCache = & get_SiteMenuCache();
-		$SiteMenuCache->load_all();
+		$SiteMenuCache->load_where( 'menu_parent_ID IS NULL');
 
 		$r = array_merge( array(
 				'section_layout_start' => array(
@@ -442,6 +442,8 @@ body {
 	 */
 	function get_header_tabs_custom( $menu_ID )
 	{
+		global $DB, $current_locale;
+
 		$header_tabs = array();
 
 		$SiteMenuCache = & get_SiteMenuCache();
@@ -449,6 +451,13 @@ body {
 		if( ! ( $SiteMenu = & $SiteMenuCache->get_by_ID( $this->get_setting( 'menu_ID' ), false, false ) ) )
 		{	// Wrong Menu:
 			return $header_tabs;
+		}
+
+		// Check if the menu has a child matching the current locale:
+		$localized_menus = $SiteMenu->get_localized_menus( $current_locale );
+		if( ! empty( $localized_menus ) )
+		{	// Use localized menu:
+			$SiteMenu = & $localized_menus[0];
 		}
 
 		$this->header_tab_active = NULL;

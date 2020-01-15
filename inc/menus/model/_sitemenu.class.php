@@ -40,6 +40,11 @@ class SiteMenu extends DataObject
 	var $count_child_menus = NULL;
 
 	/**
+	 * @var array Localized child menus
+	 */
+	var $localized_menus = NULL;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -328,6 +333,28 @@ class SiteMenu extends DataObject
 		$SQL->WHERE_and( 'ment_parent_ID '.( empty( $parent_ID ) ? 'IS NULL' : '= '.$DB->quote( $parent_ID ) ) );
 
 		return intval( $DB->get_var( $SQL ) );
+	}
+
+
+	/**
+	 * Get localized child menus
+	 * 
+	 * @param string Locale
+	 * @return array Array of SiteMenu objects
+	 */
+	function get_localized_menus( $locale )
+	{
+		global $DB;
+
+		if( ! isset( $this->localized_menus[$locale] ) )
+		{
+			$SiteMenuCache = & get_SiteMenuCache();
+			$SiteMenuCache->clear( true );
+			$where = 'menu_parent_ID = '.$DB->quote( $this->ID ).' AND menu_locale = '.$DB->quote( $locale );
+			$this->localized_menus[$locale] = $SiteMenuCache->load_where( $where );
+		}
+
+		return $this->localized_menus[$locale];
 	}
 
 
