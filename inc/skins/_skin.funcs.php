@@ -184,13 +184,14 @@ function skin_init( $disp )
 			{	// Enable "F2" hotkey that will redirect user to edit screen of Item:
 				global $admin_url;
 
+				$backoffice_edit_item_url = $admin_url.'?ctrl=items&action=edit&p='.$Item->ID.'&blog='.$Blog->ID; 
 				if( $Blog->get_setting( 'in_skin_editing' ) )
 				{
 					$edit_item_url = $Item->get_edit_url();
 				}
 				elseif( $current_User->check_perm( 'admin', 'restricted' ) )
 				{
-					$edit_item_url = $admin_url.'?ctrl=items&action=edit&p='.$Item->ID.'&blog='.$Blog->ID;
+					$edit_item_url = $backoffice_edit_item_url;
 				}
 
 				if( ! empty( $edit_item_url ) )
@@ -198,8 +199,17 @@ function skin_init( $disp )
 					init_hotkeys_js();
 					add_js_headline('jQuery( document ).ready( function()
 					{
-						hotkeys( \'f2\', function( event, handler ) {
-							window.location.href = \''.format_to_js( $edit_item_url ).'\';
+						hotkeys( \'f2, ctrl+f2\', function( event, handler ) {
+							switch( handler.key )
+							{
+								case \'f2\':
+									window.location.href = \''.format_to_js( $edit_item_url ).'\';
+									break;
+
+								case \'ctrl+f2\':
+									window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
+									break;
+							}
 						});
 					});');
 				}
@@ -397,6 +407,41 @@ function skin_init( $disp )
 		case 'posts':
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
+
+			if( $featured_intro_Item = & get_featured_Item( 'posts', NULL, true, true, true ) )
+			//$FeaturedList && $FeaturedList->result_num_rows )
+			{	// Enable "F2" hotkey that will redirect user to edit screen of Intro or Feature Post:
+				global $admin_url;
+
+				$backoffice_edit_item_url = $admin_url.'?ctrl=items&action=edit&p='.$featured_intro_Item->ID.'&blog='.$Blog->ID; 
+				if( $Blog->get_setting( 'in_skin_editing' ) )
+				{
+					$edit_item_url = $featured_intro_Item->get_edit_url();
+				}
+				elseif( $current_User->check_perm( 'admin', 'restricted' ) )
+				{
+					$edit_item_url = $backoffice_edit_item_url;
+				}
+
+				if( ! empty( $edit_item_url ) )
+				{	// Current user can edit post:
+					init_hotkeys_js();
+					add_js_headline('jQuery( document ).ready( function()
+					{
+						hotkeys( \'f2, ctrl+f2\', function( event, handler ) {
+							switch( handler.key )
+							{
+								case \'f2\':
+									window.location.href = \''.format_to_js( $edit_item_url ).'\';
+									break;
+								case \'ctrl+f2\':
+									window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
+									break;
+							}
+						});
+					});');
+				}
+			}
 
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
@@ -1517,7 +1562,7 @@ function skin_init( $disp )
 
 		case 'edit':
 		case 'proposechange':
-			global $current_User, $post_ID;
+			global $current_User, $post_ID, $admin_url;
 
 			// Post ID, go from $_GET when we edit a post from Front-office
 			//          or from $_POST when we switch from Back-office
@@ -1556,7 +1601,6 @@ function skin_init( $disp )
 				$error_message = T_('Since this blog has no categories, you cannot post into it.');
 				if( $current_User->check_perm( 'blog_cats', 'edit', false, $Blog->ID ) )
 				{ // If current user has a permission to create a category
-					global $admin_url;
 					$error_message .= ' '.sprintf( T_('You must <a %s>create categories</a> first.'), 'href="'.$admin_url.'?ctrl=chapters&amp;blog='.$Blog->ID.'"');
 				}
 				$Messages->add( $error_message, 'error' );
@@ -1575,6 +1619,19 @@ function skin_init( $disp )
 
 			// Prepare the 'In-skin editing' / 'In-skin change proposal':
 			init_inskin_editing();
+
+			// Enable "F2" hotkey that will redirect user to edit post in back-office if they have access:
+			if( $current_User->check_perm( 'admin', 'restricted' ) )
+			{
+				init_hotkeys_js();
+				$backoffice_edit_item_url = $admin_url.'?ctrl=items&action=edit&p='.$post_ID.'&blog='.$Blog->ID; 
+				add_js_headline('jQuery( document ).ready( function()
+				{
+					hotkeys( \'f2, ctrl+f2\', function( event, handler ) {
+						window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
+					});
+				});');
+			}
 			break;
 
 		case 'edit_comment':
