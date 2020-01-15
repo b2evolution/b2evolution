@@ -31,7 +31,7 @@ $params = array_merge( array(
 		'content_start_full'       => '<section class="evo_post__full">',			// In case of full display
 		'content_end_full'         => '</section>',
 
-		// In case we display a compact version of the post:
+		// In case we display a COMPACT version of the post:
 		'excerpt_before_text'      => '<div class="evo_post__excerpt_text">',
 		'excerpt_after_text'       => '</div>',
 
@@ -39,7 +39,7 @@ $params = array_merge( array(
 		'excerpt_after_more'       => '</span>',
 		'excerpt_more_text'        => T_('more').' &raquo;',
 
-		// In case we display a full version of the post:
+		// In case we display a FULL version of the post:
 		'content_start_full_text'  => '<div class="evo_post__full_text clearfix">',
 		'content_end_full_text'    => '</div>',
 
@@ -48,23 +48,36 @@ $params = array_merge( array(
 		'before_content_extension' => '',
 		'after_content_extension'  => '',
 
+		// For teaser images:
+		'display_teaser_images'    => true,
+		'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
+		// For image blocks like Teaser, After-More:
 		'before_images'            => '<div class="evo_post_images">',
-		'before_image'             => '<figure class="evo_image_block">',
-		'before_image_legend'      => '<figcaption class="evo_image_legend">',
-		'after_image_legend'       => '</figcaption>',
-		'after_image'              => '</figure>',
 		'after_images'             => '</div>',
+
+		// In case we display a CONTENT BLOCK (included in another post):
+		'content_block_before_images' => '<div class="evo_content_block_images">'
+		'content_block_after_images'  => '</div>'
+		'content_block_before_text'   => '<div class="evo_content_block_text">'
+		'content_block_after_text'  => '</div>'		
+
+		// For all images, including inline images like [image:] and [thumbnail:]:
+		'before_image'             => '<figure class="evo_image_block">',
+		'before_image_legend'      => '<figcaption class="evo_image_legend">',  // not for [thumbnail:]
+		'after_image_legend'       => '</figcaption>', // not for [thumbnail:]
+		'after_image'              => '</figure>',
 		'image_class'              => 'img-responsive',
 		'image_size'               => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 		'image_limit'              =>  1000,
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
+
+		// Overrides for all images when displayed in COMPACT version of the post:
 		'excerpt_image_class'      => '',
 		'excerpt_image_size'       => 'fit-80x80',
 		'excerpt_image_limit'      => 0,
 		'excerpt_image_link_to'    => 'single',
-		'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
-		'display_teaser_images'    => true,
 
+		// When we display the contents of a folder (multiple images) and not a single image:
 		'before_gallery'           => '<div class="evo_post_gallery">',
 		'after_gallery'            => '</div>',
 		'gallery_table_start'      => '',
