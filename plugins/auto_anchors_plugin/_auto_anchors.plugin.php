@@ -71,7 +71,7 @@ class auto_anchors_plugin extends Plugin
 				'offset_scroll' => array(
 						'label' => T_('Anchor offset'),
 						'type' => 'integer',
-						'defaultvalue' => 0,
+						'defaultvalue' => 70,
 						'suffix' => ' px',
 						'note' => T_('This will be used when scrolling to an anchor.'),
 					),
