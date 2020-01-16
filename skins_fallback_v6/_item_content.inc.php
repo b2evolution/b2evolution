@@ -56,6 +56,8 @@ $params = array_merge( array(
 		'after_images'             => '</div>',
 
 		// In case we display a CONTENT BLOCK (included in another post by short tag [include:item-slug]):
+		'content_block_start'         => '<div class="evo_content_block $cb_class$">',
+		'content_block_end'           => '</div>',
 		'content_block_before_images' => '<div class="evo_content_block_images">',
 		'content_block_after_images'  => '</div>',
 		'content_block_before_text'   => '<div class="evo_content_block_text">',
