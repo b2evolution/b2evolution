@@ -268,6 +268,10 @@ class ComponentWidget extends DataObject
 			}
 			return T_('Inactive / Uninstalled plugin').': "'.$this->code.'"';
 		}
+		elseif( $this->type == 'wrong' )
+		{
+			return T_('Wrong widget / Invalid code').': "'.$this->code.'"';
+		}
 
 		return T_('Unknown');
 	}
