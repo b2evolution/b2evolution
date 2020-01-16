@@ -1853,7 +1853,7 @@ switch( $action )
 		$server_widgets = array_diff( $enabled_widgets, $widgets );
 		if( ! empty( $client_widgets ) || ! empty( $server_widgets ) )
 		{	// Display error if at least one widget was added or deleted in the container:
-			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.');
+			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.').' '.T_('If the problem persists, check the widgets in the backoffice.');
 			// Additional data for log:
 			$SQL = new SQL( 'Get widgets for more log of reordering (Designer Mode)' );
 			$SQL->SELECT( 'wi_ID, wi_code' );
@@ -1936,7 +1936,7 @@ switch( $action )
 		$disabled_Widget = & $WidgetCache->get_by_ID( $wi_ID, false, false );
 		if( ! $disabled_Widget || ! $disabled_Widget->get( 'enabled' ) )
 		{	// Display error if widget doesn't exist or it is already disabled:
-			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.');
+			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.').' '.T_('If the problem persists, check the widgets in the backoffice.');
 			break;
 		}
 
