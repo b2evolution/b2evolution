@@ -418,7 +418,7 @@ function skin_init( $disp )
 				{
 					$edit_item_url = $featured_intro_Item->get_edit_url();
 				}
-				elseif( $current_User->check_perm( 'admin', 'restricted' ) )
+				elseif( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) )
 				{
 					$edit_item_url = $backoffice_edit_item_url;
 				}
