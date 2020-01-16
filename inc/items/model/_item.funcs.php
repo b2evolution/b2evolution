@@ -3237,6 +3237,7 @@ jQuery( document ).ready( function ()
 function echo_autocomplete_tags( $params = array() )
 {
 	$params = array_merge( array(
+			'input_ID'       => 'item_tags',
 			'item_ID'        => NULL,
 			'update_by_ajax' => false,
 			'use_quick_tags' => false,
@@ -3305,7 +3306,7 @@ function echo_autocomplete_tags( $params = array() )
 			}
 
 			quick_item_tags = quick_item_tags.splice( -5 );
-			jQuery.cookie( 'quick_item_tags', quick_item_tags.join( ',' ) );
+			jQuery.cookie( 'quick_item_tags', quick_item_tags.join( ',' ), { path: "/" } );
 		}
 
 		<?php } ?>
@@ -3338,22 +3339,24 @@ function echo_autocomplete_tags( $params = array() )
 
 	jQuery( document ).ready( function()
 	{
+		var input_ID = '<?php echo format_to_js( '#'.$params['input_ID'] );?>';
+
 		if( jQuery( '#suggest_item_tags' ).length == 0 || jQuery( '#suggest_item_tags' ).is( ':checked' ) )
 		{
-			init_autocomplete_tags( '#item_tags' );
+			init_autocomplete_tags( input_ID );
 		}
 
 		jQuery( '#suggest_item_tags' ).click( function()
 		{
 			if( jQuery( this ).is( ':checked' ) )
 			{ // Use plugin to suggest tags
-				jQuery( '#item_tags' ).hide();
-				init_autocomplete_tags( '#item_tags' );
+				jQuery( input_ID ).hide();
+				init_autocomplete_tags( input_ID );
 			}
 			else
 			{ // Remove autocomplete tags plugin
-				jQuery( '#item_tags' ).show();
-				jQuery( '#item_tags' ).parent().find( 'ul.token-input-list-facebook' ).remove();
+				jQuery( input_ID ).show();
+				jQuery( input_ID ).parent().find( 'ul.token-input-list-facebook' ).remove();
 			}
 		} );
 		<?php
