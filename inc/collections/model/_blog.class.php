@@ -5033,6 +5033,7 @@ class Blog extends DataObject
 		}
 
 		$SkinCache = & get_SkinCache();
+		$skin_containers_num = 0;
 		$created_containers_num = 0;
 		$updated_containers_num = 0;
 		$deleted_containers_num = 0;
@@ -5049,6 +5050,7 @@ class Blog extends DataObject
 
 			// Get skin containers either from declared function or from scaned skin files:
 			$skin_containers = $coll_Skin->get_containers();
+			$skin_containers_num += count( $skin_containers );
 
 			// Check all main containers and create insert rows for those which are not saved yet,
 			$update_widget_containers_sql_rows = array();
@@ -5097,12 +5099,12 @@ class Blog extends DataObject
 			{	// Display how many containers are declared or scanned by the collection skin:
 				if( method_exists( $coll_Skin, 'get_declared_containers' ) )
 				{	// If skin has the declared widget containers:
-					$Messages->add( sprintf( T_('%d containers declared by skin "%s".'), count( $skin_containers ), $coll_Skin->get_name() ), 'note' );
+					$Messages->add( sprintf( T_('%d containers declared by skin "%s".'), $skin_containers_num, $coll_Skin->get_name() ), 'note' );
 				}
 				else
 				{	// If skin scans widget containers from skin and fallback files:
 					$Messages->add( sprintf( T_('WARNING: This is an old skin which provides no container declarations (%s). Falling back to scanning all skin files.'), '<code>function get_declared_containers()</code>' ), 'warning' );
-					$Messages->add( sprintf( T_('%d containers found by scanning templates of skin "%s" (including fall-back templates).'), count( $skin_containers ), $coll_Skin->get_name() ), 'note' );
+					$Messages->add( sprintf( T_('%d containers found by scanning templates of skin "%s" (including fall-back templates).'), $skin_containers_num, $coll_Skin->get_name() ), 'note' );
 				}
 			}
 
@@ -5140,7 +5142,7 @@ class Blog extends DataObject
 		{
 			if( $created_containers_num > 0 )
 			{
-				$Messages->add( sprintf( T_('%d Containers have been added:'), $created_containers_num )
+				$Messages->add( sprintf( T_('%d Containers are left untouched and %d Containers have been added:'), ( $skin_containers_num - $created_containers_num - $updated_containers_num - $deleted_containers_num ), $created_containers_num )
 					.( empty( $new_container_messages ) ? '' : '<ul class="message_group"><li>'.implode( '</li><li>', $new_container_messages ).'</li></ul>' ), 'success' );
 			}
 			else
