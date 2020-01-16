@@ -1833,7 +1833,7 @@ switch( $action )
 		$container_ID = $DB->get_var( $SQL );
 
 		$SQL = new SQL( 'Get all widgets of container "'.$container.'" before reordering (Designer Mode)' );
-		$SQL->SELECT( 'wi_ID, wi_code, wi_order, wi_enabled' );
+		$SQL->SELECT( 'wi_ID, wi_order, wi_enabled' );
 		$SQL->FROM( 'T_widget__widget' );
 		$SQL->WHERE( 'wi_wico_ID = '.$DB->quote( $container_ID ) );
 		$all_widgets = $DB->get_results( $SQL );
