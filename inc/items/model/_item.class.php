@@ -4087,18 +4087,23 @@ class Item extends ItemLight
 			// Store current item in global array to avoid recursion:
 			array_unshift( $content_block_items, $content_Item->ID );
 
-			// Get item content:
-			$current_tag_item_content = $content_Item->get_content_block( $params );
-
-			// Update level inline tags like [---fields:] into [--fields:] in order to make them render by top caller level Item:
-			$current_tag_item_content = $this->update_level_inline_tags( $current_tag_item_content );
-
 			$tag_class = isset( $tag_options[1] ) ? trim( $tag_options[1] ) : '';
 			if( $tag_class !== '' )
 			{	// If tag has an option with style class
-				$tag_class = trim( str_replace( array( '.*', '.' ), array( '.'.$item_ID_slug, ' ' ),$tag_class ) );
-				$current_tag_item_content = '<div class="'.format_to_output( $tag_class, 'htmlattr' ).'">'.$current_tag_item_content.'</div>';
+				$content_block_class = trim( str_replace( array( '.*', '.' ), array( '.'.$item_ID_slug, ' ' ),$tag_class ) );
 			}
+			else
+			{	// Tag has no class:
+				$content_block_class = '';
+			}
+
+			// Get item content:
+			$current_tag_item_content = $content_Item->get_content_block( array_merge( $params, array(
+					'content_block_class' => $content_block_class,
+				) ) );
+
+			// Update level inline tags like [---fields:] into [--fields:] in order to make them render by top caller level Item:
+			$current_tag_item_content = $this->update_level_inline_tags( $current_tag_item_content );
 
 			// Replace inline content block tag with item content:
 			$content = str_replace( $source_tag, $current_tag_item_content, $content );
@@ -4124,11 +4129,16 @@ class Item extends ItemLight
 			return '';
 		}
 
+		load_funcs( 'skins/_skin.funcs.php' );
+
 		$params = array_merge( array(
+				'content_block_start'         => '<div class="evo_content_block $cb_class$">',
+				'content_block_end'           => '</div>',
 				'content_block_before_images' => '<div class="evo_content_block_images">',
 				'content_block_after_images'  => '</div>',
 				'content_block_before_text'   => '<div class="evo_content_block_text">',
 				'content_block_after_text'    => '</div>',
+				'content_block_class'         => '',
 				'image_class'                 => 'img-responsive',
 				'image_size'                  => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 				'image_limit'                 =>  1000,
@@ -4138,6 +4148,8 @@ class Item extends ItemLight
 
 		// Start to collect item content in buffer:
 		ob_start();
+
+		echo str_replace( '$cb_class$', $params['content_block_class'], $params['content_block_start'] );
 
 		if( ! empty( $params['image_size'] ) )
 		{	// Display images that are linked to this post:
@@ -4185,6 +4197,8 @@ class Item extends ItemLight
 		$this->footer( $params );
 
 		echo $params['content_block_after_text'];
+
+		echo $params['content_block_end'];
 
 		// Get item content from buffer:
 		return ob_get_clean();

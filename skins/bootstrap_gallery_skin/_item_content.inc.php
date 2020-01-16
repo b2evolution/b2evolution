@@ -46,6 +46,8 @@ $params = array_merge( array(
 		'content_end_full_text'    => in_array( $disp_detail, array( 'help', 'register' ) ) ? '' : '</div>',
 
 		// In case we display a CONTENT BLOCK (included in another post by short tag [include:item-slug]):
+		'content_block_start'         => '<div class="evo_content_block $cb_class$">',
+		'content_block_end'           => '</div>',
 		'content_block_before_images' => '<div class="evo_content_block_images">',
 		'content_block_after_images'  => '</div>',
 		'content_block_before_text'   => '<div class="evo_content_block_text">',
@@ -280,6 +282,8 @@ switch( $content_mode )
 
 			// Display CONTENT (at least the TEASER part):
 			$Item->content_teaser( array(
+					'content_block_start'         => $params['content_block_start'],
+					'content_block_end'           => $params['content_block_end'],
 					'content_block_before_images' => $params['content_block_before_images'],
 					'content_block_after_images'  => $params['content_block_after_images'],
 					'content_block_before_text'   => $params['content_block_before_text'],
@@ -350,6 +354,8 @@ switch( $content_mode )
 
 			// Display the "after more" part of the text: (part after "[teaserbreak]")
 			$Item->content_extension( array(
+					'content_block_start'         => $params['content_block_start'],
+					'content_block_end'           => $params['content_block_end'],
 					'content_block_before_images' => $params['content_block_before_images'],
 					'content_block_after_images'  => $params['content_block_after_images'],
 					'content_block_before_text'   => $params['content_block_before_text'],
