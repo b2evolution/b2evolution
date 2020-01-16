@@ -4087,72 +4087,8 @@ class Item extends ItemLight
 			// Store current item in global array to avoid recursion:
 			array_unshift( $content_block_items, $content_Item->ID );
 
-			$image_params = array();
-			if( ! empty( $params['image_size'] ) )
-			{	// Set only image params:
-				if( isset( $params['content_block_before_images'] ) )
-				{
-					$image_params['before'] = $params['content_block_before_images'];
-				}
-				if( isset( $params['content_block_after_images'] ) )
-				{
-					$image_params['after'] = $params['content_block_after_images'];
-				}
-				foreach( $params as $param_key => $param_value )
-				{
-					if( strpos( $param_key, 'image_' ) === 0 )
-					{
-						$image_params[ $param_key ] = $param_value;
-					}
-				}
-			}
-
-			// Start to collect item content in buffer:
-			ob_start();
-
-			if( ! empty( $params['image_size'] ) )
-			{	// Display images that are linked to this post:
-				$teaser_image_positions = 'teaser,teaserperm,teaserlink';
-				if( ! empty( $params['include_cover_images'] ) )
-				{	// Include the cover images on teaser place:
-					$teaser_image_positions = 'cover,'.$teaser_image_positions;
-				}
-				$content_Item->images( array_merge( $image_params, array(
-						'restrict_to_image_position' => $teaser_image_positions,
-					) ) );
-			}
-
-			if( isset( $params['content_block_before_text'] ) )
-			{
-				echo $params['content_block_before_text'];
-			}
-
-			// Display CONTENT (at least the TEASER part):
-			$content_Item->content_teaser( $params );
-
-			if( ! empty( $params['image_size'] ) && $content_Item->has_content_parts( $params ) /* only if not displayed all images already */ )
-			{	// Display images that are linked "after more" to this post:
-				$content_Item->images( array_merge( $image_params, array(
-						'restrict_to_image_position' => 'aftermore',
-					) ) );
-			}
-
-			// Display the "after more" part of the text: (part after "[teaserbreak]")
-			$content_Item->content_extension( $params );
-
-			// Links to post pages (for multipage posts):
-			$content_Item->page_links( $params );
-
-			// Display Item footer text (text can be edited in Blog Settings):
-			$content_Item->footer( $params );
-
-			if( isset( $params['content_block_after_text'] ) )
-			{
-				echo $params['content_block_after_text'];
-			}
-
-			// Get item content from buffer:
-			$current_tag_item_content = ob_get_clean();
+			// Get item content:
+			$current_tag_item_content = $content_Item->get_content_block( $params );
 
 			// Update level inline tags like [---fields:] into [--fields:] in order to make them render by top caller level Item:
 			$current_tag_item_content = $this->update_level_inline_tags( $current_tag_item_content );
@@ -4172,6 +4108,86 @@ class Item extends ItemLight
 		}
 
 		return $content;
+	}
+
+
+	/**
+	 * Get content of Item with Item Type usage 'content-block'
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_content_block( $params = array() )
+	{
+		if( $this->get_type_setting( 'usage' ) != 'content-block' )
+		{	// Exclude no content block Item:
+			return '';
+		}
+
+		$params = array_merge( array(
+				'content_block_before_images' => '<div class="evo_content_block_images">',
+				'content_block_after_images'  => '</div>',
+				'content_block_before_text'   => '<div class="evo_content_block_text">',
+				'content_block_after_text'    => '</div>',
+				'image_class'                 => 'img-responsive',
+				'image_size'                  => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
+				'image_limit'                 =>  1000,
+				'image_link_to'               => 'original', // Can be 'original', 'single' or empty
+				'include_cover_images'        => false, // Set to true if you want cover images to appear with teaser images.
+			), $params );
+
+		// Start to collect item content in buffer:
+		ob_start();
+
+		if( ! empty( $params['image_size'] ) )
+		{	// Display images that are linked to this post:
+			$teaser_image_positions = 'teaser,teaserperm,teaserlink';
+			if( ! empty( $params['include_cover_images'] ) )
+			{	// Include the cover images on teaser place:
+				$teaser_image_positions = 'cover,'.$teaser_image_positions;
+			}
+			$this->images( array(
+					'before'        => $params['content_block_before_images'],
+					'after'         => $params['content_block_after_images'],
+					'image_class'   => $params['image_class'],
+					'image_size'    => $params['image_size'],
+					'image_limit'   => $params['image_limit'],
+					'image_link_to' => $params['image_link_to'],
+					'restrict_to_image_position' => $teaser_image_positions,
+				) );
+		}
+
+		echo $params['content_block_before_text'];
+
+		// Display CONTENT (at least the TEASER part):
+		$this->content_teaser( $params );
+
+		if( ! empty( $params['image_size'] ) && $this->has_content_parts( $params ) /* only if not displayed all images already */ )
+		{	// Display images that are linked "after more" to this post:
+			$this->images( array(
+					'before'        => $params['content_block_before_images'],
+					'after'         => $params['content_block_after_images'],
+					'image_class'   => $params['image_class'],
+					'image_size'    => $params['image_size'],
+					'image_limit'   => $params['image_limit'],
+					'image_link_to' => $params['image_link_to'],
+					'restrict_to_image_position' => 'aftermore',
+				) );
+		}
+
+		// Display the "after more" part of the text: (part after "[teaserbreak]")
+		$this->content_extension( $params );
+
+		// Links to post pages (for multipage posts):
+		$this->page_links( $params );
+
+		// Display Item footer text (text can be edited in Blog Settings):
+		$this->footer( $params );
+
+		echo $params['content_block_after_text'];
+
+		// Get item content from buffer:
+		return ob_get_clean();
 	}
 
 
