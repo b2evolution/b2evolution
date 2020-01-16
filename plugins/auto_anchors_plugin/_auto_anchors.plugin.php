@@ -49,7 +49,7 @@ class auto_anchors_plugin extends Plugin
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_params = array(
-				'default_comment_rendering' => 'opt-in',
+				'default_comment_rendering' => 'never',
 				'default_post_rendering' => 'opt-out'
 			);
 
