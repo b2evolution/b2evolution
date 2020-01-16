@@ -2678,6 +2678,9 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 .widget_core_item_tags .evo_widget_item_tags_edit_form .evo_widget_item_tags_quicklist .btn + .btn {
   margin-left: 3px;
 }
+.widget_core_item_tags .evo_widget_item_tags_list .post_tags {
+  display: inline-block;
+}
 .videojs_block .vjs-default-skin .vjs-big-play-button {
   left: 0;
   top: 0;
