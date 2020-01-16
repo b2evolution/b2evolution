@@ -95,8 +95,8 @@ class SiteMenu extends DataObject
 		$this->set_from_Request( 'locale' );
 
 		// Parent Menu:
-		param( 'menu_parent_ID', 'integer', NULL );
-		if( $menu_parent_ID && $this->has_child_menus() )
+		$menu_parent_ID = param( 'menu_parent_ID', 'integer', NULL );
+		if( isset( $menu_parent_ID ) && $this->has_child_menus() )
 		{	// Display error message if we want make the meta category from category with posts
 			global $Messages;
 			$Messages->add( sprintf( T_('This menu cannot become a child of another because it has %d children itself.'), $this->count_child_menus ) );
