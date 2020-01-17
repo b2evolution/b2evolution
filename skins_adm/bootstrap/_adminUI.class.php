@@ -89,7 +89,7 @@ class AdminUI extends AdminUI_general
 			) );
 
 		// Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
-		init_fontawesome_icons( 'fontawesome-glyphicons' );
+		init_fontawesome_icons( 'fontawesome-glyphicons', 'rsc_uri' );
 
 		if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
 		{	// Display info message if browser IE < 9 version and it is allowed by config var:

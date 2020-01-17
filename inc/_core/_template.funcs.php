@@ -1054,7 +1054,7 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  */
 function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js', $version = '#' )
 {
-	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url;
+	global $library_local_urls, $library_cdn_urls, $use_cdns, $debug, $rsc_url, $rsc_uri;
 	global $Collection, $Blog, $baseurl, $assets_baseurl, $ReqURL;
 
 	if( $relative_to == 'blog' && ( is_admin_page() || empty( $Blog ) ) )
@@ -1116,6 +1116,10 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 		{
 			$lib_url = $lib_file;
 		}
+	}
+	elseif( $relative_to === 'rsc_uri' )
+	{ // Get the file from $rsc_uri:
+		$lib_url = $rsc_uri.$subfolder.'/'.$lib_file;
 	}
 	else
 	{ // Get the file from $rsc_url:
@@ -1223,7 +1227,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
  * Set $relative_to_base to TRUE to prevent this function from adding on the rsc_path
  *
  * @param string alias, url or filename (relative to rsc/css) for CSS file
- * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url)  or 'rsc_uri' (relative to $rsc_uri) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
  * @param string title.  The title for the link tag
  * @param string media.  ie, 'print'
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
@@ -1241,7 +1245,7 @@ function require_css( $css_file, $relative_to = 'rsc_url', $title = NULL, $media
 
 	// Which subfolder do we want to use in case of absolute paths? (doesn't appy to 'relative')
 	$subfolder = 'css';
-	if( $relative_to == 'rsc_url' || $relative_to == 'blog' )
+	if( $relative_to == 'rsc_url' || $relative_to == 'rsc_uri' || $relative_to == 'blog' )
 	{
 		if( preg_match( '/\.(bundle|bmin|min)\.css$/', $css_file ) )
 		{
