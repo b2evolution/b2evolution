@@ -10768,10 +10768,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// Get those Item Single containers where the item content widget doesn't exist:
 		$item_single_containers = $DB->get_col( 'SELECT wico_ID FROM T_widget__container
 				WHERE wico_code = "item_single" AND wico_ID NOT IN (
-					SELECT wi_wico_ID FROM T_widget__widget WHERE wi_code = "coll_item_content" )' );
+					SELECT wi_wico_ID FROM T_widget__widget WHERE wi_code = "item_content" )' );
 		foreach( $item_single_containers as $wico_ID )
 		{
-			$widgets_insert_sql_rows[] = '( '.$wico_ID.', 1, "core", "coll_item_content", NULL )';
+			$widgets_insert_sql_rows[] = '( '.$wico_ID.', 1, "core", "item_content", NULL )';
 		}
 		if( ! empty( $widgets_insert_sql_rows ) )
 		{	// There are widgets to create, insert previously built widget records:
