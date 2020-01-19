@@ -589,7 +589,7 @@
 
 			function removeFilter() {
 				if (isIE) {
-					$box[0].style.removeAttribute('filter');
+					$box[0].style.removeProperty('filter');
 				}
 			}
 
@@ -775,11 +775,11 @@
 		} else if (isImage(href)) {
 			$(photo = new Image())
 			.addClass(prefix + 'Photo')
-			.error(function () {
+			.on( 'error', function () {
 				settings.title = false;
 				prep($div('Error').text('This image could not be loaded'));
 			})
-			.load(function () {
+			.on( 'load', function () {
 				var percent;
 				photo.onload = null; //stops animated gifs from firing the onload repeatedly.
 
