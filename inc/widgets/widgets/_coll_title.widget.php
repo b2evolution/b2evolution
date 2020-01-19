@@ -118,7 +118,7 @@ class coll_title_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Collection, $Blog;
+		global $Collection, $Blog, $is_front;
 
 		$this->init_display( $params );
 
@@ -130,7 +130,7 @@ class coll_title_Widget extends ComponentWidget
 		// Check whether the title should have a link or not
 		$linked_title = $this->disp_params['add_title_link'];
 		
-		if( $linked_title == 'always' || ($linked_title == 'auto' && $disp != 'front') )
+		if( $linked_title == 'always' || ($linked_title == 'auto' && !$is_front ) )
 		{ // Add a link to the collection in the title
 			$title = '<a href="'.$Blog->get( 'url' ).'">' .$title .'</a>';
 		}
