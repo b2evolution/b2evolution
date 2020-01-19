@@ -6311,6 +6311,7 @@ function generate_link_from_params( $link_params, $params = array() )
 			'img_height'  => '',
 			'title'       => '',
 			'target'      => '_blank',
+			'rel'         => 'noopener',
 		), $params );
 
 	$text = $link_params[1];
@@ -6329,6 +6330,11 @@ function generate_link_from_params( $link_params, $params = array() )
 	if( !empty($params['target'] ) )
 	{
 		$r .= ' target="'.$params['target'].'"';
+	}
+
+	if( !empty($params['rel'] ) )
+	{
+		$r .= ' rel="'.$params['rel'].'"';
 	}
 
 	if( $params['type'] == 'img' )

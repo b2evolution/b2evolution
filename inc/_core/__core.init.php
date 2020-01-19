@@ -1324,27 +1324,32 @@ class _core_Module extends Module
 							'text' => T_('Open b2evolution.net'),
 							'href' => 'http://b2evolution.net/',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'forums' => array(
 							'text' => T_('Open Support forums'),
 							'href' => 'http://forums.b2evolution.net/',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'manual' => array(
 							'text' => T_('Open Online manual'),
 							'href' => get_manual_url( NULL ),
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'sep' => array( 'separator' => true ),
 					'twitter' => array(
 							'text' => T_('b2evolution on twitter'),
 							'href' => 'http://twitter.com/b2evolution',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						),
 					'facebook' => array(
 							'text' => T_('b2evolution on facebook'),
 							'href' => 'http://www.facebook.com/b2evolution',
 							'target' => '_blank',
+							'rel' => 'noopener',
 						)
 					)
 				);
