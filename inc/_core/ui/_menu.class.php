@@ -314,6 +314,10 @@ class Menu extends Widget
 				{
 					$anchor .= ' target="'.$loop_details['target'].'"';
 				}
+				if( isset($loop_details['rel']) )
+				{
+					$anchor .= ' rel="'.$loop_details['rel'].'"';
+				}
 				if( isset($loop_details['style']) )
 				{
 					$anchor .= ' style="'.$loop_details['style'].'"';
