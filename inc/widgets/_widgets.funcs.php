@@ -910,6 +910,16 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 							continue;
 						}
 
+						if( isset( $widget['is_pro'] ) && $widget['is_pro'] !== is_pro() )
+						{	// Skip widget because it should not be installed for the current version:
+							continue;
+						}
+
+						if( isset( $widget['coll_ID'] ) && ! is_allowed_option( $widget_Blog->ID, $widget['coll_ID'] ) )
+						{	// Skip widget because it should not be installed for the given collection ID:
+							continue;
+						}
+
 						// Initialize a widget row to insert into DB below by single query:
 						$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
 						$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
@@ -1127,7 +1137,7 @@ function insert_basic_widgets( $blog_id, $skin_type, $initial_install = false, $
 			}
 
 			if( isset( $widget['is_pro'] ) && $widget['is_pro'] !== is_pro() )
-			{	// Skip widget because it should not be installed for the current pro:
+			{	// Skip widget because it should not be installed for the current version:
 				continue;
 			}
 
