@@ -1210,12 +1210,11 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async = false, $output
 	}
 
 	/* Yura: Don't require this plugin when it is already concatenated in jquery.bundle.js
-	 * But we should don't forget it for CDN jQuery file and when js code uses deprecated things of jQuery
+	 * But we should don't forget it for CDN jQuery file and when js code uses deprecated things of jQuery */
 	if( $js_file == '#jquery#' )
 	{ // Dependency : The plugin restores deprecated features and behaviors so that older code will still run properly on jQuery 1.9 and later
 		require_js( '#jquery_migrate#', $relative_to, $async, $output, $version );
 	}
-	 */
 }
 
 
