@@ -683,7 +683,7 @@ if( $can_crop )
 	render_content();
 
 	// Initialize jcrop tool only after the image is fully loaded
-	jQuery( '#user_crop_workarea img' ).load( function()
+	jQuery( '#user_crop_workarea img' ).on( 'load', function()
 		{
 			init_jcrop_tool( jQuery( this ) );
 		});

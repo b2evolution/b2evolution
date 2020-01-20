@@ -3525,7 +3525,7 @@ function debug_info( $force = false, $force_clean = false )
 			echo '
 			<script>
 			(function($){
-				jQuery( "table.debug_timer th" ).click( function(event) {
+				jQuery( "table.debug_timer th" ).on( "click", function(event) {
 					var table = jQuery(this).closest( "table.debug_timer" );
 					if( table.data( "clicked_once" ) ) return; else table.data( "clicked_once", true );
 					jQuery( "tbody:eq(0) tr:last", table ).remove();
@@ -8202,7 +8202,7 @@ function echo_form_dropdown_js()
 	$tooltip_titles_js_array = implode( ', ', $tooltip_titles_js_array );
 ?>
 <script>
-jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
+jQuery( '.btn-group.dropdown.autoselected li a' ).on( 'click', function()
 {
 	var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};
 	var item = jQuery( this ).parent();
@@ -9727,7 +9727,7 @@ function display_importer_upload_panel( $params = array() )
 
 ?>
 <script>
-jQuery( '.table_scroll td' ).click( function()
+jQuery( '.table_scroll td' ).on( 'click', function()
 {
 	jQuery( this ).parent().find( 'input[type=radio]' ).prop( 'checked', true );
 } );
