@@ -121,7 +121,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 
 $Form->end_form( $buttons );
 
-if( $edited_SiteMenu->ID > 0 )
+if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 {	// Display menu entries:
 	$SiteMenuEntryCache = & get_SiteMenuEntryCache();
 

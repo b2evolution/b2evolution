@@ -255,14 +255,43 @@ class SiteMenu extends DataObject
 		}
 
 		// Copy all menu entries linked to the menu:
-		$menu_entry_fields = array( 'ment_menu_ID', 'ment_parent_ID', 'ment_order', 'ment_text', 'ment_type',
+		$menu_entry_fields = array( 'ment_ID', 'ment_menu_ID', 'ment_parent_ID', 'ment_order', 'ment_text', 'ment_type',
 				'ment_coll_logo_size', 'ment_coll_ID', 'ment_item_ID', 'ment_url', 'ment_visibility', 'ment_highlight' );
 
-		$DB->query( 'INSERT INTO T_menus__entry ('.implode( ', ', $menu_entry_fields ).')
-				SELECT '.$DB->quote( $this->ID ).' AS '.implode( ', ', $menu_entry_fields ).'
-				FROM T_menus__entry
-				WHERE ment_menu_ID = '.$DB->quote( $duplicated_menu_ID ),
-				'Duplicate menu entries from menu #'.$duplicated_menu_ID.' to #'.$this->ID );
+		$menu_entries_SQL = 'SELECT '.implode( ', ', $menu_entry_fields ).'
+							 FROM T_menus__entry
+							 WHERE ment_menu_ID = '.$DB->quote( $duplicated_menu_ID ).'
+							 ORDER BY ment_parent_ID ASC, ment_order ASC';
+
+		$menu_entries = $DB->get_results( $menu_entries_SQL, ARRAY_A );
+
+		$entries = array();
+		foreach( $menu_entries as $menu_entry )
+		{
+			$loop_SiteMenuEntry = new SiteMenuEntry();
+			foreach( $menu_entry_fields as $entry_field )
+			{
+				if( $entry_field == 'ment_ID')
+				{
+					continue;
+				}
+				elseif( $entry_field == 'ment_menu_ID' )
+				{
+					$loop_SiteMenuEntry->set( 'menu_ID', $this->ID );
+				}
+				elseif( $entry_field == 'ment_parent_ID' && ! empty( $menu_entry['ment_parent_ID'] ) && isset( $entries[$menu_entry['ment_parent_ID']] ) )
+				{
+					$loop_SiteMenuEntry->set( 'parent_ID', $entries[$menu_entry['ment_parent_ID']]);
+				}
+				else
+				{
+					$property = substr( $entry_field, 5 );
+					$loop_SiteMenuEntry->set( $property, $menu_entry[$entry_field] );
+				}
+			}
+			$loop_SiteMenuEntry->dbinsert();
+			$entries[$menu_entry['ment_ID']] = $loop_SiteMenuEntry->ID;
+		}
 
 		// Duplication is successful, commit all above changes:
 		$DB->commit();
