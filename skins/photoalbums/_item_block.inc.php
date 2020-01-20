@@ -157,7 +157,7 @@ function change_position_nav()
 }
 
 var $nav_album = jQuery( '.nav_album' );
-var nav_size = $nav_album.size();
+var nav_size = $nav_album.length;
 var nav_top = <?php echo ( show_toolbar() ? 27 : 0 ) ; ?>;
 var $navSpacer = $( '<div />', {
 		'class':  'nav_album_spacer',

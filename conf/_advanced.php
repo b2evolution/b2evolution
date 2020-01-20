@@ -873,6 +873,7 @@ $library_cdn_urls = array(
  */
 $library_local_urls = array(
 		'#jquery#' => array( 'jquery.min.js', 'jquery.js' ),
+		'#jquery_migrate#' => array( 'jquery/jquery-migrate.min.js', 'jquery/jquery-migrate.js' ),
 		'#jqueryUI#' => array( 'jquery/jquery.ui.b2evo.min.js', 'jquery/jquery.ui.b2evo.js' ),
 		'#jqueryUI_css#' => array( 'jquery/smoothness/jquery-ui.b2evo.min.css', 'jquery/smoothness/jquery-ui.b2evo.css' ),
 # Uncomment the following lines if your plugins need more jQueryUI features than the ones loaded by b2evo:
