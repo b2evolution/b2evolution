@@ -502,7 +502,7 @@ body {
 
 		if( $SiteMenuEntry->get( 'type' ) == 'text' )
 		{	// Only type "Text" supports sub-entries:
-			$sub_entries = $SiteMenuEntry->get_children();
+			$sub_entries = $SiteMenuEntry->get_children( true );
 			$sub_tabs = array();
 			foreach( $sub_entries as $sub_SiteMenuEntry )
 			{
