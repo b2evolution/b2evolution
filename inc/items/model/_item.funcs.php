@@ -3268,6 +3268,7 @@ function echo_autocomplete_tags( $params = array() )
 			hintText: '<?php echo TS_('Type in a tag') ?>',
 			noResultsText: '<?php echo TS_('No results') ?>',
 			searchingText: '<?php echo TS_('Searching...') ?>',
+			minInputWidth: 0,
 			jsonContainer: 'tags',
 			<?php if( $params['update_by_ajax'] ) { ?>
 			onAdd: function( obj ) { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector, obj, 'add' ) },

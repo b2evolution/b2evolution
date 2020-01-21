@@ -10,6 +10,8 @@
  * 
  * 1) May 25, 2015 by Yura Bakhtin:
  *    Remove all ".toLowerCase()" to allow use case-sensitive chars
+ * 2) January 21, 2020 by Erwin Rommel Satingin:
+ *    Added "minInputWidth" setting to customize input width
  *
  */
 
@@ -31,6 +33,7 @@ var DEFAULT_SETTINGS = {
     searchingText: "Searching...",
     deleteText: "&times;",
     animateDropdown: true,
+    minInputWidth: 30,
 
 	// Tokenization settings
     tokenLimit: null,
@@ -448,7 +451,7 @@ $.TokenList = function (input, url_or_data, settings) {
         // Enter new content into resizer and resize input accordingly
         var escaped = input_val.replace(/&/g, '&amp;').replace(/\s/g,' ').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         input_resizer.html(escaped);
-        input_box.width(input_resizer.width() + 30);
+        input_box.width(input_resizer.width() + settings.minInputWidth);
     }
 
     function is_printable_character(keycode) {
