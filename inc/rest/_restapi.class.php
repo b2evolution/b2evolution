@@ -2028,9 +2028,9 @@ class RestApi
 		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
 		 * It also allows to find "ee" when we type in "éè" and otherwise.
 		 * 
-		 * Erwin: we have to make sure that the literal search string uses UTF8 encoding when we compare it to a UTF8 column by using '_utf8' introducer
+		 * Erwin: Changed added collation from "utf8_general_ci" to "utf8mb4_general_ci" to match default DB connection collation
 		 */
-		$tags_SQL->WHERE( 'tag_name LIKE _utf8'.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$tags_SQL->WHERE( 'tag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8mb4_general_ci' );
 		$tags_SQL->ORDER_BY( 'tag_name' );
 		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
 
@@ -2089,9 +2089,9 @@ class RestApi
 		 * It allows to match "testA" with "testa", and otherwise "testa" with "testA".
 		 * It also allows to find "ee" when we type in "éè" and otherwise.
 		 * 
-		 * Erwin: we have to make sure that the literal search string uses UTF8 encoding when we compare it to a UTF8 column by using '_utf8' introducer
+		 * Erwin: Changed added collation from "utf8_general_ci" to "utf8mb4_general_ci" to match default DB connection collation
 		 */
-		$tags_SQL->WHERE( 'utag_name LIKE _utf8'.$DB->quote( '%'.$term.'%' ).' COLLATE utf8_general_ci' );
+		$tags_SQL->WHERE( 'utag_name LIKE '.$DB->quote( '%'.$term.'%' ).' COLLATE utf8mb4_general_ci' );
 		$tags_SQL->ORDER_BY( 'utag_name' );
 		$tags = $DB->get_results( $tags_SQL->get(), ARRAY_A );
 
