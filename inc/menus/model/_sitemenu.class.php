@@ -40,6 +40,11 @@ class SiteMenu extends DataObject
 	var $count_child_menus = NULL;
 
 	/**
+	 * @var array Localized child menus
+	 */
+	var $localized_menus = NULL;
+
+	/**
 	 * Constructor
 	 *
 	 * @param object table Database row
@@ -90,8 +95,8 @@ class SiteMenu extends DataObject
 		$this->set_from_Request( 'locale' );
 
 		// Parent Menu:
-		param( 'menu_parent_ID', 'integer', NULL );
-		if( $menu_parent_ID && $this->has_child_menus() )
+		$menu_parent_ID = param( 'menu_parent_ID', 'integer', NULL );
+		if( isset( $menu_parent_ID ) && $this->has_child_menus() )
 		{	// Display error message if we want make the meta category from category with posts
 			global $Messages;
 			$Messages->add( sprintf( T_('This menu cannot become a child of another because it has %d children itself.'), $this->count_child_menus ) );
@@ -250,14 +255,43 @@ class SiteMenu extends DataObject
 		}
 
 		// Copy all menu entries linked to the menu:
-		$menu_entry_fields = array( 'ment_menu_ID', 'ment_parent_ID', 'ment_order', 'ment_text', 'ment_type',
+		$menu_entry_fields = array( 'ment_ID', 'ment_menu_ID', 'ment_parent_ID', 'ment_order', 'ment_text', 'ment_type',
 				'ment_coll_logo_size', 'ment_coll_ID', 'ment_item_ID', 'ment_url', 'ment_visibility', 'ment_highlight' );
 
-		$DB->query( 'INSERT INTO T_menus__entry ('.implode( ', ', $menu_entry_fields ).')
-				SELECT '.$DB->quote( $this->ID ).' AS '.implode( ', ', $menu_entry_fields ).'
-				FROM T_menus__entry
-				WHERE ment_menu_ID = '.$DB->quote( $duplicated_menu_ID ),
-				'Duplicate menu entries from menu #'.$duplicated_menu_ID.' to #'.$this->ID );
+		$menu_entries_SQL = 'SELECT '.implode( ', ', $menu_entry_fields ).'
+							 FROM T_menus__entry
+							 WHERE ment_menu_ID = '.$DB->quote( $duplicated_menu_ID ).'
+							 ORDER BY ment_parent_ID ASC, ment_order ASC';
+
+		$menu_entries = $DB->get_results( $menu_entries_SQL, ARRAY_A );
+
+		$entries = array();
+		foreach( $menu_entries as $menu_entry )
+		{
+			$loop_SiteMenuEntry = new SiteMenuEntry();
+			foreach( $menu_entry_fields as $entry_field )
+			{
+				if( $entry_field == 'ment_ID')
+				{
+					continue;
+				}
+				elseif( $entry_field == 'ment_menu_ID' )
+				{
+					$loop_SiteMenuEntry->set( 'menu_ID', $this->ID );
+				}
+				elseif( $entry_field == 'ment_parent_ID' && ! empty( $menu_entry['ment_parent_ID'] ) && isset( $entries[$menu_entry['ment_parent_ID']] ) )
+				{
+					$loop_SiteMenuEntry->set( 'parent_ID', $entries[$menu_entry['ment_parent_ID']]);
+				}
+				else
+				{
+					$property = substr( $entry_field, 5 );
+					$loop_SiteMenuEntry->set( $property, $menu_entry[$entry_field] );
+				}
+			}
+			$loop_SiteMenuEntry->dbinsert();
+			$entries[$menu_entry['ment_ID']] = $loop_SiteMenuEntry->ID;
+		}
 
 		// Duplication is successful, commit all above changes:
 		$DB->commit();
@@ -328,6 +362,28 @@ class SiteMenu extends DataObject
 		$SQL->WHERE_and( 'ment_parent_ID '.( empty( $parent_ID ) ? 'IS NULL' : '= '.$DB->quote( $parent_ID ) ) );
 
 		return intval( $DB->get_var( $SQL ) );
+	}
+
+
+	/**
+	 * Get localized child menus
+	 * 
+	 * @param string Locale
+	 * @return array Array of SiteMenu objects
+	 */
+	function get_localized_menus( $locale )
+	{
+		global $DB;
+
+		if( ! isset( $this->localized_menus[$locale] ) )
+		{
+			$SiteMenuCache = & get_SiteMenuCache();
+			$SiteMenuCache->clear( true );
+			$where = 'menu_parent_ID = '.$DB->quote( $this->ID ).' AND menu_locale = '.$DB->quote( $locale );
+			$this->localized_menus[$locale] = $SiteMenuCache->load_where( $where );
+		}
+
+		return $this->localized_menus[$locale];
 	}
 
 

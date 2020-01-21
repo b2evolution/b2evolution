@@ -443,7 +443,7 @@ class tinymce_plugin extends Plugin
 				$item_Blog = & $edited_Item->get_Blog();
 
 				if( $edited_Comment->is_meta() )
-				{	// Do not use TinyMCE for meta comments, never!
+				{	// Do not use TinyMCE for internal comments, never!
 					return false;
 				}
 

@@ -58,7 +58,7 @@ switch( $action )
 
 		// Some users can delete & change a status of comments in their own posts, set corresponding permlevel
 		if( $edited_Comment->is_meta() )
-		{ // Use special permissions for meta comment
+		{ // Use special permissions for internal comment
 			$check_permname = 'meta_comment';
 			$check_permlevel = $action == 'delete' ? 'delete' : 'edit';
 		}
@@ -137,7 +137,7 @@ switch( $action )
 
 		// Check permission:
 		if( $tab3 == 'meta' )
-		{	// For meta comments:
+		{	// For internal comments:
 			$selected = autoselect_blog( 'meta_comment', 'blog' );
 		}
 		else
@@ -206,10 +206,10 @@ switch( $tab3 )
 		break;
 
 	case 'meta':
-		// Check permission for meta comments:
+		// Check permission for internal comments:
 		$current_User->check_perm( 'meta_comment', 'view', true, $Blog->ID );
 
-		$AdminUI->breadcrumbpath_add( T_('Meta discussion'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
+		$AdminUI->breadcrumbpath_add( T_('Internal comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;
 }
 
@@ -729,7 +729,7 @@ switch( $action )
 
 		// Filter list:
 		if( $tab3 == 'meta' )
-		{	// Meta comments:
+		{	// Internal comments:
 			$CommentList->set_default_filters( array(
 					'types' => array( 'meta' ),
 					'order' => 'DESC',

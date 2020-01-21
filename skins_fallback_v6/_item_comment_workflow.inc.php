@@ -49,7 +49,7 @@ $Item->display_workflow_field( 'priority', $Form );
 $Item->display_workflow_field( 'deadline', $Form );
 
 if( $Comment->is_meta() )
-{	// Display inputs of custom fields which are allowed to be updated with meta comment:
+{	// Display inputs of custom fields which are allowed to be updated with internal comment:
 	$custom_fields = $Item->get_custom_fields_defs();
 
 	if( isset( $Comment->item_custom_fields ) && is_array( $Comment->item_custom_fields ) )

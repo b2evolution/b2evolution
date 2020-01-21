@@ -96,7 +96,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 				$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
 				if( $row->comment_type != 'meta' )
-				{ // Exclude meta comments from feedbacks
+				{ // Exclude internal comments from feedbacks
 					// Total for status on post:
 					$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
 
@@ -137,7 +137,7 @@ function generic_ctp_number( $post_id, $mode = 'comments', $status = 'published'
 			$cache_ctp_number[$filter_index][$row->comment_item_ID][$row->comment_type.'s']['total'] += $row->type_count;
 
 			if( $row->comment_type != 'meta' )
-			{ // Exclude meta comments from feedbacks
+			{ // Exclude internal comments from feedbacks
 				// Total for status on post:
 				$cache_ctp_number[$filter_index][$row->comment_item_ID]['feedbacks'][$row->comment_status] += $row->type_count;
 
@@ -282,7 +282,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 	global $Collection, $Blog, $AdminUI;
 
 	if( $edited_Comment->is_meta() )
-	{ // Meta comments don't have a status, Display only one button to update
+	{ // Internal comments don't have a status, Display only one button to update
 		$Form->submit( array( 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) );
 	}
 	else
@@ -293,7 +293,7 @@ function echo_comment_buttons( $Form, $edited_Comment )
 			echo T_('Visibility').get_manual_link( 'visibility-status' ).': ';
 			// Get those statuses which are not allowed for the current User to create comments in this blog
 			if( $edited_Comment->is_meta() )
-			{	// Don't restrict statuses for meta comments:
+			{	// Don't restrict statuses for internal comments:
 				$restricted_statuses = array();
 			}
 			else
@@ -364,7 +364,7 @@ function echo_comment_status_buttons( $Form, $edited_Comment = NULL, $max_allowe
 	if( $edited_Comment !== NULL )
 	{	// If the edited comment is defined, e-g on edit form:
 		if( $edited_Comment->is_meta() )
-		{	// Don't suggest to change a status of meta comment:
+		{	// Don't suggest to change a status of internal comment:
 			$Form->submit( array( 'actionArray['.$action.']', T_('Save Changes!'), 'SaveButton', '' ) );
 			return;
 		}

@@ -389,7 +389,7 @@ skin_widget( array(
 	<?php
 	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
 	{	// We are running at least b2evo 6.7, so we can include this file:
-		// ------------------ META COMMENTS INCLUDED HERE ------------------
+		// ------------------ INTERNAL COMMENTS INCLUDED HERE ------------------
 		skin_include( '_item_meta_comments.inc.php', array(
 				'comment_start'         => '<article class="evo_comment evo_comment__meta panel panel-default">',
 				'comment_end'           => '</article>',
@@ -403,7 +403,7 @@ skin_widget( array(
 				'comment_text_before'   => '<div class="evo_comment_text col-md-11 col-sm-10">',
 				'comment_text_after'    => '</div>',
 			) );
-		// ---------------------- END OF META COMMENTS ---------------------
+		// ---------------------- END OF INTERNAL COMMENTS ---------------------
 	}
 	?>
 

@@ -95,7 +95,7 @@ function openModalWindow( body_html, width, height, transparent, title, buttons,
 
 	if( typeof( iframe_id ) != 'undefined' )
 	{
-		jQuery( '#' + iframe_id ).load( function()
+		jQuery( '#' + iframe_id ).on( 'load', function()
 		{	// Prepare modal window only after loading full content:
 			prepareModalWindow( jQuery( this ).contents(), button_form, use_buttons, keep_panels );
 			jQuery( '#modal_window .loader_img' ).remove();

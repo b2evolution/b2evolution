@@ -1280,7 +1280,7 @@ class CommentList2 extends DataObjectList2
 
 	/**
 	 * Initialize comment order numbers for this filtered list
-	 * (Used for meta comments)
+	 * (Used for internal comments)
 	 *
 	 * @param string Order mode:
 	 *               'date' - first created comment has first order,

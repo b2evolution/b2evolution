@@ -3305,7 +3305,7 @@ class User extends DataObject
 				$check_status = substr( $permname, 8 );
 
 				if( $Comment->is_meta() && in_array( $permlevel, array( 'edit', 'moderate', 'delete' ) ) )
-				{ // Check the permissions for meta comment with special function
+				{ // Check the permissions for internal comment with special function
 					$perm = $this->check_perm( 'meta_comment', $permlevel, false, $Comment );
 					break;
 				}
@@ -3354,7 +3354,7 @@ class User extends DataObject
 				break;
 
 			case 'meta_comment':
-				// Check permission for meta comment:
+				// Check permission for internal comment:
 
 				if( $permlevel == 'edit' || $permlevel == 'delete' )
 				{	// Set Comment from target object:
@@ -3372,7 +3372,7 @@ class User extends DataObject
 					$blog_ID = $perm_target_ID;
 				}
 				else
-				{	// Permission level is not allowed for all meta comments (For example 'moderate')
+				{	// Permission level is not allowed for all internal comments (For example 'moderate')
 					$perm = false;
 					break;
 				}
@@ -3393,7 +3393,7 @@ class User extends DataObject
 				{
 					case 'view':
 					case 'blog': // deprecated perm level
-						// Check perms to View meta comments of the collection:
+						// Check perms to View internal comments of the collection:
 						$perm = // If User is explicitly allowed in the user permissions
 								$this->check_perm_blogusers( 'meta_comment', 'view', $blog_ID )
 								// OR If User belongs to primary or secondary groups explicitly allowed in the group permissions
@@ -3401,15 +3401,15 @@ class User extends DataObject
 						break;
 
 					case 'add':
-						// Check perms to Add meta comments to the collection items:
+						// Check perms to Add internal comments to the collection items:
 						$perm = // If User can access to back-office
 								$this->check_perm( 'admin', 'restricted' )
-								// AND if user can view meta comment of the collection
+								// AND if user can view internal comment of the collection
 								&& $this->check_perm( 'meta_comment', 'view', false, $blog_ID );
 						break;
 
 					case 'edit':
-						// Check perms to Edit meta comment:
+						// Check perms to Edit internal comment:
 						$perm = // If User is explicitly allowed in the user permissions
 								$this->check_perm_blogusers( 'meta_comment', 'edit', $blog_ID, $Comment )
 								// OR If User belongs to primary or secondary groups explicitly allowed in the group permissions
@@ -3417,10 +3417,10 @@ class User extends DataObject
 						break;
 
 					case 'delete':
-						// Check perms to Delete meta comments:
+						// Check perms to Delete internal comments:
 						$perm = // If it is allowed to delete comments on the collection
 								$this->check_perm( 'blog_del_cmts', 'edit', false, $blog_ID )
-								// AND if user can view meta comment of the collection
+								// AND if user can view internal comment of the collection
 								&& $this->check_perm( 'meta_comment', 'view', false, $blog_ID );
 						break;
 				}

@@ -108,7 +108,7 @@ class CollectionSettings extends AbstractSettings
 			'comments_register' => 1,
 			'comment_quick_moderation' => 'expire',		// Comment quick moderation can be 'never', 'expire' - Links expire on first edit action, and 'always'
 			'autocomplete_usernames' => 1,
-			'meta_comments_frontoffice' => 1, // Display meta comments in front-office
+			'meta_comments_frontoffice' => 1, // Display internal comments in front-office
 			'webmentions' => 1, // Allow to accept webmentions from other sites
 
 		// Archive settings:

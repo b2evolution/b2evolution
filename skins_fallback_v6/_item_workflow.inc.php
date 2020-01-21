@@ -17,7 +17,7 @@ global $disp;
 
 if( ( $disp == 'single' || $disp == 'page' ) &&
     isset( $Item ) && $Item->ID > 0 &&
-    ! $Item->can_meta_comment() && // If user can write meta comment then we display the workflow form in the meta comment form instead of here
+    ! $Item->can_meta_comment() && // If user can write internal comment then we display the workflow form in the internal comment form instead of here
     $Item->can_edit_workflow() )
 { // Display workflow properties if current user can edit at least one workflow property:
 	$Form = new Form( get_htsrv_url().'item_edit.php' );

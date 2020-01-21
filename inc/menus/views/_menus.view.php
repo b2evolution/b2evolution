@@ -53,7 +53,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 		'th_class' => 'shrinkwrap small',
 		'td_class' => 'shrinkwrap',
 		'td' => action_icon( TS_('Edit this menu...'), 'properties', $admin_url.'?ctrl=menus&amp;action=edit&amp;menu_ID=$menu_ID$' )
-				.action_icon( TB_('Duplicate').'...', 'duplicate', $admin_url.'?ctrl=menus&amp;action=copy&amp;menu_ID=$menu_ID$&amp;'.url_crumb( 'menu') )
+				.action_icon( TB_('Duplicate / Translate').'...', 'duplicate', $admin_url.'?ctrl=menus&amp;action=copy&amp;menu_ID=$menu_ID$&amp;'.url_crumb( 'menu') )
 				.action_icon( T_('Delete this menu!'), 'delete', regenerate_url( 'menu_ID,action', 'menu_ID=$menu_ID$&amp;action=delete&amp;'.url_crumb( 'menu' ) ) ),
 		);
 

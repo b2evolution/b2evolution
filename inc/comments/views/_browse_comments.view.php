@@ -67,7 +67,7 @@ if( $tab3 != 'meta' && $current_User->check_perm( 'blogs', 'editall' ) )
 			) );
 	}
 }
-$block_item_Widget->title = ( $tab3 == 'meta' ? T_('Meta comments') : T_('Feedback (Comments, Trackbacks...)') );
+$block_item_Widget->title = ( $tab3 == 'meta' ? T_('Internal comments') : T_('Feedback (Comments, Trackbacks...)') );
 $block_item_Widget->disp_template_replaced( 'block_start' );
 
 // Display filters title

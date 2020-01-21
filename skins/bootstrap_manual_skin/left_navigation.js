@@ -22,7 +22,7 @@ jQuery( document ).ready( function()
 			return;
 		}
 
-		if( $sidebar.size() )
+		if( $sidebar.length )
 		{	// Sidebar exists
 			var column_top_point = $sidebar.offset().top;
 			var sidebar_top_start_point = top_start_point;

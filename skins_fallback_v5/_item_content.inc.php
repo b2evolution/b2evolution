@@ -31,36 +31,63 @@ $params = array_merge( array(
 		'content_start_full'       => '<div class="content_full">',
 		'content_end_full'         => '</div>',
 
-		// In case we display a compact version of the post:
+		// In case we display a COMPACT version of the post:
 		'excerpt_before_text'      => '<div class="excerpt">',
 		'excerpt_after_text'       => '</div>',
 
 		'excerpt_before_more'      => ' <span class="excerpt_more">',
 		'excerpt_after_more'       => '</span>',
 		'excerpt_more_text'        => T_('more').' &raquo;',
+
+		// In case we display a FULL version of the post:
+		'content_start_full_text'  => '<div class="bText">',
+		'content_end_full_text'    => '</div>',
+
 		'before_content_teaser'    => '',
 		'after_content_teaser'     => '',
 		'before_content_extension' => '',
 		'after_content_extension'  => '',
 
+		// For teaser images:
+		'display_teaser_images'    => true,
+		'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
+		// For image blocks like Teaser, After-More:
 		'before_images'            => '<div class="bImages">',
+		'after_images'             => '</div>',
+
+		// In case we display a CONTENT BLOCK (included in another post by short tag [include:item-slug]):
+		'content_block_start'         => '<div class="evo_content_block $cb_class$">',
+		'content_block_end'           => '</div>',
+		'content_block_before_images' => '<div class="evo_content_block_images">',
+		'content_block_after_images'  => '</div>',
+		'content_block_before_text'   => '<div class="evo_content_block_text">',
+		'content_block_after_text'    => '</div>',
+
+		// For all images, including inline images like [image:] and [thumbnail:]:
 		'before_image'             => '<div class="image_block">',
 		'before_image_legend'      => '<div class="image_legend">',
 		'after_image_legend'       => '</div>',
 		'after_image'              => '</div>',
-		'after_images'             => '</div>',
 		'image_class'              => '',
 		'image_size'               => 'fit-400x320',
 		'image_limit'              =>  1000,
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
+
+		// Overrides for all images when displayed in COMPACT version of the post:
 		'excerpt_image_class'      => '',
 		'excerpt_image_size'       => 'fit-80x80',
 		'excerpt_image_limit'      => 1,
 		'excerpt_image_link_to'    => 'single',
-		'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
 
+		// When we display the contents of a folder (multiple images) and not a single image:
 		'before_gallery'           => '<div class="bGallery">',
 		'after_gallery'            => '</div>',
+		'gallery_table_start'      => '',
+		'gallery_table_end'        => '',
+		'gallery_row_start'        => '',
+		'gallery_row_end'          => '',
+		'gallery_cell_start'       => '<div class="evo_post_gallery__image">',
+		'gallery_cell_end'         => '</div>',
 		'gallery_image_size'       => 'crop-80x80',
 		'gallery_image_limit'      => 1000,
 		'gallery_colls'            => 5,
@@ -167,6 +194,12 @@ switch( $content_mode )
 					'image_link_to'       => $params['excerpt_image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
 					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
 					'gallery_image_size'  => $params['gallery_image_size'],
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
@@ -213,6 +246,12 @@ switch( $content_mode )
 					'image_link_to'       => $params['image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
 					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
 					'gallery_image_size'  => $params['gallery_image_size'],
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
@@ -225,10 +264,16 @@ switch( $content_mode )
 		if( $params['content_display_full'] )
 		{	// We want to display text, not just images:
 
-			echo '<div class="bText">';
+			echo $params['content_start_full_text'];
 
-			// Display CONTENT:
+			// Display CONTENT (at least the TEASER part):
 			$Item->content_teaser( array(
+					'content_block_start'         => $params['content_block_start'],
+					'content_block_end'           => $params['content_block_end'],
+					'content_block_before_images' => $params['content_block_before_images'],
+					'content_block_after_images'  => $params['content_block_after_images'],
+					'content_block_before_text'   => $params['content_block_before_text'],
+					'content_block_after_text'    => $params['content_block_after_text'],
 					'before'              => $params['before_content_teaser'],
 					'after'               => $params['after_content_teaser'],
 					'before_image'        => $params['before_image'],
@@ -241,18 +286,25 @@ switch( $content_mode )
 					'image_link_to'       => $params['image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
 					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
 					'gallery_image_size'  => $params['gallery_image_size'],
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
 				) );
 
+			// Display either the "Read more"/"Full story" link OR the #anchor for #direct linking to the "after more" part:
 			$Item->more_link( array(
 					'force_more'  => $params['force_more'],
 					'before'      => $params['before_more_link'],
 					'after'       => $params['after_more_link'],
-					'link_text'   => $params['more_link_text'],
-					'anchor_text' => $params['anchor_text'],
+					'link_text'   => $params['more_link_text'],		// text to display as the more link
+					'anchor_text' => $params['anchor_text'],			// text to display as the more anchor (once the more link has been clicked, # defaults to "Follow up:")
 					'link_to'     => $params['more_link_to'],
 				) );
 
@@ -271,6 +323,12 @@ switch( $content_mode )
 						'image_link_to'       => $params['image_link_to'],
 						'before_gallery'      => $params['before_gallery'],
 						'after_gallery'       => $params['after_gallery'],
+						'gallery_table_start' => $params['gallery_table_start'],
+						'gallery_table_end'   => $params['gallery_table_end'],
+						'gallery_row_start'   => $params['gallery_row_start'],
+						'gallery_row_end'     => $params['gallery_row_end'],
+						'gallery_cell_start'  => $params['gallery_cell_start'],
+						'gallery_cell_end'    => $params['gallery_cell_end'],
 						'gallery_image_size'  => $params['gallery_image_size'],
 						'gallery_image_limit' => $params['gallery_image_limit'],
 						'gallery_colls'       => $params['gallery_colls'],
@@ -280,12 +338,25 @@ switch( $content_mode )
 					) );
 			}
 
+			// Display the "after more" part of the text: (part after "[teaserbreak]")
 			$Item->content_extension( array(
-					'before'      => $params['before_content_extension'],
-					'after'       => $params['after_content_extension'],
-					'force_more'  => $params['force_more'],
-					'image_class' => $params['image_class'],
-					'image_size'  => $params['image_size'],
+					'content_block_start'         => $params['content_block_start'],
+					'content_block_end'           => $params['content_block_end'],
+					'content_block_before_images' => $params['content_block_before_images'],
+					'content_block_after_images'  => $params['content_block_after_images'],
+					'content_block_before_text'   => $params['content_block_before_text'],
+					'content_block_after_text'    => $params['content_block_after_text'],
+					'before'              => $params['before_content_extension'],
+					'after'               => $params['after_content_extension'],
+					'before_image'        => $params['before_image'],
+					'before_image_legend' => $params['before_image_legend'],
+					'after_image_legend'  => $params['after_image_legend'],
+					'after_image'         => $params['after_image'],
+					'image_class'         => $params['image_class'],
+					'image_size'          => $params['image_size'],
+					'limit'               => $params['image_limit'],
+					'image_link_to'       => $params['image_link_to'],
+					'force_more'          => $params['force_more'],
 				) );
 
 			// Links to post pages (for multipage posts):
@@ -306,7 +377,7 @@ switch( $content_mode )
 					'block_end'   => $params['footer_text_end'],
 				) );
 
-			echo '</div>';
+			echo $params['content_end_full_text'];
 		}
 
 		echo $params['content_end_full'];

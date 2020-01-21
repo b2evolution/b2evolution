@@ -35,54 +35,6 @@
 	margin-top: 50px;
 }
 
-// Align post images left or right automatically inside widget "Content Block":
-@media (min-width: 768px) {
-	.evo_widget.widget_core_subcontainer.alternate-left-right {
-		.evo_widget.widget_core_content_block {
-			.evo_post_images {
-				width: 40%;
-			}
-			&:nth-child( even ) {
-				.evo_post_images {
-					float: left;
-					margin-right: 1em;
-				}
-			}
-			&:nth-child( odd ) {
-				.evo_post_images {
-					float: right;
-					margin-left: 1em;
-				}
-			}
-		}
-	}
-}
-@media (min-width: 1785px) {
-	.evo_widget.widget_core_subcontainer.alternate-left-right {
-		.evo_widget.widget_core_content_block {
-			.evo_post_images {
-				position: relative;
-				width: 60%;
-			}
-			.evo_post__full_text {
-				position: relative;
-				width: 125%;
-			}
-			&:nth-child( even ) {
-				.evo_post_images, .evo_post__full_text {
-					left: -295px;
-				}
-			}
-			&:nth-child( odd ) {
-				.evo_post_images {
-					left: 295px;
-					margin-left: -285px;
-				}
-			}
-		}
-	}
-}
-
 // Align title of widgets "Content Block" inside sub-containers of container "Front Page Secondary Area":
 .evo_container__front_page_secondary_area {
 	.evo_widget.widget_core_subcontainer {

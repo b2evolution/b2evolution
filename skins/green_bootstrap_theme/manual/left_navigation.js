@@ -51,7 +51,7 @@ jQuery( document ).ready( function()
 	var $sidebar = jQuery( '#evo_container__sidebar' );
 	if( $sidebar.outerHeight( true ) + 70/* footer height */ < jQuery( window ).height() )
 	{
-		var sidebar_size = $sidebar.size();
+		var sidebar_size = $sidebar.length;
 		var sidebar_top = ( jQuery( '#evo_toolbar' ).length > 0 ? 28 : 0 ) + sidebar_shift;
 		var $sidebarSpacer = $( '<div />', {
 				"class" : "evo_container__sidebar fixed_spacer",

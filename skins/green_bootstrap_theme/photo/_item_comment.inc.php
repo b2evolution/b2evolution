@@ -78,9 +78,9 @@ echo $params['comment_title_before'];
 switch( $Comment->get( 'type' ) )
 {
 	case 'comment': // Display a comment:
-	case 'meta': // Display a meta comment:
+	case 'meta': // Display an internal comment:
 		if( $Comment->is_meta() )
-		{	// Meta comment:
+		{	// Internal comment:
 			echo '<span class="badge badge-info">'.$comment_template_counter.'</span> ';
 		}
 
@@ -182,6 +182,6 @@ echo $params['comment_footer_after'];
 
 echo $params['comment_end'];
 
-// Decrease a counter for meta comments:
+// Decrease a counter for internal comments:
 $comment_template_counter--;
 ?>

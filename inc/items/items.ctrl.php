@@ -2980,6 +2980,36 @@ switch( $action )
 			$tab = 'full';
 		}
 
+		$backoffice_edit_item_url = $admin_url.'?ctrl=items&action=edit&p='.$item_ID.'&blog='.$Blog->ID; 
+		if( $Blog->get_setting( 'in_skin_editing' ) )
+		{
+			$edit_item_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&p='.$item_ID );
+		}
+		elseif( $current_User->check_perm( 'admin', 'restricted' ) )
+		{
+			$edit_item_url = $backoffice_edit_item_url;
+		}
+
+		if( ! empty( $edit_item_url ) )
+		{	// Current user can edit post:
+			init_hotkeys_js();
+			add_js_headline('jQuery( document ).ready( function()
+			{
+				hotkeys( \'f2, ctrl+f2\', function( event, handler ) {
+					switch( handler.key )
+					{
+						case \'f2\':
+							window.location.href = \''.format_to_js( $edit_item_url ).'\';
+							break;
+
+						case \'ctrl+f2\':
+							window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
+							break;
+					}
+				}); 
+			});');
+		}
+
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'tab' => $tab, 'filter' => 'restore' ) );
 
@@ -3238,7 +3268,7 @@ switch( $action )
 		// Memorize 'p' in case we reload while changing some display settings
 		memorize_param( 'p', 'integer', NULL );
 
-		// What comments view, 'feedback' - all user comments, 'meta' - meta comments of the admins
+		// What comments view, 'feedback' - all user comments, 'meta' - internal comments of the admins
 		param( 'comment_type', 'string', 'feedback', true );
 
 		// Begin payload block:

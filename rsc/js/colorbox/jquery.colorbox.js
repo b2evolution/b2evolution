@@ -343,11 +343,13 @@
 		previous_title = '';
 
 		$content.children()
-		.hover(function () {
+		.on( 'mouseenter', function () {
 			$(this).addClass('hover');
-		}, function () {
+		} )
+		.on( 'mouseleave', function () {
 			$(this).removeClass('hover');
-		}).addClass('hover');
+		} )
+		.addClass('hover');
 
 		// Cache values needed for size calculations
 		interfaceHeight = $content.outerHeight(true) - $content.height();//Subtraction needed for IE6
@@ -363,16 +365,16 @@
 
 		// Setup button events.
 		// Anonymous functions here keep the public method from being cached, thereby allowing them to be redefined on the fly.
-		$next.click(function () {
+		$next.on( 'click', function () {
 			publicMethod.next();
 		});
-		$prev.click(function () {
+		$prev.on( 'click', function () {
 			publicMethod.prev();
 		});
-		$close.click(function () {
+		$close.on( 'click', function () {
 			publicMethod.close();
 		});
-		$open.click(function () {
+		$open.on( 'click', function () {
 			publicMethod.close();
 		});
 
@@ -382,7 +384,7 @@
 		// background graphics in case the images were not part of a sprite.  The class can now can be removed.
 		$content.children().removeClass('hover');
 
-		$overlay.click(function () {
+		$overlay.on( 'click', function () {
 			if (settings.overlayClose) {
 				publicMethod.close();
 			}
@@ -398,10 +400,10 @@
 			if (open && settings.arrowKey && $related[1]) {
 				if (key === 37) {
 					e.preventDefault();
-					$prev.click();
+					$prev.trigger( 'click' );
 				} else if (key === 39) {
 					e.preventDefault();
-					$next.click();
+					$next.trigger( 'click' );
 				}
 			}
 		});
@@ -589,7 +591,7 @@
 
 			function removeFilter() {
 				if (isIE) {
-					$box[0].style.removeAttribute('filter');
+					$box[0].style.removeProperty('filter');
 				}
 			}
 
@@ -775,11 +777,11 @@
 		} else if (isImage(href)) {
 			$(photo = new Image())
 			.addClass(prefix + 'Photo')
-			.error(function () {
+			.on( 'error', function () {
 				settings.title = false;
 				prep($div('Error').text('This image could not be loaded'));
 			})
-			.load(function () {
+			.on( 'load', function () {
 				var percent;
 				photo.onload = null; //stops animated gifs from firing the onload repeatedly.
 
@@ -973,7 +975,7 @@
 	};
 
 	if ($.fn.delegate) {
-		$(document).delegate('.' + boxElement, 'click', handler);
+		$(document).on( 'delegate', '.' + boxElement, 'click', handler );
 	} else {
 		$(document).on('click', '.' + boxElement, handler);
 	}

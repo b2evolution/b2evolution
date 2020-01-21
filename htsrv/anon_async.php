@@ -1849,9 +1849,35 @@ switch( $action )
 			}
 		}
 
-		if( count( array_diff( $widgets, $enabled_widgets ) ) || count( array_diff( $enabled_widgets, $widgets ) ) )
+		$client_widgets = array_diff( $widgets, $enabled_widgets );
+		$server_widgets = array_diff( $enabled_widgets, $widgets );
+		if( ! empty( $client_widgets ) || ! empty( $server_widgets ) )
 		{	// Display error if at least one widget was added or deleted in the container:
-			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.');
+			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.').' '.T_('If the problem persists, check the widgets in the backoffice.');
+			// Additional data for log:
+			$SQL = new SQL( 'Get widgets for more log of reordering (Designer Mode)' );
+			$SQL->SELECT( 'wi_ID, wi_code' );
+			$SQL->FROM( 'T_widget__widget' );
+			$SQL->WHERE( 'wi_ID IN ( '.$DB->quote( array_merge( $client_widgets, $server_widgets ) ).' )' );
+			$code_widgets = $DB->get_assoc( $SQL );
+			if( ! empty( $client_widgets ) )
+			{	// Log what widgets were missed on server side:
+				$client_widgets_data = array();
+				foreach( $client_widgets as $client_widget_ID )
+				{
+					$client_widgets_data[] = '#'.$client_widget_ID.( isset( $code_widgets[ $client_widget_ID ] ) ? '('.$code_widgets[ $client_widget_ID ].')' : '' );
+				}
+				$Ajaxlog->add( 'Widgets: '.implode( ', ', $client_widgets_data ).' are found on the page but not found in DB or they are disabled!', 'error' );
+			}
+			if( ! empty( $server_widgets ) )
+			{	// Log what widgets were missed on client side:
+				$server_widgets_data = array();
+				foreach( $server_widgets as $server_widget_ID )
+				{
+					$server_widgets_data[] = '#'.$server_widget_ID.( isset( $code_widgets[ $server_widget_ID ] ) ? '('.$code_widgets[ $server_widget_ID ].')' : '' );
+				}
+				$Ajaxlog->add( 'Widgets: '.implode( ', ', $server_widgets_data ).' are enabled and found in DB but not found on the page!', 'error' );
+			}
 			break;
 		}
 
@@ -1910,7 +1936,7 @@ switch( $action )
 		$disabled_Widget = & $WidgetCache->get_by_ID( $wi_ID, false, false );
 		if( ! $disabled_Widget || ! $disabled_Widget->get( 'enabled' ) )
 		{	// Display error if widget doesn't exist or it is already disabled:
-			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.');
+			echo T_('The widgets have been changed since you last loaded this page.').' '.T_('Please reload the page to be in sync with the server.').' '.T_('If the problem persists, check the widgets in the backoffice.');
 			break;
 		}
 

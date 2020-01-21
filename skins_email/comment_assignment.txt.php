@@ -39,7 +39,7 @@ if( $params['notify_full'] )
 	echo T_('Status').': '.$Item->get( 't_extra_status' )."\n";
 
 	if( $Comment->is_meta() )
-	{	// Meta comment:
+	{	// Internal comment:
 		printf( T_('With the following [%s] Comment'), T_('Meta') );
 	}
 	else

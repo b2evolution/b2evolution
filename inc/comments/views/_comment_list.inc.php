@@ -38,11 +38,11 @@ if( empty( $item_id ) )
 $currentpage = param( 'currentpage', 'integer', 1 );
 $comments_number = param( 'comments_number', 'integer', 0 );
 
-// Check if current comments list displays meta comments:
+// Check if current comments list displays internal comments:
 $is_meta_comments_list = ( isset( $CommentList->filters['types'] ) && in_array( 'meta', $CommentList->filters['types'] ) );
 
 if( ! $is_meta_comments_list && $CommentList->total_rows > 0 )
-{	// Allow to select ONLY normal comments(EXCLUDE meta comments) for action on item view page:
+{	// Allow to select ONLY normal comments(EXCLUDE internal comments) for action on item view page:
 	global $blog, $admin_url;
 
 	$Form = new Form( $admin_url );
@@ -66,7 +66,7 @@ if( $item_id > 0 )
 	$display_meta_title = false;
 }
 else
-{	// Display additional info of meta comment when no post page, e.g. on "Meta discussion" tab:
+{	// Display additional info of internal comment when no post page, e.g. on "Internal comments" tab:
 	$display_meta_title = true;
 }
 
@@ -138,7 +138,7 @@ if( ( $item_id != 0 ) && ( $comments_number > 0 ) )
 }
 
 if( ! $is_meta_comments_list && $CommentList->total_rows > 0 )
-{	// Allow to select ONLY normal comments(EXCLUDE meta comments) for action on item view page:
+{	// Allow to select ONLY normal comments(EXCLUDE internal comments) for action on item view page:
 	echo T_('With checked comments').': ';
 
 	// Display a button to change visibility of selected comments:

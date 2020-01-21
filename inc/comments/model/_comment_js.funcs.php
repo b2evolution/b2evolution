@@ -275,7 +275,7 @@ function deleteComment( commentId, request_from, comment_type )
 	}
 
 	if( comment_type == 'meta' && ! confirm( '<?php echo TS_('You are about to delete this comment!\\nThis cannot be undone!'); ?>' ) )
-	{ // Meta comments are deleted permanently, We should confirm this
+	{ // Internal comments are deleted permanently, We should confirm this
 		return false;
 	}
 
@@ -296,7 +296,7 @@ function deleteComment( commentId, request_from, comment_type )
 	var limit = get_limit();
 
 	if( comment_type != 'meta' )
-	{ // Meta comments aren't moved into recycle bin, they are deleted permanently
+	{ // Internal comments aren't moved into recycle bin, they are deleted permanently
 		var recycle_bin = jQuery('#recycle_bin');
 		if( recycle_bin.length > 0 && recycle_bin.html() == '' )
 		{ // Load and display a link to recycle bin

@@ -2447,7 +2447,7 @@ function display_dragdrop_upload_button( $params = array() )
 			'resize_frame'           => false, // Resize frame on upload new image
 			'table_headers'          => '', // Use this html text as table headers when first file is loaded
 			'noresults'              => '',
-			'fieldset_prefix'        => '', // Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+			'fieldset_prefix'        => '', // Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and internal comments
 			'table_id'               => 'attachments_fieldset_table', // ID of table with files (without 'fieldset_prefix')
 		), $params );
 

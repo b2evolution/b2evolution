@@ -53,7 +53,7 @@ class WidgetContainer extends DataObject
 			$this->coll_ID = $db_row->wico_coll_ID;
 			$this->order = $db_row->wico_order;
 			$this->main = $db_row->wico_main;
-			$this->item_ID = $db_row->wico_item_ID;
+			$this->item_ID = isset( $db_row->wico_item_ID ) ? $db_row->wico_item_ID : NULL;
 		}
 	}
 

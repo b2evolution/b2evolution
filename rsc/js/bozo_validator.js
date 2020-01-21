@@ -24,7 +24,7 @@ var bozo = {
 	init: function ( )
 	{
 		// Loop through all forms:
-		jQuery("form")
+		var inputs = jQuery("form")
 			// Initialize this form as having no changes yet:
 			.each( function() { bozo.tab_changes[this.id] = 0; } )
 			// add submit event on the form to control if there are changes on others forms:
@@ -35,9 +35,16 @@ var bozo = {
 			.find("input[type=reset]:not([class$=_nocheckchanges])").click(bozo.reset_changes).end()
 			// Hook "change" and "keypress" event for all others:
 			.find("input[type=text], input[type=password], input[type=radio], input[type=checkbox], input[type=file], input[type=hidden], textarea")
-				.not("[class$=_nocheckchanges]")
-					.on("change", bozo.change)
-					.on("keypress", bozo.change);
+				.not("[class$=_nocheckchanges]");
+			inputs.each( function()
+			{
+				if( jQuery( this ).hasClass( 'form_color_input' ) )
+				{	// Store initialized color in order to know when we should skip a counting of changed inputs:
+					jQuery( this ).data( 'bozo-init-color', jQuery( this ).val() );
+				}
+			} );
+			inputs.on("change", bozo.change)
+				.on("keypress", bozo.change);
 	},
 
 
@@ -65,6 +72,21 @@ var bozo = {
 	change: function( e )
 	{	// Get the target element
 		var target = bozo.findTarget( e );
+
+		if( typeof( jQuery( target ).data( 'bozo-init-color' ) ) != 'undefined' )
+		{	// Check if color input is really changed:
+			var init_color_val = jQuery( target ).data( 'bozo-init-color' ).toLowerCase();
+			var curr_color_val = jQuery( target ).val().toLowerCase();
+			var check_same_color = init_color_val.substr( 1, 3 );
+			if( init_color_val == curr_color_val ||
+			    ( ( init_color_val == '#' + check_same_color || init_color_val == '#' + check_same_color + check_same_color ) &&
+			      ( curr_color_val == '#' + check_same_color || curr_color_val == '#' + check_same_color + check_same_color ) ) )
+			{	// Skip autofixing action of colorpicker on initialization to avoid false alerts about changed inputs,
+				// e.g. colorpicker autofix color values on initialization from #333 to #333333 or from #F0F0F0 to #f0f0f0 and etc.
+				return;
+			}
+		}
+
 		// Update changes number for his parent form
 		bozo.tab_changes[ jQuery( target ).closest( 'form' ).attr( 'id' ) ]++;
 		// Update Total changes number

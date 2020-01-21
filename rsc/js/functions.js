@@ -524,16 +524,16 @@ jQuery( document ).ready( function()
 		if( this_obj.is( ':checked' ) )
 		{ // Enable toolbar:
 			toolbar_obj.removeClass( 'disabled' );
-			toolbar_obj.find( 'input[type=button]' ).removeAttr( 'disabled' );
+			toolbar_obj.find( 'input[type=button]' ).prop( 'disabled', false );
 		}
 		else
 		{ // Disable toolbar:
 			toolbar_obj.addClass( 'disabled' );
-			toolbar_obj.find( 'input[type=button]' ).attr( 'disabled', 'disabled' );
+			toolbar_obj.find( 'input[type=button]' ).prop( 'disabled', true );
 		}
 	}
 	jQuery( 'input[type=checkbox][name="renderers[]"]' ).each( function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
-	jQuery( 'input[type=checkbox][name="renderers[]"]' ).click( function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
+	jQuery( 'input[type=checkbox][name="renderers[]"]' ).on( 'click', function() { change_plugin_toolbar_activity( jQuery( this ) ) } );
 	jQuery( '.plugin-toolbar' ).on( 'click', function() {
 			var toolbar_obj = jQuery( this );
 			if( toolbar_obj.hasClass( 'disabled' ) )

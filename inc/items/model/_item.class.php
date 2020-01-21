@@ -1325,7 +1325,7 @@ class Item extends ItemLight
 	/**
 	 * Load custom fields values from Request form fields
 	 *
-	 * @param boolean TRUE to load only custom fields which are allowed to be updated with meta comment
+	 * @param boolean TRUE to load only custom fields which are allowed to be updated with internal comment
 	 * @return boolean TRUE if loaded data seems valid, FALSE if some errors or no any property has been changed
 	 */
 	function load_custom_fields_from_Request( $meta = NULL )
@@ -1809,7 +1809,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if current User can see meta comments on this Item
+	 * Check if current User can see internal comments on this Item
 	 *
 	 * @return boolean
 	 */
@@ -1821,10 +1821,10 @@ class Item extends ItemLight
 		}
 
 		if( ! is_admin_page() )
-		{	// Check visibility of meta comments on front-office:
+		{	// Check visibility of internal comments on front-office:
 			$item_Blog = & $this->get_Blog();
 			if( ! $item_Blog || ! $item_Blog->get_setting( 'meta_comments_frontoffice' ) )
-			{	// Meta comments are disabled to be displayed on front-office for this Item's collection:
+			{	// Internal comments are disabled to be displayed on front-office for this Item's collection:
 				return false;
 			}
 		}
@@ -1836,7 +1836,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if current User can leave meta comment on this Item
+	 * Check if current User can leave internal comment on this Item
 	 *
 	 * @return boolean
 	 */
@@ -2464,15 +2464,15 @@ class Item extends ItemLight
 	 */
 	function get_content_teaser( $disppage = '#', $stripteaser = '#', $format = 'htmlbody', $params = array() )
 	{
-		global $Plugins, $preview, $Debuglog;
 		global $more;
 
 		$params = array_merge( $params, array(
 				'disppage' => $disppage,
-				'format' => $format
+				'dispmore' => ( $more != 0 ),
+				'format'   => $format,
 			) );
 
-		$view_type = 'full';
+		$params['view_type'] = 'full';
 		if( $this->has_content_parts( $params ) )
 		{ // This is an extended post (has a more section):
 			if( $stripteaser === '#' )
@@ -2485,24 +2485,48 @@ class Item extends ItemLight
 			{
 				return NULL;
 			}
-			$view_type = 'teaser';
+			$params['view_type'] = 'teaser';
 		}
 
 		$content_parts = $this->get_content_parts( $params );
 		$output = array_shift( $content_parts );
 
+		// Render content by plugins and inline short tags at display time:
+		$output = $this->get_rendered_content( $output, $params );
+
+		return $output;
+	}
+
+
+	/**
+	 * Get rendered content by plugins and inline short tags at display time
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Rendered content
+	 */
+	function get_rendered_content( $content, $params = array() )
+	{
+		global $Plugins, $preview;
+
+		$params = array_merge( array(
+				'format'    => 'htmlbody',
+				'dispmore'  => false,
+				'view_type' => 'full',
+			), $params );
+
 		// Render all inline tags to HTML code:
-		$output = $this->render_inline_tags( $output, $params );
+		$output = $this->render_inline_tags( $content, $params );
 
 		// Render switchable content:
 		$output = $this->render_switchable_content( $output );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
-		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
-				'Item' => $this,
-				'preview' => $preview,
-				'dispmore' => ($more != 0),
-				'view_type' => $view_type,
+		$output = $Plugins->render( $output, $this->get_renderers_validated(), $params['format'], array(
+				'Item'      => $this,
+				'preview'   => $preview,
+				'dispmore'  => $params['dispmore'],
+				'view_type' => $params['view_type'],
 			), 'Display' );
 
 		// Character conversions:
@@ -2511,7 +2535,7 @@ class Item extends ItemLight
 			// E.g.: to avoid replacing of condition operator from & to &amp;
 			$output = callback_on_non_matching_blocks( $output,
 				'~<(script)[^>]*>.*?</\1>~is',
-				'format_to_output', array( $format ) );
+				'format_to_output', array( $params['format'] ) );
 		}
 
 		return $output;
@@ -2540,6 +2564,37 @@ class Item extends ItemLight
 		$content_parts = array_map( 'balance_tags', $content_parts );
 
 		return $content_parts;
+	}
+
+
+	/**
+	 * Get full content with teaser and extension and all pages
+	 *
+	 * @param string Format
+	 * @param array Params
+	 * @return string Content
+	 */
+	function get_full_content( $format = 'htmlbody', $params = array() )
+	{
+		$params = array_merge( $params, array(
+				'dispmore'  => true,
+				'view_type' => 'full',
+				'format'    => $format,
+			) );
+
+		$output = '';
+		$this->split_pages( $format );
+		foreach( $this->content_pages[ $format ] as $p => $content_page )
+		{
+			$content_parts = $this->get_content_parts( array_merge( $params, array( 'disppage' => $p + 1 ) ) );
+
+			$output .= implode( "\n\n", $content_parts );
+		}
+
+		// Render content by plugins and inline short tags at display time:
+		$output = $this->get_rendered_content( $output, $params );
+
+		return $output;
 	}
 
 
@@ -2595,7 +2650,7 @@ class Item extends ItemLight
 	 */
 	function get_content_extension( $disppage = '#', $force_more = false, $format = 'htmlbody', $params = array() )
 	{
-		global $Plugins, $more, $preview;
+		global $more;
 
 		if( ! $more && ! $force_more )
 		{	// NOT in more mode:
@@ -2609,8 +2664,10 @@ class Item extends ItemLight
 
 		// Don't rewrite these params from array $params, Use them from separate params of this function
 		$params = array_merge( $params, array(
-				'disppage' => $disppage,
-				'format'   => $format
+				'disppage'  => $disppage,
+				'dispmore'  => true,
+				'view_type' => 'extension',
+				'format'    => $format,
 			) );
 
 		if( ! $this->has_content_parts( $params ) )
@@ -2624,22 +2681,8 @@ class Item extends ItemLight
 		array_shift( $content_parts );
 		$output = implode( '', $content_parts );
 
-		// Render all inline tags to HTML code:
-		$output = $this->render_inline_tags( $output, $params );
-
-		// Render switchable content:
-		$output = $this->render_switchable_content( $output );
-
-		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
-		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
-				'Item' => $this,
-				'preview' => $preview,
-				'dispmore' => true,
-				'view_type' => 'extension',
-			), 'Display' );
-
-		// Character conversions
-		$output = format_to_output( $output, $format );
+		// Render content by plugins and inline short tags at display time:
+		$output = $this->get_rendered_content( $output, $params );
 
 		return $output;
 	}
@@ -4087,62 +4130,23 @@ class Item extends ItemLight
 			// Store current item in global array to avoid recursion:
 			array_unshift( $content_block_items, $content_Item->ID );
 
-			// Start to collect item content in buffer:
-			ob_start();
-
-			if( ! empty( $params['image_size'] ) )
-			{	// Display images that are linked to this post:
-				$teaser_image_positions = 'teaser,teaserperm,teaserlink';
-				if( ! empty( $params['include_cover_images'] ) )
-				{	// Include the cover images on teaser place:
-					$teaser_image_positions = 'cover,'.$teaser_image_positions;
-				}
-				$content_Item->images( array_merge( $params, array(
-						'restrict_to_image_position' => $teaser_image_positions,
-					) ) );
-			}
-
-			if( isset( $params['content_start_full_text'] ) )
-			{
-				echo $params['content_start_full_text'];
-			}
-
-			// Display CONTENT (at least the TEASER part):
-			$content_Item->content_teaser( $params );
-
-			if( ! empty( $params['image_size'] ) && $content_Item->has_content_parts( $params ) /* only if not displayed all images already */ )
-			{	// Display images that are linked "after more" to this post:
-				$content_Item->images( array_merge( $params, array(
-						'restrict_to_image_position' => 'aftermore',
-					) ) );
-			}
-
-			// Display the "after more" part of the text: (part after "[teaserbreak]")
-			$content_Item->content_extension( $params );
-
-			// Links to post pages (for multipage posts):
-			$content_Item->page_links( $params );
-
-			// Display Item footer text (text can be edited in Blog Settings):
-			$content_Item->footer( $params );
-
-			if( isset( $params['content_end_full_text'] ) )
-			{
-				echo $params['content_end_full_text'];
-			}
-
-			// Get item content from buffer:
-			$current_tag_item_content = ob_get_clean();
-
-			// Update level inline tags like [---fields:] into [--fields:] in order to make them render by top caller level Item:
-			$current_tag_item_content = $this->update_level_inline_tags( $current_tag_item_content );
-
 			$tag_class = isset( $tag_options[1] ) ? trim( $tag_options[1] ) : '';
 			if( $tag_class !== '' )
 			{	// If tag has an option with style class
-				$tag_class = trim( str_replace( array( '.*', '.' ), array( '.'.$item_ID_slug, ' ' ),$tag_class ) );
-				$current_tag_item_content = '<div class="'.format_to_output( $tag_class, 'htmlattr' ).'">'.$current_tag_item_content.'</div>';
+				$content_block_class = trim( str_replace( array( '.*', '.' ), array( '.'.$item_ID_slug, ' ' ),$tag_class ) );
 			}
+			else
+			{	// Tag has no class:
+				$content_block_class = '';
+			}
+
+			// Get item content:
+			$current_tag_item_content = $content_Item->get_content_block( array_merge( $params, array(
+					'content_block_class' => $content_block_class,
+				) ) );
+
+			// Update level inline tags like [---fields:] into [--fields:] in order to make them render by top caller level Item:
+			$current_tag_item_content = $this->update_level_inline_tags( $current_tag_item_content );
 
 			// Replace inline content block tag with item content:
 			$content = str_replace( $source_tag, $current_tag_item_content, $content );
@@ -4152,6 +4156,95 @@ class Item extends ItemLight
 		}
 
 		return $content;
+	}
+
+
+	/**
+	 * Get content of Item with Item Type usage 'content-block'
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_content_block( $params = array() )
+	{
+		if( $this->get_type_setting( 'usage' ) != 'content-block' )
+		{	// Exclude no content block Item:
+			return '';
+		}
+
+		load_funcs( 'skins/_skin.funcs.php' );
+
+		$params = array_merge( array(
+				'content_block_start'         => '<div class="evo_content_block $cb_class$">',
+				'content_block_end'           => '</div>',
+				'content_block_before_images' => '<div class="evo_content_block_images">',
+				'content_block_after_images'  => '</div>',
+				'content_block_before_text'   => '<div class="evo_content_block_text">',
+				'content_block_after_text'    => '</div>',
+				'content_block_class'         => '',
+				'image_class'                 => 'img-responsive',
+				'image_size'                  => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
+				'image_limit'                 =>  1000,
+				'image_link_to'               => 'original', // Can be 'original', 'single' or empty
+				'include_cover_images'        => false, // Set to true if you want cover images to appear with teaser images.
+			), $params );
+
+		// Start to collect item content in buffer:
+		ob_start();
+
+		echo str_replace( '$cb_class$', $params['content_block_class'], $params['content_block_start'] );
+
+		if( ! empty( $params['image_size'] ) )
+		{	// Display images that are linked to this post:
+			$teaser_image_positions = 'teaser,teaserperm,teaserlink';
+			if( ! empty( $params['include_cover_images'] ) )
+			{	// Include the cover images on teaser place:
+				$teaser_image_positions = 'cover,'.$teaser_image_positions;
+			}
+			$this->images( array(
+					'before'        => $params['content_block_before_images'],
+					'after'         => $params['content_block_after_images'],
+					'image_class'   => $params['image_class'],
+					'image_size'    => $params['image_size'],
+					'image_limit'   => $params['image_limit'],
+					'image_link_to' => $params['image_link_to'],
+					'restrict_to_image_position' => $teaser_image_positions,
+				) );
+		}
+
+		echo $params['content_block_before_text'];
+
+		// Display CONTENT (at least the TEASER part):
+		$this->content_teaser( $params );
+
+		if( ! empty( $params['image_size'] ) && $this->has_content_parts( $params ) /* only if not displayed all images already */ )
+		{	// Display images that are linked "after more" to this post:
+			$this->images( array(
+					'before'        => $params['content_block_before_images'],
+					'after'         => $params['content_block_after_images'],
+					'image_class'   => $params['image_class'],
+					'image_size'    => $params['image_size'],
+					'image_limit'   => $params['image_limit'],
+					'image_link_to' => $params['image_link_to'],
+					'restrict_to_image_position' => 'aftermore',
+				) );
+		}
+
+		// Display the "after more" part of the text: (part after "[teaserbreak]")
+		$this->content_extension( $params );
+
+		// Links to post pages (for multipage posts):
+		$this->page_links( $params );
+
+		// Display Item footer text (text can be edited in Blog Settings):
+		$this->footer( $params );
+
+		echo $params['content_block_after_text'];
+
+		echo $params['content_block_end'];
+
+		// Get item content from buffer:
+		return ob_get_clean();
 	}
 
 
@@ -5850,8 +5943,8 @@ class Item extends ItemLight
 
 			case 'metas':
 				if( $zero == '#' ) $zero = '';
-				if( $one == '#' ) $one = T_('1 meta comment');
-				if( $more == '#' ) $more = T_('%d meta comments');
+				if( $one == '#' ) $one = T_('1 internal comment');
+				if( $more == '#' ) $more = T_('%d internal comments');
 				break;
 
 			case 'webmentions':

@@ -141,10 +141,10 @@ switch( $Comment->get( 'type' ) )
 
 	// ON *DISP = SINGLE* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case 'comment': // Display a comment:
-	case 'meta': // Display a meta comment:
+	case 'meta': // Display an internal comment:
 
 		if( $Comment->is_meta() )
-		{	// Meta comment:
+		{	// Internal comment:
 			?><span class="badge badge-info"><?php echo $comment_template_counter; ?></span> <?php
 		}
 		else
@@ -311,7 +311,7 @@ echo $params['comment_body_after'];
 <?php echo $params['comment_end'];
 
 if( $Comment->is_meta() )
-{	// Decrease a counter for meta comments:
+{	// Decrease a counter for internal comments:
 	$comment_template_counter--;
 }
 else

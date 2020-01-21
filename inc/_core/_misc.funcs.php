@@ -1176,7 +1176,7 @@ function split_outcode( $separators, $content, $capture_separator = false )
 
 
 /**
- * Remove [image:] and [video:] short tags that are inside <p> blocks and before <br> and move them before the paragraph
+ * Remove short tags like [image:], [video:] and etc. that are inside <p> blocks and before <br> and move them before the paragraph
  *
  * @param string Source content
  * @param string Search pattern
@@ -1184,13 +1184,12 @@ function split_outcode( $separators, $content, $capture_separator = false )
  * @return string Content
  */
 function move_short_tags( $content, $pattern = NULL, $callback = NULL )
-{	// Move [image:], [video:] and [audio:] tags out of <p> blocks
-
-	// Get individual paragraphs
+{
+	// Get individual paragraphs:
 	preg_match_all( '#(<p[\s*|>])?.*?<(/p|br\s?/?)>#i', $content, $paragraphs );
 
 	if( is_null( $pattern ) )
-	{
+	{	// Default pattern:
 		$pattern = '#\[(image|video|audio|include|/?div|(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields)):?.*?\]#i';
 	}
 
@@ -1213,8 +1212,8 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL )
 				// convert &nbsp; to space
 				$x = str_replace( "\xC2\xA0", ' ', $new_paragraph );
 
-				if( preg_match( '#(<p[\s*|>])?\s*<(/p|br\s?/?)>#i', $x ) === 1 )
-				{ // remove paragraph the if moving out the short tag will result to an empty paragraph
+				if( preg_match( '#^(<p[\s*|>])?\s*<(/p|br\s?/?)>$#i', $x ) === 1 )
+				{	// Remove paragraph the if moving out the short tag will result to an empty paragraph:
 					$new_paragraph = '';
 				}
 
@@ -3526,7 +3525,7 @@ function debug_info( $force = false, $force_clean = false )
 			echo '
 			<script>
 			(function($){
-				jQuery( "table.debug_timer th" ).click( function(event) {
+				jQuery( "table.debug_timer th" ).on( "click", function(event) {
 					var table = jQuery(this).closest( "table.debug_timer" );
 					if( table.data( "clicked_once" ) ) return; else table.data( "clicked_once", true );
 					jQuery( "tbody:eq(0) tr:last", table ).remove();
@@ -4199,8 +4198,8 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				// 'notify_published_comments' - "a comment is published on one of my posts.",
 				// 'notify_comment_moderation' - "a comment is posted and I have permissions to moderate it.",
 				// 'notify_edit_cmt_moderation' - "a comment is modified and I have permissions to moderate it.",
-				// 'notify_meta_comment_mentioned' - "I have been mentioned on a meta comment.",
-				// 'notify_meta_comments' - "a meta comment is posted.".
+				// 'notify_meta_comment_mentioned' - "I have been mentioned on an internal comment.",
+				// 'notify_meta_comments' - "an internal comment is posted.".
 			case 'comment_spam':
 				// 'notify_spam_cmt_moderation' - "a comment is reported as spam and I have permissions to moderate it."
 			case 'comments_unmoderated_reminder':
@@ -6312,6 +6311,7 @@ function generate_link_from_params( $link_params, $params = array() )
 			'img_height'  => '',
 			'title'       => '',
 			'target'      => '_blank',
+			'rel'         => 'noopener',
 		), $params );
 
 	$text = $link_params[1];
@@ -6330,6 +6330,11 @@ function generate_link_from_params( $link_params, $params = array() )
 	if( !empty($params['target'] ) )
 	{
 		$r .= ' target="'.$params['target'].'"';
+	}
+
+	if( !empty($params['rel'] ) )
+	{
+		$r .= ' rel="'.$params['rel'].'"';
 	}
 
 	if( $params['type'] == 'img' )
@@ -8197,7 +8202,7 @@ function echo_form_dropdown_js()
 	$tooltip_titles_js_array = implode( ', ', $tooltip_titles_js_array );
 ?>
 <script>
-jQuery( '.btn-group.dropdown.autoselected li a' ).click( function()
+jQuery( '.btn-group.dropdown.autoselected li a' ).on( 'click', function()
 {
 	var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};
 	var item = jQuery( this ).parent();
@@ -9722,7 +9727,7 @@ function display_importer_upload_panel( $params = array() )
 
 ?>
 <script>
-jQuery( '.table_scroll td' ).click( function()
+jQuery( '.table_scroll td' ).on( 'click', function()
 {
 	jQuery( this ).parent().find( 'input[type=radio]' ).prop( 'checked', true );
 } );

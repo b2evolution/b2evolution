@@ -758,10 +758,10 @@ if( $action == 'dashboard' )
 		}
 
 		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
-		{	// If user has a perm to view meta comments of the collection:
+		{	// If user has a perm to view internal comments of the collection:
 
-			// Latest Meta Comments Block
-			$Timer->start( 'Panel: Latest Meta Comments' );
+			// Latest Internal Comments Block
+			$Timer->start( 'Panel: Latest Internal Comments' );
 			$CommentList = new CommentList2( $Blog );
 
 			// Filter list:
@@ -785,16 +785,16 @@ if( $action == 'dashboard' )
 			$CommentList->load_list_data();
 
 			if( $CommentList->result_num_rows )
-			{	// We have the meta comments
+			{	// We have the internal comments
 
 				load_funcs( 'comments/model/_comment_js.funcs.php' );
 
 				$nb_blocks_displayed++;
 
-				echo '<!-- Start of Latest Meta Comments Block -->';
+				echo '<!-- Start of Latest Internal Comments Block -->';
 
 				$show_statuses_param = $param_prefix.'show_statuses[]='.implode( '&amp;'.$param_prefix.'show_statuses[]=', $user_modeartion_statuses );
-				$block_item_Widget->title = T_('Latest Meta Comments').
+				$block_item_Widget->title = T_('Latest Internal Comments').
 					' <a href="'.$admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3=meta" style="text-decoration:none">'.
 					'<span id="badge" class="badge badge-important">'.$CommentList->get_total_rows().'</span></a>';
 
@@ -805,15 +805,15 @@ if( $action == 'dashboard' )
 				$block_item_Widget->disp_template_replaced( 'block_start' );
 
 				echo '<div id="comments_container" class="evo_comments_container">';
-				// GET LATEST META COMMENTS:
+				// GET LATEST INTERNAL COMMENTS:
 				show_comments_awaiting_moderation( $Blog->ID, $CommentList );
 				echo '</div>';
 				$block_item_Widget->disp_template_raw( 'block_end' );
 
 				echo '</div>';
-				echo '<!-- End of Latest Meta Comments Block-->';
+				echo '<!-- End of Latest Internal Comments Block-->';
 			}
-			$Timer->start( 'Panel: Latest Meta Comments' );
+			$Timer->start( 'Panel: Latest Internal Comments' );
 		}
 
 		$Timer->start( 'Panel: Recently Edited Post' );

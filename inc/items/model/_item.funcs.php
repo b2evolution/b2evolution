@@ -1828,10 +1828,10 @@ function attach_browse_tabs( $display_tabs3 = true )
 		}
 
 		if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
-		{	// Initialize menu entry for meta discussion if current user has a permission:
+		{	// Initialize menu entry for Internal comments if current user has a permission:
 			$AdminUI->add_menu_entries( array( 'collections', 'comments' ), array(
 				'meta' => array(
-					'text' => T_('Meta discussion'),
+					'text' => T_('Internal comments'),
 					'href' => $admin_url.'?ctrl=comments&amp;tab3=meta&amp;filter=restore&amp;blog='.$Blog->ID ),
 				) );
 		}
@@ -3237,6 +3237,7 @@ jQuery( document ).ready( function ()
 function echo_autocomplete_tags( $params = array() )
 {
 	$params = array_merge( array(
+			'input_ID'       => 'item_tags',
 			'item_ID'        => NULL,
 			'update_by_ajax' => false,
 			'use_quick_tags' => false,
@@ -3267,6 +3268,7 @@ function echo_autocomplete_tags( $params = array() )
 			hintText: '<?php echo TS_('Type in a tag') ?>',
 			noResultsText: '<?php echo TS_('No results') ?>',
 			searchingText: '<?php echo TS_('Searching...') ?>',
+			minInputWidth: 0,
 			jsonContainer: 'tags',
 			<?php if( $params['update_by_ajax'] ) { ?>
 			onAdd: function( obj ) { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector, obj, 'add' ) },
@@ -3305,7 +3307,7 @@ function echo_autocomplete_tags( $params = array() )
 			}
 
 			quick_item_tags = quick_item_tags.splice( -5 );
-			jQuery.cookie( 'quick_item_tags', quick_item_tags.join( ',' ) );
+			jQuery.cookie( 'quick_item_tags', quick_item_tags.join( ',' ), { path: "/" } );
 		}
 
 		<?php } ?>
@@ -3338,22 +3340,24 @@ function echo_autocomplete_tags( $params = array() )
 
 	jQuery( document ).ready( function()
 	{
+		var input_ID = '<?php echo format_to_js( '#'.$params['input_ID'] );?>';
+
 		if( jQuery( '#suggest_item_tags' ).length == 0 || jQuery( '#suggest_item_tags' ).is( ':checked' ) )
 		{
-			init_autocomplete_tags( '#item_tags' );
+			init_autocomplete_tags( input_ID );
 		}
 
 		jQuery( '#suggest_item_tags' ).click( function()
 		{
 			if( jQuery( this ).is( ':checked' ) )
 			{ // Use plugin to suggest tags
-				jQuery( '#item_tags' ).hide();
-				init_autocomplete_tags( '#item_tags' );
+				jQuery( input_ID ).hide();
+				init_autocomplete_tags( input_ID );
 			}
 			else
 			{ // Remove autocomplete tags plugin
-				jQuery( '#item_tags' ).show();
-				jQuery( '#item_tags' ).parent().find( 'ul.token-input-list-facebook' ).remove();
+				jQuery( input_ID ).show();
+				jQuery( input_ID ).parent().find( 'ul.token-input-list-facebook' ).remove();
 			}
 		} );
 		<?php
@@ -3894,12 +3898,12 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
 	if( $item_ID > 0 )
 	{	// Set filters to display only comments of the given Item:
 		if( $comment_type == 'meta' )
-		{	// Check if current user can sees meta comments of this item:
+		{	// Check if current user can sees internal comments of this item:
 			global $current_User;
 			$ItemCache = & get_ItemCache();
 			$Item = & $ItemCache->get_by_ID( $item_ID, false, false );
 			if( ! $Item || empty( $current_User ) || ! $current_User->check_perm( 'meta_comment', 'view', false, $blog_ID ) )
-			{ // Current user has no permissions to view meta comments
+			{ // Current user has no permissions to view internal comments
 				$comment_type = 'feedback';
 			}
 		}
@@ -3993,7 +3997,7 @@ function echo_item_comments( $blog_ID, $item_ID, $statuses = NULL, $currentpage 
  * @param boolean true to set the new redirect param, false otherwise
  * @param integer Comment order number in the current list, FALSE - to don't display a comment order
  * @param integer A reply level (Used on mode "Threaded comments" to shift a comment block to right)
- * @param boolean TRUE to display info for meta comment
+ * @param boolean TRUE to display info for internal comment
  */
 function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $inlist_order = NULL, $display_meta_title = false, $reply_level = 0 )
 {
@@ -4020,7 +4024,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 		echo 'expired';
 	}
 	elseif( $Comment->is_meta() )
-	{ // meta comment
+	{ // internal comment
 		echo 'meta';
 	}
 	else
@@ -4031,21 +4035,21 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 
 	if( $current_User->check_perm( 'comment!CURSTATUS', 'moderate', false, $Comment ) ||
 	    ( $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) ) )
-	{	// User can moderate this comment OR Comment is meta and current user can view meta comments of the collection:
+	{	// User can moderate this comment OR Comment is meta and current user can view internal comments of the collection:
 		echo '<div class="panel-heading small">';
 		echo '<div>';
 
 		if( $Comment->is_meta() )
-		{ // Meta comment
+		{ // Internal comment
 			if( $inlist_order !== false )
-			{	// Display order of meta comment in current list:
+			{	// Display order of internal comment in current list:
 				echo '<span class="badge badge-info">'.$inlist_order.'</span> ';
 			}
 
 			if( $display_meta_title )
-			{	// Display a title for meta comment:
+			{	// Display a title for internal comment:
 				$comment_Item = & $Comment->get_Item();
-				echo sprintf( T_('<a %s>Meta comment</a> on %s'),
+				echo sprintf( T_('<a %s>Internal comment</a> on %s'),
 							'href="'.$Comment->get_permanent_url().'"',
 							'<a href="?ctrl=items&amp;blog='.$comment_Item->get_blog_ID().'&amp;p='.$comment_Item->ID.'">'.$comment_Item->dget( 'title' ).'</a>'
 								.' '.$comment_Item->get_permanent_link( '#icon#' ).' &middot; ' );
@@ -4074,7 +4078,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 		echo '</span>';
 
 		if( $Comment->is_meta() )
-		{ // Display only author for meta comment
+		{ // Display only author for internal comment
 			$Comment->author( '', '', ' &middot; '.T_('Author').': ', '' );
 		}
 		else
@@ -4111,7 +4115,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 				) );
 		}
 		if( ! $Comment->is_meta() )
-		{ // Don't display the titles for meta comments
+		{ // Don't display the titles for internal comments
 			echo '<div class="bCommentTitle">';
 			echo $Comment->get_title();
 			if( get_param( 'p' ) == '' )
@@ -4130,7 +4134,7 @@ function echo_comment( $Comment, $redirect_to = NULL, $save_context = false, $in
 		}
 		$Comment->content( 'htmlbody', 'true' );
 		if( $current_User->check_perm( 'meta_comment', 'edit', false, $Comment ) )
-		{ // End of the container that is used to edit meta comment by ajax
+		{ // End of the container that is used to edit internal comment by ajax
 			echo '</div>';
 		}
 		echo '</div>';
@@ -6306,12 +6310,12 @@ function task_title_link( $Item, $display_flag = true, $display_status = false )
 	}
 
 	if( $current_User->check_perm( 'meta_comment', 'view', false, $Item->get_blog_ID() ) )
-	{	// Display icon of meta comments Only if current user can views meta comments:
+	{	// Display icon of internal comments Only if current user can views internal comments:
 		$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
 		if( $metas_count > 0 )
-		{	// If at least one meta comment exists
+		{	// If at least one internal comment exists
 			$col .= '<a href="'.$admin_url.'?ctrl=items&amp;blog='.$Item->get_blog_ID().'&amp;p='.$Item->ID.'&amp;comment_type=meta#comments">'
-					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#5bc0de', 'title' => T_('Meta comments') ) )
+					.get_icon( 'comments', 'imgtag', array( 'style' => 'color:#5bc0de', 'title' => T_('Internal comments') ) )
 				.'</a> ';
 		}
 	}

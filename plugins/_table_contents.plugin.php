@@ -117,7 +117,7 @@ class table_contents_plugin extends Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function RenderItemAsHtml( & $params )
+	function DisplayItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
 
@@ -292,7 +292,7 @@ class table_contents_plugin extends Plugin
 		}
 
 		// Generate table of contents:
-		$toc = $this->genereate_toc( $Item, $Item->get_prerendered_content( 'htmlbody' ) );
+		$toc = $this->genereate_toc( $Item, $Item->get_full_content( 'htmlbody', $params ) );
 
 		if( empty( $toc ) )
 		{	// Don't display widget when current Item has no anchor header tags in content:

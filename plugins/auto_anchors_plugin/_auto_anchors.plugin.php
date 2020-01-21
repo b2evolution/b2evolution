@@ -49,8 +49,8 @@ class auto_anchors_plugin extends Plugin
 	function get_coll_setting_definitions( & $params )
 	{
 		$default_params = array(
-				'default_comment_rendering' => 'opt-in',
-				'default_post_rendering' => 'opt-out'
+				'default_post_rendering' => 'opt-out',
+				'default_comment_rendering' => 'never',
 			);
 
 		if( ! empty( $params['blog_type'] ) )
@@ -71,7 +71,7 @@ class auto_anchors_plugin extends Plugin
 				'offset_scroll' => array(
 						'label' => T_('Anchor offset'),
 						'type' => 'integer',
-						'defaultvalue' => 0,
+						'defaultvalue' => 70,
 						'suffix' => ' px',
 						'note' => T_('This will be used when scrolling to an anchor.'),
 					),

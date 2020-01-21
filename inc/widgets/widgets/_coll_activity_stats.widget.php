@@ -14,7 +14,7 @@
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
-init_jqplot_js();
+init_jqplot_js( 'blog' );
 
 /**
  * coll_activity_stats_Widget Class.

@@ -58,6 +58,11 @@ switch( $action )
 		break;
 
 	case 'copy':
+		// Set parent menu:
+		if( isset( $menu_ID ) )
+		{
+			$edited_SiteMenu->set( 'parent_ID', $menu_ID );
+		}
 	case 'edit':
 		// Menu edit form:
 		// Make sure we got a menu_ID:

@@ -822,11 +822,11 @@ class collections_Module extends Module
 		$last_group_menu_entry = 'posts';
 
 		if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $blog ) )
-		{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
+		{	// Initialize comments menu tab if user can view normal or internal comments of the collection:
 			$collection_menu_entries['comments'] = array(
 					'text' => T_('Comments'),
 					'href' => $admin_url.'?ctrl=comments&amp;blog='.$blog.'&amp;filter=restore'
-						// Set url to meta comments page if user has a perm to view only meta comments:
+						// Set url to internal comments page if user has a perm to view only internal comments:
 						.( $perm_comments ? '' : '&amp;tab3=meta' ),
 				);
 			$last_group_menu_entry = 'comments';

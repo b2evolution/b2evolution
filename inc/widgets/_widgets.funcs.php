@@ -910,6 +910,16 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 							continue;
 						}
 
+						if( isset( $widget['is_pro'] ) && $widget['is_pro'] !== is_pro() )
+						{	// Skip widget because it should not be installed for the current version:
+							continue;
+						}
+
+						if( isset( $widget['coll_ID'] ) && ! is_allowed_option( $widget_Blog->ID, $widget['coll_ID'] ) )
+						{	// Skip widget because it should not be installed for the given collection ID:
+							continue;
+						}
+
 						// Initialize a widget row to insert into DB below by single query:
 						$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
 						$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
@@ -1127,7 +1137,7 @@ function insert_basic_widgets( $blog_id, $skin_type, $initial_install = false, $
 			}
 
 			if( isset( $widget['is_pro'] ) && $widget['is_pro'] !== is_pro() )
-			{	// Skip widget because it should not be installed for the current pro:
+			{	// Skip widget because it should not be installed for the current version:
 				continue;
 			}
 
@@ -1299,7 +1309,7 @@ function insert_shared_widgets( $skin_type )
  */
 function display_container( $WidgetContainer, $params = array() )
 {
-	global $Collection, $Blog, $admin_url, $embedded_containers, $mode;
+	global $Collection, $Blog, $DB, $admin_url, $embedded_containers, $mode;
 	global $Session;
 
 	$params = array_merge( array(
@@ -1423,14 +1433,39 @@ function display_container( $WidgetContainer, $params = array() )
 	 * @var WidgetCache
 	 */
 	$WidgetCache = & get_WidgetCache();
-	$Widget_array = & $WidgetCache->get_by_container_ID( $WidgetContainer->ID );
 
-	if( ! empty( $Widget_array ) )
+	$widgets_SQL = new SQL( 'Get widgets of container #'.$WidgetContainer->ID );
+	$widgets_SQL->SELECT( 'wi_ID, wi_wico_ID, wi_order, wi_enabled, wi_type, wi_code, wi_params' );
+	$widgets_SQL->FROM( 'T_widget__widget' );
+	$widgets_SQL->WHERE( 'wi_wico_ID = '.$DB->quote( $WidgetContainer->ID ) );
+	$widgets = $DB->get_results( $widgets_SQL, ARRAY_A );
+
+	if( ! empty( $widgets ) )
 	{
 		$widget_count = 0;
-		foreach( $Widget_array as $ComponentWidget )
+
+		// Load all container widgets once:
+		$WidgetCache->load_list( array_column( $widgets, 'wi_ID' ) );
+
+		foreach( $widgets as $widget )
 		{
 			$widget_count++;
+			$wrong_widget = false;
+
+			if( ! ( $ComponentWidget = & $WidgetCache->get_by_ID( $widget['wi_ID'], false, false ) ) )
+			{	// This is a broken widget, but we should display this in list in order to allow to delete it:
+				$ComponentWidget = new ComponentWidget();
+				$ComponentWidget->ID       = $widget['wi_ID'];
+				$ComponentWidget->wico_ID  = $widget['wi_wico_ID'];
+				$ComponentWidget->type     = 'wrong';
+				$ComponentWidget->code     = $widget['wi_code'];
+				$ComponentWidget->params   = $widget['wi_params'];
+				$ComponentWidget->order    = $widget['wi_order'];
+				$ComponentWidget->enabled  = $widget['wi_enabled'];
+				$ComponentWidget->icon     = 'warning';
+				$wrong_widget = true;
+			}
+
 			$enabled = $ComponentWidget->get( 'enabled' );
 			$disabled_plugin = ( $ComponentWidget->type == 'plugin' && $ComponentWidget->get_Plugin() == false );
 
@@ -1458,6 +1493,10 @@ function display_container( $WidgetContainer, $params = array() )
 			if( $disabled_plugin )
 			{	// If widget's plugin is disabled:
 				echo get_icon( 'warning', 'imgtag', array( 'title' => T_('Inactive / Uninstalled plugin') ) );
+			}
+			elseif( $wrong_widget )
+			{	// If widget is wrong, e.g. widget has an old code:
+				echo get_icon( 'warning', 'imgtag', array( 'title' => T_('Wrong widget / Invalid code') ) );
 			}
 			else
 			{	// If this is a normal widget or widget's plugin is enabled:

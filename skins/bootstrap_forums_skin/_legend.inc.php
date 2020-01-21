@@ -133,7 +133,7 @@ if( !empty( $legend_statuses ) && is_logged_in() )
 		{	// Only statuses that exist on the page
 		?>
 			<li>
-				<a href="<?php echo get_manual_url( 'visibility-statuses' ); ?>" target="_blank"><span class="note status_<?php echo $status; ?>"><span class="badge"><?php echo $statuses[ $status ]; ?></span></span></a>
+				<a href="<?php echo get_manual_url( 'visibility-statuses' ); ?>" target="_blank" rel="noopener"><span class="note status_<?php echo $status; ?>"><span class="badge"><?php echo $statuses[ $status ]; ?></span></span></a>
 				<span><?php echo $title; ?></span>
 			</li>
 		<?php

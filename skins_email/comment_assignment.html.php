@@ -40,7 +40,7 @@ if( $params['notify_full'] )
 
 	echo '<p'.emailskin_style( '.p' ).'>';
 	if( $Comment->is_meta() )
-	{	// Meta comment:
+	{	// Internal comment:
 		printf( T_('With the following <span %s>%s</span> Comment'), emailskin_style( '.label+.label-status-meta' ), T_('Meta') );
 	}
 	else
@@ -51,7 +51,7 @@ if( $params['notify_full'] )
 	}
 	echo ':'."</p>\n";
 
-	// Meta comment content:
+	// Internal comment content:
 	echo '<div class="email_ugc"'.emailskin_style( 'div.email_ugc' ).'>'."\n";
 	echo '<p'.emailskin_style( '.p' ).'>'.nl2br( $Comment->get( 'content' ) ).'</p>';
 	echo "</div>\n";

@@ -107,5 +107,6 @@ AcceptPathInfo On
 	# Redirect any .htm .html or no-extension-file that's not an existing file or directory to index.php:
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteRule ^[^.]+(\.(html|htm))?$ index.php [L]
+	# 2020-01-10 : allow also tag names (containing dots) to be matched below, e-g: `6.11.4:`
+	RewriteRule ^.+(\.(html|htm))?$ index.php [L]
 </IfModule>

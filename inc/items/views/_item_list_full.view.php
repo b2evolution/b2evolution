@@ -458,7 +458,7 @@ while( $Item = & $ItemList->get_item() )
 		{ // We are looking at a single post, include files and comments:
 
 			if( $comment_type == 'meta' && ! $Item->can_see_meta_comments() )
-			{ // Current user cannot views meta comments
+			{ // Current user cannot views internal comments
 				$comment_type = 'feedback';
 			}
 
@@ -487,7 +487,7 @@ while( $Item = & $ItemList->get_item() )
 						'class'   => 'btn btn-default'
 					) );
 			if( $comment_type != 'meta' )
-			{ // Don't display "Recycle bin" link for meta comments, because they are deleted directly without recycle bin
+			{ // Don't display "Recycle bin" link for internal comments, because they are deleted directly without recycle bin
 				echo get_opentrash_link( true, false, array(
 						'before' => ' <span id="recycle_bin">',
 						'after' => '</span>',
@@ -497,7 +497,7 @@ while( $Item = & $ItemList->get_item() )
 			echo '</div>';
 
 			if( $Item->can_see_meta_comments() )
-			{ // Display tabs to switch between user and meta comments Only if current user can views meta comments
+			{ // Display tabs to switch between user and internal comments Only if current user can views internal comments
 				$switch_comment_type_url = $admin_url.'?ctrl=items&amp;blog='.$blog.'&amp;p='.$Item->ID;
 				$metas_count = generic_ctp_number( $Item->ID, 'metas', 'total', true );
 				$switch_comment_type_tabs = array(
@@ -506,7 +506,7 @@ while( $Item = & $ItemList->get_item() )
 							'title' => T_('User comments').' <span class="badge">'.generic_ctp_number( $Item->ID, 'feedbacks', 'total', true ).'</span>' ),
 						'meta' => array(
 							'url'   => $switch_comment_type_url.'&amp;comment_type=meta#comments',
-							'title' => T_('Meta discussion').' <span class="badge'.( $metas_count > 0 ? ' badge-important' : '' ).'">'.$metas_count.'</span>' )
+							'title' => T_('Internal comments').' <span class="badge'.( $metas_count > 0 ? ' badge-important' : '' ).'">'.$metas_count.'</span>' )
 					);
 				?>
 				<div class="feedback-tabs btn-group">
@@ -567,7 +567,7 @@ while( $Item = & $ItemList->get_item() )
 			}
 
 			if( $comment_type != 'meta' )
-			{ // Display this filter only for not meta comments
+			{ // Display this filter only for not internal comments
 				?>
 				<div class="tile"><label><?php echo T_('Show').':' ?></label></div>
 				<div class="tile">
@@ -605,7 +605,7 @@ while( $Item = & $ItemList->get_item() )
 			echo_item_comments( $blog, $Item->ID, $statuses, $currentpage, NULL, array(), '', $expiry_statuses, $comment_type );
 			echo '</div>';
 
-			if( ( $comment_type == 'meta' && $Item->can_meta_comment() ) // User can add meta comment on the Item
+			if( ( $comment_type == 'meta' && $Item->can_meta_comment() ) // User can add internal comment on the Item
 			    || $Item->can_comment() ) // User can add standard comment
 			{
 
@@ -630,7 +630,7 @@ while( $Item = & $ItemList->get_item() )
 
 			?>
 			<!-- ========== FORM to add a comment ========== -->
-			<h4><?php echo $comment_type == 'meta' ? T_('Leave a meta comment') : T_('Leave a comment'); ?>:</h4>
+			<h4><?php echo $comment_type == 'meta' ? T_('Leave an internal comment') : T_('Leave a comment'); ?>:</h4>
 
 			<?php
 

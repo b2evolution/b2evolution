@@ -2953,6 +2953,9 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 .widget_core_item_tags .evo_widget_item_tags_edit_form .evo_widget_item_tags_quicklist .btn + .btn {
   margin-left: 3px;
 }
+.widget_core_item_tags .evo_widget_item_tags_list .post_tags {
+  display: inline-block;
+}
 .videojs_block .vjs-default-skin .vjs-big-play-button {
   left: 0;
   top: 0;
@@ -5607,32 +5610,32 @@ span[id^=title_folding_] {
   border-bottom-left-radius: 3px !important;
 }
 @media (min-width: 768px) {
-  .alternate-left-right > div .evo_image_block {
+  .alternate-left-right > div .evo_content_block_images {
     width: 40%;
   }
-  .alternate-left-right > div:nth-child( even ) .evo_image_block {
+  .alternate-left-right > div:nth-child( even ) .evo_content_block_images {
     float: left;
     margin-right: 1em;
   }
-  .alternate-left-right > div:nth-child( odd ) .evo_image_block {
+  .alternate-left-right > div:nth-child( odd ) .evo_content_block_images {
     float: right;
     margin-left: 1em;
   }
 }
 @media (min-width: 1785px) {
-  .alternate-left-right > div .evo_image_block {
+  .alternate-left-right > div .evo_content_block_images {
     position: relative;
     width: 60%;
   }
-  .alternate-left-right > div .evo_post__full_text {
+  .alternate-left-right > div .evo_content_block_text {
     position: relative;
     width: 125%;
   }
-  .alternate-left-right > div:nth-child( even ) .evo_image_block,
-  .alternate-left-right > div:nth-child( even ) .evo_post__full_text {
+  .alternate-left-right > div:nth-child( even ) .evo_content_block_images,
+  .alternate-left-right > div:nth-child( even ) .evo_content_block_text {
     left: -295px;
   }
-  .alternate-left-right > div:nth-child( odd ) .evo_image_block {
+  .alternate-left-right > div:nth-child( odd ) .evo_content_block_images {
     left: 295px;
     margin-left: -285px;
   }
