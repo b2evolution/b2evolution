@@ -2464,15 +2464,15 @@ class Item extends ItemLight
 	 */
 	function get_content_teaser( $disppage = '#', $stripteaser = '#', $format = 'htmlbody', $params = array() )
 	{
-		global $Plugins, $preview, $Debuglog;
 		global $more;
 
 		$params = array_merge( $params, array(
 				'disppage' => $disppage,
-				'format' => $format
+				'dispmore' => ( $more != 0 ),
+				'format'   => $format,
 			) );
 
-		$view_type = 'full';
+		$params['view_type'] = 'full';
 		if( $this->has_content_parts( $params ) )
 		{ // This is an extended post (has a more section):
 			if( $stripteaser === '#' )
@@ -2485,24 +2485,48 @@ class Item extends ItemLight
 			{
 				return NULL;
 			}
-			$view_type = 'teaser';
+			$params['view_type'] = 'teaser';
 		}
 
 		$content_parts = $this->get_content_parts( $params );
 		$output = array_shift( $content_parts );
 
+		// Render content by plugins and inline short tags at display time:
+		$output = $this->get_rendered_content( $output, $params );
+
+		return $output;
+	}
+
+
+	/**
+	 * Get rendered content by plugins and inline short tags at display time
+	 *
+	 * @param string Source content
+	 * @param array Params
+	 * @return string Rendered content
+	 */
+	function get_rendered_content( $content, $params = array() )
+	{
+		global $Plugins, $preview;
+
+		$params = array_merge( array(
+				'format'    => 'htmlbody',
+				'dispmore'  => false,
+				'view_type' => 'full',
+			), $params );
+
 		// Render all inline tags to HTML code:
-		$output = $this->render_inline_tags( $output, $params );
+		$output = $this->render_inline_tags( $content, $params );
 
 		// Render switchable content:
 		$output = $this->render_switchable_content( $output );
 
 		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
-		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
-				'Item' => $this,
-				'preview' => $preview,
-				'dispmore' => ($more != 0),
-				'view_type' => $view_type,
+		$output = $Plugins->render( $output, $this->get_renderers_validated(), $params['format'], array(
+				'Item'      => $this,
+				'preview'   => $preview,
+				'dispmore'  => $params['dispmore'],
+				'view_type' => $params['view_type'],
 			), 'Display' );
 
 		// Character conversions:
@@ -2511,7 +2535,7 @@ class Item extends ItemLight
 			// E.g.: to avoid replacing of condition operator from & to &amp;
 			$output = callback_on_non_matching_blocks( $output,
 				'~<(script)[^>]*>.*?</\1>~is',
-				'format_to_output', array( $format ) );
+				'format_to_output', array( $params['format'] ) );
 		}
 
 		return $output;
@@ -2540,6 +2564,37 @@ class Item extends ItemLight
 		$content_parts = array_map( 'balance_tags', $content_parts );
 
 		return $content_parts;
+	}
+
+
+	/**
+	 * Get full content with teaser and extension and all pages
+	 *
+	 * @param string Format
+	 * @param array Params
+	 * @return string Content
+	 */
+	function get_full_content( $format = 'htmlbody', $params = array() )
+	{
+		$params = array_merge( $params, array(
+				'dispmore'  => true,
+				'view_type' => 'full',
+				'format'    => $format,
+			) );
+
+		$output = '';
+		$this->split_pages( $format );
+		foreach( $this->content_pages[ $format ] as $p => $content_page )
+		{
+			$content_parts = $this->get_content_parts( array_merge( $params, array( 'disppage' => $p + 1 ) ) );
+
+			$output .= implode( "\n\n", $content_parts );
+		}
+
+		// Render content by plugins and inline short tags at display time:
+		$output = $this->get_rendered_content( $output, $params );
+
+		return $output;
 	}
 
 
@@ -2595,7 +2650,7 @@ class Item extends ItemLight
 	 */
 	function get_content_extension( $disppage = '#', $force_more = false, $format = 'htmlbody', $params = array() )
 	{
-		global $Plugins, $more, $preview;
+		global $more;
 
 		if( ! $more && ! $force_more )
 		{	// NOT in more mode:
@@ -2609,8 +2664,10 @@ class Item extends ItemLight
 
 		// Don't rewrite these params from array $params, Use them from separate params of this function
 		$params = array_merge( $params, array(
-				'disppage' => $disppage,
-				'format'   => $format
+				'disppage'  => $disppage,
+				'dispmore'  => true,
+				'view_type' => 'extension',
+				'format'    => $format,
 			) );
 
 		if( ! $this->has_content_parts( $params ) )
@@ -2624,22 +2681,8 @@ class Item extends ItemLight
 		array_shift( $content_parts );
 		$output = implode( '', $content_parts );
 
-		// Render all inline tags to HTML code:
-		$output = $this->render_inline_tags( $output, $params );
-
-		// Render switchable content:
-		$output = $this->render_switchable_content( $output );
-
-		// Trigger Display plugins FOR THE STUFF THAT WOULD NOT BE PRERENDERED:
-		$output = $Plugins->render( $output, $this->get_renderers_validated(), $format, array(
-				'Item' => $this,
-				'preview' => $preview,
-				'dispmore' => true,
-				'view_type' => 'extension',
-			), 'Display' );
-
-		// Character conversions
-		$output = format_to_output( $output, $format );
+		// Render content by plugins and inline short tags at display time:
+		$output = $this->get_rendered_content( $output, $params );
 
 		return $output;
 	}
