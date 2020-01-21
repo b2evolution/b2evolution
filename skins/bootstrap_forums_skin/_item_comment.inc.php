@@ -139,9 +139,9 @@ switch( $Comment->get( 'type' ) )
 
 	// ON *DISP = SINGLE* SHOW THE FOLLOWING TITLE FOR EACH COMMENT
 	case 'comment': // Display a comment:
-	case 'meta': // Display a meta comment:
+	case 'meta': // Display an internal comment:
 		if( $Comment->is_meta() )
-		{	// Meta comment:
+		{	// Internal comment:
 			$permalink_text = $Comment->get_inlist_order();
 			$permalink_class = 'badge badge-info';
 		}

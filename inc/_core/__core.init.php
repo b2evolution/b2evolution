@@ -1569,11 +1569,11 @@ class _core_Module extends Module
 
 				$perm_comments = $current_User->check_perm( 'blog_comments', 'view', false, $Blog->ID );
 				if( $perm_comments || $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
-				{	// Initialize comments menu tab if user can view normal or meta comments of the collection:
+				{	// Initialize comments menu tab if user can view normal or internal comments of the collection:
 					$entries['blog']['entries']['comments'] = array(
 							'text' => T_('Comments').'&hellip;',
 							'href' => $admin_url.'?ctrl=comments&amp;blog='.$Blog->ID.'&amp;filter=restore'
-								// Set url to meta comments page if user has a perm to view only meta comments:
+								// Set url to internal comments page if user has a perm to view only internal comments:
 								.( $perm_comments ? '' : '&amp;tab3=meta' ),
 						);
 					$display_separator = true;

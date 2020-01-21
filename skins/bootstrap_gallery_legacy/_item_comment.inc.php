@@ -72,9 +72,9 @@ echo $params['comment_title_before'];
 switch( $Comment->get( 'type' ) )
 {
 	case 'comment': // Display a comment:
-	case 'meta': // Display a meta comment:
+	case 'meta': // Display an internal comment:
 		if( $Comment->is_meta() )
-		{	// Meta comment:
+		{	// Internal comment:
 			echo '<span class="badge badge-info">'.$Comment->get_inlist_order().'</span> ';
 		}
 

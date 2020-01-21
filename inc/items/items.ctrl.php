@@ -3268,7 +3268,7 @@ switch( $action )
 		// Memorize 'p' in case we reload while changing some display settings
 		memorize_param( 'p', 'integer', NULL );
 
-		// What comments view, 'feedback' - all user comments, 'meta' - meta comments of the admins
+		// What comments view, 'feedback' - all user comments, 'meta' - internal comments of the admins
 		param( 'comment_type', 'string', 'feedback', true );
 
 		// Begin payload block:

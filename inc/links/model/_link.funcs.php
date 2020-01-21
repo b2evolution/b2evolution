@@ -143,7 +143,7 @@ function get_link_owner_type( $link_ID )
  * @param object Form
  * @param object LinkOwner object
  * @param boolean true to allow folding for this fieldset, false otherwise
- * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+ * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and internal comments
  */
 function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fieldset_prefix = '' )
 {
@@ -690,7 +690,7 @@ jQuery( document ).on( 'change', 'select[id^=display_position_]', {
 /**
  * Print out JavaScript to make the links table sortable
  *
- * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+ * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and internal comments
  */
 function echo_link_sortable_js( $fieldset_prefix = '' )
 {

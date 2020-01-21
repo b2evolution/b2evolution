@@ -195,9 +195,9 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 	}
 
 	if( $params['disp_meta_comments'] )
-	{	// We requested to display meta comments
+	{	// We requested to display internal comments
 		if( $Item->can_see_meta_comments() )
-		{	// User can see meta comments
+		{	// User can see internal comments
 			$type_list[] = 'meta';
 			if( !empty( $params['comments_title_text'] ) )
 			{
@@ -209,7 +209,7 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 			}
 		}
 		else
-		{	// User cannot see meta comments
+		{	// User cannot see internal comments
 			$params['disp_meta_comments'] = false;
 		}
 		echo '<a id="comments"></a>';
@@ -238,22 +238,22 @@ if( ( $params['disp_meta_comments'] && $Item->can_see_meta_comments() )
 			echo $params['after_section_title'];
 		}
 
-		// // Display the meta comments info ?
+		// // Display the internal comments info ?
 		if( $params['disp_meta_comment_info'] // If we want it
-			&& ! $params['disp_meta_comments']  // If we're not displaying the full list of meta comments anyways
-			&& $Item->can_see_meta_comments() ) // If we have permission to view meta comment of the collection
-		{	// Display the meta comments info:
+			&& ! $params['disp_meta_comments']  // If we're not displaying the full list of internal comments anyways
+			&& $Item->can_see_meta_comments() ) // If we have permission to view internal comment of the collection
+		{	// Display the internal comments info:
 			global $admin_url;
 			echo '<div class="evo_comment__meta_info">';
 			$meta_comments_count = generic_ctp_number( $Item->ID, 'metas', 'total' );
 			$meta_comments_url = $admin_url.'?ctrl=items&amp;p='.$Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments';
 			if( $meta_comments_count > 0 )
-			{	// Display a badge with meta comments count if at least one exists for this Item:
-				echo '<a href="'.$meta_comments_url.'" class="badge badge-meta">'.sprintf( T_('%d meta comments'), $meta_comments_count ).'</a>';
+			{	// Display a badge with internal comments count if at least one exists for this Item:
+				echo '<a href="'.$meta_comments_url.'" class="badge badge-meta">'.sprintf( T_('%d internal comments'), $meta_comments_count ).'</a>';
 			}
 			elseif( $Item->can_meta_comment() )
-			{	// No meta comments yet, Display a button to add new meta comment:
-				echo '<a href="'.$meta_comments_url.'" class="btn btn-default btn-sm">'.T_('Add meta comment').'</a>';
+			{	// No internal comments yet, Display a button to add new internal comment:
+				echo '<a href="'.$meta_comments_url.'" class="btn btn-default btn-sm">'.T_('Add internal comment').'</a>';
 			}
 			echo '</div>';
 		}

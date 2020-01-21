@@ -149,8 +149,8 @@ class UserSettings extends AbstractSettings
 		'notify_edit_pst_moderation' => 1, // Notify when a edited post is awaiting moderation and the user has right to moderate that post
 		'notify_notify_post_proposed' => 1, // Notify when someone proposed a change on a post and the user has right to moderate that post
 		'notify_post_assignment' => 1, // Notify user when a post is assigned to the user
-		'notify_meta_comment_mentioned' => 1, // Notify user when I have been mentioned on a meta comment
-		'notify_meta_comments' => 1, // Notify user when a META comment is published in a post where user can sees meta comments
+		'notify_meta_comment_mentioned' => 1, // Notify user when I have been mentioned on an internal comment
+		'notify_meta_comments' => 1, // Notify user when an INTERNAL comment is published in a post where user can sees internal comments
 
 		'enable_PM' => 1,
 		'enable_email' => 1,

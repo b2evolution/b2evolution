@@ -40,7 +40,7 @@ if( empty( $Blog ) )
 
 if( ! isset( $fieldset_prefix ) )
 {	// Define default fieldset prefix:
-	// (used to display several fieldset on same page, e.g. for normal and meta comments)
+	// (used to display several fieldset on same page, e.g. for normal and internal comments)
 	$fieldset_prefix = '';
 }
 

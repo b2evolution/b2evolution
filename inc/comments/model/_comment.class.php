@@ -1157,7 +1157,7 @@ class Comment extends DataObject
 		}
 
 		if( $params['after_user'] == '#' && $this->is_meta() )
-		{	// Don't display a commenter type for meta comment, because only memebers can create them:
+		{	// Don't display a commenter type for internal comment, because only memebers can create them:
 			$params['after_user'] = '';
 		}
 
@@ -1573,7 +1573,7 @@ class Comment extends DataObject
 		echo '" title="'.$title.'"';
 		echo empty( $class ) ? '' : ' class="'.$class.'"';
 		if( $this->is_meta() )
-		{ // Edit meta comment by ajax
+		{ // Edit internal comment by ajax
 			echo ' onclick="return edit_comment( \'form\', '.$this->ID.' )"';
 		}
 		echo '>'.$text.'</a>';
@@ -1747,13 +1747,13 @@ class Comment extends DataObject
 		else
 		{
 			// JS confirm is required only when the comment is not in the recycle bin yet
-			// ...or comment is a meta comment where it cannot be recycled
+			// ...or comment is an internal comment where it cannot be recycled
 			$display_js_confirm = ( $this->status == 'trash' ) || $this->is_meta();
 			if( $display_js_confirm && ( $confirm_text == '#' ) )
 			{ // Set js confirm text on comment delete action
 				if( $this->is_meta() )
 				{
-					$confirm_text = TS_('Are you sure you want to DELETE this Meta Comment?\\nThis cannot be undone!');
+					$confirm_text = TS_('Are you sure you want to DELETE this Internal Comment?\\nThis cannot be undone!');
 				}
 				else
 				{
@@ -2003,7 +2003,7 @@ class Comment extends DataObject
 			), $params );
 
 		if( $this->is_meta() )
-		{	// Don't allow voting on meta comments:
+		{	// Don't allow voting on internal comments:
 			return;
 		}
 
@@ -2094,7 +2094,7 @@ class Comment extends DataObject
 			), $params );
 
 		if( $this->is_meta() )
-		{	// Don't allow voting on meta comments:
+		{	// Don't allow voting on internal comments:
 			return;
 		}
 
@@ -2671,7 +2671,7 @@ class Comment extends DataObject
 	 * Note: This actually only returns the URL, to get a real link, use Comment::get_permanent_link()
 	 *
 	 * @param string glue between url params
-	 * @param string Anchor for meta comment
+	 * @param string Anchor for internal comment
 	 */
 	function get_permanent_url( $glue = '&amp;', $meta_anchor = '#' )
 	{
@@ -3245,13 +3245,13 @@ class Comment extends DataObject
 				$s = T_('Webmention from %s');
 				break;
 
-			case 'meta': // Display a meta comment:
+			case 'meta': // Display an internal comment:
 				$href = '';
 				if( $params['linked_type'] )
 				{	// Make a comment type as link to permanent url:
 					$href = 'href="'.$this->get_permanent_url().'"';
 				}
-				return sprintf( T_('<a %s>Meta comment</a> from %s'), $href, $author );
+				return sprintf( T_('<a %s>Internal comment</a> from %s'), $href, $author );
 		}
 
 		return sprintf( $s, $author );
@@ -3561,7 +3561,7 @@ class Comment extends DataObject
 			), $params );
 
 		if( $this->is_meta() )
-		{	// Don't display a status banner of meta comments:
+		{	// Don't display a status banner of internal comments:
 			return;
 		}
 
@@ -4156,16 +4156,16 @@ class Comment extends DataObject
 			}
 		}
 		else
-		{	// Get the notify users for META comments:
+		{	// Get the notify users for INTERNAL comments:
 
-			// Get list of users who want to be notified when his login is mentioned in the meta comment content by @user's_login:
+			// Get list of users who want to be notified when his login is mentioned in the internal comment content by @user's_login:
 			$mentioned_user_IDs = get_mentioned_user_IDs( 'meta_comment', $this->get( 'content' ), $already_notified_user_IDs );
 			foreach( $mentioned_user_IDs as $mentioned_user_ID )
 			{
 				$notify_users[ $mentioned_user_ID ] = 'meta_comment_mentioned';
 			}
 
-			$meta_SQL = new SQL( 'Select users which have permission to the edited_Item #'.$comment_Item->ID.' meta comments and would like to recieve notifications' );
+			$meta_SQL = new SQL( 'Select users which have permission to the edited_Item #'.$comment_Item->ID.' internal comments and would like to recieve notifications' );
 			$meta_SQL->SELECT( 'user_ID' );
 			$meta_SQL->FROM( 'T_users' );
 			$meta_SQL->FROM_add( 'INNER JOIN T_groups ON user_grp_ID = grp_ID' );
@@ -4177,7 +4177,7 @@ class Comment extends DataObject
 				      OR bloggroup_group_ID IN ( SELECT sug_grp_ID FROM T_users__secondary_user_groups WHERE sug_user_ID = user_ID ) )' );
 			// Check if users have access to the back-office:
 			$meta_SQL->WHERE( '( gset_value = "normal" OR gset_value = "restricted" )' );
-			// Check if the users would like to receive notifications about new meta comments:
+			// Check if the users would like to receive notifications about new internal comments:
 			$meta_SQL->WHERE_and( 'uset_value = "1"'.( $Settings->get( 'def_notify_meta_comments' ) ? ' OR uset_value IS NULL' : '' ) );
 			// Check if users are activated:
 			$meta_SQL->WHERE_and( 'user_status IN ( "activated", "autoactivated", "manualactivated" )' );
@@ -4210,7 +4210,7 @@ class Comment extends DataObject
 			}
 			$meta_SQL->WHERE_and( $users_with_item_edit_perms );
 
-			// Select users which have permission to the edited_Item meta comments and would like to recieve notifications:
+			// Select users which have permission to the edited_Item internal comments and would like to recieve notifications:
 			$notify_list = $DB->get_col( $meta_SQL );
 
 			// Preprocess list:
@@ -4412,8 +4412,8 @@ class Comment extends DataObject
 					break;
 
 				case 'meta':
-					/* TRANS: Subject of the mail to send on new meta comments. First %s is author login, the second %s is the item's title. */
-					$subject = sprintf( T_( '%s posted a new meta comment on "%s"' ), $author_name, $comment_Item->get('title') );
+					/* TRANS: Subject of the mail to send on new internal comments. First %s is author login, the second %s is the item's title. */
+					$subject = sprintf( T_( '%s posted a new internal comment on "%s"' ), $author_name, $comment_Item->get('title') );
 					break;
 
 				default:
@@ -4460,10 +4460,10 @@ class Comment extends DataObject
 
 				case 'blog_subscription': // blog subscription
 				case 'comment_mentioned': // user was mentioned in the comment content
-				case 'meta_comment_mentioned': // user was mentioned in the meta comment content
+				case 'meta_comment_mentioned': // user was mentioned in the internal comment content
 				case 'item_subscription': // item subscription for registered user
 				case 'anon_subscription': // item subscription for anonymous user
-				case 'meta_comment': // meta comment notification
+				case 'meta_comment': // internal comment notification
 					$user_reply_to = NULL;
 					break;
 
@@ -4692,7 +4692,7 @@ class Comment extends DataObject
 		}
 
 		if( $this->is_meta() )
-		{	// Meta comments have no spam voting
+		{	// Internal comments have no spam voting
 			return;
 		}
 
@@ -5375,13 +5375,13 @@ class Comment extends DataObject
 		$commented_Item = & $this->get_Item();
 
 		if( $this->is_meta() )
-		{	// Meta comment:
+		{	// Internal comment:
 			if( ! is_logged_in() || ( $commented_Item && ! $current_User->check_perm( 'meta_comment', 'view', false, $commented_Item->get_blog_ID() ) ) )
-			{	// Change meta comment status to 'protected' if user has no perm to view them:
+			{	// Change internal comment status to 'protected' if user has no perm to view them:
 				$comment_allowed_status = 'protected';
 			}
 			else
-			{	// Do not restrict if meta comment and user has the proper permission:
+			{	// Do not restrict if internal comment and user has the proper permission:
 				$comment_allowed_status = $current_status;
 			}
 		}

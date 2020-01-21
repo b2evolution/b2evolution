@@ -1325,7 +1325,7 @@ class Item extends ItemLight
 	/**
 	 * Load custom fields values from Request form fields
 	 *
-	 * @param boolean TRUE to load only custom fields which are allowed to be updated with meta comment
+	 * @param boolean TRUE to load only custom fields which are allowed to be updated with internal comment
 	 * @return boolean TRUE if loaded data seems valid, FALSE if some errors or no any property has been changed
 	 */
 	function load_custom_fields_from_Request( $meta = NULL )
@@ -1809,7 +1809,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if current User can see meta comments on this Item
+	 * Check if current User can see internal comments on this Item
 	 *
 	 * @return boolean
 	 */
@@ -1821,10 +1821,10 @@ class Item extends ItemLight
 		}
 
 		if( ! is_admin_page() )
-		{	// Check visibility of meta comments on front-office:
+		{	// Check visibility of internal comments on front-office:
 			$item_Blog = & $this->get_Blog();
 			if( ! $item_Blog || ! $item_Blog->get_setting( 'meta_comments_frontoffice' ) )
-			{	// Meta comments are disabled to be displayed on front-office for this Item's collection:
+			{	// Internal comments are disabled to be displayed on front-office for this Item's collection:
 				return false;
 			}
 		}
@@ -1836,7 +1836,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Check if current User can leave meta comment on this Item
+	 * Check if current User can leave internal comment on this Item
 	 *
 	 * @return boolean
 	 */
@@ -5900,8 +5900,8 @@ class Item extends ItemLight
 
 			case 'metas':
 				if( $zero == '#' ) $zero = '';
-				if( $one == '#' ) $one = T_('1 meta comment');
-				if( $more == '#' ) $more = T_('%d meta comments');
+				if( $one == '#' ) $one = T_('1 internal comment');
+				if( $more == '#' ) $more = T_('%d internal comments');
 				break;
 
 			case 'webmentions':

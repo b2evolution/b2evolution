@@ -32,7 +32,7 @@ param( 'comment_type', 'string', 'feedback' );
 param( 'redirect_to', 'url', '' );
 param( 'reply_ID', 'integer', 0 );
 
-// Only logged in users can post the meta comments
+// Only logged in users can post the internal comments
 $comment_type = is_logged_in() ? $comment_type : 'feedback';
 
 $action = param_arrayindex( 'submit_comment_post_'.$comment_item_ID, 'save' );
@@ -64,10 +64,10 @@ if( $Settings->get('system_lock') )
 
 // Check user permissions to post this comment:
 if( $comment_type == 'meta' )
-{ // Meta comment
+{ // Internal comment
 	if( ! $commented_Item->can_meta_comment() )
-	{ // Current user has no permission to post a meta comment
-		$Messages->add( T_('You cannot leave meta comments on this post!'), 'error' );
+	{ // Current user has no permission to post an internal comment
+		$Messages->add( T_('You cannot leave internal comments on this post!'), 'error' );
 		header_redirect(); // Will save $Messages into Session
 	}
 }

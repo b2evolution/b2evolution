@@ -4198,8 +4198,8 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 				// 'notify_published_comments' - "a comment is published on one of my posts.",
 				// 'notify_comment_moderation' - "a comment is posted and I have permissions to moderate it.",
 				// 'notify_edit_cmt_moderation' - "a comment is modified and I have permissions to moderate it.",
-				// 'notify_meta_comment_mentioned' - "I have been mentioned on a meta comment.",
-				// 'notify_meta_comments' - "a meta comment is posted.".
+				// 'notify_meta_comment_mentioned' - "I have been mentioned on an internal comment.",
+				// 'notify_meta_comments' - "an internal comment is posted.".
 			case 'comment_spam':
 				// 'notify_spam_cmt_moderation' - "a comment is reported as spam and I have permissions to moderate it."
 			case 'comments_unmoderated_reminder':

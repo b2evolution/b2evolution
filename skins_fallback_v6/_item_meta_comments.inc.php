@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the template that displays the meta comments of the viewed post
+ * This is the template that displays the internal comments of the viewed post
  *
  * This file is not meant to be called directly.
  *
@@ -18,7 +18,7 @@ global $disp, $Session;
 
 if( is_single_page() &&
     $Item->can_see_meta_comments() )
-{	// Display the meta comments if current user has a permission:
+{	// Display the internal comments if current user has a permission:
 
 	$Form = new Form();
 
@@ -26,12 +26,12 @@ if( is_single_page() &&
 
 	if( $Item->can_meta_comment() || $total_comments_number > 0 )
 	{
-		$Form->begin_fieldset( T_('Meta comments')
+		$Form->begin_fieldset( T_('Internal comments')
 							.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
 							array( 'class' => 'evo_item_meta_comments' ) );
 
 		if( $Item->can_meta_comment() )
-		{	// Display a form to add new meta comment if current user has a permission:
+		{	// Display a form to add new internal comment if current user has a permission:
 			skin_include( '_item_comment_form.inc.php', array_merge( $params, array(
 					'form_title_start' => '<div class="panel '.( $Session->get('core.preview_Comment') ? 'panel-danger' : 'panel-default' ).' panel-meta">'
 															.'<div class="panel-heading"><h4 class="panel-title">',

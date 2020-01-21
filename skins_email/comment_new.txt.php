@@ -35,8 +35,8 @@ $Item = $params['Item'];
 $recipient_User = & $params['recipient_User'];
 
 if( $params['notify_type'] == 'meta_comment' || $params['notify_type'] == 'meta_comment_mentioned' )
-{ // Meta comment
-	$info_text = T_( '%s posted a new meta comment on %s in %s.' );
+{ // Internal comment
+	$info_text = T_( '%s posted a new internal comment on %s in %s.' );
 }
 else
 { // Normal comment
@@ -50,14 +50,14 @@ if( $params['notify_type'] == 'comment_mentioned' )
 	$notify_message .= T_( 'You were mentioned in this comment.' )."\n\n";
 }
 elseif( $params['notify_type'] == 'meta_comment_mentioned' )
-{	// Add this info line if user was mentioned in the meta comment content:
-	$notify_message .= T_( 'You were mentioned in this meta comment.' )."\n\n";
+{	// Add this info line if user was mentioned in the internal comment content:
+	$notify_message .= T_( 'You were mentioned in this internal comment.' )."\n\n";
 }
 
 if( $params['notify_full'] )
 { // Long format notification:
 	$notify_message .=
-		( $params['notify_type'] == 'meta_comment' ? T_('New meta comment') : T_('New comment') ).': '
+		( $params['notify_type'] == 'meta_comment' ? T_('New internal comment') : T_('New comment') ).': '
 		.$Comment->get_permanent_url( '&', '#comments' )."\n"
 		// TODO: fp> We MAY want to force a short URL and avoid it to wrap on a new line in the mail which may prevent people from clicking
 		.T_('Collection').': '.$Blog->get('shortname')."\n"
@@ -179,9 +179,9 @@ switch( $params['notify_type'] )
 		break;
 
 	case 'meta_comment_mentioned':
-		// user is mentioned in the meta comment
-		$params['unsubscribe_text'] = T_( 'You were mentioned in this meta comment, and you are receiving notifications when anyone mentions your name in a meta comment.' )."\n"
-			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in a meta comment, click here' ).': '
+		// user is mentioned in the internal comment
+		$params['unsubscribe_text'] = T_( 'You were mentioned in this internal comment, and you are receiving notifications when anyone mentions your name in an internal comment.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications when you were mentioned in an internal comment, click here' ).': '
 			.get_htsrv_url().'quick_unsubscribe.php?type=meta_comment_mentioned&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 
@@ -217,9 +217,9 @@ switch( $params['notify_type'] )
 		break;
 
 	case 'meta_comment':
-		// meta comment subscription
-		$params['unsubscribe_text'] = T_( 'You are receiving notifications when meta comment is added on this post.' )."\n"
-			.T_( 'If you don\'t want to receive any more notifications about meta comments, click here' ).': '
+		// internal comment subscription
+		$params['unsubscribe_text'] = T_( 'You are receiving notifications when internal comment is added on this post.' )."\n"
+			.T_( 'If you don\'t want to receive any more notifications about internal comments, click here' ).': '
 			.get_htsrv_url().'quick_unsubscribe.php?type=meta_comment&user_ID=$user_ID$&key=$unsubscribe_key$';
 		break;
 }

@@ -86,7 +86,7 @@ $comment_renderers = array( 'default' );
  * Comment form:
  */
 if( $params['comment_type'] == 'meta' )
-{	// Use different form anchor for meta comments:
+{	// Use different form anchor for internal comments:
 	$params['comment_form_anchor'] = 'meta_form_p';
 }
 

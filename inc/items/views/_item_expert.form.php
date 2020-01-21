@@ -515,22 +515,22 @@ $Form->begin_form( '', '', $params );
 
 	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 	{
-		// ####################### META COMMENTS #########################
+		// ####################### INTERNAL COMMENTS #########################
 		$currentpage = param( 'currentpage', 'integer', 1 );
 		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
 		param( 'comments_number', 'integer', $total_comments_number );
 		param( 'comment_type', 'string', 'meta' );
 
-		$Form->begin_fieldset( T_('Meta comments').get_manual_link( 'meta-comments-panel' )
+		$Form->begin_fieldset( T_('Internal comments').get_manual_link( 'meta-comments-panel' )
 						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
 					array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
 
 		if( $creating )
 		{	// Display button to save new creating item:
-			$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save post to start adding Meta comments'), 'btn-primary' ) );
+			$Form->submit( array( 'actionArray[create_edit]', /* TRANS: This is the value of an input submit button */ T_('Save post to start adding Internal comments'), 'btn-primary' ) );
 		}
 		else
-		{	// Display meta comments of the edited item:
+		{	// Display internal comments of the edited item:
 			global $CommentList, $UserSettings;
 			$CommentList = new CommentList2( $Blog );
 
@@ -553,18 +553,18 @@ $Form->begin_form( '', '', $params );
 			$CommentList->display_if_empty( array(
 					'before'    => '<div class="evo_comment"><p>',
 					'after'     => '</p></div>',
-					'msg_empty' => T_('No meta comment for this post yet...'),
+					'msg_empty' => T_('No internal comment for this post yet...'),
 				) );
 			require $inc_path.'comments/views/_comment_list.inc.php';
 			echo '</div>'; // comments_container div
 			echo '</div>';
 
 			if( $edited_Item->can_meta_comment() )
-			{ // Display a link to add new meta comment if current user has a permission
-				echo action_icon( T_('Add meta comment').'...', 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add meta comment').' &raquo;', 3, 4 );
+			{ // Display a link to add new internal comment if current user has a permission
+				echo action_icon( T_('Add internal comment').'...', 'new', $admin_url.'?ctrl=items&amp;p='.$edited_Item->ID.'&amp;comment_type=meta&amp;blog='.$Blog->ID.'#comments', T_('Add internal comment').' &raquo;', 3, 4 );
 			}
 
-			// Load JS functions to work with meta comments:
+			// Load JS functions to work with internal comments:
 			load_funcs( 'comments/model/_comment_js.funcs.php' );
 		}
 

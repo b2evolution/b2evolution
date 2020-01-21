@@ -180,7 +180,7 @@ switch( $action )
 		break;
 
 	case 'edit_comment':
-		// Used to edit a comment from back-office (Note: Only for meta comments now!)
+		// Used to edit a comment from back-office (Note: Only for internal comments now!)
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'comment' );
@@ -193,7 +193,7 @@ switch( $action )
 		// Load Item
 		$edited_Comment_Item = & $edited_Comment->get_Item();
 
-		// Check user permission to edit this meta comment
+		// Check user permission to edit this internal comment
 		$current_User->check_perm( 'meta_comment', 'edit', true, $edited_Comment );
 
 		// Load Blog of the Item

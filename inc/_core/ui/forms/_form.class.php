@@ -4959,7 +4959,7 @@ class Form extends Widget
 	 *
 	 * @param object Object of the links owner
 	 * @param boolean TRUE to allow folding for this fieldset, FALSE - otherwise
-	 * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and meta comments
+	 * @param string Fieldset prefix, Use different prefix to display several fieldset on same page, e.g. for normal and internal comments
 	 */
 	function attachments_fieldset( $object, $fold = false, $fieldset_prefix = '' )
 	{

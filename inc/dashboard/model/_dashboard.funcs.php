@@ -351,12 +351,12 @@ function show_comments_awaiting_moderation( $blog_ID, $CommentList = NULL, $limi
 
 		$user_permission = $current_User->check_perm( 'meta_comment', 'edit', false, $Comment );
 		if( $user_permission )
-		{ // Put the meta comment content into this container to edit by ajax:
+		{ // Put the internal comment content into this container to edit by ajax:
 			echo '<div id="editable_comment_'.$Comment->ID.'" class="editable_comment_content">';
 		}
 		$Comment->content( 'htmlbody', true );
 		if( $user_permission )
-		{ // End of the container that is used to edit meta comment by ajax:
+		{ // End of the container that is used to edit internal comment by ajax:
 			echo '</div>';
 		}
 

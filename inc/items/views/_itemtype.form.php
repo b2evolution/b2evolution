@@ -298,7 +298,7 @@ $Table->display_col_end();
 // With MC
 $Table->display_col_start();
 custom_field_edit_form_template( array(
-		'<input type="checkbox" name="cf_meta$cf_num$" value="1" title="'.format_to_output( T_('Allow update with Meta Comment'), 'htmlattr' ).'" />'
+		'<input type="checkbox" name="cf_meta$cf_num$" value="1" title="'.format_to_output( T_('Allow update with Internal Comment'), 'htmlattr' ).'" />'
 	), array( '-computed,-separator' ), $custom_field_templates );
 $Table->display_col_end();
 

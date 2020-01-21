@@ -282,12 +282,12 @@ echo '<div class="panel panel-default evo_content_block">';
 
 		$user_permission = is_logged_in() && ( $current_User->check_perm( 'meta_comment', 'edit', false, $posted_Comment ) );
 		if( $user_permission )
-		{	// Put the meta comment content into this container to edit by ajax:
+		{	// Put the internal comment content into this container to edit by ajax:
 			echo '<div id="editable_comment_'.$posted_Comment->ID.'" class="editable_comment_content">';
 		}
 		$posted_Comment->content();
 		if( $user_permission )
-		{	// End of the container that is used to edit meta comment by ajax:
+		{	// End of the container that is used to edit internal comment by ajax:
 			echo '</div>';
 		}
 	echo '</div>';
