@@ -491,7 +491,7 @@ if( $action == 'dashboard' )
 	$activate_collection_toolbar = true;
 
 	// Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
-	require_js( '#jqueryUI#' );
+	require_js_defer( '#jqueryUI#' );
 
 	// Load the appropriate blog navigation styles (including calendar, comment forms...):
 	require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
@@ -499,7 +499,7 @@ if( $action == 'dashboard' )
 	require_js_helper( 'colorbox' );
 
 	// Include files to work with charts
-	require_js( '#easypiechart#' );
+	require_js_defer( '#easypiechart#' );
 	require_css( 'jquery/jquery.easy-pie-chart.css' );
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
@@ -1165,7 +1165,7 @@ else
 			$AdminUI->breadcrumbpath_add( T_('User permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-user-permissions' );
 			// Load JavaScript to toggle checkboxes:
-			require_js( 'collectionperms.js', 'rsc_url' );
+			require_js_async( 'collectionperms.js', 'rsc_url' );
 			break;
 
 		case 'permgroup':
@@ -1175,7 +1175,7 @@ else
 			$AdminUI->breadcrumbpath_add( T_('Group permissions'), '?ctrl=coll_settings&amp;blog=$blog$&amp;tab='.$tab );
 			$AdminUI->set_page_manual_link( 'advanced-group-permissions' );
 			// Load JavaScript to toggle checkboxes:
-			require_js( 'collectionperms.js', 'rsc_url' );
+			require_js_async( 'collectionperms.js', 'rsc_url' );
 			break;
 	}
 

@@ -1223,7 +1223,7 @@ class Skin extends DataObject
 	 * This is where you'd specify you want to use BOOTSTRAP, etc.
 	 *
 	 * If this doesn't do what you need you may add functions like the following to your skin's display_init():
-	 * require_js() , require_css() , add_js_headline()
+	 * require_js_async() , require_js_defer() , require_css() , add_js_headline()
 	 *
 	 * @param array of possible features you want to include. If empty, will default to {'b2evo_base', 'style', 'colorbox'} for backwards compatibility.
 	 */
@@ -1255,7 +1255,7 @@ class Skin extends DataObject
 			{
 				case 'jquery':
 					// Include jQuery:
-					require_js( '#jquery#', 'blog' );
+					require_js_defer( '#jquery#', 'blog' );
 					break;
 
 				case 'font_awesome':
@@ -1265,7 +1265,7 @@ class Skin extends DataObject
 
 				case 'bootstrap':
 					// Include Bootstrap:
-					require_js( '#bootstrap#', 'blog' );
+					require_js_defer( '#bootstrap#', 'blog' );
 					require_css( '#bootstrap_css#', 'blog' );
 					break;
 
@@ -1400,7 +1400,7 @@ class Skin extends DataObject
 
 					if( $Blog->get_setting( 'allow_rating_comment_helpfulness' ) )
 					{ // Load jquery UI to animate background color on change comment status or on vote:
-						require_js( '#jqueryUI#', 'blog' );
+						require_js_defer( '#jqueryUI#', 'blog' );
 					}
 
 					if( is_logged_in() && $Blog->get_setting( 'use_workflow' ) && $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) )
@@ -1413,14 +1413,14 @@ class Skin extends DataObject
 					init_fileuploader_js( 'blog' );
 
 					// Used to change link position:
-					require_js( 'backoffice.js', 'blog' );
+					require_js_defer( 'backoffice.js', 'blog' );
 					break;
 
 				case 'disp_users':
 					// Specific features for disp=users:
 
 					// Used to add new search field "Specific criteria":
-					require_js( '#jqueryUI#', 'blog' );
+					require_js_defer( '#jqueryUI#', 'blog' );
 					require_css( '#jqueryUI_css#', 'blog' );
 					// Load jQuery QueryBuilder plugin files for user list filters:
 					init_querybuilder_js( 'blog' );
@@ -1432,7 +1432,7 @@ class Skin extends DataObject
 					}
 
 					// Require functions.js to show/hide a panel with filters:
-					require_js( 'functions.js', 'blog' );
+					require_js_defer( 'functions.js', 'blog' );
 
 					// Include this file to expand/collapse the filters panel when JavaScript is disabled
 					global $inc_path;
@@ -1452,7 +1452,7 @@ class Skin extends DataObject
 					}
 
 					// Require functions.js to show/hide a panel with filters:
-					require_js( 'functions.js', 'blog' );
+					require_js_defer( 'functions.js', 'blog' );
 
 					// Init JS to quick upload several files:
 					init_fileuploader_js( 'blog' );
@@ -1466,7 +1466,7 @@ class Skin extends DataObject
 					// Specific features for disp=contacts:
 
 					// Used for combo box "Add all selected contacts to this group":
-					require_js( 'form_extensions.js', 'blog' );
+					require_js_defer( 'form_extensions.js', 'blog' );
 
 					// Require results.css to display contact query results in a table
 					if( ! in_array( 'bootstrap', $features ) )
@@ -1475,7 +1475,7 @@ class Skin extends DataObject
 					}
 
 					// Require functions.js to show/hide a panel with filters:
-					require_js( 'functions.js', 'blog' );
+					require_js_defer( 'functions.js', 'blog' );
 
 					// Include this file to expand/collapse the filters panel when JavaScript is disabled
 					global $inc_path;
@@ -1500,7 +1500,7 @@ class Skin extends DataObject
 					}
 
 					// Require functions.js to show/hide a panel with filters:
-					require_js( 'functions.js', 'blog' );
+					require_js_defer( 'functions.js', 'blog' );
 
 					// Include this file to expand/collapse the filters panel when JavaScript is disabled
 					global $inc_path;
@@ -1523,7 +1523,7 @@ class Skin extends DataObject
 
 					if( can_use_hashed_password() )
 					{ // Include JS for client-side password hashing:
-						require_js( 'build/sha1_md5.bmin.js', 'blog' );
+						require_js_defer( 'build/sha1_md5.bmin.js', 'blog' );
 					}
 					break;
 
@@ -1534,14 +1534,14 @@ class Skin extends DataObject
 					init_userfields_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Used to crop profile pictures:
-					require_js( '#jquery#', 'blog' );
-					require_js( '#jcrop#', 'blog' );
+					require_js_defer( '#jquery#', 'blog' );
+					require_js_defer( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
 
 					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
-						require_js( 'bozo_validator.js', 'blog' );
+						require_js_defer( 'bozo_validator.js', 'blog' );
 					}
 					break;
 
@@ -1549,14 +1549,14 @@ class Skin extends DataObject
 					// Specific features for disp=avatar:
 
 					// Used to crop profile pictures:
-					require_js( '#jquery#', 'blog' );
-					require_js( '#jcrop#', 'blog' );
+					require_js_defer( '#jquery#', 'blog' );
+					require_js_defer( '#jcrop#', 'blog' );
 					require_css( '#jcrop_css#', 'blog' );
 
 					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
-						require_js( 'bozo_validator.js', 'blog' );
+						require_js_defer( 'bozo_validator.js', 'blog' );
 					}
 					break;
 
@@ -1572,7 +1572,7 @@ class Skin extends DataObject
 					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
-						require_js( 'bozo_validator.js', 'blog' );
+						require_js_defer( 'bozo_validator.js', 'blog' );
 					}
 					break;
 
@@ -1594,10 +1594,10 @@ class Skin extends DataObject
 					init_popover_js( 'blog', $this->get_template( 'tooltip_plugin' ) );
 
 					// Used to switch to advanced editing and for link position changing:
-					require_js( 'backoffice.js', 'blog' );
+					require_js_defer( 'backoffice.js', 'blog' );
 
 					// Used to automatically checks the matching extracat when we select a new main cat:
-					require_js( 'extracats.js', 'blog' );
+					require_js_defer( 'extracats.js', 'blog' );
 
 					// Used to autocomplete usernames in textarea:
 					init_autocomplete_usernames_js( 'blog' );
@@ -1605,7 +1605,7 @@ class Skin extends DataObject
 					// Activate bozo validator in order not to miss the changes of the edit forms on page leave:
 					if( $UserSettings->get( 'control_form_abortions' ) )
 					{	// Only if user wants this:
-						require_js( 'bozo_validator.js', 'blog' );
+						require_js_defer( 'bozo_validator.js', 'blog' );
 					}
 
 					// Used to quick upload several files:
@@ -1634,7 +1634,7 @@ class Skin extends DataObject
 					init_autocomplete_usernames_js( 'blog' );
 
 					// Used to switch to advanced editing:
-					require_js( 'backoffice.js', 'blog' );
+					require_js_defer( 'backoffice.js', 'blog' );
 
 					// Used to quick upload several files:
 					init_fileuploader_js( 'blog' );
@@ -1652,7 +1652,7 @@ class Skin extends DataObject
 					}
 
 					// Require functions.js to show/hide a panel with filters
-					require_js( 'functions.js', 'blog' );
+					require_js_defer( 'functions.js', 'blog' );
 
 					// Include this file to expand/collapse the filters panel when JavaScript is disabled
 					global $inc_path;
@@ -1663,7 +1663,7 @@ class Skin extends DataObject
 					// Specific features for disp=download:
 					global $Collection, $Blog;
 
-					require_js( '#jquery#', 'blog' );
+					require_js_defer( '#jquery#', 'blog' );
 
 					// Initialize JavaScript to download file after X seconds
 					add_js_headline( '
@@ -1697,17 +1697,17 @@ var downloadInterval = setInterval( function()
 		// Load general JS file:
 		if( $this->get_api_version() >= 6 )
 		{ // Bootstrap skin
-			require_js( $marketing_popup_container_code ? 'build/bootstrap-evo_frontoffice-with-ddexitpop.bmin.js' : 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
+			require_js_defer( $marketing_popup_container_code ? 'build/bootstrap-evo_frontoffice-with-ddexitpop.bmin.js' : 'build/bootstrap-evo_frontoffice.bmin.js', 'blog' );
 		}
 		else
 		{ // Standard skin
-			require_js( $marketing_popup_container_code ? 'build/evo_frontoffice-with-ddexitpop.bmin.js' : 'build/evo_frontoffice.bmin.js', 'blog' );
+			require_js_defer( $marketing_popup_container_code ? 'build/evo_frontoffice-with-ddexitpop.bmin.js' : 'build/evo_frontoffice.bmin.js', 'blog' );
 		}
 
 		if( is_logged_in() && $Session->get( 'designer_mode_'.$Blog->ID ) )
 		{	// If desinger mode when it is turned on from evo menu under "Designer Mode/Exit Designer" or "Collection" -> "Enable/Disable designer mode":
 			global $current_User;
-			require_js( '#jquery#', 'blog' );
+			require_js_defer( '#jquery#', 'blog' );
 			if( $current_User->check_perm( 'blog_properties', 'edit', false, $Blog->ID ) )
 			{	// Initialize this url var only when current user has a permission to edit widgets:
 				global $admin_url;
@@ -1732,8 +1732,8 @@ var downloadInterval = setInterval( function()
 					.'var evo_js_lang_server_error = \''.TS_('There was a server side error.').'\';'
 					.'var evo_js_lang_sync_error = \''.TS_('Please reload the page to be in sync with the server.').'\';' );
 			}
-			require_js( 'src/evo_widget_designer.js', 'blog' );
-			require_js( 'communication.js', 'blog' );
+			require_js_defer( 'src/evo_widget_designer.js', 'blog' );
+			require_js_defer( 'communication.js', 'blog' );
 		}
 
 		// Skin v7 specific initializations for kind of current collection:
@@ -1752,7 +1752,7 @@ var downloadInterval = setInterval( function()
 	 * This is where you'd specify you want to use BOOTSTRAP, etc.
 	 *
 	 * If this doesn't do what you need you may add functions like the following to your skin's siteskin_init():
-	 * require_js() , require_css() , add_js_headline()
+	 * require_js_async(), require_js_defer(), require_css(), add_js_headline()
 	 */
 	function siteskin_init()
 	{
@@ -2356,11 +2356,36 @@ var downloadInterval = setInterval( function()
 	 * this function is used to add unique version number for each skin
 	 *
 	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 * @param boolean 'async' or TRUE to add attribute "async" to load javascript asynchronously,
+	 *                'defer' to add attribute "defer" asynchronously in the order they occur in the page,
+	 *                'immediate' or FALSE to load javascript immediately
 	 */
-	function require_js( $js_file )
+	function require_js( $js_file, $async_defer = false )
 	{
 		global $app_version_long;
-		require_js( $js_file, 'relative', false, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
+		require_js( $js_file, 'relative', $async_defer, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
+	}
+
+
+	/**
+	 * Require javascript file to load asynchronously with attribute "async"
+	 *
+	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 */
+	function require_js_async( $js_file )
+	{
+		$this->require_js( $js_file, 'async' );
+	}
+
+
+	/**
+	 * Require javascript file to load asynchronously with attribute "defer" in the order they occur in the page
+	 *
+	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 */
+	function require_js_defer( $js_file )
+	{
+		$this->require_js( $js_file, 'defer' );
 	}
 
 

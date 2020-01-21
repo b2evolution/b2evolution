@@ -19,10 +19,10 @@ load_funcs('skins/_skin.funcs.php');
 // Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
 init_fontawesome_icons( 'fontawesome-glyphicons' );
 
-require_js( '#jquery#', 'rsc_url' );
+require_js_defer( '#jquery#', 'rsc_url' );
 
 // Bootstrap
-require_js( '#bootstrap#', 'rsc_url' );
+require_js_defer( '#bootstrap#', 'rsc_url' );
 require_css( '#bootstrap_css#', 'rsc_url' );
 // require_css( '#bootstrap_theme_css#', 'rsc_url' );
 

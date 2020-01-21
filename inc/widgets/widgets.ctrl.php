@@ -852,7 +852,7 @@ if( $display_mode == 'normal' )
 	var widget_crumb_url_param = \''.url_crumb( 'widget' ).'\';
 
 	var b2evo_dispatcher_url = "'.$admin_url.'";' );
-	require_js( '#jqueryUI#' ); // auto requires jQuery
+	require_js_defer( '#jqueryUI#' ); // auto requires jQuery
 	require_css( 'blog_widgets.css' );
 	init_tokeninput_js();
 

@@ -266,7 +266,7 @@ class google_maps_plugin extends Plugin
 
 		$params['Form']->switch_layout( 'linespan' );
 
-		require_js( '#jqueryUI#', 'blog' );
+		require_js_defer( '#jqueryUI#', 'blog' );
 
 		$lat = $Item->get_setting('latitude');
 		$lng = $Item->get_setting('longitude');
@@ -935,7 +935,7 @@ function locate()
 	{
 		global $Collection, $Blog;
 
-		require_js( '#jquery#', 'blog' );
+		require_js_defer( '#jquery#', 'blog' );
 
 		$api_key = $this->get_coll_setting( 'api_key', $Blog );
 		if( empty( $api_key ) )

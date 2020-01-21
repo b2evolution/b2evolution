@@ -28,7 +28,7 @@ if( $action == 'exit' )
 {	// Display messages and exit
 
 	// Bootstrap
-	require_js( '#bootstrap#', 'rsc_url' );
+	require_js_defer( '#bootstrap#', 'rsc_url' );
 	require_css( '#bootstrap_css#', 'rsc_url' );
 
 	require_css( 'bootstrap-backoffice-b2evo_base.bmin.css', 'rsc_url' );

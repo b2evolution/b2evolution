@@ -314,8 +314,8 @@ switch( $tab )
 		}
 		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
 		{	// Load JS to edit keyword status from list:
-			require_js( '#jquery#', 'rsc_url' );
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js_defer( '#jquery#', 'rsc_url' );
+			require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
 		}
 		break;
 
@@ -323,8 +323,8 @@ switch( $tab )
 		$AdminUI->breadcrumbpath_add( T_('Reporters'), $admin_url.'?ctrl=central_antispam&amp;tab='.$tab );
 		if( empty( $action ) && $current_User->check_perm( 'centralantispam', 'edit' ) )
 		{	// Load JS to edit source status from list:
-			require_js( '#jquery#', 'rsc_url' );
-			require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+			require_js_defer( '#jquery#', 'rsc_url' );
+			require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
 		}
 		break;
 }

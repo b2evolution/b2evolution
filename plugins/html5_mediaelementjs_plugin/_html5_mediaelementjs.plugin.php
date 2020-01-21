@@ -51,8 +51,8 @@ class html5_mediaelementjs_plugin extends Plugin
 		global $Collection, $Blog;
 
 		require_css( '#mediaelement_css#', 'blog' );
-		require_js( '#jquery#', 'blog' );
-		require_js( '#mediaelement#', 'blog' );
+		require_js_defer( '#jquery#', 'blog' );
+		require_js_defer( '#mediaelement#', 'blog' );
 		$this->require_skin();
 
 		// Set a video/audio size in css style, because option setting cannot sets correct size

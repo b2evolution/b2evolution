@@ -164,7 +164,7 @@ class user_login_Widget extends ComponentWidget
 		//get required js files for _widget_login.form
 		if( can_use_hashed_password() )
 		{ // Include JS for client-side password hashing:
-			require_js( 'build/sha1_md5.bmin.js', 'blog' );
+			require_js_defer( 'build/sha1_md5.bmin.js', 'blog' );
 		}
 	}
 

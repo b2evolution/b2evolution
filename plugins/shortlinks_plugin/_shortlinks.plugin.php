@@ -786,10 +786,10 @@ class shortlinks_plugin extends Plugin
 			), $params );
 
 		// Load js to work with textarea:
-		require_js( 'functions.js', 'blog', 'async', true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		// Load js and css for modal window:
-		$this->require_js( 'shortlinks.js', true );
+		$this->require_js_defer( 'shortlinks.js', true );
 		$this->require_css( 'shortlinks.css', true );
 
 		// Initialize JavaScript to build and open window:

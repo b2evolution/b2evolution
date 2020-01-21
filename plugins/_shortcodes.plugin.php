@@ -85,7 +85,7 @@ class shortcodes_plugin extends Plugin
 		}
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', 'async', true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		?><script>
 		//<![CDATA[

@@ -961,7 +961,7 @@ if( $display_mode != 'js')
 		case 'profile':
 			$AdminUI->breadcrumbpath_add( T_('Profile'), '?ctrl=user&amp;user_ID='.$edited_User->ID.'&amp;user_tab='.$user_tab );
 			init_userfields_js( 'rsc_url', $AdminUI->get_template( 'tooltip_plugin' ) );
-			require_js( '#jcrop#', 'rsc_url' );
+			require_js_defer( '#jcrop#', 'rsc_url' );
 			require_css( '#jcrop_css#', 'rsc_url' );
 
 			// Set an url for manual page:
@@ -982,7 +982,7 @@ if( $display_mode != 'js')
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'user-profile-picture-tab' );
 			}
-			require_js( '#jcrop#', 'rsc_url' );
+			require_js_defer( '#jcrop#', 'rsc_url' );
 			require_css( '#jcrop_css#', 'rsc_url' );
 			break;
 		case 'social':
@@ -1369,7 +1369,7 @@ switch( $action )
 
 				if( $display_mode != 'js')
 				{
-					require_js( '#jcrop#', 'rsc_url' );
+					require_js_defer( '#jcrop#', 'rsc_url' );
 					require_css( '#jcrop_css#', 'rsc_url' );
 					$AdminUI->disp_payload_begin();
 				}

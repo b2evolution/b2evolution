@@ -1185,7 +1185,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $
 	{	// Dependency : ensure jQuery is loaded
 		// Don't use TRUE for $async and $output because it may loads jQuery twice on AJAX request, e.g. on comment AJAX form,
 		// and all jQuery UI libraries(like resizable, sortable and etc.) will not work, e.g. on attachments fieldset
-		require_js( '#jquery#', $relative_to, false, false, $version );
+		require_js_defer( '#jquery#', $relative_to, false, $version );
 	}
 
 	// Get library url of JS file by alias name
@@ -1223,8 +1223,36 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $
 	 * But we should don't forget it for CDN jQuery file and when js code uses deprecated things of jQuery */
 	if( $js_file == '#jquery#' )
 	{ // Dependency : The plugin restores deprecated features and behaviors so that older code will still run properly on jQuery 1.9 and later
-		require_js( '#jquery_migrate#', $relative_to, $async, $output, $version );
+		require_js_defer( '#jquery_migrate#', $relative_to, $output, $version );
 	}
+}
+
+
+/**
+ * Require javascript file to load asynchronously with attribute "async"
+ *
+ * @param string Alias, url or filename (relative to rsc/js) for javascript file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
+ */
+function require_js_async( $js_file, $relative_to = 'rsc_url', $output = false, $version = '#' )
+{
+	require_js( $js_file, $relative_to, 'async', $output, $version );
+}
+
+
+/**
+ * Require javascript file to load asynchronously with attribute "defer" in the order they occur in the page
+ *
+ * @param string Alias, url or filename (relative to rsc/js) for javascript file
+ * @param boolean|string Is the file's path relative to the base path/url?
+ * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
+ * @param string Version number to append at the end of requested url to avoid getting an old version from the cache
+ */
+function require_js_defer( $js_file, $relative_to = 'rsc_url', $output = false, $version = '#' )
+{
+	require_js( $js_file, $relative_to, 'defer', $output, $version );
 }
 
 
@@ -1352,8 +1380,8 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 			case 'helper' :
 				// main helper object required
 				global $debug;
-				require_js( '#jquery#', $relative_to ); // dependency
-				require_js( 'helper.js', $relative_to );
+				require_js_defer( '#jquery#', $relative_to ); // dependency
+				require_js_defer( 'helper.js', $relative_to );
 				add_js_headline('jQuery(document).ready(function()
 				{
 					b2evoHelper.Init({
@@ -1367,7 +1395,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				require_js_helper('helper', $relative_to ); // dependency
 
 				global $dispatcher;
-				require_js( 'communication.js', $relative_to );
+				require_js_defer( 'communication.js', $relative_to );
 				add_js_headline('jQuery(document).ready(function()
 				{
 					b2evoCommunications.Init({
@@ -1434,7 +1462,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 					$colorbox_params_user = 'var b2evo_colorbox_params_user = '.$colorbox_no_voting_params;
 				}
 
-				require_js( '#jquery#', $relative_to );
+				require_js_defer( '#jquery#', $relative_to );
 				// Initialize the colorbox settings:
 				add_js_headline(
 					// General settings:
@@ -1458,7 +1486,7 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 					b2evo_colorbox_params = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_other );' );
 				// TODO: translation strings for colorbox buttons
 
-				require_js( 'build/colorbox.bmin.js', $relative_to, 'async' );
+				require_js_defer( 'build/colorbox.bmin.js', $relative_to );
 				if( is_admin_page() )
 				{
 					global $AdminUI;
@@ -1503,7 +1531,7 @@ function add_js_translation( $string, $translation )
 /**
  * Add a headline, which then gets output in the HTML HEAD section.
  * If you want to include CSS or JavaScript files, please use
- * {@link require_css()} and {@link require_js()} instead.
+ * {@link require_css()} and {@link require_js_async()} and {@link require_js_defer()} instead.
  * This avoids duplicates and allows caching/concatenating those files
  * later (not implemented yet)
  *
@@ -1583,7 +1611,7 @@ function init_ajax_forms( $relative_to = 'blog' )
 
 	if( !empty($Blog) && $Blog->get_setting('ajax_form_enabled') )
 	{
-		require_js( 'communication.js', $relative_to );
+		require_js_defer( 'communication.js', $relative_to );
 	}*/
 }
 
@@ -1598,8 +1626,8 @@ function init_ratings_js( $relative_to = 'blog', $force_init = false )
 	// fp> Note, the following test is good for $disp == 'single', not for 'posts'
 	if( $force_init || ( !empty($Item) && $Item->can_rate() ) )
 	{
-		require_js( '#jquery#', $relative_to ); // dependency
-		require_js( 'jquery/jquery.raty.min.js', $relative_to );
+		require_js_defer( '#jquery#', $relative_to ); // dependency
+		require_js_defer( 'jquery/jquery.raty.min.js', $relative_to );
 	}
 }
 
@@ -1617,20 +1645,20 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 		return;
 	}
 
-	require_js( '#jquery#', $relative_to );
+	require_js_defer( '#jquery#', $relative_to );
 
 	switch( $library )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover.bmin.js', $relative_to, 'async' );
+			require_js_defer( 'build/popover.bmin.js', $relative_to );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip.bmin.js', $relative_to, 'async' );
+			require_js_defer( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js_defer( 'build/bubbletip.bmin.js', $relative_to );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1646,21 +1674,21 @@ function init_bubbletip_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 function init_userfields_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
 	// Load to autocomplete user fields with list type
-	require_js( '#jqueryUI#', $relative_to );
+	require_js_defer( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
 	switch( $library )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover.bmin.js', $relative_to, 'async' );
+			require_js_defer( 'build/popover.bmin.js', $relative_to );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip.bmin.js', $relative_to, 'async' );
+			require_js_defer( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js_defer( 'build/bubbletip.bmin.js', $relative_to );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1689,20 +1717,20 @@ function init_plugins_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  */
 function init_popover_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
 {
-	require_js( '#jquery#', $relative_to );
+	require_js_defer( '#jquery#', $relative_to );
 
 	switch( $library )
 	{
 		case 'popover':
 			// Use popover library of bootstrap
-			require_js( 'build/popover.bmin.js', $relative_to, 'async' );
+			require_js_defer( 'build/popover.bmin.js', $relative_to );
 			break;
 
 		case 'bubbletip':
 		default:
 			// Use bubbletip plugin of jQuery
-			require_js( 'jquery/jquery.bubbletip.min.js', $relative_to );
-			require_js( 'build/bubbletip.bmin.js', $relative_to, 'async' );
+			require_js_defer( 'jquery/jquery.bubbletip.min.js', $relative_to );
+			require_js_defer( 'build/bubbletip.bmin.js', $relative_to );
 			require_css( 'jquery/jquery.bubbletip.css', $relative_to );
 			break;
 	}
@@ -1714,7 +1742,7 @@ function init_popover_js( $relative_to = 'rsc_url', $library = 'bubbletip' )
  */
 function init_datepicker_js( $relative_to = 'rsc_url' )
 {
-	require_js( '#jqueryUI#', $relative_to );
+	require_js_defer( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
 	add_js_headline( 'jQuery(document).ready( function(){
@@ -1733,8 +1761,8 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
  */
 function init_tokeninput_js( $relative_to = 'rsc_url' )
 {
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'jquery/jquery.tokeninput.js', $relative_to );
+	require_js_defer( '#jquery#', $relative_to ); // dependency
+	require_js_defer( 'jquery/jquery.tokeninput.js', $relative_to );
 	require_css( 'jquery/jquery.token-input-facebook.css', $relative_to );
 }
 
@@ -1744,8 +1772,8 @@ function init_tokeninput_js( $relative_to = 'rsc_url' )
  */
 function init_results_js( $relative_to = 'rsc_url' )
 {
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'results.js', $relative_to );
+	require_js_defer( '#jquery#', $relative_to ); // dependency
+	require_js_defer( 'results.js', $relative_to );
 }
 
 
@@ -1824,8 +1852,8 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 		return false;
 	}
 
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( 'voting.js', $relative_to );
+	require_js_defer( '#jquery#', $relative_to ); // dependency
+	require_js_defer( 'voting.js', $relative_to );
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{
@@ -1853,8 +1881,8 @@ function init_voting_item_js( $relative_to = 'rsc_url' )
 		return false;
 	}
 
-	require_js( '#jquery#', $relative_to );
-	require_js( 'voting.js', $relative_to );
+	require_js_defer( '#jquery#', $relative_to );
+	require_js_defer( 'voting.js', $relative_to );
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{
@@ -1880,8 +1908,8 @@ function init_colorpicker_js( $relative_to = 'rsc_url' )
 
 	global $current_User, $UserSettings;
 
-	require_js( '#jquery#', $relative_to );
-	require_js( 'bootstrap/colorpicker/bootstrap-colorpicker.min.js', $relative_to );
+	require_js_defer( '#jquery#', $relative_to );
+	require_js_defer( 'bootstrap/colorpicker/bootstrap-colorpicker.min.js', $relative_to );
 	require_css( 'bootstrap-colorpicker.min.css', $relative_to );
 
 	// Get preselected colors from settings of current User:
@@ -1980,13 +2008,13 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 {
 	global $Collection, $Blog;
 
-	require_js( '#jquery#', $relative_to ); // dependency
+	require_js_defer( '#jquery#', $relative_to ); // dependency
 
 	switch( $library )
 	{
 		case 'typeahead':
 			// Use typeahead library of bootstrap
-			require_js( '#bootstrap_typeahead#', $relative_to );
+			require_js_defer( '#bootstrap_typeahead#', $relative_to );
 			add_js_headline( 'jQuery( document ).ready( function()
 			{
 				jQuery( "input.autocomplete_login" ).on( "added",function()
@@ -2052,7 +2080,7 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 			//     dh> Handle it via http://www.appelsiini.net/projects/lazyload ?
 			// dh> TODO: should probably also get ported to use jquery.ui.autocomplete (or its successor)
 			require_css( 'jquery/jquery.hintbox.css', $relative_to );
-			require_js( 'jquery/jquery.hintbox.min.js', $relative_to );
+			require_js_defer( 'jquery/jquery.hintbox.min.js', $relative_to );
 			add_js_headline( 'jQuery( document ).on( "focus", "input.autocomplete_login", function()
 			{
 				var ajax_url = "";
@@ -2091,16 +2119,16 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
  */
 function init_jqplot_js( $relative_to = 'rsc_url' )
 {
-	require_js( '#jquery#', $relative_to ); // dependency
-	require_js( '#jqplot#', $relative_to );
-	require_js( '#jqplot_barRenderer#', $relative_to );
-	require_js( '#jqplot_canvasAxisTickRenderer#', $relative_to );
-	require_js( '#jqplot_canvasTextRenderer#', $relative_to );
-	require_js( '#jqplot_categoryAxisRenderer#', $relative_to );
-	require_js( '#jqplot_enhancedLegendRenderer#', $relative_to );
-	require_js( '#jqplot_highlighter#', $relative_to );
-	require_js( '#jqplot_canvasOverlay#', $relative_to );
-	require_js( '#jqplot_donutRenderer#', $relative_to );
+	require_js_defer( '#jquery#', $relative_to ); // dependency
+	require_js_defer( '#jqplot#', $relative_to );
+	require_js_defer( '#jqplot_barRenderer#', $relative_to );
+	require_js_defer( '#jqplot_canvasAxisTickRenderer#', $relative_to );
+	require_js_defer( '#jqplot_canvasTextRenderer#', $relative_to );
+	require_js_defer( '#jqplot_categoryAxisRenderer#', $relative_to );
+	require_js_defer( '#jqplot_enhancedLegendRenderer#', $relative_to );
+	require_js_defer( '#jqplot_highlighter#', $relative_to );
+	require_js_defer( '#jqplot_canvasOverlay#', $relative_to );
+	require_js_defer( '#jqplot_donutRenderer#', $relative_to );
 	require_css( '#jqplot_css#', $relative_to );
 	require_css( 'jquery/jquery.jqplot.b2evo.css', $relative_to );
 }
@@ -2113,24 +2141,24 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
 {
 	global $current_locale;
 
-	require_js( '#jquery#', $relative_to ); // dependency
+	require_js_defer( '#jquery#', $relative_to ); // dependency
 	require_css( '#jqueryUI_css#', $relative_to ); // dependency for date picker
-	require_js( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
-	require_js( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
-	require_js( 'jquery/query-builder/moment.js', $relative_to ); // dependency
+	require_js_defer( 'jquery/query-builder/doT.min.js', $relative_to ); // dependency
+	require_js_defer( 'jquery/query-builder/jquery.extendext.min.js', $relative_to ); // dependency
+	require_js_defer( 'jquery/query-builder/moment.js', $relative_to ); // dependency
 
-	require_js( 'jquery/query-builder/query-builder.min.js', $relative_to );
+	require_js_defer( 'jquery/query-builder/query-builder.min.js', $relative_to );
 	require_css( 'jquery/jquery.query-builder.default.css', $relative_to );
 
 	// Load language file if such file exists:
 	$query_builder_langs = array( 'ar', 'az', 'bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'fa-IR', 'fr', 'he', 'it', 'nl', 'no', 'pl', 'pt-BR', 'pt-PT', 'ro', 'ru', 'sq', 'tr', 'ua', 'zh-CN' );
 	if( in_array( $current_locale, $query_builder_langs ) )
 	{	// Load lang by full locale name like "en-US":
-		require_js( 'jquery/query-builder/i18n/query-builder.'.$current_locale.'.js', $relative_to );
+		require_js_defer( 'jquery/query-builder/i18n/query-builder.'.$current_locale.'.js', $relative_to );
 	}
 	elseif( in_array( substr( $current_locale, 0, 2 ), $query_builder_langs ) )
 	{	// Load lang by locale code like "en":
-		require_js( 'jquery/query-builder/i18n/query-builder.'.substr( $current_locale, 0, 2 ).'.js', $relative_to );
+		require_js_defer( 'jquery/query-builder/i18n/query-builder.'.substr( $current_locale, 0, 2 ).'.js', $relative_to );
 	}
 }
 
@@ -2140,7 +2168,7 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
  */
 function init_hotkeys_js( $relative_to = 'rsc_url' )
 {
-	require_js( '#hotkeys#', $relative_to );
+	require_js_async( '#hotkeys#', $relative_to );
 }
 
 
@@ -3761,7 +3789,7 @@ function init_field_editor_js( $params = array() )
 			'relative_to'  => 'rsc_url',
 		), $params );
 
-	require_js( '#jquery#', $params['relative_to'] ); // dependency
+	require_js_defer( '#jquery#', $params['relative_to'] ); // dependency
 
 	add_js_headline( 'jQuery( document ).on( "click", "[id^='.$params['field_prefix'].']", function()
 {
@@ -3893,12 +3921,12 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 		}
 	}
 
-	require_js( '#jquery#', $relative_to );
+	require_js_defer( '#jquery#', $relative_to );
 	if( ! empty( $Blog ) )
 	{	// Set global blog ID for textcomplete(Used to sort users by collection members and assignees):
 		add_js_headline( 'var blog = '.$Blog->ID );
 	}
-	require_js( 'build/textcomplete.bmin.js', $relative_to );
+	require_js_defer( 'build/textcomplete.bmin.js', $relative_to );
 }
 
 
@@ -4031,15 +4059,15 @@ function get_star_rating( $value, $stars_num = 5, $params = array() )
 function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = true )
 {
 	// Require Fine Uploader js and css files:
-	require_js( 'multiupload/fine-uploader.js', $relative_to );
+	require_js_async( 'multiupload/fine-uploader.js', $relative_to );
 	require_css( 'fine-uploader.css', $relative_to );
 
 	// Used to make uploader area resizable:
-	require_js( '#jqueryUI#', $relative_to );
+	require_js_defer( '#jqueryUI#', $relative_to );
 
 	if( $load_sortable_js )
 	{	// Load JS files to make the links table sortable:
-		require_js( 'jquery/jquery.sortable.min.js', $relative_to );
+		require_js_defer( 'jquery/jquery.sortable.min.js', $relative_to );
 	}
 }
 

@@ -136,7 +136,7 @@ class inlines_plugin extends Plugin
 		$temp_ID = empty( $params['temp_ID'] ) ? NULL : $params['temp_ID'];
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', 'async', true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		switch( $params['target_type'] )
 		{

@@ -46,7 +46,7 @@ $AdminUI->breadcrumbpath_add( T_('Site Dashboard'), $admin_url.'?ctrl=dashboard'
 $AdminUI->set_page_manual_link( 'site-dashboard' );
 
 // Load jquery UI to animate background color on change comment status and to transfer a comment to recycle bin
-require_js( '#jqueryUI#' );
+require_js_defer( '#jqueryUI#' );
 
 // Load the appropriate blog navigation styles (including calendar, comment forms...):
 require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for the blog navigation
@@ -54,7 +54,7 @@ require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for 
 require_js_helper( 'colorbox' );
 
 // Include files to work with charts
-require_js( '#easypiechart#' );
+require_js_defer( '#easypiechart#' );
 require_css( 'jquery/jquery.easy-pie-chart.css' );
 
 // Init JS to autcomplete the user logins

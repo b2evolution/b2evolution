@@ -289,7 +289,7 @@ if( !empty( $edited_Group ) )
 }
 if( $action == 'list' && $current_User->check_perm( 'users', 'edit', false ) )
 { // Include to edit group level
-	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
 // Set an url for manual page:
@@ -324,7 +324,7 @@ switch( $action )
 				// Memorize action to filter permissions table:
 				memorize_param( 'action', 'string', true );
 				// Load JavaScript to toggle checkboxes:
-				require_js( 'collectionperms.js', 'rsc_url' );
+				require_js_defer( 'collectionperms.js', 'rsc_url' );
 				break;
 			default:
 				// General Permissions:

@@ -83,7 +83,7 @@ class widescroll_plugin extends Plugin
 			), $params );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', 'async', true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		?><script>
 		//<![CDATA[
@@ -301,8 +301,8 @@ class widescroll_plugin extends Plugin
 			return;
 		}
 
-		require_js( '#jquery#', 'blog' );
-		$this->require_js( 'jquery.scrollwide.min.js' );
+		require_js_defer( '#jquery#', 'blog' );
+		$this->require_js_defer( 'jquery.scrollwide.min.js' );
 		$this->require_css( 'jquery.scrollwide.css' );
 	}
 
@@ -319,8 +319,8 @@ class widescroll_plugin extends Plugin
 
 		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
 		{	// Load this only on form to preview email campaign:
-			require_js( '#jquery#', 'blog' );
-			$this->require_js( 'jquery.scrollwide.min.js' );
+			require_js_defer( '#jquery#', 'blog' );
+			$this->require_js_defer( 'jquery.scrollwide.min.js' );
 			$this->require_css( 'jquery.scrollwide.css' );
 		}
 	}

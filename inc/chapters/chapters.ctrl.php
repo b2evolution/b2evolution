@@ -505,7 +505,7 @@ switch( $action )
 
 if( $action == 'list' )
 { // Load JS to edit chapter order inline
-	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
 /**

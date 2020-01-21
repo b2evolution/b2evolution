@@ -437,12 +437,12 @@ class bootstrap_forums_Skin extends Skin
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
-			require_js( '#jqueryUI#', 'blog' );
+			require_js_defer( '#jqueryUI#', 'blog' );
 		}
 
 		if( in_array( $disp, array( 'single', 'page' ) ) )
 		{	// Init JS to autcomplete the user logins:
-			require_js( '#bootstrap_typeahead#', 'blog' );
+			require_js_defer( '#bootstrap_typeahead#', 'blog' );
 			init_autocomplete_login_js( 'blog', 'typeahead' );
 			// Initialize date picker for _item_expert.form.php:
 			init_datepicker_js( 'blog' );

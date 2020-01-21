@@ -1080,7 +1080,7 @@ class test_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		require_js( '#jquery#', 'blog' );
+		require_js_defer( '#jquery#', 'blog' );
 	}
 
 

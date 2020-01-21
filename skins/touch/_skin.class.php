@@ -170,8 +170,8 @@ class touch_Skin extends Skin
 		parent::display_init();		// We pass NO params. This gives up the default Skins API v5 behavior.
 
 		add_js_headline( 'var touch_skin_switch_confirm_text = "'.TS_( 'Switch to regular view? \n \n You can switch back again in the footer.' ).'";' );
-		$this->require_js( 'js/core.js' );
-		require_js( 'navigation.js', 'blog' );
+		$this->require_js_defer( 'js/core.js' );
+		require_js_defer( 'navigation.js', 'blog' );
 	}
 
 }

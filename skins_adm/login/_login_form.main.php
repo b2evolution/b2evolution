@@ -43,7 +43,7 @@ $wrap_width = '380px';
   fp> TODO: find a javascript way to preload more stuff (like icons) WITHOUT delaying the browser autocomplete of the login & password fields
 	dh>
 	// include jquery JS:
-	require_js( '#jquery#' );
+	require_js_defer( '#jquery#' );
 
 	jQuery(function(){
 	 alert("Document is ready");
@@ -52,11 +52,11 @@ $wrap_width = '380px';
  */
 
 
-require_js( 'functions.js' );
+require_js_defer( 'functions.js' );
 
 if( can_use_hashed_password() )
 { // Include JS for client-side password hashing:
-	require_js( 'build/sha1_md5.bmin.js' );
+	require_js_defer( 'build/sha1_md5.bmin.js' );
 }
 
 // Use the links in the form title

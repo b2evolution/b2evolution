@@ -55,7 +55,7 @@ param( 'action', 'string' );
 
 if( $tab == 'domains' && $current_User->check_perm( 'stats', 'edit' ) )
 {
-	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+	require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
 if( ( $blog == 0 && empty( $sec_ID ) ) || ! $current_User->check_perm( 'stats', 'list', false, $blog ) )
@@ -592,7 +592,7 @@ else
 
 if( $tab == 'domains' )
 { // Load jquery UI to highlight cell on change domain type
-	require_js( '#jqueryUI#' );
+	require_js_defer( '#jqueryUI#' );
 }
 
 if( in_array( $tab , array( 'hits', 'other', 'referers' ) ) ||

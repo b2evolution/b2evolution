@@ -728,7 +728,7 @@ if( !$Messages->has_errors() )
 }
 
 // Used for autocomplete user fields in filter "Specific criteria" or to highlight user level cell on change
-require_js( '#jqueryUI#' );
+require_js_defer( '#jqueryUI#' );
 require_css( '#jqueryUI_css#' );
 
 // We might delegate to this action from above:
@@ -779,7 +779,7 @@ else
 			$AdminUI->top_block = get_user_quick_search_form();
 			if( $current_User->check_perm( 'users', 'moderate' ) )
 			{	// Include to edit user level
-				require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+				require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
 			}
 			load_funcs( 'regional/model/_regional.funcs.php' );
 

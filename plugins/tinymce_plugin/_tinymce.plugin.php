@@ -25,7 +25,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * It provides replacing edit components with the JavaScript rich text editor TinyMCE.
  *
  * @todo Make sure settings get transformed from 0.6 to 0.7 and obsolete ones get dropped from the DB!
- * @todo dh> use require_js() and add_js_headline() for the JavaScript includes
+ * @todo dh> use require_js_async() and require_js_defer() and add_js_headline() for the JavaScript includes
  * @todo fp> see bbcode plugin for an example about how to convert [tag] to <tag> on the fly for editing purposes. May be used for [img:] tags in b2evo. May also be used for b2evo smilies display. ed.onBeforeSetContent ed.onPostProcess
  * @todo fp> lang.js files should be moved to the standard language packs. Maybe served by .php files outputting javascript.
  * @todo dh> This is a nice plugin to apply classes and IDs: http://www.bram.us/projects/tinymce-plugins/tinymce-classes-and-ids-plugin-bramus_cssextras/
@@ -708,9 +708,9 @@ class tinymce_plugin extends Plugin
 					// Load TinyMCE Javascript source file:
 					// This cannot be done through AJAX, since there appear to be scope problems on init then (TinyMCE problem?! - "u not defined").
 					// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
-					require_js( '#tinymce#', 'blog', false, true );
-					require_js( '#tinymce_jquery#', 'blog', false, true );
-					$this->require_js( 'js/evo_view_shortcodes.bmin.js', true );
+					require_js_defer( '#tinymce#', 'blog', true );
+					require_js_defer( '#tinymce_jquery#', 'blog', true );
+					$this->require_js_defer( 'js/evo_view_shortcodes.bmin.js', true );
 					?>
 
 					<script>

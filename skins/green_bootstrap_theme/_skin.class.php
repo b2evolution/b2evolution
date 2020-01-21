@@ -1526,12 +1526,12 @@ jQuery( document ).ready( function()
 
 		if( in_array( $disp, array( 'single', 'page', 'comments' ) ) )
 		{ // Load jquery UI to animate background color on change comment status or on vote
-			require_js( '#jqueryUI#', 'blog' );
+			require_js_defer( '#jqueryUI#', 'blog' );
 		}
 
 		if( in_array( $disp, array( 'single', 'page' ) ) )
 		{	// Init JS to autcomplete the user logins
-			require_js( '#bootstrap_typeahead#', 'blog' );
+			require_js_defer( '#bootstrap_typeahead#', 'blog' );
 			init_autocomplete_login_js( 'blog', 'typeahead' );
 			// Initialize date picker for _item_expert.form.php
 			init_datepicker_js( 'blog' );
@@ -1617,7 +1617,7 @@ jQuery( document ).ready( function()
 
 		if( $this->is_left_navigation_visible() )
 		{ // Include JS code for left navigation panel only when it is displayed:
-			$this->require_js( 'left_navigation.js' );
+			$this->require_js_defer( 'left_navigation.js' );
 		}
 	}
 

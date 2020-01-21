@@ -443,7 +443,7 @@ class videoplug_plugin extends Plugin
 		echo $this->get_template( 'toolbar_after' );
 
 		// Load js to work with textarea
-		require_js( 'functions.js', 'blog', 'async', true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		?><script>
 			//<![CDATA[

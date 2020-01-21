@@ -46,8 +46,8 @@ if( ! $PageCache->check() )
 { // Cache miss, we have to generate:
 	// --------------------- PAGE LEVEL CACHING SUPPORT ---------------------
 
-require_js( '#jquery#' );
-require_js( '#bootstrap#' );
+require_js_defer( '#jquery#' );
+require_js_defer( '#bootstrap#' );
 require_css( '#bootstrap_css#' );
 require_css( 'bootstrap-b2evo_base.bmin.css' );
 require_css( 'b2evo_helper_screens.min.css' );

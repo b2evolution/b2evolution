@@ -180,11 +180,11 @@ class AdminUI_general extends Menu
 	{
 		global $Hit, $check_browser_version;
 
-		require_js( '#jquery#', 'rsc_url' );
-		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
+		require_js_defer( '#jquery#', 'rsc_url' );
+		require_js_defer( 'jquery/jquery.raty.min.js', 'rsc_url' );
 
 		// Load general JS file:
-		require_js( 'build/evo_backoffice.bmin.js', 'rsc_url' );
+		require_js_defer( 'build/evo_backoffice.bmin.js', 'rsc_url' );
 
 		if( $check_browser_version && $Hit->get_browser_version() > 0 && $Hit->is_IE( 9, '<' ) )
 		{	// Display info message if browser IE < 9 version and it is allowed by config var:

@@ -355,7 +355,7 @@ class polls_plugin extends Plugin
 			), $params );
 
 		// Load JS to work with textarea
-		require_js( 'functions.js', 'blog', 'async', true );
+		require_js_defer( 'functions.js', 'blog', true );
 
 		// Load CSS for modal window
 		$this->require_css( 'polls.css', true );

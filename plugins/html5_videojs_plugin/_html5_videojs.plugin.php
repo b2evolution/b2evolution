@@ -51,7 +51,7 @@ class html5_videojs_plugin extends Plugin
 		global $Collection, $Blog;
 
 		require_css( '#videojs_css#', 'blog' );
-		require_js( '#videojs#', 'blog' );
+		require_js_async( '#videojs#', 'blog' );
 		$this->require_skin();
 
 		add_css_headline( '.video-js{ max-width: 100% !important; margin: auto; }

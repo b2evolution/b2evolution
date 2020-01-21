@@ -255,8 +255,8 @@ $booststrap_install_form_params = array(
 		'bottom_note_format' => ' <div><span class="help-inline text-muted small">%s</span></div>',
 	);
 
-require_js( '#jquery#' );
-require_js( '#bootstrap#' );
+require_js_defer( '#jquery#' );
+require_js_defer( '#bootstrap#' );
 require_css( '#bootstrap_css#' );
 require_css( 'b2evo_helper_screens.min.css' );
 

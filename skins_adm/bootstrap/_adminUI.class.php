@@ -42,13 +42,13 @@ class AdminUI extends AdminUI_general
 	{
 		global $Messages, $debug, $Hit, $check_browser_version, $adminskins_url, $rsc_url;
 
-		require_js( '#jquery#', 'rsc_url' );
-		require_js( 'jquery/jquery.raty.min.js', 'rsc_url' );
+		require_js_defer( '#jquery#', 'rsc_url' );
+		require_js_defer( 'jquery/jquery.raty.min.js', 'rsc_url' );
 
-		require_js( '#bootstrap#', 'rsc_url' );
+		require_js_defer( '#bootstrap#', 'rsc_url' );
 		require_css( '#bootstrap_css#', 'rsc_url' );
 		// require_css( '#bootstrap_theme_css#', 'rsc_url' );
-		require_js( '#bootstrap_typeahead#', 'rsc_url' );
+		require_js_defer( '#bootstrap_typeahead#', 'rsc_url' );
 
 		// JS to init Bootstrap tooltips (E.g. on badges with title "Admin"):
 		add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip( {html: true} ) } )' );
@@ -76,7 +76,7 @@ class AdminUI extends AdminUI_general
 		}
 
 		// Load general JS file:
-		require_js( 'build/bootstrap-evo_backoffice.bmin.js', 'rsc_url' );
+		require_js_defer( 'build/bootstrap-evo_backoffice.bmin.js', 'rsc_url' );
 
 		// Set bootstrap css classes for messages
 		$Messages->set_params( array(
@@ -102,7 +102,7 @@ class AdminUI extends AdminUI_general
 
 		// evo helpdesk widget:
 		//require_css( $rsc_url.'css/evo_helpdesk_widget.min.css' );
-		//require_js( $rsc_url.'js/evo_helpdesk_widget.min.js' );
+		//require_js_defer( $rsc_url.'js/evo_helpdesk_widget.min.js' );
 	}
 
 

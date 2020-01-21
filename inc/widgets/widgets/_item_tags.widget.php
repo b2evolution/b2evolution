@@ -129,8 +129,8 @@ class item_tags_Widget extends ComponentWidget
 		if( ! empty( $Item ) && $this->get_param( 'allow_edit' ) && is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 		{	// Load JS to edit tags if it is enabled by widget setting and current User has a permission to edit them:
 			init_tokeninput_js( 'blog' );
-			require_js( '#jquery#', 'blog' );
-			require_js( 'jquery/jquery.cookie.min.js', 'blog' );
+			require_js_defer( '#jquery#', 'blog' );
+			require_js_defer( 'jquery/jquery.cookie.min.js', 'blog' );
 		}
 	}
 
