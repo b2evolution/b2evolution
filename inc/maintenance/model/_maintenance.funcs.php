@@ -328,9 +328,9 @@ function unpack_archive( $src_file, $dest_dir, $mk_dest_dir = false, $src_file_n
 	{	// Check if ZIP path is inside $basepath or $upgrade_path:
 		$canonical_path = get_canonical_path( $src_file );
 		if( strpos( $canonical_path, $basepath ) !== 0 &&
-		    strpos( $canonical_path, $upgrade_path ) !== 0 )
+		    strpos( $canonical_path, get_canonical_path( $upgrade_path ) ) !== 0 )
 		{	// ZIP file path must be started with $basepath or $upgrade_path:
-			$invalid_path_error = sprintf( TB_('Path is outside $basepath=%s and outside $upgrade_path=%s.'), '<code>'.$basepath.'</code>', '<code>'.$upgrade_path.'</code>' );
+			$invalid_path_error = sprintf( TB_('Path is outside %s and outside %s.'), '$basepath=<code>'.$basepath.'</code>', '$upgrade_path=<code>'.$upgrade_path.'</code>' );
 		}
 	}
 	if( isset( $invalid_path_error ) )
