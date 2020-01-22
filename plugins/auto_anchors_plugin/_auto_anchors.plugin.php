@@ -179,7 +179,7 @@ class auto_anchors_plugin extends Plugin
 	/**
 	 * Perform rendering
 	 */
-	function DisplayItemAsHtml( & $params )
+	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
 
