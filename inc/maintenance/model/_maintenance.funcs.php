@@ -99,6 +99,8 @@ function check_version( $new_version_dir )
 		return array(
 				'error'   => 'old',
 				'message' => TB_('This is an old version!').'<br />'
+					.'Current: '.$GLOBALS['app_version'].' '.$GLOBALS['app_date'].'<br />'			
+					.'About to install: '.$app_version.' '.$app_date.'<br />'
 					.TB_('You should NOT install this older version.')
 			);
 	}
