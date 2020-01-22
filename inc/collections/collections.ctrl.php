@@ -188,7 +188,7 @@ switch( $action )
 				}
 				$user_org_IDs = NULL;
 
-				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', true ) )
+				if( $create_demo_org && $current_User->check_perm( 'orgs', 'create', false ) )
 				{ // Create the demo organization
 					$user_org_IDs = array( create_demo_organization( $edited_Blog->owner_user_ID )->ID );
 				}
