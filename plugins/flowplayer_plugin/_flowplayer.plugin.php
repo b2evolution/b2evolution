@@ -49,7 +49,7 @@ class flowplayer_plugin extends Plugin
 	 */
 	function SkinBeginHtmlHead( & $params )
 	{
-		require_js_async( '#flowplayer#', 'blog' );
+		require_js_defer( '#flowplayer#', 'blog' );
 		add_js_headline( 'flowplayer.conf = { flashfit: true, embed: false }' );
 		$this->require_skin();
 		add_css_headline( '.flowplayer_block {
