@@ -3024,7 +3024,10 @@ function echo_autocomplete_tags( $params = array() )
 			}
 
 			quick_item_tags = quick_item_tags.splice( -5 );
-			jQuery.cookie( 'quick_item_tags', quick_item_tags.join( ',' ), { path: "/" } );
+			jQuery.cookie( 'quick_item_tags', quick_item_tags.join( ',' ), {
+					domain: '<?php echo format_to_js( get_cookie_domain() );?>',
+					path: '<?php echo format_to_js( get_cookie_path() );?>'
+				} );
 		}
 
 		<?php } ?>
