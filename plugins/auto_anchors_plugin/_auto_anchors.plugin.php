@@ -145,6 +145,14 @@ class auto_anchors_plugin extends Plugin
 		{	// Initialize JS for better scrolling only on Item's page:
 			add_js_headline( 'jQuery( document ).ready( function()
 			{
+				jQuery( "h1, h2, h3, h4, h5, h6" ).each( function()
+				{	// Append anchor link to header:
+					if( jQuery( this ).attr( "id") && jQuery( this ).hasClass( "evo_auto_anchor_header" ) )
+					{	// Only if it has id attribute and it was genereated by this plugin
+						var current_url = location.href.replace( /#.+$/, "" ) + "#" + jQuery( this ).attr( "id" );
+						jQuery( this ).append( " <a href=\"" + current_url + "\" class=\"evo_auto_anchor_link\"><span class=\"fa fa-link\"></span></a>" );
+					}
+				} );
 				var evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0;
 				jQuery( ".evo_auto_anchor_link" ).on( "click", function()
 				{
@@ -182,14 +190,6 @@ class auto_anchors_plugin extends Plugin
 	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
-
-		// Get current Item to render links for anchors:
-		if( ! ( $this->current_Item = $this->get_Item_from_params( $params ) ) ||
-		    $this->current_Item->get_type_setting( 'usage' ) == 'content-block' )
-		{	// Render anchor link only for Item or Comment,
-			// and exclude rendering for content-block Items because they are included inside current Item and have no own permanent URL:
-			return true;
-		}
 
 		// Load for replace_special_chars():
 		load_funcs( 'locales/_charset.funcs.php' );
@@ -245,9 +245,7 @@ class auto_anchors_plugin extends Plugin
 			$header_tag_start .= ' class="evo_auto_anchor_header"';
 		}
 
-		$anchor_link = ' <a href="'.$this->current_Item->get_permanent_url().'#'.$anchor.'" class="evo_auto_anchor_link">'.get_icon( 'merge', 'imgtag', array( 'title' => false ) ).'</a>';
-
-		return $header_tag_start.$anchor_attribute.'>'.$m[5].$anchor_link.$m[6];
+		return $header_tag_start.$anchor_attribute.'>'.$m[5].$m[6];
 	}
 }
 
