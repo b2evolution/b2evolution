@@ -9502,7 +9502,7 @@ function insert_image_links_block( $params )
 			$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
 
 			if( isset( $GLOBALS['files_Module'] )
-				&& $current_User->check_perm( 'emails', 'edit', true )
+				&& $current_User->check_perm( 'emails', 'edit', false )
 				&& $current_User->check_perm( 'files', 'view', false ) )
 			{	// Files module is enabled, but in case of creating new email campaign  we should show file attachments block only if user has all required permissions to attach files
 				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );

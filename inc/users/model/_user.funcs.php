@@ -7998,7 +7998,7 @@ function user_td_org_actions( $org_ID, $user_ID )
 	$r = '';
 	$OrganizationCache = & get_OrganizationCache();
 	if( ( $user_Organization = & $OrganizationCache->get_by_ID( $org_ID, false, false ) ) &&
-	    $current_User->check_perm( 'orgs', 'edit', true, $user_Organization ) )
+	    $current_User->check_perm( 'orgs', 'edit', false, $user_Organization ) )
 	{ // Current user can edit membership information:
 		$link_params = array(
 				'onclick' => 'return user_edit( '.$org_ID.', '.$user_ID.' );'
