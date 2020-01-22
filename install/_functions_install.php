@@ -859,6 +859,11 @@ function install_basic_plugins( $old_db_version = 0 )
 	{
 		install_plugin( 'nofollow_plugin' );
 	}
+
+	if( $old_db_version < 15690 )
+	{
+		install_plugin( 'content_blocks_plugin' );
+	}
 }
 
 
