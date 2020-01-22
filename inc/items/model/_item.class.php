@@ -8839,6 +8839,23 @@ class Item extends ItemLight
 			// Load the blog we're in:
 			$Collection = $Blog = & $this->get_Blog();
 
+			if( $this->get_type_setting( 'usage' ) == 'content-block' &&
+			    empty( $this->content_block_invalidate_reported ) )
+			{	// Display warning on updating of content block item:
+				global $admin_url, $current_User;
+				if( is_logged_in() &&
+				    $current_User->check_perm( 'admin', 'normal' ) &&
+				    $current_User->check_perm( 'options', 'view' ) )
+				{	// If current user has a permission to the clear tool:
+					$Messages->add( TB_('WARNING: you edited a content block.').' '.sprintf( TB_('You should <a %s>invalidate the pre-rendering cache NOW</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=del_itemprecache&amp;'.url_crumb( 'tools' ).'" target="_blank"' ), 'warning' );
+				}
+				else
+				{	// If current user has no permission to the clear tool:
+					$Messages->add( TB_('WARNING: you edited a content block.').' '.TB_('Please ask administrator to invalidate the pre-rendering cache.'), 'warning' );
+				}
+				$this->content_block_invalidate_reported = true;
+			}
+
 			// BLOCK CACHE INVALIDATION:
 			BlockCache::invalidate_key( 'cont_coll_ID', $Blog->ID ); // Content has changed
 			BlockCache::invalidate_key( 'item_ID', $this->ID ); // Item has changed
