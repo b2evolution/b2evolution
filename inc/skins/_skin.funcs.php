@@ -199,7 +199,7 @@ function skin_init( $disp )
 					init_hotkeys_js();
 					add_js_headline('jQuery( document ).ready( function()
 					{
-						hotkeys( \'f2, ctrl+f2\', function( event, handler ) {
+						hotkeys( \'f2, ctrl+f2, f9\', function( event, handler ) {
 							switch( handler.key )
 							{
 								case \'f2\':
@@ -208,6 +208,22 @@ function skin_init( $disp )
 
 								case \'ctrl+f2\':
 									window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
+									break;
+
+								case \'f9\':
+									jQuery.ajax(
+									{
+										type: "POST",
+										url: htsrv_url + "async.php",
+										data: {
+											"action": "clear_itemprecache",
+											"crumb_tools": "'.get_crumb( 'tools' ).'"
+										},
+										success: function( data )
+										{	// Item cache cleared, reload:
+											window.location.reload( true );
+										}
+									} );
 									break;
 							}
 						});
@@ -409,7 +425,6 @@ function skin_init( $disp )
 			// init_ratings_js( 'blog' );
 
 			if( $featured_intro_Item = & get_featured_Item( 'posts', NULL, true, true, true ) )
-			//$FeaturedList && $FeaturedList->result_num_rows )
 			{	// Enable "F2" hotkey that will redirect user to edit screen of Intro or Feature Post:
 				global $admin_url;
 
@@ -428,19 +443,58 @@ function skin_init( $disp )
 					init_hotkeys_js();
 					add_js_headline('jQuery( document ).ready( function()
 					{
-						hotkeys( \'f2, ctrl+f2\', function( event, handler ) {
+						hotkeys( \'f2, ctrl+f2, f9\', function( event, handler ) {
 							switch( handler.key )
 							{
 								case \'f2\':
 									window.location.href = \''.format_to_js( $edit_item_url ).'\';
 									break;
+
 								case \'ctrl+f2\':
 									window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
+									break;
+
+								case \'f9\':
+									jQuery.ajax(
+									{
+										type: "POST",
+										url: htsrv_url + "async.php",
+										data: {
+											"action": "clear_itemprecache",
+											"crumb_tools": "'.get_crumb( 'tools' ).'"
+										},
+										success: function( data )
+										{	// Item cache cleared, reload:
+											window.location.reload( true );
+										}
+									} );
 									break;
 							}
 						});
 					});');
 				}
+			}
+			else
+			{
+				init_hotkeys_js();
+				add_js_headline( 'jQuery( document ).ready( function()
+				{
+					hotkeys( \'f9\', function( event, handler ) {
+						jQuery.ajax(
+						{
+							type: "POST",
+							url: htsrv_url + "async.php",
+							data: {
+								"action": "clear_itemprecache",
+								"crumb_tools": "'.get_crumb( 'tools' ).'"
+							},
+							success: function( data )
+							{	// Item cache cleared, reload:
+								window.location.reload( true );
+							}
+						} );
+					});
+				});');
 			}
 
 			// Get list of active filters:
@@ -1625,7 +1679,7 @@ function skin_init( $disp )
 			{
 				init_hotkeys_js();
 				$backoffice_edit_item_url = $admin_url.'?ctrl=items&action=edit&p='.$post_ID.'&blog='.$Blog->ID; 
-				add_js_headline('jQuery( document ).ready( function()
+				add_js_headline( 'jQuery( document ).ready( function()
 				{
 					hotkeys( \'f2, ctrl+f2\', function( event, handler ) {
 						window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
