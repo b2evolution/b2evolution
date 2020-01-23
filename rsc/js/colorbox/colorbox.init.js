@@ -5,6 +5,21 @@
  * Used only to initialize colorbox for the links with attribute "rel" ^= "lightbox"
  * Don't load this file directly, It is appended to "/build/jquery.colorbox.b2evo.min.js" by Grunt, because we load colorbox plugin asynchronously.
  */
+// General settings:
+var b2evo_colorbox_params = {
+		maxWidth: jQuery( window ).width() > 480 ? "95%" : "100%",
+		maxHeight: jQuery( window ).height() > 480 ? "90%" : "100%",
+		slideshow: true,
+		slideshowAuto: false
+	};
+// For post images:
+b2evo_colorbox_params_post = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_post );
+// For comment images:
+b2evo_colorbox_params_cmnt = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_cmnt );
+// For user images:
+b2evo_colorbox_params_user = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_user );
+// For all other images
+b2evo_colorbox_params = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_other );
 
 /**
  * Initialize colorbox for a selected link

@@ -1465,25 +1465,14 @@ function require_js_helper( $helper = '', $relative_to = 'rsc_url' )
 				require_js_defer( '#jquery#', $relative_to );
 				// Initialize the colorbox settings:
 				add_js_headline(
-					// General settings:
-					'var b2evo_colorbox_params = {
-						maxWidth: jQuery( window ).width() > 480 ? "95%" : "100%",
-						maxHeight: jQuery( window ).height() > 480 ? "90%" : "100%",
-						slideshow: true,
-						slideshowAuto: false
-					};
-					'// For post images
-					.$colorbox_params_post.';
-					b2evo_colorbox_params_post = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_post );
+					// For post images
+					$colorbox_params_post.';
 					'// For comment images
 					.$colorbox_params_cmnt.';
-					b2evo_colorbox_params_cmnt = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_cmnt );
 					'// For user images
 					.$colorbox_params_user.';
-					b2evo_colorbox_params_user = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_user );
 					'// For all other images
-					.$colorbox_params_other.';
-					b2evo_colorbox_params = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_other );' );
+					.$colorbox_params_other.';' );
 				// TODO: translation strings for colorbox buttons
 
 				require_js_defer( 'build/colorbox.bmin.js', $relative_to );
