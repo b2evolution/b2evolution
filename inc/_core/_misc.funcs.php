@@ -999,7 +999,7 @@ function preg_match_outcode_callback( $content, $search, & $matches )
 
 
 /**
- * Replace content outside blocks <code></code>, <pre></pre> and markdown codeblocks
+ * Replace content outside blocks <code></code>, <pre></pre>, markdown codeblocks in `` and short inline tags like [image:]
  *
  * @param array|string Search list
  * @param array|string Replace list or Callback function
@@ -1012,10 +1012,16 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
 {
 	if( !empty( $search ) )
 	{
-		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
-		{ // Call replace_content() on everything outside code/pre and markdown codeblocks:
+		if( stristr( $content, '<code' ) !== false ||
+		    stristr( $content, '<pre' ) !== false ||
+		    strstr( $content, '`' ) !== false ||
+		    preg_match( '/\[[a-z]+:.+?\]/i', $content ) )
+		{ // Call replace_content() on everything outside code/pre, markdown codeblocks and short inline tags:
 			$content = callback_on_non_matching_blocks( $content,
-				'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
+				'~(`.*?`|'
+				.'<code[^>]*>.*?</code>|'
+				.'<pre[^>]*>.*?</pre>|'
+				.'\[[a-z]+:.+?\])~is',
 				$replace_function_callback, array( $search, $replace, $replace_function_type ) );
 		}
 		else
@@ -1181,10 +1187,24 @@ function split_outcode( $separators, $content, $capture_separator = false )
  * @param string Source content
  * @param string Search pattern
  * @param function Optional callback function that accepts search pattern and current paragraph as arguments and returns the new_paragraph
+ * @param array Params
  * @return string Content
  */
-function move_short_tags( $content, $pattern = NULL, $callback = NULL )
+function move_short_tags( $content, $pattern = NULL, $callback = NULL, $params = array() )
 {
+	$params = array_merge( array(
+			'check_code_block' => true,
+		), $params );
+
+	if( isset( $params['check_code_block'] ) && $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+	{	// Call $this->render_collection_data() on everything outside code/pre:
+		$params['check_code_block'] = false;
+		$content = callback_on_non_matching_blocks( $content,
+			'~<(code|pre)[^>]*>.*?</\1>~is',
+			'move_short_tags', array( $pattern, $callback, $params ) );
+		return $content;
+	}
+
 	// Get individual paragraphs:
 	preg_match_all( '#(<p[\s*|>])?.*?<(/p|br\s?/?)>#i', $content, $paragraphs );
 
@@ -8712,13 +8732,17 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				if( $File->is_image() )
 				{
 					$current_image_params = $params;
+					$image_href = false;
+					$image_rel = NULL;
 
 					if( ! empty( $inline[3] ) ) // check if second colon is present
 					{
 						// Get the inline params: caption and class
-						$inline_params = explode( ':.', $inline[4] );
+						$inline_params = explode( ':', $inline[4] );
+						$opt_index = 0;
 
-						if( ! empty( $inline_params[0] ) )
+						// Caption:
+						if( $inline_type != 'inline' && ! empty( $inline_params[0] ) )
 						{	// Caption is set, so overwrite the image link title
 							if( $inline_params[0] == '-' )
 							{	// Caption display is disabled
@@ -8732,12 +8756,43 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 							$current_image_params['image_desc'] = $current_image_params['image_link_title'];
 							$current_file_params['title'] = $inline_params[0];
+							$opt_index++;
 						}
 
-						$class_index = ( $inline_type == 'inline' ) ? 0 : 1; // [inline] tag doesn't have a caption, so 0 index is for class param
-						if( ! empty( $inline_params[ $class_index ] ) )
+						// TODO: Alt text:
+
+						// HRef:
+						if( $inline_type != 'inline' &&
+						    ! empty( $inline_params[ $opt_index ] ) &&
+						    preg_match( '#^(https?|\(\((.*?)\)\))$#i', $inline_params[ $opt_index ], $href_match ) )
+						{
+							if( stripos( $href_match[0], 'http' ) === 0 )
+							{	// Absolute URL:
+								$image_href = $href_match[0].':'.$inline_params[ $opt_index + 1 ];
+								$image_rel = ''; // reset default attribute "rel" to don't display colorbox on click
+								$opt_index++;
+							}
+							else
+							{	// Item slug:
+								$ItemCache = & get_ItemCache();
+								if( $slug_Item = & $ItemCache->get_by_urltitle( $href_match[2], false, false ) )
+								{
+									$image_href = $slug_Item->get_permanent_url();
+									$image_rel = ''; // reset default attribute "rel" to don't display colorbox on click
+								}
+							}
+							$opt_index++;
+						}
+
+						$current_image_params['image_link_to'] = ( $image_href === false ? 'original' : $image_href );
+						$current_image_params['image_link_rel'] = $image_rel;
+
+						// TODO: Size:
+
+						// Class Name(s):
+						if( ! empty( $inline_params[ $opt_index ] ) )
 						{	// A class name is set for the inline tags
-							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $class_index ] ) ) );
+							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $opt_index ] ) ) );
 
 							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
 							{
@@ -8790,10 +8845,10 @@ function render_inline_tags( $Object, $tags, $params = array() )
 								}
 
 								$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-										'image_link_to' => false,
+										'image_link_to' => $image_href,
 										'image_style'   => 'border: none; max-width: 100%; height: auto;'.$image_style,
 										'add_loadimg'   => false,
-								) ) );
+									) ) );
 								break;
 
 							default:
@@ -8835,6 +8890,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				{
 					global $thumbnail_sizes;
 
+					$thumbnail_href = false;
+					$thumbnail_rel = NULL;
 					$thumbnail_size = 'medium';
 					$thumbnail_position = 'left';
 
@@ -8842,24 +8899,54 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 					if( ! empty( $inline[3] ) ) // check if second colon is present
 					{
-						// Get the inline params: caption and class
+						// Get optional inline params: HRef, Size, Alignment, Class
 						$inline_params = explode( ':', $inline[4] );
+						$opt_index = 0;
 
+						// TODO: Alt text:
+
+						// HRef:
+						if( ! empty( $inline_params[ $opt_index ] ) &&
+						    preg_match( '#^(https?|\(\((.*?)\)\))$#i', $inline_params[ $opt_index ], $href_match ) )
+						{
+							if( stripos( $href_match[0], 'http' ) === 0 )
+							{	// Absolute URL:
+								$thumbnail_href = $href_match[0].':'.$inline_params[ $opt_index + 1 ];
+								$thumbnail_rel = ''; // reset default attribute "rel" to don't display colorbox on click
+								$opt_index++;
+							}
+							else
+							{	// Item slug:
+								$ItemCache = & get_ItemCache();
+								if( $slug_Item = & $ItemCache->get_by_urltitle( $href_match[2], false, false ) )
+								{
+									$thumbnail_href = $slug_Item->get_permanent_url();
+									$thumbnail_rel = ''; // reset default attribute "rel" to don't display colorbox on click
+								}
+							}
+							$opt_index++;
+						}
+
+						// Size:
 						$valid_thumbnail_sizes = array( 'small', 'medium', 'large' );
-						if( ! empty( $inline_params[0] ) && in_array( $inline_params[0], $valid_thumbnail_sizes ) )
+						if( ! empty( $inline_params[ $opt_index ] ) && in_array( $inline_params[ $opt_index ], $valid_thumbnail_sizes ) )
 						{
-							$thumbnail_size = $inline_params[0];
+							$thumbnail_size = $inline_params[ $opt_index ];
+							$opt_index++;
 						}
 
+						// Alignment:
 						$valid_thumbnail_positions = array( 'left', 'right' );
-						if( ! empty( $inline_params[1] ) && in_array( $inline_params[1], $valid_thumbnail_positions ) )
+						if( ! empty( $inline_params[ $opt_index ] ) && in_array( $inline_params[ $opt_index ], $valid_thumbnail_positions ) )
 						{
-							$thumbnail_position = $inline_params[1];
+							$thumbnail_position = $inline_params[ $opt_index ];
+							$opt_index++;
 						}
 
-						if( ! empty( $inline_params[2] ) )
+						// Class:
+						if( ! empty( $inline_params[ $opt_index ] ) )
 						{
-							$extra_classes = explode( '.', ltrim( $inline_params[2], '.' ) );
+							$extra_classes = explode( '.', ltrim( $inline_params[ $opt_index ], '.' ) );
 						}
 					}
 
@@ -8892,8 +8979,9 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						'after_image_legend'  => '',
 						'after_image'         => '',
 						'image_size'          => $thumbnail_size,
-						'image_link_to'       => 'original',
+						'image_link_to'       => ( $thumbnail_href === false ? 'original' : $thumbnail_href ),
 						'image_link_title'    => '',	// can be text or #title# or #desc#
+						'image_link_rel'      => $thumbnail_rel,
 						'image_class'         => implode( ' ', $thumbnail_classes ),
 					);
 
@@ -8914,7 +9002,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 								unset( $current_image_params['image_class'] );
 							}
 							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $current_image_params, array(
-									'image_link_to' => false,
+									'image_link_to' => $thumbnail_href,
 									'image_style'   => 'border: none; max-width: 100%; height: auto;'.$image_style,
 									'add_loadimg'   => false,
 								) ) );
