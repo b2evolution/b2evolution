@@ -74,7 +74,11 @@ class content_blocks_plugin extends Plugin
 			return false;
 		}
 
+		// Remove block level short tags inside <p> blocks and move them before the paragraph:
+		$content = move_short_tags( $content );
+
 		// Replace `[include:item-slug]` short tag with item content:
+		$params['check_code_block'] = true;
 		$content = $Item->render_content_blocks( $content, $params );
 
 		return true;

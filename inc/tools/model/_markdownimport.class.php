@@ -1031,7 +1031,7 @@ class MarkdownImport extends AbstractImport
 			if( ! empty( $Item->ID ) )
 			{
 				// Link files:
-				if( preg_match_all( '#\!\[([^\]]*)\]\(([^\)"]+\.('.$this->get_image_extensions().'))\s*("[^"]*")?\)(\{\..+?\})?(\r?\n?\*.*?\*(\r|\n|$))?#i', $item_content, $image_matches ) )
+				if( preg_match_all( '#(\[)?\!\[([^\]]*)\]\(([^\)"]+\.('.$this->get_image_extensions().'))\s*("[^"]*")?\)(\{\..+?\})?(\r?\n?\*.*?\*(\r|\n|$))?(.*?\]\((.*?)\))?#i', $item_content, $image_matches ) )
 				{
 					$updated_item_content = $item_content;
 					$all_links_count = 0;
@@ -1043,15 +1043,15 @@ class MarkdownImport extends AbstractImport
 							'folder_path'    => 'quick-uploads/'.$Item->get( 'urltitle' ),
 						);
 					$this->log( ( ! $this->has_yaml_messages() && empty( $this->link_messages ) ? ',' : '' ).'<ul class="list-default" style="margin-bottom:0">' );
-					foreach( $image_matches[2] as $i => $image_relative_path )
+					foreach( $image_matches[3] as $i => $image_relative_path )
 					{
-						$file_params['file_alt'] = trim( $image_matches[1][$i] );
+						$file_params['file_alt'] = trim( $image_matches[2][$i] );
 						if( strtolower( $file_params['file_alt'] ) == 'img' ||
 								strtolower( $file_params['file_alt'] ) == 'image' )
 						{	// Don't use this default text for alt image text:
 							$file_params['file_alt'] = '';
 						}
-						$file_params['file_title'] = trim( $image_matches[4][$i], ' "' );
+						$file_params['file_title'] = trim( $image_matches[5][$i], ' "' );
 						// Detect link position:
 						$content_image_parts = explode( $image_matches[0][$i], $updated_item_content, 2 );
 						if( $item_teaser_image_tag == $image_matches[0][$i] &&
@@ -1069,10 +1069,11 @@ class MarkdownImport extends AbstractImport
 						{	// Replace this img tag from content with b2evolution format:
 							if( $file_params['link_position'] == 'inline' )
 							{	// Generate image inline tag:
-								$image_inline_caption = preg_replace( '#^[\r\n\s"\*]+(.+?)[\r\n\s"\*]+$#', '$1', $image_matches[6][$i] ); // note: trim() doesn't remove char * on the right side as expected
-								$image_inline_class = trim( $image_matches[5][$i], ' {}' );
+								$image_inline_caption = preg_replace( '#^[\r\n\s"\*]+(.+?)[\r\n\s"\*]+$#', '$1', $image_matches[7][$i] ); // note: trim() doesn't remove char * on the right side as expected
+								$image_inline_class = trim( $image_matches[6][$i], ' {}' );
 								$image_inline_tag = '[image:'.$link_data['ID']
 									.( $image_inline_class === '' && $image_inline_caption === '' ? '' : ':'.$image_inline_caption )
+									.( $image_matches[1][$i] == '[' && $image_matches[10][$i] !== '' ? ( $image_inline_class === '' && $image_inline_caption === '' ? ':-' : '' ).':'.$image_matches[10][$i] : '' )
 									.( $image_inline_class === '' ? '' : ':'.$image_inline_class )
 									.']';
 							}

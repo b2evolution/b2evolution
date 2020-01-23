@@ -2804,6 +2804,41 @@ switch( $action )
 	case 'history_details':
 	case 'history_compare':
 	case 'extract_tags':
+		if( in_array( $action, array( 'edit', 'propose' ) ) )
+		{
+			$backoffice_edit_item_url = $admin_url.'?ctrl=items&action=edit&p='.$edited_Item->ID.'&blog='.$Blog->ID; 
+			if( $Blog->get_setting( 'in_skin_editing' ) )
+			{
+				$edit_item_url = url_add_param( $Blog->get( 'url' ), 'disp=edit&p='.$edited_Item->ID );
+			}
+			elseif( $current_User->check_perm( 'admin', 'restricted' ) )
+			{
+				$edit_item_url = $backoffice_edit_item_url;
+			}
+			$preview_url = url_same_protocol( $Blog->get( 'url' ) );
+
+			init_hotkeys_js();
+			add_js_headline( 'jQuery( document ).ready( function()
+			{
+				hotkeys( \'f2, ctrl+f2, f9\', function( event, handler ) {
+					switch( handler.key )
+					{
+						case \'f2\':
+							window.location.href = \''.format_to_js( $edit_item_url ).'\';
+							break;
+
+						case \'ctrl+f2\':
+							window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
+							break;
+
+						case \'f9\':	// Open preview
+							var edit_form = document.getElementById( \'item_checkchanges\' );
+							b2edit_open_preview( edit_form, \''.format_to_js( $preview_url ).'\' );
+							break;
+					}
+				}); 
+			});');
+		}
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'items', 'filter' => 'restore' ) );
@@ -2993,9 +3028,9 @@ switch( $action )
 		if( ! empty( $edit_item_url ) )
 		{	// Current user can edit post:
 			init_hotkeys_js();
-			add_js_headline('jQuery( document ).ready( function()
+			add_js_headline( 'jQuery( document ).ready( function()
 			{
-				hotkeys( \'f2, ctrl+f2\', function( event, handler ) {
+				hotkeys( \'f2, ctrl+f2, f9\', function( event, handler ) {
 					switch( handler.key )
 					{
 						case \'f2\':
@@ -3005,6 +3040,22 @@ switch( $action )
 						case \'ctrl+f2\':
 							window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
 							break;
+
+						case \'f9\':
+							jQuery.ajax(
+							{
+								type: "POST",
+								url: htsrv_url + "async.php",
+								data: {
+									"action": "clear_itemprecache",
+									"crumb_tools": "'.get_crumb( 'tools' ).'"
+								},
+								success: function( data )
+								{	// Item cache cleared, reload:
+									window.location.reload( true );
+								}
+							} );
+							
 					}
 				}); 
 			});');

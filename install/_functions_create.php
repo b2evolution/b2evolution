@@ -903,6 +903,9 @@ function create_default_data()
 	// Create default scheduled jobs
 	create_default_jobs();
 
+	// Create default templates
+	create_default_templates();
+
 	task_begin( 'Creating default "help" slug... ' );
 	$DB->query( '
 		INSERT INTO T_slug( slug_title, slug_type )
@@ -1544,7 +1547,6 @@ function create_default_jobs( $is_upgrade = false )
 }
 
 
-
 /**
  * Create demo users
  *
@@ -1631,5 +1633,51 @@ function create_default_posts_location()
 
 		echo_install_log( 'TEST FEATURE: Defining default location "France" for all posts' );
 	}
+}
+
+
+/**
+ * Create default templates
+ */
+function create_default_templates()
+{
+	global $DB, $current_locale;
+
+	task_begin( 'Creating default templates... ' );
+	$DB->query( '
+		INSERT INTO T_templates ( tpl_name, tpl_code, tpl_template_code )
+		VALUES
+			( "Item Info: Posted by Author on Date in Categories", "item_info_author_date_categories", "Posted by $author$ on $issue_date$ in $categories$" ),
+			( "Item Info: Long info line", "item_info_long", "$flag_icon$ $permalink_icon$ Posted by $author$ $issue_date$ $categories$ — Last touched: $last_touched$ — Last Updated: $last_update$ $edit_link$" ),
+			( "Include Content Block: with clearfix", "content_block_with_clearfix", \'<div class="evo_content_block clearfix $cb_class$\">
+	<div class="evo_content_block_images">
+		<img src="$teaser_image$">
+	</div>
+	<div class="evo_content_block_text">
+		$content$ 
+	</div>
+</div>\' ),
+			( "Include Content Block: without clearfix", "content_block_without_clearfix", \'<div class="evo_content_block $cb_class$">
+	<div class="evo_content_block_images">
+		<img src="$teaser_image$">
+	</div>
+	<div class="evo_content_block_text">
+		$content$ 
+	</div>
+</div>\' ),
+			( "Include Content Block: Images Left / Text Right", "content_block_images_left_text_right", \'<div class="evo_content_block $cb_class$">
+	<img src="$teaser_image$" class="floatleft">
+	<div class="evo_content_block_text">
+		$content$ 
+	</div>
+</div>\' ),
+			( "Include Content Block: Text Left / Images Right", "content_block_text_right_images_right", \'<div class="evo_content_block $cb_class$">
+	<img src="$teaser_image$" class="floatright">
+	<div class="evo_content_block_text">
+		$content$ 
+	</div>
+</div>\' )
+			' );
+	task_end();
 }
 ?>

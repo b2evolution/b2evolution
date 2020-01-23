@@ -62,6 +62,9 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 							<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
 								<input type="checkbox" name="image_disable_caption" id="image_disable_caption" value="1" style="margin: 0 8px 0 0;"'.( get_param( 'image_disable_caption' ) ? ' checked="checked"' : '' ).'>
 								<span>'.T_('Disable caption').'</span></span>', '' );
+						// TODO: Alt text:
+						$Form->text( 'image_href', get_param( 'image_href' ), 40, T_('HRef') );
+						// TODO: Size:
 						$image_class = get_param( 'image_class' );
 						$Form->text( 'image_class', $image_class, 40, T_('Styles'), '<br><div class="style_buttons" style="margin-top: 8px;">
 							<button class="btn btn-default btn-xs">border</button>
@@ -71,6 +74,8 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 						break;
 
 					case 'thumbnail':
+						// TODO: Alt text:
+						$Form->text( 'thumbnail_href', get_param( 'thumbnail_href' ), 40, T_('HRef') );
 						$Form->radio( 'thumbnail_size', get_param( 'thumbnail_size' ), array(
 								array( 'small', 'small' ),
 								array( 'medium', 'medium' ),
@@ -203,6 +208,7 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 					var alignment = jQuery( 'input[name="' + tagType + '_alignment"]:checked' ).val();
 					var size = jQuery( 'input[name="' + tagType + '_size"]:checked' ).val();
 				}
+				var href = jQuery( 'input[name="' + tagType + '_href"]' ).val();
 				var classes = jQuery( 'input[name="' + tagType + '_class"]' ).val();
 				var tag_caption = false;
 
@@ -218,6 +224,11 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 					{
 						options += caption;
 					}
+				}
+
+				if( href && href.match( /^(https?:\/\/.+|\(\((.*?)\)\))$/i ) )
+				{
+					options += ( options == '' ? '' : ':' ) + href;
 				}
 
 				if( tagType == 'thumbnail' )

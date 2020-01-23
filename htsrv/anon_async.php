@@ -1514,8 +1514,10 @@ switch( $action )
 
 		// Default values:
 		$image_caption = NULL;
+		$image_href = NULL;
 		$image_class = NULL;
 		$image_disable_caption = false;
+		$thumbnail_href = NULL;
 		$thumbnail_size = 'medium';
 		$thumbnail_alignment = 'left';
 		$thumbnail_class = NULL;
@@ -1537,6 +1539,7 @@ switch( $action )
 
 			$parts = trim( $short_tag, '[]' );
 			$parts = explode( ':', $parts );
+			$opt_index = 2;
 
 			$tag_type = $parts[0];
 			$link_ID = $parts[1];
@@ -1544,29 +1547,76 @@ switch( $action )
 			switch( $tag_type )
 			{
 				case 'image':
-					if( isset( $parts[2] ) && $parts[2] != '-' )
+					// Caption:
+					$image_disable_caption = ( isset( $parts[ $opt_index ] ) && $parts[ $opt_index ] == '-' );
+					if( isset( $parts[ $opt_index ] ) )
 					{
-						$image_caption = $parts[2];
+						if( $parts[ $opt_index ] != '-' )
+						{
+							$image_caption = $parts[ $opt_index ];
+						}
+						$opt_index++;
 					}
-					if( isset( $parts[3] ) )
+					// TODO: Alt text:
+					// HRef:
+					if( ! empty( $parts[ $opt_index ] ) &&
+					    preg_match( '#^(https?|\(\((.*?)\)\))$#i', $parts[ $opt_index ], $href_match ) )
 					{
-						$image_class = $parts[3];
+						if( stripos( $href_match[0], 'http' ) === 0 )
+						{	// Absolute URL:
+							$image_href = $href_match[0].':'.$parts[ $opt_index + 1 ];
+							$opt_index++;
+						}
+						else
+						{	// Item slug:
+							$image_href = $href_match[0];
+						}
+						$opt_index++;
 					}
-					$image_disable_caption = ( isset( $parts[2] ) && $parts[2] == '-' );
+					// TODO: Size:
+					// Class:
+					if( isset( $parts[ $opt_index ] ) )
+					{
+						$image_class = $parts[ $opt_index ];
+					}
 					break;
 
 				case 'thumbnail':
-					if( isset( $parts[2] ) )
+					// TODO: Alt text:
+					// HRef:
+					if( ! empty( $parts[ $opt_index ] ) &&
+					    preg_match( '#^(https?|\(\((.*?)\)\))$#i', $parts[ $opt_index ], $href_match ) )
 					{
-						$thumbnail_size = $parts[2];
+						if( stripos( $href_match[0], 'http' ) === 0 )
+						{	// Absolute URL:
+							$thumbnail_href = $href_match[0].':'.$parts[ $opt_index + 1 ];
+							$opt_index++;
+						}
+						else
+						{	// Item slug:
+							$thumbnail_href = $href_match[0];
+						}
+						$opt_index++;
 					}
-					if( isset( $parts[3] ) )
+					// Size:
+					$valid_thumbnail_sizes = array( 'small', 'medium', 'large' );
+					if( isset( $parts[ $opt_index ] ) && in_array( $parts[ $opt_index ], $valid_thumbnail_sizes ) )
 					{
-						$thumbnail_alignment = $parts[3];
+						$thumbnail_size = $parts[ $opt_index ];
+						$opt_index++;
 					}
-					if( isset( $parts[4] ) )
+					// Alignment:
+					$valid_thumbnail_positions = array( 'left', 'right' );
+					if( isset( $parts[ $opt_index ] ) && in_array( $parts[ $opt_index ], $valid_thumbnail_positions ) )
 					{
-						$thumbnail_class = $parts[4];
+						$thumbnail_alignment = $parts[ $opt_index ];
+						$opt_index++;
+					}
+					// Class:
+					if( isset( $parts[ $opt_index ] ) )
+					{
+						$thumbnail_class = $parts[ $opt_index ];
+						$opt_index++;
 					}
 					break;
 

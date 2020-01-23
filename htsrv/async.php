@@ -1073,6 +1073,14 @@ switch( $action )
 		require $inc_path.'items/views/_item_mass_change_cat.form.php';
 		break;
 
+	case 'clear_itemprecache':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'tools' );
+
+		load_funcs( 'tools/model/_maintenance.funcs.php' );
+		dbm_delete_itemprecache();
+		break;
+
 	default:
 		$incorrect_action = true;
 		break;
