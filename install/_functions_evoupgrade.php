@@ -11948,6 +11948,29 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15700, 'Creating tables for Templates...' ) )
+	{	// part of 7.1.0-beta
+		db_create_table( 'T_templates', '
+			tpl_ID INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+			tpl_name VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+			tpl_code VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL,
+			tpl_parent_tpl_ID INT(10) UNSIGNED NULL DEFAULT NULL,
+			tpl_locale VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT \'en-US\',
+			tpl_template_code MEDIUMTEXT NULL,
+			PRIMARY KEY (tpl_ID),
+			UNIQUE tpl_code( tpl_code )' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15710, 'Updating plugin "Nofollow UGC Sponsored"...' ) )
+	{	// part of 7.1.0-beta
+		$DB->query( 'UPDATE T_plugins
+			  SET plug_priority = 99
+			WHERE plug_classname = "nofollow_plugin"
+			  AND plug_priority = 120' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

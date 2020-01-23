@@ -268,7 +268,7 @@ function skin_init( $disp )
 					$canonical_url = url_add_param( $canonical_url, implode( '&', $page_param[1] ), '&' );
 				}
 				if( preg_match( '|[&?](revision=(p?\d+))|', $ReqURI, $revision_param )
-						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item ) )
+						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 						&& $item_revision = $Item->get_revision( $revision_param[2] ) )
 				{ // A revision of the post, keep only this param and discard all others:
 					$canonical_url = url_add_param( $canonical_url, $revision_param[1], '&' );

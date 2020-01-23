@@ -523,7 +523,7 @@ function link_actions( $link_ID, $row_idx_type = '', $link_type = 'item' )
 
 	if( $current_File && is_logged_in() &&
 	    $current_User->check_perm( 'admin', 'restricted' ) &&
-	    $current_User->check_perm( 'files', 'edit_allowed', true, $current_File->get_FileRoot() ) )
+	    $current_User->check_perm( 'files', 'edit_allowed', false, $current_File->get_FileRoot() ) )
 	{	// Edit file:
 		$title = T_('Edit properties...');
 		$url = $current_File->get_linkedit_url( $LinkOwner->type, $LinkOwner->get_ID() );

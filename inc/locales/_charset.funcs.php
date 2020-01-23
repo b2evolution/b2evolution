@@ -91,7 +91,7 @@ function evo_iconv_transliterate( $str, $post_locale = NULL )
  * @param boolean Accept period '.' as valid character
  * @return string The input string with replaced chars.
  */
-function replace_special_chars( $str, $post_locale = NULL, $accept_period = false )
+function replace_special_chars( $str, $post_locale = NULL, $accept_period = false, $separator = '-' )
 {
 	global $evo_charset, $default_locale, $current_locale, $locales;
 
@@ -153,10 +153,10 @@ function replace_special_chars( $str, $post_locale = NULL, $accept_period = fals
 	// Replace HTML entities
 	$newstr = htmlentities( $newstr, ENT_NOQUOTES, $newstr_charset );
 
-	// Handle special entities (e.g., use "-" instead of "a" for "&"):
+	// Handle special entities (e.g., use $separator instead of "a" for "&"):
 	$newstr = str_replace(
 		array( '&amp;', '&laquo;', '&raquo;' ),
-		'-',
+		$separator,
 		$newstr );
 
 
@@ -165,11 +165,11 @@ function replace_special_chars( $str, $post_locale = NULL, $accept_period = fals
 	// Replace non acceptable chars
 	if( $accept_period )
 	{
-		$newstr = preg_replace( '/[^A-Za-z0-9_\.]+/', '-', $newstr );
+		$newstr = preg_replace( '/[^A-Za-z0-9_\.]+/', $separator, $newstr );
 	}
 	else
 	{
-		$newstr = preg_replace( '/[^A-Za-z0-9_]+/', '-', $newstr );
+		$newstr = preg_replace( '/[^A-Za-z0-9_]+/', $separator, $newstr );
 	}
 	// Remove '-' at start and end:
 	$newstr = preg_replace( '/^-+/', '', $newstr );

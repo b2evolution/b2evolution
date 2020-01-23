@@ -41,6 +41,11 @@ function out_echo( $message, $specialchars, $display = true )
 		$message['specialchars'] = 0;
 	}
 
+	// Do not append Debuglog and JSlog to response!
+	global $debug, $debug_jslog;
+	$debug = false;
+	$debug_jslog = false;
+
 	$response['data'] = $message;
 	if( $display )
 	{
@@ -79,12 +84,6 @@ if( isset( $_SERVER["CONTENT_LENGTH"] ) )
 
 // Stop a request from the blocked IP addresses or Domains
 antispam_block_request();
-
-// Do not append Debuglog to response!
-$debug = false;
-
-// Do not append Debug JSlog to response!
-$debug_jslog = false;
 
 // Don't check new updates from b2evolution.net (@see b2evonet_get_updates()),
 // in order to don't break the response data:

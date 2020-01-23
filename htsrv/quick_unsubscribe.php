@@ -84,7 +84,7 @@ elseif( $confirmed )
 								&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) ||
 								     ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) ||
 								     ( $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ) )
-								&& $edited_User->check_perm( 'blog_ismember', 'view', true, $coll_ID ) )
+								&& $edited_User->check_perm( 'blog_ismember', 'view', false, $coll_ID ) )
 						{ // opt-out collection
 							if( $subscription_name == 'sub_items' )
 							{
@@ -143,7 +143,7 @@ elseif( $confirmed )
 							if( $Blog->get( 'advanced_perms' )
 									&& $Blog->get_setting( 'allow_item_subscriptions' )
 									&& $Blog->get_setting( 'opt_out_item_subscription' )
-									&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+									&& $edited_User->check_perm( 'blog_ismember', 'view', false, $blog_ID ) )
 							{
 								$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
 										VALUES ( '.$post_ID.', '.$user_ID.', 0 )' );
@@ -430,7 +430,7 @@ elseif( $confirmed )
 								&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) ||
 								     ( $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ) ||
 								     ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
-								&& $edited_User->check_perm( 'blog_ismember', 'view', true, $coll_ID ) )
+								&& $edited_User->check_perm( 'blog_ismember', 'view', false, $coll_ID ) )
 						{ // opt-out collection
 							if( $subscription_name == 'sub_items' )
 							{
@@ -489,7 +489,7 @@ elseif( $confirmed )
 							if( $Blog->get( 'advanced_perms' )
 									&& $Blog->get_setting( 'allow_item_subscriptions' )
 									&& $Blog->get_setting( 'opt_out_item_subscription' )
-									&& $edited_User->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+									&& $edited_User->check_perm( 'blog_ismember', 'view', false, $blog_ID ) )
 							{
 								$DB->query( 'REPLACE INTO T_items__subscriptions( isub_item_ID, isub_user_ID, isub_comments )
 										VALUES ( '.$post_ID.', '.$user_ID.', 1 )' );

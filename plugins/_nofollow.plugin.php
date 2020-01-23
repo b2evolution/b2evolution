@@ -20,7 +20,7 @@ class nofollow_plugin extends Plugin
 {
 	var $code = 'evo_nofollow';
 	var $name = 'Nofollow UGC Sponsored';
-	var $priority = 120;
+	var $priority = 99;
 	var $version = '7.1.0';
 	var $group = 'rendering';
 	var $short_desc;

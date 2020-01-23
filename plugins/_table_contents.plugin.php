@@ -117,7 +117,7 @@ class table_contents_plugin extends Plugin
 	 * @param array Associative array of parameters
 	 * @return boolean true if we can render something for the required output format
 	 */
-	function DisplayItemAsHtml( & $params )
+	function RenderItemAsHtml( & $params )
 	{
 		$content = & $params['data'];
 

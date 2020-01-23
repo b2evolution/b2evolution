@@ -974,11 +974,7 @@
 		}
 	};
 
-	if ($.fn.delegate) {
-		$(document).on( 'delegate', '.' + boxElement, 'click', handler );
-	} else {
-		$(document).on('click', '.' + boxElement, handler);
-	}
+	$(document).on('click', '.' + boxElement, handler);
 
 	// Initializes ColorBox when the DOM has loaded
 	$(publicMethod.init);
