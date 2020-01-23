@@ -11962,6 +11962,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15710, 'Updating plugin "Nofollow UGC Sponsored"...' ) )
+	{	// part of 7.1.0-beta
+		$DB->query( 'UPDATE T_plugins
+			  SET plug_priority = 99
+			WHERE plug_classname = "nofollow_plugin"
+			  AND plug_priority = 120' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
