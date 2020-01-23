@@ -4536,9 +4536,9 @@ class Item extends ItemLight
 		{	// We're NOT in "more" mode:
 			if( $params['link_text'] == '#' )
 			{ // TRANS: this is the default text for the extended post "more" link
-				$params['link_text'] = T_('Full story').' &raquo;';
+				$params['link_text'] = T_('Read more').' &raquo;';
 				// Dummy in order to keep previous translation in the loop:
-				$dummy = T_('Read more');
+				$dummy = T_('Full story');
 			}
 
 			switch( $params['link_to'] )
