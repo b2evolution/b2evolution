@@ -1293,7 +1293,7 @@ class Skin extends DataObject
 
 				case 'bootstrap_init_tooltips':
 					// JS to init Bootstrap tooltips (E.g. on comment form for allowed file extensions):
-					add_js_headline( 'jQuery( function () { jQuery( \'[data-toggle="tooltip"]\' ).tooltip( {html: true} ) } )' );
+					require_js_defer( 'src/evo_init_bootstrap_tooltips.js', 'blog' );
 					break;
 
 				case 'bootstrap_messages':
@@ -2359,11 +2359,12 @@ var downloadInterval = setInterval( function()
 	 * @param boolean 'async' or TRUE to add attribute "async" to load javascript asynchronously,
 	 *                'defer' to add attribute "defer" asynchronously in the order they occur in the page,
 	 *                'immediate' or FALSE to load javascript immediately
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
 	 */
-	function require_js( $js_file, $async_defer = false )
+	function require_js( $js_file, $async_defer = false, $output = false )
 	{
 		global $app_version_long;
-		require_js( $js_file, 'relative', $async_defer, false, $this->folder.'+'.$this->version.'+'.$app_version_long );
+		require_js( $js_file, 'relative', $async_defer, $output, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
 
 
@@ -2371,10 +2372,11 @@ var downloadInterval = setInterval( function()
 	 * Require javascript file to load asynchronously with attribute "async"
 	 *
 	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
 	 */
-	function require_js_async( $js_file )
+	function require_js_async( $js_file, $output = false )
 	{
-		$this->require_js( $js_file, 'async' );
+		$this->require_js( $js_file, 'async', $output );
 	}
 
 
@@ -2382,10 +2384,11 @@ var downloadInterval = setInterval( function()
 	 * Require javascript file to load asynchronously with attribute "defer" in the order they occur in the page
 	 *
 	 * @param string Name of JavaScript file relative to <base> tag (current skin folder)
+	 * @param boolean TRUE to print script tag on the page, FALSE to store in array to print then inside <head>
 	 */
-	function require_js_defer( $js_file )
+	function require_js_defer( $js_file, $output = false )
 	{
-		$this->require_js( $js_file, 'defer' );
+		$this->require_js( $js_file, 'defer', $output );
 	}
 
 

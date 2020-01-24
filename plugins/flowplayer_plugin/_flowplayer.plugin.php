@@ -50,7 +50,7 @@ class flowplayer_plugin extends Plugin
 	function SkinBeginHtmlHead( & $params )
 	{
 		require_js_defer( '#flowplayer#', 'blog' );
-		add_js_headline( 'flowplayer.conf = { flashfit: true, embed: false }' );
+		require_js_defer( 'flowplayer/flowplayer.init.js', 'blog' );
 		$this->require_skin();
 		add_css_headline( '.flowplayer_block {
 	margin: 1em auto 0;
