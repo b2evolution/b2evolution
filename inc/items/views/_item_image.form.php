@@ -228,7 +228,7 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 
 				if( href && href.match( /^(https?:\/\/.+|\(\((.*?)\)\))$/i ) )
 				{
-					options += ( options == '' ? '' : ':' ) + href;
+					options += ( options == '' ? ( tagType == 'image' ? '-:' : '' ) : ':' ) + href;
 				}
 
 				if( tagType == 'thumbnail' )
