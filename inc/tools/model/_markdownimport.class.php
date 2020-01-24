@@ -1031,7 +1031,7 @@ class MarkdownImport extends AbstractImport
 			if( ! empty( $Item->ID ) )
 			{
 				// Link files:
-				if( preg_match_all( '#(\[)?\!\[([^\]]*)\]\(([^\)"]+\.('.$this->get_image_extensions().'))\s*("[^"]*")?\)(\{\..+?\})?(\r?\n?\*.*?\*(\r|\n|$))?(.*?\]\((.*?)\))?#i', $item_content, $image_matches ) )
+				if( preg_match_all( '#(\[)?\!\[([^\]]*)\]\(([^\)"]+\.('.$this->get_image_extensions().'))\s*("[^"]*")?\)(\{\..+?\})?(\r?\n?\*.*?\*(\r|\n|$))?(.*?\]\((.*?)\))?(\{\..+?\})?#i', $item_content, $image_matches ) )
 				{
 					$updated_item_content = $item_content;
 					$all_links_count = 0;
@@ -1070,7 +1070,7 @@ class MarkdownImport extends AbstractImport
 							if( $file_params['link_position'] == 'inline' )
 							{	// Generate image inline tag:
 								$image_inline_caption = preg_replace( '#^[\r\n\s"\*]+(.+?)[\r\n\s"\*]+$#', '$1', $image_matches[7][$i] ); // note: trim() doesn't remove char * on the right side as expected
-								$image_inline_class = trim( $image_matches[6][$i], ' {}' );
+								$image_inline_class = trim( str_replace( '}{', '', $image_matches[6][$i].$image_matches[11][$i] ), ' {}' );
 								$image_inline_tag = '[image:'.$link_data['ID']
 									.( $image_inline_class === '' && $image_inline_caption === '' ? '' : ':'.$image_inline_caption )
 									.( $image_matches[1][$i] == '[' && $image_matches[10][$i] !== '' ? ( $image_inline_class === '' && $image_inline_caption === '' ? ':-' : '' ).':'.$image_matches[10][$i] : '' )
