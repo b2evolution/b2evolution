@@ -4195,7 +4195,7 @@ class Item extends ItemLight
 		echo str_replace( '$cb_class$', $params['content_block_class'], $params['content_block_start'] );
 
 		if( ! empty( $params['image_size'] ) )
-		{	// Display images that are linked to this post:
+		{	// Display Teaser images:
 			$teaser_image_positions = 'teaser,teaserperm,teaserlink';
 			if( ! empty( $params['include_cover_images'] ) )
 			{	// Include the cover images on teaser place:
@@ -4232,12 +4232,6 @@ class Item extends ItemLight
 
 		// Display the "after more" part of the text: (part after "[teaserbreak]")
 		$this->content_extension( $params );
-
-		// Links to post pages (for multipage posts):
-		$this->page_links( $params );
-
-		// Display Item footer text (text can be edited in Blog Settings):
-		$this->footer( $params );
 
 		echo $params['content_block_after_text'];
 
@@ -4536,9 +4530,9 @@ class Item extends ItemLight
 		{	// We're NOT in "more" mode:
 			if( $params['link_text'] == '#' )
 			{ // TRANS: this is the default text for the extended post "more" link
-				$params['link_text'] = T_('Full story').' &raquo;';
+				$params['link_text'] = T_('Read more').' &raquo;';
 				// Dummy in order to keep previous translation in the loop:
-				$dummy = T_('Read more');
+				$dummy = T_('Full story');
 			}
 
 			switch( $params['link_to'] )

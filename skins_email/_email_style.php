@@ -367,5 +367,9 @@ $emailskins_styles = array(
 '.squared' => '
 	border-radius: 0;
 ',
+'.imgerror' => '
+	border: 1px solid red;
+	box-shadow: 0 0 10px red;
+',
 );
 ?>

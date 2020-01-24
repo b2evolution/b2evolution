@@ -149,6 +149,12 @@ img.round,
 .evo_image_block.round img {
   border-radius: 50%;
 }
+img.imgerror,
+.image_block.imgerror img,
+.evo_image_block.imgerror img {
+  border: 1px solid red;
+  box-shadow: 0 0 10px red;
+}
 .floatleft {
   float: left;
 }

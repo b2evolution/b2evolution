@@ -284,10 +284,10 @@ class Template extends DataObject
 
 		if( ! isset( $this->localized_templates[$locale] ) )
 		{
-			$TemplatesCache = & get_TemplatesCache();
-			$TemplatesCache->clear( true );
+			$TemplateCache = & get_TemplateCache();
+			$TemplateCache->clear( true );
 			$where = 'tpl_parent_tpl_ID = '.$DB->quote( $this->ID ).' AND tpl_locale = '.$DB->quote( $locale );
-			$this->localized_templates[$locale] = $TemplatesCache->load_where( $where );
+			$this->localized_templates[$locale] = $TemplateCache->load_where( $where );
 		}
 
 		return $this->localized_templates[$locale];

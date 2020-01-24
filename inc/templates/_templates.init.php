@@ -63,8 +63,8 @@ function & get_TemplateCache()
 
 	if( ! isset( $TemplateCache ) )
 	{	// Cache doesn't exist yet:
-		load_class( 'templates/model/_template.class.php', 'Template' );
-		$TemplateCache = new DataObjectCache( 'Template', false, 'T_templates', 'tpl_', 'tpl_ID', 'tpl_name' );
+		load_class( 'templates/model/_templatecache.class.php', 'TemplateCache' );
+		$TemplateCache = new TemplateCache();
 	}
 
 	return $TemplateCache;
@@ -89,6 +89,33 @@ class templates_Module extends Module
 	{
 		$this->check_required_php_version( 'templates' );
 		load_funcs( 'templates/model/_template.funcs.php' );
+	}
+
+
+	/**
+	 * Build the evobar menu
+	 */
+	function build_evobar_menu()
+	{
+		/**
+		 * @var Menu
+		 */
+		global $topleft_Menu;
+		global $current_User;
+		global $admin_url;
+		global $Collection, $Blog;
+
+		if( $current_User->check_perm( 'admin', 'restricted' ) )
+		{
+			if( !empty( $Blog ) && $current_User->check_perm( 'options', 'view', false, $Blog->ID ) )
+			{
+				$topleft_Menu->insert_menu_entries_after( array( 'blog' , 'general', 'item_types' ), array(
+					'templates' => array(
+						'text' => T_('Templates').'&hellip;',
+						'href' => $admin_url.'?ctrl=templates' ),
+					) );
+			}
+		}
 	}
 
 

@@ -1021,7 +1021,7 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
 				'~(`.*?`|'
 				.'<code[^>]*>.*?</code>|'
 				.'<pre[^>]*>.*?</pre>|'
-				.'\[[a-z]+:.+?\])~is',
+				.'\[[a-z]+:[^\]]+\])~is',
 				$replace_function_callback, array( $search, $replace, $replace_function_type ) );
 		}
 		else
@@ -1210,7 +1210,7 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL, $params =
 
 	if( is_null( $pattern ) )
 	{	// Default pattern:
-		$pattern = '#\[(image|video|audio|include|/?div|(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields)):?.*?\]#i';
+		$pattern = '#\[(image|video|audio|include|/?div|(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields)):.+?\]#i';
 	}
 
 	foreach( $paragraphs[0] as $i => $current_paragraph )
@@ -8734,6 +8734,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					$current_image_params = $params;
 					$image_href = false;
 					$image_rel = NULL;
+					$image_additional_class = false;
 
 					if( ! empty( $inline[3] ) ) // check if second colon is present
 					{
@@ -8756,8 +8757,8 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 							$current_image_params['image_desc'] = $current_image_params['image_link_title'];
 							$current_file_params['title'] = $inline_params[0];
-							$opt_index++;
 						}
+						$opt_index++;
 
 						// TODO: Alt text:
 
@@ -8775,11 +8776,20 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							else
 							{	// Item slug:
 								$ItemCache = & get_ItemCache();
-								if( $slug_Item = & $ItemCache->get_by_urltitle( $href_match[2], false, false ) )
-								{
-									$image_href = $slug_Item->get_permanent_url();
-									$image_rel = ''; // reset default attribute "rel" to don't display colorbox on click
+								if( $href_match[2] === '' )
+								{	// No link, Display image tag without link tag around:
+									$image_href = '';
 								}
+								elseif( $slug_Item = & $ItemCache->get_by_urltitle( $href_match[2], false, false ) )
+								{	// Use a link with item permanent url around image tag:
+									$image_href = $slug_Item->get_permanent_url();
+								}
+								else
+								{	// Wrong Item provided, Singal with special red class:
+									$image_href = '';
+									$image_additional_class = 'imgerror';
+								}
+								$image_rel = ''; // reset default attribute "rel" to don't display colorbox on click
 							}
 							$opt_index++;
 						}
@@ -8790,9 +8800,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						// TODO: Size:
 
 						// Class Name(s):
-						if( ! empty( $inline_params[ $opt_index ] ) )
+						$inline_param_class = ( empty( $inline_params[ $opt_index ] ) ? '' : $inline_params[ $opt_index ] );
+						if( $image_additional_class !== false )
+						{	// Append additional class, e.g. on wrong provided item slug:
+							$inline_param_class .= '.'.$image_additional_class;
+						}
+						if( ! empty( $inline_param_class ) )
 						{	// A class name is set for the inline tags
-							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_params[ $opt_index ] ) ) );
+							$image_extraclass = strip_tags( trim( str_replace( '.', ' ', $inline_param_class ) ) );
 
 							if( preg_match('#^[A-Za-z0-9\s\-_]+$#', $image_extraclass ) )
 							{
@@ -8892,6 +8907,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 
 					$thumbnail_href = false;
 					$thumbnail_rel = NULL;
+					$thumbnail_additional_class = false;
 					$thumbnail_size = 'medium';
 					$thumbnail_position = 'left';
 
@@ -8918,11 +8934,20 @@ function render_inline_tags( $Object, $tags, $params = array() )
 							else
 							{	// Item slug:
 								$ItemCache = & get_ItemCache();
-								if( $slug_Item = & $ItemCache->get_by_urltitle( $href_match[2], false, false ) )
-								{
-									$thumbnail_href = $slug_Item->get_permanent_url();
-									$thumbnail_rel = ''; // reset default attribute "rel" to don't display colorbox on click
+								if( $href_match[2] === '' )
+								{	// No link, Display image tag without link tag around:
+									$thumbnail_href = '';
 								}
+								elseif( $slug_Item = & $ItemCache->get_by_urltitle( $href_match[2], false, false ) )
+								{	// Use a link with item permanent url around image tag:
+									$thumbnail_href = $slug_Item->get_permanent_url();
+								}
+								else
+								{	// Wrong Item provided, Singal with special red class:
+									$thumbnail_href = '';
+									$thumbnail_additional_class = 'imgerror';
+								}
+								$thumbnail_rel = ''; // reset default attribute "rel" to don't display colorbox on click
 							}
 							$opt_index++;
 						}
@@ -8944,9 +8969,14 @@ function render_inline_tags( $Object, $tags, $params = array() )
 						}
 
 						// Class:
-						if( ! empty( $inline_params[ $opt_index ] ) )
-						{
-							$extra_classes = explode( '.', ltrim( $inline_params[ $opt_index ], '.' ) );
+						$inline_param_class = ( empty( $inline_params[ $opt_index ] ) ? '' : $inline_params[ $opt_index ] );
+						if( $thumbnail_additional_class !== false )
+						{	// Append additional class, e.g. on wrong provided item slug:
+							$inline_param_class .= '.'.$thumbnail_additional_class;
+						}
+						if( ! empty( $inline_param_class ) )
+						{	// A class name is set for the inline tags
+							$extra_classes = explode( '.', ltrim( $inline_param_class, '.' ) );
 						}
 					}
 
