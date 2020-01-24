@@ -1007,8 +1007,13 @@ class DataObject
 		if( (!is_null($new_value) && $this->$parname == $new_value)
 			|| (is_null($this->$parname) && is_null($new_value)) )
 <old */
-		if( (isset($this->$parname) && $this->$parname === $new_value)
-			|| ( ! isset($this->$parname) && ! isset($new_value) ) )
+		if( ( isset( $this->$parname ) && // The param is found in the Object
+		      ( $this->$parname === $new_value || // Exact same string value
+		        intval( $this->$parname ) === $new_value || // Exact same float/double value
+		        floatval( $this->$parname ) === $new_value // Exact same integer value
+		      ) &&
+		      ! empty( $this->ID ) ) // The Object is really updating, Decide on insert we always have new value which must be inserted into DB
+		    || ( ! isset( $this->$parname ) && ! isset( $new_value ) ) ) // Wrong param, It doesn't exist for the Object
 		{	// Value has not changed (we need 2 tests, for NULL and for NOT NULL value pairs)
 			$Debuglog->add( $this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.var_export( @$this->$parname, true ), 'dataobjects' );
 			// echo '<br />'.$this->dbtablename.' object, already set to same value: '.$parname.'/'.$dbfield.' = '.$this->$parname;
