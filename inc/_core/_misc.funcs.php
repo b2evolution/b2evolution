@@ -1021,7 +1021,7 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
 				'~(`.*?`|'
 				.'<code[^>]*>.*?</code>|'
 				.'<pre[^>]*>.*?</pre>|'
-				.'\[[a-z]+:.+?\])~is',
+				.'\[[a-z]+:[^\]]+\])~is',
 				$replace_function_callback, array( $search, $replace, $replace_function_type ) );
 		}
 		else
@@ -1210,7 +1210,7 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL, $params =
 
 	if( is_null( $pattern ) )
 	{	// Default pattern:
-		$pattern = '#\[(image|video|audio|include|/?div|(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields)):?.*?\]#i';
+		$pattern = '#\[(image|video|audio|include|/?div|(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields)):.+?\]#i';
 	}
 
 	foreach( $paragraphs[0] as $i => $current_paragraph )
