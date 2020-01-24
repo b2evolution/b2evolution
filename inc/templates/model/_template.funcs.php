@@ -15,6 +15,38 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Render template content code depending on current locale
+ * 
+ * @param string Template code
+ * @return string rendered template code
+ */
+function render_template( $code, $replace_callback )
+{
+	global $current_locale;
+
+	$TemplateCache = & get_TemplateCache();
+	$Template = & $TemplateCache->get_by_code( $code );
+
+	// Check if the template has a child matching the current locale:
+	$localized_templates = $Template->get_localized_templates( $current_locale );
+	if( ! empty( $localized_templates ) )
+	{	// Use localized template:
+		$Template = & $localized_templates[0];
+	}
+
+	if( $Template )
+	{
+		$content = replace_content_outcode( '/\$[a-z_]+\$/i', $replace_callback, $Template->template_code, 'replace_content', 'preg_callback' );
+		return $content;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+/**
  * Validate Template code for uniqueness. This will add a numeric suffix if the specified template code is already in use.
  *
  * @param string Template code to validate

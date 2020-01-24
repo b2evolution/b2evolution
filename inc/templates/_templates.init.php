@@ -63,8 +63,8 @@ function & get_TemplateCache()
 
 	if( ! isset( $TemplateCache ) )
 	{	// Cache doesn't exist yet:
-		load_class( 'templates/model/_template.class.php', 'Template' );
-		$TemplateCache = new DataObjectCache( 'Template', false, 'T_templates', 'tpl_', 'tpl_ID', 'tpl_name' );
+		load_class( 'templates/model/_templatecache.class.php', 'TemplateCache' );
+		$TemplateCache = new TemplateCache();
 	}
 
 	return $TemplateCache;
