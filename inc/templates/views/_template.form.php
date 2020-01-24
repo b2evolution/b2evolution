@@ -55,7 +55,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 	$Form->text_input( 'tpl_name', $edited_Template->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 128, 'required' => true ) );
 
 	// Template code:
-	$Form->text_input( 'tpl_code', $edited_Template->get( 'code' ), 50, T_('Code'), '', array( 'maxlength' => 128 ) );
+	$Form->text_input( 'tpl_code', $edited_Template->get( 'code' ), 25, T_('Code'), '', array( 'maxlength' => 128 ) );
 
 	// Parent template ID:
 	$parent_template_options = array( NULL => '('.TB_('No Parent').')' );
