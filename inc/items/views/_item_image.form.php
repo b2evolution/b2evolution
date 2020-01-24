@@ -58,10 +58,15 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 				switch( $tag_type_key )
 				{
 					case 'image':
-						$Form->text( 'image_caption', get_param( 'image_caption' ), 40, T_('Caption'), '<br>
+						$image_caption_params = array();
+						if( get_param( 'image_disable_caption' ) )
+						{	// Disable input of Caption on initialize this edit form:
+							$image_caption_params['disabled'] = 'disabled';
+						}
+						$Form->text_input( 'image_caption', get_param( 'image_caption' ), 40, T_('Caption'), '<br>
 							<span style="display: flex; flex-flow: row; align-items: center; margin-top: 8px;">
 								<input type="checkbox" name="image_disable_caption" id="image_disable_caption" value="1" style="margin: 0 8px 0 0;"'.( get_param( 'image_disable_caption' ) ? ' checked="checked"' : '' ).'>
-								<span>'.T_('Disable caption').'</span></span>', '' );
+								<span>'.T_('Disable caption').'</span></span>', $image_caption_params );
 						// TODO: Alt text:
 						$Form->text( 'image_href', get_param( 'image_href' ), 40, T_('HRef') );
 						// TODO: Size:
@@ -214,6 +219,7 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 
 				var options = '';
 
+				// Caption (onhly for image):
 				if( tagType == 'image' )
 				{
 					if( noCaption )
@@ -226,17 +232,34 @@ foreach( $plugins_tabs as $plugin_ID => $plugin_tabs )
 					}
 				}
 
+				// TODO: Alt text:
+
+				// HRef:
 				if( href && href.match( /^(https?:\/\/.+|\(\((.*?)\)\))$/i ) )
 				{
-					options += ( options == '' ? ( tagType == 'image' ? '-:' : '' ) : ':' ) + href;
+					if( options == '' )
+					{	// Insert empty option for default Caption before HRef (only for image):
+						options += ( tagType == 'image' ? ':' : '' );
+					}
+					else
+					{	// Insert separator between previous option and HRef:
+						options += ':';
+					}
+					options += href;
 				}
 
 				if( tagType == 'thumbnail' )
 				{
+					// Size:
 					options += ( options == '' ? '' : ':' ) + size;
+
+					// Alignment:
 					options += ':' + alignment;
 				}
 
+				// TODO: Size (for image):
+
+				// Styles:
 				if( classes )
 				{
 					if( tagType == 'image' )
