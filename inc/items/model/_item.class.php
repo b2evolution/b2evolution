@@ -4079,8 +4079,8 @@ class Item extends ItemLight
 			$item_ID_slug = trim( $tag_options[0] );
 
 			if( $item_ID_slug === '' )
-			{	// Replace inline content block tag with error message about not specified item:
-				$content = str_replace( $source_tag, '<p class="evo_param_error">'.T_('You did not specify which content block to include.').'</p>', $content );
+			{	// Don't render inline content block tag without specified item:
+				continue;
 			}
 
 			if( ! ( $content_Item = & $ItemCache->get_by_ID( $item_ID_slug, false, false ) ) )

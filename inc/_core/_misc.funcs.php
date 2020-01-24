@@ -1210,7 +1210,7 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL, $params =
 
 	if( is_null( $pattern ) )
 	{	// Default pattern:
-		$pattern = '#\[(image|video|audio|include|/?div|(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields)):?.*?\]#i';
+		$pattern = '#\[(image|video|audio|include|/?div|(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields)):[^\]]+\]#i';
 	}
 
 	foreach( $paragraphs[0] as $i => $current_paragraph )
