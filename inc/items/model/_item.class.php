@@ -4078,6 +4078,11 @@ class Item extends ItemLight
 
 			$item_ID_slug = trim( $tag_options[0] );
 
+			if( $item_ID_slug === '' )
+			{	// Replace inline content block tag with error message about not specified item:
+				$content = str_replace( $source_tag, '<p class="evo_param_error">'.T_('You did not specify which content block to include.').'</p>', $content );
+			}
+
 			if( ! ( $content_Item = & $ItemCache->get_by_ID( $item_ID_slug, false, false ) ) )
 			{	// Try to get item by slug if it is not found by ID:
 				$content_Item = & $ItemCache->get_by_urltitle( $item_ID_slug, false, false );
@@ -4229,9 +4234,6 @@ class Item extends ItemLight
 					'restrict_to_image_position' => 'aftermore',
 				) );
 		}
-
-		// Display the "after more" part of the text: (part after "[teaserbreak]")
-		$this->content_extension( $params );
 
 		echo $params['content_block_after_text'];
 
