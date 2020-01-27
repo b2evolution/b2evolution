@@ -51,12 +51,14 @@ skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'breadcrumb_path',
 		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
-		'coll_logo_size'   => 'fit-128x16',
+		'block_start'           => '<ol class="breadcrumb">',
+		'block_end'             => '</ol><div class="clear"></div>',
+		'separator'             => '',
+		'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+		'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+		'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+		'item_active_mask'      => '<li class="active">$title$</li>',
+		'coll_logo_size'        => 'fit-128x16',
 	) );
 ?>
 

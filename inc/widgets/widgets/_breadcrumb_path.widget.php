@@ -119,10 +119,11 @@ class breadcrumb_path_Widget extends ComponentWidget
 		global $Collection, $Blog, $cat, $disp, $thumbnail_sizes;
 
 		$params = array_merge( array(
-				'logo_mask'        => '$logo$ ',
-				'item_mask'        => '<a href="$url$">$title$</a>',
-				'item_active_mask' => '$title$',
-				'suffix_text'      => '', // Used to add custom item at the end of list
+				'item_mask'             => '<a href="$url$">$title$</a>',
+				'item_logo_mask'        => '$logo$ <a href="$url$">$title$</a>',
+				'item_active_mask'      => '$title$',
+				'item_active_logo_mask' => '$logo$ $title$',
+				'suffix_text'           => '', // Used to add custom item at the end of list
 			), $params );
 
 		// Make sure we include the above params:
@@ -195,13 +196,12 @@ class breadcrumb_path_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_start'];
 
+		$breadcrumb_logo = NULL;
 		if( ! empty( $this->disp_params['coll_logo_size'] ) &&
 		    isset( $thumbnail_sizes[ $this->disp_params['coll_logo_size'] ] ) &&
 		    $coll_logo_File = $Blog->get( 'collection_image' ) )
 		{	// Display collection logo in the breadcrumb path:
-			$breadcrumbs[] = array(
-				'logo' => $coll_logo_File->get_thumb_imgtag( $this->disp_params['coll_logo_size'] )
-			);
+			$breadcrumb_logo = $coll_logo_File->get_thumb_imgtag( $this->disp_params['coll_logo_size'] );
 		}
 
 		// Print out the breadcrumbs
@@ -209,19 +209,33 @@ class breadcrumb_path_Widget extends ComponentWidget
 		echo $this->disp_params['widget_breadcrumb_path_before'];
 		foreach( $breadcrumbs as $b => $breadcrumb )
 		{
-			if( isset( $breadcrumb['logo'] ) )
-			{	// Display logo:
-				echo str_replace( '$logo$', $breadcrumb['logo'], $this->disp_params['logo_mask'] );
-			}
-			elseif( $b == count( $breadcrumbs ) - 1 )
+			if( $b == count( $breadcrumbs ) - 1 )
 			{ // Last crumb is active
-				echo str_replace( '$title$', $breadcrumb['title'], $this->disp_params['item_active_mask'] );
+				if( $b === 0 && isset( $breadcrumb_logo ) )
+				{	// Display logo:
+					$item_mask = $this->disp_params['item_active_logo_mask'];
+				}
+				else
+				{
+					$item_mask = $this->disp_params['item_active_mask'];
+				}
+				echo str_replace( array( '$title$', '$logo$' ),
+						array( $breadcrumb['title'], $breadcrumb_logo ),
+						$item_mask );
 			}
 			else
 			{ // All other crumbs are not active
-				echo str_replace( array( '$url$', '$title$' ),
-						array( $breadcrumb['url'], $breadcrumb['title'] ),
-						$this->disp_params['item_mask'] );
+				if( $b === 0 && isset( $breadcrumb_logo ) )
+				{	// Display logo:
+					$item_mask = $this->disp_params['item_logo_mask'];
+				}
+				else
+				{
+					$item_mask = $this->disp_params['item_mask'];
+				}
+				echo str_replace( array( '$url$', '$title$', '$logo$' ),
+						array( $breadcrumb['url'], $breadcrumb['title'], $breadcrumb_logo ),
+						$item_mask );
 				// Separator
 				echo $this->disp_params['separator'];
 			}

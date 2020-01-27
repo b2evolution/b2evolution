@@ -132,11 +132,13 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 						// CODE for the widget:
 						'widget' => 'breadcrumb_path',
 						// Optional display params
-						'block_start'      => '<nav><ol class="breadcrumb">',
-						'block_end'        => '</ol></nav>',
-						'separator'        => '',
-						'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-						'item_active_mask' => '<li class="active">$title$</li>',
+						'block_start'           => '<nav><ol class="breadcrumb">',
+						'block_end'             => '</ol></nav>',
+						'separator'             => '',
+						'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+						'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+						'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+						'item_active_mask'      => '<li class="active">$title$</li>',
 					) );
 			}
 		?>
