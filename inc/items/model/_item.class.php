@@ -8839,16 +8839,46 @@ class Item extends ItemLight
 			    empty( $this->content_block_invalidate_reported ) )
 			{	// Display warning on updating of content block item:
 				global $admin_url, $current_User;
+
+				// Get items where currently updated content block is included:
+				$include_regexp = '\[include:('.$this->ID.'|'.$this->get_slugs( '|' ).')(:[^\]]+)?\]';
+				$SQL = new SQL( 'Get items with included Item #'.$this->ID.' in order to invalidate pre-rendered content' );
+				$SQL->SELECT( 'post_ID, post_content' );
+				$SQL->FROM( 'T_items__item' );
+				$SQL->WHERE( 'post_content REGEXP '.$DB->quote( $include_regexp ) );
+				$invalidated_items = $DB->get_assoc( $SQL );
+				foreach( $invalidated_items as $invalidated_item_ID => $invalidated_item_content )
+				{	// Additional check to exclude items where short tag [include:] is contained inside code blocks:
+					if( ! preg_match_outcode( '#'.$include_regexp.'#', $invalidated_item_content, $m ) )
+					{	// Exclude Item becuase we cannot find the short tag out code block:
+						unset( $invalidated_items[ $invalidated_item_ID ] );
+					}
+				}
+				$invalidated_items_num = count( $invalidated_items );
+				if( $invalidated_items_num > 0 )
+				{	// Delete pre-rendered cache of the found items:
+					$invalidated_items_num = $DB->query( 'DELETE FROM T_items__prerendering
+						WHERE itpr_itm_ID IN ( '.$DB->quote( array_keys( $invalidated_items ) ).' )',
+						'Delete pre-rendered cache on updating content-block Item #'.$this->ID );
+				}
+
+				// Display info message about invalidated cache:
+				$invalidate_message = TB_('INFO: you edited a content block.').' '
+					// Inform this string only we we invalidate at least one Item:
+					.( $invalidated_items_num > 0
+							? sprintf( TB_('We invalidated the content cache for %d Items that include this content block.'), $invalidated_items_num )
+							: TB_('We don\'t find Items that include this content block.') ).' ';
 				if( is_logged_in() &&
 				    $current_User->check_perm( 'admin', 'normal' ) &&
 				    $current_User->check_perm( 'options', 'view' ) )
 				{	// If current user has a permission to the clear tool:
-					$Messages->add( TB_('WARNING: you edited a content block.').' '.sprintf( TB_('You should <a %s>invalidate the pre-rendering cache NOW</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=del_itemprecache&amp;'.url_crumb( 'tools' ).'" target="_blank"' ), 'warning' );
+					$Messages->add( $invalidate_message.sprintf( TB_('You may <a %s>invalidate the <b>complete</b> pre-rendering cache NOW</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=del_itemprecache&amp;'.url_crumb( 'tools' ).'" target="_blank"' ), 'note' );
 				}
 				else
 				{	// If current user has no permission to the clear tool:
-					$Messages->add( TB_('WARNING: you edited a content block.').' '.TB_('Please ask administrator to invalidate the pre-rendering cache.'), 'warning' );
+					$Messages->add( $invalidate_message.TB_('Please ask administrator to invalidate the pre-rendering cache.'), 'note' );
 				}
+
 				$this->content_block_invalidate_reported = true;
 			}
 
