@@ -8841,13 +8841,7 @@ class Item extends ItemLight
 				global $admin_url, $current_User;
 
 				// Get items where currently updated content block is included:
-				$include_regexp = '\[include:('.$this->ID.'|'.$this->get_slugs( '|' ).')(:[^]]+)?\]';
-				$SQL = new SQL( 'Get items with included Item #'.$this->ID.' in order to invalidate pre-rendered content' );
-				$SQL->SELECT( 'post_ID' );
-				$SQL->FROM( 'T_items__item' );
-				$SQL->FROM_add( 'INNER JOIN T_items__prerendering ON post_ID = itpr_itm_ID' );
-				$SQL->WHERE( 'post_content REGEXP '.$DB->quote( $include_regexp ) );
-				$invalidated_items = $DB->get_col( $SQL );
+				$invalidated_items = $this->get_included_item_IDs( $this->ID.'|'.$this->get_slugs( '|' ) );
 				$invalidated_items_num = count( $invalidated_items );
 				if( $invalidated_items_num > 0 )
 				{	// Delete pre-rendered cache of the found items:
@@ -8887,6 +8881,50 @@ class Item extends ItemLight
 		// set_coll_ID // Settings have not changed
 
 		return $result;
+	}
+
+
+	/**
+	 * Get IDs of items where this content-block is included
+	 * Used to invalidate pre-rendered content
+	 *
+	 * @param string Slugs separated by |
+	 * @return array
+	 */
+	function get_included_item_IDs( $slugs )
+	{
+		global $DB;
+
+		$slugs = trim( $slugs, '|' );
+		if( $slugs === '' )
+		{	// Wrong request without slugs:
+			return array();
+		}
+
+		// Get items where currently updated content block is included:
+		$SQL = new SQL( 'Get items with included Item #'.$this->ID.' in order to invalidate pre-rendered content' );
+		$SQL->SELECT( 'post_ID, ityp_usage, IF( ityp_usage = "content-block", GROUP_CONCAT( slug_title SEPARATOR "|" ), NULL ) AS slugs' );
+		$SQL->FROM( 'T_items__item' );
+		$SQL->FROM_add( 'INNER JOIN T_items__prerendering ON post_ID = itpr_itm_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_items__type ON post_ityp_ID = ityp_ID' );
+		$SQL->FROM_add( 'INNER JOIN T_slug ON post_ID = slug_itm_ID AND slug_ID != post_tiny_slug_ID' );
+		$SQL->WHERE( 'post_content REGEXP '.$DB->quote( '\[include:('.$slugs.')(:[^]]+)?\]' ) );
+		$SQL->GROUP_BY( 'post_ID' );
+		$content_items = $DB->get_results( $SQL );
+
+		$included_items = array();
+		foreach( $content_items as $content_item )
+		{
+			$included_items[] = $content_item->post_ID;
+			if( $content_item->ityp_usage == 'content-block' &&
+			    ! empty( $content_item->slugs ) )
+			{	// Try to find recursively where the content-block Item is included yet:
+				$block_items = $this->get_included_item_IDs( $content_item->post_ID.'|'.$content_item->slugs );
+				$included_items = array_merge( $included_items, $block_items );
+			}
+		}
+
+		return array_unique( $included_items );
 	}
 
 
