@@ -334,6 +334,10 @@ class Menu extends Widget
 				{
 					$anchor .= ' title="'.$loop_details['title'].'"';
 				}
+				if( isset($loop_details['shortcut']) )
+				{
+					$anchor .= ' data-shortcut="'.$loop_details['shortcut'].'"';
+				}
 
 				// CLASS
 				$class = '';

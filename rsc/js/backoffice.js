@@ -161,6 +161,39 @@ function evoFadeBg( selector, bgs, options )
 
 
 /**
+ * Flash evobar via backgrounds colors (bgs), back to original background
+ * color and then remove any styles (from animations and others)
+ *
+ * Used only by hotkeys
+ *
+ * @param Array
+ * @param object Options ("speed")
+ */
+function evobarFlash( bgs, options )
+{
+	var evobar = '#evo_toolbar';
+	var menus = '#evo_toolbar .evobar-menu a';
+	var origBg = jQuery( evobar ).css( "backgroundColor" );
+
+	jQuery( menus ).css( "backgroundColor", "inherit" );
+	var speed = options && options.speed || '"fast"';
+
+	var toEval = 'jQuery( evobar ).animate({ backgroundColor: ';
+	for( e in bgs )
+	{
+		if( typeof( bgs[e] ) != 'string' )
+		{ // Skip wrong color value
+			continue;
+		}
+		toEval += '"' + bgs[e] + '"' + '}, ' + speed + ' ).animate({ backgroundColor: ';
+	}
+	toEval += 'origBg }, '+speed+', "", function(){ jQuery( this ).css( "backgroundColor", "" ); jQuery( menus ).css( "backgroundColor", "" ); } );';
+
+	eval( toEval );
+}
+
+
+/**
  * Open the item in a preview window (a new window with target 'b2evo_preview'), by changing
  * the form's action attribute and target temporarily.
  *

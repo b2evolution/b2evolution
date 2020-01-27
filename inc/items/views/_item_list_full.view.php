@@ -278,6 +278,7 @@ while( $Item = & $ItemList->get_item() )
 					$edit_buttons[] = array(
 						'url'  => $item_edit_url,
 						'text' => get_icon( 'edit_button' ).' '.T_('Edit'),
+						'shortcut' => 'f2,ctrl+f2',
 					);
 				}
 				if( $item_propose_change_url = $Item->get_propose_change_url() )
@@ -306,7 +307,9 @@ while( $Item = & $ItemList->get_item() )
 				if( $edit_buttons_num > 1 )
 				{	// Display buttons in dropdown style:
 					echo '<div class="'.button_class( 'group' ).'">';
-					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'">'.$edit_buttons[0]['text'].'</a>';
+					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'"'
+							.( isset( $edit_buttons[0]['shortcut'] ) ? ' data-shortcut="'.$edit_buttons[0]['shortcut'].'"' : '' ).'>'
+							.$edit_buttons[0]['text'].'</a>';
 					echo '<button type="button" class="'.button_class( 'text' ).' dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>';
 					echo '<ul class="dropdown-menu">';
 					for( $b = 1; $b < $edit_buttons_num; $b++ )
@@ -321,7 +324,9 @@ while( $Item = & $ItemList->get_item() )
 				elseif( $edit_buttons_num == 1 )
 				{	// Display single button:
 					echo '<span class="'.button_class( 'group' ).'">';
-					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'">'.$edit_buttons[0]['text'].'</a>';
+					echo '<a href="'.$edit_buttons[0]['url'].'" class="'.button_class( 'text_primary' ).'"'
+							.( isset( $edit_buttons[0]['shortcut'] ) ? ' data-shortcut="'.$edit_buttons[0]['shortcut'].'"' : '' ).'>'
+							.$edit_buttons[0]['text'].'</a>';
 					echo '</span>';
 				}
 
