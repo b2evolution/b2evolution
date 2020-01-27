@@ -8858,7 +8858,7 @@ class Item extends ItemLight
 
 				// Display info message about invalidated cache:
 				$invalidate_message = TB_('INFO: you edited a content block.').' '
-					.sprintf( TB_('We invalidated %d pre-prerendered Items that include the content block.'), $invalidated_items_num ).' ';
+					.sprintf( TB_('We invalidated %d pre-rendered Items that include the content block.'), $invalidated_items_num ).' ';
 				if( is_logged_in() &&
 				    $current_User->check_perm( 'admin', 'normal' ) &&
 				    $current_User->check_perm( 'options', 'view' ) )
