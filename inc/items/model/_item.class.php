@@ -8843,32 +8843,22 @@ class Item extends ItemLight
 				// Get items where currently updated content block is included:
 				$include_regexp = '\[include:('.$this->ID.'|'.$this->get_slugs( '|' ).')(:[^]]+)?\]';
 				$SQL = new SQL( 'Get items with included Item #'.$this->ID.' in order to invalidate pre-rendered content' );
-				$SQL->SELECT( 'post_ID, post_content' );
+				$SQL->SELECT( 'post_ID' );
 				$SQL->FROM( 'T_items__item' );
 				$SQL->FROM_add( 'INNER JOIN T_items__prerendering ON post_ID = itpr_itm_ID' );
 				$SQL->WHERE( 'post_content REGEXP '.$DB->quote( $include_regexp ) );
-				$invalidated_items = $DB->get_assoc( $SQL );
-				foreach( $invalidated_items as $invalidated_item_ID => $invalidated_item_content )
-				{	// Additional check to exclude items where short tag [include:] is contained inside code blocks:
-					if( ! preg_match_outcode( '#'.$include_regexp.'#', $invalidated_item_content, $m ) )
-					{	// Exclude Item becuase we cannot find the short tag out code block:
-						unset( $invalidated_items[ $invalidated_item_ID ] );
-					}
-				}
+				$invalidated_items = $DB->get_col( $SQL );
 				$invalidated_items_num = count( $invalidated_items );
 				if( $invalidated_items_num > 0 )
 				{	// Delete pre-rendered cache of the found items:
 					$invalidated_items_num = $DB->query( 'DELETE FROM T_items__prerendering
-						WHERE itpr_itm_ID IN ( '.$DB->quote( array_keys( $invalidated_items ) ).' )',
+						WHERE itpr_itm_ID IN ( '.$DB->quote( $invalidated_items ).' )',
 						'Delete pre-rendered cache on updating content-block Item #'.$this->ID );
 				}
 
 				// Display info message about invalidated cache:
 				$invalidate_message = TB_('INFO: you edited a content block.').' '
-					// Inform this string only we we invalidate at least one Item:
-					.( $invalidated_items_num > 0
-							? sprintf( TB_('We invalidated the content cache for %d Items that include this content block.'), $invalidated_items_num )
-							: TB_('We don\'t find Items that include this content block.') ).' ';
+					.sprintf( TB_('We invalidated %d pre-prerendered Items that include the content block.'), $invalidated_items_num ).' ';
 				if( is_logged_in() &&
 				    $current_User->check_perm( 'admin', 'normal' ) &&
 				    $current_User->check_perm( 'options', 'view' ) )
