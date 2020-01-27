@@ -18,9 +18,10 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Render template content code depending on current locale
  * 
  * @param string Template code
- * @return string rendered template code
+ * @param array Callback function. Function should return the replacement string for the variable found in the template.
+ * @return boolean True if template is found and rendered, false otherwise
  */
-function render_template( $code, $replace_callback )
+function render_template( $code, $replace_callback, $params = array() )
 {
 	global $current_locale;
 
@@ -35,9 +36,21 @@ function render_template( $code, $replace_callback )
 	}
 
 	if( $Template )
-	{
-		$content = replace_content_outcode( '/\$[a-z_]+\$/i', $replace_callback, $Template->template_code, 'replace_content', 'preg_callback' );
-		return $content;
+	{	// Template available, replace variables using supplied callback:
+		preg_match_all( '/\$[a-z_]+\$/i', $Template->template_code, $matches, PREG_OFFSET_CAPTURE );
+		$current_pos = 0;
+		foreach( $matches[0] as $match )
+		{
+			// $match[0] = $variable$, $match[1] = offset
+			echo substr( $Template->template_code, $current_pos, $match[1] - $current_pos );
+			$current_pos = $match[1] + strlen( $match[0] );
+			echo call_user_func( $replace_callback, $match[0], $params );
+		}
+
+		// Print remaining template code:
+		echo substr( $Template->template_code, $current_pos );
+
+		return true;
 	}
 	else
 	{
