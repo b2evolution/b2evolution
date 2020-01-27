@@ -8841,10 +8841,11 @@ class Item extends ItemLight
 				global $admin_url, $current_User;
 
 				// Get items where currently updated content block is included:
-				$include_regexp = '\[include:('.$this->ID.'|'.$this->get_slugs( '|' ).')(:[^\]]+)?\]';
+				$include_regexp = '\[include:('.$this->ID.'|'.$this->get_slugs( '|' ).')(:[^]]+)?\]';
 				$SQL = new SQL( 'Get items with included Item #'.$this->ID.' in order to invalidate pre-rendered content' );
 				$SQL->SELECT( 'post_ID, post_content' );
 				$SQL->FROM( 'T_items__item' );
+				$SQL->FROM_add( 'INNER JOIN T_items__prerendering ON post_ID = itpr_itm_ID' );
 				$SQL->WHERE( 'post_content REGEXP '.$DB->quote( $include_regexp ) );
 				$invalidated_items = $DB->get_assoc( $SQL );
 				foreach( $invalidated_items as $invalidated_item_ID => $invalidated_item_content )
