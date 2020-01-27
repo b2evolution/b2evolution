@@ -807,6 +807,7 @@ function get_request_title( $params = array() )
 					$title .= action_icon( T_('Go to advanced edit screen'), 'edit', $advanced_edit_link['href'], ' '.T_('Advanced editing'), NULL, 3, array(
 							'onclick' => $advanced_edit_link['onclick'],
 							'class'   => $params['edit_links_template']['advanced_link_class'].' action_icon',
+							'data-shortcut' => 'f2,ctrl+f2',
 						) );
 				}
 				$title .= action_icon( T_('Cancel editing'), 'close', $cancel_url, ' '.T_('Cancel editing'), NULL, 3, array(
@@ -2128,9 +2129,17 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
 /**
  * Initialize Hotkeys library
  */
-function init_hotkeys_js( $relative_to = 'rsc_url' )
+function init_hotkeys_js( $relative_to = 'rsc_url', $hotkeys = array() )
 {
+	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( '#hotkeys#', $relative_to );
+
+	if( $hotkeys )
+	{
+		add_js_headline( 'var shortcut_keys = '.json_encode( $hotkeys ).';' );
+	}
+
+	require_js( 'hotkeys/hotkeys.init.js', $relative_to );
 }
 
 

@@ -181,54 +181,8 @@ function skin_init( $disp )
 			}
 
 			if( is_logged_in() && ( $disp == 'single' || $disp == 'page' ) && $Item )
-			{	// Enable "F2" hotkey that will redirect user to edit screen of Item:
-				global $admin_url;
-
-				$backoffice_edit_item_url = $admin_url.'?ctrl=items&action=edit&p='.$Item->ID.'&blog='.$Blog->ID; 
-				if( $Blog->get_setting( 'in_skin_editing' ) )
-				{
-					$edit_item_url = $Item->get_edit_url();
-				}
-				elseif( $current_User->check_perm( 'admin', 'restricted' ) )
-				{
-					$edit_item_url = $backoffice_edit_item_url;
-				}
-
-				if( ! empty( $edit_item_url ) )
-				{	// Current user can edit post:
-					init_hotkeys_js();
-					add_js_headline('jQuery( document ).ready( function()
-					{
-						hotkeys( \'f2, ctrl+f2, f9\', function( event, handler ) {
-							switch( handler.key )
-							{
-								case \'f2\':
-									window.location.href = \''.format_to_js( $edit_item_url ).'\';
-									break;
-
-								case \'ctrl+f2\':
-									window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
-									break;
-
-								case \'f9\':
-									jQuery.ajax(
-									{
-										type: "POST",
-										url: htsrv_url + "async.php",
-										data: {
-											"action": "clear_itemprecache",
-											"crumb_tools": "'.get_crumb( 'tools' ).'"
-										},
-										success: function( data )
-										{	// Item cache cleared, reload:
-											window.location.reload( true );
-										}
-									} );
-									break;
-							}
-						});
-					});');
-				}
+			{
+				init_hotkeys_js( 'blog' );
 			}
 
 			if( ( ! $preview ) && ( empty( $Item ) ) )
@@ -423,79 +377,6 @@ function skin_init( $disp )
 		case 'posts':
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
-
-			if( $featured_intro_Item = & get_featured_Item( 'posts', NULL, true, true, true ) )
-			{	// Enable "F2" hotkey that will redirect user to edit screen of Intro or Feature Post:
-				global $admin_url;
-
-				$backoffice_edit_item_url = $admin_url.'?ctrl=items&action=edit&p='.$featured_intro_Item->ID.'&blog='.$Blog->ID; 
-				if( $Blog->get_setting( 'in_skin_editing' ) )
-				{
-					$edit_item_url = $featured_intro_Item->get_edit_url();
-				}
-				elseif( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) )
-				{
-					$edit_item_url = $backoffice_edit_item_url;
-				}
-
-				if( ! empty( $edit_item_url ) )
-				{	// Current user can edit post:
-					init_hotkeys_js();
-					add_js_headline('jQuery( document ).ready( function()
-					{
-						hotkeys( \'f2, ctrl+f2, f9\', function( event, handler ) {
-							switch( handler.key )
-							{
-								case \'f2\':
-									window.location.href = \''.format_to_js( $edit_item_url ).'\';
-									break;
-
-								case \'ctrl+f2\':
-									window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
-									break;
-
-								case \'f9\':
-									jQuery.ajax(
-									{
-										type: "POST",
-										url: htsrv_url + "async.php",
-										data: {
-											"action": "clear_itemprecache",
-											"crumb_tools": "'.get_crumb( 'tools' ).'"
-										},
-										success: function( data )
-										{	// Item cache cleared, reload:
-											window.location.reload( true );
-										}
-									} );
-									break;
-							}
-						});
-					});');
-				}
-			}
-			else
-			{
-				init_hotkeys_js();
-				add_js_headline( 'jQuery( document ).ready( function()
-				{
-					hotkeys( \'f9\', function( event, handler ) {
-						jQuery.ajax(
-						{
-							type: "POST",
-							url: htsrv_url + "async.php",
-							data: {
-								"action": "clear_itemprecache",
-								"crumb_tools": "'.get_crumb( 'tools' ).'"
-							},
-							success: function( data )
-							{	// Item cache cleared, reload:
-								window.location.reload( true );
-							}
-						} );
-					});
-				});');
-			}
 
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
@@ -1675,17 +1556,7 @@ function skin_init( $disp )
 			init_inskin_editing();
 
 			// Enable "F2" hotkey that will redirect user to edit post in back-office if they have access:
-			if( $current_User->check_perm( 'admin', 'restricted' ) )
-			{
-				init_hotkeys_js();
-				$backoffice_edit_item_url = $admin_url.'?ctrl=items&action=edit&p='.$post_ID.'&blog='.$Blog->ID; 
-				add_js_headline( 'jQuery( document ).ready( function()
-				{
-					hotkeys( \'f2, ctrl+f2\', function( event, handler ) {
-						window.location.href = \''.format_to_js( $backoffice_edit_item_url ).'\';
-					});
-				});');
-			}
+			init_hotkeys_js( 'blog' );
 			break;
 
 		case 'edit_comment':

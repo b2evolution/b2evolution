@@ -1425,6 +1425,7 @@ class _core_Module extends Module
 						$entries['page']['entries']['edit_front'] = array(
 								'text' => sprintf( T_('Edit "%s" in Front-Office'), $Item->get_type_setting( 'name' ) ).'&hellip;',
 								'href' => $edit_item_url,
+								'shortcut' => 'f2',
 							);
 					}
 					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
@@ -1435,6 +1436,7 @@ class _core_Module extends Module
 							$entries['page']['entries']['edit_back'] = array(
 									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
 									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
+									'shortcut' => 'ctrl+f2',
 								);
 						}
 						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )

@@ -2176,7 +2176,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	if( ! $inskin || $display_preview )
 	{
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
-		$Form->button( array( 'button', '', /* TRANS: Verb */ T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');' ) );
+		$Form->button( array( 'button', '', /* TRANS: Verb */ T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');', 'data-shortcut' => 'f9' ) );
 	}
 
 	// ---------- VISIBILITY ----------
