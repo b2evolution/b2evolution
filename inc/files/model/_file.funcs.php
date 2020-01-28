@@ -3230,15 +3230,16 @@ function echo_file_properties()
 			jQuery( document ).on( 'submit', 'form#fm_properties_checkchanges', function( e )
 			{
 				e.preventDefault();
+				// Close modal window:
+				closeModalWindow();
+				// Submit form by AJAX request:
 				jQuery.ajax(
-				{	// Submit form by AJAX request:
+				{
 					type: 'POST',
 					url: jQuery( this ).attr( 'action' ),
 					data: jQuery( this ).serialize(),
 					success: function()
 					{	// On success updating,
-						// Close modal window:
-						closeModalWindow();
 						// Refresh links/attachments table:
 						evo_link_refresh_list( link_owner_type, link_owner_ID );
 					},
@@ -3246,8 +3247,6 @@ function echo_file_properties()
 					{	// On failed updating,
 						// Display error:
 						alert( jqXHR.responseText.replace( /<.+?>/g, "\n" ) );
-						// Close modal window:
-						closeModalWindow();
 					}
 				} );
 			} );
