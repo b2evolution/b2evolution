@@ -10178,7 +10178,7 @@ function convert_path_to_array( $property, $value, $separator = '.' )
  */
 function get_customizer_url( $url_Blog = NULL )
 {
-	global $baseurlroot, $customizer_relative_url, $Blog;
+	global $customizer_relative_url, $Blog;
 
 	if( $url_Blog === NULL && isset( $Blog ) )
 	{	// Use current collection:
@@ -10186,9 +10186,5 @@ function get_customizer_url( $url_Blog = NULL )
 	}
 
 	return $url_Blog->get_baseurl_root().$customizer_relative_url;
-
-// TODO: remove the following. It is only to show how we would fall back if we needed to.
-	// Use default customizer URL from config:
-	return $baseurlroot.$customizer_relative_url;
 }
 ?>
