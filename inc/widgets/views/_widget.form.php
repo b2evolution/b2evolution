@@ -163,7 +163,7 @@ $Plugins->trigger_event( 'WidgetEndSettingsForm', array(
 	) );
 
 $buttons = array();
-$buttons[] = array( 'submit', 'submit', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton' );
+$buttons[] = array( 'submit', 'submit', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+enter,command+enter' );
 if( $mode == 'customizer' )
 {	// Display buttons in special div on customizer mode:
 	echo '<div class="evo_customizer__buttons">';
@@ -182,7 +182,7 @@ if( $mode == 'customizer' )
 }
 else
 {	// Additional button for normal mode in back-office:
-	$buttons[] = array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s' );
 }
 
 $Form->end_form( $buttons );

@@ -136,8 +136,8 @@ $Form->end_fieldset();
 if( $current_User->check_perm( 'options', 'edit', false ) )
 {
 	$Form->buttons_input( array(
-		array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save Changes!'), 'class' => 'SaveButton' ),
-		array( 'type' => 'submit', 'name' => 'actionArray[update_edit_settings]', 'value' => T_('Save and continue editing...') ),
+		array( 'type' => 'submit', 'name' => 'actionArray[update_settings]', 'value' => T_('Save Changes!'), 'class' => 'SaveButton', 'data-shortcut' => 'ctrl+enter,command+enter' ),
+		array( 'type' => 'submit', 'name' => 'actionArray[update_edit_settings]', 'value' => T_('Save and continue editing...'), 'data-shortcut' => 'ctrl+s,command+s' ),
 		) );
 }
 $Form->end_form();

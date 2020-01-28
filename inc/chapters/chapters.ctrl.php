@@ -504,8 +504,13 @@ switch( $action )
 }
 
 if( $action == 'list' )
-{ // Load JS to edit chapter order inline
+{	// Load JS to edit chapter order inline
 	require_js( 'jquery/jquery.jeditable.js', 'rsc_url' );
+}
+
+if( in_array( $action, array( 'list', 'edit', 'move' ) ) )
+{	// Initialize Hotkeys:
+	init_hotkeys_js();
 }
 
 /**

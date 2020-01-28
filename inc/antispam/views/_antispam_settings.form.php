@@ -86,7 +86,7 @@ $Form->end_fieldset();
 if( $current_User->check_perm( 'options', 'edit' ) )
 {
 	$Form->end_form( array(
-		array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ),
+		array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' ),
 		array( 'submit', 'submit[restore_defaults]', T_('Restore defaults'), 'ResetButton' ),
 		) );
 }

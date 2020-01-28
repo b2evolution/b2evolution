@@ -855,6 +855,7 @@ switch( $action )
 			.sprintf( T_('Edit plugin &laquo;%s&raquo; (ID %d)'), $edit_Plugin->name, $edit_Plugin->ID ).'</a>' );
 		// Initialize JS for color picker field on the edit plugin settings form:
 		init_colorpicker_js();
+		init_hotkeys_js();
 		break;
 
 	case 'disp_help_plain': // just the help, without any payload

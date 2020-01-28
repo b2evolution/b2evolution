@@ -78,7 +78,7 @@ $Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'co
 	$Form->text_input( 'msgform_message_label', $edited_Blog->get_setting( 'msgform_message_label' ), 40, T_('Label of message field'), T_('Leave empty for default').': "'.T_('Message').'".', $msgform_message_label_params );
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' ) ) );
 
 ?>
 <script>

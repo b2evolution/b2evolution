@@ -515,6 +515,7 @@ if( $display_mode != 'js' )
 	{
 		case 'settings':
 			$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=antispam&amp;tab3='.$tab3 );
+			init_hotkeys_js();
 
 			// Set an url for manual page:
 			$AdminUI->set_page_manual_link( 'antispam-settings' );
@@ -599,6 +600,8 @@ if( in_array( $action, array( 'iprange_edit' ) ) )
 	init_datepicker_js();
 	// Load jQuery QueryBuilder plugin files for user list filters:
 	init_querybuilder_js( 'rsc_url' );
+	// Initialize Hotkeys
+	init_hotkeys_js();
 }
 
 // Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)

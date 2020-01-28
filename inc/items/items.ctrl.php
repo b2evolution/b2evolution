@@ -2924,7 +2924,7 @@ switch( $action )
 			$AdminUI->global_icon( T_('Cancel editing').'!', 'close', $redirect_to, T_('Cancel'), 4, 2 );
 
 			init_tokeninput_js( 'blog' );
-			init_hotkeys_js( 'blog', array( 'f2, f9' ) );
+			init_hotkeys_js( 'blog', array( 'f2', 'f9' ) );
 		}
 
 		if( in_array( $action, array( 'history', 'history_details', 'history_compare' ) ) )

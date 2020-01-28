@@ -855,6 +855,7 @@ if( $display_mode == 'normal' )
 	require_js( '#jqueryUI#' ); // auto requires jQuery
 	require_css( 'blog_widgets.css' );
 	init_tokeninput_js();
+	init_hotkeys_js( 'blog', array( 'ctrl+s', 'command+s', 'ctrl+enter', 'command+enter' ) );
 
 	if( $action == 'list' && $Session->get( 'refresh_customizer_window' ) )
 	{	// This is a request to refresh customizer back-office window:

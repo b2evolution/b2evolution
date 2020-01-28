@@ -151,7 +151,7 @@ $Form->output = true;
 $Form->switch_layout( NULL );
 
 $Form->end_form( array(
-		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' )
+		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' )
 	) );
 
 if( ! $creating && $display_mode != 'js' )
