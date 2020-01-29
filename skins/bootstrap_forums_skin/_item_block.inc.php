@@ -443,7 +443,7 @@ skin_widget( array(
 						'custom_fields_table_start'                => '<div class="item_custom_fields">',
 						'custom_fields_row_start'                  => '<div class="row"$row_attrs$>',
 						'custom_fields_topleft_cell'               => '<div class="col-md-12 col-xs-6" style="border:none"></div>',
-						'custom_fields_col_header_item'            => '<div class="col-md-12 col-xs-6 center" width="$col_width$"$col_attrs$>$item_link$$item_status$</div>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
+						'custom_fields_col_header_item'            => '<div class="$col_class$ col-md-12 col-xs-6 center" width="$col_width$"$col_attrs$>$item_link$$item_status$</div>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
 						'custom_fields_row_header_field'           => '<div class="col-md-12 col-xs-6"><b>$field_title$$field_description_icon$:</b></div>',
 						'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
 						'custom_fields_description_icon_class'     => 'grey',
