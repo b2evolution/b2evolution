@@ -115,6 +115,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 10, 'item_content' ),
 		array( 15, 'item_attachments', 'coll_type' => '-manual' ),
 		array( 17, 'item_link', 'coll_type' => '-manual' ),
+		array( 18, 'item_workflow', 'coll_type' => 'photo' ),
 		array( 20, 'item_tags', 'coll_type' => '-forum,group,manual', 'coll_ID' => '-'.$blog_a_ID.','.$events_blog_ID ),
 		array( 25, 'item_about_author', 'coll_ID' => $blog_b_ID ),
 		array( 30, 'evo_Gmaps', 'coll_ID' => $blog_a_ID.','.$events_blog_ID, 'type' => 'plugin', 'install' => $install_test_features ),
@@ -147,7 +148,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Sidebar Single */
 	$default_widgets['sidebar_single'] = array(
-		array(  1, 'coll_related_post_list', 'coll_type' => 'forum' ),
+		array(  1, 'item_workflow', 'coll_type' => 'forum,group,manual' ),
+		array(  5, 'coll_related_post_list', 'coll_type' => 'forum' ),
 		array( 10, 'item_vote', 'coll_type' => 'manual' ),
 		array( 20, 'item_tags', 'coll_type' => 'manual' ),
 		array( 30, 'item_attachments', 'coll_type' => 'manual' ),
