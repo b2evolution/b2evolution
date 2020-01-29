@@ -467,7 +467,7 @@ function wpxml_parser( $file )
 		$post['post_titletag']      = (string) $evo->post_titletag;
 		$post['post_url']           = (string) $evo->post_url;
 		$post['post_notifications_status'] = (string) $evo->post_notifications_status;
-		$post['post_renderers']     = (string) $evo->post_renderers;
+		$post['post_renderers']     = ( $evo->post_renderers->getName() == 'post_renderers' ? /*If renderer plugins are provided use them*/(string) $evo->post_renderers : /*Otherwise use default plugins*/'default' );
 		$post['post_priority']      = (int) $evo->post_priority;
 		$post['post_featured']      = (int) $evo->post_featured;
 		$post['post_order']         = (int) $evo->post_order;
