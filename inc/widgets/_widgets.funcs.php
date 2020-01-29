@@ -91,9 +91,10 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Item in List */
 	$default_widgets['item_in_list'] = array(
 		array( 10, 'item_title' ),
-		array( 20, 'coll_type' => '-manual', 'item_visibility_badge' ),
-		array( 30, 'coll_type' => '-manual', 'item_info_line' ),
-		array( 40, 'coll_type' => 'manual', 'item_content' ),
+		array( 20, 'item_visibility_badge', 'coll_type' => '-manual' ),
+		array( 30, 'item_info_line', 'coll_type' => '-manual' ),
+		array( 40, 'item_content', 'unique' => true ),
+		array( 50, 'item_footer' ),
 	);
 
 	/* Item Single Header */
@@ -123,6 +124,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 40, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'format' => 'revision' ) ),
 		array( 50, 'item_seen_by', 'coll_type' => '-forum,group,manual' ),
 		array( 60, 'item_vote', 'coll_type' => '-forum,group,manual' ),
+		array( 70, 'item_footer' ),
 	);
 
 	/* Item Page */
@@ -131,6 +133,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 15, 'item_attachments' ),
 		array( 50, 'item_seen_by' ),
 		array( 60, 'item_vote', 'coll_type' => '-forum,group' ),
+		array( 70, 'item_footer' ),
 	);
 
 	/* Comment List */
@@ -902,6 +905,11 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 							continue;
 						}
 
+						if( isset( $widget['unique'] ) && $widget['unique'] && is_installed_widget( $widget[1], $new_container_code, $widget_Blog->ID ) )
+						{	// Skip widget because it is already installed in the Container:
+							continue;
+						}
+
 						if( isset( $widget['install'] ) && ! $widget['install'] )
 						{	// Skip widget because it should not be installed by condition from config:
 							continue;
@@ -1015,6 +1023,50 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 	return $new_inserted_widgets_num;
 }
 
+
+/**
+ * Check if the requested widget is already installed in Container
+ *
+ * @param string Widget code
+ * @param string Container code
+ * @param integer Collection ID or NULL for shared container
+ * @return boolean
+ */
+function is_installed_widget( $widget_code, $container_code, $coll_ID = NULL )
+{
+	global $evo_installed_widgets_by_container_collection;
+
+	if( ! isset( $evo_installed_widgets_by_container_collection ) ||
+	    ! is_array( $evo_installed_widgets_by_container_collection ) )
+	{
+		$evo_installed_widgets_by_container_collection = array();
+	}
+
+	if( ! isset( $evo_installed_widgets_by_container_collection[ $container_code ] ) )
+	{	// Get widget and store in global cache array:
+		global $DB;
+		$SQL = new SQL( 'Get all widgets per container for check installed widgets' );
+		$SQL->SELECT( 'wi_code, wico_coll_ID' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->FROM_add( 'INNER JOIN T_widget__container ON wi_wico_ID = wico_ID' );
+		$SQL->WHERE( 'wico_code = '.$DB->quote( $container_code ) );
+		$widgets = $DB->get_results( $SQL );
+		foreach( $widgets as $widget )
+		{
+			$widget_coll_ID = ( $widget->wico_coll_ID === NULL ? 'shared' : $widget->wico_coll_ID );
+			if( ! isset( $evo_installed_widgets_by_container_collection[ $container_code ][ $widget_coll_ID ] ) )
+			{
+				$evo_installed_widgets_by_container_collection[ $container_code ][ $widget_coll_ID ] = array();
+			}
+			$evo_installed_widgets_by_container_collection[ $container_code ][ $widget_coll_ID ][] = $widget->wi_code;
+		}
+	}
+
+	$coll_ID = ( $coll_ID === NULL ? 'shared' : $coll_ID );
+
+	return ( isset( $evo_installed_widgets_by_container_collection[ $container_code ][ $coll_ID ] ) &&
+		in_array( $widget_code, $evo_installed_widgets_by_container_collection[ $container_code ][ $coll_ID ] ) );
+}
 
 /**
  * Insert the basic widgets for a collection
