@@ -1756,6 +1756,7 @@ function init_affix_messages_js( $offset = 50 )
 	jQuery( document ).ready( function()
 	{
 		var msg_obj = jQuery( ".affixed_messages" );
+		var msg_obj_width = msg_obj.outerWidth();
 		var msg_offset = '.format_to_js( $offset == '' ? 50 : $offset ).';
 
 		if( msg_obj.length == 0 )
@@ -1778,7 +1779,7 @@ function init_affix_messages_js( $offset = 50 )
 			{
 				wrapper.css( { "min-height": msg_obj.outerHeight( true ) } );
 
-				msg_obj.css( { "width": msg_obj.outerWidth(), "top": msg_offset, "z-index": 9999 } );
+				msg_obj.css( { "width": msg_obj_width, "top": msg_offset, "z-index": 9999 } );
 
 				jQuery( window ).on( "resize", function()
 					{ // This will resize the Messages based on the wrapper width
@@ -1796,6 +1797,11 @@ function init_affix_messages_js( $offset = 50 )
 			{
 				wrapper.css({ "min-height": msg_obj.outerHeight( true ) });
 			} );
+
+		if( msg_obj.hasClass( "affix" ) )
+		{	// Manually trigger the "affix.bs.affix" event:
+			msg_obj.trigger( "affix.bs.affix" );
+		}
 	} );
 	' );
 }
