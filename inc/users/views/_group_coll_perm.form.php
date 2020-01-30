@@ -20,7 +20,11 @@ global $admin_url;
 $Form = new Form( NULL, 'blogperm_checkchanges', 'post' );
 $Form->formclass = 'form-inline';
 
-$Form->begin_form( 'fform' );
+$title = ( $action == 'edit' ? T_('Editing group:') : T_('Viewing group:') )
+		.' '.$edited_Group->dget('name')
+		.' ('.T_('ID').' '.$edited_Group->ID.')';
+
+$Form->begin_form( 'fform', $title );
 
 $Form->add_crumb( 'group' );
 $Form->hidden_ctrl();
