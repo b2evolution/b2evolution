@@ -999,7 +999,7 @@ function preg_match_outcode_callback( $content, $search, & $matches )
 
 
 /**
- * Replace content outside blocks <code></code>, <pre></pre>, markdown codeblocks in `` and short inline tags like [image:]
+ * Replace content outside blocks <code></code>, <pre></pre> and markdown codeblocks in ``
  *
  * @param array|string Search list
  * @param array|string Replace list or Callback function
@@ -1010,13 +1010,47 @@ function preg_match_outcode_callback( $content, $search, & $matches )
  */
 function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
 {
-	if( !empty( $search ) )
+	if( ! empty( $search ) )
+	{
+		if( stristr( $content, '<code' ) !== false ||
+		    stristr( $content, '<pre' ) !== false ||
+		    strstr( $content, '`' ) !== false )
+		{	// Call replace_content() on everything outside code/pre, and markdown codeblocks:
+			$content = callback_on_non_matching_blocks( $content,
+				'~(`.*?`|'
+				.'<code[^>]*>.*?</code>|'
+				.'<pre[^>]*>.*?</pre>)~is',
+				$replace_function_callback, array( $search, $replace, $replace_function_type ) );
+		}
+		else
+		{	// No code/pre blocks, replace on the whole thing
+			$content = call_user_func( $replace_function_callback, $content, $search, $replace, $replace_function_type );
+		}
+	}
+
+	return $content;
+}
+
+
+/**
+ * Replace content outside blocks <code></code>, <pre></pre>, markdown codeblocks in `` AND short inline tags like [image:123]
+ *
+ * @param array|string Search list
+ * @param array|string Replace list or Callback function
+ * @param string Source content
+ * @param string Callback function name
+ * @param string Type of callback function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace() (@see replace_content())
+ * @return string Replaced content
+ */
+function replace_content_outcode_shorttags( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
+{
+	if( ! empty( $search ) )
 	{
 		if( stristr( $content, '<code' ) !== false ||
 		    stristr( $content, '<pre' ) !== false ||
 		    strstr( $content, '`' ) !== false ||
 		    preg_match( '/\[[a-z]+:.+?\]/i', $content ) )
-		{ // Call replace_content() on everything outside code/pre, markdown codeblocks and short inline tags:
+		{	// Call replace_content() on everything outside code/pre, markdown codeblocks and short inline tags:
 			$content = callback_on_non_matching_blocks( $content,
 				'~(`.*?`|'
 				.'<code[^>]*>.*?</code>|'
@@ -1025,7 +1059,7 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
 				$replace_function_callback, array( $search, $replace, $replace_function_type ) );
 		}
 		else
-		{ // No code/pre blocks, replace on the whole thing
+		{	// No code/pre blocks, replace on the whole thing
 			$content = call_user_func( $replace_function_callback, $content, $search, $replace, $replace_function_type );
 		}
 	}

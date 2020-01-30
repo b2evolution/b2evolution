@@ -298,7 +298,7 @@ Supported tags by default are: [b] [i] [s] [color=...] [size=...] [font=...] [qu
 				$this->comment_replace_list = $this->prepare_replace_list( $this->get_coll_setting( 'coll_comment_replace_list', $item_Blog ) );
 			}
 
-			$content = replace_content_outcode( $this->comment_search_list, $this->comment_replace_list, $content, array( $this, 'parse_bbcode' ) );
+			$content = replace_content_outcode_shorttags( $this->comment_search_list, $this->comment_replace_list, $content, array( $this, 'parse_bbcode' ) );
 		}
 	}
 

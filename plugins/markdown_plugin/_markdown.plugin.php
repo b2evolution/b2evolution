@@ -242,10 +242,14 @@ class markdown_plugin extends Plugin
 		$ParsedownB2evo->disable_options( $disabled_options );
 
 		// Parse markdown code to HTML
-		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false )
+		if( stristr( $content, '<code' ) !== false ||
+		    stristr( $content, '<pre' ) !== false ||
+		    preg_match( '/\[[a-z]+:.+?\]/i', $content ) )
 		{ // Call replace_content() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
-				'~<(code|pre)[^>]*>.*?</\1>~is',
+				'~(<code[^>]*>.*?</code>|'
+				.'<pre[^>]*>.*?</pre>|'
+				.'\[[a-z]+:[^\]]+\])~is',
 				array( $ParsedownB2evo, 'text' ) );
 		}
 		else

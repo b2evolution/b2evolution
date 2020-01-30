@@ -134,7 +134,7 @@ class twitter_tweet_renderer_plugin extends Plugin
 		$wrapper = '<span class="tweet" data-tweet-id="$2">$0</span>';
 
 		// Wrap Twitter URLs (not within an HTML tag attribute) with marker element:
-		$content = replace_content_outcode( '#<[^>]*".*https?\:\/\/twitter\.com\/(?:\w*)\/status\/(?:\d*)[^>]*">(*SKIP)(*F)|https?\:\/\/twitter\.com\/(\w*)\/status\/(\d*)#is', $wrapper, $content );
+		$content = replace_content_outcode_shorttags( '#<[^>]*".*https?\:\/\/twitter\.com\/(?:\w*)\/status\/(?:\d*)[^>]*">(*SKIP)(*F)|https?\:\/\/twitter\.com\/(\w*)\/status\/(\d*)#is', $wrapper, $content );
 
 		return $content;
 	}

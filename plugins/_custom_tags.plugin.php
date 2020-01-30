@@ -342,7 +342,7 @@ class custom_tags_plugin extends Plugin
 			}
 
 			// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
-			$content = replace_content_outcode( $this->shared_search_list, $this->shared_replace_list, $content, $callback );
+			$content = replace_content_outcode_shorttags( $this->shared_search_list, $this->shared_replace_list, $content, $callback );
 		}
 		else
 		{	// Use settings for collection:
@@ -369,7 +369,7 @@ class custom_tags_plugin extends Plugin
 			}
 
 			// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
-			$content = replace_content_outcode( $this->post_search_list, $this->post_replace_list, $content, $callback );
+			$content = replace_content_outcode_shorttags( $this->post_search_list, $this->post_replace_list, $content, $callback );
 		}
 
 		return true;
@@ -407,7 +407,7 @@ class custom_tags_plugin extends Plugin
 		$callback = array( $this, 'replace_callback' );
 
 		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
-		$content = replace_content_outcode( $this->msg_search_list, $this->msg_replace_list, $content, $callback );
+		$content = replace_content_outcode_shorttags( $this->msg_search_list, $this->msg_replace_list, $content, $callback );
 
 		return true;
 	}
@@ -444,7 +444,7 @@ class custom_tags_plugin extends Plugin
 		$callback = array( $this, 'replace_callback' );
 
 		// Replace content outside of <code></code>, <pre></pre> and markdown codeblocks
-		$content = replace_content_outcode( $this->email_search_list, $this->email_replace_list, $content, $callback );
+		$content = replace_content_outcode_shorttags( $this->email_search_list, $this->email_replace_list, $content, $callback );
 
 		return true;
 	}

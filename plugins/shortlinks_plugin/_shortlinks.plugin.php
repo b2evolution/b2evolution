@@ -232,7 +232,7 @@ class shortlinks_plugin extends Plugin
 				( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
 				( \]\] | \)\) )                    # Lookahead for )) or ]]
 				*ix'; // x = extended (spaces + comments allowed)
-			$content = replace_content_outcode( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
+			$content = replace_content_outcode_shorttags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
 		}
 
 		// -------- RELATIVE BRACKETED URLS -------- :
@@ -246,7 +246,7 @@ class shortlinks_plugin extends Plugin
 				( \s [^\n\r]+? )?                  # Custom link text instead of URL (Optional)
 				( \]\] | \)\) )                    # Lookahead for )) or ]]
 				*ix'; // x = extended (spaces + comments allowed)
-			$content = replace_content_outcode( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
+			$content = replace_content_outcode_shorttags( $search_urls, array( $this, 'callback_replace_bracketed_urls' ), $content, 'replace_content', 'preg_callback' );
 		}
 
 /* QUESTION: fplanque, implementation of this planned? then use make_clickable() - or remove this comment
@@ -334,7 +334,7 @@ class shortlinks_plugin extends Plugin
 			}
 
 			// Replace all found standalone words with links:
-			$content = replace_content_outcode( $search_wikiwords, $replace_links, $content );
+			$content = replace_content_outcode_shorttags( $search_wikiwords, $replace_links, $content );
 		}
 
 		// -------- BRACKETED WIKIWORDS -------- :
@@ -415,7 +415,7 @@ class shortlinks_plugin extends Plugin
 						( \]\] | \)\) )          # Lookahead for )) or ]]
 						*isx'; // s = dot matches newlines, x = extended (spaces + comments allowed)
 
-					$content = replace_content_outcode( $search_wikiword, array( $this, 'callback_replace_bracketed_words' ), $content, 'replace_content', 'preg_callback' );
+					$content = replace_content_outcode_shorttags( $search_wikiword, array( $this, 'callback_replace_bracketed_words' ), $content, 'replace_content', 'preg_callback' );
 				}
 			}
 		}
@@ -1016,7 +1016,7 @@ class shortlinks_plugin extends Plugin
 	{
 		if( ! empty( $this->link_types['abs_url_optimize'] ) )
 		{	// Optimize absolute URLs:
-			$content = replace_content_outcode( '*
+			$content = replace_content_outcode_shorttags( '*
 					( \[\[ | \(\( ) # Lookbehind for (( or [[
 					( ( (https?://|//).+/ ) ( [^/][^<>{}\s\]\)]+ ) ) # URL
 					( \s.+ )?       # Additional attributes like style classes, link target, custon link text (Optional)
@@ -1027,7 +1027,7 @@ class shortlinks_plugin extends Plugin
 
 		if( ! empty( $this->link_types['rel_url_optimize'] ) )
 		{	// Optimize relative URLs:
-			$content = replace_content_outcode( '*
+			$content = replace_content_outcode_shorttags( '*
 					( \[\[ | \(\( ) # Lookbehind for (( or [[
 					( ( /(.+/)? ) ( [^/][^<>{}\s\]\)]+ ) ) # URL
 					( \s.+ )?       # Additional attributes like style classes, link target, custon link text (Optional)
