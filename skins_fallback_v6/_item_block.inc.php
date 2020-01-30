@@ -224,6 +224,16 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 		) );
 		// ----------------------------- END OF "Item Page" CONTAINER -----------------------------
 	}
+	elseif( $Item->is_intro() )
+	{	// Display item content only for intro items because for normal items we display content by widget in container "Item in List" above:
+	// this will create a <section>
+		// ---------------------- POST CONTENT INCLUDED HERE ----------------------	
+		skin_include( '_item_content.inc.php', $params );	
+		// Note: You can customize the default item content by copying the generic	
+		// /skins/_item_content.inc.php file into the current skin folder.	
+		// -------------------------- END OF POST CONTENT -------------------------	
+	// this will end a </section>
+	}
 	?>
 
 	<?php
