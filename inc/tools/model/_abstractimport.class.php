@@ -272,5 +272,64 @@ class AbstractImport
 		// Put a message into the log file on the disk:
 		fwrite( $this->log_file_handle, $message."\r\n" );
 	}
+
+
+	/**
+	 * Check restriction by file manifest.yaml
+	 *
+	 * @param string Folder path where we should find the manifest file
+	 * @param boolean TRUE when no restrictions to import, FALSE at least one restriction is detected, so import must be stopped
+	 */
+	function check_manifest( $path )
+	{
+		$manifest_path = rtrim( $path. '/' ).'/manifest.yaml';
+
+		if( file_exists( $manifest_path ) )
+		{	// Manifest file is detected:
+			$manifest_content = file_get_contents( $manifest_path );
+
+			// Load Spyc library to parse YAML data:
+			load_funcs( '_ext/spyc/Spyc.php' );
+
+			$manifest = spyc_load( $manifest_content );
+
+			if( empty( $manifest ) || ! is_array( $manifest ) )
+			{	// Wrong or empty manifest, Don't restrict import:
+				return true;
+			}
+
+			foreach( $manifest as $manifest_rule => $manifest_value )
+			{
+				$log_prefix = 'Manifest: <code>'.$manifest_rule.': '.$manifest_value.'</code>: ';
+				switch( $manifest_rule )
+				{
+					case 'collection-name':
+						// Check collection name:
+						if( ( $import_Blog = & $this->get_Blog() ) &&
+						    $import_Blog->get( 'name' ) != $manifest_value )
+						{	// Stop import:
+							$this->log( $log_prefix.'NOT OK as destination collection name is <code>'.$import_Blog->get( 'name' ).'</code>: STOPPING IMPORT.', 'error' );
+							return false;
+						}
+						$this->log( $log_prefix.'OK', 'success' );
+						break;
+
+					case 'collection-locale':
+						// Check collection locale:
+						if( ( $import_Blog = & $this->get_Blog() ) &&
+						    $import_Blog->get( 'locale' ) != $manifest_value )
+						{	// Stop import:
+							$this->log( $log_prefix.'NOT OK as destination collection locale is <code>'.$import_Blog->get( 'locale' ).'</code>: STOPPING IMPORT.', 'error' );
+							return false;
+						}
+						$this->log( $log_prefix.'OK', 'success' );
+						break;
+				}
+			}
+		}
+
+		// Allow import because no restriction was found in manifest file:
+		return true;
+	}
 }
 ?>
