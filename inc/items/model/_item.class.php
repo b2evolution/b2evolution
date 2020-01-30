@@ -1957,7 +1957,6 @@ class Item extends ItemLight
 		{	// Normal mode for existing Item in DB:
 			$links_SQL->WHERE( 'link_itm_ID = '.$DB->quote( $this->ID ) );
 		}
-		$links_SQL->WHERE_and( 'link_position = "inline"' );
 		$inline_links_IDs = $DB->get_col( $links_SQL );
 
 		$unused_inline_images = array();

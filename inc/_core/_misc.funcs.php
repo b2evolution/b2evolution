@@ -8691,7 +8691,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				// Wrong source object type:
 				return false;
 		}
-		$LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], 'inline' );
+		$LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'] );
 	}
 
 	if( empty( $LinkList ) )
