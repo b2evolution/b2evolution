@@ -11977,12 +11977,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	//if( upg_task_start( 15720, 'Installing new widgets/containers...' ) )
+	if( upg_task_start( 15720, 'Installing new widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
 		install_new_default_widgets( 'item_in_list', 'item_content,item_footer' );
 		install_new_default_widgets( 'item_single', 'item_footer' );
 		install_new_default_widgets( 'item_page', 'item_footer' );
-		//upg_task_end();
+		upg_task_end();
 	}
 
 	/*
