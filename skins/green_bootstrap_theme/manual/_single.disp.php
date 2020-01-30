@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_manual
@@ -25,26 +25,6 @@ display_if_empty();
 if( $Item = & mainlist_get_item() )
 { // For each blog post, do everything below up to the closing curly brace "}"
 	echo '<div class="evo_content_block">'; // Beginning of posts display
-
-	if( empty( $cat ) )
-	{ // Set a category as main of current Item
-		$cat = $Item->main_cat_ID;
-
-		// Display the breadcrumbs only when global $cat is empty before line above
-		// Otherwise it is already displayed in header file
-		skin_widget( array(
-				// CODE for the widget:
-				'widget' => 'breadcrumb_path',
-				// Optional display params
-				'block_start'           => '<ol class="breadcrumb">',
-				'block_end'             => '</ol>',
-				'separator'             => '',
-				'item_mask'             => '<li><a href="$url$">$title$</a></li>',
-				'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
-				'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
-				'item_active_mask'      => '<li class="active">$title$</li>',
-			) );
-	}
 
 	if( $Skin->get_setting( 'page_navigation' ) )
 	{	// Display navigation between posts in the same category:

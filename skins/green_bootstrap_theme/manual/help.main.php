@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_manual_skin
@@ -45,44 +45,44 @@ siteskin_include( '_site_body_header.inc.php' );
 
 <header id="header" class="row<?php echo $Settings->get( 'site_skins_enabled' ) ? ' site_skins' : ''; ?>">
 
-		<?php
-		if( $Skin->show_container_when_access_denied( 'page_top' ) )
-		{	// Display 'Page Top' widget container:
-			// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
-			// Display container and contents:
-			widget_container( 'page_top', array(
-					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => true, // Display container anyway even if no widget
-					'container_start'     => '<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
-					'container_end'       => '</div></div>',
-					'block_start'         => '<div class="evo_widget $wi_class$">',
-					'block_end'           => '</div>',
-					'block_display_title' => false,
-					'list_start'          => '<ul>',
-					'list_end'            => '</ul>',
-					'item_start'          => '<li>',
-					'item_end'            => '</li>',
-				) );
-			// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
-		} ?>
+	<?php
+	if( $Skin->show_container_when_access_denied( 'page_top' ) )
+	{	// Display 'Page Top' widget container:
+		// ------------------------- "Page Top" CONTAINER EMBEDDED HERE --------------------------
+		// Display container and contents:
+		widget_container( 'page_top', array(
+				// The following params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => true, // Display container anyway even if no widget
+				'container_start'     => '<div class="col-xs-12 col-sm-12 col-md-4 col-md-push-8"><div class="evo_container $wico_class$">',
+				'container_end'       => '</div></div>',
+				'block_start'         => '<div class="evo_widget $wi_class$">',
+				'block_end'           => '</div>',
+				'block_display_title' => false,
+				'list_start'          => '<ul>',
+				'list_end'            => '</ul>',
+				'item_start'          => '<li>',
+				'item_end'            => '</li>',
+			) );
+		// ----------------------------- END OF "Page Top" CONTAINER -----------------------------
+	} ?>
 
-		<?php
-		if( $Skin->show_container_when_access_denied( 'header' ) )
-		{	// Display 'Header' widget container:
-			// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
-			// Display container and contents:
-			widget_container( 'header', array(
-					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => true, // Display container anyway even if no widget
-					'container_start'   => '<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
-					'container_end'     => '</div></div>',
-					'block_start'       => '<div class="evo_widget $wi_class$">',
-					'block_end'         => '</div>',
-					'block_title_start' => '<h1>',
-					'block_title_end'   => '</h1>',
-				) );
-			// ----------------------------- END OF "Header" CONTAINER -----------------------------
-		} ?>
+	<?php
+	if( $Skin->show_container_when_access_denied( 'header' ) )
+	{	// Display 'Header' widget container:
+		// ------------------------- "Header" CONTAINER EMBEDDED HERE --------------------------
+		// Display container and contents:
+		widget_container( 'header', array(
+				// The following params will be used as defaults for widgets included in this container:
+				'container_display_if_empty' => true, // Display container anyway even if no widget
+				'container_start'   => '<div class="col-xs-12 col-sm-12 col-md-8 col-md-pull-4"><div class="evo_container $wico_class$">',
+				'container_end'     => '</div></div>',
+				'block_start'       => '<div class="evo_widget $wi_class$">',
+				'block_end'         => '</div>',
+				'block_title_start' => '<h1>',
+				'block_title_end'   => '</h1>',
+			) );
+		// ----------------------------- END OF "Header" CONTAINER -----------------------------
+	} ?>
 
 </header><!-- .row -->
 
@@ -90,33 +90,33 @@ siteskin_include( '_site_body_header.inc.php' );
 if( $Skin->show_container_when_access_denied( 'menu' ) )
 {	// Display 'Menu' widget container:
 
-			// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
-			// Display container and contents:
-			// Note: this container is designed to be a single <ul> list
-			widget_container( 'menu', array(
-					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => false, // If no widget, don't display container at all
-					'container_start'     => '<nav class="row"><div class="col-md-12"><ul class="nav nav-tabs evo_container $wico_class$">',
-					'container_end'       => '</ul></div></nav>',
-					'block_start'         => '',
-					'block_end'           => '',
-					'block_display_title' => false,
-					'list_start'          => '',
-					'list_end'            => '',
-					'item_start'          => '<li class="evo_widget $wi_class$">',
-					'item_end'            => '</li>',
-					'item_selected_start' => '<li class="active evo_widget $wi_class$">',
-					'item_selected_end'   => '</li>',
-					'item_title_before'   => '',
-					'item_title_after'    => '',
-				) );
-			// ----------------------------- END OF "Menu" CONTAINER -----------------------------
+	// ------------------------- "Menu" CONTAINER EMBEDDED HERE --------------------------
+	// Display container and contents:
+	// Note: this container is designed to be a single <ul> list
+	widget_container( 'menu', array(
+			// The following params will be used as defaults for widgets included in this container:
+			'container_display_if_empty' => false, // If no widget, don't display container at all
+			'container_start'     => '<nav class="row"><div class="col-md-12"><ul class="nav nav-tabs evo_container $wico_class$">',
+			'container_end'       => '</ul></div></nav>',
+			'block_start'         => '',
+			'block_end'           => '',
+			'block_display_title' => false,
+			'list_start'          => '',
+			'list_end'            => '',
+			'item_start'          => '<li class="evo_widget $wi_class$">',
+			'item_end'            => '</li>',
+			'item_selected_start' => '<li class="active evo_widget $wi_class$">',
+			'item_selected_end'   => '</li>',
+			'item_title_before'   => '',
+			'item_title_after'    => '',
+		) );
+	// ----------------------------- END OF "Menu" CONTAINER -----------------------------
 
 } ?>
 
 <div class="row">
 
-	<div class="<?php echo $Skin->is_left_navigation_visible() ? 'col-xs-12 col-md-9 pull-right-md' : 'col-md-12' ?>">
+	<div class="<?php echo $Skin->is_side_navigation_visible() ? 'col-xs-12 col-md-9 pull-right-md' : 'col-md-12' ?>">
 
 		<main><!-- This is were a link like "Jump to main content" would land -->
 
@@ -130,7 +130,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 						'block_end'   => '</div>',
 					) );
 				// --------------------------------- END OF MESSAGES ---------------------------------
-			}	
+			}
 
 			if( ! empty( $cat ) )
 			{ // Display breadcrumbs if some category is selected
@@ -149,18 +149,6 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 			}
 		?>
 
-		<?php
-			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
-			request_title( array(
-					'title_before'      => '<h1 class="page_title">',
-					'title_after'       => '</h1>',
-					'title_single_disp' => false,
-					'title_page_disp'   => false,
-					'format'            => 'htmlbody',
-				) );
-			// ----------------------------- END OF REQUEST TITLE ----------------------------
-?>
-
 
 <?php
 // -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
@@ -176,7 +164,7 @@ skin_include( '$disp$' );
 	</div><!-- .col -->
 
 	<?php
-	if( $Skin->is_left_navigation_visible() )
+	if( $Skin->is_side_navigation_visible() )
 	{ // Display a left column with navigation only for several pages
 	?>
 		<!-- =================================== START OF SIDEBAR =================================== -->
@@ -216,7 +204,7 @@ skin_include( '$disp$' );
 							'item_before_opened'   => get_icon( 'collapse' ),
 							'item_before_closed'   => get_icon( 'expand' ),
 							'item_before_post'     => get_icon( 'file_message' ),
-							'expand_all'           => false,
+							'item_title_fields'    => 'short_title,title',
 							'sorted'               => true
 						) );
 					// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
@@ -254,7 +242,7 @@ skin_include( '$disp$' );
 							'item_before_opened'   => get_icon( 'collapse' ),
 							'item_before_closed'   => get_icon( 'expand' ),
 							'item_before_post'     => get_icon( 'file_message' ),
-							'expand_all'           => false,
+							'item_title_fields'    => 'short_title,title',
 							'sorted'               => true
 						) );
 					// ----------------------------- END OF "Sidebar" CONTAINER -----------------------------
@@ -338,7 +326,7 @@ skin_include( '$disp$' );
 		</p>
 
 	</div><!-- .col -->
-	
+
 </footer><!-- .row -->
 
 

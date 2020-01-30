@@ -8,7 +8,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -63,7 +63,10 @@ $params = array_merge( array(
 		'after_image'              => '</figure>',
 		'after_images'             => '</div>',
 		'image_class'              => 'img-responsive',
-		'image_size'               => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
+		'image_size'               => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ), // Standard size (for old browsers)
+		// 'image_sizes'					=> '430px: 400px, 670px: 640px, sm: 720px, md: 698px, 848px', // simplified sizes= attribute for browser to select correct size from srcset=
+		'image_sizes'					=> '(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px',
+													// Note: first we handle margins 15+640+15 = 670 in the fluid domain, then we work with bootstrap breakpoints
 		'image_limit'              =>  1000,
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
 		'excerpt_image_class'      => '',
@@ -85,7 +88,7 @@ $params = array_merge( array(
 		'gallery_colls'            => 5,
 		'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 
-		'before_url_link'          => '<p class="evo_post_link">'.T_('Link:').' ',
+		'before_url_link'          => '<p class="evo_post_link">'.T_('Link').': ',
 		'after_url_link'           => '</p>',
 		'url_link_text_template'   => '$url$', // If evaluates to empty, nothing will be displayed (except player if podcast)
 		'url_link_url_template'    => '$url$', // $url$ will be replaced with saved URL address
@@ -97,7 +100,7 @@ $params = array_merge( array(
 		'more_link_to'             => 'single#anchor', // Can be 'single' or 'single#anchor' which is permalink + "#more55" where 55 is item ID
 		'anchor_text'              => '<p class="evo_post_more_anchor">...</p>', // Text to display as the more anchor (once the more link has been clicked, '#' defaults to "Follow up:")
 
-		'page_links_start'         => '<p class="evo_post_pagination">'.T_('Pages:').' ',
+		'page_links_start'         => '<p class="evo_post_pagination">'.T_('Pages').': ',
 		'page_links_end'           => '</p>',
 		'page_links_separator'     => '&middot; ',
 		'page_links_single'        => '',
@@ -125,7 +128,10 @@ if( $content_mode == 'auto' )
 	switch( $disp_detail )
 	{
 		case 'posts-cat':
-		case 'posts-subcat':
+		case 'posts-topcat-intro':
+		case 'posts-topcat-nointro':
+		case 'posts-subcat-intro':
+		case 'posts-subcat-nointro':
 			$content_mode = $Blog->get_setting('chapter_content');
 			break;
 
@@ -137,11 +143,6 @@ if( $content_mode == 'auto' )
 			$content_mode = $Blog->get_setting('archive_content');
 			break;
 
-		case 'posts-filtered':
-		case 'search':
-			$content_mode = $Blog->get_setting('filtered_content');
-			break;
-
 		case 'single':
 		case 'page':
 			$content_mode = 'full';
@@ -149,8 +150,11 @@ if( $content_mode == 'auto' )
 
 		case 'posts-default':  // home page 1
 		case 'posts-next':     // next page 2, 3, etc
-		default:
 			$content_mode = $Blog->get_setting('main_content');
+			break;
+
+		default: // posts-filtered, search, flagged and etc.
+			$content_mode = $Blog->get_setting('filtered_content');
 	}
 }
 
@@ -233,6 +237,7 @@ switch( $content_mode )
 					'after'               => $params['after_images'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
@@ -257,16 +262,6 @@ switch( $content_mode )
 
 			echo $params['content_start_full_text'];
 
-			// URL link, if the post has one:
-			$Item->url_link( array(
-					'before'        => $params['before_url_link'],
-					'after'         => $params['after_url_link'],
-					'text_template' => $params['url_link_text_template'],
-					'url_template'  => $params['url_link_url_template'],
-					'target'        => $params['url_link_target'],
-					'podcast'       => '#', // Auto display mp3 player if post type is podcast (=> false, to disable)
-				) );
-
 			// Display CONTENT (at least the TEASER part):
 			$Item->content_teaser( array(
 					'content_block_start'         => $params['content_block_start'],
@@ -283,8 +278,21 @@ switch( $content_mode )
 					'after_image'         => $params['after_image'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
+					'before_gallery'      => $params['before_gallery'],
+					'after_gallery'       => $params['after_gallery'],
+					'gallery_table_start' => $params['gallery_table_start'],
+					'gallery_table_end'   => $params['gallery_table_end'],
+					'gallery_row_start'   => $params['gallery_row_start'],
+					'gallery_row_end'     => $params['gallery_row_end'],
+					'gallery_cell_start'  => $params['gallery_cell_start'],
+					'gallery_cell_end'    => $params['gallery_cell_end'],
+					'gallery_image_size'  => $params['gallery_image_size'],
+					'gallery_image_limit' => $params['gallery_image_limit'],
+					'gallery_colls'       => $params['gallery_colls'],
+					'gallery_order'       => $params['gallery_order'],
 				) );
 
 			// Display either the "Read more"/"Full story" link OR the #anchor for #direct linking to the "after more" part:
@@ -308,6 +316,7 @@ switch( $content_mode )
 						'after'               => $params['after_images'],
 						'image_class'         => $params['image_class'],
 						'image_size'          => $params['image_size'],
+						'image_sizes'         => $params['image_sizes'],
 						'limit'               => $params['image_limit'],
 						'image_link_to'       => $params['image_link_to'],
 						'before_gallery'      => $params['before_gallery'],
@@ -343,6 +352,7 @@ switch( $content_mode )
 					'after_image'         => $params['after_image'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
 					'force_more'          => $params['force_more'],
