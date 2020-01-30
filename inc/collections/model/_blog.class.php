@@ -1663,8 +1663,8 @@ class Blog extends DataObject
 				}
 			}
 
-			if( is_pro() )
-			{	// Only PRO version:
+			if( is_pro() && in_array( 'urls', $groups ) )
+			{	// Only PRO version and on update from tab "URLs":
 
 				// Tag source:
 				$this->set_setting( 'tinyurl_tag_source_enabled', param( 'tinyurl_tag_source_enabled', 'integer', 0 ) );
