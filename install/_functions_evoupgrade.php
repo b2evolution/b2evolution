@@ -11991,6 +11991,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15740, 'Upgrading renderers columns...' ) )
+	{	// part of 7.0.0-alpha
+		db_modify_col( 'T_email__campaign', 'ecmp_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_items__item', 'post_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_comments', 'comment_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_items__prerendering', 'itpr_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_comments__prerendering', 'cmpr_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_messaging__message', 'msg_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_messaging__prerendering', 'mspr_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

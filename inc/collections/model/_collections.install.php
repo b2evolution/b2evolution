@@ -201,7 +201,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			post_notifications_flags    SET('moderators_notified','members_notified','community_notified','pings_sent') COLLATE ascii_general_ci NOT NULL DEFAULT '',
 			post_wordcount              int(11) default NULL,
 			post_comment_status         ENUM('disabled', 'open', 'closed') COLLATE ascii_general_ci NOT NULL DEFAULT 'open',
-			post_renderers              VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			post_renderers              VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			post_priority               int(11) unsigned null COMMENT 'Task priority in workflow',
 			post_featured               tinyint(1) NOT NULL DEFAULT 0,
 			post_ctry_ID                INT(10) UNSIGNED NULL,
@@ -249,7 +249,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			comment_date               TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			comment_last_touched_ts    TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			comment_content            text COLLATE utf8mb4_unicode_ci NOT NULL,
-			comment_renderers          VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			comment_renderers          VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			comment_rating             TINYINT(1) NULL DEFAULT NULL,
 			comment_featured           TINYINT(1) NOT NULL DEFAULT 0,
 			comment_author_url_nofollow  TINYINT(1) NOT NULL DEFAULT 1,
@@ -292,7 +292,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_items__prerendering(
 			itpr_itm_ID                   INT(10) UNSIGNED NOT NULL,
 			itpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
-			itpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			itpr_renderers                VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			itpr_content_prerendered      MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
 			itpr_datemodified             TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY (itpr_itm_ID, itpr_format)
@@ -303,7 +303,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_comments__prerendering(
 			cmpr_cmt_ID                   INT(10) UNSIGNED NOT NULL,
 			cmpr_format                   ENUM('htmlbody','entityencoded','xml','text') COLLATE ascii_general_ci NOT NULL,
-			cmpr_renderers                VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			cmpr_renderers                VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			cmpr_content_prerendered      MEDIUMTEXT COLLATE utf8mb4_unicode_ci NULL,
 			cmpr_datemodified             TIMESTAMP NOT NULL DEFAULT '2000-01-01 00:00:00',
 			PRIMARY KEY (cmpr_cmt_ID, cmpr_format)
