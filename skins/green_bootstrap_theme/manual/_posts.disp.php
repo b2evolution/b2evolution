@@ -137,18 +137,6 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 		) );
 	// ----------------------------- END OF "Chapter Main Area" CONTAINER -----------------------------
 
-	$callbacks = array(
-		'line'  => 'cat_inskin_display',
-		'posts' => 'item_inskin_display'
-	);
-
-	// Display subcategories and posts
-	echo '<ul class="chapters_list posts_list">';
-
-	$ChapterCache->iterate_through_category_children( $curr_Chapter, $callbacks, false, array( 'sorted' => true ) );
-
-	echo '</ul>';
-
 	// Button to create a new sub-chapter
 	$create_new_chapter_url = $Blog->get_create_chapter_url( $cat );
 	// Button to create a new page

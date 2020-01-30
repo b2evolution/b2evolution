@@ -11985,6 +11985,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15730, 'Installing new widgets/containers...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'chapter_main_area', 'cat_content_list' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

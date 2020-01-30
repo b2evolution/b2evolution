@@ -353,6 +353,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 10, 'breadcrumb_path', 'params' => array( 'separator' => '' ) ),
 		array( 20, 'coll_featured_intro' ),
 		array( 30, 'cat_title', 'params' => array( 'blog_ID' => '-', 'display_when' => 'no_intro' ) ),
+		array( 40, 'cat_content_list' ),
 	);
 
 	/* 404 Page */

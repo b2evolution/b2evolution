@@ -5577,31 +5577,6 @@ function items_list_block_by_page( $params = array() )
 
 
 /**
- * In-skin display of an Item.
- * It is a wrapper around the skin '_item_list.inc.php' file.
- *
- * @param object Item
- */
-function item_inskin_display( $Item )
-{
-	global $cat;
-	$params = array( 'Item' => $Item );
-
-	if( isset( $cat ) && ( $cat != $Item->main_cat_ID ) )
-	{
-		$params = array_merge( array(
-				'before_title'   => '<h3>',
-				'after_title'    => '</h3>',
-				'before_content' => '<div class="excerpt">',
-				'after_content'  => '</div>'
-			), $params );
-	}
-
-	skin_include( '_item_list.inc.php', $params );
-}
-
-
-/**
  * Load user data (post/comment) read statuses for current user for a list of post IDs.
  *
  * @param array Load only for posts with these ids

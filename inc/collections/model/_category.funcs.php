@@ -428,19 +428,4 @@ function get_allow_cross_posting()
 	global $Settings;
 	return $Settings->get( 'cross_posting' ) + ( 2 *  $Settings->get( 'cross_posting_blogs' ) );
 }
-
-
-/**
- * In-skin display of a Chapter.
- * It is a wrapper around the skin '_cat_list.inc.php' file.
- *
- * @param Object Chapter
- */
-function cat_inskin_display( $Chapter )
-{
-	skin_include( '_cat_list.inc.php', array(
-					'Chapter' => $Chapter,
-				) );
-}
-
 ?>

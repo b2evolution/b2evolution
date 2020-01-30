@@ -109,6 +109,7 @@ $core_componentwidget_defs = array(
 			'coll_search_form',             // Search Form
 			'site_logo',                    // Site logo
 			'cat_title',                    // Category Title
+			'cat_content_list',             // Category Content List
 			'coll_current_filters',         // Current Item filters
 			'coll_current_comment_filters', // Current Comment filters
 			'coll_item_list_pages',         // List Pager
