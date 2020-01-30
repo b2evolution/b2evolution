@@ -282,7 +282,7 @@ class AbstractImport
 	 */
 	function check_manifest( $path )
 	{
-		$manifest_path = rtrim( $path. '/' ).'/manifest.yaml';
+		$manifest_path = rtrim( $path, '/' ).'/manifest.yaml';
 
 		if( file_exists( $manifest_path ) )
 		{	// Manifest file is detected:
@@ -303,12 +303,12 @@ class AbstractImport
 				$log_prefix = 'Manifest: <code>'.$manifest_rule.': '.$manifest_value.'</code>: ';
 				switch( $manifest_rule )
 				{
-					case 'collection-name':
-						// Check collection name:
+					case 'collection-urlname':
+						// Check collection urlname:
 						if( ( $import_Blog = & $this->get_Blog() ) &&
-						    $import_Blog->get( 'name' ) != $manifest_value )
+						    $import_Blog->get( 'urlname' ) != $manifest_value )
 						{	// Stop import:
-							$this->log( $log_prefix.'NOT OK as destination collection name is <code>'.$import_Blog->get( 'name' ).'</code>: STOPPING IMPORT.', 'error' );
+							$this->log( $log_prefix.'NOT OK as destination collection URL name is <code>'.$import_Blog->get( 'urlname' ).'</code>: STOPPING IMPORT.', 'error' );
 							return false;
 						}
 						$this->log( $log_prefix.'OK', 'success' );
@@ -326,6 +326,10 @@ class AbstractImport
 						break;
 				}
 			}
+		}
+		else
+		{	// Display warning when no manifest bu don't stop import:
+			$this->log( 'No <code>manifest.yaml</code> file was found in <code>'.$manifest_path.'</code>', 'warning' );
 		}
 
 		// Allow import because no restriction was found in manifest file:
