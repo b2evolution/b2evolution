@@ -1436,7 +1436,7 @@ class _core_Module extends Module
 							$entries['page']['entries']['edit_back'] = array(
 									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
 									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
-									'shortcut' => 'ctrl+f2',
+									'shortcut' => $Blog->get_setting( 'in_skin_editing' ) ? 'ctrl+f2' : 'f2,ctrl+f2',
 								);
 						}
 						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
@@ -1465,6 +1465,54 @@ class _core_Module extends Module
 					if( isset( $entries['page'] ) )
 					{	// Set a title when at least one menu item is allowed for current User:
 						$entries['page']['text'] = T_('Page');
+					}
+				}
+				elseif( ! is_admin_page() &&
+				    ( $disp == 'posts' ) &&
+				    $perm_admin_restricted &&
+					$featured_intro_Item = & get_featured_Item( 'posts', NULL, true, true, true ) &&
+					( $featured_intro_Item->is_intro() || ( $Blog->get_setting( 'disp_featured_above_list' ) && $featured_intro_Item->is_featured() ) ) )
+				{
+					if( $Blog->get_setting( 'in_skin_editing' ) &&
+					    $edit_item_url = $featured_intro_Item->get_edit_url() )
+					{	// Display menu entry to edit the post in front-office:
+						$entries['page']['entries']['edit_front'] = array(
+								'text' => sprintf( T_('Edit "%s" in Front-Office'), $featured_intro_Item->get_type_setting( 'name' ) ).'&hellip;',
+								'href' => $edit_item_url,
+								'shortcut' => 'f2',
+							);
+					}
+					if( $featured_intro_Item->ID > 0 )
+					{	// Display menu entries to edit and view the post in back-office:
+						if( $perm_admin_restricted && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $featured_intro_Item ) )
+						{	// Menu item to edit post in back-office:
+							$entries['page']['entries']['edit_back'] = array(
+									'text' => sprintf( T_('Edit "%s" in Back-Office'), $featured_intro_Item->get_type_setting( 'name' ) ).'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$featured_intro_Item->ID.'&amp;blog='.$Blog->ID,
+									'shortcut' => $Blog->get_setting( 'in_skin_editing' ) ? 'ctrl+f2' : 'f2,ctrl+f2',
+								);
+						}
+						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
+						{	// Menu item to view post in back-office:
+							$entries['page']['entries']['view_back'] = array(
+									'text' => T_('View in Back-Office').'&hellip;',
+									'href' => $admin_url.'?ctrl=items&amp;p='.$featured_intro_Item->ID.'&amp;blog='.$Blog->ID,
+								);
+						}
+						if( $perm_admin_restricted && ( $item_history_url = $featured_intro_Item->get_history_url() ) )
+						{
+							$entries['page']['entries']['view_history'] = array(
+								'text' => T_('View Change History').'&hellip;',
+								'href' => $item_history_url,
+							);
+						}
+						if( $disp != 'proposechange' && ( $propose_change_item_url = $featured_intro_Item->get_propose_change_url() ) )
+						{	// If current User has a permission to propose a change for the Item:
+							$entries['page']['entries']['propose'] = array(
+									'text' => T_('Propose change').'&hellip;',
+									'href' => $propose_change_item_url,
+								);
+						}
 					}
 				}
 				if( isset( $entries['post'] ) && $write_item_url = $Blog->get_write_item_url() )
