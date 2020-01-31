@@ -19,13 +19,13 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 class nofollow_plugin extends Plugin
 {
 	var $code = 'evo_nofollow';
-	var $name = 'Nofollow UGC Sponsored';
+	var $name = 'Tag external links';
 	var $priority = 99;
 	var $version = '7.1.0';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
-	var $help_topic = 'nofollow-plugin';
+	var $help_topic = 'tag-external-links-plugin';
 	var $number_of_installs = 1;
 
 
@@ -34,7 +34,7 @@ class nofollow_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = sprintf( T_('Add options %s into attribute %s for absolute links'), '<code>nofollow</code>, <code>ugc</code>, <code>sponsored</code>', '<code>rel</code>' );
+		$this->short_desc = sprintf( T_('Add options %s for absolute links'), '<code>rel="nofollow"</code>, <code>rel="ugc"</code>, <code>rel="sponsored"</code>, <code>target="_blank"</code>' );
 		$this->long_desc = $this->short_desc;
 	}
 
@@ -51,9 +51,11 @@ class nofollow_plugin extends Plugin
 				'abs_links_posts_nofollow'     => 0,
 				'abs_links_posts_ugc'          => 0,
 				'abs_links_posts_sponsored'    => 0,
+				'abs_links_posts_blank'        => 0,
 				'abs_links_comments_nofollow'  => 1,
 				'abs_links_comments_ugc'       => 1,
 				'abs_links_comments_sponsored' => 0,
+				'abs_links_comments_blank'     => 0,
 			);
 
 		if( ! empty( $params['blog_type'] ) )
@@ -78,18 +80,20 @@ class nofollow_plugin extends Plugin
 						'label' => T_('For absolute links in posts'),
 						'type' => 'checklist',
 						'options' => array(
-							array( 'nofollow', sprintf( $this->T_('Add rel %s'), '<code>nofollow</code>' ), $default_values['abs_links_posts_nofollow'] ),
-							array( 'ugc', sprintf( $this->T_('Add rel %s'), '<code>ugc</code>' ), $default_values['abs_links_posts_ugc'] ),
-							array( 'sponsored', sprintf( $this->T_('Add rel %s'), '<code>sponsored</code>' ), $default_values['abs_links_posts_sponsored'] ),
+							array( 'nofollow', sprintf( $this->T_('Add %s'), '<code>rel="nofollow"</code>' ), $default_values['abs_links_posts_nofollow'] ),
+							array( 'ugc', sprintf( $this->T_('Add %s'), '<code>rel="ugc"</code>' ), $default_values['abs_links_posts_ugc'] ),
+							array( 'sponsored', sprintf( $this->T_('Add %s'), '<code>rel="sponsored"</code>' ), $default_values['abs_links_posts_sponsored'] ),
+							array( 'blank', sprintf( $this->T_('Add %s'), '<code>target="_blank"</code>' ), $default_values['abs_links_posts_blank'] ),
 						)
 					),
 				'abs_links_comments' => array(
 						'label' => T_('For absolute links in comments'),
 						'type' => 'checklist',
 						'options' => array(
-							array( 'nofollow', sprintf( $this->T_('Add rel %s'), '<code>nofollow</code>' ), $default_values['abs_links_comments_nofollow'] ),
-							array( 'ugc', sprintf( $this->T_('Add rel %s'), '<code>ugc</code>' ), $default_values['abs_links_comments_ugc'] ),
-							array( 'sponsored', sprintf( $this->T_('Add rel %s'), '<code>sponsored</code>' ), $default_values['abs_links_comments_sponsored'] ),
+							array( 'nofollow', sprintf( $this->T_('Add %s'), '<code>rel="nofollow"</code>' ), $default_values['abs_links_comments_nofollow'] ),
+							array( 'ugc', sprintf( $this->T_('Add %s'), '<code>rel="ugc"</code>' ), $default_values['abs_links_comments_ugc'] ),
+							array( 'sponsored', sprintf( $this->T_('Add %s'), '<code>rel="sponsored"</code>' ), $default_values['abs_links_comments_sponsored'] ),
+								array( 'blank', sprintf( $this->T_('Add %s'), '<code>target="_blank"</code>' ), $default_values['abs_links_comments_blank'] ),
 						)
 					),
 			)
@@ -165,8 +169,13 @@ class nofollow_plugin extends Plugin
 		{
 			$this->setting_rel_options[] = 'sponsored';
 		}
+		$this->setting_target_options = array();
+		if( $this->get_checklist_setting( $setting_name, 'blank', 'coll', $current_Blog ) )
+		{
+			$this->setting_target_options[] = 'blank';
+		}
 
-		if( ! empty( $this->setting_rel_options ) )
+		if( ! empty( $this->setting_rel_options ) || ! empty( $this->setting_target_options ) )
 		{	// Try to find links only of at least one rel option should be added:
 			$content = replace_content_outcode( '#<a([^>]+href="https?://[^"]+"[^>]*)>(.+?)</a>#i', array( $this, 'callback_render_content' ), $content, 'replace_content_callback' );
 		}
@@ -210,32 +219,64 @@ class nofollow_plugin extends Plugin
 	{
 		$link_attrs = $link_match[1];
 
-		if( preg_match( '# rel="([^"]+)"#i', $link_attrs, $rel_match ) )
-		{	// If link already has attrbiute "rel":
-			$rel_options = explode( ' ', $rel_match[1] );
-			$rel_options_exist = true;
-		}
-		else
-		{	// If link has no attrbiute "rel" yet:
-			$rel_options = array();
-			$rel_options_exist = false;
-		}
+		if( ! empty( $this->setting_rel_options ) )
+		{	// Add attribute "rel":
+			if( preg_match( '# rel="([^"]*)"#i', $link_attrs, $rel_match ) )
+			{	// If link already has attrbiute "rel":
+				$rel_options = trim( $rel_match[1] );
+				$rel_options = ( $rel_options === '' ? array() : explode( ' ', trim( $rel_match[1] ) ) );
+				$rel_options_exist = true;
+			}
+			else
+			{	// If link has no attrbiute "rel" yet:
+				$rel_options = array();
+				$rel_options_exist = false;
+			}
 
-		foreach( $this->setting_rel_options as $setting_rel_option )
-		{
-			if( ! in_array( $setting_rel_option, $rel_options ) )
-			{	// Add only new option to avoid duplicates:
-				$rel_options[] = $setting_rel_option;
+			foreach( $this->setting_rel_options as $setting_rel_option )
+			{
+				if( ! in_array( $setting_rel_option, $rel_options ) )
+				{	// Add only new option to avoid duplicates:
+					$rel_options[] = $setting_rel_option;
+				}
+			}
+
+			if( $rel_options_exist )
+			{	// Update attribute "rel" with added options:
+				$link_attrs = preg_replace( '# rel="([^"]*)"#i', ' rel="'.implode( ' ', $rel_options ).'"', $link_attrs );
+			}
+			else
+			{	// Add attribute "rel":
+				$link_attrs .= ' rel="'.implode( ' ', $rel_options ).'"';
 			}
 		}
 
-		if( $rel_options_exist )
-		{	// Update attribute "rel" with added options:
-			$link_attrs = preg_replace( '# rel="([^"]+)"#i', ' rel="'.implode( ' ', $rel_options ).'"', $link_attrs );
-		}
-		else
-		{	// Add attribute "rel":
-			$link_attrs .= ' rel="'.implode( ' ', $rel_options ).'"';
+		if( ! empty( $this->setting_target_options ) &&
+		    in_array( 'blank', $this->setting_target_options ) )
+		{	// Add attribute "target" only if it is not provided in the link:
+			if( preg_match( '# target="([^"]*)"#i', $link_attrs, $target_match ) )
+			{	// If link already has attrbiute "target":
+				$target_option = trim( $target_match[1] );
+				$target_options_exist = true;
+			}
+			else
+			{	// If link has no attrbiute "target" yet:
+				$target_option = '';
+				$target_options_exist = false;
+			}
+
+			if( $target_option === '' )
+			{	// Add new option to target only if this attribute is not defined or value is empty string:
+				// Do NOT rewrite already defined attributes like `target="_parent"`, `target="_self"`, etc.!
+				if( $target_options_exist )
+				{	// Update attribute "target" with added options:
+					$link_attrs = preg_replace( '# target="([^"]*)"#i', ' target="_blank"', $link_attrs );
+				}
+				else
+				{	// Add attribute "rel":
+					$link_attrs .= ' target="_blank"';
+				}
+			}
 		}
 
 		return '<a'.$link_attrs.'>'.$link_match[2].'</a>';
