@@ -371,7 +371,7 @@ XX(      graydead.gif
 		    stristr( $content, '<pre' ) !== false ||
 		    strstr( $content, '`' ) !== false ||
 		    preg_match( '/\[[a-z]+:.+?\]/i', $content ) )
-		{	// Call ReplaceTagSafe() on everything outside code/pre, markdown codeblocks and short inline tags:
+		{	// Call ReplaceTagSafe() on everything outside code/pre, markdown codeblocks and short tags:
 			$content = callback_on_non_matching_blocks( $content,
 				'~(`.*?`|'
 				.'<code[^>]*>.*?</code>|'

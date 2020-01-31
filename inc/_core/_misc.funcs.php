@@ -962,7 +962,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 
 
 /**
- * Perform a global regular expression match outside blocks <code></code>, <pre></pre> and markdown codeblocks
+ * Perform a global regular expression match outside of blocks <code></code>, <pre></pre>, markdown codeblocks ``
  *
  * @param string Pattern to search for
  * @param string Content
@@ -999,7 +999,7 @@ function preg_match_outcode_callback( $content, $search, & $matches )
 
 
 /**
- * Replace content outside blocks <code></code>, <pre></pre> and markdown codeblocks in ``
+ * Replace content outside of blocks <code></code>, <pre></pre>, markdown codeblocks ``
  *
  * @param array|string Search list
  * @param array|string Replace list or Callback function
@@ -1033,7 +1033,7 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
 
 
 /**
- * Replace content outside blocks <code></code>, <pre></pre>, markdown codeblocks in `` AND short inline tags like [image:123]
+ * Replace content outside of blocks <code></code>, <pre></pre>, markdown codeblocks `` AND also outside of short tags like [image:123]
  *
  * @param array|string Search list
  * @param array|string Replace list or Callback function
@@ -1050,7 +1050,7 @@ function replace_content_outcode_shorttags( $search, $replace, $content, $replac
 		    stristr( $content, '<pre' ) !== false ||
 		    strstr( $content, '`' ) !== false ||
 		    preg_match( '/\[[a-z]+:.+?\]/i', $content ) )
-		{	// Call replace_content() on everything outside code/pre, markdown codeblocks and short inline tags:
+		{	// Call replace_content() on everything outside code/pre, markdown codeblocks and short tags:
 			$content = callback_on_non_matching_blocks( $content,
 				'~(`.*?`|'
 				.'<code[^>]*>.*?</code>|'
