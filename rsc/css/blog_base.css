@@ -606,6 +606,9 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
     line-height: 45px;
   }
 }
+.widget_core_item_workflow .evo_widget_item_workflow_form .controls {
+  display: inline-block;
+}
 .videojs_block .vjs-default-skin .vjs-big-play-button {
   left: 0;
   top: 0;

@@ -109,6 +109,7 @@ $core_componentwidget_defs = array(
 			'coll_search_form',             // Search Form
 			'site_logo',                    // Site logo
 			'cat_title',                    // Category Title
+			'cat_content_list',             // Category Content List
 			'coll_current_filters',         // Current Item filters
 			'coll_current_comment_filters', // Current Comment filters
 			'coll_item_list_pages',         // List Pager
@@ -153,6 +154,7 @@ $core_componentwidget_defs = array(
 			'item_vote',                 // Voting
 			'item_seen_by',              // Seen by
 			'item_workflow',             // Workflow Properties
+			'item_footer',               // Footer
 			'item_comment_form',         // Comment Form
 			'item_comment_feed_link',    // Comment Feed Link
 			'item_comment_notification', // Comment Notification

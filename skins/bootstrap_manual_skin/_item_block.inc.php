@@ -120,11 +120,13 @@ $params = array_merge( array(
 			'block_title_end' => '</h3>',
 			// Template params for "Breadcrumb Path" widget:
 			'override_params_for_breadcrumb_path' => array(
-					'block_start'      => '<div class="evo_widget $wi_class$"><ol class="breadcrumb">',
-					'block_end'        => '</ol></div>',
-					'separator'        => '',
-					'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-					'item_active_mask' => '<li class="active">$title$</li>',
+					'block_start'           => '<div class="evo_widget $wi_class$"><ol class="breadcrumb">',
+					'block_end'             => '</ol></div>',
+					'separator'             => '',
+					'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+					'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+					'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+					'item_active_mask'      => '<li class="active">$title$</li>',
 				),
 			// Template params for "Item Title" widget:
 			'widget_item_title_params'  => array(
@@ -251,15 +253,6 @@ $params = array_merge( array(
 		// Note: You can customize the default item feedback by copying the generic
 		// /skins/_item_feedback.inc.php file into the current skin folder.
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
-	}
-	?>
-
-	<?php
-	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
-	{	// We are running at least b2evo 6.7, so we can include this file:
-		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
-		skin_include( '_item_workflow.inc.php' );
-		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
 	}
 	?>
 

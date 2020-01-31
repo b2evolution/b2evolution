@@ -75,7 +75,7 @@ class content_blocks_plugin extends Plugin
 		}
 
 		// Remove block level short tag [include:...] inside <p> blocks and move them before the paragraph:
-		$content = move_short_tags( $content, '#\[include:.+?\]#i' );
+		$content = move_short_tags( $content, '#\[include:[^\]]+\]#i' );
 
 		// Replace `[include:item-slug]` short tag with item content:
 		$params['check_code_block'] = true;

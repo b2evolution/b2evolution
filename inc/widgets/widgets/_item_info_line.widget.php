@@ -217,11 +217,11 @@ class item_info_line_Widget extends ComponentWidget
 	 * @param string variable to be replaced
 	 * @return string replacement string
 	 */
-	function template_callback( $matches )
+	function template_callback( $var, $params )
 	{
 		global $Item;
 
-		$r = $matches[0];
+		$r = $var;
 		$match_found = true;
 
 		// Get datetime format:
@@ -256,37 +256,72 @@ class item_info_line_Widget extends ComponentWidget
 			}
 		}
 
+		$widget_params = array_merge( array(
+			'before_flag'         => '',
+			'after_flag'          => '',
+			'before_permalink'    => '',
+			'after_permalink'     => '',
+			'permalink_text'      => '#icon#',
+			'before_author'       => '',
+			'after_author'        => '',
+			'before_post_time'    => '',
+			'after_post_time'     => '',
+			'before_categories'   => '',
+			'after_categories'    => '',
+			'before_last_touched' => '',
+			'after_last_touched'  => '',
+			'before_last_updated' => '',
+			'after_last_updated'  => '',
+			'before_edit_link'    => ' &bull; ',
+			'after_edit_link'     => '',
+			'edit_link_text'      => '#',
+			'format'              => '',
+		), $params['widget_item_info_line_params'] );
+
 		ob_start();
 		switch( $r )
 		{
 			case '$flag_icon$':
-				$Item->flag();
+				$Item->flag( array(
+						'before' => $widget_params['before_flag'],
+						'after'  => $widget_params['after_flag'],
+					) );
 				break;
 
 			case '$permalink_icon$':
 				$Item->permanent_link( array(
-						'text' => '#icon#'
+						'text'   => $widget_params['permalink_text'],
+						'before' => $widget_params['before_permalink'],
+						'after'  => $widget_params['after_permalink'],
 					) );
 				break;
 
 			case '$author$':
 				$Item->author( array(
-						'link_text' => 'auto'
+						'before'    => $widget_params['before_author'],
+						'after'     => $widget_params['after_author'],
+						'link_text' => $params['author_link_text'],
 					) );
 				break;
 
 			case '$issue_date$':
 				$Item->issue_time( array(
+						'before'      => $widget_params['before_post_time'],
+						'after'       => $widget_params['after_post_time'],
 						'time_format' => $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format
 					) );
 				break;
 
 			case '$creation_date$':
+				echo $widget_params['before_post_time'];
 				echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
+				echo $widget_params['after_post_time'];
 				break;
 
 			case '$categories$':
 				$Item->categories( array(
+						'before'          => $widget_params['before_categories'],
+						'after'           => $widget_params['after_categories'],
 						'include_main'    => true,
 						'include_other'   => true,
 						'include_external'=> true,
@@ -295,17 +330,23 @@ class item_info_line_Widget extends ComponentWidget
 				break;
 
 			case '$last_touched$':
+				echo $widget_params['before_last_touched'];
 				echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) );
+				echo $widget_params['after_last_touched'];
 				break;
 
 			case '$last_updated$':
+				echo $widget_params['before_last_updated'];
 				echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
+				echo $widget_params['after_last_updated'];
 				break;
 
 			case '$edit_link$':
 				$Item->edit_link( array(
-						'text'   => '#',
-					) );
+					'before' => $widget_params['before_edit_link'],
+					'after'  => $widget_params['after_edit_link'],
+					'text'   => $widget_params['edit_link_text'],
+				) );
 				break;
 
 			default:
@@ -320,7 +361,7 @@ class item_info_line_Widget extends ComponentWidget
 		}
 		else
 		{
-			return $matches[0];
+			return $var;
 		}
 	}
 
@@ -354,16 +395,21 @@ class item_info_line_Widget extends ComponentWidget
 		if( $this->disp_params['template'] )
 		{
 			load_funcs( 'templates/model/_template.funcs.php' );
-			$content = render_template( $this->disp_params['template'], array( $this, 'template_callback' ) );
-			if( $content )
+			$TemplateCache = & get_TemplateCache();
+			if( $TemplateCache->get_by_code( $this->disp_params['template'] ) )
 			{
 				echo $this->disp_params['block_start'];
 
 				$this->disp_title();
 
 				echo $this->disp_params['block_body_start'];
-				echo $content;
+
+				echo $params['widget_item_info_line_before'];
+				render_template( $this->disp_params['template'], array( $this, 'template_callback' ), $params );
+				echo $params['widget_item_info_line_after'];
+
 				echo $this->disp_params['block_body_end'];
+				
 				echo $this->disp_params['block_end'];
 
 				return true;

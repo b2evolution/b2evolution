@@ -508,6 +508,11 @@ if( $action == 'list' )
 	require_js_defer( 'jquery/jquery.jeditable.js', 'rsc_url' );
 }
 
+if( in_array( $action, array( 'list', 'edit', 'move' ) ) )
+{	// Initialize Hotkeys:
+	init_hotkeys_js();
+}
+
 /**
  * Display page header, menus & messages:
  */

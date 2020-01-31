@@ -193,9 +193,11 @@ class table_contents_plugin extends Plugin
 			$toc .= '<ul class="evo_plugin__table_of_contents">';
 			foreach( $header_matches[3] as $h => $header_text )
 			{
+				$header_text = utf8_strip_tags( $header_text );
+				$header_text = preg_replace( '#\[[a-z]+:[^]]+\]#i', '', $header_text );
 				$anchor = trim( $header_matches[2][ $h ], '"\'' );
 				$toc .= '<li style="margin-left:'.( ( $header_matches[1][ $h ] - $min_header_level ) * 10 ).'px">'
-						.'<a href="'.$item_url.'#'.$anchor.'" data-anchor="'.$anchor.'">'.utf8_strip_tags( $header_text ).'</a>'
+						.'<a href="'.$item_url.'#'.$anchor.'" data-anchor="'.$anchor.'">'.$header_text.'</a>'
 					.'</li>';
 			}
 			$toc .= '</ul>';

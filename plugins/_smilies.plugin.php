@@ -367,14 +367,20 @@ XX(      graydead.gif
 		$content = & $params['data'];
 
 		// Lazy-check first, using stristr() (stripos() is only available since PHP5):
-		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
-		{ // Call ReplaceTagSafe() on everything outside code/pre:
+		if( stristr( $content, '<code' ) !== false ||
+		    stristr( $content, '<pre' ) !== false ||
+		    strstr( $content, '`' ) !== false ||
+		    preg_match( '/\[[a-z]+:.+?\]/i', $content ) )
+		{	// Call ReplaceTagSafe() on everything outside code/pre, markdown codeblocks and short tags:
 			$content = callback_on_non_matching_blocks( $content,
-					'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
-					array( & $this, 'ReplaceTagSafe' ) );
+				'~(`.*?`|'
+				.'<code[^>]*>.*?</code>|'
+				.'<pre[^>]*>.*?</pre>|'
+				.'\[[a-z]+:[^\]]+\])~is',
+				array( & $this, 'ReplaceTagSafe' ) );
 		}
 		else
-		{ // No code/pre blocks, replace on the whole thing
+		{	// No code/pre blocks, replace on the whole thing
 			$content = $this->ReplaceTagSafe( $content );
 		}
 

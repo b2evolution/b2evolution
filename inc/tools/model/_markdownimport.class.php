@@ -364,6 +364,39 @@ class MarkdownImport extends AbstractImport
 		// Set current collection because it is used inside several functions like urltitle_validate():
 		$Blog = $md_Blog;
 
+		// Check if we should skip a single folder in ZIP archive root which is the same as ZIP file name:
+		$root_folder_path = $folder_path;
+		if( ! empty( $source_folder_zip_name ) )
+		{	// This is an import from ZIP archive
+			$zip_file_name = preg_replace( '#\.zip$#i', '', $source_folder_zip_name );
+			if( file_exists( $folder_path.'/'.$zip_file_name ) )
+			{	// If folder exists in the root with same name as ZIP file name:
+				$skip_single_zip_root_folder = true;
+				if( $folder_path_handler = @opendir( $folder_path ) )
+				{
+					while( ( $file = readdir( $folder_path_handler ) ) !== false )
+					{
+						if( ! preg_match( '#^([\.]{1,2}|__MACOSX|'.preg_quote( $zip_file_name ).')$#i', $file ) )
+						{	// This is a different file or folder than ZIP file name:
+							$skip_single_zip_root_folder = false;
+							break;
+						}
+					}
+					closedir( $folder_path_handler );
+				}
+				if( $skip_single_zip_root_folder )
+				{	// Skip root folder with same name as ZIP file name:
+					$folder_path .= '/'.$zip_file_name;
+					$source_folder_zip_name .= '/'.$zip_file_name;
+				}
+			}
+		}
+
+		if( ! $this->check_manifest( $folder_path ) )
+		{	// Stop import because of restriction from detected file manifest.yaml:
+			return;
+		}
+
 		$DB->begin();
 
 		if( $this->get_option( 'import_type' ) == 'replace' )
@@ -508,34 +541,6 @@ class MarkdownImport extends AbstractImport
 			}
 
 			$this->log( '<br />' );
-		}
-
-		// Check if we should skip a single folder in ZIP archive root which is the same as ZIP file name:
-		$root_folder_path = $folder_path;
-		if( ! empty( $source_folder_zip_name ) )
-		{	// This is an import from ZIP archive
-			$zip_file_name = preg_replace( '#\.zip$#i', '', $source_folder_zip_name );
-			if( file_exists( $folder_path.'/'.$zip_file_name ) )
-			{	// If folder exists in the root with same name as ZIP file name:
-				$skip_single_zip_root_folder = true;
-				if( $folder_path_handler = @opendir( $folder_path ) )
-				{
-					while( ( $file = readdir( $folder_path_handler ) ) !== false )
-					{
-						if( ! preg_match( '#^([\.]{1,2}|__MACOSX|'.preg_quote( $zip_file_name ).')$#i', $file ) )
-						{	// This is a different file or folder than ZIP file name:
-							$skip_single_zip_root_folder = false;
-							break;
-						}
-					}
-					closedir( $folder_path_handler );
-				}
-				if( $skip_single_zip_root_folder )
-				{	// Skip root folder with same name as ZIP file name:
-					$folder_path .= '/'.$zip_file_name;
-					$source_folder_zip_name .= '/'.$zip_file_name;
-				}
-			}
 		}
 
 		// Get all subfolders and files from the source folder:
@@ -1031,7 +1036,7 @@ class MarkdownImport extends AbstractImport
 			if( ! empty( $Item->ID ) )
 			{
 				// Link files:
-				if( preg_match_all( '#(\[)?\!\[([^\]]*)\]\(([^\)"]+\.('.$this->get_image_extensions().'))\s*("[^"]*")?\)(\{\..+?\})?(\r?\n?\*.*?\*(\r|\n|$))?(.*?\]\((.*?)\))?#i', $item_content, $image_matches ) )
+				if( preg_match_all( '#(\[)?\!\[([^\]]*)\]\(([^\)"]+\.('.$this->get_image_extensions().'))\s*("[^"]*")?\)(\{\..+?\})?(\r?\n?\*.*?\*(\r|\n|$))?(.*?\]\((.*?)\))?(\{\..+?\})?#i', $item_content, $image_matches ) )
 				{
 					$updated_item_content = $item_content;
 					$all_links_count = 0;
@@ -1070,7 +1075,7 @@ class MarkdownImport extends AbstractImport
 							if( $file_params['link_position'] == 'inline' )
 							{	// Generate image inline tag:
 								$image_inline_caption = preg_replace( '#^[\r\n\s"\*]+(.+?)[\r\n\s"\*]+$#', '$1', $image_matches[7][$i] ); // note: trim() doesn't remove char * on the right side as expected
-								$image_inline_class = trim( $image_matches[6][$i], ' {}' );
+								$image_inline_class = trim( str_replace( '}{', '', $image_matches[6][$i].$image_matches[11][$i] ), ' {}' );
 								$image_inline_tag = '[image:'.$link_data['ID']
 									.( $image_inline_class === '' && $image_inline_caption === '' ? '' : ':'.$image_inline_caption )
 									.( $image_matches[1][$i] == '[' && $image_matches[10][$i] !== '' ? ( $image_inline_class === '' && $image_inline_caption === '' ? ':-' : '' ).':'.$image_matches[10][$i] : '' )

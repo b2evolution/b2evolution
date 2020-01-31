@@ -34,8 +34,8 @@ class date_tag_plugin extends Plugin
 	 */
 	function PluginInit( & $params )
 	{
-		$this->short_desc = sprintf( T_('Date formatting e-g %s'), '<code>[date:server:F d, Y H\:i\:s:-03.30.badge]</code>' );
-		$this->long_desc = sprintf( T_('This plugin allows to render date inside collection posts and comments by using the syntax %s for example'), '<code>[date:server:F d, Y H\:i\:s:-03.30.badge]</code>' );
+		$this->short_desc = sprintf( T_('Date formatting e-g %s'), '<code>[date:server:F d, Y H\:i\:s:-03.30:.badge]</code>' );
+		$this->long_desc = sprintf( T_('This plugin allows to render date inside collection posts and comments by using the syntax %s for example'), '<code>[date:server:F d, Y H\:i\:s:-03.30:.badge]</code>' );
 	}
 
 

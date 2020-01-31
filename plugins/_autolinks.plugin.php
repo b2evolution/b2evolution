@@ -659,7 +659,7 @@ class autolinks_plugin extends Plugin
 		}
 
 		// Replace @usernames with user identity link:
-		$text = replace_content_outcode( '#@([a-z0-9_.\-]+)#i', '@', $text, array( $this, 'replace_usernames' ) );
+		$text = replace_content_outcode_shorttags( '#@([a-z0-9_.\-]+)#i', '@', $text, array( $this, 'replace_usernames' ) );
 
 		// Make tag names clickable:
 		$text = $this->replace_tags( $text );

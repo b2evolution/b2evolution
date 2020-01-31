@@ -264,6 +264,29 @@ class item_fields_compare_Widget extends ComponentWidget
 
 
 	/**
+	 * Get advanced definitions for editable params.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 *
+	 * @return array Advanced params
+	 */
+	function get_advanced_param_definitions()
+	{
+		return array(
+				'add_css' => array(
+					'type' => 'checklist',
+					'label' => T_('Add CSS classes to cells'),
+					'options' => array(
+						array( 'row', sprintf( T_('Identify rows with %s + field code'), '<code>comp_row_</code>' ), 0 ),
+						array( 'col', sprintf( T_('Identify columns with %s + Item slug'), '<code>comp_col_</code>' ), 0 ),
+						array( 'cat', sprintf( T_('Identify column category with %s + main Cat slug'), '<code>comp_cat_</code>' ), 0 ),
+					),
+				),
+			);
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -276,7 +299,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				'custom_fields_table_start'                => '<div class="evo_content_block"><table class="item_custom_fields">',
 				'custom_fields_row_start'                  => '<tr$row_attrs$>',
 				'custom_fields_topleft_cell'               => '<td style="border:none"></td>',
-				'custom_fields_col_header_item'            => '<th class="center" width="$col_width$"$col_attrs$>$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
+				'custom_fields_col_header_item'            => '<th class="$col_class$ center" width="$col_width$"$col_attrs$>$item_link$$item_status$</th>',  // Note: we will also add reverse view later: 'custom_fields_col_header_field
 				'custom_fields_row_header_field'           => '<th class="$header_cell_class$">$field_title$$field_description_icon$</th>',
 				'custom_fields_item_status_template'       => '<div><div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div></div>',
 				'custom_fields_description_icon_class'     => 'grey',
@@ -380,9 +403,22 @@ class item_fields_compare_Widget extends ComponentWidget
 
 				if( empty( $skip_duplicate_header_cell ) )
 				{	// Display header cell only if it not hidden on merging same headers:
+					$col_class = '';
+					if( ! empty( $this->disp_params['add_css']['col'] ) )
+					{	// Add CSS class to identify columns with "comp_col_" + Item slug:
+						$col_class .= ' comp_col_'.$widget_Item->get( 'urltitle' );
+					}
+					if( ! empty( $this->disp_params['add_css']['cat'] ) &&
+							( $widget_main_Chapter = & $widget_Item->get_main_Chapter() ) )
+					{	// Add CSS class to identify column category with "comp_cat_" + main Cat slug:
+						$col_class .= ' comp_cat_'.$widget_main_Chapter->get( 'urlname' );
+					}
+					$col_class = trim( $col_class );
+
 					$table_header_cell = array(
 						'title'  => $item_title_link,
 						'status' => $item_status_badge,
+						'class'  => $col_class,
 						'cols'   => 1,
 					);
 					if( ! empty( $this->disp_params['display_condition'] ) &&
@@ -399,6 +435,7 @@ class item_fields_compare_Widget extends ComponentWidget
 				$cell_params = array(
 					'$item_link$'   => $table_header_cell['title'],
 					'$item_status$' => $table_header_cell['status'],
+					'$col_class$'   => $table_header_cell['class'],
 					'$col_width$'   => ( $col_width * $table_header_cell['cols'] ).'%',
 					'$col_attrs$'   => ( $table_header_cell['cols'] > 1 ? ' colspan="'.$table_header_cell['cols'].'"' : '' )
 						.( isset( $table_header_cell['display_condition'] ) ? $this->get_display_condition_attr( $table_header_cell['display_condition'], $items ) : '' ),
@@ -823,9 +860,16 @@ class item_fields_compare_Widget extends ComponentWidget
 		// Render special masks like #yes#, (+), #stars/3# and etc. in value with template:
 		$custom_field_label = render_custom_field( $custom_field['label'], $params );
 
+		$header_class = $custom_field['header_class'];
+		if( ! empty( $this->disp_params['add_css']['row'] ) )
+		{	// Add CSS class to identify row with "comp_row_" + field code:
+			$header_class .= ' comp_row_'.$custom_field['name'];
+		}
+		$header_class = trim( $header_class );
+
 		// Custom field title:
 		echo str_replace( array( '$field_title$', '$cols_count$', '$field_description_icon$', '$header_cell_class$' ),
-			array( $custom_field_label, count( $items ) + 1, $field_description_icon, $custom_field['header_class'] ),
+			array( $custom_field_label, count( $items ) + 1, $field_description_icon, $header_class ),
 			$this->get_field_template( 'row_header_field', $custom_field['type'] ) );
 
 		if( $custom_field['type'] != 'separator' )
@@ -911,10 +955,26 @@ class item_fields_compare_Widget extends ComponentWidget
 					$prev_field_value = $custom_field_value;
 				}
 
+				$cell_class = $custom_field['cell_class'];
+				if( ! empty( $this->disp_params['add_css']['row'] ) )
+				{	// Add CSS class to identify row with "comp_row_" + field code:
+					$cell_class .= ' comp_row_'.$custom_field['name'];
+				}
+				if( ! empty( $this->disp_params['add_css']['col'] ) )
+				{	// Add CSS class to identify columns with "comp_col_" + Item slug:
+					$cell_class .= ' comp_col_'.$widget_Item->get( 'urltitle' );
+				}
+				if( ! empty( $this->disp_params['add_css']['cat'] ) &&
+				    ( $widget_main_Chapter = & $widget_Item->get_main_Chapter() ) )
+				{	// Add CSS class to identify column category with "comp_cat_" + main Cat slug:
+					$cell_class .= ' comp_cat_'.$widget_main_Chapter->get( 'urlname' );
+				}
+				$cell_class = trim( $cell_class );
+
 				if( empty( $skip_duplicate_field_value ) )
 				{	// Display field value cell only if it not hidden on merging same values:
 					$table_row_cell = array(
-						'template' => str_replace( array( '$data_cell_class$', '$field_value$' ), array( $custom_field['cell_class'], $custom_field_value ), $field_value_template ),
+						'template' => str_replace( array( '$data_cell_class$', '$field_value$' ), array( $cell_class, $custom_field_value ), $field_value_template ),
 						'cols'     => 1,
 					);
 					if( ! empty( $this->disp_params['display_condition'] ) &&

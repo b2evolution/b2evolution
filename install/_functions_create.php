@@ -1648,7 +1648,7 @@ function create_default_templates()
 		INSERT INTO T_templates ( tpl_name, tpl_code, tpl_template_code )
 		VALUES
 			( "Item Info: Posted by Author on Date in Categories", "iteminfo_short", "Posted by $author$ on $issue_date$ in $categories$" ),
-			( "Item Info: Long info line", "iteminfo_long", "$flag_icon$ $permalink_icon$ Posted by $author$ $issue_date$ $categories$ — Last touched: $last_touched$ — Last Updated: $last_update$ $edit_link$" ),
+			( "Item Info: Long info line", "iteminfo_long", "$flag_icon$ $permalink_icon$ Posted by $author$ $issue_date$ $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$" ),
 			( "Include Content Block: with clearfix", "cblock_clearfix", \'<div class="evo_content_block clearfix $cb_class$\">
 	<div class="evo_content_block_images">
 		<img src="$teaser_image$">

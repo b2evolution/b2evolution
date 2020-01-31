@@ -395,7 +395,7 @@ $Form->radio_input( 'category_ordering', $Blog->get_setting('category_ordering')
 					array( 'value'=>'alpha', 'label'=>T_('Alphabetically') ),
 					array( 'value'=>'manual', 'label'=>T_('Manually') ),
 			 ), T_('Sort categories'), array( 'note'=>'('.T_('Note: can be overridden for sub-categories').')' ) );
-$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton' ) )  );
+$Form->end_form( array( array( 'submit', 'submit', T_('Save Changes!'), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' ) )  );
 
 echo '</div>'; // form wrapper end
 

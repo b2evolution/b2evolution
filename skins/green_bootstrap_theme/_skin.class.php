@@ -981,27 +981,22 @@ class green_bootstrap_theme_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Layout Settings')
 				),
-					'main_content_image_size' => array(
-						'label' => T_('Image size for main content'),
-						'note' => T_('Controls Aspect, Ratio and Standard Size'),
-						'defaultvalue' => 'fit-1280x720',
-						'options' => get_available_thumb_sizes(),
-						'type' => 'select',
-					),
-					'max_image_height' => array(
-						'label' => T_('Max image height'),
-						'input_suffix' => ' px ',
-						'note' => T_('Constrain height of content images by CSS.'),
-						'defaultvalue' => '',
-						'type' => 'integer',
-						'size' => '7',
-						'allow_empty' => true,
-					),
 					'page_navigation' => array(
 						'label' => T_('Page navigation'),
 						'note' => T_('(EXPERIMENTAL)').' '.T_('Check this to show previous/next page links to navigate inside the <b>current</b> chapter.'),
 						'defaultvalue' => 0,
 						'type' => 'checkbox',
+					),
+					'use_3_cols' => array(
+						'label' => T_('Use 3 cols'),
+						'type' => 'checklist',
+						'options' => array(
+							array( 'single',       sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=single</code>' ), 1 ),
+							array( 'posts-topcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-topcat-intro</code>, <code>disp=posts-topcat-nointro</code>' ), 1 ),
+							array( 'posts-subcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-subcat-intro</code>, <code>disp=posts-subcat-nointro</code>' ), 1 ),
+							array( 'front',        sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=front</code>' ), 1 ),
+							array( 'other',        T_('On other disps'), 0 ),
+						),
 					),
 				'section_layout_end' => array(
 					'layout' => 'end_fieldset',
@@ -1099,9 +1094,40 @@ class green_bootstrap_theme_Skin extends Skin
 							array( 'menu',     sprintf( T_('"%s" container'), NT_('Menu') ),      0 ),
 							array( 'sidebar',  sprintf( T_('"%s" container'), NT_('Sidebar') ),   0 ),
 							array( 'sidebar2', sprintf( T_('"%s" container'), NT_('Sidebar 2') ), 0 ),
-							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ) ),
-						),
+							array( 'footer',   sprintf( T_('"%s" container'), NT_('Footer') ),    1 ),
+						) ),
 				'section_access_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+				'section_advanced_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Advanced')
+				),
+					'main_content_image_size' => array(
+						'label' => T_('Image size for main content'),
+						'note' => T_('Controls Aspect, Ratio and Standard Size'),
+						'defaultvalue' => 'fit-1280x720',
+						'options' => get_available_thumb_sizes(),
+						'type' => 'select',
+					),
+					'max_image_height' => array(
+						'label' => T_('Max image height'),
+						'input_suffix' => ' px ',
+						'note' => T_('Constrain height of content images by CSS.'),
+						'defaultvalue' => '',
+						'type' => 'integer',
+						'size' => '7',
+						'allow_empty' => true,
+					),
+					'message_affix_offset' => array(
+						'label' => T_('Messages affix offset'),
+						'note' => 'px. ' . T_('Set message top offset value.'),
+						'defaultvalue' => '100',
+						'type' => 'integer',
+						'allow_empty' => true,
+					),
+				'section_advanced_end' => array(
 					'layout' => 'end_fieldset',
 				),
 
@@ -2078,6 +2104,122 @@ jQuery( document ).ready( function()
 
 		// Display left navigation column only on these pages:
 		return in_array( $disp, array( 'front', 'posts', 'flagged', 'mustread', 'single', 'search', 'edit', 'edit_comment', 'catdir', 'search', '404' ) );
+	}
+
+
+	/**
+	 * Check if side(left and/or right) navigations are visible for current page
+	 *
+	 * @return boolean TRUE on visible
+	 */
+	function is_side_navigation_visible()
+	{
+		global $disp;
+
+		if( in_array( $disp, array( 'access_requires_login', 'content_requires_login', 'access_denied' ) ) )
+		{ // Display left navigation column on this page when at least one sidebar container is visible:
+			return $this->show_container_when_access_denied( 'sidebar' ) || $this->show_container_when_access_denied( 'sidebar2' );
+		}
+
+		// Display left navigation column only on these pages:
+		return in_array( $disp, array( 'front', 'posts', 'comments', 'flagged', 'mustread', 'single', 'search', 'edit', 'edit_comment', 'catdir', '404' ) );
+	}
+
+
+	/**
+	 * Check if 3rd/right column layout can be used for current page
+	 *
+	 * @return boolean
+	 */
+	function is_3rd_right_column_layout()
+	{
+		global $disp, $disp_detail;
+
+		if( ! $this->is_side_navigation_visible() )
+		{	// Side navigation is hidden for current page:
+			return false;
+		}
+
+		// Check when we should use layout with 3 columns:
+		if( $disp == 'front' )
+		{	// Front page
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'front' );
+		}
+
+		if( $disp == 'single' )
+		{	// Single post/item page:
+			return ( $this->get_checklist_setting( 'use_3_cols', 'single' )
+				// old setting should be supported:
+				|| $this->get_setting( 'single_3_cols' ) );
+		}
+
+		if( $disp_detail == 'posts-topcat-nointro' || $disp_detail == 'posts-topcat-intro' )
+		{	// Category page with or without intro:
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-topcat' );
+		}
+
+		if( $disp_detail == 'posts-subcat-nointro' || $disp_detail == 'posts-subcat-intro' )
+		{	// Sub-category page with or without intro:
+			return (boolean)$this->get_checklist_setting( 'use_3_cols', 'posts-subcat' );
+		}
+
+		// All other disps:
+		return (boolean)$this->get_checklist_setting( 'use_3_cols', 'other' );
+	}
+
+
+	/**
+	 * Get layout style class depending on skin settings and current disp
+	 *
+	 * @param string Place where class is used
+	 */
+	function get_layout_class( $place )
+	{
+		$r = '';
+
+		switch( $place )
+		{
+			case 'container':
+				$r .= 'container';
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= ' container-xxl';
+				}
+				break;
+
+			case 'main_column':
+				if( $this->is_side_navigation_visible() )
+				{	// Layout with visible left sidebar:
+					if( $this->is_3rd_right_column_layout() )
+					{	// Layout with 3 columns on current page:
+						$r .= 'col-xxl-8 col-xxl-pull-2 ';
+					}
+					$r .= 'col-md-9 pull-right-md';
+				}
+				else
+				{
+					$r .= 'col-md-12';
+				}
+				break;
+
+			case 'left_column':
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= 'col-xxl-2 ';
+				}
+				$r .= 'col-md-3 col-xs-12 pull-left-md';
+				break;
+
+			case 'right_column':
+				if( $this->is_3rd_right_column_layout() )
+				{	// Layout with 3 columns on current page:
+					$r .= 'col-xxl-2 col-xxl-push-8 ';
+				}
+				$r .= 'col-md-3 col-xs-12 pull-right-md';
+				break;
+		}
+
+		return $r;
 	}
 }
 

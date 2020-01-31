@@ -378,6 +378,11 @@ function skin_init( $disp )
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 
+			if( is_logged_in() && has_featured_Item() )
+			{
+				init_hotkeys_js( 'blog' );
+			}
+
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
 

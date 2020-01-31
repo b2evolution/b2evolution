@@ -90,7 +90,7 @@ class wacko_plugin extends Plugin
 				'$1<h2>$2</h2>',
 				'<hr />',
 			);
-		$content = replace_content_outcode( $search, $replace, $content );
+		$content = replace_content_outcode_shorttags( $search, $replace, $content );
 
 		// Find bullet lists
 		if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )

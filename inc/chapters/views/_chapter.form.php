@@ -90,7 +90,7 @@ $Form->begin_fieldset( T_('Properties').get_manual_link( 'category-edit-form' ) 
 
 $Form->end_fieldset();
 
-$Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' ) ) );
 
 ?>
 <script>

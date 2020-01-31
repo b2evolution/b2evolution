@@ -962,7 +962,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 
 
 /**
- * Perform a global regular expression match outside blocks <code></code>, <pre></pre> and markdown codeblocks
+ * Perform a global regular expression match outside of blocks <code></code>, <pre></pre>, markdown codeblocks ``
  *
  * @param string Pattern to search for
  * @param string Content
@@ -999,7 +999,7 @@ function preg_match_outcode_callback( $content, $search, & $matches )
 
 
 /**
- * Replace content outside blocks <code></code>, <pre></pre>, markdown codeblocks in `` and short inline tags like [image:]
+ * Replace content outside of blocks <code></code>, <pre></pre>, markdown codeblocks ``
  *
  * @param array|string Search list
  * @param array|string Replace list or Callback function
@@ -1010,13 +1010,47 @@ function preg_match_outcode_callback( $content, $search, & $matches )
  */
 function replace_content_outcode( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
 {
-	if( !empty( $search ) )
+	if( ! empty( $search ) )
+	{
+		if( stristr( $content, '<code' ) !== false ||
+		    stristr( $content, '<pre' ) !== false ||
+		    strstr( $content, '`' ) !== false )
+		{	// Call replace_content() on everything outside code/pre, and markdown codeblocks:
+			$content = callback_on_non_matching_blocks( $content,
+				'~(`.*?`|'
+				.'<code[^>]*>.*?</code>|'
+				.'<pre[^>]*>.*?</pre>)~is',
+				$replace_function_callback, array( $search, $replace, $replace_function_type ) );
+		}
+		else
+		{	// No code/pre blocks, replace on the whole thing
+			$content = call_user_func( $replace_function_callback, $content, $search, $replace, $replace_function_type );
+		}
+	}
+
+	return $content;
+}
+
+
+/**
+ * Replace content outside of blocks <code></code>, <pre></pre>, markdown codeblocks `` AND also outside of short tags like [image:123]
+ *
+ * @param array|string Search list
+ * @param array|string Replace list or Callback function
+ * @param string Source content
+ * @param string Callback function name
+ * @param string Type of callback function: 'preg' -> preg_replace(), 'preg_callback' -> preg_replace_callback(), 'str' -> str_replace() (@see replace_content())
+ * @return string Replaced content
+ */
+function replace_content_outcode_shorttags( $search, $replace, $content, $replace_function_callback = 'replace_content', $replace_function_type = 'preg' )
+{
+	if( ! empty( $search ) )
 	{
 		if( stristr( $content, '<code' ) !== false ||
 		    stristr( $content, '<pre' ) !== false ||
 		    strstr( $content, '`' ) !== false ||
 		    preg_match( '/\[[a-z]+:.+?\]/i', $content ) )
-		{ // Call replace_content() on everything outside code/pre, markdown codeblocks and short inline tags:
+		{	// Call replace_content() on everything outside code/pre, markdown codeblocks and short tags:
 			$content = callback_on_non_matching_blocks( $content,
 				'~(`.*?`|'
 				.'<code[^>]*>.*?</code>|'
@@ -1025,7 +1059,7 @@ function replace_content_outcode( $search, $replace, $content, $replace_function
 				$replace_function_callback, array( $search, $replace, $replace_function_type ) );
 		}
 		else
-		{ // No code/pre blocks, replace on the whole thing
+		{	// No code/pre blocks, replace on the whole thing
 			$content = call_user_func( $replace_function_callback, $content, $search, $replace, $replace_function_type );
 		}
 	}
@@ -1210,7 +1244,7 @@ function move_short_tags( $content, $pattern = NULL, $callback = NULL, $params =
 
 	if( is_null( $pattern ) )
 	{	// Default pattern:
-		$pattern = '#\[(image|video|audio|include|/?div|(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields)):.+?\]#i';
+		$pattern = '#\[(image|video|audio|include|/?div|(parent:|item:[^:\]]+:)?(subscribe|emailcapture|compare|fields)):[^\]]+\]#i';
 	}
 
 	foreach( $paragraphs[0] as $i => $current_paragraph )
@@ -8657,7 +8691,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 				// Wrong source object type:
 				return false;
 		}
-		$LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], 'inline' );
+		$LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'] );
 	}
 
 	if( empty( $LinkList ) )
@@ -10178,7 +10212,7 @@ function convert_path_to_array( $property, $value, $separator = '.' )
  */
 function get_customizer_url( $url_Blog = NULL )
 {
-	global $baseurlroot, $customizer_relative_url, $Blog;
+	global $customizer_relative_url, $Blog;
 
 	if( $url_Blog === NULL && isset( $Blog ) )
 	{	// Use current collection:
@@ -10186,9 +10220,5 @@ function get_customizer_url( $url_Blog = NULL )
 	}
 
 	return $url_Blog->get_baseurl_root().$customizer_relative_url;
-
-// TODO: remove the following. It is only to show how we would fall back if we needed to.
-	// Use default customizer URL from config:
-	return $baseurlroot.$customizer_relative_url;
 }
 ?>

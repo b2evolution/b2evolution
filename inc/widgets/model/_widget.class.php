@@ -457,6 +457,9 @@ class ComponentWidget extends DataObject
 			$advanced_layout_is_started = true;
 		}
 
+		// Add advanced definitions if they are provided in a widget:
+		$r = array_merge( $r, $this->get_advanced_param_definitions() );
+
 		if( ! empty( $this->allow_link_css_params ) )
 		{	// Enable link/button CSS classes only for specific widgets like menu widgets:
 			$r['widget_link_class'] = array(
@@ -474,7 +477,7 @@ class ComponentWidget extends DataObject
 		if( ! isset( $r['widget_css_class'] ) )
 		{	// Widget CSS class:
 			$r['widget_css_class'] = array(
-					'label' => '<span class="dimmed">'.T_( 'CSS Class' ).'</span>',
+					'label' => '<span class="dimmed">'.T_( 'Widget CSS Class' ).'</span>',
 					'size' => 20,
 					'note' => sprintf( T_('Will be injected into %s in your skin containers (along with required system classes).'), '<code>$wi_class$</code>' ),
 				);
@@ -483,7 +486,7 @@ class ComponentWidget extends DataObject
 		if( ! isset( $r['widget_ID'] ) )
 		{	// Widget ID:
 			$r['widget_ID'] = array(
-					'label' => '<span class="dimmed">'.T_( 'DOM ID' ).'</span>',
+					'label' => '<span class="dimmed">'.T_( 'Widget DOM ID' ).'</span>',
 					'size' => 20,
 					'note' => sprintf( T_('Replaces %s in your skins containers.'), '<code>$wi_ID$</code>' ).' '.sprintf( T_('Leave empty to use default value: %s.'), '<code>widget_'.$this->type.'_'.$this->code.'_'.$this->ID.'</code>' ),
 				);
@@ -511,6 +514,19 @@ class ComponentWidget extends DataObject
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Get advanced definitions for editable params.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 *
+	 * @return array Advanced params
+	 */
+	function get_advanced_param_definitions()
+	{
+		return array();
 	}
 
 

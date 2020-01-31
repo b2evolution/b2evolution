@@ -51,11 +51,13 @@ skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'breadcrumb_path',
 		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
+		'block_start'           => '<ol class="breadcrumb">',
+		'block_end'             => '</ol><div class="clear"></div>',
+		'separator'             => '',
+		'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+		'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+		'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+		'item_active_mask'      => '<li class="active">$title$</li>',
 	) );
 ?>
 
@@ -289,15 +291,6 @@ skin_widget( array(
 		echo_comment_moderate_js();
 
 		// ---------------------- END OF FEEDBACK (COMMENTS/TRACKBACKS) ---------------------
-	?>
-
-	<?php
-	if( evo_version_compare( $app_version, '6.7' ) >= 0 )
-	{	// We are running at least b2evo 6.7, so we can include this file:
-		// ------------------ WORKFLOW PROPERTIES INCLUDED HERE ------------------
-		skin_include( '_item_workflow.inc.php' );
-		// ---------------------- END OF WORKFLOW PROPERTIES ---------------------
-	}
 	?>
 
 	<?php

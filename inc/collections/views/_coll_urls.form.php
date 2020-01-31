@@ -304,12 +304,12 @@ function force_http_protocols()
 	$alias_field_note .= get_icon( 'minus', 'imgtag', array( 'class' => 'url_alias_minus', 'style' => 'display: none; margin-left: 2px; cursor: pointer; position: relative;' ) );
 	if( empty( $url_aliases ) )
 	{
-		$Form->text_input( 'blog_url_alias[]', '', 150, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias' ) );
+		$Form->text_input( 'blog_url_alias[]', '', 50, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias', 'maxlength' => 255 ) );
 	}
 
 	foreach( $url_aliases as $alias )
 	{
-		$Form->text_input( 'blog_url_alias[]', $alias, 150, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias' ) );
+		$Form->text_input( 'blog_url_alias[]', $alias, 50, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias', 'maxlength' => 255 ) );
 	}
 
 $Form->end_fieldset();

@@ -352,7 +352,15 @@ foreach( $custom_fields as $custom_field )
 	{ // Get i from this temp number when form was is submitted
 		$i = $custom_field['temp_i'];
 	}
-	$custom_ID = $custom_field['ID'];
+	if( empty( $edited_Itemtype->ID ) )
+	{	// For copied Item Type we should reset ID of existing custom field to what we generete by JS code on insert new custom field row:
+		$custom_ID = generate_random_key( 32, 'abcdef0123456789' );
+		$custom_ID[8] = $custom_ID[13] = $custom_ID[18] = $custom_ID[23] = '-';
+	}
+	else
+	{	// Use ID of existing custom field:
+		$custom_ID = $custom_field['ID'];
+	}
 	if( !empty( $deleted_custom_fields ) && ( strpos( $deleted_custom_fields, $custom_ID ) !== false ) )
 	{
 		continue;
@@ -401,7 +409,7 @@ foreach( $custom_fields as $custom_field )
 	// Replace masks with values of the custom field:
 	$cf_input_replacements = array(
 		'$cf_ID$'            => $custom_ID,
-		'$cf_new$'           => ( isset( $custom_fields_data->{'new'.$i} ) ? $custom_fields_data->{'new'.$i} : 0 ),
+		'$cf_new$'           => ( isset( $custom_fields_data->{'new'.$i} ) || empty( $edited_Itemtype->ID )/* Force on copying Item Type */ ? 1 : 0 ),
 		'$cf_num$'           => $i,
 		'$cf_type$'          => format_to_output( $custom_field['type'], 'htmlattr' ),
 		'$cf_order$'         => format_to_output( $custom_field['order'], 'htmlattr' ),
@@ -467,12 +475,15 @@ $add_custom_fields_button = '<div class="btn-group dropdown" id="add_custom_fiel
 $add_custom_fields_button .= '</ul></div>';
 $Form->info_field( T_('Add new field of type'), $add_custom_fields_button, array( 'class' => 'info_full_height' ) );
 
+// On duplicate mode we should use ID of the copying Item Type in order to select proper Item Statuses:
+$current_ityp_ID = ( empty( $edited_Itemtype->ID ) ? get_param( 'ityp_ID' ) : $edited_Itemtype->ID );
+
 // Add fields from another item type:
 $SQL = new SQL( 'Get Item Types with custom fields' );
 $SQL->SELECT( 'ityp_ID, ityp_name' );
 $SQL->FROM( 'T_items__type' );
 $SQL->FROM_add( 'INNER JOIN T_items__type_custom_field ON itcf_ityp_ID = ityp_ID' );
-$SQL->WHERE( 'ityp_ID != '.$DB->quote( $edited_Itemtype->ID ) );
+$SQL->WHERE( 'ityp_ID != '.$DB->quote( $current_ityp_ID ) );
 $SQL->GROUP_BY( 'ityp_ID' );
 $SQL->ORDER_BY( 'ityp_name' );
 $item_type_with_custom_fields = $DB->get_assoc( $SQL );
@@ -489,13 +500,13 @@ echo '</div>';
 
 // Item Statuses allowed for the editing Item Type:
 $SQL = new SQL();
-if( $edited_Itemtype->ID )
+if( $current_ityp_ID )
 {
 	$SQL->SELECT( 'pst_ID, pst_name, its_ityp_ID' );
 	$SQL->FROM( 'T_items__status' );
 	$SQL->FROM_add( 'JOIN T_items__type' );
 	$SQL->FROM_add( 'LEFT JOIN T_items__status_type ON its_ityp_ID = ityp_ID AND its_pst_ID = pst_ID' );
-	$SQL->WHERE( 'ityp_ID = '.$edited_Itemtype->ID );
+	$SQL->WHERE( 'ityp_ID = '.$current_ityp_ID );
 }
 else
 {
@@ -557,7 +568,7 @@ $Results->cols[] = array(
 	);
 
 $display_params = array(
-		'page_url' => $admin_url.'?ctrl=itemtypes&ityp_ID='.$edited_Itemtype->ID.'&action=edit'
+		'page_url' => $admin_url.'?ctrl=itemtypes&ityp_ID='.$current_ityp_ID.'&action=edit'
 	);
 
 $Results->checkbox_toggle_selectors = 'input[name^=status_]:checkbox';

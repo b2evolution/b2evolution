@@ -12,6 +12,7 @@
 jQuery( document ).ready( function()
 {
 	var msg_obj = jQuery( ".affixed_messages" );
+	var msg_obj_width = msg_obj.outerWidth();
 	var msg_offset = evo_affix_msg_offset;
 
 	if( msg_obj.length == 0 )
@@ -23,33 +24,38 @@ jQuery( document ).ready( function()
 	var wrapper = msg_obj.parent();
 
 	msg_obj.affix( {
-			offset: {
-				top: function() {
-					return wrapper.offset().top - msg_offset - parseInt( msg_obj.css( "margin-top" ) );
-				}
+		offset: {
+			top: function() {
+				return wrapper.offset().top - msg_offset - parseInt( msg_obj.css( "margin-top" ) );
 			}
-		} );
+		}
+	} );
 
 	msg_obj.on( "affix.bs.affix", function()
-		{
-			wrapper.css( { "min-height": msg_obj.outerHeight( true ) } );
+	{
+		wrapper.css( { "min-height": msg_obj.outerHeight( true ) } );
 
-			msg_obj.css( { "width": msg_obj.outerWidth(), "top": msg_offset, "z-index": 99999 } );
+		msg_obj.css( { "width": msg_obj_width, "top": msg_offset, "z-index": 99999 } );
 
-			jQuery( window ).on( "resize", function()
-				{ // This will resize the Messages based on the wrapper width
-					msg_obj.css( { "width": wrapper.css( "width" ) } );
-				});
-		} );
+		jQuery( window ).on( "resize", function()
+			{ // This will resize the Messages based on the wrapper width
+				msg_obj.css( { "width": wrapper.css( "width" ) } );
+			});
+	} );
 
 	msg_obj.on( "affixed-top.bs.affix", function()
-		{
-			wrapper.css( { "min-height": "" } );
-			msg_obj.css( { "width": "", "top": "", "z-index": "" } );
-		} );
+	{
+		wrapper.css( { "min-height": "" } );
+		msg_obj.css( { "width": "", "top": "", "z-index": "" } );
+	} );
 
 	jQuery( "div.alert", msg_obj ).on( "closed.bs.alert", function()
-		{
-			wrapper.css({ "min-height": msg_obj.outerHeight( true ) });
-		} );
+	{
+		wrapper.css({ "min-height": msg_obj.outerHeight( true ) });
+	} );
+
+	if( msg_obj.hasClass( "affix" ) )
+	{	// Manually trigger the "affix.bs.affix" event:
+		msg_obj.trigger( "affix.bs.affix" );
+	}
 } );

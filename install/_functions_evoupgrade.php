@@ -11963,7 +11963,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// Create default templates:
 		$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_template_code ) VALUES
 				( "Item Info: Posted by Author on Date in Categories", "iteminfo_short", "Posted by $author$ on $issue_date$ in $categories$" ),
-				( "Item Info: Long info line", "iteminfo_long", "$flag_icon$ $permalink_icon$ Posted by $author$ $issue_date$ $categories$ — Last touched: $last_touched$ — Last Updated: $last_update$ $edit_link$" )' );
+				( "Item Info: Long info line", "iteminfo_long", "$flag_icon$ $permalink_icon$ Posted by $author$ $issue_date$ $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$" )' );
 
 		upg_task_end();
 	}
@@ -11974,6 +11974,32 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			  SET plug_priority = 99
 			WHERE plug_classname = "nofollow_plugin"
 			  AND plug_priority = 120' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15720, 'Installing new widgets/containers...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'item_in_list', 'item_content,item_footer' );
+		install_new_default_widgets( 'item_single', 'item_footer' );
+		install_new_default_widgets( 'item_page', 'item_footer' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15730, 'Installing new widgets/containers...' ) )
+	{	// part of 7.0.0-alpha
+		install_new_default_widgets( 'chapter_main_area', 'cat_content_list' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15740, 'Upgrading renderers columns...' ) )
+	{	// part of 7.0.0-alpha
+		db_modify_col( 'T_email__campaign', 'ecmp_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_items__item', 'post_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_comments', 'comment_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_items__prerendering', 'itpr_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_comments__prerendering', 'cmpr_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_messaging__message', 'msg_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		db_modify_col( 'T_messaging__prerendering', 'mspr_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
 		upg_task_end();
 	}
 

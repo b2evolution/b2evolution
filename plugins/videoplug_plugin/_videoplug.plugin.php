@@ -128,7 +128,7 @@ class videoplug_plugin extends Plugin
 		      ( $this->get_coll_setting( 'replace_url_post', $setting_Blog ) && ! empty( $params['Item'] ) && $params['Item'] instanceof Item )
 		  ) )
 		{	// Render full video URLs in post or comment content:
-			$content = replace_content_outcode( '#(<a[^>]+href=")?(https?://(.+\.)?(youtube.com|youtu.be|dailymotion.com|vimeo.com|facebook.com|wistia.com)([^"\s\n\r<]+))("[^>]*>(.+?)</a>)?#i',
+			$content = replace_content_outcode_shorttags( '#(<a[^>]+href=")?(https?://(.+\.)?(youtube.com|youtu.be|dailymotion.com|vimeo.com|facebook.com|wistia.com)([^"\s\n\r<]+))("[^>]*>(.+?)</a>)?#i',
 				array( $this, 'parse_video_url_callback' ), $content, 'replace_content', 'preg_callback' );
 		}
 

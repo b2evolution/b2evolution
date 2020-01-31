@@ -2227,10 +2227,17 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	echo '<span class="btn-group">';
 
 	// ---------- SAVE ----------
+	$save_hotkeys = array( 'ctrl+enter', 'command+enter' );
 	$next_action = ($creating ? 'create' : 'update');
 	if( ! $inskin && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $edited_Item ) )
 	{ // Show Save & Edit only on admin mode
-		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'), 'SaveEditButton btn-status-'.$edited_Item->get( 'status' ) ) );
+		$Form->submit( array( 'actionArray['.$next_action.'_edit]', /* TRANS: This is the value of an input submit button */ T_('Save & edit'),
+				'SaveEditButton btn-status-'.$edited_Item->get( 'status' ), 'data-shortcut' => 'ctrl+s,command+s' ) );
+	}
+	else
+	{
+		$save_hotkeys[] = 'ctrl+s';
+		$save_hotkeys[] = 'command+s';
 	}
 
 	if( $inskin )
@@ -2242,7 +2249,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	{ // Use static button title on back-office
 		$button_title = T_('Save');
 	}
-	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->get( 'status' ) ) );
+	$Form->submit( array( 'actionArray['.$next_action.']', $button_title, 'SaveButton btn-status-'.$edited_Item->get( 'status' ), 'data-shortcut' => implode( ',', $save_hotkeys ) ) );
 
 	echo '</span>';
 
@@ -5566,31 +5573,6 @@ function items_list_block_by_page( $params = array() )
 	// -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 	mainlist_page_links( $params );
 	// ------------------------- END OF PREV/NEXT PAGE LINKS -------------------------
-}
-
-
-/**
- * In-skin display of an Item.
- * It is a wrapper around the skin '_item_list.inc.php' file.
- *
- * @param object Item
- */
-function item_inskin_display( $Item )
-{
-	global $cat;
-	$params = array( 'Item' => $Item );
-
-	if( isset( $cat ) && ( $cat != $Item->main_cat_ID ) )
-	{
-		$params = array_merge( array(
-				'before_title'   => '<h3>',
-				'after_title'    => '</h3>',
-				'before_content' => '<div class="excerpt">',
-				'after_content'  => '</div>'
-			), $params );
-	}
-
-	skin_include( '_item_list.inc.php', $params );
 }
 
 

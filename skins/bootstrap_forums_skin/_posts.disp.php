@@ -40,13 +40,15 @@ skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'breadcrumb_path',
 		// Optional display params
-		'block_start'      => '<ol class="breadcrumb">',
-		'block_end'        => '</ol><div class="clear"></div>',
-		'separator'        => '',
-		'item_mask'        => '<li><a href="$url$">$title$</a></li>',
-		'item_active_mask' => '<li class="active">$title$</li>',
-		'suffix_text'      => empty( $single_cat_ID ) ? T_('Latest topics') : '',
-		'coll_logo_size'   => 'fit-128x16',
+		'block_start'           => '<ol class="breadcrumb">',
+		'block_end'             => '</ol><div class="clear"></div>',
+		'separator'             => '',
+		'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+		'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+		'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+		'item_active_mask'      => '<li class="active">$title$</li>',
+		'suffix_text'           => empty( $single_cat_ID ) ? T_('Latest topics') : '',
+		'coll_logo_size'        => 'fit-128x16',
 	) );
 
 // Display default title only for tag page without intro Item:

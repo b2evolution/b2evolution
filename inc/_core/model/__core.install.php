@@ -596,7 +596,7 @@ $schema_queries = array(
 			ecmp_sync_plaintext       TINYINT(1) NOT NULL DEFAULT 1,
 			ecmp_sent_ts              TIMESTAMP NULL,
 			ecmp_auto_sent_ts         TIMESTAMP NULL,
-			ecmp_renderers            VARCHAR(255) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
+			ecmp_renderers            VARCHAR(4000) COLLATE ascii_general_ci NOT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			ecmp_use_wysiwyg          TINYINT(1) NOT NULL DEFAULT 0,
 			ecmp_send_ctsk_ID         INT(10) UNSIGNED NULL DEFAULT NULL,
 			ecmp_welcome              TINYINT(1) NOT NULL DEFAULT 0,

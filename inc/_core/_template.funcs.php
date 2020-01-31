@@ -2114,8 +2114,8 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
  */
 function init_hotkeys_js( $relative_to = 'rsc_url', $hotkeys = array() )
 {
-	require_js_async( '#jquery#', $relative_to ); // dependency
-	require_js_async( '#hotkeys#', $relative_to );
+	require_js_defer( '#jquery#', $relative_to ); // dependency
+	require_js_defer( '#hotkeys#', $relative_to );
 
 	if( $hotkeys )
 	{

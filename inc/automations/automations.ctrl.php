@@ -804,6 +804,11 @@ switch( $action )
 				// Init JS to autcomplete the user logins
 				init_autocomplete_login_js( 'rsc_url', $AdminUI->get_template( 'autocomplete_plugin' ) );
 		}
+
+		if( $action == 'edit' )
+		{	// Initialize Hotkeys
+			init_hotkeys_js();
+		}
 		break;
 	default:
 		$AdminUI->display_breadcrumbpath_add( T_('Automations') );
@@ -815,6 +820,8 @@ if( in_array( $action, array( 'new_step', 'edit_step', 'copy_step' ) ) )
 {	// Load jQuery QueryBuilder plugin files:
 	$step_Automation = & $edited_AutomationStep->get_Automation();
 	init_querybuilder_js( 'rsc_url' );
+	// Initialize Hotkeys:
+	init_hotkeys_js();
 	$AdminUI->display_breadcrumbpath_add( $edited_Automation->dget( 'name' ), $admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID='.$step_Automation->ID );
 	if( $action == 'new_step' )
 	{

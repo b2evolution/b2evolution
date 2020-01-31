@@ -1179,6 +1179,9 @@ else
 			break;
 	}
 
+	// Initialize Hotkeys:
+	init_hotkeys_js();
+
 
 	// Display <html><head>...</head> section! (Note: should be done early if actions do not redirect)
 	$AdminUI->disp_html_head();

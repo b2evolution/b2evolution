@@ -119,14 +119,16 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 	widget_container( 'chapter_main_area', array(
 		// The following params will be used as defaults for widgets included in this container:
 			'container_display_if_empty' => false, // If no widget, don't display container at all
-			'block_start'       => '<div class="evo_widget $wi_class$">',
-			'block_end'         => '</div>',
-			'block_title_start' => '<h2 class="page-header">',
-			'block_title_end'   => '</h2>',
-			'intro_class'       => 'well evo_post evo_content_block',
-			'featured_class'    => 'featurepost',
-			'item_mask'         => '<li><a href="$url$">$title$</a></li>',
-			'item_active_mask'  => '<li class="active">$title$</li>',
+			'block_start'           => '<div class="evo_widget $wi_class$">',
+			'block_end'             => '</div>',
+			'block_title_start'     => '<h2 class="page-header">',
+			'block_title_end'       => '</h2>',
+			'intro_class'           => 'well evo_post evo_content_block',
+			'featured_class'        => 'featurepost',
+			'item_mask'             => '<li><a href="$url$">$title$</a></li>',
+			'item_logo_mask'        => '<li>$logo$ <a href="$url$">$title$</a></li>',
+			'item_active_logo_mask' => '<li class="active">$logo$ $title$</li>',
+			'item_active_mask'      => '<li class="active">$title$</li>',
 
 			// Template params for "Breadcrumb Path" widget:
 			'widget_breadcrumb_path_before' => '<nav><ol class="breadcrumb">',
@@ -134,18 +136,6 @@ elseif( !empty( $cat ) && ( $cat > 0 ) )
 
 		) );
 	// ----------------------------- END OF "Chapter Main Area" CONTAINER -----------------------------
-
-	$callbacks = array(
-		'line'  => 'cat_inskin_display',
-		'posts' => 'item_inskin_display'
-	);
-
-	// Display subcategories and posts
-	echo '<ul class="chapters_list posts_list">';
-
-	$ChapterCache->iterate_through_category_children( $curr_Chapter, $callbacks, false, array( 'sorted' => true ) );
-
-	echo '</ul>';
 
 	// Button to create a new sub-chapter
 	$create_new_chapter_url = $Blog->get_create_chapter_url( $cat );
