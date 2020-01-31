@@ -3576,20 +3576,7 @@ function debug_info( $force = false, $force_clean = false )
 			// add jquery.tablesorter to the "Debug info" table.
 			$relative_to = ( is_admin_page() ? 'rsc_url' : 'blog' );
 			require_js_defer( 'jquery/jquery.tablesorter.min.js', $relative_to, true );
-			echo '
-			<script>
-			(function($){
-				jQuery( "table.debug_timer th" ).on( "click", function(event) {
-					var table = jQuery(this).closest( "table.debug_timer" );
-					if( table.data( "clicked_once" ) ) return; else table.data( "clicked_once", true );
-					jQuery( "tbody:eq(0) tr:last", table ).remove();
-					jQuery( "tbody:eq(1) tr", table ).appendTo( jQuery( "tbody:eq(0)", table ) );
-					// click for tablesorter:
-					table.tablesorter();
-					jQuery(event.currentTarget).click();
-				});
-			})(jQuery);
-			</script>';
+			require_js_defer( 'src/evo_init_debug_timer.js', $relative_to, true );
 		}
 
 

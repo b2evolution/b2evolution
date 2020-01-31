@@ -314,10 +314,10 @@ class coll_search_form_Widget extends ComponentWidget
 			}
 			?>
 			<script>
-			jQuery( document ).ready( function()
-			{
-				jQuery( '[data-search-id="<?php echo format_to_js( $this->widget_instance_ID );?>"] #search_author' ).tokenInput(
-					'<?php echo format_to_js( get_restapi_url().'users/authors' ); ?>',
+				var evo_widget_coll_search_form = {
+					selector: '[data-search-id="<?php echo format_to_js( $this->widget_instance_ID );?>"] #search_author',
+					url: '<?php echo format_to_js( get_restapi_url().'users/authors' ); ?>',
+					config:
 					{
 						theme: 'facebook',
 						queryParam: 'q',
@@ -373,16 +373,17 @@ class coll_search_form_Widget extends ComponentWidget
 							jQuery( '.token-input-list-facebook' ).addClass( 'token-input-list-error' );
 						}
 						<?php } ?>
-					} );
+					},
 				<?php
 				if( empty( $selected_author ) )
 				{
-					echo 'jQuery( "#token-input-search_author" ).attr( "placeholder", "'.format_to_output( T_('Any author' ), 'htmlattr' ).'" ).css( "width", "100%" );';
+					echo 'placeholder: "'.TS_('Any author' ).'",';
 				}
 				?>
-			} );
+				}
 			</script>
 			<?php
+			require_js_defer( 'src/evo_init_widget_coll_search_form.js', 'blog', true );
 		}
 
 		// Print the search form elements depending on template:
