@@ -1214,6 +1214,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $
 {
 	global $required_js; // Use this var as global and NOT static, because it is used in other functions(e.g. display_ajax_form())
 	global $dequeued_headlines;
+	global $use_defer;
 
 	if( isset( $dequeued_headlines[ $js_file ] ) )
 	{ // Don't require this file if it was dequeued before this request
@@ -1245,7 +1246,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $
 		{
 			$script_tag .= ' async';
 		}
-		elseif( $async_defer == 'defer' )
+		elseif( $use_defer === true && $async_defer == 'defer' )
 		{
 			$script_tag .= ' defer';
 		}

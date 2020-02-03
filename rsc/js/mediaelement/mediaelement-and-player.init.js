@@ -9,17 +9,17 @@
  * @copyright (c)2003-2020 by Francois PLANQUE - {@link http://fplanque.com/}
  */
 
-if( evo_html5_mediaelementjs_player_width != '100%' )
-{	// Check to make player width <= window width
-	evo_html5_mediaelementjs_player_width = parseInt( evo_html5_mediaelementjs_player_width );
-	if( jQuery( window ).width() < evo_html5_mediaelementjs_player_width )
-	{
-		evo_html5_mediaelementjs_player_width = jQuery( window ).width();
-	}
-}
-
 jQuery( document ).ready( function()
 {
+	if( evo_html5_mediaelementjs_player_width != '100%' )
+	{	// Check to make player width <= window width
+		evo_html5_mediaelementjs_player_width = parseInt( evo_html5_mediaelementjs_player_width );
+		if( jQuery( window ).width() < evo_html5_mediaelementjs_player_width )
+		{
+			evo_html5_mediaelementjs_player_width = jQuery( window ).width();
+		}
+	}
+
 	jQuery( '.html5_mediaelementjs_player' ).mediaelementplayer(
 	{
 		defaultVideoWidth: evo_html5_mediaelementjs_player_width,

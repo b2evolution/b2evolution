@@ -950,6 +950,14 @@ $max_skin_api_version = 7;
 $access_control_allow_origin = false; // set to '*' or to specific URL to enable CORS requests
 
 
+/**
+ * Allow to use a "defer" way for loading of JavaScript files
+ * 
+ * TODO: Implement new value 'front' in order to allow this only on front-office
+ */
+$use_defer = true;
+
+
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
 $evonetsrv_protocol = 'http';
 $evonetsrv_host = 'rpc.b2evo.net';
