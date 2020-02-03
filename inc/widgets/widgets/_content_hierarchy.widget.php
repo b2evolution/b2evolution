@@ -396,6 +396,7 @@ class content_hierarchy_Widget extends ComponentWidget
 				'before_title'    => $params['item_before_post'],
 				'post_navigation' => 'same_category', // we are always navigating through category in this skin
 				'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
+				'target_blog'     => 'auto',
 				'link_type'       => 'permalink',
 				'link_class'      => 'link',
 				'title_field'     => $params['item_title_fields'],

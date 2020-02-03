@@ -1996,21 +1996,63 @@ switch( $action )
 		break;
 
 	case 'get_url_alias_new_field':
-			param( 'b2evo_icons_type', 'string', '' );
+		param( 'b2evo_icons_type', 'string', '' );
 
-			$Form = new Form();
-			$Form->fieldstart = '#fieldstart#';
-			$Form->fieldend = '#fieldend#';
-			$Form->labelclass = '#labelclass#';
-			$Form->labelstart = '#labelstart#';
-			$Form->labelend = '#labelend#';
-			$Form->inputstart = '#inputstart#';
-			$Form->inputend = '#inputend#';
+		$Form = new Form();
+		$Form->fieldstart = '#fieldstart#';
+		$Form->fieldend = '#fieldend#';
+		$Form->labelclass = '#labelclass#';
+		$Form->labelstart = '#labelstart#';
+		$Form->labelend = '#labelend#';
+		$Form->inputstart = '#inputstart#';
+		$Form->inputend = '#inputend#';
 
-			$alias_field_note = get_icon( 'add', 'imgtag', array( 'class' => 'url_alias_add', 'style' => 'cursor: pointer; position: relative;' ) );
-			$alias_field_note .= get_icon( 'minus', 'imgtag', array( 'class' => 'url_alias_minus', 'style' => 'margin-left: 2px; cursor: pointer; position: relative;' ) );
-			$Form->text_input( 'blog_url_alias[]', '', 50, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias', 'maxlength' => 255 ) );
-			break;
+		$alias_field_note = get_icon( 'add', 'imgtag', array( 'class' => 'url_alias_add', 'style' => 'cursor: pointer; position: relative;' ) );
+		$alias_field_note .= get_icon( 'minus', 'imgtag', array( 'class' => 'url_alias_minus', 'style' => 'margin-left: 2px; cursor: pointer; position: relative;' ) );
+		$Form->text_input( 'blog_url_alias[]', '', 50, T_('Alias URL'), $alias_field_note, array( 'class' => 'evo_url_alias', 'maxlength' => 255 ) );
+		break;
+
+	case 'get_item_parent_info':
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'item' );
+
+		// Use the glyph or font-awesome icons if requested by skin
+		param( 'b2evo_icons_type', 'string', 'fontawesome-glyphicons' );
+
+		param( 'parent_ID', 'integer', true );
+
+		$ItemCache = & get_ItemCache();
+		$parent_Item = & $ItemCache->get_by_ID( $parent_ID, false, false );
+
+		$r = array();
+		if( $parent_Item )
+		{
+			if( is_logged_in() )
+			{	// Remember what last collection was used for linking in order to display it by default on next linking:
+				global $UserSettings;
+
+				$UserSettings->set( 'last_select_parent_coll_ID', $parent_Item->get_blog_ID() );
+				$UserSettings->dbupdate();
+			}
+
+			$parent_info = '';
+			$status_icons = get_visibility_statuses( 'icons' );
+			if( isset( $status_icons[ $parent_Item->get( 'status' ) ] ) )
+			{	// Status colored icon:
+				$parent_info .= $status_icons[ $parent_Item->get( 'status' ) ];
+			}
+			// Title with link to permament url:
+			$parent_info .= ' '.$parent_Item->get_title( array( 'link_type' => 'permalink' ) );
+			// Icon to edit:
+			$parent_info .= ' '.$parent_Item->get_edit_link( array( 'text' => '#icon#' ) );
+
+			$r['parent_ID'] = $parent_Item->ID;
+			$r['parent_info'] = $parent_info;
+			$r['parent_coll_ID'] = $parent_Item->get_blog_ID();
+		}
+
+		echo json_encode( $r );
+		break;
 
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );

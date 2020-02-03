@@ -1009,14 +1009,14 @@ function extract_keyphrase_from_hitlogs( $display_messages = true )
 	$SQL->FROM( 'T_hitlog' );
 	$SQL->WHERE( 'hit_keyphrase IS NOT NULL' );
 	$SQL->WHERE_and( 'hit_keyphrase != ""' );
-	$SQL->WHERE_and( 'hit_keyphrase_keyp_ID IS NULL' );
+	$SQL->WHERE_and( 'hit_keyphrase_keyp_ID IS NULL' );  // Keyphrase that has not been extracted yet!
 	$ids = $DB->get_row( $SQL, ARRAY_A );
 	$Timer->stop( 'extract_keyphrase_number' );
 
 	if( $display_messages )
 	{	// Display info:
 		$log_message = sprintf( TB_('Number of hitlog records that have a keyphrase that was not processed yet: %d'), intval( $ids['hits_num'] ) );
-		$log_message .= ' <span class="note">('.sprintf( TB_('Time: %s seconds'), $Timer->get_duration( 'extract_keyphrase_number' ) ).')</span>';
+		$log_message .= ' <span class="note">(keyphrases='.$ids['keyphrases_num'].', min='.$ids['min'].', max='.$ids['max'].')('.sprintf( TB_('Time: %s seconds'), $Timer->get_duration( 'extract_keyphrase_number' ) ).')</span>';
 		if( $display_messages === 'cron_job' )
 		{	// Log a message for cron job:
 			cron_log_append( $log_message );
@@ -1028,7 +1028,7 @@ function extract_keyphrase_from_hitlogs( $display_messages = true )
 		}
 	}
 
-	if( ! empty ( $ids['min'] ) && ! empty ( $ids['max'] ) )
+	if( ! empty( $ids['min'] ) && ! empty( $ids['max'] ) )
 	{	// Extract keyphrases if needed:
 
 		$Timer->start( 'extract_keyphrase_insert' );
@@ -1079,9 +1079,10 @@ function extract_keyphrase_from_hitlogs( $display_messages = true )
 		if( $display_messages )
 		{	// Display info:
 			$log_message = TB_('Updating hit logs table...').' ';
-		if( $display_messages === 'cron_job' )
+			if( $display_messages === 'cron_job' )
 			{	// Log a message for cron job:
 				cron_log_append( $log_message, NULL, '' );
+// TODO: We must FORCE writing the log to the DB here
 			}
 			else
 			{	// Print out a message:
@@ -1091,6 +1092,7 @@ function extract_keyphrase_from_hitlogs( $display_messages = true )
 		}
 
 		$Timer->start( 'extract_keyphrase_update' );
+// TODO: this still takes too much time!
 		$sql = 'UPDATE T_hitlog as h, T_track__keyphrase as k
 				SET h.hit_keyphrase_keyp_ID = k.keyp_ID
 				WHERE
