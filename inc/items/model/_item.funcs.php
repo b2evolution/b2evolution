@@ -2578,7 +2578,7 @@ function echo_item_selector_js()
  */
 function evo_item_selector_load_window( item_ID, window_titles, restriction_message, submit_buttons, default_coll_ID, api_coll_path, api_coll_params )
 {
-	if( item_ID < 1 || ( restriction_message !== false && typeof( bozo ) && bozo.nb_changes > 0 ) )
+	if( ( restriction_message !== false && item_ID < 1 ) || ( restriction_message !== false && typeof( bozo ) && bozo.nb_changes > 0 ) )
 	{	// Don't allow to select another item if item edit form is changed and not saved yet:
 		alert( restriction_message );
 		return false;
@@ -3158,6 +3158,78 @@ jQuery( document ).on( 'click', '#evo_link_version_btn', function()
 		+ '&post_ID=' + jQuery( '#evo_item_selector_post_ID' ).val()
 		+ '&dest_post_ID=' + jQuery( '#evo_item_selector_dest_post_ID' ).val()
 		+ '&<?php echo url_crumb( 'item' ); ?>';
+} );
+</script>
+<?php
+}
+
+
+/**
+ * JS Behaviour: Output JavaScript code to select parent of Item
+ */
+function echo_item_select_parent_js()
+{
+	global $Blog, $UserSettings, $admin_url, $evo_item_select_parent_js_initialized;
+	global $b2evo_icons_type;
+
+	if( ! empty( $evo_item_select_parent_js_initialized ) )
+	{	// Don't initialize this JS code twice on same page:
+		return;
+	}
+
+	// Set flag to know this is initialized:
+	$evo_item_select_parent_js_initialized = true;
+
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize JavaScript for item selector window:
+	echo_item_selector_js();
+
+	// Get default collection:
+	if( ! ( $default_coll_ID = $UserSettings->get( 'last_select_parent_coll_ID' ) ) )
+	{
+		$default_coll_ID = empty( $Blog ) ? 0 : $Blog->ID;
+	}
+?>
+<script>
+var evo_select_parent_load_window_default_coll = <?php echo $default_coll_ID;?>;
+
+function evo_select_parent_load_window( item_ID )
+{
+	return evo_item_selector_load_window( item_ID,
+		[ '<?php echo TS_('Select the parent'); ?>', '<?php echo TS_('Select this Post as parent:'); ?>' ],
+		false,
+		[ { 'text': '<?php echo TS_('Select'); ?>', 'id': 'evo_select_parent_btn', 'class': 'btn btn-primary' } ],
+		evo_select_parent_load_window_default_coll,
+		'collections'
+	);
+}
+
+// Submit form to merge/append a post:
+jQuery( document ).on( 'click', '#evo_select_parent_btn', function()
+{
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: htsrv_url + "anon_async.php",
+		data: {
+			'action': 'get_item_parent_info',
+			'post_ID': jQuery( '#evo_item_selector_post_ID' ).val(),
+			'parent_ID': jQuery( '#evo_item_selector_dest_post_ID' ).val(),
+			'b2evo_icons_type': '<?php echo isset( $b2evo_icons_type ) ? $b2evo_icons_type : ''; ?>',
+			'crumb_item': '<?php echo get_crumb( 'item' ); ?>'
+		},
+		success: function( data )
+		{
+			data = JSON.parse( ajax_debug_clear( data ) );
+			jQuery( '#post_parent_ID' ).removeClass( 'field_error' ).val( data.parent_ID );
+			jQuery( '#parent_item_info' ).html( data.parent_info );
+
+			evo_select_parent_load_window_default_coll = data.parent_coll_ID;
+			closeModalWindow();
+		}
+	} );
 } );
 </script>
 <?php
