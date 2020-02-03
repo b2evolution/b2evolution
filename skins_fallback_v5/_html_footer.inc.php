@@ -47,6 +47,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 	// Add structured data at the end
 	skin_structured_data();
+
+	// Include ALL exposed JS variables into <script>:
+	include_js_vars();
 ?>
 </body>
 </html>

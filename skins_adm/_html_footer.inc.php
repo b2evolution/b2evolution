@@ -61,5 +61,9 @@ include_footerlines(); // enables translation strings for js
 <!-- End of skin_wrapper -->
 </div>
 
+<?php
+// Include ALL exposed JS variables into <script>:
+include_js_vars();
+?>
 </body>
 </html>

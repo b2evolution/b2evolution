@@ -1,5 +1,5 @@
 /**
- * This file initialize Comment rating
+ * This file has generic functions
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -9,12 +9,19 @@
  * @copyright (c)2003-2020 by Francois PLANQUE - {@link http://fplanque.com/}
  */
 
-jQuery( document ).ready( function()
-{
-	if( typeof( evo_comment_rating_config ) == 'undefined' )
-	{	// Don't execute code below because no config var is found:
-		return;
-	}
 
-	jQuery( '#comment_rating' ).html( '' ).raty( evo_comment_rating_config );
-} );
+/**
+ * Prevent submit a form by Enter Key, e.g. when user is editing the owner fields
+ *
+ * @param string jQuery selector
+ */
+function evo_prevent_key_enter( selector )
+{
+	jQuery( selector ).keypress( function( e )
+	{
+		if( e.keyCode == 13 )
+		{
+			return false;
+		}
+	} );
+}

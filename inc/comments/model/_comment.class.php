@@ -3421,18 +3421,13 @@ class Comment extends DataObject
 
 		echo '</div>';
 
-		echo '<script>
-		/* <![CDATA[ */
-		var evo_comment_rating_config = {
+		expose_var_to_js( 'evo_comment_rating_config', '{
 			scoreName: "comment_rating",
 			start: '.(int)$this->rating.',
 			hintList: ["'.$params['label_low'].'", "'.$params['label_2'].'", "'.$params['label_3'].'", "'.$params['label_4'].'", "'.$params['label_high'].'"],
 			width: 110,
 			'.$jquery_raty_param.'
-		};
-		/* ]]> */
-		</script>';
-		require_js_defer( 'src/evo_init_comment_rating.js', 'blog', true );
+		}' );
 
 		echo $params['after'];
 	}

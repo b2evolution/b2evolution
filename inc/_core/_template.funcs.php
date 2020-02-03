@@ -1045,6 +1045,49 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
 
 
 /**
+ * Expose PHP variable to JS variable in order to print out them into <script> before </body>
+ *
+ * @param string Name
+ * @param string Value
+ */
+function expose_var_to_js( $name, $value )
+{
+	global $evo_exposed_js_vars;
+
+	if( ! is_array( $evo_exposed_js_vars ) )
+	{	// Initialize array once:
+		$evo_exposed_js_vars = array();
+	}
+
+	$evo_exposed_js_vars[ $name ] = $value;
+}
+
+
+/**
+ * Include ALL exposed JS variables into <script>
+ */
+function include_js_vars()
+{
+	global $evo_exposed_js_vars;
+
+	if( empty( $evo_exposed_js_vars ) ||
+	    ! is_array( $evo_exposed_js_vars ) )
+	{	// No exposed JS variables found:
+		return;
+	}
+
+	echo "<script>\n/* <![CDATA[ */\n";
+
+	foreach( $evo_exposed_js_vars as $var_name => $var_value )
+	{
+		echo 'var '.$var_name.' = '.$var_value.";\n";
+	}
+
+	echo "\n/* ]]> */\n</script>";
+}
+
+
+/**
  * Get library url of JS or CSS file by file name or alias
  *
  * @param string File or Alias name
@@ -1961,59 +2004,10 @@ function init_autocomplete_login_js( $relative_to = 'rsc_url', $library = 'hintb
 		case 'typeahead':
 			// Use typeahead library of bootstrap
 			require_js_defer( '#bootstrap_typeahead#', $relative_to );
-			add_js_headline( 'jQuery( document ).ready( function()
-			{
-				jQuery( "input.autocomplete_login" ).on( "added",function()
-				{
-					jQuery( "input.autocomplete_login" ).each( function()
-					{
-						if( jQuery( this ).hasClass( "tt-input" ) || jQuery( this ).hasClass( "tt-hint" ) )
-						{	// Skip this field because typeahead is initialized before:
-							return;
-						}
-						var ajax_url = "";
-						if( jQuery( this ).hasClass( "only_assignees" ) )
-						{
-							ajax_url = restapi_url + "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'";
-						}
-						else
-						{
-							ajax_url = restapi_url + "users/logins";
-						}
-						if( jQuery( this ).data( "status" ) )
-						{
-							ajax_url += "&status=" + jQuery( this ).data( "status" );
-						}
-						jQuery( this ).typeahead( null,
-						{
-							displayKey: "login",
-							source: function ( query, cb )
-							{
-								jQuery.ajax(
-								{
-									type: "GET",
-									dataType: "JSON",
-									url: ajax_url,
-									data: { q: query },
-									success: function( data )
-									{
-										var json = new Array();
-										for( var l in data.list )
-										{
-											json.push( { login: data.list[ l ] } );
-										}
-										cb( json );
-									}
-								} );
-							}
-						} );
-					} );
-				} );
-				jQuery( "input.autocomplete_login" ).trigger( "added" );
-				'
-				// Don't submit a form by Enter when user is editing the owner fields
-				.get_prevent_key_enter_js( 'input.autocomplete_login' ).'
-			} );' );
+			expose_var_to_js( 'evo_autocomplete_login_config', '{
+					url: "'.( isset( $Blog ) ? 'collections/'.$Blog->get( 'urlname' ).'/assignees' : 'users/logins' ).'",
+					selector: "input.autocomplete_login",
+				}' );
 			break;
 
 		case 'hintbox':

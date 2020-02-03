@@ -11,6 +11,11 @@
 
 jQuery( document ).ready( function()
 {
+	if( typeof( evo_widget_coll_search_form ) == 'undefined' )
+	{	// Don't execute code below because no config var is found:
+		return;
+	}
+
 	jQuery( evo_widget_coll_search_form.selector ).tokenInput( evo_widget_coll_search_form.url, evo_widget_coll_search_form.config );
 
 	if( typeof( evo_widget_coll_search_form.placeholder ) != 'undefined' )
