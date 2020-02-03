@@ -1404,7 +1404,8 @@ class ItemLight extends DataObject
 		$blogurl = '';
 		if( ! empty( $Blog ) &&
 		    in_array( $params['link_type'], array( '#', 'permalink' ) ) &&
-		    $this->check_cross_post_nav( $params['target_blog'], $Blog->ID ) )
+		    ( $this->check_cross_post_nav( $params['target_blog'], $Blog->ID ) || // This Item can stay in the current Collection
+		      $this->is_part_of_blog( $Blog->ID ) ) ) // Also allow to stay in the current Collection if this Item has an extra category from NOT main Collection
 		{	// Get collection URL only when it is required:
 			$blogurl = $Blog->gen_blogurl();
 		}
