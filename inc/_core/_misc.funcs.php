@@ -912,7 +912,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 		// Replace all matching blocks with temporary text like '?X219a33da9c1b8f4e335bffc015df8c96X?'
 		// where X is index of match block in array $matches[0]
 		// It is used to avoid any changes in the matching blocks
-		$text = str_ireplace( $matches_source, $matches_temp, $text );
+		$text = str_replace( $matches_source, $matches_temp, $text );
 
 		// Callback:
 		$callback_params = $params;
@@ -920,7 +920,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 		$text = call_user_func_array( $callback, $callback_params );
 
 		// Revert a source code of the matching blocks in content
-		$text = str_ireplace( $matches_temp, $matches_source, $text );
+		$text = str_replace( $matches_temp, $matches_source, $text );
 
 		return $text;
 	}
