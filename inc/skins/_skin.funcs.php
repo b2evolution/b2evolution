@@ -378,7 +378,7 @@ function skin_init( $disp )
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 
-			if( is_logged_in() && has_featured_Item() )
+			if( is_logged_in() && has_featured_Item( 'posts', NULL, $Blog->get_setting( 'disp_featured_above_list' ) ) )
 			{
 				init_hotkeys_js( 'blog' );
 			}

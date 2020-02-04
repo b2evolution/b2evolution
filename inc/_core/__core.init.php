@@ -1470,8 +1470,8 @@ class _core_Module extends Module
 				elseif( ! is_admin_page() &&
 				    ( $disp == 'posts' ) &&
 				    $perm_admin_restricted &&
-					$featured_intro_Item = & get_featured_Item( 'posts', NULL, true, true, true ) &&
-					( $featured_intro_Item->is_intro() || ( $Blog->get_setting( 'disp_featured_above_list' ) && $featured_intro_Item->is_featured() ) ) )
+				    ( $featured_intro_Item = & get_featured_Item( 'posts', NULL, true, $Blog->get_setting( 'disp_featured_above_list' ) ) ) &&
+				    ( $featured_intro_Item->is_intro() || ( $Blog->get_setting( 'disp_featured_above_list' ) && $featured_intro_Item->is_featured() ) ) )
 				{
 					if( $Blog->get_setting( 'in_skin_editing' ) &&
 					    $edit_item_url = $featured_intro_Item->get_edit_url() )
