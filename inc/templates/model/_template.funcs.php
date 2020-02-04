@@ -231,7 +231,7 @@ function render_template_callback( $var, $params )
 			break;
 
 		case '$read_status$':
-			$Item->get_unread_status( array(
+			echo $Item->get_unread_status( array(
 					'style'  => 'text',
 					'before' => '<span class="evo_post_read_status">',
 					'after'  => '</span>'
