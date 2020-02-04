@@ -198,35 +198,11 @@ class poll_Widget extends ComponentWidget
 				echo '</table>';
 
 				global $evo_poll_answer_JS_is_initialized;
-				if( empty( $evo_poll_answer_JS_is_initialized ) || $Poll->get( 'max_answers' ) > 1 )
-				{	// Initialize JS code to restrict max answers per user and Fix answer long text width:
-				?>
-				<script>
-				jQuery( document ).ready( function()
-				{
-					jQuery( '.evo_poll__selector input[type="checkbox"]' ).on( 'click', function()
-					{	// Check max possible answers per user for multiple poll:
-						var poll_table = jQuery( this ).closest( '.evo_poll__table' );
-						var is_disabled = ( jQuery( '.evo_poll__selector input:checked', poll_table ).length >= poll_table.data( 'max-answers' ) );
-						jQuery( '.evo_poll__selector input[type=checkbox]:not(:checked)', poll_table ).prop( 'disabled', is_disabled );
-					} );
-
-					jQuery( '.evo_poll__table' ).each( function()
-					{	// Fix answer long text width because of labels uses css "white-space:nowrap" by default:
-						var table = jQuery( this );
-						if( table.width() > table.parent().width() )
-						{	// If table width more than parent:
-							jQuery( '.evo_poll__title', table ).css( 'white-space', 'normal' );
-							jQuery( '.evo_poll__title label', table ).css( {
-								'width': Math.floor( table.parent().width() / 2 ) + 'px', // Use 50% of table width for long answers
-								'word-wrap': 'break-word' // Wrap long words
-							} );
-						}
-					} );
-				} );
-				</script>
-				<?php
-					// Set flag to don't print out this code twice of the same page with several poll widgets:
+				if( empty( $evo_poll_answer_JS_is_initialized ) )
+				{	// Set JS var to initialize code in evo_init_widget_poll.js:
+					expose_var_to_js( 'evo_widget_poll_initialize', 'true' );
+		
+					// Set flag to not set the init var more than once if there are several poll widgets on the same page:
 					$evo_poll_answer_JS_is_initialized = true;
 				}
 

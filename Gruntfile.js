@@ -290,6 +290,7 @@ module.exports = function(grunt) {
 					'rsc/js/src/evo_init_comment_rating.js',
 					'rsc/js/src/evo_init_widget_coll_search_form.js',
 					'rsc/js/src/evo_init_autocomplete_login.js',
+					'rsc/js/src/evo_init_widget_poll.js',
 				],
 				dest: 'rsc/js/build/evo_generic.bmin.js'
 			},
