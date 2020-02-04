@@ -2719,14 +2719,17 @@ class Comment extends DataObject
 				$text = get_icon( 'permalink' ).T_('Permalink');
 				break;
 
+			case '#icon':
 			case '#icon#':
 				$text = get_icon( 'permalink' );
 				break;
 
+			case '#text':
 			case '#text#':
 				$text = T_('Permalink');
 				break;
 
+			case '#item':
 			case '#item#':
 				$comment_Item = & $this->get_Item();
 				$text = $comment_Item->get_title( array( 'link_type' => 'none' ) );

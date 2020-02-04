@@ -93,8 +93,8 @@ function render_template_callback( $var, $params )
 		'after_edit_link'     => '',
 		'edit_link_text'      => '#',
 		'format'              => '',
-		'date_format'         => 'extended',
-		'time_format'         => 'none',
+		'date_format'         => '#extended-date',
+		'time_format'         => '#none',
 		'excerpt_before_text' => '',
 		'excerpt_after_text'  => '',
 		'excerpt_before_more' => ' <span class="evo_post__excerpt_more_link">',
@@ -105,60 +105,80 @@ function render_template_callback( $var, $params )
 	$r = $var;
 	$match_found = true;
 
+// TODO: use locale_resolve_datetime_fmt()
 	// Get datetime format:
 	switch( $params['date_format'] )
 	{
-		case 'extended':
+		case 'extended':	// TODO: convert value in widget to this:
+		case '#extended_date':
 			$date_format = locale_extdatefmt();
 			break;
 
-		case 'long':
+		case 'long':	// TODO: convert value in widget to this:
+		case '#long_date':
 			$date_format = locale_longdatefmt();
 			break;
 
-		case 'short':
+		case 'short':	// TODO: convert value in widget to this:
+		case '#short_date':
 			$date_format = locale_datefmt();
 			break;
 
+		case '#none':
 		default:
-			$time_format = '';
+			$date_format = '';
 	}
 
+// TODO: use locale_resolve_datetime_fmt()
 	switch( $params['time_format'] )
 	{
-		case 'long':
+		case 'long':	// TODO: convert value in widget to this:
+		case '#long_time':
 			$time_format = locale_timefmt();
 			break;
 
-		case 'short':
+		case 'short':	// TODO: convert value in widget to this:
+		case '#short_time':
 			$time_format = locale_shorttimefmt();
 			break;
 
-		case 'none':
+		case 'none':	// TODO: convert value in widget to this:
+		case '#none':
 		default:
 			$time_format = '';
 	}
 
+
+// TODO: a variable is like `$Cat:description$` or `$Item:excerpt$`
+// If we have just $excerpt$, it is the equivalent of `$Item:excerpt$`
+// So step 1 is to isolate the Prefix `Item` or `Cat` and check if $Item or $Chapter is defined
+// If NOT, then return error
+
+
 	ob_start();
+// TODO: remove `$` and `$` from the swicth var
 	switch( $r )
 	{
 		// Item:
 		case '$flag_icon$':
+// TODO: should be  case 'Item:flag_icon':
 			$Item->flag( array(
 					'before' => $params['before_flag'],
 					'after'  => $params['after_flag'],
 				) );
 			break;
 
-		case '$permalink_icon$':
+		case '$permalink_icon$':	// Temporary
+// TODO: should be  case 'Item:permalink_icon':
 			$Item->permanent_link( array(
-					'text'   => $params['permalink_text'],
+					'text'   => '#icon#',
 					'before' => $params['before_permalink'],
 					'after'  => $params['after_permalink'],
 				) );
 			break;
 
 		case '$permalink$':
+		case '$permanent_link$':
 			$Item->permanent_link( array(
 					'text'   => $params['permalink_text'],
 					'class'  => $params['permalink_class'],
@@ -175,7 +195,8 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$issue_date$':
+		case '$issue_date$':  // TODO: remove from all templates
+		case '$issue_time$':
 			$Item->issue_time( array(
 					'before'      => $params['before_post_time'],
 					'after'       => $params['after_post_time'],
@@ -183,7 +204,9 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$creation_date$':
+		case '$creation_date$':  // TODO: remove from all templates
+		case '$creation_time$':
+// TODO: Make & Call $Item->get_creation_time();
 			echo $params['before_post_time'];
 			echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
 			echo $params['after_post_time'];
@@ -201,12 +224,15 @@ function render_template_callback( $var, $params )
 			break;
 
 		case '$last_touched$':
+// TODO: Make & Call $Item->get_last_touched_ts();
 			echo $params['before_last_touched'];
 			echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) );
 			echo $params['after_last_touched'];
 			break;
 
 		case '$last_updated$':
+		case '$contents_last_updated$':
+// TODO: Make & Call $Item->get_contents_last_updated_ts();
 			echo $params['before_last_updated'];
 			echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
 			echo $params['after_last_updated'];

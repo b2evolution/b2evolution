@@ -533,6 +533,45 @@ function locale_charset( $disp = true )
 
 
 /**
+ * Resolves a #date_format_code to the correct date or time format
+ *
+ * @param string Locale, must be set in {@link $locales}
+ * @return string Date format of the locale, e.g. 'd.m.Y'
+ */
+function locale_resolve_datetime_fmt( $format, $locale = NULL )
+{
+	// Get datetime format:
+	switch( $format )
+	{
+		case '#short_date':
+			$format = locale_datefmt( $locale );
+			break;
+
+		case '#long_date':
+			$format = locale_longdatefmt( $locale );
+			break;
+
+		case '#extended_date':
+			$format = locale_extdatefmt( $locale );
+			break;
+
+		case '#short_time':
+			$format = locale_shorttimefmt( $locale );
+			break;
+
+		case '#long_time':
+			$format = locale_timefmt( $locale );
+			break;
+
+		case '#none':
+			$format = '';
+	}
+
+	return $format;
+}
+
+
+/**
  * Returns the current locale's default date format
  * @param string Locale, must be set in {@link $locales}
  * @return string Date format of the locale, e.g. 'd.m.Y'
