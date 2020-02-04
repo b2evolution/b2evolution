@@ -94,7 +94,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 20, 'item_visibility_badge', 'coll_type' => '-manual' ),
 		array( 30, 'item_info_line', 'coll_type' => '-manual' ),
 		array( 40, 'item_content', 'unique' => true ),
-		array( 50, 'item_footer' ),
+		array( 50, 'item_footer', 'coll_type' => '-manual,forum' ),
 	);
 
 	/* Item Single Header */
