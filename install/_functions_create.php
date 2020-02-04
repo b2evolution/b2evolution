@@ -1638,46 +1638,103 @@ function create_default_posts_location()
 
 /**
  * Create default templates
+ *
+ * @param boolean TRUE to use this as separate task
  */
-function create_default_templates()
+function create_default_templates( $is_task = true )
 {
-	global $DB, $current_locale;
+	global $DB;
 
-	task_begin( 'Creating default templates... ' );
-	$DB->query( '
-		INSERT INTO T_templates ( tpl_name, tpl_code, tpl_template_code )
-		VALUES
-			( "Item Info: Posted by Author on Date in Categories", "iteminfo_short", "Posted by $author$ on $issue_date$ in $categories$" ),
-			( "Item Info: Long info line", "iteminfo_long", "$flag_icon$ $permalink_icon$ Posted by $author$ $issue_date$ $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$" ),
-			( "Include Content Block: with clearfix", "cblock_clearfix", \'<div class="evo_content_block clearfix $cb_class$\">
+	if( $is_task )
+	{
+		task_begin( 'Creating default templates... ' );
+	}
+
+	$new_templates = array(
+		'iteminfo_short' => array(
+			'name'     => 'Item Info: Posted by Author on Date in Categories',
+			'template' => 'Posted by $author$ on $issue_date$ in $categories$',
+		),
+		'iteminfo_long' => array(
+			'name'     => 'Item Info: Long info line',
+			'template' => '$flag_icon$ $permalink_icon$ Posted by $author$ $issue_date$ $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$',
+		),
+		'cblock_clearfix' => array(
+			'name'     => 'Include Content Block: with clearfix',
+			'template' => '<div class="evo_content_block clearfix $cb_class$\">
 	<div class="evo_content_block_images">
 		<img src="$teaser_image$">
 	</div>
 	<div class="evo_content_block_text">
 		$content$ 
 	</div>
-</div>\' ),
-			( "Include Content Block: without clearfix", "cblock_noclearfix", \'<div class="evo_content_block $cb_class$">
+</div>',
+		),
+		'cblock_noclearfix' => array(
+			'name'     => 'Include Content Block: without clearfix',
+			'template' => '<div class="evo_content_block $cb_class$">
 	<div class="evo_content_block_images">
 		<img src="$teaser_image$">
 	</div>
 	<div class="evo_content_block_text">
 		$content$ 
 	</div>
-</div>\' ),
-			( "Include Content Block: Images Left / Text Right", "cblock_imgleft_textright", \'<div class="evo_content_block $cb_class$">
+</div>',
+		),
+		'cblock_imgleft_textright' => array(
+			'name'     => 'Include Content Block: Images Left / Text Right',
+			'template' => '<div class="evo_content_block $cb_class$">
 	<img src="$teaser_image$" class="floatleft">
 	<div class="evo_content_block_text">
 		$content$ 
 	</div>
-</div>\' ),
-			( "Include Content Block: Text Left / Images Right", "cblock_textleft_imgright", \'<div class="evo_content_block $cb_class$">
+</div>',
+		),
+		'cblock_textleft_imgright' => array(
+			'name'     => 'Include Content Block: Text Left / Images Right',
+			'template' => '<div class="evo_content_block $cb_class$">
 	<img src="$teaser_image$" class="floatright">
 	<div class="evo_content_block_text">
 		$content$ 
 	</div>
-</div>\' )
-			' );
-	task_end();
+</div>',
+		),
+		'content_list_subcat' => array(
+			'name'     => 'Content List: Subcat',
+			'template' => '<h3>$cat_icon$ $Cat:permalink$</h3>',
+		),
+		'content_list_item' => array(
+			'name'     => 'Content List: Item',
+			'template' => '<h3>$page_icon$ $permalink$</h3>
+<div class="evo_post__excerpt_text">$excerpt$ $more_link$</div>',
+		),
+	);
+
+	$SQL = new SQL( 'Select all templates before insert new defaults' );
+	$SQL->SELECT( 'tpl_code' );
+	$SQL->FROM( 'T_templates' );
+	$SQL->WHERE( 'tpl_code IN ( '.$DB->quote( array_keys( $new_templates ) ).' )' );
+	$old_templates = $DB->get_col( $SQL );
+
+	$templates_sql = array();
+	foreach( $new_templates as $code => $template )
+	{
+		if( ! in_array( $code, $old_templates ) )
+		{	// Insert only not existing templates:
+			$templates_sql[] = '( '.$DB->quote( $template['name'] ).', '.$DB->quote( $code ).', '.$DB->quote( $template['template'] ).' )';
+		}
+	}
+
+	if( ! empty( $templates_sql ) )
+	{	// Insert new templates:
+		$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_template_code )
+			VALUES '.implode( ', ', $templates_sql ),
+			'Creating default templates' );
+	}
+
+	if( $is_task )
+	{
+		task_end();
+	}
 }
 ?>
