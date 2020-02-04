@@ -259,7 +259,7 @@ class item_info_line_Widget extends ComponentWidget
 			echo $this->disp_params['block_body_start'];
 
 			echo $params['widget_item_info_line_before'];
-			echo render_template( $this->disp_params['template'], 'render_template_callback', array_merge( $params, array(
+			echo render_template( $this->disp_params['template'], array_merge( $params, array(
 					'date_format' => $this->disp_params['date_format'],
 					'time_format' => $this->disp_params['time_format'],
 				), $params['widget_item_info_line_params'] ) );
