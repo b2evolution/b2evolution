@@ -12003,6 +12003,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15750, 'Creating new default templates...' ) )
+	{	// part of 7.0.0-alpha
+		// Create default templates what were not created before yet:
+		require_once dirname(__FILE__).'/_functions_create.php';
+		create_default_templates( false );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

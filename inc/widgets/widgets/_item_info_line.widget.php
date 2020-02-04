@@ -212,161 +212,6 @@ class item_info_line_Widget extends ComponentWidget
 
 
 	/**
-	 * Replace variables in template used by widget
-	 * 
-	 * @param string variable to be replaced
-	 * @return string replacement string
-	 */
-	function template_callback( $var, $params )
-	{
-		global $Item;
-
-		$r = $var;
-		$match_found = true;
-
-		// Get datetime format:
-		$date_format = '';
-		switch( $this->disp_params['date_format'] )
-		{
-			case 'extended':
-				$date_format = locale_extdatefmt();
-				break;
-
-			case 'long':
-				$date_format = locale_longdatefmt();
-				break;
-
-			case 'short':
-				$date_format = locale_datefmt();
-				break;
-		}
-
-		$time_format = '';
-		if( $this->disp_params['time_format'] != 'none' )
-		{
-			switch( $this->disp_params['time_format'] )
-			{
-				case 'long':
-					$time_format = locale_timefmt();
-					break;
-
-				case 'short':
-					$time_format = locale_shorttimefmt();
-					break;
-			}
-		}
-
-		$widget_params = array_merge( array(
-			'before_flag'         => '',
-			'after_flag'          => '',
-			'before_permalink'    => '',
-			'after_permalink'     => '',
-			'permalink_text'      => '#icon#',
-			'before_author'       => '',
-			'after_author'        => '',
-			'before_post_time'    => '',
-			'after_post_time'     => '',
-			'before_categories'   => '',
-			'after_categories'    => '',
-			'before_last_touched' => '',
-			'after_last_touched'  => '',
-			'before_last_updated' => '',
-			'after_last_updated'  => '',
-			'before_edit_link'    => ' &bull; ',
-			'after_edit_link'     => '',
-			'edit_link_text'      => '#',
-			'format'              => '',
-		), $params['widget_item_info_line_params'] );
-
-		ob_start();
-		switch( $r )
-		{
-			case '$flag_icon$':
-				$Item->flag( array(
-						'before' => $widget_params['before_flag'],
-						'after'  => $widget_params['after_flag'],
-					) );
-				break;
-
-			case '$permalink_icon$':
-				$Item->permanent_link( array(
-						'text'   => $widget_params['permalink_text'],
-						'before' => $widget_params['before_permalink'],
-						'after'  => $widget_params['after_permalink'],
-					) );
-				break;
-
-			case '$author$':
-				$Item->author( array(
-						'before'    => $widget_params['before_author'],
-						'after'     => $widget_params['after_author'],
-						'link_text' => $params['author_link_text'],
-					) );
-				break;
-
-			case '$issue_date$':
-				$Item->issue_time( array(
-						'before'      => $widget_params['before_post_time'],
-						'after'       => $widget_params['after_post_time'],
-						'time_format' => $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format
-					) );
-				break;
-
-			case '$creation_date$':
-				echo $widget_params['before_post_time'];
-				echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
-				echo $widget_params['after_post_time'];
-				break;
-
-			case '$categories$':
-				$Item->categories( array(
-						'before'          => $widget_params['before_categories'],
-						'after'           => $widget_params['after_categories'],
-						'include_main'    => true,
-						'include_other'   => true,
-						'include_external'=> true,
-						'link_categories' => true,
-					) );
-				break;
-
-			case '$last_touched$':
-				echo $widget_params['before_last_touched'];
-				echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) );
-				echo $widget_params['after_last_touched'];
-				break;
-
-			case '$last_updated$':
-				echo $widget_params['before_last_updated'];
-				echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
-				echo $widget_params['after_last_updated'];
-				break;
-
-			case '$edit_link$':
-				$Item->edit_link( array(
-					'before' => $widget_params['before_edit_link'],
-					'after'  => $widget_params['after_edit_link'],
-					'text'   => $widget_params['edit_link_text'],
-				) );
-				break;
-
-			default:
-				$match_found = false;
-		}
-		$r = ob_get_contents();
-		ob_end_clean();
-
-		if( $match_found )
-		{
-			return $r;
-		}
-		else
-		{
-			return $var;
-		}
-	}
-
-
-	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -397,7 +242,7 @@ class item_info_line_Widget extends ComponentWidget
 		{
 			load_funcs( 'templates/model/_template.funcs.php' );
 			$TemplateCache = & get_TemplateCache();
-			if( ! $TemplateCache->get_by_code( $this->disp_params['template'] ) )
+			if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )
 			{
 				$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
 				return false;
@@ -414,7 +259,10 @@ class item_info_line_Widget extends ComponentWidget
 			echo $this->disp_params['block_body_start'];
 
 			echo $params['widget_item_info_line_before'];
-			render_template( $this->disp_params['template'], array( $this, 'template_callback' ), $params );
+			echo render_template( $this->disp_params['template'], 'render_template_callback', array_merge( $params, array(
+					'date_format' => $this->disp_params['date_format'],
+					'time_format' => $this->disp_params['time_format'],
+				), $params['widget_item_info_line_params'] ) );
 			echo $params['widget_item_info_line_after'];
 
 			echo $this->disp_params['block_body_end'];

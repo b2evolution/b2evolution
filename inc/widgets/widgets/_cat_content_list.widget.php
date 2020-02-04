@@ -89,12 +89,35 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $current_User, $admin_url;
+
+		// Get available templates:
+		$TemplateCache = & get_TemplateCache();
+		$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
+		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
+		$template_input_suffix = ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+			.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_( 'Title' ),
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
+				),
+				'template_cat' => array(
+					'label' => T_('Template for listing a category'),
+					'type' => 'select',
+					'options' => $template_options,
+					'defaultvalue' => 'content_list_subcat',
+					'input_suffix' => $template_input_suffix,
+				),
+				'template_item' => array(
+					'label' => T_('Template for listing an item'),
+					'type' => 'select',
+					'options' => $template_options,
+					'defaultvalue' => 'content_list_item',
+					'input_suffix' => $template_input_suffix,
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -118,6 +141,20 @@ class cat_content_list_Widget extends ComponentWidget
 		if( ! ( $curr_Chapter = & $ChapterCache->get_by_ID( $cat, false, false ) ) )
 		{	// Display error when no cat is found:
 			$this->display_error_message( sprintf( 'No %s ID found. Cannot display widget "%s".', '<code>cat</code>', $this->get_name() ) );
+			return false;
+		}
+
+		$TemplateCache = & get_TemplateCache();
+
+		if( ! ( $cat_Template = & $TemplateCache->get_by_code( $this->disp_params['template_cat'], false, false ) ) )
+		{	// Display error when no or wrong template for listing a category:
+			$this->display_error_message( sprintf( 'Template is not found: %s for listing a category', '<code>'.$this->disp_params['template_cat'].'</code>' ) );
+			return false;
+		}
+
+		if( ! ( $item_Template = & $TemplateCache->get_by_code( $this->disp_params['template_item'], false, false ) ) )
+		{	// Display error when no or wrong template for listing a category:
+			$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$this->disp_params['template_item'].'</code>' ) );
 			return false;
 		}
 
@@ -169,8 +206,10 @@ class cat_content_list_Widget extends ComponentWidget
 	 * @param integer Level
 	 * @param array Params
 	 */
-	function cat_inskin_display( $Chapter, $level, $params = array() )
+	function cat_inskin_display( $param_Chapter, $level, $params = array() )
 	{
+		global $Chapter;
+
 		// Default params:
 		$params = array_merge( array(
 				'before_cat'         => '<li class="chapter">',
@@ -181,20 +220,14 @@ class cat_content_list_Widget extends ComponentWidget
 				'after_cat_content'  => '</div>',
 			), $params );
 
-		if( ! empty( $Chapter ) )
+		if( ! empty( $param_Chapter ) )
 		{	// Display chapter:
+			$Chapter = $param_Chapter;
+
 			echo $params['before_cat'];
 
-			echo $params['before_cat_title']
-				.'<a href="'.$Chapter->get_permanent_url().'" class="link">'.get_icon( 'expand' ).$Chapter->dget( 'name' ).'</a>'
-				.$params['after_cat_title'];
-
-			if( $Chapter->dget( 'description' ) != '' )
-			{	// Display chapter description:
-				echo $params['before_cat_content']
-					.$Chapter->dget( 'description' )
-					.$params['after_cat_content'];
-			}
+			load_funcs( 'templates/model/_template.funcs.php' );
+			echo render_template( $this->disp_params['template_cat'], 'render_template_callback', $params );
 
 			echo $params['after_cat'];
 		}
@@ -221,84 +254,14 @@ class cat_content_list_Widget extends ComponentWidget
 				'after_item'        => '</li>',
 				'before_content'    => '<div class="excerpt">',
 				'after_content'     => '</div>',
-				// Params with mask values: $item_icon$, $flag_icon$, $item_status$, $read_status$, $link_view_changes$
-				'before_title'      => '<h3>',
-				'after_title'       => ( isset( $cat ) && ( $cat != $Item->main_cat_ID ) ? '</h3>' : '$flag_icon$</h3>$item_status$' ),
-				'before_title_text' => '$item_icon$',
-				'after_title_text'  => '',
+				'permalink_text'    => get_icon( 'file_message' ).'$title$',
+				'permalink_class'   => 'link',
 			), $params );
-
-		// Replace masks with values in params:
-		$mask_params = array( 'before_title', 'after_title', 'before_title_text', 'after_title_text' );
-		$mask_values = array();
-		foreach( $mask_params as $mask_param )
-		{
-			if( strpos( $params[ $mask_param ], '$flag_icon$' ) !== false && ! isset( $mask_values['$flag_icon$'] ) )
-			{	// Flag icon:
-				$mask_values['$flag_icon$'] = $Item->get_flag( array(
-						'before'       => ' ',
-						'only_flagged' => true,
-						'allow_toggle' => false,
-					) );
-			}
-			if( strpos( $params[ $mask_param ], '$item_icon$' ) !== false && ! isset( $mask_values['$item_icon$'] ) )
-			{	// Item icon:
-				$mask_values['$item_icon$'] = get_icon( 'file_message' );
-			}
-			if( strpos( $params[ $mask_param ], '$item_status$' ) !== false && ! isset( $mask_values['$item_status$'] ) )
-			{	// Status(only not published):
-				$mask_values['$item_status$'] = $Item->status == 'published' ? '' : $Item->get_format_status( array(
-						'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-					) );
-			}
-			if( strpos( $params[ $mask_param ], '$read_status$' ) !== false && ! isset( $mask_values['$read_status$'] ) )
-			{	// Read status(New/Updated/Read):
-				$mask_values['$read_status$'] = $Item->get_unread_status( array(
-						'style'  => 'text',
-						'before' => '<span class="evo_post_read_status">',
-						'after'  => '</span>'
-					) );
-			}
-			if( strpos( $params[ $mask_param ], '$link_view_changes$' ) !== false && ! isset( $mask_values['$link_view_changes$'] ) )
-			{	// Link to view changes:
-				$mask_values['$link_view_changes$'] = $Item->get_changes_link( array(
-						'class' => button_class( 'text' ),
-					) );
-			}
-			$params[ $mask_param ] = str_replace( array_keys( $mask_values ), $mask_values, $params[ $mask_param ] );
-		}
 
 		echo $params['before_item'];
 
-		// ------------------------- "Item in List" CONTAINER EMBEDDED HERE --------------------------
-		// Display container contents:
-		widget_container( 'item_in_list', array(
-			'widget_context' => 'item',	// Signal that we are displaying within an Item
-			// The following (optional) params will be used as defaults for widgets included in this container:
-			'container_display_if_empty' => false, // If no widget, don't display container at all
-			// This will enclose each widget in a block:
-			'block_start' => '<div class="evo_widget $wi_class$">',
-			'block_end' => '</div>',
-			// This will enclose the title of each widget:
-			'block_title_start' => '<h3>',
-			'block_title_end' => '</h3>',
-
-			// Controlling the title:
-			'widget_item_title_params'  => array(
-				'before'          => $params['before_title'],
-				'after'           => $params['after_title'],
-				'before_title'    => $params['before_title_text'],
-				'after_title'     => $params['after_title_text'],
-				'post_navigation' => $params['post_navigation'],
-				'link_class'      => 'link',
-			),
-			// Item Visibility Badge widget template
-			'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
-			'widget_item_visibility_badge_params'  => array(
-					'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-				),
-		) );
-		// ----------------------------- END OF "Item in List" CONTAINER -----------------------------
+		load_funcs( 'templates/model/_template.funcs.php' );
+		echo render_template( $this->disp_params['template_item'], 'render_template_callback', $params );
 
 		echo $params['after_item'];
 	}

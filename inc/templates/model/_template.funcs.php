@@ -19,14 +19,17 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * 
  * @param string Template code
  * @param array Callback function. Function should return the replacement string for the variable found in the template.
- * @return boolean True if template is found and rendered, false otherwise
+ * @return string|boolean Rendered template or FALSE on wrong request
  */
 function render_template( $code, $replace_callback, $params = array() )
 {
 	global $current_locale;
 
 	$TemplateCache = & get_TemplateCache();
-	$Template = & $TemplateCache->get_by_code( $code );
+	if( ! ( $Template = & $TemplateCache->get_by_code( $code, false, false ) ) )
+	{
+		return false;
+	}
 
 	// Check if the template has a child matching the current locale:
 	$localized_templates = $Template->get_localized_templates( $current_locale );
@@ -37,24 +40,235 @@ function render_template( $code, $replace_callback, $params = array() )
 
 	if( $Template )
 	{	// Template available, replace variables using supplied callback:
-		preg_match_all( '/\$[a-z_]+\$/i', $Template->template_code, $matches, PREG_OFFSET_CAPTURE );
+		preg_match_all( '/\$[a-z_:]+\$/i', $Template->template_code, $matches, PREG_OFFSET_CAPTURE );
 		$current_pos = 0;
+		$r = '';
 		foreach( $matches[0] as $match )
 		{
-			// $match[0] = $variable$, $match[1] = offset
-			echo substr( $Template->template_code, $current_pos, $match[1] - $current_pos );
+			$r .= substr( $Template->template_code, $current_pos, $match[1] - $current_pos );
 			$current_pos = $match[1] + strlen( $match[0] );
-			echo call_user_func( $replace_callback, $match[0], $params );
+			$r .= call_user_func( $replace_callback, $match[0], $params );
 		}
 
 		// Print remaining template code:
-		echo substr( $Template->template_code, $current_pos );
+		$r .= substr( $Template->template_code, $current_pos );
 
-		return true;
+		return $r;
 	}
 	else
 	{
 		return false;
+	}
+}
+
+
+/**
+ * Callback function to replace variables in template
+ * 
+ * @param string Variable to be replaced
+ * @param array Additional parameters
+ * @return string Replacement string
+ */
+function render_template_callback( $var, $params )
+{
+	global $Chapter, $Item;
+
+	$params = array_merge( array(
+		'before_flag'         => '',
+		'after_flag'          => '',
+		'before_permalink'    => '',
+		'after_permalink'     => '',
+		'permalink_text'      => '#icon#',
+		'permalink_class'     => '',
+		'before_author'       => '',
+		'after_author'        => '',
+		'before_post_time'    => '',
+		'after_post_time'     => '',
+		'before_categories'   => '',
+		'after_categories'    => '',
+		'before_last_touched' => '',
+		'after_last_touched'  => '',
+		'before_last_updated' => '',
+		'after_last_updated'  => '',
+		'before_edit_link'    => ' &bull; ',
+		'after_edit_link'     => '',
+		'edit_link_text'      => '#',
+		'format'              => '',
+		'date_format'         => 'extended',
+		'time_format'         => 'none',
+		'excerpt_before_text' => '',
+		'excerpt_after_text'  => '',
+		'excerpt_before_more' => ' <span class="evo_post__excerpt_more_link">',
+		'excerpt_after_more'  => '</span>',
+		'excerpt_more_text'   => T_('more').' &raquo;',
+	), $params );
+
+	$r = $var;
+	$match_found = true;
+
+	// Get datetime format:
+	switch( $params['date_format'] )
+	{
+		case 'extended':
+			$date_format = locale_extdatefmt();
+			break;
+
+		case 'long':
+			$date_format = locale_longdatefmt();
+			break;
+
+		case 'short':
+			$date_format = locale_datefmt();
+			break;
+
+		default:
+			$time_format = '';
+	}
+
+	switch( $params['time_format'] )
+	{
+		case 'long':
+			$time_format = locale_timefmt();
+			break;
+
+		case 'short':
+			$time_format = locale_shorttimefmt();
+			break;
+
+		case 'none':
+		default:
+			$time_format = '';
+	}
+
+	ob_start();
+	switch( $r )
+	{
+		// Item:
+		case '$flag_icon$':
+			$Item->flag( array(
+					'before' => $params['before_flag'],
+					'after'  => $params['after_flag'],
+				) );
+			break;
+
+		case '$permalink_icon$':
+			$Item->permanent_link( array(
+					'text'   => $params['permalink_text'],
+					'before' => $params['before_permalink'],
+					'after'  => $params['after_permalink'],
+				) );
+			break;
+
+		case '$permalink$':
+			$Item->permanent_link( array(
+					'text'   => $params['permalink_text'],
+					'class'  => $params['permalink_class'],
+					'before' => $params['before_permalink'],
+					'after'  => $params['after_permalink'],
+				) );
+			break;
+
+		case '$author$':
+			$Item->author( array(
+					'before'    => $params['before_author'],
+					'after'     => $params['after_author'],
+					'link_text' => $params['author_link_text'],
+				) );
+			break;
+
+		case '$issue_date$':
+			$Item->issue_time( array(
+					'before'      => $params['before_post_time'],
+					'after'       => $params['after_post_time'],
+					'time_format' => $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format
+				) );
+			break;
+
+		case '$creation_date$':
+			echo $params['before_post_time'];
+			echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
+			echo $params['after_post_time'];
+			break;
+
+		case '$categories$':
+			$Item->categories( array(
+					'before'          => $params['before_categories'],
+					'after'           => $params['after_categories'],
+					'include_main'    => true,
+					'include_other'   => true,
+					'include_external'=> true,
+					'link_categories' => true,
+				) );
+			break;
+
+		case '$last_touched$':
+			echo $params['before_last_touched'];
+			echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) );
+			echo $params['after_last_touched'];
+			break;
+
+		case '$last_updated$':
+			echo $params['before_last_updated'];
+			echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
+			echo $params['after_last_updated'];
+			break;
+
+		case '$edit_link$':
+			$Item->edit_link( array(
+				'before' => $params['before_edit_link'],
+				'after'  => $params['after_edit_link'],
+				'text'   => $params['edit_link_text'],
+			) );
+			break;
+
+		case '$excerpt$':
+			$Item->excerpt( array(
+				'before'              => $params['excerpt_before_text'],
+				'after'               => $params['excerpt_after_text'],
+				'excerpt_before_more' => $params['excerpt_before_more'],
+				'excerpt_after_more'  => $params['excerpt_after_more'],
+				'excerpt_more_text'   => $params['excerpt_more_text'],
+				) );
+			break;
+
+		case '$read_status$':
+			$Item->get_unread_status( array(
+					'style'  => 'text',
+					'before' => '<span class="evo_post_read_status">',
+					'after'  => '</span>'
+				) );
+			break;
+
+		case '$visibility_status$':
+			if( $Item->status != 'published' )
+			{
+				$Item->format_status( array(
+						'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+					) );
+			}
+			break;
+
+		// Chapter / Category:
+		case '$Cat:permalink$':
+			echo '<a href="'.$Chapter->get_permanent_url().'" class="link">'.get_icon( 'expand' ).$Chapter->dget( 'name' ).'</a>';
+			break;
+
+		case '$Cat:description$':
+			echo $Chapter->dget( 'description' );
+			break;
+
+		default:
+			$match_found = false;
+	}
+	$r = ob_get_clean();
+
+	if( $match_found )
+	{
+		return $r;
+	}
+	else
+	{
+		return $var;
 	}
 }
 
