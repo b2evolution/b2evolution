@@ -377,8 +377,9 @@ class item_info_line_Widget extends ComponentWidget
 
 		$params = array_merge( array(
 			'author_link_text' => 'preferredname',
-			'block_body_start' => '<div class="small text-muted">',
+			'block_body_start' => '<div>',
 			'block_body_end'   => '</div>',
+// TODO: use this when building automatic template but NOT when using a template
 			'widget_item_info_line_before'  => '<span class="small text-muted">',
 			'widget_item_info_line_after'   => '</span>',
 			'widget_item_info_line_params'  => array(),
@@ -396,32 +397,36 @@ class item_info_line_Widget extends ComponentWidget
 		{
 			load_funcs( 'templates/model/_template.funcs.php' );
 			$TemplateCache = & get_TemplateCache();
-			if( $TemplateCache->get_by_code( $this->disp_params['template'] ) )
-			{
-				echo $this->disp_params['block_start'];
-
-				$this->disp_title();
-
-				echo $this->disp_params['block_body_start'];
-
-				echo $params['widget_item_info_line_before'];
-				render_template( $this->disp_params['template'], array( $this, 'template_callback' ), $params );
-				echo $params['widget_item_info_line_after'];
-
-				echo $this->disp_params['block_body_end'];
-				
-				echo $this->disp_params['block_end'];
-
-				return true;
-			}
-			else
+			if( ! $TemplateCache->get_by_code( $this->disp_params['template'] ) )
 			{
 				$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
 				return false;
 			}
+
+			// Use template:
+
+// TODO: do NOT echo. Create $info_line and factorize with display code below.
+// We do NOT want to display the title if the template produces empty output.			
+			echo $this->disp_params['block_start'];
+
+			$this->disp_title();
+
+			echo $this->disp_params['block_body_start'];
+
+			echo $params['widget_item_info_line_before'];
+			render_template( $this->disp_params['template'], array( $this, 'template_callback' ), $params );
+			echo $params['widget_item_info_line_after'];
+
+			echo $this->disp_params['block_body_end'];
+			
+			echo $this->disp_params['block_end'];
+
+			return true;
+
 		}
 		else
-		{
+		{	// BUild an automatic template:
+
 			// Get default before author:
 			switch( $this->disp_params['before_author'] )
 			{
@@ -632,6 +637,7 @@ class item_info_line_Widget extends ComponentWidget
 				return true;
 			}
 
+// TODO: THIS code should apply all the time!
 			if( ! empty( $info_line ) )
 			{
 				echo $this->disp_params['block_start'];
