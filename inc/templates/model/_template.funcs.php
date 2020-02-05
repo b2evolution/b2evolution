@@ -20,7 +20,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param string Template code
  * @return string|boolean Rendered template or FALSE on wrong request
  */
-function render_template( $code, $params = array() )
+function render_template_code( $code, $params = array() )
 {
 	global $current_locale;
 
@@ -38,21 +38,8 @@ function render_template( $code, $params = array() )
 	}
 
 	if( $Template )
-	{	// Template available, replace variables using supplied callback:
-		preg_match_all( '/\$[a-z_:]+\$/i', $Template->template_code, $matches, PREG_OFFSET_CAPTURE );
-		$current_pos = 0;
-		$r = '';
-		foreach( $matches[0] as $match )
-		{
-			$r .= substr( $Template->template_code, $current_pos, $match[1] - $current_pos );
-			$current_pos = $match[1] + strlen( $match[0] );
-			$r .= call_user_func( 'render_template_callback', $match[0], $params );
-		}
-
-		// Print remaining template code:
-		$r .= substr( $Template->template_code, $current_pos );
-
-		return $r;
+	{	// Template available, replace variables:
+		return render_template( $Template->template_code, $params );
 	}
 	else
 	{
@@ -60,6 +47,31 @@ function render_template( $code, $params = array() )
 	}
 }
 
+
+/**
+ * Render template content
+ * 
+ * @param string Template
+ * @return string Rendered template
+ */
+function render_template( $template, $params = array() )
+{
+	$current_pos = 0;
+	$r = '';
+
+	preg_match_all( '/\$[a-z_:]+\$/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	foreach( $matches[0] as $match )
+	{
+		$r .= substr( $template, $current_pos, $match[1] - $current_pos );
+		$current_pos = $match[1] + strlen( $match[0] );
+		$r .= call_user_func( 'render_template_callback', $match[0], $params );
+	}
+
+	// Print remaining template code:
+	$r .= substr( $template, $current_pos );
+
+	return $r;
+}
 
 /**
  * Callback function to replace variables in template

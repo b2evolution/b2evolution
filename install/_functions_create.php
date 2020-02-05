@@ -1653,11 +1653,11 @@ function create_default_templates( $is_task = true )
 	$new_templates = array(
 		'iteminfo_short' => array(
 			'name'     => 'Item Info: Posted by Author on Date in Categories',
-			'template' => 'Posted by $author$ on $issue_date$ in $categories$',
+			'template' => '<span class="small text-muted">$flag_icon$ Posted by $author$ on $issue_date$ in $categories$</span>',
 		),
 		'iteminfo_long' => array(
 			'name'     => 'Item Info: Long info line',
-			'template' => '$flag_icon$ $permalink_icon$ Posted by $author$ $issue_date$ $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$',
+			'template' => '<span class="small text-muted">$flag_icon$ $permalink_icon$ Posted by $author$ on $issue_date$ in $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$</span>',
 		),
 		'cblock_clearfix' => array(
 			'name'     => 'Include Content Block: with clearfix',

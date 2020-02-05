@@ -224,7 +224,7 @@ class item_info_line_Widget extends ComponentWidget
 			'author_link_text' => 'preferredname',
 			'block_body_start' => '<div>',
 			'block_body_end'   => '</div>',
-// TODO: use this when building automatic template but NOT when using a template
+			// Use the following when building automatic template but NOT when using a template:
 			'widget_item_info_line_before'  => '<span class="small text-muted">',
 			'widget_item_info_line_after'   => '</span>',
 			'widget_item_info_line_params'  => array(),
@@ -233,7 +233,7 @@ class item_info_line_Widget extends ComponentWidget
 		$this->init_display( $params );
 
 		if( empty( $Item ) )
-		{ // Don't display this widget when there is no Item object:
+		{	// Don't display this widget when there is no Item object:
 			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
 			return false;
 		}
@@ -248,261 +248,132 @@ class item_info_line_Widget extends ComponentWidget
 				return false;
 			}
 
-			// Use template:
-
-// TODO: do NOT echo. Create $info_line and factorize with display code below.
-// We do NOT want to display the title if the template produces empty output.			
-			echo $this->disp_params['block_start'];
-
-			$this->disp_title();
-
-			echo $this->disp_params['block_body_start'];
-
-			echo $params['widget_item_info_line_before'];
-			echo render_template( $this->disp_params['template'], array_merge( $params, array(
+			$template = $this->disp_params['template'];
+			$info_line = render_template_code( $template, array_merge( $params, array(
 					'date_format' => $this->disp_params['date_format'],
 					'time_format' => $this->disp_params['time_format'],
-				), $params['widget_item_info_line_params'] ) );
-			echo $params['widget_item_info_line_after'];
-
-			echo $this->disp_params['block_body_end'];
-			
-			echo $this->disp_params['block_end'];
-
-			return true;
-
+				) ) );
 		}
 		else
-		{	// BUild an automatic template:
+		{	// Build an automatic template:
+			$template = '';
 
-			// Get default before author:
+			// Flag icon:
+			if( $this->disp_params['flag_icon'] )
+			{
+				$template .= '$flag_icon$';
+			}
+
+			// Permalink icon:
+			if( $this->disp_params['permalink_icon'] )
+			{
+				$template .= ' $permalink_icon$';
+			}
+
+			// Author:
 			switch( $this->disp_params['before_author'] )
 			{
 				case 'posted_by':
 					$before_author = T_('Posted by').' ';
+					$template .= ' $author$';
 					break;
 
 				case 'started_by':
 					$before_author = T_('Started by').' ';
+					$template .= ' $author$';
 					break;
 
 				default:
 					$before_author = '';
 			}
 
-			// Get datetime format:
-			$date_format = '';
-			switch( $this->disp_params['date_format'] )
+			// Date issued / Creation date:
+			switch( $this->disp_params['display_date'] )
 			{
-				case 'extended':
-					$date_format = locale_extdatefmt();
+				case 'issue_date':
+					$before_post_time = T_('on').' ';
+					$template .= ' $issue_date$';
 					break;
 
-				case 'long':
-					$date_format = locale_longdatefmt();
+				case 'date_created':
+					$before_post_time = T_('on').' ';
+					$template .= ' $creation_date$';
 					break;
 
-				case 'short':
-					$date_format = locale_datefmt();
-					break;
+				default:
+					$before_post_time = '';
 			}
 
-			$time_format = '';
-			if( $this->disp_params['time_format'] != 'none' )
+			// Categories:
+			if( $this->disp_params['category'] )
 			{
-				switch( $this->disp_params['time_format'] )
-				{
-					case 'long':
-						$time_format = locale_timefmt();
-						break;
-
-					case 'short':
-						$time_format = locale_shorttimefmt();
-						break;
-				}
+				$template .= ' $categories$';
 			}
-			$before_post_time = $this->disp_params['before_author'] == 'none' ? '' : T_('on').' ';
+
+			// Last touched:
+			if( $this->disp_params['last_touched'] )
+			{
+				$template .= ' $last_touched$';
+			}
+
+			// Last content updated:
+			if( $this->disp_params['contents_updated'] )
+			{
+				$template .= ' $last_updated$';
+			}
+
+			// Edit link:
+			if( $this->disp_params['edit_link'] )
+			{
+				$template .= ' $edit_link$';
+			}
 
 			$widget_params = array_merge( array(
 				'before_flag'         => '',
 				'after_flag'          => '',
 				'before_permalink'    => '',
-				'after_permalink'     => ' ',
+				'after_permalink'     => '',
 				'permalink_text'      => '#icon#',
 				'before_author'       => $before_author,
-				'after_author'        => ' ',
+				'after_author'        => '',
 				'before_post_time'    => $before_post_time,
-				'after_post_time'     => ' ',
+				'after_post_time'     => '',
 				'before_categories'   => T_('in').' ',
-				'after_categories'    => ' ',
-				'before_last_touched' => '<span class="text-muted"> &ndash; '.T_('Last touched').': ',
+				'after_categories'    => '',
+				'before_last_touched' => '<span class="text-muted">&ndash; '.T_('Last touched').': ',
 				'after_last_touched'  => '</span>',
-				'before_last_updated' => '<span class="text-muted"> &ndash; '.T_('Contents updated').': ',
+				'before_last_updated' => '<span class="text-muted">&ndash; '.T_('Contents updated').': ',
 				'after_last_updated'  => '</span>',
-				'before_edit_link'    => ' &bull; ',
+				'before_edit_link'    => '&bull; ',
 				'after_edit_link'     => '',
 				'edit_link_text'      => '#',
-				'format'              => '',
 			), $params['widget_item_info_line_params'] );
 
-			ob_start();
+			$info_line = render_template( $template, array_merge( $params, array(
+				'date_format' => $this->disp_params['date_format'],
+				'time_format' => $this->disp_params['time_format'],
+			), $widget_params ) );
 
-			// Flag:
-			$flag = '';
-			if( $this->disp_params['flag_icon'] )
-			{
-				$Item->flag( array(
-						'before' => $widget_params['before_flag'],
-						'after'  => $widget_params['after_flag'],
-					)	);
-				$flag = ob_get_contents();
-				ob_clean();
-			}
-
-			// Permalink:
-			$permalink = '';
-			if( $this->disp_params['permalink_icon'] )
-			{
-				$Item->permanent_link( array(
-						'text'   => $widget_params['permalink_text'],
-						'before' => $widget_params['before_permalink'],
-						'after'  => $widget_params['after_permalink'],
-					) );
-				$permalink = ob_get_contents();
-				ob_clean();
-			}
-
-			// Author:
-			$author = '';
-			if( $this->disp_params['before_author'] != 'none' )
-			{
-				$Item->author( array(
-						'before'    => $widget_params['before_author'],
-						'after'     => $widget_params['after_author'],
-						'link_text' => $params['author_link_text'],
-					) );
-				$author = ob_get_contents();
-				ob_clean();
-			}
-
-			// We want to display the post time:
-			switch( $this->disp_params['display_date'] )
-			{
-				case 'issue_date':
-					$Item->issue_time( array(
-							'before'      => $widget_params['before_post_time'],
-							'after'       => $widget_params['after_post_time'],
-							'time_format' => $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format
-						) );
-					break;
-
-				case 'date_created':
-					echo $widget_params['before_post_time'];
-					echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
-					echo $widget_params['after_post_time'];
-					break;
-			}
-			$post_time = ob_get_contents();
-			ob_clean();
-
-			// Categories:
-			$categories = '';
-			if( $this->disp_params['category'] )
-			{
-				$Item->categories( array(
-					'before'          => $widget_params['before_categories'],
-					'after'           => $widget_params['after_categories'],
-					'include_main'    => true,
-					'include_other'   => true,
-					'include_external'=> true,
-					'link_categories' => true,
-				) );
-				$categories = ob_get_contents();
-				ob_clean();
-			}
-
-			// Last touched:
-			$last_touched = '';
-			if( $this->disp_params['last_touched'] )
-			{
-				echo $widget_params['before_last_touched'];
-				echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) );
-				echo $widget_params['after_last_touched'];
-				$last_touched = ob_get_contents();
-				ob_clean();
-			}
-
-			// Contents last updated:
-			$last_updated = '';
-			if( $this->disp_params['contents_updated'] )
-			{
-				echo $widget_params['before_last_updated'];
-				echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
-				echo $widget_params['after_last_updated'];
-				$last_updated = ob_get_contents();
-				ob_clean();
-			}
-
-			// Link for editing:
-			$edit_link = '';
-			if( $this->disp_params['edit_link'] )
-			{
-				$Item->edit_link( array(
-						'before' => $widget_params['before_edit_link'],
-						'after'  => $widget_params['after_edit_link'],
-						'text'   => $widget_params['edit_link_text'],
-					) );
-				$edit_link = ob_get_contents();
-				ob_clean();
-			}
-
-			ob_end_clean();
-
-			// Item info line format:
-			$format = empty( $widget_params['format'] ) ? '$flag$$permalink$$author$$post_time$$categories$$last_touched$$last_updated$$edit_link$' : $widget_params['format'];
-
-			$info_line = str_replace(
-					array( '$flag$', '$permalink$', '$author$', '$post_time$', '$last_touched$', '$last_updated$', '$categories$', '$edit_link$' ),
-					array( $flag, $permalink, $author, $post_time, $last_touched, $last_updated, $categories, $edit_link ), $format
-				);
-
-			$display_widget = $this->disp_params['flag_icon'] || $this->disp_params['permalink_icon'] || $this->disp_params['before_author'] != 'none'
-					|| $this->disp_params['display_date'] != 'none' || $this->disp_params['category']
-					|| $this->disp_params['last_touched'] || $this->disp_params['contents_updated'] || $this->disp_params['edit_link'];
-
-			if( ! $display_widget && empty( $info_line ) )
-			{	// Display error message when nothing to display because of widget settings:
-				global $admin_url;
-
-				echo $this->disp_params['block_start'];
-				$this->disp_title();
-				echo $this->disp_params['block_body_start'];
-				echo '<span class="evo_param_error">'.sprintf( T_('Nothing to display! Check "%s" <a %s>widget settings</a>.'),
-						$this->get_name(), 'href="'.url_add_param( $admin_url, array( 'ctrl' => 'widgets', 'action' => 'edit', 'wi_ID' => $this->ID ) ).'"' ).'</span>';
-				echo $this->disp_params['block_body_end'];
-				echo $this->disp_params['block_end'];
-
-				return true;
-			}
-
-// TODO: THIS code should apply all the time!
 			if( ! empty( $info_line ) )
 			{
-				echo $this->disp_params['block_start'];
-
-				$this->disp_title();
-
-				echo $this->disp_params['block_body_start'];
-
-				echo $params['widget_item_info_line_before'];
-				echo $info_line;
-				echo $params['widget_item_info_line_after'];
-
-				echo $this->disp_params['block_body_end'];
-				echo $this->disp_params['block_end'];
-
-				return true;
+				$info_line = $params['widget_item_info_line_before'].$info_line.$params['widget_item_info_line_after'];
 			}
+		}
+
+		if( ! empty( $info_line ) )
+		{
+			echo $this->disp_params['block_start'];
+
+			$this->disp_title();
+
+			echo $this->disp_params['block_body_start'];
+
+			echo $info_line;
+
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+
+			return true;
 		}
 
 		$this->display_debug_message();
