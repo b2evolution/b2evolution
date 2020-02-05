@@ -180,29 +180,30 @@ function render_template_callback( $var, $params )
 		'excerpt_more_text'   => T_('more').' &raquo;',
 	), $params );
 
-	// Check current object by prefix:
-	$prefix = ( preg_match( '#^\$([a-z]+):#i', $var, $prefix2 ) ? $prefix2[1] : 'Item' );
-	switch( $prefix )
+	// Get scope and var name:
+	preg_match( '#^\$(([a-z]+):)?(.+)\$$#i', $var, $match_var );
+	$scope = ( empty( $match_var[2] ) ? 'Item': $match_var[2] );
+	$var = $scope.':'.$match_var[3];
+	switch( $scope )
 	{
 		case 'Cat':
 			if( empty( $Chapter ) || ! ( $Chapter instanceof Chapter ) )
 			{
-				return '<span class="evo_param_error">'.$var.': Object Chapter is not defined at this moment.</span>';
+				return '<span class="evo_param_error">$'.$var.'$: Object Chapter is not defined at this moment.</span>';
 			}
 			break;
 
 		case 'Item':
 			if( empty( $Item ) || ! ( $Item instanceof Item ) )
 			{
-				return '<span class="evo_param_error">'.$var.': Object Item is not defined at this moment.</span>';
+				return '<span class="evo_param_error">$'.$var.'$: Object Item is not defined at this moment.</span>';
 			}
 			break;
 
 		default:
-			return '<span class="evo_param_error">'.$var.': Scope "'.$prefix.':" is not recognized.</span>';
+			return '<span class="evo_param_error">$'.$var.'$: Scope "'.$scope.':" is not recognized.</span>';
 	}
 
-	$r = $var;
 	$match_found = true;
 
 	// Resolve default date/time formats:
@@ -211,23 +212,18 @@ function render_template_callback( $var, $params )
 	$time_format = locale_resolve_datetime_fmt( $params['time_format'] );
 	$datetime_format = $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format;
 
-	// Trim '$' from variable:
-	$r = trim( $r , '$' );
-
 	ob_start();
-	switch( $r )
+	switch( $var )
 	{
 		// Item:
-		case 'flag_icon':
-// TODO: should be  case 'Item:flag_icon':
+		case 'Item:flag_icon':
 			$Item->flag( array(
 					'before' => $params['before_flag'],
 					'after'  => $params['after_flag'],
 				) );
 			break;
 
-		case 'permalink_icon':	// Temporary
-// TODO: should be  case 'Item:permalink_icon':
+		case 'Item:permalink_icon':	// Temporary
 			$Item->permanent_link( array(
 					'text'   => '#icon#',
 					'before' => $params['before_permalink'],
@@ -238,8 +234,8 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case 'permalink':
-		case 'permanent_link':
+		case 'Item:permalink':
+		case 'Item:permanent_link':
 			$Item->permanent_link( array(
 					'text'   => $params['permalink_text'],
 					'class'  => $params['permalink_class'],
@@ -251,7 +247,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case 'author_avatar':
+		case 'Item:author_avatar':
 			$Item->author( array(
 					'before'      => $params['before_author_avatar'],
 					'after'       => $params['after_author_avatar'],
@@ -262,7 +258,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case 'author':
+		case 'Item:author':
 			$Item->author( array(
 					'before'    => $params['before_author'],
 					'after'     => $params['after_author'],
@@ -270,7 +266,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case 'lastedit_user':
+		case 'Item:lastedit_user':
 			$Item->lastedit_user( array(
 					'before'    => $params['before_lastedit_user'],
 					'after'     => $params['after_lastedit_user'],
@@ -279,7 +275,7 @@ function render_template_callback( $var, $params )
 			break;
 
 		// Date/Time:
-		case 'issue_time':
+		case 'Item:issue_time':
 			$Item->issue_time( array(
 					'before'      => $params['before_issue_time'],
 					'after'       => $params['after_issue_time'],
@@ -287,29 +283,29 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case 'creation_time':
+		case 'Item:creation_time':
 			$creation_time_format = empty( $params['creation_time_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['creation_time_format'] );
 			echo $params['before_creation_time'];
 			echo $Item->get_creation_time( $creation_time_format );
 			echo $params['after_creation_time'];
 			break;
 
-		case 'mod_date':
+		case 'Item:mod_date':
 			$mod_date_format = empty( $params['mod_date_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['mod_date_format'] );
 			echo $params['before_mod_date'];
 			echo $Item->get_mod_date( $mod_date_format );
 			echo $params['after_mod_date'];
 			break;
 
-		case 'last_touched':
+		case 'Item:last_touched':
 			$last_touched_ts_format = empty( $params['last_touched_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_touched_format'] );
 			echo $params['before_last_touched'];
 			echo $Item->get_last_touched_ts( $last_touched_ts_format );
 			echo $params['after_last_touched'];
 			break;
 
-		case 'last_updated':
-		case 'contents_last_updated':
+		case 'Item:last_updated':
+		case 'Item:contents_last_updated':
 			$contents_last_updated_ts_format = empty( $params['last_updated_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_updated_format'] );
 			echo $params['before_last_updated'];
 			echo $Item->get_contents_last_updated_ts( $contents_last_updated_ts_format ).$Item->get_refresh_contents_last_updated_link();
@@ -317,7 +313,7 @@ function render_template_callback( $var, $params )
 			break;
 
 		// Links:
-		case 'edit_link':
+		case 'Item:edit_link':
 			$Item->edit_link( array(
 					'before' => $params['before_edit_link'],
 					'after'  => $params['after_edit_link'],
@@ -325,7 +321,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case 'history_link':
+		case 'Item:history_link':
 			echo $Item->get_history_link( array(
 					'before'    => $params['before_history_link'],
 					'after'     => $params['after_history_link'],
@@ -333,7 +329,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case 'propose_change_link':
+		case 'Item:propose_change_link':
 			$Item->propose_change_link( array(
 					'before' => $params['before_propose_change_link'],
 					'after'  => $params['after_propose_change_link'],
@@ -341,7 +337,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case 'excerpt':
+		case 'Item:excerpt':
 			$Item->excerpt( array(
 					'before'              => $params['excerpt_before_text'],
 					'after'               => $params['excerpt_after_text'],
@@ -352,7 +348,7 @@ function render_template_callback( $var, $params )
 			break;
 
 		// Read Status:
-		case 'read_status':
+		case 'Item:read_status':
 			$Item->display_unread_status( array(
 					'style'  => 'text',
 					'before' => '<span class="evo_post_read_status">',
@@ -361,7 +357,7 @@ function render_template_callback( $var, $params )
 			break;
 
 		// Visibility Status:
-		case 'visibility_status':
+		case 'Item:visibility_status':
 			if( $Item->status != 'published' )
 			{
 				$Item->format_status( array(
@@ -370,17 +366,8 @@ function render_template_callback( $var, $params )
 			}
 			break;
 
-		// Chapter / Category:
-		case 'Cat:permalink':
-			echo '<a href="'.$Chapter->get_permanent_url().'" class="link">'.get_icon( 'expand' ).$Chapter->dget( 'name' ).'</a>';
-			break;
-
-		case 'Cat:description':
-			echo $Chapter->dget( 'description' );
-			break;
-
 		// Categories:
-		case 'categories':
+		case 'Item:categories':
 			$Item->categories( array(
 					'before'           => $params['before_categories'],
 					'after'            => $params['after_categories'],
@@ -392,12 +379,21 @@ function render_template_callback( $var, $params )
 			break;
 
 		// Tags:
-		case 'tags':
+		case 'Item:tags':
 			$Item->tags( array(
 					'before'    => $params['before_tags'],
 					'after'     => $params['after_tags'],
 					'separator' => $params['tags_separator'],
 				) );
+			break;
+
+		// Chapter / Category:
+		case 'Cat:permalink':
+			echo '<a href="'.$Chapter->get_permanent_url().'" class="link">'.get_icon( 'expand' ).$Chapter->dget( 'name' ).'</a>';
+			break;
+
+		case 'Cat:description':
+			echo $Chapter->dget( 'description' );
 			break;
 
 		default:
@@ -411,7 +407,7 @@ function render_template_callback( $var, $params )
 	}
 	else
 	{	// Display error for not recognized variable:
-		return '<span class="evo_param_error">$Item:'.substr( $var, 1 ).' is not recognized.</span>';
+		return '<span class="evo_param_error">$'.$var.'$ is not recognized.</span>';
 	}
 }
 
