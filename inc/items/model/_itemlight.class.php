@@ -688,9 +688,10 @@ class ItemLight extends DataObject
 	 * @param string the current blog or current skin post_navigation setting
 	 * @param integer the ID of the navigation target
 	 * @param string glue
+	 * @param integer ID of Collection of the URL
 	 * @return string the received url or the received url extended with the navigation param
 	 */
-	function add_navigation_param( $url, $post_navigation, $nav_target, $glue = '&amp;' )
+	function add_navigation_param( $url, $post_navigation, $nav_target, $glue = '&amp;', $coll_ID = NULL )
 	{
 		if( empty( $url ) || empty( $nav_target ) )
 		{ // the url or the navigation target is not set we can't modify anything
@@ -702,7 +703,15 @@ class ItemLight extends DataObject
 			case 'same_category': // navigate through the selected category
 				if( $this->main_cat_ID != $nav_target )
 				{
-					$url = url_add_param( $url, 'cat='.$nav_target, $glue );
+					if( $coll_ID === NULL ||
+					    ( ( $ChapterCache = & get_ChapterCache() ) &&
+					      ( $target_Chapter = & $ChapterCache->get_by_ID( $nav_target, false, false ) ) &&
+					      $target_Chapter->get( 'blog_ID' ) == $coll_ID
+					    )
+					  )
+					{	// If the Category is from the same Collection as the URL:
+						$url = url_add_param( $url, 'cat='.$nav_target, $glue );
+					}
 				}
 				break;
 
@@ -1235,7 +1244,7 @@ class ItemLight extends DataObject
 	 * @param integer the given "current" blog ID (its usually the current blog id)
 	 * @return boolean true if we have to stay in the current blog, false otherwise
 	 */
-	function check_cross_post_nav( $target_blog, $blog_ID )
+	function check_cross_post_nav( $target_blog, $target_coll_ID )
 	{
 		global $Settings;
 
@@ -1244,19 +1253,26 @@ class ItemLight extends DataObject
 			return false;
 		}
 
-		$this->get_Blog();
-		if( $this->Blog->ID == $blog_ID )
-		{ // item's blog is the same as target blog
+		$item_Blog = & $this->get_Blog();
+
+		if( ! $item_Blog || $item_Blog->ID == $target_coll_ID )
+		{	// Item's collection is the same as target blog
 			return false;
 		}
 
-		if( ! $this->Blog->get_setting( 'allow_crosspost_urls' ) )
-		{ // we have to navigate to the item's main cat's blog.
+		$BlogCache = & get_BlogCache();
+		if( ! ( $target_Blog = & $BlogCache->get_by_ID( $target_coll_ID, false, false ) ) )
+		{	// Wrong target collection:
+			return false;
+		}
+
+		if( ! $target_Blog->get_setting( 'allow_crosspost_urls' ) )
+		{	// We have to navigate to the Collection of the Item's main Category:
 			return false;
 		}
 
 		// return true if current item has at least one category, which belongs to the corresponding blog, false otherwise
-		return $this->is_part_of_blog( $blog_ID );
+		return $this->is_part_of_blog( $target_coll_ID );
 	}
 
 
@@ -1298,10 +1314,12 @@ class ItemLight extends DataObject
 
 		$blogurl = '';
 		$permalink_type = '';
+		$url_coll_ID = $this->get_blog_ID();
 		if( ! empty( $Blog ) && $this->check_cross_post_nav( $target_blog, $Blog->ID ) )
 		{	// Use settings of current opened collection and not of this item's collection:
 			$permalink_type = $Blog->get_setting( 'permalinks' );
 			$blogurl = $Blog->gen_blogurl();
+			$url_coll_ID = $Blog->ID;
 		}
 
 		// Get item permanent URL:
@@ -1312,7 +1330,7 @@ class ItemLight extends DataObject
 		}
 
 		// Add navigation param if necessary:
-		$url = $this->add_navigation_param( $url, $post_navigation, $nav_target );
+		$url = $this->add_navigation_param( $url, $post_navigation, $nav_target, '&amp;', $url_coll_ID );
 
 		switch( $text )
 		{
@@ -1370,10 +1388,12 @@ class ItemLight extends DataObject
 				'title'       => '#',
 				'class'       => '',
 				'target_blog' => '',
+				'post_navigation' => '',
+				'nav_target'      => NULL,
 			//	'format'      => 'htmlbody',
 			), $params );
 
-		$link = $this->get_permanent_link( $params['text'], $params['title'], $params['class'], $params['target_blog'] );
+		$link = $this->get_permanent_link( $params['text'], $params['title'], $params['class'], $params['target_blog'], $params['post_navigation'], $params['nav_target'] );
 
 		if( !empty( $link ) )
 		{
@@ -1454,12 +1474,13 @@ class ItemLight extends DataObject
 		}
 
 		$blogurl = '';
+		$url_coll_ID = $this->get_blog_ID();
 		if( ! empty( $Blog ) &&
 		    in_array( $params['link_type'], array( '#', 'permalink' ) ) &&
-		    ( $this->check_cross_post_nav( $params['target_blog'], $Blog->ID ) || // This Item can stay in the current Collection
-		      $this->is_part_of_blog( $Blog->ID ) ) ) // Also allow to stay in the current Collection if this Item has an extra category from NOT main Collection
+		    $this->check_cross_post_nav( $params['target_blog'], $Blog->ID ) ) // This Item can stay in the current Collection
 		{	// Get collection URL only when it is required:
 			$blogurl = $Blog->gen_blogurl();
+			$url_coll_ID = $Blog->ID;
 		}
 
 		if( $params['link_type'] == '#' )
@@ -1519,7 +1540,7 @@ class ItemLight extends DataObject
 		if( ! empty( $url ) )
 		{ // url is set, also add navigation param if it is necessary
 			$nav_target = ( $params['nav_target'] === NULL && isset( $MainList ) && ! empty( $MainList->nav_target ) ) ? $MainList->nav_target : $params['nav_target'];
-			$url = $this->add_navigation_param( $url, $params['post_navigation'], $nav_target );
+			$url = $this->add_navigation_param( $url, $params['post_navigation'], $nav_target, '&amp;', $url_coll_ID );
 		}
 
 		$link_class = ( $params['link_class'] == '#' ? '' : ' class="'.format_to_output( $params['link_class'], 'htmlattr' ).'"' );

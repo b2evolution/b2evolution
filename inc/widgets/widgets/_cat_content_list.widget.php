@@ -260,7 +260,6 @@ class cat_content_list_Widget extends ComponentWidget
 
 		// Default params:
 		$params = array_merge( array(
-				'post_navigation'   => 'same_category', // Always navigate through category in this skin
 				'before_item'       => '<li>',
 				'after_item'        => '</li>',
 				'before_content'    => '<div class="excerpt">',
@@ -272,7 +271,11 @@ class cat_content_list_Widget extends ComponentWidget
 		echo $params['before_item'];
 
 		load_funcs( 'templates/model/_template.funcs.php' );
-		echo render_template_code( $this->disp_params['template_item'], $params );
+		echo render_template_code( $this->disp_params['template_item'], array_merge( $params, array(
+				'post_navigation' => 'same_category', // Always navigate through category in this skin
+				'target_blog'     => 'auto', // Auto navigate to current collection if it is allowed for the Item
+				'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
+			) ) );
 
 		echo $params['after_item'];
 	}

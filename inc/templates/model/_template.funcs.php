@@ -94,10 +94,15 @@ function render_template_callback( $var, $params )
 		'after_flag'          => '',
 
 		// permalink_icon:
+		// permalink:
+		// permanent_link:
 		'before_permalink'    => '',
 		'after_permalink'     => '',
 		'permalink_text'      => '#icon#',
 		'permalink_class'     => '',
+		'post_navigation'     => '',
+		'target_blog'         => '',
+		'nav_target'          => NULL,
 
 		// author:
 		'author_link_text'    => 'auto',
@@ -210,6 +215,9 @@ function render_template_callback( $var, $params )
 					'text'   => '#icon#',
 					'before' => $params['before_permalink'],
 					'after'  => $params['after_permalink'],
+					'post_navigation' => $params['post_navigation'],
+					'nav_target'      => $params['nav_target'],
+					'target_blog'     => $params['target_blog'],
 				) );
 			break;
 
@@ -220,6 +228,9 @@ function render_template_callback( $var, $params )
 					'class'  => $params['permalink_class'],
 					'before' => $params['before_permalink'],
 					'after'  => $params['after_permalink'],
+					'post_navigation' => $params['post_navigation'],
+					'nav_target'      => $params['nav_target'],
+					'target_blog'     => $params['target_blog'],
 				) );
 			break;
 

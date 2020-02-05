@@ -307,11 +307,9 @@ function skin_init( $disp )
 					if( ! $url_resolved &&
 					    $Blog->get_setting( 'canonical_item_urls' ) &&
 					    $redir == 'yes' &&
-					    ( ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) || // If Item has main category in the current collection
-					      $Item->is_part_of_blog( $Blog->ID ) // If Item has extra category from not main collection
-					    ) )
+					    ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) // If the Item cannot stay in the current Collection
 					{	// REDIRECT TO THE CANONICAL URL:
-						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].' );
+						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].', 'request' );
 						header_redirect( $canonical_url, true );
 						// EXITED.
 					}
