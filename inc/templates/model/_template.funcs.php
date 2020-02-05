@@ -184,6 +184,7 @@ function render_template_callback( $var, $params )
 	$match_found = true;
 
 	// Resolve default date/time formats:
+	// TODO: LATER: remove this code from the callback. Templates will specify their own format. Infoline widget can compute $datetime_format internally.
 	$date_format = locale_resolve_datetime_fmt( $params['date_format'] );
 	$time_format = locale_resolve_datetime_fmt( $params['time_format'] );
 	$datetime_format = $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format;
