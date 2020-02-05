@@ -227,7 +227,7 @@ class cat_content_list_Widget extends ComponentWidget
 			echo $params['before_cat'];
 
 			load_funcs( 'templates/model/_template.funcs.php' );
-			echo render_template( $this->disp_params['template_cat'], $params );
+			echo render_template_code( $this->disp_params['template_cat'], $params );
 
 			echo $params['after_cat'];
 		}
@@ -261,7 +261,7 @@ class cat_content_list_Widget extends ComponentWidget
 		echo $params['before_item'];
 
 		load_funcs( 'templates/model/_template.funcs.php' );
-		echo render_template( $this->disp_params['template_item'], $params );
+		echo render_template_code( $this->disp_params['template_item'], $params );
 
 		echo $params['after_item'];
 	}

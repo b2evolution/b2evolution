@@ -349,7 +349,7 @@ class item_info_line_Widget extends ComponentWidget
 				'edit_link_text'      => '#',
 			), $params['widget_item_info_line_params'] );
 
-			$info_line = render_template( $template, array_merge( $params, array(
+			$info_line = render_template_code( $template, array_merge( $params, array(
 				'date_format' => $this->disp_params['date_format'],
 				'time_format' => $this->disp_params['time_format'],
 			), $widget_params ) );
