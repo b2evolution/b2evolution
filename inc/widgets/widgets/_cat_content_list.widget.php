@@ -94,7 +94,7 @@ class cat_content_list_Widget extends ComponentWidget
 		// Get available templates:
 		$TemplateCache = & get_TemplateCache();
 		$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
-		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
+		$template_options = array( NULL => T_('No template') ) + $TemplateCache->get_code_option_array();
 		$template_input_suffix = ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
 			.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );
 
@@ -146,13 +146,15 @@ class cat_content_list_Widget extends ComponentWidget
 
 		$TemplateCache = & get_TemplateCache();
 
-		if( ! ( $cat_Template = & $TemplateCache->get_by_code( $this->disp_params['template_cat'], false, false ) ) )
+		if( ! empty( $this->disp_params['template_cat'] ) &&
+		    ! ( $cat_Template = & $TemplateCache->get_by_code( $this->disp_params['template_cat'], false, false ) ) )
 		{	// Display error when no or wrong template for listing a category:
 			$this->display_error_message( sprintf( 'Template is not found: %s for listing a category', '<code>'.$this->disp_params['template_cat'].'</code>' ) );
 			return false;
 		}
 
-		if( ! ( $item_Template = & $TemplateCache->get_by_code( $this->disp_params['template_item'], false, false ) ) )
+		if( ! empty( $this->disp_params['template_item'] ) &&
+		    ! ( $item_Template = & $TemplateCache->get_by_code( $this->disp_params['template_item'], false, false ) ) )
 		{	// Display error when no or wrong template for listing a category:
 			$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$this->disp_params['template_item'].'</code>' ) );
 			return false;
@@ -210,6 +212,11 @@ class cat_content_list_Widget extends ComponentWidget
 	{
 		global $Chapter;
 
+		if( empty( $this->disp_params['template_cat'] ) )
+		{	// No template is provided for listing a category:
+			return;
+		}
+
 		// Default params:
 		$params = array_merge( array(
 				'before_cat'         => '<li class="chapter">',
@@ -236,13 +243,17 @@ class cat_content_list_Widget extends ComponentWidget
 
 	/**
 	 * In-skin display of an Item.
-	 * It is a wrapper around the skin '_item_list.inc.php' file.
 	 *
 	 * @param object Item
 	 */
 	function item_inskin_display( $param_Item, $level, $params = array() )
 	{
 		global $cat, $Item;
+
+		if( empty( $this->disp_params['template_item'] ) )
+		{	// No template is provided for listing an item:
+			return;
+		}
 
 		// Set global $Item for widgets in container "Item in List":
 		$Item = $param_Item;
