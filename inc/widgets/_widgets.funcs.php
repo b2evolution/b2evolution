@@ -92,9 +92,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['item_in_list'] = array(
 		array( 10, 'item_title' ),
 		array( 20, 'item_visibility_badge', 'coll_type' => '-manual' ),
-		array( 30, 'item_info_line', 'coll_type' => '-manual' ),
+		array( 30, 'item_info_line', 'coll_type' => '-manual', 'unique' => true ),
 		array( 40, 'item_content', 'unique' => true ),
-		array( 50, 'item_footer', 'coll_type' => '-manual,forum' ),
+		array( 50, 'item_info_line', 'coll_type' => '-manual,forum', 'params' => array( 'template' => 'item_details_feedback_link' ) ),
 	);
 
 	/* Item Single Header */
@@ -124,7 +124,6 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 40, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'format' => 'revision' ) ),
 		array( 50, 'item_seen_by', 'coll_type' => '-forum,group,manual' ),
 		array( 60, 'item_vote', 'coll_type' => '-forum,group,manual' ),
-		array( 70, 'item_footer' ),
 	);
 
 	/* Item Page */
@@ -133,7 +132,6 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 15, 'item_attachments' ),
 		array( 50, 'item_seen_by' ),
 		array( 60, 'item_vote', 'coll_type' => '-forum,group' ),
-		array( 70, 'item_footer' ),
 	);
 
 	/* Comment List */

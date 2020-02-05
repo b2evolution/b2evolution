@@ -11979,9 +11979,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 15720, 'Installing new widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
-		install_new_default_widgets( 'item_in_list', 'item_content,item_footer' );
-		install_new_default_widgets( 'item_single', 'item_footer' );
-		install_new_default_widgets( 'item_page', 'item_footer' );
+		install_new_default_widgets( 'item_in_list', 'item_content' );
 		upg_task_end();
 	}
 
@@ -12013,6 +12011,21 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// Create default templates what were not created before yet:
 		require_once dirname(__FILE__).'/_functions_create.php';
 		create_default_templates( false );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15760, 'Updating item footer...' ) )
+	{	// part of 7.0.0-alpha
+		// Create default templates what were not created before yet:
+		require_once dirname(__FILE__).'/_functions_create.php';
+		create_default_templates( false );
+
+		// Delete widget "Item Footer":
+		$DB->query( 'DELETE FROM T_widget__widget
+			WHERE wi_code = "item_footer"' );
+
+		// Install widget "Info Line" with Template: "Item Details: Comment Link":
+		install_new_default_widgets( 'item_in_list', 'item_info_line' );
 		upg_task_end();
 	}
 

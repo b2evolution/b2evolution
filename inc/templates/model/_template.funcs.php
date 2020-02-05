@@ -387,6 +387,10 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
+		case 'Item:feedback_link':
+			echo $Item->get_feedback_link();
+			break;
+
 		// Chapter / Category:
 		case 'Cat:permalink':
 			echo '<a href="'.$Chapter->get_permanent_url().'" class="link">'.get_icon( 'expand' ).$Chapter->dget( 'name' ).'</a>';

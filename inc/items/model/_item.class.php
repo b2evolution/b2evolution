@@ -5673,7 +5673,7 @@ class Item extends ItemLight
 	 *
 	 * @param array
 	 */
-	function get_feedback_link( $params )
+	function get_feedback_link( $params = array() )
 	{
 		global $ReqURL, $Blog, $Settings;
 
