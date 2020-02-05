@@ -180,6 +180,28 @@ function render_template_callback( $var, $params )
 		'excerpt_more_text'   => T_('more').' &raquo;',
 	), $params );
 
+	// Check current object by prefix:
+	$prefix = ( preg_match( '#^\$([a-z]+):#i', $var, $prefix2 ) ? $prefix2[1] : 'Item' );
+	switch( $prefix )
+	{
+		case 'Cat':
+			if( empty( $Chapter ) || ! ( $Chapter instanceof Chapter ) )
+			{
+				return '<span class="evo_param_error">'.$var.': Object Chapter is not defined at this moment.</span>';
+			}
+			break;
+
+		case 'Item':
+			if( empty( $Item ) || ! ( $Item instanceof Item ) )
+			{
+				return '<span class="evo_param_error">'.$var.': Object Item is not defined at this moment.</span>';
+			}
+			break;
+
+		default:
+			return '<span class="evo_param_error">'.$var.': Scope "'.$prefix.':" is not recognized.</span>';
+	}
+
 	$r = $var;
 	$match_found = true;
 
@@ -189,12 +211,6 @@ function render_template_callback( $var, $params )
 	$time_format = locale_resolve_datetime_fmt( $params['time_format'] );
 	$datetime_format = $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format;
 
-// TODO: a variable is like `$Cat:description$` or `$Item:excerpt$`
-// If we have just $excerpt$, it is the equivalent of `$Item:excerpt$`
-// So step 1 is to isolate the Prefix `Item` or `Cat` and check if $Item or $Chapter is defined
-// If NOT, then return error
-
- 
 	// Trim '$' from variable:
 	$r = trim( $r , '$' );
 
@@ -337,7 +353,7 @@ function render_template_callback( $var, $params )
 
 		// Read Status:
 		case 'read_status':
-			echo $Item->get_unread_status( array(
+			$Item->display_unread_status( array(
 					'style'  => 'text',
 					'before' => '<span class="evo_post_read_status">',
 					'after'  => '</span>'
@@ -394,8 +410,8 @@ function render_template_callback( $var, $params )
 		return $r;
 	}
 	else
-	{
-		return $var;
+	{	// Display error for not recognized variable:
+		return '<span class="evo_param_error">$Item:'.substr( $var, 1 ).' is not recognized.</span>';
 	}
 }
 

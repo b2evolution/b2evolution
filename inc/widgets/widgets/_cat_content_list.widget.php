@@ -210,7 +210,7 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function cat_inskin_display( $param_Chapter, $level, $params = array() )
 	{
-		global $Chapter;
+		global $Chapter, $Item;
 
 		if( empty( $this->disp_params['template_cat'] ) )
 		{	// No template is provided for listing a category:
@@ -229,7 +229,14 @@ class cat_content_list_Widget extends ComponentWidget
 
 		if( ! empty( $param_Chapter ) )
 		{	// Display chapter:
+
+			// Store original Chapter and Item in order to restore this back after template rendering:
+			$orig_Chapter = $Chapter;
+			$orig_Item = $Item;
+			// Set global Chapter to render templates:
 			$Chapter = $param_Chapter;
+			// Clear current Item if it is defined, because here we have to render only templates for Chapter:
+			$Item = NULL;
 
 			echo $params['before_cat'];
 
@@ -237,6 +244,10 @@ class cat_content_list_Widget extends ComponentWidget
 			echo render_template_code( $this->disp_params['template_cat'], $params );
 
 			echo $params['after_cat'];
+
+			// Reset back to original current Chapter and Item:
+			$Chapter = $orig_Chapter;
+			$Item = $orig_Item;
 		}
 	}
 
@@ -248,15 +259,20 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function item_inskin_display( $param_Item, $level, $params = array() )
 	{
-		global $cat, $Item;
+		global $Chapter, $Item;
 
 		if( empty( $this->disp_params['template_item'] ) )
 		{	// No template is provided for listing an item:
 			return;
 		}
 
-		// Set global $Item for widgets in container "Item in List":
+		// Store original Item in order to restore this back after template rendering:
+		$orig_Chapter = $Chapter;
+		$orig_Item = $Item;
+		// Set global $Item to render templates:
 		$Item = $param_Item;
+		// Clear current Chapter if it is defined, because here we have to render only templates for Item:
+		$Chapter = NULL;
 
 		// Default params:
 		$params = array_merge( array(
@@ -278,6 +294,10 @@ class cat_content_list_Widget extends ComponentWidget
 			) ) );
 
 		echo $params['after_item'];
+
+		// Reset back to original current Chapter and Item:
+		$Chapter = $orig_Chapter;
+		$Item = $orig_Item;
 	}
 }
 
