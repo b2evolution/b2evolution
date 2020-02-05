@@ -1653,25 +1653,33 @@ function create_default_templates( $is_task = true )
 	}
 
 	$new_templates = array(
-		'iteminfo_short' => array(
-			'name'     => 'Item Info: Posted by Author on Date in Categories',
+		'item_details_infoline_date' => array(
+			'name'     => 'Item Details: Posted on Date',
+			'template' => '<span class="small text-muted">$flag_icon$ Posted on $issue_time$</span>',
+		),
+		'item_details_infoline_standard' => array(
+			'name'     => 'Item Details: Posted by Author on Date in Categories',
 			'template' => '<span class="small text-muted">$flag_icon$ Posted by $author$ on $issue_time$ in $categories$</span>',
 		),
-		'iteminfo_long' => array(
-			'name'     => 'Item Info: Long info line',
+		'item_details_infoline_long' => array(
+			'name'     => 'Item Details: Long info line',
 			'template' => '<span class="small text-muted">$flag_icon$ $permalink_icon$ Posted by $author$ on $issue_time$ in $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$</span>',
 		),
-		'iteminfo_smallprint_standard' => array(
-			'name'     => 'Item Info Small Print: Standard',
+		'item_details_smallprint_standard' => array(
+			'name'     => 'Item Details: Small Print: Standard',
 			'template' => '$flag_icon$ This entry was posted by $author$ and filed under $categories$. Tags: $tags$. $edit_link$'
 		),
-		'iteminfo_smallprint_long' => array(
-			'name'     => 'Item Info Small Print: Long',
+		'item_details_smallprint_long' => array(
+			'name'     => 'Item Details: Small Print: Long',
 			'template' => '$author_avatar$ $flag_icon$ This entry was posted on $issue_time$ at $issue_time$ by $author$ and filed under $categories$. Tags: $tags$. $edit_link$'
 		),
-		'iteminfo_revisions' => array(
-			'name'     => 'Item Info Small Print: Revisions',
+		'item_details_revisions' => array(
+			'name'     => 'Item Details: Small Print: Revisions',
 			'template' => 'Created by $author$ &bull; Last edit by $lastedit_user$ on $mod_date$ &bull; $history_link$ &bull; $propose_change_link$'
+		),
+		'item_details_feedback_link' => array(
+			'name'     => 'Item Details: Comment Link',
+			'template' => '<nav class="post_comments_link">$feedback_link$</nav>'
 		),
 		'cblock_clearfix' => array(
 			'name'     => 'Include Content Block: with clearfix',

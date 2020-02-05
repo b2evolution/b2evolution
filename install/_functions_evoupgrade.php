@@ -12003,7 +12003,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15750, 'Creating new default templates...' ) )
+	if( upg_task_start( 15751, 'Creating new default templates...' ) )
 	{	// part of 7.0.0-alpha
 
 		// Delete the following existing default templates:
