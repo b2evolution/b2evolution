@@ -7227,6 +7227,12 @@ class Item extends ItemLight
 	}
 
 
+	/**
+	 * Provide link to publish a post if user has permission
+	 *
+	 * @param $params
+	 * @return boolean true if link was displayed false otherwise
+	 */
 	function publish_link( $before = ' ', $after = ' ', $text = '#', $title = '#', $class = '', $glue = '&amp;', $save_context = true )
 	{
 		$publish_link = $this->get_publish_link( $before, $after, $text, $title, $class, $glue, $save_context );
