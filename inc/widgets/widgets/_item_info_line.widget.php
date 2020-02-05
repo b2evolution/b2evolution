@@ -271,6 +271,7 @@ class item_info_line_Widget extends ComponentWidget
 			}
 
 			// Author:
+			$before_author = '';
 			switch( $this->disp_params['before_author'] )
 			{
 				case 'posted_by':
@@ -284,7 +285,7 @@ class item_info_line_Widget extends ComponentWidget
 					break;
 
 				default:
-					$before_author = '';
+					// do nothing
 			}
 
 			// Date issued / Creation date:
@@ -293,12 +294,12 @@ class item_info_line_Widget extends ComponentWidget
 			switch( $this->disp_params['display_date'] )
 			{
 				case 'issue_date':
-					$before_issue_time = T_('on').' ';
+					$before_issue_time = empty( $before_author ) ? '' : $T_('on').' ';
 					$template .= ' $issue_time$';
 					break;
 
 				case 'date_created':
-					$before_creation_time = T_('on').' ';
+					$before_creation_time = empty( $before_author ) ? '' : T_('on').' ';
 					$template .= ' $creation_time$';
 					break;
 

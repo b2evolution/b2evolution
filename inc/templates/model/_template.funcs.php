@@ -242,6 +242,15 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
+		case 'lastedit_user':
+			$Item->lastedit_user( array(
+					'before'    => $params['before_lastedit_user'],
+					'after'     => $params['after_lastedit_user'],
+					'link_text' => $params['lastedit_user_link_text'],
+				) );
+			break;
+
+		// Date/Time:
 		case 'issue_time':
 			$Item->issue_time( array(
 					'before'      => $params['before_issue_time'],
@@ -251,52 +260,35 @@ function render_template_callback( $var, $params )
 			break;
 
 		case 'creation_time':
-// TODO: Make & Call $Item->get_creation_time();
+			$creation_time_format = empty( $params['creation_time_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['creation_time_format'] );
 			echo $params['before_creation_time'];
-			echo mysql2date( empty( $params['creation_time_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['creation_time_format'] ), $Item->datecreated );
+			echo $Item->get_creation_time( $creation_time_format );
 			echo $params['after_creation_time'];
 			break;
 
 		case 'mod_date':
+			$mod_date_format = empty( $params['mod_date_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['mod_date_format'] );
 			echo $params['before_mod_date'];
-			echo $Item->get_mod_date( empty( $params['mod_date_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['mod_date_format'] ) );
+			echo $Item->get_mod_date( $mod_date_format );
 			echo $params['after_mod_date'];
 			break;
 
-		case 'categories':
-			$Item->categories( array(
-					'before'           => $params['before_categories'],
-					'after'            => $params['after_categories'],
-					'include_main'     => $params['categories_include_main'],
-					'include_other'    => $params['categories_include_other'],
-					'include_external' => $params['categories_include_external'],
-					'link_categories'  => $params['categories_link_categories'],
-				) );
-			break;
-
-		case 'lastedit_user':
-			$Item->lastedit_user( array(
-					'before'    => $params['before_lastedit_user'],
-					'after'     => $params['after_lastedit_user'],
-					'link_text' => $params['lastedit_user_link_text'],
-				) );
-			break;
-
 		case 'last_touched':
-// TODO: Make & Call $Item->get_last_touched_ts();
+			$last_touched_ts_format = empty( $params['last_touched_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_touched_format'] );
 			echo $params['before_last_touched'];
-			echo mysql2date( empty( $params['last_touched_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_touched_format'] ), $Item->get( 'last_touched_ts' ) );
+			echo $Item->get_last_touched_ts( $last_touched_ts_format );
 			echo $params['after_last_touched'];
 			break;
 
 		case 'last_updated':
 		case 'contents_last_updated':
-// TODO: Make & Call $Item->get_contents_last_updated_ts();
+			$contents_last_updated_ts_format = empty( $params['last_updated_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_updated_format'] );
 			echo $params['before_last_updated'];
-			echo mysql2date( empty( $params['last_updated_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_updated_format'] ), $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
+			echo $Item->get_contents_last_updated_ts( $contents_last_updated_ts_format ).$Item->get_refresh_contents_last_updated_link();
 			echo $params['after_last_updated'];
 			break;
 
+		// Links:
 		case 'edit_link':
 			$Item->edit_link( array(
 					'before' => $params['before_edit_link'],
@@ -331,6 +323,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
+		// Read Status:
 		case 'read_status':
 			echo $Item->get_unread_status( array(
 					'style'  => 'text',
@@ -339,6 +332,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
+		// Visibility Status:
 		case 'visibility_status':
 			if( $Item->status != 'published' )
 			{
@@ -355,6 +349,18 @@ function render_template_callback( $var, $params )
 
 		case 'Cat:description':
 			echo $Chapter->dget( 'description' );
+			break;
+
+		// Categories:
+		case 'categories':
+			$Item->categories( array(
+					'before'           => $params['before_categories'],
+					'after'            => $params['after_categories'],
+					'include_main'     => $params['categories_include_main'],
+					'include_other'    => $params['categories_include_other'],
+					'include_external' => $params['categories_include_external'],
+					'link_categories'  => $params['categories_link_categories'],
+				) );
 			break;
 
 		// Tags:

@@ -1102,6 +1102,24 @@ class ItemLight extends DataObject
 		echo format_to_output( $locale['name'], $format );
 	}
 
+
+	/**
+	 * Get creation time of Item
+	 * 
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_creation_time( $format = '', $useGM = false )
+	{
+		if( empty( $format ) )
+		{
+			return mysql2date( locate_datefmt(), $this->datecreated, $useGM ); 
+		}
+
+		return mysql2date( $format, $this->datecreated, $useGM );
+	}
+
+
 	/**
 	 * Get last mod date (datetime) of Item
 	 *
@@ -1116,6 +1134,40 @@ class ItemLight extends DataObject
 		}
 
 		return mysql2date( $format, $this->datemodified, $useGM );
+	}
+
+
+	/**
+	 * Get last touched timestamp of Item
+	 * 
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_last_touched_ts( $format = '', $useGM = false )
+	{
+		if( empty( $format ) )
+		{
+			return mysql2date( locate_datefmt(), $this->get( 'last_touched_ts' ), $useGM ); 
+		}
+
+		return mysql2date( $format, $this->get( 'last_touched_ts' ), $useGM );
+	}
+
+
+	/**
+	 * Get contents last updated timestamp of Item
+	 * 
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_contents_last_updated_ts( $format = '', $useGM = false )
+	{
+		if( empty( $format ) )
+		{
+			return mysql2date( locate_datefmt(), $this->get( 'contents_last_updated_ts' ), $useGM ); 
+		}
+
+		return mysql2date( $format, $this->get( 'contents_last_updated_ts' ), $useGM );
 	}
 
 
