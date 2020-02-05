@@ -85,6 +85,10 @@ function render_template_callback( $var, $params )
 	global $Chapter, $Item;
 
 	$params = array_merge( array(
+		// default date/time format:
+		'date_format'         => '#extended_date',
+		'time_format'         => '#none',
+
 		// flag icon:
 		'before_flag'         => '',
 		'after_flag'          => '',
@@ -109,17 +113,17 @@ function render_template_callback( $var, $params )
 		// issue_time:
 		'before_issue_time'    => '',
 		'after_issue_time'     => '',
-		'issue_time_format'    => '#extended_date',
+		'issue_time_format'    => '', // empty by default - use default date/time format
 
 		// creation_time:
 		'before_creation_time' => '',
 		'after_creation_time'  => '',
-		'creation_time_format' => '#extended_date',
+		'creation_time_format' => '', // empty by default - use default date/time format
 
 		// mod_date:
 		'before_mod_date'     => '',
 		'after_mod_date'      => '',
-		'mod_date_format'     => '#extended_datetime',
+		'mod_date_format'     => '', // empty by default - use default date/time format
 
 		// categories:
 		'before_categories'           => '',
@@ -137,12 +141,12 @@ function render_template_callback( $var, $params )
 		// last_touched:
 		'before_last_touched' => '',
 		'after_last_touched'  => '',
-		'last_touched_format' => '#extended_date',
+		'last_touched_format' => '', // empty by default - use default date/time format
 
 		// last_updated:
 		'before_last_updated' => '',
 		'after_last_updated'  => '',
-		'last_updated_format' => '#extended_date',
+		'last_updated_format' => '', // empty by default - use default date/time format
 
 		// edit_link:
 		'before_edit_link'    => '',
@@ -164,8 +168,6 @@ function render_template_callback( $var, $params )
 		'after_tags'     => '',
 		'tags_separator' => ', ',
 
-		'date_format'         => '#extended-date',
-		'time_format'         => '#none',
 		'excerpt_before_text' => '',
 		'excerpt_after_text'  => '',
 		'excerpt_before_more' => ' <span class="evo_post__excerpt_more_link">',
@@ -176,62 +178,25 @@ function render_template_callback( $var, $params )
 	$r = $var;
 	$match_found = true;
 
-// TODO: use locale_resolve_datetime_fmt()
-	// Get datetime format:
-	switch( $params['date_format'] )
-	{
-		case 'extended':	// TODO: convert value in widget to this:
-		case '#extended_date':
-			$date_format = locale_extdatefmt();
-			break;
-
-		case 'long':	// TODO: convert value in widget to this:
-		case '#long_date':
-			$date_format = locale_longdatefmt();
-			break;
-
-		case 'short':	// TODO: convert value in widget to this:
-		case '#short_date':
-			$date_format = locale_datefmt();
-			break;
-
-		case '#none':
-		default:
-			$date_format = '';
-	}
-
-// TODO: use locale_resolve_datetime_fmt()
-	switch( $params['time_format'] )
-	{
-		case 'long':	// TODO: convert value in widget to this:
-		case '#long_time':
-			$time_format = locale_timefmt();
-			break;
-
-		case 'short':	// TODO: convert value in widget to this:
-		case '#short_time':
-			$time_format = locale_shorttimefmt();
-			break;
-
-		case 'none':	// TODO: convert value in widget to this:
-		case '#none':
-		default:
-			$time_format = '';
-	}
-
+	// Resolve default date/time formats:
+	$date_format = locale_resolve_datetime_fmt( $params['date_format'] );
+	$time_format = locale_resolve_datetime_fmt( $params['time_format'] );
+	$datetime_format = $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format;
 
 // TODO: a variable is like `$Cat:description$` or `$Item:excerpt$`
 // If we have just $excerpt$, it is the equivalent of `$Item:excerpt$`
 // So step 1 is to isolate the Prefix `Item` or `Cat` and check if $Item or $Chapter is defined
 // If NOT, then return error
 
+ 
+	// Trim '$' from variable:
+	$r = trim( $r , '$' );
 
 	ob_start();
-// TODO: remove `$` and `$` from the switch var
 	switch( $r )
 	{
 		// Item:
-		case '$flag_icon$':
+		case 'flag_icon':
 // TODO: should be  case 'Item:flag_icon':
 			$Item->flag( array(
 					'before' => $params['before_flag'],
@@ -239,7 +204,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$permalink_icon$':	// Temporary
+		case 'permalink_icon':	// Temporary
 // TODO: should be  case 'Item:permalink_icon':
 			$Item->permanent_link( array(
 					'text'   => '#icon#',
@@ -248,8 +213,8 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$permalink$':
-		case '$permanent_link$':
+		case 'permalink':
+		case 'permanent_link':
 			$Item->permanent_link( array(
 					'text'   => $params['permalink_text'],
 					'class'  => $params['permalink_class'],
@@ -258,7 +223,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$author_avatar$':
+		case 'author_avatar':
 			$Item->author( array(
 					'before'      => $params['before_author_avatar'],
 					'after'       => $params['after_author_avatar'],
@@ -269,7 +234,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$author$':
+		case 'author':
 			$Item->author( array(
 					'before'    => $params['before_author'],
 					'after'     => $params['after_author'],
@@ -277,41 +242,39 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$issue_date$':  // TODO: remove from all templates
-		case '$issue_time$':
+		case 'issue_time':
 			$Item->issue_time( array(
 					'before'      => $params['before_issue_time'],
 					'after'       => $params['after_issue_time'],
-					'time_format' => locale_resolve_datetime_fmt( $params['issue_time_format'] ),
+					'time_format' => empty( $params['issue_time_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['issue_time_format'] ),
 				) );
 			break;
 
-		case '$creation_date$':  // TODO: remove from all templates
-		case '$creation_time$':
+		case 'creation_time':
 // TODO: Make & Call $Item->get_creation_time();
 			echo $params['before_creation_time'];
-			echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
+			echo mysql2date( empty( $params['creation_time_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['creation_time_format'] ), $Item->datecreated );
 			echo $params['after_creation_time'];
 			break;
 
-		case '$mod_date$':
+		case 'mod_date':
 			echo $params['before_mod_date'];
-			echo $Item->get_mod_date( locale_resolve_datetime_fmt( $params['mod_date_format'] ) );
+			echo $Item->get_mod_date( empty( $params['mod_date_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['mod_date_format'] ) );
 			echo $params['after_mod_date'];
 			break;
 
-		case '$categories$':
+		case 'categories':
 			$Item->categories( array(
-					'before'          => $params['before_categories'],
-					'after'           => $params['after_categories'],
-					'include_main'    => true,
-					'include_other'   => true,
-					'include_external'=> true,
-					'link_categories' => true,
+					'before'           => $params['before_categories'],
+					'after'            => $params['after_categories'],
+					'include_main'     => $params['categories_include_main'],
+					'include_other'    => $params['categories_include_other'],
+					'include_external' => $params['categories_include_external'],
+					'link_categories'  => $params['categories_link_categories'],
 				) );
 			break;
 
-		case '$lastedit_user$':
+		case 'lastedit_user':
 			$Item->lastedit_user( array(
 					'before'    => $params['before_lastedit_user'],
 					'after'     => $params['after_lastedit_user'],
@@ -319,22 +282,22 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$last_touched$':
+		case 'last_touched':
 // TODO: Make & Call $Item->get_last_touched_ts();
 			echo $params['before_last_touched'];
-			echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'last_touched_ts' ) );
+			echo mysql2date( empty( $params['last_touched_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_touched_format'] ), $Item->get( 'last_touched_ts' ) );
 			echo $params['after_last_touched'];
 			break;
 
-		case '$last_updated$':
-		case '$contents_last_updated$':
+		case 'last_updated':
+		case 'contents_last_updated':
 // TODO: Make & Call $Item->get_contents_last_updated_ts();
 			echo $params['before_last_updated'];
-			echo mysql2date( $date_format.( empty( $date_format ) ? '' : ' ' ).$time_format, $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
+			echo mysql2date( empty( $params['last_updated_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_updated_format'] ), $Item->get( 'contents_last_updated_ts' ) ).$Item->get_refresh_contents_last_updated_link();
 			echo $params['after_last_updated'];
 			break;
 
-		case '$edit_link$':
+		case 'edit_link':
 			$Item->edit_link( array(
 					'before' => $params['before_edit_link'],
 					'after'  => $params['after_edit_link'],
@@ -342,7 +305,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$history_link$':
+		case 'history_link':
 			echo $Item->get_history_link( array(
 					'before'    => $params['before_history_link'],
 					'after'     => $params['after_history_link'],
@@ -350,7 +313,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$propose_change_link$':
+		case 'propose_change_link':
 			$Item->propose_change_link( array(
 					'before' => $params['before_propose_change_link'],
 					'after'  => $params['after_propose_change_link'],
@@ -358,7 +321,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$excerpt$':
+		case 'excerpt':
 			$Item->excerpt( array(
 					'before'              => $params['excerpt_before_text'],
 					'after'               => $params['excerpt_after_text'],
@@ -368,7 +331,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$read_status$':
+		case 'read_status':
 			echo $Item->get_unread_status( array(
 					'style'  => 'text',
 					'before' => '<span class="evo_post_read_status">',
@@ -376,7 +339,7 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
-		case '$visibility_status$':
+		case 'visibility_status':
 			if( $Item->status != 'published' )
 			{
 				$Item->format_status( array(
@@ -386,15 +349,16 @@ function render_template_callback( $var, $params )
 			break;
 
 		// Chapter / Category:
-		case '$Cat:permalink$':
+		case 'Cat:permalink':
 			echo '<a href="'.$Chapter->get_permanent_url().'" class="link">'.get_icon( 'expand' ).$Chapter->dget( 'name' ).'</a>';
 			break;
 
-		case '$Cat:description$':
+		case 'Cat:description':
 			echo $Chapter->dget( 'description' );
 			break;
 
-		case '$tags$':
+		// Tags:
+		case 'tags':
 			$Item->tags( array(
 					'before'    => $params['before_tags'],
 					'after'     => $params['after_tags'],

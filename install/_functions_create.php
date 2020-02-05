@@ -1653,11 +1653,11 @@ function create_default_templates( $is_task = true )
 	$new_templates = array(
 		'iteminfo_short' => array(
 			'name'     => 'Item Info: Posted by Author on Date in Categories',
-			'template' => '<span class="small text-muted">$flag_icon$ Posted by $author$ on $issue_date$ in $categories$</span>',
+			'template' => '<span class="small text-muted">$flag_icon$ Posted by $author$ on $issue_time$ in $categories$</span>',
 		),
 		'iteminfo_long' => array(
 			'name'     => 'Item Info: Long info line',
-			'template' => '<span class="small text-muted">$flag_icon$ $permalink_icon$ Posted by $author$ on $issue_date$ in $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$</span>',
+			'template' => '<span class="small text-muted">$flag_icon$ $permalink_icon$ Posted by $author$ on $issue_time$ in $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$</span>',
 		),
 		'iteminfo_smallprint_standard' => array(
 			'name'     => 'Item Info Small Print: Standard',
@@ -1665,7 +1665,7 @@ function create_default_templates( $is_task = true )
 		),
 		'iteminfo_smallprint_long' => array(
 			'name'     => 'Item Info Small Print: Long',
-			'template' => '$author_avatar$ $flag_icon$ This entry was posted on $issue_date$ at $issue_date$ by $author$ and filed under $categories$. Tags: $tags$. $edit_link$'
+			'template' => '$author_avatar$ $flag_icon$ This entry was posted on $issue_time$ at $issue_time$ by $author$ and filed under $categories$. Tags: $tags$. $edit_link$'
 		),
 		'iteminfo_revisions' => array(
 			'name'     => 'Item Info Small Print: Revisions',

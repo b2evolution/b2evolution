@@ -220,6 +220,12 @@ class item_info_line_Widget extends ComponentWidget
 	{
 		global $Item;
 
+		if( empty( $Item ) )
+		{	// Don't display this widget when there is no Item object:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
+			return false;
+		}
+
 		$params = array_merge( array(
 			'author_link_text' => 'preferredname',
 			'block_body_start' => '<div>',
@@ -231,12 +237,6 @@ class item_info_line_Widget extends ComponentWidget
 		), $params );
 
 		$this->init_display( $params );
-
-		if( empty( $Item ) )
-		{	// Don't display this widget when there is no Item object:
-			$this->display_error_message( 'Widget "'.$this->get_name().'" is hidden because there is no Item.' );
-			return false;
-		}
 
 		if( $this->disp_params['template'] )
 		{
@@ -250,8 +250,8 @@ class item_info_line_Widget extends ComponentWidget
 
 			$template_code = $this->disp_params['template'];
 			$info_line = render_template_code( $template_code, array_merge( $params, array(
-					'date_format' => $this->disp_params['date_format'],
-					'time_format' => $this->disp_params['time_format'],
+					'date_format' => '#'.$this->disp_params['date_format'].( $this->disp_params['date_format'] == 'none' ? '' : '_date' ),
+					'time_format' => '#'.$this->disp_params['time_format'].( $this->disp_params['time_format'] == 'none' ? '' : '_time' ),
 				) ) );
 		}
 		else
@@ -288,20 +288,22 @@ class item_info_line_Widget extends ComponentWidget
 			}
 
 			// Date issued / Creation date:
+			$before_issue_time = '';
+			$before_creation_time = '';
 			switch( $this->disp_params['display_date'] )
 			{
 				case 'issue_date':
-					$before_post_time = T_('on').' ';
-					$template .= ' $issue_date$';
+					$before_issue_time = T_('on').' ';
+					$template .= ' $issue_time$';
 					break;
 
 				case 'date_created':
-					$before_post_time = T_('on').' ';
-					$template .= ' $creation_date$';
+					$before_creation_time = T_('on').' ';
+					$template .= ' $creation_time$';
 					break;
 
 				default:
-					$before_post_time = '';
+					// do nothing
 			}
 
 			// Categories:
@@ -329,31 +331,46 @@ class item_info_line_Widget extends ComponentWidget
 			}
 
 			$widget_params = array_merge( array(
-				'before_flag'         => '',
-				'after_flag'          => '',
-				'before_permalink'    => '',
-				'after_permalink'     => '',
-				'permalink_text'      => '#icon#',
-				'before_author'       => $before_author,
-				'after_author'        => '',
-				'before_post_time'    => $before_post_time,
-				'after_post_time'     => '',
-				'before_categories'   => T_('in').' ',
-				'after_categories'    => '',
-				'before_last_touched' => '<span class="text-muted">&ndash; '.T_('Last touched').': ',
-				'after_last_touched'  => '</span>',
-				'before_last_updated' => '<span class="text-muted">&ndash; '.T_('Contents updated').': ',
-				'after_last_updated'  => '</span>',
-				'before_edit_link'    => '&bull; ',
-				'after_edit_link'     => '',
-				'edit_link_text'      => '#',
-			), $params['widget_item_info_line_params'] );
+					'date_format' => '#'.$this->disp_params['date_format'].( $this->disp_params['date_format'] == 'none' ? '' : '_date' ),
+					'time_format' => '#'.$this->disp_params['time_format'].( $this->disp_params['time_format'] == 'none' ? '' : '_time' ),
+
+					'before_flag' => '',
+					'after_flag'  => '',
+
+					'before_permalink' => '',
+					'after_permalink'  => '',
+					'permalink_text'   => '#icon#',
+
+					'before_author' => $before_author,
+					'after_author'  => '',
+
+					'before_issue_time' => $before_issue_time,
+					'after_issue_time'  => '',
+					'issue_time_format' => NULL, // Use date_format and time_format params
+
+					'before_creation_time' => $before_creation_time,
+					'after_creation_time'  => '',
+					'creation_time_format' => NULL, // Use date_format and time_format params
+
+					'before_categories'   => T_('in').' ',
+					'after_categories'    => '',
+
+					'before_last_touched' => '<span class="text-muted">&ndash; '.T_('Last touched').': ',
+					'after_last_touched'  => '</span>',
+					'last_touched_format' => '',
+
+					'before_last_updated' => '<span class="text-muted">&ndash; '.T_('Contents updated').': ',
+					'after_last_updated'  => '</span>',
+					'last_updated_format' => '',
+
+					'before_edit_link'    => '&bull; ',
+					'after_edit_link'     => '',
+					
+					'edit_link_text'      => '#',
+				), $params['widget_item_info_line_params'] );
 
 			// Automatic template used, render raw template:
-			$info_line = render_template( $template, array_merge( $params, array(
-				'date_format' => $this->disp_params['date_format'],
-				'time_format' => $this->disp_params['time_format'],
-			), $widget_params ) );
+			$info_line = render_template( $template, array_merge( $params, $widget_params ) );
 
 			if( ! empty( $info_line ) )
 			{
