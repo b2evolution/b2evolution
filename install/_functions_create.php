@@ -1659,6 +1659,18 @@ function create_default_templates( $is_task = true )
 			'name'     => 'Item Info: Long info line',
 			'template' => '<span class="small text-muted">$flag_icon$ $permalink_icon$ Posted by $author$ on $issue_date$ in $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$</span>',
 		),
+		'iteminfo_smallprint_standard' => array(
+			'name'     => 'Item Info Small Print: Standard',
+			'template' => '$flag_icon$ This entry was posted by $author$ and filed under $categories$. Tags: $tags$. $edit_link$'
+		),
+		'iteminfo_smallprint_long' => array(
+			'name'     => 'Item Info Small Print: Long',
+			'template' => '$author_avatar$ $flag_icon$ This entry was posted on $issue_date$ at $issue_date$ by $author$ and filed under $categories$. Tags: $tags$. $edit_link$'
+		),
+		'iteminfo_revisions' => array(
+			'name'     => 'Item Info Small Print: Revisions',
+			'template' => 'Created by $author$ &bull; Last edit by $lastedit_user$ on $mod_date$ &bull; $history_link$ &bull; $propose_change_link$'
+		),
 		'cblock_clearfix' => array(
 			'name'     => 'Include Content Block: with clearfix',
 			'template' => '<div class="evo_content_block clearfix $cb_class$\">

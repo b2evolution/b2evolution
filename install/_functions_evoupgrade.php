@@ -11962,8 +11962,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		// Create default templates:
 		$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_template_code ) VALUES
-				( "Item Info: Posted by Author on Date in Categories", "iteminfo_short", "<span class=\"small text-muted\">$flag_icon$ Posted by $author$ on $issue_date$ in $categories$</span>" ),
-				( "Item Info: Long info line", "iteminfo_long", "<span class=\"small text-muted\">$flag_icon$ $permalink_icon$ Posted by $author$ on $issue_date$ in $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$</span>" )' );
+				( "Item Info: Posted by Author on Date in Categories", "iteminfo_short", "Posted by $author$ on $issue_date$ in $categories$" ),
+				( "Item Info: Long info line", "iteminfo_long", "$flag_icon$ $permalink_icon$ Posted by $author$ $issue_date$ $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$" )' );
 
 		upg_task_end();
 	}
@@ -12005,6 +12005,11 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 15750, 'Creating new default templates...' ) )
 	{	// part of 7.0.0-alpha
+
+		// Delete the following existing default templates:
+		$template_codes = array( 'iteminfo_long', 'iteminfo_short' );
+		$DB->query( 'DELETE FROM T_templates WHERE tpl_code IN ('.$DB->quote( $template_codes ).')' );
+
 		// Create default templates what were not created before yet:
 		require_once dirname(__FILE__).'/_functions_create.php';
 		create_default_templates( false );

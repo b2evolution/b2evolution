@@ -85,26 +85,85 @@ function render_template_callback( $var, $params )
 	global $Chapter, $Item;
 
 	$params = array_merge( array(
+		// flag icon:
 		'before_flag'         => '',
 		'after_flag'          => '',
+
+		// permalink_icon:
 		'before_permalink'    => '',
 		'after_permalink'     => '',
 		'permalink_text'      => '#icon#',
 		'permalink_class'     => '',
+
+		// author:
+		'author_link_text'    => 'auto',
 		'before_author'       => '',
 		'after_author'        => '',
-		'before_post_time'    => '',
-		'after_post_time'     => '',
-		'before_categories'   => '',
-		'after_categories'    => '',
+
+		// author_avatar:
+		'author_avatar_size'   => '',
+		'author_avatar_class'  => '',
+		'before_author_avatar' => '',
+		'after_author_avatar'  => '',
+
+		// issue_time:
+		'before_issue_time'    => '',
+		'after_issue_time'     => '',
+		'issue_time_format'    => '#extended_date',
+
+		// creation_time:
+		'before_creation_time' => '',
+		'after_creation_time'  => '',
+		'creation_time_format' => '#extended_date',
+
+		// mod_date:
+		'before_mod_date'     => '',
+		'after_mod_date'      => '',
+		'mod_date_format'     => '#extended_datetime',
+
+		// categories:
+		'before_categories'           => '',
+		'after_categories'            => '',
+		'categories_include_main'     => true,
+		'categories_include_other'    => true,
+		'categories_include_external' => true,
+		'categories_link_categories'  => true,
+
+		// lastedit_user:
+		'lastedit_user_link_text' => 'auto',
+		'before_lastedit_user'    => '',
+		'after_lastedit_user'     => '',
+
+		// last_touched:
 		'before_last_touched' => '',
 		'after_last_touched'  => '',
+		'last_touched_format' => '#extended_date',
+
+		// last_updated:
 		'before_last_updated' => '',
 		'after_last_updated'  => '',
-		'before_edit_link'    => ' &bull; ',
+		'last_updated_format' => '#extended_date',
+
+		// edit_link:
+		'before_edit_link'    => '',
 		'after_edit_link'     => '',
 		'edit_link_text'      => '#',
-		'format'              => '',
+
+		// history_link:
+		'before_history_link' => '',
+		'after_history_link'  => '',
+		'history_link_text'   => T_('View change history'),
+
+		// propose_change_link:
+		'before_propose_change_link' => '',
+		'after_propose_change_link'  => '',
+		'propose_change_link_text'   => T_('Propose a change'),
+
+		// tags:
+		'before_tags'    => '',
+		'after_tags'     => '',
+		'tags_separator' => ', ',
+
 		'date_format'         => '#extended-date',
 		'time_format'         => '#none',
 		'excerpt_before_text' => '',
@@ -168,7 +227,7 @@ function render_template_callback( $var, $params )
 
 
 	ob_start();
-// TODO: remove `$` and `$` from the swicth var
+// TODO: remove `$` and `$` from the switch var
 	switch( $r )
 	{
 		// Item:
@@ -199,6 +258,17 @@ function render_template_callback( $var, $params )
 				) );
 			break;
 
+		case '$author_avatar$':
+			$Item->author( array(
+					'before'      => $params['before_author_avatar'],
+					'after'       => $params['after_author_avatar'],
+					'link_text'   => 'only_avatar',
+					'link_rel'    => 'nofollow',
+					'thumb_size'  => $params['author_avatar_size'],
+					'thumb_class' => $params['author_avatar_class'],
+				) );
+			break;
+
 		case '$author$':
 			$Item->author( array(
 					'before'    => $params['before_author'],
@@ -210,18 +280,24 @@ function render_template_callback( $var, $params )
 		case '$issue_date$':  // TODO: remove from all templates
 		case '$issue_time$':
 			$Item->issue_time( array(
-					'before'      => $params['before_post_time'],
-					'after'       => $params['after_post_time'],
-					'time_format' => $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format
+					'before'      => $params['before_issue_time'],
+					'after'       => $params['after_issue_time'],
+					'time_format' => locale_resolve_datetime_fmt( $params['issue_time_format'] ),
 				) );
 			break;
 
 		case '$creation_date$':  // TODO: remove from all templates
 		case '$creation_time$':
 // TODO: Make & Call $Item->get_creation_time();
-			echo $params['before_post_time'];
+			echo $params['before_creation_time'];
 			echo mysql2date( $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format, $Item->datecreated );
-			echo $params['after_post_time'];
+			echo $params['after_creation_time'];
+			break;
+
+		case '$mod_date$':
+			echo $params['before_mod_date'];
+			echo $Item->get_mod_date( locale_resolve_datetime_fmt( $params['mod_date_format'] ) );
+			echo $params['after_mod_date'];
 			break;
 
 		case '$categories$':
@@ -232,6 +308,14 @@ function render_template_callback( $var, $params )
 					'include_other'   => true,
 					'include_external'=> true,
 					'link_categories' => true,
+				) );
+			break;
+
+		case '$lastedit_user$':
+			$Item->lastedit_user( array(
+					'before'    => $params['before_lastedit_user'],
+					'after'     => $params['after_lastedit_user'],
+					'link_text' => $params['lastedit_user_link_text'],
 				) );
 			break;
 
@@ -252,19 +336,35 @@ function render_template_callback( $var, $params )
 
 		case '$edit_link$':
 			$Item->edit_link( array(
-				'before' => $params['before_edit_link'],
-				'after'  => $params['after_edit_link'],
-				'text'   => $params['edit_link_text'],
-			) );
+					'before' => $params['before_edit_link'],
+					'after'  => $params['after_edit_link'],
+					'text'   => $params['edit_link_text'],
+				) );
+			break;
+
+		case '$history_link$':
+			echo $Item->get_history_link( array(
+					'before'    => $params['before_history_link'],
+					'after'     => $params['after_history_link'],
+					'link_text' => $params['history_link_text'],
+				) );
+			break;
+
+		case '$propose_change_link$':
+			$Item->propose_change_link( array(
+					'before' => $params['before_propose_change_link'],
+					'after'  => $params['after_propose_change_link'],
+					'text'   => $params['propose_change_link_text'],
+				) );
 			break;
 
 		case '$excerpt$':
 			$Item->excerpt( array(
-				'before'              => $params['excerpt_before_text'],
-				'after'               => $params['excerpt_after_text'],
-				'excerpt_before_more' => $params['excerpt_before_more'],
-				'excerpt_after_more'  => $params['excerpt_after_more'],
-				'excerpt_more_text'   => $params['excerpt_more_text'],
+					'before'              => $params['excerpt_before_text'],
+					'after'               => $params['excerpt_after_text'],
+					'excerpt_before_more' => $params['excerpt_before_more'],
+					'excerpt_after_more'  => $params['excerpt_after_more'],
+					'excerpt_more_text'   => $params['excerpt_more_text'],
 				) );
 			break;
 
@@ -292,6 +392,14 @@ function render_template_callback( $var, $params )
 
 		case '$Cat:description$':
 			echo $Chapter->dget( 'description' );
+			break;
+
+		case '$tags$':
+			$Item->tags( array(
+					'before'    => $params['before_tags'],
+					'after'     => $params['after_tags'],
+					'separator' => $params['tags_separator'],
+				) );
 			break;
 
 		default:

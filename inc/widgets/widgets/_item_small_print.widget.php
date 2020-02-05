@@ -96,7 +96,14 @@ class item_small_print_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $current_User, $admin_url;
+
 		load_funcs( 'files/model/_image.funcs.php' );
+
+		// Get available templates:
+		$TemplateCache = & get_TemplateCache();
+		$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
+		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
 
 		$r = array_merge( array(
 				'title' => array(
@@ -104,6 +111,14 @@ class item_small_print_Widget extends ComponentWidget
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
+				),
+				'template' => array(
+					'label' => T_('Template'),
+					'type' => 'select',
+					'options' => $template_options,
+					'defaultvalue' => NULL,
+					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+							.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' ),
 				),
 				'format' => array(
 					'label' => T_('Format'),
@@ -164,114 +179,150 @@ class item_small_print_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		// We renamed some params; older skin may use the old names; let's convert those params now:
-		$this->convert_legacy_param( 'widget_coll_small_print_before', 'widget_item_small_print_before' );
-		$this->convert_legacy_param( 'widget_coll_small_print_after', 'widget_item_small_print_after' );
-		$this->convert_legacy_param( 'widget_coll_small_print_display_author', 'widget_item_small_print_display_author' );
-
-		$this->disp_params = array_merge( array(
-				'widget_item_small_print_before'    => '',
-				'widget_item_small_print_after'     => '',
-				'widget_item_small_print_separator' => ' &bull; ',
-			), $this->disp_params );
-
-		echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
-		$this->disp_title();
-		echo $this->disp_params['block_body_start'];
-		echo $this->disp_params['widget_item_small_print_before'];
-
-		if( $this->disp_params['format'] == 'standard' )
-		{ // Blog standard
-			/**
-			 * @global Skin
-			 */
-			global $Skin;
-
-			$Item->author( array(
-					'link_text'   => 'only_avatar',
-					'link_rel'    => 'nofollow',
-					'thumb_size'  => $this->disp_params['avatar_size'],
-					'thumb_class' => 'leftmargin',
-				) );
-
-			$Item->flag();
-
-			if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
-			{ // We want to display the post date:
-				$Item->issue_time( array(
-						'before'      => /* TRANS: date */ T_('This entry was posted on').' ',
-						'time_format' => locale_extdatefmt(),
-					) );
-				$Item->issue_time( array(
-						'before'      => /* TRANS: time */ T_('at').' ',
-						'time_format' => '#short_time',
-					) );
-				$Item->author( array(
-						'before'    => /* TRANS: author name */ T_('by').' ',
-						'link_text' => 'auto',
-					) );
-			}
-			else
+		if( $this->disp_params['template'] )
+		{
+			load_funcs( 'templates/model/_template.funcs.php' );
+			$TemplateCache = & get_TemplateCache();
+			if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )
 			{
-				$Item->author( array(
-						'before'    => T_('This entry was posted by').' ',
-						'link_text' => 'auto',
-					) );
+				$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
+				return false;
 			}
 
-			$Item->categories( array(
-					'before'           => ' '.T_('and is filed under').' ',
-					'after'            => '.',
-					'include_main'     => true,
-					'include_other'    => true,
-					'include_external' => true,
-					'link_categories'  => true,
-				) );
-
-			// List all tags attached to this post:
-			$Item->tags( array(
-					'before'    => ' '.T_('Tags').': ',
-					'after'     => ' ',
-					'separator' => ', ',
-				) );
-
-			$Item->edit_link( array( // Link to backoffice for editing
-					'before' => '',
-					'after'  => '',
-				) );
+			$template = $this->disp_params['template'];
+			$small_print = render_template_code( $template, array_merge( array(
+					'author_avatar_size'  => $this->disp_params['avatar_size'],
+					'author_avatar_class' => 'leftmargin',
+				), $this->disp_params ) );
 		}
 		else
-		{ // Revisions
-			$Item->flag();
+		{	// Build an automatic template:
+			$template = '';
 
-			$Item->author( array(
-					'before'    => T_('Created by').' ',
-					'after'     => $this->disp_params['widget_item_small_print_separator'],
-					'link_text' => 'auto',
-				) );
+			// We renamed some params; older skin may use the old names; let's convert those params now:
+			$this->convert_legacy_param( 'widget_coll_small_print_before', 'widget_item_small_print_before' );
+			$this->convert_legacy_param( 'widget_coll_small_print_after', 'widget_item_small_print_after' );
+			$this->convert_legacy_param( 'widget_coll_small_print_display_author', 'widget_item_small_print_display_author' );
 
-			$Item->lastedit_user( array(
-					'before'    => T_('Last edit by').' ',
-					'after'     => /* TRANS: "on" is followed by a date here */ ' '.T_('on').' '.$Item->get_mod_date( locale_extdatefmt() ),
-					'link_text' => 'auto',
-				) );
+			$this->disp_params = array_merge( array(
+					'widget_item_small_print_before'    => '',
+					'widget_item_small_print_after'     => '',
+					'widget_item_small_print_separator' => ' &bull; ', 
+				), $this->disp_params );
 
-			echo $Item->get_history_link( array(
-					'before'    => $this->disp_params['widget_item_small_print_separator'],
-					'link_text' => T_('View change history')
-				) );
+			if( $this->disp_params['format'] == 'standard' )
+			{	// Blog standard
+				$template = '$author_avatar$ $flag_icon$';
 
-			$Item->propose_change_link( array(
-					'before' => $this->disp_params['widget_item_small_print_separator'],
-					'text'   => T_('Propose a change')
-				) );
+				if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
+				{
+					$template .= ' $issue_time$ $author$';
+
+					ob_start();
+					$Item->issue_time( array( 'time_format' => '#short_time' ) );
+					$issue_time = ob_get_contents();
+					ob_end_clean();
+
+					$before_issue_time = T_('This entry was posted on').' ';
+					$after_issue_time  = ' '.T_('at').' '.$issue_time;
+					$issue_time_format = '#extended_date';
+
+					$before_author = T_('by').' ';
+				}
+				else
+				{
+					$template .= ' $author$';
+					$before_author = T_('This entry was posted by').' ';
+					$before_issue_time = '';
+					$after_issue_time  = '';
+					$issue_time_format = '#extended_date';
+				}
+
+				$template .= ' $categories$ $tags$ $edit_link$';
+
+				$widget_params = array(
+					'author_avatar_size'  => $this->disp_params['avatar_size'],
+					'author_avatar_class' => 'leftmargin',
+
+					'before_flag' => '',
+					'after_flag'  => '',
+
+					'before_issue_time' => $before_issue_time,
+					'after_issue_time'  => $after_issue_time,
+					'issue_time_format' => $issue_time_format,
+					
+					'author_link_text' => 'auto',
+					'before_author'    => $before_author,
+					'after_author'     => '',
+					
+					'before_categories'           => T_('and is filed under').' ',
+					'after_categories'            => '.',
+					'categories_include_main'     => true,
+					'categories_include_other'    => true,
+					'categories_include_external' => true,
+					'categories_link_categories'  => true,
+					
+					'before_tags'    => T_('Tags').': ',
+					'after_tags'     => '',
+					'tags_separator' => ', ',
+
+					'before_edit_link' => '',
+					'after_edit_link'  => '',
+				);
+			}
+			else
+			{	// Revisions
+				$template = '$flag_icon$ $author$ $lastedit_user$ $mod_date$ $history_link$ $propose_change_link$';
+
+				$widget_params = array(
+					'author_link_text'    => 'auto',
+					'before_author'       => T_('Created by').' ',
+					'after_author'        => $this->disp_params['widget_item_small_print_separator'],
+
+					'lastedit_user_link_text' => 'auto',
+					'before_lastedit_user'    => T_('Last edit by').' ',
+					'after_lastedit_user'     => '',
+
+					'mod_date_format' => '#extended_date',
+					'before_mod_date' => T_('on').' ',
+					'after_mod_date'  => '',
+
+					'before_history_link' => $this->disp_params['widget_item_small_print_separator'],
+					'after_history_link'  => '',
+					'history_link_text'   => T_('View change history'),
+
+					'before_propose_change_link' => $this->disp_params['widget_item_small_print_separator'],
+					'after_propose_change_link'  => '',
+					'propose_change_link_text'   => T_('Propose a change'),
+				);
+			}
+
+			$small_print = render_template( $template, array_merge( $widget_params, $this->disp_params ) );
+
+			if( ! empty( $small_print ) )
+			{
+				$small_print = $this->disp_params['widget_item_small_print_before'].$small_print.$this->disp_params['widget_item_small_print_after'];
+			}
 		}
 
-		echo $this->disp_params['widget_item_small_print_after'];
-		echo $this->disp_params['block_body_end'];
-		echo $this->disp_params['block_end'];
+		if( ! empty( $small_print ) )
+		{
+			echo add_tag_class( $this->disp_params['block_start'], 'clearfix' );
+			
+			$this->disp_title();
+			
+			echo $this->disp_params['block_body_start'];
 
-		return true;
+			echo $small_print;
+
+			echo $this->disp_params['block_body_end'];
+			echo $this->disp_params['block_end'];
+
+			return true;
+		}
+
+		$this->display_debug_message();
+		return false;
 	}
 
 
