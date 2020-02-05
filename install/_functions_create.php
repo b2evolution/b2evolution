@@ -1637,7 +1637,9 @@ function create_default_posts_location()
 
 
 /**
- * Create default templates
+ * Create default templates that don't already exist
+ *
+ * fp>yb TODO: UPDATE all templates that have changed. This should probably become 1 single   INSERT ON DUPLICATE UPDATE  query
  *
  * @param boolean TRUE to use this as separate task
  */
