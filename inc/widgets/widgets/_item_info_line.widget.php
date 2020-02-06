@@ -267,7 +267,7 @@ class item_info_line_Widget extends ComponentWidget
 			// Permalink icon:
 			if( $this->disp_params['permalink_icon'] )
 			{
-				$template .= ' [permalink_icon;text=#icon#]';
+				$template .= ' [permalink_icon|text=#icon#]';
 			}
 
 			// Author:
@@ -276,12 +276,12 @@ class item_info_line_Widget extends ComponentWidget
 			{
 				case 'posted_by':
 					$before_author = T_('Posted by').' ';
-					$template .= ' [author;before='.$before_author.' ]';
+					$template .= ' [author|before='.$before_author.' ]';
 					break;
 
 				case 'started_by':
 					$before_author = T_('Started by').' ';
-					$template .= ' [author;before='.$before_author.']';
+					$template .= ' [author|before='.$before_author.']';
 					break;
 
 				default:
@@ -299,11 +299,11 @@ class item_info_line_Widget extends ComponentWidget
 					$before_issue_time = empty( $before_author ) ? '' : T_('on').' ';
 					if( $this->disp_params['date_format'] != 'none' )
 					{
-						$template .= ' [issue_time;time_format='.$date_format.']';
+						$template .= ' [issue_time|time_format='.$date_format.']';
 					}
 					if( $this->disp_params['time_format'] != 'none' )
 					{
-						$template .= ' [issue_time;time_format='.$time_format.';before= ]';
+						$template .= ' [issue_time|time_format='.$time_format.'|before= ]';
 					}
 					break;
 
@@ -319,7 +319,7 @@ class item_info_line_Widget extends ComponentWidget
 			// Categories:
 			if( $this->disp_params['category'] )
 			{
-				$template .= ' [categories;before='.T_('in').' ]';
+				$template .= ' [categories|before='.T_('in').' ]';
 			}
 
 			// Last touched:
