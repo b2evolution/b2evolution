@@ -1350,8 +1350,15 @@ class Blog extends DataObject
 			$this->set_setting( 'self_canonical_posts', param( 'self_canonical_posts', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_posts', param( 'relcanonical_posts', 'integer', 0 ) );
 			$this->set_setting( 'canonical_item_urls', param( 'canonical_item_urls', 'integer', 0 ) );
+			if( ! $this->get_setting( 'canonical_item_urls' ) )
+			{	// When "301 redirect to canonical URL" is disabled then we always must NOT do 301 redirect cross-posted Items:
+				$this->set_setting( 'allow_crosspost_urls', 1 );
+			}
+			else
+			{
+				$this->set_setting( 'allow_crosspost_urls', param( 'allow_crosspost_urls', 'integer', 0 ) );
+			}
 			$this->set_setting( 'self_canonical_item_urls', param( 'self_canonical_item_urls', 'integer', 0 ) );
-			$this->set_setting( 'allow_crosspost_urls', param( 'allow_crosspost_urls', 'integer', 0 ) );
 			$this->set_setting( 'relcanonical_item_urls', param( 'relcanonical_item_urls', 'integer', 0 ) );
 			$this->set_setting( 'canonical_archive_urls', param( 'canonical_archive_urls', 'integer', 0 ) );
 			$this->set_setting( 'self_canonical_archive_urls', param( 'self_canonical_archive_urls', 'integer', 0 ) );
@@ -3514,6 +3521,13 @@ class Blog extends DataObject
 					{
 						return $File;
 					}
+				}
+				break;
+
+			case 'allow_crosspost_urls':
+				if( ! $this->get_setting( 'canonical_item_urls' ) )
+				{	// When "301 redirect to canonical URL" is disabled then we always must NOT do 301 redirect cross-posted Items:
+					return 1;
 				}
 				break;
 		}

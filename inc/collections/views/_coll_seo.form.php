@@ -386,8 +386,8 @@ jQuery( 'input[name=canonical_item_urls]' ).click( function()
 	var canonical_item_urls_is_unchecked = ! jQuery( this ).prop( 'checked' );
 	jQuery( 'input[name=allow_crosspost_urls]' ).prop( 'disabled', canonical_item_urls_is_unchecked );
 	if( canonical_item_urls_is_unchecked )
-	{
-		jQuery( 'input[name=allow_crosspost_urls]' ).prop( 'checked', false );
+	{	// When "301 redirect to canonical URL" is disabled then we always must NOT do 301 redirect cross-posted Items:
+		jQuery( 'input[name=allow_crosspost_urls]' ).prop( 'checked', true );
 	}
 } );
 </script>
