@@ -1639,8 +1639,6 @@ function create_default_posts_location()
 /**
  * Create default templates that don't already exist
  *
- * fp>yb TODO: UPDATE all templates that have changed. This should probably become 1 single   INSERT ON DUPLICATE UPDATE  query
- *
  * @param boolean TRUE to use this as separate task
  */
 function create_default_templates( $is_task = true )
@@ -1652,18 +1650,18 @@ function create_default_templates( $is_task = true )
 		task_begin( 'Creating default templates... ' );
 	}
 
-	$new_templates = array(
+	$templates = array(
 		'item_details_infoline_date' => array(
 			'name'     => 'Item Details: Posted on Date',
-			'template' => '<span class="small text-muted">[flag_icon] Posted on [issue_time;time_format=#extended_date] at [issue_time;time_format=#short_time]</span>',
+			'template' => '<span class="small text-muted">[flag_icon] Posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time]</span>',
 		),
 		'item_details_infoline_standard' => array(
 			'name'     => 'Item Details: Posted by Author on Date in Categories',
-			'template' => '<span class="small text-muted">[flag_icon] Posted by [author] on [issue_time;time_format=#extended_date] at [issue_time;time_format=#short_time] in [categories]</span>',
+			'template' => '<span class="small text-muted">[flag_icon] Posted by [author] on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] in [categories]</span>',
 		),
 		'item_details_infoline_long' => array(
 			'name'     => 'Item Details: Long info line',
-			'template' => '<span class="small text-muted">[flag_icon] [permalink_icon] Posted by [author] on [issue_time;time_format=#extended_date] at [issue_time;time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [last_updated] [edit_link]</span>',
+			'template' => '<span class="small text-muted">[flag_icon] [permalink_icon] Posted by [author] on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [last_updated] [edit_link]</span>',
 		),
 		'item_details_smallprint_standard' => array(
 			'name'     => 'Item Details: Small Print: Standard',
@@ -1671,11 +1669,11 @@ function create_default_templates( $is_task = true )
 		),
 		'item_details_smallprint_long' => array(
 			'name'     => 'Item Details: Small Print: Long',
-			'template' => '[author;link_text=only_avatar] [flag_icon] This entry was posted on [issue_time;time_format=#extended_date] at [issue_time;time_format=#short_time] by [author] and filed under [categories]. Tags: [tags]. [edit_link]'
+			'template' => '[author|link_text=only_avatar] [flag_icon] This entry was posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] by [author] and filed under [categories]. Tags: [tags]. [edit_link]'
 		),
 		'item_details_revisions' => array(
 			'name'     => 'Item Details: Small Print: Revisions',
-			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date;date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
+			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
 		),
 		'item_details_feedback_link' => array(
 			'name'     => 'Item Details: Comment Link',
@@ -1733,27 +1731,17 @@ function create_default_templates( $is_task = true )
 		),
 	);
 
-	$SQL = new SQL( 'Select all templates before insert new defaults' );
-	$SQL->SELECT( 'tpl_code' );
-	$SQL->FROM( 'T_templates' );
-	$SQL->WHERE( 'tpl_code IN ( '.$DB->quote( array_keys( $new_templates ) ).' )' );
-	$old_templates = $DB->get_col( $SQL );
-
 	$templates_sql = array();
-	foreach( $new_templates as $code => $template )
+	foreach( $templates as $code => $template )
 	{
-		if( ! in_array( $code, $old_templates ) )
-		{	// Insert only not existing templates:
-			$templates_sql[] = '( '.$DB->quote( $template['name'] ).', '.$DB->quote( $code ).', '.$DB->quote( $template['template'] ).' )';
-		}
+		$templates_sql[] = '( '.$DB->quote( $template['name'] ).', '.$DB->quote( $code ).', '.$DB->quote( $template['template'] ).' )';
 	}
 
-	if( ! empty( $templates_sql ) )
-	{	// Insert new templates:
-		$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_template_code )
-			VALUES '.implode( ', ', $templates_sql ),
-			'Creating default templates' );
-	}
+	// Insert/Update templates:
+	$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_template_code )
+		VALUES '.implode( ', ', $templates_sql ).'
+		ON DUPLICATE KEY UPDATE tpl_name = VALUES( tpl_name ), tpl_template_code = VALUES( tpl_template_code )',
+		'Creating/Updating default templates' );
 
 	if( $is_task )
 	{

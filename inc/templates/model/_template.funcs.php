@@ -69,7 +69,7 @@ function render_template( $template, $params = array() )
 	}
 
 	// New
-	preg_match_all( '/\[((?:(?:Item|Cat):)?([a-z_]+));?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Item|Cat):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		$template_params = $params;
@@ -77,7 +77,7 @@ function render_template( $template, $params = array() )
 		$temp_params = empty( $matches[3][$i][0] ) ? NULL : $matches[3][$i][0];
 		if( ! empty( $temp_params ) )
 		{	// Template has specified parameters, use it to override:
-			$temp_params = explode( ';', $temp_params );
+			$temp_params = explode( '|', $temp_params );
 			foreach( $temp_params as $temp_param )
 			{
 				$prop = substr( $temp_param, 0, strpos( $temp_param, '=' ) );
