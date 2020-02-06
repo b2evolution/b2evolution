@@ -4190,7 +4190,6 @@ class Item extends ItemLight
 				'image_size'                  => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 				'image_limit'                 =>  1000,
 				'image_link_to'               => 'original', // Can be 'original', 'single' or empty
-				'include_cover_images'        => false, // Set to true if you want cover images to appear with teaser images.
 			), $params );
 
 		// Start to collect item content in buffer:
@@ -4201,10 +4200,6 @@ class Item extends ItemLight
 		if( ! empty( $params['image_size'] ) )
 		{	// Display Teaser images:
 			$teaser_image_positions = 'teaser,teaserperm,teaserlink';
-			if( ! empty( $params['include_cover_images'] ) )
-			{	// Include the cover images on teaser place:
-				$teaser_image_positions = 'cover,'.$teaser_image_positions;
-			}
 			$this->images( array(
 					'before'        => $params['content_block_before_images'],
 					'after'         => $params['content_block_after_images'],
