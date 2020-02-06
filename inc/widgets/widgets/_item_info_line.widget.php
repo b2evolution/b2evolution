@@ -294,8 +294,6 @@ class item_info_line_Widget extends ComponentWidget
 			switch( $this->disp_params['display_date'] )
 			{
 				case 'issue_date':
-					// TODO: Issue time will always display time only at the moment. Internally compute datetime format.
-					// TODO: Issue time format will be specified explicitly in the template
 					$date_format = '#'.$this->disp_params['date_format'].( $this->disp_params['date_format'] == 'none' ? '' : '_date' );
 					$time_format = '#'.$this->disp_params['time_format'].( $this->disp_params['time_format'] == 'none' ? '' : '_time' );
 					$before_issue_time = empty( $before_author ) ? '' : T_('on').' ';
@@ -346,27 +344,6 @@ class item_info_line_Widget extends ComponentWidget
 					'date_format' => '#'.$this->disp_params['date_format'].( $this->disp_params['date_format'] == 'none' ? '' : '_date' ),
 					'time_format' => '#'.$this->disp_params['time_format'].( $this->disp_params['time_format'] == 'none' ? '' : '_time' ),
 
-					'before_flag' => '',
-					'after_flag'  => '',
-
-					'before_permalink' => '',
-					'after_permalink'  => '',
-					'permalink_text'   => '#icon#',
-
-					'before_author' => $before_author,
-					'after_author'  => '',
-
-					'before_issue_time' => $before_issue_time,
-					'after_issue_time'  => '',
-					'issue_time_format' => NULL, // Use date_format and time_format params
-
-					'before_creation_time' => $before_creation_time,
-					'after_creation_time'  => '',
-					'creation_time_format' => NULL, // Use date_format and time_format params
-
-					'before_categories'   => T_('in').' ',
-					'after_categories'    => '',
-
 					'before_last_touched' => '<span class="text-muted">&ndash; '.T_('Last touched').': ',
 					'after_last_touched'  => '</span>',
 					'last_touched_format' => '',
@@ -377,8 +354,6 @@ class item_info_line_Widget extends ComponentWidget
 
 					'before_edit_link'    => '&bull; ',
 					'after_edit_link'     => '',
-					
-					'edit_link_text'      => '#',
 				), $params['widget_item_info_line_params'] );
 
 			// Automatic template used, render raw template:

@@ -1655,15 +1655,15 @@ function create_default_templates( $is_task = true )
 	$new_templates = array(
 		'item_details_infoline_date' => array(
 			'name'     => 'Item Details: Posted on Date',
-			'template' => '<span class="small text-muted">[flag_icon] Posted on [issue_time;time_format=#extended_date] [issue_time;time_format=#short_time]</span>',
+			'template' => '<span class="small text-muted">[flag_icon] Posted on [issue_time;time_format=#extended_date] at [issue_time;time_format=#short_time]</span>',
 		),
 		'item_details_infoline_standard' => array(
 			'name'     => 'Item Details: Posted by Author on Date in Categories',
-			'template' => '<span class="small text-muted">[flag_icon] Posted by [author] on [issue_time;time_format=#extended_date] [issue_time;time_format=#short_time] in [categories]</span>',
+			'template' => '<span class="small text-muted">[flag_icon] Posted by [author] on [issue_time;time_format=#extended_date] at [issue_time;time_format=#short_time] in [categories]</span>',
 		),
 		'item_details_infoline_long' => array(
 			'name'     => 'Item Details: Long info line',
-			'template' => '<span class="small text-muted">[flag_icon] [permalink_icon] Posted by [author] on [issue_time] in [categories] — Last touched: [last_touched] — Last Updated: [last_updated] [edit_link]</span>',
+			'template' => '<span class="small text-muted">[flag_icon] [permalink_icon] Posted by [author] on [issue_time;time_format=#extended_date] at [issue_time;time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [last_updated] [edit_link]</span>',
 		),
 		'item_details_smallprint_standard' => array(
 			'name'     => 'Item Details: Small Print: Standard',

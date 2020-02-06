@@ -216,7 +216,7 @@ class item_small_print_Widget extends ComponentWidget
 
 			if( $this->disp_params['format'] == 'standard' )
 			{	// Blog standard
-				$template = '[author;link_text=only_avatar] [flag_icon]';
+				$template = '[author;link_text=only_avatar;thumb_size='.$this->disp_params['avatar_size'].';thumb_class=leftmargin] [flag_icon]';
 
 				if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
 				{
@@ -230,25 +230,13 @@ class item_small_print_Widget extends ComponentWidget
 					$template .= '[author;before= '.T_('This entry was posted by').' ;time_format=#extended_date]';
 				}
 
-				$template .= '[categories;before= '.T_('and is filed under').' ] [tags;before='.T_('Tags').': ] [edit_link]';
+				$template .= '[categories;before= '.T_('and is filed under').' ;after=.] [tags;before='.T_('Tags').': ;separator=, ] [edit_link]';
 
 				$widget_params = array(
-					'author_avatar_size'  => $this->disp_params['avatar_size'],
-					'author_avatar_class' => 'leftmargin',
-					
-					'before_categories'           => T_('and is filed under').' ',
-					'after_categories'            => '.',
 					'categories_include_main'     => true,
 					'categories_include_other'    => true,
 					'categories_include_external' => true,
 					'categories_link_categories'  => true,
-					
-					'before_tags'    => T_('Tags').': ',
-					'after_tags'     => '',
-					'tags_separator' => ', ',
-
-					'before_edit_link' => '',
-					'after_edit_link'  => '',
 				);
 			}
 			else
