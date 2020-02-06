@@ -59,12 +59,35 @@ function render_template( $template, $params = array() )
 	$current_pos = 0;
 	$r = '';
 
-	preg_match_all( '/\$[a-z_:]+\$/i', $template, $matches, PREG_OFFSET_CAPTURE );
-	foreach( $matches[0] as $match )
+	// Old
+	preg_match_all( '/\$([a-z_\:]+)\$/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	foreach( $matches[0] as $i => $match )
 	{
 		$r .= substr( $template, $current_pos, $match[1] - $current_pos );
 		$current_pos = $match[1] + strlen( $match[0] );
-		$r .= call_user_func( 'render_template_callback', $match[0], $params );
+		$r .= call_user_func( 'render_template_callback', $matches[1][$i][0], $params );
+	}
+
+	// New
+	preg_match_all( '/\[((?:(?:Item|Cat):)?([a-z_]+));?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	foreach( $matches[0] as $i => $match )
+	{
+		$template_params = $params;
+		$var = $matches[1][$i][0];
+		$temp_params = empty( $matches[3][$i][0] ) ? NULL : $matches[3][$i][0];
+		if( ! empty( $temp_params ) )
+		{	// Template has specified parameters, use it to override:
+			$temp_params = explode( ';', $temp_params );
+			foreach( $temp_params as $temp_param )
+			{
+				$prop = substr( $temp_param, 0, strpos( $temp_param, '=' ) );
+				$val  = substr( $temp_param, strpos( $temp_param, '=' ) + 1 );
+				$template_params[$prop] = $val;
+			}
+		}
+		$r .= substr( $template, $current_pos, $match[1] - $current_pos );
+		$current_pos = $match[1] + strlen( $match[0] );
+		$r .= call_user_func( 'render_template_callback', $matches[1][$i][0], $template_params );
 	}
 
 	// Print remaining template code:
@@ -181,7 +204,7 @@ function render_template_callback( $var, $params )
 	), $params );
 
 	// Get scope and var name:
-	preg_match( '#^\$(([a-z]+):)?(.+)\$$#i', $var, $match_var );
+	preg_match( '#^(([a-z]+):)?(.+)$#i', $var, $match_var );
 	$scope = ( empty( $match_var[2] ) ? 'Item': $match_var[2] );
 	$var = $scope.':'.$match_var[3];
 	switch( $scope )
@@ -208,8 +231,8 @@ function render_template_callback( $var, $params )
 
 	// Resolve default date/time formats:
 	// TODO: LATER: remove this code from the callback. Templates will specify their own format. Infoline widget can compute $datetime_format internally.
-	$date_format = locale_resolve_datetime_fmt( $params['date_format'] );
-	$time_format = locale_resolve_datetime_fmt( $params['time_format'] );
+	$params['date_format'] = $date_format = locale_resolve_datetime_fmt( $params['date_format'] );
+	$params['time_format'] = $time_format = locale_resolve_datetime_fmt( $params['time_format'] );
 	$datetime_format = $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format;
 
 	ob_start();
@@ -217,26 +240,26 @@ function render_template_callback( $var, $params )
 	{
 		// Item:
 		case 'Item:flag_icon':
-			$Item->flag( array(
+			$Item->flag( array_merge( array(
 					'before' => $params['before_flag'],
 					'after'  => $params['after_flag'],
-				) );
+				), $params ) );
 			break;
 
 		case 'Item:permalink_icon':	// Temporary
-			$Item->permanent_link( array(
+			$Item->permanent_link( array_merge( array(
 					'text'   => '#icon#',
 					'before' => $params['before_permalink'],
 					'after'  => $params['after_permalink'],
 					'post_navigation' => $params['post_navigation'],
 					'nav_target'      => $params['nav_target'],
 					'target_blog'     => $params['target_blog'],
-				) );
+				), $params ) );
 			break;
 
 		case 'Item:permalink':
 		case 'Item:permanent_link':
-			$Item->permanent_link( array(
+			$Item->permanent_link( array_merge( array(
 					'text'   => $params['permalink_text'],
 					'class'  => $params['permalink_class'],
 					'before' => $params['before_permalink'],
@@ -244,43 +267,47 @@ function render_template_callback( $var, $params )
 					'post_navigation' => $params['post_navigation'],
 					'nav_target'      => $params['nav_target'],
 					'target_blog'     => $params['target_blog'],
-				) );
+				), $params ) );
 			break;
 
 		case 'Item:author_avatar':
-			$Item->author( array(
+			$Item->author( array_merge( array(
 					'before'      => $params['before_author_avatar'],
 					'after'       => $params['after_author_avatar'],
 					'link_text'   => 'only_avatar',
 					'link_rel'    => 'nofollow',
 					'thumb_size'  => $params['author_avatar_size'],
 					'thumb_class' => $params['author_avatar_class'],
-				) );
+				), $params ) );
 			break;
 
 		case 'Item:author':
-			$Item->author( array(
+			$Item->author( array_merge( array(
 					'before'    => $params['before_author'],
 					'after'     => $params['after_author'],
 					'link_text' => $params['author_link_text'],
-				) );
+			), $params ) );
 			break;
 
 		case 'Item:lastedit_user':
-			$Item->lastedit_user( array(
+			$Item->lastedit_user( array_merge( array(
 					'before'    => $params['before_lastedit_user'],
 					'after'     => $params['after_lastedit_user'],
 					'link_text' => $params['lastedit_user_link_text'],
-				) );
+				), $params ) );
 			break;
 
 		// Date/Time:
+		case 'Item:issue_date':    // TODO: remove from all templates
 		case 'Item:issue_time':
-			$Item->issue_time( array(
+			// We are only using the "time_format" param for this:
+			unset( $params['date_format'] );
+
+			$Item->issue_time( array_merge( array(
 					'before'      => $params['before_issue_time'],
 					'after'       => $params['after_issue_time'],
 					'time_format' => empty( $params['issue_time_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['issue_time_format'] ),
-				) );
+				), $params ) );
 			break;
 
 		case 'Item:creation_time':
@@ -314,77 +341,77 @@ function render_template_callback( $var, $params )
 
 		// Links:
 		case 'Item:edit_link':
-			$Item->edit_link( array(
+			$Item->edit_link( array_merge( array(
 					'before' => $params['before_edit_link'],
 					'after'  => $params['after_edit_link'],
 					'text'   => $params['edit_link_text'],
-				) );
+				), $params ) );
 			break;
 
 		case 'Item:history_link':
-			echo $Item->get_history_link( array(
+			echo $Item->get_history_link( array_merge( array(
 					'before'    => $params['before_history_link'],
 					'after'     => $params['after_history_link'],
 					'link_text' => $params['history_link_text'],
-				) );
+				), $params ) );
 			break;
 
 		case 'Item:propose_change_link':
-			$Item->propose_change_link( array(
+			$Item->propose_change_link( array_merge( array(
 					'before' => $params['before_propose_change_link'],
 					'after'  => $params['after_propose_change_link'],
 					'text'   => $params['propose_change_link_text'],
-				) );
+				), $params ) );
 			break;
 
 		case 'Item:excerpt':
-			$Item->excerpt( array(
+			$Item->excerpt( array_merge( array(
 					'before'              => $params['excerpt_before_text'],
 					'after'               => $params['excerpt_after_text'],
 					'excerpt_before_more' => $params['excerpt_before_more'],
 					'excerpt_after_more'  => $params['excerpt_after_more'],
 					'excerpt_more_text'   => $params['excerpt_more_text'],
-				) );
+				), $params ) );
 			break;
 
 		// Read Status:
 		case 'Item:read_status':
-			$Item->display_unread_status( array(
+			$Item->display_unread_status( array_merge( array(
 					'style'  => 'text',
 					'before' => '<span class="evo_post_read_status">',
 					'after'  => '</span>'
-				) );
+				), $params ) );
 			break;
 
 		// Visibility Status:
 		case 'Item:visibility_status':
 			if( $Item->status != 'published' )
 			{
-				$Item->format_status( array(
+				$Item->format_status( array_merge( array(
 						'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-					) );
+					), $params ) );
 			}
 			break;
 
 		// Categories:
 		case 'Item:categories':
-			$Item->categories( array(
+			$Item->categories( array_merge( array(
 					'before'           => $params['before_categories'],
 					'after'            => $params['after_categories'],
 					'include_main'     => $params['categories_include_main'],
 					'include_other'    => $params['categories_include_other'],
 					'include_external' => $params['categories_include_external'],
 					'link_categories'  => $params['categories_link_categories'],
-				) );
+			), $params ) );
 			break;
 
 		// Tags:
 		case 'Item:tags':
-			$Item->tags( array(
+			$Item->tags( array_merge( array(
 					'before'    => $params['before_tags'],
 					'after'     => $params['after_tags'],
 					'separator' => $params['tags_separator'],
-				) );
+				), $params ) );
 			break;
 
 		case 'Item:feedback_link':

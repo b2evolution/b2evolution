@@ -294,6 +294,8 @@ class item_info_line_Widget extends ComponentWidget
 			switch( $this->disp_params['display_date'] )
 			{
 				case 'issue_date':
+					// TODO: Issue time will always display time only at the moment. Internally compute datetime format.
+					// TODO: Issue time format will be specified explicitly in the template
 					$before_issue_time = empty( $before_author ) ? '' : T_('on').' ';
 					$template .= ' $issue_time$';
 					break;
