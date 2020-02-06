@@ -458,6 +458,13 @@ class MarkdownImport extends AbstractImport
 												 LEFT JOIN T_links__vote AS lv ON lv.lvot_link_ID = l.link_ID
 												WHERE l.link_itm_ID IN ( '.implode( ', ', $old_posts ).' )' );
 					$DB->query( 'DELETE FROM T_items__user_data WHERE itud_item_ID IN ( '.implode( ', ', $old_posts ).' )' );
+
+					// Call plugin event after Items were deleted:
+					$Plugins->trigger_event( 'ImporterAfterItemsDelete', array(
+							'type'             => $this->import_code,
+							'Importer'         => $this,
+							'deleted_item_IDs' => $old_posts,
+						) );
 				}
 			}
 			$this->log( T_('OK').'<br />' );
