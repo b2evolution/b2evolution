@@ -12029,6 +12029,43 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15770, 'Updating widget "Small Print"...' ) )
+	{	// part of 7.0.0-alpha
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "item_small_print"' );
+		$widgets = $DB->get_assoc( $SQL );
+
+		foreach( $widgets as $widget_ID => $widget_params )
+		{
+			$widget_params = ( empty( $widget_params ) ? array() : unserialize( $widget_params ) );
+			if( isset( $widget_params['format'] ) &&
+			    $widget_params['format'] == 'revision' )
+			{	// Convert "Format / Revisions" to Template "Item Details: Small Print: Revisions":
+				$widget_params['template'] = 'item_details_revisions';
+			}
+			else
+			{	// Convert "Format / Blog standard" to Template "Item Details: Small Print: Standard":
+				$widget_params['template'] = 'item_details_smallprint_standard';
+			}
+			if( isset( $widget_params['format'] ) )
+			{	// Remove setting "Format" completely from the widget:
+				unset( $widget_params['format'] );
+			}
+			if( isset( $widget_params['avatar_size'] ) )
+			{	// Remove setting "Avatar Size" completely from the widget:
+				unset( $widget_params['avatar_size'] );
+			}
+
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+				WHERE wi_ID = '.$widget_ID );
+		}
+
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

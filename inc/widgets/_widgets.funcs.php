@@ -120,8 +120,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 20, 'item_tags', 'coll_type' => '-forum,group,manual', 'coll_ID' => '-'.$blog_a_ID.','.$events_blog_ID ),
 		array( 25, 'item_about_author', 'coll_ID' => $blog_b_ID ),
 		array( 30, 'evo_Gmaps', 'coll_ID' => $blog_a_ID.','.$events_blog_ID, 'type' => 'plugin', 'install' => $install_test_features ),
-		array( 40, 'item_small_print', 'coll_ID' => $blog_a_ID, 'params' => array( 'format' => 'standard' ) ),
-		array( 40, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'format' => 'revision' ) ),
+		array( 40, 'item_small_print', 'coll_ID' => $blog_a_ID, 'params' => array( 'template' => 'item_details_smallprint_standard' ) ),
+		array( 40, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'template' => 'item_details_revisions' ) ),
 		array( 50, 'item_seen_by', 'coll_type' => '-forum,group,manual' ),
 		array( 60, 'item_vote', 'coll_type' => '-forum,group,manual' ),
 	);

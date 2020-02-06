@@ -98,12 +98,9 @@ class item_small_print_Widget extends ComponentWidget
 	{
 		global $current_User, $admin_url;
 
-		load_funcs( 'files/model/_image.funcs.php' );
-
 		// Get available templates:
 		$TemplateCache = & get_TemplateCache();
 		$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
-		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
 
 		$r = array_merge( array(
 				'title' => array(
@@ -115,27 +112,10 @@ class item_small_print_Widget extends ComponentWidget
 				'template' => array(
 					'label' => T_('Template'),
 					'type' => 'select',
-					'options' => $template_options,
-					'defaultvalue' => NULL,
+					'options' => $TemplateCache->get_code_option_array(),
+					'defaultvalue' => 'item_details_smallprint_standard',
 					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
 							.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' ),
-				),
-				'format' => array(
-					'label' => T_('Format'),
-					'note' => T_('Select what format should be displayed'),
-					'type' => 'select',
-					'options' => array(
-							'standard' => T_('Blog standard'),
-							'revision' => T_('Revisions'),
-						),
-					'defaultvalue' => 'standard',
-				),
-				'avatar_size' => array(
-					'label' => T_('Avatar Size'),
-					'note' => '',
-					'type' => 'select',
-					'options' => get_available_thumb_sizes(),
-					'defaultvalue' => 'crop-top-32x32',
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -179,96 +159,22 @@ class item_small_print_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		if( $this->disp_params['template'] )
+		load_funcs( 'templates/model/_template.funcs.php' );
+		$TemplateCache = & get_TemplateCache();
+		if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )
 		{
-			load_funcs( 'templates/model/_template.funcs.php' );
-			$TemplateCache = & get_TemplateCache();
-			if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )
-			{
-				$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
-				return false;
-			}
-
-			$template = $this->disp_params['template'];
-
-			// The $this->disp_params is temporarily not merged to the params passed to the template renderer.
-			// That array may contain params that are not compatible with all template renderers.
-			// For example $params['format'] => 'standard' passed to $Item->categories()
-			$small_print = render_template_code( $template, array_merge( array(
-					'author_avatar_size'  => $this->disp_params['avatar_size'],
-					'author_avatar_class' => 'leftmargin',
-				)/*, $this->disp_params*/ ) );
+			$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
+			return false;
 		}
-		else
-		{	// Build an automatic template:
-			$template = '';
 
-			// We renamed some params; older skin may use the old names; let's convert those params now:
-			$this->convert_legacy_param( 'widget_coll_small_print_before', 'widget_item_small_print_before' );
-			$this->convert_legacy_param( 'widget_coll_small_print_after', 'widget_item_small_print_after' );
-			$this->convert_legacy_param( 'widget_coll_small_print_display_author', 'widget_item_small_print_display_author' );
+		$template = $this->disp_params['template'];
 
-			$this->disp_params = array_merge( array(
-					'widget_item_small_print_before'    => '',
-					'widget_item_small_print_after'     => '',
-					'widget_item_small_print_separator' => ' &bull; ', 
-				), $this->disp_params );
-
-			if( $this->disp_params['format'] == 'standard' )
-			{	// Blog standard
-				$template = '[author;link_text=only_avatar;thumb_size='.$this->disp_params['avatar_size'].';thumb_class=leftmargin] [flag_icon]';
-
-				if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
-				{
-					$template .= '[issue_time;time_format=#extended_date;before= '.T_('This entry was posted on').' ]';
-					$template .= '[issue_time;time_format=#short_time;before= '.T_('at'). ' ]';
-					$template .= '[author;link_text=auto;before= '.T_('by').' ]';
-				}
-				else
-				{
-	
-					$template .= '[author;before= '.T_('This entry was posted by').' ;time_format=#extended_date]';
-				}
-
-				$template .= '[categories;before= '.T_('and is filed under').' ;after=.] [tags;before='.T_('Tags').': ;separator=, ] [edit_link]';
-
-				$widget_params = array(
-					'categories_include_main'     => true,
-					'categories_include_other'    => true,
-					'categories_include_external' => true,
-					'categories_link_categories'  => true,
-				);
-			}
-			else
-			{	// Revisions
-				$template = '[flag_icon]';
-				$template .= '[author;link_text=auto;before= '.T_('Created by').' ]';
-				$template .= '[lastedit_user;link_text=auto;before= '.T_('Last edit by').' ]';
-				$template .= ' '.T_('on').' [mod_date;date_format=#extended_date]';
-				$template .= '[history_link;text='.T_('View change history').']';
-				$template .= '[propose_change_link;text='.T_('Propose a change').']';
-
-				$widget_params = array(
-					'after_author'        => $this->disp_params['widget_item_small_print_separator'],
-
-					'before_history_link' => $this->disp_params['widget_item_small_print_separator'],
-					'after_history_link'  => '',
-
-					'before_propose_change_link' => $this->disp_params['widget_item_small_print_separator'],
-					'after_propose_change_link'  => '',
-				);
-			}
-
-			// The $this->disp_params is temporarily not merged to the params passed to the template renderer.
-			// That array may contain params that are not compatible with all template renderers.
-			// For example $params['format'] => 'standard' passed to $Item->categories()
-			$small_print = render_template( $template, array_merge( $widget_params/*, $this->disp_params*/ ) );
-
-			if( ! empty( $small_print ) )
-			{
-				$small_print = $this->disp_params['widget_item_small_print_before'].$small_print.$this->disp_params['widget_item_small_print_after'];
-			}
-		}
+		// The $this->disp_params is temporarily not merged to the params passed to the template renderer.
+		// That array may contain params that are not compatible with all template renderers.
+		// For example $params['format'] => 'standard' passed to $Item->categories()
+		$small_print = render_template_code( $template, array_merge( array(
+				'author_avatar_class' => 'leftmargin',
+			), $this->disp_params ) );
 
 		if( ! empty( $small_print ) )
 		{
