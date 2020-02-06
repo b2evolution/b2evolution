@@ -81,6 +81,7 @@ function render_template( $template, $params = array() )
 			foreach( $temp_params as $temp_param )
 			{
 				$prop = substr( $temp_param, 0, strpos( $temp_param, '=' ) );
+				// TODO: need to ensure string assigned to $val below is single quote and properly escaped?
 				$val  = substr( $temp_param, strpos( $temp_param, '=' ) + 1 );
 				$template_params[$prop] = $val;
 			}

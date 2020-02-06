@@ -12004,7 +12004,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 15751, 'Creating new default templates...' ) )
 	{	// part of 7.0.0-alpha
 
-		// Delete the following existing default templates:
+		// Delete the following existing default templates, they'll be recreated at the next block:
 		$template_codes = array( 'iteminfo_long', 'iteminfo_short' );
 		$DB->query( 'DELETE FROM T_templates WHERE tpl_code IN ('.$DB->quote( $template_codes ).')' );
 

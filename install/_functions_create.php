@@ -1655,81 +1655,81 @@ function create_default_templates( $is_task = true )
 	$new_templates = array(
 		'item_details_infoline_date' => array(
 			'name'     => 'Item Details: Posted on Date',
-			'template' => '<span class="small text-muted">$flag_icon$ Posted on $issue_time$</span>',
+			'template' => '<span class="small text-muted">[flag_icon] Posted on [issue_time;time_format=#extended_date] [issue_time;time_format=#short_time]</span>',
 		),
 		'item_details_infoline_standard' => array(
 			'name'     => 'Item Details: Posted by Author on Date in Categories',
-			'template' => '<span class="small text-muted">$flag_icon$ Posted by $author$ on $issue_time$ in $categories$</span>',
+			'template' => '<span class="small text-muted">[flag_icon] Posted by [author] on [issue_time;time_format=#extended_date] [issue_time;time_format=#short_time] in [categories]</span>',
 		),
 		'item_details_infoline_long' => array(
 			'name'     => 'Item Details: Long info line',
-			'template' => '<span class="small text-muted">$flag_icon$ $permalink_icon$ Posted by $author$ on $issue_time$ in $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$</span>',
+			'template' => '<span class="small text-muted">[flag_icon] [permalink_icon] Posted by [author] on [issue_time] in [categories] — Last touched: [last_touched] — Last Updated: [last_updated] [edit_link]</span>',
 		),
 		'item_details_smallprint_standard' => array(
 			'name'     => 'Item Details: Small Print: Standard',
-			'template' => '$flag_icon$ This entry was posted by $author$ and filed under $categories$. Tags: $tags$. $edit_link$'
+			'template' => '[flag_icon] This entry was posted by [author] and filed under [categories]. Tags: [tags]. [edit_link]'
 		),
 		'item_details_smallprint_long' => array(
 			'name'     => 'Item Details: Small Print: Long',
-			'template' => '$author_avatar$ $flag_icon$ This entry was posted on $issue_time$ at $issue_time$ by $author$ and filed under $categories$. Tags: $tags$. $edit_link$'
+			'template' => '[author;link_text=only_avatar] [flag_icon] This entry was posted on [issue_time;time_format=#extended_date] at [issue_time;time_format=#short_time] by [author] and filed under [categories]. Tags: [tags]. [edit_link]'
 		),
 		'item_details_revisions' => array(
 			'name'     => 'Item Details: Small Print: Revisions',
-			'template' => 'Created by $author$ &bull; Last edit by $lastedit_user$ on $mod_date$ &bull; $history_link$ &bull; $propose_change_link$'
+			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date;date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
 		),
 		'item_details_feedback_link' => array(
 			'name'     => 'Item Details: Comment Link',
-			'template' => '<nav class="post_comments_link">$feedback_link$</nav>'
+			'template' => '<nav class="post_comments_link">[feedback_link]</nav>'
 		),
 		'cblock_clearfix' => array(
 			'name'     => 'Include Content Block: with clearfix',
-			'template' => '<div class="evo_content_block clearfix $cb_class$\">
+			'template' => '<div class="evo_content_block clearfix [cb_class]\">
 	<div class="evo_content_block_images">
-		<img src="$teaser_image$">
+		<img src="[teaser_image]">
 	</div>
 	<div class="evo_content_block_text">
-		$content$ 
+		[content] 
 	</div>
 </div>',
 		),
 		'cblock_noclearfix' => array(
 			'name'     => 'Include Content Block: without clearfix',
-			'template' => '<div class="evo_content_block $cb_class$">
+			'template' => '<div class="evo_content_block [cb_class]">
 	<div class="evo_content_block_images">
-		<img src="$teaser_image$">
+		<img src="[teaser_image]">
 	</div>
 	<div class="evo_content_block_text">
-		$content$ 
+		[content] 
 	</div>
 </div>',
 		),
 		'cblock_imgleft_textright' => array(
 			'name'     => 'Include Content Block: Images Left / Text Right',
-			'template' => '<div class="evo_content_block $cb_class$">
-	<img src="$teaser_image$" class="floatleft">
+			'template' => '<div class="evo_content_block [cb_class]">
+	<img src="[teaser_image]" class="floatleft">
 	<div class="evo_content_block_text">
-		$content$ 
+		[content] 
 	</div>
 </div>',
 		),
 		'cblock_textleft_imgright' => array(
 			'name'     => 'Include Content Block: Text Left / Images Right',
-			'template' => '<div class="evo_content_block $cb_class$">
-	<img src="$teaser_image$" class="floatright">
+			'template' => '<div class="evo_content_block [cb_class]">
+	<img src="[teaser_image]" class="floatright">
 	<div class="evo_content_block_text">
-		$content$ 
+		[content] 
 	</div>
 </div>',
 		),
 		'content_list_subcat' => array(
 			'name'     => 'Content List: Subcat',
-			'template' => '<h3>$Cat:permalink$</h3>
-<div class="evo_cat__description">$Cat:description$</div>',
+			'template' => '<h3>[Cat:permalink]</h3>
+<div class="evo_cat__description">[Cat:description]</div>',
 		),
 		'content_list_item' => array(
 			'name'     => 'Content List: Item',
-			'template' => '<h3>$read_status$ $permalink$ $flag_icon$</h3>$visibility_status$
-<div class="evo_post__excerpt_text">$excerpt$</div>',
+			'template' => '<h3>[read_status] [permalink] [flag_icon]</h3>[visibility_status]
+<div class="evo_post__excerpt_text">[excerpt]</div>',
 		),
 	);
 

@@ -261,13 +261,13 @@ class item_info_line_Widget extends ComponentWidget
 			// Flag icon:
 			if( $this->disp_params['flag_icon'] )
 			{
-				$template .= '$flag_icon$';
+				$template .= '[flag_icon]';
 			}
 
 			// Permalink icon:
 			if( $this->disp_params['permalink_icon'] )
 			{
-				$template .= ' $permalink_icon$';
+				$template .= ' [permalink_icon;text=#icon#]';
 			}
 
 			// Author:
@@ -276,12 +276,12 @@ class item_info_line_Widget extends ComponentWidget
 			{
 				case 'posted_by':
 					$before_author = T_('Posted by').' ';
-					$template .= ' $author$';
+					$template .= ' [author;before='.$before_author.' ]';
 					break;
 
 				case 'started_by':
 					$before_author = T_('Started by').' ';
-					$template .= ' $author$';
+					$template .= ' [author;before='.$before_author.']';
 					break;
 
 				default:
@@ -296,13 +296,22 @@ class item_info_line_Widget extends ComponentWidget
 				case 'issue_date':
 					// TODO: Issue time will always display time only at the moment. Internally compute datetime format.
 					// TODO: Issue time format will be specified explicitly in the template
+					$date_format = '#'.$this->disp_params['date_format'].( $this->disp_params['date_format'] == 'none' ? '' : '_date' );
+					$time_format = '#'.$this->disp_params['time_format'].( $this->disp_params['time_format'] == 'none' ? '' : '_time' );
 					$before_issue_time = empty( $before_author ) ? '' : T_('on').' ';
-					$template .= ' $issue_time$';
+					if( $this->disp_params['date_format'] != 'none' )
+					{
+						$template .= ' [issue_time;time_format='.$date_format.']';
+					}
+					if( $this->disp_params['time_format'] != 'none' )
+					{
+						$template .= ' [issue_time;time_format='.$time_format.';before= ]';
+					}
 					break;
 
 				case 'date_created':
 					$before_creation_time = empty( $before_author ) ? '' : T_('on').' ';
-					$template .= ' $creation_time$';
+					$template .= ' [creation_time]';
 					break;
 
 				default:
@@ -312,25 +321,25 @@ class item_info_line_Widget extends ComponentWidget
 			// Categories:
 			if( $this->disp_params['category'] )
 			{
-				$template .= ' $categories$';
+				$template .= ' [categories;before='.T_('in').' ]';
 			}
 
 			// Last touched:
 			if( $this->disp_params['last_touched'] )
 			{
-				$template .= ' $last_touched$';
+				$template .= ' [last_touched]';
 			}
 
 			// Last content updated:
 			if( $this->disp_params['contents_updated'] )
 			{
-				$template .= ' $last_updated$';
+				$template .= ' [last_updated]';
 			}
 
 			// Edit link:
 			if( $this->disp_params['edit_link'] )
 			{
-				$template .= ' $edit_link$';
+				$template .= ' [edit_link]';
 			}
 
 			$widget_params = array_merge( array(

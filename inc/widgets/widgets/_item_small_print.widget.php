@@ -216,48 +216,25 @@ class item_small_print_Widget extends ComponentWidget
 
 			if( $this->disp_params['format'] == 'standard' )
 			{	// Blog standard
-				$template = '$author_avatar$ $flag_icon$';
+				$template = '[author;link_text=only_avatar] [flag_icon]';
 
 				if( isset( $Skin ) && $Skin->get_setting( 'display_post_date' ) )
 				{
-					$template .= ' $issue_time$ $author$';
-
-					ob_start();
-					$Item->issue_time( array( 'time_format' => '#short_time' ) );
-					$issue_time = ob_get_contents();
-					ob_end_clean();
-
-					$before_issue_time = T_('This entry was posted on').' ';
-					$after_issue_time  = ' '.T_('at').' '.$issue_time;
-					$issue_time_format = '#extended_date';
-
-					$before_author = T_('by').' ';
+					$template .= '[issue_time;time_format=#extended_date;before= '.T_('This entry was posted on').' ]';
+					$template .= '[issue_time;time_format=#short_time;before= '.T_('at'). ' ]';
+					$template .= '[author;link_text=auto;before= '.T_('by').' ]';
 				}
 				else
 				{
-					$template .= ' $author$';
-					$before_author = T_('This entry was posted by').' ';
-					$before_issue_time = '';
-					$after_issue_time  = '';
-					$issue_time_format = '#extended_date';
+	
+					$template .= '[author;before= '.T_('This entry was posted by').' ;time_format=#extended_date]';
 				}
 
-				$template .= ' $categories$ $tags$ $edit_link$';
+				$template .= '[categories;before= '.T_('and is filed under').' ] [tags;before='.T_('Tags').': ] [edit_link]';
 
 				$widget_params = array(
 					'author_avatar_size'  => $this->disp_params['avatar_size'],
 					'author_avatar_class' => 'leftmargin',
-
-					'before_flag' => '',
-					'after_flag'  => '',
-
-					'before_issue_time' => $before_issue_time,
-					'after_issue_time'  => $after_issue_time,
-					'issue_time_format' => $issue_time_format,
-					
-					'author_link_text' => 'auto',
-					'before_author'    => $before_author,
-					'after_author'     => '',
 					
 					'before_categories'           => T_('and is filed under').' ',
 					'after_categories'            => '.',
@@ -276,28 +253,21 @@ class item_small_print_Widget extends ComponentWidget
 			}
 			else
 			{	// Revisions
-				$template = '$flag_icon$ $author$ $lastedit_user$ $mod_date$ $history_link$ $propose_change_link$';
+				$template = '[flag_icon]';
+				$template .= '[author;link_text=auto;before= '.T_('Created by').' ]';
+				$template .= '[lastedit_user;link_text=auto;before= '.T_('Last edit by').' ]';
+				$template .= ' '.T_('on').' [mod_date;date_format=#extended_date]';
+				$template .= '[history_link;text='.T_('View change history').']';
+				$template .= '[propose_change_link;text='.T_('Propose a change').']';
 
 				$widget_params = array(
-					'author_link_text'    => 'auto',
-					'before_author'       => T_('Created by').' ',
 					'after_author'        => $this->disp_params['widget_item_small_print_separator'],
-
-					'lastedit_user_link_text' => 'auto',
-					'before_lastedit_user'    => T_('Last edit by').' ',
-					'after_lastedit_user'     => '',
-
-					'mod_date_format' => '#extended_date',
-					'before_mod_date' => T_('on').' ',
-					'after_mod_date'  => '',
 
 					'before_history_link' => $this->disp_params['widget_item_small_print_separator'],
 					'after_history_link'  => '',
-					'history_link_text'   => T_('View change history'),
 
 					'before_propose_change_link' => $this->disp_params['widget_item_small_print_separator'],
 					'after_propose_change_link'  => '',
-					'propose_change_link_text'   => T_('Propose a change'),
 				);
 			}
 
