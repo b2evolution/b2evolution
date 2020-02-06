@@ -169,9 +169,6 @@ class item_small_print_Widget extends ComponentWidget
 
 		$template = $this->disp_params['template'];
 
-		// The $this->disp_params is temporarily not merged to the params passed to the template renderer.
-		// That array may contain params that are not compatible with all template renderers.
-		// For example $params['format'] => 'standard' passed to $Item->categories()
 		$small_print = render_template_code( $template, array_merge( array(
 				'author_avatar_class' => 'leftmargin',
 			), $this->disp_params ) );
