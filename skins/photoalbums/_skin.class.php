@@ -21,7 +21,7 @@ class photoalbums_Skin extends Skin
 	 * Skin version
 	 * @var string
 	 */
-	var $version = '7.1.0';
+	var $version = '7.1.2';
 
 	/**
 	 * Get default name for the skin.

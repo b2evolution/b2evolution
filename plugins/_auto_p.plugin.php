@@ -22,7 +22,7 @@ class auto_p_plugin extends Plugin
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
 	var $priority = 80;
-	var $version = '7.1.0';
+	var $version = '7.1.2';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
