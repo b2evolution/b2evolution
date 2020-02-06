@@ -2072,11 +2072,12 @@ class User extends DataObject
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				'link_text'      => 'avatar_name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_class'     => '', // Class for <a href=""
 				'thumb_size'     => 'crop-top-15x15',
 				'thumb_class'    => 'avatar_before_login',
 				'thumb_zoomable' => false,
-				'login_mask'     => '', // example: 'text $login$ text'
-				'login_class'    => 'identity_link_username',  // No used if login_mask is used
+				'login_mask'     => '', // example: 'text $login$ text'  TODO: replace with template
+				'login_class'    => 'identity_link_username',  // Not used if login_mask is used
 				'display_bubbletip' => true,
 				'nowrap'         => true,
 				'user_tab'       => 'profile',
@@ -2106,7 +2107,8 @@ class User extends DataObject
 		}
 
 		$link_login = '';
-		$class = empty( $params['link_class'] ) ? '' : $params['link_class'];
+		$class = $params['link_class'];
+
 		if( $params['link_text'] != 'only_avatar' )
 		{ // Display a login, nickname, firstname, lastname, fullname or preferredname
 			switch( $params['link_text'] )
@@ -2146,6 +2148,7 @@ class User extends DataObject
 			}
 			// Add class "login" to detect logins by js plugins
 			$class .= ( $link_login == $this->login ? ' login' : '' );
+			
 			if( !empty($params['login_mask']) )
 			{ // Apply login mask
 				$link_login = str_replace( '$login$', $link_login, $params['login_mask'] );
@@ -2154,12 +2157,12 @@ class User extends DataObject
 			{
 				$link_login = '<span class="'.$params['login_class'].'">'.$link_login.'</span>';
 			}
-		}
+		} // END Not for "only avatar"
 
 		$gender_class = $this->get_gender_class();
 		$attr_style = '';
 		if( $params['use_style'] )
-		{ // Use "style"
+		{ // Use "style" (e-g email template)
 			$attr_style = emailskin_style( '.user+.'.str_replace( ' ', '.', $gender_class ) );
 		}
 		$attr_style = ' class="'.trim( $class.' '.$gender_class.( $params['nowrap'] ? ' nowrap' : '' ) ).'"'.$attr_style;
