@@ -1316,7 +1316,7 @@ class ItemLight extends DataObject
 		$permalink_type = '';
 		$url_coll_ID = $this->get_blog_ID();
 		if( ! empty( $Blog ) && $this->check_cross_post_nav( $target_blog, $Blog->ID ) )
-		{	// Use settings of current opened collection and not of this item's collection:
+		{	// Use settings of currently opened collection and not of this item's collection:
 			$permalink_type = $Blog->get_setting( 'permalinks' );
 			$blogurl = $Blog->gen_blogurl();
 			$url_coll_ID = $Blog->ID;
