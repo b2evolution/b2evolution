@@ -12066,6 +12066,86 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15780, 'Updating widget "Info Line"...' ) )
+	{	// part of 7.0.0-alpha
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params, blog_type' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->FROM_add( 'LEFT JOIN T_widget__container ON wi_wico_ID = wico_ID' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON wico_coll_ID = blog_ID' );
+		$SQL->WHERE( 'wi_code = "item_info_line"' );
+		$widgets = $DB->get_results( $SQL );
+
+		foreach( $widgets as $row )
+		{
+			$widget_params = ( empty( $row->wi_params ) ? array() : unserialize( $row->wi_params ) );
+			if(	empty( $widget_params['template'] ) )
+			{	// Convert Template depending on collection type:
+				switch( $row->blog_type )
+				{
+					case 'forum':
+					case 'group':
+						$widget_params['template'] = 'item_details_infoline_forums';
+						break;
+
+					default:
+						$widget_params['template'] = 'item_details_infoline_standard'; 
+				}
+			}
+			
+			if( isset( $widget_params['flag_icon'] ) )
+			{	// Remove setting "Display flag icon" completely from the widget:
+				unset( $widget_params['flag_icon'] );
+			}
+			if( isset( $widget_params['permalink_icon'] ) )
+			{	// Remove setting "Display permalink icon" completely from the widget:
+				unset( $widget_params['permalink_icon'] );
+			}
+			if( isset( $widget_params['before_author'] ) )
+			{	// Remove setting "Display author information" completely from the widget:
+				unset( $widget_params['before_author'] );
+			}
+			if( isset( $widget_params['display_date'] ) )
+			{	// Remove setting "Post date to display" completely from the widget:
+				unset( $widget_params['display_date'] );
+			}
+			if( isset( $widget_params['last_touched'] ) )
+			{	// Remove setting "Display date and time when item/post was last touched" completely from the widget:
+				unset( $widget_params['last_touched'] );
+			}
+			if( isset( $widget_params['contents_updated'] ) )
+			{	// Remove setting "Display date and time when item/post contents (title, content, URL or attachments) were last updated" completely from the widget:
+				unset( $widget_params['contents_updated'] );
+			}
+			if( isset( $widget_params['date_format'] ) )
+			{	// Remove setting "Date format" completely from the widget:
+				unset( $widget_params['date_format'] );
+			}
+			if( isset( $widget_params['time_format'] ) )
+			{	// Remove setting "Time format" completely from the widget:
+				unset( $widget_params['time_format'] );
+			}
+			if( isset( $widget_params['category'] ) )
+			{	// Remove setting "Display item/post category" completely from the widget:
+				unset( $widget_params['category'] );
+			}
+			if( isset( $widget_params['edit_link'] ) )
+			{	// Remove setting "Display link to edit the item/post" completely from the widget:
+				unset( $widget_params['edit_link'] );
+			}
+			if( isset( $widget_params['post_time'] ) )
+			{	// Remove setting previous setting "post_time" completely from the widget:
+				unset( $widget_params['post_time'] );
+			}
+
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+				WHERE wi_ID = '.$row->wi_ID );
+		}
+
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

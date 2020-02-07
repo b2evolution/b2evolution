@@ -101,7 +101,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['item_single_header'] = array(
 		array(  4, 'item_next_previous', 'coll_type' => '-manual,minisite' ),
 		array(  5, 'item_title' ),
-		array( 10, 'item_info_line', 'coll_type' => 'forum,group', 'params' => 'a:14:{s:5:"title";s:0:"";s:9:"flag_icon";i:1;s:14:"permalink_icon";i:0;s:13:"before_author";s:10:"started_by";s:11:"date_format";s:8:"extended";s:9:"post_time";i:1;s:12:"last_touched";i:1;s:8:"category";i:0;s:9:"edit_link";i:0;s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;s:11:"time_format";s:4:"none";s:12:"display_date";s:12:"date_created";}' ),
+		array( 10, 'item_info_line', 'coll_type' => 'forum,group', 'params' => array( 'template' => 'item_details_infoline_forums' ) ),
 		array( 20, 'item_tags', 'coll_type' => 'forum,group' ),
 		array( 30, 'item_seen_by', 'coll_type' => 'forum,group' ),
 		array(  8, 'item_visibility_badge', 'coll_type' => '-manual,forum,group' ),
