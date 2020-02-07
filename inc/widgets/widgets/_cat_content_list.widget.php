@@ -239,7 +239,6 @@ class cat_content_list_Widget extends ComponentWidget
 		}
 
 		$template_params = array_merge( $params, array(
-				'permalink_text'  => get_icon( 'file_message' ).'$title$',
 				'permalink_class' => 'link',
 				'post_navigation' => 'same_category', // Always navigate through category in this skin
 				'target_blog'     => 'auto', // Auto navigate to current collection if it is allowed for the Item

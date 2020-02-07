@@ -127,7 +127,7 @@ function render_template_callback( $var, & $params, $objects = array() )
 		// permanent_link:
 		'before_permalink'    => '',
 		'after_permalink'     => '',
-		'permalink_text'      => '#icon#',
+		'permalink_text'      => '#title#',
 		'permalink_class'     => '',
 		'post_navigation'     => '',
 		'target_blog'         => '',
@@ -279,7 +279,7 @@ function render_template_callback( $var, & $params, $objects = array() )
 
 		case 'Item:permalink_icon':	// Temporary
 			$rendered_Item->permanent_link( array_merge( array(
-					'text'   => '#icon#',
+					'text'   => '#icon',
 					'before' => $params['before_permalink'],
 					'after'  => $params['after_permalink'],
 					'post_navigation' => $params['post_navigation'],
@@ -291,7 +291,7 @@ function render_template_callback( $var, & $params, $objects = array() )
 		case 'Item:permalink':
 		case 'Item:permanent_link':
 			$rendered_Item->permanent_link( array_merge( array(
-					'text'   => $params['permalink_text'],
+					'text'   => '#title',
 					'class'  => $params['permalink_class'],
 					'before' => $params['before_permalink'],
 					'after'  => $params['after_permalink'],
@@ -459,7 +459,10 @@ function render_template_callback( $var, & $params, $objects = array() )
 
 		// Chapter / Category:
 		case 'Cat:permalink':
-			echo '<a href="'.$rendered_Chapter->get_permanent_url().'" class="link">'.get_icon( 'expand' ).$rendered_Chapter->dget( 'name' ).'</a>';
+			echo $rendered_Chapter->get_permanent_link( array_merge( array(
+					'text'   => '#name',
+				), $params ) );
+			break;
 			break;
 
 		case 'Cat:description':

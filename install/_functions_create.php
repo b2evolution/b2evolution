@@ -1701,14 +1701,14 @@ function create_default_templates( $is_task = true )
 		'content_list_subcat' => array(
 			'name'     => 'Content List: Subcat',
 			'template' => '<li class="chapter">
-	<h3>[Cat:permalink]</h3>
+	<h3>[Cat:permalink|text=#expandicon+name|class=link]</h3>
 	<div class="evo_cat__description">[Cat:description]</div>
 </li>',
 		),
 		'content_list_item' => array(
 			'name'     => 'Content List: Item',
 			'template' => '<li>
-	<h3>[read_status] [permalink] [flag_icon]</h3>[visibility_status]
+	<h3>[read_status] [Item:permalink|text=#fileicon+title] [flag_icon]</h3>[visibility_status]
 	<div class="evo_post__excerpt_text">[excerpt]</div>
 </li>',
 		),
@@ -1725,7 +1725,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
 	<div class="widget_rwd_content clearfix">
 		<div class="item_first_image"></div>
-		<div class="item_title">[Cat:permalink]</div>
+		<h3 class="item_title">[Cat:permalink]</h3>
 		<div class="item_content">[Cat:description]</div>
 	</div>
 </div>',
@@ -1735,8 +1735,8 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
 	<div class="widget_rwd_content clearfix">
 		[Item:images|restrict_to_image_position=#teaser_all|before=<div class="item_first_image">|after=</div>]
-		<div class="item_title">[permalink]</div>
-		<div class="item_content">[excerpt]</div>
+		<h3 class="item_title">[Item:permalink|text=#title]</h3>
+		<div class="item_content">[Item:excerpt]</div>
 	</div>
 </div>',
 		),

@@ -710,6 +710,76 @@ class Chapter extends DataObject
 
 
 	/**
+	 * Returns a permalink link to the Category
+	 *
+	 * Note: If you only want the permalink URL, use {@link Item::get_permanent_url()}
+	 *
+	 * @param array
+	 */
+	function get_permanent_link( $params = array() )
+	{
+		// Make sure we are not missing any param:
+		$params = array_merge( array(
+				'text'        => '#name',	// possible special values: ...
+				'title'       => '',
+				'class'       => '',
+				'nofollow'    => false,
+			), $params );
+
+
+		// Get item permanent URL:
+		$url = $this->get_permanent_url();
+
+		$text = $params['text'];
+		switch( $text )
+		{
+			case '#linkicon':
+				$text = get_icon( 'permalink' );
+				break;
+
+			case '#text':
+				$text = T_('Permalink');
+				break;
+
+			case '#linkicon+text':
+				$text = get_icon( 'permalink' ).T_('Permalink');
+				break;
+
+			case '#expandicon':
+				$text = get_icon( 'file_message' );
+				break;
+
+			case '#name':
+				$text = format_to_output( $this->get( 'name' ) );
+				break;
+
+			case '#expandicon+name':
+				$text = get_icon( 'expand' ).format_to_output( $this->get( 'name' ) );
+				break;
+		}
+
+		$title = $params['title'];
+		if( $title == '#' )
+		{	// Use default title for link:
+			$title = T_('Permanent link to category');
+		}
+
+		$class = $params['class'];
+
+		// Build a permanent link to Item:
+		$r = '<a href="'.$url.'"'
+				.( empty( $title ) ? '' : ' title="'.format_to_output( $title, 'htmlattr' ).'"' )
+				.( empty( $class ) ? '' : ' class="'.format_to_output( $class, 'htmlattr' ).'"' )
+				.( $params['nofollow'] ? ' rel="nofollow"' : '' )
+			.'>'
+				.str_replace( '$name$', format_to_output( $this->get( 'name' ) ), $text )
+			.'</a>';
+
+		return $r;
+	}
+
+
+	/**
 	 * Get last touched date (datetime) of Chapter
 	 *
 	 * @param string date/time format: leave empty to use locale default date format

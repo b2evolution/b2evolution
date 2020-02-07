@@ -1334,20 +1334,32 @@ class ItemLight extends DataObject
 
 		switch( $text )
 		{
-			case '#':
-				$text = get_icon( 'permalink' ).T_('Permalink');
-				break;
-
+			case '#linkicon':
 			case '#icon#':
 				$text = get_icon( 'permalink' );
 				break;
 
+			case '#text':
 			case '#text#':
 				$text = T_('Permalink');
 				break;
 
+			case '#linkicon+text':
+			case '#':
+				$text = get_icon( 'permalink' ).T_('Permalink');
+				break;
+
+			case '#fileicon':
+				$text = get_icon( 'file_message' );
+				break;
+
+			case '#title':
 			case '#title#':
 				$text = format_to_output( $this->get( 'title' ) );
+				break;
+
+			case '#fileicon+title':
+				$text = get_icon( 'file_message' ).format_to_output( $this->get( 'title' ) );
 				break;
 		}
 
@@ -1374,9 +1386,7 @@ class ItemLight extends DataObject
 	 *
 	 * Note: If you only want the permalink URL, use {@link Item::permanent_url()}
 	 *
-	 * @param string link text or special value:
-	 * @param string link title
-	 * @param string class name
+	 * @param array
 	 */
 	function permanent_link( $params = array() )
 	{
@@ -1384,7 +1394,7 @@ class ItemLight extends DataObject
 		$params = array_merge( array(
 				'before'      => '',
 				'after'       => '',
-				'text'        => '#',	// possible special values: '#', '#icon#', '#text#', '#title#'
+				'text'        => '#',	// possible special values: ...
 				'title'       => '#',
 				'class'       => '',
 				'target_blog' => '',
