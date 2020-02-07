@@ -291,15 +291,6 @@ function render_template_callback( $var, $params, $objects = array() )
 				), $params ) );
 			break;
 
-		case 'Item:permalink_icon':	// Temporary
-			$rendered_Item->permanent_link( array_merge( array(
-					'text'   => '#icon',
-					'before' => $params['before_permalink'],
-					'after'  => $params['after_permalink'],
-					'post_navigation' => $params['post_navigation'],
-					'nav_target'      => $params['nav_target'],
-					'target_blog'     => $params['target_blog'],
-				), $params ) );
 			break;
 
 		case 'Item:permalink':
@@ -312,17 +303,6 @@ function render_template_callback( $var, $params, $objects = array() )
 					'post_navigation' => $params['post_navigation'],
 					'nav_target'      => $params['nav_target'],
 					'target_blog'     => $params['target_blog'],
-				), $params ) );
-			break;
-
-		case 'Item:author_avatar':
-			$rendered_Item->author( array_merge( array(
-					'before'      => $params['before_author_avatar'],
-					'after'       => $params['after_author_avatar'],
-					'link_text'   => 'only_avatar',
-					'link_rel'    => 'nofollow',
-					'thumb_size'  => $params['author_avatar_size'],
-					'thumb_class' => $params['author_avatar_class'],
 				), $params ) );
 			break;
 
