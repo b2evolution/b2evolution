@@ -4134,7 +4134,19 @@ class Item extends ItemLight
 			// Store current item in global array to avoid recursion:
 			array_unshift( $content_block_items, $content_Item->ID );
 
-			$tag_class = isset( $tag_options[1] ) ? trim( $tag_options[1] ) : '';
+			$option_index = 1;
+			if( isset( $tag_options[ $option_index ] ) &&
+			    substr( $tag_options[ $option_index ], 0, 1 ) != '.' )
+			{	// Use easy template from short tag options:
+				$tag_template = $tag_options[ $option_index ];
+				$option_index++;
+			}
+			else
+			{	// Use default easy template:
+				$tag_template = 'cblock_clearfix';
+			}
+
+			$tag_class = isset( $tag_options[ $option_index ] ) ? trim( $tag_options[ $option_index ] ) : '';
 			if( $tag_class !== '' )
 			{	// If tag has an option with style class
 				$content_block_class = trim( str_replace( array( '.*', '.' ), array( '.'.$item_ID_slug, ' ' ),$tag_class ) );
@@ -4146,6 +4158,7 @@ class Item extends ItemLight
 
 			// Get item content:
 			$current_tag_item_content = $content_Item->get_content_block( array_merge( $params, array(
+					'template_code'       => $tag_template,
 					'content_block_class' => $content_block_class,
 				) ) );
 
@@ -4176,65 +4189,17 @@ class Item extends ItemLight
 			return '';
 		}
 
-		load_funcs( 'skins/_skin.funcs.php' );
-
 		$params = array_merge( array(
-				'content_block_start'         => '<div class="evo_content_block $cb_class$">',
-				'content_block_end'           => '</div>',
-				'content_block_before_images' => '<div class="evo_content_block_images">',
-				'content_block_after_images'  => '</div>',
-				'content_block_before_text'   => '<div class="evo_content_block_text">',
-				'content_block_after_text'    => '</div>',
-				'content_block_class'         => '',
-				'image_class'                 => 'img-responsive',
-				'image_size'                  => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
-				'image_limit'                 =>  1000,
-				'image_link_to'               => 'original', // Can be 'original', 'single' or empty
+				'template_code' => 'cblock_clearfix',
+				'image_class'   => 'img-responsive',
+				'image_size'    => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
+				'image_limit'   =>  1000,
+				'image_link_to' => 'original', // Can be 'original', 'single' or empty
 			), $params );
 
-		// Start to collect item content in buffer:
-		ob_start();
-
-		echo str_replace( '$cb_class$', $params['content_block_class'], $params['content_block_start'] );
-
-		if( ! empty( $params['image_size'] ) )
-		{	// Display Teaser images:
-			$teaser_image_positions = 'teaser,teaserperm,teaserlink';
-			$this->images( array(
-					'before'        => $params['content_block_before_images'],
-					'after'         => $params['content_block_after_images'],
-					'image_class'   => $params['image_class'],
-					'image_size'    => $params['image_size'],
-					'image_limit'   => $params['image_limit'],
-					'image_link_to' => $params['image_link_to'],
-					'restrict_to_image_position' => $teaser_image_positions,
-				) );
-		}
-
-		echo $params['content_block_before_text'];
-
-		// Display CONTENT (at least the TEASER part):
-		$this->content_teaser( $params );
-
-		if( ! empty( $params['image_size'] ) && $this->has_content_parts( $params ) /* only if not displayed all images already */ )
-		{	// Display images that are linked "after more" to this post:
-			$this->images( array(
-					'before'        => $params['content_block_before_images'],
-					'after'         => $params['content_block_after_images'],
-					'image_class'   => $params['image_class'],
-					'image_size'    => $params['image_size'],
-					'image_limit'   => $params['image_limit'],
-					'image_link_to' => $params['image_link_to'],
-					'restrict_to_image_position' => 'aftermore',
-				) );
-		}
-
-		echo $params['content_block_after_text'];
-
-		echo $params['content_block_end'];
-
-		// Get item content from buffer:
-		return ob_get_clean();
+		return render_template_code( $params['template_code'], array_merge( $params, array(
+				'Item' => $this,
+			) ) );
 	}
 
 
@@ -5048,7 +5013,10 @@ class Item extends ItemLight
 				'gallery_colls'              => 5,
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
 				'gallery_link_rel'           => 'lightbox[p'.$this->ID.']',
-				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', // 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
+				// '#teaser_all' => 'teaser,teaserperm,teaserlink',
+				// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
+				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore',
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
 				'links_sql_select'           => '',
@@ -5060,6 +5028,17 @@ class Item extends ItemLight
 				'sql_select_add' => $params['links_sql_select'],
 				'sql_order_by'   => $params['links_sql_orderby']
 			);
+
+		// Set image positions from possible predefined values:
+		switch( $params['restrict_to_image_position'] )
+		{
+			case '#teaser_all':
+				$params['restrict_to_image_position'] = 'teaser,teaserperm,teaserlink';
+				break;
+			case '#cover_and_teaser_all':
+				$params['restrict_to_image_position'] = 'cover,teaser,teaserperm,teaserlink';
+				break;
+		}
 
 		if( empty( $this->ID ) )
 		{	// Preview mode for new creating item:

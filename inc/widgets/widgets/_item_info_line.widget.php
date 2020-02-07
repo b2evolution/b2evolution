@@ -153,7 +153,6 @@ class item_info_line_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		load_funcs( 'templates/model/_template.funcs.php' );
 		$TemplateCache = & get_TemplateCache();
 		if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )
 		{

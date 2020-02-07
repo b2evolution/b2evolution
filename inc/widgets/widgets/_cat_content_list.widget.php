@@ -229,25 +229,13 @@ class cat_content_list_Widget extends ComponentWidget
 
 		if( ! empty( $param_Chapter ) )
 		{	// Display chapter:
-
-			// Store original Chapter and Item in order to restore this back after template rendering:
-			$orig_Chapter = $Chapter;
-			$orig_Item = $Item;
-			// Set global Chapter to render templates:
-			$Chapter = $param_Chapter;
-			// Clear current Item if it is defined, because here we have to render only templates for Chapter:
-			$Item = NULL;
-
 			echo $params['before_cat'];
 
-			load_funcs( 'templates/model/_template.funcs.php' );
-			echo render_template_code( $this->disp_params['template_cat'], $params );
+			echo render_template_code( $this->disp_params['template_cat'], array_merge( $params, array(
+					'Chapter' => $param_Chapter,
+				) ) );
 
 			echo $params['after_cat'];
-
-			// Reset back to original current Chapter and Item:
-			$Chapter = $orig_Chapter;
-			$Item = $orig_Item;
 		}
 	}
 
@@ -266,38 +254,24 @@ class cat_content_list_Widget extends ComponentWidget
 			return;
 		}
 
-		// Store original Item in order to restore this back after template rendering:
-		$orig_Chapter = $Chapter;
-		$orig_Item = $Item;
-		// Set global $Item to render templates:
-		$Item = $param_Item;
-		// Clear current Chapter if it is defined, because here we have to render only templates for Item:
-		$Chapter = NULL;
-
 		// Default params:
 		$params = array_merge( array(
 				'before_item'       => '<li>',
 				'after_item'        => '</li>',
-				'before_content'    => '<div class="excerpt">',
-				'after_content'     => '</div>',
 				'permalink_text'    => get_icon( 'file_message' ).'$title$',
 				'permalink_class'   => 'link',
 			), $params );
 
 		echo $params['before_item'];
 
-		load_funcs( 'templates/model/_template.funcs.php' );
 		echo render_template_code( $this->disp_params['template_item'], array_merge( $params, array(
+				'Item'            => $param_Item,
 				'post_navigation' => 'same_category', // Always navigate through category in this skin
 				'target_blog'     => 'auto', // Auto navigate to current collection if it is allowed for the Item
 				'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
 			) ) );
 
 		echo $params['after_item'];
-
-		// Reset back to original current Chapter and Item:
-		$Chapter = $orig_Chapter;
-		$Item = $orig_Item;
 	}
 }
 

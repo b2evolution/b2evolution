@@ -69,7 +69,7 @@ function render_template( $template, $params = array() )
 	}
 
 	// New
-	preg_match_all( '/\[((?:(?:Item|Cat):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Item|Cat|echo):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		$template_params = $params;
@@ -106,9 +106,10 @@ function render_template( $template, $params = array() )
  */
 function render_template_callback( $var, $params )
 {
-	global $Chapter, $Item;
-
 	$params = array_merge( array(
+		'Chapter' => NULL, // NULL to use current global $Chapter
+		'Item'    => NULL, // NULL to use current global $Item
+
 		// default date/time format:
 		'date_format'         => '#extended_date',
 		'time_format'         => '#none',
@@ -211,21 +212,37 @@ function render_template_callback( $var, $params )
 	switch( $scope )
 	{
 		case 'Cat':
-			if( empty( $Chapter ) || ! ( $Chapter instanceof Chapter ) )
+			global $Chapter;
+			$rendered_Chapter = ( $params['Chapter'] === NULL ? $Chapter : $params['Chapter'] );
+			if( empty( $rendered_Chapter ) || ! ( $rendered_Chapter instanceof Chapter ) )
 			{
-				return '<span class="evo_param_error">$'.$var.'$: Object Chapter is not defined at this moment.</span>';
+				return '<span class="evo_param_error">['.$var.']: Object Chapter is not defined at this moment.</span>';
 			}
 			break;
 
 		case 'Item':
-			if( empty( $Item ) || ! ( $Item instanceof Item ) )
+			global $Item;
+			$rendered_Item = ( $params['Item'] === NULL ? $Item : $params['Item'] );
+			if( empty( $rendered_Item ) || ! ( $rendered_Item instanceof Item ) )
 			{
-				return '<span class="evo_param_error">$'.$var.'$: Object Item is not defined at this moment.</span>';
+				return '<span class="evo_param_error">['.$var.']: Object Item is not defined at this moment.</span>';
+			}
+			break;
+
+		case 'echo':
+			$param_name = substr( $var, 5 );
+			if( ! isset( $params[ $param_name ] ) )
+			{	// Param is not found:
+				return '<span class="evo_param_error">Param <code>'.$param_name.'</code> is not passed.</span>';
+			}
+			elseif( ! is_scalar( $params[ $param_name ] ) )
+			{	// Param is not scalar and cannot be printed on screen:
+				return '<span class="evo_param_error">Param <code>'.$param_name.'</code> is not scalar.</span>';
 			}
 			break;
 
 		default:
-			return '<span class="evo_param_error">$'.$var.'$: Scope "'.$scope.':" is not recognized.</span>';
+			return '<span class="evo_param_error">['.$var.']: Scope "'.$scope.':" is not recognized.</span>';
 	}
 
 	$match_found = true;
@@ -241,14 +258,14 @@ function render_template_callback( $var, $params )
 	{
 		// Item:
 		case 'Item:flag_icon':
-			$Item->flag( array_merge( array(
+			$rendered_Item->flag( array_merge( array(
 					'before' => $params['before_flag'],
 					'after'  => $params['after_flag'],
 				), $params ) );
 			break;
 
 		case 'Item:permalink_icon':	// Temporary
-			$Item->permanent_link( array_merge( array(
+			$rendered_Item->permanent_link( array_merge( array(
 					'text'   => '#icon#',
 					'before' => $params['before_permalink'],
 					'after'  => $params['after_permalink'],
@@ -260,7 +277,7 @@ function render_template_callback( $var, $params )
 
 		case 'Item:permalink':
 		case 'Item:permanent_link':
-			$Item->permanent_link( array_merge( array(
+			$rendered_Item->permanent_link( array_merge( array(
 					'text'   => $params['permalink_text'],
 					'class'  => $params['permalink_class'],
 					'before' => $params['before_permalink'],
@@ -272,7 +289,7 @@ function render_template_callback( $var, $params )
 			break;
 
 		case 'Item:author_avatar':
-			$Item->author( array_merge( array(
+			$rendered_Item->author( array_merge( array(
 					'before'      => $params['before_author_avatar'],
 					'after'       => $params['after_author_avatar'],
 					'link_text'   => 'only_avatar',
@@ -283,7 +300,7 @@ function render_template_callback( $var, $params )
 			break;
 
 		case 'Item:author':
-			$Item->author( array_merge( array(
+			$rendered_Item->author( array_merge( array(
 					'before'    => $params['before_author'],
 					'after'     => $params['after_author'],
 					'link_text' => $params['author_link_text'],
@@ -291,7 +308,7 @@ function render_template_callback( $var, $params )
 			break;
 
 		case 'Item:lastedit_user':
-			$Item->lastedit_user( array_merge( array(
+			$rendered_Item->lastedit_user( array_merge( array(
 					'before'    => $params['before_lastedit_user'],
 					'after'     => $params['after_lastedit_user'],
 					'link_text' => $params['lastedit_user_link_text'],
@@ -304,7 +321,7 @@ function render_template_callback( $var, $params )
 			// We are only using the "time_format" param for this:
 			unset( $params['date_format'] );
 
-			$Item->issue_time( array_merge( array(
+			$rendered_Item->issue_time( array_merge( array(
 					'before'      => $params['before_issue_time'],
 					'after'       => $params['after_issue_time'],
 					'time_format' => empty( $params['issue_time_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['issue_time_format'] ),
@@ -314,21 +331,21 @@ function render_template_callback( $var, $params )
 		case 'Item:creation_time':
 			$creation_time_format = empty( $params['creation_time_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['creation_time_format'] );
 			echo $params['before_creation_time'];
-			echo $Item->get_creation_time( $creation_time_format );
+			echo $rendered_Item->get_creation_time( $creation_time_format );
 			echo $params['after_creation_time'];
 			break;
 
 		case 'Item:mod_date':
 			$mod_date_format = empty( $params['mod_date_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['mod_date_format'] );
 			echo $params['before_mod_date'];
-			echo $Item->get_mod_date( $mod_date_format );
+			echo $rendered_Item->get_mod_date( $mod_date_format );
 			echo $params['after_mod_date'];
 			break;
 
 		case 'Item:last_touched':
 			$last_touched_ts_format = empty( $params['last_touched_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_touched_format'] );
 			echo $params['before_last_touched'];
-			echo $Item->get_last_touched_ts( $last_touched_ts_format );
+			echo $rendered_Item->get_last_touched_ts( $last_touched_ts_format );
 			echo $params['after_last_touched'];
 			break;
 
@@ -336,13 +353,13 @@ function render_template_callback( $var, $params )
 		case 'Item:contents_last_updated':
 			$contents_last_updated_ts_format = empty( $params['last_updated_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_updated_format'] );
 			echo $params['before_last_updated'];
-			echo $Item->get_contents_last_updated_ts( $contents_last_updated_ts_format ).$Item->get_refresh_contents_last_updated_link();
+			echo $rendered_Item->get_contents_last_updated_ts( $contents_last_updated_ts_format ).$rendered_Item->get_refresh_contents_last_updated_link();
 			echo $params['after_last_updated'];
 			break;
 
 		// Links:
 		case 'Item:edit_link':
-			$Item->edit_link( array_merge( array(
+			$rendered_Item->edit_link( array_merge( array(
 					'before' => $params['before_edit_link'],
 					'after'  => $params['after_edit_link'],
 					'text'   => $params['edit_link_text'],
@@ -350,7 +367,7 @@ function render_template_callback( $var, $params )
 			break;
 
 		case 'Item:history_link':
-			echo $Item->get_history_link( array_merge( array(
+			echo $rendered_Item->get_history_link( array_merge( array(
 					'before'    => $params['before_history_link'],
 					'after'     => $params['after_history_link'],
 					'link_text' => $params['history_link_text'],
@@ -358,7 +375,7 @@ function render_template_callback( $var, $params )
 			break;
 
 		case 'Item:propose_change_link':
-			$Item->propose_change_link( array_merge( array(
+			$rendered_Item->propose_change_link( array_merge( array(
 					'before' => $params['before_propose_change_link'],
 					'after'  => $params['after_propose_change_link'],
 					'text'   => $params['propose_change_link_text'],
@@ -366,7 +383,7 @@ function render_template_callback( $var, $params )
 			break;
 
 		case 'Item:excerpt':
-			$Item->excerpt( array_merge( array(
+			$rendered_Item->excerpt( array_merge( array(
 					'before'              => $params['excerpt_before_text'],
 					'after'               => $params['excerpt_after_text'],
 					'excerpt_before_more' => $params['excerpt_before_more'],
@@ -377,7 +394,7 @@ function render_template_callback( $var, $params )
 
 		// Read Status:
 		case 'Item:read_status':
-			$Item->display_unread_status( array_merge( array(
+			$rendered_Item->display_unread_status( array_merge( array(
 					'style'  => 'text',
 					'before' => '<span class="evo_post_read_status">',
 					'after'  => '</span>'
@@ -386,9 +403,9 @@ function render_template_callback( $var, $params )
 
 		// Visibility Status:
 		case 'Item:visibility_status':
-			if( $Item->status != 'published' )
+			if( $rendered_Item->status != 'published' )
 			{
-				$Item->format_status( array_merge( array(
+				$rendered_Item->format_status( array_merge( array(
 						'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 					), $params ) );
 			}
@@ -396,7 +413,7 @@ function render_template_callback( $var, $params )
 
 		// Categories:
 		case 'Item:categories':
-			$Item->categories( array_merge( array(
+			$rendered_Item->categories( array_merge( array(
 					'before'           => $params['before_categories'],
 					'after'            => $params['after_categories'],
 					'include_main'     => $params['categories_include_main'],
@@ -408,7 +425,7 @@ function render_template_callback( $var, $params )
 
 		// Tags:
 		case 'Item:tags':
-			$Item->tags( array_merge( array(
+			$rendered_Item->tags( array_merge( array(
 					'before'    => $params['before_tags'],
 					'after'     => $params['after_tags'],
 					'separator' => $params['tags_separator'],
@@ -416,20 +433,36 @@ function render_template_callback( $var, $params )
 			break;
 
 		case 'Item:feedback_link':
-			echo $Item->get_feedback_link();
+			echo $rendered_Item->get_feedback_link();
+			break;
+
+		case 'Item:images':
+			echo $rendered_Item->get_images( $params );
+			break;
+
+		case 'Item:content_teaser':
+			echo $rendered_Item->content_teaser( $params );
 			break;
 
 		// Chapter / Category:
 		case 'Cat:permalink':
-			echo '<a href="'.$Chapter->get_permanent_url().'" class="link">'.get_icon( 'expand' ).$Chapter->dget( 'name' ).'</a>';
+			echo '<a href="'.$rendered_Chapter->get_permanent_url().'" class="link">'.get_icon( 'expand' ).$rendered_Chapter->dget( 'name' ).'</a>';
 			break;
 
 		case 'Cat:description':
-			echo $Chapter->dget( 'description' );
+			echo $rendered_Chapter->dget( 'description' );
 			break;
 
 		default:
-			$match_found = false;
+			if( $scope == 'echo' )
+			{	// Print param var value, No need check this because all done above:
+				echo $params[ $param_name ];
+			}
+			else
+			{	// Unknown template var:
+				$match_found = false;
+				pre_dump( $var );
+			}
 	}
 	$r = ob_get_clean();
 
@@ -439,7 +472,7 @@ function render_template_callback( $var, $params )
 	}
 	else
 	{	// Display error for not recognized variable:
-		return '<span class="evo_param_error">$'.$var.'$ is not recognized.</span>';
+		return '<span class="evo_param_error">['.$var.'] is not recognized.</span>';
 	}
 }
 

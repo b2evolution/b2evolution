@@ -1685,24 +1685,22 @@ function create_default_templates( $is_task = true )
 		),
 		'cblock_clearfix' => array(
 			'name'     => 'Include Content Block: with clearfix',
-			'template' => '<div class="evo_content_block clearfix [cb_class]\">
-	<div class="evo_content_block_images">
-		<img src="[teaser_image]">
+			'template' => '<div class="evo_content_block clearfix [echo:content_block_class]">
+	[Item:images|restrict_to_image_position=#teaser_all|before=<div class="evo_cblock_images evo_cblock_teaser">|after=</div>]
+	<div class="evo_cblock_text">
+		[Item:content_teaser] 
 	</div>
-	<div class="evo_content_block_text">
-		[content] 
-	</div>
+	[Item:images|restrict_to_image_position=aftermore|before=<div class="evo_cblock_images evo_cblock_aftermore">|after=</div>]
 </div>',
 		),
 		'cblock_noclearfix' => array(
 			'name'     => 'Include Content Block: without clearfix',
-			'template' => '<div class="evo_content_block [cb_class]">
-	<div class="evo_content_block_images">
-		<img src="[teaser_image]">
+			'template' => '<div class="evo_content_block [echo:content_block_class]">
+	[Item:images|restrict_to_image_position=#teaser_all|before=<div class="evo_cblock_images evo_cblock_teaser">|after=</div>]
+	<div class="evo_cblock_text">
+		[Item:content_teaser] 
 	</div>
-	<div class="evo_content_block_text">
-		[content] 
-	</div>
+	[Item:images|restrict_to_image_position=aftermore|before=<div class="evo_cblock_images evo_cblock_aftermore">|after=</div>]
 </div>',
 		),
 		'cblock_imgleft_textright' => array(
