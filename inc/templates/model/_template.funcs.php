@@ -18,9 +18,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Render template content code depending on current locale
  * 
  * @param string Template code
+ * @param array Parameters
+ * @param array Objects
  * @return string|boolean Rendered template or FALSE on wrong request
  */
-function render_template_code( $code, $params = array() )
+function render_template_code( $code, $params = array(), $objects = array() )
 {
 	global $current_locale;
 
@@ -38,13 +40,11 @@ function render_template_code( $code, $params = array() )
 	}
 
 	if( $Template )
-	{	// Template available, replace variables:
-		return render_template( $Template->template_code, $params );
+	{	// Render variables in available Template:
+		return render_template( $Template->template_code, $params, $objects );
 	}
-	else
-	{
-		return false;
-	}
+
+	return false;
 }
 
 
@@ -52,9 +52,11 @@ function render_template_code( $code, $params = array() )
  * Render template content
  * 
  * @param string Template
+ * @param array Parameters
+ * @param array Objects
  * @return string Rendered template
  */
-function render_template( $template, $params = array() )
+function render_template( $template, $params = array(), $objects = array() )
 {
 	$current_pos = 0;
 	$r = '';
@@ -65,7 +67,7 @@ function render_template( $template, $params = array() )
 	{
 		$r .= substr( $template, $current_pos, $match[1] - $current_pos );
 		$current_pos = $match[1] + strlen( $match[0] );
-		$r .= call_user_func( 'render_template_callback', $matches[1][$i][0], $params );
+		$r .= render_template_callback( $matches[1][$i][0], $params, $objects );
 	}
 
 	// New
@@ -88,7 +90,7 @@ function render_template( $template, $params = array() )
 		}
 		$r .= substr( $template, $current_pos, $match[1] - $current_pos );
 		$current_pos = $match[1] + strlen( $match[0] );
-		$r .= call_user_func( 'render_template_callback', $matches[1][$i][0], $template_params );
+		$r .= render_template_callback( $matches[1][$i][0], $template_params, $objects );
 	}
 
 	// Print remaining template code:
@@ -102,14 +104,12 @@ function render_template( $template, $params = array() )
  * 
  * @param string Variable to be replaced
  * @param array Additional parameters
+ * @param array Objects
  * @return string Replacement string
  */
-function render_template_callback( $var, $params )
+function render_template_callback( $var, $params, $objects = array() )
 {
 	$params = array_merge( array(
-		'Chapter' => NULL, // NULL to use current global $Chapter
-		'Item'    => NULL, // NULL to use current global $Item
-
 		// default date/time format:
 		'date_format'         => '#extended_date',
 		'time_format'         => '#none',
@@ -205,6 +205,11 @@ function render_template_callback( $var, $params )
 		'excerpt_more_text'   => T_('more').' &raquo;',
 	), $params );
 
+	$objects = array_merge( array(
+		'Chapter' => NULL, // NULL to use current global $Chapter
+		'Item'    => NULL, // NULL to use current global $Item
+	), $objects );
+
 	// Get scope and var name:
 	preg_match( '#^(([a-z]+):)?(.+)$#i', $var, $match_var );
 	$scope = ( empty( $match_var[2] ) ? 'Item': $match_var[2] );
@@ -213,7 +218,7 @@ function render_template_callback( $var, $params )
 	{
 		case 'Cat':
 			global $Chapter;
-			$rendered_Chapter = ( $params['Chapter'] === NULL ? $Chapter : $params['Chapter'] );
+			$rendered_Chapter = ( $objects['Chapter'] === NULL ? $Chapter : $objects['Chapter'] );
 			if( empty( $rendered_Chapter ) || ! ( $rendered_Chapter instanceof Chapter ) )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Chapter is not defined at this moment.</span>';
@@ -222,7 +227,7 @@ function render_template_callback( $var, $params )
 
 		case 'Item':
 			global $Item;
-			$rendered_Item = ( $params['Item'] === NULL ? $Item : $params['Item'] );
+			$rendered_Item = ( $objects['Item'] === NULL ? $Item : $objects['Item'] );
 			if( empty( $rendered_Item ) || ! ( $rendered_Item instanceof Item ) )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Item is not defined at this moment.</span>';

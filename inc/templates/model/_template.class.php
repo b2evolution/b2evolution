@@ -108,7 +108,6 @@ class Template extends DataObject
 		// Template Code:
 		param( 'tpl_template_code', 'html' );
 		param_check_not_empty( 'tpl_template_code' );
-		param_check_html( 'tpl_template_code', T_('Invalid template code content.') );
 		$this->set( 'template_code', get_param( 'tpl_template_code' ) );
 
 		return ! param_errors_detected();

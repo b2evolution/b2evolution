@@ -210,7 +210,7 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function cat_inskin_display( $param_Chapter, $level, $params = array() )
 	{
-		global $Chapter, $Item;
+		global $Chapter;
 
 		if( empty( $this->disp_params['template_cat'] ) )
 		{	// No template is provided for listing a category:
@@ -231,9 +231,7 @@ class cat_content_list_Widget extends ComponentWidget
 		{	// Display chapter:
 			echo $params['before_cat'];
 
-			echo render_template_code( $this->disp_params['template_cat'], array_merge( $params, array(
-					'Chapter' => $param_Chapter,
-				) ) );
+			echo render_template_code( $this->disp_params['template_cat'], $params, array( 'Chapter' => $param_Chapter ) );
 
 			echo $params['after_cat'];
 		}
@@ -265,11 +263,11 @@ class cat_content_list_Widget extends ComponentWidget
 		echo $params['before_item'];
 
 		echo render_template_code( $this->disp_params['template_item'], array_merge( $params, array(
-				'Item'            => $param_Item,
 				'post_navigation' => 'same_category', // Always navigate through category in this skin
 				'target_blog'     => 'auto', // Auto navigate to current collection if it is allowed for the Item
 				'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
-			) ) );
+			) ),
+			array( 'Item' => $param_Item ) );
 
 		echo $params['after_item'];
 	}

@@ -4195,11 +4195,10 @@ class Item extends ItemLight
 				'image_size'    => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 				'image_limit'   =>  1000,
 				'image_link_to' => 'original', // Can be 'original', 'single' or empty
+				'content_block_class' => '',
 			), $params );
 
-		return render_template_code( $params['template_code'], array_merge( $params, array(
-				'Item' => $this,
-			) ) );
+		return render_template_code( $params['template_code'], $params, array( 'Item' => $this ) );
 	}
 
 
