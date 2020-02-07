@@ -2600,6 +2600,16 @@ function check_html_sanity( $content, $context = 'posting', $User = NULL, $encod
 			$verbose = false;
 			break;
 
+		case 'quick_template':
+			$Group = ( $User ? $User->get_Group() : false );
+			$xhtmlvalidation  = false;
+			$allow_css_tweaks = $Group && $Group->perm_xhtml_css_tweaks;
+			$allow_javascript = $Group && $Group->perm_xhtml_javascript;
+			$allow_iframes    = $Group && $Group->perm_xhtml_iframes;
+			$allow_objects    = $Group && $Group->perm_xhtml_objects;
+			$bypass_antispam  = $Group && $Group->perm_bypass_antispam;
+			break;
+
 		default:
 			debug_die( 'unknown context: '.$context );
 	}
