@@ -1653,20 +1653,20 @@ function create_default_templates( $is_task = true )
 	$templates = array(
 		// Item Info "info line" replacements:
 		'item_details_infoline_date' => array(
-			'name'     => 'Item Details: Posted on Date',
+			'name'     => 'Item Details: Posted on Date at Time',
 			'template' => '<span class="small text-muted">[flag_icon] Posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time]</span>',
 		),
 		'item_details_infoline_standard' => array(
-			'name'     => 'Item Details: Posted by Author on Date in Categories',
+			'name'     => 'Item Details: Posted by Author on Date at Time in Categories',
 			'template' => '<span class="small text-muted">[flag_icon] Posted by [author] on [issue_time|time_format=#extended_date] in [categories]</span>',
 		),
 		'item_details_infoline_long' => array(
 			'name'     => 'Item Details: Long info line',
-			'template' => '<span class="small text-muted">[flag_icon] [permalink_icon] Posted by [author] on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [last_updated] [edit_link]</span>',
+			'template' => '<span class="small text-muted">[flag_icon] [permalink_icon] Posted by [author] on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [contents_last_updated] [edit_link]</span>',
 		),
 		'item_details_infoline_forums' => array(
-			'name'     => 'Item Details: Started by Author on Date - Last Touched',
-			'template' => '<span class="small text-muted">[flag_icon] Started by [author] on [creation_time] &ndash; Last touched: [last_touched]',
+			'name'     => 'Item Details: Contents last updated on Date',
+			'template' => '<span class="small text-muted">[flag_icon] Thread last updated on [contents_last_updated]',
 		),
 
 		// Item info New :
