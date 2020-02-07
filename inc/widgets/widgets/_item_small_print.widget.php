@@ -168,9 +168,11 @@ class item_small_print_Widget extends ComponentWidget
 
 		$template = $this->disp_params['template'];
 
-		$small_print = render_template_code( $template, array_merge( array(
+		$template_params = array_merge( array(
 				'author_avatar_class' => 'leftmargin',
-			), $this->disp_params ) );
+			), $this->disp_params );
+		
+		$small_print = render_template_code( $template, $template_params );
 
 		if( ! empty( $small_print ) )
 		{
