@@ -105,18 +105,11 @@ class cat_content_list_Widget extends ComponentWidget
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
 				),
-				'template_cat' => array(
-					'label' => T_('Template for listing a category'),
+				'template' => array(
+					'label' => T_('Template'),
 					'type' => 'select',
 					'options' => $template_options,
-					'defaultvalue' => 'content_list_subcat',
-					'input_suffix' => $template_input_suffix,
-				),
-				'template_item' => array(
-					'label' => T_('Template for listing an item'),
-					'type' => 'select',
-					'options' => $template_options,
-					'defaultvalue' => 'content_list_item',
+					'defaultvalue' => 'content_list',
 					'input_suffix' => $template_input_suffix,
 				),
 			), parent::get_param_definitions( $params ) );
@@ -144,19 +137,22 @@ class cat_content_list_Widget extends ComponentWidget
 			return false;
 		}
 
+		// Set params from quick template:
+		$rendered_content = render_template_code( $this->disp_params['template'], $params );
+
 		$TemplateCache = & get_TemplateCache();
 
-		if( ! empty( $this->disp_params['template_cat'] ) &&
-		    ! ( $cat_Template = & $TemplateCache->get_by_code( $this->disp_params['template_cat'], false, false ) ) )
+		if( ! empty( $params['subcat_template'] ) &&
+		    ! ( $cat_Template = & $TemplateCache->get_by_code( $params['subcat_template'], false, false ) ) )
 		{	// Display error when no or wrong template for listing a category:
-			$this->display_error_message( sprintf( 'Template is not found: %s for listing a category', '<code>'.$this->disp_params['template_cat'].'</code>' ) );
+			$this->display_error_message( sprintf( 'Template is not found: %s for listing a category', '<code>'.$params['subcat_template'].'</code>' ) );
 			return false;
 		}
 
-		if( ! empty( $this->disp_params['template_item'] ) &&
-		    ! ( $item_Template = & $TemplateCache->get_by_code( $this->disp_params['template_item'], false, false ) ) )
+		if( ! empty( $params['item_template'] ) &&
+		    ! ( $item_Template = & $TemplateCache->get_by_code( $params['item_template'], false, false ) ) )
 		{	// Display error when no or wrong template for listing a category:
-			$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$this->disp_params['template_item'].'</code>' ) );
+			$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$params['item_template'].'</code>' ) );
 			return false;
 		}
 
@@ -164,17 +160,25 @@ class cat_content_list_Widget extends ComponentWidget
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
+		// Print out text if it was found in the template:
+		echo trim( $rendered_content );
+
+		// Display subcategories and posts:
+		if( isset( $params['before_list'] ) )
+		{
+			echo $params['before_list'];
+		}
+
 		$callbacks = array(
 			'line'  => array( $this, 'cat_inskin_display' ),
 			'posts' => array( $this, 'item_inskin_display' ),
 		);
-
-		// Display subcategories and posts
-		echo '<ul class="chapters_list posts_list">';
-
 		$ChapterCache->iterate_through_category_children( $curr_Chapter, $callbacks, false, array_merge( $params, array( 'sorted' => true ) ) );
 
-		echo '</ul>';
+		if( isset( $params['after_list'] ) )
+		{
+			echo $params['after_list'];
+		}
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
@@ -210,30 +214,14 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function cat_inskin_display( $param_Chapter, $level, $params = array() )
 	{
-		global $Chapter;
-
-		if( empty( $this->disp_params['template_cat'] ) )
+		if( empty( $params['subcat_template'] ) )
 		{	// No template is provided for listing a category:
 			return;
 		}
 
-		// Default params:
-		$params = array_merge( array(
-				'before_cat'         => '<li class="chapter">',
-				'after_cat'          => '</li>',
-				'before_cat_title'   => '<h3>',
-				'after_cat_title'    => '</h3>',
-				'before_cat_content' => '<div>',
-				'after_cat_content'  => '</div>',
-			), $params );
-
 		if( ! empty( $param_Chapter ) )
-		{	// Display chapter:
-			echo $params['before_cat'];
-
-			echo render_template_code( $this->disp_params['template_cat'], $params, array( 'Chapter' => $param_Chapter ) );
-
-			echo $params['after_cat'];
+		{	// Render Chapter by quick template:
+			echo render_template_code( $params['subcat_template'], $params, array( 'Chapter' => $param_Chapter ) );
 		}
 	}
 
@@ -245,31 +233,21 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function item_inskin_display( $param_Item, $level, $params = array() )
 	{
-		global $Chapter, $Item;
-
-		if( empty( $this->disp_params['template_item'] ) )
+		if( empty( $params['item_template'] ) )
 		{	// No template is provided for listing an item:
 			return;
 		}
 
-		// Default params:
-		$params = array_merge( array(
-				'before_item'       => '<li>',
-				'after_item'        => '</li>',
-				'permalink_text'    => get_icon( 'file_message' ).'$title$',
-				'permalink_class'   => 'link',
-			), $params );
-
-		echo $params['before_item'];
-
-		echo render_template_code( $this->disp_params['template_item'], array_merge( $params, array(
+		$template_params = array_merge( $params, array(
+				'permalink_text'  => get_icon( 'file_message' ).'$title$',
+				'permalink_class' => 'link',
 				'post_navigation' => 'same_category', // Always navigate through category in this skin
 				'target_blog'     => 'auto', // Auto navigate to current collection if it is allowed for the Item
 				'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
-			) ),
-			array( 'Item' => $param_Item ) );
+			) );
 
-		echo $params['after_item'];
+		// Render Item by quick template:
+		echo render_template_code( $params['item_template'], $template_params, array( 'Item' => $param_Item ) );
 	}
 }
 

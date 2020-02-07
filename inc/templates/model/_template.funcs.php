@@ -18,11 +18,11 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Render template content code depending on current locale
  * 
  * @param string Template code
- * @param array Parameters
+ * @param array Parameters (by reference)
  * @param array Objects
  * @return string|boolean Rendered template or FALSE on wrong request
  */
-function render_template_code( $code, $params = array(), $objects = array() )
+function render_template_code( $code, & $params, $objects = array() )
 {
 	global $current_locale;
 
@@ -52,11 +52,11 @@ function render_template_code( $code, $params = array(), $objects = array() )
  * Render template content
  * 
  * @param string Template
- * @param array Parameters
+ * @param array Parameters (by reference)
  * @param array Objects
  * @return string Rendered template
  */
-function render_template( $template, $params = array(), $objects = array() )
+function render_template( $template, & $params, $objects = array() )
 {
 	$current_pos = 0;
 	$r = '';
@@ -71,12 +71,16 @@ function render_template( $template, $params = array(), $objects = array() )
 	}
 
 	// New
-	preg_match_all( '/\[((?:(?:Item|Cat|echo):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Item|Cat|echo|set):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
-		$template_params = $params;
+		$template_params = & $params;
 		$var = $matches[1][$i][0];
 		$temp_params = empty( $matches[3][$i][0] ) ? NULL : $matches[3][$i][0];
+		if( substr( $var, 0, 4 ) == 'set:' )
+		{	// For "set:" scope we should pass value through temp params:
+			$temp_params = 'set_value'.$temp_params;
+		}
 		if( ! empty( $temp_params ) )
 		{	// Template has specified parameters, use it to override:
 			$temp_params = explode( '|', $temp_params );
@@ -90,7 +94,7 @@ function render_template( $template, $params = array(), $objects = array() )
 		}
 		$r .= substr( $template, $current_pos, $match[1] - $current_pos );
 		$current_pos = $match[1] + strlen( $match[0] );
-		$r .= render_template_callback( $matches[1][$i][0], $template_params, $objects );
+		$r .= render_template_callback( $var, $template_params, $objects );
 	}
 
 	// Print remaining template code:
@@ -103,11 +107,11 @@ function render_template( $template, $params = array(), $objects = array() )
  * Callback function to replace variables in template
  * 
  * @param string Variable to be replaced
- * @param array Additional parameters
+ * @param array Additional parameters (by reference)
  * @param array Objects
  * @return string Replacement string
  */
-function render_template_callback( $var, $params, $objects = array() )
+function render_template_callback( $var, & $params, $objects = array() )
 {
 	$params = array_merge( array(
 		// default date/time format:
@@ -244,6 +248,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			{	// Param is not scalar and cannot be printed on screen:
 				return '<span class="evo_param_error">Param <code>'.$param_name.'</code> is not scalar.</span>';
 			}
+			break;
+
+		case 'set':
+			$param_name = substr( $var, 4 );
 			break;
 
 		default:
@@ -459,14 +467,21 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		default:
-			if( $scope == 'echo' )
-			{	// Print param var value, No need check this because all done above:
-				echo $params[ $param_name ];
-			}
-			else
-			{	// Unknown template var:
-				$match_found = false;
-				pre_dump( $var );
+			switch( $scope )
+			{
+				case 'echo':
+					// Print param var value, No need check this because all done above:
+					echo $params[ $param_name ];
+					break;
+
+				case 'set':
+					// Set param:
+					$params[ $param_name ] = ( isset( $params['set_value'] ) ? $params['set_value'] : NULL );
+					break;
+
+				default:
+					// Unknown template var:
+					$match_found = false;
 			}
 	}
 	$r = ob_get_clean();
@@ -492,7 +507,7 @@ function render_template_callback( $var, $params, $objects = array() )
  * @param string The name of the template table to use
  * @return string Unique template code
  */
-function unique_template_code( $code, $ID = 0, $db_code_fieldname = 'tpl_code', $db_ID_fieldname = 'tpl_ID',	$db_table = 'T_templates' )
+function unique_template_code( $code, $ID = 0, $db_code_fieldname = 'tpl_code', $db_ID_fieldname = 'tpl_ID', $db_table = 'T_templates' )
 {
 	global $DB, $Messages;
 	

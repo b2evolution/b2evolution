@@ -1691,15 +1691,26 @@ function create_default_templates( $is_task = true )
 
 
 		// Content List widget:
+		'content_list' => array(
+			'name'     => 'Content List',
+			'template' => '[set:before_list=<ul class="chapters_list posts_list">]
+[set:after_list=</ul>]
+[set:subcat_template=content_list_subcat]
+[set:item_template=content_list_item]',
+		),
 		'content_list_subcat' => array(
 			'name'     => 'Content List: Subcat',
-			'template' => '<h3>[Cat:permalink]</h3>
-<div class="evo_cat__description">[Cat:description]</div>',
+			'template' => '<li class="chapter">
+	<h3>[Cat:permalink]</h3>
+	<div class="evo_cat__description">[Cat:description]</div>
+</li>',
 		),
 		'content_list_item' => array(
 			'name'     => 'Content List: Item',
-			'template' => '<h3>[read_status] [permalink] [flag_icon]</h3>[visibility_status]
-<div class="evo_post__excerpt_text">[excerpt]</div>',
+			'template' => '<li>
+	<h3>[read_status] [permalink] [flag_icon]</h3>[visibility_status]
+	<div class="evo_post__excerpt_text">[excerpt]</div>
+</li>',
 		),
 
 
