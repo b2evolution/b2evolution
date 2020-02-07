@@ -929,9 +929,25 @@ switch( $action )
 					// Don't lose current extra categories:
 					$selected_Item->set( 'extra_cat_IDs', $current_extra_categories );
 				}
-				else
+				elseif( $cat_type == 'extra' )
 				{	// Add extra categories to previous linked categories:
 					$selected_Item->set( 'extra_cat_IDs', array_unique( array_merge( $current_extra_categories, $extra_categories ) ) );
+				}
+				elseif( $cat_type == 'remove_extra' )
+				{	// Remove extra categories from previous linked categories except if an extra category is also the primary category:
+					$main_cat_ID = $selected_Item->get( 'main_cat_ID' );
+					$remove_extra_categories = $extra_categories;
+					if( ( $key = array_search( $main_cat_ID, $remove_extra_categories ) ) !== false )
+					{
+						unset( $remove_extra_categories[$key] );
+					}
+					
+					if( empty( $remove_extra_categories ) )
+					{	// Nothing to remove, skip to next Item:
+						continue;
+					}
+
+					$selected_Item->set( 'extra_cat_IDs', array_diff( $current_extra_categories, $remove_extra_categories ) );
 				}
 				if( $selected_Item->dbupdate() )
 				{	// If the item has been updated to the requested categories:
@@ -954,7 +970,7 @@ switch( $action )
 				$Messages->add( sprintf( T_('Main category of %d items could not be changed to %s.'), $items_failed, '"'.$main_Chapter->get( 'name' ).'"' ), 'error' );
 			}
 		}
-		else
+		elseif( $cat_type == 'extra' )
 		{	// Report about added extra categories:
 			$extra_cats_names = array();
 			foreach( $extra_categories as $extra_cat_ID )
@@ -971,6 +987,24 @@ switch( $action )
 			if( $items_failed )
 			{	// Inform about failed updates:
 				$Messages->add( sprintf( T_('Extra categories %s of %d items could not be added.'), implode( ', ', $extra_cats_names ), $items_failed ), 'error' );
+			}
+		}
+		elseif( $cat_type == 'remove_extra' )
+		{	// Report about removed extra categories:
+			foreach( $extra_categories as $extra_cat_ID )
+			{
+				if( $extra_Chapter = & $ChapterCache->get_by_ID( $extra_cat_ID, false, false ) )
+				{
+					$extra_cats_names[] = '"'.$extra_Chapter->get( 'name' ).'"';
+				}
+			}
+			if( $items_success )
+			{	// Inform about success updates:
+				$Messages->add( sprintf( T_('Extra categories %s of %d items have been removed.'), implode( ', ', $extra_cats_names ), $items_success ), 'success' );
+			}
+			if( $items_failed )
+			{	// Inform about failed updates:
+				$Messages->add( sprintf( T_('Extra categories %s of %d items could not be removed.'), implode( ', ', $extra_cats_names ), $items_failed ), 'error' );
 			}
 		}
 

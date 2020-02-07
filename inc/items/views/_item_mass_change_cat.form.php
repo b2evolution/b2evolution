@@ -33,7 +33,7 @@ $Form->begin_form();
 
 	cat_select( $Form, true, true, array(
 			'display_main'  => ( $cat_type == 'main' ),
-			'display_extra' => ( $cat_type == 'extra' ),
+			'display_extra' => ( $cat_type == 'extra' || $cat_type == 'remove_extra' ),
 			'display_order' => false,
 			'display_new'   => false,
 		) );
