@@ -2369,7 +2369,7 @@ function get_item_status_buttons( $edited_Item, $button_action = NULL, $button_c
 function get_mass_change_cat_buttons( $button_class = '' )
 {
 	$r = '<input type="hidden" name="" value="" />';
-	$r .= '<div class="btn-group dropup cat_dropdown" data-container="body">';
+	$r .= '<div class="btn-group dropup post_cat_dropdown" data-container="body">';
 	$r .= '<button type="submit" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray[mass_change_main_cat]" id="mass_change_main_cat">'
 				.'<span>'.T_('Change primary category').'</span>'
 			.'</button>';
@@ -2379,6 +2379,31 @@ function get_mass_change_cat_buttons( $button_class = '' )
 	$r .= '<ul class="dropdown-menu" role="menu" aria-labelledby="post_cat_dropdown">'
 				.'<li rel="" role="presentation"><a href="#" id="mass_add_extra_cat" role="menuitem" tabindex="-1">'.T_('Add secondary category').'</a></li>'
 				.'<li rel="" role="presentation"><a href="#" id="mass_remove_extra_cat" role="menuitem" tabindex="-1">'.T_('Remove secondary category').'</a></li>'
+			.'</ul>';
+	$r .= '</div>';
+
+	return $r;
+}
+
+
+/**
+ * Get html code of buttons to mass update posts' renderers
+ *
+ * @param string Button class
+ * @return string
+ */
+function get_mass_change_renderer_buttons( $button_class = '' )
+{
+	$r = '<input type="hidden" name="" value="" />';
+	$r .= '<div class="btn-group dropup post_renderer_dropdown" data-container="body">';
+	$r .= '<button type="submit" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray[mass_add_renderer]" id="mass_add_renderer">'
+				.'<span>'.T_('Add text renderer').'</span>'
+			.'</button>';
+	$r .= '<button type="button" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id=post_renderer_dropdown">'
+				.'<span class="caret"></span>'
+			.'</button>';
+	$r .= '<ul class="dropdown-menu" role="menu" aria-labelledby="post_renderer_dropdown">'
+				.'<li rel="" role="presentation"><a href="#" id="mass_remove_renderer" role="menuitem" tabindex="-1">'.T_('Remove text renderer').'</a></li>'
 			.'</ul>';
 	$r .= '</div>';
 
@@ -3348,6 +3373,66 @@ jQuery( document ).ready( function ()
 			{
 				result = ajax_debug_clear( result );
 				openModalWindow( result, '600px', 'auto', true, evo_js_lang_mass_change_item_category, evo_js_lang_mass_change_item_category );
+			}
+		} );
+		return false;
+	} );
+
+
+	jQuery( '#mass_add_renderer, #mass_remove_renderer' ).click( function()
+	{	
+		var selected_items = new Array();
+		jQuery( 'input[name="selected_items\[\]"]:checked' ).each( function()
+		{
+			selected_items.push( jQuery( this ).val() );
+		} );
+
+		if( selected_items.length == 0 )
+		{	// Don't try to load a form to change a category if no selected items:
+			alert( '<?php echo TS_('Please select at least one item.'); ?>' );
+			return false;
+		}
+
+		var evo_js_lang_mass_change_item_renderer, renderer_change_type;
+
+		switch( jQuery( this ).prop( 'id' ) )
+		{
+			case 'mass_add_renderer':
+				evo_js_lang_mass_change_item_renderer = '<?php echo TS_('Add text renderer'); ?>';
+				renderer_change_type = 'add_renderer';
+				break;
+
+			case 'mass_remove_renderer':
+				evo_js_lang_mass_change_item_renderer = '<?php echo TS_('Remove text renderer'); ?>';
+				renderer_change_type = 'remove_renderer';
+				break;
+
+			default:
+				return false;
+		}
+
+		evo_js_lang_close = '<?php echo TS_('Cancel'); ?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo format_to_output( TS_('Loading'), 'htmlattr' ); ?>"></span>',
+			'600px', 'auto', true, evo_js_lang_mass_change_item_renderer + ' <?php echo get_manual_link( 'post-language-versions#add-version' ); ?>', evo_js_lang_mass_change_item_renderer, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>async.php',
+			data:
+			{
+				'action': 'get_item_mass_change_renderer_form',
+				'blog': '<?php echo $blog; ?>',
+				'renderer_change_type': renderer_change_type,
+				'selected_items': selected_items,
+				'tab': '<?php echo get_param( 'tab' ); ?>',
+				'tab_type': '<?php echo get_param( 'tab_type' ); ?>',
+				'page': '<?php echo param( 'items_'.get_param( 'tab' ).'_paged', 'integer', 1 ); ?>',
+			},
+			success: function(result)
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '600px', 'auto', true, evo_js_lang_mass_change_item_renderer, evo_js_lang_mass_change_item_renderer );
 			}
 		} );
 		return false;
@@ -5885,6 +5970,10 @@ function items_results( & $items_Results, $params = array() )
 			'mass_change_cat' => array(
 					'type' => 'text',
 					'text' => get_mass_change_cat_buttons( 'btn-xs' ),
+				),
+			'mass_change_renderer' => array(
+					'type' => 'text',
+					'text' => get_mass_change_renderer_buttons( 'btn-xs' ),
 				),
 			);
 		if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )
