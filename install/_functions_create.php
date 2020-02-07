@@ -1722,9 +1722,9 @@ function create_default_templates( $is_task = true )
 		),
 		'content_tiles_subcat' => array(
 			'name'     => 'Content Tiles: Subcat',
-			'template' => '<div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
 	<div class="widget_rwd_content clearfix">
-		<div class="item_first_image"></div>
+		<div class="item_first_image">[Cat:image|size=fit-400x320]</div>
 		<h3 class="item_title">[Cat:permalink]</h3>
 		<div class="item_content">[Cat:description]</div>
 	</div>
@@ -1732,7 +1732,7 @@ function create_default_templates( $is_task = true )
 		),
 		'content_tiles_item' => array(
 			'name'     => 'Content Tiles: Item',
-			'template' => '<div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
 	<div class="widget_rwd_content clearfix">
 		[Item:images|restrict_to_image_position=#teaser_all|before=<div class="item_first_image">|after=</div>]
 		<h3 class="item_title">[Item:permalink|text=#title]</h3>

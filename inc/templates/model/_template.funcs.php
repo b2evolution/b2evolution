@@ -469,6 +469,12 @@ function render_template_callback( $var, & $params, $objects = array() )
 			echo $rendered_Chapter->dget( 'description' );
 			break;
 
+		case 'Cat:image':
+			echo $rendered_Chapter->get_image_tag( array_merge( array(
+					'size'       => 'crop-256x256',
+				), $params ) );
+			break;
+
 		default:
 			switch( $scope )
 			{
