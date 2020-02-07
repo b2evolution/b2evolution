@@ -1712,6 +1712,34 @@ function create_default_templates( $is_task = true )
 	<div class="evo_post__excerpt_text">[excerpt]</div>
 </li>',
 		),
+		// Tiles style:
+		'content_tiles' => array(
+			'name'     => 'Content Tiles',
+			'template' => '[set:before_list=<div class="widget_rwd_blocks row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_subcat]
+[set:item_template=content_tiles_item]',
+		),
+		'content_tiles_subcat' => array(
+			'name'     => 'Content Tiles: Subcat',
+			'template' => '<div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+	<div class="widget_rwd_content clearfix">
+		<div class="item_first_image"></div>
+		<div class="item_title">[Cat:permalink]</div>
+		<div class="item_content">[Cat:description]</div>
+	</div>
+</div>',
+		),
+		'content_tiles_item' => array(
+			'name'     => 'Content Tiles: Item',
+			'template' => '<div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+	<div class="widget_rwd_content clearfix">
+		[Item:images|restrict_to_image_position=#teaser_all|before=<div class="item_first_image">|after=</div>]
+		<div class="item_title">[permalink]</div>
+		<div class="item_content">[excerpt]</div>
+	</div>
+</div>',
+		),
 
 
 		// Content Blocks:
