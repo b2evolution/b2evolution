@@ -1651,6 +1651,7 @@ function create_default_templates( $is_task = true )
 	}
 
 	$templates = array(
+		// Item Info "info line" replacements:
 		'item_details_infoline_date' => array(
 			'name'     => 'Item Details: Posted on Date',
 			'template' => '<span class="small text-muted">[flag_icon] Posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time]</span>',
@@ -1667,6 +1668,14 @@ function create_default_templates( $is_task = true )
 			'name'     => 'Item Details: Started by Author on Date - Last Touched',
 			'template' => '<span class="small text-muted">[flag_icon] Started by [author] on [creation_time] &ndash; Last touched: [last_touched]',
 		),
+
+		// Item info New :
+		'item_details_feedback_link' => array(
+			'name'     => 'Item Details: Comment Link',
+			'template' => '<nav class="post_comments_link">[feedback_link]</nav>'
+		),
+
+		// Item Info "Small print" replacements:
 		'item_details_smallprint_standard' => array(
 			'name'     => 'Item Details: Small Print: Standard',
 			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] This entry was posted by [author] and filed under [categories]. Tags: [tags]. [edit_link]'
@@ -1679,10 +1688,22 @@ function create_default_templates( $is_task = true )
 			'name'     => 'Item Details: Small Print: Revisions',
 			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
 		),
-		'item_details_feedback_link' => array(
-			'name'     => 'Item Details: Comment Link',
-			'template' => '<nav class="post_comments_link">[feedback_link]</nav>'
+
+
+		// Content List widget:
+		'content_list_subcat' => array(
+			'name'     => 'Content List: Subcat',
+			'template' => '<h3>[Cat:permalink]</h3>
+<div class="evo_cat__description">[Cat:description]</div>',
 		),
+		'content_list_item' => array(
+			'name'     => 'Content List: Item',
+			'template' => '<h3>[read_status] [permalink] [flag_icon]</h3>[visibility_status]
+<div class="evo_post__excerpt_text">[excerpt]</div>',
+		),
+
+
+		// Content Blocks:
 		'cblock_clearfix' => array(
 			'name'     => 'Include Content Block: with clearfix',
 			'template' => '<div class="evo_content_block clearfix [echo:content_block_class]">
@@ -1721,16 +1742,7 @@ function create_default_templates( $is_task = true )
 	</div>
 </div>',
 		),
-		'content_list_subcat' => array(
-			'name'     => 'Content List: Subcat',
-			'template' => '<h3>[Cat:permalink]</h3>
-<div class="evo_cat__description">[Cat:description]</div>',
-		),
-		'content_list_item' => array(
-			'name'     => 'Content List: Item',
-			'template' => '<h3>[read_status] [permalink] [flag_icon]</h3>[visibility_status]
-<div class="evo_post__excerpt_text">[excerpt]</div>',
-		),
+
 	);
 
 	$templates_sql = array();
