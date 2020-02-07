@@ -1678,11 +1678,11 @@ function create_default_templates( $is_task = true )
 		// Item Info "Small print" replacements:
 		'item_details_smallprint_standard' => array(
 			'name'     => 'Item Details: Small Print: Standard',
-			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] This entry was posted by [author] and filed under [categories]. Tags: [tags]. [edit_link]'
+			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] This entry was posted by [author] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
 		),
 		'item_details_smallprint_long' => array(
 			'name'     => 'Item Details: Small Print: Long',
-			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] [flag_icon] This entry was posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] by [author] and filed under [categories]. Tags: [tags]. [edit_link]'
+			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] [flag_icon] This entry was posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] by [author] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
 		),
 		'item_details_revisions' => array(
 			'name'     => 'Item Details: Small Print: Revisions',
