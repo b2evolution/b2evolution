@@ -76,27 +76,44 @@ function render_template( $template, & $params, $objects = array() )
 	preg_match_all( '/\[((?:(?:Item|Cat|echo|set):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
-		$template_params = & $params;
-		$var = $matches[1][$i][0];
-		$temp_params = empty( $matches[3][$i][0] ) ? NULL : $matches[3][$i][0];
-		if( substr( $var, 0, 4 ) == 'set:' )
-		{	// For "set:" scope we should pass value through temp params:
-			$temp_params = 'set_value'.$temp_params;
-		}
-		if( ! empty( $temp_params ) )
-		{	// Template has specified parameters, use it to override:
-			$temp_params = explode( '|', $temp_params );
-			foreach( $temp_params as $temp_param )
-			{
-				$prop = substr( $temp_param, 0, strpos( $temp_param, '=' ) );
-				// TODO: need to ensure string assigned to $val below is single quote and properly escaped?
-				$val  = substr( $temp_param, strpos( $temp_param, '=' ) + 1 );
-				$template_params[$prop] = $val;
-			}
-		}
+		// Output everything until new tag:
 		$r .= substr( $template, $current_pos, $match[1] - $current_pos );
 		$current_pos = $match[1] + strlen( $match[0] );
-		$r .= render_template_callback( $var, $template_params, $objects );
+
+		// New tag to handle:
+		$tag = $matches[1][$i][0];
+
+		// Params specified for the tag:
+		$tag_param_strings = empty( $matches[3][$i][0] ) ? NULL : $matches[3][$i][0];
+
+		if( substr( $tag, 0, 4 ) == 'set:' )
+		{	// Set a param value in the $params[] array used for the whole template (will affect all future template tags)
+
+			$param_name = substr( $tag, 4 );
+			$param_val  = substr( $tag_param_strings, strpos( $tag_param_strings, '=' ) + 1 );
+
+			// Set param:
+			// we MUST do this here and in & $params[] so that it sticks. This cannot be done in the callback or $this_tag_params[]
+			$params[ $param_name ] = $param_val;
+		}
+		else
+		{	// Process a normal template tag:
+
+			$this_tag_params = $params;
+
+			if( ! empty( $tag_param_strings ) )
+			{	// Template Tag has specified parameters, use temp to override:
+				$tag_param_strings = explode( '|', $tag_param_strings );
+				foreach( $tag_param_strings as $tag_param_string )
+				{
+					$tag_param_name = substr( $tag_param_string, 0, strpos( $tag_param_string, '=' ) );
+					// TODO: need to ensure string assigned to $tag_param_val below is single quote and properly escaped?
+					$tag_param_val  = substr( $tag_param_string, strpos( $tag_param_string, '=' ) + 1 );
+					$this_tag_params[$tag_param_name] = $tag_param_val;
+				}
+			}
+			$r .= render_template_callback( $tag, $this_tag_params, $objects );
+		}
 	}
 
 	// Print remaining template code:
@@ -113,7 +130,7 @@ function render_template( $template, & $params, $objects = array() )
  * @param array Objects
  * @return string Replacement string
  */
-function render_template_callback( $var, & $params, $objects = array() )
+function render_template_callback( $var, $params, $objects = array() )
 {
 	$params = array_merge( array(
 		// default date/time format:
@@ -136,7 +153,6 @@ function render_template_callback( $var, & $params, $objects = array() )
 		'nav_target'          => NULL,
 
 		// author:
-		'author_link_text'    => 'auto',
 		'before_author'       => '',
 		'after_author'        => '',
 
@@ -252,10 +268,6 @@ function render_template_callback( $var, & $params, $objects = array() )
 			}
 			break;
 
-		case 'set':
-			$param_name = substr( $var, 4 );
-			break;
-
 		default:
 			return '<span class="evo_param_error">['.$var.']: Scope "'.$scope.':" is not recognized.</span>';
 	}
@@ -318,7 +330,7 @@ function render_template_callback( $var, & $params, $objects = array() )
 			$rendered_Item->author( array_merge( array(
 					'before'    => $params['before_author'],
 					'after'     => $params['after_author'],
-					'link_text' => $params['author_link_text'],
+					'link_text' => 'auto',
 			), $params ) );
 			break;
 
@@ -483,11 +495,6 @@ function render_template_callback( $var, & $params, $objects = array() )
 				case 'echo':
 					// Print param var value, No need check this because all done above:
 					echo $params[ $param_name ];
-					break;
-
-				case 'set':
-					// Set param:
-					$params[ $param_name ] = ( isset( $params['set_value'] ) ? $params['set_value'] : NULL );
 					break;
 
 				default:
