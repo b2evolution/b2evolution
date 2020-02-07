@@ -2106,7 +2106,7 @@ class User extends DataObject
 			}
 		}
 
-		$link_login = '';
+		$linktext = '';
 		$class = $params['link_class'];
 
 		if( $params['link_text'] != 'only_avatar' )
@@ -2115,47 +2115,47 @@ class User extends DataObject
 			{
 				case 'login':
 				case 'avatar_login':
-					$link_login = $this->get_username();
+					$linktext = $this->get_username();
 					break;
 				case 'force_login':
 				case 'avatar_force_login':
-					$link_login = $this->get( 'login' );
+					$linktext = $this->get( 'login' );
 					break;
 				case 'nickname':
-					$link_login = $this->nickname;
+					$linktext = $this->nickname;
 					break;
 				case 'firstname':
-					$link_login = $this->firstname;
+					$linktext = $this->firstname;
 					break;
 				case 'lastname':
-					$link_login = $this->lastname;
+					$linktext = $this->lastname;
 					break;
 				case 'fullname':
-					$link_login = $this->firstname.' '.$this->lastname;
+					$linktext = $this->firstname.' '.$this->lastname;
 					break;
 				case 'preferredname':
-					$link_login = $this->get_preferred_name();
+					$linktext = $this->get_preferred_name();
 					break;
 				case 'auto':
-					$link_login = $this->get_username();
+					$linktext = $this->get_username();
 					break;
 				// default: 'avatar_name' | 'avatar' | 'name'
 			}
-			$link_login = trim( $link_login );
-			if( empty( $link_login ) )
+			$linktext = trim( $linktext );
+			if( empty( $linktext ) )
 			{ // Use a login or preferred name by default
-				$link_login = $this->get_username();
+				$linktext = $this->get_username();
 			}
 			// Add class "login" to detect logins by js plugins
-			$class .= ( $link_login == $this->login ? ' login' : '' );
+			$class .= ( $linktext == $this->login ? ' login' : '' );
 			
 			if( !empty($params['login_mask']) )
 			{ // Apply login mask
-				$link_login = str_replace( '$login$', $link_login, $params['login_mask'] );
+				$linktext = str_replace( '$login$', $linktext, $params['login_mask'] );
 			}
 			elseif( !empty($params['login_class']) )
 			{
-				$link_login = '<span class="'.$params['login_class'].'">'.$link_login.'</span>';
+				$linktext = '<span class="'.$params['login_class'].'">'.$linktext.'</span>';
 			}
 		} // END Not for "only avatar"
 
@@ -2169,11 +2169,11 @@ class User extends DataObject
 
 		if( empty( $identity_url ) )
 		{
-			return '<span'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$link_login.'</span>';
+			return '<span'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$linktext.'</span>';
 		}
 
 		$link_title = T_( 'Show the user profile' );
-		return '<a href="'.$identity_url.'" title="'.$link_title.'"'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$link_login.'</a>';
+		return '<a href="'.$identity_url.'" title="'.$link_title.'"'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$linktext.'</a>';
 	}
 
 
