@@ -4189,6 +4189,9 @@ class Item extends ItemLight
 			return '';
 		}
 
+		// Load for get_skin_setting():
+		load_funcs( 'skins/_skin.funcs.php' );
+
 		$params = array_merge( array(
 				'template_code' => 'cblock_clearfix',
 				'image_class'   => 'img-responsive',
