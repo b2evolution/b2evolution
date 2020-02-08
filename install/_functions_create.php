@@ -1662,11 +1662,11 @@ function create_default_templates( $is_task = true )
 		),
 		'item_details_infoline_long' => array(
 			'name'     => 'Item Details: Long info line',
-			'template' => '<span class="small text-muted">[flag_icon] [permalink_icon] Posted by [author] on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [contents_last_updated] [edit_link]</span>',
+			'template' => '<span class="small text-muted">[flag_icon] [permalink|text=#linkicon] Posted by [author] on [issue_date|date_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [contents_last_updated][refresh_contents_last_updated_link] [edit_link]</span>',
 		),
 		'item_details_infoline_forums' => array(
-			'name'     => 'Item Details: Contents last updated on Date',
-			'template' => '<span class="small text-muted">[flag_icon] Thread last updated on [contents_last_updated]',
+			'name'     => 'Item Details: Thread last updated on Date',
+			'template' => '<span class="small text-muted">[flag_icon] Thread last updated on [contents_last_updated|format=#extended_date] at [contents_last_updated|format=#short_time] [refresh_contents_last_updated_link]',
 		),
 
 		// Item info New :
@@ -1678,11 +1678,11 @@ function create_default_templates( $is_task = true )
 		// Item Info "Small print" replacements:
 		'item_details_smallprint_standard' => array(
 			'name'     => 'Item Details: Small Print: Standard',
-			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] This entry was posted by [author] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
+			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] This entry was posted by [author|link_text=preferredname] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
 		),
 		'item_details_smallprint_long' => array(
 			'name'     => 'Item Details: Small Print: Long',
-			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] [flag_icon] This entry was posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] by [author] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
+			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] [flag_icon] This entry was posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] by [author|link_text=preferredname] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
 		),
 		'item_details_revisions' => array(
 			'name'     => 'Item Details: Small Print: Revisions',
@@ -1708,7 +1708,7 @@ function create_default_templates( $is_task = true )
 		'content_list_item' => array(
 			'name'     => 'Content List: Item',
 			'template' => '<li>
-	<h3>[read_status] [Item:permalink|text=#fileicon+title] [flag_icon]</h3>[visibility_status]
+	<h3>[read_status] [Item:permalink|text=#fileicon+title|class=link] [flag_icon]</h3>[visibility_status]
 	<div class="evo_post__excerpt_text">[excerpt]</div>
 </li>',
 		),
