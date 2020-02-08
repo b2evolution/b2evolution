@@ -219,10 +219,8 @@ class cat_content_list_Widget extends ComponentWidget
 			return;
 		}
 
-		if( ! empty( $param_Chapter ) )
-		{	// Render Chapter by quick template:
-			echo render_template_code( $params['subcat_template'], $params, array( 'Chapter' => $param_Chapter ) );
-		}
+		// Render Chapter by quick template:
+		echo render_template_code( $params['subcat_template'], $params, array( 'Chapter' => $param_Chapter ) );
 	}
 
 

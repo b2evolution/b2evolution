@@ -132,106 +132,6 @@ function render_template( $template, & $params, $objects = array() )
  */
 function render_template_callback( $var, $params, $objects = array() )
 {
-	$params = array_merge( array(
-		// default date/time format:
-		'date_format'         => '#extended_date',
-		'time_format'         => '#none',
-
-		// flag icon:
-		'before_flag'         => '',
-		'after_flag'          => '',
-
-		// permalink_icon:
-		// permalink:
-		// permanent_link:
-		'before_permalink'    => '',
-		'after_permalink'     => '',
-		'permalink_text'      => '#title#',
-		'permalink_class'     => '',
-		'post_navigation'     => '',
-		'target_blog'         => '',
-		'nav_target'          => NULL,
-
-		// author:
-		'before_author'       => '',
-		'after_author'        => '',
-
-		// author_avatar:
-		'author_avatar_size'   => '',
-		'author_avatar_class'  => '',
-		'before_author_avatar' => '',
-		'after_author_avatar'  => '',
-
-		// issue_time:
-		'before_issue_time'    => '',
-		'after_issue_time'     => '',
-		'issue_time_format'    => '', // empty by default - use default date/time format
-
-		// creation_time:
-		'before_creation_time' => '',
-		'after_creation_time'  => '',
-		'creation_time_format' => '', // empty by default - use default date/time format
-
-		// mod_date:
-		'before_mod_date'     => '',
-		'after_mod_date'      => '',
-		'mod_date_format'     => '', // empty by default - use default date/time format
-
-		// categories:
-		'before_categories'           => '',
-		'after_categories'            => '',
-		'categories_include_main'     => true,
-		'categories_include_other'    => true,
-		'categories_include_external' => true,
-		'categories_link_categories'  => true,
-
-		// lastedit_user:
-		'lastedit_user_link_text' => 'auto',
-		'before_lastedit_user'    => '',
-		'after_lastedit_user'     => '',
-
-		// last_touched:
-		'before_last_touched' => '',
-		'after_last_touched'  => '',
-		'last_touched_format' => '', // empty by default - use default date/time format
-
-		// last_updated:
-		'before_last_updated' => '',
-		'after_last_updated'  => '',
-		'last_updated_format' => '', // empty by default - use default date/time format
-
-		// edit_link:
-		'before_edit_link'    => '',
-		'after_edit_link'     => '',
-		'edit_link_text'      => '#',
-
-		// history_link:
-		'before_history_link' => '',
-		'after_history_link'  => '',
-		'history_link_text'   => T_('View change history'),
-
-		// propose_change_link:
-		'before_propose_change_link' => '',
-		'after_propose_change_link'  => '',
-		'propose_change_link_text'   => T_('Propose a change'),
-
-		// tags:
-		'before_tags'    => '',
-		'after_tags'     => '',
-		'tags_separator' => ', ',
-
-		'excerpt_before_text' => '',
-		'excerpt_after_text'  => '',
-		'excerpt_before_more' => ' <span class="evo_post__excerpt_more_link">',
-		'excerpt_after_more'  => '</span>',
-		'excerpt_more_text'   => T_('more').' &raquo;',
-	), $params );
-
-	$objects = array_merge( array(
-		'Chapter' => NULL, // NULL to use current global $Chapter
-		'Item'    => NULL, // NULL to use current global $Item
-	), $objects );
-
 	// Get scope and var name:
 	preg_match( '#^(([a-z]+):)?(.+)$#i', $var, $match_var );
 	$scope = ( empty( $match_var[2] ) ? 'Item': $match_var[2] );
@@ -240,7 +140,7 @@ function render_template_callback( $var, $params, $objects = array() )
 	{
 		case 'Cat':
 			global $Chapter;
-			$rendered_Chapter = ( $objects['Chapter'] === NULL ? $Chapter : $objects['Chapter'] );
+			$rendered_Chapter = ( !isset($objects['Chapter']) ? $Chapter : $objects['Chapter'] );
 			if( empty( $rendered_Chapter ) || ! ( $rendered_Chapter instanceof Chapter ) )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Chapter is not defined at this moment.</span>';
@@ -249,7 +149,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Item':
 			global $Item;
-			$rendered_Item = ( $objects['Item'] === NULL ? $Item : $objects['Item'] );
+			$rendered_Item = ( !isset($objects['Item']) ? $Item : $objects['Item'] );
 			if( empty( $rendered_Item ) || ! ( $rendered_Item instanceof Item ) )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Item is not defined at this moment.</span>';
@@ -274,35 +174,18 @@ function render_template_callback( $var, $params, $objects = array() )
 
 	$match_found = true;
 
-	// Resolve default date/time formats:
-	// TODO: LATER: remove this code from the callback. Templates will specify their own format. Infoline widget can compute $datetime_format internally.
-	$params['date_format'] = $date_format = locale_resolve_datetime_fmt( $params['date_format'] );
-	$params['time_format'] = $time_format = locale_resolve_datetime_fmt( $params['time_format'] );
-	$datetime_format = $date_format.( empty( $time_format ) ? '' : ' ' ).$time_format;
-
 	ob_start();
 	switch( $var )
 	{
 		// Item:
 		case 'Item:flag_icon':
-			$rendered_Item->flag( array_merge( array(
-					'before' => $params['before_flag'],
-					'after'  => $params['after_flag'],
-				), $params ) );
-			break;
-
+			echo $rendered_Item->get_flag( $params );
 			break;
 
 		case 'Item:permalink':
 		case 'Item:permanent_link':
 			$rendered_Item->permanent_link( array_merge( array(
 					'text'   => '#title',
-					'class'  => $params['permalink_class'],
-					'before' => $params['before_permalink'],
-					'after'  => $params['after_permalink'],
-					'post_navigation' => $params['post_navigation'],
-					'nav_target'      => $params['nav_target'],
-					'target_blog'     => $params['target_blog'],
 				), $params ) );
 				// Note: Cat content list widget will have set:
 				//	'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
@@ -312,26 +195,20 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Item:author':
 			$rendered_Item->author( array_merge( array(
-					'before'    => $params['before_author'],
-					'after'     => $params['after_author'],
 					'link_text' => 'auto',		// select login or nice name automatically
 				), $params ) );
 			break;
 
 		case 'Item:lastedit_user':
 			$rendered_Item->lastedit_user( array_merge( array(
-					'before'    => $params['before_lastedit_user'],
-					'after'     => $params['after_lastedit_user'],
-					'link_text' => $params['lastedit_user_link_text'],
 					'link_text' => 'auto',		// select login or nice name automatically
 				), $params ) );
 			break;
 
 		// Date/Time:
-		case 'Item:issue_date':    // TODO: remove from all templates
-		case 'Item:issue_time':
-			// We are only using the "time_format" param for this:
-			unset( $params['date_format'] );
+		case 'Item:issue_date':
+			$rendered_Item->issue_date( $params );
+			break;
 
 		case 'Item:issue_time':
 			$rendered_Item->issue_time( $params );
@@ -372,36 +249,28 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		// Links:
 		case 'Item:edit_link':
-			$rendered_Item->edit_link( array_merge( array(
-					'before' => $params['before_edit_link'],
-					'after'  => $params['after_edit_link'],
-					'text'   => $params['edit_link_text'],
-				), $params ) );
+			$rendered_Item->edit_link( $params );
 			break;
 
 		case 'Item:history_link':
 			echo $rendered_Item->get_history_link( array_merge( array(
-					'before'    => $params['before_history_link'],
-					'after'     => $params['after_history_link'],
-					'link_text' => $params['history_link_text'],
+					'link_text' => T_('View change history'),
 				), $params ) );
 			break;
 
 		case 'Item:propose_change_link':
 			$rendered_Item->propose_change_link( array_merge( array(
-					'before' => $params['before_propose_change_link'],
-					'after'  => $params['after_propose_change_link'],
-					'text'   => $params['propose_change_link_text'],
+					'text'   => T_('Propose a change'),
 				), $params ) );
 			break;
 
 		case 'Item:excerpt':
 			$rendered_Item->excerpt( array_merge( array(
-					'before'              => $params['excerpt_before_text'],
-					'after'               => $params['excerpt_after_text'],
-					'excerpt_before_more' => $params['excerpt_before_more'],
-					'excerpt_after_more'  => $params['excerpt_after_more'],
-					'excerpt_more_text'   => $params['excerpt_more_text'],
+					'before'              => '',
+					'after'               => '',
+					'excerpt_before_more' => ' <span class="evo_post__excerpt_more_link">',
+					'excerpt_after_more'  => '</span>',
+					'excerpt_more_text'   => T_('more').' &raquo;',
 				), $params ) );
 			break;
 
@@ -427,21 +296,16 @@ function render_template_callback( $var, $params, $objects = array() )
 		// Categories:
 		case 'Item:categories':
 			$rendered_Item->categories( array_merge( array(
-					'before'           => $params['before_categories'],
-					'after'            => $params['after_categories'],
-					'include_main'     => $params['categories_include_main'],
-					'include_other'    => $params['categories_include_other'],
-					'include_external' => $params['categories_include_external'],
-					'link_categories'  => $params['categories_link_categories'],
-			), $params ) );
+					'before'          => '',  // For some reason the core has ' ' as default, which is not good for templates
+					'after'           => '',  // For some reason the core has ' ' as default, which is not good for templates
+				), $params ) );
 			break;
 
 		// Tags:
 		case 'Item:tags':
 			$rendered_Item->tags( array_merge( array(
-					'before'    => $params['before_tags'],
-					'after'     => $params['after_tags'],
-					'separator' => $params['tags_separator'],
+					'before'          => '',  // For some reason the core has '<div>... ' as default, which is not good for templates
+					'after'           => '',  // For some reason the core has '</div>' as default, which is not good for templates
 				), $params ) );
 			break;
 

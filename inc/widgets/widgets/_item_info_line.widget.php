@@ -145,10 +145,6 @@ class item_info_line_Widget extends ComponentWidget
 			'author_link_text' => 'preferredname',
 			'block_body_start' => '<div>',
 			'block_body_end'   => '</div>',
-			// Use the following when building automatic template but NOT when using a template:
-			'widget_item_info_line_before'  => '<span class="small text-muted">',
-			'widget_item_info_line_after'   => '</span>',
-			'widget_item_info_line_params'  => array(),
 		), $params );
 
 		$this->init_display( $params );
