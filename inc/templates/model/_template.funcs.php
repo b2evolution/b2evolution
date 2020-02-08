@@ -304,14 +304,18 @@ function render_template_callback( $var, $params, $objects = array() )
 					'nav_target'      => $params['nav_target'],
 					'target_blog'     => $params['target_blog'],
 				), $params ) );
+				// Note: Cat content list widget will have set:
+				//	'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
+				//	'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
+				//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 			break;
 
 		case 'Item:author':
 			$rendered_Item->author( array_merge( array(
 					'before'    => $params['before_author'],
 					'after'     => $params['after_author'],
-					'link_text' => 'auto',
-			), $params ) );
+					'link_text' => 'auto',		// select login or nice name automatically
+				), $params ) );
 			break;
 
 		case 'Item:lastedit_user':
@@ -319,6 +323,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					'before'    => $params['before_lastedit_user'],
 					'after'     => $params['after_lastedit_user'],
 					'link_text' => $params['lastedit_user_link_text'],
+					'link_text' => 'auto',		// select login or nice name automatically
 				), $params ) );
 			break;
 

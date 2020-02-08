@@ -239,10 +239,9 @@ class cat_content_list_Widget extends ComponentWidget
 		}
 
 		$template_params = array_merge( $params, array(
-				'permalink_class' => 'link',
-				'post_navigation' => 'same_category', // Always navigate through category in this skin
-				'target_blog'     => 'auto', // Auto navigate to current collection if it is allowed for the Item
-				'nav_target'      => $params['chapter_ID'], // set the category ID as nav target
+				'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
+				'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
+				'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 			) );
 
 		// Render Item by quick template:
