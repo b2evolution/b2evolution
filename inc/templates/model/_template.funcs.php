@@ -328,40 +328,41 @@ function render_template_callback( $var, $params, $objects = array() )
 			// We are only using the "time_format" param for this:
 			unset( $params['date_format'] );
 
-			$rendered_Item->issue_time( array_merge( array(
-					'before'      => $params['before_issue_time'],
-					'after'       => $params['after_issue_time'],
-					'time_format' => empty( $params['issue_time_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['issue_time_format'] ),
-				), $params ) );
+		case 'Item:issue_time':
+			$rendered_Item->issue_time( $params );
 			break;
 
 		case 'Item:creation_time':
-			$creation_time_format = empty( $params['creation_time_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['creation_time_format'] );
-			echo $params['before_creation_time'];
-			echo $rendered_Item->get_creation_time( $creation_time_format );
-			echo $params['after_creation_time'];
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_creation_time( $temp_params['format'] );
 			break;
 
 		case 'Item:mod_date':
-			$mod_date_format = empty( $params['mod_date_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['mod_date_format'] );
-			echo $params['before_mod_date'];
-			echo $rendered_Item->get_mod_date( $mod_date_format );
-			echo $params['after_mod_date'];
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_mod_date( $temp_params['format'] );
 			break;
 
 		case 'Item:last_touched':
-			$last_touched_ts_format = empty( $params['last_touched_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_touched_format'] );
-			echo $params['before_last_touched'];
-			echo $rendered_Item->get_last_touched_ts( $last_touched_ts_format );
-			echo $params['after_last_touched'];
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_last_touched_ts( $temp_params['format'] );
 			break;
 
 		case 'Item:last_updated':
 		case 'Item:contents_last_updated':
-			$contents_last_updated_ts_format = empty( $params['last_updated_format'] ) ? $datetime_format : locale_resolve_datetime_fmt( $params['last_updated_format'] );
-			echo $params['before_last_updated'];
-			echo $rendered_Item->get_contents_last_updated_ts( $contents_last_updated_ts_format ).$rendered_Item->get_refresh_contents_last_updated_link();
-			echo $params['after_last_updated'];
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_contents_last_updated_ts( $temp_params['format'] );
+			break;
+
+		case 'Item:refresh_contents_last_updated_link':
+			echo $rendered_Item->get_refresh_contents_last_updated_link( $params );
 			break;
 
 		// Links:

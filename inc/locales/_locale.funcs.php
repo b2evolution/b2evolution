@@ -544,6 +544,7 @@ function locale_resolve_datetime_fmt( $format, $locale = NULL )
 	switch( $format )
 	{
 		case '#short_date':
+		case '':
 			$format = locale_datefmt( $locale );
 			break;
 
@@ -563,8 +564,9 @@ function locale_resolve_datetime_fmt( $format, $locale = NULL )
 			$format = locale_timefmt( $locale );
 			break;
 
-		case '#none':
-			$format = '';
+		case '#short_date_time':
+			$format = locale_datefmt( $locale ).' '.locale_shorttimefmt( $locale );
+			break;
 	}
 
 	return $format;

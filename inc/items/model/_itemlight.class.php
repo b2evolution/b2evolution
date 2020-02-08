@@ -983,7 +983,9 @@ class ItemLight extends DataObject
 			$params['date_format'] = locale_datefmt();
 		}
 
-		return $params['before'].mysql2date( $params['date_format'], $this->issue_date, $params['use_GMT'] ).$params['after'];
+		$date_format = locale_resolve_datetime_fmt( $params['date_format'] );
+
+		return $params['before'].mysql2date( $date_format, $this->issue_date, $params['use_GMT'] ).$params['after'];
 	}
 
 
@@ -1019,11 +1021,6 @@ class ItemLight extends DataObject
 		if( $params['date_format'] == '#' )
 		{	// Use default time format of current locale
 			$params['date_format'] = locale_timefmt();
-		}
-
-		if( $params['date_format'] == '#short_time' )
-		{	// Use short time format of current locale
-			$params['date_format'] = locale_shorttimefmt();
 		}
 
 		echo $this->get_issue_date( $params );
@@ -1120,10 +1117,7 @@ class ItemLight extends DataObject
 	 */
 	function get_creation_time( $format = '', $useGM = false )
 	{
-		if( empty( $format ) )
-		{
-			return mysql2date( locate_datefmt(), $this->datecreated, $useGM ); 
-		}
+		$format = locale_resolve_datetime_fmt( $format );
 
 		return mysql2date( $format, $this->datecreated, $useGM );
 	}
@@ -1137,10 +1131,7 @@ class ItemLight extends DataObject
 	 */
 	function get_mod_date( $format = '', $useGM = false )
 	{
-		if( empty($format) )
-		{
-			return mysql2date( locale_datefmt(), $this->datemodified, $useGM );
-		}
+		$format = locale_resolve_datetime_fmt( $format );
 
 		return mysql2date( $format, $this->datemodified, $useGM );
 	}
@@ -1154,10 +1145,7 @@ class ItemLight extends DataObject
 	 */
 	function get_last_touched_ts( $format = '', $useGM = false )
 	{
-		if( empty( $format ) )
-		{
-			return mysql2date( locate_datefmt(), $this->get( 'last_touched_ts' ), $useGM ); 
-		}
+		$format = locale_resolve_datetime_fmt( $format );
 
 		return mysql2date( $format, $this->get( 'last_touched_ts' ), $useGM );
 	}
@@ -1171,10 +1159,7 @@ class ItemLight extends DataObject
 	 */
 	function get_contents_last_updated_ts( $format = '', $useGM = false )
 	{
-		if( empty( $format ) )
-		{
-			return mysql2date( locate_datefmt(), $this->get( 'contents_last_updated_ts' ), $useGM ); 
-		}
+		$format = locale_resolve_datetime_fmt( $format );
 
 		return mysql2date( $format, $this->get( 'contents_last_updated_ts' ), $useGM );
 	}
@@ -1188,6 +1173,8 @@ class ItemLight extends DataObject
 	 */
 	function mod_date( $format = '', $useGM = false )
 	{
+		$format = locale_resolve_datetime_fmt( $format );
+
 		echo $this->get_mod_date( $format, $useGM );
 	}
 
@@ -1201,9 +1188,11 @@ class ItemLight extends DataObject
 	function mod_time( $format = '', $useGM = false )
 	{
 		if( empty($format) )
-			echo mysql2date( locale_timefmt(), $this->datemodified, $useGM );
-		else
-			echo mysql2date( $format, $this->datemodified, $useGM );
+			$format = '#long_time';
+
+		$format = locale_resolve_datetime_fmt( $format );
+
+		echo mysql2date( $format, $this->datemodified, $useGM );
 	}
 
 
