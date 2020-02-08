@@ -682,7 +682,7 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'before'         => ' ',
 				'after'          => ' ',
-				'link_text'      => 'preferredname', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'      => 'preferredname', // auto | avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 				'thumb_size'     => 'crop-top-32x32',
 				'thumb_class'    => '',
 				'thumb_zoomable' => false,
@@ -13166,7 +13166,6 @@ class Item extends ItemLight
 				'text'   => '#icon#',
 				'title'  => '#',
 				'class'  => '',
-				'glue'   => '&amp;',
 			), $params );
 
 		$refresh_url = $this->get_refresh_contents_last_updated_url( $params );

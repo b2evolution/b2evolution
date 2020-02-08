@@ -2071,7 +2071,7 @@ class User extends DataObject
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'link_text'      => 'avatar_name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'      => 'avatar_name', // auto| avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
 				'link_class'     => '', // Class for <a href=""
 				'thumb_size'     => 'crop-top-15x15',
 				'thumb_class'    => 'avatar_before_login',
@@ -2113,11 +2113,12 @@ class User extends DataObject
 		{ // Display a login, nickname, firstname, lastname, fullname or preferredname
 			switch( $params['link_text'] )
 			{
+				case 'auto':		// TODO this should be the real auto
 				case 'login':
-				case 'avatar_login':
-					$linktext = $this->get_username();
+				case 'avatar_login': 
+					$linktext = $this->get_username();  // TODO: auto has been hardcoded into this ! :(
 					break;
-				case 'force_login':
+				case 'force_login':		// TODO: we should NOT need a "force" if we correctly use auto the rest of the time!
 				case 'avatar_force_login':
 					$linktext = $this->get( 'login' );
 					break;
@@ -2136,9 +2137,6 @@ class User extends DataObject
 				case 'preferredname':
 					$linktext = $this->get_preferred_name();
 					break;
-				case 'auto':
-					$linktext = $this->get_username();
-					break;
 				// default: 'avatar_name' | 'avatar' | 'name'
 			}
 			$linktext = trim( $linktext );
@@ -2146,6 +2144,7 @@ class User extends DataObject
 			{ // Use a login or preferred name by default
 				$linktext = $this->get_username();
 			}
+
 			// Add class "login" to detect logins by js plugins
 			$class .= ( $linktext == $this->login ? ' login' : '' );
 			
