@@ -1844,16 +1844,7 @@ function init_voting_comment_js( $relative_to = 'rsc_url' )
 
 	require_js_defer( '#jquery#', $relative_to ); // dependency
 	require_js_defer( 'voting.js', $relative_to );
-	add_js_headline( '
-	jQuery( document ).ready( function()
-	{
-		var comment_voting_url = "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type.'";
-		jQuery( "span[id^=vote_helpful_]" ).each( function()
-		{
-			init_voting_bar( jQuery( this ), comment_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
-		} );
-	} );
-	' );
+	expose_var_to_js( 'evo_voting_comment_url', "'".get_htsrv_url().'anon_async.php?action=voting&vote_type=comment&b2evo_icons_type='.$b2evo_icons_type."'" );
 }
 
 
@@ -1873,16 +1864,7 @@ function init_voting_item_js( $relative_to = 'rsc_url' )
 
 	require_js_defer( '#jquery#', $relative_to );
 	require_js_defer( 'voting.js', $relative_to );
-	add_js_headline( '
-	jQuery( document ).ready( function()
-	{
-		var item_voting_url = "'.get_htsrv_url().'anon_async.php?action=voting&vote_type=item&b2evo_icons_type='.$b2evo_icons_type.'";
-		jQuery( "span[id^=vote_item_]" ).each( function()
-		{
-			init_voting_bar( jQuery( this ), item_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
-		} );
-	} );
-	' );
+	expose_var_to_js( 'evo_item_voting_url', "'".get_htsrv_url().'anon_async.php?action=voting&vote_type=item&b2evo_icons_type='.$b2evo_icons_type."'" );
 }
 
 

@@ -2,6 +2,8 @@
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  * @version $Id: voting.js 8373 2015-02-28 21:44:37Z fplanque $
+ * 
+ * Depends on jQuery
  */
 
 /**
@@ -204,3 +206,29 @@ function votingAdjust()
 	}
 
 }
+
+
+/**
+ * Initialize
+ */
+jQuery( document ).ready( function() {
+
+	// Initialize Item voting:
+	if( typeof( evo_item_voting_url ) != 'undefined' )
+	{
+		jQuery( "span[id^=vote_item_]" ).each( function()
+		{
+			init_voting_bar( jQuery( this ), evo_item_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
+		} );	
+	}
+
+	// Initialize Comment voting:
+	if( typeof( evo_comment_voting_url ) != 'undefined' )
+	{
+		jQuery( "span[id^=vote_helpful_]" ).each( function()
+		{
+			init_voting_bar( jQuery( this ), evo_comment_voting_url, jQuery( this ).find( "#votingID" ).val(), false );
+		} );
+	}
+
+} );
