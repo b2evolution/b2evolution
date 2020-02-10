@@ -292,6 +292,7 @@ module.exports = function(grunt) {
 					'rsc/js/src/evo_init_autocomplete_login.js',
 					'rsc/js/src/evo_init_widget_poll.js',
 					'rsc/js/src/evo_init_plugin_auto_anchors.js',
+					'rsc/js/src/evo_init_plugin_table_contents.js',
 				],
 				dest: 'rsc/js/build/evo_generic.bmin.js'
 			},
