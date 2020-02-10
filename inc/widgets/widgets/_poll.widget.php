@@ -197,14 +197,8 @@ class poll_Widget extends ComponentWidget
 				}
 				echo '</table>';
 
-				global $evo_poll_answer_JS_is_initialized;
-				if( empty( $evo_poll_answer_JS_is_initialized ) )
-				{	// Set JS var to initialize code in evo_init_widget_poll.js:
-					expose_var_to_js( 'evo_widget_poll_initialize', 'true' );
-		
-					// Set flag to not set the init var more than once if there are several poll widgets on the same page:
-					$evo_poll_answer_JS_is_initialized = true;
-				}
+				// Set JS var to initialize code in evo_init_widget_poll.js:
+				expose_var_to_js( 'evo_widget_poll_initialize', 'true' );
 
 				if( is_logged_in() )
 				{	// Display a button to vote:
