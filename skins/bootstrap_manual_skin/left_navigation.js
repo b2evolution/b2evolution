@@ -73,7 +73,7 @@ jQuery( document ).ready( function()
 		}
 	}
 
-	var top_start_point = ( jQuery( '#evo_toolbar' ).length > 0 ? 28 : 0 ) + ( jQuery( '.sitewide_header, .evo_container__site_header' ).length > 0 ? 54 : 0 );
+	var top_start_point = ( jQuery( '#evo_toolbar' ).length > 0 ? 28 : 0 ) + 10;
 	var sidebar_selectors = '#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single';
 	jQuery( sidebar_selectors ).each( function()
 	{
