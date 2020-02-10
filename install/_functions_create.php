@@ -1769,6 +1769,7 @@ function create_default_templates( $is_task = true )
 	[Item:images|restrict_to_image_position=aftermore|before=<div class="evo_cblock_images evo_cblock_aftermore">|after=</div>]
 </div>',
 		),
+/*
 		'cblock_imgleft_textright' => array(
 			'name'     => 'Include Content Block: Images Left / Text Right',
 			'template' => '<div class="evo_content_block [cb_class]">
@@ -1787,7 +1788,7 @@ function create_default_templates( $is_task = true )
 	</div>
 </div>',
 		),
-
+*/
 	);
 
 	$templates_sql = array();
