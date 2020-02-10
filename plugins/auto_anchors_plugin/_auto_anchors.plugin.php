@@ -143,31 +143,9 @@ class auto_anchors_plugin extends Plugin
 		$this->require_css( 'auto_anchors.css' );
 		if( $disp == 'single' || $disp == 'page' )
 		{	// Initialize JS for better scrolling only on Item's page:
-			add_js_headline( 'jQuery( document ).ready( function()
-			{
-				jQuery( "h1, h2, h3, h4, h5, h6" ).each( function()
-				{	// Append anchor link to header:
-					if( jQuery( this ).attr( "id") && jQuery( this ).hasClass( "evo_auto_anchor_header" ) )
-					{	// Only if it has id attribute and it was genereated by this plugin
-						var current_url = location.href.replace( /#.+$/, "" ) + "#" + jQuery( this ).attr( "id" );
-						jQuery( this ).append( " <a href=\"" + current_url + "\" class=\"evo_auto_anchor_link\"><span class=\"fa fa-link\"></span></a>" );
-					}
-				} );
-				var evo_toolbar_height = jQuery( "#evo_toolbar" ).length ? jQuery( "#evo_toolbar" ).height() : 0;
-				jQuery( ".evo_auto_anchor_link" ).on( "click", function()
-				{
-					var link_href = jQuery( this ).attr( "href" );
-					jQuery( "html,body" ).animate(
-					{	// Scroll to anchor:
-						scrollTop: jQuery( this ).offset().top - evo_toolbar_height - '.intval( $this->get_coll_setting( 'offset_scroll', $Blog ) ).'
-					},
-					function()
-					{	// Update URL with proper anchor in browser address bar:
-						window.history.pushState( "", "", link_href );
-					} );
-					return false;
-				} );
-			} );' );
+			expose_var_to_js( 'evo_plugin_auto_anchors_settings', '{
+					offset_scroll: '.format_to_js( intval( $this->get_coll_setting( 'offset_scroll', $Blog ) ) ).'
+				}' );
 		}
 	}
 
