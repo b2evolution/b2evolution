@@ -225,8 +225,8 @@ class mermaid_plugin extends Plugin
 			return;
 		}
 
-		$this->require_js_async( 'js/mermaid.min.js' );
-		add_js_headline( 'mermaid.initialize({startOnLoad:true});' );
+		$this->require_js_defer( 'js/mermaid.min.js' );	// Loaded in defer mode because this can take a while and init script below may already fire
+		$this->require_js_defer( 'js/evo_init_mermaid.js' );
 	}
 
 
@@ -242,8 +242,8 @@ class mermaid_plugin extends Plugin
 
 		if( $ctrl == 'campaigns' && get_param( 'tab' ) == 'send' && $this->get_email_setting( 'email_apply_rendering' ) )
 		{	// Load this only on form to preview email campaign:
-			$this->require_js_async( 'js/mermaid.min.js' );
-			add_js_headline( 'mermaid.initialize({startOnLoad:true});' );
+			$this->require_js_defer( 'js/mermaid.min.js' ); // Loaded in defer mode because this can take a while and init script below may already fire
+			$this->require_js_defer( 'js/evo_init_mermaid.js' );
 		}
 	}
 
