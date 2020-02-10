@@ -57,21 +57,68 @@ class TemplateCache extends DataObjectCache
 
 
 	/**
-	 * Get template from the given code
+	 * Get Template by given code
 	 *
-	 * @param string code
-	 * @return array of WidgetContainer
+	 * @param string Code of Template
+	 * @param boolean true if function should die on error
+	 * @param boolean true if function should die on empty/null
+	 * @return object|NULL|boolean Reference on cached Template, NULL - if request with empty code, FALSE - if requested Template does not exist
 	 */
-	function & get_by_code( $code )
+	function & get_by_code( $code, $halt_on_error = true, $halt_on_empty = true )
 	{
-		$template = NULL;
+		global $DB, $Debuglog;
+
+		if( empty( $code ) )
+		{	// Don't allow request with empty code:
+			if( $halt_on_empty )
+			{
+				debug_die( "Requested $this->objtype from $this->dbtablename without code!" );
+			}
+			$r = NULL;
+			return $r;
+		}
 
 		if( isset( $this->cache_by_code[ $code ] ) )
-		{
+		{	// Get Template from cache by code:
+			$Debuglog->add( "Accessing <strong>$this->objtype($code)</strong> from cache by code", 'dataobjects' );
 			return $this->cache_by_code[ $code ];
 		}
 
-		return $template;
+		// Load just the requested Template:
+		$Debuglog->add( "Loading <strong>$this->objtype($code)</strong>", 'dataobjects' );
+		$SQL = $this->get_SQL_object();
+		$SQL->WHERE_and( 'tpl_code = '.$DB->quote( $code ) );
+
+		if( $db_row = $DB->get_row( $SQL->get(), OBJECT, 0, 'DataObjectCache::get_by_code()' ) )
+		{
+			$resolved_ID = $db_row->{$this->dbIDname};
+			$Debuglog->add( 'success; ID = '.$resolved_ID, 'dataobjects' );
+			if( ! isset( $this->cache[$resolved_ID] ) )
+			{	// Object is not already in cache:
+				$Debuglog->add( 'Adding to cache...', 'dataobjects' );
+				//$Obj = new $this->objtype( $row ); // COPY !!
+				if( ! $this->add( $this->new_obj( $db_row ) ) )
+				{	// could not add
+					$Debuglog->add( 'Could not add() object to cache!', 'dataobjects' );
+				}
+			}
+			if( ! isset( $this->cache_by_code[ $code ] ) )
+			{	// Add object in cache by code:
+				$this->cache_by_code[ $code ] = $this->new_obj( $db_row );
+			}
+		}
+
+		if( empty( $this->cache_by_code[ $code ] ) )
+		{	// Object does not exist by requested code:
+			$Debuglog->add( 'Could not get DataObject by code.', 'dataobjects' );
+			if( $halt_on_error )
+			{
+				debug_die( "Requested $this->objtype does not exist!" );
+			}
+			$this->cache_by_code[ $code ] = false;
+		}
+
+		return $this->cache_by_code[ $code ];
 	}
 
 

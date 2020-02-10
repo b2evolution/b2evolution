@@ -2252,8 +2252,13 @@ class Plugins
 				$apply_rendering = $loop_RendererPlugin->get_coll_setting( $setting_name, $setting_Blog );
 			}
 
-			if( $apply_rendering == 'stealth'
-				|| $apply_rendering == 'never'
+			$ignored_apply_rendering = array( 'stealth', 'never' );
+			if( isset( $params['ignored_apply_rendering'] ) )
+			{
+				$ignored_apply_rendering = array_merge( $ignored_apply_rendering, $params['ignored_apply_rendering'] );
+			}
+
+			if( in_array( $apply_rendering, $ignored_apply_rendering )
 				|| empty( $apply_rendering ) )
 			{ // This is not an option.
 				continue;

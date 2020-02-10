@@ -111,6 +111,15 @@ class content_block_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $current_User, $admin_url;
+
+		// Get available templates:
+		$TemplateCache = & get_TemplateCache();
+		$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
+		$template_options = $TemplateCache->get_code_option_array();
+		$template_input_suffix = ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+			.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );
+
 		$ItemTypeCache = & get_ItemTypeCache();
 		$ItemTypeCache->clear();
 		$ItemTypeCache->load_where( 'ityp_usage = "content-block"' ); // Load only post item types
@@ -130,6 +139,13 @@ class content_block_Widget extends ComponentWidget
 				'title' => array(
 					'label' => T_('Block title'),
 					'size' => 60,
+				),
+				'template' => array(
+					'label' => T_('Template'),
+					'type' => 'select',
+					'options' => $template_options,
+					'defaultvalue' => 'cblock_clearfix',
+					'input_suffix' => $template_input_suffix,
 				),
 				'select_type' => array(
 					'label' => T_('Select content block'),
@@ -249,6 +265,15 @@ class content_block_Widget extends ComponentWidget
 	{
 		$this->init_display( $params );
 
+		$TemplateCache = & get_TemplateCache();
+
+		if( ! empty( $this->disp_params['template'] ) &&
+		    ! ( $cat_Template = & $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) ) )
+		{	// Display error when no or wrong template:
+			$this->display_error_message( sprintf( 'Template is not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
+			return false;
+		}
+
 		echo $this->disp_params['block_start'];
 
 		$this->disp_title();
@@ -287,7 +312,7 @@ class content_block_Widget extends ComponentWidget
 			//  - Content block Item is in same collection as this widget,
 			//  - Content block Item has same owner as owner of this widget's collection,
 			//  - Content block Item from collection for shared content blocks:
-			echo $widget_Item->get_content_block( $params );
+			echo $widget_Item->get_content_block( array_merge( $params, array( 'template_code' => $this->disp_params['template'] ) ) );
 		}
 		else
 		{	// Display error if the requested content block item cannot be used in this place:

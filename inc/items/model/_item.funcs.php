@@ -306,7 +306,7 @@ function init_inskin_editing()
 function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $preview = false, $load_featured = false, $load_intro = true )
 {
 	global $Collection, $Blog, $cat;
-	global $disp, $disp_detail, $MainList, $FeaturedList, $featured_list_type;
+	global $disp, $disp_detail, $MainList, $FeaturedList, $featured_list_type, $featured_disp_detail;
 	global $featured_displayed_item_IDs;
 
 	if( $disp != $restrict_disp || !isset($MainList) )
@@ -315,13 +315,18 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 		return $Item;
 	}
 
-	if( $featured_list_type !== $load_featured )
+	// Convert to boolean because settings may have '0' and '1' values instead:
+	$load_featured = (boolean)$load_featured;
+
+	if( $featured_list_type !== $load_featured || $featured_disp_detail !== $disp_detail )
 	{	// Reset a featured list if previous request was to load another type:
 		$FeaturedList = NULL;
 	}
 
 	// Save current list type in global var:
 	$featured_list_type = $load_featured;
+	// Save current disp detail in global var, but decide 'posts-topcat-intro' and 'posts-topcat-nointro' same as 'posts-topcat' and etc. for other disp details like 'posts-subcat':
+	$featured_disp_detail = preg_replace( '#(-intro|-nointro)$#', '', $disp_detail );
 
 	if( !isset( $FeaturedList ) )
 	{	// Don't repeat if we've done this already -- Initialize the featured list only first time this function is called in a skin:
@@ -362,7 +367,7 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 			else
 			{	// We are on a filtered... it means a category page or sth like this...
 				// echo $disp_detail;
-				switch( $disp_detail )
+				switch( $featured_disp_detail )
 				{
 					case 'posts-cat':
 					case 'posts-topcat':
@@ -446,11 +451,12 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
  *                 "*": all blogs
  *                 "1,2,3":blog IDs separated by comma
  *                 "-": current blog only and exclude the aggregated blogs
+ * @param string Check for featured items
  * @return boolean
  */
-function has_featured_item( $restrict_disp = 'posts', $coll_IDs = NULL )
+function has_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $check_featured = false )
 {
-	return (boolean)get_featured_Item( $restrict_disp, $coll_IDs, true );
+	return (boolean)get_featured_Item( $restrict_disp, $coll_IDs, true, $check_featured );
 }
 
 
@@ -2355,6 +2361,57 @@ function get_item_status_buttons( $edited_Item, $button_action = NULL, $button_c
 
 
 /**
+ * Get html code of buttons to mass update posts' categories
+ *
+ * @param string Button class
+ * @return string
+ */
+function get_mass_change_cat_buttons( $button_class = '' )
+{
+	$r = '<input type="hidden" name="" value="" />';
+	$r .= '<div class="btn-group dropup post_cat_dropdown" data-container="body">';
+	$r .= '<button type="submit" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray[mass_change_main_cat]" id="mass_change_main_cat">'
+				.'<span>'.T_('Change primary category').'</span>'
+			.'</button>';
+	$r .= '<button type="button" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id=post_cat_dropdown">'
+				.'<span class="caret"></span>'
+			.'</button>';
+	$r .= '<ul class="dropdown-menu" role="menu" aria-labelledby="post_cat_dropdown">'
+				.'<li rel="" role="presentation"><a href="#" id="mass_add_extra_cat" role="menuitem" tabindex="-1">'.T_('Add secondary category').'</a></li>'
+				.'<li rel="" role="presentation"><a href="#" id="mass_remove_extra_cat" role="menuitem" tabindex="-1">'.T_('Remove secondary category').'</a></li>'
+			.'</ul>';
+	$r .= '</div>';
+
+	return $r;
+}
+
+
+/**
+ * Get html code of buttons to mass update posts' renderers
+ *
+ * @param string Button class
+ * @return string
+ */
+function get_mass_change_renderer_buttons( $button_class = '' )
+{
+	$r = '<input type="hidden" name="" value="" />';
+	$r .= '<div class="btn-group dropup post_renderer_dropdown" data-container="body">';
+	$r .= '<button type="submit" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray[mass_add_renderer]" id="mass_add_renderer">'
+				.'<span>'.T_('Add text renderer').'</span>'
+			.'</button>';
+	$r .= '<button type="button" class="btn btn-default'.( empty( $button_class ) ? '' : ' '.$button_class ).'" dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id=post_renderer_dropdown">'
+				.'<span class="caret"></span>'
+			.'</button>';
+	$r .= '<ul class="dropdown-menu" role="menu" aria-labelledby="post_renderer_dropdown">'
+				.'<li rel="" role="presentation"><a href="#" id="mass_remove_renderer" role="menuitem" tabindex="-1">'.T_('Remove text renderer').'</a></li>'
+			.'</ul>';
+	$r .= '</div>';
+
+	return $r;
+}
+
+
+/**
  * Output JavaScript code for "Add/Link files" link
  *
  * This is a part of the process that makes it smoother to "Save & start attaching files".
@@ -3257,8 +3314,8 @@ function echo_item_mass_change_cat_js()
 <script>
 jQuery( document ).ready( function ()
 {
-	jQuery( '#mass_change_main_cat, #mass_add_extra_cat' ).click( function()
-	{
+	jQuery( '#mass_change_main_cat, #mass_add_extra_cat, #mass_remove_extra_cat' ).click( function()
+	{	
 		var selected_items = new Array();
 		jQuery( 'input[name="selected_items\[\]"]:checked' ).each( function()
 		{
@@ -3271,9 +3328,29 @@ jQuery( document ).ready( function ()
 			return false;
 		}
 
-		var is_main_cat_mode = ( jQuery( this ).prop( 'id' ) == 'mass_change_main_cat' );
+		var evo_js_lang_mass_change_item_category, cat_type;
 
-		var evo_js_lang_mass_change_item_category = ( is_main_cat_mode ? '<?php echo TS_('Change primary category'); ?>' : '<?php echo TS_('Add secondary category'); ?>' );
+		switch( jQuery( this ).prop( 'id' ) )
+		{
+			case 'mass_change_main_cat':
+				evo_js_lang_mass_change_item_category = '<?php echo TS_('Change primary category'); ?>';
+				cat_type = 'main';
+				break;
+
+			case 'mass_add_extra_cat':
+				evo_js_lang_mass_change_item_category = '<?php echo TS_('Add secondary category'); ?>';
+				cat_type = 'extra';
+				break;
+
+			case 'mass_remove_extra_cat':
+				evo_js_lang_mass_change_item_category = '<?php echo TS_('Remove secondary category'); ?>';
+				cat_type = 'remove_extra';
+				break;
+
+			default:
+				return false;
+		}
+
 		evo_js_lang_close = '<?php echo TS_('Cancel'); ?>';
 
 		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo format_to_output( TS_('Loading'), 'htmlattr' ); ?>"></span>',
@@ -3286,7 +3363,7 @@ jQuery( document ).ready( function ()
 			{
 				'action': 'get_item_mass_change_cat_form',
 				'blog': '<?php echo $blog; ?>',
-				'cat_type': ( is_main_cat_mode ? 'main' : 'extra' ),
+				'cat_type': cat_type,
 				'selected_items': selected_items,
 				'tab': '<?php echo get_param( 'tab' ); ?>',
 				'tab_type': '<?php echo get_param( 'tab_type' ); ?>',
@@ -3296,6 +3373,66 @@ jQuery( document ).ready( function ()
 			{
 				result = ajax_debug_clear( result );
 				openModalWindow( result, '600px', 'auto', true, evo_js_lang_mass_change_item_category, evo_js_lang_mass_change_item_category );
+			}
+		} );
+		return false;
+	} );
+
+
+	jQuery( '#mass_add_renderer, #mass_remove_renderer' ).click( function()
+	{	
+		var selected_items = new Array();
+		jQuery( 'input[name="selected_items\[\]"]:checked' ).each( function()
+		{
+			selected_items.push( jQuery( this ).val() );
+		} );
+
+		if( selected_items.length == 0 )
+		{	// Don't try to load a form to change a category if no selected items:
+			alert( '<?php echo TS_('Please select at least one item.'); ?>' );
+			return false;
+		}
+
+		var evo_js_lang_mass_change_item_renderer, renderer_change_type;
+
+		switch( jQuery( this ).prop( 'id' ) )
+		{
+			case 'mass_add_renderer':
+				evo_js_lang_mass_change_item_renderer = '<?php echo TS_('Add text renderer'); ?>';
+				renderer_change_type = 'add_renderer';
+				break;
+
+			case 'mass_remove_renderer':
+				evo_js_lang_mass_change_item_renderer = '<?php echo TS_('Remove text renderer'); ?>';
+				renderer_change_type = 'remove_renderer';
+				break;
+
+			default:
+				return false;
+		}
+
+		evo_js_lang_close = '<?php echo TS_('Cancel'); ?>';
+
+		openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo format_to_output( TS_('Loading'), 'htmlattr' ); ?>"></span>',
+			'600px', 'auto', true, evo_js_lang_mass_change_item_renderer + ' <?php echo get_manual_link( 'post-language-versions#add-version' ); ?>', evo_js_lang_mass_change_item_renderer, true );
+		jQuery.ajax(
+		{
+			type: 'POST',
+			url: '<?php echo get_htsrv_url(); ?>async.php',
+			data:
+			{
+				'action': 'get_item_mass_change_renderer_form',
+				'blog': '<?php echo $blog; ?>',
+				'renderer_change_type': renderer_change_type,
+				'selected_items': selected_items,
+				'tab': '<?php echo get_param( 'tab' ); ?>',
+				'tab_type': '<?php echo get_param( 'tab_type' ); ?>',
+				'page': '<?php echo param( 'items_'.get_param( 'tab' ).'_paged', 'integer', 1 ); ?>',
+			},
+			success: function(result)
+			{
+				result = ajax_debug_clear( result );
+				openModalWindow( result, '600px', 'auto', true, evo_js_lang_mass_change_item_renderer, evo_js_lang_mass_change_item_renderer );
 			}
 		} );
 		return false;
@@ -5830,13 +5967,13 @@ function items_results( & $items_Results, $params = array() )
 					'type' => 'text',
 					'text' => get_item_status_buttons( NULL, 'items_visibility', 'btn-xs' ),
 				),
-			'mass_change_main_cat' => array(
-					'type' => 'button',
-					'text' => T_('Change primary category'),
+			'mass_change_cat' => array(
+					'type' => 'text',
+					'text' => get_mass_change_cat_buttons( 'btn-xs' ),
 				),
-			'mass_add_extra_cat' => array(
-					'type' => 'button',
-					'text' => T_('Add secondary category'),
+			'mass_change_renderer' => array(
+					'type' => 'text',
+					'text' => get_mass_change_renderer_buttons( 'btn-xs' ),
 				),
 			);
 		if( is_pro() && is_logged_in() && $current_User->check_perm( 'options', 'edit' ) )

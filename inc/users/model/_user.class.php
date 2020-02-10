@@ -2071,12 +2071,13 @@ class User extends DataObject
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'link_text'      => 'avatar_name', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_text'      => 'avatar_name', // auto| avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
+				'link_class'     => '', // Class for <a href=""
 				'thumb_size'     => 'crop-top-15x15',
 				'thumb_class'    => 'avatar_before_login',
 				'thumb_zoomable' => false,
-				'login_mask'     => '', // example: 'text $login$ text'
-				'login_class'    => 'identity_link_username',  // No used if login_mask is used
+				'login_mask'     => '', // example: 'text $login$ text'  TODO: replace with template
+				'login_class'    => 'identity_link_username',  // Not used if login_mask is used
 				'display_bubbletip' => true,
 				'nowrap'         => true,
 				'user_tab'       => 'profile',
@@ -2105,72 +2106,73 @@ class User extends DataObject
 			}
 		}
 
-		$link_login = '';
-		$class = empty( $params['link_class'] ) ? '' : $params['link_class'];
+		$linktext = '';
+		$class = $params['link_class'];
+
 		if( $params['link_text'] != 'only_avatar' )
 		{ // Display a login, nickname, firstname, lastname, fullname or preferredname
 			switch( $params['link_text'] )
 			{
+				case 'auto':		// TODO this should be the real auto
 				case 'login':
-				case 'avatar_login':
-					$link_login = $this->get_username();
+				case 'avatar_login': 
+					$linktext = $this->get_username();  // TODO: auto has been hardcoded into this ! :(
 					break;
-				case 'force_login':
+				case 'force_login':		// TODO: we should NOT need a "force" if we correctly use auto the rest of the time!
 				case 'avatar_force_login':
-					$link_login = $this->get( 'login' );
+					$linktext = $this->get( 'login' );
 					break;
 				case 'nickname':
-					$link_login = $this->nickname;
+					$linktext = $this->nickname;
 					break;
 				case 'firstname':
-					$link_login = $this->firstname;
+					$linktext = $this->firstname;
 					break;
 				case 'lastname':
-					$link_login = $this->lastname;
+					$linktext = $this->lastname;
 					break;
 				case 'fullname':
-					$link_login = $this->firstname.' '.$this->lastname;
+					$linktext = $this->firstname.' '.$this->lastname;
 					break;
 				case 'preferredname':
-					$link_login = $this->get_preferred_name();
-					break;
-				case 'auto':
-					$link_login = $this->get_username();
+					$linktext = $this->get_preferred_name();
 					break;
 				// default: 'avatar_name' | 'avatar' | 'name'
 			}
-			$link_login = trim( $link_login );
-			if( empty( $link_login ) )
+			$linktext = trim( $linktext );
+			if( empty( $linktext ) )
 			{ // Use a login or preferred name by default
-				$link_login = $this->get_username();
+				$linktext = $this->get_username();
 			}
+
 			// Add class "login" to detect logins by js plugins
-			$class .= ( $link_login == $this->login ? ' login' : '' );
+			$class .= ( $linktext == $this->login ? ' login' : '' );
+			
 			if( !empty($params['login_mask']) )
 			{ // Apply login mask
-				$link_login = str_replace( '$login$', $link_login, $params['login_mask'] );
+				$linktext = str_replace( '$login$', $linktext, $params['login_mask'] );
 			}
 			elseif( !empty($params['login_class']) )
 			{
-				$link_login = '<span class="'.$params['login_class'].'">'.$link_login.'</span>';
+				$linktext = '<span class="'.$params['login_class'].'">'.$linktext.'</span>';
 			}
-		}
+		} // END Not for "only avatar"
 
 		$gender_class = $this->get_gender_class();
 		$attr_style = '';
 		if( $params['use_style'] )
-		{ // Use "style"
+		{ // Use "style" (e-g email template)
 			$attr_style = emailskin_style( '.user+.'.str_replace( ' ', '.', $gender_class ) );
 		}
 		$attr_style = ' class="'.trim( $class.' '.$gender_class.( $params['nowrap'] ? ' nowrap' : '' ) ).'"'.$attr_style;
 
 		if( empty( $identity_url ) )
 		{
-			return '<span'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$link_login.'</span>';
+			return '<span'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$linktext.'</span>';
 		}
 
 		$link_title = T_( 'Show the user profile' );
-		return '<a href="'.$identity_url.'" title="'.$link_title.'"'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$link_login.'</a>';
+		return '<a href="'.$identity_url.'" title="'.$link_title.'"'.$attr_style.$attr_bubbletip.'>'.$avatar_tag.$linktext.'</a>';
 	}
 
 

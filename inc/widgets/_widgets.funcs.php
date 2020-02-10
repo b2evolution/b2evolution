@@ -92,16 +92,16 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['item_in_list'] = array(
 		array( 10, 'item_title' ),
 		array( 20, 'item_visibility_badge', 'coll_type' => '-manual' ),
-		array( 30, 'item_info_line', 'coll_type' => '-manual' ),
+		array( 30, 'item_info_line', 'coll_type' => '-manual', 'unique' => true ),
 		array( 40, 'item_content', 'unique' => true ),
-		array( 50, 'item_footer' ),
+		array( 50, 'item_info_line', 'coll_type' => '-manual,forum', 'params' => array( 'template' => 'item_details_feedback_link' ) ),
 	);
 
 	/* Item Single Header */
 	$default_widgets['item_single_header'] = array(
 		array(  4, 'item_next_previous', 'coll_type' => '-manual,minisite' ),
 		array(  5, 'item_title' ),
-		array( 10, 'item_info_line', 'coll_type' => 'forum,group', 'params' => 'a:14:{s:5:"title";s:0:"";s:9:"flag_icon";i:1;s:14:"permalink_icon";i:0;s:13:"before_author";s:10:"started_by";s:11:"date_format";s:8:"extended";s:9:"post_time";i:1;s:12:"last_touched";i:1;s:8:"category";i:0;s:9:"edit_link";i:0;s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;s:11:"time_format";s:4:"none";s:12:"display_date";s:12:"date_created";}' ),
+		array( 10, 'item_info_line', 'coll_type' => 'forum,group', 'params' => array( 'template' => 'item_details_infoline_forums' ) ),
 		array( 20, 'item_tags', 'coll_type' => 'forum,group' ),
 		array( 30, 'item_seen_by', 'coll_type' => 'forum,group' ),
 		array(  8, 'item_visibility_badge', 'coll_type' => '-manual,forum,group' ),
@@ -120,11 +120,10 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 20, 'item_tags', 'coll_type' => '-forum,group,manual', 'coll_ID' => '-'.$blog_a_ID.','.$events_blog_ID ),
 		array( 25, 'item_about_author', 'coll_ID' => $blog_b_ID ),
 		array( 30, 'evo_Gmaps', 'coll_ID' => $blog_a_ID.','.$events_blog_ID, 'type' => 'plugin', 'install' => $install_test_features ),
-		array( 40, 'item_small_print', 'coll_ID' => $blog_a_ID, 'params' => array( 'format' => 'standard' ) ),
-		array( 40, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'format' => 'revision' ) ),
+		array( 40, 'item_small_print', 'coll_ID' => $blog_a_ID, 'params' => array( 'template' => 'item_details_smallprint_standard' ) ),
+		array( 40, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'template' => 'item_details_revisions' ) ),
 		array( 50, 'item_seen_by', 'coll_type' => '-forum,group,manual' ),
 		array( 60, 'item_vote', 'coll_type' => '-forum,group,manual' ),
-		array( 70, 'item_footer' ),
 	);
 
 	/* Item Page */
@@ -133,7 +132,6 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 15, 'item_attachments' ),
 		array( 50, 'item_seen_by' ),
 		array( 60, 'item_vote', 'coll_type' => '-forum,group' ),
-		array( 70, 'item_footer' ),
 	);
 
 	/* Comment List */

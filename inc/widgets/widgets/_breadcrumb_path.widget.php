@@ -67,6 +67,13 @@ class breadcrumb_path_Widget extends ComponentWidget
 				),
 			), parent::get_param_definitions( $params ) );
 
+		if( isset( $r['allow_blockcache'] ) )
+		{	// Disable "allow blockcache" because this widget uses the selected items:
+			$r['allow_blockcache']['defaultvalue'] = false;
+			$r['allow_blockcache']['disabled'] = 'disabled';
+			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
+		}
+
 		return $r;
 	}
 
@@ -144,6 +151,9 @@ class breadcrumb_path_Widget extends ComponentWidget
 				);
 		}
 
+		// Use current category:
+		$chapter_ID = $cat;
+
 		if( ! empty( $disp ) && $disp == 'single' )
 		{ // Include current post
 			global $Item;
@@ -154,16 +164,18 @@ class breadcrumb_path_Widget extends ComponentWidget
 						// Don't get an item url because we don't use a link for last crumb
 						//'url'   => $Item->get_permanent_url(),
 					);
+				if( empty( $chapter_ID ) )
+				{	// Use main category of the current Item:
+					$chapter_ID = $Item->get( 'main_cat_ID' );
+				}
 			}
 		}
 
-		if( ! empty( $cat ) )
+		if( ! empty( $chapter_ID ) )
 		{ // Include full path of the selected chapter
 			$ChapterCache = & get_ChapterCache();
-
-			$chapter_ID = $cat;
 			do
-			{ // Get all parent chapters
+			{	// Get all parent chapters:
 				if( $Chapter = & $ChapterCache->get_by_ID( $chapter_ID, false ) )
 				{
 					$breadcrumbs[] = array(

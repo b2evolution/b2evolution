@@ -89,12 +89,28 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $current_User, $admin_url;
+
+		// Get available templates:
+		$TemplateCache = & get_TemplateCache();
+		$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
+		$template_options = array( NULL => T_('No template') ) + $TemplateCache->get_code_option_array();
+		$template_input_suffix = ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+			.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_( 'Title' ),
 					'size' => 40,
 					'note' => T_( 'This is the title to display' ),
 					'defaultvalue' => '',
+				),
+				'template' => array(
+					'label' => T_('Template'),
+					'type' => 'select',
+					'options' => $template_options,
+					'defaultvalue' => 'content_list',
+					'input_suffix' => $template_input_suffix,
 				),
 			), parent::get_param_definitions( $params ) );
 
@@ -121,21 +137,48 @@ class cat_content_list_Widget extends ComponentWidget
 			return false;
 		}
 
+		// Set params from quick template:
+		$rendered_content = render_template_code( $this->disp_params['template'], $params );
+
+		$TemplateCache = & get_TemplateCache();
+
+		if( ! empty( $params['subcat_template'] ) &&
+		    ! ( $cat_Template = & $TemplateCache->get_by_code( $params['subcat_template'], false, false ) ) )
+		{	// Display error when no or wrong template for listing a category:
+			$this->display_error_message( sprintf( 'Template is not found: %s for listing a category', '<code>'.$params['subcat_template'].'</code>' ) );
+			return false;
+		}
+
+		if( ! empty( $params['item_template'] ) &&
+		    ! ( $item_Template = & $TemplateCache->get_by_code( $params['item_template'], false, false ) ) )
+		{	// Display error when no or wrong template for listing a category:
+			$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$params['item_template'].'</code>' ) );
+			return false;
+		}
+
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
+
+		// Print out text if it was found in the template:
+		echo trim( $rendered_content );
+
+		// Display subcategories and posts:
+		if( isset( $params['before_list'] ) )
+		{
+			echo $params['before_list'];
+		}
 
 		$callbacks = array(
 			'line'  => array( $this, 'cat_inskin_display' ),
 			'posts' => array( $this, 'item_inskin_display' ),
 		);
-
-		// Display subcategories and posts
-		echo '<ul class="chapters_list posts_list">';
-
 		$ChapterCache->iterate_through_category_children( $curr_Chapter, $callbacks, false, array_merge( $params, array( 'sorted' => true ) ) );
 
-		echo '</ul>';
+		if( isset( $params['after_list'] ) )
+		{
+			echo $params['after_list'];
+		}
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];
@@ -169,138 +212,38 @@ class cat_content_list_Widget extends ComponentWidget
 	 * @param integer Level
 	 * @param array Params
 	 */
-	function cat_inskin_display( $Chapter, $level, $params = array() )
+	function cat_inskin_display( $param_Chapter, $level, $params = array() )
 	{
-		// Default params:
-		$params = array_merge( array(
-				'before_cat'         => '<li class="chapter">',
-				'after_cat'          => '</li>',
-				'before_cat_title'   => '<h3>',
-				'after_cat_title'    => '</h3>',
-				'before_cat_content' => '<div>',
-				'after_cat_content'  => '</div>',
-			), $params );
-
-		if( ! empty( $Chapter ) )
-		{	// Display chapter:
-			echo $params['before_cat'];
-
-			echo $params['before_cat_title']
-				.'<a href="'.$Chapter->get_permanent_url().'" class="link">'.get_icon( 'expand' ).$Chapter->dget( 'name' ).'</a>'
-				.$params['after_cat_title'];
-
-			if( $Chapter->dget( 'description' ) != '' )
-			{	// Display chapter description:
-				echo $params['before_cat_content']
-					.$Chapter->dget( 'description' )
-					.$params['after_cat_content'];
-			}
-
-			echo $params['after_cat'];
+		if( empty( $params['subcat_template'] ) )
+		{	// No template is provided for listing a category:
+			return;
 		}
+
+		// Render Chapter by quick template:
+		echo render_template_code( $params['subcat_template'], $params, array( 'Chapter' => $param_Chapter ) );
 	}
 
 
 	/**
 	 * In-skin display of an Item.
-	 * It is a wrapper around the skin '_item_list.inc.php' file.
 	 *
 	 * @param object Item
 	 */
 	function item_inskin_display( $param_Item, $level, $params = array() )
 	{
-		global $cat, $Item;
-
-		// Set global $Item for widgets in container "Item in List":
-		$Item = $param_Item;
-
-		// Default params:
-		$params = array_merge( array(
-				'post_navigation'   => 'same_category', // Always navigate through category in this skin
-				'before_item'       => '<li>',
-				'after_item'        => '</li>',
-				'before_content'    => '<div class="excerpt">',
-				'after_content'     => '</div>',
-				// Params with mask values: $item_icon$, $flag_icon$, $item_status$, $read_status$, $link_view_changes$
-				'before_title'      => '<h3>',
-				'after_title'       => ( isset( $cat ) && ( $cat != $Item->main_cat_ID ) ? '</h3>' : '$flag_icon$</h3>$item_status$' ),
-				'before_title_text' => '$item_icon$',
-				'after_title_text'  => '',
-			), $params );
-
-		// Replace masks with values in params:
-		$mask_params = array( 'before_title', 'after_title', 'before_title_text', 'after_title_text' );
-		$mask_values = array();
-		foreach( $mask_params as $mask_param )
-		{
-			if( strpos( $params[ $mask_param ], '$flag_icon$' ) !== false && ! isset( $mask_values['$flag_icon$'] ) )
-			{	// Flag icon:
-				$mask_values['$flag_icon$'] = $Item->get_flag( array(
-						'before'       => ' ',
-						'only_flagged' => true,
-						'allow_toggle' => false,
-					) );
-			}
-			if( strpos( $params[ $mask_param ], '$item_icon$' ) !== false && ! isset( $mask_values['$item_icon$'] ) )
-			{	// Item icon:
-				$mask_values['$item_icon$'] = get_icon( 'file_message' );
-			}
-			if( strpos( $params[ $mask_param ], '$item_status$' ) !== false && ! isset( $mask_values['$item_status$'] ) )
-			{	// Status(only not published):
-				$mask_values['$item_status$'] = $Item->status == 'published' ? '' : $Item->get_format_status( array(
-						'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-					) );
-			}
-			if( strpos( $params[ $mask_param ], '$read_status$' ) !== false && ! isset( $mask_values['$read_status$'] ) )
-			{	// Read status(New/Updated/Read):
-				$mask_values['$read_status$'] = $Item->get_unread_status( array(
-						'style'  => 'text',
-						'before' => '<span class="evo_post_read_status">',
-						'after'  => '</span>'
-					) );
-			}
-			if( strpos( $params[ $mask_param ], '$link_view_changes$' ) !== false && ! isset( $mask_values['$link_view_changes$'] ) )
-			{	// Link to view changes:
-				$mask_values['$link_view_changes$'] = $Item->get_changes_link( array(
-						'class' => button_class( 'text' ),
-					) );
-			}
-			$params[ $mask_param ] = str_replace( array_keys( $mask_values ), $mask_values, $params[ $mask_param ] );
+		if( empty( $params['item_template'] ) )
+		{	// No template is provided for listing an item:
+			return;
 		}
 
-		echo $params['before_item'];
+		$template_params = array_merge( $params, array(
+				'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
+				'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
+				'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
+			) );
 
-		// ------------------------- "Item in List" CONTAINER EMBEDDED HERE --------------------------
-		// Display container contents:
-		widget_container( 'item_in_list', array(
-			'widget_context' => 'item',	// Signal that we are displaying within an Item
-			// The following (optional) params will be used as defaults for widgets included in this container:
-			'container_display_if_empty' => false, // If no widget, don't display container at all
-			// This will enclose each widget in a block:
-			'block_start' => '<div class="evo_widget $wi_class$">',
-			'block_end' => '</div>',
-			// This will enclose the title of each widget:
-			'block_title_start' => '<h3>',
-			'block_title_end' => '</h3>',
-
-			// Controlling the title:
-			'widget_item_title_params'  => array(
-				'before'          => $params['before_title'],
-				'after'           => $params['after_title'],
-				'before_title'    => $params['before_title_text'],
-				'after_title'     => $params['after_title_text'],
-				'post_navigation' => $params['post_navigation'],
-				'link_class'      => 'link',
-			),
-			// Item Visibility Badge widget template
-			'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
-			'widget_item_visibility_badge_params'  => array(
-					'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-				),
-		) );
-		// ----------------------------- END OF "Item in List" CONTAINER -----------------------------
-
-		echo $params['after_item'];
+		// Render Item by quick template:
+		echo render_template_code( $params['item_template'], $template_params, array( 'Item' => $param_Item ) );
 	}
 }
 

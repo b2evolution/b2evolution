@@ -21,6 +21,7 @@ global $more;
 $params = array_merge( array(
 		'content_mode'             => 'auto', // Can be 'excerpt', 'normal' or 'full'. 'auto' will auto select depending on backoffice SEO settings for $disp-detail
 		'intro_mode'               => 'normal', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
+													// TODO: Why do we need an extra param 'intro_mode'=> 'normal'  . Why can this not be part of 'content_mode'   == 'auto' ?
 		'force_more'               => false, // This will be set to true id 'content_mode' resolves to 'full'.
 
 		'content_display_full'     => true, // Do we want to display all post content? false to display only images/attachments
@@ -50,7 +51,7 @@ $params = array_merge( array(
 
 		// For teaser images:
 		'display_teaser_images'    => true,
-		'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images.
+		'include_cover_images'     => false, // Set to true if you want cover images to appear with teaser images. This was implemented for the Reporter skin and should be removed at some point
 		// For image blocks like Teaser, After-More:
 		'before_images'            => '<div class="evo_post_images">',
 		'after_images'             => '</div>',
@@ -165,10 +166,12 @@ if( $content_mode == 'auto' )
 
 if( $params['include_cover_images'] )
 { // Include the cover images on teaser place
+// TODO: synonym for '#cover_and_teaser_all'
 	$teaser_image_positions = 'cover,teaser,teaserperm,teaserlink';
 }
 else
 { // Don't include the cover images
+// TODO: synonym for '#teaser_all'
 	$teaser_image_positions = 'teaser,teaserperm,teaserlink';
 }
 

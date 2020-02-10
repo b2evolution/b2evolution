@@ -929,9 +929,25 @@ switch( $action )
 					// Don't lose current extra categories:
 					$selected_Item->set( 'extra_cat_IDs', $current_extra_categories );
 				}
-				else
+				elseif( $cat_type == 'extra' )
 				{	// Add extra categories to previous linked categories:
 					$selected_Item->set( 'extra_cat_IDs', array_unique( array_merge( $current_extra_categories, $extra_categories ) ) );
+				}
+				elseif( $cat_type == 'remove_extra' )
+				{	// Remove extra categories from previous linked categories except if an extra category is also the primary category:
+					$main_cat_ID = $selected_Item->get( 'main_cat_ID' );
+					$remove_extra_categories = $extra_categories;
+					if( ( $key = array_search( $main_cat_ID, $remove_extra_categories ) ) !== false )
+					{
+						unset( $remove_extra_categories[$key] );
+					}
+					
+					if( empty( $remove_extra_categories ) )
+					{	// Nothing to remove, skip to next Item:
+						continue;
+					}
+
+					$selected_Item->set( 'extra_cat_IDs', array_diff( $current_extra_categories, $remove_extra_categories ) );
 				}
 				if( $selected_Item->dbupdate() )
 				{	// If the item has been updated to the requested categories:
@@ -954,7 +970,7 @@ switch( $action )
 				$Messages->add( sprintf( T_('Main category of %d items could not be changed to %s.'), $items_failed, '"'.$main_Chapter->get( 'name' ).'"' ), 'error' );
 			}
 		}
-		else
+		elseif( $cat_type == 'extra' )
 		{	// Report about added extra categories:
 			$extra_cats_names = array();
 			foreach( $extra_categories as $extra_cat_ID )
@@ -971,6 +987,142 @@ switch( $action )
 			if( $items_failed )
 			{	// Inform about failed updates:
 				$Messages->add( sprintf( T_('Extra categories %s of %d items could not be added.'), implode( ', ', $extra_cats_names ), $items_failed ), 'error' );
+			}
+		}
+		elseif( $cat_type == 'remove_extra' )
+		{	// Report about removed extra categories:
+			$extra_cats_names = array();
+			foreach( $extra_categories as $extra_cat_ID )
+			{
+				if( $extra_Chapter = & $ChapterCache->get_by_ID( $extra_cat_ID, false, false ) )
+				{
+					$extra_cats_names[] = '"'.$extra_Chapter->get( 'name' ).'"';
+				}
+			}
+			if( $items_success )
+			{	// Inform about success updates:
+				$Messages->add( sprintf( T_('Extra categories %s of %d items have been removed.'), implode( ', ', $extra_cats_names ), $items_success ), 'success' );
+			}
+			if( $items_failed )
+			{	// Inform about failed updates:
+				$Messages->add( sprintf( T_('Extra categories %s of %d items could not be removed.'), implode( ', ', $extra_cats_names ), $items_failed ), 'error' );
+			}
+		}
+
+		// REDIRECT / EXIT:
+		header_redirect( $redirect_to );
+		break;
+
+	case 'mass_change_renderer':
+		// Mass change renderers of selected items:
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'items' );
+
+		$selected_items = param( 'selected_items', 'array:integer' );
+		$page = param( 'page', 'integer', 1 );
+		$tab = param( 'tab', 'string', 'type' );
+		$tab_type = param( 'tab_type', 'string', '' );
+		$renderer_change_type = param( 'renderer_change_type', 'string' );
+
+		// Set an URL to redirect to items list after this action:
+		$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab='.$tab.( $page > 1 ? '&items_'.$tab.'_paged='.$page : '' );
+		if( $tab == 'type' && ! empty( $tab_type ) )
+		{
+			$redirect_to .= '&tab_type='.$tab_type;
+		}
+
+		if( empty( $selected_items ) )
+		{	// If no items selected:
+			$Messages->add( T_('Please select at least one item.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		// Get the selected renderers:
+		$renderers = param( 'renderers', 'array:string' );
+
+		if( empty( $renderers ) )
+		{	// If no categories selected:
+			$Messages->add( T_('Please select a renderer.'), 'error' );
+			// REDIRECT / EXIT:
+			header_redirect( $redirect_to );
+		}
+
+		$ItemCache = & get_ItemCache();
+		$items_success = 0;
+		$items_failed = 0;
+		foreach( $selected_items as $selected_item_ID )
+		{
+			if( ( $selected_Item = & $ItemCache->get_by_ID( $selected_item_ID, false, false ) ) &&
+			    $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $selected_Item ) )
+			{	// If current User has a permission to edit the selected Item:
+				if( $renderer_change_type == 'add_renderer' )
+				{
+					foreach( $renderers as $renderer )
+					{
+						$selected_Item->add_renderer( $renderer );
+					}
+				}
+				elseif( $renderer_change_type == 'remove_renderer' )
+				{
+					foreach( $renderers as $renderer )
+					{
+						$selected_Item->remove_renderer( $renderer );
+					}
+				}
+
+				// In any case, remove 'default' renderer:
+				$selected_Item->remove_renderer( 'default' );
+				
+				if( $selected_Item->dbupdate() )
+				{	// If the item has been updated with the requested renderers:
+					$items_success++;
+					continue;
+				}
+			}
+			// Wrong item or current User has no perm to edit the selected item:
+			$items_failed++;
+		}
+
+		global $Plugins;
+
+		if( $renderer_change_type == 'add_renderer' )
+		{	// Report about added renderers:
+			$renderer_names = array();
+			foreach( $renderers as $code )
+			{
+				if( $renderer_Plugin = & $Plugins->get_by_code( $code	) )
+				{
+					$renderer_names[] = '"'.$renderer_Plugin->name.'"';
+				}
+			}
+			if( $items_success )
+			{	// Inform about success updates:
+				$Messages->add( sprintf( T_('Renderers %s of %d items have been added.'), implode( ', ', $renderer_names ), $items_success ), 'success' );
+			}
+			if( $items_failed )
+			{	// Inform about failed updates:
+				$Messages->add( sprintf( T_('Renderers %s of %d items could not be added.'), implode( ', ', $renderer_names ), $items_failed ), 'error' );
+			}
+		}
+		elseif( $renderer_change_type == 'remove_renderer' )
+		{	// Report about removed extra categories:
+			$renderer_names = array();
+			foreach( $renderers as $code )
+			{
+				if( $renderer_Plugin = & $Plugins->get_by_code( $code ) )
+				{
+					$renderer_names[] = '"'.$renderer_Plugin->name.'"';
+				}
+			}
+			if( $items_success )
+			{	// Inform about success updates:
+				$Messages->add( sprintf( T_('Renderers %s of %d items have been removed.'), implode( ', ', $renderer_names ), $items_success ), 'success' );
+			}
+			if( $items_failed )
+			{	// Inform about failed updates:
+				$Messages->add( sprintf( T_('Renderers %s of %d items could not be removed.'), implode( ', ', $renderer_names ), $items_failed ), 'error' );
 			}
 		}
 

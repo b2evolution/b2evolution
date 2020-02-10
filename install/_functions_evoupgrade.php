@@ -11960,10 +11960,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			PRIMARY KEY (tpl_ID),
 			UNIQUE tpl_code( tpl_code )' );
 
+		/* fp> removed because unnecessary: this would be overwritten later anyways
 		// Create default templates:
 		$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_template_code ) VALUES
-				( "Item Info: Posted by Author on Date in Categories", "iteminfo_short", "Posted by $author$ on $issue_date$ in $categories$" ),
-				( "Item Info: Long info line", "iteminfo_long", "$flag_icon$ $permalink_icon$ Posted by $author$ $issue_date$ $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$" )' );
+				( "Item Info: Posted by Author on Date in Categories", "iteminfo_short", "Posted by $author$ on $issue_time$ in $categories$" ),
+				( "Item Info: Long info line", "iteminfo_long", "$flag_icon$ $permalink_icon$ Posted by $author$ $issue_time$ $categories$ — Last touched: $last_touched$ — Last Updated: $last_updated$ $edit_link$" )' );
+		*/
 
 		upg_task_end();
 	}
@@ -11979,9 +11981,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 	if( upg_task_start( 15720, 'Installing new widgets/containers...' ) )
 	{	// part of 7.0.0-alpha
-		install_new_default_widgets( 'item_in_list', 'item_content,item_footer' );
-		install_new_default_widgets( 'item_single', 'item_footer' );
-		install_new_default_widgets( 'item_page', 'item_footer' );
+		install_new_default_widgets( 'item_in_list', 'item_content' );
 		upg_task_end();
 	}
 
@@ -12000,6 +12000,151 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_modify_col( 'T_comments__prerendering', 'cmpr_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
 		db_modify_col( 'T_messaging__message', 'msg_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
 		db_modify_col( 'T_messaging__prerendering', 'mspr_renderers', 'VARCHAR(4000) COLLATE ascii_general_ci NOT NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15751, 'Creating new default templates...' ) )
+	{	// part of 7.0.0-alpha
+
+		// Delete the following existing default templates, they'll be recreated at the next block:
+		$template_codes = array( 'iteminfo_long', 'iteminfo_short' );
+		$DB->query( 'DELETE FROM T_templates WHERE tpl_code IN ('.$DB->quote( $template_codes ).')' );
+
+		// Create default templates what were not created before yet:
+		require_once dirname(__FILE__).'/_functions_create.php';
+		create_default_templates( false );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15760, 'Updating item footer...' ) )
+	{	// part of 7.0.0-alpha
+		// Create default templates what were not created before yet:
+		require_once dirname(__FILE__).'/_functions_create.php';
+		create_default_templates( false );
+
+		// Delete widget "Item Footer":
+		$DB->query( 'DELETE FROM T_widget__widget
+			WHERE wi_code = "item_footer"' );
+
+		// Install widget "Info Line" with Template: "Item Details: Comment Link":
+		install_new_default_widgets( 'item_in_list', 'item_info_line' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15770, 'Updating widget "Small Print"...' ) )
+	{	// part of 7.0.0-alpha
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "item_small_print"' );
+		$widgets = $DB->get_assoc( $SQL );
+
+		foreach( $widgets as $widget_ID => $widget_params )
+		{
+			$widget_params = ( empty( $widget_params ) ? array() : unserialize( $widget_params ) );
+			if( isset( $widget_params['format'] ) &&
+			    $widget_params['format'] == 'revision' )
+			{	// Convert "Format / Revisions" to Template "Item Details: Small Print: Revisions":
+				$widget_params['template'] = 'item_details_revisions';
+			}
+			else
+			{	// Convert "Format / Blog standard" to Template "Item Details: Small Print: Standard":
+				$widget_params['template'] = 'item_details_smallprint_standard';
+			}
+			if( isset( $widget_params['format'] ) )
+			{	// Remove setting "Format" completely from the widget:
+				unset( $widget_params['format'] );
+			}
+			if( isset( $widget_params['avatar_size'] ) )
+			{	// Remove setting "Avatar Size" completely from the widget:
+				unset( $widget_params['avatar_size'] );
+			}
+
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+				WHERE wi_ID = '.$widget_ID );
+		}
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15780, 'Updating widget "Info Line"...' ) )
+	{	// part of 7.0.0-alpha
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params, blog_type' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->FROM_add( 'LEFT JOIN T_widget__container ON wi_wico_ID = wico_ID' );
+		$SQL->FROM_add( 'LEFT JOIN T_blogs ON wico_coll_ID = blog_ID' );
+		$SQL->WHERE( 'wi_code = "item_info_line"' );
+		$widgets = $DB->get_results( $SQL );
+
+		foreach( $widgets as $row )
+		{
+			$widget_params = ( empty( $row->wi_params ) ? array() : unserialize( $row->wi_params ) );
+			if(	empty( $widget_params['template'] ) )
+			{	// Convert Template depending on collection type:
+				switch( $row->blog_type )
+				{
+					case 'forum':
+					case 'group':
+						$widget_params['template'] = 'item_details_infoline_forums';
+						break;
+
+					default:
+						$widget_params['template'] = 'item_details_infoline_standard'; 
+				}
+			}
+			
+			if( isset( $widget_params['flag_icon'] ) )
+			{	// Remove setting "Display flag icon" completely from the widget:
+				unset( $widget_params['flag_icon'] );
+			}
+			if( isset( $widget_params['permalink_icon'] ) )
+			{	// Remove setting "Display permalink icon" completely from the widget:
+				unset( $widget_params['permalink_icon'] );
+			}
+			if( isset( $widget_params['before_author'] ) )
+			{	// Remove setting "Display author information" completely from the widget:
+				unset( $widget_params['before_author'] );
+			}
+			if( isset( $widget_params['display_date'] ) )
+			{	// Remove setting "Post date to display" completely from the widget:
+				unset( $widget_params['display_date'] );
+			}
+			if( isset( $widget_params['last_touched'] ) )
+			{	// Remove setting "Display date and time when item/post was last touched" completely from the widget:
+				unset( $widget_params['last_touched'] );
+			}
+			if( isset( $widget_params['contents_updated'] ) )
+			{	// Remove setting "Display date and time when item/post contents (title, content, URL or attachments) were last updated" completely from the widget:
+				unset( $widget_params['contents_updated'] );
+			}
+			if( isset( $widget_params['date_format'] ) )
+			{	// Remove setting "Date format" completely from the widget:
+				unset( $widget_params['date_format'] );
+			}
+			if( isset( $widget_params['time_format'] ) )
+			{	// Remove setting "Time format" completely from the widget:
+				unset( $widget_params['time_format'] );
+			}
+			if( isset( $widget_params['category'] ) )
+			{	// Remove setting "Display item/post category" completely from the widget:
+				unset( $widget_params['category'] );
+			}
+			if( isset( $widget_params['edit_link'] ) )
+			{	// Remove setting "Display link to edit the item/post" completely from the widget:
+				unset( $widget_params['edit_link'] );
+			}
+			if( isset( $widget_params['post_time'] ) )
+			{	// Remove setting previous setting "post_time" completely from the widget:
+				unset( $widget_params['post_time'] );
+			}
+
+			$DB->query( 'UPDATE T_widget__widget
+				  SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+				WHERE wi_ID = '.$row->wi_ID );
+		}
+
 		upg_task_end();
 	}
 
@@ -12123,6 +12268,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		task_begin( 'Checking default locale...' );
 		locale_check_default();
+		task_end();
+
+		task_begin( 'Creating and updating default templates...' );
+		create_default_templates( false );
 		task_end();
 	}
 

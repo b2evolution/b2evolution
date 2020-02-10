@@ -1,7 +1,7 @@
 <?php
 /**
- * This file displays the Form to mass change main category or add extra categories
- *
+ * This file displays the Form to mass change Item text renderers
+ * 
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
  *
@@ -13,32 +13,33 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-$Form = new Form( $admin_url, 'item_mass_cats_checkchanges', 'post' );
+global $Plugins;
+
+$Form = new Form( $admin_url, 'item_mass_renderer_checkchanges', 'post' );
 
 $Form->begin_form();
 
 	$Form->add_crumb( 'item' );
 	$Form->hidden( 'ctrl', 'items' );
-	$Form->hidden( 'action', 'mass_change_cat' );
+	$Form->hidden( 'action', 'mass_change_renderer' );
 	$Form->hidden( 'blog', $blog );
 	foreach( $selected_items as $item_ID )
 	{
 		$Form->hidden( 'selected_items[]', $item_ID );
 	}
-	$Form->hidden( 'cat_type', $cat_type );
+	$Form->hidden( 'renderer_change_type', $renderer_change_type );
 	$Form->hidden( 'tab', $tab );
 	$Form->hidden( 'tab_type', $tab_type );
 	$Form->hidden( 'page', $page );
 	$Form->add_crumb( 'items' );
 
-	cat_select( $Form, true, true, array(
-			'display_main'  => ( $cat_type == 'main' ),
-			'display_extra' => ( $cat_type == 'extra' || $cat_type == 'remove_extra' ),
-			'display_order' => false,
-			'display_new'   => false,
+	echo $Plugins->get_renderer_checkboxes( NULL, array(
+			'Blog' => $Blog,
+			'setting_name' => 'coll_apply_rendering',
+			'ignored_apply_rendering' => array( 'always', 'stealth', 'never' )
 		) );
 
-	$Form->buttons( array( array( 'submit', 'actionArray[mass_change_cat]', T_('Change main category'), 'SaveButton' ) ) );
+	$Form->buttons( array( array( 'submit', 'actionArray[mass_change_renderer]', T_('Change renderer'), 'SaveButton' ) ) );
 
 $Form->end_form();
 ?>

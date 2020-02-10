@@ -18,15 +18,19 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * Render template content code depending on current locale
  * 
  * @param string Template code
- * @param array Callback function. Function should return the replacement string for the variable found in the template.
- * @return boolean True if template is found and rendered, false otherwise
+ * @param array Parameters (by reference)
+ * @param array Objects
+ * @return string|boolean Rendered template or FALSE on wrong request
  */
-function render_template( $code, $replace_callback, $params = array() )
+function render_template_code( $code, & $params, $objects = array() )
 {
 	global $current_locale;
 
 	$TemplateCache = & get_TemplateCache();
-	$Template = & $TemplateCache->get_by_code( $code );
+	if( ! ( $Template = & $TemplateCache->get_by_code( $code, false, false ) ) )
+	{
+		return false;
+	}
 
 	// Check if the template has a child matching the current locale:
 	$localized_templates = $Template->get_localized_templates( $current_locale );
@@ -36,25 +40,327 @@ function render_template( $code, $replace_callback, $params = array() )
 	}
 
 	if( $Template )
-	{	// Template available, replace variables using supplied callback:
-		preg_match_all( '/\$[a-z_]+\$/i', $Template->template_code, $matches, PREG_OFFSET_CAPTURE );
-		$current_pos = 0;
-		foreach( $matches[0] as $match )
-		{
-			// $match[0] = $variable$, $match[1] = offset
-			echo substr( $Template->template_code, $current_pos, $match[1] - $current_pos );
-			$current_pos = $match[1] + strlen( $match[0] );
-			echo call_user_func( $replace_callback, $match[0], $params );
+	{	// Render variables in available Template:
+		return render_template( $Template->template_code, $params, $objects );
+	}
+
+	return false;
+}
+
+
+/**
+ * Render template content
+ * 
+ * @param string Template
+ * @param array Parameters (by reference)
+ * @param array Objects
+ * @return string Rendered template
+ */
+function render_template( $template, & $params, $objects = array() )
+{
+	$current_pos = 0;
+	$r = '';
+
+	/*
+	// Old
+	preg_match_all( '/\$([a-z_\:]+)\$/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	foreach( $matches[0] as $i => $match )
+	{
+		$r .= substr( $template, $current_pos, $match[1] - $current_pos );
+		$current_pos = $match[1] + strlen( $match[0] );
+		$r .= render_template_callback( $matches[1][$i][0], $params, $objects );
+	}
+	*/
+
+	// New
+	preg_match_all( '/\[((?:(?:Item|Cat|echo|set):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	foreach( $matches[0] as $i => $match )
+	{
+		// Output everything until new tag:
+		$r .= substr( $template, $current_pos, $match[1] - $current_pos );
+		$current_pos = $match[1] + strlen( $match[0] );
+
+		// New tag to handle:
+		$tag = $matches[1][$i][0];
+
+		// Params specified for the tag:
+		$tag_param_strings = empty( $matches[3][$i][0] ) ? NULL : $matches[3][$i][0];
+
+		if( substr( $tag, 0, 4 ) == 'set:' )
+		{	// Set a param value in the $params[] array used for the whole template (will affect all future template tags)
+
+			$param_name = substr( $tag, 4 );
+			$param_val  = substr( $tag_param_strings, strpos( $tag_param_strings, '=' ) + 1 );
+
+			// Set param:
+			// we MUST do this here and in & $params[] so that it sticks. This cannot be done in the callback or $this_tag_params[]
+			$params[ $param_name ] = $param_val;
 		}
+		else
+		{	// Process a normal template tag:
 
-		// Print remaining template code:
-		echo substr( $Template->template_code, $current_pos );
+			$this_tag_params = $params;
 
-		return true;
+			if( ! empty( $tag_param_strings ) )
+			{	// Template Tag has specified parameters, use temp to override:
+				$tag_param_strings = explode( '|', $tag_param_strings );
+				foreach( $tag_param_strings as $tag_param_string )
+				{
+					$tag_param_name = substr( $tag_param_string, 0, strpos( $tag_param_string, '=' ) );
+					// TODO: need to ensure string assigned to $tag_param_val below is single quote and properly escaped?
+					$tag_param_val  = substr( $tag_param_string, strpos( $tag_param_string, '=' ) + 1 );
+					$this_tag_params[$tag_param_name] = $tag_param_val;
+				}
+			}
+			$r .= render_template_callback( $tag, $this_tag_params, $objects );
+		}
+	}
+
+	// Print remaining template code:
+	$r .= substr( $template, $current_pos );
+
+	return $r;
+}
+
+/**
+ * Callback function to replace variables in template
+ * 
+ * @param string Variable to be replaced
+ * @param array Additional parameters (by reference)
+ * @param array Objects
+ * @return string Replacement string
+ */
+function render_template_callback( $var, $params, $objects = array() )
+{
+	// Get scope and var name:
+	preg_match( '#^(([a-z]+):)?(.+)$#i', $var, $match_var );
+	$scope = ( empty( $match_var[2] ) ? 'Item': $match_var[2] );
+	$var = $scope.':'.$match_var[3];
+	switch( $scope )
+	{
+		case 'Cat':
+			global $Chapter;
+			$rendered_Chapter = ( !isset($objects['Chapter']) ? $Chapter : $objects['Chapter'] );
+			if( empty( $rendered_Chapter ) || ! ( $rendered_Chapter instanceof Chapter ) )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object Chapter is not defined at this moment.</span>';
+			}
+			break;
+
+		case 'Item':
+			global $Item;
+			$rendered_Item = ( !isset($objects['Item']) ? $Item : $objects['Item'] );
+			if( empty( $rendered_Item ) || ! ( $rendered_Item instanceof Item ) )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object Item is not defined at this moment.</span>';
+			}
+			break;
+
+		case 'echo':
+			$param_name = substr( $var, 5 );
+			if( ! isset( $params[ $param_name ] ) )
+			{	// Param is not found:
+				return '<span class="evo_param_error">Param <code>'.$param_name.'</code> is not passed.</span>';
+			}
+			elseif( ! is_scalar( $params[ $param_name ] ) )
+			{	// Param is not scalar and cannot be printed on screen:
+				return '<span class="evo_param_error">Param <code>'.$param_name.'</code> is not scalar.</span>';
+			}
+			break;
+
+		default:
+			return '<span class="evo_param_error">['.$var.']: Scope "'.$scope.':" is not recognized.</span>';
+	}
+
+	$match_found = true;
+
+	ob_start();
+	switch( $var )
+	{
+		// Item:
+		case 'Item:flag_icon':
+			echo $rendered_Item->get_flag( $params );
+			break;
+
+		case 'Item:permalink':
+		case 'Item:permanent_link':
+			$rendered_Item->permanent_link( array_merge( array(
+					'text'   => '#title',
+				), $params ) );
+				// Note: Cat content list widget will have set:
+				//	'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
+				//	'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
+				//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
+			break;
+
+		case 'Item:author':
+			$rendered_Item->author( array_merge( array(
+					'link_text' => 'auto',		// select login or nice name automatically
+				), $params ) );
+			break;
+
+		case 'Item:lastedit_user':
+			$rendered_Item->lastedit_user( array_merge( array(
+					'link_text' => 'auto',		// select login or nice name automatically
+				), $params ) );
+			break;
+
+		// Date/Time:
+		case 'Item:issue_date':
+			$rendered_Item->issue_date( $params );
+			break;
+
+		case 'Item:issue_time':
+			$rendered_Item->issue_time( $params );
+			break;
+
+		case 'Item:creation_time':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_creation_time( $temp_params['format'] );
+			break;
+
+		case 'Item:mod_date':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_mod_date( $temp_params['format'] );
+			break;
+
+		case 'Item:last_touched':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_last_touched_ts( $temp_params['format'] );
+			break;
+
+		case 'Item:last_updated':
+		case 'Item:contents_last_updated':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_contents_last_updated_ts( $temp_params['format'] );
+			break;
+
+		case 'Item:refresh_contents_last_updated_link':
+			echo $rendered_Item->get_refresh_contents_last_updated_link( $params );
+			break;
+
+		// Links:
+		case 'Item:edit_link':
+			$rendered_Item->edit_link( $params );
+			break;
+
+		case 'Item:history_link':
+			echo $rendered_Item->get_history_link( array_merge( array(
+					'link_text' => T_('View change history'),
+				), $params ) );
+			break;
+
+		case 'Item:propose_change_link':
+			$rendered_Item->propose_change_link( array_merge( array(
+					'text'   => T_('Propose a change'),
+				), $params ) );
+			break;
+
+		case 'Item:excerpt':
+			$rendered_Item->excerpt( array_merge( array(
+					'before'              => '',
+					'after'               => '',
+					'excerpt_before_more' => ' <span class="evo_post__excerpt_more_link">',
+					'excerpt_after_more'  => '</span>',
+					'excerpt_more_text'   => T_('more').' &raquo;',
+				), $params ) );
+			break;
+
+		// Read Status:
+		case 'Item:read_status':
+			$rendered_Item->display_unread_status( array_merge( array(
+					'style'  => 'text',
+					'before' => '<span class="evo_post_read_status">',
+					'after'  => '</span>'
+				), $params ) );
+			break;
+
+		// Visibility Status:
+		case 'Item:visibility_status':
+			if( $rendered_Item->status != 'published' )
+			{
+				$rendered_Item->format_status( array_merge( array(
+						'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+					), $params ) );
+			}
+			break;
+
+		// Categories:
+		case 'Item:categories':
+			$rendered_Item->categories( array_merge( array(
+					'before'          => '',  // For some reason the core has ' ' as default, which is not good for templates
+					'after'           => '',  // For some reason the core has ' ' as default, which is not good for templates
+				), $params ) );
+			break;
+
+		// Tags:
+		case 'Item:tags':
+			$rendered_Item->tags( array_merge( array(
+					'before'          => '',  // For some reason the core has '<div>... ' as default, which is not good for templates
+					'after'           => '',  // For some reason the core has '</div>' as default, which is not good for templates
+				), $params ) );
+			break;
+
+		case 'Item:feedback_link':
+			echo $rendered_Item->get_feedback_link();
+			break;
+
+		case 'Item:images':
+			echo $rendered_Item->get_images( $params );
+			break;
+
+		case 'Item:content_teaser':
+			echo $rendered_Item->content_teaser( $params );
+			break;
+
+		// Chapter / Category:
+		case 'Cat:permalink':
+			echo $rendered_Chapter->get_permanent_link( array_merge( array(
+					'text'   => '#name',
+				), $params ) );
+			break;
+			break;
+
+		case 'Cat:description':
+			echo $rendered_Chapter->dget( 'description' );
+			break;
+
+		case 'Cat:image':
+			echo $rendered_Chapter->get_image_tag( array_merge( array(
+					'size'       => 'crop-256x256',
+				), $params ) );
+			break;
+
+		default:
+			switch( $scope )
+			{
+				case 'echo':
+					// Print param var value, No need check this because all done above:
+					echo $params[ $param_name ];
+					break;
+
+				default:
+					// Unknown template var:
+					$match_found = false;
+			}
+	}
+	$r = ob_get_clean();
+
+	if( $match_found )
+	{
+		return $r;
 	}
 	else
-	{
-		return false;
+	{	// Display error for not recognized variable:
+		return '<span class="evo_param_error">['.$var.'] is not recognized.</span>';
 	}
 }
 
@@ -69,7 +375,7 @@ function render_template( $code, $replace_callback, $params = array() )
  * @param string The name of the template table to use
  * @return string Unique template code
  */
-function unique_template_code( $code, $ID = 0, $db_code_fieldname = 'tpl_code', $db_ID_fieldname = 'tpl_ID',	$db_table = 'T_templates' )
+function unique_template_code( $code, $ID = 0, $db_code_fieldname = 'tpl_code', $db_ID_fieldname = 'tpl_ID', $db_table = 'T_templates' )
 {
 	global $DB, $Messages;
 	

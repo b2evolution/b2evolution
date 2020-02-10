@@ -1073,6 +1073,31 @@ switch( $action )
 		require $inc_path.'items/views/_item_mass_change_cat.form.php';
 		break;
 
+	case 'get_item_mass_change_renderer_form':
+		// Form to mass change renderer of Items:
+
+		param( 'blog', 'integer', true );
+		param( 'selected_items', 'array:integer' );
+		param( 'renderer_change_type', 'string' );
+		param( 'tab', 'string' );
+		param( 'tab_type', 'string' );
+		param( 'page', 'integer', 1 );
+
+		// Initialize objects for proper displaying of list of renderers:
+		$BlogCache = & get_BlogCache();
+		$Blog = & $BlogCache->get_by_ID( $blog );
+		load_class( 'items/model/_item.class.php', 'Item' );
+		$edited_Item = new Item();
+
+		// Initialize back-office skin:
+		global $UserSettings, $adminskins_path, $AdminUI;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		require $inc_path.'items/views/_item_mass_change_renderer.form.php';
+		break;
+
 	case 'clear_itemprecache':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'tools' );

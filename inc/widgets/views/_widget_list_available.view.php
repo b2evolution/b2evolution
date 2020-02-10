@@ -154,7 +154,6 @@ $core_componentwidget_defs = array(
 			'item_vote',                 // Voting
 			'item_seen_by',              // Seen by
 			'item_workflow',             // Workflow Properties
-			'item_footer',               // Footer
 			'item_comment_form',         // Comment Form
 			'item_comment_feed_link',    // Comment Feed Link
 			'item_comment_notification', // Comment Notification

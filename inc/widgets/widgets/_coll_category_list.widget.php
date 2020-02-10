@@ -232,6 +232,9 @@ class coll_category_list_Widget extends ComponentWidget
 			$callbacks['posts'] = $params['callback_posts'];
 		}
 
+		// Get IDs of categories that must be exluded:
+		$this->excluded_cat_IDs = sanitize_id_list( $this->disp_params['exclude_cats'], true );
+
 		// START DISPLAY:
 		echo $this->disp_params['block_start'];
 
@@ -432,9 +435,13 @@ class coll_category_list_Widget extends ComponentWidget
 			$cat_array = array();
 		}
 
-		$exclude_cats = sanitize_id_list( $this->disp_params['exclude_cats'], true );
-		if( in_array( $Chapter->ID, $exclude_cats ) )
-		{ // Cat ID is excluded, skip it
+		if( in_array( $Chapter->get( 'parent_ID' ), $this->excluded_cat_IDs ) )
+		{	// Exclude also all child categories if parent category is excluded:
+			$this->excluded_cat_IDs[] = $Chapter->ID;
+		}
+
+		if( in_array( $Chapter->ID, $this->excluded_cat_IDs ) )
+		{	// Category is excluded, Skip it:
 			return;
 		}
 
