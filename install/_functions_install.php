@@ -618,7 +618,7 @@ function install_basic_skins( $install_mobile_skins = true )
 
 	if( $install_mobile_skins )
 	{
-		skin_install( 'touch', true );
+		skin_install( 'touch' );
 	}
 	skin_install( '_atom', true );
 	skin_install( '_rss2', true );
