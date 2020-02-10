@@ -519,7 +519,7 @@ if( $params['comment_type'] == 'meta' )
 
 		if( $Item->can_attach() )
 		{	// Don't display "/Add file" on the preview button if JS is enabled:
-			echo '<script type="text/javascript">jQuery( "input[type=submit].preview.btn-info" ).val( "'.TS_('Preview').'" )</script>';
+			echo '<script>document.querySelector( "input[type=submit].preview.btn-info" ).value = "'.TS_('Preview').'";</script>';
 		}
 
 			$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
