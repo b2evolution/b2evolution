@@ -178,6 +178,10 @@ function render_template_callback( $var, $params, $objects = array() )
 	switch( $var )
 	{
 		// Item:
+		case 'Item:title':
+			echo $rendered_Item->dget( 'title' );
+			break;
+
 		case 'Item:flag_icon':
 			echo $rendered_Item->get_flag( $params );
 			break;
@@ -317,11 +321,26 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_Item->get_images( $params );
 			break;
 
+		case 'Item:image_url':
+			echo $rendered_Item->get_image_url( $params );
+			break;
+
 		case 'Item:content_teaser':
 			echo $rendered_Item->content_teaser( $params );
 			break;
 
+		case 'Item:cat_name':
+			if( $item_main_Chapter = & $rendered_Item->get_main_Chapter() )
+			{
+				echo $item_main_Chapter->dget( 'name' );
+			}
+			break;
+
 		// Chapter / Category:
+		case 'Cat:name':
+			echo $rendered_Chapter->dget( 'name' );
+			break;
+
 		case 'Cat:permalink':
 			echo $rendered_Chapter->get_permanent_link( array_merge( array(
 					'text'   => '#name',
@@ -337,6 +356,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_Chapter->get_image_tag( array_merge( array(
 					'size'       => 'crop-256x256',
 				), $params ) );
+			break;
+
+		case 'Cat:image_url':
+			echo $rendered_Chapter->get_image_url( $params );
 			break;
 
 		default:

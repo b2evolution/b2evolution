@@ -976,6 +976,37 @@ class Chapter extends DataObject
 
 
 	/**
+	 * Get URL of category's image
+	 *
+	 * @param array Parameters
+	 * @return string|NULL cover URL or NULL if it doesn't exist
+	 */
+	function get_image_url( $params = array() )
+	{
+		$params = array_merge( array(
+				'size' => 'original',
+			), $params );
+
+		// Try to get a file by ID:
+		$FileCache = & get_FileCache();
+		if( ! ( $cat_image_File = & $FileCache->get_by_ID( $this->get( 'image_file_ID' ), false, false ) ) )
+		{	// This chapter has no image file or it is broken:
+			return NULL;
+		}
+
+		if( ! $cat_image_File->is_image() )
+		{	// The file must be an image:
+			return NULL;
+		}
+
+		// Get image URL for requested size:
+		$img_attribs = $cat_image_File->get_img_attribs( $params['size'] );
+
+		return $img_attribs['src'];
+	}
+
+
+	/**
 	 * Get image tag of this chapter
 	 *
 	 * @param array Params

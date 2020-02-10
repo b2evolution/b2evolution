@@ -1715,30 +1715,36 @@ function create_default_templates( $is_task = true )
 		// Tiles style:
 		'content_tiles' => array(
 			'name'     => 'Content Tiles',
-			'template' => '[set:before_list=<div class="widget_rwd_blocks row">]
+			'template' => '[set:before_list=<div class="evo_content_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_subcat]
 [set:item_template=content_tiles_item]',
 		),
 		'content_tiles_subcat' => array(
 			'name'     => 'Content Tiles: Subcat',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
-	<div class="widget_rwd_content clearfix">
-		<div class="item_first_image">[Cat:image|size=fit-400x320]</div>
-		<h3 class="item_title">[Cat:permalink]</h3>
-		<div class="item_content">[Cat:description]</div>
+			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
+[Cat:permalink|text=]
+<div>
+	<div class="evo_content_tile_cover" style="background-image:url([Cat:image_url])"></div>
+	<div class="evo_content_tile_text">
+		<h3>[Cat:name]</h3>
+		<div>[Cat:description]</div>
 	</div>
-</div>',
+</div>
+</div></div>',
 		),
 		'content_tiles_item' => array(
 			'name'     => 'Content Tiles: Item',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
-	<div class="widget_rwd_content clearfix">
-		[Item:images|restrict_to_image_position=#teaser_all|before=<div class="item_first_image">|after=</div>]
-		<h3 class="item_title">[Item:permalink|text=#title]</h3>
-		<div class="item_content">[Item:excerpt]</div>
+			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
+[Item:permalink|text=]
+<div>
+	<div class="evo_content_tile_cover" style="background-image:url([Item:image_url])">[Item:cat_name]</div>
+	<div class="evo_content_tile_text">
+		<h3>[Item:title]</h3>
+		<div>[Item:excerpt|excerpt_more_text=]</div>
 	</div>
-</div>',
+</div>
+</div></div>',
 		),
 
 

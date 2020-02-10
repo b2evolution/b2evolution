@@ -5178,6 +5178,63 @@ class Item extends ItemLight
 
 
 	/**
+	 * Get URL of a first found image by positions
+	 *
+	 * @param array Parameters
+	 * @return string|NULL cover URL or NULL if it doesn't exist
+	 */
+	function get_image_url( $params = array() )
+	{
+		$params = array_merge( array(
+				'position' => '#cover_and_teaser_all',
+				'size'     => 'original',
+			), $params );
+
+		// Set image positions from possible predefined values:
+		switch( $params['position'] )
+		{
+			case '#teaser_all':
+				$params['position'] = 'teaser,teaserperm,teaserlink';
+				break;
+			case '#cover_and_teaser_all':
+				$params['position'] = 'cover,teaser,teaserperm,teaserlink';
+				break;
+		}
+
+		$LinkOwner = new LinkItem( $this );
+		if( ! ( $LinkList = $LinkOwner->get_attachment_LinkList( 1, $params['position'] ) ) ||
+		    ! ( $Link = & $LinkList->get_next() ) )
+		{	// No image
+			return NULL;
+		}
+
+		if( ! ( $File = & $Link->get_File() ) )
+		{	// No File object
+			global $Debuglog;
+			$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
+			return NULL;
+		}
+
+		if( ! $File->exists() )
+		{	// File doesn't exist
+			global $Debuglog;
+			$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
+			return NULL;
+		}
+
+		if( ! $File->is_image() )
+		{	// Skip anything that is not an image
+			return NULL;
+		}
+
+		// Get image URL for requested size:
+		$img_attribs = $File->get_img_attribs( $params['size'] );
+
+		return $img_attribs['src'];
+	}
+
+
+	/**
 	 * Get URL of a first cover image
 	 *
 	 * @param string Restrict to files/images linked to a specific position.
@@ -5187,38 +5244,7 @@ class Item extends ItemLight
 	 */
 	function get_cover_image_url( $position = 'cover' )
 	{
-		$LinkOwner = new LinkItem( $this );
-		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1, $position ) )
-		{ // No cover image
-			return NULL;
-		}
-
-		if( $Link = & $LinkList->get_next() )
-		{
-			if( ! ( $File = & $Link->get_File() ) )
-			{ // No File object
-				global $Debuglog;
-				$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
-				return NULL;
-			}
-
-			if( ! $File->exists() )
-			{ // File doesn't exist
-				global $Debuglog;
-				$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-				return NULL;
-			}
-
-			if( ! $File->is_image() )
-			{ // Skip anything that is not an image
-				return NULL;
-			}
-
-			// Return URL when a cover image really exists for this post
-			return $File->get_url();
-		}
-
-		return NULL;
+		return $this->get_image_url( array( 'position' => $position ) );
 	}
 
 
