@@ -796,6 +796,12 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 
 
 /**
+ * Allow parameters in URL without redirect to Item canonical URL when collection setting "301 redirect to canonical URL when possible" is enabled
+ */
+$noredir_params = array( 'page', 'mode', 'qc', 'qp' );
+
+
+/**
  * Turn this on to simulate email sends instead of really sending them through SMTP.
  * This is useful if you are debugging a production database on a development machine.
  * It will prevent from sending test notifications to real user accounts.
