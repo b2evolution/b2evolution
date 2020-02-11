@@ -4012,4 +4012,60 @@ function get_pro_label()
 {
 	return '<span class="label label-sm label-primary">PRO</span>';
 }
+
+
+/**
+ * Resolve auto content mode depending on current disp detail
+ *
+ * @param string Content mode
+ * @param object Collection
+ * @return string Content mode
+ */
+function resolve_auto_content_mode( $content_mode, $setting_Blog = NULL )
+{
+	global $disp_detail;
+
+	if( $content_mode != 'auto' )
+	{	// Use this function only for auto content mode:
+		return $content_mode;
+	}
+
+	if( $setting_Blog === NULL )
+	{	// Use current Collection:
+		global $Blog;
+		$setting_Blog = $Blog;
+	}
+
+	if( empty( $setting_Blog ) )
+	{	// Collection must be defined on call this function:
+		debug_die( 'Collection is not initialized to resolve auto content mode!' );
+	}
+
+	switch( $disp_detail )
+	{
+		case 'posts-cat':
+		case 'posts-topcat-intro':
+		case 'posts-topcat-nointro':
+		case 'posts-subcat-intro':
+		case 'posts-subcat-nointro':
+			return $setting_Blog->get_setting('chapter_content');
+
+		case 'posts-tag':
+			return $setting_Blog->get_setting('tag_content');
+
+		case 'posts-date':
+			return $setting_Blog->get_setting('archive_content');
+
+		case 'single':
+		case 'page':
+			return 'full';
+
+		case 'posts-default':  // home page 1
+		case 'posts-next':     // next page 2, 3, etc
+			return $setting_Blog->get_setting('main_content');
+
+		default: // posts-filtered, search, flagged and etc.
+			return $setting_Blog->get_setting('filtered_content');
+	}
+}
 ?>

@@ -120,41 +120,7 @@ else
 {
 	$content_mode = $params['content_mode'];
 }
-if( $content_mode == 'auto' )
-{
-	// echo $disp_detail;
-	switch( $disp_detail )
-	{
-		case 'posts-cat':
-		case 'posts-topcat-intro':
-		case 'posts-topcat-nointro':
-		case 'posts-subcat-intro':
-		case 'posts-subcat-nointro':
-			$content_mode = $Blog->get_setting('chapter_content');
-			break;
-
-		case 'posts-tag':
-			$content_mode = $Blog->get_setting('tag_content');
-			break;
-
-		case 'posts-date':
-			$content_mode = $Blog->get_setting('archive_content');
-			break;
-
-		case 'single':
-		case 'page':
-			$content_mode = 'full';
-			break;
-
-		case 'posts-default':  // home page 1
-		case 'posts-next':     // next page 2, 3, etc
-			$content_mode = $Blog->get_setting('main_content');
-			break;
-
-		default: // posts-filtered, search, flagged and etc.
-			$content_mode = $Blog->get_setting('filtered_content');
-	}
-}
+$content_mode = resolve_auto_content_mode( $content_mode );
 
 if( $params['include_cover_images'] )
 { // Include the cover images on teaser place

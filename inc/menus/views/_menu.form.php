@@ -188,6 +188,12 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 		}
 		$r .= '<td class="nowrap">'.$destination.'</td>';
 
+		// Visibility
+		$r .= '<td class="shrinkwrap">'.( $SiteMenuEntry->get( 'visibility' ) == 'always' ? T_('Always') : T_('If allowed') ).'</td>';
+
+		// Highlight
+		$r .= '<td class="shrinkwrap">'.( $SiteMenuEntry->get( 'highlight') ? '<span class="fa fa-check green"></span>' : '<span class="fa fa-times red"></span>' ).'</td>';
+
 		// Actions
 		$r .= '<td class="lastcol shrinkwrap">';
 		if( $current_User->check_perm( 'options', 'edit' ) )
@@ -258,6 +264,14 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 		);
 	$Table->cols[] = array(
 			'th' => T_('Destination'),
+		);
+	$Table->cols[] = array(
+			'th' => T_('Visibility'),
+			'th_class' => 'shrinkwrap',
+		);
+	$Table->cols[] = array(
+			'th' => T_('Highlight'),
+			'th_class' => 'shrinkwrap',
 		);
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{	// We have permission to edit, so display action column:

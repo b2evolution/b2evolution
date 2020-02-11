@@ -177,9 +177,133 @@ function render_template_callback( $var, $params, $objects = array() )
 	ob_start();
 	switch( $var )
 	{
+		// Chapter / Category:
+		case 'Cat:description':
+			echo $rendered_Chapter->dget( 'description' );
+			break;
+
+		case 'Cat:image':
+			echo $rendered_Chapter->get_image_tag( array_merge( array(
+					'size'       => 'crop-256x256',
+				), $params ) );
+			break;
+
+		case 'Cat:image_url':
+			echo $rendered_Chapter->get_image_url( $params );
+			break;
+
+		case 'Cat:name':
+			echo $rendered_Chapter->dget( 'name' );
+			break;
+
+		case 'Cat:permalink':
+			echo $rendered_Chapter->get_permanent_link( array_merge( array(
+					'text'   => '#name',
+				), $params ) );
+			break;
+
 		// Item:
+		case 'Item:author':
+			$rendered_Item->author( array_merge( array(
+					'link_text' => 'auto',		// select login or nice name automatically
+				), $params ) );
+			break;
+
+		case 'Item:cat_name':
+			if( $item_main_Chapter = & $rendered_Item->get_main_Chapter() )
+			{
+				echo $item_main_Chapter->dget( 'name' );
+			}
+			break;
+
+		case 'Item:categories':
+			$rendered_Item->categories( array_merge( array(
+					'before'          => '',  // For some reason the core has ' ' as default, which is not good for templates
+					'after'           => '',  // For some reason the core has ' ' as default, which is not good for templates
+				), $params ) );
+			break;
+
+		case 'Item:content_teaser':
+			echo $rendered_Item->content_teaser( $params );
+			break;
+
+		case 'Item:contents_last_updated':
+		case 'Item:last_updated':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_contents_last_updated_ts( $temp_params['format'] );
+			break;
+
+		case 'Item:creation_time':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_creation_time( $temp_params['format'] );
+			break;
+
+		case 'Item:edit_link':
+			$rendered_Item->edit_link( $params );
+			break;
+
+		case 'Item:excerpt':
+			$rendered_Item->excerpt( array_merge( array(
+					'before'              => '',
+					'after'               => '',
+					'excerpt_before_more' => ' <span class="evo_post__excerpt_more_link">',
+					'excerpt_after_more'  => '</span>',
+					'excerpt_more_text'   => T_('more').' &raquo;',
+				), $params ) );
+			break;
+
+		case 'Item:feedback_link':
+			echo $rendered_Item->get_feedback_link();
+			break;
+
 		case 'Item:flag_icon':
 			echo $rendered_Item->get_flag( $params );
+			break;
+
+		case 'Item:history_link':
+			echo $rendered_Item->get_history_link( array_merge( array(
+					'link_text' => T_('View change history'),
+				), $params ) );
+			break;
+
+		case 'Item:image_url':
+			echo $rendered_Item->get_image_url( $params );
+			break;
+
+		case 'Item:images':
+			echo $rendered_Item->get_images( $params );
+			break;
+			
+		case 'Item:issue_date':
+			$rendered_Item->issue_date( $params );
+			break;
+
+		case 'Item:issue_time':
+			$rendered_Item->issue_time( $params );
+			break;
+
+		case 'Item:last_touched':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_last_touched_ts( $temp_params['format'] );
+			break;
+
+		case 'Item:lastedit_user':
+			$rendered_Item->lastedit_user( array_merge( array(
+					'link_text' => 'auto',		// select login or nice name automatically
+				), $params ) );
+			break;
+
+		case 'Item:mod_date':
+			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
+					'format' => '#short_date_time',		
+				), $params );
+			echo $rendered_Item->get_mod_date( $temp_params['format'] );
 			break;
 
 		case 'Item:permalink':
@@ -193,88 +317,12 @@ function render_template_callback( $var, $params, $objects = array() )
 				//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 			break;
 
-		case 'Item:author':
-			$rendered_Item->author( array_merge( array(
-					'link_text' => 'auto',		// select login or nice name automatically
-				), $params ) );
-			break;
-
-		case 'Item:lastedit_user':
-			$rendered_Item->lastedit_user( array_merge( array(
-					'link_text' => 'auto',		// select login or nice name automatically
-				), $params ) );
-			break;
-
-		// Date/Time:
-		case 'Item:issue_date':
-			$rendered_Item->issue_date( $params );
-			break;
-
-		case 'Item:issue_time':
-			$rendered_Item->issue_time( $params );
-			break;
-
-		case 'Item:creation_time':
-			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
-					'format' => '#short_date_time',		
-				), $params );
-			echo $rendered_Item->get_creation_time( $temp_params['format'] );
-			break;
-
-		case 'Item:mod_date':
-			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
-					'format' => '#short_date_time',		
-				), $params );
-			echo $rendered_Item->get_mod_date( $temp_params['format'] );
-			break;
-
-		case 'Item:last_touched':
-			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
-					'format' => '#short_date_time',		
-				), $params );
-			echo $rendered_Item->get_last_touched_ts( $temp_params['format'] );
-			break;
-
-		case 'Item:last_updated':
-		case 'Item:contents_last_updated':
-			$temp_params = array_merge( array(  // Here, we make sure not to modify $params
-					'format' => '#short_date_time',		
-				), $params );
-			echo $rendered_Item->get_contents_last_updated_ts( $temp_params['format'] );
-			break;
-
-		case 'Item:refresh_contents_last_updated_link':
-			echo $rendered_Item->get_refresh_contents_last_updated_link( $params );
-			break;
-
-		// Links:
-		case 'Item:edit_link':
-			$rendered_Item->edit_link( $params );
-			break;
-
-		case 'Item:history_link':
-			echo $rendered_Item->get_history_link( array_merge( array(
-					'link_text' => T_('View change history'),
-				), $params ) );
-			break;
-
 		case 'Item:propose_change_link':
 			$rendered_Item->propose_change_link( array_merge( array(
 					'text'   => T_('Propose a change'),
 				), $params ) );
 			break;
 
-		case 'Item:excerpt':
-			$rendered_Item->excerpt( array_merge( array(
-					'before'              => '',
-					'after'               => '',
-					'excerpt_before_more' => ' <span class="evo_post__excerpt_more_link">',
-					'excerpt_after_more'  => '</span>',
-					'excerpt_more_text'   => T_('more').' &raquo;',
-				), $params ) );
-			break;
-
-		// Read Status:
 		case 'Item:read_status':
 			$rendered_Item->display_unread_status( array_merge( array(
 					'style'  => 'text',
@@ -283,7 +331,21 @@ function render_template_callback( $var, $params, $objects = array() )
 				), $params ) );
 			break;
 
-		// Visibility Status:
+		case 'Item:refresh_contents_last_updated_link':
+			echo $rendered_Item->get_refresh_contents_last_updated_link( $params );
+			break;
+
+		case 'Item:tags':
+			$rendered_Item->tags( array_merge( array(
+					'before'          => '',  // For some reason the core has '<div>... ' as default, which is not good for templates
+					'after'           => '',  // For some reason the core has '</div>' as default, which is not good for templates
+				), $params ) );
+			break;
+
+		case 'Item:title':
+			echo $rendered_Item->dget( 'title' );
+			break;
+
 		case 'Item:visibility_status':
 			if( $rendered_Item->status != 'published' )
 			{
@@ -292,53 +354,8 @@ function render_template_callback( $var, $params, $objects = array() )
 					), $params ) );
 			}
 			break;
-
-		// Categories:
-		case 'Item:categories':
-			$rendered_Item->categories( array_merge( array(
-					'before'          => '',  // For some reason the core has ' ' as default, which is not good for templates
-					'after'           => '',  // For some reason the core has ' ' as default, which is not good for templates
-				), $params ) );
-			break;
-
-		// Tags:
-		case 'Item:tags':
-			$rendered_Item->tags( array_merge( array(
-					'before'          => '',  // For some reason the core has '<div>... ' as default, which is not good for templates
-					'after'           => '',  // For some reason the core has '</div>' as default, which is not good for templates
-				), $params ) );
-			break;
-
-		case 'Item:feedback_link':
-			echo $rendered_Item->get_feedback_link();
-			break;
-
-		case 'Item:images':
-			echo $rendered_Item->get_images( $params );
-			break;
-
-		case 'Item:content_teaser':
-			echo $rendered_Item->content_teaser( $params );
-			break;
-
-		// Chapter / Category:
-		case 'Cat:permalink':
-			echo $rendered_Chapter->get_permanent_link( array_merge( array(
-					'text'   => '#name',
-				), $params ) );
-			break;
-			break;
-
-		case 'Cat:description':
-			echo $rendered_Chapter->dget( 'description' );
-			break;
-
-		case 'Cat:image':
-			echo $rendered_Chapter->get_image_tag( array_merge( array(
-					'size'       => 'crop-256x256',
-				), $params ) );
-			break;
-
+		
+		// Others
 		default:
 			switch( $scope )
 			{
