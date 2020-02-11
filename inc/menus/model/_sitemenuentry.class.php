@@ -142,8 +142,18 @@ class SiteMenuEntry extends DataObject
 		$this->set_from_Request( 'cat_ID', NULL, true );
 
 		// Item ID:
-		param( 'ment_item_ID', 'integer', NULL );
+		$item_ID = param( 'ment_item_ID', 'integer', NULL );
 		$this->set_from_Request( 'item_ID', NULL, true );
+
+		if( empty( $item_ID ) )
+		{	// No Item ID provided, use Item slug if available:
+			$ItemCache = & get_ItemCache();
+			$urltitle = param( 'ment_item_urltitle', 'string', NULL );
+			if( $urltitle && ( $menu_Item = $ItemCache->get_by_urltitle( $urltitle, false, false ) ) )
+			{
+				$this->set( 'item_ID', $menu_Item->ID );
+			}
+		}
 
 		// URL:
 		param( 'ment_url', 'url' );
