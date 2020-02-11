@@ -381,7 +381,11 @@ class quicktags_plugin extends Plugin
 				+ '<input type="button" id="b2evo_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>b2evoCloseAllTags" title="<?php echo format_to_output( T_('Close all tags'), 'htmlattr' ); ?>" value="<?php echo ($simple ? 'close all tags' : 'X') ?>" />'
 				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
-			jQuery( '.<?php echo $params['js_prefix'].$this->code ?>_toolbar' ).html( r );
+			var toolbar = document.querySelector( '.<?php echo $params['js_prefix'].$this->code ?>_toolbar' );
+			if( toolbar )
+			{
+				toolbar.innerHTML = r;
+			};
 		}
 
 		/**
