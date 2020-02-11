@@ -31,7 +31,7 @@ else
 }
 ?>
 
-<div class="swhead_wrapper">
+<div class="swhead_wrapper bootstrap_site_navbar_header">
 
 		<?php if( $site_has_logo_file ) { ?>
 			<div class="swhead_sitename<?php echo $site_title_class; ?>">

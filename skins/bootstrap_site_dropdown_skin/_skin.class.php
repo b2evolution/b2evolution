@@ -156,7 +156,7 @@ class bootstrap_site_dropdown_Skin extends Skin
 						'label' => T_('Fixed position'),
 						'note' => T_('Check to fix header top on scroll down'),
 						'type' => 'checkbox',
-						'defaultvalue' => 0,
+						'defaultvalue' => 1,
 					),
 
 					'section_topmenu_start' => array(

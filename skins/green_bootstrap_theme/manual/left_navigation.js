@@ -73,7 +73,16 @@ jQuery( document ).ready( function()
 		}
 	}
 
-	var top_start_point = ( jQuery( '#evo_toolbar' ).length > 0 ? 28 : 0 ) + ( jQuery( '.sitewide_header, .evo_container__site_header' ).length > 0 ? 54 : 0 );
+	var top_start_point = ( jQuery( '#evo_toolbar' ).length > 0 ? 28 : 0 ) + 10;
+
+	jQuery( '.evo_container__site_header, .bootstrap_site_navbar_header' ).each( function()
+	{	// Shift fixed sidebar down on height of site header:
+		if( jQuery( this ).css( 'position' ) == 'fixed' )
+		{
+			top_start_point += jQuery( this ).height();
+		}
+	} );
+
 	var sidebar_selectors = '#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single';
 	jQuery( sidebar_selectors ).each( function()
 	{

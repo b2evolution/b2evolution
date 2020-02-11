@@ -126,6 +126,12 @@ class bootstrap_site_tabs_Skin extends Skin
 						'allow_none' => true,
 						'defaultvalue' => 0,
 					),
+					'fixed_header' => array(
+						'label' => T_('Fixed position'),
+						'note' => T_('Check to fix header top on scroll down'),
+						'type' => 'checkbox',
+						'defaultvalue' => 1,
+					),
 
 					'section_topmenu_start' => array(
 						'layout' => 'begin_fieldset',
@@ -329,7 +335,7 @@ class bootstrap_site_tabs_Skin extends Skin
 		$footer_text_color = $this->get_setting( 'footer_text_color' );
 		$footer_link_color = $this->get_setting( 'footer_link_color' );
 
-		add_css_headline( '
+		$css = '
 .swhead_wrapper .swhead_menus div.level1 {
 	background-color: '.$menu_bar_bg_color.';
 	border-color: '.$tab_border_color.';
@@ -389,7 +395,25 @@ footer.sitewide_footer {
 footer.sitewide_footer .container a {
 	color: '.$footer_link_color.';
 }
-');
+';
+
+		if( $this->get_setting( 'fixed_header' ) )
+		{	// Enable fixed position for header:
+			$css .= '.bootstrap_site_navbar_header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10000;
+}
+body.evo_toolbar_visible .bootstrap_site_navbar_header {
+	top: 27px;
+}
+body {
+	padding-top: 50px;
+}';
+		}
+
+		add_css_headline( $css );
 	}
 
 

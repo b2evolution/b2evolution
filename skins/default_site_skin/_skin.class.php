@@ -99,6 +99,12 @@ class default_site_Skin extends Skin
 						'type' => 'integer',
 						'size' => 1,
 					),
+					'fixed_header' => array(
+						'label' => T_('Fixed position'),
+						'note' => T_('Check to fix header top on scroll down'),
+						'type' => 'checkbox',
+						'defaultvalue' => 1,
+					),
 				'section_header_end' => array(
 					'layout' => 'end_fieldset',
 				),
@@ -121,11 +127,27 @@ class default_site_Skin extends Skin
 		// Add custom styles:
 		$menu_bar_logo_padding = $this->get_setting( 'menu_bar_logo_padding' );
 
-		add_css_headline( '
-.evo_container__site_header a.evo_widget__site_logo_image img {
+		$css = '.evo_container__site_header a.evo_widget__site_logo_image img {
 	padding: '.$menu_bar_logo_padding.'px;
+}';
+
+		if( $this->get_setting( 'fixed_header' ) )
+		{	// Enable fixed position for header:
+			$css .= '.evo_container__site_header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10000;
 }
-' );
+body.evo_toolbar_visible .evo_container__site_header {
+	top: 27px;
+}
+body {
+	padding-top: 50px;
+}';
+		}
+
+		add_css_headline( $css );
 	}
 }
 
