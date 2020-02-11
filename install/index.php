@@ -382,8 +382,8 @@ $booststrap_install_form_params = array(
 		'checkbox_newline_end'   => "</div>\n",
 	);
 
-require_js_async( '#jquery#' );
-require_js_async( '#bootstrap#' );
+require_js( '#jquery#' );
+require_js( '#bootstrap#' );
 require_css( '#bootstrap_css#' );
 require_css( 'b2evo_helper_screens.min.css' );
 // Initialize font-awesome icons and use them as a priority over the glyphicons, @see get_icon()
