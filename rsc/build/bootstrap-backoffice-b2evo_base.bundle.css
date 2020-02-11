@@ -1562,10 +1562,12 @@ figure {
 }
 .evo_thumbnail__left {
   float: left;
+  clear: both;
   margin: 0 4px 4px 0;
 }
 .evo_thumbnail__right {
   float: right;
+  clear: both;
   margin: 0 0 4px 4px;
 }
 .replied_comment .evo_image_block img {

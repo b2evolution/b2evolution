@@ -167,7 +167,7 @@ class ItemQuery extends SQL
 		$BlogCache = & get_BlogCache();
 		$current_Blog = $BlogCache->get_by_ID( $blog );
 
-		$this->WHERE_and( $current_Blog->get_sql_where_aggregate_coll_IDs('cat_blog_ID') );
+		$this->WHERE_and( $current_Blog->get_sql_where_aggregate_coll_IDs( 'T_categories.cat_blog_ID' ) );
 
 
 		$cat_array = NULL;

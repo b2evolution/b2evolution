@@ -1733,7 +1733,7 @@ function init_affix_messages_js( $offset = 50 )
 			{
 				wrapper.css( { "min-height": msg_obj.outerHeight( true ) } );
 
-				msg_obj.css( { "width": msg_obj.outerWidth(), "top": msg_offset, "z-index": 99999 } );
+				msg_obj.css( { "width": msg_obj.outerWidth(), "top": msg_offset, "z-index": 9999 } );
 
 				jQuery( window ).on( "resize", function()
 					{ // This will resize the Messages based on the wrapper width
