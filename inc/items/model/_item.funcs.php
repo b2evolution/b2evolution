@@ -2955,8 +2955,10 @@ jQuery( document ).on( 'click', '#evo_merge_btn_merge, #evo_merge_btn_append', f
 function echo_autocomplete_tags( $params = array() )
 {
 	$params = array_merge( array(
+			'input_ID'       => 'item_tags',
 			'item_ID'        => NULL,
 			'update_by_ajax' => false,
+			'use_quick_tags' => false,
 		), $params );
 ?>
 	<script>
@@ -2969,7 +2971,7 @@ function echo_autocomplete_tags( $params = array() )
 			tags = tags.split( ',' );
 			for( var t in tags )
 			{
-				tags_json.push( { id: tags[t], name: tags[t] } );
+				tags_json.push( { id: tags[t].trim(), name: tags[t].trim() } );
 			}
 		}
 
@@ -2986,15 +2988,49 @@ function echo_autocomplete_tags( $params = array() )
 			searchingText: '<?php echo TS_('Searching...') ?>',
 			jsonContainer: 'tags',
 			<?php if( $params['update_by_ajax'] ) { ?>
-			onAdd: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
-			onDelete: function() { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector ) },
+			onAdd: function( obj ) { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector, obj, 'add' ) },
+			onDelete: function( obj ) { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector, obj, 'delete' ) },
 			<?php } ?>
 		} );
 	}
 
 	<?php if( $params['update_by_ajax'] ) { ?>
-	function evo_update_item_tags_by_ajax( item_ID, tags_selector )
+	function evo_update_item_tags_by_ajax( item_ID, tags_selector, tag_object, operation )
 	{
+		<?php if( $params['use_quick_tags'] ) { ?>
+		// Update quick tags:
+		if( operation == 'add' )
+		{
+			var item_tag = tag_object.name.trim();
+			var quick_item_tags = jQuery.cookie( 'quick_item_tags' );
+			if( quick_item_tags == null || quick_item_tags.length == 0 )
+			{
+				quick_item_tags = [];
+			}
+			else
+			{
+				quick_item_tags = quick_item_tags.split( ',' );
+			}
+			var tag_index = quick_item_tags.indexOf( item_tag );
+
+			if( tag_index === -1 )
+			{
+				quick_item_tags.push( item_tag );
+			}
+			else
+			{
+				quick_item_tags.splice( tag_index, 1 );
+				quick_item_tags.push( item_tag );
+			}
+
+			quick_item_tags = quick_item_tags.splice( -5 );
+			jQuery.cookie( 'quick_item_tags', quick_item_tags.join( ',' ), {
+					domain: '<?php echo format_to_js( get_cookie_domain() );?>',
+					path: '<?php echo format_to_js( get_cookie_path() );?>'
+				} );
+		}
+
+		<?php } ?>
 		// Mark input background with yellow color during AJAX updating:
 		var token_input = jQuery( '.token-input-' + tags_selector.substr( 1 ) );
 		token_input.removeClass( 'token-input-list-error' ).addClass( 'token-input-list-process' );
@@ -3024,22 +3060,24 @@ function echo_autocomplete_tags( $params = array() )
 
 	jQuery( document ).ready( function()
 	{
+		var input_ID = '<?php echo format_to_js( '#'.$params['input_ID'] );?>';
+
 		if( jQuery( '#suggest_item_tags' ).length == 0 || jQuery( '#suggest_item_tags' ).is( ':checked' ) )
 		{
-			init_autocomplete_tags( '#item_tags' );
+			init_autocomplete_tags( input_ID );
 		}
 
 		jQuery( '#suggest_item_tags' ).click( function()
 		{
 			if( jQuery( this ).is( ':checked' ) )
 			{ // Use plugin to suggest tags
-				jQuery( '#item_tags' ).hide();
-				init_autocomplete_tags( '#item_tags' );
+				jQuery( input_ID ).hide();
+				init_autocomplete_tags( input_ID );
 			}
 			else
 			{ // Remove autocomplete tags plugin
-				jQuery( '#item_tags' ).show();
-				jQuery( '#item_tags' ).parent().find( 'ul.token-input-list-facebook' ).remove();
+				jQuery( input_ID ).show();
+				jQuery( input_ID ).parent().find( 'ul.token-input-list-facebook' ).remove();
 			}
 		} );
 		<?php
@@ -5448,7 +5486,7 @@ function items_results( & $items_Results, $params = array() )
 		$items_Results->cols[] = array(
 				'th' => /* TRANS: abbrev for info */ T_('i'),
 				'th_title' => T_('Item history information'),
-				'order' => $params['field_prefix'].'datemodified',
+				'order' => $params['field_prefix'].'last_touched_ts',
 				'default_dir' => 'D',
 				'th_class' => 'shrinkwrap hidden-xs',
 				'td_class' => 'shrinkwrap hidden-xs',

@@ -912,7 +912,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 		// Replace all matching blocks with temporary text like '?X219a33da9c1b8f4e335bffc015df8c96X?'
 		// where X is index of match block in array $matches[0]
 		// It is used to avoid any changes in the matching blocks
-		$text = str_ireplace( $matches_source, $matches_temp, $text );
+		$text = str_replace( $matches_source, $matches_temp, $text );
 
 		// Callback:
 		$callback_params = $params;
@@ -920,7 +920,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 		$text = call_user_func_array( $callback, $callback_params );
 
 		// Revert a source code of the matching blocks in content
-		$text = str_ireplace( $matches_temp, $matches_source, $text );
+		$text = str_replace( $matches_temp, $matches_source, $text );
 
 		return $text;
 	}
@@ -8783,8 +8783,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 					{
 						case 'Item':
 							// Get the IMG tag with link to original image or to Item page:
-							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params )
-								.'<div class="clearfix"></div>';
+							$inlines[ $current_inline ] = $Object->get_attached_image_tag( $Link, $current_image_params );
 							break;
 
 						case 'EmailCampaign':
@@ -8800,14 +8799,12 @@ function render_inline_tags( $Object, $tags, $params = array() )
 									'image_link_to' => false,
 									'image_style'   => 'border: none; max-width: 100%; height: auto;'.$image_style,
 									'add_loadimg'   => false,
-								) ) )
-								.'<div class="clearfix"></div>';;
+								) ) );
 							break;
 
 						default:
 							// Get the IMG tag with link to original big image:
-							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) )
-								.'<div class="clearfix"></div>';
+							$inlines[ $current_inline ] = $Link->get_tag( array_merge( $params, $current_image_params ) );
 							break;
 					}
 				}
@@ -9387,7 +9384,7 @@ function insert_image_links_block( $params )
 			$edited_EmailCampaign = $EmailCampaignCache->get_by_ID( $params['target_ID'] );
 
 			if( isset( $GLOBALS['files_Module'] )
-				&& $current_User->check_perm( 'emails', 'edit', true )
+				&& $current_User->check_perm( 'emails', 'edit', false )
 				&& $current_User->check_perm( 'files', 'view', false ) )
 			{	// Files module is enabled, but in case of creating new email campaign  we should show file attachments block only if user has all required permissions to attach files
 				load_class( 'links/model/_linkemailcampaign.class.php', 'LinkEmailCampaign' );

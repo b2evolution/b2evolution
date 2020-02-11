@@ -86,7 +86,15 @@ function display_perm( $perm )
 			$r = get_icon( 'file_allowed_registered' );
 			break;
 		case 'admin':
-			$r = get_icon( 'file_not_allowed' );
+			global $admins_can_manipulate_sensitive_files;
+			if( empty( $admins_can_manipulate_sensitive_files) )
+			{
+				$r = get_icon( 'file_not_allowed', 'imgtag', array( 'title' => T_('Not allowed') ) );
+			}
+			else
+			{
+				$r = get_icon( 'file_not_allowed' );
+			}
 			break;
 		default:
 			debug_die( 'Wrong filetype allowed value!' );

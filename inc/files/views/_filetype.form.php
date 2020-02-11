@@ -77,7 +77,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New file type') : T_('File type') )
 	{
 		$admin_allow_text = T_('Prevent uploading/renaming/editing files of this type');
 		$allow_upload_note = sprintf( T_('You can unlock this for admins by setting %s in the <a %s>configuration files</a>'),
-				'<code>$admins_can_manipulate_sensitive_files = true</code>', get_manual_url( 'advanced-php') );
+				'<code>$admins_can_manipulate_sensitive_files = true</code>', 'target="_blank" href="'.get_manual_url( 'advanced-php').'"' );
 	}
 	else
 	{

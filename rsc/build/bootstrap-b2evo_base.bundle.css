@@ -1562,10 +1562,12 @@ figure {
 }
 .evo_thumbnail__left {
   float: left;
+  clear: both;
   margin: 0 4px 4px 0;
 }
 .evo_thumbnail__right {
   float: right;
+  clear: both;
   margin: 0 0 4px 4px;
 }
 .replied_comment .evo_image_block img {
@@ -2664,6 +2666,20 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
     font-size: 20px;
     line-height: 45px;
   }
+}
+.widget_core_item_tags .evo_widget_item_tags_edit_form .post_tags {
+  display: flex;
+  align-items: stretch;
+}
+.widget_core_item_tags .evo_widget_item_tags_edit_form .post_tags_label {
+  line-height: 3em;
+  margin-right: 5px;
+}
+.widget_core_item_tags .evo_widget_item_tags_edit_form .evo_widget_item_tags_quicklist .btn + .btn {
+  margin-left: 3px;
+}
+.widget_core_item_tags .evo_widget_item_tags_list .post_tags {
+  display: inline-block;
 }
 .videojs_block .vjs-default-skin .vjs-big-play-button {
   left: 0;

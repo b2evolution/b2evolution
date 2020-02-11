@@ -203,7 +203,7 @@ function skin_init( $disp )
 					$canonical_url = url_add_param( $canonical_url, implode( '&', $page_param[1] ), '&' );
 				}
 				if( preg_match( '|[&?](revision=(p?\d+))|', $ReqURI, $revision_param )
-						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', true, $Item ) )
+						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 						&& $item_revision = $Item->get_revision( $revision_param[2] ) )
 				{ // A revision of the post, keep only this param and discard all others:
 					$canonical_url = url_add_param( $canonical_url, $revision_param[1], '&' );
@@ -704,8 +704,8 @@ function skin_init( $disp )
 					}
 				}
 
-				if( $allow_msgform == 'email' )
-				{ // set recippient user param
+				if( empty( $recipient_id ) && ! empty( $recipient_User ) )
+				{	// Set recipient user param when it is not specified in GET/POST:
 					set_param( 'recipient_id', $recipient_User->ID );
 				}
 			}
