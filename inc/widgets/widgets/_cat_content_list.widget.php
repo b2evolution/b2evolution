@@ -77,7 +77,7 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display the content list of the current category when browsing categories.').' (disp=posts)';
+		return T_('Display the content list with categories and posts.');
 	}
 
 
@@ -131,9 +131,9 @@ class cat_content_list_Widget extends ComponentWidget
 
 		$ChapterCache = & get_ChapterCache();
 
-		if( ! ( $curr_Chapter = & $ChapterCache->get_by_ID( $cat, false, false ) ) )
-		{	// Display error when no cat is found:
-			$this->display_error_message( sprintf( 'No %s ID found. Cannot display widget "%s".', '<code>cat</code>', $this->get_name() ) );
+		if( ! empty( $cat ) && ! ( $curr_Chapter = & $ChapterCache->get_by_ID( $cat, false, false ) ) )
+		{	// Display error when no cat is found by requested ID:
+			$this->display_error_message( sprintf( 'No %s found by ID %s. Cannot display widget "%s".', '<code>cat</code>', $cat, $this->get_name() ) );
 			return false;
 		}
 
@@ -169,11 +169,24 @@ class cat_content_list_Widget extends ComponentWidget
 			echo $params['before_list'];
 		}
 
-		$callbacks = array(
-			'line'  => array( $this, 'cat_inskin_display' ),
-			'posts' => array( $this, 'item_inskin_display' ),
-		);
-		$ChapterCache->iterate_through_category_children( $curr_Chapter, $callbacks, false, array_merge( $params, array( 'sorted' => true ) ) );
+		if( empty( $curr_Chapter ) )
+		{	// Display all root categories of the current Collection:
+			global $Blog;
+			$ChapterCache->clear();
+			$ChapterCache->load_where( 'cat_blog_ID = '.$Blog->ID.' AND cat_parent_ID IS NULL' );
+			foreach( $ChapterCache->cache as $Chapter )
+			{
+				$this->cat_inskin_display( $Chapter, 0, $params );
+			}
+		}
+		else
+		{	// Display child categories ad posts of the current Category:
+			$callbacks = array(
+				'line'  => array( $this, 'cat_inskin_display' ),
+				'posts' => array( $this, 'item_inskin_display' ),
+			);
+			$ChapterCache->iterate_through_category_children( $curr_Chapter, $callbacks, false, array_merge( $params, array( 'sorted' => true ) ) );
+		}
 
 		if( isset( $params['after_list'] ) )
 		{

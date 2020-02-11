@@ -152,7 +152,11 @@ class cat_title_Widget extends ComponentWidget
 				$ChapterCache = & get_ChapterCache();
 				// Load blog's categories
 				$ChapterCache->reveal_children( empty( $Blog ) ? NULL : $Blog->ID );
-				$curr_Chapter = & $ChapterCache->get_by_ID( $cat, false );
+				if( ! ( $curr_Chapter = & $ChapterCache->get_by_ID( $cat, false ) ) )
+				{	// Display error when no cat is found by requested ID:
+					$this->display_error_message( sprintf( 'No %s found by ID %s. Cannot display widget "%s".', '<code>cat</code>', $cat, $this->get_name() ) );
+					return false;
+				}
 
 				echo $this->disp_params['block_start'];
 				$this->disp_title();
