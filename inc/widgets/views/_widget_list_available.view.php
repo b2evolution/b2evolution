@@ -109,7 +109,6 @@ $core_componentwidget_defs = array(
 			'coll_search_form',             // Search Form
 			'site_logo',                    // Site logo
 			'cat_title',                    // Category Title
-			'cat_content_list',             // Category Content List
 			'coll_current_filters',         // Current Item filters
 			'coll_current_comment_filters', // Current Comment filters
 			'coll_item_list_pages',         // List Pager
@@ -124,6 +123,7 @@ $core_componentwidget_defs = array(
 	'content' => array(
 			'coll_post_list',         // Post list
 			'content_hierarchy',      // Content Hierarchy
+			'cat_content_list',       // Category Content List
 			'coll_page_list',         // Page list
 			'coll_featured_posts',    // Featured Posts list
 			'coll_related_post_list', // Related Posts list

@@ -77,7 +77,7 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function get_desc()
 	{
-		return T_('Display the content list with categories and posts.');
+		return T_('Display the contents (sub-categories and posts) of the current category (or collection root).');
 	}
 
 
