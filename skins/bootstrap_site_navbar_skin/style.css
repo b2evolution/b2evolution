@@ -1,61 +1,61 @@
 /*
  * Styles for Site skin "bootstrap_site_navbar_skin"
  */
-.bootstrap_site_navbar_header .navbar {
+.evo_site_skin__header .navbar {
   margin-bottom: 0;
 }
-.bootstrap_site_navbar_header .navbar .navbar-header.navbar-header-with-logo .navbar-brand {
+.evo_site_skin__header .navbar .navbar-header.navbar-header-with-logo .navbar-brand {
   padding: 0;
 }
-.bootstrap_site_navbar_header .navbar .navbar-header.navbar-header-with-logo .navbar-brand img {
+.evo_site_skin__header .navbar .navbar-header.navbar-header-with-logo .navbar-brand img {
   max-height: 100%;
   max-width: 270px;
 }
-.bootstrap_site_navbar_header .navbar .navbar-collapse {
+.evo_site_skin__header .navbar .navbar-collapse {
   padding: 0;
 }
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav {
+.evo_site_skin__header .navbar .navbar-collapse .nav {
   margin: 0;
 }
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right {
+.evo_site_skin__header .navbar .navbar-collapse .nav.navbar-right {
   border-top: 1px solid;
   padding-top: 9px;
 }
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav .login {
+.evo_site_skin__header .navbar .navbar-collapse .nav .login {
   padding-top: 4px;
   padding-bottom: 4px;
   line-height: 32px;
 }
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav .login img {
+.evo_site_skin__header .navbar .navbar-collapse .nav .login img {
   margin-right: 5px;
   border-radius: 4px;
 }
-.bootstrap_site_navbar_header .level2 ul.nav.nav-pills {
+.evo_site_skin__header .level2 ul.nav.nav-pills {
   margin: 15px 0;
 }
 @media (min-width: 768px) {
-  .bootstrap_site_navbar_header .navbar .container-fluid.level1 {
+  .evo_site_skin__header .navbar .container-fluid.level1 {
     padding-right: 0;
   }
-  .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-left {
+  .evo_site_skin__header .navbar .navbar-collapse .nav.navbar-left {
     margin-right: 15px;
   }
-  .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right {
+  .evo_site_skin__header .navbar .navbar-collapse .nav.navbar-right {
     border-top: none;
     padding: 0;
   }
-  .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right li.evo_widget > a {
+  .evo_site_skin__header .navbar .navbar-collapse .nav.navbar-right li.evo_widget > a {
     display: inline-block;
   }
-  .bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right .login {
+  .evo_site_skin__header .navbar .navbar-collapse .nav.navbar-right .login {
     padding-top: 8px;
     padding-bottom: 9px;
   }
 }
-.bootstrap_site_navbar_footer {
+.evo_site_skin__footer {
   background-color: #f5f5f5;
 }
-.bootstrap_site_navbar_footer p {
+.evo_site_skin__footer p {
   margin: 20px 0;
 }
 .btn.slide-top {

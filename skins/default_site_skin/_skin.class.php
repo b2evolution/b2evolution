@@ -127,19 +127,19 @@ class default_site_Skin extends Skin
 		// Add custom styles:
 		$menu_bar_logo_padding = $this->get_setting( 'menu_bar_logo_padding' );
 
-		$css = '.evo_container__site_header a.evo_widget__site_logo_image img {
+		$css = '.evo_site_skin__header a.evo_widget__site_logo_image img {
 	padding: '.$menu_bar_logo_padding.'px;
 }';
 
 		if( $this->get_setting( 'fixed_header' ) )
 		{	// Enable fixed position for header:
-			$css .= '.evo_container__site_header {
+			$css .= '.evo_site_skin__header {
 	position: fixed;
 	top: 0;
 	width: 100%;
 	z-index: 10000;
 }
-body.evo_toolbar_visible .evo_container__site_header {
+body.evo_toolbar_visible .evo_site_skin__header {
 	top: 27px;
 }
 body {

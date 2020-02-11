@@ -64,7 +64,7 @@ jQuery( document ).ready( function()
 			if( $sidebar.hasClass( 'fixed' ) )
 			{	// Check and fix an overlapping of footer with sidebar:
 				$sidebar.css( 'top', sidebar_top_start_point + 'px' );
-				var diff = parseInt( column_top_point + sidebar_height - jQuery( '.evo_container__site_footer' ).offset().top );
+				var diff = parseInt( column_top_point + sidebar_height - jQuery( '.evo_site_skin__footer' ).offset().top );
 				if( diff >= 0 )
 				{
 					$sidebar.css( 'top', parseInt( sidebar_top_start_point - diff - 5 ) + 'px' );
@@ -75,7 +75,7 @@ jQuery( document ).ready( function()
 
 	var top_start_point = ( jQuery( '#evo_toolbar' ).length > 0 ? 28 : 0 ) + 10;
 
-	jQuery( '.evo_container__site_header, .bootstrap_site_navbar_header' ).each( function()
+	jQuery( '.evo_site_skin__header' ).each( function()
 	{	// Shift fixed sidebar down on height of site header:
 		if( jQuery( this ).css( 'position' ) == 'fixed' )
 		{
