@@ -80,6 +80,31 @@ echo '</div>';
 
 $UserCache = & get_UserCache();
 
+// KEYWORDS:
+$Form->begin_fieldset( T_('Keywords'), array( 'id' => 'items_filter_keywords', 'fold' => true, 'default_fold' => false ) );
+?>
+<div class="tile"><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField form-control" /></div>
+<div class="tile">
+	<input type="radio" name="<?php echo $pp ?>sentence" value="AND" id="sentAND" class="radio" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
+	<label for="sentAND"><?php echo T_('AND') ?></label>
+</div>
+<div class="tile">
+	<input type="radio" name="<?php echo $pp ?>sentence" value="OR" id="sentOR" class="radio" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> />
+	<label for="sentOR"><?php echo T_('OR') ?></label>
+</div>
+<div class="tile">
+	<input type="radio" name="<?php echo $pp ?>sentence" value="sentence" id="sentence" class="radio" <?php if( $sentence=='sentence' ) echo 'checked="checked" '?> />
+	<label for="sentence"><?php echo T_('Entire phrase') ?></label>
+</div>
+<div class="tile">
+	<input type="checkbox" name="<?php echo $pp ?>exact" value="1" id="exact" class="checkbox" <?php if( $exact ) echo 'checked="checked" '?> />
+	<label for="exact"><?php echo T_('Exact match') ?></label>
+</div>
+
+<?php
+$Form->end_fieldset();
+
+// DATE:
 if( get_param( 'tab_type' ) == 'post' )
 {
 	$fold_date = ( $ItemList->default_filters['ymdhms'] == $ItemList->filters['ymdhms'] );
@@ -252,31 +277,6 @@ foreach( $item_types as $loop_Obj )
 echo '</ul>';
 $Form->end_fieldset();
 
-// KEYWORDS:
-$fold_keywords = ( $ItemList->default_filters['keywords'] == $ItemList->filters['keywords'] );
-$Form->begin_fieldset( T_('Keywords'), array( 'id' => 'items_filter_keywords', 'fold' => true, 'default_fold' => $fold_keywords ) );
-?>
-<div class="tile"><input type="text" name="<?php echo $pp ?>s" size="20" value="<?php echo htmlspecialchars($s) ?>" class="SearchField form-control" /></div>
-<div class="tile">
-	<input type="radio" name="<?php echo $pp ?>sentence" value="AND" id="sentAND" class="radio" <?php if( $sentence=='AND' ) echo 'checked="checked" '?> />
-	<label for="sentAND"><?php echo T_('AND') ?></label>
-</div>
-<div class="tile">
-	<input type="radio" name="<?php echo $pp ?>sentence" value="OR" id="sentOR" class="radio" <?php if( $sentence=='OR' ) echo 'checked="checked" '?> />
-	<label for="sentOR"><?php echo T_('OR') ?></label>
-</div>
-<div class="tile">
-	<input type="radio" name="<?php echo $pp ?>sentence" value="sentence" id="sentence" class="radio" <?php if( $sentence=='sentence' ) echo 'checked="checked" '?> />
-	<label for="sentence"><?php echo T_('Entire phrase') ?></label>
-</div>
-<div class="tile">
-	<input type="checkbox" name="<?php echo $pp ?>exact" value="1" id="exact" class="checkbox" <?php if( $exact ) echo 'checked="checked" '?> />
-	<label for="exact"><?php echo T_('Exact match') ?></label>
-</div>
-
-<?php
-$Form->end_fieldset();
-
 // AUTHOR:
 // TODO: allow multiple selection
 // Load only first 21 users to know when we should display an input box instead of full users list
@@ -323,8 +323,8 @@ skin_widget( array(
 	// CODE for the widget:
 	'widget' => 'coll_category_list',
 	// Optional display params
-	'block_start'         => '',
-	'block_end'           => '',
+	'block_start'         => '<div class="widget_core_coll_category_list">',
+	'block_end'           => '</div>',
 	'title'               => '',
 	'block_display_title' => false,
 	'link_type'           => 'context',
