@@ -126,6 +126,12 @@ class bootstrap_site_navbar_Skin extends Skin
 						'allow_none' => true,
 						'defaultvalue' => 0,
 					),
+					'fixed_header' => array(
+						'label' => T_('Fixed position'),
+						'note' => T_('Check to fix header top on scroll down'),
+						'type' => 'checkbox',
+						'defaultvalue' => 1,
+					),
 
 					'section_topmenu_start' => array(
 						'layout' => 'begin_fieldset',
@@ -330,26 +336,26 @@ class bootstrap_site_navbar_Skin extends Skin
 		$footer_link_color = $this->get_setting( 'footer_link_color' );
 
 
-		add_css_headline( '
-.bootstrap_site_navbar_header .navbar {
+		$css = '
+.evo_site_skin__header .navbar {
 	background-color: '.$menu_bar_bg_color.';
 	border-color: '.$menu_bar_border_color.';
 }
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right {
+.evo_site_skin__header .navbar .navbar-collapse .nav.navbar-right {
 	border-color: '.$menu_bar_border_color.';
 }
-.bootstrap_site_navbar_header .navbar-brand img {
+.evo_site_skin__header .navbar-brand img {
 	padding: '.$menu_bar_logo_padding.'px;
 }
-.bootstrap_site_navbar_header .navbar .nav > li:not(.active) > a {
+.evo_site_skin__header .navbar .nav > li:not(.active) > a {
 	background-color: '.$tab_bg_color.';
 	color: '.$tab_text_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav > li:not(.active) > a:hover {
+.evo_site_skin__header .navbar .nav > li:not(.active) > a:hover {
 	background-color: '.$hover_tab_bg_color.';
 	color: '.$hover_tab_text_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav > li.active > a {
+.evo_site_skin__header .navbar .nav > li.active > a {
 	background-color: '.$selected_tab_bg_color.';
 	color: '.$selected_tab_text_color.';
 }
@@ -370,14 +376,51 @@ div.level2 ul.nav.nav-pills li.active a {
 	color: '.$sub_selected_tab_text_color.';
 }
 
-footer.bootstrap_site_navbar_footer {
+footer.evo_site_skin__footer {
 	background-color: '.$footer_bg_color.';
 	color: '.$footer_text_color.';
 }
-footer.bootstrap_site_navbar_footer .container a {
+footer.evo_site_skin__footer .container a {
 	color: '.$footer_link_color.';
 }
-' );
+';
+
+		if( $this->get_setting( 'fixed_header' ) )
+		{	// Enable fixed position for header:
+			$css .= '.evo_site_skin__header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10000;
+}
+body.evo_toolbar_visible .evo_site_skin__header {
+	top: 27px;
+}
+body {
+	padding-top: '.( $this->has_sub_menus() ? '100' : '50' ).'px;
+}';
+		}
+
+		add_css_headline( $css );
+	}
+
+
+	/**
+	 * Check if skin currently has sub menus
+	 *
+	 * @return boolean
+	 */
+	function has_sub_menus()
+	{
+		if( ! $this->get_setting( 'grouping' ) )
+		{	// Skin does NOT group collections sub tabs:
+			return false;
+		}
+
+		$header_tabs = $this->get_header_tabs();
+
+		return ( isset( $header_tabs[ $this->header_tab_active ]['items'] ) &&
+			count( $header_tabs[ $this->header_tab_active ]['items'] ) > 1 );
 	}
 
 
@@ -390,7 +433,12 @@ footer.bootstrap_site_navbar_footer .container a {
 	{
 		global $Blog, $disp, $current_User;
 
-		$header_tabs = array();
+		if( isset( $this->header_tabs ) )
+		{	// Get header tabs from previous request:
+			return $this->header_tabs;
+		}
+
+		$this->header_tabs = array();
 
 		// Get disp from request string if it is not initialized yet:
 		$current_disp = isset( $_GET['disp'] ) ? $_GET['disp'] : ( isset( $disp ) ? $disp : NULL );
@@ -466,7 +514,7 @@ footer.bootstrap_site_navbar_footer .container a {
 
 			if( ! empty( $tab_items ) )
 			{	// Display section only if at least one collection is allowed for current display:
-				$header_tabs[] = array(
+				$this->header_tabs[] = array(
 						'name'  => $Section->get_name(),
 						'url'   => $tab_items[0]['url'],
 						'items' => $tab_items
@@ -485,7 +533,7 @@ footer.bootstrap_site_navbar_footer .container a {
 
 		foreach( $BlogCache->cache as $nosec_Blog )
 		{
-			$header_tabs[] = array(
+			$this->header_tabs[] = array(
 					'name' => $nosec_Blog->get( 'shortname' ),
 					'url'  => $nosec_Blog->get( 'url' ),
 				);
@@ -529,7 +577,7 @@ footer.bootstrap_site_navbar_footer .container a {
 
 			if( ! empty( $contact_url ) )
 			{	// Display additional tabs with static pages only user has an access to contact page:
-				$header_tabs[] = array(
+				$this->header_tabs[] = array(
 						'name'   => T_('About'),
 						'url'    => $contact_url,
 						'items'  => $tab_items
@@ -537,7 +585,7 @@ footer.bootstrap_site_navbar_footer .container a {
 			}
 		}
 
-		return $header_tabs;
+		return $this->header_tabs;
 	}
 
 

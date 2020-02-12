@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2004-2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -232,11 +232,8 @@ function skin_init( $disp )
 				{	// If non-canonical URL is allowed for cross-posted items, then only get canonical URL in the main collection:
 					$canonical_url = $main_canonical_url;
 				}
-				$canonical_url_params_regexp = '#[&?](page=\d+|mode=quote&[qcp]+=\d+)+#';
-				if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
-				{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
-					$canonical_url = url_add_param( $canonical_url, implode( '&', $page_param[1] ), '&' );
-				}
+				// Keep ONLY allowed noredir params from current URL in the canonical URL:
+				$canonical_url = url_clear_noredir_params( $canonical_url );
 				if( preg_match( '|[&?](revision=(p?\d+))|', $ReqURI, $revision_param )
 						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 						&& $item_revision = $Item->get_revision( $revision_param[2] ) )
@@ -258,10 +255,8 @@ function skin_init( $disp )
 							continue;
 						}
 						$cat_canonical_url = $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $Blog->ID, $item_Chapter->ID );
-						if( preg_match_all( $canonical_url_params_regexp, $ReqURI, $page_param ) )
-						{	// A certain post page or a quote of comment/post have been requested, keep only this param and discard all others:
-							$cat_canonical_url = url_add_param( $cat_canonical_url, implode( '&', $page_param[1] ), '&' );
-						}
+						// Keep ONLY allowed noredir params from current URL in the category canonical URL:
+						$cat_canonical_url = url_clear_noredir_params( $cat_canonical_url );
 						if( $canonical_is_same_url = is_same_url( $ReqURL, $cat_canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 						{	// We have found the same URL, stop find another and stay on the current page without redirect:
 							break;

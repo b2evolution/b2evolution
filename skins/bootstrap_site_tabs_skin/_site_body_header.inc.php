@@ -31,7 +31,7 @@ else
 }
 ?>
 
-<div class="swhead_wrapper">
+<div class="evo_site_skin__header">
 
 		<?php if( $site_has_logo_file ) { ?>
 			<div class="swhead_sitename<?php echo $site_title_class; ?>">
@@ -218,7 +218,7 @@ if( $site_Skin->get_setting( 'grouping' ) &&
 ?>
 
 	</div><?php // END OF <div class="swhead_menus"> ?>
-</div><?php // END OF <div class="swhead_wrapper"> ?>
+</div><?php // END OF <div class="evo_site_skin__header"> ?>
 
 <?php if( $site_Skin->get_setting( 'back_to_top_button' ) )
 { // Check if "Back to Top" button is enabled

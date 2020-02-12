@@ -6,7 +6,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package plugins
  * @ignore
@@ -244,12 +244,12 @@ class markdown_plugin extends Plugin
 		// Parse markdown code to HTML
 		if( stristr( $content, '<code' ) !== false ||
 		    stristr( $content, '<pre' ) !== false ||
-		    preg_match( '/\[[a-z]+:.+?\]/i', $content ) )
+		    preg_match( '/\[[a-z]+:[^\]`]+\]/i', $content ) )
 		{ // Call replace_content() on everything outside code/pre:
 			$content = callback_on_non_matching_blocks( $content,
 				'~(<code[^>]*>.*?</code>|'
 				.'<pre[^>]*>.*?</pre>|'
-				.'\[[a-z]+:[^\]]+\])~is',
+				.'\[[a-z]+:[^\]`]+\])~is',
 				array( $ParsedownB2evo, 'text' ) );
 		}
 		else

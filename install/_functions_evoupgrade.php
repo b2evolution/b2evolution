@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package install
  */
@@ -12145,6 +12145,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				WHERE wi_ID = '.$row->wi_ID );
 		}
 
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15790, 'Upgrading menu entries table...') )
+	{	// part of 7.1.2-beta
+		db_add_col( 'T_menus__entry', 'ment_item_slug', 'VARCHAR(255) COLLATE ascii_general_ci NULL AFTER ment_item_ID' );
 		upg_task_end();
 	}
 

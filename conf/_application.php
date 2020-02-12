@@ -21,7 +21,7 @@ $app_version = '7.1.2-beta';
  * Release date (ISO)
  * @global string
  */
-$app_date = '2020-02-10';
+$app_date = '2020-02-12';
 
 /**
  * Is this b2evolution PRO?
@@ -43,7 +43,7 @@ $app_version_long = $app_version.'-'.$app_date;
  *
  * {@internal Before changing this in CVS, it should be discussed! }}
  */
-$new_db_version = 15780;
+$new_db_version = 15790;
 
 /**
  * Minimum PHP version required for b2evolution to function properly. It will contain each module own minimum PHP version as well.
@@ -64,7 +64,7 @@ $app_footer_text = '<a href="http://b2evolution.net/" title="visit b2evolution\'
 		&ndash;
 		<a href="http://b2evolution.net/about/gnu-gpl-license" class="nobr">GPL License</a>';
 
-$copyright_text = '<span class="nobr">&copy;2003-2018 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
+$copyright_text = '<span class="nobr">&copy;2003-2020 by <a href="http://fplanque.net/">Fran&ccedil;ois</a> <a href="http://fplanque.com/">Planque</a> &amp; <a href="http://b2evolution.net/about/about-us">others</a>.</span>';
 
 /**
  * Do you want to display the help links to online documentation?

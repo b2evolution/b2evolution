@@ -51,15 +51,9 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New Menu Entry') : T_('Menu Entry
 
 	$Form->text_input( 'ment_cat_ID', $edited_SiteMenuEntry->get( 'cat_ID' ), 11, T_('Category ID'), '', array( 'maxlength' => 11, 'hide' => ! in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'recentposts', 'postnew' ) ) ) );
 
-	$Form->begin_line( T_('Item ID'), 'ment_item', '', array( 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'item' ) ) );
-		$menu_Item_urltitle = '';
-		if( $menu_Item = $edited_SiteMenuEntry->get_Item() )
-		{
-			$menu_Item_urltitle = $menu_Item->urltitle;
-		}
-		$Form->text_input( 'ment_item_ID', $edited_SiteMenuEntry->get( 'item_ID' ), 11, '', '', array( 'maxlength' => 11 ) );
-		$Form->text_input( 'ment_item_urltitle', $menu_Item_urltitle, 25, '', '', array( 'maxlength' => 210, 'placeholder' => T_('URL "slug"') ) );
-	$Form->end_line();
+	$Form->text_input( 'ment_item_ID', $edited_SiteMenuEntry->get( 'item_ID' ), 11, T_('Item ID'), '', array( 'maxlength' => 11, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'item' ) ) );
+	
+	$Form->text_input( 'ment_item_slug', $edited_SiteMenuEntry->get( 'item_slug' ), 25, T_('Item slug'), '', array( 'maxlength' => 255, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'item' ) ) );
 
 	$Form->text_input( 'ment_url', $edited_SiteMenuEntry->get( 'url' ), 128, T_('URL'), '', array( 'maxlength' => 2000, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'url' ) ) );
 
@@ -93,7 +87,8 @@ jQuery( '#ment_type' ).change( function()
 	// Hide/Show category ID:
 	jQuery( '#ffield_ment_cat_ID' ).toggle( link_type_value == 'recentposts' || link_type_value == 'postnew' );
 	// Hide/Show item ID:
-	jQuery( '#ffield_ment_item' ).toggle( link_type_value == 'item' );
+	jQuery( '#ffield_ment_item_ID' ).toggle( link_type_value == 'item' );
+	jQuery( '#ffield_ment_item_slug' ).toggle( link_type_value == 'item' );
 	// Hide/Show URL:
 	jQuery( '#ffield_ment_url' ).toggle( link_type_value == 'url' );
 } );

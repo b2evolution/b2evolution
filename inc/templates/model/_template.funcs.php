@@ -257,7 +257,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Item:feedback_link':
-			echo $rendered_Item->get_feedback_link();
+			echo $rendered_Item->get_feedback_link( $params );
 			break;
 
 		case 'Item:flag_icon':

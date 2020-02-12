@@ -10,7 +10,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -1053,9 +1053,7 @@ switch( $action )
 		param( 'blog', 'integer', true );
 		param( 'selected_items', 'array:integer' );
 		param( 'cat_type', 'string' );
-		param( 'tab', 'string' );
-		param( 'tab_type', 'string' );
-		param( 'page', 'integer', 1 );
+		param( 'redirect_to', 'url', true );
 
 		// Initialize objects for proper displaying of categories selector table:
 		$BlogCache = & get_BlogCache();
@@ -1079,9 +1077,7 @@ switch( $action )
 		param( 'blog', 'integer', true );
 		param( 'selected_items', 'array:integer' );
 		param( 'renderer_change_type', 'string' );
-		param( 'tab', 'string' );
-		param( 'tab_type', 'string' );
-		param( 'page', 'integer', 1 );
+		param( 'redirect_to', 'url', true );
 
 		// Initialize objects for proper displaying of list of renderers:
 		$BlogCache = & get_BlogCache();

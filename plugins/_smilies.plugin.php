@@ -4,7 +4,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @author fplanque: Francois PLANQUE.
  * @author gorgeb: Bertrand GORGE / EPISTEMA
@@ -370,13 +370,13 @@ XX(      graydead.gif
 		if( stristr( $content, '<code' ) !== false ||
 		    stristr( $content, '<pre' ) !== false ||
 		    strstr( $content, '`' ) !== false ||
-		    preg_match( '/\[[a-z]+:.+?\]/i', $content ) )
+		    preg_match( '/\[[a-z]+:[^\]`]+\]/i', $content ) )
 		{	// Call ReplaceTagSafe() on everything outside code/pre, markdown codeblocks and short tags:
 			$content = callback_on_non_matching_blocks( $content,
 				'~(`.*?`|'
 				.'<code[^>]*>.*?</code>|'
 				.'<pre[^>]*>.*?</pre>|'
-				.'\[[a-z]+:[^\]]+\])~is',
+				.'\[[a-z]+:[^\]`]+\])~is',
 				array( & $this, 'ReplaceTagSafe' ) );
 		}
 		else

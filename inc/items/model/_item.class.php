@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -9144,7 +9144,7 @@ class Item extends ItemLight
 			) );
 
 		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
-		$first_content_part = preg_replace( '/\[[a-z]+:[^\]]*\]/i', '', $first_content_part );
+		$first_content_part = preg_replace( '/\[[a-z]+:[^\]`]*\]/i', '', $first_content_part );
 
 		return excerpt( $first_content_part, $maxlen, $tail );
 	}

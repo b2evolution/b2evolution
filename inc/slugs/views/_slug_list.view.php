@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
  * Parts of this file are copyright (c)2005 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package admin
@@ -179,7 +179,7 @@ function get_tinyurl( $Slug )
 			}
 			else
 			{
-				$tinyurl = url_add_tail( $Blog->get( 'url' ), '/'.$Slug->title );;
+				$tinyurl = url_add_tail( $Blog->get( 'url' ), '/'.$Slug->title );
 			}
 
 			$title = T_( 'This is a tinyurl you can copy/paste into twitter, emails and other places where you need a short link to this post' );

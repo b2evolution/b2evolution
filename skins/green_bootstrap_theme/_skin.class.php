@@ -1,5 +1,7 @@
 <?php
 /**
+ * This is an EXPERIMENTAL DEMO of grouping several skins into a single Theme. 
+ *
  * This file implements a class derived of the generic Skin class in order to provide custom code for
  * the skin in this folder.
  *
@@ -34,7 +36,7 @@ class green_bootstrap_theme_Skin extends Skin
 	 */
 	function get_default_name()
 	{
-		return 'Green Bootstrap Theme';
+		return 'Green Bootstrap Theme (EXPERIMENTAL)';
 	}
 
 

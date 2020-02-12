@@ -126,6 +126,12 @@ class bootstrap_site_tabs_Skin extends Skin
 						'allow_none' => true,
 						'defaultvalue' => 0,
 					),
+					'fixed_header' => array(
+						'label' => T_('Fixed position'),
+						'note' => T_('Check to fix header top on scroll down'),
+						'type' => 'checkbox',
+						'defaultvalue' => 1,
+					),
 
 					'section_topmenu_start' => array(
 						'layout' => 'begin_fieldset',
@@ -329,37 +335,37 @@ class bootstrap_site_tabs_Skin extends Skin
 		$footer_text_color = $this->get_setting( 'footer_text_color' );
 		$footer_link_color = $this->get_setting( 'footer_link_color' );
 
-		add_css_headline( '
-.swhead_wrapper .swhead_menus div.level1 {
+		$css = '
+.evo_site_skin__header .swhead_menus div.level1 {
 	background-color: '.$menu_bar_bg_color.';
 	border-color: '.$tab_border_color.';
 }
-.swhead_wrapper .swhead_sitename.swhead_logo img {
+.evo_site_skin__header .swhead_sitename.swhead_logo img {
 	padding: '.$menu_bar_logo_padding.'px;
 }
-.swhead_wrapper .swhead_menus div.level1 nav .pull-left li:not(.active):not(.swhead_sitename) a,
-.swhead_wrapper .swhead_menus div.level1 nav div.pull-right a.btn {
+.evo_site_skin__header .swhead_menus div.level1 nav .pull-left li:not(.active):not(.swhead_sitename) a,
+.evo_site_skin__header .swhead_menus div.level1 nav div.pull-right a.btn {
 	background-color: '.$tab_bg_color.';
 	border-color: '.$tab_border_color.';
 	color: '.$tab_text_color.';
 }
-.swhead_wrapper .swhead_menus div.level1 nav div.pull-right a.btn {
+.evo_site_skin__header .swhead_menus div.level1 nav div.pull-right a.btn {
 	border-color: '.$tab_bg_color.';
 }
-.swhead_wrapper .swhead_menus div.level1 nav .pull-left li.active a {
+.evo_site_skin__header .swhead_menus div.level1 nav .pull-left li.active a {
 	background-color: '.$selected_tab_bg_color.';
 	border-color: '.$tab_border_color.';
 	color: '.$selected_tab_text_color.';
 }
-.swhead_wrapper .swhead_menus div.level1 nav .pull-left li.swhead_sitename a {
+.evo_site_skin__header .swhead_menus div.level1 nav .pull-left li.swhead_sitename a {
 	color: '.$tab_text_color.';
 }
-.swhead_wrapper .swhead_menus div.level1 nav .pull-left li:not(.active):not(.swhead_sitename) a:hover,
-.swhead_wrapper .swhead_menus div.level1 nav div.pull-right a.btn:hover {
+.evo_site_skin__header .swhead_menus div.level1 nav .pull-left li:not(.active):not(.swhead_sitename) a:hover,
+.evo_site_skin__header .swhead_menus div.level1 nav div.pull-right a.btn:hover {
 	background-color: '.$hover_tab_bg_color.';
 	color: '.$hover_tab_text_color.';
 }
-.swhead_wrapper .swhead_menus div.level1 nav div.pull-right a.btn:hover {
+.evo_site_skin__header .swhead_menus div.level1 nav div.pull-right a.btn:hover {
 	border-color: '.$hover_tab_bg_color.';
 }
 div.level1 nav ul.nav.nav-tabs {
@@ -382,14 +388,32 @@ div.level2 ul.nav.nav-pills li.active a {
 	color: '.$sub_selected_tab_text_color.';
 }
 
-footer.sitewide_footer {
+footer.evo_site_skin__footer {
 	background-color: '.$footer_bg_color.';
 	color: '.$footer_text_color.';
 }
-footer.sitewide_footer .container a {
+footer.evo_site_skin__footer .container a {
 	color: '.$footer_link_color.';
 }
-');
+';
+
+		if( $this->get_setting( 'fixed_header' ) )
+		{	// Enable fixed position for header:
+			$css .= '.evo_site_skin__header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10000;
+}
+body.evo_toolbar_visible .evo_site_skin__header {
+	top: 27px;
+}
+body {
+	padding-top: 50px;
+}';
+		}
+
+		add_css_headline( $css );
 	}
 
 

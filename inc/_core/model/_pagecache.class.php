@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  * Parts of this file are copyright (c)2004-2006 by Daniel HAHLER - {@link http://thequod.de/contact}.
  *
  * @package evocore
@@ -643,7 +643,7 @@ class PageCache
 		{ // skip CVS folders - This could be more specific
 			if( $display_messages === 'cron_job' )
 			{	// Log a message for cron job:
-				cron_log_action_end( 'File <code>'.$folder_file.'</code> could not be deleted because of reserved name.', 'warning' );
+				cron_log_action_end( 'File <code>'.$folder_file.'</code> was not deleted because of reserved name.', 'warning' );
 			}
 			return false;
 		}
@@ -655,7 +655,7 @@ class PageCache
 		{ // this file is index.html or sample.htaccess or it is hidden, should not delete it.
 			if( $display_messages === 'cron_job' )
 			{	// Log a message for cron job:
-				cron_log_action_end( 'File <code>'.$folder_file.'</code> could not be deleted because of reserved name.', 'warning' );
+				cron_log_action_end( 'File <code>'.$folder_file.'</code> was not deleted because of reserved name.', 'warning' );
 			}
 			return false;
 		}
@@ -666,7 +666,7 @@ class PageCache
 		{ // the file is not older then 24 hour, should not delete it.
 			if( $display_messages === 'cron_job' )
 			{	// Log a message for cron job:
-				cron_log_action_end( 'File <code>'.$folder_file.'</code> could not be deleted because it\'s not older then 24 hour.', 'warning' );
+				cron_log_action_end( 'File <code>'.$folder_file.'</code> was not deleted because it\'s not older then 24 hours.' );
 			}
 			return false;
 		}

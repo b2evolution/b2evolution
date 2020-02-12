@@ -156,7 +156,7 @@ class bootstrap_site_dropdown_Skin extends Skin
 						'label' => T_('Fixed position'),
 						'note' => T_('Check to fix header top on scroll down'),
 						'type' => 'checkbox',
-						'defaultvalue' => 0,
+						'defaultvalue' => 1,
 					),
 
 					'section_topmenu_start' => array(
@@ -345,62 +345,62 @@ class bootstrap_site_dropdown_Skin extends Skin
 
 
 		$css = '
-.bootstrap_site_navbar_header .navbar {
+.evo_site_skin__header .navbar {
 	background-color: '.$menu_bar_bg_color.';
 	border-color: '.$menu_bar_border_color.';
 }
-.bootstrap_site_navbar_header .navbar .navbar-collapse .nav.navbar-right {
+.evo_site_skin__header .navbar .navbar-collapse .nav.navbar-right {
 	border-color: '.$menu_bar_border_color.';
 }
-.bootstrap_site_navbar_header .navbar-brand img {
+.evo_site_skin__header .navbar-brand img {
 	padding: '.$menu_bar_logo_padding.'px;
 }
-.bootstrap_site_navbar_header .navbar .nav > li:not(.active) > a {
+.evo_site_skin__header .navbar .nav > li:not(.active) > a {
 	color: '.$tab_text_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav > li:not(.active) > a:hover {
+.evo_site_skin__header .navbar .nav > li:not(.active) > a:hover {
 	background-color: '.$hover_tab_bg_color.';
 	color: '.$hover_tab_text_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav > li.active > a {
+.evo_site_skin__header .navbar .nav > li.active > a {
 	background-color: '.$selected_tab_bg_color.';
 	color: '.$selected_tab_text_color.';
 }
 
-.bootstrap_site_navbar_header .navbar .nav ul.dropdown-menu {
+.evo_site_skin__header .navbar .nav ul.dropdown-menu {
 	background-color: '.$sub_tab_bg_color.';
 	border-color: '.$sub_tab_border_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav ul.dropdown-menu li:not(.active) a {
+.evo_site_skin__header .navbar .nav ul.dropdown-menu li:not(.active) a {
 	color: '.$sub_tab_text_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav ul.dropdown-menu li:not(.active) a:hover {
+.evo_site_skin__header .navbar .nav ul.dropdown-menu li:not(.active) a:hover {
 	background-color: '.$sub_hover_tab_bg_color.';
 	color: '.$sub_hover_tab_text_color.';
 }
-.bootstrap_site_navbar_header .navbar .nav ul.dropdown-menu li.active a {
+.evo_site_skin__header .navbar .nav ul.dropdown-menu li.active a {
 	background-color: '.$sub_selected_tab_bg_color.';
 	color: '.$sub_selected_tab_text_color.';
 }
 
-footer.bootstrap_site_navbar_footer {
+footer.evo_site_skin__footer {
 	background-color: '.$footer_bg_color.';
 	color: '.$footer_text_color.';
 }
-footer.bootstrap_site_navbar_footer .container a {
+footer.evo_site_skin__footer .container a {
 	color: '.$footer_link_color.';
 }
 ';
 
 		if( $this->get_setting( 'fixed_header' ) )
 		{	// Enable fixed position for header:
-			$css .= '.bootstrap_site_navbar_header {
+			$css .= '.evo_site_skin__header {
 	position: fixed;
 	top: 0;
 	width: 100%;
 	z-index: 10000;
 }
-body.evo_toolbar_visible .bootstrap_site_navbar_header {
+body.evo_toolbar_visible .evo_site_skin__header {
 	top: 27px;
 }
 body {
