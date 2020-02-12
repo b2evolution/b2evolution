@@ -59,7 +59,7 @@ switch( $action )
 
 	case 'copy':
 		// Set parent menu:
-		if( isset( $menu_ID ) )
+		if( isset( $menu_ID ) && empty( $edited_SiteMenu->parent_ID ) )
 		{
 			$edited_SiteMenu->set( 'parent_ID', $menu_ID );
 		}

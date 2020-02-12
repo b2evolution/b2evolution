@@ -179,7 +179,7 @@ function get_tinyurl( $Slug )
 			}
 			else
 			{
-				$tinyurl = url_add_tail( $Blog->get( 'url' ), '/'.$Slug->title );;
+				$tinyurl = url_add_tail( $Blog->get( 'url' ), '/'.$Slug->title );
 			}
 
 			$title = T_( 'This is a tinyurl you can copy/paste into twitter, emails and other places where you need a short link to this post' );

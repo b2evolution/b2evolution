@@ -189,7 +189,18 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 		$r .= '<td class="nowrap">'.$destination.'</td>';
 
 		// Visibility
-		$r .= '<td class="shrinkwrap">'.( $SiteMenuEntry->get( 'visibility' ) == 'always' ? T_('Always') : T_('If allowed') ).'</td>';
+		$r .= '<td class="shrinkwrap">';
+		switch( $SiteMenuEntry->get( 'visibility' ) )
+		{
+			case 'always':
+				$r .= T_('Always');
+				break;
+
+			case 'access':
+				$r .= T_('If allowed');
+				break;
+		}
+		$r .= '</td>';
 
 		// Highlight
 		$r .= '<td class="shrinkwrap">'.( $SiteMenuEntry->get( 'highlight') ? '<span class="fa fa-check green"></span>' : '<span class="fa fa-times red"></span>' ).'</td>';

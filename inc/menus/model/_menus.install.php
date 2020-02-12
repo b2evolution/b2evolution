@@ -46,6 +46,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			ment_coll_ID        INT(10) UNSIGNED NULL,
 			ment_cat_ID         INT(10) UNSIGNED NULL,
 			ment_item_ID        INT(10) UNSIGNED NULL,
+			ment_item_slug      VARCHAR(255) COLLATE ascii_general_ci NULL,
 			ment_url            VARCHAR(2000) COLLATE utf8mb4_unicode_ci NULL,
 			ment_visibility     ENUM( 'always', 'access' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'always',
 			ment_highlight      TINYINT(1) NOT NULL DEFAULT 1,

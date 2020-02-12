@@ -34,6 +34,7 @@ class SiteMenuEntry extends DataObject
 	var $coll_ID;
 	var $cat_ID;
 	var $item_ID;
+	var $item_slug;
 	var $url;
 	var $visibility = 'always';
 	var $highlight = 1;
@@ -81,6 +82,7 @@ class SiteMenuEntry extends DataObject
 			$this->coll_ID = $db_row->ment_coll_ID;
 			$this->cat_ID = $db_row->ment_cat_ID;
 			$this->item_ID = $db_row->ment_item_ID;
+			$this->item_slug = $db_row->ment_item_slug;
 			$this->url = $db_row->ment_url;
 			$this->visibility = $db_row->ment_visibility;
 			$this->highlight = $db_row->ment_highlight;
@@ -142,16 +144,19 @@ class SiteMenuEntry extends DataObject
 		$this->set_from_Request( 'cat_ID', NULL, true );
 
 		// Item ID:
-		$item_ID = param( 'ment_item_ID', 'integer', NULL );
+		param( 'ment_item_ID', 'integer', NULL );
 		$this->set_from_Request( 'item_ID', NULL, true );
 
-		if( empty( $item_ID ) )
-		{	// No Item ID provided, use Item slug if available:
+		// Item Slug:
+		$item_slug = param( 'ment_item_slug', 'string', NULL );
+		$this->set_from_Request( 'item_slug', NULL, true );
+
+		if( ! empty( $this->item_ID ) && empty( $this->item_slug ) )
+		{	// Item ID is provided but Item slug is empty, use Item's urltitle as slug because ID is not considered as permanent:
 			$ItemCache = & get_ItemCache();
-			$urltitle = param( 'ment_item_urltitle', 'string', NULL );
-			if( $urltitle && ( $menu_Item = $ItemCache->get_by_urltitle( $urltitle, false, false ) ) )
+			if( $menu_Item = $ItemCache->get_by_ID( $this->item_ID, false, false ) )
 			{
-				$this->set( 'item_ID', $menu_Item->ID );
+				$this->set( 'item_slug', $menu_Item->get( 'urltitle' ) );
 			}
 		}
 
@@ -286,7 +291,14 @@ class SiteMenuEntry extends DataObject
 		if( $this->Item === NULL )
 		{	// Load collection once:
 			$ItemCache = & get_ItemCache();
-			$this->Item = & $ItemCache->get_by_ID( $this->get( 'item_ID' ), false, false );
+			if( $this->get( 'item_ID' ) )
+			{	// Item ID has priority because it is faster to resolve:
+				$this->Item = & $ItemCache->get_by_ID( $this->get( 'item_ID' ), false, false );
+			}
+			elseif( $this->get( 'item_slug' ) )
+			{	// Use item slug only if there is no Item ID specified:
+				$this->Item = & $ItemCache->get_by_urltitle( $this->get( 'item_slug' ), false, false );
+			}
 		}
 
 		return $this->Item;
@@ -596,7 +608,14 @@ class SiteMenuEntry extends DataObject
 				{	// Item is not found or it cannot be displayed for current user on front-office:
 					return false;
 				}
-				return $entry_Item->get_permanent_url();
+				if( ! empty( $this->item_ID ) )
+				{	// Item ID is specified and has priority:
+					return $entry_Item->get_permanent_url();
+				}
+				else
+				{	// No Item ID specified, use item slug:
+					return url_add_tail( $entry_Blog->get( 'url' ), '/'.$this->item_slug );
+				}
 
 			case 'url':
 				$entry_url = $this->get( 'url' );
