@@ -2962,107 +2962,16 @@ function display_login_js_handler( $params )
 
 	$params = array_merge( array( 'get_widget_login_hidden_fields' => false ), $params );
 
-?>
-	<script>
-	var requestSent = false;
-	var login = document.getElementById("<?php echo $dummy_fields[ 'login' ]; ?>");
-	if( login.value.length > 0 )
-	{ // Focus on the password field:
-		document.getElementById("<?php echo $dummy_fields[ 'pwd' ]; ?>").focus();
-	}
-	else
-	{ // Focus on the login field:
-		login.focus();
-	}
+	$login_handler_config = array(
+			'dummy_field_login'                     => $dummy_fields['login'],
+			'dummy_field_pwd'                       => $dummy_fields['pwd'],
+			'params_get_widget_login_hidden_fields' => $params['get_widget_login_hidden_fields'],
+			'params_transmit_hashed_password'       => $params['transmit_hashed_password'],
+			'session_ID'                            => $Session->ID,
+			'crumb_loginsalt'                       => get_crumb('loginsalt'),
+		);
 
-	function processSubmit(e) {
-		if (e.preventDefault) e.preventDefault();
-		if( requestSent )
-		{ // A submit request was already sent, do not send another
-			return;
-		}
-
-		requestSent = true;
-		var form = document.getElementById("login_form");
-		var username = form.<?php echo $dummy_fields[ 'login' ]; ?>.value;
-		var get_widget_login_hidden_fields = <?php echo $params['get_widget_login_hidden_fields'] ? 'true' : 'false'; ?>;
-		var sessionid = '<?php echo $Session->ID; ?>';
-
-		if( !form.<?php echo $dummy_fields[ 'pwd' ]; ?> || !form.pepper || typeof hex_sha1 == "undefined" && typeof hex_md5 == "undefined" ) {
-			return true;
-		}
-
-		jQuery.ajax({
-			type: 'POST',
-			url: '<?php echo get_htsrv_url( 'login' ); ?>anon_async.php',
-			data: {
-				'<?php echo $dummy_fields[ 'login' ]; ?>': username,
-				'action': 'get_user_salt',
-				'get_widget_login_hidden_fields': get_widget_login_hidden_fields,
-				'crumb_loginsalt': '<?php echo get_crumb('loginsalt'); ?>',
-			},
-			success: function(result) {
-				var pwd_container = jQuery('#pwd_hashed_container');
-				var parsed_result;
-
-				try {
-					parsed_result = JSON.parse(result);
-				} catch( e ) {
-					pwd_container.html( result );
-					return;
-				}
-
-				var raw_password = form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value;
-				var salts = parsed_result['salts'];
-				var hash_algo = parsed_result['hash_algo'];
-
-				if( get_widget_login_hidden_fields )
-				{
-					form.crumb_loginform.value = parsed_result['crumb'];
-					form.pepper.value = parsed_result['pepper'];
-					sessionid = parsed_result['session_id'];
-				}
-
-				for( var index in salts )
-				{
-					var pwd_hashed = eval( hash_algo[ index ] );
-					pwd_hashed = hex_sha1( pwd_hashed + form.pepper.value );
-					pwd_container.append( '<input type="hidden" value="' + pwd_hashed + '" name="pwd_hashed[]">' );
-				}
-
-				form.<?php echo $dummy_fields[ 'pwd' ]; ?>.value = 'padding_padding_padding_padding_padding_padding_hashed_' + sessionid; /* to detect cookie problems */
-				// (paddings to make it look like encryption on screen. When the string changes to just one more or one less *, it looks like the browser is changing the password on the fly)
-
-				// Append the correct login action as hidden input field
-				pwd_container.append( '<input type="hidden" value="1" name="login_action[login]">' );
-				form.submit();
-			},
-			error: function( jqXHR, textStatus, errorThrown )
-			{	// Display error text on error request:
-				requestSent = false;
-				var wrong_response_code = typeof( jqXHR.status ) != 'undefined' && jqXHR.status != 200 ? '\nHTTP Response code: ' + jqXHR.status : '';
-				alert( 'Error: could not get hash Salt from server. Please contact the site admin and check the browser and server error logs. (' + textStatus + ': ' + errorThrown + ')'
-					+ wrong_response_code );
-			}
-		});
-
-		// You must return false to prevent the default form behavior
-		return false;
-	}
-
-	<?php
-	if( $params[ 'transmit_hashed_password' ] )
-	{ // Hash the password onsubmit and clear the original pwd field
-		// TODO: dh> it would be nice to disable the clicked/used submit button. That's how it has been when the submit was attached to the submit button(s)
-		?>
-		// Set login form submit handler
-		jQuery( '#login_form' ).bind( 'submit', processSubmit );
-		<?php
-	}
-	?>
-
-	</script>
-<?php
+	expose_var_to_js( 'display_login_js_handler_config', json_encode( $login_handler_config ) );
 }
 
 
