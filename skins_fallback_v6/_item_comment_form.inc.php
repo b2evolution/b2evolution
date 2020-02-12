@@ -56,7 +56,6 @@ $params = array_merge( array(
 						'block_after'     => '',
 						'block_separator' => '<br /><br />' ) ) )
 			) ),
-		'comment_mode'         => '', // Can be 'quote' from GET request
 		'comment_type'         => 'comment',
 		'comment_title_before'  => '<div class="panel-heading"><h4 class="evo_comment_title panel-title">',
 		'comment_title_after'   => '</h4></div><div class="panel-body">',
@@ -212,20 +211,11 @@ if( $params['comment_type'] == 'meta' )
 				$checked_attachments = $Comment->checked_attachments;
 			}
 
-			if( $params['comment_mode'] == 'quote' )
-			{	// These params go from ajax form loading, Used to reply with quote
-				set_param( 'mode', $params['comment_mode'] );
-				set_param( 'qc', $params['comment_qc'] );
-				set_param( 'qp', $params['comment_qp'] );
-				set_param( $dummy_fields[ 'content' ], $params[ $dummy_fields[ 'content' ] ] );
-			}
-
-			$mode = param( 'mode', 'string' );
-			if( $mode == 'quote' )
+			$quoted_comment_ID = param( 'quote_comment', 'integer', 0 );
+			$quoted_post_ID = param( 'quote_post', 'integer', 0 );
+			if( $quoted_comment_ID || $quoted_post_ID )
 			{ // Quote for comment/post
 				$comment_content = param( $dummy_fields[ 'content' ], 'html' );
-				$quoted_comment_ID = param( 'qc', 'integer', 0 );
-				$quoted_post_ID = param( 'qp', 'integer', 0 );
 				if( ! empty( $quoted_comment_ID ) &&
 						( $CommentCache = & get_CommentCache() ) &&
 						( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&

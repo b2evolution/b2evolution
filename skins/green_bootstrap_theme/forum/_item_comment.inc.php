@@ -277,7 +277,7 @@ echo $params['comment_body_after'];
 	}
 	if( $bbcode_plugin_is_enabled && $commented_Item && $commented_Item->can_comment( NULL ) )
 	{ // Display button to quote this comment
-		echo '<a href="'.$commented_Item->get_permanent_url().'?mode=quote&amp;qc='.$Comment->ID.'#form_p'.$commented_Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
+		echo '<a href="'.$commented_Item->get_permanent_url().'?quote_comment='.$Comment->ID.'#form_p'.$commented_Item->ID.'" title="'.format_to_output( T_('Reply with quote'), 'htmlattr' ).'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
 	}
 
 	$Comment->reply_link( ' ', ' ', '#', '#', 'pull-left' ); /* Link for replying to the Comment */

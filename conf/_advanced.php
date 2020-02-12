@@ -798,7 +798,11 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 /**
  * Allow parameters in URL without redirect to Item canonical URL when collection setting "301 redirect to canonical URL when possible" is enabled
  */
-$noredir_params = array( 'page', 'mode', 'qc', 'qp' );
+$noredir_params = array(
+	'page',          // For showing a different page in a multipage post
+	'quote_post',    // For quoting a post in the forums
+	'quote_comment', // For quoting a comment in the forums
+);
 
 
 /**
