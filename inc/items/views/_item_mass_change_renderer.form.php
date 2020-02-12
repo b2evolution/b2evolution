@@ -28,9 +28,7 @@ $Form->begin_form();
 		$Form->hidden( 'selected_items[]', $item_ID );
 	}
 	$Form->hidden( 'renderer_change_type', $renderer_change_type );
-	$Form->hidden( 'tab', $tab );
-	$Form->hidden( 'tab_type', $tab_type );
-	$Form->hidden( 'page', $page );
+	$Form->hidden( 'redirect_to', $redirect_to );
 	$Form->add_crumb( 'items' );
 
 	echo $Plugins->get_renderer_checkboxes( NULL, array(

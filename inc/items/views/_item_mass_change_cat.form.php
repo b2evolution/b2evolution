@@ -26,9 +26,7 @@ $Form->begin_form();
 		$Form->hidden( 'selected_items[]', $item_ID );
 	}
 	$Form->hidden( 'cat_type', $cat_type );
-	$Form->hidden( 'tab', $tab );
-	$Form->hidden( 'tab_type', $tab_type );
-	$Form->hidden( 'page', $page );
+	$Form->hidden( 'redirect_to', $redirect_to );
 	$Form->add_crumb( 'items' );
 
 	cat_select( $Form, true, true, array(

@@ -577,7 +577,12 @@ switch( $action )
 		$tab_type = param( 'tab_type', 'string', '' );
 
 		// Set an URL to redirect to items list after this action:
-		$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab='.$tab.( $page > 1 ? '&items_'.$tab.'_paged='.$page : '' );
+		$redirect_to = param( 'redirect_to', 'url', NULL );
+
+		if( empty( $redirect_to ) )
+		{
+			$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab='.$tab.( $page > 1 ? '&items_'.$tab.'_paged='.$page : '' );
+		}
 		if( $tab == 'type' && ! empty( $tab_type ) )
 		{
 			$redirect_to .= '&tab_type='.$tab_type;
@@ -877,17 +882,10 @@ switch( $action )
 		$Session->assert_received_crumb( 'items' );
 
 		$selected_items = param( 'selected_items', 'array:integer' );
-		$page = param( 'page', 'integer', 1 );
-		$tab = param( 'tab', 'string', 'type' );
-		$tab_type = param( 'tab_type', 'string', '' );
 		$cat_type = param( 'cat_type', 'string' );
 
 		// Set an URL to redirect to items list after this action:
-		$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab='.$tab.( $page > 1 ? '&items_'.$tab.'_paged='.$page : '' );
-		if( $tab == 'type' && ! empty( $tab_type ) )
-		{
-			$redirect_to .= '&tab_type='.$tab_type;
-		}
+		$redirect_to = param( 'redirect_to', 'url', NULL );
 
 		if( empty( $selected_items ) )
 		{	// If no items selected:
@@ -1020,17 +1018,10 @@ switch( $action )
 		$Session->assert_received_crumb( 'items' );
 
 		$selected_items = param( 'selected_items', 'array:integer' );
-		$page = param( 'page', 'integer', 1 );
-		$tab = param( 'tab', 'string', 'type' );
-		$tab_type = param( 'tab_type', 'string', '' );
 		$renderer_change_type = param( 'renderer_change_type', 'string' );
 
 		// Set an URL to redirect to items list after this action:
-		$redirect_to = $admin_url.'?ctrl=items&blog='.$blog.'&tab='.$tab.( $page > 1 ? '&items_'.$tab.'_paged='.$page : '' );
-		if( $tab == 'type' && ! empty( $tab_type ) )
-		{
-			$redirect_to .= '&tab_type='.$tab_type;
-		}
+		$redirect_to = param( 'redirect_to', 'url', NULL );
 
 		if( empty( $selected_items ) )
 		{	// If no items selected:

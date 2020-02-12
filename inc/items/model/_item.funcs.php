@@ -3365,9 +3365,7 @@ jQuery( document ).ready( function ()
 				'blog': '<?php echo $blog; ?>',
 				'cat_type': cat_type,
 				'selected_items': selected_items,
-				'tab': '<?php echo get_param( 'tab' ); ?>',
-				'tab_type': '<?php echo get_param( 'tab_type' ); ?>',
-				'page': '<?php echo param( 'items_'.get_param( 'tab' ).'_paged', 'integer', 1 ); ?>',
+				'redirect_to': '<?php echo format_to_js( regenerate_url( '', '', '', '&' ) ); ?>',
 			},
 			success: function(result)
 			{
@@ -3425,9 +3423,7 @@ jQuery( document ).ready( function ()
 				'blog': '<?php echo $blog; ?>',
 				'renderer_change_type': renderer_change_type,
 				'selected_items': selected_items,
-				'tab': '<?php echo get_param( 'tab' ); ?>',
-				'tab_type': '<?php echo get_param( 'tab_type' ); ?>',
-				'page': '<?php echo param( 'items_'.get_param( 'tab' ).'_paged', 'integer', 1 ); ?>',
+				'redirect_to': '<?php echo format_to_js( regenerate_url( '', '', '', '&' ) ); ?>',
 			},
 			success: function(result)
 			{
@@ -5989,12 +5985,13 @@ function items_results( & $items_Results, $params = array() )
 				'class' => 'btn-danger',
 			);
 		$items_Results->list_form_hiddens = array(
-				'ctrl'     => 'items',
-				'tab'      => get_param( 'tab' ),
-				'tab_type' => get_param( 'tab_type' ),
-				'blog'     => $Blog->ID,
-				'page'     => $items_Results->page,
-				'crumb'    => 'items',
+				'ctrl'        => 'items',
+				'tab'         => get_param( 'tab' ),
+				'tab_type'    => get_param( 'tab_type' ),
+				'blog'        => $Blog->ID,
+				'page'        => $items_Results->page,
+				'redirect_to' => regenerate_url( '', '', '', '&' ),
+				'crumb'       => 'items',
 			);
 		echo_status_dropdown_button_js( 'post' );
 
