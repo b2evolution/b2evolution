@@ -143,7 +143,7 @@ body.evo_toolbar_visible .evo_site_skin__header {
 	top: 27px;
 }
 body {
-	padding-top: 50px;
+	padding-top: 43px;
 }';
 		}
 

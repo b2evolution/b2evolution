@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 widget_container( 'site_footer', array(
 		// The following params will be used as defaults for widgets included in this container:
 		'container_display_if_empty' => true, // Display container anyway even if no widget
-		'container_start'     => '<footer class="evo_site_skin__footer"><div class="container"><p class="evo_container $wico_class$">',
+		'container_start'     => '<footer class="evo_site_skin__footer bootstrap_site_navbar_footer"><div class="container"><p class="evo_container $wico_class$">',
 		'container_end'       => '</p></div></footer>',
 		'block_start'         => '<span class="evo_widget $wi_class$">',
 		'block_end'           => '</span>',
