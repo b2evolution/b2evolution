@@ -41,7 +41,7 @@ class auto_p_plugin extends Plugin
 
 	var $br_allowed_in = array(
 		// Block level:
-		'address', 'center', 'dd', 'dir', 'div', 'dt', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'isindex', 'menu', 'noframes', 'noscript', 'p', 'pre',
+		'address', 'center', 'dd', 'dir', 'div', 'dt', 'fieldset', 'form', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'isindex', 'menu', 'noframes', 'noscript', 'p', 'pre',
 		// Inline:
 		'a', 'abbr', 'acronym', 'applet', 'b', 'basefont', 'bdo', 'big', 'button', 'cite', 'code', 'dfn', 'em', 'font', 'i', 'img', 'input', 'iframe', 'kbd', 'label', 'li', 'map', 'object', 'q', 'samp', 'select', 'small', 'span', 'strong', 'sub', 'sup', 'textarea', 'td', 'th', 'tt', 'var' );
 
@@ -231,8 +231,8 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 					// Remove last opened tag from the array:
 					array_pop( $opened_tags );
 				}
-				else
-				{	// This is a start of new tag,
+				elseif( substr( $block, -2, 1 ) != '/' )
+				{	// This is a start of new tag AND this tag is not single/autoclosed tag like <hr />, <img /> and etc.,
 					// Put tag name in array to know what tags are opened and not closed yet:
 					$opened_tags[] = $blocks[ $b + 1 ];
 				}
