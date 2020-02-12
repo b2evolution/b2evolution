@@ -337,25 +337,25 @@ class bootstrap_site_navbar_Skin extends Skin
 
 
 		$css = '
-.evo_site_skin__header .navbar {
+#evo_site_header .navbar {
 	background-color: '.$menu_bar_bg_color.';
 	border-color: '.$menu_bar_border_color.';
 }
-.evo_site_skin__header .navbar .navbar-collapse .nav.navbar-right {
+#evo_site_header .navbar .navbar-collapse .nav.navbar-right {
 	border-color: '.$menu_bar_border_color.';
 }
-.evo_site_skin__header .navbar-brand img {
+#evo_site_header .navbar-brand img {
 	padding: '.$menu_bar_logo_padding.'px;
 }
-.evo_site_skin__header .navbar .nav > li:not(.active) > a {
+#evo_site_header .navbar .nav > li:not(.active) > a {
 	background-color: '.$tab_bg_color.';
 	color: '.$tab_text_color.';
 }
-.evo_site_skin__header .navbar .nav > li:not(.active) > a:hover {
+#evo_site_header .navbar .nav > li:not(.active) > a:hover {
 	background-color: '.$hover_tab_bg_color.';
 	color: '.$hover_tab_text_color.';
 }
-.evo_site_skin__header .navbar .nav > li.active > a {
+#evo_site_header .navbar .nav > li.active > a {
 	background-color: '.$selected_tab_bg_color.';
 	color: '.$selected_tab_text_color.';
 }
@@ -376,24 +376,24 @@ div.level2 ul.nav.nav-pills li.active a {
 	color: '.$sub_selected_tab_text_color.';
 }
 
-footer.evo_site_skin__footer {
+footer#evo_site_footer {
 	background-color: '.$footer_bg_color.';
 	color: '.$footer_text_color.';
 }
-footer.evo_site_skin__footer .container a {
+footer#evo_site_footer .container a {
 	color: '.$footer_link_color.';
 }
 ';
 
 		if( $this->get_setting( 'fixed_header' ) )
 		{	// Enable fixed position for header:
-			$css .= '.evo_site_skin__header {
+			$css .= '#evo_site_header {
 	position: fixed;
 	top: 0;
 	width: 100%;
 	z-index: 10000;
 }
-body.evo_toolbar_visible .evo_site_skin__header {
+body.evo_toolbar_visible #evo_site_header {
 	top: 27px;
 }
 body {

@@ -127,7 +127,7 @@ body.pictured.dev_designer_mode .secondary_area {
   html {
     height: auto;
   }
-  body.disp_front .evo_site_skin__header {
+  body.disp_front #evo_site_header {
     margin-bottom: 0;
   }
   body.disp_front .evo_pictured_layout {

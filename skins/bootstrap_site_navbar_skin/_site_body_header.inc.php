@@ -29,7 +29,7 @@ else
 }
 ?>
 
-<div class="evo_site_skin__header bootstrap_site_navbar_header">
+<div id="evo_site_header" class="bootstrap_site_navbar_header">
 
 	<nav class="navbar navbar-default navbar-static-top">
 		<div class="container-fluid level1">

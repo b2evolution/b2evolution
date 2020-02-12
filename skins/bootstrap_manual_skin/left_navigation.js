@@ -64,7 +64,7 @@ jQuery( document ).ready( function()
 			if( $sidebar.hasClass( 'fixed' ) )
 			{	// Check and fix an overlapping of footer with sidebar:
 				$sidebar.css( 'top', sidebar_top_start_point + 'px' );
-				var diff = parseInt( column_top_point + sidebar_height - jQuery( '.evo_site_skin__footer' ).offset().top );
+				var diff = parseInt( column_top_point + sidebar_height - jQuery( '#evo_site_footer' ).offset().top );
 				if( diff >= 0 )
 				{
 					$sidebar.css( 'top', parseInt( sidebar_top_start_point - diff - 5 ) + 'px' );
@@ -74,14 +74,11 @@ jQuery( document ).ready( function()
 	}
 
 	var top_start_point = ( jQuery( '#evo_toolbar' ).length > 0 ? 28 : 0 ) + 10;
-
-	jQuery( '.evo_site_skin__header' ).each( function()
+	var site_header_obj = jQuery( '#evo_site_header' );
+	if( site_header_obj.length && site_header_obj.css( 'position' ) == 'fixed' )
 	{	// Shift fixed sidebar down on height of site header:
-		if( jQuery( this ).css( 'position' ) == 'fixed' )
-		{
-			top_start_point += jQuery( this ).height();
-		}
-	} );
+		top_start_point += site_header_obj.height();
+	}
 
 	var sidebar_selectors = '#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single';
 	jQuery( sidebar_selectors ).each( function()
