@@ -217,6 +217,8 @@ class WidgetContainer extends DataObject
 				// Only shared containers may be switched between main and sub:
 				$this->set( 'main', param( 'wico_container_type', 'string' ) == 'sub' ? '0' : '1' );
 				set_param( 'container_type', $this->get_type() );
+				// Shared container cannot be linked to any collection:
+				$this->set( 'coll_ID', NULL, true );
 				break;
 
 			case 'page':
