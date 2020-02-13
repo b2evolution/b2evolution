@@ -229,7 +229,7 @@ switch( $action )
 			header_redirect( $admin_url.'?ctrl=menus&action=edit&menu_ID='.$edited_SiteMenuEntry->get( 'menu_ID' ) ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
-		$action = 'edit';
+		$action = 'edit_entry';
 		break;
 
 	case 'delete_entry':
