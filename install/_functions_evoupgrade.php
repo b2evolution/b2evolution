@@ -12154,6 +12154,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15800, 'Upgrading item types table...') )
+	{	// part of 7.1.2-beta
+		db_upgrade_cols( 'T_items__type', array(
+			'ADD' => array(
+				'ityp_template_excerpt' => 'VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL AFTER ityp_usage',
+				'ityp_template_normal'  => 'VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL AFTER ityp_template_excerpt',
+				'ityp_template_full'    => 'VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL AFTER ityp_template_normal',
+			),
+		) );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

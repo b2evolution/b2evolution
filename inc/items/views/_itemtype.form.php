@@ -15,7 +15,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'items/model/_itemtype.class.php', 'ItemType' );
 
-global $edited_Itemtype, $thumbnail_sizes, $admin_url;
+global $edited_Itemtype, $thumbnail_sizes, $admin_url, $Blog, $current_User;
 
 // Determine if we are creating or updating...
 global $action;
@@ -56,12 +56,25 @@ $Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 	$Form->text_input( 'ityp_name', $edited_Itemtype->name, 50, T_('Name'), '', array( 'maxlength' => 30, 'required' => true ) );
 
 	$Form->textarea_input( 'ityp_description', $edited_Itemtype->description, 2, T_('Description'), array( 'cols' => 47 ) );
+
 	$Form->radio( 'ityp_perm_level', $edited_Itemtype->perm_level, array(
 			array( 'standard',   T_('Standard') ),
 			array( 'restricted', T_('Restricted') ),
 			array( 'admin',      T_('Admin') )
 		), T_('Permission level') );
-	$Form->text_input( 'ityp_template_name', $edited_Itemtype->template_name, 25, T_('Template name'), T_('b2evolution will automatically append .main.php or .disp.php'), array( 'maxlength' => 40 ) );
+
+	// Easy Templates:
+	$TemplateCache = & get_TemplateCache();
+	$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
+	$template_options = array( NULL => sprintf( T_('Use PHP %s'), '(_item_content.inc.php)' ) ) + $TemplateCache->get_code_option_array();
+	$template_input_suffix = ( $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+		.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;blog='.$Blog->ID, NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );
+	$Form->select_input_array( 'ityp_template_excerpt', $edited_Itemtype->get( 'template_excerpt' ), $template_options, T_('Template for Excerpt display'), NULL, array( 'input_suffix' => $template_input_suffix ) );
+	$Form->select_input_array( 'ityp_template_normal', $edited_Itemtype->get( 'template_normal' ), $template_options, T_('Template for Teaser display'), NULL, array( 'input_suffix' => $template_input_suffix ) );
+	$Form->select_input_array( 'ityp_template_full', $edited_Itemtype->get( 'template_full' ), $template_options, T_('Template for Full content display'), NULL, array( 'input_suffix' => $template_input_suffix ) );
+
+	// PHP Template:
+	$Form->text_input( 'ityp_template_name', $edited_Itemtype->template_name, 25, T_('PHP Template name'), T_('b2evolution will automatically append .main.php or .disp.php'), array( 'maxlength' => 40 ) );
 
 $Form->end_fieldset();
 

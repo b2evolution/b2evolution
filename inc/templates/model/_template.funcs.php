@@ -223,6 +223,10 @@ function render_template_callback( $var, $params, $objects = array() )
 				), $params ) );
 			break;
 
+		case 'Item:content_extension':
+			echo $rendered_Item->content_extension( $params );
+			break;
+
 		case 'Item:content_teaser':
 			echo $rendered_Item->content_teaser( $params );
 			break;
@@ -262,6 +266,13 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Item:flag_icon':
 			echo $rendered_Item->get_flag( $params );
+			break;
+
+		case 'Item:footer':
+			echo $rendered_Item->footer( array_merge( array( // Here, we make sure not to modify $params
+					'block_start' => '<div class="evo_post_footer">',
+					'block_end'   => '</div>',
+				), $params ) );
 			break;
 
 		case 'Item:history_link':
@@ -304,6 +315,19 @@ function render_template_callback( $var, $params, $objects = array() )
 					'format' => '#short_date_time',		
 				), $params );
 			echo $rendered_Item->get_mod_date( $temp_params['format'] );
+			break;
+
+		case 'Item:more_link':
+			echo $rendered_Item->get_more_link( array_merge( array( // Here, we make sure not to modify $params
+					'before' => '<p class="evo_post_more_link">',
+					'after'  => '</p>',
+				), $params ) );
+			break;
+
+		case 'Item:page_links':
+			echo $rendered_Item->get_page_links( array_merge( array( // Here, we make sure not to modify $params
+					'separator'   => '&middot; ',
+				), $params ) );
 			break;
 
 		case 'Item:permalink':

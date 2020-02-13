@@ -1782,6 +1782,38 @@ function create_default_templates( $is_task = true )
 	[Item:images|restrict_to_image_position=aftermore|before=<div class="evo_cblock_images evo_cblock_aftermore">|after=</div>]
 </div>',
 		),
+
+		// Item Contents:
+		'item_content_excerpt' => array(
+			'name' => 'Item Excerpt',
+			'template' => '<section class="evo_post__excerpt">
+[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>]
+</section>',
+		),
+		'item_content_teaser' => array(
+			'name' => 'Item Teaser content',
+			'template' => '<section class="evo_post__full">
+[Item:images|restrict_to_image_position=#teaser_all|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+<div class="evo_post__full_text clearfix">
+	[Item:content_teaser]
+	[Item:more_link]
+</div>
+</section>',
+		),
+		'item_content_full' => array(
+			'name' => 'Item Full content',
+			'template' => '<section class="evo_post__full">
+[Item:images|restrict_to_image_position=#teaser_all|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+<div class="evo_post__full_text clearfix">
+	[Item:content_teaser]
+	[Item:more_link|anchor_text=]
+	[Item:images|restrict_to_image_position=aftermore|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+	[Item:content_extension]
+	[Item:page_links]
+	[Item:footer]
+</div>
+</section>',
+		),
 /*
 		'cblock_imgleft_textright' => array(
 			'name'     => 'Include Content Block: Images Left / Text Right',
