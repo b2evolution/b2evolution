@@ -92,8 +92,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['item_in_list'] = array(
 		array( 10, 'item_title' ),
 		array( 20, 'item_visibility_badge', 'coll_type' => '-manual' ),
-		array( 30, 'item_info_line', 'coll_type' => '-manual', 'unique' => true ),
-		array( 40, 'item_content', 'unique' => true ),
+		array( 30, 'item_info_line', 'coll_type' => '-manual' ),
+		array( 40, 'item_content' ),
 		array( 50, 'item_info_line', 'coll_type' => '-manual,forum', 'params' => array( 'template' => 'item_details_feedback_link' ) ),
 	);
 
@@ -904,7 +904,8 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 							continue;
 						}
 
-						if( isset( $widget['unique'] ) && $widget['unique'] && is_installed_widget( $widget[1], $new_container_code, $widget_Blog->ID ) )
+						if( ( ! isset( $widget['unique'] ) || $widget['unique'] ) && // Must be unique widget by code per container
+						    is_installed_widget( $widget[1], $new_container_code, $widget_Blog->ID ) )
 						{	// Skip widget because it is already installed in the Container:
 							continue;
 						}
