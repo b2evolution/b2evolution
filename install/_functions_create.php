@@ -1796,7 +1796,7 @@ function create_default_templates( $is_task = true )
 [Item:images|restrict_to_image_position=#teaser_all|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
 <div class="evo_post__full_text clearfix">
 	[Item:content_teaser]
-	[Item:more_link]
+	[Item:more_link|link_text=Read more &raquo;]
 </div>
 </section>',
 		),
