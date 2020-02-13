@@ -271,6 +271,7 @@ class social_links_Widget extends ComponentWidget
 
 		foreach( $social_fields as $field )
 		{
+			// TODO: Change the using of ufdf_ID to ufdf_code because code is more unique and can be used even after upgrade
 			$r[$field->ufdf_ID] = $field->ufdf_name;
 		}
 
@@ -300,6 +301,7 @@ class social_links_Widget extends ComponentWidget
 
 			foreach( $social_fields AS $field )
 			{
+				// TODO: Change the using of ufdf_ID to ufdf_code because code is more unique and can be used even after upgrade
 				$r[$field->ufdf_ID] = $field;
 			}
 		}
