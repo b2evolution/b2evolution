@@ -168,7 +168,10 @@ class user_register_standard_Widget extends ComponentWidget
 
 			$template_code = $this->disp_params['template'];
 
+			$render_template_objects = array();
 			$Form = new Form( get_htsrv_url( 'login' ).'register.php', 'register_form', 'post' );
+			$render_template_objects['Form'] = $Form;
+
 			if( $register_user = $Session->get('core.register_user') )
 			{	// Get an user data from predefined session (after adding of a comment):
 				$login = preg_replace( '/[^a-z0-9_\-\. ]/i', '', $register_user['name'] );
@@ -176,14 +179,14 @@ class user_register_standard_Widget extends ComponentWidget
 				$login = substr( $login, 0, 20 );
 				$email = $register_user['email'];
 
-				$register_user_data = array(
+				$render_template_objects['register_user_data'] = array(
 						'login' => $login,
 						'email' => $email
 					);
 
 				$Session->delete( 'core.register_user' );
 			}
-			$register_form = render_template_code( $template_code, $params, array( 'Form' => $Form, 'register_user_data' => $register_user_data ) );
+			$register_form = render_template_code( $template_code, $params, $render_template_objects );
 
 			if( ! empty( $register_form ) )
 			{
