@@ -1725,6 +1725,7 @@ function create_default_templates( $is_task = true )
 	<div class="evo_post__excerpt_text">[excerpt]</div>
 </li>',
 		),
+
 		// Tiles style:
 		'content_tiles' => array(
 			'name'     => 'Content Tiles',
@@ -1834,6 +1835,32 @@ function create_default_templates( $is_task = true )
 </div>',
 		),
 */
+
+		// Registration Templates:
+		'registration_standard' => array(
+			'name'     => 'Registration: Standard',
+			'template' => '[Form:login]
+[Form:password]
+[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+<div class="evo_register_buttons">
+	[Form:submit|name=register|class=btn btn-primary btn-lg|value=Register my account now!]
+	<br>
+	[Link:disp|disp=login|class=btn btn-default|text=Already have an account... ?]
+</div>',
+		),
+
+		'registration_ask_name' => array(
+			'name'     => 'Registration: Ask for Name',
+			'template' => '[Form:firstname]
+[Form:lastname]
+[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+[Form:password]
+<div class="evo_register_buttons">
+	[Form:submit|name=register|class=btn btn-primary btn-lg|value=Register my account now!]
+	<br>
+	[Link:disp|disp=login|class=btn btn-default|text=Already have an account... ?]
+</div>'
+		),
 	);
 
 	$templates_sql = array();

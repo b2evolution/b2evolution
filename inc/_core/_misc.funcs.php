@@ -5666,6 +5666,72 @@ function get_base_domain( $url )
 
 
 /**
+ * Generate login from registration information
+ * 
+ * @param string Email address
+ * @param string First name
+ * @param string Last name
+ * @param string Nickname
+ * @param boolean Use random alphanumeric string as login
+ * @return string Generated login
+ */
+function generate_login_from_register_info( $email = NULL, $firstname = NULL, $lastname = NULL, $nickname = NULL, $use_random = false )
+{
+	if( ! empty( $firstname ) || ! empty( $lastname ) )
+	{ // Firstname or lastname given, let's use these:
+		$login = array();
+		if( ! empty( $firstname ) )
+		{
+			$login[] = trim( $firstname );
+		}
+		if( ! empty( $lastname ) )
+		{
+			$login[] = trim( $lastname );
+		}
+		$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( implode( '.', $login ) ) );
+		$login = generate_login_from_string( $login );
+	}
+	elseif( ! empty( $email ) )
+	{ // Get the login from email address:
+		$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
+		$login = preg_replace( '/[\'"><@\s]/', '', $login );
+
+		if( strpos( $login, '.' ) )
+		{ // Get only the part before the "." if it has one
+			$temp_login = $login;
+			$login = substr( $login, 0, strpos( $login, '.' ) );
+			$login = generate_login_from_string( $login );
+
+			if( empty( $login ) )
+			{ // Resulting login empty, use full email address
+				$login = generate_login_from_string( $temp_login );
+			}
+		}
+		else
+		{
+			$login = generate_login_from_string( $login );
+		}
+	}
+	elseif( ! empty( $nickname ) )
+	{
+		$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( trim( $nickname ) ) );
+		$login = generate_login_from_string( $login );
+	}
+	elseif( $use_random )
+	{	// Nothing else to use as login, use random numbers:
+		$login = 'user_'.rand( 1, 999 );
+		$login = generate_login_from_string( $login );
+	}
+	else
+	{
+		return '';
+	}
+
+	return $login;
+}
+
+
+/**
  * Generate login from string
  *
  * @param string string to generate login from

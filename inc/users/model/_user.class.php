@@ -495,50 +495,7 @@ class User extends DataObject
 		$has_full_access = $current_User->check_perm( 'users', 'edit' );
 
 		// ---- Login checking / START ----
-		// TODO: Must be factorized with code from $this->load_from_Request()!
-		$edited_user_login = param( 'edited_user_login', 'string', NULL );
-		if( ! $is_api_request || ( $is_api_request && ( isset( $edited_user_login ) || $is_new_user ) ) )
-		{ // login specifically included in API request
-			if( empty( $edited_user_login ) )
-			{	// Empty login
-				param_error( 'edited_user_login', T_('Please enter your login.') );
-			}
-			if( param_check_valid_login( 'edited_user_login' ) )
-			{	// If login is valid
-				global $reserved_logins;
-				if( $edited_user_login != $this->get( 'login' ) &&
-				    ! empty( $reserved_logins ) &&
-				    in_array( $edited_user_login, $reserved_logins ) &&
-				    ( ! is_logged_in() || ! $has_full_access ) )
-				{	// If login has been changed and new entered login is reserved and current User cannot use this:
-					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
-				}
-			}
-		}
-		else
-		{
-			set_param( 'edited_user_login', $this->login );
-			$edited_user_login = $this->login;
-		}
-
-		$UserCache = & get_UserCache();
-		$UserLogin = $UserCache->get_by_login( $edited_user_login );
-		if( $UserLogin && $UserLogin->ID != $this->ID )
-		{	// The login is already registered
-			$login_error_message = T_( 'This login already exists.' );
-			if( $has_full_access )
-			{
-				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
-					$edited_user_login,
-					'href="'.get_user_settings_url( 'profile', $UserLogin->ID ).'"' );
-			}
-			param_error( 'edited_user_login', $login_error_message );
-		}
-
-		if( !param_has_error( 'edited_user_login' ) )
-		{	// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-			$this->set_from_Request( 'login', 'edited_user_login', true, 'utf8_strtolower' );
-		}
+		$edited_user_login = $this->check_login();
 		// ---- Login checking / END ----
 
 		// ---- Password checking / START ----
@@ -643,6 +600,7 @@ class User extends DataObject
 		// Other fields:
 		$country = param( 'country', 'integer', '' );
 		$firstname = param( 'firstname', 'string', '' );
+		$lastname = param( 'lastname', 'string', NULL );
 		$gender = param( 'gender', 'string', NULL );
 		$locale = param( 'locale', 'string', '' );
 
@@ -657,6 +615,10 @@ class User extends DataObject
 		{	// Set and check first name:
 			$this->set( 'firstname', $firstname );
 			$paramsList['firstname'] = $firstname;
+		}
+		if( ! is_null( $lastname ) )
+		{	// Set last name:
+			$this->set( 'lastname', $lastname );
 		}
 		if( $Settings->get( 'registration_require_gender' ) == 'required' || $Settings->get( 'registration_require_gender' ) == 'optional' )
 		{	// Set or check gender:
@@ -699,49 +661,7 @@ class User extends DataObject
 		$request_password_confirmation = ! ( $is_api_request && $is_new_user );
 
 		// ---- Login checking / START ----
-		$edited_user_login = param( 'edited_user_login', 'string', NULL );
-		if( ! $is_api_request || ( $is_api_request && ( isset( $edited_user_login ) || $is_new_user ) ) )
-		{ // login specifically included in API request
-			if( empty( $edited_user_login ) )
-			{	// Empty login
-				param_error( 'edited_user_login', T_('Please enter your login.') );
-			}
-			if( param_check_valid_login( 'edited_user_login' ) )
-			{	// If login is valid
-				global $reserved_logins;
-				if( $edited_user_login != $this->get( 'login' ) &&
-				    ! empty( $reserved_logins ) &&
-				    in_array( $edited_user_login, $reserved_logins ) &&
-				    ( ! is_logged_in() || ! $has_full_access ) )
-				{	// If login has been changed and new entered login is reserved and current User cannot use this:
-					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
-				}
-			}
-		}
-		else
-		{
-			set_param( 'edited_user_login', $this->login );
-			$edited_user_login = $this->login;
-		}
-
-		$UserCache = & get_UserCache();
-		$UserLogin = $UserCache->get_by_login( $edited_user_login );
-		if( $UserLogin && $UserLogin->ID != $this->ID )
-		{	// The login is already registered
-			$login_error_message = T_( 'This login already exists.' );
-			if( $has_full_access )
-			{
-				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
-					$edited_user_login,
-					'href="'.get_user_settings_url( 'profile', $UserLogin->ID ).'"' );
-			}
-			param_error( 'edited_user_login', $login_error_message );
-		}
-
-		if( !param_has_error( 'edited_user_login' ) )
-		{	// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-			$this->set_from_Request( 'login', 'edited_user_login', true, 'utf8_strtolower' );
-		}
+		$edited_user_login = $this->check_login();
 		// ---- Login checking / END ----
 
 		$is_identity_form = param( 'identity_form', 'boolean', false );
@@ -1845,6 +1765,70 @@ class User extends DataObject
 		}
 
 		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * Perform various checks on user login
+	 * 
+	 * @return string User login
+	 */
+	function check_login()
+	{
+		global $current_User;
+		global $is_api_request;
+
+		$has_full_access = $current_User->check_perm( 'users', 'edit' );
+		$has_moderate_access = $current_User->can_moderate_user( $this->ID );
+
+		// TRUE when we create new user:
+		$is_new_user = ( $this->ID == 0 );
+
+		$edited_user_login = param( 'edited_user_login', 'string', NULL );
+		if( ! $is_api_request || ( $is_api_request && ( isset( $edited_user_login ) || $is_new_user ) ) )
+		{ // login specifically included in API request
+			if( empty( $edited_user_login ) )
+			{	// Empty login
+				param_error( 'edited_user_login', T_('Please enter your login.') );
+			}
+			if( param_check_valid_login( 'edited_user_login' ) )
+			{	// If login is valid
+				global $reserved_logins;
+				if( $edited_user_login != $this->get( 'login' ) &&
+				    ! empty( $reserved_logins ) &&
+				    in_array( $edited_user_login, $reserved_logins ) &&
+				    ( ! is_logged_in() || ! $has_full_access ) )
+				{	// If login has been changed and new entered login is reserved and current User cannot use this:
+					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
+				}
+			}
+		}
+		else
+		{
+			set_param( 'edited_user_login', $this->login );
+			$edited_user_login = $this->login;
+		}
+
+		$UserCache = & get_UserCache();
+		$UserLogin = $UserCache->get_by_login( $edited_user_login );
+		if( $UserLogin && $UserLogin->ID != $this->ID )
+		{	// The login is already registered
+			$login_error_message = T_( 'This login already exists.' );
+			if( $has_full_access )
+			{
+				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
+					$edited_user_login,
+					'href="'.get_user_settings_url( 'profile', $UserLogin->ID ).'"' );
+			}
+			param_error( 'edited_user_login', $login_error_message );
+		}
+
+		if( !param_has_error( 'edited_user_login' ) )
+		{	// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
+			$this->set_from_Request( 'login', 'edited_user_login', true, 'utf8_strtolower' );
+		}
+
+		return $edited_user_login;
 	}
 
 

@@ -73,7 +73,7 @@ function render_template( $template, & $params, $objects = array() )
 	*/
 
 	// New
-	preg_match_all( '/\[((?:(?:Item|Cat|echo|set):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Cat|Form|Item|Link|echo|set):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		// Output everything until new tag:
@@ -147,6 +147,19 @@ function render_template_callback( $var, $params, $objects = array() )
 			}
 			break;
 
+		case 'Form':
+			$rendered_Form = ( !isset($objects['Form']) ? $Form : $objects['Form'] );
+			if( empty( $rendered_Form ) || ! ( $rendered_Form instanceof Form ) )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object Form is not defined at this moment.</span>';
+			}
+			// do nothing
+			break;
+
+		case 'Link':
+			// do nothing
+			break;
+
 		case 'Item':
 			global $Item;
 			$rendered_Item = ( !isset($objects['Item']) ? $Item : $objects['Item'] );
@@ -200,6 +213,236 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_Chapter->get_permanent_link( array_merge( array(
 					'text'   => '#name',
 				), $params ) );
+			break;
+
+		// Form:
+		case 'Form:country':
+			global $Settings;
+
+			$country = param( 'country', 'integer', 0 );
+			$temp_params = array(
+					'name'       => 'country',
+					'value'      => $country,
+					'label'      => T_('Country'),
+					'allow_none' => true,
+					'required'   => $Settings->get( 'registration_require_country' ),
+					'class'      => '',
+					'hide_label' => false,
+					'style'      => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+
+			$CountryCache = & get_CountryCache();
+			$rendered_Form->select_country( $temp_params['name'], $temp_params['value'], $CountryCache, $temp_params['label'], $temp_params );
+			break;
+
+		case 'Form:email':
+			global $dummy_fields;
+
+			$email = utf8_strtolower( param( $dummy_fields['email'], 'string', '' ) );
+			if( isset( $objects['register_user_data']['email'] ) )
+			{
+				$email = $objects['register_user_data']['email'];
+			}
+			$temp_params = array(
+					'name'        => $dummy_fields['email'],
+					'value'       => $email,
+					'size'        => 50,
+					'label'       => T_('Email'),
+					'placeholder' => $params['register_use_placeholders'] ? T_('Email address') : '',
+					'bottom_note' => T_('We respect your privacy. Your email will remain strictly confidential.'),
+					'maxlength'   => 255,
+					'class'       => 'input_text wide_input',
+					'required'    => true,
+					'class'      => '',
+					'hide_label' => false,
+					'style'      => '',
+			);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+
+			$rendered_Form->email_input( $temp_params['name'], $temp_params['value'], $temp_params['size'], $temp_params['label'], $temp_params );
+			break;
+
+		case 'Form:firstname':
+			global $Settings;
+
+			$firstname = param( 'firstname', 'string', '' );
+			$temp_params = array(
+					'name'        => 'firstname',
+					'value'       => $firstname,
+					'size'        => 18,
+					'label'       => T_('First name'),
+					'note'        => T_('Your real first name'),
+					'placeholder' => '',
+					'maxlength'   => 50,
+					'class'       => 'input_text',
+					'required'    => $Settings->get( 'registration_require_firstname' ),
+					'class'      => '',
+					'hide_label' => false,
+					'style'      => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+
+			$rendered_Form->text_input( $temp_params['name'], $temp_params['value'], $temp_params['size'], $temp_params['label'], $temp_params['note'], $temp_params );
+			break;
+
+		case 'Form:gender':
+			global $Settings;
+		
+			$gender = param( 'gender', 'string', false );
+			$temp_params = array(
+					'name' => 'gender',
+					'value' => $gender,
+					'label' => T_('I am'),
+					'required' => ( $Settings->get( 'registration_require_gender' ) == 'required' ),
+					'class'      => '',
+					'hide_label' => false,
+					'style'      => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+
+			$rendered_Form->radio_input( $temp_params['name'], $temp_params['value'], array(
+					array( 'value' => 'M', 'label' => T_('A man') ),
+					array( 'value' => 'F', 'label' => T_('A woman') ),
+					array( 'value' => 'O', 'label' => T_('Other') ),
+				), $temp_params['label'], $temp_params );
+			break;
+
+		case 'Form:lastname':
+			$lastname = param( 'lastname', 'string', '' );
+			$temp_params = array(
+					'name'        => 'lastname',
+					'value'       => $lastname,
+					'size'        => 18,
+					'label'       => T_('Last name'),
+					'note'        => T_('Your real last name'),
+					'placeholder' => '',
+					'maxlength'   => 50,
+					'class'       => 'input_text',
+					'required'    => false,
+					'class'      => '',
+					'hide_label' => false,
+					'style'      => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+
+			$rendered_Form->text_input( $temp_params['name'], $temp_params['value'], $temp_params['size'], $temp_params['label'], $temp_params['note'], $temp_params );
+			break;
+
+		case 'Form:locale':
+			global $Settings, $current_locale;
+
+			$temp_params = array(
+					'name'     => 'locale',
+					'value'    => $current_locale,
+					'label'    => T_('Locale'),
+					'class'    => '',
+					'note'     => T_('Preferred language'),
+					'class'      => '',
+					'hide_label' => false,
+					'style'      => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+			
+			$rendered_Form->select( $temp_params['name'], $temp_params['value'], 'locale_options_return', $temp_params['label'], $temp_params['note'], $temp_params['class'] );
+			break;
+
+		case 'Form:login':
+			global $dummy_fields;
+
+			$login = param( $dummy_fields['login'], 'string', '' );
+			if( isset( $objects['register_user_data']['login'] ) )
+			{
+				$login = $objects['register_user_data']['login'];
+			}
+			$temp_params = array(  // Here, we make sure not to modify $params
+					'name'         => $dummy_fields['login'],
+					'value'        => $login,
+					'size'         => 22,
+					'label'        => /* TRANS: noun */ T_('Login'),
+					'note'         => $params['register_use_placeholders'] ? '' : T_('Choose a username').'.',
+					'placeholder'  => $params['register_use_placeholders'] ? T_('Choose a username') : '',
+					'maxlength'    => 20,
+					'class'        => 'input_text',
+					'required'     => true,
+					'input_suffix' => ' <span id="login_status"></span><span class="help-inline"><div id="login_status_msg" class="red"></div></span>',
+					'style'        => 'width:'.( $params['register_field_width'] - 2 ).'px',
+					'class'      => '',
+					'hide_label' => false,
+					'style'      => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+
+			$rendered_Form->text_input( $temp_params['name'], $temp_params['value'], $temp_params['size'], $temp_params['label'], $temp_params['note'], $temp_params );
+			break;
+
+		case 'Form:password':
+			global $dummy_fields;
+
+			$temp_params = array(
+					'name'         => $dummy_fields['pass1'],
+					'value'        => '',
+					'size'         => 18,
+					'label'        => T_('Password'),
+					'note'         => $params['register_use_placeholders'] ? '' : T_('Choose a password').'.',
+					'placeholder'  => $params['register_use_placeholders'] ? T_('Choose a password') : '',
+					'maxlength'    => 70,
+					'class'        => 'input_text',
+					'required'     => true,
+					'style'        => 'width:'.$params['register_field_width'].'px',
+					'autocomplete' => 'off',
+					'class'      => '',
+					'hide_label' => false,
+					'style'      => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+
+			$rendered_Form->password_input( $temp_params['name'], $temp_params['value'], $temp_params['size'], $temp_params['label'], $temp_params );
+
+
+			$temp_params = array(
+					'name'         => $dummy_fields['pass2'],
+					'value'        => '',
+					'size'         => 18,
+					'label'        => '',
+					'note'         => ( $params['register_use_placeholders'] ? '' : T_('Please type your password again').'.' ).'<div id="pass2_status" class="red"></div>',
+					'placeholder'  => $params['register_use_placeholders'] ? T_('Please type your password again') : '',
+					'maxlength'    => 70,
+					'class'        => 'input_text',
+					'required'     => true,
+					'style'        => 'width:'.$params['register_field_width'].'px',
+					'autocomplete' => 'off',
+					'class'      => '',
+					'hide_label' => false,
+					'style'      => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+
+			$rendered_Form->password_input( $temp_params['name'], $temp_params['value'], $temp_params['size'], $temp_params['label'], $temp_params );
+				
+			break;
+
+		case 'Form:submit':
+			$temp_params = array(
+					'name' => 'submit',
+					'value' => T_('Submit'),
+					'class' => 'btn btn-primary',
+					'hide_label' => false,
+					'style'      => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+
+			$rendered_Form->submit_input( $temp_params );
 			break;
 
 		// Item:
@@ -376,6 +619,59 @@ function render_template_callback( $var, $params, $objects = array() )
 				$rendered_Item->format_status( array_merge( array(
 						'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
 					), $params ) );
+			}
+			break;
+
+		// Link:
+		case 'Link:disp':
+			$temp_params = array_merge( array(
+					'text'           => '',
+					'class'          => '',
+					'max_url_length' => NULL,
+				), $params );
+
+			if( empty( $temp_params['disp'] ) )
+			{
+				echo '<span class="evo_param_error">['.$var.']: Missing required param "disp".</span>';
+				break;
+			}
+
+			switch( $temp_params['disp'] )
+			{
+				case 'login':
+					$source      = param( 'source', 'string', 'register form' );
+					$redirect_to = param( 'redirect_to', 'url', '' );
+					$return_to   = param( 'return_to', 'url', '' );
+
+					// We are not using 
+					$temp_params = array_merge( array(
+							'source'             => $source,
+							'redirect_to'        => $redirect_to,
+							'return_to'          => $return_to,
+							'force_normal_login' => false,
+							'blog_ID'            => NULL,
+							'blog_page'          => 'loginurl',
+						), $temp_params );
+	
+					$disp_url = get_login_url( $temp_params['source'], $temp_params['redirect_to'], $temp_params['force_normal_login'],
+							$temp_params['blog_ID'], $temp_params['blog_page'] );
+					break;
+				
+				default:
+					$temp_params = array_merge( array(
+							'params' => '',
+						), $temp_params );
+
+					$disp_url = get_dispctrl_url( $temp_params['disp'], $temp_params['params'] );
+			}
+		
+			if( $disp_url )
+			{
+				echo get_link_tag( $disp_url, $temp_params['text'], $temp_params['class'], $temp_params['max_url_length'] );
+			}
+			else
+			{
+				echo '<span class="evo_param_error">['.$var.']: disp "'.$temp_params['disp'].'" is not recognized.</span>';
 			}
 			break;
 		
