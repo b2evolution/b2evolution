@@ -348,7 +348,7 @@ $emailskins_styles = array(
 	max-width: 100%;
 ',
 '.evo_thumbnail__left' => '
-  float: left;
+	float: left;
 	margin: 0 4px 4px 0;
 ',
 '.evo_thumbnail__right' => '
