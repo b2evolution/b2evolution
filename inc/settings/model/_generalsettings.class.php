@@ -156,6 +156,9 @@ class GeneralSettings extends AbstractSettings
 		'min_picture_size' => 160, // minimum profile picture dimensions in pixels (width and height)
 		'allow_html_message' => 0, // Allow HTML in messages
 
+		// Users list settings:
+		'userlist_default_filters' => 'gender,criteria,lastseen',
+
 		// Welcome private message
 		'welcomepm_enabled' => 0,
 		'welcomepm_notag'   => 0,

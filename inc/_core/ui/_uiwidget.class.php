@@ -488,18 +488,12 @@ class Table extends Widget
 				if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered()
 							&& get_param( $this->param_prefix.'filter_preset' ) == $key )
 				{ // The list is not filtered and the filter preset is selected, so no link on:
-					$r[] = '['.$preset[0].']';
+					$r[] = '<span class="label label-default">'.$preset[0].'</span>';
 				}
 				else
 				{	// Display preset filter link:
-					if( isset( $preset[2] ) )
-					{	// Link with additional params
-						$r[] = '<span '.$preset[2].'>[<a href="'.$preset[1].'">'.$preset[0].'</a>]</span>';
-					}
-					else
-					{
-						$r[] = '[<a href="'.$preset[1].'">'.$preset[0].'</a>]';
-					}
+					$preset_text = ( $preset[1] == '#nolink#' ? $preset[0] : '<a href="'.$preset[1].'" class="label label-default">'.$preset[0].'</a>' );
+					$r[] = ( isset( $preset[2] ) ? '<span '.$preset[2].'>'.$preset_text.'</span>' : $preset_text );
 				}
 			}
 

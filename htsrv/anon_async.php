@@ -2054,6 +2054,24 @@ switch( $action )
 		echo json_encode( $r );
 		break;
 
+	case 'get_user_default_filters_form':
+		// Get form to change default users list filters:
+
+		// Check permission:
+		$current_User->check_perm( 'users', 'edit', true );
+
+		// Load the AdminUI class for the skin:
+		global $current_User, $UserSettings, $is_admin_page;
+		$admin_skin = $UserSettings->get( 'admin_skin', $current_User->ID );
+		$is_admin_page = true;
+		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
+		$AdminUI = new AdminUI();
+
+		$display_mode = 'js';
+
+		require $inc_path.'users/views/_user_list_default_filters.form.php';
+		break;
+
 	default:
 		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
 		break;
