@@ -788,16 +788,23 @@ div.results {
 
 // Filters at the top of the Results table:
 div.filters {
-	margin-bottom: 0;
-	background: none;
+	background-color: #f9f9f9;
 	border: none;
-	> div {
-		margin-left: 0;
+	&.panel-body {
+		padding: 6px 10px;
 	}
-	// Align a filter button to the right
-	button.filter {
-		float: right;
-		padding: 4px 12px;
+
+	// For the whole filter form:
+	.form-inline{
+		margin: 5px -10px 0;
+		// For each  label:input :
+		.form-group {
+			margin: 5px 10px 2px;
+		}
+	}
+	// Styles for button on the right:
+	button.btn.btn-info {
+		margin: 0;
 	}
 
 	/*	// MISSING DOC!
@@ -816,7 +823,21 @@ div.filters {
 	// Fix style for Username fields with autocomplete:
 	.twitter-typeahead {
 		vertical-align: middle; // otherwise "Username:" label is misaligned
+	}
+
+	// Fix style for Query Builder (e-g Users filtering)
+	.query-builder {
+		margin: -15px 0 -12px -4px; 
+		> .rules-group-container {
+			// First group:
+			border: none;
+			background: transparent;
 		}
+	}
+
+	// In BackOffice > Contents > Posts we display the "cuurrent filters" widget in the form:
+	.filters_item_list_table {
+		margin: 0 8px;
 	}
 }
 .table_scroll .table {
@@ -1158,13 +1179,13 @@ div.edit_toolbars, div.message_toolbars {
 .tt-dropdown-menu {
 	background-color: #FFFFFF;
 	border: 1px solid rgba(0, 0, 0, 0.2);
-	.border-radius(8px);
+	border-radius: 3px;
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-	padding: 8px 0;
+	padding: 0;
 	.tt-suggestion {
-		font-size: 18px;
-		line-height: 24px;
-		padding: 3px 20px;
+		font-size: 14px;
+		// line-height: px;
+		padding: 4px 10px;
 		&.tt-cursor {
 			background-color: #0097CF;
 			color: #FFFFFF;
