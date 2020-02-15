@@ -1007,7 +1007,7 @@ class Results extends Table
 		echo $this->replace_vars( $this->params['content_start'] );
 
 			if( $this->total_pages == 0 )
-			{ // There are no results! Nothing to display!
+			{ // There are NO RESULTS! Nothing to display!
 
 				// START OF LIST/TABLE:
 				$this->display_list_start();
@@ -1456,12 +1456,14 @@ class Results extends Table
 		}
 		else
 		{ // Several pages
+			// e-g: 'header_text' or 'footer_text'
 			$navigation = $this->replace_vars( $this->params[$template.'_text'] );
 		}
 
 		$navigation_text = trim( strip_tags( $navigation ) );
 		if( ! empty( $navigation_text ) )
 		{ // Display navigation only when it is really filled with some text
+			// e-g: 'header_start' or 'footer_start'
 			echo $this->params[$template.'_start'];
 
 			echo $navigation;
@@ -1894,6 +1896,10 @@ class Results extends Table
 		// echo '['.$matches[1].']';
 		switch( $matches[1] )
 		{
+			case 'nb_results':
+			case 'total_rows':
+				return $this->total_rows;
+
 			case 'start' :
 				return ( ($this->page-1)*$this->limit+1 );
 
