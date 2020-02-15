@@ -351,10 +351,10 @@ class AdminUI extends AdminUI_general
 					'before' => '<div class="results panel panel-default">',
 					'content_start' => '<div id="$prefix$ajax_content">',
 					'header_start' => '<div class="evo_panel evo_panel__top_pager">',
-						'header_text' => '<div class="center"><ul class="pagination">'
+						'header_text' => '<div class="evo_result_summary">$nb_results$ Results</div><div class="evo_pager"><ul class="pagination">'
 								.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 							.'</ul></div>',
-						'header_text_single' => '',
+						'header_text_single' => '<div class="evo_result_summary">$nb_results$ Results</div>',
 					'header_end' => '</div>',
 					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 					'global_icons_class' => 'btn btn-default btn-sm',

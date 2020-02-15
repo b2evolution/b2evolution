@@ -156,6 +156,7 @@ class Widget
 	function replace_callback_wrapper( $match )
 	{
 		// Replace the variable with its content (which will be computed on the fly)
+		// This method is designed to be OVERRIDDEN by derived classes !
 		$r = $this->replace_callback( $match );
 
 		if( empty($r) )

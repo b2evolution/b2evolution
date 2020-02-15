@@ -5021,6 +5021,25 @@ div.results .table-bordered th.lastcol {
 div.results .table-bordered th {
   border-bottom: none;
 }
+div.results .evo_panel {
+  padding: 5px;
+}
+div.results .evo_panel__top_pager {
+  background-color: #f9f9f9;
+}
+div.results .evo_result_summary {
+  float: left;
+}
+div.results .evo_pager {
+  text-align: center;
+}
+div.results .evo_panel__footer {
+  background-color: #f9f9f9;
+}
+div.results .pagination {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
 div.results .page_size_selector {
   margin-bottom: 5px;
   display: block;
@@ -5028,10 +5047,6 @@ div.results .page_size_selector {
 div.results .page_size_selector select.form-control {
   display: inline-block;
   width: auto;
-}
-div.results .pagination {
-  margin-top: 5px;
-  margin-bottom: 5px;
 }
 div.results tr.placeholder {
   position: relative;

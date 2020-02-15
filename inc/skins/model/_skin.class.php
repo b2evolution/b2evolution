@@ -1825,12 +1825,12 @@ var downloadInterval = setInterval( function()
 							'page_url' => '', // All generated links will refer to the current page
 							'before' => '<div class="results panel panel-default">',
 							'content_start' => '<div id="$prefix$ajax_content">',
-							'header_start' => '',
+							'header_start' => '<div class="evo_panel evo_panel__top_pager">',
 								'header_text' => '<div class="center"><ul class="pagination">'
 										.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 									.'</ul></div>',
 								'header_text_single' => '',
-							'header_end' => '',
+							'header_end' => '</div>',
 							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 							'global_icons_class' => 'btn btn-default btn-sm',
 							'filters_start'        => '<div class="filters panel-body">',
