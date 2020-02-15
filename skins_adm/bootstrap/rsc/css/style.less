@@ -235,13 +235,31 @@ div.delete_messages ul {
 	}
 }
 
-.evo_panel {
-	margin-bottom: 20px;
+// Post / Comment browsing screen
+.evo_content_block {
+	.evo_panel__top_pager {
+		margin-top: -20px;
+	}
+	.evo_panel__footer {
+		// Pager in footer + nb line by default select
+		padding: 5px 0 20px;
+	}
 }
 
-.evo_panel__footer {
-	padding: 10px 15px;
+// Results tables:
+.panel.results {
+	.evo_panel {
+		padding: 5px;
+	}
+	.evo_panel__top_pager {
+		background-color: #f9f9f9;
+	}
+	.evo_panel__footer {
+		// Mass actions + Pager in footer + nb line by default select
+		background-color: #f9f9f9;
+	}
 }
+
 
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
@@ -1190,6 +1208,7 @@ tbody.fieldset_wrapper.folded+tbody[id^=cat_sel_] {
 }
 
 // Dashboard
+// Collection dashboard ?
 .browse {
 	.evo_content_block {
 		margin-right: 0;

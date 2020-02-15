@@ -350,7 +350,7 @@ class AdminUI extends AdminUI_general
 					'page_url' => '', // All generated links will refer to the current page
 					'before' => '<div class="results panel panel-default">',
 					'content_start' => '<div id="$prefix$ajax_content">',
-					'header_start' => '<div class="evo_panel">',
+					'header_start' => '<div class="evo_panel evo_panel__top_pager">',
 						'header_text' => '<div class="center"><ul class="pagination">'
 								.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 							.'</ul></div>',

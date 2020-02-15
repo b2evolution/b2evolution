@@ -198,11 +198,20 @@ div.delete_messages ul label {
   font-weight: normal;
   margin: 0;
 }
-.evo_panel {
-  margin-bottom: 20px;
+.evo_content_block .evo_panel__top_pager {
+  margin-top: -20px;
 }
-.evo_panel__footer {
-  padding: 10px 15px;
+.evo_content_block .evo_panel__footer {
+  padding: 5px 0 20px;
+}
+.panel.results .evo_panel {
+  padding: 5px;
+}
+.panel.results .evo_panel__top_pager {
+  background-color: #f9f9f9;
+}
+.panel.results .evo_panel__footer {
+  background-color: #f9f9f9;
 }
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
