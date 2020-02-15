@@ -1,4 +1,4 @@
-/* This file is used to fix the style issues on all bootstrap skins of b2evolution */
+/* This file is used to fix the style issues on all bootstrap skins of b2evolution, including BACK-OFFICE */
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -785,7 +785,8 @@ div.results {
 		max-width: none;
 	}
 }
-// Filters in results table
+
+// Filters at the top of the Results table:
 div.filters {
 	margin-bottom: 0;
 	background: none;
@@ -798,19 +799,23 @@ div.filters {
 		float: right;
 		padding: 4px 12px;
 	}
-	// Set vertical spaces between the filter inputs
+
+	/*	// MISSING DOC!
+		> div {
+			margin-left: 0;
+		}
+	*/
+
+	/* STILL USED ?
+	// Set vertical spaces between the filter inputs:;
 	.block {
 		display: inline-block;
 		margin: 2px;
 	}
-	&.panel-body {
-		padding: 15px;
-	}
-	// Fix style for fields with autocomplete usernames:
+	*/
+	// Fix style for Username fields with autocomplete:
 	.twitter-typeahead {
-		vertical-align: middle;
-		.tt-dropdown-menu div {
-			margin-left: 0;
+		vertical-align: middle; // otherwise "Username:" label is misaligned
 		}
 	}
 }
@@ -1149,7 +1154,7 @@ div.edit_toolbars, div.message_toolbars {
 	}
 }
 
-// Typeahead plugin
+// Typeahead plugin FOR username autosuggest
 .tt-dropdown-menu {
 	background-color: #FFFFFF;
 	border: 1px solid rgba(0, 0, 0, 0.2);

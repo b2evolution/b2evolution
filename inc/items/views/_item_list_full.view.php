@@ -108,8 +108,8 @@ else
 
 	// Initialize things in order to be ready for displaying.
 	$display_params = array(
-			'header_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['header_start'] ),
-			'footer_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['footer_start'] ),
+			'header_start' => $admin_template['header_start'],
+			'footer_start' => $admin_template['footer_start'],
 		);
 }
 

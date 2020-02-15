@@ -1203,15 +1203,18 @@ table.coll_kind .btn {
   float: none;
   padding-left: 0;
 }
+/* Fp: UNCLEAR WHAT THIS IS FOR:
+// Support for multiline inline forms
 .filters .form-inline {
-  margin: 0 -10px -5px;
+	 margin: 0 -10px -5px;
+	.form-group {
+		margin: 5px 10px;
+	}
+	.checkbox {
+		margin-left: 10px;
+	}
 }
-.filters .form-inline .form-group {
-  margin: 5px 10px;
-}
-.filters .form-inline .checkbox {
-  margin-left: 10px;
-}
+*/
 .navbar {
   margin-bottom: 0;
 }
