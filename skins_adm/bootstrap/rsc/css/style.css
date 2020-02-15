@@ -198,10 +198,10 @@ div.delete_messages ul label {
   font-weight: normal;
   margin: 0;
 }
-.evo_content_block .evo_panel__top_pager {
+.evo_content_block .results_header {
   margin-top: -20px;
 }
-.evo_content_block .evo_panel__footer {
+.evo_content_block .results_footer {
   padding: 5px 0 20px;
 }
 /*

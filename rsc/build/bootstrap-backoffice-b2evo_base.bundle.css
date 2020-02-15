@@ -3092,19 +3092,12 @@ div.results .table-bordered th.lastcol {
 div.results .table-bordered th {
   border-bottom: none;
 }
-div.results .evo_panel {
-  padding: 5px;
-}
-div.results .evo_panel__top_pager {
+div.results .results_header {
+  padding: 5px 10px;
   background-color: #f9f9f9;
 }
-div.results .evo_result_summary {
-  float: left;
-}
-div.results .evo_pager {
-  text-align: center;
-}
-div.results .evo_panel__footer {
+div.results .results_footer {
+  padding: 5px;
   background-color: #f9f9f9;
 }
 div.results .pagination {
@@ -3194,6 +3187,14 @@ div.filters .query-builder > .rules-group-container {
 }
 div.filters .filters_item_list_table {
   margin: 0 8px;
+}
+.results_summary {
+  float: left;
+  font-weight: bold;
+  margin-top: 5px;
+}
+.evo_pager {
+  text-align: center;
 }
 .table_scroll .table {
   margin-bottom: 0;
