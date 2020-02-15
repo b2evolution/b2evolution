@@ -70,7 +70,7 @@ class FilteredResults extends Results
 
 
 	/**
-	 * Get every active filter that is not the same as the defaults
+	 * Get every "active" filter, i-e: that is not the same as the defaults
 	 */
 	function get_active_filters()
 	{
@@ -102,7 +102,7 @@ class FilteredResults extends Results
 		foreach( $this->default_filters as $key => $value )
 		{
 			if( !isset( $this->filters[$key] ) )
-			{	// SOme value has not been copied over from defaults to active or specifically set:
+			{	// Some value has not been copied over from defaults to active or specifically set:
 				if( !is_null($value)) // Note: NULL value ar enot copied over. that's normal.
 				{	// A NON NULL value is missing
 					pre_dump( 'no active value for default '.$key );
@@ -132,7 +132,6 @@ class FilteredResults extends Results
 
 	/**
 	 * Activate preset default filters if necessary
-	 *
 	 */
 	function activate_preset_filters()
 	{
@@ -184,14 +183,6 @@ class FilteredResults extends Results
 		global $Debuglog;
 
 		$filters = $Session->get( $this->filterset_name );
-
-		/*
-		fp> 2007-09-26> even if there are no filters, we need to "set" them in order to set global variables like $show_statuses
-		if( empty($filters) )
-		{ // We have no saved filters:
-			return false;
-		}
-		*/
 
 		if( empty($filters) )
 		{ // set_filters() expects array
