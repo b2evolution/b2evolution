@@ -45,7 +45,7 @@ else
 
 $ItemList->filter_area = array(
 		'callback' => 'callback_filter_item_list_table',
-		'hide_filter_button' => true,
+		'apply_filters_button' => 'none',
 	);
 
 

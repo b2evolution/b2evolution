@@ -6648,6 +6648,7 @@ function users_results_block( $params = array() )
 			'callback' => 'callback_filter_userlist',
 			'url_ignore' => 'users_paged,u_paged,keywords',
 			'presets' => $filter_presets,
+			'apply_filters_button' => 'bottom',
 			);
 	}
 

@@ -411,9 +411,14 @@ class Table extends Widget
 		}
 		// Initialize default params
 		$this->params = array_merge( array(
-				'filter_button_class'  => 'filter',
+				// If button at top right: (default values for v5 skins)
 				'filter_button_before' => '',
 				'filter_button_after'  => '',
+				'filter_button_class'  => 'filter',
+				// If buttom at bottom (only happens in v7+)
+				'bottom_filter_button_before' => '<div class="form-group">',
+				'bottom_filter_button_after'  => '</div>',
+				'bottom_filter_button_class'  => 'btn-sm btn-info',
 			), $this->params );
 
 		if( $fadeout == 'session' )
@@ -519,7 +524,7 @@ class Table extends Widget
 		//_____________________________ Form and callback _________________________________________
 
 		if( !empty($this->{$area_name}['callback']) )
-		{	// We want to display filtering form fields:
+		{	// We want to display Filter Form fields:
 
 			if( $create_new_form )
 			{	// We do not already have a form surrounding the whole results list:
@@ -533,14 +538,13 @@ class Table extends Widget
 					$ignore = $this->page_param;
 				}
 
-// fp> CHECKPOINT: If filters break, revert this to 'post'.
-				$this->Form = new Form( regenerate_url( $ignore, '', '', '&' ), $this->param_prefix.'form_search', 'get', 'blockspan' ); // COPY!!
+				$this->Form = new Form( regenerate_url( $ignore, '', '', '&' ), $this->param_prefix.'form_search', 'get', 'blockspan' );
 
 				$this->Form->begin_form( '' );
 			}
 
-			if( empty( $this->filter_area['hide_filter_button'] ) )
-			{ // Display a filter button only when it is not hidden by param:
+			if( !isset( $this->filter_area['apply_filters_button'] ) || $this->filter_area['apply_filters_button'] == 'topright' )
+			{ // Display a filter button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
 				echo $this->params['filter_button_before'];
 				$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
 				$this->Form->button_input( array(
@@ -549,7 +553,6 @@ class Table extends Widget
 							'value' => get_icon( 'filter' ).' '.$submit_title,
 							'class' => $this->params['filter_button_class']
 					) );
-
 				echo $this->params['filter_button_after'];
 			}
 
@@ -564,6 +567,19 @@ class Table extends Widget
 			if( ! empty( $filter_fields ) && is_array( $filter_fields ) )
 			{	// Display filters which use JavaScript plugin QueryBuilder:
 				$this->display_filter_fields( $this->Form, $filter_fields );
+			}
+
+			if( isset( $this->filter_area['apply_filters_button'] ) && $this->filter_area['apply_filters_button'] == 'bottom' )
+			{ // Display a filter button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
+				echo $this->params['bottom_filter_button_before'];
+				$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
+				$this->Form->button_input( array(
+						'tag'   => 'button',
+						'name'  => $submit_name,
+						'value' => get_icon( 'filter' ).' '.$submit_title,
+						'class' => $this->params['bottom_filter_button_class']
+					) );
+				echo $this->params['bottom_filter_button_after'];
 			}
 
 			if( $create_new_form )
