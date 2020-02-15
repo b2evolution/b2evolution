@@ -852,7 +852,7 @@ jQuery( document ).ready( function()
 
 		$option_name = $this->param_prefix.'filters';
 
-		$submit_title = !empty( $this->filter_area['submit_title'] ) ? $this->filter_area['submit_title'] : T_('Filter list');
+		$submit_title = !empty( $this->filter_area['submit_title'] ) ? $this->filter_area['submit_title'] : T_('Apply filters');
 
 		$this->display_option_area( $option_name, 'filter_area', T_('Filters'), $submit_title, 'expanded' );
 	}

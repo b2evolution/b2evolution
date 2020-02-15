@@ -53,7 +53,7 @@ echo '<div class="evo_content_block evo_content_summary">';
 	$block_item_Widget->title = T_('Posts Browser').get_manual_link( 'browse-edit-tab' );
 	if( $ItemList->is_filtered() )
 	{ // List is filtered, offer option to reset filters:
-		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
 	}
 
 	// Generate global icons depending on seleted tab with item type

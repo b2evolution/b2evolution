@@ -6641,7 +6641,7 @@ function users_results_block( $params = array() )
 
 		if( $UserList->is_filtered() )
 		{ // Display link to reset filters only if some filter is applied
-			$UserList->global_icon( T_('Reset filters'), 'reset_filters', url_add_param( $params['page_url'], 'filter=reset' ), T_('Reset filters'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
+			$UserList->global_icon( T_('Remove filters'), 'reset_filters', url_add_param( $params['page_url'], 'filter=reset' ), T_('Remove filters'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
 		}
 
 		$UserList->filter_area = array(
@@ -6656,7 +6656,7 @@ function users_results_block( $params = array() )
 	 */
 	if( $params['display_btn_refresh'] )
 	{ // Display a button to refresh the users list
-		$UserList->global_icon( T_('Refresh users list...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
+		$UserList->global_icon( T_('Refresh the list in case some Users have been added or deleted since your last search...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
 	}
 	if( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
 	{
