@@ -6463,7 +6463,6 @@ function users_results_block( $params = array() )
 			'join_country'         => true,
 			'keywords_fields'      => NULL,
 			'where_status_closed'  => NULL,
-			'display_user_count'   => false, // user count beside the title
 			'display_params'       => array(),
 			'display_orgstatus'    => false,
 			'display_filters'      => true,
@@ -6606,13 +6605,6 @@ function users_results_block( $params = array() )
 
 	// Execute query:
 	$UserList->query();
-
-	// Display number of rows in the title
-	if( $params['display_user_count'] )
-	{
-		$UserList->title .= ' ('.$UserList->get_total_rows().')';
-	}
-
 
 	if( $params['display_filters'] )
 	{ // Display the filters

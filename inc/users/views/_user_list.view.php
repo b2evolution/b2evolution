@@ -19,9 +19,8 @@ if( !isset( $display_params ) )
 	$display_params = array();
 }
 
+// Display the users results table:
 users_results_block( array(
-		'results_title'      => T_('Users'),
-		'display_user_count' => true,
 		'display_sec_groups' => true,
 		'display_params'     => $display_params,
 		'display_contact'    => false,
