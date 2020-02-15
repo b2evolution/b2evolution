@@ -4360,7 +4360,7 @@ span.NonExistentWikiWord {
   border: 1px dotted #F00;
 }
 
-/* This file is used to fix the style issues on all bootstrap skins of b2evolution */
+/* This file is used to fix the style issues on all bootstrap skins of b2evolution, including BACK-OFFICE */
 @media (min-width: 1785px) {
   .container-xxl {
     width: 1755px;
@@ -5069,29 +5069,45 @@ div.results img {
   max-width: none;
 }
 div.filters {
-  margin-bottom: 0;
-  background: none;
+  background-color: #f9f9f9;
   border: none;
-}
-div.filters > div {
-  margin-left: 0;
-}
-div.filters button.filter {
-  float: right;
-  padding: 4px 12px;
-}
-div.filters .block {
-  display: inline-block;
-  margin: 2px;
+  /*	// MISSING DOC!
+		> div {
+			margin-left: 0;
+		}
+	*/
+  /* STILL USED ?
+	// Set vertical spaces between the filter inputs:;
+	.block {
+		display: inline-block;
+		margin: 2px;
+	}
+	*/
 }
 div.filters.panel-body {
-  padding: 15px;
+  padding: 6px 10px;
+}
+div.filters .form-inline {
+  margin: 5px -10px 0;
+}
+div.filters .form-inline .form-group {
+  margin: 5px 10px 2px;
+}
+div.filters button.btn.btn-info {
+  margin: 0;
 }
 div.filters .twitter-typeahead {
   vertical-align: middle;
 }
-div.filters .twitter-typeahead .tt-dropdown-menu div {
-  margin-left: 0;
+div.filters .query-builder {
+  margin: -15px 0 -12px -4px;
+}
+div.filters .query-builder > .rules-group-container {
+  border: none;
+  background: transparent;
+}
+div.filters .filters_item_list_table {
+  margin: 0 8px;
 }
 .table_scroll .table {
   margin-bottom: 0;
@@ -5389,18 +5405,13 @@ div.message_toolbars {
 .tt-dropdown-menu {
   background-color: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  -ms-border-radius: 8px;
-  -o-border-radius: 8px;
-  border-radius: 8px;
+  border-radius: 3px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  padding: 8px 0;
+  padding: 0;
 }
 .tt-dropdown-menu .tt-suggestion {
-  font-size: 18px;
-  line-height: 24px;
-  padding: 3px 20px;
+  font-size: 14px;
+  padding: 4px 10px;
 }
 .tt-dropdown-menu .tt-suggestion.tt-cursor {
   background-color: #0097CF;
