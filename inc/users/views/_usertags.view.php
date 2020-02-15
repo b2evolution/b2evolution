@@ -80,9 +80,9 @@ function filter_tags( & $Form )
 	$Form->text_input( 'tag_user_ID', $filter_user_ID, 9, T_('User ID'), $user_ID_filter_note, array( 'maxlength' => 9 ) );
 }
 $Results->filter_area = array(
-	'callback' => 'filter_tags',
+	'callback'   => 'filter_tags',
 	'url_ignore' => 'utag_filter,results_tag_page',
-	'presets' => array(
+	'presets'    => array(
 		'all' => array( T_('All'), '?ctrl=usertags' ),
 		)
 	);

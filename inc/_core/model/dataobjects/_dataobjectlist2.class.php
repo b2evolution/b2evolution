@@ -274,6 +274,38 @@ class FilteredResults extends Results
 
 		return false;
 	}
+
+
+
+	/**
+	 * Widget callback for template vars.
+	 *
+	 * This allows to replace template vars, see {@link Widget::replace_callback()}.
+	 *
+	 * @return string
+	 */
+	function replace_callback( $matches )
+	{
+		// echo '['.$matches[1].']';
+		switch( $matches[1] )
+		{
+			case 'reset_filters_button':
+				if( ! $this->is_filtered() )
+				{
+					return '';
+				}
+				// Resetting the filters is the same as applying preset 'all' (should be defined for all Results tables)
+				if( !isset($this->filter_area['presets']['all'][1]) )
+				{
+					return '';
+				}
+				return '<a href="'.$this->filter_area['presets']['all'][1].'" class="btn btn-sm btn-warning">'.get_icon('reset_filters').T_('Remove filters').'</a>';
+
+			default :
+				return parent::replace_callback( $matches );
+		}
+	}
+
 }
 
 
