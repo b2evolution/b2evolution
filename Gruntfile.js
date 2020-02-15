@@ -489,5 +489,6 @@ module.exports = function(grunt) {
 
 	// Default task(s):
 	grunt.registerTask('default', ['less','autoprefixer','concat','cssmin','uglify','markdown']);
+	grunt.registerTask('styles', ['less','autoprefixer','concat','cssmin']);
 
 };
