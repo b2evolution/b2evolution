@@ -39,7 +39,7 @@ $CommentList->title = T_('Comment List').get_manual_link( 'comments-list-view' )
 
 if( $CommentList->is_filtered() )
 {	// List is filtered, offer option to reset filters:
-	$CommentList->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3=listview&amp;filter=reset', T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+	$CommentList->global_icon( T_('Reset all filters'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3=listview&amp;filter=reset', T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
 }
 
 if( check_comment_mass_delete( $CommentList ) )

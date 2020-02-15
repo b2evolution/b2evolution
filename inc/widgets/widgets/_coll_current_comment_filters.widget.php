@@ -198,7 +198,7 @@ class coll_current_comment_filters_Widget extends ComponentWidget
 
 			if( $params['display_button_reset'] )
 			{ // Button to reset all filters
-				echo '<p>'.action_icon( T_('Reset all filters!'), 'reset_filters',
+				echo '<p>'.action_icon( T_('Remove filters'), 'reset_filters',
 					regenerate_url( 'catsel,cat,'
 						.$params['CommentList']->param_prefix.'author_IDs,'
 						.$params['CommentList']->param_prefix.'authors_login,'
@@ -221,7 +221,7 @@ class coll_current_comment_filters_Widget extends ComponentWidget
 						.$params['CommentList']->param_prefix.'expiry_statuses,'
 						.$params['CommentList']->param_prefix.'type,'
 						.$params['CommentList']->param_prefix.'user_perm,' ),
-					' '.T_('Reset all filters!'), 3, 4 ).'<p>';
+					' '.T_('Remove filters'), 3, 4 ).'<p>';
 			}
 		}
 

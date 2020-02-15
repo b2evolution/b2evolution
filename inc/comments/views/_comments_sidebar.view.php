@@ -63,10 +63,10 @@ echo '<div class="filter_buttons">';
 	if( $CommentList->is_filtered() )
 	{	// TODO: style this better:
 		echo '<a href="?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3='.$tab3.'&amp;filter=reset" class="btn btn-warning" style="margin-right: 5px">';
-		echo get_icon( 'filter' ).' '.T_('Reset all filters!').'</a>';
+		echo get_icon( 'filter' ).' '.T_('Remove filters').'</a>';
 	}
 
-	$Form->submit( array( 'submit', T_('Search'), 'btn-info' ) );
+	$Form->submit( array( 'submit', T_('Apply filters'), 'btn-info' ) );
 echo '</div>';
 
 // COMMENTS TO SHOW:

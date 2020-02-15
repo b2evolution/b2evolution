@@ -61,7 +61,7 @@ $Results = new Results( $SQL->get(), 'groupcoll_' );
 
 if( ! empty( $keywords ) )
 { // Display a button to reset the filters
-	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID, T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+	$Results->global_icon( T_('Reset all filters'), 'reset_filters', $admin_url.'?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID, T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
 }
 
 // Tell the Results class that we already have a form for this page:

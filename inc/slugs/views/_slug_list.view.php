@@ -56,7 +56,7 @@ $Results->Cache = get_SlugCache();
 
 if( $list_is_filtered )
 { // List is filtered, offer option to reset filters:
-	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=slugs', T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+	$Results->global_icon( T_('Reset all filters'), 'reset_filters', $admin_url.'?ctrl=slugs', T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
 }
 
 /**

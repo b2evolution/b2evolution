@@ -146,7 +146,7 @@ $ItemList->cols[] = array(
 
 if( $ItemList->is_filtered() )
 {	// List is filtered, offer option to reset filters:
-	$ItemList->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+	$ItemList->global_icon( T_('Reset all filters'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
 }
 
 if( $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )

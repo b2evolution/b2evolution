@@ -113,7 +113,7 @@ $Results = new Results( $SQL->get(), 'refdom_', '---D', $UserSettings->get( 'res
 
 if( $list_is_filtered )
 { // List is filtered, offer option to reset filters:
-	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.( empty( $blog ) ? '' : '&amp;blog='.$blog ), T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
+	$Results->global_icon( T_('Reset all filters'), 'reset_filters', $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.( empty( $blog ) ? '' : '&amp;blog='.$blog ), T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
 }
 
 if( $current_User->check_perm( 'stats', 'edit' ) )
