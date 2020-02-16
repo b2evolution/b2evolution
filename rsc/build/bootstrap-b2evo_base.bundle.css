@@ -5079,18 +5079,6 @@ div.results img {
 div.filters {
   background-color: #f9f9f9;
   border: none;
-  /*	// MISSING DOC!
-		> div {
-			margin-left: 0;
-		}
-	*/
-  /* STILL USED ?
-	// Set vertical spaces between the filter inputs:;
-	.block {
-		display: inline-block;
-		margin: 2px;
-	}
-	*/
 }
 div.filters.panel-body {
   padding: 6px 10px;
@@ -5101,7 +5089,7 @@ div.filters .form-inline {
 div.filters .form-inline .form-group {
   margin: 5px 10px 2px;
 }
-div.filters button.btn.btn-info {
+div.filters .evo_btn_apply_filters {
   margin: 0;
 }
 div.filters .twitter-typeahead {

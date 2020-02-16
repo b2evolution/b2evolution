@@ -1835,7 +1835,7 @@ var downloadInterval = setInterval( function()
 							'global_icons_class' => 'btn btn-default btn-sm',
 							'filters_start'        => '<div class="filters panel-body">',
 							'filters_end'          => '</div>',
-							'filter_button_class'  => 'btn-sm btn-info',
+							'filter_button_class'  => 'evo_btn_apply_filters btn-sm btn-info',
 							'filter_button_before' => '<div class="form-group pull-right">',
 							'filter_button_after'  => '</div>',
 							'messages_start' => '<div class="messages form-inline">',

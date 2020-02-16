@@ -419,7 +419,7 @@ class Table extends Widget
 				// If buttom at bottom (only happens in v7+)
 				'bottom_filter_button_before' => '<div class="form-group">',
 				'bottom_filter_button_after'  => '</div>',
-				'bottom_filter_button_class'  => 'btn-sm btn-info',
+				'bottom_filter_button_class'  => 'evo_btn_apply_filters btn-sm btn-info',
 			), $this->params );
 
 		if( $fadeout == 'session' )
@@ -442,7 +442,7 @@ class Table extends Widget
 
 
 	/**
-	 * Display options area
+	 * Display options area (e-g: Filters area; was also designed for makign a 'columns' options area)
 	 *
 	 * @param string name of the option ( ma_colselect, tsk_filter....)
 	 * @param string area name ( colselect_area, filter_area )
@@ -934,6 +934,7 @@ jQuery( document ).ready( function()
 		$submit_title = !empty( $this->filter_area['submit_title'] ) ? $this->filter_area['submit_title'] : T_('Apply filters');
 
 		$this->display_option_area( $option_name, 'filter_area', T_('Filters'), $submit_title, 'expanded' );
+
 	}
 
 
