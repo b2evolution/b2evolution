@@ -69,6 +69,10 @@ class Table extends Widget
 	 */
 	var $filter_area;
 
+	/**
+	 * Preset button that is currently active.
+	 */
+	var $current_filter_preset = NULL;
 
 	/**
 	 * Constructor
@@ -659,22 +663,22 @@ jQuery( document ).ready( function()
 
 		echo $this->replace_vars( $this->params['filters_start'] );
 
-		$current_filter_preset = param( $preset_name, 'string', NULL );
-		if( $current_filter_preset !== NULL )
+		$this->current_filter_preset = param( $preset_name, 'string', NULL );
+		if( $this->current_filter_preset !== NULL )
 		{	// Store new preset in Session:
-			$Session->set( $preset_name, $current_filter_preset );
+			$Session->set( $preset_name, $this->current_filter_preset );
 			$Session->dbsave();
 		}
-		if( $current_filter_preset === NULL )
+		if( $this->current_filter_preset === NULL )
 		{	// Try to get preset from Session:
-			$current_filter_preset = $Session->get( $preset_name );
+			$this->current_filter_preset = $Session->get( $preset_name );
 		}
-		if( $current_filter_preset === NULL )
+		if( $this->current_filter_preset === NULL )
 		{	// Use 'all' preset filter by default:
-			$current_filter_preset = 'all';
+			$this->current_filter_preset = 'all';
 		}
 
-		$fold_state = ( $current_filter_preset == 'custom' ? 'expanded' : 'collapsed' );
+		$fold_state = ( $this->current_filter_preset == 'custom' ? 'expanded' : 'collapsed' );
 
 		if( empty( $fold_state ) )
 		{
@@ -692,14 +696,14 @@ jQuery( document ).ready( function()
 			foreach( $this->filter_area['presets'] as $key => $preset )
 			{
 				// Link for preset filter:
-				echo '<a href="'.$preset[1].'" class="btn btn-xs btn-info'.( $current_filter_preset == $key ? ' active' : '' ).'">'.$preset[0].'</a>';
+				echo '<a href="'.$preset[1].'" class="btn btn-xs btn-info'.( $this->current_filter_preset == $key ? ' active' : '' ).'">'.$preset[0].'</a>';
 			}
 		}
 
 		// "Custom preset" with JS toggle to reveal form:
 // fp>yb: TODO: I don't think this can work without Javascript (and it doesn't need to) -- remove all unnecessary code
 		echo '<a href="'.regenerate_url( 'action,target', 'action='.( $fold_state == 'collapsed' ? 'expand_filter' : 'collapse_filter' ).'&target='.$option_name ).'"'
-			.' onclick="return toggle_filter_area(\''.$option_name.'\')" class="btn btn-xs btn-info'.( $current_filter_preset == 'custom' ? ' active' : '' ).'">'
+			.' onclick="return toggle_filter_area(\''.$option_name.'\')" class="btn btn-xs btn-info'.( $this->current_filter_preset == 'custom' ? ' active' : '' ).'">'
 				.get_icon( ( $fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$option_name ) )
 				.' '.T_('Custom filters')
 			.'</a>';
@@ -1375,6 +1379,18 @@ jQuery( document ).ready( function()
 		// echo '['.$matches[1].']';
 		switch( $matches[1] )
 		{
+			case 'reset_filters_button':
+				// Resetting the filters is the same as applying preset 'all' (should be defined for all)
+				if( !isset($this->filter_area['presets']['all'] ) )
+				{	// Preset "all" not defined, we don't know how to reset.
+					return '';
+				}
+				if( empty($this->current_filter_preset) || $this->current_filter_preset == 'all' )
+				{ // No filters applied:
+					return '';
+				}
+				return '<a href="'.$this->filter_area['presets']['all'][1].'" class="btn btn-sm btn-warning">'.get_icon('reset_filters').T_('Remove filters').'</a>';
+
 			case 'nb_cols' :
 				// Number of columns in result:
 				if( !isset($this->nb_cols) )

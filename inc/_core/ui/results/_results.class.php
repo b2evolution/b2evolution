@@ -1899,15 +1899,6 @@ class Results extends Table
 			case 'total_rows':
 				return $this->total_rows;
 
-			case 'reset_filters_button':
-// TODO: When we are NOT a FilteredResults class, how to check if a filter is already applied?
-				// Resetting the filters is the same as applying preset 'all' (should be defined for all Results tables)
-				if( !isset($this->filter_area['presets']['all'][1]) )
-				{
-					return '';
-				}
-				return '<a href="'.$this->filter_area['presets']['all'][1].'" class="btn btn-sm btn-warning">'.get_icon('reset_filters').T_('Remove filters').'</a>';
-
 			case 'start' :
 				return ( ($this->page-1)*$this->limit+1 );
 
