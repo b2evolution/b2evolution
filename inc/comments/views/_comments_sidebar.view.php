@@ -60,7 +60,7 @@ $Form->hidden( 'tab3', $tab3 );
 $Form->hidden( 'blog', $Blog->ID );
 
 echo '<div class="filter_buttons">';
-	if( $CommentList->is_filtered() )
+	if( $CommentList->is_filtered() )  // NOTE: this works (contrary to UserList)
 	{	// TODO: style this better:
 		echo '<a href="?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3='.$tab3.'&amp;filter=reset" class="btn btn-warning" style="margin-right: 5px">';
 		echo get_icon( 'filter' ).' '.T_('Remove filters').'</a>';

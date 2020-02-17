@@ -53,11 +53,6 @@ $SQL = get_coll_group_perms_SQL( $edited_Blog, $keywords );
 
 $Results = new Results( $SQL->get(), 'section_' );
 
-if( ! empty( $keywords ) )
-{ // Display a button to reset the filters
-	$Results->global_icon( T_('Reset all filters'), 'reset_filters', $admin_url.'?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID, T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
-
 // Button to export user permissions into CSV file:
 $Results->global_icon( T_('Export CSV'), '', $admin_url.'?ctrl=coll_settings&amp;action=export_groupperms&amp;blog='.$edited_Blog->ID.( empty( $keywords ) ? '' : '&amp;keywords='.urlencode( $keywords ) ), T_('Export CSV'), 3, 3, array( 'class' => 'action_icon btn-default' ) );
 
@@ -72,7 +67,7 @@ $Results->filter_area = array(
 	'url_ignore' => 'results_collgroup_page,keywords1,keywords2',
 	);
 
-$Results->register_filter_preset( 'all', T_('All users'), regenerate_url( 'action,results_collgroup_page,keywords1,keywords2', 'action=edit' ) );
+$Results->register_filter_preset( 'all', T_('All users'), '?ctrl=coll_settings&amp;tab=permgroup&amp;blog='.$edited_Blog->ID, 'action=edit' );
 
 // Initialize Results object:
 colls_groups_perms_results( $Results, array(

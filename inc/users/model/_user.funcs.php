@@ -6608,10 +6608,6 @@ function users_results_block( $params = array() )
 
 	if( $params['display_filters'] )
 	{	// Display the filters:
-		if( $UserList->is_filtered() )
-		{ // Display link to reset filters only if some filter is applied
-			$UserList->global_icon( T_('Remove filters'), 'reset_filters', url_add_param( $params['page_url'], 'filter=reset' ), T_('Remove filters'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
-		}
 
 		$UserList->filter_area = array(
 			'callback' => 'callback_filter_userlist',

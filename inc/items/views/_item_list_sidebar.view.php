@@ -65,7 +65,7 @@ $Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $Blog->ID );
 
 echo '<div class="filter_buttons">';
-	if( $ItemList->is_filtered() )
+	if( $ItemList->is_filtered() )   // NOTE: this works (contrary to UserList)
 	{	// TODO: style this better:
 		echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset" class="btn btn-warning" style="margin-right: 5px">';
 		echo get_icon( 'filter' ).' '.T_('Remove filters').'</a>';

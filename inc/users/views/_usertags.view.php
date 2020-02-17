@@ -55,11 +55,6 @@ $Results = new Results( $SQL->get(), 'utag_', 'A', NULL, $count_SQL->get() );
 $Results->title = T_('User Tags').' ('.$Results->get_total_rows().')'.get_manual_link( 'user-tags-list' );
 $Results->Cache = get_UserTagCache();
 
-if( $list_is_filtered )
-{ // List is filtered, offer option to reset filters:
-	$Results->global_icon( T_('Reset all filters'), 'reset_filters', $admin_url.'?ctrl=usertags', T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
-
 /**
  * Callback to add filters on top of the result set
  *

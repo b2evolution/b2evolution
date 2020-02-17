@@ -40,11 +40,6 @@ display_comment_mass_delete( $CommentList );
 
 $block_item_Widget = new Widget( 'block_item' );
 
-if( $CommentList->is_filtered() )
-{	// List is filtered, offer option to reset filters:
-	$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=comments&amp;blog='.$Blog->ID.'&amp;tab3='.$tab3.'&amp;filter=reset', T_('Remove filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
-
 if( check_comment_mass_delete( $CommentList ) )
 {	// A form for mass deleting is available, Display link
 	$block_item_Widget->global_icon( T_('Delete all comments!'), 'recycle', regenerate_url( 'action', 'action=mass_delete' ), T_('Mass delete...'), 3, 3 );
