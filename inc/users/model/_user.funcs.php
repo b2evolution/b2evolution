@@ -3817,6 +3817,11 @@ function get_userlist_filters_config( $Form = NULL )
 	$filters = array(
 		// Set order of the filters here, but filters are initalized below:
 		// (some filters may be hidden depending on current User permissions and front-office calling)
+		'name_email'          => NULL, // Name / Email
+		'firstname'           => NULL, // First name
+		'lastname'            => NULL, // Last name
+		'nickname'            => NULL, // Nickname
+		'email'               => NULL, // Email
 		'gender'              => NULL, // Gender
 		'criteria'            => NULL, // Specific criteria
 		'tags'                => NULL, // User tags
@@ -3833,6 +3838,56 @@ function get_userlist_filters_config( $Form = NULL )
 		'custom_sender_email' => NULL, // Uses custom sender address
 		'custom_sender_name'  => NULL, // Uses custom sender name
 	);
+
+	// Name / Email:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name' ) ) )
+	{	// Show name/email filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['name_email'] = array(
+				'label'      => T_('Name').' / '.T_('Email'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+			);
+	}
+
+	// First name:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_firstname' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['firstname'] = array(
+				'label'      => T_('First name'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+			);
+	}
+
+	// Last name:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_lastname' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['lastname'] = array(
+				'label'      => T_('Last name'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+			);
+	}
+
+	// Nickname:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_nickname' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['nickname'] = array(
+				'label'      => T_('Nickname'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+			);
+	}
+
+	// Email:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_email' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['email'] = array(
+				'label'      => T_('Email'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+			);
+	}
 
 	// Gender:
 	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_gender' ) ) )
@@ -3933,7 +3988,8 @@ function get_userlist_filters_config( $Form = NULL )
 						rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
 						rule.$el.find( ".rule-value-container [name^=criteria_operator]" ).val( val[1] ).trigger( "change" );
 						rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[2] ).trigger( "change" );
-					}'
+					}',
+				'default_value' => '0:contains:',
 			);
 	}
 
@@ -4076,7 +4132,32 @@ function callback_filter_userlist( & $Form )
 		$filters['#default'] = array();
 		foreach( $userlist_default_filters as $userlist_default_filter )
 		{
-			$filters['#default'][ $userlist_default_filter ] = ( $userlist_default_filter == 'criteria' ? '0:contains:' : '' );
+			// Set default operator:
+			if( ! empty( $filters[ $userlist_default_filter ]['operators'] ) )
+			{
+				$default_operator = explode( ',', $filters[ $userlist_default_filter ]['operators'] );
+				$default_operator = $default_operator[0];
+			}
+			else
+			{
+				$default_operator = 'equal';
+			}
+			// Set default value:
+			if( isset( $filters[ $userlist_default_filter ]['default_value'] ) )
+			{
+				$default_value = $filters[ $userlist_default_filter ]['default_value'];
+			}
+			elseif( isset( $filters[ $userlist_default_filter ]['values'] ) && is_array( $filters[ $userlist_default_filter ]['values'] ) )
+			{
+				$default_value = array_keys( $filters[ $userlist_default_filter ]['values'] );
+				$default_value = isset( $default_value[0] ) ? $default_value[0] : '';
+			}
+			else
+			{
+				$default_value = '';
+			}
+
+			$filters['#default'][ $userlist_default_filter ] = array( $default_operator, $default_value );
 		}
 	}
 
