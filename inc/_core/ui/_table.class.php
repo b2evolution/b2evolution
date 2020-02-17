@@ -462,12 +462,11 @@ class Table extends Widget
 			);
 			if( isset( $filter_fields['#default'] ) )
 			{	// Set filters from default config:
-				foreach( $filter_fields['#default'] as $def_filter_id => $def_filter_data )
+				foreach( $filter_fields['#default'] as $def_filter_id => $def_filter_value )
 				{
 					$filter_query['rules'][] = array(
-						'id'       => $def_filter_id,
-						'operator' => is_array( $def_filter_data ) && isset( $def_filter_data[0] ) ? $def_filter_data[0] : $def_filter_data,
-						'value'    => is_array( $def_filter_data ) && isset( $def_filter_data[1] ) ? $def_filter_data[1] : '',
+						'id'    => $def_filter_id,
+						'value' => $def_filter_value,
 					);
 				}
 			}
