@@ -301,6 +301,19 @@ class Table extends Widget
 
 
 	/**
+	 * Register a filter preset
+	 */
+	function register_filter_preset( $preset_codename, $preset_label, $preset_url )
+	{
+		// Append a preset
+		$this->filter_area['presets'][$preset_codename] = array( 
+				$preset_label,
+				// Append param to indicate current preset:
+				url_add_param( $preset_url, $this->param_prefix.'filter_preset='.$preset_codename ) );
+	}
+
+
+	/**
 	 * Display filter fields
 	 *
 	 * @param array Filters
