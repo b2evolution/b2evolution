@@ -969,7 +969,7 @@ jQuery( document ).ready( function()
 
 		//__________________________________ Toogle link _______________________________________
 		echo '<a href="'.regenerate_url( 'action,target', 'action='.( $fold_state == 'collapsed' ? 'expand_filter' : 'collapse_filter' ).'&target='.$option_name ).'"'
-			.' onclick="return toggle_filter_area(\''.$option_name.'\')" class="btn btn-xs btn-info">'
+			.' onclick="return toggle_filter_area(\''.$option_name.'\')" class="btn btn-xs btn-info'.( get_param( $this->param_prefix.'filter_preset' ) == 'custom' ? ' active' : '' ).'">'
 				.get_icon( ( $fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$option_name ) )
 				.' '.T_('Custom filters')
 			.'</a>';
@@ -1057,6 +1057,9 @@ jQuery( document ).ready( function()
 					) );
 				echo $this->params['bottom_filter_button_after'];
 			}
+
+			// Use reserved preset name for filtering by submitted form:
+			$this->Form->hidden( $this->param_prefix.'filter_preset', 'custom' );
 
 			if( $create_new_form )
 			{ // We do not already have a form surrounding the whole result list:
