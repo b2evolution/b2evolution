@@ -689,11 +689,6 @@ function install_basic_plugins( $old_db_version = 0 )
 
 	if( $old_db_version < 9290 )
 	{
-		if( $install_test_features )
-		{
-			echo_install_log( 'TEST FEATURE: Installing plugin "Smilies"' );
-			install_plugin( 'smilies_plugin' );
-		}
 		install_plugin( 'videoplug_plugin' );
 	}
 
@@ -711,17 +706,6 @@ function install_basic_plugins( $old_db_version = 0 )
 	if( $old_db_version < 9940 )
 	{ // Upgrade to 3.2.0
 		install_plugin( 'twitter_plugin' );
-	}
-
-	if( $old_db_version < 10300 )
-	{ // Upgrade to 5.0.0
-		install_plugin( 'flowplayer_plugin' );
-
-		if( $install_test_features )
-		{
-			echo_install_log( 'TEST FEATURE: Installing plugin "Google Maps"' );
-			install_plugin( 'google_maps_plugin' );
-		}
 	}
 
 	if( $old_db_version < 11000 )
@@ -751,11 +735,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		// files
 		install_plugin( 'html5_mediaelementjs_plugin' );
 		install_plugin( 'html5_videojs_plugin' );
-		install_plugin( 'watermark_plugin', $install_test_features );
-		if( $install_test_features )
-		{
-			echo_install_log( 'TEST FEATURE: Activating plugin "Watermark"' );
-		}
 		// ping
 		install_plugin( 'generic_ping_plugin' );
 		// rendering
@@ -789,8 +768,6 @@ function install_basic_plugins( $old_db_version = 0 )
 			echo_install_log( 'TEST FEATURE: Activating plugin "Info dots renderer"' );
 		}
 		install_plugin( 'widescroll_plugin' );
-		// widget
-		install_plugin( 'facebook_plugin' );
 		// Unclassified
 		install_plugin( 'bookmarklet_plugin' );
 	}
@@ -807,7 +784,6 @@ function install_basic_plugins( $old_db_version = 0 )
 		{
 			echo_install_log( 'TEST FEATURE: Activating plugin "Adjust headings"' );
 		}
-		install_plugin( 'cookie_consent_plugin', false );
 	}
 
 	if( $old_db_version < 11730 )

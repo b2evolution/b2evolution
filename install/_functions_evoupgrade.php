@@ -12166,6 +12166,71 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15810 ) )
+	{	// part of 7.1.2-beta
+		global $plugins_path;
+		$admin_Plugins = & get_Plugins_admin();
+
+		$plugins_to_remove = array(
+				'adsense_plugin',
+				'cookie_consent_plugin',
+				'flowplayer_plugin',
+				'google_maps_plugin',
+				'watermark_plugin',
+				'facebook_plugin',
+				'proof_of_work_captcha_plugin',
+				'smilies_plugin',
+				'twitter_tweet_renderer_plugin'
+			);
+		foreach( $plugins_to_remove as $plugin_class )
+		{
+			if( $loop_Plugin = & $admin_Plugins->get_by_classname( $plugin_class ) )
+			{
+				echo get_install_format_text( sprintf( '<span class="text-warning"><evo:warning>'
+						.'The plugin %s is no longer updated by b2evolution v7. '
+						.'You may obtain new versions from the <a href="%s" target="_blank">plugin repository</a>.'
+						.'</evo:warning></span>',
+						'<code>'.$loop_Plugin->classname.'</code>', $loop_Plugin->get_help_url() )."<br />\n", 'br' );
+			}
+			else
+			{
+				$plugin_deleted = true;
+				task_begin( sprintf( 'Trying to delete obsolete and unused plugin: %s...', $plugin_class ) );
+				$plugin_dir = $plugins_path.$plugin_class;
+				$plugin_filename = $plugins_path.'_'.preg_replace( '/_plugin$/', '.plugin.php', $plugin_class );
+				if( file_exists( $plugin_dir ) && is_dir( $plugin_dir ) )
+				{
+					if( is_writable( $plugin_dir) )
+					{
+						rmdir_r( $plugin_dir );
+					}
+					else
+					{
+						$plugin_deleted = false;
+						echo get_install_format_text( sprintf( '<span class="text-danger"><evo:error>Unable to delete directory: %s</evo:error></span>', $plugin_dir )."<br />\n", 'br' );
+					}
+				}
+				if( file_exists( $plugin_filename ) && is_file( $plugin_filename ) )
+				{
+					if( is_writable( $plugin_filename) )
+					{
+						unlink( $plugin_filename );
+					}
+					else
+					{
+						$plugin_deleted = false;
+						echo get_install_format_text( sprintf( '<span class="text-danger"><evo:error>Unable to delete file: %s</evo:error></span>', $plugin_filename )."<br />\n", 'br' );
+					}
+				}
+				if( $plugin_deleted )
+				{
+					task_end();
+				}
+			}
+		}
+		upg_task_end( false );
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
