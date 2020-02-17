@@ -933,21 +933,36 @@ jQuery( document ).ready( function()
 		}
 
 		$option_name = $this->param_prefix.'filters';
+		$preset_name = $this->param_prefix.'filter_preset';
 		$area_name = 'filter_area';
 		$option_title = T_('Filters');
 		$submit_title = !empty( $this->filter_area['submit_title'] ) ? $this->filter_area['submit_title'] : T_('Apply filters');
-		$default_fold_state = 'expanded';
 
 		// Do we already have a form?
 		$create_new_form = ! isset( $this->Form );
 
 		echo $this->replace_vars( $this->params['filters_start'] );
 
-		$fold_state = $Session->get( $option_name );
+		$current_filter_preset = param( $preset_name, 'string', NULL );
+		if( $current_filter_preset !== NULL )
+		{	// Store new preset in Session:
+			$Session->set( $preset_name, $current_filter_preset );
+			$Session->dbsave();
+		}
+		if( $current_filter_preset === NULL )
+		{	// Try to get preset from Session:
+			$current_filter_preset = $Session->get( $preset_name );
+		}
+		if( $current_filter_preset === NULL )
+		{	// Use 'all' preset filter by default:
+			$current_filter_preset = 'all';
+		}
+
+		$fold_state = ( $current_filter_preset == 'custom' ? 'expanded' : 'collapsed' );
 
 		if( empty( $fold_state ) )
 		{
-			$fold_state = $default_fold_state;
+			$fold_state = 'collapsed';
 		}
 
 		//____________________________________ Filters preset ____________________________________
@@ -955,11 +970,7 @@ jQuery( document ).ready( function()
 		echo '<span class="btn-group">';
 		if( ! empty( $this->{$area_name}['presets'] ) )
 		{	// Display preset filters:
-			$current_filter_preset = get_param( $this->param_prefix.'filter_preset' );
-			if( $current_filter_preset === NULL )
-			{	// Use 'all' preset filter by default:
-				$current_filter_preset = 'all';
-			}
+			
 			foreach( $this->{$area_name}['presets'] as $key => $preset )
 			{
 				// Link for preset filter:
@@ -969,7 +980,7 @@ jQuery( document ).ready( function()
 
 		//__________________________________ Toogle link _______________________________________
 		echo '<a href="'.regenerate_url( 'action,target', 'action='.( $fold_state == 'collapsed' ? 'expand_filter' : 'collapse_filter' ).'&target='.$option_name ).'"'
-			.' onclick="return toggle_filter_area(\''.$option_name.'\')" class="btn btn-xs btn-info'.( get_param( $this->param_prefix.'filter_preset' ) == 'custom' ? ' active' : '' ).'">'
+			.' onclick="return toggle_filter_area(\''.$option_name.'\')" class="btn btn-xs btn-info'.( $current_filter_preset == 'custom' ? ' active' : '' ).'">'
 				.get_icon( ( $fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$option_name ) )
 				.' '.T_('Custom filters')
 			.'</a>';
