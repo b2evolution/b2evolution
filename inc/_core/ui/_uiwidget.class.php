@@ -972,7 +972,8 @@ jQuery( document ).ready( function()
 			}
 		}
 
-		//__________________________________ Toogle link _______________________________________
+		// "Custom preset" with JS toggle to reveal form:
+// fp>yb: TODO: I don't think this can work without Javascript (and it doesn't need to) -- remove all unnecessary code
 		echo '<a href="'.regenerate_url( 'action,target', 'action='.( $fold_state == 'collapsed' ? 'expand_filter' : 'collapse_filter' ).'&target='.$option_name ).'"'
 			.' onclick="return toggle_filter_area(\''.$option_name.'\')" class="btn btn-xs btn-info'.( $current_filter_preset == 'custom' ? ' active' : '' ).'">'
 				.get_icon( ( $fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$option_name ) )
