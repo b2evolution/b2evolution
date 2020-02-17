@@ -6689,22 +6689,6 @@ function users_results_block( $params = array() )
 
 	if( $params['display_filters'] )
 	{	// Display the filters:
-		$filter_presets = array(
-				'all' => array( T_('All users'), url_add_param( $params['page_url'], 'filter=new' ) ),
-				'men' => array( T_('Men'), url_add_param( $params['page_url'], $UserList->param_prefix.'filter_preset=men&amp;filter=new' ) ),
-				'women' => array( T_('Women'), url_add_param( $params['page_url'], $UserList->param_prefix.'filter_preset=women&amp;filter=new' ) ),
-				'other' => array( T_('Other'), url_add_param( $params['page_url'], $UserList->param_prefix.'filter_preset=other&amp;filter=new' ) ),
-			);
-
-		if( is_admin_page() )
-		{	// Add show only activated users filter only on admin interface:
-			$filter_presets['activated'] = array( T_('Activated users'), url_add_param( $params['page_url'], $UserList->param_prefix.'filter_preset=activated&amp;filter=new' ) );
-			if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
-			{	// Show "Reported Users" filter only for users with edit user permission:
-				$filter_presets['reported'] = array( T_('Reported users'), url_add_param( $params['page_url'], $UserList->param_prefix.'filter_preset=reported&amp;filter=new' ) );
-			}
-		}
-
 		if( $UserList->is_filtered() )
 		{ // Display link to reset filters only if some filter is applied
 			$UserList->global_icon( T_('Remove filters'), 'reset_filters', url_add_param( $params['page_url'], 'filter=reset' ), T_('Remove filters'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
@@ -6713,9 +6697,24 @@ function users_results_block( $params = array() )
 		$UserList->filter_area = array(
 			'callback' => 'callback_filter_userlist',
 			'url_ignore' => 'users_paged,u_paged,keywords',
-			'presets' => $filter_presets,
 			'apply_filters_button' => 'bottom',
 			);
+
+		$new_filter_baseurl = url_add_param( $params['page_url'], 'filter=new' );
+		$UserList->register_filter_preset( 'all', T_('All'), $new_filter_baseurl );
+		$UserList->register_filter_preset( 'men', T_('Men'), $new_filter_baseurl );
+		$UserList->register_filter_preset( 'women', T_('Women'), $new_filter_baseurl );
+		$UserList->register_filter_preset( 'other', T_('Other'), $new_filter_baseurl );
+
+		if( is_admin_page() )
+		{	// show "activated users" filter only on admin interface:
+			$UserList->register_filter_preset( 'activated', T_('Activated users'), url_add_param( $params['page_url'], $new_filter_baseurl ) );
+
+			if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+			{	// Show "Reported Users" filter only to users with edit user permission:
+				$UserList->register_filter_preset( 'reported', T_('Reported users'), url_add_param( $params['page_url'], $new_filter_baseurl ) );
+			}
+		}
 
 		if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
 		{	// Settings for default user list filters:

@@ -70,10 +70,9 @@ $Results->filter_area = array(
 	'submit' => 'actionArray[filter1]',
 	'callback' => 'filter_collobjectlist',
 	'url_ignore' => 'results_collgroup_page,keywords1,keywords2',
-	'presets' => array(
-		'all' => array( T_('All users'), regenerate_url( 'action,results_collgroup_page,keywords1,keywords2', 'action=edit' ) ),
-		)
 	);
+
+$Results->register_filter_preset( 'all', T_('All users'), regenerate_url( 'action,results_collgroup_page,keywords1,keywords2', 'action=edit' ) );
 
 // Initialize Results object:
 colls_groups_perms_results( $Results, array(

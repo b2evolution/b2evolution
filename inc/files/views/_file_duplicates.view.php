@@ -109,17 +109,15 @@ function callback_filter_file_duplicated( & $Form )
 	$Form->hidden( 'file_ID', get_param( 'file_ID' ) );
 }
 
-$filter_presets = array(
-		'all' => array( T_('All'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=0&amp;msv=0' ),
-		'inappropriate' => array( T_('Inappropriate'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=1&amp;msv=0' ),
-		'spam' => array( T_('Spam'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=0&amp;msv=1' ),
-	);
-
 $Results->filter_area = array(
 	'callback' => 'callback_filter_file_duplicated',
 	'url_ignore' => 'results_fdupl_page',
-	'presets' => $filter_presets,
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=0&amp;msv=0' );
+$Results->register_filter_preset( 'inappropriate', T_('Inappropriate'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=1&amp;msv=0' );
+$Results->register_filter_preset( 'spam', T_('Spam'), '?ctrl=filemod&amp;tab=duplicates&amp;miv=0&amp;msv=1' );
+
 
 function td_file_duplicates_icon( $File )
 {

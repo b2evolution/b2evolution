@@ -216,13 +216,12 @@ function filter_crontab( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_crontab',
 	'url_ignore' => 'results_crontab_page,ctst_pending,ctst_started,ctst_timeout,ctst_error,ctst_finished',	// ignor epage param and checkboxes
-	'presets' => array(
-			'schedule' => array( T_('Schedule'), '?ctrl=crontab&amp;ctst_status[]=pending&amp;ctst_status[]=started&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;cjob_type=' ),
-			'finished' => array( T_('Finished'), '?ctrl=crontab&amp;ctst_status[]=finished&amp;cjob_type=' ),
-			'attention' => array( T_('Attention'), '?ctrl=crontab&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;cjob_type=' ),
-			'all' => array( T_('All'), '?ctrl=crontab&amp;ctst_status[]=pending&amp;ctst_status[]=started&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;ctst_status[]=finished&amp;cjob_type=' ),
-		)
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=crontab&amp;ctst_status[]=pending&amp;ctst_status[]=started&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;ctst_status[]=finished&amp;cjob_type=' );
+$Results->register_filter_preset( 'schedule', T_('Schedule'), '?ctrl=crontab&amp;ctst_status[]=pending&amp;ctst_status[]=started&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;cjob_type=' );
+$Results->register_filter_preset( 'finished', T_('Finished'), '?ctrl=crontab&amp;ctst_status[]=finished&amp;cjob_type=' );
+$Results->register_filter_preset( 'attention', T_('Attention'), '?ctrl=crontab&amp;ctst_status[]=warning&amp;ctst_status[]=timeout&amp;ctst_status[]=error&amp;ctst_status[]=imap_error&amp;cjob_type=' );
 
 
 $Results->cols[] = array(

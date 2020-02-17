@@ -75,11 +75,11 @@ function filter_email_blocked( & $Form )
 	$Form->text_input( 'ip_address', get_param( 'ip_address' ), 40, T_('IP address') );
 }
 $Results->filter_area = array(
-	'callback' => 'filter_email_blocked',
-	'presets' => array(
-		'all' => array( T_('All'), $admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges' ),
-		)
+		'callback' => 'filter_email_blocked',
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), $admin_url.'?ctrl=antispam'.$tab_param.'&amp;tab3=ipranges' );
+
 
 $Results->cols[] = array(
 		'th' => T_('ID'),

@@ -207,12 +207,10 @@ $today = date( 'Y-m-d', $localtimenow );
 $Results->filter_area = array(
 	'callback' => 'filter_keyphrases',
 	'url_ignore' => 'goal_ID,datestartinput,datestart,datestopinput,datestop,goal_name,split_engines',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords'.$section_params ),
-		'today' => array( T_('Today'), '?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords'.$section_params
-																	.'&amp;datestart='.$today.'&amp;datestop='.$today ),
-		)
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords'.$section_params );
+$Results->register_filter_preset( 'today', T_('Today'), '?ctrl=stats&amp;tab=refsearches&amp;tab3=keywords'.$section_params.'&amp;'.$Results->param_prefix.'filter_preset=today&amp;datestart='.$today.'&amp;datestop='.$today );
 
 if( $split_engines )
 {	// Search engine:

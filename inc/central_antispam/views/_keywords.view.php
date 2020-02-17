@@ -82,10 +82,9 @@ function filter_central_antispam( & $Form )
 }
 $Results->filter_area = array(
 	'callback' => 'filter_central_antispam',
-	'presets' => array(
-		'all' => array( T_('All keywords'), $admin_url.'?ctrl=central_antispam' ),
-		)
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=central_antispam' );
 
 $Results->cols[] = array(
 		'th' => T_('ID'),
