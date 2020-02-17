@@ -956,13 +956,14 @@ jQuery( document ).ready( function()
 		if( ! empty( $this->{$area_name}['presets'] ) )
 		{	// Display preset filters:
 			$current_filter_preset = get_param( $this->param_prefix.'filter_preset' );
+			if( $current_filter_preset === NULL )
+			{	// Use 'all' preset filter by default:
+				$current_filter_preset = 'all';
+			}
 			foreach( $this->{$area_name}['presets'] as $key => $preset )
 			{
-				// Check for currently active preset filter:
-				$is_active_filter_preset = ( method_exists( $this, 'is_filtered' ) && ! $this->is_filtered() &&
-					( $current_filter_preset == $key || ( $current_filter_preset === NULL && $key == 'all' ) ) );
 				// Link for preset filter:
-				echo '<a href="'.$preset[1].'" class="btn btn-xs btn-info'.( $is_active_filter_preset ? ' active' : '' ).'">'.$preset[0].'</a>';
+				echo '<a href="'.$preset[1].'" class="btn btn-xs btn-info'.( $current_filter_preset == $key ? ' active' : '' ).'">'.$preset[0].'</a>';
 			}
 		}
 
