@@ -285,17 +285,19 @@ class FilteredResults extends Results
 		// echo '['.$matches[1].']';
 		switch( $matches[1] )
 		{
+			/* fp> Disabling this because UserList->is_filtered() is currently broken; fall back to default bahvious or Table class
 			case 'reset_filters_button':
+				// Resetting the filters is the same as applying preset 'all' (should be defined for all Results tables)
+				if( !isset($this->filter_area['presets']['all']) )
+				{ // We don't know how to reset
+					return '';
+				}
 				if( ! $this->is_filtered() )
 				{
 					return '';
 				}
-				// Resetting the filters is the same as applying preset 'all' (should be defined for all Results tables)
-				if( !isset($this->filter_area['presets']['all'][1]) )
-				{
-					return '';
-				}
 				return '<a href="'.$this->filter_area['presets']['all'][1].'" class="btn btn-sm btn-warning">'.get_icon('reset_filters').T_('Remove filters').'</a>';
+			*/
 
 			default :
 				return parent::replace_callback( $matches );
