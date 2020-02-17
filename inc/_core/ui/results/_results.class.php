@@ -19,8 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 $GLOBALS['debug_results'] = false;
 
 
-load_class( '_core/ui/_uiwidget.class.php', 'Table' );
-load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
+load_class( '_core/ui/_table.class.php', 'Table' );
 
 /**
  * Results class

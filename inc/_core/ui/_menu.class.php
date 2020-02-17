@@ -14,7 +14,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '_core/ui/_uiwidget.class.php', 'Table' );
 load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
 
 /**
