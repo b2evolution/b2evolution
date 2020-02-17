@@ -123,10 +123,13 @@ class FilteredResults extends Results
 	 * @param array default filters to be merged with the class defaults
 	 * @param array default filters for each preset, to be merged with general default filters if the preset is used
 	 */
-	function set_default_filters( $default_filters, $preset_filters = array() )
+	function set_default_filters( $default_filters, $preset_filters = NULL )
 	{
 		$this->default_filters = array_merge( $this->default_filters, $default_filters );
-		$this->preset_filters = $preset_filters;
+		if( $preset_filters !== NULL )
+		{	// Overrride preset filters only when this is requested:
+			$this->preset_filters = $preset_filters;
+		}
 	}
 
 
@@ -140,8 +143,10 @@ class FilteredResults extends Results
 			return;
 		}
 
-		// Override general defaults with the specific defaults for the preset:
-		$this->default_filters = array_merge( $this->default_filters, $this->preset_filters[$this->filters['filter_preset']] );
+		if( isset( $this->preset_filters[$this->filters['filter_preset']] ) )
+		{	// Override general defaults with the specific defaults for the preset:
+			$this->default_filters = array_merge( $this->default_filters, $this->preset_filters[$this->filters['filter_preset']] );
+		}
 
 		// Save the name of the preset in order for is_filtered() to work properly:
 		$this->default_filters['filter_preset'] = $this->filters['filter_preset'];

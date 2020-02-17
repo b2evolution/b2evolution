@@ -919,6 +919,8 @@ jQuery( document ).ready( function()
 	 */
 	function display_filters()
 	{
+		global $debug, $Session;
+
 		if( empty( $this->filter_area ) )
 		{	// We don't want to display a filters section:
 			return;
@@ -930,11 +932,140 @@ jQuery( document ).ready( function()
 		}
 
 		$option_name = $this->param_prefix.'filters';
-
+		$area_name = 'filter_area';
+		$option_title = T_('Filters');
 		$submit_title = !empty( $this->filter_area['submit_title'] ) ? $this->filter_area['submit_title'] : T_('Apply filters');
+		$default_fold_state = 'expanded';
 
-		$this->display_option_area( $option_name, 'filter_area', T_('Filters'), $submit_title, 'expanded' );
+		// Do we already have a form?
+		$create_new_form = ! isset( $this->Form );
 
+		echo $this->replace_vars( $this->params['filters_start'] );
+
+		$fold_state = $Session->get( $option_name );
+
+		if( empty( $fold_state ) )
+		{
+			$fold_state = $default_fold_state;
+		}
+
+		//____________________________________ Filters preset ____________________________________
+
+		echo '<span class="btn-group">';
+		if( ! empty( $this->{$area_name}['presets'] ) )
+		{	// Display preset filters:
+			$current_filter_preset = get_param( $this->param_prefix.'filter_preset' );
+			foreach( $this->{$area_name}['presets'] as $key => $preset )
+			{
+				// Check for currently active preset filter:
+				$is_active_filter_preset = ( method_exists( $this, 'is_filtered' ) && ! $this->is_filtered() &&
+					( $current_filter_preset == $key || ( $current_filter_preset === NULL && $key == 'all' ) ) );
+				// Link for preset filter:
+				echo '<a href="'.$preset[1].'" class="btn btn-xs btn-info'.( $is_active_filter_preset ? ' active' : '' ).'">'.$preset[0].'</a>';
+			}
+		}
+
+		//__________________________________ Toogle link _______________________________________
+		echo '<a href="'.regenerate_url( 'action,target', 'action='.( $fold_state == 'collapsed' ? 'expand_filter' : 'collapse_filter' ).'&target='.$option_name ).'"'
+			.' onclick="return toggle_filter_area(\''.$option_name.'\')" class="btn btn-xs btn-info">'
+				.get_icon( ( $fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$option_name ) )
+				.' '.T_('Custom filters')
+			.'</a>';
+
+		echo '</span>'; // End of <span class="btn-group">
+
+		if( ! empty( $this->{$area_name}['presets_after'] ) )
+		{	// Display additional info after presets:
+			echo $this->{$area_name}['presets_after'];
+		}
+
+		//_________________________________________________________________________________________
+
+		if( $debug > 1 )
+		{
+			echo ' <span class="notes">('.$option_name.':'.$fold_state.')</span>';
+			echo ' <span id="asyncResponse"></span>';
+		}
+
+		// Begining of the div:
+		echo '<div id="clickdiv_'.$option_name.'"';
+		if( $fold_state == 'collapsed' )
+		{
+			echo ' style="display:none;"';
+		}
+		echo '>';
+
+		//_____________________________ Form and callback _________________________________________
+
+		if( !empty($this->{$area_name}['callback']) )
+		{	// We want to display Filter Form fields:
+
+			if( $create_new_form )
+			{	// We do not already have a form surrounding the whole results list:
+
+				if( !empty( $this->{$area_name}['url_ignore'] ) )
+				{
+					$ignore = $this->{$area_name}['url_ignore'];
+				}
+				else
+				{
+					$ignore = $this->page_param;
+				}
+
+				$this->Form = new Form( regenerate_url( $ignore, '', '', '&' ), $this->param_prefix.'form_search', 'get', 'blockspan' );
+
+				$this->Form->begin_form( '' );
+			}
+
+			if( !isset( $this->filter_area['apply_filters_button'] ) || $this->filter_area['apply_filters_button'] == 'topright' )
+			{ // Display a filter button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
+				echo $this->params['filter_button_before'];
+				$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
+				$this->Form->button_input( array(
+							'tag'   => 'button',
+							'name'  => $submit_name,
+							'value' => get_icon( 'filter' ).' '.$submit_title,
+							'class' => $this->params['filter_button_class']
+					) );
+				echo $this->params['filter_button_after'];
+			}
+
+			if( ! empty( $this->force_checkboxes_to_inline ) )
+			{ // Set this to TRUE in order to display all checkboxes before labels
+				$this->Form->force_checkboxes_to_inline = true;
+			}
+
+			$func = $this->{$area_name}['callback'];
+			$filter_fields = $func( $this->Form );
+
+			if( ! empty( $filter_fields ) && is_array( $filter_fields ) )
+			{	// Display filters which use JavaScript plugin QueryBuilder:
+				$this->display_filter_fields( $this->Form, $filter_fields );
+			}
+
+			if( isset( $this->filter_area['apply_filters_button'] ) && $this->filter_area['apply_filters_button'] == 'bottom' )
+			{ // Display a filter button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
+				echo $this->params['bottom_filter_button_before'];
+				$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
+				$this->Form->button_input( array(
+						'tag'   => 'button',
+						'name'  => $submit_name,
+						'value' => get_icon( 'filter' ).' '.$submit_title,
+						'class' => $this->params['bottom_filter_button_class']
+					) );
+				echo $this->params['bottom_filter_button_after'];
+			}
+
+			if( $create_new_form )
+			{ // We do not already have a form surrounding the whole result list:
+				$this->Form->end_form( '' );
+				unset( $this->Form );	// forget about this temporary form
+			}
+		}
+
+		echo '</div>';
+
+		echo $this->params['filters_end'];
 	}
 
 

@@ -130,6 +130,14 @@ class UserList extends DataObjectList2
 				'recipient_action'    => NULL,    // string, Recipient action on email campaign: 'img_loaded', 'link_clicked', 'cta1', 'cta2', 'cta3', 'liked', 'disliked', 'clicked_unsubscribe'
 				'user_tag'            => NULL,    // string, User tag
 				'not_user_tag'        => NULL,    // string, User tag
+		),
+		// Preset filters:
+		array(
+			'men'       => array( 'gender' => 'M' ),
+			'women'     => array( 'gender' => 'F' ),
+			'other'     => array( 'gender' => 'O' ),
+			'activated' => array( 'status_activated' => 1 ),
+			'reported'  => array( 'reported' => 1 ),
 		) );
 	}
 
@@ -187,7 +195,7 @@ class UserList extends DataObjectList2
 			/*
 			 * Selected filter preset:
 			 */
-			memorize_param( 'filter_preset', 'string', $this->default_filters['filter_preset'], $this->filters['filter_preset'] );  // List of authors to restrict to
+			memorize_param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], $this->filters['filter_preset'] );
 
 			/*
 			 * Selected filter query:
@@ -371,7 +379,7 @@ class UserList extends DataObjectList2
 			/**
 			 * Filter preset
 			 */
-			$this->filters['filter_preset'] = param( 'filter_preset', 'string', $this->default_filters['filter_preset'], true );
+			$this->filters['filter_preset'] = param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], true );
 
 			// Activate preset default filters if necessary:
 			$this->activate_preset_filters();
@@ -398,24 +406,21 @@ class UserList extends DataObjectList2
 		$this->filters['keywords'] = param( 'keywords', 'string', $this->default_filters['keywords'], true );         // Search string
 
 		/*
-		 * Restrict by gender
+		 * Restrict by gender preset filter
 		 */
-		$gender_men = param( 'gender_men', 'boolean', strpos( $this->default_filters['gender'], 'M' ), true );
-		$gender_women = param( 'gender_women', 'boolean', strpos( $this->default_filters['gender'], 'F' ), true );
-		$gender_other = param( 'gender_other', 'boolean', strpos( $this->default_filters['gender'], 'O' ), true );
-		if( $gender_men || $gender_women || $gender_other )
+		if( in_array( $this->filters['filter_preset'], array( 'men', 'women', 'other' ) ) )
 		{
-			if( $gender_men )
+			switch( $this->filters['filter_preset'] )
 			{
-				$this->filters['gender'] = 'M';
-			}
-			if( $gender_women )
-			{
-				$this->filters['gender'] .= 'F';
-			}
-			if( $gender_other )
-			{
-				$this->filters['gender'] .= 'O';
+				case 'men':
+					$this->filters['gender'] = 'M';
+					break;
+				case 'women':
+					$this->filters['gender'] = 'F';
+					break;
+				case 'other':
+					$this->filters['gender'] = 'O';
+					break;
 			}
 		}
 
@@ -424,9 +429,9 @@ class UserList extends DataObjectList2
 		 */
 		$this->filters['account_status'] = param( 'account_status', 'string', $this->default_filters['account_status'], true );
 		if( $this->filters['account_status'] === $this->default_filters['account_status'] &&
-		    param( 'status_activated', 'boolean', $this->default_filters['status_activated'], true ) )
+		    $this->filters['filter_preset'] == 'activated' )
 		{
-			$this->filters['status_activated'] = 'activated';
+			$this->filters['status_activated'] = 1;
 		}
 		else
 		{
@@ -558,7 +563,7 @@ class UserList extends DataObjectList2
 		if( empty( $this->filters ) )
 		{	// Filters have not been set before, we'll use the default filterset:
 			// If there is a preset filter, we need to activate its specific defaults:
-			$this->filters['filter_preset'] = param( 'filter_preset', 'string', $this->default_filters['filter_preset'], true );
+			$this->filters['filter_preset'] = param( $this->param_prefix.'filter_preset', 'string', $this->default_filters['filter_preset'], true );
 			$this->activate_preset_filters();
 
 			// Use the default filters:

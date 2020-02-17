@@ -6607,28 +6607,21 @@ function users_results_block( $params = array() )
 	$UserList->query();
 
 	if( $params['display_filters'] )
-	{ // Display the filters
+	{	// Display the filters:
 		$filter_presets = array(
 				'all' => array( T_('All users'), url_add_param( $params['page_url'], 'filter=new' ) ),
-				'men' => array( T_('Men'), url_add_param( $params['page_url'], 'gender_men=1&amp;filter=new' ) ),
-				'women' => array( T_('Women'), url_add_param( $params['page_url'], 'gender_women=1&amp;filter=new' ) ),
-				'other' => array( T_('Other'), url_add_param( $params['page_url'], 'gender_other=1&amp;filter=new' ) ),
+				'men' => array( T_('Men'), url_add_param( $params['page_url'], $UserList->param_prefix.'filter_preset=men&amp;filter=new' ) ),
+				'women' => array( T_('Women'), url_add_param( $params['page_url'], $UserList->param_prefix.'filter_preset=women&amp;filter=new' ) ),
+				'other' => array( T_('Other'), url_add_param( $params['page_url'], $UserList->param_prefix.'filter_preset=other&amp;filter=new' ) ),
 			);
 
 		if( is_admin_page() )
-		{ // Add show only activated users filter only on admin interface
-			$filter_presets['activated'] = array( T_('Activated users'), url_add_param( $params['page_url'], 'status_activated=1&amp;filter=new' ) );
+		{	// Add show only activated users filter only on admin interface:
+			$filter_presets['activated'] = array( T_('Activated users'), url_add_param( $params['page_url'], $UserList->param_prefix.'filter_preset=activated&amp;filter=new' ) );
 			if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
-			{ // Show "Reported Users" filter only for users with edit user permission
-				$filter_presets['reported'] = array( T_('Reported users'), url_add_param( $params['page_url'], 'reported=1&amp;filter=new' ) );
+			{	// Show "Reported Users" filter only for users with edit user permission:
+				$filter_presets['reported'] = array( T_('Reported users'), url_add_param( $params['page_url'], $UserList->param_prefix.'filter_preset=reported&amp;filter=new' ) );
 			}
-		}
-
-		if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
-		{	// Settings for default user list filters:
-			$filter_presets['settings'] = array( '', '#nolink#', 'class="fa fa-cog pointer" onclick="return evo_users_list_default_filters()" style="margin-left:20px"' );
-			// Initialize JavaScript for AJAX loading of popup window to change default filters on users list:
-			echo_userlist_filters_js();
 		}
 
 		if( $UserList->is_filtered() )
@@ -6642,6 +6635,13 @@ function users_results_block( $params = array() )
 			'presets' => $filter_presets,
 			'apply_filters_button' => 'bottom',
 			);
+
+		if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+		{	// Settings for default user list filters:
+			$UserList->filter_area['presets_after'] = '<span class="fa fa-cog pointer" onclick="return evo_users_list_default_filters()" style="margin-left:20px"></span>';
+			// Initialize JavaScript for AJAX loading of popup window to change default filters on users list:
+			echo_userlist_filters_js();
+		}
 	}
 
 	/*

@@ -294,7 +294,7 @@ class UserQuery extends FilterSQL
 			return;
 		}
 
-		if( $status == 'activated' && !$exactly )
+		if( ( $status == 'activated' || $status === 1 ) && !$exactly )
 		{	// Activated, Manually activated, Autoactivated users:
 			$this->add_filter_rule( 'status', array( 'activated', 'autoactivated', 'manualactivated' ), '=', 'OR' );
 		}
