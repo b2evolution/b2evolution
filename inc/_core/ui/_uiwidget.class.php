@@ -491,16 +491,9 @@ class Table extends Widget
 			// Loop on all preset filters:
 			foreach( $this->{$area_name}['presets'] as $key => $preset )
 			{
-				if( method_exists( $this, 'is_filtered' ) && !$this->is_filtered()
-							&& get_param( $this->param_prefix.'filter_preset' ) == $key )
-				{ // The list is not filtered and the filter preset is selected, so no link on:
-					$r[] = '<span class="label label-default">'.$preset[0].'</span>';
-				}
-				else
-				{	// Display preset filter link:
-					$preset_text = ( $preset[1] == '#nolink#' ? $preset[0] : '<a href="'.$preset[1].'" class="label label-default">'.$preset[0].'</a>' );
-					$r[] = ( isset( $preset[2] ) ? '<span '.$preset[2].'>'.$preset_text.'</span>' : $preset_text );
-				}
+				// Display preset filter link:
+				$preset_text = ( $preset[1] == '#nolink#' ? $preset[0] : '<a href="'.$preset[1].'" class="label label-default">'.$preset[0].'</a>' );
+				$r[] = ( isset( $preset[2] ) ? '<span '.$preset[2].'>'.$preset_text.'</span>' : $preset_text );
 			}
 
 			echo ' '.implode( ' ', $r );
@@ -934,7 +927,6 @@ jQuery( document ).ready( function()
 
 		$option_name = $this->param_prefix.'filters';
 		$preset_name = $this->param_prefix.'filter_preset';
-		$area_name = 'filter_area';
 		$option_title = T_('Filters');
 		$submit_title = !empty( $this->filter_area['submit_title'] ) ? $this->filter_area['submit_title'] : T_('Apply filters');
 
@@ -965,13 +957,15 @@ jQuery( document ).ready( function()
 			$fold_state = 'collapsed';
 		}
 
-		//____________________________________ Filters preset ____________________________________
+		//____________________________________ Filter presets ____________________________________
 
 		echo '<span class="btn-group">';
-		if( ! empty( $this->{$area_name}['presets'] ) )
+
+		// Display all presers;
+		if( ! empty( $this->filter_area['presets'] ) )
 		{	// Display preset filters:
 			
-			foreach( $this->{$area_name}['presets'] as $key => $preset )
+			foreach( $this->filter_area['presets'] as $key => $preset )
 			{
 				// Link for preset filter:
 				echo '<a href="'.$preset[1].'" class="btn btn-xs btn-info'.( $current_filter_preset == $key ? ' active' : '' ).'">'.$preset[0].'</a>';
@@ -987,9 +981,9 @@ jQuery( document ).ready( function()
 
 		echo '</span>'; // End of <span class="btn-group">
 
-		if( ! empty( $this->{$area_name}['presets_after'] ) )
+		if( ! empty( $this->filter_area['presets_after'] ) )
 		{	// Display additional info after presets:
-			echo $this->{$area_name}['presets_after'];
+			echo $this->filter_area['presets_after'];
 		}
 
 		//_________________________________________________________________________________________
@@ -1010,15 +1004,15 @@ jQuery( document ).ready( function()
 
 		//_____________________________ Form and callback _________________________________________
 
-		if( !empty($this->{$area_name}['callback']) )
+		if( !empty($this->filter_area['callback']) )
 		{	// We want to display Filter Form fields:
 
 			if( $create_new_form )
 			{	// We do not already have a form surrounding the whole results list:
 
-				if( !empty( $this->{$area_name}['url_ignore'] ) )
+				if( !empty( $this->filter_area['url_ignore'] ) )
 				{
-					$ignore = $this->{$area_name}['url_ignore'];
+					$ignore = $this->filter_area['url_ignore'];
 				}
 				else
 				{
@@ -1033,7 +1027,7 @@ jQuery( document ).ready( function()
 			if( !isset( $this->filter_area['apply_filters_button'] ) || $this->filter_area['apply_filters_button'] == 'topright' )
 			{ // Display a filter button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
 				echo $this->params['filter_button_before'];
-				$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
+				$submit_name = empty( $this->filter_area['submit'] ) ? 'colselect_submit' : $this->filter_area['submit'];
 				$this->Form->button_input( array(
 							'tag'   => 'button',
 							'name'  => $submit_name,
@@ -1048,7 +1042,7 @@ jQuery( document ).ready( function()
 				$this->Form->force_checkboxes_to_inline = true;
 			}
 
-			$func = $this->{$area_name}['callback'];
+			$func = $this->filter_area['callback'];
 			$filter_fields = $func( $this->Form );
 
 			if( ! empty( $filter_fields ) && is_array( $filter_fields ) )
@@ -1059,7 +1053,7 @@ jQuery( document ).ready( function()
 			if( isset( $this->filter_area['apply_filters_button'] ) && $this->filter_area['apply_filters_button'] == 'bottom' )
 			{ // Display a filter button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
 				echo $this->params['bottom_filter_button_before'];
-				$submit_name = empty( $this->{$area_name}['submit'] ) ? 'colselect_submit' : $this->{$area_name}['submit'];
+				$submit_name = empty( $this->filter_area['submit'] ) ? 'colselect_submit' : $this->filter_area['submit'];
 				$this->Form->button_input( array(
 						'tag'   => 'button',
 						'name'  => $submit_name,
