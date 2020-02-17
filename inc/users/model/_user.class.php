@@ -616,9 +616,10 @@ class User extends DataObject
 			$this->set( 'firstname', $firstname );
 			$paramsList['firstname'] = $firstname;
 		}
-		if( ! is_null( $lastname ) )
+		if( $Settings->get( 'registration_require_lastname') )
 		{	// Set last name:
 			$this->set( 'lastname', $lastname );
+			$paramsList['lastname'] = $lastname;
 		}
 		if( $Settings->get( 'registration_require_gender' ) == 'required' || $Settings->get( 'registration_require_gender' ) == 'optional' )
 		{	// Set or check gender:

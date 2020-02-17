@@ -22,7 +22,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  * @param array Objects
  * @return string|boolean Rendered template or FALSE on wrong request
  */
-function render_template_code( $code, & $params, $objects = array() )
+function render_template_code( $code, & $params, $objects = array(), & $used_template_tags = NULL )
 {
 	global $current_locale;
 
@@ -41,7 +41,7 @@ function render_template_code( $code, & $params, $objects = array() )
 
 	if( $Template )
 	{	// Render variables in available Template:
-		return render_template( $Template->template_code, $params, $objects );
+		return render_template( $Template->template_code, $params, $objects, $used_template_tags );
 	}
 
 	return false;
@@ -56,7 +56,7 @@ function render_template_code( $code, & $params, $objects = array() )
  * @param array Objects
  * @return string Rendered template
  */
-function render_template( $template, & $params, $objects = array() )
+function render_template( $template, & $params, $objects = array(), & $used_template_tags = NULL )
 {
 	$current_pos = 0;
 	$r = '';
@@ -111,6 +111,10 @@ function render_template( $template, & $params, $objects = array() )
 					$tag_param_val  = substr( $tag_param_string, strpos( $tag_param_string, '=' ) + 1 );
 					$this_tag_params[$tag_param_name] = $tag_param_val;
 				}
+			}
+			if( is_array( $used_template_tags ) )
+			{
+				$used_template_tags[] = $tag; 
 			}
 			$r .= render_template_callback( $tag, $this_tag_params, $objects );
 		}
@@ -313,6 +317,8 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Form:lastname':
+			global $Settings;
+
 			$lastname = param( 'lastname', 'string', '' );
 			$temp_params = array(
 					'name'        => 'lastname',
@@ -323,7 +329,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					'placeholder' => '',
 					'maxlength'   => 50,
 					'class'       => 'input_text',
-					'required'    => false,
+					'required'    => $Settings->get( 'registration_require_lastname' ),
 					'class'      => '',
 					'hide_label' => false,
 					'style'      => '',

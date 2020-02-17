@@ -127,6 +127,7 @@ class GeneralSettings extends AbstractSettings
 		'after_registration_slug' => '', // Slug value for after_registration == 'slug'
 		'newusers_level' => '1',
 		'registration_after_quick' => 'regform',
+		'registration_no_username' => 'firstname',
 		'registration_require_gender' => 'hidden',
 		'registration_ask_locale' => '0',
 		'pass_after_quick_reg' => '1',

@@ -49,7 +49,7 @@ $registration_require_country = (bool)$Settings->get('registration_require_count
 // Check if firstname is required
 $registration_require_firstname = (bool)$Settings->get('registration_require_firstname');
 // Check if firstname is required (It can be required for quick registration by widget)
-$registration_require_lastname = false;
+$registration_require_lastname = (bool)$Settings->get('registration_require_lastname');
 // Check if nickname is required
 $registration_require_nickname = false;
 // Check if gender is required

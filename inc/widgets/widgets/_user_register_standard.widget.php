@@ -100,7 +100,7 @@ class user_register_standard_Widget extends ComponentWidget
 					'label' => T_('Template'),
 					'type' => 'select',
 					'options' => array( NULL => T_('No template (Automatic form)') ) + $TemplateCache->get_code_option_array(),
-					'defaultvalue' => NULL,
+					'defaultvalue' => 'registration_standard',
 					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
 							.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' ),
 				),
@@ -186,7 +186,8 @@ class user_register_standard_Widget extends ComponentWidget
 
 				$Session->delete( 'core.register_user' );
 			}
-			$register_form = render_template_code( $template_code, $params, $render_template_objects );
+			$used_tags = array();
+			$register_form = render_template_code( $template_code, $params, $render_template_objects, $used_tags );
 
 			if( ! empty( $register_form ) )
 			{
@@ -196,6 +197,35 @@ class user_register_standard_Widget extends ComponentWidget
 
 				echo $this->disp_params['block_body_start'];
 
+				// Check that all required fields are available in the template:
+				$missing_fields = array();
+				if( $Settings->get( 'registration_require_country' ) && ! in_array( 'Form:country', $used_tags ) )
+				{
+					$missing_fields[] = 'country';
+				}
+				if( $Settings->get( 'registration_require_firstname' ) && ! in_array( 'Form:firstname', $used_tags ) )
+				{
+					$missing_fields[] = 'firstname';
+				}
+				if( $Settings->get( 'registration_require_lastname' ) && ! in_array( 'Form:lastname', $used_tags ) )
+				{
+					$missing_fields[] = 'lastname';
+				}
+				if( ( $Settings->get( 'registration_require_gender' ) == 'required' ) && ! in_array( 'Form:gender', $used_tags ) )
+				{
+					$missing_fields[] = 'gender';
+				}
+
+				if( ! empty( $missing_fields ) )
+				{
+					foreach( $missing_fields as $missing_field )
+					{
+						echo '<p class="evo_param_error">';
+						echo sprintf( T_('The template %s is missing the required field %s.'), '<code>'.$this->disp_params['template'].'</code>', '<code>'.$missing_field.'</code>' );
+						echo '</p>';
+					}
+				}
+ 
 				if( is_logged_in() )
 				{	// Don't allow to register if a user is already logged in:
 					echo '<p>'.T_('You are already logged in').'</p>';
@@ -493,6 +523,15 @@ class user_register_standard_Widget extends ComponentWidget
 				elseif( ! empty( $firstname ) )
 				{	// First name may be used on this form when user cannot be quickly registered because of suspected data:
 					$Form->hidden( 'firstname', $firstname );
+				}
+
+				if( $Settings->get( 'registration_require_lastname' ) )
+				{	// If lastname is required
+					$Form->text_input( 'lastname', $lastname, 18, T_('Last name'), T_('Your real last name.'), array( 'maxlength' => 50, 'class' => 'input_text', 'required' => true ) );
+				}
+				elseif( ! empty( $lastname ) )
+				{	// Last name may be used on this form when user cannot be quickly registered because of suspected data:
+					$Form->hidden( 'lastname', $lastname );
 				}
 
 				$registration_require_gender = $Settings->get( 'registration_require_gender' );

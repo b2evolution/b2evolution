@@ -5677,16 +5677,22 @@ function get_base_domain( $url )
  */
 function generate_login_from_register_info( $email = NULL, $firstname = NULL, $lastname = NULL, $nickname = NULL, $use_random = false )
 {
-	if( ! empty( $firstname ) || ! empty( $lastname ) )
+	global $Settings;
+
+	if( ! empty( $firstname ) || ( ! empty( $lastname ) && ( $Settings->get( 'registration_no_username') == 'firstname.lastname' ) ) )
 	{ // Firstname or lastname given, let's use these:
 		$login = array();
 		if( ! empty( $firstname ) )
 		{
 			$login[] = trim( $firstname );
 		}
-		if( ! empty( $lastname ) )
-		{
-			$login[] = trim( $lastname );
+
+		if( $Settings->get( 'registration_no_username' ) == 'firstname.lastname' )
+		{	// We can use lastname too:
+			if( ! empty( $lastname ) )
+			{
+				$login[] = trim( $lastname );
+			}
 		}
 		$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( implode( '.', $login ) ) );
 		$login = generate_login_from_string( $login );
@@ -5696,7 +5702,7 @@ function generate_login_from_register_info( $email = NULL, $firstname = NULL, $l
 		$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
 		$login = preg_replace( '/[\'"><@\s]/', '', $login );
 
-		if( strpos( $login, '.' ) )
+		if( strpos( $login, '.' ) && ( $Settings->get( 'registration_no_username' ) == 'firstname' ) )
 		{ // Get only the part before the "." if it has one
 			$temp_login = $login;
 			$login = substr( $login, 0, strpos( $login, '.' ) );
