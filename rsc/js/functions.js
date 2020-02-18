@@ -312,12 +312,10 @@ function toggle_filter_area( filter_name, force_toggle_action )
 	if( toggle_action == 'collapse' )
 	{	// Hide/collapse filters:
 		clickdiv.slideUp( 500 );
-		jQuery.post( htsrv_url+'anon_async.php?action=collapse_filter&target='+filter_name );
 	}
 	else if( toggle_action == 'expand' )
 	{	// Show/expand filters
 		clickdiv.slideDown( 500 );
-		jQuery.post( htsrv_url+'anon_async.php?action=expand_filter&target='+filter_name );
 	}
 
 	return false;

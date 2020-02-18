@@ -1433,10 +1433,6 @@ class Skin extends DataObject
 
 					// Require functions.js to show/hide a panel with filters:
 					require_js( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'disp_messages':
@@ -1456,10 +1452,6 @@ class Skin extends DataObject
 
 					// Init JS to quick upload several files:
 					init_fileuploader_js( 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'disp_contacts':
@@ -1476,10 +1468,6 @@ class Skin extends DataObject
 
 					// Require functions.js to show/hide a panel with filters:
 					require_js( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'disp_threads':
@@ -1498,13 +1486,6 @@ class Skin extends DataObject
 					{ // Only for NON-bootstrap skins
 						require_css( 'results.css', 'blog' ); // Results/tables styles
 					}
-
-					// Require functions.js to show/hide a panel with filters:
-					require_js( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'disp_search':
@@ -1653,10 +1634,6 @@ class Skin extends DataObject
 
 					// Require functions.js to show/hide a panel with filters
 					require_js( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'disp_download':
