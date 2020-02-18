@@ -362,12 +362,6 @@ if( $params['comment_type'] == 'meta' )
 			$Form->info_field( '', $params['policy_text'] );
 		}
 
-		// Display workflow properties if current user can edit at least one workflow property:
-		skin_include( '_item_comment_workflow.inc.php', array_merge( $params, array(
-			'Form'    => & $Form,
-			'Comment' => & $Comment,
-		) ) );
-
 		if( $Item->can_edit_workflow() )
 		{	// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
 			$params['form_submit_text'] = T_('Update Status').' / '.$params['form_submit_text'];
