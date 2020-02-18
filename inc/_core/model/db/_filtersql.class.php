@@ -90,28 +90,8 @@ class FilterSQL extends SQL
 			$this->preset_filter_query['rules'] = array();
 		}
 
-		switch( $operator )
-		{	// Convert operator alias to jQuery QueryBuilder format:
-			case '=':
-				$operator = 'equal';
-				break;
-			case '!=':
-			case '<>':
-				$operator = 'not_equal';
-				break;
-			case '<':
-				$operator = 'less';
-				break;
-			case '<=':
-				$operator = 'less_or_equal';
-				break;
-			case '>':
-				$operator = 'greater';
-				break;
-			case '>=':
-				$operator = 'greater_or_equal';
-				break;
-		}
+		// Convert operator alias to jQuery QueryBuilder format:
+		$operator = get_querybuilder_operator( $operator );
 
 		if( is_array( $values ) && $group_condition !== NULL )
 		{	// Append new grouped rules:

@@ -10293,4 +10293,33 @@ function get_customizer_url( $url_Blog = NULL )
 
 	return $url_Blog->get_baseurl_root().$customizer_relative_url;
 }
+
+
+/**
+ * Convert operator alias to jQuery QueryBuilder format
+ *
+ * @param string Alias Operator
+ * @return string Query Builder Operator
+ */
+function get_querybuilder_operator( $operator )
+{
+	switch( $operator )
+	{
+		case '=':
+			return 'equal';
+		case '!=':
+		case '<>':
+			return 'not_equal';
+		case '<':
+			return 'less';
+		case '<=':
+			return 'less_or_equal';
+		case '>':
+			return 'greater';
+		case '>=':
+			return 'greater_or_equal';
+		default:
+			return $operator;
+	}
+}
 ?>
