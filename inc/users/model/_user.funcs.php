@@ -3840,7 +3840,7 @@ function get_userlist_filters_config( $Form = NULL )
 	);
 
 	// Name / Email:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name' ) ) )
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name_email' ) ) )
 	{	// Show name/email filter only on back-office or if it is allowed by collection setting on front-office:
 		$filters['name_email'] = array(
 				'label'      => T_('Name').' / '.T_('Email'),
@@ -4169,13 +4169,18 @@ function callback_filter_userlist( & $Form )
 		$Form->checkbox( 'membersonly', get_param( 'membersonly' ), sprintf( T_('Only members of %s'), $Blog->get_shortname() ) );
 	}
 
-	if( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name' ) )
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name' ) ) )
 	{
-		$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
+		$Form->text( 'keywords', get_param( 'keywords' ), 20, T_('Name').' / '.T_('username'), '', 50 );
+	}
+
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_email' ) ) )
+	{
+		$Form->text( 'email', get_param( 'email' ), 20, T_('Email'), '', 50 );
 	}
 
 	$location_filter_displayed = false;
-	if( user_country_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) )
+	if( user_country_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) ) ) )
 	{
 		{ // Filter by country
 			load_class( 'regional/model/_country.class.php', 'Country' );
@@ -4196,7 +4201,7 @@ function callback_filter_userlist( & $Form )
 		}
 	}
 
-	if( user_region_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_region' ) )
+	if( user_region_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_region' ) ) ) )
 	{	// Filter by region
 		$region_filter_disp_style = regions_exist( get_param('country'), true ) ? '' : ' style="display:none"';
 		echo '<span id="region_filter"'.$region_filter_disp_style.'>';
@@ -4205,21 +4210,21 @@ function callback_filter_userlist( & $Form )
 		$location_filter_displayed = $location_filter_displayed || empty( $region_filter_disp_style );
 	}
 
-	if( user_subregion_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_subregion' ) )
+	if( user_subregion_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_subregion' ) ) ) )
 	{	// Filter by subregion
 		echo '<span id="subregion_filter"'.( !subregions_exist( get_param('region'), true ) ? ' style="display:none"' : '' ).'>';
 		$Form->select_input_options( 'subregion', get_subregions_option_list( get_param('region'), get_param('subregion') ), T_('Sub-region') );
 		echo '</span>';
 	}
 
-	if( user_city_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_city' ) )
+	if( user_city_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_city' ) ) ) )
 	{	// Filter by city
 		echo '<span id="city_filter"'.( !cities_exist( get_param('country'), get_param('region'), get_param('subregion'), true ) ? ' style="display:none"' : '' ).'>';
 		$Form->select_input_options( 'city', get_cities_option_list( get_param('country'), get_param('region'), get_param('subregion'), get_param('city') ), T_('City') );
 		echo '</span>';
 	}
 
-	if( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_age_group' ) )
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_age_group' ) ) )
 	{
 		$Form->begin_line( T_('Age group'), 'age_min' );
 			$Form->text( 'age_min', get_param('age_min'), 3, '' );

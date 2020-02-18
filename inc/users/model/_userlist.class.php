@@ -104,6 +104,7 @@ class UserList extends DataObjectList2
 				'city'                => NULL,    // integer, City ID
 				'membersonly'         => false,   // boolean, Restrict by members
 				'keywords'            => NULL,    // string, Search words
+				'email'               => NULL,    // string, Email
 				'gender'              => NULL,    // string: 'M', 'F', 'O', 'MF', 'MO', 'FO' or 'MFO'
 				'status_activated'    => NULL,    // string: 'activated'
 				'account_status'      => NULL,    // string: 'new', 'activated', 'manualactivated', 'autoactivated', 'emailchanged', 'deactivated', 'failedactivation', 'pendingdelete', 'closed'
@@ -216,6 +217,11 @@ class UserList extends DataObjectList2
 			 * Restrict by keywords
 			 */
 			memorize_param( 'keywords', 'string', $this->default_filters['keywords'], $this->filters['keywords'] );			 // Search string
+
+			/*
+			 * Restrict by email
+			 */
+			memorize_param( 'email', 'string', $this->default_filters['email'], $this->filters['email'] );
 
 			/*
 			 * Restrict by gender
@@ -404,6 +410,11 @@ class UserList extends DataObjectList2
 		 * Restrict by keywords
 		 */
 		$this->filters['keywords'] = param( 'keywords', 'string', $this->default_filters['keywords'], true );         // Search string
+
+		/*
+		 * Restrict by email
+		 */
+		$this->filters['email'] = param( 'email', 'string', $this->default_filters['email'], true );
 
 		/*
 		 * Restrict by gender preset filter
@@ -605,6 +616,7 @@ class UserList extends DataObjectList2
 		$this->UserQuery->where_user_IDs( $this->filters['userids'] );
 		$this->UserQuery->where_members( $this->filters['membersonly'] );
 		$this->UserQuery->where_keywords( $this->filters['keywords'] );
+		$this->UserQuery->where_email( $this->filters['email'] );
 		$this->UserQuery->where_gender( $this->filters['gender'] );
 		$this->UserQuery->where_status( $this->filters['status_activated'] );
 		$this->UserQuery->where_status( $this->filters['account_status'], true, true );

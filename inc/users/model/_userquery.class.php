@@ -27,7 +27,7 @@ class UserQuery extends FilterSQL
 	 * Fields of users table to search by keywords
 	 *
 	 */
-	var $keywords_fields = 'user_login, user_firstname, user_lastname, user_nickname, user_email';
+	var $keywords_fields = 'user_login, user_firstname, user_lastname, user_nickname';
 
 	/**
 	 * Constructor.
@@ -247,6 +247,22 @@ class UserQuery extends FilterSQL
 		if( count( $search ) > 0 )
 		{
 			$this->WHERE_and( implode( ' '.$search_kw_combine.' ', $search ) );
+		}
+	}
+
+
+	/**
+	 * Restrict with email
+	 *
+	 * @param string Email
+	 */
+	function where_email( $email )
+	{
+		global $DB;
+
+		if( $email !== '' )
+		{	// Filter only by not empty email address:
+			$this->WHERE_and( 'user_email LIKE '.$DB->quote( '%'.$email.'%' ) );
 		}
 	}
 
