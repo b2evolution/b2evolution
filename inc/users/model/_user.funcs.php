@@ -3843,9 +3843,10 @@ function get_userlist_filters_config( $Form = NULL )
 	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name_email' ) ) )
 	{	// Show name/email filter only on back-office or if it is allowed by collection setting on front-office:
 		$filters['name_email'] = array(
-				'label'      => T_('Name').' / '.T_('Email'),
+				'label'      => T_('Name').' / '.T_('Username').' / '.T_('Email'),
 				'input'      => 'text',
 				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
 			);
 	}
 
@@ -3856,6 +3857,7 @@ function get_userlist_filters_config( $Form = NULL )
 				'label'      => T_('First name'),
 				'input'      => 'text',
 				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
 			);
 	}
 
@@ -3866,6 +3868,7 @@ function get_userlist_filters_config( $Form = NULL )
 				'label'      => T_('Last name'),
 				'input'      => 'text',
 				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
 			);
 	}
 
@@ -3876,6 +3879,7 @@ function get_userlist_filters_config( $Form = NULL )
 				'label'      => T_('Nickname'),
 				'input'      => 'text',
 				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
 			);
 	}
 
@@ -3886,6 +3890,7 @@ function get_userlist_filters_config( $Form = NULL )
 				'label'      => T_('Email'),
 				'input'      => 'text',
 				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
 			);
 	}
 
@@ -4171,7 +4176,7 @@ function callback_filter_userlist( & $Form )
 
 	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name' ) ) )
 	{
-		$Form->text( 'keywords', get_param( 'keywords' ), 20, T_('Name').' / '.T_('username'), '', 50 );
+		$Form->text( 'keywords', get_param( 'keywords' ), 20, T_('Name').' / '.T_('Username'), '', 50 );
 	}
 
 	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_email' ) ) )

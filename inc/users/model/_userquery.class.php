@@ -747,7 +747,7 @@ class UserQuery extends FilterSQL
 	 */
 	function filter_field_name_email( $value, $operator )
 	{
-		return $this->get_where_condition( 'CONCAT_WS( " ", user_login, user_email )', $value, $operator );
+		return $this->get_where_condition( 'CONCAT_WS( " ", user_login, user_email, user_firstname, user_lastname, user_nickname )', $value, $operator );
 	}
 
 
