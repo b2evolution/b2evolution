@@ -70,6 +70,10 @@ switch ( $action )
 		param( 'uset_location_region', 'string', 'optional' );
 		param( 'uset_location_subregion', 'string', 'optional' );
 		param( 'uset_location_city', 'string', 'optional' );
+		param( 'uset_birthday_year', 'string', 'optional' );
+		param( 'uset_birthday_month', 'string', 'optional' );
+		param( 'uset_birthday_day', 'string', 'optiona' );
+		param( 'uset_self_selected_age_group', 'string', 'hidden' );
 		param( 'uset_minimum_age', 'integer', 0 );
 		if( $demo_mode )
 		{
@@ -104,6 +108,10 @@ switch ( $action )
 									array( 'location_region', $uset_location_region ),
 									array( 'location_subregion', $uset_location_subregion ),
 									array( 'location_city', $uset_location_city ),
+									array( 'birthday_year', $uset_birthday_year ),
+									array( 'birthday_month', $uset_birthday_month ),
+									array( 'birthday_day', $uset_birthday_day ),
+									array( 'self_selected_age_group', $uset_self_selected_age_group ),
 									array( 'minimum_age', $uset_minimum_age ),
 									array( 'multiple_sessions', $uset_multiple_sessions ),
 									array( 'emails_msgform', $uset_emails_msgform ) ) );

@@ -12231,6 +12231,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end( false );
 	}
 
+	if( upg_task_start( 15820, 'Upgrading users table...') )
+	{	// part of 7.1.2-beta
+		db_add_col( 'T_users', 'user_birthday_year', 'smallint unsigned NULL AFTER user_age_max' );
+		db_add_col( 'T_users', 'user_birthday_month', 'tinyint unsigned NULL AFTER user_birthday_year' );
+		db_add_col( 'T_users', 'user_birthday_day', 'tinyint unsigned NULL AFTER user_birthday_month' );
+
+		// Set self_selected_age_group setting to 'optional':
+		$DB->query( 'INSERT INTO T_settings ( set_name, set_value ) VALUES ( "self_selected_age_group", "optional" )
+				ON DUPLICATE KEY UPDATE set_value = VALUES( set_value )' );
+
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
