@@ -85,10 +85,8 @@ function filter_email_return( & $Form )
 }
 $Results->filter_area = array(
 	'callback' => 'filter_email_return',
-	'presets' => array(
-		'all' => array( T_('All'), $admin_url.'?ctrl=email&amp;tab=return'),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), $admin_url.'?ctrl=email&amp;tab=return' );
 
 // Initialize Results object:
 email_returns_results( $Results );

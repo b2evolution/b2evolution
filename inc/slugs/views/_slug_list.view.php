@@ -76,10 +76,8 @@ function filter_slugs( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_slugs',
 	'url_ignore' => 'slug_filter,results_slug_page',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=slugs' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=slugs' );
 
 function get_slug_link( $Slug )
 {

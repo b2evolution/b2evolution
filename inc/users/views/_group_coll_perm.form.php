@@ -68,10 +68,8 @@ $Results->filter_area = array(
 	'submit' => 'actionArray[filter]',
 	'callback' => 'filter_collobjectlist',
 	'url_ignore' => 'results_groupcoll_page,keywords1,keywords2',
-	'presets' => array(
-		'all' => array( T_('All collections'), '?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All collections'), '?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID );
 
 // Initialize Results object:
 colls_groups_perms_results( $Results, array(

@@ -108,10 +108,8 @@ function filter_userfields( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_userfields',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=userfields' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=userfields' );
 
 
 /*

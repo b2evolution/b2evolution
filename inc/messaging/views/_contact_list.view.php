@@ -142,22 +142,18 @@ else
 	$filter_url = get_dispctrl_url( 'contacts' );
 }
 
-$filter_presets = array(
-		'all' => array( T_('All'), $filter_url ),
+$Results->filter_area = array(
+	'callback' => 'filter_contacts',
 	);
+$Results->register_filter_preset( 'all', T_('All'), $filter_url );
 foreach( $user_groups as $g => $group )
 {	// Set user groups to quick filter
-	$filter_presets[] = array( $group->name, url_add_param( $filter_url, 'g='.$group->ID ) );
+	$Results->register_filter_preset( 'group_'.$group->ID, $group->name, url_add_param( $filter_url, 'g='.$group->ID ) );
 	if( $g >= 6 )
 	{	// Use only first 7 groups
 		break;
 	}
 }
-
-$Results->filter_area = array(
-	'callback' => 'filter_contacts',
-	'presets' => $filter_presets
-	);
 
 /**
  * Get block/unblock icon

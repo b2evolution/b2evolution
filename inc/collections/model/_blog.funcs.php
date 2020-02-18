@@ -2258,10 +2258,8 @@ function blogs_all_results_block( $params = array() )
 		'callback' => 'callback_filter_collectionlist',
 		'is_filtered' => ! empty( $collection_filters ),
 		'url_ignore' => 'results_blog_page',
-		'presets'  => array(
-			'all' => array( T_('All'), '?ctrl=collections&amp;cf_type=&amp;cf_name=&amp;cf_owner=' )
-		)
 	);
+	$blogs_Results->register_filter_preset( 'all', T_('All'), '?ctrl=collections&amp;cf_type=&amp;cf_name=&amp;cf_owner=' );
 
 	global $admin_url;
 	if( $current_User->check_perm( 'section', 'edit' ) )

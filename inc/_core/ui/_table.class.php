@@ -168,6 +168,10 @@ class Table extends Widget
 
 	/**
 	 * Register a filter preset
+	 *
+	 * @param string Preset code
+	 * @param string Preset title
+	 * @param string Preset URL
 	 */
 	function register_filter_preset( $preset_codename, $preset_label, $preset_url )
 	{

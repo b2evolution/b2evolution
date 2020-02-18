@@ -132,10 +132,8 @@ function filter_subregions( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_subregions',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=subregions' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=subregions' );
 
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
