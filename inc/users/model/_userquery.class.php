@@ -815,6 +815,21 @@ class UserQuery extends FilterSQL
 
 
 	/**
+	 * Restrict with user country
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_country( $value, $operator )
+	{
+		if( ! empty( $value ) )
+		{
+			return $this->get_where_condition( 'user_ctry_ID', $value, $operator );
+		}
+	}
+
+
+	/**
 	 * Restrict with user level
 	 *
 	 * @param string Value

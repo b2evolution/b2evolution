@@ -3823,6 +3823,7 @@ function get_userlist_filters_config( $Form = NULL )
 		'nickname'            => NULL, // Nickname
 		'email'               => NULL, // Email
 		'gender'              => NULL, // Gender
+		'country'             => NULL, // Country
 		'criteria'            => NULL, // Specific criteria
 		'tags'                => NULL, // User tags
 		'org'                 => NULL, // Organization
@@ -3907,6 +3908,30 @@ function get_userlist_filters_config( $Form = NULL )
 						'O' => T_('Other'),
 					),
 				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
+
+	// Country:
+	if( user_country_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) ) ) )
+	{	// Show country filter only on back-office or if it is allowed by collection setting on front-office:
+		$CountryCache = & get_CountryCache();
+		if( has_cross_country_restriction( 'users', 'list' ) )
+		{	// User cannot browse other users from other country:
+			// Load only country of the current User:
+			$CountryCache->load_all = false; // Set flag to false in order to don't load ALL records in the CountryCache->get_option_array().
+			$CountryCache->load_where( 'ctry_ID = '.( is_logged_in() ? $current_User->ctry_ID : '-1'/* For normal work anonymous users have no access to this point however use this fake condition to avoid errors */ ) );
+			$country_options = array();
+		}
+		else
+		{	// User can browse other users from other country:
+			$country_options = array( '0' => T_('All') );
+		}
+		$country_options += $CountryCache->get_option_array();
+		$filters['country'] = array(
+				'label'  => T_('Country'),
+				'input'  => 'select',
+				'type'   => 'integer',
+				'values' => $country_options,
 			);
 	}
 
@@ -4137,6 +4162,11 @@ function callback_filter_userlist( & $Form )
 		$filters['#default'] = array();
 		foreach( $userlist_default_filters as $userlist_default_filter )
 		{
+			if( $userlist_default_filter == 'country' && has_cross_country_restriction( 'users', 'list' ) )
+			{	// Skip default filter "Country" when current User can view other users only from own country:
+				continue;
+			}
+
 			// Set default operator:
 			if( ! empty( $filters[ $userlist_default_filter ]['operators'] ) )
 			{
