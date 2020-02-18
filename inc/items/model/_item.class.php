@@ -14198,7 +14198,7 @@ class Item extends ItemLight
 				$ItemStatusCache->load_all();
 				$ItemTypeCache = & get_ItemTypeCache();
 				$current_ItemType = & $this->get_ItemType();
-				$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $this->get( 'pst_ID' ), true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
+				$Form->select_input_options( 'item_st_ID', $ItemStatusCache->get_option_list( $this->get( 'pst_ID' ), true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status'), '', $params );
 				break;
 
 			case 'user':
@@ -14209,31 +14209,55 @@ class Item extends ItemLight
 
 				if( count( $UserCache->cache ) > 20 )
 				{
+					$params = array_merge( array(
+							'size' => 10,
+						), $params );
 					$assigned_User = & $UserCache->get_by_ID( $this->get( 'assigned_user_ID' ), false, false );
-					$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
+					$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', $params );
 				}
 				else
 				{
-					$Form->select_object( 'item_assigned_user_ID', NULL, $this, T_('Assigned to'), '', true, '', 'get_assigned_user_options' );
+					$params = array_merge( array(
+							'note' => '',
+							'allow_none' => true,
+							'class' => '',
+							'object_callback' => 'get_assigned_user_options',
+						), $params );
+					$Form->select_input_object( 'item_assigned_user_ID', NULL, $this, T_('Assigned to'), $params );
 				}
 				break;
 
 			case 'priority':
-				$Form->select_input_array( 'item_priority', $this->get( 'priority' ), item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+				$params = array_merge( array(
+						'force_keys_as_values' => true,
+					), $params );
+				$Form->select_input_array( 'item_priority', $this->get( 'priority' ), item_priority_titles(), T_('Priority'), '', $params );
 				break;
 
 			case 'deadline':
 				if( $this->get_coll_setting( 'use_deadline' ) )
 				{	// Display deadline fields only if it is enabled for collection:
-					$Form->begin_line( T_('Deadline'), 'item_deadline' );
+					$is_inline = $Form->is_lined_fields;
+					if( ! $is_inline )
+					{
+						$Form->begin_line( T_('Deadline'), 'item_deadline', '', $params );
+					}
 
+						$date_params = array_merge( array(
+								'input_suffix' => '&nbsp;'.T_('at').'&nbsp;',
+							), $params ); 
 						$datedeadline = $this->get( 'datedeadline' );
-						$Form->date( 'item_deadline', $datedeadline, '' );
+						$Form->date_input( 'item_deadline', $datedeadline, '', $date_params );
 
 						$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
-						$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
-
-					$Form->end_line();
+						$time_params = array_merge( array(
+								'time_format' => 'hh:mm',
+							), $params );
+						$Form->time_input( 'item_deadline_time', $datedeadline_time, T_('at'), $time_params );
+					if( ! $is_inline )
+					{
+						$Form->end_line();
+					}
 				}
 				break;
 		}
