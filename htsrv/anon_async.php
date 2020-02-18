@@ -921,25 +921,6 @@ switch( $action )
 
 		break;
 
-	case 'collapse_filter':
-	case 'expand_filter':
-		// Save a value of state(collapse/expand) of the current filter
-		param( 'target', 'string', '' );
-		if( !empty( $target ) )
-		{	// We want to record a 'collapse'/'expand' value:
-			$target_status = $action == 'collapse_filter' ? 'collapsed' : 'expanded';
-			if( preg_match( '/_(filters|colselect)$/', $target ) )
-			{	// accept all _filters and _colselect open/close requests!
-				// We have a valid value:
-				$Session->set( $target, $target_status );
-			}
-			else
-			{	// Warning: you may not see this on AJAX calls
-				$Ajaxlog->add( 'Cannot ['.$target_status.'] unknown param ['.$target.']', 'error' );
-			}
-		}
-		break;
-
 	case 'validate_login':
 		// Validate if username is available
 		param( 'login', 'string', '' );

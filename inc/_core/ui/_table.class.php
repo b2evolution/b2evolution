@@ -182,37 +182,27 @@ class Table extends Widget
 			$fold_state = $default_fold_state;
 		}
 
-		//__________________________________  Toogle link _______________________________________
+		echo '<span class="btn-group">';
 
-		if( $fold_state == 'collapsed' )
-		{
-			echo '<a class="filters_title" href="'.regenerate_url( 'action,target', 'action=expand_filter&target='.$option_name ).'"
-								onclick="return toggle_filter_area(\''.$option_name.'\');" >'
-						.get_icon( 'filters_show', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
-		}
-		else
-		{
-			echo '<a class="filters_title" href="'.regenerate_url( 'action,target', 'action=collapse_filter&target='.$option_name ).'"
-								onclick="return toggle_filter_area(\''.$option_name.'\');" >'
-						.get_icon( 'filters_hide', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) );
-		}
-		echo $option_title.'</a>:';
+		//__________________________________  Toogle link _______________________________________
+		echo '<span onclick="toggle_filter_area(\''.$option_name.'\')"'
+			.' class="btn btn-xs btn-info'.( $this->current_filter_preset == 'custom' ? ' active' : '' ).'">'
+			.get_icon( ( $fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$option_name ) )
+			.' '.$option_title
+		.'</span>';
 
 		//____________________________________ Filters preset ____________________________________
-
 		if( !empty( $this->{$area_name}['presets'] ) )
 		{ // We have preset filters
-			$r = array();
 			// Loop on all preset filters:
 			foreach( $this->{$area_name}['presets'] as $key => $preset )
 			{
 				// Display preset filter link:
-				$preset_text = ( $preset[1] == '#nolink#' ? $preset[0] : '<a href="'.$preset[1].'" class="label label-default">'.$preset[0].'</a>' );
-				$r[] = ( isset( $preset[2] ) ? '<span '.$preset[2].'>'.$preset_text.'</span>' : $preset_text );
+				echo '<a href="'.$preset[1].'" class="btn btn-xs btn-info">'.$preset[0].'</a>';
 			}
-
-			echo ' '.implode( ' ', $r );
 		}
+
+		echo '</span>';
 
 		//_________________________________________________________________________________________
 
@@ -700,12 +690,11 @@ jQuery( document ).ready( function()
 		}
 
 		// "Custom preset" with JS toggle to reveal form:
-// fp>yb: TODO: I don't think this can work without Javascript (and it doesn't need to) -- remove all unnecessary code
-		echo '<a href="'.regenerate_url( 'action,target', 'action='.( $fold_state == 'collapsed' ? 'expand_filter' : 'collapse_filter' ).'&target='.$option_name ).'"'
-			.' onclick="return toggle_filter_area(\''.$option_name.'\')" class="btn btn-xs btn-info'.( $this->current_filter_preset == 'custom' ? ' active' : '' ).'">'
+		echo '<span onclick="toggle_filter_area(\''.$option_name.'\')"'
+				.' class="btn btn-xs btn-info'.( $this->current_filter_preset == 'custom' ? ' active' : '' ).'">'
 				.get_icon( ( $fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$option_name ) )
 				.' '.T_('Custom filters')
-			.'</a>';
+			.'</span>';
 
 		echo '</span>'; // End of <span class="btn-group">
 
