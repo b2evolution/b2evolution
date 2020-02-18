@@ -916,6 +916,8 @@ $evonetsrv_protocol = 'http';
 $evonetsrv_host = 'rpc.b2evo.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
+$evonetsrv_verifypeer = false;
+$evonetsrv_retry_delay = 90;
 
 $antispamsrv_protocol = 'http';
 $antispamsrv_host = 'antispam.b2evo.net';
