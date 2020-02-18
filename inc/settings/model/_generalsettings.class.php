@@ -158,7 +158,7 @@ class GeneralSettings extends AbstractSettings
 		'allow_html_message' => 0, // Allow HTML in messages
 
 		// Users list settings:
-		'userlist_default_filters' => 'gender,criteria,lastseen',
+		'userlist_default_filters' => 'name_email',
 
 		// Welcome private message
 		'welcomepm_enabled' => 0,

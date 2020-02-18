@@ -724,6 +724,66 @@ class UserQuery extends FilterSQL
 
 
 	/**
+	 * Restrict with user name or email
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_name_email( $value, $operator )
+	{
+		return $this->get_where_condition( 'CONCAT_WS( " ", user_login, user_email )', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user first name
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_firstname( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_firstname', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user last name
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_lastname( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_lastname', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user nickname
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_nickname( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_nickname', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user email
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_email( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_email', $value, $operator );
+	}
+
+
+	/**
 	 * Restrict with user gender
 	 *
 	 * @param string Value
