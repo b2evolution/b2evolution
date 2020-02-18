@@ -40,13 +40,30 @@ if( isset( $Comment->item_workflow ) && is_array( $Comment->item_workflow ) )
 	}
 }
 
-$Item->display_workflow_field( 'status', $Form );
+$Form->switch_layout( 'linespan' );
 
-$Item->display_workflow_field( 'user', $Form );
+$Form->switch_template_parts( array(
+		'fieldstart' => '<div class="form-group text-center" $ID$>',
+		'inputstart' => '<div class="controls" style="display: inline-block">',
+	) );
 
-$Item->display_workflow_field( 'priority', $Form );
+$Form->begin_line( T_('Workflow'), NULL, '', array( 'style' => 'color:red' ) );
 
-$Item->display_workflow_field( 'deadline', $Form );
+	$form_params = array(
+			'hide_label' => true,
+		);
+
+	$Item->display_workflow_field( 'status', $Form, $form_params );
+
+	$Item->display_workflow_field( 'user', $Form, $form_params );
+
+	$Item->display_workflow_field( 'priority', $Form, $form_params );
+
+	$Item->display_workflow_field( 'deadline', $Form, $form_params );
+	
+$Form->end_line();
+
+$Form->switch_layout( NULL );
 
 if( $Comment->is_meta() )
 {	// Display inputs of custom fields which are allowed to be updated with internal comment:

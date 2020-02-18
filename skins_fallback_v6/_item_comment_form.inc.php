@@ -491,6 +491,12 @@ if( $params['comment_type'] == 'meta' )
 	// Display attachments fieldset:
 	$Form->attachments_fieldset( $Comment, false, $Comment->is_meta() ? 'meta_' : '' );
 
+		// Display workflow properties if current user can edit at least one workflow property:
+		skin_include( '_item_comment_workflow.inc.php', array_merge( $params, array(
+			'Form'    => & $Form,
+			'Comment' => & $Comment,
+		) ) );
+
 		$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
 		// Display plugin captcha for comment form before submit button:
