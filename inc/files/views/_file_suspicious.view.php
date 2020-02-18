@@ -94,17 +94,13 @@ function callback_filter_file_suspicious( & $Form )
 	$Form->text( 'msv', get_param( 'msv' ), 5, T_('Minimun spam votes'), '', 6 );
 }
 
-$filter_presets = array(
-		'all' => array( T_('All'), '?ctrl=filemod&amp;miv=0&amp;msv=0' ),
-		'inappropriate' => array( T_('Inappropriate'), '?ctrl=filemod&amp;miv=1&amp;msv=0' ),
-		'spam' => array( T_('Spam'), '?ctrl=filemod&amp;miv=0&amp;msv=1' ),
-	);
-
 $Results->filter_area = array(
 	'callback' => 'callback_filter_file_suspicious',
 	'url_ignore' => 'results_fsusp_page',
-	'presets' => $filter_presets,
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=filemod&amp;tab=suspicious&amp;miv=0&amp;msv=0' );
+$Results->register_filter_preset( 'inappropriate', T_('Inappropriate'), '?ctrl=filemod&amp;tab=suspicious&amp;miv=1&amp;msv=0' );
+$Results->register_filter_preset( 'spam', T_('Spam'), '?ctrl=filemod&amp;tab=suspicious&amp;miv=0&amp;msv=1' );
 
 $Results->cols[] = array(
 		'th' => T_('Icon/Type'),

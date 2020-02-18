@@ -142,11 +142,9 @@ function filter_goal_hits( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_goal_hits',
 	'url_ignore' => 'results_hits_page,exclude,sess_ID,goal_name,datestartinput,datestart,datestopinput,datestop',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params ),
-		'all_but_curr' => array( T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params );
+$Results->register_filter_preset( 'all_but_curr', T_('All but current session'), '?ctrl=stats&amp;tab=goals&amp;tab3=hits'.$section_params.'&amp;sess_ID='.$Session->ID.'&amp;exclude=1' );
 
 $Results->cols[] = array(
 		'th' => T_('Session'),

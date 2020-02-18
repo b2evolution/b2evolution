@@ -76,10 +76,8 @@ function filter_currencies( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_currencies',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=currencies' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=currencies' );
 
 if( $current_User->check_perm( 'options', 'edit', false ) )
 { // We have permission to modify:

@@ -77,10 +77,8 @@ function filter_tags( & $Form )
 $Results->filter_area = array(
 	'callback'   => 'filter_tags',
 	'url_ignore' => 'utag_filter,results_tag_page',
-	'presets'    => array(
-		'all' => array( T_('All'), '?ctrl=usertags' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=usertags' );
 
 function tag_td_name( $utag_ID, $utag_name )
 {

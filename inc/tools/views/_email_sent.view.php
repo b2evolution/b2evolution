@@ -113,10 +113,8 @@ function filter_email_sent( & $Form )
 }
 $Results->filter_area = array(
 	'callback' => 'filter_email_sent',
-	'presets' => array(
-		'all' => array( T_('All'), $admin_url.'?ctrl=email&amp;tab=sent'),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), $admin_url.'?ctrl=email&amp;tab=sent' );
 
 // Initialize Results object:
 emails_sent_log_results( $Results );

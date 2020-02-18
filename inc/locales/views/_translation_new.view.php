@@ -54,10 +54,8 @@ function filter_translation( & $Form )
 
 $Results->filter_area = array(
 	'callback' => 'filter_translation',
-	'presets' => array(
-		'all' => array( T_('All'), $admin_url.'?ctrl=translation&edit_locale='.$edit_locale.'&action=new_strings' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), $admin_url.'?ctrl=translation&edit_locale='.$edit_locale.'&action=new_strings' );
 
 $Results->cols[] = array(
 		'th' => T_('Original string'),
