@@ -17,6 +17,7 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+load_class( '_core/ui/_table.class.php', 'Table' );
 
 /**
  * Get config array of default widgets for install, upgrade and new collections
