@@ -6767,6 +6767,13 @@ function users_results_block( $params = array() )
 	{ // Display a button to refresh the users list
 		$UserList->global_icon( T_('Refresh the list in case some Users have been added or deleted since your last search...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
 	}
+
+	if( is_pro() )
+	{
+		$UserList->global_icon( T_('Import Users'), 'new',
+				regenerate_url( 'action', 'action=csv'), T_('Import Users').' &raquo;', 3, 4 );
+	}
+	
 	if( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
 	{
 		if( $params['display_btn_adduser'] )
@@ -6873,10 +6880,17 @@ function users_results_block( $params = array() )
 			.'</a>';
 	}
 
+	if( is_pro() )
+	{
+		$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=export_users" class="btn btn-primary">'
+				.format_to_output( T_('Export users (CSV)' ) )
+			.'</a>';
+	}
+
 	if( $params['display_btn_export'] && is_logged_in() && $UserList->result_num_rows > 0 )
 	{	// Button to export user group data as CSV file:
-		$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=export" class="btn btn-primary">'
-				.format_to_output( T_('Export groups as CSV') )
+		$user_list_buttons[] = ( is_pro() ? '' : '<br>' ).'<a href="'.$admin_url.'?ctrl=users&amp;action=export" class="btn btn-primary">'
+				.format_to_output( is_pro() ? T_('Export group membership (CSV)') : T_('Export groups as CSV') )
 			.'</a>';
 	}
 
