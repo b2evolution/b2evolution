@@ -6890,7 +6890,7 @@ function users_results_block( $params = array() )
 	if( $params['display_btn_export'] && is_logged_in() && $UserList->result_num_rows > 0 )
 	{	// Button to export user group data as CSV file:
 		$user_list_buttons[] = ( is_pro() ? '' : '<br>' ).'<a href="'.$admin_url.'?ctrl=users&amp;action=export" class="btn btn-primary">'
-				.format_to_output( is_pro() ? T_('Export group membership (CSV)') : T_('Export groups as CSV') )
+				.format_to_output( T_('Export group membership (CSV)') )
 			.'</a>';
 	}
 
