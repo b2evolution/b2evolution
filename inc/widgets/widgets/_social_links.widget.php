@@ -224,7 +224,7 @@ class social_links_Widget extends ComponentWidget
 			$r .= '<div class="ufld_icon_links">';
 			for( $i = 1; $i <= 7; $i++ )
 			{
-				if( ! empty( $this->disp_params['link'.$i] ) && ! empty( $this->disp_params['link'.$i.'_href'] ) )
+				if( isset( $social_fields[$this->disp_params['link'.$i]] ) && ! empty( $this->disp_params['link'.$i] ) && ! empty( $this->disp_params['link'.$i.'_href'] ) )
 				{
 					$r .= '<a href="'.$this->disp_params['link'.$i.'_href'].'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld_'.$social_fields[$this->disp_params['link'.$i]]->ufdf_code.$icon_colors_classes.'"' ).'>'
 									.'<span class="'.$social_fields[$this->disp_params['link'.$i]]->ufdf_icon_name.'"></span>'
