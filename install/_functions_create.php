@@ -131,12 +131,25 @@ function create_default_data()
 
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
-	// erwin > When adding anything to the list below don't forget to update the params for the Social Links widget!
+	// erwin > WARNING! When adding anything to the list below don't forget to update the params for default installed
+	//                  widget "User Social Links", see file '/inc/_widgets.funcs.php': container "page_top"/line:164 and "front_page_main_area"/line:270!
+	// yura: TODO: I think we should modify the widget "User Social Links" to make it use ufdf_code instead of currently ufdf_ID
 	$DB->query( "
 		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
 		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
 						( 1, 'word',   'I like',        NULL, 'recommended', 'list',      '2',  '1', 'ilike',        'fa fa-thumbs-o-up' ),
 						( 1, 'word',   'I don\'t like', NULL, 'recommended', 'list',      '3',  '1', 'idontlike',    'fa fa-thumbs-o-down' ),
+						( 1, 'list',   'Industry',      'Energy, Utilities & Resources
+Financial Services
+Health Services
+Hospitality & Tourism
+Industrial Manufacturing
+Pharma & Life Sciences
+Public Sector
+Real Estate
+Retail & Consumer Goods
+Sports Business Advisory
+Technology, Media & Telecom',                     'recommended', 'allowed',   '4',  '1', 'industry',     'fa fa-industry' ),
 						( 2, 'email',  'MSN/Live IM',   NULL, 'optional',    'allowed',   '1',  '0', 'msnliveim',    NULL ),
 						( 2, 'word',   'Yahoo IM',      NULL, 'optional',    'allowed',   '2',  '0', 'yahooim',      'fa fa-yahoo' ),
 						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', 'aolaim',       NULL ),
