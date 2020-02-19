@@ -2853,18 +2853,22 @@ a.btn.action_icon.hoverlink {
 .form-horizontal #item_locations select {
   display: inline-block;
 }
-.form-horizontal #itemform_renderers .dropdown-menu {
+.form-horizontal #itemform_renderers .dropdown-menu,
+.form-horizontal #commentform_renderers .dropdown-menu {
   padding: 10px 10px 5px 10px;
 }
-.form-horizontal #itemform_renderers .popover {
+.form-horizontal #itemform_renderers .popover,
+.form-horizontal #commentform_renderers .popover {
   max-width: initial;
 }
-.form-horizontal #itemform_renderers div[id^="block_renderer_"] {
+.form-horizontal #itemform_renderers div[id^="block_renderer_"],
+.form-horizontal #commentform_renderers div[id^="block_renderer_"] {
   padding-left: 20px;
   position: relative;
   white-space: nowrap;
 }
-.form-horizontal #itemform_renderers div[id^="block_renderer_"] input[type=checkbox] {
+.form-horizontal #itemform_renderers div[id^="block_renderer_"] input[type=checkbox],
+.form-horizontal #commentform_renderers div[id^="block_renderer_"] input[type=checkbox] {
   margin: 4px 0 0;
   position: absolute;
   left: 0;
@@ -3416,9 +3420,6 @@ div.message_toolbars {
 }
 .btn-toolbar[class*="_toolbar"].disabled span.btn:hover {
   background: #FFF;
-}
-.edit_plugin_actions {
-  padding-top: 7px;
 }
 .badge-important {
   background-color: #F00 !important;
