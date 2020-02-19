@@ -11394,6 +11394,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$tables_num = 0;
 		$columns_num = 0;
 		$tables = $DB->get_col( 'SHOW TABLES' );
+		// Ignore these ID columns because they can be be signed:
+		$ignore_signed_columns = array(
+			'step_yes_next_step_ID',
+			'step_no_next_step_ID',
+			'step_error_next_step_ID',
+		);
 		foreach( $tables as $table_name )
 		{
 			if( ! in_array( $table_name, $db_config['aliases'] ) )
@@ -11407,6 +11413,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				.' AND Type LIKE "int(11)%"' );
 			foreach( $columns as $column )
 			{
+				if( in_array( $column->Field, $ignore_signed_columns ) )
+				{	// Skip signed columns:
+					continue;
+				}
 				$modify_columns[ $column->Field ] = 'MODIFY COLUMN `'.$column->Field.'` '
 					.'INT(10) UNSIGNED ' // Change from INT(11) to INT(10)
 					.( $column->Null == 'YES' ? 'NULL' : 'NOT NULL' )
@@ -12291,6 +12301,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 					WHERE wi_ID = '.$widget_ID );
 			}
 		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15840, 'Upgrading automation steps table...') )
+	{	// part of 7.1.2-beta
+		db_upgrade_cols( 'T_automation__step', array(
+			'MODIFY' => array(
+				'step_yes_next_step_ID'   => 'INT NULL',
+				'step_no_next_step_ID'    => 'INT NULL',
+				'step_error_next_step_ID' => 'INT NULL',
+			),
+		) );
 		upg_task_end();
 	}
 
