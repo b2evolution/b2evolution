@@ -32,7 +32,7 @@ class Userfield extends DataObject
 	var $type = '';
 	var $name = '';
 	var $options;
-	var $required = 'optional';
+	var $required = 'recommended';
 	var $duplicated = 'allowed';
 	var $order = '';
 	var $suggest = '1';
@@ -92,13 +92,13 @@ class Userfield extends DataObject
 	static function get_types()
 	{
 		return array(
-			'email'  => T_('Email address'),
-			'word'   => T_('Single word'),
+			'word'   => T_('String'),
+			'number' => T_('Numeric'),
 			'list'   => T_('Option list'),
-			'number' => T_('Number'),
-			'phone'  => T_('Phone number'),
+			'text'   => T_('Multiline text'),
+			'email'  => T_('Email address'),
 			'url'    => T_('URL'),
-			'text'   => T_('Text'),
+			'phone'  => T_('Phone number'),
 		 );
 	}
 
@@ -111,10 +111,10 @@ class Userfield extends DataObject
 	function get_requireds()
 	{
 		return array(
-			array( 'value' => 'hidden', 'label' => T_('Hidden') ),
-			array( 'value' => 'optional', 'label' => T_('Optional') ),
-			array( 'value' => 'recommended', 'label' => T_('Recommended') ),
 			array( 'value' => 'require', 'label' => T_('Required') ),
+			array( 'value' => 'recommended', 'label' => T_('Recommended') ),
+			array( 'value' => 'optional', 'label' => T_('Optional') ),
+			array( 'value' => 'hidden', 'label' => T_('Hidden') ),
 		 );
 	}
 
