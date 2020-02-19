@@ -12244,6 +12244,56 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15830, 'Updating widget "Free Social Links"...' ) )
+	{	// part of 7.1.2-beta
+		// Make to use ufdf_code(user field code) instead of ufdf_ID(user field ID) in widget settings:
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "social_links"' );
+		$widgets = $DB->get_assoc( $SQL );
+
+		if( ! empty( $widgets ) )
+		{	// If at least one widget "Free Social Links" exists in DB:
+			$SQL = new SQL();
+			$SQL->SELECT( 'ufdf_ID, ufdf_code' );
+			$SQL->FROM( 'T_users__fielddefs' );
+			$SQL->WHERE( 'ufdf_type = "url"' );
+			$SQL->WHERE_and( 'ufdf_icon_name IS NOT NULL' );
+			$social_fields = $DB->get_assoc( $SQL );
+
+			foreach( $widgets as $widget_ID => $widget_params )
+			{
+				if( empty( $widget_params ) )
+				{	// Skip widget with default settings:
+					continue;
+				}
+
+				$widget_params = unserialize( $widget_params );
+
+				for( $i = 1; $i <= 7; $i++ )
+				{
+					if( isset( $widget_params['link'.$i] ) )
+					{
+						if( isset( $social_fields[ $widget_params['link'.$i] ] ) )
+						{	// Replace old using of ufdf_ID to new using ufdf_code if we find such user field in DB by ID:
+							$widget_params['link'.$i] = $social_fields[ $widget_params['link'.$i] ];
+						}
+						else
+						{	// Reset wrong user field to default:
+							$widget_params['link'.$i] = '';
+						}
+					}
+				}
+
+				$DB->query( 'UPDATE T_widget__widget
+						SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+					WHERE wi_ID = '.$widget_ID );
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

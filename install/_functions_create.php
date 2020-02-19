@@ -131,9 +131,6 @@ function create_default_data()
 
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
-	// erwin > WARNING! When adding anything to the list below don't forget to update the params for default installed
-	//                  widget "User Social Links", see file '/inc/_widgets.funcs.php': container "page_top"/line:164 and "front_page_main_area"/line:270!
-	// yura: TODO: I think we should modify the widget "User Social Links" to make it use ufdf_code instead of currently ufdf_ID
 	$DB->query( "
 		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
 		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
@@ -232,12 +229,12 @@ Technology, Media & Telecom',                     'recommended', 'allowed',   '4
 			'org_roles' => array( 'King of Spades' ),
 			'org_priorities' => array( 0 ),
 			'fields'    => array(
-					'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
-					'Website'     => 'http://b2evolution.net/',
-					'Twitter'     => 'https://twitter.com/b2evolution/',
-					'Facebook'    => 'https://www.facebook.com/b2evolution',
-					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
+					'microbio' => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
+					'website'  => 'http://b2evolution.net/',
+					'twitter'  => 'https://twitter.com/b2evolution/',
+					'facebook' => 'https://www.facebook.com/b2evolution',
+					'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+					'github'   => 'https://github.com/b2evolution/b2evolution',
 				)
 		) );
 	task_end();

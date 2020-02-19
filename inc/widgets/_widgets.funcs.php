@@ -163,13 +163,13 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Page Top */
 	$default_widgets['page_top'] = array(
 		array( 10, 15000, 'social_links', 'params' => array(
-				'link1'      => 17,
+				'link1'      => 'twitter',
 				'link1_href' => 'https://twitter.com/b2evolution/',
-				'link2'      => 18,
+				'link2'      => 'facebook',
 				'link2_href' => 'https://www.facebook.com/b2evolution',
-				'link3'      => 19,
+				'link3'      => 'linkedin',
 				'link3_href' => 'https://www.linkedin.com/company/b2evolution-net',
-				'link4'      => 20,
+				'link4'      => 'github',
 				'link4_href' => 'https://github.com/b2evolution/b2evolution',
 			) ),
 		array( 20, 15450, 'coll_locale_switch' ),
@@ -267,13 +267,13 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'disp_title' => 0,
 			) : NULL ) ),
 		array( 15, 15000, 'social_links', 'coll_type' => 'main', 'params' => array(
-				'link1'      => 17,
+				'link1'      => 'twitter',
 				'link1_href' => 'https://twitter.com/b2evolution/',
-				'link2'      => 18,
+				'link2'      => 'facebook',
 				'link2_href' => 'https://www.facebook.com/b2evolution',
-				'link3'      => 19,
+				'link3'      => 'linkedin',
 				'link3_href' => 'https://www.linkedin.com/company/b2evolution-net',
-				'link4'      => 20,
+				'link4'      => 'github',
 				'link4_href' => 'https://github.com/b2evolution/b2evolution',
 			) ),
 		array( 20, 15000, 'coll_featured_posts', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
