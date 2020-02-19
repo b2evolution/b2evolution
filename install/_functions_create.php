@@ -164,10 +164,9 @@ Technology, Media & Telecom',                     'recommended', 'allowed',   '4
 						( 3, 'phone',  'Home FAX',      NULL, 'optional',    'allowed',   '6',  '0', 'homefax',      'fa fa-fax' ),
 						( 4, 'url',    'Twitter',       NULL, 'recommended', 'forbidden', '1',  '0', 'twitter',      'fa fa-twitter' ),
 						( 4, 'url',    'Facebook',      NULL, 'recommended', 'forbidden', '2',  '0', 'facebook',     'fa fa-facebook' ),
-						( 4, 'url',    'Google Plus',   NULL, 'optional',    'forbidden', '3',  '0', 'googleplus',   'fa fa-google-plus fa-x-google-plus--nudge' ),
 						( 4, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '4',  '0', 'linkedin',     'fa fa-linkedin fa-x-linkedin--nudge' ),
 						( 4, 'url',    'GitHub',        NULL, 'optional',    'forbidden', '5',  '0', 'github',       'fa fa-github-alt' ),
-						( 4, 'url',    'Website',       NULL, 'recommended', 'allowed',   '6',  '0', 'website',      NULL ),
+						( 4, 'url',    'Website',       NULL, 'optional',    'allowed',   '6',  '0', 'website',      NULL ),
 						( 4, 'url',    'Blog',          NULL, 'optional',    'allowed',   '7',  '0', 'blog',         NULL ),
 						( 4, 'url',    'Myspace',       NULL, 'optional',    'forbidden', '8',  '0', 'myspace',      NULL ),
 						( 4, 'url',    'Flickr',        NULL, 'optional',    'forbidden', '9',  '0', 'flickr',       'fa fa-flickr' ),
@@ -239,7 +238,6 @@ Technology, Media & Telecom',                     'recommended', 'allowed',   '4
 					'Facebook'    => 'https://www.facebook.com/b2evolution',
 					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
 					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 				)
 		) );
 	task_end();

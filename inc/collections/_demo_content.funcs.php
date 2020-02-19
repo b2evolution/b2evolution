@@ -884,7 +884,6 @@ function get_demo_users_defaults()
 						'Facebook'    => 'https://www.facebook.com/b2evolution',
 						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
 						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 					)
 			),
 		'mary' => array(
@@ -903,7 +902,6 @@ function get_demo_users_defaults()
 						'Facebook'    => 'https://www.facebook.com/b2evolution',
 						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
 						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 					),
 			),
 		'jay' => array(
@@ -922,7 +920,6 @@ function get_demo_users_defaults()
 						'Facebook'    => 'https://www.facebook.com/b2evolution',
 						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
 						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 					),
 			),
 		'dave' => array(
@@ -941,7 +938,6 @@ function get_demo_users_defaults()
 						'Facebook'    => 'https://www.facebook.com/b2evolution',
 						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
 						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 					),
 			),
 		'paul' => array(
@@ -960,7 +956,6 @@ function get_demo_users_defaults()
 						'Facebook'    => 'https://www.facebook.com/b2evolution',
 						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
 						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
 					),
 			),
 		'larry' => array(

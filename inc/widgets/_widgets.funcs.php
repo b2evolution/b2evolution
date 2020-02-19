@@ -168,11 +168,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'link2'      => 18,
 				'link2_href' => 'https://www.facebook.com/b2evolution',
 				'link3'      => 19,
-				'link3_href' => 'https://plus.google.com/+b2evolution/posts',
+				'link3_href' => 'https://www.linkedin.com/company/b2evolution-net',
 				'link4'      => 20,
-				'link4_href' => 'https://www.linkedin.com/company/b2evolution-net',
-				'link5'      => 21,
-				'link5_href' => 'https://github.com/b2evolution/b2evolution',
+				'link4_href' => 'https://github.com/b2evolution/b2evolution',
 			) ),
 		array( 20, 15450, 'coll_locale_switch' ),
 	);
@@ -274,11 +272,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'link2'      => 18,
 				'link2_href' => 'https://www.facebook.com/b2evolution',
 				'link3'      => 19,
-				'link3_href' => 'https://plus.google.com/+b2evolution/posts',
+				'link3_href' => 'https://www.linkedin.com/company/b2evolution-net',
 				'link4'      => 20,
-				'link4_href' => 'https://www.linkedin.com/company/b2evolution-net',
-				'link5'      => 21,
-				'link5_href' => 'https://github.com/b2evolution/b2evolution',
+				'link4_href' => 'https://github.com/b2evolution/b2evolution',
 			) ),
 		array( 20, 15000, 'coll_featured_posts', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
 				'blog_ID'    => '*', // Display Items from all Collections
