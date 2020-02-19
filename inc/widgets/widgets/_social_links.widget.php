@@ -224,10 +224,15 @@ class social_links_Widget extends ComponentWidget
 			$r .= '<div class="ufld_icon_links">';
 			for( $i = 1; $i <= 7; $i++ )
 			{
-				if( ! empty( $this->disp_params['link'.$i] ) && ! empty( $this->disp_params['link'.$i.'_href'] ) )
+				if( empty( $this->disp_params['link'.$i] ) )
+				{	// Skip not using link:
+					continue;
+				}
+				$field_code = $this->disp_params['link'.$i];
+				if( isset( $social_fields[ $field_code ] ) && ! empty( $this->disp_params['link'.$i.'_href'] ) )
 				{
-					$r .= '<a href="'.$this->disp_params['link'.$i.'_href'].'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld_'.$social_fields[$this->disp_params['link'.$i]]->ufdf_code.$icon_colors_classes.'"' ).'>'
-									.'<span class="'.$social_fields[$this->disp_params['link'.$i]]->ufdf_icon_name.'"></span>'
+					$r .= '<a href="'.$this->disp_params['link'.$i.'_href'].'"'.( empty( $icon_colors_classes ) ? '' : ' class="ufld_'.$this->disp_params['link'.$i].$icon_colors_classes.'"' ).'>'
+									.'<span class="'.$social_fields[ $this->disp_params['link'.$i] ].'"></span>'
 								.'</a>';
 				}
 			}
@@ -256,59 +261,58 @@ class social_links_Widget extends ComponentWidget
 	}
 
 
+	/**
+	 * Get available social user fields
+	 *
+	 * @return array
+	 */
 	function get_available_social_fields()
 	{
 		global $DB;
 
-		$social_fields = $DB->get_results('
-				SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required,
-						ufdf_options, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
-				FROM T_users__fielddefs
-				LEFT JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
-				WHERE ufdf_type = "url" AND ufdf_icon_name IS NOT NULL' );
+		$SQL = new SQL( 'Widget "Free Social Links" #'.$this->ID.': Get available social user fields' );
+		$SQL->SELECT( 'ufdf_code, ufdf_name' );
+		$SQL->FROM( 'T_users__fielddefs' );
+		$SQL->WHERE( 'ufdf_type = "url"' );
+		$SQL->WHERE_and( 'ufdf_icon_name IS NOT NULL' );
 
-		$r = array( '' => 'None' );
-
-		foreach( $social_fields as $field )
-		{
-			$r[$field->ufdf_ID] = $field->ufdf_name;
-		}
-
-		return $r;
+		return $DB->get_assoc( $SQL );
 	}
 
+
+	/**
+	 * Get selected social user fields
+	 *
+	 * @return array
+	 */
 	function get_selected_social_fields()
 	{
 		global $DB;
 
-		$field_IDs = array();
+		$field_codes = array();
 		for( $i = 1; $i <= 7; $i++ )
 		{
 			if( $this->disp_params['link'.$i] )
 			{
-				$field_IDs[] = $this->disp_params['link'.$i];
+				$field_codes[] = $this->disp_params['link'.$i];
 			}
 		}
 
-		$r = array();
-		if( $field_IDs )
-		{
-			$social_fields = $DB->get_results('
-					SELECT ufdf_ID, ufdf_icon_name, ufdf_code
-					FROM T_users__fielddefs
-					WHERE ufdf_ID IN ('.implode(',', $field_IDs ).')' );
-
-			foreach( $social_fields AS $field )
-			{
-				$r[$field->ufdf_ID] = $field;
-			}
+		if( empty( $field_codes ) )
+		{	// No selected fields:
+			return array();
 		}
 
-		return $r;
+		$SQL = new SQL( 'Widget "Free Social Links" #'.$this->ID.': Get selected social user fields' );
+		$SQL->SELECT( 'ufdf_code, ufdf_icon_name' );
+		$SQL->FROM( 'T_users__fielddefs' );
+		$SQL->WHERE( 'ufdf_code IN ('.$DB->quote( $field_codes ).')' );
+
+		return $DB->get_assoc( $SQL );
 	}
 
 	/**
-	 * Maybe be overriden by some widgets, depending on what THEY depend on..
+	 * Maybe be overridden by some widgets, depending on what THEY depend on..
 	 *
 	 * @return array of keys this widget depends on
 	 */

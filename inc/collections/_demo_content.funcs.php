@@ -718,24 +718,24 @@ function create_user( $params = array() )
 	{	// Additional user fields
 		global $DB;
 		$fields_SQL = new SQL();
-		$fields_SQL->SELECT( 'ufdf_ID, ufdf_name' );
+		$fields_SQL->SELECT( 'ufdf_ID, ufdf_code' );
 		$fields_SQL->FROM( 'T_users__fielddefs' );
-		$fields_SQL->WHERE( 'ufdf_name IN ( '.$DB->quote( array_keys( $params['fields'] ) ).' )' );
+		$fields_SQL->WHERE( 'ufdf_code IN ( '.$DB->quote( array_keys( $params['fields'] ) ).' )' );
 		$fields = $DB->get_assoc( $fields_SQL->get() );
 		$user_field_records = array();
-		foreach( $fields as $field_ID => $field_name )
+		foreach( $fields as $field_ID => $field_code )
 		{
-			if( ! isset( $params['fields'][ $field_name ] ) )
-			{	// Skip wrong field
+			if( ! isset( $params['fields'][ $field_code ] ) )
+			{	// Skip wrong field:
 				continue;
 			}
 
-			if( is_string( $params['fields'][ $field_name ] ) )
+			if( is_string( $params['fields'][ $field_code ] ) )
 			{
-				$params['fields'][ $field_name ] = array( $params['fields'][ $field_name ] );
+				$params['fields'][ $field_code ] = array( $params['fields'][ $field_code ] );
 			}
 
-			foreach( $params['fields'][ $field_name ] as $field_value )
+			foreach( $params['fields'][ $field_code ] as $field_value )
 			{	// SQL record for each field value
 				$user_field_records[] = '( '.$User->ID.', '.$field_ID.', '.$DB->quote( $field_value ).' )';
 			}
@@ -878,13 +878,12 @@ function get_demo_users_defaults()
 				'org_roles' => array( 'King of Spades' ),
 				'org_priorities' => array( 0 ),
 				'fields'    => array(
-						'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
-						'Website'     => 'http://b2evolution.net/',
-						'Twitter'     => 'https://twitter.com/b2evolution/',
-						'Facebook'    => 'https://www.facebook.com/b2evolution',
-						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+						'microbio' => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
+						'website'  => 'http://b2evolution.net/',
+						'twitter'  => 'https://twitter.com/b2evolution/',
+						'facebook' => 'https://www.facebook.com/b2evolution',
+						'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+						'github'   => 'https://github.com/b2evolution/b2evolution',
 					)
 			),
 		'mary' => array(
@@ -897,13 +896,12 @@ function get_demo_users_defaults()
 				'org_IDs'   => '#',
 				'org_roles' => array( 'Queen of Hearts' ),
 				'fields'    => array(
-						'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I love it when things are neat!',
-						'Website'     => 'http://b2evolution.net/',
-						'Twitter'     => 'https://twitter.com/b2evolution/',
-						'Facebook'    => 'https://www.facebook.com/b2evolution',
-						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+						'microbio' => 'I am a demo moderator for this site.'."\n".'I love it when things are neat!',
+						'website'  => 'http://b2evolution.net/',
+						'twitter'  => 'https://twitter.com/b2evolution/',
+						'facebook' => 'https://www.facebook.com/b2evolution',
+						'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+						'github'   => 'https://github.com/b2evolution/b2evolution',
 					),
 			),
 		'jay' => array(
@@ -916,13 +914,12 @@ function get_demo_users_defaults()
 				'org_IDs'   => '#',
 				'org_roles' => array( 'The Artist' ),
 				'fields'    => array(
-						'Micro bio'   => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
-						'Website'     => 'http://b2evolution.net/',
-						'Twitter'     => 'https://twitter.com/b2evolution/',
-						'Facebook'    => 'https://www.facebook.com/b2evolution',
-						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+						'microbio' => 'I am a demo moderator for this site.'."\n".'I like to keep things clean!',
+						'website'  => 'http://b2evolution.net/',
+						'twitter'  => 'https://twitter.com/b2evolution/',
+						'facebook' => 'https://www.facebook.com/b2evolution',
+						'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+						'github'   => 'https://github.com/b2evolution/b2evolution',
 					),
 			),
 		'dave' => array(
@@ -935,13 +932,12 @@ function get_demo_users_defaults()
 				'org_IDs'   => '#',
 				'org_roles' => array( 'The Writer' ),
 				'fields'    => array(
-						'Micro bio'   => 'I\'m a demo author.'."\n".'I like to write!',
-						'Website'     => 'http://b2evolution.net/',
-						'Twitter'     => 'https://twitter.com/b2evolution/',
-						'Facebook'    => 'https://www.facebook.com/b2evolution',
-						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+						'microbio' => 'I\'m a demo author.'."\n".'I like to write!',
+						'website'  => 'http://b2evolution.net/',
+						'twitter'  => 'https://twitter.com/b2evolution/',
+						'facebook' => 'https://www.facebook.com/b2evolution',
+						'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+						'github'   => 'https://github.com/b2evolution/b2evolution',
 					),
 			),
 		'paul' => array(
@@ -954,13 +950,12 @@ function get_demo_users_defaults()
 				'org_IDs'   => '#',
 				'org_roles' => array( 'The Thinker' ),
 				'fields'    => array(
-						'Micro bio'   => 'I\'m a demo author.'."\n".'I like to think before I write ;)',
-						'Website'     => 'http://b2evolution.net/',
-						'Twitter'     => 'https://twitter.com/b2evolution/',
-						'Facebook'    => 'https://www.facebook.com/b2evolution',
-						'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-						'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-						'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+						'microbio' => 'I\'m a demo author.'."\n".'I like to think before I write ;)',
+						'website'  => 'http://b2evolution.net/',
+						'twitter'  => 'https://twitter.com/b2evolution/',
+						'facebook' => 'https://www.facebook.com/b2evolution',
+						'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+						'github'   => 'https://github.com/b2evolution/b2evolution',
 					),
 			),
 		'larry' => array(
@@ -971,7 +966,7 @@ function get_demo_users_defaults()
 				'gender'    => 'M',
 				'group'     => 'Normal Users',
 				'fields'    => array(
-						'Micro bio' => 'Hi there!',
+						'microbio' => 'Hi there!',
 					),
 			),
 		'kate' => array(
@@ -982,7 +977,7 @@ function get_demo_users_defaults()
 				'gender'    => 'F',
 				'group'     => 'Normal Users',
 				'fields'    => array(
-						'Micro bio' => 'Just me!',
+						'microbio' => 'Just me!',
 					),
 			),
 		);

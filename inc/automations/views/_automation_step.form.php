@@ -463,6 +463,21 @@ jQuery( document ).ready( function()
 			}
 		},
 		{
+			id: 'days_before_birthday',
+			label: '<?php echo TS_('Days before birthday'); ?>',
+			type: 'integer',
+			operators: operators_default,
+			input: 'select',
+			values: {
+			<?php
+				for( $i = 0; $i <= 365; $i++ )
+				{
+					echo $i.': \''.format_to_js( $i ).'\', ';
+				}
+			?>
+			}
+		},
+		{
 			id: 'listsend_last_sent_to_user',
 			label: '<?php echo TS_('Last sent list to user' ); ?>',
 			operators: operators_listsend,

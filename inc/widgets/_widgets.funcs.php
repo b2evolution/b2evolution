@@ -163,16 +163,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Page Top */
 	$default_widgets['page_top'] = array(
 		array( 10, 15000, 'social_links', 'params' => array(
-				'link1'      => 16,
+				'link1'      => 'twitter',
 				'link1_href' => 'https://twitter.com/b2evolution/',
-				'link2'      => 17,
+				'link2'      => 'facebook',
 				'link2_href' => 'https://www.facebook.com/b2evolution',
-				'link3'      => 18,
-				'link3_href' => 'https://plus.google.com/+b2evolution/posts',
-				'link4'      => 19,
-				'link4_href' => 'https://www.linkedin.com/company/b2evolution-net',
-				'link5'      => 20,
-				'link5_href' => 'https://github.com/b2evolution/b2evolution',
+				'link3'      => 'linkedin',
+				'link3_href' => 'https://www.linkedin.com/company/b2evolution-net',
+				'link4'      => 'github',
+				'link4_href' => 'https://github.com/b2evolution/b2evolution',
 			) ),
 		array( 20, 15450, 'coll_locale_switch' ),
 	);
@@ -269,16 +267,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'disp_title' => 0,
 			) : NULL ) ),
 		array( 15, 15000, 'social_links', 'coll_type' => 'main', 'params' => array(
-				'link1'      => 16,
+				'link1'      => 'twitter',
 				'link1_href' => 'https://twitter.com/b2evolution/',
-				'link2'      => 17,
+				'link2'      => 'facebook',
 				'link2_href' => 'https://www.facebook.com/b2evolution',
-				'link3'      => 18,
-				'link3_href' => 'https://plus.google.com/+b2evolution/posts',
-				'link4'      => 19,
-				'link4_href' => 'https://www.linkedin.com/company/b2evolution-net',
-				'link5'      => 20,
-				'link5_href' => 'https://github.com/b2evolution/b2evolution',
+				'link3'      => 'linkedin',
+				'link3_href' => 'https://www.linkedin.com/company/b2evolution-net',
+				'link4'      => 'github',
+				'link4_href' => 'https://github.com/b2evolution/b2evolution',
 			) ),
 		array( 20, 15000, 'coll_featured_posts', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
 				'blog_ID'    => '*', // Display Items from all Collections
