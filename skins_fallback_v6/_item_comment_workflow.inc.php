@@ -43,22 +43,30 @@ if( isset( $Comment->item_workflow ) && is_array( $Comment->item_workflow ) )
 $Form->switch_layout( 'linespan' );
 
 $Form->switch_template_parts( array(
-		'fieldstart' => '<div class="form-group text-center" $ID$>',
-		'inputstart' => '<div class="controls" style="display: inline-block">',
+		'fieldstart' => '<div class="form-group comment-workflow-form" $ID$>',
 	) );
 
-$Form->begin_line( T_('Workflow'), NULL, '', array( 'style' => 'color:red' ) );
+$Form->begin_line( T_('Workflow') );
 
 	$form_params = array(
-			'hide_label' => true,
+			'hide_label'  => true,
 		);
-
 	$Item->display_workflow_field( 'status', $Form, $form_params );
 
+	$form_params = array(
+			'hide_label'  => true,
+			'placeholder' => 'Assignee',
+		);
 	$Item->display_workflow_field( 'user', $Form, $form_params );
 
+	$form_params = array(
+		'hide_label'  => true,
+	);
 	$Item->display_workflow_field( 'priority', $Form, $form_params );
 
+	$form_params = array(
+		'hide_label'  => true,
+	);
 	$Item->display_workflow_field( 'deadline', $Form, $form_params );
 	
 $Form->end_line();
