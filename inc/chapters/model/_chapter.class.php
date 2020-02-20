@@ -1050,19 +1050,23 @@ class Chapter extends DataObject
 				                         	// ( $tag_size = '160x320' ) => width="160" height="320"
 				                         	// NULL - use size defined by the thumbnail
 				                         	// 'none' - don't use attributes "width" & "height"
+				'placeholder'   => '',		// HTML to be displayed if no image; possible codes: #folder_icon
 			), $params );
 
 		// Try to get a file by ID:
 		$FileCache = & get_FileCache();
 		$cat_image_File = & $FileCache->get_by_ID( $this->get( 'image_file_ID' ), false, false );
-		if( ! $cat_image_File )
-		{	// This chapter has no image file or it is broken:
-			return '';
-		}
-
-		if( ! $cat_image_File->is_image() )
-		{	// The file must be an image:
-			return '';
+		if( ! $cat_image_File // This chapter has no image file or it is broken
+			|| ! $cat_image_File->is_image() ) // The file is NOT an image
+		{	// Display placeholder:
+			$placeholder_html = $params['placeholder'];
+			switch( $placeholder_html )
+			{
+				case '#folder_icon';
+					$placeholder_html = '<div class="evo_content_tile_image_placeholder"><a href="$url$"><i class="fa fa-folder-o"></i></a></div>';
+					break;
+			}
+			return str_replace( '$url$', $this->get_permanent_url(), $placeholder_html );
 		}
 
 		if( $params['link_to'] == '#category_url' )

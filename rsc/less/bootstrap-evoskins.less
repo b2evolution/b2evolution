@@ -1560,10 +1560,24 @@ span[id^=title_folding_] {
 		text-shadow: 0px 0px 2px #000;
 		overflow: hidden;
 	}
-	.evo_content_tile_image {
-		padding: 0;
-		div {
+	.evo_content_tile_image { // TODO: fp> why do we have this again!!?? same as above
+		padding: 0;	
+		div {	// TODO: fp> add comment: What was this created for?
 			height: 100%;
+		}
+		div.evo_content_tile_image_placeholder {
+			height: 100%;	// keep or remove depending on the above div
+			width: 100%;
+			display: table;
+			a { // placeholder icon link
+				display: table-cell;
+				text-align: center; 
+				vertical-align: middle;
+				font-size: 180px;
+				color:#ddd;		
+				// temporary:
+				text-shadow: none;
+			}
 		}
 		a {
 			height: 100%;
