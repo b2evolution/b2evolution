@@ -5186,12 +5186,12 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get URL of a first found image by positions
+	 * Get File of a first found image by positions
 	 *
 	 * @param array Parameters
-	 * @return string|NULL cover URL or NULL if it doesn't exist
+	 * @return object|NULL File
 	 */
-	function get_image_url( $params = array() )
+	function & get_image_File( $params = array() )
 	{
 		$params = array_merge( array(
 				'position' => '#cover_and_teaser_all',
@@ -5213,30 +5213,51 @@ class Item extends ItemLight
 		if( ! ( $LinkList = $LinkOwner->get_attachment_LinkList( 1, $params['position'] ) ) ||
 		    ! ( $Link = & $LinkList->get_next() ) )
 		{	// No image
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 
 		if( ! ( $File = & $Link->get_File() ) )
 		{	// No File object
 			global $Debuglog;
 			$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 
 		if( ! $File->exists() )
 		{	// File doesn't exist
 			global $Debuglog;
 			$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 
 		if( ! $File->is_image() )
 		{	// Skip anything that is not an image
+			$r = NULL;
+			return $r;
+		}
+
+		return $File;
+	}
+
+
+	/**
+	 * Get URL of a first found image by positions
+	 *
+	 * @param array Parameters
+	 * @return string|NULL Image URL or NULL if it doesn't exist
+	 */
+	function get_image_url( $params = array() )
+	{
+		if( ! ( $image_File = & $this->get_image_File( $params ) ) )
+		{	// Wrong image file:
 			return NULL;
 		}
 
 		// Get image URL for requested size:
-		$img_attribs = $File->get_img_attribs( $params['size'] );
+		$img_attribs = $image_File->get_img_attribs( $params['size'] );
 
 		return $img_attribs['src'];
 	}
@@ -5253,6 +5274,29 @@ class Item extends ItemLight
 	function get_cover_image_url( $position = 'cover' )
 	{
 		return $this->get_image_url( array( 'position' => $position ) );
+	}
+
+
+	/**
+	 * Get CSS property for background with image of this Item
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_background_image_css( $params = array() )
+	{
+		$params = array_merge( array(
+				'position' => '#cover_and_teaser_all',
+				'size'     => 'fit-1280x720',
+				'size_2x'  => 'fit-2560x1440',
+			), $params );
+
+		if( ! ( $image_File = & $this->get_image_File( $params ) ) )
+		{	// Don't provide css for wrong image file:
+			return '';
+		}
+
+		return $image_File->get_background_image_css( $params );
 	}
 
 

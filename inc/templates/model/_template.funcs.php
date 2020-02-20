@@ -195,6 +195,10 @@ function render_template_callback( $var, $params, $objects = array() )
 	switch( $var )
 	{
 		// Chapter / Category:
+		case 'Cat:backround_image_css':
+			echo $rendered_Chapter->get_background_image_css( $params );
+			break;
+
 		case 'Cat:description':
 			echo $rendered_Chapter->dget( 'description' );
 			break;
@@ -456,6 +460,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Item->author( array_merge( array(
 					'link_text' => 'auto',		// select login or nice name automatically
 				), $params ) );
+			break;
+		
+		case 'Item:backround_image_css':
+			echo $rendered_Item->get_background_image_css( $params );
 			break;
 
 		case 'Item:cat_name':

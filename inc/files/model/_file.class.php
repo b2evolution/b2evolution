@@ -3600,6 +3600,38 @@ class File extends DataObject
 	{
 		return $this->download_count;
 	}
+
+
+	/**
+	 * Get CSS property for background with image of this File
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_background_image_css( $params = array() )
+	{
+		$params = array_merge( array(
+				'size'    => 'fit-1280x720',
+				'size_2x' => 'fit-2560x1440',
+			), $params );
+
+		// Get image URL for 1x size:
+		$img_attribs_1x = $this->get_img_attribs( $params['size'] );
+
+		$styles = array( 'background-image:url( '.$img_attribs_1x['src'].' )' );
+
+		if( $params['size'] != $params['size_2x'] )
+		{	// Set image-set backgrounds only when 1x and 2x size are different:
+			// Get image URL for 2x size:
+			$img_attribs_2x = $this->get_img_attribs( $params['size_2x'] );
+			$styles[] = 'background-image: -webkit-image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
+			$styles[] = 'background-image: -moz-image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
+			$styles[] = 'background-image: -o-image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
+			$styles[] = 'background-image: -ms-image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
+		}
+
+		return implode( ';', $styles );
+	}
 }
 
 ?>

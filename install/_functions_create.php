@@ -1734,7 +1734,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
 [Cat:permalink|text=]
 <div>
-	<div class="evo_content_tile_cover" style="background-image:url([Cat:image_url])"></div>
+	<div class="evo_content_tile_cover" style="[Cat:backround_image_css]"></div>
 	<div class="evo_content_tile_text">
 		<h3>[Cat:name]</h3>
 		<div>[Cat:description]</div>
@@ -1747,7 +1747,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
 [Item:permalink|text=]
 <div>
-	<div class="evo_content_tile_cover" style="background-image:url([Item:image_url])">[Item:cat_name]</div>
+	<div class="evo_content_tile_cover" style="[Item:backround_image_css]">[Item:cat_name]</div>
 	<div class="evo_content_tile_text">
 		<h3>[Item:title]</h3>
 		<div>[Item:excerpt|excerpt_more_text=]</div>

@@ -976,12 +976,12 @@ class Chapter extends DataObject
 
 
 	/**
-	 * Get URL of category's image
+	 * Get File of a first found image by positions
 	 *
 	 * @param array Parameters
-	 * @return string|NULL cover URL or NULL if it doesn't exist
+	 * @return object|NULL File
 	 */
-	function get_image_url( $params = array() )
+	function & get_image_File( $params = array() )
 	{
 		$params = array_merge( array(
 				'size' => 'original',
@@ -991,18 +991,38 @@ class Chapter extends DataObject
 		$FileCache = & get_FileCache();
 		if( ! ( $cat_image_File = & $FileCache->get_by_ID( $this->get( 'image_file_ID' ), false, false ) ) )
 		{	// This chapter has no image file or it is broken:
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 
 		if( ! $cat_image_File->is_image() )
 		{	// The file must be an image:
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 
 		// Get image URL for requested size:
 		$img_attribs = $cat_image_File->get_img_attribs( $params['size'] );
 
-		return $img_attribs['src'];
+		return $cat_image_File;
+	}
+
+
+	/**
+	 * Get URL of a first found image by positions
+	 *
+	 * @param array Parameters
+	 * @return string|NULL Image URL or NULL if it doesn't exist
+	 */
+	function get_image_url( $params = array() )
+	{
+		if( ! ( $image_File = & $this->get_image_File( $params ) ) )
+		{	// Wrong image file:
+			return NULL;
+		}
+
+		// Get image URL for requested size:
+		$img_attribs = $image_File->get_img_attribs( $params['size'] );
 	}
 
 
@@ -1063,6 +1083,29 @@ class Chapter extends DataObject
 				'',
 				$params['size_x'],
 				$params['tag_size'] );
+	}
+
+
+	/**
+	 * Get CSS property for background with image of this Item
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_background_image_css( $params = array() )
+	{
+		$params = array_merge( array(
+				'position' => '#cover_and_teaser_all',
+				'size'     => 'fit-1280x720',
+				'size_2x'  => 'fit-2560x1440',
+			), $params );
+
+		if( ! ( $image_File = & $this->get_image_File( $params ) ) )
+		{	// Don't provide css for wrong image file:
+			return '';
+		}
+
+		return $image_File->get_background_image_css( $params );
 	}
 
 
