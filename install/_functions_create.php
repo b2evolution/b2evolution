@@ -1724,7 +1724,7 @@ function create_default_templates( $is_task = true )
 		// Tiles style (bg-image style):
 		'content_tiles_bgimg' => array(
 			'name'     => 'Content Tiles (bg-image style)',
-			'template' => '[set:before_list=<div class="evo_content_tiles evo_content_tiles__shadow row">]
+			'template' => '[set:before_list=<div class="evo_content_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_bgimg_subcat]
 [set:item_template=content_tiles_bgimg_item]',
@@ -1759,7 +1759,7 @@ function create_default_templates( $is_task = true )
 		// Tiles style (shadow style):
 		'content_tiles_shadow' => array(
 			'name'     => 'Content Tiles (shadow style)',
-			'template' => '[set:before_list=<div class="evo_content_tiles row">]
+			'template' => '[set:before_list=<div class="evo_content_tiles evo_content_tiles__shadow row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_shadow_subcat]
 [set:item_template=content_tiles_shadow_item]',

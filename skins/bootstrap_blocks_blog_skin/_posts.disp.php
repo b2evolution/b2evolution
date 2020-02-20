@@ -45,7 +45,7 @@ widget_container( 'item_list', array(
 // Display message if no post:
 display_if_empty();
 
-echo '<div class="row evo_content_tiles">';
+echo '<div class="row evo_content_tiles evo_content_tiles__shadow">';
 while( $Item = & mainlist_get_item() )
 { // For each blog post, do everything below up to the closing curly brace "}"
 	echo '<div class="'.$Skin->get_setting( 'posts_list_block_class' ).'">';

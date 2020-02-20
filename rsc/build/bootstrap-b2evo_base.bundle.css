@@ -5669,7 +5669,6 @@ span[id^=title_folding_] {
 .evo_content_tiles .evo_content_tile {
   height: 400px;
   border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   position: relative;
   padding-bottom: 10px;
@@ -5697,6 +5696,9 @@ span[id^=title_folding_] {
 }
 .evo_content_tiles .evo_content_tile_image {
   padding: 0;
+}
+.evo_content_tiles .evo_content_tile_image img {
+  min-height: 100%;
 }
 .evo_content_tiles .evo_content_tile_text {
   padding-left: 10px;
