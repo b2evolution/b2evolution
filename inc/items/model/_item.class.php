@@ -5024,10 +5024,11 @@ class Item extends ItemLight
 				'gallery_colls'              => 5,
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
 				'gallery_link_rel'           => 'lightbox[p'.$this->ID.']',
-				// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
-				// '#teaser_all' => 'teaser,teaserperm,teaserlink',
-				// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
 				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore',
+																// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
+																// '#teaser_all' => 'teaser,teaserperm,teaserlink',
+																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
+				'placeholder'   => '',		// HTML to be displayed if no image; possible codes: #folder_icon
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
 				'links_sql_select'           => '',
@@ -5062,8 +5063,16 @@ class Item extends ItemLight
 
 		$LinkOwner = new LinkItem( $this, $tmp_object_ID );
 		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000, $params['restrict_to_image_position'], NULL, $links_params ) )
-		{
-			return '';
+		{	// No images macth requested positions:
+			// Display placeholder:
+			$placeholder_html = $params['placeholder'];
+			switch( $placeholder_html )
+			{
+				case '#file_text_icon';
+					$placeholder_html = '<div class="evo_content_tile_image_placeholder"><a href="$url$"><i class="fa fa-file-text-o"></i></a></div>';
+					break;
+			}
+			return str_replace( '$url$', $this->get_permanent_url(), $placeholder_html );
 		}
 
 		$galleries = array();
@@ -5106,7 +5115,7 @@ class Item extends ItemLight
 			$params['Item'] = $this;
 
 			if( $File->is_dir() && $params['gallery_image_limit'] > 0 )
-			{ // This is a directory/gallery
+			{ // This is a directory/gallery:
 				if( ( $gallery = $File->get_gallery( $params ) ) != '' )
 				{ // Got gallery code
 					$galleries[] = $gallery;
