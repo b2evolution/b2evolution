@@ -1550,7 +1550,8 @@ span[id^=title_folding_] {
 			height: 100%;
 		}
 	}
-	.evo_content_tile_cover {
+	.evo_content_tile_cover,
+	.evo_content_tile_image {
 		height: 270px;
 		background-color: #EEE;
 		background-size: cover;
@@ -1558,6 +1559,10 @@ span[id^=title_folding_] {
 		padding: 10px;
 		color: #FFF;
 		text-shadow: 0px 0px 2px #000;
+		overflow: hidden;
+	}
+	.evo_content_tile_image {
+		padding: 0;
 	}
 	.evo_content_tile_text {
 		padding-left: 10px;
@@ -1566,6 +1571,11 @@ span[id^=title_folding_] {
 			font-size: 20px;
 			padding-top: 10px;
 			margin-top: 0;
+		}
+	}
+	&.evo_content_tiles__shadow {
+		.evo_content_tile {
+			box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 		}
 	}
 }
