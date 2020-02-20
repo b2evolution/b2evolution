@@ -1782,7 +1782,7 @@ function create_default_templates( $is_task = true )
 			'name'     => 'Content Tiles Style 2 (RWD): Item',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
 	<div class="widget_rwd_content clearfix">
-		<div class="item_first_image">[Item:images|restrict_to_image_position=#teaser_all|image_size=crop-512x512|image_link_to=single]</div>
+		<div class="item_first_image">[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=crop-512x512|image_link_to=single]</div>
 		<h3 class="item_title">[Item:permalink|text=#title]</h3>
 		<div class="item_content">[Item:excerpt]</div>
 	</div>
@@ -1816,7 +1816,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
 	<div class="evo_content_tile">
 		<div class=“hide_overflow”>
-			<div class="evo_content_tile_image">[Item:images|restrict_to_image_position=#teaser_all|image_size=crop-512x512|image_link_to=single]</div>
+			<div class="evo_content_tile_image">[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=crop-512x512|image_link_to=single]</div>
 			<div class="evo_content_tile_text">
 				<h3>[Item:permalink|text=#title]</h3>
 				<div>[Item:excerpt]</div>
