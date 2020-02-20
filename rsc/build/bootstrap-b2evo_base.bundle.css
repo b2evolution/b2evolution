@@ -5705,8 +5705,8 @@ span[id^=title_folding_] {
   display: block;
 }
 .evo_content_tiles .evo_content_tile_image img {
-  min-width: 100%;
-  min-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 .evo_content_tiles .evo_content_tile_text {
