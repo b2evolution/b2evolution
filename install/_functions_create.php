@@ -1731,32 +1731,36 @@ function create_default_templates( $is_task = true )
 		),
 		'content_tiles_subcat' => array(
 			'name'     => 'Content Tiles Style 1 (bg-image): Subcat',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
-[Cat:permalink|text=]
-<div>
-	<div class="evo_content_tile_cover" style="[Cat:background_image_css|size=crop-512x512|size_2x=crop-1024x1024]"></div>
-	<div class="evo_content_tile_text">
-		<h3>[Cat:name]</h3>
-		<div>[Cat:description]</div>
+			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+	<div class="evo_content_tile">
+		[Cat:permalink|text=]
+		<div>
+			<div class="evo_content_tile_cover" style="[Cat:background_image_css|size=crop-512x512|size_2x=crop-1024x1024]"></div>
+			<div class="evo_content_tile_text">
+				<h3>[Cat:name]</h3>
+				<div>[Cat:description]</div>
+			</div>
+		</div>
 	</div>
-</div>
-</div></div>',
+</div>',
 		),
 		'content_tiles_item' => array(
 			'name'     => 'Content Tiles Style 1 (bg-image): Item',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
-[Item:permalink|text=]
-<div>
-	<div class="evo_content_tile_cover" style="[Item:background_image_css|size=crop-512x512|size_2x=crop-1024x1024]">[Item:cat_name]</div>
-	<div class="evo_content_tile_text">
-		<h3>[Item:title]</h3>
-		<div>[Item:excerpt|excerpt_more_text=]</div>
+			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+	<div class="evo_content_tile">
+		[Item:permalink|text=]
+		<div class=“hide_overflow”>
+			<div class="evo_content_tile_cover" style="[Item:background_image_css|size=crop-512x512|size_2x=crop-1024x1024]">[Item:cat_name]</div>
+			<div class="evo_content_tile_text">
+				<h3>[Item:title]</h3>
+				<div>[Item:excerpt|excerpt_more_text=]</div>
+			</div>
+		</div>
 	</div>
-</div>
-</div></div>',
+</div>',
 		),
 
-		// Tiles style 2: existing b2evo RWD
+		// Tiles style 2: existing b2evo RWD styles
 		'content_tiles_2' => array(
 			'name'     => 'Content Tiles Style 2 (RWD)',
 			'template' => '[set:before_list=<div class="widget_rwd_blocks row">]
@@ -1768,7 +1772,7 @@ function create_default_templates( $is_task = true )
 			'name'     => 'Content Tiles Style 2 (RWD): Subcat',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
 	<div class="widget_rwd_content clearfix">
-		<div class="item_first_image">[Cat:image|size=crop-512x512]</div>
+		<div class="item_first_image">[Cat:image|size=crop-512x512|link_to=#category_url]</div>
 		<h3 class="item_title">[Cat:permalink]</h3>
 		<div class="item_content">[Cat:description]</div>
 	</div>
@@ -1778,7 +1782,7 @@ function create_default_templates( $is_task = true )
 			'name'     => 'Content Tiles Style 2 (RWD): Item',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
 	<div class="widget_rwd_content clearfix">
-		<div class="item_first_image">[Item:images|image_size=crop-512x512|restrict_to_image_position=#teaser_all]</div>
+		<div class="item_first_image">[Item:images|restrict_to_image_position=#teaser_all|image_size=crop-512x512|image_link_to=single]</div>
 		<h3 class="item_title">[Item:permalink|text=#title]</h3>
 		<div class="item_content">[Item:excerpt]</div>
 	</div>
@@ -1795,27 +1799,31 @@ function create_default_templates( $is_task = true )
 		),
 		'content_tiles_3_subcat' => array(
 			'name'     => 'Content Tiles Style 3 (img cover): Subcat',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
-<div>
-	<div class="evo_content_tile_image">[Cat:image|size=crop-512x512]</div>
-	<div class="evo_content_tile_text">
-		<h3>[Cat:permalink]</h3>
-		<div>[Cat:description]</div>
+			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+	<div class="evo_content_tile">
+		<div class=“hide_overflow”>
+			<div class="evo_content_tile_image">[Cat:image|size=crop-512x512|link_to=#category_url]</div>
+			<div class="evo_content_tile_text">
+				<h3>[Cat:permalink]</h3>
+				<div>[Cat:description]</div>
+			</div>
+		</div>
 	</div>
-</div>
-</div></div>',
+</div>',
 		),
 		'content_tiles_3_item' => array(
 			'name'     => 'Content Tiles Style 3 (img cover): Item',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
-<div>
-	<div class="evo_content_tile_image">[Item:images|image_size=crop-512x512|restrict_to_image_position=#teaser_all]</div>
-	<div class="evo_content_tile_text">
-		<h3>[Item:permalink|text=#title]</h3>
-		<div>[Item:excerpt]</div>
+			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+	<div class="evo_content_tile">
+		<div class=“hide_overflow”>
+			<div class="evo_content_tile_image">[Item:images|restrict_to_image_position=#teaser_all|image_size=crop-512x512|image_link_to=single]</div>
+			<div class="evo_content_tile_text">
+				<h3>[Item:permalink|text=#title]</h3>
+				<div>[Item:excerpt]</div>
+			</div>
+		</div>
 	</div>
-</div>
-</div></div>',
+</div>',
 		),
 
 

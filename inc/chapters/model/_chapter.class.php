@@ -1031,25 +1031,25 @@ class Chapter extends DataObject
 	function get_image_tag( $params = array() )
 	{
 		$params = array_merge( array(
-				'before'        => '', // HTML code before image tag
-				'before_legend' => '', // HTML code before image legeng(info under image tag image desc is not empty)
-				'after_legend'  => '', // HTML code after image legeng
-				'after'         => '', // HTML code after image tag
+				'before'        => '',		// HTML code before image tag
+				'before_legend' => '',		// HTML code before image legeng(info under image tag image desc is not empty)
+				'after_legend'  => '',		// HTML code after image legeng
+				'after'         => '',		// HTML code after image tag
 				'size'          => 'crop-48x48', // Image thumbnail size
-				'sizes'         => NULL, // simplified sizes= attribute for browser to select correct size from srcset=. Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
-				'link_to'       => '', // Url for a link, Use 'original' for full image file url, Empty value to don't make a link
+				'sizes'         => NULL,	// simplified sizes= attribute for browser to select correct size from srcset=. Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
+				'link_to'       => '',		// URL for a link ; '#category_url' for category URL ; 'original' for full image file url ; Empty for no link
 				'link_title'    => $this->get( 'description' ), // Title of the link, can be text or #title# or #desc#
-				'link_rel'      => '', // Value for attribute "rel", usefull for jQuery libraries selecting on rel='...', e-g: 'lightbox[cat'.$this->ID.']'
-				'class'         => '', // Image class
-				'align'         => '', // Image align
+				'link_rel'      => '',		// Value for attribute "rel", usefull for jQuery libraries selecting on rel='...', e-g: 'lightbox[cat'.$this->ID.']'
+				'class'         => '',		// Image class
+				'align'         => '',		// Image align
 				'alt'           => $this->get( 'name' ), // Image alt
-				'desc'          => '#', // Image description, used in legeng under image tag, '#' - use current description of the file
-				'size_x'        => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
-				'tag_size'      => NULL, // Override "width" & "height" attributes on img tag. Allows to increase pixel density for retina/HDPI screens.
-				                         // Example: ( $tag_size = '160' ) => width="160" height="160"
-				                         // ( $tag_size = '160x320' ) => width="160" height="320"
-				                         // NULL - use size defined by the thumbnail
-				                         // 'none' - don't use attributes "width" & "height"
+				'desc'          => '#',		// Image description, used in legeng under image tag, '#' - use current description of the file
+				'size_x'        => 1,		// Use '2' to build 2x sized thumbnail that can be used for Retina display
+				'tag_size'      => NULL,	// Override "width" & "height" attributes on img tag. Allows to increase pixel density for retina/HDPI screens.
+				                         	// Example: ( $tag_size = '160' ) => width="160" height="160"
+				                         	// ( $tag_size = '160x320' ) => width="160" height="320"
+				                         	// NULL - use size defined by the thumbnail
+				                         	// 'none' - don't use attributes "width" & "height"
 			), $params );
 
 		// Try to get a file by ID:
@@ -1063,6 +1063,11 @@ class Chapter extends DataObject
 		if( ! $cat_image_File->is_image() )
 		{	// The file must be an image:
 			return '';
+		}
+
+		if( $params['link_to'] == '#category_url' )
+		{	// We want to link to the category URL:
+			$params['link_to'] = $this->get_permanent_url();
 		}
 
 		return $cat_image_File->get_tag( $params['before'],

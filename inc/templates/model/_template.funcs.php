@@ -206,6 +206,7 @@ function render_template_callback( $var, $params, $objects = array() )
 		case 'Cat:image':
 			echo $rendered_Chapter->get_image_tag( array_merge( array(
 					'size'       => 'crop-256x256',
+					'link_to'    => '#category_url',
 				), $params ) );
 			break;
 
