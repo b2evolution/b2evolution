@@ -49,7 +49,7 @@ echo '<div class="row evo_content_tiles evo_content_tiles__shadow">';
 while( $Item = & mainlist_get_item() )
 { // For each blog post, do everything below up to the closing curly brace "}"
 	echo '<div class="'.$Skin->get_setting( 'posts_list_block_class' ).'">';
-	echo '<div class="evo_content_tile">';
+	echo '<div class="evo_content_tile evo_content_tile__shadow">';
 	echo '<a href="'.$Item->get_permanent_url().'"></a>';
 	echo '<div>';
 	$item_cover_image_url = $Item->get_cover_image_url( 'cover,teaser' );
