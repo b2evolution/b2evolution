@@ -5251,6 +5251,11 @@ class Item extends ItemLight
 	 */
 	function get_image_url( $params = array() )
 	{
+		$params = array_merge( array(
+				'position' => '#cover_and_teaser_all',
+				'size'     => 'original',
+			), $params );
+
 		if( ! ( $image_File = & $this->get_image_File( $params ) ) )
 		{	// Wrong image file:
 			return NULL;

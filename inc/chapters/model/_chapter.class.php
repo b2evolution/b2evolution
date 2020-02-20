@@ -1008,6 +1008,10 @@ class Chapter extends DataObject
 	 */
 	function get_image_url( $params = array() )
 	{
+		$params = array_merge( array(
+				'size' => 'original',
+			), $params );
+
 		if( ! ( $image_File = & $this->get_image_File() ) )
 		{	// Wrong image file:
 			return NULL;
