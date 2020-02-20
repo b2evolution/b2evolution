@@ -3768,6 +3768,13 @@ span[id^=title_folding_] {
 .evo_content_tiles .evo_content_tile_image {
   padding: 0;
 }
+.evo_content_tiles .evo_content_tile_image div {
+  height: 100%;
+}
+.evo_content_tiles .evo_content_tile_image a {
+  height: 100%;
+  display: block;
+}
 .evo_content_tiles .evo_content_tile_image img {
   min-width: 100%;
   min-height: 100%;
