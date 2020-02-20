@@ -1724,7 +1724,7 @@ function create_default_templates( $is_task = true )
 		// Tiles style 1: (bg-image style):
 		'content_tiles' => array(
 			'name'     => 'Content Tiles Style 1 (bg-image)',
-			'template' => '[set:before_list=<div class="evo_content_tiles evo_content_tiles__shadow row">]
+			'template' => '[set:before_list=<div class="evo_content_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_subcat]
 [set:item_template=content_tiles_item]',
@@ -1732,7 +1732,7 @@ function create_default_templates( $is_task = true )
 		'content_tiles_subcat' => array(
 			'name'     => 'Content Tiles Style 1 (bg-image): Subcat',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
-	<div class="evo_content_tile">
+	<div class="evo_content_tile evo_content_tile__shadow">
 		[Cat:permalink|text=]
 		<div>
 			<div class="evo_content_tile_cover" style="[Cat:background_image_css|size=crop-512x512|size_2x=crop-1024x1024]"></div>
@@ -1747,7 +1747,7 @@ function create_default_templates( $is_task = true )
 		'content_tiles_item' => array(
 			'name'     => 'Content Tiles Style 1 (bg-image): Item',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
-	<div class="evo_content_tile">
+	<div class="evo_content_tile evo_content_tile__shadow">
 		[Item:permalink|text=]
 		<div class=“hide_overflow”>
 			<div class="evo_content_tile_cover" style="[Item:background_image_css|size=crop-512x512|size_2x=crop-1024x1024]">[Item:cat_name]</div>
@@ -1792,7 +1792,7 @@ function create_default_templates( $is_task = true )
 		// Tiles style 3:
 		'content_tiles_3' => array(
 			'name'     => 'Content Tiles Style 3 (img cover)',
-			'template' => '[set:before_list=<div class="evo_content_tiles evo_content_tiles__shadow row">]
+			'template' => '[set:before_list=<div class="evo_content_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_3_subcat]
 [set:item_template=content_tiles_3_item]',
@@ -1800,7 +1800,7 @@ function create_default_templates( $is_task = true )
 		'content_tiles_3_subcat' => array(
 			'name'     => 'Content Tiles Style 3 (img cover): Subcat',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
-	<div class="evo_content_tile">
+	<div class="evo_content_tile evo_content_tile__grey_bg">
 		<div class=“hide_overflow”>
 			<div class="evo_content_tile_image">[Cat:image|size=crop-512x512|link_to=#category_url]</div>
 			<div class="evo_content_tile_text">
@@ -1814,7 +1814,7 @@ function create_default_templates( $is_task = true )
 		'content_tiles_3_item' => array(
 			'name'     => 'Content Tiles Style 3 (img cover): Item',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
-	<div class="evo_content_tile">
+	<div class="evo_content_tile evo_content_tile__grey_bg">
 		<div class=“hide_overflow”>
 			<div class="evo_content_tile_image">[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=crop-512x512|image_link_to=single|placeholder=#file_text_icon]</div>
 			<div class="evo_content_tile_text">

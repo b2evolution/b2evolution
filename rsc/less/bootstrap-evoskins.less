@@ -1598,12 +1598,16 @@ span[id^=title_folding_] {
 			margin-top: 0;
 		}
 	}
-	&.evo_content_tiles__shadow {
-		.evo_content_tile {
-			box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-		}
-	}
 }
+// Note: THIS is correct MODIFIER CSS (No nesting and ON the element that it modified, NOT the parent):
+.evo_content_tile__shadow {
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+.evo_content_tile__grey_bg {
+	background-color: #fafafa;
+}
+
+
 
 // Comment Workflow
 .comment-workflow-form {
