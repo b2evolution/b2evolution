@@ -1721,16 +1721,16 @@ function create_default_templates( $is_task = true )
 </li>',
 		),
 
-		// Tiles style (bg-image style):
-		'content_tiles_bgimg' => array(
-			'name'     => 'Content Tiles (bg-image style)',
-			'template' => '[set:before_list=<div class="evo_content_tiles row">]
+		// Tiles style 1: (bg-image style):
+		'content_tiles' => array(
+			'name'     => 'Content Tiles Style 1 (bg-image)',
+			'template' => '[set:before_list=<div class="evo_content_tiles evo_content_tiles__shadow row">]
 [set:after_list=</div>]
-[set:subcat_template=content_tiles_bgimg_subcat]
-[set:item_template=content_tiles_bgimg_item]',
+[set:subcat_template=content_tiles_subcat]
+[set:item_template=content_tiles_item]',
 		),
-		'content_tiles_bgimg_subcat' => array(
-			'name'     => 'Content Tiles (bg-image style): Subcat',
+		'content_tiles_subcat' => array(
+			'name'     => 'Content Tiles Style 1 (bg-image): Subcat',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
 [Cat:permalink|text=]
 <div>
@@ -1742,8 +1742,8 @@ function create_default_templates( $is_task = true )
 </div>
 </div></div>',
 		),
-		'content_tiles_bgimg_item' => array(
-			'name'     => 'Content Tiles (bg-image style): Item',
+		'content_tiles_item' => array(
+			'name'     => 'Content Tiles Style 1 (bg-image): Item',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
 [Item:permalink|text=]
 <div>
@@ -1756,16 +1756,45 @@ function create_default_templates( $is_task = true )
 </div></div>',
 		),
 
-		// Tiles style (shadow style):
-		'content_tiles_shadow' => array(
-			'name'     => 'Content Tiles (shadow style)',
+		// Tiles style 2: existing b2evo RWD
+		'content_tiles_2' => array(
+			'name'     => 'Content Tiles Style 2 (RWD)',
+			'template' => '[set:before_list=<div class="widget_rwd_blocks row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_2_subcat]
+[set:item_template=content_tiles_2_item]',
+		),
+		'content_tiles_2_subcat' => array(
+			'name'     => 'Content Tiles Style 2 (RWD): Subcat',
+			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+	<div class="widget_rwd_content clearfix">
+		<div class="item_first_image">[Cat:image|size=crop-512x512]</div>
+		<h3 class="item_title">[Cat:permalink]</h3>
+		<div class="item_content">[Cat:description]</div>
+	</div>
+</div>',
+		),
+		'content_tiles_2_item' => array(
+			'name'     => 'Content Tiles Style 2 (RWD): Item',
+			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+	<div class="widget_rwd_content clearfix">
+		<div class="item_first_image">[Item:images|image_size=crop-512x512|restrict_to_image_position=#teaser_all]</div>
+		<h3 class="item_title">[Item:permalink|text=#title]</h3>
+		<div class="item_content">[Item:excerpt]</div>
+	</div>
+</div>',
+		),
+
+		// Tiles style 3:
+		'content_tiles_3' => array(
+			'name'     => 'Content Tiles Style 3 (img cover)',
 			'template' => '[set:before_list=<div class="evo_content_tiles evo_content_tiles__shadow row">]
 [set:after_list=</div>]
-[set:subcat_template=content_tiles_shadow_subcat]
-[set:item_template=content_tiles_shadow_item]',
+[set:subcat_template=content_tiles_3_subcat]
+[set:item_template=content_tiles_3_item]',
 		),
-		'content_tiles_shadow_subcat' => array(
-			'name'     => 'Content Tiles (shadow style): Subcat',
+		'content_tiles_3_subcat' => array(
+			'name'     => 'Content Tiles Style 3 (img cover): Subcat',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
 <div>
 	<div class="evo_content_tile_image">[Cat:image|size=crop-512x512]</div>
@@ -1776,8 +1805,8 @@ function create_default_templates( $is_task = true )
 </div>
 </div></div>',
 		),
-		'content_tiles_shadow_item' => array(
-			'name'     => 'Content Tiles (shadow style): Item',
+		'content_tiles_3_item' => array(
+			'name'     => 'Content Tiles Style 3 (img cover): Item',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
 <div>
 	<div class="evo_content_tile_image">[Item:images|image_size=crop-512x512|restrict_to_image_position=#teaser_all]</div>
@@ -1789,34 +1818,6 @@ function create_default_templates( $is_task = true )
 </div></div>',
 		),
 
-		// Tiles style (simple):
-		'content_tiles' => array(
-			'name'     => 'Content Tiles',
-			'template' => '[set:before_list=<div class="widget_rwd_blocks row">]
-[set:after_list=</div>]
-[set:subcat_template=content_tiles_subcat]
-[set:item_template=content_tiles_item]',
-		),
-		'content_tiles_subcat' => array(
-			'name'     => 'Content Tiles: Subcat',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
-	<div class="widget_rwd_content clearfix">
-		<div class="item_first_image">[Cat:image|size=crop-512x512]</div>
-		<h3 class="item_title">[Cat:permalink]</h3>
-		<div class="item_content">[Cat:description]</div>
-	</div>
-</div>',
-		),
-		'content_tiles_item' => array(
-			'name'     => 'Content Tiles: Item',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
-	<div class="widget_rwd_content clearfix">
-		<div class="item_first_image">[Item:images|image_size=crop-512x512|restrict_to_image_position=#teaser_all]</div>
-		<h3 class="item_title">[Item:permalink|text=#title]</h3>
-		<div class="item_content">[Item:excerpt]</div>
-	</div>
-</div>',
-		),
 
 		// Content Blocks:
 		'cblock_clearfix' => array(
