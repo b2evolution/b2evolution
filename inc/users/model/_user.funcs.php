@@ -3817,7 +3817,13 @@ function get_userlist_filters_config( $Form = NULL )
 	$filters = array(
 		// Set order of the filters here, but filters are initalized below:
 		// (some filters may be hidden depending on current User permissions and front-office calling)
+		'name_email'          => NULL, // Name / Email
+		'firstname'           => NULL, // First name
+		'lastname'            => NULL, // Last name
+		'nickname'            => NULL, // Nickname
+		'email'               => NULL, // Email
 		'gender'              => NULL, // Gender
+		'country'             => NULL, // Country
 		'criteria'            => NULL, // Specific criteria
 		'tags'                => NULL, // User tags
 		'org'                 => NULL, // Organization
@@ -3834,6 +3840,61 @@ function get_userlist_filters_config( $Form = NULL )
 		'custom_sender_name'  => NULL, // Uses custom sender name
 	);
 
+	// Name / Email:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name_email' ) ) )
+	{	// Show name/email filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['name_email'] = array(
+				'label'      => T_('Name').' / '.T_('Username').' / '.T_('Email'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
+
+	// First name:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_firstname' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['firstname'] = array(
+				'label'      => T_('First name'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
+
+	// Last name:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_lastname' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['lastname'] = array(
+				'label'      => T_('Last name'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
+
+	// Nickname:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_nickname' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['nickname'] = array(
+				'label'      => T_('Nickname'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
+
+	// Email:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_email' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['email'] = array(
+				'label'      => T_('Email'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
+
 	// Gender:
 	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_gender' ) ) )
 	{	// Show gender filter only on back-office or if it is allowed by collection setting on front-office:
@@ -3847,6 +3908,30 @@ function get_userlist_filters_config( $Form = NULL )
 						'O' => T_('Other'),
 					),
 				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
+
+	// Country:
+	if( user_country_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) ) ) )
+	{	// Show country filter only on back-office or if it is allowed by collection setting on front-office:
+		$CountryCache = & get_CountryCache();
+		if( has_cross_country_restriction( 'users', 'list' ) )
+		{	// User cannot browse other users from other country:
+			// Load only country of the current User:
+			$CountryCache->load_all = false; // Set flag to false in order to don't load ALL records in the CountryCache->get_option_array().
+			$CountryCache->load_where( 'ctry_ID = '.( is_logged_in() ? $current_User->ctry_ID : '-1'/* For normal work anonymous users have no access to this point however use this fake condition to avoid errors */ ) );
+			$country_options = array();
+		}
+		else
+		{	// User can browse other users from other country:
+			$country_options = array( '0' => T_('All') );
+		}
+		$country_options += $CountryCache->get_option_array();
+		$filters['country'] = array(
+				'label'  => T_('Country'),
+				'input'  => 'select',
+				'type'   => 'integer',
+				'values' => $country_options,
 			);
 	}
 
@@ -3933,7 +4018,8 @@ function get_userlist_filters_config( $Form = NULL )
 						rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
 						rule.$el.find( ".rule-value-container [name^=criteria_operator]" ).val( val[1] ).trigger( "change" );
 						rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[2] ).trigger( "change" );
-					}'
+					}',
+				'default_value' => '0:contains:',
 			);
 	}
 
@@ -4076,7 +4162,37 @@ function callback_filter_userlist( & $Form )
 		$filters['#default'] = array();
 		foreach( $userlist_default_filters as $userlist_default_filter )
 		{
-			$filters['#default'][ $userlist_default_filter ] = ( $userlist_default_filter == 'criteria' ? '0:contains:' : '' );
+			if( $userlist_default_filter == 'country' && has_cross_country_restriction( 'users', 'list' ) )
+			{	// Skip default filter "Country" when current User can view other users only from own country:
+				continue;
+			}
+
+			// Set default operator:
+			if( ! empty( $filters[ $userlist_default_filter ]['operators'] ) )
+			{
+				$default_operator = explode( ',', $filters[ $userlist_default_filter ]['operators'] );
+				$default_operator = $default_operator[0];
+			}
+			else
+			{
+				$default_operator = 'equal';
+			}
+			// Set default value:
+			if( isset( $filters[ $userlist_default_filter ]['default_value'] ) )
+			{
+				$default_value = $filters[ $userlist_default_filter ]['default_value'];
+			}
+			elseif( isset( $filters[ $userlist_default_filter ]['values'] ) && is_array( $filters[ $userlist_default_filter ]['values'] ) )
+			{
+				$default_value = array_keys( $filters[ $userlist_default_filter ]['values'] );
+				$default_value = isset( $default_value[0] ) ? $default_value[0] : '';
+			}
+			else
+			{
+				$default_value = '';
+			}
+
+			$filters['#default'][ $userlist_default_filter ] = array( $default_operator, $default_value );
 		}
 	}
 
@@ -4088,13 +4204,18 @@ function callback_filter_userlist( & $Form )
 		$Form->checkbox( 'membersonly', get_param( 'membersonly' ), sprintf( T_('Only members of %s'), $Blog->get_shortname() ) );
 	}
 
-	if( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name' ) )
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name' ) ) )
 	{
-		$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
+		$Form->text( 'keywords', get_param( 'keywords' ), 20, T_('Name').' / '.T_('Username'), '', 50 );
+	}
+
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_email' ) ) )
+	{
+		$Form->text( 'email', get_param( 'email' ), 20, T_('Email'), '', 50 );
 	}
 
 	$location_filter_displayed = false;
-	if( user_country_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) )
+	if( user_country_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) ) ) )
 	{
 		{ // Filter by country
 			load_class( 'regional/model/_country.class.php', 'Country' );
@@ -4115,7 +4236,7 @@ function callback_filter_userlist( & $Form )
 		}
 	}
 
-	if( user_region_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_region' ) )
+	if( user_region_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_region' ) ) ) )
 	{	// Filter by region
 		$region_filter_disp_style = regions_exist( get_param('country'), true ) ? '' : ' style="display:none"';
 		echo '<span id="region_filter"'.$region_filter_disp_style.'>';
@@ -4124,21 +4245,21 @@ function callback_filter_userlist( & $Form )
 		$location_filter_displayed = $location_filter_displayed || empty( $region_filter_disp_style );
 	}
 
-	if( user_subregion_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_subregion' ) )
+	if( user_subregion_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_subregion' ) ) ) )
 	{	// Filter by subregion
 		echo '<span id="subregion_filter"'.( !subregions_exist( get_param('region'), true ) ? ' style="display:none"' : '' ).'>';
 		$Form->select_input_options( 'subregion', get_subregions_option_list( get_param('region'), get_param('subregion') ), T_('Sub-region') );
 		echo '</span>';
 	}
 
-	if( user_city_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_city' ) )
+	if( user_city_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_city' ) ) ) )
 	{	// Filter by city
 		echo '<span id="city_filter"'.( !cities_exist( get_param('country'), get_param('region'), get_param('subregion'), true ) ? ' style="display:none"' : '' ).'>';
 		$Form->select_input_options( 'city', get_cities_option_list( get_param('country'), get_param('region'), get_param('subregion'), get_param('city') ), T_('City') );
 		echo '</span>';
 	}
 
-	if( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_age_group' ) )
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_age_group' ) ) )
 	{
 		$Form->begin_line( T_('Age group'), 'age_min' );
 			$Form->text( 'age_min', get_param('age_min'), 3, '' );
@@ -6646,6 +6767,13 @@ function users_results_block( $params = array() )
 	{ // Display a button to refresh the users list
 		$UserList->global_icon( T_('Refresh the list in case some Users have been added or deleted since your last search...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
 	}
+
+	if( is_pro() )
+	{
+		$UserList->global_icon( T_('Import Users'), 'new',
+				regenerate_url( 'action', 'action=csv'), T_('Import Users').' &raquo;', 3, 4 );
+	}
+	
 	if( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
 	{
 		if( $params['display_btn_adduser'] )
@@ -6752,10 +6880,17 @@ function users_results_block( $params = array() )
 			.'</a>';
 	}
 
+	if( is_pro() )
+	{
+		$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=export_users" class="btn btn-primary">'
+				.format_to_output( T_('Export users (CSV)' ) )
+			.'</a>';
+	}
+
 	if( $params['display_btn_export'] && is_logged_in() && $UserList->result_num_rows > 0 )
 	{	// Button to export user group data as CSV file:
-		$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=export" class="btn btn-primary">'
-				.format_to_output( T_('Export groups as CSV') )
+		$user_list_buttons[] = ( is_pro() ? '' : '<br>' ).'<a href="'.$admin_url.'?ctrl=users&amp;action=export" class="btn btn-primary">'
+				.format_to_output( T_('Export group membership (CSV)') )
 			.'</a>';
 	}
 

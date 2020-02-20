@@ -14237,14 +14237,14 @@ class Item extends ItemLight
 			case 'deadline':
 				if( $this->get_coll_setting( 'use_deadline' ) )
 				{	// Display deadline fields only if it is enabled for collection:
-					$is_inline = $Form->is_lined_fields;
+					$is_inline = isset( $Form->is_lined_fields ) && $Form->is_lined_fields;
 					if( ! $is_inline )
 					{
 						$Form->begin_line( T_('Deadline'), 'item_deadline', '', $params );
 					}
-
 						$date_params = array_merge( array(
 								'input_suffix' => '&nbsp;'.T_('at').'&nbsp;',
+								'placeholder'  => locale_input_datefmt(),
 							), $params ); 
 						$datedeadline = $this->get( 'datedeadline' );
 						$Form->date_input( 'item_deadline', $datedeadline, '', $date_params );
@@ -14252,6 +14252,8 @@ class Item extends ItemLight
 						$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
 						$time_params = array_merge( array(
 								'time_format' => 'hh:mm',
+								'placeholder' => 'hh:mm',
+								'note'        => '',
 							), $params );
 						$Form->time_input( 'item_deadline_time', $datedeadline_time, T_('at'), $time_params );
 					if( ! $is_inline )

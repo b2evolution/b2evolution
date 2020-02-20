@@ -434,21 +434,37 @@ if( $params['comment_type'] == 'meta' )
 			$comment_options[] = array( 'comment_user_notify', 1, T_('Notify me of replies'), ( isset( $comment_user_notify ) ? $comment_user_notify : 1 ) );
 		}
 		*/
+
+		$comment_renderers = '<div class="edit_plugin_actions pull-right">';
+			// Display renderers
+			$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array(
+					'Blog'         => & $Blog,
+					'setting_name' => 'coll_apply_comment_rendering',
+					'js_prefix'    => $plugin_js_prefix,
+				) );
+			if( !empty( $comment_renderer_checkboxes ) )
+			{
+				//$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
+				$comment_renderers .= '<div id="commentform_renderers" class="btn-group dropup">
+						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span> '.T_('Text Renderers').'</button>
+						<div class="dropdown-menu dropdown-menu-right">'.$comment_renderer_checkboxes.'</div>
+					</div>';
+					// JS code to don't hide popup on click to checkbox:
+					$comment_renderers .= '<script>jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } )</script>';
+			}
+		$comment_renderers .= '</div>';
+
 		if( count( $comment_options ) > 0 )
 		{	// Display additional options:
-			$Form->checklist( $comment_options, 'comment_options', T_('Options') );
+			$Form->checklist( $comment_options, 'comment_options', T_('Options'), false, false, array(
+					'input_prefix' => $comment_renderers,
+				) );
+		}
+		else
+		{
+			$Form->info( '', $comment_renderers );
 		}
 
-		// Display renderers
-		$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array(
-				'Blog'         => & $Blog,
-				'setting_name' => 'coll_apply_comment_rendering',
-				'js_prefix'    => $plugin_js_prefix,
-			) );
-		if( !empty( $comment_renderer_checkboxes ) )
-		{
-			$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
-		}
 
 	// Attach files:
 	if( !empty( $comment_attachments ) )

@@ -11394,6 +11394,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$tables_num = 0;
 		$columns_num = 0;
 		$tables = $DB->get_col( 'SHOW TABLES' );
+		// Ignore these ID columns because they can be be signed:
+		$ignore_signed_columns = array(
+			'step_yes_next_step_ID',
+			'step_no_next_step_ID',
+			'step_error_next_step_ID',
+		);
 		foreach( $tables as $table_name )
 		{
 			if( ! in_array( $table_name, $db_config['aliases'] ) )
@@ -11407,6 +11413,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				.' AND Type LIKE "int(11)%"' );
 			foreach( $columns as $column )
 			{
+				if( in_array( $column->Field, $ignore_signed_columns ) )
+				{	// Skip signed columns:
+					continue;
+				}
 				$modify_columns[ $column->Field ] = 'MODIFY COLUMN `'.$column->Field.'` '
 					.'INT(10) UNSIGNED ' // Change from INT(11) to INT(10)
 					.( $column->Null == 'YES' ? 'NULL' : 'NOT NULL' )
@@ -12229,6 +12239,81 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			}
 		}
 		upg_task_end( false );
+	}
+
+	if( upg_task_start( 15820, 'Upgrading users table...') )
+	{	// part of 7.1.2-beta
+		db_add_col( 'T_users', 'user_birthday_year', 'smallint unsigned NULL AFTER user_age_max' );
+		db_add_col( 'T_users', 'user_birthday_month', 'tinyint unsigned NULL AFTER user_birthday_year' );
+		db_add_col( 'T_users', 'user_birthday_day', 'tinyint unsigned NULL AFTER user_birthday_month' );
+
+		// Set self_selected_age_group setting to 'optional':
+		$DB->query( 'INSERT INTO T_settings ( set_name, set_value ) VALUES ( "self_selected_age_group", "optional" )
+				ON DUPLICATE KEY UPDATE set_value = VALUES( set_value )' );
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15830, 'Updating widget "Free Social Links"...' ) )
+	{	// part of 7.1.2-beta
+		// Make to use ufdf_code(user field code) instead of ufdf_ID(user field ID) in widget settings:
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "social_links"' );
+		$widgets = $DB->get_assoc( $SQL );
+
+		if( ! empty( $widgets ) )
+		{	// If at least one widget "Free Social Links" exists in DB:
+			$SQL = new SQL();
+			$SQL->SELECT( 'ufdf_ID, ufdf_code' );
+			$SQL->FROM( 'T_users__fielddefs' );
+			$SQL->WHERE( 'ufdf_type = "url"' );
+			$SQL->WHERE_and( 'ufdf_icon_name IS NOT NULL' );
+			$social_fields = $DB->get_assoc( $SQL );
+
+			foreach( $widgets as $widget_ID => $widget_params )
+			{
+				if( empty( $widget_params ) )
+				{	// Skip widget with default settings:
+					continue;
+				}
+
+				$widget_params = unserialize( $widget_params );
+
+				for( $i = 1; $i <= 7; $i++ )
+				{
+					if( isset( $widget_params['link'.$i] ) )
+					{
+						if( isset( $social_fields[ $widget_params['link'.$i] ] ) )
+						{	// Replace old using of ufdf_ID to new using ufdf_code if we find such user field in DB by ID:
+							$widget_params['link'.$i] = $social_fields[ $widget_params['link'.$i] ];
+						}
+						else
+						{	// Reset wrong user field to default:
+							$widget_params['link'.$i] = '';
+						}
+					}
+				}
+
+				$DB->query( 'UPDATE T_widget__widget
+						SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+					WHERE wi_ID = '.$widget_ID );
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15840, 'Upgrading automation steps table...') )
+	{	// part of 7.1.2-beta
+		db_upgrade_cols( 'T_automation__step', array(
+			'MODIFY' => array(
+				'step_yes_next_step_ID'   => 'INT NULL COMMENT "Must be unsigned for special values like -1 = STOP"',
+				'step_no_next_step_ID'    => 'INT NULL COMMENT "Must be unsigned for special values like -1 = STOP"',
+				'step_error_next_step_ID' => 'INT NULL COMMENT "Must be unsigned for special values like -1 = STOP"',
+			),
+		) );
+		upg_task_end();
 	}
 
 	/*

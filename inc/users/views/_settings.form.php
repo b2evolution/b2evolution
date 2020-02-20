@@ -64,8 +64,8 @@ $Form->begin_fieldset( T_('User latitude').get_manual_link('user-profile-latitud
 	$Form->radio( 'uset_lastname_editing', $Settings->get( 'lastname_editing' ), $name_editing_options, T_('Last name'), true );
 
 	$location_options = array(
-			array( 'optional', T_('Optional') ),
 			array( 'required', T_('Required') ),
+			array( 'optional', T_('Optional') ),
 			array( 'hidden', T_('Hidden') )
 		);
 
@@ -76,6 +76,20 @@ $Form->begin_fieldset( T_('User latitude').get_manual_link('user-profile-latitud
 	$Form->radio( 'uset_location_subregion', $Settings->get( 'location_subregion' ), $location_options, T_('Sub-region') );
 
 	$Form->radio( 'uset_location_city', $Settings->get( 'location_city' ), $location_options, T_('City') );
+
+	$birthday_options = array(
+			array( 'required', T_('Required') ),
+			array( 'optional', T_('Optional') ),
+			array( 'hidden', T_('Hidden') )
+		);
+
+	$Form->radio( 'uset_birthday_year', $Settings->get( 'birthday_year' ), $birthday_options, T_('Birthday Year') );
+
+	$Form->radio( 'uset_birthday_month', $Settings->get( 'birthday_month' ), $birthday_options, T_('Birthday Month') );
+
+	$Form->radio( 'uset_birthday_day', $Settings->get( 'birthday_day' ), $birthday_options, T_('Birthday Day') );
+
+	$Form->radio( 'uset_self_selected_age_group', $Settings->get( 'self_selected_age_group' ), $birthday_options, T_('Self-selected Age Group') );
 
 	$Form->text_input( 'uset_minimum_age', $Settings->get( 'minimum_age' ), 3, T_('Minimum age'), '', array( 'input_suffix' => ' '.T_('years old.') ) );
 

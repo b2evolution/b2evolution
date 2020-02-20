@@ -158,7 +158,7 @@ class GeneralSettings extends AbstractSettings
 		'allow_html_message' => 0, // Allow HTML in messages
 
 		// Users list settings:
-		'userlist_default_filters' => 'gender,criteria,lastseen',
+		'userlist_default_filters' => 'name_email,country',
 
 		// Welcome private message
 		'welcomepm_enabled' => 0,
@@ -326,6 +326,10 @@ C message size exceeds',
 		'location_region'    => 'optional', // Editing mode of region for user:    "optional" | "required" | "hidden"
 		'location_subregion' => 'optional', // Editing mode of subregion for user: "optional" | "required" | "hidden"
 		'location_city'      => 'optional', // Editing mode of city for user:      "optional" | "required" | "hidden"
+		'birthday_year'      => 'optional', // Editing mode of birthday year for user: "optional" | "required" | "hidden"
+		'birthday_month'     => 'optional', // Editing mode of birthday month for user: "optional" | "required" | "hidden"
+		'birthday_day'       => 'optional', // Editing mode of birthday day for user: "optional" | "required" | "hidden"
+		'self_selected_age_group' => 'hidden', // Editing mode of self-selected age group for user: "optional" | "required" | "hidden"
 		'minimum_age'        => '13', // Minimum age for user forms
 		'multiple_sessions'  => 'userset_default_no', // multiple sessions settings -- overriden for demo mode in contructor
 		'emails_msgform'     => 'adminset', // Receiving emails through a message form is allowed: "never" | "adminset" | "userset"

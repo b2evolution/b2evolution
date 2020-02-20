@@ -37,7 +37,12 @@ $Form->begin_fieldset( T_('User directory').get_manual_link( 'user-directory-oth
 
 	$Form->checklist( array(
 			array( 'userdir_filter_restrict_to_members', 1, T_('Restrict to members'), $edited_Blog->get_setting( 'userdir_filter_restrict_to_members' ) ),
-			array( 'userdir_filter_name', 1, T_('Name'), $edited_Blog->get_setting( 'userdir_filter_name' ) ),
+			array( 'userdir_filter_name', 1, T_('Name').' / '.T_('Username'), $edited_Blog->get_setting( 'userdir_filter_name' ) ),
+			array( 'userdir_filter_name_email', 1, T_('Name').' / '.T_('Username').' / '.T_('Email'), $edited_Blog->get_setting( 'userdir_filter_name_email' ) ),
+			array( 'userdir_filter_firstname', 1, T_('First name'), $edited_Blog->get_setting( 'userdir_filter_firstname' ) ),
+			array( 'userdir_filter_lastname', 1, T_('Last name'), $edited_Blog->get_setting( 'userdir_filter_lastname' ) ),
+			array( 'userdir_filter_nickname', 1, T_('Nickname'), $edited_Blog->get_setting( 'userdir_filter_nickname' ) ),
+			array( 'userdir_filter_email', 1, T_('Email'), $edited_Blog->get_setting( 'userdir_filter_email' ) ),
 			array( 'userdir_filter_country', 1, T_('Country'), $edited_Blog->get_setting( 'userdir_filter_country' ) ),
 			array( 'userdir_filter_region', 1, T_('Region'), $edited_Blog->get_setting( 'userdir_filter_region' ) ),
 			array( 'userdir_filter_subregion', 1, T_('Subregion'), $edited_Blog->get_setting( 'userdir_filter_subregion' ) ),

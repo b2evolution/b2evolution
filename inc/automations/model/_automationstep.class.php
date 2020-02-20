@@ -936,6 +936,7 @@ class AutomationStep extends DataObject
 				'time'        => 'Current time',
 				'day'         => 'Current day of the week',
 				'month'       => 'Current month',
+				'days_before_birthday'          => 'Days before birthday',
 				'listsend_last_sent_to_user'    => 'Last sent list to user',
 				'listsend_last_opened_by_user'  => 'Last opened list by user',
 				'listsend_last_clicked_by_user' => 'Last clicked list by user',
@@ -1124,6 +1125,47 @@ class AutomationStep extends DataObject
 			case 'month':
 				// Check current month:
 				return $this->check_if_condition_rule_date_value( $rule, 'm' );
+
+			case 'days_before_birthday':
+				// Check number of days before birthday:
+				global $localtimenow;
+
+				$localdatenow   = strtotime( date( 'Y-m-d', $localtimenow ) );
+				$birthday_month = $step_User->get( 'birthday_month' );
+				$birthday_day   = $step_User->get( 'birthday_day' );
+
+				if( $birthday_month && $birthday_day )
+				{
+					$birthday = strtotime( date( 'Y', $localtimenow ).'-'.$birthday_month.'-'.$birthday_day );
+					if( $birthday < $localdatenow )
+					{	// Birthday for current year has already passed, use birthday next year:
+						$birthday = strtotime( ( (int) date( 'Y', $localtimenow ) + 1 ).'-'.$birthday_month.'-'.$birthday_day );
+					}
+					$datediff = $birthday - $localdatenow;
+					$days     = (int) round( $datediff / ( 60 * 60 * 24 ) );
+
+					switch( $rule->operator )
+					{
+						case 'equal':
+							return $days == $rule->value;
+						case 'not_equal':
+							return $days != $rule->value;
+						case 'less':
+							return $days < $rule->value;
+						case 'less_or_equal':
+							return $days <= $rule->value;
+						case 'greater':
+							return $days > $rule->value;
+						case 'greater_or_equal':
+							return $days >= $rule->value;
+						case 'between':
+							return $days >= $rule->value[0] && $days <= $rule->value[1];
+						case 'not_between':
+							return $days < $rule->value[0] || $days > $rule->value[1];
+					}
+				}
+				
+				return false;
 
 			case 'listsend_last_sent_to_user':
 				// Check last sent list to user:

@@ -241,28 +241,7 @@ class Table extends Widget
 							$operators = explode( ',', $param_value );
 							foreach( $operators as $o => $operator )
 							{	// Replace aliases with corrent name which is used in jQuery QueryBuilder plugin:
-								switch( $operator )
-								{
-									case '=':
-										$operators[ $o ] = 'equal';
-										break;
-									case '!=':
-									case '<>':
-										$operators[ $o ] = 'not_equal';
-										break;
-									case '<':
-										$operators[ $o ] = 'less';
-										break;
-									case '<=':
-										$operators[ $o ] = 'less_or_equal';
-										break;
-									case '>':
-										$operators[ $o ] = 'greater';
-										break;
-									case '>=':
-										$operators[ $o ] = 'greater_or_equal';
-										break;
-								}
+								$operators[ $o ] = get_querybuilder_operator( $operator );
 							}
 							$param_value = '[\''.implode( '\',\'', $operators ).'\']';
 						}
@@ -328,11 +307,12 @@ class Table extends Widget
 			);
 			if( isset( $filter_fields['#default'] ) )
 			{	// Set filters from default config:
-				foreach( $filter_fields['#default'] as $def_filter_id => $def_filter_value )
+				foreach( $filter_fields['#default'] as $def_filter_id => $def_filter_data )
 				{
 					$filter_query['rules'][] = array(
-						'id'    => $def_filter_id,
-						'value' => $def_filter_value,
+						'id'       => $def_filter_id,
+						'operator' => get_querybuilder_operator( is_array( $def_filter_data ) && isset( $def_filter_data[0] ) ? $def_filter_data[0] : $def_filter_data ),
+						'value'    => is_array( $def_filter_data ) && isset( $def_filter_data[1] ) ? $def_filter_data[1] : '',
 					);
 				}
 			}

@@ -131,12 +131,22 @@ function create_default_data()
 
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
-	// erwin > When adding anything to the list below don't forget to update the params for the Social Links widget!
 	$DB->query( "
 		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
 		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
 						( 1, 'word',   'I like',        NULL, 'recommended', 'list',      '2',  '1', 'ilike',        'fa fa-thumbs-o-up' ),
 						( 1, 'word',   'I don\'t like', NULL, 'recommended', 'list',      '3',  '1', 'idontlike',    'fa fa-thumbs-o-down' ),
+						( 1, 'list',   'Industry',      'Energy, Utilities & Resources
+Financial Services
+Health Services
+Hospitality & Tourism
+Industrial Manufacturing
+Pharma & Life Sciences
+Public Sector
+Real Estate
+Retail & Consumer Goods
+Sports Business Advisory
+Technology, Media & Telecom',                     'recommended', 'allowed',   '4',  '1', 'industry',     'fa fa-industry' ),
 						( 2, 'email',  'MSN/Live IM',   NULL, 'optional',    'allowed',   '1',  '0', 'msnliveim',    NULL ),
 						( 2, 'word',   'Yahoo IM',      NULL, 'optional',    'allowed',   '2',  '0', 'yahooim',      'fa fa-yahoo' ),
 						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', 'aolaim',       NULL ),
@@ -151,10 +161,9 @@ function create_default_data()
 						( 3, 'phone',  'Home FAX',      NULL, 'optional',    'allowed',   '6',  '0', 'homefax',      'fa fa-fax' ),
 						( 4, 'url',    'Twitter',       NULL, 'recommended', 'forbidden', '1',  '0', 'twitter',      'fa fa-twitter' ),
 						( 4, 'url',    'Facebook',      NULL, 'recommended', 'forbidden', '2',  '0', 'facebook',     'fa fa-facebook' ),
-						( 4, 'url',    'Google Plus',   NULL, 'optional',    'forbidden', '3',  '0', 'googleplus',   'fa fa-google-plus fa-x-google-plus--nudge' ),
 						( 4, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '4',  '0', 'linkedin',     'fa fa-linkedin fa-x-linkedin--nudge' ),
 						( 4, 'url',    'GitHub',        NULL, 'optional',    'forbidden', '5',  '0', 'github',       'fa fa-github-alt' ),
-						( 4, 'url',    'Website',       NULL, 'recommended', 'allowed',   '6',  '0', 'website',      NULL ),
+						( 4, 'url',    'Website',       NULL, 'optional',    'allowed',   '6',  '0', 'website',      NULL ),
 						( 4, 'url',    'Blog',          NULL, 'optional',    'allowed',   '7',  '0', 'blog',         NULL ),
 						( 4, 'url',    'Myspace',       NULL, 'optional',    'forbidden', '8',  '0', 'myspace',      NULL ),
 						( 4, 'url',    'Flickr',        NULL, 'optional',    'forbidden', '9',  '0', 'flickr',       'fa fa-flickr' ),
@@ -220,13 +229,12 @@ function create_default_data()
 			'org_roles' => array( 'King of Spades' ),
 			'org_priorities' => array( 0 ),
 			'fields'    => array(
-					'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
-					'Website'     => 'http://b2evolution.net/',
-					'Twitter'     => 'https://twitter.com/b2evolution/',
-					'Facebook'    => 'https://www.facebook.com/b2evolution',
-					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+					'microbio' => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
+					'website'  => 'http://b2evolution.net/',
+					'twitter'  => 'https://twitter.com/b2evolution/',
+					'facebook' => 'https://www.facebook.com/b2evolution',
+					'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+					'github'   => 'https://github.com/b2evolution/b2evolution',
 				)
 		) );
 	task_end();

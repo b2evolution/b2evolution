@@ -729,7 +729,7 @@ function display_system_check( $params )
 
 	// Version:
 	$app_timestamp = mysql2timestamp( $app_date );
-	init_system_check( T_( 'b2evolution version' ), sprintf( /* TRANS: First %s: App version, second %s: release date */ T_( '%s released on %s' ), $app_version, date_i18n( locale_datefmt(), $app_timestamp ) ) );
+	init_system_check( T_( 'b2evolution version' ), sprintf( /* TRANS: First %s: App version, second %s: release date */ T_( '%s released on %s' ), $app_version, $app_date ) );
 	if( ! $params['check_version'] )
 	{	// Version was not checked above,
 		// e.g. this is impossible to do from install page where some global vars like $Settings, $global_Cache cannot be initialized:

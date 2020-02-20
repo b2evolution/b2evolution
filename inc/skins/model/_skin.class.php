@@ -1380,7 +1380,6 @@ class Skin extends DataObject
 						$webmention_url = $Blog->get_htsrv_url().'webmention.php';
 						header( 'Link: <'.$webmention_url.'>; rel="webmention"' );
 						add_headline( '<link rel="webmention" href="'.$webmention_url.'" />' );
-						add_headline( '<link rel="http://webmention.org/" href="'.$webmention_url.'" />' );// used for older version of the protocol specification
 					}
 
 					// Used to set rating for a new comment:

@@ -13,6 +13,7 @@
 
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( '_core/ui/_table.class.php', 'Table' );
 load_class( 'items/model/_itemtype.class.php', 'ItemType' );
 
 global $edited_Itemtype, $thumbnail_sizes, $admin_url, $Blog, $current_User;
