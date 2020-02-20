@@ -3624,10 +3624,8 @@ class File extends DataObject
 		{	// Set image-set backgrounds only when 1x and 2x size are different:
 			// Get image URL for 2x size:
 			$img_attribs_2x = $this->get_img_attribs( $params['size_2x'] );
+			$styles[] = 'background-image: image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
 			$styles[] = 'background-image: -webkit-image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
-			$styles[] = 'background-image: -moz-image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
-			$styles[] = 'background-image: -o-image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
-			$styles[] = 'background-image: -ms-image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
 		}
 
 		return implode( ';', $styles );
