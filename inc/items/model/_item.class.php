@@ -1273,6 +1273,10 @@ class Item extends ItemLight
 			{	// Task status:
 				$ItemTypeCache = & get_ItemTypeCache();
 				$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
+				if( get_param( 'item_st_ID' ) === 0 )
+				{	// Store NULL value instead of 0 in DB:
+					set_param( 'item_st_ID', NULL );
+				}
 				if( in_array( get_param( 'item_st_ID' ), $current_ItemType->get_applicable_post_status() ) || get_param( 'item_st_ID' ) === NULL )
 				{	// Save only task status which is allowed for item's type:
 					$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
@@ -1294,6 +1298,10 @@ class Item extends ItemLight
 			if( $this->can_edit_workflow( 'priority' ) &&
 			    param( 'item_priority', 'integer', NULL ) !== NULL )
 			{	// Priority:
+				if( get_param( 'item_priority' ) === 0 )
+				{	// Store NULL value instead of 0 in DB:
+					set_param( 'item_priority', NULL );
+				}
 				$this->set_from_Request( 'priority', 'item_priority', true );
 			}
 
