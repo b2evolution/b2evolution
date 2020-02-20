@@ -3769,7 +3769,9 @@ span[id^=title_folding_] {
   padding: 0;
 }
 .evo_content_tiles .evo_content_tile_image img {
+  min-width: 100%;
   min-height: 100%;
+  object-fit: cover;
 }
 .evo_content_tiles .evo_content_tile_text {
   padding-left: 10px;
