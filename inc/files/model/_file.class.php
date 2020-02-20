@@ -1310,7 +1310,7 @@ class File extends DataObject
 	 *                        'none' - don't use attributes "width" & "height"
 	 * @param boolean Image style= attribute
 	 * @param boolean Add loadimg class
-	 * @param string simplified sizes= attribute for browser to select correct size from srcset=
+	 * @param string simplified sizes= attribute for browser to select correct size from srcset=. Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL

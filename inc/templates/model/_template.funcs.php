@@ -195,7 +195,7 @@ function render_template_callback( $var, $params, $objects = array() )
 	switch( $var )
 	{
 		// Chapter / Category:
-		case 'Cat:backround_image_css':
+		case 'Cat:background_image_css':
 			echo $rendered_Chapter->get_background_image_css( $params );
 			break;
 
@@ -462,7 +462,7 @@ function render_template_callback( $var, $params, $objects = array() )
 				), $params ) );
 			break;
 		
-		case 'Item:backround_image_css':
+		case 'Item:background_image_css':
 			echo $rendered_Item->get_background_image_css( $params );
 			break;
 

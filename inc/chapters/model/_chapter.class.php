@@ -978,15 +978,10 @@ class Chapter extends DataObject
 	/**
 	 * Get File of a first found image by positions
 	 *
-	 * @param array Parameters
 	 * @return object|NULL File
 	 */
-	function & get_image_File( $params = array() )
+	function & get_image_File()
 	{
-		$params = array_merge( array(
-				'size' => 'original',
-			), $params );
-
 		// Try to get a file by ID:
 		$FileCache = & get_FileCache();
 		if( ! ( $cat_image_File = & $FileCache->get_by_ID( $this->get( 'image_file_ID' ), false, false ) ) )
@@ -1001,9 +996,6 @@ class Chapter extends DataObject
 			return $r;
 		}
 
-		// Get image URL for requested size:
-		$img_attribs = $cat_image_File->get_img_attribs( $params['size'] );
-
 		return $cat_image_File;
 	}
 
@@ -1016,7 +1008,7 @@ class Chapter extends DataObject
 	 */
 	function get_image_url( $params = array() )
 	{
-		if( ! ( $image_File = & $this->get_image_File( $params ) ) )
+		if( ! ( $image_File = & $this->get_image_File() ) )
 		{	// Wrong image file:
 			return NULL;
 		}
@@ -1040,6 +1032,7 @@ class Chapter extends DataObject
 				'after_legend'  => '', // HTML code after image legeng
 				'after'         => '', // HTML code after image tag
 				'size'          => 'crop-48x48', // Image thumbnail size
+				'sizes'         => NULL, // simplified sizes= attribute for browser to select correct size from srcset=. Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
 				'link_to'       => '', // Url for a link, Use 'original' for full image file url, Empty value to don't make a link
 				'link_title'    => $this->get( 'description' ), // Title of the link, can be text or #title# or #desc#
 				'link_rel'      => '', // Value for attribute "rel", usefull for jQuery libraries selecting on rel='...', e-g: 'lightbox[cat'.$this->ID.']'
@@ -1082,7 +1075,10 @@ class Chapter extends DataObject
 				$params['desc'],
 				'',
 				$params['size_x'],
-				$params['tag_size'] );
+				$params['tag_size'],
+				'',
+				true,
+				$params['sizes'] );
 	}
 
 

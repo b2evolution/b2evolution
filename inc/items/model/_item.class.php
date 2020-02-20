@@ -5014,6 +5014,7 @@ class Item extends ItemLight
 				'after'                      => '</div>',
 				'image_size'                 => 'fit-720x500',
 				'image_size_x'               => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
+				'image_sizes'                => NULL, // simplified sizes= attribute for browser to select correct size from srcset=. Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
 				'image_link_to'              => 'original', // Can be 'original' (image) or 'single' (this post)
 				'limit'                      => 1000, // Max # of images displayed
 				'before_gallery'             => '<div class="bGallery">',
@@ -5195,7 +5196,6 @@ class Item extends ItemLight
 	{
 		$params = array_merge( array(
 				'position' => '#cover_and_teaser_all',
-				'size'     => 'original',
 			), $params );
 
 		// Set image positions from possible predefined values:
