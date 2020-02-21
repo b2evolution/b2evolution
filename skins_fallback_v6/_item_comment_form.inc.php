@@ -390,6 +390,8 @@ if( $params['comment_type'] == 'meta' )
 
 		// Message field:
 		$content_id = $dummy_fields['content'].'_'.$params['comment_type'];
+		$form_fieldstart = $Form->fieldstart;
+		$Form->fieldstart = add_tag_class( $Form->fieldstart, 'form-group__narrow_margin_bottom' );
 		$form_inputstart = $Form->inputstart;
 		$Form->inputstart .= $comment_toolbar;
 		$note = '';
@@ -402,6 +404,7 @@ if( $params['comment_type'] == 'meta' )
 				'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
 			) );
 		$Form->inputstart = $form_inputstart;
+		$Form->fieldstart = $form_fieldstart;
 
 		// Set canvas object for plugins:
 		echo '<script>var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
@@ -414,7 +417,7 @@ if( $params['comment_type'] == 'meta' )
 			'content_id'    => $content_id,
 			'edit_layout'   => 'inskin',
 		) );
-		$quick_setting_switch = ob_get_flush();
+		$admin_display_editor_button = ob_get_clean();
 
 		$comment_options = array();
 		if( ! is_logged_in( false ) )
@@ -435,34 +438,66 @@ if( $params['comment_type'] == 'meta' )
 		}
 		*/
 
-		$comment_renderers = '<div class="edit_plugin_actions pull-right">';
-			// Display renderers
-			$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array(
-					'Blog'         => & $Blog,
-					'setting_name' => 'coll_apply_comment_rendering',
-					'js_prefix'    => $plugin_js_prefix,
-				) );
-			if( !empty( $comment_renderer_checkboxes ) )
-			{
-				//$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
-				$comment_renderers .= '<div id="commentform_renderers" class="btn-group dropup">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span> '.T_('Text Renderers').'</button>
-						<div class="dropdown-menu dropdown-menu-right">'.$comment_renderer_checkboxes.'</div>
-					</div>';
-					// JS code to don't hide popup on click to checkbox:
-					$comment_renderers .= '<script>jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } )</script>';
-			}
-		$comment_renderers .= '</div>';
+		// Display renderers
+		$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array(
+				'Blog'         => & $Blog,
+				'setting_name' => 'coll_apply_comment_rendering',
+				'js_prefix'    => $plugin_js_prefix,
+			) );
 
-		if( count( $comment_options ) > 0 )
-		{	// Display additional options:
-			$Form->checklist( $comment_options, 'comment_options', T_('Options'), false, false, array(
-					'input_prefix' => $comment_renderers,
-				) );
+		$text_renderers = '';
+		if( !empty( $comment_renderer_checkboxes ) )
+		{
+			$text_renderers .= '<div id="commentform_renderers" class="btn-group dropup pull-right">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span> '.T_('Text Renderers').'</button>
+					<div class="dropdown-menu dropdown-menu-right">'.$comment_renderer_checkboxes.'</div>
+				</div>';
+				// JS code to don't hide popup on click to checkbox:
+				$text_renderers .= '<script>jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } )</script>';
+		}
+
+		if( $Blog->get_setting( 'allow_html_comment' ) )
+		{
+			$Form->begin_line();
+			echo '<div class="text_editor_controls">';
+				echo '<div class="edit_plugin_actions">';
+				echo $admin_display_editor_button;
+				echo '</div>';
+
+				if( ! empty( $text_renderers ) )
+				{
+					echo $text_renderers;
+				}
+			echo '</div>';
+			$Form->end_line();
+
+			if( count( $comment_options ) > 0 )
+			{
+				$Form->checklist( $comment_options, 'comment_options', T_('Options') );
+			}
 		}
 		else
 		{
-			$Form->info( '', $comment_renderers );
+			if( count( $comment_options ) > 0 )
+			{
+				$form_inputstart = $Form->inputstart;
+				$form_inputend   = $Form->inputend;
+
+				$Form->inputstart = add_tag_class( $Form->inputstart, 'text_editor_controls' );
+				$Form->inputstart .='<div>';
+				$Form->inputend = '</div><div>'.$text_renderers.'</div>'.$Form->inputend;
+
+				$Form->checklist( $comment_options, 'comment_options', T_('Options') );
+
+				$Form->inputstart = $form_inputstart;
+				$Form->inputend   = $form_inputend;
+			}
+			elseif( ! empty( $text_renderers ) )
+			{
+				$Form->begin_line();
+				echo $text_renderers;
+				$Form->end_line();
+			}
 		}
 
 
@@ -532,16 +567,7 @@ if( $params['comment_type'] == 'meta' )
 
 			echo $Form->buttonsend;
 		$Form->end_fieldset();
-		?>
-		<script>
-		jQuery( document ).ready( function() {
-			// Align TinyMCE toggle buttons:
-			jQuery( '.evo_tinymce_toggle_buttons' ).addClass( 'col-sm-offset-3' );
-		} );
-		</script>
-		<div class="clear"></div>
 
-		<?php
 		$Form->end_form();
 
 		echo $params['after_comment_form'];

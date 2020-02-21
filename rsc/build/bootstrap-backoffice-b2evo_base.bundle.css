@@ -2945,6 +2945,9 @@ a.btn.action_icon.hoverlink {
     text-align: left;
   }
 }
+.form-group__narrow_margin_bottom {
+  margin-bottom: 3px;
+}
 .evo_msgform_recipient label.control-label,
 .evo_msgform_recipient div.controls {
   float: none;
@@ -3420,6 +3423,11 @@ div.message_toolbars {
 }
 .btn-toolbar[class*="_toolbar"].disabled span.btn:hover {
   background: #FFF;
+}
+.text_editor_controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: normal;
 }
 .badge-important {
   background-color: #F00 !important;
