@@ -99,6 +99,7 @@ param( 'link_position', 'string', NULL );
 param( 'fm_mode', 'string' );
 // Use the glyph or font-awesome icons if requested by skin
 param( 'b2evo_icons_type', 'string', '' );
+param( 'prefix', 'string', '' );
 
 // Check that this action request is not a CSRF hacked request:
 if( ! $Session->assert_received_crumb( 'file', false ) )
@@ -137,6 +138,11 @@ if( ! empty( $link_owner ) )
 }
 // Try to get LinkOwner by type and ID:
 $LinkOwner = get_LinkOwner( ( $link_owner_is_temp ? 'temporary' : $link_owner_type ), $link_owner_ID );
+
+if( $link_owner_type == 'comment' && $prefix == 'meta_' )
+{	// Set comment type for proper permission check - meta comment attachments are always allowed:
+	$LinkOwner->Comment->type = 'meta';
+}
 
 if( $upload && ! check_perm_upload_files( $LinkOwner, $fm_FileRoot ) )
 {
