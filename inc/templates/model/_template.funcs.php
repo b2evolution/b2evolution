@@ -73,7 +73,7 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	*/
 
 	// New
-	preg_match_all( '/\[((?:(?:Cat|Form|Item|Link|echo|set):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Cat|Coll|Form|Item|Link|echo|set):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		// Output everything until new tag:
@@ -147,7 +147,16 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Chapter = ( !isset($objects['Chapter']) ? $Chapter : $objects['Chapter'] );
 			if( empty( $rendered_Chapter ) || ! ( $rendered_Chapter instanceof Chapter ) )
 			{
-				return '<span class="evo_param_error">['.$var.']: Object Chapter is not defined at this moment.</span>';
+				return '<span class="evo_param_error">['.$var.']: Object Chapter/Category is not defined at this moment.</span>';
+			}
+			break;
+
+		case 'Coll':
+			global $Blog;
+			$rendered_Blog = ( !isset($objects['Collection']) ? $Blog : $objects['Collection'] );
+			if( empty( $rendered_Blog ) || ! ( $rendered_Blog instanceof Blog ) )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object Collection/Blog is not defined at this moment.</span>';
 			}
 			break;
 
@@ -223,6 +232,11 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_Chapter->get_permanent_link( array_merge( array(
 					'text'   => '#name',
 				), $params ) );
+			break;
+
+		// Collection:
+		case 'Coll:shortname':
+			echo $rendered_Blog->dget( 'shortname' );
 			break;
 
 		// Form:
@@ -556,6 +570,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_Item->get_history_link( array_merge( array(
 					'link_text' => T_('View change history'),
 				), $params ) );
+			break;
+
+		case 'Item:id':
+			echo $rendered_Item->ID;
 			break;
 
 		case 'Item:image_url':
