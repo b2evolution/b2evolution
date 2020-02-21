@@ -12304,7 +12304,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15840, 'Upgrading automation steps table...') )
+	if( upg_task_start( 15840, 'Upgrading automation steps table...' ) )
 	{	// part of 7.1.2-beta
 		db_upgrade_cols( 'T_automation__step', array(
 			'MODIFY' => array(
@@ -12313,6 +12313,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				'step_error_next_step_ID' => 'INT NULL COMMENT "Must be unsigned for special values like -1 = STOP"',
 			),
 		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15850, 'Updating Item Type "Recipe"...' ) )
+	{	// part of 7.1.2-beta
+		$DB->query( 'UPDATE T_items__type
+			  SET ityp_template_full = "recipe_content_full",
+			      ityp_template_name = NULL
+			WHERE ityp_template_name = "recipe"' );
 		upg_task_end();
 	}
 

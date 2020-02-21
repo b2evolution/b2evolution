@@ -259,7 +259,7 @@ Technology, Media & Telecom',                     'recommended', 'allowed',   '4
 		);
 	$post_types[] = array(
 			'name'          => 'Recipe',
-			'template_name' => 'recipe',
+			'template_full' => 'recipe_content_full',
 		);
 	$post_types[] = array(
 			'name'           => 'Post with Custom Fields',
@@ -432,6 +432,7 @@ Technology, Media & Telecom',                     'recommended', 'allowed',   '4
 			'name'                     => '',
 			'description'              => NULL,
 			'usage'                    => 'post',
+			'template_full'            => NULL,
 			'template_name'            => 'single',
 			'perm_level'               => 'standard',
 			'use_short_title'          => 'never',
@@ -1897,7 +1898,7 @@ function create_default_templates( $is_task = true )
 <div class="row">
 	<div class="col-lg-3 col-sm-4">
 		<h4>[Item:custom_field_title|field=ingredients]</h4>
-		<p><[Item:custom_field_formatted|field=ingredients]/p>
+		<p>[Item:custom_field_formatted|field=ingredients]</p>
 	</div>
 	<div class="col-lg-9 col-sm-8">
 		<h4>Directions</h4>
