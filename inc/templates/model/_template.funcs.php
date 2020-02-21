@@ -637,7 +637,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Item:permanent_url':
-			$rendered_Item->get_permanent_url();
+			echo $rendered_Item->get_permanent_url();
 			break;
 
 		case 'Item:propose_change_link':
