@@ -1880,6 +1880,35 @@ function create_default_templates( $is_task = true )
 </div>
 </section>',
 		),
+		'recipe_content_full' => array(
+			'name' => 'Recipe Full content',
+			'template' => '<section class="evo_post__full">
+<div class="row">
+	<div class="col-sm-5">
+		[Item:images|restrict_to_image_position=#cover_and_teaser_all|image_size=crop-320x320|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+	</div>
+	<div class="col-sm-7">
+		[Item:content_teaser]
+		[Item:tags|before=<nav class="small post_tags">|after=</nav>|separator= ]
+		[Item:custom_fields|fields=course,cuisine,servings|custom_fields_table_start=|custom_fields_row_start=<div class="row"$row_attrs$>|custom_fields_row_header_field=<div class="col-xs-3 $header_cell_class$"><b>$field_title$$field_description_icon$</b></div>|custom_fields_description_icon_class=grey|custom_fields_value_default=<div class="col-xs-9 $data_cell_class$"$data_cell_attrs$>$field_value$</div>|custom_fields_row_end=</div>|custom_fields_table_end=]
+		[Item:custom_fields|fields=prep_time,cook_time,passive_time,total_time|custom_fields_table_start=<br /><div class="row">|custom_fields_row_start=<span$row_attrs$>|custom_fields_row_header_field=<div class="col-sm-3 col-xs-6 $header_cell_class$"><b>$field_title$$field_description_icon$</b>|custom_fields_description_icon_class=grey|custom_fields_value_default=<br /><span class="$data_cell_class$"$data_cell_attrs$>$field_value$</span></div>|custom_fields_row_end=</span>|custom_fields_table_end=</div>|hide_empty_lines=1]
+	</div>
+</div>
+<div class="row">
+	<div class="col-lg-3 col-sm-4">
+		<h4>[Item:custom_field_title|field=ingredients]</h4>
+		<p><[Item:custom_field_formatted|field=ingredients]/p>
+	</div>
+	<div class="col-lg-9 col-sm-8">
+		<h4>Directions</h4>
+		[Item:content_extension]
+		[Item:page_links]
+		[Item:footer]
+		[Item:feedback_link]
+	</div>
+</div>
+</section>',
+		),
 /*
 		'cblock_imgleft_textright' => array(
 			'name'     => 'Include Content Block: Images Left / Text Right',
