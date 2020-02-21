@@ -149,19 +149,11 @@ class item_content_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
+		// Prepare params to be transmitted to template:
 		$this->disp_params = array_merge( array(
 				'widget_item_content_params' => array(),
 			), $this->disp_params );
-
-		// Get the params to be transmitted to this widget:
-		if( isset($this->disp_params['widget_item_content_params']) )
-		{	// We have an array, with the new name:
-			$widget_item_content_params = $this->disp_params['widget_item_content_params'];
-		}
-		else
-		{	// We have none, use an empty array:
-			$widget_item_content_params = array();
-		}
+		$widget_item_content_params = $this->disp_params['widget_item_content_params'];
 
 		// Now, for some skins (2015), merge in the OLD name:
 		if( isset($this->disp_params['widget_coll_item_content_params']) )
