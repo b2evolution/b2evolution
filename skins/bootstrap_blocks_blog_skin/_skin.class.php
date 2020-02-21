@@ -588,11 +588,11 @@ class bootstrap_blocks_blog_Skin extends Skin
 				$this->add_dynamic_style( '@media only screen and (min-width: '.$screen['min_width'].') { ' );
 			}
 			// Block height:
-			$this->dynamic_style_rule( $screen_key.'_block_height', '.evo_content_tiles>div>.evo_content_tile { height: $setting_value$px }', array(
+			$this->dynamic_style_rule( $screen_key.'_block_height', '.evo_tiles>div>.evo_tile { height: $setting_value$px }', array(
 					'check' => 'not_empty'
 			) );
 			// Cover height:
-			$this->dynamic_style_rule( $screen_key.'_cover_height', '.evo_content_tiles .evo_content_tile_cover { height: $setting_value$px }', array(
+			$this->dynamic_style_rule( $screen_key.'_cover_height', '.evo_tiles .evo_tile_cover { height: $setting_value$px }', array(
 					'check' => 'not_empty'
 			) );
 			if( isset( $screen['min_width'] ) )

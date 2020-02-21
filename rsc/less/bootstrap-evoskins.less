@@ -1540,11 +1540,11 @@ span[id^=title_folding_] {
 }
 
 // Content Tiles:
-.evo_content_tiles {
+.evo_tiles {
 	> div {
 		padding: 15px;
 	}
-	.evo_content_tile {
+	.evo_tile {
 		height: 400px;
 		border-radius: 10px;
 		overflow: hidden;
@@ -1561,8 +1561,8 @@ span[id^=title_folding_] {
 			height: 100%;
 		}
 	}
-	.evo_content_tile_cover,
-	.evo_content_tile_image {
+	.evo_tile_cover,  // .evo_tile_cover uses bg image and text(category name) inside, we need 10px padding for the text
+	.evo_tile_image { // .evo_tile_image contains <img> tag inside and we do NOT need 10px padding around <img> tag
 		height: 270px;
 		background-color: #EEE;
 		background-size: cover;
@@ -1572,17 +1572,14 @@ span[id^=title_folding_] {
 		text-shadow: 0px 0px 2px #000;
 		overflow: hidden;
 	}
-	.evo_content_tile_image { // TODO: fp> why do we have this again!!?? same as above
-														// yb> .evo_content_tile_cover uses bg image and text(category name) inside, we need 10px padding for the text
-														//     .evo_content_tile_image contains <img> tag inside and we do NOT need 10px padding around <img> tag
+	.evo_tile_image { // TODO: fp> why do we have this again!!?? same as above
 		padding: 0;	
-		div {	// TODO: fp> add comment: What was this created for?
-					// yb> <img> tag on Item block has many <div> and one <a> parent wrappers, in order to make 100% height works on child <img> with "height: 100%;" we need to apply 100% height for each parent wrapper.
-					//     This is CSS behaviour: child element can has 100% height properly only when parent element has defined height.
+		div {
+			// yb> <img> tag on Item block has many <div> and one <a> parent wrappers, in order to make 100% height works on child <img> with "height: 100%;" we need to apply 100% height for each parent wrapper.
+			//     This is CSS behaviour: child element can has 100% height properly only when parent element has defined height.
 			height: 100%;
 		}
-		div.evo_content_tile_image_placeholder {
-			height: 100%;	// keep or remove depending on the above div
+		div.evo_tile_image_placeholder {
 			width: 100%;
 			display: table;
 			a { // placeholder icon link
@@ -1605,7 +1602,7 @@ span[id^=title_folding_] {
 			object-fit: cover;
 		}
 	}
-	.evo_content_tile_text {
+	.evo_tile_text {
 		padding-left: 10px;
 		padding-right: 10px;
 		h2, h3 {
@@ -1616,10 +1613,10 @@ span[id^=title_folding_] {
 	}
 }
 // Note: THIS is correct MODIFIER CSS (No nesting and ON the element that it modified, NOT the parent):
-.evo_content_tile__shadow {
+.evo_tile__shadow {
 	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
-.evo_content_tile__grey_bg {
+.evo_tile__grey_bg {
 	background-color: #fafafa;
 }
 

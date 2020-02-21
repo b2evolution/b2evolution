@@ -45,26 +45,26 @@ widget_container( 'item_list', array(
 // Display message if no post:
 display_if_empty();
 
-echo '<div class="row evo_content_tiles evo_content_tiles__shadow">';
+echo '<div class="row evo_tiles evo_tiles__shadow">';
 while( $Item = & mainlist_get_item() )
 { // For each blog post, do everything below up to the closing curly brace "}"
 	echo '<div class="'.$Skin->get_setting( 'posts_list_block_class' ).'">';
-	echo '<div class="evo_content_tile evo_content_tile__shadow">';
+	echo '<div class="evo_tile evo_tile__shadow">';
 	echo '<a href="'.$Item->get_permanent_url().'"></a>';
 	echo '<div>';
 	$item_cover_image_url = $Item->get_cover_image_url( 'cover,teaser' );
-	echo '<div class="evo_content_tile_cover"'.( $item_cover_image_url ? ' style="background-image:url('.$item_cover_image_url.')"' : '' ).'>';
+	echo '<div class="evo_tile_cover"'.( $item_cover_image_url ? ' style="background-image:url('.$item_cover_image_url.')"' : '' ).'>';
 	if( $item_main_Chapter = & $Item->get_main_Chapter() )
 	{
 		echo $item_main_Chapter->get_name();
 	}
-	echo '</div>'; // End of evo_content_tile_cover
-	echo '<div class="evo_content_tile_text">';
+	echo '</div>'; // End of evo_tile_cover
+	echo '<div class="evo_tile_text">';
 		echo '<h2>'.$Item->dget( 'title' ).'</h2>';
 		$Item->excerpt();
-	echo '</div>'; // End of evo_content_tile_text
+	echo '</div>'; // End of evo_tile_text
 	echo '</div>';
-	echo '</div>'; // End of evo_content_tile
+	echo '</div>'; // End of evo_tile
 	echo '</div>'; // End of Settings:posts_list_block_class
 } // ---------------------------------- END OF POSTS ------------------------------------
 echo '</div>';

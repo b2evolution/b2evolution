@@ -5671,28 +5671,28 @@ span[id^=title_folding_] {
     margin-left: -285px;
   }
 }
-.evo_content_tiles > div {
+.evo_tiles > div {
   padding: 15px;
 }
-.evo_content_tiles .evo_content_tile {
+.evo_tiles .evo_tile {
   height: 400px;
   border-radius: 10px;
   overflow: hidden;
   position: relative;
   padding-bottom: 10px;
 }
-.evo_content_tiles .evo_content_tile > div {
+.evo_tiles .evo_tile > div {
   height: 100%;
   overflow: hidden;
 }
-.evo_content_tiles .evo_content_tile > a {
+.evo_tiles .evo_tile > a {
   position: absolute;
   display: block;
   width: 100%;
   height: 100%;
 }
-.evo_content_tiles .evo_content_tile_cover,
-.evo_content_tiles .evo_content_tile_image {
+.evo_tiles .evo_tile_cover,
+.evo_tiles .evo_tile_image {
   height: 270px;
   background-color: #EEE;
   background-size: cover;
@@ -5702,18 +5702,17 @@ span[id^=title_folding_] {
   text-shadow: 0px 0px 2px #000;
   overflow: hidden;
 }
-.evo_content_tiles .evo_content_tile_image {
+.evo_tiles .evo_tile_image {
   padding: 0;
 }
-.evo_content_tiles .evo_content_tile_image div {
+.evo_tiles .evo_tile_image div {
   height: 100%;
 }
-.evo_content_tiles .evo_content_tile_image div.evo_content_tile_image_placeholder {
-  height: 100%;
+.evo_tiles .evo_tile_image div.evo_tile_image_placeholder {
   width: 100%;
   display: table;
 }
-.evo_content_tiles .evo_content_tile_image div.evo_content_tile_image_placeholder a {
+.evo_tiles .evo_tile_image div.evo_tile_image_placeholder a {
   display: table-cell;
   text-align: center;
   vertical-align: middle;
@@ -5721,29 +5720,29 @@ span[id^=title_folding_] {
   color: #ddd;
   text-shadow: none;
 }
-.evo_content_tiles .evo_content_tile_image a {
+.evo_tiles .evo_tile_image a {
   height: 100%;
   display: block;
 }
-.evo_content_tiles .evo_content_tile_image img {
+.evo_tiles .evo_tile_image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.evo_content_tiles .evo_content_tile_text {
+.evo_tiles .evo_tile_text {
   padding-left: 10px;
   padding-right: 10px;
 }
-.evo_content_tiles .evo_content_tile_text h2,
-.evo_content_tiles .evo_content_tile_text h3 {
+.evo_tiles .evo_tile_text h2,
+.evo_tiles .evo_tile_text h3 {
   font-size: 20px;
   padding-top: 10px;
   margin-top: 0;
 }
-.evo_content_tile__shadow {
+.evo_tile__shadow {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
-.evo_content_tile__grey_bg {
+.evo_tile__grey_bg {
   background-color: #fafafa;
 }
 .comment-workflow-form {
