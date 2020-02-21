@@ -74,10 +74,9 @@ div.widget_core_coll_related_post_list {
 
 					// Important for limiting the max image size to it's parent's max width
 					.item_first_image img {
-						max-width: 100%;
-						max-height: 380px;
-						width:auto;
-						height:auto;
+						width: 100%;
+						height: 240px;
+						object-fit: cover;
 						margin: auto;
 					}
 					.item_title {
@@ -85,6 +84,15 @@ div.widget_core_coll_related_post_list {
 						font-weight: 700;
 						line-height: 1.5em;
 						margin: 10px 0 5px;
+					}
+					.item_content { // Teaser or excerpt... we want to align the [...] button in the bottom right
+						> p:last-of-type { // this is not perfect but makes things a little more coherent if we have a teaser with multiple paragraphs
+							min-height: 60px;
+							margin-bottom: 0px;
+						}
+						a {
+							margin: -20px 0 0;
+						}
 					}
 				}
 			}
