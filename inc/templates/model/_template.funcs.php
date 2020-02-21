@@ -613,14 +613,14 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Item:more_link':
-			echo $rendered_Item->get_more_link( array_merge( array( // Here, we make sure not to modify $params
+			echo $rendered_Item->get_more_link( array_merge( array(
 					'before' => '<p class="evo_post_more_link">',
 					'after'  => '</p>',
 				), $params ) );
 			break;
 
 		case 'Item:page_links':
-			echo $rendered_Item->get_page_links( array_merge( array( // Here, we make sure not to modify $params
+			echo $rendered_Item->get_page_links( array_merge( array(
 					'separator'   => '&middot; ',
 				), $params ) );
 			break;
@@ -634,6 +634,10 @@ function render_template_callback( $var, $params, $objects = array() )
 				//	'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
 				//	'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
 				//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
+			break;
+
+		case 'Item:permanent_url':
+			$rendered_Item->get_permanent_url();
 			break;
 
 		case 'Item:propose_change_link':
