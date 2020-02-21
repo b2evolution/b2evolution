@@ -1,1 +1,0 @@
-Recipe contents & photos taken from https://github.com/clarklab/chowdown/ licensed under "The Unlicense" https://unlicense.org
