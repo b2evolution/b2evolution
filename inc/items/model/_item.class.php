@@ -5014,7 +5014,7 @@ class Item extends ItemLight
 				'after'                      => '</div>',
 				'image_size'                 => 'fit-720x500',
 				'image_size_x'               => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
-				'image_sizes'                => NULL, // // Simplified "sizes="" attribute for browser to select correct size from "srcset=". 
+				'image_sizes'                => NULL, // Simplified "sizes=" attribute for browser to select correct size from "srcset=".
 															// Must be set DIFFERENTLY depending on WIDGET/CONTAINER/SKIN LAYOUT. Each time we must estimate the size the image will have on screen.
 															// Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
 				'image_link_to'              => 'original', // Can be 'original' (image) or 'single' (this post)
