@@ -94,19 +94,25 @@
 		opacity: 1;
 		visibility: visible;
 	}
-	&.logged_in_margin_top {
+	&.slide-top-toolbar {
 		top: 35px;
+	}
+	&.slide-top-fixed-header {
+		top: 50px;
+	}
+	&.slide-top-toolbar.slide-top-fixed-header {
+		top: 85px;
 	}
 }
 
 // We need these media queries for controlling margin-top on slide-top button when on devices
 @media only screen and (max-device-width: 1024px) {
-	.btn.slide-top.logged_in_margin_top {
+	.btn.slide-top.slide-top-toolbar {
 		top: 8px;
 	}
 }
 @media (min-width: 768px) and (max-width: 991px) and (min-device-width: 1024px) {
-	.btn.slide-top.logged_in_margin_top {
+	.btn.slide-top.slide-top-toolbar {
 		top: 35px;
 	}
 }

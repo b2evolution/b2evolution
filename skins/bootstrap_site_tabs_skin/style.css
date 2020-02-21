@@ -7,13 +7,19 @@
   display: table;
 }
 #evo_site_header .swhead_sitename {
-  display: table-cell;
   vertical-align: middle;
   white-space: nowrap;
-  padding: 0 10px;
+}
+#evo_site_header .swhead_sitename a {
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-right: 2px;
 }
 #evo_site_header .swhead_sitename.swhead_logo {
+  display: table-cell;
   background-color: #ddd;
+}
+#evo_site_header .swhead_sitename.swhead_logo a {
   padding: 0;
 }
 #evo_site_header .swhead_sitename.swhead_logo img {
@@ -179,16 +185,22 @@ div.level2 nav .nav li.active a:focus {
   opacity: 1;
   visibility: visible;
 }
-.btn.slide-top.logged_in_margin_top {
+.btn.slide-top.slide-top-toolbar {
   top: 35px;
 }
+.btn.slide-top.slide-top-fixed-header {
+  top: 55px;
+}
+.btn.slide-top.slide-top-toolbar.slide-top-fixed-header {
+  top: 90px;
+}
 @media only screen and (max-device-width: 1024px) {
-  .btn.slide-top.logged_in_margin_top {
+  .btn.slide-top.slide-top-toolbar {
     top: 8px;
   }
 }
 @media (min-width: 768px) and (max-width: 991px) and (min-device-width: 1024px) {
-  .btn.slide-top.logged_in_margin_top {
+  .btn.slide-top.slide-top-toolbar {
     top: 35px;
   }
 }

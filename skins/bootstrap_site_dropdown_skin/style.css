@@ -97,16 +97,22 @@
   opacity: 1;
   visibility: visible;
 }
-.btn.slide-top.logged_in_margin_top {
+.btn.slide-top.slide-top-toolbar {
   top: 35px;
 }
+.btn.slide-top.slide-top-fixed-header {
+  top: 50px;
+}
+.btn.slide-top.slide-top-toolbar.slide-top-fixed-header {
+  top: 85px;
+}
 @media only screen and (max-device-width: 1024px) {
-  .btn.slide-top.logged_in_margin_top {
+  .btn.slide-top.slide-top-toolbar {
     top: 8px;
   }
 }
 @media (min-width: 768px) and (max-width: 991px) and (min-device-width: 1024px) {
-  .btn.slide-top.logged_in_margin_top {
+  .btn.slide-top.slide-top-toolbar {
     top: 35px;
   }
 }
