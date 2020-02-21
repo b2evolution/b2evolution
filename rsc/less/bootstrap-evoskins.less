@@ -1573,8 +1573,12 @@ span[id^=title_folding_] {
 		overflow: hidden;
 	}
 	.evo_content_tile_image { // TODO: fp> why do we have this again!!?? same as above
+														// yb> .evo_content_tile_cover uses bg image and text(category name) inside, we need 10px padding for the text
+														//     .evo_content_tile_image contains <img> tag inside and we do NOT need 10px padding around <img> tag
 		padding: 0;	
 		div {	// TODO: fp> add comment: What was this created for?
+					// yb> <img> tag on Item block has many <div> and one <a> parent wrappers, in order to make 100% height works on child <img> with "height: 100%;" we need to apply 100% height for each parent wrapper.
+					//     This is CSS behaviour: child element can has 100% height properly only when parent element has defined height.
 			height: 100%;
 		}
 		div.evo_content_tile_image_placeholder {
