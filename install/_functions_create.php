@@ -1675,7 +1675,7 @@ function create_default_templates( $is_task = true )
 		),
 		'item_details_infoline_forums' => array(
 			'name'     => 'Item Details: Thread last updated on Date',
-			'template' => '<span class="small text-muted">[flag_icon] Thread last updated on [contents_last_updated|format=#extended_date] at [contents_last_updated|format=#short_time] [refresh_contents_last_updated_link]',
+			'template' => '<span class="small text-muted">[flag_icon] Thread last updated on [contents_last_updated|format=#extended_date] at [contents_last_updated|format=#short_time] [refresh_contents_last_updated_link]</span>',
 		),
 
 		// Item info New :
