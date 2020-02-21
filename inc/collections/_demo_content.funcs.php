@@ -2413,12 +2413,18 @@ function create_demo_collection( $collection_type, $owner_ID, $use_demo_user = t
 					$blog_tagline,
 					sprintf( $default_blog_longdesc, $blog_shortname, '' ),
 					'Bootstrap Forums',
-					'group', 'any', 1, '#', false, 'public',
+					'group', 'any', 1, '#', false, 'member',
 					$owner_ID,
-					'public',
+					'members',
 					$section_ID );
 			if( $blog_group_ID )
 			{
+				$BlogCache = & get_BlogCache();
+				if( $group_Collection = $BlogCache->get_by_ID( $blog_group_ID, false, false ) )
+				{
+					$group_Collection->set( 'advanced_perms', 1 );
+					$group_Collection->dbupdate();
+				}
 				$blog_ID = $blog_group_ID;
 			}
 			break;
