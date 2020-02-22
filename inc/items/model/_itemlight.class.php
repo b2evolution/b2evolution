@@ -1297,6 +1297,11 @@ class ItemLight extends DataObject
 	{
 		global $Collection, $Blog;
 
+		if( empty($text) )
+		{
+			return '';
+		}
+
 		$params = array_merge( array(
 				'nofollow' => false,
 			), $params );
@@ -1328,9 +1333,8 @@ class ItemLight extends DataObject
 				$text = get_icon( 'permalink' );
 				break;
 
-			case '#text':
-			case '#text#':
-				$text = T_('Permalink');
+			case '#fileicon+title':
+				$text = get_icon( 'file_message' ).format_to_output( $this->get( 'title' ) );
 				break;
 
 			case '#linkicon+text':
@@ -1347,9 +1351,15 @@ class ItemLight extends DataObject
 				$text = format_to_output( $this->get( 'title' ) );
 				break;
 
-			case '#fileicon+title':
-				$text = get_icon( 'file_message' ).format_to_output( $this->get( 'title' ) );
+			case '#text':
+			case '#text#':
+				$text = T_('Permalink');
 				break;
+
+			case '#more_arrow':
+				$text = T_('more').' &raquo;';
+				break;
+
 		}
 
 		if( $title == '#' )
@@ -1385,7 +1395,7 @@ class ItemLight extends DataObject
 				'after'       => '',
 				'text'        => '#',	// possible special values: ...
 				'title'       => '#',
-				'class'       => '',
+				'class'       => 'nowrap',
 				'target_blog' => '',
 				'post_navigation' => '',
 				'nav_target'      => NULL,

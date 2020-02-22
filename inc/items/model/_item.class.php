@@ -2326,7 +2326,8 @@ class Item extends ItemLight
 				'after'               => '</div>',
 				'excerpt_before_more' => ' <span class="excerpt_more">',
 				'excerpt_after_more'  => '</span>',
-				'excerpt_more_text'   => T_('more').' &raquo;',
+				'excerpt_more_text'   => '#more_arrow', 	// possible special values: ...
+				'excerpt_more_class'  => 'nowrap',
 				'format'              => 'htmlbody',
 			), $params );
 
@@ -2335,13 +2336,17 @@ class Item extends ItemLight
 		if( ! empty( $r ) )
 		{
 			echo $params['before'];
+
 			echo $r;
-			if( !empty( $params['excerpt_more_text'] ) )
-			{
-				echo $params['excerpt_before_more'];
-				echo '<a href="'.$this->get_permanent_url().'" class="nowrap">'.$params['excerpt_more_text'].'</a>';
-				echo $params['excerpt_after_more'];
-			}
+
+			$this->permanent_link( array(
+					'before'      => $params['excerpt_before_more'],
+					'after'       => $params['excerpt_after_more'],
+					'text'        => $params['excerpt_more_text'],
+					'title'       => '#',
+					'class'       => $params['excerpt_more_class'],
+				) );
+
 			echo $params['after'];
 		}
 	}
@@ -4449,7 +4454,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Template tag
+	 * Display "more" link to "After more" or follow-up anchor
 	 */
 	function more_link( $params = array() )
 	{
@@ -4458,7 +4463,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Display more link
+	 * Get "more" link to "After more" or follow-up anchor
 	 */
 	function get_more_link( $params = array() )
 	{
@@ -4479,10 +4484,11 @@ class Item extends ItemLight
 		global $more;
 
 		if( ! $this->has_content_parts($params) )
-		{ // This is NOT an extended post:
+		{ // This is NOT an extended post, no "read more" is needed:
 			return '';
 		}
 
+		/* fp 2020-02-22: obsolete code 
 		if( ( $more == 0 ) && ( $params[ 'link_to' ] == false ) )
 		{ // Don't display "After more" content
 			if( !empty( $params[ 'link_text' ] ) )
@@ -4491,6 +4497,7 @@ class Item extends ItemLight
 			}
 			return '';
 		}
+		*/
 
 		$content_parts = $this->get_content_parts($params);
 

@@ -1671,7 +1671,7 @@ function create_default_templates( $is_task = true )
 		),
 		'item_details_infoline_long' => array(
 			'name'     => 'Item Details: Long info line',
-			'template' => '<span class="small text-muted">[flag_icon] [permalink|text=#linkicon] Posted by [author] on [issue_date|date_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [contents_last_updated][refresh_contents_last_updated_link] [edit_link]</span>',
+			'template' => '<span class="small text-muted">[flag_icon] [Item:permalink|text=#linkicon] Posted by [author] on [issue_date|date_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [contents_last_updated][refresh_contents_last_updated_link] [edit_link]</span>',
 		),
 		'item_details_infoline_forums' => array(
 			'name'     => 'Item Details: Thread last updated on Date',
@@ -1718,7 +1718,7 @@ function create_default_templates( $is_task = true )
 			'name'     => 'Content List: Item',
 			'template' => '<li>
 	<h3>[read_status] [Item:permalink|text=#fileicon+title|class=link] [flag_icon]</h3>[visibility_status]
-	<div class="evo_post__excerpt_text">[excerpt]</div>
+	[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more_arrow|excerpt_after_more=</span>]
 </li>',
 		),
 
@@ -1785,7 +1785,9 @@ function create_default_templates( $is_task = true )
 	<div class="widget_rwd_content clearfix">
 		<div class="item_first_image">[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=crop-512x512|image_link_to=single|placeholder=#file_text_icon]</div>
 		<h3 class="item_title">[Item:permalink|text=#title]</h3>
-		<div class="item_content">[Item:excerpt]</div>
+		<div class="item_content">[Item:excerpt|excerpt_more_text=]
+			[Item:permalink|text=...|class=btn btn-xs btn-default]
+		</div>
 	</div>
 </div>',
 		),
@@ -1820,7 +1822,8 @@ function create_default_templates( $is_task = true )
 			<div class="evo_tile_image">[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=crop-512x512|image_link_to=single|placeholder=#file_text_icon]</div>
 			<div class="evo_tile_text">
 				<h3>[Item:permalink|text=#title]</h3>
-				<div>[Item:excerpt]</div>
+				<div>[Item:excerpt|excerpt_more_text=]</div>
+				[Item:permalink|text=...|class=btn btn-xs btn-default]
 			</div>
 		</div>
 	</div>
@@ -1854,7 +1857,7 @@ function create_default_templates( $is_task = true )
 		'item_content_excerpt' => array(
 			'name' => 'Item Excerpt',
 			'template' => '<section class="evo_post__excerpt">
-[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>]
+[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more_arrow|excerpt_after_more=</span>]
 </section>',
 		),
 		'item_content_teaser' => array(

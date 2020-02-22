@@ -547,7 +547,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					'after'               => '',
 					'excerpt_before_more' => ' <span class="evo_post__excerpt_more_link">',
 					'excerpt_after_more'  => '</span>',
-					'excerpt_more_text'   => T_('more').' &raquo;',
+					'excerpt_more_text'   => '#more_arrow',
 				), $params ) );
 			break;
 
@@ -613,6 +613,9 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Item:more_link':
+			// Display "more" link to "After more" or follow-up anchor
+			// WARNING: does not work if no "after more" part
+			// If you want a "go from excerpt to full post, use "Item:permalink"
 			echo $rendered_Item->get_more_link( array_merge( array(
 					'before' => '<p class="evo_post_more_link">',
 					'after'  => '</p>',
