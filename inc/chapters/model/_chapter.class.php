@@ -756,6 +756,10 @@ class Chapter extends DataObject
 			case '#expandicon+name':
 				$text = get_icon( 'expand' ).format_to_output( $this->get( 'name' ) );
 				break;
+
+			case '#open+arrow':
+				$text = T_('Open').' &raquo;';
+				break;
 		}
 
 		$title = $params['title'];

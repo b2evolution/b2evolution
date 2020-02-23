@@ -1351,8 +1351,12 @@ class ItemLight extends DataObject
 				$text = T_('Permalink');
 				break;
 
-			case '#more_arrow':
+			case '#more+arrow':
 				$text = T_('more').' &raquo;';
+				break;
+
+			case '#read+arrow':
+				$text = T_('Read').' &raquo;';
 				break;
 
 		}

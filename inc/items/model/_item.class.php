@@ -2326,7 +2326,7 @@ class Item extends ItemLight
 				'after'               => '</div>',
 				'excerpt_before_more' => ' <span class="excerpt_more">',
 				'excerpt_after_more'  => '</span>',
-				'excerpt_more_text'   => '#more_arrow', 	// possible special values: ...
+				'excerpt_more_text'   => '#more+arrow', 	// possible special values: ...
 				'excerpt_more_class'  => 'nowrap',
 				'format'              => 'htmlbody',
 			), $params );

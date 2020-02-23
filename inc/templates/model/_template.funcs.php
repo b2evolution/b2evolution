@@ -547,7 +547,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					'after'               => '',
 					'excerpt_before_more' => ' <span class="evo_post__excerpt_more_link">',
 					'excerpt_after_more'  => '</span>',
-					'excerpt_more_text'   => '#more_arrow',
+					'excerpt_more_text'   => '#more+arrow',
 				), $params ) );
 			break;
 

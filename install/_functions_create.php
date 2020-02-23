@@ -1718,7 +1718,7 @@ function create_default_templates( $is_task = true )
 			'name'     => 'Content List: Item',
 			'template' => '<li>
 	<h3>[read_status] [Item:permalink|text=#fileicon+title|class=link] [flag_icon]</h3>[visibility_status]
-	[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more_arrow|excerpt_after_more=</span>]
+	[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
 </li>',
 		),
 
@@ -1774,7 +1774,7 @@ function create_default_templates( $is_task = true )
 
 		// Tiles style 2:
 		'content_tiles_2' => array(
-			'name'     => 'Content Tiles Style 2 (BG image, Experimental)',
+			'name'     => 'Content Tiles Style 2 (Button, BG image:Experimental)',
 			'template' => '[set:before_list=<div class="evo_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_2_subcat]
@@ -1785,7 +1785,7 @@ function create_default_templates( $is_task = true )
 		),
 
 		'content_tiles_2_subcat' => array(
-			'name'     => 'Content Tiles Style 2 (BG image, Experimental): Subcat',
+			'name'     => 'Content Tiles Style 2 (Button, BG image:Experimental): Subcat',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1793,7 +1793,7 @@ function create_default_templates( $is_task = true )
 			<div class="evo_tile_body">
 				<h3>[Cat:permalink|class=evo_tile_title]</h3>
 				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
-				[Cat:permalink|text=cat...|class=evo_tile_more btn btn-sm btn-default]
+				[Cat:permalink|text=#open+arrow|class=evo_tile_more btn btn-sm btn-default]
 			</div>
 		</div>
 	</div>
@@ -1801,7 +1801,7 @@ function create_default_templates( $is_task = true )
 		),
 
 		'content_tiles_2_item' => array(
-			'name'     => 'Content Tiles Style 2 (BG image, Experimental): Item',
+			'name'     => 'Content Tiles Style 2 (Button, BG image:Experimental): Item',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1811,7 +1811,7 @@ function create_default_templates( $is_task = true )
 			<div class="evo_tile_body">
 				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
 				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
-				[Item:permalink|text=post...|class=evo_tile_more btn btn-sm btn-default]
+				[Item:permalink|text=#read+arrow|class=evo_tile_more btn btn-sm btn-default]
 			</div>
 		</div>
 	</div>
@@ -1821,7 +1821,7 @@ function create_default_templates( $is_task = true )
 
 		// Tiles style 3:
 		'content_tiles_3' => array(
-			'name'     => 'Content Tiles Style 3 (Standard)',
+			'name'     => 'Content Tiles Style 3 (Button)',
 			'template' => '[set:before_list=<div class="evo_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_3_subcat]
@@ -1832,7 +1832,7 @@ function create_default_templates( $is_task = true )
 		),
 
 		'content_tiles_3_subcat' => array(
-			'name'     => 'Content Tiles Style 3 (Standard): Subcat',
+			'name'     => 'Content Tiles Style 3 (Button): Subcat',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1842,7 +1842,7 @@ function create_default_templates( $is_task = true )
 			<div class="evo_tile_body">
 				<h3>[Cat:permalink|class=evo_tile_title]</h3>
 				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
-				[Cat:permalink|text=cat...|class=evo_tile_more btn btn-sm btn-default]
+				[Cat:permalink|text=#open+arrow|class=evo_tile_more btn btn-sm btn-default]
 			</div>
 		</div>
 	</div>
@@ -1850,7 +1850,7 @@ function create_default_templates( $is_task = true )
 		),
 
 		'content_tiles_3_item' => array(
-			'name'     => 'Content Tiles Style 3 (Standard): Item',
+			'name'     => 'Content Tiles Style 3 (Button): Item',
 			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1861,7 +1861,7 @@ function create_default_templates( $is_task = true )
 			<div class="evo_tile_body">
 				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
 				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
-				[Item:permalink|text=post...|class=evo_tile_more btn btn-sm btn-default]
+				[Item:permalink|text=#read+arrow|class=evo_tile_more btn btn-sm btn-default]
 			</div>
 		</div>
 	</div>
@@ -1895,7 +1895,7 @@ function create_default_templates( $is_task = true )
 		'item_content_excerpt' => array(
 			'name' => 'Item Excerpt',
 			'template' => '<section class="evo_post__excerpt">
-[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more_arrow|excerpt_after_more=</span>]
+[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
 </section>',
 		),
 		'item_content_teaser' => array(
