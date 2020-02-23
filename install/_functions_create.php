@@ -1732,7 +1732,10 @@ function create_default_templates( $is_task = true )
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers:evo_tile__lg evo_tile__grey_bg]
 [set:evo_tile_image__modifiers:]
-[set:evo_tile_text__modifiers:evo_tile_text__gradient]',
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers:evo_tile_text__gradient]
+',
 		),
 
 		'content_tiles_subcat' => array(
@@ -1741,7 +1744,7 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Cat:image|size=fit-400x320|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
+				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
 			</div>
 			<div class="evo_tile_body">
 				<h3>[Cat:name]</h3>
@@ -1759,7 +1762,7 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=fit-400x320|image_link_to=|placeholder=#file_text_icon]
+				[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=|placeholder=#file_text_icon]
 				<div class="evo_tile_overlay">[Item:cat_name]</div>
 			</div>
 			<div class="evo_tile_body">
@@ -1783,6 +1786,8 @@ function create_default_templates( $is_task = true )
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__shadow]
 [set:evo_tile_image__modifiers:]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
 [set:evo_tile_text__modifiers:evo_tile_text__gradient]',
 		),
 
@@ -1791,7 +1796,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
-			<div class="evo_tile_cover" style="[Cat:background_image_css|size=fit-400x320|size_2x=crop-1024x1024]"></div>
+			<div class="evo_tile_cover" style="[Cat:background_image_css|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$fit-400x320|size_2x=crop-1024x1024]"></div>
 			<div class="evo_tile_body">
 				<h3>[Cat:permalink|class=evo_tile_title]</h3>
 				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
@@ -1807,7 +1812,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
-			<div class="evo_tile_cover" style="[Item:background_image_css|size=fit-400x320|size_2x=crop-1024x1024]">
+			<div class="evo_tile_cover" style="[Item:background_image_css|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$fit-400x320|size_2x=crop-1024x1024]">
 				<div class="evo_tile_overlay">[Item:cat_name]</div>
 			</div>
 			<div class="evo_tile_body">
@@ -1831,6 +1836,8 @@ function create_default_templates( $is_task = true )
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg]
 [set:evo_tile_image__modifiers:evo_tile_image__margin]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
 [set:evo_tile_text__modifiers:evo_tile_text__gradient]',
 		),
 
@@ -1840,7 +1847,7 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Cat:image|size=fit-400x320|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
+				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$fit-400x320|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
 			</div>
 			<div class="evo_tile_body">
 				<h3>[Cat:permalink|class=evo_tile_title]</h3>
@@ -1858,7 +1865,7 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=fit-400x320|image_link_to=single|placeholder=#file_text_icon]
+				[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=single|placeholder=#file_text_icon]
 				<div class="evo_tile_overlay">[Item:cat_name]</div>
 			</div>
 			<div class="evo_tile_body">

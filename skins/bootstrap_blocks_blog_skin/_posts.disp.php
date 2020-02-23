@@ -56,9 +56,10 @@ $item_template_params = array_merge( $params, array(
 		'rwd_cols'                  => 'col-xs-12 col-sm-6 col-md-6 col-lg-4',
 		'evo_tile__modifiers'       => 'evo_tile__md evo_tile__grey_bg evo_tile__shadow',
 		'evo_tile_image__modifiers' => '',
+		'evo_tile_image__size'       => 'fit-400x320',
+		'evo_tile_image__sizes'      => 'max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]',
 		'evo_tile_text__modifiers'  => 'evo_tile_text__gradient',
 	) );
-
 
 
 
