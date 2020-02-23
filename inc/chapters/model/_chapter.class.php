@@ -1063,7 +1063,7 @@ class Chapter extends DataObject
 			switch( $placeholder_html )
 			{
 				case '#folder_icon';
-					$placeholder_html = '<div class="evo_tile_image_placeholder"><a href="$url$"><i class="fa fa-folder-o"></i></a></div>';
+					$placeholder_html = '<div class="evo_image_block evo_img_placeholder"><a href="$url$" class="evo_img_placeholder"><i class="fa fa-folder-o"></i></a></div>';
 					break;
 			}
 			return str_replace( '$url$', $this->get_permanent_url(), $placeholder_html );
