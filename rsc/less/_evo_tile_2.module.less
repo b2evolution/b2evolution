@@ -1,29 +1,37 @@
-// Styles for evo Tiles 2 (new design with no borders and shadow)
+// Styles for "evo Tiles" module
+// This module is designed to be used in many templates and any widgets 
 
 // Default values
+// Modifier: Size SM:
 @tile_height__sm: 272px;
 @tile_image_height__sm: 150px;
+// Modifier:ize MD: (Default)
 @tile_height__md: 342px;
 @tile_image_height__md: 200px;
+// Modifier:Size LG:
 @tile_height__lg: 402px;
 @tile_image_height__lg: 240px;
+// Modifier: grey Bbackground:
 @tile_bg_level: 250; // 0-255 ()
+// Placeholder images:
 @img_placeholder_bg_color: #f0f0f0; // Background color of the Placeholder
 @img_placeholder_icon_color: #dcdcdc; // Color of the icon inside the Placeholder element
+
+// ------------------------------------------
 
 // TILE: (designed to be associated with bootstrap col-*-*)
 .evo_tile {
 	margin: 15px 0;
 	padding-bottom: 10px;
-	height: @tile_height__md;		// We need some defined height for the embeded elements to correctl position
+	height: @tile_height__md;	// Tile height but also Note: We need some defined height for the embeded elements to correctly position
 	border-radius: 10px;
 	overflow: hidden;
-	position: relative;  // This Allows absolute positionning of children relative to this div
-	> div.hide_overflow {  // hide overflow, within desired padding
-		height: 100%;
+	position: relative;  	// This Allows absolute positionning of children relative to this div
+	> div.hide_overflow {	// hide overflow, within desired padding
+		height: 100%;			// This is the only place where we can use height 100% to avoid overflow at the bottom
 		overflow: hidden;
 		position: relative;  // This Allows absolute positionning of children relative to this div
-						// BUT this also positions realtive in the parent, so we need an individual wrapper around each
+									// BUT this also positions realtive in the parent, so we need an individual wrapper around each
 	}
 	> a { // This is for making a link that overlaps the whole tile, making everything clickable:
 		position: absolute;
@@ -62,6 +70,8 @@
 	}
 }
 
+// ------------------------------------------
+
 // Tile > COVER (used with background image):
 .evo_tile_cover { 
 	height: @tile_image_height__md;
@@ -72,6 +82,8 @@
 	text-shadow: 0px 0px 2px #000;
 	overflow: hidden;
 }
+
+// ------------------------------------------
 
 // Tile > IMAGE:
 .evo_tile_image { // .evo_tile_image contains <img> tag inside and we do NOT need 10px padding around <img> tag
@@ -116,6 +128,8 @@
 	}
 }
 
+// ------------------------------------------
+
 // Tile > OVERLAY (put text over image; "could" be used in other places too)
 .evo_tile_overlay {
 	position: absolute;
@@ -125,14 +139,18 @@
 	text-shadow: 0px 0px 2px #000;
 }
 
+// ------------------------------------------
+
 // Tile > BODY: (contains title, text, button)
 .evo_tile_body {
-	padding: 10px; // always needs a padding
+	padding: 10px; // always pas to avoid text touching image and borders
 	h2, h3 {
 		margin-top: 0;
 		font-size: 20px;
 	}
 }
+
+// ------------------------------------------
 
 // Tile > TEXT
 // Modifiers:
@@ -153,3 +171,5 @@
 	bottom: 0;
 	margin: 0 !important; // we need to override a rule like .evo_widget .btn
 }
+
+// ------------------------------------------
