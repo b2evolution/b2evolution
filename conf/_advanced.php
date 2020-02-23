@@ -121,7 +121,6 @@ $thumbnail_sizes = array(
 		// 3:2 ratio 1.5
 			'crop-480x320'			=> array( 'crop', 480, 320, 90 ),
 		// 1:1 square ratio 1
-			'crop-1024x1024'		=> array( 'crop', 1024, 1024, 85 ),	// // 2020-02-20 added for Content Tiles tests (may be removed later)
 			'crop-512x512'			=> array( 'crop', 512, 512, 85 ),		// EXPERIMENTAL For Retina
 			'crop-320x320'			=> array( 'crop', 320, 320, 85 ),
 			'crop-256x256'			=> array( 'crop', 256, 256, 85 ),
