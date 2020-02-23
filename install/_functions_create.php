@@ -1826,7 +1826,7 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_3_subcat]
 [set:item_template=content_tiles_3_item]
-[set:evo_tile__modifiers:evo_tile__lg evo_tile__grey_bg]
+[set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg]
 [set:evo_tile_image__modifiers:evo_tile_image__margin]
 [set:evo_tile_text__modifiers:evo_tile_text__gradient]',
 		),
