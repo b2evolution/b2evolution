@@ -637,6 +637,16 @@ $ext_path = $basepath.$ext_subdir;  // You should not need to change this
 
 
 /**
+ * Allow to use scripts from /cli folder
+ *
+ * Note: most scripts are available only in b2evolution PRO
+ *
+ * @global boolean
+ */
+$allow_cli_folder = false;
+
+
+/**
  * Do you want to allow public access to the media dir?
  *
  * WARNING: If you set this to false, evocore will use /htsrv/getfile.php as a stub
