@@ -581,7 +581,21 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Item:images':
-			echo $rendered_Item->get_images( $params );
+			echo $rendered_Item->get_images( array_merge( array(
+					'before'                     => '<div>',
+					'before_image'               => '<figure class="evo_image_block">',
+					'before_image_legend'        => '<div class="evo_image_legend">',
+					'after_image_legend'         => '</div>',
+					'after_image'                => '</figure>',
+					'after'                      => '</div>',
+					'image_size'                 => 'fit-720x500',
+					'image_size_x'               => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
+					'image_sizes'                => NULL, // Simplified "sizes=" attribute for browser to select correct size from "srcset=".
+																// Must be set DIFFERENTLY depending on WIDGET/CONTAINER/SKIN LAYOUT. Each time we must estimate the size the image will have on screen.
+																// Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
+					'image_link_to'              => 'original', // Can be 'original' (image), 'single' (this post), an be URL, can be empty
+					'limit'                      => 1000, // Max # of images displayed
+				), $params ) );
 			break;
 			
 		case 'Item:issue_date':

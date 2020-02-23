@@ -1297,11 +1297,6 @@ class ItemLight extends DataObject
 	{
 		global $Collection, $Blog;
 
-		if( empty($text) )
-		{
-			return '';
-		}
-
 		$params = array_merge( array(
 				'nofollow' => false,
 			), $params );
