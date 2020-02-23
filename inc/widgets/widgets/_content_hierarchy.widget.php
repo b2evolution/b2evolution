@@ -1,6 +1,6 @@
 <?php
 /**
- * This file implements the Widget class to build a content hierarchy with categories and posts.
+ * Widget class to display a nested list of the full content hierarchy (Categories and Items) of a Collection.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -34,6 +34,65 @@ class content_hierarchy_Widget extends ComponentWidget
 		// Call parent constructor:
 		parent::__construct( $db_row, 'core', 'content_hierarchy' );
 	}
+
+
+	/**
+	 * Get JavaScript code which helps to edit widget form
+	 *
+	 * @return string
+	 */
+	function get_edit_form_javascript()
+	{
+		if( ( $widget_Blog = & $this->get_Blog() ) &&
+		    $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
+		{	// Disable "Allow caching" when "Highlight current page" OR "Mark flagged posts" is enabled:
+			return 'jQuery( "#'.$this->get_param_prefix().'highlight_current, #'.$this->get_param_prefix().'show_flags" ).click( function()
+{
+	jQuery( "#'.$this->get_param_prefix().'allow_blockcache" ).prop( "disabled",
+		jQuery( "#'.$this->get_param_prefix().'highlight_current" ).prop( "checked" ) ||
+		jQuery( "#'.$this->get_param_prefix().'show_flags" ).prop( "checked" ) )
+} );';
+		}
+	}
+
+
+	/**
+	 * Get help URL
+	 *
+	 * @return string URL
+	 */
+	function get_help_url()
+	{
+		return get_manual_url( 'content-hierarchy-widget' );
+	}
+
+
+	/**
+	 * Get name of widget
+	 */
+	function get_name()
+	{
+		return T_('Content Hierarchy');
+	}
+
+
+	/**
+	 * Get a very short desc. Used in the widget list.
+	 */
+	function get_short_desc()
+	{
+		return T_('Full hierarchical list Collection\'s Categories and Posts');
+	}
+
+
+	/**
+	 * Get short description
+	 */
+	function get_desc()
+	{
+		return T_('Displays a nested list of the full content hierarchy (Categories/Chapters and Post/Items) of a Collection.');
+	}
+
 
 
 	/**
@@ -96,65 +155,6 @@ class content_hierarchy_Widget extends ComponentWidget
 
 		return $r;
 	}
-
-
-	/**
-	 * Get JavaScript code which helps to edit widget form
-	 *
-	 * @return string
-	 */
-	function get_edit_form_javascript()
-	{
-		if( ( $widget_Blog = & $this->get_Blog() ) &&
-		    $widget_Blog->get_setting( 'cache_enabled_widgets' ) )
-		{	// Disable "Allow caching" when "Highlight current page" OR "Mark flagged posts" is enabled:
-			return 'jQuery( "#'.$this->get_param_prefix().'highlight_current, #'.$this->get_param_prefix().'show_flags" ).click( function()
-{
-	jQuery( "#'.$this->get_param_prefix().'allow_blockcache" ).prop( "disabled",
-		jQuery( "#'.$this->get_param_prefix().'highlight_current" ).prop( "checked" ) ||
-		jQuery( "#'.$this->get_param_prefix().'show_flags" ).prop( "checked" ) )
-} );';
-		}
-	}
-
-
-	/**
-	 * Get help URL
-	 *
-	 * @return string URL
-	 */
-	function get_help_url()
-	{
-		return get_manual_url( 'content-hierarchy-widget' );
-	}
-
-
-	/**
-	 * Get name of widget
-	 */
-	function get_name()
-	{
-		return T_('Content Hierarchy');
-	}
-
-
-	/**
-	 * Get a very short desc. Used in the widget list.
-	 */
-	function get_short_desc()
-	{
-		return $this->get_desc();
-	}
-
-
-	/**
-	 * Get short description
-	 */
-	function get_desc()
-	{
-		return T_('Content Hierarchy');
-	}
-
 
 	/**
 	 * Prepare display params
@@ -245,6 +245,7 @@ class content_hierarchy_Widget extends ComponentWidget
 		$BlogCache = & get_BlogCache();
 		$ChapterCache = & get_ChapterCache();
 
+		//
 		if( ! empty( $this->disp_params['blog_ID'] ) )
 		{ // Set a Blog from widget setting
 			$this->Blog = & $BlogCache->get_by_ID( intval( $this->disp_params['blog_ID'] ), false, false );
