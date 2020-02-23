@@ -1317,7 +1317,7 @@ class File extends DataObject
 	                  $after_image_legend = '</div>',
 	                  $after_image = '</div>',
 	                  $size_name = 'original', 
-	                  $image_link_to = 'original',  // can be an URL
+	                  $image_link_to = 'original',  // can be an URL, can be empty
 	                  $image_link_title = '',	// can be text or #title# or #desc#
 	                  $image_link_rel = '',
 	                  $image_class = '',

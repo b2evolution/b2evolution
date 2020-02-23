@@ -227,7 +227,7 @@ class Link extends DataObject
 				'after_image'         => '</div>',
 				'image_size'          => 'original',
 				'image_sizes'         => NULL, // simplified sizes= attribute for browser to select correct size from srcset= -- NULL = no srcset
-				'image_link_to'       => 'original',
+				'image_link_to'       => 'original',   // can be URL, can be empty
 				'image_link_title'    => '',	// can be text or #title# or #desc#
 				'image_link_rel'      => '',
 				'image_class'         => '',

@@ -4980,7 +4980,7 @@ class Item extends ItemLight
 
 		// Generate the IMG tag with all the alt, title and desc if available
 		return $Link->get_tag( array_merge( $params, array(
-					'image_link_to'    => $link_to,
+					'image_link_to'    => $link_to,   // can be URL, can be empty
 					'image_link_title' => $link_title,
 					'image_link_rel'   => $link_rel,
 					'image_alt'        => $this->get( 'title' ),
@@ -5024,7 +5024,7 @@ class Item extends ItemLight
 				'image_sizes'                => NULL, // Simplified "sizes=" attribute for browser to select correct size from "srcset=".
 															// Must be set DIFFERENTLY depending on WIDGET/CONTAINER/SKIN LAYOUT. Each time we must estimate the size the image will have on screen.
 															// Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
-				'image_link_to'              => 'original', // Can be 'original' (image) or 'single' (this post)
+				'image_link_to'              => 'original', // Can be 'original' (image), 'single' (this post), an be URL, can be empty
 				'limit'                      => 1000, // Max # of images displayed
 				'before_gallery'             => '<div class="bGallery">',
 				'after_gallery'              => '</div>',
@@ -5037,7 +5037,7 @@ class Item extends ItemLight
 																// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
 																// '#teaser_all' => 'teaser,teaserperm,teaserlink',
 																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
-				'placeholder'   => '',		// HTML to be displayed if no image; possible codes: #folder_icon
+				'placeholder'                => '',		// HTML to be displayed if no image; possible codes: #folder_icon
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
 				'links_sql_select'           => '',
@@ -5070,9 +5070,10 @@ class Item extends ItemLight
 			$tmp_object_ID = NULL;
 		}
 
+		// GET list of images to display:
 		$LinkOwner = new LinkItem( $this, $tmp_object_ID );
 		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000, $params['restrict_to_image_position'], NULL, $links_params ) )
-		{	// No images macth requested positions:
+		{	// No images match requested positions:
 			// Display placeholder:
 			$placeholder_html = $params['placeholder'];
 			switch( $placeholder_html )
@@ -5084,13 +5085,14 @@ class Item extends ItemLight
 			return str_replace( '$url$', $this->get_permanent_url(), $placeholder_html );
 		}
 
+		// LOOP through images:
 		$galleries = array();
 		$image_counter = 0;
 		$plugin_render_attachments = false;
 		while( $image_counter < $params['limit'] && $Link = & $LinkList->get_next() )
 		{
 			if( ! ( $File = & $Link->get_File() ) )
-			{ // No File object
+			{ // No File object:
 				global $Debuglog;
 				$log_message = sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID );
 				if( $this->is_revision() )
@@ -5102,7 +5104,7 @@ class Item extends ItemLight
 			}
 
 			if( ! $File->exists() )
-			{ // File doesn't exist
+			{ // File doesn't exist:
 				global $Debuglog;
 				$log_message = sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() );
 				if( $this->is_revision() )
@@ -5133,13 +5135,13 @@ class Item extends ItemLight
 			}
 
 			if( ! $params['get_rendered_attachments'] )
-			{ // Save $r to temp var in order to don't get the rendered data from plugins
+			{ // Save $r to temp var in order not to get the rendered data from plugins
 				$temp_r = $r;
 			}
 
 			$temp_params = $params;
 			foreach( $params as $param_key => $param_value )
-			{ // Pass all params by reference, in order to give possibility to modify them by plugin
+			{	// Pass all params by reference, in order to give possibility to modify them by plugin
 				// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
@@ -5163,7 +5165,7 @@ class Item extends ItemLight
 				continue;
 			}
 
-			// Generate the IMG tag with all the alt, title and desc if available
+			// GENERATE the IMG tag with all the alt, title and desc if available
 			$r .= $this->get_attached_image_tag( $Link, $params );
 
 			$image_counter++;
