@@ -1729,6 +1729,7 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_subcat]
 [set:item_template=content_tiles_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers:evo_tile__lg evo_tile__grey_bg]
 [set:evo_tile_image__modifiers:]
 [set:evo_tile_text__modifiers:evo_tile_text__gradient]',
@@ -1736,7 +1737,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_subcat' => array(
 			'name'     => 'Content Tiles Style 1 (fully clickable): Subcat',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
@@ -1754,7 +1755,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_item' => array(
 			'name'     => 'Content Tiles Style 1 (fully clickable): Item',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
@@ -1779,6 +1780,7 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_2_subcat]
 [set:item_template=content_tiles_2_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__shadow]
 [set:evo_tile_image__modifiers:]
 [set:evo_tile_text__modifiers:evo_tile_text__gradient]',
@@ -1786,7 +1788,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_2_subcat' => array(
 			'name'     => 'Content Tiles Style 2 (Button, BG image:Experimental): Subcat',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_cover" style="[Cat:background_image_css|size=fit-400x320|size_2x=crop-1024x1024]"></div>
@@ -1802,7 +1804,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_2_item' => array(
 			'name'     => 'Content Tiles Style 2 (Button, BG image:Experimental): Item',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_cover" style="[Item:background_image_css|size=fit-400x320|size_2x=crop-1024x1024]">
@@ -1826,6 +1828,7 @@ function create_default_templates( $is_task = true )
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_3_subcat]
 [set:item_template=content_tiles_3_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg]
 [set:evo_tile_image__modifiers:evo_tile_image__margin]
 [set:evo_tile_text__modifiers:evo_tile_text__gradient]',
@@ -1833,7 +1836,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_3_subcat' => array(
 			'name'     => 'Content Tiles Style 3 (Button): Subcat',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
@@ -1851,7 +1854,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_3_item' => array(
 			'name'     => 'Content Tiles Style 3 (Button): Item',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
+			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
