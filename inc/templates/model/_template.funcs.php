@@ -99,16 +99,30 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 		else
 		{	// Process a normal template tag:
 
+			// Decode PARAMS like |name=value|name=value]
 			$this_tag_params = $params;
-
 			if( ! empty( $tag_param_strings ) )
-			{	// Template Tag has specified parameters, use temp to override:
+			{	
 				$tag_param_strings = explode( '|', $tag_param_strings );
+				
+				// Process each param individually:
 				foreach( $tag_param_strings as $tag_param_string )
 				{
 					$tag_param_name = substr( $tag_param_string, 0, strpos( $tag_param_string, '=' ) );
-					// TODO: need to ensure string assigned to $tag_param_val below is single quote and properly escaped?
+
 					$tag_param_val  = substr( $tag_param_string, strpos( $tag_param_string, '=' ) + 1 );
+
+					if( preg_match('/\$([a-z_]+)\$/i', $tag_param_val, $tag_param_val_matches ) )
+					{	// We have a variable to replace: // TODO: allow multiple variable replace
+						$found_param_name = $tag_param_val_matches[1];
+						if( isset($params[$found_param_name]) )
+						{	// We have anoriginal param of that name:
+							$tag_param_val = $params[$found_param_name];
+						}
+					}
+
+					// TODO: need to escape " and > from $tag_param_val, otherwise they will end up breaking something
+
 					$this_tag_params[$tag_param_name] = $tag_param_val;
 				}
 			}
