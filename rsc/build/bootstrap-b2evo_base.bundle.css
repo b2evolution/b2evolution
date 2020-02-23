@@ -2994,77 +2994,38 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   bottom: 0;
   margin: auto;
 }
-.widget_rwd_blocks > div {
-  display: inline-block;
-  float: none;
-  vertical-align: top;
-}
-.widget_rwd_content {
-  padding: 8px;
-  margin: 14px 0;
-  overflow: hidden;
-  background-color: #fafafa;
-  border-radius: 4px;
-}
-.widget_rwd_content .item_first_image img {
-  width: 100%;
-  height: 240px;
-  object-fit: cover;
-  margin: auto;
-}
-.widget_rwd_content .item_title {
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.5em;
-  margin: 10px 0 5px;
-}
-.widget_rwd_content .item_content > p:last-of-type {
-  min-height: 60px;
-  margin-bottom: 0px;
-}
-.widget_rwd_content .item_content a {
-  margin: -20px 0 0;
-}
-.widget_rwd_content .item_content a.btn {
-  background-color: transparent;
-  float: right;
-  height: 22px;
-  line-height: 13px;
-  padding: 0px 4px 0px 4px;
-}
-.widget_rwd_content .item_content a.btn:hover {
-  background-color: #e6e6e6;
-}
-.widget_rwd_content img {
-  border-radius: 3px;
-  max-width: 100%;
-  max-height: 380px;
-  width: auto;
-  height: auto;
-  margin: auto;
-}
-.widget_rwd_content div.item_first_image {
-  text-align: center;
-}
-.evo_tiles > div {
-  padding: 15px;
-}
 .evo_tile {
-  height: 400px;
+  margin: 15px 0;
+  padding-bottom: 10px;
+  height: 342px;
   border-radius: 10px;
   overflow: hidden;
   position: relative;
-  padding-bottom: 10px;
 }
-.evo_tile > div {
+.evo_tile > div.hide_overflow {
   height: 100%;
   overflow: hidden;
+  position: relative;
 }
 .evo_tile > a {
   position: absolute;
+  top: 0;
+  left: 0;
   display: block;
   width: 100%;
   height: 100%;
+}
+.evo_tile__sm {
+  height: 272px;
+}
+.evo_tile__sm .evo_tile_image a {
+  height: 150px;
+}
+.evo_tile__lg {
+  height: 402px;
+}
+.evo_tile__lg .evo_tile_image .evo_image_block {
+  height: 240px;
 }
 .evo_tile__shadow {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
@@ -3072,55 +3033,87 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 .evo_tile__grey_bg {
   background-color: #fafafa;
 }
+.evo_tile__grey_bg .evo_tile_text__gradient:after {
+  background: linear-gradient(rgba(250, 250, 250, 0), #fafafa);
+}
 .evo_tile_cover {
-  height: 270px;
-  background-color: #EEE;
+  height: 200px;
+  background-color: #f0f0f0;
   background-size: cover;
   background-position: center;
-  padding: 10px;
   color: #FFF;
   text-shadow: 0px 0px 2px #000;
   overflow: hidden;
 }
 .evo_tile_image {
-  height: 270px;
-  background-color: #EEE;
-  color: #FFF;
+  position: relative;
+}
+.evo_tile_image .evo_image_block {
+  height: 200px;
+  margin: 0;
+  background-color: #f0f0f0;
   overflow: hidden;
 }
-.evo_tile_image div {
-  height: 100%;
-}
-.evo_tile_image div.evo_tile_image_placeholder {
-  width: 100%;
-  display: table;
-}
-.evo_tile_image div.evo_tile_image_placeholder a {
-  display: table-cell;
-  text-align: center;
-  vertical-align: middle;
-  font-size: 180px;
-  color: #ddd;
-}
-.evo_tile_image a {
-  height: 100%;
+.evo_tile_image .evo_image_block a {
   display: block;
+  width: 100%;
+  height: 100%;
 }
-.evo_tile_image img {
+.evo_tile_image .evo_image_block a img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.evo_tile_text {
-  padding-left: 10px;
-  padding-right: 10px;
-  color: red;
+.evo_tile_image .evo_image_block.evo_img_placeholder {
+  width: 100%;
+  display: table;
 }
-.evo_tile_text h2,
-.evo_tile_text h3 {
-  font-size: 20px;
-  padding-top: 10px;
+.evo_tile_image .evo_image_block.evo_img_placeholder > a {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 100px;
+  color: #dcdcdc;
+}
+.evo_tile_image__margin {
+  padding: 10px 10px 0;
+}
+.evo_tile_image__margin .evo_image_block {
+  border-radius: 4px;
+}
+.evo_tile_image__margin .evo_tile_overlay {
+  right: 18px;
+  top: 15px;
+}
+.evo_tile_overlay {
+  position: absolute;
+  right: 8px;
+  top: 5px;
+  color: #FFF;
+  text-shadow: 0px 0px 2px #000;
+}
+.evo_tile_body {
+  padding: 10px;
+}
+.evo_tile_body h2,
+.evo_tile_body h3 {
   margin-top: 0;
+  font-size: 20px;
+}
+.evo_tile_text__gradient:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 60px;
+  width: 100%;
+  background: linear-gradient(rgba(255, 255, 255, 0), #fff);
+}
+.evo_tile_more {
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  margin: 0 !important;
 }
 .ratings_table {
   margin: 0 10px 10px 0;
