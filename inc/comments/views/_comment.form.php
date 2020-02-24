@@ -158,7 +158,7 @@ $Form->hidden( 'from', 'backoffice' );
 	$Form->textarea_input( 'content', $content, 16, '', array(
 			'cols' => 40 ,
 			'id' => 'commentform_post_content',
-			'class' => 'autocomplete_usernames link_attachment_dropzone',
+			'class' => ( $edited_Comment->is_meta() || $Blog->get_setting( 'autocomplete_usernames' ) ? 'autocomplete_usernames' : '' ).' link_attachment_dropzone',
 			'maxlength' => ( $edited_Comment->is_meta() ? '' : $Blog->get_setting( 'comment_maxlen' ) ),
 		) );
 	$Form->fieldstart = '<div class="tile">';
