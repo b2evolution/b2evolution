@@ -59,15 +59,19 @@
 
 	}	
 }
-.evo_tile__shadow {
-	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-}
 .evo_tile__grey_bg {
 	background-color: rgba(@tile_bg_level,@tile_bg_level,@tile_bg_level,255);
 	.evo_tile_text__gradient:after { 
 		// Override the "faedout gradient" (see further below) using correct color:
 		background: linear-gradient(rgba(@tile_bg_level,@tile_bg_level,@tile_bg_level,0), rgba(@tile_bg_level,@tile_bg_level,@tile_bg_level,255));
 	}
+}
+.evo_tile__shadow {
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+.evo_tile__hoverglow:hover {
+	box-shadow: 0px 0px 10px rgba(51, 122, 183, 0.8);
+	transition: box-shadow .3s ease;
 }
 
 // ------------------------------------------
