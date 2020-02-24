@@ -399,7 +399,7 @@ if( $params['comment_type'] == 'meta' )
 				'cols'  => 38,
 				'class' => ( $Comment->is_meta() || $Blog->get_setting( 'autocomplete_usernames') ? 'autocomplete_usernames' : '' ).' link_attachment_dropzone',
 				'id'    => $content_id,
-				'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
+				'maxlength' => ( $Comment->is_meta() ? '' : $Blog->get_setting( 'comment_maxlen' ) ),
 			) );
 		$Form->inputstart = $form_inputstart;
 

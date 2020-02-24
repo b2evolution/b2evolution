@@ -159,7 +159,7 @@ $Form->hidden( 'from', 'backoffice' );
 			'cols' => 40 ,
 			'id' => 'commentform_post_content',
 			'class' => 'autocomplete_usernames link_attachment_dropzone',
-			'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
+			'maxlength' => ( $edited_Comment->is_meta() ? '' : $Blog->get_setting( 'comment_maxlen' ) ),
 		) );
 	$Form->fieldstart = '<div class="tile">';
 	$Form->fieldend = '</div>';

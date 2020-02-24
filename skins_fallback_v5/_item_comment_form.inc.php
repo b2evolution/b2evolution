@@ -364,7 +364,7 @@ function validateCommentForm(form)
 			'cols' => 38,
 			'class' => 'bComment'.( $Comment->is_meta() || $Blog->get_setting( 'autocomplete_usernames' ) ? ' autocomplete_usernames' : '' ),
 			'display_fix_pixel' => false,
-			'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
+			'maxlength' => ( $Comment->is_meta() ? '' : $Blog->get_setting( 'comment_maxlen' ) ),
 		) );
 	$Form->inputstart = $form_inputstart;
 
