@@ -189,10 +189,16 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Item':
 			global $Item;
+
 			$rendered_Item = ( !isset($objects['Item']) ? $Item : $objects['Item'] );
-			if( empty( $rendered_Item ) || ! ( $rendered_Item instanceof Item ) )
+
+			if( empty( $rendered_Item ))
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Item is not defined at this moment.</span>';
+			}
+			if( ! ( $rendered_Item instanceof Item ) )
+			{
+				return '<span class="evo_param_error">Item object has class <code>'.get_class($rendered_Item).'</code> instead of expected <code>Item</code>.</span>';
 			}
 			break;
 
