@@ -1189,7 +1189,7 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function get_widget_extra_class()
 	{
-		$block_css_class = '';
+		$block_css_class = ' widget_uil_autotemp'; // Force tagging "Universal Item List Auto Template" for simplifying backward compatibility CSS
 
 		if( ! $this->disp_params['disp_title'] && in_array( $this->disp_params[ 'attached_pics' ], array( 'first', 'all' ) ) )
 		{	// Don't display bullets when we show only the pictures:
