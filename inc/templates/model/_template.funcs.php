@@ -61,17 +61,6 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	$current_pos = 0;
 	$r = '';
 
-	/*
-	// Old
-	preg_match_all( '/\$([a-z_\:]+)\$/i', $template, $matches, PREG_OFFSET_CAPTURE );
-	foreach( $matches[0] as $i => $match )
-	{
-		$r .= substr( $template, $current_pos, $match[1] - $current_pos );
-		$current_pos = $match[1] + strlen( $match[0] );
-		$r .= render_template_callback( $matches[1][$i][0], $params, $objects );
-	}
-	*/
-
 	// New
 	preg_match_all( '/\[((?:(?:Cat|Coll|Form|Item|Link|echo|set):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )

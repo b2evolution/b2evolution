@@ -144,9 +144,9 @@ class cat_content_list_Widget extends ComponentWidget
 		}
 
 		// Render MASTER quick template:
-		// In theory, this shouod not display anything.
+		// In theory, this should not display anything.
 		// Instead, this should set variables to define sub-templates (and potentially additional variables)
-		echo render_template_code( $this->disp_params['template'], $params );
+		echo render_template_code( $this->disp_params['template'], /* BY REF */ $params );
 
 		// Check if requested sub-templates exist:
 		$TemplateCache = & get_TemplateCache();

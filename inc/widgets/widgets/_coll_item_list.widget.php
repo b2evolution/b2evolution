@@ -1021,6 +1021,8 @@ class coll_item_list_Widget extends ComponentWidget
 	/**
 	 * Display images of the selected item
 	 *
+	 * @todo Not sure if it makes sense that this reads attachment linklist directly
+	 *
 	 * @param array Params
 	 * @param boolean Changed by reference when content is displayed
 	 */
