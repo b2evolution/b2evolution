@@ -1907,7 +1907,6 @@ class Item extends ItemLight
 	 *                        FALSE to count ONLY attachments of the created comments
 	 * @return boolean true if user can attach files to this post comments, false if s/he cannot
 	 */
-	//function can_attach( $link_tmp_ID = false, $obj = NULL )
 	function can_attach( $Comment = NULL )
 	{
 		global $Settings, $current_User;

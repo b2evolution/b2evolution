@@ -397,7 +397,7 @@ if( $params['comment_type'] == 'meta' )
 		$Form->textarea_input( $dummy_fields['content'], $comment_content, $params['textarea_lines'], $params['form_comment_text'], array(
 				'note'  => $note,
 				'cols'  => 38,
-				'class' => 'autocomplete_usernames link_attachment_dropzone',
+				'class' => ( $Comment->is_meta() || $Blog->get_setting( 'autocomplete_usernames') ? 'autocomplete_usernames' : '' ).' link_attachment_dropzone',
 				'id'    => $content_id,
 				'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
 			) );
