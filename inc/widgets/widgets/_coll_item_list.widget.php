@@ -625,29 +625,26 @@ class coll_item_list_Widget extends ComponentWidget
 			);
 
 
+		// DISPLAY START:
+
 		if( $this->disp_params['template'] )
 		{
+			// DSIPLAY with Quick TEMPLATE:
+
+			echo $this->disp_params['block_start'];
+
+			// Block title:
+			$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
+			$this->disp_title( $title );
+
+			// Check if template exists:
 			$TemplateCache = & get_TemplateCache();
-
 			$widget_Template = $TemplateCache->get_by_code( $this->disp_params['template'], false, false );
-
 			if( ! $widget_Template )
 			{
 				$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
 				return false;
 			}
-
-			if( empty( $block_css_class ) )
-			{	// No extra class, Display default wrapper:
-				echo $this->disp_params['block_start'];
-			}
-			else
-			{	// Append extra classes for widget block:
-				echo preg_replace( '/ class="([^"]+)"/', ' class="$1'.$block_css_class.'"', $this->disp_params['block_start'] );
-			}
-
-			$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
-			$this->disp_title( $title );
 
 			echo $this->disp_params['block_body_start'];
 			echo 'UIL Widget template: '.$widget_Template->name;
@@ -657,7 +654,7 @@ class coll_item_list_Widget extends ComponentWidget
 		}
 		else
 		{
-			// DISPLAY START:
+			// DISPLAY with "AUTOMATIC" template:
 
 			// Start to capture display content here in order to be able to detect if the whole widget must not be displayed
 			ob_start();
