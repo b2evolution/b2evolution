@@ -44,6 +44,14 @@ class coll_item_list_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $current_User, $admin_url;
+
+		// Get available templates:
+		$TemplateCache = & get_TemplateCache();
+		$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
+
+		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
+
 		load_funcs( 'files/model/_image.funcs.php' );
 
 		/**
@@ -67,6 +75,14 @@ class coll_item_list_Widget extends ComponentWidget
 					'note' => T_('Title to display in your skin.'),
 					'size' => 60,
 					'defaultvalue' => T_('Items'),
+				),
+				'template' => array(
+					'label' => T_('Template'),
+					'type' => 'select',
+					'options' => $template_options,
+					'defaultvalue' => NULL,
+					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+							.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' ),
 				),
 				'title_link' => array(
 					'label' => T_('Link to blog'),
@@ -609,139 +625,172 @@ class coll_item_list_Widget extends ComponentWidget
 			);
 
 
-		// DISPLAY START:
+		if( $this->disp_params['template'] )
+		{
+			$TemplateCache = & get_TemplateCache();
 
-		// Start to capture display content here in order to be able to detect if the whole widget must not be displayed
-		ob_start();
-		// This variable used to display widget. Will be set to true when content is displayed
-		$content_is_displayed = false;
+			$widget_Template = $TemplateCache->get_by_code( $this->disp_params['template'], false, false );
 
-		// Get extra classes depending on widget settings:
-		$block_css_class = $this->get_widget_extra_class();
-
-		if( empty( $block_css_class ) )
-		{	// No extra class, Display default wrapper:
-			echo $this->disp_params['block_start'];
-		}
-		else
-		{	// Append extra classes for widget block:
-			echo preg_replace( '/ class="([^"]+)"/', ' class="$1'.$block_css_class.'"', $this->disp_params['block_start'] );
-		}
-
-		$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
-		$this->disp_title( $title );
-
-		echo $this->disp_params['block_body_start'];
-
-		if( $chapter_mode )
-		{	// List grouped by chapter/category:
-
-			$items_map_by_chapter = array();
-			$chapters_of_loaded_items = array();
-			$group_by_blogs = false;
-			$prev_chapter_blog_ID = NULL;
-
-			while( $iterator_Item = & $ItemList->get_item() )
-			{	// Display contents of the Item depending on widget params:
-				$Chapter = & $iterator_Item->get_main_Chapter();
-				if( ! isset( $items_map_by_chapter[$Chapter->ID] ) )
-				{
-					$items_map_by_chapter[$Chapter->ID] = array();
-					$chapters_of_loaded_items[] = $Chapter;
-				}
-				$items_map_by_chapter[$Chapter->ID][] = $iterator_Item;
-				// Group by blogs if there are chapters from multiple blogs
-				if( ! $group_by_blogs && ( $Chapter->blog_ID != $prev_chapter_blog_ID ) )
-				{	// group by blogs is not decided yet
-					$group_by_blogs = ( $prev_chapter_blog_ID != NULL );
-					$prev_chapter_blog_ID = $Chapter->blog_ID;
-				}
+			if( ! $widget_Template )
+			{
+				$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
+				return false;
 			}
 
-			usort( $chapters_of_loaded_items, 'Chapter::compare_chapters' );
-			$displayed_blog_ID = NULL;
-
-			if( $group_by_blogs && isset( $this->disp_params['collist_start'] ) )
-			{	// Start list of blogs
-				echo $this->disp_params['collist_start'];
+			if( empty( $block_css_class ) )
+			{	// No extra class, Display default wrapper:
+				echo $this->disp_params['block_start'];
 			}
 			else
-			{	// Display list start, all chapters are in the same group ( not grouped by blogs )
-				echo $this->get_layout_start();
+			{	// Append extra classes for widget block:
+				echo preg_replace( '/ class="([^"]+)"/', ' class="$1'.$block_css_class.'"', $this->disp_params['block_start'] );
 			}
 
-			$item_index = 0;
-			foreach( $chapters_of_loaded_items as $Chapter )
-			{
-				if( $group_by_blogs && $displayed_blog_ID != $Chapter->blog_ID )
-				{
-					$Chapter->get_Blog();
-					if( $displayed_blog_ID != NULL )
-					{	// Display the end of the previous blog's chapter list
-						echo $this->get_layout_end( $item_index );
+			$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
+			$this->disp_title( $title );
+
+			echo $this->disp_params['block_body_start'];
+			echo 'UIL Widget template: '.$widget_Template->name;
+			echo $this->disp_params['block_body_end'];
+
+			echo $this->disp_params['block_end'];
+		}
+		else
+		{
+			// DISPLAY START:
+
+			// Start to capture display content here in order to be able to detect if the whole widget must not be displayed
+			ob_start();
+			// This variable used to display widget. Will be set to true when content is displayed
+			$content_is_displayed = false;
+
+			// Get extra classes depending on widget settings:
+			$block_css_class = $this->get_widget_extra_class();
+
+			if( empty( $block_css_class ) )
+			{	// No extra class, Display default wrapper:
+				echo $this->disp_params['block_start'];
+			}
+			else
+			{	// Append extra classes for widget block:
+				echo preg_replace( '/ class="([^"]+)"/', ' class="$1'.$block_css_class.'"', $this->disp_params['block_start'] );
+			}
+
+			$title = sprintf( ( $this->disp_params[ 'title_link' ] ? '<a href="'.$listBlog->gen_blogurl().'" rel="nofollow">%s</a>' : '%s' ), $this->disp_params[ 'title' ] );
+			$this->disp_title( $title );
+
+			echo $this->disp_params['block_body_start'];
+
+			if( $chapter_mode )
+			{	// List grouped by chapter/category:
+
+				$items_map_by_chapter = array();
+				$chapters_of_loaded_items = array();
+				$group_by_blogs = false;
+				$prev_chapter_blog_ID = NULL;
+
+				while( $iterator_Item = & $ItemList->get_item() )
+				{	// Display contents of the Item depending on widget params:
+					$Chapter = & $iterator_Item->get_main_Chapter();
+					if( ! isset( $items_map_by_chapter[$Chapter->ID] ) )
+					{
+						$items_map_by_chapter[$Chapter->ID] = array();
+						$chapters_of_loaded_items[] = $Chapter;
 					}
-					echo $this->disp_params['coll_start'].$Chapter->Blog->get('shortname'). $this->disp_params['coll_end'];
-					// Display start of blog's chapter list
-					echo $this->get_layout_start();
-					$displayed_blog_ID = $Chapter->blog_ID;
+					$items_map_by_chapter[$Chapter->ID][] = $iterator_Item;
+					// Group by blogs if there are chapters from multiple blogs
+					if( ! $group_by_blogs && ( $Chapter->blog_ID != $prev_chapter_blog_ID ) )
+					{	// group by blogs is not decided yet
+						$group_by_blogs = ( $prev_chapter_blog_ID != NULL );
+						$prev_chapter_blog_ID = $Chapter->blog_ID;
+					}
 				}
-				// -------------
-				$content_is_displayed = $this->disp_chapter( $Chapter, $items_map_by_chapter, $item_index ) || $content_is_displayed;
-				// -------------
-			}
 
-			if( $content_is_displayed )
-			{	// End of a chapter list - if some content was displayed this is always required
+				usort( $chapters_of_loaded_items, 'Chapter::compare_chapters' );
+				$displayed_blog_ID = NULL;
+
+				if( $group_by_blogs && isset( $this->disp_params['collist_start'] ) )
+				{	// Start list of blogs
+					echo $this->disp_params['collist_start'];
+				}
+				else
+				{	// Display list start, all chapters are in the same group ( not grouped by blogs )
+					echo $this->get_layout_start();
+				}
+
+				$item_index = 0;
+				foreach( $chapters_of_loaded_items as $Chapter )
+				{
+					if( $group_by_blogs && $displayed_blog_ID != $Chapter->blog_ID )
+					{
+						$Chapter->get_Blog();
+						if( $displayed_blog_ID != NULL )
+						{	// Display the end of the previous blog's chapter list
+							echo $this->get_layout_end( $item_index );
+						}
+						echo $this->disp_params['coll_start'].$Chapter->Blog->get('shortname'). $this->disp_params['coll_end'];
+						// Display start of blog's chapter list
+						echo $this->get_layout_start();
+						$displayed_blog_ID = $Chapter->blog_ID;
+					}
+					// -------------
+					$content_is_displayed = $this->disp_chapter( $Chapter, $items_map_by_chapter, $item_index ) || $content_is_displayed;
+					// -------------
+				}
+
+				if( $content_is_displayed )
+				{	// End of a chapter list - if some content was displayed this is always required
+					echo $this->get_layout_end( $item_index );
+				}
+
+				if( $group_by_blogs && isset( $this->disp_params['collist_end'] ) )
+				{	// End of blog list
+					echo $this->disp_params['collist_end'];
+				}
+
+			}
+			else
+			{	// Plain list: (not grouped by category)
+
+				echo $this->get_layout_start();
+
+				$item_index = 0;
+				/**
+				 * @var ItemLight (or Item)
+				 */
+				while( $Item = & $ItemList->get_item() )
+				{
+					// -------------
+					// DISPLAY CONTENT of the Item depending on widget params:
+					$content_is_displayed = $this->disp_item_contents( $Item, false, $item_index ) || $content_is_displayed;
+					// -------------
+				}
+
+				if( isset( $this->disp_params['page'] ) )
+				{
+					if( empty( $this->disp_params['pagination'] ) )
+					{
+						$this->disp_params['pagination'] = array();
+					}
+					$ItemList->page_links( $this->disp_params['pagination'] );
+				}
+
 				echo $this->get_layout_end( $item_index );
 			}
 
-			if( $group_by_blogs && isset( $this->disp_params['collist_end'] ) )
-			{	// End of blog list
-				echo $this->disp_params['collist_end'];
+
+			echo $this->disp_params['block_body_end'];
+
+			echo $this->disp_params['block_end'];
+
+			if( $content_is_displayed )
+			{	// Some content is displayed, Print out widget
+				ob_end_flush();
 			}
-
-		}
-		else
-		{	// Plain list: (not grouped by category)
-
-			echo $this->get_layout_start();
-
-			$item_index = 0;
-			/**
-			 * @var ItemLight (or Item)
-			 */
-			while( $Item = & $ItemList->get_item() )
-			{
-				// -------------
-				// DISPLAY CONTENT of the Item depending on widget params:
-				$content_is_displayed = $this->disp_item_contents( $Item, false, $item_index ) || $content_is_displayed;
-				// -------------
+			else
+			{	// No content, Don't display widget
+				ob_end_clean();
 			}
-
-			if( isset( $this->disp_params['page'] ) )
-			{
-				if( empty( $this->disp_params['pagination'] ) )
-				{
-					$this->disp_params['pagination'] = array();
-				}
-				$ItemList->page_links( $this->disp_params['pagination'] );
-			}
-
-			echo $this->get_layout_end( $item_index );
-		}
-
-
-		echo $this->disp_params['block_body_end'];
-
-		echo $this->disp_params['block_end'];
-
-		if( $content_is_displayed )
-		{	// Some content is displayed, Print out widget
-			ob_end_flush();
-		}
-		else
-		{	// No content, Don't display widget
-			ob_end_clean();
 		}
 
 		return true;
