@@ -66,6 +66,14 @@
 		background: linear-gradient(rgba(@tile_bg_level,@tile_bg_level,@tile_bg_level,0), rgba(@tile_bg_level,@tile_bg_level,@tile_bg_level,255));
 	}
 }
+.evo_tile__square {
+	border-radius: 0;
+	.evo_tile_image__margin {  // IF combined with modifier for image margins... (see below)
+		.evo_image_block { 
+			border-radius: 0; // images must also be squared
+		}
+	}
+}
 .evo_tile__shadow {
 	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
