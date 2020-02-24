@@ -1869,11 +1869,16 @@ class Item extends ItemLight
 	 * @param string blog settings name. Param value can be 'allow_comments', 'allow_attachments','allow_rating_items'
 	 * @return boolean  true if user is allowed for the corresponding action
 	 */
-	function check_blog_settings( $settings_name )
+	function check_blog_settings( $settings_name, $settings_object = NULL )
 	{
 		global $current_User;
 
 		$this->load_Blog();
+
+		if( ( $settings_name == 'allow_attachments' ) && isset( $settings_object ) && ( $settings_object instanceof Comment ) && $settings_object->is_meta() )
+		{	// Always allow attachments for meta Comments:
+			return true;
+		}
 
 		switch( $this->Blog->get_setting( $settings_name ) )
 		{
@@ -1902,20 +1907,32 @@ class Item extends ItemLight
 	 *                        FALSE to count ONLY attachments of the created comments
 	 * @return boolean true if user can attach files to this post comments, false if s/he cannot
 	 */
-	function can_attach( $link_tmp_ID = false )
+	//function can_attach( $link_tmp_ID = false, $obj = NULL )
+	function can_attach( $Comment = NULL )
 	{
-		global $Settings;
+		global $Settings, $current_User;
 
 		$attachments_quota_is_full = false;
 		if( is_logged_in() )
 		{	// We can check the attachments quota only for registered users
 			$this->load_Blog();
+
+			if( isset( $Comment ) && ( $Comment instanceof Comment ) && $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'add', false, $this->get_blog_ID() ) )
+			{	// Always allow attachments for meta Comments:
+				return true;
+			}
+
 			$max_attachments = (int)$this->Blog->get_setting( 'max_attachments' );
 			if( $max_attachments > 0 )
 			{	// Check attachments quota only when Blog setting "Max # of attachments" is defined
 				global $DB, $current_User, $Session;
 
 				// Get a number of attachments for current user on this post
+				$link_tmp_ID = false;
+				if( isset( $Comment ) && isset( $Comment->temp_link_owner_ID ) )
+				{
+					$link_tmp_ID = $Comment->temp_link_owner_ID;
+				}
 				$attachments_count = $this->get_attachments_number( NULL, $link_tmp_ID );
 
 				// Get the attachments from preview comment
@@ -2029,6 +2046,8 @@ class Item extends ItemLight
 			$sql_where .= ' OR ( comment_item_ID IS NULL AND link_tmp_ID = '.$DB->quote( $link_tmp_ID ).' )';
 		}
 		$SQL->WHERE_and( $sql_where );
+		// Do not include meta comments in the count:
+		$SQL->WHERE_and( 'comment_type != "meta"');
 		$cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ] = intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
 
 		return $cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ];

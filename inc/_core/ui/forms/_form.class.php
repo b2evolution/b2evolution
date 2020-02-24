@@ -4982,8 +4982,8 @@ class Form extends Widget
 			case 'Comment':
 				$Comment = $object;
 				$comment_Item = & $Comment->get_Item();
-				if( ! $comment_Item->check_blog_settings( 'allow_attachments' ) && ! $Comment->is_meta() )
-				{	// Comment attachments must be allowed by collection setting depending on user type(anounymous, registered, member and etc.). Attachments to meta-comments are always allowed:
+				if( ! $comment_Item->check_blog_settings( 'allow_attachments', $Comment ) || ! $comment_Item->can_attach( $Comment ) )
+				{	// Comment attachments must be allowed by collection setting depending on user type(anonymous, registered, member and etc.).:
 					return;
 				}
 				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );

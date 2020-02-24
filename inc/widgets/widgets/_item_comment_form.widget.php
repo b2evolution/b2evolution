@@ -508,8 +508,6 @@ class item_comment_form_Widget extends ComponentWidget
 
 			// Message field:
 			$content_id = $dummy_fields['content'].'_'.$widget_params['comment_type'];
-			$form_fieldstart = $Form->fieldstart;
-			$Form->fieldstart = add_tag_class( $Form->fieldstart, 'form-group__narrow_margin_bottom' );
 			$form_inputstart = $Form->inputstart;
 			$Form->inputstart .= $comment_toolbar;
 			$note = '';
@@ -522,7 +520,6 @@ class item_comment_form_Widget extends ComponentWidget
 					'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
 				) );
 			$Form->inputstart = $form_inputstart;
-			$Form->fieldstart = $form_fieldstart;
 
 			// Set canvas object for plugins:
 			echo '<script type="text/javascript">var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
@@ -576,9 +573,11 @@ class item_comment_form_Widget extends ComponentWidget
 
 			if( $Blog->get_setting( 'allow_html_comment' ) )
 			{
+				$form_fieldstart = $Form->fieldstart;
+				$Form->fieldstart = add_tag_class( $Form->fieldstart, 'comment_text_renderers' );
 				$Form->begin_line();
 				echo '<div class="text_editor_controls">';
-					echo '<div class="edit_plugin_actions">';
+					echo '<div>';
 					echo $admin_display_editor_button;
 					echo '</div>';
 
@@ -588,6 +587,7 @@ class item_comment_form_Widget extends ComponentWidget
 					}
 				echo '</div>';
 				$Form->end_line();
+				$Form->fieldstart = $form_fieldstart;
 
 				if( count( $comment_options ) > 0 )
 				{
@@ -603,7 +603,7 @@ class item_comment_form_Widget extends ComponentWidget
 
 					$Form->inputstart = add_tag_class( $Form->inputstart, 'text_editor_controls' );
 					$Form->inputstart .='<div>';
-					$Form->inputend = '</div><div>'.$text_renderers.'</div>'.$Form->inputend;
+					$Form->inputend = '</div><div class="comment_text_renderers">'.$text_renderers.'</div>'.$Form->inputend;
 
 					$Form->checklist( $comment_options, 'comment_options', T_('Options') );
 
@@ -612,9 +612,12 @@ class item_comment_form_Widget extends ComponentWidget
 				}
 				elseif( ! empty( $text_renderers ) )
 				{
+					$form_fieldstart = $Form->fieldstart;
+					$Form->fieldstart = add_tag_class( $Form->fieldstart, 'comment_text_renderers' );
 					$Form->begin_line();
 					echo $text_renderers;
 					$Form->end_line();
+					$Form->fieldstart = $form_fieldstart;
 				}
 			}
 

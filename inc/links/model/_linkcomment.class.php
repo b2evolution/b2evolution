@@ -73,8 +73,7 @@ class LinkComment extends LinkOwner
 		if( $permlevel == 'add' )
 		{	// Check permission to add/upload new files:
 			$comment_Item = & $this->get_Item();
-			$r = $comment_Item->can_attach( $this->is_temp() ? $this->get_ID() : false ) ||
-					( $this->Comment->is_meta() && $current_User->check_perm( 'meta_comment', $permlevel, $assert, $this->get_blog_ID() ) ); // Always allow attachments for meta-comments
+			$r = $comment_Item->can_attach( $this->is_temp() ? $this->Comment : false );
 		}
 		elseif( $this->is_temp() )
 		{	// Check permission for new creating comment:

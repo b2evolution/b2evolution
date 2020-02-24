@@ -5019,9 +5019,6 @@ a.btn.action_icon.hoverlink {
     text-align: left;
   }
 }
-.form-group__narrow_margin_bottom {
-  margin-bottom: 3px;
-}
 .evo_msgform_recipient label.control-label,
 .evo_msgform_recipient div.controls {
   float: none;
@@ -5502,6 +5499,12 @@ div.message_toolbars {
   display: flex;
   justify-content: space-between;
   align-items: normal;
+}
+.comment_text_renderers {
+  margin-top: -12px;
+}
+.edit_plugin_actions {
+  margin-top: 4px;
 }
 .badge-important {
   background-color: #F00 !important;
