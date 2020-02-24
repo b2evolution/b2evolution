@@ -1722,15 +1722,15 @@ function create_default_templates( $is_task = true )
 </li>',
 		),
 
-		// Tiles style 1:
+		// Content Tiles style 1 (default):
 		'content_tiles' => array(
-			'name'     => 'Content Tiles Style 1 (fully clickable)',
+			'name'     => 'Content Tiles Style 1 (Fully clickable)',
 			'template' => '[set:before_list=<div class="evo_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_subcat]
 [set:item_template=content_tiles_item]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
-[set:evo_tile__modifiers:evo_tile__lg evo_tile__grey_bg]
+[set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__hoverglow]
 [set:evo_tile_image__modifiers:]
 [set:evo_tile_image__size=fit-400x320]
 [set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
@@ -1739,7 +1739,7 @@ function create_default_templates( $is_task = true )
 		),
 
 		'content_tiles_subcat' => array(
-			'name'     => 'Content Tiles Style 1 (fully clickable): Subcat',
+			'name'     => 'Content Tiles Style 1 (Fully clickable): Subcat',
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1757,7 +1757,7 @@ function create_default_templates( $is_task = true )
 		),
 
 		'content_tiles_item' => array(
-			'name'     => 'Content Tiles Style 1 (fully clickable): Item',
+			'name'     => 'Content Tiles Style 1 (Fully clickable): Item',
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1777,72 +1777,22 @@ function create_default_templates( $is_task = true )
 
 
 		// Tiles style 2:
-		'content_tiles_2' => array(
-			'name'     => 'Content Tiles Style 2 (Button, BG image:Experimental)',
+		'content_tiles_btn' => array(
+			'name'     => 'Content Tiles Style 2 (Button)',
 			'template' => '[set:before_list=<div class="evo_tiles row">]
 [set:after_list=</div>]
-[set:subcat_template=content_tiles_2_subcat]
-[set:item_template=content_tiles_2_item]
+[set:subcat_template=content_tiles_btn_subcat]
+[set:item_template=content_tiles_btn_item]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__shadow]
-[set:evo_tile_image__modifiers:]
-[set:evo_tile_image__size=fit-400x320]
-[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
-[set:evo_tile_text__modifiers:evo_tile_text__gradient]',
-		),
-
-		'content_tiles_2_subcat' => array(
-			'name'     => 'Content Tiles Style 2 (Button, BG image:Experimental): Subcat',
-			'template' => '<div class="[echo:rwd_cols]">
-	<div class="evo_tile [echo:evo_tile__modifiers]">
-		<div class="hide_overflow">
-			<div class="evo_tile_cover" style="[Cat:background_image_css|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$fit-400x320|size_2x=crop-1024x1024]"></div>
-			<div class="evo_tile_body">
-				<h3>[Cat:permalink|class=evo_tile_title]</h3>
-				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
-				[Cat:permalink|text=#open+arrow|class=evo_tile_more btn btn-sm btn-default]
-			</div>
-		</div>
-	</div>
-</div>',
-		),
-
-		'content_tiles_2_item' => array(
-			'name'     => 'Content Tiles Style 2 (Button, BG image:Experimental): Item',
-			'template' => '<div class="[echo:rwd_cols]">
-	<div class="evo_tile [echo:evo_tile__modifiers]">
-		<div class="hide_overflow">
-			<div class="evo_tile_cover" style="[Item:background_image_css|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$fit-400x320|size_2x=crop-1024x1024]">
-				<div class="evo_tile_overlay">[Item:cat_name]</div>
-			</div>
-			<div class="evo_tile_body">
-				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
-				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
-				[Item:permalink|text=#read+arrow|class=evo_tile_more btn btn-sm btn-default]
-			</div>
-		</div>
-	</div>
-</div>',
-		),
-
-
-		// Tiles style 3:
-		'content_tiles_3' => array(
-			'name'     => 'Content Tiles Style 3 (Button)',
-			'template' => '[set:before_list=<div class="evo_tiles row">]
-[set:after_list=</div>]
-[set:subcat_template=content_tiles_3_subcat]
-[set:item_template=content_tiles_3_item]
-[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
-[set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg]
 [set:evo_tile_image__modifiers:evo_tile_image__margin]
 [set:evo_tile_image__size=fit-400x320]
 [set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
 [set:evo_tile_text__modifiers:evo_tile_text__gradient]',
 		),
 
-		'content_tiles_3_subcat' => array(
-			'name'     => 'Content Tiles Style 3 (Button): Subcat',
+		'content_tiles_btn_subcat' => array(
+			'name'     => 'Content Tiles Style 2 (Button): Subcat',
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1859,13 +1809,63 @@ function create_default_templates( $is_task = true )
 </div>',
 		),
 
-		'content_tiles_3_item' => array(
-			'name'     => 'Content Tiles Style 3 (Button): Item',
+		'content_tiles_btn_item' => array(
+			'name'     => 'Content Tiles Style 2 (Button): Item',
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
 				[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=single|placeholder=#file_text_icon]
+				<div class="evo_tile_overlay">[Item:cat_name]</div>
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
+				[Item:permalink|text=#read+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+
+		// Tiles style 3 (BG image:Experimental):
+		'content_tiles_bgimg' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental)',
+			'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_bgimg_subcat]
+[set:item_template=content_tiles_bgimg_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
+[set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__square evo_tile__shadow]
+[set:evo_tile_image__modifiers:]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers:evo_tile_text__gradient]',
+		),
+
+		'content_tiles_bgimg_subcat' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental): Subcat',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_cover" style="[Cat:background_image_css|size=fit-400x320|size_2x=fit-720x500]"></div>
+			<div class="evo_tile_body">
+				<h3>[Cat:permalink|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
+				[Cat:permalink|text=#open+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+		'content_tiles_bgimg_item' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental): Item',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_cover" style="[Item:background_image_css|size=fit-400x320|size_2x=fit-720x500]">
 				<div class="evo_tile_overlay">[Item:cat_name]</div>
 			</div>
 			<div class="evo_tile_body">
