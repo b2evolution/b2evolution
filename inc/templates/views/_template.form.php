@@ -88,14 +88,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 	$buttons = array();
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{	// Allow to save template if current User has a permission:
-		if( $action == 'copy' )
-		{
-			$buttons[] = array( 'submit', 'submit', sprintf( T_('Save and duplicate all settings from %s'), $edited_Template->get( 'name' ) ), 'SaveButton' );
-		}
-		else
-		{
-			$buttons[] = array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' );
-		}
+		$buttons[] = array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' );
 	}
 
 $Form->end_form( $buttons );
