@@ -486,8 +486,10 @@ class coll_item_list_Widget extends ComponentWidget
 		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
 		$limit = intval( $this->disp_params['limit'] );
 
-		if( $this->disp_params['disp_teaser'] )
-		{	// We want to show some of the post content, we need to load more info: use ItemList2
+		if( $this->disp_params['disp_teaser'] // We want to show some of the post content...
+			|| !empty($this->disp_params['template']) ) // We have potentially an elaborate template to display...
+		// TODO: allow "ItemLight templates"
+		{	// ... to do that, we need to load more info: use ItemList2
 			$ItemList = new ItemList2( $listBlog, $listBlog->get_timestamp_min(), $listBlog->get_timestamp_max(), $limit, 'ItemCache', $this->code.'_' );
 		}
 		else
@@ -643,12 +645,60 @@ class coll_item_list_Widget extends ComponentWidget
 			if( ! $widget_Template )
 			{
 				$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
-				return false;
 			}
+			else
+			{
 
-			echo $this->disp_params['block_body_start'];
-			echo 'UIL Widget template: '.$widget_Template->name;
-			echo $this->disp_params['block_body_end'];
+				echo $this->disp_params['block_body_start'];
+
+				// Render MASTER quick template:
+				// In theory, this should not display anything.
+				// Instead, this should set variables to define sub-templates (and potentially additional variables)
+				echo render_template_code( $this->disp_params['template'], /* BY REF */ $params );
+
+				// Check if requested sub-template exists:
+				if( empty( $params['item_template'] ) )
+				{	// Display error when no template for listing
+					$this->display_error_message( sprintf( 'Missing %s param', '<code>item_template</code>' ) );
+					return false;
+				}
+				elseif( ! ( $item_Template = & $TemplateCache->get_by_code( $params['item_template'], false, false ) ) )
+				{	// Display error when no or wrong template for listing
+					$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$params['item_template'].'</code>' ) );
+					return false;
+				}
+				else
+				{
+					// Display list of Items:
+					if( isset( $params['before_list'] ) )
+					{
+						echo $params['before_list'];
+					}
+
+					// ONLY SUPPORTING Plain list: (not grouped by category) for now
+					// TODO: maybe support group by category. Use case???
+
+					$item_index = 0;
+					/**
+					 * @var ItemLight (or Item)
+					 */
+					while( $Item = & $ItemList->get_item() )
+					{
+						// Render Item by quick template:
+						echo render_template_code( $params['item_template'], $params, array( 'Item' => $Item ) );
+					}
+
+					// TODO: maybe support $this->disp_params['page'] & $this->disp_params['pagination'] . Use case?
+
+
+					if( isset( $params['after_list'] ) )
+					{
+						echo $params['after_list'];
+					}
+				}
+
+				echo $this->disp_params['block_body_end'];
+			}
 
 			echo $this->disp_params['block_end'];
 		}
