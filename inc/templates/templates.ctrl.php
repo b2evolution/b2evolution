@@ -156,13 +156,11 @@ switch( $action )
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
 
-// Generate available blogs list:
-$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'templates' ) );
+$AdminUI->set_path( 'site', 'templates' );
 
-$AdminUI->set_path( 'collections', 'settings', 'templates' );
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
-$AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
-$AdminUI->breadcrumbpath_add( T_('Templates'), $admin_url.'?ctrl=templates&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_init( false );
+$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( T_('Templates'), $admin_url.'?ctrl=templates' );
 
 // Set an url for manual page:
 if( $action == 'new' || $action == 'edit' )
