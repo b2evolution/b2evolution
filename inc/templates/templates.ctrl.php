@@ -71,6 +71,7 @@ switch( $action )
 		break;
 
 	case 'create':
+	case 'create_edit':
 		// Create new Menu:
 		$edited_Template = new Template();
 
@@ -87,14 +88,23 @@ switch( $action )
 			$edited_Template->dbinsert();
 			$Messages->add( sprintf( TB_('New %s created.'), T_('Template') ), 'success' );
 
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=templates&action=edit&tpl_ID='.$edited_Template->ID ); // Will EXIT
+			if( $action == 'create_edit' )
+			{	// Redirect back to edit form:
+				$redirect_to = $admin_url.'?ctrl=templates&action=edit&tpl_ID='.$edited_Template->ID;
+			}
+			else
+			{
+				$redirect_to = $admin_url.'?ctrl=templates';
+			}
+
+			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'new';
 		break;
 
 	case 'update':
+	case 'update_edit':
 		// Update menu:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -113,8 +123,16 @@ switch( $action )
 			$edited_Template->dbupdate();
 			$Messages->add( sprintf( TB_('%s updated.'), T_('Template')  ), 'success' );
 
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=templates' ); // Will EXIT
+			if( $action == 'update_edit' )
+			{	// Redirect back to edit form:
+				$redirect_to = $admin_url.'?ctrl=templates&action=edit&tpl_ID='.$edited_Template->ID;
+			}
+			else
+			{	// Redirect to template list:
+				$redirect_to = $admin_url.'?ctrl=templates';
+			}
+
+			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'edit';
