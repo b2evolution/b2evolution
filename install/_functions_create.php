@@ -1763,7 +1763,7 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=|placeholder=#file_text_icon]
+				[Item:images|restrict_to_image_position=#cover_and_teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=|placeholder=#file_text_icon]
 				<div class="evo_tile_overlay">[Item:cat_name]</div>
 			</div>
 			<div class="evo_tile_body">
@@ -1816,7 +1816,7 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Item:images|restrict_to_image_position=#teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=single|placeholder=#file_text_icon]
+				[Item:images|restrict_to_image_position=#cover_and_teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=single|placeholder=#file_text_icon]
 				<div class="evo_tile_overlay">[Item:cat_name]</div>
 			</div>
 			<div class="evo_tile_body">
