@@ -29,7 +29,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			tpl_ID INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 			tpl_name VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 			tpl_code VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL,
-			tpl_parent_tpl_ID INT(10) UNSIGNED NULL DEFAULT NULL,
+			tpl_translates_tpl_ID INT(10) UNSIGNED NULL DEFAULT NULL,
 			tpl_locale VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'en-US',
 			tpl_template_code MEDIUMTEXT NULL,
 			PRIMARY KEY (tpl_ID),

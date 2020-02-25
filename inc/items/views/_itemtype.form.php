@@ -64,9 +64,9 @@ $Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 			array( 'admin',      T_('Admin') )
 		), T_('Permission level') );
 
-	// Easy Templates:
+	// Quick Templates:
 	$TemplateCache = & get_TemplateCache();
-	$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
+	$TemplateCache->load_where( 'tpl_translates_tpl_ID IS NULL' );
 	$template_options = array( NULL => sprintf( T_('Use PHP %s'), '(_item_content.inc.php)' ) ) + $TemplateCache->get_code_option_array();
 	$template_input_suffix = ( $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
 		.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;blog='.$Blog->ID, NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );

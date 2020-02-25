@@ -43,11 +43,8 @@ switch( $action )
 		break;
 
 	case 'copy':
-		// Set parent menu:
-		if( isset( $tpl_ID ) && empty( $edited_Template->parent_tpl_ID ) )
-		{
-			$edited_Template->set( 'parent_tpl_ID', $tpl_ID );
-		}
+		// Do not set a "translation of" value:
+		$edited_Template->set( 'translates_tpl_ID', NULL );
 	case 'edit':
 		// Menu edit form:
 		// Make sure we got a menu_ID:

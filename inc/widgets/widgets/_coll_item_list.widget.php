@@ -48,7 +48,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Get available templates:
 		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
+		$TemplateCache->load_where( 'tpl_translates_tpl_ID IS NULL' );
 
 		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
 

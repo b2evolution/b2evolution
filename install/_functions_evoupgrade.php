@@ -12325,6 +12325,16 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15860, 'Upgrading templates table...' ) )
+	{	// part of 7.1.2-beta
+		db_upgrade_cols( 'T_templates', array(
+			'CHANGE' => array(
+				'tpl_parent_tpl_ID' => 'tpl_translates_tpl_ID INT(10) UNSIGNED NULL DEFAULT NULL',
+			),
+		) );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

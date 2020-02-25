@@ -27,7 +27,7 @@ class Template extends DataObject
 {
 	var $name;
 	var $code;
-	var $parent_tpl_ID;
+	var $translates_tpl_ID;
 	var $locale;
 	var $template_code;
 
@@ -56,7 +56,7 @@ class Template extends DataObject
 			$this->ID = $db_row->tpl_ID;
 			$this->name = $db_row->tpl_name;
 			$this->code = $db_row->tpl_code;
-			$this->parent_tpl_ID = $db_row->tpl_parent_tpl_ID;
+			$this->translates_tpl_ID = $db_row->tpl_translates_tpl_ID;
 			$this->locale = $db_row->tpl_locale;
 			$this->template_code = $db_row->tpl_template_code;
 		}
@@ -71,7 +71,7 @@ class Template extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
-				array( 'table' => 'T_templates', 'fk' => 'tpl_parent_tpl_ID', 'msg' => T_('%d child templates') ),
+				array( 'table' => 'T_templates', 'fk' => 'tpl_translates_tpl_ID', 'msg' => T_('%d child templates') ),
 			);
 	}
 
@@ -93,13 +93,13 @@ class Template extends DataObject
 		$this->set_from_Request( 'code' );
 
 		// Parent Menu:
-		$tpl_parent_ID = param( 'tpl_parent_tpl_ID', 'integer', NULL );
-		if( isset( $tpl_parent_tpl_ID ) && $this->has_child_templates() )
+		$tpl_parent_ID = param( 'tpl_translates_tpl_ID', 'integer', NULL );
+		if( isset( $tpl_translates_tpl_ID ) && $this->has_child_templates() )
 		{
 			global $Messages;
 			$Messages->add( sprintf( T_('This template cannot become a child of another because it has %d children itself.'), $this->count_child_templates ) );
 		}
-		$this->set_from_Request( 'parent_tpl_ID' );
+		$this->set_from_Request( 'translates_tpl_ID' );
 
 		// Locale:
 		param( 'tpl_locale', 'string' );
@@ -286,7 +286,7 @@ class Template extends DataObject
 		{
 			$TemplateCache = & get_TemplateCache();
 			$TemplateCache->clear( true );
-			$where = 'tpl_parent_tpl_ID = '.$DB->quote( $this->ID ).' AND tpl_locale = '.$DB->quote( $locale );
+			$where = 'tpl_translates_tpl_ID = '.$DB->quote( $this->ID ).' AND tpl_locale = '.$DB->quote( $locale );
 			$this->localized_templates[$locale] = $TemplateCache->load_where( $where );
 		}
 
@@ -311,9 +311,9 @@ class Template extends DataObject
 		if( !isset( $this->count_child_templates ) )
 		{
 			$SQL = new SQL( 'Check if template has child templates' );
-			$SQL->SELECT( 'COUNT( tpl_parent_tpl_ID )' );
+			$SQL->SELECT( 'COUNT( tpl_translates_tpl_ID )' );
 			$SQL->FROM( 'T_templates' );
-			$SQL->WHERE( 'tpl_parent_tpl_ID = '.$DB->quote( $this->ID ) );
+			$SQL->WHERE( 'tpl_translates_tpl_ID = '.$DB->quote( $this->ID ) );
 			$this->count_child_templates = $DB->get_var( $SQL );
 		}
 
