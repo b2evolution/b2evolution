@@ -18,9 +18,9 @@ global $admin_url;
 
 $SQL = new SQL( 'Get menus' );
 
-$SQL->SELECT( 'menu.menu_ID, menu.menu_parent_ID, menu.menu_name, menu.menu_locale, parent.menu_name AS menu_parent_name' );
+$SQL->SELECT( 'menu.menu_ID, menu.menu_translates_menu_ID, menu.menu_name, menu.menu_locale, parent.menu_name AS menu_parent_name' );
 $SQL->FROM( 'T_menus__menu menu' );
-$SQL->FROM_add( 'LEFT JOIN T_menus__menu parent ON menu.menu_parent_ID = parent.menu_ID' );
+$SQL->FROM_add( 'LEFT JOIN T_menus__menu parent ON menu.menu_translates_menu_ID = parent.menu_ID' );
 
 $Results = new Results( $SQL->get(), 'menu_', '-A' );
 
@@ -34,7 +34,7 @@ $Results->cols[] = array(
 
 $Results->cols[] = array(
 		'th' => T_('Translation of'),
-		'td' => '<a href="'.$admin_url.'?ctrl=menus&amp;action=edit&amp;menu_ID=$menu_parent_ID$">$menu_parent_name$</a>',
+		'td' => '<a href="'.$admin_url.'?ctrl=menus&amp;action=edit&amp;menu_ID=$menu_translates_menu_ID$">$menu_parent_name$</a>',
 		'order' => 'menu_parent_name, menu_name, menu_locale',
 	);
 

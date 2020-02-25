@@ -53,17 +53,17 @@ $Form->begin_form( 'fform', $fieldset_title );
 	$Form->text_input( 'menu_name', $edited_SiteMenu->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 128, 'required' => true ) );
 
 	$parent_menu_options = array( NULL => '('.TB_('None').')' );
-	$SQL = new SQL('Get possible parent menus');
+	$SQL = new SQL('Get possible menus translated from');
 	$SQL->SELECT( 'menu_ID, menu_name' );
 	$SQL->FROM( 'T_menus__menu' );
-	$SQL->WHERE( 'menu_parent_ID IS NULL' );
+	$SQL->WHERE( 'menu_translates_menu_ID IS NULL' );
 	if( $action != 'copy' )
 	{
 		$SQL->WHERE_and( 'NOT menu_ID ='.$DB->quote( $edited_SiteMenu->ID ) );
 	}
 	$SQL->ORDER_BY( 'menu_name ASC' );
 	$parent_menu_options += $DB->get_assoc( $SQL->get() );
-	$Form->select_input_array( 'menu_parent_ID', $edited_SiteMenu->get('parent_ID'), $parent_menu_options, T_('Translation of'), NULL, array( 'force_keys_as_values' => true ) );
+	$Form->select_input_array( 'menu_translates_menu_ID', $edited_SiteMenu->get('translates_menu_ID'), $parent_menu_options, T_('Translation of'), NULL, array( 'force_keys_as_values' => true ) );
 
 	$locales_options = array();
 	foreach( $locales as $locale_key => $locale_data )

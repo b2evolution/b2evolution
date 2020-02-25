@@ -12332,6 +12332,15 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				'tpl_parent_tpl_ID' => 'tpl_translates_tpl_ID INT(10) UNSIGNED NULL DEFAULT NULL',
 			),
 		) );
+	}
+
+	if( upg_task_start( 15870, 'Upgrading menus table...' ) )
+	{	// part of 7.1.2-beta
+		db_upgrade_cols( 'T_menus__menu', array(
+			'CHANGE' => array(
+				'menu_parent_ID' => 'menu_translates_menu_ID INT(10) UNSIGNED NULL DEFAULT NULL',
+			),
+		) );
 		upg_task_end();
 	}
 

@@ -93,7 +93,7 @@ class bootstrap_site_dropdown_Skin extends Skin
 		$BlogCache->none_option_text = T_('Same as "Default collection to display"');
 
 		$SiteMenuCache = & get_SiteMenuCache();
-		$SiteMenuCache->load_where( 'menu_parent_ID IS NULL');
+		$SiteMenuCache->load_where( 'menu_translates_menu_ID IS NULL');
 
 		$r = array_merge( array(
 				'section_layout_start' => array(

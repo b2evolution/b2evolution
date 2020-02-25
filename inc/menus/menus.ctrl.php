@@ -58,11 +58,8 @@ switch( $action )
 		break;
 
 	case 'copy':
-		// Set parent menu:
-		if( isset( $menu_ID ) && empty( $edited_SiteMenu->parent_ID ) )
-		{
-			$edited_SiteMenu->set( 'parent_ID', $menu_ID );
-		}
+		// Do not set "translation of" value:
+		$edited_SiteMenu->set( 'translates_menu_ID', NULL );
 	case 'edit':
 		// Menu edit form:
 		// Make sure we got a menu_ID:

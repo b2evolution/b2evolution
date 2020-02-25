@@ -27,7 +27,7 @@ class SiteMenu extends DataObject
 {
 	var $name;
 	var $locale;
-	var $parent_ID;
+	var $translates_menu_ID;
 
 	/**
 	 * @var array Site Menu Entries
@@ -35,12 +35,12 @@ class SiteMenu extends DataObject
 	var $entries = NULL;
 
 	/**
-	 * @var integer Child menu count
+	 * @var integer Translation menu count
 	 */
-	var $count_child_menus = NULL;
+	var $count_translation_menus = NULL;
 
 	/**
-	 * @var array Localized child menus
+	 * @var array Localized menus
 	 */
 	var $localized_menus = NULL;
 
@@ -57,7 +57,7 @@ class SiteMenu extends DataObject
 		if( $db_row != NULL )
 		{	// Get menu data from DB:
 			$this->ID = $db_row->menu_ID;
-			$this->parent_ID = $db_row->menu_parent_ID;
+			$this->translates_menu_ID = $db_row->menu_translates_menu_ID;
 			$this->name = $db_row->menu_name;
 			$this->locale = $db_row->menu_locale;
 		}
@@ -72,7 +72,7 @@ class SiteMenu extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
-				array( 'table' => 'T_menus__menu', 'fk' => 'menu_parent_ID', 'msg' => T_('%d child menus') ),
+				array( 'table' => 'T_menus__menu', 'fk' => 'menu_translates_menu_ID', 'msg' => T_('%d child menus') ),
 				array( 'table' => 'T_menus__entry', 'fk' => 'ment_menu_ID', 'msg' => T_('%d menu entries') ),
 			);
 	}
@@ -94,14 +94,14 @@ class SiteMenu extends DataObject
 		param( 'menu_locale', 'string' );
 		$this->set_from_Request( 'locale' );
 
-		// Parent Menu:
-		$menu_parent_ID = param( 'menu_parent_ID', 'integer', NULL );
-		if( isset( $menu_parent_ID ) && $this->has_child_menus() )
+		// Translation of Menu:
+		$menu_translates_menu_ID = param( 'menu_translates_menu_ID', 'integer', NULL );
+		if( isset( $menu_translates_menu_ID ) && $this->has_translations() )
 		{	// Display error message if we want make the meta category from category with posts
 			global $Messages;
-			$Messages->add( sprintf( T_('This menu cannot become a child of another because it has %d children itself.'), $this->count_child_menus ) );
+			$Messages->add( sprintf( T_('This menu cannot become a translation of another because it has %d translations itself.'), $this->count_translation_menus ) );
 		}
-		$this->set_from_Request( 'parent_ID' );
+		$this->set_from_Request( 'translates_menu_ID' );
 
 		// Store auto menu entries in temp var, they will be inserted in SiteMenu::dbinsert():
 		$this->insert_menu_entries = param( 'menu_entries', 'array' );
@@ -366,7 +366,7 @@ class SiteMenu extends DataObject
 
 
 	/**
-	 * Get localized child menus
+	 * Get localized menus
 	 * 
 	 * @param string Locale
 	 * @return array Array of SiteMenu objects
@@ -379,7 +379,7 @@ class SiteMenu extends DataObject
 		{
 			$SiteMenuCache = & get_SiteMenuCache();
 			$SiteMenuCache->clear( true );
-			$where = 'menu_parent_ID = '.$DB->quote( $this->ID ).' AND menu_locale = '.$DB->quote( $locale );
+			$where = 'menu_translates_menu_ID = '.$DB->quote( $this->ID ).' AND menu_locale = '.$DB->quote( $locale );
 			$this->localized_menus[$locale] = $SiteMenuCache->load_where( $where );
 		}
 
@@ -392,25 +392,25 @@ class SiteMenu extends DataObject
 	 *
 	 * @return boolean
 	 */
-	function has_child_menus()
+	function has_translations()
 	{
 		global $DB;
 
 		if( $this->ID == 0 )
-		{	// New menu has no child menus:
+		{	// New menu has no translation menus:
 			return false;
 		}
 
-		if( !isset( $this->count_child_menus ) )
+		if( !isset( $this->count_translation_menus ) )
 		{
-			$SQL = new SQL( 'Check if menu has child menus' );
-			$SQL->SELECT( 'COUNT( menu_parent_ID )' );
+			$SQL = new SQL( 'Check if menu has translations menus' );
+			$SQL->SELECT( 'COUNT( menu_translates_menu_ID )' );
 			$SQL->FROM( 'T_menus__menu' );
-			$SQL->WHERE( 'menu_parent_ID = '.$DB->quote( $this->ID ) );
-			$this->count_child_menus = $DB->get_var( $SQL );
+			$SQL->WHERE( 'menu_translates_menu_ID = '.$DB->quote( $this->ID ) );
+			$this->count_translation_menus = $DB->get_var( $SQL );
 		}
 
-		return ( $this->count_child_menus > 0 );
+		return ( $this->count_translation_menus > 0 );
 	}
 }
 
