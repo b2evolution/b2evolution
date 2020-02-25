@@ -760,6 +760,10 @@ class Chapter extends DataObject
 			case '#open+arrow':
 				$text = T_('Open').' &raquo;';
 				break;
+
+			case '#view+arrow':
+				$text = T_('View').' &raquo;';
+				break;
 		}
 
 		$title = $params['title'];

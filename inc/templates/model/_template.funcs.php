@@ -240,6 +240,7 @@ function render_template_callback( $var, $params, $objects = array() )
 		case 'Cat:permalink':
 			echo $rendered_Chapter->get_permanent_link( array_merge( array(
 					'text'   => '#name',
+					'title'  => '',
 				), $params ) );
 			break;
 
@@ -655,6 +656,7 @@ function render_template_callback( $var, $params, $objects = array() )
 		case 'Item:permanent_link':
 			$rendered_Item->permanent_link( array_merge( array(
 					'text'   => '#title',
+					'title'  => '',  // No tooltip by default
 				), $params ) );
 				// Note: Cat content list widget will have set:
 				//	'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted

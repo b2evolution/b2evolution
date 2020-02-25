@@ -1722,6 +1722,7 @@ function create_default_templates( $is_task = true )
 </li>',
 		),
 
+
 		// Content Tiles style 1 (default):
 		'content_tiles' => array(
 			'name'     => 'Content Tiles Style 1 (Fully clickable)',
@@ -1797,12 +1798,12 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$fit-400x320|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
+				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
 			</div>
 			<div class="evo_tile_body">
 				<h3>[Cat:permalink|class=evo_tile_title]</h3>
 				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
-				[Cat:permalink|text=#open+arrow|class=evo_tile_more btn btn-sm btn-default]
+				[Cat:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
 			</div>
 		</div>
 	</div>
@@ -1821,7 +1822,7 @@ function create_default_templates( $is_task = true )
 			<div class="evo_tile_body">
 				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
 				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
-				[Item:permalink|text=#read+arrow|class=evo_tile_more btn btn-sm btn-default]
+				[Item:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
 			</div>
 		</div>
 	</div>
@@ -1853,7 +1854,7 @@ function create_default_templates( $is_task = true )
 			<div class="evo_tile_body">
 				<h3>[Cat:permalink|class=evo_tile_title]</h3>
 				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
-				[Cat:permalink|text=#open+arrow|class=evo_tile_more btn btn-sm btn-default]
+				[Cat:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
 			</div>
 		</div>
 	</div>
@@ -1871,7 +1872,7 @@ function create_default_templates( $is_task = true )
 			<div class="evo_tile_body">
 				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
 				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
-				[Item:permalink|text=#read+arrow|class=evo_tile_more btn btn-sm btn-default]
+				[Item:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
 			</div>
 		</div>
 	</div>

@@ -1352,11 +1352,11 @@ class ItemLight extends DataObject
 				break;
 
 			case '#more+arrow':
-				$text = T_('more').' &raquo;';
+				$text = T_('More').' &raquo;';
 				break;
 
-			case '#read+arrow':
-				$text = T_('Read').' &raquo;';
+			case '#view+arrow':
+				$text = T_('View').' &raquo;';
 				break;
 
 		}
