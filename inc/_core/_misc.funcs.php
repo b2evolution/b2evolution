@@ -953,8 +953,6 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 		// Revert a source code of the matching blocks in content
 		$text = str_replace( array_keys( $evo_non_matching_blocks ), $evo_non_matching_blocks, $text );
 
-		unset( $evo_non_matching_blocks );
-
 		return $text;
 	}
 
