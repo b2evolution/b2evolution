@@ -1663,38 +1663,46 @@ function create_default_templates( $is_task = true )
 		// Item Info "info line" replacements:
 		'item_details_infoline_date' => array(
 			'name'     => 'Item Details: Posted on Date at Time',
+			'context'  => 'item_details',
 			'template' => '<span class="small text-muted">[flag_icon] Posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time]</span>',
 		),
 		'item_details_infoline_standard' => array(
 			'name'     => 'Item Details: Posted by Author on Date at Time in Categories',
+			'context'  => 'item_details',
 			'template' => '<span class="small text-muted">[flag_icon] Posted by [author] on [issue_time|time_format=#extended_date] in [categories]</span>',
 		),
 		'item_details_infoline_long' => array(
 			'name'     => 'Item Details: Long info line',
+			'context'  => 'item_details',
 			'template' => '<span class="small text-muted">[flag_icon] [Item:permalink|text=#linkicon] Posted by [author] on [issue_date|date_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [contents_last_updated][refresh_contents_last_updated_link] [edit_link]</span>',
 		),
 		'item_details_infoline_forums' => array(
 			'name'     => 'Item Details: Thread last updated on Date',
+			'context'  => 'item_details',
 			'template' => '<span class="small text-muted">[flag_icon] Thread last updated on [contents_last_updated|format=#extended_date] at [contents_last_updated|format=#short_time] [refresh_contents_last_updated_link]</span>',
 		),
 
 		// Item info New :
 		'item_details_feedback_link' => array(
 			'name'     => 'Item Details: Comment Link',
+			'context'  => 'item_details',
 			'template' => '<nav class="post_comments_link">[feedback_link]</nav>'
 		),
 
 		// Item Info "Small print" replacements:
 		'item_details_smallprint_standard' => array(
 			'name'     => 'Item Details: Small Print: Standard',
+			'context'  => 'item_details',
 			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] This entry was posted by [author|link_text=preferredname] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
 		),
 		'item_details_smallprint_long' => array(
 			'name'     => 'Item Details: Small Print: Long',
+			'context'  => 'item_details',
 			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] [flag_icon] This entry was posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] by [author|link_text=preferredname] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
 		),
 		'item_details_revisions' => array(
 			'name'     => 'Item Details: Small Print: Revisions',
+			'context'  => 'item_details',
 			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
 		),
 
@@ -1702,6 +1710,7 @@ function create_default_templates( $is_task = true )
 		// Content List widget:
 		'content_list' => array(
 			'name'     => 'Content List',
+			'context'  => 'content_list_master',
 			'template' => '[set:before_list=<ul class="chapters_list posts_list">]
 [set:after_list=</ul>]
 [set:subcat_template=content_list_subcat]
@@ -1709,6 +1718,7 @@ function create_default_templates( $is_task = true )
 		),
 		'content_list_subcat' => array(
 			'name'     => 'Content List: Subcat',
+			'context'  => 'content_list_category',
 			'template' => '<li class="chapter">
 	<h3>[Cat:permalink|text=#expandicon+name|class=link]</h3>
 	<div class="evo_cat__description">[Cat:description]</div>
@@ -1716,6 +1726,7 @@ function create_default_templates( $is_task = true )
 		),
 		'content_list_item' => array(
 			'name'     => 'Content List: Item',
+			'context'  => 'content_list_item',
 			'template' => '<li>
 	<h3>[read_status] [Item:permalink|text=#fileicon+title|class=link] [flag_icon]</h3>[visibility_status]
 	[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
@@ -1726,6 +1737,7 @@ function create_default_templates( $is_task = true )
 		// Content Tiles style 1 (default):
 		'content_tiles' => array(
 			'name'     => 'Content Tiles Style 1 (Fully clickable)',
+			'context'  => 'content_list_master',
 			'template' => '[set:before_list=<div class="evo_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_subcat]
@@ -1741,6 +1753,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_subcat' => array(
 			'name'     => 'Content Tiles Style 1 (Fully clickable): Subcat',
+			'context'  => 'content_list_category',
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1759,6 +1772,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_item' => array(
 			'name'     => 'Content Tiles Style 1 (Fully clickable): Item',
+			'context'  => 'content_list_item',
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1780,6 +1794,7 @@ function create_default_templates( $is_task = true )
 		// Tiles style 2:
 		'content_tiles_btn' => array(
 			'name'     => 'Content Tiles Style 2 (Button)',
+			'context'  => 'content_list_master',
 			'template' => '[set:before_list=<div class="evo_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_btn_subcat]
@@ -1794,6 +1809,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_btn_subcat' => array(
 			'name'     => 'Content Tiles Style 2 (Button): Subcat',
+			'context'  => 'content_list_category',
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1812,6 +1828,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_btn_item' => array(
 			'name'     => 'Content Tiles Style 2 (Button): Item',
+			'context'  => 'content_list_item',
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1833,6 +1850,7 @@ function create_default_templates( $is_task = true )
 		// Tiles style 3 (BG image:Experimental):
 		'content_tiles_bgimg' => array(
 			'name'     => 'Content Tiles Style 3 (BG image:Experimental)',
+			'context'  => 'content_list_master',
 			'template' => '[set:before_list=<div class="evo_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_bgimg_subcat]
@@ -1847,6 +1865,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_bgimg_subcat' => array(
 			'name'     => 'Content Tiles Style 3 (BG image:Experimental): Subcat',
+			'context'  => 'content_list_category',
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1863,6 +1882,7 @@ function create_default_templates( $is_task = true )
 
 		'content_tiles_bgimg_item' => array(
 			'name'     => 'Content Tiles Style 3 (BG image:Experimental): Item',
+			'context'  => 'content_list_item',
 			'template' => '<div class="[echo:rwd_cols]">
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
@@ -1883,6 +1903,7 @@ function create_default_templates( $is_task = true )
 		// Content Blocks:
 		'cblock_clearfix' => array(
 			'name'     => 'Include Content Block: with clearfix',
+			'context'  => 'content_block',
 			'template' => '<div class="evo_content_block clearfix [echo:content_block_class]">
 	[Item:images|restrict_to_image_position=#teaser_all|before=<div class="evo_cblock_images evo_cblock_teaser">|after=</div>]
 	<div class="evo_cblock_text">
@@ -1893,6 +1914,7 @@ function create_default_templates( $is_task = true )
 		),
 		'cblock_noclearfix' => array(
 			'name'     => 'Include Content Block: without clearfix',
+			'context'  => 'content_block',
 			'template' => '<div class="evo_content_block [echo:content_block_class]">
 	[Item:images|restrict_to_image_position=#teaser_all|before=<div class="evo_cblock_images evo_cblock_teaser">|after=</div>]
 	<div class="evo_cblock_text">
@@ -1905,12 +1927,14 @@ function create_default_templates( $is_task = true )
 		// Item Contents:
 		'item_content_excerpt' => array(
 			'name' => 'Item Excerpt',
+			'context'  => 'item_content',
 			'template' => '<section class="evo_post__excerpt">
 [Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
 </section>',
 		),
 		'item_content_teaser' => array(
 			'name' => 'Item Teaser content',
+			'context'  => 'item_content',
 			'template' => '<section class="evo_post__full">
 [Item:images|restrict_to_image_position=#teaser_all|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
 <div class="evo_post__full_text clearfix">
@@ -1921,6 +1945,7 @@ function create_default_templates( $is_task = true )
 		),
 		'item_content_full' => array(
 			'name' => 'Item Full content',
+			'context'  => 'item_content',
 			'template' => '<section class="evo_post__full">
 [Item:images|restrict_to_image_position=#teaser_all|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
 <div class="evo_post__full_text clearfix">
@@ -1935,6 +1960,7 @@ function create_default_templates( $is_task = true )
 		),
 		'recipe_content_full' => array(
 			'name' => 'Recipe Full content',
+			'context'  => 'item_content',
 			'template' => '<section class="evo_post__full">
 <div class="row">
 	<div class="col-sm-5">
@@ -1965,6 +1991,7 @@ function create_default_templates( $is_task = true )
 /*
 		'cblock_imgleft_textright' => array(
 			'name'     => 'Include Content Block: Images Left / Text Right',
+			'context'  => 'content_block',
 			'template' => '<div class="evo_content_block [cb_class]">
 	<img src="[teaser_image]" class="floatleft">
 	<div class="evo_content_block_text">
@@ -1974,6 +2001,7 @@ function create_default_templates( $is_task = true )
 		),
 		'cblock_textleft_imgright' => array(
 			'name'     => 'Include Content Block: Text Left / Images Right',
+			'context'  => 'content_block',
 			'template' => '<div class="evo_content_block [cb_class]">
 	<img src="[teaser_image]" class="floatright">
 	<div class="evo_content_block_text">
@@ -1986,6 +2014,7 @@ function create_default_templates( $is_task = true )
 		// Registration Templates:
 		'registration_standard' => array(
 			'name'     => 'Registration: Standard',
+			'context'  => 'registration',
 			'template' => '[Form:login]
 [Form:password]
 [Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
@@ -1998,6 +2027,7 @@ function create_default_templates( $is_task = true )
 
 		'registration_ask_name' => array(
 			'name'     => 'Registration: Ask for Name',
+			'context'  => 'registration',
 			'template' => '[Form:firstname]
 [Form:lastname]
 [Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
@@ -2013,13 +2043,13 @@ function create_default_templates( $is_task = true )
 	$templates_sql = array();
 	foreach( $templates as $code => $template )
 	{
-		$templates_sql[] = '( '.$DB->quote( $template['name'] ).', '.$DB->quote( $code ).', '.$DB->quote( $template['template'] ).' )';
+		$templates_sql[] = '( '.$DB->quote( $template['name'] ).', '.$DB->quote( $code ).', '.$DB->quote( $template['context'] ).', '.$DB->quote( $template['template'] ).' )';
 	}
 
 	// Insert/Update templates:
-	$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_template_code )
+	$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_context, tpl_template_code )
 		VALUES '.implode( ', ', $templates_sql ).'
-		ON DUPLICATE KEY UPDATE tpl_name = VALUES( tpl_name ), tpl_template_code = VALUES( tpl_template_code )',
+		ON DUPLICATE KEY UPDATE tpl_name = VALUES( tpl_name ), tpl_context = VALUES( tpl_context ), tpl_template_code = VALUES( tpl_template_code )',
 		'Creating/Updating default templates' );
 
 	if( $is_task )

@@ -32,6 +32,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			tpl_translates_tpl_ID INT(10) UNSIGNED NULL DEFAULT NULL,
 			tpl_locale VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'en-US',
 			tpl_template_code MEDIUMTEXT NULL,
+			tpl_context ENUM( 'custom', 'custom1', 'custom2', 'custom3', 'content_list_master', 'content_list_item', 'content_list_category', 'content_block', 'item_details', 'item_content', 'registration' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'custom',
 			PRIMARY KEY (tpl_ID),
 			UNIQUE tpl_code( tpl_code )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),

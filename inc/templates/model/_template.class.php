@@ -30,6 +30,7 @@ class Template extends DataObject
 	var $translates_tpl_ID;
 	var $locale;
 	var $template_code;
+	var $context;
 
 	/**
 	 * @var integer Child template count
@@ -59,6 +60,7 @@ class Template extends DataObject
 			$this->translates_tpl_ID = $db_row->tpl_translates_tpl_ID;
 			$this->locale = $db_row->tpl_locale;
 			$this->template_code = $db_row->tpl_template_code;
+			$this->context = $db_row->tpl_context;
 		}
 	}
 
@@ -110,6 +112,10 @@ class Template extends DataObject
 		param_check_not_empty( 'tpl_template_code' );
 		param_check_html( 'tpl_template_code', T_('Invalid template code content.'), '#', 'quick_template' );
 		$this->set( 'template_code', get_param( 'tpl_template_code' ) );
+
+		// Context:
+		param( 'tpl_context', 'string', 'custom' );
+		$this->set_from_Request( 'context' );
 
 		return ! param_errors_detected();
 	}

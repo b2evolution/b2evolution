@@ -57,7 +57,15 @@ $Form->begin_form( 'fform', $fieldset_title );
 	// Template code:
 	$Form->text_input( 'tpl_code', $edited_Template->get( 'code' ), 25, T_('Code'), '', array( 'maxlength' => 128 ) );
 
-	// Parent template ID:
+	// Context:
+	$context_options = array(
+			'custom', 'custom1', 'custom2', 'custom3',
+			'content_list_master', 'content_list_item', 'content_list_category',
+			'content_block', 'item_details', 'item_content', 'registration' );
+
+	$Form->select_input_array( 'tpl_context', $edited_Template->get( 'context' ), $context_options, T_('Context') );
+
+	// Base template ID:
 	$parent_template_options = array( NULL => '('.TB_('None').')' );
 	$SQL = new SQL('Get possible parent templates');
 	$SQL->SELECT( 'tpl_ID, tpl_name' );

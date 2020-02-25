@@ -17,13 +17,19 @@ global $admin_url;
 
 $SQL = new SQL( 'Get templates' );
 
-$SQL->SELECT( 'template.tpl_ID, template.tpl_name, template.tpl_code, template.tpl_translates_tpl_ID, template.tpl_locale, base.tpl_name AS tpl_base_name' );
+$SQL->SELECT( 'template.tpl_ID, template.tpl_context, template.tpl_name, template.tpl_code, template.tpl_translates_tpl_ID, template.tpl_locale, base.tpl_name AS tpl_base_name' );
 $SQL->FROM( 'T_templates template' );
 $SQL->FROM_add( 'LEFT JOIN T_templates base ON template.tpl_translates_tpl_ID = base.tpl_ID' );
 
 $Results = new Results( $SQL->get(), 'template_', '--A' );
 
 $Results->title = T_('Templates').' ('.$Results->get_total_rows().')' . get_manual_link( 'templates-list' );
+
+$Results->cols[] = array(
+		'th' => T_('Context'),
+		'td' => '$tpl_context$',
+		'order' => 'tpl_context, tpl_base_name, tpl_name, tpl_locale, tpl_code',
+	);
 
 $Results->cols[] = array(
 		'th' => T_('Name'),

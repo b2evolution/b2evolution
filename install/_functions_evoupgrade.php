@@ -12344,6 +12344,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15880, 'Upgrading templates table...' ) )
+	{	// part of 7.1.2-beta
+		db_add_col( 'T_templates', 'tpl_context', 'ENUM( "custom", "custom1", "custom2", "custom3",	"content_list_master", "content_list_item",	"content_list_category", "content_block", "item_details", "item_content", "registration" ) COLLATE ascii_general_ci NOT NULL DEFAULT "custom" AFTER tpl_template_code' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
