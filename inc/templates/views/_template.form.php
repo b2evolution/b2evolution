@@ -65,9 +65,13 @@ $Form->begin_form( 'fform', $fieldset_title );
 
 	$Form->select_input_array( 'tpl_context', $edited_Template->get( 'context' ), $context_options, T_('Context') );
 
+	// Owner:
+	$GroupCache = & get_GroupCache();
+	$Form->select_object( 'tpl_owner_grp_ID', $edited_Template->get( 'owner_grp_ID' ), $GroupCache, T_('Owned by') );
+
 	// Base template ID:
-	$parent_template_options = array( NULL => '('.TB_('None').')' );
-	$SQL = new SQL('Get possible parent templates');
+	$base_template_options = array( NULL => '('.TB_('None').')' );
+	$SQL = new SQL('Get possible base templates');
 	$SQL->SELECT( 'tpl_ID, tpl_name' );
 	$SQL->FROM( 'T_templates' );
 	$SQL->WHERE( 'tpl_translates_tpl_ID IS NULL' );
@@ -76,8 +80,8 @@ $Form->begin_form( 'fform', $fieldset_title );
 		$SQL->WHERE_and( 'NOT tpl_ID ='.$DB->quote( $edited_Template->ID ) );
 	}
 	$SQL->ORDER_BY( 'tpl_name ASC' );
-	$parent_template_options += $DB->get_assoc( $SQL->get() );
-	$Form->select_input_array( 'tpl_translates_tpl_ID', $edited_Template->get('translates_tpl_ID'), $parent_template_options, T_('Translation of'), NULL, array( 'force_keys_as_values' => true ) );
+	$base_template_options += $DB->get_assoc( $SQL->get() );
+	$Form->select_input_array( 'tpl_translates_tpl_ID', $edited_Template->get('translates_tpl_ID'), $base_template_options, T_('Translation of'), NULL, array( 'force_keys_as_values' => true ) );
 
 	// Locale:
 	$locales_options = array();

@@ -40,6 +40,8 @@ switch( $action )
 
 	case 'new':
 		$edited_Template = new Template();
+		// Set template owner to current user's primary group:
+		$edited_Template->set( 'owner_grp_ID', $current_User->get( 'grp_ID' ) );
 		break;
 
 	case 'copy':
@@ -49,6 +51,12 @@ switch( $action )
 		// Menu edit form:
 		// Make sure we got a menu_ID:
 		param( 'tpl_ID', 'integer', true );
+		if( is_null( $edited_Template->get( 'owner_grp_ID') ) )
+		{	// This is a system-owned template, do not allow modification. Duplicate the template instead:
+			$action = 'copy';
+			// Set duplicated template owner to current user's primary group:
+			$edited_Template->set( 'owner_grp_ID', $current_User->get( 'grp_ID' ) );
+		}
 		break;
 
 	case 'duplicate':
@@ -136,7 +144,12 @@ switch( $action )
 		break;
 
 	case 'delete':
-		// Delete menu:
+		// Delete template:
+		
+		if( is_null( $edited_Template->get( 'owner_grp_ID') ) )
+		{	// Do not allow system-owned templates to be deleted:
+			$action = 'list';
+		}
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'template' );
@@ -148,7 +161,7 @@ switch( $action )
 		param( 'tpl_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
-		{ // confirmed, Delete from DB:
+		{	// confirmed, Delete from DB:
 			$msg = sprintf( TB_('Template &laquo;%s&raquo; deleted.'), $edited_Template->dget( 'name' ) );
 			$edited_Template->dbdelete();
 			unset( $edited_Template );

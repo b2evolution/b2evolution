@@ -31,11 +31,12 @@ class Template extends DataObject
 	var $locale;
 	var $template_code;
 	var $context;
+	var $owner_grp_ID;
 
 	/**
-	 * @var integer Child template count
+	 * @var integer Translated template count
 	 */
-	var $count_child_templates = NULL;
+	var $count_translated_templates = NULL;
 
 	/**
 	 * @var array Localized child templates
@@ -61,6 +62,7 @@ class Template extends DataObject
 			$this->locale = $db_row->tpl_locale;
 			$this->template_code = $db_row->tpl_template_code;
 			$this->context = $db_row->tpl_context;
+			$this->owner_grp_ID = $db_row->tpl_owner_grp_ID;
 		}
 	}
 
@@ -96,10 +98,10 @@ class Template extends DataObject
 
 		// Parent Menu:
 		$tpl_parent_ID = param( 'tpl_translates_tpl_ID', 'integer', NULL );
-		if( isset( $tpl_translates_tpl_ID ) && $this->has_child_templates() )
+		if( isset( $tpl_translates_tpl_ID ) && $this->has_translated_templates() )
 		{
 			global $Messages;
-			$Messages->add( sprintf( T_('This template cannot become a child of another because it has %d children itself.'), $this->count_child_templates ) );
+			$Messages->add( sprintf( T_('This template cannot become a child of another because it has %d children itself.'), $this->count_translated_templates ) );
 		}
 		$this->set_from_Request( 'translates_tpl_ID' );
 
@@ -116,6 +118,11 @@ class Template extends DataObject
 		// Context:
 		param( 'tpl_context', 'string', 'custom' );
 		$this->set_from_Request( 'context' );
+
+		// Owner Group:
+		param( 'tpl_owner_grp_ID', 'integer', NULL );
+		param_check_not_empty( 'tpl_owner_grp_ID', T_('Please select an owner group for the template.') );
+		$this->set_from_Request( 'owner_grp_ID' );
 
 		return ! param_errors_detected();
 	}
@@ -305,7 +312,7 @@ class Template extends DataObject
 	 *
 	 * @return boolean
 	 */
-	function has_child_templates()
+	function has_translated_templates()
 	{
 		global $DB;
 
@@ -314,16 +321,16 @@ class Template extends DataObject
 			return false;
 		}
 
-		if( !isset( $this->count_child_templates ) )
+		if( !isset( $this->count_translated_templates ) )
 		{
 			$SQL = new SQL( 'Check if template has child templates' );
 			$SQL->SELECT( 'COUNT( tpl_translates_tpl_ID )' );
 			$SQL->FROM( 'T_templates' );
 			$SQL->WHERE( 'tpl_translates_tpl_ID = '.$DB->quote( $this->ID ) );
-			$this->count_child_templates = $DB->get_var( $SQL );
+			$this->count_translated_templates = $DB->get_var( $SQL );
 		}
 
-		return ( $this->count_child_templates > 0 );
+		return ( $this->count_translated_templates > 0 );
 	}
 }
 
