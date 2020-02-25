@@ -5062,6 +5062,11 @@ class Item extends ItemLight
 				'links_sql_orderby'          => 'link_order',
 			), $params );
 
+
+// TODO: add some image_block_classes param that does something like this:
+// Inject extra class name(s) into 'before_image' param:
+//	$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
+
 		// Get list of ALL attached files
 		$links_params = array(
 				'sql_select_add' => $params['links_sql_select'],

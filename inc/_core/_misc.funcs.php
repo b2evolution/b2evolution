@@ -8923,7 +8923,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 									$current_image_params['image_class'] = $image_extraclass;
 								}
 								else
-								{	// Overwrite 'before_image' setting to add an extra class name:
+								{	// Inject extra class name(s) into 'before_image' param:
 									$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
 								}
 								$current_file_params['class'] = $image_extraclass;
