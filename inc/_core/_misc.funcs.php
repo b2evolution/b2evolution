@@ -926,24 +926,24 @@ function evo_substr( $string, $start = 0, $length = '#' )
  */
 function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = array() )
 {
-	global $evo_non_matching_blocks;
-
 	if( preg_match_all( $pattern, $text, $matches, PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER ) )
 	{	// $pattern matches, call the callback method on full text except of matching blocks
 
 		// Create an unique string in order to replace all matching blocks temporarily
 		$unique_replacement = md5( time() + rand() );
 
-		$evo_non_matching_blocks = array();
+		$matches_source = array();
+		$matches_temp = array();
 		foreach( $matches[0] as $l => $l_matching )
 		{	// Build arrays with a source code of the matching blocks and with temporary replacement
-			$evo_non_matching_blocks[ '?'.$l.$unique_replacement.$l.'?' ] = $l_matching[0];
+			$matches_source[] = $l_matching[0];
+			$matches_temp[] = '?'.$l.$unique_replacement.$l.'?';
 		}
 
 		// Replace all matching blocks with temporary text like '?X219a33da9c1b8f4e335bffc015df8c96X?'
 		// where X is index of match block in array $matches[0]
 		// It is used to avoid any changes in the matching blocks
-		$text = str_replace( $evo_non_matching_blocks, array_keys( $evo_non_matching_blocks ), $text );
+		$text = str_replace( $matches_source, $matches_temp, $text );
 
 		// Callback:
 		$callback_params = $params;
@@ -951,9 +951,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 		$text = call_user_func_array( $callback, $callback_params );
 
 		// Revert a source code of the matching blocks in content
-		$text = str_replace( array_keys( $evo_non_matching_blocks ), $evo_non_matching_blocks, $text );
-
-		unset( $evo_non_matching_blocks );
+		$text = str_replace( $matches_temp, $matches_source, $text );
 
 		return $text;
 	}
@@ -961,42 +959,6 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 	$callback_params = $params;
 	array_unshift( $callback_params, $text );
 	return call_user_func_array( $callback, $callback_params );
-}
-
-
-/**
- * Replace non matching blocks from temp strings like '?X219a33da9c1b8f4e335bffc015df8c96X?' back to original string like '<code>$some_var = "some value";</code>'
- *
- * @param array Matches
- * @return array Matches
- */
-function fix_non_matching_blocks( $matches )
-{
-	global $evo_non_matching_blocks;
-
-	if( ! is_array( $matches ) )
-	{	// This function works only with array of matches
-		return $matches;
-	}
-
-	if( empty( $evo_non_matching_blocks ) )
-	{	// Nothing to fix, Return source param value:
-		return $matches;
-	}
-
-	foreach( $matches as $m => $match )
-	{
-		if( is_array( $match ) )
-		{
-			$matches[ $m ] = fix_non_matching_blocks( $match );
-		}
-		else
-		{	// Revert back to original values from temp strings:
-			$matches[ $m ] = str_replace( array_keys( $evo_non_matching_blocks ), $evo_non_matching_blocks, $match );
-		}
-	}
-
-	return $matches;
 }
 
 
@@ -1012,12 +974,9 @@ function preg_match_outcode( $search, $content, & $matches )
 {
 	if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
 	{	// Call preg_match_all() on everything outside code/pre and markdown codeblocks:
-		$result = callback_on_non_matching_blocks( $content,
+		return callback_on_non_matching_blocks( $content,
 			'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
 			'preg_match_outcode_callback', array( $search, & $matches ) );
-		// Revert codeblocks back if they are located inside search regexp:
-		$matches = fix_non_matching_blocks( $matches );
-		return $result;
 	}
 	else
 	{	// No code/pre blocks, search in the whole thing:
@@ -1172,35 +1131,7 @@ function replace_content( $content, $search, $replace, $type = 'preg', $limit = 
  */
 function replace_content_callback( $content, $search, $replace_callback )
 {
-	global $evo_replace_content_outcode_callback;
-
-	// Store here the requested callback function in order to use pre-processor function fix_replace_content_callback() before we call the original requested callback function:
-	$evo_replace_content_outcode_callback = $replace_callback;
-
-	return preg_replace_callback( $search, 'fix_replace_content_callback', $content );
-}
-
-
-/**
- * Replace non matching blocks from temp strings like '?X219a33da9c1b8f4e335bffc015df8c96X?' back to original string like '<code>$some_var = "some value";</code>'
- *
- * @param Array Matches
- * @return mixed
- */
-function fix_replace_content_callback( $m )
-{
-	global $evo_replace_content_outcode_callback;
-
-	// Replace non matching blocks from temp strings like '?X219a33da9c1b8f4e335bffc015df8c96X?' back to original string like '<code>$some_var = "some value";</code>'
-	$m = fix_non_matching_blocks( $m );
-
-	// Call real function with fixed blocks in matches:
-	$result = call_user_func_array( $evo_replace_content_outcode_callback, array( $m ) );
-
-	// Clear temp var:
-	unset( $evo_replace_content_outcode_callback );
-
-	return $result;
+	return preg_replace_callback( $search, $replace_callback, $content );
 }
 
 
