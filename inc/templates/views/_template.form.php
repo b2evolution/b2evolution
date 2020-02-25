@@ -95,17 +95,17 @@ $Form->begin_form( 'fform', $fieldset_title );
 	$buttons = array();
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{	// Allow to save template if current User has a permission:
-		if( $creating )
+		if( $action == 'copy' )
 		{
 			$buttons = array(
-					array( 'submit', 'actionArray[create]', T_('Save'), 'SaveButton' ),
-					array( 'submit', 'actionArray[create_edit]', T_('Save and conitnue editing...'), 'SaveButton' )
+					array( 'submit', 'actionArray[create]', T_('Duplicate Template!'), 'SaveButton' ),
+					array( 'submit', 'actionArray[create_edit]', T_('Duplicate and continue editing...'), 'SaveButton' )
 				);
 		}
 		else
 		{
 			$buttons = array(
-					array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ),
+					array( 'submit', 'actionArray[update]', T_('Save!'), 'SaveButton' ),
 					array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton' )
 				);
 		}
