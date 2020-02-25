@@ -33,7 +33,7 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th' => T_('Parent'),
+		'th' => T_('Translation of'),
 		'td' => '<a href="'.$admin_url.'?ctrl=menus&amp;action=edit&amp;menu_ID=$menu_parent_ID$">$menu_parent_name$</a>',
 		'order' => 'menu_parent_name, menu_name, menu_locale',
 	);
