@@ -91,32 +91,7 @@ class subcontainer_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
-		$container_type = $this->get_container_param( 'type' );
-
-		if( $container_type == 'shared' || $container_type == 'shared-sub' )
-		{	// For shared containers allow only shared sub-containers:
-			$coll_ID = '';
-		}
-		else
-		{	// For collection containers allow only collection sub-containers:
-			global $Blog;
-			$coll_ID = $Blog->ID;
-		}
-
 		$WidgetContainerCache = & get_WidgetContainerCache();
-		$coll_widget_containers = $WidgetContainerCache->get_by_coll_skintype( $coll_ID, $this->get_container_param( 'skin_type' ) );
-		$container_options = array(
-				'' => T_('None'),
-				'!create_new' => T_('Create New'),
-				T_('Existing Sub-Containers') => array(),
-			);
-		foreach( $coll_widget_containers as $WidgetContainer )
-		{
-			if( ! $WidgetContainer->get( 'main' ) )
-			{	// Allow only sub-containers:
-				$container_options[ T_('Existing Sub-Containers') ][ $WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
-			}
-		}
 
 		$r = array_merge( array(
 				'title' => array(
@@ -127,7 +102,7 @@ class subcontainer_Widget extends ComponentWidget
 					'label' => T_('Sub-Container'),
 					'note' => T_('All widgets from this Sub-Container will be displayed.'),
 					'type' => 'select',
-					'options' => $container_options,
+					'options' => $WidgetContainerCache->get_subcontainers_option_array( $this->get_container_param( 'skin_type' ) ),
 					'defaultvalue' => ''
 				),
 			), parent::get_param_definitions( $params )	);
@@ -192,8 +167,16 @@ class subcontainer_Widget extends ComponentWidget
 	{
 		global $Blog, $Timer, $displayed_subcontainers, $Session;
 
-		// Set the subcontainer code which will be displayed:
-		$subcontainer_code = $this->disp_params['container'];
+		// Get container type "coll"/"shared" and real container code from stored value:
+		$code_data = explode( ':', $this->disp_params['container'], 2 );
+		if( count( $code_data ) != 2 || ! in_array( $code_data[0], array( 'coll', 'shared' ) ) )
+		{	// Invalid container code:
+			$this->display_error_message( 'Widget "'.$this->get_name().'" has a wrong container code "'.$this->disp_params['container'].'".' );
+			return false;
+		}
+
+		$subcontainer_coll_ID = ( $code_data[0] == 'coll' ? $this->get_coll_ID() : NULL );
+		$subcontainer_code = $code_data[1];
 
 		if( ! isset( $displayed_subcontainers ) )
 		{	// Initialize the dispalyed subcontainers array at first usage:
@@ -203,7 +186,7 @@ class subcontainer_Widget extends ComponentWidget
 		elseif( in_array( $subcontainer_code, $displayed_subcontainers ) )
 		{	// Do not try do display the same subcontainer which were already displayed to avoid infinite display:
 			$WidgetContainerCache = & get_WidgetContainerCache();
-			if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $this->get_coll_ID(), $this->get_container_param( 'skin_type' ), $subcontainer_code ) )
+			if( $WidgetContainer = & $WidgetContainerCache->get_by_coll_skintype_code( $subcontainer_coll_ID, $this->get_container_param( 'skin_type' ), $subcontainer_code ) )
 			{
 				$subcontainer_name = $WidgetContainer->get( 'name' );
 			}
@@ -230,7 +213,7 @@ class subcontainer_Widget extends ComponentWidget
 
 		// Get enabled widgets of the container:
 		$EnabledWidgetCache = & get_EnabledWidgetCache();
-		$container_widgets = & $EnabledWidgetCache->get_by_coll_container( $this->get_coll_ID(), $subcontainer_code, true );
+		$container_widgets = & $EnabledWidgetCache->get_by_coll_container( $subcontainer_coll_ID, $subcontainer_code, true );
 
 		if( ! empty( $container_widgets ) )
 		{

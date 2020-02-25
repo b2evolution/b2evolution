@@ -156,5 +156,48 @@ class WidgetContainerCache extends DataObjectCache
 			return $this->cache_by_coll_skintype_code[''][ $skin_type ][ $code ];
 		}
 	}
+
+
+	/**
+	 * Get options array with groups for collection and shared sub-containers
+	 *
+	 * @param string Skin type
+	 * @return array
+	 */
+	function get_subcontainers_option_array( $skin_type )
+	{
+		global $Blog, $DB;
+
+		$this->clear();
+		$SQL = $this->get_SQL_object();
+		$SQL->WHERE_and( 'wico_main != 1' );
+		$SQL->WHERE_and( 'wico_skin_type = '.$DB->quote( $skin_type ) );
+		$SQL->WHERE_and( 'wico_coll_ID IS NULL'.( empty( $Blog ) ? '' : ' OR wico_coll_ID = '.$DB->quote( $Blog->ID ) ) );
+		$widget_containers = $this->load_by_sql( $SQL );
+
+		$container_options = array(
+				'' => T_('None'),
+				'!create_new' => T_('Create New'),
+				T_('Existing Sub-Containers') => array(),
+				T_('Existing Shared Sub-Containers') => array(),
+			);
+
+		foreach( $widget_containers as $WidgetContainer )
+		{
+			if( $WidgetContainer->get( 'coll_ID' ) )
+			{	// Collection sub-container:
+				$group = T_('Existing Sub-Containers');
+				$prefix = 'coll:';
+			}
+			else
+			{	// Shared sub-container:
+				$group = T_('Existing Shared Sub-Containers');
+				$prefix = 'shared:';
+			}
+			$container_options[ $group ][ $prefix.$WidgetContainer->get( 'code' ) ] = $WidgetContainer->get( 'name' );
+		}
+
+		return $container_options;
+	}
 }
 ?>
