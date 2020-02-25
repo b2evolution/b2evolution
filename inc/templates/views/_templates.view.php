@@ -15,17 +15,64 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $admin_url;
 
-$SQL = new SQL( 'Get templates' );
+// Get params from request
+$name_code = param( 'q', 'string', '', true );
+$context = param( 'context', 'string', NULL, true );
+$owner = param( 'owner', 'integer', NULL, true );
 
+$SQL = new SQL( 'Get templates' );
 $SQL->SELECT( 'template.tpl_ID, template.tpl_context, template.tpl_name, template.tpl_code, template.tpl_translates_tpl_ID, template.tpl_locale,
 		template.tpl_owner_grp_ID, owner.grp_name AS owner_name, base.tpl_name AS tpl_base_name' );
 $SQL->FROM( 'T_templates template' );
 $SQL->FROM_add( 'LEFT JOIN T_templates base ON template.tpl_translates_tpl_ID = base.tpl_ID' );
 $SQL->FROM_add( 'LEFT JOIN T_groups owner ON template.tpl_owner_grp_ID = owner.grp_ID' );
 
+if( !empty( $name_code ) )
+{
+	$SQL->WHERE_and( '( template.tpl_name LIKE '.$DB->quote( '%'.$name_code.'%' ).' OR template.tpl_code LIKE '.$DB->quote( '%'.$name_code.'%').' )' );
+}
+if( !empty( $context ) )
+{
+	$SQL->WHERE_and( 'template.tpl_context = '.$DB->quote( $context ) );
+}
+if( !empty( $owner ) )
+{
+	$SQL->WHERE_and( 'template.tpl_owner_grp_ID = '.$DB->quote( $owner ) );
+}
+elseif( $owner === 0 )
+{
+	$SQL->WHERE_and( 'template.tpl_owner_grp_ID IS NULL' );
+}
+
 $Results = new Results( $SQL->get(), 'template_', '----A' );
 
 $Results->title = T_('Templates').' ('.$Results->get_total_rows().')' . get_manual_link( 'templates-list' );
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function filter_templates_list( & $Form )
+{
+	// Name / Code:
+	$Form->text_input( 'q', get_param( 'q' ), 20, T_('Name / Code'), '', array( 'maxlength' => 50 ) );
+
+	// Context:
+	$field_options = array( NULL => T_('All contexts') ) + get_template_contexts();
+	$Form->select_input_array( 'context', get_param( 'context' ), $field_options, T_('Context'), '', array( 'force_keys_as_values' => false ) );
+
+	// Owner:
+	$GroupCache = & get_GroupCache();
+	$field_options = array( NULL => T_('All owners'), '0' => 'SYSTEM' ) + $GroupCache->get_option_array();
+	$Form->select_input_array( 'owner', get_param( 'owner' ), $field_options, T_('Owner'), '', array( 'force_keys_as_values' => true ) );	
+}
+$Results->filter_area = array(
+		'callback' => 'filter_templates_list',
+		'url_ignore' => 'results_template_per_page,results_templates_page',
+	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=templates' );
 
 $Results->cols[] = array(
 		'th' => T_('Context'),
