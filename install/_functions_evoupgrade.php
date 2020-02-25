@@ -12356,6 +12356,59 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15900, 'Updating widgets "Sub-Container" and "Columns (Sub-Containers)"...' ) )
+	{	// part of 7.1.2-beta
+		// Allow to use shared containers in collection containers:
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_code, wico_coll_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->FROM_add( 'INNER JOIN T_widget__container ON wico_ID = wi_wico_ID' );
+		$SQL->WHERE( 'wi_code IN ( "subcontainer", "subcontainer_row" )' );
+		$widgets = $DB->get_results( $SQL );
+
+		if( ! empty( $widgets ) )
+		{	// If at least one widget exists in DB:
+			foreach( $widgets as $widget )
+			{
+				if( empty( $widget->wi_params ) )
+				{	// Skip widget with default settings:
+					continue;
+				}
+
+				$widget_params = unserialize( $widget->wi_params );
+
+				// Set prefix for collection or shared container:
+				$prefix = ( $widget->wico_coll_ID ? 'coll:' : 'shared:' );
+
+				switch( $widget->wi_code )
+				{
+					case 'subcontainer':
+						// Sub-Container
+						if( ! empty( $widget_params['container'] ) )
+						{
+							$widget_params['container'] = $prefix.$widget_params['container'];
+						}
+						break;
+					case 'subcontainer_row':
+						// Columns (Sub-Containers)
+						for( $i = 1; $i <= 6; $i++ )
+						{
+							if( ! empty( $widget_params['column'.$i.'_container'] ) )
+							{
+								$widget_params['column'.$i.'_container'] = $prefix.$widget_params['column'.$i.'_container'];
+							}
+						}
+						break;
+				}
+
+				$DB->query( 'UPDATE T_widget__widget
+						SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+					WHERE wi_ID = '.$widget->wi_ID );
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

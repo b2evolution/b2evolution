@@ -291,9 +291,9 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 40, 15000, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => $demo_poll_ID ) ),
 		array( 45, 15000, 'content_hierarchy', 'coll_type' => 'manual' ),
 		array( 50, 15000, 'subcontainer_row', 'coll_type' => '-main', 'params' => array(
-				'column1_container' => 'front_page_column_a',
+				'column1_container' => 'coll:front_page_column_a',
 				'column1_class'     => 'col-sm-6 col-xs-12',
-				'column2_container' => 'front_page_column_b',
+				'column2_container' => 'coll:front_page_column_b',
 				'column2_class'     => 'col-sm-6 col-xs-12',
 			) ),
 	);
@@ -510,7 +510,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		// Reputation:
 		array( 30, 15230, 'subcontainer', 'params' => array(
 				'title'     => T_('Reputation'),
-				'container' => 'user_page_reputation',
+				'container' => 'coll:user_page_reputation',
 			) ),
 	);
 
@@ -570,11 +570,11 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 10, 15260, 'site_logo' ),
 		array( 20, 15260, 'subcontainer', 'params' => array(
 				'title'     => T_('Main Navigation'),
-				'container' => 'main_navigation',
+				'container' => 'shared:main_navigation',
 			) ),
 		array( 30, 15260, 'subcontainer', 'params' => array(
 				'title'            => T_('Right Navigation'),
-				'container'        => 'right_navigation',
+				'container'        => 'shared:right_navigation',
 				'widget_css_class' => 'floatright',
 			) ),
 	);
