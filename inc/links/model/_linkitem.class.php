@@ -33,7 +33,7 @@ class LinkItem extends LinkOwner
 	 */
 	function __construct( $Item, $tmp_ID = NULL )
 	{
-		// call parent contsructor
+		// call parent constructor
 		parent::__construct( $Item, 'item', 'itm_ID', $tmp_ID );
 		$this->Item = & $this->link_Object;
 

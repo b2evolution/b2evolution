@@ -3225,10 +3225,13 @@ function echo_file_properties()
 		} );
 
 		if( typeof( link_owner_type ) != 'undefined' &&
-		    typeof( link_owner_ID ) != 'undefined' )
+		    typeof( link_owner_ID ) != 'undefined' &&
+		    ( typeof( evo_form_file_properties__is_initialized ) == 'undefined' || evo_form_file_properties__is_initialized !== true ) )
 		{	// If we edit file properties from links/attachments table we should submit the form by AJAX:
+			evo_form_file_properties__is_initialized = true; // Use this flag in order to don't init the form submitting twice:
 			jQuery( document ).on( 'submit', 'form#fm_properties_checkchanges', function( e )
 			{
+				var form = jQuery( this );
 				e.preventDefault();
 				// Close modal window:
 				closeModalWindow();
@@ -3237,11 +3240,11 @@ function echo_file_properties()
 				{
 					type: 'POST',
 					url: jQuery( this ).attr( 'action' ),
-					data: jQuery( this ).serialize(),
+					data: jQuery( this ).serialize() + '&mode=link',
 					success: function()
 					{	// On success updating,
 						// Refresh links/attachments table:
-						evo_link_refresh_list( link_owner_type, link_owner_ID );
+						evo_link_refresh_list( form.find( '[name=link_owner_type]' ).val(), form.find( '[name=link_owner_ID]' ).val() );
 					},
 					error: function( jqXHR )
 					{	// On failed updating,

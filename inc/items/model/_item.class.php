@@ -13541,6 +13541,11 @@ class Item extends ItemLight
 	{
 		global $DB;
 
+		if( empty( $this->ID ) )
+		{	// Don't try to create revision when Item is not created yet:
+			return false;
+		}
+
 		// Get next version ID:
 		$iver_ID = $this->get_next_version_ID( 'archived' );
 
