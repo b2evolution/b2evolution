@@ -39,7 +39,7 @@ class MarkdownImport extends AbstractImport
 	 */
 	function __construct()
 	{
-		global $Plugins;
+		global $Plugins, $Settings;
 
 		// Options definitions:
 		$this->options_defs = array(
@@ -75,6 +75,14 @@ class MarkdownImport extends AbstractImport
 				'default'  => 0,
 			),
 			// Options:
+			'allow_extra_cats' => array(
+				'group'   => 'options',
+				'title'   => sprintf( TB_('Allow %s to cross post into other collections'), '<code>extra-cats:</code>' ),
+				'note'    => $Settings->get( 'cross_posting' ) ? '' : TB_('Cross posting is globally disabled'),
+				'type'    => 'integer',
+				'default' => 1,
+				'disabled'=> ! $Settings->get( 'cross_posting' ),
+			),
 			'convert_md_links' => array(
 				'group'   => 'options',
 				'title'   => T_('Convert Markdown links to b2evolution ShortLinks'),
@@ -104,7 +112,8 @@ class MarkdownImport extends AbstractImport
 			),
 			'same_lang_update_file' => array(
 				'group'   => 'options',
-				'title'   => T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn\'t trigger warnings next time (and can be versioned into Git).').' <span class="note">'.T_('This requires using a directory to import, not a ZIP file.').'</span>',
+				'title'   => T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn\'t trigger warnings next time (and can be versioned into Git).'),
+				'note'    => T_('This requires using a directory to import, not a ZIP file.'),
 				'type'    => 'integer',
 				'default' => 1,
 				'indent'  => 3,
@@ -1426,16 +1435,17 @@ class MarkdownImport extends AbstractImport
 	 *
 	 * @param string Category folder path
 	 * @param boolean Check by full path, FALSE - useful to find only by slug
+	 * @param integer Item Type ID to check what categories can be allowed for cross-posting
 	 * @return object|NULL Chapter object
 	 */
-	function & get_Chapter( $cat_folder_path, $check_full_path = true )
+	function & get_Chapter( $cat_folder_path, $check_full_path = true, $item_Type_ID = NULL )
 	{
 		if( isset( $this->chapters_by_path[ $cat_folder_path ] ) )
 		{	// Get Chapter from cache:
 			return $this->chapters_by_path[ $cat_folder_path ];
 		}
 
-		global $DB;
+		global $DB, $Settings;
 
 		$cat_full_url_path = explode( '/', $cat_folder_path );
 		foreach( $cat_full_url_path as $c => $cat_slug )
@@ -1448,7 +1458,15 @@ class MarkdownImport extends AbstractImport
 		$SQL = new SQL( 'Find categories by path "'.implode( '/', $cat_full_url_path ).'/"' );
 		$SQL->SELECT( 'cat_ID' );
 		$SQL->FROM( 'T_categories' );
-		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
+		if( $Settings->get( 'cross_posting' ) && $item_Type_ID !== NULL )
+		{	// Select categories from all possible collections where cross-posting is allowed between the imported collection:
+			$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_coll_ID = cat_blog_ID' );
+			$SQL->WHERE_and( 'itc_ityp_ID = '.$DB->quote( $item_Type_ID ) );
+		}
+		else
+		{	// Select categories only from the imported collection because cross-posting is not allowed in system:
+			$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
+		}
 		$SQL->WHERE_and( 'cat_urlname REGEXP '.$DB->quote( '^('.$cat_urlname_base.')(-[0-9]+)?$' ) );
 		$cat_IDs = $DB->get_col( $SQL );
 
@@ -1816,13 +1834,13 @@ class MarkdownImport extends AbstractImport
 		$extra_cat_IDs = array();
 		foreach( $value as $extra_cat_slug )
 		{
-			if( $extra_Chapter = & $this->get_Chapter( $extra_cat_slug, strpos( $extra_cat_slug, '/' ) !== false ) )
+			if( $extra_Chapter = & $this->get_Chapter( $extra_cat_slug, ( strpos( $extra_cat_slug, '/' ) !== false ), $Item->get( 'ityp_ID' ) ) )
 			{	// Use only existing category:
 				$extra_cat_IDs[] = $extra_Chapter->ID;
 			}
 			else
 			{	// Display error on not existing category:
-				$this->add_yaml_message( sprintf( T_('Skiping extra category %s, because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>' ) );
+				$this->add_yaml_message( sprintf( T_('Skipping extra category %s, because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>' ) );
 			}
 		}
 
