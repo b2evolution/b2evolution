@@ -223,6 +223,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Cat:image':
 			echo $rendered_Chapter->get_image_tag( array_merge( array(
+					'before_classes' => '', // Allow injecting additional classes into 'before'
 					'size'        => 'crop-256x256',
 					'link_to'     => '#category_url',
 					'placeholder' => '#folder_icon',
@@ -597,7 +598,7 @@ function render_template_callback( $var, $params, $objects = array() )
 																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
 					'before'                     => '<div>',
 					'before_image'               => '<figure class="evo_image_block">',
-//TODO					'before_image_classes'        => '',     // Allow injecting additional classes into 'before image'
+					'before_image_classes'       => '', // Allow injecting additional classes into 'before image'
 					'before_image_legend'        => '<div class="evo_image_legend">',
 					'after_image_legend'         => '</div>',
 					'after_image'                => '</figure>',
