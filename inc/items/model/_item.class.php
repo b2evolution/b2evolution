@@ -4228,7 +4228,7 @@ class Item extends ItemLight
 				'image_class'   => 'img-responsive',
 				'image_size'    => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 				'image_limit'   =>  1000,
-				'image_link_to' => 'original', // Can be 'original', 'single' or empty
+				'image_link_to' => 'original', // Can be 'original' (image fiel URL), 'single', URL or empty
 				'content_block_class' => '',
 			), $params );
 
@@ -5098,7 +5098,8 @@ class Item extends ItemLight
 		$LinkOwner = new LinkItem( $this, $tmp_object_ID );
 		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000, $params['restrict_to_image_position'], NULL, $links_params ) )
 		{	// No images match requested positions:
-			// Display placeholder:
+
+			// Display PLACEHOLDER:
 			$placeholder_html = $params['placeholder'];
 			switch( $placeholder_html )
 			{
@@ -5189,7 +5190,7 @@ class Item extends ItemLight
 				continue;
 			}
 
-			// GENERATE the IMG tag with all the alt, title and desc if available
+			// GENERATE the IMG tag with all the alt, title and desc if available:
 			$r .= $this->get_attached_image_tag( $Link, $params );
 
 			$image_counter++;

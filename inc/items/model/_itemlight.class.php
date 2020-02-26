@@ -1197,7 +1197,7 @@ class ItemLight extends DataObject
 
 
 	/**
-	 * Check if current item has at least one category, which belongs to the given blog
+	 * Check if current Item has at least one category, which belongs to the given blog
 	 *
 	 * @param integer the given blog ID
 	 * @return boolean true if there is at least one category in the given blog, false otherwise
@@ -1242,19 +1242,21 @@ class ItemLight extends DataObject
 			return false;
 		}
 
+		// Check if Item main cat is in current Coll
 		$item_Blog = & $this->get_Blog();
-
 		if( ! $item_Blog || $item_Blog->ID == $target_coll_ID )
 		{	// Item's collection is the same as target blog
 			return false;
 		}
 
+		// Check if target coll ID is an existing collection
 		$BlogCache = & get_BlogCache();
 		if( ! ( $target_Blog = & $BlogCache->get_by_ID( $target_coll_ID, false, false ) ) )
 		{	// Wrong target collection:
 			return false;
 		}
 
+		// Does the target collection allow cross posts?
 		if( ! $target_Blog->get_setting( 'allow_crosspost_urls' ) )
 		{	// We have to navigate to the Collection of the Item's main Category:
 			return false;
@@ -1287,10 +1289,10 @@ class ItemLight extends DataObject
 	 * @param string Link text or special value: '#', '#icon#', '#text#', '#title#' '... $title$ ...'
 	 * @param string Link title
 	 * @param string Class name
-	 * @param string Target collection
+	 * @param string 'auto' or Target collection
 	 * @param string Post navigation type: same_category, same_tag, same_author, same_blog
 	 * @param integer|NULL ID of post navigation target
-	 * @param array What permanent types should be ignored to don't return a permanent URL
+	 * @param array What permanent types should be ignored and not return a permanent URL
 	 * @param array Additional parameters
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL, $ignore_types = array(), $params = array() )
