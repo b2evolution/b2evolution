@@ -15,6 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 init_jqplot_js( 'blog' );
+require_js_defer( 'src/evo_init_canvas_bar_chart.js', 'blog' );
+require_js_defer( 'src/evo_coll_activity_stats_widget.js', 'blog' );
 
 /**
  * coll_activity_stats_Widget Class.
@@ -274,75 +276,11 @@ class coll_activity_stats_Widget extends ComponentWidget
 
 		echo $this->disp_params['block_end'];
 
-		?>
-		<script>
-		var plot, originalData = [], weekData = [], xLabels = [],
-				displayed = '<?php echo format_to_js( $this->disp_params['time_period'] );?>',
-				resizeTimer;
+		$coll_activity_stats_config = array(
+				'time_period' => $this->disp_params['time_period'],
+			);
 
-		function resize_coll_activity_stat_widget()
-		{
-			if( plot == undefined )
-			{
-				plot = jQuery( '#canvasbarschart' ).data( 'plot' );
-				xLabels = plot.axes.xaxis.ticks.slice(0);
-				for( var i = 0; i < plot.series.length; i++ )
-				{
-					originalData.push( plot.series[i].data.slice(0) );
-				}
-
-				if( originalData[0].length == 7 )
-				{
-					weekData = originalData;
-				}
-				else
-				{
-					for( var i = 0; i < originalData.length; i++ )
-					{
-						var weekSeries = [];
-						for( var j = 7, k = 1; j > 0; j--, k++ )
-						{
-							weekSeries.unshift( [ j, originalData[i][originalData[i].length - k][1] ] );
-						}
-						weekData.push( weekSeries );
-					}
-				}
-			}
-
-			if( jQuery( '#canvasbarschart' ).width() < 650 )
-			{
-				if( displayed != 'last_week' )
-				{
-					for( var i = 0; i < plot.series.length; i++ )
-					{
-						plot.series[i].data = weekData[i];
-					}
-					plot.axes.xaxis.ticks = xLabels.slice( -7 );
-					displayed = 'last_week';
-				}
-			}
-			else
-			{
-				if( displayed != 'last_month' )
-				{
-					for( var i = 0; i < plot.series.length; i++ )
-					{
-						plot.series[i].data = originalData[i];
-					}
-					plot.axes.xaxis.ticks = xLabels;
-					displayed = 'last_month';
-				}
-			}
-			plot.replot( { resetAxes: true } );
-		}
-
-		jQuery( window ).resize( function()
-		{
-			clearTimeout( resizeTimer );
-			resizeTimer = setTimeout( resize_coll_activity_stat_widget, 100 );
-		} );
-		</script>
-		<?php
+		expose_var_to_js( 'coll_activity_stats_widget_config', json_encode( $coll_activity_stats_config ) );
 
 		return true;
 	}
