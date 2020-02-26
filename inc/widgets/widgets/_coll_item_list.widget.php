@@ -465,6 +465,7 @@ class coll_item_list_Widget extends ComponentWidget
 
 				// In case of cross-posting, we EXPECT to navigate in same collection if possible:
 				'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
+				// 'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted -- IN this case, we are NOT in a category
 
 				// The following are to auto-templates only:
 				'item_first_image_before'      => '<div class="item_first_image">',

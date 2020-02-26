@@ -1200,38 +1200,55 @@ class ItemLight extends DataObject
 	 * @param integer the given blog ID
 	 * @return boolean true if there is at least one category in the given blog, false otherwise
 	 */
-	function is_part_of_blog( $blog_ID )
+	function is_part_of_blog( $coll_ID )
+	{
+		return ( $this->get_cat_ID_in_collection( $coll_ID ) != false );
+	}
+
+
+	/**
+	 * Get some category for the Item in a given collection
+	 *
+	 * @param integer the given collection ID
+	 * @return integer cat ID in the requested collection, false otherwise
+	 */
+	function get_cat_ID_in_collection( $coll_ID )
 	{
 		if( empty( $this->ID ) )
 		{
 			return false;
 		}
 
-		if( ! isset( $this->part_of_colls ) )
+		if( ! isset( $this->coll_to_cat ) )
 		{	// Initialize array of collections where this Item has at least one category:
 			global $DB;
-			$SQL = new SQL( 'Select collections where Item #'.$this->ID.' has at least one category' );
-			$SQL->SELECT( 'DISTINCT cat_blog_ID' );
-			$SQL->FROM( 'T_postcats' );
-			$SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = postcat_cat_ID' );
+			$SQL = new SQL( 'Select colelctions & categories for Item #'.$this->ID );
+			$SQL->SELECT( 'cat_blog_ID, cat_ID' );
+			$SQL->FROM( 'T_postcats INNER JOIN T_categories ON cat_ID = postcat_cat_ID' );
 			$SQL->WHERE( 'postcat_post_ID = '.$this->ID );
-			$this->part_of_colls = $DB->get_col( $SQL );
+			$this->coll_to_cat = $DB->get_assoc( $SQL );
 		}
 
-		return in_array( $blog_ID, $this->part_of_colls );
+		if( !isset($this->coll_to_cat[$coll_ID]) )
+		{	// No cat for given collection
+			return false;
+		}
+
+		//cat ID in requested collection
+		return $this->coll_to_cat[$coll_ID];
 	}
 
 
 	/**
-	 * Check if cross post navigation should stay in the current blog or not.
-	 * Also check that this item has at least one category that belongs to the given blog.
-	 * If current blog is the same as item blog then, this function will return false, because no need to check.
+	 * Check if cross post navigation should stay in the current collection or not.
+	 * Also check that this item has at least one category that belongs to the given collection.
+	 * If current collection is the same as item collection then, this function will return false, because no need to check.
 	 *
-	 * @param string 'auto' value means this call needs to decide to stay in the current blog or not. Every other value will return false!
-	 * @param integer the given "current" blog ID (its usually the current blog id)
-	 * @return boolean true if we have to stay in the current blog, false otherwise
+	 * @param string 'auto' value means this call needs to decide to stay in the current collection or not. Every other value will return false!
+	 * @param integer the given "current" collection ID (its usually the current collection id)
+	 * @return boolean true if we have to stay in the current collection, false otherwise
 	 */
-	function check_cross_post_nav( $target_blog, $target_coll_ID )
+	function stay_in_cross_posted_collection( $target_blog, $target_coll_ID )
 	{
 		global $Settings;
 
@@ -1260,8 +1277,9 @@ class ItemLight extends DataObject
 			return false;
 		}
 
-		// return true if current item has at least one category, which belongs to the corresponding blog, false otherwise
-		return $this->is_part_of_blog( $target_coll_ID );
+		// Check if the item is part of target collection
+		return $this->get_cat_ID_in_collection( $target_coll_ID );
+		// return cat ID if current item has at least one category which belongs to the target coll ID, false otherwise
 	}
 
 
@@ -1276,6 +1294,54 @@ class ItemLight extends DataObject
 	function permanent_url( $mode = '', $blogurl='' )
 	{
 		echo $this->get_permanent_url( $mode, $blogurl );
+	}
+
+
+	/*
+	 * Return the item URL, which may be different from the permament URL as it may be a NON canoncial.
+	 * It may be the URL in current Collection or in current Category.
+	 *
+	 * Added 2020-02-26
+	 * Uses Item->get_permanent_url()
+	 * TODO: maybe we should use Item->get_single_url() instead of this function.
+	 *
+ 	 * @param string 'auto' or Target collection
+	 * @param string Post navigation type: same_category, same_tag, same_author, same_blog
+	 * @param integer|NULL ID of post navigation target
+	 * @param array What permanent types should be ignored and not return a permanent URL
+ 	 */
+	function get_item_url( $target_blog = '', $post_navigation = '', $nav_target = NULL, $ignore_types = array() )
+	{
+		global $Collection, $Blog;
+
+		if( ! empty( $Blog ) && ($cat_ID = $this->stay_in_cross_posted_collection( $target_blog, $Blog->ID ) ) )
+		{	// Get view URL in currently opened collection and not of this Item's collection:
+
+			// Get item permanent URL:
+			$url = $this->get_permanent_url( $Blog->get_setting( 'permalinks' ), $Blog->gen_blogurl(), '&amp;', $ignore_types, NULL, NULL );
+			if( $url === false )
+			{	// If URL is not detected, e-g when it is ignored for current permanent type:
+				return '';
+			}
+
+			// Add navigation param to target a valid category in cross posted collection:
+			$url = $this->add_navigation_param( $url, 'same_category', $cat_ID, '&amp;', $Blog->ID );
+		}
+		else
+		{	// Get standard permalink referencing Item main cat collection:
+
+			// Get item permanent URL:
+			$url = $this->get_permanent_url( '', '', '&amp;', $ignore_types, NULL, NULL );
+			if( $url === false )
+			{	// If URL is not detected, e-g when it is ignored for current permanent type:
+				return '';
+			}
+
+			// Add navigation param if necessary:
+			$url = $this->add_navigation_param( $url, $post_navigation, $nav_target, '&amp;', $this->get_blog_ID() );
+		}
+
+		return $url;
 	}
 
 
@@ -1295,31 +1361,12 @@ class ItemLight extends DataObject
 	 */
 	function get_permanent_link( $text = '#', $title = '#', $class = '', $target_blog = '', $post_navigation = '', $nav_target = NULL, $ignore_types = array(), $params = array() )
 	{
-		global $Collection, $Blog;
-
 		$params = array_merge( array(
 				'nofollow' => false,
 			), $params );
 
-		$blogurl = '';
-		$permalink_type = '';
-		$url_coll_ID = $this->get_blog_ID();
-		if( ! empty( $Blog ) && $this->check_cross_post_nav( $target_blog, $Blog->ID ) )
-		{	// Use settings of currently opened collection and not of this item's collection:
-			$permalink_type = $Blog->get_setting( 'permalinks' );
-			$blogurl = $Blog->gen_blogurl();
-			$url_coll_ID = $Blog->ID;
-		}
-
-		// Get item permanent URL:
-		$url = $this->get_permanent_url( $permalink_type, $blogurl, '&amp;', $ignore_types );
-		if( $url === false )
-		{	// If URL is not detected, e-g when it is ignored for current permanent type:
-			return '';
-		}
-
-		// Add navigation param if necessary:
-		$url = $this->add_navigation_param( $url, $post_navigation, $nav_target, '&amp;', $url_coll_ID );
+		// Get "permanent" URL (stay in current collection / current cat if requested):
+		$url = $this->get_item_url( $target_blog, $post_navigation, $nav_target, $ignore_types );
 
 		switch( $text )
 		{
@@ -1481,16 +1528,20 @@ class ItemLight extends DataObject
 			return;
 		}
 
+
+		// TODO: the following has already been  factorized in $this->get_item_url()
 		$blogurl = '';
 		$url_coll_ID = $this->get_blog_ID();
-		if( ! empty( $Blog ) &&
-		    in_array( $params['link_type'], array( '#', 'permalink' ) ) &&
-		    $this->check_cross_post_nav( $params['target_blog'], $Blog->ID ) ) // This Item can stay in the current Collection
+		if( ! empty( $Blog ) 
+			&& in_array( $params['link_type'], array( '#', 'permalink' ) )
+			&& $this->stay_in_cross_posted_collection( $params['target_blog'], $Blog->ID ) ) // This Item can stay in the current Collection
 		{	// Get collection URL only when it is required:
 			$blogurl = $Blog->gen_blogurl();
 			$url_coll_ID = $Blog->ID;
 		}
 
+		// TODO: Some of the rules below should probably be factorized in some function.
+		// e-g: 'special' sidebar items -> this is in NO WAY specific to get_title()
 		if( $params['link_type'] == '#' )
 		{	// Use default link type from settings:
 			if( $this->is_intro() )
@@ -1501,8 +1552,8 @@ class ItemLight extends DataObject
 			{	// We are on the single url already:
 				$params['link_type'] = 'none';
 			}
-			else if( $this->get_type_setting( 'usage' ) == 'special' )
-			{	// tblue> This is a sidebar link, link to its "link to" URL by default:
+			elseif( $this->get_type_setting( 'usage' ) == 'special' )
+			{	// This is a sidebar link, link to its "link to" URL by default:
 				$params['link_type'] = 'linkto_url';
 			}
 			else
@@ -1512,21 +1563,28 @@ class ItemLight extends DataObject
 			}
 		}
 
+		// TODO: Some of the rules below should probably be factorized in some function.
+		// e-g: 'admin_view' -> this is in NO WAY specific to get_title()
 		switch( $params['link_type'] )
 		{
 			case 'auto':
+				// If no specific URL passed, then link to permanent URL.
+				// TODO: use $this->get_item_url() so it works correctly for cross posted Items.
 				$url = ( empty($this->url) ? $this->get_permanent_url() : $this->url );
 				break;
 
 			case 'permalink':
+				// TODO: use $this->get_item_url() so it works correctly for cross posted Items.
 				$url = $this->get_permanent_url( '', $blogurl );
 				break;
 
 			case 'linkto_url':
+				// Use url field
 				$url = $this->url;
 				break;
 
 			case 'admin_view':
+				// View in admin
 				$url = '?ctrl=items&amp;blog='.$this->get_blog_ID().'&amp;p='.$this->ID;
 				break;
 
@@ -1545,6 +1603,7 @@ class ItemLight extends DataObject
 			default:
 		}
 
+		// TODO: the following has already been  factorized in $this->get_item_url()
 		if( ! empty( $url ) )
 		{ // url is set, also add navigation param if it is necessary
 			$nav_target = ( $params['nav_target'] === NULL && isset( $MainList ) && ! empty( $MainList->nav_target ) ) ? $MainList->nav_target : $params['nav_target'];

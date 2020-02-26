@@ -282,7 +282,7 @@ function get_target_coll( $Slug )
 			{ // Display just the title (If there is no object title need to change this)
 				$coll .= ' '.$target->get( 'title' );
 			}
-			return $coll;//'<a href="'.$target->get_single_url().'">'.$target->dget('title').'</a>';
+			return $coll;
 
 		default:
 			return /* TRANS: "Not Available" */ T_('N/A');

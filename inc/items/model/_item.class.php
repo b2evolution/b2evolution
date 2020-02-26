@@ -4984,8 +4984,14 @@ class Item extends ItemLight
 				$link_to = $this->get( 'url' );
 			}
 			else
-			{ // Link to permament url
-				$link_to = $this->get_permanent_url( $link_to );
+			{ // Link to Item url:
+				$params = array_merge( array(  
+						'target_blog'     => '',		
+						'post_navigation' => '',		
+						'nav_target'      => NULL,		
+					), $params );
+
+				$link_to = $this->get_item_url( $params['target_blog'], $params['post_navigation'], $params['nav_target'] );
 			}
 			$link_title = '#desc#';
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : '';
@@ -5043,8 +5049,11 @@ class Item extends ItemLight
 				'image_sizes'                => NULL, // Simplified "sizes=" attribute for browser to select correct size from "srcset=".
 															// Must be set DIFFERENTLY depending on WIDGET/CONTAINER/SKIN LAYOUT. Each time we must estimate the size the image will have on screen.
 															// Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
-				'image_link_to'              => 'original', // Can be 'original' (image), 'single' (this post), an be URL, can be empty
-				'limit'                      => 1000, // Max # of images displayed
+				'image_link_to'              => 'original', // Can be 'original' (image file URL), 'single' (this post), can be URL, can be EMPTY
+					// In case of 'single' link:
+					'target_blog'             => '',		
+					'post_navigation'         => '',		
+					'nav_target'              => NULL,		
 				'before_gallery'             => '<div class="bGallery">',
 				'after_gallery'              => '</div>',
 				'gallery_image_size'         => 'crop-80x80',
@@ -5056,6 +5065,7 @@ class Item extends ItemLight
 																// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
 																// '#teaser_all' => 'teaser,teaserperm,teaserlink',
 																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
+				'limit'                      => 1000, // Max # of images displayed
 				'placeholder'                => '',		// HTML to be displayed if no image; possible codes: #folder_icon
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
@@ -5107,7 +5117,7 @@ class Item extends ItemLight
 					$placeholder_html = '<div class="evo_image_block evo_img_placeholder"><a href="$url$" class="evo_img_placeholder"><i class="fa fa-file-text-o"></i></a></div>';
 					break;
 			}
-			return str_replace( '$url$', $this->get_permanent_url(), $placeholder_html );
+			return str_replace( '$url$', $this->get_item_url( $params['target_blog'], $params['post_navigation'], $params['nav_target'] ), $placeholder_html );
 		}
 
 		// LOOP through images:

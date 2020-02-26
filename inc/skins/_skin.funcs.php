@@ -302,7 +302,7 @@ function skin_init( $disp )
 					if( ! $url_resolved &&
 					    $Blog->get_setting( 'canonical_item_urls' ) &&
 					    $redir == 'yes' &&
-					    ! $Item->check_cross_post_nav( 'auto', $Blog->ID ) ) // If the Item cannot stay in the current Collection
+					    ! $Item->stay_in_cross_posted_collection( 'auto', $Blog->ID ) ) // If the Item cannot stay in the current Collection
 					{	// REDIRECT TO THE CANONICAL URL:
 						$Debuglog->add( 'Redirecting to canonical URL ['.$canonical_url.'].', 'request' );
 						header_redirect( $canonical_url, true );
