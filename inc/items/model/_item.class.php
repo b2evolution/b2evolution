@@ -5033,7 +5033,7 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'before'                     => '<div>',
 				'before_image'               => '<div class="image_block">',
-//TODO					'before_image_classes'        => '',     // Allow injecting additional classes into 'before image'
+				'before_image_classes'       => '', // Allow injecting additional classes into 'before image'
 				'before_image_legend'        => '<div class="image_legend">',
 				'after_image_legend'         => '</div>',
 				'after_image'                => '</div>',
@@ -5063,9 +5063,10 @@ class Item extends ItemLight
 				'links_sql_orderby'          => 'link_order',
 			), $params );
 
-
-// TODO: Inject extra class name(s) 'before_image_classes' into 'before_image' param:
-//	$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $params['before_image_classes'] ) );
+		if( ! empty( $params['before_image_classes'] ) )
+		{	// Inject additional classes into 'before image':
+			$params['before_image'] = update_html_tag_attribs( $params['before_image'], array( 'class' => $params['before_image_classes'] ) );
+		}
 
 		// Get list of ALL attached files
 		$links_params = array(
