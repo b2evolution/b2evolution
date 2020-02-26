@@ -75,13 +75,6 @@ class ItemLight extends DataObject
 	var $single_view = 'normal';
 
 	/**
-	 * ID of current extra category
-	 * Used to set correct item URL in {@link ItemLight::get_single_url()}
-	 * @var integer
-	 */
-	var $current_extra_cat_ID = NULL;
-
-	/**
 	 * ID of the main category.
 	 * Use {@link ItemLight::set()} to set it, since other vars get lazily derived from it.
 	 * @var integer
@@ -313,6 +306,8 @@ class ItemLight extends DataObject
 	/**
 	 * Generate a single URL for this Item
 	 *
+	 * Used by Item->get_permanent_url()
+	 *
 	 * @param boolean allow redir to permalink, true | false | 'auto' to prevent redit only if single isn't the current permalink type
 	 * @param string base url to use
 	 * @param string glue between url params
@@ -467,6 +462,9 @@ class ItemLight extends DataObject
 
 	/**
 	 * Generate the permalink for the item.
+    *
+    * Uses Item->get_single_url()
+    * Used by Itel->get_item_url()
 	 *
 	 * Note: Each item has an unique permalink at any given time.
 	 * Some admin settings may however change the permalinks for previous items.
