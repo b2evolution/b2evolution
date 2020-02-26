@@ -158,7 +158,7 @@ class item_info_line_Widget extends ComponentWidget
 
 		$template_code = $this->disp_params['template'];
 
-		$info_line = render_template_code( $template_code, $params );
+		$info_line = render_template_code( $template_code, $this->disp_params );
 
 		if( ! empty( $info_line ) )
 		{
