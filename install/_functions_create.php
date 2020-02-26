@@ -1815,7 +1815,7 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
+				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>|before_classes=$evo_tile_image__classes$]
 			</div>
 			<div class="evo_tile_body">
 				<h3>[Cat:permalink|class=evo_tile_title]</h3>
