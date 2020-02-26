@@ -188,9 +188,23 @@ class cat_content_list_Widget extends ComponentWidget
 		{	// Display all ROOT categories of the current Collection:
 			global $Blog;
 			$ChapterCache->clear();
-			$ChapterCache->load_where( 'cat_blog_ID = '.$Blog->ID
-				.' AND cat_parent_ID IS NULL'
-				.( empty( $exclude_cats ) ? '' : ' AND cat_ID NOT IN ( '.$DB->quote( $exclude_cats ).' )' ) );
+			$SQL = $ChapterCache->get_SQL_object();
+			$SQL->WHERE( 'cat_blog_ID = '.$Blog->ID );
+			$SQL->WHERE_and( 'cat_parent_ID IS NULL' );
+			if( ! empty( $exclude_cats ) )
+			{	// Exclude categories:
+				$SQL->WHERE_and( 'cat_ID NOT IN ( '.$DB->quote( $exclude_cats ).' )' );
+			}
+			if( $Blog->get_setting( 'category_ordering' ) == 'manual' )
+			{	// Manual order
+				$SQL->SELECT_add( ', IF( cat_order IS NULL, 999999999, cat_order ) AS temp_order' );
+				$SQL->ORDER_BY( 'temp_order' );
+			}
+			else
+			{	// Alphabetic order
+				$SQL->ORDER_BY( 'cat_name' );
+			}
+			$ChapterCache->load_by_sql( $SQL );
 			foreach( $ChapterCache->cache as $Chapter )
 			{
 				if( in_array( $Chapter->ID, $exclude_cats ) )
