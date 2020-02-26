@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -98,7 +98,7 @@ class embed_menu_Widget extends generic_menu_link_Widget
 		global $current_User, $admin_url;
 
 		$SiteMenuCache = & get_SiteMenuCache();
-		$SiteMenuCache->load_where( 'menu_parent_ID IS NULL' );
+		$SiteMenuCache->load_where( 'menu_translates_menu_ID IS NULL' );
 
 		$r = array_merge( array(
 				'title' => array(

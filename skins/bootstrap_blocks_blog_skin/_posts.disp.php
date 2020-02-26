@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -45,29 +45,34 @@ widget_container( 'item_list', array(
 // Display message if no post:
 display_if_empty();
 
-echo '<div class="row evo_content_tiles">';
+echo '<div class="evo_tiles row">';
+
+global $cat;
+$item_template_params = array_merge( $params, array(
+		'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
+		'nav_target'      => $cat,	// for use with 'same_category' : set the category ID as nav target
+		'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
+		// Params that would be set by master template:
+		'rwd_cols'                  => 'col-xs-12 col-sm-6 col-md-6 col-lg-4',
+		'evo_tile__modifiers'       => 'evo_tile__md evo_tile__grey_bg evo_tile__shadow',
+		'evo_tile_image__modifiers' => '',
+		'evo_tile_image__size'       => 'fit-400x320',
+		'evo_tile_image__sizes'      => 'max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]',
+		'evo_tile_text__modifiers'  => 'evo_tile_text__gradient',
+	) );
+
+
+
 while( $Item = & mainlist_get_item() )
 { // For each blog post, do everything below up to the closing curly brace "}"
-	echo '<div class="'.$Skin->get_setting( 'posts_list_block_class' ).'">';
-	echo '<div class="evo_content_tile">';
-	echo '<a href="'.$Item->get_permanent_url().'"></a>';
-	echo '<div>';
-	$item_cover_image_url = $Item->get_cover_image_url( 'cover,teaser' );
-	echo '<div class="evo_content_tile_cover"'.( $item_cover_image_url ? ' style="background-image:url('.$item_cover_image_url.')"' : '' ).'>';
-	if( $item_main_Chapter = & $Item->get_main_Chapter() )
-	{
-		echo $item_main_Chapter->get_name();
-	}
-	echo '</div>'; // End of evo_content_tile_cover
-	echo '<div class="evo_content_tile_text">';
-		echo '<h2>'.$Item->dget( 'title' ).'</h2>';
-		$Item->excerpt();
-	echo '</div>'; // End of evo_content_tile_text
-	echo '</div>';
-	echo '</div>'; // End of evo_content_tile
-	echo '</div>'; // End of Settings:posts_list_block_class
-} // ---------------------------------- END OF POSTS ------------------------------------
+
+	// Render Item by quick template:
+	echo render_template_code( 'content_tiles_item', $item_template_params, array( 'Item' => $Item ) );
+}
+
 echo '</div>';
+
+// ---------------------------------- END OF POSTS ------------------------------------
 
 // -------------------- PREV/NEXT PAGE LINKS (POST LIST MODE) --------------------
 mainlist_page_links( array(

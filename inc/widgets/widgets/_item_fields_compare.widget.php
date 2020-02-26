@@ -344,7 +344,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 		if( $this->disp_params['show_headers'] || $show_status !== false )
 		{	// Display item column headers row if it is enabled by widget settings:
-			echo $this->get_field_template( 'row_start' );
+			echo str_replace( '$row_attrs$', '', $this->get_field_template( 'row_start' ) );
 			echo $this->get_field_template( 'topleft_cell' );
 			$col_width = number_format( 100 / ( count( $items ) + 1 ), 2, '.', '' );
 			$table_header_cells = array();
@@ -503,7 +503,7 @@ class item_fields_compare_Widget extends ComponentWidget
 
 			if( $items_can_be_edited )
 			{	// Display the footer row with edit links if at least one compared item can be edited by current User:
-				echo $this->get_field_template( 'row_start' );
+				echo str_replace( '$row_attrs$', '', $this->get_field_template( 'row_start' ) );
 
 				echo $this->get_field_template( 'topleft_cell' );
 

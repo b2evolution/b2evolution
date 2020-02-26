@@ -149,19 +149,11 @@ class item_content_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
+		// Prepare params to be transmitted to template:
 		$this->disp_params = array_merge( array(
 				'widget_item_content_params' => array(),
 			), $this->disp_params );
-
-		// Get the params to be transmitted to this widget:
-		if( isset($this->disp_params['widget_item_content_params']) )
-		{	// We have an array, with the new name:
-			$widget_item_content_params = $this->disp_params['widget_item_content_params'];
-		}
-		else
-		{	// We have none, use an empty array:
-			$widget_item_content_params = array();
-		}
+		$widget_item_content_params = $this->disp_params['widget_item_content_params'];
 
 		// Now, for some skins (2015), merge in the OLD name:
 		if( isset($this->disp_params['widget_coll_item_content_params']) )
@@ -169,15 +161,48 @@ class item_content_Widget extends ComponentWidget
 			$widget_item_content_params = array_merge( $widget_item_content_params, $this->disp_params['widget_coll_item_content_params'] );
 		}
 
+		// Get content mode from current params or resolved auto content mode depending on current disp and collection settings:
+		$content_mode = ( isset( $widget_item_content_params['content_mode'] ) ? $widget_item_content_params['content_mode'] : 'auto' );
+		$content_mode = resolve_auto_content_mode( $content_mode );
+		switch( $content_mode )
+		{
+			case 'excerpt':
+				$template_code = $Item->get_type_setting( 'template_excerpt' );
+				break;
+			case 'normal':
+				$template_code = $Item->get_type_setting( 'template_normal' );
+				break;
+			case 'full':
+				$template_code = $Item->get_type_setting( 'template_full' );
+				break;
+			default:
+				$template_code = NULL;
+		}
+
+		$TemplateCache = & get_TemplateCache();
+		if( ! empty( $template_code ) &&
+		    ! ( $content_Template = & $TemplateCache->get_by_code( $template_code, false, false ) ) )
+		{	// Display error when no or wrong template for content display:
+			$this->display_error_message( sprintf( 'Template is not found: %s for content display!', '<code>'.$template_code.'</code>' ) );
+			return false;
+		}
+
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
 
-		// ---------------------- POST CONTENT INCLUDED HERE ----------------------
-		skin_include( '_item_content.inc.php', $widget_item_content_params );
-		// Note: You can customize the default item content by copying the generic
-		// /skins/_item_content.inc.php file into the current skin folder.
-		// -------------------------- END OF POST CONTENT -------------------------
+		if( ! empty( $content_Template ) )
+		{	// Render Item content by Easy Template:
+			echo render_template_code( $template_code, $widget_item_content_params );
+		}
+		else
+		{	// Use PHP Template to display content:
+			// ---------------------- POST CONTENT INCLUDED HERE ----------------------
+			skin_include( '_item_content.inc.php', $widget_item_content_params );
+			// Note: You can customize the default item content by copying the generic
+			// /skins/_item_content.inc.php file into the current skin folder.
+			// -------------------------- END OF POST CONTENT -------------------------
+		}
 
 		echo $this->disp_params['block_body_end'];
 		echo $this->disp_params['block_end'];

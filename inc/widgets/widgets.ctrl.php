@@ -202,7 +202,7 @@ switch( $action )
 		{	// Default settings for new shared container:
 			$edited_WidgetContainer->set( 'main', 1 );
 		}
-		else
+		elseif( $container_type != 'shared-sub' )
 		{	// Default settings for new container:
 			$edited_WidgetContainer->set( 'coll_ID', $Blog->ID );
 		}

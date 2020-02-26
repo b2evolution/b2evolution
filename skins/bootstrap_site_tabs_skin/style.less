@@ -3,19 +3,25 @@
  */
 
 // Site header:
-.evo_site_skin__header {
+#evo_site_header {
 	width: 100%;
 	font-family: Arial, Helvetica, sans-serif !important;
 	display: table;
 	.swhead_sitename {
-		display: table-cell;
 		vertical-align: middle;
 		white-space: nowrap;
-		padding: 0 10px;
+		a {
+			padding-left: 10px;
+			padding-right: 10px;
+			margin-right: 2px;
+		}
 		&.swhead_logo {
+			display: table-cell;
 			background-color: #ddd;
-			padding: 0;
-			img {;
+			a {
+				padding: 0;
+			}
+			img {
 				max-height: 60px;
 				max-width: 270px;
 			}
@@ -170,7 +176,7 @@ div.level2 {
 }
 
 // Site footer:
-.evo_site_skin__footer {
+#evo_site_footer {
 	color: #777;
 	font-family: Arial, Helvetica, sans-serif !important;
 	background: #f5f5f5;
@@ -199,19 +205,25 @@ div.level2 {
 		opacity: 1;
 		visibility: visible;
 	}
-	&.logged_in_margin_top {
+	&.slide-top-toolbar {
 		top: 35px;
+	}
+	&.slide-top-fixed-header {
+		top: 55px;
+	}
+	&.slide-top-toolbar.slide-top-fixed-header {
+		top: 90px;
 	}
 }
 
 // We need these media queries for controlling margin-top on slide-top button when on devices
 @media only screen and (max-device-width: 1024px) {
-	.btn.slide-top.logged_in_margin_top {
+	.btn.slide-top.slide-top-toolbar {
 		top: 8px;
 	}
 }
 @media (min-width: 768px) and (max-width: 991px) and (min-device-width: 1024px) {
-	.btn.slide-top.logged_in_margin_top {
+	.btn.slide-top.slide-top-toolbar {
 		top: 35px;
 	}
 }

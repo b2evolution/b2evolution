@@ -96,7 +96,7 @@ class item_info_line_Widget extends ComponentWidget
 
 		// Get available templates:
 		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
+		$TemplateCache->load_where( 'tpl_translates_tpl_ID IS NULL' );
 
 		$r = array_merge( array(
 				'title' => array(

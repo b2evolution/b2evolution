@@ -97,13 +97,12 @@ function filter_goals( & $Form )
 	$Form->select_input_object( 'cat', get_param('cat'), $GoalCategoryCache, T_('Category'), array( 'allow_none' => true ) );
 }
 $Results->filter_area = array(
-	'callback' => 'filter_goals',
-	'url_ignore' => 'results_goals_page,final',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=goals'.$section_params.'&amp;final=0&amp;s=&amp;cat=0' ),
-		'final' => array( T_('Final'), '?ctrl=goals'.$section_params.'&amp;final=1' ),
-		)
+		'callback' => 'filter_goals',
+		'url_ignore' => 'results_goals_page,final',
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=goals'.$section_params.'&amp;final=0&amp;s=&amp;cat=0' );
+$Results->register_filter_preset( 'final', T_('Final'), '?ctrl=goals'.$section_params.'&amp;final=1' );
 
 $Results->cols[] = array(
 		'th' => T_('ID'),

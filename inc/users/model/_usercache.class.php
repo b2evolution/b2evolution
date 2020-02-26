@@ -44,7 +44,7 @@ class UserCache extends DataObjectCache
 	function __construct()
 	{
 		parent::__construct( 'User', false, 'T_users', 'user_', 'user_ID', NULL, '',
-			/* TRANS: "None" select option */ NT_('No user') );
+			/* TRANS: "None" select option */ NT_('No user'), 0 );
 	}
 
 

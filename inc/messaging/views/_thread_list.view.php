@@ -59,22 +59,19 @@ function filter_recipients( & $Form )
 	}
 }
 
+$Results->filter_area = array(
+	'callback' => 'filter_recipients',
+	);
+
 if( $perm_abuse_management )
 { // In case of abuse management
-	$preset_filters = array( 'all' => array( T_('All'), get_dispctrl_url( 'abuse' ) ) );
+	$Results->register_filter_preset( 'all', T_('All'), get_dispctrl_url( 'abuse' ) );
 }
 else
 { // In case of simple thread list view
-	$preset_filters = array(
-		'avtive' => array( T_('Active conversations'), get_dispctrl_url( 'threads', 'show_closed=0' ) ),
-		'all' => array( T_('All conversations'), get_dispctrl_url( 'threads', 'show_closed=1' ) )
-	);
+	$Results->register_filter_preset( 'all', T_('All conversations'), get_dispctrl_url( 'threads', 'show_closed=1' ) );
+	$Results->register_filter_preset( 'all', T_('Active conversations'), get_dispctrl_url( 'threads', 'show_closed=0' ) );
 }
-
-$Results->filter_area = array(
-	'callback' => 'filter_recipients',
-	'presets' => $preset_filters,
-	);
 
 // Initialize Results object
 threads_results( $Results, array_merge( array(

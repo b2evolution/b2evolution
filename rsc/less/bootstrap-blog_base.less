@@ -1,11 +1,10 @@
 /**
- * These are the generic styles that are common to "all" skins.
+ * These are the generic styles that are common to "all" Bootstrap skins.
  *
  * This is for the blog NAVIGATION and global page layout. See item_base.css for the post CONTENT styles.
  *
  * Override this with style.css in your skin folder.
  */
-
 
 // ----- WIDGETS -----
 
@@ -36,6 +35,11 @@
 // CSS overrides for "HTML 5 VideoJS Player" plugin:
 @import "inc/video-js-overrides.inc.less";
 
+
+// ----- ALL PURPOSE MODULES (can be in templates in multiple widgets) -----
+
+// Tiles style 2
+@import "_evo_tile_2.module.less";
 
 // -----
 
@@ -353,21 +357,6 @@ div.extended_search_form {
 .widget_core_user_profile_pics img {
 	max-width: 100%;
 	height: auto;
-}
-
-// Advertisement widget
-div.widget_core_coll_item_list.nobullets ul,
-div.widget_core_coll_item_list.nobullets ul li,
-li.widget_core_coll_item_list.nobullets ul,
-li.widget_core_coll_item_list.nobullets ul li {
-	background: none;
-	margin-left: 0;
-	padding-left: 0;
-	list-style: none;
-}
-div.widget_core_coll_item_list.nobullets ul li:before,
-ul li.widget_core_coll_item_list.nobullets ul li:before {
-	content: none;
 }
 
 .action_icon {

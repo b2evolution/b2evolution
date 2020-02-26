@@ -4,7 +4,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evocore
  */
@@ -27,7 +27,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		'Creating table for Menus',
 		"CREATE TABLE T_menus__menu (
 			menu_ID     INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-			menu_parent_ID INT(10) UNSIGNED NULL DEFAULT NULL,
+			menu_translates_menu_ID INT(10) UNSIGNED NULL DEFAULT NULL,
 			menu_name   VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 			menu_locale VARCHAR(20) COLLATE ascii_general_ci NOT NULL DEFAULT 'en-US',
 			PRIMARY KEY (menu_ID)

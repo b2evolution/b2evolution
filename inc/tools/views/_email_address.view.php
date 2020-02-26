@@ -79,12 +79,12 @@ function filter_email_blocked( & $Form )
 }
 $Results->filter_area = array(
 	'callback' => 'filter_email_blocked',
-	'presets' => array(
-		'all'       => array( T_('All'), $admin_url.'?ctrl=email&amp;all_statuses=1'),
-		'errors'    => array( T_('Errors'), $admin_url.'?ctrl=email&amp;statuses[]=warning&amp;statuses[]=suspicious1&amp;statuses[]=suspicious2&amp;statuses[]=suspicious3&amp;statuses[]=prmerror&amp;statuses[]=spammer'),
-		'attention' => array( T_('Need Attention'), $admin_url.'?ctrl=email&amp;statuses[]=redemption&amp;statuses[]=warning&amp;statuses[]=suspicious3'),
-		)
 	);
+
+$Results->register_filter_preset( 'all', T_('All'), $admin_url.'?ctrl=email&amp;all_statuses=1' );
+$Results->register_filter_preset( 'errors', T_('Errors'), $admin_url.'?ctrl=email&amp;statuses[]=warning&amp;statuses[]=suspicious1&amp;statuses[]=suspicious2&amp;statuses[]=suspicious3&amp;statuses[]=prmerror&amp;statuses[]=spammer' );
+$Results->register_filter_preset( 'attention', T_('Need Attention'), $admin_url.'?ctrl=email&amp;statuses[]=redemption&amp;statuses[]=warning&amp;statuses[]=suspicious3' );
+
 
 /**
  * Decode the special symbols

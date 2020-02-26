@@ -637,6 +637,16 @@ $ext_path = $basepath.$ext_subdir;  // You should not need to change this
 
 
 /**
+ * Allow to use scripts from /cli folder
+ *
+ * Note: most scripts are available only in b2evolution PRO
+ *
+ * @global boolean
+ */
+$allow_cli_folder = false;
+
+
+/**
  * Do you want to allow public access to the media dir?
  *
  * WARNING: If you set this to false, evocore will use /htsrv/getfile.php as a stub
@@ -798,7 +808,11 @@ $allow_redirects_to_different_domain = 'all_collections_and_redirected_posts';
 /**
  * Allow parameters in URL without redirect to Item canonical URL when collection setting "301 redirect to canonical URL when possible" is enabled
  */
-$noredir_params = array( 'page', 'mode', 'qc', 'qp' );
+$noredir_params = array(
+	'page',          // For showing a different page in a multipage post
+	'quote_post',    // For quoting a post in the forums
+	'quote_comment', // For quoting a comment in the forums
+);
 
 
 /**
@@ -969,6 +983,8 @@ $evonetsrv_protocol = 'http';
 $evonetsrv_host = 'rpc.b2evo.net';
 $evonetsrv_port = 80;
 $evonetsrv_uri = '/evonetsrv/xmlrpc.php';
+$evonetsrv_verifypeer = false;
+$evonetsrv_retry_delay = 90;
 
 $antispamsrv_protocol = 'http';
 $antispamsrv_host = 'antispam.b2evo.net';

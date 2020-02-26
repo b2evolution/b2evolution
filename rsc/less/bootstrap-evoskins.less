@@ -1,4 +1,4 @@
-/* This file is used to fix the style issues on all bootstrap skins of b2evolution */
+/* This file is used to fix the style issues on all bootstrap skins of b2evolution, including BACK-OFFICE */
 
 .border-radius (@radius: 4px) {
 	-webkit-border-radius: @radius;
@@ -471,7 +471,7 @@ a.btn.action_icon {
 		}
 	}
 	// Text Renderers block on edit post form
-	#itemform_renderers {
+	#itemform_renderers, #commentform_renderers {
 		.dropdown-menu {
 			padding: 10px 10px 5px 10px;
 		}
@@ -735,6 +735,21 @@ div.results {
 			border-bottom: none;
 		}
 	}
+
+	.results_header {
+		padding: 5px 10px;
+		background-color: #f9f9f9;
+	}
+	.results_footer {
+		// Pager in footer + select "lines per page"
+		padding: 5px;
+		background-color: #f9f9f9;
+	}
+
+	.pagination {
+		margin-top: 5px;
+		margin-bottom: 5px;
+	}
 	.page_size_selector {
 		margin-bottom: 5px;
 		display: block;
@@ -743,10 +758,7 @@ div.results {
 			width: auto;
 		}
 	}
-	.pagination {
-		margin-top: 5px;
-		margin-bottom: 5px;
-	}
+
 	tr.placeholder {
 		position: relative;
 		&:before {
@@ -785,35 +797,64 @@ div.results {
 		max-width: none;
 	}
 }
-// Filters in results table
+
+// Filters at the top of the Results table:
 div.filters {
-	margin-bottom: 0;
-	background: none;
+	background-color: #f9f9f9;
 	border: none;
-	> div {
-		margin-left: 0;
-	}
-	// Align a filter button to the right
-	button.filter {
-		float: right;
-		padding: 4px 12px;
-	}
-	// Set vertical spaces between the filter inputs
-	.block {
-		display: inline-block;
-		margin: 2px;
-	}
 	&.panel-body {
-		padding: 15px;
+		padding: 6px 10px;
 	}
-	// Fix style for fields with autocomplete usernames:
-	.twitter-typeahead {
-		vertical-align: middle;
-		.tt-dropdown-menu div {
-			margin-left: 0;
+
+	// For the whole filter form:
+	.form-inline{
+		margin: 5px -10px 0;
+		// For each  label:input :
+		.form-group {
+			margin: 5px 10px 2px;
 		}
 	}
+	// Styles for button on the right:
+	.evo_btn_apply_filters {
+		margin: 0;
+	}
+
+	// Fix style for Username fields with autocomplete:
+	.twitter-typeahead {
+		vertical-align: middle; // otherwise "Username:" label is misaligned
+	}
+
+	// Fix style for Query Builder (e-g Users filtering)
+	.query-builder {
+		margin: -15px 0 -12px -4px; 
+		> .rules-group-container {
+			// First group:
+			border: none;
+			background: transparent;
+		}
+	}
+
+	// In BackOffice > Contents > Posts we display the "cuurrent filters" widget in the form:
+	.filters_item_list_table {
+		margin: 0 8px;
+	}
 }
+
+// Navigation used in normal Results abut also post browsing
+.results_summary {
+	float: left;
+	font-weight: bold;
+	// padding: 6px 0;
+	margin-top: 5px;
+	// margin-top: 10px;
+}
+.evo_pager {
+	text-align: center;
+}
+
+
+
+
 .table_scroll .table {
 	margin-bottom: 0;
 }
@@ -1078,9 +1119,20 @@ div.edit_toolbars, div.message_toolbars {
 		}
 	}
 }
+
+// Text editor controls
+.text_editor_controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: normal;
+}
+.comment_text_renderers {
+	margin-top: -12px;
+}
+
 // Plugin buttons
 .edit_plugin_actions {
-	padding-top: 7px;
+	margin-top: 4px;
 }
 
 // Badge
@@ -1149,17 +1201,17 @@ div.edit_toolbars, div.message_toolbars {
 	}
 }
 
-// Typeahead plugin
+// Typeahead plugin FOR username autosuggest
 .tt-dropdown-menu {
 	background-color: #FFFFFF;
 	border: 1px solid rgba(0, 0, 0, 0.2);
-	.border-radius(8px);
+	border-radius: 3px;
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-	padding: 8px 0;
+	padding: 0;
 	.tt-suggestion {
-		font-size: 18px;
-		line-height: 24px;
-		padding: 3px 20px;
+		font-size: 14px;
+		// line-height: px;
+		padding: 4px 10px;
 		&.tt-cursor {
 			background-color: #0097CF;
 			color: #FFFFFF;
@@ -1486,45 +1538,19 @@ span[id^=title_folding_] {
 	}
 }
 
-// Content Tiles:
-.evo_content_tiles {
-	> div {
-		padding: 15px;
-	}
-	.evo_content_tile {
-		height: 400px;
-		border-radius: 10px;
-		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-		overflow: hidden;
-		position: relative;
-		padding-bottom: 10px;
-		> div {
-			height: 100%;
-			overflow: hidden;
-		}
-		> a {
-			position: absolute;
-			display: block;
-			width: 100%;
-			height: 100%;
-		}
-	}
-	.evo_content_tile_cover {
-		height: 270px;
-		background-color: #EEE;
-		background-size: cover;
-		background-position: center;
-		padding: 10px;
-		color: #FFF;
-		text-shadow: 0px 0px 2px #000;
-	}
-	.evo_content_tile_text {
-		padding-left: 10px;
-		padding-right: 10px;
-		h2, h3 {
-			font-size: 20px;
-			padding-top: 10px;
-			margin-top: 0;
+
+// Comment Workflow
+.comment-workflow-form {
+	display: flex !important;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	.controls {
+		display: flex !important;
+		flex-direction: row;
+		align-items: center;
+		> * {
+			margin-left: 6px;
 		}
 	}
 }

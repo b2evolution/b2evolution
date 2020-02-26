@@ -13,6 +13,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( '_core/ui/_table.class.php', 'Table' );
+
 global $blog, $sec_ID, $admin_url, $Settings;
 
 // All diagarm and table columns for current page:
@@ -133,11 +135,9 @@ function filter_goal_hitsummary( & $Form )
 $Table->filter_area = array(
 	'callback' => 'filter_goal_hitsummary',
 	'url_ignore' => 'final,goal_name',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=goals&amp;tab3=stats'.$section_params ),
-		'final' => array( T_('Final'), '?ctrl=goals&amp;tab3=stats&amp;final=1'.$section_params ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=goals&amp;tab3=stats'.$section_params );
+$Results->register_filter_preset( 'final', T_('Final'), '?ctrl=goals&amp;tab3=stats&amp;final=1'.$section_params );
 
 
 global $AdminUI;

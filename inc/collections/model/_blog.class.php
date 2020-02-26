@@ -1158,6 +1158,11 @@ class Blog extends DataObject
 			$this->set_setting( 'userdir_enable', param( 'userdir_enable', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_restrict_to_members', param( 'userdir_filter_restrict_to_members', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_name', param( 'userdir_filter_name', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_name_email', param( 'userdir_filter_name_email', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_firstname', param( 'userdir_filter_firstname', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_lastname', param( 'userdir_filter_lastname', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_nickname', param( 'userdir_filter_nickname', 'integer', 0 ) );
+			$this->set_setting( 'userdir_filter_email', param( 'userdir_filter_email', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_country', param( 'userdir_filter_country', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_region', param( 'userdir_filter_region', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_subregion', param( 'userdir_filter_subregion', 'integer', 0 ) );

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}.
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}.
 *
  * @license http://b2evolution.net/about/license.html GNU General Public License (GPL)
  *
@@ -144,21 +144,38 @@ class SiteMenuEntry extends DataObject
 		$this->set_from_Request( 'cat_ID', NULL, true );
 
 		// Item ID:
-		param( 'ment_item_ID', 'integer', NULL );
+		$item_ID = param( 'ment_item_ID', 'integer', NULL );
+		if( $item_ID )
+		{
+			$ItemCache = & get_ItemCache();
+			$menu_Item_from_ID = & $ItemCache->get_by_ID( $item_ID, false, false );
+			if( ! $menu_Item_from_ID )
+			{
+				param_error( 'ment_item_ID', sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$item_ID.'</code>' ) );
+			}
+			elseif( in_array( $menu_Item_from_ID->get_type_setting( 'usage' ), array( 'special', 'content-block' ) ) )
+			{
+				param_error( 'ment_item_ID', sprintf( T_('Items with usage type %s is not allowed.'), '<code>'.$menu_Item_from_ID->get_type_setting( 'usage' ).'</code>' ) );
+			}
+		}
 		$this->set_from_Request( 'item_ID', NULL, true );
 
 		// Item Slug:
 		$item_slug = param( 'ment_item_slug', 'string', NULL );
-		$this->set_from_Request( 'item_slug', NULL, true );
-
-		if( ! empty( $this->item_ID ) && empty( $this->item_slug ) )
-		{	// Item ID is provided but Item slug is empty, use Item's urltitle as slug because ID is not considered as permanent:
+		if( $item_slug )
+		{
 			$ItemCache = & get_ItemCache();
-			if( $menu_Item = $ItemCache->get_by_ID( $this->item_ID, false, false ) )
+			$menu_Item_from_slug = & $ItemCache->get_by_urltitle( $item_slug, false, false );
+			if( ! $menu_Item_from_slug )
 			{
-				$this->set( 'item_slug', $menu_Item->get( 'urltitle' ) );
+				param_error( 'ment_item_slug', sprintf( T_('The Item %s doesn\'t exist.'), '<code>'.$item_slug.'</code>' ) );
+			}
+			elseif( in_array( $menu_Item_from_slug->get_type_setting( 'usage' ), array( 'special', 'content-block' ) ) )
+			{
+				param_error( 'ment_item_slug', sprintf( T_('Items with usage type %s is not allowed.'), '<code>'.$menu_Item_from_slug->get_type_setting( 'usage' ).'</code>' ) );
 			}
 		}
+		$this->set_from_Request( 'item_slug', NULL, true );
 
 		// URL:
 		param( 'ment_url', 'url' );
@@ -171,6 +188,14 @@ class SiteMenuEntry extends DataObject
 		// Highlight:
 		param( 'ment_highlight', 'integer', 0 );
 		$this->set_from_Request( 'highlight' );
+
+
+		if( ! empty( $menu_Item_from_ID ) && ! empty( $menu_Item_from_slug ) && ( $menu_Item_from_ID->ID != $menu_Item_from_slug->ID ) )
+		{
+			global $Messages;
+
+			$Messages->add( T_('You entered both an Item ID and Item slug. Only Item ID will be used. Item slug will be ignored.'), 'warning' );
+		}
 
 
 		return ! param_errors_detected();

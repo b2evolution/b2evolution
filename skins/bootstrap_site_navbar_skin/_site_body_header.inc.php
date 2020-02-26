@@ -29,7 +29,7 @@ else
 }
 ?>
 
-<div class="evo_site_skin__header">
+<div id="evo_site_header" class="bootstrap_site_navbar_header">
 
 	<nav class="navbar navbar-default navbar-static-top">
 		<div class="container-fluid level1">
@@ -215,7 +215,7 @@ if( $site_Skin->has_sub_menus() )
 <?php if( $site_Skin->get_setting( 'back_to_top_button' ) )
 { // Check if "Back to Top" button is enabled
 ?>
-<a href="#" class="btn btn-primary slide-top<?php echo ( is_logged_in() ? ' logged_in_margin_top' : '' ); ?>"><i class="fa fa-angle-double-up"></i></a>
+<a class="btn btn-primary slide-top<?php echo ( show_toolbar() ? ' slide-top-toolbar' : '' ).( $site_Skin->get_setting( 'fixed_header' ) ? ' slide-top-fixed-header' : '' ); ?>"><i class="fa fa-angle-double-up"></i></a>
 
 <script type="text/javascript">
 	// Scroll to Top

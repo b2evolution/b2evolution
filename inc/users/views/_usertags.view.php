@@ -55,11 +55,6 @@ $Results = new Results( $SQL->get(), 'utag_', 'A', NULL, $count_SQL->get() );
 $Results->title = T_('User Tags').' ('.$Results->get_total_rows().')'.get_manual_link( 'user-tags-list' );
 $Results->Cache = get_UserTagCache();
 
-if( $list_is_filtered )
-{ // List is filtered, offer option to reset filters:
-	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=usertags', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
-
 /**
  * Callback to add filters on top of the result set
  *
@@ -80,12 +75,10 @@ function filter_tags( & $Form )
 	$Form->text_input( 'tag_user_ID', $filter_user_ID, 9, T_('User ID'), $user_ID_filter_note, array( 'maxlength' => 9 ) );
 }
 $Results->filter_area = array(
-	'callback' => 'filter_tags',
+	'callback'   => 'filter_tags',
 	'url_ignore' => 'utag_filter,results_tag_page',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=usertags' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=usertags' );
 
 function tag_td_name( $utag_ID, $utag_name )
 {

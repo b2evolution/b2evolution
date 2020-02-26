@@ -3,7 +3,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2018 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -198,11 +198,11 @@ div.delete_messages ul label {
   font-weight: normal;
   margin: 0;
 }
-.evo_panel {
-  margin-bottom: 20px;
+.evo_content_block .results_header {
+  margin-top: -20px;
 }
-.evo_panel__footer {
-  padding: 10px 15px;
+.evo_content_block .results_footer {
+  padding: 5px 0 20px;
 }
 /*
  * Browse pages of items and comments ( ?ctrl=items and ?ctrl=comments - full views )
@@ -1203,15 +1203,18 @@ table.coll_kind .btn {
   float: none;
   padding-left: 0;
 }
+/* Fp: UNCLEAR WHAT THIS IS FOR:
+// Support for multiline inline forms
 .filters .form-inline {
-  margin: 0 -10px -5px;
+	 margin: 0 -10px -5px;
+	.form-group {
+		margin: 5px 10px;
+	}
+	.checkbox {
+		margin-left: 10px;
+	}
 }
-.filters .form-inline .form-group {
-  margin: 5px 10px;
-}
-.filters .form-inline .checkbox {
-  margin-left: 10px;
-}
+*/
 .navbar {
   margin-bottom: 0;
 }

@@ -1405,7 +1405,7 @@ class _core_Module extends Module
 				    isset( $edited_Item ) &&
 				    $edited_Item->ID > 0 &&
 				    $view_item_url = $edited_Item->get_permanent_url() )
-				{	// If current user has a permission to edit a current viewing post:
+				{	// If current user has a permission to edit the post currently viewed:
 					$entries['permalink'] = array(
 							'text'        => get_icon( 'permalink' ).' '.T_('Permalink'),
 							'href'        => $view_item_url,

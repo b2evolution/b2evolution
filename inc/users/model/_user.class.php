@@ -55,6 +55,9 @@ class User extends DataObject
 	var $gender;
 	var $email_dom_ID;
 	var $profileupdate_date;
+	var $birthday_year;
+	var $birthday_month;
+	var $birthday_day;
 
 	/**
 	 * User account status
@@ -271,6 +274,9 @@ class User extends DataObject
 			$this->city_ID = $db_row->user_city_ID;
 			$this->source = $db_row->user_source;
 			$this->profileupdate_date = $db_row->user_profileupdate_date;
+			$this->birthday_year = $db_row->user_birthday_year;
+			$this->birthday_month = $db_row->user_birthday_month;
+			$this->birthday_day = $db_row->user_birthday_day;
 
 			// Group for this user:
 			$this->grp_ID = $db_row->user_grp_ID;
@@ -495,50 +501,7 @@ class User extends DataObject
 		$has_full_access = $current_User->check_perm( 'users', 'edit' );
 
 		// ---- Login checking / START ----
-		// TODO: Must be factorized with code from $this->load_from_Request()!
-		$edited_user_login = param( 'edited_user_login', 'string', NULL );
-		if( ! $is_api_request || ( $is_api_request && ( isset( $edited_user_login ) || $is_new_user ) ) )
-		{ // login specifically included in API request
-			if( empty( $edited_user_login ) )
-			{	// Empty login
-				param_error( 'edited_user_login', T_('Please enter your login.') );
-			}
-			if( param_check_valid_login( 'edited_user_login' ) )
-			{	// If login is valid
-				global $reserved_logins;
-				if( $edited_user_login != $this->get( 'login' ) &&
-				    ! empty( $reserved_logins ) &&
-				    in_array( $edited_user_login, $reserved_logins ) &&
-				    ( ! is_logged_in() || ! $has_full_access ) )
-				{	// If login has been changed and new entered login is reserved and current User cannot use this:
-					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
-				}
-			}
-		}
-		else
-		{
-			set_param( 'edited_user_login', $this->login );
-			$edited_user_login = $this->login;
-		}
-
-		$UserCache = & get_UserCache();
-		$UserLogin = $UserCache->get_by_login( $edited_user_login );
-		if( $UserLogin && $UserLogin->ID != $this->ID )
-		{	// The login is already registered
-			$login_error_message = T_( 'This login already exists.' );
-			if( $has_full_access )
-			{
-				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
-					$edited_user_login,
-					'href="'.get_user_settings_url( 'profile', $UserLogin->ID ).'"' );
-			}
-			param_error( 'edited_user_login', $login_error_message );
-		}
-
-		if( !param_has_error( 'edited_user_login' ) )
-		{	// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-			$this->set_from_Request( 'login', 'edited_user_login', true, 'utf8_strtolower' );
-		}
+		$edited_user_login = $this->check_login();
 		// ---- Login checking / END ----
 
 		// ---- Password checking / START ----
@@ -643,6 +606,7 @@ class User extends DataObject
 		// Other fields:
 		$country = param( 'country', 'integer', '' );
 		$firstname = param( 'firstname', 'string', '' );
+		$lastname = param( 'lastname', 'string', NULL );
 		$gender = param( 'gender', 'string', NULL );
 		$locale = param( 'locale', 'string', '' );
 
@@ -657,6 +621,11 @@ class User extends DataObject
 		{	// Set and check first name:
 			$this->set( 'firstname', $firstname );
 			$paramsList['firstname'] = $firstname;
+		}
+		if( $Settings->get( 'registration_require_lastname') )
+		{	// Set last name:
+			$this->set( 'lastname', $lastname );
+			$paramsList['lastname'] = $lastname;
 		}
 		if( $Settings->get( 'registration_require_gender' ) == 'required' || $Settings->get( 'registration_require_gender' ) == 'optional' )
 		{	// Set or check gender:
@@ -699,49 +668,7 @@ class User extends DataObject
 		$request_password_confirmation = ! ( $is_api_request && $is_new_user );
 
 		// ---- Login checking / START ----
-		$edited_user_login = param( 'edited_user_login', 'string', NULL );
-		if( ! $is_api_request || ( $is_api_request && ( isset( $edited_user_login ) || $is_new_user ) ) )
-		{ // login specifically included in API request
-			if( empty( $edited_user_login ) )
-			{	// Empty login
-				param_error( 'edited_user_login', T_('Please enter your login.') );
-			}
-			if( param_check_valid_login( 'edited_user_login' ) )
-			{	// If login is valid
-				global $reserved_logins;
-				if( $edited_user_login != $this->get( 'login' ) &&
-				    ! empty( $reserved_logins ) &&
-				    in_array( $edited_user_login, $reserved_logins ) &&
-				    ( ! is_logged_in() || ! $has_full_access ) )
-				{	// If login has been changed and new entered login is reserved and current User cannot use this:
-					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
-				}
-			}
-		}
-		else
-		{
-			set_param( 'edited_user_login', $this->login );
-			$edited_user_login = $this->login;
-		}
-
-		$UserCache = & get_UserCache();
-		$UserLogin = $UserCache->get_by_login( $edited_user_login );
-		if( $UserLogin && $UserLogin->ID != $this->ID )
-		{	// The login is already registered
-			$login_error_message = T_( 'This login already exists.' );
-			if( $has_full_access )
-			{
-				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
-					$edited_user_login,
-					'href="'.get_user_settings_url( 'profile', $UserLogin->ID ).'"' );
-			}
-			param_error( 'edited_user_login', $login_error_message );
-		}
-
-		if( !param_has_error( 'edited_user_login' ) )
-		{	// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
-			$this->set_from_Request( 'login', 'edited_user_login', true, 'utf8_strtolower' );
-		}
+		$edited_user_login = $this->check_login();
 		// ---- Login checking / END ----
 
 		$is_identity_form = param( 'identity_form', 'boolean', false );
@@ -944,20 +871,127 @@ class User extends DataObject
 		{
 			$edited_user_perms = array( 'edited-user', 'edited-user-required' );
 
-			global $edited_user_age_min, $edited_user_age_max;
-			$age_min = param( 'edited_user_age_min', 'string', ! $is_api_request ? true : NULL );
-			$age_max = param( 'edited_user_age_max', 'string', ! $is_api_request ? true : NULL );
-
-			if( isset( $age_min ) && isset( $age_max ) || $is_identity_form )
+			if( $Settings->get( 'self_selected_age_group') != 'hidden' )
 			{
-				param_check_interval( 'edited_user_age_min', 'edited_user_age_max', T_('Age must be a number.'), T_('The first age must be lower than (or equal to) the second.') );
-				if( !param_has_error( 'edited_user_age_min' ) && $Settings->get( 'minimum_age' ) > 0 &&
-						!empty( $edited_user_age_min ) && $edited_user_age_min < $Settings->get( 'minimum_age' ) )
-				{	// Limit user by minimum age
-					param_error( 'edited_user_age_min', sprintf( T_('You must be at least %d years old to use this service.'), $Settings->get( 'minimum_age' ) ) );
+				global $edited_user_age_min, $edited_user_age_max;
+				$age_group_is_required = $Settings->get( 'self_selected_age_group' ) == 'required';
+				$age_min = param( 'edited_user_age_min', 'integer', ! $is_api_request || $age_group_is_required ? true : NULL );
+				$age_max = param( 'edited_user_age_max', 'integer', ! $is_api_request || $age_group_is_required ? true : NULL );
+				if( isset( $age_min ) || isset( $age_max ) || $is_identity_form )
+				{
+					param_check_interval( 'edited_user_age_min', 'edited_user_age_max', T_('Age must be a number.'), T_('The first age must be lower than (or equal to) the second.'), $age_group_is_required );
+					if( !param_has_error( 'edited_user_age_min' ) && $Settings->get( 'minimum_age' ) > 0 &&
+							!empty( $edited_user_age_min ) && $edited_user_age_min < $Settings->get( 'minimum_age' ) )
+					{	// Limit user by minimum age
+						param_error( 'edited_user_age_min', sprintf( T_('You must be at least %d years old to use this service.'), $Settings->get( 'minimum_age' ) ) );
+					}
+					$this->set_from_Request( 'age_min', 'edited_user_age_min', true );
+					$this->set_from_Request( 'age_max', 'edited_user_age_max', true );
 				}
-				$this->set_from_Request( 'age_min', 'edited_user_age_min', true );
-				$this->set_from_Request( 'age_max', 'edited_user_age_max', true );
+			}
+
+			$birthdate = array();
+			if( $Settings->get( 'birthday_month' ) != 'hidden' )
+			{	// Save Birthday Month
+				$birthday_month_is_required = $Settings->get( 'birthday_month' ) == 'required';
+				$edited_user_birthday_month = param( 'edited_user_birthday_month', 'integer', ! $is_api_request || $birthday_month_is_required ? true : NULL );
+				if( isset( $edited_user_birthday_month ) || $is_identity_form )
+				{
+					if( $birthday_month_is_required && $has_moderate_access && empty( $edited_user_birthday_month ) )
+					{
+						param_add_message_to_Log( 'edited_user_birthday_month', T_('Please select a birthday month').'.', 'warning', T_('Validation errors:') );
+					}
+					else
+					{
+						param_check_number( 'edited_user_birthday_month', T_('Please select a birthday month').'.', $birthday_month_is_required );
+					}
+					// Check for valid values:
+					if( isset( $edited_user_birthday_month ) )
+					{
+						param_integer_range( 'edited_user_birthday_month', 1, 12,
+								sprintf( T_('The birthday month must be between %d and %d.'), 1, 12 ),
+								! $is_api_request || $birthday_month_is_required ? true : NULL );
+
+						$birthdate['month'] = $edited_user_birthday_month;
+					}
+					$this->set_from_Request( 'birthday_month', 'edited_user_birthday_month', true );
+				}
+			}
+
+			if( $Settings->get( 'birthday_day' ) != 'hidden' )
+			{	// Save Birthday Day
+				$birthday_day_is_required = $Settings->get( 'birthday_day' ) == 'required';
+				$edited_user_birthday_day = param( 'edited_user_birthday_day', 'integer', ! $is_api_request || $birthday_day_is_required ? true : NULL );
+				if( isset( $edited_user_birthday_day ) || $is_identity_form )
+				{
+					if( $birthday_day_is_required && $has_moderate_access && empty( $edited_user_birthday_day ) )
+					{
+						param_add_message_to_Log( 'edited_user_birthday_day', T_('Please select a birthday day').'.', 'warning', T_('Validation errors:') );
+					}
+					else
+					{
+						param_check_number( 'edited_user_birthday_day', T_('Please select a birthday day').'.', $birthday_day_is_required );
+					}
+					// Chehck for valid values:
+					if( isset( $edited_user_birthday_day ) )
+					{
+						param_integer_range( 'edited_user_birthday_day', 1, 31,
+								sprintf( T_('The birthday day must be between %d and %d.'), 1, 31 ),
+								! $is_api_request || $birthday_day_is_required ? true : NULL );
+
+						$birthdate['day'] = $edited_user_birthday_day;
+					}
+					$this->set_from_Request( 'birthday_day', 'edited_user_birthday_day', true );
+				}
+			}
+
+			if( $Settings->get( 'birthday_year' ) != 'hidden' )
+			{	// Save Birthday Year
+				$birthday_year_is_required = $Settings->get( 'birthday_year' ) == 'required';
+				$edited_user_birthday_year = param( 'edited_user_birthday_year', 'integer', ! $is_api_request || $birthday_year_is_required ? true : NULL );
+				if( isset( $edited_user_birthday_year ) || $is_identity_form )
+				{
+					if( $birthday_year_is_required && $has_moderate_access && empty( $edited_user_birthday_year ) )
+					{
+						param_add_message_to_Log( 'edited_user_birthday_year', T_('Please select a birthday year').'.', 'warning', T_('Validation errors:') );
+					}
+					else
+					{
+						param_check_number( 'edited_user_birthday_year', T_('Please select a birthday year').'.', $birthday_year_is_required );
+					}
+					// Check for valid values:
+					if( isset( $edited_user_birthday_year ) )
+					{
+						param_integer_range( 'edited_user_birthday_year', 1900, (int) date( 'Y' ),
+								sprintf( T_('The birthday year must be between %d and %d.'), 1900, (int) date( 'Y' ) ),
+								! $is_api_request || $birthday_year_is_required ? true : NULL );
+
+						$birthdate['year'] = $edited_user_birthday_year;
+						if( $Settings->get( 'minimum_age' ) > 0 && ! empty( $edited_user_birthday_year ) )
+						{ 	// We can only assume age if year is provided:
+							if( empty( $birthdate['month']) )
+							{	// Assume latest month:
+								$birthdate['month'] = 12;
+							}
+							if( empty( $birthdate['day']) )
+							{	// Assume latest day of the month-year:
+								$temp_date = strtotime( $birthdate['year'].'-'.$birthdate['month'].'-01' );
+								$birthdate['day'] = (int) date( 't', $temp_date );
+							}
+
+							$birth_date = new DateTime();
+							$today     = new DateTime();
+							$birth_date->setDate( $birthdate['year'], $birthdate['month'], $birthdate['day'] );
+							$interval = date_diff( $today, $birth_date );
+							$age = (int) $interval->format( '%y' );
+							if( $age < $Settings->get( 'minimum_age' ) )
+							{
+								param_error( 'edited_user_birthday_year', sprintf( T_('You must be at least %d years old to use this service.'), $Settings->get( 'minimum_age' ) ) );
+							}
+						}
+					}
+					$this->set_from_Request( 'birthday_year', 'edited_user_birthday_year', true );
+				}
 			}
 
 			$firstname_editing = $Settings->get( 'firstname_editing' );
@@ -1845,6 +1879,70 @@ class User extends DataObject
 		}
 
 		return ! param_errors_detected();
+	}
+
+
+	/**
+	 * Perform various checks on user login
+	 * 
+	 * @return string User login
+	 */
+	function check_login()
+	{
+		global $current_User;
+		global $is_api_request;
+
+		$has_full_access = $current_User->check_perm( 'users', 'edit' );
+		$has_moderate_access = $current_User->can_moderate_user( $this->ID );
+
+		// TRUE when we create new user:
+		$is_new_user = ( $this->ID == 0 );
+
+		$edited_user_login = param( 'edited_user_login', 'string', NULL );
+		if( ! $is_api_request || ( $is_api_request && ( isset( $edited_user_login ) || $is_new_user ) ) )
+		{ // login specifically included in API request
+			if( empty( $edited_user_login ) )
+			{	// Empty login
+				param_error( 'edited_user_login', T_('Please enter your login.') );
+			}
+			if( param_check_valid_login( 'edited_user_login' ) )
+			{	// If login is valid
+				global $reserved_logins;
+				if( $edited_user_login != $this->get( 'login' ) &&
+				    ! empty( $reserved_logins ) &&
+				    in_array( $edited_user_login, $reserved_logins ) &&
+				    ( ! is_logged_in() || ! $has_full_access ) )
+				{	// If login has been changed and new entered login is reserved and current User cannot use this:
+					param_error( 'edited_user_login', T_('You cannot use this login because it is reserved.') );
+				}
+			}
+		}
+		else
+		{
+			set_param( 'edited_user_login', $this->login );
+			$edited_user_login = $this->login;
+		}
+
+		$UserCache = & get_UserCache();
+		$UserLogin = $UserCache->get_by_login( $edited_user_login );
+		if( $UserLogin && $UserLogin->ID != $this->ID )
+		{	// The login is already registered
+			$login_error_message = T_( 'This login already exists.' );
+			if( $has_full_access )
+			{
+				$login_error_message = sprintf( T_( 'This login &laquo;%s&raquo; already exists. Do you want to <a %s>edit the existing user</a>?' ),
+					$edited_user_login,
+					'href="'.get_user_settings_url( 'profile', $UserLogin->ID ).'"' );
+			}
+			param_error( 'edited_user_login', $login_error_message );
+		}
+
+		if( !param_has_error( 'edited_user_login' ) )
+		{	// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
+			$this->set_from_Request( 'login', 'edited_user_login', true, 'utf8_strtolower' );
+		}
+
+		return $edited_user_login;
 	}
 
 

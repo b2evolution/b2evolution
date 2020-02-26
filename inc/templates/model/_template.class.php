@@ -27,14 +27,16 @@ class Template extends DataObject
 {
 	var $name;
 	var $code;
-	var $parent_tpl_ID;
+	var $translates_tpl_ID;
 	var $locale;
 	var $template_code;
+	var $context;
+	var $owner_grp_ID;
 
 	/**
-	 * @var integer Child template count
+	 * @var integer Translated template count
 	 */
-	var $count_child_templates = NULL;
+	var $count_translated_templates = NULL;
 
 	/**
 	 * @var array Localized child templates
@@ -56,9 +58,11 @@ class Template extends DataObject
 			$this->ID = $db_row->tpl_ID;
 			$this->name = $db_row->tpl_name;
 			$this->code = $db_row->tpl_code;
-			$this->parent_tpl_ID = $db_row->tpl_parent_tpl_ID;
+			$this->translates_tpl_ID = $db_row->tpl_translates_tpl_ID;
 			$this->locale = $db_row->tpl_locale;
 			$this->template_code = $db_row->tpl_template_code;
+			$this->context = $db_row->tpl_context;
+			$this->owner_grp_ID = $db_row->tpl_owner_grp_ID;
 		}
 	}
 
@@ -71,7 +75,7 @@ class Template extends DataObject
 	static function get_delete_cascades()
 	{
 		return array(
-				array( 'table' => 'T_templates', 'fk' => 'tpl_parent_tpl_ID', 'msg' => T_('%d child templates') ),
+				array( 'table' => 'T_templates', 'fk' => 'tpl_translates_tpl_ID', 'msg' => T_('%d child templates') ),
 			);
 	}
 
@@ -93,13 +97,13 @@ class Template extends DataObject
 		$this->set_from_Request( 'code' );
 
 		// Parent Menu:
-		$tpl_parent_ID = param( 'tpl_parent_tpl_ID', 'integer', NULL );
-		if( isset( $tpl_parent_tpl_ID ) && $this->has_child_templates() )
+		$tpl_parent_ID = param( 'tpl_translates_tpl_ID', 'integer', NULL );
+		if( isset( $tpl_translates_tpl_ID ) && $this->has_translated_templates() )
 		{
 			global $Messages;
-			$Messages->add( sprintf( T_('This template cannot become a child of another because it has %d children itself.'), $this->count_child_templates ) );
+			$Messages->add( sprintf( T_('This template cannot become a child of another because it has %d children itself.'), $this->count_translated_templates ) );
 		}
-		$this->set_from_Request( 'parent_tpl_ID' );
+		$this->set_from_Request( 'translates_tpl_ID' );
 
 		// Locale:
 		param( 'tpl_locale', 'string' );
@@ -110,6 +114,15 @@ class Template extends DataObject
 		param_check_not_empty( 'tpl_template_code' );
 		param_check_html( 'tpl_template_code', T_('Invalid template code content.'), '#', 'quick_template' );
 		$this->set( 'template_code', get_param( 'tpl_template_code' ) );
+
+		// Context:
+		param( 'tpl_context', 'string', 'custom' );
+		$this->set_from_Request( 'context' );
+
+		// Owner Group:
+		param( 'tpl_owner_grp_ID', 'integer', NULL );
+		param_check_not_empty( 'tpl_owner_grp_ID', T_('Please select an owner group for the template.') );
+		$this->set_from_Request( 'owner_grp_ID' );
 
 		return ! param_errors_detected();
 	}
@@ -286,7 +299,7 @@ class Template extends DataObject
 		{
 			$TemplateCache = & get_TemplateCache();
 			$TemplateCache->clear( true );
-			$where = 'tpl_parent_tpl_ID = '.$DB->quote( $this->ID ).' AND tpl_locale = '.$DB->quote( $locale );
+			$where = 'tpl_translates_tpl_ID = '.$DB->quote( $this->ID ).' AND tpl_locale = '.$DB->quote( $locale );
 			$this->localized_templates[$locale] = $TemplateCache->load_where( $where );
 		}
 
@@ -299,7 +312,7 @@ class Template extends DataObject
 	 *
 	 * @return boolean
 	 */
-	function has_child_templates()
+	function has_translated_templates()
 	{
 		global $DB;
 
@@ -308,16 +321,16 @@ class Template extends DataObject
 			return false;
 		}
 
-		if( !isset( $this->count_child_templates ) )
+		if( !isset( $this->count_translated_templates ) )
 		{
 			$SQL = new SQL( 'Check if template has child templates' );
-			$SQL->SELECT( 'COUNT( tpl_parent_tpl_ID )' );
+			$SQL->SELECT( 'COUNT( tpl_translates_tpl_ID )' );
 			$SQL->FROM( 'T_templates' );
-			$SQL->WHERE( 'tpl_parent_tpl_ID = '.$DB->quote( $this->ID ) );
-			$this->count_child_templates = $DB->get_var( $SQL );
+			$SQL->WHERE( 'tpl_translates_tpl_ID = '.$DB->quote( $this->ID ) );
+			$this->count_translated_templates = $DB->get_var( $SQL );
 		}
 
-		return ( $this->count_child_templates > 0 );
+		return ( $this->count_translated_templates > 0 );
 	}
 }
 

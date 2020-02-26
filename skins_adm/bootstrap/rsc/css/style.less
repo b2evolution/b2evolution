@@ -235,12 +235,16 @@ div.delete_messages ul {
 	}
 }
 
-.evo_panel {
-	margin-bottom: 20px;
-}
-
-.evo_panel__footer {
-	padding: 10px 15px;
+// Post / Comment browsing screen
+.evo_content_block {
+	// This is not the usual results table:
+	.results_header {
+		margin-top: -20px;
+	}
+	.results_footer {
+		// Pager in footer + nb line by default select
+		padding: 5px 0 20px;
+	}
 }
 
 /*
@@ -1190,6 +1194,7 @@ tbody.fieldset_wrapper.folded+tbody[id^=cat_sel_] {
 }
 
 // Dashboard
+// Collection dashboard ?
 .browse {
 	.evo_content_block {
 		margin-right: 0;
@@ -1312,6 +1317,7 @@ table.coll_kind {
 	}
 }
 
+/* Fp: UNCLEAR WHAT THIS IS FOR:
 // Support for multiline inline forms
 .filters .form-inline {
 	 margin: 0 -10px -5px;
@@ -1322,6 +1328,7 @@ table.coll_kind {
 		margin-left: 10px;
 	}
 }
+*/
 
 // Navigations
 .navbar {

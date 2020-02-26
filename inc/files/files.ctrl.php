@@ -1377,6 +1377,11 @@ switch( $action )
 			}
 		}
 
+		if( $mode == 'link' )
+		{	// Don't redirect when we updated a linked File:
+			exit;
+		}
+
 		if( $LinkOwner = & get_LinkOwner( $link_owner_type, $link_owner_ID ) )
 		{	// Redirect back to link owner object edit form where the File was edited:
 			$redirect_to = $LinkOwner->get_edit_url( '&', ( $from == 'backoffice' ) );

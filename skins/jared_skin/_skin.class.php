@@ -1244,8 +1244,7 @@ class jared_Skin extends Skin
 				$this->dynamic_style_rule( 'section_1_link_color',
 					'body.pictured .main_page_wrapper .front_main_area a,'.
 					'body.pictured .main_page_wrapper .front_main_area div.evo_withteaser div.item_content > a { color: $setting_value$ }'.
-					'body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_item_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a,'.
-					'body.pictured .main_page_wrapper .front_main_area div.widget_core_coll_post_list.evo_noexcerpt.evo_withteaser ul li div.item_content > a, .evo_container__page_top a { color: $setting_value$ }'.
+					'body.pictured .main_page_wrapper .front_main_area div.widget_uil_autotemp.evo_noexcerpt.evo_withteaser ul li div.item_content > a, .evo_container__page_top a { color: $setting_value$ }'.
 					'body.pictured .front_main_content .ufld_icon_links a:not([class*="ufld__bgcolor"]):not(:hover) { background-color: $setting_value$ }'.
 					'body.pictured .front_main_content .ufld_icon_links a:hover:not([class*="ufld__hovertextcolor"]) { color: $setting_value$ }'
 				);

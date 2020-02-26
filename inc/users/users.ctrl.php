@@ -724,6 +724,36 @@ if( !$Messages->has_errors() )
 				echo get_csv_line( $user );
 			}
 			exit;
+
+		case 'save_default_filters':
+			// Save default users list filters:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			$filters = array();
+			for( $i = 1; $i <= 10; $i++ )
+			{
+				$filter = param( 'filter_'.$i, 'string' );
+				if( ! empty( $filter ) && ! in_array( $filter, $filters ) )
+				{
+					$filters[] = $filter;
+				}
+			}
+
+			// Set new default users list filters:
+			$Settings->set( 'userlist_default_filters', implode( ',', $filters ) );
+			$Settings->dbupdate();
+
+			$Messages->add( TB_('Default filters have been updated for users list.'), 'success' );
+
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=users', 303 ); // Will EXIT
+			// We have EXITed already at this point!!
+			break;
 	}
 }
 

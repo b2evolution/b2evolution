@@ -3805,25 +3805,25 @@ function userfield_prepare( & $userfield )
 
 
 /**
- * Callback to add filters on top of the result set
+ * Get config array for possible filters on users list
  *
- * @param Form
+ * @param object Form
+ * @return array
  */
-function callback_filter_userlist( & $Form )
+function get_userlist_filters_config( $Form = NULL )
 {
-	global $Settings, $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
-	global $registered_min, $registered_max;
+	global $current_User, $Collection, $Blog, $edited_Organization, $edited_Newsletter, $edited_EmailCampaign;
 
 	$filters = array(
-		// Set default filters which are displayed on not filtered list:
-		'#default' => array(
-			'gender'   => '',
-			'criteria' => '0:contains:',
-			'lastseen' => '',
-		),
 		// Set order of the filters here, but filters are initalized below:
 		// (some filters may be hidden depending on current User permissions and front-office calling)
+		'name_email'          => NULL, // Name / Email
+		'firstname'           => NULL, // First name
+		'lastname'            => NULL, // Last name
+		'nickname'            => NULL, // Nickname
+		'email'               => NULL, // Email
 		'gender'              => NULL, // Gender
+		'country'             => NULL, // Country
 		'criteria'            => NULL, // Specific criteria
 		'tags'                => NULL, // User tags
 		'org'                 => NULL, // Organization
@@ -3840,86 +3840,60 @@ function callback_filter_userlist( & $Form )
 		'custom_sender_name'  => NULL, // Uses custom sender name
 	);
 
-	echo '<div class="filter-inputs">';
-	$Form->hidden( 'filter', 'new' );
-
-	if( ! is_admin_page() && ! empty( $Blog ) && ( $Blog->get_setting( 'allow_access' ) == 'members' ) && ( $Blog->get_setting( 'userdir_filter_restrict_to_members' ) ) )
-	{ // Restrict by members only when it is frontoffice and Blog allow access only for members
-		$Form->checkbox( 'membersonly', get_param( 'membersonly' ), sprintf( T_('Only members of %s'), $Blog->get_shortname() ) );
-	}
-
-	if( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name' ) )
-	{
-		$Form->text( 'keywords', get_param('keywords'), 20, T_('Name'), '', 50 );
-	}
-
-	$location_filter_displayed = false;
-	if( user_country_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) )
-	{
-		{ // Filter by country
-			load_class( 'regional/model/_country.class.php', 'Country' );
-			load_funcs( 'regional/model/_regional.funcs.php' );
-			if( has_cross_country_restriction( 'users', 'list' ) )
-			{ // User cannot browse other users from other country
-				global $current_User;
-				$Form->info( T_('Country'), $current_User->get_country_name() );
-				// Create a hidden country field to correct ajax request to load regions, subregions and cities
-				$Form->hidden( 'country', $current_User->ctry_ID, array( 'id' => 'country' ) );
-			}
-			else
-			{ // User can browse other users from other country
-				$CountryCache = & get_CountryCache( NT_('All') );
-				$Form->select_country( 'country', get_param('country'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
-				$location_filter_displayed = true;
-			}
-		}
-	}
-
-	if( user_region_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_region' ) )
-	{	// Filter by region
-		$region_filter_disp_style = regions_exist( get_param('country'), true ) ? '' : ' style="display:none"';
-		echo '<span id="region_filter"'.$region_filter_disp_style.'>';
-		$Form->select_input_options( 'region', get_regions_option_list( get_param('country'), get_param('region') ), T_('Region') );
-		echo '</span>';
-		$location_filter_displayed = $location_filter_displayed || empty( $region_filter_disp_style );
-	}
-
-	if( user_subregion_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_subregion' ) )
-	{	// Filter by subregion
-		echo '<span id="subregion_filter"'.( !subregions_exist( get_param('region'), true ) ? ' style="display:none"' : '' ).'>';
-		$Form->select_input_options( 'subregion', get_subregions_option_list( get_param('region'), get_param('subregion') ), T_('Sub-region') );
-		echo '</span>';
-	}
-
-	if( user_city_visible() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_city' ) )
-	{	// Filter by city
-		echo '<span id="city_filter"'.( !cities_exist( get_param('country'), get_param('region'), get_param('subregion'), true ) ? ' style="display:none"' : '' ).'>';
-		$Form->select_input_options( 'city', get_cities_option_list( get_param('country'), get_param('region'), get_param('subregion'), get_param('city') ), T_('City') );
-		echo '</span>';
-	}
-
-	if( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_age_group' ) )
-	{
-		$Form->begin_line( T_('Age group'), 'age_min' );
-			$Form->text( 'age_min', get_param('age_min'), 3, '' );
-			$Form->text( 'age_max', get_param('age_max'), 3, T_('to') );
-		$Form->end_line();
-	}
-
-	if( is_admin_page() && $edited_EmailCampaign )
-	{
-		$campaign_send_status = array(
-				'' => T_('All'),
-				'ready_to_send' => T_('Ready to send'),
-				'sent' => T_('Sent'),
-				'send_error' => T_('Send error'),
-				'skipped' => T_('Skipped')
+	// Name / Email:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name_email' ) ) )
+	{	// Show name/email filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['name_email'] = array(
+				'label'      => T_('Name').' / '.T_('Username').' / '.T_('Email'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
 			);
-		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, '<span class="text-info">'.T_('Campaign Status').'</span>', '', array( 'allow_none' => true ) );
 	}
-	echo '<br />';
 
-	echo '</div>';
+	// First name:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_firstname' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['firstname'] = array(
+				'label'      => T_('First name'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
+
+	// Last name:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_lastname' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['lastname'] = array(
+				'label'      => T_('Last name'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
+
+	// Nickname:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_nickname' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['nickname'] = array(
+				'label'      => T_('Nickname'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
+
+	// Email:
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_email' ) ) )
+	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
+		$filters['email'] = array(
+				'label'      => T_('Email'),
+				'input'      => 'text',
+				'operators'  => 'contains,not_contains',
+				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
 
 	// Gender:
 	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_gender' ) ) )
@@ -3934,6 +3908,30 @@ function callback_filter_userlist( & $Form )
 						'O' => T_('Other'),
 					),
 				'validation' => array( 'allow_empty_value' => 'true' ),
+			);
+	}
+
+	// Country:
+	if( user_country_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) ) ) )
+	{	// Show country filter only on back-office or if it is allowed by collection setting on front-office:
+		$CountryCache = & get_CountryCache();
+		if( has_cross_country_restriction( 'users', 'list' ) )
+		{	// User cannot browse other users from other country:
+			// Load only country of the current User:
+			$CountryCache->load_all = false; // Set flag to false in order to don't load ALL records in the CountryCache->get_option_array().
+			$CountryCache->load_where( 'ctry_ID = '.( is_logged_in() ? $current_User->ctry_ID : '-1'/* For normal work anonymous users have no access to this point however use this fake condition to avoid errors */ ) );
+			$country_options = array();
+		}
+		else
+		{	// User can browse other users from other country:
+			$country_options = array( '0' => T_('All') );
+		}
+		$country_options += $CountryCache->get_option_array();
+		$filters['country'] = array(
+				'label'  => T_('Country'),
+				'input'  => 'select',
+				'type'   => 'integer',
+				'values' => $country_options,
 			);
 	}
 
@@ -3990,6 +3988,10 @@ function callback_filter_userlist( & $Form )
 	// Specific criteria:
 	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_criteria' ) ) )
 	{	// Show specific criteria filter only on back-office or if it is allowed by collection setting on front-office:
+		if( empty( $Form ) )
+		{
+			$Form = new Form();
+		}
 		$Form->output = false;
 		$Form->switch_layout( 'none' );
 		global $user_fields_empty_name;
@@ -4016,96 +4018,9 @@ function callback_filter_userlist( & $Form )
 						rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
 						rule.$el.find( ".rule-value-container [name^=criteria_operator]" ).val( val[1] ).trigger( "change" );
 						rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[2] ).trigger( "change" );
-					}'
+					}',
+				'default_value' => '0:contains:',
 			);
-	}
-
-	if( user_region_visible() )
-	{	// JS functions for AJAX loading of regions, subregions & cities
-?>
-<script>
-jQuery( '#country' ).change( function()
-{
-	var this_obj = jQuery( this );
-	jQuery.ajax( {
-	type: 'POST',
-	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-	data: 'action=get_regions_option_list&ctry_id=' + jQuery( this ).val(),
-	success: function( result )
-		{
-			jQuery( '#region' ).html( ajax_debug_clear( result ) );
-			if( jQuery( '#region option' ).length > 1 )
-			{
-				jQuery( '#region_filter' ).show();
-			}
-			else
-			{
-				jQuery( '#region_filter' ).hide();
-			}
-			load_subregions( 0 ); // Reset sub-regions
-		}
-	} );
-} );
-
-jQuery( '#region' ).change( function ()
-{	// Change option list with sub-regions
-	load_subregions( jQuery( this ).val() );
-} );
-
-jQuery( '#subregion' ).change( function ()
-{	// Change option list with cities
-	load_cities( jQuery( '#country' ).val(), jQuery( '#region' ).val(), jQuery( this ).val() );
-} );
-
-function load_subregions( region_ID )
-{	// Load option list with sub-regions for seleted region
-	jQuery.ajax( {
-	type: 'POST',
-	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-	data: 'action=get_subregions_option_list&rgn_id=' + region_ID,
-	success: function( result )
-		{
-			jQuery( '#subregion' ).html( ajax_debug_clear( result ) );
-			if( jQuery( '#subregion option' ).length > 1 )
-			{
-				jQuery( '#subregion_filter' ).show();
-			}
-			else
-			{
-				jQuery( '#subregion_filter' ).hide();
-			}
-			load_cities( jQuery( '#country' ).val(), region_ID, 0 );
-		}
-	} );
-}
-
-function load_cities( country_ID, region_ID, subregion_ID )
-{ // Load option list with cities for seleted region or sub-region
-	if( typeof( country_ID ) == 'undefined' )
-	{
-		country_ID = 0;
-	}
-
-	jQuery.ajax( {
-	type: 'POST',
-	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-	data: 'action=get_cities_option_list&ctry_id=' + country_ID + '&rgn_id=' + region_ID + '&subrg_id=' + subregion_ID,
-	success: function( result )
-		{
-			jQuery( '#city' ).html( ajax_debug_clear( result ) );
-			if( jQuery( '#city option' ).length > 1 )
-			{
-				jQuery( '#city_filter' ).show();
-			}
-			else
-			{
-				jQuery( '#city_filter' ).hide();
-			}
-		}
-	} );
-}
-</script>
-<?php
 	}
 
 	if( is_logged_in() && $current_User->check_perm( 'users', 'moderate' ) )
@@ -4211,6 +4126,252 @@ function load_cities( country_ID, region_ID, subregion_ID )
 					'valueSetter' => 'evo_set_filter_user_tags',
 					'operators'   => 'user_tagged,user_not_tagged',
 				);
+		}
+	}
+
+	// Find and remove filters which are not used for current case:
+	foreach( $filters as $filter_key => $filter_data )
+	{
+		if( $filter_data === NULL )
+		{
+			unset( $filters[ $filter_key ] );
+		}
+	}
+
+	return $filters;
+}
+
+
+/**
+ * Callback to add filters on top of the result set
+ *
+ * @param Form
+ */
+function callback_filter_userlist( & $Form )
+{
+	global $Settings, $current_User, $Collection, $Blog, $edited_EmailCampaign;
+
+	// Get filters from config:
+	$filters = get_userlist_filters_config( $Form );
+
+	// Set default filters which are displayed on not filtered list:
+	$userlist_default_filters = $Settings->get( 'userlist_default_filters' );
+	if( ! empty( $userlist_default_filters ) )
+	{
+		$userlist_default_filters = explode( ',', $userlist_default_filters );
+		$filters['#default'] = array();
+		foreach( $userlist_default_filters as $userlist_default_filter )
+		{
+			if( $userlist_default_filter == 'country' && has_cross_country_restriction( 'users', 'list' ) )
+			{	// Skip default filter "Country" when current User can view other users only from own country:
+				continue;
+			}
+
+			// Set default operator:
+			if( ! empty( $filters[ $userlist_default_filter ]['operators'] ) )
+			{
+				$default_operator = explode( ',', $filters[ $userlist_default_filter ]['operators'] );
+				$default_operator = $default_operator[0];
+			}
+			else
+			{
+				$default_operator = 'equal';
+			}
+			// Set default value:
+			if( isset( $filters[ $userlist_default_filter ]['default_value'] ) )
+			{
+				$default_value = $filters[ $userlist_default_filter ]['default_value'];
+			}
+			elseif( isset( $filters[ $userlist_default_filter ]['values'] ) && is_array( $filters[ $userlist_default_filter ]['values'] ) )
+			{
+				$default_value = array_keys( $filters[ $userlist_default_filter ]['values'] );
+				$default_value = isset( $default_value[0] ) ? $default_value[0] : '';
+			}
+			else
+			{
+				$default_value = '';
+			}
+
+			$filters['#default'][ $userlist_default_filter ] = array( $default_operator, $default_value );
+		}
+	}
+
+	echo '<div class="filter-inputs">';
+	$Form->hidden( 'filter', 'new' );
+
+	if( ! is_admin_page() && ! empty( $Blog ) && ( $Blog->get_setting( 'allow_access' ) == 'members' ) && ( $Blog->get_setting( 'userdir_filter_restrict_to_members' ) ) )
+	{ // Restrict by members only when it is frontoffice and Blog allow access only for members
+		$Form->checkbox( 'membersonly', get_param( 'membersonly' ), sprintf( T_('Only members of %s'), $Blog->get_shortname() ) );
+	}
+
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name' ) ) )
+	{
+		$Form->text( 'keywords', get_param( 'keywords' ), 20, T_('Name').' / '.T_('Username'), '', 50 );
+	}
+
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_email' ) ) )
+	{
+		$Form->text( 'email', get_param( 'email' ), 20, T_('Email'), '', 50 );
+	}
+
+	$location_filter_displayed = false;
+	if( user_country_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) ) ) )
+	{
+		{ // Filter by country
+			load_class( 'regional/model/_country.class.php', 'Country' );
+			load_funcs( 'regional/model/_regional.funcs.php' );
+			if( has_cross_country_restriction( 'users', 'list' ) )
+			{ // User cannot browse other users from other country
+				global $current_User;
+				$Form->info( T_('Country'), $current_User->get_country_name() );
+				// Create a hidden country field to correct ajax request to load regions, subregions and cities
+				$Form->hidden( 'country', $current_User->ctry_ID, array( 'id' => 'country' ) );
+			}
+			else
+			{ // User can browse other users from other country
+				$CountryCache = & get_CountryCache( NT_('All') );
+				$Form->select_country( 'country', get_param('country'), $CountryCache, T_('Country'), array( 'allow_none' => true ) );
+				$location_filter_displayed = true;
+			}
+		}
+	}
+
+	if( user_region_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_region' ) ) ) )
+	{	// Filter by region
+		$region_filter_disp_style = regions_exist( get_param('country'), true ) ? '' : ' style="display:none"';
+		echo '<span id="region_filter"'.$region_filter_disp_style.'>';
+		$Form->select_input_options( 'region', get_regions_option_list( get_param('country'), get_param('region') ), T_('Region') );
+		echo '</span>';
+		$location_filter_displayed = $location_filter_displayed || empty( $region_filter_disp_style );
+	}
+
+	if( user_subregion_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_subregion' ) ) ) )
+	{	// Filter by subregion
+		echo '<span id="subregion_filter"'.( !subregions_exist( get_param('region'), true ) ? ' style="display:none"' : '' ).'>';
+		$Form->select_input_options( 'subregion', get_subregions_option_list( get_param('region'), get_param('subregion') ), T_('Sub-region') );
+		echo '</span>';
+	}
+
+	if( user_city_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_city' ) ) ) )
+	{	// Filter by city
+		echo '<span id="city_filter"'.( !cities_exist( get_param('country'), get_param('region'), get_param('subregion'), true ) ? ' style="display:none"' : '' ).'>';
+		$Form->select_input_options( 'city', get_cities_option_list( get_param('country'), get_param('region'), get_param('subregion'), get_param('city') ), T_('City') );
+		echo '</span>';
+	}
+
+	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_age_group' ) ) )
+	{
+		$Form->begin_line( T_('Age group'), 'age_min' );
+			$Form->text( 'age_min', get_param('age_min'), 3, '' );
+			$Form->text( 'age_max', get_param('age_max'), 3, T_('to') );
+		$Form->end_line();
+	}
+
+	if( is_admin_page() && $edited_EmailCampaign )
+	{
+		$campaign_send_status = array(
+				'' => T_('All'),
+				'ready_to_send' => T_('Ready to send'),
+				'sent' => T_('Sent'),
+				'send_error' => T_('Send error'),
+				'skipped' => T_('Skipped')
+			);
+		$Form->select_input_array( 'recipient_type', get_param( 'recipient_type' ), $campaign_send_status, '<span class="text-info">'.T_('Campaign Status').'</span>', '', array( 'allow_none' => true ) );
+	}
+	echo '<br />';
+
+	echo '</div>';
+
+	if( user_region_visible() )
+	{	// JS functions for AJAX loading of regions, subregions & cities
+?>
+<script>
+jQuery( '#country' ).change( function()
+{
+	var this_obj = jQuery( this );
+	jQuery.ajax( {
+	type: 'POST',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+	data: 'action=get_regions_option_list&ctry_id=' + jQuery( this ).val(),
+	success: function( result )
+		{
+			jQuery( '#region' ).html( ajax_debug_clear( result ) );
+			if( jQuery( '#region option' ).length > 1 )
+			{
+				jQuery( '#region_filter' ).show();
+			}
+			else
+			{
+				jQuery( '#region_filter' ).hide();
+			}
+			load_subregions( 0 ); // Reset sub-regions
+		}
+	} );
+} );
+
+jQuery( '#region' ).change( function ()
+{	// Change option list with sub-regions
+	load_subregions( jQuery( this ).val() );
+} );
+
+jQuery( '#subregion' ).change( function ()
+{	// Change option list with cities
+	load_cities( jQuery( '#country' ).val(), jQuery( '#region' ).val(), jQuery( this ).val() );
+} );
+
+function load_subregions( region_ID )
+{	// Load option list with sub-regions for seleted region
+	jQuery.ajax( {
+	type: 'POST',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+	data: 'action=get_subregions_option_list&rgn_id=' + region_ID,
+	success: function( result )
+		{
+			jQuery( '#subregion' ).html( ajax_debug_clear( result ) );
+			if( jQuery( '#subregion option' ).length > 1 )
+			{
+				jQuery( '#subregion_filter' ).show();
+			}
+			else
+			{
+				jQuery( '#subregion_filter' ).hide();
+			}
+			load_cities( jQuery( '#country' ).val(), region_ID, 0 );
+		}
+	} );
+}
+
+function load_cities( country_ID, region_ID, subregion_ID )
+{ // Load option list with cities for seleted region or sub-region
+	if( typeof( country_ID ) == 'undefined' )
+	{
+		country_ID = 0;
+	}
+
+	jQuery.ajax( {
+	type: 'POST',
+	url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+	data: 'action=get_cities_option_list&ctry_id=' + country_ID + '&rgn_id=' + region_ID + '&subrg_id=' + subregion_ID,
+	success: function( result )
+		{
+			jQuery( '#city' ).html( ajax_debug_clear( result ) );
+			if( jQuery( '#city option' ).length > 1 )
+			{
+				jQuery( '#city_filter' ).show();
+			}
+			else
+			{
+				jQuery( '#city_filter' ).hide();
+			}
+		}
+	} );
+}
+</script>
+<?php
+	}
+
+	if( ! empty( $filters['tags'] ) )
+	{	// Filter by user tags if current user can moderate other users:
 ?>
 <script>
 function evo_get_filter_user_tags( rule )
@@ -4262,16 +4423,6 @@ function evo_set_filter_user_tags( rule, value )
 }
 </script>
 <?php
-		}
-	}
-
-	// Find and remove filters which are not used for current case:
-	foreach( $filters as $filter_key => $filter_data )
-	{
-		if( $filter_data === NULL )
-		{
-			unset( $filters[ $filter_key ] );
-		}
 	}
 
 	return $filters;
@@ -5410,6 +5561,24 @@ function echo_userlist_change_groups_js()
 
 
 /**
+ * Initialize JavaScript for AJAX loading of popup window to change default filters on users list
+ */
+function echo_userlist_filters_js()
+{
+	// Initialize JavaScript to build and open window:
+	echo_modalwindow_js();
+
+	// Initialize variables for the file "evo_user_filters.js":
+	echo '<script>
+		var evo_js_lang_loading = \''.TS_('Loading...').'\';
+		var evo_js_lang_change_default_users_filters = \''.TS_('Change default users list filters...').get_manual_link( 'users-list-default-filters' ).'\';
+		var evo_js_lang_save_defaults = \''.TS_('Save defaults').'\';
+		var evo_js_userlist_filters_ajax_url = \''.get_htsrv_url().'anon_async.php'.'\';
+	</script>';
+}
+
+
+/**
  * Display user report form
  *
  * @param array Params
@@ -6415,7 +6584,6 @@ function users_results_block( $params = array() )
 			'join_country'         => true,
 			'keywords_fields'      => NULL,
 			'where_status_closed'  => NULL,
-			'display_user_count'   => false, // user count beside the title
 			'display_params'       => array(),
 			'display_orgstatus'    => false,
 			'display_filters'      => true,
@@ -6559,41 +6727,37 @@ function users_results_block( $params = array() )
 	// Execute query:
 	$UserList->query();
 
-	// Display number of rows in the title
-	if( $params['display_user_count'] )
-	{
-		$UserList->title .= ' ('.$UserList->get_total_rows().')';
-	}
-
-
 	if( $params['display_filters'] )
-	{ // Display the filters
-		$filter_presets = array(
-				'all' => array( T_('All users'), url_add_param( $params['page_url'], 'filter=new' ) ),
-				'men' => array( T_('Men'), url_add_param( $params['page_url'], 'gender_men=1&amp;filter=new' ) ),
-				'women' => array( T_('Women'), url_add_param( $params['page_url'], 'gender_women=1&amp;filter=new' ) ),
-				'other' => array( T_('Other'), url_add_param( $params['page_url'], 'gender_other=1&amp;filter=new' ) ),
-			);
-
-		if( is_admin_page() )
-		{ // Add show only activated users filter only on admin interface
-			$filter_presets['activated'] = array( T_('Activated users'), url_add_param( $params['page_url'], 'status_activated=1&amp;filter=new' ) );
-			if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
-			{ // Show "Reported Users" filter only for users with edit user permission
-				$filter_presets['reported'] = array( T_('Reported users'), url_add_param( $params['page_url'], 'reported=1&amp;filter=new' ) );
-			}
-		}
-
-		if( $UserList->is_filtered() )
-		{ // Display link to reset filters only if some filter is applied
-			$UserList->global_icon( T_('Reset filters'), 'reset_filters', url_add_param( $params['page_url'], 'filter=reset' ), T_('Reset filters'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
-		}
+	{	// Display the filters:
 
 		$UserList->filter_area = array(
 			'callback' => 'callback_filter_userlist',
 			'url_ignore' => 'users_paged,u_paged,keywords',
-			'presets' => $filter_presets,
+			'apply_filters_button' => 'bottom',
 			);
+
+		$new_filter_baseurl = url_add_param( $params['page_url'], 'filter=new' );
+		$UserList->register_filter_preset( 'all', T_('All'), $new_filter_baseurl );
+		$UserList->register_filter_preset( 'men', T_('Men'), $new_filter_baseurl );
+		$UserList->register_filter_preset( 'women', T_('Women'), $new_filter_baseurl );
+		$UserList->register_filter_preset( 'other', T_('Other'), $new_filter_baseurl );
+
+		if( is_admin_page() )
+		{	// show "activated users" filter only on admin interface:
+			$UserList->register_filter_preset( 'activated', T_('Activated users'), url_add_param( $params['page_url'], $new_filter_baseurl ) );
+
+			if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+			{	// Show "Reported Users" filter only to users with edit user permission:
+				$UserList->register_filter_preset( 'reported', T_('Reported users'), url_add_param( $params['page_url'], $new_filter_baseurl ) );
+			}
+		}
+
+		if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+		{	// Settings for default user list filters:
+			$UserList->filter_area['presets_after'] = '<span class="fa fa-cog pointer" onclick="return evo_users_list_default_filters()" style="margin-left:20px"></span>';
+			// Initialize JavaScript for AJAX loading of popup window to change default filters on users list:
+			echo_userlist_filters_js();
+		}
 	}
 
 	/*
@@ -6601,8 +6765,15 @@ function users_results_block( $params = array() )
 	 */
 	if( $params['display_btn_refresh'] )
 	{ // Display a button to refresh the users list
-		$UserList->global_icon( T_('Refresh users list...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
+		$UserList->global_icon( T_('Refresh the list in case some Users have been added or deleted since your last search...'), 'refresh', url_add_param( $params['page_url'], 'filter=refresh' ), T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn-warning' ) );
 	}
+
+	if( is_pro() )
+	{
+		$UserList->global_icon( T_('Import Users'), 'new',
+				regenerate_url( 'action', 'action=csv'), T_('Import Users').' &raquo;', 3, 4 );
+	}
+	
 	if( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
 	{
 		if( $params['display_btn_adduser'] )
@@ -6709,10 +6880,17 @@ function users_results_block( $params = array() )
 			.'</a>';
 	}
 
+	if( is_pro() )
+	{
+		$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=export_users" class="btn btn-primary">'
+				.format_to_output( T_('Export users (CSV)' ) )
+			.'</a>';
+	}
+
 	if( $params['display_btn_export'] && is_logged_in() && $UserList->result_num_rows > 0 )
 	{	// Button to export user group data as CSV file:
-		$user_list_buttons[] = '<br><a href="'.$admin_url.'?ctrl=users&amp;action=export" class="btn btn-primary">'
-				.format_to_output( T_('Export groups as CSV') )
+		$user_list_buttons[] = ( is_pro() ? '' : '<br>' ).'<a href="'.$admin_url.'?ctrl=users&amp;action=export" class="btn btn-primary">'
+				.format_to_output( T_('Export group membership (CSV)') )
 			.'</a>';
 	}
 

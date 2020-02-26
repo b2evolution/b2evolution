@@ -188,11 +188,11 @@ class bootstrap_blocks_blog_Skin extends Skin
 						'type' => 'checklist',
 						'options' => array(
 							array( 'single',       sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=single</code>' ), 1 ),
-							array( 'posts-default',sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-default</code>' ), 0 ),
-							array( 'posts-topcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-topcat-intro</code>, <code>disp=posts-topcat-nointro</code>' ), 0 ),
-							array( 'posts-subcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-subcat-intro</code>, <code>disp=posts-subcat-nointro</code>' ), 0 ),
-							array( 'front',        sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=front</code>' ), 0 ),
-							array( 'other',        T_('On other disps'), 0 ),
+							array( 'posts-default',sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-default</code>' ), 1 ),
+							array( 'posts-topcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-topcat-intro</code>, <code>disp=posts-topcat-nointro</code>' ), 1 ),
+							array( 'posts-subcat', sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=posts-subcat-intro</code>, <code>disp=posts-subcat-nointro</code>' ), 1 ),
+							array( 'front',        sprintf( /* TRANS: position On disp=single or other disps */T_('On %s'), '<code>disp=front</code>' ), 1 ),
+							array( 'other',        T_('On other disps'), 1 ),
 						),
 					),
 					'main_content_image_size' => array(
@@ -262,20 +262,15 @@ class bootstrap_blocks_blog_Skin extends Skin
 					'layout' => 'end_fieldset',
 				),
 
-
+/*
 				'posts_list_start' => array(
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Posts List Settings')
 				),
-				'posts_list_block_class' => array(
-					'label' => T_('Block class'),
-					'defaultvalue' => 'col-xs-12 col-sm-6 col-lg-6 col-xxl-4',
-					'allow_empty' => true,
-					'size' => 50,
-				),
+*/
 			)
 		);
-
+/*
 		foreach( $this->get_screen_sizes() as $screen_key => $screen )
 		{
 			$r = array_merge( $r, array(
@@ -304,12 +299,13 @@ class bootstrap_blocks_blog_Skin extends Skin
 				),
 			) );
 		}
-
+*/
 		$r = array_merge( $r, array(
+/*
 				'posts_list_end' => array(
 					'layout' => 'end_fieldset',
 				),
-
+*/
 
 				'section_color_start' => array(
 					'layout' => 'begin_fieldset',
@@ -522,10 +518,12 @@ class bootstrap_blocks_blog_Skin extends Skin
 		// Skin specific initializations:
 
 		// **** Layout Settings / START ****
+/*
 		// Max image height:
 		$this->dynamic_style_rule( 'max_image_height', '.evo_image_block img { max-height: $setting_value$px; width: auto; }', array(
 			'check' => 'not_empty'
 		) );
+*/
 		// Default font - Family:
 		$this->dynamic_style_rule( 'font_family', '#skin_wrapper { font-family: $setting_value$ }', array(
 			'options' => $this->get_font_definitions()
@@ -581,25 +579,29 @@ class bootstrap_blocks_blog_Skin extends Skin
 		// **** Layout Settings / END ****
 
 		// **** Posts List Settings / START ****
+/*
 		foreach( $this->get_screen_sizes() as $screen_key => $screen )
 		{
 			if( isset( $screen['min_width'] ) )
 			{	// Start of @media screen wrapper:
 				$this->add_dynamic_style( '@media only screen and (min-width: '.$screen['min_width'].') { ' );
 			}
+
 			// Block height:
-			$this->dynamic_style_rule( $screen_key.'_block_height', '.evo_content_tiles>div>.evo_content_tile { height: $setting_value$px }', array(
+			$this->dynamic_style_rule( $screen_key.'_block_height', '.evo_tiles>div>.evo_tile { height: $setting_value$px }', array(
 					'check' => 'not_empty'
 			) );
 			// Cover height:
-			$this->dynamic_style_rule( $screen_key.'_cover_height', '.evo_content_tiles .evo_content_tile_cover { height: $setting_value$px }', array(
+			$this->dynamic_style_rule( $screen_key.'_cover_height', '.evo_tiles .evo_tile_cover { height: $setting_value$px }', array(
 					'check' => 'not_empty'
 			) );
+
 			if( isset( $screen['min_width'] ) )
 			{	// End of @media screen wrapper:
 				$this->add_dynamic_style( ' }' );
 			}
 		}
+*/
 		// **** Posts List Settings / END ****
 
 		// **** Custom Settings / START ****

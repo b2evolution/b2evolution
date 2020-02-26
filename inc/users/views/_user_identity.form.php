@@ -333,10 +333,57 @@ if( $action != 'view' )
 			);
 	}
 
-	$Form->begin_line( T_('My age group'), 'edited_user_age_min' );
-		$Form->text( 'edited_user_age_min', $edited_User->age_min, 3, '' );
-		$Form->text( 'edited_user_age_max', $edited_User->age_max, 3, T_('to') );
-	$Form->end_line();
+	if( $Settings->get( 'self_selected_age_group' ) != 'hidden' )
+	{
+		$Form->begin_line( T_('My age group'), 'edited_user_age_min', '', array( 'required' => $Settings->get( 'self_selected_age_group' ) == 'required' ) );
+			$Form->text_input( 'edited_user_age_min', $edited_User->age_min, 3, '', '', array( 'required' => $Settings->get( 'self_selected_age_group' ) == 'required', 'input_suffix' => ' '.T_('to').' ' ) );
+			$Form->text_input( 'edited_user_age_max', $edited_User->age_max, 3, '', '', array( 'required' => $Settings->get( 'self_selected_age_group' ) == 'required' ) );
+		$Form->end_line();
+	}
+
+	if( $Settings->get( 'birthday_year' ) != 'hidden' || $Settings->get( 'birthday_month') != 'hidden' || $Settings->get( 'birthday_day') != 'hidden' )
+	{
+		$Form->begin_line( T_('Birthday'), 'edited_user_birthday_month', '', array( 'required' => ( $Settings->get( 'birthday_year' ) == 'required' || $Settings->get( 'birthday_month') == 'required' || $Settings->get( 'birthday_day') == 'required' ) ) );
+			if( $Settings->get( 'birthday_month' ) != 'hidden' )
+			{
+				global $month;
+				$birthday_months = array();
+				if( $Settings->get( 'birthday_month' ) == 'optional' )
+				{
+					$birthday_months[NULL] = '---';
+				}
+				foreach( $month as $key => $value )
+				{
+					if( $key == '00' )
+					{
+						continue;
+					}
+					$birthday_months[(int) $key] = $value;
+				}
+				$Form->select_input_array( 'edited_user_birthday_month', $edited_User->birthday_month, $birthday_months, '', '', array( 'force_keys_as_values' => true ) );
+			}
+
+			if( $Settings->get( 'birthday_day' ) != 'hidden' )
+			{
+				$birthday_days = range( 1, 31 );
+				if( $Settings->get( 'birthday_day' ) == 'optional' )
+				{
+					$birthday_days = array( NULL => '---' ) + $birthday_days;
+				}
+				$Form->select_input_array( 'edited_user_birthday_day', $edited_User->birthday_day, $birthday_days, '' );
+			}
+
+			if( $Settings->get( 'birthday_year' ) != 'hidden' )
+			{
+				$birthday_years = range( (int) date( 'Y' ), 1900, -1 );
+				if( $Settings->get( 'birthday_year' ) == 'optional' )
+				{
+					$birthday_years = array( NULL => '---' ) + $birthday_years;
+				}
+				$Form->select_input_array( 'edited_user_birthday_year', $edited_User->birthday_year, $birthday_years, '' );
+			}
+		$Form->end_line();
+	}
 
 	// Organization select fields:
 	$OrganizationCache = & get_OrganizationCache();

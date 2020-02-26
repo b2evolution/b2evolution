@@ -49,7 +49,7 @@ $registration_require_country = (bool)$Settings->get('registration_require_count
 // Check if firstname is required
 $registration_require_firstname = (bool)$Settings->get('registration_require_firstname');
 // Check if firstname is required (It can be required for quick registration by widget)
-$registration_require_lastname = false;
+$registration_require_lastname = (bool)$Settings->get('registration_require_lastname');
 // Check if nickname is required
 $registration_require_nickname = false;
 // Check if gender is required
@@ -70,7 +70,7 @@ $ignore_nickname = false;
 // Do not set gender:
 $ignore_gender = false;
 
-$login = param( $dummy_fields[ 'login' ], 'string', '' );
+$login = param( $dummy_fields[ 'login' ], 'string', NULL );
 $email = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
 param( 'action', 'string', '' );
 param( 'country', 'integer', '' );
@@ -372,55 +372,9 @@ switch( $action )
 
 		if( $is_quick && ! $Messages->has_errors() )
 		{	// Generate a login for quick registration:
-
-			if( ! empty( $firstname ) || ! empty( $lastname ) )
-			{ // Firstname or lastname given, let's use these:
-				$login = array();
-				if( ! empty( $firstname ) )
-				{
-					$login[] = trim( $firstname );
-				}
-				if( ! empty( $lastname ) )
-				{
-					$login[] = trim( $lastname );
-				}
-				$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( implode( '.', $login ) ) );
-				$login = generate_login_from_string( $login );
-			}
-			elseif( ! empty( $email ) )
-			{ // Get the login from email address:
-				$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
-				$login = preg_replace( '/[\'"><@\s]/', '', $login );
-
-				if( strpos( $login, '.' ) )
-				{ // Get only the part before the "." if it has one
-					$temp_login = $login;
-					$login = substr( $login, 0, strpos( $login, '.' ) );
-					$login = generate_login_from_string( $login );
-
-					if( empty( $login ) )
-					{ // Resulting login empty, use full email address
-						$login = generate_login_from_string( $temp_login );
-					}
-				}
-				else
-				{
-					$login = generate_login_from_string( $login );
-				}
-			}
-			elseif( ! empty( $nickname ) )
-			{
-				$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( trim( $nickname ) ) );
-				$login = generate_login_from_string( $login );
-			}
-			else
-			{	// Nothing else to use as login, use random numbers:
-				$login = 'user_'.rand( 1, 999 );
-				$login = generate_login_from_string( $login );
-			}
+			$login = generate_login_from_register_info( $email, $firstname, $lastname, $nickname, true );
 		}
-
-		if( ! $is_quick )
+		if( ! $is_quick && ! is_null( $login ) )
 		{
 			// We want all logins to be lowercase to guarantee uniqueness regardless of the database case handling for UNIQUE indexes:
 			$login = utf8_strtolower( $login );
@@ -492,6 +446,10 @@ switch( $action )
 		$DB->begin();
 
 		$new_User = new User();
+		if( is_null( $login ) )
+		{
+			$login = generate_login_from_register_info( $email, $firstname, $lastname );
+		}
 		$new_User->set( 'login', $login );
 
 		if( ! empty( $widget_newsletters ) )

@@ -68,11 +68,10 @@ function filter_automation_users( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_automation_users',
 	'url_ignore' => 'step,results_aust_page',
-	'presets' => array(
-		'all'      => array( T_('All'), $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=users&amp;autm_ID='.$edited_Automation->ID ),
-		'finished' => array( T_('Finished'), $admin_url.'?ctrl=automations&amp;action=edit&amp;tab=users&amp;autm_ID='.$edited_Automation->ID.'&amp;step=finished' ),
-	)
 );
+
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=automations&amp;action=edit&amp;tab=users&amp;autm_ID='.$edited_Automation->ID );
+$Results->register_filter_preset( 'finished', T_('Finished'), '?ctrl=automations&amp;action=edit&amp;tab=users&amp;autm_ID='.$edited_Automation->ID.'&amp;step=finished' );
 
 $Results->cols[] = array(
 		'th'       => T_('User'),

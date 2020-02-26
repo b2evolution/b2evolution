@@ -369,6 +369,7 @@ function search_and_score_items( $search_term, $keywords, $quoted_parts, $exclud
 			'order'         => 'DESC',
 			'posts'         => 1000,
 			'post_ID_list'  => $exclude_posts,
+			'itemtype_usage'=> '-content-block,special',
 		);
 
 	if( ! empty( $authors ) && is_logged_in() )

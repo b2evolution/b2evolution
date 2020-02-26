@@ -65,15 +65,15 @@ $Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $Blog->ID );
 
 echo '<div class="filter_buttons">';
-	if( $ItemList->is_filtered() )
+	if( $ItemList->is_filtered() )   // NOTE: this works (contrary to UserList)
 	{	// TODO: style this better:
 		echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset" class="btn btn-warning" style="margin-right: 5px">';
-		echo get_icon( 'filter' ).' '.T_('Reset all filters!').'</a>';
+		echo get_icon( 'filter' ).' '.T_('Remove filters').'</a>';
 	}
 
 	$Form->button_input( array(
 			'tag'   => 'button',
-			'value' => get_icon( 'filter' ).' './* TRANS: Verb */ T_('Filter'),
+			'value' => get_icon( 'filter' ).' './* TRANS: Verb */ T_('Apply filters'),
 			'class' => 'search btn-info',
 		) );
 echo '</div>';

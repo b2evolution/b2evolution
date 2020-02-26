@@ -131,12 +131,22 @@ function create_default_data()
 
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
-	// erwin > When adding anything to the list below don't forget to update the params for the Social Links widget!
 	$DB->query( "
 		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
 		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
 						( 1, 'word',   'I like',        NULL, 'recommended', 'list',      '2',  '1', 'ilike',        'fa fa-thumbs-o-up' ),
 						( 1, 'word',   'I don\'t like', NULL, 'recommended', 'list',      '3',  '1', 'idontlike',    'fa fa-thumbs-o-down' ),
+						( 1, 'list',   'Industry',      'Energy, Utilities & Resources
+Financial Services
+Health Services
+Hospitality & Tourism
+Industrial Manufacturing
+Pharma & Life Sciences
+Public Sector
+Real Estate
+Retail & Consumer Goods
+Sports Business Advisory
+Technology, Media & Telecom',                     'recommended', 'allowed',   '4',  '1', 'industry',     'fa fa-industry' ),
 						( 2, 'email',  'MSN/Live IM',   NULL, 'optional',    'allowed',   '1',  '0', 'msnliveim',    NULL ),
 						( 2, 'word',   'Yahoo IM',      NULL, 'optional',    'allowed',   '2',  '0', 'yahooim',      'fa fa-yahoo' ),
 						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', 'aolaim',       NULL ),
@@ -151,10 +161,9 @@ function create_default_data()
 						( 3, 'phone',  'Home FAX',      NULL, 'optional',    'allowed',   '6',  '0', 'homefax',      'fa fa-fax' ),
 						( 4, 'url',    'Twitter',       NULL, 'recommended', 'forbidden', '1',  '0', 'twitter',      'fa fa-twitter' ),
 						( 4, 'url',    'Facebook',      NULL, 'recommended', 'forbidden', '2',  '0', 'facebook',     'fa fa-facebook' ),
-						( 4, 'url',    'Google Plus',   NULL, 'optional',    'forbidden', '3',  '0', 'googleplus',   'fa fa-google-plus fa-x-google-plus--nudge' ),
 						( 4, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '4',  '0', 'linkedin',     'fa fa-linkedin fa-x-linkedin--nudge' ),
 						( 4, 'url',    'GitHub',        NULL, 'optional',    'forbidden', '5',  '0', 'github',       'fa fa-github-alt' ),
-						( 4, 'url',    'Website',       NULL, 'recommended', 'allowed',   '6',  '0', 'website',      NULL ),
+						( 4, 'url',    'Website',       NULL, 'optional',    'allowed',   '6',  '0', 'website',      NULL ),
 						( 4, 'url',    'Blog',          NULL, 'optional',    'allowed',   '7',  '0', 'blog',         NULL ),
 						( 4, 'url',    'Myspace',       NULL, 'optional',    'forbidden', '8',  '0', 'myspace',      NULL ),
 						( 4, 'url',    'Flickr',        NULL, 'optional',    'forbidden', '9',  '0', 'flickr',       'fa fa-flickr' ),
@@ -220,13 +229,12 @@ function create_default_data()
 			'org_roles' => array( 'King of Spades' ),
 			'org_priorities' => array( 0 ),
 			'fields'    => array(
-					'Micro bio'   => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
-					'Website'     => 'http://b2evolution.net/',
-					'Twitter'     => 'https://twitter.com/b2evolution/',
-					'Facebook'    => 'https://www.facebook.com/b2evolution',
-					'Linkedin'    => 'https://www.linkedin.com/company/b2evolution-net',
-					'GitHub'      => 'https://github.com/b2evolution/b2evolution',
-					'Google Plus' => 'https://plus.google.com/+b2evolution/posts',
+					'microbio' => 'I am the demo administrator of this site.'."\n".'I love having so much power!',
+					'website'  => 'http://b2evolution.net/',
+					'twitter'  => 'https://twitter.com/b2evolution/',
+					'facebook' => 'https://www.facebook.com/b2evolution',
+					'linkedin' => 'https://www.linkedin.com/company/b2evolution-net',
+					'github'   => 'https://github.com/b2evolution/b2evolution',
 				)
 		) );
 	task_end();
@@ -251,7 +259,7 @@ function create_default_data()
 		);
 	$post_types[] = array(
 			'name'          => 'Recipe',
-			'template_name' => 'recipe',
+			'template_full' => 'recipe_content_full',
 		);
 	$post_types[] = array(
 			'name'           => 'Post with Custom Fields',
@@ -424,6 +432,7 @@ function create_default_data()
 			'name'                     => '',
 			'description'              => NULL,
 			'usage'                    => 'post',
+			'template_full'            => NULL,
 			'template_name'            => 'single',
 			'perm_level'               => 'standard',
 			'use_short_title'          => 'never',
@@ -1654,38 +1663,46 @@ function create_default_templates( $is_task = true )
 		// Item Info "info line" replacements:
 		'item_details_infoline_date' => array(
 			'name'     => 'Item Details: Posted on Date at Time',
+			'context'  => 'item_details',
 			'template' => '<span class="small text-muted">[flag_icon] Posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time]</span>',
 		),
 		'item_details_infoline_standard' => array(
 			'name'     => 'Item Details: Posted by Author on Date at Time in Categories',
+			'context'  => 'item_details',
 			'template' => '<span class="small text-muted">[flag_icon] Posted by [author] on [issue_time|time_format=#extended_date] in [categories]</span>',
 		),
 		'item_details_infoline_long' => array(
 			'name'     => 'Item Details: Long info line',
-			'template' => '<span class="small text-muted">[flag_icon] [permalink|text=#linkicon] Posted by [author] on [issue_date|date_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [contents_last_updated][refresh_contents_last_updated_link] [edit_link]</span>',
+			'context'  => 'item_details',
+			'template' => '<span class="small text-muted">[flag_icon] [Item:permalink|text=#linkicon] Posted by [author] on [issue_date|date_format=#extended_date] at [issue_time|time_format=#short_time] in [categories] — Last touched: [last_touched] — Last Updated: [contents_last_updated][refresh_contents_last_updated_link] [edit_link]</span>',
 		),
 		'item_details_infoline_forums' => array(
 			'name'     => 'Item Details: Thread last updated on Date',
-			'template' => '<span class="small text-muted">[flag_icon] Thread last updated on [contents_last_updated|format=#extended_date] at [contents_last_updated|format=#short_time] [refresh_contents_last_updated_link]',
+			'context'  => 'item_details',
+			'template' => '<span class="small text-muted">[flag_icon] Thread last updated on [contents_last_updated|format=#extended_date] at [contents_last_updated|format=#short_time] [refresh_contents_last_updated_link]</span>',
 		),
 
 		// Item info New :
 		'item_details_feedback_link' => array(
 			'name'     => 'Item Details: Comment Link',
+			'context'  => 'item_details',
 			'template' => '<nav class="post_comments_link">[feedback_link]</nav>'
 		),
 
 		// Item Info "Small print" replacements:
 		'item_details_smallprint_standard' => array(
 			'name'     => 'Item Details: Small Print: Standard',
+			'context'  => 'item_details',
 			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] This entry was posted by [author|link_text=preferredname] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
 		),
 		'item_details_smallprint_long' => array(
 			'name'     => 'Item Details: Small Print: Long',
+			'context'  => 'item_details',
 			'template' => '[author|link_text=only_avatar|thumb_size=crop-top-32x32|link_class=leftmargin] [flag_icon] This entry was posted on [issue_time|time_format=#extended_date] at [issue_time|time_format=#short_time] by [author|link_text=preferredname] and filed under [categories].[tags|before= Tags: |after=.] [edit_link]'
 		),
 		'item_details_revisions' => array(
 			'name'     => 'Item Details: Small Print: Revisions',
+			'context'  => 'item_details',
 			'template' => 'Created by [author] &bull; Last edit by [lastedit_user] on [mod_date|date_format=#extended_date] &bull; [history_link] &bull; [propose_change_link]'
 		),
 
@@ -1693,6 +1710,7 @@ function create_default_templates( $is_task = true )
 		// Content List widget:
 		'content_list' => array(
 			'name'     => 'Content List',
+			'context'  => 'content_list_master',
 			'template' => '[set:before_list=<ul class="chapters_list posts_list">]
 [set:after_list=</ul>]
 [set:subcat_template=content_list_subcat]
@@ -1700,6 +1718,7 @@ function create_default_templates( $is_task = true )
 		),
 		'content_list_subcat' => array(
 			'name'     => 'Content List: Subcat',
+			'context'  => 'content_list_category',
 			'template' => '<li class="chapter">
 	<h3>[Cat:permalink|text=#expandicon+name|class=link]</h3>
 	<div class="evo_cat__description">[Cat:description]</div>
@@ -1707,50 +1726,184 @@ function create_default_templates( $is_task = true )
 		),
 		'content_list_item' => array(
 			'name'     => 'Content List: Item',
+			'context'  => 'content_list_item',
 			'template' => '<li>
 	<h3>[read_status] [Item:permalink|text=#fileicon+title|class=link] [flag_icon]</h3>[visibility_status]
-	<div class="evo_post__excerpt_text">[excerpt]</div>
+	[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
 </li>',
 		),
-		// Tiles style:
+
+
+		// Content Tiles style 1 (default):
 		'content_tiles' => array(
-			'name'     => 'Content Tiles',
-			'template' => '[set:before_list=<div class="evo_content_tiles row">]
+			'name'     => 'Content Tiles Style 1 (Fully clickable)',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="evo_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_subcat]
-[set:item_template=content_tiles_item]',
+[set:item_template=content_tiles_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
+[set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__hoverglow]
+[set:evo_tile_image__modifiers:]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers:evo_tile_text__gradient]
+',
 		),
+
 		'content_tiles_subcat' => array(
-			'name'     => 'Content Tiles: Subcat',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
-[Cat:permalink|text=]
-<div>
-	<div class="evo_content_tile_cover" style="background-image:url([Cat:image_url])"></div>
-	<div class="evo_content_tile_text">
-		<h3>[Cat:name]</h3>
-		<div>[Cat:description]</div>
+			'name'     => 'Content Tiles Style 1 (Fully clickable): Subcat',
+			'context'  => 'content_list_category',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Cat:name]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
+			</div>
+		</div>
+		[Cat:permalink|text=]
 	</div>
-</div>
-</div></div>',
+</div>',
 		),
+
 		'content_tiles_item' => array(
-			'name'     => 'Content Tiles: Item',
-			'template' => '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4"><div class="evo_content_tile">
-[Item:permalink|text=]
-<div>
-	<div class="evo_content_tile_cover" style="background-image:url([Item:image_url])">[Item:cat_name]</div>
-	<div class="evo_content_tile_text">
-		<h3>[Item:title]</h3>
-		<div>[Item:excerpt|excerpt_more_text=]</div>
+			'name'     => 'Content Tiles Style 1 (Fully clickable): Item',
+			'context'  => 'content_list_item',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Item:images|restrict_to_image_position=#cover_and_teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=|placeholder=#file_text_icon]
+				<div class="evo_tile_overlay">[Item:cat_name]</div>
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Item:title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
+			</div>
+		</div>
+		[Item:permalink|text=]
 	</div>
-</div>
-</div></div>',
+</div>',
+		),
+
+
+		// Tiles style 2:
+		'content_tiles_btn' => array(
+			'name'     => 'Content Tiles Style 2 (Button)',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_btn_subcat]
+[set:item_template=content_tiles_btn_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
+[set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__shadow]
+[set:evo_tile_image__modifiers:evo_tile_image__margin]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers:evo_tile_text__gradient]',
+		),
+
+		'content_tiles_btn_subcat' => array(
+			'name'     => 'Content Tiles Style 2 (Button): Subcat',
+			'context'  => 'content_list_category',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Cat:permalink|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
+				[Cat:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+		'content_tiles_btn_item' => array(
+			'name'     => 'Content Tiles Style 2 (Button): Item',
+			'context'  => 'content_list_item',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
+				[Item:images|restrict_to_image_position=#cover_and_teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=single|placeholder=#file_text_icon]
+				<div class="evo_tile_overlay">[Item:cat_name]</div>
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
+				[Item:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+
+		// Tiles style 3 (BG image:Experimental):
+		'content_tiles_bgimg' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental)',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_bgimg_subcat]
+[set:item_template=content_tiles_bgimg_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
+[set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__square evo_tile__shadow]
+[set:evo_tile_image__modifiers:]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers:evo_tile_text__gradient]',
+		),
+
+		'content_tiles_bgimg_subcat' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental): Subcat',
+			'context'  => 'content_list_category',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_cover" style="[Cat:background_image_css|size=fit-400x320|size_2x=fit-720x500]"></div>
+			<div class="evo_tile_body">
+				<h3>[Cat:permalink|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Cat:description]</div>
+				[Cat:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
+		),
+
+		'content_tiles_bgimg_item' => array(
+			'name'     => 'Content Tiles Style 3 (BG image:Experimental): Item',
+			'context'  => 'content_list_item',
+			'template' => '<div class="[echo:rwd_cols]">
+	<div class="evo_tile [echo:evo_tile__modifiers]">
+		<div class="hide_overflow">
+			<div class="evo_tile_cover" style="[Item:background_image_css|size=fit-400x320|size_2x=fit-720x500]">
+				<div class="evo_tile_overlay">[Item:cat_name]</div>
+			</div>
+			<div class="evo_tile_body">
+				<h3>[Item:permalink|text=#title|class=evo_tile_title]</h3>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
+				[Item:permalink|text=#view+arrow|class=evo_tile_more btn btn-sm btn-default]
+			</div>
+		</div>
+	</div>
+</div>',
 		),
 
 
 		// Content Blocks:
 		'cblock_clearfix' => array(
 			'name'     => 'Include Content Block: with clearfix',
+			'context'  => 'content_block',
 			'template' => '<div class="evo_content_block clearfix [echo:content_block_class]">
 	[Item:images|restrict_to_image_position=#teaser_all|before=<div class="evo_cblock_images evo_cblock_teaser">|after=</div>]
 	<div class="evo_cblock_text">
@@ -1761,6 +1914,7 @@ function create_default_templates( $is_task = true )
 		),
 		'cblock_noclearfix' => array(
 			'name'     => 'Include Content Block: without clearfix',
+			'context'  => 'content_block',
 			'template' => '<div class="evo_content_block [echo:content_block_class]">
 	[Item:images|restrict_to_image_position=#teaser_all|before=<div class="evo_cblock_images evo_cblock_teaser">|after=</div>]
 	<div class="evo_cblock_text">
@@ -1769,9 +1923,75 @@ function create_default_templates( $is_task = true )
 	[Item:images|restrict_to_image_position=aftermore|before=<div class="evo_cblock_images evo_cblock_aftermore">|after=</div>]
 </div>',
 		),
+
+		// Item Contents:
+		'item_content_excerpt' => array(
+			'name' => 'Item Excerpt',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__excerpt">
+[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
+</section>',
+		),
+		'item_content_teaser' => array(
+			'name' => 'Item Teaser content',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__full">
+[Item:images|restrict_to_image_position=#teaser_all|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+<div class="evo_post__full_text clearfix">
+	[Item:content_teaser]
+	[Item:more_link|link_text=Read more &raquo;]
+</div>
+</section>',
+		),
+		'item_content_full' => array(
+			'name' => 'Item Full content',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__full">
+[Item:images|restrict_to_image_position=#teaser_all|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+<div class="evo_post__full_text clearfix">
+	[Item:content_teaser]
+	[Item:more_link|anchor_text=]
+	[Item:images|restrict_to_image_position=aftermore|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+	[Item:content_extension]
+	[Item:page_links]
+	[Item:footer]
+</div>
+</section>',
+		),
+		'recipe_content_full' => array(
+			'name' => 'Recipe Full content',
+			'context'  => 'item_content',
+			'template' => '<section class="evo_post__full">
+<div class="row">
+	<div class="col-sm-5">
+		[Item:images|restrict_to_image_position=#cover_and_teaser_all|image_size=crop-320x320|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+	</div>
+	<div class="col-sm-7">
+		[Item:content_teaser]
+		[Item:tags|before=<nav class="small post_tags">|after=</nav>|separator= ]
+		[Item:custom_fields|fields=course,cuisine,servings|custom_fields_table_start=|custom_fields_row_start=<div class="row"$row_attrs$>|custom_fields_row_header_field=<div class="col-xs-3 $header_cell_class$"><b>$field_title$$field_description_icon$</b></div>|custom_fields_description_icon_class=grey|custom_fields_value_default=<div class="col-xs-9 $data_cell_class$"$data_cell_attrs$>$field_value$</div>|custom_fields_row_end=</div>|custom_fields_table_end=]
+		[Item:custom_fields|fields=prep_time,cook_time,passive_time,total_time|custom_fields_table_start=<br /><div class="row">|custom_fields_row_start=<span$row_attrs$>|custom_fields_row_header_field=<div class="col-sm-3 col-xs-6 $header_cell_class$"><b>$field_title$$field_description_icon$</b>|custom_fields_description_icon_class=grey|custom_fields_value_default=<br /><span class="$data_cell_class$"$data_cell_attrs$>$field_value$</span></div>|custom_fields_row_end=</span>|custom_fields_table_end=</div>|hide_empty_lines=1]
+	</div>
+</div>
+<div class="row">
+	<div class="col-lg-3 col-sm-4">
+		<h4>[Item:custom_field_title|field=ingredients]</h4>
+		<p>[Item:custom_field_formatted|field=ingredients]</p>
+	</div>
+	<div class="col-lg-9 col-sm-8">
+		<h4>Directions</h4>
+		[Item:content_extension]
+		[Item:page_links]
+		[Item:footer]
+		[Item:feedback_link]
+	</div>
+</div>
+</section>',
+		),
 /*
 		'cblock_imgleft_textright' => array(
 			'name'     => 'Include Content Block: Images Left / Text Right',
+			'context'  => 'content_block',
 			'template' => '<div class="evo_content_block [cb_class]">
 	<img src="[teaser_image]" class="floatleft">
 	<div class="evo_content_block_text">
@@ -1781,6 +2001,7 @@ function create_default_templates( $is_task = true )
 		),
 		'cblock_textleft_imgright' => array(
 			'name'     => 'Include Content Block: Text Left / Images Right',
+			'context'  => 'content_block',
 			'template' => '<div class="evo_content_block [cb_class]">
 	<img src="[teaser_image]" class="floatright">
 	<div class="evo_content_block_text">
@@ -1789,18 +2010,46 @@ function create_default_templates( $is_task = true )
 </div>',
 		),
 */
+
+		// Registration Templates:
+		'registration_standard' => array(
+			'name'     => 'Registration: Standard',
+			'context'  => 'registration',
+			'template' => '[Form:login]
+[Form:password]
+[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+<div class="evo_register_buttons">
+	[Form:submit|name=register|class=btn btn-primary btn-lg|value=Register my account now!]
+	<br>
+	[Link:disp|disp=login|class=btn btn-default|text=Already have an account... ?]
+</div>',
+		),
+
+		'registration_ask_name' => array(
+			'name'     => 'Registration: Ask for Name',
+			'context'  => 'registration',
+			'template' => '[Form:firstname]
+[Form:lastname]
+[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+[Form:password]
+<div class="evo_register_buttons">
+	[Form:submit|name=register|class=btn btn-primary btn-lg|value=Register my account now!]
+	<br>
+	[Link:disp|disp=login|class=btn btn-default|text=Already have an account... ?]
+</div>'
+		),
 	);
 
 	$templates_sql = array();
 	foreach( $templates as $code => $template )
 	{
-		$templates_sql[] = '( '.$DB->quote( $template['name'] ).', '.$DB->quote( $code ).', '.$DB->quote( $template['template'] ).' )';
+		$templates_sql[] = '( '.$DB->quote( $template['name'] ).', '.$DB->quote( $code ).', '.$DB->quote( $template['context'] ).', '.$DB->quote( $template['template'] ).' )';
 	}
 
 	// Insert/Update templates:
-	$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_template_code )
+	$DB->query( 'INSERT INTO T_templates ( tpl_name, tpl_code, tpl_context, tpl_template_code )
 		VALUES '.implode( ', ', $templates_sql ).'
-		ON DUPLICATE KEY UPDATE tpl_name = VALUES( tpl_name ), tpl_template_code = VALUES( tpl_template_code )',
+		ON DUPLICATE KEY UPDATE tpl_name = VALUES( tpl_name ), tpl_context = VALUES( tpl_context ), tpl_template_code = VALUES( tpl_template_code )',
 		'Creating/Updating default templates' );
 
 	if( $is_task )

@@ -7,7 +7,7 @@
  *
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package admin
  */
@@ -58,11 +58,8 @@ switch( $action )
 		break;
 
 	case 'copy':
-		// Set parent menu:
-		if( isset( $menu_ID ) && empty( $edited_SiteMenu->parent_ID ) )
-		{
-			$edited_SiteMenu->set( 'parent_ID', $menu_ID );
-		}
+		// Do not set "translation of" value:
+		$edited_SiteMenu->set( 'translates_menu_ID', NULL );
 	case 'edit':
 		// Menu edit form:
 		// Make sure we got a menu_ID:
@@ -229,7 +226,7 @@ switch( $action )
 			header_redirect( $admin_url.'?ctrl=menus&action=edit&menu_ID='.$edited_SiteMenuEntry->get( 'menu_ID' ) ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
-		$action = 'edit';
+		$action = 'edit_entry';
 		break;
 
 	case 'delete_entry':

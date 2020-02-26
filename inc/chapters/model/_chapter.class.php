@@ -756,6 +756,14 @@ class Chapter extends DataObject
 			case '#expandicon+name':
 				$text = get_icon( 'expand' ).format_to_output( $this->get( 'name' ) );
 				break;
+
+			case '#open+arrow':
+				$text = T_('Open').' &raquo;';
+				break;
+
+			case '#view+arrow':
+				$text = T_('View').' &raquo;';
+				break;
 		}
 
 		$title = $params['title'];
@@ -976,10 +984,35 @@ class Chapter extends DataObject
 
 
 	/**
-	 * Get URL of category's image
+	 * Get File of a first found image by positions
+	 *
+	 * @return object|NULL File
+	 */
+	function & get_image_File()
+	{
+		// Try to get a file by ID:
+		$FileCache = & get_FileCache();
+		if( ! ( $cat_image_File = & $FileCache->get_by_ID( $this->get( 'image_file_ID' ), false, false ) ) )
+		{	// This chapter has no image file or it is broken:
+			$r = NULL;
+			return $r;
+		}
+
+		if( ! $cat_image_File->is_image() )
+		{	// The file must be an image:
+			$r = NULL;
+			return $r;
+		}
+
+		return $cat_image_File;
+	}
+
+
+	/**
+	 * Get URL of a first found image by positions
 	 *
 	 * @param array Parameters
-	 * @return string|NULL cover URL or NULL if it doesn't exist
+	 * @return string|NULL Image URL or NULL if it doesn't exist
 	 */
 	function get_image_url( $params = array() )
 	{
@@ -987,22 +1020,13 @@ class Chapter extends DataObject
 				'size' => 'original',
 			), $params );
 
-		// Try to get a file by ID:
-		$FileCache = & get_FileCache();
-		if( ! ( $cat_image_File = & $FileCache->get_by_ID( $this->get( 'image_file_ID' ), false, false ) ) )
-		{	// This chapter has no image file or it is broken:
-			return NULL;
-		}
-
-		if( ! $cat_image_File->is_image() )
-		{	// The file must be an image:
+		if( ! ( $image_File = & $this->get_image_File() ) )
+		{	// Wrong image file:
 			return NULL;
 		}
 
 		// Get image URL for requested size:
-		$img_attribs = $cat_image_File->get_img_attribs( $params['size'] );
-
-		return $img_attribs['src'];
+		$img_attribs = $image_File->get_img_attribs( $params['size'] );
 	}
 
 
@@ -1015,37 +1039,47 @@ class Chapter extends DataObject
 	function get_image_tag( $params = array() )
 	{
 		$params = array_merge( array(
-				'before'        => '', // HTML code before image tag
-				'before_legend' => '', // HTML code before image legeng(info under image tag image desc is not empty)
-				'after_legend'  => '', // HTML code after image legeng
-				'after'         => '', // HTML code after image tag
+				'before'        => '',		// HTML code before image tag
+				'before_legend' => '',		// HTML code before image legeng(info under image tag image desc is not empty)
+				'after_legend'  => '',		// HTML code after image legeng
+				'after'         => '',		// HTML code after image tag
 				'size'          => 'crop-48x48', // Image thumbnail size
-				'link_to'       => '', // Url for a link, Use 'original' for full image file url, Empty value to don't make a link
+				'sizes'         => NULL,	// simplified sizes= attribute for browser to select correct size from srcset=. Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
+				'link_to'       => '',		// URL for a link ; '#category_url' for category URL ; 'original' for full image file url ; Empty for no link
 				'link_title'    => $this->get( 'description' ), // Title of the link, can be text or #title# or #desc#
-				'link_rel'      => '', // Value for attribute "rel", usefull for jQuery libraries selecting on rel='...', e-g: 'lightbox[cat'.$this->ID.']'
-				'class'         => '', // Image class
-				'align'         => '', // Image align
+				'link_rel'      => '',		// Value for attribute "rel", usefull for jQuery libraries selecting on rel='...', e-g: 'lightbox[cat'.$this->ID.']'
+				'class'         => '',		// Image class
+				'align'         => '',		// Image align
 				'alt'           => $this->get( 'name' ), // Image alt
-				'desc'          => '#', // Image description, used in legeng under image tag, '#' - use current description of the file
-				'size_x'        => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
-				'tag_size'      => NULL, // Override "width" & "height" attributes on img tag. Allows to increase pixel density for retina/HDPI screens.
-				                         // Example: ( $tag_size = '160' ) => width="160" height="160"
-				                         // ( $tag_size = '160x320' ) => width="160" height="320"
-				                         // NULL - use size defined by the thumbnail
-				                         // 'none' - don't use attributes "width" & "height"
+				'desc'          => '#',		// Image description, used in legeng under image tag, '#' - use current description of the file
+				'size_x'        => 1,		// Use '2' to build 2x sized thumbnail that can be used for Retina display
+				'tag_size'      => NULL,	// Override "width" & "height" attributes on img tag. Allows to increase pixel density for retina/HDPI screens.
+				                         	// Example: ( $tag_size = '160' ) => width="160" height="160"
+				                         	// ( $tag_size = '160x320' ) => width="160" height="320"
+				                         	// NULL - use size defined by the thumbnail
+				                         	// 'none' - don't use attributes "width" & "height"
+				'placeholder'   => '',		// HTML to be displayed if no image; possible codes: #folder_icon
 			), $params );
 
 		// Try to get a file by ID:
 		$FileCache = & get_FileCache();
 		$cat_image_File = & $FileCache->get_by_ID( $this->get( 'image_file_ID' ), false, false );
-		if( ! $cat_image_File )
-		{	// This chapter has no image file or it is broken:
-			return '';
+		if( ! $cat_image_File // This chapter has no image file or it is broken
+			|| ! $cat_image_File->is_image() ) // The file is NOT an image
+		{	// Display placeholder:
+			$placeholder_html = $params['placeholder'];
+			switch( $placeholder_html )
+			{
+				case '#folder_icon';
+					$placeholder_html = '<div class="evo_image_block evo_img_placeholder"><a href="$url$" class="evo_img_placeholder"><i class="fa fa-folder-o"></i></a></div>';
+					break;
+			}
+			return str_replace( '$url$', $this->get_permanent_url(), $placeholder_html );
 		}
 
-		if( ! $cat_image_File->is_image() )
-		{	// The file must be an image:
-			return '';
+		if( $params['link_to'] == '#category_url' )
+		{	// We want to link to the category URL:
+			$params['link_to'] = $this->get_permanent_url();
 		}
 
 		return $cat_image_File->get_tag( $params['before'],
@@ -1062,7 +1096,33 @@ class Chapter extends DataObject
 				$params['desc'],
 				'',
 				$params['size_x'],
-				$params['tag_size'] );
+				$params['tag_size'],
+				'',
+				true,
+				$params['sizes'] );
+	}
+
+
+	/**
+	 * Get CSS property for background with image of this Item
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_background_image_css( $params = array() )
+	{
+		$params = array_merge( array(
+				'position' => '#cover_and_teaser_all',
+				'size'     => 'fit-1280x720',
+				'size_2x'  => 'fit-2560x1440',
+			), $params );
+
+		if( ! ( $image_File = & $this->get_image_File( $params ) ) )
+		{	// Don't provide css for wrong image file:
+			return '';
+		}
+
+		return $image_File->get_background_image_css( $params );
 	}
 
 

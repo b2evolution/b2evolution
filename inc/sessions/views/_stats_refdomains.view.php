@@ -111,11 +111,6 @@ $count_SQL->WHERE( $SQL->get_where( '' ) );
 
 $Results = new Results( $SQL->get(), 'refdom_', '---D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 
-if( $list_is_filtered )
-{ // List is filtered, offer option to reset filters:
-	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=stats&amp;tab=domains&amp;tab3='.$tab3.( empty( $blog ) ? '' : '&amp;blog='.$blog ), T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
-
 if( $current_User->check_perm( 'stats', 'edit' ) )
 { // Current user has a permission to create new domain
 	global $tab_from;
@@ -155,18 +150,16 @@ else
 }
 
 $Results->filter_area = array(
-	'callback' => 'filter_basedomains',
-	'url_ignore' => 'results_refdom_page,dtyp_normal,dtyp_searcheng,dtyp_aggregator,dtyp_unknown',	// ignore page param and checkboxes
-	'presets' => array(
-			'browser' => array( T_('Regular'), $current_url.'&amp;dtyp_normal=1' ),
-			'robot'   => array( T_('Search engines'), $current_url.'&amp;dtyp_searcheng=1' ),
-			'rss'     => array( T_('Aggregators'), $current_url.'&amp;dtyp_aggregator=1' ),
-			'email'   => array( T_('Email'), $current_url.'&amp;dtyp_email=1' ),
-			'unknown' => array( T_('Unknown'), $current_url.'&amp;dtyp_unknown=1' ),
-			'all'     => array( T_('All'), $current_url ),
-		)
+		'callback' => 'filter_basedomains',
+		'url_ignore' => 'results_refdom_page,dtyp_normal,dtyp_searcheng,dtyp_aggregator,dtyp_unknown',	// ignore page param and checkboxes
 	);
 
+$Results->register_filter_preset( 'all', T_('All'), $current_url );
+$Results->register_filter_preset( 'browser', T_('Regular'), $current_url.'&amp;dtyp_normal=1' );
+$Results->register_filter_preset( 'robot', T_('Search engines'), $current_url.'&amp;dtyp_searcheng=1' );
+$Results->register_filter_preset( 'rss', T_('Aggregators'), $current_url.'&amp;dtyp_aggregator=1' );
+$Results->register_filter_preset( 'email', T_('Email'), $current_url.'&amp;dtyp_email=1' );
+$Results->register_filter_preset( 'unknown', T_('Unknown'), $current_url.'&amp;dtyp_unknown=1');
 
 $Results->title = $page_title.get_manual_link('referring-domains-tab');
 

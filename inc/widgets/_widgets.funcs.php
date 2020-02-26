@@ -17,6 +17,7 @@
  */
 if( !defined('EVO_CONFIG_LOADED') ) die( 'Please, do not access this page directly.' );
 
+load_class( '_core/ui/_table.class.php', 'Table' );
 
 /**
  * Get config array of default widgets for install, upgrade and new collections
@@ -53,85 +54,84 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Header */
 	$default_widgets['header'] = array(
-		array( 1, 'coll_title' ),
-		array( 2, 'coll_tagline' ),
+		array( 1, 15000, 'coll_title' ),
+		array( 2, 15000, 'coll_tagline' ),
 	);
 
 	/* Menu */
 	$default_widgets['menu'] = array(
 		'coll_type' => '-main', // Don't add widgets to Menu container for Main collections
-		array(  5, 'basic_menu_link', 'coll_type' => '-minisite', 'params' => array( 'link_type' => 'home' ) ),
-		array(  7, 'mustread_menu_link', 'is_pro' => true, 'coll_type' => '-main,minisite' ),
-		array(  8, 'flag_menu_link', 'coll_type' => 'forum,group', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged topics') ) ),
-		array(  8, 'flag_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged pages') ) ),
-		array( 10, 'basic_menu_link', 'coll_ID' => $blog_b_ID, 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) ),
-		array( 13, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) ),
-		array( 15, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) ),
-		array( 13, 'basic_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) ),
-		array( 15, 'basic_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) ),
-		array( 18, 'basic_menu_link', 'coll_type' => 'photo', 'params' => array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) ),
-		array( 20, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'users' ) ),
-		array( 21, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'visits' ) ),
-		array( 25, 'coll_page_list' ),
-		array( 30, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'myprofile' ), 'enabled' => 0 ),
-		array( 33, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'catdir' ) ),
-		array( 35, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'arcdir' ) ),
-		array( 37, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'latestcomments' ) ),
-		array( 50, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ), 'enabled' => 0 ),
-		array( 60, 'basic_menu_link', 'params' => array( 'link_type' => 'ownercontact', 'show_badge' => 0 ), 'enabled' => ( $kind == 'minisite' ) ),
-		array( 70, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ), 'enabled' => 0 ),
-		array( 80, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'register' ) ),
+		array(  5, 15000, 'basic_menu_link', 'coll_type' => '-minisite', 'params' => array( 'link_type' => 'home' ) ),
+		array(  7, 15000, 'mustread_menu_link', 'is_pro' => true, 'coll_type' => '-main,minisite' ),
+		array(  8, 15000, 'flag_menu_link', 'coll_type' => 'forum,group', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged topics') ) ),
+		array(  8, 15000, 'flag_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Flagged pages') ) ),
+		array( 10, 15000, 'basic_menu_link', 'coll_ID' => $blog_b_ID, 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('News') ) ),
+		array( 13, 15000, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest topics') ) ),
+		array( 15, 15000, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest replies') ) ),
+		array( 13, 15000, 'basic_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'recentposts', 'link_text' => T_('Latest pages') ) ),
+		array( 15, 15000, 'basic_menu_link', 'coll_type' => 'manual', 'params' => array( 'link_type' => 'latestcomments', 'link_text' => T_('Latest comments') ) ),
+		array( 18, 15000, 'basic_menu_link', 'coll_type' => 'photo', 'params' => array( 'link_type' => 'mediaidx', 'link_text' => T_('Index') ) ),
+		array( 20, 15000, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'users' ) ),
+		array( 21, 15000, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'visits' ) ),
+		array( 25, 15000, 'coll_page_list' ),
+		array( 30, 15000, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'myprofile' ), 'enabled' => 0 ),
+		array( 33, 15000, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'catdir' ) ),
+		array( 35, 15000, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'arcdir' ) ),
+		array( 37, 15000, 'basic_menu_link', 'coll_type' => 'std', 'params' => array( 'link_type' => 'latestcomments' ) ),
+		array( 50, 15000, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ), 'enabled' => 0 ),
+		array( 60, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'ownercontact', 'show_badge' => 0 ), 'enabled' => ( $kind == 'minisite' ) ),
+		array( 70, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ), 'enabled' => 0 ),
+		array( 80, 15000, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'register' ) ),
 	);
 
 	/* Item List */
 	$default_widgets['item_list'] = array(
-		array( 10, 'coll_item_list_pages' ),
+		array( 10, 15190, 'coll_item_list_pages' ),
 	);
 
 	/* Item in List */
 	$default_widgets['item_in_list'] = array(
-		array( 10, 'item_title' ),
-		array( 20, 'item_visibility_badge', 'coll_type' => '-manual' ),
-		array( 30, 'item_info_line', 'coll_type' => '-manual', 'unique' => true ),
-		array( 40, 'item_content', 'unique' => true ),
-		array( 50, 'item_info_line', 'coll_type' => '-manual,forum', 'params' => array( 'template' => 'item_details_feedback_link' ) ),
+		array( 10, 15190, 'item_title' ),
+		array( 20, 15190, 'item_visibility_badge', 'coll_type' => '-manual' ),
+		array( 30, 15190, 'item_info_line', 'coll_type' => '-manual' ),
+		array( 40, 15720, 'item_content' ),
+		array( 50, 15760, 'item_info_line', 'coll_type' => '-manual,forum', 'params' => array( 'template' => 'item_details_feedback_link' ) ),
 	);
 
 	/* Item Single Header */
 	$default_widgets['item_single_header'] = array(
-		array(  4, 'item_next_previous', 'coll_type' => '-manual,minisite' ),
-		array(  5, 'item_title' ),
-		array( 10, 'item_info_line', 'coll_type' => 'forum,group', 'params' => array( 'template' => 'item_details_infoline_forums' ) ),
-		array( 20, 'item_tags', 'coll_type' => 'forum,group' ),
-		array( 30, 'item_seen_by', 'coll_type' => 'forum,group' ),
-		array(  8, 'item_visibility_badge', 'coll_type' => '-manual,forum,group' ),
-		array( 10, 'item_info_line', 'coll_type' => '-manual,forum,group' ),
+		array(  4, 15190, 'item_next_previous', 'coll_type' => '-manual,minisite' ),
+		array(  5, 15190, 'item_title' ),
+		array( 10, 15000, 'item_info_line', 'coll_type' => 'forum,group', 'params' => array( 'template' => 'item_details_infoline_forums' ) ),
+		array( 20, 15000, 'item_tags', 'coll_type' => 'forum,group' ),
+		array( 30, 15000, 'item_seen_by', 'coll_type' => 'forum,group' ),
+		array(  8, 15190, 'item_visibility_badge', 'coll_type' => '-manual,forum,group' ),
+		array( 10, 15000, 'item_info_line', 'coll_type' => '-manual,forum,group' ),
 	);
 
 	/* Item Single */
 	$default_widgets['item_single'] = array(
-		array(  4, 'breadcrumb_path', 'coll_type' => 'manual' ),
-		array(  5, 'item_visibility_badge', 'coll_type' => 'manual' ),
-		array(  7, 'item_title', 'coll_type' => 'manual' ),
-		array( 10, 'item_content' ),
-		array( 15, 'item_attachments', 'coll_type' => '-manual' ),
-		array( 17, 'item_link', 'coll_type' => '-manual' ),
-		array( 18, 'item_workflow', 'coll_type' => 'photo' ),
-		array( 20, 'item_tags', 'coll_type' => '-forum,group,manual', 'coll_ID' => '-'.$blog_a_ID.','.$events_blog_ID ),
-		array( 25, 'item_about_author', 'coll_ID' => $blog_b_ID ),
-		array( 30, 'evo_Gmaps', 'coll_ID' => $blog_a_ID.','.$events_blog_ID, 'type' => 'plugin', 'install' => $install_test_features ),
-		array( 40, 'item_small_print', 'coll_ID' => $blog_a_ID, 'params' => array( 'template' => 'item_details_smallprint_standard' ) ),
-		array( 40, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'template' => 'item_details_revisions' ) ),
-		array( 50, 'item_seen_by', 'coll_type' => '-forum,group,manual' ),
-		array( 60, 'item_vote', 'coll_type' => '-forum,group,manual' ),
+		array(  4, 15590, 'breadcrumb_path', 'coll_type' => 'manual' ),
+		array(  5, 15190, 'item_visibility_badge', 'coll_type' => 'manual' ),
+		array(  7, 15190, 'item_title', 'coll_type' => 'manual' ),
+		array( 10, 15000, 'item_content' ),
+		array( 15, 15000, 'item_attachments', 'coll_type' => '-manual' ),
+		array( 17, 15000, 'item_link', 'coll_type' => '-manual' ),
+		array( 18, 15000, 'item_workflow', 'coll_type' => 'photo' ),
+		array( 20, 15000, 'item_tags', 'coll_type' => '-forum,group,manual', 'coll_ID' => '-'.$blog_a_ID.','.$events_blog_ID ),
+		array( 25, 15000, 'item_about_author', 'coll_ID' => $blog_b_ID ),
+		array( 40, 15000, 'item_small_print', 'coll_ID' => $blog_a_ID, 'params' => array( 'template' => 'item_details_smallprint_standard' ) ),
+		array( 40, 15000, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'template' => 'item_details_revisions' ) ),
+		array( 50, 15000, 'item_seen_by', 'coll_type' => '-forum,group,manual' ),
+		array( 60, 15000, 'item_vote', 'coll_type' => '-forum,group,manual' ),
 	);
 
 	/* Item Page */
 	$default_widgets['item_page'] = array(
-		array( 10, 'item_content' ),
-		array( 15, 'item_attachments' ),
-		array( 50, 'item_seen_by' ),
-		array( 60, 'item_vote', 'coll_type' => '-forum,group' ),
+		array( 10, 15000, 'item_content' ),
+		array( 15, 15000, 'item_attachments' ),
+		array( 50, 15000, 'item_seen_by' ),
+		array( 60, 15000, 'item_vote', 'coll_type' => '-forum,group' ),
 	);
 
 	/* Comment List */
@@ -139,41 +139,39 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Comment Area */
 	$default_widgets['comment_area'] = array(
-		array(  5, 'fin_contrib', 'coll_type' => 'forum', 'type' => 'plugin' ),
-		array( 10, 'item_comment_form' ),
-		array( 20, 'item_comment_notification' ),
-		array( 30, 'coll_item_notification' ),
-		array( 40, 'coll_comment_notification' ),
-		array( 50, 'item_comment_feed_link' ),
+		array(  5, 15300, 'fin_contrib', 'coll_type' => 'forum', 'type' => 'plugin' ),
+		array( 10, 15300, 'item_comment_form' ),
+		array( 20, 15300, 'item_comment_notification' ),
+		array( 30, 15300, 'coll_item_notification' ),
+		array( 40, 15300, 'coll_comment_notification' ),
+		array( 50, 15300, 'item_comment_feed_link' ),
 	);
 
 	/* Sidebar Single */
 	$default_widgets['sidebar_single'] = array(
-		array(  1, 'item_workflow', 'coll_type' => 'forum,group,manual' ),
-		array(  5, 'coll_related_post_list', 'coll_type' => 'forum' ),
-		array( 10, 'item_vote', 'coll_type' => 'manual' ),
-		array( 20, 'item_tags', 'coll_type' => 'manual' ),
-		array( 30, 'item_attachments', 'coll_type' => 'manual' ),
-		array( 40, 'item_link', 'coll_type' => 'manual' ),
-		array( 50, 'item_custom_fields', 'coll_type' => 'manual' ),
-		array( 60, 'item_seen_by', 'coll_type' => 'manual' ),
+		array(  1, 15000, 'item_workflow', 'coll_type' => 'forum,group,manual' ),
+		array(  5, 15000, 'coll_related_post_list', 'coll_type' => 'forum' ),
+		array( 10, 15000, 'item_vote', 'coll_type' => 'manual' ),
+		array( 20, 15000, 'item_tags', 'coll_type' => 'manual' ),
+		array( 30, 15000, 'item_attachments', 'coll_type' => 'manual' ),
+		array( 40, 15000, 'item_link', 'coll_type' => 'manual' ),
+		array( 50, 15000, 'item_custom_fields', 'coll_type' => 'manual' ),
+		array( 60, 15000, 'item_seen_by', 'coll_type' => 'manual' ),
 	);
 
 	/* Page Top */
 	$default_widgets['page_top'] = array(
-		array( 10, 'social_links', 'params' => array(
-				'link1'      => 16,
+		array( 10, 15000, 'social_links', 'params' => array(
+				'link1'      => 'twitter',
 				'link1_href' => 'https://twitter.com/b2evolution/',
-				'link2'      => 17,
+				'link2'      => 'facebook',
 				'link2_href' => 'https://www.facebook.com/b2evolution',
-				'link3'      => 18,
-				'link3_href' => 'https://plus.google.com/+b2evolution/posts',
-				'link4'      => 19,
-				'link4_href' => 'https://www.linkedin.com/company/b2evolution-net',
-				'link5'      => 20,
-				'link5_href' => 'https://github.com/b2evolution/b2evolution',
+				'link3'      => 'linkedin',
+				'link3_href' => 'https://www.linkedin.com/company/b2evolution-net',
+				'link4'      => 'github',
+				'link4_href' => 'https://github.com/b2evolution/b2evolution',
 			) ),
-		array( 20, 'coll_locale_switch' ),
+		array( 20, 15450, 'coll_locale_switch' ),
 	);
 
 	/* Sidebar */
@@ -181,8 +179,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	{
 		$default_widgets['sidebar'] = array(
 			'coll_type' => 'manual',
-			array( 10, 'coll_search_form', 'params' => array( 'title' => T_('Search this manual:') ) ),
-			array( 20, 'content_hierarchy' ),
+			array( 10, 15000, 'coll_search_form', 'params' => array( 'title' => T_('Search this manual:') ) ),
+			array( 20, 15000, 'content_hierarchy' ),
 		);
 	}
 	else
@@ -198,15 +196,15 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			$sidebar_type_ID = $DB->get_var( 'SELECT ityp_ID FROM T_items__type WHERE ityp_name = "Sidebar link"' );
 		}
 		$default_widgets['sidebar'] = array(
-			array(  5, 'coll_current_filters', 'coll_type' => '-forum', 'install' => $install_test_features ),
-			array( 10, 'user_login', 'install' => $install_test_features ),
-			array( 15, 'user_greetings', 'install' => $install_test_features ),
-			array( 20, 'user_profile_pics', 'install' => $install_not_forum ),
-			array( 30, 'evo_Calr', 'type' => 'plugin', 'install' => ( $install_not_forum && $blog_id > $blog_a_ID ) ),
-			array( 40, 'coll_longdesc', 'install' => $install_not_forum, 'params' => array( 'title' => '$title$' ) ),
-			array( 50, 'coll_search_form', 'install' => $install_not_forum ),
-			array( 60, 'coll_category_list', 'install' => $install_not_forum ),
-			array( 70, 'coll_item_list', 'coll_ID' => $blog_home_ID, 'install' => $install_not_forum, 'params' => array(
+			array(  5, 15000, 'coll_current_filters', 'coll_type' => '-forum', 'install' => $install_test_features ),
+			array( 10, 15000, 'user_login', 'install' => $install_test_features ),
+			array( 15, 15000, 'user_greetings', 'install' => $install_test_features ),
+			array( 20, 15000, 'user_profile_pics', 'install' => $install_not_forum ),
+			array( 30, 15000, 'evo_Calr', 'type' => 'plugin', 'install' => ( $install_not_forum && $blog_id > $blog_a_ID ) ),
+			array( 40, 15000, 'coll_longdesc', 'install' => $install_not_forum, 'params' => array( 'title' => '$title$' ) ),
+			array( 50, 15000, 'coll_search_form', 'install' => $install_not_forum ),
+			array( 60, 15000, 'coll_category_list', 'install' => $install_not_forum ),
+			array( 70, 15000, 'coll_item_list', 'coll_ID' => $blog_home_ID, 'install' => $install_not_forum, 'params' => array(
 					'title' => 'Advertisement (Demo)',
 					'item_type' => empty( $advertisement_type_ID ) ? '#' : $advertisement_type_ID,
 					'blog_ID' => $blog_id,
@@ -218,8 +216,8 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 					'item_pic_link_type' => 'linkto_url',
 					'thumb_size' => 'fit-160x160',
 				) ),
-			array( 80, 'coll_media_index', 'coll_ID' => '-'.$blog_b_ID, 'install' => $install_not_forum, 'params' => 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
-			array( 90, 'coll_item_list', 'coll_ID' => $blog_a_ID.','.$blog_b_ID, 'install' => $install_not_forum, 'params' => array(
+			array( 80, 15000, 'coll_media_index', 'coll_ID' => '-'.$blog_b_ID, 'install' => $install_not_forum, 'params' => 'a:11:{s:5:"title";s:12:"Random photo";s:10:"thumb_size";s:11:"fit-160x120";s:12:"thumb_layout";s:4:"grid";s:12:"grid_nb_cols";s:1:"1";s:5:"limit";s:1:"1";s:8:"order_by";s:4:"RAND";s:9:"order_dir";s:3:"ASC";'.$default_blog_param.'s:11:"widget_name";s:12:"Random photo";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
+			array( 90, 15000, 'coll_item_list', 'coll_ID' => $blog_a_ID.','.$blog_b_ID, 'install' => $install_not_forum, 'params' => array(
 					'blog_ID'              => $blog_home_ID,
 					'item_type'            => empty( $sidebar_type_ID ) ? '#' : $sidebar_type_ID,
 					'title'                => 'Linkblog',
@@ -227,76 +225,74 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 					'item_title_link_type' => 'auto',
 					'item_type_usage'      => 'special',
 				) ),
-			array( 90, 'user_avatars', 'coll_type' => 'forum', 'params' => array(
+			array( 90, 15000, 'user_avatars', 'coll_type' => 'forum', 'params' => array(
 					'title'           => 'Most Active Users',
 					'limit'           => 6,
 					'order_by'        => 'numposts',
 					'rwd_block_class' => 'col-lg-3 col-md-3 col-sm-4 col-xs-6'
 				) ),
-			array( 100, 'coll_xml_feeds' ),
-			array( 110, 'mobile_skin_switcher' ),
+			array( 100, 15000, 'coll_xml_feeds' ),
+			array( 110, 15000, 'mobile_skin_switcher' ),
 		);
 	}
 
 	/* Sidebar 2 */
 	$default_widgets['sidebar_2'] = array(
 		'coll_type' => '-forum',
-		array(  1, 'coll_post_list' ),
-		array(  5, 'coll_item_list', 'coll_ID' => $blog_b_ID, 'params' => array(
+		array(  1, 15000, 'coll_post_list' ),
+		array(  5, 15000, 'coll_item_list', 'coll_ID' => $blog_b_ID, 'params' => array(
 				'title'                => 'Sidebar links',
 				'order_by'             => 'RAND',
 				'item_title_link_type' => 'auto',
 				'item_type_usage'      => 'special',
 			) ),
-		array( 10, 'coll_comment_list' ),
-		array( 15, 'coll_media_index', 'params' => 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
-		array( 20, 'free_html', 'params' => 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:166:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Collection", then "Widgets&hellip;".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
+		array( 10, 15000, 'coll_comment_list' ),
+		array( 15, 15000, 'coll_media_index', 'params' => 'a:11:{s:5:"title";s:13:"Recent photos";s:10:"thumb_size";s:10:"crop-80x80";s:12:"thumb_layout";s:4:"flow";s:12:"grid_nb_cols";s:1:"3";s:5:"limit";s:1:"9";s:8:"order_by";s:9:"datestart";s:9:"order_dir";s:4:"DESC";'.$default_blog_param.'s:11:"widget_name";s:11:"Photo index";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
+		array( 20, 15000, 'free_html', 'params' => 'a:5:{s:5:"title";s:9:"Sidebar 2";s:7:"content";s:166:"This is the "Sidebar 2" container. You can place any widget you like in here. In the evo toolbar at the top of this page, select "Collection", then "Widgets&hellip;".";s:11:"widget_name";s:9:"Free HTML";s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";}' ),
 	);
 
 	/* Front Page Main Area */
 	$default_widgets['front_page_main_area'] = array(
-		array(  1, 'coll_title', 'coll_type' => 'main,minisite' ),
-		array(  2, 'coll_tagline', 'coll_type' => 'minisite' ),
-		array(  5, 'free_text', 'coll_type' => 'main', 'params' => array(
+		array(  1, 15000, 'coll_title', 'coll_type' => 'main,minisite' ),
+		array(  2, 15000, 'coll_tagline', 'coll_type' => 'minisite' ),
+		array(  5, 15000, 'free_text', 'coll_type' => 'main', 'params' => array(
 				'content' => T_('This is the Home page of your site.')."\n\n"
 					.T_('More specifically it is the "Front page" of the first collection of your site. This first collection is called "Home". Several other sample collections may have been created during the setup process. You can access these collections by clicking "Blog A", "Blog B", "Photos", etc. in the menu bar at the top of this page.')."\n\n"
 					.T_('You can think of collections as "sections" of your site. Different collections/sections may have different purposes: blog, photo gallery, forums, manual, etc. You can add or remove collections at will through the back-office. You can even remove this "Home" collection if you don\'t need it.')."\n\n"
 					.T_('Feel free to experiment! If you delete all collections, the Quick start wizard will come back and you will be able to start with a completely new arrangement of collections.'),
 			) ),
-		array( 10, 'coll_featured_intro', 'coll_type' => '-main,minisite', 'params' => ( $kind == 'main' ? array(
+		array( 10, 15000, 'coll_featured_intro', 'coll_type' => '-main,minisite', 'params' => ( $kind == 'main' ? array(
 			// Hide a title of the front intro post:
 				'disp_title' => 0,
 			) : NULL ) ),
-		array( 15, 'social_links', 'coll_type' => 'main', 'params' => array(
-				'link1'      => 16,
+		array( 15, 15000, 'social_links', 'coll_type' => 'main', 'params' => array(
+				'link1'      => 'twitter',
 				'link1_href' => 'https://twitter.com/b2evolution/',
-				'link2'      => 17,
+				'link2'      => 'facebook',
 				'link2_href' => 'https://www.facebook.com/b2evolution',
-				'link3'      => 18,
-				'link3_href' => 'https://plus.google.com/+b2evolution/posts',
-				'link4'      => 19,
-				'link4_href' => 'https://www.linkedin.com/company/b2evolution-net',
-				'link5'      => 20,
-				'link5_href' => 'https://github.com/b2evolution/b2evolution',
+				'link3'      => 'linkedin',
+				'link3_href' => 'https://www.linkedin.com/company/b2evolution-net',
+				'link4'      => 'github',
+				'link4_href' => 'https://github.com/b2evolution/b2evolution',
 			) ),
-		array( 20, 'coll_featured_posts', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
+		array( 20, 15000, 'coll_featured_posts', 'coll_type' => '-minisite', 'params' => ( $kind == 'main' ? array(
 				'blog_ID'    => '*', // Display Items from all Collections
 				'limit'      => 5,
 				'layout'     => 'list',
 				'thumb_size' => 'crop-80x80',
 			) : NULL ) ),
-		array( 30, 'coll_post_list', 'coll_type' => 'main', 'params' => array(
+		array( 30, 15000, 'coll_post_list', 'coll_type' => 'main', 'params' => array(
 				'blog_ID'  => '*', // Display Items from all Collections
 				'title'    => T_('More Posts'),
 				'featured' => 'other',
 			) ),
 		// Install widget "Poll" only for Blog B on install:
-		array( 40, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => $demo_poll_ID ) ),
-		array( 45, 'content_hierarchy', 'coll_type' => 'manual' ),
-		array( 50, 'subcontainer_row', 'coll_type' => '-main', 'params' => array(
-				'column1_container' => 'front_page_column_a',
+		array( 40, 15000, 'poll', 'coll_ID' => $blog_b_ID, 'params' => array( 'poll_ID' => $demo_poll_ID ) ),
+		array( 45, 15000, 'content_hierarchy', 'coll_type' => 'manual' ),
+		array( 50, 15000, 'subcontainer_row', 'coll_type' => '-main', 'params' => array(
+				'column1_container' => 'coll:front_page_column_a',
 				'column1_class'     => 'col-sm-6 col-xs-12',
-				'column2_container' => 'front_page_column_b',
+				'column2_container' => 'coll:front_page_column_b',
 				'column2_class'     => 'col-sm-6 col-xs-12',
 			) ),
 	);
@@ -306,7 +302,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'type'  => 'sub',
 		'name'  => NT_('Front Page Column A'),
 		'order' => 1,
-		array( 10, 'coll_post_list', 'coll_type' => '-minisite', 'params' => array( 'title' => T_('More Posts'), 'featured' => 'other' ) ),
+		array( 10, 15230, 'coll_post_list', 'coll_type' => '-minisite', 'params' => array( 'title' => T_('More Posts'), 'featured' => 'other' ) ),
 	);
 
 	/* Front Page Column B */
@@ -314,14 +310,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'type'  => 'sub',
 		'name'  => NT_('Front Page Column B'),
 		'order' => 2,
-		array( 10, 'coll_comment_list', 'coll_type' => '-main,minisite' ),
+		array( 10, 15230, 'coll_comment_list', 'coll_type' => '-main,minisite' ),
 	);
 
 	/* Front Page Secondary Area */
 	$default_widgets['front_page_secondary_area'] = array(
-		array( 10, 'org_members', 'coll_type' => 'main,minisite' ),
-		array( 20, 'coll_flagged_list', 'coll_type' => '-main,minisite' ),
-		array( 30, 'content_block', 'coll_type' => 'main', 'params' => array(
+		array( 10, 15000, 'org_members', 'coll_type' => 'main,minisite' ),
+		array( 20, 15000, 'coll_flagged_list', 'coll_type' => '-main,minisite' ),
+		array( 30, 15000, 'content_block', 'coll_type' => 'main', 'params' => array(
 			'title'     => T_('Content Block Example'),
 			'item_slug' => 'this-is-a-content-block',
 		) ),
@@ -330,41 +326,41 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* Front Page Area 3 */
 	$default_widgets['front_page_area_3'] = array(
 		'coll_type' => 'minisite',
-		array( 10, 'free_text', 'params' => 'a:6:{s:5:"title";s:0:"";s:7:"content";s:446:"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";s:9:"renderers";a:10:{s:11:"escape_code";i:1;s:8:"b2evMark";i:1;s:8:"b2evWiLi";i:1;s:8:"b2evCTag";i:1;s:8:"b2evGMco";i:1;s:8:"b2evALnk";i:1;s:8:"evo_poll";i:1;s:13:"evo_videoplug";i:1;s:8:"b2WPAutP";i:1;s:14:"evo_widescroll";i:1;}s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' ),
-		array( 20, 'user_links' ),
+		array( 10, 15230, 'free_text', 'params' => 'a:6:{s:5:"title";s:0:"";s:7:"content";s:446:"Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";s:9:"renderers";a:10:{s:11:"escape_code";i:1;s:8:"b2evMark";i:1;s:8:"b2evWiLi";i:1;s:8:"b2evCTag";i:1;s:8:"b2evGMco";i:1;s:8:"b2evALnk";i:1;s:8:"evo_poll";i:1;s:13:"evo_videoplug";i:1;s:8:"b2WPAutP";i:1;s:14:"evo_widescroll";i:1;}s:16:"widget_css_class";s:0:"";s:9:"widget_ID";s:0:"";s:16:"allow_blockcache";i:0;}' ),
+		array( 20, 15230, 'user_links' ),
 	);
 
 	/* Forum Front Secondary Area */
 	$default_widgets['forum_front_secondary_area'] = array(
 		'coll_type' => 'forum',
-		array( 10, 'coll_activity_stats' ),
+		array( 10, 15000, 'coll_activity_stats' ),
 	);
 
 	/* Compare Main Area */
 	$default_widgets['compare_main_area'] = array(
-		array( 10, 'item_fields_compare', 'params' => array( 'items_source' => 'all' ) ),
+		array( 10, 15000, 'item_fields_compare', 'params' => array( 'items_source' => 'all' ) ),
 	);
 
 	/* Chapter Main Area */
 	$default_widgets['chapter_main_area'] = array(
 		'coll_type' => 'manual',
-		array( 10, 'breadcrumb_path', 'params' => array( 'separator' => '' ) ),
-		array( 20, 'coll_featured_intro' ),
-		array( 30, 'cat_title', 'params' => array( 'blog_ID' => '-', 'display_when' => 'no_intro' ) ),
-		array( 40, 'cat_content_list' ),
+		array( 10, 15320, 'breadcrumb_path', 'params' => array( 'separator' => '' ) ),
+		array( 20, 15320, 'coll_featured_intro' ),
+		array( 30, 15320, 'cat_title', 'params' => array( 'blog_ID' => '-', 'display_when' => 'no_intro' ) ),
+		array( 40, 15730, 'cat_content_list' ),
 	);
 
 	/* 404 Page */
 	$default_widgets['404_page'] = array(
-		array( 10, 'page_404_not_found' ),
-		array( 20, 'coll_search_form' ),
-		array( 30, 'coll_tag_cloud' ),
+		array( 10, 15000, 'page_404_not_found' ),
+		array( 20, 15000, 'coll_search_form' ),
+		array( 30, 15000, 'coll_tag_cloud' ),
 	);
 
 	/* Login Required */
 	$default_widgets['login_required'] = array(
-		array( 10, 'content_block', 'params' => array( 'item_slug' => 'login-required' ) ),
-		array( 20, 'user_login', 'params' => array(
+		array( 10, 15000, 'content_block', 'params' => array( 'item_slug' => 'login-required' ) ),
+		array( 20, 15000, 'user_login', 'params' => array(
 				'title'               => T_( 'Log in to your account' ),
 				'login_button_class'  => 'btn btn-success btn-lg',
 				'register_link_class' => 'btn btn-primary btn-lg pull-right',
@@ -373,12 +369,12 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Access Denied */
 	$default_widgets['access_denied'] = array(
-		array( 10, 'content_block', 'params' => array( 'item_slug' => 'access-denied' ) ),
+		array( 10, 15000, 'content_block', 'params' => array( 'item_slug' => 'access-denied' ) ),
 	);
 
 	/* Help */
 	$default_widgets['help'] = array(
-		array( 10, 'content_block', 'params' =>  array(
+		array( 10, 15000, 'content_block', 'params' =>  array(
 				'item_slug' => 'help-content',
 				'title'     => T_('Personal Data & Privacy'),
 			) ),
@@ -386,13 +382,13 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Register */
 	$default_widgets['register'] = array(
-		array( 10, 'user_register_standard' ),
-		array( 20, 'content_block', 'params' => array( 'item_slug' => 'register-content' ) ),
+		array( 10, 15000, 'user_register_standard' ),
+		array( 20, 15000, 'content_block', 'params' => array( 'item_slug' => 'register-content' ) ),
 	);
 
 	/* Photo Index */
 	$default_widgets['photo_index'] = array(
-		array( 10, 'coll_media_index', 'params' => array(
+		array( 10, 15370, 'coll_media_index', 'params' => array(
 				'title'        => '',
 				'thumb_size'   => 'fit-256x256',
 				'thumb_layout' => 'grid',
@@ -403,30 +399,30 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 
 	/* Mobile Footer */
 	$default_widgets['mobile_footer'] = array(
-		array( 10, 'coll_longdesc' ),
-		array( 20, 'mobile_skin_switcher' ),
+		array( 10, 15000, 'coll_longdesc' ),
+		array( 20, 15000, 'mobile_skin_switcher' ),
 	);
 
 	/* Mobile Navigation Menu */
 	$default_widgets['mobile_navigation_menu'] = array(
-		array( 10, 'coll_page_list' ),
-		array( 20, 'basic_menu_link', 'params' => array( 'link_type' => 'ownercontact' ) ),
-		array( 30, 'basic_menu_link', 'params' => array( 'link_type' => 'home' ) ),
-		array( 30, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'users' ) ),
+		array( 10, 15000, 'coll_page_list' ),
+		array( 20, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'ownercontact' ) ),
+		array( 30, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'home' ) ),
+		array( 30, 15000, 'basic_menu_link', 'coll_type' => 'forum', 'params' => array( 'link_type' => 'users' ) ),
 	);
 
 	/* Mobile Tools Menu */
 	$default_widgets['mobile_tools_menu'] = array(
-		array( 10, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ) ),
-		array( 20, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ) ),
-		array( 30, 'msg_menu_link', 'params' => array( 'link_type' => 'contacts', 'show_badge' => 0 ) ),
-		array( 50, 'basic_menu_link', 'params' => array( 'link_type' => 'logout' ) ),
+		array( 10, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'login' ) ),
+		array( 20, 15000, 'msg_menu_link', 'params' => array( 'link_type' => 'messages' ) ),
+		array( 30, 15000, 'msg_menu_link', 'params' => array( 'link_type' => 'contacts', 'show_badge' => 0 ) ),
+		array( 50, 15000, 'basic_menu_link', 'params' => array( 'link_type' => 'logout' ) ),
 	);
 
 	/* User Profile - Left */
 	$default_widgets['user_profile_left'] = array(
 		// User Profile Picture(s):
-		array( 10, 'user_profile_pics', 'params' => array(
+		array( 10, 15230, 'user_profile_pics', 'params' => array(
 				'link_to'           => 'fullsize',
 				'thumb_size'        => 'crop-top-320x320',
 				'anon_thumb_size'   => 'crop-top-320x320-blur-8',
@@ -434,64 +430,64 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'widget_css_class'  => 'evo_user_profile_pics_main',
 			) ),
 		// User info / Name:
-		array( 20, 'user_info', 'params' => array(
+		array( 20, 15230, 'user_info', 'params' => array(
 				'info'             => 'name',
 				'widget_css_class' => 'evo_user_info_name',
 			) ),
 		// User info / Nickname:
-		array( 30, 'user_info', 'params' => array(
+		array( 30, 15230, 'user_info', 'params' => array(
 				'info'             => 'nickname',
 				'widget_css_class' => 'evo_user_info_nickname',
 			) ),
 		// User info / Login:
-		array( 40, 'user_info', 'params' => array(
+		array( 40, 15230, 'user_info', 'params' => array(
 				'info'             => 'login',
 				'widget_css_class' => 'evo_user_info_login',
 			) ),
 		// Separator:
-		array( 60, 'separator' ),
+		array( 60, 15230, 'separator' ),
 		// User info / :
-		array( 70, 'user_info', 'params' => array(
+		array( 70, 15230, 'user_info', 'params' => array(
 				'info'             => 'gender_age',
 				'widget_css_class' => 'evo_user_info_gender',
 			) ),
 		// User info / Location:
-		array( 80, 'user_info', 'params' => array(
+		array( 80, 15230, 'user_info', 'params' => array(
 				'info'             => 'location',
 				'widget_css_class' => 'evo_user_info_location',
 			) ),
 		// Separator:
-		array( 90, 'separator' ),
+		array( 90, 15230, 'separator' ),
 		// User action / Edit my profile:
-		array( 100, 'user_action', 'params' => array(
+		array( 100, 15230, 'user_action', 'params' => array(
 				'button'           => 'edit_profile',
 			) ),
 		// User action / Send Message:
-		array( 110, 'user_action', 'params' => array(
+		array( 110, 15230, 'user_action', 'params' => array(
 				'button'           => 'send_message',
 			) ),
 		// User action / Add to Contacts:
-		array( 120, 'user_action', 'params' => array(
+		array( 120, 15230, 'user_action', 'params' => array(
 				'button'           => 'add_contact',
 			) ),
 		// User action / Block Contact & Report User:
-		array( 130, 'user_action', 'params' => array(
+		array( 130, 15230, 'user_action', 'params' => array(
 				'button'           => 'block_report',
 				'widget_css_class' => 'btn-group',
 			) ),
 		// User action / Edit in Back-Office:
-		array( 140, 'user_action', 'params' => array(
+		array( 140, 15230, 'user_action', 'params' => array(
 				'button'           => 'edit_backoffice',
 			) ),
 		// User action / Delete & Delete Spammer:
-		array( 150, 'user_action', 'params' => array(
+		array( 150, 15230, 'user_action', 'params' => array(
 				'button'           => 'delete',
 				'widget_css_class' => 'btn-group',
 			) ),
 		// Separator:
-		array( 160, 'separator' ),
+		array( 160, 15230, 'separator' ),
 		// User info / Organizations:
-		array( 170, 'user_info', 'params' => array(
+		array( 170, 15230, 'user_info', 'params' => array(
 				'info'             => 'orgs',
 				'title'            => T_('Organizations').':',
 				'widget_css_class' => 'evo_user_info_orgs',
@@ -501,7 +497,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	/* User Profile - Right */
 	$default_widgets['user_profile_right'] = array(
 		// User Profile Picture(s):
-		array( 10, 'user_profile_pics', 'params' => array(
+		array( 10, 15230, 'user_profile_pics', 'params' => array(
 				'display_main'     => 0,
 				'display_other'    => 1,
 				'link_to'          => 'fullsize',
@@ -509,11 +505,11 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 				'widget_css_class' => 'evo_user_profile_pics_other',
 			) ),
 		// User fields:
-		array( 20, 'user_fields' ),
+		array( 20, 15230, 'user_fields' ),
 		// Reputation:
-		array( 30, 'subcontainer', 'params' => array(
+		array( 30, 15230, 'subcontainer', 'params' => array(
 				'title'     => T_('Reputation'),
-				'container' => 'user_page_reputation',
+				'container' => 'coll:user_page_reputation',
 			) ),
 	);
 
@@ -523,42 +519,42 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'name'  => NT_('User Page - Reputation'),
 		'order' => 100,
 		// User info / Joined:
-		array( 10, 'user_info', 'params' => array(
+		array( 10, 15230, 'user_info', 'params' => array(
 				'title' => T_('Joined'),
 				'info'  => 'joined',
 			) ),
 		// User info / Last Visit:
-		array( 20, 'user_info', 'params' => array(
+		array( 20, 15230, 'user_info', 'params' => array(
 				'title' => T_('Last seen on'),
 				'info'  => 'last_visit',
 			) ),
 		// User info / Number of posts:
-		array( 30, 'user_info', 'params' => array(
+		array( 30, 15230, 'user_info', 'params' => array(
 				'title' => T_('Number of posts'),
 				'info'  => 'posts',
 			) ),
 		// User info / Comments:
-		array( 40, 'user_info', 'params' => array(
+		array( 40, 15230, 'user_info', 'params' => array(
 				'title' => T_('Comments'),
 				'info'  => 'comments',
 			) ),
 		// User info / Photos:
-		array( 50, 'user_info', 'params' => array(
+		array( 50, 15230, 'user_info', 'params' => array(
 				'title' => T_('Photos'),
 				'info'  => 'photos',
 			) ),
 		// User info / Audio:
-		array( 60, 'user_info', 'params' => array(
+		array( 60, 15230, 'user_info', 'params' => array(
 				'title' => T_('Audio'),
 				'info'  => 'audio',
 			) ),
 		// User info / Other files:
-		array( 70, 'user_info', 'params' => array(
+		array( 70, 15230, 'user_info', 'params' => array(
 				'title' => T_('Other files'),
 				'info'  => 'files',
 			) ),
 		// User info / Spam fighter score:
-		array( 80, 'user_info', 'params' => array(
+		array( 80, 15230, 'user_info', 'params' => array(
 				'title' => T_('Spam fighter score'),
 				'info'  => 'spam',
 			) ),
@@ -570,14 +566,14 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['site_header'] = array(
 		'type' => 'shared',
 		'name' => NT_('Site Header'),
-		array( 10, 'site_logo' ),
-		array( 20, 'subcontainer', 'params' => array(
+		array( 10, 15260, 'site_logo' ),
+		array( 20, 15260, 'subcontainer', 'params' => array(
 				'title'     => T_('Main Navigation'),
-				'container' => 'main_navigation',
+				'container' => 'shared:main_navigation',
 			) ),
-		array( 30, 'subcontainer', 'params' => array(
+		array( 30, 15260, 'subcontainer', 'params' => array(
 				'title'            => T_('Right Navigation'),
-				'container'        => 'right_navigation',
+				'container'        => 'shared:right_navigation',
 				'widget_css_class' => 'floatright',
 			) ),
 	);
@@ -586,7 +582,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['site_footer'] = array(
 		'type' => 'shared',
 		'name' => NT_('Site Footer'),
-		array( 10, 'free_text', 'params' => array(
+		array( 10, 15260, 'free_text', 'params' => array(
 				'content' => T_('Cookies are required to enable core site functionality.'),
 			) ),
 	);
@@ -595,7 +591,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['navigation_hamburger'] = array(
 		'type' => 'shared',
 		'name' => NT_('Navigation Hamburger'),
-		array( 10, 'colls_list_public', 'params' => array(
+		array( 10, 15260, 'colls_list_public', 'params' => array(
 				'widget_css_class' => 'visible-xs',
 			) ),
 	);
@@ -604,7 +600,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	{	// Install additional menu items for each page from info/shared collection:
 		foreach( $installed_collection_info_pages as $installed_collection_info_page_item_ID )
 		{
-			$default_widgets['navigation_hamburger'][] = array( $tmp_widget_order++, 'basic_menu_link', 'params' => array(
+			$default_widgets['navigation_hamburger'][] = array( $tmp_widget_order++, 15260, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'item',
 				'item_ID'          => $installed_collection_info_page_item_ID,
 				'widget_css_class' => 'visible-sm visible-xs',
@@ -613,22 +609,22 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	}
 	$tmp_widget_order = intval( $tmp_widget_order / 10 ) * 10;
 	$default_widgets['navigation_hamburger'] = array_merge( $default_widgets['navigation_hamburger'], array(
-		array( $tmp_widget_order + 10, 'basic_menu_link', 'params' => array(
+		array( $tmp_widget_order + 10, 15260, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'ownercontact',
 				'widget_css_class' => 'visible-sm visible-xs',
 			) ),
-		array( $tmp_widget_order + 20, 'free_html', 'params' => array(
+		array( $tmp_widget_order + 20, 15260, 'free_html', 'params' => array(
 				'content' => '<hr class="visible-xs" />',
 			) ),
-		array( $tmp_widget_order + 30, 'basic_menu_link', 'params' => array(
+		array( $tmp_widget_order + 30, 15260, 'basic_menu_link', 'params' => array(
 				'link_type' => 'register',
 				'widget_css_class' => 'visible-xs',
 				'widget_link_class'=> 'bg-white',
 			) ),
-		array( $tmp_widget_order + 40, 'msg_menu_link', 'params' => array(
+		array( $tmp_widget_order + 40, 15260, 'msg_menu_link', 'params' => array(
 				'widget_css_class' => 'visible-xs',
 			) ),
-		array( $tmp_widget_order + 50, 'basic_menu_link', 'params' => array(
+		array( $tmp_widget_order + 50, 15260, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'logout',
 				'widget_css_class' => 'visible-xs',
 			) ),
@@ -638,7 +634,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['main_navigation'] = array(
 		'type' => 'shared-sub',
 		'name' => NT_('Main Navigation'),
-		array( 10, 'colls_list_public', 'params' => array(
+		array( 10, 15260, 'colls_list_public', 'params' => array(
 				'widget_css_class' => 'hidden-xs',
 			) )
 	);
@@ -647,7 +643,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	{	// Install additional menu items for each page from info/shared collection:
 		foreach( $installed_collection_info_pages as $installed_collection_info_page_item_ID )
 		{
-			$default_widgets['main_navigation'][] = array( $tmp_widget_order++, 'basic_menu_link', 'params' => array(
+			$default_widgets['main_navigation'][] = array( $tmp_widget_order++, 15260, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'item',
 				'item_ID'          => $installed_collection_info_page_item_ID,
 				'widget_link_class'=> 'hidden-sm hidden-xs',
@@ -656,7 +652,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	}
 	$tmp_widget_order = intval( $tmp_widget_order / 10 ) * 10;
 	$default_widgets['main_navigation'] = array_merge( $default_widgets['main_navigation'], array(
-		array( $tmp_widget_order + 10, 'basic_menu_link', 'params' => array(
+		array( $tmp_widget_order + 10, 15260, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'ownercontact',
 				'widget_link_class'=> 'hidden-sm hidden-xs',
 			) ),
@@ -666,24 +662,24 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['right_navigation'] = array(
 		'type' => 'shared-sub',
 		'name' => NT_('Right Navigation'),
-		array( 10, 'basic_menu_link', 'params' => array(
+		array( 10, 15260, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'login',
 			) ),
-		array( 20, 'basic_menu_link', 'params' => array(
+		array( 20, 15260, 'basic_menu_link', 'params' => array(
 				'link_type' => 'register',
 				'widget_link_class' => 'hidden-xs bg-white',
 			) ),
-		array( 30, 'profile_menu_link', 'params' => array(
+		array( 30, 15260, 'profile_menu_link', 'params' => array(
 				'profile_picture_size' => 'crop-top-32x32',
 			) ),
-		array( 40, 'msg_menu_link', 'params' => array(
+		array( 40, 15260, 'msg_menu_link', 'params' => array(
 				'widget_link_class' => 'hidden-xs',
 			) ),
-		array( 50, 'basic_menu_link', 'params' => array(
+		array( 50, 15260, 'basic_menu_link', 'params' => array(
 				'link_type'        => 'logout',
 				'widget_css_class' => 'hidden-xs',
 			) ),
-		array( 60, 'free_html', 'params' => array(
+		array( 60, 15260, 'free_html', 'params' => array(
 				'content' => '<label for="nav-trigger"></label>',
 				'widget_css_class' => 'visible-sm-inline-block visible-xs-inline-block',
 			) ),
@@ -693,7 +689,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	$default_widgets['marketing_popup'] = array(
 		'type' => 'shared',
 		'name' => NT_('Marketing Popup'),
-		array( 10, 'user_register_quick' ),
+		array( 10, 15310, 'user_register_quick' ),
 	);
 
 	// **** PAGE CONTAINERS ***** //
@@ -707,11 +703,11 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'name'    => NT_('Widget Page Section 1'),
 		'order'   => 10,
 		'item_ID' => $installed_collection_info_pages['widget_page'],
-		array(  5, 'free_text', 'params' => array(
+		array(  5, 15000, 'free_text', 'params' => array(
 				'title'   => T_('This is a sample widget page'),
 				'content' => T_('A widget page is a page that is constructed entirely with widgets, rather than being constructed around a classic structure of title, content and comments.'),
 			) ),
-		array( 10, 'coll_featured_posts', 'params' => array(
+		array( 10, 15000, 'coll_featured_posts', 'params' => array(
 				'blog_ID' => '*', // Display Items from all Collections
 			) ),
 	);
@@ -722,7 +718,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'name'    => NT_('Widget Page Section 2'),
 		'order'   => 20,
 		'item_ID' => $installed_collection_info_pages['widget_page'],
-		array( 10, 'org_members' ),
+		array( 10, 15000, 'org_members' ),
 	);
 
 	/* Widget Page Section 3 */
@@ -731,10 +727,6 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'name'    => NT_('Widget Page Section 3'),
 		'order'   => 30,
 		'item_ID' => $installed_collection_info_pages['widget_page'],
-		array( 10, 'evo_Gmaps', 'type' => 'plugin', 'params' => array(
-				'latitude'  => '48.8566573582',
-				'longitude' => '2.35195398331',
-			) ),
 	);
 
 	}
@@ -770,7 +762,7 @@ function get_default_widgets_by_container( $container_code, $kind = '', $blog_id
  */
 function install_new_default_widgets( $new_container_code, $new_widget_codes = '*', $coll_ID = NULL, $skin_type = 'normal' )
 {
-	global $DB, $Settings;
+	global $DB, $Settings, $upgrade_db_version;
 
 	if( function_exists( 'upg_init_environment' ) )
 	{	// We're going to need some environment in order to init item type cache and create item:
@@ -899,13 +891,13 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 							continue;
 						}
 
-						if( ! is_allowed_option( $widget[1], $new_widget_codes ) )
+						if( ! is_allowed_option( $widget[2], $new_widget_codes ) )
 						{	// Skip not requested widget:
 							continue;
 						}
 
-						if( isset( $widget['unique'] ) && $widget['unique'] && is_installed_widget( $widget[1], $new_container_code, $widget_Blog->ID ) )
-						{	// Skip widget because it is already installed in the Container:
+						if( ! empty( $upgrade_db_version ) && $widget[1] != $upgrade_db_version )
+						{	// Skip widget because it must be installed only for the specific upgrade block:
 							continue;
 						}
 
@@ -944,7 +936,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 							$widget_orders_in_containers[ $coll_container['ID'] ][] = $widget_order;
 						}
 						// A row with new widget values:
-						$new_widgets_insert_sql_rows[] = '( '.$coll_container['ID'].', '.$widget_order.', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[1] ).', '.$DB->quote( $widget_params ).' )';
+						$new_widgets_insert_sql_rows[] = '( '.$coll_container['ID'].', '.$widget_order.', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[2] ).', '.$DB->quote( $widget_params ).' )';
 					}
 				}
 			}
@@ -998,8 +990,18 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 					continue;
 				}
 
+				if( ! empty( $upgrade_db_version ) && $widget[1] != $upgrade_db_version )
+				{	// Skip widget because it must be installed only for the specific upgrade block:
+					continue;
+				}
+
 				if( isset( $widget['install'] ) && ! $widget['install'] )
 				{	// Skip widget because it should not be installed by condition from config:
+					continue;
+				}
+
+				if( isset( $widget['is_pro'] ) && $widget['is_pro'] !== is_pro() )
+				{	// Skip widget because it should not be installed for the current version:
 					continue;
 				}
 
@@ -1007,7 +1009,7 @@ function install_new_default_widgets( $new_container_code, $new_widget_codes = '
 				$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
 				$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
 				$widget_enabled = isset( $widget['enabled'] ) ? intval( $widget['enabled'] ) : 1;
-				$new_widgets_insert_sql_rows[] = '( '.$cache_installed_shared_containers[ $new_container_code ].', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[1] ).', '.$DB->quote( $widget_params ).' )';
+				$new_widgets_insert_sql_rows[] = '( '.$cache_installed_shared_containers[ $new_container_code ].', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[2] ).', '.$DB->quote( $widget_params ).' )';
 			}
 			break;
 	}
@@ -1203,7 +1205,7 @@ function insert_basic_widgets( $blog_id, $skin_type, $initial_install = false, $
 			$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
 			$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
 			$widget_enabled = isset( $widget['enabled'] ) ? intval( $widget['enabled'] ) : 1;
-			$basic_widgets_insert_sql_rows[] = '( '.$wico_id.', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[1] ).', '.$DB->quote( $widget_params ).' )';
+			$basic_widgets_insert_sql_rows[] = '( '.$wico_id.', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[2] ).', '.$DB->quote( $widget_params ).' )';
 		}
 	}
 
@@ -1335,6 +1337,11 @@ function insert_shared_widgets( $skin_type )
 				continue;
 			}
 
+			if( isset( $widget['is_pro'] ) && $widget['is_pro'] !== is_pro() )
+			{	// Skip widget because it should not be installed for the current version:
+				continue;
+			}
+
 			if( isset( $shared_widgets[ $wico_id ][ $widget[0] ] ) )
 			{	// Skip the widget because a widget was already installed for the container with same order:
 				continue;
@@ -1344,7 +1351,7 @@ function insert_shared_widgets( $skin_type )
 			$widget_type = isset( $widget['type'] ) ? $widget['type'] : 'core';
 			$widget_params = isset( $widget['params'] ) ? ( is_array( $widget['params'] ) ? serialize( $widget['params'] ) : $widget['params'] ) : NULL;
 			$widget_enabled = isset( $widget['enabled'] ) ? intval( $widget['enabled'] ) : 1;
-			$shared_widgets_insert_sql_rows[] = '( '.$wico_id.', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[1] ).', '.$DB->quote( $widget_params ).' )';
+			$shared_widgets_insert_sql_rows[] = '( '.$wico_id.', '.$widget[0].', '.$widget_enabled.', '.$DB->quote( $widget_type ).', '.$DB->quote( $widget[2] ).', '.$DB->quote( $widget_params ).' )';
 		}
 	}
 

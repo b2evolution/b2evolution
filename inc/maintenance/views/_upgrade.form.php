@@ -14,6 +14,8 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( '_core/ui/_table.class.php', 'Table' );
+
 /**
  * @var action
  */
@@ -42,7 +44,8 @@ else
 	$Form->info( TB_('Version'), $update['version'] );
 
 	$Form->text_input( 'upd_url', ( get_param( 'upd_url' ) != '' ? get_param( 'upd_url' ) : $update['url'] ), 90,
-		TB_('URL'), '<br/><span class="note">'.TB_('You <i>might</i> replace this with a different URL in case you want to upgrade to a custom version.').'</span>', array( 'maxlength' => 300, 'required' => true ) );
+		TB_('URL'), '<br/><span class="note">'.TB_('You <i>might</i> replace this with a different URL in case you want to upgrade to a custom version.').'</span>',
+		array( 'maxlength' => 300, 'required' => true, 'class' => 'large' ) );
 
 	$Form->add_crumb( 'upgrade_started' );
 	$Form->hiddens_by_key( get_memorized( 'action' ) );

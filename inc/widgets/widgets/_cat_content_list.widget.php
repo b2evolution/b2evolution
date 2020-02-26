@@ -1,6 +1,7 @@
 <?php
 /**
- * This file implements the Category Content List Widget class.
+ * Widget class to display current Category's Contents (Sub-categories and Items) as List or Tiles (using Template)
+ *  Also works in collection root.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link http://sourceforge.net/projects/evocms/}.
@@ -59,7 +60,7 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function get_name()
 	{
-		return T_('Category Content List');
+		return T_('Category Contents (List/Tiles)');
 	}
 
 
@@ -93,7 +94,7 @@ class cat_content_list_Widget extends ComponentWidget
 
 		// Get available templates:
 		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_where( 'tpl_parent_tpl_ID IS NULL' );
+		$TemplateCache->load_where( 'tpl_translates_tpl_ID IS NULL' );
 		$template_options = array( NULL => T_('No template') ) + $TemplateCache->get_code_option_array();
 		$template_input_suffix = ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
 			.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );
@@ -129,26 +130,32 @@ class cat_content_list_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		$ChapterCache = & get_ChapterCache();
+		// Display block TITLE:
+		echo $this->disp_params['block_start'];
+		$this->disp_title();
+		echo $this->disp_params['block_body_start'];
 
+		// Get current Chapter:
+		$ChapterCache = & get_ChapterCache();
 		if( ! empty( $cat ) && ! ( $curr_Chapter = & $ChapterCache->get_by_ID( $cat, false, false ) ) )
-		{	// Display error when no cat is found by requested ID:
+		{	// Display error if no cat is found by current cat ID:
 			$this->display_error_message( sprintf( 'No %s found by ID %s. Cannot display widget "%s".', '<code>cat</code>', $cat, $this->get_name() ) );
 			return false;
 		}
 
-		// Set params from quick template:
-		$rendered_content = render_template_code( $this->disp_params['template'], $params );
+		// Render MASTER quick template:
+		// In theory, this should not display anything.
+		// Instead, this should set variables to define sub-templates (and potentially additional variables)
+		echo render_template_code( $this->disp_params['template'], /* BY REF */ $params );
 
+		// Check if requested sub-templates exist:
 		$TemplateCache = & get_TemplateCache();
-
 		if( ! empty( $params['subcat_template'] ) &&
 		    ! ( $cat_Template = & $TemplateCache->get_by_code( $params['subcat_template'], false, false ) ) )
 		{	// Display error when no or wrong template for listing a category:
 			$this->display_error_message( sprintf( 'Template is not found: %s for listing a category', '<code>'.$params['subcat_template'].'</code>' ) );
 			return false;
 		}
-
 		if( ! empty( $params['item_template'] ) &&
 		    ! ( $item_Template = & $TemplateCache->get_by_code( $params['item_template'], false, false ) ) )
 		{	// Display error when no or wrong template for listing a category:
@@ -156,34 +163,27 @@ class cat_content_list_Widget extends ComponentWidget
 			return false;
 		}
 
-		echo $this->disp_params['block_start'];
-		$this->disp_title();
-		echo $this->disp_params['block_body_start'];
-
-		// Print out text if it was found in the template:
-		echo trim( $rendered_content );
-
-		// Display subcategories and posts:
+		// Display MAIN CONTENT: subcategories and posts:
 		if( isset( $params['before_list'] ) )
 		{
 			echo $params['before_list'];
 		}
 
 		if( empty( $curr_Chapter ) )
-		{	// Display all root categories of the current Collection:
+		{	// Display all ROOT categories of the current Collection:
 			global $Blog;
 			$ChapterCache->clear();
 			$ChapterCache->load_where( 'cat_blog_ID = '.$Blog->ID.' AND cat_parent_ID IS NULL' );
 			foreach( $ChapterCache->cache as $Chapter )
 			{
-				$this->cat_inskin_display( $Chapter, 0, $params );
+				$this->display_subcat_template( $Chapter, 0, $params );
 			}
 		}
 		else
-		{	// Display child categories ad posts of the current Category:
+		{	// Display CHILD categories and posts of the current Category:
 			$callbacks = array(
-				'line'  => array( $this, 'cat_inskin_display' ),
-				'posts' => array( $this, 'item_inskin_display' ),
+				'line'  => array( $this, 'display_subcat_template' ),
+				'posts' => array( $this, 'display_item_template' ),
 			);
 			$ChapterCache->iterate_through_category_children( $curr_Chapter, $callbacks, false, array_merge( $params, array( 'sorted' => true ) ) );
 		}
@@ -225,7 +225,7 @@ class cat_content_list_Widget extends ComponentWidget
 	 * @param integer Level
 	 * @param array Params
 	 */
-	function cat_inskin_display( $param_Chapter, $level, $params = array() )
+	function display_subcat_template( $param_Chapter, $level, $params = array() )
 	{
 		if( empty( $params['subcat_template'] ) )
 		{	// No template is provided for listing a category:
@@ -242,21 +242,21 @@ class cat_content_list_Widget extends ComponentWidget
 	 *
 	 * @param object Item
 	 */
-	function item_inskin_display( $param_Item, $level, $params = array() )
+	function display_item_template( $param_Item, $level, $params = array() )
 	{
 		if( empty( $params['item_template'] ) )
 		{	// No template is provided for listing an item:
 			return;
 		}
 
-		$template_params = array_merge( $params, array(
+		$item_template_params = array_merge( $params, array(
 				'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
 				'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
 				'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 			) );
 
 		// Render Item by quick template:
-		echo render_template_code( $params['item_template'], $template_params, array( 'Item' => $param_Item ) );
+		echo render_template_code( $params['item_template'], $item_template_params, array( 'Item' => $param_Item ) );
 	}
 }
 

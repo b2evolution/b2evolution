@@ -111,6 +111,9 @@ class ItemType extends DataObject
 			$this->name = $db_row->ityp_name;
 			$this->description = $db_row->ityp_description;
 			$this->usage = $db_row->ityp_usage;
+			$this->template_excerpt = isset( $db_row->ityp_template_excerpt ) ? $db_row->ityp_template_excerpt : NULL;
+			$this->template_normal = isset( $db_row->ityp_template_normal ) ? $db_row->ityp_template_normal : NULL;
+			$this->template_full = isset( $db_row->ityp_template_full ) ? $db_row->ityp_template_full : NULL;
 			$this->template_name = $db_row->ityp_template_name;
 			$this->schema = isset( $db_row->ityp_schema ) ? $db_row->ityp_schema : $this->schema;
 			$this->add_aggregate_rating = isset( $db_row->ityp_add_aggregate_rating ) ? $db_row->ityp_add_aggregate_rating : $this->add_aggregate_rating;
@@ -216,7 +219,19 @@ class ItemType extends DataObject
 		param( 'ityp_usage', 'string' );
 		$this->set_from_Request( 'usage', NULL, true );
 
-		// Template name
+		// Template for Excerpt display
+		param( 'ityp_template_excerpt', 'string' );
+		$this->set_from_Request( 'template_excerpt', NULL, true );
+
+		// Template for Teaser display
+		param( 'ityp_template_normal', 'string' );
+		$this->set_from_Request( 'template_normal', NULL, true );
+
+		// Template for Full content display
+		param( 'ityp_template_full', 'string' );
+		$this->set_from_Request( 'template_full', NULL, true );
+
+		// PHP Template name
 		param( 'ityp_template_name', 'string' );
 		$this->set_from_Request( 'template_name', NULL, true );
 

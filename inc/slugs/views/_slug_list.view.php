@@ -54,11 +54,6 @@ $Results = new Results( $SQL->get(), 'slug_', 'A' );
 $Results->title = T_('Slugs').' ('.$Results->get_total_rows().')' . get_manual_link('slugs-list');
 $Results->Cache = get_SlugCache();
 
-if( $list_is_filtered )
-{ // List is filtered, offer option to reset filters:
-	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=slugs', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
-
 /**
  * Callback to add filters on top of the result set
  *
@@ -81,10 +76,8 @@ function filter_slugs( & $Form )
 $Results->filter_area = array(
 	'callback' => 'filter_slugs',
 	'url_ignore' => 'slug_filter,results_slug_page',
-	'presets' => array(
-		'all' => array( T_('All'), '?ctrl=slugs' ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All'), '?ctrl=slugs' );
 
 function get_slug_link( $Slug )
 {

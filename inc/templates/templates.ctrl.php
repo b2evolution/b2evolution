@@ -40,18 +40,23 @@ switch( $action )
 
 	case 'new':
 		$edited_Template = new Template();
+		// Set template owner to current user's primary group:
+		$edited_Template->set( 'owner_grp_ID', $current_User->get( 'grp_ID' ) );
 		break;
 
 	case 'copy':
-		// Set parent menu:
-		if( isset( $tpl_ID ) && empty( $edited_Template->parent_tpl_ID ) )
-		{
-			$edited_Template->set( 'parent_tpl_ID', $tpl_ID );
-		}
+		// Do not set a "translation of" value:
+		$edited_Template->set( 'translates_tpl_ID', NULL );
 	case 'edit':
 		// Menu edit form:
 		// Make sure we got a menu_ID:
 		param( 'tpl_ID', 'integer', true );
+		if( is_null( $edited_Template->get( 'owner_grp_ID') ) )
+		{	// This is a system-owned template, do not allow modification. Duplicate the template instead:
+			$action = 'copy';
+			// Set duplicated template owner to current user's primary group:
+			$edited_Template->set( 'owner_grp_ID', $current_User->get( 'grp_ID' ) );
+		}
 		break;
 
 	case 'duplicate':
@@ -71,6 +76,7 @@ switch( $action )
 		break;
 
 	case 'create':
+	case 'create_edit':
 		// Create new Menu:
 		$edited_Template = new Template();
 
@@ -87,14 +93,23 @@ switch( $action )
 			$edited_Template->dbinsert();
 			$Messages->add( sprintf( TB_('New %s created.'), T_('Template') ), 'success' );
 
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=templates&action=edit&tpl_ID='.$edited_Template->ID ); // Will EXIT
+			if( $action == 'create_edit' )
+			{	// Redirect back to edit form:
+				$redirect_to = $admin_url.'?ctrl=templates&action=edit&tpl_ID='.$edited_Template->ID;
+			}
+			else
+			{
+				$redirect_to = $admin_url.'?ctrl=templates';
+			}
+
+			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'new';
 		break;
 
 	case 'update':
+	case 'update_edit':
 		// Update menu:
 
 		// Check that this action request is not a CSRF hacked request:
@@ -113,15 +128,28 @@ switch( $action )
 			$edited_Template->dbupdate();
 			$Messages->add( sprintf( TB_('%s updated.'), T_('Template')  ), 'success' );
 
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=templates' ); // Will EXIT
+			if( $action == 'update_edit' )
+			{	// Redirect back to edit form:
+				$redirect_to = $admin_url.'?ctrl=templates&action=edit&tpl_ID='.$edited_Template->ID;
+			}
+			else
+			{	// Redirect to template list:
+				$redirect_to = $admin_url.'?ctrl=templates';
+			}
+
+			header_redirect( $redirect_to, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 		}
 		$action = 'edit';
 		break;
 
 	case 'delete':
-		// Delete menu:
+		// Delete template:
+		
+		if( is_null( $edited_Template->get( 'owner_grp_ID') ) )
+		{	// Do not allow system-owned templates to be deleted:
+			$action = 'list';
+		}
 
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'template' );
@@ -133,7 +161,7 @@ switch( $action )
 		param( 'tpl_ID', 'integer', true );
 
 		if( param( 'confirm', 'integer', 0 ) )
-		{ // confirmed, Delete from DB:
+		{	// confirmed, Delete from DB:
 			$msg = sprintf( TB_('Template &laquo;%s&raquo; deleted.'), $edited_Template->dget( 'name' ) );
 			$edited_Template->dbdelete();
 			unset( $edited_Template );
@@ -156,13 +184,11 @@ switch( $action )
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
 
-// Generate available blogs list:
-$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'templates' ) );
+$AdminUI->set_path( 'site', 'templates' );
 
-$AdminUI->set_path( 'collections', 'settings', 'templates' );
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
-$AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
-$AdminUI->breadcrumbpath_add( T_('Templates'), $admin_url.'?ctrl=templates&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_init( false );
+$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( T_('Templates'), $admin_url.'?ctrl=templates' );
 
 // Set an url for manual page:
 if( $action == 'new' || $action == 'edit' )

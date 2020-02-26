@@ -1380,7 +1380,6 @@ class Skin extends DataObject
 						$webmention_url = $Blog->get_htsrv_url().'webmention.php';
 						header( 'Link: <'.$webmention_url.'>; rel="webmention"' );
 						add_headline( '<link rel="webmention" href="'.$webmention_url.'" />' );
-						add_headline( '<link rel="http://webmention.org/" href="'.$webmention_url.'" />' );// used for older version of the protocol specification
 					}
 
 					// Used to set rating for a new comment:
@@ -1433,10 +1432,6 @@ class Skin extends DataObject
 
 					// Require functions.js to show/hide a panel with filters:
 					require_js_defer( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'disp_messages':
@@ -1456,10 +1451,6 @@ class Skin extends DataObject
 
 					// Init JS to quick upload several files:
 					init_fileuploader_js( 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'disp_contacts':
@@ -1476,10 +1467,6 @@ class Skin extends DataObject
 
 					// Require functions.js to show/hide a panel with filters:
 					require_js_defer( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'disp_threads':
@@ -1498,13 +1485,6 @@ class Skin extends DataObject
 					{ // Only for NON-bootstrap skins
 						require_css( 'results.css', 'blog' ); // Results/tables styles
 					}
-
-					// Require functions.js to show/hide a panel with filters:
-					require_js_defer( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'disp_search':
@@ -1654,10 +1634,6 @@ class Skin extends DataObject
 
 					// Require functions.js to show/hide a panel with filters
 					require_js_defer( 'functions.js', 'blog' );
-
-					// Include this file to expand/collapse the filters panel when JavaScript is disabled
-					global $inc_path;
-					require_once $inc_path.'_filters.inc.php';
 					break;
 
 				case 'disp_download':
@@ -1826,17 +1802,17 @@ var downloadInterval = setInterval( function()
 							'page_url' => '', // All generated links will refer to the current page
 							'before' => '<div class="results panel panel-default">',
 							'content_start' => '<div id="$prefix$ajax_content">',
-							'header_start' => '',
-								'header_text' => '<div class="center"><ul class="pagination">'
+							'header_start' => '<div class="results_header clearfix">',
+								'header_text' => '<div class="evo_pager"><div class="results_summary">$nb_results$ Results $reset_filters_button$</div><ul class="pagination">'
 										.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 									.'</ul></div>',
-								'header_text_single' => '',
-							'header_end' => '',
+								'header_text_single' => '<div class="results_summary">$nb_results$ Results $reset_filters_button$</div>',
+							'header_end' => '</div>',
 							'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 							'global_icons_class' => 'btn btn-default btn-sm',
 							'filters_start'        => '<div class="filters panel-body">',
 							'filters_end'          => '</div>',
-							'filter_button_class'  => 'btn-sm btn-info',
+							'filter_button_class'  => 'evo_btn_apply_filters btn-sm btn-info',
 							'filter_button_before' => '<div class="form-group pull-right">',
 							'filter_button_after'  => '</div>',
 							'messages_start' => '<div class="messages form-inline">',
@@ -1887,7 +1863,7 @@ var downloadInterval = setInterval( function()
 									'total_col_end' => "</td>\n",
 								'total_line_end' => "</tr>\n\n",
 							'list_end' => "</table></div>\n\n",
-							'footer_start' => '',
+							'footer_start' => '<div class="results_footer">',
 							'footer_text' => '<div class="center"><ul class="pagination">'
 									.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 								.'</ul></div><div class="center">$page_size$</div>'
@@ -1911,7 +1887,7 @@ var downloadInterval = setInterval( function()
 								'scroll_list_range' => 5,
 							'footer_end' => "\n\n",
 							'no_results_start' => '<div class="panel-footer">'."\n",
-							'no_results_end'   => '$no_results$</div>'."\n\n",
+							'no_results_end'   => '$no_results$ $reset_filters_button$</div>'."\n\n",
 							'content_end' => '</div>',
 							'after' => '</div>',
 							'sort_type' => 'basic'

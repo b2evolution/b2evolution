@@ -1273,6 +1273,10 @@ class Item extends ItemLight
 			{	// Task status:
 				$ItemTypeCache = & get_ItemTypeCache();
 				$current_ItemType = $ItemTypeCache->get_by_ID( $this->get( 'ityp_ID' ) );
+				if( get_param( 'item_st_ID' ) === 0 )
+				{	// Store NULL value instead of 0 in DB:
+					set_param( 'item_st_ID', NULL );
+				}
 				if( in_array( get_param( 'item_st_ID' ), $current_ItemType->get_applicable_post_status() ) || get_param( 'item_st_ID' ) === NULL )
 				{	// Save only task status which is allowed for item's type:
 					$this->set_from_Request( 'pst_ID', 'item_st_ID', true );
@@ -1294,6 +1298,10 @@ class Item extends ItemLight
 			if( $this->can_edit_workflow( 'priority' ) &&
 			    param( 'item_priority', 'integer', NULL ) !== NULL )
 			{	// Priority:
+				if( get_param( 'item_priority' ) === 0 )
+				{	// Store NULL value instead of 0 in DB:
+					set_param( 'item_priority', NULL );
+				}
 				$this->set_from_Request( 'priority', 'item_priority', true );
 			}
 
@@ -1861,11 +1869,16 @@ class Item extends ItemLight
 	 * @param string blog settings name. Param value can be 'allow_comments', 'allow_attachments','allow_rating_items'
 	 * @return boolean  true if user is allowed for the corresponding action
 	 */
-	function check_blog_settings( $settings_name )
+	function check_blog_settings( $settings_name, $settings_object = NULL )
 	{
 		global $current_User;
 
 		$this->load_Blog();
+
+		if( ( $settings_name == 'allow_attachments' ) && isset( $settings_object ) && ( $settings_object instanceof Comment ) && $settings_object->is_meta() )
+		{	// Always allow attachments for meta Comments:
+			return true;
+		}
 
 		switch( $this->Blog->get_setting( $settings_name ) )
 		{
@@ -1894,20 +1907,31 @@ class Item extends ItemLight
 	 *                        FALSE to count ONLY attachments of the created comments
 	 * @return boolean true if user can attach files to this post comments, false if s/he cannot
 	 */
-	function can_attach( $link_tmp_ID = false )
+	function can_attach( $Comment = NULL )
 	{
-		global $Settings;
+		global $Settings, $current_User;
 
 		$attachments_quota_is_full = false;
 		if( is_logged_in() )
 		{	// We can check the attachments quota only for registered users
 			$this->load_Blog();
+
+			if( isset( $Comment ) && ( $Comment instanceof Comment ) && $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'add', false, $this->get_blog_ID() ) )
+			{	// Always allow attachments for meta Comments:
+				return true;
+			}
+
 			$max_attachments = (int)$this->Blog->get_setting( 'max_attachments' );
 			if( $max_attachments > 0 )
 			{	// Check attachments quota only when Blog setting "Max # of attachments" is defined
 				global $DB, $current_User, $Session;
 
 				// Get a number of attachments for current user on this post
+				$link_tmp_ID = false;
+				if( isset( $Comment ) && isset( $Comment->temp_link_owner_ID ) )
+				{
+					$link_tmp_ID = $Comment->temp_link_owner_ID;
+				}
 				$attachments_count = $this->get_attachments_number( NULL, $link_tmp_ID );
 
 				// Get the attachments from preview comment
@@ -2021,6 +2045,8 @@ class Item extends ItemLight
 			$sql_where .= ' OR ( comment_item_ID IS NULL AND link_tmp_ID = '.$DB->quote( $link_tmp_ID ).' )';
 		}
 		$SQL->WHERE_and( $sql_where );
+		// Do not include meta comments in the count:
+		$SQL->WHERE_and( 'comment_type != "meta"');
 		$cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ] = intval( $DB->get_var( $SQL->get(), 0, NULL, $SQL->title ) );
 
 		return $cache_item_attachments_number[ $User->ID ][ $link_tmp_ID ];
@@ -2318,7 +2344,8 @@ class Item extends ItemLight
 				'after'               => '</div>',
 				'excerpt_before_more' => ' <span class="excerpt_more">',
 				'excerpt_after_more'  => '</span>',
-				'excerpt_more_text'   => T_('more').' &raquo;',
+				'excerpt_more_text'   => '#more+arrow', 	// possible special values: ...
+				'excerpt_more_class'  => 'nowrap',
 				'format'              => 'htmlbody',
 			), $params );
 
@@ -2327,13 +2354,17 @@ class Item extends ItemLight
 		if( ! empty( $r ) )
 		{
 			echo $params['before'];
+
 			echo $r;
-			if( !empty( $params['excerpt_more_text'] ) )
-			{
-				echo $params['excerpt_before_more'];
-				echo '<a href="'.$this->get_permanent_url().'" class="nowrap">'.$params['excerpt_more_text'].'</a>';
-				echo $params['excerpt_after_more'];
-			}
+
+			$this->permanent_link( array(
+					'before'      => $params['excerpt_before_more'],
+					'after'       => $params['excerpt_after_more'],
+					'text'        => $params['excerpt_more_text'],
+					'title'       => '#',
+					'class'       => $params['excerpt_more_class'],
+				) );
+
 			echo $params['after'];
 		}
 	}
@@ -4441,7 +4472,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Template tag
+	 * Display "more" link to "After more" or follow-up anchor
 	 */
 	function more_link( $params = array() )
 	{
@@ -4450,7 +4481,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Display more link
+	 * Get "more" link to "After more" or follow-up anchor
 	 */
 	function get_more_link( $params = array() )
 	{
@@ -4471,10 +4502,11 @@ class Item extends ItemLight
 		global $more;
 
 		if( ! $this->has_content_parts($params) )
-		{ // This is NOT an extended post:
+		{ // This is NOT an extended post, no "read more" is needed:
 			return '';
 		}
 
+		/* fp 2020-02-22: obsolete code 
 		if( ( $more == 0 ) && ( $params[ 'link_to' ] == false ) )
 		{ // Don't display "After more" content
 			if( !empty( $params[ 'link_text' ] ) )
@@ -4483,6 +4515,7 @@ class Item extends ItemLight
 			}
 			return '';
 		}
+		*/
 
 		$content_parts = $this->get_content_parts($params);
 
@@ -4965,7 +4998,7 @@ class Item extends ItemLight
 
 		// Generate the IMG tag with all the alt, title and desc if available
 		return $Link->get_tag( array_merge( $params, array(
-					'image_link_to'    => $link_to,
+					'image_link_to'    => $link_to,   // can be URL, can be empty
 					'image_link_title' => $link_title,
 					'image_link_rel'   => $link_rel,
 					'image_alt'        => $this->get( 'title' ),
@@ -5006,7 +5039,10 @@ class Item extends ItemLight
 				'after'                      => '</div>',
 				'image_size'                 => 'fit-720x500',
 				'image_size_x'               => 1, // Use '2' to build 2x sized thumbnail that can be used for Retina display
-				'image_link_to'              => 'original', // Can be 'original' (image) or 'single' (this post)
+				'image_sizes'                => NULL, // Simplified "sizes=" attribute for browser to select correct size from "srcset=".
+															// Must be set DIFFERENTLY depending on WIDGET/CONTAINER/SKIN LAYOUT. Each time we must estimate the size the image will have on screen.
+															// Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
+				'image_link_to'              => 'original', // Can be 'original' (image), 'single' (this post), an be URL, can be empty
 				'limit'                      => 1000, // Max # of images displayed
 				'before_gallery'             => '<div class="bGallery">',
 				'after_gallery'              => '</div>',
@@ -5015,15 +5051,21 @@ class Item extends ItemLight
 				'gallery_colls'              => 5,
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
 				'gallery_link_rel'           => 'lightbox[p'.$this->ID.']',
-				// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
-				// '#teaser_all' => 'teaser,teaserperm,teaserlink',
-				// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
 				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore',
+																// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
+																// '#teaser_all' => 'teaser,teaserperm,teaserlink',
+																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
+				'placeholder'                => '',		// HTML to be displayed if no image; possible codes: #folder_icon
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
 				'links_sql_select'           => '',
 				'links_sql_orderby'          => 'link_order',
 			), $params );
+
+
+// TODO: add some image_block_classes param that does something like this:
+// Inject extra class name(s) into 'before_image' param:
+//	$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
 
 		// Get list of ALL attached files
 		$links_params = array(
@@ -5051,19 +5093,29 @@ class Item extends ItemLight
 			$tmp_object_ID = NULL;
 		}
 
+		// GET list of images to display:
 		$LinkOwner = new LinkItem( $this, $tmp_object_ID );
 		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000, $params['restrict_to_image_position'], NULL, $links_params ) )
-		{
-			return '';
+		{	// No images match requested positions:
+			// Display placeholder:
+			$placeholder_html = $params['placeholder'];
+			switch( $placeholder_html )
+			{
+				case '#file_text_icon';
+					$placeholder_html = '<div class="evo_image_block evo_img_placeholder"><a href="$url$" class="evo_img_placeholder"><i class="fa fa-file-text-o"></i></a></div>';
+					break;
+			}
+			return str_replace( '$url$', $this->get_permanent_url(), $placeholder_html );
 		}
 
+		// LOOP through images:
 		$galleries = array();
 		$image_counter = 0;
 		$plugin_render_attachments = false;
 		while( $image_counter < $params['limit'] && $Link = & $LinkList->get_next() )
 		{
 			if( ! ( $File = & $Link->get_File() ) )
-			{ // No File object
+			{ // No File object:
 				global $Debuglog;
 				$log_message = sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID );
 				if( $this->is_revision() )
@@ -5075,7 +5127,7 @@ class Item extends ItemLight
 			}
 
 			if( ! $File->exists() )
-			{ // File doesn't exist
+			{ // File doesn't exist:
 				global $Debuglog;
 				$log_message = sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() );
 				if( $this->is_revision() )
@@ -5097,7 +5149,7 @@ class Item extends ItemLight
 			$params['Item'] = $this;
 
 			if( $File->is_dir() && $params['gallery_image_limit'] > 0 )
-			{ // This is a directory/gallery
+			{ // This is a directory/gallery:
 				if( ( $gallery = $File->get_gallery( $params ) ) != '' )
 				{ // Got gallery code
 					$galleries[] = $gallery;
@@ -5106,13 +5158,13 @@ class Item extends ItemLight
 			}
 
 			if( ! $params['get_rendered_attachments'] )
-			{ // Save $r to temp var in order to don't get the rendered data from plugins
+			{ // Save $r to temp var in order not to get the rendered data from plugins
 				$temp_r = $r;
 			}
 
 			$temp_params = $params;
 			foreach( $params as $param_key => $param_value )
-			{ // Pass all params by reference, in order to give possibility to modify them by plugin
+			{	// Pass all params by reference, in order to give possibility to modify them by plugin
 				// So plugins can add some data before/after image tags (E.g. used by infodots plugin)
 				$params[ $param_key ] = & $params[ $param_key ];
 			}
@@ -5136,7 +5188,7 @@ class Item extends ItemLight
 				continue;
 			}
 
-			// Generate the IMG tag with all the alt, title and desc if available
+			// GENERATE the IMG tag with all the alt, title and desc if available
 			$r .= $this->get_attached_image_tag( $Link, $params );
 
 			$image_counter++;
@@ -5178,16 +5230,15 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get URL of a first found image by positions
+	 * Get File of a first found image by positions
 	 *
 	 * @param array Parameters
-	 * @return string|NULL cover URL or NULL if it doesn't exist
+	 * @return object|NULL File
 	 */
-	function get_image_url( $params = array() )
+	function & get_image_File( $params = array() )
 	{
 		$params = array_merge( array(
 				'position' => '#cover_and_teaser_all',
-				'size'     => 'original',
 			), $params );
 
 		// Set image positions from possible predefined values:
@@ -5205,30 +5256,56 @@ class Item extends ItemLight
 		if( ! ( $LinkList = $LinkOwner->get_attachment_LinkList( 1, $params['position'] ) ) ||
 		    ! ( $Link = & $LinkList->get_next() ) )
 		{	// No image
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 
 		if( ! ( $File = & $Link->get_File() ) )
 		{	// No File object
 			global $Debuglog;
 			$Debuglog->add( sprintf( 'Link ID#%d of item #%d does not have a file object!', $Link->ID, $this->ID ), array( 'error', 'files' ) );
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 
 		if( ! $File->exists() )
 		{	// File doesn't exist
 			global $Debuglog;
 			$Debuglog->add( sprintf( 'File linked to item #%d does not exist (%s)!', $this->ID, $File->get_full_path() ), array( 'error', 'files' ) );
-			return NULL;
+			$r = NULL;
+			return $r;
 		}
 
 		if( ! $File->is_image() )
 		{	// Skip anything that is not an image
+			$r = NULL;
+			return $r;
+		}
+
+		return $File;
+	}
+
+
+	/**
+	 * Get URL of a first found image by positions
+	 *
+	 * @param array Parameters
+	 * @return string|NULL Image URL or NULL if it doesn't exist
+	 */
+	function get_image_url( $params = array() )
+	{
+		$params = array_merge( array(
+				'position' => '#cover_and_teaser_all',
+				'size'     => 'original',
+			), $params );
+
+		if( ! ( $image_File = & $this->get_image_File( $params ) ) )
+		{	// Wrong image file:
 			return NULL;
 		}
 
 		// Get image URL for requested size:
-		$img_attribs = $File->get_img_attribs( $params['size'] );
+		$img_attribs = $image_File->get_img_attribs( $params['size'] );
 
 		return $img_attribs['src'];
 	}
@@ -5245,6 +5322,29 @@ class Item extends ItemLight
 	function get_cover_image_url( $position = 'cover' )
 	{
 		return $this->get_image_url( array( 'position' => $position ) );
+	}
+
+
+	/**
+	 * Get CSS property for background with image of this Item
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_background_image_css( $params = array() )
+	{
+		$params = array_merge( array(
+				'position' => '#cover_and_teaser_all',
+				'size'     => 'fit-1280x720',
+				'size_2x'  => 'fit-2560x1440',
+			), $params );
+
+		if( ! ( $image_File = & $this->get_image_File( $params ) ) )
+		{	// Don't provide css for wrong image file:
+			return '';
+		}
+
+		return $image_File->get_background_image_css( $params );
 	}
 
 
@@ -13446,6 +13546,11 @@ class Item extends ItemLight
 	{
 		global $DB;
 
+		if( empty( $this->ID ) )
+		{	// Don't try to create revision when Item is not created yet:
+			return false;
+		}
+
 		// Get next version ID:
 		$iver_ID = $this->get_next_version_ID( 'archived' );
 
@@ -14198,7 +14303,7 @@ class Item extends ItemLight
 				$ItemStatusCache->load_all();
 				$ItemTypeCache = & get_ItemTypeCache();
 				$current_ItemType = & $this->get_ItemType();
-				$Form->select_options( 'item_st_ID', $ItemStatusCache->get_option_list( $this->get( 'pst_ID' ), true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status') );
+				$Form->select_input_options( 'item_st_ID', $ItemStatusCache->get_option_list( $this->get( 'pst_ID' ), true, 'get_name', $current_ItemType->get_ignored_post_status() ), T_('Task status'), '', $params );
 				break;
 
 			case 'user':
@@ -14209,31 +14314,57 @@ class Item extends ItemLight
 
 				if( count( $UserCache->cache ) > 20 )
 				{
+					$params = array_merge( array(
+							'size' => 10,
+						), $params );
 					$assigned_User = & $UserCache->get_by_ID( $this->get( 'assigned_user_ID' ), false, false );
-					$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', array( 'size' => 10 ) );
+					$Form->username( 'item_assigned_user_login', $assigned_User, T_('Assigned to'), '', 'only_assignees', $params );
 				}
 				else
 				{
-					$Form->select_object( 'item_assigned_user_ID', NULL, $this, T_('Assigned to'), '', true, '', 'get_assigned_user_options' );
+					$params = array_merge( array(
+							'note' => '',
+							'allow_none' => true,
+							'class' => '',
+							'object_callback' => 'get_assigned_user_options',
+						), $params );
+					$Form->select_input_object( 'item_assigned_user_ID', NULL, $this, T_('Assigned to'), $params );
 				}
 				break;
 
 			case 'priority':
-				$Form->select_input_array( 'item_priority', $this->get( 'priority' ), item_priority_titles(), T_('Priority'), '', array( 'force_keys_as_values' => true ) );
+				$params = array_merge( array(
+						'force_keys_as_values' => true,
+					), $params );
+				$Form->select_input_array( 'item_priority', $this->get( 'priority' ), item_priority_titles(), T_('Priority'), '', $params );
 				break;
 
 			case 'deadline':
 				if( $this->get_coll_setting( 'use_deadline' ) )
 				{	// Display deadline fields only if it is enabled for collection:
-					$Form->begin_line( T_('Deadline'), 'item_deadline' );
-
+					$is_inline = isset( $Form->is_lined_fields ) && $Form->is_lined_fields;
+					if( ! $is_inline )
+					{
+						$Form->begin_line( T_('Deadline'), 'item_deadline', '', $params );
+					}
+						$date_params = array_merge( array(
+								'input_suffix' => '&nbsp;'.T_('at').'&nbsp;',
+								'placeholder'  => locale_input_datefmt(),
+							), $params ); 
 						$datedeadline = $this->get( 'datedeadline' );
-						$Form->date( 'item_deadline', $datedeadline, '' );
+						$Form->date_input( 'item_deadline', $datedeadline, '', $date_params );
 
 						$datedeadline_time = empty( $datedeadline ) ? '' : date( 'Y-m-d H:i', strtotime( $datedeadline ) );
-						$Form->time( 'item_deadline_time', $datedeadline_time, T_('at'), 'hh:mm' );
-
-					$Form->end_line();
+						$time_params = array_merge( array(
+								'time_format' => 'hh:mm',
+								'placeholder' => 'hh:mm',
+								'note'        => '',
+							), $params );
+						$Form->time_input( 'item_deadline_time', $datedeadline_time, T_('at'), $time_params );
+					if( ! $is_inline )
+					{
+						$Form->end_line();
+					}
 				}
 				break;
 		}

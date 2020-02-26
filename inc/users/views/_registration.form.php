@@ -131,9 +131,16 @@ $Form->begin_fieldset( T_('Other options').get_manual_link('other-registration-s
 					array( 'continue', T_('Continue directly to next page (note: user will have no password)') ),
 				), T_('After quick registration'), true );
 
-	$Form->checkbox_input( 'registration_require_country', $Settings->get('registration_require_country'), T_('Require country'), array( 'note'=>T_('New users will have to specify their country in order to register.') ) );
+	$Form->radio( 'registration_no_username', $Settings->get( 'registration_no_username'), array(
+					array( 'firstname', sprintf( T_('Use %s'), '<code>firstname</code>').' ('.T_('default').')' ),
+					array( 'firstname.lastname', sprintf( T_('Use %s'), '<code>firstname.lastname</code>') )
+				), T_('If no username'), true );
 
 	$Form->checkbox_input( 'registration_require_firstname', $Settings->get('registration_require_firstname'), T_('Require first name'), array( 'note'=>T_('New users will have to specify their first name in order to register.') ) );
+
+	$Form->checkbox_input( 'registration_require_lastname', $Settings->get('registration_require_lastname'), T_('Require last name'), array( 'note'=>T_('New users will have to specify their last name in order to register.') ) );
+
+	$Form->checkbox_input( 'registration_require_country', $Settings->get('registration_require_country'), T_('Require country'), array( 'note'=>T_('New users will have to specify their country in order to register.') ) );
 
 	$Form->checkbox_input( 'registration_ask_locale', $Settings->get('registration_ask_locale'), T_('Ask for language'), array( 'note'=>T_('New users will be prompted for their preferred language/locale.') ) );
 

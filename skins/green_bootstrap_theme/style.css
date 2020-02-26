@@ -101,7 +101,7 @@ body.pictured div#debug_info.debug {
   width: 100%;
 }
 @media only screen and (max-width: 640px) {
-  body.disp_front .evo_site_skin__header {
+  body.disp_front #evo_site_header {
     margin-bottom: 0;
   }
   body.disp_front #bg_picture {

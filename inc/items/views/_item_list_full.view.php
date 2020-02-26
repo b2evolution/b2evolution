@@ -75,10 +75,6 @@ if( $action == 'view' )
 else
 { // We are displaying multiple posts ( Not a single post! )
 	$block_item_Widget->title = T_('Posts Browser').get_manual_link( 'browse-edit-tab' );
-	if( $ItemList->is_filtered() )
-	{ // List is filtered, offer option to reset filters:
-		$block_item_Widget->global_icon( T_('Reset all filters!'), 'reset_filters', '?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset', T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-	}
 
 	// Generate global icons depending on seleted tab with item type
 	item_type_global_icons( $block_item_Widget );
@@ -108,8 +104,8 @@ else
 
 	// Initialize things in order to be ready for displaying.
 	$display_params = array(
-			'header_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['header_start'] ),
-			'footer_start' => str_replace( 'class="', 'class="NavBar center ', $admin_template['footer_start'] ),
+			'header_start' => $admin_template['header_start'],
+			'footer_start' => $admin_template['footer_start'],
 		);
 }
 

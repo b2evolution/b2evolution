@@ -27,7 +27,7 @@ class UserQuery extends FilterSQL
 	 * Fields of users table to search by keywords
 	 *
 	 */
-	var $keywords_fields = 'user_login, user_firstname, user_lastname, user_nickname, user_email';
+	var $keywords_fields = 'user_login, user_firstname, user_lastname, user_nickname';
 
 	/**
 	 * Constructor.
@@ -60,7 +60,7 @@ class UserQuery extends FilterSQL
 				'grouped'          => false,
 			), $params );
 
-		$this->SELECT( 'user_ID, user_login, user_nickname, user_lastname, user_firstname, user_gender, user_source, user_created_datetime, user_profileupdate_date, user_lastseen_ts, user_level, user_status, user_avatar_file_ID, user_email, user_url, user_age_min, user_age_max, user_pass, user_salt, user_pass_driver, user_locale, user_unsubscribe_key, user_reg_ctry_ID, user_ctry_ID, user_rgn_ID, user_subrg_ID, user_city_ID, user_grp_ID' );
+		$this->SELECT( 'user_ID, user_login, user_nickname, user_lastname, user_firstname, user_gender, user_source, user_created_datetime, user_profileupdate_date, user_lastseen_ts, user_level, user_status, user_avatar_file_ID, user_email, user_url, user_birthday_year, user_birthday_month, user_birthday_day, user_age_min, user_age_max, user_pass, user_salt, user_pass_driver, user_locale, user_unsubscribe_key, user_reg_ctry_ID, user_ctry_ID, user_rgn_ID, user_subrg_ID, user_city_ID, user_grp_ID' );
 		$this->SELECT_add( ', IF( user_avatar_file_ID IS NOT NULL, 1, 0 ) as has_picture' );
 		$this->FROM( $this->dbtablename );
 
@@ -252,6 +252,22 @@ class UserQuery extends FilterSQL
 
 
 	/**
+	 * Restrict with email
+	 *
+	 * @param string Email
+	 */
+	function where_email( $email )
+	{
+		global $DB;
+
+		if( $email !== '' )
+		{	// Filter only by not empty email address:
+			$this->WHERE_and( 'user_email LIKE '.$DB->quote( '%'.$email.'%' ) );
+		}
+	}
+
+
+	/**
 	 * Restrict with gender
 	 *
 	 * @param string Gender ( M, F, O, MF, MO, FO, MFO )
@@ -294,7 +310,7 @@ class UserQuery extends FilterSQL
 			return;
 		}
 
-		if( $status == 'activated' && !$exactly )
+		if( ( $status == 'activated' || $status === 1 ) && !$exactly )
 		{	// Activated, Manually activated, Autoactivated users:
 			$this->add_filter_rule( 'status', array( 'activated', 'autoactivated', 'manualactivated' ), '=', 'OR' );
 		}
@@ -724,6 +740,66 @@ class UserQuery extends FilterSQL
 
 
 	/**
+	 * Restrict with user name or email
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_name_email( $value, $operator )
+	{
+		return $this->get_where_condition( 'CONCAT_WS( " ", user_login, user_email, user_firstname, user_lastname, user_nickname )', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user first name
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_firstname( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_firstname', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user last name
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_lastname( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_lastname', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user nickname
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_nickname( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_nickname', $value, $operator );
+	}
+
+
+	/**
+	 * Restrict with user email
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_email( $value, $operator )
+	{
+		return $this->get_where_condition( 'user_email', $value, $operator );
+	}
+
+
+	/**
 	 * Restrict with user gender
 	 *
 	 * @param string Value
@@ -734,6 +810,21 @@ class UserQuery extends FilterSQL
 		if( in_array( $value, array( 'M', 'F', 'O' ) ) )
 		{
 			return $this->get_where_condition( 'user_gender', $value, $operator );
+		}
+	}
+
+
+	/**
+	 * Restrict with user country
+	 *
+	 * @param string Value
+	 * @param string Operator
+	 */
+	function filter_field_country( $value, $operator )
+	{
+		if( ! empty( $value ) )
+		{
+			return $this->get_where_condition( 'user_ctry_ID', $value, $operator );
 		}
 	}
 

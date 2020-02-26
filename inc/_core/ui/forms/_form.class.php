@@ -22,7 +22,6 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( '_core/ui/_uiwidget.class.php', 'Table' );
 load_class( '_core/ui/_uiwidget.class.php', 'Widget' );
 
 /**
@@ -4983,8 +4982,8 @@ class Form extends Widget
 			case 'Comment':
 				$Comment = $object;
 				$comment_Item = & $Comment->get_Item();
-				if( ! $comment_Item->check_blog_settings( 'allow_attachments' ) )
-				{	// Item attachments must be allowed by collection setting depending on user type(anounymous, registered, member and etc.):
+				if( ! $comment_Item->check_blog_settings( 'allow_attachments', $Comment ) || ! $comment_Item->can_attach( $Comment ) )
+				{	// Comment attachments must be allowed by collection setting depending on user type(anonymous, registered, member and etc.).:
 					return;
 				}
 				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );

@@ -56,7 +56,6 @@ $params = array_merge( array(
 						'block_after'     => '',
 						'block_separator' => '<br /><br />' ) ) )
 			) ),
-		'comment_mode'         => '', // Can be 'quote' from GET request
 		'comment_type'         => 'comment',
 		'comment_title_before'  => '<div class="panel-heading"><h4 class="evo_comment_title panel-title">',
 		'comment_title_after'   => '</h4></div><div class="panel-body">',
@@ -212,20 +211,11 @@ if( $params['comment_type'] == 'meta' )
 				$checked_attachments = $Comment->checked_attachments;
 			}
 
-			if( $params['comment_mode'] == 'quote' )
-			{	// These params go from ajax form loading, Used to reply with quote
-				set_param( 'mode', $params['comment_mode'] );
-				set_param( 'qc', $params['comment_qc'] );
-				set_param( 'qp', $params['comment_qp'] );
-				set_param( $dummy_fields[ 'content' ], $params[ $dummy_fields[ 'content' ] ] );
-			}
-
-			$mode = param( 'mode', 'string' );
-			if( $mode == 'quote' )
+			$quoted_comment_ID = param( 'quote_comment', 'integer', 0 );
+			$quoted_post_ID = param( 'quote_post', 'integer', 0 );
+			if( $quoted_comment_ID || $quoted_post_ID )
 			{ // Quote for comment/post
 				$comment_content = param( $dummy_fields[ 'content' ], 'html' );
-				$quoted_comment_ID = param( 'qc', 'integer', 0 );
-				$quoted_post_ID = param( 'qp', 'integer', 0 );
 				if( ! empty( $quoted_comment_ID ) &&
 						( $CommentCache = & get_CommentCache() ) &&
 						( $quoted_Comment = & $CommentCache->get_by_ID( $quoted_comment_ID, false ) ) &&
@@ -372,12 +362,6 @@ if( $params['comment_type'] == 'meta' )
 			$Form->info_field( '', $params['policy_text'] );
 		}
 
-		// Display workflow properties if current user can edit at least one workflow property:
-		skin_include( '_item_comment_workflow.inc.php', array_merge( $params, array(
-			'Form'    => & $Form,
-			'Comment' => & $Comment,
-		) ) );
-
 		if( $Item->can_edit_workflow() )
 		{	// Prepend info for the form submit button title to inform user about additional action when workflow properties are on the form:
 			$params['form_submit_text'] = T_('Update Status').' / '.$params['form_submit_text'];
@@ -413,9 +397,9 @@ if( $params['comment_type'] == 'meta' )
 		$Form->textarea_input( $dummy_fields['content'], $comment_content, $params['textarea_lines'], $params['form_comment_text'], array(
 				'note'  => $note,
 				'cols'  => 38,
-				'class' => 'autocomplete_usernames link_attachment_dropzone',
+				'class' => ( $Comment->is_meta() || $Blog->get_setting( 'autocomplete_usernames') ? 'autocomplete_usernames' : '' ).' link_attachment_dropzone',
 				'id'    => $content_id,
-				'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
+				'maxlength' => ( $Comment->is_meta() ? '' : $Blog->get_setting( 'comment_maxlen' ) ),
 			) );
 		$Form->inputstart = $form_inputstart;
 
@@ -430,7 +414,7 @@ if( $params['comment_type'] == 'meta' )
 			'content_id'    => $content_id,
 			'edit_layout'   => 'inskin',
 		) );
-		$quick_setting_switch = ob_get_flush();
+		$admin_display_editor_button = ob_get_clean();
 
 		$comment_options = array();
 		if( ! is_logged_in( false ) )
@@ -450,10 +434,6 @@ if( $params['comment_type'] == 'meta' )
 			$comment_options[] = array( 'comment_user_notify', 1, T_('Notify me of replies'), ( isset( $comment_user_notify ) ? $comment_user_notify : 1 ) );
 		}
 		*/
-		if( count( $comment_options ) > 0 )
-		{	// Display additional options:
-			$Form->checklist( $comment_options, 'comment_options', T_('Options') );
-		}
 
 		// Display renderers
 		$comment_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $comment_renderers, array(
@@ -461,10 +441,68 @@ if( $params['comment_type'] == 'meta' )
 				'setting_name' => 'coll_apply_comment_rendering',
 				'js_prefix'    => $plugin_js_prefix,
 			) );
+
+		$text_renderers = '';
 		if( !empty( $comment_renderer_checkboxes ) )
 		{
-			$Form->info( T_('Text Renderers'), $comment_renderer_checkboxes );
+			$text_renderers .= '<div id="commentform_renderers" class="btn-group dropup pull-right">
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span> '.T_('Text Renderers').'</button>
+					<div class="dropdown-menu dropdown-menu-right">'.$comment_renderer_checkboxes.'</div>
+				</div>';
+				// JS code to don't hide popup on click to checkbox:
+				$text_renderers .= '<script>jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } )</script>';
 		}
+
+		if( $Blog->get_setting( 'allow_html_comment' ) )
+		{
+			$form_fieldstart = $Form->fieldstart;
+			$Form->fieldstart = add_tag_class( $Form->fieldstart, 'comment_text_renderers' );
+			$Form->begin_line();
+			echo '<div class="text_editor_controls">';
+				echo '<div>';
+				echo $admin_display_editor_button;
+				echo '</div>';
+
+				if( ! empty( $text_renderers ) )
+				{
+					echo $text_renderers;
+				}
+			echo '</div>';
+			$Form->end_line();
+			$Form->fieldstart = $form_fieldstart;
+
+			if( count( $comment_options ) > 0 )
+			{
+				$Form->checklist( $comment_options, 'comment_options', T_('Options') );
+			}
+		}
+		else
+		{
+			if( count( $comment_options ) > 0 )
+			{
+				$form_inputstart = $Form->inputstart;
+				$form_inputend   = $Form->inputend;
+
+				$Form->inputstart = add_tag_class( $Form->inputstart, 'text_editor_controls' );
+				$Form->inputstart .='<div>';
+				$Form->inputend = '</div><div class="comment_text_renderers">'.$text_renderers.'</div>'.$Form->inputend;
+
+				$Form->checklist( $comment_options, 'comment_options', T_('Options') );
+
+				$Form->inputstart = $form_inputstart;
+				$Form->inputend   = $form_inputend;
+			}
+			elseif( ! empty( $text_renderers ) )
+			{
+				$form_fieldstart = $Form->fieldstart;
+				$Form->fieldstart = add_tag_class( $Form->fieldstart, 'comment_text_renderers' );
+				$Form->begin_line();
+				echo $text_renderers;
+				$Form->end_line();
+				$Form->fieldstart = $form_fieldstart;
+			}
+		}
+
 
 	// Attach files:
 	if( !empty( $comment_attachments ) )
@@ -501,6 +539,12 @@ if( $params['comment_type'] == 'meta' )
 	// Display attachments fieldset:
 	$Form->attachments_fieldset( $Comment, false, $Comment->is_meta() ? 'meta_' : '' );
 
+		// Display workflow properties if current user can edit at least one workflow property:
+		skin_include( '_item_comment_workflow.inc.php', array_merge( $params, array(
+			'Form'    => & $Form,
+			'Comment' => & $Comment,
+		) ) );
+
 		$Plugins->trigger_event( 'DisplayCommentFormFieldset', array( 'Form' => & $Form, 'Item' => & $Item ) );
 
 		// Display plugin captcha for comment form before submit button:
@@ -526,16 +570,7 @@ if( $params['comment_type'] == 'meta' )
 
 			echo $Form->buttonsend;
 		$Form->end_fieldset();
-		?>
-		<script>
-		jQuery( document ).ready( function() {
-			// Align TinyMCE toggle buttons:
-			jQuery( '.evo_tinymce_toggle_buttons' ).addClass( 'col-sm-offset-3' );
-		} );
-		</script>
-		<div class="clear"></div>
 
-		<?php
 		$Form->end_form();
 
 		echo $params['after_comment_form'];

@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2019 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  */
@@ -377,7 +377,7 @@ if( mainlist_get_item() )
 				}
 				if( $bbcode_plugin_is_enabled && $Item->can_comment( NULL ) )
 				{	// Display button to quote this post
-					echo '<a href="'.$Item->get_permanent_url().'?mode=quote&amp;qp='.$Item->ID.'#form_p'.$Item->ID.'" title="'.T_('Reply with quote').'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
+					echo '<a href="'.$Item->get_permanent_url().'?quote_post='.$Item->ID.'#form_p'.$Item->ID.'" title="'.format_to_output( T_('Reply with quote'), 'htmlattr' ).'" class="'.button_class( 'text' ).' pull-left quote_button">'.get_icon( 'comments', 'imgtag', array( 'title' => T_('Reply with quote') ) ).' '.T_('Quote').'</a>';
 				}
 
 				if( $disp != 'page' )

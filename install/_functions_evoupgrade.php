@@ -11394,6 +11394,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		$tables_num = 0;
 		$columns_num = 0;
 		$tables = $DB->get_col( 'SHOW TABLES' );
+		// Ignore these ID columns because they can be be signed:
+		$ignore_signed_columns = array(
+			'step_yes_next_step_ID',
+			'step_no_next_step_ID',
+			'step_error_next_step_ID',
+		);
 		foreach( $tables as $table_name )
 		{
 			if( ! in_array( $table_name, $db_config['aliases'] ) )
@@ -11407,6 +11413,10 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				.' AND Type LIKE "int(11)%"' );
 			foreach( $columns as $column )
 			{
+				if( in_array( $column->Field, $ignore_signed_columns ) )
+				{	// Skip signed columns:
+					continue;
+				}
 				$modify_columns[ $column->Field ] = 'MODIFY COLUMN `'.$column->Field.'` '
 					.'INT(10) UNSIGNED ' // Change from INT(11) to INT(10)
 					.( $column->Null == 'YES' ? 'NULL' : 'NOT NULL' )
@@ -12151,6 +12161,251 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 15790, 'Upgrading menu entries table...') )
 	{	// part of 7.1.2-beta
 		db_add_col( 'T_menus__entry', 'ment_item_slug', 'VARCHAR(255) COLLATE ascii_general_ci NULL AFTER ment_item_ID' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15800, 'Upgrading item types table...') )
+	{	// part of 7.1.2-beta
+		db_upgrade_cols( 'T_items__type', array(
+			'ADD' => array(
+				'ityp_template_excerpt' => 'VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL AFTER ityp_usage',
+				'ityp_template_normal'  => 'VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL AFTER ityp_template_excerpt',
+				'ityp_template_full'    => 'VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL AFTER ityp_template_normal',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15810 ) )
+	{	// part of 7.1.2-beta
+		global $plugins_path;
+		$admin_Plugins = & get_Plugins_admin();
+
+		$plugins_to_remove = array(
+				'adsense_plugin',
+				'cookie_consent_plugin',
+				'flowplayer_plugin',
+				'google_maps_plugin',
+				'watermark_plugin',
+				'facebook_plugin',
+				'proof_of_work_captcha_plugin',
+				'smilies_plugin',
+				'twitter_tweet_renderer_plugin'
+			);
+		foreach( $plugins_to_remove as $plugin_class )
+		{
+			if( $loop_Plugin = & $admin_Plugins->get_by_classname( $plugin_class ) )
+			{
+				echo get_install_format_text( sprintf( '<span class="text-warning"><evo:warning>'
+						.'The plugin %s is no longer updated by b2evolution v7. '
+						.'You may obtain new versions from the <a href="%s" target="_blank">plugin repository</a>.'
+						.'</evo:warning></span>',
+						'<code>'.$loop_Plugin->classname.'</code>', $loop_Plugin->get_help_url() )."<br />\n", 'br' );
+			}
+			else
+			{
+				$plugin_deleted = true;
+				task_begin( sprintf( 'Trying to delete obsolete and unused plugin: %s...', $plugin_class ) );
+				$plugin_dir = $plugins_path.$plugin_class;
+				$plugin_filename = $plugins_path.'_'.preg_replace( '/_plugin$/', '.plugin.php', $plugin_class );
+				if( file_exists( $plugin_dir ) && is_dir( $plugin_dir ) )
+				{
+					if( is_writable( $plugin_dir) )
+					{
+						rmdir_r( $plugin_dir );
+					}
+					else
+					{
+						$plugin_deleted = false;
+						echo get_install_format_text( sprintf( '<span class="text-danger"><evo:error>Unable to delete directory: %s</evo:error></span>', $plugin_dir )."<br />\n", 'br' );
+					}
+				}
+				if( file_exists( $plugin_filename ) && is_file( $plugin_filename ) )
+				{
+					if( is_writable( $plugin_filename) )
+					{
+						unlink( $plugin_filename );
+					}
+					else
+					{
+						$plugin_deleted = false;
+						echo get_install_format_text( sprintf( '<span class="text-danger"><evo:error>Unable to delete file: %s</evo:error></span>', $plugin_filename )."<br />\n", 'br' );
+					}
+				}
+				if( $plugin_deleted )
+				{
+					task_end();
+				}
+			}
+		}
+		upg_task_end( false );
+	}
+
+	if( upg_task_start( 15820, 'Upgrading users table...') )
+	{	// part of 7.1.2-beta
+		db_add_col( 'T_users', 'user_birthday_year', 'smallint unsigned NULL AFTER user_age_max' );
+		db_add_col( 'T_users', 'user_birthday_month', 'tinyint unsigned NULL AFTER user_birthday_year' );
+		db_add_col( 'T_users', 'user_birthday_day', 'tinyint unsigned NULL AFTER user_birthday_month' );
+
+		// Set self_selected_age_group setting to 'optional':
+		$DB->query( 'INSERT INTO T_settings ( set_name, set_value ) VALUES ( "self_selected_age_group", "optional" )
+				ON DUPLICATE KEY UPDATE set_value = VALUES( set_value )' );
+
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15830, 'Updating widget "Free Social Links"...' ) )
+	{	// part of 7.1.2-beta
+		// Make to use ufdf_code(user field code) instead of ufdf_ID(user field ID) in widget settings:
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "social_links"' );
+		$widgets = $DB->get_assoc( $SQL );
+
+		if( ! empty( $widgets ) )
+		{	// If at least one widget "Free Social Links" exists in DB:
+			$SQL = new SQL();
+			$SQL->SELECT( 'ufdf_ID, ufdf_code' );
+			$SQL->FROM( 'T_users__fielddefs' );
+			$SQL->WHERE( 'ufdf_type = "url"' );
+			$SQL->WHERE_and( 'ufdf_icon_name IS NOT NULL' );
+			$social_fields = $DB->get_assoc( $SQL );
+
+			foreach( $widgets as $widget_ID => $widget_params )
+			{
+				if( empty( $widget_params ) )
+				{	// Skip widget with default settings:
+					continue;
+				}
+
+				$widget_params = unserialize( $widget_params );
+
+				for( $i = 1; $i <= 7; $i++ )
+				{
+					if( isset( $widget_params['link'.$i] ) )
+					{
+						if( isset( $social_fields[ $widget_params['link'.$i] ] ) )
+						{	// Replace old using of ufdf_ID to new using ufdf_code if we find such user field in DB by ID:
+							$widget_params['link'.$i] = $social_fields[ $widget_params['link'.$i] ];
+						}
+						else
+						{	// Reset wrong user field to default:
+							$widget_params['link'.$i] = '';
+						}
+					}
+				}
+
+				$DB->query( 'UPDATE T_widget__widget
+						SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+					WHERE wi_ID = '.$widget_ID );
+			}
+		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15840, 'Upgrading automation steps table...' ) )
+	{	// part of 7.1.2-beta
+		db_upgrade_cols( 'T_automation__step', array(
+			'MODIFY' => array(
+				'step_yes_next_step_ID'   => 'INT NULL COMMENT "Must be unsigned for special values like -1 = STOP"',
+				'step_no_next_step_ID'    => 'INT NULL COMMENT "Must be unsigned for special values like -1 = STOP"',
+				'step_error_next_step_ID' => 'INT NULL COMMENT "Must be unsigned for special values like -1 = STOP"',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15850, 'Updating Item Type "Recipe"...' ) )
+	{	// part of 7.1.2-beta
+		$DB->query( 'UPDATE T_items__type
+			  SET ityp_template_full = "recipe_content_full",
+			      ityp_template_name = NULL
+			WHERE ityp_template_name = "recipe"' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15860, 'Upgrading templates table...' ) )
+	{	// part of 7.1.2-beta
+		db_upgrade_cols( 'T_templates', array(
+			'CHANGE' => array(
+				'tpl_parent_tpl_ID' => 'tpl_translates_tpl_ID INT(10) UNSIGNED NULL DEFAULT NULL',
+			),
+		) );
+	}
+
+	if( upg_task_start( 15870, 'Upgrading menus table...' ) )
+	{	// part of 7.1.2-beta
+		db_upgrade_cols( 'T_menus__menu', array(
+			'CHANGE' => array(
+				'menu_parent_ID' => 'menu_translates_menu_ID INT(10) UNSIGNED NULL DEFAULT NULL',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15880, 'Upgrading templates table...' ) )
+	{	// part of 7.1.2-beta
+		db_add_col( 'T_templates', 'tpl_context', 'ENUM( "custom", "custom1", "custom2", "custom3", "content_list_master", "content_list_item",	"content_list_category", "content_block", "item_details", "item_content", "registration" ) COLLATE ascii_general_ci NOT NULL DEFAULT "custom" AFTER tpl_template_code' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15890, 'Upgrading templates table...' ) )
+	{	// part of 7.1.2-beta
+		db_add_col( 'T_templates', 'tpl_owner_grp_ID', 'INT(4) NULL DEFAULT NULL AFTER tpl_context' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15900, 'Updating widgets "Sub-Container" and "Columns (Sub-Containers)"...' ) )
+	{	// part of 7.1.2-beta
+		// Allow to use shared containers in collection containers:
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_code, wico_coll_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->FROM_add( 'INNER JOIN T_widget__container ON wico_ID = wi_wico_ID' );
+		$SQL->WHERE( 'wi_code IN ( "subcontainer", "subcontainer_row" )' );
+		$widgets = $DB->get_results( $SQL );
+
+		if( ! empty( $widgets ) )
+		{	// If at least one widget exists in DB:
+			foreach( $widgets as $widget )
+			{
+				if( empty( $widget->wi_params ) )
+				{	// Skip widget with default settings:
+					continue;
+				}
+
+				$widget_params = unserialize( $widget->wi_params );
+
+				// Set prefix for collection or shared container:
+				$prefix = ( $widget->wico_coll_ID ? 'coll:' : 'shared:' );
+
+				switch( $widget->wi_code )
+				{
+					case 'subcontainer':
+						// Sub-Container
+						if( ! empty( $widget_params['container'] ) )
+						{
+							$widget_params['container'] = $prefix.$widget_params['container'];
+						}
+						break;
+					case 'subcontainer_row':
+						// Columns (Sub-Containers)
+						for( $i = 1; $i <= 6; $i++ )
+						{
+							if( ! empty( $widget_params['column'.$i.'_container'] ) )
+							{
+								$widget_params['column'.$i.'_container'] = $prefix.$widget_params['column'.$i.'_container'];
+							}
+						}
+						break;
+				}
+
+				$DB->query( 'UPDATE T_widget__widget
+						SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+					WHERE wi_ID = '.$widget->wi_ID );
+			}
+		}
 		upg_task_end();
 	}
 

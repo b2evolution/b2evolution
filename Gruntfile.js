@@ -21,7 +21,7 @@ module.exports = function(grunt) {
 				},
 				files: {
 					// target.css file: source.less file
-					'rsc/build/testless.css': 'rsc/less/test.less',
+					// 'rsc/build/testless.css': 'rsc/less/test.less',
 
 					// Basic styles:
 					'rsc/css/basic_styles.css': 'rsc/less/basic_styles.less',
@@ -381,6 +381,7 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_tags.js',
 							'rsc/js/src/evo_user_status.js',
 							'rsc/js/src/evo_user_groups.js',
+							'rsc/js/src/evo_user_filters.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_links.js',
 							'rsc/js/src/evo_forms.js',
@@ -414,6 +415,7 @@ module.exports = function(grunt) {
 							'rsc/js/src/evo_user_tags.js',
 							'rsc/js/src/evo_user_status.js',
 							'rsc/js/src/evo_user_groups.js',
+							'rsc/js/src/evo_user_filters.js',
 							'rsc/js/src/evo_rest_api.js',
 							'rsc/js/src/evo_links.js',
 							'rsc/js/src/evo_forms.js',
@@ -508,5 +510,6 @@ module.exports = function(grunt) {
 
 	// Default task(s):
 	grunt.registerTask('default', ['less','autoprefixer','concat','cssmin','uglify','markdown']);
+	grunt.registerTask('styles', ['less','autoprefixer','concat','cssmin']);
 
 };

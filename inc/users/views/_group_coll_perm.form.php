@@ -59,11 +59,6 @@ if( ! empty( $keywords ) )
 
 $Results = new Results( $SQL->get(), 'groupcoll_' );
 
-if( ! empty( $keywords ) )
-{ // Display a button to reset the filters
-	$Results->global_icon( T_('Reset all filters!'), 'reset_filters', $admin_url.'?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID, T_('Reset filters'), 3, 3, array( 'class' => 'action_icon btn-warning' ) );
-}
-
 // Tell the Results class that we already have a form for this page:
 $Results->Form = & $Form;
 
@@ -73,10 +68,8 @@ $Results->filter_area = array(
 	'submit' => 'actionArray[filter]',
 	'callback' => 'filter_collobjectlist',
 	'url_ignore' => 'results_groupcoll_page,keywords1,keywords2',
-	'presets' => array(
-		'all' => array( T_('All collections'), regenerate_url( 'action,results_groupcoll_page,keywords1,keywords2', 'action=edit' ) ),
-		)
 	);
+$Results->register_filter_preset( 'all', T_('All collections'), '?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID );
 
 // Initialize Results object:
 colls_groups_perms_results( $Results, array(

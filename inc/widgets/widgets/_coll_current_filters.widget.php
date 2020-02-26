@@ -222,7 +222,7 @@ class coll_current_filters_Widget extends ComponentWidget
 
 			if( $params['display_button_reset'] )
 			{ // Button to reset all filters
-				echo '<p>'.action_icon( T_('Reset all filters!'), 'reset_filters',
+				echo '<p>'.action_icon( T_('Remove filters'), 'reset_filters',
 					regenerate_url( 'catsel,cat,'
 						.$params['ItemList']->param_prefix.'tag,'
 						.$params['ItemList']->param_prefix.'author,'
@@ -248,7 +248,7 @@ class coll_current_filters_Widget extends ComponentWidget
 						.$params['ItemList']->param_prefix.'show_future,'
 						.$params['ItemList']->param_prefix.'flagged,'
 						.$params['ItemList']->param_prefix.'mustread' ),
-					' '.T_('Reset all filters!'), 3, 4 ).'<p>';
+					' '.T_('Remove filters'), 3, 4 ).'<p>';
 			}
 		}
 

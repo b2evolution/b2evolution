@@ -71,12 +71,18 @@ $params = array_merge( array(
 		'after_image'              => '</figure>',
 		'image_class'              => 'img-responsive',
 		'image_size'               => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
+		'image_sizes'              => NULL, // Simplified "sizes=" attribute for browser to select correct size from "srcset=".
+													// Must be set DIFFERENTLY depending on WIDGET/CONTAINER/SKIN LAYOUT. Each time we must estimate the size the image will have on screen.
+													// Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
 		'image_limit'              =>  1000,
 		'image_link_to'            => 'original', // Can be 'original', 'single' or empty
 
 		// Overrides for all images when displayed in COMPACT version of the post:
 		'excerpt_image_class'      => '',
 		'excerpt_image_size'       => 'fit-80x80',
+		'excerpt_image_sizes'      => NULL, // Simplified "sizes=" attribute for browser to select correct size from "srcset=".
+													// Must be set DIFFERENTLY depending on WIDGET/CONTAINER/SKIN LAYOUT. Each time we must estimate the size the image will have on screen.
+													// Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
 		'excerpt_image_limit'      => 0,
 		'excerpt_image_link_to'    => 'single',
 
@@ -159,6 +165,7 @@ switch( $content_mode )
 					'after'               => $params['after_images'],
 					'image_class'         => $params['excerpt_image_class'],
 					'image_size'          => $params['excerpt_image_size'],
+					'image_sizes'         => $params['excerpt_image_sizes'],
 					'limit'               => $params['excerpt_image_limit'],
 					'image_link_to'       => $params['excerpt_image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
@@ -211,6 +218,7 @@ switch( $content_mode )
 					'after'               => $params['after_images'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
@@ -251,6 +259,7 @@ switch( $content_mode )
 					'after_image'         => $params['after_image'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
 					'before_gallery'      => $params['before_gallery'],
@@ -288,6 +297,7 @@ switch( $content_mode )
 						'after'               => $params['after_images'],
 						'image_class'         => $params['image_class'],
 						'image_size'          => $params['image_size'],
+						'image_sizes'         => $params['image_sizes'],
 						'limit'               => $params['image_limit'],
 						'image_link_to'       => $params['image_link_to'],
 						'before_gallery'      => $params['before_gallery'],
@@ -323,6 +333,7 @@ switch( $content_mode )
 					'after_image'         => $params['after_image'],
 					'image_class'         => $params['image_class'],
 					'image_size'          => $params['image_size'],
+					'image_sizes'         => $params['image_sizes'],
 					'limit'               => $params['image_limit'],
 					'image_link_to'       => $params['image_link_to'],
 					'force_more'          => $params['force_more'],

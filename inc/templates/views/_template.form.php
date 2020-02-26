@@ -57,19 +57,26 @@ $Form->begin_form( 'fform', $fieldset_title );
 	// Template code:
 	$Form->text_input( 'tpl_code', $edited_Template->get( 'code' ), 25, T_('Code'), '', array( 'maxlength' => 128 ) );
 
-	// Parent template ID:
-	$parent_template_options = array( NULL => '('.TB_('No Parent').')' );
-	$SQL = new SQL('Get possible parent templates');
+	// Context:
+	$Form->select_input_array( 'tpl_context', $edited_Template->get( 'context' ), get_template_contexts(), T_('Context') );
+
+	// Owner:
+	$GroupCache = & get_GroupCache();
+	$Form->select_object( 'tpl_owner_grp_ID', $edited_Template->get( 'owner_grp_ID' ), $GroupCache, T_('Owned by') );
+
+	// Base template ID:
+	$base_template_options = array( NULL => '('.TB_('None').')' );
+	$SQL = new SQL('Get possible base templates');
 	$SQL->SELECT( 'tpl_ID, tpl_name' );
 	$SQL->FROM( 'T_templates' );
-	$SQL->WHERE( 'tpl_parent_tpl_ID IS NULL' );
+	$SQL->WHERE( 'tpl_translates_tpl_ID IS NULL' );
 	if( $action != 'copy' )
 	{
 		$SQL->WHERE_and( 'NOT tpl_ID ='.$DB->quote( $edited_Template->ID ) );
 	}
 	$SQL->ORDER_BY( 'tpl_name ASC' );
-	$parent_template_options += $DB->get_assoc( $SQL->get() );
-	$Form->select_input_array( 'tpl_parent_tpl_ID', $edited_Template->get('parent_tpl_ID'), $parent_template_options, T_('Parent'), NULL, array( 'force_keys_as_values' => true ) );
+	$base_template_options += $DB->get_assoc( $SQL->get() );
+	$Form->select_input_array( 'tpl_translates_tpl_ID', $edited_Template->get('translates_tpl_ID'), $base_template_options, T_('Translation of'), NULL, array( 'force_keys_as_values' => true ) );
 
 	// Locale:
 	$locales_options = array();
@@ -90,11 +97,17 @@ $Form->begin_form( 'fform', $fieldset_title );
 	{	// Allow to save template if current User has a permission:
 		if( $action == 'copy' )
 		{
-			$buttons[] = array( 'submit', 'submit', sprintf( T_('Save and duplicate all settings from %s'), $edited_Template->get( 'name' ) ), 'SaveButton' );
+			$buttons = array(
+					array( 'submit', 'actionArray[create]', T_('Duplicate Template!'), 'SaveButton' ),
+					array( 'submit', 'actionArray[create_edit]', T_('Duplicate and continue editing...'), 'SaveButton' )
+				);
 		}
 		else
 		{
-			$buttons[] = array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' );
+			$buttons = array(
+					array( 'submit', 'actionArray[update]', T_('Save!'), 'SaveButton' ),
+					array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton' )
+				);
 		}
 	}
 

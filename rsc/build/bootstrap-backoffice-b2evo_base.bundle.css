@@ -1811,12 +1811,10 @@ figure {
 }
 .evo_thumbnail__left {
   float: left;
-  clear: both;
   margin: 0 4px 4px 0;
 }
 .evo_thumbnail__right {
   float: right;
-  clear: both;
   margin: 0 0 4px 4px;
 }
 .replied_comment .evo_image_block img {
@@ -2433,7 +2431,7 @@ span.NonExistentWikiWord {
   border: 1px dotted #F00;
 }
 
-/* This file is used to fix the style issues on all bootstrap skins of b2evolution */
+/* This file is used to fix the style issues on all bootstrap skins of b2evolution, including BACK-OFFICE */
 @media (min-width: 1785px) {
   .container-xxl {
     width: 1755px;
@@ -2855,18 +2853,22 @@ a.btn.action_icon.hoverlink {
 .form-horizontal #item_locations select {
   display: inline-block;
 }
-.form-horizontal #itemform_renderers .dropdown-menu {
+.form-horizontal #itemform_renderers .dropdown-menu,
+.form-horizontal #commentform_renderers .dropdown-menu {
   padding: 10px 10px 5px 10px;
 }
-.form-horizontal #itemform_renderers .popover {
+.form-horizontal #itemform_renderers .popover,
+.form-horizontal #commentform_renderers .popover {
   max-width: initial;
 }
-.form-horizontal #itemform_renderers div[id^="block_renderer_"] {
+.form-horizontal #itemform_renderers div[id^="block_renderer_"],
+.form-horizontal #commentform_renderers div[id^="block_renderer_"] {
   padding-left: 20px;
   position: relative;
   white-space: nowrap;
 }
-.form-horizontal #itemform_renderers div[id^="block_renderer_"] input[type=checkbox] {
+.form-horizontal #itemform_renderers div[id^="block_renderer_"] input[type=checkbox],
+.form-horizontal #commentform_renderers div[id^="block_renderer_"] input[type=checkbox] {
   margin: 4px 0 0;
   position: absolute;
   left: 0;
@@ -3094,6 +3096,18 @@ div.results .table-bordered th.lastcol {
 div.results .table-bordered th {
   border-bottom: none;
 }
+div.results .results_header {
+  padding: 5px 10px;
+  background-color: #f9f9f9;
+}
+div.results .results_footer {
+  padding: 5px;
+  background-color: #f9f9f9;
+}
+div.results .pagination {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
 div.results .page_size_selector {
   margin-bottom: 5px;
   display: block;
@@ -3101,10 +3115,6 @@ div.results .page_size_selector {
 div.results .page_size_selector select.form-control {
   display: inline-block;
   width: auto;
-}
-div.results .pagination {
-  margin-top: 5px;
-  margin-bottom: 5px;
 }
 div.results tr.placeholder {
   position: relative;
@@ -3142,29 +3152,41 @@ div.results img {
   max-width: none;
 }
 div.filters {
-  margin-bottom: 0;
-  background: none;
+  background-color: #f9f9f9;
   border: none;
 }
-div.filters > div {
-  margin-left: 0;
-}
-div.filters button.filter {
-  float: right;
-  padding: 4px 12px;
-}
-div.filters .block {
-  display: inline-block;
-  margin: 2px;
-}
 div.filters.panel-body {
-  padding: 15px;
+  padding: 6px 10px;
+}
+div.filters .form-inline {
+  margin: 5px -10px 0;
+}
+div.filters .form-inline .form-group {
+  margin: 5px 10px 2px;
+}
+div.filters .evo_btn_apply_filters {
+  margin: 0;
 }
 div.filters .twitter-typeahead {
   vertical-align: middle;
 }
-div.filters .twitter-typeahead .tt-dropdown-menu div {
-  margin-left: 0;
+div.filters .query-builder {
+  margin: -15px 0 -12px -4px;
+}
+div.filters .query-builder > .rules-group-container {
+  border: none;
+  background: transparent;
+}
+div.filters .filters_item_list_table {
+  margin: 0 8px;
+}
+.results_summary {
+  float: left;
+  font-weight: bold;
+  margin-top: 5px;
+}
+.evo_pager {
+  text-align: center;
 }
 .table_scroll .table {
   margin-bottom: 0;
@@ -3399,8 +3421,16 @@ div.message_toolbars {
 .btn-toolbar[class*="_toolbar"].disabled span.btn:hover {
   background: #FFF;
 }
+.text_editor_controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: normal;
+}
+.comment_text_renderers {
+  margin-top: -12px;
+}
 .edit_plugin_actions {
-  padding-top: 7px;
+  margin-top: 4px;
 }
 .badge-important {
   background-color: #F00 !important;
@@ -3462,18 +3492,13 @@ div.message_toolbars {
 .tt-dropdown-menu {
   background-color: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  -ms-border-radius: 8px;
-  -o-border-radius: 8px;
-  border-radius: 8px;
+  border-radius: 3px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  padding: 8px 0;
+  padding: 0;
 }
 .tt-dropdown-menu .tt-suggestion {
-  font-size: 18px;
-  line-height: 24px;
-  padding: 3px 20px;
+  font-size: 14px;
+  padding: 4px 10px;
 }
 .tt-dropdown-menu .tt-suggestion.tt-cursor {
   background-color: #0097CF;
@@ -3720,43 +3745,17 @@ span[id^=title_folding_] {
     margin-left: -285px;
   }
 }
-.evo_content_tiles > div {
-  padding: 15px;
+.comment-workflow-form {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
-.evo_content_tiles .evo_content_tile {
-  height: 400px;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  position: relative;
-  padding-bottom: 10px;
+.comment-workflow-form .controls {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
 }
-.evo_content_tiles .evo_content_tile > div {
-  height: 100%;
-  overflow: hidden;
-}
-.evo_content_tiles .evo_content_tile > a {
-  position: absolute;
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-.evo_content_tiles .evo_content_tile_cover {
-  height: 270px;
-  background-color: #EEE;
-  background-size: cover;
-  background-position: center;
-  padding: 10px;
-  color: #FFF;
-  text-shadow: 0px 0px 2px #000;
-}
-.evo_content_tiles .evo_content_tile_text {
-  padding-left: 10px;
-  padding-right: 10px;
-}
-.evo_content_tiles .evo_content_tile_text h2,
-.evo_content_tiles .evo_content_tile_text h3 {
-  font-size: 20px;
-  padding-top: 10px;
-  margin-top: 0;
+.comment-workflow-form .controls > * {
+  margin-left: 6px;
 }

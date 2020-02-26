@@ -1310,14 +1310,14 @@ class File extends DataObject
 	 *                        'none' - don't use attributes "width" & "height"
 	 * @param boolean Image style= attribute
 	 * @param boolean Add loadimg class
-	 * @param string simplified sizes= attribute for browser to select correct size from srcset=
+	 * @param string simplified sizes= attribute for browser to select correct size from srcset=. Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
 	 */
 	function get_tag( $before_image = '<div class="image_block">',
 	                  $before_image_legend = '<div class="image_legend">', // can be NULL
 	                  $after_image_legend = '</div>',
 	                  $after_image = '</div>',
 	                  $size_name = 'original', 
-	                  $image_link_to = 'original',
+	                  $image_link_to = 'original',  // can be an URL, can be empty
 	                  $image_link_title = '',	// can be text or #title# or #desc#
 	                  $image_link_rel = '',
 	                  $image_class = '',
@@ -3599,6 +3599,36 @@ class File extends DataObject
 	function get_download_count()
 	{
 		return $this->download_count;
+	}
+
+
+	/**
+	 * Get CSS property for background with image of this File
+	 *
+	 * @param array Params
+	 * @return string
+	 */
+	function get_background_image_css( $params = array() )
+	{
+		$params = array_merge( array(
+				'size'    => 'fit-1280x720',
+				'size_2x' => 'fit-2560x1440',
+			), $params );
+
+		// Get image URL for 1x size:
+		$img_attribs_1x = $this->get_img_attribs( $params['size'] );
+
+		$styles = array( 'background-image:url( '.$img_attribs_1x['src'].' )' );
+
+		if( $params['size'] != $params['size_2x'] )
+		{	// Set image-set backgrounds only when 1x and 2x size are different:
+			// Get image URL for 2x size:
+			$img_attribs_2x = $this->get_img_attribs( $params['size_2x'] );
+			$styles[] = 'background-image: image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
+			$styles[] = 'background-image: -webkit-image-set( url( '.$img_attribs_1x['src'].' ) 1x, url( '.$img_attribs_2x['src'].' ) 2x )';
+		}
+
+		return implode( ';', $styles );
 	}
 }
 

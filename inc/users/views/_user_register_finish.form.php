@@ -144,6 +144,11 @@ if( $Settings->get( 'registration_require_firstname' ) )
 	$Form->text_input( 'firstname', $edited_User->firstname, 18, T_('First name'), T_('Your real first name.'), array( 'maxlength' => 50, 'class' => 'input_text', 'required' => true ) );
 }
 
+if( $Settings->get( 'registration_require_lastname' ) )
+{	// Lastname is visible:
+	$Form->text_input( 'lastname', $edited_User->lastname, 18, T_('Last name'), T_('Your real last name.'), array( 'maxlength' => 50, 'class' => 'input_text', 'required' => true ) );
+}
+
 $registration_require_gender = $Settings->get( 'registration_require_gender' );
 if( $registration_require_gender != 'hidden' )
 {	// Display a gender field if it is not hidden:

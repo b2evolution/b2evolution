@@ -15,6 +15,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
+load_class( '_core/ui/_table.class.php', 'Table' );
 
 /**
  * Dependencies
@@ -925,24 +926,31 @@ function evo_substr( $string, $start = 0, $length = '#' )
  */
 function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = array() )
 {
+	global $evo_non_matching_blocks;
+
 	if( preg_match_all( $pattern, $text, $matches, PREG_OFFSET_CAPTURE | PREG_PATTERN_ORDER ) )
 	{	// $pattern matches, call the callback method on full text except of matching blocks
 
 		// Create an unique string in order to replace all matching blocks temporarily
 		$unique_replacement = md5( time() + rand() );
 
-		$matches_source = array();
-		$matches_temp = array();
+		if( ! isset( $evo_non_matching_blocks ) )
+		{	// Init cache array once:
+			$evo_non_matching_blocks = array();
+		}
+		// Use level in order to don't mix from other recursive calls:
+		$level = count( $evo_non_matching_blocks );
+		$evo_non_matching_blocks[ $level ] = array();
+
 		foreach( $matches[0] as $l => $l_matching )
 		{	// Build arrays with a source code of the matching blocks and with temporary replacement
-			$matches_source[] = $l_matching[0];
-			$matches_temp[] = '?'.$l.$unique_replacement.$l.'?';
+			$evo_non_matching_blocks[ $level ][ '?'.$l.$unique_replacement.$l.'?' ] = $l_matching[0];
 		}
 
 		// Replace all matching blocks with temporary text like '?X219a33da9c1b8f4e335bffc015df8c96X?'
 		// where X is index of match block in array $matches[0]
 		// It is used to avoid any changes in the matching blocks
-		$text = str_replace( $matches_source, $matches_temp, $text );
+		$text = str_replace( $evo_non_matching_blocks[ $level ], array_keys( $evo_non_matching_blocks[ $level ] ), $text );
 
 		// Callback:
 		$callback_params = $params;
@@ -950,7 +958,7 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 		$text = call_user_func_array( $callback, $callback_params );
 
 		// Revert a source code of the matching blocks in content
-		$text = str_replace( $matches_temp, $matches_source, $text );
+		$text = str_replace( array_keys( $evo_non_matching_blocks[ $level ] ), $evo_non_matching_blocks[ $level ], $text );
 
 		return $text;
 	}
@@ -958,6 +966,53 @@ function callback_on_non_matching_blocks( $text, $pattern, $callback, $params = 
 	$callback_params = $params;
 	array_unshift( $callback_params, $text );
 	return call_user_func_array( $callback, $callback_params );
+}
+
+
+/**
+ * Replace non matching blocks from temp strings like '?X219a33da9c1b8f4e335bffc015df8c96X?' back to original string like '<code>$some_var = "some value";</code>'
+ *
+ * @param array Matches
+ * @return array Matches
+ */
+function fix_non_matching_blocks( $matches )
+{
+	global $evo_non_matching_blocks;
+
+	if( ! is_array( $matches ) )
+	{	// This function works only with array of matches
+		return $matches;
+	}
+
+	if( ! isset( $evo_non_matching_blocks ) ||
+	    ! is_array( $evo_non_matching_blocks ) )
+	{	// Nothing to fix, Return source param value:
+		return $matches;
+	}
+
+	$level = count( $evo_non_matching_blocks ) - 1;
+
+	if( empty( $evo_non_matching_blocks[ $level ] ) )
+	{	// Nothing to fix, Return source param value:
+		return $matches;
+	}
+
+	foreach( $matches as $m => $match )
+	{
+		if( is_array( $match ) )
+		{	// Fix recursively:
+			foreach( $match as $s => $sub_match )
+			{
+				$matches[ $m ][ $s ] = str_replace( array_keys( $evo_non_matching_blocks[ $level ] ), $evo_non_matching_blocks[ $level ], $sub_match );
+			}
+		}
+		else
+		{	// Revert back to original values from temp strings:
+			$matches[ $m ] = str_replace( array_keys( $evo_non_matching_blocks[ $level ] ), $evo_non_matching_blocks[ $level ], $match );
+		}
+	}
+
+	return $matches;
 }
 
 
@@ -973,9 +1028,12 @@ function preg_match_outcode( $search, $content, & $matches )
 {
 	if( stristr( $content, '<code' ) !== false || stristr( $content, '<pre' ) !== false || strstr( $content, '`' ) !== false )
 	{	// Call preg_match_all() on everything outside code/pre and markdown codeblocks:
-		return callback_on_non_matching_blocks( $content,
+		$result = callback_on_non_matching_blocks( $content,
 			'~(`|<(code|pre)[^>]*>).*?(\1|</\2>)~is',
 			'preg_match_outcode_callback', array( $search, & $matches ) );
+		// Revert codeblocks back if they are located inside search regexp:
+		$matches = fix_non_matching_blocks( $matches );
+		return $result;
 	}
 	else
 	{	// No code/pre blocks, search in the whole thing:
@@ -1130,7 +1188,35 @@ function replace_content( $content, $search, $replace, $type = 'preg', $limit = 
  */
 function replace_content_callback( $content, $search, $replace_callback )
 {
-	return preg_replace_callback( $search, $replace_callback, $content );
+	global $evo_replace_content_outcode_callback;
+
+	// Store here the requested callback function in order to use pre-processor function fix_replace_content_callback() before we call the original requested callback function:
+	$evo_replace_content_outcode_callback = $replace_callback;
+
+	return preg_replace_callback( $search, 'fix_replace_content_callback', $content );
+}
+
+
+/**
+ * Replace non matching blocks from temp strings like '?X219a33da9c1b8f4e335bffc015df8c96X?' back to original string like '<code>$some_var = "some value";</code>'
+ *
+ * @param Array Matches
+ * @return mixed
+ */
+function fix_replace_content_callback( $m )
+{
+	global $evo_replace_content_outcode_callback;
+
+	// Replace non matching blocks from temp strings like '?X219a33da9c1b8f4e335bffc015df8c96X?' back to original string like '<code>$some_var = "some value";</code>'
+	$m = fix_non_matching_blocks( $m );
+
+	// Call real function with fixed blocks in matches:
+	$result = call_user_func_array( $evo_replace_content_outcode_callback, array( $m ) );
+
+	// Clear temp var:
+	unset( $evo_replace_content_outcode_callback );
+
+	return $result;
 }
 
 
@@ -5653,6 +5739,78 @@ function get_base_domain( $url )
 
 
 /**
+ * Generate login from registration information
+ * 
+ * @param string Email address
+ * @param string First name
+ * @param string Last name
+ * @param string Nickname
+ * @param boolean Use random alphanumeric string as login
+ * @return string Generated login
+ */
+function generate_login_from_register_info( $email = NULL, $firstname = NULL, $lastname = NULL, $nickname = NULL, $use_random = false )
+{
+	global $Settings;
+
+	if( ! empty( $firstname ) || ( ! empty( $lastname ) && ( $Settings->get( 'registration_no_username') == 'firstname.lastname' ) ) )
+	{ // Firstname or lastname given, let's use these:
+		$login = array();
+		if( ! empty( $firstname ) )
+		{
+			$login[] = trim( $firstname );
+		}
+
+		if( $Settings->get( 'registration_no_username' ) == 'firstname.lastname' )
+		{	// We can use lastname too:
+			if( ! empty( $lastname ) )
+			{
+				$login[] = trim( $lastname );
+			}
+		}
+		$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( implode( '.', $login ) ) );
+		$login = generate_login_from_string( $login );
+	}
+	elseif( ! empty( $email ) )
+	{ // Get the login from email address:
+		$login = preg_replace( '/^([^@]+)@(.+)$/', '$1', utf8_strtolower( $email ) );
+		$login = preg_replace( '/[\'"><@\s]/', '', $login );
+
+		if( strpos( $login, '.' ) && ( $Settings->get( 'registration_no_username' ) == 'firstname' ) )
+		{ // Get only the part before the "." if it has one
+			$temp_login = $login;
+			$login = substr( $login, 0, strpos( $login, '.' ) );
+			$login = generate_login_from_string( $login );
+
+			if( empty( $login ) )
+			{ // Resulting login empty, use full email address
+				$login = generate_login_from_string( $temp_login );
+			}
+		}
+		else
+		{
+			$login = generate_login_from_string( $login );
+		}
+	}
+	elseif( ! empty( $nickname ) )
+	{
+		$login = preg_replace( '/[\s]+/', '_', utf8_strtolower( trim( $nickname ) ) );
+		$login = generate_login_from_string( $login );
+	}
+	elseif( $use_random )
+	{	// Nothing else to use as login, use random numbers:
+		$login = 'user_'.rand( 1, 999 );
+		$login = generate_login_from_string( $login );
+	}
+	else
+	{
+		return '';
+	}
+
+	return $login;
+}
+
+
+/**
  * Generate login from string
  *
  * @param string string to generate login from
@@ -8837,7 +8995,7 @@ function render_inline_tags( $Object, $tags, $params = array() )
 									$current_image_params['image_class'] = $image_extraclass;
 								}
 								else
-								{	// Overwrite 'before_image' setting to add an extra class name:
+								{	// Inject extra class name(s) into 'before_image' param:
 									$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
 								}
 								$current_file_params['class'] = $image_extraclass;
@@ -10207,5 +10365,34 @@ function get_customizer_url( $url_Blog = NULL )
 	}
 
 	return $url_Blog->get_baseurl_root().$customizer_relative_url;
+}
+
+
+/**
+ * Convert operator alias to jQuery QueryBuilder format
+ *
+ * @param string Alias Operator
+ * @return string Query Builder Operator
+ */
+function get_querybuilder_operator( $operator )
+{
+	switch( $operator )
+	{
+		case '=':
+			return 'equal';
+		case '!=':
+		case '<>':
+			return 'not_equal';
+		case '<':
+			return 'less';
+		case '<=':
+			return 'less_or_equal';
+		case '>':
+			return 'greater';
+		case '>=':
+			return 'greater_or_equal';
+		default:
+			return $operator;
+	}
 }
 ?>

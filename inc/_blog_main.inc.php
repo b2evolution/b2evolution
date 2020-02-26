@@ -758,9 +758,13 @@ elseif( $disp == '-' )
 		$ItemCache = & get_ItemCache();
 		$Item = & $ItemCache->get_by_ID( $p, false );
 
-		if( empty($Item) )
-		{
+		if( empty( $Item ) || ! in_array( $Item->get_type_setting( 'usage' ), array ( 'page', 'widget-page' ) ) )
+		{	// Display error when page or widget-page Item is not found:
 			$Messages->add( sprintf( T_('Front page is set to display page ID=%d but it does not exist.'), $p ), 'error' );
+		}
+		elseif( $Item->get_type_setting( 'usage' ) == 'widget-page' )
+		{	// Switch to proper disp for Widget-Page Item in order to set correct filters on init $MainList:
+			$disp = 'widget_page';
 		}
 	}
 }
