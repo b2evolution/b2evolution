@@ -120,7 +120,6 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 18, 15000, 'item_workflow', 'coll_type' => 'photo' ),
 		array( 20, 15000, 'item_tags', 'coll_type' => '-forum,group,manual', 'coll_ID' => '-'.$blog_a_ID.','.$events_blog_ID ),
 		array( 25, 15000, 'item_about_author', 'coll_ID' => $blog_b_ID ),
-		array( 30, 15000, 'evo_Gmaps', 'coll_ID' => $blog_a_ID.','.$events_blog_ID, 'type' => 'plugin', 'install' => $install_test_features ),
 		array( 40, 15000, 'item_small_print', 'coll_ID' => $blog_a_ID, 'params' => array( 'template' => 'item_details_smallprint_standard' ) ),
 		array( 40, 15000, 'item_small_print', 'coll_type' => 'manual', 'params' => array( 'template' => 'item_details_revisions' ) ),
 		array( 50, 15000, 'item_seen_by', 'coll_type' => '-forum,group,manual' ),
@@ -728,10 +727,6 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		'name'    => NT_('Widget Page Section 3'),
 		'order'   => 30,
 		'item_ID' => $installed_collection_info_pages['widget_page'],
-		array( 10, 15000, 'evo_Gmaps', 'type' => 'plugin', 'params' => array(
-				'latitude'  => '48.8566573582',
-				'longitude' => '2.35195398331',
-			) ),
 	);
 
 	}
