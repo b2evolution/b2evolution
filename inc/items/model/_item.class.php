@@ -5033,6 +5033,7 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'before'                     => '<div>',
 				'before_image'               => '<div class="image_block">',
+//TODO					'before_image_classes'        => '',     // Allow injecting additional classes into 'before image'
 				'before_image_legend'        => '<div class="image_legend">',
 				'after_image_legend'         => '</div>',
 				'after_image'                => '</div>',
@@ -5063,9 +5064,8 @@ class Item extends ItemLight
 			), $params );
 
 
-// TODO: add some image_block_classes param that does something like this:
-// Inject extra class name(s) into 'before_image' param:
-//	$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
+// TODO: Inject extra class name(s) 'before_image_classes' into 'before_image' param:
+//	$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $params['before_image_classes'] ) );
 
 		// Get list of ALL attached files
 		$links_params = array(
