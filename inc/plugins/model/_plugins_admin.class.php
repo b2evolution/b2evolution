@@ -906,9 +906,10 @@ class Plugins_admin extends Plugins
 	 *  - Unregister obsolete events
 	 *  - Detect plugins with no code and try to have at least one plugin with the default code
 	 *
+	 * @param boolean TRUE to print log
 	 * @return boolean true if plugins have been changed, false otherwise
 	 */
-	function reload_plugins()
+	function reload_plugins( $print_log = false )
 	{
 		$this->restart();
 		$this->load_events();
@@ -916,6 +917,11 @@ class Plugins_admin extends Plugins
 		while( $loop_Plugin = & $this->get_next() )
 		{ // loop through in each plugin
 			// NOTE: we don't need to handle plug_version here, because it gets handled in Plugins::register() already.
+
+			if( $print_log )
+			{
+				task_begin( '- Reloading "'.$loop_Plugin->name.'" ('.'_'.str_replace( '_plugin', '.plugin', $loop_Plugin->classname ).'.php'.')...' );
+			}
 
 			// Discover new events:
 			if( $this->save_events( $loop_Plugin, array() ) )
@@ -938,6 +944,11 @@ class Plugins_admin extends Plugins
 				}
 
 				$this->unregister($default_Plugin, true);
+			}
+
+			if( $print_log )
+			{
+				task_end();
 			}
 		}
 
