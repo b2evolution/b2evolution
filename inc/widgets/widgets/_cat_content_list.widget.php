@@ -288,6 +288,7 @@ class cat_content_list_Widget extends ComponentWidget
 		}
 
 		$item_template_params = array_merge( $params, array(
+				// In case of cross-posting, we EXPECT tp navigate in same category and same collection if possible:
 				'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
 				'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
 				'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item

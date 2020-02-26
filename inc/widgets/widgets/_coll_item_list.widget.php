@@ -462,6 +462,11 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Define default template params that can be rewritten by skin
 		$this->disp_params = array_merge( array(
+
+				// In case of cross-posting, we EXPECT to navigate in same collection if possible:
+				'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
+
+				// The following are to auto-templates only:
 				'item_first_image_before'      => '<div class="item_first_image">',
 				'item_first_image_after'       => '</div>',
 				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"'.$placeholder_dimension.'><a href="$item_permaurl$"></a></div>',

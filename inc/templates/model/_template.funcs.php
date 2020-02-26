@@ -608,6 +608,12 @@ function render_template_callback( $var, $params, $objects = array() )
 																// Must be set DIFFERENTLY depending on WIDGET/CONTAINER/SKIN LAYOUT. Each time we must estimate the size the image will have on screen.
 																// Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
 					'image_link_to'              => 'original', // Can be 'original' (image), 'single' (this post), an be URL, can be empty
+// TODO:
+// Note: Widget MAY have set the following for same CAT navigation:
+//	'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
+//	'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
+// Note: Widget MAY have set the following for same COLL navigation:
+//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 					'limit'                      => 1000, // Max # of images displayed
 				), $params ) );
 			break;
@@ -661,11 +667,12 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Item->permanent_link( array_merge( array(
 					'text'   => '#title',
 					'title'  => '',  // No tooltip by default
+					// Note: Widget MAY have set the following for same CAT navigation:
+					//	'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
+					//	'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
+					// Note: Widget MAY have set the following for same COLL navigation:
+					//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 				), $params ) );
-				// Note: Cat content list widget will have set:
-				//	'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
-				//	'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
-				//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 			break;
 
 		case 'Item:permanent_url':
