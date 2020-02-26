@@ -60,7 +60,13 @@ $Form->begin_fieldset( T_('Import log').get_manual_link( 'markdown-importer' ) )
 		}
 		if( param( $option_key, $option['type'], 0 ) )
 		{
-			$selected_options[ $option_key ] = array( $option['title'], isset( $option['indent'] ) ? $option['indent'] : 0 );
+			$selected_options[ $option_key ] = array(
+					// Option title and note:
+					( empty( $option['disabled'] ) ? $option['title'] : '<span class="grey">'.$option['title'].'</span>' )
+						.( isset( $option['note'] ) ? ' <span class="note">'.$option['note'].'</span>' : '' ),
+					// Indent value:
+					isset( $option['indent'] ) ? $option['indent'] : 0
+				);
 		}
 	}
 	if( $selected_options_count = count( $selected_options ) )

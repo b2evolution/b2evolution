@@ -92,7 +92,7 @@ if( ! empty( $import_files ) )
 			$option_attrs['style'] = 'margin-left:'.( $option['indent'] * 20 ).'px';
 		}
 		$option_value = ( $import_type_value === NULL ? $option['default'] : param( $option_key, $option['type'], 0 ) );
-		$checklist_options[] = array( $option_key, '1', $option['title'], $option_value, NULL, NULL, NULL, NULL, $option_attrs );
+		$checklist_options[] = array( $option_key, '1', $option['title'], $option_value, ( isset( $option['disabled'] ) ? $option['disabled'] : NULL ), ( isset( $option['note'] ) ? $option['note'] : NULL ), NULL, NULL, $option_attrs );
 	}
 	if( ! empty( $checklist_options ) )
 	{
