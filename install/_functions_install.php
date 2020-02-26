@@ -854,10 +854,7 @@ function install_basic_plugins( $old_db_version = 0 )
  */
 function install_plugin( $plugin, $activate = true, $settings = array(), $params = array() )
 {
-	/**
-	 * @var Plugins_admin
-	 */
-	global $Plugins_admin;
+	global $Plugins_admin, $plugins_path;
 
 	$params = array_merge( array(
 			'single_task' => true,
@@ -865,7 +862,7 @@ function install_plugin( $plugin, $activate = true, $settings = array(), $params
 
 	if( $params['single_task'] )
 	{
-		task_begin( 'Installing plugin: '.$plugin.'... ' );
+		task_begin( 'Installing plugin "'.$plugin.'" from <code>'.substr( $Plugins_admin->get_classfile_path( $plugin ), strlen( $plugins_path ) ).'</code>... ' );
 	}
 
 	$edit_Plugin = & $Plugins_admin->install( $plugin, 'broken' ); // "broken" by default, gets adjusted later

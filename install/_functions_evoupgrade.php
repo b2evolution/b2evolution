@@ -12494,7 +12494,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// Reload plugins after every upgrade, to detect even those changes on plugins which didn't require db modifications
 		task_begin( 'Reloading installed plugins to make sure their config is up to date...<br />' );
 		$Plugins_admin = & get_Plugins_admin();
-		$Plugins_admin->reload_plugins( true );
+		$Plugins_admin->log_register = true; // Set flag to know what plugin is going to be installed before it is initialized in order to detect error
+		$Plugins_admin->reload_plugins();
 		task_end();
 
 

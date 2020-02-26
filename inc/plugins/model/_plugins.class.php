@@ -331,6 +331,13 @@ class Plugins
 
 		$Debuglog->add( 'register(): '.$classname.', ID: '.$ID.', priority: '.$priority.', classfile_path: ['.$classfile_path.']', 'plugins' );
 
+		if( ! empty( $this->log_register ) )
+		{	// Display additional log on upgrade page when we reload all plugins:
+			global $plugins_path;
+			echo '- Reloading "'.$classname.'" from <code>'.substr( $classfile_path, strlen( $plugins_path ) ).'</code><br />';
+			evo_flush();
+		}
+
 		if( ! is_readable( $classfile_path ) )
 		{ // Plugin file not found!
 			if( $must_exists )
