@@ -158,27 +158,27 @@ class cat_content_list_Widget extends ComponentWidget
 		// Render MASTER quick template:
 		// In theory, this should not display anything.
 		// Instead, this should set variables to define sub-templates (and potentially additional variables)
-		echo render_template_code( $this->disp_params['template'], /* BY REF */ $params );
+		echo render_template_code( $this->disp_params['template'], /* BY REF */ $this->disp_params );
 
 		// Check if requested sub-templates exist:
 		$TemplateCache = & get_TemplateCache();
-		if( ! empty( $params['subcat_template'] ) &&
-		    ! ( $cat_Template = & $TemplateCache->get_by_code( $params['subcat_template'], false, false ) ) )
+		if( ! empty( $this->disp_params['subcat_template'] ) &&
+		    ! ( $cat_Template = & $TemplateCache->get_by_code( $this->disp_params['subcat_template'], false, false ) ) )
 		{	// Display error when no or wrong template for listing a category:
-			$this->display_error_message( sprintf( 'Template is not found: %s for listing a category', '<code>'.$params['subcat_template'].'</code>' ) );
+			$this->display_error_message( sprintf( 'Template is not found: %s for listing a category', '<code>'.$this->disp_params['subcat_template'].'</code>' ) );
 			return false;
 		}
-		if( ! empty( $params['item_template'] ) &&
-		    ! ( $item_Template = & $TemplateCache->get_by_code( $params['item_template'], false, false ) ) )
+		if( ! empty( $this->disp_params['item_template'] ) &&
+		    ! ( $item_Template = & $TemplateCache->get_by_code( $this->disp_params['item_template'], false, false ) ) )
 		{	// Display error when no or wrong template for listing a category:
-			$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$params['item_template'].'</code>' ) );
+			$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$this->disp_params['item_template'].'</code>' ) );
 			return false;
 		}
 
 		// Display MAIN CONTENT: subcategories and posts:
-		if( isset( $params['before_list'] ) )
+		if( isset( $this->disp_params['before_list'] ) )
 		{
-			echo $params['before_list'];
+			echo $this->disp_params['before_list'];
 		}
 
 		$exclude_cats = ( empty( $this->disp_params['exclude_cats'] ) ? array() : $this->disp_params['exclude_cats'] );
@@ -211,7 +211,7 @@ class cat_content_list_Widget extends ComponentWidget
 				{	// Skip excluded category:
 					continue;
 				}
-				$this->display_subcat_template( $Chapter, 0, $params );
+				$this->display_subcat_template( $Chapter, 0, $this->disp_params );
 			}
 		}
 		else
@@ -220,15 +220,15 @@ class cat_content_list_Widget extends ComponentWidget
 				'line'  => array( $this, 'display_subcat_template' ),
 				'posts' => array( $this, 'display_item_template' ),
 			);
-			$ChapterCache->iterate_through_category_children( $curr_Chapter, $callbacks, false, array_merge( $params, array(
+			$ChapterCache->iterate_through_category_children( $curr_Chapter, $callbacks, false, array_merge( $this->disp_params, array(
 					'sorted'       => true,
 					'exclude_cats' => $exclude_cats,
 				) ) );
 		}
 
-		if( isset( $params['after_list'] ) )
+		if( isset( $this->disp_params['after_list'] ) )
 		{
-			echo $params['after_list'];
+			echo $this->disp_params['after_list'];
 		}
 
 		echo $this->disp_params['block_body_end'];

@@ -659,25 +659,25 @@ class coll_item_list_Widget extends ComponentWidget
 				// Render MASTER quick template:
 				// In theory, this should not display anything.
 				// Instead, this should set variables to define sub-templates (and potentially additional variables)
-				echo render_template_code( $this->disp_params['template'], /* BY REF */ $params );
+				echo render_template_code( $this->disp_params['template'], /* BY REF */ $this->disp_params );
 
 				// Check if requested sub-template exists:
-				if( empty( $params['item_template'] ) )
+				if( empty( $this->disp_params['item_template'] ) )
 				{	// Display error when no template for listing
 					$this->display_error_message( sprintf( 'Missing %s param', '<code>item_template</code>' ) );
 					return false;
 				}
-				elseif( ! ( $item_Template = & $TemplateCache->get_by_code( $params['item_template'], false, false ) ) )
+				elseif( ! ( $item_Template = & $TemplateCache->get_by_code( $this->disp_params['item_template'], false, false ) ) )
 				{	// Display error when no or wrong template for listing
-					$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$params['item_template'].'</code>' ) );
+					$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$this->disp_params['item_template'].'</code>' ) );
 					return false;
 				}
 				else
 				{
 					// Display list of Items:
-					if( isset( $params['before_list'] ) )
+					if( isset( $this->disp_params['before_list'] ) )
 					{
-						echo $params['before_list'];
+						echo $this->disp_params['before_list'];
 					}
 
 					// ONLY SUPPORTING Plain list: (not grouped by category) for now
@@ -690,15 +690,15 @@ class coll_item_list_Widget extends ComponentWidget
 					while( $Item = & $ItemList->get_item() )
 					{
 						// Render Item by quick template:
-						echo render_template_code( $params['item_template'], $params, array( 'Item' => $Item ) );
+						echo render_template_code( $this->disp_params['item_template'], $this->disp_params, array( 'Item' => $Item ) );
 					}
 
 					// TODO: maybe support $this->disp_params['page'] & $this->disp_params['pagination'] . Use case?
 
 
-					if( isset( $params['after_list'] ) )
+					if( isset( $this->disp_params['after_list'] ) )
 					{
-						echo $params['after_list'];
+						echo $this->disp_params['after_list'];
 					}
 				}
 
