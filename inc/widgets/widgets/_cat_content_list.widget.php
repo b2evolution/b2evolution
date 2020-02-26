@@ -99,6 +99,10 @@ class cat_content_list_Widget extends ComponentWidget
 		$template_input_suffix = ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
 			.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );
 
+		// Get all catgories of the widget Collection:
+		$ChapterCache = & get_ChapterCache();
+		$chapter_options = $ChapterCache->recurse_select_options( $this->get_Blog()->ID );
+
 		$r = array_merge( array(
 				'title' => array(
 					'label' => T_( 'Title' ),
@@ -113,6 +117,14 @@ class cat_content_list_Widget extends ComponentWidget
 					'defaultvalue' => 'content_list',
 					'input_suffix' => $template_input_suffix,
 				),
+				'exclude_cats' => array(
+					'label' => T_('Categories to exclude'),
+					'type' => 'select',
+					'multiple' => true,
+					'allow_none' => true,
+					'options' => $chapter_options,
+					'defaultvalue' => array(),
+				),
 			), parent::get_param_definitions( $params ) );
 
 		return $r;
@@ -126,7 +138,7 @@ class cat_content_list_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $cat;
+		global $cat, $DB;
 
 		$this->init_display( $params );
 
@@ -169,13 +181,22 @@ class cat_content_list_Widget extends ComponentWidget
 			echo $params['before_list'];
 		}
 
+		$exclude_cats = ( empty( $this->disp_params['exclude_cats'] ) ? array() : $this->disp_params['exclude_cats'] );
+		//pre_dump( $exclude_cats );
+
 		if( empty( $curr_Chapter ) )
 		{	// Display all ROOT categories of the current Collection:
 			global $Blog;
 			$ChapterCache->clear();
-			$ChapterCache->load_where( 'cat_blog_ID = '.$Blog->ID.' AND cat_parent_ID IS NULL' );
+			$ChapterCache->load_where( 'cat_blog_ID = '.$Blog->ID
+				.' AND cat_parent_ID IS NULL'
+				.( empty( $exclude_cats ) ? '' : ' AND cat_ID NOT IN ( '.$DB->quote( $exclude_cats ).' )' ) );
 			foreach( $ChapterCache->cache as $Chapter )
 			{
+				if( in_array( $Chapter->ID, $exclude_cats ) )
+				{	// Skip excluded category:
+					continue;
+				}
 				$this->display_subcat_template( $Chapter, 0, $params );
 			}
 		}
@@ -185,7 +206,10 @@ class cat_content_list_Widget extends ComponentWidget
 				'line'  => array( $this, 'display_subcat_template' ),
 				'posts' => array( $this, 'display_item_template' ),
 			);
-			$ChapterCache->iterate_through_category_children( $curr_Chapter, $callbacks, false, array_merge( $params, array( 'sorted' => true ) ) );
+			$ChapterCache->iterate_through_category_children( $curr_Chapter, $callbacks, false, array_merge( $params, array(
+					'sorted'       => true,
+					'exclude_cats' => $exclude_cats,
+				) ) );
 		}
 
 		if( isset( $params['after_list'] ) )
