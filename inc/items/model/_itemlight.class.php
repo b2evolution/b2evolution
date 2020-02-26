@@ -88,6 +88,13 @@ class ItemLight extends DataObject
 	var $main_Chapter;
 
 	/**
+	 * ID of current extra category
+	 * Used to set correct item URL in {@link ItemLight::get_single_url()}
+	 * @var integer
+	 */
+	var $current_extra_cat_ID = NULL;
+
+	/**
 	 * Derived from $main_cat_ID.
 	 *
 	 * @var integer
