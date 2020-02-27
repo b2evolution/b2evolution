@@ -1724,9 +1724,14 @@ class Item extends ItemLight
 	 * @param array Skin params
 	 * @return boolean true if user can post, false if s/he cannot
 	 */
-	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#', $section_title = '', $params = array() )
+	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#', $section_title = '', $params = array(), $comment_type = 'comment' )
 	{
 		global $current_User, $disp;
+
+		if( $comment_type == 'meta' )
+		{	// Meta comment are always allowed!
+			return true;
+		}
 
 		if( $disp == 'terms' )
 		{	// Don't allow comment a page with terms & conditions:
@@ -1875,7 +1880,11 @@ class Item extends ItemLight
 
 		$this->load_Blog();
 
-		if( ( $settings_name == 'allow_attachments' ) && isset( $settings_object ) && ( $settings_object instanceof Comment ) && $settings_object->is_meta() )
+		if( ( $settings_name == 'allow_attachments' )
+				&& isset( $settings_object )
+				&& ( $settings_object instanceof Comment )
+				&& $settings_object->is_meta()
+				&& $this->can_meta_comment() )
 		{	// Always allow attachments for meta Comments:
 			return true;
 		}
@@ -1905,9 +1914,10 @@ class Item extends ItemLight
 	 *
 	 * @param boolean|integer ID of Temporary object to count also temporary attached files to new creating comment,
 	 *                        FALSE to count ONLY attachments of the created comments
+	 * @param string Comment type
 	 * @return boolean true if user can attach files to this post comments, false if s/he cannot
 	 */
-	function can_attach( $Comment = NULL )
+	function can_attach( $link_tmp_ID = false, $comment_type = 'comment' )
 	{
 		global $Settings, $current_User;
 
@@ -1916,7 +1926,7 @@ class Item extends ItemLight
 		{	// We can check the attachments quota only for registered users
 			$this->load_Blog();
 
-			if( isset( $Comment ) && ( $Comment instanceof Comment ) && $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'add', false, $this->get_blog_ID() ) )
+			if( $comment_type == 'meta' && $this->can_meta_comment() )
 			{	// Always allow attachments for meta Comments:
 				return true;
 			}
@@ -1928,10 +1938,6 @@ class Item extends ItemLight
 
 				// Get a number of attachments for current user on this post
 				$link_tmp_ID = false;
-				if( isset( $Comment ) && isset( $Comment->temp_link_owner_ID ) )
-				{
-					$link_tmp_ID = $Comment->temp_link_owner_ID;
-				}
 				$attachments_count = $this->get_attachments_number( NULL, $link_tmp_ID );
 
 				// Get the attachments from preview comment
