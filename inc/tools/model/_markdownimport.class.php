@@ -810,7 +810,7 @@ class MarkdownImport extends AbstractImport
 					! ( $Item = & $this->get_Item( $item_slug ) ) )
 			{	// Create new Item for not update mode or if it is not found by slug in the requested Collection:
 				$Item = new Item();
-				$Item->set( 'creator_user_ID', $current_User->ID );
+				$Item->set( 'creator_user_ID', ( is_logged_in() ? $current_User->ID : 1/*Run from CLI mode by admin*/ )  );
 				$Item->set( 'datestart', date2mysql( $localtimenow ) );
 				$Item->set( 'datecreated', date2mysql( $localtimenow ) );
 				$Item->set( 'status', 'published' );
@@ -853,7 +853,7 @@ class MarkdownImport extends AbstractImport
 
 			if( $this->get_option( 'force_item_update' ) || $item_content_was_changed )
 			{	// Set new fields only when import hash(title + content + YAML data) was really changed:
-				$Item->set( 'lastedit_user_ID', $current_User->ID );
+				$Item->set( 'lastedit_user_ID', ( is_logged_in() ? $current_User->ID : 1/*Run from CLI mode by admin*/ ) );
 				$Item->set( 'datemodified', date2mysql( $localtimenow ) );
 
 				// Filter title and content by renderer plugins:
@@ -1982,6 +1982,87 @@ class MarkdownImport extends AbstractImport
 			// Set flag to know the item content was updated:
 			$this->item_file_is_updated = true;
 		}
+	}
+
+
+	/**
+	 * Display process of importing
+	 */
+	function display_import()
+	{
+		// Start to log:
+		$this->start_log();
+
+		$this->log( '<p style="margin-bottom:0">' );
+
+		if( preg_match( '/\.zip$/i', $this->source ) )
+		{	// ZIP archive:
+			$this->log( '<b>'.T_('Source ZIP').':</b> <code>'.$this->source.'</code><br />' );
+			$this->log( '<b>'.T_('Unzipping').'...</b> '.( $this->unzip() ? T_('OK').'<br />' : '' ) );
+		}
+		else
+		{	// Folder:
+			$this->log( '<b>'.T_('Source folder').':</b> <code>'.$this->source.'</code><br />' );
+		}
+		if( $this->get_data( 'errors' ) !== false )
+		{	// Display errors:
+			$this->log( $this->get_data( 'errors' ) );
+		}
+
+		$import_Blog = & $this->get_Blog();
+		$this->log( '<b>'.T_('Destination collection').':</b> '.$import_Blog->dget( 'shortname' ).' &ndash; '.$import_Blog->dget( 'name' ).'<br />' );
+		$this->log( '<b>'.T_('Mode').':</b> '
+			.( isset( $this->options_defs['import_type']['options'][ $this->get_option( 'import_type' ) ] )
+				? $this->options_defs['import_type']['options'][ $this->get_option( 'import_type' ) ]['title']
+				: '<b class="red">Unknown mode!</b>' ) );
+		$this->log( '</p>' );
+		$selected_options = array();
+		foreach( $this->options_defs as $option_key => $option )
+		{
+			if( $option['group'] != 'options' )
+			{	// Skip option from different group:
+				continue;
+			}
+			if( $this->get_option( $option_key ) )
+			{
+				$selected_options[ $option_key ] = array(
+						// Option title and note:
+						( empty( $option['disabled'] ) ? $option['title'] : '<span class="grey">'.$option['title'].'</span>' )
+							.( isset( $option['note'] ) ? ' <span class="note">'.$option['note'].'</span>' : '' ),
+						// Indent value:
+						isset( $option['indent'] ) ? $option['indent'] : 0
+					);
+			}
+		}
+		if( $selected_options_count = count( $selected_options ) )
+		{
+			$this->log( '<b>'.T_('Options').':</b> ' );
+			if( $selected_options_count == 1 )
+			{
+				$this->log( $selected_options[0] );
+			}
+			else
+			{
+				$this->log( '<ul class="list-default">' );
+				foreach( $selected_options as $option_key => $option )
+				{
+					$this->log( '<li'.( $option[1] ? ' style="margin-left:'.( $option[1] * 10 ).'px"' : '' ).'>'.$option[0].'</li>' );
+				}
+				$this->log( '</ul>' );
+			}
+		}
+
+		if( $this->get_data( 'errors' ) === false )
+		{	// Import the data and display a report on the screen:
+			$this->execute();
+		}
+		else
+		{	// Display errors if import cannot be done:
+			$this->log( '<p class="text-danger">'.T_('Import failed.').'</p>' );
+		}
+
+		// End log:
+		$this->end_log();
 	}
 }
 ?>
