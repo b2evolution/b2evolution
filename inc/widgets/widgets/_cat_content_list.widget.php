@@ -93,11 +93,14 @@ class cat_content_list_Widget extends ComponentWidget
 		global $current_User, $admin_url;
 
 		// Get available templates:
+		$context = 'content_list_master';
 		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_by_context( 'content_list_master' );
+		$TemplateCache->load_by_context( $context );
 		$template_options = array( NULL => T_('No template') ) + $TemplateCache->get_code_option_array();
 		$template_input_suffix = ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
-			.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );
+				.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
+				array( 'onclick' => 'return b2template_list_highlight( this )' ),
+				array( 'title' => T_('Manage templates').'...' ) ) : '' );
 
 		// Get all catgories of the widget Collection:
 		$ChapterCache = & get_ChapterCache();
@@ -116,6 +119,7 @@ class cat_content_list_Widget extends ComponentWidget
 					'options' => $template_options,
 					'defaultvalue' => 'content_list',
 					'input_suffix' => $template_input_suffix,
+					'class' => 'evo_template_select',
 				),
 				'exclude_cats' => array(
 					'label' => T_('Categories to exclude'),

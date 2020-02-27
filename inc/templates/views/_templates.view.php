@@ -15,6 +15,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $admin_url;
 
+$highlight = param( 'highlight', 'string', NULL );
+
 // Get params from request
 $name_code = param( 'q', 'string', '', true );
 $context = param( 'context', 'string', NULL, true );
@@ -148,6 +150,9 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$Results->global_icon( T_('New template'), 'new', regenerate_url( 'action', 'action=new' ), T_('New template').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 }
 
-$Results->display();
+// Highlight rows:
+$highlight_fadeout = empty( $highlight ) ? array() : array( 'tpl_code' => array( $highlight ) );
+
+$Results->display( NULL, $highlight_fadeout );
 
 ?>

@@ -5225,6 +5225,9 @@ legend.panel-heading a.action_icon.pull-right span.fa {
 .form-horizontal .controls .form-control.form_textarea_input {
   display: block;
 }
+.form-horizontal .controls .form-control.evo_template_select {
+  width: calc(100% - 24px);
+}
 div.edit_toolbars {
   margin-top: 5px;
   text-align: left;

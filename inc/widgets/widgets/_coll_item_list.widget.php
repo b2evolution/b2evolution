@@ -47,8 +47,9 @@ class coll_item_list_Widget extends ComponentWidget
 		global $current_User, $admin_url;
 
 		// Get available templates:
+		$context = 'content_list_master';
 		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_by_context( 'content_list_master' );
+		$TemplateCache->load_by_context( $context );
 
 		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
 
@@ -82,7 +83,10 @@ class coll_item_list_Widget extends ComponentWidget
 					'options' => $template_options,
 					'defaultvalue' => NULL,
 					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
-							.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' ),
+							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
+							array( 'onclick' => 'return b2template_list_highlight( this )' ),
+							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
+					'class' => 'evo_template_select',
 				),
 				'title_link' => array(
 					'label' => T_('Link to blog'),
