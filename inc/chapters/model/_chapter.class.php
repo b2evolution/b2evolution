@@ -1040,7 +1040,7 @@ class Chapter extends DataObject
 	{
 		$params = array_merge( array(
 				'before'        => '',		// HTML code before image tag
-				'before_classes'=> '', // Allow injecting additional classes into 'before'
+				'before_classes'=> '',		// Allow injecting additional classes into 'before'
 				'before_legend' => '',		// HTML code before image legeng(info under image tag image desc is not empty)
 				'after_legend'  => '',		// HTML code after image legeng
 				'after'         => '',		// HTML code after image tag

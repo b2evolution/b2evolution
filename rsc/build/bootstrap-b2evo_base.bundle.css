@@ -142,10 +142,11 @@ img.rounded,
 .evo_image_block.rounded img {
   border-radius: 4px;
 }
-img.round,
-.image_block.round img,
-.evo_image_block.round img {
-  border-radius: 50%;
+.evo_image_block.contain img {
+  object-fit: contain !important;
+}
+.evo_image_block.cover img {
+  object-fit: cover !important;
 }
 img.imgerror,
 .image_block.imgerror img,
@@ -2835,7 +2836,6 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   height: 200px;
   margin: 0;
   background-color: #f0f0f0;
-  overflow: hidden;
 }
 .evo_tile_image .evo_image_block a {
   display: block;

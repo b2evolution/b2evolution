@@ -497,7 +497,6 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   height: 200px;
   margin: 0;
   background-color: #f0f0f0;
-  overflow: hidden;
 }
 .evo_tile_image .evo_image_block a {
   display: block;

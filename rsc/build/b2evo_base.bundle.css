@@ -145,10 +145,11 @@ img.rounded,
 .evo_image_block.rounded img {
   border-radius: 4px;
 }
-img.round,
-.image_block.round img,
-.evo_image_block.round img {
-  border-radius: 50%;
+.evo_image_block.contain img {
+  object-fit: contain !important;
+}
+.evo_image_block.cover img {
+  object-fit: cover !important;
 }
 img.imgerror,
 .image_block.imgerror img,

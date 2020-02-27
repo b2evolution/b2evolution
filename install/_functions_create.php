@@ -1745,6 +1745,23 @@ function create_default_templates( $is_task = true )
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__hoverglow]
 [set:evo_tile_image__modifiers:]
+[set:evo_tile_image__classes:evo_image_block]
+[set:evo_tile_image__size=fit-400x320]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers:evo_tile_text__gradient]
+',
+		),
+		'content_tiles_contain' => array(
+			'name'     => 'Content Tiles Style 1.1 (Contained images)',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_subcat]
+[set:item_template=content_tiles_item]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
+[set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__hoverglow]
+[set:evo_tile_image__modifiers:]
+[set:evo_tile_image__classes:evo_image_block contain]
 [set:evo_tile_image__size=fit-400x320]
 [set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
 [set:evo_tile_text__modifiers:evo_tile_text__gradient]
@@ -1758,7 +1775,7 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
+				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$|link_to=#category_url|before=<figure class="evo_image_block">|before_classes=$evo_tile_image__classes$|after=</figure>]
 			</div>
 			<div class="evo_tile_body">
 				<h3>[Cat:name]</h3>
@@ -1777,7 +1794,7 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Item:images|restrict_to_image_position=#cover_and_teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=|placeholder=#file_text_icon]
+				[Item:images|restrict_to_image_position=#cover_and_teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=|placeholder=#file_text_icon|before_image_classes=$evo_tile_image__classes$]
 				<div class="evo_tile_overlay">[Item:cat_name]</div>
 			</div>
 			<div class="evo_tile_body">
@@ -1802,7 +1819,7 @@ function create_default_templates( $is_task = true )
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__shadow]
 [set:evo_tile_image__modifiers:evo_tile_image__margin]
-[set:evo_tile_image__classes:evo_image_block temp_dummy_test_class]
+[set:evo_tile_image__classes:evo_image_block]
 [set:evo_tile_image__size=fit-400x320]
 [set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
 [set:evo_tile_text__modifiers:evo_tile_text__gradient]',
@@ -1859,6 +1876,7 @@ function create_default_templates( $is_task = true )
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
 [set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__square evo_tile__shadow]
 [set:evo_tile_image__modifiers:]
+[set:evo_tile_image__classes:evo_image_block]
 [set:evo_tile_image__size=fit-400x320]
 [set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
 [set:evo_tile_text__modifiers:evo_tile_text__gradient]',
