@@ -48,12 +48,12 @@ class MarkdownImport extends AbstractImport
 				'group'   => 'mode',
 				'title'   => T_('Import mode'),
 				'options' => array(
-					'update'  => array( 'title' => T_('Update existing contents'), 'note' => T_('Existing Categories & Posts will be re-used (based on slug).') ),
-					'append'  => array( 'title' => T_('Append to existing contents') ),
-					'replace' => array(
+					'update' => array( 'title' => T_('Update existing contents'), 'note' => T_('Existing Categories & Posts will be re-used (based on slug).') ),
+					'append' => array( 'title' => T_('Append to existing contents') ),
+					'delete' => array(
 							'title'  => T_('DELETE & replace ALL contents'),
 							'note'   => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.'),
-							'suffix' => '<br /><div id="import_type_replace_confirm_block" class="alert alert-danger" style="display:none;margin:0">'.T_('WARNING').': '.T_('you will LOSE any data that is not part of the files you import.').' '.sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).': <input name="import_type_replace_confirm" type="text" class="form-control" size="8" style="margin:-8px 0" /></div>',
+							'suffix' => '<br /><div id="import_type_delete_confirm_block" class="alert alert-danger" style="display:none;margin:0">'.T_('WARNING').': '.T_('you will LOSE any data that is not part of the files you import.').' '.sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).': <input name="import_type_delete_confirm" type="text" class="form-control" size="8" style="margin:-8px 0" /></div>',
 						),
 				),
 				'type'    => 'string',
@@ -69,7 +69,7 @@ class MarkdownImport extends AbstractImport
 			),
 			'delete_files' => array(
 				'group'    => 'import_type',
-				'subgroup' => 'replace',
+				'subgroup' => 'delete',
 				'title'    => T_('Also delete media files that will no longer be referenced in the destination collection after replacing its contents'),
 				'type'     => 'integer',
 				'default'  => 0,
@@ -348,10 +348,10 @@ class MarkdownImport extends AbstractImport
 			$this->set_option( $option_key, param( $option_key, $option['type'], ( $option['type'] == 'integer' ? 0 : $option['default'] ) ) );
 		}
 
-		if( $this->get_option( 'import_type' ) == 'replace' &&
-		    param( 'import_type_replace_confirm', 'string' ) !== 'DELETE' )
+		if( $this->get_option( 'import_type' ) == 'delete' &&
+		    param( 'import_type_delete_confirm', 'string' ) !== 'DELETE' )
 		{	// If deleting/replacing is not confirmed:
-			param_error( 'import_type_replace_confirm', sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).'!' );
+			param_error( 'import_type_delete_confirm', sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).'!' );
 		}
 
 		return ! param_errors_detected();
@@ -408,7 +408,7 @@ class MarkdownImport extends AbstractImport
 
 		$DB->begin();
 
-		if( $this->get_option( 'import_type' ) == 'replace' )
+		if( $this->get_option( 'import_type' ) == 'delete' )
 		{	// Remove data from selected collection:
 
 			// Get existing categories

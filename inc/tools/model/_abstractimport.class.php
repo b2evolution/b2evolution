@@ -324,6 +324,15 @@ class AbstractImport
 						}
 						$this->log( $log_prefix.'OK', 'success' );
 						break;
+
+					case 'import-mode':
+						if( $this->get_option( 'import_type' ) != $manifest_value )
+						{	// Stop import because currently selected import mode is defferent than rule from manifest file:
+							$this->log( $log_prefix.'NOT OK as currently selected import mode is <code>'.$this->get_option( 'import_type' ).'</code>', 'error' );
+							return false;
+						}
+						$this->log( $log_prefix.'OK', 'success' );
+						break;
 				}
 			}
 		}

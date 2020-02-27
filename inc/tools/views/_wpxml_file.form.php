@@ -60,13 +60,13 @@ if( ! empty( $import_files ) )
 
 	$Form->radio_input( 'import_type', $import_type, array(
 				array(
-					'value' => 'replace',
+					'value' => 'delete',
 					'label' => T_('Replace existing contents'),
 					'note'  => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.'),
-					'id'    => 'import_type_replace' ),
+					'id'    => 'import_type_delete' ),
 			), '', array( 'lines' => true ) );
 
-	echo '<div id="checkbox_delete_files"'.( $import_type == 'replace' ? '' : ' style="display:none"' ).'>';
+	echo '<div id="checkbox_delete_files"'.( $import_type == 'delete' ? '' : ' style="display:none"' ).'>';
 	$Form->checkbox_input( 'delete_files', param( 'delete_files', 'integer', 0 ), '', array(
 		'input_suffix' => '<label for="delete_files" style="padding-left:0">'.T_(' Also delete media files that will no longer be referenced in the destination collection after replacing its contents').'</label>',
 		'input_prefix' => '<span style="margin-left:25px"></span>') );
@@ -89,7 +89,7 @@ $Form->end_form();
 <script>
 jQuery( 'input[name=import_type]' ).click( function()
 { // Show/Hide checkbox to delete files
-	if( jQuery( this ).val() == 'replace' )
+	if( jQuery( this ).val() == 'delete' )
 	{
 		jQuery( '#checkbox_delete_files' ).show();
 	}
