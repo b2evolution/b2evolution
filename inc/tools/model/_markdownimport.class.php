@@ -1831,12 +1831,27 @@ class MarkdownImport extends AbstractImport
 			return;
 		}
 
+		// Get current extra categories:
+		if( isset( $Item->extra_cat_IDs ) )
+		{	// Clear to be sure all etra categories are loaded from DB:
+			unset( $Item->extra_cat_IDs );
+		}
+		$old_extra_cat_IDs = $Item->get( 'extra_cat_IDs' );
+
 		$extra_cat_IDs = array();
 		foreach( $value as $extra_cat_slug )
 		{
 			if( $extra_Chapter = & $this->get_Chapter( $extra_cat_slug, ( strpos( $extra_cat_slug, '/' ) !== false ), $Item->get( 'ityp_ID' ) ) )
 			{	// Use only existing category:
 				$extra_cat_IDs[] = $extra_Chapter->ID;
+				if( in_array( $extra_Chapter->ID, $old_extra_cat_IDs ) )
+				{	// Inform about already assigned extra category:
+					$this->add_yaml_message( sprintf( T_('Extra category already assigned: %s.'), '<code>'.$extra_cat_slug.'</code>' ), 'info' );
+				}
+				else
+				{	// Inform about new assigned extra category:
+					$this->add_yaml_message( sprintf( T_('Assigned new category: %s.'), '<code>'.$extra_cat_slug.'</code>' ), 'info' );
+				}
 			}
 			else
 			{	// Display error on not existing category:
