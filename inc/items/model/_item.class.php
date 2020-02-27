@@ -1728,7 +1728,7 @@ class Item extends ItemLight
 	{
 		global $current_User, $disp;
 
-		if( $comment_type == 'meta' )
+		if( $comment_type == 'meta' && $this->can_meta_comment() )
 		{	// Meta comment are always allowed!
 			return true;
 		}
