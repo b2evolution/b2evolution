@@ -115,7 +115,7 @@ class content_block_Widget extends ComponentWidget
 
 		// Get available templates:
 		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_where( 'tpl_translates_tpl_ID IS NULL' );
+		$TemplateCache->load_by_context( 'content_block' );
 		$template_options = $TemplateCache->get_code_option_array();
 		$template_input_suffix = ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
 			.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );

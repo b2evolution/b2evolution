@@ -87,7 +87,7 @@ class user_register_standard_Widget extends ComponentWidget
 
 		// Get available templates:
 		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_where( 'tpl_translates_tpl_ID IS NULL' );
+		$TemplateCache->load_by_context( 'registration' );
 
 		$r = array_merge( array(
 				'title' => array(

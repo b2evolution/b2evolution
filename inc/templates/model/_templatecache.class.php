@@ -30,6 +30,9 @@ class TemplateCache extends DataObjectCache
 	 */
 	var $cache_by_code;
 	
+	var $loaded_contexts = array();
+
+
 	/**
 	 * Constructor
 	 *
@@ -158,5 +161,47 @@ class TemplateCache extends DataObjectCache
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Load templates for a given context
+	 * 
+	 * @param string Comma-separated list of contexts to load
+	 */
+	function load_by_context( $context )
+	{
+		global $DB;
+
+		if( empty( $context ) )
+		{	// Nothing to load:
+			return;
+		}
+
+		$context = array_map( 'trim', explode( ',', $context ) );
+
+		$context_already_loaded = array_intersect( array_keys( $this->loaded_contexts ), $context );
+		if( $this->all_loaded || ( count( $context_already_loaded ) == count( $context ) ) )
+		{	// Already loaded
+			return false;
+		}
+
+		$context_to_load = array_diff( $context, $this->loaded_contexts );
+	
+		$SQL = new SQL( 'Get templates with context: '.implode( ', ', $context_to_load ) );
+		$SQL->SELECT( '*' );
+		$SQL->FROM( 'T_templates' );
+		$SQL->WHERE( 'tpl_translates_tpl_ID IS NULL' );
+		$SQL->WHERE_and( 'tpl_context IN ('.$DB->quote( $context_to_load ).')' );
+		$SQL->ORDER_BY( 'tpl_name, tpl_code' );
+
+		$this->load_by_sql( $SQL );
+
+		foreach( $context_to_load as $loop_context )
+		{
+			$this->loaded_contexts[$loop_context] = true;
+		}
+
+		return true;
 	}
 }
