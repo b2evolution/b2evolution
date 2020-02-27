@@ -872,7 +872,7 @@ function unique_template_code( $code, $ID = 0, $db_code_fieldname = 'tpl_code', 
 function get_template_contexts()
 {
 	return array(
-		'custom', 'custom1', 'custom2', 'custom3',
+		'custom1', 'custom2', 'custom3',
 		'content_list_master', 'content_list_item', 'content_list_category',
 		'content_block', 'item_details', 'item_content', 'registration' );
 }

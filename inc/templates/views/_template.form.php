@@ -105,8 +105,8 @@ $Form->begin_form( 'fform', $fieldset_title );
 		else
 		{
 			$buttons = array(
-					array( 'submit', 'actionArray[update]', T_('Save!'), 'SaveButton' ),
-					array( 'submit', 'actionArray[update_edit]', T_('Save and continue editing...'), 'SaveButton' )
+					array( 'submit', 'actionArray['.( $creating ? 'create' : 'update' ).']', T_('Save!'), 'SaveButton' ),
+					array( 'submit', 'actionArray['.( $creating ? 'create' : 'update' ).'_edit]', T_('Save and continue editing...'), 'SaveButton' )
 				);
 		}
 	}
