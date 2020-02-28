@@ -98,7 +98,7 @@ $Form->begin_fieldset( T_('Standard registration').get_manual_link('default-user
 					array( 'hidden', T_('Hidden') ),
 					array( 'optional', T_('Optional') ),
 					array( 'required', T_('Required') ),
-				), T_('Aske / require gender'), false );
+				), T_('Ask for / require gender'), false );
 
 $Form->end_fieldset();
 

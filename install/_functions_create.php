@@ -2120,6 +2120,15 @@ function create_default_templates( $is_task = true )
 */
 
 		// Registration Templates:
+		'registration_master_standard' => array(   // Should become registration_master
+			'name'     => 'Registration: Standard',
+			'context'  => 'custom1',  // should become registration_master
+			'template' => '
+[set:reg1_template=registration_standard]
+[set:reg1_required=login,password,email]
+',
+		),
+
 		'registration_standard' => array(
 			'name'     => 'Registration: Standard',
 			'context'  => 'registration',
@@ -2137,6 +2146,18 @@ function create_default_templates( $is_task = true )
 		class=btn btn-default|
 		text=Already have an account... ?]
 </div>',
+		),
+
+
+
+		// Registration Templates:
+		'registration_master_ask_name' => array(   
+			'name'     => 'Registration: Ask for Name',
+			'context'  => 'custom1',  // should become registration_master
+			'template' => '
+[set:reg1_template=registration_ask_name]
+[set:reg1_required=login,firstname,password,email]
+',
 		),
 
 		'registration_ask_name' => array(
@@ -2159,6 +2180,19 @@ function create_default_templates( $is_task = true )
 </div>'
 		),
 
+		// Registration Templates:
+		'registration_master_email_social' => array(   
+			'name'     => 'Registration: email & social buttons',
+			'context'  => 'custom1',  // should become registration_master
+			'template' => '
+[set:reg1_template=registration_email_social]
+[set:reg1_required=email]
+
+[set:reg2_template=registration_step2]
+[set:reg2_required=firstname]
+',
+		),
+
 		'registration_email_social' => array(
 			'name'     => 'Registration: email & social buttons',
 			'context'  => 'registration',
@@ -2177,7 +2211,22 @@ function create_default_templates( $is_task = true )
 [Plugin:evo_sociallogin| // This should call the SkinTag of plugin with given code
 	before=<div class="evo_social_login_buttons margin-top-md">|
 	after=</div>]
-'
+',
+		),
+
+		'registration_step2' => array(
+			'name'     => 'Registration: Step 2',
+			'context'  => 'registration',
+			'template' => '[Form:firstname]
+	[Form:lastname]
+	[Form:custom_field|field=industry| // this is an example of a User custom field]
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Continue]
+',
+		),
+
 	);
 
 	$templates_sql = array();
