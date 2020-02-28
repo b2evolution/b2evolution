@@ -127,7 +127,7 @@ class Menu extends Widget
 		{ // find index of menu itemafter which to insert new entries
 			$keys = array_keys( $entries );
 
-			if( !empty( $keys ) ) $index = array_search( $menu_item, $keys );
+			if( !empty( $keys ) ) $index = array_search( $menu_item, $keys, true );
 		}
 
 		if( ( $index === false ) || ($index === NULL) )
