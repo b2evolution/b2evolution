@@ -1839,23 +1839,25 @@ class MarkdownImport extends AbstractImport
 		$old_extra_cat_IDs = $Item->get( 'extra_cat_IDs' );
 
 		$extra_cat_IDs = array();
+		$specified_yaml_message = ' ('.TB_('specified in YAML block').')';
 		foreach( $value as $extra_cat_slug )
 		{
 			if( $extra_Chapter = & $this->get_Chapter( $extra_cat_slug, ( strpos( $extra_cat_slug, '/' ) !== false ), $Item->get( 'ityp_ID' ) ) )
 			{	// Use only existing category:
 				$extra_cat_IDs[] = $extra_Chapter->ID;
 				// Inform about new or already assigned extra category:
-				$cat_message = ( in_array( $extra_Chapter->ID, $old_extra_cat_IDs ) ? TB_('Extra category already assigned: %s.') : TB_('Assigned new category: %s.') );
+				$cat_message = ( in_array( $extra_Chapter->ID, $old_extra_cat_IDs ) ? TB_('Extra category already assigned: %s') : TB_('Assigned new extra-category: %s') );
 				$cross_posted_message = ( $extra_Chapter->get( 'blog_ID' ) != $this->coll_ID ? ' <b>'.TB_('Cross-posted').'</b>' : '' );
-				$this->add_yaml_message( sprintf( $cat_message, $extra_Chapter->get_permanent_link().$cross_posted_message ), 'info' );
+				$this->add_yaml_message( sprintf( $cat_message, $extra_Chapter->get_permanent_link().$specified_yaml_message.$cross_posted_message ), 'info' );
 			}
 			else
 			{	// Display error on not existing category:
-				$this->add_yaml_message( sprintf( TB_('Skipping extra category %s, because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>' ) );
+				$this->add_yaml_message( sprintf( TB_('Skipping extra category %s because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>'.$specified_yaml_message ) );
 			}
 		}
 
-		$del_extra_cat_IDs = array_diff( $old_extra_cat_IDs, $extra_cat_IDs );
+		$del_extra_cat_IDs = array_diff( $old_extra_cat_IDs, array_merge( $extra_cat_IDs, array( $Item->get( 'main_cat_ID' ) ) ) );
+		$no_yaml_message = ' ('.TB_('no longer in YAML block').')';
 		if( ! empty( $del_extra_cat_IDs ) )
 		{	// Inform about unassigned extra categories:
 			$ChapterCache = & get_ChapterCache();
@@ -1865,11 +1867,11 @@ class MarkdownImport extends AbstractImport
 				if( $del_Chapter = & $ChapterCache->get_by_ID( $del_extra_cat_ID, false, false ) )
 				{	// If category is found in DB:
 					$cross_posted_message = ( $del_Chapter->get( 'blog_ID' ) != $this->coll_ID ? ' <b>'.TB_('Cross-posted').'</b>' : '' );
-					$this->add_yaml_message( sprintf( TB_('Extra category unassigned: %s.'), $del_Chapter->get_permanent_link().$cross_posted_message ), 'warning' );
+					$this->add_yaml_message( sprintf( TB_('Un-assigned old extra-category: %s.'), $del_Chapter->get_permanent_link().$no_yaml_message.$cross_posted_message ), 'warning' );
 				}
 				else
 				{	// If category is NOT found in DB:
-					$this->add_yaml_message( sprintf( TB_('Extra category unassigned because not found by ID#%d in DB.'), $del_extra_cat_ID ), 'error' );
+					$this->add_yaml_message( sprintf( TB_('Un-assigned old extra-category #%s because it doesn\'t exist.'), $del_extra_cat_ID.$no_yaml_message ), 'error' );
 				}
 			}
 		}
