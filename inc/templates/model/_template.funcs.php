@@ -62,7 +62,7 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	$r = '';
 
 	// New
-	preg_match_all( '/\[((?:(?:Cat|Coll|Form|Item|Link|echo|set):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Cat|Coll|Form|Item|Link|echo|set):)?([a-z_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		// Output everything until new tag:
@@ -80,10 +80,37 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 
 			$param_name = substr( $tag, 4 );
 			$param_val  = substr( $tag_param_strings, strpos( $tag_param_strings, '=' ) + 1 );
+			$param_strings = $param_name.'='.$param_val;
+			$param_strings = explode( '|', $param_strings );
 
-			// Set param:
-			// we MUST do this here and in & $params[] so that it sticks. This cannot be done in the callback or $this_tag_params[]
-			$params[ $param_name ] = $param_val;
+			foreach( $param_strings as $param_string )
+			{
+				if( empty( $param_string ) || ctype_space( $param_string ) )
+				{	// Nothing here, ignore:
+					continue;
+				}
+
+				$param_name = substr( $param_string, 0, strpos( $param_string, '=' ) );
+
+				if( empty( $param_name ) )
+				{	// Does not contain a param name, ignore:
+					continue;
+				}
+
+				if( strpos( $param_name, '//' ) !== false )
+				{	// We found a comment that we should remove:
+					$param_name = preg_replace( '~(.*)//.*$~im','$1', $param_name );
+				}
+
+				// Trim off whitespace:
+				$param_name = trim( $param_name );
+
+				$param_val  = substr( $param_string, strpos( $param_string, '=' ) + 1 );
+
+				// Set param:
+				// we MUST do this here and in & $params[] so that it sticks. This cannot be done in the callback or $this_tag_params[]
+				$params[ $param_name ] = $param_val;
+			}
 		}
 		else
 		{	// Process a normal template tag:
@@ -97,7 +124,20 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 				// Process each param individually:
 				foreach( $tag_param_strings as $tag_param_string )
 				{
+					if( empty( $tag_param_string ) || ctype_space( $tag_param_string) )
+					{
+						continue;
+					}
+
 					$tag_param_name = substr( $tag_param_string, 0, strpos( $tag_param_string, '=' ) );
+
+					if( strpos( $tag_param_name, '//' ) !== false )
+					{	// We found a comment that we should remove:
+						$tag_param_name = preg_replace( '~(.*)//.*$~im','$1', $tag_param_name );
+					}
+
+					// Trim off whitespace:
+					$tag_param_name = trim( $tag_param_name );
 
 					$tag_param_val  = substr( $tag_param_string, strpos( $tag_param_string, '=' ) + 1 );
 
