@@ -2158,6 +2158,26 @@ function create_default_templates( $is_task = true )
 		text=Already have an account... ?]
 </div>'
 		),
+
+		'registration_email_social' => array(
+			'name'     => 'Registration: email & social buttons',
+			'context'  => 'registration',
+			'template' => '[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+<div class="evo_register_buttons">
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Register my account now!]
+	<br>
+	[Link:disp|
+		disp=login|
+		class=btn btn-default|
+		text=Already have an account... ?]
+</div>
+[Plugin:evo_sociallogin| // This should call the SkinTag of plugin with given code
+	before=<div class="evo_social_login_buttons margin-top-md">|
+	after=</div>]
+'
 	);
 
 	$templates_sql = array();
