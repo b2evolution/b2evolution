@@ -1844,18 +1844,33 @@ class MarkdownImport extends AbstractImport
 			if( $extra_Chapter = & $this->get_Chapter( $extra_cat_slug, ( strpos( $extra_cat_slug, '/' ) !== false ), $Item->get( 'ityp_ID' ) ) )
 			{	// Use only existing category:
 				$extra_cat_IDs[] = $extra_Chapter->ID;
-				if( in_array( $extra_Chapter->ID, $old_extra_cat_IDs ) )
-				{	// Inform about already assigned extra category:
-					$this->add_yaml_message( sprintf( T_('Extra category already assigned: %s.'), '<code>'.$extra_cat_slug.'</code>' ), 'info' );
-				}
-				else
-				{	// Inform about new assigned extra category:
-					$this->add_yaml_message( sprintf( T_('Assigned new category: %s.'), '<code>'.$extra_cat_slug.'</code>' ), 'info' );
-				}
+				// Inform about new or already assigned extra category:
+				$cat_message = ( in_array( $extra_Chapter->ID, $old_extra_cat_IDs ) ? TB_('Extra category already assigned: %s.') : TB_('Assigned new category: %s.') );
+				$cross_posted_message = ( $extra_Chapter->get( 'blog_ID' ) != $this->coll_ID ? ' <b>'.TB_('Cross-posted').'</b>' : '' );
+				$this->add_yaml_message( sprintf( $cat_message, $extra_Chapter->get_permanent_link().$cross_posted_message ), 'info' );
 			}
 			else
 			{	// Display error on not existing category:
-				$this->add_yaml_message( sprintf( T_('Skipping extra category %s, because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>' ) );
+				$this->add_yaml_message( sprintf( TB_('Skipping extra category %s, because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>' ) );
+			}
+		}
+
+		$del_extra_cat_IDs = array_diff( $old_extra_cat_IDs, $extra_cat_IDs );
+		if( ! empty( $del_extra_cat_IDs ) )
+		{	// Inform about unassigned extra categories:
+			$ChapterCache = & get_ChapterCache();
+			$ChapterCache->load_list( $del_extra_cat_IDs );
+			foreach( $del_extra_cat_IDs as $del_extra_cat_ID )
+			{
+				if( $del_Chapter = & $ChapterCache->get_by_ID( $del_extra_cat_ID, false, false ) )
+				{	// If category is found in DB:
+					$cross_posted_message = ( $del_Chapter->get( 'blog_ID' ) != $this->coll_ID ? ' <b>'.TB_('Cross-posted').'</b>' : '' );
+					$this->add_yaml_message( sprintf( TB_('Extra category unassigned: %s.'), $del_Chapter->get_permanent_link().$cross_posted_message ), 'warning' );
+				}
+				else
+				{	// If category is NOT found in DB:
+					$this->add_yaml_message( sprintf( TB_('Extra category unassigned because not found by ID#%d in DB.'), $del_extra_cat_ID ), 'error' );
+				}
 			}
 		}
 
