@@ -18,5 +18,27 @@ jQuery( document ).ready( function()
 	{
 		jQuery( evo_init_datepicker['selector'] ).datepicker( evo_init_datepicker['config'] );
 	}
-	
+
+	// Change Link Position JS
+	if( typeof( evo_link_position_config ) != 'undefined' )
+	{
+		var config = evo_link_position_config['config'];
+		var displayInlineReminder = config['display_inline_reminder'];
+		var deferInlineReminder = config['defer_inline_reminder'];
+
+		jQuery( document ).on( 'change', evo_link_position_config['selector'], {
+				url: config['url'],
+				crumb: config['crumb'],
+			},
+			function( event )
+			{
+				if( this.value == 'inline' && displayInlineReminder && !deferInlineReminder )
+				{ // Display inline position reminder
+					alert( config['alert_msg'] );
+					displayInlineReminder = false;
+				}
+				evo_link_change_position( this, event.data.url, event.data.crumb );
+			} );
+	}
+
 } );

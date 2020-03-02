@@ -665,25 +665,19 @@ function display_link_position( & $row, $show_actions = true, $fieldset_prefix =
 function echo_link_position_js()
 {
 	global $Session;
-?>
-<script>
-var displayInlineReminder = <?php echo $Session->get( 'display_inline_reminder', 'true' );?>;
-var deferInlineReminder = false;
 
-jQuery( document ).on( 'change', 'select[id^=display_position_]', {
-		url:   '<?php echo get_htsrv_url(); ?>',
-		crumb: '<?php echo get_crumb( 'link' ); ?>',
-}, function( event )
-{
-	if( this.value == 'inline' && displayInlineReminder && !deferInlineReminder )
-	{ // Display inline position reminder
-		alert( '<?php echo TS_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.');?>' );
-		displayInlineReminder = false;
-	}
-	evo_link_change_position( this, event.data.url, event.data.crumb );
-} );
-</script>
-<?php
+	$evo_link_position_config = array(
+			'selector' => 'select[id^=display_position_]',
+			'config' => array(
+				'url'       => get_htsrv_url(),
+				'crumb'     => get_crumb( 'link' ),
+				'alert_msg' => TS_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.'),
+				'display_inline_reminder' => $Session->get( 'display_inline_reminder', 'true' ),
+				'defer_inline_reminder'   => false, 
+			)
+		);
+
+	expose_var_to_js( 'evo_link_position_config', json_encode( $evo_link_position_config ) );
 }
 
 
