@@ -62,50 +62,20 @@ jQuery( document ).ready( function()
 
 		if( $sidebar.length )
 		{	// If sidebar exists on the page
-			// Get top position of column:
-			// Note: 2 cases possible:
-			//   A) 3 sidebars in single left column
-			//   B) 1 sidebar in left column, 2 sidebars in right column
-			var column_top_point = $sidebar.offset().top;
-			var column_height = $sidebar.outerHeight( true );
-			// Top position(for position:fixed) where sidebar is started, it may be a position under other sidebar for case B:
-			var sidebar_top_start_point = top_start_point;
-			// Top position of shifting sidebar inside column relating on top sidebars:
-			var sidebar_top_shift_in_column = 0
-			jQuery( sidebar_selectors ).each( function()
-			{	// Go through all sidebars in order to detect in each column current sidebar is located:
-				if( $sidebar.offset().left == jQuery( this ).offset().left )
-				{	// This is the same column:
-					if( column_top_point > jQuery( this ).offset().top )
-					{	// Find the toppest point of the column:
-						column_top_point = jQuery( this ).offset().top;
-					}
-					if( jQuery( this ).attr( 'id' ) != $sidebar.attr( 'id' ) )
-					{	// This another sidebar but from the same column:
-						var sidebar_height = jQuery( this ).parent().outerHeight( true );
-						column_height += sidebar_height;
-						if( $sidebar.offset().top > jQuery( this ).offset().top )
-						{	// If current sidebar is located under another sidebar in the same column (case B)
-							sidebar_top_shift_in_column += sidebar_height;
-							sidebar_top_start_point += sidebar_height;
-						}
-					}
-				}
-			} );
 
 			// Set width of current sidebar to what wrapper has:
 			$sidebar.css( 'width', $sidebar.parent().width() );
 
 			if( ! $sidebar.hasClass( 'fixed' ) &&
-					column_height < jQuery( window ).height() &&
-					jQuery( window ).scrollTop() > $sidebar.offset().top - sidebar_top_start_point )
+					$sidebar.data( 'column-height' ) < jQuery( window ).height() &&
+					jQuery( window ).scrollTop() > $sidebar.offset().top - $sidebar.data( 'top-start' ) )
 			{	// Fill the space with fake block with same size where we had real sidebar
 				// AND Make sidebar as fixed if we scroll down:
 				$sidebar.before( $sidebarSpacer );
 				$sidebar.addClass( 'fixed' );
 			}
 			else if( $sidebar.hasClass( 'fixed' ) &&
-					jQuery( window ).scrollTop() < $sidebarSpacer.offset().top - sidebar_top_start_point )
+					jQuery( window ).scrollTop() < $sidebarSpacer.offset().top - $sidebar.data( 'top-start' ) )
 			{	// Remove 'fixed' class from sidebar if we scroll to the top of page:
 				$sidebar.removeClass( 'fixed' ).css( 'top', '' );
 				// Remove fake block after reverting real sidebar at the original place:
@@ -114,11 +84,11 @@ jQuery( document ).ready( function()
 
 			if( $sidebar.hasClass( 'fixed' ) )
 			{	// Check and fix an overlapping of footer with sidebar:
-				$sidebar.css( 'top', sidebar_top_start_point + 'px' );
-				var diff = $sidebar.offset().top + column_height - sidebar_top_shift_in_column - jQuery( '#evo_site_footer' ).offset().top;
+				$sidebar.css( 'top', $sidebar.data( 'top-start' ) + 'px' );
+				var diff = $sidebar.offset().top + $sidebar.data( 'column-height' ) - $sidebar.data( 'top-shift' ) - jQuery( '#evo_site_footer' ).offset().top;
 				if( diff >= 0 )
 				{	// Don't allow to put sidebar over footer:
-					$sidebar.css( 'top', ( sidebar_top_start_point - diff - 5 ) + 'px' );
+					$sidebar.css( 'top', ( $sidebar.data( 'top-start' ) - diff - 5 ) + 'px' );
 				}
 			}
 		}
@@ -134,6 +104,41 @@ jQuery( document ).ready( function()
 
 	// Get site footer height for initialization below:
 	var footer_height = ( jQuery( '#evo_site_footer' ).length > 0 ? jQuery( '#evo_site_footer' ).height() : 0 );
+
+	// Initialize properties of each sidebar on page load:
+	jQuery( sidebar_selectors ).each( function()
+	{
+		var $sidebar = jQuery( this );
+		// Get top position of column:
+		// Note: 2 cases possible:
+		//   A) 3 sidebars in single left column
+		//   B) 1 sidebar in left column, 2 sidebars in right column
+		var column_height = $sidebar.outerHeight( true );
+		// Top position(for position:fixed) where sidebar is started, it may be a position under other sidebar for case B:
+		var sidebar_top_start_point = top_start_point;
+		// Top position of shifting sidebar inside column relating on top sidebars:
+		var sidebar_top_shift_in_column = 0
+		jQuery( sidebar_selectors ).each( function()
+		{	// Go through all sidebars in order to detect in each column current sidebar is located:
+			if( $sidebar.offset().left == jQuery( this ).offset().left )
+			{	// This is the same column:
+				if( jQuery( this ).attr( 'id' ) != $sidebar.attr( 'id' ) )
+				{	// This another sidebar but from the same column:
+					var sidebar_height = jQuery( this ).parent().outerHeight( true );
+					column_height += sidebar_height;
+					if( $sidebar.offset().top > jQuery( this ).offset().top )
+					{	// If current sidebar is located under another sidebar in the same column (case B)
+						sidebar_top_shift_in_column += sidebar_height;
+						sidebar_top_start_point += sidebar_height;
+					}
+				}
+			}
+		} );
+
+		$sidebar.data( 'column-height', column_height );
+		$sidebar.data( 'top-start', sidebar_top_start_point );
+		$sidebar.data( 'top-shift', sidebar_top_shift_in_column );
+	} );
 
 	// Set proper position for each sidebar on page loading and on scrolling and resizing window:
 	jQuery( sidebar_selectors ).each( function()
