@@ -787,6 +787,12 @@ if( $inskin && !empty( $Blog ) )
 }
 
 // Display reg form:
+
+// Use skin of default Collection for login/registration:
+$login_Blog = & get_setting_Blog( 'login_blog_ID' );
+$SkinCache = & get_SkinCache();
+$Skin = & $SkinCache->get_by_ID( $login_Blog->get_skin_ID() );
+
 require $adminskins_path.'login/_reg_form.main.php';
 
 ?>
