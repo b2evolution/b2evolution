@@ -62,7 +62,7 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	$r = '';
 
 	// New
-	preg_match_all( '/\[((?:(?:Cat|Coll|Form|Item|Link|echo|set):)?([a-z_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Cat|Coll|Form|Item|Link|Plugin|echo|set):)?([a-z0-9_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		// Output everything until new tag:
@@ -144,8 +144,8 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 					if( preg_match('/\$([a-z_]+)\$/i', $tag_param_val, $tag_param_val_matches ) )
 					{	// We have a variable to replace: // TODO: allow multiple variable replace
 						$found_param_name = $tag_param_val_matches[1];
-						if( isset($params[$found_param_name]) )
-						{	// We have anoriginal param of that name:
+						if( isset( $params[$found_param_name] ) )
+						{	// We have an original param of that name:
 							$tag_param_val = $params[$found_param_name];
 						}
 					}
@@ -209,7 +209,6 @@ function render_template_callback( $var, $params, $objects = array() )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Form is not defined at this moment.</span>';
 			}
-			// do nothing
 			break;
 
 		case 'Link':
@@ -229,6 +228,19 @@ function render_template_callback( $var, $params, $objects = array() )
 			{
 				return '<span class="evo_param_error">Item object has class <code>'.get_class($rendered_Item).'</code> instead of expected <code>Item</code>.</span>';
 			}
+			break;
+
+		case 'Plugin':
+			global $Plugins;
+
+			$rendered_Plugin = & $Plugins->get_by_code( $match_var[3] );
+
+			if( empty( $rendered_Plugin ) )
+			{
+				return '<span class="evo_param_error">Plugin <code>'.$match_var[3].'</code> is not recognized.</span>';
+			}
+
+			$var = $scope;
 			break;
 
 		case 'echo':
@@ -813,6 +825,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			{
 				echo '<span class="evo_param_error">['.$var.']: disp "'.$temp_params['disp'].'" is not recognized.</span>';
 			}
+			break;
+
+		case 'Plugin':
+			$rendered_Plugin->SkinTag( $params );
 			break;
 		
 		// Others
