@@ -878,19 +878,7 @@ class bootstrap_forums_Skin extends Skin
 					.'<option value="-"'.( $status == '-' ? ' selected="selected"' : '' ).'>'.T_('No status').'</option>'
 					.$ItemStatusCache->get_option_list( $status )
 				.'</select>';
-				// JavaScript to reload page with new selected task status:
-				echo '<script>
-				jQuery( "#evo_workflow_status_filter" ).change( function()
-				{
-					var url = location.href.replace( /([\?&])((status|redir)=[^&]*(&|$))+/, "$1" );
-					var status_ID = jQuery( this ).val();
-					if( status_ID !== "" )
-					{
-						url += ( url.indexOf( "?" ) == -1 ? "?" : "&" ) + "status=" + status_ID + "&redir=no";
-					}
-					location.href = url.replace( "?&", "?" ).replace( /\?$/, "" );
-				} );
-				</script>';
+			expose_var_to_JS( 'evo_skin_bootstrap_forums__post_list_header', true );
 			echo $params['after_workflow_status'];
 		}
 
