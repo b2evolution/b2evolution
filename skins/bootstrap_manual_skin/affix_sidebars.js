@@ -86,9 +86,9 @@ jQuery( document ).ready( function()
 			{	// Check and fix an overlapping of footer with sidebar:
 				$sidebar.css( 'top', $sidebar.data( 'top-start' ) + 'px' );
 				var diff = $sidebar.offset().top + $sidebar.data( 'column-height' ) - $sidebar.data( 'top-shift' ) - jQuery( '#evo_site_footer' ).offset().top;
-				if( diff >= 0 )
+				if( diff >= -20 )
 				{	// Don't allow to put sidebar over footer:
-					$sidebar.css( 'top', ( $sidebar.data( 'top-start' ) - diff - 5 ) + 'px' );
+					$sidebar.css( 'top', ( $sidebar.data( 'top-start' ) - diff - 20 ) + 'px' );
 				}
 			}
 		}
