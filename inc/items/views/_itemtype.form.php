@@ -188,7 +188,7 @@ $Table->title = T_('Custom Fields').get_manual_link( 'item-type-custom-fields' )
 
 $Table->cols = array(
 	array( 'th' => T_('Order'), 'th_class' => 'shrinkwrap' ),
-	array( 'th' => T_('Title') ),
+	array( 'th' => T_('Label') ),
 	array( 'th' => T_('Name'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Type'), 'th_class' => 'shrinkwrap' ),
 	array( 'th' => T_('Format'), 'th_class' => 'shrinkwrap' ),

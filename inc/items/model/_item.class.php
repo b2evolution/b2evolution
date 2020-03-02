@@ -3328,7 +3328,7 @@ class Item extends ItemLight
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				// required: 'field'
-				'what'   => 'formatted_value',	// TODO: support 'label'
+				'what'   => 'formatted_value', // 'label' - to display label of the custom field
  				'before' => ' ',
 				'after'  => ' ',
 			), $params );
@@ -3350,7 +3350,18 @@ class Item extends ItemLight
 		}
 
 		echo $params['before'];
-		echo $this->get_custom_field_formatted( $field_name, $params );
+
+		switch( $params['what'] )
+		{
+			case 'label':
+				echo $this->get_custom_field_title( $params['field'] );
+				break;
+
+			default: // formatted_value
+				echo $this->get_custom_field_formatted( $field_name, $params );
+				break;
+		}
+
 		echo $params['after'];
 	}
 

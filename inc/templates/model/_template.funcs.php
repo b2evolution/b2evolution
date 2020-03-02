@@ -582,18 +582,11 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_Item->get_creation_time( $temp_params['format'] );
 			break;
 
-		case 'Item:custom_field_formatted':
+		case 'Item:custom':
 			$temp_params = array_merge( array( // Here, we make sure not to modify $params
 					'field' => '',
 				), $params );
-			echo $rendered_Item->get_custom_field_formatted( $temp_params['field'] );
-			break;
-
-		case 'Item:custom_field_title':
-			$temp_params = array_merge( array( // Here, we make sure not to modify $params
-					'field' => '',
-				), $params );
-			echo $rendered_Item->get_custom_field_title( $temp_params['field'] );
+			$rendered_Item->custom( $temp_params );
 			break;
 
 		case 'Item:custom_fields':

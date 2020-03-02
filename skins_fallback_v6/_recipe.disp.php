@@ -227,27 +227,11 @@ if( mainlist_get_item() )
 	</div>
 
 	<div class="row">
-		<?php
-		// Custom field "Ingredients" (if it exists for current Item):
-		$ingredients = $Item->get_custom_field_formatted( 'ingredients' );
-		if( $ingredients !== false )
-		{	// Display "Ingredients" only if this custom field exists for the current Item:
-		?>
 		<div class="col-lg-3 col-sm-4">
-			<h4><?php echo $Item->get_custom_field_title( 'ingredients' ); ?></h4>
-			<p><?php echo $ingredients; ?></p>
+			<h4><?php $Item->custom( array( 'field' => 'ingredients', 'what' => 'label' )  ); ?></h4>
+			<p><?php $Item->custom( array( 'field' => 'ingredients' ) ); ?></p>
 		</div>
-		<?php
-			$directions_col_size = 'col-lg-9 col-sm-8';
-		}
-		else
-		{	// Use full width if ingredients field is not detected:
-			$directions_col_size = 'col-sm-12';
-		}
-
-		// Directions:
-		?>
-		<div class="<?php echo $directions_col_size; ?>">
+		<div class="col-lg-9 col-sm-8">
 			<h4><?php echo T_('Directions'); ?></h4>
 			<?php
 			// Display the "after more" part of the text: (part after "[teaserbreak]")
