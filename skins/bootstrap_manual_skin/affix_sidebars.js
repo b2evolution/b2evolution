@@ -1,12 +1,12 @@
 /* 
- * This code is used to fix left navigation bar when page is scrolled down
+ * This code is used to fix position of sidebars on top when page is scrolled down
  */
 
 jQuery( document ).ready( function()
 {
 	var sidebar_selectors = '#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single';
 
-	function fix_sidebars_positions()
+	function evo_affix_fix_sidebar_position()
 	{	// Check all 3 sidebars are NOT in 3 columns (broken layout):
 		// (We need to work only with correct layout when 3 sidebars are either in single column or in 2 columns)
 		if( jQuery( sidebar_selectors ).length < 3 )
@@ -35,8 +35,8 @@ jQuery( document ).ready( function()
 		}
 	}
 	// Fix position of sidebar on load and resize window:
-	fix_sidebars_positions();
-	jQuery( window ).bind( 'resize', fix_sidebars_positions );
+	evo_affix_fix_sidebar_position();
+	jQuery( window ).bind( 'resize', evo_affix_fix_sidebar_position );
 
 	// Detect touch device in order to disable the fixed position for sidebars at all:
 	var has_touch_event;
@@ -48,9 +48,12 @@ jQuery( document ).ready( function()
 	}, false );
 
 	/**
-	 * Change header position to fixed or revert to static
+	 * Set sidebar position to fixed or revert to static depending on window size and scroll point
+	 *
+	 * @param object Sidebar
+	 * @param object Empty block with same width and height as original Sidebar
 	 */
-	function change_position_leftnav( $sidebar, $sidebarSpacer )
+	function evo_affix_update_sidebar_position( $sidebar, $sidebarSpacer )
 	{
 		if( has_touch_event )
 		{	// Don't fix the objects on touch devices:
@@ -146,10 +149,10 @@ jQuery( document ).ready( function()
 				} );
 			jQuery( window ).bind( 'scroll resize', function ()
 			{	// Set proper position on scroll and resize window:
-				change_position_leftnav( $sidebar, $sidebarSpacer );
+				evo_affix_update_sidebar_position( $sidebar, $sidebarSpacer );
 			} );
 			// Set proper position on page loading:
-			change_position_leftnav( $sidebar, $sidebarSpacer );
+			evo_affix_update_sidebar_position( $sidebar, $sidebarSpacer );
 		}
 	} );
 } );

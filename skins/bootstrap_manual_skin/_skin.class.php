@@ -361,7 +361,7 @@ class bootstrap_manual_Skin extends Skin
 
 		if( $this->is_side_navigation_visible() )
 		{ // Include JS code for left navigation panel only when it is displayed:
-			$this->require_js( 'left_navigation.js' );
+			$this->require_js( 'affix_sidebars.js' );
 		}
 
 		// Init JS to affix Messages:
