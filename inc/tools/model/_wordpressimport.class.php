@@ -92,8 +92,8 @@ class WordpressImport extends AbstractImport
 		param_check_not_empty( 'wp_blog_ID', 'Please select a collection!' );
 
 		// The import type ( replace | append )
-		$import_type = param( 'import_type', 'string', 'replace', true );
-		// Should we delete files on 'replace' mode?
+		$import_type = param( 'import_type', 'string', 'delete', true );
+		// Should we delete files on 'delete' mode?
 		param( 'delete_files', 'integer', 0, true );
 		// Should we try to match <img> tags with imported attachments based on filename in post content after import?
 		param( 'import_img', 'integer', 0, true );
@@ -128,10 +128,10 @@ class WordpressImport extends AbstractImport
 		}
 
 		if( get_param( 'action' ) == 'import' && 
-		    $import_type == 'replace' &&
-		    param( 'import_type_replace_confirm', 'string' ) !== 'DELETE' )
+		    $import_type == 'delete' &&
+		    param( 'import_type_delete_confirm', 'string' ) !== 'DELETE' )
 		{	// If deleting/replacing is not confirmed:
-			param_error( 'import_type_replace_confirm', sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).'!' );
+			param_error( 'import_type_delete_confirm', sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).'!' );
 		}
 
 		return ! param_errors_detected();
@@ -196,7 +196,7 @@ class WordpressImport extends AbstractImport
 				case 'append':
 					$this->log( TB_('Append to existing contents') );
 					break;
-				case 'replace':
+				case 'delete':
 					$this->log( TB_('Replace existing contents').' <span class="note">'.TB_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.').'</span>' );
 					if( get_param( 'action' ) == 'confirm' )
 					{	// Display an input to confirm replace import mode:
@@ -204,7 +204,7 @@ class WordpressImport extends AbstractImport
 							.TB_('WARNING').': '
 							.TB_('you will LOSE any data that is not part of the files you import.').' '
 							.sprintf( TB_('Type %s to confirm'), '<code>DELETE</code>' ).': '
-							.'<input name="import_type_replace_confirm" type="text" class="form-control" size="8" style="display:inline-block;width:auto;margin:-8px 0" /></div>';
+							.'<input name="import_type_delete_confirm" type="text" class="form-control" size="8" style="display:inline-block;width:auto;margin:-8px 0" /></div>';
 					}
 					if( get_param( 'delete_files' ) )
 					{
@@ -282,7 +282,7 @@ class WordpressImport extends AbstractImport
 
 		// The import type ( replace | append )
 		$import_type = get_param( 'import_type' );
-		// Should we delete files on 'replace' mode?
+		// Should we delete files on 'delete' mode?
 		$delete_files = get_param( 'delete_files' );
 		// Should we try to match <img> tags with imported attachments based on filename in post content after import?
 		$import_img = get_param( 'import_img' );
@@ -309,7 +309,7 @@ class WordpressImport extends AbstractImport
 
 		$DB->begin();
 
-		if( $import_type == 'replace' )
+		if( $import_type == 'delete' )
 		{ // Remove data from selected blog
 
 			// Get existing categories

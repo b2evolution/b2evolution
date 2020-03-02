@@ -47,8 +47,9 @@ class coll_item_list_Widget extends ComponentWidget
 		global $current_User, $admin_url;
 
 		// Get available templates:
+		$context = 'content_list_master';
 		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_where( 'tpl_translates_tpl_ID IS NULL' );
+		$TemplateCache->load_by_context( $context );
 
 		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
 
@@ -82,7 +83,10 @@ class coll_item_list_Widget extends ComponentWidget
 					'options' => $template_options,
 					'defaultvalue' => NULL,
 					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
-							.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' ),
+							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
+							array( 'onclick' => 'return b2template_list_highlight( this )' ),
+							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
+					'class' => 'evo_template_select',
 				),
 				'title_link' => array(
 					'label' => T_('Link to blog'),
@@ -462,6 +466,12 @@ class coll_item_list_Widget extends ComponentWidget
 
 		// Define default template params that can be rewritten by skin
 		$this->disp_params = array_merge( array(
+
+				// In case of cross-posting, we EXPECT to navigate in same collection if possible:
+				'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
+				// 'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted -- IN this case, we are NOT in a category
+
+				// The following are to auto-templates only:
 				'item_first_image_before'      => '<div class="item_first_image">',
 				'item_first_image_after'       => '</div>',
 				'item_first_image_placeholder' => '<div class="item_first_image_placeholder"'.$placeholder_dimension.'><a href="$item_permaurl$"></a></div>',
@@ -654,25 +664,25 @@ class coll_item_list_Widget extends ComponentWidget
 				// Render MASTER quick template:
 				// In theory, this should not display anything.
 				// Instead, this should set variables to define sub-templates (and potentially additional variables)
-				echo render_template_code( $this->disp_params['template'], /* BY REF */ $params );
+				echo render_template_code( $this->disp_params['template'], /* BY REF */ $this->disp_params );
 
 				// Check if requested sub-template exists:
-				if( empty( $params['item_template'] ) )
+				if( empty( $this->disp_params['item_template'] ) )
 				{	// Display error when no template for listing
 					$this->display_error_message( sprintf( 'Missing %s param', '<code>item_template</code>' ) );
 					return false;
 				}
-				elseif( ! ( $item_Template = & $TemplateCache->get_by_code( $params['item_template'], false, false ) ) )
+				elseif( ! ( $item_Template = & $TemplateCache->get_by_code( $this->disp_params['item_template'], false, false ) ) )
 				{	// Display error when no or wrong template for listing
-					$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$params['item_template'].'</code>' ) );
+					$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$this->disp_params['item_template'].'</code>' ) );
 					return false;
 				}
 				else
 				{
 					// Display list of Items:
-					if( isset( $params['before_list'] ) )
+					if( isset( $this->disp_params['before_list'] ) )
 					{
-						echo $params['before_list'];
+						echo $this->disp_params['before_list'];
 					}
 
 					// ONLY SUPPORTING Plain list: (not grouped by category) for now
@@ -685,15 +695,15 @@ class coll_item_list_Widget extends ComponentWidget
 					while( $Item = & $ItemList->get_item() )
 					{
 						// Render Item by quick template:
-						echo render_template_code( $params['item_template'], $params, array( 'Item' => $Item ) );
+						echo render_template_code( $this->disp_params['item_template'], $this->disp_params, array( 'Item' => $Item ) );
 					}
 
 					// TODO: maybe support $this->disp_params['page'] & $this->disp_params['pagination'] . Use case?
 
 
-					if( isset( $params['after_list'] ) )
+					if( isset( $this->disp_params['after_list'] ) )
 					{
-						echo $params['after_list'];
+						echo $this->disp_params['after_list'];
 					}
 				}
 

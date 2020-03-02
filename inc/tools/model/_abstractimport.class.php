@@ -76,7 +76,7 @@ class AbstractImport
 		}
 
 		// Display where log will be stored:
-		echo '<b>Log file:</b> <code>'.$log_file_path.'</code><br />';
+		$this->log_to_screen( '<b>Log file:</b> <code>'.$log_file_path.'</code><br />' );
 
 		// Write header of the log file:
 		$this->log_to_file( '<!DOCTYPE html>'."\r\n"
@@ -86,6 +86,9 @@ class AbstractImport
 			.'<link href="'.$rsc_url.'build/bootstrap-backoffice-b2evo_base.bundle.css?v='.$app_version_long.'" type="text/css" rel="stylesheet" />'."\r\n"
 			.'</head>'."\r\n"
 			.'<body>' );
+
+		// Display start time:
+		$this->log( 'Import started at: '.date( 'Y-m-d H:i:s' ) );
 	}
 
 
@@ -109,6 +112,9 @@ class AbstractImport
 	 */
 	function end_log()
 	{
+		// Display finish time:
+		$this->log( 'Import finished at: '.date( 'Y-m-d H:i:s' ) );
+
 		// Write footer of the log file:
 		$this->log_to_file( '</body>'."\r\n"
 			.'</html>' );
@@ -191,8 +197,7 @@ class AbstractImport
 		}
 
 		// Display message on screen:
-		echo $message;
-		evo_flush();
+		$this->log_to_screen( $message );
 
 		// Try to store a message into the log file on the disk:
 		$this->log_to_file( $message );
@@ -275,6 +280,97 @@ class AbstractImport
 
 
 	/**
+	 * Log a message to screen
+	 *
+	 * @param string Message
+	 */
+	function log_to_screen( $message )
+	{
+		global $is_cli;
+
+		if( $is_cli )
+		{	// Remove and convert all html tags on CLI mode:
+
+			// Remove all new lines because we build them from HTML tags:
+			$message = str_replace( array( "\n", "\r" ), '', $message );
+
+			// Keep all URLs and display them:
+			$message = preg_replace( '/<a[^>]+href="([^"]+)"[^>]*>(.+)<\/a>/i', '$2(URL: $1)', $message );
+
+			// Convert all HTML tags to readable on CLI mode:
+			$message = preg_replace_callback( '#<(/?[a-z\d]+)[^>]*>([\r\n]*)#is', array( $this, 'log_to_screen_cli_callback' ), $message );
+
+			// Remove all not formatted HTML tags from text:
+			$text = strip_tags( $message );
+
+			// Replace all html entities like "&nbsp;", "&raquo;", "&laquo;" to readable chars:
+			$message = html_entity_decode( $message );
+		}
+
+		echo $message;
+		evo_flush();
+	}
+
+
+	/**
+	 * Callback function to clear log message for CLI mode
+	 *
+	 * @param array Matches
+	 */
+	function log_to_screen_cli_callback( $m )
+	{
+		switch( $m[1] )
+		{
+			case 'br':
+				return '';
+
+			case 'p':
+				return "\n";
+			case '/p':
+				return "\n";
+
+			case 'h1':
+			case 'h2':
+			case 'h3':
+			case 'h4':
+			case 'h5':
+			case 'h6':
+				return "\n\n".str_repeat( '-', substr( $m[1], 1 ) ).' ';
+			case '/h1':
+			case '/h2':
+			case '/h3':
+			case '/h4':
+			case '/h5':
+			case '/h6':
+				return ' '.str_repeat( '-', substr( $m[1], 2 ) )."\n";
+
+			case 'b':
+			case '/b':
+				return '*';
+
+			case 'ul':
+			case '/ul':
+				return '';
+			case 'li':
+				return ' - ';
+			case '/li':
+				return '';
+
+			case 'code':
+			case '/code':
+				return '`';
+
+			case 'span':
+				return '[';
+			case '/span':
+				return ']';
+		}
+
+		return $m[0];
+	}
+
+
+	/**
 	 * Check restriction by file manifest.yaml
 	 *
 	 * @param string Folder path where we should find the manifest file
@@ -317,9 +413,18 @@ class AbstractImport
 					case 'collection-locale':
 						// Check collection locale:
 						if( ( $import_Blog = & $this->get_Blog() ) &&
-						    $import_Blog->get( 'locale' ) != $manifest_value )
+						    ! $import_Blog->has_locale( $manifest_value ) )
 						{	// Stop import:
 							$this->log( $log_prefix.'NOT OK as destination collection locale is <code>'.$import_Blog->get( 'locale' ).'</code>: STOPPING IMPORT.', 'error' );
+							return false;
+						}
+						$this->log( $log_prefix.'OK', 'success' );
+						break;
+
+					case 'import-mode':
+						if( $this->get_option( 'import_type' ) != $manifest_value )
+						{	// Stop import because currently selected import mode is defferent than rule from manifest file:
+							$this->log( $log_prefix.'NOT OK as currently selected import mode is <code>'.$this->get_option( 'import_type' ).'</code>', 'error' );
 							return false;
 						}
 						$this->log( $log_prefix.'OK', 'success' );

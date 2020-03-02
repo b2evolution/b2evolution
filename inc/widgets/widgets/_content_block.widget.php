@@ -114,11 +114,14 @@ class content_block_Widget extends ComponentWidget
 		global $current_User, $admin_url;
 
 		// Get available templates:
+		$context = 'content_block';
 		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_where( 'tpl_translates_tpl_ID IS NULL' );
+		$TemplateCache->load_by_context( $context );
 		$template_options = $TemplateCache->get_code_option_array();
 		$template_input_suffix = ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
-			.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );
+				.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
+				array( 'onclick' => 'return b2template_list_highlight( this )' ),
+				array( 'title' => T_('Manage templates').'...' ) ) : '' );
 
 		$ItemTypeCache = & get_ItemTypeCache();
 		$ItemTypeCache->clear();
@@ -146,6 +149,7 @@ class content_block_Widget extends ComponentWidget
 					'options' => $template_options,
 					'defaultvalue' => 'cblock_clearfix',
 					'input_suffix' => $template_input_suffix,
+					'class' => 'evo_template_select',
 				),
 				'select_type' => array(
 					'label' => T_('Select content block'),

@@ -143,6 +143,9 @@ switch( $action )
 			$registration_require_country   = ( isset( $social_params['require_country'] ) && ( $social_params['require_country'] == 'required' ) );
 			$registration_require_gender    = ( isset( $social_params['require_gender'] ) && ( $social_params['require_gender'] == 'required' ) );
 
+			// After social registration setting:
+			$after_social_registration     = ( isset( $social_params['after_social_registration'] ) ? $social_params['after_social_registration'] : 'regform' );
+
 			// Except for email address that should be required by default:
 			$registration_require_email = isset( $social_params['require_email'] ) ? ( $social_params['require_email'] == 'required' ) : true;
 
@@ -672,7 +675,17 @@ switch( $action )
 				}
 			}
 
-			if( $Settings->get( 'registration_after_quick' ) == 'regform' )
+			$redirect_to_registration_form = true;
+			if( $is_social )
+			{	
+				$redirect_to_registration_form = ( $after_social_registration == 'regform' );
+			}
+			else
+			{
+				$redirect_to_registration_form = ( $Settings->get( 'registration_after_quick' ) == 'regform' );
+			}
+
+			if( $redirect_to_registration_form )
 			{	// If we should display additional registration screen after quick registration:
 				$Messages->add( T_('Please double check your email address and choose a password so that you can log in next time you visit us.'), 'warning' );
 				if( $is_social && empty( $Blog ) )
@@ -774,6 +787,12 @@ if( $inskin && !empty( $Blog ) )
 }
 
 // Display reg form:
+
+// Use skin of default Collection for login/registration:
+$login_Blog = & get_setting_Blog( 'login_blog_ID' );
+$SkinCache = & get_SkinCache();
+$Skin = & $SkinCache->get_by_ID( $login_Blog->get_skin_ID() );
+
 require $adminskins_path.'login/_reg_form.main.php';
 
 ?>

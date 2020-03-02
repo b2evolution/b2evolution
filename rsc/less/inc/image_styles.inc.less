@@ -73,12 +73,18 @@ img.rounded,
 .evo_image_block.rounded img {
 	border-radius: 4px;
 }
-// Make image round/oval:
-img.round,
-.image_block.round img,
-.evo_image_block.round img {
-	border-radius: 50%;
+
+// Make image contained in its wrapper:
+.evo_image_block.contain img {
+	object-fit: contain !important;
 }
+// Make image cover in its wrapper:
+.evo_image_block.cover img {
+	object-fit: cover !important;
+}
+
+
+
 
 // Image with wrong item slug like [image:123:caption:((non-existing-slug))]
 img.imgerror,

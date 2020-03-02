@@ -1724,9 +1724,14 @@ class Item extends ItemLight
 	 * @param array Skin params
 	 * @return boolean true if user can post, false if s/he cannot
 	 */
-	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#', $section_title = '', $params = array() )
+	function can_comment( $before_error = '<p><em>', $after_error = '</em></p>', $non_published_msg = '#', $closed_msg = '#', $section_title = '', $params = array(), $comment_type = 'comment' )
 	{
 		global $current_User, $disp;
+
+		if( $comment_type == 'meta' && $this->can_meta_comment() )
+		{	// Meta comment are always allowed!
+			return true;
+		}
 
 		if( $disp == 'terms' )
 		{	// Don't allow comment a page with terms & conditions:
@@ -1875,7 +1880,11 @@ class Item extends ItemLight
 
 		$this->load_Blog();
 
-		if( ( $settings_name == 'allow_attachments' ) && isset( $settings_object ) && ( $settings_object instanceof Comment ) && $settings_object->is_meta() )
+		if( ( $settings_name == 'allow_attachments' )
+				&& isset( $settings_object )
+				&& ( $settings_object instanceof Comment )
+				&& $settings_object->is_meta()
+				&& $this->can_meta_comment() )
 		{	// Always allow attachments for meta Comments:
 			return true;
 		}
@@ -1905,9 +1914,10 @@ class Item extends ItemLight
 	 *
 	 * @param boolean|integer ID of Temporary object to count also temporary attached files to new creating comment,
 	 *                        FALSE to count ONLY attachments of the created comments
+	 * @param string Comment type
 	 * @return boolean true if user can attach files to this post comments, false if s/he cannot
 	 */
-	function can_attach( $Comment = NULL )
+	function can_attach( $link_tmp_ID = false, $comment_type = 'comment' )
 	{
 		global $Settings, $current_User;
 
@@ -1916,7 +1926,7 @@ class Item extends ItemLight
 		{	// We can check the attachments quota only for registered users
 			$this->load_Blog();
 
-			if( isset( $Comment ) && ( $Comment instanceof Comment ) && $Comment->is_meta() && $current_User->check_perm( 'meta_comment', 'add', false, $this->get_blog_ID() ) )
+			if( $comment_type == 'meta' && $this->can_meta_comment() )
 			{	// Always allow attachments for meta Comments:
 				return true;
 			}
@@ -1928,10 +1938,6 @@ class Item extends ItemLight
 
 				// Get a number of attachments for current user on this post
 				$link_tmp_ID = false;
-				if( isset( $Comment ) && isset( $Comment->temp_link_owner_ID ) )
-				{
-					$link_tmp_ID = $Comment->temp_link_owner_ID;
-				}
 				$attachments_count = $this->get_attachments_number( NULL, $link_tmp_ID );
 
 				// Get the attachments from preview comment
@@ -2785,7 +2791,7 @@ class Item extends ItemLight
 	 * @param string Value key: 'value', 'parent_sync'
 	 * @param boolean TRUE to set to NULL if empty value
 	 */
-	function set_custom_field( $field_index, $new_value, $value_key = 'value', $make_null = true )
+	function set_custom_field( $field_name, $new_value, $value_key = 'value', $make_null = true )
 	{
 		if( $value_key != 'value' && $value_key != 'parent_sync' )
 		{	// Skip unknown column in the table T_items__type_custom_field:
@@ -2795,9 +2801,9 @@ class Item extends ItemLight
 		// Load all custom fields for this item:
 		$this->get_custom_fields_defs();
 
-		if( ! isset( $this->custom_fields[ $field_index ] ) )
+		if( ! isset( $this->custom_fields[ $field_name ] ) )
 		{	// Set new array for custom field data, Used for new creating Item:
-			$this->custom_fields[ $field_index ] = array();
+			$this->custom_fields[ $field_name ] = array();
 		}
 
 		if( $value_key == 'value' && $make_null && empty( $new_value ) )
@@ -2806,7 +2812,7 @@ class Item extends ItemLight
 		}
 
 		// Set new value for the field:
-		$this->custom_fields[ $field_index ][ $value_key ] = $new_value;
+		$this->custom_fields[ $field_name ][ $value_key ] = $new_value;
 	}
 
 
@@ -2860,43 +2866,43 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get item custom field title by field index
+	 * Get item custom field label/title by field name
 	 *
-	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
+	 * @param string Field name, see {@link get_custom_fields_defs()}
 	 * @return string|boolean FALSE if the field doesn't exist
 	 */
-	function get_custom_field_title( $field_index )
+	function get_custom_field_title( $field_name )
 	{
 		// Get all custom fields by item ID:
 		$custom_fields = $this->get_custom_fields_defs();
 
-		if( ! isset( $custom_fields[ $field_index ] ) )
+		if( ! isset( $custom_fields[ $field_name ] ) )
 		{	// The requested field is not detected:
 			return false;
 		}
 
-		return $custom_fields[ $field_index ]['label'];
+		return $custom_fields[ $field_name ]['label'];
 	}
 
 
 	/**
-	 * Get item custom field value by field index
+	 * Get item custom field value by field name
 	 *
-	 * @param string Field index which by default is the field name, see {@link load_custom_field_value()}
+	 * @param string Field name, see {@link load_custom_field_value()}
 	 * @param string Restring field by type, FALSE - to don't restrict
 	 * @return mixed false if the field doesn't exist Double/String otherwise depending from the custom field type
 	 */
-	function get_custom_field_value( $field_index, $restrict_type = false )
+	function get_custom_field_value( $field_name, $restrict_type = false )
 	{
 		// Get all custom fields by item ID:
 		$custom_fields = $this->get_custom_fields_defs();
 
-		if( ! isset( $custom_fields[ $field_index ] ) )
+		if( ! isset( $custom_fields[ $field_name ] ) )
 		{	// The requested field is not detected:
 			return false;
 		}
 
-		if( $restrict_type !== false && $custom_fields[ $field_index ]['type'] != $restrict_type )
+		if( $restrict_type !== false && $custom_fields[ $field_name ]['type'] != $restrict_type )
 		{	// The requested field is detected but it has another type:
 			return false;
 		}
@@ -2904,23 +2910,23 @@ class Item extends ItemLight
 		// Get custom item field value:
 		if( $this->is_revision() )
 		{	// from current revision if it is active for this Item:
-			return $this->get_revision_custom_field_value( $field_index );
+			return $this->get_revision_custom_field_value( $field_name );
 		}
 		else
 		{	// from the item setting:
-			return $custom_fields[ $field_index ]['value'];
+			return $custom_fields[ $field_name ]['value'];
 		}
 	}
 
 
 	/**
-	 * Get formatted item custom field value by field index
+	 * Get formatted item custom field value by field name
 	 *
-	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
+	 * @param string Field name, see {@link get_custom_fields_defs()}
 	 * @param array Params
 	 * @return string|boolean FALSE if the field doesn't exist
 	 */
-	function get_custom_field_formatted( $field_index, $params = array() )
+	function get_custom_field_formatted( $field_name, $params = array() )
 	{
 		$params = array_merge( array(
 				'field_value_format'  => '', // Format for custom field, Leave empty to use a format from DB
@@ -2929,7 +2935,7 @@ class Item extends ItemLight
 			), $params );
 
 		// Try to get an original value of the requested custom field:
-		$custom_field_value = $this->get_custom_field_value( $field_index, $params['field_restrict_type'] );
+		$custom_field_value = $this->get_custom_field_value( $field_name, $params['field_restrict_type'] );
 
 		if( $custom_field_value === false )
 		{	// The requested field is not found for the item type:
@@ -2940,7 +2946,7 @@ class Item extends ItemLight
 
 		// Get custom field:
 		$custom_fields = $this->get_custom_fields_defs();
-		$custom_field = $custom_fields[ $field_index ];
+		$custom_field = $custom_fields[ $field_name ];
 
 		if( ( $custom_field_value === '' || $custom_field_value === NULL ) && // don't format empty value
 		    ! in_array( $custom_field['type'], array( 'double', 'computed', 'url' ) ) ) // double, computed and url fields may have a special format even for empty value
@@ -3216,34 +3222,34 @@ class Item extends ItemLight
 
 
 	/**
-	 * Get computed item custom field value by field index
+	 * Get computed item custom field value by field name
 	 *
-	 * @param string Field index which by default is the field name, see {@link get_custom_fields_defs()}
+	 * @param string Field name, see {@link get_custom_fields_defs()}
 	 * @return string|boolean|NULL FALSE if the field doesn't exist, NULL if formula is invalid
 	 */
-	function get_custom_field_computed( $field_index )
+	private function get_custom_field_computed( $field_name )
 	{
 		// Get all custom fields by item ID:
 		$custom_fields = $this->get_custom_fields_defs();
 
-		if( ! isset( $custom_fields[ $field_index ] ) )
+		if( ! isset( $custom_fields[ $field_name ] ) )
 		{	// The requested field is not detected:
 			return false;
 		}
 
-		if( $custom_fields[ $field_index ]['type'] == 'double' )
+		if( $custom_fields[ $field_name ]['type'] == 'double' )
 		{	// This case may be called by computing of the formula:
 			// Use floatval() in order to consider empty value as 0
-			return floatval( $this->get_custom_field_value( $field_index ) );
+			return floatval( $this->get_custom_field_value( $field_name ) );
 		}
 
-		if( $custom_fields[ $field_index ]['type'] != 'computed' )
+		if( $custom_fields[ $field_name ]['type'] != 'computed' )
 		{	// The requested field is detected but it is not computed field:
 			return false;
 		}
 
 		// Compute value by formula:
-		$formula = $custom_fields[ $field_index ]['formula'];
+		$formula = $custom_fields[ $field_name ]['formula'];
 		if( empty( $formula ) )
 		{	// Use NULL value because formula is empty:
 			return NULL;
@@ -3256,11 +3262,11 @@ class Item extends ItemLight
 		{	// Store in this array all computed fields to avoid recursion:
 			$this->cache_computed_custom_fields = array();
 		}
-		if( in_array( $field_index, $this->cache_computed_custom_fields ) )
+		if( in_array( $field_name, $this->cache_computed_custom_fields ) )
 		{	// Stop here because of recursion:
 			return NULL;
 		}
-		$this->cache_computed_custom_fields[] = $field_index;
+		$this->cache_computed_custom_fields[] = $field_name;
 
 		// Try to use a formula:
 		$formula_is_valid = true;
@@ -3313,15 +3319,17 @@ class Item extends ItemLight
 
 
 	/**
-	 * Display custom field
+	 * TEMPLATE TAG: Display custom field
 	 *
 	 * @param array Params
 	 */
-	function custom( $params )
+	public function custom( $params )
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
-				'before' => ' ',
+				// required: 'field'
+				'what'   => 'formatted_value',	// TODO: support 'label'
+ 				'before' => ' ',
 				'after'  => ' ',
 			), $params );
 
@@ -3332,17 +3340,17 @@ class Item extends ItemLight
 
 		// Load custom field by index:
 		$custom_fields = $this->get_custom_fields_defs();
-		$field_index = $params['field'];
-		if( ! isset( $custom_fields[ $field_index ] ) )
+		$field_name = $params['field'];
+		if( ! isset( $custom_fields[ $field_name ] ) )
 		{ // Custom field with this index doesn't exist
 			echo $params['before']
-				.'<span class="evo_param_error">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_index.'</b>' ).'</span>'
+				.'<span class="evo_param_error">'.sprintf( T_('The custom field %s does not exist!'), '<b>'.$field_name.'</b>' ).'</span>'
 				.$params['after'];
 			return;
 		}
 
 		echo $params['before'];
-		echo $this->get_custom_field_formatted( $field_index, $params );
+		echo $this->get_custom_field_formatted( $field_name, $params );
 		echo $params['after'];
 	}
 
@@ -3352,7 +3360,7 @@ class Item extends ItemLight
 	 *
 	 * @param array Params
 	 */
-	function custom_fields( $params = array() )
+	public function custom_fields( $params = array() )
 	{
 		echo $this->get_custom_fields( $params );
 	}
@@ -3364,7 +3372,7 @@ class Item extends ItemLight
 	 * @param array Params
 	 * @return string
 	 */
-	function get_custom_fields( $params = array() )
+	public function get_custom_fields( $params = array() )
 	{
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
@@ -3820,22 +3828,22 @@ class Item extends ItemLight
 		foreach( $tags[0] as $t => $source_tag )
 		{
 			// Render single field as text:
-			$field_index = trim( $tags[1][ $t ] );
-			$field_value = $this->get_custom_field_formatted( $field_index, $params );
+			$field_name = trim( $tags[1][ $t ] );
+			$field_value = $this->get_custom_field_formatted( $field_name, $params );
 			if( $field_value === false )
 			{	// Wrong field request, display error:
-				$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
+				$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>', $content );
 			}
 			else
 			{	// Display field value:
 				$custom_fields = $this->get_custom_fields_defs();
-				if( $custom_fields[ $field_index ]['public'] )
+				if( $custom_fields[ $field_name ]['public'] )
 				{	// Display value only if custom field is public:
 					$content = str_replace( $source_tag, $field_value, $content );
 				}
 				else
 				{	// Display an error for not public custom field:
-					$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_index ).'</span>', $content );
+					$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_name ).'</span>', $content );
 				}
 			}
 		}
@@ -3903,22 +3911,22 @@ class Item extends ItemLight
 				{
 					case 'field':
 						// Render single parent custom field as text:
-						$field_index = trim( $tags[3][ $t ] );
-						$field_value = $other_Item->get_custom_field_formatted( $field_index, $params );
+						$field_name = trim( $tags[3][ $t ] );
+						$field_value = $other_Item->get_custom_field_formatted( $field_name, $params );
 						if( $field_value === false )
 						{	// Wrong field request, display error:
-							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_index ).'</span>', $content );
+							$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" does not exist.'), $field_name ).'</span>', $content );
 						}
 						else
 						{	// Display field value:
 							$custom_fields = $other_Item->get_custom_fields_defs();
-							if( $custom_fields[ $field_index ]['public'] )
+							if( $custom_fields[ $field_name ]['public'] )
 							{	// Display value only if custom field is public:
 								$content = str_replace( $source_tag, $field_value, $content );
 							}
 							else
 							{	// Display an error for not public custom field:
-								$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_index ).'</span>', $content );
+								$content = str_replace( $source_tag, '<span class="text-danger">'.sprintf( T_('The field "%s" is not public.'), $field_name ).'</span>', $content );
 							}
 						}
 						break;
@@ -4228,7 +4236,7 @@ class Item extends ItemLight
 				'image_class'   => 'img-responsive',
 				'image_size'    => get_skin_setting( 'main_content_image_size', 'fit-1280x720' ),
 				'image_limit'   =>  1000,
-				'image_link_to' => 'original', // Can be 'original', 'single' or empty
+				'image_link_to' => 'original', // Can be 'original' (image fiel URL), 'single', URL or empty
 				'content_block_class' => '',
 			), $params );
 
@@ -4984,8 +4992,14 @@ class Item extends ItemLight
 				$link_to = $this->get( 'url' );
 			}
 			else
-			{ // Link to permament url
-				$link_to = $this->get_permanent_url( $link_to );
+			{ // Link to Item url:
+				$params = array_merge( array(  
+						'target_blog'     => '',		
+						'post_navigation' => '',		
+						'nav_target'      => NULL,		
+					), $params );
+
+				$link_to = $this->get_item_url( $params['target_blog'], $params['post_navigation'], $params['nav_target'] );
 			}
 			$link_title = '#desc#';
 			$link_rel = isset( $params['image_link_rel'] ) ? $params['image_link_rel'] : '';
@@ -5033,6 +5047,7 @@ class Item extends ItemLight
 		$params = array_merge( array(
 				'before'                     => '<div>',
 				'before_image'               => '<div class="image_block">',
+				'before_image_classes'       => '', // Allow injecting additional classes into 'before image'
 				'before_image_legend'        => '<div class="image_legend">',
 				'after_image_legend'         => '</div>',
 				'after_image'                => '</div>',
@@ -5042,8 +5057,11 @@ class Item extends ItemLight
 				'image_sizes'                => NULL, // Simplified "sizes=" attribute for browser to select correct size from "srcset=".
 															// Must be set DIFFERENTLY depending on WIDGET/CONTAINER/SKIN LAYOUT. Each time we must estimate the size the image will have on screen.
 															// Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
-				'image_link_to'              => 'original', // Can be 'original' (image), 'single' (this post), an be URL, can be empty
-				'limit'                      => 1000, // Max # of images displayed
+				'image_link_to'              => 'original', // Can be 'original' (image file URL), 'single' (this post), can be URL, can be EMPTY
+					// In case of 'single' link:
+					'target_blog'             => '',		
+					'post_navigation'         => '',		
+					'nav_target'              => NULL,		
 				'before_gallery'             => '<div class="bGallery">',
 				'after_gallery'              => '</div>',
 				'gallery_image_size'         => 'crop-80x80',
@@ -5055,6 +5073,7 @@ class Item extends ItemLight
 																// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
 																// '#teaser_all' => 'teaser,teaserperm,teaserlink',
 																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
+				'limit'                      => 1000, // Max # of images displayed
 				'placeholder'                => '',		// HTML to be displayed if no image; possible codes: #folder_icon
 				'data'                       =>  & $r,
 				'get_rendered_attachments'   => true,
@@ -5062,10 +5081,10 @@ class Item extends ItemLight
 				'links_sql_orderby'          => 'link_order',
 			), $params );
 
-
-// TODO: add some image_block_classes param that does something like this:
-// Inject extra class name(s) into 'before_image' param:
-//	$current_image_params['before_image'] = update_html_tag_attribs( $current_image_params['before_image'], array( 'class' => $image_extraclass ) );
+		if( ! empty( $params['before_image_classes'] ) )
+		{	// Inject additional classes into 'before image':
+			$params['before_image'] = update_html_tag_attribs( $params['before_image'], array( 'class' => $params['before_image_classes'] ) );
+		}
 
 		// Get list of ALL attached files
 		$links_params = array(
@@ -5097,7 +5116,8 @@ class Item extends ItemLight
 		$LinkOwner = new LinkItem( $this, $tmp_object_ID );
 		if( ! $LinkList = $LinkOwner->get_attachment_LinkList( 1000, $params['restrict_to_image_position'], NULL, $links_params ) )
 		{	// No images match requested positions:
-			// Display placeholder:
+
+			// Display PLACEHOLDER:
 			$placeholder_html = $params['placeholder'];
 			switch( $placeholder_html )
 			{
@@ -5105,7 +5125,7 @@ class Item extends ItemLight
 					$placeholder_html = '<div class="evo_image_block evo_img_placeholder"><a href="$url$" class="evo_img_placeholder"><i class="fa fa-file-text-o"></i></a></div>';
 					break;
 			}
-			return str_replace( '$url$', $this->get_permanent_url(), $placeholder_html );
+			return str_replace( '$url$', $this->get_item_url( $params['target_blog'], $params['post_navigation'], $params['nav_target'] ), $placeholder_html );
 		}
 
 		// LOOP through images:
@@ -5188,7 +5208,7 @@ class Item extends ItemLight
 				continue;
 			}
 
-			// GENERATE the IMG tag with all the alt, title and desc if available
+			// GENERATE the IMG tag with all the alt, title and desc if available:
 			$r .= $this->get_attached_image_tag( $Link, $params );
 
 			$image_counter++;
@@ -11550,10 +11570,10 @@ class Item extends ItemLight
 	/**
 	 * Get item custom field value by index from current revision
 	 *
-	 * @param string Field index which by default is the field name, see {@link load_custom_field_value()}
+	 * @param string Field name, see {@link load_custom_field_value()}
 	 * @return mixed false if the field doesn't exist Double/String otherwise depending from the custom field type
 	 */
-	function get_revision_custom_field_value( $field_index )
+	function get_revision_custom_field_value( $field_name )
 	{
 		if( ! $this->is_revision() )
 		{	// Revision is not active:
@@ -11578,9 +11598,9 @@ class Item extends ItemLight
 			$Revision->custom_fields = $DB->get_assoc( $SQL );
 		}
 
-		if( isset( $Revision->custom_fields[ $field_index ] ) )
+		if( isset( $Revision->custom_fields[ $field_name ] ) )
 		{	// If the revision has a requested custom field:
-			return $Revision->custom_fields[ $field_index ];
+			return $Revision->custom_fields[ $field_name ];
 		}
 		else
 		{	// If the revision has no requested custom field:
@@ -12540,9 +12560,9 @@ class Item extends ItemLight
 			.$this->get_setting( 'metakeywords' ).' ';
 		// + all text custom fields:
 		$text_custom_fields = $this->get_type_custom_fields( 'varchar,text,html' );
-		foreach( $text_custom_fields as $field_index => $text_custom_field )
+		foreach( $text_custom_fields as $field_name => $text_custom_field )
 		{
-			$search_string .= $this->get_custom_field_value( $field_index ).' ';
+			$search_string .= $this->get_custom_field_value( $field_name ).' ';
 		}
 
 		// Clear spaces:

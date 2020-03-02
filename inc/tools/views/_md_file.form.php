@@ -92,7 +92,7 @@ if( ! empty( $import_files ) )
 			$option_attrs['style'] = 'margin-left:'.( $option['indent'] * 20 ).'px';
 		}
 		$option_value = ( $import_type_value === NULL ? $option['default'] : param( $option_key, $option['type'], 0 ) );
-		$checklist_options[] = array( $option_key, '1', $option['title'], $option_value, NULL, NULL, NULL, NULL, $option_attrs );
+		$checklist_options[] = array( $option_key, '1', $option['title'], $option_value, ( isset( $option['disabled'] ) ? $option['disabled'] : NULL ), ( isset( $option['note'] ) ? $option['note'] : NULL ), NULL, NULL, $option_attrs );
 	}
 	if( ! empty( $checklist_options ) )
 	{
@@ -110,15 +110,15 @@ $Form->end_form();
 function evo_md_import_update_mode_visibility()
 {	// Show/Hide additional options for import mode:
 	var mode = jQuery( 'input[name=import_type]:checked' ).val();
-	jQuery( '#checkbox_delete_files' ).toggle( mode == 'replace' );
+	jQuery( '#checkbox_delete_files' ).toggle( mode == 'delete' );
 	jQuery( '#checkbox_reuse_cats' ).toggle( mode == 'append' );
-	if( mode == 'replace' )
+	if( mode == 'delete' )
 	{
-		jQuery( '#import_type_replace_confirm_block' ).css( 'display', 'inline-block' );
+		jQuery( '#import_type_delete_confirm_block' ).css( 'display', 'inline-block' );
 	}
 	else
 	{
-		jQuery( '#import_type_replace_confirm_block' ).hide();
+		jQuery( '#import_type_delete_confirm_block' ).hide();
 	}
 }
 jQuery( 'input[name=import_type]' ).click( evo_md_import_update_mode_visibility );

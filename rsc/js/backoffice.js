@@ -379,3 +379,30 @@ function get_whois_info( ip_address )
 
 	return false;
 }
+
+
+/**
+ * Open and highlight selected template
+ */
+function b2template_list_highlight( obj )
+{
+	var link = jQuery( obj );
+	var select = link.prevAll( 'select' );
+	var selected_template = select.find( ':selected' ).val();
+	var link_url = link.attr('href');
+
+	if( selected_template )
+	{
+		link_url += '&highlight=' + selected_template;
+	}
+
+	if( window.self !== window.top )
+	{
+		window.top.location = link_url;
+	}
+	else
+	{
+		window.location = link_url;
+	}
+	return false;
+} 

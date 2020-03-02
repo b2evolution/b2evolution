@@ -3031,7 +3031,7 @@ Hello
 	$demo_items['first_post'] = array(
 		'title'    => T_('First Post'),
 		'category' => 'welcome',
-		'content'  => T_('<p>This is the second post in the "[coll:shortname]" collection.</p>
+		'content'  => T_('<p>This is the first post in the "[coll:shortname]" collection.</p>
 
 <p>It appears in multiple categories.</p>'),
 	);

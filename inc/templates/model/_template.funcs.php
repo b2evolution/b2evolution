@@ -62,7 +62,7 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	$r = '';
 
 	// New
-	preg_match_all( '/\[((?:(?:Cat|Coll|Form|Item|Link|echo|set):)?([a-z_]+))\|?(.*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Cat|Coll|Form|Item|Link|echo|set):)?([a-z_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		// Output everything until new tag:
@@ -80,10 +80,37 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 
 			$param_name = substr( $tag, 4 );
 			$param_val  = substr( $tag_param_strings, strpos( $tag_param_strings, '=' ) + 1 );
+			$param_strings = $param_name.'='.$param_val;
+			$param_strings = explode( '|', $param_strings );
 
-			// Set param:
-			// we MUST do this here and in & $params[] so that it sticks. This cannot be done in the callback or $this_tag_params[]
-			$params[ $param_name ] = $param_val;
+			foreach( $param_strings as $param_string )
+			{
+				if( empty( $param_string ) || ctype_space( $param_string ) )
+				{	// Nothing here, ignore:
+					continue;
+				}
+
+				$param_name = substr( $param_string, 0, strpos( $param_string, '=' ) );
+
+				if( empty( $param_name ) )
+				{	// Does not contain a param name, ignore:
+					continue;
+				}
+
+				if( strpos( $param_name, '//' ) !== false )
+				{	// We found a comment that we should remove:
+					$param_name = preg_replace( '~(.*)//.*$~im','$1', $param_name );
+				}
+
+				// Trim off whitespace:
+				$param_name = trim( $param_name );
+
+				$param_val  = substr( $param_string, strpos( $param_string, '=' ) + 1 );
+
+				// Set param:
+				// we MUST do this here and in & $params[] so that it sticks. This cannot be done in the callback or $this_tag_params[]
+				$params[ $param_name ] = $param_val;
+			}
 		}
 		else
 		{	// Process a normal template tag:
@@ -97,7 +124,20 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 				// Process each param individually:
 				foreach( $tag_param_strings as $tag_param_string )
 				{
+					if( empty( $tag_param_string ) || ctype_space( $tag_param_string) )
+					{
+						continue;
+					}
+
 					$tag_param_name = substr( $tag_param_string, 0, strpos( $tag_param_string, '=' ) );
+
+					if( strpos( $tag_param_name, '//' ) !== false )
+					{	// We found a comment that we should remove:
+						$tag_param_name = preg_replace( '~(.*)//.*$~im','$1', $tag_param_name );
+					}
+
+					// Trim off whitespace:
+					$tag_param_name = trim( $tag_param_name );
 
 					$tag_param_val  = substr( $tag_param_string, strpos( $tag_param_string, '=' ) + 1 );
 
@@ -223,6 +263,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Cat:image':
 			echo $rendered_Chapter->get_image_tag( array_merge( array(
+					'before_classes' => '', // Allow injecting additional classes into 'before'
 					'size'        => 'crop-256x256',
 					'link_to'     => '#category_url',
 					'placeholder' => '#folder_icon',
@@ -595,8 +636,10 @@ function render_template_callback( $var, $params, $objects = array() )
 					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', 	// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
 																// '#teaser_all' => 'teaser,teaserperm,teaserlink',
 																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
+					'limit'                      => 1000, // Max # of images displayed
 					'before'                     => '<div>',
 					'before_image'               => '<figure class="evo_image_block">',
+					'before_image_classes'       => '', // Allow injecting additional classes into 'before image'
 					'before_image_legend'        => '<div class="evo_image_legend">',
 					'after_image_legend'         => '</div>',
 					'after_image'                => '</figure>',
@@ -607,7 +650,11 @@ function render_template_callback( $var, $params, $objects = array() )
 																// Must be set DIFFERENTLY depending on WIDGET/CONTAINER/SKIN LAYOUT. Each time we must estimate the size the image will have on screen.
 																// Sample value: (max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 991px) 720px, (max-width: 1199px) 698px, 848px
 					'image_link_to'              => 'original', // Can be 'original' (image), 'single' (this post), an be URL, can be empty
-					'limit'                      => 1000, // Max # of images displayed
+					// Note: Widget MAY have set the following for same CAT navigation:
+					//	'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
+					//	'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
+					// Note: Widget MAY have set the following for same COLL navigation:
+					//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 				), $params ) );
 			break;
 			
@@ -660,15 +707,21 @@ function render_template_callback( $var, $params, $objects = array() )
 			$rendered_Item->permanent_link( array_merge( array(
 					'text'   => '#title',
 					'title'  => '',  // No tooltip by default
+					// Note: Widget MAY have set the following for same CAT navigation:
+					//	'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
+					//	'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
+					// Note: Widget MAY have set the following for same COLL navigation:
+					//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 				), $params ) );
-				// Note: Cat content list widget will have set:
-				//	'post_navigation' => 'same_category',			// Stay in the same category if Item is cross-posted
-				//	'nav_target'      => $params['chapter_ID'],	// for use with 'same_category' : set the category ID as nav target
-				//	'target_blog'     => 'auto', 						// Stay in current collection if it is allowed for the Item
 			break;
 
 		case 'Item:permanent_url':
-			echo $rendered_Item->get_permanent_url();
+			$temp_params = array_merge( array(  
+					'target_blog'     => '',		
+					'post_navigation' => '',		
+					'nav_target'      => NULL,		
+				), $params );
+			echo $rendered_Item->get_item_url( $temp_params['target_blog'], $temp_params['post_navigation'], $temp_params['nav_target'] );
 			break;
 
 		case 'Item:propose_change_link':
@@ -859,7 +912,7 @@ function unique_template_code( $code, $ID = 0, $db_code_fieldname = 'tpl_code', 
 function get_template_contexts()
 {
 	return array(
-		'custom', 'custom1', 'custom2', 'custom3',
+		'custom1', 'custom2', 'custom3',
 		'content_list_master', 'content_list_item', 'content_list_category',
 		'content_block', 'item_details', 'item_content', 'registration' );
 }

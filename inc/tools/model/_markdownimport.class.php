@@ -39,7 +39,7 @@ class MarkdownImport extends AbstractImport
 	 */
 	function __construct()
 	{
-		global $Plugins;
+		global $Plugins, $Settings;
 
 		// Options definitions:
 		$this->options_defs = array(
@@ -48,12 +48,12 @@ class MarkdownImport extends AbstractImport
 				'group'   => 'mode',
 				'title'   => T_('Import mode'),
 				'options' => array(
-					'update'  => array( 'title' => T_('Update existing contents'), 'note' => T_('Existing Categories & Posts will be re-used (based on slug).') ),
-					'append'  => array( 'title' => T_('Append to existing contents') ),
-					'replace' => array(
+					'update' => array( 'title' => T_('Update existing contents'), 'note' => T_('Existing Categories & Posts will be re-used (based on slug).') ),
+					'append' => array( 'title' => T_('Append to existing contents') ),
+					'delete' => array(
 							'title'  => T_('DELETE & replace ALL contents'),
 							'note'   => T_('WARNING: this option will permanently remove existing posts, comments, categories and tags from the selected collection.'),
-							'suffix' => '<br /><div id="import_type_replace_confirm_block" class="alert alert-danger" style="display:none;margin:0">'.T_('WARNING').': '.T_('you will LOSE any data that is not part of the files you import.').' '.sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).': <input name="import_type_replace_confirm" type="text" class="form-control" size="8" style="margin:-8px 0" /></div>',
+							'suffix' => '<br /><div id="import_type_delete_confirm_block" class="alert alert-danger" style="display:none;margin:0">'.T_('WARNING').': '.T_('you will LOSE any data that is not part of the files you import.').' '.sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).': <input name="import_type_delete_confirm" type="text" class="form-control" size="8" style="margin:-8px 0" /></div>',
 						),
 				),
 				'type'    => 'string',
@@ -69,12 +69,20 @@ class MarkdownImport extends AbstractImport
 			),
 			'delete_files' => array(
 				'group'    => 'import_type',
-				'subgroup' => 'replace',
+				'subgroup' => 'delete',
 				'title'    => T_('Also delete media files that will no longer be referenced in the destination collection after replacing its contents'),
 				'type'     => 'integer',
 				'default'  => 0,
 			),
 			// Options:
+			'allow_extra_cats' => array(
+				'group'   => 'options',
+				'title'   => sprintf( TB_('Allow %s to cross post into other collections'), '<code>extra-cats:</code>' ),
+				'note'    => $Settings->get( 'cross_posting' ) ? '' : TB_('Cross posting is globally disabled'),
+				'type'    => 'integer',
+				'default' => 1,
+				'disabled'=> ! $Settings->get( 'cross_posting' ),
+			),
 			'convert_md_links' => array(
 				'group'   => 'options',
 				'title'   => T_('Convert Markdown links to b2evolution ShortLinks'),
@@ -104,7 +112,8 @@ class MarkdownImport extends AbstractImport
 			),
 			'same_lang_update_file' => array(
 				'group'   => 'options',
-				'title'   => T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn\'t trigger warnings next time (and can be versioned into Git).').' <span class="note">'.T_('This requires using a directory to import, not a ZIP file.').'</span>',
+				'title'   => T_('If a same language match was found, replace the link slug in the original <code>.md</code> file on disk so it doesn\'t trigger warnings next time (and can be versioned into Git).'),
+				'note'    => T_('This requires using a directory to import, not a ZIP file.'),
 				'type'    => 'integer',
 				'default' => 1,
 				'indent'  => 3,
@@ -339,10 +348,10 @@ class MarkdownImport extends AbstractImport
 			$this->set_option( $option_key, param( $option_key, $option['type'], ( $option['type'] == 'integer' ? 0 : $option['default'] ) ) );
 		}
 
-		if( $this->get_option( 'import_type' ) == 'replace' &&
-		    param( 'import_type_replace_confirm', 'string' ) !== 'DELETE' )
+		if( $this->get_option( 'import_type' ) == 'delete' &&
+		    param( 'import_type_delete_confirm', 'string' ) !== 'DELETE' )
 		{	// If deleting/replacing is not confirmed:
-			param_error( 'import_type_replace_confirm', sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).'!' );
+			param_error( 'import_type_delete_confirm', sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).'!' );
 		}
 
 		return ! param_errors_detected();
@@ -399,7 +408,7 @@ class MarkdownImport extends AbstractImport
 
 		$DB->begin();
 
-		if( $this->get_option( 'import_type' ) == 'replace' )
+		if( $this->get_option( 'import_type' ) == 'delete' )
 		{	// Remove data from selected collection:
 
 			// Get existing categories
@@ -801,7 +810,7 @@ class MarkdownImport extends AbstractImport
 					! ( $Item = & $this->get_Item( $item_slug ) ) )
 			{	// Create new Item for not update mode or if it is not found by slug in the requested Collection:
 				$Item = new Item();
-				$Item->set( 'creator_user_ID', $current_User->ID );
+				$Item->set( 'creator_user_ID', ( is_logged_in() ? $current_User->ID : 1/*Run from CLI mode by admin*/ )  );
 				$Item->set( 'datestart', date2mysql( $localtimenow ) );
 				$Item->set( 'datecreated', date2mysql( $localtimenow ) );
 				$Item->set( 'status', 'published' );
@@ -844,7 +853,7 @@ class MarkdownImport extends AbstractImport
 
 			if( $this->get_option( 'force_item_update' ) || $item_content_was_changed )
 			{	// Set new fields only when import hash(title + content + YAML data) was really changed:
-				$Item->set( 'lastedit_user_ID', $current_User->ID );
+				$Item->set( 'lastedit_user_ID', ( is_logged_in() ? $current_User->ID : 1/*Run from CLI mode by admin*/ ) );
 				$Item->set( 'datemodified', date2mysql( $localtimenow ) );
 
 				// Filter title and content by renderer plugins:
@@ -1426,16 +1435,17 @@ class MarkdownImport extends AbstractImport
 	 *
 	 * @param string Category folder path
 	 * @param boolean Check by full path, FALSE - useful to find only by slug
+	 * @param integer Item Type ID to check what categories can be allowed for cross-posting
 	 * @return object|NULL Chapter object
 	 */
-	function & get_Chapter( $cat_folder_path, $check_full_path = true )
+	function & get_Chapter( $cat_folder_path, $check_full_path = true, $item_Type_ID = NULL )
 	{
 		if( isset( $this->chapters_by_path[ $cat_folder_path ] ) )
 		{	// Get Chapter from cache:
 			return $this->chapters_by_path[ $cat_folder_path ];
 		}
 
-		global $DB;
+		global $DB, $Settings;
 
 		$cat_full_url_path = explode( '/', $cat_folder_path );
 		foreach( $cat_full_url_path as $c => $cat_slug )
@@ -1448,7 +1458,15 @@ class MarkdownImport extends AbstractImport
 		$SQL = new SQL( 'Find categories by path "'.implode( '/', $cat_full_url_path ).'/"' );
 		$SQL->SELECT( 'cat_ID' );
 		$SQL->FROM( 'T_categories' );
-		$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
+		if( $Settings->get( 'cross_posting' ) && $item_Type_ID !== NULL )
+		{	// Select categories from all possible collections where cross-posting is allowed between the imported collection:
+			$SQL->FROM_add( 'INNER JOIN T_items__type_coll ON itc_coll_ID = cat_blog_ID' );
+			$SQL->WHERE_and( 'itc_ityp_ID = '.$DB->quote( $item_Type_ID ) );
+		}
+		else
+		{	// Select categories only from the imported collection because cross-posting is not allowed in system:
+			$SQL->WHERE( 'cat_blog_ID = '.$DB->quote( $this->coll_ID ) );
+		}
 		$SQL->WHERE_and( 'cat_urlname REGEXP '.$DB->quote( '^('.$cat_urlname_base.')(-[0-9]+)?$' ) );
 		$cat_IDs = $DB->get_col( $SQL );
 
@@ -1813,16 +1831,48 @@ class MarkdownImport extends AbstractImport
 			return;
 		}
 
+		// Get current extra categories:
+		if( isset( $Item->extra_cat_IDs ) )
+		{	// Clear to be sure all etra categories are loaded from DB:
+			unset( $Item->extra_cat_IDs );
+		}
+		$old_extra_cat_IDs = $Item->get( 'extra_cat_IDs' );
+
 		$extra_cat_IDs = array();
+		$specified_yaml_message = ' ('.TB_('specified in YAML block').')';
 		foreach( $value as $extra_cat_slug )
 		{
-			if( $extra_Chapter = & $this->get_Chapter( $extra_cat_slug, strpos( $extra_cat_slug, '/' ) !== false ) )
+			if( $extra_Chapter = & $this->get_Chapter( $extra_cat_slug, ( strpos( $extra_cat_slug, '/' ) !== false ), $Item->get( 'ityp_ID' ) ) )
 			{	// Use only existing category:
 				$extra_cat_IDs[] = $extra_Chapter->ID;
+				// Inform about new or already assigned extra category:
+				$cat_message = ( in_array( $extra_Chapter->ID, $old_extra_cat_IDs ) ? TB_('Extra category already assigned: %s') : TB_('Assigned new extra-category: %s') );
+				$cross_posted_message = ( $extra_Chapter->get( 'blog_ID' ) != $this->coll_ID ? ' <b>'.TB_('Cross-posted').'</b>' : '' );
+				$this->add_yaml_message( sprintf( $cat_message, $extra_Chapter->get_permanent_link().$specified_yaml_message.$cross_posted_message ), 'info' );
 			}
 			else
 			{	// Display error on not existing category:
-				$this->add_yaml_message( sprintf( T_('Skiping extra category %s, because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>' ) );
+				$this->add_yaml_message( sprintf( TB_('Skipping extra category %s because it doesn\'t exist.'), '<code>'.$extra_cat_slug.'</code>'.$specified_yaml_message ) );
+			}
+		}
+
+		$del_extra_cat_IDs = array_diff( $old_extra_cat_IDs, array_merge( $extra_cat_IDs, array( $Item->get( 'main_cat_ID' ) ) ) );
+		$no_yaml_message = ' ('.TB_('no longer in YAML block').')';
+		if( ! empty( $del_extra_cat_IDs ) )
+		{	// Inform about unassigned extra categories:
+			$ChapterCache = & get_ChapterCache();
+			$ChapterCache->load_list( $del_extra_cat_IDs );
+			foreach( $del_extra_cat_IDs as $del_extra_cat_ID )
+			{
+				if( $del_Chapter = & $ChapterCache->get_by_ID( $del_extra_cat_ID, false, false ) )
+				{	// If category is found in DB:
+					$cross_posted_message = ( $del_Chapter->get( 'blog_ID' ) != $this->coll_ID ? ' <b>'.TB_('Cross-posted').'</b>' : '' );
+					$this->add_yaml_message( sprintf( TB_('Un-assigned old extra-category: %s.'), $del_Chapter->get_permanent_link().$no_yaml_message.$cross_posted_message ), 'warning' );
+				}
+				else
+				{	// If category is NOT found in DB:
+					$this->add_yaml_message( sprintf( TB_('Un-assigned old extra-category #%s because it doesn\'t exist.'), $del_extra_cat_ID.$no_yaml_message ), 'error' );
+				}
 			}
 		}
 
@@ -1949,6 +1999,87 @@ class MarkdownImport extends AbstractImport
 			// Set flag to know the item content was updated:
 			$this->item_file_is_updated = true;
 		}
+	}
+
+
+	/**
+	 * Display process of importing
+	 */
+	function display_import()
+	{
+		// Start to log:
+		$this->start_log();
+
+		$this->log( '<p style="margin-bottom:0">' );
+
+		if( preg_match( '/\.zip$/i', $this->source ) )
+		{	// ZIP archive:
+			$this->log( '<b>'.T_('Source ZIP').':</b> <code>'.$this->source.'</code><br />' );
+			$this->log( '<b>'.T_('Unzipping').'...</b> '.( $this->unzip() ? T_('OK').'<br />' : '' ) );
+		}
+		else
+		{	// Folder:
+			$this->log( '<b>'.T_('Source folder').':</b> <code>'.$this->source.'</code><br />' );
+		}
+		if( $this->get_data( 'errors' ) !== false )
+		{	// Display errors:
+			$this->log( $this->get_data( 'errors' ) );
+		}
+
+		$import_Blog = & $this->get_Blog();
+		$this->log( '<b>'.T_('Destination collection').':</b> '.$import_Blog->dget( 'shortname' ).' &ndash; '.$import_Blog->dget( 'name' ).'<br />' );
+		$this->log( '<b>'.T_('Mode').':</b> '
+			.( isset( $this->options_defs['import_type']['options'][ $this->get_option( 'import_type' ) ] )
+				? $this->options_defs['import_type']['options'][ $this->get_option( 'import_type' ) ]['title']
+				: '<b class="red">Unknown mode!</b>' ) );
+		$this->log( '</p>' );
+		$selected_options = array();
+		foreach( $this->options_defs as $option_key => $option )
+		{
+			if( $option['group'] != 'options' )
+			{	// Skip option from different group:
+				continue;
+			}
+			if( $this->get_option( $option_key ) )
+			{
+				$selected_options[ $option_key ] = array(
+						// Option title and note:
+						( empty( $option['disabled'] ) ? $option['title'] : '<span class="grey">'.$option['title'].'</span>' )
+							.( isset( $option['note'] ) ? ' <span class="note">'.$option['note'].'</span>' : '' ),
+						// Indent value:
+						isset( $option['indent'] ) ? $option['indent'] : 0
+					);
+			}
+		}
+		if( $selected_options_count = count( $selected_options ) )
+		{
+			$this->log( '<b>'.T_('Options').':</b> ' );
+			if( $selected_options_count == 1 )
+			{
+				$this->log( $selected_options[0] );
+			}
+			else
+			{
+				$this->log( '<ul class="list-default">' );
+				foreach( $selected_options as $option_key => $option )
+				{
+					$this->log( '<li'.( $option[1] ? ' style="margin-left:'.( $option[1] * 10 ).'px"' : '' ).'>'.$option[0].'</li>' );
+				}
+				$this->log( '</ul>' );
+			}
+		}
+
+		if( $this->get_data( 'errors' ) === false )
+		{	// Import the data and display a report on the screen:
+			$this->execute();
+		}
+		else
+		{	// Display errors if import cannot be done:
+			$this->log( '<p class="text-danger">'.T_('Import failed.').'</p>' );
+		}
+
+		// End log:
+		$this->end_log();
 	}
 }
 ?>

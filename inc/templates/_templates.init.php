@@ -93,6 +93,35 @@ class templates_Module extends Module
 
 
 	/**
+	 * Build the evobar menu
+	 */
+	function build_evobar_menu()
+	{
+		/**
+		 * @var Menu
+		 */
+		global $topleft_Menu;
+		global $current_User;
+		global $admin_url;
+		global $Collection, $Blog;
+
+		//pre_dump( $topleft_Menu->get_menu_entries( 'site') ); 
+
+		if( $current_User->check_perm( 'admin', 'restricted' ) )
+		{
+
+			// FM enabled and permission to view files:
+			$entries['templates'] = array(
+					'text' => T_('Templates').'&hellip;',
+					'href' => $admin_url.'?ctrl=templates',
+				);
+
+			$topleft_Menu->insert_menu_entries_after( array( 'site', 'skin' ), $entries );
+		}
+	}
+
+
+	/**
 	 * Builds the 2nd half of the menu. This is the one with the configuration features
 	 *
 	 * At some point this might be displayed differently than the 1st half.

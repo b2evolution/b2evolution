@@ -12409,6 +12409,19 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15910, 'Updating templates table...' ) )
+	{	// part of 7.1.2-beta
+
+		$DB->query( 'UPDATE T_templates SET tpl_context = "custom1" WHERE tpl_context = "custom"' );
+
+		db_upgrade_cols( 'T_templates', array(
+			'MODIFY' => array(
+				'tpl_context' => 'ENUM( "custom1", "custom2", "custom3", "content_list_master", "content_list_item",	"content_list_category", "content_block", "item_details", "item_content", "registration" ) COLLATE ascii_general_ci NOT NULL DEFAULT "custom1"',
+			),
+		) );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
@@ -12452,6 +12465,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 			$Plugins = new Plugins();
 		}
 
+		echo get_install_format_text( '<h2>'.T_('Clearing caches...').'</h2>', 'h2' );
+		evo_flush();
+
 		// Init Caches:
 		load_funcs('tools/model/_system.funcs.php');
 		system_init_caches( true, ($old_db_version <= 11410) ); // Only force enabling the caches if we upgrade from a version older or equal to 11410 (6.4.2-beta)
@@ -12490,10 +12506,13 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		invalidate_pagecaches();
 		task_end();
 
+		echo get_install_format_text( '<h2>'.T_('Letting plugins upgrade themselves...').'</h2>', 'h2' );
+		evo_flush();
 
 		// Reload plugins after every upgrade, to detect even those changes on plugins which didn't require db modifications
-		task_begin( 'Reloading installed plugins to make sure their config is up to date...' );
+		task_begin( 'Reloading installed plugins to make sure their config is up to date...<br />' );
 		$Plugins_admin = & get_Plugins_admin();
+		$Plugins_admin->log_register = true; // Set flag to know what plugin is going to be installed before it is initialized in order to detect error
 		$Plugins_admin->reload_plugins();
 		task_end();
 
@@ -12504,6 +12523,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		task_begin( 'Installing new default plugins (if any)...' );
 		install_basic_plugins( $old_db_version );
 		task_end();
+
+		echo get_install_format_text( '<h2>'.T_('Checking defaults...').'</h2>', 'h2' );
+		evo_flush();
 
 		// Create default cron jobs (this can be done at each upgrade):
 		echo get_install_format_text( "Checking if some default cron jobs need to be installed...<br/>\n", 'br' );
@@ -12565,6 +12587,9 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	 * Check to make sure the DB schema is up to date:
 	 * -----------------------------------------------
 	 */
+	echo get_install_format_text( '<h2>'.T_('Double checking DB structure...').'</h2>', 'h2' );
+	evo_flush();
+
 	echo get_install_format_text( "Starting to check DB...<br/>\n", 'br' );
 	evo_flush();
 

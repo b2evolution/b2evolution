@@ -65,11 +65,12 @@ $Form->begin_fieldset( T_('General').get_manual_link('item-type-general') );
 		), T_('Permission level') );
 
 	// Quick Templates:
+	$context = 'item_content';
 	$TemplateCache = & get_TemplateCache();
-	$TemplateCache->load_where( 'tpl_translates_tpl_ID IS NULL' );
+	$TemplateCache->load_by_context( $context );
 	$template_options = array( NULL => sprintf( T_('Use PHP %s'), '(_item_content.inc.php)' ) ) + $TemplateCache->get_code_option_array();
 	$template_input_suffix = ( $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
-		.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;blog='.$Blog->ID, NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' );
+		.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context.'&amp;blog='.$Blog->ID, NULL, NULL, NULL, array( 'onclick' => 'return b2template_list_highlight( this )' ), array( 'title' => T_('Manage templates').'...' ) ) : '' );
 	$Form->select_input_array( 'ityp_template_excerpt', $edited_Itemtype->get( 'template_excerpt' ), $template_options, T_('Template for Excerpt display'), NULL, array( 'input_suffix' => $template_input_suffix ) );
 	$Form->select_input_array( 'ityp_template_normal', $edited_Itemtype->get( 'template_normal' ), $template_options, T_('Template for Teaser display'), NULL, array( 'input_suffix' => $template_input_suffix ) );
 	$Form->select_input_array( 'ityp_template_full', $edited_Itemtype->get( 'template_full' ), $template_options, T_('Template for Full content display'), NULL, array( 'input_suffix' => $template_input_suffix ) );

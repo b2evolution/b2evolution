@@ -4982,7 +4982,7 @@ class Form extends Widget
 			case 'Comment':
 				$Comment = $object;
 				$comment_Item = & $Comment->get_Item();
-				if( ! $comment_Item->check_blog_settings( 'allow_attachments', $Comment ) || ! $comment_Item->can_attach( $Comment ) )
+				if( ! $comment_Item->check_blog_settings( 'allow_attachments', $Comment ) || ! $comment_Item->can_attach( $Comment->temp_link_owner_ID, $Comment->type ) )
 				{	// Comment attachments must be allowed by collection setting depending on user type(anonymous, registered, member and etc.).:
 					return;
 				}

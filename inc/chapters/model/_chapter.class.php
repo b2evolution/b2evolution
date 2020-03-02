@@ -1040,6 +1040,7 @@ class Chapter extends DataObject
 	{
 		$params = array_merge( array(
 				'before'        => '',		// HTML code before image tag
+				'before_classes'=> '',		// Allow injecting additional classes into 'before'
 				'before_legend' => '',		// HTML code before image legeng(info under image tag image desc is not empty)
 				'after_legend'  => '',		// HTML code after image legeng
 				'after'         => '',		// HTML code after image tag
@@ -1060,6 +1061,11 @@ class Chapter extends DataObject
 				                         	// 'none' - don't use attributes "width" & "height"
 				'placeholder'   => '',		// HTML to be displayed if no image; possible codes: #folder_icon
 			), $params );
+
+		if( ! empty( $params['before_classes'] ) )
+		{	// Inject additional classes into 'before':
+			$params['before'] = update_html_tag_attribs( $params['before'], array( 'class' => $params['before_classes'] ) );
+		}
 
 		// Try to get a file by ID:
 		$FileCache = & get_FileCache();

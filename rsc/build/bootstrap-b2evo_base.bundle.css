@@ -142,10 +142,11 @@ img.rounded,
 .evo_image_block.rounded img {
   border-radius: 4px;
 }
-img.round,
-.image_block.round img,
-.evo_image_block.round img {
-  border-radius: 50%;
+.evo_image_block.contain img {
+  object-fit: contain !important;
+}
+.evo_image_block.cover img {
+  object-fit: cover !important;
 }
 img.imgerror,
 .image_block.imgerror img,
@@ -185,6 +186,18 @@ img.imgerror,
 }
 .margin2ex {
   margin: 2ex;
+}
+.margin-top-sm {
+  margin-top: 10px;
+}
+.margin-top-md {
+  margin-top: 20px;
+}
+.margin-bottom-sm {
+  margin-bottom: 10px;
+}
+.margin-bottom-md {
+  margin-bottom: 20px;
 }
 .indented {
   padding-left: 3em;
@@ -5223,6 +5236,9 @@ legend.panel-heading a.action_icon.pull-right span.fa {
 .form-horizontal .controls input.large,
 .form-horizontal .controls .form-control.form_textarea_input {
   display: block;
+}
+.form-horizontal .controls .form-control.evo_template_select {
+  width: calc(100% - 24px);
 }
 div.edit_toolbars {
   margin-top: 5px;

@@ -492,6 +492,7 @@ if( !empty($p) || !empty($title) )
 
 			if( ! $Item->is_part_of_blog( $blog ) )
 			{	// We have found an Item object, but it doesn't belong to the current collection!
+
 				// Check if we want to redirect moved posts:
 				if( $Settings->get( 'redirect_moved_posts' ) )
 				{	// Set disp to 'redirect' in order to store this value in hitlog table:
@@ -507,12 +508,15 @@ if( !empty($p) || !empty($title) )
 				unset($Item);
 			}
 
+			// So here we know the Item is part of the current blog/collection....
+
 			if( !empty($Item) &&
-				 $Blog->get_setting( 'canonical_item_urls' ) &&
-			    ( $SlugCache = & get_SlugCache() ) && 
-			    ( $item_Slug = & $SlugCache->get_by_ID( $Item->get( 'canonical_slug_ID' ), false, false ) ) &&
-			    ( $item_Slug->get( 'title' ) != $title ) && // If current slug is NOT canonical slug of the Item
-			    $Item->is_part_of_blog( $blog ) ) // If the Item has a category from current collection
+					 $Blog->get_setting( 'canonical_item_urls' ) &&
+				    ( $SlugCache = & get_SlugCache() ) && 
+				    ( $item_Slug = & $SlugCache->get_by_ID( $Item->get( 'canonical_slug_ID' ), false, false ) ) &&
+				    ( $item_Slug->get( 'title' ) != $title ) // If current slug is NOT canonical slug of the Item
+				    // redundant check: && $Item->is_part_of_blog( $blog )  // If the Item has a category from current collection
+			    )
 			{	// Redirect permanently to the item main/canonical permanent url in the current collection:
 				$Debuglog->add( 'Redirecting to correct canonical slug but stay in current collection', 'url_decode_part_2' );
 				header_redirect( $Item->get_permanent_url( '', $Blog->get( 'url' ), '&', array(), $blog ), 301 );

@@ -1729,25 +1729,46 @@ function create_default_templates( $is_task = true )
 			'context'  => 'content_list_item',
 			'template' => '<li>
 	<h3>[read_status] [Item:permalink|text=#fileicon+title|class=link] [flag_icon]</h3>[visibility_status]
-	[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
+	[Item:excerpt|
+		before=<div class="evo_post__excerpt_text">|
+		after=</div>|
+		excerpt_before_more=<span class="evo_post__excerpt_more_link">|
+		excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
 </li>',
 		),
 
 
 		// Content Tiles style 1 (default):
 		'content_tiles' => array(
-			'name'     => 'Content Tiles Style 1 (Fully clickable)',
+            'name'     => 'Content Tiles Style 1 (Fully clickable)',
+            'context'  => 'content_list_master',
+            'template' => '[set:before_list=<div class="evo_tiles row">]
+[set:after_list=</div>]
+[set:subcat_template=content_tiles_subcat|          // Sub-template for displaying categories]
+[set:item_template=content_tiles_item|              // Sub-template for displaying items]
+[set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4| // RWD classes for tile containers]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__hoverglow| // Modifier classes for each tile]
+[set:evo_tile_image__modifiers=|                    // Modifier classes for each tile image]
+[set:evo_tile_image__classes=evo_image_block|       // Modifier classes for each evo_image_block]
+[set:evo_tile_image__size=fit-400x320|              // Image size for old browsers]
+[set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]
+',
+		),
+		'content_tiles_contain' => array(
+			'name'     => 'Content Tiles Style 1.1 (Contained images)',
 			'context'  => 'content_list_master',
 			'template' => '[set:before_list=<div class="evo_tiles row">]
 [set:after_list=</div>]
 [set:subcat_template=content_tiles_subcat]
 [set:item_template=content_tiles_item]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
-[set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__hoverglow]
-[set:evo_tile_image__modifiers:]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__hoverglow]
+[set:evo_tile_image__modifiers=]
+[set:evo_tile_image__classes=evo_image_block contain]
 [set:evo_tile_image__size=fit-400x320]
 [set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
-[set:evo_tile_text__modifiers:evo_tile_text__gradient]
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]
 ',
 		),
 
@@ -1758,7 +1779,13 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
+				[Cat:image|
+					size=$evo_tile_image__size$|
+					sizes=$evo_tile_image__sizes$|
+					link_to=#category_url|
+					before=<figure class="evo_image_block">|
+					before_classes=$evo_tile_image__classes$|
+					after=</figure>]
 			</div>
 			<div class="evo_tile_body">
 				<h3>[Cat:name]</h3>
@@ -1777,15 +1804,27 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Item:images|restrict_to_image_position=#cover_and_teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=|placeholder=#file_text_icon]
+				[Item:images|
+					restrict_to_image_position=#cover_and_teaser_all| // Priority to cover image, fall back to any teaser image
+					limit=1|	                                      // Max 1 images
+					image_size=$evo_tile_image__size$|                // Size for old browsers
+					image_sizes=$evo_tile_image__sizes$|	          // RWD Sizes for modern browsers
+					image_link_to=|	                                  // Do NOT link to anything
+					placeholder=#file_text_icon|	                  // If no image available, display text file icon
+					before_image_classes=$evo_tile_image__classes$|	  // CSS classes to inject into evo_image_block
+				]
 				<div class="evo_tile_overlay">[Item:cat_name]</div>
 			</div>
 			<div class="evo_tile_body">
 				<h3>[Item:title]</h3>
-				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">[Item:excerpt|excerpt_more_text=]</div>
+				<div class="evo_tile_text [echo:evo_tile_text__modifiers]">
+					[Item:excerpt|
+						excerpt_more_text=| // No "more" link
+					]
+				</div>
 			</div>
 		</div>
-		[Item:permalink|text=]
+		[Item:permalink|text=| // This is a link without text which will cover the whole tile and make the whole tile clickable]
 	</div>
 </div>',
 		),
@@ -1800,11 +1839,12 @@ function create_default_templates( $is_task = true )
 [set:subcat_template=content_tiles_btn_subcat]
 [set:item_template=content_tiles_btn_item]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
-[set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__shadow]
-[set:evo_tile_image__modifiers:evo_tile_image__margin]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__shadow]
+[set:evo_tile_image__modifiers=evo_tile_image__margin]
+[set:evo_tile_image__classes=evo_image_block]
 [set:evo_tile_image__size=fit-400x320]
 [set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
-[set:evo_tile_text__modifiers:evo_tile_text__gradient]',
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]',
 		),
 
 		'content_tiles_btn_subcat' => array(
@@ -1814,7 +1854,13 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Cat:image|size=$evo_tile_image__size$|sizes=$evo_tile_image__sizes$|link_to=#category_url|before=<figure class="evo_image_block">|after=</figure>]
+				[Cat:image|
+					size=$evo_tile_image__size$|
+					sizes=$evo_tile_image__sizes$|
+					link_to=#category_url|
+					before=<figure class="evo_image_block">|
+					after=</figure>|
+					before_classes=$evo_tile_image__classes$]
 			</div>
 			<div class="evo_tile_body">
 				<h3>[Cat:permalink|class=evo_tile_title]</h3>
@@ -1833,7 +1879,14 @@ function create_default_templates( $is_task = true )
 	<div class="evo_tile [echo:evo_tile__modifiers]">
 		<div class="hide_overflow">
 			<div class="evo_tile_image [echo:evo_tile_image__modifiers]">
-				[Item:images|restrict_to_image_position=#cover_and_teaser_all|limit=1|image_size=$evo_tile_image__size$|image_sizes=$evo_tile_image__sizes$|image_link_to=single|placeholder=#file_text_icon]
+				[Item:images|
+					restrict_to_image_position=#cover_and_teaser_all|
+					limit=1|
+					image_size=$evo_tile_image__size$|
+					image_sizes=$evo_tile_image__sizes$|
+					image_link_to=single|
+					placeholder=#file_text_icon|
+					before_image_classes=$evo_tile_image__classes$]
 				<div class="evo_tile_overlay">[Item:cat_name]</div>
 			</div>
 			<div class="evo_tile_body">
@@ -1856,11 +1909,12 @@ function create_default_templates( $is_task = true )
 [set:subcat_template=content_tiles_bgimg_subcat]
 [set:item_template=content_tiles_bgimg_item]
 [set:rwd_cols=col-xs-12 col-sm-6 col-md-6 col-lg-4]
-[set:evo_tile__modifiers:evo_tile__md evo_tile__grey_bg evo_tile__square evo_tile__shadow]
-[set:evo_tile_image__modifiers:]
+[set:evo_tile__modifiers=evo_tile__md evo_tile__grey_bg evo_tile__square evo_tile__shadow]
+[set:evo_tile_image__modifiers=]
+[set:evo_tile_image__classes=evo_image_block]
 [set:evo_tile_image__size=fit-400x320]
 [set:evo_tile_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]
-[set:evo_tile_text__modifiers:evo_tile_text__gradient]',
+[set:evo_tile_text__modifiers=evo_tile_text__gradient]',
 		),
 
 		'content_tiles_bgimg_subcat' => array(
@@ -1916,11 +1970,17 @@ function create_default_templates( $is_task = true )
 			'name'     => 'Include Content Block: without clearfix',
 			'context'  => 'content_block',
 			'template' => '<div class="evo_content_block [echo:content_block_class]">
-	[Item:images|restrict_to_image_position=#teaser_all|before=<div class="evo_cblock_images evo_cblock_teaser">|after=</div>]
+	[Item:images|
+		restrict_to_image_position=#teaser_all|
+		before=<div class="evo_cblock_images evo_cblock_teaser">|
+		after=</div>]
 	<div class="evo_cblock_text">
 		[Item:content_teaser] 
 	</div>
-	[Item:images|restrict_to_image_position=aftermore|before=<div class="evo_cblock_images evo_cblock_aftermore">|after=</div>]
+	[Item:images|
+		restrict_to_image_position=aftermore|
+		before=<div class="evo_cblock_images evo_cblock_aftermore">|
+		after=</div>]
 </div>',
 		),
 
@@ -1929,14 +1989,25 @@ function create_default_templates( $is_task = true )
 			'name' => 'Item Excerpt',
 			'context'  => 'item_content',
 			'template' => '<section class="evo_post__excerpt">
-[Item:excerpt|before=<div class="evo_post__excerpt_text">|after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|excerpt_more_text=#more+arrow|excerpt_after_more=</span>]
+[Item:excerpt|
+	before=<div class="evo_post__excerpt_text">|
+	after=</div>|excerpt_before_more=<span class="evo_post__excerpt_more_link">|
+	excerpt_more_text=#more+arrow|
+	excerpt_after_more=</span>]
 </section>',
 		),
 		'item_content_teaser' => array(
 			'name' => 'Item Teaser content',
 			'context'  => 'item_content',
 			'template' => '<section class="evo_post__full">
-[Item:images|restrict_to_image_position=#teaser_all|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+[Item:images|
+	restrict_to_image_position=#teaser_all|
+	image_size=fit-1280x720|
+	image_class=img-responsive|
+	before=<div class="evo_post_images">|
+	after=</div>|
+	before_image=<figure class="evo_image_block">|
+	after_image=</figure>]
 <div class="evo_post__full_text clearfix">
 	[Item:content_teaser]
 	[Item:more_link|link_text=Read more &raquo;]
@@ -1947,11 +2018,25 @@ function create_default_templates( $is_task = true )
 			'name' => 'Item Full content',
 			'context'  => 'item_content',
 			'template' => '<section class="evo_post__full">
-[Item:images|restrict_to_image_position=#teaser_all|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+[Item:images|
+	restrict_to_image_position=#teaser_all|
+	image_size=fit-1280x720|
+	image_class=img-responsive|
+	before=<div class="evo_post_images">|
+	after=</div>|
+	before_image=<figure class="evo_image_block">|
+	after_image=</figure>]
 <div class="evo_post__full_text clearfix">
 	[Item:content_teaser]
 	[Item:more_link|anchor_text=]
-	[Item:images|restrict_to_image_position=aftermore|image_size=fit-1280x720|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+	[Item:images|
+		restrict_to_image_position=aftermore|
+		image_size=fit-1280x720|
+		image_class=img-responsive|
+		before=<div class="evo_post_images">|
+		after=</div>|
+		before_image=<figure class="evo_image_block">|
+		after_image=</figure>]
 	[Item:content_extension]
 	[Item:page_links]
 	[Item:footer]
@@ -1964,13 +2049,36 @@ function create_default_templates( $is_task = true )
 			'template' => '<section class="evo_post__full">
 <div class="row">
 	<div class="col-sm-5">
-		[Item:images|restrict_to_image_position=#cover_and_teaser_all|image_size=crop-320x320|image_class=img-responsive|before=<div class="evo_post_images">|after=</div>|before_image=<figure class="evo_image_block">|after_image=</figure>]
+		[Item:images|
+			restrict_to_image_position=#cover_and_teaser_all|
+			image_size=crop-320x320|image_class=img-responsive|
+			before=<div class="evo_post_images">|
+			after=</div>|
+			before_image=<figure class="evo_image_block">|
+			after_image=</figure>]
 	</div>
 	<div class="col-sm-7">
 		[Item:content_teaser]
 		[Item:tags|before=<nav class="small post_tags">|after=</nav>|separator= ]
-		[Item:custom_fields|fields=course,cuisine,servings|custom_fields_table_start=|custom_fields_row_start=<div class="row"$row_attrs$>|custom_fields_row_header_field=<div class="col-xs-3 $header_cell_class$"><b>$field_title$$field_description_icon$</b></div>|custom_fields_description_icon_class=grey|custom_fields_value_default=<div class="col-xs-9 $data_cell_class$"$data_cell_attrs$>$field_value$</div>|custom_fields_row_end=</div>|custom_fields_table_end=]
-		[Item:custom_fields|fields=prep_time,cook_time,passive_time,total_time|custom_fields_table_start=<br /><div class="row">|custom_fields_row_start=<span$row_attrs$>|custom_fields_row_header_field=<div class="col-sm-3 col-xs-6 $header_cell_class$"><b>$field_title$$field_description_icon$</b>|custom_fields_description_icon_class=grey|custom_fields_value_default=<br /><span class="$data_cell_class$"$data_cell_attrs$>$field_value$</span></div>|custom_fields_row_end=</span>|custom_fields_table_end=</div>|hide_empty_lines=1]
+		[Item:custom_fields|
+			fields=course,cuisine,servings|
+			custom_fields_table_start=|
+			custom_fields_row_start=<div class="row"$row_attrs$>|
+			custom_fields_row_header_field=<div class="col-xs-3 $header_cell_class$"><b>$field_title$$field_description_icon$</b></div>|
+			custom_fields_description_icon_class=grey|
+			custom_fields_value_default=<div class="col-xs-9 $data_cell_class$"$data_cell_attrs$>$field_value$</div>|
+			custom_fields_row_end=</div>|
+			custom_fields_table_end=]
+		[Item:custom_fields|
+			fields=prep_time,cook_time,passive_time,total_time|
+			custom_fields_table_start=<br /><div class="row">|
+			custom_fields_row_start=<span$row_attrs$>|
+			custom_fields_row_header_field=<div class="col-sm-3 col-xs-6 $header_cell_class$"><b>$field_title$$field_description_icon$</b>|
+			custom_fields_description_icon_class=grey|
+			custom_fields_value_default=<br /><span class="$data_cell_class$"$data_cell_attrs$>$field_value$</span></div>|
+			custom_fields_row_end=</span>|
+			custom_fields_table_end=</div>|
+			hide_empty_lines=1]
 	</div>
 </div>
 <div class="row">
@@ -2012,6 +2120,15 @@ function create_default_templates( $is_task = true )
 */
 
 		// Registration Templates:
+		'registration_master_standard' => array(   // Should become registration_master
+			'name'     => 'Registration: Standard',
+			'context'  => 'custom1',  // should become registration_master
+			'template' => '
+[set:reg1_template=registration_standard]
+[set:reg1_required=login,password,email]
+',
+		),
+
 		'registration_standard' => array(
 			'name'     => 'Registration: Standard',
 			'context'  => 'registration',
@@ -2019,10 +2136,28 @@ function create_default_templates( $is_task = true )
 [Form:password]
 [Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
 <div class="evo_register_buttons">
-	[Form:submit|name=register|class=btn btn-primary btn-lg|value=Register my account now!]
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Register my account now!]
 	<br>
-	[Link:disp|disp=login|class=btn btn-default|text=Already have an account... ?]
+	[Link:disp|
+		disp=login|
+		class=btn btn-default|
+		text=Already have an account... ?]
 </div>',
+		),
+
+
+
+		// Registration Templates:
+		'registration_master_ask_name' => array(   
+			'name'     => 'Registration: Ask for Name',
+			'context'  => 'custom1',  // should become registration_master
+			'template' => '
+[set:reg1_template=registration_ask_name]
+[set:reg1_required=login,firstname,password,email]
+',
 		),
 
 		'registration_ask_name' => array(
@@ -2033,11 +2168,65 @@ function create_default_templates( $is_task = true )
 [Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
 [Form:password]
 <div class="evo_register_buttons">
-	[Form:submit|name=register|class=btn btn-primary btn-lg|value=Register my account now!]
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Register my account now!]
 	<br>
-	[Link:disp|disp=login|class=btn btn-default|text=Already have an account... ?]
+	[Link:disp|
+		disp=login|
+		class=btn btn-default|
+		text=Already have an account... ?]
 </div>'
 		),
+
+		// Registration Templates:
+		'registration_master_email_social' => array(   
+			'name'     => 'Registration: email & social buttons',
+			'context'  => 'custom1',  // should become registration_master
+			'template' => '
+[set:reg1_template=registration_email_social]
+[set:reg1_required=email]
+
+[set:reg2_template=registration_step2]
+[set:reg2_required=firstname]
+',
+		),
+
+		'registration_email_social' => array(
+			'name'     => 'Registration: email & social buttons',
+			'context'  => 'registration',
+			'template' => '[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+<div class="evo_register_buttons">
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Register my account now!]
+	<br>
+	[Link:disp|
+		disp=login|
+		class=btn btn-default|
+		text=Already have an account... ?]
+</div>
+[Plugin:evo_sociallogin| // This should call the SkinTag of plugin with given code
+	before=<div class="evo_social_login_buttons margin-top-md">|
+	after=</div>]
+',
+		),
+
+		'registration_step2' => array(
+			'name'     => 'Registration: Step 2',
+			'context'  => 'registration',
+			'template' => '[Form:firstname]
+	[Form:lastname]
+	[Form:custom_field|field=industry| // this is an example of a User custom field]
+	[Form:submit|
+		name=register|
+		class=btn btn-primary btn-lg|
+		value=Continue]
+',
+		),
+
 	);
 
 	$templates_sql = array();

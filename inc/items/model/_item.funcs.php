@@ -5466,7 +5466,7 @@ function items_manual_results_block( $params = array() )
 		}
 	}
 
-	load_class( '_core/ui/_uiwidget.class.php', 'Table' );
+	load_class( '_core/ui/_table.class.php', 'Table' );
 
 	$Table = new Table( 'Results', $params['results_param_prefix'] );
 

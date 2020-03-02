@@ -99,8 +99,9 @@ class item_small_print_Widget extends ComponentWidget
 		global $current_User, $admin_url;
 
 		// Get available templates:
+		$context = 'item_details';
 		$TemplateCache = & get_TemplateCache();
-		$TemplateCache->load_where( 'tpl_translates_tpl_ID IS NULL' );
+		$TemplateCache->load_by_context( $context );
 
 		$r = array_merge( array(
 				'title' => array(
@@ -115,7 +116,10 @@ class item_small_print_Widget extends ComponentWidget
 					'options' => $TemplateCache->get_code_option_array(),
 					'defaultvalue' => 'item_details_smallprint_standard',
 					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
-							.action_icon( '', 'edit', $admin_url.'?ctrl=templates', NULL, NULL, NULL, array(), array( 'title' => T_('Manage templates').'...' ) ) : '' ),
+							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
+							array( 'onclick' => 'return b2template_list_highlight( this )' ),
+							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
+					'class' => 'evo_template_select',
 				),
 			), parent::get_param_definitions( $params ) );
 

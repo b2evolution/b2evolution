@@ -852,6 +852,7 @@ class ChapterCache extends DataObjectCache
 				'max_level' => 0,
 				'subset_ID' => $Chapter->blog_ID,
 				'items_order_alpha_func' => 'compare_items_by_title',
+				'exclude_cats' => array(),
 			), $params );
 
 		if( $params['sorted'] && $has_sub_cats )
@@ -898,6 +899,10 @@ class ChapterCache extends DataObjectCache
 						{ // Display each category without recursion
 							foreach( $subcats_to_display as $sub_Chapter )
 							{ // Display each category:
+								if( in_array( $sub_Chapter->ID, $params['exclude_cats'] ) )
+								{	// Exclude category:
+									continue;
+								}
 								if( is_array( $callbacks['line'] ) )
 								{ // object callback:
 									$r .= $callbacks['line'][0]->{$callbacks['line'][1]}( $sub_Chapter, 0, $params ); // <li> Category  - or - <tr><td>Category</td></tr> ...
@@ -937,6 +942,10 @@ class ChapterCache extends DataObjectCache
 				{ // Display each category without recursion
 					foreach( $subcats_to_display as $sub_Chapter )
 					{ // Display each category:
+						if( in_array( $sub_Chapter->ID, $params['exclude_cats'] ) )
+						{	// Exclude category:
+							continue;
+						}
 						if( is_array( $callbacks['line'] ) )
 						{ // object callback:
 							$r .= $callbacks['line'][0]->{$callbacks['line'][1]}( $sub_Chapter, 0, $params ); // <li> Category  - or - <tr><td>Category</td></tr> ...
@@ -969,22 +978,19 @@ class ChapterCache extends DataObjectCache
 
 
 	/**
-	 * Return recursive select options list of all loaded categories
+	 * Return array of recursive select options list of all loaded categories
 	 *
-	 * @param integer selected category in the select input
 	 * @param integer NULL for all subsets
 	 * @param boolean Include the root element?
 	 * @param array GenercCategory objects to display (will recurse from those starting points)
 	 * @param integer depth of categories list
 	 * @param array IDs of categories to exclude (their children will be ignored to)
 	 *
-	 * @return string select options list of all loaded categories
+	 * @return array select options list of all loaded categories
 	 */
-	function recurse_select( $selected = NULL, $subset_ID = NULL, $include_root = false, $Cat_array = NULL,
+	function recurse_select_options( $subset_ID = NULL, $include_root = false, $Cat_array = NULL,
 							$level = 0, $exclude_array = array() )
 	{
-		// pre_dump( $exclude_array );
-
 		// Make sure children have been revealed for specific subset:
 		$this->reveal_children( $subset_ID );
 
@@ -996,11 +1002,11 @@ class ChapterCache extends DataObjectCache
 		// Sort categories alphabetically or manually depending on settings:
 		usort( $Cat_array, array( 'Chapter', 'compare_chapters' ) );
 
-		$r = '';
+		$options = array();
 
 		if( $include_root )
 		{
-			$r .= '<option value="">'.T_('Root').'</option>';
+			$options[] = T_('Root');
 			$level++;
 		}
 
@@ -1018,14 +1024,40 @@ class ChapterCache extends DataObjectCache
 				$indent .='&nbsp;&nbsp;';
 			}
 			// Set category option:
-			$r .= '<option value="'.$Chapter->ID.'" ';
-			if( $Chapter->ID == $selected ) $r .= ' selected="selected"';
-			$r .= ' >'.$indent.$Chapter->name.'</option>';
+			$options[ $Chapter->ID ] = $indent.$Chapter->name;
 
-			if( !empty( $Chapter->children ) )
+			if( ! empty( $Chapter->children ) )
 			{	// Add children categories:
-				$r .= $this->recurse_select( $selected, $subset_ID, false, $Chapter->children, $level+1, $exclude_array );
+				$options += $this->recurse_select_options( $subset_ID, false, $Chapter->children, $level+1, $exclude_array );
 			}
+		}
+
+		return $options;
+	}
+
+
+	/**
+	 * Return string of recursive select options list of all loaded categories
+	 *
+	 * @param integer selected category in the select input
+	 * @param integer NULL for all subsets
+	 * @param boolean Include the root element?
+	 * @param array GenercCategory objects to display (will recurse from those starting points)
+	 * @param integer depth of categories list
+	 * @param array IDs of categories to exclude (their children will be ignored to)
+	 *
+	 * @return string select options list of all loaded categories
+	 */
+	function recurse_select( $selected = NULL, $subset_ID = NULL, $include_root = false, $Cat_array = NULL,
+							$level = 0, $exclude_array = array() )
+	{
+		$r = '';
+
+		$options = $this->recurse_select_options( $subset_ID, $include_root, $Cat_array, $level, $exclude_array );
+
+		foreach( $options as $chapter_ID => $option_title )
+		{
+			$r .= '<option value="'.( $chapter_ID ? $chapter_ID : '' ).'"'.( $chapter_ID == $selected ? ' selected="selected"' : '' ).'>'.$option_title.'</option>';
 		}
 
 		return $r;

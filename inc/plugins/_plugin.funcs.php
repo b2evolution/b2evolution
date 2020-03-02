@@ -371,6 +371,10 @@ function autoform_display_field( $parname, $parmeta, & $Form, $set_type, $Obj, $
 
 		case 'select':
 			$params['force_keys_as_values'] = true; // so that numeric keys get used as values! autoform_validate_param_value() checks for the keys only.
+			if( ! empty( $parmeta['multiple'] ) )
+			{	// Set specific size of multiple selector or use automatic size depending on count of options:
+				$params['size'] = ( isset( $parmeta['size'] ) ? $parmeta['size'] : count( $parmeta['options'] ) );
+			}
 			$Form->select_input_array( $input_name, $set_value, $parmeta['options'], $set_label, isset($parmeta['note']) ? $parmeta['note'] : NULL, $params );
 			break;
 
