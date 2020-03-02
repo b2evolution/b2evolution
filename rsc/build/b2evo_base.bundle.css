@@ -1376,6 +1376,13 @@ div.dev-blocks--widget--notincache > .dev-blocks-name {
   color: #f8bb00;
   background-color: #fff0e0;
 }
+div.dev-blocks--content-block {
+  border-color: #F60;
+}
+div.dev-blocks--content-block > .dev-blocks-name {
+  color: #F60;
+  background-color: #ffeac1;
+}
 div.dev-blocks--belowtoolbar {
   margin: 27px 0 -27px 0;
 }

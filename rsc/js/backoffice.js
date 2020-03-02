@@ -199,7 +199,7 @@ function evobarFlash( bgs, options )
  *
  * fp> This is gonna die...
  */
-function b2edit_open_preview( form_selector, new_action_url )
+function b2edit_open_preview( form_selector, new_action_url, preview_block )
 {
 	var form = jQuery( form_selector );
 
@@ -215,6 +215,11 @@ function b2edit_open_preview( form_selector, new_action_url )
 		return false;
 	}
 
+	if( typeof preview_block != undefined && preview_block === true )
+	{	// Enable debug blocks of included content-block Items by short tag [include:]:
+		form.find('input[name=preview_block]').val( '1' );
+	}
+
 	// Set new form action URL:
 	var saved_action_url = form.attr( 'action' );
 	form.attr( 'action', new_action_url );
@@ -228,6 +233,7 @@ function b2edit_open_preview( form_selector, new_action_url )
 	// Revert action URL and target of the form to original values:
 	form.attr( 'action', saved_action_url );
 	form.attr( 'target', '_self' );
+	form.find('input[name=preview_block]').val( '0' );
 
 	// Don't submit the original form:
 	return false;
