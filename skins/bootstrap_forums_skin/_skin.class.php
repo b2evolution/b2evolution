@@ -878,7 +878,7 @@ class bootstrap_forums_Skin extends Skin
 					.'<option value="-"'.( $status == '-' ? ' selected="selected"' : '' ).'>'.T_('No status').'</option>'
 					.$ItemStatusCache->get_option_list( $status )
 				.'</select>';
-			expose_var_to_JS( 'evo_skin_bootstrap_forums__post_list_header', true );
+			expose_var_to_js( 'evo_skin_bootstrap_forums__post_list_header', true );
 			echo $params['after_workflow_status'];
 		}
 

@@ -1779,14 +1779,15 @@ function init_datepicker_js( $relative_to = 'rsc_url' )
 	require_js_defer( '#jqueryUI#', $relative_to );
 	require_css( '#jqueryUI_css#', $relative_to );
 
-	add_js_headline( 'jQuery(document).ready( function(){
-		jQuery(".form_date_input").datepicker({
-			dateFormat: "'.jquery_datepicker_datefmt().'",
-			monthNames: '.jquery_datepicker_month_names().',
-			dayNamesMin: '.jquery_datepicker_day_names().',
-			firstDay: '.locale_startofweek().'
-		})
-	})' );
+	// We did not use json_encode here as it will escape the dateFormat:
+	expose_var_to_js( 'evo_init_datepicker', '{'
+				.'selector: ".form_date_input",'
+				.'config: {'
+					.'dateFormat: "'.jquery_datepicker_datefmt().'",'
+					.'monthNames: '.jquery_datepicker_month_names().','
+					.'dayNamesMin: '.jquery_datepicker_day_names().','
+					.'firstDay: '.locale_startofweek().'}'
+			.'}' );
 }
 
 
