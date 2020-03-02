@@ -1248,7 +1248,7 @@ class MarkdownImport extends AbstractImport
 				'link_position'  => 'inline',
 			), $params );
 
-		$requested_file_relative_path = ltrim( str_replace( '\\', '/', $requested_file_relative_path ), '/' );
+		$requested_file_relative_path = ltrim( str_replace( '\\', '/', urldecode( $requested_file_relative_path ) ), '/' );
 
 		$source_file_relative_path = $source_category_folder.'/'.$requested_file_relative_path;
 		$file_source_path = $source_folder_absolute_path.'/'.$source_file_relative_path;
