@@ -288,7 +288,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 								<div class="dropdown-menu dropdown-menu-right">'.$item_renderer_checkboxes.'</div>
 							</div>';
 							// JS code to don't hide popup on click to checkbox:
-							echo '<script>jQuery( "#itemform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } )</script>';
+							expose_var_to_js( 'evo_itemform_renderers__click', true );
 						}
 						// CALL PLUGINS NOW:
 						$display_editor_params = array(

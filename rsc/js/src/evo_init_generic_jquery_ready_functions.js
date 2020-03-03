@@ -41,4 +41,16 @@ jQuery( document ).ready( function()
 			} );
 	}
 
+	// Item Text Renderers
+	if( typeof( evo_itemform_renderers__click ) != 'undefined' )
+	{
+		jQuery( "#itemform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } );
+	}
+
+	// Comment Text Renderers
+	if( typeof( evo_commentform_renderers__click ) != 'undefined' )
+	{
+		jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } );
+	}
+
 } );

@@ -568,7 +568,7 @@ class item_comment_form_Widget extends ComponentWidget
 						<div class="dropdown-menu dropdown-menu-right">'.$comment_renderer_checkboxes.'</div>
 					</div>';
 					// JS code to don't hide popup on click to checkbox:
-					$text_renderers .= '<script>jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } )</script>';
+					expose_var_to_js( 'evo_commentform_renderers__click', true );
 			}
 
 			if( $Blog->get_setting( 'allow_html_comment' ) )
