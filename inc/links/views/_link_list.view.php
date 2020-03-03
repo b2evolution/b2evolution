@@ -208,5 +208,5 @@ display_dragdrop_upload_button( array(
 	) );
 
 	// Initialize attachments fieldset to set proper height and handler to resize it:
-	expose_var_to_js( 'evo_link_initialize_fieldset_config', array( 'fieldset_prefix' => $fieldset_prefix ) );
+	expose_var_to_js( 'evo_link_initialize_fieldset_config', json_encode( array( 'fieldset_prefix' => $fieldset_prefix ) ) );
 ?>
