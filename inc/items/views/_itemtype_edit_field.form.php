@@ -24,7 +24,7 @@ $Form->hidden( 'itcf_ID', get_param( 'itcf_ID' ) );
 $Form->text( 'itcf_order', get_param( 'itcf_order' ), 6, T_('Order'), '', 11 );
 
 // Title:
-$Form->text( 'itcf_label', get_param( 'itcf_label' ), 120, T_('Title'), '', 255 );
+$Form->text( 'itcf_label', get_param( 'itcf_label' ), 120, T_('Label'), '', 255 );
 
 // Name:
 $Form->text( 'itcf_name', get_param( 'itcf_name' ), 60, T_('Name'), '', 255 );

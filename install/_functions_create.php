@@ -2083,8 +2083,8 @@ function create_default_templates( $is_task = true )
 </div>
 <div class="row">
 	<div class="col-lg-3 col-sm-4">
-		<h4>[Item:custom_field_title|field=ingredients]</h4>
-		<p>[Item:custom_field_formatted|field=ingredients]</p>
+		<h4>[Item:custom|field=ingredients|what=label]</h4>
+		<p>[Item:custom|field=ingredients]</p>
 	</div>
 	<div class="col-lg-9 col-sm-8">
 		<h4>Directions</h4>

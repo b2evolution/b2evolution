@@ -2183,7 +2183,15 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 	if( ! $inskin || $display_preview )
 	{
 		$url = url_same_protocol( $Blog->get( 'url' ) ); // was dynurl
-		$Form->button( array( 'button', '', /* TRANS: Verb */ T_('Preview'), 'PreviewButton', 'b2edit_open_preview(this.form, \''.$url.'\');', 'data-shortcut' => 'f9' ) );
+		echo '<div class="btn-group dropup PreviewButton">
+				<button type="button" class="btn btn-info" onclick="return b2edit_open_preview( this.form, \''.$url.'\' )" data-shortcut="f9">'./* TRANS: Verb */ T_('Preview').'</button>
+				<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li role="presentation"><a onclick="return b2edit_open_preview( forms.item_checkchanges, \''.$url.'\', true )" class="pointer"><span class="fa fa-square-o orange"></span> <span>'.TB_('Preview blocks').'</span></a></li>
+				</ul>
+			</div>';
 	}
 
 	// ---------- VISIBILITY ----------

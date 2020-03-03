@@ -1248,7 +1248,7 @@ class MarkdownImport extends AbstractImport
 				'link_position'  => 'inline',
 			), $params );
 
-		$requested_file_relative_path = ltrim( str_replace( '\\', '/', $requested_file_relative_path ), '/' );
+		$requested_file_relative_path = ltrim( str_replace( '\\', '/', urldecode( $requested_file_relative_path ) ), '/' );
 
 		$source_file_relative_path = $source_category_folder.'/'.$requested_file_relative_path;
 		$file_source_path = $source_folder_absolute_path.'/'.$source_file_relative_path;
@@ -1271,7 +1271,9 @@ class MarkdownImport extends AbstractImport
 
 		$FileCache = & get_FileCache();
 
-		$file_source_name = basename( $file_source_path );
+		// Get file name from path and replace all space chars with char "-":
+		$file_source_name = str_replace( ' ', '-', basename( $file_source_path ) );
+		// Get hash of file in order to find existing file in DB:
 		$file_source_hash = md5_file( $file_source_path, true );
 
 		// Try to find already existing File by hash in DB:

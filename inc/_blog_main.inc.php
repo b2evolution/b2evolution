@@ -449,6 +449,7 @@ if( $resolve_extra_path )
 param( 'p', 'integer', '', true );              // Specific post number to display
 param( 'title', 'string', '', 'auto' );			// urtitle of post to display
 param( 'preview', 'integer', 0, true );         // Is this preview ?
+param( 'preview_block', 'integer', 0, true ); // Should we display blocks of included content-block Items by short tag [include:] ?
 param( 'stats', 'integer', 0 );						// Deprecated but might still be used by spambots
 
 /*

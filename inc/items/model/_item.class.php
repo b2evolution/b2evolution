@@ -3328,7 +3328,7 @@ class Item extends ItemLight
 		// Make sure we are not missing any param:
 		$params = array_merge( array(
 				// required: 'field'
-				'what'   => 'formatted_value',	// TODO: support 'label'
+				'what'   => 'formatted_value', // 'label' - to display label of the custom field
  				'before' => ' ',
 				'after'  => ' ',
 			), $params );
@@ -3350,7 +3350,18 @@ class Item extends ItemLight
 		}
 
 		echo $params['before'];
-		echo $this->get_custom_field_formatted( $field_name, $params );
+
+		switch( $params['what'] )
+		{
+			case 'label':
+				echo $this->get_custom_field_title( $params['field'] );
+				break;
+
+			default: // formatted_value
+				echo $this->get_custom_field_formatted( $field_name, $params );
+				break;
+		}
+
 		echo $params['after'];
 	}
 
@@ -4203,6 +4214,17 @@ class Item extends ItemLight
 
 			// Update level inline tags like [---fields:] into [--fields:] in order to make them render by top caller level Item:
 			$current_tag_item_content = $this->update_level_inline_tags( $current_tag_item_content );
+
+			if( get_param( 'preview' ) === 1 && get_param( 'preview_block' ) === 1 )
+			{	// Display orange debug wrapper around included content-block Item:
+				$current_tag_item_content = '<div class="dev-blocks dev-blocks--content-block">'."\n"
+					.'<div class="dev-blocks-name">'
+						.$content_Item->get_edit_link( array( 'before' => '<span class="dev-blocks-action">', 'after' => '</span>', 'text' => T_('Edit') ) )
+						.'<b>'.$content_Item->get( 'title' ).'</b> ('.$content_Item->get( 'urltitle' ).')'
+					.'</div>'."\n"
+					.$current_tag_item_content."\n"
+				.'</div>';
+			}
 
 			// Replace inline content block tag with item content:
 			$content = str_replace( $source_tag, $current_tag_item_content, $content );

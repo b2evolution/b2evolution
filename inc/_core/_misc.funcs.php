@@ -9909,6 +9909,7 @@ function display_importer_upload_panel( $params = array() )
 	// Get available files to import from the folder /media/import/
 	$import_files = get_import_files( $params['folder'], $params['allowed_extensions'], $params['infolder_extensions'], $params['find_attachments'], $params['folder_with_extensions'] );
 
+	load_class( '_core/ui/_table.class.php', 'Table' );
 	$Table = new Table( NULL, 'import' );
 
 	$Table->cols = array();

@@ -98,6 +98,7 @@ $Form->begin_form( '', '', $params );
 
 	// In case we send this to the blog for a preview :
 	$Form->hidden( 'preview', 1 );
+	$Form->hidden( 'preview_block', 0 );
 	$Form->hidden( 'more', 1 );
 
 	// Post type
