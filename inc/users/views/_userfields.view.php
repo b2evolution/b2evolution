@@ -173,42 +173,31 @@ if( $current_User->check_perm( 'users', 'edit', false ) )
 /*
  * Data columns:
  */
-function ufdf_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name, $ufdf_code )
-{
-	global $current_User;
-
-	$field_icon = '<span class="uf_icon_block ufld_'.$ufdf_code.' ufld__textcolor">'
-			.( empty( $ufdf_icon_name ) ? '' : '<span class="'.$ufdf_icon_name.'"></span>' )
-		.'</span>';
-
-	if( $current_User->check_perm( 'users', 'edit' ) )
-	{ // We have permission to modify:
-		return $field_icon.'<a href="'.regenerate_url( 'action', 'ufdf_ID='.$ufdf_ID.'&amp;action=edit' ).'"><strong>'.T_( $ufdf_name ).'</strong></a>';
-	}
-	else
-	{
-		return $field_icon.'<strong>'.T_( $ufdf_name ).'</strong>';
-	}
-}
 $Results->cols[] = array(
 		'th' => T_('Name'),
-		'td' => '%ufdf_td_name( #ufdf_ID#, #ufdf_name#, #ufdf_icon_name#, #ufdf_code# )%',
+		'td' => '%userfield_td_name( #ufdf_ID#, #ufdf_name#, #ufdf_icon_name#, #ufdf_code# )%',
 	);
 
 $Results->cols[] = array(
 	'th' => T_('Type'),
-	'td' => '%T_(#ufdf_type#)%',
+	'td' => '%userfield_td_type( #ufdf_type# )%',
 );
 
 $Results->cols[] = array(
 		'th' => T_('Required?'),
-		'td' => '%get_userfield_required( #ufdf_required# )%',
+		'td' => '%userfield_td_required( #ufdf_required# )%',
+		'td_class' => 'center',
+	);
+
+$Results->cols[] = array(
+		'th' => T_('Visibility'),
+		'td' => '%userfield_td_visibility( #ufdf_visibility# )%',
 		'td_class' => 'center',
 	);
 
 $Results->cols[] = array(
 		'th' => T_('Multiple values'),
-		'td' => '$ufdf_duplicated$',
+		'td' => '%userfield_td_duplicate( #ufdf_duplicated# )%',
 		'td_class' => 'center',
 	);
 

@@ -130,6 +130,7 @@ $schema_queries = array(
 			ufdf_name       varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
 			ufdf_options    VARCHAR(255) COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,"/* Do NOT change this field back to TEXT without a very good reason. */."
 			ufdf_required   enum('hidden','optional','recommended','require') COLLATE ascii_general_ci NOT NULL default 'optional',
+			ufdf_visibility enum('unrestricted','private','admin') COLLATE ascii_general_ci NOT NULL default 'unrestricted',
 			ufdf_duplicated enum('forbidden','allowed','list') COLLATE ascii_general_ci NOT NULL default 'allowed',
 			ufdf_order      int(11) NOT NULL,
 			ufdf_suggest    tinyint(1) NOT NULL DEFAULT 0,

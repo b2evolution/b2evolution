@@ -126,16 +126,17 @@ function create_default_data()
 					 ( 'Instant Messaging', '2' ),
 					 ( 'Phone', '3' ),
 					 ( 'Web', '4' ),
-					 ( 'Address', '5' )" );
+					 ( 'Address', '5' ),
+					 ( 'Administrative', '6' )" );
 	task_end();
 
 	task_begin( 'Creating user field definitions... ' );
 	// fp> Anyone, please add anything you can think of. It's better to start with a large list that update it progressively.
 	$DB->query( "
-		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
-		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
-						( 1, 'word',   'I like',        NULL, 'recommended', 'list',      '2',  '1', 'ilike',        'fa fa-thumbs-o-up' ),
-						( 1, 'word',   'I don\'t like', NULL, 'recommended', 'list',      '3',  '1', 'idontlike',    'fa fa-thumbs-o-down' ),
+		INSERT INTO T_users__fielddefs (ufdf_ufgp_ID, ufdf_type, ufdf_name, ufdf_options, ufdf_required, ufdf_visibility, ufdf_duplicated, ufdf_order, ufdf_suggest, ufdf_code, ufdf_icon_name)
+		 VALUES ( 1, 'text',   'Micro bio',     NULL, 'recommended', 'unrestricted', 'forbidden', '1',  '0', 'microbio',     'fa fa-info-circle' ),
+						( 1, 'word',   'I like',        NULL, 'recommended', 'unrestricted', 'list',      '2',  '1', 'ilike',        'fa fa-thumbs-o-up' ),
+						( 1, 'word',   'I don\'t like', NULL, 'recommended', 'unrestricted', 'list',      '3',  '1', 'idontlike',    'fa fa-thumbs-o-down' ),
 						( 1, 'list',   'Industry',      'Energy, Utilities & Resources
 Financial Services
 Health Services
@@ -146,40 +147,41 @@ Public Sector
 Real Estate
 Retail & Consumer Goods
 Sports Business Advisory
-Technology, Media & Telecom',                     'recommended', 'allowed',   '4',  '1', 'industry',     'fa fa-industry' ),
-						( 2, 'email',  'MSN/Live IM',   NULL, 'optional',    'allowed',   '1',  '0', 'msnliveim',    NULL ),
-						( 2, 'word',   'Yahoo IM',      NULL, 'optional',    'allowed',   '2',  '0', 'yahooim',      'fa fa-yahoo' ),
-						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'allowed',   '3',  '0', 'aolaim',       NULL ),
-						( 2, 'number', 'ICQ ID',        NULL, 'optional',    'allowed',   '4',  '0', 'icqid',        NULL ),
-						( 2, 'phone',  'Skype',         NULL, 'optional',    'allowed',   '5',  '0', 'skype',        'fa fa-skype' ),
-						( 2, 'phone',  'WhatsApp',      NULL, 'optional',    'allowed',   '6',  '0', 'whatsapp',     'fa fa-whatsapp' ),
-						( 3, 'phone',  'Main phone',    NULL, 'optional',    'forbidden', '1',  '0', 'mainphone',    'fa fa-phone' ),
-						( 3, 'phone',  'Cell phone',    NULL, 'optional',    'allowed',   '2',  '0', 'cellphone',    'fa fa-mobile-phone' ),
-						( 3, 'phone',  'Office phone',  NULL, 'optional',    'allowed',   '3',  '0', 'officephone',  'fa fa-phone' ),
-						( 3, 'phone',  'Home phone',    NULL, 'optional',    'allowed',   '4',  '0', 'homephone',    'fa fa-phone' ),
-						( 3, 'phone',  'Office FAX',    NULL, 'optional',    'allowed',   '5',  '0', 'officefax',    'fa fa-fax' ),
-						( 3, 'phone',  'Home FAX',      NULL, 'optional',    'allowed',   '6',  '0', 'homefax',      'fa fa-fax' ),
-						( 4, 'url',    'Twitter',       NULL, 'recommended', 'forbidden', '1',  '0', 'twitter',      'fa fa-twitter' ),
-						( 4, 'url',    'Facebook',      NULL, 'recommended', 'forbidden', '2',  '0', 'facebook',     'fa fa-facebook' ),
-						( 4, 'url',    'Linkedin',      NULL, 'optional',    'forbidden', '4',  '0', 'linkedin',     'fa fa-linkedin fa-x-linkedin--nudge' ),
-						( 4, 'url',    'GitHub',        NULL, 'optional',    'forbidden', '5',  '0', 'github',       'fa fa-github-alt' ),
-						( 4, 'url',    'Website',       NULL, 'optional',    'allowed',   '6',  '0', 'website',      NULL ),
-						( 4, 'url',    'Blog',          NULL, 'optional',    'allowed',   '7',  '0', 'blog',         NULL ),
-						( 4, 'url',    'Myspace',       NULL, 'optional',    'forbidden', '8',  '0', 'myspace',      NULL ),
-						( 4, 'url',    'Flickr',        NULL, 'optional',    'forbidden', '9',  '0', 'flickr',       'fa fa-flickr' ),
-						( 4, 'url',    'YouTube',       NULL, 'optional',    'forbidden', '10', '0', 'youtube',      'fa fa-youtube' ),
-						( 4, 'url',    'Digg',          NULL, 'optional',    'forbidden', '11', '0', 'digg',         'fa fa-digg' ),
-						( 4, 'url',    'StumbleUpon',   NULL, 'optional',    'forbidden', '12', '0', 'stumbleupon',  'fa fa-stumbleupon' ),
-						( 4, 'url',    'Pinterest',     NULL, 'optional',    'forbidden', '13', '0', 'pinterest',    'fa fa-pinterest-p' ),
-						( 4, 'url',    'SoundCloud',    NULL, 'optional',    'forbidden', '14', '0', 'soundcloud',   'fa fa-soundcloud' ),
-						( 4, 'url',    'Yelp',          NULL, 'optional',    'forbidden', '15', '0', 'yelp',         'fa fa-yelp' ),
-						( 4, 'url',    'PayPal',        NULL, 'optional',    'forbidden', '16', '0', 'paypal',       'fa fa-paypal' ),
-						( 4, 'url',    '500px',         NULL, 'optional',    'forbidden', '17', '0', '500px',        'fa fa-500px' ),
-						( 4, 'url',    'Amazon',        NULL, 'optional',    'forbidden', '18', '0', 'amazon',       'fa fa-amazon' ),
-						( 4, 'url',    'Instagram',     NULL, 'optional',    'forbidden', '19', '0', 'instagram',    'fa fa-instagram' ),
-						( 4, 'url',    'Vimeo',         NULL, 'optional',    'forbidden', '20', '0', 'vimeo',        'fa fa-vimeo' ),
-						( 5, 'text',   'Main address',  NULL, 'optional',    'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
-						( 5, 'text',   'Home address',  NULL, 'optional',    'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' )" );
+Technology, Media & Telecom',                     'recommended', 'unrestricted', 'allowed',   '4',  '1', 'industry',     'fa fa-industry' ),
+						( 2, 'email',  'MSN/Live IM',   NULL, 'optional',    'unrestricted', 'allowed',   '1',  '0', 'msnliveim',    NULL ),
+						( 2, 'word',   'Yahoo IM',      NULL, 'optional',    'unrestricted', 'allowed',   '2',  '0', 'yahooim',      'fa fa-yahoo' ),
+						( 2, 'word',   'AOL AIM',       NULL, 'optional',    'unrestricted', 'allowed',   '3',  '0', 'aolaim',       NULL ),
+						( 2, 'number', 'ICQ ID',        NULL, 'optional',    'unrestricted', 'allowed',   '4',  '0', 'icqid',        NULL ),
+						( 2, 'phone',  'Skype',         NULL, 'optional',    'private',      'allowed',   '5',  '0', 'skype',        'fa fa-skype' ),
+						( 2, 'phone',  'WhatsApp',      NULL, 'optional',    'private',      'allowed',   '6',  '0', 'whatsapp',     'fa fa-whatsapp' ),
+						( 3, 'phone',  'Main phone',    NULL, 'optional',    'private',      'forbidden', '1',  '0', 'mainphone',    'fa fa-phone' ),
+						( 3, 'phone',  'Cell phone',    NULL, 'optional',    'private',      'allowed',   '2',  '0', 'cellphone',    'fa fa-mobile-phone' ),
+						( 3, 'phone',  'Office phone',  NULL, 'optional',    'private',      'allowed',   '3',  '0', 'officephone',  'fa fa-phone' ),
+						( 3, 'phone',  'Home phone',    NULL, 'optional',    'private',      'allowed',   '4',  '0', 'homephone',    'fa fa-phone' ),
+						( 3, 'phone',  'Office FAX',    NULL, 'optional',    'private',      'allowed',   '5',  '0', 'officefax',    'fa fa-fax' ),
+						( 3, 'phone',  'Home FAX',      NULL, 'optional',    'private',      'allowed',   '6',  '0', 'homefax',      'fa fa-fax' ),
+						( 4, 'url',    'Twitter',       NULL, 'recommended', 'unrestricted', 'forbidden', '1',  '0', 'twitter',      'fa fa-twitter' ),
+						( 4, 'url',    'Facebook',      NULL, 'recommended', 'unrestricted', 'forbidden', '2',  '0', 'facebook',     'fa fa-facebook' ),
+						( 4, 'url',    'Linkedin',      NULL, 'optional',    'unrestricted', 'forbidden', '4',  '0', 'linkedin',     'fa fa-linkedin fa-x-linkedin--nudge' ),
+						( 4, 'url',    'GitHub',        NULL, 'optional',    'unrestricted', 'forbidden', '5',  '0', 'github',       'fa fa-github-alt' ),
+						( 4, 'url',    'Website',       NULL, 'optional',    'unrestricted', 'allowed',   '6',  '0', 'website',      NULL ),
+						( 4, 'url',    'Blog',          NULL, 'optional',    'unrestricted', 'allowed',   '7',  '0', 'blog',         NULL ),
+						( 4, 'url',    'Myspace',       NULL, 'optional',    'unrestricted', 'forbidden', '8',  '0', 'myspace',      NULL ),
+						( 4, 'url',    'Flickr',        NULL, 'optional',    'unrestricted', 'forbidden', '9',  '0', 'flickr',       'fa fa-flickr' ),
+						( 4, 'url',    'YouTube',       NULL, 'optional',    'unrestricted', 'forbidden', '10', '0', 'youtube',      'fa fa-youtube' ),
+						( 4, 'url',    'Digg',          NULL, 'optional',    'unrestricted', 'forbidden', '11', '0', 'digg',         'fa fa-digg' ),
+						( 4, 'url',    'StumbleUpon',   NULL, 'optional',    'unrestricted', 'forbidden', '12', '0', 'stumbleupon',  'fa fa-stumbleupon' ),
+						( 4, 'url',    'Pinterest',     NULL, 'optional',    'unrestricted', 'forbidden', '13', '0', 'pinterest',    'fa fa-pinterest-p' ),
+						( 4, 'url',    'SoundCloud',    NULL, 'optional',    'unrestricted', 'forbidden', '14', '0', 'soundcloud',   'fa fa-soundcloud' ),
+						( 4, 'url',    'Yelp',          NULL, 'optional',    'unrestricted', 'forbidden', '15', '0', 'yelp',         'fa fa-yelp' ),
+						( 4, 'url',    'PayPal',        NULL, 'optional',    'unrestricted', 'forbidden', '16', '0', 'paypal',       'fa fa-paypal' ),
+						( 4, 'url',    '500px',         NULL, 'optional',    'unrestricted', 'forbidden', '17', '0', '500px',        'fa fa-500px' ),
+						( 4, 'url',    'Amazon',        NULL, 'optional',    'unrestricted', 'forbidden', '18', '0', 'amazon',       'fa fa-amazon' ),
+						( 4, 'url',    'Instagram',     NULL, 'optional',    'unrestricted', 'forbidden', '19', '0', 'instagram',    'fa fa-instagram' ),
+						( 4, 'url',    'Vimeo',         NULL, 'optional',    'unrestricted', 'forbidden', '20', '0', 'vimeo',        'fa fa-vimeo' ),
+						( 5, 'text',   'Main address',  NULL, 'optional',    'private',      'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
+						( 5, 'text',   'Home address',  NULL, 'optional',    'private',      'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' ),
+						( 6, 'text',   'Admin notes',   NULL, 'recommended', 'admin',        'forbidden', '2',  '0', 'adminnotes',   'fa fa-edit' )" );
 	task_end();
 
 

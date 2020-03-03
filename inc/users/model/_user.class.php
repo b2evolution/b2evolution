@@ -1149,6 +1149,11 @@ class User extends DataObject
 					continue;
 				}
 
+				if( ! userfield_is_viewable( $this->userfield_defs[$userfield->uf_ufdf_ID][5], $this->ID ) )
+				{	// Current user cannot update the user field:
+					continue;
+				}
+
 				$uf_val = param( 'uf_'.$userfield->uf_ID, 'raw' );
 				$field_type = $this->userfield_defs[$userfield->uf_ufdf_ID][0];
 				if( $field_type == 'number' )
@@ -1318,6 +1323,11 @@ class User extends DataObject
 					}
 					foreach( $uf_new_fields as $uf_new_id => $uf_new_vals )
 					{
+						if( ! userfield_is_viewable( $this->userfield_defs[$uf_new_id][5], $this->ID ) )
+						{	// Current user cannot add the user field:
+							continue;
+						}
+
 						foreach( $uf_new_vals as $uf_new_val )
 						{
 							if( $this->userfield_defs[$uf_new_id][0] == 'list' && $uf_new_val == '---' )
@@ -5528,10 +5538,10 @@ class User extends DataObject
 			return;
 		}
 
-		global $DB;
+		global $DB, $current_User;
 
 		$SQL = new SQL( 'Load values of user fields for User #'.$this->ID );
-		$SQL->SELECT( 'uf_ID, ufdf_ID, uf_varchar, ufdf_duplicated, ufdf_type, ufdf_name, ufdf_icon_name, ufdf_code, ufgp_ID, ufgp_name' );
+		$SQL->SELECT( 'uf_ID, ufdf_ID, uf_varchar, ufdf_duplicated, ufdf_type, ufdf_name, ufdf_icon_name, ufdf_code, ufgp_ID, ufgp_name, ufdf_visibility' );
 		$SQL->FROM( 'T_users__fields' );
 		$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
 		$SQL->FROM_add( 'INNER JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID' );
@@ -5541,8 +5551,14 @@ class User extends DataObject
 		$userfields = $DB->get_results( $SQL );
 
 		$userfield_lists = array();
-		foreach( $userfields as $userfield )
+		foreach( $userfields as $u => $userfield )
 		{
+			if( ! userfield_is_viewable( $userfield->ufdf_visibility, $this->ID ) )
+			{	// Current user cannot view this user field:
+				unset( $userfields[ $u ] );
+				continue;
+			}
+
 			if( $userfield->ufdf_duplicated == 'list' )
 			{ // Prepare a values of list into one array
 				if( !isset( $userfield_lists[$userfield->ufdf_ID] ) )
@@ -5591,10 +5607,10 @@ class User extends DataObject
 	{
 		global $DB;
 
-		if( !isset($this->userfield_defs) )
+		if( ! isset( $this->userfield_defs ) )
 		{
 			$SQL = new SQL( 'Load user field definitions' );
-			$SQL->SELECT( 'ufdf_ID, ufdf_type, ufdf_name, ufdf_required, ufdf_options, ufdf_duplicated' );
+			$SQL->SELECT( 'ufdf_ID, ufdf_type, ufdf_name, ufdf_required, ufdf_options, ufdf_duplicated, ufdf_visibility' );
 			$SQL->FROM( 'T_users__fielddefs' );
 			$userfield_defs = $DB->get_results( $SQL );
 
@@ -5605,7 +5621,8 @@ class User extends DataObject
 					$userfield_def->ufdf_name,
 					$userfield_def->ufdf_required,
 					$userfield_def->ufdf_options,
-					$userfield_def->ufdf_duplicated
+					$userfield_def->ufdf_duplicated,
+					$userfield_def->ufdf_visibility,
 				); //jamesz
 			}
 		}

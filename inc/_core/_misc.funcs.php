@@ -5261,7 +5261,12 @@ function get_icon( $iconKey, $what = 'imgtag', $params = NULL, $include_in_legen
 				}
 
 				$styles = array();
-				if( isset( $icon['color-'.$icon_param_name] ) )
+				if( isset( $params['color'] ) )
+				{	// Set color from params:
+					$styles[] = 'color:'.$params['color'];
+					unset( $params['color'] );
+				}
+				elseif( isset( $icon['color-'.$icon_param_name] ) )
 				{ // Set a color for icon only for current type
 					if( $icon['color-'.$icon_param_name] != 'default' )
 					{
