@@ -12416,7 +12416,18 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 
 		db_upgrade_cols( 'T_templates', array(
 			'MODIFY' => array(
-				'tpl_context' => 'ENUM( "custom1", "custom2", "custom3", "content_list_master", "content_list_item",	"content_list_category", "content_block", "item_details", "item_content", "registration" ) COLLATE ascii_general_ci NOT NULL DEFAULT "custom1"',
+				'tpl_context' => 'ENUM( "custom1", "custom2", "custom3", "content_list_master", "content_list_item", "content_list_category", "content_block", "item_details", "item_content", "registration" ) COLLATE ascii_general_ci NOT NULL DEFAULT "custom1"',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15920, 'Updating templates table...' ) )
+	{	// part of 7.1.2-beta
+
+		db_upgrade_cols( 'T_templates', array(
+			'MODIFY' => array(
+				'tpl_context' => 'ENUM( "custom1", "custom2", "custom3", "content_list_master", "content_list_item", "content_list_category", "content_block", "item_details", "item_content", "registration_master", "registration" ) COLLATE ascii_general_ci NOT NULL DEFAULT "custom1"',
 			),
 		) );
 		upg_task_end();

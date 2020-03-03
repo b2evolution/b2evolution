@@ -2120,9 +2120,9 @@ function create_default_templates( $is_task = true )
 */
 
 		// Registration Templates:
-		'registration_master_standard' => array(   // Should become registration_master
+		'registration_master_standard' => array(
 			'name'     => 'Registration: Standard',
-			'context'  => 'custom1',  // should become registration_master
+			'context'  => 'registration_master',
 			'template' => '
 [set:reg1_template=registration_standard]
 [set:reg1_required=login,password,email]
@@ -2153,7 +2153,7 @@ function create_default_templates( $is_task = true )
 		// Registration Templates:
 		'registration_master_ask_name' => array(   
 			'name'     => 'Registration: Ask for Name',
-			'context'  => 'custom1',  // should become registration_master
+			'context'  => 'registration_master',
 			'template' => '
 [set:reg1_template=registration_ask_name]
 [set:reg1_required=login,firstname,password,email]
@@ -2183,7 +2183,7 @@ function create_default_templates( $is_task = true )
 		// Registration Templates:
 		'registration_master_email_social' => array(   
 			'name'     => 'Registration: email & social buttons',
-			'context'  => 'custom1',  // should become registration_master
+			'context'  => 'registration_master',
 			'template' => '
 [set:reg1_template=registration_email_social]
 [set:reg1_required=email]

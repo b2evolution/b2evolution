@@ -520,8 +520,6 @@ function create_default_settings( $override = array() )
 	{
 		$defaults['gender_colored'] = 1;
 		echo_install_log( 'TEST FEATURE: Enabling colored gender usernames by default' );
-		$defaults['registration_require_country'] = 1;
-		$defaults['registration_require_gender'] = 'required';
 		echo_install_log( 'TEST FEATURE: Making country and gender required on registration' );
 		$defaults['location_country'] = 'required';
 		$defaults['location_region'] = 'required';

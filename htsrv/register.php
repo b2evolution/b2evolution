@@ -42,20 +42,23 @@ if( empty( $session_registration_trigger_url ) && isset( $_SERVER['HTTP_REFERER'
 	$Session->set( 'registration_trigger_url', $session_registration_trigger_url );
 }
 
+// Get required fields from registration master template:
+$required_fields = get_registration_template_required_fields();
+
 // Check if email is required
 $registration_require_email = true;
 // Check if country is required
-$registration_require_country = (bool)$Settings->get('registration_require_country');
+$registration_require_country = in_array( 'country', $required_fields );
 // Check if firstname is required
-$registration_require_firstname = (bool)$Settings->get('registration_require_firstname');
+$registration_require_firstname = in_array( 'firstname', $required_fields );
 // Check if firstname is required (It can be required for quick registration by widget)
-$registration_require_lastname = (bool)$Settings->get('registration_require_lastname');
+$registration_require_lastname = in_array( 'lastname', $required_fields );
 // Check if nickname is required
-$registration_require_nickname = false;
+$registration_require_nickname = in_array( 'nickname', $required_fields );
 // Check if gender is required
-$registration_require_gender = $Settings->get('registration_require_gender');
+$registration_require_gender = in_array( 'gender', $required_fields );
 // Check if registration ask for locale
-$registration_ask_locale = $Settings->get('registration_ask_locale');
+$registration_ask_locale = in_array( 'locale', $required_fields );
 
 // Do not set email:
 $ignore_email = false;

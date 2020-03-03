@@ -611,31 +611,30 @@ class User extends DataObject
 		$locale = param( 'locale', 'string', '' );
 
 		// Set params:
+		$required_fields = get_registration_template_required_fields();
+
 		$paramsList = array();
-		if( $Settings->get( 'registration_require_country' ) )
+		if( in_array( 'country', $required_fields ) )
 		{	// Set and check country:
 			$this->set( 'ctry_ID', $country );
 			$paramsList['country'] = $country;
 		}
-		if( $Settings->get( 'registration_require_firstname' ) )
+		if( in_array( 'firstname', $required_fields ) )
 		{	// Set and check first name:
 			$this->set( 'firstname', $firstname );
 			$paramsList['firstname'] = $firstname;
 		}
-		if( $Settings->get( 'registration_require_lastname') )
+		if( in_array( 'lastname', $required_fields ) )
 		{	// Set last name:
 			$this->set( 'lastname', $lastname );
 			$paramsList['lastname'] = $lastname;
 		}
-		if( $Settings->get( 'registration_require_gender' ) == 'required' || $Settings->get( 'registration_require_gender' ) == 'optional' )
+		if( in_array( 'gender', $required_fields ) )
 		{	// Set or check gender:
 			$this->set( 'gender', $gender );
-			if( $Settings->get( 'registration_require_gender' ) == 'required' )
-			{	// Check gender because it is mandatory:
-				$paramsList['gender'] = $gender;
-			}
+			$paramsList['gender'] = $gender;
 		}
-		if( $Settings->get( 'registration_ask_locale' ) )
+		if( in_array( 'country', $required_fields ) )
 		{	// Only update locale without checking:
 			$this->set( 'locale', $locale );
 		}
@@ -1036,13 +1035,11 @@ class User extends DataObject
 				}
 			}
 
-			$gender_editing = $Settings->get( 'registration_require_gender' );
-			if( $this->ID == $current_User->ID || ( $gender_editing != 'hidden' && $has_moderate_access ) )
-			{
+			if( $this->ID == $current_User->ID || $has_moderate_access )
+			{	// No user latitude setting:
 				$edited_user_gender = param( 'edited_user_gender', 'string' );
 				if( isset( $edited_user_gender ) || $is_identity_form )
 				{
-					param_check_gender( 'edited_user_gender', $gender_editing == 'required' );
 					$this->set_from_Request('gender', 'edited_user_gender', true);
 				}
 			}

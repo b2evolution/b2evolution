@@ -99,7 +99,7 @@ else if( $activated_User->gender == 'F' )
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('I am').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.T_('A woman').'</td></tr>'."\n";
 }
 
-if( $Settings->get( 'registration_ask_locale' ) && $activated_User->locale != '' )
+if( in_array( 'locale', get_registration_template_required_fields() ) && $activated_User->locale != '' )
 { // Locale field is defined
 	global $locales;
 	echo '<tr><th'.emailskin_style( 'table.email_table th' ).'>'.T_('Locale').':</th><td'.emailskin_style( 'table.email_table td' ).'>'.$locales[$activated_User->locale]['name'].'</td></tr>'."\n";

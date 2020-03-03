@@ -1855,6 +1855,46 @@ function social_profile_check_params( $params, $provider )
 
 
 /**
+ * Get required fields from registration master template
+ * 
+ * @param string Registration master template code
+ * @return array List of fieldnames required by template
+ */
+function get_registration_template_required_fields( $template_code = NULL )
+{
+	global $Settings;
+	
+	$required_fields = array();
+
+	if( empty( $template_code ) )
+	{
+		$template_code = $Settings->get( 'registration_master_template' );
+	}
+
+	$TemplateCache = & get_TemplateCache();
+	if( ! $TemplateCache->get_by_code( $template_code, false, false ) )
+	{	// Template not found:
+		debug_die( 'Template <code>'.$template_code.'</code> not found!' );
+	}
+
+	$temp_params = array();
+
+	// Render MASTER quick template:
+	// In theory, this should not display anything.
+	// Instead, this should set variables to define sub-templates (and potentially additional variables)
+	echo render_template_code( $template_code, /* BY REF */ $temp_params );
+
+	// Get required fields defined by master template:
+	if( isset( $temp_params['reg1_required'] ) )
+	{
+		$required_fields = array_map( 'trim', explode( ',', $temp_params['reg1_required'] ) );
+	}
+
+	return $required_fields;
+}
+
+
+/**
  * Get avatar <img> tag by user login
  *
  * @param string user login

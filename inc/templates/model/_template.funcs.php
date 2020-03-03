@@ -312,7 +312,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					'value'      => $country,
 					'label'      => T_('Country'),
 					'allow_none' => true,
-					'required'   => $Settings->get( 'registration_require_country' ),
+					'required'   => isset( $params['reg1_required'] ) ? in_array( 'country', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'class'      => '',
 					'hide_label' => false,
 					'style'      => '',
@@ -341,7 +341,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					'bottom_note' => T_('We respect your privacy. Your email will remain strictly confidential.'),
 					'maxlength'   => 255,
 					'class'       => 'input_text wide_input',
-					'required'    => true,
+					'required'    => isset( $params['reg1_required'] ) ? in_array( 'email', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'class'      => '',
 					'hide_label' => false,
 					'style'      => '',
@@ -365,7 +365,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					'placeholder' => '',
 					'maxlength'   => 50,
 					'class'       => 'input_text',
-					'required'    => $Settings->get( 'registration_require_firstname' ),
+					'required'    => isset( $params['reg1_required'] ) ? in_array( 'firstname', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'class'      => '',
 					'hide_label' => false,
 					'style'      => '',
@@ -384,7 +384,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					'name' => 'gender',
 					'value' => $gender,
 					'label' => T_('I am'),
-					'required' => ( $Settings->get( 'registration_require_gender' ) == 'required' ),
+					'required' => isset( $params['reg1_required'] ) ? in_array( 'gender', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'class'      => '',
 					'hide_label' => false,
 					'style'      => '',
@@ -412,7 +412,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					'placeholder' => '',
 					'maxlength'   => 50,
 					'class'       => 'input_text',
-					'required'    => $Settings->get( 'registration_require_lastname' ),
+					'required'    => isset( $params['reg1_required'] ) ? in_array( 'lastname', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'class'      => '',
 					'hide_label' => false,
 					'style'      => '',
@@ -433,13 +433,14 @@ function render_template_callback( $var, $params, $objects = array() )
 					'class'    => '',
 					'note'     => T_('Preferred language'),
 					'class'      => '',
+					'required'   => isset( $params['reg1_required'] ) ? in_array( 'locale', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'hide_label' => false,
 					'style'      => '',
 				);
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
 			
-			$rendered_Form->select( $temp_params['name'], $temp_params['value'], 'locale_options_return', $temp_params['label'], $temp_params['note'], $temp_params['class'] );
+			$rendered_Form->select_input( $temp_params['name'], $temp_params['value'], 'locale_options_return', $temp_params['label'], $temp_params );
 			break;
 
 		case 'Form:login':
@@ -459,7 +460,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					'placeholder'  => $params['register_use_placeholders'] ? T_('Choose a username') : '',
 					'maxlength'    => 20,
 					'class'        => 'input_text',
-					'required'     => true,
+					'required'     => isset( $params['reg1_required'] ) ? in_array( 'login', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'input_suffix' => ' <span id="login_status"></span><span class="help-inline"><div id="login_status_msg" class="red"></div></span>',
 					'style'        => 'width:'.( $params['register_field_width'] - 2 ).'px',
 					'class'      => '',
@@ -484,7 +485,7 @@ function render_template_callback( $var, $params, $objects = array() )
 					'placeholder'  => $params['register_use_placeholders'] ? T_('Choose a password') : '',
 					'maxlength'    => 70,
 					'class'        => 'input_text',
-					'required'     => true,
+					'required'     => isset( $params['reg1_required'] ) ? in_array( 'password', array_map( 'trim', explode( ',', $params['reg1_required'] ) ) ) : false,
 					'style'        => 'width:'.$params['register_field_width'].'px',
 					'autocomplete' => 'off',
 					'class'      => '',
@@ -923,6 +924,6 @@ function get_template_contexts()
 	return array(
 		'custom1', 'custom2', 'custom3',
 		'content_list_master', 'content_list_item', 'content_list_category',
-		'content_block', 'item_details', 'item_content', 'registration' );
+		'content_block', 'item_details', 'item_content', 'registration_master', 'registration' );
 }
 ?>

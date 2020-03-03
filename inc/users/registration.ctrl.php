@@ -103,11 +103,7 @@ switch ( $action )
 		param( 'strict_logins', 'integer', 0 );
 		param( 'registration_after_quick', 'string', '' );
 		param( 'registration_no_username', 'string', '' );
-		param( 'registration_require_country', 'integer', 0 );
-		param( 'registration_require_firstname', 'integer', 0 );
-		param( 'registration_require_lastname', 'integer', 0 );
-		param( 'registration_ask_locale', 'integer', 0 );
-		param( 'registration_require_gender', 'string', '' );
+		param( 'registration_master_template', 'string', '' );
 
 		// We are about to allow non-ASCII logins
 		// Let's check if there are users with logins starting with reserved prefix usr_
@@ -172,11 +168,7 @@ switch ( $action )
 					 array( 'strict_logins', $strict_logins ),
 					 array( 'registration_after_quick', $registration_after_quick ),
 					 array( 'registration_no_username', $registration_no_username ),
-					 array( 'registration_require_country', $registration_require_country ),
-					 array( 'registration_require_firstname', $registration_require_firstname ),
-					 array( 'registration_require_lastname', $registration_require_lastname ),
-					 array( 'registration_ask_locale', $registration_ask_locale ),
-					 array( 'registration_require_gender', $registration_require_gender )
+					 array( 'registration_master_template', $registration_master_template ),
 				) );
 
 		if( ! $Messages->has_errors() )

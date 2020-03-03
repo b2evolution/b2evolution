@@ -23,7 +23,7 @@ global $Settings;
 
 global $collections_Module, $Plugins;
 
-global $baseurl;
+global $baseurl, $admin_url, $current_User, $Blog;
 
 $Form = new Form( NULL, 'settings_checkchanges' );
 $Form->begin_form( 'fform', '',
@@ -86,19 +86,13 @@ $Form->begin_fieldset( T_('Standard registration').get_manual_link('default-user
 		$disabled_param_grouplevel['disabled'] = 'disabled';
 	}
 
-	$Form->checkbox_input( 'registration_require_firstname', $Settings->get('registration_require_firstname'), T_('Require first name'), array( 'note'=>T_('New users will have to specify their first name in order to register.') ) );
+	$context = 'registration_master';
+	$TemplateCache = & get_TemplateCache();
+	$TemplateCache->load_by_context( $context );
 
-	$Form->checkbox_input( 'registration_require_lastname', $Settings->get('registration_require_lastname'), T_('Require last name'), array( 'note'=>T_('New users will have to specify their last name in order to register.') ) );
-
-	$Form->checkbox_input( 'registration_require_country', $Settings->get('registration_require_country'), T_('Require country'), array( 'note'=>T_('New users will have to specify their country in order to register.') ) );
-
-	$Form->checkbox_input( 'registration_ask_locale', $Settings->get('registration_ask_locale'), T_('Ask for language'), array( 'note'=>T_('New users will be prompted for their preferred language/locale.') ) );
-
-	$Form->radio( 'registration_require_gender',$Settings->get('registration_require_gender'), array(
-					array( 'hidden', T_('Hidden') ),
-					array( 'optional', T_('Optional') ),
-					array( 'required', T_('Required') ),
-				), T_('Ask for / require gender'), false );
+	$template_input_suffix = ( $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+		.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context.( isset( $Blog ) ? '&amp;blog='.$Blog->ID : '' ), NULL, NULL, NULL, array( 'onclick' => 'return b2template_list_highlight( this )' ), array( 'title' => T_('Manage templates').'...' ) ) : '' );
+	$Form->select_input_array( 'registration_master_template', $Settings->get( 'registration_master_template' ), $TemplateCache->get_code_option_array(), T_('Registration master template'), NULL, array( 'input_suffix' => $template_input_suffix ) );
 
 $Form->end_fieldset();
 
