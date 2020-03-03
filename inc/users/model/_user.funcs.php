@@ -1575,14 +1575,82 @@ function get_user_contacts_url()
 
 
 /**
- * Get colored tag with user field "required"
+ * Helper function to display user field "name" in table list
  *
- * @param string required value
- * @param integer user ID for the requested user. If isn't set then return $current_User settings url.
+ * @param string Field ID
+ * @param string Field name
+ * @param string Field icon name
+ * @param string Field code
+ * @return string
  */
-function get_userfield_required( $value )
+function userfield_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name, $ufdf_code )
 {
-	return '<span class="userfield '.$value.'">'.T_( $value ).'</span>';
+	global $current_User;
+
+	$field_icon = '<span class="uf_icon_block ufld_'.$ufdf_code.' ufld__textcolor">'
+			.( empty( $ufdf_icon_name ) ? '' : '<span class="'.$ufdf_icon_name.'"></span>' )
+		.'</span>';
+
+	if( $current_User->check_perm( 'users', 'edit' ) )
+	{ // We have permission to modify:
+		return $field_icon.'<a href="'.regenerate_url( 'action', 'ufdf_ID='.$ufdf_ID.'&amp;action=edit' ).'"><strong>'.T_( $ufdf_name ).'</strong></a>';
+	}
+	else
+	{
+		return $field_icon.'<strong>'.T_( $ufdf_name ).'</strong>';
+	}
+}
+
+
+/**
+ * Helper function to display user field "Type" in table list
+ *
+ * @param string Value
+ * @return string Title
+ */
+function userfield_td_type( $value )
+{
+	$titles = Userfield::get_types();
+	return isset( $titles[ $value ] ) ? $titles[ $value ] : $value;
+}
+
+
+/**
+ * Helper function to display user field "Required" in table list
+ *
+ * @param string Value
+ * @return string Title
+ */
+function userfield_td_required( $value )
+{
+	$titles = Userfield::get_requireds();
+	return isset( $titles[ $value ] ) ? $titles[ $value ] : $value;
+}
+
+
+/**
+* Helper function to display user field "Visibility" in table list
+ *
+ * @param string Value
+ * @return string Title
+ */
+function userfield_td_visibility( $value )
+{
+	$titles = Userfield::get_visibilities();
+	return isset( $titles[ $value ] ) ? $titles[ $value ] : $value;
+}
+
+
+/**
+ * Get user field "Visibility"
+ *
+ * @param string Value
+ * @return string Title
+ */
+function userfield_td_duplicate( $value )
+{
+	$titles = Userfield::get_duplicateds();
+	return isset( $titles[ $value ] ) ? $titles[ $value ] : $value;
 }
 
 
@@ -1851,6 +1919,46 @@ function social_profile_check_params( $params, $provider )
 			param_error( $params['gender'][1], T_('Gender value is invalid'), NULL, $error_messages_header );
 		}
 	}
+}
+
+
+/**
+ * Get required fields from registration master template
+ * 
+ * @param string Registration master template code
+ * @return array List of fieldnames required by template
+ */
+function get_registration_template_required_fields( $template_code = NULL )
+{
+	global $Settings;
+	
+	$required_fields = array();
+
+	if( empty( $template_code ) )
+	{
+		$template_code = $Settings->get( 'registration_master_template' );
+	}
+
+	$TemplateCache = & get_TemplateCache();
+	if( ! $TemplateCache->get_by_code( $template_code, false, false ) )
+	{	// Template not found:
+		debug_die( 'Template <code>'.$template_code.'</code> not found!' );
+	}
+
+	$temp_params = array();
+
+	// Render MASTER quick template:
+	// In theory, this should not display anything.
+	// Instead, this should set variables to define sub-templates (and potentially additional variables)
+	echo render_template_code( $template_code, /* BY REF */ $temp_params );
+
+	// Get required fields defined by master template:
+	if( isset( $temp_params['reg1_required'] ) )
+	{
+		$required_fields = array_map( 'trim', explode( ',', $temp_params['reg1_required'] ) );
+	}
+
+	return $required_fields;
 }
 
 
@@ -3568,7 +3676,7 @@ function callback_options_user_new_fields( $value = 0 )
 
 	// Get list of possible field types:
 	$userfielddefs = $DB->get_results( '
-		SELECT ufdf_ID, ufdf_type, ufdf_name, ufgp_ID, ufgp_name, ufdf_suggest
+		SELECT ufdf_ID, ufdf_type, ufdf_name, ufgp_ID, ufgp_name, ufdf_suggest, ufdf_visibility
 		  FROM T_users__fielddefs
 		  LEFT JOIN T_users__fieldgroups ON ufgp_ID = ufdf_ufgp_ID
 		 WHERE ufdf_required != "hidden"
@@ -3586,6 +3694,11 @@ function callback_options_user_new_fields( $value = 0 )
 		$current_group_ID = 0;
 		foreach( $userfielddefs as $f => $fielddef )
 		{
+			if( ! userfield_is_viewable( $fielddef->ufdf_visibility, $edited_User->ID ) )
+			{	// Current user cannot add the user field:
+				continue;
+			}
+
 			if( $fielddef->ufgp_ID != $current_group_ID )
 			{	// New group
 				if( $f != 0 )
@@ -3614,6 +3727,43 @@ function callback_options_user_new_fields( $value = 0 )
 
 
 /**
+ * Check if user field can be viewable for current User
+ *
+ * @param string User field visibility
+ * @param integer ID of displayed user, NULL - for current User
+ * @return boolean
+ */
+function userfield_is_viewable( $user_field_visibility, $user_ID = NULL )
+{
+	global $current_User;
+
+	if( $user_ID === NULL && is_logged_in() )
+	{	// Use current User ID:
+		$user_ID = $current_User->ID;
+	}
+
+	switch( $user_field_visibility )
+	{
+		case 'unrestricted':
+			// The field is unrestricted
+			return true;
+
+		case 'private':
+			// Owner and admins can view this user field:
+			return is_logged_in() && ( $current_User->ID == $user_ID || $current_User->can_moderate_user( $user_ID ) );
+
+		case 'admin':
+			// Only admins can view this user field:
+			return is_logged_in() && $current_User->can_moderate_user( $user_ID );
+
+		default:
+			// Unknown visibility:
+			return false;
+	}
+}
+
+
+/**
  * Display user fields from given array
  *
  * @param array User fields given from sql query with following structure:
@@ -3623,14 +3773,16 @@ function callback_options_user_new_fields( $value = 0 )
  * 						ufdf_name
  * 						uf_varchar
  * 						ufdf_required
+ * 						ufdf_visibility
  * 						ufdf_option
  * @param object Form
  * @param string Field name of the new fields ( new | add )
  * @param boolean Add a fieldset for group or don't
+ * @param integer ID of displayed user, NULL - for current User
  */
-function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_group_fieldset = true )
+function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_group_fieldset = true, $user_ID = NULL )
 {
-	global $action;
+	global $action, $current_User;
 
 	// Array contains values of the new fields from the request
 	$uf_new_fields = param( 'uf_'.$new_field_name, 'array' );
@@ -3643,6 +3795,11 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 	{
 		if( empty( $userfield->ufgp_ID ) )
 		{	// Don't display user field without group, because the user field definition was deleted from DB incorrectly:
+			continue;
+		}
+
+		if( ! userfield_is_viewable( $userfield->ufdf_visibility, $user_ID ) )
+		{	// Current user cannot view this user field:
 			continue;
 		}
 
@@ -3695,6 +3852,14 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 
 		$field_note = '';
 		$field_size = 40;
+
+		if( $userfield->ufdf_visibility == 'private' || $userfield->ufdf_visibility == 'admin' )
+		{	// Field visibility icon:
+			$field_note .= get_icon( 'file_not_allowed', 'imgtag', array(
+				'title' => ( $userfield->ufdf_visibility == 'private' ? T_('This field cannot be seen by other users.') : T_('This field can only be seen by admins.') ),
+				'color' => ( $userfield->ufdf_visibility == 'private' ? '#5bc0de' : '#F00' ) ) ).' ';
+		}
+
 		if( $action != 'view' )
 		{
 			if( in_array( $userfield->ufdf_duplicated, array( 'allowed', 'list' ) ) )

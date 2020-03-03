@@ -264,14 +264,13 @@ if( $action != 'view' )
 		$Form->text_input( 'edited_user_nickname', $edited_User->nickname, 20, T_('Nickname'), '', array( 'maxlength' => 50, 'required' => ( $nickname_editing == 'edited-user-required' ) ) );
 	}
 
-	$gender_editing = $Settings->get( 'registration_require_gender' );
-	if( $gender_editing != 'hidden' && ( $edited_User->ID == $current_User->ID || $has_moderate_access ) )
+	if( $edited_User->ID == $current_User->ID || $has_moderate_access )
 	{
 		$Form->radio( 'edited_user_gender', $edited_User->get('gender'), array(
 				array( 'M', T_('A man') ),
 				array( 'F', T_('A woman') ),
 				array( 'O', T_('Other') ),
-			), T_('I am'), false, '', $Settings->get( 'registration_require_gender' ) == 'required' );
+			), T_('I am'), false, '' );
 	}
 
 	$button_refresh_regional = '<button id="%s" type="submit" name="actionArray[refresh_regional]" class="action_icon refresh_button">'.get_icon( 'refresh' ).'</button>';
@@ -653,10 +652,10 @@ else
 
 // -------------------  Get existing userfields: -------------------------------
 $userfields = $DB->get_results( '
-SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, uf_varchar, ufdf_required, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
+SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
 FROM
 	(
-		SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, uf_varchar, ufdf_required, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
+		SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
 			FROM T_users__fields
 				LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
 				LEFT JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
@@ -664,7 +663,7 @@ FROM
 
 		UNION
 
-		SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
+		SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
 			FROM T_users__fielddefs
 				LEFT JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
 		WHERE ufdf_required IN ( "recommended", "require" )
@@ -672,7 +671,7 @@ FROM
 	) tfields
 ORDER BY ufgp_order, ufdf_order, uf_ID' );
 
-userfields_display( $userfields, $Form );
+userfields_display( $userfields, $Form, 'new', true, $user_id );
 
 if( $action != 'view' )
 {	// Edit mode
@@ -689,12 +688,12 @@ $Form->begin_fieldset( T_('Add new fields').( is_admin_page() ? get_manual_link(
 			foreach( $add_field_types as $add_field_type )
 			{	// We use "foreach" because sometimes the user adds several fields with the same type
 				$userfields = $DB->get_results( '
-				SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required, ufdf_options, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
+				SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
 					FROM T_users__fielddefs
 						LEFT JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
 				WHERE ufdf_ID = '.intval( $add_field_type ) );
 
-				userfields_display( $userfields, $Form, 'add', false );
+				userfields_display( $userfields, $Form, 'add', false, $user_id );
 			}
 		}
 	}

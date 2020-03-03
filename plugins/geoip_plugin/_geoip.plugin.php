@@ -457,7 +457,7 @@ jQuery( document ).ready( function()
 		}
 		else
 		{	// Get a setting for normal registration form:
-			$registration_require_country = (bool)$Settings->get('registration_require_country');
+			$registration_require_country = in_array( 'country', get_registration_template_required_fields() );
 		}
 		if( !$registration_require_country )
 		{	// Country is not required on registration form. Exit here.
@@ -499,9 +499,6 @@ jQuery( document ).ready( function()
 				{
 					$Form = & $params['Form'];
 				}
-
-				// Disable this setting temporary to hide a select list with countries
-				$Settings->set( 'registration_require_country', 0 );
 
 				if( isset( $params['Widget'] ) )
 				{	// Hide country selector on widget:

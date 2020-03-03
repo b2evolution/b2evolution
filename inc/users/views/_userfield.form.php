@@ -44,7 +44,7 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 
 	$Form->text_input( 'ufdf_icon_name', $edited_Userfield->icon_name, 20, T_('Icon name'), '', array( 'maxlength' => 100 ) );
 
-	$Form->select_input_array( 'ufdf_type', $edited_Userfield->type, $edited_Userfield->get_types(),
+	$Form->select_input_array( 'ufdf_type', $edited_Userfield->type, Userfield::get_types(),
 		T_('Field type'), '', array( 'required' => true ) );
 
 	// Show this textarea only for field type with "Option list"
@@ -57,9 +57,11 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 	$Form->checkbox_input( 'ufdf_suggest', $edited_Userfield->suggest, T_('Suggest values') );
 	echo '</div>';
 
-	$Form->radio_input( 'ufdf_duplicated', $edited_Userfield->duplicated, $edited_Userfield->get_duplicateds(), T_('Multiple values'), array( 'required'=>true, 'lines'=>true ) );
+	$Form->radio_input( 'ufdf_duplicated', $edited_Userfield->duplicated, Userfield::get_duplicateds( 'radio' ), T_('Multiple values'), array( 'required'=>true, 'lines'=>true ) );
 
-	$Form->radio_input( 'ufdf_required', $edited_Userfield->required, $edited_Userfield->get_requireds(), T_('Required?'), array( 'required'=>true ) );
+	$Form->radio_input( 'ufdf_required', $edited_Userfield->required, Userfield::get_requireds( 'radio' ), T_('Required?'), array( 'required'=>true ) );
+
+	$Form->radio_input( 'ufdf_visibility', $edited_Userfield->visibility, Userfield::get_visibilities( 'radio' ), T_('Field visibility'), array( 'required' => true ) );
 
 	$Form->textarea_input( 'ufdf_bubbletip', $edited_Userfield->bubbletip, 5, T_('Bubbletip text') );
 

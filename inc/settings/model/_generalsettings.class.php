@@ -126,10 +126,9 @@ class GeneralSettings extends AbstractSettings
 		'after_registration' => 'return_to_original', // where to redirect after new user registration. Values: 'return_to_original' redirect_to url, or 'slug', or return to the previously set specific url
 		'after_registration_slug' => '', // Slug value for after_registration == 'slug'
 		'newusers_level' => '1',
+		'registration_master_template' => 'registration_master_standard',
 		'registration_after_quick' => 'regform',
 		'registration_no_username' => 'firstname',
-		'registration_require_gender' => 'hidden',
-		'registration_ask_locale' => '0',
 		'pass_after_quick_reg' => '1',
 
 		// Default user settings

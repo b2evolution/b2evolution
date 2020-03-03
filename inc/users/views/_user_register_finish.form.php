@@ -52,6 +52,8 @@ else
 	$params = $default_params;
 }
 
+$required_fields = get_registration_template_required_fields();
+
 $Form = new Form( $form_action, 'user_checkchanges' );
 
 $Form->switch_template_parts( $params['skin_form_params'] );
@@ -130,7 +132,7 @@ $Form->email_input( 'edited_user_email', $edited_User->email, 50, T_('Email'), a
 		)
 	);
 
-if( $Settings->get( 'registration_require_country' ) )
+if( in_array( 'country', $required_fields ) )
 {	// Country is required:
 	$CountryCache = & get_CountryCache();
 	$Form->select_country( 'country', $edited_User->ctry_ID, $CountryCache, T_('Country'), array(
@@ -139,27 +141,26 @@ if( $Settings->get( 'registration_require_country' ) )
 		) );
 }
 
-if( $Settings->get( 'registration_require_firstname' ) )
+if( in_array( 'firstname', $required_fields ) )
 {	// Firstname is visible:
 	$Form->text_input( 'firstname', $edited_User->firstname, 18, T_('First name'), T_('Your real first name.'), array( 'maxlength' => 50, 'class' => 'input_text', 'required' => true ) );
 }
 
-if( $Settings->get( 'registration_require_lastname' ) )
+if( in_array( 'lastname', $required_fields ) )
 {	// Lastname is visible:
 	$Form->text_input( 'lastname', $edited_User->lastname, 18, T_('Last name'), T_('Your real last name.'), array( 'maxlength' => 50, 'class' => 'input_text', 'required' => true ) );
 }
 
-$registration_require_gender = $Settings->get( 'registration_require_gender' );
-if( $registration_require_gender != 'hidden' )
+if( in_array( 'gender', $required_fields ) )
 {	// Display a gender field if it is not hidden:
 	$Form->radio_input( 'gender', $edited_User->gender, array(
 				array( 'value' => 'M', 'label' => T_('A man') ),
 				array( 'value' => 'F', 'label' => T_('A woman') ),
 				array( 'value' => 'O', 'label' => T_('Other') ),
-			), T_('I am'), array( 'required' => $registration_require_gender == 'required' ) );
+			), T_('I am'), array( 'required' => true ) );
 }
 
-if( $Settings->get( 'registration_ask_locale' ) )
+if( in_array( 'locale', $required_fields ) )
 {	// Ask user language:
 	$Form->select( 'locale', $edited_User->get( 'locale' ), 'locale_options_return', T_('Locale'), T_('Preferred language') );
 }

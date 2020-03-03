@@ -130,7 +130,7 @@ else if( $subscribed_User->gender == 'F' )
 	echo T_('I am').": ".T_('A woman')."\n";
 }
 
-if( $Settings->get( 'registration_ask_locale' ) && $subscribed_User->locale != '' )
+if( in_array( 'locale', get_registration_template_required_fields() ) && $subscribed_User->locale != '' )
 {	// Locale field is defined
 	global $locales;
 	echo T_('Locale').": ".$locales[$subscribed_User->locale]['name']."\n";
