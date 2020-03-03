@@ -121,6 +121,8 @@ class default_site_Skin extends Skin
 	 */
 	function siteskin_init()
 	{
+		global $Blog, $Session;
+
 		// Include the default skin style.css relative current SITE skin folder:
 		require_css( 'style.min.css', 'siteskin' );
 
@@ -131,8 +133,10 @@ class default_site_Skin extends Skin
 	padding: '.$menu_bar_logo_padding.'px;
 }';
 
-		if( $this->get_setting( 'fixed_header' ) )
-		{	// Enable fixed position for header:
+		if( $this->get_setting( 'fixed_header' ) &&
+		    ! $Session->get( 'display_containers_'.$Blog->ID ) &&
+		    ! $Session->get( 'display_includes_'.$Blog->ID ) )
+		{	// Enable fixed position for header only when no debug blocks:
 			$css .= '#evo_site_header {
 	position: fixed;
 	top: 0;

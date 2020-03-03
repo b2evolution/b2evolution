@@ -296,6 +296,8 @@ class bootstrap_site_tabs_Skin extends Skin
 	 */
 	function siteskin_init()
 	{
+		global $Blog, $Session;
+
 		// Include the enabled skin CSS files relative current SITE skin folder:
 		$css_files = $this->get_setting( 'css_files' );
 		if( is_array( $css_files ) && count( $css_files ) )
@@ -397,8 +399,10 @@ footer#evo_site_footer .container a {
 }
 ';
 
-		if( $this->get_setting( 'fixed_header' ) )
-		{	// Enable fixed position for header:
+		if( $this->get_setting( 'fixed_header' ) &&
+		    ! $Session->get( 'display_containers_'.$Blog->ID ) &&
+		    ! $Session->get( 'display_includes_'.$Blog->ID ) )
+		{	// Enable fixed position for header only when no debug blocks:
 			$css .= '#evo_site_header {
 	position: fixed;
 	top: 0;
