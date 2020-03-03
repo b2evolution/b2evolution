@@ -53,4 +53,10 @@ jQuery( document ).ready( function()
 		jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } );
 	}
 
+	// Initialize attachments fieldset
+	if( typeof( 'evo_link_initialize_fieldset_config' ) != 'undefined' )
+	{
+		evo_link_initialize_fieldset( evo_link_initialize_fieldset_config['fieldset_prefix'] );
+	}
+
 } );
