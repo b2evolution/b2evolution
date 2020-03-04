@@ -53,6 +53,24 @@ jQuery( document ).ready( function()
 		jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } );
 	}
 
+	// disp=download
+	if( typeof( evo_disp_download_delay_config ) != 'undefined' )
+	{
+		var b2evo_download_timer = evo_disp_download_delay_config;
+		var downloadInterval = setInterval( function()
+				{
+					jQuery( "#download_timer" ).html( b2evo_download_timer );
+					if( b2evo_download_timer == 0 )
+					{	// Stop timer and download a file:
+						clearInterval( downloadInterval );
+						jQuery( "#download_help_url" ).show();
+					}
+					b2evo_download_timer--;
+				}, 1000 );
+
+		jQuery( "#download_timer_js" ).show();
+	}
+
 	// Bootstrap Forums skin: Add click event to quote button
 	if( typeof( evo_skin_bootstrap_forum__quote_button_click ) != 'undefined' )
 	{

@@ -1643,23 +1643,7 @@ class Skin extends DataObject
 					require_js_defer( '#jquery#', 'blog' );
 
 					// Initialize JavaScript to download file after X seconds
-					add_js_headline( '
-jQuery( document ).ready( function ()
-{
-	jQuery( "#download_timer_js" ).show();
-} );
-
-var b2evo_download_timer = '.intval( $Blog->get_setting( 'download_delay' ) ).';
-var downloadInterval = setInterval( function()
-{
-	jQuery( "#download_timer" ).html( b2evo_download_timer );
-	if( b2evo_download_timer == 0 )
-	{	// Stop timer and download a file:
-		clearInterval( downloadInterval );
-		jQuery( "#download_help_url" ).show();
-	}
-	b2evo_download_timer--;
-}, 1000 );' );
+					expose_var_to_js( 'evo_disp_download_delay_config', intval( $Blog->get_setting( 'download_delay' ) ) );
 					break;
 
 				default:
