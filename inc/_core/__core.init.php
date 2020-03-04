@@ -1911,6 +1911,11 @@ class _core_Module extends Module
 						'text' => $debug_text,
 						'disabled' => true,
 					);
+
+				$dev_entries['defer'] = array(
+						'text' => use_defer() ? 'Using Deferred loading' : 'Using Normal loading',
+						'disabled' => true,
+					);
 			}
 
 			if( ! is_admin_page() && ! empty( $dev_entries ) )
