@@ -52,4 +52,21 @@ jQuery( document ).ready( function()
 	{
 		jQuery( "#commentform_renderers .dropdown-menu" ).on( "click", function( e ) { e.stopPropagation() } );
 	}
+
+	// Bootstrap Forums skin: Add click event to quote button
+	if( typeof( evo_skin_bootstrap_forum__quote_button_click ) != 'undefined' )
+	{
+		jQuery( '.quote_button' ).click( function()
+			{	// Submit a form to save the already entered content
+				var form = jQuery( 'form[id^=evo_comment_form_id_]' );
+				if( form.length == 0 )
+				{ // No form found, Use an url of this link
+					return true;
+				}
+				// Set an action as url of this link and submit a form
+				form.attr( 'action', jQuery( this ).attr( 'href' ) );
+				form.submit();
+				return false;
+			} );
+	}
 } );

@@ -465,24 +465,7 @@ skin_widget( array(
 
 </div><!-- ../forums_list single_topic -->
 
-	<?php
-		locale_restore_previous();	// Restore previous locale (Blog locale)
-	?>
-<script>
-jQuery( document ).ready( function()
-{
-	jQuery( '.quote_button' ).click( function()
-	{ // Submit a form to save the already entered content
-		console.log( jQuery( this ).attr( 'href' ) );
-		var form = jQuery( 'form[id^=evo_omment_form_id_]' );
-		if( form.length == 0 )
-		{ // No form found, Use an url of this link
-			return true;
-		}
-		// Set an action as url of this link and submit a form
-		form.attr( 'action', jQuery( this ).attr( 'href' ) );
-		form.submit();
-		return false;
-	} );
-} );
-</script>
+<?php
+	locale_restore_previous();	// Restore previous locale (Blog locale)
+	expose_var_to_js( 'evo_skin_bootstrap_forum__quote_button_click', true );
+?>
