@@ -10408,10 +10408,16 @@ function get_querybuilder_operator( $operator )
  */
 function use_defer()
 {
-	global $use_defer, $use_defer_for_backoffice, $use_defer_for_loggedin_users, $use_defer_for_anonymous_users;
+	global $disp,
+		$use_defer,
+		$use_defer_for_backoffice,
+		$use_defer_for_loggedin_users,
+		$use_defer_for_anonymous_users,
+		$use_defer_for_anonymous_disp_register;
 	
 	return $use_defer
 		   && ( is_admin_page() ? $use_defer_for_backoffice : true )
-		   && ( is_logged_in() ? $use_defer_loggedin_users : $use_defer_for_anonymous_users );
+		   && ( is_logged_in() ? $use_defer_loggedin_users : $use_defer_for_anonymous_users )
+		   && ( $disp == 'register' ? $use_defer_for_anonymous_disp_register : true );
 }
 ?>

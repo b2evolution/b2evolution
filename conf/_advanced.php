@@ -979,6 +979,7 @@ $use_defer = true;
 $use_defer_for_backoffice = false;
 $use_defer_for_loggedin_users = false;
 $use_defer_for_anonymous_users = true;
+$use_defer_for_anonymous_disp_register = false;
 
 $disable_ajax_forms_for_frontoffice = true;	// Disables comment ajax forms in the front-office
 $disable_tinymce_for_frontoffice = true; // Disables TinyMCE plugin in the front-office
