@@ -16,7 +16,6 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 load_class( 'widgets/model/_widget.class.php', 'ComponentWidget' );
 init_jqplot_js( 'blog' );
 require_js_defer( 'src/evo_init_canvas_bar_chart.js', 'blog' );
-require_js_defer( 'src/evo_coll_activity_stats_widget.js', 'blog' );
 
 /**
  * coll_activity_stats_Widget Class.
