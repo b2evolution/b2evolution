@@ -10408,16 +10408,20 @@ function get_querybuilder_operator( $operator )
  */
 function use_defer()
 {
-	global $disp,
+	global $disp, $ReqPath,
 		$use_defer,
 		$use_defer_for_backoffice,
 		$use_defer_for_loggedin_users,
 		$use_defer_for_anonymous_users,
-		$use_defer_for_anonymous_disp_register;
+		$use_defer_for_anonymous_disp_register,
+		$use_defer_for_default_register_form;
 	
-	return $use_defer
+	$r =  $use_defer
 		   && ( is_admin_page() ? $use_defer_for_backoffice : true )
-		   && ( is_logged_in() ? $use_defer_loggedin_users : $use_defer_for_anonymous_users )
-		   && ( $disp == 'register' ? $use_defer_for_anonymous_disp_register : true );
+		   && ( is_logged_in() ? $use_defer_for_loggedin_users : $use_defer_for_anonymous_users )
+		   && ( $disp == 'register' ? $use_defer_for_anonymous_disp_register : true )
+		   && ( empty( $disp ) && $ReqPath == '/htsrv/register.php' ? $use_defer_for_default_register_form : true );
+
+	return $r;
 }
 ?>

@@ -10,12 +10,13 @@
  * 
  * Depends on jQuery
  */
+var resizeTimer;
+
 function resize_coll_activity_stat_widget()
 {
 	var config = coll_activity_stats_widget_config;
 	var	originalData = [], weekData = [], xLabels = [],
-			displayed = config['time_period'],
-			resizeTimer;
+			displayed = config['time_period'];
 
 	if( plot == undefined )
 	{
@@ -72,8 +73,8 @@ function resize_coll_activity_stat_widget()
 	plot.replot( { resetAxes: true } );
 }
 
-jQuery( window ).resize( function()
-	{
-		clearTimeout( resizeTimer );
-		resizeTimer = setTimeout( resize_coll_activity_stat_widget, 100 );
-	} );
+// jQuery( window ).resize( function()
+// 	{
+// 		clearTimeout( resizeTimer );
+// 		resizeTimer = setTimeout( resize_coll_activity_stat_widget, 100 );
+// 	} );

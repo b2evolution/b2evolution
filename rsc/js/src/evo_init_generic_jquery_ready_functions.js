@@ -69,4 +69,90 @@ jQuery( document ).ready( function()
 				return false;
 			} );
 	}
+
+
+	if( typeof( evo_user_func__callback_filter_userlist ) != 'undefined' )
+	{
+		jQuery( '#country' ).change( function()
+			{
+				var this_obj = jQuery( this );
+				jQuery.ajax( {
+				type: 'POST',
+				url: htsrv_url + 'anon_async.php',
+				data: 'action=get_regions_option_list&ctry_id=' + jQuery( this ).val(),
+				success: function( result )
+					{
+						jQuery( '#region' ).html( ajax_debug_clear( result ) );
+						if( jQuery( '#region option' ).length > 1 )
+						{
+							jQuery( '#region_filter' ).show();
+						}
+						else
+						{
+							jQuery( '#region_filter' ).hide();
+						}
+						load_subregions( 0 ); // Reset sub-regions
+					}
+				} );
+			} );
+
+		jQuery( '#region' ).change( function ()
+			{	// Change option list with sub-regions
+				load_subregions( jQuery( this ).val() );
+			} );
+
+		jQuery( '#subregion' ).change( function ()
+			{	// Change option list with cities
+				load_cities( jQuery( '#country' ).val(), jQuery( '#region' ).val(), jQuery( this ).val() );
+			} );
+
+		window['load_subregions'] = function load_subregions( region_ID )
+			{	// Load option list with sub-regions for seleted region
+				jQuery.ajax( {
+				type: 'POST',
+				url: htsrv_url + 'anon_async.php',
+				data: 'action=get_subregions_option_list&rgn_id=' + region_ID,
+				success: function( result )
+					{
+						jQuery( '#subregion' ).html( ajax_debug_clear( result ) );
+						if( jQuery( '#subregion option' ).length > 1 )
+						{
+							jQuery( '#subregion_filter' ).show();
+						}
+						else
+						{
+							jQuery( '#subregion_filter' ).hide();
+						}
+						load_cities( jQuery( '#country' ).val(), region_ID, 0 );
+					}
+				} );
+			};
+
+		window['load_cities'] = function load_cities( country_ID, region_ID, subregion_ID )
+			{ // Load option list with cities for seleted region or sub-region
+				if( typeof( country_ID ) == 'undefined' )
+				{
+					country_ID = 0;
+				}
+
+				jQuery.ajax( {
+				type: 'POST',
+				url: htsrv_url + 'anon_async.php',
+				data: 'action=get_cities_option_list&ctry_id=' + country_ID + '&rgn_id=' + region_ID + '&subrg_id=' + subregion_ID,
+				success: function( result )
+					{
+						jQuery( '#city' ).html( ajax_debug_clear( result ) );
+						if( jQuery( '#city option' ).length > 1 )
+						{
+							jQuery( '#city_filter' ).show();
+						}
+						else
+						{
+							jQuery( '#city_filter' ).hide();
+						}
+					}
+				} );
+			};
+	}
+
 } );
