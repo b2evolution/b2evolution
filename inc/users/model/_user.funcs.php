@@ -1587,8 +1587,8 @@ function userfield_td_name( $ufdf_ID, $ufdf_name, $ufdf_icon_name, $ufdf_code )
 {
 	global $current_User;
 
-	$field_icon = '<span class="uf_icon_block ufld_'.$ufdf_code.' ufld__textcolor">'
-			.( empty( $ufdf_icon_name ) ? '' : '<span class="'.$ufdf_icon_name.'"></span>' )
+	$field_icon = '<span class="uf_icon_block">'
+			.get_userfield_icon( $ufdf_icon_name, $ufdf_code )
 		.'</span>';
 
 	if( $current_User->check_perm( 'users', 'edit' ) )
@@ -3694,7 +3694,7 @@ function callback_options_user_new_fields( $value = 0 )
 		$current_group_ID = 0;
 		foreach( $userfielddefs as $f => $fielddef )
 		{
-			if( ! userfield_is_viewable( $fielddef->ufdf_visibility, $edited_User->ID ) )
+			if( ! userfield_is_viewable( empty( $edited_User ) ? NULL : $edited_User->ID, $fielddef->ufdf_visibility, $fielddef->ufdf_type ) )
 			{	// Current user cannot add the user field:
 				continue;
 			}
@@ -3729,17 +3729,18 @@ function callback_options_user_new_fields( $value = 0 )
 /**
  * Check if user field can be viewable for current User
  *
+ * @param integer ID of displayed user
  * @param string User field visibility
- * @param integer ID of displayed user, NULL - for current User
+ * @param string User field type
  * @return boolean
  */
-function userfield_is_viewable( $user_field_visibility, $user_ID = NULL )
+function userfield_is_viewable( $user_ID, $user_field_visibility, $user_field_type )
 {
 	global $current_User;
 
-	if( $user_ID === NULL && is_logged_in() )
-	{	// Use current User ID:
-		$user_ID = $current_User->ID;
+	if( ! is_pro() && $user_field_type == 'user' )
+	{	// Type "User select" is allowed only on PRO version:
+		return false;
 	}
 
 	switch( $user_field_visibility )
@@ -3760,6 +3761,24 @@ function userfield_is_viewable( $user_field_visibility, $user_ID = NULL )
 			// Unknown visibility:
 			return false;
 	}
+}
+
+
+/**
+ * Get user field icon HTML code
+ *
+ * @param string Icon class
+ * @param string User field code
+ * @return string HTML code for user field icon
+ */
+function get_userfield_icon( $icon_class, $field_code )
+{
+	if( empty( $icon_class ) )
+	{	// No icon class is provided:
+		return '';
+	}
+
+	return '<span class="'.$icon_class.' ufld_'.$field_code.' ufld__textcolor"></span> ';
 }
 
 
@@ -3798,7 +3817,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			continue;
 		}
 
-		if( ! userfield_is_viewable( $userfield->ufdf_visibility, $user_ID ) )
+		if( ! userfield_is_viewable( $user_ID, $userfield->ufdf_visibility, $userfield->ufdf_type ) )
 		{	// Current user cannot view this user field:
 			continue;
 		}
@@ -3893,11 +3912,8 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			$field_params['autocomplete'] = 'on';
 		}
 
-		$userfield_icon = '';
-		if( ! empty( $userfield->ufdf_icon_name ) )
-		{ // Field icon
-			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.' ufld_'.$userfield->ufdf_code.' ufld__textcolor"></span> ';
-		}
+		// Field icon:
+		$userfield_icon = get_userfield_icon( $userfield->ufdf_icon_name, $userfield->ufdf_code ).' ';
 
 		if( $action == 'view' )
 		{	// Only view
@@ -3922,6 +3938,14 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 						$uf_options = array_merge( array( '---' ), $uf_options );
 					}
 					$Form->select_input_array( 'uf_'.$userfield->uf_ID, $uf_val, $uf_options, $userfield_icon.$userfield->ufdf_name, $field_note, $field_params );
+					break;
+
+				case 'user':
+					if( is_pro() )
+					{	// Display user selector by PRO function:
+						load_funcs( '_core/_pro_features.funcs.php' );
+						pro_display_user_field_input( 'uf_'.$userfield->uf_ID, $userfield, $uf_val, $field_note, $field_params, $Form );
+					}
 					break;
 
 				default:
@@ -8256,7 +8280,7 @@ function user_td_phone( $User )
 	foreach( $phone_fields as $phone_field )
 	{
 		$r .= '<div class="nowrap">'
-				.'<span class="'.$phone_field->ufdf_icon_name.' ufld_'.$phone_field->ufdf_code.' ufld__textcolor"></span> '
+				.get_userfield_icon( $phone_field->ufdf_icon_name, $phone_field->ufdf_code ).' '
 				.$phone_field->uf_varchar
 			.'</div>';
 	}

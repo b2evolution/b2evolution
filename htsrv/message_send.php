@@ -342,7 +342,16 @@ if( is_array( $user_fields ) && ! empty( $user_fields ) )
 				'uf_varchar' => $text_value,
 			);
 		userfield_prepare( $userfield );
-		$html_value = $userfield->uf_varchar;
+		if( is_pro() )
+		{	// Format user field value by PRO function:
+			load_funcs( '_core/_pro_features.funcs.php' );
+			$html_value = pro_get_user_field_value( $userfield );
+			$text_value = strip_tags( $html_value );
+		}
+		else
+		{	// Display normal value:
+			$html_value = $userfield->uf_varchar;
+		}
 
 		$send_additional_fields[] = array(
 				'title'       => $UserField->get( 'name' ),

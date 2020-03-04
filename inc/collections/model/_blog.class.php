@@ -6680,7 +6680,7 @@ class Blog extends DataObject
 		}
 
 		// Field icon:
-		$userfield_icon = $UserField->get( 'icon_name' ) ? '<span class="'.$UserField->get( 'icon_name' ).' ufld_'.$UserField->get( 'code' ).' ufld__textcolor"></span> ' : '';
+		$userfield_icon = $UserField->get_icon().' ';
 
 		switch( $UserField->get( 'type' ) )
 		{
@@ -6696,6 +6696,14 @@ class Blog extends DataObject
 					$uf_options = array_merge( array( '', '---' ), $uf_options );
 				}
 				$Form->select_input_array( $field_name, $field_value, $uf_options, $userfield_icon.$UserField->get( 'name' ), '', $field_params );
+				break;
+
+			case 'user':
+				if( is_pro() )
+				{	// Display user selector by PRO function:
+					load_funcs( '_core/_pro_features.funcs.php' );
+					pro_display_user_field_input( $field_name, $UserField, $field_value, '', $field_params, $Form );
+				}
 				break;
 
 			default:

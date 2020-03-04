@@ -1149,7 +1149,7 @@ class User extends DataObject
 					continue;
 				}
 
-				if( ! userfield_is_viewable( $this->userfield_defs[$userfield->uf_ufdf_ID][5], $this->ID ) )
+				if( ! userfield_is_viewable( $this->ID, $this->userfield_defs[$userfield->uf_ufdf_ID][5], $this->userfield_defs[$userfield->uf_ufdf_ID][0] ) )
 				{	// Current user cannot update the user field:
 					continue;
 				}
@@ -1323,7 +1323,7 @@ class User extends DataObject
 					}
 					foreach( $uf_new_fields as $uf_new_id => $uf_new_vals )
 					{
-						if( ! userfield_is_viewable( $this->userfield_defs[$uf_new_id][5], $this->ID ) )
+						if( ! userfield_is_viewable( $this->ID, $this->userfield_defs[$uf_new_id][5], $this->userfield_defs[$uf_new_id][0] ) )
 						{	// Current user cannot add the user field:
 							continue;
 						}
@@ -5553,7 +5553,7 @@ class User extends DataObject
 		$userfield_lists = array();
 		foreach( $userfields as $u => $userfield )
 		{
-			if( ! userfield_is_viewable( $userfield->ufdf_visibility, $this->ID ) )
+			if( ! userfield_is_viewable( $this->ID, $userfield->ufdf_visibility, $userfield->ufdf_type ) )
 			{	// Current user cannot view this user field:
 				unset( $userfields[ $u ] );
 				continue;

@@ -44,11 +44,23 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field') : T_('User field')
 
 	$Form->text_input( 'ufdf_icon_name', $edited_Userfield->icon_name, 20, T_('Icon name'), '', array( 'maxlength' => 100 ) );
 
+	if( is_pro() )
+	{	// Allow to select user group for PRO version:
+		load_funcs( '_core/_pro_features.funcs.php' );
+		$user_group_selector = pro_user_field_group_selector( $edited_Userfield->grp_ID, $Form );
+	}
+	else
+	{	// Display info about unavailable feature:
+		$user_group_selector = sprintf( T_('This is a %s feature'), get_pro_label() );
+	}
 	$Form->select_input_array( 'ufdf_type', $edited_Userfield->type, Userfield::get_types(),
-		T_('Field type'), '', array( 'required' => true ) );
+		T_('Field type'), '', array(
+			'required' => true,
+			'input_suffix' => '<span id="div_ufdf_user_type_options"'.( $edited_Userfield->type == 'user' ? '' : ' style="display:none"' ).'> '.$user_group_selector.'</span>'
+		) );
 
 	// Show this textarea only for field type with "Option list"
-	echo '<div id="div_ufdf_options"'. ( $edited_Userfield->type != 'list' ? ' style="display:none"' : '' ) .'>';
+	echo '<div id="div_ufdf_options"'.( $edited_Userfield->type != 'list' ? ' style="display:none"' : '' ).'>';
 	$Form->textarea_input( 'ufdf_options', $edited_Userfield->options, 10, T_('Options'), array( 'required' => ( $edited_Userfield->type == 'list' ? true : 'mark_only' ), 'maxlength' => 255, 'note' => T_('Enter one option per line. Max length 255 symbols.') ) );
 	echo '</div>';
 
@@ -90,13 +102,8 @@ else
 			jQuery( '#ufdf_options' ).removeAttr( 'required' );
 		}
 		// Suggest values only for field type with "Single word"
-		if( jQuery( this ).val() == 'word' )
-		{
-			jQuery( '#div_ufdf_suggest' ).show();
-		}
-		else
-		{
-			jQuery( '#div_ufdf_suggest' ).hide();
-		}
+		jQuery( '#div_ufdf_suggest' ).toggle( jQuery( this ).val() == 'word' );
+		// Suggest to select group for type "User select":
+		jQuery( '#div_ufdf_user_type_options' ).toggle( jQuery( this ).val() == 'user' );
 	} );
 </script>

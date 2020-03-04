@@ -137,6 +137,7 @@ $schema_queries = array(
 			ufdf_bubbletip  varchar(2000) COLLATE utf8mb4_unicode_ci NULL,
 			ufdf_icon_name  varchar(100) COLLATE ascii_general_ci NULL,
 			ufdf_code       varchar(20) COLLATE ascii_bin UNIQUE NOT NULL COMMENT 'Code MUST be lowercase ASCII only',
+			ufdf_grp_ID     int(10) UNSIGNED NULL,
 			PRIMARY KEY (ufdf_ID)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 

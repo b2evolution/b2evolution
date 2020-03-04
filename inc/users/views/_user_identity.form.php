@@ -652,10 +652,10 @@ else
 
 // -------------------  Get existing userfields: -------------------------------
 $userfields = $DB->get_results( '
-SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
+SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufdf_grp_ID, ufgp_ID, ufgp_name, ufdf_ufgp_ID, ufdf_bubbletip
 FROM
 	(
-		SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
+		SELECT ufdf_ID, uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufdf_grp_ID, ufgp_ID, ufgp_name, ufdf_ufgp_ID, ufdf_bubbletip
 			FROM T_users__fields
 				LEFT JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID
 				LEFT JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
@@ -663,7 +663,7 @@ FROM
 
 		UNION
 
-		SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
+		SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufgp_order, ufdf_order, ufdf_suggest, ufdf_duplicated, ufdf_grp_ID, ufgp_ID, ufgp_name, ufdf_ufgp_ID, ufdf_bubbletip
 			FROM T_users__fielddefs
 				LEFT JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
 		WHERE ufdf_required IN ( "recommended", "require" )
@@ -688,7 +688,7 @@ $Form->begin_fieldset( T_('Add new fields').( is_admin_page() ? get_manual_link(
 			foreach( $add_field_types as $add_field_type )
 			{	// We use "foreach" because sometimes the user adds several fields with the same type
 				$userfields = $DB->get_results( '
-				SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name
+				SELECT ufdf_ID, "0" AS uf_ID, ufdf_type, ufdf_code, ufdf_name, ufdf_icon_name, "" AS uf_varchar, ufdf_required, ufdf_visibility, ufdf_options, ufdf_suggest, ufdf_duplicated, ufgp_ID, ufgp_name, ufdf_ufgp_ID, ufdf_bubbletip
 					FROM T_users__fielddefs
 						LEFT JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID
 				WHERE ufdf_ID = '.intval( $add_field_type ) );
