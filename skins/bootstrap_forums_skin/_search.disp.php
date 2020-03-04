@@ -23,8 +23,8 @@ skin_widget( array(
 		// CODE for the widget:
 		'widget' => 'coll_search_form',
 		// Optional display params
-		'block_start'                => '<div class="panel panel-default"><div class="panel-heading">',
-		'block_end'                  => '</div></div>',
+		'block_start'                => '<div class="well">',
+		'block_end'                  => '</div>',
 		'block_display_title'        => false,
 		'disp_search_options'        => 0,
 		'search_class'               => 'extended_search_form',
@@ -38,7 +38,7 @@ skin_widget( array(
 		'search_input_age_after'     => '</div>',
 		'search_input_type_before'   => '<div class="col-sm-12 col-md-12 col-lg-3">',
 		'search_input_type_after'    => '</div>',
-		'search_line_before'         => '<div style="text-align: left; margin: .5em 0;" class="row">',
+		'search_line_before'         => '<div class="row margin-top-sm">',
 		'search_line_after'          => '</div>',
 		'search_template'            => '$input_keywords$$button_search$'."\n".'$input_author$$input_age$$input_content_type$',
 		'use_search_disp'            => 1,
