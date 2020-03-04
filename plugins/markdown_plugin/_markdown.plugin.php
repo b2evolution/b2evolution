@@ -302,6 +302,13 @@ class markdown_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
+		global $disable_markdown_toolbar_for_frontoffice;
+
+		if( ! is_admin_page() && $disable_markdown_toolbar_for_frontoffice )
+		{	// Disable markdown toolbar until JS can be fixed to defer load:
+			return false;
+		}
+
 		if( ! empty( $params['Item'] ) )
 		{ // Item is set, get Blog from post
 			$edited_Item = & $params['Item'];
@@ -336,6 +343,13 @@ class markdown_plugin extends Plugin
 	 */
 	function DisplayCommentToolbar( & $params )
 	{
+		global $disable_markdown_toolbar_for_frontoffice;
+
+		if( ! is_admin_page() && $disable_markdown_toolbar_for_frontoffice )
+		{	// Disable markdown toolbar until JS can be fixed to defer load:
+			return false;
+		}
+
 		if( ! empty( $params['Comment'] ) )
 		{ // Comment is set, get Blog from comment
 			$Comment = & $params['Comment'];
@@ -374,6 +388,13 @@ class markdown_plugin extends Plugin
 	 */
 	function DisplayMessageToolbar( & $params )
 	{
+		global $disable_markdown_toolbar_for_frontoffice;
+
+		if( ! is_admin_page() && $disable_markdown_toolbar_for_frontoffice )
+		{	// Disable markdown toolbar until JS can be fixed to defer load:
+			return false;
+		}
+
 		$apply_rendering = $this->get_msg_setting( 'msg_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{ // Print toolbar on screen
@@ -391,6 +412,13 @@ class markdown_plugin extends Plugin
 	 */
 	function DisplayEmailToolbar( & $params )
 	{
+		global $disable_markdown_toolbar_for_frontoffice;
+
+		if( ! is_admin_page() && $disable_markdown_toolbar_for_frontoffice )
+		{	// Disable markdown toolbar until JS can be fixed to defer load:
+			return false;
+		}
+		
 		$apply_rendering = $this->get_email_setting( 'email_apply_rendering' );
 		if( ! empty( $apply_rendering ) && $apply_rendering != 'never' )
 		{	// Print toolbar on screen:

@@ -981,8 +981,9 @@ $use_defer_for_loggedin_users = false;
 $use_defer_for_anonymous_users = true;
 $use_defer_for_anonymous_disp_register = false;
 
-$disable_ajax_forms_for_frontoffice = true;	// Disables comment ajax forms in the front-office
+$disable_ajax_forms_for_frontoffice = true; // Disables comment ajax forms in the front-office
 $disable_tinymce_for_frontoffice = true; // Disables TinyMCE plugin in the front-office
+$disable_markdown_toolbar_for_frontoffice = true; // Disabled Markdown toolbar for front-office
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
