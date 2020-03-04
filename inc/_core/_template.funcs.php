@@ -1246,7 +1246,7 @@ function require_js( $js_file, $relative_to = 'rsc_url', $async_defer = false, $
 		{
 			$script_tag .= ' async';
 		}
-		elseif( $use_defer === true && $async_defer == 'defer' )
+		elseif( use_defer() && $async_defer == 'defer' )
 		{
 			$script_tag .= ' defer';
 		}

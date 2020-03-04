@@ -10401,4 +10401,17 @@ function get_querybuilder_operator( $operator )
 			return $operator;
 	}
 }
+
+
+/**
+ * Temporary function to check if we should use defer when loading scripts.
+ */
+function use_defer()
+{
+	global $use_defer, $use_defer_for_backoffice, $use_defer_for_loggedin_users, $use_defer_for_anonymous_users;
+	
+	return $use_defer
+		   && ( is_admin_page() ? $use_defer_for_backoffice : true )
+		   && ( is_logged_in() ? $use_defer_loggedin_users : $use_defer_for_anonymous_users );
+}
 ?>
