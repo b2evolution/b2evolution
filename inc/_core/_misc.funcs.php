@@ -10417,7 +10417,12 @@ function use_defer()
 		$use_defer_for_anonymous_disp_users,
 		$use_defer_for_loggedin_disp_single_page,
 		$use_defer_for_loggedin_disp_front,
+		$use_defer_for_loggedin_disp_profile,
+		$use_defer_for_loggedin_disp_pwdchange,
+		$use_defer_for_loggedin_disp_edit,
+		$use_defer_for_loggedin_disp_edit_comment,
 		$use_defer_for_loggedin_disp_messages,
+		$use_defer_for_loggedin_disp_threads,
 		$use_defer_for_default_register_form;
 	
 	$r =  $use_defer
@@ -10428,7 +10433,12 @@ function use_defer()
 		   && ( empty( $disp ) && $ReqPath == '/htsrv/register.php' ? $use_defer_for_default_register_form : true )
 		   && ( is_logged_in() && in_array( $disp, array( 'single', 'page' ) ) ? $use_defer_for_loggedin_disp_single_page : true )
 		   && ( is_logged_in() && $disp == 'front' ? $use_defer_for_loggedin_disp_front : true )
-		   && ( is_logged_in() && $disp == 'messages' ? $use_defer_for_loggedin_disp_messages : true );
+		   && ( is_logged_in() && $disp == 'profile' ? $use_defer_for_loggedin_disp_profile : true )
+		   && ( is_logged_in() && $disp == 'pwdchange' ? $use_defer_for_loggedin_disp_pwdchange : true )
+		   && ( is_logged_in() && $disp == 'edit' ? $use_defer_for_loggedin_disp_edit : true )
+		   && ( is_logged_in() && $disp == 'edit_comment' ? $use_defer_for_loggedin_disp_edit_comment : true )
+		   && ( is_logged_in() && $disp == 'messages' ? $use_defer_for_loggedin_disp_messages : true )
+		   && ( is_logged_in() && $disp == 'threads' ? $use_defer_for_loggedin_disp_threads : true );
 
 	return $r;
 }
