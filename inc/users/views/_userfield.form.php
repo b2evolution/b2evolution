@@ -89,21 +89,31 @@ else
 }
 ?>
 <script>
-	jQuery( '#ufdf_type' ).change( function()
-	{	// Show textarea input only for field type with "Option list"
-		if( jQuery( this ).val() == 'list' )
-		{
-			jQuery( '#div_ufdf_options' ).show();
-			jQuery( '#ufdf_options' ).attr( 'required', 'required' );
-		}
-		else
-		{
-			jQuery( '#div_ufdf_options' ).hide();
-			jQuery( '#ufdf_options' ).removeAttr( 'required' );
-		}
-		// Suggest values only for field type with "Single word"
-		jQuery( '#div_ufdf_suggest' ).toggle( jQuery( this ).val() == 'word' );
-		// Suggest to select group for type "User select":
-		jQuery( '#div_ufdf_user_type_options' ).toggle( jQuery( this ).val() == 'user' );
-	} );
+function evo_check_userfield_type_user_select()
+{	// Resctrict "User select" for not PRO version:
+<?php if( ! is_pro() ) { ?>
+	jQuery( '#userfield_checkchanges input[type=submit]' ).prop( 'disabled', jQuery( '#ufdf_type' ).val() == 'user' );
+<?php } ?>
+}
+
+jQuery( '#ufdf_type' ).change( function()
+{	// Show textarea input only for field type with "Option list"
+	if( jQuery( this ).val() == 'list' )
+	{
+		jQuery( '#div_ufdf_options' ).show();
+		jQuery( '#ufdf_options' ).attr( 'required', 'required' );
+	}
+	else
+	{
+		jQuery( '#div_ufdf_options' ).hide();
+		jQuery( '#ufdf_options' ).removeAttr( 'required' );
+	}
+	// Suggest values only for field type with "Single word"
+	jQuery( '#div_ufdf_suggest' ).toggle( jQuery( this ).val() == 'word' );
+	// Suggest to select group for type "User select":
+	jQuery( '#div_ufdf_user_type_options' ).toggle( jQuery( this ).val() == 'user' );
+	// Check for type "User select":
+	evo_check_userfield_type_user_select();
+} );
+evo_check_userfield_type_user_select();
 </script>
