@@ -10,13 +10,13 @@ Multiblog/CMS + user community + email marketing + social network + more...
 b2evolution includes everything you need to run and maintain a modern website.
 Plus, it's optimized for low maintenance with easy upgrades and effective antispam. Full Bootstrap & RWD support.
 
-More info: http://b2evolution.net
+More info: https://b2evolution.net
 
 ## Requirements
 
 Basically, all you need is a standard [web hosting plan](https://b2evolution.net/web-hosting/cheap-plans/).
 
-More specifically, your web server should support PHP 5.6+, MySQL 5.5.3+ & Apache 2+ (which is very common). More info about these requirements [here](http://b2evolution.net/man/installation-upgrade/system_requirements).
+More specifically, your web server should support PHP 5.6+, MySQL 5.5.3+ & Apache 2+ (which is very common). More info about these requirements [here](https://b2evolution.net/man/installation-upgrade/system_requirements).
 
 ## Downloading
 
@@ -24,18 +24,20 @@ More specifically, your web server should support PHP 5.6+, MySQL 5.5.3+ & Apach
 
 If you're familiar with bower, just type: `bower install b2evolution`
 
+This will install the latest **stable** version of b2evolution.
+
 ### Manual Download
 
 You can download releases either from GitHub or from b2evolution.net :
 
 - https://github.com/b2evolution/b2evolution/releases
-- http://b2evolution.net/downloads/
+- https://b2evolution.net/downloads/
 
 ## Installation: Amazing 3-minute install ;)
 
 Upload everything to your web server and call the installation script that you will find at `/install/index.php` on your website. Then you just need to enter your database connection details and the installer will take care of everything for you.
 
-Now, you might ask for more details here... Totally legitimate! Please check out our [Getting Stated - Installation Guide](http://b2evolution.net/man/getting-started).
+Now, you might ask for more details here... Totally legitimate! Please check out our [Getting Stated - Installation Guide](https://b2evolution.net/man/getting-started).
 
 Hint: It is possible to install b2evolution in less than 3 minutes. Probably not the first time though. (And the same is true for anyone else claiming a 5 minute install process.)
 
@@ -51,7 +53,7 @@ You can download any newer version (including beta releases), overwrite the file
 
 The installation script will detect that the b2evolution database is already installed (any version) and offer to upgrade it to the current version.
 
-There are [several other upgrade options](http://b2evolution.net/man/upgrading).
+There are [several other upgrade options](https://b2evolution.net/man/upgrading).
 
 ## GitHub
 
