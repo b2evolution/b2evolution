@@ -70,7 +70,7 @@ jQuery( document ).ready( function()
 			} );
 	}
 
-
+	// Userlist filter callback JS
 	if( typeof( evo_user_func__callback_filter_userlist ) != 'undefined' )
 	{
 		jQuery( '#country' ).change( function()
@@ -155,4 +155,44 @@ jQuery( document ).ready( function()
 			};
 	}
 
+	// Parameter switcher widget
+	if( typeof( evo_widget_param_switcher_config ) != 'undefined' )
+	{
+		for( var i = 0; i < evo_widget_param_switcher_config.length; i++ )
+		{
+			var config = evo_widget_param_switcher_config[i];
+
+			jQuery( 'a[data-param-switcher=' + config['widget_id'] + ']' ).click( function()
+				{
+					var default_params = config['default_params'];
+
+					// Remove previous value from the URL:
+					var regexp = new RegExp( '([\?&])((' + jQuery( this ).data( 'code' ) + '|redir)=[^&]*(&|$))+', 'g' );
+					var url = location.href.replace( regexp, '$1' );
+					url = url.replace( /[\?&]$/, '' );
+					// Add param code with value of the clicked button:
+					url += ( url.indexOf( '?' ) === -1 ? '?' : '&' );
+					url += jQuery( this ).data( 'code' ) + '=' + jQuery( this ).data( 'value' );
+					for( default_param in default_params )
+					{
+						regexp = new RegExp( '[\?&]' + default_param + '=', 'g' );
+						if( ! url.match( regexp ) )
+						{	// Append defaul param if it is not found in the current URL:
+							url += '&' + default_param + '=' + default_params[ default_param ];
+						}
+					}
+					url += '&redir=no';
+
+					// Change URL in browser address bar:
+					window.history.pushState( '', '', url );
+
+					// Change active button:
+					jQuery( 'a[data-param-switcher=' + config['widget_id'] + ']' ).attr( 'class', config['link_class'] );
+					jQuery( this ).attr( 'class', config['active_link_class'] );
+
+					return false;
+				} );
+		}
+	}
+	
 } );

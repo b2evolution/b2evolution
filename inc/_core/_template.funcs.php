@@ -1050,7 +1050,7 @@ function blog_home_link( $before = '', $after = '', $blog_text = 'Blog', $home_t
  * @param string Name
  * @param string Value
  */
-function expose_var_to_js( $name, $value )
+function expose_var_to_js( $name, $value, $parent_object = NULL )
 {
 	global $evo_exposed_js_vars;
 
@@ -1059,7 +1059,19 @@ function expose_var_to_js( $name, $value )
 		$evo_exposed_js_vars = array();
 	}
 
-	$evo_exposed_js_vars[ $name ] = $value;
+	if( ! empty( $parent_object ) )
+	{
+		if( ! isset( $evo_exposed_js_vars[$parent_object] ) )
+		{
+			$evo_exposed_js_vars[$parent_object] = array();
+		}
+
+		$evo_exposed_js_vars[$parent_object][$name] = $value;
+	}
+	else
+	{
+		$evo_exposed_js_vars[ $name ] = $value;
+	}
 }
 
 
@@ -1080,6 +1092,10 @@ function include_js_vars()
 
 	foreach( $evo_exposed_js_vars as $var_name => $var_value )
 	{
+		if( is_array( $var_value ) )
+		{
+			$var_value = json_encode( $var_value, JSON_FORCE_OBJECT );
+		}
 		echo 'var '.$var_name.' = '.$var_value.";\n";
 	}
 

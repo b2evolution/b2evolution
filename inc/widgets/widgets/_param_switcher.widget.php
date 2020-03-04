@@ -232,51 +232,24 @@ class param_switcher_Widget extends generic_menu_link_Widget
 
 		if( $this->get_param( 'allow_switch_js' ) )
 		{	// Initialize JS to allow switching by JavaScript:
-		?>
-<script>
-jQuery( 'a[data-param-switcher=<?php echo $this->ID; ?>]' ).click( function()
-{
-	var default_params = {};
-<?php
-	// Load switchable params in order to add all default values in the current URL:
-	$Item->load_switchable_params();
-	if( ! empty( $Item->switchable_params ) )
-	{
-		foreach( $Item->switchable_params as $switchable_param_name => $switchable_param_default_value )
-		{
-			echo "\t".'default_params.'.$switchable_param_name.' = \''.$switchable_param_default_value.'\';'."\r\n";
-		}
-	}
-?>
+			// Load switchable params in order to add all default values in the current URL:
+			$default_params = array();
+			$Item->load_switchable_params();
+			if( ! empty( $Item->switchable_params ) )
+			{
+				foreach( $Item->switchable_params as $switchable_param_name => $switchable_param_default_value )
+				{
+					$default_params[$switchable_param_name] = $switchable_param_default_value;
+				}
+			}
 
-	// Remove previous value from the URL:
-	var regexp = new RegExp( '([\?&])((' + jQuery( this ).data( 'code' ) + '|redir)=[^&]*(&|$))+', 'g' );
-	var url = location.href.replace( regexp, '$1' );
-	url = url.replace( /[\?&]$/, '' );
-	// Add param code with value of the clicked button:
-	url += ( url.indexOf( '?' ) === -1 ? '?' : '&' );
-	url += jQuery( this ).data( 'code' ) + '=' + jQuery( this ).data( 'value' );
-	for( default_param in default_params )
-	{
-		regexp = new RegExp( '[\?&]' + default_param + '=', 'g' );
-		if( ! url.match( regexp ) )
-		{	// Append defaul param if it is not found in the current URL:
-			url += '&' + default_param + '=' + default_params[ default_param ];
-		}
-	}
-	url += '&redir=no';
-
-	// Change URL in browser address bar:
-	window.history.pushState( '', '', url );
-
-	// Change active button:
-	jQuery( 'a[data-param-switcher=<?php echo $this->ID; ?>]' ).attr( 'class', '<?php echo ( empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'] ); ?>' );
-	jQuery( this ).attr( 'class', '<?php echo ( empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'] ); ?>' );
-
-	return false;
-} );
-</script>
-		<?php
+			$script_config = array(
+					'widget_id' => $this->ID,
+					'link_class' => ( empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'] ),
+					'active_link_class' => ( empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'] ),
+					'default_params' => $default_params,
+				);
+			expose_var_to_js( 'widget_'.$this->ID, json_encode( $script_config ), 'evo_widget_param_switcher_config' );
 		}
 
 		global $evo_widget_param_switcher_js_initied;
