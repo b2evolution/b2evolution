@@ -688,13 +688,73 @@ function echo_link_position_js()
  */
 function echo_link_sortable_js( $fieldset_prefix = '' )
 {
-	$link_sortable_config = array(
-			'fieldset_prefix' =>  $fieldset_prefix,
-			'htsrv_url' => get_htsrv_url(),
-			'crumb' => get_crumb( 'link' ),
-		);
-	// TODO: make this work for multiple tables with different fieldset prefixes
-	expose_var_to_js( 'evo_link_sortable_config', json_encode( $link_sortable_config ) );
+	?>
+	<script>
+	jQuery( document ).ready( function()
+	{
+		jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table' ).sortable(
+		{
+			containerSelector: 'table',
+			itemPath: '> tbody',
+			itemSelector: 'tr',
+			placeholder: jQuery.parseHTML( '<tr class="placeholder"><td colspan="5"></td></tr>' ),
+			onMousedown: function( $item, _super, event )
+			{
+				if( ! event.target.nodeName.match( /^(a|img|select|span)$/i ) )
+				{	// Ignore a sort action when mouse is clicked on the tags <a>, <img>, <select> or <span>
+					event.preventDefault();
+					return true;
+				}
+			},
+			onDrop: function( $item, container, _super )
+			{
+				jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr' ).removeClass( 'odd even' );
+				jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr:odd' ).addClass( 'even' );
+				jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr:even' ).addClass( 'odd' );
+	
+				var link_IDs = '';
+				jQuery( '#<?php echo $fieldset_prefix; ?>attachments_fieldset_table table tr' ).each( function()
+				{
+					var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
+					if( link_ID_cell.length > 0 )
+					{
+						link_IDs += link_ID_cell.html() + ',';
+					}
+				} );
+				link_IDs = link_IDs.slice( 0, -1 );
+	
+				jQuery.ajax(
+				{
+					url: '<?php echo get_htsrv_url(); ?>anon_async.php',
+					type: 'POST',
+					data:
+					{
+						'action': 'update_links_order',
+						'links': link_IDs,
+						'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
+					},
+					success: function( data )
+					{
+						link_data = JSON.parse( ajax_debug_clear( data ) );
+						// Update data-order attributes
+						jQuery( '#attachments_fieldset_table table tr' ).each( function()
+						{
+							var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
+							if( link_ID_cell.length > 0 )
+							{
+								link_ID_cell.attr( 'data-order', link_data[link_ID_cell.html()] );
+							}
+						} );
+						evoFadeSuccess( $item );
+					}
+				} );
+	
+				$item.removeClass(container.group.options.draggedClass).removeAttr("style");
+			}
+		} );
+	} );
+	</script>
+	<?php
 }
 
 
