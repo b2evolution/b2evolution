@@ -994,6 +994,7 @@ $use_defer_for_loggedin_disp_profile = false; // Temporarily disabled. Need tof 
 $use_defer_for_loggedin_disp_pwdchange = false; // Temporarily disabled. Need to fix password related JS.
 $use_defer_for_loggedin_disp_edit = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
 $use_defer_for_loggedin_disp_edit_comment = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
+$use_defer_for_loggedin_disp_comments = false; // Temporarily disabled. Need to fix comments and voting related JS.
 
 $disable_ajax_forms_for_frontoffice = true; // Disables comment ajax forms in the front-office
 $disable_tinymce_for_frontoffice = true; // Disables TinyMCE plugin in the front-office
