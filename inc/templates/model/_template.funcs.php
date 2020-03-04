@@ -762,9 +762,13 @@ function render_template_callback( $var, $params, $objects = array() )
 		case 'Item:visibility_status':
 			if( $rendered_Item->status != 'published' )
 			{
-				$rendered_Item->format_status( array_merge( array(
-						'template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
-					), $params ) );
+				$temp_params = array_merge( array(
+						'status_template' => '<div class="evo_status evo_status__$status$ badge" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+					), $params );
+				// Override param 'template' to avoid conflict in params in the status function,
+				// because here param 'template' contains a code of quick template:
+				$temp_params['template'] = $temp_params['status_template'];
+				echo $rendered_Item->get_format_status( $temp_params );
 			}
 			break;
 
