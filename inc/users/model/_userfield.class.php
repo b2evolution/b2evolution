@@ -158,8 +158,8 @@ class Userfield extends DataObject
 	{
 		return Userfield::format_options( array(
 				'unrestricted' => T_('Unrestricted'),
-				'private'      => T_('Private (owner + admins)'),
-				'admin'        => T_('Admins only'),
+				'private'      => T_('Private (owner + admins)').' '.get_userfield_visibility_icon( 'private' ),
+				'admin'        => T_('Admins only').' '.get_userfield_visibility_icon( 'admin' ),
 			), $format );
 	}
 
@@ -354,13 +354,19 @@ class Userfield extends DataObject
 
 
 	/**
-	 * Get user field icon HTML code
+	 * Get label for input of the User Field
 	 *
-	 * @return string HTML code for user field icon
+	 * @return string HTML code for user field input label
 	 */
-	function get_icon()
+	function get_input_label()
 	{
-		return get_userfield_icon( $this->get( 'icon_name' ), $this->get( 'code' ) );
+		return trim(
+			// User field icon:
+			get_userfield_icon( $this->get( 'icon_name' ), $this->get( 'code' ) ).' '
+			// User field name:
+			.$this->get( 'name' ).' '
+			// User field visibility icon(blue/red lock):
+			.get_userfield_visibility_icon( $this->get( 'visibility' ) ) );
 	}
 }
 ?>

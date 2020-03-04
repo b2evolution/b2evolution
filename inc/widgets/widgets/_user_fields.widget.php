@@ -158,7 +158,7 @@ class user_fields_Widget extends ComponentWidget
 
 			// Field title:
 			echo $this->disp_params['item_title_start']
-				.get_userfield_icon( $userfield->ufdf_icon_name, $userfield->ufdf_code ).$userfield->ufdf_name
+				.get_userfield_input_label( $userfield )
 				.$this->disp_params['item_title_end'];
 
 			// Field value:

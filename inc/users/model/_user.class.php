@@ -5541,7 +5541,7 @@ class User extends DataObject
 		global $DB, $current_User;
 
 		$SQL = new SQL( 'Load values of user fields for User #'.$this->ID );
-		$SQL->SELECT( 'uf_ID, ufdf_ID, uf_varchar, ufdf_duplicated, ufdf_type, ufdf_name, ufdf_icon_name, ufdf_code, ufgp_ID, ufgp_name, ufdf_visibility' );
+		$SQL->SELECT( 'uf_ID, uf_varchar, ufgp_ID, ufgp_name, T_users__fielddefs.*' );
 		$SQL->FROM( 'T_users__fields' );
 		$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
 		$SQL->FROM_add( 'INNER JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID' );

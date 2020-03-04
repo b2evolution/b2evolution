@@ -58,7 +58,7 @@ $Form->begin_fieldset( T_('Contact form').' (disp=msgform)'.get_manual_link( 'co
 	{
 		$saved_additional_fields .= $Form->infostart
 			.'<input type="hidden" name="msgform_additional_fields[]" value="'.$UserField->ID.'" />'
-			.$UserField->get( 'name' )
+			.$UserField->get_input_label()
 			.' '.get_icon( 'minus', 'imgtag', array( 'class' => 'remove_user_field', 'style' => 'cursor:pointer' ) )
 			.$Form->infoend;
 	}

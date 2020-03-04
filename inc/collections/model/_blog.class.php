@@ -6679,14 +6679,11 @@ class Blog extends DataObject
 			$field_name .= '[]';
 		}
 
-		// Field icon:
-		$userfield_icon = $UserField->get_icon().' ';
-
 		switch( $UserField->get( 'type' ) )
 		{
 			case 'text':
 				$field_params['cols'] = 38;
-				$Form->textarea_input( $field_name, $field_value, 5, $userfield_icon.$UserField->get( 'name' ), $field_params );
+				$Form->textarea_input( $field_name, $field_value, 5, $UserField->get_input_label(), $field_params );
 				break;
 
 			case 'list':
@@ -6695,7 +6692,7 @@ class Blog extends DataObject
 				{	// Add an empty value for not required field:
 					$uf_options = array_merge( array( '', '---' ), $uf_options );
 				}
-				$Form->select_input_array( $field_name, $field_value, $uf_options, $userfield_icon.$UserField->get( 'name' ), '', $field_params );
+				$Form->select_input_array( $field_name, $field_value, $uf_options, $UserField->get_input_label(), '', $field_params );
 				break;
 
 			case 'user':
@@ -6709,7 +6706,7 @@ class Blog extends DataObject
 			default:
 				$field_params['maxlength'] = 255;
 				$field_params['style'] = 'max-width:90%';
-				$Form->text_input( $field_name, $field_value, ( $UserField->get( 'type' ) == 'url' ? 80 : 40 ), $userfield_icon.$UserField->get( 'name' ), '', $field_params );
+				$Form->text_input( $field_name, $field_value, ( $UserField->get( 'type' ) == 'url' ? 80 : 40 ), $UserField->get_input_label(), '', $field_params );
 		}
 	}
 

@@ -3783,6 +3783,52 @@ function get_userfield_icon( $icon_class, $field_code )
 
 
 /**
+ * Get user field visibility icon HTML code
+ *
+ * @param string User field visibility
+ * @return string HTML code for user field visibility icon
+ */
+function get_userfield_visibility_icon( $user_field_visibility )
+{
+	switch( $user_field_visibility )
+	{
+		case 'unrestricted':
+			return '';
+
+		case 'private':
+			return get_icon( 'file_not_allowed', 'imgtag', array( 'title' => T_('This field cannot be seen by other users.'), 'color' => '#5bc0de' ) );
+
+		case 'admin':
+			return get_icon( 'file_not_allowed', 'imgtag', array( 'title' => T_('This field can only be seen by admins.'), 'color' => '#F00' ) );
+	}
+
+	return '';
+}
+
+
+/**
+ * Get label for input of the User Field
+ *
+ * @param object User field data
+ * @return string
+ */
+function get_userfield_input_label( $userfield_row )
+{
+	if( $userfield_row instanceof Userfield )
+	{	// The passed row is already Userfield object:
+		$Userfield = $userfield_row;
+	}
+	else
+	{	// Initialize Userfield object from row data:
+		load_class( 'users/model/_userfield.class.php', 'Userfield' );
+		$Userfield = new Userfield( $userfield_row );
+	}
+
+	return $Userfield->get_input_label();
+}
+
+
+/**
  * Display user fields from given array
  *
  * @param array User fields given from sql query with following structure:
@@ -3872,13 +3918,6 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 		$field_note = '';
 		$field_size = 40;
 
-		if( $userfield->ufdf_visibility == 'private' || $userfield->ufdf_visibility == 'admin' )
-		{	// Field visibility icon:
-			$field_note .= get_icon( 'file_not_allowed', 'imgtag', array(
-				'title' => ( $userfield->ufdf_visibility == 'private' ? T_('This field cannot be seen by other users.') : T_('This field can only be seen by admins.') ),
-				'color' => ( $userfield->ufdf_visibility == 'private' ? '#5bc0de' : '#F00' ) ) ).' ';
-		}
-
 		if( $action != 'view' )
 		{
 			if( in_array( $userfield->ufdf_duplicated, array( 'allowed', 'list' ) ) )
@@ -3912,12 +3951,9 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 			$field_params['autocomplete'] = 'on';
 		}
 
-		// Field icon:
-		$userfield_icon = get_userfield_icon( $userfield->ufdf_icon_name, $userfield->ufdf_code ).' ';
-
 		if( $action == 'view' )
 		{	// Only view
-			$Form->info( $userfield_icon.$userfield->ufdf_name, $uf_val.' '.$field_note );
+			$Form->info( get_userfield_input_label( $userfield ), $uf_val.' '.$field_note );
 		}
 		else
 		{	// Edit mode
@@ -3926,7 +3962,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 				case 'text':
 					$field_params['cols'] = 38;
 					$field_params['note'] = $field_note;
-					$Form->textarea_input( 'uf_'.$userfield->uf_ID, $uf_val, 5, $userfield_icon.$userfield->ufdf_name, $field_params );
+					$Form->textarea_input( 'uf_'.$userfield->uf_ID, $uf_val, 5, get_userfield_input_label( $userfield ), $field_params );
 					break;
 
 				case 'list':
@@ -3937,7 +3973,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 					{	// Add empty value
 						$uf_options = array_merge( array( '---' ), $uf_options );
 					}
-					$Form->select_input_array( 'uf_'.$userfield->uf_ID, $uf_val, $uf_options, $userfield_icon.$userfield->ufdf_name, $field_note, $field_params );
+					$Form->select_input_array( 'uf_'.$userfield->uf_ID, $uf_val, $uf_options, get_userfield_input_label( $userfield ), $field_note, $field_params );
 					break;
 
 				case 'user':
@@ -3951,7 +3987,7 @@ function userfields_display( $userfields, $Form, $new_field_name = 'new', $add_g
 				default:
 					$field_params['maxlength'] = 255;
 					$field_params['style'] = 'max-width:90%';
-					$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, $field_size, $userfield_icon.$userfield->ufdf_name, $field_note, $field_params );
+					$Form->text_input( 'uf_'.$userfield->uf_ID, $uf_val, $field_size, get_userfield_input_label( $userfield ), $field_note, $field_params );
 			}
 		}
 
