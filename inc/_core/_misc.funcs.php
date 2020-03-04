@@ -10414,12 +10414,14 @@ function use_defer()
 		$use_defer_for_loggedin_users,
 		$use_defer_for_anonymous_users,
 		$use_defer_for_anonymous_disp_register,
+		$use_defer_for_anonymous_disp_users,
 		$use_defer_for_default_register_form;
 	
 	$r =  $use_defer
 		   && ( is_admin_page() ? $use_defer_for_backoffice : true )
 		   && ( is_logged_in() ? $use_defer_for_loggedin_users : $use_defer_for_anonymous_users )
 		   && ( $disp == 'register' ? $use_defer_for_anonymous_disp_register : true )
+		   && ( $disp == 'users' ? $use_defer_for_anonymous_disp_users : true )
 		   && ( empty( $disp ) && $ReqPath == '/htsrv/register.php' ? $use_defer_for_default_register_form : true );
 
 	return $r;
