@@ -10420,8 +10420,10 @@ function use_defer()
 		$use_defer_for_loggedin_disp_profile,
 		$use_defer_for_loggedin_disp_pwdchange,
 		$use_defer_for_loggedin_disp_edit,
+		$use_defer_for_loggedin_disp_proposechange,
 		$use_defer_for_loggedin_disp_edit_comment,
 		$use_defer_for_loggedin_disp_comments,
+		$use_defer_for_loggedin_disp_visits,
 		$use_defer_for_loggedin_disp_messages,
 		$use_defer_for_loggedin_disp_threads,
 		$use_defer_for_default_register_form;
@@ -10437,8 +10439,10 @@ function use_defer()
 		   && ( is_logged_in() && $disp == 'profile' ? $use_defer_for_loggedin_disp_profile : true )
 		   && ( is_logged_in() && $disp == 'pwdchange' ? $use_defer_for_loggedin_disp_pwdchange : true )
 		   && ( is_logged_in() && $disp == 'edit' ? $use_defer_for_loggedin_disp_edit : true )
+		   && ( is_logged_in() && $disp == 'proposechange' ? $use_defer_for_loggedin_disp_proposechange : true )
 		   && ( is_logged_in() && $disp == 'edit_comment' ? $use_defer_for_loggedin_disp_edit_comment : true )
 		   && ( is_logged_in() && $disp == 'comments' ? $use_defer_for_loggedin_disp_comments : true )
+		   && ( is_logged_in() && $disp == 'visits' ? $use_defer_for_loggedin_disp_visits : true )
 		   && ( is_logged_in() && $disp == 'messages' ? $use_defer_for_loggedin_disp_messages : true )
 		   && ( is_logged_in() && $disp == 'threads' ? $use_defer_for_loggedin_disp_threads : true );
 
