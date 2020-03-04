@@ -113,7 +113,7 @@ jQuery( document ).ready( function()
 
 	jQuery( config['canvas_id'] ).data( 'plot', plot );
 
-	if( config['init_js_callback'] )
+	if( window[config['init_js_callback']] && typeof window[config['init_js_callback'] == 'function'] )
 	{
 		window[config['init_js_callback']]();
 	}

@@ -10,13 +10,13 @@
  * 
  * Depends on jQuery
  */
-var config = coll_activity_stats_widget_config;
-var	originalData = [], weekData = [], xLabels = [],
-		displayed = config['time_period'],
-		resizeTimer;
-
 function resize_coll_activity_stat_widget()
 {
+	var config = coll_activity_stats_widget_config;
+	var	originalData = [], weekData = [], xLabels = [],
+			displayed = config['time_period'],
+			resizeTimer;
+
 	if( plot == undefined )
 	{
 		plot = jQuery( '#canvasbarschart' ).data( 'plot' );
