@@ -977,9 +977,15 @@ $access_control_allow_origin = false; // set to '*' or to specific URL to enable
  */
 $use_defer = true;
 $use_defer_for_backoffice = false;
-$use_defer_for_loggedin_users = false;
+$use_defer_for_loggedin_users = true;
 $use_defer_for_anonymous_users = true;
-$use_defer_for_anonymous_disp_register = false;
+
+$use_defer_for_anonymous_disp_register = false; // Temporarily disabled. Need to fix password related JS.
+$use_defer_for_default_register_form = false; // Temporarily disabled. Need to fix password related JS.
+$use_defer_for_anonymous_disp_users = false; // Temporarily disabled. Need to fix QueryBuilder JS.
+$use_defer_for_loggedin_disp_single_page = false; // Temporarily disabled. Need to fix attachments related JS.
+$use_defer_for_loggedin_disp_front = false; // Temporarily disabled. Need to fix attachments related JS (Bootstrap Manual front-page specially).
+$use_defer_for_loggedin_disp_messages = false; // Temporarily disabled. Need to fix attachments related JS.
 
 $disable_ajax_forms_for_frontoffice = true; // Disables comment ajax forms in the front-office
 $disable_tinymce_for_frontoffice = true; // Disables TinyMCE plugin in the front-office
