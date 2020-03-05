@@ -382,7 +382,7 @@ function campaign_results_block( $params = array() )
 		$count_SQL->FROM_add( 'LEFT JOIN T_users ON csnd_user_ID = user_ID' );
 	}
 
-	$Results = new Results( $SQL->get(), 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
+	$Results = new Results( $SQL->get(), isset( $params['enlt_ID'] ) ? 'lemcmp_' : 'emcmp_', 'D', $UserSettings->get( 'results_per_page' ), $count_SQL->get() );
 	$Results->Cache = & get_EmailCampaignCache();
 	$Results->title = $params['results_title'];
 
@@ -395,8 +395,12 @@ function campaign_results_block( $params = array() )
 			'callback' => 'filter_campaign_results_block' 
 		);
 
-// fp>yb TODO: make All go to correct URL; 
-	$Results->register_filter_preset( 'all', T_('All'), $admin_url.'?ctrl=campaigns' );
+	$Results->register_filter_preset( 'all', T_('All'),
+		isset( $params['enlt_ID'] )
+		// URL to display campaigns of the edited List:
+		? $admin_url.'?ctrl=newsletters&amp;action=edit&amp;tab=campaigns&amp;enlt_ID='.$params['enlt_ID']
+		// URL to display all campaigns:
+		: $admin_url.'?ctrl=campaigns' );
 
 	$Results->cols[] = array(
 			'th' => T_('ID'),
