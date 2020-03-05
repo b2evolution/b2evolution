@@ -81,6 +81,28 @@ class Template extends DataObject
 
 
 	/**
+	 * Set param value
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
+	 * @return boolean true, if a value has been set; false if it has not changed
+	 */
+	function set( $parname, $parvalue, $make_null = false )
+	{
+		switch( $parname )
+		{
+			case 'code':
+				// Store previous code value before update:
+				$this->previous_code = $this->get( 'code' );
+				return parent::set_param( $parname, 'string', $parvalue, $make_null );
+		}
+
+		return parent::set_param( $parname, 'string', $parvalue, $make_null );
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
@@ -194,11 +216,24 @@ class Template extends DataObject
 
 		$result = parent::dbupdate();
 		if( $result )
-		{
+		{	// If Template has been updated successfully
+
+			// Invalidate pre-rendered cache of Items which use [include:...:this_template_code]:
+			$template_code = isset( $this->previous_code ) ? $this->previous_code : $this->get( 'code' );
+			$invalidated_items_num = $DB->query( 'DELETE T_items__prerendering
+				 FROM T_items__prerendering
+				 LEFT JOIN T_items__item ON itpr_itm_ID = post_ID
+				WHERE post_content LIKE '.$DB->quote( '%:'.$template_code.'%' ) );
+			if( $invalidated_items_num > 0 )
+			{	// Inform about invalidated cache:
+				$Messages->add_to_group( sprintf( T_('Pre-render caches have been invalidated for %d items that use this template in an %s.'), $invalidated_items_num, '<code>[include:]</code>' ), 'note', T_('Cache invalidated:' ) );
+			}
+
+			// Commit changes on successful update:
 			$DB->commit();
 		}
 		else
-		{
+		{	// Rollback changes on failed update:
 			$DB->rollback();
 		}
 
