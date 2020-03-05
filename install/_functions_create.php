@@ -181,7 +181,13 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 						( 4, 'url',    'Vimeo',         NULL, 'optional',    'unrestricted', 'forbidden', '20', '0', 'vimeo',        'fa fa-vimeo' ),
 						( 5, 'text',   'Main address',  NULL, 'optional',    'private',      'forbidden', '1',  '0', 'mainaddress',  'fa fa-building' ),
 						( 5, 'text',   'Home address',  NULL, 'optional',    'private',      'forbidden', '2',  '0', 'homeaddress',  'fa fa-home' ),
-						( 6, 'text',   'Admin notes',   NULL, 'recommended', 'admin',        'forbidden', '2',  '0', 'adminnotes',   'fa fa-edit' )" );
+						( 6, 'text',   'Admin notes',   NULL, 'recommended', 'admin',        'forbidden', '1',  '0', 'adminnotes',   'fa fa-edit' )" );
+
+	if( is_pro() )
+	{	// Install default user field definitions for PRO version:
+		load_funcs( '_core/_pro_features.funcs.php' );
+		pro_install_default_user_fields();
+	}
 	task_end();
 
 

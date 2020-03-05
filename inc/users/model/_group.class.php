@@ -127,6 +127,7 @@ class Group extends DataObject
 		return array(
 				array( 'table'=>'T_users', 'fk'=>'user_grp_ID', 'msg'=>T_('%d users in this group') ),
 				array( 'table'=>'T_users__invitation_code', 'fk'=>'ivc_grp_ID', 'msg'=>T_('%d user invitation codes in this group') ),
+				array( 'table'=>'T_users__fielddefs', 'fk'=>'ufdf_grp_ID', 'msg'=>T_('%d user fields use this group') ),
 			);
 	}
 

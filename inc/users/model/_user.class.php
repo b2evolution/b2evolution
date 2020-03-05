@@ -1149,7 +1149,7 @@ class User extends DataObject
 					continue;
 				}
 
-				if( ! userfield_is_viewable( $this->userfield_defs[$userfield->uf_ufdf_ID][5], $this->ID ) )
+				if( ! userfield_is_viewable( $this->ID, $this->userfield_defs[$userfield->uf_ufdf_ID][5], $this->userfield_defs[$userfield->uf_ufdf_ID][0] ) )
 				{	// Current user cannot update the user field:
 					continue;
 				}
@@ -1323,7 +1323,7 @@ class User extends DataObject
 					}
 					foreach( $uf_new_fields as $uf_new_id => $uf_new_vals )
 					{
-						if( ! userfield_is_viewable( $this->userfield_defs[$uf_new_id][5], $this->ID ) )
+						if( ! userfield_is_viewable( $this->ID, $this->userfield_defs[$uf_new_id][5], $this->userfield_defs[$uf_new_id][0] ) )
 						{	// Current user cannot add the user field:
 							continue;
 						}
@@ -5541,7 +5541,7 @@ class User extends DataObject
 		global $DB, $current_User;
 
 		$SQL = new SQL( 'Load values of user fields for User #'.$this->ID );
-		$SQL->SELECT( 'uf_ID, ufdf_ID, uf_varchar, ufdf_duplicated, ufdf_type, ufdf_name, ufdf_icon_name, ufdf_code, ufgp_ID, ufgp_name, ufdf_visibility' );
+		$SQL->SELECT( 'uf_ID, uf_varchar, ufgp_ID, ufgp_name, T_users__fielddefs.*' );
 		$SQL->FROM( 'T_users__fields' );
 		$SQL->FROM_add( 'INNER JOIN T_users__fielddefs ON uf_ufdf_ID = ufdf_ID' );
 		$SQL->FROM_add( 'INNER JOIN T_users__fieldgroups ON ufdf_ufgp_ID = ufgp_ID' );
@@ -5553,7 +5553,7 @@ class User extends DataObject
 		$userfield_lists = array();
 		foreach( $userfields as $u => $userfield )
 		{
-			if( ! userfield_is_viewable( $userfield->ufdf_visibility, $this->ID ) )
+			if( ! userfield_is_viewable( $this->ID, $userfield->ufdf_visibility, $userfield->ufdf_type ) )
 			{	// Current user cannot view this user field:
 				unset( $userfields[ $u ] );
 				continue;

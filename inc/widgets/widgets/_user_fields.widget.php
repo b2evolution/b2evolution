@@ -156,21 +156,23 @@ class user_fields_Widget extends ComponentWidget
 			// Start user field:
 			echo $this->disp_params['item_start'];
 
-			$userfield_icon = '';
-			if( ! empty( $userfield->ufdf_icon_name ) )
-			{	// Field Icon:
-				$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.' ufld_'.$userfield->ufdf_code.' ufld__textcolor"></span> ';
-			}
-
 			// Field title:
 			echo $this->disp_params['item_title_start']
-				.$userfield_icon.$userfield->ufdf_name
+				.get_userfield_input_label( $userfield )
 				.$this->disp_params['item_title_end'];
 
 			// Field value:
-			echo $this->disp_params['item_text_start']
-				.$userfield->uf_varchar
-				.$this->disp_params['item_text_end'];
+			echo $this->disp_params['item_text_start'];
+			if( is_pro() )
+			{	// Format user field value by PRO function:
+				load_funcs( '_core/_pro_features.funcs.php' );
+				echo pro_get_user_field_value( $userfield );
+			}
+			else
+			{	// Display normal value:
+				echo $userfield->uf_varchar;
+			}
+			echo $this->disp_params['item_text_end'];
 
 			$group_ID = $userfield->ufgp_ID;
 

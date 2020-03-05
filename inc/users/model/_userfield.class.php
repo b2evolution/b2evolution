@@ -40,6 +40,7 @@ class Userfield extends DataObject
 	var $bubbletip;
 	var $icon_name;
 	var $code;
+	var $grp_ID;
 
 	/**
 	 * Constructor
@@ -69,6 +70,7 @@ class Userfield extends DataObject
 			$this->bubbletip  = $db_row->ufdf_bubbletip;
 			$this->icon_name  = $db_row->ufdf_icon_name;
 			$this->code       = $db_row->ufdf_code;
+			$this->grp_ID     = isset( $db_row->ufdf_grp_ID ) ? $db_row->ufdf_grp_ID : NULL;
 		}
 	}
 
@@ -124,6 +126,7 @@ class Userfield extends DataObject
 			'email'  => T_('Email address'),
 			'url'    => T_('URL'),
 			'phone'  => T_('Phone number'),
+			'user'   => T_('User select'),
 		 );
 	}
 
@@ -155,8 +158,8 @@ class Userfield extends DataObject
 	{
 		return Userfield::format_options( array(
 				'unrestricted' => T_('Unrestricted'),
-				'private'      => T_('Private (owner + admins)'),
-				'admin'        => T_('Admins only'),
+				'private'      => T_('Private (owner + admins)').' '.get_userfield_visibility_icon( 'private' ),
+				'admin'        => T_('Admins only').' '.get_userfield_visibility_icon( 'admin' ),
 			), $format );
 	}
 
@@ -227,6 +230,21 @@ class Userfield extends DataObject
 		// Type
 		param_string_not_empty( 'ufdf_type', T_('Please enter a type.') );
 		$this->set_from_Request( 'type' );
+
+		// User group
+		if( $this->get( 'type' ) == 'user' )
+		{	// Group is required for type "User select":
+			$ufdf_grp_ID = param( 'ufdf_grp_ID', 'integer', NULL );
+			if( $ufdf_grp_ID === NULL || ! is_pro() )
+			{
+				param_error( 'ufdf_grp_ID', 'Please select Group for field type "User select"' );
+			}
+			$this->set( 'grp_ID', ( empty( $ufdf_grp_ID ) ? NULL : $ufdf_grp_ID ), true );
+		}
+		else
+		{	// Reset group for not user select type:
+			$this->set( 'grp_ID', NULL, true );
+		}
 
 		// Code
 		$code = param( 'ufdf_code', 'string' );
@@ -332,6 +350,23 @@ class Userfield extends DataObject
 	function get_name()
 	{
 		return $this->name;
+	}
+
+
+	/**
+	 * Get label for input of the User Field
+	 *
+	 * @return string HTML code for user field input label
+	 */
+	function get_input_label()
+	{
+		return trim(
+			// User field icon:
+			get_userfield_icon( $this->get( 'icon_name' ), $this->get( 'code' ) ).' '
+			// User field name:
+			.$this->get( 'name' ).' '
+			// User field visibility icon(blue/red lock):
+			.get_userfield_visibility_icon( $this->get( 'visibility' ) ) );
 	}
 }
 ?>

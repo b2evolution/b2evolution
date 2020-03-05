@@ -364,13 +364,7 @@ echo '<div class="profile_column_right">';
 			$profileForm->begin_fieldset( $userfield->ufgp_name, array( 'id' => 'fieldset_user_fields' ) );
 		}
 
-		$userfield_icon = '';
-		if( ! empty( $userfield->ufdf_icon_name ) )
-		{ // Icon
-			$userfield_icon = '<span class="'.$userfield->ufdf_icon_name.' ufld_'.$userfield->ufdf_code.' ufld__textcolor"></span> ';
-		}
-
-		$profileForm->info( $userfield_icon.$userfield->ufdf_name, $userfield->uf_varchar );
+		$profileForm->info( get_userfield_icon( $userfield->ufdf_icon_name, $userfield->ufdf_code ).' '.$userfield->ufdf_name, $userfield->uf_varchar );
 
 		$group_ID = $userfield->ufgp_ID;
 	}
