@@ -1808,10 +1808,12 @@ class _core_Module extends Module
 				global $Session;
 				$customizer_mode = $Session->get( 'customizer_mode_'.$Blog->ID );
 				$entries['skin'] = array(
-					'text'        => '<span class="fa fa-sliders"></span> '.T_('Customize'),
-					'href'        => $Blog->get( 'customizer_url', ( $customizer_mode ? array( 'mode' => 'disable' ) : array() ) ),
-					'entry_class' => 'rwdhide',
-					'class'       => 'evo_customizer__toggler'.( $customizer_mode ? ' active' : '' ),
+					'text'         => '<span class="fa fa-sliders"></span> '.T_('Customize'),
+					'href'         => $Blog->get( 'customizer_url', ( $customizer_mode ? array( 'mode' => 'disable' ) : array() ) ),
+					'entry_class'  => 'rwdhide',
+					'class'        => 'evo_customizer__toggler'.( $customizer_mode ? ' active' : '' ),
+					'shortcut'     => 'f4',
+					'shortcut-top' => 'f4',
 				);
 			}
 

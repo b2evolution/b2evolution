@@ -2135,7 +2135,7 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
 /**
  * Initialize Hotkeys library
  */
-function init_hotkeys_js( $relative_to = 'rsc_url', $hotkeys = array() )
+function init_hotkeys_js( $relative_to = 'rsc_url', $hotkeys = array(), $top_hotkeys = array() )
 {
 	require_js( '#jquery#', $relative_to ); // dependency
 	require_js( '#hotkeys#', $relative_to );
@@ -2143,6 +2143,12 @@ function init_hotkeys_js( $relative_to = 'rsc_url', $hotkeys = array() )
 	if( $hotkeys )
 	{
 		add_js_headline( 'var shortcut_keys = '.json_encode( $hotkeys ).';' );
+	}
+
+	// top_hotkeys only serve as a flag, do not forget to include in hotkeys definition above:
+	if( $top_hotkeys )
+	{
+		add_js_headline( 'var top_shortcut_keys = '.json_encode( $top_hotkeys ).';' );
 	}
 
 	require_js( 'hotkeys/hotkeys.init.js', $relative_to );
