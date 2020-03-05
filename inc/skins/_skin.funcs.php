@@ -169,6 +169,12 @@ function skin_init( $disp )
 	switch( $disp )
 	{
 		// CONTENT PAGES:
+		case 'front':
+			if( is_logged_in() && has_featured_Item( 'front' ) )
+			{
+				init_hotkeys_js( 'blog' );
+			}
+			break;
 		case 'single':
 		case 'page':
 		case 'terms':
@@ -371,7 +377,7 @@ function skin_init( $disp )
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
 
-			if( is_logged_in() )
+			if( is_logged_in() && has_featured_Item( 'posts' ) )
 			{
 				init_hotkeys_js( 'blog' );
 			}

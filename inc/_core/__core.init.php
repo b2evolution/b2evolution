@@ -1468,11 +1468,12 @@ class _core_Module extends Module
 					}
 				}
 				elseif( ! is_admin_page() &&
-				    ( $disp == 'posts' ) &&
-				    $perm_admin_restricted &&
-				    ( $featured_intro_Item = & get_featured_Item( 'posts', NULL, true, $Blog->get_setting( 'disp_featured_above_list' ) ) ) &&
-				    ( $featured_intro_Item->is_intro() || ( $Blog->get_setting( 'disp_featured_above_list' ) && $featured_intro_Item->is_featured() ) ) )
+					$perm_admin_restricted &&
+					( ( $disp == 'posts' && has_featured_Item( 'posts' ) ) || ( $disp == 'front' && has_featured_Item( 'front' ) ) ) )
 				{
+					// Get Featured/Intro Item:
+					$featured_intro_Item = & get_featured_Item( $disp, NULL, true );
+
 					if( $Blog->get_setting( 'in_skin_editing' ) &&
 					    $edit_item_url = $featured_intro_Item->get_edit_url() )
 					{	// Display menu entry to edit the post in front-office:
