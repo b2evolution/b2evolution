@@ -11,6 +11,14 @@
  *
  * @param object jQuery object
  */
+// General settings:
+var b2evo_colorbox_params = {
+	maxWidth: jQuery( window ).width() > 480 ? "95%" : "100%",
+	maxHeight: jQuery( window ).height() > 480 ? "90%" : "100%",
+	slideshow: true,
+	slideshowAuto: false
+};
+
 function init_colorbox( this_obj )
 {
 	if( typeof( this_obj ) != 'object' || this_obj.length == 0 )
@@ -37,13 +45,6 @@ function init_colorbox( this_obj )
 }
 jQuery( document ).ready( function()
 {
-	// General settings:
-	var b2evo_colorbox_params = {
-			maxWidth: jQuery( window ).width() > 480 ? "95%" : "100%",
-			maxHeight: jQuery( window ).height() > 480 ? "90%" : "100%",
-			slideshow: true,
-			slideshowAuto: false
-		};
 	// For post images:
 	b2evo_colorbox_params_post = jQuery.extend( {}, b2evo_colorbox_params, b2evo_colorbox_params_post );
 	// For comment images:
