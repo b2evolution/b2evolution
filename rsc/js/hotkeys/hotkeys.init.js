@@ -21,6 +21,11 @@ jQuery( document ).ready( function() {
 
 	//console.info( 'Hotkeys found:', shortcut_keys );
 
+	// Enable hotkeys even inside INPUT, SELECT, TEXTAREA elements:
+	hotkeys.filter = function( event ) {
+			return true;
+		}
+
 	hotkeys( shortcut_keys.join( ',' ), function( event, handler ) {
 			var shortcuts = jQuery( '[data-shortcut*="' + handler.key + '"]' );
 			if( shortcuts.length )

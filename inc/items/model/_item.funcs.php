@@ -2189,7 +2189,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu">
-					<li role="presentation"><a onclick="return b2edit_open_preview( forms.item_checkchanges, \''.$url.'\', true )" class="pointer"><span class="fa fa-square-o orange"></span> <span>'.TB_('Preview blocks').'</span></a></li>
+					<li role="presentation"><a onclick="return b2edit_open_preview( forms.item_checkchanges, \''.$url.'\', true )" class="pointer" data-shortcut="ctrl+f9"><span class="fa fa-square-o orange"></span> <span>'.TB_('Preview blocks').'</span></a></li>
 				</ul>
 			</div>';
 	}
