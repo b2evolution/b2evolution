@@ -348,13 +348,13 @@ function campaign_results_block( $params = array() )
 
 	// Create result set:
 	$SQL = new SQL();
-	$SQL->SELECT( 'T_email__campaign.*, enlt_ID, enlt_name, IF( ecmp_send_count = 0, 0, ecmp_open_count / ecmp_send_count ) AS open_rate' );
+	$SQL->SELECT( 'DISTINCT ecmp_ID, T_email__campaign.*, enlt_ID, enlt_name, IF( ecmp_send_count = 0, 0, ecmp_open_count / ecmp_send_count ) AS open_rate' );
 	$SQL->FROM( 'T_email__campaign' );
 	$SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 	$SQL->WHERE( 1 );
 
 	$count_SQL = new SQL();
-	$count_SQL->SELECT( 'COUNT( ecmp_ID )' );
+	$count_SQL->SELECT( 'COUNT( DISTINCT ecmp_ID )' );
 	$count_SQL->FROM( 'T_email__campaign' );
 	$count_SQL->FROM_add( 'INNER JOIN T_email__newsletter ON ecmp_enlt_ID = enlt_ID' );
 
@@ -377,6 +377,7 @@ function campaign_results_block( $params = array() )
 		$SQL->WHERE_and( $sql_where );
 		$count_SQL->WHERE_and( $sql_where );
 		// Join additional tables for the user columns:
+		$SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
 		$SQL->FROM_add( 'LEFT JOIN T_users ON csnd_user_ID = user_ID' );
 		$count_SQL->FROM_add( 'LEFT JOIN T_email__campaign_send ON csnd_camp_ID = ecmp_ID AND csnd_emlog_ID IS NOT NULL' );
 		$count_SQL->FROM_add( 'LEFT JOIN T_users ON csnd_user_ID = user_ID' );
