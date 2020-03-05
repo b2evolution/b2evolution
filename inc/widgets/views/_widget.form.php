@@ -163,7 +163,7 @@ $Plugins->trigger_event( 'WidgetEndSettingsForm', array(
 	) );
 
 $buttons = array();
-$buttons[] = array( 'submit', 'submit', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+enter,command+enter' );
+$buttons[] = array( 'submit', 'submit', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s' );
 if( $mode == 'customizer' )
 {	// Display buttons in special div on customizer mode:
 	echo '<div class="evo_customizer__buttons">';

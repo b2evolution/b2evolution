@@ -1427,6 +1427,7 @@ class _core_Module extends Module
 								'text' => sprintf( T_('Edit "%s" in Front-Office'), $Item->get_type_setting( 'name' ) ).'&hellip;',
 								'href' => $edit_item_url,
 								'shortcut' => 'f2',
+								'shortcut-top' => 'f2'
 							);
 					}
 					if( ! empty( $Item ) || ( ! empty( $edited_Item ) && $edited_Item->ID > 0 ) )
@@ -1438,6 +1439,7 @@ class _core_Module extends Module
 									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
 									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
 									'shortcut' => ( $Blog->get_setting( 'in_skin_editing' ) || ( $disp == 'widget_page' ) ) ? 'ctrl+f2' : 'f2,ctrl+f2',
+									'shortcut-top' => ( $Blog->get_setting( 'in_skin_editing' ) || ( $disp == 'widget_page' ) ) ? 'ctrl+f2' : 'f2,ctrl+f2',
 								);
 
 							if( $disp == 'widget_page' )
@@ -1446,6 +1448,7 @@ class _core_Module extends Module
 									'text' => T_('Edit widgets in Back-Office').'&hellip;',
 									'href' => $admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID,
 									'shortcut' => 'f2',
+									'shortcut-top' => 'f2',
 								);
 							}
 						}
@@ -1491,6 +1494,7 @@ class _core_Module extends Module
 								'text' => sprintf( T_('Edit "%s" in Front-Office'), $featured_intro_Item->get_type_setting( 'name' ) ).'&hellip;',
 								'href' => $edit_item_url,
 								'shortcut' => 'f2',
+								'shortcut-top' => 'f2',
 							);
 					}
 					if( $featured_intro_Item->ID > 0 )
@@ -1501,6 +1505,7 @@ class _core_Module extends Module
 									'text' => sprintf( T_('Edit "%s" in Back-Office'), $featured_intro_Item->get_type_setting( 'name' ) ).'&hellip;',
 									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$featured_intro_Item->ID.'&amp;blog='.$Blog->ID,
 									'shortcut' => $Blog->get_setting( 'in_skin_editing' ) ? 'ctrl+f2' : 'f2,ctrl+f2',
+									'shortcut-top' => $Blog->get_setting( 'in_skin_editing' ) ? 'ctrl+f2' : 'f2,ctrl+f2',
 								);
 						}
 						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )

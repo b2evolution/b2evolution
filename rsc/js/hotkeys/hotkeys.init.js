@@ -56,34 +56,53 @@ function shortcut_handler( key )
 }
 
 
-jQuery( document ).ready( function() {
-
-	// console.info( 'Init Hotkeys script...' );
-
-	// Get available shortcut keys:
-	var top_shortcut_keys = window.top_shortcut_keys || [];
-	var shortcut_keys = window.shortcut_keys || [];
-	var shortcuts = jQuery( '[data-shortcut]' );
+/**
+ * Get shortcut keys defined in the current window
+ */
+function get_shortcut_keys( keys, selector, data_attr )
+{
+	var shortcuts = jQuery( selector );
+	
 	if( shortcuts.length )
 	{
 		shortcuts.each( function( index ) {
-				var s = $( this ).data( 'shortcut' ).split( ',' ).map( function( n ) {
+				var s = $( this ).data( data_attr ).split( ',' ).map( function( n ) {
 					return n.trim();
 				} );
 
 				for( var i = 0; i < s.length; i++ )
 				{
-					if( shortcut_keys.indexOf( s[i] ) == -1 )
+					if( keys.indexOf( s[i] ) == -1 )
 					{
-						shortcut_keys.push( s[i] );
+						keys.push( s[i] );
 					}
 				}
 			} );
 	}
+}
+
+jQuery( document ).ready( function()
+{
+	// console.info( 'Init Hotkeys script...' );
+
+	// Get available shortcut keys:
+	var top_shortcut_keys = window.top_shortcut_keys || [];
+	var shortcut_keys = window.shortcut_keys || [];
+	
+	// console.info( 'Hotkeys already defined: ', shortcut_keys, top_shortcut_keys );
+
+	get_shortcut_keys( shortcut_keys, '[data-shortcut]', 'shortcut' );
 
 	if( window.self !== window.top )
 	{	// Get available top shortcut keys. Keys included in this list will be sent directly to the top window:
-		var top_shortcut_keys = window.top['top_shortcut_keys'];
+		if( window.top.top_shortcut_keys )
+		{
+			top_shortcut_keys = window.top.top_shortcut_keys;
+		}
+
+		// Get top shortcuts defined in this window:
+		// Caution! The top window might not know how to handle the keys added below.
+		get_shortcut_keys( top_shortcut_keys, '[data-shortcut-top]', 'shortcut-top' );
 
 		// Add top shortcut keys to list of shortcut keys:
 		for( var i = 0; i < top_shortcut_keys.length; i++ )
@@ -96,26 +115,10 @@ jQuery( document ).ready( function() {
 	}
 	else
 	{
-		var top_shortcuts = jQuery( '[data-shortcut-top]' );
-		if( top_shortcuts.length )
-		{
-			top_shortcuts.each( function( index ) {
-				var s = $( this ).data( 'shortcut-top' ).split( ',' ).map( function( n ) {
-					return n.trim();
-				} );
-
-				for( var i = 0; i < s.length; i++ )
-				{
-					if( top_shortcut_keys.indexOf( s[i] ) == -1 )
-					{
-						top_shortcut_keys.push( s[i] );
-					}
-				}
-			} );
-		}
+		get_shortcut_keys( top_shortcut_keys, '[data-shortcut-top]', 'shortcut-top' );
 	}
 
-	// console.info( 'Hotkeys found:', shortcut_keys, top_shortcut_keys );
+	// console.info( 'Hotkeys found' + ( window.self != window.top ? ' in ' + window.name : '' ) + ':' , shortcut_keys, top_shortcut_keys );
 
 	// Enable hotkeys even inside INPUT, SELECT, TEXTAREA elements:
 	hotkeys.filter = function( event ) {

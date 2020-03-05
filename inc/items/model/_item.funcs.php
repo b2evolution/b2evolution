@@ -2351,7 +2351,7 @@ function get_item_status_buttons( $edited_Item, $button_action = NULL, $button_c
 
 	$r = '<input type="hidden" name="post_status" value="'.format_to_output( $item_status, 'formvalue' ).'" />';
 	$r .= '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="'.$tooltip_placement.'" data-container="body" title="'.get_status_tooltip_title( $item_status ).'">';
-	$r .= '<button type="submit" class="btn btn-status-'.$item_status.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray['.$next_action.']">'
+	$r .= '<button type="submit" class="btn btn-status-'.$item_status.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray['.$next_action.']" data-shortcut="ctrl+s,command+s">'
 				.'<span>'.$status_options[ $item_status ].'</span>'
 			.'</button>'
 			.'<button type="button" class="btn btn-status-'.$item_status.( empty( $button_class ) ? '' : ' '.$button_class ).' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
