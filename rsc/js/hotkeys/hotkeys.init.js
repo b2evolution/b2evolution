@@ -27,7 +27,7 @@ jQuery( document ).ready( function() {
 		}
 
 	hotkeys( shortcut_keys.join( ',' ), function( event, handler ) {
-			var shortcuts = jQuery( '[data-shortcut*="' + handler.key + '"]' );
+			var shortcuts = jQuery( '[data-shortcut^="' + handler.key + '"],[data-shortcut*=",' + handler.key + '"]' );
 			if( shortcuts.length )
 			{
 				var el = shortcuts[0];

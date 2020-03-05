@@ -1785,6 +1785,12 @@ function skin_init( $disp )
 				$Messages->add( T_('The requested items don\'t exist.'), 'error' );
 			}
 			break;
+		case 'widget_page':
+			if( is_logged_in() )
+			{
+				init_hotkeys_js( 'blog' );
+			}
+			break;
 	}
 
 	// Add hreflang tags for Items with several versions:

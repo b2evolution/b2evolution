@@ -1372,6 +1372,7 @@ class _core_Module extends Module
 							// PLACE HOLDER FOR ENTRIES "Edit in Front-Office", "Edit in Back-Office", "View in Back-Office":
 							'edit_front'   => NULL,
 							'edit_back'    => NULL,
+							'edit_widgets' => NULL,
 							'propose'      => NULL,
 							'view_back'    => NULL,
 							'view_history' => NULL,
@@ -1436,8 +1437,17 @@ class _core_Module extends Module
 							$entries['page']['entries']['edit_back'] = array(
 									'text' => sprintf( T_('Edit "%s" in Back-Office'), $menu_Item->get_type_setting( 'name' ) ).'&hellip;',
 									'href' => $admin_url.'?ctrl=items&amp;action=edit&amp;p='.$menu_Item->ID.'&amp;blog='.$Blog->ID,
-									'shortcut' => $Blog->get_setting( 'in_skin_editing' ) ? 'ctrl+f2' : 'f2,ctrl+f2',
+									'shortcut' => ( $Blog->get_setting( 'in_skin_editing' ) || ( $disp == 'widget_page' ) ) ? 'ctrl+f2' : 'f2,ctrl+f2',
 								);
+
+							if( $disp == 'widget_page' )
+							{
+								$entries['page']['entries']['edit_widgets'] = array(
+									'text' => T_('Edit widgets in Back-Office').'&hellip;',
+									'href' => $admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID,
+									'shortcut' => 'f2',
+								);
+							}
 						}
 						if( $perm_admin_restricted && $current_User->check_perm( 'blog_post_statuses', 'edit', false, $Blog->ID ) )
 						{	// Menu item to view post in back-office:
