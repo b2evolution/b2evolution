@@ -82,6 +82,14 @@ $ItemList->cols[] = array(
 					);
 
 $ItemList->cols[] = array(
+						'th' => T_('Slug'),
+						'order' => 'urltitle',
+						'td' => '%item_row_slug( #post_urltitle# )%',
+						'th_class' => 'shrinkwrap',
+						'td_class' => 'shrinkwrap left',
+					);
+
+$ItemList->cols[] = array(
 						'th' => T_('Status'),
 						'th_class' => 'shrinkwrap',
 						'td_class' => 'shrinkwrap left',

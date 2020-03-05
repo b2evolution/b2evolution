@@ -5945,6 +5945,7 @@ function items_results( & $items_Results, $params = array() )
 			'display_title'              => true,
 			'display_title_flag'         => true,
 			'display_title_status'       => true,
+			'display_slug'               => true,
 			'display_visibility_actions' => true,
 			'display_status'             => true,
 			'display_ord'                => true,
@@ -6063,6 +6064,17 @@ function items_results( & $items_Results, $params = array() )
 				'td_class' => 'tskst_$post_pst_ID$',
 				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].' )%</strong>'.
 				        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\', \'\', NULL, array( \'none\' ) )@' : '' ),
+			);
+	}
+
+	if( $params['display_slug'] )
+	{	// Display Slug column:
+		$items_Results->cols[] = array(
+				'th' => T_('Slug'),
+				'order' => $params['field_prefix'].'urltitle',
+				'td' => '%item_row_slug( #post_urltitle# )%',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap left',
 			);
 	}
 
@@ -6545,6 +6557,21 @@ function item_row_type( $Item )
 	{ // Display a link to quick change type
 		return '<a href="'.$type_edit_url.'&amp;from_tab=type">'.$type_title.'</a>';
 	}
+}
+
+
+/**
+ * Helper function: Get slug to display in items table list
+ *
+ * @param string Item slug
+ * @return string
+ */
+function item_row_slug( $item_slug )
+{
+	// Item slug:
+	return '<span id="evo_item_slug_'.$item_slug.'">'.$item_slug.'</span> '
+	// Icon to copy slug in clipboard:
+		.'<span class="fa fa-copy pointer" onclick="evo_copy_to_clipboard( \'evo_item_slug_'.$item_slug.'\' )"></span>';
 }
 
 
