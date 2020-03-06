@@ -16,5 +16,7 @@ jQuery( document ).ready( function()
 		return;
 	}
 
-	jQuery( '#comment_rating' ).html( '' ).raty( evo_comment_rating_config );
+	// This will only be run once when the document is ready. This will not render the
+	// star ratings for AJAX forms:
+	evo_render_star_rating();
 } );

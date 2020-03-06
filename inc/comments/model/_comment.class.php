@@ -3361,7 +3361,7 @@ class Comment extends DataObject
 		echo $params['after'];
 	}
 
-  /**
+	/**
 	 * Rating input
 	 */
 	function rating_input( $params = array() )
@@ -3369,16 +3369,16 @@ class Comment extends DataObject
 		global $rsc_uri;
 
 		$params = array_merge( array(
-									'before'     => '',
-									'after'      => '',
-									'label_low'  => T_('Bad'),
-									'label_2'    => T_('Poor'),
-									'label_3'    => T_('Average'),
-									'label_4'    => T_('Good'),
-									'label_high' => T_('Excellent'),
-									'reset'      => false,
-									'item_ID'    => 0, // Set only for new comments without defined item ID
-								), $params );
+				'before'     => '',
+				'after'      => '',
+				'label_low'  => T_('Bad'),
+				'label_2'    => T_('Poor'),
+				'label_3'    => T_('Average'),
+				'label_4'    => T_('Good'),
+				'label_high' => T_('Excellent'),
+				'reset'      => false,
+				'item_ID'    => 0, // Set only for new comments without defined item ID
+			), $params );
 
 		echo $params['before'];
 
@@ -3415,22 +3415,32 @@ class Comment extends DataObject
 
 		echo $params['label_high'];
 
-		$jquery_raty_param = '';
+		$raty_params = array(
+			'scoreName' => "comment_rating",
+			'start' => (int) $this->rating,
+			'hintList' => array(
+					$params['label_low'],
+					$params['label_2'],
+					$params['label_3'],
+					$params['label_4'],
+					$params['label_high'],
+				),
+			'width' => 110,
+		);
+
 		if( $params['reset'] )
-		{ // Init "reset" button
-			$jquery_raty_param = 'cancel: true';
+		{	// Init "reset" button
+			$raty_params['cancel'] = true;
 			$this->rating_none_input( array( 'before' => '<p>', 'after' => '</p>' ) );
 		}
 
+		// This will be used by the JS function "evo_render_star_rating".
+		// This is a bit of a hack. There must be some more elegant way to store the params:
+		echo '<span class="raty_params" style="display:none">'.evo_json_encode( $raty_params ).'</span>';
+
 		echo '</div>';
 
-		expose_var_to_js( 'evo_comment_rating_config', '{
-			scoreName: "comment_rating",
-			start: '.(int)$this->rating.',
-			hintList: ["'.$params['label_low'].'", "'.$params['label_2'].'", "'.$params['label_3'].'", "'.$params['label_4'].'", "'.$params['label_high'].'"],
-			width: 110,
-			'.$jquery_raty_param.'
-		}' );
+		expose_var_to_js( 'evo_comment_rating_config', true );
 
 		echo $params['after'];
 	}
