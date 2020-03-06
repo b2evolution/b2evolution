@@ -412,3 +412,28 @@ function b2template_list_highlight( obj )
 	}
 	return false;
 } 
+
+
+/**
+ * Copy text of element to clipboard
+ *
+ * @param string Element ID
+ */
+function evo_copy_to_clipboard( id )
+{
+	// Create range to select element by ID:
+	var range = document.createRange();
+	range.selectNode( document.getElementById( id ) );
+	// Clear current selection:
+	window.getSelection().removeAllRanges();
+	// Select text of the element temporary:
+	window.getSelection().addRange( range );
+	// Copy to clipboard:
+	document.execCommand( 'copy' );
+	// Deselect:
+	window.getSelection().removeAllRanges();
+	// Highlight copied element:
+	evoFadeBg( '#' + id, new Array( '#ffbf00' ), { speed: 100 } );
+
+	return false;
+}

@@ -2189,7 +2189,7 @@ function echo_publish_buttons( $Form, $creating, $edited_Item, $inskin = false, 
 					<span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu">
-					<li role="presentation"><a onclick="return b2edit_open_preview( forms.item_checkchanges, \''.$url.'\', true )" class="pointer"><span class="fa fa-square-o orange"></span> <span>'.TB_('Preview blocks').'</span></a></li>
+					<li role="presentation"><a onclick="return b2edit_open_preview( forms.item_checkchanges, \''.$url.'\', true )" class="pointer" data-shortcut="ctrl+f9"><span class="fa fa-square-o orange"></span> <span>'.TB_('Preview blocks').'</span></a></li>
 				</ul>
 			</div>';
 	}
@@ -2351,7 +2351,7 @@ function get_item_status_buttons( $edited_Item, $button_action = NULL, $button_c
 
 	$r = '<input type="hidden" name="post_status" value="'.format_to_output( $item_status, 'formvalue' ).'" />';
 	$r .= '<div class="btn-group dropup post_status_dropdown" data-toggle="tooltip" data-placement="'.$tooltip_placement.'" data-container="body" title="'.get_status_tooltip_title( $item_status ).'">';
-	$r .= '<button type="submit" class="btn btn-status-'.$item_status.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray['.$next_action.']">'
+	$r .= '<button type="submit" class="btn btn-status-'.$item_status.( empty( $button_class ) ? '' : ' '.$button_class ).'" name="actionArray['.$next_action.']" data-shortcut="ctrl+s,command+s">'
 				.'<span>'.$status_options[ $item_status ].'</span>'
 			.'</button>'
 			.'<button type="button" class="btn btn-status-'.$item_status.( empty( $button_class ) ? '' : ' '.$button_class ).' dropdown-toggle" data-toggle="dropdown" aria-expanded="false" id="post_status_dropdown">'
@@ -5945,6 +5945,7 @@ function items_results( & $items_Results, $params = array() )
 			'display_title'              => true,
 			'display_title_flag'         => true,
 			'display_title_status'       => true,
+			'display_slug'               => true,
 			'display_visibility_actions' => true,
 			'display_status'             => true,
 			'display_ord'                => true,
@@ -6063,6 +6064,17 @@ function items_results( & $items_Results, $params = array() )
 				'td_class' => 'tskst_$post_pst_ID$',
 				'td' => '<strong lang="@get(\'locale\')@">%task_title_link( {Obj}, '.(int)$params['display_title_flag'].' )%</strong>'.
 				        ( is_admin_page() ? ' @get_permanent_link( get_icon(\'permalink\'), \'\', \'\', \'auto\', \'\', NULL, array( \'none\' ) )@' : '' ),
+			);
+	}
+
+	if( $params['display_slug'] )
+	{	// Display Slug column:
+		$items_Results->cols[] = array(
+				'th' => T_('Slug'),
+				'order' => $params['field_prefix'].'urltitle',
+				'td' => '%item_row_slug( #post_urltitle# )%',
+				'th_class' => 'shrinkwrap',
+				'td_class' => 'shrinkwrap left',
 			);
 	}
 
@@ -6545,6 +6557,21 @@ function item_row_type( $Item )
 	{ // Display a link to quick change type
 		return '<a href="'.$type_edit_url.'&amp;from_tab=type">'.$type_title.'</a>';
 	}
+}
+
+
+/**
+ * Helper function: Get slug to display in items table list
+ *
+ * @param string Item slug
+ * @return string
+ */
+function item_row_slug( $item_slug )
+{
+	// Item slug:
+	return '<span id="evo_item_slug_'.$item_slug.'">'.$item_slug.'</span> '
+	// Icon to copy slug in clipboard:
+		.'<span class="fa fa-copy pointer" onclick="evo_copy_to_clipboard( \'evo_item_slug_'.$item_slug.'\' )"></span>';
 }
 
 

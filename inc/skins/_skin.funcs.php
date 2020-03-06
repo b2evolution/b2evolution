@@ -180,11 +180,6 @@ function skin_init( $disp )
 				break;
 			}
 
-			if( is_logged_in() && ( $disp == 'single' || $disp == 'page' ) && $Item )
-			{
-				init_hotkeys_js( 'blog' );
-			}
-
 			if( ( ! $preview ) && ( empty( $Item ) ) )
 			{ // No Item, incorrect request and incorrect state of the application, a 404 redirect should have already happened
 				//debug_die( 'Invalid page URL!' );
@@ -370,11 +365,6 @@ function skin_init( $disp )
 		case 'posts':
 			// fp> if we add this here, we have to exetnd the inner if()
 			// init_ratings_js( 'blog' );
-
-			if( is_logged_in() && has_featured_Item( 'posts', NULL, $Blog->get_setting( 'disp_featured_above_list' ) ) )
-			{
-				init_hotkeys_js( 'blog' );
-			}
 
 			// Get list of active filters:
 			$active_filters = $MainList->get_active_filters();
@@ -1552,9 +1542,6 @@ function skin_init( $disp )
 
 			// Prepare the 'In-skin editing' / 'In-skin change proposal':
 			init_inskin_editing();
-
-			// Enable "F2" hotkey that will redirect user to edit post in back-office if they have access:
-			init_hotkeys_js( 'blog' );
 			break;
 
 		case 'edit_comment':
@@ -1779,6 +1766,12 @@ function skin_init( $disp )
 				$Messages->add( T_('The requested items don\'t exist.'), 'error' );
 			}
 			break;
+	}
+
+	// Enable shortcut keys:
+	if( is_logged_in() )
+	{
+		init_hotkeys_js( 'blog' );
 	}
 
 	// Add hreflang tags for Items with several versions:

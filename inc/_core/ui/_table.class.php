@@ -470,8 +470,6 @@ jQuery( document ).ready( function()
 	 */
 	function display_colselect()
 	{
-		global $debug, $Session;
-
 		if( empty( $this->colselect_area ) )
 		{	// We don't want to display a col selection section:
 			return;
@@ -483,134 +481,18 @@ jQuery( document ).ready( function()
 		}
 
 		$option_name = $this->param_prefix.'colselect';
-		$preset_name = $this->param_prefix.'colselect_preset';
-		$submit_title = ( empty( $this->colselect_area['submit_title'] ) ? T_('Apply') : $this->colselect_area['submit_title'] );
-
-		// Do we already have a form?
-		$create_new_form = ! isset( $this->Form );
-
-		echo $this->replace_vars( $this->params['filters_start'] );
-
-		$this->current_colselect_preset = param( $preset_name, 'string', NULL );
-		if( $this->current_colselect_preset !== NULL )
-		{	// Store new preset in Session:
-			$Session->set( $preset_name, $this->current_colselect_preset );
-			$Session->dbsave();
-		}
-		if( $this->current_colselect_preset === NULL )
-		{	// Try to get preset from Session:
-			$this->current_colselect_preset = $Session->get( $preset_name );
-		}
-		if( $this->current_colselect_preset === NULL )
-		{	// Use columns preset "All" by default:
-			$this->current_colselect_preset = 'all';
-		}
-
-		$fold_state = ( $this->current_colselect_preset == 'custom' ? 'expanded' : 'collapsed' );
-
-		//____________________________________ Column presets ____________________________________
-
-		echo '<span class="btn-group">';
-
-		if( ! empty( $this->colselect_area['presets'] ) )
-		{	// Loop on all preset columns:
-			foreach( $this->colselect_area['presets'] as $key => $preset )
-			{	// Display preset column link:
-				echo '<a href="'.$preset[1].'" class="btn btn-xs btn-info">'.$preset[0].'</a>';
-			}
-		}
 
 		// "Columns" with JS toggle to reveal form:
 		echo '<span onclick="toggle_filter_area(\''.$option_name.'\')"'
-			.' class="btn btn-xs btn-info'.( $this->current_colselect_preset == 'custom' ? ' active' : '' ).'">'
-			.get_icon( ( $fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$option_name ) )
+			.' class="btn btn-xs btn-info">'
+			.get_icon( 'filters_show', 'imgtag', array( 'id' => 'clickimg_'.$option_name ) )
 			.' '.T_('Columns')
 		.'</span>';
 
-		echo '</span>'; // End of <span class="btn-group">
-
-		if( ! empty( $this->colselect_area['presets_after'] ) )
-		{	// Display additional info after presets:
-			echo $this->colselect_area['presets_after'];
-		}
-
-		//_________________________________________________________________________________________
-
-		if( $debug > 1 )
-		{
-			echo ' <span class="notes">('.$option_name.':'.$fold_state.')</span>';
-			echo ' <span id="asyncResponse"></span>';
-		}
-
-		// Begining of the div:
-		echo '<div id="clickdiv_'.$option_name.'"'.( $fold_state == 'collapsed' ? ' style="display:none"' : '' ).'>';
-
-		//_____________________________ Form and callback _________________________________________
-
-		if( ! empty( $this->colselect_area['callback'] ) )
-		{	// Display Columns Form fields:
-
-			if( $create_new_form )
-			{	// We do not already have a form surrounding the whole results list:
-				$ignore = ( empty( $this->colselect_area['url_ignore'] ) ? $this->page_param : $this->colselect_area['url_ignore'] );
-
-				$this->Form = new Form( regenerate_url( $ignore, '', '', '&' ), $this->param_prefix.'form_search', 'get', 'blockspan' );
-
-				$this->Form->begin_form( '' );
-			}
-
-			if( ! isset( $this->colselect_area['apply_columns_button'] ) || $this->colselect_area['apply_columns_button'] == 'topright' )
-			{ // Display a columns preset button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
-				echo $this->params['filter_button_before'];
-				$submit_name = empty( $this->colselect_area['submit'] ) ? 'colselect_submit' : $this->colselect_area['submit'];
-				$this->Form->button_input( array(
-							'tag'   => 'button',
-							'name'  => $submit_name,
-							'value' => get_icon( 'filter' ).' '.$submit_title,
-							'class' => $this->params['filter_button_class']
-					) );
-				echo $this->params['filter_button_after'];
-			}
-
-			if( ! empty( $this->force_checkboxes_to_inline ) )
-			{ // Set this to TRUE in order to display all checkboxes before labels
-				$this->Form->force_checkboxes_to_inline = true;
-			}
-
-			$func = $this->colselect_area['callback'];
-			$column_fields = $func( $this->Form );
-
-			if( ! empty( $column_fields ) && is_array( $column_fields ) )
-			{	// Display filters which use JavaScript plugin QueryBuilder:
-				$this->display_filter_fields( $this->Form, $column_fields );
-			}
-
-			if( isset( $this->colselect_area['apply_columns_button'] ) && $this->colselect_area['apply_columns_button'] == 'bottom' )
-			{ // Display a filter button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
-				echo $this->params['bottom_filter_button_before'];
-				$submit_name = empty( $this->colselect_area['submit'] ) ? 'colselect_submit' : $this->colselect_area['submit'];
-				$this->Form->button_input( array(
-						'tag'   => 'button',
-						'name'  => $submit_name,
-						'value' => get_icon( 'filter' ).' '.$submit_title,
-						'class' => $this->params['bottom_filter_button_class']
-					) );
-				echo $this->params['bottom_filter_button_after'];
-			}
-
-			// Use reserved preset name for selecting columns by submitted form:
-			$this->Form->hidden( $this->param_prefix.'colselect_preset', 'custom' );
-
-			if( $create_new_form )
-			{ // We do not already have a form surrounding the whole result list:
-				$this->Form->end_form( '' );
-				unset( $this->Form );	// forget about this temporary form
-			}
-		}
+		// Begining of the div with columns:
+		echo '<div id="clickdiv_'.$option_name.'" style="display:none">';
 
 		echo '</div>';
-
-		echo $this->params['filters_end'];
 	}
 
 

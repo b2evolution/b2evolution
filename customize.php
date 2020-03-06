@@ -115,6 +115,9 @@ require_js_defer( '#bootstrap#' );
 require_css( '#bootstrap_css#' );
 require_js_defer( 'build/bootstrap-evo_frontoffice.bmin.js' );
 
+// Initialize shortcut keys:
+init_hotkeys_js( 'blog' );
+
 // Send the predefined cookies:
 evo_sendcookies();
 

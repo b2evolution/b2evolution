@@ -2106,15 +2106,13 @@ function init_querybuilder_js( $relative_to = 'rsc_url' )
 /**
  * Initialize Hotkeys library
  */
-function init_hotkeys_js( $relative_to = 'rsc_url', $hotkeys = array() )
+function init_hotkeys_js( $relative_to = 'rsc_url', $hotkeys = array(), $top_hotkeys = array() )
 {
 	require_js_defer( '#jquery#', $relative_to ); // dependency
 	require_js_defer( '#hotkeys#', $relative_to );
 
-	if( $hotkeys )
-	{
-		add_js_headline( 'var shortcut_keys = '.json_encode( $hotkeys ).';' );
-	}
+	add_js_headline( 'var shortcut_keys = '.json_encode( $hotkeys ).';' );
+	add_js_headline( 'var top_shortcut_keys = '.json_encode( $top_hotkeys ).';' );
 
 	require_js_defer( 'hotkeys/hotkeys.init.js', $relative_to );
 }
