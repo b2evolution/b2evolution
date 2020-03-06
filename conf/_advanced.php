@@ -625,6 +625,18 @@ $upgrade_path = $basepath.$upgrade_subdir;  // You should not need to change thi
 
 
 /**
+ * Location of the logs folder.
+ *
+ * Note: This folder does SHOULD NOT be accessible through HTTP.
+ * This folder MUST be writable by PHP.
+ *
+ * @global string $upgrade_subdir
+ */
+$logs_subdir = '_logs/';              // Subdirectory relative to base
+$logs_path = $basepath.$logs_subdir;  // You should not need to change this
+
+
+/**
  * Location of the external library folder.
  *
  * Note: This folder does NOT NEED to be accessible through HTTP.
