@@ -184,12 +184,26 @@ class Table extends Widget
 
 
 	/**
-	 * Display filter fields
+	 * Display advanced filter fields
 	 *
-	 * @param array Filters
+	 * @param object Form
 	 */
-	function display_filter_fields( & $Form, $filter_fields )
+	function display_advanced_filter_fields( & $Form )
 	{
+		if( empty( $this->filter_area['callback_advanced'] ) )
+		{	// No callback function is defined for advanced filters:
+			return;
+		}
+
+		// Get advanced filters from provided callback function:
+		$func = $this->filter_area['callback_advanced'];
+		$filter_fields = $func( $this->Form );
+
+		if( ! is_array( $filter_fields ) )
+		{	// Don't allow wrong callback for advanced filters:
+			debug_die( 'Callback function <code>'.$this->filter_area['callback_advanced'].'()</code> of advanced filters must has an array in result!' );
+		}
+
 		echo '<div id="evo_results_filters"></div>';
 		$Form->hidden( 'filter_query', '' );
 
@@ -513,7 +527,8 @@ jQuery( document ).ready( function()
 			debug_die( 'You must define a $param_prefix before you can use filters.' );
 		}
 
-		$option_name = $this->param_prefix.'filters';
+		$custom_option_name = $this->param_prefix.'custom_filters';
+		$advanced_option_name = $this->param_prefix.'advanced_filters';
 		$preset_name = $this->param_prefix.'filter_preset';
 		$submit_title = ( empty( $this->filter_area['submit_title'] ) ? T_('Apply filters') : $this->filter_area['submit_title'] );
 
@@ -537,7 +552,8 @@ jQuery( document ).ready( function()
 			$this->current_filter_preset = 'all';
 		}
 
-		$fold_state = ( $this->current_filter_preset == 'custom' ? 'expanded' : 'collapsed' );
+		$custom_fold_state = ( $this->current_filter_preset == 'custom' ? 'expanded' : 'collapsed' );
+		$advanced_fold_state = ( $this->current_filter_preset == 'advanced' ? 'expanded' : 'collapsed' );
 
 		//____________________________________ Filter presets ____________________________________
 
@@ -554,12 +570,23 @@ jQuery( document ).ready( function()
 			}
 		}
 
-		// "Custom preset" with JS toggle to reveal form:
-		echo '<span onclick="toggle_filter_area(\''.$option_name.'\')"'
-				.' class="btn btn-xs btn-info'.( $this->current_filter_preset == 'custom' ? ' active' : '' ).'">'
-				.get_icon( ( $fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$option_name ) )
-				.' '.T_('Custom filters')
-			.'</span>';
+		if( ! empty( $this->filter_area['callback'] ) )
+		{	// "Custom preset" with JS toggle to reveal form:
+			echo '<span onclick="toggle_filter_area(\''.$custom_option_name.'\')"'
+					.' class="btn btn-xs btn-info'.( $this->current_filter_preset == 'custom' ? ' active' : '' ).'">'
+					.get_icon( ( $custom_fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$custom_option_name ) )
+					.' '.T_('Custom filters')
+				.'</span>';
+		}
+
+		if( ! empty( $this->filter_area['callback_advanced'] ) )
+		{	// "Advanced preset" with JS toggle to reveal form:
+			echo '<span onclick="toggle_filter_area(\''.$advanced_option_name.'\')"'
+					.' class="btn btn-xs btn-info'.( $this->current_filter_preset == 'advanced' ? ' active' : '' ).'">'
+					.get_icon( ( $advanced_fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$advanced_option_name ) )
+					.' '.T_('Advanced filters')
+				.'</span>';
+		}
 
 		echo '</span>'; // End of <span class="btn-group">
 
@@ -572,17 +599,16 @@ jQuery( document ).ready( function()
 
 		if( $debug > 1 )
 		{
-			echo ' <span class="notes">('.$option_name.':'.$fold_state.')</span>';
+			echo ' <span class="notes">('.$custom_option_name.':'.$custom_fold_state.'; '.$advanced_option_name.':'.$custom_fold_state.')</span>';
 			echo ' <span id="asyncResponse"></span>';
 		}
 
-		// Begining of the div:
-		echo '<div id="clickdiv_'.$option_name.'"'.( $fold_state == 'collapsed' ? ' style="display:none"' : '' ).'>';
+		// ---------------- CUSTOM FILTERS ---------------- :
+		if( ! empty( $this->filter_area['callback'] ) )
+		{	// Display Custom Filters Form fields:
 
-		//_____________________________ Form and callback _________________________________________
-
-		if( ! empty($this->filter_area['callback'] ) )
-		{	// Display Filters Form fields:
+			// Begining of the Custom filters area:
+			echo '<div id="clickdiv_'.$custom_option_name.'"'.( $custom_fold_state == 'collapsed' ? ' style="display:none"' : '' ).'>';
 
 			if( $create_new_form )
 			{	// We do not already have a form surrounding the whole results list:
@@ -593,8 +619,8 @@ jQuery( document ).ready( function()
 				$this->Form->begin_form( '' );
 			}
 
-			if( !isset( $this->filter_area['apply_filters_button'] ) || $this->filter_area['apply_filters_button'] == 'topright' )
-			{ // Display a filter button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
+			if( ! isset( $this->filter_area['apply_filters_button'] ) || $this->filter_area['apply_filters_button'] != 'none' )
+			{	// Display a filter button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
 				echo $this->params['filter_button_before'];
 				$submit_name = empty( $this->filter_area['submit'] ) ? 'colselect_submit' : $this->filter_area['submit'];
 				$this->Form->button_input( array(
@@ -611,16 +637,54 @@ jQuery( document ).ready( function()
 				$this->Form->force_checkboxes_to_inline = true;
 			}
 
+			// Call function to display custom filters:
 			$func = $this->filter_area['callback'];
-			$filter_fields = $func( $this->Form );
+			$func( $this->Form );
 
-			if( ! empty( $filter_fields ) && is_array( $filter_fields ) )
-			{	// Display filters which use JavaScript plugin QueryBuilder:
-				$this->display_filter_fields( $this->Form, $filter_fields );
+			// Use reserved preset name for filtering by submitted form:
+			$this->Form->hidden( $this->param_prefix.'filter_preset', 'custom' );
+			if( method_exists( $this, 'save_filterset' ) )
+			{	// For table that can save filterset we should set new filter on each form submit:
+				$this->Form->hidden( 'filter', 'new' );
 			}
 
-			if( isset( $this->filter_area['apply_filters_button'] ) && $this->filter_area['apply_filters_button'] == 'bottom' )
-			{ // Display a filter button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
+			if( $create_new_form )
+			{ // We do not already have a form surrounding the whole result list:
+				$this->Form->end_form( '' );
+				unset( $this->Form );	// forget about this temporary form
+			}
+
+			echo '</div>'; // End of the Custom filters area.
+		}
+
+		// ---------------- ADVANCED FILTERS ---------------- :
+		if( ! empty($this->filter_area['callback_advanced'] ) )
+		{	// Display Advanced Filters Form fields:
+
+			// Begining of the Advanced filters area:
+			echo '<div id="clickdiv_'.$advanced_option_name.'"'.( $advanced_fold_state == 'collapsed' ? ' style="display:none"' : '' ).'>';
+
+			if( $create_new_form )
+			{	// We do not already have a form surrounding the whole results list:
+				$ignore = ( empty( $this->filter_area['url_ignore'] ) ? $this->page_param : $this->filter_area['url_ignore'] );
+
+				$this->Form = new Form( regenerate_url( $ignore, '', '', '&' ), $this->param_prefix.'form_search', 'get', 'blockspan' );
+
+				$this->Form->begin_form( '' );
+			}
+
+			// Print out Advanced filters which use JavaScript plugin QueryBuilder:
+			$this->display_advanced_filter_fields( $this->Form );
+
+			// Use reserved preset name for filtering by submitted form:
+			$this->Form->hidden( $this->param_prefix.'filter_preset', 'advanced' );
+			if( method_exists( $this, 'save_filterset' ) )
+			{	// For table that can save filterset we should set new filter on each form submit:
+				$this->Form->hidden( 'filter', 'new' );
+			}
+
+			if( ! isset( $this->filter_area['apply_filters_button'] ) || $this->filter_area['apply_filters_button'] != 'none' )
+			{	// Display a filter button only when it is not hidden by param:  (Hidden example: BackOffice > Contents > Posts)
 				echo $this->params['bottom_filter_button_before'];
 				$submit_name = empty( $this->filter_area['submit'] ) ? 'colselect_submit' : $this->filter_area['submit'];
 				$this->Form->button_input( array(
@@ -632,17 +696,14 @@ jQuery( document ).ready( function()
 				echo $this->params['bottom_filter_button_after'];
 			}
 
-			// Use reserved preset name for filtering by submitted form:
-			$this->Form->hidden( $this->param_prefix.'filter_preset', 'custom' );
-
 			if( $create_new_form )
 			{ // We do not already have a form surrounding the whole result list:
 				$this->Form->end_form( '' );
 				unset( $this->Form );	// forget about this temporary form
 			}
-		}
 
-		echo '</div>';
+			echo '</div>'; // End of the Advanced filters area.
+		}
 
 		echo $this->params['filters_end'];
 	}

@@ -4368,7 +4368,7 @@ function get_userlist_filters_config( $Form = NULL )
 
 
 /**
- * Callback to add filters on top of the result set
+ * Callback to add custom filters on top of the result set
  *
  * @param Form
  */
@@ -4376,53 +4376,7 @@ function callback_filter_userlist( & $Form )
 {
 	global $Settings, $current_User, $Collection, $Blog, $edited_EmailCampaign;
 
-	// Get filters from config:
-	$filters = get_userlist_filters_config( $Form );
-
-	// Set default filters which are displayed on not filtered list:
-	$userlist_default_filters = $Settings->get( 'userlist_default_filters' );
-	if( ! empty( $userlist_default_filters ) )
-	{
-		$userlist_default_filters = explode( ',', $userlist_default_filters );
-		$filters['#default'] = array();
-		foreach( $userlist_default_filters as $userlist_default_filter )
-		{
-			if( $userlist_default_filter == 'country' && has_cross_country_restriction( 'users', 'list' ) )
-			{	// Skip default filter "Country" when current User can view other users only from own country:
-				continue;
-			}
-
-			// Set default operator:
-			if( ! empty( $filters[ $userlist_default_filter ]['operators'] ) )
-			{
-				$default_operator = explode( ',', $filters[ $userlist_default_filter ]['operators'] );
-				$default_operator = $default_operator[0];
-			}
-			else
-			{
-				$default_operator = 'equal';
-			}
-			// Set default value:
-			if( isset( $filters[ $userlist_default_filter ]['default_value'] ) )
-			{
-				$default_value = $filters[ $userlist_default_filter ]['default_value'];
-			}
-			elseif( isset( $filters[ $userlist_default_filter ]['values'] ) && is_array( $filters[ $userlist_default_filter ]['values'] ) )
-			{
-				$default_value = array_keys( $filters[ $userlist_default_filter ]['values'] );
-				$default_value = isset( $default_value[0] ) ? $default_value[0] : '';
-			}
-			else
-			{
-				$default_value = '';
-			}
-
-			$filters['#default'][ $userlist_default_filter ] = array( $default_operator, $default_value );
-		}
-	}
-
 	echo '<div class="filter-inputs">';
-	$Form->hidden( 'filter', 'new' );
 
 	if( ! is_admin_page() && ! empty( $Blog ) && ( $Blog->get_setting( 'allow_access' ) == 'members' ) && ( $Blog->get_setting( 'userdir_filter_restrict_to_members' ) ) )
 	{ // Restrict by members only when it is frontoffice and Blog allow access only for members
@@ -4593,6 +4547,63 @@ function load_cities( country_ID, region_ID, subregion_ID )
 }
 </script>
 <?php
+	}
+}
+
+
+/**
+ * Callback to add advanced filters on top of the result set
+ *
+ * @param object Form
+ * @return array Config of advanced filters
+ */
+function callback_advanced_filter_userlist( & $Form )
+{
+	global $Settings, $current_User, $Collection, $Blog, $edited_EmailCampaign;
+
+	// Get filters from config:
+	$filters = get_userlist_filters_config( $Form );
+
+	// Set default filters which are displayed on not filtered list:
+	$userlist_default_filters = $Settings->get( 'userlist_default_filters' );
+	if( ! empty( $userlist_default_filters ) )
+	{
+		$userlist_default_filters = explode( ',', $userlist_default_filters );
+		$filters['#default'] = array();
+		foreach( $userlist_default_filters as $userlist_default_filter )
+		{
+			if( $userlist_default_filter == 'country' && has_cross_country_restriction( 'users', 'list' ) )
+			{	// Skip default filter "Country" when current User can view other users only from own country:
+				continue;
+			}
+
+			// Set default operator:
+			if( ! empty( $filters[ $userlist_default_filter ]['operators'] ) )
+			{
+				$default_operator = explode( ',', $filters[ $userlist_default_filter ]['operators'] );
+				$default_operator = $default_operator[0];
+			}
+			else
+			{
+				$default_operator = 'equal';
+			}
+			// Set default value:
+			if( isset( $filters[ $userlist_default_filter ]['default_value'] ) )
+			{
+				$default_value = $filters[ $userlist_default_filter ]['default_value'];
+			}
+			elseif( isset( $filters[ $userlist_default_filter ]['values'] ) && is_array( $filters[ $userlist_default_filter ]['values'] ) )
+			{
+				$default_value = array_keys( $filters[ $userlist_default_filter ]['values'] );
+				$default_value = isset( $default_value[0] ) ? $default_value[0] : '';
+			}
+			else
+			{
+				$default_value = '';
+			}
+
+			$filters['#default'][ $userlist_default_filter ] = array( $default_operator, $default_value );
+		}
 	}
 
 	if( ! empty( $filters['tags'] ) )
@@ -6957,8 +6968,8 @@ function users_results_block( $params = array() )
 
 		$UserList->filter_area = array(
 			'callback' => 'callback_filter_userlist',
+			'callback_advanced' => 'callback_advanced_filter_userlist',
 			'url_ignore' => 'users_paged,u_paged,keywords',
-			'apply_filters_button' => 'bottom',
 			);
 
 		$new_filter_baseurl = url_add_param( $params['page_url'], 'filter=new' );
