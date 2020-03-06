@@ -218,16 +218,9 @@ class Template extends DataObject
 		if( $result )
 		{	// If Template has been updated successfully
 
-			// Invalidate pre-rendered cache of Items which use [include:...:this_template_code]:
+			// Invalidate caches where template may be used:
 			$template_code = isset( $this->previous_code ) ? $this->previous_code : $this->get( 'code' );
-			$invalidated_items_num = $DB->query( 'DELETE T_items__prerendering
-				 FROM T_items__prerendering
-				 LEFT JOIN T_items__item ON itpr_itm_ID = post_ID
-				WHERE post_content LIKE '.$DB->quote( '%:'.$template_code.'%' ) );
-			if( $invalidated_items_num > 0 )
-			{	// Inform about invalidated cache:
-				$Messages->add_to_group( sprintf( T_('Pre-render caches have been invalidated for %d items that use this template in an %s.'), $invalidated_items_num, '<code>[include:]</code>' ), 'note', T_('Cache invalidated:' ) );
-			}
+			$this->invalidate_caches( $template_code );
 
 			// Commit changes on successful update:
 			$DB->commit();
@@ -238,6 +231,59 @@ class Template extends DataObject
 		}
 
 		return $result;
+	}
+
+
+	/**
+	 * Delete object from DB.
+	 *
+	 * @return boolean true on success
+	 */
+	function dbdelete()
+	{
+		global $DB;
+
+		$old_template_code = $this->get( 'code' );
+
+		$result = parent::dbdelete();
+		if( $result )
+		{	// If Template has been deleted successfully
+
+			// Invalidate caches where template may be used:
+			$this->invalidate_caches( $old_template_code );
+
+			// Commit changes on successful update:
+			$DB->commit();
+		}
+		else
+		{	// Rollback changes on failed update:
+			$DB->rollback();
+		}
+	}
+
+
+	/**
+	 * Invalidate caches where template may be used
+	 *
+	 * @param string Template code
+	 */
+	function invalidate_caches( $template_code )
+	{
+		global $DB, $Messages;
+
+		// Invalidate pre-rendered cache of Items which use [include:...:this_template_code]:
+		$invalidated_items_num = $DB->query( 'DELETE T_items__prerendering
+			 FROM T_items__prerendering
+			 LEFT JOIN T_items__item ON itpr_itm_ID = post_ID
+			WHERE post_content LIKE '.$DB->quote( '%:'.$template_code.'%' ) );
+		if( $invalidated_items_num > 0 )
+		{	// Inform about invalidated cache:
+			$Messages->add_to_group( sprintf( T_('Pre-render caches have been invalidated for %d items that use this template in an %s.'), $invalidated_items_num, '<code>[include:]</code>' ), 'note', T_('Cache invalidated:' ) );
+		}
+
+		// BLOCK CACHE INVALIDATION:
+		BlockCache::invalidate_key( 'template_code', $template_code ); // Template has changed
+		BlockCache::invalidate_key( 'master_template', true ); // Any widget which may use Master Template must be invalidated
 	}
 
 

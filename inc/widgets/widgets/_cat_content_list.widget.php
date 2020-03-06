@@ -256,6 +256,8 @@ class cat_content_list_Widget extends ComponentWidget
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => $Blog->ID, // Has the content of the displayed blog changed ?
 				'cat_ID'       => empty( $cat ) ? 0 : $cat, // Has the chapter changed ?
+				'template_code'   => $this->get_param( 'template' ), // Has the Template changed?
+				'master_template' => true, // This widget cache must be invalidated on updating of any Template because it may has a Master Template.
 			);
 	}
 
