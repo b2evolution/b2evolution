@@ -88,6 +88,77 @@ jQuery( document ).ready( function()
 			} );
 	}
 
+	// Ajax Form
+	if( typeof( evo_ajax_form_config ) != 'undefined' )
+	{
+		var evo_ajax_forms = Object.values( evo_ajax_form_config );
+		for( var i = 0; i < evo_ajax_forms.length; i++ )
+		{
+			var config = evo_ajax_forms[i];
+
+			window['ajax_form_offset_' + config['form_number']] = jQuery( '#ajax_form_number_' + config['form_number'] ).offset().top;
+			window['request_sent_' + config['form_number']] = false;
+			window['ajax_form_loading_number_' + config['form_number']] = 0;
+
+			var get_form_func_name = 'get_form' + config['form_number']
+			window[get_form_func_name] = function()
+				{
+					var form_id = '#ajax_form_number_' + config['form_number'];
+					window['ajax_form_loading_number_' + config['form_number']]++;
+					jQuery.ajax({
+						url: htsrv_url + 'anon_async.php',
+						type: 'POST',
+						data: config['json_params'],
+						success: function(result)
+						{
+							jQuery( form_id ).html( ajax_debug_clear( result ) );
+						},
+						error: function( jqXHR, textStatus, errorThrown )
+						{
+							jQuery( '.loader_ajax_form', form_id ).after( '<div class="red center">' + errorThrown + ': ' + jqXHR.responseText + '</div>' );
+							if( window['ajax_form_loading_number_' + config['form_number']] < 3 )
+							{	// Try to load 3 times this ajax form if error occurs:
+								setTimeout( function()
+								{	// After 1 second delaying:
+									jQuery( '.loader_ajax_form', form_id ).next().remove();
+									window[get_form_func_name]();
+								}, 1000 );
+							}
+						}
+					});
+				}
+
+			var check_and_show_func_name = 'check_and_show_' + config['form_number']
+			window[check_and_show_func_name] = function( force_load )
+				{
+					if( window['request_sent_' + config['form_number']] )
+					{	// Don't load the form twice:
+						return;
+					}
+					var load_form = ( typeof force_load == undefined ) ? false : force_load;
+					if( ! load_form )
+					{	// Check if the ajax form is visible, or if it will be visible soon ( 20 pixel ):
+						load_form = jQuery( window ).scrollTop() >= window['ajax_form_offset_' + config['form_number']] - jQuery(window).height() - 20;
+					}
+					if( load_form )
+					{	// Load the form only if it is forced or allowed because page is scrolled down to the form position:
+						window['request_sent_' + config['form_number']] = true;
+						window[get_form_func_name]();
+					}
+				}
+
+			jQuery( window ).scroll( function() {
+				window[check_and_show_func_name]();
+			});
+	
+			jQuery(window).resize( function() {
+				window[check_and_show_func_name]();
+			});
+
+			window[check_and_show_func_name]( config['load_ajax_form_on_page_load'] );
+		}
+	}
+
 	// Userlist filter callback JS
 	if( typeof( evo_user_func__callback_filter_userlist ) != 'undefined' )
 	{

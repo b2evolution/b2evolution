@@ -5440,13 +5440,11 @@ class Blog extends DataObject
 	 */
 	function get_ajax_form_enabled()
 	{
-		global $disable_ajax_forms_for_frontoffice;
-
 		if( is_logged_in() )
 		{
 			return $this->get_setting( 'ajax_form_loggedin_enabled' );
 		}
-		return $this->get_setting( 'ajax_form_enabled' ) && ( is_admin_page() ? true : !$disable_ajax_forms_for_frontoffice );
+		return $this->get_setting( 'ajax_form_enabled' );
 	}
 
 

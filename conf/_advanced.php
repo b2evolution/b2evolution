@@ -998,7 +998,6 @@ $use_defer_for_loggedin_disp_edit_comment = false; // Temporarily disabled. Need
 $use_defer_for_loggedin_disp_comments = false; // Temporarily disabled. Need to fix comments and voting related JS.
 $use_defer_for_loggedin_disp_visits = false; // Temporarily disabled. Need to fix QueryBuilder JS.
 
-$disable_ajax_forms_for_frontoffice = true; // Disables comment ajax forms in the front-office
 $disable_tinymce_for_frontoffice = true; // Disables TinyMCE plugin in the front-office
 $disable_markdown_toolbar_for_frontoffice = true; // Disabled Markdown toolbar for front-office
 

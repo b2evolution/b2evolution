@@ -1094,7 +1094,7 @@ function include_js_vars()
 	{
 		if( is_array( $var_value ) )
 		{
-			$var_value = json_encode( $var_value, JSON_FORCE_OBJECT );
+			$var_value = evo_json_encode( $var_value, JSON_FORCE_OBJECT );
 		}
 		echo 'var '.$var_name.' = '.$var_value.";\n";
 	}
@@ -2613,74 +2613,15 @@ function display_ajax_form( $params )
 		echo '<a id="'.format_to_output( $comment_form_anchor.$params['p'], 'htmlattr' ).'"></a>';
 	}
 
-	// Needs json_encode function to create json type params
-	$json_params = evo_json_encode( $params );
-
 	// Display loader gif until the ajax call returns:
 	echo '<p class="ajax-loader"><span class="loader_img loader_ajax_form" title="'.T_('Loading...').'"></span><br />'.T_( 'Form is loading...' ).'</p>';
+	$ajax_form_config = array(
+			'form_number' => $ajax_form_number,
+			'json_params' => $params,
+			'load_ajax_form_on_page_load' => !empty( $params['params']['load_ajax_form_on_page_load'] ),
+		);
+	expose_var_to_js( 'ajax_form_'.$ajax_form_number, $ajax_form_config, 'evo_ajax_form_config' );
 	?>
-	<script>
-		var ajax_form_offset_<?php echo $ajax_form_number; ?> = jQuery('#ajax_form_number_<?php echo $ajax_form_number; ?>').offset().top;
-		var request_sent_<?php echo $ajax_form_number; ?> = false;
-		var ajax_form_loading_number_<?php echo $ajax_form_number; ?> = 0;
-
-		function get_form_<?php echo $ajax_form_number; ?>()
-		{
-			var form_id = '#ajax_form_number_<?php echo $ajax_form_number; ?>';
-			ajax_form_loading_number_<?php echo $ajax_form_number; ?>++;
-			jQuery.ajax({
-				url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-				type: 'POST',
-				data: <?php echo $json_params; ?>,
-				success: function(result)
-				{
-					jQuery( form_id ).html( ajax_debug_clear( result ) );
-				},
-				error: function( jqXHR, textStatus, errorThrown )
-				{
-					jQuery( '.loader_ajax_form', form_id ).after( '<div class="red center">' + errorThrown + ': ' + jqXHR.responseText + '</div>' );
-					if( ajax_form_loading_number_<?php echo $ajax_form_number; ?> < 3 )
-					{	// Try to load 3 times this ajax form if error occurs:
-						setTimeout( function()
-						{	// After 1 second delaying:
-							jQuery( '.loader_ajax_form', form_id ).next().remove();
-							get_form_<?php echo $ajax_form_number; ?>();
-						}, 1000 );
-					}
-				}
-			});
-		}
-
-		function check_and_show_<?php echo $ajax_form_number; ?>( force_load )
-		{
-			if( request_sent_<?php echo $ajax_form_number; ?> )
-			{	// Don't load the form twice:
-				return;
-			}
-			var load_form = ( typeof force_load == undefined ) ? false : force_load;
-			if( ! load_form )
-			{	// Check if the ajax form is visible, or if it will be visible soon ( 20 pixel ):
-				load_form = jQuery(window).scrollTop() >= ajax_form_offset_<?php echo $ajax_form_number; ?> - jQuery(window).height() - 20;
-			}
-			if( load_form )
-			{	// Load the form only if it is forced or allowed because page is scrolled down to the form position:
-				request_sent_<?php echo $ajax_form_number; ?> = true;
-				get_form_<?php echo $ajax_form_number; ?>();
-			}
-		}
-
-		jQuery(window).scroll(function() {
-			check_and_show_<?php echo $ajax_form_number; ?>();
-		});
-
-		jQuery(document).ready( function() {
-			check_and_show_<?php echo $ajax_form_number; ?>( <?php echo empty( $params['params']['load_ajax_form_on_page_load'] ) ? 'false' : 'true'; ?> );
-		});
-
-		jQuery(window).resize( function() {
-			check_and_show_<?php echo $ajax_form_number; ?>();
-		});
-	</script>
 	<noscript>
 		<?php echo '<p>'.T_( 'This section can only be displayed by javascript enabled browsers.' ).'</p>'; ?>
 	</noscript>
