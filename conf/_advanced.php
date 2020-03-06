@@ -985,6 +985,7 @@ $use_defer_for_default_register_form = false; // Temporarily disabled. Need to f
 
 $use_defer_for_anonymous_disp_register = false; // Temporarily disabled. Need to fix password related JS.
 $use_defer_for_anonymous_disp_users = false; // Temporarily disabled. Need to fix QueryBuilder JS.
+$use_defer_for_anonymous_disp_anonpost = true; // Erwin> We can use defer as long as we use AJAX forms to load the item form.
 
 $use_defer_for_loggedin_disp_single_page = false; // Temporarily disabled. Need to fix attachments related JS.
 $use_defer_for_loggedin_disp_front = false; // Temporarily disabled. Need to fix attachments related JS (Bootstrap Manual front-page specially).
@@ -998,7 +999,8 @@ $use_defer_for_loggedin_disp_edit_comment = false; // Temporarily disabled. Need
 $use_defer_for_loggedin_disp_comments = false; // Temporarily disabled. Need to fix comments and voting related JS.
 $use_defer_for_loggedin_disp_visits = false; // Temporarily disabled. Need to fix QueryBuilder JS.
 
-$disable_tinymce_for_frontoffice = true; // Disables TinyMCE plugin in the front-office
+// Erwin> I think this can be disabled if we are able to use AJAX forms to load the comment form:
+$disable_tinymce_for_frontoffice_comment_form = false; // Disables TinyMCE plugin in the front-office for comment forms
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----

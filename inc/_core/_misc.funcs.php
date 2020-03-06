@@ -10415,6 +10415,7 @@ function use_defer()
 		$use_defer_for_anonymous_users,
 		$use_defer_for_anonymous_disp_register,
 		$use_defer_for_anonymous_disp_users,
+		$use_defer_for_anonymous_disp_anonpost,
 		$use_defer_for_loggedin_disp_single_page,
 		$use_defer_for_loggedin_disp_front,
 		$use_defer_for_loggedin_disp_profile,
@@ -10433,6 +10434,7 @@ function use_defer()
 		   && ( is_logged_in() ? $use_defer_for_loggedin_users : $use_defer_for_anonymous_users )
 		   && ( $disp == 'register' ? $use_defer_for_anonymous_disp_register : true )
 		   && ( $disp == 'users' ? $use_defer_for_anonymous_disp_users : true )
+		   && ( $disp == 'anonpost' ? $use_defer_for_anonymous_disp_anonpost : true )
 		   && ( empty( $disp ) && $ReqPath == '/htsrv/register.php' ? $use_defer_for_default_register_form : true )
 		   && ( is_logged_in() && in_array( $disp, array( 'single', 'page' ) ) ? $use_defer_for_loggedin_disp_single_page : true )
 		   && ( is_logged_in() && $disp == 'front' ? $use_defer_for_loggedin_disp_front : true )

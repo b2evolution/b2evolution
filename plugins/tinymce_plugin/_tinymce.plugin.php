@@ -343,12 +343,7 @@ class tinymce_plugin extends Plugin
 	function AdminDisplayEditorButton( & $params )
 	{
 		global $wysiwyg_toggle_switch_js_initialized;
-		global $disable_tinymce_for_frontoffice;
-
-		if( ! is_admin_page() && $disable_tinymce_for_frontoffice )
-		{	// Disable TinyMCE until JS can be fixed to defer load:
-			return false;
-		}
+		global $disable_tinymce_for_frontoffice_comment_form;
 
 		// Initialize JavaScript to build and open window, used in insert inline modals:
 		echo_modalwindow_js();
@@ -433,6 +428,11 @@ class tinymce_plugin extends Plugin
 				break;
 
 			case 'Comment':
+				if( ! is_admin_page() && $disable_tinymce_for_frontoffice_comment_form )
+				{	// Disable TinyMCE until JS can be fixed to defer load:
+					return false;
+				}
+
 				// Initialize settings for item:
 				global $Collection, $Blog;
 
