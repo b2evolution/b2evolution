@@ -976,7 +976,7 @@ class Blog extends DataObject
 			$this->set_setting( 'front_disp', $front_disp );
 			if( $front_disp == 'mustread' && ! is_pro() )
 			{	// Don't allow to store not supported front page:
-				$Messages->add( TB_('Not supported front page!'), 'error' );
+				$Messages->add( T_('"Must Read" is supported only on b2evolution PRO.'), 'error' );
 			}
 
 			$front_post_ID = param( 'front_post_ID', 'integer', 0 );

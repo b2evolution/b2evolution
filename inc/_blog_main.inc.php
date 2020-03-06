@@ -589,7 +589,7 @@ if( !empty($p) || !empty($title) )
 		{	// We were not able to fallback to anything meaningful:
 			$Debuglog->add( 'Could not identify anything! This is a 404!', 'url_decode_part_2' );
 			$disp = '404';
-			$disp_detail = '404-post_not_found';
+			$disp_detail = '404-item-not-found';
 			$requested_404_title = $title;
 		}
 	}

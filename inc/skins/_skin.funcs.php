@@ -125,7 +125,7 @@ function skin_init( $disp )
 					global $disp, $disp_detail;
 					$disp = '404';
 					$disp_detail = '404-not-supported';
-					$Messages->add( T_('This feature is supported only on PRO version.'), 'error' );
+					$Messages->add( T_('"Must Read" is supported only on b2evolution PRO.'), 'error' );
 					break;
 				}
 				if( ! $Blog->get_setting( 'track_unread_content' ) )
