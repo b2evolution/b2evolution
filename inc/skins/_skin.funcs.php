@@ -120,6 +120,14 @@ function skin_init( $disp )
 					header_redirect( get_login_url( 'no access to must read content', NULL, false, NULL, 'access_requires_loginurl' ), 302 );
 					// Exit here.
 				}
+				if( ! is_pro() )
+				{	// Forbid access for not PRO version:
+					global $disp, $disp_detail;
+					$disp = '404';
+					$disp_detail = '404-not-supported';
+					$Messages->add( T_('This feature is supported only on PRO version.'), 'error' );
+					break;
+				}
 				if( ! $Blog->get_setting( 'track_unread_content' ) )
 				{	// Forbid access to "must read" content if collection doesn't track unread content:
 					global $disp;

@@ -974,6 +974,10 @@ class Blog extends DataObject
 		{ // we want to load the front page params:
 			$front_disp = param( 'front_disp', 'string', '' );
 			$this->set_setting( 'front_disp', $front_disp );
+			if( $front_disp == 'mustread' && ! is_pro() )
+			{	// Don't allow to store not supported front page:
+				$Messages->add( TB_('Not supported front page!'), 'error' );
+			}
 
 			$front_post_ID = param( 'front_post_ID', 'integer', 0 );
 			if( $front_disp == 'page' )
