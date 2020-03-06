@@ -302,13 +302,6 @@ class markdown_plugin extends Plugin
 	 */
 	function AdminDisplayToolbar( & $params )
 	{
-		global $disable_markdown_toolbar_for_frontoffice;
-
-		if( ! is_admin_page() && $disable_markdown_toolbar_for_frontoffice )
-		{	// Disable markdown toolbar until JS can be fixed to defer load:
-			return false;
-		}
-
 		if( ! empty( $params['Item'] ) )
 		{ // Item is set, get Blog from post
 			$edited_Item = & $params['Item'];
@@ -693,7 +686,7 @@ class markdown_plugin extends Plugin
 				+ '<input type="button" id="<?php echo $params['js_prefix']; ?>mrkdwn_close" class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="<?php echo $params['js_prefix']; ?>markdown_close_all_tags" title="<?php echo format_to_output( TS_('Close all tags'), 'htmlattr' ); ?>" value="X" />'
 				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
 
-			jQuery( '.<?php echo $params['js_prefix'].$this->code ?>_toolbar' ).html( r );
+			document.querySelector( '.<?php echo $params['js_prefix'].$this->code ?>_toolbar' ).innerHTML = r;
 		}
 
 		function <?php echo $params['js_prefix']; ?>markdown_insert_tag( field, i )
