@@ -4066,78 +4066,60 @@ function get_userlist_filters_config( $Form = NULL )
 	);
 
 	// Name / Email:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_name_email' ) ) )
-	{	// Show name/email filter only on back-office or if it is allowed by collection setting on front-office:
-		$filters['name_email'] = array(
-				'label'      => T_('Name').' / '.T_('Username').' / '.T_('Email'),
-				'input'      => 'text',
-				'operators'  => 'contains,not_contains',
-				'validation' => array( 'allow_empty_value' => 'true' ),
-			);
-	}
+	$filters['name_email'] = array(
+			'label'      => T_('Name').' / '.T_('Username').' / '.T_('Email'),
+			'input'      => 'text',
+			'operators'  => 'contains,not_contains',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
 
 	// First name:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_firstname' ) ) )
-	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
-		$filters['firstname'] = array(
-				'label'      => T_('First name'),
-				'input'      => 'text',
-				'operators'  => 'contains,not_contains',
-				'validation' => array( 'allow_empty_value' => 'true' ),
-			);
-	}
+	$filters['firstname'] = array(
+			'label'      => T_('First name'),
+			'input'      => 'text',
+			'operators'  => 'contains,not_contains',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
 
 	// Last name:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_lastname' ) ) )
-	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
-		$filters['lastname'] = array(
-				'label'      => T_('Last name'),
-				'input'      => 'text',
-				'operators'  => 'contains,not_contains',
-				'validation' => array( 'allow_empty_value' => 'true' ),
-			);
-	}
+	$filters['lastname'] = array(
+			'label'      => T_('Last name'),
+			'input'      => 'text',
+			'operators'  => 'contains,not_contains',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
 
 	// Nickname:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_nickname' ) ) )
-	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
-		$filters['nickname'] = array(
-				'label'      => T_('Nickname'),
-				'input'      => 'text',
-				'operators'  => 'contains,not_contains',
-				'validation' => array( 'allow_empty_value' => 'true' ),
-			);
-	}
+	$filters['nickname'] = array(
+			'label'      => T_('Nickname'),
+			'input'      => 'text',
+			'operators'  => 'contains,not_contains',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
 
 	// Email:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_email' ) ) )
-	{	// Show first name filter only on back-office or if it is allowed by collection setting on front-office:
-		$filters['email'] = array(
-				'label'      => T_('Email'),
-				'input'      => 'text',
-				'operators'  => 'contains,not_contains',
-				'validation' => array( 'allow_empty_value' => 'true' ),
-			);
-	}
+	$filters['email'] = array(
+			'label'      => T_('Email'),
+			'input'      => 'text',
+			'operators'  => 'contains,not_contains',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
 
 	// Gender:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_gender' ) ) )
-	{	// Show gender filter only on back-office or if it is allowed by collection setting on front-office:
-		$filters['gender'] = array(
-				'label'  => T_('Gender'),
-				'input'  => 'select',
-				'values' => array(
-						''  => T_('Any'),
-						'M' => T_('Men'),
-						'F' => T_('Women'),
-						'O' => T_('Other'),
-					),
-				'validation' => array( 'allow_empty_value' => 'true' ),
-			);
-	}
+	$filters['gender'] = array(
+			'label'  => T_('Gender'),
+			'input'  => 'select',
+			'values' => array(
+					''  => T_('Any'),
+					'M' => T_('Men'),
+					'F' => T_('Women'),
+					'O' => T_('Other'),
+				),
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
 
 	// Country:
-	if( user_country_visible() && ( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_country' ) ) ) )
+	if( user_country_visible() )
 	{	// Show country filter only on back-office or if it is allowed by collection setting on front-office:
 		$CountryCache = & get_CountryCache();
 		if( has_cross_country_restriction( 'users', 'list' ) )
@@ -4161,20 +4143,16 @@ function get_userlist_filters_config( $Form = NULL )
 	}
 
 	// Level:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_level' ) ) )
-	{	// Show user level filter only on back-office or if it is allowed by collection setting on front-office:
-		$filters['level'] = array(
-				'label'     => T_('User level'),
-				'operators' => '=,!=,<,<=,>,>=,between,not_between',
-				'input'     => 'select',
-				'type'      => 'integer',
-				'values'    => array( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ),
-			);
-	}
+	$filters['level'] = array(
+			'label'     => T_('User level'),
+			'operators' => '=,!=,<,<=,>,>=,between,not_between',
+			'input'     => 'select',
+			'type'      => 'integer',
+			'values'    => array( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ),
+		);
 
 	// Organization:
-	if( ( is_admin_page() && empty( $edited_Organization ) ) ||
-	    ( ! is_admin_page() && isset( $Blog ) && $Blog->get_setting( 'userdir_filter_org' ) ) )
+	if( empty( $edited_Organization ) )
 	{	// Show organization filter only when organization form is not selected on back-office or if it is allowed by collection setting on front-office:
 		$OrganizationCache = & get_OrganizationCache( T_('All') );
 		$OrganizationCache->load_all();
@@ -4185,7 +4163,7 @@ function get_userlist_filters_config( $Form = NULL )
 			);
 	}
 
-	if( is_admin_page() && $current_User->check_perm( 'users', 'edit' ) )
+	if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
 	{
 		// Uses custom sender address:
 		$filters['custom_sender_email'] = array(
@@ -4211,147 +4189,136 @@ function get_userlist_filters_config( $Form = NULL )
 	}
 
 	// Specific criteria:
-	if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_criteria' ) ) )
-	{	// Show specific criteria filter only on back-office or if it is allowed by collection setting on front-office:
-		if( empty( $Form ) )
-		{
-			$Form = new Form();
-		}
-		$Form->output = false;
-		$Form->switch_layout( 'none' );
-		global $user_fields_empty_name;
-		$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
-		$criteria_input = $Form->select_input_array( 'criteria_operator[]', '', array( 'contains' => T_('contains'), 'not_contains' => T_('doesn\'t contain') ), '' );
-		$criteria_input .= $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
-		$criteria_input = $Form->select_input( 'criteria_type[]', '', 'callback_options_user_new_fields', '', array( 'field_suffix' => $criteria_input ) );
-		$Form->switch_layout( NULL );
-		$Form->output = true;
-		$filters['criteria'] = array(
-				'label' => T_('Specific criteria'),
-				'operators' => 'blank',
-				'input' => 'function( rule, input_name ) { return \''.format_to_js( $criteria_input ).'\'; }',
-				'validation' => array( 'allow_empty_value' => 'true' ),
-				'valueGetter' => 'function( rule )
-					{
-						return rule.$el.find(".rule-value-container [name^=criteria_type]").val()
-							+ ":" + rule.$el.find(".rule-value-container [name^=criteria_operator]").val()
-							+ ":" + rule.$el.find(".rule-value-container [name^=criteria_value]").val();
-					}',
-				'valueSetter' => 'function( rule, value )
-					{
-						var val = value.split( ":" );
-						rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
-						rule.$el.find( ".rule-value-container [name^=criteria_operator]" ).val( val[1] ).trigger( "change" );
-						rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[2] ).trigger( "change" );
-					}',
-				'default_value' => '0:contains:',
-			);
+	if( empty( $Form ) )
+	{
+		$Form = new Form();
 	}
+	$Form->output = false;
+	$Form->switch_layout( 'none' );
+	global $user_fields_empty_name;
+	$user_fields_empty_name = /* TRANS: verb */ T_('Select').'...';
+	$criteria_input = $Form->select_input_array( 'criteria_operator[]', '', array( 'contains' => T_('contains'), 'not_contains' => T_('doesn\'t contain') ), '' );
+	$criteria_input .= $Form->text( 'criteria_value[]', '', 17, '', '', 50 );
+	$criteria_input = $Form->select_input( 'criteria_type[]', '', 'callback_options_user_new_fields', '', array( 'field_suffix' => $criteria_input ) );
+	$Form->switch_layout( NULL );
+	$Form->output = true;
+	$filters['criteria'] = array(
+			'label' => T_('Specific criteria'),
+			'operators' => 'blank',
+			'input' => 'function( rule, input_name ) { return \''.format_to_js( $criteria_input ).'\'; }',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+			'valueGetter' => 'function( rule )
+				{
+					return rule.$el.find(".rule-value-container [name^=criteria_type]").val()
+						+ ":" + rule.$el.find(".rule-value-container [name^=criteria_operator]").val()
+						+ ":" + rule.$el.find(".rule-value-container [name^=criteria_value]").val();
+				}',
+			'valueSetter' => 'function( rule, value )
+				{
+					var val = value.split( ":" );
+					rule.$el.find( ".rule-value-container [name^=criteria_type]" ).val( val[0] ).trigger( "change" );
+					rule.$el.find( ".rule-value-container [name^=criteria_operator]" ).val( val[1] ).trigger( "change" );
+					rule.$el.find( ".rule-value-container [name^=criteria_value]" ).val( val[2] ).trigger( "change" );
+				}',
+			'default_value' => '0:contains:',
+		);
 
 	if( is_logged_in() && $current_User->check_perm( 'users', 'moderate' ) )
 	{	// If current user can moderate other users:
 
 		// User last seen:
-		if( is_admin_page() || ( isset( $Blog ) && $Blog->get_setting( 'userdir_filter_lastseen' ) ) )
-		{	// Show user last seen filter only on back-office or if it is allowed by collection setting on front-office:
-			$filters['lastseen'] = array(
-					'label'      => T_('User last seen'),
-					'type'       => 'date',
-					'validation' => array( 'allow_empty_value' => 'true' ),
-				);
-		}
-
-		if( is_admin_page() )
-		{	// Registration source:
-			$filters['source'] = array(
-					'label'      => T_('Registration source'),
-					'operators'  => 'contains,not_contains',
-				);
-		}
-	}
-
-	if( is_admin_page() )
-	{	// Filters only for back-office:
-		if( $current_User->check_perm( 'users', 'edit' ) )
-		{	// Allow "Report count" filter only for users with edit user permission:
-			$filters['report_count'] = array(
-					'label'         => T_('Report count'),
-					'type'          => 'integer',
-					'operators'     => 'greater_or_equal',
-					'default_value' => 1,
-				);
-		}
-
-		// Primary group:
-		$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_level DESC, grp_name ASC' );
-		$GroupCache->load_where( 'grp_usage = "primary"' );
-		$GroupCache->all_loaded = true;
-		$group_options_array = array(
-				'-1' => T_('All (Ungrouped)'),
-				'0'  => T_('All (Grouped)'),
-			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
-		$OrganizationCache = & get_OrganizationCache( T_('All') );
-		$OrganizationCache->load_all();
-		$filters['group'] = array(
-				'label'  => T_('Primary Group'),
-				'type'   => 'integer',
-				'input'  => 'select',
-				'values' => $group_options_array,
-			);
-
-		// Secondary group:
-		$GroupCache->clear();
-		$GroupCache->load_where( 'grp_usage = "secondary"' );
-		$GroupCache->all_loaded = true;
-		$group_options_array = array(
-				'0'  => T_('All'),
-			) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
-		$filters['group2'] = array(
-				'label'  => T_('Secondary Group'),
-				'type'   => 'integer',
-				'input'  => 'select',
-				'values' => $group_options_array,
-			);
-
-		// Account status:
-		$filters['status'] = array(
-				'label'  => T_('Account status'),
-				'input'  => 'select',
-				'values' => get_user_statuses(),
-			);
-
-		// Registered from:
-		$filters['regdate'] = array(
-				'label'      => T_('Registration date'),
+		$filters['lastseen'] = array(
+				'label'      => T_('User last seen'),
 				'type'       => 'date',
 				'validation' => array( 'allow_empty_value' => 'true' ),
 			);
 
-		// Subscribed to:
-		if( empty( $edited_Newsletter ) && empty( $edited_EmailCampaign ) )
-		{	// Filter by newsletter(except of newsletter and email campaign edit forms):
-			$NewsletterCache = & get_NewsletterCache();
-			$NewsletterCache->load_all();
-			if( count( $NewsletterCache->cache ) > 0 )
-			{
-				$filters['newsletter'] = array(
-						'label'  => T_('Subscribed to'),
-						'type'   => 'integer',
-						'input'  => 'select',
-						'values' => $NewsletterCache->get_option_array_worker(),
-					);
-			}
-		}
+		// Registration source:
+		$filters['source'] = array(
+				'label'      => T_('Registration source'),
+				'operators'  => 'contains,not_contains',
+			);
+	}
 
-		if( $current_User->check_perm( 'users', 'moderate' ) )
-		{	// Filter by user tags if current user can moderate other users:
-			$filters['tags'] = array(
-					'label'  => T_('User tags'),
-					'valueGetter' => 'evo_get_filter_user_tags',
-					'valueSetter' => 'evo_set_filter_user_tags',
-					'operators'   => 'user_tagged,user_not_tagged',
+	if( is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
+	{	// Allow "Report count" filter only for users with edit user permission:
+		$filters['report_count'] = array(
+				'label'         => T_('Report count'),
+				'type'          => 'integer',
+				'operators'     => 'greater_or_equal',
+				'default_value' => 1,
+			);
+	}
+
+	// Primary group:
+	$GroupCache = new DataObjectCache( 'Group', true, 'T_groups', 'grp_', 'grp_ID', 'grp_name', 'grp_level DESC, grp_name ASC' );
+	$GroupCache->load_where( 'grp_usage = "primary"' );
+	$GroupCache->all_loaded = true;
+	$group_options_array = array(
+			'-1' => T_('All (Ungrouped)'),
+			'0'  => T_('All (Grouped)'),
+		) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
+	$OrganizationCache = & get_OrganizationCache( T_('All') );
+	$OrganizationCache->load_all();
+	$filters['group'] = array(
+			'label'  => T_('Primary Group'),
+			'type'   => 'integer',
+			'input'  => 'select',
+			'values' => $group_options_array,
+		);
+
+	// Secondary group:
+	$GroupCache->clear();
+	$GroupCache->load_where( 'grp_usage = "secondary"' );
+	$GroupCache->all_loaded = true;
+	$group_options_array = array(
+			'0'  => T_('All'),
+		) + $GroupCache->get_option_array_worker( 'get_name_without_level' );
+	$filters['group2'] = array(
+			'label'  => T_('Secondary Group'),
+			'type'   => 'integer',
+			'input'  => 'select',
+			'values' => $group_options_array,
+		);
+
+	// Account status:
+	$filters['status'] = array(
+			'label'  => T_('Account status'),
+			'input'  => 'select',
+			'values' => get_user_statuses(),
+		);
+
+	// Registered from:
+	$filters['regdate'] = array(
+			'label'      => T_('Registration date'),
+			'type'       => 'date',
+			'validation' => array( 'allow_empty_value' => 'true' ),
+		);
+
+	// Subscribed to:
+	if( empty( $edited_Newsletter ) && empty( $edited_EmailCampaign ) )
+	{	// Filter by newsletter(except of newsletter and email campaign edit forms):
+		$NewsletterCache = & get_NewsletterCache();
+		$NewsletterCache->load_all();
+		if( count( $NewsletterCache->cache ) > 0 )
+		{
+			$filters['newsletter'] = array(
+					'label'  => T_('Subscribed to'),
+					'type'   => 'integer',
+					'input'  => 'select',
+					'values' => $NewsletterCache->get_option_array_worker(),
 				);
 		}
+	}
+
+	if( is_logged_in() && $current_User->check_perm( 'users', 'moderate' ) )
+	{	// Filter by user tags if current user can moderate other users:
+		$filters['tags'] = array(
+				'label'  => T_('User tags'),
+				'valueGetter' => 'evo_get_filter_user_tags',
+				'valueSetter' => 'evo_set_filter_user_tags',
+				'operators'   => 'user_tagged,user_not_tagged',
+			);
 	}
 
 	// Find and remove filters which are not used for current case:
@@ -6990,7 +6957,7 @@ function users_results_block( $params = array() )
 
 		if( is_admin_page() && is_logged_in() && $current_User->check_perm( 'users', 'edit' ) )
 		{	// Settings for default user list filters:
-			$UserList->filter_area['presets_after'] = '<span class="fa fa-cog pointer" onclick="return evo_users_list_default_filters()" style="margin-left:20px"></span>';
+			$UserList->filter_area['advanced_defaults_jsfunc'] = 'evo_users_list_default_filters()';
 			// Initialize JavaScript for AJAX loading of popup window to change default filters on users list:
 			echo_userlist_filters_js();
 		}

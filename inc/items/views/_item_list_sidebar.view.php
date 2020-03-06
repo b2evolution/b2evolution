@@ -63,11 +63,13 @@ $Form->begin_form( 'evo_sidebar_filters' );
 $Form->hidden_ctrl();
 $Form->hidden( 'tab', $tab );
 $Form->hidden( 'blog', $Blog->ID );
+// Set this hidden in order to open custom filters area when filters were applied:
+$Form->hidden( $pp.'filter_preset', 'custom' );
 
 echo '<div class="filter_buttons">';
 	if( $ItemList->is_filtered() )   // NOTE: this works (contrary to UserList)
 	{	// TODO: style this better:
-		echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;filter=reset" class="btn btn-warning" style="margin-right: 5px">';
+		echo '<a href="?ctrl=items&amp;blog='.$Blog->ID.'&amp;'.$pp.'filter_preset=&amp;filter=reset" class="btn btn-warning" style="margin-right: 5px">';
 		echo get_icon( 'filter' ).' '.T_('Remove filters').'</a>';
 	}
 

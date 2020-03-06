@@ -579,8 +579,8 @@ jQuery( document ).ready( function()
 				.'</span>';
 		}
 
-		if( ! empty( $this->filter_area['callback_advanced'] ) )
-		{	// "Advanced preset" with JS toggle to reveal form:
+		if( is_admin_page() && ! empty( $this->filter_area['callback_advanced'] ) )
+		{	// "Advanced preset" with JS toggle to reveal form ONLY on back-office:
 			echo '<span onclick="toggle_filter_area(\''.$advanced_option_name.'\')"'
 					.' class="btn btn-xs btn-info'.( $this->current_filter_preset == 'advanced' ? ' active' : '' ).'">'
 					.get_icon( ( $advanced_fold_state == 'collapsed' ? 'filters_show' : 'filters_hide' ), 'imgtag', array( 'id' => 'clickimg_'.$advanced_option_name ) )
@@ -589,11 +589,6 @@ jQuery( document ).ready( function()
 		}
 
 		echo '</span>'; // End of <span class="btn-group">
-
-		if( ! empty( $this->filter_area['presets_after'] ) )
-		{	// Display additional info after presets:
-			echo $this->filter_area['presets_after'];
-		}
 
 		//_________________________________________________________________________________________
 
@@ -658,11 +653,11 @@ jQuery( document ).ready( function()
 		}
 
 		// ---------------- ADVANCED FILTERS ---------------- :
-		if( ! empty($this->filter_area['callback_advanced'] ) )
-		{	// Display Advanced Filters Form fields:
+		if( is_admin_page() && ! empty($this->filter_area['callback_advanced'] ) )
+		{	// Display Advanced Filters Form fields ONLY on back-office:
 
 			// Begining of the Advanced filters area:
-			echo '<div id="clickdiv_'.$advanced_option_name.'"'.( $advanced_fold_state == 'collapsed' ? ' style="display:none"' : '' ).'>';
+			echo '<div id="clickdiv_'.$advanced_option_name.'" class="evo_results_filters__advanced"'.( $advanced_fold_state == 'collapsed' ? ' style="display:none"' : '' ).'>';
 
 			if( $create_new_form )
 			{	// We do not already have a form surrounding the whole results list:
@@ -700,6 +695,11 @@ jQuery( document ).ready( function()
 			{ // We do not already have a form surrounding the whole result list:
 				$this->Form->end_form( '' );
 				unset( $this->Form );	// forget about this temporary form
+			}
+
+			if( isset( $this->filter_area['advanced_defaults_jsfunc'] ) )
+			{	// Display a button to change default advanced filters:
+				echo '<button class="btn btn-xs btn-default evo_results_filters__defaults_btn" onclick="'.$this->filter_area['advanced_defaults_jsfunc'].'"><span class="fa fa-cog pointer"></span> '.T_('Defaults').'</button>';
 			}
 
 			echo '</div>'; // End of the Advanced filters area.

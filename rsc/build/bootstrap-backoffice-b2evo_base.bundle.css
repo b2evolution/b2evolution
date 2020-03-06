@@ -3187,6 +3187,14 @@ div.filters .form-inline .form-group {
 div.filters .evo_btn_apply_filters {
   margin: 0;
 }
+div.filters .evo_results_filters__advanced {
+  position: relative;
+}
+div.filters .evo_results_filters__advanced .evo_results_filters__defaults_btn {
+  position: absolute;
+  top: 10px;
+  right: 0;
+}
 div.filters .twitter-typeahead {
   vertical-align: middle;
 }
