@@ -30,6 +30,7 @@ $params = array_merge( array(
 			'item_title_after'           => '</h2>',
 			'item_title_single_before'   => '<h1>',	// This replaces the above in case of disp=single or disp=page
 			'item_title_single_after'    => '</h1>',
+			'item_link_type'             => '#',
 		'item_title_line_after'      => '</div>',
 		// Controlling the content:
 		'content_mode'               => 'auto',		// excerpt|full|normal|auto -- auto will auto select depending on $disp-detail
@@ -103,6 +104,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'widget_item_title_params'  => array(
 						'before' => $params['item_title_line_before'].$params['item_title_before'],
 						'after' => $params['item_title_after'].$params['item_title_line_after'],
+						'link_type' => $params['item_link_type'],
 				),
 				// Item Visibility Badge widge template
 				'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
@@ -133,6 +135,7 @@ echo '<div class="evo_content_block">'; // Beginning of post display
 				'widget_item_title_params'  => array(
 						'before' => $params['item_title_line_before'].( $disp == 'single' ? $params['item_title_single_before'] : $params['item_title_before'] ),
 						'after' => ( $disp == 'single' ? $params['item_title_single_after'] : $params['item_title_after'] ).$params['item_title_line_after'],
+						'link_type' => $params['item_link_type'],
 					),
 				// Item Previous Next widget
 				'widget_item_next_previous_params' => array(

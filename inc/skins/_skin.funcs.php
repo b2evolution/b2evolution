@@ -1768,6 +1768,14 @@ function skin_init( $disp )
 			break;
 	}
 
+	// NOTE: Call the update item read status only after complete initialization of $disp_detail in the code above,
+	//       because the $disp_detail is used to select correct intro Item:
+	if( ( $disp == 'posts' || $disp == 'front' ) &&
+	    ( $featured_intro_Item = & get_featured_Item( $disp, NULL, true ) ) )
+	{	// We assume the current user will have read the entire intro Item and all its current comments:
+		$featured_intro_Item->update_read_timestamps( true, true );
+	}
+
 	// Enable shortcut keys:
 	if( is_logged_in() )
 	{

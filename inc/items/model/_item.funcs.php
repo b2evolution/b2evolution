@@ -77,6 +77,7 @@ function init_MainList( $items_nb_limit )
 
 				case 'mustread':
 					$MainList->set_default_filters( array(
+							'itemtype_usage' => 'post,page,intro-front,intro-main,intro-cat,intro-tag,intro-sub,intro-all',
 							'mustread' => 1,
 							'orderby'  => 'mustread',
 						) );

@@ -17,6 +17,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 // Default params:
 $params = array_merge( array(
 		'post_navigation' => 'same_category', // In this skin, it makes no sense to navigate in any different mode than "same category"
+		'item_link_type'  => '#',
 	), $params );
 
 global $Item, $cat, $disp;
@@ -113,6 +114,7 @@ $display_workflow =
 						$Item->title( array(
 								'link_class'      => 'topictitle ellipsis'.( $Item->get_read_status() != 'read' ? ' unread' : '' ),
 								'post_navigation' => $params['post_navigation'],
+								'link_type'       => $params['item_link_type'],
 							) );
 
 						if( $disp == 'mustread' )

@@ -7018,6 +7018,7 @@ class Blog extends DataObject
 
 			// Filter only the flagged items:
 			$mustread_ItemList2->set_default_filters( array(
+					'itemtype_usage' => 'post,page,intro-front,intro-main,intro-cat,intro-tag,intro-sub,intro-all',
 					'mustread' => $read_status
 				) );
 
