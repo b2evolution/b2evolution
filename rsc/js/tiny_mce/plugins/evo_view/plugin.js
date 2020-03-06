@@ -1158,19 +1158,17 @@ tinymce.PluginManager.add( 'evo_view', function( editor ) {
 				}
 			} );
 
-		// Add to editor.wp
-		editor.evo = editor.evo || {};
-		editor.evo.getView = getView;
-		editor.evo.setViewCursor = setViewCursor;
-
 		editor.addCommand( 'evo_view_edit_inline', function() {
 				editView();
 			} );
 
-		// Keep for back-compat.
 		return {
-				getView: getView,
-				editView: editView
+				getMetadata: function () {
+						return  {
+							name: "b2evo View plugin",
+							url: "http://b2evolution.net"
+						};
+					}
 			};
 
 	} );

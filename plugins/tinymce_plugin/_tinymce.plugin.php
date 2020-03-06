@@ -189,7 +189,7 @@ class tinymce_plugin extends Plugin
 				'label' => $this->T_('Custom TinyMCE init'),
 				'type' => 'textarea',
 				'defaultvalue' => // Provide some sample:
-						'height : "240"',
+						'height : 240',
 				'note' => sprintf( $this->T_('Custom parameters to tinymce.init(). See the <a %s>TinyMCE manual</a>.'), 'href="http://wiki.moxiecode.com/index.php/TinyMCE:Configuration"' ),
 			),
 		);
@@ -403,7 +403,7 @@ class tinymce_plugin extends Plugin
 				}
 
 				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_'.$Blog->ID );
-				$wysiwyg_checkbox_label = TS_("Don't show this again for this Collection");
+				$wysiwyg_checkbox_label = T_("Don't show this again for this Collection");
 
 				$state_params = array(
 						'type' => $params['target_type'],
@@ -419,7 +419,7 @@ class tinymce_plugin extends Plugin
 				$this->target_ID = $edited_EmailCampaign->ID;
 
 				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_emailcampaign' );
-				$wysiwyg_checkbox_label = TS_("Don't show this again when composing email campaigns");
+				$wysiwyg_checkbox_label = T_("Don't show this again when composing email campaigns");
 
 				$state_params = array(
 						'type'  => $params['target_type'],
@@ -469,7 +469,7 @@ class tinymce_plugin extends Plugin
 				}
 
 				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_'.$Blog->ID );
-				$wysiwyg_checkbox_label = TS_("Don't show this again for this Collection");
+				$wysiwyg_checkbox_label = T_("Don't show this again for this Collection");
 
 				// Currently shares the same editor state as Item above:
 				$state_params = array(
@@ -494,7 +494,7 @@ class tinymce_plugin extends Plugin
 				}
 
 				$show_wysiwyg_warning = $this->UserSettings->get( 'show_wysiwyg_warning_message' );
-				$wysiwyg_checkbox_label = TS_("Don't show this again when composing private messages");
+				$wysiwyg_checkbox_label = T_("Don't show this again when composing private messages");
 
 				$state_params = array(
 						'type'    => $params['target_type'],
@@ -507,25 +507,12 @@ class tinymce_plugin extends Plugin
 				return false;
 		}
 
-		if( empty( $wysiwyg_toggle_switch_js_initialized ) )
-		{
-		?>
-			<script>
-			function toggle_switch_warning( state )
-			{
-				var activate_link = '<?php echo $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' );?>';
-				var deactivate_link = '<?php echo $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' );?>';
-				jQuery.get( ( state ? activate_link : deactivate_link ),
-						function( data )
-						{	// Fire wysiwyg warning state change event
-							jQuery( document ).trigger( 'wysiwyg_warning_changed', [ state ] );
-						} );
-				return false;
-			}
-			</script>
-		<?php
-			$wysiwyg_toggle_switch_js_initialized = true;
-		}
+		// Toggle switch configuration for JS function "toggle_switch_warning()":
+		$toggle_switch_warning_config = array(
+				'activate_link' => $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ),
+				'deactivate_link' => $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' ),
+			);
+		expose_var_to_js( 'evo_plugin_tinymce_config__toggle_switch_warning', evo_json_encode( $toggle_switch_warning_config ) );
 
 		switch( $params['edit_layout'] )
 		{
@@ -544,20 +531,34 @@ class tinymce_plugin extends Plugin
 				echo $params['quicksetting_item_start'];
 				echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? $deactivate_warning_link : $activate_warning_link;
 				echo $params['quicksetting_item_end'];
-				?>
-				<script>
-					var quicksetting_switch = jQuery( '#<?php echo $params['quicksetting_item_id'];?>' );
-					jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
-							quicksetting_switch.html( state ? '<?php echo format_to_js( $deactivate_warning_link );?>' : '<?php echo format_to_js( $activate_warning_link ); ?>' );
-						} );
-				</script>
-				<?php
+
+				$quicksettings_config = array(
+						'item_id' => $params['quicksetting_item_id'],
+						'activate_warning_link' => $activate_warning_link,
+						'deactivate_warning_link' => $deactivate_warning_link,
+					);
+
+				expose_var_to_js( 'evo_plugin_tinymce_config__quicksettings', evo_json_encode( $quicksettings_config ) );
 
 				return true;
 
 			default:
 				// Get init params, depending on edit mode: simple|expert
 				$tmce_init = $this->get_tmce_init( $params['edit_layout'], $params['content_id'], $params['target_type'] );
+
+				$toggle_editor_config = array(
+						'plugin_code'            => $this->code,
+						'content_id'             => $params['content_id'],
+						'display_warning'        => ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ),
+						'save_editor_state_url'  => $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ),
+						'toggle_warning_msg'     => T_('By switching to WYSIWYG, you might lose newline and paragraph marks as well as some other formatting. Your text is safe though! Are you sure you want to switch?'),
+						'warning_text'           => T_('WARNING'),
+						'wysiwyg_checkbox_label' => $wysiwyg_checkbox_label,
+						'ok_btn_label'           => T_('OK'),
+						'cancel_btn_label'       => T_('Cancel'),
+					);
+
+				expose_var_to_js( 'evo_plugin_tinymce_config__toggle_editor', evo_json_encode( $toggle_editor_config ) );
 				?>
 
 				<div class="btn-group evo_tinymce_toggle_buttons">
@@ -567,309 +568,36 @@ class tinymce_plugin extends Plugin
 						title="<?php echo format_to_output( $this->T_('Toggle to the WYSIWYG editor.'), 'htmlattr' ); ?>" />
 				</div>
 
-				<script>
-					var displayWarning = <?php echo ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ) ? 'true' : 'false';?>;
-
-					jQuery( document ).on( 'wysiwyg_warning_changed', function( event, state ) {
-						displayWarning = state;
-					} );
-
-					function confirm_switch()
-					{
-						if( jQuery( 'input[name=hideWarning]' ).is(':checked') )
-						{	// Do not show warning again
-							toggle_switch_warning( false );
-						}
-
-						// switch to WYSIWYG
-						tinymce_plugin_toggleEditor( '<?php echo $params['content_id']; ?>' );
-
-						// close the modal window
-						closeModalWindow();
-
-						return false;
-					}
-
-					jQuery( '[id^=tinymce_plugin_toggle_button_]').click( function()
-					{
-						if( jQuery( this ).val() == 'WYSIWYG' )
-						{
-							if( displayWarning )
-							{
-								evo_js_lang_close = '<?php echo TS_('Cancel');?>';
-								openModalWindow( '<p><?php echo TS_('By switching to WYSIWYG, you might lose newline and paragraph marks as well as some other formatting. Your text is safe though! Are you sure you want to switch?');?></p>'
-									+ '<form>'
-									+ '<input type="checkbox" name="hideWarning" value="1"> ' + '<?php echo $wysiwyg_checkbox_label;?>'
-									+ '<input type="submit" name="submit" onclick="return confirm_switch();">'
-									+ '</form>',
-									'500px', '', true,
-									'<span class="text-danger"><?php echo TS_('WARNING');?></span>',
-									[ '<?php echo TS_('OK');?>', 'btn-primary' ], true );
-							}
-							else
-							{
-								tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
-							}
-						}
-						else
-						{
-							tinymce_plugin_toggleEditor('<?php echo $params['content_id']; ?>');
-						}
-					} );
-
-					/**
-					* Toggle TinyMCE editor on/off.
-					* This updates the corresponding PluginUserSetting, too.
-					*/
-					function tinymce_plugin_toggleEditor( id )
-					{
-						var textarea = jQuery( '#<?php echo $params['content_id'];?>' );
-
-						jQuery( '[id^=tinymce_plugin_toggle_button_]' ).removeClass( 'active' ).attr( 'disabled', 'disabled' );
-
-						if( ! tinymce_plugin_init_done )
-						{
-							tinymce_plugin_init_done = true;
-							// call this method on init again, with "null" id, so that mceAddControl gets called.
-							tinymce_plugin_init_tinymce( function() { tinymce_plugin_toggleEditor( null ) } );
-							return;
-						}
-
-						if( ! tinymce.get( id ) )
-						{ // Turn on WYSIWYG editor
-							tinymce.execCommand( 'mceAddEditor', false, id );
-							jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ); ?>' );
-							jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).addClass( 'active' );
-							jQuery( '#tinymce_plugin_toggle_button_html' ).removeAttr( 'disabled' );
-							jQuery( '[name="editor_code"]').attr('value', '<?php echo $this->code; ?>' );
-							// Hide the plugin toolbars that allow to insert html tags
-							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar, .evo_mermaid_toolbar' ).hide();
-							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark, #block_renderer_evo_mermaid' ).addClass( 'disabled' );
-							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark, input#renderer_evo_mermaid' ).each( function()
-							{
-								if( jQuery( this ).is( ':checked' ) )
-								{
-									jQuery( this ).addClass( 'checked' );
-								}
-								jQuery( this ).attr( 'disabled', 'disabled' ).removeAttr( 'checked' );
-							} );
-
-							if( id && textarea.prop( 'required' ) )
-							{
-								textarea.attr( 'data-required', true );
-								textarea.removeAttr( 'required' );
-							}
-						}
-						else
-						{ // Hide the editor, Display only source HTML
-							tinymce.execCommand( 'mceRemoveEditor', false, id );
-							jQuery.get( '<?php echo $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' ); ?>' );
-							jQuery( '#tinymce_plugin_toggle_button_html' ).addClass( 'active' );
-							jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).removeAttr( 'disabled' );
-							jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
-							// Show the plugin toolbars that allow to insert html tags
-							jQuery( '.quicktags_toolbar, .evo_code_toolbar, .evo_prism_toolbar, .b2evMark_toolbar, .evo_mermaid_toolbar' ).show();
-							jQuery( '#block_renderer_evo_code, #block_renderer_evo_prism, #block_renderer_b2evMark, #block_renderer_evo_mermaid' ).removeClass( 'disabled' );
-							jQuery( 'input#renderer_evo_code, input#renderer_evo_prism, input#renderer_b2evMark, input#renderer_evo_mermaid' ).each( function()
-							{
-								if( jQuery( this ).hasClass( 'checked' ) )
-								{
-									jQuery( this ).attr( 'checked', 'checked' ).removeClass( 'checked' );
-								}
-								jQuery( this ).removeAttr( 'disabled' );
-							} );
-
-							if( id && textarea.attr( 'data-required' ) )
-							{
-								textarea.removeAttr( 'data-required' );
-								textarea.attr( 'required', true );
-							}
-						}
-					}
-
-					// Init array with all usernames from the page for autocomplete plugin
-					var autocomplete_static_options = [];
-					jQuery( '.user.login' ).each( function()
-					{
-						var login = jQuery( this ).text();
-						if( login != '' && autocomplete_static_options.indexOf( login ) == -1 )
-						{
-							if( login[0] == '@' )
-							{
-								login = login.substr( 1 );
-							}
-							autocomplete_static_options.push( login );
-						}
-					} );
-					autocomplete_static_options = autocomplete_static_options.join();
-
-					var tmce_init={<?php echo $tmce_init; ?>};
-					var tinymce_plugin_displayed_error = false;
-					var tinymce_plugin_init_done = false;
-					window.evo = {};
-
-					</script>
-
-					<?php
-					// Load TinyMCE Javascript source file:
-					// This cannot be done through AJAX, since there appear to be scope problems on init then (TinyMCE problem?! - "u not defined").
-					// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
-					require_js_defer( '#tinymce#', 'blog', true );
-					require_js_defer( '#tinymce_jquery#', 'blog', true );
-					$this->require_js_defer( 'js/evo_view_shortcodes.bmin.js', true );
-					?>
-
-					<script>
-					function tinymce_plugin_init_tinymce( oninit )
-					{
-						// Init tinymce:
-						if( typeof tinymce == "undefined" )
-						{
-							if( ! tinymce_plugin_displayed_error )
-							{
-								alert( '<?php echo sprintf( $this->TS_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'), $this->TS_('URL to TinyMCE') ); ?>' );
-								tinymce_plugin_displayed_error = true;
-							}
-						}
-						else
-						{
-							<?php
-							global $Plugins;
-							$Plugins->trigger_event('tinymce_before_init');
-							?>
-
-							// Define oninit function for TinyMCE
-							if( typeof tmce_init.oninit != "undefined" )
-							{
-								oninit = function() {
-									tmce_init.oninit();
-									oninit();
-								}
-							}
-
-							tmce_init.oninit = function ()
-							{
-								oninit();
-
-								// Provide hooks for textarea manipulation (where other plugins should hook into):
-								var ed = tinymce.get("<?php echo $params['content_id']; ?>");
-								if( ed && typeof b2evo_Callbacks == "object" )
-								{
-									// add a callback, that returns the selected (raw) html:
-									b2evo_Callbacks.register_callback( "get_selected_text_for_<?php echo $params['content_id']; ?>", function(value) {
-											var inst = tinymce.get("<?php echo $params['content_id']; ?>");
-											if( ! inst ) return null;
-											return inst.selection.getContent();
-										}, true );
-
-									// add a callback, that wraps a selection:
-									b2evo_Callbacks.register_callback( "wrap_selection_for_<?php echo $params['content_id']; ?>", function(params) {
-											var inst = tinymce.get("<?php echo $params['content_id']; ?>");
-											if( ! inst ) return null;
-											var sel = inst.selection.getContent();
-
-											if( params.replace )
-											{
-												var value = params.before + params.after;
-											}
-											else
-											{
-												var value = params.before + sel + params.after;
-											}
-											inst.selection.setContent( value );
-
-											return true;
-										}, true );
-
-									// add a callback, that replaces a string
-									b2evo_Callbacks.register_callback( "str_replace_for_<?php echo $params['content_id']; ?>", function(params) {
-											var inst = tinymce.get("<?php echo $params['content_id']; ?>");
-											if( ! inst ) return null;
-
-											// Replace substring with new value
-											inst.setContent( inst.getContent().replace( params.search, params.replace ) );
-
-											return true;
-										}, true );
-
-									// add a callback, that lets us insert raw content:
-									// DEPRECATED, used in b2evo 1.10.x
-									b2evo_Callbacks.register_callback( "insert_raw_into_<?php echo $params['content_id']; ?>", function(value) {
-											tinymce.execInstanceCommand( "<?php echo $params['content_id']; ?>", "mceInsertRawHTML", false, value );
-											return true;
-									}, true );
-								}
-
-								var textarea = jQuery( '#<?php echo $params['content_id'];?>' );
-								if( textarea.prop( 'required' ) )
-								{
-									textarea.attr( 'data-required', true );
-									textarea.removeAttr( 'required' );
-								}
-							}
-
-							// Try to add custom shortcuts from page:
-							tmce_init.init_instance_callback = function( ed ) {
-									if( window.shortcut_keys )
-									{
-										console.log( window.shortcut_keys );
-										for( var i = 0; i < window.shortcut_keys.length; i++ )
-										{
-											var key = window.shortcut_keys[i];
-											ed.shortcuts.add( key, 'b2evo shortcut key: ' + key, function() {
-												window.shortcut_handler( key );
-											} );
-										}
-									}
-								}
-
-							tmce_init.setup = function( ed )
-							{
-								ed.on( 'init', tmce_init.oninit );
-							}
-
-							tinymce.on( 'AddEditor', function( e )
-							{	// Switching to WYSIWYG mode:
-								var textarea = jQuery( '#<?php echo $params['content_id'];?>' );
-								if( ! textarea.val().match( /<(p\s?|br\s?\/?)[^>]*>/i ) )
-								{	// Try to apply "Auto P" plugin(if it is installed) in order to replace
-									// new lines with <p> or <br> html tags if content has no them yet:
-									jQuery.ajax(
-									{
-										type: 'POST',
-										url: '<?php echo $this->get_htsrv_url( 'update_content', array(), '&' ); ?>',
-										data:
-										{
-											'content': textarea.val(),
-										},
-										success: function( result )
-										{
-											e.editor.setContent( result );
-										}
-									} );
-								}
-								return false;
-							} );
-
-							tinymce.init( tmce_init );
-						}
-					}
-
-				</script>
-
 				<?php
+				// Load TinyMCE Javascript source file:
+				// This cannot be done through AJAX, since there appear to be scope problems on init then (TinyMCE problem?! - "u not defined").
+				// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
+				require_js_defer( '#tinymce#', 'blog', true );
+				require_js_defer( '#tinymce_jquery#', 'blog', true );
+				$this->require_js_defer( 'js/evo_view_shortcodes.bmin.js', true );
+
+				$tinymce_init_config = array(
+						'content_id'         => $params['content_id'],
+						'code_editor'        => $this->code,
+						'use_tinymce'        => $this->get_editor_state( $state_params ),
+						'tmce_init'          => $tmce_init,
+						'display_erro_msg'   => sprintf( $this->T_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'), $this->T_('URL to TinyMCE') ),
+						'update_content_url' => $this->get_htsrv_url( 'update_content', array(), '&' )
+					);
+				expose_var_to_js( 'evo_plugin_tinymce_config__init', evo_json_encode( $tinymce_init_config ) );
+
 				$use_tinymce = $this->get_editor_state( $state_params );
 
 				$editor_code = 'html';
 				if( $use_tinymce )
 				{ // User used MCE last time, load MCE on document.ready:
 					$editor_code = $this->code;
-					echo '<script>jQuery( tinymce_plugin_toggleEditor("'.$params['content_id'].'") );</script>';
+					expose_var_to_js( 'evo_plugin_tinymce_config__use_content_id', evo_json_encode( array( 'content_id' => $params['content_id'] ) ) );
 				}
 				// By default set the editor code to an empty string
-				echo '<input type="hidden" name="editor_code" value="">';
-				// If the js is enabled set the editor code to the currently used value
-				echo '<script>jQuery(\'[name="editor_code"]\').attr(\'value\', \''.$editor_code.'\');</script>';
+				//echo '<input type="hidden" name="editor_code" value="">';
+				// If the JS is enabled set the editor code to the currently used value
+				//expose_var_to_js( 'evo_plugin_tinymce_config__use_editor_code', evo_json_encode( array( 'editor_code' => $editor_code ) ) );
 
 				// We also want to save the 'last used/not-used' state: (if no NULLs, this won't change anything)
 				$this->htsrv_save_editor_state( array_merge( $state_params, array( 'on' => $use_tinymce ) ) );
@@ -1054,27 +782,30 @@ class tinymce_plugin extends Plugin
 
 		// Configuration: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration
 		$init_options = array();
-		$init_options[] = 'blog_ID: '.( !empty($Blog) ? $Blog->ID : 'null' );
-		$init_options[] = 'cache_suffix: "?v='.$this->version.'"';
-		$init_options[] = 'selector: "textarea#'.$content_id.'"';
+		
+		$init_options['blog_ID'] = !empty( $Blog ) ? $Blog->ID : NULL;
+		$init_options['cache_suffix'] = '?v='.$this->version;
+		$init_options['selector'] = 'textarea#'.$content_id;
+
 		if( $this->Settings->get( 'use_gzip_compressor' ) )
 		{	// Load script to use gzip compressor:
-			$init_options[] = 'script_url: "'.get_require_url( 'tiny_mce/tinymce.gzip.php', 'blog', 'js' ).'"';
+			$init_options['script_url'] = get_require_url( 'tiny_mce/tinymce.gzip.php', 'blog', 'js' );
 		}
 
 		// B2evo plugin options
-		$init_options[] = 'collection: "'.$this->collection.'"';
-		$init_options[] = 'target_ID: '.( empty( $this->target_ID ) ? 'undefined' : $this->target_ID );
-		$init_options[] = 'temp_ID: '.( empty( $this->temp_ID ) ? 'undefined' : $this->temp_ID );
-		$init_options[] = 'target_type: "'.( empty( $this->target_type ) ? 'undefined' : format_to_js( $this->target_type ) ).'"';
+		$init_options['collection']  = $this->collection;
+		$init_options['target_ID']   = empty( $this->target_ID ) ? 'undefined' : $this->target_ID;
+		$init_options['temp_ID']     = empty( $this->temp_ID ) ? 'undefined' : $this->temp_ID;
+		$init_options['target_type'] = empty( $this->target_type ) ? 'undefined' : format_to_js( $this->target_type );
 
-		$init_options[] = 'rest_url: "'.get_htsrv_url().'rest.php"';
-		$init_options[] = 'anon_async_url: "'.get_htsrv_url().'anon_async.php"';
+		$init_options['rest_url']       = get_htsrv_url().'rest.php';
+		$init_options['anon_async_url'] = get_htsrv_url().'anon_async.php';
 		$insert_inline_modal_params = array(
 				'target_type'  => $this->target_type,
 				'target_ID'    => $this->target_ID,
 				'request_from' => is_admin_page() ? 'back' : 'front',
 			);
+
 		if( $Blog )
 		{
 			$insert_inline_modal_params['blog'] = $Blog->ID;
@@ -1083,49 +814,50 @@ class tinymce_plugin extends Plugin
 		{
 			$insert_inline_modal_params['temp_ID'] = $this->temp_ID;
 		}
-		$init_options[] = 'modal_url: "'.$this->get_htsrv_url( 'insert_inline', $insert_inline_modal_params, '&' ).'"';
 
-		$init_options[] = 'fontsize_formats: "8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt"';
+		$init_options['modal_url'] = $this->get_htsrv_url( 'insert_inline', $insert_inline_modal_params, '&' );
 
-		// TinyMCE Theme+Skin+Variant to use:
-		$init_options[] = 'theme : "modern"';
-		$init_options[] = 'menubar : false';
+		$init_options['fontsize_formats'] = '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt';
 
-		// comma separated list of plugins: -- http://wiki.moxiecode.com/index.php/TinyMCE:Plugins
-		$init_options[] = 'plugins : "'.$tmce_plugins.'"';
-		$init_options[] = 'external_plugins: {
-				"morebreak"    : "'.$rsc_url.'js/tiny_mce/plugins/morebreak/plugin.min.js"
-			}';
-		$init_options[] = 'morebreak_separator : "[teaserbreak]"';
-		$init_options[] = 'pagebreak_separator : "[pagebreak]"';
+		$init_options['theme'] = 'modern';
+		$init_options['menubar'] = false;
+
+		$init_options['plugins'] = $tmce_plugins;
+		$init_options['external_plugins'] = array(
+				'morebreak' => $rsc_url.'js/tiny_mce/plugins/morebreak/plugin.min.js'
+			);
+		$init_options['morebreak_separator'] = '[teaserbreak]';
+		$init_options['pagebreak_separator'] = '[pagebreak]';
 		// Toolbars:
-		$init_options[] = 'toolbar1: "'.$tmce_theme_advanced_buttons1.'"';
-		$init_options[] = 'toolbar2: "'.$tmce_theme_advanced_buttons2.'"';
-		$init_options[] = 'toolbar3: "'.$tmce_theme_advanced_buttons3.'"';
-		$init_options[] = 'toolbar4: "'.$tmce_theme_advanced_buttons4.'"';
+		$init_options['toolbar1'] = $tmce_theme_advanced_buttons1;
+		$init_options['toolbar2'] = $tmce_theme_advanced_buttons2;
+		$init_options['toolbar3'] = $tmce_theme_advanced_buttons3;
+		$init_options['toolbar4'] = $tmce_theme_advanced_buttons4;
+
 		// Context menu:
 		if( $this->Settings->get( 'tmce_options_contextmenu' ) == 1 )
 		{
-			$init_options[] = 'contextmenu: "cut copy paste | link image | inserttable"';
+			$init_options['contextmenu'] = 'cut copy paste | link image | inserttable';
 		}
 
 		if( $this->Settings->get( 'tmce_options_spellcheck' ) == 1 )
 		{
-			$init_options[] = 'browser_spellcheck: true';
+			$init_options['browser_spellcheck'] = true;
 		}
 		else
 		{
-			$init_options[] = 'browser_spellcheck: false';
+			$init_options['browser_spellcheck'] = false;
 		}
 
 		// UI options:
-		$init_options[] = 'block_formats : "Paragraph=p;Preformatted=pre;Block Quote=blockquote;Heading 2=h2;Heading 3=h3;Heading 4=h4;Heading 5=h5;Heading 6=h6;Address=address;Definition Term=dt;Definition Description=dd;DIV=div"';
-		$init_options[] = 'resize : true';
-		$init_options[] = 'language : "'.$tmce_language.'"';
-		$init_options[] = 'language_url : "'.$rsc_url.'js/tiny_mce/langs/'.$tmce_language.'.js"';
+		$init_options['block_formats'] = 'Paragraph=p;Preformatted=pre;Block Quote=blockquote;Heading 2=h2;Heading 3=h3;Heading 4=h4;Heading 5=h5;Heading 6=h6;Address=address;Definition Term=dt;Definition Description=dd;DIV=div';
+		$init_options['resize']        = true;
+		$init_options['language']      = $tmce_language;
+		$init_options['language_url']  = $rsc_url.'js/tiny_mce/langs/'.$tmce_language.'.js';
+
 		if( function_exists( 'enchant_broker_init' ) )
 		{ // Requires Enchant spelling library
-			$init_options[] = 'spellchecker_rpc_url: \'spellchecker.php\'';
+			$init_options['spellchecker_rpc_url'] = 'spellchecker.php';
 		}
 		// body_class : "my_class"
 		// CSS used in the iframe/editable area: -- http://wiki.moxiecode.com/index.php/TinyMCE:Configuration/content_css
@@ -1133,13 +865,13 @@ class tinymce_plugin extends Plugin
 		// TODO: we don't want all of basic.css here
 
 		// Prevent object resizing in editor
-		$init_options[] = 'object_resizing : false';
+		$init_options['object_resizing'] = false;
 
-		$init_options[] = 'extended_valid_elements : "figure[class],figcaption[class]"';
+		$init_options['extended_valid_elements'] = 'figure[class],figcaption[class]';
 
 		// Options below should prevent insertion of <p> for every newline:
-		//$init_options[] = 'force_p_newlines : false';
-		//$init_options[] = 'forced_root_block : ""';
+		//$init_options['force_p_newlines'] = false';
+		//$init_options['forced_root_block'] = '';
 
 		// Content CSS:
 		$content_css = array();
@@ -1179,41 +911,46 @@ class tinymce_plugin extends Plugin
 			$content_css = implode( ',', array_merge( $content_css, $tinymce_content_css ) );
 		}
 
-		$init_options[] = 'content_css : "'.$content_css.'"';
+		$init_options['content_css'] = $content_css;
 
 		// Generated HTML code options:
 		// Do not make the path relative to "document_base_url":
-		$init_options[] = 'relative_urls : false';
+		//$init_options[] = 'relative_urls : false';
+		$init_options['relative_urls'] = false;
+
 		// Do not convert absolute urls to relative if url domain is the same as current page,
 		// (we should keep urls as they were entered manually, because urls can be broken if collection has different domain than back-office; also an issue with RSS feeds):
-		$init_options[] = 'convert_urls : false';
-		$init_options[] = 'entity_encoding : "raw"';
+		$init_options['convert_urls'] = false;
+		$init_options['entity_encoding'] = 'raw';
 
 		// Autocomplete options:
-		$init_options[] = 'autocomplete_options: autocomplete_static_options'; // Must be initialize before as string with usernames that are separated by comma
-		$init_options[] = 'autocomplete_options_url: restapi_url + "users/autocomplete"';
+		$init_options['autocomplete_options'] = 'autocomplete_static_options'; // Must be initialize before as string with usernames that are separated by comma
+		$init_options['autocomplete_options_url'] = 'restapi_url + "users/autocomplete"';
 
 		// remove_linebreaks : false,
 		// not documented:	auto_cleanup_word : true,
 
 		// Prevent auto generated <p> that wrap around the views
-		//$init_options[] = 'forced_root_block: ""';
+		//$init_options['forced_root_block'] = '';
 
 		// Enable advanced tab for images:
-		$init_options[] = 'image_advtab : true';
+		$init_options['image_advtab'] = true;
 
 		// Disable branding:
-		$init_options[] = 'branding : false';
-
-
-		$init = implode( ",\n", $init_options );
+		$init_options['branding'] = false;
 
 		// custom conf:
 		if( $tmce_custom_conf = $this->Settings->get('tmce_custom_conf') )
 		{
-			$init .= ",\n// tmce_custom_conf (from PluginSettings):\n".$tmce_custom_conf;
+			$tmce_custom_conf = preg_split("/\r\n|\n|\r/", $tmce_custom_conf);
+			foreach( $tmce_custom_conf as $row )
+			{
+				list( $key, $value ) = explode( ':', $row );
+				$init_options[trim( $key ) ] = trim( $value );
+			}
 		}
-		return $init;
+
+		return $init_options;
 	}
 
 
