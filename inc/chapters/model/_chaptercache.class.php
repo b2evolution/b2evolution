@@ -836,7 +836,7 @@ class ChapterCache extends DataObjectCache
 	 * Iterate through the given Chapter sub cats and items
 	 *
 	 * @param Object Chapter
-	 * @param array  Callback functions to display a Chapter and to display an Item
+	 * @param array Callback functions to display a Chapter and to display an Item
 	 * @param boolean Set true to iterate sub categories recursively, false otherwise
 	 * @param array Any additional params ( e.g. 'sorted', 'level', 'list_subs_start', etc. )
 	 * @return string the concatenated callbacks result
@@ -865,6 +865,7 @@ class ChapterCache extends DataObjectCache
 			$cat_items = $ItemCache->get_by_cat_ID( $Chapter->ID, $params['items_order_alpha_func'] );
 		}
 
+		// Does this category have content to display?
 		if( $has_sub_cats || !empty( $cat_items ) )
 		{ // Display category or posts
 			$cat_index = 0;
@@ -873,6 +874,7 @@ class ChapterCache extends DataObjectCache
 			$chapter_children_ids = array_keys( $Chapter->children );
 			$has_more_children = isset( $chapter_children_ids[$cat_index] );
 			$has_more_items = isset( $cat_items[$item_index] );
+			// alpha or manual order? 
 			$cat_order = $Chapter->get_subcat_ordering();
 			// Set post params for post display
 			$params['chapter_ID'] = $Chapter->ID;
@@ -883,20 +885,26 @@ class ChapterCache extends DataObjectCache
 				$r .= $params['list_subs_start'];
 			}
 
+			// Display all sub Chapters and items of current Chapter:
 			while( $has_more_children || $has_more_items )
 			{
 				$current_sub_Chapter = $has_more_children ? $Chapter->children[$chapter_children_ids[$cat_index]] : NULL;
 				$current_Item = $has_more_items ? $cat_items[$item_index] : NULL;
-				if( $current_Item != NULL && ( $current_sub_Chapter == NULL || ( $this->compare_item_with_chapter( $current_Item, $current_sub_Chapter, $cat_order ) <= 0 ) ) )
-				{
+
+				// Determine if the next thing to display is a Chapter or an Item:
+				if( $current_Item != NULL 
+					&& ( $current_sub_Chapter == NULL 
+						|| ( $this->compare_item_with_chapter( $current_Item, $current_sub_Chapter, $cat_order ) <= 0 ) ) )
+				{	// Next Item should display before Next Chapter/subcat
+
 					if( ! empty( $subcats_to_display ) )
 					{
 						if( $recurse )
-						{
+						{	// Display sub-contents:
 							$r .= $this->recurse( $callbacks, $params['subset_ID'], $subcats_to_display, $params['level'] + 1, $params['max_level'], $params );
 						}
 						else
-						{ // Display each category without recursion
+						{	// Display each category without recursion:
 							foreach( $subcats_to_display as $sub_Chapter )
 							{ // Display each category:
 								if( in_array( $sub_Chapter->ID, $params['exclude_cats'] ) )
@@ -915,6 +923,8 @@ class ChapterCache extends DataObjectCache
 						}
 						$subcats_to_display = array();
 					}
+
+					// Display an Item:
 					if( is_array( $callbacks['posts'] ) )
 					{ // object callback:
 						$r .= $callbacks['posts'][0]->{$callbacks['posts'][1]}( $current_Item, $params['level'] + 1, $params );
@@ -926,20 +936,21 @@ class ChapterCache extends DataObjectCache
 					$has_more_items = isset( $cat_items[++$item_index] );
 				}
 				elseif( $current_sub_Chapter != NULL )
-				{
+				{ 	// Next Chapter should display before next Item:
+
 					$subcats_to_display[] = $current_sub_Chapter;
 					$has_more_children = isset( $chapter_children_ids[++$cat_index] );
 				}
 			}
 
 			if( ! empty( $subcats_to_display ) )
-			{ // Display all subcats which were not displayed yet
+			{ // Display all subcats which were not displayed yet:
 				if( $recurse )
 				{
 					$r .= $this->recurse( $callbacks, $params['subset_ID'], $subcats_to_display, $params['level'] + 1, $params['max_level'], $params );
 				}
 				else
-				{ // Display each category without recursion
+				{ // Display each category without recursion:
 					foreach( $subcats_to_display as $sub_Chapter )
 					{ // Display each category:
 						if( in_array( $sub_Chapter->ID, $params['exclude_cats'] ) )
@@ -964,7 +975,8 @@ class ChapterCache extends DataObjectCache
 			}
 		}
 		elseif( isset( $callbacks['no_children'] ) )
-		{ // Display message when no children
+		{ // Display message when no children:
+			
 			if( is_array( $callbacks['no_children'] ) )
 			{ // object callback:
 				$r .= $callbacks['no_children'][0]->{$callbacks['no_children'][1]}( $Chapter, $params['level'] + 1 ); // </li>
