@@ -783,7 +783,7 @@ class ChapterCache extends DataObjectCache
 		// Go through all categories at this level:
 		foreach( $cat_array as $cat )
 		{
-			if( in_array(  $cat->ID, $params['excluded_cat_IDs'] ) )
+			if( isset($params['excluded_cat_IDs']) && in_array(  $cat->ID, $params['excluded_cat_IDs'] ) )
 			{	// Category is excluded, Skip it:
 				continue;
 			}
