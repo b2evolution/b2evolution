@@ -113,10 +113,10 @@ class content_hierarchy_Widget extends ComponentWidget
 					'defaultvalue' => T_('Content Hierarchy'),
 				),
 				'display_blog_title' => array(
-					'label' => T_('Blog Title'),
-					'note' => T_('Display blog title.'),
+					'label' => T_('Root line'),
+					'note' => T_('Display collection name above categories.'),
 					'type' => 'checkbox',
-					'defaultvalue' => true,
+					'defaultvalue' => false,
 				),
 				'open_children_levels' => array(
 					'label' => T_('Open children levels'),
@@ -256,7 +256,7 @@ class content_hierarchy_Widget extends ComponentWidget
 				'class_closed'         => 'closed',
 				'class_selected'       => 'selected',
 				'class_post'           => 'post',
-				'display_blog_title'   => true,
+				'display_blog_title'   => false,
 				'custom_title'         => '',
 				'open_children_levels' => 0,
 				'highlight_current'    => true,
@@ -304,7 +304,7 @@ class content_hierarchy_Widget extends ComponentWidget
 		echo $params['list_start'];
 
 		if( $params['display_blog_title'] )
-		{	// Display blog title
+		{	// Display "root level" line:
 			if( empty( $params['custom_title'] ) )
 			{
 				echo str_replace( '>', ' class="title '.$params['class_selected'].'">', $params['item_start'] );
