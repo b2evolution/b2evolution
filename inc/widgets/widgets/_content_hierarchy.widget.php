@@ -135,7 +135,7 @@ class content_hierarchy_Widget extends ComponentWidget
 				),
 				'exclude_cats' => array(
 					'type' => 'text',
-					'label' => T_('Exclude categories'),
+					'label' => T_('Root categories to exclude'),
 					'note' => T_('A comma-separated list of category IDs that you want to exclude from the list.'),
 					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
 																		'error'   => T_('Invalid list of Category IDs.') ),
@@ -223,6 +223,7 @@ class content_hierarchy_Widget extends ComponentWidget
 				'highlight_current'    => $this->disp_params['highlight_current'],
 				'show_flags'           => $this->disp_params['show_flags'],
 				'item_title_fields'    => isset( $this->disp_params['item_title_fields'] ) ? $this->disp_params['item_title_fields'] : 'title',
+				'excluded_cat_IDs'   => $this->excluded_cat_IDs,
 				'sorted' => true
 			), $params, $params['widget_content_hierarchy_params'] ) );
 
@@ -358,23 +359,6 @@ class content_hierarchy_Widget extends ComponentWidget
 	 */
 	function display_chapter( $Chapter, $level, $params = array() )
 	{
-		global $cat_array;
-
-		if( ! isset( $cat_array ) )
-		{
-			$cat_array = array();
-		}
-
-		if( in_array( $Chapter->get( 'parent_ID' ), $this->excluded_cat_IDs ) )
-		{	// Exclude also all child categories if parent category is excluded:
-			$this->excluded_cat_IDs[] = $Chapter->ID;
-		}
-
-		if( in_array( $Chapter->ID, $this->excluded_cat_IDs ) )
-		{	// Category is excluded, Skip it:
-			return;
-		}
-		
 		// What display before link text, Used for icon
 		$item_before = $params['item_before_closed'];
 

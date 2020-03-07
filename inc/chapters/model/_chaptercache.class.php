@@ -783,6 +783,11 @@ class ChapterCache extends DataObjectCache
 		// Go through all categories at this level:
 		foreach( $cat_array as $cat )
 		{
+			if( in_array(  $cat->ID, $params['excluded_cat_IDs'] ) )
+			{	// Category is excluded, Skip it:
+				continue;
+			}
+			
 			// Check if category is expended
 			$params['is_selected'] = $params['highlight_current'] && in_array( $cat->ID, $params['chapter_path'] );
 			$params['is_opened'] = $params['expand_all'] || $params['is_selected'];
