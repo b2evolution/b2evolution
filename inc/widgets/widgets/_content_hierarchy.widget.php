@@ -106,6 +106,12 @@ class content_hierarchy_Widget extends ComponentWidget
 		load_funcs( 'files/model/_image.funcs.php' );
 
 		$r = array_merge( array(
+				'title' => array(
+					'label'        => T_('Block title'),
+					'note'         => T_( 'Title to display in your skin.' ),
+					'size'         => 40,
+					'defaultvalue' => T_('Content Hierarchy'),
+				),
 				'display_blog_title' => array(
 					'label' => T_('Blog Title'),
 					'note' => T_('Display blog title.'),
@@ -126,6 +132,13 @@ class content_hierarchy_Widget extends ComponentWidget
 					'size' => 4,
 					'type' => 'integer',
 					'allow_empty' => true,
+				),
+				'exclude_cats' => array(
+					'type' => 'text',
+					'label' => T_('Exclude categories'),
+					'note' => T_('A comma-separated list of category IDs that you want to exclude from the list.'),
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																		'error'   => T_('Invalid list of Category IDs.') ),
 				),
 				'highlight_current' => array(
 					'label' => T_('Highlight current page'),
@@ -192,6 +205,17 @@ class content_hierarchy_Widget extends ComponentWidget
 		{	// Set selected Item in the params ONLY if we really view item page:
 			$params['selected_item_ID'] = $Item->ID;
 		}
+		
+		// Get IDs of categories that must be exluded:
+		$this->excluded_cat_IDs = sanitize_id_list( $this->disp_params['exclude_cats'], true );
+		
+		// START DISPLAY:
+		echo $this->disp_params['block_start'];
+
+		// Display title if requested
+		$this->disp_title();
+
+		echo $this->disp_params['block_body_start'];
 
 		$this->display_hierarchy( array_merge( array(
 				'display_blog_title'   => $this->disp_params['display_blog_title'],
@@ -334,6 +358,23 @@ class content_hierarchy_Widget extends ComponentWidget
 	 */
 	function display_chapter( $Chapter, $level, $params = array() )
 	{
+		global $cat_array;
+
+		if( ! isset( $cat_array ) )
+		{
+			$cat_array = array();
+		}
+
+		if( in_array( $Chapter->get( 'parent_ID' ), $this->excluded_cat_IDs ) )
+		{	// Exclude also all child categories if parent category is excluded:
+			$this->excluded_cat_IDs[] = $Chapter->ID;
+		}
+
+		if( in_array( $Chapter->ID, $this->excluded_cat_IDs ) )
+		{	// Category is excluded, Skip it:
+			return;
+		}
+		
 		// What display before link text, Used for icon
 		$item_before = $params['item_before_closed'];
 
