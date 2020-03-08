@@ -208,15 +208,7 @@ class content_hierarchy_Widget extends ComponentWidget
 		
 		// Get IDs of categories that must be exluded:
 		$this->excluded_cat_IDs = sanitize_id_list( $this->disp_params['exclude_cats'], true );
-		
-		// START DISPLAY:
-		echo $this->disp_params['block_start'];
-
-		// Display title if requested
-		$this->disp_title();
-
-		echo $this->disp_params['block_body_start'];
-
+	
 		$this->display_hierarchy( array_merge( array(
 				'display_blog_title'   => $this->disp_params['display_blog_title'],
 				'open_children_levels' => $this->disp_params['open_children_levels'],
@@ -297,7 +289,11 @@ class content_hierarchy_Widget extends ComponentWidget
 			$params['chapter_path'] = $ChapterCache->get_chapter_path( $this->Blog->ID, $Item->main_cat_ID );
 		}
 
+		// START DISPLAY:
 		echo $params['block_start'];
+		
+		// Display title if requested
+		$this->disp_title();
 
 		echo $params['block_body_start'];
 
