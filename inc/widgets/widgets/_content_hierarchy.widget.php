@@ -135,7 +135,7 @@ class content_hierarchy_Widget extends ComponentWidget
 				),
 				'exclude_cats' => array(
 					'type' => 'text',
-					'label' => T_('Root categories to exclude'),
+					'label' => T_('Exclude categories'),
 					'note' => T_('A comma-separated list of category IDs that you want to exclude from the list.'),
 					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
 																		'error'   => T_('Invalid list of Category IDs.') ),
