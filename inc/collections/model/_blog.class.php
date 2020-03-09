@@ -974,6 +974,10 @@ class Blog extends DataObject
 		{ // we want to load the front page params:
 			$front_disp = param( 'front_disp', 'string', '' );
 			$this->set_setting( 'front_disp', $front_disp );
+			if( $front_disp == 'mustread' && ! is_pro() )
+			{	// Don't allow to store not supported front page:
+				$Messages->add( T_('"Must Read" is supported only on b2evolution PRO.'), 'error' );
+			}
 
 			$front_post_ID = param( 'front_post_ID', 'integer', 0 );
 			if( $front_disp == 'page' )
@@ -1158,21 +1162,12 @@ class Blog extends DataObject
 			$this->set_setting( 'userdir_enable', param( 'userdir_enable', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_restrict_to_members', param( 'userdir_filter_restrict_to_members', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_name', param( 'userdir_filter_name', 'integer', 0 ) );
-			$this->set_setting( 'userdir_filter_name_email', param( 'userdir_filter_name_email', 'integer', 0 ) );
-			$this->set_setting( 'userdir_filter_firstname', param( 'userdir_filter_firstname', 'integer', 0 ) );
-			$this->set_setting( 'userdir_filter_lastname', param( 'userdir_filter_lastname', 'integer', 0 ) );
-			$this->set_setting( 'userdir_filter_nickname', param( 'userdir_filter_nickname', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_email', param( 'userdir_filter_email', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_country', param( 'userdir_filter_country', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_region', param( 'userdir_filter_region', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_subregion', param( 'userdir_filter_subregion', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_city', param( 'userdir_filter_city', 'integer', 0 ) );
 			$this->set_setting( 'userdir_filter_age_group', param( 'userdir_filter_age_group', 'integer', 0 ) );
-			$this->set_setting( 'userdir_filter_gender', param( 'userdir_filter_gender', 'integer', 0 ) );
-			$this->set_setting( 'userdir_filter_level', param( 'userdir_filter_level', 'integer', 0 ) );
-			$this->set_setting( 'userdir_filter_org', param( 'userdir_filter_org', 'integer', 0 ) );
-			$this->set_setting( 'userdir_filter_criteria', param( 'userdir_filter_criteria', 'integer', 0 ) );
-			$this->set_setting( 'userdir_filter_lastseen', param( 'userdir_filter_lastseen', 'integer', 0 ) );
 
 			$this->set_setting( 'userdir_picture', param( 'userdir_picture', 'integer', 0 ) );
 			$this->set_setting( 'image_size_user_list', param( 'image_size_user_list', 'string' ) );
@@ -7018,6 +7013,7 @@ class Blog extends DataObject
 
 			// Filter only the flagged items:
 			$mustread_ItemList2->set_default_filters( array(
+					'itemtype_usage' => 'post,page,intro-front,intro-main,intro-cat,intro-tag,intro-sub,intro-all',
 					'mustread' => $read_status
 				) );
 

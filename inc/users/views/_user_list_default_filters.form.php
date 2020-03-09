@@ -53,8 +53,6 @@ $Form->begin_fieldset( TB_('Change default users list filters...').get_manual_li
 			$filters_options, sprintf( TB_('Default filter criteria %d'), $i ) );
 	}
 
-	echo '<p>'.TB_('Note: These defaults will also be used in the front office.').'</p>';
-
 $Form->end_fieldset();
 
 $Form->button( array( '', 'actionArray[save_default_filters]', TB_('Save defaults'), 'SaveButton' ) );

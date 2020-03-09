@@ -120,6 +120,14 @@ function skin_init( $disp )
 					header_redirect( get_login_url( 'no access to must read content', NULL, false, NULL, 'access_requires_loginurl' ), 302 );
 					// Exit here.
 				}
+				if( ! is_pro() )
+				{	// Forbid access for not PRO version:
+					global $disp, $disp_detail;
+					$disp = '404';
+					$disp_detail = '404-not-supported';
+					$Messages->add( T_('"Must Read" is supported only on b2evolution PRO.'), 'error' );
+					break;
+				}
 				if( ! $Blog->get_setting( 'track_unread_content' ) )
 				{	// Forbid access to "must read" content if collection doesn't track unread content:
 					global $disp;
@@ -1766,6 +1774,14 @@ function skin_init( $disp )
 				$Messages->add( T_('The requested items don\'t exist.'), 'error' );
 			}
 			break;
+	}
+
+	// NOTE: Call the update item read status only after complete initialization of $disp_detail in the code above,
+	//       because the $disp_detail is used to select correct intro Item:
+	if( ( $disp == 'posts' || $disp == 'front' ) &&
+	    ( $featured_intro_Item = & get_featured_Item( $disp, NULL, true ) ) )
+	{	// We assume the current user will have read the entire intro Item and all its current comments:
+		$featured_intro_Item->update_read_timestamps( true, true );
 	}
 
 	// Enable shortcut keys:

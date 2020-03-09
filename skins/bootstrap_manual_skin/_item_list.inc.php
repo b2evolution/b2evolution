@@ -23,6 +23,7 @@ $params = array_merge( array(
 		'after_title'       => '$flag_icon$</h3>$item_status$',
 		'before_title_text' => '$item_icon$',
 		'after_title_text'  => '',
+		'item_link_type'    => '#',
 	), $params );
 
 global $Item;
@@ -92,6 +93,7 @@ foreach( $mask_params as $mask_param )
 				'before_title'    => $params['before_title_text'],
 				'after_title'     => $params['after_title_text'],
 				'post_navigation' => $params['post_navigation'],
+				'link_type'       => $params['item_link_type'],
 				'link_class'      => 'link',
 			),
 			// Item Visibility Badge widget template

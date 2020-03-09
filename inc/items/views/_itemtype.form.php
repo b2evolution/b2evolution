@@ -139,7 +139,6 @@ $Form->begin_fieldset( T_('Features').get_manual_link( 'item-type-features' ), a
 		$Form->text_input( 'ityp_front_order_attachments', $edited_Itemtype->front_order_attachments, 6, ' &nbsp; <b>'.T_('Front-Office Order').':</b>', T_('Leave empty to hide'), $front_order_params );
 	$Form->end_line();
 	$Form->checkbox( 'ityp_allow_featured', $edited_Itemtype->allow_featured, T_('Allow featured'), $intro_type_note, '', 1, $intro_type_disabled );
-	$Form->checkbox( 'ityp_allow_switchable', $edited_Itemtype->allow_switchable, T_('Allow switchable'), T_('Check to allow dinamically switchable blocks inside the content'), '', 1 );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Use of Advanced Properties').get_manual_link( 'item-type-advanced-properties' ), array( 'id' => 'itemtype_advprops' ) );
@@ -160,6 +159,7 @@ $Form->begin_fieldset( T_('Use of Advanced Properties').get_manual_link( 'item-t
 	$Form->radio( 'ityp_use_title_tag', $edited_Itemtype->use_title_tag, $options, htmlspecialchars( T_('Use <title> tag') ) );
 	$Form->radio( 'ityp_use_meta_desc', $edited_Itemtype->use_meta_desc, $options, htmlspecialchars( T_('Use <meta> description') ) );
 	$Form->radio( 'ityp_use_meta_keywds', $edited_Itemtype->use_meta_keywds, $options, htmlspecialchars( T_('Use <meta> keywords') ) );
+	$Form->checkbox( 'ityp_allow_switchable', $edited_Itemtype->allow_switchable, T_('Allow switchable'), T_('Check to allow dynamically switchable blocks inside the content'), '', 1 );
 $Form->end_fieldset();
 
 $Form->begin_fieldset( T_('Use of Location').get_manual_link( 'item-type-location' ), array( 'id' => 'itemtype_location' ) );

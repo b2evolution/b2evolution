@@ -1289,6 +1289,7 @@ class coll_item_list_Widget extends ComponentWidget
 				'wi_ID'        => $this->ID, // Have the widget settings changed ?
 				'set_coll_ID'  => $Blog->ID, // Have the settings of the blog changed ? (ex: new skin)
 				'cont_coll_ID' => empty( $blog_ID ) ? $Blog->ID : $blog_ID, // Has the content of the displayed blog changed ?
+				'template_code'=> $this->get_param( 'template' ), // Has the Template changed?
 			);
 	}
 }

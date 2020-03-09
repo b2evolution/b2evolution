@@ -51,13 +51,13 @@ $Form->begin_fieldset( T_('Front page').get_manual_link('collection-front-page-s
 			array( 'users',    T_('Users') ),
 			array( 'terms',    T_('Terms & Conditions') ),
 			array( 'flagged',  T_('Flagged Items') ),
-			array( 'mustread', T_('Must Read Items') ),
+			array( 'mustread', T_('Must Read Items'), '', ' '.get_pro_label() ),
 			array( 'single',   T_('First post') ),
 			array( 'page',     T_('A specific page') ),
 		);
 	foreach( $front_disp_options as $i => $option )
 	{ // Set a note for each disp
-		$front_disp_options[$i][] = '(disp='.$option[0].')';
+		$front_disp_options[$i][2] = '(disp='.$option[0].')';
 	}
 
 	$Form->radio( 'front_disp', $edited_Blog->get_setting('front_disp'), $front_disp_options, T_('What do you want to display on the front page of this collection'), true );
