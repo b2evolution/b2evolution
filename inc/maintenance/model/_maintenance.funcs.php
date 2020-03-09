@@ -118,7 +118,7 @@ function check_version( $new_version_dir )
 /**
  * Enable/disable maintenance mode
  *
- * @param boolean true if maintenance mode need to be enabled
+ * @param boolean Do we want to enable or disable maintenance mode?
  * @param string Mode: 'all', 'install', 'upgrade'
  * @param string maintenance mode message
  * @param boolean TRUE to don't print out a message status
