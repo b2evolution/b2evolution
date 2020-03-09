@@ -106,11 +106,17 @@ class content_hierarchy_Widget extends ComponentWidget
 		load_funcs( 'files/model/_image.funcs.php' );
 
 		$r = array_merge( array(
+				'title' => array(
+					'label'        => T_('Block title'),
+					'note'         => T_( 'Title to display in your skin.' ),
+					'size'         => 40,
+					'defaultvalue' => T_('Content Hierarchy'),
+				),
 				'display_blog_title' => array(
-					'label' => T_('Blog Title'),
-					'note' => T_('Display blog title.'),
+					'label' => T_('Root line'),
+					'note' => T_('Display collection name above categories.'),
 					'type' => 'checkbox',
-					'defaultvalue' => true,
+					'defaultvalue' => false,
 				),
 				'open_children_levels' => array(
 					'label' => T_('Open children levels'),
@@ -126,6 +132,13 @@ class content_hierarchy_Widget extends ComponentWidget
 					'size' => 4,
 					'type' => 'integer',
 					'allow_empty' => true,
+				),
+				'exclude_cats' => array(
+					'type' => 'text',
+					'label' => T_('Exclude categories'),
+					'note' => T_('A comma-separated list of category IDs that you want to exclude from the list.'),
+					'valid_pattern' => array( 'pattern' => '/^(\d+(,\d+)*|-|\*)?$/',
+																		'error'   => T_('Invalid list of Category IDs.') ),
 				),
 				'highlight_current' => array(
 					'label' => T_('Highlight current page'),
@@ -192,13 +205,17 @@ class content_hierarchy_Widget extends ComponentWidget
 		{	// Set selected Item in the params ONLY if we really view item page:
 			$params['selected_item_ID'] = $Item->ID;
 		}
-
+		
+		// Get IDs of categories that must be exluded:
+		$this->excluded_cat_IDs = sanitize_id_list( $this->disp_params['exclude_cats'], true );
+	
 		$this->display_hierarchy( array_merge( array(
 				'display_blog_title'   => $this->disp_params['display_blog_title'],
 				'open_children_levels' => $this->disp_params['open_children_levels'],
 				'highlight_current'    => $this->disp_params['highlight_current'],
 				'show_flags'           => $this->disp_params['show_flags'],
 				'item_title_fields'    => isset( $this->disp_params['item_title_fields'] ) ? $this->disp_params['item_title_fields'] : 'title',
+				'excluded_cat_IDs'   => $this->excluded_cat_IDs,
 				'sorted' => true
 			), $params, $params['widget_content_hierarchy_params'] ) );
 
@@ -231,7 +248,7 @@ class content_hierarchy_Widget extends ComponentWidget
 				'class_closed'         => 'closed',
 				'class_selected'       => 'selected',
 				'class_post'           => 'post',
-				'display_blog_title'   => true,
+				'display_blog_title'   => false,
 				'custom_title'         => '',
 				'open_children_levels' => 0,
 				'highlight_current'    => true,
@@ -272,14 +289,18 @@ class content_hierarchy_Widget extends ComponentWidget
 			$params['chapter_path'] = $ChapterCache->get_chapter_path( $this->Blog->ID, $Item->main_cat_ID );
 		}
 
+		// START DISPLAY:
 		echo $params['block_start'];
+		
+		// Display title if requested
+		$this->disp_title();
 
 		echo $params['block_body_start'];
 
 		echo $params['list_start'];
 
 		if( $params['display_blog_title'] )
-		{	// Display blog title
+		{	// Display "root level" line:
 			if( empty( $params['custom_title'] ) )
 			{
 				echo str_replace( '>', ' class="title '.$params['class_selected'].'">', $params['item_start'] );
