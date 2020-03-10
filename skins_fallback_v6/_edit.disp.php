@@ -326,6 +326,40 @@ $Form->begin_form( 'inskin', '', $form_params );
 						$Form->attachments_fieldset( $edited_Item );
 					}
 					break;
+				
+				case 'workflow':
+					// Workflows:
+					if( $front_edit_field_is_visible )
+					{	
+					    $Form->switch_layout('linespan');
+
+					    $Form->switch_template_parts(array(
+						'fieldstart' => '<div class="form-group comment-workflow-form" $ID$>',
+					    ));
+
+					    $Form->begin_line();
+
+					    $form_params = array(
+						'hide_label' => true,
+					    );
+					    $edited_Item->display_workflow_field('status', $Form, $form_params);
+
+					    $form_params = array(
+						'hide_label' => true,
+						'placeholder' => 'Assignee',
+					    );
+					    $edited_Item->display_workflow_field('user', $Form, $form_params);
+
+					    $form_params = array(
+						'hide_label' => true,
+					    );
+					    $edited_Item->display_workflow_field('priority', $Form, $form_params);
+
+					    $Form->end_line();
+
+					    $Form->switch_layout(NULL);
+					}
+					break;
 
 				case 'tags':
 					// Tags:

@@ -14428,6 +14428,7 @@ class Item extends ItemLight
 			'short_title',
 			'instruction',
 			'attachments',
+			'workflow',
 			'text',
 			'tags',
 			'excerpt',

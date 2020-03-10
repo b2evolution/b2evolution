@@ -162,6 +162,14 @@ $Form->begin_fieldset( T_('Use of Advanced Properties').get_manual_link( 'item-t
 	$Form->checkbox( 'ityp_allow_switchable', $edited_Itemtype->allow_switchable, T_('Allow switchable'), T_('Check to allow dynamically switchable blocks inside the content'), '', 1 );
 $Form->end_fieldset();
 
+
+$Form->begin_fieldset( T_('Workflow Properties').get_manual_link( 'workflow' ), array( 'id' => 'itemtype_features' ) );
+	$Form->begin_line( T_('Allow workflow') );
+		$Form->checkbox( 'ityp_allow_workflow', $edited_Itemtype->allow_workflow );
+		$Form->text_input( 'ityp_front_order_workflow', $edited_Itemtype->front_order_workflow, 6, ' &nbsp; <b>'.T_('Front-Office Order').':</b>', T_('Leave empty to hide'), $front_order_params );
+	$Form->end_line();
+$Form->end_fieldset();
+
 $Form->begin_fieldset( T_('Use of Location').get_manual_link( 'item-type-location' ), array( 'id' => 'itemtype_location' ) );
 	$Form->begin_line( T_('Use country') );
 		$Form->radio( 'ityp_use_country', $edited_Itemtype->use_country, $options );

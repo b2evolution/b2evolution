@@ -41,6 +41,7 @@ class ItemType extends DataObject
 	var $allow_html = 1;
 	var $allow_breaks = 1;
 	var $allow_attachments = 1;
+	var $allow_workflow = 1;
 	var $use_excerpt = 'optional';
 	var $use_title_tag = 'optional';
 	var $use_meta_desc = 'optional';
@@ -73,6 +74,7 @@ class ItemType extends DataObject
 	var $front_order_excerpt     = NULL;
 	var $front_order_url         = NULL;
 	var $front_order_location    = NULL;
+	var $front_order_workflow = 50;
 
 	/**
 	 * Custom fields
@@ -129,6 +131,7 @@ class ItemType extends DataObject
 			$this->allow_html = $db_row->ityp_allow_html;
 			$this->allow_breaks = $db_row->ityp_allow_breaks;
 			$this->allow_attachments = $db_row->ityp_allow_attachments;
+			$this->allow_workflow = $db_row->ityp_allow_workflow;
 			$this->use_excerpt = $db_row->ityp_use_excerpt;
 			$this->use_title_tag = $db_row->ityp_use_title_tag;
 			$this->use_meta_desc = $db_row->ityp_use_meta_desc;
@@ -156,6 +159,7 @@ class ItemType extends DataObject
 			$this->front_order_short_title = isset( $db_row->ityp_front_order_short_title ) ? $db_row->ityp_front_order_short_title : NULL;
 			$this->front_order_instruction = isset( $db_row->ityp_front_order_instruction ) ? $db_row->ityp_front_order_instruction : NULL;
 			$this->front_order_attachments = isset( $db_row->ityp_front_order_attachments ) ? $db_row->ityp_front_order_attachments : NULL;
+			$this->front_order_workflow = isset( $db_row->ityp_front_order_workflow ) ? $db_row->ityp_front_order_workflow : NULL;
 			$this->front_order_text = isset( $db_row->ityp_front_order_text ) ? $db_row->ityp_front_order_text : NULL;
 			$this->front_order_tags = isset( $db_row->ityp_front_order_tags ) ? $db_row->ityp_front_order_tags : NULL;
 			$this->front_order_excerpt = isset( $db_row->ityp_front_order_excerpt ) ? $db_row->ityp_front_order_excerpt : NULL;
@@ -332,6 +336,14 @@ class ItemType extends DataObject
 		// Front-Office Order (Attachments)
 		param( 'ityp_front_order_attachments', 'integer', NULL );
 		$this->set_from_Request( 'front_order_attachments' );
+
+		// Allow workflow
+		param( 'ityp_allow_workflow', 'integer', 0 );
+		$this->set_from_Request( 'allow_workflow' );
+
+		// Front-Office Order (Workflow)
+		param( 'ityp_front_order_workflow', 'integer', NULL );
+		$this->set_from_Request( 'front_order_workflow' );
 
 		// Use excerpt
 		param( 'ityp_use_excerpt', 'string' );
