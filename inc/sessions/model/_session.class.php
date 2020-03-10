@@ -637,7 +637,8 @@ class Session
 		$params = array_merge( array(
 				'msg_format'        => 'html',
 				'msg_no_crumb'      => 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.',
-				'msg_expired_crumb' => sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor( $crumb_expires / 60 ) ),
+				'msg_incorrect_crumb' => sprintf( T_('Incorrect crumb received. Have you waited more than %d minutes before submitting your request?'), floor( $crumb_expires / 60 ) ),
+				'msg_expired_crumb' => sprintf( T_('Expired crumb received. Have you waited more than %d minutes before submitting your request?'), floor( $crumb_expires / 60 ) ),
 				'error_code'        => '400 Bad Crumb Request',
 			), $params );
 
@@ -657,8 +658,8 @@ class Session
 		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
 		list( $crumb_value, $latest_crumb_time ) = explode( '-', $crumb_recalled );
 		if( $crumb_received == $crumb_value && $servertimenow - $latest_crumb_time <= $crumb_expires )
+// TODO: record independent debug info for both tests
 		{	// Crumb is valid
-			// echo '<p>-<p>-<p>A';
 			return true;
 		}
 
@@ -668,8 +669,8 @@ class Session
 		$crumb_recalled = $this->get( 'crumb_prev_'.$crumb_name, '-0' );
 		list( $crumb_value, $prev_crumb_time ) = explode( '-', $crumb_recalled );
 		if( $crumb_received == $crumb_value && $servertimenow - $prev_crumb_time <= $crumb_expires )
+// TODO: record independent debug info for both tests
 		{	// Crumb is valid
-			// echo '<p>-<p>-<p>B';
 			return true;
 		}
 
@@ -688,15 +689,14 @@ class Session
 		}
 
 		// Add messages to AJAX Log:
-		ajax_log_add( T_('Incorrect crumb received!').' ['.$crumb_name.']', 'error' );
-		ajax_log_add( $params['msg_expired_crumb'].' (Crumbs live time = '.$crumb_expires.' seconds)', 'error' );
-		ajax_log_add( 'Received crumb: '.$crumb_received.' (Now: '.date( 'Y-m-d H:i:s', $servertimenow ).')', 'error' );
+		ajax_log_add( $params['msg_incorrect_crumb'].' (Crumbs live time = '.$crumb_expires.' seconds)', 'error' );
+		ajax_log_add( 'Received crumb: '.$crumb_received, 'error' );
 		ajax_log_add( 'Latest saved crumb: '.$crumb_valid_latest.' (Created at: '.date( 'Y-m-d H:i:s', $latest_crumb_time ).')', 'error' );
 		ajax_log_add( 'Previous saved crumb: '.$crumb_value.' (Created at: '.date( 'Y-m-d H:i:s', $prev_crumb_time ).')', 'error' );
 
 		if( $params['msg_format'] == 'text' )
 		{	// Display error message in TEXT format:
-			echo $params['msg_expired_crumb'];
+			echo $params['msg_incorrect_crumb'];
 			// Display AJAX Log if it was initialized:
 			ajax_log_display();
 			die();
@@ -714,7 +714,7 @@ class Session
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
 		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').' ['.$crumb_name.']</h3>';
 		echo '<p>'.T_('Your request was stopped for security reasons.').'</p>';
-		echo '<p>'.$params['msg_expired_crumb'].'</p>';
+		echo '<p>'.$params['msg_incorrect_crumb'].'</p>';
 		echo '<p>'.T_('Please go back to the previous page and refresh it before submitting the form again.').'</p>';
 		echo '</div>';
 
