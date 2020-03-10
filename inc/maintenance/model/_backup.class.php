@@ -125,6 +125,7 @@ $backup_tables = array(
 			'T_sessions',
 			'T_track__goalhit',
 			'T_track__keyphrase',
+			'T_syslog',
 		),
 		'included' => false ) );
 
