@@ -10413,6 +10413,7 @@ function use_defer()
 		$use_defer_for_loggedin_users,
 		$use_defer_for_anonymous_users,
 		$use_defer_for_anonymous_disp_register,
+		$use_defer_for_anonymous_disp_register_finish,
 		$use_defer_for_anonymous_disp_users,
 		$use_defer_for_anonymous_disp_anonpost,
 		$use_defer_for_loggedin_disp_single_page,
@@ -10426,12 +10427,14 @@ function use_defer()
 		$use_defer_for_loggedin_disp_visits,
 		$use_defer_for_loggedin_disp_messages,
 		$use_defer_for_loggedin_disp_threads,
+		$use_defer_for_loggedin_disp_users,
 		$use_defer_for_default_register_form;
 	
 	$r =  $use_defer
 		   && ( is_admin_page() ? $use_defer_for_backoffice : true )
 		   && ( is_logged_in() ? $use_defer_for_loggedin_users : $use_defer_for_anonymous_users )
 		   && ( $disp == 'register' ? $use_defer_for_anonymous_disp_register : true )
+		   && ( $disp == 'register_finish' ? $use_defer_for_anonymous_disp_register_finish : true )
 		   && ( $disp == 'users' ? $use_defer_for_anonymous_disp_users : true )
 		   && ( $disp == 'anonpost' ? $use_defer_for_anonymous_disp_anonpost : true )
 		   && ( empty( $disp ) && $ReqPath == '/htsrv/register.php' ? $use_defer_for_default_register_form : true )
@@ -10445,7 +10448,8 @@ function use_defer()
 		   && ( is_logged_in() && $disp == 'comments' ? $use_defer_for_loggedin_disp_comments : true )
 		   && ( is_logged_in() && $disp == 'visits' ? $use_defer_for_loggedin_disp_visits : true )
 		   && ( is_logged_in() && $disp == 'messages' ? $use_defer_for_loggedin_disp_messages : true )
-		   && ( is_logged_in() && $disp == 'threads' ? $use_defer_for_loggedin_disp_threads : true );
+		   && ( is_logged_in() && $disp == 'threads' ? $use_defer_for_loggedin_disp_threads : true )
+		   && ( is_logged_in() && $disp == 'users' ? $use_defer_for_loggedin_disp_users : true );
 
 	return $r;
 }

@@ -996,7 +996,8 @@ $use_defer_for_anonymous_users = true;
 $use_defer_for_default_register_form = false; // Temporarily disabled. Need to fix password related JS.
 
 $use_defer_for_anonymous_disp_register = false; // Temporarily disabled. Need to fix password related JS.
-$use_defer_for_anonymous_disp_users = false; // Temporarily disabled. Need to fix QueryBuilder JS.
+$use_defer_for_anonymous_disp_register_finish = false; // Temporarily disabled. Need to fix password related JS.
+$use_defer_for_anonymous_disp_users = true; // Temporarily disabled. Need to fix user_js.funcs.php JS.
 $use_defer_for_anonymous_disp_anonpost = false; // Erwin> I think we can use defer here as long as we use AJAX forms to load the item form.
 
 $use_defer_for_loggedin_disp_single_page = false; // Temporarily disabled. Need to fix attachments related JS.
@@ -1009,7 +1010,7 @@ $use_defer_for_loggedin_disp_edit = false; // Temporarily disabled. Need to fix 
 $use_defer_for_loggedin_disp_proposechange = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
 $use_defer_for_loggedin_disp_edit_comment = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
 $use_defer_for_loggedin_disp_comments = false; // Temporarily disabled. Need to fix comments and voting related JS.
-$use_defer_for_loggedin_disp_visits = false; // Temporarily disabled. Need to fix QueryBuilder JS.
+$use_defer_for_loggedin_disp_visits = false; // Temporarily disabled. Need to fix user_js.funcs.php JS.
 
 // Erwin> I think this can be disabled if we are able to use AJAX forms to load the comment form:
 $disable_tinymce_for_frontoffice_comment_form = true; // Disables TinyMCE plugin in the front-office for comment forms
