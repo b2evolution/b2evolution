@@ -645,6 +645,9 @@ class Session
 		{ // We did not receive a crumb!
 			if( $die )
 			{
+				// Add message to AJAX Log:
+				ajax_log_add( $params['msg_no_crumb'].' ['.$crumb_name.']', 'error' );
+				// Die with error message:
 				bad_request_die( $params['msg_no_crumb'], $params['error_code'], $params['msg_format'] );
 			}
 			return false;
@@ -652,8 +655,8 @@ class Session
 
 		// Retrieve latest saved crumb:
 		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
-		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
-		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= $crumb_expires )
+		list( $crumb_value, $latest_crumb_time ) = explode( '-', $crumb_recalled );
+		if( $crumb_received == $crumb_value && $servertimenow - $latest_crumb_time <= $crumb_expires )
 		{	// Crumb is valid
 			// echo '<p>-<p>-<p>A';
 			return true;
@@ -663,8 +666,8 @@ class Session
 
 		// Retrieve previous saved crumb:
 		$crumb_recalled = $this->get( 'crumb_prev_'.$crumb_name, '-0' );
-		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
-		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= $crumb_expires )
+		list( $crumb_value, $prev_crumb_time ) = explode( '-', $crumb_recalled );
+		if( $crumb_received == $crumb_value && $servertimenow - $prev_crumb_time <= $crumb_expires )
 		{	// Crumb is valid
 			// echo '<p>-<p>-<p>B';
 			return true;
@@ -684,9 +687,18 @@ class Session
 			header_http_response( $params['error_code'] );
 		}
 
+		// Add messages to AJAX Log:
+		ajax_log_add( T_('Incorrect crumb received!').' ['.$crumb_name.']', 'error' );
+		ajax_log_add( $params['msg_expired_crumb'].' (Crumbs live time = '.$crumb_expires.' seconds)', 'error' );
+		ajax_log_add( 'Received crumb: '.$crumb_received.' (Now: '.date( 'Y-m-d H:i:s', $servertimenow ).')', 'error' );
+		ajax_log_add( 'Latest saved crumb: '.$crumb_valid_latest.' (Created at: '.date( 'Y-m-d H:i:s', $latest_crumb_time ).')', 'error' );
+		ajax_log_add( 'Previous saved crumb: '.$crumb_value.' (Created at: '.date( 'Y-m-d H:i:s', $prev_crumb_time ).')', 'error' );
+
 		if( $params['msg_format'] == 'text' )
 		{	// Display error message in TEXT format:
 			echo $params['msg_expired_crumb'];
+			// Display AJAX Log if it was initialized:
+			ajax_log_display();
 			die();
 		}
 		// else display error message in HTML format:
@@ -724,6 +736,9 @@ class Session
 		$Form->button( array( 'submit', '', T_('Resubmit now!'), 'ActionButton' ) );
 		$Form->end_form();
 		echo '</div>';
+
+		// Display AJAX Log if it was initialized:
+		ajax_log_display();
 
 		die();
 	}

@@ -3121,16 +3121,8 @@ function debug_die( $additional_info = '', $params = array() )
 			echo '</div>';
 
 			// Append the error text to AJAX log if it is AJAX request
-			global $Ajaxlog;
-			if( ! empty( $Ajaxlog ) )
-			{
-				$Ajaxlog->add( $additional_info, 'error' );
-				$Ajaxlog->display( NULL, NULL, true, 'all',
-								array(
-										'error' => array( 'class' => 'jslog_error', 'divClass' => false ),
-										'note'  => array( 'class' => 'jslog_note',  'divClass' => false ),
-									), 'ul', 'jslog' );
-			}
+			ajax_log_add( $additional_info, 'error' );
+			ajax_log_display();
 		}
 	}
 
@@ -3247,6 +3239,8 @@ function bad_request_die( $additional_info = '', $error_code = '400 Bad Request'
 	if( $format == 'text' )
 	{	// Display error message in TEXT format:
 		echo $additional_info;
+		// Display AJAX Log if it was initialized:
+		ajax_log_display();
 		die(2); // Error code 2. Note: this will still call the shutdown function.
 	}
 	// else display error message in HTML format:
@@ -3278,16 +3272,7 @@ function bad_request_die( $additional_info = '', $error_code = '400 Bad Request'
 		echo '</div>';
 
 		// Append the error text to AJAX log if it is AJAX request
-		global $Ajaxlog;
-		if( ! empty( $Ajaxlog ) )
-		{
-			$Ajaxlog->add( $additional_info, 'error' );
-			$Ajaxlog->display( NULL, NULL, true, 'all',
-							array(
-									'error' => array( 'class' => 'jslog_error', 'divClass' => false ),
-									'note'  => array( 'class' => 'jslog_note',  'divClass' => false ),
-								), 'ul', 'jslog' );
-		}
+		ajax_log_add( $additional_info, 'error' );
 	}
 
 	if( $debug )
@@ -3297,6 +3282,9 @@ function bad_request_die( $additional_info = '', $error_code = '400 Bad Request'
 
 	// Attempt to keep the html valid (but it doesn't really matter anyway)
 	echo '</body></html>';
+
+	// Display AJAX Log if it was initialized:
+	ajax_log_display();
 
 	die(2); // Error code 2. Note: this will still call the shutdown function.
 }
@@ -7728,6 +7716,55 @@ function is_ajax_content( $template_name = '' )
 	return !empty( $ajax_content_mode ) &&
 		$ajax_content_mode === true &&
 		!in_array( $template_name, $content_templates );
+}
+
+
+/**
+ * Add a message to AJAX Log
+ *
+ * @param string Message
+ * @param string|array Category, default is to use the object's default category.
+ *        Can also be an array of categories to add the same message to.
+ */
+function ajax_log_add( $message, $category = NULL )
+{
+	global $ajax_Log;
+
+	if( ! isset( $ajax_Log ) ||
+	    ! ( $ajax_Log instanceof Log ) )
+	{	// AJAX Log is not initialized:
+		return;
+	}
+
+	// Add a message to AJAX Log:
+	$ajax_Log->add( $message, $category );
+}
+
+
+/**
+ * Display AJAX log
+ */
+function ajax_log_display()
+{
+	global $ajax_Log, $debug, $debug_jslog, $current_debug, $current_debug_jslog;
+
+	if( ! ( $debug || $debug_jslog || $current_debug || $current_debug_jslog ) )
+	{	// At least one debug must be enabled:
+		return;
+	}
+
+	if( ! isset( $ajax_Log ) ||
+	    ! ( $ajax_Log instanceof Log ) )
+	{	// AJAX Log is not initialized:
+		return;
+	}
+
+	// Print out AJAX Log messages:
+	$ajax_Log->display( NULL, NULL, true, 'all',
+		array(
+				'error' => array( 'class' => 'jslog_error', 'divClass' => false ),
+				'note'  => array( 'class' => 'jslog_note',  'divClass' => false ),
+			), 'ul', 'jslog' );
 }
 
 

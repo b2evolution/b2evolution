@@ -112,7 +112,6 @@ class Log
 	 * @param string the message
 	 * @param string|array the category, default is to use the object's default category.
 	 *        Can also be an array of categories to add the same message to.
-	 * @param boolean Dump (output) this directly?
 	 */
 	function add( $message, $category = NULL )
 	{

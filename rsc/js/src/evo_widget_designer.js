@@ -469,7 +469,7 @@ jQuery( document ).on( 'click', '.evo_designer__action_order_top, .evo_designer_
 		},
 		error: function( jqXHR, textStatus, errorThrown )
 		{	// Display error text on error request:
-			var error_text = ( jqXHR.statusText == 'Bad Crumb Request' ? jqXHR.responseText : evo_js_lang_server_error );
+			var error_text = ( jqXHR.statusText == 'Bad Crumb Request' ? ajax_debug_clear( jqXHR.responseText ) : evo_js_lang_server_error );
 			evo_widget_display_error( error_text + ' ' + evo_js_lang_sync_error, widget, order_type, widget_index );
 		}
 	} );
@@ -531,7 +531,7 @@ jQuery( document ).on( 'click', '.evo_designer__action_disable', function()
 		},
 		error: function( jqXHR, textStatus, errorThrown )
 		{	// Display error text on error request:
-			var error_text = ( jqXHR.statusText == 'Bad Crumb Request' ? jqXHR.responseText : evo_js_lang_server_error );
+			var error_text = ( jqXHR.statusText == 'Bad Crumb Request' ? ajax_debug_clear( jqXHR.responseText ) : evo_js_lang_server_error );
 			evo_widget_display_error( error_text + ' ' + evo_js_lang_sync_error, widget, order_type );
 		}
 	} );
