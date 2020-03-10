@@ -115,7 +115,7 @@ $Form->begin_form( 'evo_comment' );
 	$Form->textarea_input( 'content', $comment_content, $display_params['textarea_lines'], $display_params['form_comment_text'], array(
 			'cols' => 38,
 			'rows' => 11,
-			'class' => 'evo_comment_field autocomplete_usernames',
+			'class' => 'evo_comment_field'.( check_autocomplete_usernames( $edited_Comment ) ? ' autocomplete_usernames' : ''),
 			'id' => $dummy_fields[ 'content' ],
 			'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
 		) );

@@ -259,6 +259,12 @@ function edit_comment( action, comment_ID )
 		success: function( result )
 		{
 			content_obj.html( ajax_debug_clear( result ) );
+
+			// Init autocomplete usernames:
+			if( window.init_autocomplete_usernames )
+			{
+				init_autocomplete_usernames();
+			}
 		}
 	} );
 

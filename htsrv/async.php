@@ -217,7 +217,7 @@ switch( $action )
 				$rows_approx = round( strlen( $comment_content ) / 200 );
 				$rows_number = substr_count( $comment_content, "\n" );
 				$rows_number = ( ( $rows_number > 3 && $rows_number > $rows_approx ) ? $rows_number : $rows_approx ) + 2;
-				echo '<textarea class="form_textarea_input form-control" rows="'.$rows_number.'">'.$comment_content.'</textarea>';
+				echo '<textarea class="form_textarea_input form-control'.( check_autocomplete_usernames( $edited_Comment ) ? ' autocomplete_usernames' : '' ).'" rows="'.$rows_number.'">'.$comment_content.'</textarea>';
 				// Display a button to Save the changes
 				echo '<input type="button" value="'.T_('Save Changes!').'" class="SaveButton btn btn-primary" onclick="edit_comment( \'update\', '.$edited_Comment->ID.' )" /> ';
 				// Display a button to Cancel the changes

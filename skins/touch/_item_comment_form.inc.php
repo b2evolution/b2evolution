@@ -292,7 +292,7 @@ function validateCommentForm(form)
 	$textarea_params = array(
 			'note' => $note,
 			'cols' => 38,
-			'class' => 'bComment autocomplete_usernames',
+			'class' => 'bComment'.( check_autocomplete_usernames( $Comment ) ? ' autocomplete_usernames' : '' ),
 			'display_fix_pixel' => false,
 		);
 	if( !empty( $comment_toolbar ) )

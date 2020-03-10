@@ -3876,26 +3876,6 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 {
 	global $Collection, $Blog;
 
-	if( is_admin_page() )
-	{ // Check to enable it in back-office
-		if( empty( $Blog ) || ! $Blog->get_setting( 'autocomplete_usernames' ) )
-		{ // Blog setting doesn't allow to autocomplete usernames
-			return;
-		}
-	}
-	else
-	{ // Check to enable it in front-office
-		global $Item, $Skin, $disp;
-		if( ! empty( $Skin ) && ! $Skin->get_setting( 'autocomplete_usernames' ) )
-		{ // Skin disables to autocomplete usernames
-			return;
-		}
-		if( $disp != 'search' && $disp != 'edit' && $disp != 'edit_comment' && ( empty( $Item ) || ! $Item->can_comment( NULL ) ) )
-		{ // It is not a search form and not an edit post/comment form and No form to comment of this post
-			return;
-		}
-	}
-
 	require_js( '#jquery#', $relative_to );
 	if( ! empty( $Blog ) )
 	{	// Set global blog ID for textcomplete(Used to sort users by collection members and assignees):
