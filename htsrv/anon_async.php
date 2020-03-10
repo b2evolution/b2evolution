@@ -1945,9 +1945,6 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget', true, array(
 				'msg_format'        => 'text',
-				'msg_no_crumb'      => T_('The server did not receive a security crumb.'),
-				'msg_expired_crumb' => T_('The security crumb has expired.'),
-				'error_code'        => '400 Bad Crumb Request',
 			) );
 
 		param( 'blog', 'integer', 0 );
