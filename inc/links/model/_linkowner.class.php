@@ -122,7 +122,15 @@ class LinkOwner
 			else
 			{	// Create new temporary object:
 				$tmp_link_Object = new TemporaryID();
-				$tmp_link_Object->set( 'type', $this->type );
+				if( $this->type == 'comment' && $link_Object->type == 'meta' )
+				{	// Special case for internal (meta) comment so we can determine between internal and regular comments:
+					$tmp_link_Object_type = 'metacomment';
+				}
+				else
+				{
+					$tmp_link_Object_type = $this->type;
+				}
+				$tmp_link_Object->set( 'type', $tmp_link_Object_type );
 				if( ! empty( $this->link_Object->blog_ID ) )
 				{	// Set parent collection ID of Item:
 					$tmp_link_Object->set( 'coll_ID', $this->link_Object->blog_ID );

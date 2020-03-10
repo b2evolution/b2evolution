@@ -104,8 +104,14 @@ function & get_LinkOwner( $link_type, $object_ID )
 						break;
 
 					case 'comment':
+					case 'metacomment':
 						load_class( 'comments/model/_comment.class.php', 'Comment' );
-						$LinkOwner = new LinkComment( new Comment(), $object_ID );
+						$Comment = new Comment();
+						if( $TemporaryID->get( 'type' ) == 'metacomment' )
+						{	// Set comment type to meta to ensure correct permissions:
+							$Comment->type = 'meta';
+						}
+						$LinkOwner = new LinkComment( $Comment, $object_ID );
 						break;
 				}
 				$LinkOwner->tmp_ID = $object_ID;
