@@ -24,6 +24,8 @@ $params = array_merge( array(
 		'before_title_text' => '$item_icon$',
 		'after_title_text'  => '',
 		'item_link_type'    => '#',
+		'content_mode'      => 'auto', // Can be 'excerpt', 'normal' or 'full'. 'auto' will auto select depending on backoffice SEO settings for $disp-detail
+		'intro_mode'        => 'normal', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
 	), $params );
 
 global $Item;
@@ -100,6 +102,11 @@ foreach( $mask_params as $mask_param )
 			'widget_item_visibility_badge_display' => ( ! $Item->is_intro() && $Item->status != 'published' ),
 			'widget_item_visibility_badge_params'  => array(
 					'template' => '<div class="evo_status evo_status__$status$ badge pull-right" data-toggle="tooltip" data-placement="top" title="$tooltip_title$">$status_title$</div>',
+				),
+			// Params for widget "Item Content":
+			'widget_item_content_params' => array(
+					'content_mode' => $params['content_mode'],
+					'intro_mode'   => $params['intro_mode'],
 				),
 		) );
 		// ----------------------------- END OF "Item in List" CONTAINER -----------------------------

@@ -116,7 +116,7 @@ $params = array_merge( array(
 // Determine content mode to use..
 if( $Item->is_intro() )
 {
-	$content_mode = $params['intro_mode'];
+	$content_mode = ( $params['intro_mode'] == '$content_mode$' ? $params['content_mode'] : $params['intro_mode'] );
 }
 else
 {
