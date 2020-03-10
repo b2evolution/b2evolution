@@ -751,7 +751,7 @@ if( !$Messages->has_errors() )
 			$Messages->add( TB_('Default filters have been updated for users list.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=users', 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=users&filter=new&users_filter_preset=advanced', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
 	}

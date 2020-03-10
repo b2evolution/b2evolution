@@ -318,6 +318,17 @@ function toggle_filter_area( filter_name, force_toggle_action )
 		clickdiv.slideDown( 500 );
 	}
 
+	if( typeof( force_toggle_action ) == 'undefined' && toggle_action == 'expand' )
+	{	// Collapse other opened filter areas on expand current filter area:
+		jQuery( '#clickdiv_'+filter_name ).closest( '.filters' ).find( '[id^=clickdiv_]' ).each( function()
+		{
+			if( jQuery( this ).is( ':visible' ) && jQuery( this ).attr( 'id' ) != 'clickdiv_' + filter_name )
+			{	// Collapse only different opened area:
+				toggle_filter_area( jQuery( this ).attr( 'id' ).substr( 9 ), 'collapse' )
+			}
+		} );
+	}
+
 	return false;
 }
 
