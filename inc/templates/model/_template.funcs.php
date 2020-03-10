@@ -521,6 +521,135 @@ function render_template_callback( $var, $params, $objects = array() )
 				
 			break;
 
+		case 'Form:search_author':
+			$search_author = param( 'search_author', 'string', NULL );
+			$temp_params = array(  // Here, we make sure not to modify $params
+					'name'         => 'search_author',
+					'value'        => $search_author,
+					'size'         => '',
+					'label'        => '',
+					'note'         => '',
+					'placeholder'  => T_('Any author'),
+					'maxlength'    => '',
+					'class'        => 'input_text'.is_logged_in() ? '' : ' autocomplete_login',
+					'required'     => false,
+					'input_suffix' => '',
+					'style'        => '',
+					'hide_label'   => true,
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+				
+			$rendered_Form->text_input( $temp_params['name'], $temp_params['value'], $temp_params['size'], $temp_params['label'], $temp_params['note'], $temp_params );
+			break;
+
+		case 'Form:search_content_age':
+			$search_content_age = param( 'search_content_age', 'string' );
+			$content_age_options = array(
+					''     => T_('Any time'),
+					'hour' => T_('Last hour'),
+					'day'  => T_('Less than a day'),
+					'week' => T_('Less than a week'),
+					'30d'  => T_('Last 30 days'),
+					'90d'  => T_('Last 90 days'),
+					'year' => T_('Last year'),
+				);
+
+			$temp_params = array(
+					'name'       => 'search_content_age',
+					'value'      => $search_content_age,
+					'label'      => T_('Content age'),
+					'class'      => '',
+					'note'       => '',
+					'class'      => '',
+					'required'   => false,
+					'hide_label' => true,
+					'style'      => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+			
+			$rendered_Form->select_input_array( $temp_params['name'], $temp_params['value'], $content_age_options, $temp_params['label'], $temp_params['note'], $temp_params );
+			break;
+
+		case 'Form:search_content_type':
+			global $Blog;
+			
+			if( ! $Blog )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object Blog is not defined at this moment.</span>';
+			}
+
+			$search_type = param( 'search_type', 'string', NULL );
+			$content_type_options = array();
+			if( $Blog->get_setting( 'search_include_posts' ) )
+			{
+				$content_type_options['item'] = T_('Posts');
+			}
+			if( $Blog->get_setting( 'search_include_cmnts' ) )
+			{
+				$content_type_options['comment'] = T_('Comments');
+			}
+			if( $Blog->get_setting( 'search_include_files' ) )
+			{
+				$content_type_options['file'] = T_('Files');
+			}
+			if( $Blog->get_setting( 'search_include_cats' ) )
+			{
+				$content_type_options['category'] = T_('Categories');
+			}
+			if( $Blog->get_setting( 'search_include_tags' ) )
+			{
+				$content_type_options['tag'] = T_('Tags');
+			}
+
+			if( count( $content_type_options ) > 1 )
+			{
+				$content_type_options = array( '' => T_('All') ) + $content_type_options;
+				$temp_params = array(
+						'name'       => 'search_type',
+						'value'      => $search_type,
+						'label'      => T_('Content type'),
+						'class'      => '',
+						'note'       => '',
+						'class'      => '',
+						'required'   => false,
+						'hide_label' => true,
+						'style'      => '',
+					);
+				// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+				$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+				
+				$rendered_Form->select_input_array( $temp_params['name'], $temp_params['value'], $content_type_options, $temp_params['label'], $temp_params['note'], $temp_params );
+			}
+			else
+			{	// Do not display anything
+				return;
+			}
+			break;
+
+		case 'Form:search_input':
+			$search_term = param('s', 'string', '');
+			$temp_params = array(  // Here, we make sure not to modify $params
+					'name'         => 's',
+					'value'        => $search_term,
+					'size'         => 25,
+					'label'        => '',
+					'note'         => '',
+					'placeholder'  => '',
+					'maxlength'    => '',
+					'class'        => 'input_text',
+					'required'     => false,
+					'input_suffix' => '',
+					'style'        => '',
+					'hide_label'   => true,
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+				
+			$rendered_Form->text_input( $temp_params['name'], $temp_params['value'], $temp_params['size'], $temp_params['label'], $temp_params['note'], $temp_params );
+			break;
+
 		case 'Form:submit':
 			$temp_params = array(
 					'name' => 'submit',
@@ -928,6 +1057,6 @@ function get_template_contexts()
 	return array(
 		'custom1', 'custom2', 'custom3',
 		'content_list_master', 'content_list_item', 'content_list_category',
-		'content_block', 'item_details', 'item_content', 'registration_master', 'registration' );
+		'content_block', 'item_details', 'item_content', 'registration_master', 'registration', 'search_form' );
 }
 ?>

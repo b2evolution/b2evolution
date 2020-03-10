@@ -12445,6 +12445,53 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15950, 'Updating templates table...' ) )
+	{	// part of 7.1.2-beta
+
+		db_upgrade_cols( 'T_templates', array(
+			'MODIFY' => array(
+				'tpl_context' => 'ENUM( "custom1", "custom2", "custom3", "content_list_master", "content_list_item", "content_list_category", "content_block", "item_details", "item_content", "registration_master", "registration", "search_form" ) COLLATE ascii_general_ci NOT NULL DEFAULT "custom1"',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15960, 'Installing widget container "Search Area" and updating "Search Form" widget...' ) )
+	{	// part of 7.1.2-beta
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params, wico_name' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "coll_search_form"' );
+		$SQL->FROM_add( 'LEFT JOIN T_widget__container ON wi_wico_ID = wico_ID' );
+		$widgets = $DB->get_results( $SQL );
+
+		if( ! empty( $widgets ) )
+		{	// If at least one widget exists in DB:
+			foreach( $widgets as $widget )
+			{
+				$widget_params = unserialize( $widget->wi_params );;
+
+				if( $widget->wico_name == 'Sidebar' || $widget->wico_name == 'Sidebar 2' )
+				{
+					$widget_params['template'] = 'search_form_sidebar';
+				}
+				else
+				{
+					$widget_params['template'] = 'search_form_full';
+				}
+
+				$DB->query( 'UPDATE T_widget__widget
+						SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+					WHERE wi_ID = '.$widget->wi_ID );
+			}
+		}
+
+		// Install widget "Collection Search Form":
+		install_new_default_widgets( 'search_area' );
+		
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

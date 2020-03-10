@@ -3196,6 +3196,7 @@ function get_skin_default_containers()
 			'register'                  => array( NT_('Register'), 170 ),
 			'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
 			'photo_index'               => array( NT_('Photo Index'), 190 ),
+			'search_area'               => array( NT_('Search Area'), 200 ),
 		);
 }
 

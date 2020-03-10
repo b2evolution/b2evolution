@@ -18,20 +18,18 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 echo '<div class="forums_table_search">';
 
-// --------------------------------- START OF COMMON LINKS --------------------------------
-skin_widget( array(
-		// CODE for the widget:
-		'widget' => 'coll_search_form',
-		// Optional display params
-		'block_start' => '<div class="panel panel-default"><div class="panel-heading">',
-		'block_end' => '</div></div>',
-		'block_display_title' => false,
-		'disp_search_options' => 0,
-		'search_class' => 'extended_search_form',
-		'use_search_disp' => 1,
-		'button' => T_('Search')
-	) );
-// ---------------------------------- END OF COMMON LINKS ---------------------------------
+// ------------------------- "Search Area" CONTAINER EMBEDDED HERE --------------------------
+// Display container and contents:
+widget_container( 'search_area', array(
+	// The following params will be used as defaults for widgets included in this container:
+	'container_display_if_empty' => false, // If no widget, don't display container at all
+	'container_start'     => '<div class="evo_container $wico_class$ well">',
+	'container_end'       => '</div>',
+	'block_start'         => '<div class="evo_widget $wi_class$">',
+	'block_end'           => '</div>',
+	'block_display_title' => false,
+) );
+// ----------------------------- END OF "Search Area" CONTAINER -----------------------------
 
 // Display the search result
 search_result_block( array(

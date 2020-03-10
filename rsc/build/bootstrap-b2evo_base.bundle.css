@@ -193,11 +193,24 @@ img.imgerror,
 .margin-top-md {
   margin-top: 20px;
 }
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
 .margin-bottom-sm {
   margin-bottom: 10px;
 }
 .margin-bottom-md {
   margin-bottom: 20px;
+}
+.margin-top-xs {
+  margin-top: 3px;
+}
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
+.margin-y-xs {
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 .indented {
   padding-left: 3em;
@@ -2786,6 +2799,24 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   right: 0;
   bottom: 0;
   margin: auto;
+}
+.search_form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.row-gutter-sm [class*='col-']:not(:first-child):not(:last-child) {
+  padding-right: 3px;
+  padding-left: 3px;
+}
+.row-gutter-sm [class*='col-']:first-child:not(:last-child) {
+  padding-right: 3px;
+}
+.row-gutter-sm [class*='col-']:last-child:not(:first-child) {
+  padding-left: 3px;
+}
+.row-gutter-sm [class*='col-'] {
+  padding-left: 3px;
+  padding-right: 3px;
 }
 .evo_tile {
   margin: 15px 0;

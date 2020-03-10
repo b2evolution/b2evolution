@@ -195,11 +195,24 @@ img.imgerror,
 .margin-top-md {
   margin-top: 20px;
 }
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
 .margin-bottom-sm {
   margin-bottom: 10px;
 }
 .margin-bottom-md {
   margin-bottom: 20px;
+}
+.margin-top-xs {
+  margin-top: 3px;
+}
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
+.margin-y-xs {
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 .indented {
   padding-left: 3em;

@@ -179,7 +179,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	{
 		$default_widgets['sidebar'] = array(
 			'coll_type' => 'manual',
-			array( 10, 15000, 'coll_search_form', 'params' => array( 'title' => T_('Search this manual:') ) ),
+			array( 10, 15000, 'coll_search_form', 'params' => array( 'title' => T_('Search this manual:'), 'template' => 'search_form_sidebar' ) ),
 			array( 20, 15000, 'content_hierarchy' ),
 		);
 	}
@@ -202,7 +202,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			array( 20, 15000, 'user_profile_pics', 'install' => $install_not_forum ),
 			array( 30, 15000, 'evo_Calr', 'type' => 'plugin', 'install' => ( $install_not_forum && $blog_id > $blog_a_ID ) ),
 			array( 40, 15000, 'coll_longdesc', 'install' => $install_not_forum, 'params' => array( 'title' => '$title$' ) ),
-			array( 50, 15000, 'coll_search_form', 'install' => $install_not_forum ),
+			array( 50, 15000, 'coll_search_form', 'install' => $install_not_forum, 'params' => array( 'template' => 'search_form_sidebar' ) ),
 			array( 60, 15000, 'coll_category_list', 'install' => $install_not_forum ),
 			array( 70, 15000, 'coll_item_list', 'coll_ID' => $blog_home_ID, 'install' => $install_not_forum, 'params' => array(
 					'title' => 'Advertisement (Demo)',
@@ -557,6 +557,13 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 80, 15230, 'user_info', 'params' => array(
 				'title' => T_('Spam fighter score'),
 				'info'  => 'spam',
+			) ),
+	);
+
+	/* Search Area */
+	$default_widgets['search_area'] = array(
+		array( 10, 15960, 'coll_search_form', 'params' => array(
+				'template' => 'search_form_full',
 			) ),
 	);
 
