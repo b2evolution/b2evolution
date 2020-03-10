@@ -638,7 +638,7 @@ class Session
 				'msg_format'        => 'html',
 				'msg_no_crumb'      => 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.',
 				'msg_expired_crumb' => sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor( $crumb_expires / 60 ) ),
-				'error_code'        => '400 Bad Request',
+				'error_code'        => '400 Bad Crumb Request',
 			), $params );
 
 		if( ! $crumb_received = param( 'crumb_'.$crumb_name, 'string', NULL ) )

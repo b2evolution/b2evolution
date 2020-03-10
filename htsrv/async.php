@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the handler for asynchronous 'AJAX' calls.
+ * This is the handler for asynchronous 'AJAX' calls. This requires access to the back office.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
