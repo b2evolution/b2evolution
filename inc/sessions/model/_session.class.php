@@ -600,7 +600,7 @@ class Session
 	 */
 	function create_crumb( $crumb_name )
 	{
-		global $servertimenow, $crumb_expires;
+		global $servertimenow, $crumb_expires, $Debuglog;
 
 		// Retrieve latest saved crumb:
 		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
@@ -612,6 +612,8 @@ class Session
 			$crumb_value = '';
 			if( $servertimenow - $crumb_time < ( $crumb_expires - 200 ) ) // Leave some margin here to make sure we do no overwrite a newer 1-2 hr crumb
 			{	// Not too old either, save as previous crumb:
+				$Debuglog->add( 'Session: Store previous value for crumb ['.$crumb_name.'].', 'request' );
+
 				$this->set( 'crumb_prev_'.$crumb_name, $crumb_recalled );
 			}
 		}
@@ -619,6 +621,8 @@ class Session
 		if( empty( $crumb_value ) )
 		{	// We need to generate a new crumb:
 			$crumb_value = generate_random_key( 32 );
+
+			$Debuglog->add( 'Session: Add new crumb ['.$crumb_name.'] (Store the latest value).', 'request' );
 
 			// Save crumb into session so we can later compare it to what get got back from the user request:
 			$this->set( 'crumb_latest_'.$crumb_name, $crumb_value.'-'.$servertimenow );
