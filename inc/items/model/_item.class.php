@@ -4453,6 +4453,7 @@ class Item extends ItemLight
 		if( ! $this->get_type_setting( 'allow_switchable' ) ||
 		    ! $this->get_setting( 'switchable' ) )
 		{	// Don't render switchable content if it is not allowed by Item Type and disabled for this Item:
+			$this->switchable_params = array();
 			return;
 		}
 
@@ -4488,10 +4489,23 @@ class Item extends ItemLight
 
 
 	/**
-	 * Initialize switchable params
+	 * Get switchable params
+	 *
+	 * @return array Switchable params: Key - param code, Value - default param value
+	 */
+	function get_switchable_params()
+	{
+		$this->load_switchable_params();
+
+		return $this->switchable_params;
+	}
+
+
+	/**
+	 * Get switchable param by code
 	 *
 	 * @param string Param code
-	 * @param string|NULL Param value
+	 * @return string|NULL Param value
 	 */
 	function get_switchable_param( $param_code )
 	{
