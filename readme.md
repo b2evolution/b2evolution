@@ -2,7 +2,7 @@
 
 # b2evolution CMS
 
-This is b2evolution CMS version **7.1.2-beta**.
+This is b2evolution CMS version **7.1.3-beta**.
 
 ## A complete engine for your website !
 
@@ -24,7 +24,7 @@ More specifically, your web server should support PHP 5.6+, MySQL 5.5.3+ & Apach
 
 If you're familiar with bower, just type: `bower install b2evolution`
 
-This will install the latest **stable** version of b2evolution.
+This will install the **latest** GitHub release of b2evolution (which may be a beta version).
 
 ### Manual Download
 
