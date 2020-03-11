@@ -41,7 +41,6 @@ class ItemType extends DataObject
 	var $allow_html = 1;
 	var $allow_breaks = 1;
 	var $allow_attachments = 1;
-	var $allow_workflow = 1;
 	var $use_excerpt = 'optional';
 	var $use_title_tag = 'optional';
 	var $use_meta_desc = 'optional';
@@ -131,7 +130,6 @@ class ItemType extends DataObject
 			$this->allow_html = $db_row->ityp_allow_html;
 			$this->allow_breaks = $db_row->ityp_allow_breaks;
 			$this->allow_attachments = $db_row->ityp_allow_attachments;
-			$this->allow_workflow = $db_row->ityp_allow_workflow;
 			$this->use_excerpt = $db_row->ityp_use_excerpt;
 			$this->use_title_tag = $db_row->ityp_use_title_tag;
 			$this->use_meta_desc = $db_row->ityp_use_meta_desc;
@@ -336,10 +334,6 @@ class ItemType extends DataObject
 		// Front-Office Order (Attachments)
 		param( 'ityp_front_order_attachments', 'integer', NULL );
 		$this->set_from_Request( 'front_order_attachments' );
-
-		// Allow workflow
-		param( 'ityp_allow_workflow', 'integer', 0 );
-		$this->set_from_Request( 'allow_workflow' );
 
 		// Front-Office Order (Workflow)
 		param( 'ityp_front_order_workflow', 'integer', NULL );

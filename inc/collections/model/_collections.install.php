@@ -389,7 +389,6 @@ $schema_queries = array_merge( $schema_queries, array(
 			ityp_allow_html        TINYINT DEFAULT 1,
 			ityp_allow_breaks      TINYINT DEFAULT 1,
 			ityp_allow_attachments TINYINT DEFAULT 1,
-			ityp_allow_workflow    TINYINT DEFAULT 1,
 			ityp_use_excerpt       ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_use_title_tag     ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',
 			ityp_use_meta_desc     ENUM( 'required', 'optional', 'never' ) COLLATE ascii_general_ci DEFAULT 'optional',

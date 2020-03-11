@@ -164,8 +164,7 @@ $Form->end_fieldset();
 
 
 $Form->begin_fieldset( T_('Workflow Properties').get_manual_link( 'workflow' ), array( 'id' => 'itemtype_features' ) );
-	$Form->begin_line( T_('Allow workflow') );
-		$Form->checkbox( 'ityp_allow_workflow', $edited_Itemtype->allow_workflow );
+	$Form->begin_line();
 		$Form->text_input( 'ityp_front_order_workflow', $edited_Itemtype->front_order_workflow, 6, ' &nbsp; <b>'.T_('Front-Office Order').':</b>', T_('Leave empty to hide'), $front_order_params );
 	$Form->end_line();
 $Form->end_fieldset();

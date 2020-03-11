@@ -337,7 +337,7 @@ $Form->begin_form( 'inskin', '', $form_params );
 						'fieldstart' => '<div class="form-group comment-workflow-form" $ID$>',
 					    ));
 
-					    $Form->begin_line();
+					    $Form->begin_line( T_('Workflow') );
 
 					    $form_params = array(
 						'hide_label' => true,
