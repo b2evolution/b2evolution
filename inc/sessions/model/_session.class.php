@@ -689,44 +689,38 @@ class Session
 			return false;
 		}
 
-		// Retrieve latest saved crumb:
-		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
-		list( $crumb_latest, $latest_crumb_time ) = explode( '-', $crumb_recalled );
-		if( $crumb_received != $crumb_latest )
-		{	// Wrong crumb:
-			$crumb_info_message = $params['msg_incorrect_crumb'];
-			$crumb_latest_expired = false;
-		}
-		elseif( $servertimenow - $latest_crumb_time > $crumb_expires )
-		{	// Expired crumb:
-			$crumb_info_message = $params['msg_expired_crumb'];
-			$crumb_latest_expired = true;
-		}
-		else
-		{	// Crumb is valid:
-			return true;
-		}
+		// Retrieve latest and previous crumbs:
+		list( $crumb_latest, $latest_crumb_time ) = explode( '-', $this->get( 'crumb_latest_'.$crumb_name, '-0' ) );
+		list( $crumb_previous, $prev_crumb_time ) = explode( '-', $this->get( 'crumb_prev_'.$crumb_name, '-0' ) );
 
-		// Retrieve previous saved crumb:
-		$crumb_recalled = $this->get( 'crumb_prev_'.$crumb_name, '-0' );
-		list( $crumb_previous, $prev_crumb_time ) = explode( '-', $crumb_recalled );
-		if( $crumb_received != $crumb_previous )
-		{	// Wrong crumb:
-			// $crumb_info_message = $params['msg_incorrect_crumb']; // yb>fp: I think we should override the message what we already set above for $crumb_latest
-			$crumb_prev_expired = false;
-		}
-		elseif( $servertimenow - $prev_crumb_time > $crumb_expires )
-		{	// Expired crumb:
-			// $crumb_info_message = $params['msg_expired_crumb']; // yb>fp: I think we should override the message what we already set above for $crumb_latest
-			$crumb_prev_expired = true;
+		// Validate the latest and previous crumbs:
+		$crumb_latest_is_valid = ( $crumb_received == $crumb_latest );
+		$crumb_previous_is_valid = ( $crumb_received == $crumb_previous );
+
+		if( $crumb_latest_is_valid || $crumb_previous_is_valid )
+		{	// At least one crumb is valid, check for expired:
+			if( $crumb_latest_is_valid && $servertimenow - $latest_crumb_time <= $crumb_expires )
+			{	// The latest crumb is valid and not expired:
+				return true;
+			}
+			if( $crumb_previous_is_valid && $servertimenow - $prev_crumb_time <= $crumb_expires )
+			{	// The previous crumb is valid and not expired:
+				return true;
+			}
+			// The latest and previous crumbs are expired:
+			$crumb_info_message = $params['msg_expired_crumb'];
+			$crumb_latest_status = ( $crumb_latest_is_valid ? 'EXPIRED' : 'Invalid' );
+			$crumb_previous_status = ( $crumb_previous_is_valid ? 'EXPIRED' : 'Invalid' );
 		}
 		else
-		{	// Crumb is valid:
-			return true;
+		{	// The latest and previous crumbs are invalid:
+			$crumb_info_message = $params['msg_incorrect_crumb'];
+			$crumb_latest_status = 'Invalid';
+			$crumb_previous_status = 'Invalid';
 		}
 
 		if( ! $die )
-		{
+		{	// Return false result when we don't need die action on error:
 			return false;
 		}
 
@@ -743,8 +737,12 @@ class Session
 
 		// Info for debug log:
 		$received_crumb_info = 'Received crumb: '.$crumb_received;
-		$latest_crumb_info = 'Latest saved crumb: '.$crumb_latest.' (Created at: '.date( 'Y-m-d H:i:s', $latest_crumb_time ).' - '.( $crumb_latest_expired ? 'EXPIRED' : 'Not expired' ).')';
-		$previous_crumb_info = 'Previous saved crumb: '.$crumb_previous.' (Created at: '.date( 'Y-m-d H:i:s', $prev_crumb_time ).' - '.( $crumb_prev_expired ? 'EXPIRED' : 'Not expired' ).')';
+		$latest_crumb_info = 'Latest saved crumb: '.( empty( $crumb_latest ) && empty( $latest_crumb_time )
+			? 'Not saved yet' // The latest crumb was not saved in Sessions yet.
+			: $crumb_latest.' (Created at: '.date( 'Y-m-d H:i:s', $latest_crumb_time ).' - '.$crumb_latest_status.')' );
+		$previous_crumb_info = 'Previous saved crumb: '.( empty( $crumb_previous ) && empty( $prev_crumb_time )
+			? 'Not saved yet' // Previous crumb was not saved in Sessions yet.
+			: $crumb_previous.' (Created at: '.date( 'Y-m-d H:i:s', $prev_crumb_time ).' - '.$crumb_previous_status.')' );
 		$session_info = 'Session ID: '.$this->ID;
 
 		// Add messages to AJAX Log:
