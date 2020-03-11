@@ -595,6 +595,10 @@ div.debug code {
   margin: 1ex 1ex 0;
   display: block;
 }
+div.debug code.debug_code_inline {
+  display: inline;
+  margin: 0;
+}
 div.debug div.query_info {
   background-color: #fff;
   font-size: 12px;
