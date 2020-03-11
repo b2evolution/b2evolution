@@ -12016,22 +12016,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 15751, 'Creating new default templates...' ) )
 	{	// part of 7.0.0-alpha
 
-		// Delete the following existing default templates, they'll be recreated at the next block:
+		// Delete the following existing default templates, they may be recreated at the end of upgrade process:
 		$template_codes = array( 'iteminfo_long', 'iteminfo_short' );
 		$DB->query( 'DELETE FROM T_templates WHERE tpl_code IN ('.$DB->quote( $template_codes ).')' );
-
-		// Create default templates what were not created before yet:
-		require_once dirname(__FILE__).'/_functions_create.php';
-		create_default_templates( false );
 		upg_task_end();
 	}
 
 	if( upg_task_start( 15760, 'Updating item footer...' ) )
 	{	// part of 7.0.0-alpha
-		// Create default templates what were not created before yet:
-		require_once dirname(__FILE__).'/_functions_create.php';
-		create_default_templates( false );
-
 		// Delete widget "Item Footer":
 		$DB->query( 'DELETE FROM T_widget__widget
 			WHERE wi_code = "item_footer"' );
