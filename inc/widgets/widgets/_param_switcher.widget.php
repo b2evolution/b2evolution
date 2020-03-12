@@ -232,116 +232,32 @@ class param_switcher_Widget extends generic_menu_link_Widget
 
 		if( $this->get_param( 'allow_switch_js' ) )
 		{	// Initialize JS to allow switching by JavaScript:
-		?>
-<script>
-jQuery( 'a[data-param-switcher=<?php echo $this->ID; ?>]' ).click( function()
-{
-	var default_params = {};
-<?php
-	// Load switchable params in order to add all default values in the current URL:
-	$Item->load_switchable_params();
-	if( ! empty( $Item->switchable_params ) )
-	{
-		foreach( $Item->switchable_params as $switchable_param_name => $switchable_param_default_value )
-		{
-			echo "\t".'default_params.'.$switchable_param_name.' = \''.$switchable_param_default_value.'\';'."\r\n";
-		}
-	}
 ?>
-
-	// Remove previous value from the URL:
-	var regexp = new RegExp( '([\?&])((' + jQuery( this ).data( 'code' ) + '|redir)=[^&]*(&|$))+', 'g' );
-	var url = location.href.replace( regexp, '$1' );
-	url = url.replace( /[\?&]$/, '' );
-	// Add param code with value of the clicked button:
-	url += ( url.indexOf( '?' ) === -1 ? '?' : '&' );
-	url += jQuery( this ).data( 'code' ) + '=' + jQuery( this ).data( 'value' );
-	for( default_param in default_params )
-	{
-		regexp = new RegExp( '[\?&]' + default_param + '=', 'g' );
-		if( ! url.match( regexp ) )
-		{	// Append defaul param if it is not found in the current URL:
-			url += '&' + default_param + '=' + default_params[ default_param ];
-		}
-	}
-	url += '&redir=no';
-
-	// Change URL in browser address bar:
-	window.history.pushState( '', '', url );
-
-	// Change active button:
-	jQuery( 'a[data-param-switcher=<?php echo $this->ID; ?>]' ).attr( 'class', '<?php echo ( empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'] ); ?>' );
-	jQuery( this ).attr( 'class', '<?php echo ( empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'] ); ?>' );
-
-	return false;
-} );
-</script>
-		<?php
-		}
-
-		global $evo_widget_param_switcher_js_initied;
-		if( empty( $evo_widget_param_switcher_js_initied ) )
-		{	// Initialize JS to allow switching by JavaScript once:
-		?>
 <script>
-// Modifications to listen event when URL in browser address bar is changed:
-history.pushState = ( f => function pushState(){
-	var ret = f.apply(this, arguments);
-	window.dispatchEvent(new Event('pushstate'));
-	window.dispatchEvent(new Event('locationchange'));
-	return ret;
-})(history.pushState);
-
-window.addEventListener( 'locationchange', function()
-{	// Show/Hide custom fields by condition depending on current URL in browser address:
-	var custom_fields = jQuery( '[data-display-condition]' );
-	if( custom_fields.length == 0 )
-	{	// No custom fields with display conditions:
-		return false;
-	}
-
-	function get_url_params( url, multiple_values )
-	{
-		url = url.replace( /^.+\?/, '' ).split( '&' );
-		var params = [];
-		url.forEach( function( url_param )
-		{
-			url_param = url_param.split( '=' );
-			params[ url_param[0] ] = multiple_values ? url_param[1].split( '|' ) : url_param[1];
-		} );
-
-		return params;
-	}
-
-	// Get params of the current URL:
-	var url_params = get_url_params( location.href, false );
-
-	// Show all custom fields by default:
-	custom_fields.show();
-
-	custom_fields.each( function()
-	{	// Check each custom fields by display condition:
-		var conditions = get_url_params( jQuery( this ).data( 'display-condition' ), true );
-		for( var cond_param in conditions )
-		{
-			var url_param_value = ( typeof( url_params[ cond_param ] ) == 'undefined' ? '' : url_params[ cond_param ] );
-			if( ( url_param_value === '' && conditions[ cond_param ].indexOf( '' ) === -1 ) ||
-			    conditions[ cond_param ].indexOf( url_param_value ) === -1 )
-			{	// Hide the custom field if at least one condition is not equal:
-				jQuery( this ).hide();
-				break;
-			}
-		}
-	} );
-} );
+evo_init_switchable_buttons( 'a[data-param-switcher=<?php echo $this->ID; ?>]',
+	'<?php echo empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class']; ?>',
+	'<?php echo empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class']; ?>',
+	<?php echo json_encode( $Item->get_switchable_params() ); ?> );
 </script>
-		<?php
-			$evo_widget_param_switcher_js_initied = true;
+<?php
 		}
 
 		echo $this->disp_params['block_end'];
 
 		return true;
+	}
+
+
+	/**
+	 * Request all required css and js files for this widget
+	 */
+	function request_required_files()
+	{
+		if( $this->get_param( 'allow_switch_js' ) )
+		{	// Load JS to switch between blocks on change URL in address bar:
+			require_js( '#jquery#', 'blog' );
+			require_js( 'src/evo_switchable_blocks.js', 'blog' );
+		}
 	}
 }
 

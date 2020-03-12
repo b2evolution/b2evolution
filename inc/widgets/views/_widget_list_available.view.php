@@ -129,6 +129,7 @@ $core_componentwidget_defs = array(
 			'coll_related_post_list', // Related Posts list
 			'coll_flagged_list',      // Flagged Item List
 			'coll_item_list',         // Universal Item list
+			'coll_tabbed_items',      // Tabbed Items
 			'coll_media_index',       // Photo index
 			'coll_comment_list',      // Comment list
 		),
@@ -137,7 +138,8 @@ $core_componentwidget_defs = array(
 			'coll_featured_intro', // Featured/Intro Post
 			'display_item',        // Specific Item
 			'item_fields_compare', // Compare Items
-			'param_switcher',    // Param Switcher
+			'coll_tabbed_items',   // Tabbed Items
+			'param_switcher',      // Param Switcher
 		),
 	'infoitem' => array(
 			'item_title',                // Title

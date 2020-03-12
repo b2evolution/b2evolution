@@ -2127,6 +2127,40 @@ function create_default_templates( $is_task = true )
 		),
 */
 
+
+		// Content Tabs:
+		'content_tabs' => array(
+			'name'     => 'Content Tabs',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="row">]
+[set:after_list=</div>]
+[set:item_template=content_tabs_item]
+[set:rwd_header_col=col-sm-5 col-xs-12]
+[set:rwd_text_col=col-sm-5 col-xs-12]
+[set:rwd_image_col=col-sm-7 pull-right-sm col-xs-12]
+[set:evo_tabs_image__size=fit-1920x1080]',
+		),
+
+		'content_tabs_item' => array(
+			'name'     => 'Content Tabs: Item',
+			'context'  => 'content_list_item',
+			'template' => '
+	<div class="[echo:rwd_header_col]">
+		<h1>[Item:title]</h1>
+	</div>
+	<div class="[echo:rwd_image_col]">
+		[Item:images|
+			restrict_to_image_position=#cover_and_teaser_all|
+			limit=1|
+			image_size=$evo_tabs_image__size$]
+	</div>
+	<div class="[echo:rwd_text_col]">
+		[Item:content_teaser]
+	</div>
+',
+		),
+
+
 		// Registration Templates:
 		'registration_master_standard' => array(
 			'name'     => 'Registration: Standard',
