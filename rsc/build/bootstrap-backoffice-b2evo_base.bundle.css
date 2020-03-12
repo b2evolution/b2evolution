@@ -193,11 +193,24 @@ img.imgerror,
 .margin-top-md {
   margin-top: 20px;
 }
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
 .margin-bottom-sm {
   margin-bottom: 10px;
 }
 .margin-bottom-md {
   margin-bottom: 20px;
+}
+.margin-top-xs {
+  margin-top: 3px;
+}
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
+.margin-y-xs {
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 .indented {
   padding-left: 3em;
@@ -1327,6 +1340,10 @@ div.debug code {
   font-size: 9pt;
   margin: 1ex 1ex 0;
   display: block;
+}
+div.debug code.debug_code_inline {
+  display: inline;
+  margin: 0;
 }
 div.debug div.query_info {
   background-color: #fff;

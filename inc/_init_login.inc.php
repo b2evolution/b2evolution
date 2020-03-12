@@ -125,8 +125,8 @@ if( ! empty( $login_action_value ) || ( ! empty( $login ) && ! empty( $pass ) ) 
 
 	// Note: login and password cannot include ' or " or > or <
 	// Note: login cannot include @
-	$login = utf8_strtolower( utf8_strip_tags( remove_magic_quotes( $login ) ) );
-	$pass = utf8_strip_tags( remove_magic_quotes( $pass ) );
+	$login = utf8_strtolower( utf8_strip_tags( $login ) );
+	$pass = utf8_strip_tags( $pass );
 	$pass_md5 = md5( $pass );
 
 

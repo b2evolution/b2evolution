@@ -236,7 +236,7 @@ function skin_init( $disp )
 					$canonical_url = $main_canonical_url;
 				}
 				// Keep ONLY allowed noredir params from current URL in the canonical URL:
-				$canonical_url = url_clear_noredir_params( $canonical_url );
+				$canonical_url = url_clear_noredir_params( $canonical_url, '&', array_keys( $Item->get_switchable_params() ) );
 				if( preg_match( '|[&?](revision=(p?\d+))|', $ReqURI, $revision_param )
 						&& ( is_logged_in() && $current_User->check_perm( 'item_post!CURSTATUS', 'edit', false, $Item ) )
 						&& $item_revision = $Item->get_revision( $revision_param[2] ) )
@@ -3196,6 +3196,7 @@ function get_skin_default_containers()
 			'register'                  => array( NT_('Register'), 170 ),
 			'compare_main_area'         => array( NT_('Compare Main Area'), 180 ),
 			'photo_index'               => array( NT_('Photo Index'), 190 ),
+			'search_area'               => array( NT_('Search Area'), 200 ),
 		);
 }
 

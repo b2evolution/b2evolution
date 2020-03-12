@@ -2957,7 +2957,8 @@ class Comment extends DataObject
 				{	// This method is used to attach several files by quick uploader JS button:
 					$TemporaryIDCache = & get_TemporaryIDCache();
 					if( ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $this->temp_link_owner_ID, false, false ) ) &&
-					    $TemporaryID->type == 'comment' )
+					    ( ( $this->get( 'type' ) != 'meta' && $TemporaryID->type == 'comment' ) ||
+					      ( $this->get( 'type' ) == 'meta' && $TemporaryID->type == 'metacomment' ) ) )
 					{	// Get all links of the temporary object which is used for new creating comment:
 						$LinkOwner = new LinkComment( new Comment(), $TemporaryID->ID );
 						$attachments = & $LinkOwner->get_Links();
@@ -5540,7 +5541,8 @@ class Comment extends DataObject
 			return;
 		}
 
-		if( $TemporaryID->type != 'comment' )
+		if( ( $this->get( 'type' ) != 'meta' && $TemporaryID->type != 'comment' ) ||
+		    ( $this->get( 'type' ) == 'meta' && $TemporaryID->type != 'metacomment' ) )
 		{	// Wrong temporary object:
 			return;
 		}

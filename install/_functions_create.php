@@ -2235,6 +2235,39 @@ function create_default_templates( $is_task = true )
 ',
 		),
 
+		'search_form_full' => array(
+			'name'     => 'Search Form: Full',
+			'context'  => 'search_form',
+			'template' => '<div class="row row-gutter-sm">
+	<div class="col-sm-12 margin-top-sm margin-bottom-xs">
+		<div class="input-group">
+			[Form:search_input|class=w-100]
+			<span class="input-group-btn">[Form:submit|value=Search]</span>
+		</div>
+	</div>
+</div>
+<div class="row row-gutter-sm">
+	<div class="col-sm-12 col-md-12 col-lg-5 margin-y-xs">
+		[Form:search_author]
+	</div>
+	<div class="col-sm-12 col-md-12 col-lg-4 margin-y-xs">
+		[Form:search_content_age]
+	</div>
+	<div class="col-sm-12 col-md-12 col-lg-3 margin-y-xs">
+		[Form:search_content_type]
+	</div>
+</div>',
+		),
+
+		'search_form_simple' => array(
+			'name'     => 'Search Form: Simple',
+			'context'  => 'search_form',
+			'template' => '<div class="input-group">
+	[Form:search_input|class=w-100]
+	<span class="input-group-btn">[Form:submit|value=Search]</span>
+</div>',
+		),
+
 	);
 
 	$templates_sql = array();

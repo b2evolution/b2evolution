@@ -12016,22 +12016,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 15751, 'Creating new default templates...' ) )
 	{	// part of 7.0.0-alpha
 
-		// Delete the following existing default templates, they'll be recreated at the next block:
+		// Delete the following existing default templates, they may be recreated at the end of upgrade process:
 		$template_codes = array( 'iteminfo_long', 'iteminfo_short' );
 		$DB->query( 'DELETE FROM T_templates WHERE tpl_code IN ('.$DB->quote( $template_codes ).')' );
-
-		// Create default templates what were not created before yet:
-		require_once dirname(__FILE__).'/_functions_create.php';
-		create_default_templates( false );
 		upg_task_end();
 	}
 
 	if( upg_task_start( 15760, 'Updating item footer...' ) )
 	{	// part of 7.0.0-alpha
-		// Create default templates what were not created before yet:
-		require_once dirname(__FILE__).'/_functions_create.php';
-		create_default_templates( false );
-
 		// Delete widget "Item Footer":
 		$DB->query( 'DELETE FROM T_widget__widget
 			WHERE wi_code = "item_footer"' );
@@ -12442,6 +12434,81 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	if( upg_task_start( 15940, 'Upgrading user field definitions table...' ) )
 	{	// part of 7.1.2-beta
 		db_add_col( 'T_users__fielddefs', 'ufdf_grp_ID', 'int(10) UNSIGNED NULL' );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15950, 'Updating templates table...' ) )
+	{	// part of 7.1.2-beta
+
+		db_upgrade_cols( 'T_templates', array(
+			'MODIFY' => array(
+				'tpl_context' => 'ENUM( "custom1", "custom2", "custom3", "content_list_master", "content_list_item", "content_list_category", "content_block", "item_details", "item_content", "registration_master", "registration", "search_form" ) COLLATE ascii_general_ci NOT NULL DEFAULT "custom1"',
+			),
+		) );
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15960, 'Installing widget container "Search Area" and updating "Search Form" widget...' ) )
+	{	// part of 7.1.2-beta
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params, wico_name' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "coll_search_form"' );
+		$SQL->FROM_add( 'LEFT JOIN T_widget__container ON wi_wico_ID = wico_ID' );
+		$widgets = $DB->get_results( $SQL );
+
+		if( ! empty( $widgets ) )
+		{	// If at least one widget exists in DB:
+			foreach( $widgets as $widget )
+			{
+				$widget_params = unserialize( $widget->wi_params );
+
+				if( $widget->wico_name == 'Sidebar' || $widget->wico_name == 'Sidebar 2' )
+				{
+					$widget_params['template'] = 'search_form_sidebar';
+				}
+				else
+				{
+					$widget_params['template'] = 'search_form_full';
+				}
+
+				$DB->query( 'UPDATE T_widget__widget
+						SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+					WHERE wi_ID = '.$widget->wi_ID );
+			}
+		}
+
+		// Install widget "Collection Search Form":
+		install_new_default_widgets( 'search_area' );
+		
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15970, 'Updating "Search Form" widget...' ) )
+	{	// part of 7.1.2-beta
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "coll_search_form"' );
+		$widgets = $DB->get_results( $SQL );
+
+		if( ! empty( $widgets ) )
+		{	// If at least one widget exists in DB:
+			foreach( $widgets as $widget )
+			{
+				$widget_params = unserialize( $widget->wi_params );
+
+				if( in_array( $widget_params['template'], array( 'search_form_sidebar', 'search_form_header' ) ) )
+				{	// Merge previous search forms to new search_form_simple:
+					$widget_params['template'] = 'search_form_simple';
+				
+
+					$DB->query( 'UPDATE T_widget__widget
+							SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+						WHERE wi_ID = '.$widget->wi_ID );
+				}
+			}
+		}
 		upg_task_end();
 	}
 

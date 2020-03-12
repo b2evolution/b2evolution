@@ -1124,13 +1124,20 @@ function clear_url( $url, $exclude_params )
  *
  * @param string Given URL
  * @param string Separator between URL params
+ * @param array Additional noredir params for config var $noredir_params. Used for Item's switchable params
  * @return string Given URL with allowed noredir params which are found in current URL
  */
-function url_clear_noredir_params( $url, $glue = '&' )
+function url_clear_noredir_params( $url, $glue = '&', $custom_noredir_params = array() )
 {
 	global $noredir_params;
 
-	if( empty( $noredir_params ) )
+	$all_noredir_params = is_array( $custom_noredir_params ) ? $custom_noredir_params : array();
+	if( is_array( $noredir_params ) )
+	{	// Merge config and custom noredir params:
+		$all_noredir_params = array_merge( $noredir_params, $all_noredir_params );
+	}
+
+	if( empty( $all_noredir_params ) )
 	{	// No allowed params:
 		return $url;
 	}
@@ -1142,7 +1149,7 @@ function url_clear_noredir_params( $url, $glue = '&' )
 	$allowed_params = array();
 	foreach( $_GET as $param => $value )
 	{	// Check each GET param:
-		if( in_array( $param, $noredir_params ) && // If param is allowed by config $noredir_params
+		if( in_array( $param, $all_noredir_params ) && // If param is allowed by config $noredir_params
 		    ! in_array( $param, $url_params ) ) // If param is NOT defined in the given URL yet
 		{
 			$allowed_params[ $param ] = $value;
