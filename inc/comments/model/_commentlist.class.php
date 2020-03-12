@@ -684,6 +684,10 @@ class CommentList2 extends DataObjectList2
 					$statuses = array();
 					foreach( $status_IDs as $status_ID )
 					{
+						if( ! isset( $comment_statuses[$status_ID] ) )
+						{	// User has no permission:
+							continue;
+						}
 						$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_statuses='.$status_ID ) ) : '';
 						$statuses[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 							array( $params['visibility_text'], $comment_statuses[$status_ID], $status_clear_icon, $filter_classes[ $filter_class_i ] ),
