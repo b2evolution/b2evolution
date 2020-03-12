@@ -62,7 +62,7 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	$r = '';
 
 	// New
-	preg_match_all( '/\[((?:(?:Cat|Coll|Form|Item|Link|Plugin|echo|set):)?([a-z0-9_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Cat|Coll|Comment|File|Form|Item|Link|Plugin|Tag|echo|set):)?([a-z0-9_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		// Output everything until new tag:
@@ -187,7 +187,7 @@ function render_template_callback( $var, $params, $objects = array() )
 	{
 		case 'Cat':
 			global $Chapter;
-			$rendered_Chapter = ( !isset($objects['Chapter']) ? $Chapter : $objects['Chapter'] );
+			$rendered_Chapter = ( !isset( $objects['Chapter'] ) ? $Chapter : $objects['Chapter'] );
 			if( empty( $rendered_Chapter ) || ! ( $rendered_Chapter instanceof Chapter ) )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Chapter/Category is not defined at this moment.</span>';
@@ -196,29 +196,44 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Coll':
 			global $Blog;
-			$rendered_Blog = ( !isset($objects['Collection']) ? $Blog : $objects['Collection'] );
+			$rendered_Blog = ( !isset( $objects['Collection'] ) ? $Blog : $objects['Collection'] );
 			if( empty( $rendered_Blog ) || ! ( $rendered_Blog instanceof Blog ) )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Collection/Blog is not defined at this moment.</span>';
 			}
 			break;
 
+		case 'Comment':
+			global $Comment;
+			$rendered_Comment = ( !isset( $objects['Comment'] ) ? $Comment : $objects['Comment'] );
+			if( empty( $rendered_Comment ) || ! ( $rendered_Comment instanceof Comment ) )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object Comment is not defined at this moment.</span>';
+			}
+			break;
+
+		case 'File':
+			global $File;
+			$rendered_File = ( !isset( $objects['File'] ) ? $File : $objects['File'] );
+			if( empty( $rendered_File ) || ! ( $rendered_File instanceof File ) )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object File is not defined at this moment.</span>';
+			}
+			break;
+
 		case 'Form':
-			$rendered_Form = ( !isset($objects['Form']) ? $Form : $objects['Form'] );
+			global $Form;
+			$rendered_Form = ( !isset( $objects['Form'] ) ? $Form : $objects['Form'] );
 			if( empty( $rendered_Form ) || ! ( $rendered_Form instanceof Form ) )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Form is not defined at this moment.</span>';
 			}
 			break;
 
-		case 'Link':
-			// do nothing
-			break;
-
 		case 'Item':
 			global $Item;
 
-			$rendered_Item = ( !isset($objects['Item']) ? $Item : $objects['Item'] );
+			$rendered_Item = ( !isset( $objects['Item'] ) ? $Item : $objects['Item'] );
 
 			if( empty( $rendered_Item ))
 			{
@@ -228,6 +243,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			{
 				return '<span class="evo_param_error">Item object has class <code>'.get_class($rendered_Item).'</code> instead of expected <code>Item</code>.</span>';
 			}
+			break;
+
+		case 'Link':
+			// do nothing
 			break;
 
 		case 'Plugin':
@@ -241,6 +260,15 @@ function render_template_callback( $var, $params, $objects = array() )
 			}
 
 			$var = $scope;
+			break;
+
+		case 'Tag':
+			$tag = ( !isset( $objects['tag'] ) ? $tag : $objects['tag'] );
+
+			if( empty( $tag ))
+			{
+				return '<span class="evo_param_error">['.$var.']: Tag is not defined at this moment.</span>';
+			}
 			break;
 
 		case 'echo':
@@ -300,6 +328,58 @@ function render_template_callback( $var, $params, $objects = array() )
 		// Collection:
 		case 'Coll:shortname':
 			echo $rendered_Blog->dget( 'shortname' );
+			break;
+
+		// Comment:
+		case 'Comment:author':
+			echo $rendered_Comment->get_author( array_merge( array(
+					'link_text' => 'auto',		// select login or nice name automatically
+				), $params ) );
+			break;
+
+		case 'Comment:creation_time':
+			echo mysql2date( $params['date_format'], $rendered_Comment->date );
+			break;
+
+		case 'Comment:content':
+			$temp_params =  array_merge( array(
+					'format'           => 'htmlbody',
+					'ban_urls'         => false,
+					'show_attachments' => false,
+				), $params );
+			echo $rendered_Comment->content( $temp_params['format'], $temp_params['ban_urls'], $temp_params['show_attachments'], $temp_params );
+			break;
+
+		case 'Comment:permalink':
+			$rendered_Comment->permanent_link( array_merge( array(
+					'text'   => '#item#',
+					'title'  => '',  // No tooltip by default
+				), $params ) );
+			break;
+
+		// File:
+		case 'File:description':
+			echo $rendered_File->get_description( $params );
+			break;
+
+		case 'File:file_size':
+			echo $rendered_File->get_size_formatted();
+			break;
+
+		case 'File:icon':
+			echo $rendered_File->get_icon();
+			break;
+
+		case 'File:type':
+			echo $rendered_File->get_type();
+			break;
+
+		case 'File:url':
+			echo $rendered_File->get_url();
+			break;
+
+		case 'File:file_link':
+			echo $rendered_File->get_file_link( $params );	
 			break;
 
 		// Form:
@@ -885,7 +965,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Item:title':
-			echo $rendered_Item->dget( 'title' );
+			echo $rendered_Item->get_title( 'title' );
 			break;
 
 		case 'Item:visibility_status':
@@ -956,6 +1036,35 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Plugin':
 			$rendered_Plugin->SkinTag( $params );
+			break;
+
+		// Tag
+		case 'Tag:name':
+			echo $tag;
+			break;
+
+		case 'Tag:item_count':
+			break;
+
+		case 'Tag:permalink':
+			global $Blog;
+			$rendered_Blog = ( !isset( $objects['Collection'] ) ? $Blog : $objects['Collection'] );
+			if( empty( $rendered_Blog ) || ! ( $rendered_Blog instanceof Blog ) )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object Collection/Blog is not defined at this moment.</span>';
+			}
+
+			$temp_params = array(
+						'class' => '',
+						'style' => '',
+						'rel'   => NULL,
+						'text'  => NULL,
+						'title' => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+
+			echo $rendered_Blog->get_tag_link( $tag, $temp_params['text'], $temp_params );
 			break;
 		
 		// Others
@@ -1057,6 +1166,8 @@ function get_template_contexts()
 	return array(
 		'custom1', 'custom2', 'custom3',
 		'content_list_master', 'content_list_item', 'content_list_category',
-		'content_block', 'item_details', 'item_content', 'registration_master', 'registration', 'search_form' );
+		'content_block', 'item_details', 'item_content',
+		'registration_master', 'registration',
+		'search_form', 'search_result' );
 }
 ?>

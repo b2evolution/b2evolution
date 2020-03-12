@@ -1207,32 +1207,10 @@ function search_result_block( $params = array() )
 				}
 
 				$display_params = array(
-					'title'   => $Item->get_title( array( 'link_type' => 'permalink' ) ).$params['title_suffix_post'],
-					'excerpt' => $Item->get_excerpt(),
-					'chapter' => sprintf( /* TRANS: %s gets replaced by chapter links */ T_('In %s'), $Item->get_chapter_links() ),
+					'search_result_type'   => 'item',
+					'search_result_object' => $Item,
 				);
 
-				if( $params['use_editor'] )
-				{	// Get editor info to display:
-					$lastedit_User = & $Item->get_lastedit_User();
-					if( empty( $lastedit_User ) )
-					{	// If editor is not defined yet then use author
-						$lastedit_User = & $Item->get_creator_User();
-					}
-					$display_params = array_merge( array(
-							'editor'        => $lastedit_User->get_identity_link( array( 'link_text' => $params['author_format'] ) ),
-							'lastedit_date' => mysql2date( $params['date_format'], empty( $Item->datemodified ) ? $Item->datecreated : $Item->datemodified ),
-						), $display_params );
-				}
-				else
-				{	// Get author info to display:
-					$creator_User = & $Item->get_creator_User();
-					$display_params = array_merge( array(
-							'author'        => $creator_User->get_identity_link( array( 'link_text' => $params['author_format'] ) ),
-							'creation_date' => mysql2date( $params['date_format'], $Item->datestart ),
-							'lastedit_date' => mysql2date( $params['date_format'], $Item->datemodified ),
-						), $display_params );
-				}
 				break;
 
 			case 'comment':
@@ -1246,14 +1224,8 @@ function search_result_block( $params = array() )
 				}
 
 				$display_params = array(
-					'title'   => $Comment->get_permanent_link( '#item#' ).$params['title_suffix_comment'],
-					'excerpt' => excerpt( $Comment->content ),
-					'author'  => $Comment->get_author( array(
-							'link_text'   => $params['author_format'],
-							'thumb_size'  => 'crop-top-15x15',
-							'thumb_class' => 'avatar_before_login'
-						) ),
-					'creation_date' => mysql2date( $params['date_format'], $Comment->date )
+					'search_result_type'   => 'comment',
+					'search_result_object' => $Comment,
 				);
 				break;
 
@@ -1267,8 +1239,8 @@ function search_result_block( $params = array() )
 					continue 2; // skip from switch and skip to the next item in loop
 				}
 				$display_params = array(
-					'title'   => '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get_name().'</a>'.$params['title_suffix_category'],
-					'excerpt' => excerpt( $Chapter->get( 'description' ) ),
+					'search_result_type'   => 'category',
+					'search_result_object' => $Chapter,
 				);
 				break;
 
@@ -1277,8 +1249,10 @@ function search_result_block( $params = array() )
 
 				list( $tag_name, $post_count ) = explode( ',', $row['name'] );
 				$display_params = array(
-					'title'   => '<a href="'.url_add_param( $Blog->gen_blogurl(), 'tag='.$tag_name ).'">'.$tag_name.'</a>'.$params['title_suffix_tag'],
-					'excerpt' => sprintf( T_('%d posts are tagged with \'%s\''), $post_count, $tag_name ),
+					'search_result_type'       => 'tag',
+					'search_result_tag'        => $tag_name,
+					'search_result_collection' => $Blog,
+					'tag_post_count'           => $post_count,
 				);
 				break;
 
@@ -1286,7 +1260,9 @@ function search_result_block( $params = array() )
 				// Prepare to display a File:
 
 				$File = $FileCache->get_by_id( $row['ID'], false );
-				$FileType = & $File->get_FileType();
+
+				
+				/* TODO: Create File function to get this:
 				$link_owners = array();
 				if( ! empty( $row['post_IDs'] ) )
 				{
@@ -1307,15 +1283,11 @@ function search_result_block( $params = array() )
 						$link_owners[] = $Comment->get_permanent_link( '#item#' );
 					}
 				}
-
-				$file_description = $File->get( 'desc' );
+				*/
 
 				$display_params = array(
-					'title' => '<a href="'.$File->get_url().'"'.( $File->get('desc') ? ' title="'.$File->dget('desc', 'htmlattr').'"' : '' ).'>'
-							.( $File->get( 'title' ) ? $File->dget( 'title' ) : $File->dget( 'name' ) ).'</a>'
-							.' ('.T_('File').': '.$File->get_view_link( $File->get_icon() ).' '.$File->get_type().')',
-					'excerpt' => $File->get_url().( ! empty( $file_description ) ? '<div>'.$file_description.'</div>' : '' ),
-					'chapter' => empty( $link_owners ) ? NULL : sprintf( /* TRANS: %s get replaced by list of post and comment links */ T_('In %s'), implode( ', ', $link_owners ) )
+					'search_result_type'   => 'file',
+					'search_result_object' => $File,
 				);
 				break;
 
@@ -1600,78 +1572,74 @@ function search_page_links( $params = array() )
  */
 function display_search_result( $params = array() )
 {
-	global $debug;
+	global $debug, $Blog;
 
+	// TODO: Check if we still need this:
 	// Make sure we are not missing any param:
-	$params = array_merge( array(
-			'title'              => '',
-			'author'             => '',
-			'creation_date'      => '',
-			'excerpt'            => '',
-			'row_start'          => '<div class="search_result">',
-			'row_end'            => '</div>',
-			'cell_title_start'   => '<div class="search_title">',
-			'cell_title_end'     => '</div>',
-			'cell_chapter_start' => '<div class="search_info dimmed">',
-			'cell_chapter_end'   => '</div>',
-			'cell_author_start'  => '<div class="search_info dimmed">',
-			'cell_author_end'    => '</div>',
-			'cell_author_empty'  => false, // false - to display author only when it is defined, use string to print text instead of empty author
-			'cell_content_start' => '<div class="result_content">',
-			'cell_content_end'   => '</div>',
-		), $params );
+	// $params = array_merge( array(
+	// 		'title'              => '',
+	// 		'author'             => '',
+	// 		'creation_date'      => '',
+	// 		'excerpt'            => '',
+	// 		'row_start'          => '<div class="search_result">',
+	// 		'row_end'            => '</div>',
+	// 		'cell_title_start'   => '<div class="search_title">',
+	// 		'cell_title_end'     => '</div>',
+	// 		'cell_chapter_start' => '<div class="search_info dimmed">',
+	// 		'cell_chapter_end'   => '</div>',
+	// 		'cell_author_start'  => '<div class="search_info dimmed">',
+	// 		'cell_author_end'    => '</div>',
+	// 		'cell_author_empty'  => false, // false - to display author only when it is defined, use string to print text instead of empty author
+	// 		'cell_content_start' => '<div class="result_content">',
+	// 		'cell_content_end'   => '</div>',
+	// 	), $params );
 
 	// Prepare the display params of search result object by modules:
 	modules_call_method_reference_params( 'prepare_search_result_display_params', $params );
 
-	echo $params['row_start'];
+	$render_template_objects = array();
+	switch( $params['search_result_type'] )
+	{
+		case 'item':
+			$render_template_objects['Item'] = $params['search_result_object'];
+			break;
 
-	echo '<div class="search_result_score dimmed">'.$params['percentage'].'%</div>';
+		case 'comment':
+			$render_template_objects['Comment'] = $params['search_result_object'];
+			break;
 
-	echo '<div class="search_content_wrap">';
+		case 'file':
+			$render_template_objects['File'] = $params['search_result_object'];
+			break;
 
-	// Title
-	echo $params['cell_title_start'].$params['title'].$params['cell_title_end'];
+		case 'category':
+			$render_template_objects['Chapter'] = $params['search_result_object'];
+			break;
 
-	// Content
-	echo $params['cell_content_start'];
-	echo ! empty( $params['excerpt'] ) ? $params['excerpt'] : '&nbsp;';
-	echo $params['cell_content_end'];
-
-	if( ! empty( $params['chapter'] ) )
-	{	// Display a chapter info:
-		echo $params['cell_chapter_start'];
-		echo $params['chapter'];
-		echo $params['cell_chapter_end'];
+		case 'tag':
+			$object_name = 'Tag';
+			$render_template_objects['tag'] = $params['search_result_tag'];
+			$render_template_objects['Collection'] = $params['search_result_collection'];
+			break;
 	}
 
-	if( ! empty( $params['author'] ) || ! empty( $params['editor'] ) || $params['cell_author_empty'] !== false )
-	{	// Display author or empty string when no author
-		echo $params['cell_author_start'];
-		if( ! empty( $params['author'] ) )
-		{	// Display author if it is defined
-			$lastedit_date = ( isset( $params['lastedit_date'] ) ) ? ', '.T_('last edited on').' '.$params['lastedit_date'] : '';
-			printf( T_('Published by %s on %s'), $params['author'], $params['creation_date'] ).$lastedit_date;
-		}
-		elseif( ! empty( $params['editor'] ) )
-		{	// Display editor if it is defined
-			echo T_('Last edit by ').$params['editor'].T_(' on ').$params['lastedit_date'];
-		}
-		else// $params['cell_author_empty'] !== false
-		{	// Display empty value if author is not defined
-			echo $params['cell_author_empty'];
-		}
-		echo $params['cell_author_end'];
+	$TemplateCache = & get_TemplateCache();
+	$template_code = $Blog->get_setting( 'search_result_template_'.$params['search_result_type'] );
+	if( $template_code && ! $TemplateCache->get_by_code( $template_code, false, false ) )
+	{
+		$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$template_code.'</code>' ) );
+		return false;
 	}
 
-	echo '</div>';
+	$search_result = render_template_code( $template_code, $params, $render_template_objects );
+
+	// Display search result item:
+	echo $search_result;
 
 	if( $debug )
 	{
 		display_score_map( $params );
 	}
-
-	echo $params['row_end'];
 }
 
 

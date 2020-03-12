@@ -1237,6 +1237,13 @@ class Blog extends DataObject
 			// Scoring for tags:
 			$this->set_setting( 'search_score_tag_name', param( 'search_score_tag_name', 'integer', 0 ) );
 
+			// Quick Templates for search results:
+			$this->set_setting( 'search_result_template_item', param( 'search_result_template_item', 'string' ) );
+			$this->set_setting( 'search_result_template_comment', param( 'search_result_template_comment', 'string' ) );
+			$this->set_setting( 'search_result_template_file', param( 'search_result_template_file', 'string' ) );
+			$this->set_setting( 'search_result_template_category', param( 'search_result_template_category', 'string' ) );
+			$this->set_setting( 'search_result_template_tag', param( 'search_result_template_tag', 'string' ) );
+
 			// Latest comments :
 			param_integer_range( 'latest_comments_num', 1, 9999, T_('Number of shown comments must be between %d and %d.') );
 			$this->set_setting( 'latest_comments_num', get_param( 'latest_comments_num' ) );
