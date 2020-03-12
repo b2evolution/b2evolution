@@ -496,18 +496,11 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdirs 
 	}
 
 	$zip_result = true;
-	$compressing_started = false;
 	foreach( $files as $file )
 	{	// Add files into archive:
 		if( $log_type == 'print' )
 		{
 			echo sprintf( TB_('Adding &laquo;<strong>%s</strong>&raquo; to ZIP file...'), $source_dir_path.$file );
-			
-			// check if any file remains to add into archive to start compressing:
-			if( !next( $files ) )
-			{
-				$compressing_started = true;
-			}
 			evo_flush();
 		}
 		$add_in_subdir = isset( $add_in_subdirs[ $file ] ) ? $add_in_subdirs[ $file ] : $add_in_subdirs[0];
@@ -553,10 +546,6 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdirs 
 			if( $log_type == 'print' )
 			{
 				echo ' OK.<br />';
-				if( $compressing_started )  
-				{
-					echo sprintf( TB_('Compressing &laquo;<strong>%s</strong>&raquo;...'), $archive_path );
-				}
 				evo_flush();
 			}
 		}
@@ -577,12 +566,12 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdirs 
 		$zip_result = $zip_result && $file_result;
 	}
 	
+	echo sprintf( TB_('Compressing &laquo;<strong>%s</strong>&raquo;...'), $archive_path );
+	evo_flush();
+	
 	$ZipArchive->close();
 	
-	if( $compressing_started )
-	{
-		echo ' OK.<br />';
-	}
+	echo ' OK.<br />';
 
 	// Set rights for new created ZIP file:
 	@chmod( $archive_path, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );
