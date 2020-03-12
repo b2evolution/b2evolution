@@ -125,7 +125,7 @@ echo '</table>'."\n";
 echo '<div'.emailskin_style( 'div.buttons' ).'>'."\n";
 echo get_link_tag( $admin_url.'?ctrl=user&user_tab=profile&user_ID='.$params['new_user_ID'], T_('Edit User'), 'div.buttons a+a.btn-primary' )."\n";
 echo get_link_tag( $admin_url.'?ctrl=users&action=show_recent', T_('View recent registrations'), 'div.buttons a+a.btn-default' )."\n";
-echo get_link_tag( $admin_url.'?ctrl=users&action=delete&deltype=spammer&user_ID='.$params['new_user_ID'].'&'.url_crumb('user'), T_('Delete Spammer'), 'div.buttons a+a.btn-danger' )."\n";
+echo get_link_tag( $admin_url.'?ctrl=users&action=delete&deltype=spammer&user_ID='.$params['new_user_ID'], T_('Delete Spammer'), 'div.buttons a+a.btn-danger' )."\n";
 echo "</div>\n";
 
 // Footer vars:
