@@ -3436,7 +3436,7 @@ class Item extends ItemLight
 		$content = move_short_tags( $content );
 
 		if( $params['render_content_blocks'] )
-		{	// Render Content block tags like [include:123], [include:item-slug]:
+		{	// Render Content block tags like [include:123], [include:item-slug], [cblock:123], [cblock:item-slug]:
 			$content = $this->render_content_blocks( $content, $params );
 		}
 
@@ -4095,7 +4095,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline content block tags like [include:123], [include:item-slug] into item/post content
+	 * Convert inline content block tags like [include:123], [include:item-slug], [cblock:123], [cblock:item-slug] into item/post content
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -4115,7 +4115,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of content block posts:
-		preg_match_all( '/\[include:?([^\]]*)?\]/i', $content, $tags );
+		preg_match_all( '/\[(include|cblock):?([^\]]*)?\]/i', $content, $tags );
 
 		$ItemCache = & get_ItemCache();
 
@@ -4123,7 +4123,7 @@ class Item extends ItemLight
 
 		foreach( $tags[0] as $t => $source_tag )
 		{
-			$tag_options = explode( ':', $tags[1][ $t ] );
+			$tag_options = explode( ':', $tags[2][ $t ] );
 
 			$item_ID_slug = trim( $tag_options[0] );
 
@@ -9071,7 +9071,7 @@ class Item extends ItemLight
 		$SQL->FROM_add( 'INNER JOIN T_items__prerendering ON post_ID = itpr_itm_ID' );
 		$SQL->FROM_add( 'INNER JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 		$SQL->FROM_add( 'INNER JOIN T_slug ON post_ID = slug_itm_ID AND slug_ID != post_tiny_slug_ID' );
-		$SQL->WHERE( 'post_content REGEXP '.$DB->quote( '\[include:('.$slugs.')(:[^]]+)?\]' ) );
+		$SQL->WHERE( 'post_content REGEXP '.$DB->quote( '\[(include|cblock):('.$slugs.')(:[^]]+)?\]' ) );
 		$SQL->GROUP_BY( 'post_ID' );
 		$content_items = $DB->get_results( $SQL );
 

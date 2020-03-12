@@ -36,7 +36,7 @@ class content_blocks_plugin extends Plugin
 	{
 		$this->name = T_('Include Content Blocks');
 		$this->short_desc = T_('Render content blocks.');
-		$this->long_desc = sprintf( T_('This renderer display a content block found in the content by short tag %s'), '<code>[include:item-slug]</code>' );
+		$this->long_desc = sprintf( T_('This renderer display a content block found in the content by short tag %s or %s'), '<code>[include:item-slug]</code>', '<code>[cblock:item-slug]</code>' );
 	}
 
 
@@ -75,9 +75,9 @@ class content_blocks_plugin extends Plugin
 		}
 
 		// Remove block level short tag [include:...] inside <p> blocks and move them before the paragraph:
-		$content = move_short_tags( $content, '#\[include:[^\]]+\]#i' );
+		$content = move_short_tags( $content, '#\[(include|cblock):[^\]]+\]#i' );
 
-		// Replace `[include:item-slug]` short tag with item content:
+		// Replace [include:item-slug] or [cblock:item-slug] short tags with item content:
 		$params['check_code_block'] = true;
 		$content = $Item->render_content_blocks( $content, $params );
 
