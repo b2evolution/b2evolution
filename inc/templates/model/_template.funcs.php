@@ -965,7 +965,7 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Item:title':
-			echo $rendered_Item->get_title( 'title' );
+			echo $rendered_Item->dget( 'title' );
 			break;
 
 		case 'Item:visibility_status':
