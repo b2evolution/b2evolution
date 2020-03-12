@@ -243,11 +243,11 @@ class user_action_Widget extends ComponentWidget
 					)
 				{	// Current user must has an access to back-office and delete the target user:
 					global $admin_url;
-					$r = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$target_User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+					$r = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$target_User->ID ).'" class="btn btn-danger">'
 							.'<button type="button">'.T_('Delete').'</button>'
 						.'</a>'
 						."\n"
-						.'<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$target_User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+						.'<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$target_User->ID ).'" class="btn btn-danger">'
 							.'<button type="button">'.T_('Delete Spammer').'</button>'
 						.'</a>';
 				}
