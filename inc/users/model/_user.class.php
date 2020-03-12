@@ -3509,10 +3509,8 @@ class User extends DataObject
 
 					case 'add':
 						// Check perms to Add internal comments to the collection items:
-						$perm = // If User can access to back-office
-								$this->check_perm( 'admin', 'restricted' )
-								// AND if user can view internal comment of the collection
-								&& $this->check_perm( 'meta_comment', 'view', false, $blog_ID );
+						$perm = // If User can view internal comment of the collection
+								$this->check_perm( 'meta_comment', 'view', false, $blog_ID );
 						break;
 
 					case 'edit':
@@ -3520,7 +3518,7 @@ class User extends DataObject
 						$perm = // If User is explicitly allowed in the user permissions
 								$this->check_perm_blogusers( 'meta_comment', 'edit', $blog_ID, $Comment )
 								// OR If User belongs to primary or secondary groups explicitly allowed in the group permissions
-								|| $this->check_perm_bloggroups( 'meta_comment', 'edit', $blog_ID, $Comment );
+								|| $this->check_perm_bloggroups( 'meta_comment', 'edit', $blog_ID, $Comment, $this );
 						break;
 
 					case 'delete':
