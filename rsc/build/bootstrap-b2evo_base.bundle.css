@@ -2818,10 +2818,6 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 .row-gutter-sm [class*='col-']:last-child:not(:first-child) {
   padding-left: 3px;
 }
-.row-gutter-sm [class*='col-'] {
-  padding-left: 3px;
-  padding-right: 3px;
-}
 .evo_tile {
   margin: 15px 0;
   padding-bottom: 10px;

@@ -206,12 +206,7 @@ siteskin_include( '_site_body_header.inc.php' );
 					// Optional display params
 					'block_display_title'  => false,
 					'search_class'         => 'index_compact_search_form',
-					'search_input_before'  => '<div class="input-group">',
-					'search_input_after'   => '',
-					'search_submit_before' => '<span class="input-group-btn">',
-					'search_submit_after'  => '</span></div>',
-					'template'             => 'search_form_header',
-					'button'               => T_('Search')
+					'template'             => 'search_form_simple',
 				) );
 			// Display a button to view the Recent/New Topics:
 			$Skin->display_button_recent_topics();

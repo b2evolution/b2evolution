@@ -1315,3 +1315,18 @@ div.message_toolbars div.edit_toolbar {
 .widget_core_coll_category_list .evo_cat_meta input[disabled="disabled"] {
   visibility: hidden;
 }
+.w-100 {
+  width: 100% !important;
+}
+.w-75 {
+  width: 75% !important;
+}
+.w-50 {
+  width: 50% !important;
+}
+.w-25 {
+  width: 25% !important;
+}
+.w-auto {
+  width: auto !important;
+}

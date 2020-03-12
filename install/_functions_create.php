@@ -2241,7 +2241,7 @@ function create_default_templates( $is_task = true )
 			'template' => '<div class="row row-gutter-sm">
 	<div class="col-sm-12 margin-top-sm margin-bottom-xs">
 		<div class="input-group">
-			[Form:search_input]
+			[Form:search_input|class=w-100]
 			<span class="input-group-btn">[Form:submit|value=Search]</span>
 		</div>
 	</div>
@@ -2259,20 +2259,11 @@ function create_default_templates( $is_task = true )
 </div>',
 		),
 
-		'search_form_sidebar' => array(
-			'name'     => 'Search Form: Sidebar',
+		'search_form_simple' => array(
+			'name'     => 'Search Form: Simple',
 			'context'  => 'search_form',
 			'template' => '<div class="input-group">
-	[Form:search_input|placeholder=]
-	<span class="input-group-btn">[Form:submit|value=Go]</span>
-</div>',
-		),
-
-		'search_form_header' => array(
-			'name'     => 'Search Form: Header',
-			'context'  => 'search_form',
-			'template' => '<div class="input-group">
-	[Form:search_input|placeholder=]
+	[Form:search_input|class=w-100]
 	<span class="input-group-btn">[Form:submit|value=Search]</span>
 </div>',
 		),

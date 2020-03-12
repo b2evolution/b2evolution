@@ -101,8 +101,8 @@ class coll_search_form_Widget extends ComponentWidget
 				'template' => array(
 					'label' => T_('Template'),
 					'type' => 'select',
-					'options' => array( NULL => T_('No template (Automatic form)') ) + $TemplateCache->get_code_option_array(),
-					'defaultvalue' => NULL,
+					'options' => $TemplateCache->get_code_option_array(),
+					'defaultvalue' => 'search_form_simple',
 					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
 							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
 							array( 'onclick' => 'return b2template_list_highlight( this )' ),

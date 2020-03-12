@@ -12461,7 +12461,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		{	// If at least one widget exists in DB:
 			foreach( $widgets as $widget )
 			{
-				$widget_params = unserialize( $widget->wi_params );;
+				$widget_params = unserialize( $widget->wi_params );
 
 				if( $widget->wico_name == 'Sidebar' || $widget->wico_name == 'Sidebar 2' )
 				{
@@ -12481,6 +12481,34 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		// Install widget "Collection Search Form":
 		install_new_default_widgets( 'search_area' );
 		
+		upg_task_end();
+	}
+
+	if( upg_task_start( 15970, 'Updating "Search Form" widget...' ) )
+	{	// part of 7.1.2-beta
+		$SQL = new SQL();
+		$SQL->SELECT( 'wi_ID, wi_params' );
+		$SQL->FROM( 'T_widget__widget' );
+		$SQL->WHERE( 'wi_code = "coll_search_form"' );
+		$widgets = $DB->get_results( $SQL );
+
+		if( ! empty( $widgets ) )
+		{	// If at least one widget exists in DB:
+			foreach( $widgets as $widget )
+			{
+				$widget_params = unserialize( $widget->wi_params );
+
+				if( in_array( $widget_params['template'], array( 'search_form_sidebar', 'search_form_header' ) ) )
+				{	// Merge previous search forms to new search_form_simple:
+					$widget_params['template'] = 'search_form_simple';
+				
+
+					$DB->query( 'UPDATE T_widget__widget
+							SET wi_params = '.$DB->quote( serialize( $widget_params ) ).'
+						WHERE wi_ID = '.$widget->wi_ID );
+				}
+			}
+		}
 		upg_task_end();
 	}
 
