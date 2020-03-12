@@ -159,9 +159,6 @@ if( !$Messages->has_errors() )
 			 * Delete user
 			 */
 
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'user' );
-
 			if( !isset($edited_User) )
 				debug_die( 'no User set' );
 
@@ -184,6 +181,10 @@ if( !$Messages->has_errors() )
 			$fullname = $edited_User->dget( 'fullname' );
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
+
+				// Check that this action request is not a CSRF hacked request:
+				$Session->assert_received_crumb( 'user' );
+
 				if ( ! empty( $fullname ) )
 				{
 					$msg_format = $is_spammer ? T_('Spammer &laquo;%s&raquo; [%s] deleted.') : T_('User &laquo;%s&raquo; [%s] deleted.');

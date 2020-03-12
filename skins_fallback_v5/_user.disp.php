@@ -267,10 +267,10 @@ echo '<div class="profile_column_left">';
 		if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
 		{ // - Delete in back-office:
 			$buttons['del'] = array();
-			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;user_ID='.$User->ID ).'" class="btn btn-danger">'
 					.'<button type="button">'.T_('Delete').'</button>'
 				.'</a>';
-			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) ).'" class="btn btn-danger">'
+			$buttons['del'][] = '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID ).'" class="btn btn-danger">'
 					.'<button type="button">'.T_('Delete Spammer').'</button>'
 				.'</a>';
 		}
