@@ -72,8 +72,8 @@ class RestApi
 		$UserCache = & get_UserCache();
 
 		// Note: login and password cannot include ' or " or > or <
-		$entered_login = utf8_strtolower( utf8_strip_tags( remove_magic_quotes( $entered_login ) ) );
-		$entered_password = utf8_strip_tags( remove_magic_quotes( $entered_password ) );
+		$entered_login = utf8_strtolower( utf8_strip_tags( $entered_login ) );
+		$entered_password = utf8_strip_tags( $entered_password );
 
 		if( is_email( $entered_login ) )
 		{	// We have an email address instead of login name

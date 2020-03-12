@@ -791,7 +791,7 @@ class Session
 		$Form = new Form( '', 'evo_session_crumb_resend', $_SERVER['REQUEST_METHOD'] );
 		$Form->begin_form( 'inline' );
 		$Form->add_crumb( $crumb_name );
-		$Form->hiddens_by_key( remove_magic_quotes( $_REQUEST ) );
+		$Form->hiddens_by_key( $_REQUEST );
 		$Form->button( array( 'submit', '', T_('Resubmit now!'), 'ActionButton' ) );
 		$Form->end_form();
 		echo '</div>';
