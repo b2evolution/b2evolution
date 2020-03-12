@@ -127,7 +127,7 @@ It will also perform the following replacements:
 		for ($i = 0; $i < $stop; $i++) {
 			$curl = strval( $textarr[$i] );
 
-			if (strlen($curl) && '<' != $curl{0} && $next) { // If it's not a tag
+			if (strlen($curl) && '<' != $curl[0] && $next) { // If it's not a tag
 				$curl = str_replace('---', '&#8212;', $curl);
 				$curl = str_replace('--', '&#8211;', $curl);
 				$curl = str_replace("...", '&#8230;', $curl);
