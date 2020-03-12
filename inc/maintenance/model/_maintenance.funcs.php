@@ -503,7 +503,8 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdirs 
 		{
 			echo sprintf( TB_('Adding &laquo;<strong>%s</strong>&raquo; to ZIP file...'), $source_dir_path.$file );
 			
-			if( !next( $files ) ) // fp>kn : Why do we need this if()?
+			// check if any file remains to add into archive to start compressing:
+			if( !next( $files ) )
 			{
 				$compressing_started = true;
 			}
