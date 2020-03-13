@@ -502,7 +502,13 @@ class coll_tabbed_items_Widget extends generic_menu_link_Widget
 				: '' );
 			echo $this->get_layout_menu_link(
 				// URL to filter current page:
-				( $this->get_param( 'allow_switch_url' ) ? regenerate_url( $this->get_param( 'param_code' ).',redir', $this->get_param( 'param_code' ).'='.$item_slug.'&amp;redir=no' ) : '#' ),
+				( $this->get_param( 'allow_switch_url' )
+					? regenerate_url(
+						// Exclude params from current URL:
+						$this->get_param( 'param_code' ).( $this->get_param( 'add_redir_no' ) ? ',redir' : '' ),
+						// Add new param:
+						$this->get_param( 'param_code' ).'='.$item_slug.( $this->get_param( 'add_redir_no' ) ? '&amp;redir=no' : '' ) )
+					: '#' ),
 				// Title of the button:
 				$row_Item->get( 'title' ),
 				// Mark the button as active:
@@ -573,9 +579,12 @@ class coll_tabbed_items_Widget extends generic_menu_link_Widget
 		{	// Initialize JS to allow switching by JavaScript:
 ?>
 <script>
-evo_init_switchable_buttons( 'a[data-tabbed-items=<?php echo $this->ID; ?>]',
-	'<?php echo empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class']; ?>',
-	'<?php echo empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class']; ?>' );
+evo_init_switchable_buttons( {
+	selector:     'a[data-tabbed-items=<?php echo $this->ID; ?>]',
+	class_normal: '<?php echo empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class']; ?>',
+	class_active: '<?php echo empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class']; ?>',
+	add_redir_no: <?php echo $this->get_param( 'add_redir_no' ) ? 'true' : 'false'; ?>,
+} );
 </script>
 <?php
 		}

@@ -8,14 +8,20 @@
  * Click event for button to switch between blocks:
  * (this function change URL in browser address bar and make the clicked button to active style)
  *
- * @param string Selector for buttons of the group
- * @param string Class for not active button
- * @param string Class for active button
- * @param object Default params
+ * @param object Params
  */
-function evo_init_switchable_buttons( buttons_selector, normal_class, active_class, default_params )
+function evo_init_switchable_buttons( params )
 {
-	jQuery( buttons_selector ).click( function()
+	// Default params:
+	params = jQuery.extend( {
+		selector:     '', // Selector for buttons of the group
+		class_normal: '', // Class for normal(not active) buttons
+		class_active: '', // Class for active buttons
+		defaults:     {}, // Default url params(May be specified per Item in "Switchable params")
+		add_redir_no: false, // Add &redr=no to URLs
+	}, params ),
+
+	jQuery( params.selector ).click( function()
 	{
 		// Remove previous value from the URL:
 		var regexp = new RegExp( '([\?&])((' + jQuery( this ).data( 'code' ) + '|redir)=[^&]*(&|$))+', 'g' );
@@ -24,25 +30,26 @@ function evo_init_switchable_buttons( buttons_selector, normal_class, active_cla
 		// Add param code with value of the clicked button:
 		url += ( url.indexOf( '?' ) === -1 ? '?' : '&' );
 		url += jQuery( this ).data( 'code' ) + '=' + jQuery( this ).data( 'value' );
-		if( typeof( default_params ) == 'object' )
-		{	// Append default params:
-			for( default_param in default_params )
-			{
-				regexp = new RegExp( '[\?&]' + default_param + '=', 'g' );
-				if( ! url.match( regexp ) )
-				{	// Append default param if it is not found in the current URL:
-					url += '&' + default_param + '=' + default_params[ default_param ];
-				}
+		// Append default params:
+		for( default_param in params.defaults )
+		{
+			regexp = new RegExp( '[\?&]' + default_param + '=', 'g' );
+			if( ! url.match( regexp ) )
+			{	// Append default param if it is not found in the current URL:
+				url += '&' + default_param + '=' + params.defaults[ default_param ];
 			}
 		}
-		url += '&redir=no';
+		if( params.add_redir_no )
+		{	// Append this url param only when it is required:
+			url += '&redir=no';
+		}
 
 		// Change URL in browser address bar:
 		window.history.pushState( '', '', url );
 
 		// Change active button:
-		jQuery( buttons_selector ).attr( 'class', normal_class );
-		jQuery( this ).attr( 'class', active_class );
+		jQuery( params.selector ).attr( 'class', params.class_normal );
+		jQuery( this ).attr( 'class', params.class_active );
 
 		return false;
 	} );

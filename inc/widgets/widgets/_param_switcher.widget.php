@@ -142,6 +142,26 @@ class param_switcher_Widget extends generic_menu_link_Widget
 
 
 	/**
+	 * Get advanced definitions for editable params.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 *
+	 * @return array Advanced params
+	 */
+	function get_advanced_param_definitions()
+	{
+		return array(
+				'add_redir_no' => array(
+					'type' => 'checkbox',
+					'label' => sprintf( T_('Add %s'), '<code>&redir=no</code>' ),
+					'note' => T_('This is normally not needed, check this only when you have an auto redirect to canonical url.'),
+					'defaultvalue' => 0,
+				),
+			);
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -217,7 +237,13 @@ class param_switcher_Widget extends generic_menu_link_Widget
 				: '' );
 			echo $this->get_layout_menu_link(
 				// URL to filter current page:
-				( $this->get_param( 'allow_switch_url' ) ? regenerate_url( $this->get_param( 'param_code' ).',redir', $this->get_param( 'param_code' ).'='.$button['value'].'&amp;redir=no' ) : '#' ),
+				( $this->get_param( 'allow_switch_url' )
+					? regenerate_url(
+						// Exclude params from current URL:
+						$this->get_param( 'param_code' ).( $this->get_param( 'add_redir_no' ) ? ',redir' : '' ),
+						// Add new param:
+						$this->get_param( 'param_code' ).'='.$button['value'].( $this->get_param( 'add_redir_no' ) ? '&amp;redir=no' : '' ) )
+					: '#' ),
 				// Title of the button:
 				$button['text'],
 				// Mark the button as active:
@@ -234,10 +260,13 @@ class param_switcher_Widget extends generic_menu_link_Widget
 		{	// Initialize JS to allow switching by JavaScript:
 ?>
 <script>
-evo_init_switchable_buttons( 'a[data-param-switcher=<?php echo $this->ID; ?>]',
-	'<?php echo empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class']; ?>',
-	'<?php echo empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class']; ?>',
-	<?php echo json_encode( $Item->get_switchable_params() ); ?> );
+evo_init_switchable_buttons( {
+	selector:     'a[data-param-switcher=<?php echo $this->ID; ?>]',
+	class_normal: '<?php echo empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class']; ?>',
+	class_active: '<?php echo empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class']; ?>',
+	add_redir_no: <?php echo $this->get_param( 'add_redir_no' ) ? 'true' : 'false'; ?>,
+	defaults:     <?php echo json_encode( $Item->get_switchable_params() ); ?>,
+} );
 </script>
 <?php
 		}
