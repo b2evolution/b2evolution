@@ -1,0 +1,62 @@
+// Classes to blockquotes styling of text
+// May be used in quick Templates
+
+@base-font-size: 2.4em;
+@base-line-height: 1.5em;
+
+.brooks {
+	position: relative;
+	font-size: @base-font-size;
+	line-height: @base-line-height;
+	font-style: italic;
+	&:before {
+		content: '\201C';
+		position: absolute;
+		top: 0.25em;
+		left: -0.15em;
+		color: #e7e6e4;
+		font-size: 6em;
+		z-index: -1;
+	}
+}
+
+.ludwig {
+	padding-left: 1em;
+	border-left: 0.2em solid #4d91b3;
+	font-size: @base-font-size;
+	line-height: @base-line-height;
+	font-weight: 100;
+	&:before, &:after {
+		content: '\201C';
+		color: #4d91b3;
+	}
+	&:after {
+		content: '\201D';
+	}
+}
+
+.groucho {
+	position: relative;
+	font-size: @base-font-size;
+	line-height: @base-line-height;
+	footer {
+		font-size: 0.6em;
+		font-weight: 700;
+		color: #d3d3cf;
+		float: right;
+		
+		&:before {
+			content: '\2015';  
+		}
+	}
+	&:after {
+		content: '\201D';
+		position: absolute;
+		top: 0.28em;
+		right: 0;
+		font-size: 6em;
+		font-style: italic;
+		color: #e7e6e4;
+		z-index: -1;
+	}
+}

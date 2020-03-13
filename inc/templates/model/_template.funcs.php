@@ -62,7 +62,7 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	$r = '';
 
 	// New
-	preg_match_all( '/\[((?:(?:Cat|Coll|Comment|File|Form|Item|Link|Plugin|Tag|echo|set):)?([a-z0-9_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Cat|Coll|Comment|File|Form|Item|Link|Plugin|Tag|echo|set|param):)?([a-z0-9_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		// Output everything until new tag:
@@ -75,10 +75,13 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 		// Params specified for the tag:
 		$tag_param_strings = empty( $matches[3][$i][0] ) ? NULL : $matches[3][$i][0];
 
-		if( substr( $tag, 0, 4 ) == 'set:' )
-		{	// Set a param value in the $params[] array used for the whole template (will affect all future template tags)
+		if( substr( $tag, 0, 4 ) == 'set:' || substr( $tag, 0, 6 ) == 'param:' )
+		{	// Set new or default param value in the $params[] array used for the whole template (will affect all future template tags)
 
-			$param_name = substr( $tag, 4 );
+			// Override/Set new param OR Initialize default value?
+			$override_param = ( substr( $tag, 0, 4 ) == 'set:' );
+
+			$param_name = substr( $tag, $override_param ? 4 : 6 );
 			$param_val  = substr( $tag_param_strings, strpos( $tag_param_strings, '=' ) + 1 );
 			$param_strings = $param_name.'='.$param_val;
 			$param_strings = explode( '|', $param_strings );
@@ -107,54 +110,19 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 
 				$param_val  = substr( $param_string, strpos( $param_string, '=' ) + 1 );
 
-				// Set param:
-				// we MUST do this here and in & $params[] so that it sticks. This cannot be done in the callback or $this_tag_params[]
-				$params[ $param_name ] = $param_val;
+				if( $override_param || ! isset( $params[ $param_name ] ) )
+				{	// Set new param or default param:
+					// we MUST do this here and in & $params[] so that it sticks. This cannot be done in the callback or $this_tag_params[]
+					$params[ $param_name ] = $param_val;
+				}
 			}
 		}
 		else
 		{	// Process a normal template tag:
 
 			// Decode PARAMS like |name=value|name=value]
-			$this_tag_params = $params;
-			if( ! empty( $tag_param_strings ) )
-			{	
-				$tag_param_strings = explode( '|', $tag_param_strings );
-				
-				// Process each param individually:
-				foreach( $tag_param_strings as $tag_param_string )
-				{
-					if( empty( $tag_param_string ) || ctype_space( $tag_param_string) )
-					{
-						continue;
-					}
+			$this_tag_params = get_template_tag_params_from_string( $tag_param_strings, $params );
 
-					$tag_param_name = substr( $tag_param_string, 0, strpos( $tag_param_string, '=' ) );
-
-					if( strpos( $tag_param_name, '//' ) !== false )
-					{	// We found a comment that we should remove:
-						$tag_param_name = preg_replace( '~(.*)//.*$~im','$1', $tag_param_name );
-					}
-
-					// Trim off whitespace:
-					$tag_param_name = trim( $tag_param_name );
-
-					$tag_param_val  = substr( $tag_param_string, strpos( $tag_param_string, '=' ) + 1 );
-
-					if( preg_match('/\$([a-z_]+)\$/i', $tag_param_val, $tag_param_val_matches ) )
-					{	// We have a variable to replace: // TODO: allow multiple variable replace
-						$found_param_name = $tag_param_val_matches[1];
-						if( isset( $params[$found_param_name] ) )
-						{	// We have an original param of that name:
-							$tag_param_val = $params[$found_param_name];
-						}
-					}
-
-					// TODO: need to escape " and > from $tag_param_val, otherwise they will end up breaking something
-
-					$this_tag_params[$tag_param_name] = $tag_param_val;
-				}
-			}
 			if( is_array( $used_template_tags ) )
 			{
 				$used_template_tags[] = $tag; 
@@ -167,6 +135,62 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	$r .= substr( $template, $current_pos );
 
 	return $r;
+}
+
+
+/**
+ * Get params of tempalte tag from provided string
+ *
+ * @param string Params in string format
+ * @param array Default params
+ * @return array Params in array format
+ */
+function get_template_tag_params_from_string( $tag_param_strings, $default_params = array() )
+{
+	$this_tag_params = $default_params;
+
+	if( empty( $tag_param_strings ) )
+	{	
+		return $this_tag_params;
+	}
+
+	$tag_param_strings = explode( '|', $tag_param_strings );
+
+	// Process each param individually:
+	foreach( $tag_param_strings as $tag_param_string )
+	{
+		if( empty( $tag_param_string ) || ctype_space( $tag_param_string) )
+		{
+			continue;
+		}
+
+		$tag_param_name = substr( $tag_param_string, 0, strpos( $tag_param_string, '=' ) );
+
+		if( strpos( $tag_param_name, '//' ) !== false )
+		{	// We found a comment that we should remove:
+			$tag_param_name = preg_replace( '~(.*)//.*$~im','$1', $tag_param_name );
+		}
+
+		// Trim off whitespace:
+		$tag_param_name = trim( $tag_param_name );
+
+		$tag_param_val  = substr( $tag_param_string, strpos( $tag_param_string, '=' ) + 1 );
+
+		if( preg_match('/\$([a-z_]+)\$/i', $tag_param_val, $tag_param_val_matches ) )
+		{	// We have a variable to replace: // TODO: allow multiple variable replace
+			$found_param_name = $tag_param_val_matches[1];
+			if( isset( $default_params[$found_param_name] ) )
+			{	// We have an original param of that name:
+				$tag_param_val = $default_params[$found_param_name];
+			}
+		}
+
+		// TODO: need to escape " and > from $tag_param_val, otherwise they will end up breaking something
+
+		$this_tag_params[$tag_param_name] = $tag_param_val;
+	}
+
+	return $this_tag_params;
 }
 
 /**

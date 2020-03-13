@@ -3430,6 +3430,7 @@ class Item extends ItemLight
 				'render_inline_widgets' => true,
 				'render_block_widgets'  => true,
 				'render_switchable_blocks' => true,
+				'render_templates'      => true,
 			), $params );
 
 		// Remove block level short tags inside <p> blocks and move them before the paragraph:
@@ -3480,6 +3481,11 @@ class Item extends ItemLight
 		if( $params['render_switchable_blocks'] )
 		{	// Render switchable block tags like [div::view=detailed]Multiline Content Text[/div]:
 			$content = $this->render_switchable_blocks( $content, $params );
+		}
+
+		if( $params['render_templates'] )
+		{	// Render template tags like [template:template_code|param1=value1|param2=value2]:
+			$content = $this->render_templates( $content, $params );
 		}
 
 		return $content;
@@ -4288,6 +4294,64 @@ class Item extends ItemLight
 		$content = preg_replace( '#\[-([\-a-z:]+.*?\])#i', '[$1', $content );
 
 		return $content;
+	}
+
+
+	/**
+	 * Render templates from [template:template_code|param1=value1|param2=value2]
+	 *
+	 * @param string Content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_templates( $content, $params = array() )
+	{
+		$params = array_merge( array(
+				'check_code_block' => true,
+			), $params );
+
+		if( $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call render_templates() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_templates' ), array( $params ) );
+			return $content;
+		}
+
+		$content = preg_replace_callback( '#\[template:(.+?)\]#is', array( $this, 'render_templates_callback' ), $content );
+
+		return $content;
+	}
+
+
+	/**
+	 * Callback function to render templates
+	 *
+	 * @param array Match
+	 */
+	function render_templates_callback( $m )
+	{
+		$params = explode( '|', $m[1], 2 );
+
+		$TemplateCache = & get_TemplateCache();
+
+		if( ! ( $Template = & $TemplateCache->get_by_code( $params[0], false, false ) ) )
+		{	// Template is not found:
+			return $m[0];
+		}
+
+		if( isset( $params[1] ) )
+		{	// Decode params from tag like |param1=value1|param2=value2:
+			$short_tag_params = get_template_tag_params_from_string( $params[1] );
+		}
+		else
+		{	// No params are provided for the short tag:
+			$short_tag_params = array();
+		}
+
+		// Render template by code:
+		return render_template_code( $params[0], $short_tag_params );
 	}
 
 
