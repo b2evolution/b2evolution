@@ -272,6 +272,26 @@ class coll_tabbed_items_Widget extends generic_menu_link_Widget
 
 
 	/**
+	 * Get advanced definitions for editable params.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 *
+	 * @return array Advanced params
+	 */
+	function get_advanced_param_definitions()
+	{
+		return array(
+				'add_redir_no' => array(
+					'type' => 'checkbox',
+					'label' => sprintf( T_('Add %s'), '<code>&redir=no</code>' ),
+					'note' => T_('This is normally not needed, check this only when you have an auto redirect to canonical url.'),
+					'defaultvalue' => 0,
+				),
+			);
+	}
+
+
+	/**
 	 * Get JavaScript code which helps to edit widget form
 	 *
 	 * @return string
