@@ -806,7 +806,6 @@ class tinymce_plugin extends Plugin
 							tmce_init.init_instance_callback = function( ed ) {
 									if( window.shortcut_keys )
 									{
-										console.log( window.shortcut_keys );
 										for( var i = 0; i < window.shortcut_keys.length; i++ )
 										{
 											var key = window.shortcut_keys[i];
