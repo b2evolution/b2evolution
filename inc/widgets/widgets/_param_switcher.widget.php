@@ -207,12 +207,33 @@ class param_switcher_Widget extends generic_menu_link_Widget
 
 		echo $this->disp_params['block_body_start'];
 
+		// Display switchable tabs:
+		$this->display_switchable_tabs( $buttons, $Item->get_switchable_params() );
+
+		echo $this->disp_params['block_body_end'];
+
+		echo $this->disp_params['block_end'];
+
+		return true;
+	}
+
+
+	/**
+	 * Display switchable tabs
+	 *
+	 * @param array Tabs: key - tab value, value - tab text/title
+	 * @param array Default params: key - param value, value - default param value
+	 * @return string Active button value
+	 */
+	function display_switchable_tabs( $buttons, $defaults = array() )
+	{
 		// Get current param value and memorize it for regenerating url:
 		$param_value = param( $this->get_param( 'param_code' ), 'string', '', true );
 
 		echo $this->disp_params['button_group_start'];
 
 		$button_is_active_by_default = false;
+		$active_button_value = NULL;
 		foreach( $buttons as $button )
 		{	// Display button:
 			if( $param_value === $button['value'] )
@@ -221,7 +242,8 @@ class param_switcher_Widget extends generic_menu_link_Widget
 			}
 			elseif( ! $button_is_active_by_default &&
 			        $param_value === '' &&
-			        $Item->get_switchable_param( $this->get_param( 'param_code' ) ) == $button['value'] )
+			        isset( $defaults[ $this->get_param( 'param_code' ) ] ) &&
+			        $defaults[ $this->get_param( 'param_code' ) ] == $button['value'] )
 			{	// Active button by default with empty param:
 				$button_is_active = true;
 				$button_is_active_by_default = true;
@@ -250,11 +272,14 @@ class param_switcher_Widget extends generic_menu_link_Widget
 				$button_is_active,
 				// Link template:
 				'<a href="$link_url$" class="$link_class$"'.$link_js_attrs.'>$link_text$</a>' );
+
+			if( $button_is_active )
+			{	// Set active button value:
+				$active_button_value = $button['value'];
+			}
 		}
 
 		echo $this->disp_params['button_group_end'];
-
-		echo $this->disp_params['block_body_end'];
 
 		if( $this->get_param( 'allow_switch_js' ) )
 		{	// Initialize JS to allow switching by JavaScript:
@@ -265,15 +290,13 @@ evo_init_switchable_buttons( {
 	class_normal: '<?php echo empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class']; ?>',
 	class_active: '<?php echo empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class']; ?>',
 	add_redir_no: <?php echo $this->get_param( 'add_redir_no' ) ? 'true' : 'false'; ?>,
-	defaults:     <?php echo json_encode( $Item->get_switchable_params() ); ?>,
+	defaults:     <?php echo json_encode( $defaults ); ?>,
 } );
 </script>
 <?php
 		}
 
-		echo $this->disp_params['block_end'];
-
-		return true;
+		return $active_button_value;
 	}
 
 

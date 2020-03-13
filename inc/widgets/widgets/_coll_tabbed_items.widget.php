@@ -13,7 +13,7 @@
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 
-load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_Widget' );
+load_class( 'widgets/widgets/_param_switcher.widget.php', 'param_switcher_Widget' );
 
 /**
  * Universal Item List Widget Class
@@ -22,7 +22,7 @@ load_class( 'widgets/widgets/_generic_menu_link.widget.php', 'generic_menu_link_
  *
  * @package evocore
  */
-class coll_tabbed_items_Widget extends generic_menu_link_Widget
+class coll_tabbed_items_Widget extends param_switcher_Widget
 {
 	var $icon = 'refresh';
 
@@ -88,14 +88,8 @@ class coll_tabbed_items_Widget extends generic_menu_link_Widget
 		$context = 'content_list_master';
 		$TemplateCache = & get_TemplateCache();
 		$TemplateCache->load_by_context( $context );
-
 		$template_options = $TemplateCache->get_code_option_array();
 
-		load_funcs( 'files/model/_image.funcs.php' );
-
-		/**
-		 * @var ItemTypeCache
-		 */
 		$ItemTypeCache = & get_ItemTypeCache();
 
 		$item_type_options =
@@ -109,36 +103,34 @@ class coll_tabbed_items_Widget extends generic_menu_link_Widget
 			) + $ItemTypeCache->get_usage_option_array();
 
 		$r = array(
+				'general_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Settings')
+				),
+
 				'title' => array(
 					'label' => T_('Block title'),
 					'note' => T_('Title to display in your skin.'),
 					'size' => 60,
 				),
-				'param_code' => array(
-					'label' => T_('Param code'),
-					'size' => 60,
-					'defaultvalue' => 'tab',
+
+				'tabs_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('Tabs settings'),
 				),
-				'display_mode' => array(
-					'type' => 'select',
-					'label' => T_('Display as'),
-					'options' => array(
-							'auto'    => T_('Auto'),
-							'list'    => T_('List'),
-							'buttons' => T_('Buttons'),
-						),
-					'note' => sprintf( T_('Auto is based on the %s param.'), '<code>inlist</code>' ),
-					'defaultvalue' => 'auto',
+					// Set NULL to properly order them in this place, but really they are declared in the parent class param_switcher_Widget:
+					'param_code' => NULL,
+					'display_mode' => NULL,
+					'allow_switch_js' => NULL,
+					'allow_switch_url' => NULL,
+					'buttons' => NULL, // This param is not used by this widget but we need to move this here in order to avoid empty fields "Settings" around this hidden param
+				'tabs_layout_end' => array(
+					'layout' => 'end_fieldset',
 				),
-				'allow_switch_js' => array(
-					'type' => 'checkbox',
-					'label' => T_('Allow Javascript switching (dynamic)'),
-					'defaultvalue' => 1,
-				),
-				'allow_switch_url' => array(
-					'type' => 'checkbox',
-					'label' => T_('Allow Standard switching (page reload)'),
-					'defaultvalue' => 1,
+
+				'list_layout_start' => array(
+					'layout' => 'begin_fieldset',
+					'label'  => T_('List settings'),
 				),
 				'template' => array(
 					'label' => T_('Template'),
@@ -258,6 +250,14 @@ class coll_tabbed_items_Widget extends generic_menu_link_Widget
 					'size' => 4,
 					'defaultvalue' => 10,
 				),
+
+				'list_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
+
+				'general_layout_end' => array(
+					'layout' => 'end_fieldset',
+				),
 			), parent::get_param_definitions( $params ) );
 
 		if( isset( $r['allow_blockcache'] ) )
@@ -267,27 +267,10 @@ class coll_tabbed_items_Widget extends generic_menu_link_Widget
 			$r['allow_blockcache']['note'] = T_('This widget cannot be cached in the block cache.');
 		}
 
+		// Don't allow param "Buttons", because they are automatically generated from Items:
+		$r['buttons']['no_edit'] = true;
+
 		return $r;
-	}
-
-
-	/**
-	 * Get advanced definitions for editable params.
-	 *
-	 * @see Plugin::GetDefaultSettings()
-	 *
-	 * @return array Advanced params
-	 */
-	function get_advanced_param_definitions()
-	{
-		return array(
-				'add_redir_no' => array(
-					'type' => 'checkbox',
-					'label' => sprintf( T_('Add %s'), '<code>&redir=no</code>' ),
-					'note' => T_('This is normally not needed, check this only when you have an auto redirect to canonical url.'),
-					'defaultvalue' => 0,
-				),
-			);
 	}
 
 
@@ -490,59 +473,31 @@ class coll_tabbed_items_Widget extends generic_menu_link_Widget
 
 		// -------- START TABS --------
 
-		// Get current param value and memorize it for regenerating url:
-		$param_value = param( $this->get_param( 'param_code' ), 'string', '', true );
-
-		echo $this->disp_params['button_group_start'];
-
-		$button_is_active_by_default = false;
-		$active_item_slug = NULL;
+		$items_tabs = array();
 		while( $row_Item = & $ItemList->get_item() )
-		{	// Display button:
-			$item_slug = $row_Item->get( 'urltitle' );
-			if( $param_value === $item_slug )
-			{	// Active button by current param value:
-				$button_is_active = true;
-			}
-			elseif( ! $button_is_active_by_default &&
-			        $param_value === '' &&
-			        ( ! in_array( $disp, array( 'single', 'page', 'widget-page' ) ) || ( isset( $Item ) && $Item->get_switchable_param( $this->get_param( 'param_code' ) ) == $item_slug ) ) )
-			{	// Active button by default with empty param:
-				$button_is_active = true;
-				$button_is_active_by_default = true;
-			}
-			else
-			{	// No active button:
-				$button_is_active = false;
-			}
-			$link_js_attrs = ( $this->get_param( 'allow_switch_js' )
-				? ' data-tabbed-items="'.$this->ID.'"'
-				 .' data-code="'.format_to_output( $this->get_param( 'param_code' ), 'htmlattr' ).'"'
-				 .' data-value="'.format_to_output( $item_slug, 'htmlattr' ).'"'
-				: '' );
-			echo $this->get_layout_menu_link(
-				// URL to filter current page:
-				( $this->get_param( 'allow_switch_url' )
-					? regenerate_url(
-						// Exclude params from current URL:
-						$this->get_param( 'param_code' ).( $this->get_param( 'add_redir_no' ) ? ',redir' : '' ),
-						// Add new param:
-						$this->get_param( 'param_code' ).'='.$item_slug.( $this->get_param( 'add_redir_no' ) ? '&amp;redir=no' : '' ) )
-					: '#' ),
-				// Title of the button:
-				$row_Item->get( 'title' ),
-				// Mark the button as active:
-				$button_is_active,
-				// Link template:
-				'<a href="$link_url$" class="$link_class$"'.$link_js_attrs.'>$link_text$</a>' );
-
-			if( $button_is_active )
-			{	// Set active item slug:
-				$active_item_slug = $item_slug;
-			}
+		{	// Initialize tabs from items list:
+			$items_tabs[] = array(
+					'value' => $row_Item->get( 'urltitle' ),
+					'text'  => $row_Item->get( 'title' )
+				);
 		}
 
-		echo $this->disp_params['button_group_end'];
+		// Set active tab by default on page loading:
+		if( ! in_array( $disp, array( 'single', 'page', 'widget-page' ) ) && isset( $items_tabs[0] ) )
+		{	// Use first item tab by default for not single Item pages:
+			$default_tabs = array( $this->get_param( 'param_code' ) => $items_tabs[0]['value'] );
+		}
+		elseif( isset( $Item ) && $Item instanceof Item )
+		{	// Use default params from current Item:
+			$default_tabs = $Item->get_switchable_params();
+		}
+		else
+		{	// No default:
+			$default_tabs = array();
+		}
+
+		// Display switchable tabs:
+		$active_item_slug = $this->display_switchable_tabs( $items_tabs, $default_tabs );
 
 		// -------- END TABS --------
 
@@ -595,36 +550,9 @@ class coll_tabbed_items_Widget extends generic_menu_link_Widget
 
 		echo $this->disp_params['block_body_end'];
 
-		if( $this->get_param( 'allow_switch_js' ) )
-		{	// Initialize JS to allow switching by JavaScript:
-?>
-<script>
-evo_init_switchable_buttons( {
-	selector:     'a[data-tabbed-items=<?php echo $this->ID; ?>]',
-	class_normal: '<?php echo empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class']; ?>',
-	class_active: '<?php echo empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class']; ?>',
-	add_redir_no: <?php echo $this->get_param( 'add_redir_no' ) ? 'true' : 'false'; ?>,
-} );
-</script>
-<?php
-		}
-
 		echo $this->disp_params['block_end'];
 
 		return true;
-	}
-
-
-	/**
-	 * Request all required css and js files for this widget
-	 */
-	function request_required_files()
-	{
-		if( $this->get_param( 'allow_switch_js' ) )
-		{	// Load JS to switch between blocks on change URL in address bar:
-			require_js( '#jquery#', 'blog' );
-			require_js( 'src/evo_switchable_blocks.js', 'blog' );
-		}
 	}
 }
 ?>
