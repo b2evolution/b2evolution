@@ -12523,6 +12523,65 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 15990, 'Removing obsolete skins...<br>' ) )
+	{	// part of 7.1.3-beta
+		global $skins_path;
+
+		$obsolete_skin_classes = array( 'asevo_Skin', 'basic_Skin', 'dating_mood_Skin', 'evopress_Skin', 'photoalbums_Skin', 'photoblog_Skin', 'touch_Skin' );
+
+		load_funcs( 'skins/_skin.funcs.php' );
+		$SkinCache = & get_SkinCache();
+
+		// Get list of available skins in skins folder:
+		$skin_folders = get_filenames( $skins_path, array(
+				'inc_files' => false,
+				'inc_dirs'  => true,
+				'recurse'   => false,
+				'basename'  => true )
+			);
+		$r = array();
+		foreach( $skin_folders as $folder )
+		{
+			list( $base_skin, $skin_version ) = get_skin_folder_base_version( $folder );
+			$skin_class_name = preg_replace( '/_skin$/i', '', $base_skin ).'_Skin';
+			$r[$skin_class_name][$folder] = false;
+		}
+
+		foreach( $obsolete_skin_classes as $skin_class )
+		{
+			if( $obsolete_Skin = $SkinCache->get_by_class( $skin_class, false, false ) )
+			{	// Installed skin, display a warning:
+				echo get_install_format_text( sprintf( '<span class="text-warning"><evo:warning>'
+						.'The skin %s is no longer updated by b2evolution v7. You may obtain new versions from the <a href="%s" target="_blank">skin repository</a>'
+						.'</evo:warning></span>',
+						'<code>'.$obsolete_Skin->get_default_name().'</code>', 'https://skins.b2evolution.net/' )."<br />\n", 'br' );
+				if( isset( $r[$skin_class][$obsolete_Skin->folder] ) )
+				{	// Indicate this skin - version is installed:
+					$r[$skin_class][$obsolete_Skin->folder] = true;
+				}
+				// We can loop through the $r[$skin_class] here if we want to remove unused versions of an installed obsolete skin.
+			}
+			else
+			{	// Not installed, delete the folders:
+				task_begin( sprintf( 'Trying to delete obsolete and unused skin: %s...', $skin_class ) );
+				$folders_deleted = true;
+				if( isset( $r[$skin_class] ) )
+				{	// Obsolete skin found in the skins folder:
+					foreach( $r[$skin_class] as $folder => $installed )
+					{	// Iterate through all available versions:
+						if( ! rmdir_r( $skins_path.$folder ) )
+						{
+							$folders_deleted = false;
+							echo get_install_format_text( sprintf( '<span class="text-danger"><evo:error>Unable to delete folder %s.</evo:error></span>', $skins_path.$folder ) );
+						}
+					}
+				}
+				task_end( $folders_deleted ? 'OK.' : '' );
+			}
+		}
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *
