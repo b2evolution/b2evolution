@@ -7500,7 +7500,7 @@ class Item extends ItemLight
 		{
 			$next_status_in_row = $this->get_next_status( true );
 			$action = 'publish';
-			$button_default_icon = 'move_up_'.$next_status_in_row[2];
+			$button_default_icon = isset( $next_status_in_row[2] ) ? 'move_up_'.$next_status_in_row[2] : 'move_up_';
 		}
 		else
 		{
