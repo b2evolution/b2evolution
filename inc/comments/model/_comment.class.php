@@ -2555,7 +2555,7 @@ class Comment extends DataObject
 						$tmp_params['class'] .= ' last-child';
 					}
 				}
-				if( $next_status_in_row[0] == $first_status_in_row[0] )
+				if( isset( $next_status_in_row[0] ) && isset( $first_status_in_row[0] ) && $next_status_in_row[0] == $first_status_in_row[0] )
 				{
 					$tmp_params['class'] .= ' btn_next_status';
 				}
@@ -2565,7 +2565,10 @@ class Comment extends DataObject
 				}
 				$r .= $this->next_status_link( $tmp_params, true, $status[0] );
 			}
-			$prev_status = $next_status_in_row[0];
+			if( isset( $next_status_in_row[0] ) )
+			{
+			    $prev_status = $next_status_in_row[0];
+			}
 		}
 
 		$prev_status = '';
@@ -2595,7 +2598,11 @@ class Comment extends DataObject
 				}
 				$r .= $this->next_status_link( $tmp_params, false, $status[0] );
 			}
-			$prev_status = $next_status_in_row[0];
+			if( isset( $next_status_in_row[0] ) )
+			{
+			    $prev_status = $next_status_in_row[0];
+			}
+			
 		}
 
 		return $r;
