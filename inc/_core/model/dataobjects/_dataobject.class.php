@@ -890,7 +890,7 @@ class DataObject
 	 */
 	function get( $parname )
 	{
-		return ! empty( $this->$parname ) ? $this->$parname : '';
+		return $this->$parname;
 	}
 
 
