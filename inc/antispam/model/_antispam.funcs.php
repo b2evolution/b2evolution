@@ -625,7 +625,7 @@ function antispam_block_by_ip()
 			SET aipr_block_count = aipr_block_count + 1
 			WHERE aipr_ID = '.$DB->quote( $ip_range_ID ) );
 
-		$log_message = sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( ', ', $request_ip_list ), $ip_range_ID );
+		$log_message = sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( $request_ip_list, ', ' ), $ip_range_ID );
 		exit_blocked_request( 'IP', $log_message ); // WILL exit();
 	}
 }
@@ -1489,11 +1489,11 @@ function antispam_get_whois( $query = NULL, $window_height = NULL )
 				$result['rawdata'][$i] = str_replace( $matches[2][0], $ip_range_text, $result['rawdata'][$i] );
 			}
 		}
-		$winfo .= format_to_output( implode( $result['rawdata'], "\n" ) );
+		$winfo .= format_to_output( implode( "\n", $result['rawdata'] ) );
 	}
 	else
 	{
-		$winfo = format_to_output( implode( $whois->Query['errstr'], "\n" ) )."<br></br>";
+		$winfo = format_to_output( implode( "\n", $whois->Query['errstr'] ) )."<br></br>";
 	}
 	$winfo .= '</pre>';
 
