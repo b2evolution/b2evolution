@@ -12376,7 +12376,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				{
 					case 'subcontainer':
 						// Sub-Container
-						if( ! empty( $widget_params['container'] ) )
+						if( ! empty( $widget_params['container'] ) &&
+						    strpos( $widget_params['container'], $prefix ) !== 0 ) // Don't add double prefix
 						{
 							$widget_params['container'] = $prefix.$widget_params['container'];
 						}
@@ -12385,7 +12386,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 						// Columns (Sub-Containers)
 						for( $i = 1; $i <= 6; $i++ )
 						{
-							if( ! empty( $widget_params['column'.$i.'_container'] ) )
+							if( ! empty( $widget_params['column'.$i.'_container'] ) &&
+							    strpos( $widget_params['column'.$i.'_container'], $prefix ) !== 0 ) // Don't add double prefix
 							{
 								$widget_params['column'.$i.'_container'] = $prefix.$widget_params['column'.$i.'_container'];
 							}
