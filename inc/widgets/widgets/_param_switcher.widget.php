@@ -29,10 +29,11 @@ class param_switcher_Widget extends generic_menu_link_Widget
 	/**
 	 * Constructor
 	 */
-	function __construct( $db_row = NULL )
+	function __construct( $db_row = NULL, $type = 'core', $code = 'param_switcher' )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'param_switcher' );
+		// Note: $code may be different e.g. for widget "Tabbed Items"
+		parent::__construct( $db_row, $type, $code );
 	}
 
 
