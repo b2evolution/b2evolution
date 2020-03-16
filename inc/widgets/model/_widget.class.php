@@ -15,6 +15,9 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 load_class( '_core/model/dataobjects/_dataobject.class.php', 'DataObject' );
 
+// Load functions for widget layout:
+load_funcs( 'widgets/_widgets.funcs.php' );
+
 /**
  * ComponentWidget Class
  *
@@ -1322,17 +1325,7 @@ class ComponentWidget extends DataObject
 	 */
 	function get_layout()
 	{
-		if( isset( $this->disp_params['layout'] ) )
-		{
-			return $this->disp_params['layout'];
-		}
-
-		if( isset( $this->disp_params['thumb_layout'] ) )
-		{
-			return $this->disp_params['thumb_layout'];
-		}
-
-		return NULL;
+		return get_widget_layout( $this->disp_params );
 	}
 
 
@@ -1343,24 +1336,7 @@ class ComponentWidget extends DataObject
 	 */
 	function get_layout_start()
 	{
-		switch( $this->get_layout() )
-		{
-			case 'grid':
-				// Grid / Table layout:
-				return $this->disp_params['grid_start'];
-
-			case 'flow':
-				// Flow block layout:
-				return $this->disp_params['flow_start'];
-
-			case 'rwd':
-				// RWD block layout:
-				return $this->disp_params['rwd_start'];
-
-			default:
-				// List layout:
-				return $this->disp_params['list_start'];
-		}
+		return get_widget_layout_start( $this->disp_params );
 	}
 
 
@@ -1372,31 +1348,7 @@ class ComponentWidget extends DataObject
 	 */
 	function get_layout_end( $cell_index = 0 )
 	{
-		switch( $this->get_layout() )
-		{
-			case 'grid':
-				// Grid / Table layout:
-				$r = '';
-				$nb_cols = isset( $this->disp_params['grid_nb_cols'] ) ? $this->disp_params['grid_nb_cols'] : 1;
-				if( $cell_index && ( $cell_index % $nb_cols != 0 ) )
-				{
-					$r .= $this->disp_params['grid_colend'];
-				}
-				$r .= $this->disp_params['grid_end'];
-				return $r;
-
-			case 'flow':
-				// Flow block layout:
-				return $this->disp_params['flow_end'];
-
-			case 'rwd':
-				// RWD block layout:
-				return $this->disp_params['rwd_end'];
-
-			default:
-				// List layout:
-				return $this->disp_params['list_end'];
-		}
+		return get_widget_layout_end( $cell_index, $this->disp_params );
 	}
 
 
@@ -1410,43 +1362,7 @@ class ComponentWidget extends DataObject
 	 */
 	function get_layout_item_start( $cell_index = 0, $is_selected = false, $disp_param_prefix = '' )
 	{
-		switch( $this->get_layout() )
-		{
-			case 'grid':
-				// Grid / Table layout:
-				$r = '';
-				$nb_cols = isset( $this->disp_params['grid_nb_cols'] ) ? $this->disp_params['grid_nb_cols'] : 1;
-				if( $cell_index % $nb_cols == 0 )
-				{
-					$r .= $this->disp_params['grid_colstart'];
-				}
-				$r .= $this->disp_params['grid_cellstart'];
-				return $r;
-
-			case 'flow':
-				// Flow block layout:
-				return $this->disp_params['flow_block_start'];
-
-			case 'rwd':
-				// RWD block layout:
-				$r = $this->disp_params['rwd_block_start'];
-				if( isset( $this->disp_params['rwd_block_class'] ) )
-				{	// Replace css class of RWD block with value from widget setting:
-					$r = str_replace( '$wi_rwd_block_class$', $this->disp_params['rwd_block_class'], $r );
-				}
-				return $r;
-
-			default:
-				// List layout:
-				if( $is_selected )
-				{
-					return $this->disp_params[$disp_param_prefix.'item_selected_start'];
-				}
-				else
-				{
-					return $this->disp_params[$disp_param_prefix.'item_start'];
-				}
-		}
+		return get_widget_layout_item_start( $cell_index, $is_selected, $disp_param_prefix, $this->disp_params );
 	}
 
 
@@ -1460,37 +1376,7 @@ class ComponentWidget extends DataObject
 	 */
 	function get_layout_item_end( $cell_index = 0, $is_selected = false, $disp_param_prefix = '' )
 	{
-		switch( $this->get_layout() )
-		{
-			case 'grid':
-				// Grid / Table layout:
-				$r = $this->disp_params['grid_cellend'];
-				$nb_cols = isset( $this->disp_params['grid_nb_cols'] ) ? $this->disp_params['grid_nb_cols'] : 1;
-				if( $cell_index % $nb_cols == 0 )
-				{
-					$r .= $this->disp_params['grid_colend'];
-				}
-				return $r;
-
-			case 'flow':
-				// Flow block layout:
-				return $this->disp_params['flow_block_end'];
-
-			case 'rwd':
-				// RWD block layout:
-				return $this->disp_params['rwd_block_end'];
-
-			default:
-				// List layout:
-				if( $is_selected )
-				{
-					return $this->disp_params[$disp_param_prefix.'item_selected_end'];
-				}
-				else
-				{
-					return $this->disp_params[$disp_param_prefix.'item_end'];
-				}
-		}
+		return get_widget_layout_item_end($cell_index, $is_selected, $disp_param_prefix, $this->disp_params );
 	}
 
 

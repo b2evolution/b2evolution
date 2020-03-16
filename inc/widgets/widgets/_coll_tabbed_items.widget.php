@@ -88,7 +88,7 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 		$context = 'content_list_master';
 		$TemplateCache = & get_TemplateCache();
 		$TemplateCache->load_by_context( $context );
-		$template_options = $TemplateCache->get_code_option_array();
+		$template_options = array( NULL => T_('No template / use settings below').':' ) + $TemplateCache->get_code_option_array();
 
 		$ItemTypeCache = & get_ItemTypeCache();
 
@@ -351,15 +351,6 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 			return false;
 		}
 
-		// Check if template exists:
-		$TemplateCache = & get_TemplateCache();
-		$widget_Template = $TemplateCache->get_by_code( $this->disp_params['template'], false, false );
-		if( ! $widget_Template )
-		{
-			$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
-			return false;
-		}
-
 		// Create ItemList
 		// Note: we pass a widget specific prefix in order to make sure to never interfere with the mainlist
 		$limit = intval( $this->disp_params['limit'] );
@@ -464,15 +455,7 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 			return false;
 		}
 
-		echo $this->disp_params['block_start'];
-
-		// Block title:
-		$this->disp_title();
-
-		echo $this->disp_params['block_body_start'];
-
-		// -------- START TABS --------
-
+		// Get tabs:
 		$items_tabs = array();
 		while( $row_Item = & $ItemList->get_item() )
 		{	// Initialize tabs from items list:
@@ -481,7 +464,6 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 					'text'  => $row_Item->get( 'title' )
 				);
 		}
-
 		// Set active tab by default on page loading:
 		if( ! in_array( $disp, array( 'single', 'page', 'widget-page' ) ) && isset( $items_tabs[0] ) )
 		{	// Use first item tab by default for not single Item pages:
@@ -495,58 +477,36 @@ class coll_tabbed_items_Widget extends param_switcher_Widget
 		{	// No default:
 			$default_tabs = array();
 		}
-
-		// Display switchable tabs:
+		ob_start();
 		$active_item_slug = $this->display_switchable_tabs( $items_tabs, $default_tabs );
+		$switchable_tabs_content = ob_get_clean();
 
-		// -------- END TABS --------
+		// Get items list:
+		ob_start();
+		$items_list_result = $ItemList->display_list( array_merge( array(
+				'switch_param_code' => $this->get_param( 'param_code' ),
+				'active_item_slug'  => $active_item_slug,
+			), $this->disp_params ) );
+		$items_list_content = ob_get_clean();
 
-		// -------- START ITEMS CONTENT --------
-
-		// Render MASTER quick template:
-		// In theory, this should not display anything.
-		// Instead, this should set variables to define sub-templates (and potentially additional variables)
-		echo render_template_code( $this->disp_params['template'], /* BY REF */ $this->disp_params );
-
-		// Check if requested sub-template exists:
-		if( empty( $this->disp_params['item_template'] ) )
-		{	// Display error when no template for listing
-			$this->display_error_message( sprintf( 'Missing %s param', '<code>item_template</code>' ) );
+		if( $items_list_result !== true )
+		{	// Display error message:
+			$this->display_error_message( $items_list_result );
 			return false;
 		}
 
-		if( ! ( $item_Template = & $TemplateCache->get_by_code( $this->disp_params['item_template'], false, false ) ) )
-		{	// Display error when no or wrong template for listing
-			$this->display_error_message( sprintf( 'Template is not found: %s for listing an item', '<code>'.$this->disp_params['item_template'].'</code>' ) );
-			return false;
-		}
+		echo $this->disp_params['block_start'];
 
-		if( isset( $this->disp_params['before_list'] ) )
-		{
-			echo $this->disp_params['before_list'];
-		}
+		// Block title:
+		$this->disp_title();
 
-		$ItemList->restart();
-		while( $row_Item = & $ItemList->get_item() )
-		{
-			// Start wrapper to make each item block switchable:
-			echo '<div data-display-condition="'.$this->get_param( 'param_code' ).'='.$row_Item->get( 'urltitle' ).'"'
-				// Hide not active item on page loading:
-				.( $active_item_slug == $row_Item->get( 'urltitle' ) ? '' : ' style="display:none"' ).'>';
+		echo $this->disp_params['block_body_start'];
 
-			// Render Item by quick Template:
-			echo render_template_code( $this->disp_params['item_template'], $this->disp_params, array( 'Item' => $row_Item ) );
+		// Display tabs to switch between items:
+		echo $switchable_tabs_content;
 
-			// End of switchable item block:
-			echo '</div>';
-		}
-
-		if( isset( $this->disp_params['after_list'] ) )
-		{
-			echo $this->disp_params['after_list'];
-		}
-
-		// -------- END ITEMS CONTENT --------
+		// Display items list:
+		echo $items_list_content;
 
 		echo $this->disp_params['block_body_end'];
 
