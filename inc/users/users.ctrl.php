@@ -725,7 +725,40 @@ if( !$Messages->has_errors() )
 				echo get_csv_line( $user );
 			}
 			exit;
+			
+		case 'export_users':
+			// Export user data into CSV file:
+			load_class( 'users/model/_userlist.class.php', 'UserList' );
+			$UserList = new UserList( 'admin' );
+			$UserList->memorize = false;
+			$UserList->load_from_Request();
+			if( empty( $UserList->filters['users'] ) )
+			{	// No users to export:
+				header_redirect( $admin_url.'?ctrl=users' );
+				break;
+			}
 
+			$SQL_main = new SQL();
+			$SQL_main->SELECT( 'user_login, user_email, user_firstname, user_lastname, user_nickname, ctry_code, user_locale' );
+			$SQL_main->FROM( 'T_users' );
+			$SQL_main->FROM_add( 'LEFT JOIN T_regional__country ON ctry_ID = user_ctry_ID' );
+			$SQL_main->WHERE( 'user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ORDER BY user_ID' );
+			$user_main_sql = $SQL_main->get();
+			$users = $DB->get_results( $user_main_sql, ARRAY_A, 'Get users data for export users into CSV file' );
+
+			header_nocache();
+			header_content_type( 'text/csv' );
+			header( 'Content-Disposition: attachment; filename=users.csv' );
+
+			echo get_csv_line( array( 'login', 'email', 'firstname', 'lastname', 'nickname', 'country code', 'locale') );
+
+			foreach( $users as $user )
+			{
+				unset( $user['user_ID'] );
+				echo get_csv_line( $user );
+			}
+			exit;
+			
 		case 'save_default_filters':
 			// Save default users list filters:
 
