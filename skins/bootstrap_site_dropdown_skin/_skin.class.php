@@ -396,7 +396,8 @@ footer#evo_site_footer .container a {
 
 		if( $this->get_setting( 'fixed_header' ) &&
 		    ! $Session->get( 'display_containers_'.$Blog->ID ) &&
-		    ! $Session->get( 'display_includes_'.$Blog->ID ) )
+		    ! $Session->get( 'display_includes_'.$Blog->ID ) &&
+		    ! $Session->get( 'customizer_mode_'.$Blog->ID ) )
 		{	// Enable fixed position for header only when no debug blocks:
 			$css .= '#evo_site_header {
 	position: fixed;
