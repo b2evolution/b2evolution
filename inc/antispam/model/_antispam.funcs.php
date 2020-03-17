@@ -625,7 +625,7 @@ function antispam_block_by_ip()
 			SET aipr_block_count = aipr_block_count + 1
 			WHERE aipr_ID = '.$DB->quote( $ip_range_ID ) );
 
-		$log_message = sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( $request_ip_list, ', ' ), $ip_range_ID );
+		$log_message = sprintf( 'A request with ( %s ) ip addresses was blocked because of a blocked IP range ID#%s.', implode( ', ', $request_ip_list ), $ip_range_ID );
 		exit_blocked_request( 'IP', $log_message ); // WILL exit();
 	}
 }
