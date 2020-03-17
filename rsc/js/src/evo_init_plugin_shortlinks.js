@@ -1,5 +1,5 @@
 /**
- * This file initialize plugin "Auto Anchors"
+ * This file initialize plugin "Shortlinks"
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -33,10 +33,10 @@ jQuery( document ).ready( function()
 
 	if( typeof( evo_init_shortlinks_toolbar ) != 'undefined' )
 	{	// Init individual shortlinks toolbar:
-		var shortlinks_toolbars = Object.values( evo_init_shortlinks_toolbar );
-		for( var i = 0; i < shortlinks_toolbars.length; i++ )
+		var toolbars = Object.values( evo_init_shortlinks_toolbar );
+		for( var i = 0; i < toolbars.length; i++ )
 		{
-			window.shortlinks_toolbar( shortlinks_toolbars[i]['title'], shortlinks_toolbars[i]['prefix'] );
+			window.shortlinks_toolbar( toolbars[i]['title'], toolbars[i]['prefix'] );
 		}
 	}
 } );
