@@ -56,7 +56,9 @@ require_js_defer( 'functions.js' );
 
 if( can_use_hashed_password() )
 { // Include JS for client-side password hashing:
+	add_js_headline( "var htsrv_url = '".get_htsrv_url()."';" );
 	require_js_defer( 'build/sha1_md5.bmin.js' );
+	require_js_defer( 'src/evo_init_display_login_js_handler.js', 'blog' );
 }
 
 // Use the links in the form title
