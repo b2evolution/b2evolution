@@ -21,7 +21,7 @@ function evo_init_switchable_buttons( params )
 		wrapper_class_active: '', // Wrapper style class for active params
 		defaults:             {}, // Default url params(May be specified per Item in "Switchable params")
 		add_redir_no:         false, // Add &redr=no to URLs
-		inlist_mode:          false, // FALSE - inlist mode, TRUE - buttons mode
+		display_mode:         'list', // 'list', 'buttons', 'tabs'
 	}, params ),
 
 	jQuery( params.selector ).click( function()
@@ -53,8 +53,8 @@ function evo_init_switchable_buttons( params )
 		// Change active button/link:
 		jQuery( params.selector ).attr( 'class', params.link_class_normal );
 		jQuery( this ).attr( 'class', params.link_class_active );
-		if( params.inlist_mode )
-		{	// 
+		if( params.display_mode == 'list' || params.display_mode == 'tabs' )
+		{	// List mode has a wrapper with active style class:
 			jQuery( params.selector ).parent().removeClass( params.wrapper_class_active ).addClass( params.wrapper_class_normal );
 			jQuery( this ).parent().removeClass( params.wrapper_class_normal ).addClass( params.wrapper_class_active );
 		}

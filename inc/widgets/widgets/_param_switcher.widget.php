@@ -114,6 +114,7 @@ class param_switcher_Widget extends generic_menu_link_Widget
 							'auto'    => T_('Auto'),
 							'list'    => T_('List'),
 							'buttons' => T_('Buttons'),
+							'tabs'    => T_('Tabs'),
 						),
 					'note' => sprintf( T_('Auto is based on the %s param.'), '<code>inlist</code>' ),
 					'defaultvalue' => 'auto',
@@ -231,9 +232,14 @@ class param_switcher_Widget extends generic_menu_link_Widget
 		// Get current param value and memorize it for regenerating url:
 		$param_value = param( $this->get_param( 'param_code' ), 'string', '', true );
 
-		if( ! $this->is_inlist_mode() )
-		{	// Only for button mode:
-			echo $this->disp_params['button_group_start'];
+		switch( $this->get_display_mode() )
+		{
+			case 'buttons':
+				echo $this->disp_params['button_group_start'];
+				break;
+			case 'tabs':
+				echo $this->disp_params['tabs_start'];
+				break;
 		}
 
 		$button_is_active_by_default = false;
@@ -283,40 +289,39 @@ class param_switcher_Widget extends generic_menu_link_Widget
 			}
 		}
 
-		if( ! $this->is_inlist_mode() )
-		{	// Only for button mode:
-			echo $this->disp_params['button_group_end'];
+		switch( $this->get_display_mode() )
+		{
+			case 'buttons':
+				echo $this->disp_params['button_group_end'];
+				break;
+			case 'tabs':
+				echo $this->disp_params['tabs_end'];
+				break;
 		}
 
 		if( $this->get_param( 'allow_switch_js' ) )
 		{	// Initialize JS to allow switching by JavaScript:
-			if( $this->is_inlist_mode() )
-			{	// List mode:
-				$class_normal = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['link_default_class'] : $this->disp_params['widget_link_class'];
-				$class_active = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['link_selected_class']: $this->disp_params['widget_active_link_class'];
-				preg_match( '/class="([^"]+)"/i', $this->disp_params['item_start'], $match_normal );
-				preg_match( '/class="([^"]+)"/i', $this->disp_params['item_selected_start'], $match_active );
-				$wrapper_class_normal = empty( $match_normal[1] ) ? '' : $match_normal[1];
-				$wrapper_class_active = empty( $match_active[1] ) ? '' : $match_active[1];
-			}
-			else
-			{	// Button mode:
-				$class_normal = empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'];
-				$class_active = empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'];
-				$wrapper_class_normal = '';
-				$wrapper_class_active = '';
-			}
+
+			// Get class of normal(not active) wrapper:
+			$item_start = $this->get_menu_link_item_start( false );
+			preg_match( '/class="([^"]+)"/i', $item_start, $match_class );
+			$wrapper_class_normal = empty( $match_class[1] ) ? '' : $match_class[1];
+
+			// Get class of active wrapper:
+			$item_start = $this->get_menu_link_item_start( true );
+			preg_match( '/class="([^"]+)"/i', $item_start, $match_class );
+			$wrapper_class_active = empty( $match_class[1] ) ? '' : $match_class[1];
 ?>
 <script>
 evo_init_switchable_buttons( {
 	selector:             'a[data-param-switcher=<?php echo $this->ID; ?>]',
-	link_class_normal:    '<?php echo $class_normal; ?>',
-	link_class_active:    '<?php echo $class_active; ?>',
+	link_class_normal:    '<?php echo $this->get_link_class( false ); ?>',
+	link_class_active:    '<?php echo $this->get_link_class( true ); ?>',
 	wrapper_class_normal: '<?php echo $wrapper_class_normal; ?>',
 	wrapper_class_active: '<?php echo $wrapper_class_active; ?>',
 	add_redir_no:         <?php echo $this->get_param( 'add_redir_no' ) ? 'true' : 'false'; ?>,
 	defaults:             <?php echo json_encode( $defaults ); ?>,
-	inlist_mode:          <?php echo $this->is_inlist_mode() ? 'true' : 'false'; ?>,
+	display_mode:         '<?php echo $this->get_display_mode(); ?>',
 } );
 </script>
 <?php
