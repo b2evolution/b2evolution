@@ -798,27 +798,26 @@ class shortlinks_plugin extends Plugin
 		// Initialize Javascript to build shortlinks modal window;
 		$this->init_js_lang_vars();
 
-		?><script>
-		//<![CDATA[
-		function shortlinks_toolbar( title, prefix )
-		{
-			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>'
+		$shortlinks_toolbar_config = array(
+				'toolbar_title_before' => format_to_js( $this->get_template( 'toolbar_title_before' ) ),
+				'toolbar_title_after'  => format_to_js( $this->get_template( 'toolbar_title_after' ) ),
+				'toolbar_group_before' => format_to_js( $this->get_template( 'toolbar_group_before' ) ),
+				'toolbar_group_after'  => format_to_js( $this->get_template( 'toolbar_group_after' ) ),
+				'plugin_code'          => $this->code,
+				'button_title'         => T_('Link to a Post'),
+				'button_value'         => T_('Link to a Post'),
+				'button_class'         => $this->get_template( 'toolbar_button_class' ),
+			);
 
-				+ '<input type="button" title="<?php echo TS_('Link to a Post') ?>"'
-				+ ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>"'
-				+ ' data-func="shortlinks_load_window|' + prefix + '" value="<?php echo TS_('Link to a Post') ?>" />'
-
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
-
-				jQuery( '.' + prefix + '<?php echo $this->code ?>_toolbar' ).html( r );
-		}
-		//]]>
-		</script><?php
+		expose_var_to_js( 'evo_init_shortlinks_toolbar_config', json_encode( $shortlinks_toolbar_config ) );
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?><script>shortlinks_toolbar( '<?php echo TS_('Short Links:'); ?>', '<?php echo $params['js_prefix']; ?>' );</script><?php
+
+		expose_var_to_js( 'toolbar_'.$params['js_prefix'], array(
+				'title' => T_('Short Links:'),
+				'prefix' => $params['js_prefix'] ),
+			'evo_init_shortlinks_toolbar' );
 
 		return true;
 	}
@@ -829,6 +828,7 @@ class shortlinks_plugin extends Plugin
 	 */
 	function init_js_lang_vars( $relative_to = 'rsc_url' )
 	{
+		// TODO: Include in rsc/js/src/evo_init_plugin_shortlinks.js
 		global $Blog;
 
 		// Initialize variables for the file "shortlinks.js":
