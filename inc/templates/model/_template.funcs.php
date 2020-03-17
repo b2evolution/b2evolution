@@ -174,6 +174,11 @@ function get_template_tag_params_from_string( $tag_param_strings, $default_param
 		// Trim off whitespace:
 		$tag_param_name = trim( $tag_param_name );
 
+		if( $tag_param_name === '' )
+		{	// Skip empty param:
+			continue;
+		}
+
 		$tag_param_val  = substr( $tag_param_string, strpos( $tag_param_string, '=' ) + 1 );
 
 		if( preg_match('/\$([a-z_]+)\$/i', $tag_param_val, $tag_param_val_matches ) )

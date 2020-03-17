@@ -220,11 +220,16 @@ img.imgerror,
 }
 .brooks {
   position: relative;
+  padding: 0;
+  margin-bottom: 3em;
+  border-left: none;
+  font-family: "Sanchez", "Helvetica Neue", Helvetica, Arial, serif;
   font-size: 2.4em;
   line-height: 1.5em;
   font-style: italic;
+  color: #3d748f;
 }
-.brooks:before {
+.brooks q:before {
   content: '\201C';
   position: absolute;
   top: 0.25em;
@@ -233,27 +238,54 @@ img.imgerror,
   font-size: 6em;
   z-index: -1;
 }
+.brooks footer {
+  font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, serif;
+  font-size: 0.6em;
+  font-weight: 700;
+  color: #d3d3cf;
+  text-align: right;
+}
 .ludwig {
-  padding-left: 1em;
+  padding: 0 0 0 1em;
+  margin-bottom: 3em;
   border-left: 0.2em solid #4d91b3;
+  font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, serif;
   font-size: 2.4em;
   line-height: 1.5em;
   font-weight: 100;
+  color: #3d748f;
 }
-.ludwig:before,
-.ludwig:after {
+.ludwig q:before,
+.ludwig q:after {
   content: '\201C';
+  font-family: "Sanchez", "Helvetica Neue", Helvetica, Arial, serif;
   color: #4d91b3;
 }
-.ludwig:after {
+.ludwig q:before {
   content: '\201D';
+}
+.ludwig footer {
+  font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, serif;
+  font-size: 0.6em;
+  font-weight: 700;
+  color: #d3d3cf;
+  text-align: right;
 }
 .groucho {
   position: relative;
+  padding: 0;
+  margin-bottom: 3em;
+  border-left: none;
+  font-family: "Sanchez", "Helvetica Neue", Helvetica, Arial, serif;
   font-size: 2.4em;
   line-height: 1.5em;
+  color: #3d748f;
+}
+.groucho p {
+  padding-right: 60px;
 }
 .groucho footer {
+  font-family: "Noto Sans", "Helvetica Neue", Helvetica, Arial, serif;
   font-size: 0.6em;
   font-weight: 700;
   color: #d3d3cf;
@@ -262,15 +294,17 @@ img.imgerror,
 .groucho footer:before {
   content: '\2015';
 }
-.groucho:after {
+.groucho q:before {
+  content: '';
+}
+.groucho q:after {
   content: '\201D';
   position: absolute;
-  top: 0.28em;
+  top: 25px;
   right: 0;
-  font-size: 6em;
+  font-size: 5em;
   font-style: italic;
   color: #e7e6e4;
-  z-index: -1;
 }
 /* The sprite image file is located: "/rsc/icons/flags_sprite.png"
  * **** To change this file use the original file from: "/rsc/icons/src/flags.PSD"

@@ -4338,7 +4338,7 @@ class Item extends ItemLight
 
 		if( ! ( $Template = & $TemplateCache->get_by_code( $params[0], false, false ) ) )
 		{	// Template is not found:
-			return $m[0];
+			return '<span class="evo_param_error">Template "'.$params[0].'" is not found for <code>'.$m[0].'</code><span>';
 		}
 
 		if( isset( $params[1] ) )
