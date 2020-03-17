@@ -3430,13 +3430,14 @@ class Item extends ItemLight
 				'render_inline_widgets' => true,
 				'render_block_widgets'  => true,
 				'render_switchable_blocks' => true,
+				'render_templates'      => true,
 			), $params );
 
 		// Remove block level short tags inside <p> blocks and move them before the paragraph:
 		$content = move_short_tags( $content );
 
 		if( $params['render_content_blocks'] )
-		{	// Render Content block tags like [include:123], [include:item-slug]:
+		{	// Render Content block tags like [include:123], [include:item-slug], [cblock:123], [cblock:item-slug]:
 			$content = $this->render_content_blocks( $content, $params );
 		}
 
@@ -3480,6 +3481,11 @@ class Item extends ItemLight
 		if( $params['render_switchable_blocks'] )
 		{	// Render switchable block tags like [div::view=detailed]Multiline Content Text[/div]:
 			$content = $this->render_switchable_blocks( $content, $params );
+		}
+
+		if( $params['render_templates'] )
+		{	// Render template tags like [template:template_code|param1=value1|param2=value2]:
+			$content = $this->render_templates( $content, $params );
 		}
 
 		return $content;
@@ -4095,7 +4101,7 @@ class Item extends ItemLight
 
 
 	/**
-	 * Convert inline content block tags like [include:123], [include:item-slug] into item/post content
+	 * Convert inline content block tags like [include:123], [include:item-slug], [cblock:123], [cblock:item-slug] into item/post content
 	 *
 	 * @param string Source content
 	 * @param array Params
@@ -4115,7 +4121,7 @@ class Item extends ItemLight
 		}
 
 		// Find all matches with tags of content block posts:
-		preg_match_all( '/\[include:?([^\]]*)?\]/i', $content, $tags );
+		preg_match_all( '/\[(include|cblock):?([^\]]*)?\]/i', $content, $tags );
 
 		$ItemCache = & get_ItemCache();
 
@@ -4123,7 +4129,7 @@ class Item extends ItemLight
 
 		foreach( $tags[0] as $t => $source_tag )
 		{
-			$tag_options = explode( ':', $tags[1][ $t ] );
+			$tag_options = explode( ':', $tags[2][ $t ] );
 
 			$item_ID_slug = trim( $tag_options[0] );
 
@@ -4292,6 +4298,64 @@ class Item extends ItemLight
 
 
 	/**
+	 * Render templates from [template:template_code|param1=value1|param2=value2]
+	 *
+	 * @param string Content
+	 * @param array Params
+	 * @return string Content
+	 */
+	function render_templates( $content, $params = array() )
+	{
+		$params = array_merge( array(
+				'check_code_block' => true,
+			), $params );
+
+		if( $params['check_code_block'] && ( ( stristr( $content, '<code' ) !== false ) || ( stristr( $content, '<pre' ) !== false ) ) )
+		{	// Call render_templates() on everything outside code/pre:
+			$params['check_code_block'] = false;
+			$content = callback_on_non_matching_blocks( $content,
+				'~<(code|pre)[^>]*>.*?</\1>~is',
+				array( $this, 'render_templates' ), array( $params ) );
+			return $content;
+		}
+
+		$content = preg_replace_callback( '#\[template:(.+?)\]#is', array( $this, 'render_templates_callback' ), $content );
+
+		return $content;
+	}
+
+
+	/**
+	 * Callback function to render templates
+	 *
+	 * @param array Match
+	 */
+	function render_templates_callback( $m )
+	{
+		$params = explode( '|', $m[1], 2 );
+
+		$TemplateCache = & get_TemplateCache();
+
+		if( ! ( $Template = & $TemplateCache->get_by_code( $params[0], false, false ) ) )
+		{	// Template is not found:
+			return $m[0];
+		}
+
+		if( isset( $params[1] ) )
+		{	// Decode params from tag like |param1=value1|param2=value2:
+			$short_tag_params = get_template_tag_params_from_string( $params[1] );
+		}
+		else
+		{	// No params are provided for the short tag:
+			$short_tag_params = array();
+		}
+
+		// Render template by code:
+		return render_template_code( $params[0], $short_tag_params );
+	}
+
+
+	/**
 	 * Render switchable blocks
 	 *   from [div:.optional.classnames:view=detailed&size=middle]Multiline Content Text[/div]
 	 *   to <div class="optional classnames" data-display-condition="view=detailed&size=middle" style="display:none">Multiline Content Text</div>
@@ -4453,6 +4517,7 @@ class Item extends ItemLight
 		if( ! $this->get_type_setting( 'allow_switchable' ) ||
 		    ! $this->get_setting( 'switchable' ) )
 		{	// Don't render switchable content if it is not allowed by Item Type and disabled for this Item:
+			$this->switchable_params = array();
 			return;
 		}
 
@@ -4488,10 +4553,23 @@ class Item extends ItemLight
 
 
 	/**
-	 * Initialize switchable params
+	 * Get switchable params
+	 *
+	 * @return array Switchable params: Key - param code, Value - default param value
+	 */
+	function get_switchable_params()
+	{
+		$this->load_switchable_params();
+
+		return $this->switchable_params;
+	}
+
+
+	/**
+	 * Get switchable param by code
 	 *
 	 * @param string Param code
-	 * @param string|NULL Param value
+	 * @return string|NULL Param value
 	 */
 	function get_switchable_param( $param_code )
 	{
@@ -7422,13 +7500,13 @@ class Item extends ItemLight
 		{
 			$next_status_in_row = $this->get_next_status( true );
 			$action = 'publish';
-			$button_default_icon = 'move_up_'.$next_status_in_row[2];
+			$button_default_icon = isset( $next_status_in_row[2] ) ? 'move_up_'.$next_status_in_row[2] : 'move_up_';
 		}
 		else
 		{
 			$next_status_in_row =  $this->get_next_status( false );
 			$action = 'restrict';
-			$button_default_icon = 'move_down_'.$next_status_in_row[2];
+			$button_default_icon = isset( $next_status_in_row[2] ) ? 'move_down_'.$next_status_in_row[2] : 'move_down_';
 		}
 
 		if( $next_status_in_row === false )
@@ -9057,7 +9135,7 @@ class Item extends ItemLight
 		$SQL->FROM_add( 'INNER JOIN T_items__prerendering ON post_ID = itpr_itm_ID' );
 		$SQL->FROM_add( 'INNER JOIN T_items__type ON post_ityp_ID = ityp_ID' );
 		$SQL->FROM_add( 'INNER JOIN T_slug ON post_ID = slug_itm_ID AND slug_ID != post_tiny_slug_ID' );
-		$SQL->WHERE( 'post_content REGEXP '.$DB->quote( '\[include:('.$slugs.')(:[^]]+)?\]' ) );
+		$SQL->WHERE( 'post_content REGEXP '.$DB->quote( '\[(include|cblock):('.$slugs.')(:[^]]+)?\]' ) );
 		$SQL->GROUP_BY( 'post_ID' );
 		$content_items = $DB->get_results( $SQL );
 

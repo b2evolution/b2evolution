@@ -271,14 +271,14 @@ class Template extends DataObject
 	{
 		global $DB, $Messages;
 
-		// Invalidate pre-rendered cache of Items which use [include:...:this_template_code]:
+		// Invalidate pre-rendered cache of Items which use [include:...:this_template_code] or [cblock:...:this_template_code]:
 		$invalidated_items_num = $DB->query( 'DELETE T_items__prerendering
 			 FROM T_items__prerendering
 			 LEFT JOIN T_items__item ON itpr_itm_ID = post_ID
 			WHERE post_content LIKE '.$DB->quote( '%:'.$template_code.'%' ) );
 		if( $invalidated_items_num > 0 )
 		{	// Inform about invalidated cache:
-			$Messages->add_to_group( sprintf( T_('Pre-render caches have been invalidated for %d items that use this template in an %s.'), $invalidated_items_num, '<code>[include:]</code>' ), 'note', T_('Cache invalidated:' ) );
+			$Messages->add_to_group( sprintf( T_('Pre-render caches have been invalidated for %d items that use this template in the %s or %s.'), $invalidated_items_num, '<code>[include:]</code>', '<code>[cblock:]</code>' ), 'note', T_('Cache invalidated:' ) );
 		}
 
 		// BLOCK CACHE INVALIDATION:

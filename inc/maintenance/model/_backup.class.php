@@ -125,6 +125,7 @@ $backup_tables = array(
 			'T_sessions',
 			'T_track__goalhit',
 			'T_track__keyphrase',
+			'T_syslog',
 		),
 		'included' => false ) );
 
@@ -529,7 +530,7 @@ class Backup
 		foreach( $backup_structure as $table )
 		{
 			// progressive display of what backup is doing
-			echo sprintf( TB_('Backing up table &laquo;<strong>%s</strong>&raquo; ...'), $table );
+			echo sprintf( TB_('Backing up table &laquo;<strong>%s</strong>&raquo; to SQL file...'), $table );
 			evo_flush();
 
 			if( $this->drop_table_first )

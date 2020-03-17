@@ -986,34 +986,6 @@ function display_system_check( $params )
 	}
 
 
-	// Magic quotes:
-	if( !strcasecmp( ini_get('magic_quotes_sybase'), 'on' ) )
-	{
-		$magic_quotes = T_('On').' (magic_quotes_sybase)';
-		$message = 'magic_quotes_sybase = Off';
-	}
-	elseif( get_magic_quotes_gpc() )
-	{
-		$magic_quotes = T_('On').' (magic_quotes_gpc)';
-		$message = 'magic_quotes_gpc = Off';
-	}
-	else
-	{
-		$magic_quotes = T_('Off');
-		$message = '';
-	}
-	init_system_check( 'PHP Magic Quotes', $magic_quotes );
-	if( !empty( $message ) )
-	{
-		disp_system_check( 'warning', T_('PHP is adding extra quotes to all inputs. This leads to unnecessary extra processing.')
-			.' '.sprintf( $change_ini, $message ) );
-	}
-	else
-	{
-		disp_system_check( 'ok' );
-	}
-
-
 	// Max upload size:
 	$upload_max_filesize = system_check_upload_max_filesize();
 	init_system_check( 'PHP upload_max_filesize', ini_get('upload_max_filesize') );

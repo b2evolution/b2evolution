@@ -708,6 +708,70 @@ class File extends DataObject
 
 
 	/**
+	 * Get the filename
+	 * 
+	 * @return string
+	 */
+	function get_file_link( $params = array() )
+	{
+		$params = array_merge( array(
+			'before'    => '',
+			'after'     => '',
+			'link_text' => 'filename',
+			'class'     => '',
+			'nofollow'  => false,
+		), $params );
+
+		switch( $params['link_text'] )
+		{
+			case 'filename':
+				$text = $this->dget( 'name' );
+				break;
+
+			case 'title':
+				$text = ( empty( $this->get( 'title' ) ) ? $this->dget('name') : $this->dget( 'title' ) );
+				break;
+
+			case 'icon':
+				$text = $this->get_icon();
+				break;
+
+			default:
+				$text = $this->dget( 'name' );
+		}
+
+		$r = '<a href="'.$this->get_url().'"';
+		if( !empty( $class ) ) $r .= ' class="'.$class.'"';
+		if( ! empty( $params['nofollow'] ) ) $r .= ' rel="nofollow"';
+		$r .= '>'.$text.'</a>';
+
+		return $r;
+	}
+
+
+	/**
+	 * Get the File's description
+	 * 
+	 * @return string
+	 */
+	function get_description( $params = array() )
+	{
+		$params = array_merge( array(
+				'before' => '',
+				'after'  => '',
+				'format' => 'htmlbody',
+			), $params );
+
+		$r = '';
+		$r .= $params['before'];
+		$r .= format_to_output( $this->get( 'desc' ), $params['format'] );
+		$r .= $params['after'];
+
+		return $r;
+	}
+
+
+	/**
 	 * Get file creator
 	 *
 	 * @return object User

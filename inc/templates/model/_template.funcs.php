@@ -62,7 +62,7 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	$r = '';
 
 	// New
-	preg_match_all( '/\[((?:(?:Cat|Coll|Form|Item|Link|Plugin|echo|set):)?([a-z0-9_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/\[((?:(?:Cat|Coll|Comment|File|Form|Item|Link|Plugin|Tag|echo|set|param):)?([a-z0-9_]+))\|?((?:.|\n|\r|\t)*?)\]/i', $template, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $i => $match )
 	{
 		// Output everything until new tag:
@@ -75,10 +75,13 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 		// Params specified for the tag:
 		$tag_param_strings = empty( $matches[3][$i][0] ) ? NULL : $matches[3][$i][0];
 
-		if( substr( $tag, 0, 4 ) == 'set:' )
-		{	// Set a param value in the $params[] array used for the whole template (will affect all future template tags)
+		if( substr( $tag, 0, 4 ) == 'set:' || substr( $tag, 0, 6 ) == 'param:' )
+		{	// Set new or default param value in the $params[] array used for the whole template (will affect all future template tags)
 
-			$param_name = substr( $tag, 4 );
+			// Override/Set new param OR Initialize default value?
+			$override_param = ( substr( $tag, 0, 4 ) == 'set:' );
+
+			$param_name = substr( $tag, $override_param ? 4 : 6 );
 			$param_val  = substr( $tag_param_strings, strpos( $tag_param_strings, '=' ) + 1 );
 			$param_strings = $param_name.'='.$param_val;
 			$param_strings = explode( '|', $param_strings );
@@ -107,54 +110,19 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 
 				$param_val  = substr( $param_string, strpos( $param_string, '=' ) + 1 );
 
-				// Set param:
-				// we MUST do this here and in & $params[] so that it sticks. This cannot be done in the callback or $this_tag_params[]
-				$params[ $param_name ] = $param_val;
+				if( $override_param || ! isset( $params[ $param_name ] ) )
+				{	// Set new param or default param:
+					// we MUST do this here and in & $params[] so that it sticks. This cannot be done in the callback or $this_tag_params[]
+					$params[ $param_name ] = $param_val;
+				}
 			}
 		}
 		else
 		{	// Process a normal template tag:
 
 			// Decode PARAMS like |name=value|name=value]
-			$this_tag_params = $params;
-			if( ! empty( $tag_param_strings ) )
-			{	
-				$tag_param_strings = explode( '|', $tag_param_strings );
-				
-				// Process each param individually:
-				foreach( $tag_param_strings as $tag_param_string )
-				{
-					if( empty( $tag_param_string ) || ctype_space( $tag_param_string) )
-					{
-						continue;
-					}
+			$this_tag_params = get_template_tag_params_from_string( $tag_param_strings, $params );
 
-					$tag_param_name = substr( $tag_param_string, 0, strpos( $tag_param_string, '=' ) );
-
-					if( strpos( $tag_param_name, '//' ) !== false )
-					{	// We found a comment that we should remove:
-						$tag_param_name = preg_replace( '~(.*)//.*$~im','$1', $tag_param_name );
-					}
-
-					// Trim off whitespace:
-					$tag_param_name = trim( $tag_param_name );
-
-					$tag_param_val  = substr( $tag_param_string, strpos( $tag_param_string, '=' ) + 1 );
-
-					if( preg_match('/\$([a-z_]+)\$/i', $tag_param_val, $tag_param_val_matches ) )
-					{	// We have a variable to replace: // TODO: allow multiple variable replace
-						$found_param_name = $tag_param_val_matches[1];
-						if( isset( $params[$found_param_name] ) )
-						{	// We have an original param of that name:
-							$tag_param_val = $params[$found_param_name];
-						}
-					}
-
-					// TODO: need to escape " and > from $tag_param_val, otherwise they will end up breaking something
-
-					$this_tag_params[$tag_param_name] = $tag_param_val;
-				}
-			}
 			if( is_array( $used_template_tags ) )
 			{
 				$used_template_tags[] = $tag; 
@@ -167,6 +135,62 @@ function render_template( $template, & $params, $objects = array(), & $used_temp
 	$r .= substr( $template, $current_pos );
 
 	return $r;
+}
+
+
+/**
+ * Get params of tempalte tag from provided string
+ *
+ * @param string Params in string format
+ * @param array Default params
+ * @return array Params in array format
+ */
+function get_template_tag_params_from_string( $tag_param_strings, $default_params = array() )
+{
+	$this_tag_params = $default_params;
+
+	if( empty( $tag_param_strings ) )
+	{	
+		return $this_tag_params;
+	}
+
+	$tag_param_strings = explode( '|', $tag_param_strings );
+
+	// Process each param individually:
+	foreach( $tag_param_strings as $tag_param_string )
+	{
+		if( empty( $tag_param_string ) || ctype_space( $tag_param_string) )
+		{
+			continue;
+		}
+
+		$tag_param_name = substr( $tag_param_string, 0, strpos( $tag_param_string, '=' ) );
+
+		if( strpos( $tag_param_name, '//' ) !== false )
+		{	// We found a comment that we should remove:
+			$tag_param_name = preg_replace( '~(.*)//.*$~im','$1', $tag_param_name );
+		}
+
+		// Trim off whitespace:
+		$tag_param_name = trim( $tag_param_name );
+
+		$tag_param_val  = substr( $tag_param_string, strpos( $tag_param_string, '=' ) + 1 );
+
+		if( preg_match('/\$([a-z_]+)\$/i', $tag_param_val, $tag_param_val_matches ) )
+		{	// We have a variable to replace: // TODO: allow multiple variable replace
+			$found_param_name = $tag_param_val_matches[1];
+			if( isset( $default_params[$found_param_name] ) )
+			{	// We have an original param of that name:
+				$tag_param_val = $default_params[$found_param_name];
+			}
+		}
+
+		// TODO: need to escape " and > from $tag_param_val, otherwise they will end up breaking something
+
+		$this_tag_params[$tag_param_name] = $tag_param_val;
+	}
+
+	return $this_tag_params;
 }
 
 /**
@@ -187,7 +211,7 @@ function render_template_callback( $var, $params, $objects = array() )
 	{
 		case 'Cat':
 			global $Chapter;
-			$rendered_Chapter = ( !isset($objects['Chapter']) ? $Chapter : $objects['Chapter'] );
+			$rendered_Chapter = ( !isset( $objects['Chapter'] ) ? $Chapter : $objects['Chapter'] );
 			if( empty( $rendered_Chapter ) || ! ( $rendered_Chapter instanceof Chapter ) )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Chapter/Category is not defined at this moment.</span>';
@@ -196,29 +220,44 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Coll':
 			global $Blog;
-			$rendered_Blog = ( !isset($objects['Collection']) ? $Blog : $objects['Collection'] );
+			$rendered_Blog = ( !isset( $objects['Collection'] ) ? $Blog : $objects['Collection'] );
 			if( empty( $rendered_Blog ) || ! ( $rendered_Blog instanceof Blog ) )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Collection/Blog is not defined at this moment.</span>';
 			}
 			break;
 
+		case 'Comment':
+			global $Comment;
+			$rendered_Comment = ( !isset( $objects['Comment'] ) ? $Comment : $objects['Comment'] );
+			if( empty( $rendered_Comment ) || ! ( $rendered_Comment instanceof Comment ) )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object Comment is not defined at this moment.</span>';
+			}
+			break;
+
+		case 'File':
+			global $File;
+			$rendered_File = ( !isset( $objects['File'] ) ? $File : $objects['File'] );
+			if( empty( $rendered_File ) || ! ( $rendered_File instanceof File ) )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object File is not defined at this moment.</span>';
+			}
+			break;
+
 		case 'Form':
-			$rendered_Form = ( !isset($objects['Form']) ? $Form : $objects['Form'] );
+			global $Form;
+			$rendered_Form = ( !isset( $objects['Form'] ) ? $Form : $objects['Form'] );
 			if( empty( $rendered_Form ) || ! ( $rendered_Form instanceof Form ) )
 			{
 				return '<span class="evo_param_error">['.$var.']: Object Form is not defined at this moment.</span>';
 			}
 			break;
 
-		case 'Link':
-			// do nothing
-			break;
-
 		case 'Item':
 			global $Item;
 
-			$rendered_Item = ( !isset($objects['Item']) ? $Item : $objects['Item'] );
+			$rendered_Item = ( !isset( $objects['Item'] ) ? $Item : $objects['Item'] );
 
 			if( empty( $rendered_Item ))
 			{
@@ -228,6 +267,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			{
 				return '<span class="evo_param_error">Item object has class <code>'.get_class($rendered_Item).'</code> instead of expected <code>Item</code>.</span>';
 			}
+			break;
+
+		case 'Link':
+			// do nothing
 			break;
 
 		case 'Plugin':
@@ -241,6 +284,15 @@ function render_template_callback( $var, $params, $objects = array() )
 			}
 
 			$var = $scope;
+			break;
+
+		case 'Tag':
+			$tag = ( !isset( $objects['tag'] ) ? $tag : $objects['tag'] );
+
+			if( empty( $tag ))
+			{
+				return '<span class="evo_param_error">['.$var.']: Tag is not defined at this moment.</span>';
+			}
 			break;
 
 		case 'echo':
@@ -300,6 +352,58 @@ function render_template_callback( $var, $params, $objects = array() )
 		// Collection:
 		case 'Coll:shortname':
 			echo $rendered_Blog->dget( 'shortname' );
+			break;
+
+		// Comment:
+		case 'Comment:author':
+			echo $rendered_Comment->get_author( array_merge( array(
+					'link_text' => 'auto',		// select login or nice name automatically
+				), $params ) );
+			break;
+
+		case 'Comment:creation_time':
+			echo mysql2date( $params['date_format'], $rendered_Comment->date );
+			break;
+
+		case 'Comment:content':
+			$temp_params =  array_merge( array(
+					'format'           => 'htmlbody',
+					'ban_urls'         => false,
+					'show_attachments' => false,
+				), $params );
+			echo $rendered_Comment->content( $temp_params['format'], $temp_params['ban_urls'], $temp_params['show_attachments'], $temp_params );
+			break;
+
+		case 'Comment:permalink':
+			$rendered_Comment->permanent_link( array_merge( array(
+					'text'   => '#item#',
+					'title'  => '',  // No tooltip by default
+				), $params ) );
+			break;
+
+		// File:
+		case 'File:description':
+			echo $rendered_File->get_description( $params );
+			break;
+
+		case 'File:file_size':
+			echo $rendered_File->get_size_formatted();
+			break;
+
+		case 'File:icon':
+			echo $rendered_File->get_icon();
+			break;
+
+		case 'File:type':
+			echo $rendered_File->get_type();
+			break;
+
+		case 'File:url':
+			echo $rendered_File->get_url();
+			break;
+
+		case 'File:file_link':
+			echo $rendered_File->get_file_link( $params );	
 			break;
 
 		// Form:
@@ -519,6 +623,135 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			$rendered_Form->password_input( $temp_params['name'], $temp_params['value'], $temp_params['size'], $temp_params['label'], $temp_params );
 				
+			break;
+
+		case 'Form:search_author':
+			$search_author = param( 'search_author', 'string', NULL );
+			$temp_params = array(  // Here, we make sure not to modify $params
+					'name'         => 'search_author',
+					'value'        => $search_author,
+					'size'         => '',
+					'label'        => '',
+					'note'         => '',
+					'placeholder'  => T_('Any author'),
+					'maxlength'    => '',
+					'class'        => 'input_text'.is_logged_in() ? '' : ' autocomplete_login',
+					'required'     => false,
+					'input_suffix' => '',
+					'style'        => '',
+					'hide_label'   => true,
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+				
+			$rendered_Form->text_input( $temp_params['name'], $temp_params['value'], $temp_params['size'], $temp_params['label'], $temp_params['note'], $temp_params );
+			break;
+
+		case 'Form:search_content_age':
+			$search_content_age = param( 'search_content_age', 'string' );
+			$content_age_options = array(
+					''     => T_('Any time'),
+					'hour' => T_('Last hour'),
+					'day'  => T_('Less than a day'),
+					'week' => T_('Less than a week'),
+					'30d'  => T_('Last 30 days'),
+					'90d'  => T_('Last 90 days'),
+					'year' => T_('Last year'),
+				);
+
+			$temp_params = array(
+					'name'       => 'search_content_age',
+					'value'      => $search_content_age,
+					'label'      => T_('Content age'),
+					'class'      => '',
+					'note'       => '',
+					'class'      => '',
+					'required'   => false,
+					'hide_label' => true,
+					'style'      => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+			
+			$rendered_Form->select_input_array( $temp_params['name'], $temp_params['value'], $content_age_options, $temp_params['label'], $temp_params['note'], $temp_params );
+			break;
+
+		case 'Form:search_content_type':
+			global $Blog;
+			
+			if( ! $Blog )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object Blog is not defined at this moment.</span>';
+			}
+
+			$search_type = param( 'search_type', 'string', NULL );
+			$content_type_options = array();
+			if( $Blog->get_setting( 'search_include_posts' ) )
+			{
+				$content_type_options['item'] = T_('Posts');
+			}
+			if( $Blog->get_setting( 'search_include_cmnts' ) )
+			{
+				$content_type_options['comment'] = T_('Comments');
+			}
+			if( $Blog->get_setting( 'search_include_files' ) )
+			{
+				$content_type_options['file'] = T_('Files');
+			}
+			if( $Blog->get_setting( 'search_include_cats' ) )
+			{
+				$content_type_options['category'] = T_('Categories');
+			}
+			if( $Blog->get_setting( 'search_include_tags' ) )
+			{
+				$content_type_options['tag'] = T_('Tags');
+			}
+
+			if( count( $content_type_options ) > 1 )
+			{
+				$content_type_options = array( '' => T_('All') ) + $content_type_options;
+				$temp_params = array(
+						'name'       => 'search_type',
+						'value'      => $search_type,
+						'label'      => T_('Content type'),
+						'class'      => '',
+						'note'       => '',
+						'class'      => '',
+						'required'   => false,
+						'hide_label' => true,
+						'style'      => '',
+					);
+				// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+				$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+				
+				$rendered_Form->select_input_array( $temp_params['name'], $temp_params['value'], $content_type_options, $temp_params['label'], $temp_params['note'], $temp_params );
+			}
+			else
+			{	// Do not display anything
+				return;
+			}
+			break;
+
+		case 'Form:search_input':
+			$search_term = param('s', 'string', '');
+			$temp_params = array(  // Here, we make sure not to modify $params
+					'name'         => 's',
+					'value'        => $search_term,
+					'size'         => 25,
+					'label'        => '',
+					'note'         => '',
+					'placeholder'  => '',
+					'maxlength'    => '',
+					'class'        => 'input_text',
+					'required'     => false,
+					'input_suffix' => '',
+					'style'        => '',
+					'hide_label'   => true,
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+				
+			$rendered_Form->text_input( $temp_params['name'], $temp_params['value'], $temp_params['size'], $temp_params['label'], $temp_params['note'], $temp_params );
 			break;
 
 		case 'Form:submit':
@@ -828,6 +1061,35 @@ function render_template_callback( $var, $params, $objects = array() )
 		case 'Plugin':
 			$rendered_Plugin->SkinTag( $params );
 			break;
+
+		// Tag
+		case 'Tag:name':
+			echo $tag;
+			break;
+
+		case 'Tag:item_count':
+			break;
+
+		case 'Tag:permalink':
+			global $Blog;
+			$rendered_Blog = ( !isset( $objects['Collection'] ) ? $Blog : $objects['Collection'] );
+			if( empty( $rendered_Blog ) || ! ( $rendered_Blog instanceof Blog ) )
+			{
+				return '<span class="evo_param_error">['.$var.']: Object Collection/Blog is not defined at this moment.</span>';
+			}
+
+			$temp_params = array(
+						'class' => '',
+						'style' => '',
+						'rel'   => NULL,
+						'text'  => NULL,
+						'title' => '',
+				);
+			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
+			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
+
+			echo $rendered_Blog->get_tag_link( $tag, $temp_params['text'], $temp_params );
+			break;
 		
 		// Others
 		default:
@@ -928,6 +1190,8 @@ function get_template_contexts()
 	return array(
 		'custom1', 'custom2', 'custom3',
 		'content_list_master', 'content_list_item', 'content_list_category',
-		'content_block', 'item_details', 'item_content', 'registration_master', 'registration' );
+		'content_block', 'item_details', 'item_content',
+		'registration_master', 'registration',
+		'search_form', 'search_result' );
 }
 ?>

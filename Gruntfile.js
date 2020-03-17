@@ -130,11 +130,6 @@ module.exports = function(grunt) {
 				src: ['rsc/css/basic_styles.css', 'rsc/css/basic.css', 'rsc/css/blog_base.css', 'rsc/css/item_base.css'],
 				dest: 'rsc/build/b2evo_base.bundle.css',
 			},
-			skin_evopress: {
-				nonull: true, // Display missing files
-				src: ['skins/evopress/style.css', 'skins/evopress/item.css'],
-				dest: 'skins/evopress/evopress.bundle.css',
-			},
 			/*
 			 * JS:
 			 */
@@ -188,10 +183,6 @@ module.exports = function(grunt) {
 					'skins/bootstrap_site_tabs_skin/style.min.css':     'skins/bootstrap_site_tabs_skin/style.css',
 					'skins_adm/bootstrap/rsc/css/style.min.css':        'skins_adm/bootstrap/rsc/css/style.css',
 				}
-			},
-			skin_evopress: {
-				src: 'skins/evopress/evopress.bundle.css',
-				dest: 'skins/evopress/evopress.bmin.css',
 			},
 			colorbox: {
 				files: {

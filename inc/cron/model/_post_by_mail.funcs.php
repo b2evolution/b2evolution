@@ -328,8 +328,8 @@ function pbm_process_messages( & $mbox, $limit, $cron = false )
 		}
 
 		// TODO: dh> should the password really get trimmed here?!
-		$user_pass = isset($auth[1]) ? trim( remove_magic_quotes($auth[1]) ) : NULL;
-		$user_login = trim( utf8_strtolower(remove_magic_quotes($auth[0])) );
+		$user_pass = isset($auth[1]) ? trim( $auth[1] ) : NULL;
+		$user_login = trim( utf8_strtolower( $auth[0] ) );
 
 		if( empty($user_login) || empty($user_pass) )
 		{

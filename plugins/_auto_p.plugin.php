@@ -22,7 +22,7 @@ class auto_p_plugin extends Plugin
 	var $code = 'b2WPAutP';
 	var $name = 'Auto P';
 	var $priority = 80;
-	var $version = '7.1.2';
+	var $version = '7.1.3';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
@@ -99,7 +99,17 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 	{
 		$content = & $params['data'];
 
-		$content = $this->render_autop( $content );
+		// Render outside multiline short tags:
+		if( preg_match( '/\[[a-z]+:[^\]`]+\]/i', $content ) )
+		{	// Call replace_content() on everything outside multiline short tags:
+			$content = callback_on_non_matching_blocks( $content,
+				'~\[[a-z]+:[^\]`]+\]~is',
+				array( $this, 'render_autop' ) );
+		}
+		else
+		{	// No short tags, replace on the whole content:
+			$content = $this->render_autop( $content );
+		}
 
 		return true;
 	}
@@ -530,9 +540,9 @@ Optionally, it will also mark single line breaks with HTML &lt;BR&gt; tags.');
 		$NL_end = '';
 		if( $ignore_NL )
 		{
-			while( isset( $block{0} ) && $block{0} == "\n" )
+			while( isset( $block[0] ) && $block[0] == "\n" )
 			{
-				$NL_start .= $block{0};
+				$NL_start .= $block[0];
 				$block = substr($block, 1);
 			}
 			while( substr($block, -1) == "\n" )

@@ -20,7 +20,7 @@ global $more;
 // Default params:
 $params = array_merge( array(
 		'content_mode'             => 'auto', // Can be 'excerpt', 'normal' or 'full'. 'auto' will auto select depending on backoffice SEO settings for $disp-detail
-		'intro_mode'               => 'normal', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there
+		'intro_mode'               => 'normal', // Same as above. This will typically be forced to "normal" when displaying an intro section so that intro posts always display as normal there. Value '$content_mode$' to use exact value as above, may be used for disp=mustread.
 		'force_more'               => false, // This will be set to true id 'content_mode' resolves to 'full'.
 
 		'content_display_full'     => true, // Do we want to display all post content? false to display only images/attachments
@@ -115,11 +115,12 @@ $params = array_merge( array(
 
 // Determine content mode to use..
 if( $Item->is_intro() )
-{
-	$content_mode = $params['intro_mode'];
+{	// Content mode for intro items:
+	// ($content_mode$ may be used for disp=mustread)
+	$content_mode = ( $params['intro_mode'] == '$content_mode$' ? $params['content_mode'] : $params['intro_mode'] );
 }
 else
-{
+{	// Content mode for normal(not intro) items:
 	$content_mode = $params['content_mode'];
 }
 $content_mode = resolve_auto_content_mode( $content_mode );

@@ -2852,7 +2852,7 @@ function display_login_form( $params )
 		// Passthrough REQUEST data (when login is required after having POSTed something)
 		// (Exclusion of 'login_action', 'login', and 'action' has been removed. This should get handled via detection in Form (included_input_field_names),
 		//  and "action" is protected via crumbs)
-		$Form->hiddens_by_key( remove_magic_quotes( $_REQUEST ), array( 'pwd_hashed', 'submit' ) );
+		$Form->hiddens_by_key( $_REQUEST, array( 'pwd_hashed', 'submit' ) );
 	}
 
 	$Form->end_form();
@@ -3105,7 +3105,6 @@ function display_activateinfo( $params )
 
 		// set email text input content only if this is not a forced request. This way the user may have bigger chance to write a correct email address.
 		$user_email = ( $force_request ? '' : $current_User->email );
-		// fp> note: 45 is the max length for evopress skin.
 		$Form->email_input( $dummy_fields[ 'email' ], $user_email, 42, T_('Your email'), array( 'maxlength' => 255, 'class' => 'input_text', 'required' => true, 'input_required' => 'required' ) );
 		$Form->end_fieldset();
 
@@ -3697,27 +3696,6 @@ function init_autocomplete_usernames_js( $relative_to = 'rsc_url' )
 {
 	global $Collection, $Blog;
 
-	if( is_admin_page() )
-	{ // Check to enable it in back-office
-		if( empty( $Blog ) || ! $Blog->get_setting( 'autocomplete_usernames' ) )
-		{ // Blog setting doesn't allow to autocomplete usernames
-			return;
-		}
-	}
-	else
-	{ // Check to enable it in front-office
-		global $Item, $Skin, $disp;
-		if( ! empty( $Skin ) && ! $Skin->get_setting( 'autocomplete_usernames' ) )
-		{ // Skin disables to autocomplete usernames
-			return;
-		}
-		if( $disp != 'search' && $disp != 'edit' && $disp != 'edit_comment' && ( empty( $Item ) || ! $Item->can_comment( NULL ) ) )
-		{ // It is not a search form and not an edit post/comment form and No form to comment of this post
-			return;
-		}
-	}
-
-	require_js_defer( '#jquery#', $relative_to );
 	if( ! empty( $Blog ) )
 	{	// Set global blog ID for textcomplete(Used to sort users by collection members and assignees):
 		add_js_headline( 'var blog = '.$Blog->ID );

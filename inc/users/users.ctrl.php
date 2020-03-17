@@ -159,9 +159,6 @@ if( !$Messages->has_errors() )
 			 * Delete user
 			 */
 
-			// Check that this action request is not a CSRF hacked request:
-			$Session->assert_received_crumb( 'user' );
-
 			if( !isset($edited_User) )
 				debug_die( 'no User set' );
 
@@ -184,6 +181,10 @@ if( !$Messages->has_errors() )
 			$fullname = $edited_User->dget( 'fullname' );
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
+
+				// Check that this action request is not a CSRF hacked request:
+				$Session->assert_received_crumb( 'user' );
+
 				if ( ! empty( $fullname ) )
 				{
 					$msg_format = $is_spammer ? T_('Spammer &laquo;%s&raquo; [%s] deleted.') : T_('User &laquo;%s&raquo; [%s] deleted.');
@@ -751,7 +752,7 @@ if( !$Messages->has_errors() )
 			$Messages->add( TB_('Default filters have been updated for users list.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=users', 303 ); // Will EXIT
+			header_redirect( $admin_url.'?ctrl=users&filter=new&users_filter_preset=advanced', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
 	}

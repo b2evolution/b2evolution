@@ -809,7 +809,7 @@ require_css( $AdminUI->get_template( 'blog_base.css' ) ); // Default styles for 
 // Colorbox (a lightweight Lightbox alternative) allows to zoom on images and do slideshows with groups of images:
 require_js_helper( 'colorbox' );
 
-if( in_array( $action, array( 'edit', 'elevate', 'update_publish', 'update', 'update_edit', 'switch_view' ) ) )
+if( in_array( $action, array( 'edit', 'elevate', 'update_publish', 'update', 'update_edit', 'switch_view' ) ) || $tab3 == 'meta' )
 { // Page with comment edit form
 	// Initialize js to autocomplete usernames in comment form
 	init_autocomplete_usernames_js();

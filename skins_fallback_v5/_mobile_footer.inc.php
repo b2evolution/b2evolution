@@ -8,7 +8,6 @@
  * This is meant to be included in a page template.
  *
  * @package evoskins
- * @subpackage evopress
  */
 if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.' );
 

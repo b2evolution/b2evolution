@@ -684,6 +684,10 @@ class CommentList2 extends DataObjectList2
 					$statuses = array();
 					foreach( $status_IDs as $status_ID )
 					{
+						if( ! isset( $comment_statuses[$status_ID] ) )
+						{	// User has no permission:
+							continue;
+						}
 						$status_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_statuses='.$status_ID ) ) : '';
 						$statuses[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 							array( $params['visibility_text'], $comment_statuses[$status_ID], $status_clear_icon, $filter_classes[ $filter_class_i ] ),
@@ -1065,7 +1069,7 @@ class CommentList2 extends DataObjectList2
 		{ // Check if statuses filter contains the 'trash' value
 			return is_array( $this->filters['statuses'] ) && in_array( 'trash', $this->filters['statuses'] );
 		}
-		if( count( $this->filters['statuses'] ) == 1 )
+		if( ! empty( $this->filters['statuses'] ) && count( $this->filters['statuses'] ) == 1 )
 		{ // Check if statuses filter contains only the 'trash' value
 			return $this->filters['statuses'][0] == 'trash';
 		}

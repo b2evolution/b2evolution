@@ -2555,7 +2555,7 @@ class Comment extends DataObject
 						$tmp_params['class'] .= ' last-child';
 					}
 				}
-				if( $next_status_in_row[0] == $first_status_in_row[0] )
+				if( isset( $next_status_in_row[0] ) && isset( $first_status_in_row[0] ) && $next_status_in_row[0] == $first_status_in_row[0] )
 				{
 					$tmp_params['class'] .= ' btn_next_status';
 				}
@@ -2565,7 +2565,10 @@ class Comment extends DataObject
 				}
 				$r .= $this->next_status_link( $tmp_params, true, $status[0] );
 			}
-			$prev_status = $next_status_in_row[0];
+			if( isset( $next_status_in_row[0] ) )
+			{
+			    $prev_status = $next_status_in_row[0];
+			}
 		}
 
 		$prev_status = '';
@@ -2595,7 +2598,11 @@ class Comment extends DataObject
 				}
 				$r .= $this->next_status_link( $tmp_params, false, $status[0] );
 			}
-			$prev_status = $next_status_in_row[0];
+			if( isset( $next_status_in_row[0] ) )
+			{
+			    $prev_status = $next_status_in_row[0];
+			}
+			
 		}
 
 		return $r;
@@ -2957,7 +2964,8 @@ class Comment extends DataObject
 				{	// This method is used to attach several files by quick uploader JS button:
 					$TemporaryIDCache = & get_TemporaryIDCache();
 					if( ( $TemporaryID = & $TemporaryIDCache->get_by_ID( $this->temp_link_owner_ID, false, false ) ) &&
-					    $TemporaryID->type == 'comment' )
+					    ( ( $this->get( 'type' ) != 'meta' && $TemporaryID->type == 'comment' ) ||
+					      ( $this->get( 'type' ) == 'meta' && $TemporaryID->type == 'metacomment' ) ) )
 					{	// Get all links of the temporary object which is used for new creating comment:
 						$LinkOwner = new LinkComment( new Comment(), $TemporaryID->ID );
 						$attachments = & $LinkOwner->get_Links();
@@ -5546,7 +5554,8 @@ class Comment extends DataObject
 			return;
 		}
 
-		if( $TemporaryID->type != 'comment' )
+		if( ( $this->get( 'type' ) != 'meta' && $TemporaryID->type != 'comment' ) ||
+		    ( $this->get( 'type' ) == 'meta' && $TemporaryID->type != 'metacomment' ) )
 		{	// Wrong temporary object:
 			return;
 		}

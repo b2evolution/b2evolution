@@ -566,7 +566,7 @@ param( 'import_mode', 'string', 'normal' );
 				$blog_id = ($cat == '#DEFAULTBLOG#') ? $default_blog : $match[1];
 				// remember the name to create it when posts get inserted
 				// fp>dh: please use param() instead of $_POST[] (everywhere)
-				$catsmapped[ $categories[$i_cat] ] = array( 'blogid', $blog_id, remove_magic_quotes( $_POST['catmap_name'][$i_cat]) );
+				$catsmapped[ $categories[$i_cat] ] = array( 'blogid', $blog_id, $_POST['catmap_name'][$i_cat] );
 			}
 			else
 			{
@@ -639,8 +639,8 @@ param( 'import_mode', 'string', 'normal' );
 		{
 			if( !empty($replace) )
 			{
-				$urlsearch[] = remove_magic_quotes($_POST['url_search'][$i]);
-				$urlreplace[] = remove_magic_quotes( $replace );
+				$urlsearch[] = $_POST['url_search'][$i];
+				$urlreplace[] = $replace;
 			}
 			$i++;
 		}
@@ -666,7 +666,7 @@ param( 'import_mode', 'string', 'normal' );
 			}
 			elseif( $select == '#CREATENEW#' )
 			{
-				$usersmapped[ $mtauthor ] = array( 'createnew', remove_magic_quotes( $_POST['user_name'][$i_user] ) );
+				$usersmapped[ $mtauthor ] = array( 'createnew', $_POST['user_name'][$i_user] );
 			}
 			elseif( preg_match( '#\d+#', $select, $match ) )
 			{
@@ -1659,7 +1659,7 @@ function ripline( $prefix, &$haystack )
 
 function tidypostdata( $string )
 {
-	return str_replace( array('&quot;', '&#039;', '&lt;', '&gt;'), array('"', "'", '<', '>'), remove_magic_quotes( $string ) );
+	return str_replace( array('&quot;', '&#039;', '&lt;', '&gt;'), array('"', "'", '<', '>'), $string );
 }
 
 ?>

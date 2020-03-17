@@ -475,6 +475,37 @@ class Session
 		 || $this->_data[$param][1] != $value
 		 || $expire != 0 )
 		{	// There is something to update:
+			if( isset( $this->_data[ $param ] ) )
+			{	// Log updated session var:
+				if( isset( $this->_data[ $param ][1] ) )
+				{
+					if( is_scalar( $this->_data[ $param ][1] ) )
+					{	// Display value for scalar var:
+						$session_old_value = '<code class="debug_code_inline">'.$this->_data[ $param ][1].'</code>';
+					}
+					elseif( is_array( $this->_data[ $param ][1] ) )
+					{	// Display only type for array var:
+						$session_old_value = 'Array( '.implode( ', ', array_keys( $this->_data[ $param ][1] ) ).' )';
+					}
+					elseif( is_object( $this->_data[ $param ][1] ) )
+					{	// Display class name for object var:
+						$session_old_value = 'Object: '.get_class( $this->_data[ $param ][1] );
+					}
+					else
+					{	// Display var type for others:
+						$session_old_value = gettype( $this->_data[ $param ][1] );
+					}
+				}
+				else
+				{	// No old value:
+					$session_old_value = '';
+				}
+				$action_type = 'updated (old value: '.$session_old_value.')';
+			}
+			else
+			{	// Log created session var:
+				$action_type = 'created';
+			}
 			$this->_data[$param] = array( ( $expire ? ( $localtimenow + $expire ) : NULL ), $value );
 
 			if( $param == 'Messages' )
@@ -482,7 +513,7 @@ class Session
 				$this->set( 'core.no_CachePageContent', 1 );
 			}
 
-			$Debuglog->add( 'Session: Session data['.$param.'] updated. Expire in: '.( $expire ? $expire.'s' : '-' ).'.', 'request' );
+			$Debuglog->add( 'Session: Session data['.$param.'] '.$action_type.'. Expire in: '.( $expire ? $expire.'s' : 'never' ).'.', 'request' );
 
 			$this->session_needs_save( true );
 		}
@@ -592,7 +623,7 @@ class Session
 	 */
 	function create_crumb( $crumb_name )
 	{
-		global $servertimenow, $crumb_expires;
+		global $servertimenow, $crumb_expires, $Debuglog;
 
 		// Retrieve latest saved crumb:
 		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
@@ -604,6 +635,8 @@ class Session
 			$crumb_value = '';
 			if( $servertimenow - $crumb_time < ( $crumb_expires - 200 ) ) // Leave some margin here to make sure we do no overwrite a newer 1-2 hr crumb
 			{	// Not too old either, save as previous crumb:
+				$Debuglog->add( 'Session: Store previous value <code class="debug_code_inline">'.$crumb_value.'-'.$servertimenow.'</code> for crumb ['.$crumb_name.'].', 'request' );
+
 				$this->set( 'crumb_prev_'.$crumb_name, $crumb_recalled );
 			}
 		}
@@ -611,6 +644,8 @@ class Session
 		if( empty( $crumb_value ) )
 		{	// We need to generate a new crumb:
 			$crumb_value = generate_random_key( 32 );
+
+			$Debuglog->add( 'Session: Add new crumb ['.$crumb_name.'] = <code class="debug_code_inline">'.$crumb_value.'-'.$servertimenow.'</code> (Store the latest value).', 'request' );
 
 			// Save crumb into session so we can later compare it to what get got back from the user request:
 			$this->set( 'crumb_latest_'.$crumb_name, $crumb_value.'-'.$servertimenow );
@@ -637,41 +672,55 @@ class Session
 		$params = array_merge( array(
 				'msg_format'        => 'html',
 				'msg_no_crumb'      => 'Missing crumb ['.$crumb_name.'] -- It looks like this request is not legit.',
-				'msg_expired_crumb' => sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor( $crumb_expires / 60 ) ),
-				'error_code'        => '400 Bad Request',
+				'msg_incorrect_crumb' => T_('Incorrect crumb received!'),
+				'msg_expired_crumb'   => T_('Expired crumb received!'),
+				'error_code'        => '400 Bad Crumb Request',
 			), $params );
 
 		if( ! $crumb_received = param( 'crumb_'.$crumb_name, 'string', NULL ) )
 		{ // We did not receive a crumb!
 			if( $die )
 			{
+				// Add message to AJAX Log:
+				ajax_log_add( $params['msg_no_crumb'].' ['.$crumb_name.']', 'error' );
+				// Die with error message:
 				bad_request_die( $params['msg_no_crumb'], $params['error_code'], $params['msg_format'] );
 			}
 			return false;
 		}
 
-		// Retrieve latest saved crumb:
-		$crumb_recalled = $this->get( 'crumb_latest_'.$crumb_name, '-0' );
-		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
-		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= $crumb_expires )
-		{	// Crumb is valid
-			// echo '<p>-<p>-<p>A';
-			return true;
+		// Retrieve latest and previous crumbs:
+		list( $crumb_latest, $latest_crumb_time ) = explode( '-', $this->get( 'crumb_latest_'.$crumb_name, '-0' ) );
+		list( $crumb_previous, $prev_crumb_time ) = explode( '-', $this->get( 'crumb_prev_'.$crumb_name, '-0' ) );
+
+		// Validate the latest and previous crumbs:
+		$crumb_latest_is_valid = ( $crumb_received == $crumb_latest );
+		$crumb_previous_is_valid = ( $crumb_received == $crumb_previous );
+
+		if( $crumb_latest_is_valid || $crumb_previous_is_valid )
+		{	// At least one crumb is valid, check for expired:
+			if( $crumb_latest_is_valid && $servertimenow - $latest_crumb_time <= $crumb_expires )
+			{	// The latest crumb is valid and not expired:
+				return true;
+			}
+			if( $crumb_previous_is_valid && $servertimenow - $prev_crumb_time <= $crumb_expires )
+			{	// The previous crumb is valid and not expired:
+				return true;
+			}
+			// The latest and previous crumbs are expired:
+			$crumb_info_message = $params['msg_expired_crumb'];
+			$crumb_latest_status = ( $crumb_latest_is_valid ? 'EXPIRED' : 'Invalid' );
+			$crumb_previous_status = ( $crumb_previous_is_valid ? 'EXPIRED' : 'Invalid' );
 		}
-
-		$crumb_valid_latest = $crumb_value;
-
-		// Retrieve previous saved crumb:
-		$crumb_recalled = $this->get( 'crumb_prev_'.$crumb_name, '-0' );
-		list( $crumb_value, $crumb_time ) = explode( '-', $crumb_recalled );
-		if( $crumb_received == $crumb_value && $servertimenow - $crumb_time <= $crumb_expires )
-		{	// Crumb is valid
-			// echo '<p>-<p>-<p>B';
-			return true;
+		else
+		{	// The latest and previous crumbs are invalid:
+			$crumb_info_message = $params['msg_incorrect_crumb'];
+			$crumb_latest_status = 'Invalid';
+			$crumb_previous_status = 'Invalid';
 		}
 
 		if( ! $die )
-		{
+		{	// Return false result when we don't need die action on error:
 			return false;
 		}
 
@@ -684,9 +733,30 @@ class Session
 			header_http_response( $params['error_code'] );
 		}
 
+		$crumb_info_full_message = $crumb_info_message.' '.sprintf( T_('Have you waited more than %d minutes before submitting your request?'), floor( $crumb_expires / 60 ) );
+
+		// Info for debug log:
+		$received_crumb_info = 'Received crumb: '.$crumb_received;
+		$latest_crumb_info = 'Latest saved crumb: '.( empty( $crumb_latest ) && empty( $latest_crumb_time )
+			? 'Not saved yet' // The latest crumb was not saved in Sessions yet.
+			: $crumb_latest.' (Created at: '.date( 'Y-m-d H:i:s', $latest_crumb_time ).' - '.$crumb_latest_status.')' );
+		$previous_crumb_info = 'Previous saved crumb: '.( empty( $crumb_previous ) && empty( $prev_crumb_time )
+			? 'Not saved yet' // Previous crumb was not saved in Sessions yet.
+			: $crumb_previous.' (Created at: '.date( 'Y-m-d H:i:s', $prev_crumb_time ).' - '.$crumb_previous_status.')' );
+		$session_info = 'Session ID: '.$this->ID;
+
+		// Add messages to AJAX Log:
+		ajax_log_add( $crumb_info_full_message.' (Config var: <code class="debug_code_inline">$crumb_expires</code> = '.$crumb_expires.' seconds)', 'error' );
+		ajax_log_add( $received_crumb_info, 'error' );
+		ajax_log_add( $latest_crumb_info, 'error' );
+		ajax_log_add( $previous_crumb_info, 'error' );
+		ajax_log_add( $session_info, 'error' );
+
 		if( $params['msg_format'] == 'text' )
 		{	// Display error message in TEXT format:
-			echo $params['msg_expired_crumb'];
+			echo $crumb_info_full_message;
+			// Display AJAX Log if it was initialized:
+			ajax_log_display();
 			die();
 		}
 		// else display error message in HTML format:
@@ -700,18 +770,19 @@ class Session
 		// echo '</head>';
 
 		echo '<div style="background-color: #fdd; padding: 1ex; margin-bottom: 1ex;">';
-		echo '<h3 style="color:#f00;">'.T_('Incorrect crumb received!').' ['.$crumb_name.']</h3>';
+		echo '<h3 style="color:#f00;">'.$crumb_info_message.' ['.$crumb_name.']</h3>';
 		echo '<p>'.T_('Your request was stopped for security reasons.').'</p>';
-		echo '<p>'.$params['msg_expired_crumb'].'</p>';
+		echo '<p>'.$crumb_info_full_message.'</p>';
 		echo '<p>'.T_('Please go back to the previous page and refresh it before submitting the form again.').'</p>';
 		echo '</div>';
 
 		if( $debug > 0 )
-		{
+		{	// Display additional info when debug is enabled:
 			echo '<div>';
-			echo '<p>Received crumb:'.$crumb_received.'</p>';
-			echo '<p>Latest saved crumb:'.$crumb_valid_latest.'</p>';
-			echo '<p>Previous saved crumb:'.$crumb_value.'</p>';
+			echo '<p>'.$received_crumb_info.'</p>';
+			echo '<p>'.$latest_crumb_info.'</p>';
+			echo '<p>'.$previous_crumb_info.'</p>';
+			echo '<p>'.$session_info.'</p>';
 			echo '</div>';
 		}
 
@@ -720,10 +791,13 @@ class Session
 		$Form = new Form( '', 'evo_session_crumb_resend', $_SERVER['REQUEST_METHOD'] );
 		$Form->begin_form( 'inline' );
 		$Form->add_crumb( $crumb_name );
-		$Form->hiddens_by_key( remove_magic_quotes( $_REQUEST ) );
+		$Form->hiddens_by_key( $_REQUEST );
 		$Form->button( array( 'submit', '', T_('Resubmit now!'), 'ActionButton' ) );
 		$Form->end_form();
 		echo '</div>';
+
+		// Display AJAX Log if it was initialized:
+		ajax_log_display();
 
 		die();
 	}

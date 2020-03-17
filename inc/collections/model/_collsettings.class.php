@@ -307,6 +307,11 @@ class CollectionSettings extends AbstractSettings
 			'search_score_cat_name'            => 3, // weight multiplier for keywords found in category name
 			'search_score_cat_desc'            => 1, // weight multiplier for keywords found in category description
 			'search_score_tag_name'            => 3, // weight multiplier for keywords found in tag name
+			'search_result_template_item'      => 'search_result_item',
+			'search_result_template_comment'   => 'search_result_comment',
+			'search_result_template_file'      => 'search_result_file',
+			'search_result_template_category'  => 'search_result_category',
+			'search_result_template_tag'       => 'search_result_tag',
 			'latest_comments_num'  => 20, // Number of the shown comments on disp=comments
 
 		// Time frame settings:

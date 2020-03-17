@@ -1947,6 +1947,534 @@ class ItemListLight extends DataObjectList2
 	}
 
 
-}
+	/**
+	 * Display items list depending on provided parameters
+	 *
+	 * @param array Parameters
+	 * @return true|string TRUE on success displaying, String - error message on fail
+	 */
+	function display_list( $params )
+	{
+		$params = array_merge( array(
+				'template' => NULL,
+			), $params );
 
+		if( ! empty( $params['template'] ) )
+		{	// DISPLAY with Quick TEMPLATE:
+
+			// Check if template exists:
+			$TemplateCache = & get_TemplateCache();
+			if( ! ( $widget_Template = $TemplateCache->get_by_code( $params['template'], false, false ) ) )
+			{
+				return sprintf( 'Template not found: %s', '<code>'.$params['template'].'</code>' );
+			}
+
+			// Render MASTER quick template:
+			// In theory, this should not display anything.
+			// Instead, this should set variables to define sub-templates (and potentially additional variables)
+			echo render_template_code( $params['template'], /* BY REF */ $params );
+
+			// Check if requested sub-template exists:
+			if( empty( $params['item_template'] ) )
+			{	// Display error when no template for listing
+				return sprintf( 'Missing %s param', '<code>item_template</code>' );
+			}
+			elseif( ! ( $item_Template = & $TemplateCache->get_by_code( $params['item_template'], false, false ) ) )
+			{	// Display error when no or wrong template for listing
+				return sprintf( 'Template is not found: %s for listing an item', '<code>'.$params['item_template'].'</code>' );
+			}
+
+			// Display list of Items:
+			if( isset( $params['before_list'] ) )
+			{
+				echo $params['before_list'];
+			}
+
+			// ONLY SUPPORTING Plain list: (not grouped by category) for now
+			// TODO: maybe support group by category. Use case???
+
+			$this->restart();
+			while( $row_Item = & $this->get_item() )
+			{
+				if( ! empty( $params['switch_param_code'] ) )
+				{	// Start wrapper to make each item block switchable:
+					echo '<div data-display-condition="'.$params['switch_param_code'].'='.$row_Item->get( 'urltitle' ).'"'
+						// Hide not active item on page loading:
+						.( $params['active_item_slug'] == $row_Item->get( 'urltitle' ) ? '' : ' style="display:none"' ).'>';
+				}
+
+				// Render Item by quick template:
+				echo render_template_code( $params['item_template'], $params, array( 'Item' => $row_Item ) );
+
+				if( ! empty( $params['switch_param_code'] ) )
+				{	// End of switchable item block:
+					echo '</div>';
+				}
+			}
+
+			// TODO: maybe support $params['page'] & $params['pagination'] . Use case?
+
+			if( isset( $params['after_list'] ) )
+			{
+				echo $params['after_list'];
+			}
+
+			return true;
+		}
+
+		// DISPLAY with "AUTOMATIC" template:
+
+		// Load functions for widget layout:
+		load_funcs( 'widgets/_widgets.funcs.php' );
+
+		// Start to capture display content here in order to be able to detect if the whole widget must not be displayed
+		ob_start();
+		// This variable used to display widget. Will be set to true when content is displayed
+		$content_is_displayed = false;
+
+		if( $params['item_group_by'] == 'chapter' )
+		{	// List grouped by chapter/category:
+
+			$items_map_by_chapter = array();
+			$chapters_of_loaded_items = array();
+			$group_by_blogs = false;
+			$prev_chapter_blog_ID = NULL;
+
+			$this->restart();
+			while( $iterator_Item = & $this->get_item() )
+			{	// Display contents of the Item depending on widget params:
+				$Chapter = & $iterator_Item->get_main_Chapter();
+				if( ! isset( $items_map_by_chapter[$Chapter->ID] ) )
+				{
+					$items_map_by_chapter[$Chapter->ID] = array();
+					$chapters_of_loaded_items[] = $Chapter;
+				}
+				$items_map_by_chapter[$Chapter->ID][] = $iterator_Item;
+				// Group by blogs if there are chapters from multiple blogs
+				if( ! $group_by_blogs && ( $Chapter->blog_ID != $prev_chapter_blog_ID ) )
+				{	// group by blogs is not decided yet
+					$group_by_blogs = ( $prev_chapter_blog_ID != NULL );
+					$prev_chapter_blog_ID = $Chapter->blog_ID;
+				}
+			}
+
+			usort( $chapters_of_loaded_items, 'Chapter::compare_chapters' );
+			$displayed_blog_ID = NULL;
+
+			if( $group_by_blogs && isset( $params['collist_start'] ) )
+			{	// Start list of blogs
+				echo $params['collist_start'];
+			}
+			else
+			{	// Display list start, all chapters are in the same group ( not grouped by blogs )
+				echo get_widget_layout_start( $params );
+			}
+
+			$item_index = 0;
+			foreach( $chapters_of_loaded_items as $Chapter )
+			{
+				if( $group_by_blogs && $displayed_blog_ID != $Chapter->blog_ID )
+				{
+					$Chapter->get_Blog();
+					if( $displayed_blog_ID != NULL )
+					{	// Display the end of the previous blog's chapter list
+						echo get_widget_layout_end( $item_index, $params );
+					}
+					echo $params['coll_start'].$Chapter->Blog->get('shortname'). $params['coll_end'];
+					// Display start of blog's chapter list
+					echo get_widget_layout_start( $params );
+					$displayed_blog_ID = $Chapter->blog_ID;
+				}
+				// -------------
+				$content_is_displayed = $this->display_list_chapter( $Chapter, $items_map_by_chapter, $item_index, $params ) || $content_is_displayed;
+				// -------------
+			}
+
+			if( $content_is_displayed )
+			{	// End of a chapter list - if some content was displayed this is always required
+				echo get_widget_layout_end( $item_index, $params );
+			}
+
+			if( $group_by_blogs && isset( $params['collist_end'] ) )
+			{	// End of blog list
+				echo $params['collist_end'];
+			}
+
+		}
+		else
+		{	// Plain list: (not grouped by category)
+
+			echo get_widget_layout_start( $params );
+
+			$item_index = 0;
+			$this->restart();
+			while( $Item = & $this->get_item() )
+			{
+				// -------------
+				// DISPLAY CONTENT of the Item depending on widget params:
+				$content_is_displayed = $this->display_list_item_contents( $Item, false, $item_index, $params ) || $content_is_displayed;
+				// -------------
+			}
+
+			if( isset( $params['page'] ) )
+			{
+				if( empty( $params['pagination'] ) )
+				{
+					$params['pagination'] = array();
+				}
+				$this->page_links( $params['pagination'] );
+			}
+
+			echo get_widget_layout_end( $item_index, $params );
+		}
+
+		if( $content_is_displayed )
+		{	// Some content is displayed, Print out widget
+			ob_end_flush();
+		}
+		else
+		{	// No content, Don't display widget
+			ob_end_clean();
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * Display a chapter with all of its loaded items
+	 *
+	 * @param Chapter
+	 * @param array Items map by Chapter
+	 * @param integer Item index
+	 * @return boolean true if content was displayed, false otherwise
+	 */
+	function display_list_chapter( $Chapter, & $items_map_by_chapter, & $item_index, $params = array() )
+	{
+		$content_is_displayed = false;
+
+		if( isset( $items_map_by_chapter[$Chapter->ID] ) && ( count( $items_map_by_chapter[$Chapter->ID] ) > 0 ) )
+		{	// Display Chapter only if it has some items:
+			echo get_widget_layout_item_start( 0, false, '', $params );
+			$Chapter->get_Blog();
+			echo '<a href="'.$Chapter->get_permanent_url().'">'.$Chapter->get('name').'</a>';
+
+			echo $params['group_start'];
+
+			$item_index = 0;
+			foreach( $items_map_by_chapter[$Chapter->ID] as $iterator_Item )
+			{	// Display contents of the Item depending on widget params:
+				$content_is_displayed = $this->display_list_item_contents( $iterator_Item, true, $item_index, $params ) || $content_is_displayed;
+			}
+
+			// Close category group:
+			echo $params['group_end'];
+			echo get_widget_layout_item_end( 0, false, '', $params );
+		}
+
+		return $content_is_displayed;
+	}
+
+
+	/**
+	 * Support function for above
+	 *
+	 * @param Item
+	 * @param boolean set to true if Items are displayed grouped by chapters, false otherwise
+	 * @param integer Item index
+	 * @return boolean TRUE - if content is displayed
+	 */
+	function display_list_item_contents( & $disp_Item, $chapter_mode = false, & $item_index, $params = array() )
+	{
+		global $disp, $Item;
+
+		// INIT:
+
+		// Set this var to TRUE when some content(title, excerpt or picture) is displayed
+		$content_is_displayed = false;
+
+		// Set a 'group_' prefix for param keys if the items are grouped by chapters
+		$disp_param_prefix = $chapter_mode ? 'group_' : '';
+
+		// Is this the current item?
+		if( !empty($Item) && $disp_Item->ID == $Item->ID )
+		{	// The current page is currently displaying the Item this link is pointing to
+			// Let's display it as selected
+			$link_class = $params['link_selected_class'];
+		}
+		else
+		{	// Default link class
+			$link_class = $params['link_default_class'];
+		}
+
+		$item_is_selected = ( $link_class == $params['link_selected_class'] );
+
+		// DISPLAY START:
+
+		// Start of Item block (Grid / flow / RWD)
+		echo get_widget_layout_item_start( $item_index, $item_is_selected, $disp_param_prefix, $params );
+
+		// DISPLAY CATEGORY:
+
+		if( $params['disp_cat'] != 'no' )
+		{	// Display categories:
+			$disp_Item->categories( array(
+					'before'           => $params['item_categories_before'],
+					'after'            => $params['item_categories_after'],
+					'separator'        => $params['item_categories_separator'],
+					'include_main'     => true,
+					'include_other'    => ( $params['disp_cat'] == 'all' ),
+					'include_external' => ( $params['disp_cat'] == 'all' ),
+					'link_categories'  => true,
+				) );
+		}
+
+		// SPECIAL FIRST IMAGE:
+
+		if( $params['disp_first_image'] == 'special' )
+		{	// If we should display first picture before title then get "Cover" images and order them at top:
+			$cover_image_params = array(
+					'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
+					// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
+					'links_sql_select'  => ', CASE '
+							.'WHEN link_position = "cover"      THEN "1" '
+							.'WHEN link_position = "teaser"     THEN "2" '
+							.'WHEN link_position = "teaserperm" THEN "3" '
+							.'WHEN link_position = "teaserlink" THEN "4" '
+							.'WHEN link_position = "aftermore"  THEN "5" '
+							.'WHEN link_position = "inline"     THEN "6" '
+							// .'ELSE "99999999"' // Use this line only if you want to put the other position types at the end
+						.'END AS position_order',
+					'links_sql_orderby' => 'position_order, link_order',
+				);
+		}
+		else
+		{
+			$cover_image_params = array();
+		}
+
+		if( $params['attached_pics'] != 'none' && $params['disp_first_image'] == 'special' )
+		{	// We want to display first image separately before the title
+			// Display before/after even if there is no image so we can use it as a placeholder.
+			$this->display_list_images( array_merge( $params, array(
+					'before'      => $params['item_first_image_before'],
+					'after'       => $params['item_first_image_after'],
+					'placeholder' => $params['item_first_image_placeholder'],
+					'Item'        => $disp_Item,
+					'start'       => 1,
+					'limit'       => 1,
+				), $cover_image_params ),
+				$content_is_displayed );
+		}
+
+		// DISPLAY ITEM TITLE:
+
+		if( $params['disp_title'] )
+		{	// Display title
+			$disp_Item->title( array(
+					'before'     => $params['disp_only_title'] ? $params['item_title_single_before'] : $params['item_title_before'],
+					'after'      => $params['disp_only_title'] ? $params['item_title_single_after'] : $params['item_title_after'],
+					'link_type'  => $params['item_title_link_type'],
+					'link_class' => $link_class,
+				) );
+			$content_is_displayed = true;
+		}
+
+		// DISPLAY EXCERPT:
+
+		if( $params['disp_excerpt'] )
+		{	// Display excerpt
+			$excerpt = $disp_Item->get_excerpt();
+
+			$item_permanent_url = $disp_Item->get_permanent_url();
+			if( ! $params['disp_teaser'] && $item_permanent_url !== false )
+			{ // only display if there is no teaser to display
+				$excerpt .= ' <a href="'.$item_permanent_url.'" class="'.$params['item_readmore_class'].'">'.$params['item_readmore_text'].'</a>';
+			}
+
+			if( !empty($excerpt) )
+			{	// Note: Excerpts are plain text -- no html (at least for now)
+				echo $params['item_excerpt_before'].$excerpt.$params['item_excerpt_after'];
+				$content_is_displayed = true;
+			}
+		}
+
+		// DISPLAY TEASER:
+
+		if( $params['disp_teaser'] )
+		{	// we want to show some or all of the post content
+			$content = $disp_Item->get_content_teaser( 1, false, 'htmlbody' );
+
+			if( $words = $params['disp_teaser_maxwords'] )
+			{ // limit number of words:
+
+				$content = strmaxwords( $content, $words, array(
+						'continued_link'  => $disp_Item->get_permanent_url(),
+						'continued_text'  => $params['item_readmore_text'],
+						'continued_class' => $params['item_readmore_class'],
+						'always_continue' => true, // Because Item::has_content_parts() is not optimized, we cannot be sure if the content has been cut because of max words or becaus eof [teaserbreak], so in doubt, we display a read more link all the time. Additionally: if there are images "after more", we also need the "more "link.
+					 ) );
+			}
+
+			echo $params['item_content_before'].$content.$params['item_content_after'];
+			$content_is_displayed = true;
+		}
+
+		// DISPLAY PICTURES:
+
+		if( $params['attached_pics'] == 'all' ||
+		   ( $params['attached_pics'] == 'first' && $params['disp_first_image'] == 'normal' ) ||
+			 ( $params['attached_pics'] == 'category' && $params['disp_first_image'] == 'normal' ) )
+		{	// Display attached pictures
+			if( $params['attached_pics'] == 'first' || $params['attached_pics'] == 'category' )
+			{	// Display only one first image:
+				$picture_limit = 1;
+			}
+			else
+			{
+				$max_pics = intval( $params['max_pics'] );
+				if( $max_pics > 0 )
+				{	// Limit images after title with widget param:
+					$picture_limit = $max_pics;
+					if( $params['disp_first_image'] == 'special' )
+					{	// If first image is already displayed before title, then we should skip this first to get next images:
+						$picture_limit += 1;
+					}
+				}
+				else
+				{	// Don't limit the images:
+					$picture_limit = 1000;
+				}
+			}
+			$this->display_list_images( array_merge( $params, array(
+					'before' => $params['item_images_before'],
+					'after'  => $params['item_images_after'],
+					'Item'   => $disp_Item,
+					'start'  => ( $params['disp_first_image'] == 'special' ? 2 : 1 ), // Skip first image if it is displayed on top
+					'limit'  => $picture_limit,
+				), $cover_image_params ),
+				$content_is_displayed );
+		}
+
+		++$item_index;
+
+		// End of Item block (Grid / flow / RWD)
+		echo get_widget_layout_item_end( $item_index, $item_is_selected, $disp_param_prefix, $params );
+
+		return $content_is_displayed;
+	}
+
+
+	/**
+	 * Display images of the selected item
+	 *
+	 * @todo Not sure if it makes sense that this reads attachment linklist directly
+	 *
+	 * @param array Params
+	 * @param boolean Changed by reference when content is displayed
+	 */
+	function display_list_images( $params = array(), & $content_is_displayed )
+	{
+		$params = array_merge( array(
+				'before'                     => '',
+				'after'                      => '',
+				'placeholder'                => '',
+				'Item'                       => NULL,
+				'start'                      => 1,
+				'limit'                      => 1,
+				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore,inline',
+				'links_sql_select'           => '',
+				'links_sql_orderby'          => 'link_order',
+			), $params );
+
+		$links_params = array(
+				'sql_select_add' => $params['links_sql_select'],
+				'sql_order_by'   => $params['links_sql_orderby']
+			);
+
+		$disp_Item = & $params['Item'];
+		switch( $params[ 'item_pic_link_type' ] )
+		{	// Set url for picture link
+			case 'none':
+				$pic_url = NULL;
+				break;
+
+			case 'permalink':
+				$pic_url = $disp_Item->get_permanent_url();
+				break;
+
+			case 'linkto_url':
+				$pic_url = $disp_Item->url;
+				break;
+
+			case 'auto':
+			default:
+				$pic_url = ( empty( $disp_Item->url ) ? $disp_Item->get_permanent_url() : $disp_Item->url );
+				break;
+		}
+
+		if( $params['attached_pics'] != 'category' )
+		{
+			// Get list of ALL attached files:
+			$LinkOwner = new LinkItem( $disp_Item );
+
+			$images = '';
+
+			if( $LinkList = $LinkOwner->get_attachment_LinkList( $params['limit'], $params['restrict_to_image_position'], 'image', $links_params ) )
+			{	// Get list of attached files
+				$image_num = 1;
+				while( $Link = & $LinkList->get_next() )
+				{
+					if( ( $File = & $Link->get_File() ) && $File->is_image() )
+					{	// Get only images
+						if( $image_num < $params['start'] )
+						{ // Skip these first images
+							$image_num++;
+							continue;
+						}
+
+						// Print attached picture
+						$images .= $File->get_tag( '', '', '', '', $params['thumb_size'], $pic_url, '', '', '', '', '', '' );
+
+						$content_is_displayed = true;
+
+						$image_num++;
+					}
+				}
+			}
+		}
+
+		$display_placeholder = true;
+		if( ! empty( $images ) )
+		{	// Print out images only when at least one exists:
+			echo $params['before'];
+			echo $images;
+			echo $params['after'];
+			$display_placeholder = false;
+		}
+		elseif( $params['limit'] == 1 )
+		{	// First picture is empty, fallback to category picture:
+			if( $main_Chapter = & $disp_Item->get_main_Chapter() )
+			{	// If item has a main chapter:
+				$main_chapter_image_tag = $main_Chapter->get_image_tag( array(
+						'before'  => $params['before'],
+						'after'   => $params['after'],
+						'size'    => $params['thumb_size'],
+						'link_to' => $pic_url,
+					) );
+				if( ! empty( $main_chapter_image_tag ) )
+				{	// If main chapter has a correct image file:
+					echo $main_chapter_image_tag;
+					$display_placeholder = false;
+				}
+			}
+		}
+
+		if( $display_placeholder )
+		{	// Display placeholder if no images:
+			// Replace mask $item_permaurl$ with the item permanent URL:
+			echo str_replace( '$item_permaurl$', $disp_Item->get_permanent_url(), $params['placeholder'] );
+		}
+	}
+}
 ?>

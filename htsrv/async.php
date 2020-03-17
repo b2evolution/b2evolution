@@ -1,6 +1,6 @@
 <?php
 /**
- * This is the handler for asynchronous 'AJAX' calls.
+ * This is the handler for asynchronous 'AJAX' calls. This requires access to the back office.
  *
  * This file is part of the evoCore framework - {@link http://evocore.net/}
  * See also {@link https://github.com/b2evolution/b2evolution}.
@@ -71,9 +71,9 @@ $debug_jslog = false;
 $allow_evo_stats = false;
 
 // Init AJAX log
-$Ajaxlog = new Log();
+$ajax_Log = new Log();
 
-$Ajaxlog->add( sprintf( T_('action: %s'), $action ), 'note' );
+ajax_log_add( sprintf( T_('action: %s'), $action ), 'note' );
 
 $incorrect_action = false;
 
@@ -217,7 +217,7 @@ switch( $action )
 				$rows_approx = round( strlen( $comment_content ) / 200 );
 				$rows_number = substr_count( $comment_content, "\n" );
 				$rows_number = ( ( $rows_number > 3 && $rows_number > $rows_approx ) ? $rows_number : $rows_approx ) + 2;
-				echo '<textarea class="form_textarea_input form-control" rows="'.$rows_number.'">'.$comment_content.'</textarea>';
+				echo '<textarea class="form_textarea_input form-control'.( check_autocomplete_usernames( $edited_Comment ) ? ' autocomplete_usernames' : '' ).'" rows="'.$rows_number.'">'.$comment_content.'</textarea>';
 				// Display a button to Save the changes
 				echo '<input type="button" value="'.T_('Save Changes!').'" class="SaveButton btn btn-primary" onclick="edit_comment( \'update\', '.$edited_Comment->ID.' )" /> ';
 				// Display a button to Cancel the changes
@@ -546,7 +546,7 @@ switch( $action )
 		$field = param( 'field', 'string' );
 		if( ! in_array( $field, array( 'priority', 'status', 'assigned' ) ) )
 		{ // Invalid field
-			$Ajaxlog->add( sprintf( 'Invalid field: %s', $field ), 'error' );
+			ajax_log_add( sprintf( 'Invalid field: %s', $field ), 'error' );
 			break;
 		}
 
@@ -1111,11 +1111,7 @@ if( !$incorrect_action )
 {
 	if( $current_debug || $current_debug_jslog )
 	{	// debug is ON
-		$Ajaxlog->display( NULL, NULL, true, 'all',
-						array(
-								'error' => array( 'class' => 'jslog_error', 'divClass' => false ),
-								'note'  => array( 'class' => 'jslog_note',  'divClass' => false ),
-							), 'ul', 'jslog' );
+		ajax_log_display();
 	}
 
 	if( $add_response_end_comment )

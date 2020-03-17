@@ -2127,6 +2127,40 @@ function create_default_templates( $is_task = true )
 		),
 */
 
+
+		// Content Tabs:
+		'content_tabs' => array(
+			'name'     => 'Content Tabs',
+			'context'  => 'content_list_master',
+			'template' => '[set:before_list=<div class="row">]
+[set:after_list=</div>]
+[set:item_template=content_tabs_item]
+[set:rwd_header_col=col-sm-5 col-xs-12]
+[set:rwd_text_col=col-sm-5 col-xs-12]
+[set:rwd_image_col=col-sm-7 pull-right-sm col-xs-12]
+[set:evo_tabs_image__size=fit-1920x1080]',
+		),
+
+		'content_tabs_item' => array(
+			'name'     => 'Content Tabs: Item',
+			'context'  => 'content_list_item',
+			'template' => '
+	<div class="[echo:rwd_header_col]">
+		<h1>[Item:title]</h1>
+	</div>
+	<div class="[echo:rwd_image_col]">
+		[Item:images|
+			restrict_to_image_position=#cover_and_teaser_all|
+			limit=1|
+			image_size=$evo_tabs_image__size$]
+	</div>
+	<div class="[echo:rwd_text_col]">
+		[Item:content_teaser]
+	</div>
+',
+		),
+
+
 		// Registration Templates:
 		'registration_master_standard' => array(
 			'name'     => 'Registration: Standard',
@@ -2234,6 +2268,113 @@ function create_default_templates( $is_task = true )
 		value=Continue]
 ',
 		),
+
+		'search_form_full' => array(
+			'name'     => 'Search Form: Full',
+			'context'  => 'search_form',
+			'template' => '<div class="row row-gutter-sm">
+	<div class="col-sm-12 margin-top-sm margin-bottom-xs">
+		<div class="input-group">
+			[Form:search_input|class=w-100]
+			<span class="input-group-btn">[Form:submit|value=Search]</span>
+		</div>
+	</div>
+</div>
+<div class="row row-gutter-sm">
+	<div class="col-sm-12 col-md-12 col-lg-5 margin-y-xs">
+		[Form:search_author]
+	</div>
+	<div class="col-sm-12 col-md-12 col-lg-4 margin-y-xs">
+		[Form:search_content_age]
+	</div>
+	<div class="col-sm-12 col-md-12 col-lg-3 margin-y-xs">
+		[Form:search_content_type]
+	</div>
+</div>',
+		),
+
+		'search_form_simple' => array(
+			'name'     => 'Search Form: Simple',
+			'context'  => 'search_form',
+			'template' => '<div class="input-group">
+	[Form:search_input|class=w-100]
+	<span class="input-group-btn">[Form:submit|value=Search]</span>
+</div>',
+		),
+
+		'search_result_item' => array(
+			'name'     => 'Search Result: Item',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Item:permalink] (Post)</div>
+		<div class="result_content">[Item:excerpt|excerpt_more_text=]</div>
+		<div class="search_info dimmed">[Item:categories|before=In ]</div>
+		<div class="search_info dimmed">Published by [Item:author|
+			link_text=avatar_login|
+			thumb_size=crop-top-15x15] on [Item:creation_time|format=#short_date]
+		</div>
+	</div>
+</div>',
+		),
+
+		'search_result_comment' => array(
+			'name'     => 'Search Result: Comment',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Comment:permalink] (Comment)</div>
+		<div class="result_content">[Comment:content|format=raw_text]</div>
+		<div class="search_info dimmed">Published by [Comment:author|
+			link_text=avatar_name|
+			thumb_size=crop-top-15x15|
+			thumb_class=avatar_before_login] on [Comment:creation_time|format=#short_date]
+		</div>
+	</div>
+</div>',
+		),
+
+		'search_result_file' => array(
+			'name'     => 'Search Result: File',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[File:file_link|link_text=title] (File: [File:file_link|link_text=icon] [File:type])</div>
+		<div class="result_content">
+			[File:url]
+			[File:description|before=<div>|after=</div>]
+		</div>
+		<div class="search_info dimmed">File size: [File:file_size]</div>
+	</div>
+</div>',
+		),
+
+		'search_result_category' => array(
+			'name'     => 'Search Result: Category',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Cat:permalink] (Category)</div>
+		<div class="result_content">[Cat:description]</div>
+	</div>
+</div>',
+		),
+
+		'search_result_tag' => array(
+			'name'     => 'Search Result: Tag',
+			'context'  => 'search_result',
+			'template' => '<div class="search_result">
+	<div class="search_result_score dimmed">[echo:percentage]%</div>
+	<div class="search_content_wrap">
+		<div class="search_title">[Tag:permalink] (Tag)</div>
+		<div class="result_content">[echo:tag_post_count] posts are tagged with "[Tag:name]"</div>
+	</div>
+</div>',
+		)
 
 	);
 

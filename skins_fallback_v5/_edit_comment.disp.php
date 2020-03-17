@@ -71,7 +71,7 @@ $Form->begin_form( 'bComment' );
 	$Form->inputstart .= $comment_toolbar;
 	$Form->textarea_input( 'content', $comment_content, $display_params['textarea_lines'], $display_params['form_comment_text'], array(
 			'cols' => 38,
-			'class' => 'bComment autocomplete_usernames',
+			'class' => 'bComment'.( check_autocomplete_usernames( $edited_Comment ) ? ' autocomplete_usernames' : '' ),
 			'id' => $dummy_fields[ 'content' ],
 			'maxlength' => $Blog->get_setting( 'comment_maxlen' ),
 		) );

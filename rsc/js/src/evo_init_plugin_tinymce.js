@@ -301,6 +301,19 @@ jQuery( document ).ready( function()
 									}
 								}
 							}
+						// Try to add custom shortcuts from page:
+				tmce_init.init_instance_callback = function( ed ) {
+						if( window.shortcut_keys )
+						{
+							for( var i = 0; i < window.shortcut_keys.length; i++ )
+							{
+								var key = window.shortcut_keys[i];
+								ed.shortcuts.add( key, 'b2evo shortcut key: ' + key, function() {
+									window.shortcut_handler( key );
+								} );
+							}
+						}
+					}
 
 						window.tmce_init.setup = function( ed )
 							{

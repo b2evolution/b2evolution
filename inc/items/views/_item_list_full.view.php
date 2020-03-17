@@ -710,7 +710,7 @@ while( $Item = & $ItemList->get_item() )
 			$Form->inputstart .= $comment_toolbar;
 			$Form->textarea_input( $dummy_fields['content'], $comment_content, 12, T_('Comment text'), array(
 					'cols'  => 40,
-					'class' => 'autocomplete_usernames link_attachment_dropzone'
+					'class' => ( check_autocomplete_usernames( $Comment ) ? 'autocomplete_usernames ' : '' ).'link_attachment_dropzone'
 				) );
 			$Form->inputstart = $form_inputstart;
 

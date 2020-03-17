@@ -614,10 +614,6 @@ function install_basic_skins( $install_mobile_skins = true )
 	// Note: Skin #6 will be used by Mini-Site
 	skin_install( 'jared_skin', true );
 
-	if( $install_mobile_skins )
-	{
-		skin_install( 'touch' );
-	}
 	skin_install( '_atom', true );
 	skin_install( '_rss2', true );
 

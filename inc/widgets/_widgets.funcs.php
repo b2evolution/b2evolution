@@ -179,7 +179,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 	{
 		$default_widgets['sidebar'] = array(
 			'coll_type' => 'manual',
-			array( 10, 15000, 'coll_search_form', 'params' => array( 'title' => T_('Search this manual:') ) ),
+			array( 10, 15000, 'coll_search_form', 'params' => array( 'title' => T_('Search this manual:'), 'template' => 'search_form_simple' ) ),
 			array( 20, 15000, 'content_hierarchy' ),
 		);
 	}
@@ -202,7 +202,7 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 			array( 20, 15000, 'user_profile_pics', 'install' => $install_not_forum ),
 			array( 30, 15000, 'evo_Calr', 'type' => 'plugin', 'install' => ( $install_not_forum && $blog_id > $blog_a_ID ) ),
 			array( 40, 15000, 'coll_longdesc', 'install' => $install_not_forum, 'params' => array( 'title' => '$title$' ) ),
-			array( 50, 15000, 'coll_search_form', 'install' => $install_not_forum ),
+			array( 50, 15000, 'coll_search_form', 'install' => $install_not_forum, 'params' => array( 'template' => 'search_form_simple' ) ),
 			array( 60, 15000, 'coll_category_list', 'install' => $install_not_forum ),
 			array( 70, 15000, 'coll_item_list', 'coll_ID' => $blog_home_ID, 'install' => $install_not_forum, 'params' => array(
 					'title' => 'Advertisement (Demo)',
@@ -557,6 +557,13 @@ function get_default_widgets( $kind = '', $blog_id = NULL, $initial_install = fa
 		array( 80, 15230, 'user_info', 'params' => array(
 				'title' => T_('Spam fighter score'),
 				'info'  => 'spam',
+			) ),
+	);
+
+	/* Search Area */
+	$default_widgets['search_area'] = array(
+		array( 10, 15960, 'coll_search_form', 'params' => array(
+				'template' => 'search_form_full',
 			) ),
 	);
 
@@ -1809,5 +1816,188 @@ function display_widgets_action_buttons( & $Form )
 			'type'  => 'submit'
 		) );
 	echo '</span>';
+}
+
+
+/**
+ * Get current layout
+ *
+ * @return string|NULL Widget layout | NULL - if widget has no layout setting
+ */
+function get_widget_layout( $params = array() )
+{
+	if( isset( $params['layout'] ) )
+	{
+		return $params['layout'];
+	}
+
+	if( isset( $params['thumb_layout'] ) )
+	{
+		return $params['thumb_layout'];
+	}
+
+	return NULL;
+}
+
+
+/**
+ * Get start of layout
+ *
+ * @param array Parameters
+ * @return string
+ */
+function get_widget_layout_start( $params = array() )
+{
+	switch( get_widget_layout( $params ) )
+	{
+		case 'grid':
+			// Grid / Table layout:
+			return $params['grid_start'];
+
+		case 'flow':
+			// Flow block layout:
+			return $params['flow_start'];
+
+		case 'rwd':
+			// RWD block layout:
+			return $params['rwd_start'];
+
+		default:
+			// List layout:
+			return $params['list_start'];
+	}
+}
+
+
+/**
+ * Get end of layout
+ *
+ * @param integer Cell index (used for grid/table layout)
+ * @param array Parameters
+ * @return string
+ */
+function get_widget_layout_end( $cell_index = 0, $params = array() )
+{
+	switch( get_widget_layout( $params ) )
+	{
+		case 'grid':
+			// Grid / Table layout:
+			$r = '';
+			$nb_cols = isset( $params['grid_nb_cols'] ) ? $params['grid_nb_cols'] : 1;
+			if( $cell_index && ( $cell_index % $nb_cols != 0 ) )
+			{
+				$r .= $params['grid_colend'];
+			}
+			$r .= $params['grid_end'];
+			return $r;
+
+		case 'flow':
+			// Flow block layout:
+			return $params['flow_end'];
+
+		case 'rwd':
+			// RWD block layout:
+			return $params['rwd_end'];
+
+		default:
+			// List layout:
+			return $params['list_end'];
+	}
+}
+
+
+/**
+ * Get item start of layout
+ *
+ * @param integer Cell index (used for grid/table layout)
+ * @param boolean TRUE if current item/cell is selected
+ * @param string Prefix for param
+ * @param array Parameters
+ * @return string
+ */
+function get_widget_layout_item_start( $cell_index = 0, $is_selected = false, $disp_param_prefix = '', $params = array() )
+{
+	switch( get_widget_layout( $params ) )
+	{
+		case 'grid':
+			// Grid / Table layout:
+			$r = '';
+			$nb_cols = isset( $params['grid_nb_cols'] ) ? $params['grid_nb_cols'] : 1;
+			if( $cell_index % $nb_cols == 0 )
+			{
+				$r .= $params['grid_colstart'];
+			}
+			$r .= $params['grid_cellstart'];
+			return $r;
+
+		case 'flow':
+			// Flow block layout:
+			return $params['flow_block_start'];
+
+		case 'rwd':
+			// RWD block layout:
+			$r = $params['rwd_block_start'];
+			if( isset( $params['rwd_block_class'] ) )
+			{	// Replace css class of RWD block with value from widget setting:
+				$r = str_replace( '$wi_rwd_block_class$', $params['rwd_block_class'], $r );
+			}
+			return $r;
+
+		default:
+			// List layout:
+			if( $is_selected )
+			{
+				return $params[$disp_param_prefix.'item_selected_start'];
+			}
+			else
+			{
+				return $params[$disp_param_prefix.'item_start'];
+			}
+	}
+}
+
+
+/**
+ * Get item end of layout
+ *
+ * @param integer Cell index (used for grid/table layout)
+ * @param boolean TRUE if current item/cell is selected
+ * @param string Prefix for param
+ * @param array Parameters
+ * @return string
+ */
+function get_widget_layout_item_end( $cell_index = 0, $is_selected = false, $disp_param_prefix = '', $params = array() )
+{
+	switch( get_widget_layout( $params ) )
+	{
+		case 'grid':
+			// Grid / Table layout:
+			$r = $params['grid_cellend'];
+			$nb_cols = isset( $params['grid_nb_cols'] ) ? $params['grid_nb_cols'] : 1;
+			if( $cell_index % $nb_cols == 0 )
+			{
+				$r .= $params['grid_colend'];
+			}
+			return $r;
+
+		case 'flow':
+			// Flow block layout:
+			return $params['flow_block_end'];
+
+		case 'rwd':
+			// RWD block layout:
+			return $params['rwd_block_end'];
+
+		default:
+			// List layout:
+			if( $is_selected )
+			{
+				return $params[$disp_param_prefix.'item_selected_end'];
+			}
+			else
+			{
+				return $params[$disp_param_prefix.'item_end'];
+			}
+	}
 }
 ?>

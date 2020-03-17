@@ -85,6 +85,12 @@ class coll_search_form_Widget extends ComponentWidget
 	 */
 	function get_param_definitions( $params )
 	{
+		global $current_User, $admin_url;
+		// Get available templates:
+		$context = 'search_form';
+		$TemplateCache = & get_TemplateCache();
+		$TemplateCache->load_by_context( $context );
+
 		$r = array_merge( array(
 				'title' => array(
 					'label'        => T_('Block title'),
@@ -92,19 +98,16 @@ class coll_search_form_Widget extends ComponentWidget
 					'size'         => 40,
 					'defaultvalue' => T_('Search'),
 				),
-				'button' => array(
-					'label'        => T_('Button name'),
-					'note'         => T_( 'Button name to submit a search form.' ),
-					'size'         => 40,
-					'defaultvalue' => T_('Go'),
-				),
-				'search_template' => array(
-					'label'        => T_('Template'),
-					'type'         => 'textarea',
-					'size'         => 40,
-					'rows'         => 3,
-					'defaultvalue' => '$input_keywords$$button_search$',
-					'note'         => T_('Can be overriden by skin'),
+				'template' => array(
+					'label' => T_('Template'),
+					'type' => 'select',
+					'options' => $TemplateCache->get_code_option_array(),
+					'defaultvalue' => 'search_form_simple',
+					'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? '&nbsp;'
+							.action_icon( '', 'edit', $admin_url.'?ctrl=templates&amp;context='.$context, NULL, NULL, NULL,
+							array( 'onclick' => 'return b2template_list_highlight( this )' ),
+							array( 'title' => T_('Manage templates').'...' ) ) : '' ),
+					'class' => 'evo_template_select',
 				),
 				'blog_ID' => array(
 					'label' => T_('Collection ID'),
@@ -176,9 +179,6 @@ class coll_search_form_Widget extends ComponentWidget
 
 		$this->init_display( $params );
 
-		// Check previous search keywords so it can be displayed in the search input box
-		param( 's', 'string', empty( $requested_404_title ) ? '' : $requested_404_title, true );
-
 		$blog_ID = intval( $this->disp_params['blog_ID'] );
 		if( $blog_ID > 0 )
 		{	// Get Blog for widget setting
@@ -191,125 +191,62 @@ class coll_search_form_Widget extends ComponentWidget
 			$widget_Blog = & $Blog;
 		}
 
-		// Collection search form:
-		echo $this->disp_params['block_start'];
 
-		$this->disp_title();
-
-		echo $this->disp_params['block_body_start'];
-
-		form_formstart( $widget_Blog->gen_blogurl(), 'search', 'SearchForm' );
-
-		if( empty( $this->disp_params['search_class'] ) )
-		{	// Class name is not defined, Use class depend on serach options
-			$search_form_class = 'compact_search_form';
-		}
-		else
-		{	// Use class from params
-			$search_form_class = $this->disp_params['search_class'];
-		}
-
-		echo '<div class="'.$search_form_class.'" data-search-id="'.$this->widget_instance_ID.'">';
-
-		// Search keyword input field:
-		$search_input_keywords = '';
-		$search_input_keywords .= $this->disp_params['search_input_before'];
-		$search_input_keywords .= '<input type="text" name="s" size="25" value="'.htmlspecialchars( get_param( 's' ) ).'" class="search_field SearchField form-control" title="'.format_to_output( T_('Enter text to search for'), 'htmlattr' ).'" />';
-		$search_input_keywords .= $this->disp_params['search_input_after'];
-
-		// Search submit button:
-		$search_button = '';
-		$search_button .= $this->disp_params['search_submit_before'];
-		$search_button .= '<input type="submit" name="submit" class="search_submit submit btn btn-primary" value="'.format_to_output( $this->disp_params['button'], 'htmlattr' ).'" />';
-		$search_button .= $this->disp_params['search_submit_after'];
-
-		// Search author input field:
-		$search_input_author = '';
-		$search_input_author .= str_replace( array( '$for$', '$label$' ), array( 'search_author', T_('Author') ), $this->disp_params['search_input_author_before'] );
-		$search_input_author .= '<input type="text" name="search_author" id="search_author" value="'.htmlspecialchars( param( 'search_author', 'string' ) )
-					.'" class="form-control'.( is_logged_in() ? '' : ' autocomplete_login' ).'" title="'.format_to_output( T_('Enter author to search for' ), 'htmlattr' ).'"'
-					.( ! is_logged_in() ? ' placeholder="'.T_('Any author' ).'"' : '' ).' />';
-		$search_input_author .= $this->disp_params['search_input_author_after'];
-
-		// Search age input field:
-		$search_content_age = param( 'search_content_age', 'string' );
-		$content_age_options = array(
-				''     => T_('Any time'),
-				'hour' => T_('Last hour'),
-				'day'  => T_('Less than a day'),
-				'week' => T_('Less than a week'),
-				'30d'  => T_('Last 30 days'),
-				'90d'  => T_('Last 90 days'),
-				'year' => T_('Last year'),
-			);
-		$search_input_age = '';
-		$search_input_age .= str_replace( array( '$for$', '$label$' ), array( 'search_content_age', T_('Content age') ), $this->disp_params['search_input_age_before'] );
-		$search_input_age .= '<select name="search_content_age" id="search_content_age" class="form-control">';
-		foreach( $content_age_options as $value => $title )
+		$TemplateCache = & get_TemplateCache();
+		if( ! $TemplateCache->get_by_code( $this->disp_params['template'], false, false ) )
 		{
-			$search_input_age .= '<option value="'.format_to_output( $value, 'htmlattr' ).'"'
-					.( $value == $search_content_age ? ' selected="selected"' : '' ).'>'.format_to_output( $title, 'htmlbody' ).'</option>';
+			$this->display_error_message( sprintf( 'Template not found: %s', '<code>'.$this->disp_params['template'].'</code>' ) );
+			return false;
 		}
-		$search_input_age .= '</select>';
-		$search_input_age .= $this->disp_params['search_input_age_after'];
 
-		// Search content type input field:
-		$item_type_options = array();
-		if( $Blog->get_setting( 'search_include_posts' ) )
-		{
-			$item_type_options['item'] = T_('Posts');
-		}
-		if( $Blog->get_setting( 'search_include_cmnts' ) )
-		{
-			$item_type_options['comment'] = T_('Comments');
-		}
-		if( $Blog->get_setting( 'search_include_files' ) )
-		{
-			$item_type_options['file'] = T_('Files');
-		}
-		if( $Blog->get_setting( 'search_include_cats' ) )
-		{
-			$item_type_options['category'] = T_('Categories');
-		}
-		if( $Blog->get_setting( 'search_include_tags' ) )
-		{
-			$item_type_options['tag'] = T_('Tags');
-		}
-		if( count( $item_type_options ) > 1 )
-		{
-			$item_type_options = array( '' => T_('All') ) + $item_type_options;
-			$search_type = param( 'search_type', 'string' );
+		$render_template_objects = array();
+		$Form = new Form( $widget_Blog->gen_blogurl(), 'SearchForm', 'get' );
+		$Form->switch_layout( 'none' );
+		$render_template_objects['Form'] = $Form;
 
-			$search_input_type = '';
-			$search_input_type .= str_replace( array( '$for$', '$label$' ), array( 'search_type', T_('Content type') ), $this->disp_params['search_input_type_before'] );
-			$search_input_type .= '<select name="search_type" id="search_type" class="form-control">';
-			foreach( $item_type_options as $key => $value )
-			{
-				$search_input_type .= '<option value="'.format_to_output( $key, 'htmlattr' ).'"'.( $search_type == $key ? ' selected' : '' )
-						.'>'.format_to_output( $value, 'htmlbody' ).'</option>';
+		// Render search form template:
+		$search_form = render_template_code( $this->disp_params['template'], $this->disp_params, $render_template_objects );
+
+		if( ! empty( $search_form ) )
+		{
+			// Collection search form:
+			echo $this->disp_params['block_start'];
+
+			$this->disp_title();
+
+			echo $this->disp_params['block_body_start'];
+
+			if( empty( $this->disp_params['search_class'] ) )
+			{	// Class name is not defined, Use class depend on serach options
+				$search_form_class = 'search_form';
 			}
-			$search_input_type .= '</select>';
-			$search_input_type .= $this->disp_params['search_input_type_after'];
-		}
+			else
+			{	// Use class from params
+				$search_form_class = $this->disp_params['search_class'];
+			}
 
-		// Wrap lines:
-		$template_lines = explode( "\n", $this->disp_params['search_template'] );
-		foreach( $template_lines as $key => $value )
-		{
-			$template_lines[$key] = $this->disp_params['search_line_before'].$value.$this->disp_params['search_line_after'];
-		}
-		$template = implode( "\n", $template_lines );
+			echo '<div class="'.$search_form_class.'" data-search-id="'.$this->widget_instance_ID.'">';
+			
+			$Form->begin_form( 'search' );
+			$Form->hidden( 'disp', 'search' );
+			
+			echo $search_form;
 
-		// JS for author autocomplete:
-		if( is_logged_in() )
-		{
-			$selected_author_array = param( 'search_author_array', 'array' );
-			$selected_author = array();
-			foreach( $selected_author_array as $field => $row )
+			$Form->end_form();
+			
+			echo '</div>';
+
+			// JS for author autocomplete:
+			if( is_logged_in() )
 			{
-				foreach( $row as $key => $value )
+				$selected_author_array = param( 'search_author_array', 'array' );
+				$selected_author = array();
+				foreach( $selected_author_array as $field => $row )
 				{
-					$selected_author[$key][$field] = $value;
+					foreach( $row as $key => $value )
+					{
+						$selected_author[$key][$field] = $value;
+					}
 				}
 			}
 
@@ -373,25 +310,18 @@ class coll_search_form_Widget extends ComponentWidget
 				( empty( $selected_author ) ? '
 					placeholder: "'.TS_('Any author' ).'",' : '' ).'
 				}' );
+
+			echo $this->disp_params['block_body_end'];
+
+			echo $this->disp_params['block_end'];
+
+			return true;
 		}
-
-		// Print the search form elements depending on template:
-		echo str_replace(
-				array( '$input_keywords$', '$button_search$', '$input_author$', '$input_age$', '$input_content_type$' ),
-				array( $search_input_keywords, $search_button, $search_input_author, $search_input_age, $search_input_type ),
-				$template );
-
-		echo '</div>';
-
-		echo '<input type="hidden" name="disp" value="search" />';
-
-		echo '</form>';
-
-		echo $this->disp_params['block_body_end'];
-
-		echo $this->disp_params['block_end'];
-
-		return true;
+		else
+		{
+			$this->display_debug_message();
+			return false;
+		}
 	}
 }
 

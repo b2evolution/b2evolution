@@ -29,10 +29,11 @@ class param_switcher_Widget extends generic_menu_link_Widget
 	/**
 	 * Constructor
 	 */
-	function __construct( $db_row = NULL )
+	function __construct( $db_row = NULL, $type = 'core', $code = 'param_switcher' )
 	{
 		// Call parent constructor:
-		parent::__construct( $db_row, 'core', 'param_switcher' );
+		// Note: $code may be different e.g. for widget "Tabbed Items"
+		parent::__construct( $db_row, $type, $code );
 	}
 
 
@@ -142,6 +143,26 @@ class param_switcher_Widget extends generic_menu_link_Widget
 
 
 	/**
+	 * Get advanced definitions for editable params.
+	 *
+	 * @see Plugin::GetDefaultSettings()
+	 *
+	 * @return array Advanced params
+	 */
+	function get_advanced_param_definitions()
+	{
+		return array(
+				'add_redir_no' => array(
+					'type' => 'checkbox',
+					'label' => sprintf( T_('Add %s'), '<code>&redir=no</code>' ),
+					'note' => T_('This is normally not needed, check this only when you have an auto redirect to canonical url.'),
+					'defaultvalue' => 0,
+				),
+			);
+	}
+
+
+	/**
 	 * Display the widget!
 	 *
 	 * @param array MUST contain at least the basic display params
@@ -187,12 +208,33 @@ class param_switcher_Widget extends generic_menu_link_Widget
 
 		echo $this->disp_params['block_body_start'];
 
+		// Display switchable tabs:
+		$this->display_switchable_tabs( $buttons, $Item->get_switchable_params() );
+
+		echo $this->disp_params['block_body_end'];
+
+		echo $this->disp_params['block_end'];
+
+		return true;
+	}
+
+
+	/**
+	 * Display switchable tabs
+	 *
+	 * @param array Tabs: key - tab value, value - tab text/title
+	 * @param array Default params: key - param value, value - default param value
+	 * @return string Active button value
+	 */
+	function display_switchable_tabs( $buttons, $defaults = array() )
+	{
 		// Get current param value and memorize it for regenerating url:
 		$param_value = param( $this->get_param( 'param_code' ), 'string', '', true );
 
 		echo $this->disp_params['button_group_start'];
 
 		$button_is_active_by_default = false;
+		$active_button_value = NULL;
 		foreach( $buttons as $button )
 		{	// Display button:
 			if( $param_value === $button['value'] )
@@ -201,7 +243,8 @@ class param_switcher_Widget extends generic_menu_link_Widget
 			}
 			elseif( ! $button_is_active_by_default &&
 			        $param_value === '' &&
-			        $Item->get_switchable_param( $this->get_param( 'param_code' ) ) == $button['value'] )
+			        isset( $defaults[ $this->get_param( 'param_code' ) ] ) &&
+			        $defaults[ $this->get_param( 'param_code' ) ] == $button['value'] )
 			{	// Active button by default with empty param:
 				$button_is_active = true;
 				$button_is_active_by_default = true;
@@ -217,104 +260,56 @@ class param_switcher_Widget extends generic_menu_link_Widget
 				: '' );
 			echo $this->get_layout_menu_link(
 				// URL to filter current page:
-				( $this->get_param( 'allow_switch_url' ) ? regenerate_url( $this->get_param( 'param_code' ).',redir', $this->get_param( 'param_code' ).'='.$button['value'].'&amp;redir=no' ) : '#' ),
+				( $this->get_param( 'allow_switch_url' )
+					? regenerate_url(
+						// Exclude params from current URL:
+						$this->get_param( 'param_code' ).( $this->get_param( 'add_redir_no' ) ? ',redir' : '' ),
+						// Add new param:
+						$this->get_param( 'param_code' ).'='.$button['value'].( $this->get_param( 'add_redir_no' ) ? '&amp;redir=no' : '' ) )
+					: '#' ),
 				// Title of the button:
 				$button['text'],
 				// Mark the button as active:
 				$button_is_active,
 				// Link template:
 				'<a href="$link_url$" class="$link_class$"'.$link_js_attrs.'>$link_text$</a>' );
+
+			if( $button_is_active )
+			{	// Set active button value:
+				$active_button_value = $button['value'];
+			}
 		}
 
 		echo $this->disp_params['button_group_end'];
 
-		echo $this->disp_params['block_body_end'];
-
 		if( $this->get_param( 'allow_switch_js' ) )
 		{	// Initialize JS to allow switching by JavaScript:
-			// Load switchable params in order to add all default values in the current URL:
-			$default_params = array();
-			$Item->load_switchable_params();
-			if( ! empty( $Item->switchable_params ) )
-			{
-				foreach( $Item->switchable_params as $switchable_param_name => $switchable_param_default_value )
-				{
-					$default_params[$switchable_param_name] = $switchable_param_default_value;
-				}
-			}
-
-			$script_config = array(
-					'widget_id' => $this->ID,
-					'link_class' => ( empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'] ),
-					'active_link_class' => ( empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'] ),
-					'default_params' => $default_params,
+			$switchable_buttons_config = array(
+					'selector'      => 'a[data-param-switcher='.$this->ID.']',
+					'class_normal'  => empty( $this->disp_params['widget_link_class'] ) ? $this->disp_params['button_default_class'] : $this->disp_params['widget_link_class'],
+					'class_active'  => empty( $this->disp_params['widget_active_link_class'] ) ? $this->disp_params['button_selected_class'] : $this->disp_params['widget_active_link_class'],
+					'add_redier_no' => $this->get_param( 'add_redir_no' ) ? true : false,
+					'defaults'      => $defaults,
 				);
-			expose_var_to_js( 'widget_'.$this->ID, json_encode( $script_config ), 'evo_widget_param_switcher_config' );
+			expose_var_to_js( 'param_switcher_'.$this->ID, $switchable_buttons_config, 'evo_init_switchable_buttons_config' );
 		}
 
-		global $evo_widget_param_switcher_js_initied;
-		if( empty( $evo_widget_param_switcher_js_initied ) )
-		{	// Initialize JS to allow switching by JavaScript once:
-		?>
-<script>
-// Modifications to listen event when URL in browser address bar is changed:
-history.pushState = ( f => function pushState(){
-	var ret = f.apply(this, arguments);
-	window.dispatchEvent(new Event('pushstate'));
-	window.dispatchEvent(new Event('locationchange'));
-	return ret;
-})(history.pushState);
-
-window.addEventListener( 'locationchange', function()
-{	// Show/Hide custom fields by condition depending on current URL in browser address:
-	var custom_fields = jQuery( '[data-display-condition]' );
-	if( custom_fields.length == 0 )
-	{	// No custom fields with display conditions:
-		return false;
+		return $active_button_value;
 	}
 
-	function get_url_params( url, multiple_values )
+
+	/**
+	 * Request all required css and js files for this widget
+	 */
+	function request_required_files()
 	{
-		url = url.replace( /^.+\?/, '' ).split( '&' );
-		var params = [];
-		url.forEach( function( url_param )
-		{
-			url_param = url_param.split( '=' );
-			params[ url_param[0] ] = multiple_values ? url_param[1].split( '|' ) : url_param[1];
-		} );
-
-		return params;
-	}
-
-	// Get params of the current URL:
-	var url_params = get_url_params( location.href, false );
-
-	// Show all custom fields by default:
-	custom_fields.show();
-
-	custom_fields.each( function()
-	{	// Check each custom fields by display condition:
-		var conditions = get_url_params( jQuery( this ).data( 'display-condition' ), true );
-		for( var cond_param in conditions )
-		{
-			var url_param_value = ( typeof( url_params[ cond_param ] ) == 'undefined' ? '' : url_params[ cond_param ] );
-			if( ( url_param_value === '' && conditions[ cond_param ].indexOf( '' ) === -1 ) ||
-			    conditions[ cond_param ].indexOf( url_param_value ) === -1 )
-			{	// Hide the custom field if at least one condition is not equal:
-				jQuery( this ).hide();
-				break;
-			}
+		// TODO: This does not get run when the param switcher is inserted into a post/item via shorttag.
+		//       Cannot uglify evo_switchable_blocks.js because of the arrow function there.
+		if( $this->get_param( 'allow_switch_js' ) )
+		{	// Load JS to switch between blocks on change URL in address bar:
+			require_js_defer( '#jquery#', 'blog' );
+			require_js_defer( 'src/evo_switchable_blocks.js', 'blog' );
 		}
-	} );
-} );
-</script>
-		<?php
-			$evo_widget_param_switcher_js_initied = true;
-		}
-
-		echo $this->disp_params['block_end'];
-
-		return true;
 	}
 }
 

@@ -196,11 +196,24 @@ img.imgerror,
 .margin-top-md {
   margin-top: 20px;
 }
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
 .margin-bottom-sm {
   margin-bottom: 10px;
 }
 .margin-bottom-md {
   margin-bottom: 20px;
+}
+.margin-top-xs {
+  margin-top: 3px;
+}
+.margin-bottom-xs {
+  margin-bottom: 3px;
+}
+.margin-y-xs {
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 .indented {
   padding-left: 3em;
@@ -1303,6 +1316,21 @@ div.message_toolbars div.edit_toolbar {
 .widget_core_coll_category_list .evo_cat_meta input[disabled="disabled"] {
   visibility: hidden;
 }
+.w-100 {
+  width: 100% !important;
+}
+.w-75 {
+  width: 75% !important;
+}
+.w-50 {
+  width: 50% !important;
+}
+.w-25 {
+  width: 25% !important;
+}
+.w-auto {
+  width: auto !important;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
@@ -1900,6 +1928,10 @@ div.debug code {
   font-size: 9pt;
   margin: 1ex 1ex 0;
   display: block;
+}
+div.debug code.debug_code_inline {
+  display: inline;
+  margin: 0;
 }
 div.debug div.query_info {
   background-color: #fff;
@@ -3185,6 +3217,20 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 }
 .autocomplete_usernames {
   display: block;
+}
+.search_form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.row-gutter-sm [class*='col-']:not(:first-child):not(:last-child) {
+  padding-right: 3px;
+  padding-left: 3px;
+}
+.row-gutter-sm [class*='col-']:first-child:not(:last-child) {
+  padding-right: 3px;
+}
+.row-gutter-sm [class*='col-']:last-child:not(:first-child) {
+  padding-left: 3px;
 }
 .ratings_table {
   margin: 0 10px 10px 0;

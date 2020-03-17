@@ -61,9 +61,9 @@ $debug_jslog = false;
 $allow_evo_stats = false;
 
 // Init AJAX log
-$Ajaxlog = new Log();
+$ajax_Log = new Log();
 
-$Ajaxlog->add( sprintf( 'action: %s', $action ), 'note' );
+ajax_log_add( sprintf( 'action: %s', $action ), 'note' );
 
 $params = param( 'params', 'array', array() );
 switch( $action )
@@ -224,7 +224,7 @@ switch( $action )
 			$UserCache = & get_UserCache();
 			$User = & $UserCache->get_by_ID( $user_ID );
 
-			$Ajaxlog->add( 'User: #'.$user_ID.' '.$User->login );
+			ajax_log_add( 'User: #'.$user_ID.' '.$User->login );
 
 			if( is_logged_in() &&
 			    ( $current_User->ID == $User->ID || $current_User->can_moderate_user( $User->ID ) ) &&
@@ -239,7 +239,7 @@ switch( $action )
 				}
 				if( $current_User->ID != $User->ID && $current_User->check_perm( 'users', 'edit' ) )
 				{	// Display a button to delete a spammer only for other users and if current user can edit them:
-					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID.'&amp;'.url_crumb( 'user' ) )
+					$moderation_buttons .= '<a href="'.url_add_param( $admin_url, 'ctrl=users&amp;action=delete&amp;deltype=spammer&amp;user_ID='.$User->ID )
 								.'" class="btn btn-sm btn-block btn-danger">'
 							.T_('Delete Spammer')
 						.'</a>';
@@ -375,7 +375,7 @@ switch( $action )
 			$CommentCache = & get_CommentCache();
 			$Comment = $CommentCache->get_by_ID( $comment_ID );
 
-			$Ajaxlog->add( 'Comment: #'.$comment_ID.' '.$Comment->get_author_name() );
+			ajax_log_add( 'Comment: #'.$comment_ID.' '.$Comment->get_author_name() );
 
 			echo '<div class="bubbletip_anon">';
 
@@ -487,9 +487,9 @@ switch( $action )
 		// Use the glyph or font-awesome icons if requested by skin
 		param( 'b2evo_icons_type', 'string', '' );
 
-		$Ajaxlog->add( sprintf( 'vote action: %s', $vote_action ), 'note' );
-		$Ajaxlog->add( sprintf( 'vote type: %s', $vote_type ), 'note' );
-		$Ajaxlog->add( sprintf( 'vote ID: %s', $vote_ID ), 'note' );
+		ajax_log_add( sprintf( 'vote action: %s', $vote_action ), 'note' );
+		ajax_log_add( sprintf( 'vote type: %s', $vote_type ), 'note' );
+		ajax_log_add( sprintf( 'vote ID: %s', $vote_ID ), 'note' );
 
 		$voting_form_params = array(
 				'vote_type' => $vote_type,
@@ -1012,7 +1012,7 @@ switch( $action )
 				break;
 
 			default:
-				$Ajaxlog->add( 'Incorrect callback function name!', 'error' );
+				ajax_log_add( 'Incorrect callback function name!', 'error' );
 				debug_die( 'Incorrect callback function!' );
 		}
 
@@ -1173,7 +1173,7 @@ switch( $action )
 
 		if( count( $status ) != 5 || ( $status[2] != 'y' && $status[2] != 'n' ) || $org_ID == 0 || ! $user_Organization )
 		{ // Incorrect format of status param
-			$Ajaxlog->add( /* DEBUG: do not translate */ 'Incorrect request to accept organization!', 'error' );
+			ajax_log_add( /* DEBUG: do not translate */ 'Incorrect request to accept organization!', 'error' );
 			break;
 		}
 
@@ -1829,9 +1829,6 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget', true, array(
 				'msg_format'        => 'text',
-				'msg_no_crumb'      => T_('The server did not receive a security crumb.'),
-				'msg_expired_crumb' => T_('The security crumb has expired.'),
-				'error_code'        => '400 Bad Crumb Request',
 			) );
 
 		// Collection ID:
@@ -1898,7 +1895,7 @@ switch( $action )
 				{
 					$client_widgets_data[] = '#'.$client_widget_ID.( isset( $code_widgets[ $client_widget_ID ] ) ? '('.$code_widgets[ $client_widget_ID ].')' : '' );
 				}
-				$Ajaxlog->add( 'Widgets: '.implode( ', ', $client_widgets_data ).' are found on the page but not found in DB or they are disabled!', 'error' );
+				ajax_log_add( 'Widgets: '.implode( ', ', $client_widgets_data ).' are found on the page but not found in DB or they are disabled!', 'error' );
 			}
 			if( ! empty( $server_widgets ) )
 			{	// Log what widgets were missed on client side:
@@ -1907,7 +1904,7 @@ switch( $action )
 				{
 					$server_widgets_data[] = '#'.$server_widget_ID.( isset( $code_widgets[ $server_widget_ID ] ) ? '('.$code_widgets[ $server_widget_ID ].')' : '' );
 				}
-				$Ajaxlog->add( 'Widgets: '.implode( ', ', $server_widgets_data ).' are enabled and found in DB but not found on the page!', 'error' );
+				ajax_log_add( 'Widgets: '.implode( ', ', $server_widgets_data ).' are enabled and found in DB but not found on the page!', 'error' );
 			}
 			break;
 		}
@@ -1948,9 +1945,6 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget', true, array(
 				'msg_format'        => 'text',
-				'msg_no_crumb'      => T_('The server did not receive a security crumb.'),
-				'msg_expired_crumb' => T_('The security crumb has expired.'),
-				'error_code'        => '400 Bad Crumb Request',
 			) );
 
 		param( 'blog', 'integer', 0 );
@@ -2054,21 +2048,15 @@ switch( $action )
 		break;
 
 	default:
-		$Ajaxlog->add( T_('Incorrect action!'), 'error' );
+		ajax_log_add( T_('Incorrect action!'), 'error' );
 		break;
 }
 
 $disp = NULL;
 $ctrl = NULL;
 
-if( $current_debug || $current_debug_jslog )
-{	// debug is ON
-	$Ajaxlog->display( NULL, NULL, true, 'all',
-					array(
-							'error' => array( 'class' => 'jslog_error', 'divClass' => false ),
-							'note'  => array( 'class' => 'jslog_note',  'divClass' => false ),
-						), 'ul', 'jslog' );
-}
+// Display AJAX Log:
+ajax_log_display();
 
 // Add ajax response end comment:
 echo '<!-- Ajax response end -->';

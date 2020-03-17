@@ -118,7 +118,7 @@ function check_version( $new_version_dir )
 /**
  * Enable/disable maintenance mode
  *
- * @param boolean true if maintenance mode need to be enabled
+ * @param boolean Do we want to enable or disable maintenance mode?
  * @param string Mode: 'all', 'install', 'upgrade'
  * @param string maintenance mode message
  * @param boolean TRUE to don't print out a message status
@@ -126,6 +126,7 @@ function check_version( $new_version_dir )
 function switch_maintenance_mode( $enable, $mode = 'all', $msg = '', $silent = false )
 {
 	global $conf_path;
+	static $maintenance_mode = 'unknown';
 
 	switch( $mode )
 	{
@@ -186,26 +187,32 @@ a clean DB may make it impossible to ever ugrade your b2evolution in the future.
 	}
 	else
 	{	// Delete maintenance file
-		if( ! $silent )
-		{
-			echo '<p>'.TB_('Switching out of maintenance mode...');
-		}
-		// Delete a maintenance file if it exists and writable:
-		if( is_writable( $conf_path.$maintenance_mode_file ) && @unlink( $conf_path.$maintenance_mode_file ) )
-		{	// Unlink was successful:
-			if( ! $silent )
-			{	// Dispaly OK message:
-				echo ' OK.</p>';
-				evo_flush();
-			}
-		}
-		else
-		{	// Unlink failed:
-			echo '</p><p style="color:red"><evo:error>'.sprintf( TB_('Unable to delete maintenance file: &laquo;%s&raquo;'), $maintenance_mode_file ).'</evo:error></p>';
-			evo_flush();
+	    
+		if( $maintenance_mode == 'unknown' ){
+		    
+		    if( ! $silent )
+		    {
+			    echo '<p>'.TB_('Switching out of maintenance mode...');
+			    $maintenance_mode = 'disable';
+		    }
+		    // Delete a maintenance file if it exists and writable:
+		    if( is_writable( $conf_path.$maintenance_mode_file ) && @unlink( $conf_path.$maintenance_mode_file ) )
+		    {	// Unlink was successful:
+			    if( ! $silent )
+			    {	// Dispaly OK message:
+				    echo ' OK.</p>';
+				    evo_flush();
+			    }
+		    }
+		    else
+		    {	// Unlink failed:
+			    echo '</p><p style="color:red"><evo:error>'.sprintf( TB_('Unable to delete maintenance file: &laquo;%s&raquo;'), $maintenance_mode_file ).'</evo:error></p>';
+			    evo_flush();
 
-			return false;
+			    return false;
+		    }
 		}
+		
 	}
 
 	return true;
@@ -493,7 +500,7 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdirs 
 	{	// Add files into archive:
 		if( $log_type == 'print' )
 		{
-			echo sprintf( TB_('Backing up &laquo;<strong>%s</strong>&raquo; ...'), $source_dir_path.$file );
+			echo sprintf( TB_('Adding &laquo;<strong>%s</strong>&raquo; to ZIP file...'), $source_dir_path.$file );
 			evo_flush();
 		}
 		$add_in_subdir = isset( $add_in_subdirs[ $file ] ) ? $add_in_subdirs[ $file ] : $add_in_subdirs[0];
@@ -558,8 +565,13 @@ function pack_archive( $archive_path, $source_dir_path, $files, $add_in_subdirs 
 
 		$zip_result = $zip_result && $file_result;
 	}
-
+	
+	echo sprintf( TB_('Compressing &laquo;<strong>%s</strong>&raquo;...'), $archive_path );
+	evo_flush();
+	
 	$ZipArchive->close();
+	
+	echo ' OK.<br />';
 
 	// Set rights for new created ZIP file:
 	@chmod( $archive_path, octdec( $Settings->get( 'fm_default_chmod_file' ) ) );

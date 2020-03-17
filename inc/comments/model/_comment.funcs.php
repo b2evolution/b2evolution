@@ -1015,6 +1015,35 @@ function check_comment_mass_delete( $CommentList )
 
 
 /**
+ * Check if autocomplete username is enabled
+ * 
+ * @param object Comment object
+ * @return boolean TRUE - if autocomplete username is enabled
+ */
+function check_autocomplete_usernames( $Comment )
+{
+	global $Settings, $Collection, $Blog;
+
+	if( $Comment->is_meta() )
+	{	// Always enable autocomplete username for internal comments
+		return true;
+	}
+	elseif( is_admin_page() && ! empty( $Blog ) )
+	{	// Check setting in the Back office or when Blog is not defined
+		return $Blog->get_setting( 'autocomplete_usernames' );
+	}
+	else
+	{	// Check setting in the Front office for current blog & skin
+		$SkinCache = & get_SkinCache();
+		$skin = & $SkinCache->get_by_ID( $Blog->get( 'skin_ID' ) );
+		return $skin->get_setting( 'autocomplete_usernames' );
+	}
+
+	return false;
+}
+
+
+/**
  * Dispay a form to mass delete the comments
  *
  * @param object Comment List
