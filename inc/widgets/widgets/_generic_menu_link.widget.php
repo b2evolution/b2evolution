@@ -46,23 +46,7 @@ class generic_menu_link_Widget extends ComponentWidget
 
 		$r = '';
 
-		// Are we displaying a link in a list or a standalone button?
-		// "Menu" Containers are 'inlist'. Some sub-containers will also be 'inlist' (displaying a local menu).
-		// fp> Maybe this should be moved up to container level? 
-		$inlist = $this->disp_params['inlist'];
-		if( $inlist === 'auto' )
-		{
-			if( empty( $this->disp_params['list_start'] ) )
-			{	// We're not starting a list. This means (very high probability) that we are already in a list:
-				$inlist = true;
-			}
-			else
-			{	// We have no override for list start. This means (very high probability) that we are displaying a standalone link -> we want a button for this widget
-				$inlist = false;
-			}
-		}
-
-		if( $inlist )
+		if( $this->is_inlist_mode() )
 		{	// Classic menu link display:
 
 			// It's debatable whether of not we want 'list_start' here but it doesn't hurt to keep it (will be empty under typical circumstances):
@@ -124,6 +108,48 @@ class generic_menu_link_Widget extends ComponentWidget
 		}
 
 		return $r;
+	}
+
+
+	/**
+	 * Check if currently is inlist mode
+	 *
+	 * @return boolean
+	 */
+	function is_inlist_mode()
+	{
+		if( isset( $this->disp_params['display_mode'] ) )
+		{	// Get inlist mode from "Display mode" param:
+			switch( $this->disp_params['display_mode'] )
+			{
+				case 'list':
+					$this->disp_params['inlist'] = true;
+					break;
+				case 'buttons':
+					$this->disp_params['inlist'] = false;
+					break;
+				default:
+					$this->disp_params['inlist'] = 'auto';
+			}
+		}
+
+		// Are we displaying a link in a list or a standalone button?
+		// "Menu" Containers are 'inlist'. Some sub-containers will also be 'inlist' (displaying a local menu).
+		// fp> Maybe this should be moved up to container level? 
+		$inlist = isset( $this->disp_params['inlist'] ) ? $this->disp_params['inlist'] : false;
+		if( $inlist === 'auto' )
+		{
+			if( empty( $this->disp_params['list_start'] ) )
+			{	// We're not starting a list. This means (very high probability) that we are already in a list:
+				$inlist = true;
+			}
+			else
+			{	// We have no override for list start. This means (very high probability) that we are displaying a standalone link -> we want a button for this widget
+				$inlist = false;
+			}
+		}
+
+		return $inlist;
 	}
 
 

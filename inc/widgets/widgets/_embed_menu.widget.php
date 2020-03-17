@@ -173,18 +173,6 @@ class embed_menu_Widget extends generic_menu_link_Widget
 			return false;
 		}
 
-		switch( $this->get_param( 'display_mode' ) )
-		{
-			case 'list':
-				$this->disp_params['inlist'] = true;
-				break;
-			case 'buttons':
-				$this->disp_params['inlist'] = false;
-				break;
-			default:
-				$this->disp_params['inlist'] = 'auto';
-		}
-
 		echo $this->disp_params['block_start'];
 		$this->disp_title();
 		echo $this->disp_params['block_body_start'];
