@@ -1457,6 +1457,58 @@ jQuery( document ).on( 'click', '#evo_comment_change_item_btn', function()
 
 
 /**
+ * Handles anonymous comment cookies
+ * 
+ * @param boolean True to set cookie, false otherwise
+ * @param string Value of anonymous comment author
+ * @param string Value of anonymous comment author's email
+ * @param string Value of anonymous comment author's URL
+ * @param boolean True if anonymous URLs are allowed
+ */
+function handle_comment_cookies( $set_cookies, $author, $email = '', $url = '', $allow_anon_url = false )
+{
+	global $cookie_name, $cookie_email, $cookie_url, $cookie_expires, $cookie_expired;
+
+	if( !is_logged_in() )
+	{
+		if( $set_cookies )
+		{	// Set cookies:
+			if ($email == '')
+				$email = ' '; // this to make sure a cookie is set for 'no email'
+			if ($url == '')
+				$url = ' '; // this to make sure a cookie is set for 'no url'
+
+			// fplanque: made cookies available for whole site
+			evo_setcookie( $cookie_name, $author, $cookie_expires, '', '', false, true );
+			evo_setcookie( $cookie_email, $email, $cookie_expires, '', '', false, true );
+			if( $allow_anon_url )
+			{
+				evo_setcookie( $cookie_url, $url, $cookie_expires, '', '', false, true );
+			}
+		}
+		else
+		{	// Erase cookies:
+			if( !empty( $_COOKIE[$cookie_name] ) )
+			{
+				evo_setcookie( $cookie_name, '', $cookie_expired, '', '', false, true );
+			}
+			if( !empty( $_COOKIE[$cookie_email] ) )
+			{
+				evo_setcookie( $cookie_email, '', $cookie_expired, '', '', false, true );
+			}
+			if( !empty( $_COOKIE[$cookie_url] ) )
+			{
+				evo_setcookie( $cookie_url, '', $cookie_expired, '', '', false, true );
+			}
+		}
+	}
+
+	// Send the predefined cookies:
+	evo_sendcookies();
+}
+
+
+/**
  * Helper functions to display Comments results.
  * New ( not display helper ) functions must be created above comments_results function
  */

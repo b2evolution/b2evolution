@@ -58,16 +58,18 @@ class cookie_consent_plugin extends Plugin
 				'intro' => array(
 					'label' => T_('Intro Text'),
 					'note' => T_('Leave empty for default').'.',
-					'type' => 'text',
+					'type' => 'html_textarea',
 				),
 				'post_ID' => array(
 					'label' => T_('Post ID for more info'),
 					'type' => 'integer',
+					'allow_empty' => true,
 				),
 				'info' => array(
 					'label' => T_('More info Text'),
 					'note' => T_('Leave empty for default').'.',
-					'type' => 'html_textarea',
+					'type' => 'text',
+					'size' => 50,
 				),
 				'consent' => array(
 					'label' => T_('Consent Text'),

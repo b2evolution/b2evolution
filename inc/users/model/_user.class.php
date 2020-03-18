@@ -1708,7 +1708,7 @@ class User extends DataObject
 										&& ( ( $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ) ||
 										     ( $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ) ||
 										     ( $Blog->get_setting( 'allow_comment_subscriptions' ) && $Blog->get_setting( 'opt_out_comment_subscription' ) ) )
-										&& $this->check_perm( 'blog_ismember', 'view', true, $loop_blog_ID ) )
+										&& $this->check_perm( 'blog_ismember', 'view', false, $loop_blog_ID ) )
 								{
 									$opt_item = $Blog->get_setting( 'allow_subscriptions' ) && $Blog->get_setting( 'opt_out_subscription' ) ? $sub_items : 0;
 									$opt_item_mod = $Blog->get_setting( 'allow_item_mod_subscriptions' ) && $Blog->get_setting( 'opt_out_item_mod_subscription' ) ? $sub_items : 0;
@@ -1763,7 +1763,7 @@ class User extends DataObject
 								if( $Blog->get( 'advanced_perms' )
 										&& $Blog->get_setting( 'allow_item_subscriptions' )
 										&& $Blog->get_setting( 'opt_out_item_subscription' )
-										&& $this->check_perm( 'blog_ismember', 'view', true, $blog_ID ) )
+										&& $this->check_perm( 'blog_ismember', 'view', false, $blog_ID ) )
 								{
 									$opt_out_values[] = "( $loop_item_ID, $this->ID, $isub_comments )";
 								}

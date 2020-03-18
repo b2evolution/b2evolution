@@ -20,6 +20,8 @@ require_once dirname(__FILE__).'/../conf/_config.php';
 
 require_once $inc_path.'_main.inc.php';
 
+load_funcs( 'comments/model/_comment.funcs.php' );
+
 // Stop a request from the blocked IP addresses or Domains
 antispam_block_request();
 
@@ -44,6 +46,8 @@ $commented_Item->load_Blog();
 $blog = $commented_Item->Blog->ID;
 // Initialize global $Collection, $Blog to avoid restriction of redirect to external URL, for example, when collection URL is subdomain:
 $Collection = $Blog = $commented_Item->Blog;
+
+$allow_anon_url = $commented_Item->Blog->get_setting( 'allow_anon_url' );
 
 // Re-Init charset handling, in case current_charset has changed:
 locale_activate( $commented_Item->Blog->get('locale') );
@@ -403,9 +407,12 @@ if( $workflow_is_loaded )
 if( ( $Messages->has_errors() && $action != 'preview' ) ||
     ( $workflow_is_updated && $is_empty_comment ) )
 {
+	global $Session;
+
 	$Comment->set( 'preview_attachments', $preview_attachments );
 	$Comment->set( 'checked_attachments', $checked_attachments );
 	save_comment_to_session( $Comment, 'unsaved', $comment_type );
+	$Session->set( 'core.comment_cookies', $comment_cookies );
 
 	if( !empty( $reply_ID ) )
 	{
@@ -418,6 +425,8 @@ if( ( $Messages->has_errors() && $action != 'preview' ) ||
 	{	// Send post assignment notification when only workflow assigned User was changed without posting new comment:
 		$commented_Item->send_assignment_notification();
 	}
+
+	handle_comment_cookies( $comment_cookies, $author, $email, $url, $allow_anon_url );
 
 	header_redirect(); // 303 redirect
 	// exited here
@@ -455,6 +464,7 @@ if( $action == 'preview' )
 	// Set Comment Item object to NULL, so this way the Item object won't be serialized, but the item_ID is still set
 	$Comment->Item = NULL;
 	save_comment_to_session( $Comment, 'preview', $comment_type );
+	$Session->set( 'core.comment_cookies_preview', $comment_cookies );
 	$Session->set( 'core.no_CachePageContent', 1 );
 	$Session->dbsave();
 
@@ -501,6 +511,8 @@ if( $action == 'preview' )
 	}
 
 	$redirect_to .= '#comment_preview';
+
+	handle_comment_cookies( $comment_cookies, $author, $email, $url, $allow_anon_url );
 
 	header_redirect();
 	exit(0);
@@ -559,45 +571,8 @@ if( $result && ( !empty( $preview_attachments ) ) )
 	}
 }
 
-
-/*
- * ---------------
- * Handle cookies:
- * ---------------
- */
-if( !is_logged_in() )
-{
-	if( $comment_cookies )
-	{	// Set cookies:
-		if ($email == '')
-			$email = ' '; // this to make sure a cookie is set for 'no email'
-		if ($url == '')
-			$url = ' '; // this to make sure a cookie is set for 'no url'
-
-		// fplanque: made cookies available for whole site
-		evo_setcookie( $cookie_name, $author, $cookie_expires, '', '', false, true );
-		evo_setcookie( $cookie_email, $email, $cookie_expires, '', '', false, true );
-		evo_setcookie( $cookie_url, $url, $cookie_expires, '', '', false, true );
-	}
-	else
-	{	// Erase cookies:
-		if( !empty($_COOKIE[$cookie_name]) )
-		{
-			evo_setcookie( $cookie_name, '', $cookie_expired, '', '', false, true );
-		}
-		if( !empty($_COOKIE[$cookie_email]) )
-		{
-			evo_setcookie( $cookie_email, '', $cookie_expired, '', '', false, true );
-		}
-		if( !empty($_COOKIE[$cookie_url]) )
-		{
-			evo_setcookie( $cookie_url, '', $cookie_expired, '', '', false, true );
-		}
-	}
-}
-
-// Send the predefined cookies:
-evo_sendcookies();
+// Handle cookies:
+handle_comment_cookies( $comment_cookies, $author, $email, $url, $allow_anon_url );
 
 // Note: we don't give any clue that we have automatically deleted a comment. It would only give spammers the perfect tool to find out how to pass the filter.
 

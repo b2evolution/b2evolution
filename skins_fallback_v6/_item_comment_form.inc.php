@@ -136,6 +136,9 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 				// ---------------------- END OF PREVIEW COMMENT ---------------------
 			}
 
+			$comment_cookies = $Session->get( 'core.comment_cookies_preview' );
+			$Session->delete( 'core.comment_cookies_preview' );
+
 			// Form fields:
 			$comment_content = $Comment->original_content;
 			// comment_attachments contains all file IDs that have been attached
@@ -186,6 +189,9 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 		}
 		else
 		{ // set saved Comment attributes from Session
+			$comment_cookies = $Session->get( 'core.comment_cookies' );
+			$Session->delete( 'core.comment_cookies' );
+
 			$comment_content = $Comment->content;
 			$comment_author = $Comment->author;
 			$comment_author_email = $Comment->author_email;
@@ -262,9 +268,9 @@ if( $params['disp_comment_form'] && ( $params['comment_type'] == 'meta' && $Item
 		param( 'comment_cookies', 'integer', NULL );
 		param( 'comment_allow_msgform', 'integer', NULL ); // checkbox
 
-		if( is_null($comment_cookies) )
-		{ // "Remember me" checked, if remembered before:
-			$comment_cookies = isset($_COOKIE[$cookie_name]) || isset($_COOKIE[$cookie_email]) || isset($_COOKIE[$cookie_url]);
+		if( is_null( $comment_cookies ) )
+		{	// "Remember me" checked, if remembered before:
+			$comment_cookies = isset( $_COOKIE[$cookie_name] ) || isset( $_COOKIE[$cookie_email] ) || isset( $_COOKIE[$cookie_url] );
 		}
 	}
 
