@@ -6973,8 +6973,7 @@ function users_results_block( $params = array() )
 
 	if( is_pro() )
 	{
-		$UserList->global_icon( T_('Import Users'), 'new',
-				regenerate_url( 'action', 'action=csv'), T_('Import Users').' &raquo;', 3, 4 );
+		$UserList->global_icon( T_('Import Users'), 'new', $admin_url.'?ctrl=user&amp;action=csv', T_('Import Users').' &raquo;', 3, 4 );
 	}
 	
 	if( is_logged_in() && $current_User->check_perm( 'users', 'edit', false ) )
@@ -8939,5 +8938,88 @@ jQuery( document ).on( 'click', '.add_secondary_group', function()
 } );
 </script>
 <?php
+}
+
+/**
+ * Import users from CSV file
+ *
+ * @param integer Group ID
+ * @param string File path
+ * @return array (
+ *   'inserted' => Count of inserted users,
+ *   'updated'  => Count of updated users );
+ */
+function import_users( $group_ID, $file_path )
+{
+	global $DB;
+
+	$DB->begin();
+
+	// Get users from DB:
+	$SQL = new SQL( 'Get users before import' );
+	$SQL->SELECT( 'user_login, user_email' );
+	$SQL->FROM( 'T_users' );
+	$existing_users = $DB->get_assoc( $SQL );
+
+	// Open file:
+	$file_handle = fopen( $file_path, 'r' );
+
+	$r = 0;
+	$users_insert_values = array();
+	$users_update_values = array();
+	while( $data = fgetcsv( $file_handle, 1024, ";" ) )
+	{
+		$r++;
+		if( $r == 1 )
+		{	// Skip first row with titles:
+			continue;
+		}
+
+		$login = trim( $data[0], " \xA0" ); // \xA0 - ASCII Non-breaking space
+		$email = trim( $data[1], " \xA0" );
+
+		if( empty( $email ) )
+		{	// Skip empty row:
+			continue;
+		}
+
+		if( isset( $existing_users[ $login ] ) )
+		{	// Set new name for existing user if it already exists:
+			$users_update_values[ $login ] = $email;
+		}
+		else
+		{	// Insert a new user:
+			$users_insert_values[] = '( '.$DB->quote( $login ).', '.$DB->quote( $group_ID ).', '.$DB->quote( $email ).', "", "" )';
+			$existing_users[ $login ] = $email;
+		}
+	}
+
+	// Close file pointer:
+	fclose( $file_handle );
+
+	$count_insert_users = count( $users_insert_values );
+	$count_update_users = count( $users_update_values );
+
+	if( $count_insert_users > 0 )
+	{	// New users are found to import:
+		$DB->query( 'INSERT INTO T_users ( user_login, user_grp_ID, user_email, user_pass, user_salt )
+			VALUES '.implode( ', ', $users_insert_values ) );
+	}
+
+	if( $count_update_users > 0 )
+	{	// Some users should be updated:
+		foreach( $users_update_values as $user_login => $user_email )
+		{	// Update an existing user:
+			$DB->query( 'UPDATE T_users
+				  SET user_email = '.$DB->quote( $user_email ).'
+				WHERE user_login = '.$DB->quote( $user_login ) );
+		}
+	}
+
+	$DB->commit();
+
+	return array(
+		'inserted' => $count_insert_users,
+		'updated'  => $count_update_users );
 }
 ?>

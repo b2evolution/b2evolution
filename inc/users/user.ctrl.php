@@ -934,6 +934,55 @@ if( !$Messages->has_errors() )
 			header_redirect( '?ctrl=user&user_tab=marketing&user_ID='.$edited_User->ID, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
 			break;
+		
+		case 'import':
+			if( is_pro() )
+			{
+				// Import new users:
+
+				// Check that this action request is not a CSRF hacked request:
+				$Session->assert_received_crumb( 'user' );
+
+				// Check permission:
+				$current_User->check_perm( 'options', 'edit', true );
+
+				set_max_execution_time( 0 );
+
+				// Group Id
+				param( 'grp_ID', 'integer', true );
+				param_check_number( 'grp_ID', T_('Please select a group'), true );
+
+				// CSV File
+				$import_file = param( 'import_file', 'string', '' );
+				if( empty( $import_file ) )
+				{	// File is not selected:
+					$Messages->add( T_('Please select a CSV file to import.'), 'error' );
+				}
+				else if( ! preg_match( '/\.csv$/i', $import_file ) )
+				{	// Extension is incorrect
+					$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
+				}
+
+				if( param_errors_detected() )
+				{	// Some errors are exist, Stop the importing:
+					$action = 'csv';
+					break;
+				}
+
+				// Import users from CSV file:
+				$count_users = import_users( $grp_ID, $import_file );
+
+				$GroupCache = & get_GroupCache();
+				$Group = $GroupCache->get_by_ID( $grp_ID );
+
+				$Messages->add( sprintf( T_('%s users have been added and %s users have been updated for primary group %s.'),
+					$count_users['inserted'], $count_users['updated'], $Group->get_name() ), 'success' );
+				// Redirect so that a reload doesn't write to the DB twice:
+				header_redirect( $admin_url.'?ctrl=users', 303 ); // Will EXIT
+				break;
+			
+			}
+		
 	}
 }
 
@@ -1096,7 +1145,12 @@ switch( $action )
 	case 'nil':
 		// Display NO payload!
 		break;
-
+	case 'csv':
+		if( is_pro() )
+		{
+			$AdminUI->disp_view( 'users/views/_user_import.form.php' );
+			break;
+		}
 	case 'new':
 	case 'view':
 	case 'edit':
