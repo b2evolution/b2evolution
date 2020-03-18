@@ -14281,8 +14281,8 @@ class Item extends ItemLight
 		global $current_User;
 
 		$perm =
-			// Item must be saved in DB:
-			! empty( $this->ID ) &&
+			// Main Category must be defined for this Item in order to check permission in Collection of the Category:
+			! empty( $this->main_cat_ID ) &&
 			// User must be logged in:
 			is_logged_in() &&
 			// Workflow must be enabled for current Collection:
