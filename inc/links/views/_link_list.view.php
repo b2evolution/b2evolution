@@ -137,6 +137,7 @@ switch( $link_owner_type )
 		break;
 
 	case 'comment':
+	case 'metacomment':
 		$upload_fileroot = FileRoot::gen_ID( 'collection', $LinkOwner->get_blog_ID() );
 		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'c' ).$LinkOwner->get_ID().'/';
 		break;
@@ -156,13 +157,14 @@ $link_owner_positions = $LinkOwner->get_positions();
 
 // Display a button to quick upload the files by drag&drop method
 display_dragdrop_upload_button( array(
-		'before' => '<div class="evo_fileuploader_form">',
-		'after'  => '</div>',
-		'fileroot_ID'      => $upload_fileroot,
-		'path'             => $upload_path,
-		'listElement'      => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody" ).get(0)',
-		'list_style'       => 'table',
-		'template'         => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
+		'before'                 => '<div class="evo_fileuploader_form">',
+		'after'                  => '</div>',
+		'fileroot_ID'            => $upload_fileroot,
+		'path'                   => $upload_path,
+		'listElement'            => 'jQuery( "#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody" ).get(0)',
+		'list_element'           => '#'.$fieldset_prefix.'attachments_fieldset_table .filelist_tbody',
+		'list_style'             => 'table',
+		'template'               => '<div class="qq-uploader-selector qq-uploader" qq-drop-area-text="#button_text#">'
 				.'<div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>'	// Main dropzone
 					// The div below is not necessary because were making the main dropzone transparent so
 					// the upload button below will not be covered when the main dropzone is "displayed" on drop ((see qq-hide-dropzone doc)):
@@ -209,4 +211,5 @@ display_dragdrop_upload_button( array(
 
 	// Initialize attachments fieldset to set proper height and handler to resize it:
 	expose_var_to_js( 'link_initialize_fieldset_'.$fieldset_prefix, array( 'fieldset_prefix' => $fieldset_prefix ), 'evo_link_initialize_fieldset_config' );
+	// This will only initialize once when the page is loaded. If this is loaded via AJAX then that should also call "evo_link_initialize_fieldset()". 
 ?>

@@ -2539,6 +2539,7 @@ class RestApi
 
 		$link_type = param( 'type', 'string' );
 		$link_object_ID = param( 'object_ID', 'string' );
+		$fieldset_prefix = param( 'prefix', 'string', NULL );
 
 		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 

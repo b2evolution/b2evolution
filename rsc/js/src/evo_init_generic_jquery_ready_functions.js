@@ -93,73 +93,75 @@ jQuery( document ).ready( function()
 		var evo_ajax_forms = Object.values( evo_ajax_form_config );
 		for( var i = 0; i < evo_ajax_forms.length; i++ )
 		{
-			var config = evo_ajax_forms[i];
+			( function() {
+				var config = evo_ajax_forms[i];
 
-			window['ajax_form_offset_' + config['form_number']] = jQuery( '#ajax_form_number_' + config['form_number'] ).offset().top;
-			window['request_sent_' + config['form_number']] = false;
-			window['ajax_form_loading_number_' + config['form_number']] = 0;
+				window['ajax_form_offset_' + config['form_number']] = jQuery( '#ajax_form_number_' + config['form_number'] ).offset().top;
+				window['request_sent_' + config['form_number']] = false;
+				window['ajax_form_loading_number_' + config['form_number']] = 0;
 
-			var get_form_func_name = 'get_form' + config['form_number']
-			window[get_form_func_name] = function()
-				{
-					var form_id = '#ajax_form_number_' + config['form_number'];
-					window['ajax_form_loading_number_' + config['form_number']]++;
-					jQuery.ajax({
-						url: htsrv_url + 'anon_async.php',
-						type: 'POST',
-						data: config['json_params'],
-						success: function(result)
-						{
-							jQuery( form_id ).html( ajax_debug_clear( result ) );
+				var get_form_func_name = 'get_form' + config['form_number']
+				window[get_form_func_name] = function()
+					{
+						var form_id = '#ajax_form_number_' + config['form_number'];
+						window['ajax_form_loading_number_' + config['form_number']]++;
+						jQuery.ajax({
+							url: htsrv_url + 'anon_async.php',
+							type: 'POST',
+							data: config['json_params'],
+							success: function(result)
+							{
+								jQuery( form_id ).html( ajax_debug_clear( result ) );
 
-							if( config['json_params'].action == 'get_comment_form' )
-							{	// Call function to render the star ratings for AJAX comment forms:
-								evo_render_star_rating();
+								if( config['json_params'].action == 'get_comment_form' )
+								{	// Call function to render the star ratings for AJAX comment forms:
+									evo_render_star_rating();
+								}
+							},
+							error: function( jqXHR, textStatus, errorThrown )
+							{
+								jQuery( '.loader_ajax_form', form_id ).after( '<div class="red center">' + errorThrown + ': ' + jqXHR.responseText + '</div>' );
+								if( window['ajax_form_loading_number_' + config['form_number']] < 3 )
+								{	// Try to load 3 times this ajax form if error occurs:
+									setTimeout( function()
+									{	// After 1 second delaying:
+										jQuery( '.loader_ajax_form', form_id ).next().remove();
+										window[get_form_func_name]();
+									}, 1000 );
+								}
 							}
-						},
-						error: function( jqXHR, textStatus, errorThrown )
-						{
-							jQuery( '.loader_ajax_form', form_id ).after( '<div class="red center">' + errorThrown + ': ' + jqXHR.responseText + '</div>' );
-							if( window['ajax_form_loading_number_' + config['form_number']] < 3 )
-							{	// Try to load 3 times this ajax form if error occurs:
-								setTimeout( function()
-								{	// After 1 second delaying:
-									jQuery( '.loader_ajax_form', form_id ).next().remove();
-									window[get_form_func_name]();
-								}, 1000 );
-							}
+						});
+					}
+
+				var check_and_show_func_name = 'check_and_show_' + config['form_number']
+				window[check_and_show_func_name] = function( force_load )
+					{
+						if( window['request_sent_' + config['form_number']] )
+						{	// Don't load the form twice:
+							return;
 						}
-					});
-				}
-
-			var check_and_show_func_name = 'check_and_show_' + config['form_number']
-			window[check_and_show_func_name] = function( force_load )
-				{
-					if( window['request_sent_' + config['form_number']] )
-					{	// Don't load the form twice:
-						return;
+						var load_form = ( typeof force_load == undefined ) ? false : force_load;
+						if( ! load_form )
+						{	// Check if the ajax form is visible, or if it will be visible soon ( 20 pixel ):
+							load_form = jQuery( window ).scrollTop() >= window['ajax_form_offset_' + config['form_number']] - jQuery(window).height() - 20;
+						}
+						if( load_form )
+						{	// Load the form only if it is forced or allowed because page is scrolled down to the form position:
+							window['request_sent_' + config['form_number']] = true;
+							window[get_form_func_name]();
+						}
 					}
-					var load_form = ( typeof force_load == undefined ) ? false : force_load;
-					if( ! load_form )
-					{	// Check if the ajax form is visible, or if it will be visible soon ( 20 pixel ):
-						load_form = jQuery( window ).scrollTop() >= window['ajax_form_offset_' + config['form_number']] - jQuery(window).height() - 20;
-					}
-					if( load_form )
-					{	// Load the form only if it is forced or allowed because page is scrolled down to the form position:
-						window['request_sent_' + config['form_number']] = true;
-						window[get_form_func_name]();
-					}
-				}
 
-			jQuery( window ).scroll( function() {
-				window[check_and_show_func_name]();
-			});
-	
-			jQuery(window).resize( function() {
-				window[check_and_show_func_name]();
-			});
+				jQuery( window ).scroll( function() {
+					window[check_and_show_func_name]();
+				});
+		
+				jQuery(window).resize( function() {
+					window[check_and_show_func_name]();
+				});
 
-			window[check_and_show_func_name]( config['load_ajax_form_on_page_load'] );
+				window[check_and_show_func_name]( config['load_ajax_form_on_page_load'] );
+			} )();
 		}
 	}
 
@@ -419,66 +421,69 @@ jQuery( document ).ready( function()
 		var evo_link_sortable_js_configs = Object.values( evo_link_sortable_js_config );
 		for( var i = 0; i < evo_link_sortable_js_configs.length; i++ )
 		{
-			jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table' ).sortable(
-				{
-					containerSelector: 'table',
-					itemPath: '> tbody',
-					itemSelector: 'tr',
-					placeholder: jQuery.parseHTML( '<tr class="placeholder"><td colspan="5"></td></tr>' ),
-					onMousedown: function( $item, _super, event )
-						{
-							if( ! event.target.nodeName.match( /^(a|img|select|span)$/i ) )
-							{	// Ignore a sort action when mouse is clicked on the tags <a>, <img>, <select> or <span>
-								event.preventDefault();
-								return true;
-							}
-						},
-					onDrop: function( $item, container, _super )
-						{
-							jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr' ).removeClass( 'odd even' );
-							jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr:odd' ).addClass( 'even' );
-							jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr:even' ).addClass( 'odd' );
-				
-							var link_IDs = '';
-							jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr' ).each( function()
-								{
-									var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
-									if( link_ID_cell.length > 0 )
-									{
-										link_IDs += link_ID_cell.html() + ',';
-									}
-								} );
-							link_IDs = link_IDs.slice( 0, -1 );
-				
-							jQuery.ajax(
+			( function() {
+				jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table' ).sortable(
+					{
+						containerSelector: 'table',
+						itemPath: '> tbody',
+						itemSelector: 'tr',
+						placeholder: jQuery.parseHTML( '<tr class="placeholder"><td colspan="5"></td></tr>' ),
+						onMousedown: function( $item, _super, event )
 							{
-								url: htsrv_url + 'anon_async.php',
-								type: 'POST',
-								data:
+								if( ! event.target.nodeName.match( /^(a|img|select|span)$/i ) )
+								{	// Ignore a sort action when mouse is clicked on the tags <a>, <img>, <select> or <span>
+									event.preventDefault();
+									return true;
+								}
+							},
+						onDrop: function( $item, container, _super )
+							{
+								jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr' ).removeClass( 'odd even' );
+								jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr:odd' ).addClass( 'even' );
+								jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr:even' ).addClass( 'odd' );
+					
+								var link_IDs = '';
+								jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr' ).each( function()
 									{
-										'action': 'update_links_order',
-										'links': link_IDs,
-										'crumb_link': evo_link_sortable_js_configs[i].crumb_link,
-									},
-								success: function( data )
-									{
-										link_data = JSON.parse( ajax_debug_clear( data ) );
-										// Update data-order attributes
-										jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr' ).each( function()
+										var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
+										if( link_ID_cell.length > 0 )
 										{
-											var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
-											if( link_ID_cell.length > 0 )
+											link_IDs += link_ID_cell.html() + ',';
+										}
+									} );
+								link_IDs = link_IDs.slice( 0, -1 );
+					
+								jQuery.ajax(
+								{
+									url: htsrv_url + 'anon_async.php',
+									type: 'POST',
+									data:
+										{
+											'action': 'update_links_order',
+											'links': link_IDs,
+											'crumb_link': evo_link_sortable_js_configs[i].crumb_link,
+										},
+									success: function( data )
+										{
+											link_data = JSON.parse( ajax_debug_clear( data ) );
+											// Update data-order attributes
+											jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr' ).each( function()
 											{
-												link_ID_cell.attr( 'data-order', link_data[link_ID_cell.html()] );
-											}
-										} );
-										evoFadeSuccess( $item );
-									}
-							} );
-				
-							$item.removeClass( container.group.options.draggedClass ).removeAttr("style");
-						}
-				} );
+												var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
+												if( link_ID_cell.length > 0 )
+												{
+													link_ID_cell.attr( 'data-order', link_data[link_ID_cell.html()] );
+												}
+											} );
+											evoFadeSuccess( $item );
+										}
+								} );
+					
+								$item.removeClass( container.group.options.draggedClass ).removeAttr("style");
+							}
+					} );
+			} )();
+			
 		}
 	}
 

@@ -340,9 +340,16 @@ function evo_link_ajax_loading_overlay()
  * @param integer ID of Item or Comment
  * @param string Action: 'refresh', 'sort'
  */
-function evo_link_refresh_list( type, object_ID, action )
+function evo_link_refresh_list( type, object_ID, action, obj )
 {
 	var ajax_loading = evo_link_ajax_loading_overlay();
+	var fieldset, fieldset_prefix;
+
+	if( obj )
+	{
+		fieldset = jQuery( obj ).closest( 'fieldset.fieldset' );
+		fieldset_prefix = fieldset.data('fieldset_prefix');
+	}
 
 	if( ajax_loading )
 	{	// If new request is allowed in current time:
@@ -350,20 +357,27 @@ function evo_link_refresh_list( type, object_ID, action )
 		// Call REST API request to attach a file to Item/Comment:
 		evo_rest_api_request( 'links',
 		{
-			'action':    typeof( action ) == 'undefined' ? 'refresh' : 'sort',
-			'type':      type.toLowerCase(),
-			'object_ID': object_ID,
+			'action'    : typeof( action ) == 'undefined' ? 'refresh' : 'sort',
+			'type'      : type.toLowerCase(),
+			'object_ID' : object_ID,
+			'prefix'    : fieldset ? fieldset.data('fieldsetPrefix') : undefined,
 		},
 		function( data )
 		{
 			// Refresh a content of the links list:
-			jQuery( '#attachments_fieldset_table' ).html( data.html );
+			jQuery( '#attachments_fieldset_table' ).html( data.html ); // TODO: this has missing fieldset_prefix in the ID! Check if this works with meta comment attachments
 
-			// Remove temporary content of ajax loading indicator:
-			ajax_loading.remove();
+			if( fieldset_prefix )
+			{	// Initialize init_uploader( 'fieldset_' + prefix ) to display uploader button
+				init_uploader( 'fieldset_' + fieldset_prefix );
+			}
 
 			// Update the attachment block height after refreshing:
 			evo_link_fix_wrapper_height();
+			
+
+			// Remove temporary content of ajax loading indicator:
+			ajax_loading.remove();	
 		} );
 	}
 

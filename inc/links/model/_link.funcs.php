@@ -241,12 +241,12 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 	$fieldset_title .= '<span class="floatright panel_heading_action_icons">&nbsp;'
 
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
-				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
+				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'refresh\', this )' ) )
 
 			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) ) )
 				? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
 				: $LinkOwner->get_edit_url().'#',
-				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) )
+				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\', this )' ) )
 
 		.'</span>';
 
@@ -257,7 +257,8 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 			'id' => $fieldset_prefix.$form_id,
 			'style' => 'display:none', // Show this uploader fieldset only when JS is enabled
 			'fold' => $fold,
-			'deny_fold' => ( $links_count > 0 )
+			'deny_fold' => ( $links_count > 0 ),
+			'data-fieldset-prefix' => $fieldset_prefix,
 		) );
 
 	echo '<div id="'.$fieldset_prefix.'attachments_fieldset_wrapper" class="evo_attachments_fieldset__wrapper">';

@@ -289,6 +289,7 @@ module.exports = function(grunt) {
 					'rsc/js/src/evo_init_plugin_tinymce.js',
 					'rsc/js/src/evo_init_plugin_shortlinks.js',
 					'rsc/js/src/evo_init_plugin_polls.js',
+					'rsc/js/src/evo_init_dragdrop_button.js',
 				],
 				dest: 'rsc/js/build/evo_generic.bmin.js'
 			},

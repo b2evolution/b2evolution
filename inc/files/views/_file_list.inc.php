@@ -616,18 +616,19 @@ $Form->begin_form();
 
 			// Display a button to quick upload the files by drag&drop method
 			display_dragdrop_upload_button( array(
-					'fileroot_ID'          => $fm_FileRoot->ID,
-					'path'                 => $path,
-					'listElement'          => 'jQuery( ".filelist_tbody" ).get(0)',
-					'list_style'           => 'table',
-					'template'             => $template,
-					'display_support_msg'  => false,
+					'fileroot_ID'            => $fm_FileRoot->ID,
+					'path'                   => $path,
+					'listElement'            => 'jQuery( ".filelist_tbody" ).get(0)',
+					'list_element'           => '.filelist_tbody',
+					'list_style'             => 'table',
+					'template'               => $template,
+					'display_support_msg'    => false,
 					'display_status_success' => false,
-					'additional_dropzone'  => '[ jQuery( ".filelist_tbody" ).get(0) ]',
-					'filename_before'      => $icon_to_link_files,
-					'table_headers'        => $table_headers,
-					'noresults'            => $noresults,
-					'table_id'             => 'FilesForm',
+					'additional_dropzone'    => '[ jQuery( ".filelist_tbody" ).get(0) ]',
+					'filename_before'        => $icon_to_link_files,
+					'table_headers'          => $table_headers,
+					'noresults'              => $noresults,
+					'table_id'               => 'FilesForm',
 				) );
 			?>
 			</td>
