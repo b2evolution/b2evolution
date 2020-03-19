@@ -248,6 +248,12 @@ jQuery( document ).ready( function()
 		window.check_multiple_recipients();
 	}
 
+	// Comment Form: Preview Button
+	if( typeof( evo_comment_form_preview_button_config ) != 'undefined' )
+	{
+		jQuery( "input[type=submit].preview.btn-info" ).val( evo_comment_form_preview_button_config.button_value );
+	}
+
 	// Userlist filter callback JS
 	if( typeof( evo_user_func__callback_filter_userlist ) != 'undefined' )
 	{
@@ -483,6 +489,16 @@ jQuery( document ).ready( function()
 		for( var i = 0; i < evo_link_initialize_fieldset_configs.length; i++ )
 		{
 			evo_link_initialize_fieldset( evo_link_initialize_fieldset_configs[i].fieldset_prefix );
+		}
+	}
+
+	// Display attachments fieldset
+	if( typeof( evo_display_attachments_fieldset_config ) != 'undefined' )
+	{
+		var evo_display_attachments_fieldset_configs = Object.values( evo_display_attachments_fieldset_config );
+		for( var i = 0; i < evo_display_attachments_fieldset_configs.length; i++ )
+		{
+			jQuery( '#' + evo_display_attachments_fieldset_configs[i].fieldset_prefix + evo_display_attachments_fieldset_configs[i].form_id ).show();
 		}
 	}
 } );

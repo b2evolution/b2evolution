@@ -275,45 +275,23 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 	$Form->end_fieldset();
 
 	// Show fieldset of quick uploader only when JS is enabled:
-	echo '<script type="text/javascript">jQuery( "#'.$fieldset_prefix.$form_id.'" ).show()</script>';
-
+	expose_var_to_js( 'fieldset_'.$fieldset_prefix.$form_id, array( 'fieldset_prefix' => $fieldset_prefix, 'form_id' => $form_id ), 'evo_display_attachments_fieldset_config' );
+	
 	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) && empty( $restriction_overlay ) )
 	{	// Check if current user has a permission to back-office files manager:
 
 		// Initialize JavaScript to build and open window:
 		echo_modalwindow_js();
-?>
-<script>
-function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight, prefix )
-{
-	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
-		'90%', '80%', true, '<?php echo $window_title; ?>', '', true );
-	jQuery.ajax(
-	{
-		type: 'POST',
-		url: '<?php echo get_htsrv_url(); ?>async.php',
-		data:
-		{
-			'action': 'link_attachment',
-			'link_owner_type': link_owner_type,
-			'link_owner_ID': link_owner_ID,
-			'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
-			'root': typeof( root ) == 'undefined' ? '' : root,
-			'path': typeof( path ) == 'undefined' ? '' : path,
-			'fm_highlight': typeof( fm_highlight ) == 'undefined' ? '' : fm_highlight,
-			'prefix': typeof( prefix ) == 'undefined' ? '' : prefix,
-		},
-		success: function(result)
-		{
-			openModalWindow( result, '90%', '80%', true, '<?php echo $window_title; ?>', '' );
-		}
-	} );
-	return false;
-}
-</script>
-<?php
-// Print JS function to allow edit file properties on modal window
-echo_file_properties();
+
+		$link_attachment_window_config = array(
+				'loader_title' => T_('Loading...'),
+				'window_title' => $window_title,
+				'crumb_link'   => get_crumb( 'link' ),
+			);
+		expose_var_to_js( 'evo_link_attachment_window_config', evo_json_encode( $link_attachment_window_config ) );
+
+		// Print JS function to allow edit file properties on modal window
+		echo_file_properties();
 	}
 }
 

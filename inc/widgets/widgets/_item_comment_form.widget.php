@@ -687,7 +687,7 @@ class item_comment_form_Widget extends ComponentWidget
 
 				if( $Item->can_attach() )
 				{	// Don't display "/Add file" on the preview button if JS is enabled:
-					echo '<script type="text/javascript">jQuery( "input[type=submit].preview.btn-info" ).val( "'.TS_('Preview').'" )</script>';
+					expose_var_to_js( 'evo_comment_form_preview_button_config', evo_json_encode( array( 'button_value' => T_('Preview') ) ) );
 				}
 
 				$Plugins->trigger_event( 'DisplayCommentFormButton', array( 'Form' => & $Form, 'Item' => & $Item ) );
