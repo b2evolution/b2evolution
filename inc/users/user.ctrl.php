@@ -949,6 +949,9 @@ if( !$Messages->has_errors() )
 		// Group Id
 		param( 'grp_ID', 'integer', true );
 		param_check_number( 'grp_ID', T_('Please select a group'), true );
+		
+		param( 'on_duplicate_login', 'integer', true );
+		param( 'on_duplicate_email', 'integer', true );
 
 		// CSV File
 		$import_file = param( 'import_file', 'string', '' );
@@ -968,8 +971,14 @@ if( !$Messages->has_errors() )
 		}
 
 		// Import users from CSV file:
-		$count_users = import_users( $grp_ID, $import_file );
-
+		$count_users = import_users( $grp_ID, $on_duplicate_login, $on_duplicate_email, $import_file );
+		
+		if( is_bool( $count_users ) === true && ! $count_users )
+		{	// Some errors are exist, Stop the importing:
+			$action = 'csv';
+			break;
+		}
+		
 		$GroupCache = & get_GroupCache();
 		$Group = $GroupCache->get_by_ID( $grp_ID );
 

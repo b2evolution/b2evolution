@@ -35,8 +35,22 @@ $Form->begin_form( 'fform', T_('Import users') );
 	{
 		$edited_User = new User();
 		$GroupCache = & get_GroupCache();
-		$Form->select_object( 'grp_ID', $edited_User->grp_ID, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
-
+		
+		$selected_group = ( get_param( 'grp_ID' ) > 0 )? get_param( 'grp_ID' ) : $edited_User->grp_ID;
+		$Form->select_object( 'grp_ID', $selected_group, $GroupCache, sprintf( T_('<span %s>Primary</span> user group'), 'class="label label-primary"' ) );
+		
+		$selected_duplicate_login = ( is_numeric( get_param( 'on_duplicate_login' ) ))? get_param( 'on_duplicate_login' ) : 1;
+		$Form->radio( 'on_duplicate_login', $selected_duplicate_login, array(
+				array( 1, T_('Update existing user') ),
+				array( 0, T_('Ignore the user from the CSV file') )
+			), T_('On duplicate login'), false, '' );
+		
+		$selected_duplicate_email = ( is_numeric( get_param( 'on_duplicate_email' ) ))? get_param( 'on_duplicate_email' ) : 1;
+		$Form->radio( 'on_duplicate_email', $selected_duplicate_email, array(
+				array( 1, T_('Update existing user') ),
+				array( 0, T_('Ignore the user from the CSV file') )
+			), T_('On duplicate email'), false, '' );
+		
 		$Form->buttons( array( array( 'submit', 'actionArray[import]', T_('Import'), 'SaveButton' ) ) );
 	}
 

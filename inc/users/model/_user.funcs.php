@@ -8942,18 +8942,36 @@ jQuery( document ).on( 'click', '.add_secondary_group', function()
  * Import users from CSV file
  *
  * @param integer Group ID
+ * @param bool On duplicate login update user
+ * @param bool On duplicate email update user
+ * @param integer Group ID
  * @param string File path
  * @return array (
  *   'inserted' => Count of inserted users,
  *   'updated'  => Count of updated users );
  */
-function import_users( $group_ID, $file_path )
+function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate_email_update_user, $file_path )
 {
-	global $DB;
+	global $DB, $db_config, $Messages;
 
 	$DB->begin();
+	
+	// Listing the fields which should be ignored from CSV:
+	$invalid_fields_for_import = ['user_ID', 'user_pass', 'user_salt', 'user_pass_driver', 'user_grp_ID'];
+	$valid_fields_for_import = array();
+	
+	// Get all the fields from user table:
+	$valid_fields = $DB->get_assoc( "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$db_config['name']."' AND TABLE_NAME = 'evo_users' " );
+	
+	foreach ( $valid_fields as $db_key => $db_column_name )
+	{
+		if ( !in_array($db_key, $invalid_fields_for_import) )
+		{
+			$valid_fields_for_import[] = str_replace( "user_", "", $db_key );
+		}
+	}
 
-	// Get users from DB:
+	// Get existing users from DB:
 	$SQL = new SQL( 'Get users before import' );
 	$SQL->SELECT( 'user_login, user_email' );
 	$SQL->FROM( 'T_users' );
@@ -8964,53 +8982,266 @@ function import_users( $group_ID, $file_path )
 
 	$r = 0;
 	$users_insert_values = array();
-	$users_update_values = array();
+	$users_update_values_login = array();
+	$users_update_values_email = array();
+	$user_import_columns = array();
+	$csv_unknown_fields = '';
 	while( $data = fgetcsv( $file_handle, 1024, ";" ) )
 	{
 		$r++;
 		if( $r == 1 )
-		{	// Skip first row with titles:
+		{	// check which field are valid in CSV file:
+			$headercolumn = 0;
+			foreach ( $data as $header_column_name )
+			{
+				$header_column_name = trim( $header_column_name, " \xA0" );
+				if( !empty( $header_column_name ) )
+				{
+					if ( in_array($header_column_name, $valid_fields_for_import) )
+					{
+						$user_import_columns[] = $header_column_name;
+					}
+					else
+					{
+						if( empty($csv_unknown_fields) )
+						{
+							$csv_unknown_fields = $csv_unknown_fields. $header_column_name;
+						}
+						else
+						{
+							$csv_unknown_fields = $csv_unknown_fields . ', ' . $header_column_name;
+						}
+					}
+
+				}
+				else
+				{	// Header column title is missing:
+					$Messages->add( sprintf( T_('Column %s title is missing in your CSV file!'),
+						$headercolumn + 1 ), 'error' );
+					return false;
+				}
+				$headercolumn++;
+			}
+			// Skip first row with titles:
 			continue;
 		}
 
-		$login = trim( $data[0], " \xA0" ); // \xA0 - ASCII Non-breaking space
-		$email = trim( $data[1], " \xA0" );
+		if( !empty($csv_unknown_fields) )
+		{	// display error message if any unknown field is found in the CSV file:
+			$Messages->add( sprintf( T_('Unknown column ( %s ) has been detected in your CSV file!'),
+				$csv_unknown_fields ), 'error' );
+			return false;
+		}
+		else if (!in_array('email', $user_import_columns))
+		{	// display error message if email field is missing in the CSV file:
+			global $Messages;
+			$Messages->add( sprintf( T_('Email column is missing in your CSV file!') ), 'error' );
+			return false;
+		}
+		
+		$status_column = true;
+		$login_column = true;
+		if (!in_array('status', $user_import_columns))
+		{	// Check status column availability in CSV file:
+			$status_column = false;
+		}
+		if (!in_array('login', $user_import_columns))
+		{	// Check login column availability in CSV file:
+			$login_column = false;
+		}
+		
+		$i = 0;
+		$insert_data = '';
+		$update_data = '';
+		$break = false;
+		$login = '';
+		$email = '';
+		$firstname = '';
+		$lastname = '';
+		$nickname = '';
+		if ( in_array('firstname', $user_import_columns) )
+		{	// Find firstname value from CSV file:
+			$index = (int) array_search( "firstname", $user_import_columns);
+			$firstname = $data[$index];
+		}
+		
+		if ( in_array('lastname', $user_import_columns) )
+		{	// Find lastname value from CSV file:
+			$index = (int) array_search( "lastname", $user_import_columns);
+			$lastname = $data[$index];
+		}
+		
+		if ( in_array('nickname', $user_import_columns) )
+		{	// Find nickname value from CSV file:
+			$index = (int) array_search( "nickname", $user_import_columns);
+			$nickname = $data[$index];
+		}
+		
+		foreach ( $data as $row_column_value )
+		{	// Get each row values of CSV file:
+			if( $user_import_columns[$i] == 'email')
+			{
+				$email = trim( $row_column_value, " \xA0" );
+				if( empty( $email ) )
+				{	// Skip row if email column value is empty:
+					$break = true;
+					break;
+				}
+			}
 
-		if( empty( $email ) )
-		{	// Skip empty row:
+			if( $user_import_columns[$i] == 'login')
+			{
+				$login = trim( $row_column_value, " \xA0" );
+				if( empty( $login ) )
+				{
+					// Generate auto login filed value if login column value is empty:
+					$login = generate_login_from_register_info( $email, $firstname, $lastname, $nickname, true);
+				}
+				$row_column_value = $login;
+			}
+			else
+			{
+				$row_column_value = trim( $row_column_value, " \xA0" );
+			}
+			
+			// Prepare values for insert into DB:
+			if( empty($insert_data) )
+			{
+				if( empty($row_column_value) )
+				{
+					$insert_data = $insert_data."''";
+				}
+				else
+				{
+					$insert_data = $insert_data.$DB->quote( $row_column_value );
+				}
+			}
+			else
+			{
+				if( empty($row_column_value) )
+				{
+					$insert_data = $insert_data.', '."''";
+				}
+				else
+				{
+					$insert_data = $insert_data.', '.$DB->quote( $row_column_value );
+				}
+			}
+
+			// Prepare values for update into DB:
+			if( empty($update_data) )
+			{
+				if( empty($row_column_value) )
+				{
+					$update_data = 'user_'.$user_import_columns[$i].' = '."''";
+				}
+				else
+				{
+					$update_data = 'user_'.$user_import_columns[$i].' = '.$DB->quote( $row_column_value );
+				}
+			}
+			else
+			{
+				if( empty($row_column_value) )
+				{
+					$update_data = $update_data.', user_'.$user_import_columns[$i].' = '."''";
+				}
+				else
+				{
+					$update_data = $update_data.', user_'.$user_import_columns[$i].' = '.$DB->quote( $row_column_value );
+				}
+			}
+			$i++;
+		}
+		
+		if( empty( $login ) )
+		{	// Generate auto login filed value if login column value is empty:
+			$login = generate_login_from_register_info( $email, $firstname, $lastname, $nickname, true);
+		}
+		
+		if($break)
+		{	// Skip row if email column is not found:
 			continue;
 		}
-
+		
 		if( isset( $existing_users[ $login ] ) )
-		{	// Set new name for existing user if it already exists:
-			$users_update_values[ $login ] = $email;
+		{	// update a existing user according to login:
+			if( $on_duplicate_login_update_user )
+			{
+				$users_update_values_login[ $login ] = $update_data;
+			}
+			else{
+				continue;
+			}
+		}
+		else if( isset( $existing_users[ $email ] ) )
+		{	// update a existing user according to email:
+			if( $on_duplicate_login_update_user )
+			{
+				$users_update_values_email[ $email ] = $update_data;
+			}
+			else{
+				continue;
+			}
 		}
 		else
 		{	// Insert a new user:
-			$users_insert_values[] = '( '.$DB->quote( $login ).', '.$DB->quote( $group_ID ).', '.$DB->quote( $email ).', "", "" )';
+			$insert_data = $insert_data.", '', ".$DB->quote( $group_ID );
+			if(!$status_column)
+			{	// inser status field value if not available in CSV:
+				$insert_data = $insert_data.", " ."'autoactivated'";
+			}
+			if(!$login_column)
+			{	// inser login field value if not available in CSV:
+				$insert_data = $insert_data. ", ".$DB->quote( $login );
+			}
+			$users_insert_values[] = '( '.$insert_data.' )';
 			$existing_users[ $login ] = $email;
 		}
 	}
 
+	// Add colums pass and grp_ID:
+	$user_import_columns[] = 'pass';
+	$user_import_columns[] = 'grp_ID';
+	
+	if(!$status_column)
+	{
+		$user_import_columns[] = 'status';
+	}
+	if(!$login_column)
+	{
+		$user_import_columns[] = 'login';
+	}
+	
+	// add prefix "user_" for each of the column of CSV:
+	$user_import_columns = preg_filter( '/^/', 'user_',  $user_import_columns );
+	
 	// Close file pointer:
 	fclose( $file_handle );
 
 	$count_insert_users = count( $users_insert_values );
-	$count_update_users = count( $users_update_values );
+	$count_update_users = count( $users_update_values_login ) + count( $users_update_values_email );
 
 	if( $count_insert_users > 0 )
 	{	// New users are found to import:
-		$DB->query( 'INSERT INTO T_users ( user_login, user_grp_ID, user_email, user_pass, user_salt )
+		$DB->query( 'INSERT INTO T_users ( '.implode( ",",$user_import_columns).' )
 			VALUES '.implode( ', ', $users_insert_values ) );
 	}
 
 	if( $count_update_users > 0 )
-	{	// Some users should be updated:
-		foreach( $users_update_values as $user_login => $user_email )
+	{	// Some users should be updated based on login:
+		foreach( $users_update_values_login as $user_login => $user_update_data )
 		{	// Update an existing user:
 			$DB->query( 'UPDATE T_users
-				  SET user_email = '.$DB->quote( $user_email ).'
+				  SET '.$user_update_data.'
 				WHERE user_login = '.$DB->quote( $user_login ) );
+		}
+		
+		foreach( $users_update_values_email as $user_email => $user_update_data )
+		{	// Update an existing user based on email:
+			$DB->query( 'UPDATE T_users
+				  SET '.$user_update_data.'
+				WHERE user_email = '.$DB->quote( $user_email ) );
 		}
 	}
 
