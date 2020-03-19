@@ -137,6 +137,7 @@ switch( $link_owner_type )
 		break;
 
 	case 'comment':
+	case 'metacomment':
 		$upload_fileroot = FileRoot::gen_ID( 'collection', $LinkOwner->get_blog_ID() );
 		$upload_path = '/quick-uploads/'.( $LinkOwner->is_temp() ? 'tmp' : 'c' ).$LinkOwner->get_ID().'/';
 		break;
