@@ -22,20 +22,19 @@ jQuery( document ).ready( function()
 	// Change Link Position JS
 	if( typeof( evo_link_position_config ) != 'undefined' )
 	{
-		var config = evo_link_position_config['config'];
-		var displayInlineReminder = config['display_inline_reminder'];
-		var deferInlineReminder = config['defer_inline_reminder'];
+		window.displayInlineReminder = evo_link_position_config['display_inline_reminder'];
+		window.deferInlineReminder   = evo_link_position_config['defer_inline_reminder'];
 
 		jQuery( document ).on( 'change', evo_link_position_config['selector'], {
-				url: config['url'],
-				crumb: config['crumb'],
+				url: evo_link_position_config['url'],
+				crumb: evo_link_position_config['crumb'],
 			},
 			function( event )
 			{
-				if( this.value == 'inline' && displayInlineReminder && !deferInlineReminder )
+				if( this.value == 'inline' && window.displayInlineReminder && !window.deferInlineReminder )
 				{ // Display inline position reminder
-					alert( config['alert_msg'] );
-					displayInlineReminder = false;
+					alert( evo_link_position_config['alert_msg'] );
+					window.displayInlineReminder = false;
 				}
 				evo_link_change_position( this, event.data.url, event.data.crumb );
 			} );
@@ -56,17 +55,17 @@ jQuery( document ).ready( function()
 	// disp=download
 	if( typeof( evo_disp_download_delay_config ) != 'undefined' )
 	{
-		var b2evo_download_timer = evo_disp_download_delay_config;
-		var downloadInterval = setInterval( function()
-				{
-					jQuery( "#download_timer" ).html( b2evo_download_timer );
-					if( b2evo_download_timer == 0 )
-					{	// Stop timer and download a file:
-						clearInterval( downloadInterval );
-						jQuery( "#download_help_url" ).show();
-					}
-					b2evo_download_timer--;
-				}, 1000 );
+		window.b2evo_download_timer = evo_disp_download_delay_config;
+		window.downloadInterval = setInterval( function()
+			{
+				jQuery( "#download_timer" ).html( window.b2evo_download_timer );
+				if( window.b2evo_download_timer == 0 )
+				{	// Stop timer and download a file:
+					clearInterval( window.downloadInterval );
+					jQuery( "#download_help_url" ).show();
+				}
+				window.b2evo_download_timer--;
+			}, 1000 );
 
 		jQuery( "#download_timer_js" ).show();
 	}
@@ -162,6 +161,91 @@ jQuery( document ).ready( function()
 
 			window[check_and_show_func_name]( config['load_ajax_form_on_page_load'] );
 		}
+	}
+
+	// Thread Form
+	if( typeof( evo_thread_form_config ) != 'undefined' )
+	{
+		/**
+		 * Show the multiple recipients radio selection if the number of recipients is more than one
+		 */
+		window.check_multiple_recipients = function check_multiple_recipients()
+			{
+				if( jQuery( 'input[name="thrd_recipients_array[login][]"]' ).length > 1 )
+				{
+					jQuery( '#multiple_recipients' ).show();
+				}
+				else
+				{
+					jQuery( '#multiple_recipients' ).hide();
+				}
+			}
+
+		/**
+		 * Check form fields before send a thread data
+		 *
+		 * @return boolean TRUE - success filling of the fields, FALSE - some erros, stop a submitting of the form
+		 */
+		window.check_form_thread = function check_form_thread()
+			{
+				if( jQuery( 'input#token-input-thrd_recipients' ).val() != '' )
+				{	// Don't submit a form with incomplete username
+					alert( evo_thread_form_config['missing_username_msg'] );
+					jQuery( 'input#token-input-thrd_recipients' ).focus();
+					return false;
+				}
+
+				return true;
+			};
+
+		// TokenInput config:
+		evo_thread_form_config.token_input_config.tokenFormatter = function( user )
+			{
+				return '<li>' + user[evo_thread_form_config.username_display] +
+						'<input type="hidden" name="thrd_recipients_array[id][]" value="' + user.id + '" />' +
+						'<input type="hidden" name="thrd_recipients_array[login][]" value="' + user.login + '" />' +
+					'</li>';
+			};
+		evo_thread_form_config.token_input_config.resultsFormatter = function( user )
+			{
+				var title = user.login;
+				if( user.fullname != null && user.fullname !== undefined )
+				{
+					title += '<br />' + user.fullname;
+				}
+				return '<li>' +
+						user.avatar +
+						'<div>' +
+							title +
+						'</div><span></span>' +
+					'</li>';
+			};
+		evo_thread_form_config.token_input_config.onAdd = function()
+			{
+				window.check_multiple_recipients();
+			};
+		evo_thread_form_config.token_input_config.onDelete = function()
+			{
+				window.check_multiple_recipients();
+			};
+
+		evo_thread_form_config.token_input_config.onReady = function()
+			{
+				if( evo_thread_form_config.thrd_recipients_has_error )
+				{	// Mark this field as error
+					jQuery( '.token-input-list-facebook' ).addClass( 'token-input-list-error' );
+				}
+				// Remove required attribute to prevent unfocusable field error during validation checking when the field is hidden:
+				jQuery( '#thrd_recipients' ).removeAttr( 'required' );
+			};
+
+		jQuery( '#thrd_recipients' ).tokenInput(
+				restapi_url + 'users/recipients',
+				evo_thread_form_config.token_input_config
+			);
+
+		// Run check on multiple recipients
+		window.check_multiple_recipients();
 	}
 
 	// Userlist filter callback JS
