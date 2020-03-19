@@ -406,4 +406,73 @@ jQuery( document ).ready( function()
 			} );
 	}
 	
+
+	// Link function: Link Sortable JS
+	if( typeof( evo_link_sortable_js_config ) != 'undefined' )
+	{
+		var evo_link_sortable_js_configs = Object.values( evo_link_sortable_js_config );
+		for( var i = 0; i < evo_link_sortable_js_configs.length; i++ )
+		{
+			jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table' ).sortable(
+				{
+					containerSelector: 'table',
+					itemPath: '> tbody',
+					itemSelector: 'tr',
+					placeholder: jQuery.parseHTML( '<tr class="placeholder"><td colspan="5"></td></tr>' ),
+					onMousedown: function( $item, _super, event )
+						{
+							if( ! event.target.nodeName.match( /^(a|img|select|span)$/i ) )
+							{	// Ignore a sort action when mouse is clicked on the tags <a>, <img>, <select> or <span>
+								event.preventDefault();
+								return true;
+							}
+						},
+					onDrop: function( $item, container, _super )
+						{
+							jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr' ).removeClass( 'odd even' );
+							jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr:odd' ).addClass( 'even' );
+							jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr:even' ).addClass( 'odd' );
+				
+							var link_IDs = '';
+							jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr' ).each( function()
+								{
+									var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
+									if( link_ID_cell.length > 0 )
+									{
+										link_IDs += link_ID_cell.html() + ',';
+									}
+								} );
+							link_IDs = link_IDs.slice( 0, -1 );
+				
+							jQuery.ajax(
+							{
+								url: htsrv_url + 'anon_async.php',
+								type: 'POST',
+								data:
+									{
+										'action': 'update_links_order',
+										'links': link_IDs,
+										'crumb_link': evo_link_sortable_js_configs[i].crumb_link,
+									},
+								success: function( data )
+									{
+										link_data = JSON.parse( ajax_debug_clear( data ) );
+										// Update data-order attributes
+										jQuery( '#' + evo_link_sortable_js_configs[i].fieldset_prefix + 'attachments_fieldset_table table tr' ).each( function()
+										{
+											var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
+											if( link_ID_cell.length > 0 )
+											{
+												link_ID_cell.attr( 'data-order', link_data[link_ID_cell.html()] );
+											}
+										} );
+										evoFadeSuccess( $item );
+									}
+							} );
+				
+							$item.removeClass( container.group.options.draggedClass ).removeAttr("style");
+						}
+				} );
+		}
+	}
 } );
