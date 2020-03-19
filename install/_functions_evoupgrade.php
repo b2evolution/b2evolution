@@ -12514,9 +12514,8 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
-	if( upg_task_start( 15980, 'Updating templates table...' ) )
+	if( upg_task_start( 15980, 'Upgrading templates table...' ) )
 	{	// part of 7.1.2-beta
-
 		db_upgrade_cols( 'T_templates', array(
 			'MODIFY' => array(
 				'tpl_context' => 'ENUM( "custom1", "custom2", "custom3", "content_list_master", "content_list_item", "content_list_category", "content_block", "item_details", "item_content", "registration_master", "registration", "search_form", "search_result" ) COLLATE ascii_general_ci NOT NULL DEFAULT "custom1"',
@@ -12581,6 +12580,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 				task_end( $folders_deleted ? 'OK.' : '' );
 			}
 		}
+		upg_task_end();
+	}
+
+	if( upg_task_start( 16000, 'Upgrading skins table...' ) )
+	{	// part of 7.1.3-beta
+		db_modify_col( 'T_skins__skin', 'skin_name', 'varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL' );
 		upg_task_end();
 	}
 

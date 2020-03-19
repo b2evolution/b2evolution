@@ -94,7 +94,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 		echo '<div class="skin_settings_form">';
 			$Form->begin_fieldset( T_('System Settings for this skin').get_manual_link( 'skin-system-settings' ) );
 
-			$Form->text_input( 'skin_name', $edited_Skin->name, 32, T_('Skin name'), T_('As seen by blog owners'), array( 'required'=>true ) );
+			$Form->text_input( 'skin_name', $edited_Skin->name, 128, T_('Skin name'), T_('As seen by blog owners'), array( 'required'=>true ) );
 
 			$skin_types = get_skin_types();
 			$skin_types_options = array();

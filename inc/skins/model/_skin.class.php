@@ -248,6 +248,30 @@ class Skin extends DataObject
 
 
 	/**
+	 * Set param value
+	 *
+	 * By default, all values will be considered strings
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
+	 * @return boolean true, if a value has been set; false if it has not changed
+	 */
+	function set( $parname, $parvalue, $make_null = false )
+	{
+		switch( $parname )
+		{
+			case 'name':
+				// Restrict long skin names to avoid die error:
+				$parvalue = utf8_substr( $parvalue, 0, 128 );
+				break;
+		}
+
+		return parent::set( $parname, $parvalue, $make_null );
+	}
+
+
+	/**
 	 * Load data from Request form fields.
 	 *
 	 * @return boolean true if loaded data seems valid.
