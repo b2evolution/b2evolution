@@ -17,17 +17,16 @@
 	padding-top: 30px;
 }
 
-// -------------------------- Left sidebar --------------------------
+// -------------------------- Sidebars --------------------------
 #evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single {
 	background: #FFF;
 	&.fixed {
 		position: fixed;
 	}
 }
-// Windows with height <= 800px OR width <= 992px:
-// Don't fix a position of the left side bar
+// Don't fix a position of ALL sidebars when window height <= 800px OR width <= 992px:
 @media (max-height:800px),(max-width:992px) {
-	#evo_container__sidebar, #evo_container__sidebar_single {
+	#evo_container__sidebar, #evo_container__sidebar_2, #evo_container__sidebar_single {
 		&.fixed {
 			position: static;
 		}

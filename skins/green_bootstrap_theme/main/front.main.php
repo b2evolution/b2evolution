@@ -33,15 +33,19 @@ siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
 
 // Display a picture from skin setting as background image
-global $media_path, $media_url;
-$bg_image = $Skin->get_setting( 'front_bg_image' );
-echo '<div id="bg_picture">';
-if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-{ // If it exists in media folder
-	echo '<img src="'.$media_url.$bg_image.'" />';
+$FileCache = & get_FileCache();
+$bg_File = NULL;
+if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
+{
+	$bg_File = & $FileCache->get_by_ID( $bg_File_ID, false, false );
 }
-echo '</div>';
+echo '<div class="evo_pictured_layout">';
+if( ! empty( $bg_File ) && $bg_File->exists() )
+{ // If it exists in media folder
+	echo '<img class="evo_pictured__image" src="'.$bg_File->get_url().'" />';
+}
 ?>
+
 
 <div class="container main_page_wrapper">
 
@@ -54,7 +58,7 @@ echo '</div>';
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
-		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
+		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 			messages( array(
@@ -163,15 +167,6 @@ echo '</div>';
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -186,8 +181,10 @@ echo '</div>';
 					'front_block_first_title_end'   => '</h1>',
 					'front_block_title_start'       => '<h2>',
 					'front_block_title_end'         => '</h2>',
+					'intro_class'                   => '',
+					'featured_class'                => 'featurepost',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
@@ -204,11 +201,14 @@ echo '</div>';
 	</div><!-- .col -->
 
 	<!-- "Slide down" button -->
-	<div class="slide_button_wrap"><i class="fa fa-angle-down" id="slide_button"></i></div>
+	<div class="slide_button_wrap"><a href="#" id="slide_button"><i class="fa fa-angle-down" ></i></a></div>
 
 </div><!-- .row -->
 
 </div><!-- .container -->
+
+</div><!-- .evo_pictured_layout -->
+
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
 <section class="secondary_area" id="slide_destination"><!-- white background, ID is used to slide here from "slide_button" -->
@@ -232,21 +232,23 @@ echo '</div>';
 				// ----------------------------- END OF "Front Page Secondary Area" CONTAINER -----------------------------
 			?>
 
-		<footer class="col-md-12 center">
+		<footer class="col-md-12">
 
 			<?php
-			// Display container and contents:
-			widget_container( 'footer', array(
-					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => false, // If no widget, don't display container at all
-					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
-					'container_end'   => '</div>',
-					'block_start'     => '<div class="evo_widget $wi_class$">',
-					'block_end'       => '</div>',
-				) );
+				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
+				// Display container and contents:
+				widget_container( 'footer', array(
+						// The following params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+						'container_end'   => '</div>',
+						'block_start'     => '<div class="evo_widget $wi_class$">',
+						'block_end'       => '</div>',
+					) );
+				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
 
-			<p>
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
@@ -306,6 +308,41 @@ echo '</div>';
 </div><!-- .container -->
 
 </section><!-- .secondary_area -->
+
+<script>
+// Scroll Down to content
+// ======================================================================== /
+$slide_down = $( "#slide_button" );
+// Smooth scroll to top
+$slide_down.on( "click", function(event) {
+	event.preventDefault();
+	$( "body, html, #skin_wrapper" ).animate({
+		scrollTop: $("#slide_destination").offset().top +26
+	}, 1000);
+});
+
+jQuery( document ).ready( function()
+{
+	// Check if .slide-top div exists (used to name back-to-top button)
+	if( $( '.slide-top' )[0] ) {
+		// Scroll to Top
+		// This skin needs to override the default scroll-top script because the `height: 100%` and `overflow: hidden` both exist on disp=front
+		// ======================================================================== /
+		// hide or show the "scroll to top" link
+		$( "body, html, #skin_wrapper" ).scroll( function() {
+			( $(this).scrollTop() > offset ) ? $slide_top.addClass("slide-top-visible") : $slide_top.removeClass("slide-top-visible");
+		});
+
+		-// Smooth scroll to top
+		$( ".slide-top" ).on( "click", function(event) {
+			event.preventDefault();
+			$( "body, html, #skin_wrapper" ).animate({
+				scrollTop: 0,
+			}, scroll_top_duration );
+		});
+	}
+} );
+</script>
 
 <?php
 // ---------------------------- SITE FOOTER INCLUDED HERE ----------------------------

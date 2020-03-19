@@ -25,6 +25,7 @@
 }
 @media (max-height: 800px), (max-width: 992px) {
   #evo_container__sidebar.fixed,
+  #evo_container__sidebar_2.fixed,
   #evo_container__sidebar_single.fixed {
     position: static;
   }

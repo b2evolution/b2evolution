@@ -479,7 +479,7 @@ siteskin_include( '_site_body_footer.inc.php' );
 skin_include( '_html_footer.inc.php' );
 // ------------------------------- END OF FOOTER --------------------------------
 
-if( $Skin->is_visible_sidebar( 'single', true ) && $Skin->get_setting( 'sidebar_single_affix' ) )
+if( $Skin->is_visible_sidebar( true, 'single' ) && $Skin->get_setting( 'sidebar_single_affix' ) )
 {	// Sidebar enabled, add script that will affix the sidebar:
 	$sidebar_offset = $Skin->get_setting( 'message_affix_offset' ) == '' ? 20 : $Skin->get_setting( 'message_affix_offset' );
 	?>

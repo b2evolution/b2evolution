@@ -2494,6 +2494,28 @@ var downloadInterval = setInterval( function()
 	function echo_settings_form_js()
 	{
 	}
+
+
+	/**
+	 * Call skin function with suffix that is current collection kind
+	 *
+	 * @param string Function name
+	 * @param array Function parameters
+	 * @return 
+	 */
+	function call_func_by_coll_type( $func_name, $params )
+	{
+		global $Blog;
+
+		if( ! empty( $Blog ) &&
+		    $this->get_api_version() == 7 && 
+		    method_exists( $this, $func_name.'_'.$Blog->get( 'type' ) ) )
+		{	// If skin has declared the method for collection kind:
+			return call_user_func_array( array( $this, $func_name.'_'.$Blog->get( 'type' ) ), $params );
+		}
+
+		return NULL;
+	}
 }
 
 ?>
