@@ -32,45 +32,53 @@ jQuery( document ).ready( function()
 		{
 			// Default params:
 			params = jQuery.extend( {
-				selector:     '', // Selector for buttons of the group
-				class_normal: '', // Class for normal(not active) buttons
-				class_active: '', // Class for active buttons
-				defaults:     {}, // Default url params(May be specified per Item in "Switchable params")
-				add_redir_no: false, // Add &redr=no to URLs
+				selector:             '', // Selector for buttons of the group
+				link_class_normal:    '', // Link style class for normal(not active) params
+				link_class_active:    '', // Link style class for active params
+				wrapper_class_normal: '', // Wrapper style class for normal(not active) params
+				wrapper_class_active: '', // Wrapper style class for active params
+				defaults:             {}, // Default url params(May be specified per Item in "Switchable params")
+				add_redir_no:         false, // Add &redr=no to URLs
+				display_mode:         'list', // 'list', 'buttons', 'tabs'
 			}, params ),
 
 			jQuery( params.selector ).click( function()
-			{
-				// Remove previous value from the URL:
-				var regexp = new RegExp( '([\?&])((' + jQuery( this ).data( 'code' ) + '|redir)=[^&]*(&|$))+', 'g' );
-				var url = location.href.replace( regexp, '$1' );
-				url = url.replace( /[\?&]$/, '' );
-				// Add param code with value of the clicked button:
-				url += ( url.indexOf( '?' ) === -1 ? '?' : '&' );
-				url += jQuery( this ).data( 'code' ) + '=' + jQuery( this ).data( 'value' );
-				// Append default params:
-				for( default_param in params.defaults )
 				{
-					regexp = new RegExp( '[\?&]' + default_param + '=', 'g' );
-					if( ! url.match( regexp ) )
-					{	// Append default param if it is not found in the current URL:
-						url += '&' + default_param + '=' + params.defaults[ default_param ];
+					// Remove previous value from the URL:
+					var regexp = new RegExp( '([\?&])((' + jQuery( this ).data( 'code' ) + '|redir)=[^&]*(&|$))+', 'g' );
+					var url = location.href.replace( regexp, '$1' );
+					url = url.replace( /[\?&]$/, '' );
+					// Add param code with value of the clicked button:
+					url += ( url.indexOf( '?' ) === -1 ? '?' : '&' );
+					url += jQuery( this ).data( 'code' ) + '=' + jQuery( this ).data( 'value' );
+					// Append default params:
+					for( default_param in params.defaults )
+					{
+						regexp = new RegExp( '[\?&]' + default_param + '=', 'g' );
+						if( ! url.match( regexp ) )
+						{	// Append default param if it is not found in the current URL:
+							url += '&' + default_param + '=' + params.defaults[ default_param ];
+						}
 					}
-				}
-				if( params.add_redir_no )
-				{	// Append this url param only when it is required:
-					url += '&redir=no';
-				}
+					if( params.add_redir_no )
+					{	// Append this url param only when it is required:
+						url += '&redir=no';
+					}
 
-				// Change URL in browser address bar:
-				window.history.pushState( '', '', url );
+					// Change URL in browser address bar:
+					window.history.pushState( '', '', url );
 
-				// Change active button:
-				jQuery( params.selector ).attr( 'class', params.class_normal );
-				jQuery( this ).attr( 'class', params.class_active );
+					// Change active button/link:
+					jQuery( params.selector ).attr( 'class', params.link_class_normal );
+					jQuery( this ).attr( 'class', params.link_class_active );
+					if( params.display_mode == 'list' || params.display_mode == 'tabs' )
+					{	// List mode has a wrapper with active style class:
+						jQuery( params.selector ).parent().removeClass( params.wrapper_class_active ).addClass( params.wrapper_class_normal );
+						jQuery( this ).parent().removeClass( params.wrapper_class_normal ).addClass( params.wrapper_class_active );
+					}
 
-				return false;
-			} );
+					return false;
+				} );
 		}
 
 	// Modifications to listen event when URL in browser address bar is changed:

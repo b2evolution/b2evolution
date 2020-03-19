@@ -4338,7 +4338,7 @@ class Item extends ItemLight
 
 		if( ! ( $Template = & $TemplateCache->get_by_code( $params[0], false, false ) ) )
 		{	// Template is not found:
-			return $m[0];
+			return '<span class="evo_param_error">Template "'.$params[0].'" is not found for <code>'.$m[0].'</code><span>';
 		}
 
 		if( isset( $params[1] ) )
@@ -14345,8 +14345,8 @@ class Item extends ItemLight
 		global $current_User;
 
 		$perm =
-			// Item must be saved in DB:
-			! empty( $this->ID ) &&
+			// Main Category must be defined for this Item in order to check permission in Collection of the Category:
+			! empty( $this->main_cat_ID ) &&
 			// User must be logged in:
 			is_logged_in() &&
 			// Workflow must be enabled for current Collection:

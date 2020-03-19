@@ -86,9 +86,14 @@ class bootstrap_site_navbar_Skin extends Skin
 	 */
 	function get_param_definitions( $params )
 	{
+		global $current_User, $admin_url;
+
 		// Set params for setting "Collection for Info Pages":
 		$BlogCache = & get_BlogCache();
 		$BlogCache->none_option_text = T_('Same as "Default collection to display"');
+
+		$SiteMenuCache = & get_SiteMenuCache();
+		$SiteMenuCache->load_where( 'menu_translates_menu_ID IS NULL');
 
 		$r = array_merge( array(
 				'section_layout_start' => array(
@@ -114,17 +119,32 @@ class bootstrap_site_navbar_Skin extends Skin
 					'layout' => 'begin_fieldset',
 					'label'  => T_('Header')
 				),
-					'grouping' => array(
-						'label' => T_('Grouping'),
-						'note' => T_('Check to group collections into tabs / sub tabs'),
-						'type' => 'checkbox',
-						'defaultvalue' => 1,
+					'menu_type' => array(
+						'label' => T_('Menu type'),
+						'options' => array(
+								array( 'auto', T_('Automatic - Collection list') ),
+								array( 'auto_grouped', T_('Automatic - Grouped collection list') ),
+								array( 'custom', T_('Custom menu') ),
+							),
+						'defaultvalue' => 'auto',
+						'type' => 'radio',
+						'field_lines' => true,
 					),
 					'info_coll_ID' => array(
 						'label' => T_('Collection for Info Pages'),
 						'type' => 'select_blog',
 						'allow_none' => true,
 						'defaultvalue' => 0,
+						'hide' => ( $this->get_setting( 'menu_type', NULL, 'auto' ) == 'custom' ),
+					),
+					'menu_ID' => array(
+						'label' => T_('Menu to display'),
+						'input_suffix' => ( is_logged_in() && $current_User->check_perm( 'options', 'edit' ) ? ' <a href="'.$admin_url.'?ctrl=menus">'.T_('Manage Menus').' &gt;&gt;</a>' : '' ),
+						'type' => 'select_object',
+						'object' => $SiteMenuCache,
+						'allow_none' => true,
+						'defaultvalue' => '',
+						'hide' => in_array( $this->get_setting( 'menu_type', NULL, 'auto' ), array( 'auto', 'auto_grouped' ) ),
 					),
 					'fixed_header' => array(
 						'label' => T_('Fixed position'),
@@ -389,7 +409,8 @@ footer#evo_site_footer .container a {
 
 		if( $this->get_setting( 'fixed_header' ) &&
 		    ! $Session->get( 'display_containers_'.$Blog->ID ) &&
-		    ! $Session->get( 'display_includes_'.$Blog->ID ) )
+		    ! $Session->get( 'display_includes_'.$Blog->ID ) &&
+		    ! $Session->get( 'customizer_mode_'.$Blog->ID ) )
 		{	// Enable fixed position for header only when no debug blocks:
 			$css .= '#evo_site_header {
 	position: fixed;
@@ -416,7 +437,7 @@ body {
 	 */
 	function has_sub_menus()
 	{
-		if( ! $this->get_setting( 'grouping' ) )
+		if( $this->get_setting( 'menu_type' ) == 'auto' )
 		{	// Skin does NOT group collections sub tabs:
 			return false;
 		}
@@ -429,11 +450,134 @@ body {
 
 
 	/**
-	 * Get header tabs
+	 * Get header tabs if custom menu is selected or when automatic menu is grouped
+	 *
+	 * @return array|boolean Array of header tabs OR FALSE when
+	 */
+	function get_header_tabs()
+	{
+		if( $this->get_setting( 'menu_type' ) == 'custom' &&
+		    ( $SiteMenuCache = & get_SiteMenuCache() ) &&
+		    ( $SiteMenu = & $SiteMenuCache->get_by_ID( $this->get_setting( 'menu_ID' ), false, false ) ) )
+		{	// Use custom menu if it is found in DB:
+			return $this->get_header_tabs_custom( $SiteMenu->ID );
+		}
+		elseif( $this->get_setting( 'menu_type' ) == 'auto_grouped' )
+		{	// Use automatic grouped menu:
+			return $this->get_header_tabs_auto();
+		}
+
+		// Don't use grouped header tabs:
+		return false;
+	}
+
+
+	/**
+	 * Get header tabs from custom menu
+	 *
+	 * @param integer Menu ID
+	 * @return array
+	 */
+	function get_header_tabs_custom( $menu_ID )
+	{
+		global $DB, $current_locale;
+
+		$header_tabs = array();
+
+		$SiteMenuCache = & get_SiteMenuCache();
+
+		if( ! ( $SiteMenu = & $SiteMenuCache->get_by_ID( $this->get_setting( 'menu_ID' ), false, false ) ) )
+		{	// Wrong Menu:
+			return $header_tabs;
+		}
+
+		// Check if the menu has a child matching the current locale:
+		$localized_menus = $SiteMenu->get_localized_menus( $current_locale );
+		if( ! empty( $localized_menus ) )
+		{	// Use localized menu:
+			$SiteMenu = & $localized_menus[0];
+		}
+
+		$this->header_tab_active = NULL;
+
+		$site_menu_entries = $SiteMenu->get_entries();
+		$level0_index = 0;
+		foreach( $site_menu_entries as $SiteMenuEntry )
+		{
+			if( $header_tab = $this->get_header_tab_custom( $SiteMenuEntry ) )
+			{
+				$header_tabs[] = $header_tab;
+				if( ! empty( $header_tab['items'] ) )
+				{
+					foreach( $header_tab['items'] as $sub_item )
+					{
+						if( ! empty( $sub_item['active'] ) )
+						{
+							$this->header_tab_active = $level0_index;
+							break;
+						}
+					}
+				}
+				$level0_index++;
+			}
+		}
+
+		return $header_tabs;
+	}
+
+
+	/**
+	 * Get custom header tab
+	 *
+	 * @param object SiteMenuEntry
+	 * @param array header tab params
+	 */
+	function get_header_tab_custom( $SiteMenuEntry )
+	{
+		global $Blog;
+
+		$header_tab = false;
+
+		if( $SiteMenuEntry->get( 'type' ) == 'text' )
+		{	// Only type "Text" supports sub-entries:
+			$sub_entries = $SiteMenuEntry->get_children( true );
+			$sub_tabs = array();
+			foreach( $sub_entries as $sub_SiteMenuEntry )
+			{
+				if( $sub_tab = $this->get_header_tab_custom( $sub_SiteMenuEntry ) )
+				{
+					$sub_tabs[] = $sub_tab;
+				}
+			}
+
+			if( ! empty( $sub_tabs ) )
+			{	// Display parent tab only if at least one sub tab is allowed for current display:
+				$header_tab = array(
+						'name'  => $SiteMenuEntry->get_text(),
+						'url'   => $sub_tabs[0]['url'],
+						'items' => $sub_tabs,
+					);
+			}
+		}
+		elseif( $menu_entry_url = $SiteMenuEntry->get_url() )
+		{	// Only if the menu entry is allowed for current User, page and etc.:
+			$header_tab = array(
+					'name'   => $SiteMenuEntry->get_text(),
+					'url'    => $menu_entry_url,
+					'active' => $SiteMenuEntry->is_active(),
+				);
+		}
+
+		return $header_tab;
+	}
+
+
+	/**
+	 * Get automatic (from collection List) header tabs
 	 *
 	 * @return array
 	 */
-	function get_header_tabs()
+	function get_header_tabs_auto()
 	{
 		global $Blog, $disp, $current_User;
 
@@ -609,6 +753,24 @@ body {
 		}
 
 		return $info_coll_ID;
+	}
+
+
+	/**
+	 * Additional JavaScript code for skin settings form
+	 */
+	function echo_settings_form_js()
+	{
+?>
+<script>
+jQuery( '[name=edit_skin_<?php echo $this->ID; ?>_set_menu_type]' ).click( function()
+{
+	var is_custom_mode = ( jQuery( '[name=edit_skin_<?php echo $this->ID; ?>_set_menu_type]:checked' ).val() == 'custom' );
+	jQuery( '#ffield_edit_skin_<?php echo $this->ID; ?>_set_info_coll_ID' ).toggle( ! is_custom_mode );
+	jQuery( '#ffield_edit_skin_<?php echo $this->ID; ?>_set_menu_ID' ).toggle( is_custom_mode );
+} );
+</script>
+<?php
 	}
 }
 ?>

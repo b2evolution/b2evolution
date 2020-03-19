@@ -741,6 +741,15 @@ class ComponentWidget extends DataObject
 					'button_selected_class' => 'btn btn-default btn-margin-right active',
 					'button_group_start' => '<span class="btn-group">',
 					'button_group_end' => '</span>',
+					// Tabs style:
+					'tabs_start'         => '<ul class="nav nav-tabs">',
+					'tabs_end'           => '</ul>',
+					'tab_start'          => '<li>',
+					'tab_end'            => '</li>',
+					'tab_selected_start' => '<li class="active">',
+					'tab_selected_end'   => '</li>',
+					'tab_default_class'  => '',
+					'tab_selected_class' => 'active',
 
 					'grid_start' => '<table cellspacing="1" class="widget_grid">',
 						'grid_colstart' => '<tr>',
