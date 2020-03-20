@@ -4159,6 +4159,18 @@ class Item extends ItemLight
 			}
 			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
 			{	// Deny to display content block Item with lower status than parent Item:
+			  // It means visibility status of content block Item cannot be higher than visibility status of the current/parent Item,
+				// See below the ordered list of visibility statuses by weight:
+				// - Redirected
+				// - Public
+				// - Community
+				// - Deprecated
+				// - Protected
+				// - Private
+				// - Draft
+				// - Review
+				// For example, if content block Item has a status "Public" but current/parent Item has a status "Community",
+				//              then such content block Item cannot be included into the current/parent Item.
 				$content = str_replace( $source_tag, '<p class="evo_param_error">'.sprintf( T_('The visibility level of the content block "%s" is not sufficient.'), '#'.$content_Item->ID.' '.$content_Item->get( 'urltitle' ) ).'</p>', $content );
 				continue;
 			}
