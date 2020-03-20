@@ -79,14 +79,14 @@ $ignore_gender = false;
 // Do not set locale:
 $ignore_locale = false;
 
-$login = param( $dummy_fields[ 'login' ], 'string', NULL );
+$login = param( $dummy_fields[ 'login' ], 'string', '' );
 $email = utf8_strtolower( param( $dummy_fields[ 'email' ], 'string', '' ) );
 param( 'action', 'string', '' );
 param( 'firstname', 'string', '' );
 param( 'lastname', 'string', '' );
 param( 'nickname', 'string', '' );
 param( 'country', 'integer', '' );
-param( 'gender', 'string', NULL );
+param( 'gender', 'string', '' );
 param( 'locale', 'string', '' );
 param( 'source', 'string', '' );
 param( 'redirect_to', 'url', '' ); // do not default to $admin_url; "empty" gets handled better in the end (uses $blogurl, if no admin perms).
@@ -148,14 +148,6 @@ switch( $action )
 
 		// Stop a request from the blocked IP addresses or Domains
 		antispam_block_request();
-
-		// Check email:
-		// Stop a request from the blocked email address or its domain:
-		if( $registration_require_email || !empty( $email ) )
-		{
-			param_check_new_user_email( $dummy_fields['email'], $email );
-			antispam_block_by_email( $email );
-		}
 
 		// We will need the following parameter for the session data that will be set later:
 		param( 'widget', 'integer', 0 );
@@ -300,6 +292,14 @@ switch( $action )
 				// Use collection of the widget to subscribe:
 				$subscribe_coll_ID = $user_register_quick_Widget->get( 'coll_ID' );
 			}
+		}
+
+		// Check email:
+		// Stop a request from the blocked email address or its domain:
+		if( $registration_require_email || !empty( $email ) )
+		{
+			param_check_new_user_email( $dummy_fields['email'], $email );
+			antispam_block_by_email( $email );
 		}
 
 		if( ! $is_quick )
