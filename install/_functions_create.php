@@ -2198,7 +2198,7 @@ function create_default_templates( $is_task = true )
 			'context'  => 'registration_master',
 			'template' => '
 [set:reg1_template=registration_ask_name]
-[set:reg1_required=login,firstname,password,email]
+[set:reg1_required=firstname,password,email]
 ',
 		),
 
