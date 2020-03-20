@@ -9028,7 +9028,7 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 
 		if( !empty($csv_unknown_fields) )
 		{	// display error message if any unknown field is found in the CSV file:
-			$Messages->add( sprintf( T_('Unknown column ( %s ) has been detected in your CSV file!'),
+			$Messages->add( sprintf( T_('Forbidden column %s has been detected in your CSV file!'),
 				$csv_unknown_fields ), 'error' );
 			return false;
 		}
