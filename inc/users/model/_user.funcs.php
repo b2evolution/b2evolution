@@ -8955,14 +8955,14 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 	global $DB, $db_config, $Messages;
 
 	$DB->begin();
-	
+
 	// Listing the fields which should be ignored from CSV:
 	$invalid_fields_for_import = ['user_ID', 'user_pass', 'user_salt', 'user_pass_driver', 'user_grp_ID'];
 	$valid_fields_for_import = array();
-	
+
 	// Get all the fields from user table:
 	$valid_fields = $DB->get_assoc( "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '".$db_config['name']."' AND TABLE_NAME = 'evo_users' " );
-	
+
 	foreach ( $valid_fields as $db_key => $db_column_name )
 	{
 		if ( !in_array($db_key, $invalid_fields_for_import) )
@@ -9038,7 +9038,7 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 			$Messages->add( sprintf( T_('Email column is missing in your CSV file!') ), 'error' );
 			return false;
 		}
-		
+
 		$status_column = true;
 		$login_column = true;
 		if (!in_array('status', $user_import_columns))
@@ -9049,7 +9049,7 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 		{	// Check login column availability in CSV file:
 			$login_column = false;
 		}
-		
+
 		$i = 0;
 		$insert_data = '';
 		$update_data = '';
@@ -9064,19 +9064,19 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 			$index = (int) array_search( "firstname", $user_import_columns);
 			$firstname = $data[$index];
 		}
-		
+
 		if ( in_array('lastname', $user_import_columns) )
 		{	// Find lastname value from CSV file:
 			$index = (int) array_search( "lastname", $user_import_columns);
 			$lastname = $data[$index];
 		}
-		
+
 		if ( in_array('nickname', $user_import_columns) )
 		{	// Find nickname value from CSV file:
 			$index = (int) array_search( "nickname", $user_import_columns);
 			$nickname = $data[$index];
 		}
-		
+
 		foreach ( $data as $row_column_value )
 		{	// Get each row values of CSV file:
 			if( $user_import_columns[$i] == 'email')
@@ -9103,7 +9103,7 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 			{
 				$row_column_value = trim( $row_column_value, " \xA0" );
 			}
-			
+
 			// Prepare values for insert into DB:
 			if( empty($insert_data) )
 			{
@@ -9153,7 +9153,7 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 			}
 			$i++;
 		}
-		
+
 		if( empty( $login ) )
 		{	// Generate auto login filed value if login column value is empty:
 			$login = generate_login_from_register_info( $email, $firstname, $lastname, $nickname, true);
@@ -9163,7 +9163,7 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 		{	// Skip row if email column is not found:
 			continue;
 		}
-		
+
 		if( isset( $existing_users[ $login ] ) )
 		{	// update a existing user according to login:
 			if( $on_duplicate_login_update_user )
@@ -9186,7 +9186,7 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 		}
 		else
 		{	// Insert a new user:
-			$insert_data = $insert_data.", '', ".$DB->quote( $group_ID );
+			$insert_data = $insert_data.", '', '', 'nopass', ".$DB->quote( $group_ID );
 			if(!$status_column)
 			{	// inser status field value if not available in CSV:
 				$insert_data = $insert_data.", " ."'autoactivated'";
@@ -9202,8 +9202,10 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 
 	// Add colums pass and grp_ID:
 	$user_import_columns[] = 'pass';
+	$user_import_columns[] = 'salt';
+	$user_import_columns[] = 'pass_driver';
 	$user_import_columns[] = 'grp_ID';
-	
+
 	if(!$status_column)
 	{
 		$user_import_columns[] = 'status';
@@ -9212,10 +9214,10 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 	{
 		$user_import_columns[] = 'login';
 	}
-	
+
 	// add prefix "user_" for each of the column of CSV:
 	$user_import_columns = preg_filter( '/^/', 'user_',  $user_import_columns );
-	
+
 	// Close file pointer:
 	fclose( $file_handle );
 
@@ -9236,7 +9238,7 @@ function import_users( $group_ID, $on_duplicate_login_update_user, $on_duplicate
 				  SET '.$user_update_data.'
 				WHERE user_login = '.$DB->quote( $user_login ) );
 		}
-		
+
 		foreach( $users_update_values_email as $user_email => $user_update_data )
 		{	// Update an existing user based on email:
 			$DB->query( 'UPDATE T_users
