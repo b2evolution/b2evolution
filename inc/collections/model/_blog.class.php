@@ -1485,6 +1485,14 @@ class Blog extends DataObject
 
 			if( in_array( 'styles', $groups ) )
 			{ // we want to load the styles params:
+				$this->set_setting( 'display_alt_skin_referer', param( 'display_alt_skin_referer', 'integer', 0 ) );
+				$display_alt_skin_referer_url = param( 'display_alt_skin_referer_url', 'url', NULL );
+				if( param_check_not_empty( 'display_alt_skin_referer_url', T_('The Referer URL cannot be empty to display Alt skin automatically.') ) )
+				{
+					param_check_url( 'display_alt_skin_referer_url', 'http-https' );
+				}
+				$this->set_setting( 'display_alt_skin_referer_url', $display_alt_skin_referer_url );
+
 				$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
 				$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
 			}
@@ -6078,7 +6086,6 @@ class Blog extends DataObject
 		}
 	}
 	
-	
 	/**
 	 * Enable item types for duplicate collection
 	 */
@@ -6100,9 +6107,9 @@ class Blog extends DataObject
 		$SQL->SELECT( 't.ityp_ID, IF( tb.itc_ityp_ID > 0, 1, 0 ) AS type_enabled, IF( ityp_ID = '.$this->get_setting( 'default_post_type' ).', 1, 0 ) AS type_default' );
 		$SQL->FROM( 'T_items__type AS t' );
 		$SQL->FROM_add( 'LEFT JOIN T_items__type_coll AS tb ON itc_ityp_ID = ityp_ID AND itc_coll_ID = '.$this->base_collection_ID.' having type_enabled = 1 ' );
-		
+
 		$base_blog_item_types = $DB->get_results($SQL->get());
-		
+
 		$enable_post_types = array();
 
 		foreach ($base_blog_item_types as $key => $value) 
