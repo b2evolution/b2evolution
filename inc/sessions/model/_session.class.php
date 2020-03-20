@@ -830,7 +830,17 @@ class Session
 	 */
 	function is_alt_session()
 	{
-		// TODO: Implement to detect session for alternative skin:
+		global $Blog, $Hit;
+
+		if( isset( $Hit ) &&
+		    isset( $Blog ) &&
+		    $Blog->get_setting( 'display_alt_skin_referer' ) &&
+		    strpos( $Hit->get_referer(), $Blog->get_setting( 'display_alt_skin_referer_url' ) ) === 0 )
+		{	// Current referer URL starts with URL from collection setting:
+			return true;
+		}
+
+		// No condition is found to display Alt skin:
 		return false;
 	}
 

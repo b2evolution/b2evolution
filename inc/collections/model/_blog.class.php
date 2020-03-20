@@ -1484,6 +1484,14 @@ class Blog extends DataObject
 
 			if( in_array( 'styles', $groups ) )
 			{ // we want to load the styles params:
+				$this->set_setting( 'display_alt_skin_referer', param( 'display_alt_skin_referer', 'integer', 0 ) );
+				$display_alt_skin_referer_url = param( 'display_alt_skin_referer_url', 'url', NULL );
+				if( param_check_not_empty( 'display_alt_skin_referer_url', T_('The Referer URL cannot be empty to display Alt skin automatically.') ) )
+				{
+					param_check_url( 'display_alt_skin_referer_url', 'http-https' );
+				}
+				$this->set_setting( 'display_alt_skin_referer_url', $display_alt_skin_referer_url );
+
 				$this->set( 'allowblogcss', param( 'blog_allowblogcss', 'integer', 0 ) );
 				$this->set( 'allowusercss', param( 'blog_allowusercss', 'integer', 0 ) );
 			}

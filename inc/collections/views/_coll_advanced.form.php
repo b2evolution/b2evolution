@@ -186,6 +186,16 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 {	// Permission to edit advanced admin settings
 
 	$Form->begin_fieldset( T_('Skin and style').get_admin_badge().get_manual_link('skin-and-style') );
+
+		$Form->output = false;
+		$Form->switch_layout( 'none' );
+		$display_alt_skin_referer_url_input = $Form->text( 'display_alt_skin_referer_url', $edited_Blog->get_setting( 'display_alt_skin_referer_url' ), 64, '', '', 10000 );
+		$Form->switch_layout( NULL );
+		$Form->output = true;
+		$Form->checklist( array(
+				array( 'display_alt_skin_referer', 1, sprintf( T_('Referer URL starts with %s'), $display_alt_skin_referer_url_input ), $edited_Blog->get_setting( 'display_alt_skin_referer' ), false, '', 'checkbox_with_input' ),
+			), 'alt_skin_conditions', T_('Automatically display Alt skin if') );
+
 		$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('You will be able to customize the blog\'s skin stylesheet with a file named style.css in the blog\'s media file folder.') );
 		$Form->checkbox( 'blog_allowusercss', $edited_Blog->get( 'allowusercss' ), T_('Allow user customized CSS file for this blog'), T_('Users will be able to customize the blog and skin stylesheets with a file named style.css in their personal file folder.') );
 		$Form->textarea( 'blog_head_includes', $edited_Blog->get_setting( 'head_includes' ), 5, T_('Custom meta tag/css section (before &lt;/head&gt;)'),
