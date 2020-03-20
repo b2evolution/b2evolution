@@ -94,6 +94,7 @@ class Blog extends DataObject
 	var $normal_skin_ID = NULL;
 	var $mobile_skin_ID = NULL;
 	var $tablet_skin_ID = NULL;
+	var $alt_skin_ID = NULL;
 
 	/**
 	 * The basepath of that collection.
@@ -268,8 +269,9 @@ class Blog extends DataObject
 			$this->type = isset( $db_row->blog_type ) ? $db_row->blog_type : 'std';
 			$this->order = isset( $db_row->blog_order ) ? $db_row->blog_order : 0;
 			$this->normal_skin_ID = isset( $db_row->blog_normal_skin_ID ) ? $db_row->blog_normal_skin_ID : NULL; // check by isset() to avoid warnings of deleting all tables before new install
-			$this->mobile_skin_ID = isset( $db_row->blog_mobile_skin_ID ) ? $db_row->blog_mobile_skin_ID : NULL; // NULL means the same as normal_skid_ID value
-			$this->tablet_skin_ID = isset( $db_row->blog_tablet_skin_ID ) ? $db_row->blog_tablet_skin_ID : NULL; // NULL means the same as normal_skid_ID value
+			$this->mobile_skin_ID = isset( $db_row->blog_mobile_skin_ID ) ? $db_row->blog_mobile_skin_ID : NULL; // NULL means the same as normal_skin_ID value
+			$this->tablet_skin_ID = isset( $db_row->blog_tablet_skin_ID ) ? $db_row->blog_tablet_skin_ID : NULL; // NULL means the same as normal_skin_ID value
+			$this->alt_skin_ID = isset( $db_row->blog_alt_skin_ID ) ? $db_row->blog_alt_skin_ID : NULL; // NULL means the same as normal_skin_ID value
 		}
 
 		$Timer->pause( 'Blog constructor' );
@@ -913,6 +915,20 @@ class Blog extends DataObject
 			else
 			{ // Set tablet skin
 				$this->set( 'tablet_skin_ID', $updated_skin_ID );
+			}
+		}
+
+		if( param( 'alt_skin_ID', 'integer', NULL ) !== NULL )
+		{ // Alt skin ID:
+			$updated_skin_type = 'alt';
+			$updated_skin_ID = get_param( 'alt_skin_ID' );
+			if( $updated_skin_ID == 0 )
+			{ // Don't store this empty setting in DB
+				$this->set( 'alt_skin_ID', NULL );
+			}
+			else
+			{ // Set alt skin
+				$this->set( 'alt_skin_ID', $updated_skin_ID );
 			}
 		}
 
@@ -3343,8 +3359,9 @@ class Blog extends DataObject
 			case 'normal_skin_ID':
 			case 'mobile_skin_ID':
 			case 'tablet_skin_ID':
+			case 'alt_skin_ID':
 				$result = parent::get( $parname );
-				if( $parname == 'mobile_skin_ID' || $parname == 'tablet_skin_ID' )
+				if( $parname == 'mobile_skin_ID' || $parname == 'tablet_skin_ID' || $parname == 'alt_skin_ID' )
 				{
 					if( empty( $result ) && ! ( isset( $params['real_value'] ) && $params['real_value'] ) )
 					{	// Empty values(NULL, 0, '0', '') means that use the same as normal case:
@@ -3629,7 +3646,7 @@ class Blog extends DataObject
 		global $DB, $Plugins, $Settings;
 
 		// Set default skins on creating new collection:
-		$skin_types = array( 'normal', 'mobile', 'tablet' );
+		$skin_types = array( 'normal', 'mobile', 'tablet', 'alt' );
 		foreach( $skin_types as $skin_type )
 		{
 			$skin_ID = $this->get( $skin_type.'_skin_ID', array( 'real_value' => true ) );
@@ -4818,13 +4835,17 @@ class Blog extends DataObject
 		{
 			$skin_type = 'tablet';
 		}
+		elseif( $Session->is_alt_session() )
+		{
+			$skin_type = 'alt';
+		}
 		else
 		{
 			$skin_type = 'normal';
 		}
 
-		if( $skin_type == 'mobile' || $skin_type == 'tablet' )
-		{	// Check if collection use different mobile/tablet skin or same as normal skin:
+		if( $skin_type == 'mobile' || $skin_type == 'tablet' || $skin_type == 'alt' )
+		{	// Check if collection use different mobile/tablet/alt skin or same as normal skin:
 			$skin_ID = $this->get( $skin_type.'_skin_ID', array( 'real_value' => true ) );
 			if( empty( $skin_ID ) )
 			{	// Force to use widgets for normal skin because collection doesn't use different skin for mobile/tablet session:
@@ -4839,7 +4860,7 @@ class Blog extends DataObject
 	/*
 	 * Get the blog skin ID which correspond to the current session device or which correspond to the selected skin type
 	 *
-	 * @param string Skin type: 'auto', 'normal', 'mobile', 'tablet'
+	 * @param string Skin type: 'auto', 'normal', 'mobile', 'tablet', 'alt'
 	 * @return integer skin ID
 	 */
 	function get_skin_ID( $skin_type = 'auto', $real_value = false )
@@ -4859,6 +4880,10 @@ class Blog extends DataObject
 					{
 						return $this->get( 'tablet_skin_ID', array( 'real_value' => $real_value ) );
 					}
+					if( $Session->is_alt_session() )
+					{
+						return $this->get( 'alt_skin_ID', array( 'real_value' => $real_value ) );
+					}
 				}
 				return $this->get( 'normal_skin_ID' );
 
@@ -4873,6 +4898,10 @@ class Blog extends DataObject
 			case 'tablet':
 				// Tablet skin
 				return $this->get( 'tablet_skin_ID', array( 'real_value' => $real_value ) );
+
+			case 'alt':
+				// Alt skin
+				return $this->get( 'alt_skin_ID', array( 'real_value' => $real_value ) );
 		}
 
 		// Deny to request invalid skin types
@@ -4883,7 +4912,7 @@ class Blog extends DataObject
 	/**
 	 * Get distinct skin ids used by the current blog
 	 *
-	 * @return array Ids of skins which are used as normal, mobile or tablet skin with the current blog
+	 * @return array Ids of skins which are used as normal, mobile, tablet or alt skin with the current Collection
 	 */
 	function get_skin_ids()
 	{
@@ -4896,6 +4925,10 @@ class Blog extends DataObject
 		{
 			$skin_ids[] = $this->get( 'tablet_skin_ID' );
 		}
+		if( $this->get( 'alt_skin_ID' ) > 0 )
+		{
+			$skin_ids[] = $this->get( 'alt_skin_ID' );
+		}
 
 		return array_unique( $skin_ids );
 	}
@@ -4904,7 +4937,7 @@ class Blog extends DataObject
 	/**
 	 * Get collection skin containers which correspond to the current session device or which correspond to the selected skin type
 	 *
-	 * @param string Skin type: 'auto', 'normal', 'mobile', 'tablet'
+	 * @param string Skin type: 'auto', 'normal', 'mobile', 'tablet', 'alt'
 	 * @return array
 	 */
 	function get_skin_containers( $skin_type = 'auto' )
@@ -4919,7 +4952,7 @@ class Blog extends DataObject
 	/**
 	 * Get collection main containers
 	 *
-	 * @param string Skin type: 'normal', 'mobile', 'tablet'
+	 * @param string Skin type: 'normal', 'mobile', 'tablet', 'alt'
 	 * @param boolean TRUE to initialize IDs of containers
 	 * @return array main container codes => array( name, order, id(optional) )
 	 */
@@ -4972,7 +5005,7 @@ class Blog extends DataObject
 	 * Get all collection main containers from either declared skin function or from scanned skin files
 	 *
 	 * @param boolean TRUE to display result messages
-	 * @param string Skin type: 'all', 'normal', 'mobile', 'tablet'
+	 * @param string Skin type: 'all', 'normal', 'mobile', 'tablet', 'alt'
 	 */
 	function db_save_main_containers( $verbose = false, $skin_type = 'all' )
 	{
@@ -4982,9 +5015,9 @@ class Blog extends DataObject
 
 		if( $skin_type == 'all' )
 		{	// Use all skin types:
-			$skin_types = array( 'normal', 'mobile', 'tablet' );
+			$skin_types = array( 'normal', 'mobile', 'tablet', 'alt' );
 		}
-		elseif( in_array( $skin_type, array( 'normal', 'mobile', 'tablet' ) ) )
+		elseif( in_array( $skin_type, array( 'normal', 'mobile', 'tablet', 'alt' ) ) )
 		{	// Use single skin type:
 			$skin_types = array( $skin_type );
 		}
@@ -5148,7 +5181,7 @@ class Blog extends DataObject
 	/**
 	 * Get skin folder/name by skin type
 	 *
-	 * @param string Force session type: 'auto', 'normal', 'mobile', 'tablet'
+	 * @param string Force session type: 'auto', 'normal', 'mobile', 'tablet', 'alt'
 	 * @return string Skin folder/name
 	 */
 	function get_skin_folder( $skin_type = 'auto' )

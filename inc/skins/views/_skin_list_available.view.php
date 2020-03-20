@@ -47,6 +47,9 @@ switch( $sel_skin_type )
 	case 'tablet':
 		$skin_type_title = /* TRANS: Skin type name */ T_('Tablet');
 		break;
+	case 'alt':
+		$skin_type_title = /* TRANS: Skin type name */ T_('Alt');
+		break;
 	default:
 		$skin_type_title = '';
 		break;
@@ -90,6 +93,7 @@ $Form->select_input_array( 'sel_skin_type', $sel_skin_type, array(
 		'normal'  => T_('Standard skins'),
 		'mobile'  => T_('Phone skins'),
 		'tablet'  => T_('Tablet skins'),
+		'alt'     => T_('Alt skins'),
 		'feed'    => T_('Feed skins'),
 		'sitemap' => T_('Sitemap skins'),
 	), T_('Skin type'), '', array(
@@ -272,7 +276,7 @@ foreach( $skin_folders_data as $skin_folder => $data )
 
 			$redirect_to_after_install = $redirect_to;
 			/*
-			$skin_compatible = ( empty( $kind ) || in_array( $folder_Skin->type, array( 'normal', 'feed', 'sitemap', 'mobile', 'tablet', 'rwd' ) ) );
+			$skin_compatible = ( empty( $kind ) || in_array( $folder_Skin->type, array( 'normal', 'feed', 'sitemap', 'mobile', 'tablet', 'alt', 'rwd' ) ) );
 			if( ! empty( $kind ) && $skin_folders_data[$skin_folder]['supported'] )
 			{ // If we are installing skin for a new collection we're currently creating:
 				$redirect_to_after_install = $admin_url.'?ctrl=collections&action=new-name&kind='.$kind.'&skin_ID=$skin_ID$';
@@ -355,9 +359,9 @@ foreach( $skin_folders_data as $skin_folder => $data )
 			}
 
 			if( ! empty( $sel_skin_type ) && $folder_Skin->type != $sel_skin_type &&
-					( $folder_Skin->type != 'rwd' || ! in_array( $sel_skin_type, array( 'normal', 'mobile', 'tablet' ) ) ) )
+					( $folder_Skin->type != 'rwd' || ! in_array( $sel_skin_type, array( 'normal', 'mobile', 'tablet', 'alt' ) ) ) )
 			{	// Filter skin by selected type;
-				// For normal, mobile, tablet skins also displays rwd skins:
+				// For normal, mobile, tablet, alt skins also displays rwd skins:
 				$skin_folders_data[$skin_folder]['status'] = 'ignore';
 				continue;
 			}
@@ -370,7 +374,7 @@ foreach( $skin_folders_data as $skin_folder => $data )
 			}
 
 			$redirect_to_after_install = $redirect_to;
-			$skin_compatible = ( empty( $kind ) || in_array( $folder_Skin->type, array( 'normal', 'feed', 'sitemap', 'mobile', 'tablet', 'rwd' ) ) );
+			$skin_compatible = ( empty( $kind ) || in_array( $folder_Skin->type, array( 'normal', 'feed', 'sitemap', 'mobile', 'tablet', 'alt', 'rwd' ) ) );
 			if( ! empty( $kind ) && $skin_compatible )
 			{ // If we are installing skin for a new collection we're currently creating:
 				$coll_url_suffix = get_param( 'sec_ID' ) ? '&sec_ID='.get_param( 'sec_ID' ) : '';
@@ -444,9 +448,9 @@ foreach( $skin_folders as $skin_folder )
 	}
 
 	if( ! empty( $sel_skin_type ) && $skin_folders_data[$skin_folder]['skin_type'] != $sel_skin_type &&
-			( $skin_folders_data[$skin_folder]['skin_type'] != 'rwd' || ! in_array( $sel_skin_type, array( 'normal', 'mobile', 'tablet' ) ) ) )
+			( $skin_folders_data[$skin_folder]['skin_type'] != 'rwd' || ! in_array( $sel_skin_type, array( 'normal', 'mobile', 'tablet', 'alt' ) ) ) )
 	{	// Filter skin by selected type;
-		// For normal, mobile, tablet skins also displays rwd skins:
+		// For normal, mobile, tablet, alt skins also displays rwd skins:
 		continue;
 	}
 

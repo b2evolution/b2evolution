@@ -35,6 +35,11 @@ switch( $skin_type )
 		$fieldset_title = isset( $Blog ) ? T_('Tablet skin for this collection') : T_('Tablet skin for this site');
 		break;
 
+	case 'alt':
+		$skin_ID = isset( $Blog ) ? $Blog->get( 'alt_skin_ID', array( 'real_value' => true ) ) : $Settings->get( 'alt_skin_ID', true );
+		$fieldset_title = isset( $Blog ) ? T_('Alt skin for this collection') : T_('Alt skin for this site');
+		break;
+
 	default:
 		debug_die( 'Wrong skin type: '.$skin_type );
 }
@@ -109,7 +114,7 @@ $Form->begin_form( 'fform' );
 	{	// If collection skin page is opened currently:
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{	// If current user has a permission to view site skin:
-			$goto_link_url = $admin_url.'?ctrl=collections&amp;tab=site_skin'.( $skin_type == 'mobile' || $skin_type == 'tablet' ? '&amp;skin_type='.$skin_type : '' );
+			$goto_link_url = $admin_url.'?ctrl=collections&amp;tab=site_skin'.( $skin_type == 'mobile' || $skin_type == 'tablet' || $skin_type == 'alt' ? '&amp;skin_type='.$skin_type : '' );
 			$goto_link_title = T_('Go to Site skin');
 		}
 		// Append manual/doc link:
@@ -120,7 +125,7 @@ $Form->begin_form( 'fform' );
 		if( ( $working_coll_ID = get_working_blog() ) &&
 		    $current_User->check_perm( 'blog_properties', 'edit', false, $working_coll_ID ) )
 		{	// If working collection is set and current user has a permission to edit the collection skin:
-			$goto_link_url = $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$working_coll_ID.( $skin_type == 'mobile' || $skin_type == 'tablet' ? '&amp;skin_type='.$skin_type : '' );
+			$goto_link_url = $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$working_coll_ID.( $skin_type == 'mobile' || $skin_type == 'tablet' || $skin_type == 'alt' ? '&amp;skin_type='.$skin_type : '' );
 			$goto_link_title = T_('Go to Collection skin');
 		}
 		// Append manual/doc link:

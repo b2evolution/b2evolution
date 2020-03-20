@@ -826,6 +826,16 @@ class Session
 
 
 	/**
+	 * Was this session specially switched to alternative skin
+	 */
+	function is_alt_session()
+	{
+		// TODO: Implement to detect session for alternative skin:
+		return false;
+	}
+
+
+	/**
 	 * Was this session created from a desktop device
 	 */
 	function is_desktop_session()

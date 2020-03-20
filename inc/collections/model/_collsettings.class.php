@@ -348,6 +348,7 @@ class CollectionSettings extends AbstractSettings
 	 *  'normal_skin_ID' => NULL,
 	 *  'mobile_skin_ID' => NULL,
 	 *  'tablet_skin_ID' => NULL,
+	 *  'alt_skin_ID' => NULL,
 	 */
 
 

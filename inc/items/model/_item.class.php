@@ -4159,7 +4159,7 @@ class Item extends ItemLight
 			}
 			elseif( get_status_permvalue( $this->get( 'status' ) ) > get_status_permvalue( $content_Item->get( 'status' ) ) )
 			{	// Deny to display content block Item with lower status than parent Item:
-			  // It means visibility status of content block Item cannot be higher than visibility status of the current/parent Item,
+				// It means visibility status of content block Item cannot be higher than visibility status of the current/parent Item,
 				// See below the ordered list of visibility statuses by weight:
 				// - Redirected
 				// - Public

@@ -107,7 +107,7 @@ class WidgetContainerCache extends DataObjectCache
 	 * Get widget containers from the given collection for the given skin type
 	 *
 	 * @param integer Collection ID
-	 * @param string Skin type: 'normal', 'mobile', 'tablet'
+	 * @param string Skin type: 'normal', 'mobile', 'tablet', 'alt'
 	 * @return array of WidgetContainer
 	 */
 	function get_by_coll_skintype( $coll_ID, $skin_type )

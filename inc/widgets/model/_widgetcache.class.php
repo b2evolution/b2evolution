@@ -67,7 +67,7 @@ class WidgetCache extends DataObjectCache
 	 *
 	 * @param integer Collection (blog) ID or NULL to get widgets from shared container
 	 * @param boolean TRUE to return array grouped by container code, FALSE - by container name
-	 * @param string Skin type: 'all', 'auto', 'normal', 'mobile', 'tablet'
+	 * @param string Skin type: 'all', 'auto', 'normal', 'mobile', 'tablet', 'alt'
 	 * @return array of coll_ID => array of container_name => array of Widget
 	 */
 	function & get_by_coll_ID( $coll_ID, $by_code = false, $skin_type = 'all' )
@@ -225,7 +225,7 @@ class WidgetCache extends DataObjectCache
 	 * @param integer Collection (blog) ID
 	 * @param string Container name or code
 	 * @param boolean TRUE to get by container code, FALSE - by container name
-	 * @param string Skin type: 'auto', 'normal', 'mobile', 'tablet'
+	 * @param string Skin type: 'auto', 'normal', 'mobile', 'tablet', 'alt'
 	 * @return array of Widget
 	 */
 	function & get_by_coll_container( $coll_ID, $container, $by_code = false, $skin_type = 'auto' )

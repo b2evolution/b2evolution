@@ -12589,6 +12589,14 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		upg_task_end();
 	}
 
+	if( upg_task_start( 16010, 'Upgrading blogs, skins, widgets tables for new skin type "Alt"...' ) )
+	{	// part of 7.1.3-beta
+		db_add_col( 'T_blogs', 'blog_alt_skin_ID', 'int(10) unsigned NULL' );
+		db_modify_col( 'T_skins__skin', 'skin_type', 'enum("normal","feed","sitemap","mobile","tablet","alt","rwd") COLLATE ascii_general_ci NOT NULL default "normal"' );
+		db_modify_col( 'T_widget__container', 'wico_skin_type', 'ENUM( "normal", "mobile", "tablet", "alt" ) COLLATE ascii_general_ci NOT NULL DEFAULT "normal"' );
+		upg_task_end();
+	}
+
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.
 	 *

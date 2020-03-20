@@ -117,6 +117,7 @@ $Form->begin_fieldset( T_('Default Skins for New Collections').get_manual_link( 
 	$normal_skins = array();
 	$mobile_skins = array( 0 => T_('Same as standard skin') );
 	$tablet_skins = array( 0 => T_('Same as standard skin') );
+	$alt_skins = array( 0 => T_('Same as standard skin') );
 
 	$SkinCache = & get_SkinCache();
 	$SkinCache->load_all();
@@ -140,6 +141,12 @@ $Form->begin_fieldset( T_('Default Skins for New Collections').get_manual_link( 
 				$tablet_skins[ $iterator_Skin->ID ] = $iterator_Skin->get( 'name' );
 				break;
 
+			case 'rwd':
+			case 'alt':
+				$alt_skins[ $iterator_Skin->ID ] = $iterator_Skin->get( 'name' );
+				break;
+
+
 			//default: It's not a skin whit a type what we should show in these select lists ( e.g. feed )
 		}
 	}
@@ -147,6 +154,7 @@ $Form->begin_fieldset( T_('Default Skins for New Collections').get_manual_link( 
 	$Form->select_input_array( 'def_normal_skin_ID', $Settings->get( 'def_normal_skin_ID' ), $normal_skins, T_('Default standard skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_mobile_skin_ID', $Settings->get( 'def_mobile_skin_ID' ), $mobile_skins, T_('Default mobile phone skin'), NULL, $field_params );
 	$Form->select_input_array( 'def_tablet_skin_ID', $Settings->get( 'def_tablet_skin_ID' ), $tablet_skins, T_('Default tablet skin'), NULL, $field_params );
+	$Form->select_input_array( 'def_alt_skin_ID', $Settings->get( 'def_alt_skin_ID' ), $alt_skins, T_('Default alt skin'), NULL, $field_params );
 $Form->end_fieldset();
 
 // --------------------------------------------

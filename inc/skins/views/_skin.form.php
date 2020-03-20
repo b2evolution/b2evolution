@@ -116,14 +116,22 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 					UNION ALL
 					SELECT blog_ID, blog_name, "tablet" AS skin_type, "3" AS skin_type_order
 					FROM T_blogs
-					WHERE blog_tablet_skin_ID = '.$edited_Skin->ID.' ) AS a
+					WHERE blog_tablet_skin_ID = '.$edited_Skin->ID.' 
+					UNION ALL
+					SELECT blog_ID, blog_name, "alt" AS skin_type, "4" AS skin_type_order
+					FROM T_blogs
+					WHERE blog_alt_skin_ID = '.$edited_Skin->ID.' ) AS a
 					ORDER BY blog_ID ASC, skin_type_order ASC';
 
 			$count_SQL = 'SELECT SUM( IF( blog_normal_skin_ID = '.$edited_Skin->ID.', 1, 0 )
 					+ IF( blog_mobile_skin_ID = '.$edited_Skin->ID.', 1, 0 )
-					+ IF( blog_tablet_skin_ID = '.$edited_Skin->ID.', 1, 0 ) )
+					+ IF( blog_tablet_skin_ID = '.$edited_Skin->ID.', 1, 0 )
+					+ IF( blog_alt_skin_ID = '.$edited_Skin->ID.', 1, 0 ) )
 					FROM T_blogs
-					WHERE blog_normal_skin_ID = '.$edited_Skin->ID.' OR blog_mobile_skin_ID = '.$edited_Skin->ID.' OR blog_tablet_skin_ID = '.$edited_Skin->ID;
+					WHERE blog_normal_skin_ID = '.$edited_Skin->ID.'
+					   OR blog_mobile_skin_ID = '.$edited_Skin->ID.'
+					   OR blog_tablet_skin_ID = '.$edited_Skin->ID.'
+					   OR blog_alt_skin_ID = '.$edited_Skin->ID;
 
 			$Results = new Results( $SQL, '', '', 1000, $count_SQL );
 			$Results->title = T_('Used by').'...';
@@ -141,7 +149,7 @@ $Form->begin_form( 'fform', T_('Skin properties') );
 				}
 				$url_params = 'tab=skin&amp;blog='.$row->blog_ID;
 
-				if( in_array( $row->skin_type, array( 'mobile', 'tablet' ) ) )
+				if( in_array( $row->skin_type, array( 'mobile', 'tablet', 'alt' ) ) )
 				{
 					$url_params .= '&amp;skin_type='.str_replace( '_skin_ID', '', $row->skin_type );
 				}

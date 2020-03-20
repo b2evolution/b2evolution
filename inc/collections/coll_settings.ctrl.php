@@ -183,22 +183,26 @@ switch( $action )
 
 						$Messages->add( T_('The blog skin has been changed.')
 											.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
-						if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && param( 'normal_skin_ID', 'integer', NULL ) !== NULL ) ||
+						if( ( ! $Session->is_mobile_session() && ! $Session->is_tablet_session() && ! $Session->is_alt_session() && param( 'normal_skin_ID', 'integer', NULL ) !== NULL ) ||
 						    ( $Session->is_mobile_session() && param( 'mobile_skin_ID', 'integer', NULL ) !== NULL ) ||
-						    ( $Session->is_tablet_session() && param( 'tablet_skin_ID', 'integer', NULL ) !== NULL ) )
+						    ( $Session->is_tablet_session() && param( 'tablet_skin_ID', 'integer', NULL ) !== NULL ) ||
+						    ( $Session->is_alt_session() && param( 'alt_skin_ID', 'integer', NULL ) !== NULL ) )
 						{	// Redirect to blog home page if we change the skin for current device type
 							header_redirect( $edited_Blog->gen_blogurl() );
 						}
 						else
 						{	// Redirect to admin skins page if we change the skin for another device type:
-							$skin_type = ( get_param( 'mobile_skin_ID' ) !== NULL ? 'mobile' : ( get_param( 'tablet_skin_ID' ) !== NULL ? 'tablet' : 'normal' ) );
+							$skin_type = ( get_param( 'mobile_skin_ID' ) !== NULL ? 'mobile'
+								: ( get_param( 'tablet_skin_ID' ) !== NULL ? 'tablet'
+								: ( get_param( 'alt_skin_ID' ) !== NULL ? 'alt'
+								: 'normal' ) ) );
 							header_redirect( $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&skin_type='.$skin_type );
 						}
 					}
 				}
 				else
 				{	// Update skin params/settings of the collection:
-					if( ! in_array( $skin_type, array( 'normal', 'mobile', 'tablet' ) ) )
+					if( ! in_array( $skin_type, array( 'normal', 'mobile', 'tablet', 'alt' ) ) )
 					{
 						debug_die( 'Wrong skin type: '.$skin_type );
 					}
@@ -357,6 +361,7 @@ switch( $action )
 			insert_basic_widgets( $edited_Blog->ID, 'normal', false, $type );
 			insert_basic_widgets( $edited_Blog->ID, 'mobile', false, $type );
 			insert_basic_widgets( $edited_Blog->ID, 'tablet', false, $type );
+			insert_basic_widgets( $edited_Blog->ID, 'alt', false, $type );
 		}
 
 		$edited_Blog->init_by_kind( $type, $edited_Blog->get( 'name' ), $edited_Blog->get( 'shortname' ), $edited_Blog->get( 'urlname' ) );

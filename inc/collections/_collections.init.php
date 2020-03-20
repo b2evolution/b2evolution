@@ -742,6 +742,10 @@ class collections_Module extends Module
 								'text' => T_('Tablet'),
 								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;skin_type=tablet'
 							),
+							'skin_alt' => array(
+								'text' => T_('Alt'),
+								'href' => $admin_url.'?ctrl=collections&amp;tab=site_skin&amp;skin_type=alt'
+							),
 							'manage_skins' => array(
 								'text' => T_('Manage skins'),
 								'href' => $admin_url.'?ctrl=skins&amp;tab=site_skin'
@@ -903,7 +907,11 @@ class collections_Module extends Module
 							'skin_tablet' => array(
 								'text' => T_('Tablet'),
 								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=tablet'
-							)
+							),
+							'skin_alt' => array(
+								'text' => T_('Alt'),
+								'href' => $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$blog.'&amp;skin_type=alt'
+							),
 						),
 					),
 					'widgets' => array(
@@ -921,7 +929,11 @@ class collections_Module extends Module
 							'skin_tablet' => array(
 								'text' => T_('Tablet'),
 								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog.'&amp;skin_type=tablet'
-							)
+							),
+							'skin_alt' => array(
+								'text' => T_('Alt'),
+								'href' => $admin_url.'?ctrl=widgets&amp;blog='.$blog.'&amp;skin_type=alt'
+							),
 						),
 						'order' => 'group_last', ),
 					'settings' => array(
