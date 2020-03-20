@@ -285,7 +285,7 @@ function render_template_callback( $var, $params, $objects = array() )
 
 			if( empty( $rendered_Plugin ) )
 			{
-				return '<span class="evo_param_error">Plugin <code>'.$match_var[3].'</code> is not recognized.</span>';
+				return '<span class="evo_param_error">Plugin <code>'.$match_var[3].'</code> is not installed.</span>';
 			}
 
 			$var = $scope;

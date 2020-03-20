@@ -182,7 +182,7 @@ class user_register_standard_Widget extends ComponentWidget
 		// Render MASTER quick template:
 		// In theory, this should not display anything.
 		// Instead, this should set variables to define sub-templates (and potentially additional variables)
-		echo render_template_code( $master_template_code, /* BY REF */ $this->disp_params );
+		render_template_code( $master_template_code, /* BY REF */ $this->disp_params );
 
 		// Check if requestes sub-template exists:
 		$register_form_Template = $TemplateCache->get_by_code( $this->disp_params['reg1_template'], false, false );
