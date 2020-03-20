@@ -26,6 +26,9 @@ class ItemType extends DataObject
 	var $name;
 	var $description;
 	var $usage;
+	var $template_excerpt;
+	var $template_normal;
+	var $template_full;
 	var $template_name;
 	var $schema = '';
 	var $add_aggregate_rating = 1;
