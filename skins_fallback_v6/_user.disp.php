@@ -83,9 +83,12 @@ echo '<div class="profile_column_left">';
 	}
 	else
 	{ // Avatar settings for anonymous user
-        if ($Settings->get( 'blur_avatar_if_anonymous' ) ) {
+        if ($Settings->get( 'blur_avatar_if_anonymous' ) )
+        {
             $avatar_image_size = $params['avatar_image_size_if_anonymous'];
-        } else {
+        }
+        else
+        {
             $avatar_image_size = $params['avatar_image_size'];
         }
         if( $params['avatar_overlay_text_if_anonymous'] != '#default#' )
@@ -133,14 +136,16 @@ echo '<div class="profile_column_left">';
 	}
 
 	// Login:
-	if ( $is_logged_in ) {
+	if ( $is_logged_in )
+	{
         echo '<h2 class="'.$User->get_gender_class().'">'.$User->get( 'login' ).'</h2>';
 	}
 
 	echo '<hr class="profile_separator" />'."\n";
 
 	// Gender & age group:
-	if ( $is_logged_in ) {
+	if ( $is_logged_in )
+	{
         $gender_age_group = $User->get_gender();
         if( ! empty( $User->age_min ) || ! empty( $User->age_max ) )
         {
@@ -388,7 +393,8 @@ echo '<div class="profile_column_right">';
 		$profileForm->end_fieldset();
 	}
 
-    if ($Settings->get( 'show_reputation_data' )) {
+    if ($Settings->get( 'show_reputation_data' ))
+    {
         $profileForm->begin_fieldset( T_( 'Reputation' ) );
 
             $profileForm->info( T_('Registration date'), mysql2localedate( $User->datecreated ) );

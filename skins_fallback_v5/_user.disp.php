@@ -82,7 +82,8 @@ echo '<div class="profile_column_left">';
 	}
 	else
 	{ // Avatar settings for anonymous user
-        if ($Settings->get( 'blur_avatar_if_anonymous' ) ) {
+        if ($Settings->get( 'blur_avatar_if_anonymous' ) )
+        {
             $avatar_image_size = $params['avatar_image_size_if_anonymous'];
         } else {
             $avatar_image_size = $params['avatar_image_size'];
@@ -133,14 +134,16 @@ echo '<div class="profile_column_left">';
 	}
 
 	// Login:
-	if ( $is_logged_in ) {
+	if ( $is_logged_in )
+	{
         echo '<h2 class="'.$User->get_gender_class().'">'.$User->get( 'login' ).'</h2>';
 	}
 
 	echo '<hr class="profile_separator" />'."\n";
 
 	// Gender & age group:
-	if ( $is_logged_in ) {
+	if ( $is_logged_in )
+	{
         $gender_age_group = $User->get_gender();
         if( ! empty( $User->age_min ) || ! empty( $User->age_max ) )
         {
