@@ -333,7 +333,8 @@ class org_members_Widget extends ComponentWidget
 
 				echo $this->get_layout_end( $member_counter );
 			}
-			else {
+			else
+			{
 				// No members found
 				global $Messages;
 				$Messages->add( T_('Requested Team has no members.'), 'error' );
