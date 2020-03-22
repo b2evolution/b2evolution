@@ -85,7 +85,9 @@ echo '<div class="profile_column_left">';
         if ($Settings->get( 'blur_avatar_if_anonymous' ) )
         {
             $avatar_image_size = $params['avatar_image_size_if_anonymous'];
-        } else {
+        }
+        else
+        {
             $avatar_image_size = $params['avatar_image_size'];
         }
 		
