@@ -193,7 +193,7 @@ if( $current_User->check_perm( 'blog_admin', 'edit', false, $edited_Blog->ID ) )
 		$Form->switch_layout( NULL );
 		$Form->output = true;
 		$Form->checklist( array(
-				array( 'display_alt_skin_referer', 1, sprintf( T_('Referer URL starts with %s'), $display_alt_skin_referer_url_input ), $edited_Blog->get_setting( 'display_alt_skin_referer' ), false, '', 'checkbox_with_input' ),
+				array( 'display_alt_skin_referer', 1, sprintf( T_('Referer URL contains %s'), $display_alt_skin_referer_url_input ), $edited_Blog->get_setting( 'display_alt_skin_referer' ), false, '', 'checkbox_with_input' ),
 			), 'alt_skin_conditions', T_('Automatically display Alt skin if') );
 
 		$Form->checkbox( 'blog_allowblogcss', $edited_Blog->get( 'allowblogcss' ), T_('Allow customized blog CSS file'), T_('You will be able to customize the blog\'s skin stylesheet with a file named style.css in the blog\'s media file folder.') );

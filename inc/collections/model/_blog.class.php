@@ -1485,11 +1485,12 @@ class Blog extends DataObject
 
 			if( in_array( 'styles', $groups ) )
 			{ // we want to load the styles params:
-				$this->set_setting( 'display_alt_skin_referer', param( 'display_alt_skin_referer', 'integer', 0 ) );
+				$display_alt_skin_referer = param( 'display_alt_skin_referer', 'integer', 0 );
+				$this->set_setting( 'display_alt_skin_referer', $display_alt_skin_referer );
 				$display_alt_skin_referer_url = param( 'display_alt_skin_referer_url', 'url', NULL );
-				if( param_check_not_empty( 'display_alt_skin_referer_url', T_('The Referer URL cannot be empty to display Alt skin automatically.') ) )
-				{
-					param_check_url( 'display_alt_skin_referer_url', 'http-https' );
+				if( $display_alt_skin_referer )
+				{	// Check for not empty value only when setting is enabled:
+					param_check_not_empty( 'display_alt_skin_referer_url', T_('The Referer URL cannot be empty to display Alt skin automatically.') );
 				}
 				$this->set_setting( 'display_alt_skin_referer_url', $display_alt_skin_referer_url );
 
