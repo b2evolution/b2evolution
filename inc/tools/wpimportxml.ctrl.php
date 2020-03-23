@@ -25,9 +25,11 @@ load_class( 'tools/model/_wordpressimport.class.php', 'WordpressImport' );
  * values:
  * 1) 'file'
  * 2) 'confirm'
+ *   2.1) 'delete_extract'
+ *   2.2) 'use_existing_folder'
  * 3) 'import'
  */
-param( 'action', 'string' );
+param_action();
 
 if( !empty( $action ) )
 {	// Try to obtain some serious time to do some serious processing (15 minutes)
@@ -47,6 +49,8 @@ if( param( 'wp_blog_ID', 'integer', 0, true ) > 0 )
 switch( $action )
 {
 	case 'confirm':
+	case 'delete_extract':
+	case 'use_existing_folder':
 	case 'import':
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'wpxml' );
@@ -59,7 +63,7 @@ switch( $action )
 			$action = ( $action == 'confirm' ? 'file' : 'confirm' );
 		}
 
-		if( $action == 'confirm' )
+		if( in_array( $action, array( 'confirm', 'delete_extract', 'use_existing_folder' ) ) )
 		{	// Don't log into file for the confirm screen before start importing:
 			$WordpressImport->log_file = false;
 		}
@@ -92,6 +96,8 @@ $AdminUI->disp_payload_begin();
 switch( $action )
 {
 	case 'confirm':	// Step 2
+	case 'delete_extract': // Delete and extract again
+	case 'use_existing_folder': // Continue with existing folder
 		$AdminUI->disp_view( 'tools/views/_wpxml_confirm.form.php' );
 		break;
 

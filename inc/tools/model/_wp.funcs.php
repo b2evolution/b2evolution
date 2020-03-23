@@ -27,6 +27,8 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 function wpxml_get_import_data( & $XML_file_path, $allow_use_extracted_folder = false )
 {
+	$error_type = NULL;
+
 	// Start to collect all printed errors from buffer:
 	ob_start();
 
@@ -56,6 +58,7 @@ function wpxml_get_import_data( & $XML_file_path, $allow_use_extracted_folder = 
 
 		if( ! $allow_use_extracted_folder && $zip_folder_exists )
 		{	// Don't try to extract into already existing folder:
+			$error_type = 'folder_exists';
 			echo '<p class="text-danger">'.sprintf( 'The destination folder %s already exists. If you want to unzip %s again, delete %s first.',
 					'<code>'.$ZIP_folder_path.'/</code>',
 					'<code>'.$XML_file_name.'</code>',
@@ -122,6 +125,7 @@ function wpxml_get_import_data( & $XML_file_path, $allow_use_extracted_folder = 
 	}
 	else
 	{	// Unrecognized extension:
+		$error_type = 'wrong_extension';
 		echo '<p class="text-danger">'.sprintf( '%s has an unrecognized extension.', '<code>'.$xml_file['name'].'</code>' ).'</p>';
 	}
 
@@ -138,6 +142,7 @@ function wpxml_get_import_data( & $XML_file_path, $allow_use_extracted_folder = 
 
 	if( isset( $xml_exists_in_zip ) && $xml_exists_in_zip === false && file_exists( $ZIP_folder_path ) )
 	{	// No XML is detected in ZIP package:
+		$error_type = 'no_xml';
 		echo '<p class="text-danger">'.'Correct XML file is not detected in your ZIP package.'.'</p>';
 		// Delete temporary folder that contains the files from extracted ZIP package:
 		rmdir_r( $ZIP_folder_path );
@@ -159,6 +164,7 @@ function wpxml_get_import_data( & $XML_file_path, $allow_use_extracted_folder = 
 
 	return array(
 			'errors'               => empty( $errors ) ? false : $errors,
+			'error_type'           => $error_type,
 			'XML_file_path'        => $XML_file_path,
 			'attached_files_path'  => $attached_files_path,
 			'attached_files_folder'=> $attached_files_folder,
