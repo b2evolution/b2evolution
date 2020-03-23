@@ -114,6 +114,11 @@ if( isset( $edited_Thread ) )
 {
 	global $action;
 	$action = !empty( $action ) ? $action : 'create';
+	if( $action == 'create' )
+	{
+		global $edited_Message;
+		$edited_Message = new Message();
+	}
 	require $inc_path.'messaging/views/_message_list.view.php';
 }
 
