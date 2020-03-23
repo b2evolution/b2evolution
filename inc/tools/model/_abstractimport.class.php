@@ -191,8 +191,8 @@ class AbstractImport
 			return;
 		}
 
-		if( $display_label && ( $type == 'error' || $type == 'warning' ) )
-		{	// Count a number of errors + warnings:
+		if( $display_label && $type == 'error' )
+		{	// Count a number of errors:
 			$this->log_errors_num++;
 		}
 
