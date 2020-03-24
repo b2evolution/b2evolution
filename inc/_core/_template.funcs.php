@@ -2579,7 +2579,7 @@ function display_ajax_form( $params )
 	global $rsc_url, $ajax_form_number, $required_js, $b2evo_icons_type;
 
 	if( is_recursive( $params ) )
-	{ // The params array contains recursion, don't try to encode, display error message instead
+	{	// The params array contains recursion, don't try to encode, display error message instead
 		// We don't use translation because this situation should not really happen ( Probably it happesn with some wrong skin )
 		echo '<p style="color:red;font-weight:bold">'.T_( 'This section can\'t be displayed because wrong params were created by the skin.' ).'</p>';
 		return;
@@ -2600,7 +2600,7 @@ function display_ajax_form( $params )
 	}
 
 	if( empty( $ajax_form_number ) )
-	{ // Set number for ajax form to use unique ID for each new form
+	{	// Set number for ajax form to use unique ID for each new form
 		$ajax_form_number = 0;
 	}
 	$ajax_form_number++;

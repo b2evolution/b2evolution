@@ -77,7 +77,7 @@ jQuery( document ).ready( function()
 			{	// Submit a form to save the already entered content
 				var form = jQuery( 'form[id^=evo_comment_form_id_]' );
 				if( form.length == 0 )
-				{ // No form found, Use an url of this link
+				{	// No form found, Use an url of this link
 					return true;
 				}
 				// Set an action as url of this link and submit a form
@@ -100,7 +100,7 @@ jQuery( document ).ready( function()
 				window['request_sent_' + config['form_number']] = false;
 				window['ajax_form_loading_number_' + config['form_number']] = 0;
 
-				var get_form_func_name = 'get_form' + config['form_number']
+				var get_form_func_name = 'get_form' + config['form_number'];
 				window[get_form_func_name] = function()
 					{
 						var form_id = '#ajax_form_number_' + config['form_number'];
@@ -277,22 +277,22 @@ jQuery( document ).ready( function()
 						{
 							jQuery( '#region_filter' ).hide();
 						}
-						load_subregions( 0 ); // Reset sub-regions
+						window.load_subregions( 0 ); // Reset sub-regions
 					}
 				} );
 			} );
 
 		jQuery( '#region' ).change( function ()
 			{	// Change option list with sub-regions
-				load_subregions( jQuery( this ).val() );
+				window.load_subregions( jQuery( this ).val() );
 			} );
 
 		jQuery( '#subregion' ).change( function ()
 			{	// Change option list with cities
-				load_cities( jQuery( '#country' ).val(), jQuery( '#region' ).val(), jQuery( this ).val() );
+				window.load_cities( jQuery( '#country' ).val(), jQuery( '#region' ).val(), jQuery( this ).val() );
 			} );
 
-		window['load_subregions'] = function load_subregions( region_ID )
+		window.load_subregions = function load_subregions( region_ID )
 			{	// Load option list with sub-regions for seleted region
 				jQuery.ajax( {
 				type: 'POST',
@@ -314,8 +314,8 @@ jQuery( document ).ready( function()
 				} );
 			};
 
-		window['load_cities'] = function load_cities( country_ID, region_ID, subregion_ID )
-			{ // Load option list with cities for seleted region or sub-region
+		window.load_cities = function load_cities( country_ID, region_ID, subregion_ID )
+			{	// Load option list with cities for seleted region or sub-region
 				if( typeof( country_ID ) == 'undefined' )
 				{
 					country_ID = 0;
@@ -344,13 +344,12 @@ jQuery( document ).ready( function()
 	// Collection Activity Stats widget
 	if( typeof( coll_activity_stats_widget_config ) != 'undefined' )
 	{
-		var resizeTimer;
+		window.coll_activity_stats_widget_resize_timer;
 
 		window['resize_coll_activity_stat_widget'] = function resize_coll_activity_stat_widget()
 			{
-				var config = coll_activity_stats_widget_config;
 				var	originalData = [], weekData = [], xLabels = [],
-						displayed = config['time_period'];
+					displayed = coll_activity_stats_widget_config['time_period'];
 
 				if( plot == undefined )
 				{
@@ -409,8 +408,8 @@ jQuery( document ).ready( function()
 
 		jQuery( window ).resize( function()
 			{
-				clearTimeout( resizeTimer );
-				resizeTimer = setTimeout( resize_coll_activity_stat_widget, 100 );
+				clearTimeout( coll_activity_stats_widget_resize_timer );
+				coll_activity_stats_widget_resize_timer = setTimeout( resize_coll_activity_stat_widget, 100 );
 			} );
 	}
 	
@@ -490,20 +489,24 @@ jQuery( document ).ready( function()
 	// Link initialize fieldset
 	if( typeof( evo_link_initialize_fieldset_config ) != 'undefined' )
 	{
-		var evo_link_initialize_fieldset_configs = Object.values( evo_link_initialize_fieldset_config );
-		for( var i = 0; i < evo_link_initialize_fieldset_configs.length; i++ )
-		{
-			evo_link_initialize_fieldset( evo_link_initialize_fieldset_configs[i].fieldset_prefix );
-		}
+		( function() {
+			var evo_link_initialize_fieldset_configs = Object.values( evo_link_initialize_fieldset_config );
+			for( var i = 0; i < evo_link_initialize_fieldset_configs.length; i++ )
+			{
+				evo_link_initialize_fieldset( evo_link_initialize_fieldset_configs[i].fieldset_prefix );
+			}
+		} )();
 	}
 
 	// Display attachments fieldset
 	if( typeof( evo_display_attachments_fieldset_config ) != 'undefined' )
 	{
-		var evo_display_attachments_fieldset_configs = Object.values( evo_display_attachments_fieldset_config );
-		for( var i = 0; i < evo_display_attachments_fieldset_configs.length; i++ )
-		{
-			jQuery( '#' + evo_display_attachments_fieldset_configs[i].fieldset_prefix + evo_display_attachments_fieldset_configs[i].form_id ).show();
-		}
+		( function() {
+			var evo_display_attachments_fieldset_configs = Object.values( evo_display_attachments_fieldset_config );
+			for( var i = 0; i < evo_display_attachments_fieldset_configs.length; i++ )
+			{
+				jQuery( '#' + evo_display_attachments_fieldset_configs[i].fieldset_prefix + evo_display_attachments_fieldset_configs[i].form_id ).show();
+			}
+		} )();
 	}
 } );
