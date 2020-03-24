@@ -248,68 +248,68 @@ class coll_search_form_Widget extends ComponentWidget
 						$selected_author[$key][$field] = $value;
 					}
 				}
-			}
-
-			expose_var_to_js( 'evo_widget_coll_search_form', '{
-					selector: "[data-search-id] #search_author",
-					url: "'.format_to_js( get_restapi_url().'users/authors' ).'",
-					config:
-					{
-						theme: "facebook",
-						queryParam: "q",
-						propertyToSearch: "login",
-						preventDuplicates: true,
-						prePopulate: '.evo_json_encode( $selected_author ).',
-						hintText: "'.TS_('Type in a username').'",
-						noResultsText: "'.TS_('No results').'",
-						searchingText: "'.TS_('Searching...').'",
-						jsonContainer: "users",
-						tokenFormatter: function( user )
+			
+				expose_var_to_js( 'evo_widget_coll_search_form', '{
+						selector: "[data-search-id] #search_author",
+						url: "'.format_to_js( get_restapi_url().'users/authors' ).'",
+						config:
 						{
-							return "<li>" +
-									'.( $Settings->get( 'username_display' ) == 'name' ? 'user.fullname' : 'user.login' ).' +
-									\'<input type="hidden" name="search_author_array[id][]" value="\' + user.id + \'" />\' +
-									\'<input type="hidden" name="search_author_array[login][]" value="\' + user.login + \'" />\' +
-								"</li>";
-						},
-						resultsFormatter: function( user )
-						{
-							var title = user.login;
-							if( user.fullname != null && user.fullname !== undefined )
+							theme: "facebook",
+							queryParam: "q",
+							propertyToSearch: "login",
+							preventDuplicates: true,
+							prePopulate: '.evo_json_encode( $selected_author ).',
+							hintText: "'.TS_('Type in a username').'",
+							noResultsText: "'.TS_('No results').'",
+							searchingText: "'.TS_('Searching...').'",
+							jsonContainer: "users",
+							tokenFormatter: function( user )
 							{
-								title += "<br />" + user.fullname;
-							}
-							return "<li>" +
-									user.avatar +
-									"<div>" +
-										title +
-									"</div><span></span>" +
-								"</li>";
-						},
-						onAdd: function()
-						{
-							if( this.tokenInput( "get" ).length > 0 )
+								return "<li>" +
+										'.( $Settings->get( 'username_display' ) == 'name' ? 'user.fullname' : 'user.login' ).' +
+										\'<input type="hidden" name="search_author_array[id][]" value="\' + user.id + \'" />\' +
+										\'<input type="hidden" name="search_author_array[login][]" value="\' + user.login + \'" />\' +
+									"</li>";
+							},
+							resultsFormatter: function( user )
 							{
-								jQuery( "#token-input-search_author" ).attr( "placeholder", "" );
-							}
-						},
-						onDelete: function()
-						{
-							if( this.tokenInput( "get" ).length === 0 )
+								var title = user.login;
+								if( user.fullname != null && user.fullname !== undefined )
+								{
+									title += "<br />" + user.fullname;
+								}
+								return "<li>" +
+										user.avatar +
+										"<div>" +
+											title +
+										"</div><span></span>" +
+									"</li>";
+							},
+							onAdd: function()
 							{
-								jQuery( "#token-input-search_author" ).attr( "placeholder", "'.TS_('Any author' ).'" ).css( "width", "100%" );
-							}
+								if( this.tokenInput( "get" ).length > 0 )
+								{
+									jQuery( "#token-input-search_author" ).attr( "placeholder", "" );
+								}
+							},
+							onDelete: function()
+							{
+								if( this.tokenInput( "get" ).length === 0 )
+								{
+									jQuery( "#token-input-search_author" ).attr( "placeholder", "'.TS_('Any author' ).'" ).css( "width", "100%" );
+								}
+							},'.
+							( param_has_error( 'search_author' ) ?
+							// Mark this field as error
+							'onReady: function()
+							{
+								jQuery( ".token-input-list-facebook" ).addClass( "token-input-list-error" );
+							}' : '' ).'
 						},'.
-						( param_has_error( 'search_author' ) ?
-						// Mark this field as error
-						'onReady: function()
-						{
-							jQuery( ".token-input-list-facebook" ).addClass( "token-input-list-error" );
-						}' : '' ).'
-					},'.
-				( empty( $selected_author ) ? '
-					placeholder: "'.TS_('Any author' ).'",' : '' ).'
-				}' );
+					( empty( $selected_author ) ? '
+						placeholder: "'.TS_('Any author' ).'",' : '' ).'
+					}' );
+			}
 
 			echo $this->disp_params['block_body_end'];
 
