@@ -3507,7 +3507,6 @@ a school bus stop where you wouldn\'t really expect it!
 						'in-real-life' => array( T_('In real life'), 'order' => 4, 'subcat_ordering' => 'alpha', 'subs' => array(
 							'movies' => T_('Movies'),
 							'music'  => T_('Music'),
-							'recipes' => array( T_('Recipes'), 'default_item_type' => 'Recipe' ),
 						) ),
 						'on-the-web' => array( T_('On the web'), 'order' => 4 ),
 					) ),
@@ -3524,6 +3523,15 @@ a school bus stop where you wouldn\'t really expect it!
 				'type'     => 'Standalone Page',
 				'content'  => sprintf( get_filler_text( 'info_page' ), T_('Photos') ),
 			);
+
+			// Don't install the following demo Items:
+			$exclude_demo_items = array(
+					'mongolian_beef',
+					'stuffed_peppers',
+					'custom_fields_example',
+					'another_custom_fields_example',
+					'child_post_example',
+				);
 			break;
 
 		// =======================================================================================================
@@ -3697,6 +3705,15 @@ Just to be clear: this is a **demo** of a manual. The user manual for b2evolutio
 		{	// Use first category as default:
 			$edited_Blog->set_setting( 'default_cat_ID', $first_category_ID );
 			$edited_Blog->dbupdate();
+		}
+
+		// Exclude demo items which must not be installed:
+		foreach( $exclude_demo_items as $exclude_demo_item_key )
+		{
+			if( isset( $demo_items[ $exclude_demo_item_key ] ) )
+			{
+				unset( $demo_items[ $exclude_demo_item_key ] );
+			}
 		}
 
 		// Create sample Items:
