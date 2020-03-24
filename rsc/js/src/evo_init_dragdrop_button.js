@@ -12,16 +12,9 @@
  */
 jQuery( document ).ready( function()
 {
-	if( typeof( evo_init_dragdrop_button_config ) == 'undefined' )
-	{	// Don't execute code below because no config var is found:
-		return;
-	}
-
 	window.dndb = {};
-	window.init_uploader = function( prefix )
+	window.init_uploader = function( config )
 		{
-			var config = evo_init_dragdrop_button_config[prefix];
-
 			if( 'draggable' in document.createElement('span') )
 			{
 				var button_text = config['draggable_button_text'];
@@ -493,10 +486,15 @@ jQuery( document ).ready( function()
 			}
 		};
 
+	if( typeof( evo_init_dragdrop_button_config ) == 'undefined' )
+	{	// Don't execute code below because no config var is found:
+		return;
+	}
+
 	// Init
-	var evo_init_dragdrop_button_configs = Object.keys( evo_init_dragdrop_button_config );
-	for( var i = 0; i < evo_init_dragdrop_button_configs.length; i++ )
+	var evo_init_dragdrop_button_config_keys = Object.keys( evo_init_dragdrop_button_config );
+	for( var i = 0; i < evo_init_dragdrop_button_config_keys.length; i++ )
 	{
-		window.init_uploader( evo_init_dragdrop_button_configs[i] );
+		window.init_uploader( evo_init_dragdrop_button_config[evo_init_dragdrop_button_config_keys[i]] );
 	}
 } );

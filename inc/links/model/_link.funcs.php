@@ -241,12 +241,12 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 	$fieldset_title .= '<span class="floatright panel_heading_action_icons">&nbsp;'
 
 			.action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
-				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'refresh\', this )' ) )
+				T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'refresh\', \''.$fieldset_prefix.'\' )' ) )
 
 			.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) ) )
 				? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
 				: $LinkOwner->get_edit_url().'#',
-				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\', this )' ) )
+				T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\', \''.$fieldset_prefix.'\' )' ) )
 
 		.'</span>';
 
@@ -276,7 +276,14 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 	$Form->end_fieldset();
 
 	// Show fieldset of quick uploader only when JS is enabled:
-	expose_var_to_js( 'fieldset_'.$fieldset_prefix.$form_id, array( 'fieldset_prefix' => $fieldset_prefix, 'form_id' => $form_id ), 'evo_display_attachments_fieldset_config' );
+	if( is_ajax_request() )
+	{
+		echo '<script type="text/javascript">jQuery( "#'.$fieldset_prefix.$form_id.'" ).show()</script>';
+	}
+	else
+	{
+		expose_var_to_js( 'fieldset_'.$fieldset_prefix.$form_id, array( 'fieldset_prefix' => $fieldset_prefix, 'form_id' => $form_id ), 'evo_display_attachments_fieldset_config' );
+	}
 	
 	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) && empty( $restriction_overlay ) )
 	{	// Check if current user has a permission to back-office files manager:
@@ -289,7 +296,24 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 				'window_title' => $window_title,
 				'crumb_link'   => get_crumb( 'link' ),
 			);
-		expose_var_to_js( 'evo_link_attachment_window_config', evo_json_encode( $link_attachment_window_config ) );
+
+		if( is_ajax_request() )
+		{
+			?>
+			<script>
+			jQuery( document ).ready( function() {
+				if( ! window.evo_link_attachment_window_config )
+				{
+					window.evo_link_attachment_window_config = <?php echo evo_json_encode( $dragdrop_upload_button_config );?>;
+				}
+			} );
+			</script>
+			<?php
+		}
+		else
+		{
+			expose_var_to_js( 'evo_link_attachment_window_config', evo_json_encode( $link_attachment_window_config ) );
+		}
 
 		// Print JS function to allow edit file properties on modal window
 		echo_file_properties();
@@ -678,7 +702,25 @@ function echo_link_sortable_js( $fieldset_prefix = '' )
 			'crumb_link'      => get_crumb( 'link' ),
 		);
 
-	expose_var_to_js( 'link_sortable_'.$fieldset_prefix, $link_sortable_js_config, 'evo_link_sortable_js_config' );
+	if( is_ajax_request() )
+	{
+		?>
+		<script>
+		jQuery( document ).ready( function() {
+			if( typeof( window.evo_link_sortable_js_config ) == 'undefined' )
+			{
+				window.evo_link_sortable_js_config = {};
+			}
+			window.evo_link_sortable_js_config['link_sortable_<?php echo $fieldset_prefix;?>'] = <?php echo evo_json_encode( $link_sortable_js_config );?>;
+			window.init_link_sortable( evo_link_sortable_js_config['link_sortable_<?php echo $fieldset_prefix;?>'] );
+		} );
+		</script>
+		<?php
+	}
+	else
+	{
+		expose_var_to_js( 'link_sortable_'.$fieldset_prefix, $link_sortable_js_config, 'evo_link_sortable_js_config' );
+	}
 }
 
 

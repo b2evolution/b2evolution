@@ -2560,7 +2560,26 @@ function display_dragdrop_upload_button( $params = array() )
 			'conflict_file_format'    => $params['conflict_file_format'],
 			'crumb_conflictfiles'     => get_crumb( 'conflictfiles' ),
 		);
-	expose_var_to_js( 'fieldset_'.$params['fieldset_prefix'], $dragdrop_upload_button_config, 'evo_init_dragdrop_button_config' );
+	
+	if( is_ajax_request() )
+	{
+		?>
+		<script>
+		jQuery( document ).ready( function() {
+			if( typeof( window.evo_init_dragdrop_button_config ) == 'undefined' )
+			{
+				window.evo_init_dragdrop_button_config = {};
+			}
+			window.evo_init_dragdrop_button_config['fieldset_<?php echo $params['fieldset_prefix'];?>'] = <?php echo evo_json_encode( $dragdrop_upload_button_config );?>;
+			window.init_uploader( evo_init_dragdrop_button_config['fieldset_<?php echo $params['fieldset_prefix'];?>'] );
+		} );
+		</script>
+		<?php
+	}
+	else
+	{
+		expose_var_to_js( 'fieldset_'.$params['fieldset_prefix'], $dragdrop_upload_button_config, 'evo_init_dragdrop_button_config' );
+	}
 	?>
 
 	<script type="text/template" id="<?php echo $params['fieldset_prefix']; ?>qq-template">
