@@ -179,6 +179,9 @@ $Form->begin_form( 'inskin', '', $form_params );
 		$LinkOwner = new LinkItem( $edited_Item, param( 'temp_link_owner_ID', 'integer', 0 ) );
 	}
 
+	// Display buttons to change Item Type:
+	echo_item_type_change_buttons( $edited_Item );
+
 	$front_edit_fields = $edited_Item->get_front_edit_fields();
 	foreach( $front_edit_fields as $front_edit_field )
 	{
