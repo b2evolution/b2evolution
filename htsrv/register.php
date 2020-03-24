@@ -56,7 +56,7 @@ $registration_require_firstname = in_array( 'firstname', $required_fields );
 // Check if firstname is required
 $registration_require_lastname = in_array( 'lastname', $required_fields );
 // Check if nickname is required
-$registration_require_nickname = in_array( 'nickname', $required_fields );
+$registration_require_nickname = false;
 // Check if country is required
 $registration_require_country = in_array( 'country', $required_fields );
 // Check if gender is required
