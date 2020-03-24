@@ -926,7 +926,7 @@ function install_basic_widgets( $old_db_version = 0 )
 
 	$blog_type = ( $old_db_version < 11010 ) ? '"std"' : 'blog_type';
 	$SQL = new SQL( 'Get all collections with their skins before install basic widgets' );
-	$SQL->SELECT( 'blog_ID, '.$blog_type.', blog_normal_skin_ID, blog_mobile_skin_ID, blog_tablet_skin_ID' );
+	$SQL->SELECT( 'blog_ID, '.$blog_type.', blog_normal_skin_ID, blog_mobile_skin_ID, blog_tablet_skin_ID, blog_alt_skin_ID' );
 	$SQL->FROM( 'T_blogs' );
 	$SQL->GROUP_BY( 'blog_ID, blog_type' );
 	$blogs_data = $DB->get_results( $SQL );
@@ -937,6 +937,7 @@ function install_basic_widgets( $old_db_version = 0 )
 		insert_basic_widgets( $blog_data->blog_ID, 'normal', true, $blog_data->blog_type );
 		insert_basic_widgets( $blog_data->blog_ID, 'mobile', true, $blog_data->blog_type );
 		insert_basic_widgets( $blog_data->blog_ID, 'tablet', true, $blog_data->blog_type );
+		insert_basic_widgets( $blog_data->blog_ID, 'alt', true, $blog_data->blog_type );
 		task_end();
 	}
 }

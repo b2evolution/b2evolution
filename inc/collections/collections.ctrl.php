@@ -411,6 +411,7 @@ switch( $action )
 		}
 		$Settings->set( 'def_mobile_skin_ID', param( 'def_mobile_skin_ID', 'integer', 0 ) );
 		$Settings->set( 'def_tablet_skin_ID', param( 'def_tablet_skin_ID', 'integer', 0 ) );
+		$Settings->set( 'def_alt_skin_ID', param( 'def_alt_skin_ID', 'integer', 0 ) );
 
 		// Default URL for New Collections:
 		if( param( 'coll_access_type', 'string', NULL ) !== NULL )
@@ -647,6 +648,19 @@ switch( $action )
 					$Settings->set( 'tablet_skin_ID', $updated_skin_ID );
 				}
 			}
+			elseif( param( 'alt_skin_ID', 'integer', NULL ) !== NULL )
+			{	// Alt skin ID:
+				$updated_skin_type = 'alt';
+				$updated_skin_ID = get_param( 'alt_skin_ID' );
+				if( $updated_skin_ID == 0 )
+				{	// Don't store this empty setting in DB:
+					$Settings->delete( 'alt_skin_ID' );
+				}
+				else
+				{	// Set alt skin:
+					$Settings->set( 'alt_skin_ID', $updated_skin_ID );
+				}
+			}
 
 			if( ! empty( $updated_skin_ID ) && ! skin_check_compatibility( $updated_skin_ID, 'site' ) )
 			{	// Redirect to admin skins page selector if the skin cannot be selected:
@@ -659,9 +673,10 @@ switch( $action )
 			{
 				$Messages->add( T_('The site skin has been changed.')
 									.' <a href="'.$admin_url.'?ctrl=collections&amp;tab=site_skin">'.T_('Edit...').'</a>', 'success' );
-				if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && param( 'normal_skin_ID', 'integer', NULL ) !== NULL ) ||
+				if( ( ! $Session->is_mobile_session() && ! $Session->is_tablet_session() && ! $Session->is_alt_session() && param( 'normal_skin_ID', 'integer', NULL ) !== NULL ) ||
 						( $Session->is_mobile_session() && param( 'mobile_skin_ID', 'integer', NULL ) !== NULL ) ||
-						( $Session->is_tablet_session() && param( 'tablet_skin_ID', 'integer', NULL ) !== NULL ) )
+						( $Session->is_tablet_session() && param( 'tablet_skin_ID', 'integer', NULL ) !== NULL ) ||
+						( $Session->is_alt_session() && param( 'alt_skin_ID', 'integer', NULL ) !== NULL ) )
 				{	// Redirect to home page if we change the skin for current device type:
 					header_redirect( $baseurl );
 				}
@@ -673,7 +688,7 @@ switch( $action )
 		}
 		else
 		{	// Update site skin settings:
-			if( ! in_array( $skin_type, array( 'normal', 'mobile', 'tablet' ) ) )
+			if( ! in_array( $skin_type, array( 'normal', 'mobile', 'tablet', 'alt' ) ) )
 			{
 				debug_die( 'Wrong skin type: '.$skin_type );
 			}

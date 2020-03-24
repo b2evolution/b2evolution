@@ -27,7 +27,7 @@ skin_init( $disp );
 
 
 // Check if current page has a big picture as background
-$is_pictured_page = in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login' ) );
+$is_pictured_page = in_array( $disp, array( 'login', 'register', 'lostpassword', 'activateinfo', 'access_denied', 'access_requires_login', 'content_requires_login' ) );
 
 // -------------------------- HTML HEADER INCLUDED HERE --------------------------
 skin_include( '_html_header.inc.php', array(
@@ -43,14 +43,17 @@ siteskin_include( '_site_body_header.inc.php' );
 
 if( $is_pictured_page )
 { // Display a picture from skin setting as background image
-	global $media_path, $media_url;
-	$bg_image = $Skin->get_setting( 'front_bg_image' );
-	echo '<div id="bg_picture">';
-	if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-	{ // If it exists in media folder
-		echo '<img src="'.$media_url.$bg_image.'" />';
+	$FileCache = & get_FileCache();
+	$bg_File = NULL;
+	if( $bg_File_ID = $Skin->get_setting( 'front_bg_image_file_ID' ) )
+	{
+		$bg_File = & $FileCache->get_by_ID( $bg_File_ID, false, false );
 	}
-	echo '</div>';
+	echo '<div class="evo_pictured_layout">';
+	if( $bg_File && $bg_File->exists() )
+	{ // If it exists in media folder
+		echo '<img class="evo_pictured__image" src="'.$bg_File->get_url().'" />';
+	}
 }
 ?>
 
@@ -129,7 +132,7 @@ if( $is_pictured_page )
 		<!-- ================================= START OF MAIN AREA ================================== -->
 
 		<?php
-		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login' ) ) )
+		if( ! in_array( $disp, array( 'login', 'lostpassword', 'register', 'activateinfo', 'access_requires_login', 'content_requires_login' ) ) )
 		{ // Don't display the messages here because they are displayed inside wrapper to have the same width as form
 			// ------------------------- MESSAGES GENERATED FROM ACTIONS -------------------------
 			messages( array(
@@ -184,16 +187,27 @@ if( $is_pictured_page )
 		<?php
 		// Go Grab the featured post:
 		if( ! in_array( $disp, array( 'single', 'page' ) ) && $Item = & get_featured_Item() )
-		{ // We have a featured/intro post to display:
+		{	// We have a featured/intro post to display:
+			$intro_item_style = '';
+			$LinkOwner = new LinkItem( $Item );
+			$LinkList = $LinkOwner->get_attachment_LinkList( 1, 'cover' );
+			if( ! empty( $LinkList ) &&
+					$Link = & $LinkList->get_next() &&
+					$File = & $Link->get_File() &&
+					$File->exists() &&
+					$File->is_image() )
+			{	// Use cover image of intro-post as background:
+				$intro_item_style = 'background-image: url("'.$File->get_url().'")';
+			}
 			// ---------------------- ITEM BLOCK INCLUDED HERE ------------------------
-			echo '<div class="panel panel-default"><div class="panel-body">';
 			skin_include( '_item_block.inc.php', array(
 					'feature_block' => true,
-					'content_mode'  => 'auto',		// 'auto' will auto select depending on $disp-detail
+					'content_mode'  => 'full', // We want regular "full" content, even in category browsing: i-e no excerpt or thumbnail
 					'intro_mode'    => 'normal',	// Intro posts will be displayed in normal mode
+					'item_class'    => ($Item->is_intro() ? 'well evo_intro_post' : 'well evo_featured_post').( empty( $intro_item_style ) ? '' : ' evo_hasbgimg' ),
+					'item_style'    => $intro_item_style,
 					'Item'          => $Item,
 				) );
-			echo '</div></div>';
 			// ----------------------------END ITEM BLOCK  ----------------------------
 		}
 		?>
@@ -242,15 +256,6 @@ if( $is_pictured_page )
 					'display_reg_link'      => true,
 					'abort_link_position'   => 'form_title',
 					'abort_link_text'       => '<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>',
-					// Register
-					'register_page_before'      => '<div class="evo_panel__register">',
-					'register_page_after'       => '</div>',
-					'register_form_title'       => T_('Register'),
-					'register_links_attrs'      => '',
-					'register_use_placeholders' => true,
-					'register_field_width'      => 252,
-					'register_disabled_page_before' => '<div class="evo_panel__register register-disabled">',
-					'register_disabled_page_after'  => '</div>',
 					// Activate form
 					'activate_form_title'  => T_('Account activation'),
 					'activate_page_before' => '<div class="evo_panel__activation">',
@@ -266,7 +271,7 @@ if( $is_pictured_page )
 					'front_block_title_start'       => '<h2>',
 					'front_block_title_end'         => '</h2>',
 					// Form "Sending a message"
-					'msgform_form_title' => T_('Sending a message'),
+					'msgform_form_title' => T_('Contact'),
 				) );
 			// Note: you can customize any of the sub templates included here by
 			// copying the matching php file into your skin directory.
@@ -281,6 +286,8 @@ if( $is_pictured_page )
 
 </div><!-- .container -->
 
+<?php if( $is_pictured_page ) {	echo '</div><!-- .evo_pictured_layout -->'; } ?>
+
 
 <!-- =================================== START OF SECONDARY AREA =================================== -->
 <section class="secondary_area"><!-- white background -->
@@ -288,21 +295,23 @@ if( $is_pictured_page )
 
 	<div class="row">
 
-		<footer class="col-md-12 center">
+		<footer class="col-md-12">
 
 			<?php
-			// Display container and contents:
-			widget_container( 'footer', array(
-					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => false, // If no widget, don't display container at all
-					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
-					'container_end'   => '</div>',
-					'block_start'     => '<div class="evo_widget $wi_class$">',
-					'block_end'       => '</div>',
-				) );
+				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
+				// Display container and contents:
+				widget_container( 'footer', array(
+						// The following params will be used as defaults for widgets included in this container:
+						'container_display_if_empty' => false, // If no widget, don't display container at all
+						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+						'container_end'   => '</div>',
+						'block_start'     => '<div class="evo_widget $wi_class$">',
+						'block_end'       => '</div>',
+					) );
+				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
 			?>
 
-			<p>
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(

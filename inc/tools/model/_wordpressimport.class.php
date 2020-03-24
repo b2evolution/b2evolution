@@ -142,9 +142,10 @@ class WordpressImport extends AbstractImport
 	 * Display info for the wordpress importer
 	 *
 	 * @param boolean TRUE to allow to use already extracted ZIP archive
+	 * @param boolean TRUE to allow to delete folder of already extracted ZIP archive and extract again
 	 * @return array Data of the parsed XML file, @see wpxml_get_import_data()
 	 */
-	function display_info( $allow_use_extracted_folder = false )
+	function display_info( $allow_use_extracted_folder = false, $allow_delete_existing_folder = false )
 	{
 		$this->log( '<p style="margin-bottom:0">' );
 
@@ -154,10 +155,23 @@ class WordpressImport extends AbstractImport
 		{	// Inform about unzipping before start this in wpxml_get_import_data():
 			$zip_folder_path = substr( $wp_file, 0, -4 );
 			if( ! $allow_use_extracted_folder ||
-					! file_exists( $zip_folder_path ) ||
-					! is_dir( $zip_folder_path ) )
-			{
-				$this->log( '<b>'.TB_('Unzipping ZIP').':</b> <code>'.$wp_file.'</code>...<br />' );
+			    $allow_delete_existing_folder ||
+			    ! file_exists( $zip_folder_path ) ||
+			    ! is_dir( $zip_folder_path ) )
+			{	// If folder doesn't exist OR allowed to use existing folder OR allowed to delete existing folder:
+				if( $allow_delete_existing_folder && 
+						file_exists( $zip_folder_path ) &&
+						is_dir( $zip_folder_path ) )
+				{	// Delete already existing folder:
+					$this->log( '<b>'.TB_('Deleting folder').':</b> <code>'.$zip_folder_path.'</code>...' );
+					if( rmdir_r( $zip_folder_path ) )
+					{
+						$this->log( T_('OK').'<br />' );
+					}
+				}
+				// Start unzipping:
+				$this->log( '<b>'.TB_('Unzipping ZIP').':</b> <code>'.$wp_file.'</code>...' );
+				$is_unzipping = true;
 			}
 		}
 
@@ -166,6 +180,11 @@ class WordpressImport extends AbstractImport
 
 		if( $this->info_data['errors'] === false )
 		{
+			if( ! empty( $is_unzipping ) )
+			{	// Display end of unzip process:
+				$this->log( T_('OK').'<br />' );
+			}
+
 			if( preg_match( '/\.zip$/i', $wp_file ) )
 			{	// ZIP archive:
 				$this->log( '<b>'.TB_('Source ZIP').':</b> <code>'.$wp_file.'</code><br />' );
@@ -253,8 +272,11 @@ class WordpressImport extends AbstractImport
 		}
 		else
 		{	// Display errors if import cannot be done:
-			$this->log( $this->info_data['errors'].'<br />' );
-			$this->log_error( T_('Import failed.'), 'p', false );
+			$this->log( $this->info_data['errors'] );
+			if( $this->info_data['error_type'] != 'folder_exists' )
+			{	// Don't inform about failed import for this error type because below we suggest to delete or use already existing folder:
+				$this->log_error( '<br />'.T_('Import failed.'), 'p', false );
+			}
 		}
 
 		$this->log( '</p>' );

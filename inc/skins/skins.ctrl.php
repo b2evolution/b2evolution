@@ -101,9 +101,10 @@ switch( $action )
 
 			$Messages->add( T_('The blog skin has been changed.')
 								.' <a href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$edited_Blog->ID.'">'.T_('Edit...').'</a>', 'success' );
-			if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && $skin_type == 'normal' ) ||
+			if( ( ! $Session->is_mobile_session() && ! $Session->is_tablet_session() && ! $Session->is_alt_session() && $skin_type == 'normal' ) ||
 					( $Session->is_mobile_session() && $skin_type == 'mobile' ) ||
-					( $Session->is_tablet_session() && $skin_type == 'tablet' ) )
+					( $Session->is_tablet_session() && $skin_type == 'tablet' ) ||
+					( $Session->is_alt_session() && $skin_type == 'alt' ) )
 			{	// Redirect to blog home page if we change the skin for current device type:
 				header_redirect( $edited_Blog->gen_blogurl() );
 			}
@@ -128,9 +129,10 @@ switch( $action )
 				{
 					$Messages->add( T_('The site skin has been changed.')
 										.' <a href="'.$admin_url.'?ctrl=collections&amp;tab=site_skin">'.T_('Edit...').'</a>', 'success' );
-					if( ( !$Session->is_mobile_session() && !$Session->is_tablet_session() && $skin_type == 'normal' ) ||
+					if( ( ! $Session->is_mobile_session() && ! $Session->is_tablet_session() && ! $Session->is_alt_session() && $skin_type == 'normal' ) ||
 							( $Session->is_mobile_session() && $skin_type == 'mobile' ) ||
-							( $Session->is_tablet_session() && $skin_type == 'tablet' ) )
+							( $Session->is_tablet_session() && $skin_type == 'tablet' ) ||
+							( $Session->is_alt_session() && $skin_type == 'alt' ) )
 					{	// Redirect to home page if we change the skin for current device type:
 						header_redirect( $baseurl );
 					}

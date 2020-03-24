@@ -1950,7 +1950,7 @@ function get_registration_template_required_fields( $template_code = NULL )
 	// Render MASTER quick template:
 	// In theory, this should not display anything.
 	// Instead, this should set variables to define sub-templates (and potentially additional variables)
-	echo render_template_code( $template_code, /* BY REF */ $temp_params );
+	render_template_code( $template_code, /* BY REF */ $temp_params );
 
 	// Get required fields defined by master template:
 	if( isset( $temp_params['reg1_required'] ) )

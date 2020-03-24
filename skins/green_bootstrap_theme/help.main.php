@@ -9,7 +9,7 @@
  *
  * b2evolution - {@link http://b2evolution.net/}
  * Released under GNU GPL License - {@link http://b2evolution.net/about/gnu-gpl-license}
- * @copyright (c)2003-2016 by Francois Planque - {@link http://fplanque.com/}
+ * @copyright (c)2003-2020 by Francois Planque - {@link http://fplanque.com/}
  *
  * @package evoskins
  * @subpackage bootstrap_main_skin
@@ -38,16 +38,6 @@ skin_include( '_html_header.inc.php' );
 // If site headers are enabled, they will be included here:
 siteskin_include( '_site_body_header.inc.php' );
 // ------------------------------- END OF SITE HEADER --------------------------------
-
-// Display a picture from skin setting as background image
-global $media_path, $media_url;
-$bg_image = $Skin->get_setting( 'front_bg_image' );
-echo '<div id="bg_picture">';
-if( ! empty( $bg_image ) && file_exists( $media_path.$bg_image ) )
-{ // If it exists in media folder
-	echo '<img src="'.$media_url.$bg_image.'" />';
-}
-echo '</div>';
 ?>
 
 
@@ -140,17 +130,6 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 		?>
 
 		<?php
-			// ------------------------ TITLE FOR THE CURRENT REQUEST ------------------------
-			request_title( array(
-					'title_before'      => '<h2 class="page_title">',
-					'title_after'       => '</h2>',
-					'title_none'        => '',
-					'glue'              => ' - ',
-				) );
-			// ----------------------------- END OF REQUEST TITLE ----------------------------
-		?>
-
-		<?php
 			// -------------- MAIN CONTENT TEMPLATE INCLUDED HERE (Based on $disp) --------------
 			skin_include( '$disp$' );
 			// Note: you can customize any of the sub templates included here by
@@ -171,26 +150,25 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 <section class="secondary_area"><!-- white background -->
 <div class="container">
 
-	<div class="row">
+<footer class="row">
 
-		<footer class="col-md-12 center">
+	<!-- =================================== START OF FOOTER =================================== -->
+	<div class="col-md-12">
 
-			<?php
-			if( $Skin->show_container_when_access_denied( 'footer' ) )
-			{	// Display 'Footer' widget container:
-				// ------------------------- "Footer" CONTAINER EMBEDDED HERE --------------------------
-				widget_container( 'footer', array(
-						// The following params will be used as defaults for widgets included in this container:
-						'container_display_if_empty' => false, // If no widget, don't display container at all
-						'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
-						'container_end'   => '</div>',
-						'block_start'     => '<div class="evo_widget $wi_class$">',
-						'block_end'       => '</div>',
-					) );
-				// ----------------------------- END OF "Footer" CONTAINER -----------------------------
-			} ?>
-	
-			<p>
+		<?php
+		if( $Skin->show_container_when_access_denied( 'footer' ) )
+		{	// Display 'Footer' widget container:
+			widget_container( 'footer', array(
+					// The following params will be used as defaults for widgets included in this container:
+					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_start' => '<div class="evo_container $wico_class$ clearfix">', // Note: clearfix is because of Bootstraps' .cols
+					'container_end'   => '</div>',
+					'block_start'     => '<div class="evo_widget $wi_class$">',
+					'block_end'       => '</div>',
+				) );
+		} ?>
+
+			<p class="center">
 			<?php
 				// Display footer text (text can be edited in Blog Settings):
 				$Blog->footer_text( array(
@@ -243,10 +221,7 @@ if( $Skin->show_container_when_access_denied( 'menu' ) )
 					) );
 			?>
 
-		</footer><!-- .col -->
-
-	</div><!-- .row -->
-
+</footer><!-- .row -->
 
 </div><!-- .container -->
 

@@ -19,11 +19,11 @@ global $Collection, $Blog, $admin_url;
 $skin_ID = $Blog->get( get_param( 'skin_type' ).'_skin_ID', array( 'real_value' => true ) );
 
 if( empty( $skin_ID ) && get_param( 'skin_type' ) != 'normal' )
-{	// Don't allow to control widgets if same skin is used for mobile/tablet:
-	echo '<div>'.sprintf( T_('If you want control widgets differently for mobile/tablet, <a %s>select a specific skin here</a>.'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;skinpage=selection&amp;skin_type='.get_param( 'skin_type' ).'&amp;blog='.$Blog->ID.'"' ).'</div>';
+{	// Don't allow to control widgets if same skin is used for mobile/tablet/alt:
+	echo '<div>'.sprintf( T_('If you want control widgets differently for mobile/tablet/alt, <a %s>select a specific skin here</a>.'), 'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;skinpage=selection&amp;skin_type='.get_param( 'skin_type' ).'&amp;blog='.$Blog->ID.'"' ).'</div>';
 }
 else
-{	// Allow to control widgets if different skin is used for mobile/tablet:
+{	// Allow to control widgets if different skin is used for mobile/tablet/alt:
 
 	// Load widgets for current collection:
 	$WidgetCache = & get_WidgetCache();

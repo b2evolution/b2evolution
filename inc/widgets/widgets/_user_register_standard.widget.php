@@ -182,7 +182,7 @@ class user_register_standard_Widget extends ComponentWidget
 		// Render MASTER quick template:
 		// In theory, this should not display anything.
 		// Instead, this should set variables to define sub-templates (and potentially additional variables)
-		echo render_template_code( $master_template_code, /* BY REF */ $this->disp_params );
+		render_template_code( $master_template_code, /* BY REF */ $this->disp_params );
 
 		// Check if requestes sub-template exists:
 		$register_form_Template = $TemplateCache->get_by_code( $this->disp_params['reg1_template'], false, false );
@@ -208,9 +208,17 @@ class user_register_standard_Widget extends ComponentWidget
 
 			// Check that all required fields are available in the template:
 			$missing_fields = array();
-			if( in_array( 'country', $required_fields ) && ! in_array( 'Form:country', $used_tags ) )
+			if( in_array( 'email', $required_fields ) && ! in_array( 'Form:email', $used_tags ) )
 			{
-				$missing_fields[] = 'country';
+				$missing_fields[] = 'email';
+			}
+			if( in_array( 'login', $required_fields ) && ! in_array( 'Form:login', $used_tags ) )
+			{
+				$missing_fields[] = 'login';
+			}
+			if( in_array( 'password', $required_fields ) && ! in_array( 'Form:password', $used_tags ) )
+			{
+				$missing_fields[] = 'password';
 			}
 			if( in_array( 'firstname', $required_fields ) && ! in_array( 'Form:firstname', $used_tags ) )
 			{
@@ -220,9 +228,17 @@ class user_register_standard_Widget extends ComponentWidget
 			{
 				$missing_fields[] = 'lastname';
 			}
+			if( in_array( 'country', $required_fields ) && ! in_array( 'Form:country', $used_tags ) )
+			{
+				$missing_fields[] = 'country';
+			}
 			if( in_array( 'gender', $required_fields ) && ! in_array( 'Form:gender', $used_tags ) )
 			{
 				$missing_fields[] = 'gender';
+			}
+			if( in_array( 'locale', $required_fields ) && ! in_array( 'Form:locale', $used_tags ) )
+			{
+				$missing_fields[] = 'locale';
 			}
 
 			if( ! empty( $missing_fields ) )

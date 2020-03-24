@@ -48,7 +48,7 @@ siteskin_include( '_site_body_header.inc.php' );
 			// Display container and contents:
 			widget_container( 'page_top', array(
 					// The following params will be used as defaults for widgets included in this container:
-					'container_display_if_empty' => false, // If no widget, don't display container at all
+					'container_display_if_empty' => true, // Display container anyway even if no widget
 					'block_start'         => '<div class="evo_widget $wi_class$">',
 					'block_end'           => '</div>',
 					'block_display_title' => false,
@@ -268,6 +268,13 @@ siteskin_include( '_site_body_header.inc.php' );
 				<?php
 					// ------------------ FEEDBACK (COMMENTS/TRACKBACKS) INCLUDED HERE ------------------
 					skin_include( '_item_feedback.inc.php', array(
+							'disp_comments'        => true,
+							'disp_comment_form'    => true,
+							'disp_trackbacks'      => true,
+							'disp_trackback_url'   => true,
+							'disp_pingbacks'       => true,
+							'disp_webmentions'     => true,
+							'disp_meta_comments'   => false,
 							'before_section_title' => '<h4>',
 							'after_section_title'  => '</h4>',
 							'author_link_text'     => 'auto',

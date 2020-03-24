@@ -1931,9 +1931,13 @@ function & get_site_Skin()
 			{	// Tablet session:
 				$skin_ID = $Settings->get( 'tablet_skin_ID' );
 			}
+			elseif( $Session->is_alt_session() )
+			{	// Session for alternative skin:
+				$skin_ID = $Settings->get( 'alt_skin_ID' );
+			}
 		}
 		if( empty( $skin_ID ) )
-		{	// Use normal skin ID by default when mobile and tablet skins are not defined for site:
+		{	// Use normal skin ID by default when mobile, tablet and alt skins are not defined for site:
 			$skin_ID = $Settings->get( 'normal_skin_ID' );
 		}
 
@@ -3320,7 +3324,7 @@ function skin_installed( $name )
 
 
 /**
- * Display a blog skin setting fieldset which can be normal, mobile or tablet ( used on _coll_skin_settings.form.php )
+ * Display a blog skin setting fieldset which can be normal, mobile, tablet or alt ( used on _coll_skin_settings.form.php )
  *
  * @param object Form
  * @param integer skin ID
@@ -3508,6 +3512,10 @@ function skin_body_attrs( $params = array() )
 			{ // Tablet device
 				$classes[] = 'tablet_device';
 			}
+			elseif( $Session->is_alt_session() )
+			{	// Session for alternative skin:
+				$classes[] = 'alt_skin';
+			}
 			else
 			{ // Desktop device
 				$classes[] = 'desktop_device';
@@ -3646,7 +3654,8 @@ function get_skin_types()
 		'normal'  => array( T_('Standard'), T_('Standard skin for general browsing') ),
 		'mobile'  => array( T_('Phone'), T_('Mobile skin for mobile phones browsers') ),
 		'tablet'  => array( T_('Tablet'), T_('Tablet skin for tablet browsers') ),
-		'rwd'     => array( T_('RWD'), T_('Skin can be used for general, mobile phones and tablet browsers') ),
+		'alt'     => array( T_('Alt'), T_('Alt skin to display by conditions') ),
+		'rwd'     => array( T_('RWD'), T_('Skin can be used for general, mobile phones and tablet browsers and for alt skin') ),
 		'feed'    => array( T_('XML Feed'), T_('Special system skin for XML feeds like RSS and Atom') ),
 		'sitemap' => array( T_('XML Sitemap'), T_('Special system skin for XML sitemaps') ),
 	);

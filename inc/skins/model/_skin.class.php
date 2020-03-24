@@ -106,10 +106,11 @@ class Skin extends DataObject
 				array( 'table'=>'T_blogs', 'fk'=>'blog_normal_skin_ID', 'fk_short'=>'normal_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
 				array( 'table'=>'T_blogs', 'fk'=>'blog_mobile_skin_ID', 'fk_short'=>'mobile_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
 				array( 'table'=>'T_blogs', 'fk'=>'blog_tablet_skin_ID', 'fk_short'=>'tablet_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
+				array( 'table'=>'T_blogs', 'fk'=>'blog_alt_skin_ID', 'fk_short'=>'alt_skin_ID', 'msg'=>T_('%d blogs using this skin') ),
 				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('This skin is set as default skin.'),
-						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" )' ),
+						'and_condition' => '( set_name = "def_normal_skin_ID" OR set_name = "def_mobile_skin_ID" OR set_name = "def_tablet_skin_ID" OR set_name = "def_alt_skin_ID" )' ),
 				array( 'table'=>'T_settings', 'fk'=>'set_value', 'msg'=>T_('The site is using this skin.'),
-						'and_condition' => '( set_name = "normal_skin_ID" OR set_name = "mobile_skin_ID" OR set_name = "tablet_skin_ID" )' ),
+						'and_condition' => '( set_name = "normal_skin_ID" OR set_name = "mobile_skin_ID" OR set_name = "tablet_skin_ID" OR set_name = "alt_skin_ID" )' ),
 			);
 	}
 
@@ -143,7 +144,7 @@ class Skin extends DataObject
 	/**
 	 * Get default type/format for the skin.
 	 *
-	 * Possible values are normal, tablet, phone, feed, sitemap.
+	 * Possible values are normal, tablet, phone, feed, sitemap, alt.
 	 */
 	function get_default_type()
 	{
@@ -244,6 +245,30 @@ class Skin extends DataObject
 	function get_css_framework()
 	{
 		return '';	// Other possibilities: 'bootstrap', 'foundation'... (maybe 'bootstrap4' later...)
+	}
+
+
+	/**
+	 * Set param value
+	 *
+	 * By default, all values will be considered strings
+	 *
+	 * @param string parameter name
+	 * @param mixed parameter value
+	 * @param boolean true to set to NULL if empty value
+	 * @return boolean true, if a value has been set; false if it has not changed
+	 */
+	function set( $parname, $parvalue, $make_null = false )
+	{
+		switch( $parname )
+		{
+			case 'name':
+				// Restrict long skin names to avoid die error:
+				$parvalue = utf8_substr( $parvalue, 0, 128 );
+				break;
+		}
+
+		return parent::set( $parname, $parvalue, $make_null );
 	}
 
 
@@ -2482,6 +2507,28 @@ class Skin extends DataObject
 	 */
 	function echo_settings_form_js()
 	{
+	}
+
+
+	/**
+	 * Call skin function with suffix that is current collection kind
+	 *
+	 * @param string Function name
+	 * @param array Function parameters
+	 * @return 
+	 */
+	function call_func_by_coll_type( $func_name, $params )
+	{
+		global $Blog;
+
+		if( ! empty( $Blog ) &&
+		    $this->get_api_version() == 7 && 
+		    method_exists( $this, $func_name.'_'.$Blog->get( 'type' ) ) )
+		{	// If skin has declared the method for collection kind:
+			return call_user_func_array( array( $this, $func_name.'_'.$Blog->get( 'type' ) ), $params );
+		}
+
+		return NULL;
 	}
 }
 

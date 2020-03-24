@@ -211,9 +211,10 @@ class GeneralSettings extends AbstractSettings
 		'newblog_cache_enabled_widget' => 0,
 
 		// Default Skins for New Collections:
-		'def_normal_skin_ID' => '1',                // Default normal skin ID
-		'def_mobile_skin_ID' => NULL,               // NULL means same as normal skin
-		'def_tablet_skin_ID' => NULL,               // NULL means same as normal skin
+		'def_normal_skin_ID' => '1',  // Default normal skin ID
+		'def_mobile_skin_ID' => NULL, // NULL means same as normal skin
+		'def_tablet_skin_ID' => NULL, // NULL means same as normal skin
+		'def_alt_skin_ID'    => NULL, // NULL means same as normal skin
 
 		// Default URL for New Collections:
 		'coll_access_type' => 'extrapath',
@@ -473,6 +474,7 @@ C message size exceeds',
 
 			case 'mobile_skin_ID':
 			case 'tablet_skin_ID':
+			case 'alt_skin_ID':
 				$result = parent::getx( $parname );
 				if( $result === NULL )
 				{	// Try to get default from the global settings:

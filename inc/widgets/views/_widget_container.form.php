@@ -122,6 +122,7 @@ $Form->begin_fieldset( T_('Container Properties') );
 						array( 'normal', T_('Standard'), T_('Standard skin for general browsing') ),
 						array( 'mobile', T_('Phone'), T_('Mobile skin for mobile phones browsers') ),
 						array( 'tablet', T_('Tablet'), T_('Tablet skin for tablet browsers') ),
+						array( 'alt',    T_('Alt'), T_('Alternative skin to display by conditions') ),
 					),
 				T_( 'Skin type' ), true, '', true
 			);

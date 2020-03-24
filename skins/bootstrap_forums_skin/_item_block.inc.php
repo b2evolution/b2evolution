@@ -403,7 +403,7 @@ skin_widget( array(
 		</div><!-- .col -->
 
 		<?php
-		if( $Skin->is_visible_sidebar( 'single' ) )
+		if( $Skin->is_visible_sidebar( false, 'single' ) )
 		{	// Display sidebar:
 				// ------------------------- "Sidebar Single" CONTAINER EMBEDDED HERE --------------------------
 				// Display container contents:

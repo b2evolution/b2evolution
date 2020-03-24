@@ -1496,6 +1496,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'normal', false, 'main' );
 				insert_basic_widgets( $blog_ID, 'mobile', false, 'main' );
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'main' );
+				insert_basic_widgets( $blog_ID, 'alt', false, 'main' );
 			}
 
 			$collection_created++;
@@ -1534,6 +1535,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
 				insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
+				insert_basic_widgets( $blog_ID, 'alt', false, 'std' );
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1571,6 +1573,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'normal', false, 'std' );
 				insert_basic_widgets( $blog_ID, 'mobile', false, 'std' );
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'std' );
+				insert_basic_widgets( $blog_ID, 'alt', false, 'std' );
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1608,6 +1611,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'normal', false, 'photo' );
 				insert_basic_widgets( $blog_ID, 'mobile', false, 'photo' );
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'photo' );
+				insert_basic_widgets( $blog_ID, 'alt', false, 'photo' );
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1645,6 +1649,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'normal', false, 'forum' );
 				insert_basic_widgets( $blog_ID, 'mobile', false, 'forum' );
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'forum' );
+				insert_basic_widgets( $blog_ID, 'alt', false, 'forum' );
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1682,6 +1687,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'normal', false, 'manual' );
 				insert_basic_widgets( $blog_ID, 'mobile', false, 'manual' );
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'manual' );
+				insert_basic_widgets( $blog_ID, 'alt', false, 'manual' );
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1719,6 +1725,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'normal', false, 'group' );
 				insert_basic_widgets( $blog_ID, 'mobile', false, 'group' );
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'group' );
+				insert_basic_widgets( $blog_ID, 'alt', false, 'group' );
 			}
 			$collection_created++;
 			if( $coll_error_messages )
@@ -1756,6 +1763,7 @@ function create_demo_contents( $demo_users = array(), $use_demo_users = true, $i
 				insert_basic_widgets( $blog_ID, 'normal', false, 'minisite' );
 				insert_basic_widgets( $blog_ID, 'mobile', false, 'minisite' );
 				insert_basic_widgets( $blog_ID, 'tablet', false, 'minisite' );
+				insert_basic_widgets( $blog_ID, 'alt', false, 'minisite' );
 			}
 			$collection_created++;
 			if( $coll_error_messages )

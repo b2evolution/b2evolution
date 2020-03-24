@@ -1080,7 +1080,7 @@ function is_installed_widget( $widget_code, $container_code, $coll_ID = NULL )
  * Insert the basic widgets for a collection
  *
  * @param integer should never be 0
- * @param string Skin type: 'normal', 'mobile', 'tablet'
+ * @param string Skin type: 'normal', 'mobile', 'tablet', 'alt'
  * @param boolean should be true only when it's called after initial install
  * fp> TODO: $initial_install is used to know if we want to trust globals like $blog_photoblog_ID and $blog_forums_ID. We don't want that.
  *           We should pass a $context array with values like 'photo_source_coll_ID' => 4.
@@ -1230,7 +1230,7 @@ function insert_basic_widgets( $blog_id, $skin_type, $initial_install = false, $
  * Note: It is used during creating and reordering widgets
  *
  * @param integer Collection ID
- * @param string Skin type: 'normal', 'mobile', 'tablet'
+ * @param string Skin type: 'normal', 'mobile', 'tablet', 'alt'
  * @param string Container fieldset ID like 'wico_code_containercode' or 'wico_ID_123'
  * @return object WidgetContainer
  */
@@ -1269,7 +1269,7 @@ function & get_WidgetContainer_by_coll_skintype_fieldset( $coll_ID, $skin_type, 
 /**
  * Insert shared widget containers
  *
- * @param string Skin type: 'normal', 'mobile', 'tablet'
+ * @param string Skin type: 'normal', 'mobile', 'tablet', 'alt'
  */
 function insert_shared_widgets( $skin_type )
 {
@@ -1672,7 +1672,7 @@ function display_container( $WidgetContainer, $params = array() )
 /**
  * Display containers
  *
- * @param string Skin type: 'normal', 'mobile', 'tablet'
+ * @param string Skin type: 'normal', 'mobile', 'tablet', 'alt'
  * @param string Container type: 'main', 'sub', 'page', 'shared', 'shared-sub'
  * @param array Params
  */

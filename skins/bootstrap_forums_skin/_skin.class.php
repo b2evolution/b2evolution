@@ -583,11 +583,11 @@ class bootstrap_forums_Skin extends Skin
 	/**
 	 * Check if we can display a sidebar for the current layout
 	 *
-	 * @param string Layout: 'general' or 'single'
 	 * @param boolean TRUE to check if at least one sidebar container is visible
+	 * @param string Layout: 'general' or 'single'
 	 * @return boolean TRUE to display a sidebar
 	 */
-	function is_visible_sidebar( $layout = 'general', $check_containers = false )
+	function is_visible_sidebar( $check_containers = false, $layout = 'general' )
 	{
 		$layout = $this->get_setting_layout( $layout );
 

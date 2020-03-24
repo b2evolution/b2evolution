@@ -28,8 +28,8 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_skins__skin (
 				skin_ID      int(10) unsigned NOT NULL auto_increment,
 				skin_class   varchar(32) COLLATE ascii_general_ci NOT NULL,
-				skin_name    varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
-				skin_type    enum('normal','feed','sitemap','mobile','tablet','rwd') COLLATE ascii_general_ci NOT NULL default 'normal',
+				skin_name    varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+				skin_type    enum('normal','feed','sitemap','mobile','tablet','alt','rwd') COLLATE ascii_general_ci NOT NULL default 'normal',
 				skin_folder  varchar(32) NOT NULL,
 				PRIMARY KEY skin_ID (skin_ID),
 				UNIQUE skin_folder( skin_folder ),
@@ -69,6 +69,7 @@ $schema_queries = array_merge( $schema_queries, array(
 			blog_normal_skin_ID  int(10) unsigned NULL,
 			blog_mobile_skin_ID  int(10) unsigned NULL,
 			blog_tablet_skin_ID  int(10) unsigned NULL,
+			blog_alt_skin_ID     int(10) unsigned NULL,
 			PRIMARY KEY blog_ID (blog_ID),
 			UNIQUE KEY blog_urlname (blog_urlname)
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
@@ -115,7 +116,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_widget__container (
 			wico_ID        INT(10) UNSIGNED auto_increment,
 			wico_code      VARCHAR(128) COLLATE ascii_general_ci NULL DEFAULT NULL,
-			wico_skin_type ENUM( 'normal', 'mobile', 'tablet' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'normal',
+			wico_skin_type ENUM( 'normal', 'mobile', 'tablet', 'alt' ) COLLATE ascii_general_ci NOT NULL DEFAULT 'normal',
 			wico_name      VARCHAR(128) COLLATE utf8mb4_unicode_ci NOT NULL,
 			wico_coll_ID   INT(10) NULL DEFAULT NULL,
 			wico_order     INT(10) NOT NULL,

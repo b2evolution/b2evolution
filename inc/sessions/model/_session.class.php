@@ -826,6 +826,40 @@ class Session
 
 
 	/**
+	 * Was this session specially switched to alternative skin
+	 */
+	function is_alt_session()
+	{
+		global $Blog, $Hit;
+
+		if( $this->get( 'using_alt_skin' ) )
+		{	// Do additional check to know if we can continue to use Alt skin:
+			if( isset( $Blog ) &&
+			    strpos( $Hit->get_referer(), $Blog->get( 'url' ) ) === 0 )
+			{	// We can continue to use Alt skin because referer URL is started with collection base URL:
+				return true;
+			}
+			else
+			{	// Don't continue to use Alt skin because referer is not started with collection base URL:
+				$this->delete( 'using_alt_skin' );
+			}
+		}
+
+		if( isset( $Hit ) &&
+		    isset( $Blog ) &&
+		    $Blog->get_setting( 'display_alt_skin_referer' ) &&
+		    strpos( $Hit->get_referer(), $Blog->get_setting( 'display_alt_skin_referer_url' ) ) !== false )
+		{	// Current referer URL contains string from collection setting:
+			$this->set( 'using_alt_skin', true );
+			return true;
+		}
+
+		// No condition is found to display Alt skin:
+		return false;
+	}
+
+
+	/**
 	 * Was this session created from a desktop device
 	 */
 	function is_desktop_session()

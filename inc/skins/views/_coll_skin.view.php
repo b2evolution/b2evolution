@@ -69,6 +69,13 @@ switch( $skin_type )
 		$display_same_as_normal = true;
 		break;
 
+	case 'alt':
+		$block_item_Widget->title = $is_collection_skin ?
+			sprintf( T_('Recommended Alt skins for a "%s" collection'), $kind_title ) :
+			T_('Choose an Alt skin');
+		$display_same_as_normal = true;
+		break;
+
 	default:
 		debug_die( 'Invalid skin type!' );
 }
@@ -96,7 +103,7 @@ $block_item_Widget->disp_template_replaced( 'block_start' );
 	}
 
 	if( $display_same_as_normal )
-	{	// A link to select the same skin as normal for tablet and mobile skins:
+	{	// A link to select the same skin as normal for tablet, mobile and alt skins:
 		if( $is_collection_skin )
 		{	// Collection skin:
 			$select_url = $admin_url.'?ctrl=coll_settings&tab=skin&blog='.$edited_Blog->ID.'&amp;action=update&amp;skinpage=selection&amp;'.$skin_type.'_skin_ID=0&amp;'.url_crumb( 'collection' );
