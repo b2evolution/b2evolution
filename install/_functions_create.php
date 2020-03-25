@@ -812,15 +812,6 @@ Technology, Media & Telecom',                     'recommended', 'unrestricted',
 			'order'           => 120,
 			'note'            => T_('Rating must be a value between 1 and 5 with 5 being the highest.'),
 		),
-		// for Item Type "Forum Topic":
-		array(
-			'ityp_ID'         => $forum_topic_ityp_ID,
-			'label'           => T_('Project Cost'),
-			'name'            => 'project_cost',
-			'type'            => 'double',
-			'order'           => 110,
-			'format'          => '$ 0 0.00',
-		),
 	);
 	// Default settings for custom fields:
 	$custom_field_default_settings = array(
