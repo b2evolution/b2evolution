@@ -185,7 +185,14 @@ $Form->begin_form( 'inskin', '', $form_params );
 	$front_edit_fields = $edited_Item->get_front_edit_fields();
 	foreach( $front_edit_fields as $front_edit_field )
 	{
-		$front_edit_field_is_visible = ! empty( $front_edit_field['order'] );
+		if( $front_edit_field['type'] == 'custom' )
+		{	// For custom field we should check option "Public" to know when it may be visible on front-office:
+			$front_edit_field_is_visible = ! empty( $front_edit_field['public'] );
+		}
+		else
+		{	// For other item fields we can make it visible onle when setting "Front-Office Order" is filled for the field:
+			$front_edit_field_is_visible = ! empty( $front_edit_field['order'] );
+		}
 		if( $front_edit_field['type'] == 'item' )
 		{	// Item field:
 			switch( $front_edit_field['name'] )
