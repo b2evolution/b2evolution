@@ -155,6 +155,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 {
 	global $admin_url, $inc_path;
 	global $current_User, $action;
+	global $attachment_tab;
 
 	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
 	{	// Files module is not enabled:
@@ -206,7 +207,15 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 			break;
 	}
 
-	$fieldset_title = T_( 'Images &amp; Attachments' );
+	if( !$attachment_tab )
+	{
+		$fieldset_title = T_( 'Images &amp; Attachments' );
+	}
+	else
+	{
+		$fieldset_title = '';
+		$fold = false;
+	}
 
 	if( is_admin_page() )
 	{	// Display a link to manual page only on back-office:
@@ -284,6 +293,10 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 		echo_modalwindow_js();
 ?>
 <script>
+function attachment_tab_window()
+{
+	evo_link_initialize_fieldset( '<?php echo $fieldset_prefix; ?>' );
+}
 function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight, prefix )
 {
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',

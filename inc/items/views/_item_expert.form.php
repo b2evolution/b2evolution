@@ -47,6 +47,7 @@ global $post_comment_status, $trackback_url, $item_tags;
 global $bozo_start_modified, $creating;
 global $item_title, $item_content;
 global $redirect_to, $orig_action;
+global $attachment_tab;
 
 // Determine if we are creating or updating...
 $creating = is_create_action( $action );
@@ -290,16 +291,53 @@ $Form->begin_form( '', '', $params );
 	$Form->end_fieldset();
 
 
-	// ####################### ATTACHMENTS/LINKS #########################
+	echo '<input type="hidden" name="nav_tabs_selected" id="nav_tabs_selected" value="">';
+
+	echo '<ul class="nav nav-tabs">';
+
+	echo '<li class="active"><a data-toggle="tab" href="#attachment">'.T_('Attachments').'</a></li>';
+
+	$custom_fields = $edited_Item->get_type_custom_fields();
+	if( count( $custom_fields ) )
+	{
+		echo '<li><a data-toggle="tab" href="#custom_fields">'.T_('Custom fields').'</a></li>';
+	}
+
+	echo '<li><a data-toggle="tab" href="#advance_properties">'.T_('Advanced properties').'</a></li>';
+
+	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
+	{
+		echo '<li><a data-toggle="tab" href="#allowtrackbacks">'.T_('Additional actions').'</a></li>';
+	}
+
+	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
+
+	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
+	{
+		echo '<li><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').'</a></li>';
+	}
+
+	echo '</ul>';
+
+
+	echo '<div class="tab-content">';
+
+	echo '<div id="attachment" class="tab-pane fade in active">';
+
+	echo '<br>';
+	$attachment_tab = true;
 	$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
 	$Form->attachments_fieldset( $edited_Item, $fold_images_attachments_block );
 
+	echo '</div>';
 
-	// ############################ CUSTOM FIELDS #############################
-	$custom_fields = $edited_Item->get_type_custom_fields();
 	if( count( $custom_fields ) )
-	{	// Display fieldset with custom fields only if at least one exists:
-		$custom_fields_title = T_('Custom fields').get_manual_link( 'post-custom-fields-panel' );
+	{	
+		echo '<div id="custom_fields" class="tab-pane fade">';
+
+		echo '<br>';
+		// Display fieldset with custom fields only if at least one exists:
+		$custom_fields_title = get_manual_link( 'post-custom-fields-panel' );
 		if( $current_User->check_perm( 'options', 'edit' ) )
 		{	// Display an icon to edit post type if current user has a permission:
 			$custom_fields_title .= '<span class="floatright panel_heading_action_icons">'
@@ -309,7 +347,7 @@ $Form->begin_form( '', '', $params );
 				.'</span>';
 		}
 
-		$Form->begin_fieldset( $custom_fields_title, array( 'id' => 'itemform_custom_fields', 'fold' => true ) );
+		$Form->begin_fieldset( $custom_fields_title, array( 'id' => 'itemform_custom_fields', 'fold' => false ) );
 
 		$Form->switch_layout( 'fields_table' );
 		$Form->begin_fieldset();
@@ -321,11 +359,16 @@ $Form->begin_form( '', '', $params );
 		$Form->switch_layout( NULL );
 
 		$Form->end_fieldset();
+
+		echo '</div>';
 	}
 
+	echo '<div id="advance_properties" class="tab-pane fade">';
+
+	echo '<br>';
 	// ############################ ADVANCED PROPERTIES #############################
 
-	$Form->begin_fieldset( T_('Advanced properties').get_manual_link( 'post-advanced-properties-panel' ), array( 'id' => 'itemform_adv_props', 'fold' => true ) );
+	$Form->begin_fieldset( get_manual_link( 'post-advanced-properties-panel' ), array( 'id' => 'itemform_adv_props', 'fold' => false ) );
 
 	$Form->switch_layout( 'fields_table' );
 	$Form->begin_fieldset();
@@ -490,12 +533,16 @@ $Form->begin_form( '', '', $params );
 
 	$Form->end_fieldset();
 
+	echo '</div>';
+	
+	echo '<div id="allowtrackbacks" class="tab-pane fade">';
 
+	echo '<br>';
 	// ####################### ADDITIONAL ACTIONS #########################
 
 	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
 	{
-		$Form->begin_fieldset( T_('Additional actions').get_manual_link( 'post-edit-additional-actions-panel' ), array( 'id' => 'itemform_additional_actions', 'fold' => true ) );
+		$Form->begin_fieldset( get_manual_link( 'post-edit-additional-actions-panel' ), array( 'id' => 'itemform_additional_actions', 'fold' => false ) );
 
 		// --------------------------- TRACKBACK --------------------------------------
 		?>
@@ -509,10 +556,12 @@ $Form->begin_form( '', '', $params );
 		$Form->end_fieldset();
 	}
 
+	echo '</div>';
+	
+	echo '<div id="internal_comments" class="tab-pane fade">';
 
+	echo '<br>';
 	// ####################### PLUGIN FIELDSETS #########################
-
-	$Plugins->trigger_event( 'AdminDisplayItemFormFieldset', array( 'Form' => & $Form, 'Item' => & $edited_Item, 'edit_layout' => 'expert' ) );
 
 	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 	{
@@ -522,9 +571,9 @@ $Form->begin_form( '', '', $params );
 		param( 'comments_number', 'integer', $total_comments_number );
 		param( 'comment_type', 'string', 'meta' );
 
-		$Form->begin_fieldset( T_('Internal comments').get_manual_link( 'meta-comments-panel' )
+		$Form->begin_fieldset( get_manual_link( 'meta-comments-panel' )
 						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
-					array( 'id' => 'itemform_meta_cmnt', 'fold' => true, 'deny_fold' => ( $total_comments_number > 0 ) ) );
+					array( 'id' => 'itemform_meta_cmnt', 'fold' => false, 'deny_fold' => ( $total_comments_number > 0 ) ) );
 
 		if( $creating )
 		{	// Display button to save new creating item:
@@ -571,6 +620,11 @@ $Form->begin_form( '', '', $params );
 
 		$Form->end_fieldset();
 	}
+
+	echo '</div>';
+
+	echo '</div>';
+
 	?>
 
 </div>
@@ -1137,8 +1191,6 @@ else
 echo_onchange_newcat();
 // Goal
 echo_onchange_goal_cat();
-// Fieldset folding
-echo_fieldset_folding_js();
 // Save and restore item content field height and scroll position:
 echo_item_content_position_js( get_param( 'content_height' ), get_param( 'content_scroll' ) );
 // JS code for merge button:
@@ -1156,6 +1208,27 @@ if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
 // JS to post excerpt mode switching:
 ?>
 <script>
+// Align tab content header to right:
+jQuery( ".tab-content .panel-title" ).addClass( 'text-right' );	 
+jQuery( '.nav-tabs a' ).on( 'shown.bs.tab', function( event )
+{	// Do tab wise operations
+	tab_href_value = jQuery( event.target ).attr( "href" );
+	jQuery( '#nav_tabs_selected' ).val( tab_href_value );
+	if( tab_href_value === '#advance_properties' )
+	{
+		jQuery(window).resize();
+	}
+	if( tab_href_value === '#attachment' )
+	{
+		attachment_tab_window();
+	}
+});
+
+if( jQuery( '#nav_tabs_selected' ).val() != '' )
+{	// Active earlier activated tab
+	jQuery( '.nav-tabs a[href="' + jQuery( '#nav_tabs_selected' ).val() + '"]' ).tab( 'show' );
+}
+
 jQuery( '#post_excerpt' ).on( 'keyup', function()
 {
 	// Disable excerpt auto-generation on any changing and enable if excerpt field is empty:
