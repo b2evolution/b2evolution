@@ -27,6 +27,7 @@ class AbstractImport
 	var $coll_ID;
 	var $log_file = true;
 	var $log_errors_num = 0;
+	var $log_cli_format = 'text';
 
 	/**
 	 * Get collection
@@ -288,8 +289,8 @@ class AbstractImport
 	{
 		global $is_cli;
 
-		if( $is_cli )
-		{	// Remove and convert all html tags on CLI mode:
+		if( $is_cli && $this->log_cli_format == 'text' )
+		{	// Remove and convert all html tags to text format on CLI mode:
 
 			// Remove all new lines because we build them from HTML tags:
 			$message = str_replace( array( "\n", "\r" ), '', $message );

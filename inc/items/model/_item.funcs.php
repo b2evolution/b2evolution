@@ -172,7 +172,6 @@ function init_inskin_editing()
 	elseif( $post_ID > 0 )
 	{	// Edit post
 		global $post_extracats;
-		$action = 'edit';
 
 		$ItemCache = & get_ItemCache ();
 		$edited_Item = $ItemCache->get_by_ID ( $post_ID );
@@ -189,6 +188,14 @@ function init_inskin_editing()
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit&p='.$post_ID, '&' );
 		$tab_switch_params .= '&amp;p='.$edited_Item->ID;
+
+		if( $action == 'edit_item_type' )
+		{	// On change Item Type we should load all data from request
+			$edited_Item->load_from_Request( /* editing? */ true, /* creating? */ false );
+		}
+
+		// Set action for edit mode:
+		$action = 'edit';
 	}
 	elseif( $copy_post_ID > 0 )
 	{	// Copy post
@@ -217,7 +224,7 @@ function init_inskin_editing()
 
 		$redirect_to = url_add_param( $Blog->gen_blogurl(), 'disp=edit', '&' );
 	}
-	elseif( empty( $action ) )
+	elseif( empty( $action ) || $action == 'new_item_type' )
 	{	// Create new post (from Front-office)
 		$action = 'new';
 
@@ -2367,6 +2374,72 @@ function get_item_status_buttons( $edited_Item, $button_action = NULL, $button_c
 	$r .= '</div>';
 
 	return $r;
+}
+
+
+/**
+ * Display buttons to change Item Type
+ *
+ * @param object Edited Item
+ * @param array Parameters
+ */
+function echo_item_type_change_buttons( $edited_Item, $params = array() )
+{
+	$params = array_merge( array(
+			'before_buttons'      => '<p class="text-center"><span class="btn-group text-center">',
+			'after_buttons'       => '</span></p>',
+			'button_normal_class' => 'btn btn-default btn-lg',
+			'button_active_class' => 'btn btn-default btn-lg active',
+		), $params );
+
+	if( ! ( $item_Blog = & $edited_Item->get_Blog() ) )
+	{	// Collection is required to dispplay buttons:
+		return;
+	}
+
+	// Get all enabled Item Types for the Item's Collection with same usage:
+	$item_types = $item_Blog->get_enabled_item_types( $edited_Item->get_type_setting( 'usage' ) );
+
+	if( count( $item_types ) < 2 )
+	{	// No reason to display single button with current Item Type:
+		return;
+	}
+
+	// Load Item Types to display buttons:
+	$ItemTypeCache = & get_ItemTypeCache();
+	$ItemTypeCache->clear();
+	$ItemTypeCache->load_list( $item_types );
+
+	echo $params['before_buttons'];
+
+	foreach( $ItemTypeCache->cache as $ItemType )
+	{
+		echo '<button type="button"'
+			// Set Item Type ID to know what button is pressed:
+			.' data-item-type="'.$ItemType->ID.'"'
+			// Set active or normal button class:
+			.' class="'.( $edited_Item->get( 'ityp_ID' ) == $ItemType->ID ? $params['button_active_class'] : $params['button_normal_class'] ).'"'
+			.'>'
+				// Use Item Type name as button title:
+				.$ItemType->get( 'name' )
+			.'</button>';
+	}
+
+	echo $params['after_buttons'];
+
+	// JavaScript to set proper Item Type on press button:
+	// Note: We remove all attributes "required" at the press moment in order to avoid HTML5
+	//       restrictions on submit form and allow to change Item Type even with empty fields
+	echo '<script>
+jQuery( "button[data-item-type]" ).on( "click", function()
+{
+	jQuery( "[required]" ).removeAttr( "required" );
+	jQuery( "input[name=item_typ_ID]" ).val( jQuery( this ).data( "item-type" ) );
+	jQuery( this ).closest( "form" )
+		.append( "<input type=\"hidden\" name=\"action\" value=\"'.( empty( $edited_Item->ID ) ? 'new_item_type' : 'edit_item_type' ).'\">" )
+		.submit();
+} );
+</script>';
 }
 
 

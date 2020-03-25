@@ -1394,8 +1394,8 @@ class Item extends ItemLight
 				{
 					param( $param_name, $param_type, NULL ); // get par value
 				}
-				if( $custom_field['required'] )
-				{	// Check required field:
+				if( $custom_field['required'] && ( $custom_field['public'] || is_admin_page() ) )
+				{	// Check required field only when it is public:
 					param_check_not_empty( $param_name, sprintf( T_('Custom "%s" cannot be empty.'), $custom_field['label'] ) );
 				}
 				$custom_field_make_null = $custom_field['type'] != 'double'; // store '0' values in DB for numeric fields
@@ -14539,6 +14539,7 @@ class Item extends ItemLight
 		{
 			$fields[] = array(
 				'name'  => $custom_field['name'],
+				'public'=> $custom_field['public'],
 				'order' => $custom_field['order'],
 				'type'  => 'custom',
 				'value' => $custom_field['value'],

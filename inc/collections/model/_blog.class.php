@@ -6027,6 +6027,7 @@ class Blog extends DataObject
 				break;
 
 			case 'forum':
+				$default_post_types = array(); // Don't install the default Item Types(see above) for forums collection.
 				$default_post_types[] = 'Forum Topic';
 				break;
 

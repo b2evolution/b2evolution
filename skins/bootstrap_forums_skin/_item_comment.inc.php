@@ -37,7 +37,7 @@ $params = array_merge( array(
 		'comment_text_after'    => '</div>',
 		'link_to'               => 'userurl>userpage', // 'userpage' or 'userurl' or 'userurl>userpage' or 'userpage>userurl'
 		'author_link_text'      => 'auto', // avatar_name | avatar_login | only_avatar | name | login | nickname | firstname | lastname | fullname | preferredname
-		'before_image'          => '<figure class="evo_image_block">',
+		'before_image'          => '<figure class="evo_image_block raised">',
 		'before_image_legend'   => '<figcaption class="evo_image_legend">',
 		'after_image_legend'    => '</figcaption>',
 		'after_image'           => '</figure>',
