@@ -2414,9 +2414,7 @@ function echo_item_type_change_buttons( $edited_Item, $params = array() )
 
 	foreach( $ItemTypeCache->cache as $ItemType )
 	{
-		echo '<button type="submit"'
-			// Set submit action:
-			.' name="actionArray['.( empty( $edited_Item->ID ) ? 'new_item_type' : 'edit_item_type' ).']"'
+		echo '<button type="button"'
 			// Set Item Type ID to know what button is pressed:
 			.' data-item-type="'.$ItemType->ID.'"'
 			// Set active or normal button class:
@@ -2437,6 +2435,9 @@ jQuery( "button[data-item-type]" ).on( "click", function()
 {
 	jQuery( "[required]" ).removeAttr( "required" );
 	jQuery( "input[name=item_typ_ID]" ).val( jQuery( this ).data( "item-type" ) );
+	jQuery( this ).closest( "form" )
+		.append( "<input type=\"hidden\" name=\"action\" value=\"'.( empty( $edited_Item->ID ) ? 'new_item_type' : 'edit_item_type' ).'\">" )
+		.submit();
 } );
 </script>';
 }
