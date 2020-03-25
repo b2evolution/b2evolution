@@ -293,10 +293,6 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 		echo_modalwindow_js();
 ?>
 <script>
-function attachment_tab_window()
-{
-	evo_link_initialize_fieldset( '<?php echo $fieldset_prefix; ?>' );
-}
 function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight, prefix )
 {
 	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',

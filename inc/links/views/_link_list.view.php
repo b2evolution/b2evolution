@@ -207,10 +207,13 @@ display_dragdrop_upload_button( array(
 		'fm_mode'                => $fm_mode,
 		'fieldset_prefix'        => $fieldset_prefix,
 	) );
-?>
+
+if( !isset( $attachment_tab ) )
+{?>
 <script type="text/javascript">
 jQuery( document ).ready( function()
 {	// Initialize attachments fieldset to set proper height and handler to resize it:
 	evo_link_initialize_fieldset( '<?php echo $fieldset_prefix; ?>' );
 } );
 </script>
+<?php } ?>
