@@ -1487,7 +1487,7 @@ class Blog extends DataObject
 			{ // we want to load the styles params:
 				$display_alt_skin_referer = param( 'display_alt_skin_referer', 'integer', 0 );
 				$this->set_setting( 'display_alt_skin_referer', $display_alt_skin_referer );
-				$display_alt_skin_referer_url = param( 'display_alt_skin_referer_url', 'url', NULL );
+				$display_alt_skin_referer_url = param( 'display_alt_skin_referer_url', 'string', NULL );
 				if( $display_alt_skin_referer )
 				{	// Check for not empty value only when setting is enabled:
 					param_check_not_empty( 'display_alt_skin_referer_url', T_('The Referer URL cannot be empty to display Alt skin automatically.') );
