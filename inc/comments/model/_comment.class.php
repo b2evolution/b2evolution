@@ -2786,14 +2786,14 @@ class Comment extends DataObject
 
 		$use_cache = $this->ID && in_array( $format, array('htmlbody', 'entityencoded', 'xml', 'text') );
 		if( $use_cache )
-		{ // the format/comment can be cached:
+		{	// the format/comment can be cached:
 			if( empty( $CommentList ) )
-			{ // set comments Blog from comment Item
+			{	// set comments Blog from comment Item
 				$this->get_Item();
 				$comments_Blog = & $this->Item->get_Blog();
 			}
 			else
-			{ // set comments Blog from CommentList
+			{	// set comments Blog from CommentList
 				$comments_Blog = & $CommentList->Blog;
 			}
 			$comment_renderers = $this->get_renderers_validated();
@@ -2807,15 +2807,15 @@ class Comment extends DataObject
 			$CommentPrerenderingCache = & get_CommentPrerenderingCache();
 
 			if( isset($CommentPrerenderingCache[$format][$this->ID][$cache_key]) )
-			{ // already in PHP cache.
+			{	// already in PHP cache.
 				$r = $CommentPrerenderingCache[$format][$this->ID][$cache_key];
 				// Save memory, typically only accessed once.
 				unset($CommentPrerenderingCache[$format][$this->ID][$cache_key]);
 			}
 			else
-			{ // try loading into Cache
+			{	// try loading into Cache
 				if( ! isset($CommentPrerenderingCache[$format]) )
-				{ // only do the prefetch loading once.
+				{	// only do the prefetch loading once.
 					$CommentPrerenderingCache[$format] = array();
 
 					$SQL = new SQL( 'Preload prerendered comments content ('.$format.')' );
@@ -2841,7 +2841,7 @@ class Comment extends DataObject
 						$row_cache_key = $row->cmpr_format.'/'.$row->cmpr_renderers;
 
 						if( ! isset($CommentPrerenderingCache[$format][$row->cmpr_cmt_ID]) )
-						{ // init list
+						{	// init list
 							$CommentPrerenderingCache[$format][$row->cmpr_cmt_ID] = array();
 						}
 
@@ -2866,7 +2866,7 @@ class Comment extends DataObject
 			$r = format_to_output( $data, $format );
 
 			if( $use_cache )
-			{ // save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
+			{	// save into DB (using REPLACE INTO because it may have been pre-rendered by another thread since the SELECT above)
 				global $servertimenow;
 				$DB->query( 'REPLACE INTO T_comments__prerendering ( cmpr_cmt_ID, cmpr_format, cmpr_renderers, cmpr_content_prerendered, cmpr_datemodified )
 					 VALUES ( '.$this->ID.', '.$DB->quote( $format ).', '.$DB->quote( $comment_renderers ).', '.$DB->quote( $r ).', '.$DB->quote( date2mysql( $servertimenow ) ).' )', 'Cache prerendered comment content' );
@@ -2925,6 +2925,42 @@ class Comment extends DataObject
 		$content = $this->render_inline_tags( $content, $params );
 
 		return $content;
+	}
+
+
+	/**
+	 * Get excerpt, derived from {@link Comment::$content}.
+	 *
+	 * @param int Maximum length
+	 * @param string Tail to use, when string gets cropped. Its length gets
+	 *               substracted from the total length (with HTML entities
+	 *               being decoded). Default is "&hellip;" (HTML entity)
+	 * @return string
+	 */
+	function get_excerpt( $params = array() )
+	{
+		$params = array_merge( array(
+				'format' => 'htmlbody',
+				'maxlen' => 254,
+				'tail'   => '&hellip;',
+			), $params );
+
+		$content = $this->get_prerendered_content( $params['format'] );
+		
+		// Render inline tags to HTML code, except of inline file tags because they are removed below:
+		$content = $this->render_inline_tags( $content, array(
+			'render_inline_files'      => false,
+			'render_links'             => false,
+			'render_other_item'        => false,
+			'render_inline_widgets'    => false,
+			'render_block_widgets'     => false,
+			'render_switchable_blocks' => false,
+		) );
+
+		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
+		$content = preg_replace( '/\[[a-z]+:[^\]`]*\]/i', '', $content );
+
+		return excerpt( $content, $params['maxlen'], $params['tail'] );
 	}
 
 

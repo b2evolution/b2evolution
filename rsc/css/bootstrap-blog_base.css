@@ -433,14 +433,8 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   max-width: 600px;
   margin: 0 auto;
 }
-.row-gutter-sm [class*='col-']:not(:first-child):not(:last-child) {
+.row-gutter-sm [class*='col-'] {
   padding-right: 3px;
-  padding-left: 3px;
-}
-.row-gutter-sm [class*='col-']:first-child:not(:last-child) {
-  padding-right: 3px;
-}
-.row-gutter-sm [class*='col-']:last-child:not(:first-child) {
   padding-left: 3px;
 }
 .evo_tile {
