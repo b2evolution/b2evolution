@@ -2946,16 +2946,6 @@ class Comment extends DataObject
 			), $params );
 
 		$content = $this->get_prerendered_content( $params['format'] );
-		
-		// Render inline tags to HTML code, except of inline file tags because they are removed below:
-		$content = $this->render_inline_tags( $content, array(
-			'render_inline_files'      => false,
-			'render_links'             => false,
-			'render_other_item'        => false,
-			'render_inline_widgets'    => false,
-			'render_block_widgets'     => false,
-			'render_switchable_blocks' => false,
-		) );
 
 		// Remove shorttags from excerpt // [image:123:caption:.class] [file:123:caption:.class] [inline:123:.class] etc:
 		$content = preg_replace( '/\[[a-z]+:[^\]`]*\]/i', '', $content );
