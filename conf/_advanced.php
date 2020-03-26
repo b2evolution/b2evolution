@@ -54,7 +54,7 @@ $display_errors_on_production = true;
  *
  * @var boolean - set to 1 to display the dev menu in the evobar.
  */
-$dev_menu = 0;
+$dev_menu = 1;
 
 
 // If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
@@ -378,7 +378,7 @@ $crumb_expires = 7200;
  *
  * @global int $pagecache_max_age
  */
-$pagecache_max_age = 900;
+$pagecache_max_age = 1;
 
 
 /**
@@ -833,7 +833,7 @@ $noredir_params = array(
  * It will prevent from sending test notifications to real user accounts.
  * You will still be able to see the emails that would have been sent through the Emails > Sent tab in the back-office.
  */
-$email_send_simulate_only = false;
+$email_send_simulate_only = true;
 
 
 /**
@@ -993,9 +993,9 @@ $use_defer_for_backoffice = false;
 $use_defer_for_loggedin_users = true;
 $use_defer_for_anonymous_users = true;
 
-$use_defer_for_default_register_form = false; // Temporarily disabled. Need to fix password related JS.
+$use_defer_for_default_register_form = true;
 
-$use_defer_for_anonymous_disp_register = false; // Temporarily disabled. Need to fix password related JS.
+$use_defer_for_anonymous_disp_register = true;
 $use_defer_for_anonymous_disp_register_finish = false; // Temporarily disabled. Need to fix password related JS.
 $use_defer_for_anonymous_disp_users = false; // Temporarily disabled. Need to fix user_js.funcs.php JS.
 $use_defer_for_anonymous_disp_anonpost = false; // Erwin> I think we can use defer here as long as we use AJAX forms to load the item form.
@@ -1005,7 +1005,7 @@ $use_defer_for_loggedin_disp_front = false; // Temporarily disabled. Need to fix
 $use_defer_for_loggedin_disp_messages = false; // Temporarily disabled. Need to fix attachments related JS.
 $use_defer_for_loggedin_disp_threads = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
 $use_defer_for_loggedin_disp_profile = false; // Temporarily disabled. Need tof fix various JS.
-$use_defer_for_loggedin_disp_pwdchange = false; // Temporarily disabled. Need to fix password related JS.
+$use_defer_for_loggedin_disp_pwdchange = true;
 $use_defer_for_loggedin_disp_edit = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
 $use_defer_for_loggedin_disp_proposechange = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
 $use_defer_for_loggedin_disp_edit_comment = false; // Temporarily disabled. Need to fix various editor toolbar related JS.

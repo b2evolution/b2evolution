@@ -3224,162 +3224,30 @@ function display_password_indicator( $params = array() )
 {
 	global $Settings, $Collection, $Blog, $rsc_url, $disp, $dummy_fields;
 
-	$params = array_merge( array(
-			'pass1-id'    => $dummy_fields[ 'pass1' ],
-			'pass2-id'    => $dummy_fields[ 'pass2' ],
-			'login-id'    => $dummy_fields[ 'login' ],
-			'email-id'    => $dummy_fields[ 'email' ],
-			'field-width' => 140,
-			'disp-status' => 1,
-			'disp-time'   => 0,
-			'blacklist'   => "'b2evo','b2evolution'", // Identify the password as "weak" if it includes any of these words
-		), $params );
-
-	echo "<script>
-	// Load password strength estimation library
-	(function(){var a;a=function(){var a,b;b=document.createElement('script');b.src='".force_https_url( $rsc_url, 'login' )."js/zxcvbn.js';b.type='text/javascript';b.async=!0;a=document.getElementsByTagName('script')[0];return a.parentNode.insertBefore(b,a)};null!=window.attachEvent?window.attachEvent('onload',a):window.addEventListener('load',a,!1)}).call(this);
-
-	// Call 'passcheck' function when document is loaded
-	if( document.addEventListener )
-	{
-		document.addEventListener( 'DOMContentLoaded', passcheck, false );
-	}
-	else
-	{
-		window.attachEvent( 'onload', passcheck );
-	}
-
-	function passcheck()
-	{
-		var pass1input = jQuery( 'input#".$params['pass1-id']."' );
-		if( pass1input.length == 0 ) {
-			return; // password field not found
-		}
-
-		var pass2input = jQuery( 'input#".$params['pass2-id']."' );
-		if( pass2input.length != 0 ) {
-			pass2input.css( 'width', '".($params['field-width'] - 2)."px' ); // Set fixed length
-		}
-
-		// Prepare password field
-		pass1input.css( 'width', '".($params['field-width'] - 2)."px' ); // Set fixed length
-		pass1input.attr( 'onkeyup', 'return passinfo(this);' ); // Add onkeyup attribute
-		pass1input.parent().append( \"<div id='p-container'><div id='p-result'></div><div id='p-status'></div><div id='p-time'></div></div>\" );
-
-		jQuery( 'head' ).append( '<style>' +
-				'#p-container { position: relative; margin-top: 4px; height:5px; border: 1px solid #CCC; font-size: 84%; line-height:normal; color: #999; background: #FFF } ' +
-				'#p-result { height:5px } ' +
-				'#p-status { position:absolute; width: 100px; top:-5px; left:".($params['field-width']+8)."px } ' +
-				'#p-time { position:absolute; width: 400px } ' +
-			'</style>'
+	$password_indicator_config = array(
+			'pass1_id'    => $dummy_fields[ 'pass1' ],
+			'pass2_id'    => $dummy_fields[ 'pass2' ],
+			'login_id'    => $dummy_fields[ 'login' ],
+			'email_id'    => $dummy_fields[ 'email' ],
+			'field_width' => NULL, // Use current field width
+			'disp_status' => true,
+			'disp_time'   => false,
+			'blacklist'   => array( 'b2evo', 'b2evolution' ), // Identify the password as "weak" if it includes any of these words
+			'rsc_url'     => force_https_url( $rsc_url, 'login'),
+			'msg_status_very_weak' => format_to_output( T_('Very weak'), 'htmlattr' ),
+			'msg_status_weak'      => format_to_output( T_('Weak'), 'htmlattr' ),
+			'msg_status_soso'      => format_to_output( T_('So-so'), 'htmlattr' ),
+			'msg_status_good'      => format_to_output( T_('Good'), 'htmlattr' ),
+			'msg_status_great'     => format_to_output( T_('Great'), 'htmlattr' ),
+			'msg_est_crack_time'   => T_('Estimated crack time'),
+			'msg_illegal_char'     => sprintf( TS_('Password cannot contain the following characters: %s'), '<code><</code> <code>></code> <code>&</code>' ),
+			'msg_min_pwd_len'      => sprintf( TS_('The minimum password length is %d characters.'), $Settings->get( 'user_minpwdlen' ) ),
+			'msg_pwd_not_matching' => TS_('The second password is different from the first.'),
+			'min_pwd_len'          => (int) $Settings->get( 'user_minpwdlen' ),
+			'error_icon'           => get_icon( 'xross' ),
 		);
-		jQuery( '#p-container' ).css( 'width', pass1input.outerWidth() - 2 );
-		var pass1input_marginleft = parseInt( pass1input.css( 'margin-left' ) );
-		if( pass1input_marginleft > 0 )
-		{
-			jQuery( '#p-container' ).css( 'margin-left', pass1input_marginleft + 'px' );
-		}
-	}
 
-	function passinfo(el)
-	{
-		var presult = document.getElementById('p-result');
-		var pstatus = document.getElementById('p-status');
-		var ptime = document.getElementById('p-time');
-
-		var vlogin = '';
-		var login = document.getElementById('".$params['login-id']."');
-		if( login != null && login.value != '' ) { vlogin = login.value; }
-
-		var vemail = '';
-		var email = document.getElementById('".$params['email-id']."');
-		if( email != null && email.value != '' ) { vemail = email.value; }
-
-		// Check the password
-		var passcheck = zxcvbn(el.value, [vlogin, vemail, ".$params['blacklist']."]);
-
-		var bar_color = 'red';
-		var bar_status = '".format_to_output( T_('Very weak'), 'htmlattr' )."';
-
-		if( el.value.length == 0 ) {
-			presult.style.display = 'none';
-			pstatus.style.display = 'none';
-			ptime.style.display = 'none';
-		} else {
-			presult.style.display = 'block';
-			pstatus.style.display = 'block';
-			ptime.style.display = 'block';
-		}
-
-		switch(passcheck.score) {
-			case 1:
-				bar_color = '#F88158';
-				bar_status = '".format_to_output( TS_('Weak'), 'htmlattr' )."';
-				break;
-			case 2:
-				bar_color = '#FBB917';
-				bar_status = '".format_to_output( TS_('So-so'), 'htmlattr' )."';
-				break;
-			case 3:
-				bar_color = '#8BB381';
-				bar_status = '".format_to_output( TS_('Good'), 'htmlattr' )."';
-				break;
-			case 4:
-				bar_color = '#59E817';
-				bar_status = '".format_to_output( TS_('Great!'), 'htmlattr' )."';
-				break;
-		}
-
-		presult.style.width = (passcheck.score * 20 + 20)+'%';
-		presult.style.background = bar_color;
-
-		if( ".$params['disp-status']." ) {
-			pstatus.innerHTML = bar_status;
-		}
-		if( ".$params['disp-time']." ) {
-			document.getElementById('p-time').innerHTML = '".TS_('Estimated crack time').": ' + passcheck.crack_time_display;
-		}
-	}
-
-	jQuery( 'input#".$params[ 'pass1-id' ].", input#".$params[ 'pass2-id' ]."' ).keyup( function()
-	{	// Validate passwords
-		var minLength = ".format_to_js( $Settings->get( 'user_minpwdlen' ) ).";
-		var pass1Field = jQuery( 'input#".$params[ 'pass1-id' ]."' );
-		var pass2Field = jQuery( 'input#".$params[ 'pass2-id' ]."' );
-		var passStatus = jQuery( '#pass2_status' );
-		var errorMsg = '';
-		const regex = /^[^\<\&\>]+$/g; // Password cannot contain the following characters: < > &
-
-		if( ( pass1Field.val().length && ( pass1Field.val().match( regex ) == null ) ) ||
-				( pass2Field.val().length && ( pass2Field.val().match( regex ) == null ) ) )
-		{
-			errorMsg = '".sprintf( TS_('Password cannot contain the following characters: %s'), '<code><</code> <code>></code> <code>&</code>' )."';
-			pass1Field[0].setCustomValidity( pass1Field.val().match( regex ) ? '' : errorMsg );
-			pass2Field[0].setCustomValidity( pass2Field.val().match( regex ) ? '' : errorMsg );
-			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
-		}
-		else if( ( pass1Field.val().length > 0 && pass1Field.val().length < minLength ) || ( pass2Field.val().length > 0 && pass2Field.val().length < minLength ) )
-		{ // Password does not meet minimum length
-			errorMsg = '".sprintf( TS_('The minimum password length is %d characters.'), $Settings->get( 'user_minpwdlen' ) )."';
-			pass1Field[0].setCustomValidity( pass1Field.val().length < minLength ? errorMsg : '' );
-			pass2Field[0].setCustomValidity( pass2Field.val().length < minLength ? errorMsg : '' );
-			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
-		}
-		else if( pass2Field.val() != pass1Field.val() )
-		{	// Passwords are different
-			errorMsg = '".TS_('The second password is different from the first.')."';
-			pass1Field[0].setCustomValidity( '' );
-			pass2Field[0].setCustomValidity( errorMsg );
-			passStatus.html( '".get_icon( 'xross' )." ' + errorMsg );
-		}
-		else
-		{
-			pass1Field[0].setCustomValidity( errorMsg );
-			pass2Field[0].setCustomValidity( errorMsg );
-			passStatus.html( errorMsg );
-		}
-	} );
-</script>";
+	expose_var_to_js( 'evo_init_password_indicator_config', evo_json_encode( $password_indicator_config ) );
 }
 
 
@@ -3392,110 +3260,12 @@ function display_password_js_edit()
 {
 	global $Settings;
 
-	echo '<script>
-jQuery( "#current_user_pass" ).keyup( function()
-{
-	var error_obj = jQuery( this ).parent().find( "span.field_error" );
-	if( error_obj.length )
-	{
-		if( jQuery( this ).val() == "" )
-		{
-			error_obj.show();
-		}
-		else
-		{
-			error_obj.hide();
-		}
-	}
+	$password_edit_config = array(
+			'user_minpwdlen' => intval( $Settings->get('user_minpwdlen') ),
+			'msg_pwd_trim_warning' => T_('The leading and trailing spaces will be trimmed.'),
+		);
 
-	user_pass_clear_style( "#current_user_pass" );
-} );
-
-jQuery( "#edited_user_pass1, #edited_user_pass2" ).keyup( function()
-{
-	var minpass_obj = jQuery( this ).parent().find( ".pass_check_min" );
-	if( minpass_obj.length )
-	{ // Hide/Show a message about min pass length
-		if( jQuery.trim( jQuery( this ).val() ).length >= '.intval( $Settings->get('user_minpwdlen') ).' )
-		{
-			minpass_obj.hide();
-		}
-		else
-		{
-			minpass_obj.show();
-		}
-	}
-
-	var diff_obj = jQuery( ".pass_check_diff" );
-	if( diff_obj.length && jQuery( "#edited_user_pass1" ).val() == jQuery( " #edited_user_pass2" ).val() )
-	{ // Hide message about different passwords
-		diff_obj.hide();
-	}
-
-	// Hide message about that new password must be entered
-	var new_obj = jQuery( this ).parent().find( ".pass_check_new" );
-	if( new_obj.length )
-	{
-		if( jQuery( this ).val() == "" )
-		{
-			new_obj.show();
-		}
-		else
-		{
-			new_obj.hide();
-		}
-	}
-
-	// Hide message about that new password must be entered twice
-	var twice_obj = jQuery( this ).parent().find( ".pass_check_twice" );
-	if( twice_obj.length )
-	{
-		if( jQuery( this ).val() == "" )
-		{
-			twice_obj.show();
-		}
-		else
-		{
-			twice_obj.hide();
-		}
-	}
-
-	var warning_obj = jQuery( this ).parent().find( ".pass_check_warning" );
-	if( jQuery.trim( jQuery( this ).val() ) != jQuery( this ).val() )
-	{ // Password contains the leading and trailing spaces
-		if( ! warning_obj.length )
-		{
-			jQuery( this ).parent().append( "<span class=\"pass_check_warning notes field_error\">.'.TS_('The leading and trailing spaces will be trimmed.').'</span>" );
-		}
-	}
-	else if( warning_obj.length )
-	{ // No spaces, Remove warning
-		warning_obj.remove();
-	}
-
-	user_pass_clear_style( "#edited_user_pass1, #edited_user_pass2" );
-} );
-
-/**
- * Hide/Show error style of input depending on visibility of the error messages
- *
- * @param string jQuery selector
- */
-function user_pass_clear_style( obj_selector )
-{
-	jQuery( obj_selector ).each( function()
-	{
-		if( jQuery( this ).parent().find( "span.field_error span:visible" ).length )
-		{
-			jQuery( this ).addClass( "field_error" );
-		}
-		else
-		{
-			jQuery( this ).removeClass( "field_error" );
-		}
-	} );
-}
-</script>';
+	expose_var_to_js( 'evo_init_password_edit_config', evo_json_encode( $password_edit_config ) );
 }
 
 
@@ -3508,63 +3278,20 @@ function display_login_validator( $params = array() )
 {
 	global $rsc_url, $dummy_fields;
 
-	$params = array_merge( array(
-			'login-id' => $dummy_fields[ 'login' ],
-		), $params );
+	$login_validator_config = array(
+			'login_id'             => $dummy_fields[ 'login' ],
+			'rsc_url'              => $rsc_url,
+			'login_htsrv_url'      => get_htsrv_url( 'login' ),
+			'login_icon_load'      => '<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.T_('Loading...').'" title="'.T_('Loading...').'" style="margin:2px 0 0 5px" align="top" />',
+			'login_icon_available' => get_icon( 'allowback', 'imgtag', array( 'title' => T_('This username is available.') ) ),
+			'login_icon_exists'    => get_icon( 'xross', 'imgtag', array( 'title' => T_('This username is already in use. Please choose another one.') ) ),
+			'login_icon_error'     => get_icon( 'xross', 'imgtag', array( 'title' => '$error_msg$' ) ),
+			'login_text_empty'     => T_('Choose a username'),
+			'login_text_available' => T_('This username is available.'),
+			'login_text_exists'    => T_('This username is already in use. Please choose another one.'),
+		);
 
-	echo '<script>
-	var login_icon_load = \'<img src="'.$rsc_url.'img/ajax-loader.gif" alt="'.TS_('Loading...').'" title="'.TS_('Loading...').'" style="margin:2px 0 0 5px" align="top" />\';
-	var login_icon_available = \''.get_icon( 'allowback', 'imgtag', array( 'title' => TS_('This username is available.') ) ).'\';
-	var login_icon_exists = \''.get_icon( 'xross', 'imgtag', array( 'title' => TS_('This username is already in use. Please choose another one.') ) ).'\';
-	var login_icon_error = \''.get_icon( 'xross', 'imgtag', array( 'title' => '$error_msg$' ) ).'\';
-
-	var login_text_empty = \''.TS_('Choose a username').'.\';
-	var login_text_available = \''.TS_('This username is available.').'\';
-	var login_text_exists = \''.TS_('This username is already in use. Please choose another one.').'\';
-
-	var login_field = jQuery( "#register_form input#'.$params[ 'login-id' ].'" );
-	login_field.change( function()
-	{	// Validate if username is available
-		var note_Obj = jQuery( "#login_status_msg" );
-		if( jQuery( this ).val() == "" )
-		{	// Login is empty
-			jQuery( "#login_status" ).html( "" );
-			note_Obj.html( login_text_empty ).attr( "class", "notes" );
-		}
-		else
-		{	// Validate login
-			jQuery( "#login_status" ).html( login_icon_load );
-			jQuery.ajax( {
-				type: "POST",
-				url: "'.get_htsrv_url( 'login' ).'anon_async.php",
-				data: "action=validate_login&login=" + jQuery( this ).val(),
-				success: function( result )
-				{
-					result = ajax_debug_clear( result );
-					if( result == "exists" )
-					{	// Login already exists
-						jQuery( "#login_status" ).html( "" );
-						note_Obj.html( login_icon_exists + " " + login_text_exists ).attr( "class", "red" );
-						login_field[0].setCustomValidity( login_text_exists );
-					}
-					else if( result == "available" )
-					{	// Login is available
-						jQuery( "#login_status" ).html( "" );
-						//note_Obj.html( login_icon_available + " " + login_text_available ).attr( "class", "green" );
-						note_Obj.html( "" );
-						login_field[0].setCustomValidity( "" );
-					}
-					else
-					{	// Errors
-						jQuery( "#login_status" ).html( "" );
-						note_Obj.html( login_icon_error.replace( "$error_msg$", result.replace( /(<([^>]+)>)/ig, "" ) ) + " " + result ).attr( "class", "red" );
-						login_field[0].setCustomValidity( result.replace( /(<([^>]+)>)/ig, "" ) );
-					}
-				}
-			} );
-		}
-	} );
-</script>';
+	expose_var_to_js( 'evo_init_login_validator_config', evo_json_encode( $login_validator_config ) );
 }
 
 

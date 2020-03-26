@@ -279,6 +279,9 @@ module.exports = function(grunt) {
 				src: [
 					'rsc/js/src/evo_generic_functions.js',
 					'rsc/js/src/evo_init_generic_jquery_ready_functions.js',
+					'rsc/js/src/evo_init_password_indicator.js',
+					'rsc/js/src/evo_init_password_edit.js',
+					'rsc/js/src/evo_init_login_validator.js',
 					'rsc/js/src/evo_init_skin_bootstrap_forums.js',
 					'rsc/js/src/evo_init_comment_rating.js',
 					'rsc/js/src/evo_init_widget_coll_search_form.js',
