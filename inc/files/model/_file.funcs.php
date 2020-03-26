@@ -2578,6 +2578,10 @@ function display_dragdrop_upload_button( $params = array() )
 				callbacks: {
 					onSubmit: function( id, fileName, dropTarget )
 					{
+						if( jQuery( '.content-form-with-tab #nav_tabs_selected' ).length > 0 && jQuery( '.content-form-with-tab #attachment' ).length > 0 )
+						{
+							jQuery( '.content-form-with-tab .nav-tabs a[href="' + '#attachment' + '"]' ).tab( 'show' );
+						}
 						var defaultParams = { root_and_path: <?php echo $params['fieldset_prefix']; ?>root_and_path },
 								finalParams = defaultParams;
 
