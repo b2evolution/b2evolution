@@ -2272,13 +2272,13 @@ function create_default_templates( $is_task = true )
 	</div>
 </div>
 <div class="row row-gutter-sm">
-	<div class="col-sm-12 col-md-12 col-lg-5 margin-y-xs">
+	<div class="col-sm-12 col-md-4 col-lg-5 margin-y-xs">
 		[Form:search_author]
 	</div>
-	<div class="col-sm-12 col-md-12 col-lg-4 margin-y-xs">
+	<div class="col-sm-12 col-md-4 col-lg-4 margin-y-xs">
 		[Form:search_content_age]
 	</div>
-	<div class="col-sm-12 col-md-12 col-lg-3 margin-y-xs">
+	<div class="col-sm-12 col-md-4 col-lg-3 margin-y-xs">
 		[Form:search_content_type]
 	</div>
 </div>',
@@ -2317,7 +2317,7 @@ function create_default_templates( $is_task = true )
 	<div class="search_result_score dimmed">[echo:percentage]%</div>
 	<div class="search_content_wrap">
 		<div class="search_title">[Comment:permalink] (Comment)</div>
-		<div class="result_content">[Comment:content| // This must change]</div>
+		<div class="result_content">[Comment:excerpt]</div>
 		<div class="search_info dimmed">Published by [Comment:author|
 			link_text=avatar_name|
 			thumb_size=crop-top-15x15|

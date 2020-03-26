@@ -379,6 +379,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_Comment->content( $temp_params['format'], $temp_params['ban_urls'], $temp_params['show_attachments'], $temp_params );
 			break;
 
+		case 'Comment:excerpt':
+			echo $rendered_Comment->get_excerpt( $params );
+			break;
+
 		case 'Comment:permalink':
 			$rendered_Comment->permanent_link( array_merge( array(
 					'text'   => '#item#',
