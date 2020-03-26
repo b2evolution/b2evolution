@@ -650,7 +650,7 @@ class coll_item_list_Widget extends ComponentWidget
 			return true;
 		}
 
-		if( empty( $this->disp_params['template'] ) )
+		if( ! empty( $this->disp_params['template'] ) )
 		{	// For template mode we cannot know what will be displayed so no extra classes:
 			echo $this->disp_params['block_start'];
 		}
