@@ -1166,6 +1166,27 @@ tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
   display: inline-table;
   vertical-align: middle;
 }
+.content-form-with-tab .tab-content {
+  border: 1px solid #ddd;
+  border-width: 0 1px 1px;
+  padding: 1px;
+}
+.content-form-with-tab .tab-content .panel {
+  border-radius: 0px;
+  border: none;
+  margin-bottom: 0px;
+}
+.content-form-with-tab .tab-content .panel-default .panel-heading {
+  color: #333;
+  background-color: transparent;
+  border-color: transparent;
+}
+.content-form-with-tab .results_summary {
+  margin-top: 0px;
+}
+.content-form-with-tab .results_header {
+  display: none;
+}
 
 /*
  * Obviously, this file no longer contains only basic styles.
