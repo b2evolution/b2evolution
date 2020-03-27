@@ -738,7 +738,7 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			$users_SQL = new SQL();
+			$users_SQL = new SQL( "Get users for export" );
 			$users_SQL->SELECT( 'user_login, user_email, user_firstname, user_lastname, user_nickname, ctry_code, user_locale' );
 			$users_SQL->FROM( 'T_users' );
 			$users_SQL->FROM_add( 'LEFT JOIN T_regional__country ON ctry_ID = user_ctry_ID' );
