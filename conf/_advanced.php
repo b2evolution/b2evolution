@@ -54,7 +54,7 @@ $display_errors_on_production = true;
  *
  * @var boolean - set to 1 to display the dev menu in the evobar.
  */
-$dev_menu = 1;
+$dev_menu = 0;
 
 
 // If you get blank pages or missing thumbnail images, PHP may be crashing because it doesn't have enough memory.
@@ -378,7 +378,7 @@ $crumb_expires = 7200;
  *
  * @global int $pagecache_max_age
  */
-$pagecache_max_age = 1;
+$pagecache_max_age = 900;
 
 
 /**
@@ -833,7 +833,7 @@ $noredir_params = array(
  * It will prevent from sending test notifications to real user accounts.
  * You will still be able to see the emails that would have been sent through the Emails > Sent tab in the back-office.
  */
-$email_send_simulate_only = true;
+$email_send_simulate_only = false;
 
 
 /**
