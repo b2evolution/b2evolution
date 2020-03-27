@@ -1185,8 +1185,7 @@ function display_attachments_tab_pane( & $Form, & $LinkOwner, $fold = false, $ta
 			'id' => 'attachment',
 			'class' => 'in active tab_pane_no_pads',
 			'left_items' => $items_left,
-			'right_items' => $items_right
-
+			'right_items' => $items_right,
 		) );
 
 	echo '<div id="'.$tab_pane_prefix.'attachments_fieldset_wrapper" class="evo_attachments_fieldset__wrapper">';
@@ -1201,9 +1200,7 @@ function display_attachments_tab_pane( & $Form, & $LinkOwner, $fold = false, $ta
 		echo '</div>';
 	echo '</div>';
 
-	
 	$Form->close_tab_pane();
-	
 
 	// Show fieldset of quick uploader only when JS is enabled:
 	echo '<script type="text/javascript">jQuery( "#'.$tab_pane_prefix.$form_id.'" ).show()</script>';

@@ -926,10 +926,10 @@ class Form extends Widget
 		$tab_pane_params = array_merge( array(
 				'class'     => 'tab-pane fade',
 			), $tab_pane_params );
-		
+
 		$left_items = '';
 		$right_items = '';
-		
+
 		if( isset( $tab_pane_params['left_items'] ) )
 		{
 			$left_items = $tab_pane_params['left_items'];
@@ -944,14 +944,14 @@ class Form extends Widget
 		$r = str_replace( '$tab_pane_attribs$', get_field_attribs_as_string( $tab_pane_params ), $this->tab_pane_open );
 		$r = str_replace( '$pull_right$', $right_items, $r );
 		$r = str_replace( '$pull_left$', $left_items, $r );
-		
+
 		if( isset($tab_pane_params['id']) )
 		{
 			$r = str_replace( '$id$', $tab_pane_params['id'], $r );
 		}
-		
+
 		$r = str_replace( '$class$', $tab_pane_params['class'], $r );
-		
+
 		return $this->display_or_return( $r );
 	}
 
@@ -963,7 +963,7 @@ class Form extends Widget
 	function close_tab_pane()
 	{
 		$r = $this->tab_pane_close;
-		
+
 		return $this->display_or_return( $r );
 	}
 
@@ -5074,11 +5074,11 @@ class Form extends Widget
 		// Display attachments:
 		if( ! $attachment_tab )
 		{
-		    display_attachments_fieldset( $this, $LinkOwner, $fold, $fieldset_prefix );
+			display_attachments_fieldset( $this, $LinkOwner, $fold, $fieldset_prefix );
 		}
 		else
 		{
-		    display_attachments_tab_pane( $this, $LinkOwner, $fold, $fieldset_prefix );
+			display_attachments_tab_pane( $this, $LinkOwner, $fold, $fieldset_prefix );
 		}
 
 		// Insert image modal window:

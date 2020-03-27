@@ -564,8 +564,6 @@ class AdminUI extends AdminUI_general
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
 															.'<legend class="panel-heading" $title_attribs$><h3 class="panel-title">$fieldset_title$</h3></legend><div class="panel-body $class$">'."\n",
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
-					
-				    
 					'tab_pane_open' => '<div id="$id$" class="tab-pane fade $class$" $tab_pane_attribs$ ><div class="pull-left">$pull_left$</div><div class="pull-right">$pull_right$</div><div class="clearfix"></div>'."\n",
 					'tab_pane_close'   => '</div>'."\n",
 					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
