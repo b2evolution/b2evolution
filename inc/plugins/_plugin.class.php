@@ -3505,7 +3505,7 @@ class Plugin
 
 			if( is_admin_page() || empty( $Blog ) )
 			{	// Get plugin url for nack-office and when collection is not viewed now:
-				$r = get_same_domain_url( $plugins_url ).$sub_path;
+				$r = $plugins_url.$sub_path;
 			}
 			else
 			{	// Get plugin url depending on collection setting:

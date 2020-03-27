@@ -126,7 +126,7 @@ headers_content_mightcache( 'text/html' );		// In most situations, you do NOT wa
 <!DOCTYPE html>
 <html lang="<?php locale_lang() ?>" class="evo_customizer__html">
 <head>
-	<base href="<?php echo get_same_domain_url( $baseurl ); ?>">
+	<base href="<?php echo $baseurl; ?>">
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">

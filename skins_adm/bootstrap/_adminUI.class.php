@@ -68,11 +68,11 @@ class AdminUI extends AdminUI_general
 		// Make sure standard CSS is called ahead of custom CSS generated below:
 		if( $debug )
 		{	// Use readable CSS:
-			require_css( get_same_domain_url( $adminskins_url ).'bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( $adminskins_url.'bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
 		else
 		{	// Use minified CSS:
-			require_css( get_same_domain_url( $adminskins_url ).'bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( $adminskins_url.'bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
 
 		// Load general JS file:
