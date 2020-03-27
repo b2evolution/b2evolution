@@ -155,7 +155,6 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 {
 	global $admin_url, $inc_path;
 	global $current_User, $action;
-	global $attachment_tab;
 
 	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
 	{	// Files module is not enabled:
@@ -207,15 +206,7 @@ function display_attachments_fieldset( & $Form, & $LinkOwner, $fold = false, $fi
 			break;
 	}
 
-	if( !$attachment_tab )
-	{
-		$fieldset_title = T_( 'Images &amp; Attachments' );
-	}
-	else
-	{
-		$fieldset_title = '';
-		$fold = false;
-	}
+	$fieldset_title = T_( 'Images &amp; Attachments' );
 
 	if( is_admin_page() )
 	{	// Display a link to manual page only on back-office:
@@ -1083,5 +1074,177 @@ function display_subtype( $link_ID )
 	$current_File = $Link->get_File();
 
 	return $Link->get_preview_thumb();
+}
+
+/**
+ * Display attachments tab pane
+ *
+ * @param object Form
+ * @param object LinkOwner object
+ * @param boolean true to allow folding for this fieldset, false otherwise
+ * @param string Tab pane prefix
+ */
+function display_attachments_tab_pane( & $Form, & $LinkOwner, $fold = false, $tab_pane_prefix = '' )
+{
+	global $admin_url, $inc_path;
+	global $current_User, $action;
+
+	if( ! isset( $GLOBALS[ 'files_Module' ] ) )
+	{	// Files module is not enabled:
+		return;
+	}
+
+	if( ! $LinkOwner->check_perm( 'edit', false ) )
+	{	// Current user has no perm to edit the link owner:
+		return;
+	}
+
+	// Set title for modal window:
+	switch( $LinkOwner->type )
+	{
+		case 'item':
+			if( $LinkOwner->is_temp() )
+			{
+				$window_title = '';
+			}
+			else
+			{
+				$window_title = format_to_js( sprintf( T_('Attach files to "%s"'), $LinkOwner->Item->get( 'title' ) ) );
+				if( ! $LinkOwner->Item->check_proposed_change_restriction() )
+				{	// Display overlay if the Item has a restriction by existing proposed change:
+					$restriction_overlay = T_('You must save the post and/or accept the proposed changes before you can edit the attachments.');
+				}
+			}
+			$form_id = 'itemform_links';
+			break;
+
+		case 'comment':
+			$window_title = $LinkOwner->is_temp() ? '' : format_to_js( sprintf( T_('Attach files to comment #%s'), $LinkOwner->Comment->ID ) );
+			$form_id = 'cmntform_links';
+			break;
+
+		case 'emailcampaign':
+			$window_title = format_to_js( sprintf( T_('Attach files to email campaign "%s"'), $LinkOwner->EmailCampaign->get( 'name' ) ) );
+			$form_id = 'ecmpform_links';
+			break;
+
+		case 'message':
+			$window_title = '';
+			$form_id = 'msgform_links';
+			break;
+
+		default:
+			$window_title = '';
+			$form_id = 'atchform_links';
+			break;
+	}
+
+	$items_left = '';
+	$items_right = '';
+
+	if( is_admin_page() )
+	{	// Display a link to manual page only on back-office:
+		$items_right .= ' '.get_manual_link( 'images-attachments-panel' );
+	}
+
+	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) )
+	{	// Check if current user has a permission to back-office files manager:
+		$attach_files_url = $admin_url.'?ctrl=files&amp;fm_mode=link_object&amp;link_type='.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).( $LinkOwner->type != 'message' ? '&amp;link_object_ID='.$LinkOwner->get_ID() : '' );
+		if( $linkowner_FileList = $LinkOwner->get_attachment_FileList( 1 ) )
+		{	// Get first file of the Link Owner:
+			$linkowner_File = & $linkowner_FileList->get_next();
+			if( ! empty( $linkowner_File ) && $current_User->check_perm( 'files', 'view', false, $linkowner_File->get_FileRoot() ) )
+			{	// Obtain and use file root of first file:
+				$linkowner_FileRoot = & $linkowner_File->get_FileRoot();
+				$attach_files_url .= '&amp;root='.$linkowner_FileRoot->ID;
+				$attach_files_url .= '&amp;path='.dirname( $linkowner_File->get_rdfs_rel_path() ).'/';
+			}
+		}
+		$items_left .= action_icon( T_('Attach existing files'), 'folder', $attach_files_url,
+				T_('Attach existing files'), 3, 4,
+				array( 'onclick' => 'return link_attachment_window( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'\', \'\', \'\', \''.$tab_pane_prefix.'\' )' ) );
+		if( ! $LinkOwner->is_temp() )
+		{	// Don't allow this option for new creating objects:
+			$items_left .= action_icon( T_('Attach existing files'), 'permalink', $attach_files_url,
+				T_('Attach existing files'), 1, 0,
+				array( 'target' => '_blank' ) );
+		}
+	}
+
+	$items_right .= action_icon( T_('Refresh'), 'refresh', $LinkOwner->get_edit_url(),
+			T_('Refresh'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\' )' ) )
+
+		.action_icon( T_('Sort'), 'ascending', ( is_admin_page() || ( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) ) )
+			? $admin_url.'?ctrl=links&amp;action=sort_links&amp;link_type='.$LinkOwner->type.'&amp;link_object_ID='.$LinkOwner->get_ID().'&amp;'.url_crumb( 'link' )
+			: $LinkOwner->get_edit_url().'#',
+			T_('Sort'), 3, 4, array( 'class' => 'action_icon btn btn-default btn-sm', 'onclick' => 'return evo_link_refresh_list( \''.( $LinkOwner->is_temp() ? 'temporary' : $LinkOwner->type ).'\', \''.$LinkOwner->get_ID().'\', \'sort\' )' ) );
+
+	// Get a count of links in order to deny folding when there is at least one link
+	$links_count = count( $LinkOwner->get_Links() );
+	$Form->open_tab_pane( array(
+			'id' => 'attachment',
+			'class' => 'in active tab_pane_no_pads',
+			'left_items' => $items_left,
+			'right_items' => $items_right
+
+		) );
+
+	echo '<div id="'.$tab_pane_prefix.'attachments_fieldset_wrapper" class="evo_attachments_fieldset__wrapper">';
+		if( ! empty( $restriction_overlay ) )
+		{	// Restrict attachments with overlay:
+			echo '<div id="'.$tab_pane_prefix.'attachments_fieldset_overlay" class="evo_attachments_fieldset__overlay"><b>'.$restriction_overlay.'</b></div>';
+		}
+		echo '<div id="'.$tab_pane_prefix.'attachments_fieldset_block" class="evo_attachments_fieldset__block">';
+			echo '<div id="'.$tab_pane_prefix.'attachments_fieldset_table" class="evo_attachments_fieldset__table">';
+				require $inc_path.'links/views/_link_list.view.php';
+			echo '</div>';
+		echo '</div>';
+	echo '</div>';
+
+	
+	$Form->close_tab_pane();
+	
+
+	// Show fieldset of quick uploader only when JS is enabled:
+	echo '<script type="text/javascript">jQuery( "#'.$tab_pane_prefix.$form_id.'" ).show()</script>';
+
+	if( is_logged_in() && $current_User->check_perm( 'admin', 'restricted' ) && $current_User->check_perm( 'files', 'view' ) && empty( $restriction_overlay ) )
+	{	// Check if current user has a permission to back-office files manager:
+
+		// Initialize JavaScript to build and open window:
+		echo_modalwindow_js();
+?>
+<script>
+function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_highlight, prefix )
+{
+	openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="<?php echo T_('Loading...'); ?>"></span>',
+		'90%', '80%', true, '<?php echo $window_title; ?>', '', true );
+	jQuery.ajax(
+	{
+		type: 'POST',
+		url: '<?php echo get_htsrv_url(); ?>async.php',
+		data:
+		{
+			'action': 'link_attachment',
+			'link_owner_type': link_owner_type,
+			'link_owner_ID': link_owner_ID,
+			'crumb_link': '<?php echo get_crumb( 'link' ); ?>',
+			'root': typeof( root ) == 'undefined' ? '' : root,
+			'path': typeof( path ) == 'undefined' ? '' : path,
+			'fm_highlight': typeof( fm_highlight ) == 'undefined' ? '' : fm_highlight,
+			'prefix': typeof( prefix ) == 'undefined' ? '' : prefix,
+		},
+		success: function(result)
+		{
+			openModalWindow( result, '90%', '80%', true, '<?php echo $window_title; ?>', '' );
+		}
+	} );
+	return false;
+}
+</script>
+<?php
+// Print JS function to allow edit file properties on modal window
+echo_file_properties();
+	}
 }
 ?>

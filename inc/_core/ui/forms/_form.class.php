@@ -916,6 +916,56 @@ class Form extends Widget
 		return $this->display_or_return( $r );
 	}
 
+	/**
+	 * Open a tab-pane block
+	 * @param array Optional params.
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function open_tab_pane( $tab_pane_params = array() )
+	{
+		$tab_pane_params = array_merge( array(
+				'class'     => 'tab-pane fade',
+			), $tab_pane_params );
+		
+		$left_items = '';
+		$right_items = '';
+		
+		if( isset( $tab_pane_params['left_items'] ) )
+		{
+			$left_items = $tab_pane_params['left_items'];
+			unset( $tab_pane_params['left_items'] );
+		}
+		if( isset( $tab_pane_params['right_items'] ) )
+		{
+			$right_items = $tab_pane_params['right_items'];
+			unset( $tab_pane_params['right_items'] );
+		}
+
+		$r = str_replace( '$tab_pane_attribs$', get_field_attribs_as_string( $tab_pane_params ), $this->tab_pane_open );
+		$r = str_replace( '$pull_right$', $right_items, $r );
+		$r = str_replace( '$pull_left$', $left_items, $r );
+		
+		if( isset($tab_pane_params['id']) )
+		{
+			$r = str_replace( '$id$', $tab_pane_params['id'], $r );
+		}
+		
+		$r = str_replace( '$class$', $tab_pane_params['class'], $r );
+		
+		return $this->display_or_return( $r );
+	}
+
+	/**
+	 * close a tab-pane block.
+	 *
+	 * @return true|string true (if output) or the generated HTML if not outputting
+	 */
+	function close_tab_pane()
+	{
+		$r = $this->tab_pane_close;
+		
+		return $this->display_or_return( $r );
+	}
 
 	/**
 	 * Builds a fieldset tag. This is a "fieldset" element by default, but a "th" element
@@ -4963,6 +5013,7 @@ class Form extends Widget
 	function attachments_fieldset( $object, $fold = false, $fieldset_prefix = '' )
 	{
 		global $current_User;
+		global $attachment_tab;
 
 		// Get object type to initialize link owner
 		$object_type = get_class( $object );
@@ -5019,9 +5070,16 @@ class Form extends Widget
 			default:
 				debug_die( 'Wrong object type "'.$object_type.'" to display attachments fieldset!' );
 		}
-
-		// Display attachments fieldset:
-		display_attachments_fieldset( $this, $LinkOwner, $fold, $fieldset_prefix );
+		
+		// Display attachments:
+		if( ! $attachment_tab )
+		{
+		    display_attachments_fieldset( $this, $LinkOwner, $fold, $fieldset_prefix );
+		}
+		else
+		{
+		    display_attachments_tab_pane( $this, $LinkOwner, $fold, $fieldset_prefix );
+		}
 
 		// Insert image modal window:
 		echo_image_insert_modal();

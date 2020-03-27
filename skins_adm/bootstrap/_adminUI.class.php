@@ -354,7 +354,7 @@ class AdminUI extends AdminUI_general
 						'header_text' => '<div class="evo_pager"><div class="results_summary">$nb_results$ Results $reset_filters_button$</div><ul class="pagination">'
 								.'$prev$$first$$list_prev$$list$$list_next$$last$$next$'
 							.'</ul></div>',
-						'header_text_single' => '<div class="results_summary">$nb_results$ Results $reset_filters_button$</div>',
+						'header_text_single' => '<div class="results_summary">$nb_results$ attachments $reset_filters_button$</div>',
 					'header_end' => '</div>',
 					'head_title' => '<div class="panel-heading fieldset_title"><span class="pull-right panel_heading_action_icons">$global_icons$</span><h3 class="panel-title">$title$</h3></div>'."\n",
 					'global_icons_class' => 'btn btn-default btn-sm',
@@ -564,6 +564,10 @@ class AdminUI extends AdminUI_general
 					'fieldset_begin' => '<div class="fieldset_wrapper $class$" id="fieldset_wrapper_$id$"><fieldset $fieldset_attribs$><div class="panel panel-default">'."\n"
 															.'<legend class="panel-heading" $title_attribs$><h3 class="panel-title">$fieldset_title$</h3></legend><div class="panel-body $class$">'."\n",
 					'fieldset_end'   => '</div></div></fieldset></div>'."\n",
+					
+				    
+					'tab_pane_open' => '<div id="$id$" class="tab-pane fade $class$" $tab_pane_attribs$ ><div class="pull-left">$pull_left$</div><div class="pull-right">$pull_right$</div><div class="clearfix"></div>'."\n",
+					'tab_pane_close'   => '</div>'."\n",
 					'fieldstart'     => '<div class="form-group" $ID$>'."\n",
 					'fieldend'       => "</div>\n\n",
 					'labelclass'     => 'control-label col-sm-3',

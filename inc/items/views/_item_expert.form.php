@@ -314,27 +314,20 @@ $Form->begin_form( '', '', $params );
 
 	if( $current_User->check_perm( 'meta_comment', 'view', false, $Blog->ID ) )
 	{
-		echo '<li><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').'</a></li>';
+		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
+		echo '<li><a data-toggle="tab" href="#internal_comments">'.T_('Internal comments').( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ).'</a></li>';
 	}
 
 	echo '</ul>';
 
-
 	echo '<div class="tab-content">';
-
-	echo '<div id="attachment" class="tab-pane fade in active">';
 
 	$attachment_tab = true;
 	$fold_images_attachments_block = ( $orig_action != 'update_edit' && $orig_action != 'create_edit' ); // don't fold the links block on these two actions
 	$Form->attachments_fieldset( $edited_Item, $fold_images_attachments_block );
 
-	echo '</div>';
-
 	if( count( $custom_fields ) )
-	{	
-		echo '<div id="custom_fields" class="tab-pane fade">';
-
-		// Display fieldset with custom fields only if at least one exists:
+	{	// Display fieldset with custom fields only if at least one exists:
 		$custom_fields_title = get_manual_link( 'post-custom-fields-panel' );
 		if( $current_User->check_perm( 'options', 'edit' ) )
 		{	// Display an icon to edit post type if current user has a permission:
@@ -345,30 +338,25 @@ $Form->begin_form( '', '', $params );
 				.'</span>';
 		}
 
-		$Form->begin_fieldset( $custom_fields_title, array( 'id' => 'itemform_custom_fields', 'fold' => false ) );
-
+		$Form->open_tab_pane( array( 'id' => 'custom_fields', 'class' => 'tab_pane_pads', 'right_items' => $custom_fields_title ) );
+		
 		$Form->switch_layout( 'fields_table' );
-		$Form->begin_fieldset();
-
+		
 		// Display inputs to edit custom fields:
 		display_editable_custom_fields( $Form, $edited_Item );
 
-		$Form->end_fieldset();
 		$Form->switch_layout( NULL );
 
-		$Form->end_fieldset();
-
-		echo '</div>';
+		$Form->close_tab_pane();
 	}
 
-	echo '<div id="advance_properties" class="tab-pane fade">';
+	
 
 	// ############################ ADVANCED PROPERTIES #############################
 
-	$Form->begin_fieldset( get_manual_link( 'post-advanced-properties-panel' ), array( 'id' => 'itemform_adv_props', 'fold' => false ) );
+	$Form->open_tab_pane( array( 'id' => 'advance_properties', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'post-advanced-properties-panel' ) ) );
 
 	$Form->switch_layout( 'fields_table' );
-	$Form->begin_fieldset();
 
 	// URL slugs:
 	//add slug_changed field - needed for slug trim, if this field = 0 slug will trimmed
@@ -525,20 +513,15 @@ $Form->begin_form( '', '', $params );
 		}
 	}
 
-	$Form->end_fieldset();
 	$Form->switch_layout( NULL );
 
-	$Form->end_fieldset();
-
-	echo '</div>';
-	
-	echo '<div id="allowtrackbacks" class="tab-pane fade">';
+	$Form->close_tab_pane();
 
 	// ####################### ADDITIONAL ACTIONS #########################
 
 	if( isset( $Blog ) && $Blog->get('allowtrackbacks') )
 	{
-		$Form->begin_fieldset( get_manual_link( 'post-edit-additional-actions-panel' ), array( 'id' => 'itemform_additional_actions', 'fold' => false ) );
+		$Form->open_tab_pane( array( 'id' => 'allowtrackbacks', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'post-edit-additional-actions-panel' ) ) );
 
 		// --------------------------- TRACKBACK --------------------------------------
 		?>
@@ -549,12 +532,8 @@ $Form->begin_form( '', '', $params );
 		</div>
 		<?php
 
-		$Form->end_fieldset();
+		$Form->close_tab_pane();
 	}
-
-	echo '</div>';
-	
-	echo '<div id="internal_comments" class="tab-pane fade">';
 
 	// ####################### PLUGIN FIELDSETS #########################
 
@@ -562,13 +541,10 @@ $Form->begin_form( '', '', $params );
 	{
 		// ####################### INTERNAL COMMENTS #########################
 		$currentpage = param( 'currentpage', 'integer', 1 );
-		$total_comments_number = generic_ctp_number( $edited_Item->ID, 'metas', 'total' );
 		param( 'comments_number', 'integer', $total_comments_number );
 		param( 'comment_type', 'string', 'meta' );
 
-		$Form->begin_fieldset( get_manual_link( 'meta-comments-panel' )
-						.( $total_comments_number > 0 ? ' <span class="badge badge-important">'.$total_comments_number.'</span>' : '' ),
-					array( 'id' => 'itemform_meta_cmnt', 'fold' => false, 'deny_fold' => ( $total_comments_number > 0 ) ) );
+		$Form->open_tab_pane( array( 'id' => 'internal_comments', 'class' => 'tab_pane_pads', 'right_items' => get_manual_link( 'meta-comments-panel' ) ) );
 
 		if( $creating )
 		{	// Display button to save new creating item:
@@ -613,10 +589,8 @@ $Form->begin_form( '', '', $params );
 			load_funcs( 'comments/model/_comment_js.funcs.php' );
 		}
 
-		$Form->end_fieldset();
+		$Form->close_tab_pane();
 	}
-
-	echo '</div>';
 
 	echo '</div>';
 
@@ -1203,12 +1177,10 @@ if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
 // JS to post excerpt mode switching:
 ?>
 <script>			    
-// Align tab content header to right:
-jQuery( ".content-form-with-tab .tab-content .panel-title" ).addClass( 'text-right' );	
 // Attachment tab height:
-jQuery( ".content-form-with-tab #attachments_fieldset_wrapper" ).css( 'height', 'auto' );
+jQuery( ".content-form-with-tab .tab-content #attachment #attachments_fieldset_wrapper" ).css( 'height', 'auto' );
 // Show attachment tab result summary in single line
-jQuery( ".content-form-with-tab .results_summary" ).detach().prependTo( '.content-form-with-tab #attachment .panel-heading' );
+jQuery( ".content-form-with-tab .results_summary" ).detach().prependTo( '.content-form-with-tab #attachment .pull-left' );
 jQuery( '.content-form-with-tab .nav-tabs a' ).on( 'shown.bs.tab', function( event )
 {	// Do tab wise operations
 	tab_href_value = jQuery( event.target ).attr( "href" );
@@ -1216,6 +1188,10 @@ jQuery( '.content-form-with-tab .nav-tabs a' ).on( 'shown.bs.tab', function( eve
 	if( tab_href_value === '#advance_properties' )
 	{
 		jQuery( window ).resize();
+	}
+	if( tab_href_value === '#attachment' )
+	{
+		jQuery( ".content-form-with-tab .tab-content #attachment #attachments_fieldset_wrapper" ).css( 'height', 'auto' );	
 	}
 });
 if( jQuery( '.content-form-with-tab #nav_tabs_selected' ).val() != '' )

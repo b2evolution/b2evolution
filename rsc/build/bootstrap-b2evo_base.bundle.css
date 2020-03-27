@@ -1171,18 +1171,33 @@ tbody.fieldset_wrapper.folded + tbody[id^=cat_sel_] {
   border-width: 0 1px 1px;
   padding: 1px;
 }
-.content-form-with-tab .tab-content .panel {
-  border-radius: 0px;
-  border: none;
-  margin-bottom: 0px;
+.content-form-with-tab .tab-content .tab_pane_no_pads .pull-left,
+.content-form-with-tab .tab-content .tab_pane_no_pads .pull-right {
+  line-height: 36px;
+  padding-right: 15px;
+  padding-left: 10px;
+  padding-bottom: 5px;
 }
-.content-form-with-tab .tab-content .panel-default .panel-heading {
+.content-form-with-tab .tab-content .tab_pane_pads {
+  padding: 0 15px 15px 15px;
+}
+.content-form-with-tab .tab-content .tab_pane_pads .pull-left,
+.content-form-with-tab .tab-content .tab_pane_pads .pull-right {
   color: #333;
-  background-color: transparent;
-  border-color: transparent;
+  line-height: 36px;
+  padding-bottom: 5px;
+}
+.content-form-with-tab .tab-content .tab_pane_no_pads a,
+.content-form-with-tab .tab-content .tab_pane_pads a {
+  color: #333;
+}
+.content-form-with-tab .badge {
+  margin-top: -1px;
 }
 .content-form-with-tab .results_summary {
   margin-top: 0px;
+  margin-right: 5px;
+  font-weight: normal;
 }
 .content-form-with-tab .results_header {
   display: none;
