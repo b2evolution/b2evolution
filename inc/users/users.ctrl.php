@@ -738,13 +738,13 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			$SQL_main = new SQL();
-			$SQL_main->SELECT( 'user_login, user_email, user_firstname, user_lastname, user_nickname, ctry_code, user_locale' );
-			$SQL_main->FROM( 'T_users' );
-			$SQL_main->FROM_add( 'LEFT JOIN T_regional__country ON ctry_ID = user_ctry_ID' );
-			$SQL_main->WHERE( 'user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ORDER BY user_ID' );
-			$user_main_sql = $SQL_main->get();
-			$users = $DB->get_results( $user_main_sql, ARRAY_A, 'Get users data for export users into CSV file' );
+			$users_SQL = new SQL();
+			$users_SQL->SELECT( 'user_login, user_email, user_firstname, user_lastname, user_nickname, ctry_code, user_locale' );
+			$users_SQL->FROM( 'T_users' );
+			$users_SQL->FROM_add( 'LEFT JOIN T_regional__country ON ctry_ID = user_ctry_ID' );
+			$users_SQL->WHERE( 'user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ORDER BY user_ID' );
+			$users_raw_SQL = $users_SQL->get();
+			$users = $DB->get_results( $users_raw_SQL, ARRAY_A, 'Get users data for export users into CSV file' );
 
 			header_nocache();
 			header_content_type( 'text/csv' );
