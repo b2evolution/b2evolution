@@ -7911,11 +7911,11 @@ function echo_editable_column_js( $params = array() )
 	$params = array_merge( array(
 			'column_selector' => '', // jQuery selector of cell
 			'ajax_url'        => '', // AJAX url to update a column value
-			'options'         => array(), // Key = Value of option, Value = Title of option
+			'options'         => array(), // Key = Value of option, Value = Title of option. Do not use Javascript code to populate this - use 'options_eval' param to do this.
 			'new_field_name'  => '', // Name of _POST variable that will be send to ajax request with new value
 			'ID_value'        => '', // jQuery to get value of ID
 			'ID_name'         => '', // ID of field in DB
-			'tooltip'         => TS_('Click to edit'),
+			'tooltip'         => T_('Click to edit'),
 			'colored_cells'   => false, // Use TRUE when colors are used for background of cell
 			'print_init_tags' => true, // Use FALSE to don't print <script> tags if it is already used inside js
 			'field_type'      => 'select', // Type of the editable field: 'select', 'text'
@@ -7924,122 +7924,7 @@ function echo_editable_column_js( $params = array() )
 			'callback_code'   => '', // Additional JS code after main callback code
 		), $params );
 
-	// Set onblur action to 'submit' when type is 'text' in order to don't miss the selected user login from autocomplete list
-	$onblur_action = $params['field_type'] == 'text' ? 'submit' : 'cancel';
-
-	if( $params['field_type'] == 'select' )
-	{
-		$options = '';
-		if( is_array( $params['options'] ) )
-		{
-			foreach( $params['options'] as $option_value => $option_title )
-			{
-				$options .= '\''.$option_value.'\':\''.$option_title.'\','."\n";
-			}
-		}
-	}
-
-	if( $params['print_init_tags'] )
-	{
-?>
-<script>
-jQuery( document ).ready( function()
-{
-<?php
-	}
-?>
-if( jQuery( '<?php echo $params['column_selector']; ?>' ).length > 0 )
-{	// Initialize only when the requested element exists on the current page:
-	jQuery( '<?php echo $params['column_selector']; ?>' ).editable( '<?php echo $params['ajax_url']; ?>',
-	{
-		data: function( value, settings )
-		{
-			value = ajax_debug_clear( value );
-			<?php if( $params['field_type'] == 'select' ) { ?>
-			var result = value.match( /rel="([^"]*)"/ );
-			<?php
-			if( is_array( $params['options'] ) )
-			{
-				echo "return { ".$options."'selected' : result[1] }";
-			}
-			else
-			{
-				echo "return ".$params['options'];
-			}
-			?>
-			<?php } else { ?>
-			var result = value.match( />\s*([^<]+)\s*</ );
-			return result[1] == '<?php echo $params['null_text'] ?>' ? '' : result[1];
-			<?php } ?>
-		},
-		type       : '<?php echo $params['field_type']; ?>',
-		class_name : '<?php echo $params['field_class']; ?>',
-		name       : '<?php echo $params['new_field_name']; ?>',
-		tooltip    : '<?php echo $params['tooltip']; ?>',
-		event      : 'click',
-		onblur     : '<?php echo $onblur_action; ?>',
-		onedit     : function ( settings, original )
-		{
-			// Set width to fix value to don't change it on selector displaying:
-			var wrapper_width = jQuery( original ).width();
-			jQuery( original ).css( { 'width': wrapper_width, 'max-width': wrapper_width } );
-		},
-		callback   : function ( settings, original )
-		{
-			<?php
-			if( $params['colored_cells'] )
-			{ // Use different color for each value
-			?>
-			jQuery( this ).html( ajax_debug_clear( settings ) );
-			var link = jQuery( this ).find( 'a' );
-			jQuery( this ).css( 'background-color', link.attr( 'color' ) == 'none' ? 'transparent' : link.attr( 'color' ) );
-			link.removeAttr( 'color' );
-			<?php
-			}
-			else
-			{ // Use simple fade effect
-			?>
-			if( typeof( evoFadeSuccess ) == 'function' )
-			{
-				evoFadeSuccess( this );
-			}
-			<?php
-			}
-			// Execute additional code:
-			echo $params['callback_code'];
-			?>
-		},
-		submitdata : function( value, settings )
-		{
-			return { <?php echo $params['ID_name']; ?>: <?php echo $params['ID_value']; ?> }
-		},
-		onerror : function( settings, original, xhr )
-		{
-			if( typeof( evoFadeFailure ) == 'function' )
-			{
-				evoFadeFailure( original );
-			}
-			var input = jQuery( original ).find( 'input' );
-			if( input.length > 0 )
-			{
-				jQuery( original ).find( 'span.field_error' ).remove();
-				input.addClass( 'field_error' );
-				if( typeof( xhr.responseText ) != 'undefined' )
-				{
-					input.after( '<span class="note field_error">' + xhr.responseText + '</span>' );
-				}
-			}
-		}
-	} );
-}
-<?php
-	if( $params['print_init_tags'] )
-	{
-?>
-} );
-</script>
-<?php
-	}
+	expose_var_to_js( $params['column_selector'], $params, 'evo_init_editable_column_config' );
 }
 
 

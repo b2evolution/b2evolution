@@ -205,7 +205,7 @@ echo_editable_column_js( array(
 	'ID_name'         => 'post_ID',
 	'field_type'      => $field_type,
 	'field_class'     => 'autocomplete_login only_assignees',
-	'null_text'       => TS_('No user') ) );
+	'null_text'       => T_('No user') ) );
 
 // Print JS to edit a task status
 global $DB;
@@ -239,7 +239,7 @@ foreach( $post_status_types as $post_status_type )
 echo_editable_column_js( array(
 	'column_selector' => '.task_status_edit',
 	'ajax_url'        => get_htsrv_url().'async.php?action=item_task_edit&field=status&'.url_crumb( 'itemtask' ),
-	'options'         => 'getApplicableStatus( jQuery( this ), result[1] );',
+	'options_eval'    => 'getApplicableStatus( jQuery( this ), result[1] );',
 	'new_field_name'  => 'new_status',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',
 	'ID_name'         => 'post_ID' ) );
