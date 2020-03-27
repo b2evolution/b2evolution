@@ -1376,7 +1376,7 @@ function insert_shared_widgets( $skin_type )
  */
 function display_container( $WidgetContainer, $params = array() )
 {
-	global $Collection, $Blog, $DB, $admin_url, $embedded_containers, $mode;
+	global $Collection, $Blog, $DB, $embedded_containers, $mode;
 	global $Session;
 
 	$params = array_merge( array(
@@ -1397,14 +1397,14 @@ function display_container( $WidgetContainer, $params = array() )
 	{
 		$widget_container_id = 'wico_ID_'.$WidgetContainer->ID;
 		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_ID='.$WidgetContainer->ID.'&amp;container='.$widget_container_id );
-		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;'.url_crumb('widget_container') );
+		$destroy_container_url = get_admin_url( 'ctrl=widgets&amp;action=destroy_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;'.url_crumb('widget_container') );
 	}
 	else
 	{
 		$wico_code = $WidgetContainer->get( 'code' );
 		$widget_container_id = 'wico_code_'.$wico_code;
 		$add_widget_url = regenerate_url( '', 'action=new&amp;wico_code='.$wico_code.'&amp;container='.$widget_container_id );
-		$destroy_container_url = url_add_param( $admin_url, 'ctrl=widgets&amp;action=destroy_container&amp;wico_code='.$wico_code.'&amp;'.url_crumb('widget_container') );
+		$destroy_container_url = get_admin_url( 'ctrl=widgets&amp;action=destroy_container&amp;wico_code='.$wico_code.'&amp;'.url_crumb('widget_container') );
 	}
 
 	if( $mode == 'customizer' )
@@ -1424,14 +1424,14 @@ function display_container( $WidgetContainer, $params = array() )
 		$Table->title = '<span class="container_name" data-wico_id="'.$widget_container_id.'">'.$widget_container_name.'</span>';
 		if( ! empty( $WidgetContainer->ID ) )
 		{	// Link to edit current widget container:
-			$Table->global_icon( T_('Edit widget container'), 'edit', $admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;mode='.$mode, T_('Edit widget container'), 0, 0 );
+			$Table->global_icon( T_('Edit widget container'), 'edit', get_admin_url( 'ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;mode='.$mode ), T_('Edit widget container'), 0, 0 );
 		}
 	}
 	else
 	{	// Normal/back-office mode:
 		if( ! empty( $WidgetContainer->ID ) )
 		{
-			$widget_container_name = '<a href="'.$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.( $mode == 'customizer' ? '&amp;mode='.$mode : '' ).'">'.$widget_container_name.'</a>';
+			$widget_container_name = '<a href="'.get_admin_url( 'ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=edit_container&amp;wico_ID='.$WidgetContainer->ID.( $mode == 'customizer' ? '&amp;mode='.$mode : '' ) ).'">'.$widget_container_name.'</a>';
 			if( $WidgetContainer->get_type() == 'page' )
 			{	// Display additional info for Page Container:
 				$ItemCache = & get_ItemCache();
@@ -1455,14 +1455,14 @@ function display_container( $WidgetContainer, $params = array() )
 		if( get_default_widgets_by_container( $WidgetContainer->get( 'code' ) ) !== false )
 		{	// Action icon to remove all widgets and replace with default widgets of the container from config:
 			$Table->global_icon( T_('Reload container widgets'), 'reload',
-				$admin_url.'?ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;skin_type='.get_param( 'skin_type' ).'&amp;'.url_crumb( 'widget_container' ),
+				get_admin_url( 'ctrl=widgets&amp;blog='.$Blog->ID.'&amp;action=reload_container&amp;wico_ID='.$WidgetContainer->ID.'&amp;skin_type='.get_param( 'skin_type' ).'&amp;'.url_crumb( 'widget_container' ) ),
 				'', 0, 0, array( 'onclick' => 'return confirm( \''.TS_('Do you want to reload the default widgets for this container?').'\n'.TS_('THIS CANNOT BE UNDONE!').'\n'.TS_('YOU MAY LOSE SOME CUSTOMIZATIONS!').'\' )' ) );
 		}
 
 		$add_widget_link_params = array();
 		if( $mode == 'customizer' )
 		{	// Set special url to add new widget on customizer mode:
-			$add_widget_url = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container='.urlencode( $WidgetContainer->get( 'name' ) ).'&container_code='.urlencode( $WidgetContainer->get( 'code' ) ).'&mode=customizer';
+			$add_widget_url = get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=add_list&container='.urlencode( $WidgetContainer->get( 'name' ) ).'&container_code='.urlencode( $WidgetContainer->get( 'code' ) ).'&mode=customizer' );
 		}
 		else
 		{	// Add id for link to initialize JS code of opening modal window only for not customizer mode,
@@ -1598,7 +1598,7 @@ function display_container( $WidgetContainer, $params = array() )
 					case 'denied':
 						echo action_icon( T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ),
 							'block_cache_denied',
-							$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching', NULL, NULL, NULL,
+							get_admin_url( 'ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID ).'#fieldset_wrapper_caching', NULL, NULL, NULL,
 							array( 'rel' => $widget_cache_status ) );
 						break;
 

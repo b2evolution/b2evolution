@@ -1159,7 +1159,7 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	{ // Get the file from $rsc_uri relative to the current blog's domain (may be a subdomain or a custom domain):
 		if( $assets_baseurl !== $baseurl )
 		{ // We are using a specific domain, don't try to load from blog specific domain
-			$lib_url = $rsc_url.$subfolder.'/'.$lib_file;
+			$lib_url = get_same_domain_url( $rsc_url ).$subfolder.'/'.$lib_file;
 		}
 		else
 		{
@@ -1183,7 +1183,7 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	}
 	else
 	{ // Get the file from $rsc_url:
-		$lib_url = $rsc_url.$subfolder.'/'.$lib_file;
+		$lib_url = get_same_domain_url( $rsc_url ).$subfolder.'/'.$lib_file;
 	}
 
 	if( ! empty( $version ) )

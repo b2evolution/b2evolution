@@ -1159,4 +1159,45 @@ function url_clear_noredir_params( $url, $glue = '&', $custom_noredir_params = a
 	// Append allowed params from current URL to the given URL:
 	return url_add_param( $url, $allowed_params, $glue );
 }
+
+
+/**
+ * Get URL with same domain as current URL
+ *
+ * @param string Original URL to check and use with current domain
+ * @return string Fixed URL with domain of current URL
+ */
+function get_same_domain_url( $url )
+{
+	global $ReqHost;
+
+	if( ! isset( $ReqHost ) || strpos( $url, $ReqHost ) === 0 )
+	{	// If domain of original URL is same as current URL domain:
+		return $url;
+	}
+	else
+	{	// Use current domain if domains are different, e.g. when collection URL uses subdomain or different absolute URL:
+		return preg_replace( '#https?://[^/]+#i', $ReqHost, $url );
+	}
+}
+
+
+/**
+ * Get admin URL
+ *
+ * @param string URL params
+ * @param string Delimiter to use for more params
+ * @return string Admin URL
+ */
+function get_admin_url( $url_params = '', $glue = '&amp;' )
+{
+	global $admin_url, $current_admin_url;
+
+	if( ! isset( $current_admin_url ) )
+	{	// Initialize current admin URL once:
+		$current_admin_url = get_same_domain_url( $admin_url );
+	}
+
+	return url_add_param( $current_admin_url, $url_params, $glue );
+}
 ?>

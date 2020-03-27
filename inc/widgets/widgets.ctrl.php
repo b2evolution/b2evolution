@@ -53,7 +53,7 @@ else
 	// Note: we may still have permission to edit categories!!
 	$Messages->add( T_('Sorry, you have no permission to edit collection properties.'), 'error' );
 	// Redirect to collections list:
-	header_redirect( $admin_url.'?ctrl=collections' );
+	header_redirect( get_admin_url( 'ctrl=collections', '&' ) );
 	// EXITED.
 }
 
@@ -351,7 +351,7 @@ switch( $action )
 
 			case 'normal' :
 			default : // take usual action
-				header_redirect( '?ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID.( $mode == 'customizer' ? '&mode=customizer' : '' ) );
+				header_redirect( get_admin_url( 'ctrl=widgets&action=edit&wi_ID='.$edited_ComponentWidget->ID.( $mode == 'customizer' ? '&mode=customizer' : '' ), '&' ) );
 				break;
 		}
 		break;
@@ -400,7 +400,7 @@ switch( $action )
 			}
 			if( $action == 'update_edit' )
 			{	// Stay on edit widget form:
-				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&action=edit&wi_ID='.$edited_ComponentWidget->ID.'&display_mode='.$display_mode, 303 );
+				header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&action=edit&wi_ID='.$edited_ComponentWidget->ID.'&display_mode='.$display_mode, '&' ), 303 );
 			}
 			else
 			{	// If $action == 'update'
@@ -411,7 +411,7 @@ switch( $action )
 					// (e.g. used to display new auto created sub-container by widget "Columns(Sub-Containers)" - subcontainer_row_Widget)
 					$Session->set( 'refresh_customizer_window', 1 );
 				}
-				header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+				header_redirect( get_admin_url( '?ctrl=widgets&blog='.$Blog->ID, '&' ), 303 );
 			}
 		}
 		elseif( $display_mode == 'js' )
@@ -524,7 +524,7 @@ switch( $action )
 			// EXITS:
 			send_javascript_message( array( 'doToggle' => array( $edited_ComponentWidget->ID, (int)! $enabled, $plugin_disabled ) ) );
 		}
-		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+		header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID, '&' ), 303 );
 		break;
 
 	case 'cache_enable':
@@ -561,7 +561,7 @@ switch( $action )
 					$edited_ComponentWidget->get_cache_status( true ),
 				) ) );
 		}
-		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID, 303 );
+		header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID, '&' ), 303 );
 		break;
 
 	case 'activate':
@@ -597,7 +597,7 @@ switch( $action )
 
 		if( $mode == 'customizer' )
 		{	// Set an URL to redirect back to customizer mode:
-			$redirect_to = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type.'&action=customize&mode=customizer';
+			$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type.'&action=customize&mode=customizer', '&' );
 			$WidgetContainerCache = & get_WidgetContainerCache();
 			if( $WidgetContainer = & $WidgetContainerCache->get_by_ID( $wico_ID, false, false ) )
 			{
@@ -606,7 +606,7 @@ switch( $action )
 		}
 		else
 		{	// Set an URL to redirect to normal mode:
-			$redirect_to = $admin_url.'?ctrl=widgets&blog='.$Blog->ID;
+			$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$Blog->ID, '&' );
 		}
 
 		header_redirect( $redirect_to, 303 );
@@ -634,7 +634,7 @@ switch( $action )
 			case 'normal' :
 			default : // take usual action
 				// PREVENT RELOAD & Switch to list mode:
-				header_redirect( '?ctrl=widgets&blog='.$blog );
+				header_redirect( get_admin_url( 'ctrl=widgets&blog='.$blog, '&' ) );
 				break;
 		}
 		break;
@@ -714,7 +714,7 @@ switch( $action )
 		// Save to DB, and display correpsonding messages:
 		$Blog->db_save_main_containers( true, $skin_type );
 
-		header_redirect( '?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type, 303 );
+		header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type, '&' ), 303 );
 		break;
 
 	case 'create_container':
@@ -741,11 +741,11 @@ switch( $action )
 			}
 			if( $mode == 'customizer' )
 			{	// Redirect back to customizer mode:
-				$redirect_to = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type.'&action=customize&mode=customizer';
+				$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$skin_type.'&action=customize&mode=customizer', '&' );
 			}
 			else
 			{	// Redirect back to back-office widgets list:
-				$redirect_to = $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' );
+				$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' ), '&' );
 			}
 			header_redirect( $redirect_to, 303 );
 		}
@@ -766,11 +766,11 @@ switch( $action )
 
 		if( $mode == 'customizer' )
 		{	// Redirect back to customizer mode:
-			$redirect_to = $admin_url.'?ctrl=widgets&blog='.$blog.'&skin_type='.$skin_type.'&action=customize&mode=customizer';
+			$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$blog.'&skin_type='.$skin_type.'&action=customize&mode=customizer', '&' );
 		}
 		else
 		{	// Redirect back to back-office widgets list:
-			$redirect_to = $admin_url.'?ctrl=widgets&blog='.$blog;
+			$redirect_to = get_admin_url( 'ctrl=widgets&blog='.$blog, '&' );
 		}
 		header_redirect( $redirect_to, 303 );
 		break;
@@ -799,7 +799,7 @@ switch( $action )
 		}
 
 		// Redirect back to back-office widgets list:
-		header_redirect( $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' ), 303 );
+		header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$edited_WidgetContainer->get( 'skin_type' ), '&' ), 303 );
 		break;
 
 	default:
@@ -851,7 +851,7 @@ if( $display_mode == 'normal' )
 
 	var widget_crumb_url_param = \''.url_crumb( 'widget' ).'\';
 
-	var b2evo_dispatcher_url = "'.$admin_url.'";' );
+	var b2evo_dispatcher_url = "'.get_admin_url().'";' );
 	require_js_defer( '#jqueryUI#' ); // auto requires jQuery
 	require_css( 'blog_widgets.css' );
 	init_tokeninput_js();
@@ -865,8 +865,8 @@ if( $display_mode == 'normal' )
 		$Session->delete( 'refresh_customizer_window' );
 	}
 
-	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
-	$AdminUI->breadcrumbpath_add( T_('Widgets'), $admin_url.'?ctrl=widgets&amp;blog=$blog$' );
+	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => get_admin_url( 'ctrl=collections' ) ) );
+	$AdminUI->breadcrumbpath_add( T_('Widgets'), get_admin_url( 'ctrl=widgets&amp;blog=$blog$' ) );
 
 	// Set an url for manual page:
 	$AdminUI->set_page_manual_link( 'widget-settings' );

@@ -26,7 +26,7 @@ $Timer->start( '_init_session' );
 load_funcs( '_core/_url.funcs.php' );
 if( !empty($is_admin_page) )
 {	// Make sure we are calling the right page (on the right domain) to make sure that session cookie goes through:
-	if( ! is_same_url( $ReqHost.$ReqPath, $admin_url, true ) )
+	if( ! is_same_url( $ReqHost.$ReqPath, get_admin_url(), true ) )
 	{	// The requested URL does not look like it's under the admin URL...
 		if( is_same_url( $ReqHost.$ReqPath, $baseurl.'admin.php', true ) )
 		{	// Permanent redirect from obsolete admin.php url:

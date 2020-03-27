@@ -68,11 +68,11 @@ class AdminUI extends AdminUI_general
 		// Make sure standard CSS is called ahead of custom CSS generated below:
 		if( $debug )
 		{	// Use readable CSS:
-			require_css( $adminskins_url.'bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( get_same_domain_url( $adminskins_url ).'bootstrap/rsc/css/style.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
 		else
 		{	// Use minified CSS:
-			require_css( $adminskins_url.'bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
+			require_css( get_same_domain_url( $adminskins_url ).'bootstrap/rsc/css/style.min.css', 'relative' );	// Relative to <base> tag (current skin folder)
 		}
 
 		// Load general JS file:
@@ -994,7 +994,7 @@ class AdminUI extends AdminUI_general
 	 */
 	function display_customizer_tabs( $params = array() )
 	{
-		global $Blog, $Settings, $current_User, $admin_url;
+		global $Blog, $Settings, $current_User;
 
 		$params = array_merge( array(
 				'action_links'   => '',
@@ -1021,7 +1021,7 @@ class AdminUI extends AdminUI_general
 		{	// If current User can edit site skin settings:
 			$tabs['site'] = array(
 				'text' => T_('Site'),
-				'href' => $admin_url.'?ctrl=customize&amp;view=site_skin',
+				'href' => get_admin_url( 'ctrl=customize&amp;view=site_skin' ),
 			);
 		}
 		// Collection:
@@ -1029,15 +1029,15 @@ class AdminUI extends AdminUI_general
 		{	// If current User can edit current collection settings:
 			$tabs['coll'] = array(
 				'text' => $tab_Blog->get( 'shortname' ),
-				'href' => $admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID,
+				'href' => get_admin_url( 'ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID ),
 				'entries' => array(
 					'skin' => array(
 						'text' => T_('Skin'),
-						'href' => $admin_url.'?ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID,
+						'href' => get_admin_url( 'ctrl=customize&amp;view=coll_skin&amp;blog='.$tab_Blog->ID ),
 					),
 					'widgets' => array(
 						'text' => T_('Widgets'),
-						'href' => $admin_url.'?ctrl=customize&amp;view=coll_widgets&amp;blog='.$tab_Blog->ID,
+						'href' => get_admin_url( 'ctrl=customize&amp;view=coll_widgets&amp;blog='.$tab_Blog->ID ),
 					),
 				)
 			);
@@ -1050,7 +1050,7 @@ class AdminUI extends AdminUI_general
 		{	// If current User can edit settings of at least two collections:
 			$tabs['other'] = array(
 				'text' => T_('Other'),
-				'href' => $admin_url.'?ctrl=customize&amp;view=other&amp;blog='.$tab_Blog->ID,
+				'href' => get_admin_url( 'ctrl=customize&amp;view=other&amp;blog='.$tab_Blog->ID ),
 			);
 		}
 

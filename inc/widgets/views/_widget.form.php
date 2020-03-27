@@ -130,7 +130,7 @@ $Form->end_fieldset();
 			if( ! $Blog->get_setting( 'cache_enabled_widgets' ) )
 			{ // Widget/block cache is disabled by blog setting
 				$l_meta['allow_blockcache']['note'] = sprintf( T_('This widget could be cached but the block cache is OFF. Click <a %s>here</a> to enable.'),
-						'href="'.$admin_url.'?ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID.'#fieldset_wrapper_caching"' );
+						'href="'.get_admin_url( 'ctrl=coll_settings&amp;tab=advanced&amp;blog='.$Blog->ID ).'#fieldset_wrapper_caching"' );
 				$l_meta['disabled'] = 'disabled';
 			}
 		}
@@ -171,7 +171,7 @@ if( $mode == 'customizer' )
 	{	// Display a button-link to go back (only in customizer mode):
 		$buttons[] = array( 'button', 'button', T_('Cancel'),
 			'tag'    => 'link',
-			'href'   => $admin_url.'?ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=customize&container_code='.urlencode( $edited_ComponentWidget->get_container_param( 'code' ) ).'&mode=customizer',
+			'href'   => get_admin_url( 'ctrl=widgets&blog='.$Blog->ID.'&skin_type='.$Blog->get_skin_type().'&action=customize&container_code='.urlencode( $edited_ComponentWidget->get_container_param( 'code' ) ).'&mode=customizer', '&' ),
 			'target' => '_self',
 		);
 	}
