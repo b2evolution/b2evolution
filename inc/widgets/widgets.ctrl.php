@@ -411,7 +411,7 @@ switch( $action )
 					// (e.g. used to display new auto created sub-container by widget "Columns(Sub-Containers)" - subcontainer_row_Widget)
 					$Session->set( 'refresh_customizer_window', 1 );
 				}
-				header_redirect( get_admin_url( '?ctrl=widgets&blog='.$Blog->ID, '&' ), 303 );
+				header_redirect( get_admin_url( 'ctrl=widgets&blog='.$Blog->ID, '&' ), 303 );
 			}
 		}
 		elseif( $display_mode == 'js' )
