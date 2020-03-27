@@ -1177,7 +1177,7 @@ function get_same_domain_url( $url )
 	}
 	else
 	{	// Use current domain if domains are different, e.g. when collection URL uses subdomain or different absolute URL:
-		return preg_replace( '#https?://[^/]+#i', $ReqHost, $url );
+		return preg_replace( '#^https?://[^/]+#i', $ReqHost, $url );
 	}
 }
 
