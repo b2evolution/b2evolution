@@ -1188,7 +1188,7 @@ function display_attachments_tab_pane( & $Form, & $LinkOwner, $fold = false, $ta
 			'right_items' => $items_right,
 		) );
 
-	echo '<div id="'.$tab_pane_prefix.'attachments_fieldset_wrapper" class="evo_attachments_fieldset__wrapper">';
+	echo '<div id="'.$tab_pane_prefix.'attachments_tab_pane_wrapper" class="evo_attachments_tab_pane__wrapper">';
 		if( ! empty( $restriction_overlay ) )
 		{	// Restrict attachments with overlay:
 			echo '<div id="'.$tab_pane_prefix.'attachments_fieldset_overlay" class="evo_attachments_fieldset__overlay"><b>'.$restriction_overlay.'</b></div>';

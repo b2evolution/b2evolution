@@ -1176,9 +1176,7 @@ if( $edited_Item->get_type_setting( 'use_parent' ) != 'never' )
 
 // JS to post excerpt mode switching:
 ?>
-<script>			    
-// Attachment tab height:
-jQuery( ".content-form-with-tab .tab-content #attachment #attachments_fieldset_wrapper" ).css( 'height', 'auto' );
+<script>
 // Show attachment tab result summary in single line
 jQuery( ".content-form-with-tab .results_summary" ).detach().prependTo( '.content-form-with-tab #attachment .pull-left' );
 jQuery( '.content-form-with-tab .nav-tabs a' ).on( 'shown.bs.tab', function( event )
@@ -1188,10 +1186,6 @@ jQuery( '.content-form-with-tab .nav-tabs a' ).on( 'shown.bs.tab', function( eve
 	if( tab_href_value === '#advance_properties' )
 	{
 		jQuery( window ).resize();
-	}
-	if( tab_href_value === '#attachment' )
-	{
-		jQuery( ".content-form-with-tab .tab-content #attachment #attachments_fieldset_wrapper" ).css( 'height', 'auto' );	
 	}
 });
 if( jQuery( '.content-form-with-tab #nav_tabs_selected' ).val() != '' )
