@@ -36,7 +36,7 @@ $Form->begin_form();
 			'display_new'   => false,
 		) );
 
-	$Form->buttons( array( array( 'submit', 'actionArray[mass_change_cat]', T_('Change main category'), 'SaveButton' ) ) );
+	$Form->buttons( array( array( 'submit', 'actionArray[mass_change_cat]', TB_('Change main category'), 'SaveButton' ) ) );
 
 $Form->end_form();
 ?>

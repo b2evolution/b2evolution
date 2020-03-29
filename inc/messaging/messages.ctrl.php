@@ -28,7 +28,7 @@ global $current_User;
 // Check minimum permission:
 if( !$current_User->check_perm( 'perm_messaging', 'reply' ) )
 {
-	$Messages->add( T_('You are not allowed to view messages.') );
+	$Messages->add( TB_('You are not allowed to view messages.') );
 	header_redirect( $admin_url );
 }
 
@@ -57,14 +57,14 @@ if( param( 'thrd_ID', 'integer', '', true ) )
 	{ // Thread doesn't exists with this ID
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( T_('The private conversation you are trying to access does not exist any longer.'), 'error' );
+		$Messages->add( TB_('The private conversation you are trying to access does not exist any longer.'), 'error' );
 		$action = 'nil';
 	}
 	else if( ! $edited_Thread->check_thread_recipient( $current_User->ID ) && ! $perm_abuse_management )
 	{ // Current user is not recipient of this thread and he is not abuse manager
 		unset( $edited_Thread );
 		forget_param( 'thrd_ID' );
-		$Messages->add( T_('You are not allowed to view this thread.'), 'error' );
+		$Messages->add( TB_('You are not allowed to view this thread.'), 'error' );
 		$action = 'nil';
 	}
 }
@@ -76,7 +76,7 @@ if( param( 'msg_ID', 'integer', '', true ) )
 	{
 		unset( $edited_Message );
 		forget_param( 'msg_ID' );
-		$Messages->add( T_('The requested message does not exist any longer.'), 'error' );
+		$Messages->add( TB_('The requested message does not exist any longer.'), 'error' );
 		$action = 'nil';
 	}
 }
@@ -87,7 +87,7 @@ else
 
 if( ! $Messages->has_errors() && ( empty( $thrd_ID ) || empty( $edited_Thread ) ) )
 { // Display this error only when no error above
-	$Messages->add( T_( 'Can\'t show messages without thread!' ), 'error' );
+	$Messages->add( TB_( 'Can\'t show messages without thread!' ), 'error' );
 	$action = 'nil';
 }
 else
@@ -149,7 +149,7 @@ switch( $action )
 			$edited_Message->dbdelete();
 			unset( $edited_Message );
 			forget_param( 'msg_ID' );
-			$Messages->add( T_('Message deleted.'), 'success' );
+			$Messages->add( TB_('Message deleted.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=messages&thrd_ID='.$thrd_ID.$param_tab, 303 ); // Will EXIT
@@ -157,7 +157,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Message->check_delete( T_('Cannot delete message.') ) )
+			if( ! $edited_Message->check_delete( TB_('Cannot delete message.') ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -180,10 +180,10 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
+$AdminUI->breadcrumbpath_add( TB_('Messages'), '?ctrl=threads' );
 if( $perm_abuse_management )
 {	// We see a messages from abuse management
-	$AdminUI->breadcrumbpath_add( T_('Abuse Management'), '?ctrl=abuse' );
+	$AdminUI->breadcrumbpath_add( TB_('Abuse Management'), '?ctrl=abuse' );
 	$AdminUI->set_path( 'messaging', 'abuse' );
 }
 else
@@ -227,7 +227,7 @@ switch( $action )
 			memorize_param( 'tab', 'string', 'abuse' );
 		}
 		// We need to ask for confirmation:
-		$edited_Message->confirm_delete( T_('Delete message?'),
+		$edited_Message->confirm_delete( TB_('Delete message?'),
 				'messaging_messages', $action, get_memorized( 'action' ) );
 	default:
 		// No specific request, list all messages:

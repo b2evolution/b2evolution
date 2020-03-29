@@ -23,9 +23,9 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'menu_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,ment_ID,blog', 'action=edit' ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action,ment_ID,blog', 'action=edit' ) );
 
-$Form->begin_form( 'fform', ( $creating ?  T_('New Menu Entry') : T_('Menu Entry') ).get_manual_link( 'menu-entry-form' ) );
+$Form->begin_form( 'fform', ( $creating ?  TB_('New Menu Entry') : TB_('Menu Entry') ).get_manual_link( 'menu-entry-form' ) );
 
 	$Form->add_crumb( 'menuentry' );
 	$Form->hidden( 'action',  $creating ? 'create_entry' : 'update_entry' );
@@ -33,46 +33,46 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New Menu Entry') : T_('Menu Entry
 
 	$SiteMenuCache = & get_SiteMenuCache();
 	$SiteMenuCache->load_all();
-	$Form->select_input_object( 'ment_menu_ID', $edited_SiteMenuEntry->get( 'menu_ID' ), $SiteMenuCache, T_('Menu'), array( 'required' => true ) );
+	$Form->select_input_object( 'ment_menu_ID', $edited_SiteMenuEntry->get( 'menu_ID' ), $SiteMenuCache, TB_('Menu'), array( 'required' => true ) );
 
 	$SiteMenuEntryCache = & get_SiteMenuEntryCache();
-	$Form->select_input_options( 'ment_parent_ID', $SiteMenuEntryCache->recurse_select( $edited_SiteMenuEntry->get( 'parent_ID' ), $edited_SiteMenuEntry->get( 'menu_ID' ), true, NULL, 0, array( $edited_SiteMenuEntry->ID ) ), T_('Parent') );
+	$Form->select_input_options( 'ment_parent_ID', $SiteMenuEntryCache->recurse_select( $edited_SiteMenuEntry->get( 'parent_ID' ), $edited_SiteMenuEntry->get( 'menu_ID' ), true, NULL, 0, array( $edited_SiteMenuEntry->ID ) ), TB_('Parent') );
 
-	$Form->text_input( 'ment_order', $edited_SiteMenuEntry->get( 'order' ), 11, T_('Order'), '', array( 'maxlength' => 11 ) );
+	$Form->text_input( 'ment_order', $edited_SiteMenuEntry->get( 'order' ), 11, TB_('Order'), '', array( 'maxlength' => 11 ) );
 
-	$Form->text_input( 'ment_text', $edited_SiteMenuEntry->get( 'text' ), 50, T_('Text'), ( $edited_SiteMenuEntry->get( 'type' ) != 'text' ? T_('Leave empty for default').( $edited_SiteMenuEntry->ID > 0 ? ': <code>'.$edited_SiteMenuEntry->get_text( true ).'</code>' : '' ) : '' ), array( 'maxlength' => 128 ) );
+	$Form->text_input( 'ment_text', $edited_SiteMenuEntry->get( 'text' ), 50, TB_('Text'), ( $edited_SiteMenuEntry->get( 'type' ) != 'text' ? TB_('Leave empty for default').( $edited_SiteMenuEntry->ID > 0 ? ': <code>'.$edited_SiteMenuEntry->get_text( true ).'</code>' : '' ) : '' ), array( 'maxlength' => 128 ) );
 
-	$Form->select_input_array( 'ment_type', $edited_SiteMenuEntry->get( 'type' ), get_site_menu_types(), T_('Type') );
+	$Form->select_input_array( 'ment_type', $edited_SiteMenuEntry->get( 'type' ), get_site_menu_types(), TB_('Type') );
 
 	load_funcs( 'files/model/_image.funcs.php' );
-	$Form->select_input_array( 'ment_coll_logo_size', $edited_SiteMenuEntry->get( 'coll_logo_size' ), get_available_thumb_sizes( T_('No logo') ), T_('Collection logo before link text') );
+	$Form->select_input_array( 'ment_coll_logo_size', $edited_SiteMenuEntry->get( 'coll_logo_size' ), get_available_thumb_sizes( TB_('No logo') ), TB_('Collection logo before link text') );
 
-	$Form->text_input( 'ment_coll_ID', $edited_SiteMenuEntry->get( 'coll_ID' ), 11, T_('Collection ID'), '', array( 'maxlength' => 11, 'hide' => in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'item', 'admin', 'url', 'text' ) ) ) );
+	$Form->text_input( 'ment_coll_ID', $edited_SiteMenuEntry->get( 'coll_ID' ), 11, TB_('Collection ID'), '', array( 'maxlength' => 11, 'hide' => in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'item', 'admin', 'url', 'text' ) ) ) );
 
-	$Form->text_input( 'ment_cat_ID', $edited_SiteMenuEntry->get( 'cat_ID' ), 11, T_('Category ID'), '', array( 'maxlength' => 11, 'hide' => ! in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'recentposts', 'postnew' ) ) ) );
+	$Form->text_input( 'ment_cat_ID', $edited_SiteMenuEntry->get( 'cat_ID' ), 11, TB_('Category ID'), '', array( 'maxlength' => 11, 'hide' => ! in_array( $edited_SiteMenuEntry->get( 'type' ), array( 'recentposts', 'postnew' ) ) ) );
 
-	$Form->text_input( 'ment_item_ID', $edited_SiteMenuEntry->get( 'item_ID' ), 11, T_('Item ID'), '', array( 'maxlength' => 11, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'item' ) ) );
+	$Form->text_input( 'ment_item_ID', $edited_SiteMenuEntry->get( 'item_ID' ), 11, TB_('Item ID'), '', array( 'maxlength' => 11, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'item' ) ) );
 	
-	$Form->text_input( 'ment_item_slug', $edited_SiteMenuEntry->get( 'item_slug' ), 25, T_('Item slug'), '', array( 'maxlength' => 255, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'item' ) ) );
+	$Form->text_input( 'ment_item_slug', $edited_SiteMenuEntry->get( 'item_slug' ), 25, TB_('Item slug'), '', array( 'maxlength' => 255, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'item' ) ) );
 
-	$Form->text_input( 'ment_url', $edited_SiteMenuEntry->get( 'url' ), 128, T_('URL'), '', array( 'maxlength' => 2000, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'url' ) ) );
+	$Form->text_input( 'ment_url', $edited_SiteMenuEntry->get( 'url' ), 128, TB_('URL'), '', array( 'maxlength' => 2000, 'hide' => ( $edited_SiteMenuEntry->get( 'type' ) != 'url' ) ) );
 
 	$Form->radio( 'ment_visibility', $edited_SiteMenuEntry->get( 'visibility' ),
 		array(
-			array( 'always', T_( 'Always show') ),
-			array( 'access', T_( 'Only show if access is allowed' ) )
-		), T_('Visibility'), true );
+			array( 'always', TB_( 'Always show') ),
+			array( 'access', TB_( 'Only show if access is allowed' ) )
+		), TB_('Visibility'), true );
 
 	$Form->radio( 'ment_highlight', $edited_SiteMenuEntry->get( 'highlight' ),
 		array(
-			array( 1, T_('Highlight the current item') ),
-			array( 0, T_('Do not try to highlight') )
-		), T_('Highlight'), true );
+			array( 1, TB_('Highlight the current item') ),
+			array( 0, TB_('Do not try to highlight') )
+		), TB_('Highlight'), true );
 
 	$buttons = array();
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{	// Allow to save menu if current User has a permission:
-		$buttons[] = array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' );
+		$buttons[] = array( 'submit', 'submit', ( $creating ? TB_('Record') : TB_('Save Changes!') ), 'SaveButton' );
 	}
 
 $Form->end_form( $buttons );

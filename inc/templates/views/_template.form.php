@@ -22,15 +22,15 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'template_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,tpl_ID,blog' ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action,tpl_ID,blog' ) );
 
 if( $action == 'copy' )
 {
-	$fieldset_title = T_('Duplicate template').get_manual_link( 'template-form');
+	$fieldset_title = TB_('Duplicate template').get_manual_link( 'template-form');
 }
 else
 {
-	$fieldset_title = $creating ?  T_('New Template') . get_manual_link( 'template-form' ) : T_('Template') . get_manual_link( 'template-form' );
+	$fieldset_title = $creating ?  TB_('New Template') . get_manual_link( 'template-form' ) : TB_('Template') . get_manual_link( 'template-form' );
 }
 
 $Form->begin_form( 'fform', $fieldset_title );
@@ -52,17 +52,17 @@ $Form->begin_form( 'fform', $fieldset_title );
 	}
 	
 	// Template name:
-	$Form->text_input( 'tpl_name', $edited_Template->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 128, 'required' => true ) );
+	$Form->text_input( 'tpl_name', $edited_Template->get( 'name' ), 50, TB_('Name'), '', array( 'maxlength' => 128, 'required' => true ) );
 
 	// Template code:
-	$Form->text_input( 'tpl_code', $edited_Template->get( 'code' ), 25, T_('Code'), '', array( 'maxlength' => 128 ) );
+	$Form->text_input( 'tpl_code', $edited_Template->get( 'code' ), 25, TB_('Code'), '', array( 'maxlength' => 128 ) );
 
 	// Context:
-	$Form->select_input_array( 'tpl_context', $edited_Template->get( 'context' ), get_template_contexts(), T_('Context') );
+	$Form->select_input_array( 'tpl_context', $edited_Template->get( 'context' ), get_template_contexts(), TB_('Context') );
 
 	// Owner:
 	$GroupCache = & get_GroupCache();
-	$Form->select_object( 'tpl_owner_grp_ID', $edited_Template->get( 'owner_grp_ID' ), $GroupCache, T_('Owned by') );
+	$Form->select_object( 'tpl_owner_grp_ID', $edited_Template->get( 'owner_grp_ID' ), $GroupCache, TB_('Owned by') );
 
 	// Base template ID:
 	$base_template_options = array( NULL => '('.TB_('None').')' );
@@ -76,7 +76,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 	}
 	$SQL->ORDER_BY( 'tpl_name ASC' );
 	$base_template_options += $DB->get_assoc( $SQL->get() );
-	$Form->select_input_array( 'tpl_translates_tpl_ID', $edited_Template->get('translates_tpl_ID'), $base_template_options, T_('Translation of'), NULL, array( 'force_keys_as_values' => true ) );
+	$Form->select_input_array( 'tpl_translates_tpl_ID', $edited_Template->get('translates_tpl_ID'), $base_template_options, TB_('Translation of'), NULL, array( 'force_keys_as_values' => true ) );
 
 	// Locale:
 	$locales_options = array();
@@ -87,10 +87,10 @@ $Form->begin_form( 'fform', $fieldset_title );
 			$locales_options[ $locale_key ] = $locale_key;
 		}
 	}
-	$Form->select_input_array( 'tpl_locale', $edited_Template->get( 'locale' ), $locales_options, T_('Locale') );
+	$Form->select_input_array( 'tpl_locale', $edited_Template->get( 'locale' ), $locales_options, TB_('Locale') );
 	
 	// Template code:
-	$Form->textarea( 'tpl_template_code', $edited_Template->get( 'template_code' ), 20, T_('Template code'), '', 80, '', true );
+	$Form->textarea( 'tpl_template_code', $edited_Template->get( 'template_code' ), 20, TB_('Template code'), '', 80, '', true );
 
 	$buttons = array();
 	if( $current_User->check_perm( 'options', 'edit' ) )
@@ -98,15 +98,15 @@ $Form->begin_form( 'fform', $fieldset_title );
 		if( $action == 'copy' )
 		{
 			$buttons = array(
-					array( 'submit', 'actionArray[create]', T_('Duplicate Template!'), 'SaveButton' ),
-					array( 'submit', 'actionArray[create_edit]', T_('Duplicate and continue editing...'), 'SaveButton' )
+					array( 'submit', 'actionArray[create]', TB_('Duplicate Template!'), 'SaveButton' ),
+					array( 'submit', 'actionArray[create_edit]', TB_('Duplicate and continue editing...'), 'SaveButton' )
 				);
 		}
 		else
 		{
 			$buttons = array(
-					array( 'submit', 'actionArray['.( $creating ? 'create' : 'update' ).']', T_('Save!'), 'SaveButton' ),
-					array( 'submit', 'actionArray['.( $creating ? 'create' : 'update' ).'_edit]', T_('Save and continue editing...'), 'SaveButton' )
+					array( 'submit', 'actionArray['.( $creating ? 'create' : 'update' ).']', TB_('Save!'), 'SaveButton' ),
+					array( 'submit', 'actionArray['.( $creating ? 'create' : 'update' ).'_edit]', TB_('Save and continue editing...'), 'SaveButton' )
 				);
 		}
 	}

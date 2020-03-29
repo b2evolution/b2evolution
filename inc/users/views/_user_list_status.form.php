@@ -33,12 +33,12 @@ $Form->add_crumb( 'users' );
 $Form->hidden_ctrl();
 
 // A link to close popup window:
-$close_icon = action_icon( T_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
+$close_icon = action_icon( TB_('Close this window'), 'close', '', '', 0, 0, array( 'id' => 'close_button', 'class' => 'floatright' ) );
 
-$Form->begin_fieldset( T_('Set account status...').get_manual_link( 'userlist-set-account-status' ).$close_icon );
+$Form->begin_fieldset( TB_('Set account status...').get_manual_link( 'userlist-set-account-status' ).$close_icon );
 
 	echo '<div class="alert alert-info">';
-	echo T_('Changing the account status for users may trigger additional actions: Welcome messages, Subscriptions, Unsubscriptions, etc.');
+	echo TB_('Changing the account status for users may trigger additional actions: Welcome messages, Subscriptions, Unsubscriptions, etc.');
 	echo '</div>';
 
 	// Status:
@@ -46,11 +46,11 @@ $Form->begin_fieldset( T_('Set account status...').get_manual_link( 'userlist-se
 	reset( $user_status_icons );
 	$first_key = key( $user_status_icons );
 	$status_icon = '<div id="user_status_icon" class="status_icon">'.$user_status_icons[$first_key].'</div>';
-	$Form->select_input_array( 'account_status', $first_key, get_user_statuses(), T_( 'New account status' ), '', array( 'input_prefix' => $status_icon ) );
+	$Form->select_input_array( 'account_status', $first_key, get_user_statuses(), TB_( 'New account status' ), '', array( 'input_prefix' => $status_icon ) );
 
 $Form->end_fieldset();
 
-$Form->button( array( '', 'actionArray[update_status]', T_('Make changes now!'), 'SaveButton' ) );
+$Form->button( array( '', 'actionArray[update_status]', TB_('Make changes now!'), 'SaveButton' ) );
 
 $Form->end_form();
 ?>

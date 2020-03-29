@@ -947,7 +947,7 @@ function param_check_new_user_email( $var, $value = NULL, $link_Blog = NULL )
 			$params = $temp_params;
 		}
 
-		$error_message .= ' '.sprintf( T_('If you don’t know it or have forgotten your password, you can <a %s>reset it here</a>.'), 'href="'.$lostpassword_url.'"' );
+		$error_message .= ' '.sprintf( T_('If you don\'t know it or have forgotten your password, you can <a %s>reset it here</a>.'), 'href="'.$lostpassword_url.'"' );
 
 		param_error( $var, $error_message );
 

@@ -27,9 +27,9 @@ $Form->hidden( 'ctrl', 'campaigns' );
 $Form->hidden( 'current_tab', $tab );
 $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 
-$Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'campaign-compose-panel' ) );
-	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ), 60, T_('Email title'), T_('as it will appear in your subscriber\'s inboxes'), array( 'maxlength' => 255, 'required' => true ) );
-	$Form->text_input( 'ecmp_email_defaultdest', $edited_EmailCampaign->get( 'email_defaultdest' ), 60, T_('Default destination'), '', array( 'maxlength' => 255 ) );
+$Form->begin_fieldset( sprintf( TB_('Compose message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'campaign-compose-panel' ) );
+	$Form->text_input( 'ecmp_email_title', $edited_EmailCampaign->get( 'email_title' ), 60, TB_('Email title'), TB_('as it will appear in your subscriber\'s inboxes'), array( 'maxlength' => 255, 'required' => true ) );
+	$Form->text_input( 'ecmp_email_defaultdest', $edited_EmailCampaign->get( 'email_defaultdest' ), 60, TB_('Default destination'), '', array( 'maxlength' => 255 ) );
 
 	// Plugin toolbars:
 	ob_start();
@@ -70,7 +70,7 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	$form_inputend = $Form->inputend;
 	$Form->inputstart .= $email_toolbar;
 	$Form->inputend = $email_plugin_buttons.$Form->inputend;
-	$Form->textarea_input( 'ecmp_email_text', $edited_EmailCampaign->get( 'email_text' ), 20, T_('HTML Message'), array( 'required' => true ) );
+	$Form->textarea_input( 'ecmp_email_text', $edited_EmailCampaign->get( 'email_text' ), 20, TB_('HTML Message'), array( 'required' => true ) );
 	$Form->inputstart = $form_inputstart;
 	$Form->inputend = $form_inputend;
 
@@ -84,7 +84,7 @@ $Form->begin_fieldset( sprintf( T_('Compose message for: %s'), $edited_EmailCamp
 	$email_renderer_checkboxes = $Plugins->get_renderer_checkboxes( $current_renderers, array( 'setting_name' => 'email_apply_rendering' ) );
 	if( !empty( $email_renderer_checkboxes ) )
 	{
-		$Form->info( T_('Text Renderers'), $email_renderer_checkboxes );
+		$Form->info( TB_('Text Renderers'), $email_renderer_checkboxes );
 	}
 $Form->end_fieldset();
 
@@ -96,7 +96,7 @@ $Form->attachments_fieldset( $edited_EmailCampaign );
 $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
-	$buttons[] = array( 'submit', 'actionArray[save]', T_('Save & continue').' >>', 'SaveButton' );
+	$buttons[] = array( 'submit', 'actionArray[save]', TB_('Save & continue').' >>', 'SaveButton' );
 }
 $Form->end_form( $buttons );
 

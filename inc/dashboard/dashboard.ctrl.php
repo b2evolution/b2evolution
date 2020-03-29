@@ -39,8 +39,8 @@ param_action();
 $AdminUI->set_path( 'site', 'dashboard' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
-$AdminUI->breadcrumbpath_add( T_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( TB_('Site'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( TB_('Site Dashboard'), $admin_url.'?ctrl=dashboard' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'site-dashboard' );
@@ -99,14 +99,14 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 	$chart_data = array();
 	// Users
 	$chart_data[] = array(
-			'title' => T_('Users'),
+			'title' => TB_('Users'),
 			'value' => get_table_count( 'T_users' ),
 			'type'  => 'number',
 		);
 
 	// Blogs
 	$chart_data[] = array(
-			'title' => T_('Collections'),
+			'title' => TB_('Collections'),
 			'value' => $collection_count,
 			'type'  => 'number',
 		);
@@ -114,48 +114,48 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	// Posts
 	$chart_data[] = array(
-			'title' => T_('Posts'),
+			'title' => TB_('Posts'),
 			'value' => $post_all_counter,
 			'type'  => 'number',
 		);
 
 	// Slugs
 	$chart_data[] = array(
-			'title' => T_('Slugs'),
+			'title' => TB_('Slugs'),
 			'value' => get_table_count( 'T_slug' ),
 			'type'  => 'number',
 		);
 	// Comments
 	$chart_data[] = array(
-			'title' => T_('Comments'),
+			'title' => TB_('Comments'),
 			'value' => get_table_count( 'T_comments' ),
 			'type'  => 'number',
 		);
 
 	// Files
 	$chart_data[] = array(
-			'title' => T_('Files'),
+			'title' => TB_('Files'),
 			'value' => get_table_count( 'T_files' ),
 			'type'  => 'number',
 		);
 
 	// Conversations
 	$chart_data[] = array(
-			'title' => T_('Conversations'),
+			'title' => TB_('Conversations'),
 			'value' => get_table_count( 'T_messaging__thread' ),
 			'type'  => 'number',
 		);
 
 	// Messages
 	$chart_data[] = array(
-			'title' => T_('Messages'),
+			'title' => TB_('Messages'),
 			'value' => get_table_count( 'T_messaging__message' ),
 			'type'  => 'number',
 		);
 
 	// Email Lists
 	$chart_data[] = array(
-			'title' => T_('Email Lists'),
+			'title' => TB_('Email Lists'),
 			'value' => get_table_count( 'T_email__newsletter' ),
 			'type'  => 'number',
 			'max'   => 20,
@@ -163,7 +163,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	// Campaigns
 	$chart_data[] = array(
-			'title' => T_('Campaigns'),
+			'title' => TB_('Campaigns'),
 			'value' => get_table_count( 'T_email__campaign' ),
 			'type'  => 'number',
 			'max'   => 10000,
@@ -171,7 +171,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	// Automations
 	$chart_data[] = array(
-			'title' => T_('Automations'),
+			'title' => TB_('Automations'),
 			'value' => get_table_count( 'T_automation__automation' ),
 			'type'  => 'number',
 			'max'   => 20,
@@ -179,7 +179,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	$stat_item_Widget = new Widget( 'block_item' );
 
-	$stat_item_Widget->title = T_('System metrics');
+	$stat_item_Widget->title = TB_('System metrics');
 	$stat_item_Widget->disp_template_replaced( 'block_start' );
 
 	display_charts( $chart_data );
@@ -191,7 +191,7 @@ if( $current_User->check_perm( 'options', 'edit' ) )
 
 	$block_item_Widget = new Widget( 'block_item' );
 
-	$block_item_Widget->title = T_('Updates from b2evolution.net');
+	$block_item_Widget->title = TB_('Updates from b2evolution.net');
 	$block_item_Widget->disp_template_replaced( 'block_start' );
 
 

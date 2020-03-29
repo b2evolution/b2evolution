@@ -19,7 +19,7 @@ global $admin_url, $media_subdir, $media_path, $Session, $MarkdownImport;
 
 $Form = new Form( NULL, '', 'post', NULL, 'multipart/form-data' );
 
-$Form->begin_form( 'fform', T_('Markdown Importer') );
+$Form->begin_form( 'fform', TB_('Markdown Importer') );
 
 $Form->add_crumb( 'mdimport' );
 $Form->hidden_ctrl();
@@ -36,14 +36,14 @@ $import_files = display_importer_upload_panel( array(
 
 if( ! empty( $import_files ) )
 {
-	$Form->begin_fieldset( T_('Destination collection') );
+	$Form->begin_fieldset( TB_('Destination collection') );
 
 	$BlogCache = & get_BlogCache();
 	$BlogCache->load_all( 'shortname,name', 'ASC' );
-	$BlogCache->none_option_text = T_('Please select...');
+	$BlogCache->none_option_text = TB_('Please select...');
 
-	$Form->select_input_object( 'md_blog_ID', $Session->get( 'last_import_coll_ID' ), $BlogCache, T_('Destination collection'), array(
-			'note' => T_('This blog will be used for import.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.T_('Create new blog').' &raquo;</a>',
+	$Form->select_input_object( 'md_blog_ID', $Session->get( 'last_import_coll_ID' ), $BlogCache, TB_('Destination collection'), array(
+			'note' => TB_('This blog will be used for import.').' <a href="'.$admin_url.'?ctrl=collections&action=new">'.TB_('Create new blog').' &raquo;</a>',
 			'allow_none' => true,
 			'required' => true,
 			'loop_object_method' => 'get_extended_name' ) );
@@ -96,12 +96,12 @@ if( ! empty( $import_files ) )
 	}
 	if( ! empty( $checklist_options ) )
 	{
-		$Form->checklist( $checklist_options, 'md_options', T_('Options') );
+		$Form->checklist( $checklist_options, 'md_options', TB_('Options') );
 	}
 
 	$Form->end_fieldset();
 
-	$Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' ) ) );
+	$Form->buttons( array( array( 'submit', 'submit', TB_('Continue').'!', 'SaveButton' ) ) );
 }
 
 $Form->end_form();

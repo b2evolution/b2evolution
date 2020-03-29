@@ -22,15 +22,15 @@ $current_User->check_perm( 'options', 'view', true );
 
 if( $current_User->check_perm( 'options', 'edit' ) && system_check_charset_update() )
 { // DB charset is required to update
-	$Messages->add( sprintf( T_('WARNING: Some of your tables have different charsets/collations than the expected. It is strongly recommended to upgrade your database charset by running the tool <a %s>Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8check&amp;'.url_crumb( 'tools' ).'"' ) );
+	$Messages->add( sprintf( TB_('WARNING: Some of your tables have different charsets/collations than the expected. It is strongly recommended to upgrade your database charset by running the tool <a %s>Check/Convert/Normalize the charsets/collations used by the DB (UTF-8 / ASCII)</a>.'), 'href="'.$admin_url.'?ctrl=tools&amp;action=utf8check&amp;'.url_crumb( 'tools' ).'"' ) );
 }
 
 $AdminUI->set_path( 'options', 'system' );
 
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Status'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( TB_('Status'), $admin_url.'?ctrl=system' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'system-status-tab' );
@@ -44,12 +44,12 @@ $AdminUI->disp_body_top();
 // Begin payload block:
 $AdminUI->disp_payload_begin();
 
-$facilitate_exploits = '<p>'.T_('When enabled, this feature is known to facilitate hacking exploits in any PHP application.')."</p>\n<p>"
-	.T_('b2evolution includes additional measures in order not to be affected by this. However, for maximum security, we still recommend disabling this PHP feature.')."</p>\n";
-$change_ini = '<p>'.T_('If possible, change this setting to <code>%s</code> in your php.ini or ask your hosting provider about it.').'</p>';
+$facilitate_exploits = '<p>'.TB_('When enabled, this feature is known to facilitate hacking exploits in any PHP application.')."</p>\n<p>"
+	.TB_('b2evolution includes additional measures in order not to be affected by this. However, for maximum security, we still recommend disabling this PHP feature.')."</p>\n";
+$change_ini = '<p>'.TB_('If possible, change this setting to <code>%s</code> in your php.ini or ask your hosting provider about it.').'</p>';
 
 
-echo '<h2 class="page-title">'.T_('System status').'</h2>';
+echo '<h2 class="page-title">'.TB_('System status').'</h2>';
 
 $block_item_Widget = new Widget( 'block_item' );
 $block_item_Widget->title = '#section_title#';

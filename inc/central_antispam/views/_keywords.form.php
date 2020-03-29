@@ -36,21 +36,21 @@ if( ! $creating )
 	$Form->hidden( 'cakw_ID', $edited_CaKeyword->ID );
 }
 
-$Form->begin_fieldset( $creating ? T_('Add keyword') : T_('Edit keyword') );
+$Form->begin_fieldset( $creating ? TB_('Add keyword') : TB_('Edit keyword') );
 
-$Form->text_input( 'cakw_keyword', $edited_CaKeyword->keyword, 32, T_('Keyword'), '', array( 'maxlength' => 2000, 'required' => true ) );
+$Form->text_input( 'cakw_keyword', $edited_CaKeyword->keyword, 32, TB_('Keyword'), '', array( 'maxlength' => 2000, 'required' => true ) );
 
-$Form->select_input_array( 'cakw_status', $edited_CaKeyword->status, ca_get_keyword_statuses(), T_('Status') );
+$Form->select_input_array( 'cakw_status', $edited_CaKeyword->status, ca_get_keyword_statuses(), TB_('Status') );
 
 $Form->end_fieldset();
 
 if( $creating )
 {
-	$Form->end_form( array( array( 'submit', 'actionArray[keyword_create]', T_('Add keyword'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'actionArray[keyword_create]', TB_('Add keyword'), 'SaveButton' ) ) );
 }
 else
 {
-	$Form->end_form( array( array( 'submit', 'actionArray[keyword_save]', T_('Save changes!'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'actionArray[keyword_save]', TB_('Save changes!'), 'SaveButton' ) ) );
 }
 
 
@@ -70,7 +70,7 @@ if( ! $creating )
 
 	$Results = new Results( $SQL->get(), 'carpt_', '-D', $UserSettings->get( 'results_per_page' ), $CountSQL->get() );
 
-	$Results->title = T_('Reports');
+	$Results->title = TB_('Reports');
 
 	function get_link_for_url( $id, $url )
 	{
@@ -89,13 +89,13 @@ if( ! $creating )
 	}
 
 	$Results->cols[] = array(
-			'th' => T_('Url'),
+			'th' => TB_('Url'),
 			'order' => 'casrc_baseurl',
 			'td' => '%get_link_for_url( #casrc_ID#, #casrc_baseurl# )%',
 		);
 
 	$Results->cols[] = array(
-			'th' => T_('Date'),
+			'th' => TB_('Date'),
 			'th_class' => 'shrinkwrap',
 			'order' => 'carpt_ts',
 			'td' => '%mysql2localedatetime_spans( #carpt_ts# )%',

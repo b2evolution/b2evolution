@@ -88,7 +88,7 @@ switch( $action )
 		// Check permissions to create new collection:
 		if( ! $current_User->check_perm( 'blogs', 'create', false, $sec_ID ) )
 		{
-			$Messages->add( T_('You don\'t have permission to create a collection.'), 'error' );
+			$Messages->add( TB_('You don\'t have permission to create a collection.'), 'error' );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
 			header_redirect( $redirect_to );
 		}
@@ -96,7 +96,7 @@ switch( $action )
 		// Check permissions to copy the selected collection:
 		if( $action == 'copy' && ! $current_User->check_perm( 'blog_properties', 'copy', false, $edited_Blog->ID ) )
 		{
-			$Messages->add( sprintf( T_('You don\'t have a permission to copy the collection "%s".'), $edited_Blog->get( 'shortname' ) ), 'error' );
+			$Messages->add( sprintf( TB_('You don\'t have a permission to copy the collection "%s".'), $edited_Blog->get( 'shortname' ) ), 'error' );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
 			header_redirect( $redirect_to );
 		}
@@ -107,7 +107,7 @@ switch( $action )
 
 		if( $max_allowed_blogs != '' && $max_allowed_blogs <= $user_blog_count )
 		{
-			$Messages->add( sprintf( T_('You already own %d collection/s. You are not currently allowed to create any more.'), $user_blog_count ) );
+			$Messages->add( sprintf( TB_('You already own %d collection/s. You are not currently allowed to create any more.'), $user_blog_count ) );
 			$redirect_to = param( 'redirect_to', 'url', $admin_url );
 			header_redirect( $redirect_to );
 		}
@@ -117,7 +117,7 @@ switch( $action )
 			$duplicating_collection_name = $edited_Blog->get( 'shortname' );
 		}
 
-		$AdminUI->append_path_level( 'new', array( 'text' => T_('New') ) );
+		$AdminUI->append_path_level( 'new', array( 'text' => TB_('New') ) );
 		break;
 
 	case 'new-selskin':
@@ -131,7 +131,7 @@ switch( $action )
 
 		param( 'kind', 'string', true );
 
-		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( /* TRANS: %s can become "Standard blog", "Photoblog", "Group blog" or "Forum" */ T_('New "%s" collection'), get_collection_kinds($kind) ) ) );
+		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( /* TRANS: %s can become "Standard blog", "Photoblog", "Group blog" or "Forum" */ TB_('New "%s" collection'), get_collection_kinds($kind) ) ) );
 		break;
 
 	case 'new-name':
@@ -157,7 +157,7 @@ switch( $action )
 			$edited_Blog->set( 'sec_ID', $sec_ID );
 		}
 
-		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( T_('New [%s]'), get_collection_kinds($kind) ) ) );
+		$AdminUI->append_path_level( 'new', array( 'text' => sprintf( TB_('New [%s]'), get_collection_kinds($kind) ) ) );
 		break;
 
 	case 'create':
@@ -180,7 +180,7 @@ switch( $action )
 
 		if( $kind == 'main' && ! $current_User->check_perm( 'blog_admin', 'editAll', false ) )
 		{ // Non-collection admins should not be able to create home/main collections
-			$Messages->add( sprintf( T_('You don\'t have permission to create a collection of kind %s.'), '<b>&laquo;'.$kind.'&raquo;</b>' ), 'error' );
+			$Messages->add( sprintf( TB_('You don\'t have permission to create a collection of kind %s.'), '<b>&laquo;'.$kind.'&raquo;</b>' ), 'error' );
 			header_redirect( $admin_url.'?ctrl=collections' ); // will EXIT
 			// We have EXITed already at this point!!
 		}
@@ -200,7 +200,7 @@ switch( $action )
 		param( 'create_demo_contents', 'boolean', NULL );
 		if( $create_demo_contents === NULL )
 		{
-			param_error( 'create_demo_contents', T_('Please select an option for "New contents"') );
+			param_error( 'create_demo_contents', TB_('Please select an option for "New contents"') );
 		}
 
 		if( $edited_Blog->load_from_Request() )
@@ -302,7 +302,7 @@ switch( $action )
 
 		if( $edited_Blog->duplicate( $duplicate_params ) )
 		{	// The collection has been duplicated successfully:
-			$Messages->add( T_('The collection has been duplicated.'), 'success' );
+			$Messages->add( TB_('The collection has been duplicated.'), 'success' );
 
 			header_redirect( $admin_url.'?ctrl=coll_settings&tab=dashboard&blog='.$edited_Blog->ID ); // will save $Messages into Session
 		}
@@ -323,7 +323,7 @@ switch( $action )
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed
 			// Delete from DB:
-			$msg = sprintf( T_('Blog &laquo;%s&raquo; deleted.'), $edited_Blog->dget('name') );
+			$msg = sprintf( TB_('Blog &laquo;%s&raquo; deleted.'), $edited_Blog->dget('name') );
 
 			if( $edited_Blog->dbdelete() )
 			{ // Blog was deleted
@@ -346,7 +346,7 @@ switch( $action )
 		}
 		else
 		{ // Check if blog has delete restrictions
-			if( ! $edited_Blog->check_delete( sprintf( T_('Cannot delete Blog &laquo;%s&raquo;'), $edited_Blog->get_name() ), array( 'file_root_ID', 'cat_blog_ID' ) ) )
+			if( ! $edited_Blog->check_delete( sprintf( TB_('Cannot delete Blog &laquo;%s&raquo;'), $edited_Blog->get_name() ), array( 'file_root_ID', 'cat_blog_ID' ) ) )
 			{ // There are restrictions:
 				$action = 'view';
 			}
@@ -422,7 +422,7 @@ switch( $action )
 		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
-			$Messages->add( T_('The collection settings have been updated.'), 'success' );
+			$Messages->add( TB_('The collection settings have been updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=collections&tab=blog_settings', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
@@ -452,7 +452,7 @@ switch( $action )
 
 		// Site color
 		$site_color = param( 'site_color', 'string', '' );
-		param_check_color( 'site_color', T_('Invalid color code.') );
+		param_check_color( 'site_color', TB_('Invalid color code.') );
 		$Settings->set( 'site_color', $site_color );
 
 		// Site short name
@@ -500,7 +500,7 @@ switch( $action )
 		$reloadpage_timeout = param_duration( 'reloadpage_timeout' );
 		if( $reloadpage_timeout > 99999 )
 		{
-			param_error( 'reloadpage_timeout', sprintf( T_( 'Reload-page timeout must be between %d and %d seconds.' ), 0, 99999 ) );
+			param_error( 'reloadpage_timeout', sprintf( TB_( 'Reload-page timeout must be between %d and %d seconds.' ), 0, 99999 ) );
 		}
 		$Settings->set( 'reloadpage_timeout', $reloadpage_timeout );
 
@@ -520,7 +520,7 @@ switch( $action )
 		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
-			$Messages->add( T_('Site settings updated.'), 'success' );
+			$Messages->add( TB_('Site settings updated.'), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $admin_url.'?ctrl=collections&tab=site_settings', 303 ); // Will EXIT
 			// We have EXITed already at this point!!
@@ -552,11 +552,11 @@ switch( $action )
 			{
 				if( is_create_action( $action ) )
 				{
-					$Messages->add( T_('New section has been created.'), 'success' );
+					$Messages->add( TB_('New section has been created.'), 'success' );
 				}
 				else
 				{
-					$Messages->add( T_('The section has been updated.'), 'success' );
+					$Messages->add( TB_('The section has been updated.'), 'success' );
 				}
 			}
 
@@ -577,14 +577,14 @@ switch( $action )
 
 		if( $edited_Section->ID == 1 )
 		{	// Forbid to delete default section:
-			$Messages->add( T_('This section cannot be deleted.'), 'error' );
+			$Messages->add( TB_('This section cannot be deleted.'), 'error' );
 			$action = 'edit_section';
 			break;
 		}
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{	// confirmed, Delete from DB:
-			$msg = sprintf( T_('Section "%s" has been deleted.'), $edited_Section->dget( 'name' ) );
+			$msg = sprintf( TB_('Section "%s" has been deleted.'), $edited_Section->dget( 'name' ) );
 			$edited_Section->dbdelete();
 			unset( $edited_Section );
 			forget_param( 'sec_ID' );
@@ -596,7 +596,7 @@ switch( $action )
 		else
 		{	// not confirmed, Check for restrictions:
 			memorize_param( 'sec_ID', 'integer', $sec_ID );
-			if( ! $edited_Section->check_delete( sprintf( T_('Cannot delete section "%s"'), $edited_Section->dget( 'name' ) ) ) )
+			if( ! $edited_Section->check_delete( sprintf( TB_('Cannot delete section "%s"'), $edited_Section->dget( 'name' ) ) ) )
 			{
 				$action = 'edit_section';
 			}
@@ -664,15 +664,15 @@ switch( $action )
 
 			if( ! empty( $updated_skin_ID ) && ! skin_check_compatibility( $updated_skin_ID, 'site' ) )
 			{	// Redirect to admin skins page selector if the skin cannot be selected:
-				$Messages->add( T_('This skin cannot be used as a site skin.'), 'error' );
+				$Messages->add( TB_('This skin cannot be used as a site skin.'), 'error' );
 				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skinpage=selection&skin_type='.$updated_skin_type );
 				break;
 			}
 
 			if( $Settings->dbupdate() )
 			{
-				$Messages->add( T_('The site skin has been changed.')
-									.' <a href="'.$admin_url.'?ctrl=collections&amp;tab=site_skin">'.T_('Edit...').'</a>', 'success' );
+				$Messages->add( TB_('The site skin has been changed.')
+									.' <a href="'.$admin_url.'?ctrl=collections&amp;tab=site_skin">'.TB_('Edit...').'</a>', 'success' );
 				if( ( ! $Session->is_mobile_session() && ! $Session->is_tablet_session() && ! $Session->is_alt_session() && param( 'normal_skin_ID', 'integer', NULL ) !== NULL ) ||
 						( $Session->is_mobile_session() && param( 'mobile_skin_ID', 'integer', NULL ) !== NULL ) ||
 						( $Session->is_tablet_session() && param( 'tablet_skin_ID', 'integer', NULL ) !== NULL ) ||
@@ -709,7 +709,7 @@ switch( $action )
 			if(	! param_errors_detected() )
 			{	// Update settings:
 				$edited_Skin->dbupdate_settings();
-				$Messages->add( T_('Skin settings have been updated'), 'success' );
+				$Messages->add( TB_('Skin settings have been updated'), 'success' );
 				// Redirect so that a reload doesn't write to the DB twice:
 				header_redirect( $admin_url.'?ctrl=collections&tab=site_skin&skin_type='.$skin_type, 303 ); // Will EXIT
 			}
@@ -740,8 +740,8 @@ switch( $tab )
 			$AdminUI->set_path( 'site', 'skin', 'skin_'.$skin_type );
 
 			$AdminUI->breadcrumbpath_init( false );
-			$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
-			$AdminUI->breadcrumbpath_add( T_('Site skin'), $admin_url.'?ctrl=collections&amp;tab=site_skin' );
+			$AdminUI->breadcrumbpath_add( TB_('Site'), $admin_url.'?ctrl=dashboard' );
+			$AdminUI->breadcrumbpath_add( TB_('Site skin'), $admin_url.'?ctrl=collections&amp;tab=site_skin' );
 
 			$AdminUI->set_page_manual_link( 'site-skin-settings' );
 
@@ -752,7 +752,7 @@ switch( $tab )
 		else
 		{
 			$tab = 'site_settings';
-			$Messages->add( T_('Please enable site skins to use them.'), 'error' );
+			$Messages->add( TB_('Please enable site skins to use them.'), 'error' );
 		}
 
 	case 'site_settings':
@@ -762,8 +762,8 @@ switch( $tab )
 		$AdminUI->set_path( 'site', 'settings' );
 
 		$AdminUI->breadcrumbpath_init( false );
-		$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
-		$AdminUI->breadcrumbpath_add( T_('Site Settings'), $admin_url.'?ctrl=collections&amp;tab=site_settings' );
+		$AdminUI->breadcrumbpath_add( TB_('Site'), $admin_url.'?ctrl=dashboard' );
+		$AdminUI->breadcrumbpath_add( TB_('Site Settings'), $admin_url.'?ctrl=collections&amp;tab=site_settings' );
 
 		$AdminUI->set_page_manual_link( 'site-settings' );
 
@@ -779,9 +779,9 @@ switch( $tab )
 
 		$AdminUI->set_path( 'collections', 'settings', 'blog_settings' );
 
-		$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
-		$AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog=$blog$' );
-		$AdminUI->breadcrumbpath_add( T_('Common Settings'), $admin_url.'?ctrl=collections&amp;tab=blog_settings&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_init( true, array( 'text' => TB_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
+		$AdminUI->breadcrumbpath_add( TB_('Settings'), $admin_url.'?ctrl=coll_settings&amp;tab=general&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( TB_('Common Settings'), $admin_url.'?ctrl=collections&amp;tab=blog_settings&amp;blog=$blog$' );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'global-collection-settings' );
@@ -797,8 +797,8 @@ switch( $tab )
 		$AdminUI->set_path( 'collections' );
 		$AdminUI->clear_menu_entries( 'collections' );
 
-		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
-		$AdminUI->breadcrumbpath_add( T_('New Collection'), $admin_url.'?ctrl=collections&amp;action=new' );
+		$AdminUI->breadcrumbpath_init( false, array( 'text' => TB_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
+		$AdminUI->breadcrumbpath_add( TB_('New Collection'), $admin_url.'?ctrl=collections&amp;action=new' );
 
 		// Init params to display a panel with blog selectors
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'coll_settings', 'tab' => 'dashboard' ) );
@@ -826,7 +826,7 @@ switch( $tab )
 		$AdminUI->set_path( 'collections' );
 		$AdminUI->clear_menu_entries( 'collections' );
 
-		$AdminUI->breadcrumbpath_init( false, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
+		$AdminUI->breadcrumbpath_init( false, array( 'text' => TB_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
 
 		// Init params to display a panel with blog selectors
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'coll_settings', 'tab' => 'dashboard' ) );
@@ -841,8 +841,8 @@ switch( $tab )
 		$AdminUI->clear_menu_entries( 'collections' );
 
 		$AdminUI->breadcrumbpath_init( false );
-		$AdminUI->breadcrumbpath_add( T_('List'), $admin_url.'?ctrl=collections' );
-		$AdminUI->breadcrumbpath_add( T_('Collections'), $admin_url.'?ctrl=collections' );
+		$AdminUI->breadcrumbpath_add( TB_('List'), $admin_url.'?ctrl=collections' );
+		$AdminUI->breadcrumbpath_add( TB_('Collections'), $admin_url.'?ctrl=collections' );
 
 		// Init params to display a panel with blog selectors
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'coll_settings', 'tab' => 'dashboard' ) );
@@ -859,8 +859,8 @@ switch( $tab )
 		$AdminUI->clear_menu_entries( 'collections' );
 
 		$AdminUI->breadcrumbpath_init( false );
-		$AdminUI->breadcrumbpath_add( T_('List'), $admin_url.'?ctrl=collections' );
-		$AdminUI->breadcrumbpath_add( T_('Collections'), $admin_url.'?ctrl=collections' );
+		$AdminUI->breadcrumbpath_add( TB_('List'), $admin_url.'?ctrl=collections' );
+		$AdminUI->breadcrumbpath_add( TB_('Collections'), $admin_url.'?ctrl=collections' );
 
 		// Init params to display a panel with blog selectors
 		$AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'coll_settings', 'tab' => 'dashboard' ) );
@@ -945,34 +945,34 @@ switch( $action )
 			$number_of_comments = $edited_Blog->get_number_of_comments();
 			if( $number_of_comments > 0 )
 			{ // There is at least one comment
-				$delete_notes[] = array( sprintf( T_('WARNING: This collection contains %d items and %d comments.'), $number_of_items, $number_of_comments ), 'warning' );
+				$delete_notes[] = array( sprintf( TB_('WARNING: This collection contains %d items and %d comments.'), $number_of_items, $number_of_comments ), 'warning' );
 			}
 			else
 			{
-				$delete_notes[] = array( sprintf( T_('WARNING: This collection contains %d items.'), $number_of_items ), 'warning' );
+				$delete_notes[] = array( sprintf( TB_('WARNING: This collection contains %d items.'), $number_of_items ), 'warning' );
 			}
 		}
 
 		// Check if the deleting blog is used as default blog and Display a warning
 		if( $default_Blog = & get_setting_Blog( 'default_blog_ID' ) && $default_Blog->ID == $edited_Blog->ID )
 		{ // Default blog
-			$delete_notes[] = array( T_('WARNING: You are about to delete the default collection.'), 'warning' );
+			$delete_notes[] = array( TB_('WARNING: You are about to delete the default collection.'), 'warning' );
 		}
 		if( $info_Blog = & get_setting_Blog( 'info_blog_ID' ) && $info_Blog->ID == $edited_Blog->ID  )
 		{ // Info blog
-			$delete_notes[] = array( T_('WARNING: You are about to delete the collection used for info pages.'), 'warning' );
+			$delete_notes[] = array( TB_('WARNING: You are about to delete the collection used for info pages.'), 'warning' );
 		}
 		if( $login_Blog = & get_setting_Blog( 'login_blog_ID' ) && $login_Blog->ID == $edited_Blog->ID  )
 		{ // Login blog
-			$delete_notes[] = array( T_('WARNING: You are about to delete the collection used for login/registration pages.'), 'warning' );
+			$delete_notes[] = array( TB_('WARNING: You are about to delete the collection used for login/registration pages.'), 'warning' );
 		}
 		if( $msg_Blog = & get_setting_Blog( 'msg_blog_ID' ) && $msg_Blog->ID == $edited_Blog->ID  )
 		{ // Messaging blog
-			$delete_notes[] = array( T_('WARNING: You are about to delete the collection used for messaging pages.'), 'warning' );
+			$delete_notes[] = array( TB_('WARNING: You are about to delete the collection used for messaging pages.'), 'warning' );
 		}
 
-		$delete_notes[] = array( T_('Note: Some files in this collection\'s fileroot may be linked to users or to other collections posts and comments. Those files will ALSO be deleted, which may be undesirable!'), 'note' );
-		$edited_Blog->confirm_delete( sprintf( T_('Delete collection &laquo;%s&raquo;?'), $edited_Blog->get_name() ), 'collection', $action,
+		$delete_notes[] = array( TB_('Note: Some files in this collection\'s fileroot may be linked to users or to other collections posts and comments. Those files will ALSO be deleted, which may be undesirable!'), 'note' );
+		$edited_Blog->confirm_delete( sprintf( TB_('Delete collection &laquo;%s&raquo;?'), $edited_Blog->get_name() ), 'collection', $action,
 			get_memorized( 'action' ), $delete_notes );
 		break;
 
@@ -987,7 +987,7 @@ switch( $action )
 		{	// We need to ask for confirmation:
 			set_param( 'redirect_to', $admin_url.'?ctrl=collections' );
 			$edited_Section->confirm_delete(
-				sprintf( T_('Delete section "%s"?'), $edited_Section->dget( 'name' ) ),
+				sprintf( TB_('Delete section "%s"?'), $edited_Section->dget( 'name' ) ),
 				'section', $action, get_memorized( 'action' ) );
 		}
 
@@ -1031,7 +1031,7 @@ switch( $action )
 				{	// Create new demo content inside template to display a process in real time:
 					$block_item_Widget = new Widget( 'block_item' );
 
-					$block_item_Widget->title = T_('Demo content').':';
+					$block_item_Widget->title = TB_('Demo content').':';
 					$block_item_Widget->disp_template_replaced( 'block_start' );
 
 					load_funcs( 'collections/_demo_content.funcs.php' );

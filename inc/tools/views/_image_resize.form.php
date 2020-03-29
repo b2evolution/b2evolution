@@ -15,15 +15,15 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 global $Settings;
 
-$confirm_title = T_('Confirm resize');
+$confirm_title = TB_('Confirm resize');
 
 $block_item_Widget = new Widget( 'block_item' );
 
 $block_item_Widget->title = $confirm_title;
 echo str_replace( 'panel-default', 'panel-danger', $block_item_Widget->replace_vars( $block_item_Widget->params[ 'block_start' ] ) );
 
-echo '<p class="warning text-danger">'.sprintf( T_('You are about to resize all the images in the media directory to fit %dx%d.'), $Settings->get( 'fm_resize_width' ), $Settings->get( 'fm_resize_height' ) ).'</p>';
-echo '<p class="warning text-danger">'.T_('THIS CANNOT BE UNDONE!').'</p>';
+echo '<p class="warning text-danger">'.sprintf( TB_('You are about to resize all the images in the media directory to fit %dx%d.'), $Settings->get( 'fm_resize_width' ), $Settings->get( 'fm_resize_height' ) ).'</p>';
+echo '<p class="warning text-danger">'.TB_('THIS CANNOT BE UNDONE!').'</p>';
 $Form = new Form( '' );
 
 $Form->begin_form( 'inline' );
@@ -31,12 +31,12 @@ $Form->begin_form( 'inline' );
 $Form->add_crumb( 'tools' );
 $Form->hidden( 'action', 'resize_all_images' );
 $Form->hidden( 'confirmed', 1 );
-$Form->button( array( 'submit', '', T_('I am sure!'), 'DeleteButton btn-danger' ) );
+$Form->button( array( 'submit', '', TB_('I am sure!'), 'DeleteButton btn-danger' ) );
 $Form->end_form();
 
 $Form = new Form( get_dispctrl_url( 'tools' ), 'form_cancel', 'get', '' );
 $Form->begin_form( 'inline' );
-$Form->button( array( 'submit', '', T_('Cancel'), 'CancelButton' ) );
+$Form->button( array( 'submit', '', TB_('Cancel'), 'CancelButton' ) );
 $Form->end_form();
 
 $block_item_Widget->disp_template_replaced( 'block_end' );

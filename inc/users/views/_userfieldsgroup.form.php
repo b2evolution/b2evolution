@@ -26,10 +26,10 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'userfieldgroup_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Delete this user field group!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('userfieldgroup') ) );
-$Form->global_icon( T_('Cancel editing').'!', 'close', '?ctrl=userfields' );
+$Form->global_icon( TB_('Delete this user field group!'), 'delete', regenerate_url( 'action', 'action=delete&amp;'.url_crumb('userfieldgroup') ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', '?ctrl=userfields' );
 
-$Form->begin_form( 'fform', $creating ?  T_('New user field group') : T_('User field group') );
+$Form->begin_form( 'fform', $creating ?  TB_('New user field group') : TB_('User field group') );
 
 	$Form->add_crumb( 'userfieldgroup' );
 
@@ -37,19 +37,19 @@ $Form->begin_form( 'fform', $creating ?  T_('New user field group') : T_('User f
 
 	$Form->hidden( 'ufgp_ID', $edited_UserfieldGroup->ID );
 
-	$Form->text_input( 'ufgp_name', $edited_UserfieldGroup->name, 50, T_('Name'), '', array( 'maxlength'=> 255, 'required'=>true ) );
+	$Form->text_input( 'ufgp_name', $edited_UserfieldGroup->name, 50, TB_('Name'), '', array( 'maxlength'=> 255, 'required'=>true ) );
 
-	$Form->text_input( 'ufgp_order', $edited_UserfieldGroup->order, 5, T_('Order number'), '', array( 'maxlength'=> 11, 'required'=>true ) );
+	$Form->text_input( 'ufgp_order', $edited_UserfieldGroup->order, 5, TB_('Order number'), '', array( 'maxlength'=> 11, 'required'=>true ) );
 
 if( $creating )
 {
-	$Form->end_form( array( array( 'submit', 'actionArray[create]', T_('Record'), 'SaveButton' ),
-													array( 'submit', 'actionArray[create_new]', T_('Record, then Create New'), 'SaveButton' ),
-													array( 'submit', 'actionArray[create_copy]', T_('Record, then Create Similar'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'actionArray[create]', TB_('Record'), 'SaveButton' ),
+													array( 'submit', 'actionArray[create_new]', TB_('Record, then Create New'), 'SaveButton' ),
+													array( 'submit', 'actionArray[create_copy]', TB_('Record, then Create Similar'), 'SaveButton' ) ) );
 }
 else
 {
-	$Form->end_form( array( array( 'submit', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
+	$Form->end_form( array( array( 'submit', 'actionArray[update]', TB_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 ?>

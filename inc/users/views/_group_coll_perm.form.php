@@ -20,9 +20,9 @@ global $admin_url;
 $Form = new Form( NULL, 'blogperm_checkchanges', 'post' );
 $Form->formclass = 'form-inline';
 
-$title = ( $action == 'edit' ? T_('Editing group:') : T_('Viewing group:') )
+$title = ( $action == 'edit' ? TB_('Editing group:') : TB_('Viewing group:') )
 		.' '.$edited_Group->dget('name')
-		.' ('.T_('ID').' '.$edited_Group->ID.')';
+		.' ('.TB_('ID').' '.$edited_Group->ID.')';
 
 $Form->begin_form( 'fform', $title );
 
@@ -62,14 +62,14 @@ $Results = new Results( $SQL->get(), 'groupcoll_' );
 // Tell the Results class that we already have a form for this page:
 $Results->Form = & $Form;
 
-$Results->title = T_('Collection permissions').get_manual_link( 'group-collection-permissions' );
+$Results->title = TB_('Collection permissions').get_manual_link( 'group-collection-permissions' );
 
 $Results->filter_area = array(
 	'submit' => 'actionArray[filter]',
 	'callback' => 'filter_collobjectlist',
 	'url_ignore' => 'results_groupcoll_page,keywords1,keywords2',
 	);
-$Results->register_filter_preset( 'all', T_('All collections'), '?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID );
+$Results->register_filter_preset( 'all', TB_('All collections'), '?ctrl=groups&amp;action=edit&amp;tab=collection&amp;grp_ID='.$edited_Group->ID );
 
 // Initialize Results object:
 colls_groups_perms_results( $Results, array(
@@ -83,7 +83,7 @@ echo '</div>';
 
 // Permission note:
 // fp> TODO: link
-echo '<p class="note center">'.T_('Note: General group permissions may further restrict or extend any media folder permissions defined here.').'</p>';
+echo '<p class="note center">'.TB_('Note: General group permissions may further restrict or extend any media folder permissions defined here.').'</p>';
 
 // Make a hidden list of all displayed users:
 $BlogCache = & get_BlogCache();
@@ -98,6 +98,6 @@ foreach( $Results->rows as $row )
 }
 $Form->hidden( 'coll_IDs', implode( ',', $coll_IDs) );
 
-$Form->end_form( array( array( 'submit', 'actionArray[update_perms]', T_('Save Changes!'), 'SaveButton' ) ) );
+$Form->end_form( array( array( 'submit', 'actionArray[update_perms]', TB_('Save Changes!'), 'SaveButton' ) ) );
 
 ?>

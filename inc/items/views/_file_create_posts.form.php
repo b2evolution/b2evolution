@@ -25,7 +25,7 @@ $edited_Item = new Item();
 
 $Form = new Form( NULL, 'pre_post_publish' );
 
-$Form->begin_form( 'fform', T_('Posts preview') );
+$Form->begin_form( 'fform', TB_('Posts preview') );
 $Form->hidden_ctrl();
 
 $images_list = param( 'fm_selected', 'array:string' );
@@ -123,8 +123,8 @@ foreach( $images_list as $item )
 	{
 		$title = basename( $File->get( 'name' ) );
 	}
-	$Form->begin_fieldset( /* TRANS: noun */ T_('Post').' #'.( $post_counter + 1 ).get_manual_link( 'creating-posts-from-files' ) );
-	$Form->text_input( 'post_title['.$post_counter.']', $title, 40, T_('Post title') );
+	$Form->begin_fieldset( /* TRANS: noun */ TB_('Post').' #'.( $post_counter + 1 ).get_manual_link( 'creating-posts-from-files' ) );
+	$Form->text_input( 'post_title['.$post_counter.']', $title, 40, TB_('Post title') );
 
 	if( $post_counter != 0 )
 	{ // The posts after first
@@ -134,7 +134,7 @@ foreach( $images_list as $item )
 				array(
 					array(
 						'value' => 'same',
-						'label' => T_('Same as above').'<br />',
+						'label' => TB_('Same as above').'<br />',
 					)
 				), $categories );
 		}
@@ -151,16 +151,16 @@ foreach( $images_list as $item )
 	{ // Field to create a new category if current user has the rights
 		$categories[] = array(
 				'value'  => 'new',
-				'label'  => T_('New').':',
+				'label'  => TB_('New').':',
 				'suffix' => '<input type="text" id="new_categories['.$post_counter.']" name="new_categories['.$post_counter.']" class="form_text_input" maxlength="255" size="25" />'
 			);
 	}
 
-	$Form->radio_input( 'category['.$post_counter.']', $selected_category_ID, $categories, T_('Category'), array( 'suffix' => '<br />' ) );
+	$Form->radio_input( 'category['.$post_counter.']', $selected_category_ID, $categories, TB_('Category'), array( 'suffix' => '<br />' ) );
 	// Clear last option to create a new for next item with other $post_counter
 	array_pop( $categories );
 
-	$Form->info( T_('Post content'), '<img src="'.$fm_FileRoot->ads_url.$item.'" width="200" />' );
+	$Form->info( TB_('Post content'), '<img src="'.$fm_FileRoot->ads_url.$item.'" width="200" />' );
 
 	$Form->end_fieldset();
 
@@ -174,15 +174,15 @@ if( empty( $visibility_statuses ) )
 	$visibility_statuses = get_visibility_statuses( 'notes-string' );
 	if( isset( $visibility_statuses[ $Blog->get_setting( 'default_post_status' ) ] ) )
 	{ // Current user can create a post only with default status
-		$Form->info( T_('Status of new posts'), $visibility_statuses[ $Blog->get_setting( 'default_post_status' ) ] );
+		$Form->info( TB_('Status of new posts'), $visibility_statuses[ $Blog->get_setting( 'default_post_status' ) ] );
 	}
 }
 else
 { // Display a list with the post statuses
-	$Form->select_input_array( 'post_status', $Blog->get_setting( 'default_post_status' ), $visibility_statuses, T_('Status of new posts') );
+	$Form->select_input_array( 'post_status', $Blog->get_setting( 'default_post_status' ), $visibility_statuses, TB_('Status of new posts') );
 }
 
-$Form->end_form( array( array( 'submit', 'actionArray[make_posts_from_files]', T_('Make posts'), 'ActionButton') ) );
+$Form->end_form( array( array( 'submit', 'actionArray[make_posts_from_files]', TB_('Make posts'), 'ActionButton') ) );
 
 ?>
 <script>

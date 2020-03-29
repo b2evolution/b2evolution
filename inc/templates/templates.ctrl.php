@@ -28,7 +28,7 @@ if( param( 'tpl_ID', 'integer', '', true ) )
 	{	// We could not find the goal to edit:
 		unset( $edited_Template );
 		forget_param( 'tpl_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Template') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Template') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -69,7 +69,7 @@ switch( $action )
 
 		if( $edited_Template && $edited_Template->duplicate() )
 		{
-			$Messages->add( sprintf( TB_('The %s has been duplicated.'), T_('Template') ), 'success' );
+			$Messages->add( sprintf( TB_('The %s has been duplicated.'), TB_('Template') ), 'success' );
 			header_redirect( $admin_url.'?ctrl=templates&action=edit&tpl_ID='.$edited_Template->ID ); // will save $Messages into Session
 			// We have EXITed already at this point!!
 		}
@@ -91,7 +91,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Insert in DB:
 			$edited_Template->dbinsert();
-			$Messages->add( sprintf( TB_('New %s created.'), T_('Template') ), 'success' );
+			$Messages->add( sprintf( TB_('New %s created.'), TB_('Template') ), 'success' );
 
 			if( $action == 'create_edit' )
 			{	// Redirect back to edit form:
@@ -126,7 +126,7 @@ switch( $action )
 		{	// We could load data from form without errors:
 			// Update Menu in DB:
 			$edited_Template->dbupdate();
-			$Messages->add( sprintf( TB_('%s updated.'), T_('Template')  ), 'success' );
+			$Messages->add( sprintf( TB_('%s updated.'), TB_('Template')  ), 'success' );
 
 			if( $action == 'update_edit' )
 			{	// Redirect back to edit form:
@@ -173,7 +173,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Template->check_delete( sprintf( TB_('Cannot delete %s &laquo;%s&raquo;'), T_('Template'), $edited_Template->dget( 'name' ) ), array(), true ) )
+			if( ! $edited_Template->check_delete( sprintf( TB_('Cannot delete %s &laquo;%s&raquo;'), TB_('Template'), $edited_Template->dget( 'name' ) ), array(), true ) )
 			{	// There are restrictions:
 				$action = 'list';
 			}
@@ -187,8 +187,8 @@ $activate_collection_toolbar = true;
 $AdminUI->set_path( 'site', 'templates' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
-$AdminUI->breadcrumbpath_add( T_('Templates'), $admin_url.'?ctrl=templates' );
+$AdminUI->breadcrumbpath_add( TB_('Site'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( TB_('Templates'), $admin_url.'?ctrl=templates' );
 
 // Set an url for manual page:
 if( $action == 'new' || $action == 'edit' )
@@ -220,7 +220,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Template->confirm_delete(
-				sprintf( TB_('Delete %s &laquo;%s&raquo;?'), T_('Template'), $edited_Template->dget( 'name' ) ),
+				sprintf( TB_('Delete %s &laquo;%s&raquo;?'), TB_('Template'), $edited_Template->dget( 'name' ) ),
 				'template', $action, get_memorized( 'action' ) );
 		// NO BREAK
 	case 'new':

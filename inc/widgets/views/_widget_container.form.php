@@ -43,7 +43,7 @@ $Form = new Form( NULL, 'form' );
 
 if( $mode != 'customizer' )
 {
-	$Form->global_icon( T_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
+	$Form->global_icon( TB_('Cancel editing!'), 'close', regenerate_url( 'action' ) );
 }
 
 $Form->begin_form( 'fform', $form_title );
@@ -53,7 +53,7 @@ $Form->hidden( 'action', $creating ? 'create_container' : 'update_container' );
 $Form->hiddens_by_key( get_memorized( 'action' ) );
 $Form->hidden( 'wico_coll_ID', intval( $edited_WidgetContainer->get( 'coll_ID' ) ) );
 
-$Form->begin_fieldset( T_('Container Properties') );
+$Form->begin_fieldset( TB_('Container Properties') );
 
 	$container_type = get_param( 'container_type' );
 	if( $edited_WidgetContainer->ID > 0 || $container_type === NULL )
@@ -71,10 +71,10 @@ $Form->begin_fieldset( T_('Container Properties') );
 			$Form->radio( 'wico_container_type',
 					$edited_WidgetContainer->get( 'main' ) ? 'main' : 'sub',
 					array(
-							array( 'main', T_('Shared main container') ),
-							array( 'sub',  T_('Shared sub-container') ),
+							array( 'main', TB_('Shared main container') ),
+							array( 'sub',  TB_('Shared sub-container') ),
 						),
-					T_( 'Container type' ), true, '', true
+					TB_( 'Container type' ), true, '', true
 				);
 			break;
 
@@ -85,7 +85,7 @@ $Form->begin_fieldset( T_('Container Properties') );
 			$ItemTypeCache = & get_ItemTypeCache();
 			$ItemTypeCache->clear();
 			$ItemTypeCache->load_where( 'ityp_usage = "widget-page"' );
-			$item_types = array( '' => T_('None') );
+			$item_types = array( '' => TB_('None') );
 			foreach( $ItemTypeCache->cache as $ItemType )
 			{
 				$item_types[ $ItemType->ID ] = $ItemType->get_name();
@@ -102,38 +102,38 @@ $Form->begin_fieldset( T_('Container Properties') );
 			$Form->radio_input( 'container_page_type', $container_page_type, array(
 					array(
 						'value' => 'type',
-						'label' => T_('For a new page of type').': '.$container_ityp_ID_select_input ),
+						'label' => TB_('For a new page of type').': '.$container_ityp_ID_select_input ),
 					array(
 						'value' => 'item',
-						'label' => T_('For an existing page').': '.$wico_item_ID_text_input ),
-				), T_('Page container type'), array( 'lines' => true, 'required' => true ) );
+						'label' => TB_('For an existing page').': '.$wico_item_ID_text_input ),
+				), TB_('Page container type'), array( 'lines' => true, 'required' => true ) );
 			break;
 	}
 
-	$Form->text_input( 'wico_name', $edited_WidgetContainer->get( 'name' ), 40, T_('Name'), '', array( 'required' => true, 'maxlength' => 40 ) );
+	$Form->text_input( 'wico_name', $edited_WidgetContainer->get( 'name' ), 40, TB_('Name'), '', array( 'required' => true, 'maxlength' => 40 ) );
 
-	$Form->text_input( 'wico_code', $edited_WidgetContainer->get( 'code' ), 40, T_('Code'), T_('Used for calling from skins. Must be unique.'), array( 'required' => true, 'maxlength' => 32 ) );
+	$Form->text_input( 'wico_code', $edited_WidgetContainer->get( 'code' ), 40, TB_('Code'), TB_('Used for calling from skins. Must be unique.'), array( 'required' => true, 'maxlength' => 32 ) );
 
 	if( $edited_WidgetContainer->ID == 0 )
 	{	// Allow to set skin type only on creating new widget container:
 		$Form->radio( 'wico_skin_type',
 				$edited_WidgetContainer->get( 'skin_type' ),
 				array(
-						array( 'normal', T_('Standard'), T_('Standard skin for general browsing') ),
-						array( 'mobile', T_('Phone'), T_('Mobile skin for mobile phones browsers') ),
-						array( 'tablet', T_('Tablet'), T_('Tablet skin for tablet browsers') ),
-						array( 'alt',    T_('Alt'), T_('Alternative skin to display by conditions') ),
+						array( 'normal', TB_('Standard'), TB_('Standard skin for general browsing') ),
+						array( 'mobile', TB_('Phone'), TB_('Mobile skin for mobile phones browsers') ),
+						array( 'tablet', TB_('Tablet'), TB_('Tablet skin for tablet browsers') ),
+						array( 'alt',    TB_('Alt'), TB_('Alternative skin to display by conditions') ),
 					),
-				T_( 'Skin type' ), true, '', true
+				TB_( 'Skin type' ), true, '', true
 			);
 	}
 
-	$Form->text_input( 'wico_order', $edited_WidgetContainer->get( 'order' ), 10, T_('Order'), T_('For manual ordering of the containers.'), array( 'required' => !$creating, 'maxlength' => 10 ) );
+	$Form->text_input( 'wico_order', $edited_WidgetContainer->get( 'order' ), 10, TB_('Order'), TB_('For manual ordering of the containers.'), array( 'required' => !$creating, 'maxlength' => 10 ) );
 
 $Form->end_fieldset();
 
 $buttons = array();
-$buttons[] = array( 'submit', 'save', ( $creating ? T_('Record') : ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ) ), 'SaveButton' );
+$buttons[] = array( 'submit', 'save', ( $creating ? TB_('Record') : ( $mode == 'customizer' ? TB_('Apply Changes!') : TB_('Save Changes!') ) ), 'SaveButton' );
 if( $mode == 'customizer' )
 {	// Display buttons in special div on customizer mode:
 	echo '<div class="evo_customizer__buttons">';

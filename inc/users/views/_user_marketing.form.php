@@ -25,7 +25,7 @@ global $servertimenow, $admin_url, $user_tags, $action;
 
 if( ! $current_User->can_moderate_user( $edited_User->ID ) )
 { // Check permission:
-	debug_die( T_( 'You have no permission to see this tab!' ) );
+	debug_die( TB_( 'You have no permission to see this tab!' ) );
 }
 
 // Begin payload block:
@@ -45,8 +45,8 @@ $Form->title_fmt = '$title$';
 
 echo_user_actions( $Form, $edited_User, $action );
 
-$form_text_title = T_( 'User marketing settings' ); // used for js confirmation message on leave the changed form
-$form_title = get_usertab_header( $edited_User, 'marketing', '<span class="nowrap">'.T_( 'User marketing settings' ).'</span>'.get_manual_link( 'user-marketing-tab' ) );
+$form_text_title = TB_( 'User marketing settings' ); // used for js confirmation message on leave the changed form
+$form_title = get_usertab_header( $edited_User, 'marketing', '<span class="nowrap">'.TB_( 'User marketing settings' ).'</span>'.get_manual_link( 'user-marketing-tab' ) );
 
 $Form->begin_form( 'fform', $form_title, array( 'title' => ( isset( $form_text_title ) ? $form_text_title : $form_title ) ) );
 
@@ -57,25 +57,25 @@ $Form->hidden( 'user_tab', 'marketing' );
 $Form->hidden( 'user_ID', $edited_User->ID );
 $Form->hidden( 'edited_user_login', $edited_User->login );
 
-$Form->begin_fieldset( T_('Tags').get_manual_link('user-marketing-tags') );
+$Form->begin_fieldset( TB_('Tags').get_manual_link('user-marketing-tags') );
 
 	if( $action != 'view' )
 	{	// If current user can edit this user:
-		$Form->usertag_input( 'edited_user_tags', param( 'edited_user_tags', 'string', $user_tags ), 40, T_('Tags'), '', array(
+		$Form->usertag_input( 'edited_user_tags', param( 'edited_user_tags', 'string', $user_tags ), 40, TB_('Tags'), '', array(
 				'maxlength' => 255,
 				'style'     => 'width: 100%;',
 			) );
 	}
 	else
 	{	// If current user cannot edit this user:
-		$Form->info( T_('Tags'), $user_tags );
+		$Form->info( TB_('Tags'), $user_tags );
 	}
 
 $Form->end_fieldset(); // user tags
 
 if( $action != 'view' )
 {	// If current user can edit this user:
-	$Form->buttons( array( array( '', 'actionArray[update]', T_('Save Changes!'), 'SaveButton' ) ) );
+	$Form->buttons( array( array( '', 'actionArray[update]', TB_('Save Changes!'), 'SaveButton' ) ) );
 }
 
 $Form->end_form();
@@ -92,16 +92,16 @@ $Results = new Results( $SQL->get(), 'ustep_', '--A' );
 
 if( $action != 'view' )
 {	// If current user can edit this user:
-	$Results->global_icon( T_('Add user to an automation...'), 'new', regenerate_url( 'action,user_tab', 'action=new_automation&amp;user_tab=automation' ), T_('Add user to an automation...'), 3, 4, array(
+	$Results->global_icon( TB_('Add user to an automation...'), 'new', regenerate_url( 'action,user_tab', 'action=new_automation&amp;user_tab=automation' ), TB_('Add user to an automation...'), 3, 4, array(
 			'class' => 'action_icon btn-primary',
 			'onclick' => 'return add_user_automation( '.$edited_User->ID.' )'
 		) );
 }
 
-$Results->title = T_('Automations').get_manual_link( 'user-automations' );
+$Results->title = TB_('Automations').get_manual_link( 'user-automations' );
 
 $Results->cols[] = array(
-		'th'    => T_('Automation'),
+		'th'    => TB_('Automation'),
 		'order' => 'autm_name',
 		'td'    => ( $current_User->check_perm( 'options', 'edit' )
 			? '<a href="'.$admin_url.'?ctrl=automations&amp;action=edit&amp;autm_ID=$autm_ID$"><b>$autm_name$</b></a>'
@@ -109,13 +109,13 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th'    => T_('Next step'),
+		'th'    => TB_('Next step'),
 		'order' => 'step_order, step_label',
 		'td'    => '%step_td_user_state( #step_ID#, #step_label#, #step_type#, #step_info#, #step_order# )%',
 	);
 
 $Results->cols[] = array(
-		'th'       => T_('Next execution time'),
+		'th'       => TB_('Next execution time'),
 		'order'    => 'aust_next_exec_ts',
 		'td'       => '%mysql2localedatetime_spans( #aust_next_exec_ts# )%',
 		'th_class' => 'shrinkwrap',
@@ -123,8 +123,8 @@ $Results->cols[] = array(
 	);
 
 $Results->cols[] = array(
-		'th'       => T_('Actions'),
-		'td'       => action_icon( T_('Remove this user from automation'), 'delete', $admin_url.'?ctrl=user&amp;action=remove_automation&amp;user_ID='.$edited_User->ID.'&amp;autm_ID=$autm_ID$&amp;'.url_crumb( 'user' ) ),
+		'th'       => TB_('Actions'),
+		'td'       => action_icon( TB_('Remove this user from automation'), 'delete', $admin_url.'?ctrl=user&amp;action=remove_automation&amp;user_ID='.$edited_User->ID.'&amp;autm_ID=$autm_ID$&amp;'.url_crumb( 'user' ) ),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 	);
@@ -141,10 +141,10 @@ $campaign_SQL->WHERE( 'csnd_user_ID = '.$edited_User->ID );
 
 $campaign_Results = new Results( $campaign_SQL->get(), 'ucamp_', 'D' );
 $Results->Cache = & get_EmailCampaignCache();
-$campaign_Results->title = T_('Email campaigns').get_manual_link( 'email-campaign-recipients' );
+$campaign_Results->title = TB_('Email campaigns').get_manual_link( 'email-campaign-recipients' );
 
 $campaign_Results->cols[] = array(
-	'th' => T_('ID'),
+	'th' => TB_('ID'),
 	'order' => 'ecmp_ID',
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'right',
@@ -152,22 +152,22 @@ $campaign_Results->cols[] = array(
 );
 
 $campaign_Results->cols[] = array(
-	'th' => T_('Campaign name'),
+	'th' => TB_('Campaign name'),
 	'order' => 'ecmp_name',
 	'td' => '<a href="'.$admin_url.'?ctrl=campaigns&amp;action=edit&amp;ecmp_ID=$ecmp_ID$"><b>$ecmp_name$</b></a>',
 );
 
 
 $campaign_Results->cols[] = array(
-		'th' => T_('List Status'),
+		'th' => TB_('List Status'),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'nowrap',
 		'order' => 'enls_user_ID',
-		'td' => '~conditional( #enls_subscribed# > 0, \''.format_to_output( T_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( T_('Unsubscribed'), 'htmlattr' ).'\' )~',
+		'td' => '~conditional( #enls_subscribed# > 0, \''.format_to_output( TB_('Still subscribed'), 'htmlattr' ).'\', \''.format_to_output( TB_('Unsubscribed'), 'htmlattr' ).'\' )~',
 	);
 
 $campaign_Results->cols[] = array(
-		'th' => T_('Campaign Status'),
+		'th' => TB_('Campaign Status'),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'center nowrap',
 		'order' => 'csnd_status',
@@ -175,7 +175,7 @@ $campaign_Results->cols[] = array(
 	);
 
 $campaign_Results->cols[] = array(
-		'th' => T_('Send date'),
+		'th' => TB_('Send date'),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'timestamp',
 		'order' => 'csnd_last_sent_ts',
@@ -184,7 +184,7 @@ $campaign_Results->cols[] = array(
 	);
 
 $campaign_Results->cols[] = array(
-	'th' => T_('Last opened'),
+	'th' => TB_('Last opened'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'timestamp',
 	'order' => 'csnd_last_open_ts',
@@ -193,7 +193,7 @@ $campaign_Results->cols[] = array(
 );
 
 $campaign_Results->cols[] = array(
-	'th' => T_('Last clicked'),
+	'th' => TB_('Last clicked'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'timestamp',
 	'order' => 'csnd_last_click_ts',
@@ -202,7 +202,7 @@ $campaign_Results->cols[] = array(
 );
 
 $campaign_Results->cols[] = array(
-	'th' => /* TRANS: Call To Action 1*/ T_('CTA1'),
+	'th' => /* TRANS: Call To Action 1*/ TB_('CTA1'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'order' => 'csnd_cta1',
@@ -210,7 +210,7 @@ $campaign_Results->cols[] = array(
 );
 
 $campaign_Results->cols[] = array(
-	'th' => /* TRANS: Call To Action 2*/ T_('CTA2'),
+	'th' => /* TRANS: Call To Action 2*/ TB_('CTA2'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'order' => 'csnd_cta2',
@@ -218,7 +218,7 @@ $campaign_Results->cols[] = array(
 );
 
 $campaign_Results->cols[] = array(
-	'th' => /* TRANS: Call To Action 3*/ T_('CTA3'),
+	'th' => /* TRANS: Call To Action 3*/ TB_('CTA3'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'order' => 'csnd_cta3',
@@ -226,7 +226,7 @@ $campaign_Results->cols[] = array(
 );
 
 $campaign_Results->cols[] = array(
-	'th' => T_('Liked'),
+	'th' => TB_('Liked'),
 	'th_class' => 'shrinkwrap',
 	'td_class' => 'center',
 	'order' => 'csnd_like',
@@ -235,7 +235,7 @@ $campaign_Results->cols[] = array(
 if( $action != 'view' )
 {	// If current user can edit this user:
 	$campaign_Results->cols[] = array(
-		'th' => T_('Actions'),
+		'th' => TB_('Actions'),
 		'th_class' => 'small',
 		'td_class' => 'shrinkwrap small',
 		'td' => '%user_td_campaign_actions( #ecmp_ID#, '.$edited_User->ID.', #csnd_status# )%'

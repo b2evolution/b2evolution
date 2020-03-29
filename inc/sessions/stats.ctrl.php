@@ -64,7 +64,7 @@ if( ( $blog == 0 && empty( $sec_ID ) ) || ! $current_User->check_perm( 'stats', 
 	{ // Find a blog we can view stats for:
 		if( ! $selected = autoselect_blog( 'stats', 'list' ) )
 		{ // No blog could be selected
-			$Messages->add( T_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
+			$Messages->add( TB_('Sorry, there is no blog you have permission to view stats for.'), 'error' );
 			$action = 'nil';
 		}
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
@@ -88,7 +88,7 @@ switch( $action )
 		param( 'new_hit_type', 'string', true ); // Required!
 
 		Hitlist::change_type( $hit_ID, $new_hit_type );
-		$Messages->add( sprintf( T_('Changed hit #%d type to: %s.'), $hit_ID, $new_hit_type), 'success' );
+		$Messages->add( sprintf( TB_('Changed hit #%d type to: %s.'), $hit_ID, $new_hit_type), 'success' );
 		break;
 
 
@@ -102,11 +102,11 @@ switch( $action )
 		param( 'date', 'integer', true ); // Required!
 		if( $r = Hitlist::prune( $date ) )
 		{
-			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('Deleted %d hits for %s.'), $r, date( locale_datefmt(), $date ) ), 'success' );
+			$Messages->add( sprintf( /* TRANS: %s is a date */ TB_('Deleted %d hits for %s.'), $r, date( locale_datefmt(), $date ) ), 'success' );
 		}
 		else
 		{
-			$Messages->add( sprintf( /* TRANS: %s is a date */ T_('No hits deleted for %s.'), date( locale_datefmt(), $date ) ), 'note' );
+			$Messages->add( sprintf( /* TRANS: %s is a date */ TB_('No hits deleted for %s.'), date( locale_datefmt(), $date ) ), 'note' );
 		}
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( '?ctrl=stats&blog='.$blog, 303 ); // Will EXIT
@@ -148,7 +148,7 @@ switch( $action )
 		if( ! $Messages->has_errors() )
 		{
 			$Settings->dbupdate();
-			$Messages->add( T_( 'Settings updated.' ), 'success' );
+			$Messages->add( TB_( 'Settings updated.' ), 'success' );
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=stats&tab=settings&blog='.$blog, 303 ); // Will EXIT
 			// We have EXITed already at this point!!
@@ -178,7 +178,7 @@ switch( $action )
 			{ // We could not find the goal to edit:
 				unset( $edited_Domain );
 				forget_param( 'dom_ID' );
-				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Domain') ), 'error' );
+				$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Domain') ), 'error' );
 			}
 		}
 		break;
@@ -205,7 +205,7 @@ switch( $action )
 			{ // We could not find the goal to edit:
 				unset( $edited_Domain );
 				forget_param( 'dom_ID' );
-				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Domain') ), 'error' );
+				$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Domain') ), 'error' );
 			}
 		}
 
@@ -217,7 +217,7 @@ switch( $action )
 			// Insert/Update in DB:
 			$edited_Domain->dbsave();
 			$DB->commit();
-			$Messages->add( $is_creating ? T_('New domain created.') : T_('Domain has been updated.'), 'success' );
+			$Messages->add( $is_creating ? TB_('New domain created.') : TB_('Domain has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			if( $tab_from == 'antispam' )
@@ -255,13 +255,13 @@ switch( $action )
 			{ // We could not find the goal to edit:
 				unset( $edited_Domain );
 				forget_param( 'dom_ID' );
-				$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Domain') ), 'error' );
+				$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Domain') ), 'error' );
 			}
 
 			// Delete from DB:
 			if( $edited_Domain->dbdelete() )
 			{
-				$Messages->add( T_('Domain has been deleted.'), 'success' );
+				$Messages->add( TB_('Domain has been deleted.'), 'success' );
 			}
 
 			header_redirect( $admin_url.'?ctrl=stats&tab=domains&tab3='.$tab3.'&blog='.$blog );
@@ -281,7 +281,7 @@ switch( $action )
 		Hitlist::aggregate_hits();
 		Hitlist::aggregate_sessions();
 
-		$Messages->add( T_('The hits have been aggregated.'), 'success' );
+		$Messages->add( TB_('The hits have been aggregated.'), 'success' );
 
 		// Redirect to referer page:
 		header_redirect( $admin_url.'?ctrl=stats&tab='.$tab.'&tab3='.$tab3.'&blog='.$blog, 303 ); // Will EXIT
@@ -378,7 +378,7 @@ if( isset( $collections_Module ) && $tab_from != 'antispam' )
 { // Display list of blogs:
 	if( $perm_view_all )
 	{
-		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), T_('All'),
+		$AdminUI->set_coll_list_params( 'stats', 'view', array( 'ctrl' => 'stats', 'tab' => $tab, 'tab3' => $tab3 ), TB_('All'),
 						$admin_url.'?ctrl=stats&amp;tab='.$tab.'&amp;tab3='.$tab3.'&amp;blog=0', NULL, false, true );
 	}
 	else
@@ -388,7 +388,7 @@ if( isset( $collections_Module ) && $tab_from != 'antispam' )
 	}
 }
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Analytics'), 'url' => '?ctrl=stats&amp;blog=$blog$' ) );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => TB_('Analytics'), 'url' => '?ctrl=stats&amp;blog=$blog$' ) );
 $AdminUI->set_page_manual_link( 'analytics-tab' );
 
 if( isset( $tab_real ) )
@@ -405,8 +405,8 @@ switch( $tab )
 			$Session->set( 'hits_summary_mode', $hits_summary_mode );
 		}
 
-		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
-		$AdminUI->breadcrumbpath_add( T_('Summary'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( TB_('Summary'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		if( empty( $tab3 ) )
 		{
 			$tab3 = 'global';
@@ -414,42 +414,42 @@ switch( $tab )
 		switch( $tab3 )
 		{
 			case 'global':
-				$AdminUI->breadcrumbpath_add( T_('All'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('All'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'global-hits-summary' );
 				break;
 
 			case 'browser':
-				$AdminUI->breadcrumbpath_add( T_('Browsers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Browsers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'browser-hits-summary' );
 				break;
 
 			case 'api':
-				$AdminUI->breadcrumbpath_add( T_('API'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('API'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'api-hits-summary' );
 				break;
 
 			case 'search_referers':
-				$AdminUI->breadcrumbpath_add( T_('Search & Referers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Search & Referers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'search-referers-hits-summary' );
 				break;
 
 			case 'robot':
-				$AdminUI->breadcrumbpath_add( T_('Robots'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Robots'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'robots-hits-summary' );
 				break;
 
 			case 'feed':
-				$AdminUI->breadcrumbpath_add( T_('RSS/Atom'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('RSS/Atom'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'feed-hits-summary' );
@@ -460,32 +460,32 @@ switch( $tab )
 		break;
 
 	case 'other':
-		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
-		$AdminUI->breadcrumbpath_add( T_('Direct hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( TB_('Direct hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'direct-b-hits' );
 		break;
 
 	case 'hits':
-		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
-		$AdminUI->breadcrumbpath_add( T_('All Hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( TB_('All Hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'all-hits' );
 		break;
 
 	case 'referers':
-		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
-		$AdminUI->breadcrumbpath_add( T_('Referred by other sites'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( TB_('Referred by other sites'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'referred-b-hits' );
 		break;
 
 	case 'refsearches':
-		$AdminUI->breadcrumbpath_add( T_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
-		$AdminUI->breadcrumbpath_add( T_('Incoming searches'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Hits'), '?ctrl=stats&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( TB_('Incoming searches'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		if( empty( $tab3 ) )
 		{
 			$tab3 = 'hits';
@@ -493,21 +493,21 @@ switch( $tab )
 		switch( $tab3 )
 		{
 			case 'hits':
-				// $AdminUI->breadcrumbpath_add( T_('Latest'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				// $AdminUI->breadcrumbpath_add( TB_('Latest'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'search-browser-hits-tab' );
 				break;
 
 			case 'keywords':
-				$AdminUI->breadcrumbpath_add( T_('Searched keywords'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Searched keywords'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'search-browser-keywords-tab' );
 				break;
 
 			case 'topengines':
-				$AdminUI->breadcrumbpath_add( T_('Top search engines'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Top search engines'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'search-browser-top-engines-tab' );
@@ -517,8 +517,8 @@ switch( $tab )
 		break;
 
 	case 'ips':
-		$AdminUI->breadcrumbpath_add( T_('IPs'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
-		$AdminUI->breadcrumbpath_add( T_('Top IPs'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('IPs'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Top IPs'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		$tab3 = 'top';
 
 		// Set an url for manual page:
@@ -526,10 +526,10 @@ switch( $tab )
 		break;
 
 	case 'domains':
-		$AdminUI->breadcrumbpath_add( T_('Referring domains'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Referring domains'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 		if( $action == 'domain_new' )
 		{
-			$AdminUI->breadcrumbpath_add( T_('Add domain'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;action=domain_new' );
+			$AdminUI->breadcrumbpath_add( TB_('Add domain'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;action=domain_new' );
 		}
 		if( empty( $tab3 ) )
 		{
@@ -538,7 +538,7 @@ switch( $tab )
 		switch( $tab3 )
 		{
 			case 'top':
-				$AdminUI->breadcrumbpath_add( T_('Top referrers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('Top referrers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'top-referring-domains' );
@@ -546,7 +546,7 @@ switch( $tab )
 
 			case 'all':
 			default:
-				$AdminUI->breadcrumbpath_add( T_('All referrers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
+				$AdminUI->breadcrumbpath_add( TB_('All referrers'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab.'&amp;tab3='.$tab3 );
 
 				// Set an url for manual page:
 				$AdminUI->set_page_manual_link( 'referring-domains-tab' );
@@ -555,18 +555,18 @@ switch( $tab )
 		break;
 
 	case 'goals':
-		$AdminUI->breadcrumbpath_add( T_('Goal tracking'), '?ctrl=goals&amp;blog=$blog$' );
+		$AdminUI->breadcrumbpath_add( TB_('Goal tracking'), '?ctrl=goals&amp;blog=$blog$' );
 		switch( $tab3 )
 		{
 			case 'hits':
-				$AdminUI->breadcrumbpath_add( T_('Goal hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+				$AdminUI->breadcrumbpath_add( TB_('Goal hits'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 				break;
 		}
 		$AdminUI->set_page_manual_link( 'goal-hits' );
 		break;
 
 	case 'settings':
-		$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
+		$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=stats&amp;blog=$blog$&amp;tab='.$tab );
 
 		// Set an url for manual page:
 		$AdminUI->set_page_manual_link( 'hit-logging' );
@@ -580,10 +580,10 @@ if( $tab_from == 'antispam' )
 	$AdminUI->breadcrumbpath = array();
 	$AdminUI->breadcrumb_titles = array();
 	$AdminUI->breadcrumbpath_init( false );
-	$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-	$AdminUI->breadcrumbpath_add( T_('Antispam'), $admin_url.'?ctrl=antispam' );
-	$AdminUI->breadcrumbpath_add( T_('Referring domains'), $admin_url.'?ctrl=antispam&amp;tab3=domains' );
-	$AdminUI->breadcrumbpath_add( T_('Add domain'), $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;tab_from='.$tab_from );
+	$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system' );
+	$AdminUI->breadcrumbpath_add( TB_('Antispam'), $admin_url.'?ctrl=antispam' );
+	$AdminUI->breadcrumbpath_add( TB_('Referring domains'), $admin_url.'?ctrl=antispam&amp;tab3=domains' );
+	$AdminUI->breadcrumbpath_add( TB_('Add domain'), $admin_url.'?ctrl=stats&amp;tab=domains&amp;action=domain_new&amp;tab_from='.$tab_from );
 }
 else
 {
@@ -689,7 +689,7 @@ switch( $AdminUI->get_path( 1 ) )
 			case 'domain_delete':
 				// We need to ask for confirmation:
 				$edited_Domain->confirm_delete(
-					sprintf( T_('Delete domain &laquo;%s&raquo;?'), $edited_Domain->dget( 'name' ) ),
+					sprintf( TB_('Delete domain &laquo;%s&raquo;?'), $edited_Domain->dget( 'name' ) ),
 					'domain', $action, get_memorized( 'action' ) );
 				/* no break */
 			case 'domain_new':

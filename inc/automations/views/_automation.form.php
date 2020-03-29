@@ -22,17 +22,17 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'automation_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,autm_ID' ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action,autm_ID' ) );
 
-$Form->begin_form( 'fform', ( $creating ?  T_('New automation') : T_('Automation') ).get_manual_link( 'automation-form-settings' ) );
+$Form->begin_form( 'fform', ( $creating ?  TB_('New automation') : TB_('Automation') ).get_manual_link( 'automation-form-settings' ) );
 
 $Form->add_crumb( 'automation' );
 $Form->hidden( 'action',  $creating ? 'create' : 'update' );
 $Form->hiddens_by_key( get_memorized( 'action'.( $creating ? ',autm_ID' : '' ) ) );
 
-$Form->text_input( 'autm_name', $edited_Automation->get( 'name' ), 40, T_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
+$Form->text_input( 'autm_name', $edited_Automation->get( 'name' ), 40, TB_('Name'), '', array( 'maxlength' => 255, 'required' => true ) );
 
-$Form->select_input_array( 'autm_status', $edited_Automation->get( 'status' ), autm_get_status_titles(), T_('Status'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
+$Form->select_input_array( 'autm_status', $edited_Automation->get( 'status' ), autm_get_status_titles(), TB_('Status'), '', array( 'force_keys_as_values' => true, 'required' => true ) );
 
 // Tied Lists:
 $NewsletterCache = & get_NewsletterCache();
@@ -40,29 +40,29 @@ $NewsletterCache->load_all();
 $newsletters = $edited_Automation->get_newsletters();
 foreach( $newsletters as $n => $newsletter )
 {
-	$Form->begin_line( T_('Tied to List').' <span class="evo_tied_list_number">'.( $n + 1 ).'</span>', '', '', array( 'required' => true ) );
+	$Form->begin_line( TB_('Tied to List').' <span class="evo_tied_list_number">'.( $n + 1 ).'</span>', '', '', array( 'required' => true ) );
 		$Form->select_input_object( 'aunl_enlt_ID[]', $newsletter['ID'], $NewsletterCache, '', array( 'allow_none' => true, 'required' => true ) );
-		$Form->checkbox_input( 'aunl_autostart', $newsletter['autostart'], '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto start on list subscribe').'</label> &nbsp; ' ) );
-		$Form->checkbox_input( 'aunl_autoexit', $newsletter['autoexit'], '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto exit on list unsubscribe').'</label>'
+		$Form->checkbox_input( 'aunl_autostart', $newsletter['autostart'], '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.TB_('auto start on list subscribe').'</label> &nbsp; ' ) );
+		$Form->checkbox_input( 'aunl_autoexit', $newsletter['autoexit'], '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.TB_('auto exit on list unsubscribe').'</label>'
 			.' &nbsp; <a href="#" class="evo_remove_tied_list">'.get_icon( 'minus' ).'</a>' ) );
 	$Form->end_line();
 }
 // Initialize a template to add more newsletter fields by JS code below:
 $Form->output = false;
-$newsletter_fields = $Form->begin_line( T_('Tied to List').' <span class="evo_tied_list_number"></span>', '', '', array( 'required' => true ) )
+$newsletter_fields = $Form->begin_line( TB_('Tied to List').' <span class="evo_tied_list_number"></span>', '', '', array( 'required' => true ) )
 		.$Form->select_input_object( 'aunl_enlt_ID[]', '', $NewsletterCache, '', array( 'allow_none' => true, 'required' => true ) )
-		.$Form->checkbox_input( 'aunl_autostart', 1, '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto start on list subscribe').'</label> &nbsp; ' ) )
-		.$Form->checkbox_input( 'aunl_autoexit', 1, '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.T_('auto exit on list unsubscribe').'</label>'
+		.$Form->checkbox_input( 'aunl_autostart', 1, '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.TB_('auto start on list subscribe').'</label> &nbsp; ' ) )
+		.$Form->checkbox_input( 'aunl_autoexit', 1, '', array( 'input_prefix' => '<label>', 'input_suffix' => ' '.TB_('auto exit on list unsubscribe').'</label>'
 			.' &nbsp; <a href="#" class="evo_remove_tied_list">'.get_icon( 'minus' ).'</a>' ) )
 	.$Form->end_line();
 $Form->output = true;
 // Display a button to add more newsletter:
-$Form->info_field( '', '<button class="btn btn-default" type="button" id="evo_add_tied_list">'.get_icon( 'add' ).' '.T_('Tie to an additional list...').'</button>', array( 'class' => 'info_full_height' ) );
+$Form->info_field( '', '<button class="btn btn-default" type="button" id="evo_add_tied_list">'.get_icon( 'add' ).' '.TB_('Tie to an additional list...').'</button>', array( 'class' => 'info_full_height' ) );
 
-$Form->username( 'autm_owner_login', $edited_Automation->get_owner_User(), T_('Owner'), '', '', array( 'required' => true ) );
+$Form->username( 'autm_owner_login', $edited_Automation->get_owner_User(), TB_('Owner'), '', '', array( 'required' => true ) );
 
 $Form->end_form( array(
-		array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' )
+		array( 'submit', 'submit', ( $creating ? TB_('Record') : TB_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s,ctrl+enter,command+enter' )
 	) );
 
 ?>

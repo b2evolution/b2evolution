@@ -28,9 +28,9 @@ $current_User->check_perm( 'options', 'edit', true );
 $AdminUI->set_path( 'options', 'syslog' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
-		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('System log'), $admin_url.'?ctrl=syslog' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system',
+		TB_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( TB_('System log'), $admin_url.'?ctrl=syslog' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'system-log-tab' );

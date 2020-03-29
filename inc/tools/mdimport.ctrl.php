@@ -73,10 +73,10 @@ switch( $action )
 $AdminUI->set_path( 'options', 'misc', 'import' );
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system' );
-$AdminUI->breadcrumbpath_add( T_('Maintenance'), $admin_url.'?ctrl=tools' );
-$AdminUI->breadcrumbpath_add( T_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
-$AdminUI->breadcrumbpath_add( T_('Markdown Importer'), $admin_url.'?ctrl=mdimport' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system' );
+$AdminUI->breadcrumbpath_add( TB_('Maintenance'), $admin_url.'?ctrl=tools' );
+$AdminUI->breadcrumbpath_add( TB_('Import'), $admin_url.'?ctrl=tools&amp;tab3=import' );
+$AdminUI->breadcrumbpath_add( TB_('Markdown Importer'), $admin_url.'?ctrl=mdimport' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'markdown-importer' );
