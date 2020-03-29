@@ -72,7 +72,7 @@ switch( $action )
 
 		if( $result = create_contacts_group_users( $group, $users ) )
 		{	// Users have been added to the group
-			$Messages->add( sprintf( T_('%d contacts have been added to the &laquo;%s&raquo; group.'), $result['count_users'], $result['group_name'] ), 'success' );
+			$Messages->add( sprintf( TB_('%d contacts have been added to the &laquo;%s&raquo; group.'), $result['count_users'], $result['group_name'] ), 'success' );
 			header_redirect( url_add_param( $admin_url, 'ctrl=contacts' ) );
 		}
 		break;
@@ -85,7 +85,7 @@ switch( $action )
 
 		if( rename_contacts_group( $group_ID ) )
 		{
-			$Messages->add( T_('The group has been renamed.'), 'success' );
+			$Messages->add( TB_('The group has been renamed.'), 'success' );
 			header_redirect( url_add_param( $admin_url, 'ctrl=contacts&g='.$group_ID, '&' ) );
 		}
 		break;
@@ -98,7 +98,7 @@ switch( $action )
 
 		if( delete_contacts_group( $group_ID ) )
 		{
-			$Messages->add( T_('The group has been deleted.'), 'success' );
+			$Messages->add( TB_('The group has been deleted.'), 'success' );
 			header_redirect( url_add_param( $admin_url, 'ctrl=contacts', '&' ) );
 		}
 		break;
@@ -119,8 +119,8 @@ if( isset( $mct_blocked ) )
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Messages'), '?ctrl=threads' );
-$AdminUI->breadcrumbpath_add( T_('Contacts'), '?ctrl=contacts' );
+$AdminUI->breadcrumbpath_add( TB_('Messages'), '?ctrl=threads' );
+$AdminUI->breadcrumbpath_add( TB_('Contacts'), '?ctrl=contacts' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'contacts-list' );

@@ -42,7 +42,7 @@ if( param( 'subrg_ID', 'integer', '', true) )
 	if( ($edited_Subregion = & $SubregionCache->get_by_ID( $subrg_ID, false )) === false )
 	{	unset( $edited_Subregion );
 		forget_param( 'subrg_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Region') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Region') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -67,12 +67,12 @@ switch( $action )
 		if ( $action == 'disable_subregion' )
 		{	// Disable this subregion by setting flag to false.
 			$edited_Subregion->set( 'enabled', 0 );
-			$Messages->add( sprintf( T_('Disabled sub-region (%s, #%d).'), $edited_Subregion->name, $edited_Subregion->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Disabled sub-region (%s, #%d).'), $edited_Subregion->name, $edited_Subregion->ID ), 'success' );
 		}
 		elseif ( $action == 'enable_subregion' )
 		{	// Enable subregion by setting flag to true.
 			$edited_Subregion->set( 'enabled', 1 );
-			$Messages->add( sprintf( T_('Enabled sub-region (%s, #%d).'), $edited_Subregion->name, $edited_Subregion->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Enabled sub-region (%s, #%d).'), $edited_Subregion->name, $edited_Subregion->ID ), 'success' );
 		}
 
 		// Update db with new flag value.
@@ -105,12 +105,12 @@ switch( $action )
 		if ( $action == 'disable_subregion_pref' )
 		{	// Disable this subregion by setting flag to false.
 			$edited_Subregion->set( 'preferred', 0 );
-			$Messages->add( sprintf( T_('Removed from preferred sub-regions (%s, #%d).'), $edited_Subregion->name, $edited_Subregion->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Removed from preferred sub-regions (%s, #%d).'), $edited_Subregion->name, $edited_Subregion->ID ), 'success' );
 		}
 		elseif ( $action == 'enable_subregion_pref' )
 		{	// Enable subregion by setting flag to true.
 			$edited_Subregion->set( 'preferred', 1 );
-			$Messages->add( sprintf( T_('Added to preferred sub-regions (%s, #%d).'), $edited_Subregion->name, $edited_Subregion->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Added to preferred sub-regions (%s, #%d).'), $edited_Subregion->name, $edited_Subregion->ID ), 'success' );
 		}
 
 		// Update db with new flag value.
@@ -171,7 +171,7 @@ switch( $action )
 			// Insert in DB:
 			unset( $edited_Subregion->dbchanges['subrg_ctry_ID'] );
 			$edited_Subregion->dbinsert();
-			$Messages->add( T_('New region created.'), 'success' );
+			$Messages->add( TB_('New region created.'), 'success' );
 
 			// What next?
 			switch( $action )
@@ -214,7 +214,7 @@ switch( $action )
 			// Update in DB:
 			unset( $edited_Subregion->dbchanges['subrg_ctry_ID'] );
 			$edited_Subregion->dbupdate();
-			$Messages->add( T_('Region updated.'), 'success' );
+			$Messages->add( TB_('Region updated.'), 'success' );
 
 			// If no error, Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( '?ctrl=subregions', 303 ); // Will EXIT
@@ -236,7 +236,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Region &laquo;%s&raquo; deleted.'), $edited_Subregion->dget('name') );
+			$msg = sprintf( TB_('Region &laquo;%s&raquo; deleted.'), $edited_Subregion->dget('name') );
 			$edited_Subregion->dbdelete();
 			unset( $edited_Subregion );
 			forget_param( 'subrg_ID' );
@@ -247,7 +247,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Subregion->check_delete( sprintf( T_('Cannot delete sub-region &laquo;%s&raquo;'), $edited_Subregion->dget('name') ) ) )
+			if( ! $edited_Subregion->check_delete( sprintf( TB_('Cannot delete sub-region &laquo;%s&raquo;'), $edited_Subregion->dget('name') ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -267,7 +267,7 @@ switch( $action )
 
 		// Country Id
 		param( 'ctry_ID', 'integer', true );
-		param_check_number( 'ctry_ID', T_('Please select a country'), true );
+		param_check_number( 'ctry_ID', TB_('Please select a country'), true );
 
 		param( 'auto_create_regions', 'boolean' );
 
@@ -275,11 +275,11 @@ switch( $action )
 		$import_file = param( 'import_file', 'string', '' );
 		if( empty( $import_file ) )
 		{	// File is not selected:
-			$Messages->add( T_('Please select a CSV file to import.'), 'error' );
+			$Messages->add( TB_('Please select a CSV file to import.'), 'error' );
 		}
 		else if( ! preg_match( '/\.csv$/i', $import_file ) )
 		{	// Extension is incorrect
-			$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
+			$Messages->add( sprintf( TB_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
 		}
 
 		if( param_errors_detected() )
@@ -295,12 +295,12 @@ switch( $action )
 		$CountryCache = & get_CountryCache();
 		$Country = $CountryCache->get_by_ID( $ctry_ID );
 
-		$Messages->add( sprintf( T_('%s sub-regions have been added and %s sub-regions have been updated for country %s.'),
+		$Messages->add( sprintf( TB_('%s sub-regions have been added and %s sub-regions have been updated for country %s.'),
 			$count_subregions['inserted'], $count_subregions['updated'], $Country->get_name() ), 'success' );
 
 		if( $count_subregions['regions'] > 0 )
 		{	// Inform when at least one region has been created automatically:
-			$Messages->add( sprintf( T_('%s regions have been automatically created for country %s.'),
+			$Messages->add( sprintf( TB_('%s regions have been automatically created for country %s.'),
 				$count_subregions['regions'], $Country->get_name() ), 'success' );
 		}
 
@@ -312,10 +312,10 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
-		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
-$AdminUI->breadcrumbpath_add( T_('Sub-regions'), $admin_url.'?ctrl=subregions' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system',
+		TB_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( TB_('Regional'), $admin_url.'?ctrl=locales' );
+$AdminUI->breadcrumbpath_add( TB_('Sub-regions'), $admin_url.'?ctrl=subregions' );
 
 // Set an url for manual page:
 switch( $action )
@@ -357,7 +357,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Subregion->confirm_delete(
-				sprintf( T_('Delete sub-region &laquo;%s&raquo;?'), $edited_Subregion->dget('name') ),
+				sprintf( TB_('Delete sub-region &laquo;%s&raquo;?'), $edited_Subregion->dget('name') ),
 				'subregion', $action, get_memorized( 'action' ) );
 	case 'new':
 	case 'create':

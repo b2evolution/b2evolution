@@ -82,10 +82,10 @@ class AutomationStep extends DataObject
 	static function get_delete_restrictions()
 	{
 		return array(
-				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_next_step_ID', 'msg' => T_('%d states of User in Automation') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_yes_next_step_ID', 'and_condition' => 'step_yes_next_step_ID != step_ID', 'msg' => T_('Step is used as Next Step %d times').' '.T_('("YES" column)') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_no_next_step_ID', 'and_condition' => 'step_no_next_step_ID != step_ID', 'msg' => T_('Step is used as Next Step %d times').' '.T_('("NO" column)') ),
-				array( 'table' => 'T_automation__step', 'fk' => 'step_error_next_step_ID', 'and_condition' => 'step_error_next_step_ID != step_ID', 'msg' => T_('Step is used as Next Step %d times').' '.T_('("ERROR" column)') ),
+				array( 'table' => 'T_automation__user_state', 'fk' => 'aust_next_step_ID', 'msg' => TB_('%d states of User in Automation') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_yes_next_step_ID', 'and_condition' => 'step_yes_next_step_ID != step_ID', 'msg' => TB_('Step is used as Next Step %d times').' '.TB_('("YES" column)') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_no_next_step_ID', 'and_condition' => 'step_no_next_step_ID != step_ID', 'msg' => TB_('Step is used as Next Step %d times').' '.TB_('("NO" column)') ),
+				array( 'table' => 'T_automation__step', 'fk' => 'step_error_next_step_ID', 'and_condition' => 'step_error_next_step_ID != step_ID', 'msg' => TB_('Step is used as Next Step %d times').' '.TB_('("ERROR" column)') ),
 			);
 	}
 
@@ -179,15 +179,15 @@ class AutomationStep extends DataObject
 		{	// Don't allow to edit step of active automation without confirmation:
 			global $Messages;
 			$Messages->add( empty( $this->ID )
-				? T_('You must pause the automation before creating new step.')
-				: T_('You must pause the automation before changing step.'), 'error' );
+				? TB_('You must pause the automation before creating new step.')
+				: TB_('You must pause the automation before changing step.'), 'error' );
 		}
 
 		// Order:
 		$step_order = param( 'step_order', 'integer', NULL );
 		if( $this->ID > 0 )
 		{	// Order is required for edited step:
-			param_string_not_empty( 'step_order', T_('Please enter a step order number.') );
+			param_string_not_empty( 'step_order', TB_('Please enter a step order number.') );
 		}
 		elseif( $step_order === NULL )
 		{	// Set order for new creating step automatically:
@@ -213,11 +213,11 @@ class AutomationStep extends DataObject
 			{	// Display error because of duplicated order in the same Automation:
 				global $admin_url;
 				param_error( 'step_order',
-					sprintf( T_('Another step with the same order number already exists in the current automation. Do you want to <a %s>edit that step</a>?'),
+					sprintf( TB_('Another step with the same order number already exists in the current automation. Do you want to <a %s>edit that step</a>?'),
 						'href="'.$admin_url.'?ctrl=automations&amp;action=edit_step&amp;step_ID='.$existing_step_ID.'"' ) );
 			}
 		}
-		param_check_range( 'step_order', -2147483646, 2147483647, sprintf( T_('Step order must be numeric (%d - %d).'), -2147483646, 2147483647 ) );
+		param_check_range( 'step_order', -2147483646, 2147483647, sprintf( TB_('Step order must be numeric (%d - %d).'), -2147483646, 2147483647 ) );
 
 		// Type:
 		param_string_not_empty( 'step_type', 'Please select a step type.' );
@@ -228,31 +228,31 @@ class AutomationStep extends DataObject
 			case 'if_condition':
 				// IF Condition:
 				param_condition( 'step_if_condition' );
-				param_string_not_empty( 'step_if_condition', T_('Please set a condition.') );
+				param_string_not_empty( 'step_if_condition', TB_('Please set a condition.') );
 				$this->set( 'info', get_param( 'step_if_condition' ) );
 				break;
 
 			case 'send_campaign':
 				// Email campaign:
 				param( 'step_email_campaign', 'integer', NULL );
-				param_check_number( 'step_email_campaign', T_('Please select an email campaign.'), true );
+				param_check_number( 'step_email_campaign', TB_('Please select an email campaign.'), true );
 				$this->set( 'info', get_param( 'step_email_campaign' ) );
 				break;
 
 			case 'notify_owner':
 				// Notify owner:
 				param( 'step_notification_message', 'text' );
-				param_check_not_empty( 'step_notification_message', T_('Please enter a notification message.') );
+				param_check_not_empty( 'step_notification_message', TB_('Please enter a notification message.') );
 				$this->set( 'info', get_param( 'step_notification_message' ) );
 				break;
 
 			case 'add_usertag':
 			case 'remove_usertag':
 				// Add/Remove usertag:
-				param_string_not_empty( 'step_usertag', T_('Please enter an user tag.') );
+				param_string_not_empty( 'step_usertag', TB_('Please enter an user tag.') );
 				if( preg_match( '/(^-|[;,])/', get_param( 'step_usertag' ) ) )
 				{	// If usertag has a not allowed char:
-					param_error( 'step_usertag', sprintf( T_('Usertag cannot start with %s and contain chars %s'), '<code>-</code>', '<code>;,</code>' ) );
+					param_error( 'step_usertag', sprintf( TB_('Usertag cannot start with %s and contain chars %s'), '<code>-</code>', '<code>;,</code>' ) );
 				}
 				$this->set( 'info', get_param( 'step_usertag' ) );
 				break;
@@ -261,14 +261,14 @@ class AutomationStep extends DataObject
 			case 'unsubscribe':
 				// Subscribe/Unsubscribe:
 				param( 'step_newsletter', 'integer', true );
-				param_check_not_empty( 'step_newsletter', T_('Please select a list.') );
+				param_check_not_empty( 'step_newsletter', TB_('Please select a list.') );
 				$this->set( 'info', get_param( 'step_newsletter' ) );
 				break;
 
 			case 'start_automation':
 				// Start new automation:
 				param( 'step_automation', 'integer', true );
-				param_check_not_empty( 'step_automation', T_('Please select an automation.') );
+				param_check_not_empty( 'step_automation', TB_('Please select an automation.') );
 				$this->set( 'info', get_param( 'step_automation' ) );
 				break;
 
@@ -609,7 +609,7 @@ class AutomationStep extends DataObject
 						'message_text' => str_replace( '$login$', $step_User->get( 'login' ), $notification_message ),
 					);
 
-					if( send_mail_to_User( $owner_User->ID, sprintf( T_('Notification of automation %s'), '"'.$Automation->get( 'name' ).'"' ), 'automation_owner_notification', $email_template_params ) )
+					if( send_mail_to_User( $owner_User->ID, sprintf( TB_('Notification of automation %s'), '"'.$Automation->get( 'name' ).'"' ), 'automation_owner_notification', $email_template_params ) )
 					{	// If email has been sent to user successfully now:
 						$step_result = 'YES';
 					}
@@ -1423,7 +1423,7 @@ class AutomationStep extends DataObject
 		if( $step_Automation->dbupdate() )
 		{	// Display a message if automation has been paused:
 			global $Messages;
-			$Messages->add( T_('Automation has been paused.'), 'success' );
+			$Messages->add( TB_('Automation has been paused.'), 'success' );
 			return true;
 		}
 		else

@@ -36,7 +36,7 @@ if( param( 'ufgp_ID', 'integer', '', true) )
 	{	// We could not find the user field to edit:
 		unset( $edited_UserfieldGroup );
 		forget_param( 'ufgp_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('User field group') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('User field group') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -86,7 +86,7 @@ switch( $action )
 
 			// Insert in DB:
 			$edited_UserfieldGroup->dbinsert();
-			$Messages->add( T_('New User field group created.'), 'success' );
+			$Messages->add( TB_('New User field group created.'), 'success' );
 
 			switch( $action )
 			{
@@ -129,7 +129,7 @@ switch( $action )
 			$DB->begin();
 
 			$edited_UserfieldGroup->dbupdate();
-			$Messages->add( T_('User field group updated.'), 'success' );
+			$Messages->add( TB_('User field group updated.'), 'success' );
 
 			$DB->commit();
 
@@ -152,7 +152,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('User field group &laquo;%s&raquo; deleted.'), $edited_UserfieldGroup->dget('name') );
+			$msg = sprintf( TB_('User field group &laquo;%s&raquo; deleted.'), $edited_UserfieldGroup->dget('name') );
 			$edited_UserfieldGroup->dbdelete();
 			unset( $edited_UserfieldGroup );
 			forget_param( 'ufgp_ID' );
@@ -164,7 +164,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_UserfieldGroup->check_delete( sprintf( T_('Cannot delete user field group &laquo;%s&raquo;'), $edited_UserfieldGroup->dget('name') ) ) )
+			if( ! $edited_UserfieldGroup->check_delete( sprintf( TB_('Cannot delete user field group &laquo;%s&raquo;'), $edited_UserfieldGroup->dget('name') ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -174,9 +174,9 @@ switch( $action )
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
-$AdminUI->breadcrumbpath_add( T_('User fields configuration'), '?ctrl=userfields' );
+$AdminUI->breadcrumbpath_add( TB_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=usersettings' );
+$AdminUI->breadcrumbpath_add( TB_('User fields configuration'), '?ctrl=userfields' );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'user-field-group-form' );
@@ -202,7 +202,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_UserfieldGroup->confirm_delete(
-				sprintf( T_('Delete user field &laquo;%s&raquo;?'), $edited_UserfieldGroup->dget('name') ),
+				sprintf( TB_('Delete user field &laquo;%s&raquo;?'), $edited_UserfieldGroup->dget('name') ),
 				'userfieldgroup', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':

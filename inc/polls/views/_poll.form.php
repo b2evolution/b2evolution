@@ -25,9 +25,9 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'poll_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,pqst_ID' ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action,pqst_ID' ) );
 
-$Form->begin_form( 'fform', ( $creating ?  T_('New poll') : T_('Poll') ).get_manual_link( 'poll-form' ) );
+$Form->begin_form( 'fform', ( $creating ?  TB_('New poll') : TB_('Poll') ).get_manual_link( 'poll-form' ) );
 
 	$Form->add_crumb( 'poll' );
 	$Form->hidden( 'action',  $creating ? 'create' : 'update' );
@@ -35,25 +35,25 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New poll') : T_('Poll') ).get_man
 
 	if( $current_User->check_perm( 'polls', 'edit' ) )
 	{	// Allow to change an owner if current user has a permission to edit all polls:
-		$Form->username( 'pqst_owner_login', $edited_Poll->get_owner_User(), T_('Owner'), '', '', array( 'required' => true ) );
+		$Form->username( 'pqst_owner_login', $edited_Poll->get_owner_User(), TB_('Owner'), '', '', array( 'required' => true ) );
 	}
 	else
 	{	// Current user has no permission to edit a poll owner, Display the owner as info field:
-		$Form->info( T_('Owner'), get_user_identity_link( NULL, $edited_Poll->owner_user_ID ) );
+		$Form->info( TB_('Owner'), get_user_identity_link( NULL, $edited_Poll->owner_user_ID ) );
 	}
 
 	if( $perm_poll_edit )
 	{
-		$Form->text_input( 'pqst_question_text', $edited_Poll->get( 'question_text' ), 10, T_('Question'), '', array( 'maxlength' => 2000, 'required' => true, 'class' => 'large' ) );
+		$Form->text_input( 'pqst_question_text', $edited_Poll->get( 'question_text' ), 10, TB_('Question'), '', array( 'maxlength' => 2000, 'required' => true, 'class' => 'large' ) );
 	}
 	else
 	{
-		$Form->info( T_('Question'), $edited_Poll->get( 'question_text' ) );
+		$Form->info( TB_('Question'), $edited_Poll->get( 'question_text' ) );
 	}
 
 	if( $perm_poll_edit )
 	{
-		$Form->select_input_array( 'pqst_max_answers', $edited_Poll->get( 'max_answers'), range( 1, 10 ), T_('Allowed answers per user') );
+		$Form->select_input_array( 'pqst_max_answers', $edited_Poll->get( 'max_answers'), range( 1, 10 ), TB_('Allowed answers per user') );
 	}
 
 	if( $creating )
@@ -61,14 +61,14 @@ $Form->begin_form( 'fform', ( $creating ?  T_('New poll') : T_('Poll') ).get_man
 		$answer_options = param( 'answer_options', 'array:string', array() );
 		for( $i = 0; $i < 10; $i++ )
 		{
-			$Form->text_input( 'answer_options[]', ( isset( $answer_options[ $i ] ) ? $answer_options[ $i ] : '' ), 10, ( $i == 0 ? T_('Answer options') : '' ), '', array( 'maxlength' => 2000, 'style' => 'width:50%' ) );
+			$Form->text_input( 'answer_options[]', ( isset( $answer_options[ $i ] ) ? $answer_options[ $i ] : '' ), 10, ( $i == 0 ? TB_('Answer options') : '' ), '', array( 'maxlength' => 2000, 'style' => 'width:50%' ) );
 		}
 	}
 
 $buttons = array();
 if( $creating || $perm_poll_edit )
 {	// Display a button to update the poll question only if current user has a permission:
-	$buttons[] = array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' );
+	$buttons[] = array( 'submit', 'submit', ( $creating ? TB_('Record') : TB_('Save Changes!') ), 'SaveButton' );
 }
 
 $Form->end_form( $buttons );
@@ -99,11 +99,11 @@ if( $edited_Poll->ID > 0 )
 	// Create result set:
 	$Results = new Results( $SQL->get(), 'pans_', 'A', NULL, $count_SQL->get() );
 
-	$Results->title = sprintf( T_('%d votes from %d users on %d possible answers'), $poll_vote_nums['votes'], $poll_vote_nums['voters'], $Results->get_total_rows() ).get_manual_link( 'polls-answers-list' );
+	$Results->title = sprintf( TB_('%d votes from %d users on %d possible answers'), $poll_vote_nums['votes'], $poll_vote_nums['voters'], $Results->get_total_rows() ).get_manual_link( 'polls-answers-list' );
 	$Results->Cache = get_PollOptionCache();
 
 	$Results->cols[] = array(
-			'th'       => T_('Order'),
+			'th'       => TB_('Order'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'shrinkwrap',
 			'order'    => 'popt_order',
@@ -131,7 +131,7 @@ if( $edited_Poll->ID > 0 )
 	}
 	$Results->cols[] = array(
 			'td_class' => 'nowrap',
-			'th'    => T_('Option'),
+			'th'    => TB_('Option'),
 			'order' => 'popt_option_text',
 			'td'    => '%poll_option_td_option( {Obj} )%',
 		);
@@ -150,7 +150,7 @@ if( $edited_Poll->ID > 0 )
 	}
 
 	$Results->cols[] = array(
-			'th'       => T_('Answers'),
+			'th'       => TB_('Answers'),
 			'th_class' => 'shrinkwrap',
 			'td_class' => 'right',
 			'order'    => 'answers_count',
@@ -189,15 +189,15 @@ if( $edited_Poll->ID > 0 )
 	if( $perm_poll_edit )
 	{	// Display a columnt with edit/delete icons only if current user has a perm to edit the Poll
 		$Results->cols[] = array(
-				'th' => T_('Actions'),
+				'th' => TB_('Actions'),
 				'th_class' => 'shrinkwrap',
 				'td_class' => 'shrinkwrap',
-				'td' => action_icon( T_('Edit this poll option'), 'edit', $admin_url.'?ctrl=polls&amp;pqst_ID='.$edited_Poll->ID.'&amp;popt_ID=$popt_ID$&amp;action=edit_option' )
-						.action_icon( T_('Delete this poll option!'), 'delete', regenerate_url( 'pqst_ID,action', 'pqst_ID='.$edited_Poll->ID.'&amp;popt_ID=$popt_ID$&amp;action=delete_option&amp;'.url_crumb( 'poll' ) ) )
+				'td' => action_icon( TB_('Edit this poll option'), 'edit', $admin_url.'?ctrl=polls&amp;pqst_ID='.$edited_Poll->ID.'&amp;popt_ID=$popt_ID$&amp;action=edit_option' )
+						.action_icon( TB_('Delete this poll option!'), 'delete', regenerate_url( 'pqst_ID,action', 'pqst_ID='.$edited_Poll->ID.'&amp;popt_ID=$popt_ID$&amp;action=delete_option&amp;'.url_crumb( 'poll' ) ) )
 			);
 	}
 
-	$Results->global_icon( T_('New poll option'), 'new', regenerate_url( 'action', 'action=new_option' ), T_('New poll option').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+	$Results->global_icon( TB_('New poll option'), 'new', regenerate_url( 'action', 'action=new_option' ), TB_('New poll option').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 	$Results->display();
 }
@@ -244,10 +244,10 @@ if( $edited_Poll->ID > 0 )
 
 	// Create result set:
 	$answer_Results = new Results( $answer_SQL->get(), 'dpans_', '-A', NULL, $answer_count_SQL->get() );
-	$answer_Results->title = T_('Detailed answers').( empty( $option_text ) ? '' : ' - '.$option_text ).get_manual_link( 'poll-detailed-answers' );
+	$answer_Results->title = TB_('Detailed answers').( empty( $option_text ) ? '' : ' - '.$option_text ).get_manual_link( 'poll-detailed-answers' );
 
 	$answer_Results->cols[] = array(
-		'th'       => T_('Picture'),
+		'th'       => TB_('Picture'),
 		'th_class' => 'shrinkwrap',
 		'td_class' => 'shrinkwrap',
 		'order'    => 'pans_user_ID',
@@ -256,7 +256,7 @@ if( $edited_Poll->ID > 0 )
 
 	$answer_Results->cols[] = array(
 		'td_class' => 'nowrap',
-		'th'    => T_('Login'),
+		'th'    => TB_('Login'),
 		'order' => 'user_login',
 		'td' => '%get_user_identity_link( #user_login#, #pans_user_ID#, "profile", "login" )%',
 	);

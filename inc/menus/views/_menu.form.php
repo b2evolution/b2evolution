@@ -24,15 +24,15 @@ $creating = is_create_action( $action );
 
 $Form = new Form( NULL, 'menu_checkchanges', 'post', 'compact' );
 
-$Form->global_icon( T_('Cancel editing').'!', 'close', regenerate_url( 'action,menu_ID,blog' ) );
+$Form->global_icon( TB_('Cancel editing').'!', 'close', regenerate_url( 'action,menu_ID,blog' ) );
 
 if( $action == 'copy' )
 {
-	$fieldset_title = T_('Duplicate menu').get_manual_link( 'menu_form');
+	$fieldset_title = TB_('Duplicate menu').get_manual_link( 'menu_form');
 }
 else
 {
-	$fieldset_title = $creating ?  T_('New Menu') . get_manual_link( 'menu-form' ) : T_('Menu') . get_manual_link( 'menu-form' );
+	$fieldset_title = $creating ?  TB_('New Menu') . get_manual_link( 'menu-form' ) : TB_('Menu') . get_manual_link( 'menu-form' );
 }
 
 $Form->begin_form( 'fform', $fieldset_title );
@@ -50,7 +50,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 	}
 	
 
-	$Form->text_input( 'menu_name', $edited_SiteMenu->get( 'name' ), 50, T_('Name'), '', array( 'maxlength' => 128, 'required' => true ) );
+	$Form->text_input( 'menu_name', $edited_SiteMenu->get( 'name' ), 50, TB_('Name'), '', array( 'maxlength' => 128, 'required' => true ) );
 
 	$parent_menu_options = array( NULL => '('.TB_('None').')' );
 	$SQL = new SQL('Get possible menus translated from');
@@ -63,7 +63,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 	}
 	$SQL->ORDER_BY( 'menu_name ASC' );
 	$parent_menu_options += $DB->get_assoc( $SQL->get() );
-	$Form->select_input_array( 'menu_translates_menu_ID', $edited_SiteMenu->get('translates_menu_ID'), $parent_menu_options, T_('Translation of'), NULL, array( 'force_keys_as_values' => true ) );
+	$Form->select_input_array( 'menu_translates_menu_ID', $edited_SiteMenu->get('translates_menu_ID'), $parent_menu_options, TB_('Translation of'), NULL, array( 'force_keys_as_values' => true ) );
 
 	$locales_options = array();
 	foreach( $locales as $locale_key => $locale_data )
@@ -73,7 +73,7 @@ $Form->begin_form( 'fform', $fieldset_title );
 			$locales_options[ $locale_key ] = $locale_key;
 		}
 	}
-	$Form->select_input_array( 'menu_locale', $edited_SiteMenu->get( 'locale' ), $locales_options, T_('Locale') );
+	$Form->select_input_array( 'menu_locale', $edited_SiteMenu->get( 'locale' ), $locales_options, TB_('Locale') );
 
 	if( $edited_SiteMenu->ID == 0 )
 	{	// Suggest menu entries based on existing collections:
@@ -103,8 +103,8 @@ $Form->begin_form( 'fform', $fieldset_title );
 			$suggested_menu_entries[] = array( 'menu_entries[coll_'.$section_Blog->ID.']', $section_Blog->get( 'shortname' ), $section_Blog->get( 'shortname' ), 1 );
 		}
 		// Contact menu entry:
-		$suggested_menu_entries[] = array( 'menu_entries[#contact#]', '#contact#', T_('Contact'), 1 );
-		$Form->checklist( $suggested_menu_entries, '', T_('Menu entries') );
+		$suggested_menu_entries[] = array( 'menu_entries[#contact#]', '#contact#', TB_('Contact'), 1 );
+		$Form->checklist( $suggested_menu_entries, '', TB_('Menu entries') );
 	}
 
 	$buttons = array();
@@ -112,11 +112,11 @@ $Form->begin_form( 'fform', $fieldset_title );
 	{	// Allow to save menu if current User has a permission:
 		if( $action == 'copy' )
 		{
-			$buttons[] = array( 'submit', 'submit', sprintf( T_('Save and duplicate all settings from %s'), $edited_SiteMenu->get( 'name' ) ), 'SaveButton' );
+			$buttons[] = array( 'submit', 'submit', sprintf( TB_('Save and duplicate all settings from %s'), $edited_SiteMenu->get( 'name' ) ), 'SaveButton' );
 		}
 		else
 		{
-			$buttons[] = array( 'submit', 'submit', ( $creating ? T_('Record') : T_('Save Changes!') ), 'SaveButton' );
+			$buttons[] = array( 'submit', 'submit', ( $creating ? TB_('Record') : TB_('Save Changes!') ), 'SaveButton' );
 		}
 	}
 
@@ -164,7 +164,7 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 		{	// We have permission permission to edit:
 			$edit_url = regenerate_url( 'action,ment_ID', 'ment_ID='.$SiteMenuEntry->ID.'&amp;action=edit_entry' );
 			$r .= '<td class="nowrap">
-					<strong style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.T_('Edit...').'">'.$SiteMenuEntry->get_text().'</a></strong>
+					<strong style="padding-left: '.($level).'em;"><a href="'.$edit_url.'" title="'.TB_('Edit...').'">'.$SiteMenuEntry->get_text().'</a></strong>
 				</td>';
 		}
 		else
@@ -194,11 +194,11 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 		switch( $SiteMenuEntry->get( 'visibility' ) )
 		{
 			case 'always':
-				$r .= T_('Always');
+				$r .= TB_('Always');
 				break;
 
 			case 'access':
-				$r .= T_('If allowed');
+				$r .= TB_('If allowed');
 				break;
 		}
 		$r .= '</td>';
@@ -210,9 +210,9 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 		$r .= '<td class="lastcol shrinkwrap">';
 		if( $current_User->check_perm( 'options', 'edit' ) )
 		{	// We have permission permission to edit, so display action column:
-			$r .= action_icon( T_('Edit...'), 'edit', $edit_url );
-			$r .= action_icon( T_('New').'...', 'new', regenerate_url( 'action,ment_ID,blog', 'ment_parent_ID='.$SiteMenuEntry->ID.'&amp;action=new_entry' ) )
-						.action_icon( T_('Delete').'...', 'delete', regenerate_url( 'action,ment_ID,blog', 'ment_ID='.$SiteMenuEntry->ID.'&amp;action=delete_entry&amp;'.url_crumb( 'menuentry' ) ) );
+			$r .= action_icon( TB_('Edit...'), 'edit', $edit_url );
+			$r .= action_icon( TB_('New').'...', 'new', regenerate_url( 'action,ment_ID,blog', 'ment_parent_ID='.$SiteMenuEntry->ID.'&amp;action=new_entry' ) )
+						.action_icon( TB_('Delete').'...', 'delete', regenerate_url( 'action,ment_ID,blog', 'ment_ID='.$SiteMenuEntry->ID.'&amp;action=delete_entry&amp;'.url_crumb( 'menuentry' ) ) );
 		}
 		$r .= '</td>';
 		$r .=	'</tr>';
@@ -258,37 +258,37 @@ if( $edited_SiteMenu->ID > 0 && $action != 'copy' )
 
 	$Table = new Table();
 
-	$Table->title = T_('Menu').': '.$edited_SiteMenu->get( 'name' ).' '.locale_flag( $edited_SiteMenu->get( 'locale' ), '', 'flag', '', false ).get_manual_link( 'menu-entries-list' );
+	$Table->title = TB_('Menu').': '.$edited_SiteMenu->get( 'name' ).' '.locale_flag( $edited_SiteMenu->get( 'locale' ), '', 'flag', '', false ).get_manual_link( 'menu-entries-list' );
 
-	$Table->global_icon( T_('New menu entry'), 'new', regenerate_url( 'action,blog', 'action=new_entry' ), T_('New menu entry').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
+	$Table->global_icon( TB_('New menu entry'), 'new', regenerate_url( 'action,blog', 'action=new_entry' ), TB_('New menu entry').' &raquo;', 3, 4, array( 'class' => 'action_icon btn-primary' ) );
 
 	$Table->cols[] = array(
-			'th' => T_('Order'),
+			'th' => TB_('Order'),
 			'th_class' => 'shrinkwrap',
 		);
 	$Table->cols[] = array(
-			'th' => T_('Entry'),
+			'th' => TB_('Entry'),
 			'th_class' => 'shrinkwrap',
 		);
 	$Table->cols[] = array(
-			'th' => T_('Entry type'),
+			'th' => TB_('Entry type'),
 			'th_class' => 'shrinkwrap',
 		);
 	$Table->cols[] = array(
-			'th' => T_('Destination'),
+			'th' => TB_('Destination'),
 		);
 	$Table->cols[] = array(
-			'th' => T_('Visibility'),
+			'th' => TB_('Visibility'),
 			'th_class' => 'shrinkwrap',
 		);
 	$Table->cols[] = array(
-			'th' => T_('Highlight'),
+			'th' => TB_('Highlight'),
 			'th_class' => 'shrinkwrap',
 		);
 	if( $current_User->check_perm( 'options', 'edit' ) )
 	{	// We have permission to edit, so display action column:
 		$Table->cols[] = array(
-				'th' => T_('Actions'),
+				'th' => TB_('Actions'),
 				'th_class' => 'shrinkwrap',
 			);
 	}

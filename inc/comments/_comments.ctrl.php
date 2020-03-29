@@ -146,7 +146,7 @@ switch( $action )
 		}
 		if( ! $selected )
 		{ // No blog could be selected
-			$Messages->add( T_('You have no permission to edit comments.' ), 'error' );
+			$Messages->add( TB_('You have no permission to edit comments.' ), 'error' );
 			$action = 'nil';
 		}
 		elseif( set_working_blog( $selected ) )	// set $blog & memorize in user prefs
@@ -193,23 +193,23 @@ switch( $action )
 		debug_die( 'unhandled action 1' );
 }
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
-$AdminUI->breadcrumbpath_add( T_('Comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => TB_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
+$AdminUI->breadcrumbpath_add( TB_('Comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;filter=restore' );
 switch( $tab3 )
 {
 	case 'listview':
-		$AdminUI->breadcrumbpath_add( T_('List view'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
+		$AdminUI->breadcrumbpath_add( TB_('List view'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;
 
 	case 'fullview':
-		$AdminUI->breadcrumbpath_add( T_('Full text view'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
+		$AdminUI->breadcrumbpath_add( TB_('Full text view'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;
 
 	case 'meta':
 		// Check permission for internal comments:
 		$current_User->check_perm( 'meta_comment', 'view', true, $Blog->ID );
 
-		$AdminUI->breadcrumbpath_add( T_('Internal comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
+		$AdminUI->breadcrumbpath_add( TB_('Internal comments'), $admin_url.'?ctrl=comments&amp;blog=$blog$&amp;tab3='.$tab3.'&amp;filter=restore' );
 		break;
 }
 
@@ -226,7 +226,7 @@ switch( $action )
 
 
 	case 'edit':
-		$AdminUI->title_titlearea = T_('Editing comment').' #'.$edited_Comment->ID;
+		$AdminUI->title_titlearea = TB_('Editing comment').' #'.$edited_Comment->ID;
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_comments', 'view', array( 'ctrl' => 'comments', 'filter' => 'restore' ) );
@@ -239,8 +239,8 @@ switch( $action )
 
 		$AdminUI->set_path( 'collections', 'comments' );
 
-		$AdminUI->breadcrumbpath_add( sprintf( T_('Comment #%s'), $edited_Comment->ID ), '?ctrl=comments&amp;comment_ID='.$edited_Comment->ID.'&amp;action=edit' );
-		$AdminUI->breadcrumbpath_add( T_('Edit'), '?ctrl=comments&amp;comment_ID='.$edited_Comment->ID.'&amp;action=edit' );
+		$AdminUI->breadcrumbpath_add( sprintf( TB_('Comment #%s'), $edited_Comment->ID ), '?ctrl=comments&amp;comment_ID='.$edited_Comment->ID.'&amp;action=edit' );
+		$AdminUI->breadcrumbpath_add( TB_('Edit'), '?ctrl=comments&amp;comment_ID='.$edited_Comment->ID.'&amp;action=edit' );
 		break;
 
 
@@ -264,7 +264,7 @@ switch( $action )
 		{	// This comment has been created by member
 			if( $current_User->check_perm( 'users', 'edit' ) && param( 'comment_author_login', 'string', NULL ) !== NULL )
 			{	// Only admins can change the author
-				if( param_check_not_empty( 'comment_author_login', T_('Please enter valid author login.') ) && param_check_login( 'comment_author_login', true ) )
+				if( param_check_not_empty( 'comment_author_login', TB_('Please enter valid author login.') ) && param_check_login( 'comment_author_login', true ) )
 				{
 					if( ( $author_User = & $UserCache->get_by_login( $comment_author_login ) ) !== false )
 					{	// Update author user:
@@ -279,7 +279,7 @@ switch( $action )
 			param( 'newcomment_author_email', 'string' );
 			param( 'newcomment_author_url', 'string' );
 
-			param_check_not_empty( 'newcomment_author', T_('Please enter an author name.'), '' );
+			param_check_not_empty( 'newcomment_author', TB_('Please enter an author name.'), '' );
 			$edited_Comment->set( 'author', $newcomment_author );
 			param_check_email( 'newcomment_author_email', false );
 			$edited_Comment->set( 'author_email', $newcomment_author_email );
@@ -322,12 +322,12 @@ switch( $action )
 					}
 					else
 					{
-						$Messages->add( T_('Destination post blog owner is different!'), 'error' );
+						$Messages->add( TB_('Destination post blog owner is different!'), 'error' );
 					}
 				}
 				else
 				{ // the item doesn't exists
-					$Messages->add( sprintf( T_('Post ID &laquo;%d&raquo; does not exist!'), $moveto_post ), 'error' );
+					$Messages->add( sprintf( TB_('Post ID &laquo;%d&raquo; does not exist!'), $moveto_post ), 'error' );
 				}
 			}
 		}
@@ -365,15 +365,15 @@ switch( $action )
 			{ // Check new entered comment ID
 				if( ! empty( $edited_Comment->ID ) && $in_reply_to_cmt_ID == $edited_Comment->ID )
 				{ // Restrict such brake case
-					$Messages->add( T_('This comment cannot be a reply to itself.'), 'error' );
+					$Messages->add( TB_('This comment cannot be a reply to itself.'), 'error' );
 				}
 				elseif( ! ( $Comment = & $CommentCache->get_by_ID( $in_reply_to_cmt_ID, false, false ) ) )
 				{ // No comment exists
-					$Messages->add( T_('The ID of the parent comment you entered does not exist.'), 'error' );
+					$Messages->add( TB_('The ID of the parent comment you entered does not exist.'), 'error' );
 				}
 				elseif( $Comment->item_ID != $edited_Comment_Item->ID )
 				{ // Item of new reply comment is not same
-					$Messages->add( T_('The ID of the parent comment must belong to the same post.'), 'error' );
+					$Messages->add( TB_('The ID of the parent comment must belong to the same post.'), 'error' );
 				}
 			}
 			else
@@ -393,14 +393,14 @@ switch( $action )
 				'renderers' => $edited_Comment->get_renderers(),
 			) );
 
-		param_check_html( 'content', T_('Invalid comment text.') );	// Check this is backoffice content (NOT with comment rules)
-		param_check_not_empty( 'content', T_('Empty comment content is not allowed.') );
+		param_check_html( 'content', TB_('Invalid comment text.') );	// Check this is backoffice content (NOT with comment rules)
+		param_check_not_empty( 'content', TB_('Empty comment content is not allowed.') );
 		$edited_Comment->set( 'content', get_param( 'content' ) );
 
 		if( $current_User->check_perm( 'admin', 'restricted' ) &&
 		    $current_User->check_perm( 'blog_edit_ts', 'edit', false, $Blog->ID ) )
 		{ // We use user date
-			param_date( 'comment_issue_date', T_('Please enter a valid comment date.'), true );
+			param_date( 'comment_issue_date', TB_('Please enter a valid comment date.'), true );
 			if( strlen(get_param('comment_issue_date')) )
 			{ // only set it, if a date was given:
 				param_time( 'comment_issue_time' );
@@ -456,7 +456,7 @@ switch( $action )
 			// Execute or schedule email notifications:
 			$edited_Comment->handle_notifications( NULL, false, $comment_members_notified, $comment_community_notified );
 
-			$Messages->add( T_('Comment has been updated.'), 'success' );
+			$Messages->add( TB_('Comment has been updated.'), 'success' );
 
 			if( $action == 'update_edit' )
 			{	// Redirect back to the edit comment form in order to see the updated content correctly:
@@ -498,19 +498,19 @@ switch( $action )
 		switch( $edited_Comment->status )
 		{
 			case 'published':
-				$success_message = T_('Comment has been published.');
+				$success_message = TB_('Comment has been published.');
 				break;
 			case 'community':
-				$success_message = T_('The comment is now visible by the community.');
+				$success_message = TB_('The comment is now visible by the community.');
 				break;
 			case 'protected':
-				$success_message = T_('The comment is now visible by the members.');
+				$success_message = TB_('The comment is now visible by the members.');
 				break;
 			case 'review':
-				$success_message = T_('The comment is now visible by moderators.');
+				$success_message = TB_('The comment is now visible by moderators.');
 				break;
 			default:
-				$success_message = T_('Comment has been updated.');
+				$success_message = TB_('Comment has been updated.');
 				break;
 		}
 		$Messages->add( $success_message, 'success' );
@@ -530,7 +530,7 @@ switch( $action )
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		$Messages->add( T_('Comment has been restricted.'), 'success' );
+		$Messages->add( TB_('Comment has been restricted.'), 'success' );
 
 		header_redirect( $redirect_to );
 		/* exited */
@@ -547,7 +547,7 @@ switch( $action )
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		$Messages->add( T_('Comment has been deprecated.'), 'success' );
+		$Messages->add( TB_('Comment has been deprecated.'), 'success' );
 
 		header_redirect( $redirect_to );
 		/* exited */
@@ -562,7 +562,7 @@ switch( $action )
 
 		$edited_Comment->dbupdate();	// Commit update to the DB
 
-		$Messages->add( T_('Comment url has been deleted.'), 'success' );
+		$Messages->add( TB_('Comment url has been deleted.'), 'success' );
 
 		header_redirect( $redirect_to );
 		/* exited */
@@ -574,7 +574,7 @@ switch( $action )
 		$Session->assert_received_crumb( 'comment' );
 
 		// fp> TODO: non JS confirm
-		$success_message = ( $edited_Comment->status == 'trash' || $edited_Comment->is_meta() ) ? T_('Comment has been deleted.') : T_('Comment has been recycled.');
+		$success_message = ( $edited_Comment->status == 'trash' || $edited_Comment->is_meta() ) ? TB_('Comment has been deleted.') : TB_('Comment has been recycled.');
 
 		// Delete from DB:
 		$edited_Comment->dbdelete();
@@ -606,11 +606,11 @@ switch( $action )
 
 		if( $result !== false )
 		{
-			$Messages->add( T_('Recycle bin contents were successfully deleted.'), 'success' );
+			$Messages->add( TB_('Recycle bin contents were successfully deleted.'), 'success' );
 		}
 		else
 		{
-			$Messages->add( T_('Could not empty recycle bin.'), 'error' );
+			$Messages->add( TB_('Could not empty recycle bin.'), 'error' );
 		}
 
 		header_redirect( regenerate_url( 'action', 'action=list', '', '&' ) );
@@ -620,7 +620,7 @@ switch( $action )
 		/*
 		 * Trash comments:
 		 */
-		$AdminUI->title_titlearea = T_('Comment recycle bins');
+		$AdminUI->title_titlearea = TB_('Comment recycle bins');
 
 		/*
 		 * Add sub menu entries:
@@ -630,7 +630,7 @@ switch( $action )
 
 		$AdminUI->set_path( 'collections', 'comments' );
 
-		$AdminUI->breadcrumbpath_add( T_('Comment recycle bins'), '?ctrl=comments&amp;action=emptytrash' );
+		$AdminUI->breadcrumbpath_add( TB_('Comment recycle bins'), '?ctrl=comments&amp;action=emptytrash' );
 		break;
 
 	case 'elevate':
@@ -642,11 +642,11 @@ switch( $action )
 		$new_Item = new Item();
 		$new_Item->set( 'status', 'draft' );
 		$new_Item->set( 'main_cat_ID', $Blog->get_default_cat_ID() );
-		$new_Item->set( 'title', T_( 'Elevated from comment' ) );
+		$new_Item->set( 'title', TB_( 'Elevated from comment' ) );
 
 		if( $type == 'quote' )
 		{ // Set a post data for a quote mode:
-			$item_content = $edited_Comment->get_author_name().' '.T_( 'wrote' ).':';
+			$item_content = $edited_Comment->get_author_name().' '.TB_( 'wrote' ).':';
 			if( $new_Item->get_type_setting( 'allow_html' ) )
 			{ // Use html quote format if HTML is allowed for new creating post:
 				$item_content .= ' <blockquote>'.$edited_Comment->get_content( 'raw_text' ).'</blockquote>';
@@ -678,7 +678,7 @@ switch( $action )
 
 		if( ! $new_Item->dbinsert() )
 		{
-			$Messages->add( T_( 'Unable to create the new post!' ), 'error' );
+			$Messages->add( TB_( 'Unable to create the new post!' ), 'error' );
 			break;
 		}
 
@@ -697,7 +697,7 @@ switch( $action )
 		/*
 		 * Latest comments:
 		 */
-		$AdminUI->title_titlearea = T_('Latest comments');
+		$AdminUI->title_titlearea = TB_('Latest comments');
 
 		// Generate available blogs list:
 		$AdminUI->set_coll_list_params( 'blog_comments', 'view', array( 'ctrl' => 'comments', 'filter' => 'restore', 'tab3' => $tab3 ) );

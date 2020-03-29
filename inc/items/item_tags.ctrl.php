@@ -37,7 +37,7 @@ if( param( 'tag_ID', 'integer', '', true) )
 	{ // We could not find the goal to edit:
 		unset( $edited_ItemTag );
 		forget_param( 'tag_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), /* TRANS: noun */ T_('Tag') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), /* TRANS: noun */ TB_('Tag') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -74,7 +74,7 @@ switch( $action )
 		{ // We could load data from form without errors:
 			// Insert in DB:
 			$edited_ItemTag->dbinsert();
-			$Messages->add( T_('New tag has been created.'), 'success' );
+			$Messages->add( TB_('New tag has been created.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $return_to ? $return_to : $admin_url.'?ctrl=itemtags', 303 ); // Will EXIT
@@ -100,7 +100,7 @@ switch( $action )
 		{ // We could load data from form without errors:
 			// Update tag in DB:
 			$edited_ItemTag->dbupdate();
-			$Messages->add( T_('Tag has been updated.'), 'success' );
+			$Messages->add( TB_('Tag has been updated.'), 'success' );
 
 			// Redirect so that a reload doesn't write to the DB twice:
 			header_redirect( $return_to ? $return_to : $admin_url.'?ctrl=itemtags', 303 ); // Will EXIT
@@ -123,7 +123,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Tag "%s" has been deleted.'), '<b>'.$edited_ItemTag->dget( 'name' ).'</b>' );
+			$msg = sprintf( TB_('Tag "%s" has been deleted.'), '<b>'.$edited_ItemTag->dget( 'name' ).'</b>' );
 			$edited_ItemTag->dbdelete();
 			unset( $edited_ItemTag );
 			forget_param( 'tag_ID' );
@@ -134,7 +134,7 @@ switch( $action )
 		}
 		else
 		{ // not confirmed, Check for restrictions:
-			if( ! $edited_ItemTag->check_delete( sprintf( T_('Cannot delete tag "%s"'), '<b>'.$edited_ItemTag->dget( 'name' ).'</b>' ), array(), true ) )
+			if( ! $edited_ItemTag->check_delete( sprintf( TB_('Cannot delete tag "%s"'), '<b>'.$edited_ItemTag->dget( 'name' ).'</b>' ), array(), true ) )
 			{ // There are restrictions:
 				$action = 'list';
 			}
@@ -164,7 +164,7 @@ switch( $action )
 
 		if( $result )
 		{
-			$Messages->add( sprintf( T_('Tag "%s" has been unlinked from the post "%s".'),
+			$Messages->add( sprintf( TB_('Tag "%s" has been unlinked from the post "%s".'),
 				'<b>'.$edited_ItemTag->dget( 'name' ).'</b>',
 				'<b>'.$edited_Item->dget( 'title' ).'</b>' ), 'success' );
 		}
@@ -222,7 +222,7 @@ switch( $action )
 		$DB->query( 'DELETE FROM T_items__tag
 			WHERE tag_ID = '.$DB->quote( $old_ItemTag->ID ) );
 
-		$Messages->add( sprintf( T_('The previously named "%s" tag has been merged with the existing "%s" tag.'),
+		$Messages->add( sprintf( TB_('The previously named "%s" tag has been merged with the existing "%s" tag.'),
 				'<b>'.$old_ItemTag->dget( 'name' ).'</b>',
 				'<b>'.$edited_ItemTag->dget( 'name' ).'</b>' ), 'success' );
 
@@ -243,12 +243,12 @@ switch( $action )
 		$DB->query( 'DELETE T_items__itemtag FROM T_items__itemtag
 				LEFT JOIN T_items__item ON itag_itm_ID = post_ID
 			 WHERE post_ID IS NULL' );
-		$Messages->add_to_group( sprintf( T_('Removed %d associations with non-existing posts.'), $DB->rows_affected ), 'success', T_('Deleting orphan tags:') );
+		$Messages->add_to_group( sprintf( TB_('Removed %d associations with non-existing posts.'), $DB->rows_affected ), 'success', TB_('Deleting orphan tags:') );
 
 		$DB->query( 'DELETE T_items__tag FROM T_items__tag
 				LEFT JOIN T_items__itemtag ON tag_ID = itag_tag_ID
 			 WHERE itag_itm_ID IS NULL' );
-		$Messages->add_to_group( sprintf( T_('Removed %d obsolete tag entries.'), $DB->rows_affected ), 'success', T_('Deleting orphan tags:') );
+		$Messages->add_to_group( sprintf( TB_('Removed %d obsolete tag entries.'), $DB->rows_affected ), 'success', TB_('Deleting orphan tags:') );
 
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $return_to ? $return_to : $admin_url.'?ctrl=itemtags', 303 ); // Will EXIT
@@ -258,8 +258,8 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Site'), $admin_url.'?ctrl=dashboard' );
-$AdminUI->breadcrumbpath_add( T_('Tags'), $admin_url.'?ctrl=itemtags' );
+$AdminUI->breadcrumbpath_add( TB_('Site'), $admin_url.'?ctrl=dashboard' );
+$AdminUI->breadcrumbpath_add( TB_('Tags'), $admin_url.'?ctrl=itemtags' );
 
 if( $action == 'new' || $action == 'edit' )
 {
@@ -296,7 +296,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_ItemTag->confirm_delete(
-				sprintf( T_('Delete tag "%s"?'), '<b>'.$edited_ItemTag->dget( 'name' ).'</b>' ),
+				sprintf( TB_('Delete tag "%s"?'), '<b>'.$edited_ItemTag->dget( 'name' ).'</b>' ),
 				'tag', $action, get_memorized( 'action' ) );
 		// NO BREAK
 	case 'list':

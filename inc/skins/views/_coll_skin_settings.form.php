@@ -22,31 +22,31 @@ switch( $skin_type )
 {
 	case 'normal':
 		$skin_ID = isset( $Blog ) ? $Blog->get( 'normal_skin_ID' ) : $Settings->get( 'normal_skin_ID' );
-		$fieldset_title = isset( $Blog ) ? T_('Standard skin for this collection') : T_('Standard skin for this site');
+		$fieldset_title = isset( $Blog ) ? TB_('Standard skin for this collection') : TB_('Standard skin for this site');
 		break;
 
 	case 'mobile':
 		$skin_ID = isset( $Blog ) ? $Blog->get( 'mobile_skin_ID', array( 'real_value' => true ) ) : $Settings->get( 'mobile_skin_ID', true );
-		$fieldset_title = isset( $Blog ) ? T_('Phone skin for this collection') : T_('Phone skin for this site');
+		$fieldset_title = isset( $Blog ) ? TB_('Phone skin for this collection') : TB_('Phone skin for this site');
 		break;
 
 	case 'tablet':
 		$skin_ID = isset( $Blog ) ? $Blog->get( 'tablet_skin_ID', array( 'real_value' => true ) ) : $Settings->get( 'tablet_skin_ID', true );
-		$fieldset_title = isset( $Blog ) ? T_('Tablet skin for this collection') : T_('Tablet skin for this site');
+		$fieldset_title = isset( $Blog ) ? TB_('Tablet skin for this collection') : TB_('Tablet skin for this site');
 		break;
 
 	case 'alt':
 		$skin_ID = isset( $Blog ) ? $Blog->get( 'alt_skin_ID', array( 'real_value' => true ) ) : $Settings->get( 'alt_skin_ID', true );
-		$fieldset_title = isset( $Blog ) ? T_('Alt skin for this collection') : T_('Alt skin for this site');
+		$fieldset_title = isset( $Blog ) ? TB_('Alt skin for this collection') : TB_('Alt skin for this site');
 		break;
 
 	default:
 		debug_die( 'Wrong skin type: '.$skin_type );
 }
 
-$link_select_skin = action_icon( T_('Select another skin...'), 'choose',
+$link_select_skin = action_icon( TB_('Select another skin...'), 'choose',
 		regenerate_url( 'action,mode', 'skinpage=selection&amp;skin_type='.$skin_type ),
-		' '.T_('Choose a different skin').' &raquo;', 3, 4, array(
+		' '.TB_('Choose a different skin').' &raquo;', 3, 4, array(
 			'class' => $mode == 'customizer' ? 'small' : 'action_icon btn btn-info btn-sm',
 			'target' => $mode == 'customizer' ? '_top' : '',
 	) );
@@ -65,9 +65,9 @@ $can_edit_skin_settings =
 if( $can_edit_skin_settings )
 {	// Display "Reset params" button if current User can edit skin settings:
 	$link_reset_url = regenerate_url( 'ctrl,action', 'ctrl=skins&amp;skin_ID='.$skin_ID.'&amp;skin_type='.$skin_type.'&amp;blog='.( isset( $Blog ) ? $Blog->ID : get_working_blog() ).'&amp;action='.( isset( $Blog ) ? 'reset_coll' : 'reset_site' ).'&amp;'.url_crumb( 'skin' ) );
-	$link_reset_params = action_icon( T_('Reset params'), 'reload',
+	$link_reset_params = action_icon( TB_('Reset params'), 'reload',
 			$link_reset_url,
-			' '.T_('Reset params'), 3, 4, array(
+			' '.TB_('Reset params'), 3, 4, array(
 				'class'   => $mode == 'customizer' ? 'small' : 'action_icon btn btn-default btn-sm',
 				'onclick' => 'return evo_confirm_skin_reset()',
 				'target' => $mode == 'customizer' ? 'evo_customizer__backoffice' : '',
@@ -115,7 +115,7 @@ $Form->begin_form( 'fform' );
 		if( $current_User->check_perm( 'options', 'view' ) )
 		{	// If current user has a permission to view site skin:
 			$goto_link_url = $admin_url.'?ctrl=collections&amp;tab=site_skin'.( $skin_type == 'mobile' || $skin_type == 'tablet' || $skin_type == 'alt' ? '&amp;skin_type='.$skin_type : '' );
-			$goto_link_title = T_('Go to Site skin');
+			$goto_link_title = TB_('Go to Site skin');
 		}
 		// Append manual/doc link:
 		$fieldset_title .= get_manual_link( 'blog-skin-settings' );
@@ -126,7 +126,7 @@ $Form->begin_form( 'fform' );
 		    $current_User->check_perm( 'blog_properties', 'edit', false, $working_coll_ID ) )
 		{	// If working collection is set and current user has a permission to edit the collection skin:
 			$goto_link_url = $admin_url.'?ctrl=coll_settings&amp;tab=skin&amp;blog='.$working_coll_ID.( $skin_type == 'mobile' || $skin_type == 'tablet' || $skin_type == 'alt' ? '&amp;skin_type='.$skin_type : '' );
-			$goto_link_title = T_('Go to Collection skin');
+			$goto_link_title = TB_('Go to Collection skin');
 		}
 		// Append manual/doc link:
 		$fieldset_title .= get_manual_link( 'site-skin-settings' );
@@ -144,8 +144,8 @@ $Form->begin_form( 'fform' );
 $buttons = array();
 if( $can_edit_skin_settings )
 {	// Display a button to update skin params only when if current User can edit this:
-	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? T_('Apply Changes!') : T_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s' );
-	$buttons[] = array( 'button', 'cancel', T_('Cancel'), ( $mode == 'customizer' ? '' : 'ResetButton' ), 'location.reload()' );
+	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? TB_('Apply Changes!') : TB_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s' );
+	$buttons[] = array( 'button', 'cancel', TB_('Cancel'), ( $mode == 'customizer' ? '' : 'ResetButton' ), 'location.reload()' );
 }
 
 if( $mode == 'customizer' )

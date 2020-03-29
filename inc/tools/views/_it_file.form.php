@@ -61,13 +61,13 @@ if( ! empty( $import_files ) )
 					'value' => 'update',
 					'label' => TB_('Update existing Item Types'),
 					'note'  => TB_('This may DELETE some existing custom fields.'),
-					'suffix' => '<br /><div id="import_type_update_confirm_block" class="alert alert-danger" style="display:none;margin:0">'.T_('WARNING').': '.TB_('you will LOSE custom fields that are not part of the Item Types you import.').' '.sprintf( T_('Type %s to confirm'), '<code>DELETE</code>' ).': <input name="import_type_update_confirm" type="text" class="form-control" size="8" style="margin:-8px 0" /></div>',
+					'suffix' => '<br /><div id="import_type_update_confirm_block" class="alert alert-danger" style="display:none;margin:0">'.TB_('WARNING').': '.TB_('you will LOSE custom fields that are not part of the Item Types you import.').' '.sprintf( TB_('Type %s to confirm'), '<code>DELETE</code>' ).': <input name="import_type_update_confirm" type="text" class="form-control" size="8" style="margin:-8px 0" /></div>',
 				),
 			), TB_('Import mode'), array( 'lines' => true ) );
 
 	$Form->end_fieldset();
 
-	$Form->buttons( array( array( 'submit', 'submit', T_('Continue').'!', 'SaveButton' ) ) );
+	$Form->buttons( array( array( 'submit', 'submit', TB_('Continue').'!', 'SaveButton' ) ) );
 }
 
 $Form->end_form();

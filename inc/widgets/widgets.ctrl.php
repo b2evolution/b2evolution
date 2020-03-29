@@ -51,7 +51,7 @@ if( $selected = autoselect_blog( 'blog_properties', 'edit' ) ) // Includes perm 
 else
 {	// We could not find a blog we have edit perms on...
 	// Note: we may still have permission to edit categories!!
-	$Messages->add( T_('Sorry, you have no permission to edit collection properties.'), 'error' );
+	$Messages->add( TB_('Sorry, you have no permission to edit collection properties.'), 'error' );
 	// Redirect to collections list:
 	header_redirect( $admin_url.'?ctrl=collections' );
 	// EXITED.
@@ -168,7 +168,7 @@ switch( $display_mode )
 // fp> when does this happen -- should be documented
 		if( !$current_User->check_perm( 'blog_properties', 'edit', false, $blog ) )
 		{	// user doesn't have permissions
-			$Messages->add( T_('You do not have permission to perform this action' ) );
+			$Messages->add( TB_('You do not have permission to perform this action' ) );
 // fp>does this only happen when we try to edit settings. The hardcoded 'closeWidgetSettings' response looks bad.
 			send_javascript_message( array( 'closeWidgetSettings' => array() ) );
 		}
@@ -242,7 +242,7 @@ switch( $action )
 		}
 		if( ! in_array( $WidgetContainer->get( 'code' ), array_keys( $Blog->get_main_containers( $skin_type ) ) ) )
 		{ // The container is not part of the current skin
-			$Messages->add( T_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'error' );
+			$Messages->add( TB_('WARNING: you are adding to a container that does not seem to be part of the current skin.'), 'error' );
 		}
 
 		switch( $type )
@@ -306,7 +306,7 @@ switch( $action )
 
 			if( ! empty( $duplicated_Widget->get_param( 'title' ) ) )
 			{	// Append "(copy)" to title:
-				$edited_ComponentWidget->set( 'title', $duplicated_Widget->get_param( 'title' ).' ('.T_('copy').')' );
+				$edited_ComponentWidget->set( 'title', $duplicated_Widget->get_param( 'title' ).' ('.TB_('copy').')' );
 			}
 		}
 
@@ -315,7 +315,7 @@ switch( $action )
 
 		$DB->commit();
 
-		$Messages->add( sprintf( T_('Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;.'),
+		$Messages->add( sprintf( TB_('Widget &laquo;%s&raquo; has been added to container &laquo;%s&raquo;.'),
 					$edited_ComponentWidget->get_name(), $edited_ComponentWidget->get_container_param( 'name' ) ), 'success' );
 
 		switch( $display_mode )
@@ -372,7 +372,7 @@ switch( $action )
 		if( ! param_errors_detected() )
 		{ // Update settings:
 			$edited_ComponentWidget->dbupdate();
-			$Messages->add( T_('Widget settings have been updated'), 'success' );
+			$Messages->add( TB_('Widget settings have been updated'), 'success' );
 			switch( $display_mode )
 			{
 				case 'js' : // js reply
@@ -511,11 +511,11 @@ switch( $action )
 
 		if ( $enabled )
 		{
-			$msg = T_( 'Widget has been disabled.' );
+			$msg = TB_( 'Widget has been disabled.' );
 		}
 		else
 		{
-			$msg = T_( 'Widget has been enabled.' );
+			$msg = TB_( 'Widget has been enabled.' );
 		}
 		$Messages->add( $msg, 'success' );
 
@@ -536,7 +536,7 @@ switch( $action )
 
 		if( $edited_ComponentWidget->get_cache_status() == 'disallowed' )
 		{ // Don't allow to change cache status because it is not allowed by widget config
-			$Messages->add( T_( 'This widget cannot be cached in the block cache.' ), 'error' );
+			$Messages->add( TB_( 'This widget cannot be cached in the block cache.' ), 'error' );
 		}
 		else
 		{ // Update widget cache status
@@ -545,11 +545,11 @@ switch( $action )
 
 			if( $action == 'cache_enable' )
 			{
-				$Messages->add( T_( 'Block caching has been turned on for this widget.' ), 'success' );
+				$Messages->add( TB_( 'Block caching has been turned on for this widget.' ), 'success' );
 			}
 			else
 			{
-				$Messages->add( T_( 'Block caching has been turned off for this widget.' ), 'success' );
+				$Messages->add( TB_( 'Block caching has been turned off for this widget.' ), 'success' );
 			}
 		}
 
@@ -587,11 +587,11 @@ switch( $action )
 		{ // Display a result message only when at least one widget has been updated
 			if( $action == 'activate' )
 			{
-				$Messages->add( sprintf( T_( '%d widgets have been enabled.' ), $updated_widgets ), 'success' );
+				$Messages->add( sprintf( TB_( '%d widgets have been enabled.' ), $updated_widgets ), 'success' );
 			}
 			else
 			{
-				$Messages->add( sprintf( T_( '%d widgets have been disabled.' ), $updated_widgets ), 'success' );
+				$Messages->add( sprintf( TB_( '%d widgets have been disabled.' ), $updated_widgets ), 'success' );
 			}
 		}
 
@@ -618,7 +618,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget' );
 
-		$msg = sprintf( T_('Widget &laquo;%s&raquo; removed.'), $edited_ComponentWidget->get_name() );
+		$msg = sprintf( TB_('Widget &laquo;%s&raquo; removed.'), $edited_ComponentWidget->get_name() );
 		$edited_widget_ID = $edited_ComponentWidget->ID;
 		$edited_ComponentWidget->dbdelete();
 		unset( $edited_ComponentWidget );
@@ -700,7 +700,7 @@ switch( $action )
 
 		$DB->commit();
 
-		$Messages->add( T_( 'Widgets updated' ), 'success' );
+		$Messages->add( TB_( 'Widgets updated' ), 'success' );
 		send_javascript_message( array( 'sendWidgetOrderCallback' => array( 'blog='.$Blog->ID ) ) ); // exits() automatically
 		break;
 
@@ -737,7 +737,7 @@ switch( $action )
 		{	// If widget container has been saved successfully:
 			if( $edited_WidgetContainer->dbsave() )
 			{
-				$Messages->add( sprintf( T_('%s has been saved.'), $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"' ), 'success' );
+				$Messages->add( sprintf( TB_('%s has been saved.'), $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"' ), 'success' );
 			}
 			if( $mode == 'customizer' )
 			{	// Redirect back to customizer mode:
@@ -757,7 +757,7 @@ switch( $action )
 		// Check that this action request is not a CSRF hacked request:
 		$Session->assert_received_crumb( 'widget_container' );
 
-		$success_msg = sprintf( T_('Widget container &laquo;%s&raquo; removed.'), $edited_WidgetContainer->get( 'name' ) );
+		$success_msg = sprintf( TB_('Widget container &laquo;%s&raquo; removed.'), $edited_WidgetContainer->get( 'name' ) );
 		// Remove the widget container from the database
 		$edited_WidgetContainer->dbdelete();
 		unset( $edited_WidgetContainer );
@@ -795,7 +795,7 @@ switch( $action )
 			$DB->query( 'DELETE FROM T_widget__widget
 				WHERE wi_wico_ID = '.$edited_WidgetContainer->ID );
 			$new_inserted_widgets_num = install_new_default_widgets( $edited_WidgetContainer->get( 'code' ), '*', $Blog->ID, $edited_WidgetContainer->get( 'skin_type' ) );
-			$Messages->add( sprintf( T_('%s has been reset to defaults (populated with %d widgets).'), $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"', $new_inserted_widgets_num ), 'success' );
+			$Messages->add( sprintf( TB_('%s has been reset to defaults (populated with %d widgets).'), $edited_WidgetContainer->get_type_title().' "'.$edited_WidgetContainer->get( 'name' ).'"', $new_inserted_widgets_num ), 'success' );
 		}
 
 		// Redirect back to back-office widgets list:
@@ -836,18 +836,18 @@ if( $display_mode == 'normal' )
 	 *
 	 * @internal Tblue> We get the whole img tags here (easier).
 	 */
-	var edit_icon_tag = \''.get_icon( 'edit', 'imgtag', array( 'title' => T_( 'Edit widget settings!' ) ) ).'\';
-	var duplicate_icon_tag = \''.get_icon( 'copy', 'imgtag', array( 'title' => T_('Duplicate') ) ).'\';
-	var delete_icon_tag = \''.get_icon( 'delete', 'imgtag', array( 'title' => T_( 'Remove this widget!' ) ) ).'\';
-	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => T_( 'The widget is enabled.' ) ) ).'\';
-	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_( 'The widget is disabled.' ) ) ).'\';
-	var disabled_plugin_tag = \''.get_icon( 'warning', 'imgtag', array( 'title' => T_('Inactive / Uninstalled plugin') ) ).'\';
-	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => T_( 'Enable this widget!' ) ) ).'\';
-	var deactivate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => T_( 'Disable this widget!' ) ) ).'\';
-	var cache_enabled_icon_tag = \''.get_icon( 'block_cache_on', 'imgtag', array( 'title' => T_( 'Caching is enabled. Click to disable.' ) ) ).'\';
-	var cache_disabled_icon_tag = \''.get_icon( 'block_cache_off', 'imgtag', array( 'title' => T_( 'Caching is disabled. Click to enable.' ) ) ).'\';
-	var cache_disallowed_icon_tag = \''.get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => T_( 'This widget cannot be cached.' ) ) ).'\';
-	var cache_denied_icon_tag = \''.get_icon( 'block_cache_denied', 'imgtag', array( 'title' => T_( 'This widget could be cached but the block cache is OFF. Click to enable.' ) ) ).'\';
+	var edit_icon_tag = \''.get_icon( 'edit', 'imgtag', array( 'title' => TB_( 'Edit widget settings!' ) ) ).'\';
+	var duplicate_icon_tag = \''.get_icon( 'copy', 'imgtag', array( 'title' => TB_('Duplicate') ) ).'\';
+	var delete_icon_tag = \''.get_icon( 'delete', 'imgtag', array( 'title' => TB_( 'Remove this widget!' ) ) ).'\';
+	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => TB_( 'The widget is enabled.' ) ) ).'\';
+	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => TB_( 'The widget is disabled.' ) ) ).'\';
+	var disabled_plugin_tag = \''.get_icon( 'warning', 'imgtag', array( 'title' => TB_('Inactive / Uninstalled plugin') ) ).'\';
+	var activate_icon_tag = \''.get_icon( 'activate', 'imgtag', array( 'title' => TB_( 'Enable this widget!' ) ) ).'\';
+	var deactivate_icon_tag = \''.get_icon( 'deactivate', 'imgtag', array( 'title' => TB_( 'Disable this widget!' ) ) ).'\';
+	var cache_enabled_icon_tag = \''.get_icon( 'block_cache_on', 'imgtag', array( 'title' => TB_( 'Caching is enabled. Click to disable.' ) ) ).'\';
+	var cache_disabled_icon_tag = \''.get_icon( 'block_cache_off', 'imgtag', array( 'title' => TB_( 'Caching is disabled. Click to enable.' ) ) ).'\';
+	var cache_disallowed_icon_tag = \''.get_icon( 'block_cache_disabled', 'imgtag', array( 'title' => TB_( 'This widget cannot be cached.' ) ) ).'\';
+	var cache_denied_icon_tag = \''.get_icon( 'block_cache_denied', 'imgtag', array( 'title' => TB_( 'This widget could be cached but the block cache is OFF. Click to enable.' ) ) ).'\';
 
 	var widget_crumb_url_param = \''.url_crumb( 'widget' ).'\';
 
@@ -865,8 +865,8 @@ if( $display_mode == 'normal' )
 		$Session->delete( 'refresh_customizer_window' );
 	}
 
-	$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
-	$AdminUI->breadcrumbpath_add( T_('Widgets'), $admin_url.'?ctrl=widgets&amp;blog=$blog$' );
+	$AdminUI->breadcrumbpath_init( true, array( 'text' => TB_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
+	$AdminUI->breadcrumbpath_add( TB_('Widgets'), $admin_url.'?ctrl=widgets&amp;blog=$blog$' );
 
 	// Set an url for manual page:
 	$AdminUI->set_page_manual_link( 'widget-settings' );
@@ -981,7 +981,7 @@ switch( $action )
 		echo '<div class="available_widgets">'."\n";
 		echo '<div class="available_widgets_toolbar modal-header">'
 						.'<a href="#" class="floatright close">'.get_icon('close').'</a>'
-						.'<h4 class="modal-title">'.T_( 'Select widget to add:' ).'</h4>'
+						.'<h4 class="modal-title">'.TB_( 'Select widget to add:' ).'</h4>'
 					.'</div>'."\n";
 		echo '<div id="available_widgets_inner">'."\n";
 		$AdminUI->disp_view( 'widgets/views/_widget_list_available.view.php' );

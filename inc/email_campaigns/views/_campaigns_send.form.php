@@ -35,32 +35,32 @@ $Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
 
 if( !empty( $template_action ) && $template_action == 'send_campaign' )
 { // Execute action to send campaign to all users
-	$Form->begin_fieldset( T_('Send report') );
+	$Form->begin_fieldset( TB_('Send report') );
 	$edited_EmailCampaign->send_all_emails();
 	$Form->end_fieldset();
 }
 
-$Form->begin_fieldset( sprintf( T_('Review message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'campaign-review-panel' ) );
-	$Form->info( T_('Email title'), mail_autoinsert_user_data( $edited_EmailCampaign->get( 'email_title' ), $current_User, 'text', NULL, NULL, array( 'enlt_ID' => $edited_EmailCampaign->get( 'enlt_ID' ) ) ) );
-	$Form->info( T_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ) ) );
-	$Form->info( T_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ) ) : T_('Not sent yet') );
+$Form->begin_fieldset( sprintf( TB_('Review message for: %s'), $edited_EmailCampaign->dget( 'name' ) ).get_manual_link( 'campaign-review-panel' ) );
+	$Form->info( TB_('Email title'), mail_autoinsert_user_data( $edited_EmailCampaign->get( 'email_title' ), $current_User, 'text', NULL, NULL, array( 'enlt_ID' => $edited_EmailCampaign->get( 'enlt_ID' ) ) ) );
+	$Form->info( TB_('Campaign created'), mysql2localedatetime_spans( $edited_EmailCampaign->get( 'date_ts' ) ) );
+	$Form->info( TB_('Last sent'), $edited_EmailCampaign->get( 'sent_ts' ) ? mysql2localedatetime_spans( $edited_EmailCampaign->get( 'sent_ts' ) ) : TB_('Not sent yet') );
 
 echo '<div style="display:table;width:100%;table-layout:fixed;">';
 	echo '<div class="floatleft" style="width:50%">';
-	echo '<p><b>'.T_('HTML message').':</b></p>';
+	echo '<p><b>'.TB_('HTML message').':</b></p>';
 	echo '<div style="overflow:auto">'.$edited_EmailCampaign->get( 'html_template_preview' ).'</div>';
 	echo '</div>';
 
 	echo '<div class="floatright" style="width:49%">';
 	echo '<p>';
-		echo '<b>'.T_('Plain-text message').':</b> &nbsp; ';
+		echo '<b>'.TB_('Plain-text message').':</b> &nbsp; ';
 		$Form->switch_layout( 'none' );
 		$Form->radio( 'ecmp_sync_plaintext', $edited_EmailCampaign->get( 'sync_plaintext' ), array(
-				array( 1, T_('Keep in sync with HTML') ),
-				array( 0, T_('Edit separately') ),
+				array( 1, TB_('Keep in sync with HTML') ),
+				array( 0, TB_('Edit separately') ),
 			), '' );
 		$Form->button( array(
-				'value' => T_('Edit'),
+				'value' => TB_('Edit'),
 				'class' => 'btn btn-info btn-sm'.( $edited_EmailCampaign->get( 'sync_plaintext' ) ? ' hidden' : '' ),
 				'name'  => 'actionArray[save_sync_plaintext]',
 				'id'    => 'ecmp_edit_plaintext_button',
@@ -72,47 +72,47 @@ echo '<div style="display:table;width:100%;table-layout:fixed;">';
 echo '</div>';
 $Form->end_fieldset();
 
-$Form->begin_fieldset( T_('Campaign recipients').get_manual_link( 'campaign-recipients-panel' ) );
+$Form->begin_fieldset( TB_('Campaign recipients').get_manual_link( 'campaign-recipients-panel' ) );
 	$NewsletterCache = & get_NewsletterCache();
 	$NewsletterCache->load_where( 'enlt_active = 1 OR enlt_ID = '.intval( $edited_EmailCampaign->get( 'enlt_ID' ) ) );
-	$Form->select_input_object( 'ecmp_enlt_ID', $edited_EmailCampaign->get( 'enlt_ID' ), $NewsletterCache, T_('Send to subscribers of'), array(
+	$Form->select_input_object( 'ecmp_enlt_ID', $edited_EmailCampaign->get( 'enlt_ID' ), $NewsletterCache, TB_('Send to subscribers of'), array(
 			'required'     => true,
-			'field_suffix' => '<input type="submit" name="actionArray[update_newsletter]" class="btn btn-default" value="'.format_to_output( T_('Update'), 'htmlattr' ).'" />' ) );
+			'field_suffix' => '<input type="submit" name="actionArray[update_newsletter]" class="btn btn-default" value="'.format_to_output( TB_('Update'), 'htmlattr' ).'" />' ) );
 	evo_flush();
-	$Form->info( T_('Subscribers'), $edited_EmailCampaign->get_recipients_count( 'all', true ), '('.T_('Accounts which currently accept this list').')' );
-	$Form->info_field( T_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter', true ), array(
+	$Form->info( TB_('Subscribers'), $edited_EmailCampaign->get_recipients_count( 'all', true ), '('.TB_('Accounts which currently accept this list').')' );
+	$Form->info_field( TB_('After additional filter'), $edited_EmailCampaign->get_recipients_count( 'filter', true ), array(
 			'class' => 'info_full_height',
-			'note'  => '('.T_('Accounts that match your additional filter').') '
-			           .'<a href="'.$admin_url.'?ctrl=users&amp;action=campaign&amp;ecmp_ID='.$edited_EmailCampaign->ID.'" class="btn btn-default">'.T_('Change filter').'</a>',
+			'note'  => '('.TB_('Accounts that match your additional filter').') '
+			           .'<a href="'.$admin_url.'?ctrl=users&amp;action=campaign&amp;ecmp_ID='.$edited_EmailCampaign->ID.'" class="btn btn-default">'.TB_('Change filter').'</a>',
 		) );
-	$Form->info( T_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive', true ), '('.T_('Accounts which have already been sent this campaign').')' );
-	$Form->info( T_('Send error'), $edited_EmailCampaign->get_recipients_count( 'error', true ), '('.T_('Accounts which had errors on receiving this campaign').')' );
-	$Form->info( T_('Manually skipped'), $edited_EmailCampaign->get_recipients_count( 'skipped', true ), '('.T_('Accounts which will be skipped from receiving this campaign').')' );
-	$Form->info( T_('Ready to send'), $edited_EmailCampaign->get_recipients_count( 'wait', 'only_subscribed' ), '('.T_('Accounts which meet all criteria to receive this campaign').')' );
+	$Form->info( TB_('Already received'), $edited_EmailCampaign->get_recipients_count( 'receive', true ), '('.TB_('Accounts which have already been sent this campaign').')' );
+	$Form->info( TB_('Send error'), $edited_EmailCampaign->get_recipients_count( 'error', true ), '('.TB_('Accounts which had errors on receiving this campaign').')' );
+	$Form->info( TB_('Manually skipped'), $edited_EmailCampaign->get_recipients_count( 'skipped', true ), '('.TB_('Accounts which will be skipped from receiving this campaign').')' );
+	$Form->info( TB_('Ready to send'), $edited_EmailCampaign->get_recipients_count( 'wait', 'only_subscribed' ), '('.TB_('Accounts which meet all criteria to receive this campaign').')' );
 
 	if( $edited_EmailCampaign->get_recipients_count( 'wait' ) > 0 )
 	{	// Display message to send emails only when users exist for this campaign:
 		$Form->checklist( array(
-				array( 'track_email_image_load', 1, T_('track image loads in HTML version'), 1 ),
-				array( 'track_email_click_html', 1, T_('track clickthroughs in HTML version'), 1 ),
-				array( 'track_email_click_plain_text', 1, T_('track clickthroughs in plain text version'), 1 )
-			), 'track_email', T_('Track email opens') );
+				array( 'track_email_image_load', 1, TB_('track image loads in HTML version'), 1 ),
+				array( 'track_email_click_html', 1, TB_('track clickthroughs in HTML version'), 1 ),
+				array( 'track_email_click_plain_text', 1, TB_('track clickthroughs in plain text version'), 1 )
+			), 'track_email', TB_('Track email opens') );
 		if( $Settings->get( 'email_campaign_send_mode' ) == 'cron' )
 		{	// Asynchronous sending mode:
 			if( $edited_EmailCampaign->get_Cronjob() )
 			{	// Cron job was already created:
-				$button_title = T_('See scheduled send jobs for this campaign');
+				$button_title = TB_('See scheduled send jobs for this campaign');
 				$button_action = 'view_cron';
 			}
 			else
 			{	// Cron job is not created yet:
-				$button_title = sprintf( T_('Start a job to send campaign to %s users'), $edited_EmailCampaign->get_recipients_count( 'wait' ) );
+				$button_title = sprintf( TB_('Start a job to send campaign to %s users'), $edited_EmailCampaign->get_recipients_count( 'wait' ) );
 				$button_action = 'create_cron';
 			}
 		}
 		else
 		{	// Immediate sending mode:
-			$button_title = sprintf( T_('Send campaign to %s users now'), $edited_EmailCampaign->get_recipients_count( 'wait' ) );
+			$button_title = sprintf( TB_('Send campaign to %s users now'), $edited_EmailCampaign->get_recipients_count( 'wait' ) );
 			$button_action = 'send';
 		}
 		$send_button = array( array( 'name' => 'actionArray['.$button_action.']', 'value' => $button_title, 'class' => 'SaveButton btn btn-default' ) );
@@ -124,14 +124,14 @@ $buttons = array();
 if( $current_User->check_perm( 'emails', 'edit' ) )
 { // User must has a permission to edit emails
 
-	$Form->begin_fieldset( T_('Send test email').get_manual_link( 'campaign-send-test-panel' ) );
+	$Form->begin_fieldset( TB_('Send test email').get_manual_link( 'campaign-send-test-panel' ) );
 		$Form->checklist( array(
-			array( 'track_test_email_image_load', 1, T_('track image loads in HTML version'), 1 ),
-			array( 'track_test_email_click_html', 1, T_('track clickthroughs in HTML version'), 1 ),
-			array( 'track_test_email_click_plain_text', 1, T_('track clickthroughs in plain text version'), 1 )
-		), 'track_test_email', T_('Track email opens') );
-		$Form->text_input( 'test_email_address', $Session->get( 'test_campaign_email' ), 30, T_('Email address'), T_('Fill your email address and press button "Send test email" if you want to test this list'), array( 'maxlength' => 255 ) );
-		$test_button = array( array( 'name' => 'actionArray[test]', 'value' => T_('Send test email'), 'class' => 'SaveButton btn btn-primary' ) );
+			array( 'track_test_email_image_load', 1, TB_('track image loads in HTML version'), 1 ),
+			array( 'track_test_email_click_html', 1, TB_('track clickthroughs in HTML version'), 1 ),
+			array( 'track_test_email_click_plain_text', 1, TB_('track clickthroughs in plain text version'), 1 )
+		), 'track_test_email', TB_('Track email opens') );
+		$Form->text_input( 'test_email_address', $Session->get( 'test_campaign_email' ), 30, TB_('Email address'), TB_('Fill your email address and press button "Send test email" if you want to test this list'), array( 'maxlength' => 255 ) );
+		$test_button = array( array( 'name' => 'actionArray[test]', 'value' => TB_('Send test email'), 'class' => 'SaveButton btn btn-primary' ) );
 		$Form->buttons_input( $test_button );
 	$Form->end_fieldset();
 }

@@ -36,7 +36,7 @@ if( param( 'ivc_ID', 'integer', '', true ) )
 	{ // We could not find the invitation code to edit:
 		unset( $edited_Invitation );
 		forget_param( 'ivc_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('Invitation') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('Invitation') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -95,13 +95,13 @@ switch( $action )
 			if( $duplicated_invitation_ID )
 			{	// Display error if we have a duplicate entry:
 				param_error( 'ivc_ID',
-					sprintf( T_('This invitation code already exists. Do you want to <a %s>edit the existing invitation code</a>?'),
+					sprintf( TB_('This invitation code already exists. Do you want to <a %s>edit the existing invitation code</a>?'),
 						'href="?ctrl=invitations&amp;action=edit&amp;ivc_ID='.$duplicated_invitation_ID.'"' ) );
 			}
 			else
 			{
 				$edited_Invitation->dbinsert();
-				$Messages->add( T_('New invitation code created.'), 'success' );
+				$Messages->add( TB_('New invitation code created.'), 'success' );
 			}
 			$DB->commit();
 
@@ -149,7 +149,7 @@ switch( $action )
 			$DB->begin();
 
 			$edited_Invitation->dbupdate();
-			$Messages->add( T_('Invitation code updated.'), 'success' );
+			$Messages->add( TB_('Invitation code updated.'), 'success' );
 
 			$DB->commit();
 
@@ -172,7 +172,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('Invitation code &laquo;%s&raquo; deleted.'), $edited_Invitation->dget( 'code' ) );
+			$msg = sprintf( TB_('Invitation code &laquo;%s&raquo; deleted.'), $edited_Invitation->dget( 'code' ) );
 			$edited_Invitation->dbdelete();
 			unset( $edited_Invitation );
 			forget_param( 'ivc_ID' );
@@ -184,7 +184,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_Invitation->check_delete( sprintf( T_('Cannot delete invitation code &laquo;%s&raquo;'), $edited_Invitation->dget( 'code' ) ) ) )
+			if( ! $edited_Invitation->check_delete( sprintf( TB_('Cannot delete invitation code &laquo;%s&raquo;'), $edited_Invitation->dget( 'code' ) ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -198,9 +198,9 @@ if( in_array( $action, array( 'delete', 'new', 'create', 'create_new', 'create_c
 }
 
 $AdminUI->breadcrumbpath_init( false );  // fp> I'm playing with the idea of keeping the current blog in the path here...
-$AdminUI->breadcrumbpath_add( T_('Users'), '?ctrl=users' );
-$AdminUI->breadcrumbpath_add( T_('Settings'), '?ctrl=usersettings' );
-$AdminUI->breadcrumbpath_add( T_('Invitations'), '?ctrl=invitations' );
+$AdminUI->breadcrumbpath_add( TB_('Users'), '?ctrl=users' );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), '?ctrl=usersettings' );
+$AdminUI->breadcrumbpath_add( TB_('Invitations'), '?ctrl=invitations' );
 
 // Set an url for manual page:
 switch( $action )
@@ -240,7 +240,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Invitation->confirm_delete(
-				sprintf( T_('Delete invitation code &laquo;%s&raquo;?'), $edited_Invitation->dget( 'code' ) ),
+				sprintf( TB_('Delete invitation code &laquo;%s&raquo;?'), $edited_Invitation->dget( 'code' ) ),
 				'invitation', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':

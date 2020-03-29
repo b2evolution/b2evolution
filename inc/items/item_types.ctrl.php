@@ -50,7 +50,7 @@ if( param( 'ityp_ID', 'integer', '', true ) )
 	{	// We could not find the post type to edit:
 		unset( $edited_Itemtype );
 		forget_param( 'ityp_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), 'Itemtype' ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), 'Itemtype' ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -103,7 +103,7 @@ switch( $action )
 
 			// Insert in DB:
 			$edited_Itemtype->dbinsert();
-			$Messages->add( T_('New Post Type created.'), 'success' );
+			$Messages->add( TB_('New Post Type created.'), 'success' );
 
 			// Update allowed item statuses
 			$edited_Itemtype->update_item_statuses_from_Request();
@@ -152,7 +152,7 @@ switch( $action )
 
 			$edited_Itemtype->update_item_statuses_from_Request();
 			$edited_Itemtype->dbupdate();
-			$Messages->add( T_('Post type updated.'), 'success' );
+			$Messages->add( TB_('Post type updated.'), 'success' );
 
 			$DB->commit();
 
@@ -189,7 +189,7 @@ switch( $action )
 		{ // is default post type of the blog
 			if( $item_type_blog_ID == 'default' )
 			{
-				$Messages->add( T_('This Item type is the default for all collections. You can not delete this Item type.' ) );
+				$Messages->add( TB_('This Item type is the default for all collections. You can not delete this Item type.' ) );
 			}
 			else
 			{
@@ -202,7 +202,7 @@ switch( $action )
 						$blog_names[] = '<a href="'.$admin_url.'?ctrl=coll_settings&tab=features&blog='.$Blog->ID.'#fieldset_wrapper_post_options"><b>'.$Blog->get('name').'</b></a>';
 					}
 				}
-				$Messages->add( sprintf( T_('This Item type is the default for the collections: %s. You can not delete this Item type.' ), implode( ', ', $blog_names ) ) );
+				$Messages->add( sprintf( TB_('This Item type is the default for the collections: %s. You can not delete this Item type.' ), implode( ', ', $blog_names ) ) );
 			}
 			// To don't display a confirmation question
 			$action = 'edit';
@@ -211,7 +211,7 @@ switch( $action )
 		{ // ID is good
 			if( param( 'confirm', 'integer', 0 ) )
 			{ // confirmed, Delete from DB:
-				$msg = sprintf( T_('Post type &laquo;%s&raquo; deleted.'), $edited_Itemtype->dget('name') );
+				$msg = sprintf( TB_('Post type &laquo;%s&raquo; deleted.'), $edited_Itemtype->dget('name') );
 				$edited_Itemtype->dbdelete();
 				unset( $edited_Itemtype );
 				forget_param( 'ityp_ID' );
@@ -222,7 +222,7 @@ switch( $action )
 			}
 			else
 			{	// not confirmed, Check for restrictions:
-				if( ! $edited_Itemtype->check_delete( sprintf( T_('Cannot delete Post Type &laquo;%s&raquo;'), $edited_Itemtype->dget('name') ) ) )
+				if( ! $edited_Itemtype->check_delete( sprintf( TB_('Cannot delete Post Type &laquo;%s&raquo;'), $edited_Itemtype->dget('name') ) ) )
 				{	// There are restrictions:
 					$action = 'view';
 				}
@@ -247,14 +247,14 @@ switch( $action )
 				$DB->query( 'REPLACE INTO T_items__type_coll
 								 ( itc_ityp_ID, itc_coll_ID )
 					VALUES ( '.$DB->quote( $edited_Itemtype->ID ).', '.$DB->quote( $blog ).' )' );
-				$Messages->add( T_('Post type has been enabled for this collection.'), 'success' );
+				$Messages->add( TB_('Post type has been enabled for this collection.'), 'success' );
 			}
 			elseif( $Blog->can_be_item_type_disabled( $edited_Itemtype->ID, true ) )
 			{ // Disable item type for the collection only if it is allowed:
 				$DB->query( 'DELETE FROM T_items__type_coll
 					WHERE itc_ityp_ID = '.$DB->quote( $edited_Itemtype->ID ).'
 					  AND itc_coll_ID = '.$DB->quote( $blog ) );
-				$Messages->add( T_('Post type has been disabled for this collection.'), 'success' );
+				$Messages->add( TB_('Post type has been disabled for this collection.'), 'success' );
 			}
 		}
 
@@ -284,7 +284,7 @@ switch( $action )
 								 ( itc_ityp_ID, itc_coll_ID )
 					VALUES ( '.$DB->quote( $edited_Itemtype->ID ).', '.$DB->quote( $blog ).' )' );
 
-			$Messages->add( T_('The item type has been set as the default for this collection.'), 'success' );
+			$Messages->add( TB_('The item type has been set as the default for this collection.'), 'success' );
 		}
 
 		// Redirect so that a reload doesn't write to the DB twice:
@@ -296,9 +296,9 @@ switch( $action )
 // Generate available blogs list:
 $AdminUI->set_coll_list_params( 'blog_ismember', 'view', array( 'ctrl' => 'itemtypes', 'tab' => $tab, 'tab3' => 'types' ) );
 
-$AdminUI->breadcrumbpath_init( true, array( 'text' => T_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
-$AdminUI->breadcrumbpath_add( T_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
-$AdminUI->breadcrumbpath_add( T_('Post Types'), $admin_url.'?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=types' );
+$AdminUI->breadcrumbpath_init( true, array( 'text' => TB_('Collections'), 'url' => $admin_url.'?ctrl=collections' ) );
+$AdminUI->breadcrumbpath_add( TB_('Settings'), $admin_url.'?ctrl=coll_settings&amp;blog=$blog$&amp;tab=general' );
+$AdminUI->breadcrumbpath_add( TB_('Post Types'), $admin_url.'?ctrl=itemtypes&amp;blog=$blog$&amp;tab=settings&amp;tab3=types' );
 
 // Set an url for manual page:
 switch( $action )
@@ -340,7 +340,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_Itemtype->confirm_delete(
-				sprintf( T_('Delete Post Type &laquo;%s&raquo;?'),  $edited_Itemtype->dget('name') ),
+				sprintf( TB_('Delete Post Type &laquo;%s&raquo;?'),  $edited_Itemtype->dget('name') ),
 				'itemtype', $action, get_memorized( 'action' ) );
 		/* no break */
 	case 'new':

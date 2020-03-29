@@ -93,7 +93,7 @@ if( ! empty( $root ) )
 
 	if( ! $fm_FileRoot || !isset( $available_Roots[$fm_FileRoot->ID] ) || !$current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
 	{ // Root not found or not in list of available ones. If avatar upload is in progress, the edited user root doesn't have to be available.
-		$Messages->add( T_('You don\'t have upload permission to the requested root directory.'), 'warning' );
+		$Messages->add( TB_('You don\'t have upload permission to the requested root directory.'), 'warning' );
 		$fm_FileRoot = false;
 	}
 }
@@ -113,7 +113,7 @@ if( ! $fm_FileRoot )
 	}
 	if( ! $fm_FileRoot )
 	{
-		$Messages->add( T_('You don\'t have access to any root directory.'), 'error' );
+		$Messages->add( TB_('You don\'t have access to any root directory.'), 'error' );
 	}
 }
 
@@ -121,7 +121,7 @@ if( $fm_FileRoot )
 { // We have access to a file root:
 	if( empty($fm_FileRoot->ads_path) )
 	{	// Not sure it's possible to get this far, but just in case...
-		$Messages->add( sprintf( T_('The root directory &laquo;%s&raquo; does not exist.'), $fm_FileRoot->ads_path ), 'error' );
+		$Messages->add( sprintf( TB_('The root directory &laquo;%s&raquo; does not exist.'), $fm_FileRoot->ads_path ), 'error' );
 	}
 	else
 	{ // Root exists
@@ -133,13 +133,13 @@ if( $fm_FileRoot )
 
 		if( !is_dir( $ads_list_path ) )
 		{ // This should never happen, but just in case the diretory does not exist:
-			$Messages->add( sprintf( T_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
+			$Messages->add( sprintf( TB_('The directory &laquo;%s&raquo; does not exist.'), $path ), 'error' );
 			$path = '';		// fp> added
 			$ads_list_path = NULL;
 		}
 		elseif( ! preg_match( '#^'.preg_quote($fm_FileRoot->ads_path, '#').'#', $ads_list_path ) )
 		{ // cwd is OUTSIDE OF root!
-			$Messages->add( T_( 'You are not allowed to go outside your root directory!' ), 'error' );
+			$Messages->add( TB_( 'You are not allowed to go outside your root directory!' ), 'error' );
 			$path = '';		// fp> added
 			$ads_list_path = $fm_FileRoot->ads_path;
 		}
@@ -191,7 +191,7 @@ if( empty($ads_list_path) )
 // Tblue> Note: Perm 'files' (level 'add') gets checked above with $assert = true.
 if( ! $Settings->get('upload_enabled') )
 { // Upload is globally disabled
-	$Messages->add( T_('Upload is disabled.'), 'error' );
+	$Messages->add( TB_('Upload is disabled.'), 'error' );
 }
 
 
@@ -249,7 +249,7 @@ if( ( $action != 'switchtab' ) && $uploadfile_url )
 				|| empty($parsed_url['scheme']) || empty($parsed_url['host'])
 				|| empty($parsed_url['path']) || $parsed_url['path'] == '/' )
 			{	// Includes forbidding getting the root of a server
-				$failedFiles[$k] = T_('The URL must start with <code>http://</code> or <code>https://</code> and point to a valid file!');
+				$failedFiles[$k] = TB_('The URL must start with <code>http://</code> or <code>https://</code> and point to a valid file!');
 				continue;
 			}
 
@@ -329,7 +329,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 
 		foreach( $uploadedFiles as $uploadedFile )
 		{
-			$success_msg = sprintf( T_('The file &laquo;%s&raquo; has been successfully uploaded to the server.'), $uploadedFile->dget('name') );
+			$success_msg = sprintf( TB_('The file &laquo;%s&raquo; has been successfully uploaded to the server.'), $uploadedFile->dget('name') );
 
 			// Allow to insert/link new upload into currently edited link object:
 			if( $mode == 'upload' && !empty( $link_object_ID ) && !empty( $link_type ) )
@@ -340,7 +340,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 				if( $uploadedFile->is_image() )
 				{
 					$link_msg = $LinkOwner->translate( 'Link this image to your xxx' );
-					$link_note = T_('recommended - allows automatic resizing');
+					$link_note = TB_('recommended - allows automatic resizing');
 				}
 				else
 				{
@@ -348,12 +348,12 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 					$link_note = $LinkOwner->translate( 'The file will be linked for download at the end of the xxx' );
 				}
 				$success_msg .= '<ul>'
-						.'<li>'.action_icon( T_('Link this file!'), 'link',
+						.'<li>'.action_icon( TB_('Link this file!'), 'link',
 									regenerate_url( 'fm_selected,ctrl', 'ctrl=files&amp;action=link_inpost&amp;fm_selected[]='.rawurlencode($uploadedFile->get_rdfp_rel_path()).'&amp;'.url_crumb('file') ),
 									' '.$link_msg, 5, 5, array( 'target' => $iframe_name ) )
 						.' ('.$link_note.')</li>'
 
-						.'<li>'.T_('or').' <a href="#" onclick="if( window.focus && window.opener ){'
+						.'<li>'.TB_('or').' <a href="#" onclick="if( window.focus && window.opener ){'
 						.'window.opener.focus(); textarea_wrap_selection( window.opener.document.getElementById(\''.$LinkOwner->type.'form_post_content\'), \''
 						.format_to_output( $uploadedFile->get_tag(), 'formvalue' ).'\', \'\', 1, window.opener.document ); } return false;">'
 						.$LinkOwner->translate( 'Insert the following code snippet into your xxx' ).'</a> : <input type="text" value="'.$img_tag.'" size="60" /></li>'
@@ -361,7 +361,7 @@ if( ( $action != 'switchtab' ) && isset($_FILES) && count( $_FILES ) )
 					.'</ul>';
 			}
 
-			$Messages->add_to_group( $success_msg, 'success', T_('Uploading files:') );
+			$Messages->add_to_group( $success_msg, 'success', TB_('Uploading files:') );
 		}
 	}
 
@@ -385,14 +385,14 @@ if( $mode == 'popup' )
 // fp> TODO: this here is a bit sketchy since we have Blog & fileroot not necessarilly in sync. Needs investigation / propositions.
 // Note: having both allows to post from any media dir into any blog.
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('Files'), '?ctrl=files&amp;blog=$blog$' );
+$AdminUI->breadcrumbpath_add( TB_('Files'), '?ctrl=files&amp;blog=$blog$' );
 if( !isset($Blog) || $fm_FileRoot->type != 'collection' || $fm_FileRoot->in_type_ID != $Blog->ID )
 {	// Display only if we're not browsing our home blog
 	$AdminUI->breadcrumbpath_add( $fm_FileRoot->name, '?ctrl=files&amp;blog=$blog$&amp;root='.$fm_FileRoot->ID,
-			(isset($Blog) && $fm_FileRoot->type == 'collection') ? sprintf( T_('You are ready to post files from %s into %s...'),
+			(isset($Blog) && $fm_FileRoot->type == 'collection') ? sprintf( TB_('You are ready to post files from %s into %s...'),
 			$fm_FileRoot->name, $Blog->get('shortname') ) : '' );
 }
-$AdminUI->breadcrumbpath_add( /* TRANS: noun */ T_('Advanced Upload'), '?ctrl=upload&amp;blog=$blog$&amp;root='.$fm_FileRoot->ID );
+$AdminUI->breadcrumbpath_add( /* TRANS: noun */ TB_('Advanced Upload'), '?ctrl=upload&amp;blog=$blog$&amp;root='.$fm_FileRoot->ID );
 
 // Set an url for manual page:
 $AdminUI->set_page_manual_link( 'advanced-upload' );

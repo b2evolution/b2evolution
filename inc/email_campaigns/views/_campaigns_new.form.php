@@ -27,7 +27,7 @@ $Form->hidden( 'action', $action == 'copy' ? 'duplicate' : 'add' );
 if( $action == 'copy' )
 {
 	global $edited_EmailCampaign;
-	$fieldset_title = T_('Duplicate campaign').get_manual_link( 'duplicating-an-email-campaign' );
+	$fieldset_title = TB_('Duplicate campaign').get_manual_link( 'duplicating-an-email-campaign' );
 	if( empty( $enlt_ID ) )
 	{ // No list specified, use list of original campaign
 		$enlt_ID = $edited_EmailCampaign->enlt_ID;
@@ -35,13 +35,13 @@ if( $action == 'copy' )
 }
 else
 {
-	$fieldset_title = T_('New campaign').get_manual_link( 'creating-an-email-campaign' );
+	$fieldset_title = TB_('New campaign').get_manual_link( 'creating-an-email-campaign' );
 }
 
 $Form->begin_fieldset( $fieldset_title );
 	$NewsletterCache = & get_NewsletterCache();
 	$NewsletterCache->load_where( 'enlt_active = 1' );
-	$Form->select_input_object( 'ecmp_enlt_ID', $enlt_ID, $NewsletterCache, T_('Send to subscribers of'), array( 'required' => true ) );
+	$Form->select_input_object( 'ecmp_enlt_ID', $enlt_ID, $NewsletterCache, TB_('Send to subscribers of'), array( 'required' => true ) );
 	if( isset( $edited_EmailCampaign ) )
 	{
 		$campaign_name = $edited_EmailCampaign->get( 'name' );
@@ -50,17 +50,17 @@ $Form->begin_fieldset( $fieldset_title );
 	{
 		$campaign_name = '';
 	}
-	$Form->text_input( 'ecmp_name', $campaign_name, 60, T_('Campaign name'), T_('for internal use'), array( 'maxlength' => 255, 'required' => true ) );
+	$Form->text_input( 'ecmp_name', $campaign_name, 60, TB_('Campaign name'), TB_('for internal use'), array( 'maxlength' => 255, 'required' => true ) );
 $Form->end_fieldset();
 
 if( $action == 'copy' )
 {
 	$Form->hidden( 'ecmp_ID', $edited_EmailCampaign->ID );
-	$buttons[] = array( 'submit', 'submit', sprintf( T_('Save and duplicate all settings from %s'), $edited_EmailCampaign->get( 'name' ) ), 'SaveButton' );
+	$buttons[] = array( 'submit', 'submit', sprintf( TB_('Save and duplicate all settings from %s'), $edited_EmailCampaign->get( 'name' ) ), 'SaveButton' );
 }
 else
 {
-	$buttons[] = array( 'submit', 'submit', T_('Create campaign'), 'SaveButton' );
+	$buttons[] = array( 'submit', 'submit', TB_('Create campaign'), 'SaveButton' );
 }
 $Form->end_form( $buttons );
 

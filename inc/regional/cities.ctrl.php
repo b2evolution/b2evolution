@@ -42,7 +42,7 @@ if( param( 'city_ID', 'integer', '', true) )
 	if( ($edited_City = & $CityCache->get_by_ID( $city_ID, false )) === false )
 	{	unset( $edited_City );
 		forget_param( 'city_ID' );
-		$Messages->add( sprintf( T_('Requested &laquo;%s&raquo; object does not exist any longer.'), T_('City') ), 'error' );
+		$Messages->add( sprintf( TB_('Requested &laquo;%s&raquo; object does not exist any longer.'), TB_('City') ), 'error' );
 		$action = 'nil';
 	}
 }
@@ -67,12 +67,12 @@ switch( $action )
 		if ( $action == 'disable_city' )
 		{	// Disable this city by setting flag to false.
 			$edited_City->set( 'enabled', 0 );
-			$Messages->add( sprintf( T_('Disabled city (%s, #%d).'), $edited_City->name, $edited_City->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Disabled city (%s, #%d).'), $edited_City->name, $edited_City->ID ), 'success' );
 		}
 		elseif ( $action == 'enable_city' )
 		{	// Enable city by setting flag to true.
 			$edited_City->set( 'enabled', 1 );
-			$Messages->add( sprintf( T_('Enabled city (%s, #%d).'), $edited_City->name, $edited_City->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Enabled city (%s, #%d).'), $edited_City->name, $edited_City->ID ), 'success' );
 		}
 
 		// Update db with new flag value.
@@ -105,12 +105,12 @@ switch( $action )
 		if ( $action == 'disable_city_pref' )
 		{	// Disable this city by setting flag to false.
 			$edited_City->set( 'preferred', 0 );
-			$Messages->add( sprintf( T_('Removed from preferred cities (%s, #%d).'), $edited_City->name, $edited_City->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Removed from preferred cities (%s, #%d).'), $edited_City->name, $edited_City->ID ), 'success' );
 		}
 		elseif ( $action == 'enable_city_pref' )
 		{	// Enable city by setting flag to true.
 			$edited_City->set( 'preferred', 1 );
-			$Messages->add( sprintf( T_('Added to preferred cities (%s, #%d).'), $edited_City->name, $edited_City->ID ), 'success' );
+			$Messages->add( sprintf( TB_('Added to preferred cities (%s, #%d).'), $edited_City->name, $edited_City->ID ), 'success' );
 		}
 
 		// Update db with new flag value.
@@ -171,7 +171,7 @@ switch( $action )
 			// Insert in DB:
 			$DB->begin();
 			$edited_City->dbinsert();
-			$Messages->add( T_('New city created.'), 'success' );
+			$Messages->add( TB_('New city created.'), 'success' );
 			$DB->commit();
 
 			if( empty($q) )
@@ -218,7 +218,7 @@ switch( $action )
 			// Update in DB:
 			$DB->begin();
 			$edited_City->dbupdate();
-			$Messages->add( T_('City updated.'), 'success' );
+			$Messages->add( TB_('City updated.'), 'success' );
 			$DB->commit();
 
 			if( empty($q) )
@@ -243,7 +243,7 @@ switch( $action )
 
 		if( param( 'confirm', 'integer', 0 ) )
 		{ // confirmed, Delete from DB:
-			$msg = sprintf( T_('City &laquo;%s&raquo; deleted.'), $edited_City->dget('name') );
+			$msg = sprintf( TB_('City &laquo;%s&raquo; deleted.'), $edited_City->dget('name') );
 			$edited_City->dbdelete();
 			unset( $edited_City );
 			forget_param( 'city_ID' );
@@ -254,7 +254,7 @@ switch( $action )
 		}
 		else
 		{	// not confirmed, Check for restrictions:
-			if( ! $edited_City->check_delete( sprintf( T_('Cannot delete city &laquo;%s&raquo;'), $edited_City->dget('name') ) ) )
+			if( ! $edited_City->check_delete( sprintf( TB_('Cannot delete city &laquo;%s&raquo;'), $edited_City->dget('name') ) ) )
 			{	// There are restrictions:
 				$action = 'view';
 			}
@@ -272,17 +272,17 @@ switch( $action )
 
 		// Country Id
 		param( 'ctry_ID', 'integer', true );
-		param_check_number( 'ctry_ID', T_('Please select a country'), true );
+		param_check_number( 'ctry_ID', TB_('Please select a country'), true );
 
 		// CSV File
 		$import_file = param( 'import_file', 'string', '' );
 		if( empty( $import_file ) )
 		{	// File is not selected:
-			$Messages->add( T_('Please select a CSV file to import.'), 'error' );
+			$Messages->add( TB_('Please select a CSV file to import.'), 'error' );
 		}
 		else if( !preg_match( '/\.csv$/i', $import_file ) )
 		{	// Extension is incorrect
-			$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
+			$Messages->add( sprintf( TB_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
 		}
 
 		if( param_errors_detected() )
@@ -298,7 +298,7 @@ switch( $action )
 		$CountryCache = & get_CountryCache();
 		$Country = $CountryCache->get_by_ID( $ctry_ID );
 
-		$Messages->add( sprintf( T_('%s cities added and %s cities updated for country %s.'), $count_cities['inserted'], $count_cities['updated'], $Country->get_name() ), 'success' );
+		$Messages->add( sprintf( TB_('%s cities added and %s cities updated for country %s.'), $count_cities['inserted'], $count_cities['updated'], $Country->get_name() ), 'success' );
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=cities&c='.$ctry_ID, 303 ); // Will EXIT
 		break;
@@ -307,10 +307,10 @@ switch( $action )
 
 
 $AdminUI->breadcrumbpath_init( false );
-$AdminUI->breadcrumbpath_add( T_('System'), $admin_url.'?ctrl=system',
-		T_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
-$AdminUI->breadcrumbpath_add( T_('Regional'), $admin_url.'?ctrl=locales' );
-$AdminUI->breadcrumbpath_add( T_('Cities'), $admin_url.'?ctrl=cities' );
+$AdminUI->breadcrumbpath_add( TB_('System'), $admin_url.'?ctrl=system',
+		TB_('Global settings are shared between all blogs; see Blog settings for more granular settings.') );
+$AdminUI->breadcrumbpath_add( TB_('Regional'), $admin_url.'?ctrl=locales' );
+$AdminUI->breadcrumbpath_add( TB_('Cities'), $admin_url.'?ctrl=cities' );
 
 // Set an url for manual page:
 switch( $action )
@@ -352,7 +352,7 @@ switch( $action )
 	case 'delete':
 		// We need to ask for confirmation:
 		$edited_City->confirm_delete(
-				sprintf( T_('Delete city &laquo;%s&raquo;?'), $edited_City->dget('name') ),
+				sprintf( TB_('Delete city &laquo;%s&raquo;?'), $edited_City->dget('name') ),
 				'city', $action, get_memorized( 'action' ) );
 	case 'new':
 	case 'create':
