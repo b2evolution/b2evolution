@@ -2332,7 +2332,7 @@ class Skin extends DataObject
 	function require_css( $css_file )
 	{
 		global $app_version_long;
-		require_css( $css_file, 'relative', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long );
+		require_css( $this->get_url().$css_file, 'relative', NULL, NULL, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
 
 
@@ -2350,7 +2350,7 @@ class Skin extends DataObject
 	function require_js( $js_file, $async_defer = false, $output = false )
 	{
 		global $app_version_long;
-		require_js( $js_file, 'relative', $async_defer, $output, $this->folder.'+'.$this->version.'+'.$app_version_long );
+		require_js( $this->get_url().$js_file, 'relative', $async_defer, $output, $this->folder.'+'.$this->version.'+'.$app_version_long );
 	}
 
 
