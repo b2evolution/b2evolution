@@ -836,9 +836,9 @@ class bootstrap_forums_Skin extends Skin
 				'after_workflow_header'   => '<div class="clearfix"></header>',
 				'before_workflow_title'   => '<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">',
 				'after_workflow_title'    => '</div>',
-				'before_workflow_status'  => '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12">',
+				'before_workflow_status'  => '<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6">',
 				'after_workflow_status'   => '</div>',
-				'before_workflow_actions' => '<div class="col-lg-2 col-md-4 col-sm-6 col-xs-12 text-right">',
+				'before_workflow_actions' => '<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 text-right">',
 				'after_workflow_actions'  => '</div>',
 			), $params );
 
