@@ -12513,7 +12513,7 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 	}
 	
 	if( upg_task_start( 15980, 'Upgrading items type table...' ) )
-	{	// part of 7.1.2-beta
+	{	// part of 7.1.3-beta
 		db_add_col( 'T_items__type', 'ityp_front_order_workflow', 'SMALLINT(6) NULL DEFAULT NULL AFTER ityp_front_order_attachments' );
 		upg_task_end();
 	}

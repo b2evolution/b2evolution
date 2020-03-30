@@ -73,7 +73,7 @@ class ItemType extends DataObject
 	var $front_order_excerpt     = NULL;
 	var $front_order_url         = NULL;
 	var $front_order_location    = NULL;
-	var $front_order_workflow = 50;
+	var $front_order_workflow    = 50;
 
 	/**
 	 * Custom fields
