@@ -677,13 +677,11 @@ function echo_link_position_js()
 
 	$evo_link_position_config = array(
 			'selector' => 'select[id^=display_position_]',
-			'config' => array(
-				'url'       => get_htsrv_url(),
-				'crumb'     => get_crumb( 'link' ),
-				'alert_msg' => TS_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.'),
-				'display_inline_reminder' => $Session->get( 'display_inline_reminder', 'true' ),
-				'defer_inline_reminder'   => false, 
-			)
+			'url'       => get_htsrv_url(),
+			'crumb'     => get_crumb( 'link' ),
+			'alert_msg' => TS_('You can use the (+) icons to change the position to inline and automatically insert a short tag at the current cursor position.'),
+			'display_inline_reminder' => $Session->get( 'display_inline_reminder', 'true' ),
+			'defer_inline_reminder'   => false,
 		);
 
 	expose_var_to_js( 'evo_link_position_config', json_encode( $evo_link_position_config ) );
