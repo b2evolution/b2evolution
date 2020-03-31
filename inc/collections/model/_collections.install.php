@@ -362,6 +362,7 @@ $schema_queries = array_merge( $schema_queries, array(
 		"CREATE TABLE T_items__status (
 			pst_ID   int(10) unsigned not null AUTO_INCREMENT,
 			pst_name varchar(30) COLLATE utf8mb4_unicode_ci not null,
+			pst_order   int(11) NULL DEFAULT NULL,
 			primary key ( pst_ID )
 		) ENGINE = innodb DEFAULT CHARSET = $db_storage_charset" ),
 
