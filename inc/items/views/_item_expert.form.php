@@ -153,8 +153,18 @@ $Form->begin_form( '', '', $params );
 	{
 		$item_type_edit_link = '';
 	}
+	if( $ItemType->is_enabled( $edited_Item->get_blog_ID() ) )
+	{	// If Item Type is enabled for the Item's Collection:
+		$item_type_before = '';
+		$item_type_after = '';
+	}
+	else
+	{	// Mark with orange label if Item Type is disabled for the Item's Collection:
+		$item_type_before = '<span class="label label-warning" title="'.format_to_output( TB_('This type is disabled for this collection.'), 'htmlattr' ).'">';
+		$item_type_after = '</span>';
+	}
 	$Form->begin_fieldset( $form_title_item_ID.get_manual_link( 'post-contents-panel' )
-				.'<span class="pull-right">'.sprintf( TB_('Type: %s'), $item_type_link ).$item_type_edit_link.'</span>',
+				.'<span class="pull-right">'.$item_type_before.TB_('Type').$item_type_after.': '.$item_type_link.$item_type_edit_link.'</span>',
 			array( 'id' => 'itemform_content' ) );
 
 	$Form->switch_layout( 'fields_table' );

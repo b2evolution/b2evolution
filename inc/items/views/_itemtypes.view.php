@@ -103,7 +103,7 @@ function ityp_row_enabled( $enabled, $item_type_ID )
 		{ // URL to disable the item type
 			$status_url = $admin_url.'?ctrl=itemtypes&amp;action=disable&amp;ityp_ID='.$item_type_ID.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'itemtype' );
 		}
-		$status_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => T_('The item type is enabled.') ) );
+		$status_icon = get_icon( 'bullet_green', 'imgtag', array( 'title' => TB_('The item type is enabled.') ) );
 	}
 	else
 	{ // Disabled
@@ -111,7 +111,14 @@ function ityp_row_enabled( $enabled, $item_type_ID )
 		{ // URL to enable the item type
 			$status_url = $admin_url.'?ctrl=itemtypes&amp;action=enable&amp;ityp_ID='.$item_type_ID.'&amp;blog='.$Blog->ID.'&amp;'.url_crumb( 'itemtype' );
 		}
-		$status_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => T_('The item type is disabled.') ) );
+		if( $Blog->has_items_per_item_type( $item_type_ID ) )
+		{	// Use orange icon if collection has at least one Item per this disabled Item Type:
+			$status_icon = get_icon( 'bullet_orange', 'imgtag', array( 'title' => TB_('Disabled but used by some Items in this collection.') ) );
+		}
+		else
+		{	// Use "grey empty" icon if collection has no Items per this disabled Item Type:
+			$status_icon = get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => TB_('The item type is disabled.') ) );
+		}
 	}
 
 	if( isset( $status_url ) )

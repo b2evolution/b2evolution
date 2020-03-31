@@ -5963,31 +5963,33 @@ class Blog extends DataObject
 			return false;
 		}
 
+		return true;
+	}
+
+
+	/**
+	 * Check if this collection has items per requested Item Type
+	 *
+	 * @param integer Item Type ID
+	 * @return boolean TRUE if at least one Item exists with given
+	 */
+	function has_items_per_item_type( $item_type_ID )
+	{
 		if( ! isset( $this->used_item_types ) )
-		{ // Get all item types that are used for posts in this collection:
+		{	// Get all Item Types which are used for Items in this Collection:
 			global $DB;
 
-			$coll_item_types_SQL = new SQL();
+			$coll_item_types_SQL = new SQL( 'Get all Item Types which are used for Items of Collection #'.$this->ID );
 			$coll_item_types_SQL->SELECT( 'post_ityp_ID' );
 			$coll_item_types_SQL->FROM( 'T_items__item' );
 			$coll_item_types_SQL->FROM_add( 'INNER JOIN T_categories ON post_main_cat_ID = cat_ID' );
 			$coll_item_types_SQL->WHERE( 'cat_blog_ID = '.$this->ID );
 			$coll_item_types_SQL->GROUP_BY( 'post_ityp_ID' );
 
-			$this->used_item_types = $DB->get_col( $coll_item_types_SQL->get() );
+			$this->used_item_types = $DB->get_col( $coll_item_types_SQL );
 		}
 
-		if( ! empty( $this->used_item_types ) && in_array( $item_type_ID, $this->used_item_types ) )
-		{ // Don't allow to disable an item type which is used at least for one post in this collection:
-			if( $display_message )
-			{
-				global $Messages;
-				$Messages->add( 'This post type is used at least for one post in this collection. Thus you cannot disable it.', 'error' );
-			}
-			return false;
-		}
-
-		return true;
+		return is_array( $this->used_item_types ) && in_array( $item_type_ID, $this->used_item_types );
 	}
 
 
