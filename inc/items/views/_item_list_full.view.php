@@ -400,8 +400,8 @@ while( $Item = & $ItemList->get_item() )
 						'gallery_cell_end'    => '</div>',
 						'gallery_image_limit' => 1000,
 						'gallery_link_rel'    => 'lightbox[p'.$Item->ID.']',
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
-						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink',
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
+						'restrict_to_image_position' => 'cover,background,background,teaser,teaserperm,teaserlink',
 					) );
 			?>
 

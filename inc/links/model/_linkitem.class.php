@@ -100,9 +100,10 @@ class LinkItem extends LinkOwner
 		$FileCache = & get_FileCache();
 		$File = $FileCache->get_by_ID( $file_ID, false, false );
 		if( $File && $File->is_image() )
-		{ // Only images can have this position
+		{	// Only images can have these positions:
 			// TRANS: Noun - we're talking about a cover image i-e: an image that used as cover for a post
 			$positions['cover'] = T_('Cover');
+			$positions['background'] = T_('Background');
 		}
 
 		$positions = array_merge( $positions, array(

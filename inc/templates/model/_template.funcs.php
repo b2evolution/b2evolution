@@ -879,9 +879,9 @@ function render_template_callback( $var, $params, $objects = array() )
 
 		case 'Item:images':
 			echo $rendered_Item->get_images( array_merge( array(
-					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', 	// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
+					'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore', 	// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background',
 																// '#teaser_all' => 'teaser,teaserperm,teaserlink',
-																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
+																// '#cover_and_teaser_all' => 'cover,background,teaser,teaserperm,teaserlink'
 					'limit'                      => 1000, // Max # of images displayed
 					'before'                     => '<div>',
 					'before_image'               => '<figure class="evo_image_block">',

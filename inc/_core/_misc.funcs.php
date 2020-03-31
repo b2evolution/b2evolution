@@ -9556,7 +9556,7 @@ function get_social_media_image( $Item = NULL, $params = array() )
 	if( ! empty( $Item ) )
 	{	// Try to get attached images
 		$LinkOwner = new LinkItem( $Item );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink', 'image', array(
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,background,teaser,teaserperm,teaserlink', 'image', array(
 				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
 				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
 		{	// Item has linked files:

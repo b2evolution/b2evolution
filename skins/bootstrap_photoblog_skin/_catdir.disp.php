@@ -78,7 +78,7 @@ if( ! empty( $chapters ) )
 						'image_desc'                 => '',
 						'gallery_image_limit'        => 0, // Don't use images from attached folders.
 						'limit'                      => 1, // Get only first attached image depending on position priority, see param below:
-						'restrict_to_image_position' => 'cover,teaser,aftermore,inline',
+						'restrict_to_image_position' => 'cover,background,teaser,aftermore,inline',
 						'get_rendered_attachments'   => false,
 						// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
 						'links_sql_select'           => ', CASE '

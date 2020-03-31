@@ -99,7 +99,7 @@ if( ! $list_is_empty )
 				'image_link_to'       => 'single',
 				'image_desc'          => '',
 				'limit'                      => 1,
-				'restrict_to_image_position' => 'cover,teaser,aftermore,inline',
+				'restrict_to_image_position' => 'cover,background,teaser,aftermore,inline',
 				'get_rendered_attachments'   => false,
 				// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
 				'links_sql_select'           => ', CASE '

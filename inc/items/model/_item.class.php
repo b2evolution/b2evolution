@@ -5084,6 +5084,7 @@ class Item extends ItemLight
 
 			case 'teaserperm':
 			case 'cover':
+			case 'background':
 				// Teaser-Permalink or Cover
 				global $disp;
 				if( isset( $disp ) && $disp == 'single' )
@@ -5182,9 +5183,9 @@ class Item extends ItemLight
 				'gallery_order'              => '', // 'ASC', 'DESC', 'RAND'
 				'gallery_link_rel'           => 'lightbox[p'.$this->ID.']',
 				'restrict_to_image_position' => 'teaser,teaserperm,teaserlink,aftermore',
-																// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover',
+																// 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background',
 																// '#teaser_all' => 'teaser,teaserperm,teaserlink',
-																// '#cover_and_teaser_all' => 'cover,teaser,teaserperm,teaserlink'
+																// '#cover_and_teaser_all' => 'cover,background,teaser,teaserperm,teaserlink'
 				'limit'                      => 1000, // Max # of images displayed
 				'placeholder'                => '',		// HTML to be displayed if no image; possible codes: #folder_icon
 				'data'                       =>  & $r,
@@ -5211,7 +5212,7 @@ class Item extends ItemLight
 				$params['restrict_to_image_position'] = 'teaser,teaserperm,teaserlink';
 				break;
 			case '#cover_and_teaser_all':
-				$params['restrict_to_image_position'] = 'cover,teaser,teaserperm,teaserlink';
+				$params['restrict_to_image_position'] = 'cover,background,teaser,teaserperm,teaserlink';
 				break;
 		}
 
@@ -5380,7 +5381,7 @@ class Item extends ItemLight
 				$params['position'] = 'teaser,teaserperm,teaserlink';
 				break;
 			case '#cover_and_teaser_all':
-				$params['position'] = 'cover,teaser,teaserperm,teaserlink';
+				$params['position'] = 'cover,background,teaser,teaserperm,teaserlink';
 				break;
 		}
 
@@ -5447,7 +5448,7 @@ class Item extends ItemLight
 	 * Get URL of a first cover image
 	 *
 	 * @param string Restrict to files/images linked to a specific position.
-	 *               Position can be 'cover'|'teaser'|'aftermore'|'inline'
+	 *               Position can be 'cover'|'background'|'teaser'|'aftermore'|'inline'
 	 *               Use comma as separator
 	 * @return string|NULL cover URL or NULL if it doesn't exist
 	 */
@@ -5484,7 +5485,7 @@ class Item extends ItemLight
 	 * Get a number of images linked to the current Item
 	 *
 	 * @param string Restrict to files/images linked to a specific position.
-	 *               Position can be 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+	 *               Position can be 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 	 *               Use comma as separator
 	 * @param integer Number of images
 	 */
@@ -5534,8 +5535,8 @@ class Item extends ItemLight
 			// sam2kb> It's needed only for flexibility, in the meantime if user attaches 200 files he expects to see all of them in skin, I think.
 				'limit_attach' =>        1000, // Max # of files displayed
 				'limit' =>               1000,
-				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
-				'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,attachment',
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
+				'restrict_to_image_position' => 'cover,background,teaser,teaserperm,teaserlink,aftermore,attachment',
 				'data'                       => '',
 				'attach_format'              => '$icon_link$ $file_link$ $file_size$ $file_desc$', // $icon_link$ $icon$ $file_link$ $file_size$ $file_desc$
 				'file_link_format'           => '$file_name$', // $icon$ $file_name$ $file_size$ $file_desc$
@@ -13542,7 +13543,7 @@ class Item extends ItemLight
 		}
 
 		$LinkOwner = new LinkItem( $this );
-		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,teaser,teaserperm,teaserlink,inline', 'image', array(
+		if(  $LinkList = $LinkOwner->get_attachment_LinkList( 1000, 'cover,background,teaser,teaserperm,teaserlink,inline', 'image', array(
 				'sql_select_add' => ', CASE WHEN link_position = "cover" THEN 1 WHEN link_position IN ( "teaser", "teaserperm", "teaserlink" ) THEN 2 ELSE 3 END AS link_priority',
 				'sql_order_by'   => 'link_priority ASC, link_order ASC' ) ) )
 		{ // Item has linked files

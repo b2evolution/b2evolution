@@ -2349,7 +2349,8 @@ class RestApi
 			// Update last touched date of Owners
 			$LinkOwner->update_last_touched_date();
 
-			if( $link_position == 'cover' && $LinkOwner->type == 'item' )
+			if( $LinkOwner->type == 'item' &&
+			    ( $link_position == 'cover' || $link_position == 'background' ) )
 			{ // Position "Cover" can be used only by one link
 			  // Replace previous position with "Inline"
 				$DB->query( 'UPDATE T_links

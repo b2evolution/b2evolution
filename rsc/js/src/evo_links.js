@@ -98,7 +98,7 @@ function evo_link_change_position( selectInput, url, crumb )
 		if( r == "OK" ) {
 			evoFadeSuccess( jQuery(oThis).closest('tr') );
 			jQuery(oThis).closest('td').removeClass('error');
-			if( new_position == 'cover' )
+			if( new_position == 'cover' || new_position == 'background' )
 			{ // Position "Cover" can be used only by one link
 				jQuery( 'select[name=link_position][id!=' + selectInput.id + '] option[value=cover]:selected' ).each( function()
 				{ // Replace previous position with "Inline"

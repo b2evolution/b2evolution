@@ -33,7 +33,7 @@ $params = array_merge( array(
 		'before_content_extension' => '',
 		'after_content_extension'  => '',
 		// Controlling the images:
-		'image_positions'          => 'cover,teaser,teaserperm,teaserlink',
+		'image_positions'          => 'cover,background,teaser,teaserperm,teaserlink',
 		'before_images'            => '<div class="evo_post_images">',
 		'before_image'             => '<figure class="evo_image_block">',
 		'before_image_legend'      => '<figcaption class="evo_image_legend">',
@@ -151,7 +151,7 @@ if( mainlist_get_item() )
 					'gallery_image_limit' => $params['gallery_image_limit'],
 					'gallery_colls'       => $params['gallery_colls'],
 					'gallery_order'       => $params['gallery_order'],
-					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+					// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 					'restrict_to_image_position' => $params['image_positions'],
 				) );
 		?>

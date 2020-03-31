@@ -2234,7 +2234,7 @@ class ItemListLight extends DataObjectList2
 		if( $params['disp_first_image'] == 'special' )
 		{	// If we should display first picture before title then get "Cover" images and order them at top:
 			$cover_image_params = array(
-					'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
+					'restrict_to_image_position' => 'cover,background,teaser,teaserperm,teaserlink,aftermore,inline',
 					// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
 					'links_sql_select'  => ', CASE '
 							.'WHEN link_position = "cover"      THEN "1" '

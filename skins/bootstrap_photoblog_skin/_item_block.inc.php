@@ -71,7 +71,7 @@ $params = array_merge( array(
 				'gallery_colls'            => 5,
 				'gallery_order'            => '', // Can be 'ASC', 'DESC', 'RAND' or empty
 
-				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'
+				// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'cover'|'background'
 				'restrict_to_image_position' => 'teaser',
 			) );
 	?>

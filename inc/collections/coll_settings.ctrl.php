@@ -889,8 +889,8 @@ if( $action == 'dashboard' )
 						'after'               => '</div>',
 						'image_size'          => 'crop-80x80',
 						'limit'               => 1,
-						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'fallback'|'cover'
-						'restrict_to_image_position' => 'cover,teaser,teaserperm,teaserlink,aftermore,inline',
+						// Optionally restrict to files/images linked to specific position: 'teaser'|'teaserperm'|'teaserlink'|'aftermore'|'inline'|'fallback'|'cover'|'background'
+						'restrict_to_image_position' => 'cover,background,teaser,teaserperm,teaserlink,aftermore,inline',
 						// Sort the attachments to get firstly "Cover", then "Teaser", and "After more" as last order
 						'links_sql_select'    => ', CASE '
 								.'WHEN link_position = "cover"      THEN "1" '

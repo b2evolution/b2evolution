@@ -1677,14 +1677,15 @@ switch( $action )
 			// Update last touched date of Owners
 			$LinkOwner->update_last_touched_date();
 
-			if( $link_position == 'cover' && $LinkOwner->type == 'item' )
-			{ // Position "Cover" can be used only by one link
-			  // Replace previous position with "Inline"
+			if( $LinkOwner->type == 'item' &&
+			    ( $link_position == 'cover' || $link_position == 'background' ) )
+			{	// Position "Cover" or "Background" can be used only by one link
+				// Replace previous position with "After more":
 				$DB->query( 'UPDATE T_links
 						SET link_position = "aftermore"
 					WHERE link_ID != '.$DB->quote( $link_ID ).'
 						AND link_itm_ID = '.$DB->quote( $LinkOwner->Item->ID ).'
-						AND link_position = "cover"' );
+						AND link_position = '.$DB->quote( $link_position ) );
 			}
 		}
 		else
