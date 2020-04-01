@@ -236,7 +236,7 @@ if( isset( $MainList ) &&
 
 if( $single_cat_ID )
 {	// Go to grab the intro/featured posts only on pages with defined category:
-	while( $Item = & get_featured_Item( 'posts', NULL, false, true, false ) )
+	while( $Item = & get_featured_Item( 'posts', NULL, false, false, false ) )
 	{	// We have the intro or featured posts to display:
 		// ---------------------- ITEM LIST INCLUDED HERE ------------------------
 		skin_include( '_item_list.inc.php', array(
