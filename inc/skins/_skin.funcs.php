@@ -2437,8 +2437,6 @@ function siteskin_include( $template_name, $params = array() )
 /**
  * Template tag. Output HTML base tag to current skin.
  *
- * @deprecated since version 7.1.3-beta 2020-03-30 because we removed this from all default skins
- *
  * This is needed for relative css and img includes.
  */
 function skin_base_tag()

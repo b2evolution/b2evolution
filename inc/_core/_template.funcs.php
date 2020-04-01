@@ -972,8 +972,6 @@ function request_title( $params = array() )
 /**
  * Returns a "<base />" tag and remembers that we've used it ({@link regenerate_url()} needs this).
  *
- * @deprecated since version 7.1.3-beta 2020-03-30 because we removed skin_base_tag() from all default skins
- *
  * @param string URL to use (this gets used as base URL for all relative links on the HTML page)
  * @return string
  */
@@ -1151,7 +1149,6 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 
 	if( $relative_to === 'relative' || $relative_to === true )
 	{ // Make the file relative to current page <base>:
-		// NOTE: <base> was removed from default skins since version 7.1.3-beta 2020-03-30.
 		$lib_url = $lib_file;
 	}
 	elseif( preg_match( '~^(https?:)?//~', $lib_file ) )

@@ -26,6 +26,7 @@ $params = array_merge( array(
 	'viewport_tag'  => NULL,
 	'generator_tag' => '<meta name="generator" content="b2evolution '.$app_version.'" /> <!-- Please leave this for stats -->'."\n",
 	'body_class'    => NULL,
+	'use_base_tag'  => true,
 ), $params );
 
 init_bubbletip_js( 'blog', $Skin->get_template( 'tooltip_plugin' ) ); // Add jQuery bubbletip plugin
@@ -50,6 +51,12 @@ echo $params['html_tag'];
 	?>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<?php skin_content_meta(); /* Charset in case we can't trust the HTTP header or the page is saved to an .html file */ ?>
+	<?php
+	if( $params['use_base_tag'] )
+	{	// Base URL for this skin. You need this to fix relative links!
+		skin_base_tag();
+	}
+	?>
 	<?php $Plugins->trigger_event( 'SkinBeginHtmlHead' ); ?>
 	<title><?php
 		// ------------------------- TITLE FOR THE CURRENT REQUEST -------------------------
