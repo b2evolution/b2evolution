@@ -1074,9 +1074,6 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $tag;
 			break;
 
-		case 'Tag:item_count':
-			break;
-
 		case 'Tag:permalink':
 			global $Blog;
 			$rendered_Blog = ( !isset( $objects['Collection'] ) ? $Blog : $objects['Collection'] );
