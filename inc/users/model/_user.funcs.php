@@ -2454,9 +2454,16 @@ function load_blog_advanced_perms( & $blog_perms, $perm_target_blog, $perm_targe
 		{
 			if( ! isset( $blog_perms[ $perm_target_ID ] ) )
 			{	// No rights set for this Blog - User/Group: remember this (in order not to have the same query next time)
+
+				// Check if the User is admin or owner of the Collection, so he must be assignee by default when no perm record is not stored in DB yet:
+				$null_row = ( $prefix == 'bloguser'
+					? array( 'user_ID' => $perm_target_ID )
+					: array( 'grp_ID'  => $perm_target_ID ) );
+				$default_can_be_assignee = is_always_coll_perm_enabled( (object)$null_row, $prefix.'_', 'can_be_assignee', $Blog->get( 'owner_user_ID' ) ) ? 1 : 0;
+
 				$blog_perms[ $perm_target_ID ] = array(
 						'blog_ismember'           => 0,
-						'blog_can_be_assignee'    => 0,
+						'blog_can_be_assignee'    => $default_can_be_assignee,
 						'blog_workflow_status'    => 0,
 						'blog_workflow_user'      => 0,
 						'blog_workflow_priority'  => 0,

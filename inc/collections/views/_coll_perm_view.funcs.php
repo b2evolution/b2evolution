@@ -121,54 +121,6 @@ function get_id_coll_from_prefix( $prefix )
 
 
 /**
- * Check if permission is always enabled
- *
- * @param object the db row
- * @param string the prefix of the db row: 'bloguser_' or 'bloggroup_'
- * @param string permission name
- * @param string Collection owner user ID
- * @return boolean
- */
-function is_always_coll_perm_enabled( $row, $prefix, $perm, $coll_owner_user_ID )
-{
-	if( $prefix == 'bloguser_' && $perm != 'perm_admin' && $coll_owner_user_ID == $row->user_ID )
-	{	// Collection owner has almost all permissions by default (One exception is "admin" perm to edit advanced/administrative coll properties):
-		return true;
-	}
-
-	// Check if permission is always enabled by group setting:
-	if( ! empty( $row->user_ID ) )
-	{	// User perm:
-		$UserCache = & get_UserCache();
-		if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
-		{	// Get user group:
-			$perm_Group = & $User->get_Group();
-		}
-	}
-	elseif( ! empty( $row->grp_ID ) )
-	{	// Group perm:
-		$GroupCache = & get_GroupCache();
-		$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
-	}
-
-	if( ! empty( $perm_Group ) )
-	{	// Check global group setting permission:
-		$group_perm_blogs = $perm_Group->get( 'perm_blogs' );
-		if( $group_perm_blogs == 'editall' )
-		{	// If the group has a global permission to edit ALL collections:
-			return true;
-		}
-		elseif( $perm == 'ismember' && $group_perm_blogs == 'viewall' )
-		{	// If the group has a global permission to view or edit ALL collections:
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
-/**
  * Get collection perm checkbox
  * 
  * @param object the db row
@@ -201,8 +153,18 @@ function coll_perm_checkbox( $row, $prefix, $perm, $title, $id = NULL )
 	$r .= ' name="blog_'.$perm.'_'.$row->{$row_id_coll}.'"';
 
 	if( is_always_coll_perm_enabled( $row, $prefix, $perm, $row_Blog->owner_user_ID ) )
-	{	// This perm option is always enabled:
-		$r .= ' checked="checked" disabled="disabled"';
+	{	// This perm option is almost always enabled:
+		if( $perm == 'can_be_assignee' )
+		{	// This permission can be edited even for admins:
+			if( $row->{$prefix.$perm} === NULL || $row->{$prefix.$perm} )
+			{
+				$r .= ' checked="checked"';
+			}
+		}
+		else
+		{
+			$r .= ' checked="checked" disabled="disabled"';
+		}
 	}
 	else
 	{	// Check if perm option is enabled or/and disabled:
@@ -622,8 +584,8 @@ function coll_grp_perm_col_member( $row )
 	{	// If the collection uses workflow:
 		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'can_be_assignee', format_to_output( T_('Workflow Member (Items can be assigned to members of this Group)'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
 		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_status', format_to_output( T_('Members of this Group can change task status'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
-		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_user', format_to_output( T_('Members of this Group can assign items to others'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
-		$r .= ' '.coll_perm_checkbox( $row, 'bloggroup_', 'workflow_priority', format_to_output( T_('Members of this Group can set priority / deadline'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
+		$r .= coll_perm_checkbox( $row, 'bloggroup_', 'workflow_user', format_to_output( T_('Members of this Group can assign items to others'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
+		$r .= coll_perm_checkbox( $row, 'bloggroup_', 'workflow_priority', format_to_output( T_('Members of this Group can set priority / deadline'), 'htmlattr' ), 'checkallspan_state_'.$row->grp_ID );
 	}
 
 	return $r;

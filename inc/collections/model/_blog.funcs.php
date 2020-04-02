@@ -16,6 +16,54 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
 
 
 /**
+ * Check if permission is always enabled
+ *
+ * @param object the db row
+ * @param string the prefix of the db row: 'bloguser_' or 'bloggroup_'
+ * @param string permission name
+ * @param string Collection owner user ID
+ * @return boolean
+ */
+function is_always_coll_perm_enabled( $row, $prefix, $perm, $coll_owner_user_ID )
+{
+	if( $prefix == 'bloguser_' && $perm != 'perm_admin' && $coll_owner_user_ID == $row->user_ID )
+	{	// Collection owner has almost all permissions by default (One exception is "admin" perm to edit advanced/administrative coll properties):
+		return true;
+	}
+
+	// Check if permission is always enabled by group setting:
+	if( ! empty( $row->user_ID ) )
+	{	// User perm:
+		$UserCache = & get_UserCache();
+		if( $User = & $UserCache->get_by_ID( $row->user_ID, false, false ) )
+		{	// Get user group:
+			$perm_Group = & $User->get_Group();
+		}
+	}
+	elseif( ! empty( $row->grp_ID ) )
+	{	// Group perm:
+		$GroupCache = & get_GroupCache();
+		$perm_Group = & $GroupCache->get_by_ID( $row->grp_ID, false, false );
+	}
+
+	if( ! empty( $perm_Group ) )
+	{	// Check global group setting permission:
+		$group_perm_blogs = $perm_Group->get( 'perm_blogs' );
+		if( $group_perm_blogs == 'editall' )
+		{	// If the group has a global permission to edit ALL collections:
+			return true;
+		}
+		elseif( $perm == 'ismember' && $group_perm_blogs == 'viewall' )
+		{	// If the group has a global permission to view or edit ALL collections:
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+/**
  * Update the advanced user/group permissions for edited blog
  *
  * @param integer Blog ID or Group ID
@@ -88,6 +136,9 @@ function blog_update_perms( $object_ID, $context = 'user' )
 		return;
 	}
 
+	$BlogCache = & get_BlogCache();
+	$BlogCache->load_list( $coll_IDs );
+
 	// Delete old perms for the edited collection/group:
 	$DB->query( "DELETE FROM $table
 								WHERE {$ID_field_edit} IN (".implode( ',',$ID_array ).")
@@ -95,7 +146,7 @@ function blog_update_perms( $object_ID, $context = 'user' )
 
 	$inserted_values = array();
 	foreach( $ID_array as $loop_ID )
-	{ // Check new permissions for each user:
+	{	// Check new permissions per each user or group or collection:
 
 		// Get collection/object ID depedning on request:
 		$coll_ID = ( $context == 'coll' ? $loop_ID : $blog );
@@ -176,10 +227,22 @@ function blog_update_perms( $object_ID, $context = 'user' )
 
 		// Update those permissions in DB:
 
-		if( $ismember || $can_be_assignee || $workflow_status || $workflow_user || $workflow_priority ||
+		// Update permissions per user or group or collection if at least on is selected:
+		$update_permissions = ( $ismember || $can_be_assignee || $workflow_status || $workflow_user || $workflow_priority ||
 			$perm_item_propose || count($perm_post) || $perm_delpost || $perm_edit_ts || $perm_delcmts || $perm_recycle_owncmts || $perm_vote_spam_comments || $perm_cmtstatuses ||
-			$perm_meta_comments || $perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change || $perm_analytics )
-		{ // There are some permissions for this user:
+			$perm_meta_comments || $perm_cats || $perm_properties || $perm_admin || $perm_media_upload || $perm_media_browse || $perm_media_change || $perm_analytics );
+		if( ! $update_permissions &&
+		    ( $perm_Blog = & $BlogCache->get_by_ID( $coll_ID, false, false ) ) )
+		{	// When all permissions are disabled(not checked),
+			// do additional check for users or groups which are always members of the Collection:
+			$null_row = ( $context == 'user'
+				? array( 'user_ID' => $loop_ID )
+				: array( 'grp_ID'  => ( $context == 'coll' ? $group_ID : $loop_ID ) ) );
+			$update_permissions = is_always_coll_perm_enabled( (object)$null_row, $prefix, 'can_be_assignee', $perm_Blog->get( 'owner_user_ID' ) );
+		}
+
+		if( $update_permissions )
+		{	// Initialize value to update permissions:
 			$ismember = 1;	// Must have this permission
 
 			// insert new perms:

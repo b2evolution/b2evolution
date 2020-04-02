@@ -3295,7 +3295,6 @@ class User extends DataObject
 			// Permissions on a collection:
 			// NOTE: these are currently the only collections that will check multiple user groups:
 			case 'blog_ismember':
-			case 'blog_can_be_assignee':
 			case 'blog_workflow_status':
 			case 'blog_workflow_user':
 			case 'blog_workflow_priority':
@@ -3350,6 +3349,10 @@ class User extends DataObject
 					// Stop checking other perms:
 					break;
 				}
+
+			case 'blog_can_be_assignee':
+				// Apply next rules below for above collection permissions if current User is not admin or not owner of the Collection:
+				// NOTE: The permission "Workflow Member (Items can be assigned to this User/Group)" may be disabled even for admin!
 
 				if( $perm_target_ID > 0 )
 				{	// Check the permissions below only for requested target collection:
