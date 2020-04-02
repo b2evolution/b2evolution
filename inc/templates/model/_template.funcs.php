@@ -367,7 +367,11 @@ function render_template_callback( $var, $params, $objects = array() )
 			break;
 
 		case 'Comment:creation_time':
-			echo mysql2date( $params['date_format'], $rendered_Comment->date );
+			$temp_params = array_merge( array(
+					'format' => '#short_date_time',
+					'useGM'  => false,
+				), $params );
+			echo $rendered_Comment->get_creation_time( $temp_params['format'], $temp_params['useGM'] );
 			break;
 
 		case 'Comment:content':

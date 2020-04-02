@@ -3373,6 +3373,20 @@ class Comment extends DataObject
 
 
 	/**
+	 * Get creation time of Comment. This should replace Comment::date() and Comment::time()
+	 * 
+	 * @param string date/time format: leave empty to use locale default date format
+	 * @param boolean true if you want GMT
+	 */
+	function get_creation_time( $format = '', $useGM = false )
+	{
+		$format = locale_resolve_datetime_fmt( $format );
+
+		return mysql2date( $format, $this->date, $useGM );
+	}
+
+
+	/**
 	 * Template tag:  display rating
 	 */
 	function rating( $params = array() )
