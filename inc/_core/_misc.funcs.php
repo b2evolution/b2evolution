@@ -117,7 +117,7 @@ function load_db_schema( $inlcude_plugins = false )
 	// Load modules:
 	foreach( $modules as $module )
 	{
-		echo get_install_format_text( 'Loading module: <code>'.$module.'/model/_'.$module.'.install.php</code><br />', 'br' );
+		echo get_install_format_text_and_log( 'Loading module: <code>'.$module.'/model/_'.$module.'.install.php</code><br />', 'br' );
 		require_once $inc_path.$module.'/model/_'.$module.'.install.php';
 	}
 
@@ -8547,12 +8547,13 @@ function evo_version_compare( $version1, $version2, $operator = NULL )
  * @param string Format (Used for CLI mode)
  * @return string Prepared text
  */
-function get_install_format_text( $text, $format = 'string' )
+function get_install_format_text_and_log( $text, $format = 'string' )
 {
-	global $display;
+	global $display, $logs_path, $log_file_handle;
 
 	if( empty( $display ) || $display != 'cli' )
 	{	// Don't touch text for non CLI modes:
+		prepare_install_log_message( $text );
 		return $text;
 	}
 
@@ -8613,8 +8614,158 @@ function get_install_format_text( $text, $format = 'string' )
 
 	// Replace all html entities like "&nbsp;", "&raquo;", "&laquo;" to readable chars:
 	$text = html_entity_decode( $text );
-
+	
+	prepare_install_log_message( $text );
+	
 	return $text;
+}
+
+
+/**
+* Start to log into file on disk
+*/
+function start_install_log( $log_file_name )
+{	// TODO: Factorize with start_log():
+	global $rsc_url, $app_version_long, $log_file_handle, $logs_path, $servertimenow;
+
+	// Get file path for log:
+	$log_file_path = $logs_path.date( 'Y-m-d-H-i-s', $servertimenow ).'-'.$log_file_name.'.html';
+	
+	// Check log path is writeable or not: 
+	if ( ! is_writable( $logs_path ) ) {
+
+		return false;
+	}
+	
+	// Try to create log file:
+	if( ! ( $log_file_handle = fopen( $log_file_path, 'w' ) ) )
+	{	
+		return false;
+	}
+
+	// Write header of the log file:
+	install_log_to_file( '<!DOCTYPE html>'."\r\n"
+		.'<html lang="en-US">'."\r\n"
+		.'<head>'."\r\n"
+		.'<link href="'.$rsc_url.'css/bootstrap/bootstrap.css?v='.$app_version_long.'" type="text/css" rel="stylesheet" />'."\r\n"
+		.'</head>'."\r\n"
+		.'<body>'."\r\n"
+		.'<div style="padding:5px">' );
+}
+
+
+/**
+* End of log into file on disk
+*/
+function end_install_log()
+{	// TODO: Factorize with end_log():
+	global $log_file_handle;
+
+	// Write footer of the log file:
+	install_log_to_file( '</div>'."\r\n"
+		.'</body>'."\r\n"
+		.'</html>' );
+
+	if( isset( $log_file_handle ) && $log_file_handle )
+	{	// Close the log file:
+		fclose( $log_file_handle );
+	}
+}
+
+
+/**
+* Log a message on screen and into file on disk
+*
+* @param string Message
+* @param string Type: 'success', 'error', 'warning'
+* @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
+* @param boolean TRUE to display label
+*/
+function prepare_install_log_message( $message, $type = NULL, $type_html_tag = 'p', $display_label = true )
+{	// TODO: Factorize with log():
+	global $log_file_handle;
+
+	if( ! isset( $log_file_handle ) || ! $log_file_handle )
+	{	
+		return false;
+	}
+	
+	$message = get_install_log( $message, $type, $type_html_tag, $display_label );
+
+	if( $message === false )
+	{	// Skip when message should not be displayed:
+		return;
+	}
+
+	// Try to store a message into the log file on the disk:
+	install_log_to_file( $message );
+}
+
+
+/**
+* Get a log message
+*
+* @param string Message
+* @param string Type: 'success', 'error', 'warning', 'info'
+* @param string HTML tag for type/styled log: 'p', 'span', 'b', etc.
+* @param boolean TRUE to display label
+* @return string|FALSE Formatted log message, FALSE - when message should not be displayed
+*/
+function get_install_log( $message, $type = NULL, $type_html_tag = 'p', $display_label = true )
+{	// TODO: Factorize with get_log():
+	if( $message === '' )
+	{	// Don't log empty strings:
+		return false;
+	}
+
+	switch( $type )
+	{
+		case 'success':
+			$before = '<'.$type_html_tag.' class="text-success"> ';
+			$after = '</'.$type_html_tag.'>';
+			break;
+
+		case 'error':
+			$before = '<'.$type_html_tag.' class="text-danger">'.( $display_label ? '<span class="label label-danger">ERROR</span>' : '' ).' ';
+			$after = '</'.$type_html_tag.'>';
+			break;
+
+		case 'warning':
+			$before = '<'.$type_html_tag.' class="text-warning">'.( $display_label ? '<span class="label label-warning">WARNING</span>' : '' ).' ';
+			$after = '</'.$type_html_tag.'>';
+			break;
+
+		case 'info':
+			$before = '<'.$type_html_tag.' class="text-info">'.( $display_label ? '<span class="label label-info">INFO</span>' : '' ).' ';
+			$after = '</'.$type_html_tag.'>';
+			break;
+
+		default:
+			$before = '';
+			$after = '';
+			break;
+	}
+
+	return $before.$message.$after;
+}
+
+
+/**
+* Log a message into file on disk
+*
+* @param string Message
+*/
+function install_log_to_file( $message )
+{	// TODO: Factorize with log_to_file():
+	global $log_file_handle;
+
+	if( ! isset( $log_file_handle ) || ! $log_file_handle )
+	{	
+		return false;
+	}
+
+	// Put a message into the log file on the disk:
+	fwrite( $log_file_handle, $message."\r\n" );
 }
 
 

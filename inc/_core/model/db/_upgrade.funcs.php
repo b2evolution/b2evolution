@@ -1448,7 +1448,7 @@ function install_make_db_schema_current( $display = true )
 			{
 				if( count($itemlist) == 1 && $itemlist[0]['type'] == 'create_table' )
 				{
-					echo get_install_format_text( $itemlist[0]['note']."<br />\n", 'br' );
+					echo get_install_format_text_and_log( $itemlist[0]['note']."<br />\n", 'br' );
 					evo_flush();
 					foreach( $itemlist[0]['queries'] as $query )
 					{ // should be just one, but just in case
@@ -1461,22 +1461,22 @@ function install_make_db_schema_current( $display = true )
 				}
 				else
 				{
-					echo get_install_format_text( 'Altering table &laquo;'.$table.'&raquo;...' );
-					echo get_install_format_text( '<ul>' );
+					echo get_install_format_text_and_log( 'Altering table &laquo;'.$table.'&raquo;...' );
+					echo get_install_format_text_and_log( '<ul>' );
 					foreach( $itemlist as $item )
 					{
-						echo get_install_format_text( '<li>'.$item['note'], 'li' );
+						echo get_install_format_text_and_log( '<li>'.$item['note'], 'li' );
 						if( $debug )
 						{
 							pre_dump( $item['queries'] );
 						}
-						echo get_install_format_text( '</li>' );
+						echo get_install_format_text_and_log( '</li>' );
 						foreach( $item['queries'] as $query )
 						{
 							$DB->query( $query );
 						}
 					}
-					echo get_install_format_text( '</ul>' );
+					echo get_install_format_text_and_log( '</ul>' );
 				}
 			}
 		}
