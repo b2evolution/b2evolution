@@ -327,7 +327,9 @@ function install_newdb()
 
 	track_step( 'install-success' );
 
+	// Display installation data and instructions
 	$install_result_title = T_('Installation successful!');
+	echo get_install_format_text_and_log( '<h2>'.$install_result_title.'</h2>', 'h2' );
 	$install_result_body = get_install_format_text_and_log(
 		'<p><strong>'
 			.sprintf( T_('Now you can <a %s>log in</a> with the following credentials:'), 'href="'.$admin_url.'"' )
@@ -340,9 +342,6 @@ function install_newdb()
 		.'</table>', 'br' )
 		.get_install_format_text_and_log(
 		'<br /><p>'.T_('Note that password carefully! It is a <em>random</em> password that is given to you when you install b2evolution. If you lose it, you will have to delete the database tables and re-install anew.').'</p>', 'p' );
-
-	// Display installation data and instructions
-	echo get_install_format_text_and_log( '<h2>'.$install_result_title.'</h2>', 'h2' );
 	echo $install_result_body;
 
 	// Modal window with installation data and instructions
