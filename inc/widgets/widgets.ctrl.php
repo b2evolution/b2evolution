@@ -837,7 +837,7 @@ if( $display_mode == 'normal' )
 	 * @internal Tblue> We get the whole img tags here (easier).
 	 */
 	var edit_icon_tag = \''.get_icon( 'edit', 'imgtag', array( 'title' => TB_( 'Edit widget settings!' ) ) ).'\';
-	var duplicate_icon_tag = \''.get_icon( 'copy', 'imgtag', array( 'title' => TB_('Duplicate') ) ).'\';
+	var duplicate_icon_tag = \''.get_icon( 'duplicate', 'imgtag', array( 'title' => TB_('Duplicate') ) ).'\';
 	var delete_icon_tag = \''.get_icon( 'delete', 'imgtag', array( 'title' => TB_( 'Remove this widget!' ) ) ).'\';
 	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => TB_( 'The widget is enabled.' ) ) ).'\';
 	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => TB_( 'The widget is disabled.' ) ) ).'\';
