@@ -2651,7 +2651,12 @@ class Form extends Widget
 	{
 		global $edited_User;
 
-		if( isset($field_params['allow_none']) )
+		if( isset($field_params['required']) )
+		{	// 'allow_none' param value should depend on 'required' param value:
+			$allow_none = !$field_params['required'];
+			unset( $field_params['allow_none'] );
+		}
+		elseif( isset($field_params['allow_none']) )
 		{
 			$allow_none = $field_params['allow_none'];
 			unset( $field_params['allow_none'] );
