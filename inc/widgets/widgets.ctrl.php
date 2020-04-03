@@ -284,8 +284,7 @@ switch( $action )
 			$duplicated_Widget->load_param_array();
 			$edited_ComponentWidget->param_array = $duplicated_Widget->param_array;
 
-			// Commented block below can be used to insert the duplicate widget below the original widget:
-			/*
+			// Get widget order for new widget, must be next to the duplicated widget:
 			$widget_order = $duplicated_Widget->order + 1;
 			$edited_ComponentWidget->set( 'order', $widget_order );
 
@@ -300,7 +299,6 @@ switch( $action )
 				WHERE wi_wico_ID = '.$DB->quote( $WidgetContainer->ID ).'
 				AND wi_order <= '.$DB->quote( $widget_order ).'
 				ORDER BY wi_order ASC' );
-			*/
 
 			$edited_ComponentWidget->set( 'enabled', $duplicated_Widget->get( 'enabled' ) );
 
@@ -341,6 +339,7 @@ switch( $action )
 						$edited_ComponentWidget->enabled,
 						$plugin_disabled,
 						$edited_ComponentWidget->get_cache_status( true ),
+						( ( $action == 'duplicate' ) && isset( $duplicated_Widget ) ) ? $duplicated_Widget->ID : NULL, 
 					),
 					// Open widget settings:
 					'editWidget' => array(

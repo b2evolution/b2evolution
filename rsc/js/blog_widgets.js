@@ -563,12 +563,15 @@ function addNewWidget( widget_list_item, admin_call )
  * @param string container Container to add widget to
  * @param intger wi_order ( unused atm ) Order of the widget on the server
  * @param string wi_name Name of the new widget
+ * @param boolean wi_enabled Is the widget enabled?
+ * @param boolean wi_plugin_status
  * @param string wi_cache_status Cache status
+ * @param integer wi_ID Id of widget where new widget will be added next to
  */
-function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_enabled, wi_plugin_status, wi_cache_status )
+function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_enabled, wi_plugin_status, wi_cache_status, next_to_wi_ID )
 {
 	jQuery( '.fade_me' ).removeClass( 'fade_me' ); // kill any active fades
-	createWidget( 'wi_ID_' + wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, wi_name, '', wi_enabled, wi_plugin_status, wi_cache_status );
+	createWidget( 'wi_ID_' + wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, wi_name, '', wi_enabled, wi_plugin_status, wi_cache_status, next_to_wi_ID );
 	doFade( '#wi_ID_'+wi_ID );
 	if( reorder_delay_remaining > 0 )
 	{ // send outstanding updates
@@ -587,11 +590,15 @@ function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_enabled, 
  * @param string container Container to add widget to
  * @param integer wi_order ( unused atm ) Order of the widget on the server
  * @param string wi_name Name of the new widget
+ * @param string wi_class CSS class
  * @param boolean wi_enabled Is the widget enabled?
+ * @param boolean wi_plugin_disabled
+ * @param string wi_cache_status Cache status
+ * @param integer wi_ID Id of widget where new widget will be added next to
  */
-function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled, wi_plugin_disabled, wi_cache_status )
+function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled, wi_plugin_disabled, wi_cache_status, next_to_wi_ID )
 {
-	var newWidget = jQuery( '<li id="'+wi_ID+'" class="draggable_widget"><span class="widget_title">'+wi_name+'</span></li>' );
+	var newWidget = jQuery( '<li id="'+ wi_ID +'" class="draggable_widget"><span class="widget_title">'+wi_name+'</span></li>' );
 	newWidget.find( 'a.widget_name' ).click( function()
 	{
 		return editWidget( wi_ID );
@@ -629,7 +636,14 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 	actionIcons = jQuery( actionIcons );
 	jQuery( newWidget ).append( actionIcons ); // add widget action icons
 
-	jQuery( '#container_'+container ).append( newWidget );	// add widget to container
+	if( next_to_wi_ID )
+	{
+		jQuery( '#container_' + container + ' li#wi_ID_' + next_to_wi_ID ).after( newWidget ); // add next to specified widget
+	}
+	else
+	{
+		jQuery( '#container_' + container ).append( newWidget );	// add widget to container
+	}
 
 	makeDragnDrop( '#'+wi_ID );
 	colourWidgets();	// recolour the widgets
