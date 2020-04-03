@@ -439,9 +439,6 @@ function render_template_callback( $var, $params, $objects = array() )
 			// Only params specified in $temp_params above will be passed to prevent unknown params transformed into input attributes!
 			$temp_params = array_merge( $temp_params, array_intersect_key( $params, $temp_params ) );
 
-			// Apply correct allow_none param based on $params['required'] value:
-			$temp_params['allow_none'] = !$temp_params['required'];
-
 			$CountryCache = & get_CountryCache();
 			$rendered_Form->select_country( $temp_params['name'], $temp_params['value'], $CountryCache, $temp_params['label'], $temp_params );
 			break;
