@@ -2167,7 +2167,7 @@ function create_default_templates( $is_task = true )
 			'context'  => 'registration',
 			'template' => '[Form:login]
 [Form:password]
-[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+[Form:email]
 <div class="evo_register_buttons">
 	[Form:submit|
 		name=register|
@@ -2198,7 +2198,7 @@ function create_default_templates( $is_task = true )
 			'context'  => 'registration',
 			'template' => '[Form:firstname]
 [Form:lastname]
-[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+[Form:email]
 [Form:password]
 <div class="evo_register_buttons">
 	[Form:submit|
@@ -2229,7 +2229,7 @@ function create_default_templates( $is_task = true )
 		'registration_email_social' => array(
 			'name'     => 'Registration: email & social buttons',
 			'context'  => 'registration',
-			'template' => '[Form:email|note=We respect your privacy. Your email will remain strictly confidential.]
+			'template' => '[Form:email]
 <div class="evo_register_buttons">
 	[Form:submit|
 		name=register|
