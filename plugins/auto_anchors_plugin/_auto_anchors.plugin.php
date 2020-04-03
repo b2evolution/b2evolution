@@ -141,12 +141,11 @@ class auto_anchors_plugin extends Plugin
 		}
 
 		$this->require_css( 'auto_anchors.css' );
-		if( $disp == 'single' || $disp == 'page' )
-		{	// Initialize JS for better scrolling only on Item's page:
-			expose_var_to_js( 'evo_plugin_auto_anchors_settings', '{
-					offset_scroll: '.format_to_js( intval( $this->get_coll_setting( 'offset_scroll', $Blog ) ) ).'
-				}' );
-		}
+		// JS for initialize anchor icons and for better scrolling:
+		// NOTE: we need this on each page because content bloc items may be included as widget even on front page!
+		expose_var_to_js( 'evo_plugin_auto_anchors_settings', '{
+				offset_scroll: '.format_to_js( intval( $this->get_coll_setting( 'offset_scroll', $Blog ) ) ).'
+			}' );
 	}
 
 
