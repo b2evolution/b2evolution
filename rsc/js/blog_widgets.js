@@ -363,10 +363,15 @@ function deleteWidget( widget )
 /**
  * Duplicate widget
  */
-function duplicateWidget( widget )
+function duplicateWidget( widget, mode )
 {
 	var widget_id = widget.substr( 6, widget.length );
-	SendAdminRequest( 'widgets', 'duplicate', 'wi_ID=' + widget_id + '&' + widget_crumb_url_param, true );
+	var query_string = 'wi_ID=' + widget_id + '&' + widget_crumb_url_param;
+	if( mode == 'customizer' )
+	{
+		query_string += '&mode=customizer';
+	}
+	SendAdminRequest( 'widgets', 'duplicate', query_string, true );
 	return false;
 }
 
@@ -567,11 +572,12 @@ function addNewWidget( widget_list_item, admin_call )
  * @param boolean wi_plugin_status
  * @param string wi_cache_status Cache status
  * @param integer wi_ID Id of widget where new widget will be added next to
+ * @param string mode Mode
  */
-function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_enabled, wi_plugin_status, wi_cache_status, next_to_wi_ID )
+function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_enabled, wi_plugin_status, wi_cache_status, next_to_wi_ID, mode )
 {
 	jQuery( '.fade_me' ).removeClass( 'fade_me' ); // kill any active fades
-	createWidget( 'wi_ID_' + wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, wi_name, '', wi_enabled, wi_plugin_status, wi_cache_status, next_to_wi_ID );
+	createWidget( 'wi_ID_' + wi_ID, container.replace( / /g, '_' ).replace( /:/g, '-' ), wi_order, wi_name, '', wi_enabled, wi_plugin_status, wi_cache_status, next_to_wi_ID, mode );
 	doFade( '#wi_ID_'+wi_ID );
 	if( reorder_delay_remaining > 0 )
 	{ // send outstanding updates
@@ -595,8 +601,9 @@ function addNewWidgetCallback( wi_ID, container, wi_order, wi_name, wi_enabled, 
  * @param boolean wi_plugin_disabled
  * @param string wi_cache_status Cache status
  * @param integer wi_ID Id of widget where new widget will be added next to
+ * @param string mode Mode
  */
-function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled, wi_plugin_disabled, wi_cache_status, next_to_wi_ID )
+function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled, wi_plugin_disabled, wi_cache_status, next_to_wi_ID, mode )
 {
 	var newWidget = jQuery( '<li id="'+ wi_ID +'" class="draggable_widget"><span class="widget_title">'+wi_name+'</span></li>' );
 	newWidget.find( 'a.widget_name' ).click( function()
@@ -616,21 +623,28 @@ function createWidget( wi_ID, container, wi_order, wi_name, wi_class, wi_enabled
 			'</a>' ) +
 		'</span>' ) );
 
-	// Add checkbox:
-	jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox' + ( wi_enabled ? ' widget_checkbox_enabled' : '' ) + '">' +
-			'<input type="checkbox" name="widgets[]" value="' + wi_ID.replace( 'wi_ID_', '' ) + '" ' + ( wi_plugin_disabled ? 'disabled="disabled" ' : '' ) + '/>'+
-		'</span>' ) );
+	if( mode != 'customizer' )
+	{
+		// Add checkbox:
+		jQuery( newWidget ).prepend( jQuery( '<span class="widget_checkbox' + ( wi_enabled ? ' widget_checkbox_enabled' : '' ) + '">' +
+				'<input type="checkbox" name="widgets[]" value="' + wi_ID.replace( 'wi_ID_', '' ) + '" ' + ( wi_plugin_disabled ? 'disabled="disabled" ' : '' ) + '/>'+
+			'</span>' ) );
 
-	// Add icon to toggle cache status:
-	var cacheIcon = jQuery( '<span class="widget_cache_status">' + getWidgetCacheIcon( wi_ID, wi_cache_status ) + '</span>' );
-	jQuery( newWidget ).append( cacheIcon ); // add widget action icons
+
+		// Add icon to toggle cache status:
+		var cacheIcon = jQuery( '<span class="widget_cache_status">' + getWidgetCacheIcon( wi_ID, wi_cache_status ) + '</span>' );
+		jQuery( newWidget ).append( cacheIcon ); // add widget action icons
+	}
 
 	// Add action icons:
 	// Toggle state
 	var actionIcons = '<span class="widget_actions">';
 
-	actionIcons += '<a href="#" onclick="return editWidget( \'' + wi_ID + '\' );">' + edit_icon_tag + '</a>'
-			+ '<a href="#" onclick="return duplicateWidget( \'' + wi_ID + '\' );">' + duplicate_icon_tag + '</a>'
+	if( mode != 'customizer' )
+	{
+		actionIcons += '<a href="#" onclick="return editWidget( \'' + wi_ID + '\' );">' + edit_icon_tag + '</a>';
+	}
+	actionIcons += '<a href="#" onclick="return duplicateWidget( \'' + wi_ID + '\', \''  + mode + '\' );">' + duplicate_icon_tag + '</a>'
 			+ '<a href="#" onclick="return deleteWidget( \'' + wi_ID + '\' );">' + delete_icon_tag + '</a></span>'
 
 	actionIcons = jQuery( actionIcons );

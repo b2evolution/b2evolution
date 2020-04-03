@@ -328,7 +328,8 @@ switch( $action )
 				{
 					$plugin_disabled = 0;
 				}
-				send_javascript_message( array(
+
+				$methods =  array(
 					'addNewWidgetCallback' => array(
 						$edited_ComponentWidget->ID,
 						$container,
@@ -339,13 +340,17 @@ switch( $action )
 						$edited_ComponentWidget->enabled,
 						$plugin_disabled,
 						$edited_ComponentWidget->get_cache_status( true ),
-						( ( $action == 'duplicate' ) && isset( $duplicated_Widget ) ) ? $duplicated_Widget->ID : NULL, 
+						( ( $action == 'duplicate' ) && isset( $duplicated_Widget ) ) ? $duplicated_Widget->ID : NULL,
+						$mode,
 					),
-					// Open widget settings:
-					'editWidget' => array(
-						'wi_ID_'.$edited_ComponentWidget->ID,
-					),
-				) );
+				);
+
+				if( $mode != 'customizer' )
+				{	// Open widget settings, except when in customizer mode:
+					$methods['editWidget'] = array( 'wi_ID_'.$edited_ComponentWidget->ID );
+				}
+
+				send_javascript_message( $methods );
 				break;
 
 			case 'normal' :
