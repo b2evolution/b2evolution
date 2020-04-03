@@ -91,7 +91,7 @@ jQuery( document ).ready( function()
 					if( ! window.tinymce.get( id ) )
 					{	// Turn on WYSIWYG editor
 						window.tinymce.execCommand( 'mceAddEditor', false, id );
-						jQuery.get( config['save_editor_state_url'] );
+						jQuery.get( config['save_state_wysiwyg_url'] );
 						jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).addClass( 'active' );
 						jQuery( '#tinymce_plugin_toggle_button_html' ).removeAttr( 'disabled' );
 						jQuery( '[name="editor_code"]').attr( 'value', config['plugin_code'] );
@@ -116,7 +116,7 @@ jQuery( document ).ready( function()
 					else
 					{ // Hide the editor, Display only source HTML
 						window.tinymce.execCommand( 'mceRemoveEditor', false, id );
-						jQuery.get( config['save_editor_state_url'] );
+						jQuery.get( config['save_state_html_url'] );
 						jQuery( '#tinymce_plugin_toggle_button_html' ).addClass( 'active' );
 						jQuery( '#tinymce_plugin_toggle_button_wysiwyg' ).removeAttr( 'disabled' );
 						jQuery( '[name="editor_code"]' ).attr( 'value', 'html' );
@@ -346,7 +346,7 @@ jQuery( document ).ready( function()
 					}
 				}
 
-			if( config['use_tinymce'] )
+			if( config['use_tinymce'] == 1 )
 			{
 				window.tinymce_plugin_toggleEditor( config['content_id'] );
 			}
