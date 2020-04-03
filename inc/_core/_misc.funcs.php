@@ -3440,8 +3440,24 @@ function debug_info( $force = false, $force_clean = false )
 	}
 
 	// FULL DEBUG INFO(s) FROM PREVIOUS SESSION(s), after REDIRECT(s):
-	if( isset( $Session ) && ( $sess_debug_infos = $Session->get( 'debug_infos' ) ) && ! empty( $sess_debug_infos ) )
-	{
+	$get_redirected_debuginfo_from_sess_ID = param( 'get_redirected_debuginfo_from_sess_ID', 'integer' );
+	if( ! empty( $get_redirected_debuginfo_from_sess_ID ) )
+	 {	// Get Session by ID for debug info from redirected page:
+		// (This is used for redirect from different domain)
+		$debug_info_Session = new Session( $get_redirected_debuginfo_from_sess_ID );
+	}
+	elseif( isset( $Session ) )
+	{	// Use current Session for debug info from redirected page:
+		$debug_info_Session = $Session;
+	}
+
+	if( isset( $debug_info_Session ) && ! empty( $debug_info_Session->ID ) )
+	{	// Get debug info from redirected page:
+		$sess_debug_infos = $debug_info_Session->get( 'debug_infos' );
+	}
+
+	if( ! empty( $sess_debug_infos ) )
+	{	// Display debug info from redirected page:
 		$count_sess_debug_infos = count( $sess_debug_infos );
 		if( $count_sess_debug_infos > 1 )
 		{	// Links to those Debuglogs:
@@ -3503,7 +3519,7 @@ function debug_info( $force = false, $force_clean = false )
 		// So in that case we want them to move over to the next page...
 		if( $http_response_code < 300 || $http_response_code >= 400 )
 		{	// This is NOT a 3xx redirect, assume debuglogs have been seen & delete them:
-			$Session->delete( 'debug_infos' );
+			$debug_info_Session->delete( 'debug_infos' );
 		}
 
 		echo "\n\n\n";

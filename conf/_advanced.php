@@ -824,6 +824,7 @@ $noredir_params = array(
 	'page',          // For showing a different page in a multipage post
 	'quote_post',    // For quoting a post in the forums
 	'quote_comment', // For quoting a comment in the forums
+	'get_redirected_debuginfo_from_sess_ID', // For display debug info of redirected page from different domain
 );
 
 

@@ -189,7 +189,7 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 	 */
 	global $Hit;
 	global $baseurl, $Collection, $Blog, $htsrv_url, $ReqHost, $ReqURL, $dispatcher;
-	global $Session, $Debuglog, $Messages;
+	global $Session, $Debuglog, $Messages, $debug;
 	global $http_response_code, $allow_redirects_to_different_domain;
 
 	if( empty( $redirect_to ) )
@@ -282,8 +282,6 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 
 	if( ! empty($Session) )
 	{	// Session is required here
-
-		global $debug;
 		if( ! empty( $debug ) )
 		{	// Transfer full debug info to next page only when debug is enabled:
 			ob_start();
@@ -329,6 +327,13 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 		case 302:
 		default:
 			header_http_response( '302 Found' );
+	}
+
+	if( $debug &&
+	    ! empty( $ReqHost ) &&
+	    strpos( $redirect_to, $ReqHost ) !== 0 )
+	{	// Append param to redirect from different domain in order to see debug info of the current page after redirect:
+		$redirect_to = url_add_param( $redirect_to, 'get_redirected_debuginfo_from_sess_ID='.$Session->ID, '&' );
 	}
 
 	// debug_die($redirect_to);
