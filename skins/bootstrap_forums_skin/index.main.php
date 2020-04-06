@@ -391,7 +391,7 @@ if( $disp == 'front' )
 }
 ?>
 
-<footer class="row">
+<footer class="container-fluid">
 
 	<!-- =================================== START OF FOOTER =================================== -->
 	<div class="col-md-12">
