@@ -176,6 +176,42 @@ class content_hierarchy_Widget extends ComponentWidget
 	 */
 	function init_display( $params )
 	{
+		// Set default params for this widget:
+		$params = array_merge( array(
+				'block_start'          => '',
+				'block_end'            => '',
+				'block_body_start'     => '',
+				'block_body_end'       => '',
+				'list_start'           => '<ul class="chapters_list">',
+				'list_end'             => '</ul>',
+				'list_subs_start'      => '<ul>',
+				'list_subs_end'        => '</ul>',
+				'item_start'           => '<li>',
+				'item_end'             => '</li>',
+				'item_before_opened'   => '',
+				'item_before_closed'   => '',
+				'item_before_post'     => '',
+				'item_title_fields'    => 'title',
+				'link_type'            => 'permalink',
+				'class_opened'         => 'opened',
+				'class_closed'         => 'closed',
+				'class_selected'       => 'selected',
+				'class_post'           => 'post',
+				'display_blog_title'   => false,
+				'custom_title'         => '',
+				'open_children_levels' => 0,
+				'highlight_current'    => true,
+				'list_posts'           => true,
+				// Don't expand all categories by default for this widget, because it has a separate parameter 'open_children_levels':
+				'expand_all'           => false,
+			), $params );
+
+		if( isset( $params['widget_content_hierarchy_params'] ) &&
+		    is_array( $params['widget_content_hierarchy_params'] ) )
+		{	// Override with special params for this widget:
+			$params = array_merge( $params, $params['widget_content_hierarchy_params'] );
+		}
+
 		parent::init_display( $params );
 
 		if( $this->disp_params['highlight_current'] || $this->disp_params['show_flags'] )
@@ -192,77 +228,24 @@ class content_hierarchy_Widget extends ComponentWidget
 	 */
 	function display( $params )
 	{
-		global $Item, $disp;
+		global $Item, $disp, $blog, $cat;
 
 		$this->init_display( $params );
 
-		if( !isset( $params['widget_content_hierarchy_params'] ) )
-		{
-			$params['widget_content_hierarchy_params'] = array();
-		}
-
 		if( ( $disp == 'single' || $disp == 'page' ) && ! empty( $Item ) )
 		{	// Set selected Item in the params ONLY if we really view item page:
-			$params['selected_item_ID'] = $Item->ID;
+			$this->disp_params['selected_item_ID'] = $Item->ID;
 		}
-		
+
 		// Get IDs of categories that must be exluded:
-		$this->excluded_cat_IDs = sanitize_id_list( $this->disp_params['exclude_cats'], true );
-	
-		$this->display_hierarchy( array_merge( array(
-				'display_blog_title'   => $this->disp_params['display_blog_title'],
-				'open_children_levels' => $this->disp_params['open_children_levels'],
-				'highlight_current'    => $this->disp_params['highlight_current'],
-				'show_flags'           => $this->disp_params['show_flags'],
-				'item_title_fields'    => isset( $this->disp_params['item_title_fields'] ) ? $this->disp_params['item_title_fields'] : 'title',
-				'excluded_cat_IDs'   => $this->excluded_cat_IDs,
-				'sorted' => true
-			), $params, $params['widget_content_hierarchy_params'] ) );
+		$this->disp_params['excluded_cat_IDs'] = sanitize_id_list( $this->disp_params['exclude_cats'], true );
 
-		return true;
-	}
-
-
-	/**
-	 * Display a content hierarchy as list with chapters and posts
-	 *
-	 * @param array Params
-	 */
-	function display_hierarchy( $params = array() )
-	{
-		$params = array_merge( array(
-				'block_start'          => '',
-				'block_end'            => '',
-				'block_body_start'     => '',
-				'block_body_end'       => '',
-				'list_start'           => '<ul class="chapters_list">',
-				'list_end'             => '</ul>',
-				'list_subs_start'      => '<ul>',
-				'list_subs_end'        => '</ul>',
-				'item_start'           => '<li>',
-				'item_end'             => '</li>',
-				'item_before_opened'   => '',
-				'item_before_closed'   => '',
-				'item_before_post'     => '',
-				'class_opened'         => 'opened',
-				'class_closed'         => 'closed',
-				'class_selected'       => 'selected',
-				'class_post'           => 'post',
-				'display_blog_title'   => false,
-				'custom_title'         => '',
-				'open_children_levels' => 0,
-				'highlight_current'    => true,
-				'list_posts'           => true,
-				// Don't expand all categories by default for this widget, because it has a separate parameter 'open_children_levels':
-				'expand_all'           => false,
-			), $params );
-
-		global $blog, $cat, $Item;
+		// Set param to sort categories and items inside callback functions of ChapterCache->recurse():
+		$this->disp_params['sorted'] = true;
 
 		$BlogCache = & get_BlogCache();
 		$ChapterCache = & get_ChapterCache();
 
-		//
 		if( ! empty( $this->disp_params['blog_ID'] ) )
 		{ // Set a Blog from widget setting
 			$this->Blog = & $BlogCache->get_by_ID( intval( $this->disp_params['blog_ID'] ), false, false );
@@ -282,34 +265,34 @@ class content_hierarchy_Widget extends ComponentWidget
 		$chapter_path = array();
 		if( !empty( $cat ) )
 		{ // A category is opened
-			$params['chapter_path'] = $ChapterCache->get_chapter_path( $this->Blog->ID, $cat );
+			$this->disp_params['chapter_path'] = $ChapterCache->get_chapter_path( $this->Blog->ID, $cat );
 		}
 		elseif( ! empty( $Item ) && ! $Item->is_intro() )
 		{ // A post is opened (Ignore intro posts)
-			$params['chapter_path'] = $ChapterCache->get_chapter_path( $this->Blog->ID, $Item->main_cat_ID );
+			$this->disp_params['chapter_path'] = $ChapterCache->get_chapter_path( $this->Blog->ID, $Item->main_cat_ID );
 		}
 
 		// START DISPLAY:
-		echo $params['block_start'];
-		
+		echo $this->disp_params['block_start'];
+
 		// Display title if requested
 		$this->disp_title();
 
-		echo $params['block_body_start'];
+		echo $this->disp_params['block_body_start'];
 
-		echo $params['list_start'];
+		echo $this->disp_params['list_start'];
 
-		if( $params['display_blog_title'] )
+		if( $this->disp_params['display_blog_title'] )
 		{	// Display "root level" line:
-			if( empty( $params['custom_title'] ) )
+			if( empty( $this->disp_params['custom_title'] ) )
 			{
-				echo str_replace( '>', ' class="title '.$params['class_selected'].'">', $params['item_start'] );
+				echo str_replace( '>', ' class="title '.$this->disp_params['class_selected'].'">', $this->disp_params['item_start'] );
 				echo '<a href="'.$this->Blog->get( 'url' ).'" class="link">'.$this->Blog->get( 'name' ).'</a>';
-				echo $params['item_end'];
+				echo $this->disp_params['item_end'];
 			}
 			else
 			{
-				echo $params['custom_title'];
+				echo $this->disp_params['custom_title'];
 			}
 		}
 
@@ -320,18 +303,20 @@ class content_hierarchy_Widget extends ComponentWidget
 			'posts' => array( $this, 'display_post_row' ),
 		);
 
-		if( strpos( $params['item_title_fields'], 'short_title' ) !== false )
+		if( strpos( $this->disp_params['item_title_fields'], 'short_title' ) !== false )
 		{	// Use function to order items/posts by short title if this field is used to display instead of default title field:
-			$params['items_order_alpha_func'] = 'compare_items_by_short_title';
+			$this->disp_params['items_order_alpha_func'] = 'compare_items_by_short_title';
 		}
 
-		echo $ChapterCache->recurse( $callbacks, $this->Blog->ID, NULL, 0, $params['open_children_levels'] + 1, $params );
+		echo $ChapterCache->recurse( $callbacks, $this->Blog->ID, NULL, 0, $this->disp_params['open_children_levels'] + 1, $this->disp_params );
 
-		echo $params['list_end'];
+		echo $this->disp_params['list_end'];
 
-		echo $params['block_body_end'];
+		echo $this->disp_params['block_body_end'];
 
-		echo $params['block_end'];
+		echo $this->disp_params['block_end'];
+
+		return true;
 	}
 
 
