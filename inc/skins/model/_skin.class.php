@@ -2407,22 +2407,18 @@ class Skin extends DataObject
 	 * Returns an option list for font customization
 	 *
 	 * Uses: $this->font_definitions
+	 * @param string Type: 'select' - for skin setting <select>, 'style' - for using in styles
 	 */
-	function get_font_definitions()
+	function get_font_definitions( $type = 'select' )
 	{
-		// Pull font array keys
-		$font_options = array_keys($this->font_definitions);
-
-		// Pull first value from each array key
-		$font_names = array();
-		foreach ($this->font_definitions as $f) {
-				$font_names[] = current($f);
+		$fonts = array();
+		foreach( $this->font_definitions as $font_key => $font_data )
+		{
+			$font_data_index = $type == 'style' ? 1 : 0;
+			$fonts[ $font_key ] = isset( $font_data[ $font_data_index ] ) ? $font_data[ $font_data_index ] : $font_data[0];
 		}
 
-		// Create array in format: 'system_arial' => 'arial', etc.
-		$dropdown_option_list = array_combine($font_options, $font_names);
-
-		return $dropdown_option_list;
+		return $fonts;
 	}
 
 
