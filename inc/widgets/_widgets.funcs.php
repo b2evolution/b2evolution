@@ -1641,7 +1641,7 @@ function display_container( $WidgetContainer, $params = array() )
 					echo action_icon( T_('Duplicate'),
 							'duplicate',
 							regenerate_url( 'blog', 'action=duplicate&amp;wi_ID='.$ComponentWidget->ID.'&amp;'.url_crumb( 'widget' ) ), NULL, NULL, NULL,
-							array( 'onclick' => 'return duplicateWidget( \'wi_ID_'.$ComponentWidget->ID.'\' )', 'class' => '' )
+							array( 'onclick' => 'return duplicateWidget( \'wi_ID_'.$ComponentWidget->ID.'\', \''.$mode.'\' )', 'class' => '' )
 						);
 
 					// Remove:

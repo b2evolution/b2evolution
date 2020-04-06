@@ -284,8 +284,7 @@ switch( $action )
 			$duplicated_Widget->load_param_array();
 			$edited_ComponentWidget->param_array = $duplicated_Widget->param_array;
 
-			// Commented block below can be used to insert the duplicate widget below the original widget:
-			/*
+			// Get widget order for new widget, must be next to the duplicated widget:
 			$widget_order = $duplicated_Widget->order + 1;
 			$edited_ComponentWidget->set( 'order', $widget_order );
 
@@ -300,7 +299,6 @@ switch( $action )
 				WHERE wi_wico_ID = '.$DB->quote( $WidgetContainer->ID ).'
 				AND wi_order <= '.$DB->quote( $widget_order ).'
 				ORDER BY wi_order ASC' );
-			*/
 
 			$edited_ComponentWidget->set( 'enabled', $duplicated_Widget->get( 'enabled' ) );
 
@@ -330,7 +328,8 @@ switch( $action )
 				{
 					$plugin_disabled = 0;
 				}
-				send_javascript_message( array(
+
+				$methods =  array(
 					'addNewWidgetCallback' => array(
 						$edited_ComponentWidget->ID,
 						$container,
@@ -341,12 +340,17 @@ switch( $action )
 						$edited_ComponentWidget->enabled,
 						$plugin_disabled,
 						$edited_ComponentWidget->get_cache_status( true ),
+						( ( $action == 'duplicate' ) && isset( $duplicated_Widget ) ) ? $duplicated_Widget->ID : NULL,
+						$mode,
 					),
-					// Open widget settings:
-					'editWidget' => array(
-						'wi_ID_'.$edited_ComponentWidget->ID,
-					),
-				) );
+				);
+
+				if( $mode != 'customizer' )
+				{	// Open widget settings, except when in customizer mode:
+					$methods['editWidget'] = array( 'wi_ID_'.$edited_ComponentWidget->ID );
+				}
+
+				send_javascript_message( $methods );
 				break;
 
 			case 'normal' :
@@ -837,7 +841,7 @@ if( $display_mode == 'normal' )
 	 * @internal Tblue> We get the whole img tags here (easier).
 	 */
 	var edit_icon_tag = \''.get_icon( 'edit', 'imgtag', array( 'title' => TB_( 'Edit widget settings!' ) ) ).'\';
-	var duplicate_icon_tag = \''.get_icon( 'copy', 'imgtag', array( 'title' => TB_('Duplicate') ) ).'\';
+	var duplicate_icon_tag = \''.get_icon( 'duplicate', 'imgtag', array( 'title' => TB_('Duplicate') ) ).'\';
 	var delete_icon_tag = \''.get_icon( 'delete', 'imgtag', array( 'title' => TB_( 'Remove this widget!' ) ) ).'\';
 	var enabled_icon_tag = \''.get_icon( 'bullet_green', 'imgtag', array( 'title' => TB_( 'The widget is enabled.' ) ) ).'\';
 	var disabled_icon_tag = \''.get_icon( 'bullet_empty_grey', 'imgtag', array( 'title' => TB_( 'The widget is disabled.' ) ) ).'\';

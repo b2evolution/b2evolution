@@ -1277,12 +1277,15 @@ class ComponentWidget extends DataObject
 
 		$DB->begin();
 
-		$order_max = $DB->get_var(
-			'SELECT MAX(wi_order)
-				 FROM T_widget__widget
-				WHERE wi_wico_ID = '.$this->wico_ID, 0, 0, 'Get current max order' );
+		if( ! isset( $this->order ) )
+		{
+			$order_max = $DB->get_var(
+				'SELECT MAX(wi_order)
+					FROM T_widget__widget
+					WHERE wi_wico_ID = '.$this->wico_ID, 0, 0, 'Get current max order' );
 
-		$this->set( 'order', $order_max+1 );
+			$this->set( 'order', $order_max+1 );
+		}
 
 		$res = parent::dbinsert();
 
