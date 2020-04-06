@@ -4705,7 +4705,7 @@ class Plugin
 	function require_css( $css_file, $output = false )
 	{
 		global $app_version_long;
-		require_css( $this->get_plugin_url().$css_file, 'relative', NULL, NULL, $this->version.'+'.$app_version_long, $output );
+		require_css( $this->get_plugin_url().$css_file, 'absolute', NULL, NULL, $this->version.'+'.$app_version_long, $output );
 	}
 
 
@@ -4723,7 +4723,7 @@ class Plugin
 	function require_js( $js_file, $output = false, $async_defer = false )
 	{
 		global $app_version_long;
-		require_js( $this->get_plugin_url().$js_file, 'relative', $async_defer, $output, $this->version.'+'.$app_version_long );
+		require_js( $this->get_plugin_url().$js_file, 'absolute', $async_defer, $output, $this->version.'+'.$app_version_long );
 	}
 
 

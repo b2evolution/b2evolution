@@ -188,7 +188,7 @@ class widescroll_plugin extends Plugin
 		{ // Initialize first time
 			$tinymce_content_css = array();
 		}
-		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', true, 'css', $this->version.'+'.$app_version_long );
+		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'tinymce_editor.css', 'absolute', 'css', $this->version.'+'.$app_version_long );
 
 		// Print toolbar on screen
 		return $this->DisplayCodeToolbar( $params );

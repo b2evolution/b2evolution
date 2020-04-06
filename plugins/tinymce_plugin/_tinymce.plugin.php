@@ -904,8 +904,8 @@ class tinymce_plugin extends Plugin
 		// Load the content css files from 3rd party code, e.g. other plugins:
 		global $tinymce_content_css, $app_version_long;
 
-		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'evo_view.css', true, 'css', $this->version.'+'.$app_version_long );
-		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'editor.css', true, 'css', $this->version.'+'.$app_version_long );
+		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'evo_view.css', 'absolute', 'css', $this->version.'+'.$app_version_long );
+		$tinymce_content_css[] = get_require_url( $this->get_plugin_url().'editor.css', 'absolute', 'css', $this->version.'+'.$app_version_long );
 
 		if( is_array( $tinymce_content_css ) && count( $tinymce_content_css ) )
 		{

@@ -1112,7 +1112,7 @@ function include_js_vars()
  * Get library url of JS or CSS file by file name or alias
  *
  * @param string File or Alias name
- * @param boolean|string 'relative' or true (relative to <base>) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
+ * @param boolean|string 'relative' or true (relative to <base>) or 'absolute'(for absolute url) or 'rsc_url' (relative to $rsc_url) or 'blog' (relative to current blog URL -- may be subdomain or custom domain)
  * @param string 'js' or 'css' or 'build'
  * @return string URL
  * @param string version number to append at the end of requested url to avoid getting an old version from the cache
@@ -1156,8 +1156,9 @@ function get_require_url( $lib_file, $relative_to = 'rsc_url', $subfolder = 'js'
 	{ // Make the file relative to current page <base>:
 		$lib_url = $lib_file;
 	}
-	elseif( preg_match( '~^(https?:)?//~', $lib_file ) )
-	{ // It's already an absolute url, keep it as is:
+	elseif( $relative_to === 'absolute' || preg_match( '~^(https?:)?//~', $lib_file ) )
+	{	// It's already an absolute url, keep it as is:
+		// (used to require CSS and JS files from Skin and Plugin because there we always use absolute URLs)
 		$lib_url = $lib_file;
 	}
 	elseif( $relative_to === 'blog' && ! empty( $Blog ) )
