@@ -435,7 +435,7 @@ class bootstrap_blog_Skin extends Skin
 		) );
 		// Default font - Family:
 		$this->dynamic_style_rule( 'font_family', '#skin_wrapper { font-family: $setting_value$ }', array(
-			'options' => $this->get_font_definitions()
+			'options' => $this->get_font_definitions( 'style' )
 		) );
 		// Default font - Size:
 		$this->dynamic_style_rule( 'font_size', '$setting_value$', array(
