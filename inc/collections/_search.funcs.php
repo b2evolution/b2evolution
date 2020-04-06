@@ -1594,9 +1594,6 @@ function display_search_result( $params = array() )
 	// 		'cell_content_end'   => '</div>',
 	// 	), $params );
 
-	// Prepare the display params of search result object by modules:
-	modules_call_method_reference_params( 'prepare_search_result_display_params', $params );
-
 	$render_template_objects = array();
 	switch( $params['search_result_type'] )
 	{
@@ -1632,6 +1629,9 @@ function display_search_result( $params = array() )
 	}
 
 	$search_result = render_template_code( $template_code, $params, $render_template_objects );
+
+	// Modify the search result content by modules:
+	modules_call_method_reference_params( 'modify_search_result', $search_result );
 
 	// Display search result item:
 	echo $search_result;

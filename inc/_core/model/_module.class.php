@@ -382,11 +382,11 @@ class Module
 
 
 	/**
-	 * Prepare the display params of search result object by modules
+	 * Modify the search result content
 	 *
-	 * @param array Parameters of the displayed search result object (param is updated by reference)
+	 * @param string Modified content (content is updated by reference)
 	 */
-	function prepare_search_result_display_params( & $params )
+	function modify_search_result( & $content )
 	{
 	}
 
