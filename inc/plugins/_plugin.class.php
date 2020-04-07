@@ -1055,6 +1055,7 @@ class Plugin
 	 *                to modify it.
 	 *
 	 * This is the hook to register menu entries. See {@link register_menu_entry()}.
+	 * Remember to set adminUI_set_path() function to set the correct full selected path.
 	 */
 	function AdminAfterMenuInit()
 	{

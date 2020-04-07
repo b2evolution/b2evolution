@@ -71,7 +71,14 @@ if( ! empty($tab) )
 }
 
 // Highlight the requested tab (if valid):
-$AdminUI->set_path( 'options', 'misc', !empty( $tab ) ? $tab : $tab3 );
+if( $tab_Plugin && method_exists( $tab_Plugin, 'adminUI_set_path' ) )
+{
+	$tab_Plugin->adminUI_set_path( $AdminUI );
+}
+else
+{
+	$AdminUI->set_path( 'options', 'misc', !empty( $tab ) ? $tab : $tab3 );
+}
 
 
 if( empty( $tab ) )
