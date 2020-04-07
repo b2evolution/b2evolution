@@ -313,7 +313,7 @@ class param_switcher_Widget extends generic_menu_link_Widget
 			$wrapper_class_active = empty( $match_class[1] ) ? '' : $match_class[1];
 
 			$switchable_buttons_config = array(
-					'selector'             => 'a[data-param-switcher='.$this->ID.']',
+					'selector'             => 'a[data-param-switcher][data-code='.$this->get_param( 'param_code' ).']',
 					'link_class_normal'    => $this->get_link_class( false ),
 					'link_class_active'    => $this->get_link_class( true ),
 					'wrapper_class_normal' => $wrapper_class_normal,

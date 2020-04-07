@@ -4479,15 +4479,25 @@ class Item extends ItemLight
 	 */
 	function render_switchable_content_callback( $m )
 	{
-		if( strpos( $m[4].$m[1], 'style="display:' ) !== false )
+		if( preg_match( '#(^.+ style=")(.+?)(".+)$#i', $m[0], $style_match ) &&
+		    stripos( $style_match[2], 'display:' ) !== false )
 		{	// Skip already rendered content, probably by render_switchable_blocks() from short tags [div:]Content[/div]:
 			return $m[0];
 		}
 
-		// Check visibility conditions:
-		$display_attrs = ( $this->check_switchable_visibility( $m[3] ) ? '' : ' style="display:none"' );
-
-		return $m[1].$m[2].$display_attrs.$m[4];
+		if( $this->check_switchable_visibility( $m[3] ) )
+		{	// This switchable block should be visible on load current page:
+			return $m[0];
+		}
+		// Otherwise hide this switchable block:
+		if( empty( $style_match ) )
+		{	// Add new style attribute:
+			return $m[1].$m[2].' style="display:none;"'.$m[4];
+		}
+		else
+		{	// Append style property to existing attribute:
+			return $style_match[1].trim( $style_match[2], '; ' ).';display:none;"'.$style_match[3];
+		}
 	}
 
 
@@ -4499,7 +4509,7 @@ class Item extends ItemLight
 	 */
 	function check_switchable_visibility( $conditions )
 	{
-		$disp_conditions = explode( '&', str_replace( '&amp;', '&', $conditions ) );
+		$disp_conditions = explode( '&', str_replace( array( '&amp;amp;', '&amp;' ), '&', $conditions ) );
 
 		foreach( $disp_conditions as $disp_condition )
 		{

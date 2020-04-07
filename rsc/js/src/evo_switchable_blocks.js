@@ -69,12 +69,13 @@ jQuery( document ).ready( function()
 					window.history.pushState( '', '', url );
 
 					// Change active button/link:
+					var current_selector = params.selector + '[data-value=' + jQuery( this ).data( 'value' ) + ']';
 					jQuery( params.selector ).attr( 'class', params.link_class_normal );
-					jQuery( this ).attr( 'class', params.link_class_active );
+					jQuery( current_selector ).attr( 'class', params.link_class_active );
 					if( params.display_mode == 'list' || params.display_mode == 'tabs' )
 					{	// List mode has a wrapper with active style class:
 						jQuery( params.selector ).parent().removeClass( params.wrapper_class_active ).addClass( params.wrapper_class_normal );
-						jQuery( this ).parent().removeClass( params.wrapper_class_normal ).addClass( params.wrapper_class_active );
+						jQuery( current_selector ).parent().removeClass( params.wrapper_class_normal ).addClass( params.wrapper_class_active );
 					}
 
 					return false;
@@ -99,7 +100,7 @@ jQuery( document ).ready( function()
 
 			function get_url_params( url, multiple_values )
 			{
-				url = url.replace( /^.+\?/, '' ).split( '&' );
+				url = url.replace( /^.+\?/, '' ).replace( '&amp;', '&' ).split( '&' );
 				var params = [];
 				url.forEach( function( url_param )
 				{
