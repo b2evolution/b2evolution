@@ -82,7 +82,7 @@ window.addEventListener( 'locationchange', function()
 
 	function get_url_params( url, multiple_values )
 	{
-		url = url.replace( /^.+\?/, '' ).split( '&' );
+		url = url.replace( /^.+\?/, '' ).replace( '&amp;', '&' ).split( '&' );
 		var params = [];
 		url.forEach( function( url_param )
 		{

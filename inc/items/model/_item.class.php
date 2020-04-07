@@ -4509,7 +4509,7 @@ class Item extends ItemLight
 	 */
 	function check_switchable_visibility( $conditions )
 	{
-		$disp_conditions = explode( '&', str_replace( '&amp;', '&', $conditions ) );
+		$disp_conditions = explode( '&', str_replace( array( '&amp;amp;', '&amp;' ), '&', $conditions ) );
 
 		foreach( $disp_conditions as $disp_condition )
 		{
