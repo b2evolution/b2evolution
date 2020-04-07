@@ -314,7 +314,7 @@ class param_switcher_Widget extends generic_menu_link_Widget
 ?>
 <script>
 evo_init_switchable_buttons( {
-	selector:             'a[data-param-switcher=<?php echo $this->ID; ?>]',
+	selector:             'a[data-param-switcher][data-code=<?php echo $this->get_param( 'param_code' ); ?>]',
 	link_class_normal:    '<?php echo $this->get_link_class( false ); ?>',
 	link_class_active:    '<?php echo $this->get_link_class( true ); ?>',
 	wrapper_class_normal: '<?php echo $wrapper_class_normal; ?>',
