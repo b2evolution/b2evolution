@@ -687,7 +687,7 @@ if( !$Messages->has_errors() )
 			break;
 
 		case 'export':
-			// Export user group data into CSV file:
+			// Export users group membership data into CSV file:
 			load_class( 'users/model/_userlist.class.php', 'UserList' );
 			$UserList = new UserList( 'admin' );
 			$UserList->memorize = false;
@@ -711,11 +711,11 @@ if( !$Messages->has_errors() )
 			$SQL_sub_groups->WHERE( 'sug_user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ' );
 			$user_groups_sql = 'SELECT * FROM ( '.$SQL_main_group->get().' UNION '.$SQL_sub_groups->get().' ) AS users
 				ORDER BY FIND_IN_SET( user_ID, "'.implode( ',', $UserList->filters['users'] ).'" ), type';
-			$users = $DB->get_results( $user_groups_sql, ARRAY_A, 'Get users data for export group data into CSV file' );
+			$users = $DB->get_results( $user_groups_sql, ARRAY_A, 'Get users group membership data for export group data into CSV file' );
 
 			header_nocache();
 			header_content_type( 'text/csv' );
-			header( 'Content-Disposition: attachment; filename=users.csv' );
+			header( 'Content-Disposition: attachment; filename=user-groups.csv' );
 
 			echo get_csv_line( array( 'username', 'groupname', 'type' ) );
 
@@ -725,9 +725,9 @@ if( !$Messages->has_errors() )
 				echo get_csv_line( $user );
 			}
 			exit;
-			
+
 		case 'export_users':
-			// Export user data into CSV file:
+			// Export users data into CSV file:
 			load_class( 'users/model/_userlist.class.php', 'UserList' );
 			$UserList = new UserList( 'admin' );
 			$UserList->memorize = false;
@@ -738,13 +738,13 @@ if( !$Messages->has_errors() )
 				break;
 			}
 
-			$users_SQL = new SQL( "Get users for export" );
+			$users_SQL = new SQL( 'Get users data for export users into CSV file' );
 			$users_SQL->SELECT( 'user_login, user_email, user_firstname, user_lastname, user_nickname, ctry_code, user_locale' );
 			$users_SQL->FROM( 'T_users' );
 			$users_SQL->FROM_add( 'LEFT JOIN T_regional__country ON ctry_ID = user_ctry_ID' );
 			$users_SQL->WHERE( 'user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ORDER BY user_ID' );
 			$users_raw_SQL = $users_SQL->get();
-			$users = $DB->get_results( $users_raw_SQL, ARRAY_A, 'Get users data for export users into CSV file' );
+			$users = $DB->get_results( $users_raw_SQL, ARRAY_A );
 
 			header_nocache();
 			header_content_type( 'text/csv' );
@@ -754,11 +754,10 @@ if( !$Messages->has_errors() )
 
 			foreach( $users as $user )
 			{
-				unset( $user['user_ID'] );
 				echo get_csv_line( $user );
 			}
 			exit;
-			
+
 		case 'save_default_filters':
 			// Save default users list filters:
 

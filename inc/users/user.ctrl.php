@@ -948,8 +948,10 @@ if( !$Messages->has_errors() )
 
 		// Group Id
 		param( 'grp_ID', 'integer', true );
-		param_check_number( 'grp_ID', T_('Please select a group'), true );
-		
+		param_check_number( 'grp_ID', TB_('Please select a group'), true );
+		$GroupCache = & get_GroupCache();
+		$Group = & $GroupCache->get_by_ID( $grp_ID );
+
 		param( 'on_duplicate_login', 'integer', true );
 		param( 'on_duplicate_email', 'integer', true );
 
@@ -957,11 +959,11 @@ if( !$Messages->has_errors() )
 		$import_file = param( 'import_file', 'string', '' );
 		if( empty( $import_file ) )
 		{	// File is not selected:
-			$Messages->add( T_('Please select a CSV file to import.'), 'error' );
+			$Messages->add( TB_('Please select a CSV file to import.'), 'error' );
 		}
 		else if( ! preg_match( '/\.csv$/i', $import_file ) )
 		{	// Extension is incorrect
-			$Messages->add( sprintf( T_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
+			$Messages->add( sprintf( TB_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
 		}
 
 		if( param_errors_detected() )
@@ -972,17 +974,14 @@ if( !$Messages->has_errors() )
 
 		// Import users from CSV file:
 		$count_users = import_users( $grp_ID, $on_duplicate_login, $on_duplicate_email, $import_file );
-		
+
 		if( is_bool( $count_users ) === true && ! $count_users )
 		{	// Some errors are exist, Stop the importing:
 			$action = 'csv';
 			break;
 		}
-		
-		$GroupCache = & get_GroupCache();
-		$Group = $GroupCache->get_by_ID( $grp_ID );
 
-		$Messages->add( sprintf( T_('%s users have been added and %s users have been updated for primary group %s.'),
+		$Messages->add( sprintf( TB_('%d users have been added and %d users have been updated for primary group %s.'),
 			$count_users['inserted'], $count_users['updated'], $Group->get_name() ), 'success' );
 		// Redirect so that a reload doesn't write to the DB twice:
 		header_redirect( $admin_url.'?ctrl=users', 303 ); // Will EXIT
