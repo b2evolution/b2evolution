@@ -141,6 +141,7 @@ $ctrl_mappings = array(
 		'automations'      => 'automations/automations.ctrl.php',
 		'syslog'           => 'tools/syslog.ctrl.php',
 		'customize'        => 'customize/customize.ctrl.php',
+		'pro_only'         => 'pro_only/pro_only.ctrl.php',
 	);
 
 

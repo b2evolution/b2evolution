@@ -6258,6 +6258,20 @@ function is_pro()
 
 
 /**
+ * Check if current version is PRO otherwise redirect to info page about PRO version
+ */
+function check_pro()
+{
+	if( ! is_pro() )
+	{	// Restrict the checking feature for NOT PRO version:
+		global $admin_url;
+
+		header_redirect( $admin_url.'?ctrl=pro_only' );
+	}
+}
+
+
+/**
  * Does the given url require logged in user
  *
  * @param string url

@@ -687,7 +687,14 @@ if( !$Messages->has_errors() )
 			break;
 
 		case 'export':
-			// Export user group data into CSV file:
+			// Export users group membership data into CSV file:
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'view', true );
+
 			load_class( 'users/model/_userlist.class.php', 'UserList' );
 			$UserList = new UserList( 'admin' );
 			$UserList->memorize = false;
@@ -711,11 +718,11 @@ if( !$Messages->has_errors() )
 			$SQL_sub_groups->WHERE( 'sug_user_ID IN ('.implode( ',', $UserList->filters['users'] ).') ' );
 			$user_groups_sql = 'SELECT * FROM ( '.$SQL_main_group->get().' UNION '.$SQL_sub_groups->get().' ) AS users
 				ORDER BY FIND_IN_SET( user_ID, "'.implode( ',', $UserList->filters['users'] ).'" ), type';
-			$users = $DB->get_results( $user_groups_sql, ARRAY_A, 'Get users data for export group data into CSV file' );
+			$users = $DB->get_results( $user_groups_sql, ARRAY_A, 'Get users group membership data for export group data into CSV file' );
 
 			header_nocache();
 			header_content_type( 'text/csv' );
-			header( 'Content-Disposition: attachment; filename=users.csv' );
+			header( 'Content-Disposition: attachment; filename=user-groups.csv' );
 
 			echo get_csv_line( array( 'username', 'groupname', 'type' ) );
 
@@ -725,6 +732,85 @@ if( !$Messages->has_errors() )
 				echo get_csv_line( $user );
 			}
 			exit;
+
+		case 'export_users': // PRO-ONLY
+			// Export users data into CSV file:
+
+			// Restrict this feature for NOT PRO version:
+			check_pro();
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'view', true );
+
+			// Do export:
+			load_funcs( 'pro_only/model/_pro_user.funcs.php' );
+			pro_export_users();
+			exit;
+
+		case 'csv': // PRO-ONLY
+			// Check if we can display form to import users:
+			// Restrict this feature for NOT PRO version:
+			check_pro();
+			break;
+
+		case 'import': // PRO-ONLY
+			// Import new users:
+
+			// Restrict this feature for NOT PRO version:
+			check_pro();
+
+			// Check that this action request is not a CSRF hacked request:
+			$Session->assert_received_crumb( 'users' );
+
+			// Check permission:
+			$current_User->check_perm( 'users', 'edit', true );
+
+			set_max_execution_time( 0 );
+
+			// Group Id
+			param( 'grp_ID', 'integer', true );
+			param_check_number( 'grp_ID', TB_('Please select a group'), true );
+			$GroupCache = & get_GroupCache();
+			$Group = & $GroupCache->get_by_ID( $grp_ID );
+
+			param( 'on_duplicate_login', 'integer', true );
+			param( 'on_duplicate_email', 'integer', true );
+
+			// CSV File
+			$import_file = param( 'import_file', 'string', '' );
+			if( empty( $import_file ) )
+			{	// File is not selected:
+				$Messages->add( TB_('Please select a CSV file to import.'), 'error' );
+			}
+			else if( ! preg_match( '/\.csv$/i', $import_file ) )
+			{	// Extension is incorrect
+				$Messages->add( sprintf( TB_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
+			}
+
+			if( param_errors_detected() )
+			{	// Some errors are exist, Stop the importing:
+				$action = 'csv';
+				break;
+			}
+
+			// Import users from CSV file:
+			load_funcs( 'pro_only/model/_pro_user.funcs.php' );
+			$count_users = pro_import_users( $grp_ID, $on_duplicate_login, $on_duplicate_email, $import_file );
+
+			if( $count_users === false )
+			{	// Some errors are exist, Stop the importing:
+				$action = 'csv';
+				break;
+			}
+
+			$Messages->add( sprintf( TB_('%d users have been added and %d users have been updated for primary group %s.'),
+				$count_users['inserted'], $count_users['updated'], $Group->get_name() ), 'success' );
+			// Redirect so that a reload doesn't write to the DB twice:
+			header_redirect( $admin_url.'?ctrl=users', 303 ); // Will EXIT
+			break;
 
 		case 'save_default_filters':
 			// Save default users list filters:
@@ -839,6 +925,11 @@ switch( $action )
 {
 	case 'nil':
 		// Display NO payload!
+		break;
+
+	case 'csv': // PRO-ONLY
+		// Display form to import users:
+		$AdminUI->disp_view( 'users/views/_user_import.form.php' );
 		break;
 
 	case 'delete':
