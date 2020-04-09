@@ -108,9 +108,13 @@ if( ! empty( $recipient_User ) )
 			echo "\n\n".T_('You can edit your profile to not receive emails through a form:')."\n".$edit_preferences_url."\n";
 		}
 	}
-	// Add quick unsubcribe link so users can deny receiving emails through b2evo message form in any circumstances
-	$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more emails through a message form, click here:' ).' '.
-		get_htsrv_url().'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$';
+
+	// Add quick unsubcribe link so users can deny receiving emails through b2evo message form in any circumstances:
+	if( empty( $params['email_headers']['Reply-To'] ) )
+	{	// Display the message below only when replying is not allowed to current email message (usually for email messages from anonymous users):
+		$params['unsubscribe_text'] = T_( 'If you don\'t want to receive any more emails through a message form, click here:' ).' '.
+			get_htsrv_url().'quick_unsubscribe.php?type=msgform&user_ID=$user_ID$&key=$unsubscribe_key$';
+	}
 }
 elseif( !empty( $params['Comment'] ) )
 { // Visitor:

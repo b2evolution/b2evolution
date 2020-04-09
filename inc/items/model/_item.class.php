@@ -9875,7 +9875,7 @@ class Item extends ItemLight
 			$subject = sprintf( $subject, $this->Blog->get('shortname'), $this->get('title') );
 
 			// Send the email:
-			if( send_mail_to_User( $moderator_ID, $subject, 'post_new', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) ) )
+			if( send_mail_to_User( $moderator_ID, $subject, 'post_new', $email_template_params ) )
 			{	// A send notification email request to the user with $moderator_ID ID was processed:
 				$notified_user_IDs[] = $moderator_ID;
 			}
@@ -9954,7 +9954,7 @@ class Item extends ItemLight
 			$subject = sprintf( T_('[%s] New change was proposed on: "%s"'), $this->get_Blog()->get( 'shortname' ), $this->get( 'title' ) );
 
 			// Send the email:
-			if( send_mail_to_User( $moderator_ID, $subject, 'post_proposed_change', $email_template_params, false, array( 'Reply-To' => $post_creator_User->email ) ) )
+			if( send_mail_to_User( $moderator_ID, $subject, 'post_proposed_change', $email_template_params ) )
 			{	// A send notification email request to the user with $moderator_ID ID was processed:
 				$notified_users_num++;
 			}
@@ -10012,7 +10012,7 @@ class Item extends ItemLight
 				$subject = sprintf( $subject, $this->Blog->get('shortname'), $this->get('title') );
 
 				// Send the email:
-				if( send_mail_to_User( $assigned_User->ID, $subject, 'post_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
+				if( send_mail_to_User( $assigned_User->ID, $subject, 'post_assignment', $email_template_params ) )
 				{	// A send notification email request to the assigned user was processed:
 					$notified_user_IDs[] = $assigned_User->ID;
 					$this->display_notification_message( T_('Sending email notification to assigned user.') );

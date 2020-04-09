@@ -23,7 +23,7 @@ global $UserSettings;
 $action = param_action( 'list' );
 
 // Set the third level tab
-param( 'tab3', 'string', '', true );
+param( 'tab3', '/^[a-z0-9\-_]+$/i', '', true );
 
 // We should activate toolbar menu items for this controller
 $activate_collection_toolbar = true;
