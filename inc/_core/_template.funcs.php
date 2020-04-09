@@ -1743,25 +1743,49 @@ function init_results_js( $relative_to = 'rsc_url' )
 /**
  * Registers headlines for initialization of functions to work with affixed Messages
  */
-function init_affix_messages_js( $offset = 50 )
+function init_affix_messages_js( $offset = NULL )
 {
-	global $display_mode;
+	global $display_mode, $site_Skin;
 
 	if( isset( $display_mode ) && $display_mode == 'js' )
 	{	// Don't use affixed Messages in JS mode from modal windows:
 		return;
 	}
 
+	if( empty( $offset ) && ! ( ( $offset === '0' ) || ( $offset === 0 ) ) )
+	{	// This should not include evobar and header height - those will be taken care of by the message affix JS script:
+		$offset = 10;
+	}
+
+	$site_header_fixed = 'false';
+	if( $site_Skin )
+	{	// Get fixed header setting to pass to messages affix JS script:
+		$site_header_fixed = $site_Skin->get_setting( 'fixed_header' ) == 1 ? 'true' : 'false';
+	}
+
 	add_js_headline( '
 	jQuery( document ).ready( function()
 	{
 		var msg_obj = jQuery( ".affixed_messages" );
-		var msg_obj_width = msg_obj.outerWidth();
-		var msg_offset = '.format_to_js( $offset == '' ? 50 : $offset ).';
 
 		if( msg_obj.length == 0 )
-		{ // No Messages, exit
+		{	// No Messages, exit
 			return;
+		}
+
+		var msg_obj_width = msg_obj.outerWidth();
+		var msg_offset = '.format_to_js( $offset ).';
+		var evo_bar = jQuery( "#evo_toolbar" );
+		var site_header = jQuery( "#evo_site_header" );
+		var evo_affix_fixed_header = '.format_to_js( $site_header_fixed ).';
+
+		if( evo_bar.length )
+		{	// Add evobar height to offset:
+			msg_offset += evo_bar.outerHeight();
+		}
+		if( evo_affix_fixed_header && site_header.length )
+		{	// Site header is fixed, add height to offset:
+			msg_offset += site_header.outerHeight();
 		}
 
 		msg_obj.wrap( "<div class=\"msg_wrapper\"></div>" );
