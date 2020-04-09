@@ -991,6 +991,9 @@ function search_result_block( $params = array() )
 			echo '<p class="text-muted">Starting a new search...</p>';
 		}
 
+		// Display search spinner:
+		echo '<div id="search_loader_wrapper" class="text-center"><span class="loader_img"></span></div>';
+
 		// Flush first part of the page before starting search, which can be long...
 		evo_flush();
 
@@ -1323,6 +1326,19 @@ function search_result_block( $params = array() )
 	{
 		search_page_links( $page_params );
 	}
+
+	?>
+	<script>
+	// Hide spinner:
+	( function() {
+		var search_spinner = document.querySelector( "#search_loader_wrapper" );
+		if( search_spinner )
+		{
+			search_spinner.classList.add( 'hide' );
+		}
+	} )();
+	</script>
+	<?php
 }
 
 
