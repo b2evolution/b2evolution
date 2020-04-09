@@ -1837,16 +1837,27 @@ function init_results_js( $relative_to = 'rsc_url' )
 /**
  * Registers headlines for initialization of functions to work with affixed Messages
  */
-function init_affix_messages_js( $offset = 50 )
+function init_affix_messages_js( $offset = NULL )
 {
-	global $display_mode;
+	global $display_mode, $site_Skin;
 
 	if( isset( $display_mode ) && $display_mode == 'js' )
 	{	// Don't use affixed Messages in JS mode from modal windows:
 		return;
 	}
 
-	add_js_headline( 'evo_affix_msg_offset = '.format_to_js( $offset == '' ? 50 : $offset ).';' );
+	if( empty( $offset ) && ! ( ( $offset === '0' ) || ( $offset === 0 ) ) )
+	{	// This should not include evobar and header height - those will be taken care of by the message affix JS script:
+		$offset = 10;
+	}
+
+	$site_header_fixed = 'false';
+	if( $site_Skin )
+	{	// Get fixed header setting to pass to messages affix JS script:
+		$site_header_fixed = $site_Skin->get_setting( 'fixed_header' ) == 1 ? 'true' : 'false';
+	}
+
+	add_js_headline( 'evo_affix_msg_offset = '.format_to_js( $offset ).'; evo_affix_fixed_header = '.format_to_js( $site_header_fixed ).';' );
 	require_js_defer( 'src/evo_init_affix_messages.js', 'blog' );
 }
 
