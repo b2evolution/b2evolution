@@ -360,7 +360,8 @@ class Table extends Widget
 	{
 		parent::__construct( $ui_template );
 
-		$this->param_prefix = $param_prefix;
+		// Remove unexpected chars from prefix:
+		$this->param_prefix = preg_replace( '#[^a-z0-9\-_]#i', '', $param_prefix );
 
 		$this->no_results_text = T_('No results').'.';
 	}
