@@ -4394,7 +4394,7 @@ class Comment extends DataObject
 		// Get author email address. It will be visible for moderators/blog/post owners only -- NOT for other subscribers
 		if( $this->get_author_User() )
 		{ // Comment from a registered user:
-			$reply_to = $this->author_User->get( 'email' );
+			$reply_to = NULL; // Don't allow to reply to registered User:
 			$author_name = $this->author_User->get_username();
 			$author_user_ID = $this->author_User->ID;
 		}
@@ -4547,16 +4547,22 @@ class Comment extends DataObject
 				$Debuglog->add( $mail_dump, 'notification' );
 			}
 
+			$email_headers = array();
+			if( ! empty( $user_reply_to ) )
+			{	// Allow to reply only to anonymous user and when it is allowed depending on notify user type:
+				$email_headers['Reply-To'] = $user_reply_to;
+			}
+
 			if( $notify_User )
 			{	// Send the email to registered User:
 				// Note: Note activated users won't get notification email
-				$send_mail_result = send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+				$send_mail_result = send_mail_to_User( $notify_user_ID, $subject, 'comment_new', $email_template_params, false, $email_headers );
 			}
 			else
 			{	// Send the email to anonymous user:
 				$email_template_params['comment_ID'] = $anon_Comment->ID;
 				$email_template_params['anonymous_unsubscribe_key'] = md5( $anon_Comment->ID.$anon_Comment->get( 'secret' ) );
-				$send_mail_result = send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, array( 'Reply-To' => $user_reply_to ) );
+				$send_mail_result = send_mail_to_anonymous_user( $notify_email, $notify_user_name, $subject, 'comment_new', $email_template_params, false, $email_headers );
 			}
 
 			if( $send_mail_result )
@@ -4646,7 +4652,7 @@ class Comment extends DataObject
 					$commented_Item->get( 'title' ) );
 
 				// Send the email:
-				if( send_mail_to_User( $assigned_User->ID, $subject, 'comment_assignment', $email_template_params, false, array( 'Reply-To' => $principal_User->email ) ) )
+				if( send_mail_to_User( $assigned_User->ID, $subject, 'comment_assignment', $email_template_params ) )
 				{	// A send notification email request to the assigned user was processed:
 					$notified_user_IDs[] = $assigned_User->ID;
 					$commented_Item->display_notification_message( T_('Sending email notification to assigned user.') );

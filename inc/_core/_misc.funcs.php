@@ -4412,6 +4412,9 @@ function send_mail_to_User( $user_ID, $subject, $template_name, $template_params
 			$template_params['recipient_User'] = $User;
 		}
 
+		// Pass all email headers to template because they may be used there, e.g. in email footer template:
+		$template_params['email_headers'] = $headers;
+
 		// Get a message text from template file
 		$message = mail_template( $template_name, $UserSettings->get( 'email_format', $User->ID ), $template_params, $User );
 
