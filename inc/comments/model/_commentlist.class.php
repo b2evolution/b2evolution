@@ -80,7 +80,7 @@ class CommentList2 extends DataObjectList2
 
 		if( !empty( $filterset_name ) )
 		{	// Set the filterset_name with the filterset_name param
-			$this->filterset_name = 'CommentList_filters_'.$filterset_name;
+			$this->filterset_name = 'CommentList_filters_'.preg_replace( '#[^a-z0-9\-_]#i', '', $filterset_name );
 		}
 		else
 		{	// Set a generic filterset_name
