@@ -710,10 +710,10 @@ elseif( $disp == '-' && !empty($Item) )
 		$disp = 'single';
 	}
 }
-elseif( $disp == '-' || $disp == $Blog->get_setting( 'front_disp' ) )
-{ // No specific request of any kind OR 
+elseif( $disp == '-' )
+{ // No specific request of any kind...
 	// We consider this to be the home page:
-	$disp = $Blog->get_setting( 'front_disp' );
+	$disp = $Blog->get_setting('front_disp');
 	// Note: the above is where we MIGHT in fact set $disp = 'front';
 
 	$is_front = true; // we have detected that we are displaying the front page
@@ -724,9 +724,7 @@ elseif( $disp == '-' || $disp == $Blog->get_setting( 'front_disp' ) )
 	    || $Blog->get_setting( 'self_canonical_homepage' ) )
 	{ // Check if the URL was canonical:
 		$canonical_url = $Blog->gen_blogurl();
-		// Consider URL with possible params like disp=front or coll_locale=en-US as front canonical URL of the current Collection:
-		$current_url = preg_replace( '#[\?&]((coll_locale=[^&]+|disp='.preg_quote( $disp ).')(&|$))+#', '', $ReqURL );
-		if( ! is_same_url( $current_url, $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
+		if( ! is_same_url( preg_replace( '#[\?&]coll_locale=([^&]+|$)#', '', $ReqURL ), $canonical_url, $Blog->get_setting( 'http_protocol' ) == 'allow_both' ) )
 		{	// We are not on the canonical blog url:
 			if( $Blog->get_setting( 'canonical_homepage' ) && $redir == 'yes' )
 			{	// REDIRECT TO THE CANONICAL URL:
