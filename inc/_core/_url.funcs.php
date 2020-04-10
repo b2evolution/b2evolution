@@ -634,6 +634,12 @@ function url_add_param( $url, $param, $glue = '&amp;' )
 		$param = implode( $glue, $param_list );
 	}
 
+	if( strpos( $param, '"' ) !== false ||
+	    strpos( $param, '\'' ) !== false )
+	{	// Don't allow chars " and ' in new set params:
+		debug_die( 'Invalid chars in params <b>'.format_to_output( $param, 'htmlbody' ).'</b> for <code>url_add_param()</code> !' );
+	}
+
 	if( strpos( $url, '?' ) !== false )
 	{ // There are already params in the URL
 		$r = $url;

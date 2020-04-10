@@ -717,15 +717,10 @@ switch( $action )
 
 		$AdminUI->set_path( 'collections', 'comments', $tab3 );
 
-		$comments_list_param_prefix = 'cmnt_';
-		if( !empty( $tab3 ) )
-		{	// Use different param prefix for each tab
-			$comments_list_param_prefix .= $tab3.'_';
-		}
 		/*
 		 * List of comments to display:
 		 */
-		$CommentList = new CommentList2( $Blog, NULL, 'CommentCache', $comments_list_param_prefix, $tab3 );
+		$CommentList = new CommentList2( $Blog, NULL, 'CommentCache', 'cmnt_', $tab3 );
 
 		// Filter list:
 		if( $tab3 == 'meta' )
