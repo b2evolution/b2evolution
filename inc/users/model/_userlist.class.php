@@ -91,8 +91,8 @@ class UserList extends DataObjectList2
 			$this->filterset_name = 'UserList_filters';
 		}
 
-		$this->order_param = 'results_'.$param_prefix.'order';
-		$this->page_param = $param_prefix.'paged';
+		$this->order_param = 'results_'.$this->param_prefix.'order';
+		$this->page_param = $this->param_prefix.'paged';
 
 		// Initialize the default filter set:
 		$this->set_default_filters( array(

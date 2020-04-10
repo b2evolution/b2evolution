@@ -87,7 +87,7 @@ class CommentList2 extends DataObjectList2
 			$this->filterset_name = 'CommentList_filters_coll'.( !is_null( $this->Blog ) ? $this->Blog->ID : '0' );
 		}
 
-		$this->page_param = $param_prefix.'paged';
+		$this->page_param = $this->param_prefix.'paged';
 
 		// Initialize the default filter set:
 		$this->set_default_filters( array(
