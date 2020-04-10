@@ -710,9 +710,9 @@ elseif( $disp == '-' && !empty($Item) )
 		$disp = 'single';
 	}
 }
-elseif( $disp == '-' || $disp == $Blog->get_setting( 'front_disp' ) )
-{ // No specific request of any kind OR 
-	// We consider this to be the home page:
+elseif( $disp == '-' || ( $disp == 'front' && $disp == $Blog->get_setting( 'front_disp' ) ) )
+{	// No specific request of any kind OR
+	// We consider this is home front page:
 	$disp = $Blog->get_setting( 'front_disp' );
 	// Note: the above is where we MIGHT in fact set $disp = 'front';
 
