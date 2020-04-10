@@ -79,7 +79,7 @@ class ResultSel extends Results
 		$this->cols[] = array(
 						'th' => /* TRANS: abbr. for "Selection" */ T_('Sel'),
 						'td_class' => 'shrinkwrap',
-						'td' => '%selection_checkbox( #'.$field_ID.'#, \''.$param_prefix.'\' )%',
+						'td' => '%selection_checkbox( #'.$field_ID.'#, \''.$this->param_prefix.'\' )%',
 					);
 	}
 
