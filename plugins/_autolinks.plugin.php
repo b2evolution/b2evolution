@@ -28,7 +28,7 @@ class autolinks_plugin extends Plugin
 	var $code = 'b2evALnk';
 	var $name = 'Auto Links';
 	var $priority = 63;
-	var $version = '7.1.3';
+	var $version = '7.1.4';
 	var $group = 'rendering';
 	var $short_desc;
 	var $long_desc;
