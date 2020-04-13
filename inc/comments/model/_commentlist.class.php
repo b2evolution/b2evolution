@@ -80,14 +80,14 @@ class CommentList2 extends DataObjectList2
 
 		if( !empty( $filterset_name ) )
 		{	// Set the filterset_name with the filterset_name param
-			$this->filterset_name = 'CommentList_filters_'.$filterset_name;
+			$this->filterset_name = 'CommentList_filters_'.preg_replace( '#[^a-z0-9\-_]#i', '', $filterset_name );
 		}
 		else
 		{	// Set a generic filterset_name
 			$this->filterset_name = 'CommentList_filters_coll'.( !is_null( $this->Blog ) ? $this->Blog->ID : '0' );
 		}
 
-		$this->page_param = $param_prefix.'paged';
+		$this->page_param = $this->param_prefix.'paged';
 
 		// Initialize the default filter set:
 		$this->set_default_filters( array(
