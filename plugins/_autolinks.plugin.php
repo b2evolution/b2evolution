@@ -804,12 +804,31 @@ class autolinks_plugin extends Plugin
 						continue;
 					}
 
-					if( $User = & $UserCache->get_by_login( $username ) )
+					$username_source = $user_matches[0][ $u ];
+					if( ! ( $User = & $UserCache->get_by_login( $username ) ) )
+					{	// If user is not found try to find by removing a dot at the end,
+						// because usernames may contain dot and also we have a case like "some text to @username.",
+						// so firstly we find user by 'username.' and then by 'username':
+						$username_without_dot = rtrim( $username, '.' );
+						if( $username_without_dot != $username &&
+						    ( $User = & $UserCache->get_by_login( $username_without_dot ) ) )
+						{	// We found user by username without dots at the end:
+							$username = $username_without_dot;
+							$username_source = rtrim( $username_source, '.' );
+							// Check again but already for username without dot:
+							if( in_array( $username, $this->already_linked_usernames ) )
+							{	// Skip this username, it was already linked before:
+								continue;
+							}
+						}
+					}
+
+					if( $User )
 					{	// Replace @usernames
 						$user_link_attrs = str_replace( '%user_ID%', $User->ID, $link_attrs );
-						$user_link = '<a href="'.$User->get_userpage_url().'"'.$user_link_attrs.'>'.$user_matches[0][ $u ].'</a>';
-						$content = preg_replace( '#'.preg_quote( $user_matches[0][ $u ] ).'#', $user_link, $content, 1 );
-						$this->already_linked_usernames[] = $user_matches[1][ $u ];
+						$user_link = '<a href="'.$User->get_userpage_url().'"'.$user_link_attrs.'>'.$username_source.'</a>';
+						$content = preg_replace( '#'.preg_quote( $username_source ).'#', $user_link, $content, 1 );
+						$this->already_linked_usernames[] = $username;
 					}
 				}
 			}

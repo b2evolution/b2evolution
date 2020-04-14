@@ -63,6 +63,7 @@ request_title( array(
 if( ! in_array( $disp, array( 'single', 'page' ) ) &&
     $Item = & get_featured_Item( 'posts', NULL, false, ( isset( $tag ) || $single_cat_ID ? false : NULL ) ) )
 {	// We have a intro post to display:
+	$featured_item_ID = $Item->ID;
 	// Use background position image of intro-post for background URL:
 	$background_image_url = $Item->get_cover_image_url( 'background' );
 	$intro_item_style = $background_image_url ? 'background-image: url("'.$background_image_url.'")' : '';
@@ -227,9 +228,13 @@ if( isset( $MainList ) &&
 <?php
 
 if( $single_cat_ID )
-{	// Go to grab the intro/featured posts only on pages with defined category:
+{	// Go to grab only featured posts only on pages with defined category:
 	while( $Item = & get_featured_Item( 'posts', NULL, false, true, false ) )
-	{	// We have the intro or featured posts to display:
+	{	// We have the featured posts to display:
+		if( isset( $featured_item_ID ) && $featured_item_ID == $Item->ID )
+		{	// Skip featured Item if it is already displayed above in intro style block:
+			continue;
+		}
 		// ---------------------- ITEM LIST INCLUDED HERE ------------------------
 		skin_include( '_item_list.inc.php', array(
 				'Item'       => $Item,

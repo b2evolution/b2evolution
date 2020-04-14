@@ -215,7 +215,7 @@ class item_comment_form_Widget extends ComponentWidget
 		$section_title = $widget_params['form_title_start'].$widget_params['form_title_text'].$widget_params['form_title_end'];
 		if( $widget_params['disp_comment_form'] && ( $widget_params['comment_type'] == 'meta' && $Item->can_meta_comment() ||
 				$Item->can_comment( $widget_params['before_comment_error'], $widget_params['after_comment_error'], '#', $widget_params['comment_closed_text'], $section_title, $widget_params ) ) )
-		{ // We want to display the comments form and the item can be commented on:
+		{	// We want to display the comments form and the item can be commented on:
 
 			echo '<a name="'.( $widget_params['comment_type'] == 'meta' ? 'meta-comment-form' : 'comment-form' ).'"></a>';
 
@@ -225,7 +225,7 @@ class item_comment_form_Widget extends ComponentWidget
 			if( $Comment = get_comment_from_session( 'preview', $widget_params['comment_type'] ) )
 			{	// We have a comment to preview
 				if( $Comment->item_ID == $Item->ID )
-				{ // display PREVIEW:
+				{	// display PREVIEW:
 
 					// We do not want the current rendered page to be cached!!
 					if( !empty( $PageCache ) )
@@ -239,7 +239,7 @@ class item_comment_form_Widget extends ComponentWidget
 					}
 
 					if( empty( $Comment->in_reply_to_cmt_ID ) )
-					{ // Display the comment preview here only if this comment is not a reply, otherwise it was already displayed
+					{	// Display the comment preview here only if this comment is not a reply, otherwise it was already displayed
 						// ------------------ PREVIEW COMMENT INCLUDED HERE ------------------
 						skin_include( $widget_params['comment_template'], array(
 								'Comment'               => & $Comment,
@@ -285,9 +285,9 @@ class item_comment_form_Widget extends ComponentWidget
 				}
 			}
 			else
-			{ // New comment:
+			{	// New comment:
 				if( ( $Comment = get_comment_from_session( 'unsaved', $widget_params['comment_type'] ) ) == NULL )
-				{ // there is no saved Comment in Session
+				{	// there is no saved Comment in Session
 					$Comment = new Comment();
 					$Comment->set( 'type', $widget_params['comment_type'] );
 					$Comment->set( 'item_ID', $Item->ID );
@@ -299,7 +299,7 @@ class item_comment_form_Widget extends ComponentWidget
 						$comment_author_url = '';
 					}
 					else
-					{ // Get params from $_COOKIE
+					{	// Get params from $_COOKIE
 						$comment_author = param_cookie( $cookie_name, 'string', '' );
 						$comment_author_email = utf8_strtolower( param_cookie( $cookie_email, 'string', '' ) );
 						$comment_author_url = param_cookie( $cookie_url, 'string', '' );
@@ -312,7 +312,7 @@ class item_comment_form_Widget extends ComponentWidget
 					$comment_content =  $widget_params['default_text'];
 				}
 				else
-				{ // set saved Comment attributes from Session
+				{	// set saved Comment attributes from Session
 					$comment_content = $Comment->content;
 					$comment_author = $Comment->author;
 					$comment_author_email = $Comment->author_email;
@@ -329,7 +329,7 @@ class item_comment_form_Widget extends ComponentWidget
 				$quoted_comment_ID = param( 'quote_comment', 'integer', 0 );
 				$quoted_post_ID = param( 'quote_post', 'integer', 0 );
 				if( $quoted_comment_ID || $quoted_post_ID )
-				{ // Quote for comment/post
+				{	// Quote for comment/post
 					$comment_content = param( $dummy_fields[ 'content' ], 'html' );
 					if( ! empty( $quoted_comment_ID ) &&
 							( $CommentCache = & get_CommentCache() ) &&
@@ -338,11 +338,11 @@ class item_comment_form_Widget extends ComponentWidget
 					{	// Allow comment quoting only for the same comment type form:
 						$quoted_Item = $quoted_Comment->get_Item();
 						if( $quoted_User = $quoted_Comment->get_author_User() )
-						{ // User is registered
+						{	// User is registered
 							$quoted_login = $quoted_User->login;
 						}
 						else
-						{ // Anonymous user
+						{	// Anonymous user
 							$quoted_login = $quoted_Comment->get_author_name();
 						}
 						$quoted_content = $quoted_Comment->get( 'content' );
@@ -381,7 +381,7 @@ class item_comment_form_Widget extends ComponentWidget
 				param( 'comment_allow_msgform', 'integer', NULL ); // checkbox
 
 				if( is_null($comment_cookies) )
-				{ // "Remember me" checked, if remembered before:
+				{	// "Remember me" checked, if remembered before:
 					$comment_cookies = isset($_COOKIE[$cookie_name]) || isset($_COOKIE[$cookie_email]) || isset($_COOKIE[$cookie_url]);
 				}
 			}
@@ -464,7 +464,7 @@ class item_comment_form_Widget extends ComponentWidget
 			}
 
 			if( ! $Comment->is_meta() && $Item->can_rate() )
-			{ // Comment rating:
+			{	// Comment rating:
 				ob_start();
 				$Comment->rating_input( array( 'item_ID' => $Item->ID ) );
 				$comment_rating = ob_get_clean();
@@ -524,14 +524,32 @@ class item_comment_form_Widget extends ComponentWidget
 			// Set canvas object for plugins:
 			echo '<script type="text/javascript">var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
 
+			if( $Item->can_attach( false, $Comment->type ) )
+			{	// If current user has permission to attach files for the item:
+				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+				// Initialize this object as global because this is used in many link functions:
+				global $LinkOwner;
+				$LinkOwner = new LinkComment( $Comment, param( 'temp_link_owner_ID', 'integer', $Comment->temp_link_owner_ID ) );
+
+				if( empty( $Comment->temp_link_owner_ID ) )
+				{	// Set Comment temp_link_owner_ID:
+					$Comment->temp_link_owner_ID = $LinkOwner->get_ID();
+				}
+			}
+
 			// CALL PLUGINS NOW:
 			ob_start();
-			$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
-				'target_type'   => 'Comment',
-				'target_object' => $Comment,
-				'content_id'    => $content_id,
-				'edit_layout'   => 'inskin',
-			) );
+			$admin_editor_params = array(
+					'target_type'   => 'Comment',
+					'target_object' => $Comment,
+					'content_id'    => $content_id,
+					'edit_layout'   => 'inskin',
+				);
+			if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+			{
+				$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+			}
+			$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
 			$admin_display_editor_button = ob_get_clean();
 
 			// Additional options:

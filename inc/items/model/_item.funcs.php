@@ -411,10 +411,12 @@ function & get_featured_Item( $restrict_disp = 'posts', $coll_IDs = NULL, $previ
 
 		// SECOND: If no Intro, try to find an Featured post:
 
-		if( $load_featured === false && // Don't try to load featured posts twice,
-		    $FeaturedList->result_num_rows == 0 && // If no intro post has been load above,
-		    $restrict_disp != 'front' && // Exclude front page,
-		    $Blog->get_setting( 'disp_featured_above_list' ) ) // If the collection setting "Featured post above list" is enabled.
+		if( ( ! $load_intro && $load_featured === true ) || // If load of featured posts is requested
+		    // If load of featured posts is NOT requested by we need to load because of collection setting "Featured post above list":
+		    ( $load_featured === false && // Don't try to load featured posts twice,
+		      $FeaturedList->result_num_rows == 0 && // If no intro post has been load above,
+		      $restrict_disp != 'front' && // Exclude front page,
+		      $Blog->get_setting( 'disp_featured_above_list' ) ) ) // If the collection setting "Featured post above list" is enabled.
 		{	// No Intro page was found, try to find a featured post instead:
 
 			$FeaturedList->reset();
