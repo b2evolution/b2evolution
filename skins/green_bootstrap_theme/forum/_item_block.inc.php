@@ -127,7 +127,6 @@ skin_widget( array(
 					'link_type' => 'permalink',
 				),
 			// Item Next Previous widget
-			'widget_item_next_previous_display' => ! $Item->is_featured(), // Do not show Item Next Previous widget if featured item
 			'widget_item_next_previous_params' => array(
 					'target_blog'     => $Blog->ID,	// this forces to stay in the same blog, should the post be cross posted in multiple blogs
 					'post_navigation' => 'same_category', // force to stay in the same category in this skin
