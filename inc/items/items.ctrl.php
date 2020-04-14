@@ -1268,6 +1268,9 @@ switch( $action )
 		// Load all custom fields:
 		$edited_Item->get_custom_fields_defs();
 
+		// Set parent item ID to find category order
+		$edited_Item->set( 'parent_item_ID', $edited_Item->ID );
+
 		// Set ID of copied post to 0, because some functions can update current post, e.g. $edited_Item->get( 'excerpt' )
 		$edited_Item->ID = 0;
 

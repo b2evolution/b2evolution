@@ -10699,14 +10699,15 @@ class Item extends ItemLight
 	 */
 	function load_orders()
 	{
-		if( ! isset( $this->orders ) && $this->ID > 0 )
+		if( ! isset( $this->orders ) && ( $this->ID > 0 || isset( $this->parent_item_ID ) ) )
 		{	// Initialize item orders in all assigned categories:
+			$item_ID = ( $this->ID > 0 ) ? $this->ID : $this->parent_item_ID;
 			global $DB;
-			$SQL = new SQL( 'Get all orders per categories of Item #'.$this->ID );
+			$SQL = new SQL( 'Get all orders per categories of Item #'.$item_ID );
 			$SQL->SELECT( 'cat_ID, cat_blog_ID, postcat_order' );
 			$SQL->FROM( 'T_postcats' );
 			$SQL->FROM_add( 'INNER JOIN T_categories ON cat_ID = postcat_cat_ID' );
-			$SQL->WHERE( 'postcat_post_ID = '.$this->ID );
+			$SQL->WHERE( 'postcat_post_ID = '.$item_ID );
 			$orders = $DB->get_results( $SQL );
 			$this->orders = array();
 			$this->orders_per_coll = array();
