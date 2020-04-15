@@ -1821,7 +1821,7 @@ class DB
 			$this->query( 'ROLLBACK', 'ROLLBACK transaction' );
 			$this->rollback_nested_transaction = false;
 		}
-		elseif( $this->transaction_nesting_level > 1 )
+		else
 		{ // Remember we'll have to roll back at the end!
 			$this->rollback_nested_transaction = true;
 		}
