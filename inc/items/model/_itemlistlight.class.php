@@ -946,7 +946,7 @@ class ItemListLight extends DataObjectList2
 	 */
 	function get_filter_titles( $ignore = array(), $params = array() )
 	{
-		global $month, $disp_detail;
+		global $month, $disp_detail, $Blog;
 
 		$params = array_merge( array(
 				'display_category'    => true,
@@ -1067,7 +1067,7 @@ class ItemListLight extends DataObjectList2
 						$cat_clear_url = regenerate_url( ( empty( $catsel_param ) ? 'cat=' : 'catsel=' ).$cat_ID );
 						if( in_array( $disp_detail, array( 'posts-cat', 'posts-topcat-intro', 'posts-topcat-nointro', 'posts-subcat-intro', 'posts-subcat-nointro' ) ) )
 						{ // Remove category url from $ReqPath when we use the cat url instead of cat ID
-							$cat_clear_url = str_replace( '/'.$tmp_Chapter->get_url_path(), '', $cat_clear_url );
+							$cat_clear_url = str_replace( '/'.$tmp_Chapter->get_url_path(), '/', $cat_clear_url );
 						}
 						$cat_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', $cat_clear_url ) : '';
 						$cat_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
@@ -1115,17 +1115,19 @@ class ItemListLight extends DataObjectList2
 
 				if( strlen( $this->filters['ymdhms'] ) > 4 )
 				{ // We have requested a month too:
-					$my_month = T_( $month[ substr( $this->filters['ymdhms'], 4, 2 ) ] );
+					$my_month = substr( $this->filters['ymdhms'], 4, 2 );
+					$my_month_string = T_( $month[ $my_month ] );
 				}
 				else
 				{
-					$my_month = '';
+					$my_month = NULL;
+					$my_month_string = '';
 				}
 
 				// Requested a day?
 				$my_day = substr( $this->filters['ymdhms'], 6, 2 );
 
-				$arch = $my_month.' '.$my_year;
+				$arch = $my_month_string.' '.$my_year;
 
 				if( ! empty( $my_day ) )
 				{ // We also want to display a day
@@ -1138,7 +1140,13 @@ class ItemListLight extends DataObjectList2
 				}
 
 				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
-				$arch_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'m' ) ) : '';
+				$archive_clear_url = regenerate_url( $this->param_prefix.'m' );
+				if( $disp_detail == 'posts-date' )
+				{	// Remove archive url from $ReqPath when we use archive url instead of tag ID:
+					$current_archive_url = $Blog->gen_archive_url( $my_year, ( empty( $my_month ) ? NULL : $my_month ), ( empty( $my_day ) ? NULL : $my_day ), ( empty( $this->filters['week'] ) ? NULL : $this->filters['week'] ) );
+					$archive_clear_url = preg_replace( '#^'.preg_quote( $current_archive_url, '#' ).'#', $Blog->get( 'url' ), $archive_clear_url );
+				}
+				$arch_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', $archive_clear_url ) : '';
 				$arch = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
 					array( $params['archives_text'], $arch, $arch_clear_icon, $filter_classes[ $filter_class_i ] ),
 					$params['filter_mask'] );
@@ -1198,9 +1206,9 @@ class ItemListLight extends DataObjectList2
 				foreach( $tags as $tag )
 				{
 					$tag_clear_url = regenerate_url( $this->param_prefix.'tag='.$tag );
-					if( $disp_detail == 'posts-tag' )
+					if( $disp_detail == 'posts-tag-intro' || $disp_detail == 'posts-tag-nointro' )
 					{ // Remove tag url from $ReqPath when we use tag url instead of tag ID
-						$tag_clear_url = str_replace( '/'.$tag.':', '', $tag_clear_url );
+						$tag_clear_url = str_replace( '/'.$tag.':', '/', $tag_clear_url );
 					}
 					$tag_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', $tag_clear_url ) : '';
 					$tag_names[] = str_replace( array( '$group_title$', '$filter_name$', '$clear_icon$', '$filter_class$' ),
