@@ -10383,6 +10383,7 @@ function use_defer()
 		$use_defer_for_loggedin_disp_messages,
 		$use_defer_for_loggedin_disp_threads,
 		$use_defer_for_loggedin_disp_users,
+		$use_defer_for_loggedin_disp_contacts,
 		$use_defer_for_default_register_form;
 	
 	$r =  $use_defer
@@ -10404,7 +10405,8 @@ function use_defer()
 		   && ( is_logged_in() && $disp == 'visits' ? $use_defer_for_loggedin_disp_visits : true )
 		   && ( is_logged_in() && $disp == 'messages' ? $use_defer_for_loggedin_disp_messages : true )
 		   && ( is_logged_in() && $disp == 'threads' ? $use_defer_for_loggedin_disp_threads : true )
-		   && ( is_logged_in() && $disp == 'users' ? $use_defer_for_loggedin_disp_users : true );
+		   && ( is_logged_in() && $disp == 'users' ? $use_defer_for_loggedin_disp_users : true )
+		   && ( is_logged_in() && $disp == 'contacts' ? $use_defer_for_loggedin_disp_contacts : true );
 
 	return $r;
 }

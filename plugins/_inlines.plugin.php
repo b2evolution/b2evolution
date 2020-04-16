@@ -133,6 +133,10 @@ class inlines_plugin extends Plugin
 			return false;
 		}
 
+		$params = array_merge( array(
+				'js_prefix' => '', // Use different prefix if you use several toolbars on one page
+			), $params );
+
 		$temp_ID = empty( $params['temp_ID'] ) ? NULL : $params['temp_ID'];
 
 		// Load js to work with textarea
@@ -180,138 +184,46 @@ class inlines_plugin extends Plugin
 				return false;
 		}
 
-		?><script>
-		//<![CDATA[
-		var target_ID = <?php echo empty( $target_ID ) ? 'undefined' : format_to_js( $target_ID );?>;
-		var temp_ID = <?php echo empty( $temp_ID ) ? 'undefined' : format_to_js( $temp_ID );?>;
-		var target_type = '<?php echo format_to_js( $params['target_type'] );?>';
-		var inline_buttons = new Array();
-
-		function inline_button( id, text, type, title, style )
+		$insert_inline_params = array(
+			'target_ID'    => $target_ID,
+			'target_type'  => $params['target_type'],
+			'request_from' => is_admin_page() ? 'back' : 'front',
+		);
+		if( isset( $blog ) )
 		{
-			this.id = id;       // used to name the toolbar button
-			this.text = text;   // label on button
-			this.type = type;   // type of inline
-			this.title = title; // title
-			this.style = style; // style on button
+			$insert_inline_params['blog'] = $blog;
+		}
+		if( isset( $temp_ID ) )
+		{
+			$insert_inline_params['temp_ID'] = $temp_ID;
 		}
 
-		inline_buttons[inline_buttons.length] = new inline_button(
-				'inline_image', 'image', 'image', '<?php echo TS_('inline image') ?>', ''
-			);
+		$inlines_toolbar_config = array(
+			'target_ID'            => empty( $target_ID ) ? NULL : format_to_js( $target_ID ),
+			'temp_ID'              => empty( $temp_ID ) ? NULL : format_to_js( $temp_ID ),
+			'target_type'          => format_to_js( $params['target_type'] ),
 
-		function inline_toolbar( title )
-		{
-			var r = '<?php echo format_to_js( $this->get_template( 'toolbar_title_before' ) ); ?>' + title + '<?php echo format_to_js( $this->get_template( 'toolbar_title_after' ) ); ?>'
-				+ '<?php echo format_to_js( $this->get_template( 'toolbar_group_before' ) ); ?>';
-			for( var i = 0; i < inline_buttons.length; i++ )
-			{
-				var button = inline_buttons[i];
-				r += '<input type="button" id="' + button.id + '" title="' + button.title + '"'
-					+ ( typeof( button.style ) != 'undefined' ? ' style="' + button.style + '"' : '' ) + ' class="<?php echo $this->get_template( 'toolbar_button_class' ); ?>" data-func="insert_inline|' + button.type + '" value="' + button.text + '" />';
-			}
-			r += '<?php echo format_to_js( $this->get_template( 'toolbar_group_after' ) ); ?>';
+			'toolbar_title_before' => format_to_js( $this->get_template( 'toolbar_title_before' ) ),
+			'toolbar_title_after'  => format_to_js( $this->get_template( 'toolbar_title_after' ) ),
+			'toolbar_group_before' => format_to_js( $this->get_template( 'toolbar_group_before' ) ),
+			'toolbar_group_after'  => format_to_js( $this->get_template( 'toolbar_group_after' ) ),
+			'plugin_code'          => $this->code,
+			'button_title'         => T_('inline image'),
+			'button_class'         => $this->get_template( 'toolbar_button_class' ),
 
-			jQuery( '.<?php echo $this->code ?>_toolbar' ).html( r );
-		}
+			'insert_inline_url'    => $this->get_htsrv_url( 'insert_inline', $insert_inline_params, '&' ),
+		);
 
-		function insert_inline( inlineType )
-		{
-
-			switch( target_type )
-			{
-				case 'Item':
-					if( ! target_ID && ! temp_ID )
-					{
-						alert( evo_js_lang_alert_before_insert_item  );
-						return false;
-					}
-					break;
-
-				case 'Comment':
-					if( ! target_ID )
-					{
-						alert( evo_js_lang_alert_before_insert_comment );
-						return false;
-					}
-					break;
-
-				case 'EmailCampaign':
-					if( ! target_ID )
-					{
-						alert( evo_js_lang_alert_before_insert_emailcampaign );
-						return false;
-					}
-					break;
-
-				case 'Message':
-					if( ! target_ID && ! temp_ID )
-					{
-						alert( evo_js_lang_alert_before_insert_message );
-						return false;
-					}
-					break;
-			}
-
-			if( typeof( tinyMCE ) != 'undefined' && typeof( tinyMCE.activeEditor ) != 'undefined' && tinyMCE.activeEditor )
-			{	// tinyMCE plugin is active now, we should focus cursor to the edit area
-				tinyMCE.execCommand( 'mceFocus', false, tinyMCE.activeEditor.id );
-				tinyMCE.execCommand( 'evo_view_edit_inline', false, tinyMCE.activeEditor.id );
-			}
-			else
-			{
-				<?php
-				$insert_inline_params = array(
-						'target_ID' => $target_ID,
-						'target_type' => $params['target_type'],
-						'request_from' => is_admin_page() ? 'back' : 'front',
-					);
-
-				if( isset( $blog ) )
-				{
-					$insert_inline_params['blog'] = $blog;
-				}
-				if( isset( $temp_ID ) )
-				{
-					$insert_inline_params['temp_ID'] = $temp_ID;
-				}
-				?>
-				openModalWindow( '<span class="loader_img loader_user_report absolute_center" title="' + evo_js_lang_loading + '..."></span>',
-						'80%', '', true, evo_js_lang_select_image_insert, '', true );
-
-				jQuery.ajax( {
-					type: 'POST',
-					url: '<?php echo $this->get_htsrv_url( 'insert_inline', $insert_inline_params, '&' ); ?>',
-					success: function( result )
-					{
-						var param_target_type, param_target_ID;
-						if( temp_ID == undefined )
-						{
-							param_target_type = target_type;
-							param_target_ID = target_ID
-						}
-						else
-						{
-							param_target_type = 'temporary';
-							param_target_ID = temp_ID;
-						}
-						openModalWindow( result, '90%', '80%', true, 'Select image', '', '', '', '', '', function() {
-									evo_link_refresh_list( param_target_type, param_target_ID );
-									evo_link_fix_wrapper_height();
-								} );
-					}
-				} );
-			}
-		}
-		//]]>
-		</script><?php
+		expose_var_to_js( 'evo_init_inlines_toolbar_config', json_encode( $inlines_toolbar_config ) );
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-		?>
-		<script>inline_toolbar( '<?php echo TS_('Inlines').':'; ?>' );</script>
-		<?php
 
+		expose_var_to_js( 'inlines_toolbar_'.$params['js_prefix'], array(
+				'title'  => T_('Inlines').':',
+				'prefix' => $params['js_prefix'] ),
+			'evo_init_inlines_toolbar' );
+		
 		return true;
 	}
 

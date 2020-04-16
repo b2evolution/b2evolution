@@ -290,6 +290,7 @@ module.exports = function(grunt) {
 					'rsc/js/src/evo_init_plugin_table_contents.js',
 					'rsc/js/src/evo_init_plugin_tinymce.js',
 					'rsc/js/src/evo_init_plugin_shortlinks.js',
+					'rsc/js/src/evo_init_plugin_inlines.js',
 					'rsc/js/src/evo_init_plugin_polls.js',
 					'rsc/js/src/evo_init_editable_column.js',
 				],

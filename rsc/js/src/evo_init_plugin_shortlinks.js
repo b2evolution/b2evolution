@@ -20,16 +20,16 @@ jQuery( document ).ready( function()
 	var config = evo_init_shortlinks_toolbar_config;
 	
 	window.shortlinks_toolbar = function shortlinks_toolbar( title, prefix )
-	{
-		var r = config['toolbar_title_before'] + title + config['toolbar_title_after']
-				+ config['toolbar_group_before']
-				+ '<input type="button" title="' + config['button_title'] + '"'
-				+ ' class="' + config['button_class'] + '"'
-				+ ' data-func="shortlinks_load_window|' + prefix + '" value="' + config['button_value'] + '" />'
-				+ config['toolbar_group_after'];
+		{
+			var r = config['toolbar_title_before'] + title + config['toolbar_title_after']
+					+ config['toolbar_group_before']
+					+ '<input type="button" title="' + config['button_title'] + '"'
+					+ ' class="' + config['button_class'] + '"'
+					+ ' data-func="shortlinks_load_window|' + prefix + '" value="' + config['button_value'] + '" />'
+					+ config['toolbar_group_after'];
 
-			jQuery( '.' + prefix + config['plugin_code'] + '_toolbar' ).html( r );
-	}
+				jQuery( '.' + prefix + config['plugin_code'] + '_toolbar' ).html( r );
+		};
 
 	if( typeof( evo_init_shortlinks_toolbar ) != 'undefined' )
 	{	// Init individual shortlinks toolbar:
