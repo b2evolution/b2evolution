@@ -1002,7 +1002,7 @@ $use_defer_for_anonymous_disp_users = false; // Temporarily disabled. Need to fi
 $use_defer_for_anonymous_disp_anonpost = false; // Erwin> I think we can use defer here as long as we use AJAX forms to load the item form.
 
 $use_defer_for_loggedin_disp_single_page = false; // Temporarily disabled. Need to fix attachments related JS.
-$use_defer_for_loggedin_disp_front = false; // Temporarily disabled. Need to fix attachments related JS (Bootstrap Manual front-page specially).
+$use_defer_for_loggedin_disp_front = true;
 $use_defer_for_loggedin_disp_messages = false; // Temporarily disabled. Need to fix attachments related JS.
 $use_defer_for_loggedin_disp_threads = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
 $use_defer_for_loggedin_disp_profile = false; // Temporarily disabled. Need tof fix various JS.

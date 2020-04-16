@@ -3586,6 +3586,7 @@ function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = tru
 	if( $load_sortable_js )
 	{	// Load JS files to make the links table sortable:
 		require_js_defer( 'jquery/jquery.sortable.min.js', $relative_to );
+		require_js_defer( 'src/evo_init_link_sortable.js', $relative_to );
 	}
 }
 

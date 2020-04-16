@@ -10,6 +10,55 @@
  */
 
 
+ /**
+ * Fade jQuery selector via backgrounds colors (bgs), back to original background
+ * color and then remove any styles (from animations and others)
+ *
+ * Already declared in src/backoffice.js
+ *
+ * @param string|jQuery
+ * @param Array
+ * @param object Options ("speed")
+ */
+if( typeof evoFadeBg === 'undefined' )
+{
+	evoFadeBg = function evoFadeBg( selector, bgs, options )
+		{
+			var origBg = jQuery(selector).css("backgroundColor");
+			var speed = options && options.speed || '"slow"';
+
+			var toEval = 'jQuery(selector).animate({ backgroundColor: ';
+			for( e in bgs )
+			{
+				if( typeof( bgs[e] ) != 'string' )
+				{ // Skip wrong color value
+					continue;
+				}
+				toEval += '"'+bgs[e]+'"'+'}, '+speed+' ).animate({ backgroundColor: ';
+			}
+			toEval += 'origBg }, '+speed+', "", function(){jQuery( this ).css( "backgroundColor", "" );});';
+
+			eval(toEval);
+		};
+}
+
+
+ /**
+ * Fades the relevant object to provide feedback, in case of success.
+ *
+ * Already declared in src/backoffice.js
+ *
+ * @param jQuery selector
+ */
+if( typeof evoFadeSuccess === 'undefined' )
+{
+	evoFadeSuccess = function evoFadeSuccess( selector )
+		{
+			evoFadeBg(selector, new Array("#ddff00", "#bbff00"));
+		};
+}
+
+
 /**
  * Prevent submit a form by Enter Key, e.g. when user is editing the owner fields
  *
@@ -79,72 +128,3 @@ function link_attachment_window( link_owner_type, link_owner_ID, root, path, fm_
 		} );
 	return false;
 };
-
-
-/**
- * Initialize sortable links
- * @param object config 
- */
-function init_link_sortable( config )
-{
-	jQuery( '#' + config.fieldset_prefix + 'attachments_fieldset_table table' ).sortable(
-		{
-			containerSelector: 'table',
-			itemPath: '> tbody',
-			itemSelector: 'tr',
-			placeholder: jQuery.parseHTML( '<tr class="placeholder"><td colspan="5"></td></tr>' ),
-			onMousedown: function( $item, _super, event )
-				{
-					if( ! event.target.nodeName.match( /^(a|img|select|span)$/i ) )
-					{	// Ignore a sort action when mouse is clicked on the tags <a>, <img>, <select> or <span>
-						event.preventDefault();
-						return true;
-					}
-				},
-			onDrop: function( $item, container, _super )
-				{
-					jQuery( '#' + config.fieldset_prefix + 'attachments_fieldset_table table tr' ).removeClass( 'odd even' );
-					jQuery( '#' + config.fieldset_prefix + 'attachments_fieldset_table table tr:odd' ).addClass( 'even' );
-					jQuery( '#' + config.fieldset_prefix + 'attachments_fieldset_table table tr:even' ).addClass( 'odd' );
-		
-					var link_IDs = '';
-					jQuery( '#' + config.fieldset_prefix + 'attachments_fieldset_table table tr' ).each( function()
-						{
-							var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
-							if( link_ID_cell.length > 0 )
-							{
-								link_IDs += link_ID_cell.html() + ',';
-							}
-						} );
-					link_IDs = link_IDs.slice( 0, -1 );
-		
-					jQuery.ajax(
-					{
-						url: htsrv_url + 'anon_async.php',
-						type: 'POST',
-						data:
-							{
-								'action': 'update_links_order',
-								'links': link_IDs,
-								'crumb_link': config.crumb_link,
-							},
-						success: function( data )
-							{
-								link_data = JSON.parse( ajax_debug_clear( data ) );
-								// Update data-order attributes
-								jQuery( '#' + config.fieldset_prefix + 'attachments_fieldset_table table tr' ).each( function()
-								{
-									var link_ID_cell = jQuery( this ).find( '.link_id_cell > span[data-order]' );
-									if( link_ID_cell.length > 0 )
-									{
-										link_ID_cell.attr( 'data-order', link_data[link_ID_cell.html()] );
-									}
-								} );
-								evoFadeSuccess( $item );
-							}
-					} );
-		
-					$item.removeClass( container.group.options.draggedClass ).removeAttr("style");
-				}
-		} );
-}

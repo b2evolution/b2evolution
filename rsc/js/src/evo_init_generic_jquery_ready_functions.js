@@ -346,7 +346,7 @@ jQuery( document ).ready( function()
 	{
 		window.coll_activity_stats_widget_resize_timer;
 
-		window['resize_coll_activity_stat_widget'] = function resize_coll_activity_stat_widget()
+		window.resize_coll_activity_stat_widget = function resize_coll_activity_stat_widget()
 			{
 				var	originalData = [], weekData = [], xLabels = [],
 					displayed = coll_activity_stats_widget_config['time_period'];
@@ -404,24 +404,13 @@ jQuery( document ).ready( function()
 				}
 				
 				plot.replot( { resetAxes: true } );
-			}
+			};
 
 		jQuery( window ).resize( function()
 			{
 				clearTimeout( coll_activity_stats_widget_resize_timer );
 				coll_activity_stats_widget_resize_timer = setTimeout( resize_coll_activity_stat_widget, 100 );
 			} );
-	}
-	
-
-	// Link function: Link Sortable JS
-	if( typeof( evo_link_sortable_js_config ) != 'undefined' )
-	{
-		var evo_link_sortable_js_config_keys = Object.keys( evo_link_sortable_js_config );
-		for( var i = 0; i < evo_link_sortable_js_config_keys.length; i++ )
-		{
-			init_link_sortable( evo_link_sortable_js_config[evo_link_sortable_js_config_keys[i]] );
-		}
 	}
 
 	// Link initialize fieldset
