@@ -13,7 +13,7 @@
 jQuery( document ).ready( function()
 {
 	window.dndb = {};
-	window.init_uploader = function( config )
+	window.init_uploader = function init_uploader( config )
 		{
 			if( 'draggable' in document.createElement('span') )
 			{
