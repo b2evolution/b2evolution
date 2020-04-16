@@ -634,6 +634,7 @@ switch( $action )
 
 		$item_order = param( 'new_item_order', 'string' );
 		$post_ID = param( 'post_ID', 'integer' );
+		$blog = param( 'blog', 'integer', 0 );
 		$cat_ID = param( 'cat_ID', 'integer', NULL );
 
 		$ItemCache = & get_ItemCache();
@@ -651,7 +652,7 @@ switch( $action )
 			$item_order = floatval( $item_order );
 		}
 
-		$Item->update_order( $item_order, $cat_ID );
+		$Item->update_order( $item_order, $cat_ID, $blog );
 
 		// Return a link to make the cell editable on next time:
 		echo '<a href="#" rel="'.$Item->ID.'">'.( $item_order === NULL ? '-' : $item_order ).'</a>';

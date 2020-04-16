@@ -115,7 +115,7 @@ else
 // Print JS to edit an item order:
 echo_editable_column_js( array(
 	'column_selector' => '.item_order_edit',
-	'ajax_url'        => get_htsrv_url().'async.php?action=item_order_edit'.$order_cat_param.'&'.url_crumb( 'itemorder' ),
+	'ajax_url'        => get_htsrv_url().'async.php?action=item_order_edit&blog='.$Blog->ID.$order_cat_param.'&'.url_crumb( 'itemorder' ),
 	'field_type'      => 'text',
 	'new_field_name'  => 'new_item_order',
 	'ID_value'        => 'jQuery( this ).attr( "rel" )',

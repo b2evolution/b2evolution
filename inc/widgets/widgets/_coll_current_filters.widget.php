@@ -221,9 +221,11 @@ class coll_current_filters_Widget extends ComponentWidget
 			echo $filters;
 
 			if( $params['display_button_reset'] )
-			{ // Button to reset all filters
-				echo '<p>'.action_icon( T_('Remove filters'), 'reset_filters',
-					regenerate_url( 'catsel,cat,'
+			{	// Display link/button to reset all filters:
+				global $Blog;
+				if( is_admin_page() || ! isset( $Blog )  )
+				{	// Regenerate URL by removing all filters from current URL on back-office:
+					$remove_filters_url = regenerate_url( 'catsel,cat,'
 						.$params['ItemList']->param_prefix.'tag,'
 						.$params['ItemList']->param_prefix.'author,'
 						.$params['ItemList']->param_prefix.'author_login,'
@@ -247,8 +249,15 @@ class coll_current_filters_Widget extends ComponentWidget
 						.$params['ItemList']->param_prefix.'show_past,'
 						.$params['ItemList']->param_prefix.'show_future,'
 						.$params['ItemList']->param_prefix.'flagged,'
-						.$params['ItemList']->param_prefix.'mustread' ),
-					' '.T_('Remove filters'), 3, 4 ).'<p>';
+						.$params['ItemList']->param_prefix.'mustread' );
+				}
+				else
+				{	// Use home page of the current Collection on front-office:
+					$remove_filters_url = $Blog->get( 'url' );
+				}
+
+				echo '<p>'.action_icon( T_('Remove filters'), 'reset_filters',
+					$remove_filters_url, ' '.T_('Remove filters'), 3, 4 ).'<p>';
 			}
 		}
 
