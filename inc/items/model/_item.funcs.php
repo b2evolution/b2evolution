@@ -6732,7 +6732,8 @@ function item_row_order( $Item )
 	$item_order = $Item->get_order( $order_cat_ID );
 
 	if( ( ! isset( $ItemList, $ItemList->filters['cat_array'] ) || count( $ItemList->filters['cat_array'] ) != 1 ) &&
-	    $Blog->ID != $Item->get_blog_ID() )
+	    $Blog->ID != $Item->get_blog_ID() &&
+	    count( $Item->get_orders_by_coll_ID( $Blog->ID ) ) > 1 )
 	{	// Don't allow to edit order because in such case we display a sum of orders from all extra categories of the Item:
 		return '<span data-toggle="tooltip" title="'.format_to_output( sprintf( T_('Several order numbers were found: %s. This will sort as %s.'), implode( '+', $Item->get_orders_by_coll_ID( $Blog->ID, true ) ), $item_order ), 'htmlattr' ).'">'.$item_order.'</span>';
 	}

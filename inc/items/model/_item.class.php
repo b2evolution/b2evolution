@@ -10800,10 +10800,11 @@ class Item extends ItemLight
 	 * Update item order per category
 	 *
 	 * @param double New order value
-	 * @param integer Category ID, NULL - for main category
+	 * @param integer Category ID, NULL - for main category or for extra category from provided Collection ID
+	 * @param integer Collection ID - to use extra category when $cat_ID is NULL
 	 * @return boolean
 	 */
-	function update_order( $order, $cat_ID = NULL )
+	function update_order( $order, $cat_ID = NULL, $coll_ID = NULL )
 	{
 		global $DB;
 
@@ -10813,8 +10814,21 @@ class Item extends ItemLight
 		}
 
 		if( $cat_ID === NULL )
-		{	// Use main category:
-			$cat_ID = $this->get( 'main_cat_ID' );
+		{	// Find what category to use for updating of order:
+			if( empty( $coll_ID ) || $this->get_blog_ID() == $coll_ID )
+			{	// Use main category:
+				$cat_ID = $this->get( 'main_cat_ID' );
+			}
+			elseif( count( $this->get_orders_by_coll_ID( $coll_ID ) ) == 1 )
+			{	// Use extra category if it is single category per Collection for this Item:
+				$extra_cats = array_keys( $this->orders_per_coll[ $coll_ID ] );
+				$cat_ID = $extra_cats[0];
+			}
+		}
+
+		if( empty( $cat_ID ) )
+		{	// Don't try to update without provided and detected Category:
+			return false;
 		}
 
 		// Change order to correct value:
