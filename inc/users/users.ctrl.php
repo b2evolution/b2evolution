@@ -768,48 +768,19 @@ if( !$Messages->has_errors() )
 			// Check permission:
 			$current_User->check_perm( 'users', 'edit', true );
 
-			set_max_execution_time( 0 );
-
-			// Group Id
-			param( 'grp_ID', 'integer', true );
-			param_check_number( 'grp_ID', TB_('Please select a group'), true );
-			$GroupCache = & get_GroupCache();
-			$Group = & $GroupCache->get_by_ID( $grp_ID );
-
-			param( 'on_duplicate_login', 'integer', true );
-			param( 'on_duplicate_email', 'integer', true );
-
-			// CSV File
-			$import_file = param( 'import_file', 'string', '' );
-			if( empty( $import_file ) )
-			{	// File is not selected:
-				$Messages->add( TB_('Please select a CSV file to import.'), 'error' );
-			}
-			else if( ! preg_match( '/\.csv$/i', $import_file ) )
-			{	// Extension is incorrect
-				$Messages->add( sprintf( TB_('&laquo;%s&raquo; has an unrecognized extension.'), basename( $import_file ) ), 'error' );
-			}
-
-			if( param_errors_detected() )
-			{	// Some errors are exist, Stop the importing:
-				$action = 'csv';
-				break;
-			}
-
-			// Import users from CSV file:
+			// Do import:
 			load_funcs( 'pro_only/model/_pro_user.funcs.php' );
-			$count_users = pro_import_users( $grp_ID, $on_duplicate_login, $on_duplicate_email, $import_file );
+			$import_operation = pro_import_users();
 
-			if( $count_users === false )
+			if( $import_operation === false )
 			{	// Some errors are exist, Stop the importing:
 				$action = 'csv';
 				break;
 			}
-
-			$Messages->add( sprintf( TB_('%d users have been added and %d users have been updated for primary group %s.'),
-				$count_users['inserted'], $count_users['updated'], $Group->get_name() ), 'success' );
-			// Redirect so that a reload doesn't write to the DB twice:
-			header_redirect( $admin_url.'?ctrl=users', 303 ); // Will EXIT
+			else
+			{
+				header_redirect( $admin_url.'?ctrl=users', 303 ); // Will EXIT
+			}
 			break;
 
 		case 'save_default_filters':
