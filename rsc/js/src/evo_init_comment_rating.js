@@ -7,6 +7,8 @@
  * @license GNU GPL v2 - {@link http://b2evolution.net/about/gnu-gpl-license}
  *
  * @copyright (c)2003-2020 by Francois PLANQUE - {@link http://fplanque.com/}
+ * 
+ * Depends on: jQuery, jQuery.raty
  */
 
 jQuery( document ).ready( function()

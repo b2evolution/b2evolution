@@ -1684,6 +1684,7 @@ function init_ratings_js( $relative_to = 'blog', $force_init = false )
 	{
 		require_js_defer( '#jquery#', $relative_to ); // dependency
 		require_js_defer( 'jquery/jquery.raty.min.js', $relative_to );
+		require_js_defer( 'src/evo_init_comment_rating.js', $relative_to );
 	}
 }
 
@@ -3579,9 +3580,11 @@ function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = tru
 	// Require Fine Uploader js and css files:
 	require_js_defer( 'multiupload/fine-uploader.js', $relative_to );
 	require_css( 'fine-uploader.css', $relative_to );
+	require_js_defer( 'src/evo_init_dragdrop_button.js', $relative_to );
 
 	// Used to make uploader area resizable:
 	require_js_defer( '#jqueryUI#', $relative_to );
+	require_js_defer( 'src/evo_init_attachment_fieldset.js', $relative_to );
 
 	if( $load_sortable_js )
 	{	// Load JS files to make the links table sortable:

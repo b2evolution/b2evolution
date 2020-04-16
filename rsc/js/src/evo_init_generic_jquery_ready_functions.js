@@ -413,18 +413,6 @@ jQuery( document ).ready( function()
 			} );
 	}
 
-	// Link initialize fieldset
-	if( typeof( evo_link_initialize_fieldset_config ) != 'undefined' )
-	{
-		( function() {
-			var evo_link_initialize_fieldset_configs = Object.values( evo_link_initialize_fieldset_config );
-			for( var i = 0; i < evo_link_initialize_fieldset_configs.length; i++ )
-			{
-				evo_link_initialize_fieldset( evo_link_initialize_fieldset_configs[i].fieldset_prefix );
-			}
-		} )();
-	}
-
 	// Display attachments fieldset
 	if( typeof( evo_display_attachments_fieldset_config ) != 'undefined' )
 	{

@@ -8,7 +8,7 @@
  *
  * @copyright (c)2003-2020 by Francois PLANQUE - {@link http://fplanque.com/}
  * 
- * Depends on: jQuery
+ * Depends on: jQuery, jQuery.sortable
  */
 window.init_link_sortable = function init_link_sortable( config )
 	{
