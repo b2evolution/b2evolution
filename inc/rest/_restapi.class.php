@@ -2539,6 +2539,7 @@ class RestApi
 
 		$link_type = param( 'type', 'string' );
 		$link_object_ID = param( 'object_ID', 'string' );
+		$fieldset_prefix = param( 'prefix', 'string', NULL );
 
 		$LinkOwner = get_LinkOwner( $link_type, $link_object_ID );
 
@@ -2582,7 +2583,7 @@ class RestApi
 		}
 
 		// Initialize admin skin:
-		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI;
+		global $current_User, $UserSettings, $is_admin_page, $adminskins_path, $AdminUI, $inc_path;
 		$admin_skin = is_logged_in() ? $UserSettings->get( 'admin_skin', $current_User->ID ) : 'bootstrap';
 		$is_admin_page = true;
 		require_once $adminskins_path.$admin_skin.'/_adminUI.class.php';
@@ -2593,7 +2594,8 @@ class RestApi
 
 		// Get the refreshed content:
 		ob_start();
-		$AdminUI->disp_view( 'links/views/_link_list.view.php' );
+		// We do not use $AdminUI->disp_view() because we need the $fieldset_prefix above:
+		require $inc_path.'links/views/_link_list.view.php';
 		$refreshed_content = ob_get_clean();
 
 		$this->add_response( 'html', $refreshed_content );

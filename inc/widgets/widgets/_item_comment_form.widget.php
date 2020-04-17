@@ -527,9 +527,8 @@ class item_comment_form_Widget extends ComponentWidget
 			if( $Item->can_attach( false, $Comment->type ) )
 			{	// If current user has permission to attach files for the item:
 				load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
-				// Initialize this object as global because this is used in many link functions:
-				global $LinkOwner;
-				$LinkOwner = new LinkComment( $Comment, param( 'temp_link_owner_ID', 'integer', $Comment->temp_link_owner_ID ) );
+				// Create $LinkComment to generate temporary link owner ID for the $Comment:
+				$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
 
 				if( empty( $Comment->temp_link_owner_ID ) )
 				{	// Set Comment temp_link_owner_ID:
