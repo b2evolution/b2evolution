@@ -314,8 +314,8 @@ function evo_link_attach( type, object_ID, root, path, prefix )
  */
 function evo_link_ajax_loading_overlay( fieldset_prefix )
 {
-	var table = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' );
-
+	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
+	var table = jQuery( '#' + prefix + 'attachments_fieldset_table' );
 	var ajax_loading = false;
 
 	if( table.find( '.results_ajax_loading' ).length == 0 )
@@ -342,12 +342,8 @@ function evo_link_ajax_loading_overlay( fieldset_prefix )
  */
 function evo_link_refresh_list( type, object_ID, action, fieldset_prefix )
 {
-	if( fieldset_prefix == 'undefined' )
-	{
-		fieldset_prefix = '';
-	}
-
-	var ajax_loading = evo_link_ajax_loading_overlay( fieldset_prefix );
+	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
+	var ajax_loading = evo_link_ajax_loading_overlay( prefix );
 
 	if( ajax_loading )
 	{	// If new request is allowed in current time:
@@ -355,15 +351,15 @@ function evo_link_refresh_list( type, object_ID, action, fieldset_prefix )
 		// Call REST API request to attach a file to Item/Comment:
 		evo_rest_api_request( 'links',
 		{
-			'action'    : typeof( action ) == 'undefined' ? 'refresh' : 'sort',
-			'type'      : type.toLowerCase(),
-			'object_ID' : object_ID,
-			'prefix'    : fieldset_prefix,
+			'action':    typeof( action ) == 'undefined' ? 'refresh' : 'sort',
+			'type':      type.toLowerCase(),
+			'object_ID': object_ID,
+			'prefix':    prefix,
 		},
 		function( data )
 		{
 			// Refresh a content of the links list:
-			jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table' ).html( data.html ); // TODO: this has missing fieldset_prefix in the ID! Check if this works with meta comment attachments
+			jQuery( '#' + prefix + 'attachments_fieldset_table' ).html( data.html );
 
 			// Initialize init_uploader( 'fieldset_' + prefix ) to display uploader button
 			if( window.evo_init_dragdrop_button_config['fieldset_' + fieldset_prefix] )
@@ -372,7 +368,7 @@ function evo_link_refresh_list( type, object_ID, action, fieldset_prefix )
 			}
 
 			// Update the attachment block height after refreshing:
-			evo_link_fix_wrapper_height();
+			evo_link_fix_wrapper_height( prefix );
 			
 
 			// Remove temporary content of ajax loading indicator:
@@ -391,7 +387,7 @@ function evo_link_refresh_list( type, object_ID, action, fieldset_prefix )
 function evo_link_sort_list( fieldset_prefix )
 {
 	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
-	var rows = jQuery( '#' + fieldset_prefix + 'attachments_fieldset_table tbody.filelist_tbody tr' );
+	var rows = jQuery( '#' + prefix + 'attachments_fieldset_table tbody.filelist_tbody tr' );
 	rows.sort( function( a, b )	{
 		var A = parseInt( jQuery( 'span[data-order]', a ).attr( 'data-order' ) );
 		var B = parseInt( jQuery( 'span[data-order]', b ).attr( 'data-order' ) );
@@ -416,7 +412,7 @@ function evo_link_sort_list( fieldset_prefix )
 	$.each( rows, function( index, row ) {
 		if( index === 0 )
 		{
-			jQuery( row ).prependTo( '#' + fieldset_prefix + 'attachments_fieldset_table tbody.filelist_tbody' );
+			jQuery( row ).prependTo( '#' + prefix + 'attachments_fieldset_table tbody.filelist_tbody' );
 			previousRow = row;
 		}
 		else
