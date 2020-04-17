@@ -293,6 +293,7 @@ module.exports = function(grunt) {
 					'rsc/js/src/evo_init_plugin_inlines.js',
 					'rsc/js/src/evo_init_plugin_polls.js',
 					'rsc/js/src/evo_init_editable_column.js',
+					'rsc/js/src/evo_comment_funcs.js',
 				],
 				dest: 'rsc/js/build/evo_generic.bmin.js'
 			},
