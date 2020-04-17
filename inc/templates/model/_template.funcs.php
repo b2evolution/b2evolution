@@ -1014,6 +1014,10 @@ function render_template_callback( $var, $params, $objects = array() )
 			echo $rendered_Item->dget( 'title' );
 			break;
 
+		case 'Item:type':
+			echo $rendered_Item->get_type_setting( 'name' );
+			break;
+
 		case 'Item:visibility_status':
 			if( $rendered_Item->status != 'published' )
 			{
