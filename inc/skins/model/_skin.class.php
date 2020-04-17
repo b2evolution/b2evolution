@@ -1510,6 +1510,9 @@ class Skin extends DataObject
 					{ // Only for NON-bootstrap skins
 						require_css( 'results.css', 'blog' ); // Results/tables styles
 					}
+
+					// Require functions.js to show/hide a panel with filters
+					require_js_defer( 'functions.js', 'blog' );
 					break;
 
 				case 'disp_search':
@@ -1564,6 +1567,11 @@ class Skin extends DataObject
 					{	// Only if user wants this:
 						require_js_defer( 'bozo_validator.js', 'blog' );
 					}
+					break;
+
+				case 'disp_visits':
+					// Require functions.js to show/hide a panel with filters
+					require_js_defer( 'functions.js', 'blog' );
 					break;
 
 				case 'disp_pwdchange':

@@ -1010,7 +1010,7 @@ $use_defer_for_loggedin_disp_pwdchange = true;
 $use_defer_for_loggedin_disp_edit = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
 $use_defer_for_loggedin_disp_proposechange = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
 $use_defer_for_loggedin_disp_edit_comment = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
-$use_defer_for_loggedin_disp_comments = false; // Temporarily disabled. Need to fix comments and voting related JS.
+$use_defer_for_loggedin_disp_comments = true;
 $use_defer_for_loggedin_disp_visits = false; // Temporarily disabled. Need to fix user_js.funcs.php JS.
 $use_defer_for_loggedin_disp_contacts = false; // Temporarily disabled. Need to fix contact_list JS.
 
