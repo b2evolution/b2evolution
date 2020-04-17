@@ -605,8 +605,10 @@ function url_same_protocol( $url, $other_url = NULL )
  * @param string existing url
  * @param string|array Params to add (string as-is) or array, which gets urlencoded.
  * @param string delimiter to use for more params
+ * @param boolean true by default for extra security checking
+ * @return string URL with added param
  */
-function url_add_param( $url, $param, $glue = '&amp;' )
+function url_add_param( $url, $param, $glue = '&amp;', $prevent_quotes = true )
 {
 	if( empty( $param ) )
 	{
@@ -634,8 +636,8 @@ function url_add_param( $url, $param, $glue = '&amp;' )
 		$param = implode( $glue, $param_list );
 	}
 
-	if( strpos( $param, '"' ) !== false ||
-	    strpos( $param, '\'' ) !== false )
+	if( $prevent_quotes &&
+	    ( strpos( $param, '"' ) !== false || strpos( $param, '\'' ) !== false ) )
 	{	// Don't allow chars " and ' in new set params:
 		debug_die( 'Invalid chars in params <b>'.format_to_output( $param, 'htmlbody' ).'</b> for <code>url_add_param()</code> !' );
 	}

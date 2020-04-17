@@ -529,6 +529,16 @@ class ItemLight extends DataObject
 				// This is a silent fallback when we try to permalink to an Item that cannot be addressed directly:
 				return $this->Blog->gen_blogurl();
 
+			case 'tag':
+				// Link to permanent url of first tag:
+				$item_tags = $this->get_tags();
+				if( ! empty( $item_tags ) )
+				{	// If Item has at least one tag:
+					$item_Blog = & $this->get_Blog();
+					return $item_Blog->gen_tag_url( array_shift( $item_tags ), 1, $glue );
+				}
+				// else fallback to category permanent url:
+
 			case 'cat':
 				// Link to permanent url of main chapter:
 				$this->get_main_Chapter();
@@ -544,7 +554,7 @@ class ItemLight extends DataObject
 	/**
 	 * Get permalink type
 	 *
-	 * @return string Permalink type: front, none, cat, single, archive, subchap
+	 * @return string Permalink type: front, none, cat, tag, single, archive, subchap
 	 */
 	function get_permalink_type( $default_permalink_type = '' )
 	{
@@ -578,9 +588,13 @@ class ItemLight extends DataObject
 			{	// This type of post is not allowed to have a permalink:
 				$permalink_type = 'none';
 			}
-			elseif( in_array( $item_type_usage, array( 'intro-cat', 'intro-tag', 'intro-sub', 'intro-all' ) ) )
+			elseif( in_array( $item_type_usage, array( 'intro-cat', 'intro-sub', 'intro-all' ) ) )
 			{	// This post has a permanent URL as url to main chapter:
 				$permalink_type = 'cat';
+			}
+			elseif( $item_type_usage == 'intro-tag' )
+			{	// This post has a permanent URL as url to tag page:
+				$permalink_type = 'tag';
 			}
 			else
 			{	// Allowed to have a permalink:
