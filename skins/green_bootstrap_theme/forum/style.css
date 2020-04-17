@@ -704,6 +704,9 @@ a.btn + .vote_spam {
   display: block;
   font-weight: bold;
 }
+.evo_voting_panel__left_score > span.fa {
+  margin: 0 2px;
+}
 .ft_avatar .evo_voting_panel__left_score,
 .evo_comment_avatar .evo_voting_panel__left_score {
   width: 100%;

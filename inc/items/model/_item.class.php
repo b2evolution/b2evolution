@@ -13033,10 +13033,21 @@ class Item extends ItemLight
 				'title_dontlike'         => T_('Cast a negative vote!'),
 				'title_dontlike_voted'   => T_('You sent a negative vote.'),
 				'title_empty'            => T_('No user votes yet.'),
+				'title_own'              => T_('You cannot vote on own Item.'),
 				'display_summary'        => 'replace', // 'no' - Don't display, 'replace' - Replace label after vote, 'always' - Always display after icons
 				'display_summary_author' => true, // Display summary for author
 				'display_wrapper'        => true, // Use FALSE when you update this from AJAX request
 				'display_score'          => false,
+				'display_noactive'       => false, // Display not active icons, when current User is owner of this Item
+				'display_like'           => true,
+				'display_noopinion'      => true,
+				'display_dontlike'       => true,
+				'icon_like_active'       => 'thumb_up',
+				'icon_like_noactive'     => 'thumb_up_disabled',
+				'icon_noopinion_active'  => 'ban',
+				'icon_noopinion_noactive'=> 'ban_disabled',
+				'icon_dontlike_active'   => 'thumb_down',
+				'icon_dontlike_noactive' => 'thumb_down_disabled',
 			), $params );
 
 		if( ! $this->can_vote() )
@@ -13053,6 +13064,16 @@ class Item extends ItemLight
 
 		if( $current_User->ID == $this->creator_user_ID )
 		{	// Display only vote summary/score for users on their own items:
+			if( $params['display_noactive'] && $params['display_like'])
+			{	// Display disabled 'Like' icon:
+				echo get_icon( $params['icon_like_noactive'], 'imgtag', array( 'title' => $params['title_own'] ) );
+			}
+
+			if( $params['display_noactive'] && $params['display_noopinion'] )
+			{	// Display disabled 'No opinion' icon:
+				echo get_icon( $params['icon_noopinion_noactive'], 'imgtag', array( 'title' => $params['title_own'] ) );
+			}
+
 			if( $params['display_score'] )
 			{	// Display score:
 				echo '<span class="vote_score">'.$this->get( 'addvotes' ).'</span>';
@@ -13063,6 +13084,11 @@ class Item extends ItemLight
 				$params['after_result'] = '.';
 				$result_summary = $this->get_vote_summary( $params );
 				echo ( !empty( $result_summary ) ? $result_summary : $params['title_empty'] );
+			}
+
+			if( $params['display_noactive'] && $params['display_dontlike'] )
+			{	// Display disabled 'Don't like' icon:
+				echo get_icon( $params['icon_dontlike_noactive'], 'imgtag', array( 'title' => $params['title_own'] ) );
 			}
 		}
 		else
