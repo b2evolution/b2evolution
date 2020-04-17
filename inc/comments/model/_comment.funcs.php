@@ -940,14 +940,14 @@ jQuery( 'a.comment_reply' ).click( function()
 		.html( '<?php echo TS_('Reply to this comment') ?>' );
 
 	// Add data for a current comment
-	var link_back_comment = '<a href="<?php echo url_add_param( $Item->get_permanent_url(), 'reply_ID=\' + comment_ID + \'&amp;redir=no' ) ?>#c' + comment_ID + '" class="comment_reply_current" rel="' + comment_ID + '"><?php echo TS_('You are currently replying to a specific comment') ?></a>';
+	var link_back_comment = '<a href="<?php echo url_add_param( $Item->get_permanent_url(), 'reply_ID=\' + comment_ID + \'&amp;redir=no', '&amp;', false ) ?>#c' + comment_ID + '" class="comment_reply_current" rel="' + comment_ID + '"><?php echo TS_('You are currently replying to a specific comment') ?></a>';
 	var hidden_reply_ID = '<input type="hidden" name="reply_ID" value="' + comment_ID + '" />';
-	jQuery( '#bComment_form_id_<?php echo $Item->ID; ?>' ).prepend( link_back_comment + hidden_reply_ID );
+	jQuery( '#evo_comment_form_id_<?php echo $Item->ID; ?>' ).prepend( link_back_comment + hidden_reply_ID );
 
 	jQuery( this ).addClass( 'active' )
 		.html( '<?php echo TS_('You are currently replying to this comment') ?>' );
 	// Scroll to the comment form
-	jQuery( window ).scrollTop( jQuery( '#bComment_form_id_<?php echo $Item->ID ?>' ).offset().top - 30 );
+	jQuery( window ).scrollTop( jQuery( '#evo_comment_form_id_<?php echo $Item->ID ?>' ).offset().top - 30 );
 
 	return false;
 } );
