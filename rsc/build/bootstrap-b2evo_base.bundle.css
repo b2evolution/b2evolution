@@ -4315,6 +4315,50 @@ div.evo_fileuploader_form {
 .evo_widget.widget_core_basic_menu_link img {
   margin-top: -2px;
 }
+.evo_thumbnail_content_block img {
+  border-radius: 3px;
+  max-width: 100%;
+  max-height: 380px;
+  width: auto;
+  height: auto;
+  margin: auto;
+}
+.evo_thumbnail_content_block a.btn {
+  background-color: transparent;
+  float: right;
+  height: 22px;
+  line-height: 13px;
+  padding: 0 4px 0 4px;
+}
+.evo_thumbnail_content_block .evo_thumbnail_contents {
+  padding: 8px;
+  margin: 14px 0;
+  overflow: hidden;
+  background-color: #fafafa;
+  border-radius: 4px;
+}
+.evo_thumbnail_content_block .evo_thumbnail_contents .thumbnail_item_title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5em;
+  margin: 10px 0 5px;
+}
+.evo_thumbnail_content_block .evo_thumbnail_contents .thumb_item_first_image img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  margin: auto;
+}
+.evo_thumbnail_content_block .evo_thumbnail_contents .thumb_item_first_image figure {
+  margin: 0em;
+}
+.evo_thumbnail_content_block .evo_thumbnail_contents .thumbnail_item_content > p:last-of-type {
+  min-height: 60px;
+  margin-bottom: 0px;
+}
+.evo_thumbnail_content_block .evo_thumbnail_contents .thumbnail_item_content a {
+  margin: -20px 0 0;
+}
 
 /**
  * item_base.css
