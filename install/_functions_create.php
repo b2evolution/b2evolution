@@ -2370,19 +2370,16 @@ function create_default_templates( $is_task = true )
 		'content_list_with_thumbnail' => array(
 			'name'     => 'Content List with Thumbnail',
 			'context'  => 'content_list_master',
-			'template' => '[set:before_list=<div class="evo_thumbnail_content_block row">]
-[set:after_list=</div>]
+			'template' => '[set:before_list=<ul class="evo_thumbnail_content_block">]
+[set:after_list=</ul>]
 [set:item_template=content_list_with_thumbnail_item|              // Sub-template for displaying items]
-[set:rwd_thumbnail_cols=col-lg-4 col-md-6 col-sm-6 col-xs-12| // RWD classes for thumbnail containers]
-[set:evo_thumbnail_image__size=fit-400x320|              // Image size for old browsers]
-[set:evo_thumbnail_image__sizes=(max-width: 430px) 400px, (max-width: 670px) 640px, (max-width: 767px) 720px, (max-width: 991px) 345px, (max-width: 1199px) 334px, (max-width: 1799px) 262px, 400px]',
+[set:evo_thumbnail_image__size=crop-80x80|              // Image size for old browsers]',
 		),
 
 		'content_list_with_thumbnail_item' => array(
 			'name'     => 'Content List with Thumbnail: Item',
 			'context'  => 'content_list_item',
-			'template' => '<div class="[echo:rwd_thumbnail_cols]">
-	<div class="evo_thumbnail_contents clearfix">
+			'template' => '<li>
 		<div class="thumb_item_first_image">
 			[Item:images|
 				restrict_to_image_position=#cover_and_teaser_all| // Priority to cover image, fall back to any teaser image
@@ -2390,21 +2387,20 @@ function create_default_templates( $is_task = true )
 				image_size=$evo_thumbnail_image__size$|                // Size for old browsers
 				image_sizes=$evo_thumbnail_image__sizes$|	          // RWD thumbnail Sizes for modern browsers
 				image_link_to=|	                                  // Do NOT link to anything
-				placeholder=|	                  // If no image available, display text file icon
+				placeholder=#file_custom_icon|	                  // If no image available, display text file icon
 			]
 		</div>
 		<div class="thumbnail_item_title">
-		   [Item:permalink|text=#title|class=default]
+			[Item:permalink|text=#title|class=default]
 		</div>
 		<div class="thumbnail_item_content">
-		    <p>[Item:excerpt|
+			<p>[Item:excerpt|
 							excerpt_more_text=| // No "more" link
 			]
-		    </p> 
-		    [Item:permalink|text=...|class=btn btn-default|title=] 
+			</p> 
+			[Item:permalink|text=...|class=btn btn-default|title=] 
 		</div>
-	</div>
-</div>',
+</li>',
 		)
 
 	);

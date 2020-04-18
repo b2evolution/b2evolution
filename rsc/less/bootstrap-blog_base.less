@@ -1327,56 +1327,167 @@ div.evo_fileuploader_form {
 	}
 }
 
-// Widget "Content with thumbnail":
-.evo_thumbnail_content_block {
-	img {
-		border-radius: 3px;
-		max-width: 100%;
-		max-height: 380px;
-		width: auto;
-		height: auto;
-		margin: auto;
-	}
-	a.btn {
-		
+// Rwd layout when template "Content with thumbnail":
+.evo_layout_rwd {
+	.evo_thumbnail_content_block {
+		img {
+			border-radius: 3px;
+			max-width: 100%;
+			max-height: 380px;
+			width: auto;
+			height: auto;
+			margin: auto;
+		}
+		a.btn {
 			background-color: transparent;
 			float: right;
 			height: 22px;
 			line-height: 13px;
 			padding: 0 4px 0 4px;
-		
+
+		}
+		.evo_thumbnail_contents {
+			padding: 8px;
+			margin: 14px 0;
+			overflow: hidden;
+			background-color: #fafafa;
+			border-radius: 4px;
+			.thumbnail_item_title {
+				font-size:16px;
+				font-weight:700;
+				line-height:1.5em;
+				margin:10px 0 5px;
+			}
+			.thumb_item_first_image {
+				img {
+					width: 100%;
+					height: 240px;
+					object-fit: cover;
+					margin: auto; 
+				}
+				figure {
+					margin: 0em;
+				}
+			}
+			.thumbnail_item_content {
+				> p:last-of-type {
+					min-height: 60px;
+					margin-bottom: 0px;
+				}
+				a {
+					margin: -20px 0 0;
+				}
+			}
+		}
 	}
-	.evo_thumbnail_contents {
-		padding: 8px;
-		margin: 14px 0;
-		overflow: hidden;
-		background-color: #fafafa;
-		border-radius: 4px;
+}
+
+// List layout when template "Content with thumbnail":
+.evo_layout_list {
+	.evo_thumbnail_content_block {
+		padding: 0;
+		margin-left: 0;
+		li {
+			height: auto;
+			width: 100%;
+			clear: both;
+			margin: 15px 0;
+			padding: 0;
+			vertical-align: middle;
+			list-style: none;
+			display: table;
+		}
+		img {
+			border-radius: 3px;
+			max-width: 100%;
+			max-height: 380px;
+			width: auto;
+			height: auto;
+			margin: auto;
+		}
+		a.btn {
+			background-color: transparent;
+			float: right;
+			height: 22px;
+			line-height: 13px;
+			padding: 0 4px 0 4px;
+		}
+		a.btn:hover {
+			background-color: #e6e6e6;
+		}
+		
 		.thumbnail_item_title {
-			font-size:16px;
-			font-weight:700;
-			line-height:1.5em;
-			margin:10px 0 5px;
+			vertical-align: middle;
+			display: inline;
+			height: auto !important;
+			width: 100%;
+			font-size: 16px;
+			a {
+				text-decoration: underline;
+			}
 		}
 		.thumb_item_first_image {
 			img {
-				width: 100%;
-				height: 240px;
-				object-fit: cover;
-				margin: auto; 
+				border-radius: 3px;
+				max-width: 100%;
+				max-height: 380px;
+				width: auto;
+				height: auto;
+				margin: auto;
 			}
 			figure {
 				margin: 0em;
 			}
+			float: left;
+			margin-right: 6px;
+			text-align: center; 
+			.thumbnail_item_first_image_placeholder::before {
+				font-family: FontAwesome;
+				display: table-cell;
+				content: '\f0f6';
+				color: #dcdcdc;
+				font-size: 40px;
+				vertical-align: middle;
+				text-align: center;
+			}
+			
+			.thumbnail_item_first_image_placeholder {
+				display: table;
+				float: left;
+				max-width: 380px;
+				max-height: 380px;
+				background: #f0f0f0;
+				margin-right: 6px;
+				-webkit-border-radius: 3px;
+				-moz-border-radius: 3px;
+				-ms-border-radius: 3px;
+				-o-border-radius: 3px;
+				border-radius: 3px;
+			}
 		}
 		.thumbnail_item_content {
-			> p:last-of-type {
-				min-height: 60px;
-				margin-bottom: 0px;
-			}
 			a {
-				margin: -20px 0 0;
+				color: #000000;
 			}
+			> p:last-of-type {
+				margin: 0 !important;
+				display: inline;
+			}
+		}
+		
+	}
+}
+
+// Resporsive Rwd layout when template "Content with thumbnail":
+@media only screen and (min-width: 641px) {
+	.evo_layout_list {
+		.evo_thumbnail_content_block {
+			.thumbnail_item_content {
+				a {
+					color: #FFFFFF;
+				}
+			}
+
 		}
 	}
 }
