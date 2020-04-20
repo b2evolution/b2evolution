@@ -206,6 +206,14 @@ switch( $type )
 			}
 		}
 
+		// Check redirect URL:
+		if( ! empty( $redirect_to ) &&
+		    ( empty( $email_log['emlog_message'] ) ||
+		      strpos( $email_log['emlog_message'], 'redirect_to='.rawurlencode( $redirect_to ) ) === false ) )
+		{	// Deny redirect to URL what is not found in the email message:
+			$redirect_to = $baseurl;
+		}
+
 		// Redirect
 		if( empty( $redirect_to ) )
 		{	// If a redirect param was not defined on submitted form then redirect to site url:
@@ -225,6 +233,19 @@ switch( $type )
 
 		if( ! empty( $redirect_to ) )
 		{
+			// Check redirect URL:
+			$SQL = new SQL( 'Get email log message to check redirect url' );
+			$SQL->SELECT( 'emlog_message' );
+			$SQL->FROM( 'T_email__log' );
+			$SQL->WHERE( 'emlog_ID = '.$DB->quote( $email_ID ) );
+			$SQL->WHERE_and( 'emlog_key = '.$DB->quote( $email_key ) );
+			$email_log_message = $DB->get_var( $SQL );
+			if( empty( $email_log_message ) ||
+			    strpos( $email_log_message, 'redirect_to='.rawurlencode( $redirect_to ) ) === false )
+			{	// Deny redirect to URL what is not found in the email message:
+				$redirect_to = $baseurl;
+			}
+
 			// Redirect
 			// header_redirect can prevent redirection depending on some advanced settings like $allow_redirects_to_different_domain!
 			//header_redirect( $redirect_to, 302 ); // Will EXIT
