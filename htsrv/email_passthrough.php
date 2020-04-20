@@ -207,9 +207,8 @@ switch( $type )
 		}
 
 		// Check redirect URL:
-		if( ! empty( $redirect_to ) &&
-		    ( empty( $email_log['emlog_message'] ) ||
-		      strpos( $email_log['emlog_message'], 'redirect_to='.rawurlencode( $redirect_to ) ) === false ) )
+		if( empty( $email_log['emlog_message'] ) ||
+		    ! check_redirect_url_by_content( $redirect_to, $email_log['emlog_message'] ) )
 		{	// Deny redirect to URL what is not found in the email message:
 			$redirect_to = $baseurl;
 		}
@@ -240,8 +239,7 @@ switch( $type )
 			$SQL->WHERE( 'emlog_ID = '.$DB->quote( $email_ID ) );
 			$SQL->WHERE_and( 'emlog_key = '.$DB->quote( $email_key ) );
 			$email_log_message = $DB->get_var( $SQL );
-			if( empty( $email_log_message ) ||
-			    strpos( $email_log_message, 'redirect_to='.rawurlencode( $redirect_to ) ) === false )
+			if( ! check_redirect_url_by_content( $redirect_to, $email_log_message ) )
 			{	// Deny redirect to URL what is not found in the email message:
 				$redirect_to = $baseurl;
 			}

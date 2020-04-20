@@ -1087,4 +1087,36 @@ function url_check_same_domain( $main_url, $check_url )
 	// Check subdomain
 	return $same_domain || ( substr( $check_url_host, - ( strlen( $main_url_host ) + 1 ) ) == '.'.$main_url_host );
 }
+
+
+/**
+ * Check redirect URL if it is a part of any URL in content
+ *
+ * Used to check redirect_to URLs from email message
+ *
+ * @param string Redirect URL
+ * @param string Content
+ * @return boolean TRUE if 
+ */
+function check_redirect_url_by_content( $redirect_to, $content )
+{
+	if( empty( $redirect_to ) || empty( $content ) )
+	{	// Nothing to check:
+		return false;
+	}
+
+	if( strpos( $content, 'redirect_to='.rawurlencode( $redirect_to ) ) !== false )
+	{	// Allow to use found the requested redirect URL from provided content:
+		return true;
+	}
+
+	// Additional check for case when URLs are encoded to html entities:
+	if( strpos( $content, 'redirect_to='.rawurlencode( str_replace( '&', '&amp;', $redirect_to ) ) ) !== false )
+	{	// Allow to use found the requested redirect URL from provided content:
+		return true;
+	}
+
+	// The redirect URL is not allowed:
+	return false;
+}
 ?>
