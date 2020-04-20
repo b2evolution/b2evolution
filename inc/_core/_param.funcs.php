@@ -2820,7 +2820,7 @@ function param_check_serialized_array( $param_name )
 	}
 
 	// Search all string items in the serialized array:
-	preg_match_all( '/[{;]s:(\d+):"/', $param_value, $matches, PREG_OFFSET_CAPTURE );
+	preg_match_all( '/[{;]s:(\d+):"/i', $param_value, $matches, PREG_OFFSET_CAPTURE );
 	foreach( $matches[0] as $m => $match )
 	{	// And replace its values with spaces in order to don't decide below the following string values as object structures:
 		//    a:2:{s:1:"a";s:1:"b";i:123;O:8:"stdClass":1:{s:1:"a";s:1:"b";}}
@@ -2830,7 +2830,7 @@ function param_check_serialized_array( $param_name )
 	if(
 		// Allow to unserialize only arrays, main reason is an excluding of object structure like:
 		//     - O:7:"Results":1:{s:3:"sql";s:21:"SELECT * FROM T_users";}
-		( substr( $param_value, 0, 2 ) == 'a:' ) &&
+		( stripos( $param_value, 'a:' ) === 0 ) &&
 		// + Check there is no Object in the array (We NEVER want to unserialize an object):
 		//     a:1:{s:3:"key";O:8:"stdClass":1:{s:1:"x";i:1;}}
 		//     a:1:{i:123;O:8:"stdClass":1:{s:1:"x";i:1;}}
@@ -2838,7 +2838,7 @@ function param_check_serialized_array( $param_name )
 		//     a:1:{s:3:"key";a:1:{i:456;O:8:"stdClass":1:{s:1:"x";i:1;}}}
 		//   This checking exclude real string with object structure value like ';O:8:':
 		//     a:1:{s:3:"key";s:5:";O:8:";}
-		( ! preg_match( '/(s:\d+:"[^"]*"|i:\d+);O:\+?[0-9]+:"/', $param_value ) )
+		( ! preg_match( '/(s:\d+:"[^"]*"|i:\d+);O:\+?[0-9]+:"/i', $param_value ) )
 	)
 	{	// Correct data:
 		return true;
