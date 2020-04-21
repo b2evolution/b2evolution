@@ -1011,7 +1011,7 @@ $use_defer_for_loggedin_disp_edit = false; // Temporarily disabled. Need to fix 
 $use_defer_for_loggedin_disp_proposechange = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
 $use_defer_for_loggedin_disp_edit_comment = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
 $use_defer_for_loggedin_disp_comments = true;
-$use_defer_for_loggedin_disp_visits = false; // Temporarily disabled. Need to fix user_js.funcs.php JS.
+$use_defer_for_loggedin_disp_visits = true;
 $use_defer_for_loggedin_disp_contacts = true;
 
 // Erwin> I think this can be disabled if we are able to use AJAX forms to load the comment form:
