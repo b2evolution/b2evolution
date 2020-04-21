@@ -528,7 +528,17 @@ class ItemType extends DataObject
 				}
 			}
 
-			if( ! $formula_has_wrong_field && $custom_field['formula'] !== '' )
+			if( $formula_uses_function = preg_match( '#[a-z0-9_]+\s*\(.*?\)#i', $custom_field['formula'] ) )
+			{	// Don't allow to use functions in formula:
+				$Messages->add( sprintf( T_('Forbidden to use functions in formula, please fix %s of the field "%s".'),
+						'<code>'.$custom_field['formula'].'</code>',
+						$custom_field['label']
+					), 'warning' );
+			}
+
+			if( ! $formula_has_wrong_field &&
+			    ! $formula_uses_function &&
+			    $custom_field['formula'] !== '' )
 			{	// Check for correct formula:
 				$test_formula = preg_replace( '#\$(.+?)\$#', '1', $custom_field['formula'] );
 				try

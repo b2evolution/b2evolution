@@ -3007,6 +3007,11 @@ class Item extends ItemLight
 		}
 
 		if( $formula_is_valid )
+		{	// Check functions in formula because all functions are forbidden in formula:
+			$formula_is_valid = ! preg_match( '#[a-z0-9_]+\s*\(.*?\)#i', $formula );
+		}
+
+		if( $formula_is_valid )
 		{	// Try to compute a value if formula is valid:
 			$formula = preg_replace( '#\$([^$]+)\$#', '$this->get_custom_field_computed( \'$1\' )', $formula );
 			try
