@@ -687,8 +687,11 @@ function strmaxwords( $str, $maxwords = 50, $params = array() )
 	}
 
 	if( $params['always_continue'] || $maxwords < 1 )
-	{ // we want a continued text
-		$str .= ' <a href="'.$params['continued_link'].'" class="'.$params['continued_class'].'">'.$params['continued_text'].'</a>';
+	{ // we want a continued text if avoid_end_hellip is not set:
+		if( ! isset( $params['avoid_end_hellip'] ) )
+		{
+			$str .= ' <a href="'.$params['continued_link'].'" class="'.$params['continued_class'].'">'.$params['continued_text'].'</a>';
+		}
 	}
 
 	return $str;

@@ -2362,8 +2362,11 @@ class Item extends ItemLight
 			echo $params['before'];
 			
 			if( isset( $params['max_words'] ) )
-			{
-				echo excerpt_words( $r, $params['max_words'] );
+			{	
+				// to stop displaying double hellip
+				$params['avoid_end_hellip'] = true;
+				
+				echo excerpt_words( $r, $params['max_words'], $params );
 			}
 			else
 			{
