@@ -466,4 +466,298 @@ jQuery( document ).ready( function()
 				jQuery( 'input[name=users]' ).val( window.get_selected_users() );
 			} );
 	}
+
+	// User Identity Form
+	if( typeof( evo_user_identity_form_config ) != 'undefined' )
+	{
+		( function() {
+
+			var config = evo_user_identity_form_config;
+
+			window.replace_form_params = function replace_form_params( result, field_id )
+				{
+					field_id = ( typeof( field_id ) == 'undefined' ? '' : ' id="' + field_id + '"' );
+					return result
+						.replace( '#fieldstart#', config.fieldstart )
+						.replace( '#fieldend#', config.fieldend )
+						.replace( '#labelclass#', config.labelclass )
+						.replace( '#labelstart#', config.labelstart )
+						.replace( '#labelend#', config.labelend )
+						.replace( '#inputstart#', config.inputstart )
+						.replace( '#inputend#', config.inputend );
+				};
+
+			jQuery( '#button_add_field' ).click( function ()
+				{	// Action for the button when we want to add a new field in the Additional info
+					var field_id = jQuery( this ).prev().find( 'option:selected' ).val();
+
+					if( field_id == '' )
+					{	// Mark select element of field types as error
+						window.field_type_error( config.msg_select_field_type );
+						// We should to stop the ajax request without field_id
+						return false;
+					}
+					else
+					{	// Remove an error class from the field
+						window.field_type_error_clear();
+					}
+
+					var params = config.params;
+
+					jQuery.ajax({
+						type: 'POST',
+						url: htsrv_url + 'anon_async.php',
+						data: 'action=get_user_new_field&user_id=' + config.user_ID + '&field_id=' + field_id + params,
+						success: function( result )
+							{
+								result = ajax_debug_clear( result );
+								if( result == '[0]' )
+								{	// This field(not duplicated) already exists for current user
+									window.field_type_error( config.msg_field_already_added );
+								}
+								else
+								{
+									result = window.replace_form_params( result );
+									var field_duplicated = parseInt( result.replace( /^\[(\d+)\](.*)/, '$1' ) );
+									if( field_duplicated == 0 )
+									{	// This field is NOT duplicated
+										var field_id = parseInt( result.replace( /(.*)fieldset id="ffield_uf_add_(\d+)_(.*)/, '$2' ) );
+										// Remove option from select element
+										jQuery( '#new_field_type option[value='+field_id+']').remove();
+										if( jQuery( '[id^=uf_new_' + field_id + '], [id^=uf_add_' + field_id + ']' ).length > 0 )
+										{	// This field already exists(on the html form, not in DB) AND user cannot add a duplicate
+											window.field_type_error( config.msg_field_already_added );
+											return false;
+										}
+									}
+									// Print out new field on the form
+									jQuery( '#ffield_new_field_type' ).before( result.replace( /^\[\d+\](.*)/, '$1' ) );
+									// Show a button 'Add(+)' with new field
+									jQuery( 'span[rel^=add_ufdf_]' ).show();
+
+									bind_autocomplete( jQuery( '#ffield_new_field_type' ).prev().prev().find( 'input[id^=uf_add_][autocomplete=on]' ) );
+								}
+							}
+						} );
+
+					return false;
+				} );
+
+			jQuery( document ).on( 'focus', '[rel^=ufdf_]', function ()
+				{	// Auto select the value for the field of type
+					var field_id = parseInt( jQuery( this ).attr( 'rel' ).replace( /^ufdf_(\d+)$/, '$1' ) );
+					if( field_id > 0 )
+					{	// Select an option with current field type
+						jQuery( '#new_field_type' ).val( field_id );
+						window.field_type_error_clear();
+					}
+				} );
+
+			jQuery( '#new_field_type' ).change( function ()
+				{	// Remove all errors messages from field "Add a field of type:"
+					window.field_type_error_clear();
+				} );
+
+			window.field_type_error = function field_type_error( message )
+				{	// Add an error message for the "field of type" select
+					jQuery( 'select#new_field_type' ).addClass( 'field_error' );
+					var span_error = jQuery( 'select#new_field_type' ).next().find( 'span.field_error' );
+					if( span_error.length > 0 )
+					{	// Replace a content of the existing span element
+						span_error.html( message );
+					}
+					else
+					{	// Create a new span element for error message
+						jQuery( 'select#new_field_type' ).next().append( '<span class="field_error">' + message + '</span>' );
+					}
+				};
+
+			window.field_type_error_clear = function field_type_error_clear()
+				{	// Remove an error style from the "field of type" select
+					jQuery( 'select#new_field_type' ).removeClass( 'field_error' ).next().find( 'span.field_error' ).remove();
+				};
+
+			/*
+			jQuery( 'span[rel^=add_ufdf_]' ).each( function()
+				{	// Show only last button 'Add(+)' for each field type
+					// These buttons is hidden by default to ignore browsers without javascript
+					jQuery( 'span[rel=' + jQuery( this ).attr( 'rel' ) + ']:last' ).show();
+				} );
+			*/ 
+
+			// Show a buttons 'Add(+)' for each field
+			// These buttons is hidden by default to ignore a browsers without javascript
+			jQuery( 'span[rel^=add_ufdf_]' ).show();
+
+			jQuery( document ).on( 'click', 'span[rel^=add_ufdf_]', function()
+				{	// Click event for button 'Add(+)'
+					var this_obj = jQuery( this );
+					var field_id = this_obj.attr( 'rel' ).replace( /^add_ufdf_(\d+)$/, '$1' );
+					var params = config.params;
+
+					jQuery.ajax( {
+						type: 'POST',
+						url: htsrv_url + 'anon_async.php',
+						data: 'action=get_user_new_field&user_id=' + config.user_ID + '&field_id=' + field_id + params,
+						success: function( result )
+							{
+								result = ajax_debug_clear( result );
+								if( result == '[0]' )
+								{	// This field(not duplicated) already exists for current user
+									window.field_type_error( config.msg_field_already_added );
+								}
+								else
+								{
+									result = window.replace_form_params( result );
+									var field_duplicated = parseInt( result.replace( /^\[(\d+)\](.*)/, '$1' ) );
+									if( field_duplicated == 0 )
+									{	// This field is NOT duplicated
+										window.field_type_error( config.msg_field_already_added );
+										return false;
+									}
+									var cur_fieldset_obj = this_obj.parent().parent().parent();
+									
+									/*
+									// Remove current button 'Add(+)' and then we will show button with new added field
+									this_obj.remove();
+									*/
+
+									// Print out new field on the form
+									cur_fieldset_obj.after( result.replace( /^\[\d+\](.*)/, '$1' ) )
+									// Show a button 'Add(+)' with new field
+																	.next().find( 'span[rel^=add_ufdf_]' ).show();
+
+									var new_field = cur_fieldset_obj.next().find( 'input[id^=uf_add_]' );
+									if( new_field.attr( 'autocomplete' ) == 'on' )
+									{	// Bind autocomplete event
+										bind_autocomplete( new_field );
+									}
+									// Set auto focus on new created field
+									new_field.focus();
+								}
+							}
+						} );
+				} );
+
+			jQuery( document ).on( 'mouseover', 'span[rel^=add_ufdf_]', function()
+				{	// Grab event from input to show bubbletip
+					jQuery( this ).parent().prev().focus();
+					jQuery( this ).css( 'z-index', jQuery( this ).parent().prev().css( 'z-index' ) );
+				} );
+
+			jQuery( document ).on( 'mouseout', 'span[rel^=add_ufdf_]', function()
+				{	// Grab event from input to hide bubbletip
+					var input = jQuery( this ).parent().prev();
+					if( input.is( ':focus' ) )
+					{	// Don't hide bubbletip if current input is focused
+						return false;
+					}
+					input.blur();
+				} );
+
+		
+			// JS code to add new organization for user
+			var org_fieldset_selector = '[id^="ffield_organizations_"]';
+			var max_organizations = config.max_organizations;
+			var user_org_num = 0;
+
+			jQuery( document ).on( 'click', 'span.add_org', function()
+				{	// Add new organization select box
+					var this_obj = jQuery( this );
+					var params = config.params;
+
+					params += ( typeof( remove_obj_after_org_adding ) != 'undefined' ? '&first_org=1' : '' );
+					jQuery.ajax( {
+							type: 'POST',
+							url: htsrv_url + 'anon_async.php',
+							data: 'action=get_user_new_org' + params,
+							success: function( result )
+							{
+								result = window.replace_form_params( ajax_debug_clear( result ), 'ffield_organizations_' + user_org_num );
+								var cur_fieldset_obj = this_obj.closest( org_fieldset_selector );
+								cur_fieldset_obj.after( result );
+
+								if( typeof( remove_obj_after_org_adding ) != 'undefined' )
+								{ // Delete last fieldset
+									remove_obj_after_org_adding.remove();
+									delete remove_obj_after_org_adding;
+								}
+
+								if( jQuery( org_fieldset_selector ).length >= max_organizations )
+								{ // It was last organization, Hide all "add" buttons
+									jQuery( 'span.add_org' ).hide();
+								}
+
+								// Show/Hide all "remove" buttons
+								( jQuery( org_fieldset_selector ).length > 1 ) ?
+									jQuery( 'span.remove_org' ).show() :
+									jQuery( 'span.remove_org' ).hide();
+
+								user_org_num++;
+							}
+						} );
+				} );
+
+			jQuery( document ).on( 'click', 'span.remove_org', function()
+				{	// Remove organization select box
+					if( jQuery( org_fieldset_selector ).length > 1 )
+					{
+						jQuery( this ).closest( org_fieldset_selector ).remove();
+					}
+					else
+					{ // Add a form to select an organization
+						remove_obj_after_org_adding = jQuery( this ).closest( org_fieldset_selector );
+						jQuery( this ).parent().find( 'span.add_org' ).click();
+					}
+
+					if( jQuery( org_fieldset_selector ).length < max_organizations )
+					{ // Show the "add" buttons
+						jQuery( 'span.add_org' ).show();
+					}
+
+					// Show/Hide all "remove" buttons
+					( jQuery( org_fieldset_selector ).length > 0 ) ?
+						jQuery( 'span.remove_org' ).show() :
+						jQuery( 'span.remove_org' ).hide();
+				} );
+
+			window.bind_autocomplete = function bind_autocomplete( field_objs )
+				{	// Bind autocomplete plugin event
+					if( field_objs.length > 0 )
+					{	// If selected elements are exists
+						field_objs.autocomplete( {
+							source: function(request, response) {
+								jQuery.getJSON( htsrv_url + 'anon_async.php?action=get_user_field_autocomplete', {
+									term: request.term, attr_id: this.element[0].getAttribute( 'id' )
+								}, response);
+							},
+						} );
+					}
+				};
+
+			// Plugin jQuery(...).live() doesn't work with autocomplete
+			// We should assign an autocomplete event for each new added field
+			bind_autocomplete( jQuery( 'input[id^=uf_][autocomplete=on]' ) );
+		} )();
+	}
+
+	// User Organization JS
+	if( typeof( evo_user_organization_config ) != 'undefined' )
+	{
+		jQuery( document ).on( 'click', 'span[rel^=org_status_]', function()
+			{	// Change an accept status of organization
+				var this_obj = jQuery( this );
+				var params = evo_user_organization_config.params;
+
+				jQuery.ajax( {
+						type: 'POST',
+						url: htsrv_url + 'anon_async.php',
+						data: 'action=change_user_org_status&status=' + this_obj.attr( 'rel' ) + '&crumb_userorg=' + evo_user_organization_config.crumb_userorg + params,
+						success: function( result )
+						{
+							this_obj.after( ajax_debug_clear( result ) ).remove();
+						}
+					} );
+			} );
+	}
 } );

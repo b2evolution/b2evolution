@@ -5802,29 +5802,14 @@ function echo_user_organization_js()
 	{	// Check this min permission, because even owner of one organization can accept it:
 		return;
 	}
-?>
-<script>
-jQuery( document ).on( 'click', 'span[rel^=org_status_]', function()
-{ // Change an accept status of organization
-	var this_obj = jQuery( this );
-	var params = '<?php
-		global $b2evo_icons_type;
-		echo empty( $b2evo_icons_type ) ? '' : '&b2evo_icons_type='.$b2evo_icons_type;
-	?>';
 
-	jQuery.ajax(
-	{
-		type: 'POST',
-		url: '<?php echo get_htsrv_url(); ?>anon_async.php',
-		data: 'action=change_user_org_status&status=' + this_obj.attr( 'rel' ) + '&crumb_userorg=<?php echo get_crumb( 'userorg' ); ?>' + params,
-		success: function( result )
-		{
-			this_obj.after( ajax_debug_clear( result ) ).remove();
-		}
-	} );
-} );
-</script>
-<?php
+	global $b2evo_icons_type;
+	$user_organization_config = array(
+			'params' => empty( $b2evo_icons_type ) ? '' : '&b2evo_icons_type='.$b2evo_icons_type,
+			'crumb_userorg' => get_crumb( 'userorg' ),
+		);
+
+	expose_var_to_js( 'evo_user_organization_config', evo_json_encode( $user_organization_config ) );
 }
 
 
