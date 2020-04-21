@@ -488,45 +488,9 @@ if( $Results->total_rows > 0 )
 	$Form->end_form();
 	$Form->switch_layout( NULL );
 
-?>
-<script>
-jQuery( '#send_selected_recipients' ).click( function()
-{ // Add selected users to this link
-	var recipients_param = '';
-	var recipients = get_selected_users();
-	if( recipients.length > 0 )
-	{
-		recipients_param = '&recipients=' + recipients;
-	}
-	location.href = '<?php echo str_replace( '&amp;', '&', $module_contacts_list_params['recipients_link'] ); ?>' + recipients_param;
-	return false;
-} );
-
-jQuery( '#add_group_contacts' ).submit( function()
-{
-	jQuery( 'input[name=users]' ).val( get_selected_users() );
-} );
-
-function get_selected_users()
-{
-	var users = '';
-	jQuery( 'input[name^=contacts]' ).each( function()
-	{
-		if( jQuery( this ).is( ':checked' ) )
-		{
-			users += jQuery( this ).val() + ',';
-		}
-	} );
-
-	if( users.length > 0 )
-	{ // Delete last comma
-		users = users.substr( 0, users.length-1 );
-	}
-
-	return users;
+	$contact_list_view_config = array(
+			'recipients_link_url' => str_replace( '&amp;', '&', $module_contacts_list_params['recipients_link'] ),
+		);
+	expose_var_to_js( 'evo_contact_list_view_config', evo_json_encode( $contact_list_view_config ) );
 }
-</script>
-<?php
-}
-
 ?>

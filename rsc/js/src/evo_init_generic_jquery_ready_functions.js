@@ -424,4 +424,46 @@ jQuery( document ).ready( function()
 			}
 		} )();
 	}
+
+	// Contact List view
+	if( typeof( evo_contact_list_view_config ) != 'undefined' )
+	{
+		window.get_selected_users = function get_selected_users()
+			{
+				var users = '';
+				jQuery( 'input[name^=contacts]' ).each( function()
+				{
+					if( jQuery( this ).is( ':checked' ) )
+					{
+						users += jQuery( this ).val() + ',';
+					}
+				} );
+
+				if( users.length > 0 )
+				{	// Delete last comma
+					users = users.substr( 0, users.length-1 );
+				}
+
+				return users;
+			};
+
+		jQuery( '#send_selected_recipients' ).click( function()
+			{	// Add selected users to this link
+				var recipients_param = '';
+				var recipients = window.get_selected_users();
+				if( recipients.length > 0 )
+				{
+					recipients_param = '&recipients=' + recipients;
+				}
+
+				location.href = evo_contact_list_view_config.recipients_link_url + recipients_param;
+				
+				return false;
+			} );
+
+		jQuery( '#add_group_contacts' ).submit( function()
+			{
+				jQuery( 'input[name=users]' ).val( window.get_selected_users() );
+			} );
+	}
 } );
