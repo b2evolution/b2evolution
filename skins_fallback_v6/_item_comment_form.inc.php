@@ -410,14 +410,32 @@ function validateCommentForm(form)
 	// Set canvas object for plugins:
 	echo '<script>var '.$plugin_js_prefix.'b2evoCanvas = document.getElementById( "'.$content_id.'" );</script>';
 
+	if( $Item->can_attach( false, $Comment->type ) )
+	{	// If current user has permission to attach files for the item:
+		load_class( 'links/model/_linkcomment.class.php', 'LinkComment' );
+
+		// Create $LinkComment to generate temporary link owner ID for the $Comment:
+		$LinkOwner = new LinkComment( $Comment, $Comment->temp_link_owner_ID );
+
+		if( empty( $Comment->temp_link_owner_ID ) )
+		{	// Set Comment temp_link_owner_ID:
+			$Comment->temp_link_owner_ID = $LinkOwner->get_ID();
+		}
+	}
+
 	// CALL PLUGINS NOW:
 	ob_start();
-	$Plugins->trigger_event( 'AdminDisplayEditorButton', array(
-		'target_type'   => 'Comment',
-		'target_object' => $Comment,
-		'content_id'    => $content_id,
-		'edit_layout'   => 'inskin',
-	) );
+	$admin_editor_params = array(
+			'target_type'   => 'Comment',
+			'target_object' => $Comment,
+			'content_id'    => $content_id,
+			'edit_layout'   => 'inskin',
+		);
+	if( isset( $LinkOwner) && $LinkOwner->is_temp() )
+	{
+		$admin_editor_params['temp_ID'] = $LinkOwner->get_ID();
+	}
+	$Plugins->trigger_event( 'AdminDisplayEditorButton', $admin_editor_params );
 	$quick_setting_switch = ob_get_flush();
 
 	$comment_options = array();

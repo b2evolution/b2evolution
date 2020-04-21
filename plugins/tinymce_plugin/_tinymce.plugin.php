@@ -424,6 +424,7 @@ class tinymce_plugin extends Plugin
 				$edited_Item = & $edited_Comment->get_Item();
 				$this->target_type = 'Comment';
 				$this->target_ID = $edited_Comment->ID;
+				$this->temp_ID = $params['temp_ID'];
 
 				if( ! empty( $Blog ) && ! $Blog->get_setting( 'allow_html_comment' ) )
 				{	// Only when HTML is allowed in comment:

@@ -1445,7 +1445,11 @@ switch( $action )
 
 			case 'Comment':
 				$CommentCache = & get_CommentCache();
-				$edited_Comment = $CommentCache->get_by_ID( $target_ID );
+				$edited_Comment = $CommentCache->get_by_ID( $target_ID, false, false );
+				if( ! $edited_Comment )
+				{
+					$edited_Comment = new Comment();
+				}
 				$rendered_tags = render_inline_tags( $edited_Comment, $tags, $params );
 				break;
 
