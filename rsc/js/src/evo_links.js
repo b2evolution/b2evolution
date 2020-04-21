@@ -344,6 +344,10 @@ function evo_link_refresh_list( type, object_ID, action, fieldset_prefix )
 {
 	var prefix = typeof( fieldset_prefix ) == 'undefined' ? '' : fieldset_prefix;
 	var ajax_loading = evo_link_ajax_loading_overlay( prefix );
+	if( typeof( action ) == 'undefined' )
+	{
+		action = 'refresh';
+	}
 
 	if( ajax_loading )
 	{	// If new request is allowed in current time:
@@ -351,7 +355,7 @@ function evo_link_refresh_list( type, object_ID, action, fieldset_prefix )
 		// Call REST API request to attach a file to Item/Comment:
 		evo_rest_api_request( 'links',
 		{
-			'action':    typeof( action ) == 'undefined' ? 'refresh' : 'sort',
+			'action':    action,
 			'type':      type.toLowerCase(),
 			'object_ID': object_ID,
 			'prefix':    prefix,
