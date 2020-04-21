@@ -2370,32 +2370,32 @@ function create_default_templates( $is_task = true )
 		'content_list_with_thumbnail' => array(
 			'name'     => 'Content List with Thumbnail',
 			'context'  => 'content_list_master',
-			'template' => '[set:before_list=<ul class="evo_thumbnail_content_block">]
+			'template' => '[set:before_list=<ul class="evo_list_with_thumbnail">]
 [set:after_list=</ul>]
 [set:item_template=content_list_with_thumbnail_item|              // Sub-template for displaying items]
-[set:evo_thumbnail_image__size=crop-80x80|              // Image size for old browsers]',
+[set:evo_thumbnail_image__size=crop-80x80|              // Image size for displaying image]',
 		),
 
 		'content_list_with_thumbnail_item' => array(
 			'name'     => 'Content List with Thumbnail: Item',
 			'context'  => 'content_list_item',
 			'template' => '<li>
-		<div class="thumb_item_first_image">
+		<div class="first_image">
 			[Item:images|
 				restrict_to_image_position=#cover_and_teaser_all| // Priority to cover image, fall back to any teaser image
 				limit=1|	                                      // Max 1 images
-				image_size=$evo_thumbnail_image__size$|                // Size for old browsers
-				image_sizes=$evo_thumbnail_image__sizes$|	          // RWD thumbnail Sizes for modern browsers
-				image_link_to=|	                                  // Do NOT link to anything
-				placeholder=#file_custom_icon|	                  // If no image available, display text file icon
+				image_size=$evo_thumbnail_image__size$|                
+				image_link_to=single|	                                  // Link to item details
+				placeholder=#file_thumbnail_text_icon|	                  // If no image available, display text file icon
 			]
 		</div>
-		<div class="thumbnail_item_title">
+		<div class="item_title">
 			[Item:permalink|text=#title|class=default]
 		</div>
-		<div class="thumbnail_item_content">
+		<div class="item_content">
 			<p>[Item:excerpt|
 							excerpt_more_text=| // No "more" link
+							max_words=20| // how many words we will display
 			]
 			</p> 
 			[Item:permalink|text=...|class=btn btn-default|title=] 

@@ -12596,6 +12596,12 @@ function upgrade_b2evo_tables( $upgrade_action = 'evoupgrade' )
 		db_modify_col( 'T_widget__container', 'wico_skin_type', 'ENUM( "normal", "mobile", "tablet", "alt" ) COLLATE ascii_general_ci NOT NULL DEFAULT "normal"' );
 		upg_task_end();
 	}
+	
+	if( upg_task_start( 16020, 'Dummy upgrade block, just to force execution of the upgrade procedure to insert new template "Content List with Thumbnail"..' ) )
+	{	// part of 7.1.3-beta
+		upg_task_end();
+		
+	}
 
 	/*
 	 * ADD UPGRADES __ABOVE__ IN A NEW UPGRADE BLOCK.

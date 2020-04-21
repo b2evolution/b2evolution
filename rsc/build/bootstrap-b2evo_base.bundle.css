@@ -3036,6 +3036,98 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   bottom: 0;
   margin: 0 !important;
 }
+.evo_list_with_thumbnail {
+  padding: 0;
+  margin-left: 0;
+}
+.evo_list_with_thumbnail li {
+  height: auto;
+  width: 100%;
+  clear: both;
+  margin: 15px 0;
+  padding: 0;
+  vertical-align: middle;
+  list-style: none;
+  display: table;
+}
+.evo_list_with_thumbnail img {
+  border-radius: 3px;
+  max-width: 100%;
+  max-height: 380px;
+  width: auto;
+  height: auto;
+  margin: auto;
+}
+.evo_list_with_thumbnail a.btn {
+  background-color: transparent;
+  float: right;
+  height: 22px;
+  line-height: 13px;
+  padding: 0 4px 0 4px;
+}
+.evo_list_with_thumbnail a.btn:hover {
+  background-color: #e6e6e6;
+}
+.evo_list_with_thumbnail .item_title {
+  vertical-align: middle;
+  display: inline;
+  height: auto !important;
+  width: 100%;
+  font-size: 16px;
+}
+.evo_list_with_thumbnail .item_title a {
+  text-decoration: underline;
+}
+.evo_list_with_thumbnail .first_image {
+  float: left;
+  margin-right: 6px;
+  text-align: center;
+}
+.evo_list_with_thumbnail .first_image img {
+  border-radius: 3px;
+  max-width: 100%;
+  max-height: 380px;
+  width: auto;
+  height: auto;
+  margin: auto;
+}
+.evo_list_with_thumbnail .first_image figure {
+  margin: 0em;
+}
+.evo_list_with_thumbnail .first_image .first_image_placeholder::before {
+  font-family: FontAwesome;
+  display: table-cell;
+  content: '\f0f6';
+  color: #dcdcdc;
+  font-size: 40px;
+  vertical-align: middle;
+  text-align: center;
+}
+.evo_list_with_thumbnail .first_image .first_image_placeholder {
+  display: table;
+  float: left;
+  max-width: 380px;
+  max-height: 380px;
+  background: #f0f0f0;
+  margin-right: 6px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+}
+.evo_list_with_thumbnail .item_content a {
+  color: #000000;
+}
+.evo_list_with_thumbnail .item_content > p:last-of-type {
+  margin: 0 !important;
+  display: inline;
+}
+@media only screen and (min-width: 641px) {
+  .evo_list_with_thumbnail .item_content a {
+    color: inherit;
+  }
+}
 .ratings_table {
   margin: 0 10px 10px 0;
   display: inline-block;
@@ -4314,142 +4406,6 @@ div.evo_fileuploader_form {
 }
 .evo_widget.widget_core_basic_menu_link img {
   margin-top: -2px;
-}
-.evo_layout_rwd .evo_thumbnail_content_block img {
-  border-radius: 3px;
-  max-width: 100%;
-  max-height: 380px;
-  width: auto;
-  height: auto;
-  margin: auto;
-}
-.evo_layout_rwd .evo_thumbnail_content_block a.btn {
-  background-color: transparent;
-  float: right;
-  height: 22px;
-  line-height: 13px;
-  padding: 0 4px 0 4px;
-}
-.evo_layout_rwd .evo_thumbnail_content_block .evo_thumbnail_contents {
-  padding: 8px;
-  margin: 14px 0;
-  overflow: hidden;
-  background-color: #fafafa;
-  border-radius: 4px;
-}
-.evo_layout_rwd .evo_thumbnail_content_block .evo_thumbnail_contents .thumbnail_item_title {
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.5em;
-  margin: 10px 0 5px;
-}
-.evo_layout_rwd .evo_thumbnail_content_block .evo_thumbnail_contents .thumb_item_first_image img {
-  width: 100%;
-  height: 240px;
-  object-fit: cover;
-  margin: auto;
-}
-.evo_layout_rwd .evo_thumbnail_content_block .evo_thumbnail_contents .thumb_item_first_image figure {
-  margin: 0em;
-}
-.evo_layout_rwd .evo_thumbnail_content_block .evo_thumbnail_contents .thumbnail_item_content > p:last-of-type {
-  min-height: 60px;
-  margin-bottom: 0px;
-}
-.evo_layout_rwd .evo_thumbnail_content_block .evo_thumbnail_contents .thumbnail_item_content a {
-  margin: -20px 0 0;
-}
-.evo_layout_list .evo_thumbnail_content_block {
-  padding: 0;
-  margin-left: 0;
-}
-.evo_layout_list .evo_thumbnail_content_block li {
-  height: auto;
-  width: 100%;
-  clear: both;
-  margin: 15px 0;
-  padding: 0;
-  vertical-align: middle;
-  list-style: none;
-  display: table;
-}
-.evo_layout_list .evo_thumbnail_content_block img {
-  border-radius: 3px;
-  max-width: 100%;
-  max-height: 380px;
-  width: auto;
-  height: auto;
-  margin: auto;
-}
-.evo_layout_list .evo_thumbnail_content_block a.btn {
-  background-color: transparent;
-  float: right;
-  height: 22px;
-  line-height: 13px;
-  padding: 0 4px 0 4px;
-}
-.evo_layout_list .evo_thumbnail_content_block a.btn:hover {
-  background-color: #e6e6e6;
-}
-.evo_layout_list .evo_thumbnail_content_block .thumbnail_item_title {
-  vertical-align: middle;
-  display: inline;
-  height: auto !important;
-  width: 100%;
-  font-size: 16px;
-}
-.evo_layout_list .evo_thumbnail_content_block .thumbnail_item_title a {
-  text-decoration: underline;
-}
-.evo_layout_list .evo_thumbnail_content_block .thumb_item_first_image {
-  float: left;
-  margin-right: 6px;
-  text-align: center;
-}
-.evo_layout_list .evo_thumbnail_content_block .thumb_item_first_image img {
-  border-radius: 3px;
-  max-width: 100%;
-  max-height: 380px;
-  width: auto;
-  height: auto;
-  margin: auto;
-}
-.evo_layout_list .evo_thumbnail_content_block .thumb_item_first_image figure {
-  margin: 0em;
-}
-.evo_layout_list .evo_thumbnail_content_block .thumb_item_first_image .thumbnail_item_first_image_placeholder::before {
-  font-family: FontAwesome;
-  display: table-cell;
-  content: '\f0f6';
-  color: #dcdcdc;
-  font-size: 40px;
-  vertical-align: middle;
-  text-align: center;
-}
-.evo_layout_list .evo_thumbnail_content_block .thumb_item_first_image .thumbnail_item_first_image_placeholder {
-  display: table;
-  float: left;
-  max-width: 380px;
-  max-height: 380px;
-  background: #f0f0f0;
-  margin-right: 6px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
-  border-radius: 3px;
-}
-.evo_layout_list .evo_thumbnail_content_block .thumbnail_item_content a {
-  color: #000000;
-}
-.evo_layout_list .evo_thumbnail_content_block .thumbnail_item_content > p:last-of-type {
-  margin: 0 !important;
-  display: inline;
-}
-@media only screen and (min-width: 641px) {
-  .evo_layout_list .evo_thumbnail_content_block .thumbnail_item_content a {
-    color: #FFFFFF;
-  }
 }
 
 /**

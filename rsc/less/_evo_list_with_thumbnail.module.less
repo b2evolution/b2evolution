@@ -1,0 +1,104 @@
+// Styles for "evo list with tumbnail" module
+// This module is designed to be used in many templates and any widgets 
+.evo_list_with_thumbnail {
+	padding: 0;
+	margin-left: 0;
+	li {
+		height: auto;
+		width: 100%;
+		clear: both;
+		margin: 15px 0;
+		padding: 0;
+		vertical-align: middle;
+		list-style: none;
+		display: table;
+	}
+	img {
+		border-radius: 3px;
+		max-width: 100%;
+		max-height: 380px;
+		width: auto;
+		height: auto;
+		margin: auto;
+	}
+	a.btn {
+		background-color: transparent;
+		float: right;
+		height: 22px;
+		line-height: 13px;
+		padding: 0 4px 0 4px;
+	}
+	a.btn:hover {
+		background-color: #e6e6e6;
+	}
+	.item_title {
+		vertical-align: middle;
+		display: inline;
+		height: auto !important;
+		width: 100%;
+		font-size: 16px;
+		a {
+			text-decoration: underline;
+		}
+	}
+	.first_image {
+		img {
+			border-radius: 3px;
+			max-width: 100%;
+			max-height: 380px;
+			width: auto;
+			height: auto;
+			margin: auto;
+		}
+		figure {
+			margin: 0em;
+		}
+		float: left;
+		margin-right: 6px;
+		text-align: center; 
+		.first_image_placeholder::before {
+			font-family: FontAwesome;
+			display: table-cell;
+			content: '\f0f6';
+			color: #dcdcdc;
+			font-size: 40px;
+			vertical-align: middle;
+			text-align: center;
+		}
+		.first_image_placeholder {
+			display: table;
+			float: left;
+			max-width: 380px;
+			max-height: 380px;
+			background: #f0f0f0;
+			margin-right: 6px;
+			-webkit-border-radius: 3px;
+			-moz-border-radius: 3px;
+			-ms-border-radius: 3px;
+			-o-border-radius: 3px;
+			border-radius: 3px;
+		}
+	}
+	.item_content {
+		a {
+			color: #000000;
+		}
+		> p:last-of-type {
+			margin: 0 !important;
+			display: inline;
+		}
+	}
+
+}
+
+// Responsive screen:
+@media only screen and (min-width: 641px) {
+	.evo_list_with_thumbnail {
+		.item_content {
+			a {
+				color: inherit;
+			}
+		}
+
+	}
+}
