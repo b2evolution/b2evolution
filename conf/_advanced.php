@@ -608,6 +608,15 @@ $upgrade_subdir = '_upgrade/';              // Subdirectory relative to base
 $upgrade_path = $basepath.$upgrade_subdir;  // You should not need to change this
 
 
+/*
+ * Change to true if you want to be able to install arbitrary ZIP files on the server.
+ * ATTENTION: this poses a security risk if the admin password is compromised.
+ *
+ * @global boolean $auto_upgrade_from_any_url
+ */
+$auto_upgrade_from_any_url = false;
+
+
 /**
  * Do you want to allow public access to the media dir?
  *
