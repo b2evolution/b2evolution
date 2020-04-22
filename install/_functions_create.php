@@ -2373,6 +2373,7 @@ function create_default_templates( $is_task = true )
 			'template' => '[set:before_list=<ul class="evo_list_with_thumbnail">]
 [set:after_list=</ul>]
 [set:item_template=content_list_with_thumbnail_item|              // Sub-template for displaying items]
+[set:evo_list_with_thumbnail_image__modifiers=|                    // Modifier classes for each thumbnail image]
 [set:evo_thumbnail_image__size=crop-80x80|              // Image size for displaying image]',
 		),
 
@@ -2380,7 +2381,7 @@ function create_default_templates( $is_task = true )
 			'name'     => 'Content List with Thumbnail: Item',
 			'context'  => 'content_list_item',
 			'template' => '<li>
-		<div class="first_image">
+		<div class="evo_list_with_thumbnail__image [echo:evo_list_with_thumbnail_image__modifiers]">
 			[Item:images|
 				restrict_to_image_position=#cover_and_teaser_all| // Priority to cover image, fall back to any teaser image
 				limit=1|	                                      // Max 1 images
@@ -2389,16 +2390,16 @@ function create_default_templates( $is_task = true )
 				placeholder=#file_thumbnail_text_icon|	                  // If no image available, display text file icon
 			]
 		</div>
-		<div class="item_title">
+		<div class="evo_list_with_thumbnail__title">
 			[Item:permalink|text=#title|class=default]
 		</div>
-		<div class="item_content">
+		<div class="evo_list_with_thumbnail__body">
 			<p>[Item:excerpt|
-							excerpt_more_text=| // No "more" link
+							excerpt_no_more_link=| // No "more" link
 							max_words=20| // how many words we will display
 			]
 			</p> 
-			[Item:permalink|text=...|class=btn btn-default|title=] 
+			[Item:permalink|text=...|class=btn btn-default  evo_list_with_thumbnail__button evo_list_with_thumbnail__button__transparent|title=]
 		</div>
 </li>',
 		)

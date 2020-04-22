@@ -13,35 +13,10 @@
 		list-style: none;
 		display: table;
 	}
-	img {
-		border-radius: 3px;
-		max-width: 100%;
-		max-height: 380px;
-		width: auto;
-		height: auto;
-		margin: auto;
-	}
-	a.btn {
-		background-color: transparent;
-		float: right;
-		height: 22px;
-		line-height: 13px;
-		padding: 0 4px 0 4px;
-	}
-	a.btn:hover {
-		background-color: #e6e6e6;
-	}
-	.item_title {
-		vertical-align: middle;
-		display: inline;
-		height: auto !important;
-		width: 100%;
-		font-size: 16px;
-		a {
-			text-decoration: underline;
-		}
-	}
-	.first_image {
+	&__image {
+		float: left;
+		margin-right: 6px;
+		text-align: center; 
 		img {
 			border-radius: 3px;
 			max-width: 100%;
@@ -53,34 +28,41 @@
 		figure {
 			margin: 0em;
 		}
+	}
+	&__placeholder::before {
+		font-family: FontAwesome;
+		display: table-cell;
+		content: '\f0f6';
+		color: #dcdcdc;
+		font-size: 40px;
+		vertical-align: middle;
+		text-align: center;
+	}
+	&__placeholder {
+		display: table;
 		float: left;
+		max-width: 380px;
+		max-height: 380px;
+		background: #f0f0f0;
 		margin-right: 6px;
-		text-align: center; 
-		.first_image_placeholder::before {
-			font-family: FontAwesome;
-			display: table-cell;
-			content: '\f0f6';
-			color: #dcdcdc;
-			font-size: 40px;
-			vertical-align: middle;
-			text-align: center;
-		}
-		.first_image_placeholder {
-			display: table;
-			float: left;
-			max-width: 380px;
-			max-height: 380px;
-			background: #f0f0f0;
-			margin-right: 6px;
-			-webkit-border-radius: 3px;
-			-moz-border-radius: 3px;
-			-ms-border-radius: 3px;
-			-o-border-radius: 3px;
-			border-radius: 3px;
+		-webkit-border-radius: 3px;
+		-moz-border-radius: 3px;
+		-ms-border-radius: 3px;
+		-o-border-radius: 3px;
+		border-radius: 3px;
+	}
+	&__title {
+		vertical-align: middle;
+		display: inline;
+		height: auto !important;
+		width: 100%;
+		font-size: 16px;
+		a {
+			text-decoration: underline;
 		}
 	}
-	.item_content {
-		a {
+	&__body {  
+		> a {
 			color: #000000;
 		}
 		> p:last-of-type {
@@ -88,17 +70,28 @@
 			display: inline;
 		}
 	}
-
+	&__button {
+		float: right;
+		height: 22px;
+		line-height: 13px;
+		padding: 0 4px 0 4px;
+		// modifier
+		&__transparent {
+			background-color: transparent;
+		}
+		&__transparent:hover {
+			background-color: #e6e6e6;
+		}
+	}
 }
 
 // Responsive screen:
 @media only screen and (min-width: 641px) {
 	.evo_list_with_thumbnail {
-		.item_content {
+		&__body {
 			a {
 				color: inherit;
 			}
 		}
-
 	}
 }
