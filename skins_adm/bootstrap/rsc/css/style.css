@@ -901,17 +901,6 @@ form#FilesForm {
 #fm_bar form {
   margin-bottom: 0;
 }
-ul#uploadfileinputs {
-  list-style: none;
-  margin-left: 0;
-}
-ul#uploadfileinputs label {
-  display: inline;
-}
-ul#uploadfileinputs li {
-  border-bottom: 1px solid #DDD;
-  padding: 10px 0;
-}
 div.evo_fileuploader_form {
   padding: 5px;
   height: 65px;
@@ -932,10 +921,6 @@ tr.evo_fileuploader_form td {
 }
 .file_browser .panel-body #fm_browser tr td:last-child {
   border-right: none;
-}
-.file_browser .upload_title {
-  font-weight: bold;
-  font-size: 120%;
 }
 .file_browser .form-group {
   margin-bottom: 10px;

@@ -584,7 +584,7 @@ class tinymce_plugin extends Plugin
 						'use_tinymce'        => $this->get_editor_state( $state_params ),
 						'tmce_init'          => $tmce_init,
 						'display_erro_msg'   => sprintf( $this->T_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'), $this->T_('URL to TinyMCE') ),
-						'update_content_url' => $this->get_htsrv_url( 'update_content', array(), '&' )
+						'update_content_url' => $this->get_htsrv_url( 'convert_content_to_wysiwyg', array(), '&' )
 					);
 				expose_var_to_js( 'evo_plugin_tinymce_config__init', evo_json_encode( $tinymce_init_config ) );
 
@@ -1163,11 +1163,11 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * AJAX callback to update content for WYSIWYG mode
+	 * AJAX callback to convert content for WYSIWYG mode
 	 *
 	 * @param array Params
 	 */
-	function htsrv_update_content( $params )
+	function htsrv_convert_content_to_wysiwyg( $params )
 	{
 		global $Plugins;
 
@@ -1195,7 +1195,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function GetHtsrvMethods()
 	{
-		return array( 'save_editor_state', 'save_wysiwyg_warning_state', 'insert_inline'/*, 'get_item_content_css'*/, 'update_content' );
+		return array( 'save_editor_state', 'save_wysiwyg_warning_state', 'insert_inline'/*, 'get_item_content_css'*/, 'convert_content_to_wysiwyg' );
 	}
 
 

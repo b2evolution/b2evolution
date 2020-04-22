@@ -1276,18 +1276,6 @@ function file_controller_build_tabs()
 					)
 				);
 
-	if( $current_User->check_perm( 'files', 'add', false, $blog ? $blog : NULL ) )
-	{ // Permission to upload: (no subtabs needed otherwise)
-		$AdminUI->add_menu_entries(
-				'files',
-				array(
-						'upload' => array(
-							'text' => /* TRANS: verb */ T_('Advanced Upload'),
-							'href' => $admin_url.'?ctrl=upload' ),
-					)
-			);
-	}
-
 	if( $current_User->check_perm( 'options', 'view' ) )
 	{	// Permission to view settings:
 		$AdminUI->add_menu_entries(
