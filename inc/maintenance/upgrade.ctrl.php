@@ -266,6 +266,15 @@ switch( $action )
 		param_check_not_empty( 'upd_url', TB_('Please enter the URL to download ZIP archive') );
 		// Check the download url for correct http, https, ftp URI
 		$success = param_check_url( 'upd_url', 'download_src', NULL );
+
+		if( $success &&
+		    ! $auto_upgrade_from_any_url &&
+		    ! url_check_same_domain( 'http://b2evolution.net', $download_url ) )
+		{	// Allow to upgrade only from 
+			param_error( 'upd_url', sprintf( T_( 'Auto upgrade is allowed only from domain %s.' ), '<code>b2evolution.net</code>' ) );
+			$success = false;
+		}
+
 		if( $success && ! preg_match( '#\.zip$#i', $download_url ) )
 		{ // Check the download url is a .zip or .ZIP
 			param_error( 'upd_url', sprintf( TB_('The URL "%s" must point to a ZIP archive.'), $download_url ) );
