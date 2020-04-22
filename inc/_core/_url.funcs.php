@@ -1090,28 +1090,55 @@ function url_check_same_domain( $main_url, $check_url )
 
 
 /**
- * Check redirect URL if it is a part of any URL in content
+ * Check redirect URL if it is a part of redirect URLs in email log content
  *
  * Used to check redirect_to URLs from email message
  *
  * @param string Redirect URL
- * @param string Content
- * @return boolean TRUE if 
+ * @param string Email log content, NULL - if we need to get email log message from DB by email log ID and key
+ * @param string Email log ID
+ * @param string Email log key
+ * @return boolean TRUE if the requested URL can be used as redirect URL for the email log
  */
-function check_redirect_url_by_content( $redirect_to, $content )
+function check_redirect_url_by_email_log( $redirect_to, $email_log_message = NULL, $email_log_ID = NULL, $email_log_key = NULL )
 {
-	if( empty( $redirect_to ) || empty( $content ) )
-	{	// Nothing to check:
+	global $baseurl;
+
+	if( empty( $redirect_to ) )
+	{	// No URL to check:
 		return false;
 	}
 
-	if( strpos( $content, 'redirect_to='.rawurlencode( $redirect_to ) ) !== false )
+	if( stripos( $redirect_to, $baseurl ) === 0 )
+	{	// Allow redirect url if it is started with same domain as base url:
+		return true;
+	}
+
+	if( $email_log_message === NULL &&
+	    ! empty( $email_log_ID ) &&
+	    ! empty( $email_log_key ) )
+	{	// Try to get email log message from DB if it is not provided yet:
+		global $DB;
+		$SQL = new SQL( 'Get message of email log #'.$email_log_ID.' to check redirect url' );
+		$SQL->SELECT( 'emlog_message' );
+		$SQL->FROM( 'T_email__log' );
+		$SQL->WHERE( 'emlog_ID = '.$DB->quote( $email_log_ID ) );
+		$SQL->WHERE_and( 'emlog_key = '.$DB->quote( $email_log_key ) );
+		$email_log_message = $DB->get_var( $SQL );
+	}
+
+	if( empty( $email_log_message ) )
+	{	// Email log message is not provided and not found in DB:
+		return false;
+	}
+
+	if( strpos( $email_log_message, 'redirect_to='.rawurlencode( $redirect_to ) ) !== false )
 	{	// Allow to use found the requested redirect URL from provided content:
 		return true;
 	}
 
 	// Additional check for case when URLs are encoded to html entities:
-	if( strpos( $content, 'redirect_to='.rawurlencode( str_replace( '&', '&amp;', $redirect_to ) ) ) !== false )
+	if( strpos( $email_log_message, 'redirect_to='.rawurlencode( str_replace( '&', '&amp;', $redirect_to ) ) ) !== false )
 	{	// Allow to use found the requested redirect URL from provided content:
 		return true;
 	}
