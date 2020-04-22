@@ -58,11 +58,6 @@ if( isset( $edited_User ) )
 <?php
 	$Widget = new Widget( 'file_browser' );
 
-	if( ! $ajax_request && $current_User->check_perm( 'files', 'add', false, $fm_FileRoot ) )
-	{
-		$Widget->global_icon( /* TRANS: verb */ T_('Advanced Upload').'...', '', regenerate_url( 'ctrl', 'ctrl=upload' ), /* TRANS: verb */ T_('Advanced Upload').' &raquo;', 1, 5 );
-	}
-
 	$close_link_params = array();
 	if( $ajax_request )
 	{ // Initialize JavaScript functions to work with modal window:
