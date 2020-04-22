@@ -626,7 +626,7 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   text-decoration: underline;
 }
 .evo_list_with_thumbnail__body > a {
-  color: #000000;
+  color: inherit;
 }
 .evo_list_with_thumbnail__body > p:last-of-type {
   margin: 0 !important;
@@ -643,11 +643,6 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 }
 .evo_list_with_thumbnail__button__transparent:hover {
   background-color: #e6e6e6;
-}
-@media only screen and (min-width: 641px) {
-  .evo_list_with_thumbnail__body a {
-    color: inherit;
-  }
 }
 .ratings_table {
   margin: 0 10px 10px 0;
