@@ -807,7 +807,7 @@ class tinymce_plugin extends Plugin
 									jQuery.ajax(
 									{
 										type: 'POST',
-										url: '<?php echo $this->get_htsrv_url( 'update_content', array(), '&' ); ?>',
+										url: '<?php echo $this->get_htsrv_url( 'convert_content_to_wysiwyg', array(), '&' ); ?>',
 										data:
 										{
 											'content': textarea.val(),
@@ -1394,11 +1394,11 @@ class tinymce_plugin extends Plugin
 
 
 	/**
-	 * AJAX callback to update content for WYSIWYG mode
+	 * AJAX callback to convert content for WYSIWYG mode
 	 *
 	 * @param array Params
 	 */
-	function htsrv_update_content( $params )
+	function htsrv_convert_content_to_wysiwyg( $params )
 	{
 		global $Plugins;
 
@@ -1426,7 +1426,7 @@ class tinymce_plugin extends Plugin
 	 */
 	function GetHtsrvMethods()
 	{
-		return array( 'save_editor_state', 'save_wysiwyg_warning_state', 'insert_inline'/*, 'get_item_content_css'*/, 'update_content' );
+		return array( 'save_editor_state', 'save_wysiwyg_warning_state', 'insert_inline'/*, 'get_item_content_css'*/, 'convert_content_to_wysiwyg' );
 	}
 
 
