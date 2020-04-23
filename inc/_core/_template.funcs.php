@@ -347,6 +347,43 @@ function header_redirect( $redirect_to = NULL, $status = false, $redirected_post
 }
 
 
+/**
+ * Redirect to URL with additional checking from email log
+ *
+ * @param string Redirect URL
+ * @param integer Header response status code: 301, 302, 303
+ * @param string Email log content, NULL - if we need to get email log message from DB by email log ID and key
+ * @param string Email log ID
+ * @param string Email log key
+ */
+function header_redirect_from_email( $redirect_to, $status = false, $email_log_message = NULL, $email_log_ID = NULL, $email_log_key = NULL )
+{
+	global $baseurl;
+
+	if( empty( $redirect_to ) )
+	{	// Use base site URL for redirect if it is not provided:
+		$redirect_to = $baseurl;
+	}
+
+	// 1) Try to redirect if it is allowed by config $allow_redirects_to_different_domain,
+	// (Use $return_to_caller_if_forbidden = true in order to return false without redirect)
+	$redirect_result = header_redirect( $redirect_to, $status, false, true );
+	// May be EXITed here!
+
+	// 2) Otherwise(when $redirect_result === false) use additional checking by email log:
+	if( ! check_redirect_url_by_email_log( $redirect_to, $email_log_message, $email_log_ID, $email_log_key ) )
+	{	// Deny redirect to URL what is not found in the email message:
+		$redirect_to = $baseurl;
+	}
+
+	// Campaign author explicitly wanted to link to an external URL:
+	// Use php function header() instead of b2evolution core function header_redirect(),
+	// because we already used it above to redirect and it can prevent redirection depending
+	// on some advanced settings like $allow_redirects_to_different_domain!
+	header( 'Location: '.$redirect_to, true, $status ); // explictly setting the status is required for (fast)cgi
+	exit(0);
+}
+
 
 /**
  * Sends HTTP headers to avoid caching of the page at the browser level

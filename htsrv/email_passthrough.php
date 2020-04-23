@@ -208,15 +208,7 @@ switch( $type )
 
 		// Use message of already loaded email log above, otherwise set empty string in order to don't execute SQL query twice:
 		$email_log_message = ( isset( $email_log['emlog_message'] ) ? $email_log['emlog_message'] : '' );
-		if( ! check_redirect_url_by_email_log( $redirect_to, $email_log_message ) )
-		{	// Deny redirect to URL what is not found in the email message:
-			$redirect_to = $baseurl;
-		}
-
-		// header_redirect can prevent redirection depending on some advanced settings like $allow_redirects_to_different_domain!
-		// header_redirect( $redirect_to, 303 ); // Will EXIT
-		header( 'Location: '.$redirect_to, true, 303 ); // explictly setting the status is required for (fast)cgi
-		exit(0);
+		header_redirect_from_email( $redirect_to, 303, $email_log_message );
 		// We have EXITed already at this point!!
 		break;
 
@@ -225,17 +217,8 @@ switch( $type )
 		update_mail_log_time( 'open', $email_ID, $email_key );
 
 		if( ! empty( $redirect_to ) )
-		{
-			if( ! check_redirect_url_by_email_log( $redirect_to, NULL, $email_ID, $email_key ) )
-			{	// Deny redirect to URL what is not found in the email message:
-				$redirect_to = $baseurl;
-			}
-
-			// Redirect
-			// header_redirect can prevent redirection depending on some advanced settings like $allow_redirects_to_different_domain!
-			//header_redirect( $redirect_to, 302 ); // Will EXIT
-			header( 'Location: '.$redirect_to, true, 302 ); // explictly setting the status is required for (fast)cgi
-			exit(0);
+		{	// Do redirect only when URL is provided:
+			header_redirect_from_email( $redirect_to, 302, NULL, $email_ID, $email_key );
 			// We have EXITed already at this point!!
 		}
 		break;
