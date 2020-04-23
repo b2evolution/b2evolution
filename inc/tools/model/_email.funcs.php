@@ -906,7 +906,7 @@ function & get_Swift_SmtpTransport()
 	}
 
 	// Load Swift Mailer functions:
-	load_funcs( '_ext/swift/swift_required.php' );
+	load_funcs( '_ext/swift/vendor/autoload.php' );
 
 	$smtp_server_host = $Settings->get( 'smtp_server_host' );
 	$smtp_server_port = $Settings->get( 'smtp_server_port' );
@@ -915,7 +915,7 @@ function & get_Swift_SmtpTransport()
 	$smtp_server_password = $Settings->get( 'smtp_server_password' );
 
 	// Create the Transport:
-	$Swift_SmtpTransport = Swift_SmtpTransport::newInstance( $smtp_server_host, $smtp_server_port );
+	$Swift_SmtpTransport = new Swift_SmtpTransport( $smtp_server_host, $smtp_server_port );
 	if( $smtp_server_security == 'ssl' || $smtp_server_security == 'tls' )
 	{	// Set encryption:
 		$Swift_SmtpTransport->setEncryption( $smtp_server_security );
@@ -961,7 +961,7 @@ function & get_Swift_Mailer()
 
 	if( $connection_result === true )
 	{ // Create the Mailer using the created Transport
-		$Swift_Mailer = Swift_Mailer::newInstance( $Swift_SmtpTransport );
+		$Swift_Mailer = new Swift_Mailer( $Swift_SmtpTransport );
 	}
 	else
 	{ // Some errors on SMTP connection
@@ -1088,7 +1088,7 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array() )
 		$charset = ( isset( $headers['Content-Type'] ) && preg_match( '#charset=(.+)$#i', $headers['Content-Type'], $charset ) ) ? $charset[1] : NULL;
 
 		// Create a Swift_Message object
-		$Swift_Message = Swift_Message::newInstance();
+		$Swift_Message = new Swift_Message();
 		// Subject:
 		$Swift_Message->setSubject( $subject );
 		// To:
@@ -1122,7 +1122,7 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array() )
 					// HTML:
 				case 'text/plain':
 					// TEXT:
-					$Swift_Message->setBody( $message['full'], $content_type, $charset );
+					$Swift_Message->setBody( $message['full'], $content_type[0], $charset );
 					break;
 
 				default:
@@ -1154,7 +1154,8 @@ function evo_mail_smtp( $to, $subject, $message, $headers = array() )
 		}
 		if( ! empty( $headers['Date'] ) )
 		{ // Date:
-			$Swift_Message->setDate( is_string( $headers['Date'] ) ? strtotime( $headers['Date'] ) : $headers['Date'] );
+			$DateTime = new DateTime( is_string( $headers['Date'] ) ? $headers['Date'] : date( 'Y-m-d H:i:s', $headers['Date'] ) );
+			$Swift_Message->setDate( $DateTime );
 		}
 
 		// Send the message by SMTP transport:
