@@ -2432,16 +2432,10 @@ function echo_item_type_change_buttons( $edited_Item, $params = array() )
 	// JavaScript to set proper Item Type on press button:
 	// Note: We remove all attributes "required" at the press moment in order to avoid HTML5
 	//       restrictions on submit form and allow to change Item Type even with empty fields
-	echo '<script>
-jQuery( "button[data-item-type]" ).on( "click", function()
-{
-	jQuery( "[required]" ).removeAttr( "required" );
-	jQuery( "input[name=item_typ_ID]" ).val( jQuery( this ).data( "item-type" ) );
-	jQuery( this ).closest( "form" )
-		.append( "<input type=\"hidden\" name=\"action\" value=\"'.( empty( $edited_Item->ID ) ? 'new_item_type' : 'edit_item_type' ).'\">" )
-		.submit();
-} );
-</script>';
+	$js_config = array(
+			'action' =>  empty( $edited_Item->ID ) ? 'new_item_type' : 'edit_item_type',
+		);
+	expose_var_to_js( 'evo_item_type_change_buttons_config', evo_json_encode( $js_config ) );
 }
 
 

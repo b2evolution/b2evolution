@@ -760,4 +760,17 @@ jQuery( document ).ready( function()
 					} );
 			} );
 	}
+
+	// Item Type Change Buttons JS
+	if( typeof( evo_item_type_change_buttons_config ) != 'undefined' )
+	{
+		jQuery( "button[data-item-type]" ).on( "click", function()
+			{
+				jQuery( "[required]" ).removeAttr( "required" );
+				jQuery( "input[name=item_typ_ID]" ).val( jQuery( this ).data( "item-type" ) );
+				jQuery( this ).closest( "form" )
+					.append( '<input type="hidden" name="action" value="' + evo_item_type_change_buttons_config.action + '">' )
+					.submit();
+			} );
+	}
 } );
