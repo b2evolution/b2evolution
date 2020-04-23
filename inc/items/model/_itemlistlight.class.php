@@ -188,13 +188,13 @@ class ItemListLight extends DataObjectList2
 	function set_filters( $filters, $memorize = true, $use_previous_filters = false )
 	{
 		if( !empty( $filters ) )
-		{ // Activate the filterset (fallback to default filter when a value is not set):
+		{	// Activate the filterset (fallback to default filter when a value is not set):
 			if( $use_previous_filters )
-			{ // If $this->filters were activated before(e.g. on load from request), they can be saved here
+			{	// If $this->filters were activated before(e.g. on load from request), they can be saved here
 				$this->filters = array_merge( $this->default_filters, $this->filters, $filters );
 			}
 			else
-			{ // Don't use the filters from previous request
+			{	// Don't use the filters from previous request
 				$this->filters = array_merge( $this->default_filters, $filters );
 			}
 		}
@@ -221,7 +221,7 @@ class ItemListLight extends DataObjectList2
 			 */
 			// Get chapters/categories (and compile those values right away)
 			if( isset( $this->filters['cat_modifier'] ) )
-			{ // Update cat param with the cat modifier only if it was set explicitly, otherwise it may overwrite the global $cat variable
+			{	// Update cat param with the cat modifier only if it was set explicitly, otherwise it may overwrite the global $cat variable
 				memorize_param( 'cat', '/^[*\-]?([0-9]+(,[0-9]+)*)?$/', $this->default_filters['cat_modifier'], $this->filters['cat_modifier'] );  // Category modifier
 			}
 			memorize_param( 'catsel', 'array', $this->default_filters['cat_array'], $this->filters['cat_array'] );
@@ -610,7 +610,7 @@ class ItemListLight extends DataObjectList2
 		 * Filtering stuff:
 		 */
 		if( !is_null( $this->Blog ) )
-		{ // Get the posts only for current Blog
+		{	// Get the posts only for current Blog
 			$this->ItemQuery->where_chapter2( $this->Blog, $this->filters['cat_array'], $this->filters['cat_modifier'],
 																			$this->filters['cat_focus'], $this->filters['coll_IDs'] );
 		}
@@ -661,7 +661,7 @@ class ItemListLight extends DataObjectList2
 		}
 
 		if( isset( $this->filters['orderby'] ) && $this->filters['orderby'] == 'numviews' )
-		{ // Order by number of views
+		{	// Order by number of views
 			//$this->ItemQuery->FROM_add( 'LEFT JOIN ( SELECT itud_item_ID, COUNT(*) AS '.$this->Cache->dbprefix.'numviews FROM T_items__user_data GROUP BY itud_item_ID ) AS numviews
 			//		ON '.$this->Cache->dbIDname.' = numviews.itud_item_ID' );
 		}
@@ -679,7 +679,7 @@ class ItemListLight extends DataObjectList2
 		 * GET TOTAL ROW COUNT:
 		 */
 		if( $this->single_post )   // p or title
-		{ // Single post: no paging required!
+		{	// Single post: no paging required!
 			$this->total_rows = 1;
 			$this->total_pages = 1;
 			$this->page = 1;
@@ -695,16 +695,16 @@ class ItemListLight extends DataObjectList2
 			$this->page = 1;
 		}
 		elseif( $this->filters['unit'] == 'posts' )
-		{ // Calculate a count of the posts
+		{	// Calculate a count of the posts
 			if( $this->ItemQuery->get_group_by() == '' )
-			{ // SQL query without GROUP BY clause
+			{	// SQL query without GROUP BY clause
 				$sql_count = 'SELECT COUNT( DISTINCT '.$this->Cache->dbIDname.' )'
 					.$this->ItemQuery->get_from()
 					.$this->ItemQuery->get_where()
 					.$this->ItemQuery->get_limit();
 			}
 			else
-			{ // SQL query with GROUP BY clause, Summarize a count of each grouped result
+			{	// SQL query with GROUP BY clause, Summarize a count of each grouped result
 				$sql_count = 'SELECT SUM( cnt_tbl.cnt ) FROM (
 						SELECT COUNT( DISTINCT '.$this->Cache->dbIDname.' ) AS cnt '
 						.$this->ItemQuery->get_from()
@@ -726,12 +726,12 @@ class ItemListLight extends DataObjectList2
 		 * Paging LIMITs:
 		 */
 		if( $this->single_post )   // p or title
-		{ // Single post: no paging required!
+		{	// Single post: no paging required!
 		}
 		/*
 			fp> 2007-11-25 : a very high post count can now be configured in the admin for this. Default is 100.
 			elseif( !empty($this->filters['ymdhms']) )
-			{ // no restriction if we request a month... some permalinks may point to the archive!
+			{	// no restriction if we request a month... some permalinks may point to the archive!
 				// echo 'ARCHIVE - no limits';
 			}
 		*/
@@ -744,24 +744,24 @@ class ItemListLight extends DataObjectList2
 			// echo 'LIMIT POSTS ';
 			$pgstrt = '';
 			if( $this->page > 1 )
-			{ // We have requested a specific page number
+			{	// We have requested a specific page number
 				$pgstrt = (intval($this->page) -1) * $this->limit. ', ';
 			}
 			$this->ItemQuery->LIMIT( $pgstrt.$this->limit );
 		}
 		elseif( $this->filters['unit'] == 'days' )
-		{ // We are going to limit to x days:
+		{	// We are going to limit to x days:
 			// echo 'LIMIT DAYS ';
 			if( empty( $this->filters['ymdhms_min'] ) )
-			{ // We have no start date, we'll display the last x days:
+			{	// We have no start date, we'll display the last x days:
 				if( !empty($this->filters['keywords'])
 					|| !empty($this->filters['cat_array'])
 					|| !empty($this->filters['authors']) )
-				{ // We are in DAYS mode but we can't restrict on these! (TODO: ?)
+				{	// We are in DAYS mode but we can't restrict on these! (TODO: ?)
 					$limits = '';
 				}
 				else
-				{ // We are going to limit to LAST x days:
+				{	// We are going to limit to LAST x days:
 					$lastpostdate = $this->get_lastpostdate();
 					$lastpostdate = mysql2date('Y-m-d 00:00:00',$lastpostdate);
 					$lastpostdate = mysql2date('U',$lastpostdate);
@@ -771,7 +771,7 @@ class ItemListLight extends DataObjectList2
 				}
 			}
 			else
-			{ // We have a start date, we'll display x days starting from that point:
+			{	// We have a start date, we'll display x days starting from that point:
 				// $dstart_mysql has been calculated earlier
 
 				// TODO: this is redundant with previous dstart processing:
@@ -820,7 +820,7 @@ class ItemListLight extends DataObjectList2
 		global $DB;
 
 		if( !is_null( $this->rows ) )
-		{ // Query has already executed:
+		{	// Query has already executed:
 			return;
 		}
 
@@ -829,7 +829,7 @@ class ItemListLight extends DataObjectList2
 
 		// Check the number of totla rows after it was initialized in the query_init() function
 		if( isset( $this->total_rows ) && ( intval( $this->total_rows ) === 0 ) )
-		{ // Count query was already executed and returned 0
+		{	// Count query was already executed and returned 0
 			return;
 		}
 
@@ -1006,7 +1006,7 @@ class ItemListLight extends DataObjectList2
 			), $params );
 
 		if( empty( $this->filters ) )
-		{ // Filters have no been set before, we'll use the default filterset:
+		{	// Filters have no been set before, we'll use the default filterset:
 			// echo ' setting default filterset ';
 			$this->set_filters( $this->default_filters );
 		}
@@ -1014,7 +1014,7 @@ class ItemListLight extends DataObjectList2
 		$title_array = array();
 
 		if( $this->single_post )
-		{ // We have requested a specific post:
+		{	// We have requested a specific post:
 			// Should be in first position
 			$Item = & $this->get_by_idx( 0 );
 
@@ -1035,7 +1035,7 @@ class ItemListLight extends DataObjectList2
 		$filter_classes = array( 'green' );
 		$filter_class_i = 0;
 		if( strpos( $params['filter_mask'], '$filter_class$' ) !== false )
-		{ // Initialize array with available classes for filter items
+		{	// Initialize array with available classes for filter items
 			$filter_classes = array( 'green', 'yellow', 'orange', 'red', 'magenta', 'blue' );
 		}
 
@@ -1051,7 +1051,7 @@ class ItemListLight extends DataObjectList2
 
 			}
 			elseif( ! empty( $this->filters['cat_array'] ) )
-			{ // We have requested specific categories...
+			{	// We have requested specific categories...
 				$catlist = $this->filters['cat_array'];
 			}
 
@@ -1063,10 +1063,10 @@ class ItemListLight extends DataObjectList2
 				foreach( $catlist as $cat_ID )
 				{
 					if( ( $tmp_Chapter = & $ChapterCache->get_by_ID( $cat_ID, false ) ) !== false )
-					{ // It is almost never meaningful to die over an invalid cat when generating title
+					{	// It is almost never meaningful to die over an invalid cat when generating title
 						$cat_clear_url = regenerate_url( ( empty( $catsel_param ) ? 'cat=' : 'catsel=' ).$cat_ID );
 						if( in_array( $disp_detail, array( 'posts-cat', 'posts-topcat-intro', 'posts-topcat-nointro', 'posts-subcat-intro', 'posts-subcat-nointro' ) ) )
-						{ // Remove category url from $ReqPath when we use the cat url instead of cat ID
+						{	// Remove category url from $ReqPath when we use the cat url instead of cat ID
 							$cat_clear_url = str_replace( '/'.$tmp_Chapter->get_url_path(), '/', $cat_clear_url );
 						}
 						$cat_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', $cat_clear_url ) : '';
@@ -1077,21 +1077,21 @@ class ItemListLight extends DataObjectList2
 				}
 				$filter_class_i++;
 				if( $this->filters['cat_modifier'] == '*' )
-				{ // Categories with "AND" condition
+				{	// Categories with "AND" condition
 					$cat_names_string = implode( $params['separator_and'], $cat_names );
 				}
 				elseif( $this->filters['cat_modifier'] == '-' )
-				{ // Categories with "NOR" condition
+				{	// Categories with "NOR" condition
 					$cat_names_string = implode( $params['separator_nor'], $cat_names );
 				}
 				else
-				{ // Categories with "OR" condition
+				{	// Categories with "OR" condition
 					$cat_names_string = implode( $params['separator_or'], $cat_names );
 				}
 				if( ! empty( $cat_names_string ) )
 				{
 					if( $this->filters['cat_modifier'] == '-' )
-					{ // Categories with "NOR" condition
+					{	// Categories with "NOR" condition
 						$cat_names_string = $params['categories_nor_text'].$cat_names_string;
 						$params['category_text'] = $params['categories_text'];
 					}
@@ -1109,12 +1109,12 @@ class ItemListLight extends DataObjectList2
 		if( $params['display_archive'] )
 		{
 			if( ! empty( $this->filters['ymdhms'] ) )
-			{ // We have asked for a specific timeframe:
+			{	// We have asked for a specific timeframe:
 
 				$my_year = substr( $this->filters['ymdhms'], 0, 4 );
 
 				if( strlen( $this->filters['ymdhms'] ) > 4 )
-				{ // We have requested a month too:
+				{	// We have requested a month too:
 					$my_month = substr( $this->filters['ymdhms'], 4, 2 );
 					$my_month_string = T_( $month[ $my_month ] );
 				}
@@ -1130,12 +1130,13 @@ class ItemListLight extends DataObjectList2
 				$arch = $my_month_string.' '.$my_year;
 
 				if( ! empty( $my_day ) )
-				{ // We also want to display a day
+				{	// We also want to display a day
 					$arch .= ', '.$my_day;
+					$arch = date( locale_extdatefmt(), strtotime( implode( '-', array( $my_year, $my_month, $my_day ) ) ) );
 				}
 
 				if( ! empty( $this->filters['week'] ) || ( $this->filters['week'] === 0 ) ) // Note: week # can be 0
-				{ // We also want to display a week number
+				{	// We also want to display a week number
 					$arch .= ', '.T_('week').' '.$this->filters['week'];
 				}
 
@@ -1164,12 +1165,12 @@ class ItemListLight extends DataObjectList2
 			if( ! empty( $this->filters['keywords'] ) )
 			{
 				if( $this->filters['phrase'] == 'OR' || $this->filters['phrase'] == 'AND' )
-				{ // Search by each keyword
+				{	// Search by each keyword
 					$keywords = trim( preg_replace( '/("|, *)/', ' ', $this->filters['keywords'] ) );
 					$keywords = explode( ' ', $keywords );
 				}
 				else
-				{ // Exact match (Single keyword)
+				{	// Exact match (Single keyword)
 					$keywords = array( $this->filters['keywords'] );
 				}
 
@@ -1207,7 +1208,7 @@ class ItemListLight extends DataObjectList2
 				{
 					$tag_clear_url = regenerate_url( $this->param_prefix.'tag='.$tag );
 					if( $disp_detail == 'posts-tag-intro' || $disp_detail == 'posts-tag-nointro' )
-					{ // Remove tag url from $ReqPath when we use tag url instead of tag ID
+					{	// Remove tag url from $ReqPath when we use tag url instead of tag ID
 						$tag_clear_url = str_replace( '/'.$tag.':', '/', $tag_clear_url );
 					}
 					$tag_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', $tag_clear_url ) : '';
@@ -1234,7 +1235,7 @@ class ItemListLight extends DataObjectList2
 				$authors = trim( $this->filters['authors'].','.get_users_IDs_by_logins( $this->filters['authors_login'] ), ',' );
 				$exclude_authors = false;
 				if( substr( $authors, 0, 1 ) == '-' )
-				{ // Authors are excluded
+				{	// Authors are excluded
 					$authors = substr( $authors, 1 );
 					$exclude_authors = true;
 				}
@@ -1257,13 +1258,13 @@ class ItemListLight extends DataObjectList2
 					$filter_class_i++;
 				}
 				if( count( $author_names ) > 0 )
-				{ // Display info of filter by authors
+				{	// Display info of filter by authors
 					if( $exclude_authors )
-					{ // Exclude authors
+					{	// Exclude authors
 						$author_names_string = $params['authors_nor_text'].implode( $params['separator_nor'], $author_names );
 					}
 					else
-					{ // Filter by authors
+					{	// Filter by authors
 						$author_names_string = implode( $params['separator_comma'], $author_names );
 					}
 
@@ -1385,7 +1386,7 @@ class ItemListLight extends DataObjectList2
 			{
 				$post_statuses = get_visibility_statuses();
 				if( count( $this->filters['visibility_array'] ) != count( $post_statuses ) )
-				{ // Display it only when visibility filter is changed
+				{	// Display it only when visibility filter is changed
 					$status_titles = array();
 					$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
 					foreach( $this->filters['visibility_array'] as $status )
@@ -1463,10 +1464,13 @@ class ItemListLight extends DataObjectList2
 				{
 					if( $this->filters['ts_min'] == 'now' )
 					{
-						$time_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_future' ) ) : '';
-						$title_array['ts_min'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
-							array( T_('Hide past'), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
-							$params['filter_mask_nogroup'] );
+						if( ! in_array( 'hide_past', $ignore ) && ( $this->filters['ts_min'] != $this->default_filters['ts_min'] ) )
+						{
+							$time_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_future' ) ) : '';
+							$title_array['ts_min'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
+								array( T_('Hide past'), $time_clear_icon, $filter_classes[ $filter_class_i ] ),
+								$params['filter_mask_nogroup'] );
+						}
 					}
 					else
 					{
@@ -1495,7 +1499,7 @@ class ItemListLight extends DataObjectList2
 				{
 					if( $this->filters['ts_max'] == 'now' )
 					{
-						if( ! in_array( 'hide_future', $ignore ) )
+						if( ! in_array( 'hide_future', $ignore ) && ( $this->filters['ts_max'] != $this->default_filters['ts_max'] ) )
 						{
 							$time_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'show_past' ) ) : '';
 							$title_array['ts_max'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
@@ -1520,27 +1524,27 @@ class ItemListLight extends DataObjectList2
 		if( $params['display_limit'] )
 		{
 			if( $this->single_post )   // p or title
-			{ // Single post: no paging required!
+			{	// Single post: no paging required!
 			}
 			elseif( !empty($this->filters['ymdhms']) )
-			{ // no restriction if we request a month... some permalinks may point to the archive!
+			{	// no restriction if we request a month... some permalinks may point to the archive!
 			}
 			elseif( $this->filters['unit'] == 'posts' || $this->filters['unit'] == 'all' )
-			{ // We're going to page, so there's no real limit here...
+			{	// We're going to page, so there's no real limit here...
 			}
 			elseif( $this->filters['unit'] == 'days' )
-			{ // We are going to limit to x days:
+			{	// We are going to limit to x days:
 				// echo 'LIMIT DAYS ';
 				$filter_class_i = ( $filter_class_i > count( $filter_classes ) - 1 ) ? 0 : $filter_class_i;
 				if( empty( $this->filters['ymdhms_min'] ) )
-				{ // We have no start date, we'll display the last x days:
+				{	// We have no start date, we'll display the last x days:
 					if( !empty($this->filters['keywords'])
 						|| !empty($this->filters['cat_array'])
 						|| !empty($this->filters['authors']) )
-					{ // We are in DAYS mode but we can't restrict on these! (TODO: ?)
+					{	// We are in DAYS mode but we can't restrict on these! (TODO: ?)
 					}
 					else
-					{ // We are going to limit to LAST x days:
+					{	// We are going to limit to LAST x days:
 						// TODO: rename 'posts' to 'limit'
 						$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'unit' ) ) : '';
 						$title_array['posts'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
@@ -1549,7 +1553,7 @@ class ItemListLight extends DataObjectList2
 					}
 				}
 				else
-				{ // We have a start date, we'll display x days starting from that point:
+				{	// We have a start date, we'll display x days starting from that point:
 					$unit_clear_icon = $clear_icon ? action_icon( T_('Remove this filter'), 'remove', regenerate_url( $this->param_prefix.'unit' ) ) : '';
 					$title_array['posts'] = str_replace( array( '$filter_name$', '$clear_icon$', '$filter_class$' ),
 						array( sprintf( T_('Limited to %d days'), $this->limit ), $unit_clear_icon, $filter_classes[ $filter_class_i ] ),
@@ -1780,12 +1784,12 @@ class ItemListLight extends DataObjectList2
 					$this->advertised_stop_date = mktime( 0, 0, 0, substr($m,4,2), substr($m,6,2), substr($m,0,4) );
 				}
 				elseif( strlen( $this->filters['ymdhms'] ) == 6 )
-				{ // We want to go to the end of the month:
+				{	// We want to go to the end of the month:
 					$m = $this->filters['ymdhms'];
 					$this->advertised_stop_date = mktime( 0, 0, 0, substr($m,4,2)+1, 0, substr($m,0,4) ); // 0th day of next mont = last day of month
 				}
 				elseif( strlen( $this->filters['ymdhms'] ) == 4 )
-				{ // We want to go to the end of the year:
+				{	// We want to go to the end of the year:
 					$m = $this->filters['ymdhms'];
 					$this->advertised_stop_date = mktime( 0, 0, 0, 12, 31, substr($m,0,4) );
 				}
@@ -2296,7 +2300,7 @@ class ItemListLight extends DataObjectList2
 
 			$item_permanent_url = $disp_Item->get_permanent_url();
 			if( ! $params['disp_teaser'] && $item_permanent_url !== false )
-			{ // only display if there is no teaser to display
+			{	// only display if there is no teaser to display
 				$excerpt .= ' <a href="'.$item_permanent_url.'" class="'.$params['item_readmore_class'].'">'.$params['item_readmore_text'].'</a>';
 			}
 
@@ -2314,7 +2318,7 @@ class ItemListLight extends DataObjectList2
 			$content = $disp_Item->get_content_teaser( 1, false, 'htmlbody' );
 
 			if( $words = $params['disp_teaser_maxwords'] )
-			{ // limit number of words:
+			{	// limit number of words:
 
 				$content = strmaxwords( $content, $words, array(
 						'continued_link'  => $disp_Item->get_permanent_url(),
@@ -2436,7 +2440,7 @@ class ItemListLight extends DataObjectList2
 					if( ( $File = & $Link->get_File() ) && $File->is_image() )
 					{	// Get only images
 						if( $image_num < $params['start'] )
-						{ // Skip these first images
+						{	// Skip these first images
 							$image_num++;
 							continue;
 						}
