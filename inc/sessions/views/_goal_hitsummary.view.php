@@ -136,8 +136,8 @@ $Table->filter_area = array(
 	'callback' => 'filter_goal_hitsummary',
 	'url_ignore' => 'final,goal_name',
 	);
-$Results->register_filter_preset( 'all', T_('All'), '?ctrl=goals&amp;tab3=stats'.$section_params );
-$Results->register_filter_preset( 'final', T_('Final'), '?ctrl=goals&amp;tab3=stats&amp;final=1'.$section_params );
+$Table->register_filter_preset( 'all', T_('All'), '?ctrl=goals&amp;tab3=stats'.$section_params );
+$Table->register_filter_preset( 'final', T_('Final'), '?ctrl=goals&amp;tab3=stats&amp;final=1'.$section_params );
 
 
 global $AdminUI;
