@@ -4005,19 +4005,7 @@ function check_categories_nosave( & $post_category, & $post_extracats, $Item = N
  */
 function echo_onchange_newcat()
 {
-?>
-	<script>
-		jQuery( '#new_category_name' ).keypress( function()
-		{
-			var newcategory_radio = jQuery( '#sel_maincat_new' );
-			if( ! newcategory_radio.attr('checked') )
-			{
-				newcategory_radio.attr('checked', true);
-				jQuery( '#sel_extracat_new' ).attr('checked', true);
-			}
-		} );
-	</script>
-<?php
+	expose_var_to_js( 'evo_init_onchange_newcat', true );
 }
 
 /**

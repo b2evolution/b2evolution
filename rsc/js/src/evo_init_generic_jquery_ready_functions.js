@@ -824,4 +824,18 @@ jQuery( document ).ready( function()
 			} )();
 		}
 	}
+
+	// New Category Name Input: onChange
+	if( typeof( evo_init_onchange_newcat ) != 'undefined' )
+	{
+		jQuery( '#new_category_name' ).keypress( function()
+			{
+				var newcategory_radio = jQuery( '#sel_maincat_new' );
+				if( ! newcategory_radio.attr('checked') )
+				{
+					newcategory_radio.attr('checked', true);
+					jQuery( '#sel_extracat_new' ).attr('checked', true);
+				}
+			} );
+	}
 } );
