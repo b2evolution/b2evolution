@@ -179,6 +179,7 @@ function skin_init( $disp )
 		// CONTENT PAGES:
 		case 'single':
 		case 'page':
+		case 'widget_page':
 		case 'terms':
 			if( $disp == 'terms' && ! $Item )
 			{	// Wrong post ID for terms page:
