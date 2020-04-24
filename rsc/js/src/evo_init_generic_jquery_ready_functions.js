@@ -773,4 +773,55 @@ jQuery( document ).ready( function()
 					.submit();
 			} );
 	}
+
+	// Item/Comment Status Dropdown button JS
+	if( typeof( evo_status_dropdown_button_config ) != 'undefined' )
+	{
+		var evo_status_dropdown_button_configs = Object.values( evo_status_dropdown_button_config );
+		for( var i = 0; i < evo_status_dropdown_button_configs.length; i++ )
+		{
+			( function() {
+				var config = evo_status_dropdown_button_configs[i];
+				jQuery( '.' + config.type + '_status_dropdown li a' ).click( function()
+					{
+						var item_status_tooltips = config.tooltip_titles_js_array;
+						var item = jQuery( this ).parent();
+						var status = item.attr( 'rel' );
+						var btn_group = item.parent().parent();
+						var btn_wrapper = btn_group.parent().parent();
+						var dropdown_buttons = btn_group.find( 'button' );
+						var first_button = dropdown_buttons.parent().find( 'button:first' );
+						var save_buttons = btn_wrapper.find( 'input[type="submit"]:not(.quick-publish)' ).add( dropdown_buttons );
+
+						if( status == 'published' )
+						{	// Hide button "Publish!" if current status is already the "published":
+							btn_wrapper.find( '.quick-publish' ).hide();
+						}
+						else
+						{	// Show button "Publish!" only when another status is selected:
+							btn_wrapper.find( '.quick-publish' ).show();
+						}
+
+						save_buttons.each( function()
+							{	// Change status class name to new changed for all buttons
+								jQuery( this ).attr( 'class', jQuery( this ).attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
+							} );
+			
+						first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
+						jQuery( 'input[type=hidden][name=' + config.type + '_status]' ).val( status ); // update hidden field to new status value
+						btn_group.removeClass( 'open' ); // hide dropdown menu
+
+						if( first_button.attr( 'type' ) == 'submit' )
+						{	// Submit form if current dropdown button is used to submit form
+							first_button.click();
+						}
+
+						// Change tooltip based on selected status
+						btn_group.tooltip( 'hide' ).attr( 'data-original-title', item_status_tooltips[status] ).tooltip( 'show' );
+
+						return false;
+					} );
+			} )();
+		}
+	}
 } );

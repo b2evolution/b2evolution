@@ -2575,55 +2575,15 @@ function echo_status_dropdown_button_js( $type = 'post' )
 	$tooltip_titles_js_array = array();
 	foreach( $tooltip_titles as $status => $tooltip_title )
 	{
-		$tooltip_titles_js_array[] = $status.': \''.TS_( $tooltip_title ).'\'';
+		$tooltip_titles_js_array[$status] = TS_( $tooltip_title );
 	}
-	$tooltip_titles_js_array = implode( ', ', $tooltip_titles_js_array );
 
-	?>
-	<script>
-	jQuery( document ).ready( function()
-	{
-		jQuery( '.<?php echo $type; ?>_status_dropdown li a' ).click( function()
-		{
-			var item_status_tooltips = {<?php echo $tooltip_titles_js_array ?>};
-			var item = jQuery( this ).parent();
-			var status = item.attr( 'rel' );
-			var btn_group = item.parent().parent();
-			var btn_wrapper = btn_group.parent().parent();
-			var dropdown_buttons = btn_group.find( 'button' );
-			var first_button = dropdown_buttons.parent().find( 'button:first' );
-			var save_buttons = btn_wrapper.find( 'input[type="submit"]:not(.quick-publish)' ).add( dropdown_buttons );
+	$js_config = array(
+			'type' => $type,
+			'tooltip_titles_js_array' => $tooltip_titles_js_array,
+		);
 
-			if( status == 'published' )
-			{ // Hide button "Publish!" if current status is already the "published":
-				btn_wrapper.find( '.quick-publish' ).hide();
-			}
-			else
-			{ // Show button "Publish!" only when another status is selected:
-				btn_wrapper.find( '.quick-publish' ).show();
-			}
-
-			save_buttons.each( function()
-			{ // Change status class name to new changed for all buttons
-				jQuery( this ).attr( 'class', jQuery( this ).attr( 'class' ).replace( /btn-status-[^\s]+/, 'btn-status-' + status ) );
-			} );
-			first_button.find( 'span:first' ).html( item.find( 'span:last' ).html() ); // update selector button to status title
-			jQuery( 'input[type=hidden][name=<?php echo $type; ?>_status]' ).val( status ); // update hidden field to new status value
-			btn_group.removeClass( 'open' ); // hide dropdown menu
-
-			if( first_button.attr( 'type' ) == 'submit' )
-			{ // Submit form if current dropdown button is used to submit form
-				first_button.click();
-			}
-
-			// Change tooltip based on selected status
-			btn_group.tooltip( 'hide' ).attr( 'data-original-title', item_status_tooltips[status] ).tooltip( 'show' );
-
-			return false;
-		} );
-	} );
-	</script>
-	<?php
+	expose_var_to_js( 'evo_status_dropdown_button_'.$type, $js_config, 'evo_status_dropdown_button_config' );
 }
 
 

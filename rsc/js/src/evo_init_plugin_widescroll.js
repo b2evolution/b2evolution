@@ -68,7 +68,6 @@ jQuery( document ).ready( function()
 				};
 
 			// Render toolbar:
-			console.log( config.js_prefix + 'widescroll_toolbar' );
 			window[config.js_prefix + 'widescroll_toolbar']( config.toolbar_title + ': ' );
 		} )();
 	}
