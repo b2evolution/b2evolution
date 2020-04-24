@@ -413,6 +413,37 @@ jQuery( document ).ready( function()
 			} );
 	}
 
+	// Item Tags widget
+	if( typeof( evo_item_tags_widget_config ) != 'undefined' )
+	{
+		window.add_quick_tag = function ( input_ID, obj )
+			{
+				var item_tag = jQuery( obj ).text();
+				jQuery( '#item_tags_' + input_ID ).tokenInput( 'add', { id: item_tag, name: item_tag } );
+			};
+
+		window.init_edit_item_tags_icon = function ( widget_ID )
+			{
+				jQuery( '#evo_widget_item_tags_edit_icon_' + widget_ID ).click( function()
+					{
+						jQuery( '#evo_widget_item_tags_edit_form_' + widget_ID ).show();
+						jQuery( '#evo_widget_item_tags_edit_form_' + widget_ID ).focus();
+						jQuery( '#evo_widget_item_tags_list_' + widget_ID ).hide();
+						return false;
+					} );
+			};
+
+		var evo_temp_configs = Object.values( evo_item_tags_widget_config );
+		for( var i = 0; i < evo_temp_configs.length; i++ )
+		{
+			( function() {
+				var config = evo_temp_configs[i];
+				window.init_edit_item_tags_icon( config.widget_ID );
+			} )();
+		}
+		delete evo_temp_configs;
+	}
+
 	// Display attachments fieldset
 	if( typeof( evo_display_attachments_fieldset_config ) != 'undefined' )
 	{
@@ -837,5 +868,146 @@ jQuery( document ).ready( function()
 					jQuery( '#sel_extracat_new' ).attr('checked', true);
 				}
 			} );
+	}
+
+	// Autocomplete Tags JS
+	if( typeof( evo_autocomplete_tags_config ) != 'undefined' )
+	{
+		window.init_autocomplete_tags = function init_autocomplete_tags( selector, params )
+			{
+				if( ! params && window.evo_autocomplete_input_tag_configs[selector] )
+				{	// No params specified, use cached params:
+					params = window.evo_autocomplete_input_tag_configs[selector];
+				}
+
+				if( params )
+				{	// We have params we can use to initialize the autocomplete:
+					var tags = jQuery( selector ).val();
+					var tags_json = new Array();
+					if( tags && tags.length > 0 )
+					{	// Get tags from <input>
+						tags = tags.split( ',' );
+						for( var t in tags )
+						{
+							tags_json.push( { id: tags[t].trim(), name: tags[t].trim() } );
+						}
+						params.token_input_params.prePopulate = tags_json;
+					}
+					
+					if( params.update_by_ajax )
+					{	// Update the item tags by AJAX:
+						params.token_input_params.onAdd = function( obj )
+							{
+								if( params.use_quick_tags )
+								{
+									window.evo_update_item_quick_tags( obj );
+								}
+								window.evo_update_item_tags_by_ajax( params.item_ID, selector, obj, 'add' );
+							};
+						params.token_input_params.onDelete = function( obj )
+							{
+								window.evo_update_item_tags_by_ajax( params.item_ID, selector, obj, 'delete' );
+							};
+					}
+
+					jQuery( selector ).tokenInput( restapi_url + 'tags', params.token_input_params );
+				}
+			};
+
+		window.evo_update_item_quick_tags = function evo_update_item_quick_tags( tag_object )
+			{
+				var item_tag = tag_object.name.trim();
+				var quick_item_tags = jQuery.cookie( 'quick_item_tags' );
+
+				if( quick_item_tags == null || quick_item_tags.length == 0 )
+				{
+					quick_item_tags = [];
+				}
+				else
+				{
+					quick_item_tags = quick_item_tags.split( ',' );
+				}
+
+				var tag_index = quick_item_tags.indexOf( item_tag );
+
+				if( tag_index === -1 )
+				{
+					quick_item_tags.push( item_tag );
+				}
+				else
+				{
+					quick_item_tags.splice( tag_index, 1 );
+					quick_item_tags.push( item_tag );
+				}
+
+				quick_item_tags = quick_item_tags.splice( -5 );
+				jQuery.cookie( 'quick_item_tags', quick_item_tags.join( ',' ), {
+						domain: evo_autocomplete_tags_config.cookie_domain,
+						path: evo_autocomplete_tags_config.cookie_path,
+					} );
+			};
+
+		window.evo_update_item_tags_by_ajax = function evo_update_item_tags_by_ajax( item_ID, tags_selector, tag_object, operation, use_quick_tags )
+			{
+				// Mark input background with yellow color during AJAX updating:
+				var token_input = jQuery( '.token-input-' + tags_selector.substr( 1 ) );
+				token_input.removeClass( 'token-input-list-error' ).addClass( 'token-input-list-process' );
+				jQuery.ajax( {
+						type: 'POST',
+						url: htsrv_url + 'action.php',
+						data: {
+								'mname': 'collections',
+								'action': 'update_tags',
+								'item_ID': item_ID,
+								'item_tags': jQuery( tags_selector ).val(),
+								'crumb_collections_update_tags': evo_autocomplete_tags_config.crumb_collections_update_tags,
+							},
+						success: function()
+							{	// Remove yellow background from input after success AJAX updating:
+								token_input.removeClass( 'token-input-list-process' );
+							},
+						error: function()
+							{	// Mark input background with red color after fail AJAX updating:
+								token_input.removeClass( 'token-input-list-process' ).addClass( 'token-input-list-error' );
+							}
+					} );
+			};
+
+		// Initialize autocomplete input tags:
+		window.evo_autocomplete_input_tag_configs = {};
+		var evo_temp_config = Object.values( evo_autocomplete_input_tags_config );
+		for( var i = 0, n = evo_temp_config.length; i < n; i++ )
+		{
+			( function() {
+				var config = evo_temp_config[i];
+				var input_ID = '#' + config.input_ID;
+
+				// Cache configuration for later initialization, see "init_autocomplete_tags()":
+				window.evo_autocomplete_input_tag_configs[input_ID] = config;
+
+				if( jQuery( '#suggest_item_tags' ).length == 0 || jQuery( '#suggest_item_tags' ).is( ':checked' ) )
+				{
+					window.init_autocomplete_tags( input_ID, config );
+				}
+
+				jQuery( '#suggest_item_tags' ).click( function()
+					{
+						if( jQuery( this ).is( ':checked' ) )
+						{	// Use plugin to suggest tags
+							jQuery( input_ID ).hide();
+							window.init_autocomplete_tags( input_ID );
+						}
+						else
+						{	// Remove autocomplete tags plugin
+							jQuery( input_ID ).show();
+							jQuery( input_ID ).parent().find( 'ul.token-input-list-facebook' ).remove();
+						}
+					} );
+
+				// Don't submit form on keypress Enter when user is editing the tags:
+				evo_prevent_key_enter( '#token-input-' + config.input_ID );
+			} )();
+		}
+		delete evo_temp_config;
 	}
 } );

@@ -3493,134 +3493,38 @@ function echo_autocomplete_tags( $params = array() )
 			'update_by_ajax' => false,
 			'use_quick_tags' => false,
 		), $params );
-?>
-	<script>
-	function init_autocomplete_tags( selector )
-	{
-		var tags = jQuery( selector ).val();
-		var tags_json = new Array();
-		if( tags && tags.length > 0 )
-		{ // Get tags from <input>
-			tags = tags.split( ',' );
-			for( var t in tags )
-			{
-				tags_json.push( { id: tags[t].trim(), name: tags[t].trim() } );
-			}
-		}
 
-		jQuery( selector ).tokenInput( '<?php echo get_restapi_url().'tags' ?>',
-		{
-			theme: 'facebook',
-			queryParam: 's',
-			propertyToSearch: 'name',
-			tokenValue: 'name',
-			preventDuplicates: true,
-			prePopulate: tags_json,
-			hintText: '<?php echo TS_('Type in a tag') ?>',
-			noResultsText: '<?php echo TS_('No results') ?>',
-			searchingText: '<?php echo TS_('Searching...') ?>',
-			minInputWidth: 0,
-			jsonContainer: 'tags',
-			<?php if( $params['update_by_ajax'] ) { ?>
-			onAdd: function( obj ) { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector, obj, 'add' ) },
-			onDelete: function( obj ) { evo_update_item_tags_by_ajax( <?php echo $params['item_ID']; ?>, selector, obj, 'delete' ) },
-			<?php } ?>
-		} );
-	}
+	// Initialize only once:
+	$autocomplete_params = array(
+			'cookie_domain' => get_cookie_domain(),
+			'cookie_path'   => get_cookie_path(),
+			'crumb_collections_update_tags' => get_crumb( 'collections_update_tags' ),
+		);
+	expose_var_to_js( 'evo_autocomplete_tags_config', evo_json_encode( $autocomplete_params ) );
 
-	<?php if( $params['update_by_ajax'] ) { ?>
-	function evo_update_item_tags_by_ajax( item_ID, tags_selector, tag_object, operation )
-	{
-		<?php if( $params['use_quick_tags'] ) { ?>
-		// Update quick tags:
-		if( operation == 'add' )
-		{
-			var item_tag = tag_object.name.trim();
-			var quick_item_tags = jQuery.cookie( 'quick_item_tags' );
-			if( quick_item_tags == null || quick_item_tags.length == 0 )
-			{
-				quick_item_tags = [];
-			}
-			else
-			{
-				quick_item_tags = quick_item_tags.split( ',' );
-			}
-			var tag_index = quick_item_tags.indexOf( item_tag );
+	// Initialize per instance/call:
+	$autocomplete_input_params = array(
+			'input_ID'          => $params['input_ID'],
+			'item_ID'           => $params['item_ID'],
+			'update_by_ajax'    => $params['update_by_ajax'],
+			'use_quick_tags'    => $params['use_quick_tags'],
 
-			if( tag_index === -1 )
-			{
-				quick_item_tags.push( item_tag );
-			}
-			else
-			{
-				quick_item_tags.splice( tag_index, 1 );
-				quick_item_tags.push( item_tag );
-			}
-
-			quick_item_tags = quick_item_tags.splice( -5 );
-			jQuery.cookie( 'quick_item_tags', quick_item_tags.join( ',' ), {
-					domain: '<?php echo format_to_js( get_cookie_domain() );?>',
-					path: '<?php echo format_to_js( get_cookie_path() );?>'
-				} );
-		}
-
-		<?php } ?>
-		// Mark input background with yellow color during AJAX updating:
-		var token_input = jQuery( '.token-input-' + tags_selector.substr( 1 ) );
-		token_input.removeClass( 'token-input-list-error' ).addClass( 'token-input-list-process' );
-		jQuery.ajax(
-		{
-			type: 'POST',
-			url: '<?php echo get_htsrv_url(); ?>action.php',
-			data:
-			{
-				'mname': 'collections',
-				'action': 'update_tags',
-				'item_ID': item_ID,
-				'item_tags': jQuery( tags_selector ).val(),
-				'crumb_collections_update_tags': '<?php echo get_crumb( 'collections_update_tags' ); ?>'
-			},
-			success: function()
-			{	// Remove yellow background from input after success AJAX updating:
-				token_input.removeClass( 'token-input-list-process' );
-			},
-			error: function()
-			{	// Mark input background with red color after fail AJAX updating:
-				token_input.removeClass( 'token-input-list-process' ).addClass( 'token-input-list-error' );
-			}
-		} );
-	}
-	<?php } ?>
-
-	jQuery( document ).ready( function()
-	{
-		var input_ID = '<?php echo format_to_js( '#'.$params['input_ID'] );?>';
-
-		if( jQuery( '#suggest_item_tags' ).length == 0 || jQuery( '#suggest_item_tags' ).is( ':checked' ) )
-		{
-			init_autocomplete_tags( input_ID );
-		}
-
-		jQuery( '#suggest_item_tags' ).click( function()
-		{
-			if( jQuery( this ).is( ':checked' ) )
-			{ // Use plugin to suggest tags
-				jQuery( input_ID ).hide();
-				init_autocomplete_tags( input_ID );
-			}
-			else
-			{ // Remove autocomplete tags plugin
-				jQuery( input_ID ).show();
-				jQuery( input_ID ).parent().find( 'ul.token-input-list-facebook' ).remove();
-			}
-		} );
-		<?php
-			// Don't submit a form by Enter when user is editing the tags
-			echo get_prevent_key_enter_js( '#token-input-item_tags' );
-		?>
-	} );
-	</script>
-<?php
+			// Default token_input parameters:
+			'token_input_params' => array(
+					'theme'             => 'facebook',
+					'queryParam'        => 's',
+					'propertyToSearch'  => 'name',
+					'tokenValue'        => 'name',
+					'preventDuplicates' => true,
+					'prePopulate'       => NULL,
+					'hintText'          => T_('Type in a tag'),
+					'noResultsText'     => T_('No results'),
+					'searchingText'     => T_('Searching...'),
+					'minInputWidth'     => 0,
+					'jsonContainer'     => 'tags',
+				),
+		);
+	expose_var_to_js( $params['input_ID'], $autocomplete_input_params, 'evo_autocomplete_input_tags_config' );
 }
 
 
