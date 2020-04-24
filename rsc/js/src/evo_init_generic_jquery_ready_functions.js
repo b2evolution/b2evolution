@@ -422,12 +422,12 @@ jQuery( document ).ready( function()
 				jQuery( '#item_tags_' + input_ID ).tokenInput( 'add', { id: item_tag, name: item_tag } );
 			};
 
-		window.init_edit_item_tags_icon = function ( widget_ID )
+		window.init_edit_item_tags_icon = function ( input_ID, widget_ID )
 			{
 				jQuery( '#evo_widget_item_tags_edit_icon_' + widget_ID ).click( function()
 					{
 						jQuery( '#evo_widget_item_tags_edit_form_' + widget_ID ).show();
-						jQuery( '#evo_widget_item_tags_edit_form_' + widget_ID ).focus();
+						jQuery( 'input#token-input-' + input_ID, '#evo_widget_item_tags_edit_form_' + widget_ID ).focus();
 						jQuery( '#evo_widget_item_tags_list_' + widget_ID ).hide();
 						return false;
 					} );
@@ -438,7 +438,7 @@ jQuery( document ).ready( function()
 		{
 			( function() {
 				var config = evo_temp_configs[i];
-				window.init_edit_item_tags_icon( config.widget_ID );
+				window.init_edit_item_tags_icon( config.input_ID, config.widget_ID );
 			} )();
 		}
 		delete evo_temp_configs;

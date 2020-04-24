@@ -253,7 +253,10 @@ class item_tags_Widget extends ComponentWidget
 				.'</span>';
 			
 			// JS to activate an edit tags form:	
-			$js_config = array( 'widget_ID' => $this->ID );
+			$js_config = array(
+					'input_ID'  => 'item_tags_'.$this->ID,
+					'widget_ID' => $this->ID
+				);
 			expose_var_to_js( 'item_tags_widget_'.$this->ID, $js_config, 'evo_item_tags_widget_config' );
 		}
 
