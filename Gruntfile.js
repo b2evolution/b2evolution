@@ -294,6 +294,7 @@ module.exports = function(grunt) {
 					'rsc/js/src/evo_init_plugin_inlines.js',
 					'rsc/js/src/evo_init_plugin_markdown.js',
 					'rsc/js/src/evo_init_plugin_polls.js',
+					'rsc/js/src/evo_init_plugin_shortcodes.js',
 					'rsc/js/src/evo_init_editable_column.js',
 					'rsc/js/src/evo_init_regional.js',
 					'rsc/js/src/evo_comment_funcs.js',
