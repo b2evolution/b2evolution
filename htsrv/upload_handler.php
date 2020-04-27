@@ -199,6 +199,11 @@ class UploadHandler {
 			return array( 'error' => sprintf( T_('File has an invalid extension, it should be one of %s.'), $these ) );
 		}
 
+		if( empty( $_REQUEST['qquuid'] ) )
+		{	// Param qquuid must be passed:
+			return array( 'error' => 'Parameter "qquuid" is required!' );
+		}
+
 		// Save a chunk
 		$totalParts = isset( $_REQUEST['qqtotalparts'] ) ? ( int ) $_REQUEST['qqtotalparts'] : 1;
 		$uuid = $_REQUEST['qquuid'];
