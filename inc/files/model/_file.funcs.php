@@ -3079,7 +3079,7 @@ function check_perm_upload_files( $LinkOwner, $FileRoot, $assert = false )
 			debug_die( 'You have no permission to upload new files!' );
 		}
 		global $current_User;
-		return $current_User->check_perm( 'files', 'add', $assert, $FileRoot );
+		return is_logged_in() && $current_User->check_perm( 'files', 'add', $assert, $FileRoot );
 	}
 	else
 	{	// Check perm when we upload new files for the object like Item, Comment, Message or EmailCampaign:
