@@ -1094,6 +1094,7 @@ function search_result_block( $params = array() )
 	if( empty( $search_result ) )
 	{
 		echo $params['no_match_message'];
+		hide_spinner();
 		return;
 	}
 
@@ -1327,18 +1328,7 @@ function search_result_block( $params = array() )
 		search_page_links( $page_params );
 	}
 
-	?>
-	<script>
-	// Hide spinner:
-	( function() {
-		var search_spinner = document.querySelector( "#search_loader_wrapper" );
-		if( search_spinner )
-		{
-			search_spinner.classList.add( 'hide' );
-		}
-	} )();
-	</script>
-	<?php
+	hide_spinner();
 }
 
 
@@ -1877,4 +1867,24 @@ function display_search_debug_info( $search_result )
 
 		$Debuglog->add( sprintf('Result for [%s]: [Percentage:%d%%][Percentage score:%d][Total score:%d]', $score_map_key, $search_result[$index]['percentage'], $search_result[$index]['percentage_score'], $search_result[$index]['score']), 'info' );
 	}
+}
+
+
+/**
+ * Hide spinner
+ */
+function hide_spinner()
+{
+	?>
+	<script>
+	// Hide spinner:
+	( function() {
+		var search_spinner = document.querySelector( "#search_loader_wrapper" );
+		if( search_spinner )
+		{
+			search_spinner.classList.add( 'hide' );
+		}
+	} )();
+	</script>
+	<?php
 }
