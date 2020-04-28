@@ -1671,7 +1671,7 @@ function install_plugin_db_schema_action( & $Plugin, $force_install_db_deltas = 
 	global $inc_path, $install_db_deltas, $DB, $Messages;
 
 	// Prepare vars for DB layout changes
-	$install_db_deltas_confirm_md5 = param( 'install_db_deltas_confirm_md5' );
+	$install_db_deltas_confirm_md5 = param( 'install_db_deltas_confirm_md5', 'string' );
 
 	$db_layout = $Plugin->GetDbLayout();
 	$install_db_deltas = array(); // This holds changes to make, if any (just all queries)

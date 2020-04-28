@@ -1588,7 +1588,7 @@ switch( $action )
 
 
 		param( 'perms', 'array:integer', array() );
-		param( 'edit_perms_default' ); // default value when multiple files are selected
+		param( 'edit_perms_default', 'string' ); // default value when multiple files are selected
 		param( 'use_default_perms', 'array:string', array() ); // array of file IDs that should be set to default
 
 		if( count( $use_default_perms ) && $edit_perms_default === '' )

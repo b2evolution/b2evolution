@@ -599,7 +599,8 @@ class tinymce_plugin extends Plugin
 						'use_tinymce'        => $use_tinymce,
 						'tmce_init'          => $tmce_init,
 						'display_error_msg'  => sprintf( $this->T_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'), $this->T_('URL to TinyMCE') ),
-						'update_content_url' => $this->get_htsrv_url( 'convert_content_to_wysiwyg', array(), '&' )
+						'update_content_url' => $this->get_htsrv_url( 'convert_content_to_wysiwyg', array(), '&' ),
+						'crumb_tinymce'      => get_crumb( 'tinymce' ),
 					);
 				$tinymce_config['editor'] = $tinymce_init_config;
 
@@ -1194,7 +1195,10 @@ class tinymce_plugin extends Plugin
 	 */
 	function htsrv_convert_content_to_wysiwyg( $params )
 	{
-		global $Plugins;
+		global $Plugins, $Session;
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'tinymce' );
 
 		$content = param( 'content', 'raw' );
 

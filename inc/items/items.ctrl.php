@@ -2780,6 +2780,10 @@ function init_list_mode()
 	{	// Store/retrieve preferred tab from UserSettings:
 		$UserSettings->param_Request( 'tab', 'pref_browse_tab', 'string', NULL, true /* memorize */, true /* force */ );
 		$UserSettings->param_Request( 'tab_type', 'pref_browse_tab_type', 'string', NULL, true /* memorize */, true /* force */ );
+		if( ! in_array( $tab_type, array( 'post', 'page', 'intro', 'content-block', 'special' ) ) )
+		{	// Fix wrong requested type:
+			$tab_type = 'post';
+		}
 	}
 
 	if( $tab == 'tracker' && ( ! $Blog->get_setting( 'use_workflow' ) || ! $current_User->check_perm( 'blog_can_be_assignee', 'edit', false, $Blog->ID ) ) )
@@ -3449,7 +3453,7 @@ switch( $action )
 
 		$FileRootCache = & get_FileRootCache();
 		// getting root
-		$root = param("root");
+		$root = param( 'root', 'string' );
 		global $fm_FileRoot;
 		$fm_FileRoot = & $FileRootCache->get_by_ID($root, true);
 

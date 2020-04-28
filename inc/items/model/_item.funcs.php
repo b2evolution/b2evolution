@@ -521,7 +521,7 @@ function get_urltitle( $title, $locale = NULL )
 	// Leave only first 5 words in order to get a shorter URL
 	// (which is generally accepted as a better practice)
 	// User can manually enter a very long URL if he wants
-	$slug_changed = param( 'slug_changed' );
+	$slug_changed = param( 'slug_changed', 'integer' );
 	if( $slug_changed == 0 )
 	{ // this should only happen when the slug is auto generated
 		global $Collection, $Blog;
@@ -1959,6 +1959,30 @@ function get_item_type_usage_by_tab( $tab_name )
 	}
 
 	return $type_usages;
+}
+
+
+/**
+ * Get item type title by tab name
+ *
+ * @return string
+ */
+function get_item_type_title_by_tab( $tab_name )
+{
+	switch( $tab_name )
+	{
+		case 'page':
+			return T_('Pages');
+		case 'special':
+			return T_('Special');
+		case 'intro':
+			return T_('Intros');
+		case 'content-block':
+			return T_('Content Blocks');
+		case 'post':
+		default:
+			return T_('Posts');
+	}
 }
 
 

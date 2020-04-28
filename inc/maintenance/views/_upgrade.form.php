@@ -21,7 +21,7 @@ load_class( '_core/ui/_table.class.php', 'Table' );
  */
 global $action;
 
-global $updates, $upgrade_path, $admin_url;
+global $updates, $upgrade_path, $admin_url, $auto_upgrade_from_any_url;
 
 $Form = new Form( NULL, 'upgrade_form', 'post', 'compact' );
 
@@ -43,14 +43,20 @@ else
 	$Form->info( TB_('Description'), $update['description'] );
 	$Form->info( TB_('Version'), $update['version'] );
 
-	$Form->text_input( 'upd_url', ( get_param( 'upd_url' ) != '' ? get_param( 'upd_url' ) : $update['url'] ), 90,
-		TB_('URL'), '<br/><span class="note">'.TB_('You <i>might</i> replace this with a different URL in case you want to upgrade to a custom version.').'</span>',
-		array( 'maxlength' => 300, 'required' => true, 'class' => 'large' ) );
+	$buttons = array();
+	if( $auto_upgrade_from_any_url )
+	{	// Only when upgrade is allowed from URL:
+		$Form->text_input( 'upd_url', ( get_param( 'upd_url' ) != '' ? get_param( 'upd_url' ) : $update['url'] ), 90,
+			TB_('URL'), '<br/><span class="note">'.TB_('You <i>might</i> replace this with a different URL in case you want to upgrade to a custom version.').'</span>',
+			array( 'maxlength' => 300, 'required' => true, 'class' => 'large' ) );
 
-	$Form->add_crumb( 'upgrade_started' );
-	$Form->hiddens_by_key( get_memorized( 'action' ) );
+		$Form->add_crumb( 'upgrade_started' );
+		$Form->hiddens_by_key( get_memorized( 'action' ) );
 
-	$Form->end_form( array( array( 'submit', 'actionArray[download]', TB_('Continue'), 'SaveButton' ) ) );
+		$buttons[] = array( 'submit', 'actionArray[download]', TB_('Continue'), 'SaveButton' );
+	}
+
+	$Form->end_form( $buttons );
 }
 
 // Display a list of already downloaded packages:

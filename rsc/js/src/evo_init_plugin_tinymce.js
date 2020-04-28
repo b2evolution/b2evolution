@@ -322,6 +322,7 @@ jQuery( document ).ready( function()
 											data:
 												{
 													'content': textarea.val(),
+													'crumb_tinymce': config.editor.crumb_tinymce,
 												},
 											success: function( result )
 												{
