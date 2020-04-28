@@ -55,7 +55,7 @@ class ParamFuncsTestCase extends EvoUnitTestCase
 
 	function test_defaults()
 	{
-		$this->assertIdentical( param( 'test1' ), '' );
+		$this->assertIdentical( param( 'test1', 'raw' ), '' );
 		$this->assertIdentical( param( 'test1', 'string', NULL ), '' ); // set from first call
 
 		$this->assertIdentical( param( 'test2', 'string', NULL ), NULL );
