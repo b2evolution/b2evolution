@@ -508,20 +508,26 @@ class tinymce_plugin extends Plugin
 				return false;
 		}
 
+		// JS config:
+		$tinymce_config = array(
+			'content_id'  => $params['content_id'],
+			'plugin_code' => $this->code,
+		);
+
 		// Toggle switch configuration for JS function "toggle_switch_warning()":
 		$toggle_switch_warning_config = array(
-				'activate_link' => $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ),
+				'activate_link'   => $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ),
 				'deactivate_link' => $this->get_htsrv_url( 'save_wysiwyg_warning_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' ),
 			);
-		expose_var_to_js( 'evo_plugin_tinymce_config__toggle_switch_warning', evo_json_encode( $toggle_switch_warning_config ) );
+		$tinymce_config['toggle_switch_warning'] = $toggle_switch_warning_config;
 
 		switch( $params['edit_layout'] )
 		{
 			case 'expert_quicksettings':
 				$params = array_merge( array(
-						'quicksetting_item_id' => 'quicksetting_wysiwyg_switch',
+						'quicksetting_item_id'    => 'quicksetting_wysiwyg_switch',
 						'quicksetting_item_start' => '<span id="%quicksetting_id%">',
-						'quicksetting_item_end' => '</span>'
+						'quicksetting_item_end'   => '</span>'
 					), $params );
 
 				$params['quicksetting_item_start'] = str_replace( '%quicksetting_id%', $params['quicksetting_item_id'], $params['quicksetting_item_start'] );
@@ -534,12 +540,26 @@ class tinymce_plugin extends Plugin
 				echo $params['quicksetting_item_end'];
 
 				$quicksettings_config = array(
-						'item_id' => $params['quicksetting_item_id'],
-						'activate_warning_link' => $activate_warning_link,
+						'item_id'                 => $params['quicksetting_item_id'],
+						'activate_warning_link'   => $activate_warning_link,
 						'deactivate_warning_link' => $deactivate_warning_link,
 					);
+				$tinymce_config['expert_quicksettings'] = $quicksettings_config;
 
-				expose_var_to_js( 'evo_plugin_tinymce_config__quicksettings', evo_json_encode( $quicksettings_config ) );
+				if( is_ajax_request() )
+				{
+					?>
+					<script>
+					jQuery( document ).ready( function() {
+							evo_init_tinymce( <?php echo evo_json_encode( $tinymce_config ); ?> );
+						} );
+					</script>
+					<?php
+				}
+				else
+				{
+					expose_var_to_js( 'tinymce_quicksettings_'.$params['content_id'], $tinymce_config, 'evo_tinymce_config' );
+				}
 
 				return true;
 
@@ -548,22 +568,19 @@ class tinymce_plugin extends Plugin
 				$tmce_init = $this->get_tmce_init( $params['edit_layout'], $params['content_id'], $params['target_type'] );
 
 				$toggle_editor_config = array(
-						'plugin_code'            => $this->code,
-						'content_id'             => $params['content_id'],
 						'display_warning'        => ( is_null( $show_wysiwyg_warning ) || $show_wysiwyg_warning ),
 						'save_state_html_url'    => $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 0 ) ), '&' ),
 						'save_state_wysiwyg_url' => $this->get_htsrv_url( 'save_editor_state', array_merge( $state_params, array( 'on' => 1 ) ), '&' ),
 						'toggle_warning_msg'     => T_('By switching to WYSIWYG, you might lose newline and paragraph marks as well as some other formatting. Your text is safe though! Are you sure you want to switch?'),
 						'warning_text'           => T_('WARNING'),
 						'wysiwyg_checkbox_label' => $wysiwyg_checkbox_label,
-						'ok_btn_label'           => T_('OK'),
-						'cancel_btn_label'       => T_('Cancel'),
+						'btn_label_ok'           => T_('OK'),
+						'btn_label_cancel'       => T_('Cancel'),
 					);
-
-				expose_var_to_js( 'evo_plugin_tinymce_config__toggle_editor', evo_json_encode( $toggle_editor_config ) );
+				$tinymce_config['toggle_editor'] = $toggle_editor_config;
 				?>
 
-				<div class="btn-group evo_tinymce_toggle_buttons">
+				<div class="btn-group evo_tinymce_toggle_buttons" data-content-id="<?php echo format_to_output( $params['content_id'], 'htmlattr' ); ?>">
 					<input id="tinymce_plugin_toggle_button_html" type="button" value="<?php echo format_to_output( $this->T_('Markup'), 'htmlattr' ); ?>" class="btn btn-default active" disabled="disabled"
 						title="<?php echo format_to_output( $this->T_('Toggle to the markup/pro editor.'), 'htmlattr' ); ?>" />
 					<input id="tinymce_plugin_toggle_button_wysiwyg" type="button" value="WYSIWYG" class="btn btn-default"
@@ -572,34 +589,42 @@ class tinymce_plugin extends Plugin
 
 				<?php
 				// Load TinyMCE Javascript source file:
-				// This cannot be done through AJAX, since there appear to be scope problems on init then (TinyMCE problem?! - "u not defined").
-				// Anyway, not using AJAX to fetch the file makes it more cachable anyway.
 				require_js_defer( '#tinymce#', 'blog', true );
 				require_js_defer( '#tinymce_jquery#', 'blog', true );
 				$this->require_js_defer( 'js/evo_view_shortcodes.bmin.js', true );
 
-				$tinymce_init_config = array(
-						'content_id'         => $params['content_id'],
-						'code_editor'        => $this->code,
-						'use_tinymce'        => $this->get_editor_state( $state_params ),
-						'tmce_init'          => $tmce_init,
-						'display_erro_msg'   => sprintf( $this->T_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'), $this->T_('URL to TinyMCE') ),
-						'update_content_url' => $this->get_htsrv_url( 'convert_content_to_wysiwyg', array(), '&' )
-					);
-				expose_var_to_js( 'evo_plugin_tinymce_config__init', evo_json_encode( $tinymce_init_config ) );
-
 				$use_tinymce = $this->get_editor_state( $state_params );
 
-				$editor_code = 'html';
+				$tinymce_init_config = array(
+						'use_tinymce'        => $use_tinymce,
+						'tmce_init'          => $tmce_init,
+						'display_error_msg'  => sprintf( $this->T_('TinyMCE javascript could not be loaded. Check the "%s" plugin setting.'), $this->T_('URL to TinyMCE') ),
+						'update_content_url' => $this->get_htsrv_url( 'convert_content_to_wysiwyg', array(), '&' )
+					);
+				$tinymce_config['editor'] = $tinymce_init_config;
+
 				if( $use_tinymce )
-				{ // User used MCE last time, load MCE on document.ready:
+				{	// User used MCE last time, load MCE on document.ready:
 					$editor_code = $this->code;
-					expose_var_to_js( 'evo_plugin_tinymce_config__use_content_id', evo_json_encode( array( 'content_id' => $params['content_id'] ) ) );
 				}
+
 				// By default set the editor code to an empty string
-				//echo '<input type="hidden" name="editor_code" value="">';
-				// If the JS is enabled set the editor code to the currently used value
-				//expose_var_to_js( 'evo_plugin_tinymce_config__use_editor_code', evo_json_encode( array( 'editor_code' => $editor_code ) ) );
+				echo '<input type="hidden" name="editor_code" value="">';
+
+				if( is_ajax_request() )
+				{
+					?>
+					<script>
+					jQuery( document ).ready( function() {
+							evo_init_tinymce( <?php echo evo_json_encode( $tinymce_config ); ?> );
+						} );
+					</script>
+					<?php
+				}
+				else
+				{
+					expose_var_to_js( 'tinymce_'.$params['content_id'], $tinymce_config, 'evo_tinymce_config' );
+				}
 
 				// We also want to save the 'last used/not-used' state: (if no NULLs, this won't change anything)
 				$this->htsrv_save_editor_state( array_merge( $state_params, array( 'on' => $use_tinymce ) ) );
@@ -926,8 +951,8 @@ class tinymce_plugin extends Plugin
 		$init_options['entity_encoding'] = 'raw';
 
 		// Autocomplete options:
-		$init_options['autocomplete_options'] = 'autocomplete_static_options'; // Must be initialize before as string with usernames that are separated by comma
-		$init_options['autocomplete_options_url'] = 'restapi_url + "users/autocomplete"';
+		$init_options['autocomplete_options'] = 'window.tinymce_autocomplete_static_options'; // Must be initialize before as string with usernames that are separated by comma
+		$init_options['autocomplete_options_url'] = get_restapi_url().'users/autocomplete';
 
 		// remove_linebreaks : false,
 		// not documented:	auto_cleanup_word : true,

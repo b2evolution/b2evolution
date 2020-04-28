@@ -96,71 +96,73 @@ jQuery( document ).ready( function()
 			( function() {
 				var config = evo_ajax_forms[i];
 
-				window['ajax_form_offset_' + config['form_number']] = jQuery( '#ajax_form_number_' + config['form_number'] ).offset().top;
-				window['request_sent_' + config['form_number']] = false;
-				window['ajax_form_loading_number_' + config['form_number']] = 0;
+				window['ajax_form_offset_' + config.form_number]         = jQuery( '#ajax_form_number_' + config.form_number ).offset().top;
+				window['request_sent_' + config.form_number]             = false;
+				window['ajax_form_loading_number_' + config.form_number] = 0;
 
-				var get_form_func_name = 'get_form' + config['form_number'];
+				var get_form_func_name = 'get_form_' + config.form_number;
 				window[get_form_func_name] = function()
 					{
-						var form_id = '#ajax_form_number_' + config['form_number'];
-						window['ajax_form_loading_number_' + config['form_number']]++;
+						var form_id = '#ajax_form_number_' + config.form_number;
+						window['ajax_form_loading_number_' + config.form_number]++;
 						jQuery.ajax({
 							url: htsrv_url + 'anon_async.php',
 							type: 'POST',
-							data: config['json_params'],
-							success: function(result)
-							{
-								jQuery( form_id ).html( ajax_debug_clear( result ) );
+							data: config.json_params,
+							success: function( result )
+								{
+									jQuery( form_id ).html( ajax_debug_clear( result ) );
 
-								if( config['json_params'].action == 'get_comment_form' )
-								{	// Call function to render the star ratings for AJAX comment forms:
-									evo_render_star_rating();
-								}
-							},
+									if( config['json_params'].action == 'get_comment_form' )
+									{	// Call function to render the star ratings for AJAX comment forms:
+										evo_render_star_rating();
+
+										// Call function to initialize TinyMCE plugin:
+									}
+								},
 							error: function( jqXHR, textStatus, errorThrown )
-							{
-								jQuery( '.loader_ajax_form', form_id ).after( '<div class="red center">' + errorThrown + ': ' + jqXHR.responseText + '</div>' );
-								if( window['ajax_form_loading_number_' + config['form_number']] < 3 )
-								{	// Try to load 3 times this ajax form if error occurs:
-									setTimeout( function()
-									{	// After 1 second delaying:
-										jQuery( '.loader_ajax_form', form_id ).next().remove();
-										window[get_form_func_name]();
-									}, 1000 );
+								{
+									jQuery( '.loader_ajax_form', form_id ).after( '<div class="red center">' + errorThrown + ': ' + jqXHR.responseText + '</div>' );
+									if( window['ajax_form_loading_number_' + config.form_number] < 3 )
+									{	// Try to load 3 times this ajax form if error occurs:
+										setTimeout( function()
+											{	// After 1 second delaying:
+												jQuery( '.loader_ajax_form', form_id ).next().remove();
+												window[get_form_func_name]();
+											}, 1000 );
+									}
 								}
-							}
 						});
 					}
 
-				var check_and_show_func_name = 'check_and_show_' + config['form_number']
+				var check_and_show_func_name = 'check_and_show_' + config.form_number;
 				window[check_and_show_func_name] = function( force_load )
 					{
-						if( window['request_sent_' + config['form_number']] )
+						if( window['request_sent_' + config.form_number] )
 						{	// Don't load the form twice:
 							return;
 						}
 						var load_form = ( typeof force_load == undefined ) ? false : force_load;
 						if( ! load_form )
 						{	// Check if the ajax form is visible, or if it will be visible soon ( 20 pixel ):
-							load_form = jQuery( window ).scrollTop() >= window['ajax_form_offset_' + config['form_number']] - jQuery(window).height() - 20;
+							load_form = jQuery( window ).scrollTop() >= window['ajax_form_offset_' + config.form_number] - jQuery( window ).height() - 20;
 						}
 						if( load_form )
 						{	// Load the form only if it is forced or allowed because page is scrolled down to the form position:
-							window['request_sent_' + config['form_number']] = true;
+							window['request_sent_' + config.form_number] = true;
 							window[get_form_func_name]();
 						}
-					}
+					};
 
 				jQuery( window ).scroll( function() {
-					window[check_and_show_func_name]();
-				});
+						window[check_and_show_func_name]();
+					});
 		
 				jQuery(window).resize( function() {
-					window[check_and_show_func_name]();
-				});
+						window[check_and_show_func_name]();
+					});
 
-				window[check_and_show_func_name]( config['load_ajax_form_on_page_load'] );
+				window[check_and_show_func_name]( config.load_ajax_form_on_page_load );
 			} )();
 		}
 	}
@@ -974,7 +976,7 @@ jQuery( document ).ready( function()
 			};
 
 		// Initialize autocomplete input tags:
-		window.evo_autocomplete_input_tag_configs = {};
+		window.evo_autocomplete_input_tag_configs = window.evo_autocomplete_input_tag_configs || {};
 		var evo_temp_config = Object.values( evo_autocomplete_input_tags_config );
 		for( var i = 0, n = evo_temp_config.length; i < n; i++ )
 		{

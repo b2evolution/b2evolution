@@ -1016,15 +1016,14 @@ $use_defer_for_loggedin_disp_messages = true;
 $use_defer_for_loggedin_disp_threads = true;
 $use_defer_for_loggedin_disp_profile = true;
 $use_defer_for_loggedin_disp_pwdchange = true;
-$use_defer_for_loggedin_disp_edit = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
-$use_defer_for_loggedin_disp_proposechange = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
-$use_defer_for_loggedin_disp_edit_comment = false; // Temporarily disabled. Need to fix various editor toolbar related JS.
+$use_defer_for_loggedin_disp_edit = true;
+$use_defer_for_loggedin_disp_proposechange = true;
+$use_defer_for_loggedin_disp_edit_comment = true;
 $use_defer_for_loggedin_disp_comments = true;
 $use_defer_for_loggedin_disp_visits = true;
 $use_defer_for_loggedin_disp_contacts = true;
 
-// Erwin> I think this can be disabled if we are able to use AJAX forms to load the comment form:
-$disable_tinymce_for_frontoffice_comment_form = true; // Disables TinyMCE plugin in the front-office for comment forms
+$disable_tinymce_for_frontoffice_comment_form = false; // Disables TinyMCE plugin in the front-office for comment forms
 
 
 // ----- CHANGE THE FOLLOWING SETTINGS ONLY IF YOU KNOW WHAT YOU'RE DOING! -----
