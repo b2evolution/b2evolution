@@ -5800,7 +5800,7 @@ function format_french_phone( $phone )
 function get_manual_url( $topic )
 {
 	// fp> TODO: this below is a temmporary hack while we work on the new manual:
-	return 'http://b2evolution.net/man/'.str_replace( '_', '-', strtolower( $topic ) );
+	return 'http://b2evolution.net/man/'.str_replace( '_', '-', strtolower( rawurlencode( $topic ) ) );
 }
 
 
