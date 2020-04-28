@@ -19,7 +19,7 @@ if( !defined('EVO_MAIN_INIT') ) die( 'Please, do not access this page directly.'
  */
 global $action;
 
-global $updates, $upgrade_path, $admin_url;
+global $updates, $upgrade_path, $admin_url, $auto_upgrade_from_any_url;
 
 $Form = new Form( NULL, 'upgrade_form', 'post', 'compact' );
 
@@ -41,13 +41,20 @@ else
 	$Form->info( T_( 'Description' ), $update['description'] );
 	$Form->info( T_( 'Version' ), $update['version'] );
 
-	$Form->text_input( 'upd_url', ( get_param( 'upd_url' ) != '' ? get_param( 'upd_url' ) : $update['url'] ), 90,
-		T_('URL'), '<br/><span class="note">'.T_( 'You <i>might</i> replace this with a different URL in case you want to upgrade to a custom version.' ).'</span>', array( 'maxlength' => 300, 'required' => true ) );
+	$buttons = array();
 
-	$Form->add_crumb( 'upgrade_started' );
-	$Form->hiddens_by_key( get_memorized( 'action' ) );
+	if( $auto_upgrade_from_any_url )
+	{	// Only when upgrade is allowed from URL:
+		$Form->text_input( 'upd_url', ( get_param( 'upd_url' ) != '' ? get_param( 'upd_url' ) : $update['url'] ), 90,
+			T_('URL'), '<br/><span class="note">'.T_( 'You <i>might</i> replace this with a different URL in case you want to upgrade to a custom version.' ).'</span>', array( 'maxlength' => 300, 'required' => true ) );
+		
+		$Form->add_crumb( 'upgrade_started' );
+		$Form->hiddens_by_key( get_memorized( 'action' ) );
 
-	$Form->end_form( array( array( 'submit', 'actionArray[download]', T_( 'Continue' ), 'SaveButton' ) ) );
+		$buttons[] = array( 'submit', 'actionArray[download]', T_( 'Continue' ), 'SaveButton' );
+	}
+
+	$Form->end_form( $buttons );
 }
 
 // Display a list of already downloaded packages:

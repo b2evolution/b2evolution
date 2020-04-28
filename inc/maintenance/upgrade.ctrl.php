@@ -99,6 +99,17 @@ switch( $action )
 		header_redirect( $admin_url.'?ctrl=upgrade' );
 		// Exit here.
 		break;
+
+	case 'download':
+	case 'force_download':
+		// Check for STEP 2: DOWNLOAD.
+		if( ! $auto_upgrade_from_any_url )
+		{	// Don't allow upgrade from URL:
+			$Messages->add( /*Don't translate because it must not happens on normal back-office UI*/'Auto upgrade is not allowed from URL!', 'error' );
+			header_redirect( $admin_url.'?ctrl=upgrade' );
+			// EXIT here!
+		}
+		break;
 }
 
 // Display message if the upgrade config file doesn't exist
