@@ -792,11 +792,11 @@ class Blog extends DataObject
 			}
 
 			// Publisher logo:
-			$this->set_setting( 'publisher_logo_file_ID', param( 'blog_publisher_logo_file_ID' ) );
+			$this->set_setting( 'publisher_logo_file_ID', param( 'blog_publisher_logo_file_ID', 'integer' ) );
 
 			if( param( 'blog_publisher_name', 'string', NULL ) !== NULL )
 			{	// Publisher name:
-				$this->set_setting( 'publisher_name', param( 'blog_publisher_name' ) );
+				$this->set_setting( 'publisher_name', get_param( 'blog_publisher_name' ) );
 			}
 
 			if( param( 'blog_footer_text', 'html', NULL ) !== NULL )
