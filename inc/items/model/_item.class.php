@@ -5261,7 +5261,7 @@ class Item extends ItemLight
 					$placeholder_html = '<div class="evo_image_block evo_img_placeholder"><a href="$url$" class="evo_img_placeholder"><i class="fa fa-file-text-o"></i></a></div>';
 					break;
 				case '#file_thumbnail_text_icon';
-					$placeholder_html = '<div class="evo_list_with_thumbnail__placeholder" style="width:80px;height:80px"><a href="$url$"></a></div>';
+					$placeholder_html = '<div class="evo_thumblist_placeholder" style="width:80px;height:80px"><a href="$url$"></a></div>';
 					break; 
 			}
 			return str_replace( '$url$', $this->get_item_url( $params['target_blog'], $params['post_navigation'], $params['nav_target'] ), $placeholder_html );

@@ -2370,36 +2370,36 @@ function create_default_templates( $is_task = true )
 		'content_list_with_thumbnail' => array(
 			'name'     => 'Content List with Thumbnail',
 			'context'  => 'content_list_master',
-			'template' => '[set:before_list=<ul class="evo_list_with_thumbnail">]
+			'template' => '[set:before_list=<ul class="evo_thumblist">]
 [set:after_list=</ul>]
 [set:item_template=content_list_with_thumbnail_item|              // Sub-template for displaying items]
-[set:evo_list_with_thumbnail_image__modifiers=|                    // Modifier classes for each thumbnail image]
-[set:evo_thumbnail_image__size=crop-80x80|              // Image size for displaying image]',
+[set:evo_thumblist_image__modifiers=|                    // Modifier classes for each thumbnail image]
+[set:evo_thumblist_image__size=crop-80x80|              // Image size for displaying image]',
 		),
 
 		'content_list_with_thumbnail_item' => array(
 			'name'     => 'Content List with Thumbnail: Item',
 			'context'  => 'content_list_item',
 			'template' => '<li>
-		<div class="evo_list_with_thumbnail__image [echo:evo_list_with_thumbnail_image__modifiers]">
+		<div class="evo_thumblist_image [echo:evo_thumblist_image__modifiers]">
 			[Item:images|
 				restrict_to_image_position=#cover_and_teaser_all| // Priority to cover image, fall back to any teaser image
 				limit=1|	                                      // Max 1 images
-				image_size=$evo_thumbnail_image__size$|                
+				image_size=$evo_thumblist_image__size$|                
 				image_link_to=single|	                                  // Link to item details
 				placeholder=#file_thumbnail_text_icon|	                  // If no image available, display text file icon
 			]
 		</div>
-		<div class="evo_list_with_thumbnail__title">
+		<div class="evo_thumblist_title">
 			[Item:permalink|text=#title|class=default]
 		</div>
-		<div class="evo_list_with_thumbnail__body">
+		<div class="evo_thumblist_body">
 			<p>[Item:excerpt|
 							excerpt_no_more_link=| // No "more" link
 							max_words=20| // how many words we will display
 			]
 			</p> 
-			[Item:permalink|text=...|class=btn btn-default  evo_list_with_thumbnail__button evo_list_with_thumbnail__button__transparent|title=]
+			[Item:permalink|text=...|class=btn btn-default  evo_thumblist_button evo_thumblist_button__transparent|title=]
 		</div>
 </li>',
 		)

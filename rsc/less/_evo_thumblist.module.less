@@ -1,6 +1,7 @@
 // Styles for "evo list with tumbnail" templates, used by the Universal Item List Widget(s)
 
-.evo_list_with_thumbnail {
+// THUMBLIST: (can be embedded in a bootstrap col-*-*)
+.evo_thumblist {
 	padding: 0;
 	margin-left: 0;
 	li {
@@ -14,12 +15,14 @@
 		display: table;
 	}
 }
-.evo_list_with_thumbnail__image {
+// THUMBLIST > IMAGE:
+.evo_thumblist_image {
 	float: left;
 	margin-right: 6px;
 	text-align: center; 
 	img {
 		border-radius: 3px;
+		// Preventing images to exceed the parent's width
 		max-width: 100%;
 		max-height: 380px;
 		width: auto;
@@ -30,29 +33,27 @@
 		margin: 0em;
 	}
 }
-.evo_list_with_thumbnail__placeholder::before {
-	font-family: FontAwesome;
-	display: table-cell;
-	content: '\f0f6';
-	color: #dcdcdc;
-	font-size: 40px;
-	vertical-align: middle;
-	text-align: center;
-}
-.evo_list_with_thumbnail__placeholder {
+// THUMBLIST > PLACEHOLDER: ( Placeholder when "Display picture" selected, but no picture to show )
+.evo_thumblist_placeholder {
 	display: table;
 	float: left;
 	max-width: 380px;
 	max-height: 380px;
 	background: #f0f0f0;
 	margin-right: 6px;
-	-webkit-border-radius: 3px;
-	-moz-border-radius: 3px;
-	-ms-border-radius: 3px;
-	-o-border-radius: 3px;
 	border-radius: 3px;
+	&:before {
+		font-family: FontAwesome;
+		display: table-cell;
+		content: '\f0f6';
+		color: #dcdcdc;
+		font-size: 40px;
+		vertical-align: middle;
+		text-align: center;
+	}
 }
-.evo_list_with_thumbnail__title {
+// THUMBLIST > TITLE:
+.evo_thumblist_title {
 	vertical-align: middle;
 	display: inline;
 	height: auto !important;
@@ -62,7 +63,8 @@
 		text-decoration: underline;
 	}
 }
-.evo_list_with_thumbnail__body {  
+// THUMBLIST > BODY:
+.evo_thumblist_body {  
 	> a {
 		color: inherit;
 	}
@@ -71,15 +73,17 @@
 		display: inline;
 	}
 }
-.evo_list_with_thumbnail__button {
+// THUMBLIST > BUTTON:
+.evo_thumblist_button {
 	float: right;
 	height: 22px;
 	line-height: 13px;
 	padding: 0 4px 0 4px;
 }
-.evo_list_with_thumbnail__button__transparent {
+// Modifiers:
+.evo_thumblist_button__transparent {
 	background-color: transparent;
-}
-.evo_list_with_thumbnail__button__transparent:hover {
-	background-color: #e6e6e6;
+	&:hover {
+		background-color: #e6e6e6;
+	}
 }

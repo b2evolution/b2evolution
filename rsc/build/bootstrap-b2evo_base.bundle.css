@@ -3036,11 +3036,11 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   bottom: 0;
   margin: 0 !important;
 }
-.evo_list_with_thumbnail {
+.evo_thumblist {
   padding: 0;
   margin-left: 0;
 }
-.evo_list_with_thumbnail li {
+.evo_thumblist li {
   height: auto;
   width: 100%;
   clear: both;
@@ -3050,12 +3050,12 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   list-style: none;
   display: table;
 }
-.evo_list_with_thumbnail__image {
+.evo_thumblist_image {
   float: left;
   margin-right: 6px;
   text-align: center;
 }
-.evo_list_with_thumbnail__image img {
+.evo_thumblist_image img {
   border-radius: 3px;
   max-width: 100%;
   max-height: 380px;
@@ -3063,10 +3063,19 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   height: auto;
   margin: auto;
 }
-.evo_list_with_thumbnail__image figure {
+.evo_thumblist_image figure {
   margin: 0em;
 }
-.evo_list_with_thumbnail__placeholder::before {
+.evo_thumblist_placeholder {
+  display: table;
+  float: left;
+  max-width: 380px;
+  max-height: 380px;
+  background: #f0f0f0;
+  margin-right: 6px;
+  border-radius: 3px;
+}
+.evo_thumblist_placeholder:before {
   font-family: FontAwesome;
   display: table-cell;
   content: '\f0f6';
@@ -3075,46 +3084,33 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   vertical-align: middle;
   text-align: center;
 }
-.evo_list_with_thumbnail__placeholder {
-  display: table;
-  float: left;
-  max-width: 380px;
-  max-height: 380px;
-  background: #f0f0f0;
-  margin-right: 6px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
-  border-radius: 3px;
-}
-.evo_list_with_thumbnail__title {
+.evo_thumblist_title {
   vertical-align: middle;
   display: inline;
   height: auto !important;
   width: 100%;
   font-size: 16px;
 }
-.evo_list_with_thumbnail__title a {
+.evo_thumblist_title a {
   text-decoration: underline;
 }
-.evo_list_with_thumbnail__body > a {
+.evo_thumblist_body > a {
   color: inherit;
 }
-.evo_list_with_thumbnail__body > p:last-of-type {
+.evo_thumblist_body > p:last-of-type {
   margin: 0 !important;
   display: inline;
 }
-.evo_list_with_thumbnail__button {
+.evo_thumblist_button {
   float: right;
   height: 22px;
   line-height: 13px;
   padding: 0 4px 0 4px;
 }
-.evo_list_with_thumbnail__button__transparent {
+.evo_thumblist_button__transparent {
   background-color: transparent;
 }
-.evo_list_with_thumbnail__button__transparent:hover {
+.evo_thumblist_button__transparent:hover {
   background-color: #e6e6e6;
 }
 .ratings_table {
