@@ -98,7 +98,7 @@ div.widget_uil_autotemp.evo_1pic__special ul li .item_first_image_placeholder {
   margin-right: 6px;
   border-radius: 3px;
 }
-div.widget_uil_autotemp.evo_1pic__special ul li .item_first_image_placeholder:before {
+div.widget_uil_autotemp.evo_1pic__special ul li .item_first_image_placeholder::before {
   font-family: FontAwesome;
   display: table-cell;
   content: '\f0f6';
