@@ -1859,6 +1859,30 @@ function get_item_type_usage_by_tab( $tab_name )
 
 
 /**
+ * Get item type title by tab name
+ *
+ * @return string
+ */
+function get_item_type_title_by_tab( $tab_name )
+{
+	switch( $tab_name )
+	{
+		case 'page':
+			return T_('Pages');
+		case 'special':
+			return T_('Special');
+		case 'intro':
+			return T_('Intros');
+		case 'content-block':
+			return T_('Content Blocks');
+		case 'post':
+		default:
+			return T_('Posts');
+	}
+}
+
+
+/**
  * Get item type custom field types
  *
  * @return array
