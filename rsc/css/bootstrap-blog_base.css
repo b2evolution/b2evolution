@@ -98,7 +98,7 @@ div.widget_uil_autotemp.evo_1pic__special ul li .item_first_image_placeholder {
   margin-right: 6px;
   border-radius: 3px;
 }
-div.widget_uil_autotemp.evo_1pic__special ul li .item_first_image_placeholder:before {
+div.widget_uil_autotemp.evo_1pic__special ul li .item_first_image_placeholder::before {
   font-family: FontAwesome;
   display: table-cell;
   content: '\f0f6';
@@ -473,7 +473,7 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
 .evo_tile__grey_bg {
   background-color: #fafafa;
 }
-.evo_tile__grey_bg .evo_tile_text__gradient:after {
+.evo_tile__grey_bg .evo_tile_text__gradient::after {
   background: linear-gradient(rgba(250, 250, 250, 0), #fafafa);
 }
 .evo_tile__square {
@@ -552,7 +552,7 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   margin-top: 0;
   font-size: 20px;
 }
-.evo_tile_text__gradient:after {
+.evo_tile_text__gradient::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -606,7 +606,7 @@ div.widget_core_user_avatars.evo_layout_flow .widget_flow_blocks > div img {
   margin-right: 6px;
   border-radius: 3px;
 }
-.evo_thumblist_placeholder:before {
+.evo_thumblist_placeholder::before {
   font-family: FontAwesome;
   display: table-cell;
   content: '\f0f6';
@@ -782,7 +782,7 @@ main .well header .small.text-muted a {
   text-decoration: none;
   background: #ddd;
 }
-.post_tags > a:before {
+.post_tags > a::before {
   font-family: FontAwesome;
   content: '\f02b \00a0 ';
   color: #aaa;
@@ -1759,7 +1759,7 @@ div.evo_fileuploader_form {
   height: 6px;
   bottom: 0;
 }
-.evo_attachments_fieldset__wrapper .ui-resizable-s:after {
+.evo_attachments_fieldset__wrapper .ui-resizable-s::after {
   content: "...";
   font-size: 10px;
   top: -7px;

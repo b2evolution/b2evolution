@@ -297,8 +297,8 @@ a.roundbutton_red:hover, span.roundbutton_red:hover {
 	border-left: none;
 	border-right: 1px solid #787878;
 }
-.roundbutton_group .roundbutton:before,
-.roundbutton_group .roundbutton_text:before {
+.roundbutton_group .roundbutton::before,
+.roundbutton_group .roundbutton_text::before {
 	border-left: 1px solid #b1b1b1;
 	content: "";
 	position: absolute;
@@ -306,9 +306,9 @@ a.roundbutton_red:hover, span.roundbutton_red:hover {
 	bottom: 0;
 	left: -1px;
 }
-.roundbutton_group .roundbutton:first-child:before,
-.roundbutton_group .roundbutton_text:first-child:before,
-.roundbutton_group .roundbutton_text.first-child:before {
+.roundbutton_group .roundbutton:first-child::before,
+.roundbutton_group .roundbutton_text:first-child::before,
+.roundbutton_group .roundbutton_text.first-child::before {
 	border: none;
 }
 .roundbutton_group .roundbutton:first-child,
@@ -383,7 +383,7 @@ a.roundbutton_text span, a.roundbutton_text_noicon span {
 		rgba(255,255,255,0.3) 100%
 		);
 }
-.roundbutton.rbtn_black:before, .roundbutton_group .roundbutton.rbtn_black:before {
+.roundbutton.rbtn_black::before, .roundbutton_group .roundbutton.rbtn_black::before {
 	border-color: #1a1a1a;
 }
 .roundbutton.rbtn_black:hover, .roundbutton_group .roundbutton.rbtn_black:hover {

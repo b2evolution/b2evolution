@@ -999,15 +999,15 @@ div.avatartag.main .avatar_actions {
   display: inline-block;
   font-size: 10px;
 }
-.evobar-menu [class^=evobar-icon-]:before {
+.evobar-menu [class^=evobar-icon-]::before {
   width: 10px;
   height: 10px;
   content: "\25BC";
 }
-.evobar-menu .evobar-icon-right:before {
+.evobar-menu .evobar-icon-right::before {
   content: "\25B6";
 }
-.evobar-menu .evobar-icon-left:before {
+.evobar-menu .evobar-icon-left::before {
   content: "\25C0";
 }
 form {
@@ -1250,7 +1250,7 @@ div.bText div.log_container li {
   padding: 0;
   background: none;
 }
-div.bText div.log_container ul li:before {
+div.bText div.log_container ul li::before {
   content: none;
 }
 div.skin_error {
