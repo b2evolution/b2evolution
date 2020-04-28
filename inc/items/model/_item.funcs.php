@@ -493,7 +493,7 @@ function urltitle_validate( $urltitle, $title, $post_ID = 0, $query_only = false
 	// Leave only first 5 words in order to get a shorter URL
 	// (which is generally accepted as a better practice)
 	// User can manually enter a very long URL if he wants
-	$slug_changed = param( 'slug_changed' );
+	$slug_changed = param( 'slug_changed', 'integer' );
 	if( $slug_changed == 0 )
 	{ // this should only happen when the slug is auto generated
 		global $Collection, $Blog;

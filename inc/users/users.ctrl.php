@@ -265,7 +265,7 @@ if( !$Messages->has_errors() )
 		case 'del_settings_set':
 			// Delete a set of an array type setting:
 			param( 'plugin_ID', 'integer', true );
-			param( 'set_path' );
+			param( 'set_path', 'string' );
 
 			$admin_Plugins = & get_Plugins_admin();
 			$admin_Plugins->restart();

@@ -61,7 +61,7 @@ switch( $action )
 	case 'del_settings_set':
 		// Delete a set from an array type setting:
 		param( 'plugin_ID', 'integer', true );
-		param( 'set_path' );
+		param( 'set_path', 'string' );
 
 		$edit_Plugin = & $admin_Plugins->get_by_ID($plugin_ID);
 
@@ -469,11 +469,10 @@ switch( $action )
 		}
 
 		// Params from/for form:
-		param( 'edited_plugin_name' );
-		param( 'edited_plugin_shortdesc' );
-		param( 'edited_plugin_code' );
-		param( 'edited_plugin_priority' );
-		param( 'edited_plugin_apply_rendering' );
+		param( 'edited_plugin_name', 'string' );
+		param( 'edited_plugin_shortdesc', 'string' );
+		param( 'edited_plugin_code', 'string' );
+		param( 'edited_plugin_priority', 'integer' );
 		param( 'edited_plugin_displayed_events', 'array:string', array() );
 		param( 'edited_plugin_events', 'array:integer', array() );
 

@@ -619,7 +619,7 @@ class Blog extends DataObject
 						$default_in_bloglist = 'never';
 				}
 			}
-			$this->set( 'in_bloglist', param( 'blog_in_bloglist' ), $default_in_bloglist );
+			$this->set( 'in_bloglist', param( 'blog_in_bloglist', 'string' ), $default_in_bloglist );
 		}
 
 		if( param( 'archive_links', 'string', NULL ) !== NULL )
