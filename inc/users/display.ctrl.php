@@ -38,7 +38,7 @@ switch ( $action )
 		param( 'bubbletip_size_front', 'string', '' );
 		param( 'bubbletip_anonymous', 'integer', 0 );
 		param( 'bubbletip_size_anonymous', 'string', '' );
-		param( 'bubbletip_overlay' );
+		param( 'bubbletip_overlay', 'text' );
 		param( 'allow_anonymous_user_list', 'integer', 0 );
 		param( 'allow_anonymous_user_profiles', 'integer', 0 );
 		param( 'user_url_loggedin', 'string', '' );

@@ -835,6 +835,7 @@ class tinymce_plugin extends Plugin
 										data:
 										{
 											'content': textarea.val(),
+											'crumb_tinymce': '<?php echo get_crumb( 'tinymce' ); ?>',
 										},
 										success: function( result )
 										{
@@ -1424,7 +1425,10 @@ class tinymce_plugin extends Plugin
 	 */
 	function htsrv_convert_content_to_wysiwyg( $params )
 	{
-		global $Plugins;
+		global $Plugins, $Session;
+
+		// Check that this action request is not a CSRF hacked request:
+		$Session->assert_received_crumb( 'tinymce' );
 
 		$content = param( 'content', 'raw' );
 
