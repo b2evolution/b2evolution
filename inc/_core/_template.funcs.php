@@ -3615,6 +3615,7 @@ function get_star_rating( $value, $stars_num = 5, $params = array() )
 function init_fileuploader_js( $relative_to = 'rsc_url', $load_sortable_js = true )
 {
 	// Require Fine Uploader js and css files:
+	require_js_defer( '#jquery#', $relative_to );
 	require_js_defer( 'multiupload/fine-uploader.js', $relative_to );
 	require_css( 'fine-uploader.css', $relative_to );
 	require_js_defer( 'src/evo_init_dragdrop_button.js', $relative_to );
