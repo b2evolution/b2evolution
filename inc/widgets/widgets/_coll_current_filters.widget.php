@@ -200,7 +200,24 @@ class coll_current_filters_Widget extends ComponentWidget
 			{
 				if( is_admin_page() && get_param( 'tab' ) == 'type' )
 				{ // Try to get a title for current selected post type on back-office pages:
-					$current_post_type_title = '"'.get_item_type_title_by_tab( get_param( 'tab_type' ) ).'"';
+					switch( get_param( 'tab_type' ) )
+					{
+						case 'page':
+							$current_post_type_title = T_('Pages');
+							break;
+						case 'special':
+							$current_post_type_title = T_('Special Items');
+							break;
+						case 'intro':
+							$current_post_type_title = T_('Intros');
+							break;
+						case 'content-block':
+							$current_post_type_title = T_('Content Blocks');
+							break;
+						default: // post
+							$current_post_type_title = T_('Posts');
+					}
+					$current_post_type_title = '"'.$current_post_type_title.'"';
 				}
 				if( empty( $current_post_type_title ) )
 				{ // Use this title by default for unknown selected post type:

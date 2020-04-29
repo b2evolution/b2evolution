@@ -63,8 +63,25 @@ $ItemList->filter_area = array(
 	$ItemList->filters_callback = 'filter_on_post_title';
 */
 
+switch( $tab_type )
+{
+	case 'page':
+		$ItemList->title = T_('Page list');
+		break;
+	case 'special':
+		$ItemList->title = T_('Special Items list');
+		break;
+	case 'intro':
+		$ItemList->title = T_('Intro list');
+		break;
+	case 'content-block':
+		$ItemList->title = T_('Content Block list');
+		break;
+	default: // post
+		$ItemList->title = T_('Post list');
+}
 
-$ItemList->title = sprintf( /* TRANS: list of "posts"/"intros"/"custom types"/etc */ T_('"%s" list'), get_item_type_title_by_tab( $tab_type ) ).get_manual_link( $tab_type.'-list' );
+$ItemList->title .= get_manual_link( $tab_type.'-list' );
 
 // Initialize Results object
 items_results( $ItemList, array(
