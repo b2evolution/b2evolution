@@ -12,15 +12,25 @@
  * @package htsrv
  */
 
-function out_echo( $message, $specialchars, $display = true )
+
+/**
+ * Print out result of uploader process for AJAX response in JSON format
+ *
+ * @param array Message data to print out
+ */
+function evo_uploader_result( $message )
 {
 	$response = array();
 	$response['success'] = isset( $message['status'] ) && in_array( $message['status'], array( 'success', 'rename' ) );
 
-	if( $message['status'] == 'error' )
-	{
+	if( isset( $message['error'] ) )
+	{	// If error message is passed:
 		$response['error'] = $message['error'];
 		unset( $message['error'] );
+		if( ! isset( $message['status'] ) )
+		{	// Set status to error when it is not provided:
+			$message['status'] = 'error';
+		}
 	}
 
 	if( isset( $message['text'] ) )
@@ -28,16 +38,16 @@ function out_echo( $message, $specialchars, $display = true )
 		$message['text'] = base64_encode( $message['text'] );
 	}
 
-	if( $specialchars == 1 )
-	{
-		$response['specialchars'] = 1;
+	if( isset( $_FILES['qqfile'] ) )
+	{	// If file is sending to quick uploader:
+		$response['specialchars'] = 1; // Used to decode chars on JS side
 		if( isset( $message['text'] ) )
-		{
+		{	// Convert special chars to HTML entities:
 			$message['text'] = htmlspecialchars( $message['text'] );
 		}
 	}
 	else
-	{
+	{	// Don't try to encode when no file was sent:
 		$message['specialchars'] = 0;
 	}
 
@@ -47,39 +57,37 @@ function out_echo( $message, $specialchars, $display = true )
 	$debug_jslog = false;
 
 	$response['data'] = $message;
-	if( $display )
-	{
-		echo evo_json_encode( $response );
-	}
-	else
-	{
-		return evo_json_encode( $response );
-	}
+
+	// Print out message data for response:
+	exit( evo_json_encode( $response ) );
 }
 
 
-$specialchars = 0;
-if( isset( $_FILES['qqfile'] ) )
+/**
+ * Print out error result of uploader process
+ *
+ * @param string Error message
+ */
+function evo_uploader_error( $error_message )
 {
-	$specialchars = 1;
+	// Log each error message in system:
+	syslog_insert( 'Upload error: '.$error_message, 'error', 'file' );
+	// Return result data with error message for AJAX response:
+	evo_uploader_result( array( 'error' => $error_message ) );
+	// EXIT here.
 }
 
-$message = array();
 
 require_once dirname(__FILE__).'/../conf/_config.php';
 require_once $inc_path.'_main.inc.php';
 require_once dirname(__FILE__).'/upload_handler.php';
 
-// Check that post_max_size is not exceeded
-if( isset( $_SERVER["CONTENT_LENGTH"] ) )
+// Check that post_max_size is not exceeded:
+if( isset( $_SERVER['CONTENT_LENGTH'] ) &&
+    $_SERVER['CONTENT_LENGTH'] > return_bytes( ini_get( 'post_max_size' ) ) )
 {
-	if( $_SERVER["CONTENT_LENGTH"] > return_bytes( ini_get( 'post_max_size' ) ) )
-	{
-		$message['error'] = sprintf( T_('File cannot be uploaded because maximum post size is too small. The maximum allowed post size is %s.'), ini_get( 'post_max_size' ) );
-		$message['status'] = 'error';
-		out_echo( $message, $specialchars );
-		exit();
-	}
+	evo_uploader_error( sprintf( T_('File cannot be uploaded because maximum post size is too small. The maximum allowed post size is %s.'), ini_get( 'post_max_size' ) ) );
+	// EXIT here.
 }
 
 // Stop a request from the blocked IP addresses or Domains
@@ -91,8 +99,8 @@ $allow_evo_stats = false;
 
 global $current_User;
 
-param( 'upload', 'boolean', true );
-param( 'root_and_path', 'filepath', true );
+param( 'upload', 'boolean' );
+param( 'root_and_path', 'filepath' );
 param( 'blog', 'integer' );
 param( 'link_owner', 'string' );
 param( 'link_position', 'string', NULL );
@@ -101,10 +109,17 @@ param( 'fm_mode', 'string' );
 param( 'b2evo_icons_type', 'string', '' );
 param( 'prefix', 'string', '' );
 
+if( ! $upload )
+{	// Don't try to upload if this param is not passed:
+	evo_uploader_error( 'Invalid upload param' ); // NO TRANS!!
+	// EXIT here.
+}
+
 // Check that this action request is not a CSRF hacked request:
 if( ! $Session->assert_received_crumb( 'file', false ) )
-{ // Send a clear error message
-	die( T_('Incorrect crumb received. Did you wait too long before uploading?') );
+{	// Send a clear error message:
+	evo_uploader_error( T_('Incorrect crumb received. Did you wait too long before uploading?') );
+	// EXIT here.
 }
 
 $upload_path = false;
@@ -121,11 +136,9 @@ if( strpos( $root_and_path, '::' ) )
 }
 
 if( $upload_path === false )
-{
-	$message['error'] = '#'.$root_and_path.'# Bad request. Unknown upload location!'; // NO TRANS!!
-	$message['status'] = 'error';
-	out_echo( $message, $specialchars );
-	exit();
+{	// Stop on wrong upload path:
+	evo_uploader_error( 'Bad request. Unknown upload location "'.$root_and_path.'"!' ); // NO TRANS!!
+	// EXIT here.
 }
 
 $link_owner_type = NULL;
@@ -144,22 +157,11 @@ if( $link_owner_type == 'comment' && $prefix == 'meta_' )
 	$LinkOwner->Comment->type = 'meta';
 }
 
-if( $upload && ! check_perm_upload_files( $LinkOwner, $fm_FileRoot ) )
-{
-	$message['error'] = T_( 'You don\'t have permission to upload on this file root.' );
-	$message['status'] = 'error';
-	$response = out_echo( $message, $specialchars, false );
-	exit( $response );
+if( ! check_perm_upload_files( $LinkOwner, $fm_FileRoot ) )
+{	// If current User has no permission to upload files into the file root:
+	evo_uploader_error( T_('You don\'t have permission to upload on this file root.') );
+	// EXIT here.
 }
-
-if( $upload )
-{ // Create the object and assign property
-
-	$size_limits = array( return_bytes( ini_get( 'post_max_size' ) ), return_bytes( ini_get( 'upload_max_filesize') ) );
-	if( $Settings->get( 'upload_maxkb' ) )
-	{
-		$size_limits[] = $Settings->get( 'upload_maxkb' ) * 1024;
-	}
 
 	// Check for sensitive filetype upload:
 	$path_info = pathinfo( param( 'qqfilename', 'string', true ) );
@@ -167,11 +169,17 @@ if( $upload )
 	$upload_Filetype = $FiletypeCache->get_by_extension( isset( $path_info['extension'] ) ? strtolower( $path_info['extension'] ) : '', false, false );
 	if( ! $upload_Filetype || ! $upload_Filetype->is_allowed() )
 	{
-		$message['error'] = sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
-				'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' );
-		$message['status'] = 'error';
-		$response = out_echo( $message, $specialchars, false );
-		exit( $response );
+		evo_uploader_error( sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+			'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ) );
+		// EXIT here.
+	}
+
+// Start to upload if it is allowed by all checks above:
+
+	$size_limits = array( return_bytes( ini_get( 'post_max_size' ) ), return_bytes( ini_get( 'upload_max_filesize') ) );
+	if( $Settings->get( 'upload_maxkb' ) )
+	{
+		$size_limits[] = $Settings->get( 'upload_maxkb' ) * 1024;
 	}
 
 	$file = new UploadHandler();
@@ -212,10 +220,8 @@ if( $upload )
 
 	if( empty( $fm_FileRoot ) )
 	{ // Stop when this object is NULL, it can happens when media path has no rights to write
-		$message['error'] = sprintf( T_( 'We cannot open the folder %s. PHP needs execute permissions on this folder.' ), '<b>'.$media_path.'</b>' );
-		$message['status'] = 'error';
-		out_echo( $message, $specialchars );
-		exit();
+		evo_uploader_error( sprintf( T_('We cannot open the folder %s. PHP needs execute permissions on this folder.'), '<b>'.$media_path.'</b>' ) );
+		// EXIT here.
 	}
 
 	$newName = $file->getName();
@@ -223,11 +229,8 @@ if( $upload )
 	// validate file name
 	if( $error_filename = process_filename( $newName, true, true, $fm_FileRoot, $path ) )
 	{ // Not a file name or not an allowed extension
-		$message['error'] = $error_filename;
-		$message['status'] = 'error';
-		out_echo( $message, $specialchars );
-		syslog_insert( sprintf( 'The uploaded file %s has an unrecognized extension', '[['.$newName.']]' ), 'warning', 'file' );
-		exit();
+		evo_uploader_error( $error_filename );
+		// EXIT here.
 	}
 
 	// Process a name of old name
@@ -239,10 +242,8 @@ if( $upload )
 	// If everything is ok, save the file somewhere
 	if( ! isset( $result['success'] ) || ! $result['success'] )
 	{ // Error on upload
-		$message['error'] = $result['error'];
-		$message['status'] = 'error';
-		out_echo( $message, $specialchars );
-		exit();
+		evo_uploader_error( $result['error'] );
+		// EXIT here.
 	}
 	$file_content = $result['contents'];
 
@@ -403,20 +404,10 @@ if( $upload )
 			$message['link_position'] = display_link_position( $mask_row, $fm_mode != 'file_select', param( 'prefix', 'string' ) );
 		}
 
-		out_echo( $message, $specialchars );
-		exit();
+		evo_uploader_result( $message );
+		// EXIT here.
 	}
 
-	$message['error'] = T_( 'The file could not be saved!' );
-	$message['status'] = 'error';
-	out_echo( $message, $specialchars );
-	exit();
-
-}
-
-$message['error'] =  'Invalid upload param';
-$message['status'] = 'error';
-out_echo( $message, $specialchars );
-exit();
-
+evo_uploader_error( T_('The file could not be saved!') );
+// EXIT here.
 ?>
