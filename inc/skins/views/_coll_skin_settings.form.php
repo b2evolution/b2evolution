@@ -147,6 +147,7 @@ if( $can_edit_skin_settings )
 	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? TB_('Apply Changes!') : TB_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s' );
 	if( $mode == 'customizer' )
 	{	// Display cancel button only on customizer mode:
+		// Reload settings from DB, which may be different from "reset" setting since the user has clicked "Apply changes"
 		$buttons[] = array( 'button', 'cancel', T_('Cancel'), '', 'location.reload()' );
 	}
 }
