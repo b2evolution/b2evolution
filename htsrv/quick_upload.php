@@ -157,250 +157,250 @@ if( ! check_perm_upload_files( $LinkOwner, $fm_FileRoot ) )
 	// EXIT here.
 }
 
-	// Check for sensitive filetype upload:
-	$path_info = pathinfo( param( 'qqfilename', 'string', true ) );
-	$FiletypeCache = & get_FiletypeCache();
-	$upload_Filetype = $FiletypeCache->get_by_extension( isset( $path_info['extension'] ) ? strtolower( $path_info['extension'] ) : '', false, false );
-	if( ! $upload_Filetype || ! $upload_Filetype->is_allowed() )
-	{
-		evo_uploader_error( sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
-			'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ) );
-		// EXIT here.
-	}
+// Check for sensitive filetype upload:
+$path_info = pathinfo( param( 'qqfilename', 'string', true ) );
+$FiletypeCache = & get_FiletypeCache();
+$upload_Filetype = $FiletypeCache->get_by_extension( isset( $path_info['extension'] ) ? strtolower( $path_info['extension'] ) : '', false, false );
+if( ! $upload_Filetype || ! $upload_Filetype->is_allowed() )
+{
+	evo_uploader_error( sprintf( T_('Admins can upload/rename/edit this file type only if %s in the <a %s>configuration files</a>'),
+		'<code>$admins_can_manipulate_sensitive_files = true</code>', 'href="'.get_manual_url( 'advanced-php' ).'"' ) );
+	// EXIT here.
+}
 
 // Start to upload if it is allowed by all checks above:
 
-	$size_limits = array( return_bytes( ini_get( 'post_max_size' ) ), return_bytes( ini_get( 'upload_max_filesize') ) );
-	if( $Settings->get( 'upload_maxkb' ) )
-	{
-		$size_limits[] = $Settings->get( 'upload_maxkb' ) * 1024;
-	}
+$size_limits = array( return_bytes( ini_get( 'post_max_size' ) ), return_bytes( ini_get( 'upload_max_filesize') ) );
+if( $Settings->get( 'upload_maxkb' ) )
+{
+	$size_limits[] = $Settings->get( 'upload_maxkb' ) * 1024;
+}
 
-	$file = new UploadHandler();
-	// Specify the list of valid extensions, ex. array("jpeg", "xml", "bmp")
-	$file->allowedExtensions = array(); // all files types allowed by default
-	// Specify max file size in bytes.
-	$file->sizeLimit = min( $size_limits );
-	// Specify the input name set in the javascript.
-	$file->inputName = "qqfile"; // matches Fine Uploader's default inputName value by default
-	// If you want to use the chunking/resume feature, specify the folder to temporarily save parts.
-	$file->chunksFolder = 'chunks';
-	$method = $_SERVER['REQUEST_METHOD'];
-	if ( $method == 'POST' )
+$file = new UploadHandler();
+// Specify the list of valid extensions, ex. array("jpeg", "xml", "bmp")
+$file->allowedExtensions = array(); // all files types allowed by default
+// Specify max file size in bytes.
+$file->sizeLimit = min( $size_limits );
+// Specify the input name set in the javascript.
+$file->inputName = "qqfile"; // matches Fine Uploader's default inputName value by default
+// If you want to use the chunking/resume feature, specify the folder to temporarily save parts.
+$file->chunksFolder = 'chunks';
+$method = $_SERVER['REQUEST_METHOD'];
+if ( $method == 'POST' )
+{
+	header( 'Content-Type: text/plain' );
+	// Assumes you have a chunking.success.endpoint set to point here with a query parameter of "done".
+	// For example: /myserver/handlers/endpoint.php?done
+	if ( isset( $_GET['done'] ) )
 	{
-		header( 'Content-Type: text/plain' );
-		// Assumes you have a chunking.success.endpoint set to point here with a query parameter of "done".
-		// For example: /myserver/handlers/endpoint.php?done
-		if ( isset( $_GET['done'] ) )
-		{
-			$result = $file->combineChunks();
-		}
-		else
-		{ // Handles upload requests
-			// Call handleUpload() with the name of the folder, relative to PHP's getcwd()
-			$result = $file->handleUpload();
-			// To return a name used for uploaded file you can use the following line.
-			$result["uploadName"] = $file->getUploadName();
-		}
-	}
-	else if( $method == 'DELETE' )
-	{ // for delete file requests
-		$result = $file->handleDelete("files");
+		$result = $file->combineChunks();
 	}
 	else
-	{
-		header( 'HTTP/1.0 405 Method Not Allowed' );
+	{ // Handles upload requests
+		// Call handleUpload() with the name of the folder, relative to PHP's getcwd()
+		$result = $file->handleUpload();
+		// To return a name used for uploaded file you can use the following line.
+		$result["uploadName"] = $file->getUploadName();
 	}
+}
+else if( $method == 'DELETE' )
+{ // for delete file requests
+	$result = $file->handleDelete("files");
+}
+else
+{
+	header( 'HTTP/1.0 405 Method Not Allowed' );
+}
 
-	if( empty( $fm_FileRoot ) )
-	{ // Stop when this object is NULL, it can happens when media path has no rights to write
-		evo_uploader_error( sprintf( T_('We cannot open the folder %s. PHP needs execute permissions on this folder.'), '<b>'.$media_path.'</b>' ) );
-		// EXIT here.
-	}
+if( empty( $fm_FileRoot ) )
+{ // Stop when this object is NULL, it can happens when media path has no rights to write
+	evo_uploader_error( sprintf( T_('We cannot open the folder %s. PHP needs execute permissions on this folder.'), '<b>'.$media_path.'</b>' ) );
+	// EXIT here.
+}
 
-	$newName = $file->getName();
-	$oldName = $newName;
-	// validate file name
-	if( $error_filename = process_filename( $newName, true, true, $fm_FileRoot, $path ) )
-	{ // Not a file name or not an allowed extension
-		evo_uploader_error( $error_filename );
-		// EXIT here.
-	}
+$newName = $file->getName();
+$oldName = $newName;
+// validate file name
+if( $error_filename = process_filename( $newName, true, true, $fm_FileRoot, $path ) )
+{ // Not a file name or not an allowed extension
+	evo_uploader_error( $error_filename );
+	// EXIT here.
+}
 
-	// Process a name of old name
-	process_filename( $oldName, true );
+// Process a name of old name
+process_filename( $oldName, true );
 
-	list( $newFile, $oldFile_thumb ) = check_file_exists( $fm_FileRoot, $path, $newName );
-	$newName = $newFile->get( 'name' );
+list( $newFile, $oldFile_thumb ) = check_file_exists( $fm_FileRoot, $path, $newName );
+$newName = $newFile->get( 'name' );
 
-	// If everything is ok, save the file somewhere
-	if( ! isset( $result['success'] ) || ! $result['success'] )
-	{ // Error on upload
-		evo_uploader_error( $result['error'] );
-		// EXIT here.
-	}
-	$file_content = $result['contents'];
+// If everything is ok, save the file somewhere
+if( ! isset( $result['success'] ) || ! $result['success'] )
+{ // Error on upload
+	evo_uploader_error( $result['error'] );
+	// EXIT here.
+}
+$file_content = $result['contents'];
 
-	if( ! file_exists( $newFile->get_dir() ) )
-	{ // Create a folder for new uploaded file if it doesn't exist yet
-		mkdir_r( $newFile->get_dir() );
-	}
+if( ! file_exists( $newFile->get_dir() ) )
+{ // Create a folder for new uploaded file if it doesn't exist yet
+	mkdir_r( $newFile->get_dir() );
+}
 
-	if( save_to_file( $file_content, $newFile->get_full_path(), 'wb' ) )
-	{
-		// Change to default chmod settings
-		$newFile->chmod( NULL );
+if( save_to_file( $file_content, $newFile->get_full_path(), 'wb' ) )
+{
+	// Change to default chmod settings
+	$newFile->chmod( NULL );
 
-		// Refreshes file properties (type, size, perms...)
-		$newFile->load_properties();
+	// Refreshes file properties (type, size, perms...)
+	$newFile->load_properties();
 
-		// save file into the db
-		$newFile->dbsave();
+	// save file into the db
+	$newFile->dbsave();
 
-		// Prepare the uploaded file to the final format ( E.g. Resize and Rotate images )
-		prepare_uploaded_files( array( $newFile ) );
+	// Prepare the uploaded file to the final format ( E.g. Resize and Rotate images )
+	prepare_uploaded_files( array( $newFile ) );
 
-		if( isset( $LinkOwner ) )
-		{ // Link the uploaded file to the object only if it is found in DB:
-			$LinkCache = & get_LinkCache();
-			do
-			{
-				$new_link_ID = $newFile->link_to_Object( $LinkOwner );
-				// Check if Link has been created really
-				$new_Link = & $LinkCache->get_by_ID( $new_link_ID, false, false );
-			}
-			while( empty( $new_Link ) );
-			$current_File = $newFile; // $current_File is used in the function link_actions() as global var
-		}
-
-		$message = '';
-		if( ! empty( $oldFile_thumb ) )
+	if( isset( $LinkOwner ) )
+	{ // Link the uploaded file to the object only if it is found in DB:
+		$LinkCache = & get_LinkCache();
+		do
 		{
-			$image_info = getimagesize( $newFile->get_full_path() );
-			if( $image_info )
-			{
-				$newFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
-			}
-			else
-			{
-				$newFile_thumb = $newFile->get_size_formatted();
-			}
-			$message .= '<br />';
-			$message .= sprintf( T_('%s was renamed to %s. Would you like to replace %s with the new version instead?'),
-								'&laquo;'.$oldName.'&raquo;', '&laquo;'.$newName.'&raquo;', '&laquo;'.$oldName.'&raquo;' );
-			$message .= '<div class="invalid" title="'.T_('File name changed.').'">';
-			$message .= '<input type="radio" name="Renamed_'.$newFile->ID.'" value="Yes" id="Yes_'.$newFile->ID.'"/>';
-			$message .= '<label for="Yes_'.$newFile->ID.'">';
-			$message .= sprintf( T_("Replace the old version %s with the new version %s and keep old version as %s."), $oldFile_thumb, $newFile_thumb, $newName ).'</label><br />';
-			$message .= '<input type="radio" name="Renamed_'.$newFile->ID.'" value="No" id="No_'.$newFile->ID.'" checked="checked"/>';
-			$message .= '<label for="No_'.$newFile->ID.'">';
-			$message .= sprintf( T_("Don't touch the old version and keep the new version as %s."), $newName ).'</label><br />';
-			$message .= '</div>';
+			$new_link_ID = $newFile->link_to_Object( $LinkOwner );
+			// Check if Link has been created really
+			$new_Link = & $LinkCache->get_by_ID( $new_link_ID, false, false );
 		}
+		while( empty( $new_Link ) );
+		$current_File = $newFile; // $current_File is used in the function link_actions() as global var
+	}
 
-		$warning = '';
-		if( $Messages->count > 0 )
-		{ // Some errors/info messages can be created during prepare_uploaded_files()
-			$warning .= $Messages->display( NULL, NULL, false );
-		}
-
-		if( ! empty( $message ) )
-		{ // There is an error message on uploading
-			$FileCache = & get_FileCache();
-			$old_File = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash( $path ).$oldName, true );
-
-			$message .= '<input type="hidden" name="renamedFiles['.$newFile->ID.'][newName]" value="'.$newName.'" />'.
-				'<input type="hidden" name="renamedFiles['.$newFile->ID.'][oldName]" value="'.$oldName.'" />';
-
-			$message = array(
-					'text'    => $message,
-					'status'  => 'rename',
-					'file'    => $newFile->get_preview_thumb( 'fulltype', array( 'init' => true ) ),
-					'old_rootrelpath' => $old_File->get_root_and_rel_path(),
-					'oldpath' => $old_File->get_root_and_rel_path(),
-				);
+	$message = '';
+	if( ! empty( $oldFile_thumb ) )
+	{
+		$image_info = getimagesize( $newFile->get_full_path() );
+		if( $image_info )
+		{
+			$newFile_thumb = $newFile->get_preview_thumb( 'fulltype' );
 		}
 		else
-		{ // Success uploading
-			$message = array(
-					'text'   => $newFile->get_preview_thumb( 'fulltype', array( 'init' => true ) ),
-					'status' => 'success',
-				);
-			report_user_upload( $newFile );
-		}
-
-		$creator = $newFile->get_creator();
-
-		$message['filetype'] = $newFile->get( 'type' );
-		$message['formatted_name'] = file_td_name( $newFile );
-		$message['new_rootrelpath'] = $newFile->get_root_and_rel_path();
-		$message['newpath'] = $newFile->get_root_and_rel_path();
-		$message['filesize'] = bytesReadable( $newFile->get_size() );
-
-		if( $UserSettings->get('fm_showtypes') )
 		{
-			$message['filetype'] = $newFile->get_type();
+			$newFile_thumb = $newFile->get_size_formatted();
 		}
-
-		if( $UserSettings->get('fm_showcreator') )
-		{
-			$message['creator'] = $creator ? $creator->get( 'login' ) : T_('Unknown');
-		}
-
-		if( $UserSettings->get( 'fm_showdownload' ) )
-		{
-			$message['downloads'] = 0;
-		}
-
-		if( $UserSettings->get('fm_showfsowner') )
-		{
-			$message['owner'] = $newFile->get_fsowner_name();
-		}
-
-		if( $UserSettings->get('fm_showfsgroup') )
-		{
-			$message['group'] = $newFile->get_fsgroup_name();
-		}
-
-		if( $UserSettings->get( 'fm_showdate' ) != 'no' )
-		{	// Get last modified datetime:
-			$message['file_date'] = file_td_lastmod( $newFile );
-		}
-
-		$message['file_actions'] = file_td_actions( $newFile );
-
-		$message['warning'] = $warning;
-		$message['path'] = $newFile->get_rdfp_rel_path();
-		$message['checkbox'] = '<span name="surround_check" class="checkbox_surround_init">'
-				.'<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"'
-				.' name="fm_selected[]" value="'.format_to_output( $newFile->get_rdfp_rel_path(), 'formvalue' ).'" id="cb_filename_u'.$newFile->ID.'" />'
-			.'</span>'
-			.'<input type="hidden" name="img_tag_u'.$newFile->ID.'" id="img_tag_u'.$newFile->ID.'"'
-				.' value="'.format_to_output( $newFile->get_tag(), 'formvalue' ).'" />';
-
-		if( ! empty( $new_Link ) )
-		{ // Send also the link data if it was created
-			$message['link_ID'] = $new_Link->ID;
-			$message['link_url'] = $newFile->get_view_link();
-			$message['link_preview'] = $new_Link->get_preview_thumb();
-			$message['link_actions'] = link_actions( $new_Link->ID, 'last', $link_owner_type );
-			$message['link_order'] = $new_Link->get( 'order' );
-			if( isset( $fm_mode ) && $fm_mode == 'file_select' )
-			{
-				$message['select_link_button'] = select_link_button( $new_Link->ID );
-			}
-			$mask_row = (object) array(
-					'link_ID'       => $new_Link->ID,
-					'file_ID'       => $newFile->ID,
-					'file_type'     => $newFile->get_file_type(),
-					'link_position' => $new_Link->get( 'position' ),
-				);
-			$message['link_position'] = display_link_position( $mask_row, $fm_mode != 'file_select', param( 'prefix', 'string' ) );
-		}
-
-		evo_uploader_result( $message );
-		// EXIT here.
+		$message .= '<br />';
+		$message .= sprintf( T_('%s was renamed to %s. Would you like to replace %s with the new version instead?'),
+							'&laquo;'.$oldName.'&raquo;', '&laquo;'.$newName.'&raquo;', '&laquo;'.$oldName.'&raquo;' );
+		$message .= '<div class="invalid" title="'.T_('File name changed.').'">';
+		$message .= '<input type="radio" name="Renamed_'.$newFile->ID.'" value="Yes" id="Yes_'.$newFile->ID.'"/>';
+		$message .= '<label for="Yes_'.$newFile->ID.'">';
+		$message .= sprintf( T_("Replace the old version %s with the new version %s and keep old version as %s."), $oldFile_thumb, $newFile_thumb, $newName ).'</label><br />';
+		$message .= '<input type="radio" name="Renamed_'.$newFile->ID.'" value="No" id="No_'.$newFile->ID.'" checked="checked"/>';
+		$message .= '<label for="No_'.$newFile->ID.'">';
+		$message .= sprintf( T_("Don't touch the old version and keep the new version as %s."), $newName ).'</label><br />';
+		$message .= '</div>';
 	}
+
+	$warning = '';
+	if( $Messages->count > 0 )
+	{ // Some errors/info messages can be created during prepare_uploaded_files()
+		$warning .= $Messages->display( NULL, NULL, false );
+	}
+
+	if( ! empty( $message ) )
+	{ // There is an error message on uploading
+		$FileCache = & get_FileCache();
+		$old_File = & $FileCache->get_by_root_and_path( $fm_FileRoot->type, $fm_FileRoot->in_type_ID, trailing_slash( $path ).$oldName, true );
+
+		$message .= '<input type="hidden" name="renamedFiles['.$newFile->ID.'][newName]" value="'.$newName.'" />'.
+			'<input type="hidden" name="renamedFiles['.$newFile->ID.'][oldName]" value="'.$oldName.'" />';
+
+		$message = array(
+				'text'    => $message,
+				'status'  => 'rename',
+				'file'    => $newFile->get_preview_thumb( 'fulltype', array( 'init' => true ) ),
+				'old_rootrelpath' => $old_File->get_root_and_rel_path(),
+				'oldpath' => $old_File->get_root_and_rel_path(),
+			);
+	}
+	else
+	{ // Success uploading
+		$message = array(
+				'text'   => $newFile->get_preview_thumb( 'fulltype', array( 'init' => true ) ),
+				'status' => 'success',
+			);
+		report_user_upload( $newFile );
+	}
+
+	$creator = $newFile->get_creator();
+
+	$message['filetype'] = $newFile->get( 'type' );
+	$message['formatted_name'] = file_td_name( $newFile );
+	$message['new_rootrelpath'] = $newFile->get_root_and_rel_path();
+	$message['newpath'] = $newFile->get_root_and_rel_path();
+	$message['filesize'] = bytesReadable( $newFile->get_size() );
+
+	if( $UserSettings->get('fm_showtypes') )
+	{
+		$message['filetype'] = $newFile->get_type();
+	}
+
+	if( $UserSettings->get('fm_showcreator') )
+	{
+		$message['creator'] = $creator ? $creator->get( 'login' ) : T_('Unknown');
+	}
+
+	if( $UserSettings->get( 'fm_showdownload' ) )
+	{
+		$message['downloads'] = 0;
+	}
+
+	if( $UserSettings->get('fm_showfsowner') )
+	{
+		$message['owner'] = $newFile->get_fsowner_name();
+	}
+
+	if( $UserSettings->get('fm_showfsgroup') )
+	{
+		$message['group'] = $newFile->get_fsgroup_name();
+	}
+
+	if( $UserSettings->get( 'fm_showdate' ) != 'no' )
+	{	// Get last modified datetime:
+		$message['file_date'] = file_td_lastmod( $newFile );
+	}
+
+	$message['file_actions'] = file_td_actions( $newFile );
+
+	$message['warning'] = $warning;
+	$message['path'] = $newFile->get_rdfp_rel_path();
+	$message['checkbox'] = '<span name="surround_check" class="checkbox_surround_init">'
+			.'<input title="'.T_('Select this file').'" type="checkbox" class="checkbox"'
+			.' name="fm_selected[]" value="'.format_to_output( $newFile->get_rdfp_rel_path(), 'formvalue' ).'" id="cb_filename_u'.$newFile->ID.'" />'
+		.'</span>'
+		.'<input type="hidden" name="img_tag_u'.$newFile->ID.'" id="img_tag_u'.$newFile->ID.'"'
+			.' value="'.format_to_output( $newFile->get_tag(), 'formvalue' ).'" />';
+
+	if( ! empty( $new_Link ) )
+	{ // Send also the link data if it was created
+		$message['link_ID'] = $new_Link->ID;
+		$message['link_url'] = $newFile->get_view_link();
+		$message['link_preview'] = $new_Link->get_preview_thumb();
+		$message['link_actions'] = link_actions( $new_Link->ID, 'last', $link_owner_type );
+		$message['link_order'] = $new_Link->get( 'order' );
+		if( isset( $fm_mode ) && $fm_mode == 'file_select' )
+		{
+			$message['select_link_button'] = select_link_button( $new_Link->ID );
+		}
+		$mask_row = (object) array(
+				'link_ID'       => $new_Link->ID,
+				'file_ID'       => $newFile->ID,
+				'file_type'     => $newFile->get_file_type(),
+				'link_position' => $new_Link->get( 'position' ),
+			);
+		$message['link_position'] = display_link_position( $mask_row, $fm_mode != 'file_select', param( 'prefix', 'string' ) );
+	}
+
+	evo_uploader_result( $message );
+	// EXIT here.
+}
 
 evo_uploader_error( T_('The file could not be saved!') );
 // EXIT here.
