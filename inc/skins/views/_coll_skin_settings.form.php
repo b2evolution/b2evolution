@@ -145,7 +145,10 @@ $buttons = array();
 if( $can_edit_skin_settings )
 {	// Display a button to update skin params only when if current User can edit this:
 	$buttons[] = array( 'submit', 'save', ( $mode == 'customizer' ? TB_('Apply Changes!') : TB_('Save Changes!') ), 'SaveButton', 'data-shortcut' => 'ctrl+s,command+s' );
-	$buttons[] = array( 'button', 'cancel', TB_('Cancel'), ( $mode == 'customizer' ? '' : 'ResetButton' ), 'location.reload()' );
+	if( $mode == 'customizer' )
+	{	// Display cancel button only on customizer mode:
+		$buttons[] = array( 'button', 'cancel', T_('Cancel'), '', 'location.reload()' );
+	}
 }
 
 if( $mode == 'customizer' )
