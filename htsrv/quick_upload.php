@@ -100,19 +100,12 @@ $allow_evo_stats = false;
 
 global $current_User;
 
-param( 'upload', 'boolean' );
 param( 'root_and_path', 'filepath' );
 param( 'blog', 'integer' );
 param( 'link_owner', 'string' );
 param( 'fm_mode', 'string' );
 // Use the glyph or font-awesome icons if requested by skin
 param( 'b2evo_icons_type', 'string', '' );
-
-if( ! $upload )
-{	// Don't try to upload if this param is not passed:
-	evo_uploader_error( 'Invalid upload param' ); // NO TRANS!!
-	// EXIT here.
-}
 
 // Check that this action request is not a CSRF hacked request:
 if( ! $Session->assert_received_crumb( 'file', false ) )
