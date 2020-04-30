@@ -12,18 +12,8 @@
  */
 jQuery( document ).ready( function()
 {
-	if( typeof( evo_init_markdown_toolbar_config ) == 'undefined' )
-	{	// Don't execute code below because no config var is found:
-		return;
-	}
-
-	var evo_init_markdown_toolbar_configs = Object.values( evo_init_markdown_toolbar_config );
-	for( var i = 0; i < evo_init_markdown_toolbar_configs.length; i++ )
-	{
-		var config = evo_init_markdown_toolbar_configs[i];
-
-		( function() {
-
+	window.evo_init_markdown_toolbar = function ( config )
+		{
 			window[config.js_prefix + 'markdown_btns'] = new Array();
 			window[config.js_prefix + 'markdown_open_tags'] = new Array();
 
@@ -295,6 +285,18 @@ jQuery( document ).ready( function()
 				};
 
 			window[config.js_prefix + 'markdown_toolbar']( config.toolbar_title + ': ' );
-		} )();
+		};
+
+	if( typeof( evo_init_markdown_toolbar_config ) != 'undefined' )
+	{
+		// Initialize each Markdown Toolbar instance:
+		var evo_temp_config = Object.values( evo_init_markdown_toolbar_config );
+		for( var i = 0; i < evo_temp_config.length; i++ )
+		{
+			( function() {
+				window.evo_init_markdown_toolbar( evo_temp_config[i] );
+			} )();
+		}
+		delete evo_temp_config;
 	}
 } );
