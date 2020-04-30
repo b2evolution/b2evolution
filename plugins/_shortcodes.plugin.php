@@ -102,7 +102,20 @@ class shortcodes_plugin extends Plugin
 				'toolbar_title'        => T_('Shortcodes'),
 			);
 
-		expose_var_to_js( 'shortcodes_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_shortcodes_toolbar_config' );
+		if( is_ajax_request() )
+		{
+			?>
+			<script>
+				jQuery( document ).ready( function() {
+						window.evo_init_shortcodes_toolbar( <?php echo evo_json_encode( $js_config ); ?> );
+					} );
+			</script>
+			<?php
+		}
+		else
+		{
+			expose_var_to_js( 'shortcodes_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_shortcodes_toolbar_config' );
+		}
 
 		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );

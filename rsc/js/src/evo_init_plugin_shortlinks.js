@@ -16,7 +16,6 @@ jQuery( document ).ready( function()
 		{
 			window.shortlinks_toolbar = function shortlinks_toolbar( title )
 				{
-					console.log( config );
 					var r = config.toolbar_title_before + title + config.toolbar_title_after
 							+ config.toolbar_group_before
 							+ '<input type="button" title="' + config.button_title + '"'
