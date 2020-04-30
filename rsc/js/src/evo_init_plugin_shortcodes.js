@@ -67,7 +67,7 @@ jQuery( document ).ready( function()
 
 	if( typeof( evo_init_shortcodes_toolbar_config ) != 'undefined' )
 	{
-		// Initialize each Markdown Toolbar instance:
+		// Initialize each Shortcodes toolbar instance:
 		var evo_temp_config = Object.values( evo_init_shortcodes_toolbar_config );
 		for( var i = 0; i < evo_temp_config.length; i++ )
 		{

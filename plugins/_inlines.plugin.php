@@ -198,7 +198,10 @@ class inlines_plugin extends Plugin
 			$insert_inline_params['temp_ID'] = $temp_ID;
 		}
 
-		$inlines_toolbar_config = array(
+		$js_config = array(
+			'prefix'               => $params['js_prefix'],
+			'plugin_code'          => $this->code,
+
 			'target_ID'            => empty( $target_ID ) ? NULL : format_to_js( $target_ID ),
 			'temp_ID'              => empty( $temp_ID ) ? NULL : format_to_js( $temp_ID ),
 			'target_type'          => format_to_js( $params['target_type'] ),
@@ -207,22 +210,31 @@ class inlines_plugin extends Plugin
 			'toolbar_title_after'  => format_to_js( $this->get_template( 'toolbar_title_after' ) ),
 			'toolbar_group_before' => format_to_js( $this->get_template( 'toolbar_group_before' ) ),
 			'toolbar_group_after'  => format_to_js( $this->get_template( 'toolbar_group_after' ) ),
-			'plugin_code'          => $this->code,
+			'toolbar_title'        => T_('Inlines').': ',
+			
 			'button_title'         => T_('inline image'),
 			'button_class'         => $this->get_template( 'toolbar_button_class' ),
 
 			'insert_inline_url'    => $this->get_htsrv_url( 'insert_inline', $insert_inline_params, '&' ),
 		);
 
-		expose_var_to_js( 'evo_init_inlines_toolbar_config', json_encode( $inlines_toolbar_config ) );
+		if( is_ajax_request() )
+		{
+			?>
+			<script>
+				jQuery( document ).ready( function() {
+						window.evo_init_inlines_toolbar( <?php echo evo_json_encode( $js_config ); ?> );
+					} );
+			</script>
+			<?php
+		}
+		else
+		{
+			expose_var_to_js( 'inlines_toolbar_'.$params['js_prefix'], $js_config, 'evo_init_inlines_toolbar_config' );
+		}
 
-		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $this->code.'_toolbar' ) );
+		echo $this->get_template( 'toolbar_before', array( '$toolbar_class$' => $params['js_prefix'].$this->code.'_toolbar' ) );
 		echo $this->get_template( 'toolbar_after' );
-
-		expose_var_to_js( 'inlines_toolbar_'.$params['js_prefix'], array(
-				'title'  => T_('Inlines').':',
-				'prefix' => $params['js_prefix'] ),
-			'evo_init_inlines_toolbar' );
 		
 		return true;
 	}
