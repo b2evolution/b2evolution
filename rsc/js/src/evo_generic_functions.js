@@ -79,15 +79,11 @@ function evo_prevent_key_enter( selector )
 /**
  * Render comment ratings to star buttons
  */
-function evo_render_star_rating()
+function evo_render_star_rating( params )
 {
 	jQuery( '#comment_rating' ).each( function( index ) {
-		var raty_params = jQuery( 'span.raty_params', this );
-		if( raty_params )
-		{
-			jQuery( this ).html( '' ).raty( raty_params );
-		}
-	} );
+			jQuery( this ).html( '' ).raty( params );
+		} );
 }
 
 

@@ -3460,6 +3460,7 @@ class Comment extends DataObject
 		{	// Set item ID for form with new comment
 			$this->item_ID = $params['item_ID'];
 		}
+
 		if( $comment_Item = & $this->get_Item() )
 		{
 			if( $item_Blog = & $comment_Item->get_Blog() )
@@ -3474,7 +3475,6 @@ class Comment extends DataObject
 		}
 
 		echo '<div id="comment_rating">';
-
 		echo $params['label_low'];
 
 		for( $i=1; $i<=5; $i++ )
@@ -3489,6 +3489,15 @@ class Comment extends DataObject
 
 		echo $params['label_high'];
 
+		if( $params['reset'] )
+		{	// Init "reset" button
+			$raty_params['cancel'] = true;
+			$this->rating_none_input( array( 'before' => '<p>', 'after' => '</p>' ) );
+		}
+
+		echo '</div>';
+		echo $params['after'];
+
 		$raty_params = array(
 			'scoreName' => "comment_rating",
 			'start' => (int) $this->rating,
@@ -3502,21 +3511,20 @@ class Comment extends DataObject
 			'width' => 110,
 		);
 
-		if( $params['reset'] )
-		{	// Init "reset" button
-			$raty_params['cancel'] = true;
-			$this->rating_none_input( array( 'before' => '<p>', 'after' => '</p>' ) );
+		if( is_ajax_request() )
+		{
+			?>
+			<script>
+			jQuery( document ).ready( function() {
+					evo_render_star_rating( <?php echo evo_json_encode( $raty_params ); ?> );
+				} );
+			</script>
+			<?php
+		}	
+		else
+		{
+			expose_var_to_js( 'evo_comment_rating_config', evo_json_encode( $raty_params ) );
 		}
-
-		// This will be used by the JS function "evo_render_star_rating".
-		// This is a bit of a hack. There must be some more elegant way to store the params:
-		echo '<span class="raty_params" style="display:none">'.evo_json_encode( $raty_params ).'</span>';
-
-		echo '</div>';
-
-		expose_var_to_js( 'evo_comment_rating_config', true );
-
-		echo $params['after'];
 	}
 
 

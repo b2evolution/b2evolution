@@ -20,5 +20,5 @@ jQuery( document ).ready( function()
 
 	// This will only be run once when the document is ready. This will not render the
 	// star ratings for AJAX forms:
-	evo_render_star_rating();
+	evo_render_star_rating( evo_comment_rating_config );
 } );

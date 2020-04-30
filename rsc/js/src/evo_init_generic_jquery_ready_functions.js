@@ -112,13 +112,6 @@ jQuery( document ).ready( function()
 							success: function( result )
 								{
 									jQuery( form_id ).html( ajax_debug_clear( result ) );
-
-									if( config['json_params'].action == 'get_comment_form' )
-									{	// Call function to render the star ratings for AJAX comment forms:
-										evo_render_star_rating();
-
-										// Call function to initialize TinyMCE plugin:
-									}
 								},
 							error: function( jqXHR, textStatus, errorThrown )
 								{
