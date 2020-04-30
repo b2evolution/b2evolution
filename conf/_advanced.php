@@ -1008,7 +1008,7 @@ $use_defer_for_default_register_form = true;
 $use_defer_for_anonymous_disp_register = true;
 $use_defer_for_anonymous_disp_register_finish = false; // Temporarily disabled. Need to fix password related JS.
 $use_defer_for_anonymous_disp_users = false; // Temporarily disabled. Need to fix user_js.funcs.php JS.
-$use_defer_for_anonymous_disp_anonpost = false; // Erwin> I think we can use defer here as long as we use AJAX forms to load the item form.
+$use_defer_for_anonymous_disp_anonpost = true;
 
 $use_defer_for_loggedin_disp_single_page = true;
 $use_defer_for_loggedin_disp_front = true;
